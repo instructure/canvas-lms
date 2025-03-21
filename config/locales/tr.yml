@@ -2072,6 +2072,8 @@ tr:
   add_groups_a133e48c: "Grupları ekle"
   add_help_menu_links_de9fc34f: "Yardım menüsü bağlantılarını ekle"
   add_icon_567dbcaa: "simge ekle"
+  add_item_75b67d07: "Öğe Ekle"
+  add_item_to_module_3d7a05b2: "Modüle Bir Öğe Ekle"
   add_link_5c01c1e8: "Bağlantı Ekle"
   add_link_fc336ed6: "Bağlantı ekle"
   add_login_f871148: "Oturum Ekle"
@@ -2607,6 +2609,7 @@ tr:
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Bunu yapmak istediğinize emin misiniz? Bu işlem geri alınamaz ve not defterinde var olan notların üzerine yazılır."
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Tekrardan token yaratmak istediğinize emin misiniz? Yapacağınız değişiklikle birçok şeyi değiştirmek durumunda kalabilirsiniz."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Bu notlandırma peryodunu silmek istediğinize emin misiniz?"
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "Bu öğeyi modülden çıkarmak istediğinize emin misiniz?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Bu aracı kaldırmak istediğinize emin misiniz?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Bu kullanıcıyı silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Bu kullanıcının profil resmini silmek istediğinize emin misiniz?"
@@ -5576,6 +5579,7 @@ tr:
   continue_ac067716: Devam
   continue_typing_to_find_additional_sections_or_stu_49786085: "Daha fazla bölüm veya öğrenci bulmak için yazmaya devam edin."
   contribute_4730e633: "Katkı sağla"
+  contributed_fadcc2b9: "Katkı sağladı"
   contributed_to_this_module_item_and_is_complete_2799d5c: "Bu modül öğesine kaykı sağladı ve tamamlandı"
   conversation_dialog: 
     errors: 
@@ -7757,6 +7761,7 @@ tr:
   domain_is_required_1d4c8b25: "Alan adı gerekli"
   dominican_republic_1_3cef4021: "Dominik Cumhuriyeti (+1)"
   don_t_add_this_user_for_now_32912974: "Şimdilik bu kullanıcıyı ekleme."
+  don_t_indent_b35ae9fb: "İçeriden başlatma"
   don_t_move_lti_query_params_to_post_body_21744487: "LTI sorgu parametrelerini POST gövdesine taşıma"
   don_t_move_lti_query_params_to_post_body_5c80e037: "LTI Sorgu Parametrelerini POST Gövdesine taşıma"
   don_t_show_again_15d8253e: "bir daha gösterme"
@@ -8667,6 +8672,7 @@ tr:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "Araç bulunamadı"
   external_tools_6e77821: "Harici Araçlar"
+  external_url_4752767f: "Harici URL"
   external_url_e9b87215: "Harici URL"
   external_urls_62082a38: "Harici Web adresleri"
   extra_large_b6cdf1ff: "Ekstra Büyük"
@@ -10422,6 +10428,8 @@ tr:
   increase_indent_6af90f7c: "İçerden başlat"
   increase_indent_6d550a4a: "İçerden başlat"
   incremental_update_successfully_generated_against__db3f3f06: "Önceki ÖBS içeri aktarımına karşın artış içeren güncelleme başarıyla oluşturuldu."
+  indent_1_level_e7b18c1e: "1 Seviye İçeriden başlat"
+  indentation_3c6081d5: "İçeriden Başlat"
   india_91_6c290107: "Hindistan (+91)"
   indigo_2035fc55: Indigo
   individual_2033c005: Bireysel
@@ -13163,6 +13171,7 @@ tr:
   module_module_name_was_successfully_deleted_fc9e9d47: "%{module_name} modülü başarıyla silindi."
   module_name_1127ebdb: "Modül Adı"
   module_navigation_97043417: "Modül Gezinme"
+  module_options_24663bfb: "Modül Ayarları"
   modules: 
     add: 
       assignment: 
@@ -17301,6 +17310,7 @@ tr:
   schedule_student_availability_332154a: "Öğrenci uygunluğunu ayarla"
   scheduler_65b5ac91: Zamanlayıcı
   scheduling_5a3327e7: Zamanlanıyor
+  score_at_least_score_8668a54a: "En az %{score} puan alın"
   score_change_notifications_6b94f27f: "Puan değişikliği bildirimleri"
   score_details_2995369: "Puan Ayrıntıları"
   score_f7ac9e08: Puan
@@ -17309,6 +17319,7 @@ tr:
   score_out_of_points_possible_88f370fd: "%{points_possible} üzerinden %{score}"
   score_pts_adcb1af3: "%{score} puan"
   score_score_6f81e8c8: "Puan: %{score}"
+  scored_at_least_score_e2272f6d: "En az %{score} puan aldı"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -19226,6 +19237,7 @@ tr:
   text_document_eacbcdb7: "Metin belgesi"
   text_entry_e1808b2f: "Metin Girişi"
   text_entry_submission_cannot_be_empty_3d187cae: "Metin girişli gönderi boş olamaz"
+  text_header_48fa9c37: "Metin Başlığı"
   text_input_d3480b8c: "Metin Girişi"
   text_sms_4e2d82a7: "Metin (SMS)"
   thailand_66_5b3ef324: "Tayland (+66)"
@@ -20265,6 +20277,7 @@ tr:
   view_notifications_6aea09a2: "Bildirimleri Göster"
   view_previous_file_b846db4f: "Önceki dosyayı gör"
   view_prior_enrollments_9b519b25: "Öncei Ders Kayıtlarını Göster"
+  view_progress_2d61dd4: "İlerleme Durumunu Göster"
   view_question_banks_188a9e0f: "Soru Bankalarını Göster"
   view_registered_services_6c8cd301: "Kayıt Olunan Servisleri Göster"
   view_rubric_d71cce10: "Değerlendirme Listesini Göster"
