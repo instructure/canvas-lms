@@ -128,104 +128,122 @@ describe Lti::ToolFinder do
     end
   end
 
-  describe "find_external_tool" do
+  describe "from_url" do
+    subject { Lti::ToolFinder.from_url(url, context, preferred_tool_id:, exclude_tool_id:, preferred_client_id:, prefer_1_1:, only_1_3:) }
+
+    let(:url) { "http://www.google.com/is/cool" }
+    let(:context) { @course }
+    let(:preferred_tool_id) { nil }
+    let(:exclude_tool_id) { nil }
+    let(:preferred_client_id) { nil }
+    let(:prefer_1_1) { false }
+    let(:only_1_3) { false }
+
+    let(:tool) { @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret") }
+
     it "matches on the same domain" do
-      @tool = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://google.com/is/cool", Course.find(@course.id))
-      expect(@found_tool).to eql(@tool)
+      tool
+      expect(subject).to eql(tool)
     end
 
     context "when context is a course on a different shard" do
       specs_require_sharding
 
+      before { tool }
+
       it "matches on the same domain" do
-        @tool = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
         @shard2.activate do
-          @found_tool = ContextExternalTool.find_external_tool("http://google.com/is/cool", @course)
+          expect(subject).to eql(tool)
         end
-        expect(@found_tool).to eql(@tool)
       end
     end
 
     it "is case insensitive when matching on the same domain" do
-      @tool = @course.context_external_tools.create!(name: "a", domain: "Google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://google.com/is/cool", Course.find(@course.id), @tool.id)
-      expect(@found_tool).to eql(@tool)
+      tool.update!(domain: "Google.com")
+      expect(subject).to eql(tool)
     end
 
-    it "matches on a subdomain" do
-      @tool = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/is/cool", Course.find(@course.id))
-      expect(@found_tool).to eql(@tool)
+    context "with subdomain url" do
+      let(:url) { "http://www.google.com/is/cool" }
+
+      it "matches on a subdomain" do
+        tool
+        expect(subject).to eql(tool)
+      end
     end
 
     it "matches on a domain with a scheme attached" do
-      @tool = @course.context_external_tools.create!(name: "a", domain: "http://google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/is/cool", Course.find(@course.id))
-      expect(@found_tool).to eql(@tool)
+      tool.update!(domain: "http://google.com")
+      expect(subject).to eql(tool)
     end
 
     it "does not match on non-matching domains" do
       @tool = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @tool2 = @course.context_external_tools.create!(name: "a", domain: "www.google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://mgoogle.com/is/cool", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://mgoogle.com/is/cool", Course.find(@course.id))
       expect(@found_tool).to be_nil
-      @found_tool = ContextExternalTool.find_external_tool("http://sgoogle.com/is/cool", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://sgoogle.com/is/cool", Course.find(@course.id))
       expect(@found_tool).to be_nil
     end
 
     it "does not match on the closest matching domain" do
       @tool = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @tool2 = @course.context_external_tools.create!(name: "a", domain: "www.google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.www.google.com/is/cool", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.www.google.com/is/cool", Course.find(@course.id))
       expect(@found_tool).to eql(@tool2)
     end
 
-    it "matches on exact url" do
-      @tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com/coolness", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/coolness", Course.find(@course.id))
-      expect(@found_tool).to eql(@tool)
+    context "with exact url match" do
+      let(:url) { "http://www.google.com/coolness" }
+
+      before do
+        tool.update!(url:)
+      end
+
+      it "matches" do
+        expect(subject).to eql(tool)
+      end
     end
 
     it "matches on url ignoring query parameters" do
       @tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com/coolness", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/coolness?a=1", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com/coolness?a=1", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/coolness?a=1&b=2", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com/coolness?a=1&b=2", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
 
     it "matches on url even when tool url contains query parameters" do
       @tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com/coolness?a=1&b=2", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/coolness?b=2&a=1", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com/coolness?b=2&a=1", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/coolness?c=3&b=2&d=4&a=1", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com/coolness?c=3&b=2&d=4&a=1", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
 
     it "does not match on url if the tool url contains query parameters that the search url doesn't" do
       @tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com/coolness?a=1", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/coolness?a=2", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com/coolness?a=2", Course.find(@course.id))
       expect(@found_tool).to be_nil
     end
 
     it "does not match on url before matching on domain" do
       @tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com/coolness", consumer_key: "12345", shared_secret: "secret")
       @tool2 = @course.context_external_tools.create!(name: "a", domain: "www.google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/coolness", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com/coolness", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
 
     it "does not match on domain if domain is nil" do
       @tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com/coolness", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://malicious.domain./hahaha", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://malicious.domain./hahaha", Course.find(@course.id))
       expect(@found_tool).to be_nil
     end
 
     it "matches on url or domain for a tool that has both" do
       @tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com/coolness", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      expect(ContextExternalTool.find_external_tool("http://google.com/is/cool", Course.find(@course.id))).to eql(@tool)
-      expect(ContextExternalTool.find_external_tool("http://www.google.com/coolness", Course.find(@course.id))).to eql(@tool)
+      expect(Lti::ToolFinder.from_url("http://google.com/is/cool", Course.find(@course.id))).to eql(@tool)
+      expect(Lti::ToolFinder.from_url("http://www.google.com/coolness", Course.find(@course.id))).to eql(@tool)
     end
 
     it "finds the context's tool matching on url first" do
@@ -235,7 +253,7 @@ describe Lti::ToolFinder do
       @account.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @root_account.context_external_tools.create!(name: "e", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
       @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
 
@@ -245,7 +263,7 @@ describe Lti::ToolFinder do
       @account.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @root_account.context_external_tools.create!(name: "e", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
       @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
 
@@ -254,7 +272,7 @@ describe Lti::ToolFinder do
       @account.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @tool = @root_account.context_external_tools.create!(name: "e", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
       @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
 
@@ -262,30 +280,25 @@ describe Lti::ToolFinder do
       @tool = @course.context_external_tools.create!(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @account.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
 
     it "finds the nearest account's tool matching on domain if no url-matching tools are found" do
       @tool = @account.context_external_tools.create!(name: "c", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @root_account.context_external_tools.create!(name: "e", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
 
     it "finds the root account's tool matching on domain if no url-matching tools are found" do
       @tool = @root_account.context_external_tools.create!(name: "e", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/", Course.find(@course.id))
+      @found_tool = Lti::ToolFinder.from_url("http://www.google.com/", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
 
     context "when exclude_tool_id is set" do
-      subject { ContextExternalTool.find_external_tool("http://www.google.com", Course.find(course.id), nil, exclude_tool.id) }
-
-      let(:course) { @course }
-      let(:exclude_tool) do
-        course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-      end
+      let(:exclude_tool_id) { tool.id }
 
       it "does not return the excluded tool" do
         expect(subject).to be_nil
@@ -296,18 +309,18 @@ describe Lti::ToolFinder do
       it "finds the preferred tool if there are two matching-priority tools" do
         @tool1 = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
         @tool2 = @course.context_external_tools.create!(name: "b", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1.id)
+        @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @tool1.id)
         expect(@found_tool).to eql(@tool1)
-        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool2.id)
+        @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @tool2.id)
         expect(@found_tool).to eql(@tool2)
         @tool1.destroy
         @tool2.destroy
 
         @tool1 = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
         @tool2 = @course.context_external_tools.create!(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1.id)
+        @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @tool1.id)
         expect(@found_tool).to eql(@tool1)
-        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool2.id)
+        @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @tool2.id)
         expect(@found_tool).to eql(@tool2)
       end
 
@@ -315,7 +328,7 @@ describe Lti::ToolFinder do
         @tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
         @preferred = @root_account.context_external_tools.create!(name: "f", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
 
-        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
+        @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @preferred.id)
         expect(@found_tool).to eql(@preferred)
       end
 
@@ -327,7 +340,7 @@ describe Lti::ToolFinder do
         @account.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
         @root_account.context_external_tools.create!(name: "e", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
         @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
+        @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @preferred.id)
         expect(@found_tool).to eql(@tool)
       end
 
@@ -339,19 +352,19 @@ describe Lti::ToolFinder do
         @account.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
         @root_account.context_external_tools.create!(name: "e", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
         @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
+        @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @preferred.id)
         expect(@found_tool).to eql(@tool)
       end
 
       it "does not return preferred tool outside of context chain" do
         preferred = @root_account.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-        expect(ContextExternalTool.find_external_tool("http://www.google.com", @course, preferred.id)).to eq preferred
+        expect(Lti::ToolFinder.from_url("http://www.google.com", @course, preferred_tool_id: preferred.id)).to eq preferred
       end
 
       it "does not return preferred tool if url doesn't match" do
         c1 = @course
         preferred = c1.account.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-        expect(ContextExternalTool.find_external_tool("http://example.com", c1, preferred.id)).to be_nil
+        expect(Lti::ToolFinder.from_url("http://example.com", c1, preferred_tool_id: preferred.id)).to be_nil
       end
 
       it "finds preferred tool if url doesn't match but url's domain is a subdomain of the tool domain" do
@@ -359,13 +372,13 @@ describe Lti::ToolFinder do
         preferred = c1.account.context_external_tools.create!(name: "a", url: "http://www.google.com", domain: "example.com", consumer_key: "12345", shared_secret: "secret")
         # If we didn't favor the preferred tool, we would return this tool because it's in a closer context
         c1.context_external_tools.create!(name: "a", url: "http://www.google.com", domain: "example.com", consumer_key: "12345", shared_secret: "secret")
-        expect(ContextExternalTool.find_external_tool("http://subdomain.example.com", c1, preferred.id)).to eq(preferred)
+        expect(Lti::ToolFinder.from_url("http://subdomain.example.com", c1, preferred_tool_id: preferred.id)).to eq(preferred)
       end
 
       it "returns the preferred tool if the url is nil" do
         c1 = @course
         preferred = c1.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-        expect(ContextExternalTool.find_external_tool(nil, c1, preferred.id)).to eq preferred
+        expect(Lti::ToolFinder.from_url(nil, c1, preferred_tool_id: preferred.id)).to eq preferred
       end
 
       it "does not return preferred tool if it is 1.1 and there is a matching 1.3 tool" do
@@ -376,9 +389,9 @@ describe Lti::ToolFinder do
         @tool1_3.developer_key = developer_key
         @tool1_3.save!
 
-        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_1.id)
+        @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @tool1_1.id)
         expect(@found_tool).to eql(@tool1_3)
-        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_3.id)
+        @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @tool1_3.id)
         expect(@found_tool).to eql(@tool1_3)
         @tool1_1.destroy
         @tool1_3.destroy
@@ -388,9 +401,9 @@ describe Lti::ToolFinder do
         @tool1_3.lti_version = "1.3"
         @tool1_3.developer_key = developer_key
         @tool1_3.save!
-        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_1.id)
+        @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @tool1_1.id)
         expect(@found_tool).to eql(@tool1_3)
-        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_3.id)
+        @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @tool1_3.id)
         expect(@found_tool).to eql(@tool1_3)
       end
     end
@@ -418,13 +431,13 @@ describe Lti::ToolFinder do
       end
 
       it "picks up url in higher priority" do
-        tool = ContextExternalTool.find_external_tool("http://www.tool.com/launch?p1=2082", Course.find(@course.id))
+        tool = Lti::ToolFinder.from_url("http://www.tool.com/launch?p1=2082", Course.find(@course.id))
         expect(tool.tool_id).to eq("real")
       end
 
       context "and there is a difference in LTI version" do
         def find_tool(url, **opts)
-          ContextExternalTool.find_external_tool(url, context, **opts)
+          Lti::ToolFinder.from_url(url, context, **opts)
         end
 
         before do
@@ -490,15 +503,15 @@ describe Lti::ToolFinder do
       end
 
       it "preferred_tool_id has precedence over preferred_client_id" do
-        external_tool = ContextExternalTool.find_external_tool(
-          url, @course, tool1.id, nil, tool2.developer_key.id
+        external_tool = Lti::ToolFinder.from_url(
+          url, @course, preferred_tool_id: tool1.id, preferred_client_id: tool2.developer_key.id
         )
         expect(external_tool).to eq tool1
       end
 
       it "finds the tool based on developer key id" do
-        external_tool = ContextExternalTool.find_external_tool(
-          url, @course, nil, nil, tool2.developer_key.id
+        external_tool = Lti::ToolFinder.from_url(
+          url, @course, preferred_client_id: tool2.developer_key.id
         )
         expect(external_tool).to eq tool2
       end
@@ -524,7 +537,7 @@ describe Lti::ToolFinder do
       context "when original tool exists" do
         it "finds original tool" do
           tool
-          expect(ContextExternalTool.find_external_tool(url, @course)).to eq tool
+          expect(Lti::ToolFinder.from_url(url, @course)).to eq tool
         end
       end
 
@@ -535,7 +548,7 @@ describe Lti::ToolFinder do
         end
 
         it "finds duplicate tool" do
-          expect(ContextExternalTool.find_external_tool(url, @course)).to eq duplicate
+          expect(Lti::ToolFinder.from_url(url, @course)).to eq duplicate
         end
       end
 
@@ -549,7 +562,7 @@ describe Lti::ToolFinder do
         end
 
         it "finds tool with non-duplicate identity_hash" do
-          expect(ContextExternalTool.find_external_tool(url, @course)).to eq duplicate
+          expect(Lti::ToolFinder.from_url(url, @course)).to eq duplicate
         end
       end
 
@@ -562,7 +575,7 @@ describe Lti::ToolFinder do
         end
 
         it "finds duplicate tool" do
-          expect(ContextExternalTool.find_external_tool(url, @course)).to eq duplicate
+          expect(Lti::ToolFinder.from_url(url, @course)).to eq duplicate
         end
       end
     end
@@ -575,7 +588,7 @@ describe Lti::ToolFinder do
 
       context "when the matching tool is 1.1" do
         it "returns nil" do
-          expect(ContextExternalTool.find_external_tool(url, @course, only_1_3: true)).to be_nil
+          expect(Lti::ToolFinder.from_url(url, @course, only_1_3: true)).to be_nil
         end
       end
 
@@ -587,13 +600,13 @@ describe Lti::ToolFinder do
         end
 
         it "returns the tool" do
-          expect(ContextExternalTool.find_external_tool(url, @course, only_1_3: true)).to eq tool
+          expect(Lti::ToolFinder.from_url(url, @course, only_1_3: true)).to eq tool
         end
       end
     end
 
     context "with env-specific override urls" do
-      subject { ContextExternalTool.find_external_tool(given_url, @course) }
+      subject { Lti::ToolFinder.from_url(given_url, @course) }
 
       let(:given_url) { "http://example.beta.com/launch?foo=bar" }
       let(:tool) do
@@ -687,7 +700,7 @@ describe Lti::ToolFinder do
         end
 
         it "returns the closest matching tool" do
-          expect(ContextExternalTool.find_external_tool(url, @course, original_tool.id)).to eq closest_tool
+          expect(Lti::ToolFinder.from_url(url, @course, preferred_tool_id: original_tool.id)).to eq closest_tool
         end
       end
 
@@ -697,15 +710,15 @@ describe Lti::ToolFinder do
         end
 
         it "prefers tool from the same developer key" do
-          expect(ContextExternalTool.find_external_tool(url, @course, original_tool.id)).to eq matching_tool
+          expect(Lti::ToolFinder.from_url(url, @course, preferred_tool_id: original_tool.id)).to eq matching_tool
         end
       end
     end
   end
 
-  describe "find_and_order_tools" do
+  describe "potential_matching_tools" do
     subject do
-      Lti::ToolFinder.send(:find_and_order_tools, context: @course, preferred_tool_id:, exclude_tool_id:, preferred_client_id:, original_client_id:).to_a
+      Lti::ToolFinder.send(:potential_matching_tools, context: @course, preferred_tool_id:, original_client_id:).to_a
     end
 
     let(:tool1) { external_tool_model(context: @course, opts: { name: "tool1" }) }
@@ -713,8 +726,6 @@ describe Lti::ToolFinder do
     let(:tool3) { external_tool_model(context: @course, opts: { name: "tool3" }) }
     let(:tools) { [tool1, tool2, tool3] }
     let(:preferred_tool_id) { nil }
-    let(:exclude_tool_id) { nil }
-    let(:preferred_client_id) { nil }
     let(:original_client_id) { nil }
     let(:key) { DeveloperKey.create! }
 
@@ -731,52 +742,11 @@ describe Lti::ToolFinder do
       end
     end
 
-    context "when tool is deleted" do
-      before do
-        tool1.destroy
-      end
-
-      it "is not included" do
-        expect(subject).not_to include(tool1)
-      end
-    end
-
     context "when tool is from separate context" do
       let(:other_tool) { external_tool_model(context: Course.create!) }
 
       it "does not include tools from separate contexts" do
         expect(subject).not_to include(other_tool)
-      end
-    end
-
-    context "when exclude_tool_is is provided" do
-      let(:exclude_tool_id) { tool2.id }
-
-      it "does not include tool with that id" do
-        expect(subject).not_to include(tool2)
-      end
-    end
-
-    context "when preferred_client_id is provided" do
-      let(:key) { DeveloperKey.create! }
-      let(:other_key) { DeveloperKey.create! }
-      let(:preferred_client_id) { key.id }
-
-      before do
-        tool3.update!(developer_key: key)
-        tool1.update!(developer_key: other_key)
-      end
-
-      it "includes tool from that developer key" do
-        expect(subject).to include(tool3)
-      end
-
-      it "does not include a tool from other developer key" do
-        expect(subject).not_to include(tool1)
-      end
-
-      it "does not include tool without developer key" do
-        expect(subject).not_to include(tool2)
       end
     end
 
@@ -835,7 +805,7 @@ describe Lti::ToolFinder do
 
       context "when prefer_1_1 is true" do
         subject do
-          Lti::ToolFinder.send(:find_and_order_tools, context: @course, preferred_tool_id:, exclude_tool_id:, preferred_client_id:, prefer_1_1: true).to_a
+          Lti::ToolFinder.send(:potential_matching_tools, context: @course, preferred_tool_id:, prefer_1_1: true).to_a
         end
 
         it "sorts 1.1 tools to the front and 1.3 tools to the back" do
@@ -868,14 +838,11 @@ describe Lti::ToolFinder do
     end
 
     context "when closest matching tool is from a different developer key" do
-      let(:preferred_tool_id) { tool3.id }
       let(:original_client_id) { key.id }
 
       before do
-        # preferred tool is gone,
-        tool3.developer_key = key
-        tool3.save!
-        tool3.destroy!
+        # preferred tool is gone
+        tool3.delete
 
         # the tool we actually want is farther up in context chain
         tool1.context = @course.account
