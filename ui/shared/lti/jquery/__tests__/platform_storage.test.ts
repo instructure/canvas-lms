@@ -21,6 +21,7 @@ import {
   clearData,
   clearLimit,
   getData,
+  getKey,
   getLimit,
   putData,
   removeFromLimit,
@@ -33,7 +34,7 @@ describe('platform_storage', () => {
 
   beforeEach(() => {
     clearLimit(tool_id)
-    jest.clearAllMocks()
+    window.localStorage.clear()
   })
 
   describe('getLimit', () => {
@@ -128,57 +129,40 @@ describe('platform_storage', () => {
   })
 
   describe('putData', () => {
-    beforeEach(() => {
-      jest.spyOn(window.localStorage, 'setItem')
-    })
-
     it('namespaces key with tool id', () => {
       putData(tool_id, key, value)
-      expect(window.localStorage.setItem).toHaveBeenCalledWith(
-        `lti|platform_storage|${tool_id}|${key}`,
-        value,
-      )
+      expect(window.localStorage.getItem(getKey(tool_id, key))).toBe(value)
     })
   })
 
   describe('getData', () => {
     beforeEach(() => {
-      jest.spyOn(window.localStorage, 'getItem')
       putData(tool_id, key, value)
     })
 
     it('namespaces key with tool id', () => {
       getData(tool_id, key)
-      expect(window.localStorage.getItem).toHaveBeenCalledWith(
-        `lti|platform_storage|${tool_id}|${key}`,
-      )
+      expect(window.localStorage.getItem(getKey(tool_id, key))).toBe(value)
     })
   })
 
   describe('clearData', () => {
-    beforeEach(() => {
-      jest.spyOn(window.localStorage, 'removeItem')
-    })
-
     describe('when key does not exist', () => {
-      beforeEach(() => {
-        jest.spyOn(window.localStorage, 'getItem').mockReturnValue(null)
-      })
-
       it('does nothing', () => {
+        expect(window.localStorage.getItem(getKey(tool_id, key))).toBeNull()
         clearData(tool_id, key)
-        expect(window.localStorage.removeItem).not.toHaveBeenCalled()
+        expect(window.localStorage.getItem(getKey(tool_id, key))).toBeNull()
       })
     })
 
     describe('when key is already stored', () => {
       beforeEach(() => {
-        jest.spyOn(window.localStorage, 'getItem').mockReturnValue(value)
         putData(tool_id, key, value)
       })
 
       it('namespaces key with tool id', () => {
         clearData(tool_id, key)
+        expect(window.localStorage.getItem(getKey(tool_id, key))).toBeNull()
         expect(window.localStorage.removeItem).toHaveBeenCalledWith(
           `lti|platform_storage|${tool_id}|${key}`,
         )

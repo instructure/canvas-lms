@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import React from 'react'
 import ConfigurationForm from '../ConfigurationForm'
-import $ from 'jquery'
 
 describe('ConfigurationForm', () => {
   const renderConfigurationForm = (props = {}) => {
@@ -33,37 +32,8 @@ describe('ConfigurationForm', () => {
     return render(<ConfigurationForm {...defaultProps} {...props} />)
   }
 
-  beforeEach(() => {
-    // Mock jQuery's ajax method to prevent actual network requests
-    const mockJQueryResponse = {
-      done: jest.fn(function (callback) {
-        callback?.()
-        return this
-      }),
-      fail: jest.fn(function (_callback) {
-        return this
-      }),
-      always: jest.fn(function (callback) {
-        callback?.()
-        return this
-      }),
-      abort: jest.fn(),
-      state: () => 'resolved',
-      status: 200,
-      statusText: 'OK',
-      responseJSON: {},
-    }
-
-    $.ajax = jest.fn().mockReturnValue(mockJQueryResponse)
-
-    // Mock jQuery's animate method since we use it for scrolling
-    $.fn.animate = jest.fn()
-  })
-
   afterEach(() => {
-    document.body.innerHTML = ''
     jest.clearAllMocks()
-    jest.restoreAllMocks()
   })
 
   describe('form type rendering', () => {

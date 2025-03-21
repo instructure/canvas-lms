@@ -16,36 +16,48 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import handler from '../lti.put_data'
 import * as platformStorage from '../../platform_storage'
+import type {ResponseMessages} from '../../response_messages'
+import handler from '../lti.put_data'
 
 jest.mock('../../platform_storage')
 
+const mockedPlatformStorage = platformStorage as jest.Mocked<typeof platformStorage>
+
 describe('lti.put_data handler', () => {
-  let message
-  let responseMessages
-  let event
+  let message: Parameters<typeof handler>[0]['message']
+  let responseMessages: ResponseMessages
+  let event: MessageEvent
 
   beforeEach(() => {
     responseMessages = {
       sendBadRequestError: jest.fn(),
       sendResponse: jest.fn(),
+      sendSuccess: jest.fn(),
       sendError: jest.fn(),
+      sendGenericError: jest.fn(),
+      sendWrongOriginError: jest.fn(),
+      sendUnsupportedSubjectError: jest.fn(),
+      sendUnauthorizedError: jest.fn(),
+      isResponse: jest.fn(),
     }
-    event = {
+    event = new MessageEvent('message', {
       origin: 'http://example.com',
-    }
-    platformStorage.clearData.mockImplementation(() => {})
-    platformStorage.putData.mockImplementation(() => {})
+    })
+    mockedPlatformStorage.clearData.mockImplementation(() => {})
+    mockedPlatformStorage.putData.mockImplementation(() => {})
   })
 
   afterEach(() => {
-    platformStorage.clearData.mockRestore()
-    platformStorage.putData.mockRestore()
+    mockedPlatformStorage.clearData.mockRestore()
+    mockedPlatformStorage.putData.mockRestore()
   })
 
   describe('when key is not present', () => {
     beforeEach(() => {
+      // This code is used from JavaScript, so while we might know that the key has to be present,
+      // some JavaScript code might not know that.
+      // @ts-expect-error
       message = {message_id: 'any', value: 'world'}
     })
 
@@ -59,6 +71,9 @@ describe('lti.put_data handler', () => {
 
   describe('when message_id is not present', () => {
     beforeEach(() => {
+      // This code is used from JavaScript, so while we might know that the message_id has to be present,
+      // some JavaScript code might not know that.
+      // @ts-expect-error
       message = {key: 'hello', value: 'world'}
     })
 
@@ -72,6 +87,9 @@ describe('lti.put_data handler', () => {
 
   describe('when value is not present', () => {
     beforeEach(() => {
+      // This code is used from JavaScript, so while we might know that the value has to be present,
+      // some JavaScript code might not know that.
+      // @ts-expect-error
       message = {key: 'hello', message_id: 'any'}
     })
 
@@ -108,11 +126,12 @@ describe('lti.put_data handler', () => {
 
     beforeEach(() => {
       message = {key: 'hello', value: 'world', message_id: 'any'}
-      platformStorage.putData.mockRestore()
-      platformStorage.putData.mockImplementation(() => {
-        const e = new Error(errorMessage)
-        e.code = code
-        throw e
+      mockedPlatformStorage.putData.mockRestore()
+      mockedPlatformStorage.putData.mockImplementation(() => {
+        throw {
+          code,
+          message: errorMessage,
+        }
       })
     })
 
