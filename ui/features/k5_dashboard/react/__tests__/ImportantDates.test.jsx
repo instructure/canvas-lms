@@ -30,6 +30,7 @@ import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import {
   MOCK_ASSIGNMENTS,
   MOCK_EVENTS,
+  MOCK_SECTION_EVENTS,
   MOCK_OBSERVEE_EVENTS,
   MOCK_OBSERVEE_ASSIGNMENTS,
   IMPORTANT_DATES_CONTEXTS,
@@ -156,6 +157,13 @@ describe('ImportantDates', () => {
     const mathLink = getByText('Math HW')
     expect(mathLink).toBeInTheDocument()
     expect(mathLink.href).toBe('http://localhost:3000/courses/30/assignments/175')
+  })
+
+  it('filters events with children', async () => {
+    fetchMock.get(EVENTS_URL, MOCK_SECTION_EVENTS, {overwriteRoutes: true})
+    const {findByText, queryByText} = render(<ImportantDates {...getProps()} />)
+    expect(await findByText('Morning Yoga (Section A)')).toBeInTheDocument()
+    expect(await queryByText('Morning Yoga')).not.toBeInTheDocument()
   })
 
   it('shows close button if handleClose is provided', async () => {

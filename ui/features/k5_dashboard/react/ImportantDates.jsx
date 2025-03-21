@@ -162,7 +162,12 @@ const ImportantDates = ({
   )
 
   const dates = useMemo(
-    () => groupImportantDates(assignments, events, timeZone),
+    () =>
+      groupImportantDates(
+        assignments,
+        events?.filter(e => e.child_events_count === 0),
+        timeZone,
+      ),
     [assignments, events, timeZone],
   )
 

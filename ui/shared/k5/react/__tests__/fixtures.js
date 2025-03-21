@@ -199,7 +199,39 @@ export const MOCK_EVENTS = [
     start_at: '2021-06-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
     title: 'Morning Yoga',
     type: 'event',
+    child_events_count: 0,
+    child_events: [],
   },
+]
+
+const CHILD_EVENT = {
+  context_color: '#CCCCCC',
+  context_name: 'Biology',
+  html_url: 'http://localhost:3000/calendar?event_id=101&include_contexts=course_30',
+  id: '101',
+  important_dates: true,
+  start_at: '2021-06-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
+  title: 'Morning Yoga (Section A)',
+  type: 'event',
+  parent_event_id: '100',
+  child_events_count: 0,
+  child_events: [],
+}
+export const MOCK_SECTION_EVENTS = [
+  {
+    context_color: '#CCCCCC',
+    context_name: 'Biology',
+    html_url: 'http://localhost:3000/calendar?event_id=100&include_contexts=course_30',
+    id: '100',
+    important_dates: true,
+    start_at: '2021-06-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
+    title: 'Morning Yoga',
+    type: 'event',
+    parent_event_id: null,
+    child_events_count: 1,
+    child_events: [{...CHILD_EVENT}],
+  },
+  {...CHILD_EVENT},
 ]
 
 export const MOCK_ACCOUNT_CALENDAR_EVENT = {
@@ -211,6 +243,8 @@ export const MOCK_ACCOUNT_CALENDAR_EVENT = {
   start_at: '2021-06-29T07:00:00Z',
   title: 'Football Game',
   type: 'event',
+  child_events_count: 0,
+  child_events: [],
 }
 
 export const MOCK_OBSERVEE_EVENTS = [
@@ -223,6 +257,8 @@ export const MOCK_OBSERVEE_EVENTS = [
     start_at: '2021-10-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
     title: 'First Quiz',
     type: 'event',
+    child_events_count: 0,
+    child_events: [],
   },
 ]
 
