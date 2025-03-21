@@ -260,7 +260,7 @@ module Lti::Messages
     end
 
     def associated_1_1_tool
-      @associated_1_1_tool ||= @tool&.associated_1_1_tool(@context, target_link_uri)
+      @associated_1_1_tool ||= Lti::ToolFinder.associated_1_1_tool(@tool, @context, target_link_uri)
     end
 
     # Used to construct URLs for AGS endpoints like line item index, or line item show

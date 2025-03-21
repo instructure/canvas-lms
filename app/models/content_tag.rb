@@ -193,7 +193,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def set_content_from_external_tool
-    content = ContextExternalTool.find_external_tool(url, context)
+    content = Lti::ToolFinder.from_url(url, context)
     self.content = content if content
   end
 
@@ -730,7 +730,7 @@ class ContentTag < ActiveRecord::Base
       .where(id: ids)
       .preload(:associated_asset, :context)
       .find_each do |item|
-      possible_tool = ContextExternalTool.find_external_tool(item.url, item.context, nil, new_tool_id)
+      possible_tool = Lti::ToolFinder.from_url(item.url, item.context, exclude_tool_id: new_tool_id)
       next if possible_tool.nil? || possible_tool.id != tool_id
 
       yield item

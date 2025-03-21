@@ -97,7 +97,7 @@ module Lti::IMS::Concerns
       assignment = Assignment.find_by(lti_context_id: params[:resourceLinkId])
       raise ActiveRecord::RecordNotFound unless assignment
 
-      if tool == ContextExternalTool.from_content_tag(assignment.external_tool_tag, assignment)
+      if tool == Lti::ToolFinder.from_content_tag(assignment.external_tool_tag, assignment)
         assignment.migrate_to_1_3_if_needed!(tool)
         return
       end

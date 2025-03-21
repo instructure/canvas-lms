@@ -1350,7 +1350,7 @@ class AbstractAssignment < ActiveRecord::Base
       .find_each do |a|
         # again, look for the 1.1 tool by excluding the new tool from this query.
         # a (currently) unavoidable N+1, sadly
-        a_tool = ContextExternalTool.find_external_tool(a.external_tool_tag.url, a, nil, new_tool_id)
+        a_tool = Lti::ToolFinder.from_url(a.external_tool_tag.url, a, exclude_tool_id: new_tool_id)
         next if a_tool.nil? || a_tool.id != tool_id
 
         yield a
@@ -1487,7 +1487,7 @@ class AbstractAssignment < ActiveRecord::Base
   private :lti_1_3_external_tool_tag?
 
   def tool_from_external_tool_tag
-    @tool_from_external_tool_tag = ContextExternalTool.from_content_tag(
+    @tool_from_external_tool_tag = Lti::ToolFinder.from_content_tag(
       external_tool_tag,
       context
     )

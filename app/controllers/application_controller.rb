@@ -2205,7 +2205,7 @@ class ApplicationController < ActionController::Base
         @resource_title = @tag.title
       end
       @resource_url = @tag.url
-      @tool = ContextExternalTool.from_content_tag(tag, context)
+      @tool = Lti::ToolFinder.from_content_tag(tag, context)
 
       @assignment&.migrate_to_1_3_if_needed!(@tool)
       tag.migrate_to_1_3_if_needed!(@tool)

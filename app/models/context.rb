@@ -276,7 +276,7 @@ module Context
         tool_url = query_params["url"]&.first
         resource_link_lookup_uuid = query_params["resource_link_lookup_uuid"]&.first
         object = if tool_url
-                   ContextExternalTool.find_external_tool(tool_url, context)
+                   Lti::ToolFinder.from_url(tool_url, context)
                  elsif resource_link_lookup_uuid
                    Lti::ResourceLink.where(
                      lookup_uuid: resource_link_lookup_uuid,

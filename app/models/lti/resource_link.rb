@@ -74,10 +74,10 @@ class Lti::ResourceLink < ApplicationRecord
   end
 
   def current_external_tool(context)
-    ContextExternalTool.find_external_tool(
+    Lti::ToolFinder.from_url(
       original_context_external_tool.url || original_context_external_tool.domain,
       context,
-      original_context_external_tool.id,
+      preferred_tool_id: original_context_external_tool.id,
       only_1_3: true
     )
   end
@@ -88,7 +88,7 @@ class Lti::ResourceLink < ApplicationRecord
   )
     result = lookup_uuid.present? && context&.lti_resource_links&.find_by(lookup_uuid:)
     result || context&.shard&.activate do
-      context_external_tool ||= ContextExternalTool.find_external_tool(
+      context_external_tool ||= Lti::ToolFinder.from_url(
         context_external_tool_launch_url, context, only_1_3: true
       )
       new(

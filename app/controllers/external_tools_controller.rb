@@ -212,7 +212,7 @@ class ExternalToolsController < ApplicationController
                     end
     if resource_link.nil? || resource_link.url.nil?
       # If the resource_link doesn't have a url, then use the provided url to look up the tool
-      tool = ContextExternalTool.find_external_tool(provided_url, context, nil, nil, client_id, prefer_1_1:)
+      tool = Lti::ToolFinder.from_url(provided_url, context, preferred_client_id: client_id, prefer_1_1:)
       unless tool
         invalid_settings_error
       end
@@ -348,7 +348,7 @@ class ExternalToolsController < ApplicationController
       @lti_launch.analytics_id = launch_settings["analytics_id"]
 
       tool = ContextExternalTool.where(id: launch_settings.dig("metadata", "tool_id")).first ||
-             ContextExternalTool.find_external_tool(launch_settings["launch_url"], @context)
+             Lti::ToolFinder.from_url(launch_settings["launch_url"], @context)
       if tool
         placement = launch_settings.dig("metadata", "placement")
         launch_type = launch_settings.dig("metadata", "launch_type")&.to_sym
@@ -1292,7 +1292,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def jwt_token
-    tool = ContextExternalTool.find_external_tool(params[:tool_launch_url], @context, params[:tool_id])
+    tool = Lti::ToolFinder.from_url(params[:tool_launch_url], @context, preferred_tool_id: params[:tool_id])
 
     raise ActiveRecord::RecordNotFound if tool.nil?
 
@@ -1578,9 +1578,9 @@ class ExternalToolsController < ApplicationController
     if resource_link_lookup_uuid
       @tool = find_tool_and_url(resource_link_lookup_uuid, launch_url, context, nil).first
     elsif launch_url && module_item.blank?
-      @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
+      @tool = Lti::ToolFinder.from_url(launch_url, @context, preferred_tool_id: tool_id)
     elsif module_item
-      @tool = ContextExternalTool.from_content_tag(module_item, @context)
+      @tool = Lti::ToolFinder.from_content_tag(module_item, @context)
     else
       return unless find_tool(tool_id, launch_type)
     end
