@@ -251,6 +251,10 @@ $(document).ready(function () {
                   .end()
                   .find('.running_report_message')
                   .show()
+                // set focus to next input element
+                const nextRow = $(`#${reportName}`).next('tr')
+                const descButton = nextRow.find('button.open_report_description_link')
+                descButton.focus()
               }
 
               const setupJQuery = () => {
