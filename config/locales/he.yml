@@ -1968,6 +1968,8 @@ he:
   add_group_set_f9809e11: "הוספת אוסף קבוצות"
   add_help_menu_links_de9fc34f: "הוספת קישורי תפריט עזרה"
   add_icon_567dbcaa: "הוספת צלמית"
+  add_item_75b67d07: "הוספת פריט"
+  add_item_to_module_3d7a05b2: "הוספת פריט למודול"
   add_link_5c01c1e8: "הוספת קישור"
   add_link_fc336ed6: "הוספת קישור"
   add_login_f871148: "הוספת לוג-אין "
@@ -2462,6 +2464,7 @@ he:
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "בטוח/ה שרוצה לבצע פעולה זו? לא ניתן לשחזר זאת והפעולה תדרוס ציונים קיימים בספר הציונים."
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "בטוח/ה שרוצה לייצר מחדש את האסימון? כל מי שמשתמש בו יצטרך להתעדכן"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "בטוח/ה שרוצה להסיר את תקופת ההערכה הזו?"
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "בטוח/ה שרוצה להסיר פריט זה מהמודול?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "בטוח/ה שרוצה להסיר כלי זה?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "האם בטוחים שרוצים להסיר משתמש זה"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "האם את/ה בטוח/ה שאת/ה רוצה להסיר את תמונת פרופיל המשתמש הזו?"
@@ -5307,6 +5310,7 @@ he:
   continue_ac067716: המשך
   continue_typing_to_find_additional_sections_or_stu_49786085: "המשיכו להקליד כדי למצוא הקבצות או תלמידים נוספים "
   contribute_4730e633: תרום/י
+  contributed_fadcc2b9: נתרם
   contributed_to_this_module_item_and_is_complete_2799d5c: "המענה לפריט מודול זה הושלם"
   conversation_dialog: 
     message_sent: "הודעה נשלחה!"
@@ -7487,6 +7491,7 @@ he:
   domain_3b54c511: דומיין
   domain_is_required_1d4c8b25: "נדרש דומיין"
   don_t_add_this_user_for_now_32912974: "אין להוסיף משתמש זה כרגע"
+  don_t_indent_b35ae9fb: "אין לעמד"
   don_t_move_lti_query_params_to_post_body_5c80e037: "אין להעביר את הפרמטרים של שאילתת LTI  לגוף הPOST."
   don_t_show_again_15d8253e: "אין להציג שוב"
   done_54e3d4b6: בוצע
@@ -8405,6 +8410,7 @@ he:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "לא נמצאו כלים"
   external_tools_6e77821: "כלים חיצוניים"
+  external_url_4752767f: "כתובת דף חיצוני"
   external_url_e9b87215: "כתובת דף חיצונית"
   external_urls_62082a38: "כתובות אינטרנט חיצוניות"
   extreme_critical_emergency_80b3dbda: "מצב חירום קיצוני!"
@@ -10310,6 +10316,8 @@ he:
   increase_indent_6af90f7c: "הרחבת עימוד"
   increase_indent_6d550a4a: "הרחבת עימוד"
   incremental_update_successfully_generated_against__db3f3f06: "תהליך העדכון במנות נסתיים בהצלחה אל מול היבוא הקודם מהמערכת הבית ספרית"
+  indent_1_level_e7b18c1e: "עימוד רמה 1"
+  indentation_3c6081d5: עימוד
   india_91_6c290107: "הודו (+91)"
   indigo_2035fc55: אינדיגו
   individual_2033c005: "פרטני "
@@ -17252,6 +17260,7 @@ he:
   scheduling_5a3327e7: תיזמון
   school_of_rock_4b7b1fd0: "School of Rock"
   score_68107950: "%{score}%"
+  score_at_least_score_8668a54a: "הציון צריך להיות לפחות %{score}"
   score_change_notifications_6b94f27f: "התראות שינוי ציון"
   score_details_2995369: "פרטי ציונים"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
@@ -17267,6 +17276,7 @@ he:
   score_points_3c48e2a8: "%{score} נקודות"
   score_pts_adcb1af3: "%{score} נקודות"
   score_score_6f81e8c8: "ציון: %{score}"
+  scored_at_least_score_e2272f6d: "הושג לפחות %{score}"
   scored_less_than_2427896c: "הציון נמוך מ-"
   scored_less_than_cutoff_on_assignment_5f5c4303: "הציון נמוך מ-%{cutoff} עבור %{assignment}"
   scored_more_than_cutoff_on_assignment_f422fec: "הציון גבוה -%{cutoff}  עבור %{assignment}"
@@ -19332,6 +19342,7 @@ he:
   text_entry_e1808b2f: "הקלדת טקסט"
   text_entry_submission_7b0ae0c5: "הגשת מלל מוקלד"
   text_entry_submission_cannot_be_empty_3d187cae: "הגשת תוכן מילולי אינה יכולה להשאר ריקה"
+  text_header_48fa9c37: "תוכן כותרת"
   text_input_d3480b8c: "קלט מילולי"
   text_sms_4e2d82a7: "טקסט (מסרון)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "חשבון המשתמש בוטל. יש ליצור קשר עם מנהל המערכת שלך כדי שיפעיל את החשבון מחדש."
@@ -20569,6 +20580,7 @@ he:
   view_previous_file_b846db4f: "הצגת הקובץ הקודם"
   view_previous_student_90000459: "הצגת התלמיד הקודם"
   view_prior_enrollments_9b519b25: "הצגת הרשמות קודמות"
+  view_progress_2d61dd4: "צפיה בהתקדמות"
   view_question_banks_188a9e0f: "הצגת בנקי שאלות"
   view_range_student_details_8116d68a: "הצגת פרטי קבוצת תלמידים"
   view_registered_services_6c8cd301: "הצגת שרותים רשומים"
