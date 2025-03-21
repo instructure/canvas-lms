@@ -51,5 +51,13 @@ describe Login::LoginBrandConfigFilter do
       other_group = filtered_schema.find { |group| group["group_key"] == "another_group" }
       expect(other_group["variables"].pluck("variable_name")).to include("ic-brand-Another-variable")
     end
+
+    it "sets the default value for ic-brand-Login-logo to an empty string" do
+      filtered_schema = subject
+      login_group = filtered_schema.find { |group| group["group_key"] == "login" }
+      logo_variable = login_group["variables"].find { |v| v["variable_name"] == "ic-brand-Login-logo" }
+      expect(logo_variable).to include("default")
+      expect(logo_variable["default"]).to eq("")
+    end
   end
 end

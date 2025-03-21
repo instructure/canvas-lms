@@ -30,9 +30,18 @@ class Login::LoginBrandConfigFilter
     variable_schema.each do |group|
       next unless group["group_key"] == "login"
 
+      # remove disallowed login-related brand variables
       group["variables"].reject! do |variable|
         variable_name = variable["variable_name"]
         variable_name.start_with?("ic-brand-Login") && !ALLOWED_LOGIN_VARS.include?(variable_name)
+      end
+
+      # set default to "" for login logo to prevent legacy image from displaying
+      # this preserves the key to satisfy frontend prop type expectations
+      group["variables"].each do |variable|
+        if variable["variable_name"] == "ic-brand-Login-logo"
+          variable["default"] = ""
+        end
       end
     end
 
