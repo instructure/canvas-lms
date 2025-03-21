@@ -169,7 +169,7 @@ export const DiscussionTopicAlertManager = props => {
                 size={responsiveProps?.alert?.textSize}
               >
                 {I18n.t(
-                  'This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled at the root account level. To enable this functionality, please contact an administrator to activate the feature flag.',
+                  'This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled. To enable this functionality, please contact an administrator to activate the feature flag.',
                 )}
               </Text>
             </Alert>,
