@@ -3,20 +3,35 @@ services:
   web: &WEB
     build:
       context: .
-    links:
+    depends_on:
       - postgres
       - redis
     environment:
       POSTGRES_PASSWORD: sekret
+      DATABASE_URL: postgresql://canvas:sekret@postgres:5432/canvas_production
+      RAILS_ENV: development
+    ports:
+      - "3000:3000"  # Map container port 3000 to host port 3000
 
   jobs:
     <<: *WEB
     command: bundle exec script/delayed_job run
+    ports: []  # Jobs don’t need a port exposed
 
   postgres:
     build: ./docker-compose/postgres
     environment:
+      POSTGRES_USER: canvas
       POSTGRES_PASSWORD: sekret
+      POSTGRES_DB: canvas_production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persist database
 
   redis:
     image: redis:alpine
+    volumes:
+      - redis_data:/data  # Persist Redis data
+
+volumes:
+  postgres_data:
+  redis_data:
