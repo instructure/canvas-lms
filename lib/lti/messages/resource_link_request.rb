@@ -103,7 +103,7 @@ module Lti::Messages
         unless @assignment.external_tool?
           raise launch_error.new(nil, api_message: "Assignment not configured for external tool launches")
         end
-        unless ContextExternalTool.from_assignment(@assignment) == @tool
+        unless Lti::ToolFinder.from_assignment(@assignment) == @tool
           raise launch_error.new(nil, api_message: "Assignment not configured for launches with specified tool")
         end
 

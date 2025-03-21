@@ -217,8 +217,8 @@ RSpec.describe Lti::ResourceLink do
 
         it_behaves_like "creating a new resource link"
 
-        it "ContextExternalTool.find_external_tool to look up the tool" do
-          expect(ContextExternalTool).to receive(:find_external_tool)
+        it "Lti::ToolFinder.from_url to look up the tool" do
+          expect(Lti::ToolFinder).to receive(:from_url)
             .with(tool.url, context, only_1_3: true).and_call_original
           subject
         end

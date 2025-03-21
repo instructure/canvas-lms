@@ -433,7 +433,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     end
 
     it "throws an error if a matching external tool cannot be found" do
-      allow(ContextExternalTool).to receive(:find_external_tool).and_return(nil)
+      allow(Lti::ToolFinder).to receive(:from_url).and_return(nil)
       result = run_mutation(
         active_submission_type: "basic_lti_launch",
         attempt: 1,
@@ -445,7 +445,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     end
 
     it "saves the draft if lti_launch_url is present and external_tool_id points to a valid tool" do
-      allow(ContextExternalTool).to receive(:find_external_tool).and_return(external_tool)
+      allow(Lti::ToolFinder).to receive(:from_url).and_return(external_tool)
       result = run_mutation(
         active_submission_type: "basic_lti_launch",
         attempt: 1,
@@ -462,7 +462,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     end
 
     it "optionally saves a resource_link_lookup_uuid" do
-      allow(ContextExternalTool).to receive(:find_external_tool).and_return(external_tool)
+      allow(Lti::ToolFinder).to receive(:from_url).and_return(external_tool)
       uuid = SecureRandom.uuid
       result = run_mutation(
         active_submission_type: "basic_lti_launch",

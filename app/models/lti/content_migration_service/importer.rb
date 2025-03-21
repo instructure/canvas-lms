@@ -95,7 +95,7 @@ module Lti
         return @tool if @tool
 
         original_tool = ContextExternalTool.find(@original_tool_id)
-        @tool = ContextExternalTool.find_external_tool(original_tool.domain, @course, @original_tool_id).tap do |t|
+        @tool = Lti::ToolFinder.from_url(original_tool.domain, @course, preferred_tool_id: @original_tool_id).tap do |t|
           unless t&.content_migration_configured?
             raise "Unable to find external tool to import content."
           end

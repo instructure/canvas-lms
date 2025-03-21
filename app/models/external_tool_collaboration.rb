@@ -63,7 +63,7 @@ class ExternalToolCollaboration < Collaboration
   # @see Lti::Migratable
   def self.fetch_indirect_batch(tool_id, new_tool_id, ids)
     ExternalToolCollaboration.where(id: ids).find_each do |collaboration|
-      possible_tool = ContextExternalTool.find_external_tool(collaboration.url, collaboration.context, nil, new_tool_id)
+      possible_tool = Lti::ToolFinder.from_url(collaboration.url, collaboration.context, exclude_tool_id: new_tool_id)
       next if possible_tool.nil? || possible_tool.id != tool_id
 
       yield collaboration
