@@ -623,7 +623,7 @@ RSpec.configure do |config|
   config.after do |example|
     if %i[controller request].include?(example.metadata[:type]) &&
        example.exception &&
-       !(errors = @last_error_report_id.nil? ? ErrorReport.all.to_a : ErrorReport.where(id: @last_error_report_id).to_a).empty?
+       !(errors = @last_error_report_id.nil? ? ErrorReport.all.to_a : ErrorReport.where("id>?", @last_error_report_id).to_a).empty?
       errors.each do |er|
         example.set_exception(ErrorReportExceptionWrapper.new(er))
       end
