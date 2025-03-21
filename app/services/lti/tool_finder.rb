@@ -24,6 +24,13 @@ module Lti
   # For finding all tools available for a given context, use Lti::ContextToolFinder.
   class ToolFinder
     class << self
+      # Returns the ContextExternalTool associated with this assignment.
+      #
+      # Prefers the tool directly linked to the assignment's ContentTag
+      # if it uses LTI 1.3. Otherwise, searches using from_url.
+      #
+      # @param assignment [Assignment] an LTI assignment
+      # @return [ContextExternalTool] the tool associated with the assignment
       def from_assignment(assignment)
         tag = assignment.external_tool_tag
         return unless tag
@@ -31,6 +38,14 @@ module Lti
         from_content_tag(tag, assignment.context)
       end
 
+      # Returns the ContextExternalTool associated with this content tag.
+      #
+      # Prefers the tool directly linked to the ContentTag
+      # if it uses LTI 1.3. Otherwise, searches using from_url.
+      #
+      # @param tag [ContentTag] an LTI content item, like module item or assignment.external_tool_tag
+      # @param context [Context] the context in which the tag is being used
+      # @return [ContextExternalTool] the tool associated with the content tag
       def from_content_tag(tag, context)
         return nil if tag.blank? || context.blank?
 
@@ -50,20 +65,27 @@ module Lti
         )
       end
 
-      # Order of precedence: Basic LTI defines precedence as first
-      # checking for a match on domain.  Subdomains count as a match
-      # on less-specific domains, but the most-specific domain will
-      # match first.  So awesome.bob.example.com matches an
-      # external_tool with example.com as the domain, but only if
-      # there isn't another external_tool where awesome.bob.example.com
-      # or bob.example.com is set as the domain.
+      # Returns the ContextExternalTool that matches the given URL.
       #
-      # If there is no domain match then check for an exact url match
-      # as configured by an admin.  If there is still no match
-      # then check for a match on the current context (configured by
-      # the teacher).
+      # Given URL is compared against all potential tool matches available
+      # in the given context, sorted by the context chain (nearest first, so
+      # prefers tool installed in a Course vs a tool installed in an Account).
       #
-      # Tools with exclude_tool_id as their ID will never be returned.
+      # Matching checks against the tool's base URL, appropriate environment-specific
+      # URL overrides, and then the tool's domain. Tools are also sorted by most specific
+      # subdomains. A URL with "awesome.bob.example.com" will match a tool with a domain
+      # of "example.com" but only if there isn't also a potential matching tool with a
+      # domain of "awesome.bob.example.com" or "bob.example.com".
+      #
+      # @param url [String] the URL to match against
+      # @param context [Context] search in all contexts up the chain from this
+      # @param preferred_tool_id [Integer] Returns this tool if it matches the URL,
+      #   unless the tool is an LTI 1.1 tool and another matched tool is an LTI 1.3 tool.
+      # @param exclude_tool_id [Integer] Will never return this tool
+      # @param preferred_client_id [Integer] Matches only against tools from this registration
+      # @param only_1_3 [Boolean] Matches only against LTI 1.3 tools
+      # @param prefer_1_1 [Boolean] Sorts LTI 1.1 tools in front of LTI 1.3 tools
+      # @return [ContextExternalTool] the tool that matches the given URL
       def from_url(
         url,
         context,
@@ -82,18 +104,18 @@ module Lti
           return preferred_tool if url.blank? && can_use_preferred_tool
           return nil unless url
 
-          sorted_external_tools = find_and_order_tools(
+          potential_tools = potential_matching_tools(
             context:,
             preferred_tool_id:,
-            exclude_tool_id:,
-            preferred_client_id:,
             original_client_id:,
-            only_1_3:,
             prefer_1_1:
-          )
+          ).active
+          potential_tools = potential_tools.where(developer_key_id: preferred_client_id) if preferred_client_id
+          potential_tools = potential_tools.where.not(id: exclude_tool_id) if exclude_tool_id
+          potential_tools = potential_tools.where(lti_version: "1.3") if only_1_3
 
           # Check for a tool that exactly matches the given URL
-          match = find_matching_tool(url, sorted_external_tools)
+          match = find_matching_tool(url, potential_tools)
 
           # always use the preferred tool id *unless* the preferred tool is a 1.1 tool
           # and the matched tool is a 1.3 tool, since 1.3 is the preferred version of a tool
@@ -109,34 +131,21 @@ module Lti
         end
       end
 
+      # Finds an LTI 1.1 tool associated with the given LTI 1.3 tool.
+      #
+      # @param tool [ContextExternalTool] must be an LTI 1.3 tool
+      # @param context [Context] search in all contexts up the chain from this
+      # @param launch_url [String] the specific URL to match against
       def associated_1_1_tool(tool, context, launch_url)
         return nil unless launch_url && tool.use_1_3?
 
         # Finding tools is expensive and this relationship doesn't change very often, so
         # it's worth it to maintain this possibly "incorrect" relationship for 5 minutes.
+        # Rails themselves recommends against caching ActiveRecord models directly
+        # https://guides.rubyonrails.org/caching_with_rails.html#avoid-caching-instances-of-active-record-objects
         id = Rails.cache.fetch([tool.global_asset_string, context.global_asset_string, launch_url.slice(0..1024)].cache_key, expires_in: 5.minutes) do
-          # Rails themselves recommends against caching ActiveRecord models directly
-          # https://guides.rubyonrails.org/caching_with_rails.html#avoid-caching-instances-of-active-record-objects
           GuardRail.activate(:secondary) do
-            sorted_external_tools = context.shard.activate do
-              table_name = ContextExternalTool.quoted_table_name
-              contexts = Lti::ContextToolFinder.contexts_to_search(context)
-              context_order = contexts.map.with_index { |c, i| "(#{c.id},'#{c.class.polymorphic_name}',#{i})" }.join(",")
-
-              order_clauses = [
-                # prefer tools that are not duplicates
-                sort_by_sql_string("identity_hash != 'duplicate'"),
-                # prefer tools from closer contexts
-                "context_order.ordering",
-                # prefer tools with more subdomains
-                precedence_sql_string
-              ]
-              query = ContextExternalTool.where(context: contexts, lti_version: "1.1")
-              query.joins(ContextExternalTool.sanitize_sql("INNER JOIN (values #{context_order}) as context_order (context_id, class, ordering)
-              ON #{table_name}.context_id = context_order.context_id AND #{table_name}.context_type = context_order.class"))
-                   .order(Arel.sql(ContextExternalTool.sanitize_sql_for_order(order_clauses.join(","))))
-            end
-
+            sorted_external_tools = potential_matching_tools(context:).where(lti_version: "1.1")
             find_matching_tool(launch_url, sorted_external_tools)&.id
           end
         end
@@ -153,45 +162,36 @@ module Lti
       # Criteria:
       # * closer contexts preferred (Course over Account over Root Account etc)
       # * more specific subdomains preferred (sub.domain.instructure.com over instructure.com)
-      # * LTI 1.3 tools preferred over 1.1 tools
+      # * LTI 1.3 tools preferred over 1.1 tools unless prefer_1_1: true is provided
       # * if preferred_tool_id is provided, moves that tool to the front
-      # * if preferred_client_id is provided, only retrieves tools that came from that developer key
-      # * if exclude_tool_id is provided, does not retrieve that tool
+      # * if original_client_id is provided, sorts tools from that registration to the front
+      #     ahead of all other criteria
       #
       # Theoretically once this method is done, the very first tool to match the URL will be
       # the right tool, making it possible to eventually perform the rest of the URL matching
       # in SQL as well.
-      def find_and_order_tools(
+      def potential_matching_tools(
         context:,
         preferred_tool_id: nil,
-        exclude_tool_id: nil,
-        preferred_client_id: nil,
         original_client_id: nil,
-        only_1_3: false,
         prefer_1_1: false
       )
         context.shard.activate do
-          table_name = ContextExternalTool.quoted_table_name
-          preferred_tool_id = Shard.integral_id_for(preferred_tool_id)
-          contexts = Lti::ContextToolFinder.contexts_to_search(context)
-          context_order = contexts.map.with_index { |c, i| "(#{c.id},'#{c.class.polymorphic_name}',#{i})" }.join(",")
-
-          preferred_version = prefer_1_1 ? "1.1" : "1.3" # Hack required for one Turnitin case :( see git blame
-
           order_clauses = [
             # prefer 1.3 tools (unless told otherwise)
-            sort_by_sql_string("lti_version = '#{preferred_version}'"),
+            sort_by_sql_string("lti_version = '#{prefer_1_1 ? "1.1" : "1.3"}'"),
             # prefer tools that are not duplicates
             sort_by_sql_string("identity_hash != 'duplicate'"),
-            # prefer tools from closer contexts
+            # prefer tools from closer contexts, uses context_ordering_sql below
             "context_order.ordering",
             # prefer tools with more subdomains
             precedence_sql_string
           ]
-          # move preferred tool to the front when requested, and only if the id
-          # is in an actual id format
+
+          # move preferred tool to the front when requested, and id is well-formed
+          preferred_tool_id = Shard.integral_id_for(preferred_tool_id)
           if preferred_tool_id
-            order_clauses << sort_by_sql_string("#{table_name}.id = #{preferred_tool_id}")
+            order_clauses << sort_by_sql_string("#{ContextExternalTool.quoted_table_name}.id = #{preferred_tool_id}")
           end
 
           # prefer tools from the original developer key when requested,
@@ -201,14 +201,11 @@ module Lti
             order_clauses.prepend(sort_by_sql_string("developer_key_id = #{original_client_id}"))
           end
 
-          query = ContextExternalTool.where(context: contexts).active
-          query = query.where(lti_version: "1.3") if only_1_3
-          query = query.where(developer_key_id: preferred_client_id) if preferred_client_id
-          query = query.where.not(id: exclude_tool_id) if exclude_tool_id
-
-          query.joins(ContextExternalTool.sanitize_sql("INNER JOIN (values #{context_order}) as context_order (context_id, class, ordering)
-            ON #{table_name}.context_id = context_order.context_id AND #{table_name}.context_type = context_order.class"))
-               .order(Arel.sql(ContextExternalTool.sanitize_sql_for_order(order_clauses.join(","))))
+          contexts = Lti::ContextToolFinder.contexts_to_search(context)
+          ContextExternalTool
+            .where(context: contexts)
+            .joins(Lti::ContextToolFinder.context_ordering_sql(contexts))
+            .order(Arel.sql(ContextExternalTool.sanitize_sql_for_order(order_clauses.join(","))))
         end
       end
 

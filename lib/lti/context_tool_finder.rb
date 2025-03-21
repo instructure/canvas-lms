@@ -146,6 +146,24 @@ module Lti
       end
     end
 
+    # Produces an SQL fragment for ordering by context. This should be used
+    # in a JOIN clause and coupled with an "ORDER BY context_order.ordering" clause.
+    #
+    # @param contexts [Array<Context>] the context chain, usually from contexts_to_search
+    # @return [String] SQL fragment for ordering by context. use in .joins
+    def self.context_ordering_sql(contexts)
+      table_name = ContextExternalTool.quoted_table_name
+      context_order = contexts.map.with_index { |c, i| "(#{c.id},'#{c.class.polymorphic_name}',#{i})" }.join(",")
+
+      ContextExternalTool.sanitize_sql(
+        <<~SQL.squish
+          INNER JOIN (values #{context_order}) as context_order (context_id, class, ordering)
+          ON #{table_name}.context_id = context_order.context_id
+          AND #{table_name}.context_type = context_order.class
+        SQL
+      )
+    end
+
     private
 
     # Returns an array of scopes (which have no SQL order) for all tools.
@@ -175,12 +193,7 @@ module Lti
         end
 
         if @order_by_context
-          quoted_table_name = ContextExternalTool.quoted_table_name
-          context_order = contexts.map.with_index { |c, i| "(#{c.id},'#{c.class.polymorphic_name}',#{i})" }.join(",")
-          context_order_sql = ContextExternalTool.sanitize_sql("INNER JOIN (values #{context_order}) as context_order (context_id, class, ordering)
-            ON #{quoted_table_name}.context_id = context_order.context_id AND #{quoted_table_name}.context_type = context_order.class")
-
-          scope = scope.joins(context_order_sql).order("context_order.ordering")
+          scope = scope.joins(Lti::ContextToolFinder.context_ordering_sql(contexts)).order("context_order.ordering")
         end
 
         if @order_in_scope
