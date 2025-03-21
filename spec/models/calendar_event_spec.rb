@@ -1137,16 +1137,17 @@ describe CalendarEvent do
 
     context "cascading" do
       it "copies cascaded attributes when creating a child event" do
-        calendar_event_model(start_at: "Sep 3 2008", title: "some event")
+        calendar_event_model(start_at: "Sep 3 2008", title: "some event", important_dates: true)
         child = @event.child_events.build
         child.context = user_factory
         child.save!
         expect(child.start_at).to be_nil
         expect(child.title).to eql @event.title
+        expect(child.important_dates).to eql @event.important_dates
       end
 
       it "updates cascaded attributes on the child events whenever the parent is updated" do
-        calendar_event_model(start_at: "Sep 3 2008", title: "some event")
+        calendar_event_model(start_at: "Sep 3 2008", title: "some event", important_dates: false)
         child = @event.child_events.build
         child.context = user_factory
         child.save!
@@ -1154,9 +1155,11 @@ describe CalendarEvent do
         orig_start_at = child.start_at
 
         @event.title = "asdf"
+        @event.important_dates = true
         @event.start_at = Time.now.utc
         @event.save!
         expect(child.reload.title).to eql "asdf"
+        expect(child.important_dates).to be true
         expect(child.start_at).to eql orig_start_at
       end
 
