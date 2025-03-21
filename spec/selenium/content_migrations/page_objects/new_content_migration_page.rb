@@ -67,10 +67,6 @@ class NewContentMigrationPage
       fxpath('//*[text()="Select specific content"]')
     end
 
-    def progress_status_label
-      f('[data-testid="migrationStatus"]')
-    end
-
     def migration_file_upload_input
       f("#migrationFileUpload")
     end
@@ -201,6 +197,10 @@ class NewContentMigrationPage
 
     def new_end_date_input
       find_by_test_id("new_end_date")
+    end
+
+    def progress_status_label
+      f("[data-testid='migrationStatus']")
     end
 
     def select_day_substition_range(index, from_weekday, to_weekday)

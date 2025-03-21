@@ -844,6 +844,10 @@ describe ContentMigrationsController, type: :request do
       end
 
       context "is disabled" do
+        before do
+          Account.site_admin.disable_feature!(:instui_for_import_page)
+        end
+
         it "returns the migrators without external tools" do
           json = api_call(:get,
                           "/api/v1/courses/#{@course.id}/content_migrations/migrators",

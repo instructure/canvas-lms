@@ -183,7 +183,7 @@ export const CopyCourseForm = ({
       </Heading>
       <Text size="large">{I18n.t('Please enter the details for the new course.')}</Text>
       <View as="div" margin="large none none none" width="100%" maxWidth="28.75rem">
-        <View as="div" margin="medium none none none">
+        <View as="div" margin="medium none none none" data-testid="course-name">
           <ConfiguredTextInput
             label={I18n.t('Name')}
             inputValue={courseName}
@@ -192,7 +192,7 @@ export const CopyCourseForm = ({
             errorMessage={invalidCourseNameMessage}
           />
         </View>
-        <View as="div" margin="medium none none none">
+        <View as="div" margin="medium none none none" data-testid="course-code">
           <ConfiguredTextInput
             label={I18n.t('Course code')}
             inputValue={courseCode}
@@ -211,7 +211,7 @@ export const CopyCourseForm = ({
             searchable
           />
         </View>
-        <View as="div" margin="medium none none none">
+        <View as="div" margin="medium none none none" data-testid="course-start-date">
           <ConfiguredDateInput
             selectedDate={isoNewCourseStartDate}
             onSelectedDateChange={setNewCourseStartDate}
@@ -225,7 +225,7 @@ export const CopyCourseForm = ({
             infoMessage={disableStartEndDateMessage}
           />
         </View>
-        <View as="div" margin="medium none none none">
+        <View as="div" margin="medium none none none" data-testid="course-end-date">
           <ConfiguredDateInput
             selectedDate={isoNewCourseEndDate}
             onSelectedDateChange={setNewCourseEndDate}

@@ -38,6 +38,7 @@ describe "course copy" do
 
   before(:once) do
     Account.site_admin.disable_feature! :instui_for_import_page
+    Account.site_admin.disable_feature! :instui_for_course_copy_page
   end
 
   it "copies the course" do

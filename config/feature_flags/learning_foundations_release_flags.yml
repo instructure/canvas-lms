@@ -120,6 +120,11 @@ instui_for_import_page:
   description: |-
     If enabled, the course import page will use InstUI components
   applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 differentiated_files:
   state: hidden
