@@ -1657,6 +1657,8 @@ hy:
   add_group_c84f9e9d: "Ավելացնել խումբ"
   add_group_set_f9809e11: "Ավելացնել խմբերի շարք"
   add_icon_567dbcaa: "ավելացնել պատկերանշան"
+  add_item_75b67d07: "Ավելացնել տարր"
+  add_item_to_module_3d7a05b2: "Տարր ավելացնել մոդուլին"
   add_login_f871148: "Ավելացնել մուտքանուն"
   add_moderator_review_copy_1st_a484c813: "Ավելացնել մոդերատորի կարգավիճակ ունեցող կարծիք ներկայացող (1-ին պատճե)"
   add_moderator_review_copy_2nd_e80d458f: "Ավելացնել մոդերատորի կարգավիճակ ունեցող կարծիք ներկայացնող (2-րդ պատճե)"
@@ -1964,6 +1966,7 @@ hy:
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Դուք իսկապե՞ս ցանկանում եք ապաակտիվացնել այս օգտատիրոջը: Ապաակտիվացման դեպքում նա չի կարող մասնակցել դասընթացին:"
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Դուք իսկապե՞ս ցանկանում եք կրկին ստեղծել այս token-ը: Անհրաժեշտ կլինի թարմացնել token-ն օգտագործող ամեն ինչ:"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Դուք իսկապե՞ս ցանկանում եք ջնջել գնահատման այս ժամանակահատվածը:"
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "Դուք իսկապե՞ս ցանկանում եք հանել այս տարրը մոդուլից:"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս գործիքը:"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Դուք իսկապե՞ս ցանկանում եք հեռացնել այս օգտատիրոջ պրոֆիլի պատկերը:"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Դուք իսկապե՞ս ցանկանում եք հայտնել պրոֆիլի այս նկարի մասին:"
@@ -4450,6 +4453,7 @@ hy:
   continue_ac067716: Շարունակել
   continue_typing_to_find_additional_sections_or_stu_49786085: "Շարունակել մուտքագրել` լրացուցիչ բաժիններ կամ ունկնդիրներ գտնելու համար"
   contribute_4730e633: " Ներառել"
+  contributed_fadcc2b9: "Ներառված է"
   conversation_dialog: 
     errors: 
       field_is_required: "Անհրաժեշտ է լրացնել այս դաշտը"
@@ -6322,6 +6326,7 @@ hy:
   does_not_meet_expectations_b0736d20: "Չի համապատասխանում սպասումներին"
   domain_3b54c511: Դոմեն
   domain_is_required_1d4c8b25: "Անհրաժեշտ է նշել դոմենը"
+  don_t_indent_b35ae9fb: "Ներսի տողագլխից չսկսել"
   don_t_move_lti_query_params_to_post_body_21744487: "Մի տեղափոխեք LTI հարցման պարամետրերը POST տեսքտային մաս:"
   don_t_show_again_15d8253e: "Նորից ցույց չտալ"
   done_54e3d4b6: "Պատրաստ է"
@@ -7074,6 +7079,7 @@ hy:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "Գործիքներ չեն գտնվել"
   external_tools_6e77821: "Արտաքին գործիքներ"
+  external_url_4752767f: "Արտաքին URL-հասցե"
   external_url_e9b87215: "Արտաքին url"
   external_urls_62082a38: "Արտաքին URL հասցեներ "
   failed_307449e1: "Չհաջողված փորձ."
@@ -8566,6 +8572,8 @@ hy:
   incorrect_username_and_or_password_2de73abb: "Սխալ օգտատիրոջ անուն և/կամ գաղտնաբառ"
   increase_indent_6af90f7c: "Մեծացնել ներսի տողագլուխը"
   incremental_update_successfully_generated_against__db3f3f06: "Նախկինում SIS ներմուծման հիման վրա հաջողությամբ իրականացվել է լրացուցիչ թարմացում: "
+  indent_1_level_e7b18c1e: "Ներսի տողագլուխ 1 մակարդակ"
+  indentation_3c6081d5: "Ներսի տողագլուխ թողնել"
   indigo_2035fc55: Indigo
   individual_2033c005: Անհատ
   info: 
@@ -14883,6 +14891,7 @@ hy:
   score_of_score_view_in_speedgrader_a7c1c954: "%{score} միավոր: Դիտել «Արագ գնահատման համակարգ»-ում"
   score_out_of_points_possible_88f370fd: "%{points_possible} -ից  %{score} "
   score_score_6f81e8c8: "Գնահատական՝ %{score}"
+  scored_at_least_score_e2272f6d: "Գնահատված առնվազն %{score}"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -16678,6 +16687,7 @@ hy:
   text_document_eacbcdb7: "Տեքստային փաստաթուղթ"
   text_entry_e1808b2f: "Տեքստի մուտքագրում"
   text_entry_submission_cannot_be_empty_3d187cae: "Տեքստային դաշտը չի կարող դատարկ լինել"
+  text_header_48fa9c37: "Տեքստի վերնագիր"
   text_input_d3480b8c: "Տեքստի մուտք"
   text_sms_4e2d82a7: "Տեքստ (SMS)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Օգտատիրոջ այդ հաշիվը ջնջվել է: Խնդրում ենք դիմել ձեր համակարգի ադմինիստրատորին կրկին ակտիվացնելու ձեր հաշիվը:"
@@ -17646,6 +17656,7 @@ hy:
   view_next_file_a8a4a885: "Դիտել հաջորդ ֆայլը"
   view_notifications_6aea09a2: "Դիտել ծանուցումները"
   view_previous_file_b846db4f: "Դիտել նախորդ ֆայլը"
+  view_progress_2d61dd4: "Դիտել կատարման ընթացքը"
   view_question_banks_188a9e0f: "Դիտել հարցերի շտեմարանները"
   view_registered_services_6c8cd301: "Դիտել գրանցված ծառայությունները"
   view_rubric_d71cce10: "Դիտել ռուբրիկը"
