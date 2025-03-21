@@ -50,7 +50,7 @@ buttons_and_icons_root_account:
       state: hidden
 
 consolidated_media_player:
-  applies_to: Account
+  applies_to: SiteAdmin
   state: hidden
   display_name: Consolidated Media Player
   description: |-
