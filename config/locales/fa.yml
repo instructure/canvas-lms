@@ -2095,6 +2095,8 @@ fa:
   add_help_menu_links_de9fc34f: "افزودن پیوندهای منوی راهنما"
   add_hostname_as_an_allowed_domain_1f58c38d: "%{hostname} را به عنوان دامنه مجاز اضافه کنید"
   add_icon_567dbcaa: "افزودن نماد"
+  add_item_75b67d07: "افزودن مورد"
+  add_item_to_module_3d7a05b2: "افزودن مورد به ماژول"
   add_items_44913315: "افزودن مورد ها"
   add_items_into_scoring_range_title_be08104e: "افزودن مورد ها به %{scoring_range_title}"
   add_items_to_score_range_297d413b: "موارد را به محدوده امتیاز اضافه کنید"
@@ -3207,6 +3209,7 @@ fa:
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "آیا مطمئن هستید که می خواهید ادامه دهید؟ تغییراتی که ایجاد کرده اید ذخیره نمی شوند."
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "مطمئنید که می خواهید این نشانه دوباره ایجاد شود؟ هرچیزی که از این نشانه استفاده می کند باید بهنگام سازی شود."
   are_you_sure_you_want_to_remove_this_item_7887ce31: "آیا مطمئن هستید که می خواهید این مورد را حذف کنید؟"
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "مطمئنید که می خواهید این مورد از ماژول حذف شود؟"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "مطمئنید که می خواهید این ابزار حذف شود؟"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "مطمئنید که می خواهید این کاربر حذف شود؟"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "مطمئنید که می خواهید عکس رخ نمای این کاربر حذف شود؟"
@@ -6721,6 +6724,7 @@ fa:
   continue_draft_6166ea79: "ادامه پیش نویس"
   continue_typing_to_find_additional_sections_or_stu_49786085: "تایپ کردن برای یافتن بخش ها یا دانشجویان دیگر را ادامه دهید."
   contribute_4730e633: مشارکت
+  contributed_fadcc2b9: "مشارکت کرد"
   contributed_to_this_module_item_and_is_complete_2799d5c: "در این مورد ماژول مشارکت کرد و تکمیل شده است"
   conversation_dialog: 
     errors: 
@@ -9305,6 +9309,7 @@ fa:
   domains_count_max_a52b7947: " دامنه ها (%{max}/%{count})"
   dominican_republic_1_3cef4021: "جمهوری دومنیک (+1)"
   don_t_add_this_user_for_now_32912974: "اکنون این کاربر را اضافه نکنید."
+  don_t_indent_b35ae9fb: "عدم افزایش تورفتگی"
   don_t_miss_notifications_from_your_students_900e9e30: "اعلان های دانشجویان خود را از دست ندهید."
   don_t_move_lti_query_params_to_post_body_5c80e037: "پارامترهای جستجوی LTI به متن پست حرکت نکنند"
   don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "حاصل نتایج را در دفتر نمره تسلط یادگیری ارسال نکنید."
@@ -10454,6 +10459,7 @@ fa:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "ابزاری یافت نشد"
   external_tools_6e77821: "ابزارهای بیرونی"
+  external_url_4752767f: "نشانی اینترنتی بیرونی"
   external_url_e9b87215: "نشانی اینترنتی بیرونی"
   external_urls_62082a38: "نشانی های اینترنتی بیرونی"
   extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "امتیاز اضافی در نتایج مجاز نیست، نمره در حداکثر ممکن برای %{outcome}  تنظیم شده است."
@@ -12823,6 +12829,8 @@ fa:
   increase_indent_6af90f7c: "افزایش تورفتگی"
   increase_indent_6d550a4a: "افزایش تورفتگی"
   incremental_update_successfully_generated_against__db3f3f06: "بهنگام سازی صعودی با موفقیت در برابر ورود قبلی در سامانه اطلاعات دانشجو ایجاد شد."
+  indent_1_level_e7b18c1e: "تورفتگی به میزان 1 سطح"
+  indentation_3c6081d5: "افزایش تورفتگی"
   india_91_6c290107: "هند (+91)"
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "تصویر را فقط برای اهداف تزیینی نشان می دهد و نباید توسط صفحه خوان ها خوانده شود"
   indigo_2035fc55: Indigo
@@ -16014,6 +16022,7 @@ fa:
   module_module_name_was_successfully_deleted_fc9e9d47: "ماژول %{module_name} با موفقیت حذف شد."
   module_name_1127ebdb: "نام ماژول"
   module_navigation_97043417: "پیمایش ماژول"
+  module_options_24663bfb: "گزینه های ماژول"
   modules: 
     add: 
       assignment: 
@@ -20974,6 +20983,7 @@ fa:
   scheduling_5a3327e7: "در حال زمان بندی"
   scheduling_sync_3f4a7cac: "همگام سازی زمان بندی شده"
   school_of_rock_4b7b1fd0: "School of Rock"
+  score_at_least_score_8668a54a: "حداقل نمره %{score}"
   score_change_notifications_6b94f27f: "اطلاعیه های تغییر نمره"
   score_details_2995369: "اطلاعات نمره"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
@@ -20999,6 +21009,7 @@ fa:
   score_student_points_possible_points_78360e86: "نمره {{student_points}}/{{possible_points}}"
   score_to_ungraded_process_failed_e143fd1b: "امتیاز به فرآیند نمره دهی نشده انجام نشد"
   score_to_ungraded_process_finished_successfully_6689b418: "امتیاز به فرآیند نمره دهی نشده با موفقیت به پایان رسید"
+  scored_at_least_score_e2272f6d: "حداقل نمره %{score} کسب کرده اید"
   scored_less_than_2427896c: "نمره گذاری شده کمتر از"
   scored_less_than_cutoff_on_assignment_5f5c4303: "نمره گذاری شده کمتر از %{cutoff} در %{assignment}"
   scored_less_than_score_on_assignmenttitle_5a011033: "نمره گذاری شده کمتر از %{score} در %{assignmentTitle}"
@@ -23553,6 +23564,7 @@ fa:
   text_entry_e1808b2f: "ورودی متن"
   text_entry_submission_7b0ae0c5: "ارسال ورودی متن"
   text_entry_submission_cannot_be_empty_3d187cae: "مورد ارسالی ورود متن نمی تواند خالی باشد"
+  text_header_48fa9c37: "عنوان متن"
   text_input_d3480b8c: "ورودی متن"
   text_sms_4e2d82a7: "متن (پیامک)"
   thai_8f9bc548: تایلندی
@@ -25549,6 +25561,7 @@ fa:
   view_previous_student_90000459: "مشاهده دانشجوی قبلی"
   view_previous_submission_2b57bb85: "مشاهده مورد ارسالی قبلی"
   view_prior_enrollments_9b519b25: "مشاهده ثبت نام های قبلی"
+  view_progress_2d61dd4: "مشاهده پیشرفت"
   view_question_banks_188a9e0f: "مشاهده مخزن های پرسش"
   view_range_student_details_8116d68a: "مشاهده بازه بندی اطلاعات دانشجو"
   view_registered_services_6c8cd301: "نمایش سرویس های ثبت شده"
