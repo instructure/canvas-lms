@@ -609,9 +609,7 @@ module SpeedGrader
       return nil unless course.filter_speed_grader_by_student_group?
 
       group_id =
-        current_user
-        .get_preference(:gradebook_settings, course.global_id)
-        &.dig("filter_rows_by", "student_group_id")
+        current_user.get_latest_preference_setting_by_key(:gradebook_settings, course.global_id, "filter_rows_by", "student_group_ids")
 
       # If we selected a group that is now deleted, don't use it
       Group.active.where(id: group_id).exists? ? group_id : nil

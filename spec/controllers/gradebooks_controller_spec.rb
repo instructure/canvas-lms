@@ -3234,7 +3234,7 @@ describe GradebooksController do
               get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: @student }
               @teacher.reload
 
-              saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_id")
+              saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_ids")&.last
               expect(saved_group_id).to eq group1.id.to_s
             end
 
@@ -3247,11 +3247,25 @@ describe GradebooksController do
               get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: @student }
               expect(js_env[:student_group_reason_for_change]).to eq :no_group_selected
             end
+
+            it "clears all other group filters when there are multiple groups selected" do
+              new_student = @course.enroll_student(User.create!, enrollment_state: :active).user
+              group2 = group_category.groups.last
+              group_category.create_groups(1)
+              new_group = group_category.groups.last
+              new_group.add_user(new_student)
+              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_ids" => [group1.id, group2.id] } })
+
+              get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: new_student }
+              @teacher.reload
+              saved_group_ids = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_ids")
+              expect(saved_group_ids).to eq [new_group.id.to_s]
+            end
           end
 
           context "when the selected group stays the same" do
             before do
-              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_id" => group1.id } })
+              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_ids" => [group1.id] } })
             end
 
             it "sets selected_student_group to the selected group's JSON representation" do
@@ -3263,21 +3277,41 @@ describe GradebooksController do
               get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: @student }
               expect(js_env).not_to include(:student_group_reason_for_change)
             end
+
+            it "sets the selected_student_group to the most recently selected group when there are multiple groups selected" do
+              group2 = group_category.groups.last
+              second_student = @course.enroll_student(User.create!, enrollment_state: :active).user
+              group2.add_user(second_student)
+              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_ids" => [group1.id, group2.id] } })
+
+              get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: second_student }
+              expect(js_env.dig(:selected_student_group, "id")).to eq group2.id
+            end
           end
 
           context "when the selected group is cleared due to loading a student not in any group" do
             let(:groupless_student) { @course.enroll_student(User.create!, enrollment_state: :active).user }
 
             before do
-              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_id" => group1.id } })
+              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_ids" => [group1.id] } })
             end
 
             it "clears the selected group from the viewing user's preferences for the course" do
               get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: groupless_student }
               @teacher.reload
 
-              saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_id")
+              saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_ids")&.last
               expect(saved_group_id).to be_nil
+            end
+
+            it "clears all selected groups if multiple groups were selected" do
+              group2 = group_category.groups.last
+              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_ids" => [group1.id, group2.id] } })
+
+              get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: groupless_student }
+              @teacher.reload
+              saved_group_ids = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_ids")
+              expect(saved_group_ids).to be_empty
             end
 
             it "does not set selected_student_group" do
