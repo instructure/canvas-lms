@@ -79,6 +79,7 @@ export default class ConfigurationForm extends React.Component {
     registrationUrl: '',
     xml: '',
     allow_membership_service_access: false,
+    hasBeenSubmitted: false,
   })
 
   reset = () => {
@@ -95,6 +96,7 @@ export default class ConfigurationForm extends React.Component {
       registrationUrl: '',
       xml: '',
       allow_membership_service_access: false,
+      hasBeenSubmitted: false,
     })
   }
 
@@ -106,6 +108,7 @@ export default class ConfigurationForm extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault()
+    this.setState({hasBeenSubmitted: true})
     let form
     switch (this.state.configurationType) {
       case 'manual':
@@ -169,6 +172,7 @@ export default class ConfigurationForm extends React.Component {
           description={this.state.description}
           allowMembershipServiceAccess={this.state.allow_membership_service_access}
           membershipServiceFeatureFlagEnabled={this.props.membershipServiceFeatureFlagEnabled}
+          hasBeenSubmitted={this.state.hasBeenSubmitted}
         />
       )
     }
