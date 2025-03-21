@@ -17,11 +17,10 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import $ from 'jquery'
-import React from 'react'
 import PropTypes from 'prop-types'
-import ConfigurationFormLti13 from './ConfigurationFormLti13'
+import React from 'react'
 import ConfigurationFormLti2 from './ConfigurationFormLti2'
+import ConfigurationFormLti13 from './ConfigurationFormLti13'
 import ConfigurationFormManual from './ConfigurationFormManual'
 import ConfigurationFormUrl from './ConfigurationFormUrl'
 import ConfigurationFormXml from './ConfigurationFormXml'
@@ -143,7 +142,7 @@ export default class ConfigurationForm extends React.Component {
       formData = strip(formData)
       this.props.handleSubmit(this.state.configurationType, formData, e)
     } else {
-      $('.ReactModal__Overlay').animate({scrollTop: 0}, 'slow')
+      document.querySelector('.ReactModal__Body')?.scrollIntoView({behavior: 'smooth'})
     }
   }
 
