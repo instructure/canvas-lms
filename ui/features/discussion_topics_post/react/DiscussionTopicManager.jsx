@@ -49,6 +49,7 @@ import useNavigateEntries from './hooks/useNavigateEntries'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import DiscussionTopicToolbarContainer from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 import StickyToolbarWrapper from './containers/StickyToolbarWrapper/StickyToolbarWrapper'
+import $ from 'jquery'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -130,6 +131,8 @@ const DiscussionTopicManager = props => {
 
   const usedThreadingToolbarChildRef = useRef(null)
 
+  const previousSearchTerm = useRef(null);
+
   const [isSummaryEnabled, setIsSummaryEnabled] = useState(ENV.discussion_summary_enabled || false)
 
   const discussionManagerUtilities = {
@@ -162,7 +165,7 @@ const DiscussionTopicManager = props => {
   const urlParams = new URLSearchParams(window.location.search)
   const isPersistEnabled = urlParams.get('persist') === '1'
 
-  // Reset search to 0 when inactive
+  // Reset page number to 0 when inactive
   useEffect(() => {
     if (searchTerm && pageNumber !== 0) {
       setPageNumber(0)
@@ -236,6 +239,37 @@ const DiscussionTopicManager = props => {
     setFirstRequest(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [discussionTopicQuery])
+
+  // announce search entry count
+  useEffect(() => {
+    if (searchTerm && discussionTopicQuery.data) {
+      const searchEntryCount = discussionTopicQuery.data.legacyNode?.searchEntryCount || 0
+      setTimeout(() => {
+        $.screenReaderFlashMessageExclusive(
+          I18n.t(
+            {
+              one: '1 result found for %{searchTerm}',
+              other: '%{count} results found for %{searchTerm}',
+              zero: 'No results found for %{searchTerm}',
+            },
+            {
+              count: searchEntryCount,
+              searchTerm: searchTerm,
+            },
+          ),
+        )
+      }, 500)
+    }
+  }, [searchTerm, discussionTopicQuery])
+
+  useEffect(() => {
+    if (previousSearchTerm.current && !searchTerm) {
+      setTimeout(() => {
+        $.screenReaderFlashMessageExclusive(I18n.t("Search cleared. No filters applied."))
+      }, 500)
+    }
+    previousSearchTerm.current = searchTerm;
+  }, [searchTerm]);
 
   // Unread filter
   // This introduces a double query for DISCUSSION_QUERY when filter changes
