@@ -295,4 +295,76 @@ describe Types::ModuleItemType do
       expect(resolver.resolve("content { canUnpublish }")).to be true
     end
   end
+
+  context "blueprint courses" do
+    before do
+      @course_1 = Course.create!(name: "Course 1")
+      @course_2 = Course.create!(name: "Course 2")
+
+      @teacher_1 = User.create!(name: "Teacher 1")
+      @course_1.enroll_teacher(@teacher_1).accept!
+      @course_2.enroll_teacher(@teacher_1).accept!
+
+      @module_1 = @course_1.context_modules.create!(name: "Module the First", position: 1)
+      @original_assmt = @course_1.assignments.create!(
+        title: "blah", description: "bloo", points_possible: 27
+      )
+
+      @module_1.add_item({ type: "Assignment", id: @original_assmt.id }, nil, position: 1)
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@course_1)
+      @tag = @template.create_content_tag_for!(@original_assmt)
+
+      @module_2 = @course_2.context_modules.create!(name: "Module the First", position: 1)
+      @copy_assmt = @course_2.assignments.create!(
+        title: "blah", description: "bloo", points_possible: 27
+      )
+
+      @module_2.add_item({ type: "Assignment", id: @copy_assmt.id }, nil, position: 1)
+      @template.add_child_course!(@course_2)
+      @copy_assmt.migration_id = @tag.migration_id
+      @copy_assmt.save!
+
+      @module_item = ContentTag.find_by!(content_id: @original_assmt.id, context_id: @course_1.id)
+      @module_item_copy = ContentTag.find_by!(content_id: @copy_assmt.id, context_id: @course_2.id)
+    end
+
+    context "returns false" do
+      context "for the master course" do
+        it "isLockedByMasterCourse" do
+          resolver = GraphQLTypeTester.new(@module_item, current_user: @teacher_1)
+          expect(resolver.resolve("content { isLockedByMasterCourse }")).to be false
+        end
+      end
+
+      context "for the child course" do
+        it "isLockedByMasterCourse" do
+          resolver = GraphQLTypeTester.new(@module_item_copy, current_user: @teacher_1)
+          expect(resolver.resolve("content { isLockedByMasterCourse }")).to be false
+        end
+      end
+    end
+
+    context "returns true" do
+      before do
+        mc_tag = @template.content_tag_for(@original_assmt)
+        mc_tag.use_default_restrictions = true
+        mc_tag.restrictions = { content: true, points: true, due_dates: false, availability_dates: false }
+        mc_tag.save!
+      end
+
+      context "for the master course" do
+        it "isLockedByMasterCourse" do
+          resolver = GraphQLTypeTester.new(@module_item, current_user: @teacher_1)
+          expect(resolver.resolve("content { isLockedByMasterCourse }")).to be true
+        end
+      end
+
+      context "for the child course" do
+        it "isLockedByMasterCourse" do
+          resolver = GraphQLTypeTester.new(@module_item_copy, current_user: @teacher_1)
+          expect(resolver.resolve("content { isLockedByMasterCourse }")).to be true
+        end
+      end
+    end
+  end
 end
