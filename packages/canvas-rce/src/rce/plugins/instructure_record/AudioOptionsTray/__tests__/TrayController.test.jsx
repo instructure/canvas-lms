@@ -25,7 +25,6 @@ import AudioOptionsTrayDriver from './AudioOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 import bridge from '../../../../../bridge'
-import RCEGlobals from '../../../../RCEGlobals'
 
 const MOCK_AUDIO_PLAYERS = [
   {
@@ -50,7 +49,6 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
   let trayController
 
   beforeEach(() => {
-    RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
     createLiveRegion()
 
     const trayProps = {

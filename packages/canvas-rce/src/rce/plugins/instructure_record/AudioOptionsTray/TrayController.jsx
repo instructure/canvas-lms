@@ -22,7 +22,6 @@ import ReactDOM from 'react-dom'
 import bridge from '../../../../bridge'
 import {asAudioElement, findMediaPlayerIframe} from '../../shared/ContentSelection'
 import AudioOptionsTray from '.'
-import RCEGlobals from '../../../RCEGlobals'
 
 export const CONTAINER_ID = 'instructure-audio-options-tray-container'
 
@@ -87,7 +86,7 @@ export default class TrayController {
 
   _applyAudioOptions(audioOptions) {
     const hasAttachmentId =
-      RCEGlobals.getFeatures().media_links_use_attachment_id && audioOptions.attachment_id
+      audioOptions.attachment_id
 
     if (
       !hasAttachmentId &&
