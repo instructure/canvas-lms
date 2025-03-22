@@ -23,7 +23,6 @@ module Api::V1::SisImport
   include Api::V1::Attachment
   include Api::V1::User
   include Api::V1::SisImportError
-  include SisImportHelper
 
   def sis_imports_json(batches, user, session)
     SisBatch.load_downloadable_attachments(batches)
@@ -34,20 +33,12 @@ module Api::V1::SisImport
 
   def sis_import_json(batch, user, session, includes: [])
     json = api_json(batch, user, session)
-    if batch.errors_attachment_id
-      json[:errors_attachment] = attachment_json(
-        batch.errors_attachment,
-        user,
-        { verifier: sis_import_error_attachment_token(batch, user:) },
-        # skip permission checks since the context is a sis_import it will fail permission checks
-        { skip_permission_checks: true }
-      )
-    end
+    json[:errors_attachment] = attachment_json(batch.errors_attachment, user) if batch.errors_attachment_id
     json[:user] = user_json(batch.user, user, session) if batch.user
     atts = batch.downloadable_attachments(:uploaded)
-    json[:csv_attachments] = attachments_json(atts, user, {}, { skip_permission_checks: true }) if atts.any?
+    json[:csv_attachments] = attachments_json(atts, user) if atts.any?
     diff_atts = batch.downloadable_attachments(:diffed)
-    json[:diffed_csv_attachments] = attachments_json(diff_atts, user, {}, { skip_permission_checks: true }) if diff_atts.any?
+    json[:diffed_csv_attachments] = attachments_json(diff_atts, user) if diff_atts.any?
     json
   end
 end

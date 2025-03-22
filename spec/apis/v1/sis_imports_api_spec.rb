@@ -1148,20 +1148,39 @@ describe SisImportsApiController, type: :request do
     expect(json["errors_attachment"]["id"]).to eq batch.errors_attachment.id
   end
 
-  it "expires the errors_attachment after an hour" do
-    batch = @account.sis_batches.create!
-    batch.sis_batch_errors.create(root_account: @account, file: "users.csv", message: "some error", row: 1)
-    batch.finish(false)
-    json = api_call(:get,
-                    "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
-                    { controller: "sis_imports_api",
-                      action: "show",
-                      format: "json",
-                      account_id: @account.id.to_s,
-                      id: batch.id.to_s })
-    url_params = Rack::Utils.parse_query URI(json["errors_attachment"]["url"]).query
-    expiration = Time.zone.at(CanvasSecurity.decode_jwt(url_params["verifier"])[:exp])
+  shared_examples_for "disable_adding_uuid_verifier_in_api" do
+    it "verifier on errors_attachment" do
+      batch = @account.sis_batches.create!
+      batch.sis_batch_errors.create(root_account: @account, file: "users.csv", message: "some error", row: 1)
+      batch.finish(false)
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
+                      { controller: "sis_imports_api",
+                        action: "show",
+                        format: "json",
+                        account_id: @account.id.to_s,
+                        id: batch.id.to_s })
+      url_params = Rack::Utils.parse_query URI(json["errors_attachment"]["url"]).query
 
-    expect(expiration).to be_within(1.minute).of(1.hour.from_now)
+      expect(url_params["verifier"]).to eq @feature_on ? nil : batch.errors_attachment.uuid
+    end
+  end
+
+  context "when the disable_adding_uuid_verifier_in_api flag is on" do
+    before do
+      @feature_on = true
+      Account.default.enable_feature!(:disable_adding_uuid_verifier_in_api)
+    end
+
+    it_behaves_like "disable_adding_uuid_verifier_in_api"
+  end
+
+  context "when the disable_adding_uuid_verifier_in_api flag is off" do
+    before do
+      @feature_on = false
+      Account.default.disable_feature!(:disable_adding_uuid_verifier_in_api)
+    end
+
+    it_behaves_like "disable_adding_uuid_verifier_in_api"
   end
 end
