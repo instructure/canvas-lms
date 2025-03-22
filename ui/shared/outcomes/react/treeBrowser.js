@@ -221,42 +221,34 @@ const useTreeBrowser = queryVariables => {
       return
     }
 
-    client
-      .query({
-        query: CHILD_GROUPS_QUERY,
-        variables: {
-          id,
-          type: 'LearningOutcomeGroup',
-        },
-        fetchPolicy: 'network-only',
-      })
-      .then(({data}) => {
-        setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
-        addGroups(extractGroups(data.context))
-        addLoadedGroups([id])
-      })
-      .catch(err => {
-        setError(err.message)
-      })
+    getAllChildGroups({
+      client,
+      contextId: id,
+      contextType: 'LearningOutcomeGroup',
+    })
+    .then(({data}) => {
+      setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
+      addGroups(extractGroups(data.context))
+      addLoadedGroups([id])
+    })
+    .catch(err => {
+      setError(err.message)
+    })
   }
 
   const refetchGroup = id => {
-    client
-      .query({
-        query: CHILD_GROUPS_QUERY,
-        variables: {
-          id,
-          type: 'LearningOutcomeGroup',
-        },
-        fetchPolicy: 'network-only',
-      })
-      .then(({data}) => {
-        addGroups(extractGroups(data.context))
-        addLoadedGroups([id])
-      })
-      .catch(err => {
-        setError(err.message)
-      })
+    getAllChildGroups({
+      client,
+      contextId: id,
+      contextType: 'LearningOutcomeGroup',
+    })
+    .then(({data}) => {
+      addGroups(extractGroups(data.context))
+      addLoadedGroups([id])
+    })
+    .catch(err => {
+      setError(err.message)
+    })
   }
   const refetchGroupOutcome = (groupId, contextId, contextType) => {
     client.query({
@@ -411,55 +403,46 @@ export const useManageOutcomes = ({
   const fetchContextGroups = () => {
     if (initialGroupId) {
       setSelectedGroupId(initialGroupId)
-
-      client
-        .query({
-          query: CHILD_GROUPS_QUERY,
-          variables: {
-            id: initialGroupId,
-            type: 'LearningOutcomeGroup',
-          },
-          fetchPolicy: 'network-only',
-        })
-        .then(({data}) => {
-          setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
-          addGroups(extractGroups(data.context))
-          addLoadedGroups([initialGroupId])
-        })
-        .catch(err => {
-          setError(err.message)
-        })
+      getAllChildGroups({
+        client,
+        contextId: initialGroupId,
+        contextType: 'LearningOutcomeGroup',
+      })
+      .then(({data}) => {
+        setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
+        addGroups(extractGroups(data.context))
+        addLoadedGroups([initialGroupId])
+      })
+      .catch(err => {
+        setError(err.message)
+      })
     } else {
-      client
-        .query({
-          query: CHILD_GROUPS_QUERY,
+      getAllChildGroups({
+        client,
+        contextId,
+        contextType,
+      })
+      .then(({data}) => {
+        const rootGroup = data.context.rootOutcomeGroup
+        client.writeQuery({
+          query: CONTEXT_GROUPS_QUERY,
           variables: {
-            id: contextId,
-            type: contextType,
+            contextId,
+            contextType,
           },
-          fetchPolicy: 'network-only',
+          data: {
+            rootGroupId: rootGroup._id,
+          },
         })
-        .then(({data}) => {
-          const rootGroup = data.context.rootOutcomeGroup
-          client.writeQuery({
-            query: CONTEXT_GROUPS_QUERY,
-            variables: {
-              contextId,
-              contextType,
-            },
-            data: {
-              rootGroupId: rootGroup._id,
-            },
-          })
-          saveRootGroupId(rootGroup._id)
-          addGroups(extractGroups({...rootGroup, isRootGroup: true}))
-          if (lhsGroupId && lhsGroupId !== rootGroup._id && loadedGroups.includes(lhsGroupId)) {
-            removeFromLoadedGroups([lhsGroupId])
-          }
-        })
-        .catch(err => {
-          setError(err.message)
-        })
+        saveRootGroupId(rootGroup._id)
+        addGroups(extractGroups({...rootGroup, isRootGroup: true}))
+        if (lhsGroupId && lhsGroupId !== rootGroup._id && loadedGroups.includes(lhsGroupId)) {
+          removeFromLoadedGroups([lhsGroupId])
+        }
+      })
+      .catch(err => {
+        setError(err.message)
+      })
     }
   }
 
@@ -673,4 +656,43 @@ export const useTargetGroupSelector = ({skipGroupId, initialGroupId}) => {
     ...useManageOutcomesProps,
     queryCollections,
   }
+}
+
+export const getAllChildGroups = async ({client, contextId, contextType}) => {
+
+  const pickFn = {
+    'LearningOutcomeGroup': data => data.context.childGroups,
+    'Course': data => data.context.rootOutcomeGroup.childGroups,
+    'Account': data => data.context.rootOutcomeGroup.childGroups,
+  }[contextType] || (data => data)
+
+  const query = after => {
+    return client.query({
+      query: CHILD_GROUPS_QUERY,
+      variables: {
+        id: contextId,
+        type: contextType,
+        childGroupsCursor: after,
+      },
+      fetchPolicy: 'network-only',
+    })
+  }
+    const {data: initialData} = JSON.parse(JSON.stringify(await query(null)))
+
+  const groupConnection = pickFn(initialData)
+
+  while (true) {
+    const after = groupConnection?.pageInfo?.hasNextPage
+        && groupConnection?.pageInfo?.endCursor
+
+    if (!after) break
+
+    const {data: pagedData} = await query(after)
+
+    const pagedGroupConnection = pickFn(pagedData)
+    groupConnection.nodes = groupConnection.nodes.concat(pagedGroupConnection.nodes)
+    groupConnection.pageInfo = pagedGroupConnection.pageInfo
+  }
+
+  return {data: initialData}
 }
