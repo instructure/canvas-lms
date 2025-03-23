@@ -163,6 +163,7 @@ export const findModalMocks = ({
           type: 'Account',
           rootGroupId: includeGlobalRootGroup ? '1' : '0',
           includeGlobalRootGroup,
+          parentAccountsCursor: null,
         },
       },
       result: {
@@ -184,6 +185,7 @@ export const findModalMocks = ({
           type: 'Course',
           rootGroupId: '0',
           includeGlobalRootGroup: false,
+          parentAccountsCursor: null,
         },
       },
       result: {
