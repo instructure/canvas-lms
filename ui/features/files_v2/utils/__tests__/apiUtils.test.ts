@@ -31,43 +31,26 @@ jest.mock('@canvas/util/globalUtils', () => ({
 }))
 
 describe('generateFolderByPathUrl', () => {
-  describe('when showing all contexts', () => {
-    beforeAll(() => {
-      setupFilesEnv(true)
-    })
+  const expectedPluralContextType = 'courses'
+  const expectedContextId = '1'
 
-    it('returns correct url for user subfolder', () => {
-      const url = generateFolderByPathUrl('/users_1/profile pictures')
-      expect(url).toBe('/api/v1/users/1/folders/by_path/profile%20pictures')
-    })
-
-    it('returns correct url for course subfolder', () => {
-      const url = generateFolderByPathUrl('/courses_1/afolder/asubfolder')
-      expect(url).toBe('/api/v1/courses/1/folders/by_path/afolder/asubfolder')
-    })
-
-    it('returns the correct url when folder has uri characters', () => {
-      const url = generateFolderByPathUrl('/courses_1/some folder/this#could+be bad?maybe')
-      expect(url).toBe(
-        '/api/v1/courses/1/folders/by_path/some%20folder/this%23could%2Bbe%20bad%3Fmaybe',
-      )
-    })
+  it('returns correct url when no path is given', () => {
+    const url = generateFolderByPathUrl(expectedPluralContextType, expectedContextId)
+    expect(url).toBe(`/api/v1/${expectedPluralContextType}/${expectedContextId}/folders/by_path`)
   })
 
-  describe('when showing only course context', () => {
-    beforeAll(() => {
-      setupFilesEnv(false)
-    })
+  it('returns correct url for subfolder', () => {
+    const path = 'afolder/asubfolder'
+    const expectedPath = 'afolder/asubfolder'
+    const url = generateFolderByPathUrl(expectedPluralContextType, expectedContextId, path)
+    expect(url).toBe(`/api/v1/${expectedPluralContextType}/${expectedContextId}/folders/by_path/${expectedPath}`)
+  })
 
-    it('returns correct url for course subfolder', () => {
-      const url = generateFolderByPathUrl('/afolder/asubfolder')
-      expect(url).toBe('/api/v1/courses/1/folders/by_path/afolder/asubfolder')
-    })
-
-    it('returns the correct url when folder has uri characters', () => {
-      const url = generateFolderByPathUrl('/this#could+be bad?maybe')
-      expect(url).toBe('/api/v1/courses/1/folders/by_path/this%23could%2Bbe%20bad%3Fmaybe')
-    })
+  it('returns the correct url when path has uri characters', () => {
+    const path = 'some folder/this#could+be bad?maybe'
+    const expectedPath = 'some%20folder/this%23could%2Bbe%20bad%3Fmaybe'
+    const url = generateFolderByPathUrl(expectedPluralContextType, expectedContextId, path)
+    expect(url).toBe(`/api/v1/${expectedPluralContextType}/${expectedContextId}/folders/by_path/${expectedPath}`)
   })
 })
 
