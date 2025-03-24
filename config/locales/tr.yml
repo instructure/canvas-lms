@@ -4890,6 +4890,7 @@ tr:
   configuration_type_25a084a4: "Yapılandırma Türü"
   configure_ecb97e30: Yapılandır
   configure_individual_learning_paths_for_students_b_e2fce294: "Değerlendirme sonuçlarına göre öğrenciler için bireysel öğrenme süreçleri yapılandır"
+  configure_report_91ed07f9: "Raporu Yapılandır"
   configure_tool_app_3b1bb50b: "%{tool} Uygulaması Yapılandırılsın mı?"
   configure_toolname_app_651371be: "%{toolName} Uygulamasını Yapılandır"
   confirm_6556b3a6: Onayla
