@@ -97,6 +97,7 @@ const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) =
         {...buttonProps}
         disabled={disabled || hasPendingUploads || !contextType}
         onClick={handleUploadClick}
+        data-testid="upload-button"
       >
         {children}
       </Button>
