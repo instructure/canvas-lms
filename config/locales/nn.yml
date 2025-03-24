@@ -6760,6 +6760,7 @@ nn:
   configure_ecb97e30: Konfigurer
   configure_impact_integration_9bd1189f: "Konfigurer Impact-integrering"
   configure_individual_learning_paths_for_students_b_e2fce294: "Sett opp individuelle læringsstiar for studentar basert på resultat av vurdering"
+  configure_report_91ed07f9: "Konfigurer rapport"
   configure_tool_app_3b1bb50b: "Vil du konfigurere %{tool}-appen?"
   configure_toolname_app_651371be: "Konfigurer %{toolName}-appen"
   confirm_6556b3a6: Stadfest
