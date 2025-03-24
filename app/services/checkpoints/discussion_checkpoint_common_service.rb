@@ -67,6 +67,8 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
       submission_types
       title
       workflow_state
+      unlock_at
+      lock_at
     ]
   end
 
