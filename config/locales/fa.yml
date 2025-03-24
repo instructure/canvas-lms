@@ -6003,6 +6003,7 @@ fa:
   configure_ecb97e30: پیکربندی
   configure_impact_integration_9bd1189f: "یکپارچه سازی Impact را پیکربندی کنید"
   configure_individual_learning_paths_for_students_b_e2fce294: "بر اساس نتایج ارزیابی، مسیرهای یادگیری جداگانه ای را برای دانشجویان پیکربندی کنید."
+  configure_report_91ed07f9: "پیکربندی گزارش"
   configure_tool_app_3b1bb50b: "برنامه %{tool} پیکربندی شود؟"
   configure_toolname_app_651371be: "پیکربندی برنامه %{toolName}"
   confirm_6556b3a6: تأیید
