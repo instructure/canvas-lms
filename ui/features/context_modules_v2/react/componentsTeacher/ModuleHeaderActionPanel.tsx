@@ -33,6 +33,7 @@ import {
 import { Pill } from '@instructure/ui-pill'
 import {Prerequisite, CompletionRequirement} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
+import AddItemModal from './AddItemModalComponents/AddItemModal'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -44,7 +45,7 @@ interface ModuleHeaderActionPanelProps {
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
   handleOpeningModuleUpdateTray?: (moduleId?: string, moduleName?: string, prerequisites?: {id: string, name: string, type: string}[], openTab?: 'settings' | 'assign-to') => void
-  onAddItem?: (id: string, name: string) => void
+  itemCount?: number
 }
 
 const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
@@ -55,11 +56,12 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   completionRequirements,
   requirementCount = null,
   handleOpeningModuleUpdateTray,
-  onAddItem
+  itemCount
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDirectShareOpen, setIsDirectShareOpen] = useState(false)
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
+  const [isAddItemOpen, setIsAddItemOpen] = useState(false)
   const {courseId} = useContextModule()
 
   const onPublishCompleteRef = useCallback(() => {
@@ -68,70 +70,77 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
 
   return (
     <>
-    <Flex gap="small" alignItems="center" justifyItems="end" wrap='wrap'>
-      {prerequisites?.length && <Flex.Item>
-        <Text size="small" color="secondary">
-          {I18n.t('Prerequisites: %{prerequisiteModuleName}', { prerequisiteModuleName: prerequisites?.map?.(p => p.name).join(', ') || '' })}
-        </Text>
-      </Flex.Item>}
-      {completionRequirements?.length && <Flex.Item>
-        <Pill>
-          <Text size="medium" weight='bold'>
-            {requirementCount ? I18n.t('Complete One Item') : I18n.t('Complete All Items')}
+      <Flex gap="small" alignItems="center" justifyItems="end" wrap='wrap'>
+        {prerequisites?.length && <Flex.Item>
+          <Text size="small" color="secondary">
+            {I18n.t('Prerequisites: %{prerequisiteModuleName}', { prerequisiteModuleName: prerequisites?.map?.(p => p.name).join(', ') || '' })}
           </Text>
-        </Pill>
-      </Flex.Item>}
-      <Flex.Item>
-        <ContextModulesPublishIcon
-          courseId={courseId}
-          moduleId={id}
-          moduleName={name}
-          published={published}
-          isPublishing={false}
-          onPublishComplete={onPublishCompleteRef}
-        />
-      </Flex.Item>
-      <Flex.Item>
-        <IconButton
-          size="small"
-          screenReaderLabel={I18n.t("Add Item")}
-          renderIcon={IconPlusLine}
-          withBorder={false}
-          withBackground={true}
-          onClick={() => onAddItem?.(id, name)}
-        />
-      </Flex.Item>
-      <Flex.Item>
-        <ModuleActionMenu
-          isMenuOpen={isMenuOpen}
-          setIsMenuOpen={setIsMenuOpen}
-          id={id}
-          name={name}
-          prerequisites={prerequisites}
-          handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
-          setIsDirectShareOpen={setIsDirectShareOpen}
-          setIsDirectShareCourseOpen={setIsDirectShareCourseOpen}
-        />
-      </Flex.Item>
-    </Flex>
-    <DirectShareUserModal
-      open={isDirectShareOpen}
-      sourceCourseId={courseId}
-      courseId={courseId}
-      contentShare={{content_type: 'module', content_id: id}}
-      onDismiss={() => {
-        setIsDirectShareOpen(false)
-      }}
-    />
-    <DirectShareCourseTray
-      open={isDirectShareCourseOpen}
-      sourceCourseId={courseId}
-      courseId={courseId}
-      contentSelection={{modules: [id]}}
-      onDismiss={() => {
-        setIsDirectShareCourseOpen(false)
-      }}
-    />
+        </Flex.Item>}
+        {completionRequirements?.length && <Flex.Item>
+          <Pill>
+            <Text size="medium" weight='bold'>
+              {requirementCount ? I18n.t('Complete One Item') : I18n.t('Complete All Items')}
+            </Text>
+          </Pill>
+        </Flex.Item>}
+        <Flex.Item>
+          <ContextModulesPublishIcon
+            courseId={courseId}
+            moduleId={id}
+            moduleName={name}
+            published={published}
+            isPublishing={false}
+            onPublishComplete={onPublishCompleteRef}
+          />
+        </Flex.Item>
+        <Flex.Item>
+          <IconButton
+            size="small"
+            screenReaderLabel={I18n.t("Add Item")}
+            renderIcon={IconPlusLine}
+            withBorder={false}
+            withBackground={true}
+            onClick={() => setIsAddItemOpen(true)}
+          />
+        </Flex.Item>
+        <Flex.Item>
+          <ModuleActionMenu
+            isMenuOpen={isMenuOpen}
+            setIsMenuOpen={setIsMenuOpen}
+            id={id}
+            name={name}
+            prerequisites={prerequisites}
+            handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
+            setIsDirectShareOpen={setIsDirectShareOpen}
+            setIsDirectShareCourseOpen={setIsDirectShareCourseOpen}
+          />
+        </Flex.Item>
+      </Flex>
+      <DirectShareUserModal
+        open={isDirectShareOpen}
+        sourceCourseId={courseId}
+        courseId={courseId}
+        contentShare={{content_type: 'module', content_id: id}}
+        onDismiss={() => {
+          setIsDirectShareOpen(false)
+        }}
+      />
+      <DirectShareCourseTray
+        open={isDirectShareCourseOpen}
+        sourceCourseId={courseId}
+        courseId={courseId}
+        contentSelection={{modules: [id]}}
+        onDismiss={() => {
+          setIsDirectShareCourseOpen(false)
+        }}
+      />
+      <AddItemModal
+        isOpen={isAddItemOpen}
+        onRequestClose={() => setIsAddItemOpen(false)}
+        moduleName={name}
+        moduleId={id}
+        itemCount={itemCount || 0}
+      />
     </>
   )
 }

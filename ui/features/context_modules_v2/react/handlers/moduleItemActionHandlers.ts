@@ -68,7 +68,7 @@ export const handleEdit = (
   courseId: string,
   setIsMenuOpen?: (isOpen: boolean) => void
 ) => {
-  window.location.href = `/courses/${courseId}/modules/items/${itemId}/edit`
+  window.location.href = `/courses/${courseId}/modules/items/${itemId}`
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }

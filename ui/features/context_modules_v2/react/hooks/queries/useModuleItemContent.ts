@@ -31,7 +31,7 @@ export type ModuleItemContentType =
   | 'file'
   | 'page'
   | 'discussion'
-  | 'text_header'
+  | 'context_module_sub_header'
   | 'external_url'
   | 'external_tool'
 
@@ -363,7 +363,7 @@ function transformQueryResult(contentType: ModuleItemContentType, result: GraphQ
         })) || [],
         pageInfo: course?.externalToolsConnection?.pageInfo
       }
-    case 'text_header':
+    case 'context_module_sub_header':
       // Text headers don't need to fetch data
       return { items: [] }
     case 'external_url':
@@ -383,7 +383,7 @@ export async function getModuleItemContent({
   const [, contentType, courseId, searchTerm] = queryKey
 
   // Special cases that don't require API calls
-  if (contentType === 'text_header' || contentType === 'external_url') {
+  if (contentType === 'context_module_sub_header' || contentType === 'external_url') {
     return { items: [] }
   }
 
@@ -424,7 +424,7 @@ export function useModuleItemContent(
   return useQuery({
     queryKey: ['moduleItemContent', contentType, courseId, searchTerm],
     queryFn: getModuleItemContent,
-    enabled: enabled && contentType !== 'text_header' && contentType !== 'external_url',
+    enabled: enabled && contentType !== 'context_module_sub_header' && contentType !== 'external_url',
     staleTime: 10 * 60 * 1000, // 10 minutes
   })
 }

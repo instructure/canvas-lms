@@ -45,7 +45,7 @@ interface ModuleHeaderProps {
   ) => void
   requirementCount: number
   dragHandleProps?: any // For react-beautiful-dnd drag handle
-  onAddItem?: (id: string, name: string) => void
+  itemCount: number
 }
 
 const ModuleHeader: React.FC<ModuleHeaderProps> = ({
@@ -59,7 +59,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
   handleOpeningModuleUpdateTray,
   requirementCount,
   dragHandleProps,
-  onAddItem
+  itemCount
 }) => {
   const onToggleExpandRef = useCallback(() => {
     onToggleExpand(id)
@@ -108,8 +108,8 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             prerequisites={prerequisites}
             completionRequirements={completionRequirements}
             requirementCount={requirementCount || undefined}
-            onAddItem={onAddItem}
             handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
+            itemCount={itemCount}
           />
         </Flex.Item>
       </Flex>
