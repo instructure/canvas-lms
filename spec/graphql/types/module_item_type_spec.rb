@@ -271,4 +271,28 @@ describe Types::ModuleItemType do
       expect(resolver.resolve("content { pointsPossible }")).to eq module_item.content.points_possible
     end
   end
+
+  context "module text sub header" do
+    let_once(:module_item) { module1.add_item({ type: "ContextModuleSubHeader", title: "Sub Header" }, nil, position: 1) }
+
+    it "works" do
+      resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("content { title }")).to eq module_item.title
+      expect(resolver.resolve("content { type }")).to eq "ContentTag"
+      expect(resolver.resolve("content { published }")).to be module_item.active?
+      expect(resolver.resolve("content { canUnpublish }")).to be true
+    end
+  end
+
+  context "external url" do
+    let_once(:module_item) { module1.add_item({ type: "ExternalUrl", title: "External URL", url: "https://example.com" }, nil, position: 1) }
+
+    it "works" do
+      resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("content { title }")).to eq module_item.title
+      expect(resolver.resolve("content { type }")).to eq "ContentTag"
+      expect(resolver.resolve("content { published }")).to be module_item.active?
+      expect(resolver.resolve("content { canUnpublish }")).to be true
+    end
+  end
 end
