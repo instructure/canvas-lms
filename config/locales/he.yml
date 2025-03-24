@@ -4661,6 +4661,7 @@ he:
   configuration_type_25a084a4: "סוג קונפיגורציה"
   configure_ecb97e30: קינפוג
   configure_individual_learning_paths_for_students_b_e2fce294: "קינפוג מסלולי למידה פרטניים לתלמידים בהתבסס על תוצאות הערכה."
+  configure_report_91ed07f9: "הגדרת דו\"ח"
   configure_tool_app_3b1bb50b: "האם לקנפג את האפליקציה %{tool} "
   configure_toolname_app_651371be: "קינפוג של אפליקציה %{toolName} "
   confirm_6556b3a6: אישור
