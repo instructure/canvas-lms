@@ -36,7 +36,7 @@ describe('EntitySearchForm', () => {
     render(<EntitySearchForm {...props} isDisabled={true} />)
     const title = screen.getByText(props.title)
     const input = screen.getByLabelText(`${props.inputConfig.label} *`)
-    const submit = screen.getByLabelText('Find')
+    const submit = screen.getByTestId('entity-search-form-submit')
 
     expect(title).toBeInTheDocument()
     expect(input).toHaveAttribute('placeholder', props.inputConfig.placeholder)
@@ -46,7 +46,7 @@ describe('EntitySearchForm', () => {
 
   it('should show an error when the form is invalid', async () => {
     render(<EntitySearchForm {...props} />)
-    const submit = screen.getByLabelText('Find')
+    const submit = screen.getByTestId('entity-search-form-submit')
 
     await userEvent.click(submit)
 
@@ -56,7 +56,7 @@ describe('EntitySearchForm', () => {
 
   it('should show a spinner while submitting', async () => {
     render(<EntitySearchForm {...props} />)
-    const submit = screen.getByLabelText('Find')
+    const submit = screen.getByTestId('entity-search-form-submit')
     const input = screen.getByLabelText(`${props.inputConfig.label} *`)
 
     await userEvent.type(input, '123')
@@ -69,8 +69,8 @@ describe('EntitySearchForm', () => {
   it('should call the onSubmit function when the form is submitted', async () => {
     const entityId = '123'
     render(<EntitySearchForm {...props} />)
-    const submit = screen.getByLabelText('Find')
     const input = screen.getByLabelText(`${props.inputConfig.label} *`)
+    const submit = screen.getByTestId('entity-search-form-submit')
 
     await userEvent.type(input, entityId)
     await userEvent.click(submit)

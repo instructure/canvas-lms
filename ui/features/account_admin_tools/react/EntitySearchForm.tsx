@@ -114,7 +114,12 @@ export const EntitySearchForm = ({
             )}
           />
         </Flex.Item>
-        <Button type="submit" color="primary" disabled={isDisabled} aria-label={buttonText}>
+        <Button
+          type="submit"
+          color="primary"
+          disabled={isDisabled}
+          data-testid="entity-search-form-submit"
+        >
           {buttonText}
         </Button>
       </Flex>
