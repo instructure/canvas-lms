@@ -116,8 +116,8 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }
 
   const handleEditRef = useCallback(() => {
-    handleEdit(id, courseId, setIsMenuOpen)
-  }, [handleEdit, id, courseId, setIsMenuOpen])
+    handleEdit(itemId, courseId, setIsMenuOpen)
+  }, [handleEdit, itemId, courseId, setIsMenuOpen])
 
   const handleSpeedGraderRef = useCallback(() => {
     handleSpeedGrader(content, courseId, setIsMenuOpen)
@@ -202,15 +202,15 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         />
       </Flex.Item>
     </Flex>
-    <DirectShareUserModal
+    {["assignment","attachment","discussion_topic","page","quiz","module","module_item"].includes(content?.type?.toLowerCase() || '') && <>
+      <DirectShareUserModal
         open={isDirectShareOpen}
         sourceCourseId={courseId}
         courseId={courseId}
-        contentShare={{content_type: content?.type?.toLowerCase() || '', content_id: itemId}}
+        contentShare={{ content_type: content?.type?.toLowerCase() || '', content_id: itemId }}
         onDismiss={() => {
-            setIsDirectShareOpen(false)
-          }}
-      />
+          setIsDirectShareOpen(false)
+        } } />
       <DirectShareCourseTray
         open={isDirectShareCourseOpen}
         sourceCourseId={courseId}
@@ -218,9 +218,9 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         contentSelection={mapContentSelection(itemId, content?.type?.toLowerCase() || '') || {}}
         onDismiss={() => {
           setIsDirectShareCourseOpen(false)
-        }}
-      />
-      </>
+        } } />
+      </>}
+    </>
   )
 }
 

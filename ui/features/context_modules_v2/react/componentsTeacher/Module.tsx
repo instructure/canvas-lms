@@ -35,7 +35,6 @@ export interface ModuleProps {
   dragHandleProps?: any
   expanded?: boolean
   onToggleExpand?: (id: string) => void
-  onAddItem?: (id: string, name: string) => void
 }
 
 const Module: React.FC<ModuleProps> = ({
@@ -49,7 +48,6 @@ const Module: React.FC<ModuleProps> = ({
   dragHandleProps,
   expanded: propExpanded,
   onToggleExpand,
-  onAddItem,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
   const {data, isLoading, error} = useModuleItems(id, !!isExpanded)
@@ -103,7 +101,7 @@ const Module: React.FC<ModuleProps> = ({
             handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
             completionRequirements={completionRequirements}
             requirementCount={requirementCount ?? 0}
-            onAddItem={onAddItem}
+            itemCount={moduleItems.length}
           />
         </Flex.Item>
       {isExpanded && (

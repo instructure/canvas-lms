@@ -95,8 +95,8 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
                           moduleId={moduleId}
                           index={index}
                           id={item.id}
-                          published={item.content?.published || false}
-                          canUnpublish={item.content?.canUnpublish || false}
+                          published={item.content?.published ?? false}
+                          canUnpublish={item.content?.canUnpublish ?? true}
                           completionRequirements={completionRequirements}
                           dragHandleProps={dragProvided.dragHandleProps}
                         />

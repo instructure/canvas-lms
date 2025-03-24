@@ -22,7 +22,6 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import ModulePageActionHeader from './ModulePageActionHeader'
 import Module from './Module'
-import AddItemModal from '../components/AddItemModal'
 import {DragDropContext, Droppable, Draggable, DropResult} from 'react-beautiful-dnd'
 import {
   handleCollapseAll,
@@ -50,9 +49,6 @@ const ModulesList: React.FC = () => {
 
   // Initialize with an empty Map - all modules will be collapsed by default
   const [expandedModules, setExpandedModules] = useState<Map<string, boolean>>(new Map())
-  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState<boolean>(false)
-  const [selectedModuleId, setSelectedModuleId] = useState<string>('')
-  const [selectedModuleName, setSelectedModuleName] = useState<string>('')
 
   // Set initial expanded state for modules when data is loaded
   useEffect(() => {
@@ -127,16 +123,6 @@ const ModulesList: React.FC = () => {
     window.location.href = `/courses/${courseId}/modules/progressions`
   }, [])
 
-  const handleOnCloseRequestRef = useCallback(() => {
-    setIsAddItemModalOpen(false)
-  }, [setIsAddItemModalOpen])
-
-  const onAddItemRef = useCallback((id: string, name: string) => {
-    setIsAddItemModalOpen(true)
-    setSelectedModuleId(id)
-    setSelectedModuleName(name)
-  }, [setIsAddItemModalOpen, setSelectedModuleId, setSelectedModuleName])
-
   const onToggleExpandRef = useCallback((moduleId: string) => {
     handleToggleExpand(moduleId, setExpandedModules)
   }, [handleToggleExpand, setExpandedModules])
@@ -150,11 +136,6 @@ const ModulesList: React.FC = () => {
           onViewProgress={handleViewProgressRef}
           handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTrayRef}
           anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
-        />
-        <AddItemModal
-          isOpen={isAddItemModalOpen}
-          onRequestClose={handleOnCloseRequestRef}
-          moduleName={selectedModuleName}
         />
         {isLoading && !data ? (
           <View as="div" textAlign="center" padding="large">
@@ -202,7 +183,6 @@ const ModulesList: React.FC = () => {
                             expanded={!!expandedModules.get(module._id)}
                             onToggleExpand={onToggleExpandRef}
                             dragHandleProps={dragProvided.dragHandleProps}
-                            onAddItem={onAddItemRef}
                           />
                         </div>
                       )}

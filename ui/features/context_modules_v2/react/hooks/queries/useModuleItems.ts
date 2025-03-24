@@ -103,6 +103,7 @@ const MODULE_ITEMS_QUERY = gql`
             }
             ... on SubHeader {
               title
+              published
               type: __typename
             }
           }
