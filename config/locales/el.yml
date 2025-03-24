@@ -1633,6 +1633,8 @@ el:
   add_group_set_f9809e11: "Προσθήκη Σετ Ομάδων"
   add_help_menu_links_de9fc34f: "Προσθέστε συνδέσμους στο μενού βοήθειας"
   add_icon_567dbcaa: "προσθήκη εικονιδίου"
+  add_item_75b67d07: "Προσθήκη Αντικειμένου"
+  add_item_to_module_3d7a05b2: "Προσθήκη Στοιχείου στην Ενότητα"
   add_link_5c01c1e8: "Προσθήκη Συνδέσμου"
   add_link_fc336ed6: "Προσθήκη συνδέσμου"
   add_login_f871148: "Προσθήκη Σύνδεσης"
@@ -3668,6 +3670,7 @@ el:
   configuration_location_ee0f6592: "Τοποθεσία Ρύθμισης"
   configuration_type_25a084a4: "Τύπος Ρυθμίσεων"
   configure_ecb97e30: Ρύθμιση
+  configure_report_91ed07f9: "Ρύθμιση Αναφοράς"
   configure_toolname_app_651371be: "Ρύθμιση Εφαρμογής %{toolName}"
   confirm_6556b3a6: Επιβεβαιώστε
   confirm_contact_method_29d6fe4b: "Επιβεβαίωση τρόπου επικοινωνίας"
@@ -5861,6 +5864,7 @@ el:
   does_not_meet_expectations_b0736d20: "Δεν Ικανοποιεί τις Προσδοκίες"
   domain_3b54c511: Domain
   domain_is_required_1d4c8b25: "Απαιτείται domain"
+  don_t_indent_b35ae9fb: "Χωρίς Εσοχή Κειμένου"
   don_t_move_lti_query_params_to_post_body_5c80e037: "Μην Μετακινείτε τις Παραμέτρους Αναζήτησης LTI στο Κύριο Μέρος POST"
   done_54e3d4b6: Ολοκληρώθηκε
   done_8af51c9b: Ολοκληρώθηκε.
@@ -6492,6 +6496,7 @@ el:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "Δεν βρέθηκαν εργαλεία"
   external_tools_6e77821: "Εξωτερικά Εργαλεία"
+  external_url_4752767f: "Εξωτερικό URL"
   external_url_e9b87215: "Εξωτερικό Url"
   external_urls_62082a38: "Εξωτερικά URL"
   failed_307449e1: "Απέτυχε:"
@@ -7565,6 +7570,8 @@ el:
   increase_indent_6af90f7c: "Αύξηση Εσοχής Κειμένου"
   increase_indent_6d550a4a: "Αύξηση Εσοχής Κειμένου"
   incremental_update_successfully_generated_against__db3f3f06: "Η αυξητική ενημέρωση ολοκληρώθηκε επιτυχώς σε αντιπαραβολή με προηγούμενη Εισαγωγή προς το SIS."
+  indent_1_level_e7b18c1e: "Εσοχή Κειμένου Επίπεδο 1"
+  indentation_3c6081d5: "Προσθήκη εσοχής κειμένου"
   india_91_6c290107: "Ινδία (+91)"
   indigo_2035fc55: Λουλακί
   individual_2033c005: Μεμονωμένη
@@ -13337,6 +13344,7 @@ el:
   score_muted_82eef66: "<mrk mid=\"4347\" mtype=\"seg\">Βαθμολογία:</mrk> <mrk mid=\"4348\" mtype=\"seg\">(σε σίγαση)</mrk>"
   score_of_score_view_in_speedgrader_a7c1c954: "<mrk mid=\"1488\" mtype=\"seg\">Βαθμολογία %{score}.</mrk> <mrk mid=\"1489\" mtype=\"seg\">Προβολή στο SpeedGrader</mrk>"
   score_out_of_points_possible_88f370fd: "%{score} από %{points_possible}"
+  scored_at_least_score_e2272f6d: "Πέτυχε βαθμολογία τουλάχιστον %{score}"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -14885,6 +14893,7 @@ el:
   text_document_eacbcdb7: "Έγγραφο κειμένου"
   text_entry_e1808b2f: "Καταχώριση Κειμένου"
   text_entry_submission_cannot_be_empty_3d187cae: "Η υποβολή καταχώρισης κειμένου δεν μπορεί να είναι κενή"
+  text_header_48fa9c37: "Επικεφαλίδα Κειμένου"
   text_input_d3480b8c: "Εισαγωγή κειμένου"
   text_sms_4e2d82a7: "Κείμενο (SMS)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "<mrk mid=\"3666\" mtype=\"seg\">Ο λογαριασμός αυτού του χρήστη έχει διαγραφεί.</mrk>  <mrk mid=\"3667\" mtype=\"seg\">Παρακαλώ επικοινωνήστε με τον διαχειριστή των υπολογιστικών συστημάτων σας για την επανενεργοποίηση του λογαριασμού σας.</mrk>"
@@ -15802,6 +15811,7 @@ el:
   view_next_file_a8a4a885: "Προβολή επόμενου αρχείου"
   view_notifications_6aea09a2: "Προβολή Ειδοποιήσεων"
   view_previous_file_b846db4f: "Προβολή προηγούμενου αρχείου"
+  view_progress_2d61dd4: "Εμφάνιση Προόδου"
   view_question_banks_188a9e0f: "Προβολή Τραπεζών Ερωτήσεων"
   view_registered_services_6c8cd301: "Προβολή Υπηρεσιών στις οποίες έχετε Εγγραφεί"
   view_rubric_d71cce10: "Εμφάνιση Ρουμπρίκας Αξιολόγισης"
