@@ -862,14 +862,25 @@ describe "new groups" do
         end
 
         it "clones group set when deleting a group with submission" do
-          skip("KNO-187")
+          # skip("KNO-187")
           group_test_setup
           add_user_to_group(@students.first, @testgroup.first)
           create_and_submit_assignment_from_group(@students.first)
 
           CourseGroups.visit_course_groups(@course.id)
-          CourseGroups.delete_group(@testgroup.first.id)
+          manually_delete_group
+
+          set_value f("#cloned_category_name"), ""
           CourseGroups.clone_category_confirm
+          expect(f("body")).to include_text("Name is required")
+
+          set_value f("#cloned_category_name"), "a" * 300
+          CourseGroups.clone_category_confirm
+          expect(f("body")).to include_text("Enter a shorter category name")
+
+          set_value f("#cloned_category_name"), "(Cloned) #{@testgroup.first.name}"
+          CourseGroups.clone_category_confirm
+
           CourseGroups.toggle_group_detail_view(@testgroup.first.name)
 
           # Verifies student has not changed groups and there is a new groupset tab

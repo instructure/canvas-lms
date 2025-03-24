@@ -28,15 +28,16 @@
   </fieldset>
 {{/if}}
 <fieldset>
-  <label class="pad-box cloned_category_name_option" aria-hidden="false">
-    {{#t}}Group Set Name{{/t}}
-    <input type="text" id="cloned_category_name" name="name" value="(Clone) {{name}}">
+  <label for="cloned_category_name" class="pad-box cloned_category_name_option" aria-hidden="false">
+    {{#t}}Group Set Name{{/t}}<sup>*</sup> 
+    <input type="text" id="cloned_category_name" name="name" value="(Clone) {{name}}" style="width:100%">
+    <div id="cloned_category_name_errors"></div>
   </label>
 </fieldset>
 </div>
 
 <div class="form-controls">
   <button type="button" class="btn dialog_closer">{{#t "cancel"}}Cancel{{/t}}</button>
-  <button type="submit" class="btn btn-primary" id="clone_category_submit_button">
+  <button type="submit" class="btn btn-primary" id="clone_category_submit_button" novalidate>
   {{#t}}Submit{{/t}}</button>
 </div>
