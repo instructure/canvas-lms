@@ -163,6 +163,133 @@ describe "files index page" do
         end
       end
 
+      context "accessibility tests for preview" do
+        before do
+          add_file(fixture_file_upload(base_file_name, "application/pdf"),
+                   @course,
+                   base_file_name)
+          get "/courses/#{@course.id}/files"
+          get_item_files_table(1, 1).click
+        end
+
+        it "tabs through all buttons in the header button bar", priority: "1" do
+          buttons = [preview_file_info_button, preview_print_button, preview_download_icon_button]
+          buttons[0].send_keys "" # focuses on the first button
+          buttons.each do |button|
+            check_element_has_focus(button)
+            button.send_keys("\t")
+          end
+        end
+
+        it "returns focus to the link that was clicked when closing with the esc key", priority: "1" do
+          driver.switch_to.active_element.send_keys :escape
+          check_element_has_focus(flnpt(base_file_name))
+        end
+
+        it "returns focus to the link when the close button is clicked", priority: "1" do
+          preview_close_button.click
+          check_element_has_focus(flnpt(base_file_name))
+        end
+      end
+
+      context "File Preview" do
+        a_txt_file_name = "a_file.txt"
+        b_txt_file_name = "b_file.txt"
+        mp3_file_name = "292.mp3"
+        before do
+          add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
+                   @course,
+                   a_txt_file_name)
+          add_file(fixture_file_upload(b_txt_file_name, "text/plain"),
+                   @course,
+                   b_txt_file_name)
+          add_file(fixture_file_upload(mp3_file_name, "audio/mpeg"),
+                   @course,
+                   mp3_file_name)
+          get "/courses/#{@course.id}/files"
+        end
+
+        it "switches files in preview when clicking the arrows" do
+          get_item_files_table(2, 1).click
+          preview_next_button.click
+          expect(preview_file_header).to include_text(b_txt_file_name)
+          preview_previous_button.click
+          expect(preview_file_header).to include_text(a_txt_file_name)
+        end
+
+        context "with media file" do
+          before do
+            stub_kaltura
+          end
+
+          context "when consolidated_media_player feature is enabled" do
+            before do
+              Account.site_admin.enable_feature! :consolidated_media_player
+            end
+
+            it "works in the user's files page" do
+              get "/files/folder/courses_#{@course.id}/"
+              get_item_files_table(1, 1).click
+              wait_for_ajaximations
+              expect(preview_file_preview_modal_alert).to include_text("Your media has been uploaded and will appear here after processing.")
+            end
+
+            it "works in the course's files page" do
+              get_item_files_table(1, 1).click
+              wait_for_ajaximations
+              expect(preview_file_preview_modal_alert).to include_text("Your media has been uploaded and will appear here after processing.")
+            end
+          end
+        end
+      end
+
+      context "Usage Rights Dialog" do
+        before :once do
+          course_with_teacher(active_all: true)
+          @course.usage_rights_required = true
+          @course.save!
+          add_file(fixture_file_upload("a_file.txt", "text/plan"),
+                   @course,
+                   "a_file.txt")
+          add_file(fixture_file_upload("amazing_file.txt", "text/plan"),
+                   @user,
+                   "amazing_file.txt")
+          add_file(fixture_file_upload("a_file.txt", "text/plan"),
+                   @user,
+                   "a_file.txt")
+        end
+
+        before do
+          user_session @teacher
+        end
+
+        context "user files" do
+          it "updates course files from user files page", priority: "1" do
+            get "/files/folder/courses_#{@course.id}/"
+            get_item_files_table(1, 6).click
+            set_usage_rights_in_modal
+            verify_usage_rights_ui_updates
+          end
+        end
+      end
+
+      context "When Require Usage Rights is turned-off" do
+        a_txt_file_name = "a_file.txt"
+        before do
+          course_with_teacher_logged_in
+          @course.usage_rights_required = false
+          @course.save!
+          add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
+                   @course,
+                   a_txt_file_name)
+        end
+
+        it "sets files to published by default", priority: "1" do
+          get "/courses/#{@course.id}/files"
+          expect(get_item_content_files_table(1, 6)).to eq "#{a_txt_file_name} is Published - Click to modify"
+        end
+      end
+
       context "when a public course is accessed" do
         include_context "public course as a logged out user"
 

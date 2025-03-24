@@ -158,6 +158,7 @@ const BulkActionButtons = ({
             <Flex.Item>
               {renderTooltip(
                 <IconButton
+                  data-testid="bulk-actions-download-button"
                   disabled={!isEnabled}
                   renderIcon={<IconDownloadLine />}
                   screenReaderLabel={I18n.t('Download')}

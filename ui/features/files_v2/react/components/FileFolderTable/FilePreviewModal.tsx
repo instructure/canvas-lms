@@ -256,9 +256,9 @@ const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePreviewModalP
           </Flex.Item>
         </Flex>
       </Modal.Header>
-      <Modal.Body padding="none">
+      <Modal.Body padding="none" id="file-preview-modal-alert">
         <DrawerLayout onOverlayTrayChange={handleOverlayTrayChange}>
-          <DrawerLayout.Content label={I18n.t('File Preview')}>
+          <DrawerLayout.Content id="file-preview-modal-drawer-layout" label={I18n.t('File Preview')}>
             <FilePreview item={currentItem} setMediaInfo={setMediaInfo}/>
           </DrawerLayout.Content>
           <DrawerLayout.Tray
