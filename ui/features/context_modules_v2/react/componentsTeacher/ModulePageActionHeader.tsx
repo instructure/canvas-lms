@@ -29,6 +29,7 @@ import {
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ContextModulesPublishMenu from '@canvas/context-modules/react/ContextModulesPublishMenu'
 import {queryClient} from '@canvas/query'
+import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHeader'
 import {useContextModule} from '../hooks/useModuleContext'
 
 const I18n = createI18nScope('context_modules_v2')
@@ -68,18 +69,45 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
     handleOpeningModuleUpdateTray?.(undefined)
   }, [handleOpeningModuleUpdateTray])
 
-  return (
+  const renderExpandCollapseAll = useCallback((displayOptions?: {
+    display: 'block' | 'inline-block' | undefined
+    ariaExpanded: boolean
+    dataExpand: boolean
+    ariaLabel: string
+  }) => {
+    return (
+      <Button
+        renderIcon={anyModuleExpanded ? <IconCollapseLine /> : <IconExpandLine />}
+        onClick={handleCollapseExpandClick}
+        display={displayOptions?.display}
+        aria-expanded={displayOptions?.ariaExpanded}
+        data-expand={displayOptions?.dataExpand}
+        aria-label={displayOptions?.ariaLabel}
+      >
+        {anyModuleExpanded ? I18n.t('Collapse All') : I18n.t('Expand All')}
+      </Button>
+    )
+  }, [anyModuleExpanded, handleCollapseExpandClick])
+
+  return ENV.FEATURES.instui_header ? (
+    <ContextModulesHeader
+      // @ts-expect-error
+      {...ENV.CONTEXT_MODULES_HEADER_PROPS}
+      overrides={{
+        expandCollapseAll: {renderComponent: renderExpandCollapseAll},
+        publishMenu: {
+          onPublishComplete: handlePublishComplete
+        },
+        handleAddModule: handleAddModule
+      }}
+    />
+  ) : (
     <View as="div" padding="small">
       <Flex justifyItems="space-between" wrap='wrap'>
         <Flex.Item>
           <Flex gap="small" wrap='wrap'>
             <Flex.Item>
-              <Button
-                renderIcon={anyModuleExpanded ? <IconCollapseLine /> : <IconExpandLine />}
-                onClick={handleCollapseExpandClick}
-              >
-                {anyModuleExpanded ? I18n.t('Collapse All') : I18n.t('Expand All')}
-              </Button>
+              {renderExpandCollapseAll()}
             </Flex.Item>
             <Flex.Item>
               <Button

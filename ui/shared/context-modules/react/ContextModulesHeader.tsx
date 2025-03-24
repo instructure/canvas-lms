@@ -70,6 +70,21 @@ type PublishMenuProps = {
   visible: boolean
 }
 
+type OverridesProps = {
+  expandCollapseAll?: {
+    renderComponent: (props: {
+      display: string
+      ariaExpanded: boolean
+      dataExpand: boolean
+      ariaLabel: string
+    }) => React.ReactNode
+  }
+  publishMenu?: {
+    onPublishComplete?: () => void
+  }
+  handleAddModule?: () => void
+}
+
 type Props = {
   title: string
   publishMenu: PublishMenuProps
@@ -100,6 +115,7 @@ type Props = {
     date: string
     visible: boolean
   }
+  overrides?: OverridesProps
 }
 
 type ContentProps = Props & {
@@ -164,7 +180,6 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
         ...prev,
         disabled: e.detail.disabled,
       }))
-       
     }) as EventListener)
   }, [])
 
@@ -237,7 +252,12 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
             )}
 
             <Flex.Item overflowY="visible">
-              <Button
+              {props.overrides?.expandCollapseAll?.renderComponent({
+                display: responsive.props.display,
+                ariaExpanded: props.expandCollapseAll.ariaExpanded,
+                dataExpand: props.expandCollapseAll.dataExpand,
+                ariaLabel: props.expandCollapseAll.ariaLabel,
+              }) || <Button
                 id="expand_collapse_all"
                 display={responsive.props.display}
                 aria-expanded={props.expandCollapseAll.ariaExpanded}
@@ -246,7 +266,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
                 aria-label={props.expandCollapseAll.ariaLabel}
               >
                 {props.expandCollapseAll.label}
-              </Button>
+              </Button>}
             </Flex.Item>
 
             {props.viewProgress.visible && (
@@ -290,7 +310,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
                   }
                   data-progress-id={publishMenu.runningProgressId}
                 >
-                  <ContextModulesPublishMenu {...publishMenu} />
+                  <ContextModulesPublishMenu {...publishMenu} onPublishComplete={props.overrides?.publishMenu?.onPublishComplete} />
                 </View>
               </Flex.Item>
             )}
@@ -299,7 +319,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
               <Flex.Item overflowY="visible">
                 <Button
                   // @ts-expect-error
-                  onClick={e => document.add_module_link_handler(e)}
+                  onClick={props.overrides?.handleAddModule ? props.overrides.handleAddModule : e => document.add_module_link_handler(e)}
                   id="context-modules-header-add-module-button"
                   color="primary"
                   // @ts-expect-error
