@@ -31,23 +31,14 @@ interface TableUrlParams {
   pageQueryParam?: string
 }
 
-export const generateFolderByPathUrl = (path: string) => {
-  let contextType = filesEnv.contexts[0].contextType
-  let contextId = filesEnv.contexts[0].contextId
-  let uriEscapedPath = encodeURIComponent(path).replace(/%2F/g, '/')
-
-  if (filesEnv.showingAllContexts) {
-    const LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^/]*/
-    // users_1 or courses_102
-    const pluralAssetString = uriEscapedPath.split('/')[1]
-    const context = filesEnv.contextsDictionary[pluralAssetString] || filesEnv.contexts[0]
-    // this removes users_1 or course_102 from the path for the correct api call
-    uriEscapedPath = uriEscapedPath.replace(LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH, '')
-    contextType = context.contextType
-    contextId = context.contextId
+export const generateFolderByPathUrl = (pluralContextType: string, contextId: string, path?: string) => {
+  const baseUrl = `/api/v1/${pluralContextType}/${contextId}/folders/by_path`
+  if (!path) {
+    return baseUrl
   }
 
-  return `/api/v1/${contextType}/${contextId}/folders/by_path${uriEscapedPath}`
+  const encodedPath = encodeURIComponent(path).replace(/%2F/g, '/')
+  return `${baseUrl}/${encodedPath}`
 }
 
 export const generateFilesQuotaUrl = (singularContextType: string, contextId: string) => {

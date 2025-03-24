@@ -196,12 +196,8 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   )
 }
 
-interface ResponsiveFilesAppProps {
-  contextAssetString: string
-}
-
-const ResponsiveFilesApp = ({contextAssetString}: ResponsiveFilesAppProps) => {
-  const isUserContext = contextAssetString.startsWith('user_')
+const ResponsiveFilesApp = () => {
+  const isUserContext = filesEnv.showingAllContexts
 
   return (
     <Responsive
