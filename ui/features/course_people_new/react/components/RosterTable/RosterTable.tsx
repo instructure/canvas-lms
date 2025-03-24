@@ -21,29 +21,25 @@ import {Table} from '@instructure/ui-table'
 import RosterTableHeader from './RosterTableHeader'
 import RosterTableRow from './RosterTableRow'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ASCENDING, DESCENDING} from '../../../util/constants'
-import {User} from '../../../types'
+import {User, SortField, SortDirection} from '../../../types'
 
 const I18n = createI18nScope('course_people')
 
 interface RosterTableProps {
   users: User[] | undefined
+  handleSort: (event: SyntheticEvent<Element, Event>, {id}: {id: string}) => void
+  sortField: SortField
+  sortDirection: SortDirection
 }
 
-const RosterTable: FC<RosterTableProps> = ({users}) => {
-  const [sortBy, setSortBy] = useState<string>("name")
-  const [ascending, setAscending] = useState<boolean>(true)
+const RosterTable: FC<RosterTableProps> = ({
+  users,
+  handleSort,
+  sortField,
+  sortDirection
+}) => {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const userIds = (users || []).map(user => user._id)
-
-  const handleSort = (_event: SyntheticEvent<Element, Event>, {id}: {id: string}) => {
-    if (id === sortBy) {
-      setAscending(!ascending)
-    } else {
-      setSortBy(id)
-      setAscending(true)
-    }
-  }
 
   const handleSelectAll = (allSelected: boolean) =>
     setSelected(allSelected ? new Set() : new Set(userIds))
@@ -61,7 +57,6 @@ const RosterTable: FC<RosterTableProps> = ({users}) => {
   const allSelected =
     selected.size > 0 && userIds.every(id => selected.has(id))
   const someSelected = selected.size > 0 && !allSelected
-  const direction = ascending ? ASCENDING : DESCENDING
 
   const renderRows = () => (users || []).map(user => (
     <RosterTableRow
@@ -79,8 +74,8 @@ const RosterTable: FC<RosterTableProps> = ({users}) => {
         someSelected={someSelected}
         handleSelectAll={handleSelectAll}
         handleSort={handleSort}
-        sortBy={sortBy}
-        direction={direction}
+        sortField={sortField}
+        sortDirection={sortDirection}
       />
       <Table.Body>
         {renderRows()}
