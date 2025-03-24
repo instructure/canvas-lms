@@ -322,7 +322,7 @@ describe "admin settings tab" do
       question = f("label[for='account_services_google_docs_previews'] .icon-question")
       scroll_into_view(question)
       question.click
-      expect(fj(".ui-dialog-title:visible")).to include_text("About Google Docs Previews")
+      expect(f("[data-testid='about-google-docs']")).to include_text("About Google Docs Previews")
     end
 
     it "unclicks and then click on skype" do
