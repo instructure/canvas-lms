@@ -112,6 +112,7 @@ describe('MasteryScale', () => {
           query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
           variables: {
             contextId: '11',
+            proficiencyRatingsCursor: null,
           },
         },
         result: {
