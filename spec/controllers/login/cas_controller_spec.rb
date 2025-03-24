@@ -43,9 +43,9 @@ describe Login::CasController do
       <samlp:LogoutRequest
         xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
         xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-        ID="42"
+        ID="_42"
         Version="2.0"
-        IssueInstant="#{Time.zone.now.in_time_zone}">
+        IssueInstant="#{Time.zone.now.iso8601}">
         <saml:NameID>@NOT_USED@</saml:NameID>
         <samlp:SessionIndex>#{cas_ticket}</samlp:SessionIndex>
       </samlp:LogoutRequest>

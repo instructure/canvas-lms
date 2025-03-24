@@ -95,18 +95,18 @@ class Login::CasController < ApplicationController
     end
   end
 
-  CAS_SAML_LOGOUT_REQUEST = %r{^<samlp:LogoutRequest.*?<samlp:SessionIndex>(?<session_index>.*)</samlp:SessionIndex>}m
-
   def destroy
     if !Canvas.redis_enabled?
       # NOT SUPPORTED without redis
       return render plain: "NOT SUPPORTED", status: :method_not_allowed
     elsif params["logoutRequest"] &&
-          (match = params["logoutRequest"].match(CAS_SAML_LOGOUT_REQUEST))
+          (logout_request = SAML2::LogoutRequest.parse(params["logoutRequest"])) &&
+          logout_request.valid_schema? &&
+          logout_request.session_index.length == 1
       increment_statsd(:attempts)
       # we *could* validate the timestamp here, but the whole request is easily spoofed anyway, so there's no
       # point. all the security is in the ticket being secret and non-predictable
-      if Pseudonym.expire_cas_ticket(match[:session_index], request)
+      if Pseudonym.expire_cas_ticket(logout_request.session_index.first, request)
         increment_statsd(:success)
         return render plain: "OK", status: :ok
       else
