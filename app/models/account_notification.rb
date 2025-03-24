@@ -18,18 +18,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AccountNotification < ActiveRecord::Base
+  include Canvas::SoftDeletable
+
   validates :start_at, :end_at, :subject, :message, :account_id, presence: true
   validate :validate_dates
   validate :send_message_not_set_for_site_admin
   belongs_to :account, touch: true
   belongs_to :user
-  has_many :account_notification_roles, dependent: :destroy
+  has_many :account_notification_roles, -> { active }, dependent: :destroy
   validates :message, length: { maximum: maximum_text_length, allow_blank: false }
   validates :subject, length: { maximum: maximum_string_length }
   sanitize_field :message, CanvasSanitize::SANITIZE
 
-  after_save :create_alert
-  after_save :queue_message_broadcast
+  after_save :create_alert, unless: -> { saved_change_to_workflow_state?(to: "deleted") }
+  after_save :queue_message_broadcast, unless: -> { saved_change_to_workflow_state?(to: "deleted") }
   after_save :clear_cache
 
   USERS_PER_MESSAGE_BATCH = 1000
@@ -226,7 +228,8 @@ class AccountNotification < ActiveRecord::Base
       base_shard = Shard.current
       result = Shard.partition_by_shard(account_ids) do |sharded_account_ids|
         load_by_account = lambda do |slice_account_ids|
-          scope = AccountNotification.where(account_id: slice_account_ids)
+          scope = AccountNotification.active
+                                     .where(account_id: slice_account_ids)
                                      .order("start_at DESC")
                                      .preload({ account: :root_account }, account_notification_roles: :role)
           scope = if include_all

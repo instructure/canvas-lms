@@ -163,7 +163,7 @@ class Account < ActiveRecord::Base
 
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :error_reports
-  has_many :announcements, class_name: "AccountNotification"
+  has_many :announcements, -> { active }, class_name: "AccountNotification"
   has_many :alerts, -> { preload(:criteria) }, as: :context, inverse_of: :context
   has_many :report_snapshots
   has_many :external_integration_keys, as: :context, inverse_of: :context, dependent: :destroy

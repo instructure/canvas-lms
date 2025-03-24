@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-#
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,22 +15,12 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class AccountNotificationRole < ActiveRecord::Base
-  include Canvas::SoftDeletable
+class AddWorkflowStateToAccountNotifications < ActiveRecord::Migration[7.1]
+  tag :predeploy
 
-  belongs_to :account_notification
-  belongs_to :role
-  before_save :resolve_cross_account_role
-
-  def resolve_cross_account_role
-    if will_save_change_to_role_id? && role.root_account_id != account_notification.account.resolved_root_account_id
-      self.role = role.role_for_root_account_id(account_notification.account.resolved_root_account_id)
-    end
-  end
-
-  def role_name
-    role_id ? role.name : "NilEnrollment"
+  def change
+    add_column :account_notifications, :workflow_state, :string, default: "active", null: false, limit: 255
+    add_column :account_notification_roles, :workflow_state, :string, default: "active", null: false, limit: 255
   end
 end
