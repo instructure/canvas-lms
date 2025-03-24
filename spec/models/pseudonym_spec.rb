@@ -475,7 +475,7 @@ describe Pseudonym do
 
     it "expires a cas ticket" do
       expect(Canvas.redis).to receive(:set).once.and_return(true)
-      expect(Pseudonym.expire_cas_ticket(cas_ticket)).to be_truthy
+      expect(Pseudonym.expire_cas_ticket(cas_ticket, nil)).to be_truthy
     end
   end
 

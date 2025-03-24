@@ -106,7 +106,7 @@ class Login::CasController < ApplicationController
       increment_statsd(:attempts)
       # we *could* validate the timestamp here, but the whole request is easily spoofed anyway, so there's no
       # point. all the security is in the ticket being secret and non-predictable
-      if Pseudonym.expire_cas_ticket(match[:session_index])
+      if Pseudonym.expire_cas_ticket(match[:session_index], request)
         increment_statsd(:success)
         return render plain: "OK", status: :ok
       else
