@@ -73,6 +73,7 @@ export const masteryScalesGraphqlMocks = [
       query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
       variables: {
         contextId: '11',
+        proficiencyRatingsCursor: null,
       },
     },
     result: {
@@ -90,6 +91,7 @@ export const masteryScalesGraphqlMocks = [
       query: COURSE_OUTCOME_PROFICIENCY_QUERY,
       variables: {
         contextId: '12',
+        proficiencyRatingsCursor: null,
       },
     },
     result: {
