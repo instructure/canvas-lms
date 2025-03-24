@@ -24,7 +24,6 @@ describe AccountReportRunner do
     let(:admin) { user_model }
 
     it "removes any existing account report rows that pre-exist the run" do
-      account.enable_feature!(:custom_report_experimental)
       report = AccountReport.create!(account_id: account.id, user_id: admin.id)
       arr = AccountReportRunner.create!(created_at: 1.day.ago, account_report_id: report.id)
       a_row = AccountReportRow.create!(account_report_id: report.id, account_report_runner_id: arr.id, created_at: 1.day.ago)
@@ -33,17 +32,6 @@ describe AccountReportRunner do
       arr.start
       arr.abort
       expect(AccountReportRow.where(id: a_row.id).count).to eq(0)
-    end
-
-    it "does not remove any existing account report rows that pre-exist the run if feature flag not enabled" do
-      report = AccountReport.create!(account_id: account.id, user_id: admin.id)
-      arr = AccountReportRunner.create!(created_at: 1.day.ago, account_report_id: report.id)
-      a_row = AccountReportRow.create!(account_report_id: report.id, account_report_runner_id: arr.id, created_at: 1.day.ago)
-      expect(AccountReportRunner.where(id: arr.id).count).to eq(1)
-      expect(AccountReportRow.where(id: a_row.id).count).to eq(1)
-      arr.start
-      arr.abort
-      expect(AccountReportRow.where(id: a_row.id).count).to eq(1)
     end
   end
 end
