@@ -149,3 +149,9 @@ export type User = {
 }
 
 export type SisRole = typeof TEACHER_ROLE | typeof STUDENT_ROLE | typeof TA_ROLE | typeof OBSERVER_ROLE | typeof DESIGNER_ROLE
+
+export type SortField = 'name' | 'sis_id' | 'login_id' | 'total_activity_time'
+
+export type SortDirection = 'asc' | 'desc'
+
+export type TableHeaderSortDirection = 'ascending' | 'descending' | 'none'

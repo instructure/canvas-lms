@@ -22,7 +22,7 @@ import {renderHook} from '@testing-library/react-hooks'
 import useCoursePeopleQuery, {CoursePeopleQueryResponse, QueryProps} from '../useCoursePeopleQuery'
 import {executeQuery} from '@canvas/query/graphql'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {DEFAULT_OPTION} from '../../../util/constants'
+import {DEFAULT_OPTION, DEFAULT_SORT_FIELD, DEFAULT_SORT_DIRECTION} from '../../../util/constants'
 import type {User} from '../../../types'
 
 jest.mock('../useCoursePeopleContext')
@@ -40,7 +40,9 @@ describe('useCoursePeopleQuery', () => {
   const defaultProps: QueryProps = {
     courseId: '123',
     searchTerm: '',
-    optionId: defaultRole.id
+    optionId: defaultRole.id,
+    sortField: DEFAULT_SORT_FIELD,
+    sortDirection: DEFAULT_SORT_DIRECTION
   }
 
   const useCoursePeopleContextMocks = {
@@ -49,7 +51,9 @@ describe('useCoursePeopleQuery', () => {
 
   const defaultQueryProps = {
     courseId: '123',
-    searchTerm: ''
+    searchTerm: '',
+    sortField: DEFAULT_SORT_FIELD,
+    sortDirection: DEFAULT_SORT_DIRECTION
   }
 
   const queryClient = new QueryClient({

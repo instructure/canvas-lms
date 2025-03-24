@@ -20,6 +20,7 @@ import React from 'react'
 import {render, fireEvent, within} from '@testing-library/react'
 import RosterTableHeader from '../RosterTableHeader'
 import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
+import {DEFAULT_SORT_FIELD, DEFAULT_SORT_DIRECTION} from '../../../../util/constants'
 
 jest.mock('../../../hooks/useCoursePeopleContext')
 
@@ -27,8 +28,8 @@ describe('RosterTableHeader', () => {
   const defaultProps = {
     allSelected: false,
     someSelected: false,
-    sortBy: 'name',
-    direction: 'ascending' as const,
+    sortField: DEFAULT_SORT_FIELD,
+    sortDirection: DEFAULT_SORT_DIRECTION,
     handleSelectAll: jest.fn(),
     handleSort: jest.fn()
   }
@@ -55,11 +56,11 @@ describe('RosterTableHeader', () => {
       const {getByTestId} = render(<RosterTableHeader {...defaultProps} />)
       expect(getByTestId('header-select-all')).toBeInTheDocument()
       expect(getByTestId('header-name')).toHaveTextContent(/name/i)
-      expect(getByTestId('header-sisID')).toHaveTextContent(/sis id/i)
+      expect(getByTestId('header-sis_id')).toHaveTextContent(/sis id/i)
       expect(getByTestId('header-section')).toHaveTextContent(/section/i)
       expect(getByTestId('header-role')).toHaveTextContent(/role/i)
       expect(getByTestId('header-lastActivity')).toHaveTextContent(/last activity/i)
-      expect(getByTestId('header-totalActivity')).toHaveTextContent(/total activity/i)
+      expect(getByTestId('header-total_activity_time')).toHaveTextContent(/total activity/i)
       expect(getByTestId('header-admin-links')).toHaveTextContent(/administrative links/i)
       const headerCells = document.querySelectorAll('[data-testid^="header-"]')
       expect(headerCells).toHaveLength(9)
@@ -78,7 +79,7 @@ describe('RosterTableHeader', () => {
         canViewLoginIdColumn: false
       })
       const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
-      expect(queryByTestId('header-loginID')).not.toBeInTheDocument()
+      expect(queryByTestId('header-login_id')).not.toBeInTheDocument()
     })
 
     it('hides SIS ID column when canViewSisIdColumn is false', () => {
@@ -87,7 +88,7 @@ describe('RosterTableHeader', () => {
         canViewSisIdColumn: false
       })
       const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
-      expect(queryByTestId('header-sisID')).not.toBeInTheDocument()
+      expect(queryByTestId('header-sis_id')).not.toBeInTheDocument()
     })
 
     it('hides sections column when hideSectionsOnCourseUsersPage is true', () => {
@@ -138,12 +139,12 @@ describe('RosterTableHeader', () => {
     })
 
     it('shows correct sort direction for active column', () => {
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} sortBy="name" direction="ascending" />)
+      const {getByTestId} = render(<RosterTableHeader {...defaultProps} />)
       expect(getByTestId('header-name')).toHaveAttribute('aria-sort', 'ascending')
     })
 
     it('shows no sort direction for inactive columns', () => {
-      const {getByRole} = render(<RosterTableHeader {...defaultProps} sortBy="name" direction="ascending" />)
+      const {getByRole} = render(<RosterTableHeader {...defaultProps} />)
       const roleHeader = Array.from(getByRole('row', { hidden: true }).querySelectorAll('th')).find(
         cell => cell.textContent?.includes('Role')
       )

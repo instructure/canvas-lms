@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState, type FC} from 'react'
+import React, {useEffect, useState, type FC, type SyntheticEvent} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -29,8 +29,15 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import useSearch from './hooks/useSearch'
 import useCoursePeopleContext from './hooks/useCoursePeopleContext'
 import useCoursePeopleQuery from './hooks/useCoursePeopleQuery'
-import {DEFAULT_OPTION} from '../util/constants'
+import {
+  ASC,
+  DESC,
+  DEFAULT_OPTION,
+  DEFAULT_SORT_FIELD,
+  DEFAULT_SORT_DIRECTION
+} from '../util/constants'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {SortField, SortDirection} from '../types'
 
 const I18n = createI18nScope('course_people')
 
@@ -44,8 +51,19 @@ const CoursePeople: FC = () => {
 
   const [optionId, setOptionId] = useState<string>(DEFAULT_OPTION.id)
   const {courseId} = useCoursePeopleContext()
-  const {data: users, isLoading, error} = useCoursePeopleQuery({courseId, searchTerm, optionId})
+  const [sortField, setSortField] = useState<SortField>(DEFAULT_SORT_FIELD)
+  const [sortDirection, setSortDirection] = useState<SortDirection>(DEFAULT_SORT_DIRECTION)
+
+  const {data: users, isLoading, error} = useCoursePeopleQuery({
+    courseId,
+    searchTerm,
+    optionId,
+    sortField,
+    sortDirection
+  })
+
   const numberOfResults = users ? users.length : 0
+  const sortableFields = ['name', 'login_id', 'sis_id', 'total_activity_time']
 
   useEffect(() => {
     if (error) {
@@ -55,6 +73,21 @@ const CoursePeople: FC = () => {
       })
     }
   }, [error])
+
+  const handleSort = (_event: SyntheticEvent<Element, Event>, {id}: {id: string}) => {
+    if (sortableFields.includes(id)) {
+      if (sortField === id) {
+        // toggle sort direction for the same field
+        setSortDirection(direction => direction === ASC ? DESC : ASC)
+      } else {
+        setSortField(id as SortField)
+        setSortDirection(DEFAULT_SORT_DIRECTION)
+      }
+    } else {
+      setSortField(DEFAULT_SORT_FIELD)
+      setSortDirection(DEFAULT_SORT_DIRECTION)
+    }
+  }
 
   return (
     <View as="div" margin="medium 0">
@@ -81,7 +114,12 @@ const CoursePeople: FC = () => {
         </Flex>
       )}
       {!isLoading && numberOfResults > 0 && (
-        <RosterTable users={users} />
+        <RosterTable
+          users={users}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          handleSort={handleSort}
+        />
       )}
       {!isLoading && numberOfResults === 0 && (
         <NoPeopleFound />
