@@ -3813,6 +3813,7 @@ hy:
   configurate_tool_app_5a721f2c: "Կարգաբերե՞լ %{tool} հավելվածը"
   configuration_type_25a084a4: "Կարգաբերման տեսակ"
   configure_ecb97e30: Կարգաբերել
+  configure_report_91ed07f9: "Կարգաբերել հաշվետվությունը"
   configure_toolname_app_651371be: "Կարգաբերել %{toolName} հավելվածը"
   confirm_6556b3a6: Հաստատել
   confirm_contact_method_29d6fe4b: "Հաստատել կապ հաստատելու եղանակը"
