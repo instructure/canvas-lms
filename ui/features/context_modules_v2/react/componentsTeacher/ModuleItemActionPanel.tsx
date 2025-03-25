@@ -193,6 +193,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       {/* Kebab Menu */}
       <Flex.Item>
         <ModuleItemActionMenu
+          itemType={content?.type || ''}
           isMenuOpen={isMenuOpen}
           setIsMenuOpen={setIsMenuOpen}
           indent={indent}
