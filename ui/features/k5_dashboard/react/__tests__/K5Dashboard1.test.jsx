@@ -21,7 +21,8 @@ import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__test
 import {resetPlanner} from '@canvas/planner'
 import {act, screen, render as testingLibraryRender, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import moxios from 'moxios'
+import axios from 'axios'
+import AxiosMockAdapter from 'axios-mock-adapter'
 import React from 'react'
 import {
   MOCK_TODOS,
@@ -35,7 +36,6 @@ import K5Dashboard from '../K5Dashboard'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import * as ReactQuery from '@tanstack/react-query'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   reloadWindow: jest.fn(),
@@ -140,8 +140,12 @@ const staff = [
   },
 ]
 
+let axiosMock
+
 beforeEach(() => {
-  moxios.install()
+  axiosMock = new AxiosMockAdapter(axios)
+  axiosMock.onGet(/\/api\/v1\/dashboard\/dashboard_cards(\?.*)?$/).reply(200, MOCK_CARDS)
+  axiosMock.onGet(/\/api\/v1\/announcements.*latest_only=true/).reply(200, announcements)
   createPlannerMocks()
   fetchMock.get(/\/api\/v1\/announcements.*/, announcements)
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, gradeCourses)
@@ -161,7 +165,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  moxios.uninstall()
+  axiosMock.restore()
   fetchMock.restore()
   fakeENV.teardown()
   resetPlanner()
@@ -265,11 +269,6 @@ describe('K-5 Dashboard', () => {
 
     // FOO-3830
     it.skip('displays an empty state on the homeroom and schedule tabs if the user has no cards (flaky)', async () => {
-      moxios.stubs.reset()
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
-        status: 200,
-        response: [],
-      })
       const {getByTestId, getByText} = render(
         <K5Dashboard {...defaultProps} plannerEnabled={true} />,
       )
@@ -283,48 +282,28 @@ describe('K-5 Dashboard', () => {
       expect(getByTestId('empty-dash-panda')).toBeInTheDocument()
     })
 
-    it('only fetches announcements based on cards once per page load', done => {
+    it('only fetches announcements based on cards once per page load', async () => {
       sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(MOCK_CARDS))
-      moxios.withMock(() => {
-        render(<K5Dashboard {...defaultProps} />)
-        // Don't respond immediately, let the cards from sessionStorage return first
-        moxios.wait(() =>
-          moxios.requests
-            .mostRecent()
-            .respondWith({
-              status: 200,
-              response: MOCK_CARDS,
-            })
-            .then(() => {
-              // Expect just one announcement request for all cards
-              expect(fetchMock.calls(/\/api\/v1\/announcements.*latest_only=true.*/)).toHaveLength(
-                1,
-              )
-              done()
-            }),
-        )
+      render(<K5Dashboard {...defaultProps} />)
+      await waitFor(() => {
+        const announcementCalls = fetchMock.calls(/\/api\/v1\/announcements.*latest_only=true/)
+        expect(announcementCalls).toHaveLength(1)
       })
     })
 
-    it('only fetches announcements and apps if there are any cards', done => {
+    it('only fetches announcements and apps if there are any cards', async () => {
       sessionStorage.setItem('dashcards_for_user_1', JSON.stringify([]))
-      moxios.withMock(() => {
-        render(<K5Dashboard {...defaultProps} />)
-        moxios.wait(() =>
-          moxios.requests
-            .mostRecent()
-            .respondWith({
-              status: 200,
-              response: [],
-            })
-            .then(() => {
-              expect(fetchMock.calls(/\/api\/v1\/announcements.*/)).toHaveLength(0)
-              expect(
-                fetchMock.calls(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/),
-              ).toHaveLength(0)
-              done()
-            }),
+      render(<K5Dashboard {...defaultProps} />)
+      await waitFor(() => {
+        const announcementCalls = axiosMock.history.get.filter(call =>
+          call.url.match(/\/api\/v1\/announcements.*/)
         )
+        expect(announcementCalls).toHaveLength(0)
+
+        const externalToolsCalls = axiosMock.history.get.filter(call =>
+          call.url.match(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/)
+        )
+        expect(externalToolsCalls).toHaveLength(0)
       })
     })
   })

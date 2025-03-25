@@ -79,14 +79,19 @@ describe('CourseHomeDialog', () => {
     store.setState({selectedDefaultView: 'assignments'})
     submitButton(dialog).simulate('click')
 
-    window.setTimeout(() => {
+    setTimeout(() => {
       equal(xhrs.length, 1)
-      xhrs[0].respond([200, {}, {}])
-    })
-    window.setTimeout(() => {
-      ok(onSubmit.called)
-      done()
-    })
+      xhrs[0].respond(
+        200,
+        { 'Content-Type': 'application/json' },
+        JSON.stringify({ default_view: 'assignments' })
+      )
+
+      setTimeout(() => {
+        ok(onSubmit.called, 'onSubmit should be called after saving')
+        done()
+      }, 50)
+    }, 0)
   })
 
   test('calls onRequestClose when cancel is clicked', () => {
