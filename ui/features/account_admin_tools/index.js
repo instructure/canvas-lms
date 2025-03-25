@@ -23,54 +23,17 @@ import RestoreContentPaneView from './backbone/views/RestoreContentPaneView'
 import CourseSearchResultsView from './backbone/views/CourseSearchResultsView'
 import UserSearchResultsView from './backbone/views/UserSearchResultsView'
 import LoggingContentPaneView from './backbone/views/LoggingContentPaneView'
-import InputFilterView from '@canvas/backbone-input-filter-view'
-import UserView from './backbone/views/UserView'
-import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
-import CommMessageCollection from './backbone/collections/CommMessageCollection'
 import AccountUserCollection from './backbone/collections/AccountUserCollection'
-import CommMessagesContentPaneView from './backbone/views/CommMessagesContentPaneView'
-import UserDateRangeSearchFormView from './backbone/views/UserDateRangeSearchFormView'
-import CommMessageItemView from './backbone/views/CommMessageItemView'
-import messagesSearchResultsTemplate from './jst/commMessagesSearchResults.handlebars'
-import usersTemplate from './jst/usersList.handlebars'
-import React from 'react'
-import {createRoot} from 'react-dom/client'
-import BouncedEmailsView from './react/BouncedEmailsView'
 import ready from '@instructure/ready'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
-// This is used by admin tools to display search results
 const courseRestoreModel = new CourseRestoreModel({account_id: ENV.ACCOUNT_ID})
 const userRestoreModel = new UserRestoreModel({account_id: ENV.ACCOUNT_ID})
 
-const messages = new CommMessageCollection(null, {params: {perPage: 10}})
-const messagesUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_ID})
 const loggingUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_ID})
 
 ready(() => {
   initializeTopNavPortal()
-
-  const messagesContentView = new CommMessagesContentPaneView({
-    searchForm: new UserDateRangeSearchFormView({
-      formName: 'messages',
-      inputFilterView: new InputFilterView({
-        collection: messagesUsers,
-      }),
-      usersView: new PaginatedCollectionView({
-        collection: messagesUsers,
-        itemView: UserView,
-        buffer: 1000,
-        template: usersTemplate,
-      }),
-      collection: messages,
-    }),
-    resultsView: new PaginatedCollectionView({
-      template: messagesSearchResultsTemplate,
-      itemView: CommMessageItemView,
-      collection: messages,
-    }),
-    collection: messages,
-  })
 
   // Render tabs
   const app = new AdminToolsView({
@@ -86,7 +49,6 @@ ready(() => {
       courseSearchResultsView: new CourseSearchResultsView({model: courseRestoreModel}),
       userSearchResultsView: new UserSearchResultsView({model: userRestoreModel}),
     }),
-    messageContentPaneView: messagesContentView,
     loggingContentPaneView: new LoggingContentPaneView({
       permissions: ENV.PERMISSIONS.logging,
       users: loggingUsers,
@@ -94,12 +56,4 @@ ready(() => {
   })
 
   app.render()
-
-  const bouncedEmailsMountPoint = document.getElementById('bouncedEmailsPane')
-  if (bouncedEmailsMountPoint) {
-    const root = createRoot(bouncedEmailsMountPoint)
-    root.render(<BouncedEmailsView accountId={ENV.ACCOUNT_ID} />)
-    return () => root.unmount()
-  }
-  return () => {}
 })

@@ -63,10 +63,16 @@ type FormValues = z.infer<typeof validationSchema>
 export interface UserDateRangeSearchProps {
   userName: string
   onSubmit: (data: FormValues) => void
+  isOpen: boolean
   onClose: () => void
 }
 
-const UserDateRangeSearch = ({userName, onSubmit, onClose}: UserDateRangeSearchProps) => {
+const UserDateRangeSearch = ({
+  userName,
+  onSubmit,
+  isOpen = true,
+  onClose,
+}: UserDateRangeSearchProps) => {
   const {
     formState: {errors},
     control,
@@ -98,7 +104,7 @@ const UserDateRangeSearch = ({userName, onSubmit, onClose}: UserDateRangeSearchP
   return (
     <Modal
       as="form"
-      open={true}
+      open={isOpen}
       onDismiss={onClose}
       size="medium"
       label={title}
