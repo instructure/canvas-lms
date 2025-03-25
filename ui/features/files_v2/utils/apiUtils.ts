@@ -69,8 +69,8 @@ export const generateSearchNavigationUrl = (searchValue: string) => {
   const path = windowPathname()
   const pluralContext = path.split('/')[3]
   return filesEnv.showingAllContexts
-    ? `/folder/${pluralContext}/search?search_term=${searchValue}`
-    : `/search?search_term=${searchValue}`
+    ? `/folder/${pluralContext}?search_term=${searchValue}`
+    : `/?search_term=${searchValue}`
 }
 
 export const parseLinkHeader = (header: string | null) => {

@@ -37,6 +37,7 @@ import SearchBar from './SearchBar'
 import {generateTableUrl} from '../../utils/apiUtils'
 import {BBFolderWrapper} from '../../utils/fileFolderWrappers'
 import {LoaderData} from '../../interfaces/LoaderData'
+import { useSearchTerm } from '../hooks/useSearchTerm'
 
 const I18n = createI18nScope('files_v2')
 
@@ -47,7 +48,8 @@ interface FilesAppProps {
 
 const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const showingAllContexts = filesEnv.showingAllContexts
-  const {folders, searchTerm} = useLoaderData() as LoaderData
+  const {folders} = useLoaderData() as LoaderData
+  const {searchTerm, setSearchTerm} = useSearchTerm()
   const [isTableLoading, setIsTableLoading] = useState(true)
   const [sort, setSort] = useState({
     sortBy: 'name',
@@ -151,7 +153,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
           isUserContext={isUserContext}
           shouldHideUploadButtons={!userCanAddFilesForContext}
         />
-        <SearchBar initialValue={searchTerm} />
+        <SearchBar initialValue={searchTerm} onSearch={setSearchTerm} />
         {currentUrl && (
           <FileFolderTable
             size={size}

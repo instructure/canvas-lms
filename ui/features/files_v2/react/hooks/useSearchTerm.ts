@@ -16,8 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Folder} from './File'
+import { useNavigate, useSearchParams } from "react-router-dom"
+import { generateSearchNavigationUrl } from "../../utils/apiUtils"
 
-export interface LoaderData {
-  folders: Folder[]
+export const useSearchTerm = () => {
+  const navigate = useNavigate()
+  const setSearchTerm = (term: string) => {
+    const searchUrl = generateSearchNavigationUrl(term)
+    navigate(searchUrl)
+  }
+  const [searchParams] = useSearchParams()
+  const searchTerm = searchParams.get('search_term') || ''
+
+  return { searchTerm, setSearchTerm }
 }
