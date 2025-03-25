@@ -151,10 +151,7 @@ $(document).ready(() => {
     if (!reviewee_id) {
       const container = $(this)
       if (container) {
-        container.css({
-          outline: '1px solid red',
-          borderRadius: '3px',
-        })
+        container.addClass('error-outline')
         container.attr('aria-label', ERROR_MESSAGE)
       }
 
@@ -174,10 +171,7 @@ $(document).ready(() => {
     } else {
       const container = $(this)
       if (container) {
-        container.css({
-          outline: '',
-          borderRadius: '',
-        })
+        container.removeClass('error-outline')
         container.removeAttr('aria-label')
       }
       errorRoots[form.attr('action')]?.unmount()
@@ -192,10 +186,7 @@ $(document).ready(() => {
         const errorsContainer = form.find('#reviewee_errors')[0]
         const container = form.find('#reviewee_id')
         if (container) {
-          container.css({
-            outline: '1px solid red',
-            borderRadius: '3px',
-          })
+          container.addClass('error-outline')
           container.attr('aria-label', ERROR_MESSAGE)
           container.focus()
         }
