@@ -58,10 +58,7 @@ describe('FilesApp', () => {
       [
         {
           path: '/',
-          element: <FilesApp />,
-          loader: async () => {
-            return {folders: [FAKE_FOLDERS[0]], searchTerm: ''}
-          },
+          Component: FilesApp,
         },
       ],
       {initialEntries: ['/']},

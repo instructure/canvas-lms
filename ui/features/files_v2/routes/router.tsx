@@ -16,14 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createBrowserRouter, LoaderFunctionArgs, Outlet, RouteObject} from 'react-router-dom'
+import {createBrowserRouter, Outlet, RouteObject} from 'react-router-dom'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {FilesGenericErrorPage} from '../react/components/FilesGenericErrorPage'
 import AllMyFilesTable from '../react/components/AllMyFilesTable'
 import FilesApp from '../react/components/FilesApp'
-import {LoaderData} from '../interfaces/LoaderData'
-import splitAssetString from '@canvas/util/splitAssetString'
-import {getRootFolder, loadFolders} from './utilities'
 
 const ROUTES = {
   ALL_FOLDER: 'folder/:context/*',
@@ -38,12 +35,6 @@ const allMyFilesRoutes: RouteObject[] = [
   {
     path: ROUTES.ALL_FOLDER,
     Component: FilesApp,
-    loader: async ({params}: LoaderFunctionArgs): Promise<LoaderData> => {
-      const [pluralContextType, contextId] = splitAssetString(params.context!)!
-      return {
-        folders: await loadFolders(pluralContextType, contextId, params['*']),
-      }
-    }
   },
 ]
 
@@ -51,20 +42,10 @@ const filesRoutes: RouteObject[] = [
   {
     index: true,
     Component: FilesApp,
-    loader: (): LoaderData => {
-      return {
-        folders: [getRootFolder(filesEnv.contextType, filesEnv.contextId)],
-      }
-    }
   },
   {
     path: ROUTES.FOLDER,
     Component: FilesApp,
-    loader: async ({params}: LoaderFunctionArgs): Promise<LoaderData> => {
-      return {
-        folders: await loadFolders(filesEnv.contextType, filesEnv.contextId, params['*']),
-      }
-    }
   },
 ]
 
