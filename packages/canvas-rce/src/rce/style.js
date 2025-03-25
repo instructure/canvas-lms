@@ -559,6 +559,7 @@ export default function buildStyle() {
   }
   .tox .tox-menubar {
     background-color: ${theme.canvasBackgroundColor};
+    font-family: ${theme.canvasFontFamily};
   }
   .tox .tox-mbtn {
     color: ${theme.canvasButtonColor};
@@ -744,6 +745,7 @@ export default function buildStyle() {
   .tox-editor-container .tox-toolbar-overlord {
     background-image: none;
     margin-bottom: 5px;
+    font-family: ${theme.canvasFontFamily};
   }
   .tox-editor-container .tox-toolbar__primary {
     background-image: none;
