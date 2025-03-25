@@ -26,6 +26,9 @@ module Types
     value "sis_id"
     value "login_id"
     value "total_activity_time"
+    value "last_activity_at"
+    value "section_name"
+    value "role"
   end
 
   class CourseUsersSortDirectionType < Types::BaseEnum
