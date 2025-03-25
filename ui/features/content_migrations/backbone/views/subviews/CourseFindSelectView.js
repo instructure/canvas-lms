@@ -151,17 +151,14 @@ CourseFindSelectView.prototype.toggleConcludedCourses = function () {
 // "term=typed in stuff" automagically so we don't have to worry about
 // refining the search term
 CourseFindSelectView.prototype.manageableCourseUrl = function () {
-  let params
+  const params = {
+    current_course_id: ENV.COURSE_ID
+  }
   if (this.includeConcludedCourses) {
-    params = encodeQueryString({
-      'include[]': 'concluded',
-    })
+    params['include[]'] = 'concluded'
   }
-  if (params) {
-    return '/users/' + this.current_user_id + '/manageable_courses?' + params
-  } else {
-    return '/users/' + this.current_user_id + '/manageable_courses'
-  }
+
+  return '/users/' + this.current_user_id + '/manageable_courses?' + encodeQueryString(params)
 }
 
 // Build a list of courses that our template and autocomplete can use
