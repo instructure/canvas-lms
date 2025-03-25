@@ -18,10 +18,11 @@
  @import "base/environment";
 
 .ui-listview {
-  box-shadow: 0px 1px 4px rgba(0,0,0,.3);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
   padding: 0;
   list-style: none;
   min-width: 300px;
+  overflow: hidden; // crop the iframe outside the border-radius
 
   border-radius: 0.6em;
   li:first-child {
@@ -31,13 +32,6 @@
   li:last-child  {
     border-bottom-#{direction(right)}-radius: 0.6em;
     border-bottom-#{direction(left)}-radius: 0.6em;
-  }
-
-  &.ui-listview-no-rounded-bottom {
-    &, li:last-child {
-      border-bottom-#{direction(right)}-radius: 0;
-      border-bottom-#{direction(left)}-radius: 0;
-    }
   }
 
 /*  &, li:first-child, li:last-child {
@@ -61,6 +55,11 @@
       font-size: 1em; /*this is to override the .file, .pdf, .doc etc 10px size*/
       background-position: 15px center; /*overrides background-position left of attachment_links*/
     }
+    .ui-listview-text > iframe {
+      border: none; // remove big iframe border
+      border-radius: 0 0 .6em .6em;
+      border-bottom: 1px solid #ccc;
+    }
     &:hover {
       border-color: #bbb;
       background:       #dadada;
@@ -71,13 +70,11 @@
       a{ text-decoration: none;}
     }
     &:active, &.active {
-      border-color: #999;
-      background:       #999;
       font-weight: bold;
-      color:          #fff;
+      color: #fff;
       cursor: pointer;
       text-decoration: none;
-      @include vertical-gradient(#ccc, #aaa);
+      background: #f9fbfd; // make background white instead of an ugly gradient
       outline: none;
       a {
         color: #444;
