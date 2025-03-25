@@ -44,6 +44,8 @@ type CourseOption = {
   term: string
   start_at: string
   end_at: string
+  start_at_locale: string | null
+  end_at_locale: string | null
   blueprint: boolean
 }
 
@@ -77,18 +79,21 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
 
   const composeManageableCourseURL = useCallback(
     (currentSearchParam?: string, includeConcluded?: boolean) => {
-      let url = `/users/${currentUser}/manageable_courses`
+      const params = new URLSearchParams();
 
-      if (currentSearchParam || includeConcluded) {
-        url += '?'
+      if(ENV.COURSE_ID) {
+        params.set('current_course_id', ENV.COURSE_ID)
       }
+
       if (currentSearchParam) {
-        url += `term=${currentSearchParam}`
+        params.set('term', currentSearchParam)
       }
+
       if (includeConcluded) {
-        url += `${currentSearchParam ? '&' : ''}include=concluded`
+        params.set('include', 'concluded')
       }
-      return url
+
+      return `/users/${currentUser}/manageable_courses?${params.toString()}`
     },
     [currentUser]
   )
@@ -231,6 +236,10 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
     : []
   const value = selectedCourse ? selectedCourse.id : ''
 
+  // Prefer locale date, fallback if unavailable
+  const oldStartDate = selectedCourse?.start_at_locale || selectedCourse?.start_at;
+  const oldEndDate = selectedCourse?.end_at_locale || selectedCourse?.end_at;
+
   return (
     <>
       <View as="div" margin="medium none none none" width="100%" maxWidth="46.5rem">
@@ -358,8 +367,8 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
         canImportBPSettings={
           selectedCourse && showBpSettingImport ? selectedCourse.blueprint : false
         }
-        oldStartDate={parseDateToISOString(selectedCourse?.start_at)}
-        oldEndDate={parseDateToISOString(selectedCourse?.end_at)}
+        oldStartDate={parseDateToISOString(oldStartDate)}
+        oldEndDate={parseDateToISOString(oldEndDate)}
         newStartDate={parseDateToISOString(newStartDate)}
         newEndDate={parseDateToISOString(newEndDate)}
         onSubmit={handleSubmit}

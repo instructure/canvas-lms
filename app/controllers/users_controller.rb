@@ -896,9 +896,12 @@ class UsersController < ApplicationController
       @courses.select! { |c| c.grants_all_rights?(@current_user, :read_as_admin, :read) }
     end
 
+    current_course = Course.find_by(id: params[:current_course_id]) if params[:current_course_id].present?
     MasterCourses::MasterTemplate.preload_is_master_course(@courses)
+
     render json: @courses.map { |c|
-      { label: c.nickname_for(@current_user),
+      {
+        label: c.nickname_for(@current_user),
         id: c.id,
         course_code: c.course_code,
         sis_id: c.sis_source_id,
@@ -908,7 +911,8 @@ class UsersController < ApplicationController
         account_id: c.enrollment_term.root_account.id,
         start_at: datetime_string(c.start_at, :verbose, nil, true),
         end_at: datetime_string(c.conclude_at, :verbose, nil, true),
-        blueprint: MasterCourses::MasterTemplate.is_master_course?(c) }
+        blueprint: MasterCourses::MasterTemplate.is_master_course?(c)
+      }.merge(locale_dates_for(c, current_course))
     }
   end
 
@@ -3382,6 +3386,17 @@ class UsersController < ApplicationController
       nil
     else
       raise "Error connecting to recaptcha #{response}"
+    end
+  end
+
+  def locale_dates_for(course, current_course)
+    return { start_at_locale: nil, end_at_locale: nil } unless current_course&.locale.present?
+
+    I18n.with_locale(current_course.locale) do
+      {
+        start_at_locale: datetime_string(course.start_at, :verbose, nil, true),
+        end_at_locale: datetime_string(course.conclude_at, :verbose, nil, true)
+      }
     end
   end
 end

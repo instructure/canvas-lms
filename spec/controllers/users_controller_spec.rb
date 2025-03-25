@@ -555,6 +555,72 @@ describe UsersController do
     end
   end
 
+  context "when current_course_id is present" do
+    before do
+      course_with_teacher_logged_in(course_name: "LocaleTestCourse", active_all: true)
+
+      # Simulate a course in Spanish
+      @spanish_course = @course
+      @spanish_course.locale = "es"
+      @spanish_course.start_at = Time.zone.local(2025, 2, 1, 0, 0, 0)
+      @spanish_course.conclude_at = Time.zone.local(2025, 5, 20, 0, 0, 0)
+      @spanish_course.save!
+
+      course_with_teacher(course_name: "CurrentCourse", user: @teacher, active_all: true)
+      @current_course_catalan = @course
+      @current_course_catalan.locale = "ca"
+      @current_course_catalan.save!
+
+      user_session(@teacher)
+    end
+
+    it "includes start_at_locale and end_at_locale using the current_course locale" do
+      # Simulate importing a course set in Spanish to a course set to Catalan
+      get "manageable_courses", params: {
+        user_id: @teacher.id,
+        current_course_id: @current_course_catalan.id,
+        term: "LocaleTestCourse"
+      }
+
+      expect(response).to be_successful
+      courses = json_parse
+      returned_course = courses.find { |c| c["course_code"] == "LocaleTestCourse" }
+      expect(returned_course).not_to be_nil
+
+      expect(returned_course["start_at_locale"]).to be_present
+      expect(returned_course["end_at_locale"]).to be_present
+
+      expect(returned_course["start_at_locale"]).to eq("Febr 1, 2025 a les 0:00")
+      expect(returned_course["end_at_locale"]).to eq("Maig 20, 2025 a les 0:00")
+    end
+  end
+
+  context "when current_course_id is not present" do
+    before do
+      course_with_teacher_logged_in(course_name: "NoLocale", active_all: true)
+
+      @course.start_at = 2.weeks.ago
+      @course.conclude_at = 1.day.from_now
+      @course.save!
+    end
+
+    it "returns nil for start_at_locale and end_at_locale" do
+      get "manageable_courses", params: {
+        user_id: @teacher.id,
+        term: "NoLocale"
+      }
+
+      expect(response).to be_successful
+      courses = json_parse
+
+      returned_course = courses.find { |c| c["course_code"] == "NoLocale" }
+      expect(returned_course).not_to be_nil
+
+      expect(returned_course["start_at_locale"]).to be_nil
+      expect(returned_course["end_at_locale"]).to be_nil
+    end
+  end
+
   describe "POST 'create'" do
     it "does not allow creating when self_registration is disabled and you're not an admin'" do
       post "create", params: { pseudonym: { unique_id: "jacob@instructure.com" }, user: { name: "Jacob Fugal" } }
