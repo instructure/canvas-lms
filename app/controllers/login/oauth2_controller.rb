@@ -143,7 +143,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
 
   def pop_nonce
     return unless (nonce_array = session[:oauth2_nonce])
-    return nonce if nonce_array.is_a?(String)
+    return nonce_array if nonce_array.is_a?(String)
 
     nonce = nonce_array.pop
     session.delete(:oauth2_nonce) if nonce_array.empty?
