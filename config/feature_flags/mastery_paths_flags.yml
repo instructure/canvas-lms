@@ -1,0 +1,6 @@
+---
+mastery_path_unreleased_items_block_progression:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Mastery Path Unreleased Items block Module Progression
+  description: When an ungraded assignment will always release at least one item, all possible unreleased items are considered for module progression logic
