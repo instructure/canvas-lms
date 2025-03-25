@@ -1738,6 +1738,78 @@ describe ContextModule do
     end
   end
 
+  describe "#content_tags_for" do
+    before :once do
+      setup_course_with_native_conditional_release
+      @course.root_account.enable_feature! :mastery_path_unreleased_items_block_progression
+
+      @module1 = @course.context_modules.create!(name: "M1")
+      @module2 = @course.context_modules.create!(name: "M2")
+      @module2.update(prerequisites: "module_#{@module1.id}")
+      @module3 = @course.context_modules.create!(name: "M3")
+      @module3.update(prerequisites: "module_#{@module2.id}")
+    end
+
+    describe "when a module contains only conditionally released items" do
+      before :once do
+        @tag_m1_1 = @module1.add_item(type: "assignment", id: @trigger_assmt.id)
+        @module1.completion_requirements = { id: @tag_m1_1.id, type: "must_submit" }
+        @module1.save
+        @tag_m2_1 = @module2.add_item(type: "assignment", id: @set1_assmt1.id)
+        @tag_m2_2 = @module2.add_item(type: "assignment", id: @set2_assmt1.id)
+        @tag_m2_3 = @module2.add_item(type: "assignment", id: @set2_assmt2.id)
+        @tag_m2_4 = @module2.add_item(type: "assignment", id: @set3a_assmt.id)
+        @tag_m2_5 = @module2.add_item(type: "assignment", id: @set3b_assmt.id)
+        @module2.completion_requirements = [
+          { id: @tag_m2_1.id, type: "must_view" },
+          { id: @tag_m2_2.id, type: "must_view" },
+          { id: @tag_m2_3.id, type: "must_view" },
+          { id: @tag_m2_4.id, type: "must_view" },
+          { id: @tag_m2_5.id, type: "must_view" },
+        ]
+        @module2.save
+        @m3_assmt = @course.assignments.create!
+        @module3.add_item(type: "assignment", id: @m3_assmt.id)
+
+        course_with_student(course: @course)
+        @trigger_assmt.submit_homework(@student, body: "hi")
+      end
+
+      it "includes unreleased items if at least one of them will be released" do
+        expect(@module2.content_tags_for(@student)).to include(@tag_m2_1)
+      end
+    end
+
+    describe "when a module contains a trigger assignment with conditionally released items" do
+      before :once do
+        @tag_m1_1 = @module1.add_item(type: "assignment", id: @trigger_assmt.id)
+        @tag_m1_2 = @module1.add_item(type: "assignment", id: @set1_assmt1.id)
+        @tag_m1_3 = @module1.add_item(type: "assignment", id: @set2_assmt1.id)
+        @tag_m1_4 = @module1.add_item(type: "assignment", id: @set2_assmt2.id)
+        @tag_m1_5 = @module1.add_item(type: "assignment", id: @set3a_assmt.id)
+        @tag_m1_6 = @module1.add_item(type: "assignment", id: @set3b_assmt.id)
+        @module1.completion_requirements = [
+          { id: @tag_m1_1.id, type: "must_submit" },
+          { id: @tag_m1_2.id, type: "must_view" },
+          { id: @tag_m1_3.id, type: "must_view" },
+          { id: @tag_m1_4.id, type: "must_view" },
+          { id: @tag_m1_5.id, type: "must_view" },
+          { id: @tag_m1_6.id, type: "must_view" },
+        ]
+        @module1.save
+        @m2_assmt = @course.assignments.create!
+        @module2.add_item(type: "assignment", id: @m2_assmt.id)
+
+        course_with_student(course: @course)
+        @trigger_assmt.submit_homework(@student, body: "hi")
+      end
+
+      it "includes unreleased items if at least one of them will be released" do
+        expect(@module1.content_tags_for(@student)).to include(@tag_m1_2)
+      end
+    end
+  end
+
   describe "#find_or_create_progression" do
     it "does not create progressions for non-enrolled users" do
       course = Course.create!
