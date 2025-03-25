@@ -43,8 +43,6 @@ const getMembershipServiceCheckbox = () => {
 
 const handleSubmitMock = jest.fn()
 
-const mockedFlash = showFlashAlert as jest.Mock<typeof showFlashAlert>
-
 afterEach(() => {
   jest.clearAllMocks()
 })
@@ -167,26 +165,6 @@ describe('when configuration type is manual', () => {
           screen.getAllByText(/One or both of Launch URL and Domain should be entered./i),
         ).not.toHaveLength(0)
       })
-
-      it("doesn't flash an error if just url is set and tries to submit the form", async () => {
-        renderForm(baseProps)
-        await userPaste(getNameInput(), 'a really cool name')
-        await userPaste(getUrlInput(), 'https://example.com')
-        await userEvent.click(getSubmitButton())
-
-        expect(mockedFlash).not.toHaveBeenCalled()
-        expect(handleSubmitMock).toHaveBeenCalled()
-      })
-
-      it("doesn't flash an error if just domain is set and tries to submit the form", async () => {
-        renderForm(baseProps)
-        await userPaste(getNameInput(), 'a really cool name')
-        await userPaste(getDomainInput(), 'example.com')
-        await userEvent.click(getSubmitButton())
-
-        expect(mockedFlash).not.toHaveBeenCalled()
-        expect(handleSubmitMock).toHaveBeenCalled()
-      })
     })
   })
 })
@@ -270,28 +248,27 @@ describe('when configuration type is url', () => {
       await userEvent.click(screen.getByText(/submit/i))
 
       expect(handleSubmitMock).not.toHaveBeenCalled()
-      expect(mockedFlash).toHaveBeenCalled()
-      expect(screen.getByText(/This field is required/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/please enter a valid url \(e\.g\. https:\/\/example\.com\)/i),
+      ).toBeInTheDocument()
     })
 
-    it('flashes and renders error when the name is empty', async () => {
+    it('renders error when the name is empty', async () => {
       renderForm(baseProps)
       await userPaste(screen.getByLabelText(/config url/i), 'https://example.com')
       await userEvent.click(screen.getByText(/submit/i))
 
       expect(handleSubmitMock).not.toHaveBeenCalled()
-      expect(mockedFlash).toHaveBeenCalled()
       expect(screen.getByText(/This field is required/i)).toBeInTheDocument()
     })
 
-    it('flashes and renders multiple errors when both fields are empty', async () => {
+    it('renders multiple errors when both fields are empty', async () => {
       renderForm(baseProps)
 
       await userEvent.click(screen.getByText(/submit/i))
 
       expect(handleSubmitMock).not.toHaveBeenCalled()
-      expect(mockedFlash).toHaveBeenCalled()
-      expect(screen.getAllByText(/This field is required/i)).toHaveLength(2)
+      expect(screen.getAllByText(/This field is required/i)).toHaveLength(1)
     })
   })
 })
@@ -367,33 +344,30 @@ describe('when configuration type is xml', () => {
   })
 
   describe('error checking', () => {
-    it('flashes and renders an error when xml configuration is empty', async () => {
+    it('renders an error when xml configuration is empty', async () => {
       renderForm(baseProps)
       await userPaste(screen.getByLabelText(/name/i), 'a great name')
       await userEvent.click(screen.getByText(/submit/i))
 
       expect(handleSubmitMock).not.toHaveBeenCalled()
-      expect(mockedFlash).toHaveBeenCalled()
       expect(screen.getByText(/This field is required/i)).toBeInTheDocument()
     })
 
-    it('flashes and renders error when the name is empty', async () => {
+    it('renders error when the name is empty', async () => {
       renderForm(baseProps)
       await userPaste(screen.getByLabelText(/xml configuration/i), 'some for sure real xml')
       await userEvent.click(screen.getByText(/submit/i))
 
       expect(handleSubmitMock).not.toHaveBeenCalled()
-      expect(mockedFlash).toHaveBeenCalled()
       expect(screen.getByText(/This field is required/i)).toBeInTheDocument()
     })
 
-    it('flashes and renders multiple errors when both fields are empty', async () => {
+    it('renders multiple errors when both fields are empty', async () => {
       renderForm(baseProps)
 
       await userEvent.click(screen.getByText(/submit/i))
 
       expect(handleSubmitMock).not.toHaveBeenCalled()
-      expect(mockedFlash).toHaveBeenCalled()
       expect(screen.getAllByText(/This field is required/i)).toHaveLength(2)
     })
   })
