@@ -181,12 +181,12 @@ describe('generateSearchNavigationUrl', () => {
   it('returns correct url when showing all contexts', () => {
     setupFilesEnv(true)
     const url = generateSearchNavigationUrl('foo')
-    expect(url).toBe('/folder/users_1/search?search_term=foo')
+    expect(url).toBe('/folder/users_1?search_term=foo')
   })
 
   it('returns correct url when showing only course context', () => {
     setupFilesEnv(false)
     const url = generateSearchNavigationUrl('foo')
-    expect(url).toBe('/search?search_term=foo')
+    expect(url).toBe('/?search_term=foo')
   })
 })

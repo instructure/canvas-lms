@@ -17,7 +17,6 @@
  */
 
 import {useState} from 'react'
-import {useNavigate} from 'react-router-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
@@ -25,7 +24,6 @@ import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {generateSearchNavigationUrl} from '../../utils/apiUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -48,11 +46,11 @@ const renderClearButton = (searchValue: string, handleClear: () => void) => {
 
 interface SearchBarProps {
   initialValue?: string
+  onSearch: (searchTerm: string) => void
 }
 
-const SearchBar = ({initialValue = ''}: SearchBarProps) => {
+const SearchBar = ({initialValue = '', onSearch}: SearchBarProps) => {
   const [searchValue, setSearchValue] = useState(initialValue)
-  const navigate = useNavigate()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,8 +58,7 @@ const SearchBar = ({initialValue = ''}: SearchBarProps) => {
       return
     }
 
-    const searchUrl = generateSearchNavigationUrl(searchValue)
-    navigate(searchUrl)
+    onSearch(searchValue)
   }
 
   const handleClear = () => {

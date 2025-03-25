@@ -27,9 +27,7 @@ import {getRootFolder, loadFolders} from './utilities'
 
 const ROUTES = {
   ALL_FOLDER: 'folder/:context/*',
-  ALL_SEARCH: 'folder/:context/search',
   FOLDER: 'folder/*',
-  SEARCH: 'search',
 } as const
 
 const allMyFilesRoutes: RouteObject[] = [
@@ -44,19 +42,6 @@ const allMyFilesRoutes: RouteObject[] = [
       const [pluralContextType, contextId] = splitAssetString(params.context!)!
       return {
         folders: await loadFolders(pluralContextType, contextId, params['*']),
-        searchTerm: ''
-      }
-    }
-  },
-  {
-    path: ROUTES.ALL_SEARCH,
-    Component: FilesApp,
-    loader: ({params, request}: LoaderFunctionArgs): LoaderData => {
-      const [pluralContextType, contextId] = splitAssetString(params.context!)!
-      const searchTerm = new URL(request.url).searchParams.get('search_term') || ''
-      return {
-        folders: [getRootFolder(pluralContextType, contextId)],
-        searchTerm
       }
     }
   },
@@ -69,7 +54,6 @@ const filesRoutes: RouteObject[] = [
     loader: (): LoaderData => {
       return {
         folders: [getRootFolder(filesEnv.contextType, filesEnv.contextId)],
-        searchTerm: ''
       }
     }
   },
@@ -79,18 +63,6 @@ const filesRoutes: RouteObject[] = [
     loader: async ({params}: LoaderFunctionArgs): Promise<LoaderData> => {
       return {
         folders: await loadFolders(filesEnv.contextType, filesEnv.contextId, params['*']),
-        searchTerm: ''
-      }
-    }
-  },
-  {
-    path: ROUTES.SEARCH,
-    Component: FilesApp,
-    loader: ({request}: LoaderFunctionArgs): LoaderData => {
-      const searchTerm = new URL(request.url).searchParams.get('search_term') || ''
-      return {
-        folders: [getRootFolder(filesEnv.contextType, filesEnv.contextId)],
-        searchTerm
       }
     }
   },
