@@ -241,7 +241,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
       <Flex gap="small" wrap="wrap" margin="0 0 medium 0" alignItems='end'>
         <Flex.Item width={props.isMobile ? '100%' : 'auto'} shouldGrow={true}>
           <TextInput
-            renderLabel={I18n.t('Topics to focus on')}
+            renderLabel={I18n.t('Topics to focus on (optional)')}
             placeholder={I18n.t('Enter the areas or topics you want the summary to focus on')}
             value={userInput}
             onChange={(_, value) => {
