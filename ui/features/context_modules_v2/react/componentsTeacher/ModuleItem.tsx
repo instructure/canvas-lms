@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useMemo, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {
-  IconDragHandleLine
+  IconDragHandleLine,
+  IconExternalLinkLine,
 } from '@instructure/ui-icons'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import {INDENT_LOOKUP, getItemIcon} from '../utils/utils'
@@ -94,13 +95,15 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
 
   const masteryPathsData = getMasteryPathsData()
 
+  const itemIcon = useMemo(() => getItemIcon(content), [content])
+
+  const itemLeftMargin = useMemo(() => INDENT_LOOKUP[indent ?? 0], [indent])
+
   return (
     <View
       as="div"
-      padding="x-small medium x-small x-small"
+      padding="small medium small xxx-small"
       background="transparent"
-      borderWidth="0"
-      borderRadius="medium"
       overflowX="hidden"
       data-item-id={_id}
     >
@@ -114,10 +117,10 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
         <Flex.Item>
           <Flex>
             {/* Item Type Icon */}
-            <Flex.Item margin={`0 small 0 ${INDENT_LOOKUP[indent] ?? 'x-small'}`}>
-              {getItemIcon(content)}
-            </Flex.Item>
-            <Flex.Item>
+            {itemIcon && <Flex.Item margin={`0 small 0 ${itemLeftMargin}`}>
+              {itemIcon}
+            </Flex.Item>}
+            <Flex.Item margin={itemIcon ? '0' : `0 small 0 ${itemLeftMargin}`}>
               <Flex
                 alignItems="start"
                 justifyItems="start"
@@ -128,8 +131,8 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
                 <Flex.Item>
                   <Flex.Item shouldGrow={true}>
                     <Link href={url} isWithinText={false} onClick={onClick}>
-                      <Text weight="bold" color='primary'>
-                        {content?.title || 'Untitled Item'}
+                      <Text weight={content?.type === 'ExternalUrl' ? 'normal' : 'bold'} color={content?.type === 'ExternalUrl' ? 'brand' : 'primary'}>
+                        {content?.title || 'Untitled Item'} {/* FIXME:show when link opens a new tab{content?.type === 'ExternalUrl' && <IconExternalLinkLine size="x-small" color="brand" />}*/}
                       </Text>
                     </Link>
                   </Flex.Item>

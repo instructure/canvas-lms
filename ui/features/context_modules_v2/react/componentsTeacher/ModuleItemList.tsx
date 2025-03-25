@@ -56,7 +56,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
             style={{
               minHeight: '50px',
               background: snapshot.isDraggingOver ? '#f5f5f5' : 'transparent',
-              padding: '4px 0',
+              padding: '0',
               overflowX: 'hidden'
             }}
           >
@@ -83,23 +83,25 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
                         ...dragProvided.draggableProps.style,
                         background: dragSnapshot.isDragging ? '#ffffff' : 'transparent',
                         boxShadow: dragSnapshot.isDragging ? '0 2px 8px rgba(0,0,0,0.15)' : 'none',
-                        borderRadius: '4px',
-                        margin: '2px 0',
-                        overflowX: 'hidden'
+                        overflowX: 'hidden',
+                        borderWidth: item.content?.published ? '0 0 0 large' : '0',
+                        borderColor: 'success'
                       }}
                       data-item-id={item._id}
                     >
-                      <View as="div" borderWidth={`${index === 0 ? '0' : 'small'} 0 0 0`} borderRadius="small">
-                        <ModuleItem
-                          {...item}
-                          moduleId={moduleId}
-                          index={index}
-                          id={item.id}
-                          published={item.content?.published ?? false}
-                          canUnpublish={item.content?.canUnpublish ?? true}
-                          completionRequirements={completionRequirements}
-                          dragHandleProps={dragProvided.dragHandleProps}
-                        />
+                      <View as="div" borderWidth={`${index === 0 ? '0' : 'small'} 0 0 0`}>
+                        <View as="div" borderWidth="0 0 0 large" borderColor={item.content?.published ? 'success' : 'transparent'}>
+                          <ModuleItem
+                            {...item}
+                            moduleId={moduleId}
+                            index={index}
+                            id={item.id}
+                            published={item.content?.published ?? false}
+                            canUnpublish={item.content?.canUnpublish ?? true}
+                            completionRequirements={completionRequirements}
+                            dragHandleProps={dragProvided.dragHandleProps}
+                          />
+                        </View>
                       </View>
                     </div>
                   )}

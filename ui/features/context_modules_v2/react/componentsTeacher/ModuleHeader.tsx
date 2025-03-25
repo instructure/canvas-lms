@@ -69,7 +69,6 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
     <View as="div"
       background="secondary"
       borderWidth="0 0 small 0"
-      borderRadius="small"
     >
       <Flex
         padding="small"

@@ -23,7 +23,6 @@ import {
     IconAssignmentLine,
     IconQuizLine,
     IconLinkLine,
-    IconExternalLinkLine
   } from '@instructure/ui-icons'
 import { ModuleContent } from './types'
 
@@ -42,15 +41,15 @@ export const getItemIcon = (content: ModuleContent) => {
 
     const type = content.type.toLowerCase()
 
-    if (type.includes('assignment')) return <IconAssignmentLine />
-    if (type.includes('quiz')) return <IconQuizLine />
-    if (type.includes('discussion')) return <IconDiscussionLine />
-    if (type.includes('attachment') || type.includes('file')) return <IconAttachMediaLine />
-    if (type.includes('external') || type.includes('url')) return <IconExternalLinkLine />
-    if (type.includes('wiki') || type.includes('page')) return <IconDocumentLine />
-    if (type.includes('link')) return <IconLinkLine />
+    if (type.includes('assignment')) return <IconAssignmentLine color={content.published ? 'success' : 'primary'} />
+    if (type.includes('quiz')) return <IconQuizLine color={content.published ? 'success' : 'primary'} />
+    if (type.includes('discussion')) return <IconDiscussionLine color={content.published ? 'success' : 'primary'} />
+    if (type.includes('attachment') || type.includes('file')) return <IconAttachMediaLine color={content.published ? 'success' : 'primary'} />
+    if (type.includes('external') || type.includes('url')) return <IconLinkLine color={content.published ? 'success' : 'primary'} />
+    if (type.includes('wiki') || type.includes('page')) return <IconDocumentLine color={content.published ? 'success' : 'primary'} />
+    if (type.includes('link')) return <IconLinkLine color={content.published ? 'success' : 'primary'} />
 
-    return <IconDocumentLine />
+    return null
   }
 
 export const mapContentSelection = (id: string, contentType: string) => {
