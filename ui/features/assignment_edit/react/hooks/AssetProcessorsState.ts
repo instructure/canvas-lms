@@ -23,6 +23,7 @@ import {LtiLaunchDefinition} from "@canvas/select-content-dialog/jquery/select_c
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {confirmDanger} from "@canvas/instui-bindings/react/Confirm"
 import {DeepLinkResponse} from "@canvas/deep-linking/DeepLinkResponse"
+import {showFlashAlert, showFlashError} from "@canvas/alerts/react/FlashAlert"
 
 const I18n = createI18nScope('asset_processors_selection')
 
@@ -113,11 +114,26 @@ function existingAttachedAssetProcessor(
   }
 }
 
+function showFlashMessagesFromDeepLinkingResponse(data: DeepLinkResponse) {
+  if (data.errormsg) {
+    showFlashError(I18n.t("Error from document processing app: %{errorFromTool}", {errorFromTool: data.errormsg}))()
+  }
+
+  if (data.msg) {
+    showFlashAlert({message: I18n.t("Message from document processing app: %{messageFromTool}", {messageFromTool: data.msg})})
+  }
+
+  if (!data.msg && !data.errormsg && !data.content_items?.length) {
+    showFlashAlert({message: I18n.t("The document processing app returned with no processors to attach.")})
+  }
+}
+
 export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) => ({
   attachedProcessors: [],
 
   addAttachedProcessors({tool, data}) {
-    // TODO handle msg, errors, anything else in DeepLinkResponse
+    showFlashMessagesFromDeepLinkingResponse(data)
+
     const items = data.content_items.filter(item => item.type === 'ltiAssetProcessor')
     const newProcessors: AttachedAssetProcessor[] = items.map(contentItem => newAttachedAssetProcessor({tool, contentItem}))
     set({attachedProcessors: [...get().attachedProcessors, ...newProcessors]})
