@@ -185,7 +185,7 @@ GroupCategoryEditView.prototype.validateFormData = function (data, _errors) {
     }
   }
 
-  if (data.group_limit !== '') {
+  if (data.group_limit != null && data.group_limit !== '') {
     const groupLimitValue = Number(data.group_limit)
     if (Number.isNaN(groupLimitValue) || !Number.isInteger(groupLimitValue)) {
       errors.group_limit = [
