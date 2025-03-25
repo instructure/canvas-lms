@@ -3175,14 +3175,47 @@ describe UsersController do
       end
     end
 
-    it "sets ENV.CREATE_COURSES_PERMISSIONS correctly if user is a teacher and can create courses" do
-      Account.default.settings[:teachers_can_create_courses] = true
-      Account.default.save!
-      course_with_teacher_logged_in(active_all: true)
+    context "ENV.CREATE_COURSES_PERMISSIONS" do
+      before do
+        Account.default.enable_feature!(:create_course_subaccount_picker)
+        Account.default.settings[:teachers_can_create_courses] = true
+        Account.default.settings[:students_can_create_courses] = true
+        Account.default.save!
+      end
 
-      get "user_dashboard"
-      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:teacher)
-      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+      it "sets correct for a teacher with enrollments" do
+        course_with_teacher_logged_in(active_all: true)
+
+        get "user_dashboard"
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:teacher)
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+      end
+
+      it "sets correctly for a user with no enrollments" do
+        user_session(user_factory(active_all: true))
+
+        get "user_dashboard"
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be_nil
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_truthy
+      end
+
+      it "sets correctly for a student with enrollments in a sub-account" do
+        @subaccount = Account.default.sub_accounts.create!(name: "SA")
+        course_with_student_logged_in(active_all: true, account: @subaccount)
+
+        get "user_dashboard"
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:student)
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+      end
+
+      it "sets correctly for an admin user" do
+        admin_user = account_admin_user(active_all: true)
+        user_session(admin_user)
+
+        get "user_dashboard"
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:admin)
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+      end
     end
   end
 
