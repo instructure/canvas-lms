@@ -1788,6 +1788,7 @@ hy:
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Թեմայի ստեղծման ժամանակ սխալ է տեղի ունեցել, խնդրում ենք փորձել կրկին:"
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Ներբեռնմանը պատրաստվելու ժամանակ սխալ է տեղի ունեցել, փորձեք կրկին:"
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Սխալ է տեղի ունեցել %{filename} -ի օգտագործման իրավունքը սահմանելիս"
+  an_external_identity_provider_is_enabled_7859c6fb: "Արտաքին նույնականացման պրովայդերը միացված է"
   an_integer_value_is_required_e073bd46: "Պահանջվում է մուտքագրել ամբողջ թիվ"
   an_item_named_name_already_exists_in_this_location_147b7312: "\"%{name}\" անունը կրող տարր արդեն իսկ առկա է: Արդյո՚ք Դուք ցանկանում եք փոխարինել արդեն իսկ առկա ֆայլը նոր ֆայլով: "
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Սերվերի անհայտ սխալ: Կրկին փորձեք:"
@@ -6578,6 +6579,7 @@ hy:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Մուտքագրել hexcode լրացուցիչ գույն օգտագործելու համար"
   enter_a_score_to_test_c6f89f4a: "Մուտքագրեք գնահատականը թեստի համար"
   enter_a_section_name_adbe3099: "Մուտքագրել բաժնի անվանումը"
+  enter_a_shorter_category_name_4befe0da: "Մուտքագրեք կատեգորիայի ավելի կարճ անվանում"
   enter_a_shorter_group_name_8f7fc42c: "Մուտքագրեք խմբի ավելի կարճ անուն"
   enter_the_date_you_would_like_to_navigate_to_a712de47: "Մուտքագրեք այն ամսաթիվը, որին կցանկանայիք անցնել"
   enter_your_question_and_multiple_answers_31370054: "Մուտքագրեք Ձեր հարցը եւ պատասխանների տարբերակները:"
@@ -17673,6 +17675,7 @@ hy:
       unpublish: "Չեղարկել հրապարակումը"
     context_modules: 
       publish: Հրապարակել
+  visibility_f62e7f12: Տեսանելիություն
   visit_864b4060: Այցելել
   visit_group_group_name_7a816081: "Այցելել %{group_name} խումբը"
   waiting_for_attempted_login_6d00cb49: "Համակարգ մուտք գործելու սպասում "
