@@ -69,5 +69,33 @@ describe RubricAssessmentExport do
         expect(rows.size).to eq(1)
       end
     end
+
+    context "when there is a new criteria that hasn't been assessed yet" do
+      before do
+        new_criteria = {
+          description: "New criterion",
+          points: 10,
+          id: "crit2",
+          ratings: [{ description: "Good", points: 10, id: "rat1", criterion_id: "crit2" }]
+        }
+        @rubric.update!(data: @rubric.data + [new_criteria])
+      end
+
+      it "returns only one row" do
+        csv_content = @export.generate_file
+        rows = CSV.parse(csv_content, headers: true)
+
+        expect(rows.size).to eq(1)
+      end
+
+      it "returns empty fields for new criterion" do
+        csv_content = @export.generate_file
+        rows = CSV.parse(csv_content, headers: true)
+
+        expect(rows[0]["New criterion - Rating"]).to eq("")
+        expect(rows[0]["New criterion - Points"]).to eq("")
+        expect(rows[0]["New criterion - Comments"]).to eq("")
+      end
+    end
   end
 end
