@@ -24,23 +24,14 @@ import {Link} from '@instructure/ui-link'
 import {INDENT_LOOKUP, getItemIcon} from '../utils/utils'
 
 import ModuleItemSupplementalInfo from '../components/ModuleItemSupplementalInfo'
-import {CompletionRequirement} from '../utils/types'
+import {CompletionRequirement, ModuleItemContent} from '../utils/types'
 
 export interface ModuleItemStudentProps {
   _id: string
   url: string
   indent: number
   index: number
-  content: {
-    id?: string
-    _id?: string
-    title: string
-    type?: string
-    pointsPossible?: number
-    dueAt?: string
-    lockAt?: string
-    unlockAt?: string
-  } | null
+  content: ModuleItemContent
   onClick?: () => void
   completionRequirements?: CompletionRequirement[]
 }

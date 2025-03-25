@@ -45,7 +45,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleItemActionMenu from './ModuleItemActionMenu'
-import {MasteryPathsData} from '../utils/types'
+import {MasteryPathsData, ModuleItemContent} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import {mapContentSelection} from '../utils/utils'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
@@ -60,15 +60,7 @@ interface ModuleItemActionPanelProps {
   itemId: string
   id: string
   indent: number
-  content: {
-    id?: string
-    _id?: string
-    title?: string
-    type?: string
-    published?: boolean
-    canUnpublish?: boolean
-    isLockedByMasterCourse?: boolean
-  } | null
+  content: ModuleItemContent
   published: boolean
   canBeUnpublished: boolean
   masteryPathsData: MasteryPathsData | null
@@ -130,8 +122,8 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [handleAssignTo, content, courseId, setIsMenuOpen])
 
   const handleDuplicateRef = useCallback(() => {
-    handleDuplicate(id, itemId, queryClient, courseId, setIsMenuOpen)
-  }, [handleDuplicate, id, itemId, queryClient, courseId, setIsMenuOpen])
+    handleDuplicate(moduleId, itemId, queryClient, courseId, setIsMenuOpen)
+  }, [handleDuplicate, moduleId, itemId, queryClient, courseId, setIsMenuOpen])
 
   const handleMoveToRef = useCallback(() => {
     handleMoveTo(setIsMenuOpen)

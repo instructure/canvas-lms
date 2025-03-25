@@ -98,6 +98,7 @@ const MODULE_ITEMS_QUERY = gql`
               url
               published
               canUnpublish
+              newTab
             }
             ... on ModuleExternalTool {
               title

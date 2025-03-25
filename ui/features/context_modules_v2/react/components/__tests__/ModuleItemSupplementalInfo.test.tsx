@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import {ContextModuleProvider} from '../../hooks/useModuleContext'
 import ModuleItemSupplementalInfo from '../ModuleItemSupplementalInfo'
-import type {ModuleContent, CompletionRequirement} from '../../utils/types'
+import type {ModuleItemContent, CompletionRequirement} from '../../utils/types'
 
 const defaultCompletionRequirement: CompletionRequirement = {
   id: '19',
@@ -29,14 +29,14 @@ const defaultCompletionRequirement: CompletionRequirement = {
 }
 
 const currentDate = new Date().toISOString()
-const defaultContent: ModuleContent = {
+const defaultContent: ModuleItemContent = {
   id: '19',
   title: 'Test Module Item',
   dueAt: currentDate,
   pointsPossible: 100,
 }
 
-const setUp = (content: ModuleContent = defaultContent, completionRequirement: CompletionRequirement | null = defaultCompletionRequirement) => {
+const setUp = (content: ModuleItemContent = defaultContent, completionRequirement: CompletionRequirement | null = defaultCompletionRequirement) => {
   return render(
     <ContextModuleProvider courseId="1" isMasterCourse={true} isChildCourse={false}>
       <ModuleItemSupplementalInfo
@@ -91,6 +91,4 @@ describe('ModuleItemSupplementalInfo', () => {
         expect(container.queryByText('100 pts')).not.toBeInTheDocument()
       })
     })
-
-
 })

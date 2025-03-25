@@ -16,21 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo, useState} from 'react'
+import React, {useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
 import {
   IconDragHandleLine,
-  IconExternalLinkLine,
 } from '@instructure/ui-icons'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import {INDENT_LOOKUP, getItemIcon} from '../utils/utils'
 
 import ModuleItemActionPanel from './ModuleItemActionPanel'
+import ModuleItemTitle from './ModuleItemTitle'
 import ModuleItemSupplementalInfo from '../components/ModuleItemSupplementalInfo'
-import {CompletionRequirement, MasteryPathsData} from '../utils/types'
+import {CompletionRequirement, MasteryPathsData, ModuleItemContent} from '../utils/types'
 
 export interface ModuleItemProps {
   id: string
@@ -39,18 +37,7 @@ export interface ModuleItemProps {
   indent: number
   moduleId: string
   index: number
-  content: {
-    id?: string
-    _id?: string
-    title: string
-    type?: string
-    pointsPossible?: number
-    published?: boolean
-    canUnpublish?: boolean
-    dueAt?: string
-    lockAt?: string
-    unlockAt?: string
-  } | null
+  content: ModuleItemContent
   onClick?: () => void
   published?: boolean
   canUnpublish?: boolean
@@ -122,7 +109,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
                 {itemIcon}
               </div>
             </Flex.Item>}
-            <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`}>
+            <Flex.Item>
               <div style={itemIcon ? {} : { padding: `0 0 0 ${itemLeftMargin}` }}>
                 <Flex
                   alignItems="start"
@@ -131,14 +118,8 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
                   direction="column"
                 >
                   {/* Item Title */}
-                  <Flex.Item>
-                    <Flex.Item shouldGrow={true}>
-                      <Link href={url} isWithinText={false} onClick={onClick}>
-                        <Text weight={content?.type === 'ExternalUrl' ? 'normal' : 'bold'} color={content?.type === 'ExternalUrl' ? 'brand' : 'primary'}>
-                          {content?.title || 'Untitled Item'} {/* FIXME:show when link opens a new tab{content?.type === 'ExternalUrl' && <IconExternalLinkLine size="x-small" color="brand" />}*/}
-                        </Text>
-                      </Link>
-                    </Flex.Item>
+                  <Flex.Item shouldGrow={true}>
+                    <ModuleItemTitle content={content} url={url} onClick={onClick} />
                   </Flex.Item>
                   {/* Due Date and Points Possible */}
                   <Flex.Item>

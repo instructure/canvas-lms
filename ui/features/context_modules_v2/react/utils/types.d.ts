@@ -47,7 +47,7 @@ declare global {
     }
 }
 
-export type ModuleContent = {
+export type ModuleItemContent = {
   id?: string
   _id?: string
   title: string
@@ -60,6 +60,9 @@ export type ModuleContent = {
   unlockAt?: string
   todoDate?: string
   url?: string
+  isLockedByMasterCourse?: boolean
+  dueAt?: string
+  lockAt?: string
   // Assignment specific
   assignmentGroupId?: string
   submissionTypes?: string[]
@@ -72,6 +75,7 @@ export type ModuleContent = {
   thumbnailUrl?: string
   // External URL specific
   externalUrl?: string
+  newTab?: boolean
 } | null
 
 export interface CompletionRequirement {
@@ -148,22 +152,5 @@ export interface ModuleItem {
   _id: string
   url: string
   indent: number
-  content: {
-    title: string
-    type?: string
-    pointsPossible?: number
-    published?: boolean
-    canUnpublish?: boolean
-    id?: string
-  } | null
-}
-
-interface ModuleItemContent {
-  id?: string
-  _id?: string
-  title?: string
-  type?: string
-  pointsPossible?: number
-  published?: boolean
-  canUnpublish?: boolean
+  content: ModuleItemContent
 }

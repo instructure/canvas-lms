@@ -21,14 +21,14 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {ModuleContent, CompletionRequirement} from '../utils/types'
+import type {ModuleItemContent, CompletionRequirement} from '../utils/types'
 import CompletionRequirementInfo from '../components/CompletionRequirementInfo'
 
 const I18n = createI18nScope('context_modules_v2')
 
 export interface ModuleItemSupplementalInfoProps {
   contentTagId: string
-  content: ModuleContent
+  content: ModuleItemContent
   completionRequirement?: CompletionRequirement
 }
 

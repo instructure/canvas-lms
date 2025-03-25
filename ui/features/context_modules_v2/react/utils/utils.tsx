@@ -24,7 +24,7 @@ import {
     IconQuizLine,
     IconLinkLine,
   } from '@instructure/ui-icons'
-import { ModuleContent } from './types'
+import { ModuleItemContent } from './types'
 
 const pixelOffset = 20
 
@@ -37,7 +37,7 @@ export const INDENT_LOOKUP: Record<number, string> = {
     5: `${pixelOffset * 5}px`,
 }
 
-export const getItemIcon = (content: ModuleContent) => {
+export const getItemIcon = (content: ModuleItemContent) => {
     if (!content?.type) return <IconDocumentLine />
 
     const type = content.type.toLowerCase()
