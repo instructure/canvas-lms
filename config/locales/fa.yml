@@ -2883,6 +2883,7 @@ fa:
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "یک کاربر کانواس موجود با شناسه %{user_id} قبلا شناسه_یکپارچه سازی درخواست شده %{other_user_id} را ادعا کرده است، از قلم انداختن"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "یک کاربر موجود با کاربران موجود ارائه شده برای ورود به سیستم با شناسه سامانه اطلاعات دانشجو %{user_id} مطابقت ندارد، نادیده گرفتن"
   an_export_is_already_in_progress_54270f01: "یک صدور در حال انجام است."
+  an_external_identity_provider_is_enabled_7859c6fb: "یک ارائه دهنده بیرونی هویت فعال شده است"
   an_integer_value_is_required_e073bd46: "یک مقدار صحیح لازم است"
   an_internal_error_occurred_83b8a685: "یک خطای داخلی رخ داد"
   an_item_named_name_already_exists_in_this_location_147b7312: "یک مورد با عنوان \"%{name}\" در این محل موجود است. می خواهید با فایل موجود جایگزین شود؟"
@@ -9803,6 +9804,7 @@ fa:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "در اینجا یک کد هگزا برای استفاده از رنگ سفارشی وارد نمایید."
   enter_a_score_to_test_c6f89f4a: "وارد کردن یک نمره برای آزمایش"
   enter_a_section_name_adbe3099: "نام بخش را وارد کنید"
+  enter_a_shorter_category_name_4befe0da: "یک نام کوتاه تر برای رده وارد کنید"
   enter_a_shorter_group_name_8f7fc42c: "یک نام کوتاه تر را برای گروه وارد کنید"
   enter_a_student_pairing_code_below_to_add_a_studen_15789251: "یک کد جفت سازی دانش آموز را در زیر وارد کنید تا دانش آموزی برای مشاهده اضافه شود."
   enter_a_valid_date_46d77547: "یک تاریخ معتبر وارد کنید"
@@ -25593,6 +25595,7 @@ fa:
   violation_log_491edd84: "گزارش تخلف"
   violation_log_tray_d4eff9f4: "سینی گزارش تخلف"
   virtual_lectures_in_real_time_a1778dea: "سخنرانی مجازی بلادرنگ"
+  visibility_f62e7f12: "قابلیت مشاهده"
   visit_864b4060: بازدید
   visit_google_meet_ebdaf94f: "رفتن به Google Meet"
   visit_group_group_name_7a816081: "بازدید از گروه %{group_name}"
