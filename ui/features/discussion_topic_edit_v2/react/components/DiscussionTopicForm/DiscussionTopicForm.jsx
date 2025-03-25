@@ -24,7 +24,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
-import {FormFieldGroup} from '@instructure/ui-form-field'
+import {FormField, FormFieldGroup} from '@instructure/ui-form-field'
 import {
   IconAddLine,
   IconPublishSolid,
@@ -966,8 +966,9 @@ function DiscussionTopicForm({
             disabled={ENV?.DISCUSSION_CONTENT_LOCKED}
           />
           <View>
-              {!ENV?.DISCUSSION_CONTENT_LOCKED ? (
-                <span className="discussions-editor" data-testid="discussion-topic-message-editor">
+            {!ENV?.DISCUSSION_CONTENT_LOCKED ? (
+              <span className="discussions-editor" data-testid="discussion-topic-message-editor">
+                <FormField label={I18n.t('Topic content')} id="discussion-topic-message-body">
                   <CanvasRce
                     textareaId="discussion-topic-message-body"
                     onFocus={() => {}}
@@ -977,7 +978,7 @@ function DiscussionTopicForm({
                     onContentChange={setRceContent}
                     editorOptions={{
                       focus: false,
-                      plugins: []
+                      plugins: [],
                     }}
                     height={300}
                     defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
@@ -985,19 +986,20 @@ function DiscussionTopicForm({
                     resourceType={isAnnouncement ? 'announcement.body' : 'discussion_topic.body'}
                     resourceId={currentDiscussionTopic?._id}
                   />
-                </span>
-              ) : (
-                <View
-                  className="user_content discussion-post-content"
-                  data-testid="discussion-topic-message-locked"
-                >
-                  <Text
-                    dangerouslySetInnerHTML={{
-                      __html: currentDiscussionTopic?.message || ''
-                    }}
-                  />
-                </View>
-              )}
+                </FormField>
+              </span>
+            ) : (
+              <View
+                className="user_content discussion-post-content"
+                data-testid="discussion-topic-message-locked"
+              >
+                <Text
+                  dangerouslySetInnerHTML={{
+                    __html: currentDiscussionTopic?.message || '',
+                  }}
+                />
+              </View>
+            )}
           </View>
           {ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH && (
             <AttachmentDisplay
