@@ -67,10 +67,7 @@ $(document).ready(function () {
       const container = $(formError.containerId)
       const errorsContainer = $(formError.errorsContainerId)[0]
       if (container) {
-        container.css({
-          outline: '1px solid red',
-          borderRadius: '3px',
-        })
+        container.addClass('error-outline')
         if (shouldFocus && document.activeElement !== container){
           container.focus()
         }
@@ -182,20 +179,14 @@ $(document).ready(function () {
       errorRoots['#course_autocomplete_id_lookup'] = null
       errorRoots['#course_id']?.unmount()
       errorRoots['#course_id'] = null
-      $("#course_autocomplete_id_lookup, #course_id").css({
-        outline: '',
-        borderRadius: '',
-      })
+      $("#course_autocomplete_id_lookup, #course_id").removeClass('error-outline')
   }
 
   // remove course_section_name errors if you begin to type.
   $edit_section_form.find('#course_section_name').on("input", function (e) {
     const container = $(this)
       if (container) {
-        container.css({
-          outline: '',
-          borderRadius: '',
-        })
+        container.removeClass('error-outline')
       }
     errorRoots['#course_section_name']?.unmount()
     errorRoots['#course_section_name'] = null
@@ -210,10 +201,7 @@ $(document).ready(function () {
     else {
       const container = $(this)
       if (container) {
-        container.css({
-          outline: '',
-          borderRadius: '',
-        })
+        container.removeClass('error-outline')
       }
       errorRoots['#course_section_name']?.unmount()
       errorRoots['#course_section_name'] = null
@@ -223,10 +211,7 @@ $(document).ready(function () {
   $edit_section_form.find('.datetime_field').on("input", function (e) {
     const container = $('#course_section_end_at')
       if (container) {
-        container.css({
-          outline: '',
-          borderRadius: '',
-        })
+        container.removeClass('error-outline')
       }
       errorRoots['#course_section_end_at']?.unmount()
       errorRoots['#course_section_end_at'] = null
@@ -240,10 +225,7 @@ $(document).ready(function () {
     else {
       const container = $('#course_section_end_at')
       if (container) {
-        container.css({
-          outline: '',
-          borderRadius: '',
-        })
+        container.removeClass('error-outline')
       }
       errorRoots['#course_section_end_at']?.unmount()
       errorRoots['#course_section_end_at'] = null
@@ -387,10 +369,7 @@ $(document).ready(function () {
   $('#course_autocomplete_id_lookup').on('input', function (event) {
     const container = $(this)
     if (container) {
-      container.css({
-        outline: '',
-        borderRadius: '',
-      })
+      container.removeClass('error-outline')
     }
     $("#course_autocomplete_id").val('')
     $("#course_id").val('')
@@ -405,10 +384,7 @@ $(document).ready(function () {
   $('#course_id').on('input', function (event) {
     const container = $(this)
     if (container) {
-      container.css({
-        outline: '',
-        borderRadius: '',
-      })
+      container.removeClass('error-outline')
     }
     clearCrossListFormErrors()
   })

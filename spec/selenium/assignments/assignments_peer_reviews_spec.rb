@@ -97,6 +97,7 @@ describe "assignments" do
         f(".assign_peer_review_link").click
         find_button("Add").click
         expect(f("#reviewee_errors")).to be_displayed
+        expect(f("#reviewee_id").attribute("class")).to include("error-outline")
         input = driver.find_element(:css, "select[name='reviewee_id']")
         expect(input.attribute("aria-label")).to eq("Please select a student")
       end
