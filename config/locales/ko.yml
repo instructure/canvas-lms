@@ -1481,6 +1481,7 @@ ko:
   always_3a59e701: 항상
   an_alert_is_generated_for_each_student_that_meets__c36e3561: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사, 계정 관리자에게 보냅니다."
   an_alert_is_generated_for_each_student_that_meets__fcd175ac: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사에게 보냅니다."
+  an_external_identity_provider_is_enabled_7859c6fb: "외부 ID 공급자를 사용"
   an_integer_value_is_required_e073bd46: "정수 값이 필요함"
   analytics: 
     course: 
@@ -5531,6 +5532,7 @@ ko:
   enrollments_tas: 조교
   enrollments_teachers: 교사
   enter_a_section_name_adbe3099: "섹션 이름 입력"
+  enter_a_shorter_category_name_4befe0da: "더 짧은 범주 이름을 입력"
   enter_a_shorter_group_name_8f7fc42c: "짧은 그룹 이름 입력"
   enter_the_date_you_would_like_to_navigate_to_a712de47: "탐색하려는 날짜를 입력하십시오."
   eportfolio: 
@@ -14558,6 +14560,7 @@ ko:
       unpublish: "게시 취소"
     context_modules: 
       publish: 게시
+  visibility_f62e7f12: "표시 여부"
   waiting_for_attempted_login_6d00cb49: "로그인 대기 중"
   warnings: 
     test_install: 
