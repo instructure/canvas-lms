@@ -3404,6 +3404,7 @@ nn:
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Ein eksisterande Canvas-brukar med SIS-ID %{user_id}har allereie gjort krav på %{other_user_id} sin integration_id"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "Ein eksisterande brukar matchar ingen brukar-ID-ar som skal nyttast til innlogging med SIS-ID %{user_id}, hoppar over"
   an_export_is_already_in_progress_54270f01: "Ein eksport er allereie i gang."
+  an_external_identity_provider_is_enabled_7859c6fb: "Ein ekstern  identitetsleverandør er aktivert"
   an_integer_value_is_required_e073bd46: "Ein heiltalverdi er nødvendig"
   an_internal_error_occurred_83b8a685: "Det oppstod ein feil"
   an_item_named_name_already_exists_in_this_location_147b7312: "Eit element med namnet \"%{name}\" finst allereie.\" Vil du erstatte den eksisterande fila?"
@@ -10902,6 +10903,7 @@ nn:
   enter_a_letter_grade_536a8cef: "Skriv inn bokstavkarakter"
   enter_a_score_to_test_c6f89f4a: "Oppgi eit resultat du vil teste"
   enter_a_section_name_adbe3099: "Oppgi eit seksjonsnamn"
+  enter_a_shorter_category_name_4befe0da: "Oppgi eit kortare kategorinamn"
   enter_a_shorter_group_name_8f7fc42c: "Oppgi eit kortare gruppenamn"
   enter_a_student_pairing_code_below_to_add_a_studen_15789251: "Skriv inn ein paringskode under for å leggje til ein student å observere"
   enter_a_valid_date_46d77547: "Legg inn ein gyldig dato"
@@ -22714,6 +22716,7 @@ nn:
   restored_course_association_course_c9e16045: "Gjenopprett emneforbindelse %{course}"
   restrict_push_notifications_to_select_types_941d9da3: "Avgrens push-varsel til utvalde typar"
   restrict_quantitative_data_72411674: "Begrens kvantitativ data"
+  restrict_quantitative_data_fcd08bb0: "Begrens kvantitativ data"
   restrict_sms_to_select_types_9dd6399c: "Begrens SMS til nokre valde typar."
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Studentar skal ikkje få tilgang til emne etter sluttdato"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Studentar skal ikkje få tilgang til emne før startdato"
@@ -28917,6 +28920,7 @@ nn:
   violation_log_tray_d4eff9f4: Bruddloggmeny
   virtual_lectures_in_real_time_a1778dea: "Virtuelle førelesingar i sanntid"
   visibility_3ad7b08d: "Synlegheit:"
+  visibility_f62e7f12: Synlegheit
   visibility_selector_866f70df: Synlegheitsveljar
   visit_864b4060: Besøk
   visit_canvas_guides_to_learn_more_8c7361ad: "Gå til *Canvas Guides* for å lære meir"
@@ -29091,6 +29095,7 @@ nn:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Det er kun lesetilgang til emnet utanfor desse datoane dersom valet er slått på."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Når denne er vald er emnet ikkje tilgjengeleg utanfor emnedatoane. Dersom emnedatoane er blanke, gjeld start- og sluttdatoen som semesterdatoar."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Det er kun lesetilgang til seksjonane utanfor desse datoane dersom valet er slått på."
+  when_selected_this_setting_will_limit_the_view_of__40af593a: "Når valgt vil denne innstillinga begrense visninga av kvantitativ (numerisk) vurderingsdata for nye emner. Studentar og observatørar vil kun sjå kvalitative data, som inkluderar bokstavkarakterar og kommentarar."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Når denne funksjonen er slått på vil emnemenyen forbli komprimert eller utvida
       medan brukar navigerer mellom sider avhengig av kva brukar har valgt, i staden for å
