@@ -183,10 +183,10 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
   def serialize_overrides(quiz, user, include_all_dates)
     {}.tap do |quiz_overrides|
       quiz_overrides[:quiz_id] = quiz.id
-      quiz_overrides[:due_dates] = quiz.dates_hash_visible_to(user)
+      quiz_overrides[:due_dates] = quiz.formatted_dates_hash_visible_to(user)
 
       if include_all_dates
-        quiz_overrides[:all_dates] = quiz.formatted_dates_hash(quiz.all_due_dates)
+        quiz_overrides[:all_dates] = quiz.formatted_dates_hash_visible_to(user, include_all_dates: true)
       end
     end
   end
