@@ -1186,14 +1186,14 @@ acknowledge that you have read and agreed to the
           </div>
         <% end %>
         <div class="ic-Form-control">
-          <div class="ic-Label" id="aria-announcements-send-to-group">
+          <div class="ic-Label">
             <%= t "Show to" %>
             <%= roles_message(@account) %>
           </div>
           <div class="grid-row">
             <div class="col-xs-12 col-lg-4">
-              <i><%= t "Course roles" %></i>
-              <div class="ic-Checkbox-group" role="group" aria-labelledby="aria-announcements-send-to-group">
+              <i id="course-roles-label"><%= t "Course roles" %></i>
+              <div class="ic-Checkbox-group" role="radiogroup" aria-labelledby="course-roles-label">
                 <% @course_roles.each do |r| %>
                   <div class="ic-Form-control ic-Form-control--checkbox">
                     <%= check_box_tag "account_notification_roles[]", r[:id], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx" } %>
@@ -1219,8 +1219,8 @@ acknowledge that you have read and agreed to the
               </div>
             </div>
             <div class="col-xs-12 col-lg-4">
-              <i><%= t "Account roles" %></i>
-              <div class="ic-Checkbox-group" role="group" aria-labelledby="aria-announcements-send-to-group">
+              <i id="account-roles-label"><%= t "Account roles" %></i>
+              <div class="ic-Checkbox-group" role="radiogroup" aria-labelledby="account-roles-label">
                 <% @account_roles.each do |r| %>
                   <div class="ic-Form-control ic-Form-control--checkbox">
                     <%= check_box_tag "account_notification_roles[]", r[:id], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx" } %>
