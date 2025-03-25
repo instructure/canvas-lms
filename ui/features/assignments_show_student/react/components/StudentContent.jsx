@@ -130,11 +130,18 @@ function renderAttemptsAndAvailability(assignment) {
   )
 }
 
-function renderLTIToolIframe(submission) {
+function renderLTIToolIframe(assignment, submission) {
+  const showTool = ENV.LTI_TOOL === 'true'
+  const showSubmissionDetailsLink =
+    submission.state === 'graded' && assignment.submissionTypes?.includes('external_tool')
+
+  // render nothing new if neither is true
+  if (!showTool && !showSubmissionDetailsLink) {
+    return null
+  }
+
   const launchURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/tool_launch`
   const submissionDetailsURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/submissions/${ENV.current_user_id}`
-
-  const showSubmissionDetailsLink = submission.state === 'graded'
 
   return (
     <>
@@ -145,15 +152,17 @@ function renderLTIToolIframe(submission) {
           </Link>
         </View>
       )}
-      <ToolLaunchIframe
-        allow={iframeAllowances()}
-        src={launchURL}
-        data-testid="lti-external-tool"
-        title={I18n.t('Tool content')}
-        allowFullScreen="true"
-        webkitallowfullscreen="true"
-        mozallowfullscreen="true"
-      />
+      {showTool && (
+        <ToolLaunchIframe
+          allow={iframeAllowances()}
+          src={launchURL}
+          data-testid="lti-external-tool"
+          title={I18n.t('Tool content')}
+          allowFullScreen="true"
+          webkitallowfullscreen="true"
+          mozallowfullscreen="true"
+        />
+      )}
     </>
   )
 }
@@ -241,7 +250,7 @@ function renderContentBaseOnAvailability(
         ) : (
           <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
         )}
-        {ENV.LTI_TOOL === 'true' && renderLTIToolIframe(submission)}
+        {renderLTIToolIframe(assignment, submission)}
         {ENV.enrollment_state === 'completed' && <EnrollmentConcludedNotice />}
       </>
     )
