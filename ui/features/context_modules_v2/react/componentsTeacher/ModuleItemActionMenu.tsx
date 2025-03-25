@@ -38,7 +38,10 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_v2')
 
+const basicContentTypes = ['SubHeader', 'ExternalUrl']
+
 export interface ModuleItemActionMenuProps {
+  itemType: string
   isMenuOpen: boolean
   setIsMenuOpen: (isOpen: boolean) => void
   indent: number
@@ -62,6 +65,7 @@ export interface ModuleItemActionMenuProps {
 }
 
 const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
+  itemType,
   isMenuOpen,
   setIsMenuOpen,
   indent,
@@ -98,24 +102,24 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Edit')}</Flex.Item>
         </Flex>
       </Menu.Item>
-      <Menu.Item onClick={handleSpeedGrader}>
+      {!basicContentTypes.includes(itemType) && <Menu.Item onClick={handleSpeedGrader}>
         <Flex>
           <Flex.Item><IconSpeedGraderLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('SpeedGrader')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      <Menu.Item onClick={handleAssignTo}>
+      </Menu.Item>}
+      {!basicContentTypes.includes(itemType) && <Menu.Item onClick={handleAssignTo}>
         <Flex>
           <Flex.Item><IconPermissionsSolid /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Assign To...')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      <Menu.Item onClick={handleDuplicate}>
+      </Menu.Item>}
+      {!basicContentTypes.includes(itemType) && <Menu.Item onClick={handleDuplicate}>
         <Flex>
           <Flex.Item><IconDuplicateLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Duplicate')}</Flex.Item>
         </Flex>
-      </Menu.Item>
+      </Menu.Item>}
       <Menu.Item onClick={handleMoveTo}>
         <Flex>
           <Flex.Item><IconUpdownLine /></Flex.Item>
@@ -134,19 +138,19 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Increase indent')}</Flex.Item>
         </Flex>
       </Menu.Item>}
-      <Menu.Item onClick={handleSendTo}>
+      {!basicContentTypes.includes(itemType) && <Menu.Item onClick={handleSendTo}>
         <Flex>
           <Flex.Item><IconUserLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Send To...')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      <Menu.Item onClick={handleCopyTo}>
+      </Menu.Item>}
+      {!basicContentTypes.includes(itemType) && <Menu.Item onClick={handleCopyTo}>
         <Flex>
           <Flex.Item><IconDuplicateSolid /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Copy To...')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      {masteryPathsData?.isCyoeAble && (
+      </Menu.Item>}
+      {!basicContentTypes.includes(itemType) && masteryPathsData?.isCyoeAble && (
         <Menu.Item onClick={handleMasteryPaths}>
           <Flex>
             <Flex.Item><IconMasteryPathsLine /></Flex.Item>
