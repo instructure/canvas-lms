@@ -17,8 +17,6 @@
  */
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {useLoaderData} from 'react-router-dom'
-
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Pagination} from '@instructure/ui-pagination'
@@ -36,19 +34,20 @@ import FilesUsageBar from './FilesUsageBar'
 import SearchBar from './SearchBar'
 import {generateTableUrl} from '../../utils/apiUtils'
 import {BBFolderWrapper} from '../../utils/fileFolderWrappers'
-import {LoaderData} from '../../interfaces/LoaderData'
-import { useSearchTerm } from '../hooks/useSearchTerm'
+import {useSearchTerm} from '../hooks/useSearchTerm'
+import {useGetFolders} from '../hooks/useGetFolders'
+import {Folder} from '../../interfaces/File'
 
 const I18n = createI18nScope('files_v2')
 
 interface FilesAppProps {
+  folders: Folder[]
   isUserContext: boolean
   size: 'small' | 'medium' | 'large'
 }
 
-const FilesApp = ({isUserContext, size}: FilesAppProps) => {
+const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   const showingAllContexts = filesEnv.showingAllContexts
-  const {folders} = useLoaderData() as LoaderData
   const {searchTerm, setSearchTerm} = useSearchTerm()
   const [isTableLoading, setIsTableLoading] = useState(true)
   const [sort, setSort] = useState({
@@ -200,6 +199,15 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
 
 const ResponsiveFilesApp = () => {
   const isUserContext = filesEnv.showingAllContexts
+  const { data: folders } = useGetFolders()
+
+  const foldersRef = useRef<Folder[] | null>(null)
+  if (folders) {
+    foldersRef.current = folders
+  }
+  if (!foldersRef.current) {
+    return null
+  }
 
   return (
     <Responsive
@@ -211,6 +219,7 @@ const ResponsiveFilesApp = () => {
       render={(_props: any, matches: string[] | undefined) => (
         <FilesApp
           isUserContext={isUserContext}
+          folders={foldersRef.current!}
           size={(matches?.[0] as 'small' | 'medium') || 'large'}
         />
       )}
