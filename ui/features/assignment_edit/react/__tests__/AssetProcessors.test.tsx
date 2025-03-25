@@ -26,9 +26,11 @@ import {AssetProcessorsAddModalOnProcessorResponseFn, AssetProcessorsAddModalPro
 import {ExistingAttachedAssetProcessor, useAssetProcessorsState} from '../hooks/AssetProcessorsState'
 import {AssetProcessors} from '../AssetProcessors'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
+import {showFlashAlert, showFlashError} from "@canvas/alerts/react/FlashAlert"
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/external-tools/messages')
+jest.mock('@canvas/alerts/react/FlashAlert')
 
 let onProcessorResponseCb: null | AssetProcessorsAddModalOnProcessorResponseFn = null
 
@@ -92,6 +94,32 @@ describe('AssetProcessors', () => {
     const {getByText} = renderAssetProcessors()
     onProcessorResponseCb!({ tool: mockTools[1], data: mockDeepLinkResponse })
     expect(getByText("t2 · Lti 1.3 Tool Title")).toBeInTheDocument()
+  })
+
+  it('shows flash messages when the deep linking response contains "msg" or "errormsg"', () => {
+    renderAssetProcessors()
+
+    onProcessorResponseCb!({ tool: mockTools[1], data: {...mockDeepLinkResponse, msg: "hello"} })
+    expect(showFlashAlert).toHaveBeenCalledWith(
+      {message: "Message from document processing app: hello"}
+    )
+
+    const mockFlashErrorFn = jest.fn()
+    ;(showFlashError as jest.Mock).mockImplementation(() => mockFlashErrorFn)
+    onProcessorResponseCb!({ tool: mockTools[1], data: {...mockDeepLinkResponse, errormsg: "oopsy"} })
+    expect(showFlashError).toHaveBeenCalledWith(
+      "Error from document processing app: oopsy"
+    )
+  })
+
+  it("shows a flash message when the deep linking response has no processors", () => {
+    renderAssetProcessors()
+    onProcessorResponseCb!({ tool: mockTools[1], data: {...mockDeepLinkResponse, content_items: []} })
+
+    expect(showFlashAlert).toHaveBeenCalledWith(
+      {message: "The document processing app returned with no processors to attach."}
+    )
+
   })
 
   it('removes attached processors when the delete menu item is clicked', async () => {
