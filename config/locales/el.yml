@@ -1783,6 +1783,7 @@ el:
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Παρουσιάστηκε σφάλμα κατά τον ορισμό του δικαιώματος χρήσης του αρχείου %{filename}"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Ένα σφάλμα συνέβη κατά την αφαίρεση της ομάδας ραντεβού."
   an_export_is_already_in_progress_54270f01: "Μια εξαγωγή δεδομέων βρίσκεται σε εξέλιξη."
+  an_external_identity_provider_is_enabled_7859c6fb: "Ένας εξωτερικός πάροχος αναγνωριστικού ταυτότητας έχει ενεργοποιηθεί"
   an_integer_value_is_required_e073bd46: "Μια τιμή ακέραιου απαιτείται"
   an_internal_error_occurred_83b8a685: "Παρουσιάστηκε ένα εσωτερικό σφάλμα"
   an_item_named_name_already_exists_in_this_location_147b7312: "Ένα στοιχείο που ονομάζεται «%{name}» υπάρχει ήδη σε αυτή την τοποθεσία. Θέλετε να αντικαταστήσετε το υπάρχον αρχείο;"
@@ -4152,6 +4153,8 @@ el:
     index: 
       titles: 
         course_modules: "Αρθρώματα Μαθήματος"
+    links: 
+      student_progress: "Εμφάνιση Προόδου"
     module_complete: Ολοκλήρωση
     module_empty: "Δεν υπάρχουν στοιχεία στην ενότητα «%{module}»"
     module_item_next: 
@@ -6092,6 +6095,7 @@ el:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Εισάγετε έναν εξαψήφιο κωδικό/hex εδώ για να χρησιμοποιήσετε ένα προσαρμοσμένο χρώμα."
   enter_a_score_to_test_c6f89f4a: "Εισαγωγή βαθμολογίας για έλεγχο"
   enter_a_section_name_adbe3099: "Εισάγετε ένα όνομα τμήματος"
+  enter_a_shorter_category_name_4befe0da: "Πληκτρολογήστε ένα συντομότερο όνομα κατηγορίας"
   enter_a_shorter_group_name_8f7fc42c: "Πληκτρολογήστε ένα συντομότερο όνομα ομάδας"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Εισαγάγετε «{{ACCOUNT_DOMAIN}}» για να υποκαταστήσετε τον τομέα λογαριασμού ρίζας του χρήστη"
   enter_or_find_an_external_tool_url_6aebbd0d: "Εισαγωγή ή εύρεση URL Εξωτερικού Εργαλείου"
@@ -12648,6 +12652,9 @@ el:
         attempt_number: "Προσπάθεια %{att_no}"
         kept: ΔΙΑΤΗΡΗΘΗΚΕ
         latest: "ΠΙΟ ΠΡΟΣΦΑΤΟ"
+        time: Χρόνος
+      submission_version_score: 
+        score: Βαθμολογία
       submission_versions: 
         attempt: Προσπάθεια
         attempt_history: "Ιστορικό Προσπαθειών"
@@ -15826,6 +15833,7 @@ el:
       unpublish: "Απενεργοποιήστε τη Δημοσίευση"
     context_modules: 
       publish: Δημοσίευση
+  visibility_f62e7f12: Ορατότητα
   visit_864b4060: Επίσκεψη
   visit_group_group_name_7a816081: "Επισκεφθείτε την ομάδα %{group_name}"
   waiting_for_attempted_login_6d00cb49: "Σε αναμονή για την προσπάθεια σύνδεσης"
