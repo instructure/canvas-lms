@@ -74,6 +74,7 @@ module Lti::Messages
       add_names_and_roles_service_claims! if include_names_and_roles_service_claims?
       add_lti11_legacy_user_id! if include_claims?(:lti11_legacy_user_id)
       add_lti1p1_claims! if include_lti1p1_claims?
+      add_asset_processor_eula_claims! if include_asset_processor_eula_claims?
       add_extension("placement", @opts[:resource_type])
       add_extension("lti_student_id", @opts[:student_id].to_s) if @opts[:student_id].present?
       add_extension("student_context", { "id" => @opts[:student_lti_id] }) if @opts[:student_lti_id].present?
@@ -226,6 +227,11 @@ module Lti::Messages
         @tool.root_account.feature_enabled?(:platform_notification_service)
     end
 
+    def include_asset_processor_eula_claims?
+      include_claims?(:asset_processor_eula) &&
+        @tool.root_account.feature_enabled?(:lti_asset_processor)
+    end
+
     # Follows the spec at https://www.imsglobal.org/spec/lti-ags/v2p0/#assignment-and-grade-service-claim
     # see ResourceLinkRequest#add_line_item_url_to_ags_claim! for adding the 'lineitem' properties
     def add_assignment_and_grade_service_claims!
@@ -257,6 +263,11 @@ module Lti::Messages
           host: @context.root_account.environment_specific_domain
         )
       end
+    end
+
+    def add_asset_processor_eula_claims!
+      @message.eulaservice.url = @tool.asset_processor_eula_url
+      @message.eulaservice.scope = [TokenScopes::LTI_EULA_SCOPE]
     end
 
     def associated_1_1_tool

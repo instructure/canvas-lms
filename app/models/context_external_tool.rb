@@ -1373,6 +1373,13 @@ class ContextExternalTool < ActiveRecord::Base
     on_by_default_ids.include?(global_developer_key_id)
   end
 
+  def asset_processor_eula_url
+    Rails.application.routes.url_helpers.update_tool_eula_url(
+      context_external_tool_id: id,
+      host: context.root_account.environment_specific_domain
+    ).delete_suffix("/deployment")
+  end
+
   private
 
   # Locally and in OSS installations, this can be configured in config/dynamic_settings.yml.
