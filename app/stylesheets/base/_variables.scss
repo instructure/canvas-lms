@@ -118,7 +118,7 @@ $tiara: #C7CDD1; // tiara
   $ic-border-color: #667887;
 }
 
-$ic-color-medium-light: #F5F5F5; // porcelain
+$ic-color-medium-light: #F2F4F4; // porcelain
 
 @if $use_high_contrast {
   $ic-color-medium-light: #FFFFFF;
@@ -137,7 +137,7 @@ $ic-bg-light-neutral: $ic-color-medium-light;
 $ic-bg-light-neutral-text: #394B58;
 
 @if $use_high_contrast {
-  $ic-bg-light-neutral: #EBEDEE;
+  $ic-bg-light-neutral: #F2F4F4;
 }
 
 $ic-bg-light-primary: #E5F2F8;

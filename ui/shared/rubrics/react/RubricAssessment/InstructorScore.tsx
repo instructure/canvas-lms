@@ -44,7 +44,7 @@ export const InstructorScore = ({
             lineHeight: '3rem',
             width: '13.813rem',
             height: '3rem',
-            backgroundColor: '#F5F5F5',
+            backgroundColor: '#F2F4F4',
             borderRadius: '.35rem 0 0 .35rem',
           }}
         >
