@@ -2940,6 +2940,11 @@ CanvasRails::Application.routes.draw do
       get "asset_processors/:asset_processor_id/assets/:asset_id", action: :lti_asset_show, as: :lti_asset_processor_asset_show
     end
 
+    # 1Edtech (IMS) LTI Asset Processor Eula service
+    scope(controller: "lti/ims/asset_processor_eula") do
+      put "asset_processor_eulas/:context_external_tool_id/deployment", action: :update_tool_eula, as: :update_tool_eula
+    end
+
     # Dynamic Registration Service
     scope(controller: "lti/ims/dynamic_registration") do
       get "accounts/:account_id/registration_token", action: :registration_token

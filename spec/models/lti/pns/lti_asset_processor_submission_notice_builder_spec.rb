@@ -119,7 +119,11 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model 
       allow(SecureRandom).to receive(:uuid).and_return("random_uuid")
       allow(Time.zone).to receive(:now).and_return(now)
       allow(LtiAdvantage::Messages::JwtMessage).to receive(:create_jws).and_return("signed_jwt")
-      allow(Rails.application.routes.url_helpers).to receive(:lti_notice_handlers_url).and_return("https://example.com/notice_handler")
+      allow(Rails.application.routes.url_helpers).to receive_messages(
+        lti_notice_handlers_url: "https://example.com/notice_handler",
+        update_tool_eula_url: "https://example.com/eula"
+      )
+
       notice_message = notice_builder.build(tool)
 
       expect(notice_message).to eq({ jwt: "signed_jwt" })
@@ -169,6 +173,10 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model 
           "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint" => {
             "lineitems" => "http://localhost/api/lti/courses/#{assignment.course.id}/line_items",
             "scope" => ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"]
+          },
+          "https://purl.imsglobal.org/spec/lti/claim/eulaservice" => {
+            "scope" => ["https://purl.imsglobal.org/spec/lti/scope/eula"],
+            "url" => "https://example.com/eula"
           },
         },
         anything

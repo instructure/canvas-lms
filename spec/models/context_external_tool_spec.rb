@@ -3453,4 +3453,13 @@ describe ContextExternalTool do
       end
     end
   end
+
+  describe "#asset_processor_eula_url" do
+    let(:tool) { external_tool_model }
+
+    it "returns the correct EULA URL for the tool" do
+      expected_url = "http://#{tool.context.root_account.environment_specific_domain}/api/lti/asset_processor_eulas/#{tool.id}"
+      expect(tool.asset_processor_eula_url).to eq(expected_url)
+    end
+  end
 end

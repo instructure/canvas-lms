@@ -37,6 +37,7 @@ describe "lti full width launch view" do
     before do
       ctrl.instance_variable_set(:@domain_root_account, Account.default)
       ctrl.instance_variable_set(:@current_user, current_user)
+      allow(Rails.application.routes.url_helpers).to receive(:update_tool_eula_url).and_return("https://example.com/eula")
     end
 
     context "when the user is a student" do
