@@ -7353,6 +7353,8 @@ nn:
     index: 
       titles: 
         course_modules: Emnemodular
+    links: 
+      student_progress: "Vis framdrift"
     module_complete: Fullført
     module_empty: "Det finst ikkje element i modulen \"%{module}\""
     module_item_next: 
@@ -21908,6 +21910,9 @@ nn:
         attempt_number: "Forsøk %{att_no}"
         kept: VALT
         latest: SISTE
+        time: Tidspunkt
+      submission_version_score: 
+        score: Resultat
       submission_versions: 
         attempt: Forsøk
         attempt_history: Forsøkhistorikk
