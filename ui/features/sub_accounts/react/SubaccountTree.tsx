@@ -29,6 +29,7 @@ import {calculateIndent, resetQuery, useFocusContext} from './util'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {QueryFunctionContext, useInfiniteQuery} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
+import DeleteSubaccountModal from './DeleteSubaccountModal'
 
 const I18n = createI18nScope('sub_accounts')
 
@@ -45,6 +46,7 @@ export default function SubaccountTree(props: Props) {
   const {setFocusId, focusRef, overMax} = useFocusContext()
   const [showForm, setShowForm] = useState(false)
   const [isExpanded, setIsExpanded] = useState(!overMax && subCount.current > 0 && props.depth < 3)
+  const [displayConfirmation, setDisplayConfirmation] = useState(false)
 
   const fetchSubAccounts = async (
     context: QueryFunctionContext,
@@ -110,8 +112,7 @@ export default function SubaccountTree(props: Props) {
     }
   }
 
-  const handleDelete = async () => {
-    const deleteMsg = I18n.t("Confirm deleting '%{name}'?", {name: props.rootAccount.name})
+  const handleDelete = () => {
     if (subCount.current > 0) {
       showFlashAlert({
         message: I18n.t('You cannot delete accounts with active subaccounts'),
@@ -122,8 +123,8 @@ export default function SubaccountTree(props: Props) {
         message: I18n.t('You cannot delete accounts with active courses'),
         type: 'warning',
       })
-    } else if (window.confirm(deleteMsg)) {
-      await deleteAccount()
+    } else {
+      setDisplayConfirmation(true)
     }
   }
 
@@ -179,6 +180,19 @@ export default function SubaccountTree(props: Props) {
     return childTree
   }
 
+  const renderDeleteConfirmation = () => {
+    return (
+      <DeleteSubaccountModal
+        account={props.rootAccount}
+        onClose={() => setDisplayConfirmation(false)}
+        onConfirm={async () => {
+          await deleteAccount()
+          setDisplayConfirmation(false)
+        }}
+      />
+    )
+  }
+
   const childIndent = calculateIndent(props.depth + 1)
   if (error) {
     return (
@@ -190,7 +204,12 @@ export default function SubaccountTree(props: Props) {
       </Flex>
     )
   } else if (isLoading && !isFetching && !showForm) {
-    return renderRoot(true)
+    return (
+      <>
+        {renderRoot(true)}
+        {displayConfirmation ? renderDeleteConfirmation() : null}
+      </>
+    )
   } else {
     const subaccounts = data?.pages.flatMap(page => page.json) || []
     const showSpinner = isFetching && !isFetchingNextPage
@@ -212,6 +231,7 @@ export default function SubaccountTree(props: Props) {
           </Flex>
         ) : null}
         {renderRoot(!showSpinner)}
+        {displayConfirmation ? renderDeleteConfirmation() : null}
         {renderChildren(subaccounts, parentExpanded)}
         {isFetchingNextPage ? (
           <Flex>
