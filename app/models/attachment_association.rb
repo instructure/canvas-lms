@@ -19,6 +19,8 @@
 #
 
 class AttachmentAssociation < ActiveRecord::Base
+  enum :field_name, %i[syllabus_body]
+
   belongs_to :attachment
   belongs_to :context, polymorphic: %i[conversation_message submission course group]
   belongs_to :user
@@ -26,6 +28,23 @@ class AttachmentAssociation < ActiveRecord::Base
   before_create :set_root_account_id
 
   after_save :set_word_count
+
+  def self.update_associations(context, attachment_ids, user, session, field_name = nil)
+    currently_has = AttachmentAssociation.where(context:, field_name:).pluck(:attachment_id)
+
+    to_delete = currently_has - attachment_ids
+    to_create = attachment_ids - currently_has
+
+    AttachmentAssociation.where(context:, field_name:, attachment_id: to_delete).destroy_all if to_delete.any?
+
+    if to_create.any?
+      Attachment.where(id: to_create).find_each do |attachment|
+        next unless attachment.grants_right?(user, session, :download)
+
+        AttachmentAssociation.create!(context:, attachment:, user:, field_name:)
+      end
+    end
+  end
 
   def set_root_account_id
     self.root_account_id ||=

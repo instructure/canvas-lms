@@ -194,10 +194,14 @@ module Context
     result
   end
 
-  def self.context_code_for(record)
+  def self.context_code_for(record, fieldname = nil)
     raise ArgumentError unless record.respond_to?(:context_type) && record.respond_to?(:context_id)
 
-    "#{record.context_type.underscore}_#{record.context_id}"
+    if record.is_a?(Course) && fieldname == "syllabus_body"
+      "course_syllabus_#{record.context_id}"
+    else
+      "#{record.context_type.underscore}_#{record.context_id}"
+    end
   end
 
   def self.find_by_asset_string(string)

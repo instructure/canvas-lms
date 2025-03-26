@@ -187,6 +187,7 @@ class Course < ActiveRecord::Base
   has_many :announcements, as: :context, inverse_of: :context, class_name: "Announcement", dependent: :destroy
   has_many :active_announcements, -> { where("discussion_topics.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Announcement"
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy, extend: Attachment::FindInContextAssociation
+  has_many :attachment_associations, as: :context, inverse_of: :context
   has_many :active_images, -> { where("attachments.file_state<>? AND attachments.content_type LIKE 'image%'", "deleted").order("attachments.display_name").preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: "Attachment"
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'").order("assignments.title, assignments.position") }, as: :context, inverse_of: :context, class_name: "Assignment"
   has_many :folders, -> { order("folders.name") }, as: :context, inverse_of: :context, dependent: :destroy
