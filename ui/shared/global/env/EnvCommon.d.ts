@@ -289,6 +289,7 @@ export type SiteAdminFeatureId =
   | 'speedgrader_studio_media_capture'
   | 'validate_call_to_action'
   | 'new_quizzes_navigation_updates'
+  | 'create_wiki_page_mastery_path_overrides'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES

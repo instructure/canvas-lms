@@ -384,6 +384,7 @@ class ApplicationController < ActionController::Base
     differentiation_tags
     validate_call_to_action
     new_quizzes_navigation_updates
+    create_wiki_page_mastery_path_overrides
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
