@@ -91,7 +91,7 @@ export const DiscussionTranslationModuleContainer = () => {
       borderRadius="medium"
       borderWidth="small"
       padding="large"
-      margin="medium 0 0 0"
+      margin="0 0 small 0"
     >
       <TranslationTriggerModal
         isModalOpen={isModalOpen}
