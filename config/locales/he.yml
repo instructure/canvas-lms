@@ -5219,6 +5219,8 @@ he:
     index: 
       titles: 
         course_modules: "מודולי הקורס"
+    links: 
+      student_progress: "צפיה בהתקדמות"
     module_complete: נסתיים
     module_empty: "אין פריטים במודול \"%{module}\""
     module_item_next: 
@@ -16452,6 +16454,9 @@ he:
         attempt_number: "ניסיון הגשה %{att_no}"
         kept: נשמר
         latest: אחרון
+        time: "זמן "
+      submission_version_score: 
+        score: ציון
       submission_versions: 
         attempt: נסיון
         attempt_history: "הסטורית ניסיונות"

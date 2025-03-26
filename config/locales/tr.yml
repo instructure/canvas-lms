@@ -5470,6 +5470,8 @@ tr:
     index: 
       titles: 
         course_modules: "Ders Modülleri"
+    links: 
+      student_progress: "İlerleme Durumunu Göster"
     module_complete: Tamam
     module_empty: "\"%{module}\" modülünde hiç öğe yok"
     module_item_next: 
@@ -16559,6 +16561,9 @@ tr:
         attempt_number: "%{att_no}. hak"
         kept: SAKLANDI
         latest: "EN SON"
+        time: Süre
+      submission_version_score: 
+        score: Puan
       submission_versions: 
         attempt: Hak
         attempt_history: "Hak Geçmişi"

@@ -4789,6 +4789,8 @@ uk:
     index: 
       titles: 
         course_modules: "Розділи курсу"
+    links: 
+      student_progress: "Переглянути прогрес"
     module_complete: Завершити
     module_empty: "Жодного пункту в модулі \"%{module}\""
     module_item_next: 
@@ -14753,6 +14755,9 @@ uk:
         attempt_number: "Спроба %{att_no}"
         kept: ЗБЕРЕЖЕНИЙ
         latest: ПІЗНІШЕ
+        time: Час
+      submission_version_score: 
+        score: Оцінка
       submission_versions: 
         attempt: Спроба
         attempt_history: "Iсторiя спроб"
