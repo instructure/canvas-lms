@@ -15,39 +15,51 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import DiscussionInsightsPage from './DiscussionInsightsPage'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ErrorBoundary from '@canvas/error-boundary'
 import AlertManager from '@canvas/alerts/react/AlertManager'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import LoadingIndicator from '@canvas/loading-indicator/react'
 
 const I18n = createI18nScope('discussion_insights')
 
 const DiscussionInsightsApp = () => {
+  const [client, setClient] = useState(null)
+
   const queryClient = new QueryClient()
-  const context = ENV.context_type === 'Course' ? 'courses' : 'groups'
+
+  useEffect(() => {
+    if (!client) {
+      setClient(createClient())
+    }
+  }, [client, setClient])
+
+  if (!client) {
+    return <LoadingIndicator />
+  }
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <ErrorBoundary
-        errorComponent={
-          <GenericErrorPage
-            imageUrl={errorShipUrl}
-            errorCategory={I18n.t('Discussion Insights Error Page')}
-          />
-        }
-      >
-        <AlertManager>
-          <DiscussionInsightsPage
-            context={context}
-            contextId={ENV.context_id}
-            discussionId={ENV.discussion_topic_id}
-          />
-        </AlertManager>
-      </ErrorBoundary>
-    </QueryClientProvider>
+    <ApolloProvider client={client}>
+      <QueryClientProvider client={queryClient}>
+        <ErrorBoundary
+          errorComponent={
+            <GenericErrorPage
+              imageUrl={errorShipUrl}
+              errorCategory={I18n.t('Discussion Insights Error Page')}
+            />
+          }
+        >
+          <AlertManager>
+            <DiscussionInsightsPage />
+          </AlertManager>
+        </ErrorBoundary>
+      </QueryClientProvider>
+    </ApolloProvider>
   )
 }
 

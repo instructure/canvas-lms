@@ -16,22 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import DiscussionInsights from './components/DiscussionInsights/DiscussionInsights'
-import ReviewModal from './components/ReviewModal/ReviewModal'
-import useInsightStore from './hooks/useInsightStore'
+import {gql} from '@apollo/client'
 
-
-const DiscussionInsightsPage: React.FC = () => {
-  const modalOpen = useInsightStore((state) => state.modalOpen)
-  const setModalOpen = useInsightStore((state) => state.setModalOpen)
-
-  return (
-    <>
-      <ReviewModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
-      <DiscussionInsights />
-    </>
-  )
+export interface EntryCountResponse {
+  legacyNode: {
+    _id: string
+    entryCounts: {
+      repliesCount: number
+    }
+  }
 }
 
-export default DiscussionInsightsPage
+export const GET_ENTRY_COUNT = gql`
+  query GetDiscussionTopic($discussionTopicId: ID!) {
+    legacyNode(_id: $discussionTopicId, type: Discussion) {
+      ... on Discussion {
+        _id
+        entryCounts {
+          repliesCount
+        }
+      }
+    }
+  }
+`

@@ -27,12 +27,14 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('discussion_insights')
 
 type InsightsActionBarProps = {
+  loading: boolean
+  entryCount: number
   handleSearch: (query: string) => void
 }
 
-const InsightsActionBar: React.FC<InsightsActionBarProps> = ({handleSearch}) => {
+const InsightsActionBar: React.FC<InsightsActionBarProps> = ({loading, entryCount, handleSearch}) => {
   return (
-    <Flex width="100%" direction="row" wrap="wrap" gap="small">
+    <Flex width="100%" direction="row" wrap="wrap" gap="small" margin="0 0 medium 0">
       <Flex.Item shouldGrow shouldShrink>
         <InsightsSearchBar onSearch={handleSearch} />
       </Flex.Item>
@@ -51,6 +53,7 @@ const InsightsActionBar: React.FC<InsightsActionBarProps> = ({handleSearch}) => 
           onClick={() => {
             //TODO: will be implemented in VICE-5151
           }}
+          disabled={loading || entryCount === 0}
           data-testid="discussion-insights-generate-button"
         >
           <Text>{I18n.t('Generate Insights')}</Text>

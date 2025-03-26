@@ -16,22 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import DiscussionInsights from './components/DiscussionInsights/DiscussionInsights'
-import ReviewModal from './components/ReviewModal/ReviewModal'
-import useInsightStore from './hooks/useInsightStore'
+import { create } from 'zustand'
 
-
-const DiscussionInsightsPage: React.FC = () => {
-  const modalOpen = useInsightStore((state) => state.modalOpen)
-  const setModalOpen = useInsightStore((state) => state.setModalOpen)
-
-  return (
-    <>
-      <ReviewModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
-      <DiscussionInsights />
-    </>
-  )
+type GlobalEnv = {
+  context_type: string
+  context_id: string
+  discussion_topic_id: string
 }
 
-export default DiscussionInsightsPage
+declare const ENV: GlobalEnv
+
+type ReadOnlyState = Readonly<{
+  context: string
+  contextId: string
+  discussionId: string
+}>
+
+type State = {
+  modalOpen: boolean
+}
+
+type Action = {
+  setModalOpen: (isOpen: boolean) => void
+}
+
+const useInsightStore = create<ReadOnlyState & State & Action>((set) => ({
+  context: ENV.context_type === 'Course' ? 'courses' : 'groups',
+  contextId: ENV.context_id,
+  discussionId: ENV.discussion_topic_id,
+  modalOpen: false,
+  setModalOpen: (isOpen) => set(() => ({ modalOpen: isOpen })),
+}))
+
+export default useInsightStore
