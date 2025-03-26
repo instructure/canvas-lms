@@ -41,7 +41,7 @@ describe('CollaborationsToolLaunch screenreader functionality', () => {
     const alert = wrapper.container.querySelector('.before_external_content_info_alert')
     alert.focus()
     expect(ref.current.state.beforeExternalContentAlertClass).toEqual('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
+    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
   })
 
   test('shows ending info alert and adds styles to iframe', () => {
@@ -51,7 +51,7 @@ describe('CollaborationsToolLaunch screenreader functionality', () => {
     const alert = wrapper.container.querySelector('.after_external_content_info_alert')
     alert.focus()
     expect(ref.current.state.afterExternalContentAlertClass).toEqual('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
+    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
   })
 
   test('hides beginning info alert and adds styles to iframe', () => {

@@ -42,7 +42,7 @@ describe('ThemeEditor', () => {
     brandConfig: {
       md5: '9e3c6d00c73e0fa989896e63077b45a8',
       variables: {
-        'ic-brand-primary': '#0374B5',
+        'ic-brand-primary': '#2B7ABC',
         'ic-brand-font-color-dark': '#273540',
       },
     },
@@ -63,7 +63,7 @@ describe('ThemeEditor', () => {
             variable_name: 'ic-brand-primary',
             type: 'color',
             human_name: 'Primary Brand Color',
-            default: '#0374B5',
+            default: '#2B7ABC',
           },
           {
             variable_name: 'ic-brand-font-color-dark',
@@ -91,7 +91,7 @@ describe('ThemeEditor', () => {
   it('initializes theme store with correct values', () => {
     const {getByRole} = render(<ThemeEditor {...defaultProps} />)
     const colorInput = getByRole('textbox', {name: /Primary Brand Color/i})
-    expect(colorInput.placeholder).toBe('#0374B5')
+    expect(colorInput.placeholder).toBe('#2B7ABC')
   })
 
   it('updates theme store when color value changes', async () => {
@@ -137,6 +137,6 @@ describe('ThemeEditor', () => {
 
     await user.clear(colorInput)
     expect(colorInput.value).toBe('')
-    expect(colorInput.placeholder).toBe('#0374B5')
+    expect(colorInput.placeholder).toBe('#2B7ABC')
   })
 })

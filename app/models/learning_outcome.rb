@@ -637,25 +637,25 @@ class LearningOutcome < ActiveRecord::Base
       ratings[1][:color] ||= "555555"
 
     when 3
-      ratings[0][:color] ||= (mastery_index == 1) ? "0374B5" : "03893D"
+      ratings[0][:color] ||= (mastery_index == 1) ? "2B7ABC" : "03893D"
       ratings[1][:color] ||= (mastery_index == 1) ? "03893D" : "FAB901"
       ratings[2][:color] ||= "555555"
 
     when 4
-      ratings[0][:color] ||= (mastery_index == 1) ? "0374B5" : "03893D"
+      ratings[0][:color] ||= (mastery_index == 1) ? "2B7ABC" : "03893D"
       ratings[1][:color] ||= (mastery_index == 1) ? "03893D" : "FAB901"
       ratings[2][:color] ||= (mastery_index == 1) ? "FAB901" : "E62429"
       ratings[3][:color] ||= "555555"
 
     when 5
-      ratings[0][:color] ||= "0374B5"
+      ratings[0][:color] ||= "2B7ABC"
       ratings[1][:color] ||= "03893D"
       ratings[2][:color] ||= "FAB901"
       ratings[3][:color] ||= "E62429"
       ratings[4][:color] ||= "555555"
 
     when 6
-      ratings[0][:color] ||= "0374B5"
+      ratings[0][:color] ||= "2B7ABC"
       ratings[1][:color] ||= "03893D"
       ratings[2][:color] ||= "FAB901"
       ratings[3][:color] ||= "D97900"

@@ -50,10 +50,10 @@
 // Abstract Color Variables
 //====================================
 // TODO-INSTUI: these color are from the pre v10 color palette, change them please
-$electric: #0374B5; // blue
+$electric: #2B7ABC; // blue
 
 @if $use_high_contrast {
-  $electric: #0073A7;
+  $electric: #2B7ABC;
 }
 
 $shamrock: #03893D; // green
@@ -146,7 +146,7 @@ $ic-bg-light-primary: #E0EBF5;
   $ic-bg-light-primary: #E0EBF5;
 }
 
-$ic-bg-light-primary-text: #0078BD;
+$ic-bg-light-primary-text: #2B7ABC;
 
 @if $use_high_contrast {
   $ic-bg-light-primary-text: #0A5A9E;

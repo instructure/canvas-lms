@@ -77,7 +77,7 @@ test('shows beginning info alert and adds styles to iframe', () => {
   expect(ref.current.state.beforeExternalContentAlertClass).toEqual('')
   // Note: The width here is normally 300px, but because these are older JS files, the CSS isn't included,
   // so the offsetWidth is 0.
-  expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
+  expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
 })
 
 test('shows ending info alert and adds styles to iframe', () => {
@@ -95,7 +95,7 @@ test('shows ending info alert and adds styles to iframe', () => {
   expect(ref.current.state.afterExternalContentAlertClass).toEqual('')
   // Note: The width here is normally 300px, but because these are older JS files, the CSS isn't included,
   // so the offsetWidth is 0.
-  expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
+  expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
 })
 
 test('hides beginning info alert and adds styles to iframe', async () => {
@@ -123,7 +123,7 @@ test("doesn't show alerts or add border to iframe by default", () => {
   ref.current.openModal(event)
   const iframe = screen.getByTitle(/Tool Configuration/i)
   expect(iframe).toHaveClass('tool_launch')
-  expect(iframe).not.toHaveStyle('border: 2px solid #0374B5;')
+  expect(iframe).not.toHaveStyle('border: 2px solid #2B7ABC;')
 })
 
 test('sets the iframe allowances', () => {
