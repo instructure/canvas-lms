@@ -43,7 +43,7 @@ export const SelfAssessmentInstructorScore = ({
           style={{
             padding: '9px 25px',
             backgroundColor: '#F3F9F6',
-            border: '2px dashed #0B874B',
+            border: '2px dashed #03893D',
             borderRadius: '4px',
             display: 'flex',
             alignItems: 'center',

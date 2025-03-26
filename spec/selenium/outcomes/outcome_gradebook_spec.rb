@@ -620,7 +620,7 @@ describe "outcome gradebook" do
           select_learning_mastery
           wait_for_ajax_requests
 
-          expect(selected_values_colors).to contain_exactly("#0B874B")
+          expect(selected_values_colors).to contain_exactly("#03893D")
         end
 
         it "Displays mastery not achieved if Account Level Mastery Scales FF is disabled" do

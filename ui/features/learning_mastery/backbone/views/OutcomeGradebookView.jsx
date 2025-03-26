@@ -42,7 +42,7 @@ const Dictionary = {
     label: I18n.t('Exceeds Mastery'),
   },
   mastery: {
-    color: ENV.use_high_contrast ? '#127A1B' : '#0B874B',
+    color: ENV.use_high_contrast ? '#127A1B' : '#03893D',
     label: I18n.t('Meets Mastery'),
   },
   nearMastery: {

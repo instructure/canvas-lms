@@ -53,7 +53,7 @@ const getBasicState = () => ({
     pastNextUrl: null,
     allOpportunitiesLoaded: true,
   },
-  currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/avatar/is/here', color: '#0B874B'},
+  currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/avatar/is/here', color: '#03893D'},
   opportunities: {
     items: [
       {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},

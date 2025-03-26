@@ -491,7 +491,7 @@ const CriterionRow = ({
                                 inset: '2px',
                                 backgroundColor: 'transparent',
                                 color: colors.contrasts.green4570,
-                                border: '2px dashed #0B874B',
+                                border: '2px dashed #03893D',
                                 borderRadius: '4px',
                                 pointerEvents: 'none',
                               }}

@@ -56,9 +56,9 @@
               "description": "Mastery",
               "points": 3.0,
               "mastery": true,
-              "color": "0B874B",
+              "color": "03893D",
               "workflow_state": "active"
-            }, 
+            },
             {
               "outcome_proficiency_rating_id": "3",
               "description": "Near Mastery",

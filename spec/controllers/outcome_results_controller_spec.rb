@@ -1576,7 +1576,7 @@ describe OutcomeResultsController do
           json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", add_defaults: true, per_page: 1, page: 1, include: ["outcomes"]))
           ratings = json["linked"]["outcomes"][0]["ratings"]
           expect(ratings.pluck("mastery")).to eq [true, false]
-          expect(ratings.pluck("color")).to eq ["0B874B", "555555"]
+          expect(ratings.pluck("color")).to eq ["03893D", "555555"]
         end
 
         it "does not contain mastery and color information if \"add_defaults\" parameter is not provided" do

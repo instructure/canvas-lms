@@ -356,7 +356,7 @@ exports[`does not render end time if the same as start time 1`] = `
               currentUser={
                 {
                   "avatarUrl": "/picture/is/here",
-                  "color": "#0B874B",
+                  "color": "#03893D",
                   "displayName": "Jane",
                   "id": "1",
                 }
@@ -4217,7 +4217,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
               currentUser={
                 {
                   "avatarUrl": "/picture/is/here",
-                  "color": "#0B874B",
+                  "color": "#03893D",
                   "displayName": "Jane",
                   "id": "1",
                 }
@@ -4620,7 +4620,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
               currentUser={
                 {
                   "avatarUrl": "/picture/is/here",
-                  "color": "#0B874B",
+                  "color": "#03893D",
                   "displayName": "Jane",
                   "id": "1",
                 }
@@ -5044,7 +5044,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
               currentUser={
                 {
                   "avatarUrl": "/picture/is/here",
-                  "color": "#0B874B",
+                  "color": "#03893D",
                   "displayName": "Jane",
                   "id": "1",
                 }
@@ -5447,7 +5447,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
               currentUser={
                 {
                   "avatarUrl": "/picture/is/here",
-                  "color": "#0B874B",
+                  "color": "#03893D",
                   "displayName": "Jane",
                   "id": "1",
                 }
@@ -5851,7 +5851,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
               currentUser={
                 {
                   "avatarUrl": "/picture/is/here",
-                  "color": "#0B874B",
+                  "color": "#03893D",
                   "displayName": "Jane",
                   "id": "1",
                 }
@@ -15560,7 +15560,7 @@ exports[`renders the end time if available 1`] = `
               currentUser={
                 {
                   "avatarUrl": "/picture/is/here",
-                  "color": "#0B874B",
+                  "color": "#03893D",
                   "displayName": "Jane",
                   "id": "1",
                 }

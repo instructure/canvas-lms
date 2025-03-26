@@ -22,7 +22,7 @@ import {Provider} from 'react-redux'
 import {createStore} from 'redux'
 import {Day} from '../index'
 
-const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#0B874B'}
+const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#03893D'}
 const defaultProps = {registerAnimatable: jest.fn(), deregisterAnimatable: jest.fn()}
 
 // Create a mock store for MissingAssignments component

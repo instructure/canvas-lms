@@ -70,7 +70,7 @@ export const SelfAssessmentRatingButton = ({
                     width: '30px',
                     backgroundColor: '#F3F9F6',
                     color: colors.contrasts.green4570,
-                    border: '2px dashed #0B874B',
+                    border: '2px dashed #03893D',
                     borderRadius: '4px',
                     display: 'flex',
                     alignItems: 'center',

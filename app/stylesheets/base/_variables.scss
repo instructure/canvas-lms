@@ -56,7 +56,7 @@ $electric: #0374B5; // blue
   $electric: #0073A7;
 }
 
-$shamrock: #0B874B; // green
+$shamrock: #03893D; // green
 
 @if $use_high_contrast {
   $shamrock: #127A1B;
@@ -158,7 +158,7 @@ $ic-bg-light-success: #E8F6E9;
   $ic-bg-light-success: #E8F2E9;
 }
 
-$ic-bg-light-success-text: #008A13;
+$ic-bg-light-success-text: #03893D;
 
 @if $use_high_contrast {
   $ic-bg-light-success-text: $ic-color-success;
