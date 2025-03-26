@@ -26,6 +26,7 @@ const I18n = createI18nScope('external_tools')
 
 export interface ConfigurationFormLti2Props {
   registrationUrl?: string
+  hasBeenSubmitted?: boolean
 }
 
 export interface ConfigurationFormLti2State {
@@ -46,22 +47,34 @@ export default class ConfigurationFormLti2 extends React.Component<
     errors: {},
   }
 
+  urlRef = React.createRef<TextInput>()
+
   handleChange: TextInputChangeHandler = (_, val) => {
     this.setState({
       registrationUrl: val,
     })
+    this.isValid()
   }
 
   isValid = () => {
-    if (!this.state.registrationUrl) {
+    if (
+      !this.state.registrationUrl ||
+      this.state.registrationUrl.trim() === '' ||
+      !URL.canParse(this.state.registrationUrl)
+    ) {
       this.setState({
         errors: {
-          registrationUrl: [{text: I18n.t('This field is required'), type: 'error'}],
+          registrationUrl: [
+            {text: I18n.t('Please enter a valid URL (e.g. https://example.com)'), type: 'error'},
+          ],
         },
       })
-
+      this.urlRef.current?.focus()
       return false
     } else {
+      this.setState({
+        errors: {},
+      })
       return true
     }
   }
@@ -83,10 +96,11 @@ export default class ConfigurationFormLti2 extends React.Component<
           // to just let the form handle that, rather than replicate that functionality in JS.
           name="tool_consumer_url"
           value={this.state.registrationUrl}
+          ref={this.urlRef}
           onChange={this.handleChange}
           renderLabel={I18n.t('Registration URL')}
           placeholder={I18n.t('https://lti-tool-provider-example.herokuapp.com/register')}
-          messages={this.state.errors.registrationUrl}
+          messages={this.props.hasBeenSubmitted ? this.state.errors.registrationUrl : []}
           isRequired={true}
         />
       </div>

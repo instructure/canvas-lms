@@ -213,6 +213,7 @@ export default class ConfigurationForm extends React.Component {
           ref="configurationFormLti2"
           data-testid="configuration-form-lti2"
           registrationUrl={this.state.registrationUrl}
+          hasBeenSubmitted={this.state.hasBeenSubmitted}
         />
       )
     }
