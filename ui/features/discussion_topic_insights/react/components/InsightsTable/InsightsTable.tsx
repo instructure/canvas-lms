@@ -17,13 +17,14 @@
  */
 import React from 'react'
 import SortableTable from './SortableTable'
-import {BaseTableProps} from './SimpleTable'
+import { BaseTableProps } from './SimpleTable'
 
 export type InsightsTableProps = BaseTableProps & {
   perPage: number
 }
 
-const InsightsTable: React.FC<InsightsTableProps> = ({caption, headers, rows, perPage}) => {
+
+const InsightsTable: React.FC<InsightsTableProps> = ({ caption, rows, headers, perPage }) => {
   return <SortableTable caption={caption} headers={headers} rows={rows} perPage={perPage} />
 }
 
