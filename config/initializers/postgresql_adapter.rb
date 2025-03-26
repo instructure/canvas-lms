@@ -268,7 +268,7 @@ module PostgreSQLAdapterExtensions
     # internal_metadata to exist and this guard isn't really useful there either
     return if [ActiveRecord::Base.internal_metadata_table_name, ActiveRecord::Base.schema_migrations_table_name].include?(table_name)
     # If the function doesn't exist yet it will be backfilled
-    return unless ::ActiveRecord::InternalMetadata.new(self)[:guard_dangerous_changes_installed]
+    return unless ::ActiveRecord::Base.internal_metadata[:guard_dangerous_changes_installed]
 
     ["UPDATE", "DELETE"].each do |operation|
       trigger_name = "guard_excessive_#{operation.downcase}s"
