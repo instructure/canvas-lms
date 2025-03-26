@@ -201,7 +201,7 @@ export const PaceModalStats = ({
           margin="small small none none"
           borderRadius="circle"
         >
-          <IconAssignmentLine color="alert" size="small" themeOverride={{alertColor: '#0374B5'}} />
+          <IconAssignmentLine color="alert" size="small" themeOverride={{alertColor: '#2B7ABC'}} />
         </View>
         <View
           data-testid="course-pace-assignment-number"
@@ -209,7 +209,7 @@ export const PaceModalStats = ({
           margin="small none none none"
         >
           {getColoredText('#30203A', I18n.t('Assignments'))}
-          {getColoredText('#0374B5', assignments, {as: 'div', weight: 'bold'})}
+          {getColoredText('#2B7ABC', assignments, {as: 'div', weight: 'bold'})}
         </View>
       </View>
     )

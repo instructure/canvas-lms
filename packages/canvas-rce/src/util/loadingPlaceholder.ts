@@ -360,7 +360,7 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 					box-sizing: border-box;
 					overflow: hidden;
 					--Spinner-trackColor: #F2F4F4;
-					--Spinner-color: #0374B5;
+					--Spinner-color: #2B7ABC;
 					--Spinner-xSmallSize: 1.5em;
 					--Spinner-xSmallBorderWidth: 0.25em;
 					--Spinner-smallSize: 3em;
@@ -369,7 +369,7 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 					--Spinner-mediumBorderWidth: 0.5em;
 					--Spinner-largeSize: 7em;
 					--Spinner-largeBorderWidth: 0.75em;
-					--Spinner-inverseColor: #0374B5;
+					--Spinner-inverseColor: #2B7ABC;
 				}
 
 				.Spinner-circleTrack {
