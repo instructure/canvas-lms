@@ -38,7 +38,7 @@ module Api
 
       APPLICABLE_CONTEXT_TYPES = %w[Course Group Account].freeze
       SKIP_CONTEXT_TYPES = ["User"].freeze
-      FILE_LINK_REGEX = %r{/files/(\d+)/(?:download|preview)}
+      FILE_LINK_REGEX = %r{/files/(\d+)/?(?:download|preview|\?wrap=1)}
       VERIFIER_REGEX = /(\?)verifier=[^&]*&?|&verifier=[^&]*/
       private_constant :APPLICABLE_CONTEXT_TYPES, :SKIP_CONTEXT_TYPES, :FILE_LINK_REGEX, :VERIFIER_REGEX
 
