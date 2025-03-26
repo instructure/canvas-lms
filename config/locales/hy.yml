@@ -4358,6 +4358,8 @@ hy:
     index: 
       titles: 
         course_modules: "Դասընթացի մոդուլներ"
+    links: 
+      student_progress: "Դիտել կատարման ընթացքը"
     module_complete: Ավարտել
     module_empty: "\"%{module}\" մոդուլում տարրեր չկան"
     module_item_next: 
@@ -14170,6 +14172,9 @@ hy:
         attempt_number: "%{att_no} փորձ"
         kept: ՊԱՀՊԱՆՎԱԾ
         latest: ՎԵՐՋԻՆ
+        time: Ժամը
+      submission_version_score: 
+        score: Գնահատական
       submission_versions: 
         attempt: Փորձ
         attempt_history: "Փորձի պատմություն"
