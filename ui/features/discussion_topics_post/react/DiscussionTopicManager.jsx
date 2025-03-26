@@ -50,6 +50,10 @@ import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import DiscussionTopicToolbarContainer from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 import StickyToolbarWrapper from './containers/StickyToolbarWrapper/StickyToolbarWrapper'
 import $ from 'jquery'
+import {
+  DiscussionTranslationModuleContainer
+} from "./containers/DiscussionTranslationModuleContainer/DiscussionTranslationModuleContainer";
+import {TranslationControls} from "./components/TranslationControls/TranslationControls";
 import useHighlightStore from './hooks/useHighlightStore'
 import {
   KeyboardShortcuts,
@@ -157,6 +161,7 @@ const DiscussionTopicManager = props => {
 
   const previousSearchTerm = useRef(null);
 
+  const [isSummaryEnabled, setIsSummaryEnabled] = useState(ENV.discussion_summary_enabled || false)
 
   const discussionManagerUtilities = {
     replyFromId,
@@ -181,6 +186,8 @@ const DiscussionTopicManager = props => {
     setTranslateTargetLanguage,
     entryTranslatingSet,
     setEntryTranslating,
+    isSummaryEnabled,
+    setIsSummaryEnabled,
   }
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -511,6 +518,10 @@ const DiscussionTopicManager = props => {
                         breakpoints={props.breakpoints}
                       />
                     )}
+                    {showTranslationControl && ENV.ai_translation_improvements && (
+                      <DiscussionTranslationModuleContainer />
+                    )}
+                    {showTranslationControl && !ENV.ai_translation_improvements && <TranslationControls />}
                     <DiscussionTopicContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       expandedTopicReply={expandedTopicReply}
@@ -537,6 +548,8 @@ const DiscussionTopicManager = props => {
                       isHighlighted={isTopicHighlighted}
                       replyToTopicSubmission={replyToTopicSubmission}
                       replyToEntrySubmission={replyToEntrySubmission}
+                      isSummaryEnabled={ENV.user_can_summarize && isSummaryEnabled}
+                      setIsSummaryEnabled={setIsSummaryEnabled}
                       isSubmitting={isSubmitting}
                     />
 

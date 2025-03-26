@@ -28,7 +28,6 @@ import {
 } from '../../utils/constants'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {TranslationControls} from '../../components/TranslationControls/TranslationControls'
 import {useMutation} from '@apollo/client'
 import {UPDATE_DISCUSSION_TOPIC_PARTICIPANT} from '../../../graphql/Mutations'
 import DiscussionTopicTitleContainer from '../DiscussionTopicTitleContainer/DiscussionTopicTitleContainer'
@@ -37,7 +36,6 @@ import {Flex} from '@instructure/ui-flex'
 import {hideStudentNames} from '../../utils'
 import DiscussionPostSearchTool from '../../components/DiscussionPostToolbar/DiscussionPostSearchTool'
 import {breakpointsShape} from '@canvas/with-breakpoints'
-import {DiscussionTranslationModuleContainer} from '../DiscussionTranslationModuleContainer/DiscussionTranslationModuleContainer'
 import useSpeedGrader from '../../hooks/useSpeedGrader'
 import SortOrderDropDown from '../../components/DiscussionPostToolbar/SortOrderDropDown'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -45,12 +43,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {
   IconArrowDownLine,
-  IconArrowOpenDownLine,
-  IconArrowOpenUpLine,
   IconArrowUpLine,
-  IconGroupLine,
-  IconMoreSolid,
-  IconPermissionsLine,
 } from '@instructure/ui-icons'
 
 const I18n = createI18nScope('discussion_topic')
@@ -168,7 +161,7 @@ const DiscussionTopicToolbarContainer = props => {
       ? 'secondary'
       : 'primary'
   return (
-    <View as="div" padding="small" margin="0 0 x-small 0" background={background}>
+    <View as="div" padding="0" margin="0 0 x-small 0" background={background}>
       {instUINavEnabled() ? (
         <>
           <Flex
@@ -244,7 +237,10 @@ const DiscussionTopicToolbarContainer = props => {
               height="100%"
               padding="xxx-small 0"
             >
-              <Flex.Item shouldGrow={true} shouldShrink={true}>
+              <Flex.Item
+                shouldGrow={true}
+                shouldShrink={true}
+              >
                 {!hideStudentNames && (
                   <DiscussionPostSearchTool
                     discussionAnonymousState={props.discussionTopic.anonymousState}
@@ -308,10 +304,6 @@ const DiscussionTopicToolbarContainer = props => {
           />
         </>
       )}
-      {showTranslationControl && ENV.ai_translation_improvements && (
-        <DiscussionTranslationModuleContainer />
-      )}
-      {showTranslationControl && !ENV.ai_translation_improvements && <TranslationControls />}
     </View>
   )
 }
