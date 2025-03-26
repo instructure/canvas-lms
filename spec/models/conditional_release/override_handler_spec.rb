@@ -148,7 +148,6 @@ module ConditionalRelease
       context "with course pace" do
         before :once do
           @course.update start_at: "2021-06-30", restrict_enrollments_to_course_dates: true, time_zone: "UTC"
-          @course.root_account.enable_feature!(:course_paces)
           @course.enable_course_paces = true
           @course.save!
           @module = @course.context_modules.create!

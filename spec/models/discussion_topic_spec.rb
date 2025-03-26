@@ -3210,7 +3210,6 @@ describe DiscussionTopic do
     context "with course paces" do
       before do
         discussion_topic_model(context: @course)
-        @course.root_account.enable_feature!(:course_paces)
         @course.enable_course_paces = true
         @course.save!
         @course_pace = course_pace_model(course: @course)

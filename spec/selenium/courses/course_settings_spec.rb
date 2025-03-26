@@ -313,43 +313,6 @@ describe "course settings" do
       expect(home_page_announcement_limit).not_to be_disabled
     end
 
-    describe "course paces setting" do
-      describe "when the course paces feature flag is enabled" do
-        before do
-          @account.enable_feature!(:course_paces)
-        end
-
-        it "displays the course paces setting (and if checked, the caution text)" do
-          get "/courses/#{@course.id}/settings"
-
-          expect(element_exists?(".course-paces-row")).to be_truthy
-
-          caution_text = "Course Pacing is in active development."
-          course_paces_checkbox = f("#course_enable_course_paces")
-          course_paces_checkbox.location_once_scrolled_into_view
-          course_paces_checkbox.click
-          wait_for_ajaximations
-          expect(f(".course-paces-row")).to include_text caution_text
-
-          course_paces_checkbox.click
-          wait_for_ajaximations
-          expect(f(".course-paces-row")).not_to include_text caution_text
-        end
-      end
-
-      describe "when the course paces feature flag is disabled" do
-        before do
-          @account.disable_feature!(:course_paces)
-        end
-
-        it "does not display the course paces setting" do
-          get "/courses/#{@course.id}/settings"
-
-          expect(element_exists?(".course-paces-row")).to be_falsey
-        end
-      end
-    end
-
     it "shows participation by default" do
       get "/courses/#{@course.id}/settings"
 

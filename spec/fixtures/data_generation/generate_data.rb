@@ -434,7 +434,6 @@ def generate_course_pace_course
   course_with_teacher_enrolled
   course_with_students_enrolled
 
-  @root_account.enable_feature!(:course_paces)
   @course.update(enable_course_paces: true)
 
   module1 = create_module(@course)

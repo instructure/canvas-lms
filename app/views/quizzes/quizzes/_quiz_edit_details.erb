@@ -374,7 +374,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
       <% if (
         @context.root_account.feature_enabled?(:course_pace_pacing_with_mastery_paths) &&
         ConditionalRelease::Service.enabled_in_context?(@context) &&
-        @context.is_a?(Course) && @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces?
+        @context.is_a?(Course) && @context.enable_course_paces?
       ) %>
         <div>
           <label class="control-label">

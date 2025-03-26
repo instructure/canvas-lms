@@ -453,23 +453,10 @@ describe "context modules" do
 
           get "/courses/#{@course.id}/modules"
 
+          wait_for_ajaximations
+
           expect(fj(".context_module:contains('An Assignment')")).to be_displayed
           expect(f(".context_module")).not_to contain_css(".due_date_display")
-        end
-
-        it "shows due dates if the feature is off for the account" do
-          @course.account.disable_feature!(:course_paces)
-
-          modules = create_modules(1, true)
-          modules[0].add_item({ id: @assignment.id, type: "assignment", title: "An Assignment" })
-
-          @assignment.due_at = 3.days.from_now
-          @assignment.save!
-
-          get "/courses/#{@course.id}/modules"
-
-          expect(fj(".context_module:contains('An Assignment')")).to be_displayed
-          expect(f(".context_module")).to contain_css(".due_date_display")
         end
       end
     end

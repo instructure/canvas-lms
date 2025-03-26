@@ -260,7 +260,7 @@ class ApplicationController < ActionController::Base
           },
           RAILS_ENVIRONMENT: Canvas.environment,
         }
-        @js_env[:IN_PACED_COURSE] = @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces? if @context.is_a?(Course)
+        @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.is_a?(Course)
         unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {
             dsn: SentryExtensions::Settings.settings[:frontend_dsn],
@@ -361,8 +361,6 @@ class ApplicationController < ActionController::Base
     render_both_to_do_lists
     commons_new_quizzes
     consolidated_media_player
-    course_paces_redesign
-    course_paces_for_students
     explicit_latex_typesetting
     media_links_use_attachment_id
     permanent_page_links

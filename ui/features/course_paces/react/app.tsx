@@ -106,54 +106,29 @@ export const App = ({
   }
 
   const renderApp = () => {
-    if (window.ENV.FEATURES.course_paces_redesign) {
-      return (
-        <>
-          <Flex as="section" alignItems="end" wrap="wrap">
-            <Flex.Item margin="0 0 small">
-              <Header
-                handleDrawerToggle={() => setTrayOpen(!trayOpen)}
-                responsiveSize={responsiveSize}
-              />
-              {!coursePace.id && coursePace.context_type === 'Course' ? (
-                <CoursePaceEmpty responsiveSize={responsiveSize} />
-              ) : (
-                // Make sure changes have finished before updating contexts
-                <PaceContent />
-              )}
-            </Flex.Item>
-          </Flex>
-          <PaceModal
-            isOpen={modalOpen}
-            changes={unpublishedChanges}
-            onClose={() => handleModalClose()}
-          />
-        </>
-      )
-    } else {
-      return (
-        <>
-          <View>
-            <Errors />
-            <Header handleDrawerToggle={() => setTrayOpen(!trayOpen)} responsiveSize="large" />
-          </View>
-          <Body />
-          {/* @ts-expect-error */}
-          <Footer responsiveSize={responsiveSize} />
-          <Tray
-            label={I18n.t('Unpublished Changes tray')}
-            open={trayOpen}
-            onDismiss={() => setTrayOpen(false)}
-            placement={responsiveSize === 'small' ? 'bottom' : 'end'}
-            shouldContainFocus={true}
-            shouldReturnFocus={true}
-            shouldCloseOnDocumentClick={true}
-          >
-            <UnpublishedChangesTrayContents handleTrayDismiss={() => setTrayOpen(false)} />
-          </Tray>
-        </>
-      )
-    }
+    return (
+      <>
+        <Flex as="section" alignItems="end" wrap="wrap">
+          <Flex.Item margin="0 0 small">
+            <Header
+              handleDrawerToggle={() => setTrayOpen(!trayOpen)}
+              responsiveSize={responsiveSize}
+            />
+            {!coursePace.id && coursePace.context_type === 'Course' ? (
+              <CoursePaceEmpty responsiveSize={responsiveSize} />
+            ) : (
+              // Make sure changes have finished before updating contexts
+              <PaceContent />
+            )}
+          </Flex.Item>
+        </Flex>
+        <PaceModal
+          isOpen={modalOpen}
+          changes={unpublishedChanges}
+          onClose={() => handleModalClose()}
+        />
+      </>
+    )
   }
 
   return (

@@ -260,7 +260,7 @@ module Api::V1::DiscussionTopics
       topic_course = Course.find_by(id: context.context_id)
     end
 
-    paced_course = topic_course ? topic_course.account.feature_enabled?(:course_paces) && topic_course.enable_course_paces? : nil
+    paced_course = topic_course&.enable_course_paces?
     fields[:in_paced_course] = paced_course if paced_course
 
     locked_json(fields, topic, user, "topic", check_policies: true, deep_check_if_needed: true)

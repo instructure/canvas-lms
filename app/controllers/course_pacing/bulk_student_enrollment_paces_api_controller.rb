@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::PacesApiController
-  before_action :require_feature_flag
   before_action :require_context
   before_action :ensure_pacing_enabled
   before_action :authorize_action

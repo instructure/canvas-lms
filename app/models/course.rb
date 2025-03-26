@@ -3408,7 +3408,7 @@ class Course < ActiveRecord::Base
                           })
     end
 
-    if account.feature_enabled?(:course_paces) && enable_course_paces && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    if enable_course_paces && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       default_tabs.insert(default_tabs.index { |t| t[:id] == TAB_MODULES } + 1, {
                             id: TAB_COURSE_PACES,
                             label: t("#tabs.course_paces", "Course Pacing"),
@@ -4524,7 +4524,7 @@ class Course < ActiveRecord::Base
     return unless publishing?
 
     publish_time = ((updated_at - created_at) * 1000).round
-    statsd_bucket = (account.feature_enabled?(:course_paces) && enable_course_paces?) ? "paced" : "unpaced"
+    statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
     InstStatsd::Statsd.timing("course.#{statsd_bucket}.create_to_publish_time", publish_time)
   end
 

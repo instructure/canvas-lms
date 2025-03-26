@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {act, render, within} from '@testing-library/react'
 import {renderConnected} from '../../__tests__/utils'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -54,62 +53,41 @@ const defaultProps: ComponentProps = {
 }
 
 describe('Footer', () => {
-  beforeEach(() => {
-    fakeENV.setup({
-      FEATURES: {
-        course_paces_for_students: false,
-        course_paces_redesign: false,
-      },
-    })
-  })
-
   afterEach(() => {
     fakeENV.teardown()
     jest.clearAllMocks()
   })
 
-  it('renders cancel and publish buttons when there are unpublished changes', () => {
+  it('renders apply changes buttons when there are unpublished changes', () => {
     const {getByRole} = renderConnected(<Footer {...defaultProps} />)
-
-    const cancelButton = getByRole('button', {name: 'Cancel'})
-    expect(cancelButton).toBeInTheDocument()
-    act(() => cancelButton.click())
-    expect(onResetPace).toHaveBeenCalled()
-
-    const publishButton = getByRole('button', {name: 'Publish'})
+    const publishButton = getByRole('button', {name: 'Apply Changes'})
     expect(publishButton).toBeInTheDocument()
     act(() => publishButton.click())
     expect(syncUnpublishedChanges).toHaveBeenCalled()
   })
 
-  it('shows cannot cancel and publish tooltip when there are no unpublished changes', () => {
+  it('shows apply changes tooltip when there are no unpublished changes', () => {
     const {getByRole} = renderConnected(<Footer {...defaultProps} unpublishedChanges={false} />)
-    const cancelButton = getByRole('button', {name: 'Cancel'})
-    const publishButton = getByRole('button', {name: 'Publish'})
-    expect(cancelButton).toHaveAttribute('aria-describedby')
+    const publishButton = getByRole('button', {name: 'Apply Changes'})
     expect(publishButton).toHaveAttribute('aria-describedby')
   })
 
-  it('shows cannot cancel and publish tooltip while publishing', () => {
+  it('shows apply changestooltip while publishing', () => {
     const {getByRole} = renderConnected(
       <Footer {...defaultProps} pacePublishing={true} isSyncing={true} />,
     )
-    const cancelButton = getByRole('button', {name: 'Cancel'})
     const publishButton = getByRole('button', {name: 'Publishing...'})
-    expect(cancelButton).toHaveAttribute('aria-describedby')
     expect(publishButton).toHaveAttribute('aria-describedby')
   })
 
-  it('shows cannot cancel and publish tooltip while auto saving', () => {
+  it('shows apply changes tooltip while auto saving', () => {
     const {getByRole} = renderConnected(<Footer {...defaultProps} autoSaving={true} />)
-    const cancelButton = getByRole('button', {name: 'Cancel'})
-    const publishButton = getByRole('button', {name: 'Publish'})
-    expect(cancelButton).toHaveAttribute('aria-describedby')
+    const publishButton = getByRole('button', {name: 'Apply Changes'})
     expect(publishButton).toHaveAttribute('aria-describedby')
   })
 
   it('shows cannot cancel and publish tooltip while loading', () => {
-    const {getByText} = renderConnected(<Footer {...defaultProps} showLoadingOverlay={true} />)
+    const {getByText} = renderConnected(<Footer {...defaultProps} showLoadingOverlay={true} anyActiveRequests={true}/>)
     expect(getByText('You cannot cancel while loading the pace')).toBeInTheDocument()
     expect(getByText('You cannot publish while loading the pace')).toBeInTheDocument()
   })
@@ -118,7 +96,6 @@ describe('Footer', () => {
     const {getByText, queryByText} = renderConnected(
       <Footer {...defaultProps} unpublishedChanges={false} newPace={true} />,
     )
-    expect(getByText('There are no pending changes to cancel')).toBeInTheDocument()
     expect(queryByText('You cannot publish while loading the pace')).not.toBeInTheDocument()
   })
 
@@ -134,26 +111,10 @@ describe('Footer', () => {
     expect(spinner).toBeInTheDocument()
   })
 
-  it('renders nothing for student paces', () => {
-    const {queryByRole} = renderConnected(<Footer {...defaultProps} studentPace={true} />)
-    expect(queryByRole('button')).not.toBeInTheDocument()
-  })
-
-  it('keeps focus on Cancel button after clicking', () => {
-    const {getByRole} = renderConnected(<Footer {...defaultProps} />)
-
-    const cancelButton = getByRole('button', {name: 'Cancel'})
-    act(() => {
-      cancelButton.focus()
-      cancelButton.click()
-    })
-    expect(document.activeElement).toBe(cancelButton)
-  })
-
   it('keeps focus on Publish button after clicking', () => {
     const {getByRole} = renderConnected(<Footer {...defaultProps} />)
 
-    const pubButton = getByRole('button', {name: 'Publish'})
+    const pubButton = getByRole('button', {name: 'Apply Changes'})
     act(() => {
       pubButton.focus()
       pubButton.click()
@@ -162,23 +123,9 @@ describe('Footer', () => {
   })
 
   describe('with course paces for students', () => {
-    beforeEach(() => {
-      fakeENV.setup({
-        FEATURES: {
-          course_paces_for_students: true,
-        },
-      })
-    })
-
     it('renders everything for student paces', () => {
       const {getByRole} = renderConnected(<Footer {...defaultProps} studentPace={true} />)
-
-      const cancelButton = getByRole('button', {name: 'Cancel'})
-      expect(cancelButton).toBeInTheDocument()
-      act(() => cancelButton.click())
-      expect(onResetPace).toHaveBeenCalled()
-
-      const publishButton = getByRole('button', {name: 'Publish'})
+      const publishButton = getByRole('button', {name: 'Apply Changes'})
       expect(publishButton).toBeInTheDocument()
       act(() => publishButton.click())
       expect(syncUnpublishedChanges).toHaveBeenCalled()
@@ -186,14 +133,6 @@ describe('Footer', () => {
   })
 
   describe('with course_paces_redesign flag', () => {
-    beforeEach(() => {
-      fakeENV.setup({
-        FEATURES: {
-          course_paces_redesign: true,
-        },
-      })
-    })
-
     it('includes the correct components for new pace', () => {
       const {getByText, queryByText} = renderConnected(
         <Footer {...defaultProps} sectionPace={true} newPace={true} isUnpublishedNewPace={true} />,
