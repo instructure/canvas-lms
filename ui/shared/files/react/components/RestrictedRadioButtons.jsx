@@ -170,10 +170,10 @@ class RestrictedRadioButtons extends React.Component {
 
   renderPermissionOptions = () => (
     <div>
-      <label className="control-label label-offline" htmlFor="availabilitySelector">
+      <label id="availability-label" className="control-label label-offline">
         <b>{I18n.t('Availability:')}</b>
       </label>
-      <div>
+      <div role="radiogroup" aria-labelledby="availability-label">
         {this.permissionOptions.map((option, index) => (
           <div className="radio" key={index}>
             {}
