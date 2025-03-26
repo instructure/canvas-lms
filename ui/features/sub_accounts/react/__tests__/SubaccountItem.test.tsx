@@ -25,7 +25,7 @@ const account = {id: '1', name: 'Account_Name', sub_account_count: 3, course_cou
 
 const props = {
   account,
-  indent: 0,
+  depth: 0,
   onAdd: jest.fn(),
   onEditSaved: jest.fn(),
   onDelete: jest.fn(),

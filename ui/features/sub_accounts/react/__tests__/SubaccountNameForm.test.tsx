@@ -29,13 +29,6 @@ describe('SubaccountNameForm', () => {
     onCancel: jest.fn(),
   }
 
-  const newAccount = {
-    id: '2',
-    name: 'New Name',
-    sub_account_count: 0,
-    course_count: 0,
-  }
-
   const updatedAccount = {
     id: '1',
     name: 'Updated Name',

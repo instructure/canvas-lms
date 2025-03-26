@@ -26,7 +26,7 @@ import {AccountWithCounts} from './types'
 import {Heading} from '@instructure/ui-heading'
 import {useParams} from 'react-router-dom'
 import {Portal} from '@instructure/ui-portal'
-import {FocusProvider} from './util'
+import {calculateIndent, FocusProvider} from './util'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('sub_accounts')
@@ -57,9 +57,14 @@ export default function SubaccountRoute(props: Props) {
     if (error) {
       return <Alert variant="error">{I18n.t('Failed loading subaccounts')}</Alert>
     } else if (isLoading || !data) {
-      return <Spinner renderTitle={I18n.t('Loading subaccounts')} />
+      return (
+        <Flex>
+          <Flex.Item width={`${calculateIndent(2)}%`} />
+          <Spinner size="medium" renderTitle={I18n.t('Loading subaccounts')} />
+        </Flex>
+      )
     }
-    return <SubaccountTree isTopAccount={true} rootAccount={data} indent={1} />
+    return <SubaccountTree rootAccount={data} depth={1} />
   }
 
   return <FocusProvider accountId={props.rootAccountId}>{renderTree()}</FocusProvider>
