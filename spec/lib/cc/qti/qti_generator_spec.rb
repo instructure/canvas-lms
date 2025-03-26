@@ -74,6 +74,62 @@ describe "QTI Generator" do
     end
   end
 
+  describe "add_question for text_only_question" do
+    it "includes the passage meta_field when question type is text_only_question" do
+      qti_generator
+      allow(@qg).to receive_messages(aq_mig_id: "dummy_id", qq_mig_id: "dummy_id")
+
+      html_exporter = double("HtmlExporter")
+      allow(html_exporter).to receive(:html_content) { |s| s }
+      @qg.instance_variable_set(:@html_exporter, html_exporter)
+
+      question = {
+        "question_type" => "text_only_question",
+        "points_possible" => 5,
+        "answers" => [],
+        "name" => "Text Only Question",
+        "question_name" => "Text Only Question",
+        "question_text" => "Some text"
+      }
+
+      output = +""
+      doc = Builder::XmlMarkup.new(target: output, indent: 2)
+      @qg.send(:add_question, doc, question)
+
+      expected_xml = <<~XML
+        <item ident="dummy_id" title="Text Only Question">
+          <itemmetadata>
+            <qtimetadata>
+              <qtimetadatafield>
+                <fieldlabel>question_type</fieldlabel>
+                <fieldentry>text_only_question</fieldentry>
+              </qtimetadatafield>
+              <qtimetadatafield>
+                <fieldlabel>points_possible</fieldlabel>
+                <fieldentry>5</fieldentry>
+              </qtimetadatafield>
+              <qtimetadatafield>
+                <fieldlabel>original_answer_ids</fieldlabel>
+                <fieldentry></fieldentry>
+              </qtimetadatafield>
+              <qtimetadatafield>
+                <fieldlabel>passage</fieldlabel>
+                <fieldentry>true</fieldentry>
+              </qtimetadatafield>
+            </qtimetadata>
+          </itemmetadata>
+          <presentation>
+            <material>
+              <mattext texttype="text/html">&lt;div&gt;Some text&lt;/div&gt;</mattext>
+            </material>
+          </presentation>
+        </item>
+      XML
+
+      expect(output).to eq(expected_xml)
+    end
+  end
+
   describe "generate new quizzes" do
     subject do
       doc = Builder::XmlMarkup.new(target: +"", indent: 2)
