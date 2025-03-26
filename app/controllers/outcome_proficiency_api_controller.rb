@@ -97,7 +97,7 @@ class OutcomeProficiencyApiController < ApplicationController
   #        -F 'ratings[][mastery]=false' \
   #        -F 'ratings[][description]=Mastery' \
   #        -F 'ratings[][points]=3' \
-  #        -F 'ratings[][color]=0B874B' \
+  #        -F 'ratings[][color]=03893D' \
   #        -F 'ratings[][mastery]=true' \
   #        -F 'ratings[][description]=Near Mastery' \
   #        -F 'ratings[][points]=2' \
