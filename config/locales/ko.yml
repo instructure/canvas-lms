@@ -3759,6 +3759,8 @@ ko:
     index: 
       titles: 
         course_modules: "과목 모듈"
+    links: 
+      student_progress: "진행 상황 보기"
     module_complete: 완료
     module_empty: "\"%{module}\" 모듈에 항목이 없음"
     module_item_next: 
@@ -11787,6 +11789,9 @@ ko:
         attempt_number: "시도 %{att_no}"
         kept: 보관
         latest: 최신
+        time: 시간
+      submission_version_score: 
+        score: 점수
       submission_versions: 
         attempt: 시도
         attempt_history: "시도 이력"
