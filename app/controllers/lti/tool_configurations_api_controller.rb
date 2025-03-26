@@ -88,9 +88,18 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def create
-    developer_key_redirect_uris
-    tool_config = Lti::ToolConfiguration.create_tool_config_and_key!(account, tool_configuration_params, tool_configuration_redirect_uris)
-    update_developer_key!(tool_config, developer_key_redirect_uris)
+    tool_config = Lti::ToolConfiguration.transaction do
+      developer_key_redirect_uris
+      tool_config = Lti::ToolConfiguration.create_tool_config_and_key!(account,
+                                                                       tool_configuration_params,
+                                                                       tool_configuration_redirect_uris)
+      update_developer_key!(tool_config, developer_key_redirect_uris)
+      Lti::AccountBindingService.call(account:,
+                                      user: @current_user,
+                                      registration: tool_config.developer_key.lti_registration,
+                                      overwrite_created_by: true)
+      tool_config
+    end
     render json: Lti::ToolConfigurationSerializer.new(tool_config, include_warnings: true)
   end
 
