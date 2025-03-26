@@ -6779,6 +6779,8 @@ hu:
     index: 
       titles: 
         course_modules: Modulok
+    links: 
+      student_progress: "Előrehaladás megtekintése"
     module_complete: Kész
     module_empty: "Nincsenek elemek ebben a modulban: \"%{module}\""
     module_item_next: 
@@ -20480,6 +20482,9 @@ hu:
         attempt_number: "%{att_no}. próbálkozás"
         kept: MEGTARTOTT
         latest: LEGUTOLSÓ
+        time: Idő
+      submission_version_score: 
+        score: Eredmény
       submission_versions: 
         attempt: Próbálkozás
         attempt_history: "Próbálkozások naplója"
