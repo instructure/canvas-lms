@@ -178,3 +178,9 @@ modules_perf:
     Improves modules page performance on courses with a large number of modules or module items.
   applies_to: Account
 
+create_wiki_page_mastery_path_overrides:
+  state: hidden
+  display_name: In MasteryPaths Create AssignmentOverrides on WikiPages Instead of Creating a Hidden Assignment
+  description: |-
+    In Mastery Paths create AssignmentOverrides directly onto WikiPages instead of creating a hidden Assignment.
+  applies_to: SiteAdmin
