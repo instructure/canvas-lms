@@ -167,9 +167,9 @@ unless $canvas_tasks_loaded
     task pending_migrations: :environment do
       ActiveRecord::Migrator.new(
         :up,
-        ActiveRecord::Base.connection.migration_context.migrations,
-        ActiveRecord::Base.connection.schema_migration,
-        ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
+        ActiveRecord::Base.migration_context.migrations,
+        ActiveRecord::Base.schema_migration,
+        ActiveRecord::Base.internal_metadata
       ).pending_migrations.each do |pending_migration|
         tags = pending_migration.tags
         tags = " (#{tags.join(", ")})" unless tags.empty?
@@ -180,9 +180,9 @@ unless $canvas_tasks_loaded
     desc "Shows skipped db migrations."
     task skipped_migrations: :environment do
       ActiveRecord::Migrator.new(:up,
-                                 ActiveRecord::Base.connection.migration_context.migrations,
-                                 ActiveRecord::Base.connection.schema_migration,
-                                 ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)).skipped_migrations.each do |skipped_migration|
+                                 ActiveRecord::Base.migration_context.migrations,
+                                 ActiveRecord::Base.schema_migration,
+                                 ActiveRecord::Base.internal_metadata).skipped_migrations.each do |skipped_migration|
         tags = skipped_migration.tags
         tags = " (#{tags.join(", ")})" unless tags.empty?
         puts "  %4d %s%s" % [skipped_migration.version, skipped_migration.name, tags]
@@ -196,12 +196,12 @@ unless $canvas_tasks_loaded
       # When all callsites are migrated, this task
       # definition can be dropped.
       task predeploy: [:environment, :load_config] do
-        migrations = ActiveRecord::Base.connection.migration_context.migrations
+        migrations = ActiveRecord::Base.migration_context.migrations
         migrations = migrations.select { |m| m.tags.include?(:predeploy) }
         ActiveRecord::Migrator.new(:up,
                                    migrations,
-                                   ActiveRecord::Base.connection.schema_migration,
-                                   ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection))
+                                   ActiveRecord::Base.schema_migration,
+                                   ActiveRecord::Base.internal_metadata)
                               .migrate
       end
     end
