@@ -38,7 +38,7 @@ const subAccounts = [
 
 const props = {
   rootAccount,
-  indent: 0,
+  depth: 0,
   isTopAccount: false,
 }
 

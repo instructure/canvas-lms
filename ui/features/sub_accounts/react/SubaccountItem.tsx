@@ -37,7 +37,7 @@ const I18n = createI18nScope('sub_accounts')
 
 interface Props {
   account: AccountWithCounts
-  indent: number
+  depth: number
   onAdd: () => void
   onExpand: () => void
   onCollapse: () => void
@@ -175,7 +175,7 @@ export default function SubaccountItem(props: Props) {
     )
   }
 
-  const indent = calculateIndent(props.indent)
+  const indent = calculateIndent(props.depth)
   if (props.show && !isEditing) {
     return (
       <Flex key={`${props.account.id}_header`}>
@@ -186,7 +186,7 @@ export default function SubaccountItem(props: Props) {
   } else if (props.show) {
     return (
       <SubaccountNameForm
-        indent={props.indent}
+        depth={props.depth}
         accountName={props.account.name}
         accountId={props.account.id}
         onSuccess={() => {

@@ -32,7 +32,7 @@ const I18n = createI18nScope('sub_accounts')
 interface Props {
   accountName: string
   accountId: string
-  indent?: number
+  depth?: number
   onSuccess: () => void
   onCancel: () => void
 }
@@ -110,12 +110,12 @@ export default function SubaccountNameForm(props: Props) {
     return json!
   }
 
-  const indent = props.indent ? calculateIndent(props.indent) : undefined
+  const indent = props.depth ? calculateIndent(props.depth) : undefined
   if (isSaving) {
     return (
       <Flex margin="small 0">
         {indent ? <Flex.Item width={`${indent}%`} /> : null}
-        <Spinner renderTitle={I18n.t('Saving account')} />
+        <Spinner size="small" renderTitle={I18n.t('Saving account')} />
       </Flex>
     )
   }
