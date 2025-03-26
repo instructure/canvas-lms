@@ -33,6 +33,8 @@ class ConfigurationFormLti13 extends React.Component {
     }
   }
 
+  clientIdInput = React.createRef()
+
   setClientId = event => {
     const clientId = event.currentTarget.value
 
@@ -50,6 +52,9 @@ class ConfigurationFormLti13 extends React.Component {
 
   isValid() {
     const {clientId} = this.state
+    if (!clientId) {
+      this.clientIdInput.current.focus()
+    }
     this.setState({
       messages: this.messages({clientId}),
     })
