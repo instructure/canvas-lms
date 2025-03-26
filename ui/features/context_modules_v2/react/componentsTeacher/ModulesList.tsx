@@ -168,7 +168,7 @@ const ModulesList: React.FC = () => {
                           style={{
                             ...dragProvided.draggableProps.style,
                             margin: '0 0 8px 0',
-                            background: snapshot.isDragging ? '#f5f5f5' : 'transparent',
+                            background: snapshot.isDragging ? '#F2F4F4' : 'transparent',
                             borderRadius: '4px'
                           }}
                         >

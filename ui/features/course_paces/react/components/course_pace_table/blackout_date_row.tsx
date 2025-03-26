@@ -36,7 +36,7 @@ const I18n = createI18nScope('course_paces_blackout_date_row')
 
 const componentOverrides = {
   'Table.Cell': {
-    background: '#F5F5F5',
+    background: '#F2F4F4',
   },
 }
 

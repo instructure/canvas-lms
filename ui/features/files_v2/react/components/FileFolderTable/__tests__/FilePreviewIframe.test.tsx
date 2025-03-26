@@ -36,7 +36,7 @@ describe('FilePreviewIframe', () => {
 
     expect(iframe).toHaveAttribute('sandbox', 'allow-same-origin');
     expect(iframe).toHaveAttribute('src', 'https://example.com');
-    expect(iframe).toHaveStyle('background-color: #f5f5f5');
+    expect(iframe).toHaveStyle('background-color: #F2F4F4');
     expect(iframe).toHaveStyle('height: 100%');
     expect(iframe).toHaveStyle('width: 100%');
   });
@@ -54,7 +54,7 @@ describe('FilePreviewIframe', () => {
 
     expect(iframe).toHaveAttribute('sandbox', 'allow-scripts allow-same-origin');
     expect(iframe).toHaveAttribute('src', 'https://example.com');
-    expect(iframe).not.toHaveStyle('background-color: #f5f5f5');
+    expect(iframe).not.toHaveStyle('background-color: #F2F4F4');
     expect(iframe).toHaveStyle('height: 100%');
     expect(iframe).toHaveStyle('width: 100%');
   });

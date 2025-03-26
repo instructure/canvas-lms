@@ -209,7 +209,7 @@ export async function insertPlaceholder(
           padding: '5px',
           verticalAlign: 'baseline',
           gap: '8px',
-          backgroundColor: '#F5F5F5',
+          backgroundColor: '#F2F4F4',
         } as CSSStyleDeclaration)
         break
 
@@ -359,7 +359,7 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 					position: relative;
 					box-sizing: border-box;
 					overflow: hidden;
-					--Spinner-trackColor: #F5F5F5;
+					--Spinner-trackColor: #F2F4F4;
 					--Spinner-color: #0374B5;
 					--Spinner-xSmallSize: 1.5em;
 					--Spinner-xSmallBorderWidth: 0.25em;

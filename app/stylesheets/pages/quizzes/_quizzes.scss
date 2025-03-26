@@ -22,7 +22,7 @@
 
 $backgroundColor: #fff;
 $borderColor: #AAA;
-$questionHeaderBackground: #F5F5F5;
+$questionHeaderBackground: #F2F4F4;
 $selectedBorderColor: #31b5ff;
 
 $answersSprite: url(/images/answers_sprite.png);
@@ -253,7 +253,7 @@ input[type]:required:invalid {
 
     &.error {
       color: $ic-color-danger;
-  
+
       & .icon-warning {
         display: inline-block !important;
       }
@@ -639,7 +639,7 @@ input[type]:required:invalid {
       }
     }
   }
-  
+
   .answers_warning {
     margin: 0.5rem 0;
   }

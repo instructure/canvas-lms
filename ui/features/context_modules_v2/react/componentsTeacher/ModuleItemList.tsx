@@ -55,7 +55,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
             {...provided.droppableProps}
             style={{
               minHeight: '50px',
-              background: snapshot.isDraggingOver ? '#f5f5f5' : 'transparent',
+              background: snapshot.isDraggingOver ? '#F2F4F4' : 'transparent',
               padding: '0',
               overflowX: 'hidden'
             }}
