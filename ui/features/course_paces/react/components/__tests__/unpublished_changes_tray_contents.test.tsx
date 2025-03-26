@@ -41,7 +41,6 @@ const defaultProps = {
 
 beforeAll(() => {
   window.ENV.FEATURES ||= {}
-  window.ENV.FEATURES.course_paces_redesign = true
 })
 
 afterEach(() => {
@@ -112,12 +111,5 @@ describe('UnpublishedChangesTrayContents', () => {
     act(() => cancelButton.click())
     expect(onResetPace).toHaveBeenCalledTimes(1)
     expect(onTrayDismiss).toHaveBeenCalledWith(true)
-  })
-
-  it('does not render the reset all button if the course_paces_redesign flag is disabled', () => {
-    window.ENV.FEATURES.course_paces_redesign = false
-    const {getByText, queryByText} = render(<UnpublishedChangesTrayContents {...defaultProps} />)
-    expect(getByText('Unsaved Changes')).toBeInTheDocument()
-    expect(queryByText('Reset all')).not.toBeInTheDocument()
   })
 })

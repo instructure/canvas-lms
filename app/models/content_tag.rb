@@ -812,7 +812,7 @@ class ContentTag < ActiveRecord::Base
     return unless tag_type == "context_module"
 
     course = context.is_a?(Course) ? context : context.try(:course)
-    return unless course&.account&.feature_enabled?(:course_paces) && course.enable_course_paces
+    return unless course&.enable_course_paces
 
     course.course_paces.published.find_each do |course_pace|
       cpmi = course_pace.course_pace_module_items.find_by(module_item_id: id)

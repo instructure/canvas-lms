@@ -22,7 +22,6 @@ require_relative "../../spec_helper"
 describe CoursePacing::PaceContextsPresenter do
   describe ".as_json" do
     before :once do
-      Account.site_admin.enable_feature!(:course_paces_redesign)
       @course = course_factory(active_all: true)
       @course_section = @course.course_sections.create!(name: "Test Section")
 

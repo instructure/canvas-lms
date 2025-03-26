@@ -19,7 +19,6 @@
 
 class CoursePacing::PacesApiController < ApplicationController
   before_action :load_contexts
-  before_action :require_feature_flag
   before_action :authorize_action
 
   include Api::V1::Progress
@@ -115,9 +114,5 @@ class CoursePacing::PacesApiController < ApplicationController
 
   def load_contexts
     raise NotImplementedError
-  end
-
-  def require_feature_flag
-    not_found unless Account.site_admin.feature_enabled?(:course_paces_redesign)
   end
 end

@@ -82,18 +82,10 @@ export const ProjectedDates = ({
 }: StoreProps) => {
   const [dateFormatter] = useState(coursePaceDateFormatter)
 
-  const enrollmentType = coursePace.context_type === 'Enrollment'
   const startDateValue = coursePace.start_date
   const startHelpText = START_DATE_CAPTIONS[coursePace.start_date_context]
-  let endDateValue, endHelpText
-  if (enrollmentType && !window.ENV.FEATURES.course_paces_for_students) {
-    endDateValue = plannedEndDate
-    endHelpText = END_DATE_CAPTIONS.user
-  } else {
-    endDateValue =
-      coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
-    endHelpText = END_DATE_CAPTIONS[coursePace.end_date_context]
-  }
+  const endDateValue = coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
+  const endHelpText = END_DATE_CAPTIONS[coursePace.end_date_context]
 
   useEffect(() => {
     if (compression > 0) {

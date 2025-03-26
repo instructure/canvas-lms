@@ -40,8 +40,6 @@ describe "course pace modal" do
       course: @course
     )
     enable_course_paces_in_course
-    Account.site_admin.enable_feature!(:course_paces_redesign)
-    Account.site_admin.enable_feature!(:course_paces_for_students)
   end
 
   before do

@@ -32,7 +32,6 @@ describe "Pace Contexts API" do
   let!(:default_pace) { course_pace_model(course:) }
 
   before do
-    Account.site_admin.enable_feature!(:course_paces_redesign)
     user_session(teacher)
   end
 
@@ -237,17 +236,6 @@ describe "Pace Contexts API" do
       it "returns a 401" do
         get api_v1_pace_contexts_path(course.id), params: { format: :json }
         expect(response).to have_http_status :forbidden
-      end
-    end
-
-    context "when the course_paces_redesign flag is disabled" do
-      before do
-        Account.site_admin.disable_feature!(:course_paces_redesign)
-      end
-
-      it "returns a 404" do
-        get api_v1_pace_contexts_path(course.id), params: { format: :json }
-        expect(response).to have_http_status :not_found
       end
     end
 

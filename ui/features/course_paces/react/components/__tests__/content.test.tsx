@@ -369,7 +369,6 @@ describe('PaceContextsContent', () => {
     describe('when course_pace_download_document feature is enabled', () => {
       beforeAll(() => {
         window.ENV.FEATURES ||= {}
-        window.ENV.FEATURES.course_paces_redesign = true
         window.ENV.FEATURES.course_pace_download_document = true
       })
 
@@ -403,7 +402,6 @@ describe('PaceContextsContent', () => {
     describe('when course_pace_download_document feature is disabled', () => {
       beforeAll(() => {
         window.ENV.FEATURES ||= {}
-        window.ENV.FEATURES.course_paces_redesign = true
         window.ENV.FEATURES.course_pace_download_document = false
       })
 
@@ -431,7 +429,6 @@ describe('PaceContextsContent', () => {
     describe('when course_pace_download_document feature is disabled', () => {
       beforeAll(() => {
         window.ENV.FEATURES ||= {}
-        window.ENV.FEATURES.course_paces_redesign = true
         window.ENV.FEATURES.course_pace_download_document = false
       })
 
@@ -458,7 +455,6 @@ describe('PaceContextsContent', () => {
     describe('when course_pace_allow_bulk_pace_assign feature is disabled', () => {
       beforeAll(() => {
         window.ENV.FEATURES ||= {}
-        window.ENV.FEATURES.course_paces_redesign = true
         window.ENV.FEATURES.course_pace_allow_bulk_pace_assign = false
       })
 

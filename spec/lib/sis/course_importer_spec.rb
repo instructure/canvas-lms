@@ -22,12 +22,9 @@ module SIS
     describe "#add_course" do
       it "republishes course paces if appropriate" do
         @account = Account.default
-        @account.enable_feature!(:course_paces)
-
         @course = Course.create!(account: @account, sis_source_id: "SIS_ID", short_name: "C001")
         @course.enable_course_paces = true
         @course.save!
-
         @course_pace = course_pace_model(course: @course)
 
         importer = SIS::CourseImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, nil, nil, [], nil, {})

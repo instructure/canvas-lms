@@ -131,7 +131,6 @@ module CoursePacesCommonPageObject
 
   def feature_setup
     @account = Account.default
-    @account.enable_feature!(:course_paces)
   end
 
   def skip_weekends(date, duration = 1)

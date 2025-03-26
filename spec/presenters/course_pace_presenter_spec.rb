@@ -44,7 +44,6 @@ end
 describe CoursePacePresenter do
   before :once do
     course_with_teacher(active_all: true)
-    @course.root_account.enable_feature!(:course_paces)
     @course.enable_course_paces = true
     @course.save!
     student_in_course(active_all: true)

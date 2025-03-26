@@ -638,8 +638,6 @@ class CoursePacesController < ApplicationController
   def destroy
     return unless authorized_action(@course, @current_user, :manage_course_content_delete)
 
-    return not_found unless Account.site_admin.feature_enabled?(:course_paces_redesign)
-
     if @course_pace.primary? && @course_pace.published?
       return render json: { success: false, errors: t("You cannot delete the default course pace.") }, status: :unprocessable_entity
     end
@@ -706,7 +704,7 @@ class CoursePacesController < ApplicationController
   end
 
   def require_feature_flag
-    not_found unless @course.account.feature_enabled?(:course_paces) && @course.enable_course_paces
+    not_found unless @course.enable_course_paces
   end
 
   def load_course_pace

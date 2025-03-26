@@ -274,8 +274,6 @@ export interface EnvCommon {
 export type SiteAdminFeatureId =
   | 'account_calendar_events'
   | 'account_level_blackout_dates'
-  | 'course_paces_for_students'
-  | 'course_paces_redesign'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'
   | 'instui_for_import_page'

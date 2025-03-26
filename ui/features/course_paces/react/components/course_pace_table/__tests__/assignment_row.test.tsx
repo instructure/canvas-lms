@@ -172,22 +172,9 @@ describe('AssignmentRow', () => {
     expect(getByText(PACE_ITEM_1.assignment_title)).toBeInTheDocument()
   })
 
-  it('shows durations as read-only text when on student paces', () => {
-    const {queryByRole, getByText} = renderConnected(
-      renderRow(<AssignmentRow {...defaultProps} coursePace={STUDENT_PACE} isStudentPace={true} />),
-    )
-    expect(
-      queryByRole('textbox', {
-        name: 'Duration for assignment Basic encryption/decryption',
-      }),
-    ).not.toBeInTheDocument()
-    expect(getByText('2')).toBeInTheDocument()
-  })
-
   describe('with course paces for students', () => {
     beforeAll(() => {
       window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_for_students = true
       window.ENV.FEATURES.course_pace_pacing_status_labels = true
     })
 

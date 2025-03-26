@@ -3397,7 +3397,6 @@ describe CoursesController do
 
       context "logging master courses and course pacing" do
         before do
-          Account.default.enable_feature!(:course_paces)
           allow(InstStatsd::Statsd).to receive(:increment)
         end
 
@@ -3464,7 +3463,6 @@ describe CoursesController do
 
     context "course paces" do
       before do
-        @course.account.enable_feature!(:course_paces)
         @course.enable_course_paces = true
         @course.restrict_enrollments_to_course_dates = true
         @course.save!

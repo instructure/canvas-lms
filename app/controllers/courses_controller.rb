@@ -3053,7 +3053,6 @@ class CoursesController < ApplicationController
   # @argument course[enable_course_paces] [Boolean]
   #   Enable or disable Course Pacing for the course. This setting only has an effect when the Course Pacing feature flag is
   #   enabled for the sub-account. Otherwise, Course Pacing are always disabled.
-  #     Note: Course Pacing is in active development.
   #
   # @argument course[conditional_release] [Boolean]
   #   Enable or disable individual learning paths for students based on assessment
@@ -3371,7 +3370,7 @@ class CoursesController < ApplicationController
 
       # Republish course paces if the course dates have been changed
       term_changed = (@course.enrollment_term_id != enrollment_term_id) && term_id_param_was_sent
-      if @course.account.feature_enabled?(:course_paces) && (course_availability_changed || term_changed)
+      if course_availability_changed || term_changed
         @course.course_paces.find_each(&:create_publish_progress)
       end
       disable_conditional_release if changes[:conditional_release]&.last == false

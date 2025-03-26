@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CoursePacing::PaceContextsApiController < ApplicationController
-  before_action :require_feature_flag
   before_action :require_context
   before_action :ensure_pacing_enabled
   before_action :authorize_action
@@ -65,10 +64,6 @@ class CoursePacing::PaceContextsApiController < ApplicationController
   end
 
   private
-
-  def require_feature_flag
-    not_found unless Account.site_admin.feature_enabled?(:course_paces_redesign)
-  end
 
   def ensure_pacing_enabled
     not_found unless @context.enable_course_paces

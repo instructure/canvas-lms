@@ -27,31 +27,10 @@ confetti_branding:
   description: Applies account branding to confetti splashes
   applies_to: SiteAdmin
 
-course_paces:
-  state: hidden
-  display_name: 'Course Pacing'
-  description:
-    wrapper: <a href="https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing">\1</a>
-    course_paces_description: |-
-      Course Pacing adds support for rolling enrollments to Canvas;
-      automatically distributing due dates for students with different
-      start dates based on an instructor's defined pace. Learn more and give
-      feedback by joining the *Course Pacing User Group*.
-  applies_to: Account
-  beta: true
-  environments:
-    development:
-      state: allowed_on
-    beta:
-      state: allowed_on
-    ci:
-      state: allowed_on
-
 course_paces_skip_selected_days:
   state: hidden
   display_name: 'Course Pacing Skip Selected Days'
-  description: Course pacing removes support for exclude weekends field and add the
-        ability to select specific days of the week.
+  description: Course pacing removes support for exclude weekends field and add the ability to select specific days of the week.
   applies_to: RootAccount
   beta: true
   environments:
@@ -89,18 +68,6 @@ render_both_to_do_lists:
   display_name: Render both To Do lists for teachers with student enrollments
   description: |-
     Renders both To Do lists on the dashboard sidebar for teachers with student enrollments.
-
-course_paces_for_students:
-  state: hidden
-  display_name: 'Per Student Course Paces'
-  description: Enable unique course paces for students.
-  applies_to: SiteAdmin
-
-course_paces_redesign:
-  state: hidden
-  display_name: 'Course Pacing Redesign'
-  description: Enable the redesigned course pacing user experience.
-  applies_to: SiteAdmin
 
 blueprint_line_item_support:
   state: hidden

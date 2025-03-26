@@ -147,21 +147,15 @@ describe('pace modal stats', () => {
     expect(defaultProps.uncompressDates).toHaveBeenCalled()
   })
 
-  describe('with course_paces_for_students enabled', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES = {course_paces_for_students: true}
-    })
+  it("shows course end date for student if start date is all that's given", () => {
+    const cpace = {...STUDENT_PACE, end_date: null}
+    const {getByTestId, getByText} = render(
+      <PaceModalStats {...defaultProps} coursePace={cpace} />,
+    )
 
-    it("shows course end date for student if start date is all that's given", () => {
-      const cpace = {...STUDENT_PACE, end_date: null}
-      const {getByTestId, getByText} = render(
-        <PaceModalStats {...defaultProps} coursePace={cpace} />,
-      )
-
-      expect(getByText('Start Date')).toBeInTheDocument()
-      expect(getByText('End Date')).toBeInTheDocument()
-      const end = getByTestId('coursepace-end-date')
-      expect(within(end).getByText('Wed, Jun 1, 2022')).toBeInTheDocument()
-    })
+    expect(getByText('Start Date')).toBeInTheDocument()
+    expect(getByText('End Date')).toBeInTheDocument()
+    const end = getByTestId('coursepace-end-date')
+    expect(within(end).getByText('Wed, Jun 1, 2022')).toBeInTheDocument()
   })
 })

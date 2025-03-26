@@ -53,11 +53,6 @@ describe "blueprinted course pace page" do
   end
 
   context "course paces redesign" do
-    before :once do
-      Account.site_admin.enable_feature!(:course_paces_redesign)
-      Account.site_admin.enable_feature!(:course_paces_for_students)
-    end
-
     context "master course" do
       context "with an unpublished pace" do
         before do
