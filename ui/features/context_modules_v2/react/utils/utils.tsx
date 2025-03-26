@@ -26,14 +26,15 @@ import {
   } from '@instructure/ui-icons'
 import { ModuleContent } from './types'
 
+const pixelOffset = 20
 
-export const INDENT_LOOKUP: Record<number, 'x-small' | 'small' | 'medium' | 'large' | 'x-large' | 'xx-large'> = {
-    0: 'x-small',
-    1: 'small',
-    2: 'medium',
-    3: 'large',
-    4: 'x-large',
-    5: 'xx-large',
+export const INDENT_LOOKUP: Record<number, string> = {
+    0: `${pixelOffset * 0}px`,
+    1: `${pixelOffset * 1}px`,
+    2: `${pixelOffset * 2}px`,
+    3: `${pixelOffset * 3}px`,
+    4: `${pixelOffset * 4}px`,
+    5: `${pixelOffset * 5}px`,
 }
 
 export const getItemIcon = (content: ModuleContent) => {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -53,6 +53,9 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   onClick,
   completionRequirements,
 }) => {
+  const itemIcon = useMemo(() => getItemIcon(content), [content])
+  const itemLeftMargin = useMemo(() => INDENT_LOOKUP[indent ?? 0], [indent])
+
   return (
     <View
       as="div"
@@ -64,15 +67,14 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
       data-item-id={_id}
     >
       <Flex>
-        <Flex.Item>
-          <Flex>
-            <Flex.Item>
-            {/* Item Type Icon */}
-            <Flex.Item margin={`0 small 0 ${INDENT_LOOKUP[indent] ?? 'x-small'}`}>
-              {getItemIcon(content)}
-            </Flex.Item>
-            </Flex.Item>
-          <Flex.Item>
+        {/* Item Type Icon */}
+        {itemIcon && <Flex.Item margin="0 small 0 0">
+          <div style={{ padding: `0 0 0 ${itemLeftMargin}` }}>
+            {itemIcon}
+          </div>
+        </Flex.Item>}
+        <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`}>
+          <div style={itemIcon ? {} : { padding: `0 0 0 ${itemLeftMargin}` }}>
             <Flex
               alignItems="start"
               justifyItems="start"
@@ -94,8 +96,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
                 <ModuleItemSupplementalInfo contentTagId={_id} content={content} completionRequirement={completionRequirements?.find(req => req.id === _id)} />
               </Flex.Item>
             </Flex>
-          </Flex.Item>
-          </Flex>
+          </div>
         </Flex.Item>
       </Flex>
     </View>
