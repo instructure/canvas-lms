@@ -148,7 +148,9 @@ export const RubricTable = ({
                 {canImportExportRubrics && (
                   <Flex.Item margin="0 small 0 0">
                     <Checkbox
-                      label=""
+                      label={
+                        <ScreenReaderContent>{`${I18n.t('Select')} ${rubric.title}`}</ScreenReaderContent>
+                      }
                       value={rubric.id}
                       onChange={event => handleCheckboxChange(event, rubric.id)}
                       checked={selectedRubricIds.includes(rubric.id)}
