@@ -416,7 +416,9 @@ describe('when configuration type is lti2', () => {
       await userEvent.click(screen.getByText(/launch registration tool/i))
 
       expect(handleSubmitMock).not.toHaveBeenCalled()
-      expect(screen.getByLabelText(/this field is required/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/please enter a valid url \(e\.g\. https:\/\/example\.com\)/i),
+      ).toBeInTheDocument()
     })
   })
 })
