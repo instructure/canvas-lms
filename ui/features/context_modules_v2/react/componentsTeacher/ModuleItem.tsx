@@ -117,31 +117,35 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
         <Flex.Item>
           <Flex>
             {/* Item Type Icon */}
-            {itemIcon && <Flex.Item margin={`0 small 0 ${itemLeftMargin}`}>
-              {itemIcon}
+            {itemIcon && <Flex.Item margin="0 small 0 0">
+              <div style={{ padding: `0 0 0 ${itemLeftMargin}` }}>
+                {itemIcon}
+              </div>
             </Flex.Item>}
-            <Flex.Item margin={itemIcon ? '0' : `0 small 0 ${itemLeftMargin}`}>
-              <Flex
-                alignItems="start"
-                justifyItems="start"
-                wrap="no-wrap"
-                direction="column"
-              >
-                {/* Item Title */}
-                <Flex.Item>
-                  <Flex.Item shouldGrow={true}>
-                    <Link href={url} isWithinText={false} onClick={onClick}>
-                      <Text weight={content?.type === 'ExternalUrl' ? 'normal' : 'bold'} color={content?.type === 'ExternalUrl' ? 'brand' : 'primary'}>
-                        {content?.title || 'Untitled Item'} {/* FIXME:show when link opens a new tab{content?.type === 'ExternalUrl' && <IconExternalLinkLine size="x-small" color="brand" />}*/}
-                      </Text>
-                    </Link>
+            <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`}>
+              <div style={itemIcon ? {} : { padding: `0 0 0 ${itemLeftMargin}` }}>
+                <Flex
+                  alignItems="start"
+                  justifyItems="start"
+                  wrap="no-wrap"
+                  direction="column"
+                >
+                  {/* Item Title */}
+                  <Flex.Item>
+                    <Flex.Item shouldGrow={true}>
+                      <Link href={url} isWithinText={false} onClick={onClick}>
+                        <Text weight={content?.type === 'ExternalUrl' ? 'normal' : 'bold'} color={content?.type === 'ExternalUrl' ? 'brand' : 'primary'}>
+                          {content?.title || 'Untitled Item'} {/* FIXME:show when link opens a new tab{content?.type === 'ExternalUrl' && <IconExternalLinkLine size="x-small" color="brand" />}*/}
+                        </Text>
+                      </Link>
+                    </Flex.Item>
                   </Flex.Item>
-                </Flex.Item>
-                {/* Due Date and Points Possible */}
-                <Flex.Item>
-                  <ModuleItemSupplementalInfo contentTagId={_id} content={content} completionRequirement={completionRequirements?.find(req => req.id === _id)} />
-                </Flex.Item>
-              </Flex>
+                  {/* Due Date and Points Possible */}
+                  <Flex.Item>
+                    <ModuleItemSupplementalInfo contentTagId={_id} content={content} completionRequirement={completionRequirements?.find(req => req.id === _id)} />
+                  </Flex.Item>
+                </Flex>
+              </div>
             </Flex.Item>
           </Flex>
         </Flex.Item>
