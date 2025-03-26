@@ -6612,6 +6612,8 @@ fa:
     index: 
       titles: 
         course_modules: "ماژول های درس"
+    links: 
+      student_progress: "مشاهده پیشرفت"
     module_complete: "تکمیل است"
     module_empty: "هیچ موردی در ماژول \"%{module}\" موجود نیست"
     module_item_next: 
@@ -19984,6 +19986,7 @@ fa:
         attempt_number: "تلاش %{att_no}"
         kept: "نگه داری شده"
         latest: آخرین
+        time: زمان
       submission_versions: 
         attempt: تلاش
         attempt_history: "تاریخچه تلاش ها"
