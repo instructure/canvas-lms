@@ -35,19 +35,19 @@ module Lti
       it "requires the message type" do
         subject.message_type = nil
         subject.save
-        expect(subject.errors.first).to eq [:message_type, "can't be blank"]
+        expect(subject.errors[:message_type].first).to eq "can't be blank"
       end
 
       it "requires the launch path" do
         subject.launch_path = nil
         subject.save
-        expect(subject.errors.first).to eq [:launch_path, "can't be blank"]
+        expect(subject.errors[:launch_path].first).to eq "can't be blank"
       end
 
       it "requires a resource_handler" do
         subject.resource_handler = nil
         subject.save
-        expect(subject.errors.first).to eq [:resource_handler, "can't be blank"]
+        expect(subject.errors[:resource_handler].first).to eq "can't be blank"
       end
     end
 

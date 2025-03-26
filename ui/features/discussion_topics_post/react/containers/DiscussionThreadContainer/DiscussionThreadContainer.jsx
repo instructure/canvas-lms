@@ -560,6 +560,7 @@ export const DiscussionThreadContainer = props => {
                                 }
                           }
                           goToTopic={props.goToTopic}
+                          permalinkId={props.discussionEntry._id}
                           onReport={
                             ENV.discussions_reporting &&
                             props.discussionTopic.permissions?.studentReporting

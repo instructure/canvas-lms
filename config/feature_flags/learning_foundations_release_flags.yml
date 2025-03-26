@@ -189,3 +189,10 @@ calendar_events_api_pagination_enhancements:
   description: |-
     Improves API pagination handling for assignment events on user calendar.
   applies_to: RootAccount
+
+modules_page_rewrite:
+  state: hidden
+  display_name: Modules Page React Enhancement
+  description: |-
+    If enabled, the modules page will use the new modules page rewrite.
+  applies_to: RootAccount

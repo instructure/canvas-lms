@@ -923,7 +923,7 @@ class ContextModulesController < ApplicationController
       preload_has_too_many_overrides(plain_quizzes, :quiz_id)
 
       sub_assignments = []
-      if @context.root_account.feature_enabled?(:discussion_checkpoints)
+      if @context.discussion_checkpoints_enabled?
         ActiveRecord::Associations.preload(assignments, :sub_assignments) if assignments.any?
         sub_assignments = assignments.flat_map(&:sub_assignments)
         preload_has_too_many_overrides(sub_assignments, :assignment_id)

@@ -109,10 +109,6 @@ const DiscussionTopicToolbarContainer = props => {
     })
   }
 
-  const onSummarizeClick = () => {
-    props.setIsSummaryEnabled(true)
-  }
-
   const renderSort = () => {
     if (discDefaultSortEnabled) {
       return (
@@ -212,8 +208,6 @@ const DiscussionTopicToolbarContainer = props => {
                 canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
                 setUserSplitScreenPreference={props.setUserSplitScreenPreference}
                 userSplitScreenPreference={props.userSplitScreenPreference}
-                onSummarizeClick={onSummarizeClick}
-                isSummaryEnabled={props.isSummaryEnabled}
                 closeView={props.closeView}
                 discussionId={props.discussionTopic._id}
                 typeName={props.discussionTopic.__typename?.toLowerCase()}
@@ -296,8 +290,6 @@ const DiscussionTopicToolbarContainer = props => {
           onSwitchLinkClick={onSwitchLinkClick}
           setUserSplitScreenPreference={props.setUserSplitScreenPreference}
           userSplitScreenPreference={props.userSplitScreenPreference}
-          onSummarizeClick={onSummarizeClick}
-          isSummaryEnabled={props.isSummaryEnabled}
           closeView={props.closeView}
           discussionId={props.discussionTopic._id}
           typeName={props.discussionTopic.__typename?.toLowerCase()}
@@ -329,8 +321,6 @@ DiscussionTopicToolbarContainer.propTypes = {
   discussionTopic: Discussion.shape,
   setUserSplitScreenPreference: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,
-  isSummaryEnabled: PropTypes.bool,
-  setIsSummaryEnabled: PropTypes.func,
   closeView: PropTypes.func,
   breakpoints: breakpointsShape,
 }

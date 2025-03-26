@@ -646,17 +646,10 @@ class DeveloperKey < ActiveRecord::Base
   def validate_public_jwk
     return if public_jwk.blank?
 
-    if Account.site_admin.feature_enabled?(:lti_report_multiple_schema_validation_errors)
-      jwk_errors = Schemas::Lti::PublicJwk.simple_validation_errors(public_jwk)
-      return if jwk_errors.nil?
+    jwk_errors = Schemas::Lti::PublicJwk.simple_validation_errors(public_jwk)
+    return if jwk_errors.nil?
 
-      jwk_errors.each { |error| errors.add :public_jwk, error }
-    else
-      jwk_errors = Schemas::Lti::PublicJwk.simple_validation_first_error(public_jwk)
-      return if jwk_errors.blank?
-
-      errors.add :public_jwk, jwk_errors
-    end
+    jwk_errors.each { |error| errors.add :public_jwk, error }
   end
 
   def invalidate_access_tokens_if_scopes_removed!

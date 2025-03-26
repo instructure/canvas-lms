@@ -418,7 +418,7 @@ module Importers
 
     def self.handle_sub_assignments(assignment_hash, parent_item, migration)
       return unless assignment_hash[:sub_assignments].present?
-      return unless parent_item.context.root_account.feature_enabled?(:discussion_checkpoints)
+      return unless parent_item.context.discussion_checkpoints_enabled?
 
       parent_item.has_sub_assignments = true
 

@@ -565,7 +565,8 @@ class CoursesController < ApplicationController
         if first_enrollment.enrollment_state.pending? || state == :creation_pending ||
            (first_enrollment.admin? && (
                first_enrollment.course.restrict_enrollments_to_course_dates &&
-               first_enrollment.course.start_at&.>(Time.now.utc)
+               first_enrollment.course.start_at&.>(Time.now.utc) &&
+               (first_enrollment.course_section&.start_at&.>(Time.now.utc) || first_enrollment.course_section&.start_at.nil?)
              )
            )
           @future_enrollments << first_enrollment unless first_enrollment.restrict_future_listing?
@@ -2399,7 +2400,7 @@ class CoursesController < ApplicationController
         end
 
         if @current_user && (@show_recent_feedback = @context.user_is_student?(@current_user))
-          @recent_feedback = @current_user.recent_feedback(contexts: @contexts, exclude_parent_assignment_submissions: @domain_root_account.feature_enabled?(:discussion_checkpoints)) || []
+          @recent_feedback = @current_user.recent_feedback(contexts: @contexts, exclude_parent_assignment_submissions: @context.discussion_checkpoints_enabled?) || []
         end
 
         flash.now[:notice] = t("notices.updated", "Course was successfully updated.") if params[:for_reload]
@@ -3354,7 +3355,7 @@ class CoursesController < ApplicationController
       end
 
       if params[:course][:horizon_course].present? && !@course.account.feature_enabled?(:horizon_course_setting)
-        horizon_message = t("Horizon Course cannot be set without the feature flag enabled")
+        horizon_message = t("Canvas Career cannot be set without the feature flag enabled")
         @course.errors.add(:horizon_course, horizon_message)
       end
 
@@ -3804,6 +3805,12 @@ class CoursesController < ApplicationController
   end
 
   def check_horizon_redirect
+    if params[:stop_acting_as_user] && @user != @real_current_user
+      session[:masquerade_return_to] = params[:stop_acting_as_user]
+      redirect_to user_masquerade_url(@real_current_user.id, stop_acting_as_user: true)
+      return
+    end
+
     if @current_user&.fake_student?
       if params[:leave_student_view]
         session[:masquerade_return_to] = params[:leave_student_view]

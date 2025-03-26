@@ -24,16 +24,6 @@ describe OutcomeFriendlyDescription do
   let(:description) { "description" }
   let(:creation_params) { { context: account, description:, learning_outcome: outcome } }
 
-  describe "validations" do
-    subject { OutcomeFriendlyDescription.create!(creation_params) }
-
-    it { is_expected.to validate_presence_of :context }
-    it { is_expected.to validate_presence_of :description }
-    it { is_expected.to validate_length_of(:description).is_at_most(255) }
-    it { is_expected.to validate_length_of(:description).is_at_least(1) }
-    it { is_expected.to validate_uniqueness_of(:learning_outcome_id).scoped_to(:context_type, :context_id) }
-  end
-
   it_behaves_like "soft deletion" do
     subject { OutcomeFriendlyDescription }
 

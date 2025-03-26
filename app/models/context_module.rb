@@ -992,7 +992,7 @@ class ContextModule < ActiveRecord::Base
 
   def update_assignment_submissions(module_assignments = current_items_with_assignment)
     create_sub_assignment_submissions = false
-    if context.root_account.feature_enabled?(:discussion_checkpoints) && module_assignments.has_sub_assignments.any?
+    if context.discussion_checkpoints_enabled? && module_assignments.has_sub_assignments.any?
       create_sub_assignment_submissions = true
     end
 

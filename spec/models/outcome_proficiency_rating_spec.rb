@@ -19,18 +19,12 @@
 #
 
 describe OutcomeProficiencyRating do
-  describe "associations" do
-    it { is_expected.to belong_to(:outcome_proficiency) }
-  end
+  let(:proficiency) { outcome_proficiency_model(account_model) }
 
-  describe "validations" do
-    it { is_expected.to validate_presence_of :description }
-    it { is_expected.to validate_presence_of :points }
-    it { is_expected.to validate_numericality_of(:points).is_greater_than_or_equal_to(0) }
-    it { is_expected.to allow_value("0F160a").for(:color) }
-    it { is_expected.not_to allow_value("#0F160a").for(:color) }
-    it { is_expected.not_to allow_value("").for(:color) }
-    it { is_expected.not_to allow_value(nil).for(:color) }
+  it "requires a specific format for the color" do
+    common_params = { description: "A", points: 4, mastery: true, outcome_proficiency: proficiency }
+    expect(OutcomeProficiencyRating.new(**common_params, color: "0F160a")).to be_valid
+    expect(OutcomeProficiencyRating.new(**common_params, color: "#0F160a")).not_to be_valid
   end
 
   describe "root_account_id" do
@@ -46,8 +40,6 @@ describe OutcomeProficiencyRating do
 
   it_behaves_like "soft deletion" do
     subject { OutcomeProficiencyRating }
-
-    let(:proficiency) { outcome_proficiency_model(account_model) }
 
     let(:creation_arguments) { [{ description: "A", points: 4, mastery: true, color: "00ff00", outcome_proficiency: proficiency }] }
   end

@@ -467,6 +467,7 @@ const SplitScreenThreadContainer = props => {
                           )
                         }}
                         goToTopic={props.goToTopic}
+                        permalinkId={props.discussionEntry._id}
                         goToQuotedReply={
                           props.discussionEntry.quotedEntry !== null
                             ? () => {

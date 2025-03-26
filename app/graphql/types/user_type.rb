@@ -160,7 +160,7 @@ module Types
                required: false
       argument :horizon_courses,
                Boolean,
-               "Whether or not to include or exclude Horizon courses",
+               "Whether or not to include or exclude Canvas Career courses",
                required: false
       argument :order_by,
                [String],

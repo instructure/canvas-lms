@@ -16,28 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useState} from 'react'
+import React, {useState} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
 import {useMutation, queryClient} from '@canvas/query'
-import {FileManagementContext} from '../Contexts'
+import {useFileManagement} from '../Contexts'
 import {generateFolderPostUrl} from '../../../utils/apiUtils'
 import getCookie from '@instructure/get-cookie'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('files_v2')
 
-interface AddFolderModalProps {
+interface CreateFolderModalProps {
   isOpen: boolean
   onRequestClose: () => void
 }
 
-const CreateFolderModal = ({isOpen, onRequestClose}: AddFolderModalProps) => {
+const CreateFolderModal = ({isOpen, onRequestClose}: CreateFolderModalProps) => {
+  const [folderName, setFolderName] = useState('')
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
-  const {folderId: parentFolderId} = useContext(FileManagementContext)
+  const {folderId: parentFolderId} = useFileManagement()
 
   const createFolderMutation = useMutation({
     mutationFn: async (name: string) => {
@@ -70,20 +73,22 @@ const CreateFolderModal = ({isOpen, onRequestClose}: AddFolderModalProps) => {
     },
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const target = e.target as HTMLFormElement
-    const folderNameElement = target.elements.namedItem('folderName') as HTMLInputElement | null
-    const folderName = folderNameElement ? folderNameElement.value : ''
+  const handleSubmit = () => {
     createFolderMutation.mutate(folderName)
+  }
+
+  const handleExited = () => {
+    setFolderName('')
+    setIsRequestInFlight(false)
   }
 
   return (
     <Modal
-      as="form"
+      as="div"
       open={isOpen}
       onDismiss={onRequestClose}
       onSubmit={handleSubmit}
+      onExited={handleExited}
       label={I18n.t('Create Folder')}
       shouldCloseOnDocumentClick
       size="small"
@@ -98,13 +103,34 @@ const CreateFolderModal = ({isOpen, onRequestClose}: AddFolderModalProps) => {
         <Heading level="h2">{I18n.t('Create Folder')}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <TextInput renderLabel={I18n.t('Folder Name')} name="folderName" />
+        {isRequestInFlight ? (
+          <View as="div" textAlign="center">
+            <Spinner
+              renderTitle={() => I18n.t('Creating folder')}
+              margin="0 0 0 medium"
+              aria-live="polite"
+              data-testid="create-folder-spinner"
+            />
+          </View>
+        ) : (
+          <TextInput
+            renderLabel={I18n.t('Folder Name')}
+            name="folderName"
+            value={folderName}
+            onChange={(_e, newValue) => setFolderName(newValue)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                handleSubmit()
+              }
+            }}
+          />
+        )}
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onRequestClose} margin="0 x-small 0 0">
+        <Button onClick={onRequestClose} disabled={isRequestInFlight} margin="0 x-small 0 0">
           {I18n.t('Cancel')}
         </Button>
-        <Button color="primary" type="submit" disabled={isRequestInFlight}>
+        <Button color="primary" onClick={handleSubmit} disabled={isRequestInFlight}>
           {I18n.t('Create Folder')}
         </Button>
       </Modal.Footer>

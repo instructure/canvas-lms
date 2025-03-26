@@ -28,11 +28,7 @@ module LtiAdvantage::Messages
       roles
     ]).freeze
 
-    TYPED_ATTRIBUTES = superclass::TYPED_ATTRIBUTES.merge(
-      activity: LtiAdvantage::Claims::Activity
-    ).freeze
-
-    attr_accessor(*(REQUIRED_CLAIMS - [:context, :roles]))
+    attr_accessor(*(REQUIRED_CLAIMS - %i[context roles activity]))
 
     validates_presence_of(*REQUIRED_CLAIMS)
     validates_with LtiAdvantage::TypeValidator
@@ -45,10 +41,6 @@ module LtiAdvantage::Messages
       self.message_type = MESSAGE_TYPE
       self.version = "1.3.0"
       super
-    end
-
-    def activity
-      @activity ||= TYPED_ATTRIBUTES[:activity].new
     end
   end
 end

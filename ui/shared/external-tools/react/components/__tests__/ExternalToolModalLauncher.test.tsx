@@ -18,12 +18,13 @@
 
 import React from 'react'
 import {render, waitFor, fireEvent} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import ExternalToolModalLauncher from '../ExternalToolModalLauncher'
 
 function generateProps(overrides = {}) {
   return {
     title: 'Modal Title',
-    tool: {placements: {course_assignments_menu: {}}, definition_id: 1},
+    tool: {placements: {course_assignments_menu: {}}, definition_id: '1'},
     isOpen: false,
     onRequestClose: () => {},
     contextType: 'course',
@@ -94,6 +95,46 @@ describe('ExternalToolModalLauncher', () => {
       sendPostMessage({subject: 'externalContentCancel'})
 
       expect(onRequestCloseMock).toHaveBeenCalledTimes(1)
+    })
+
+    test('invokes onDeepLinkingResponse prop when window receives externalContentCancel event', () => {
+      const onDeepLinkingResponseMock = jest.fn()
+      const props = generateProps({onDeepLinkingResponse: onDeepLinkingResponseMock})
+
+      render(<ExternalToolModalLauncher {...props} />)
+
+      sendPostMessage({subject: 'LtiDeepLinkingResponse'})
+
+      expect(onDeepLinkingResponseMock).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('onClose behavior', () => {
+    // INTEROP-9242
+    it.skip('calls onRequestClose when clicking a button element', async () => {
+      const onRequestCloseMock = jest.fn()
+      const {getByText} = render(
+        <ExternalToolModalLauncher {...generateProps({ onRequestClose: onRequestCloseMock, isOpen: true })} />
+      )
+
+      const closeButton = getByText('Close').closest('button')
+      if (!closeButton) throw new Error('No close button found')
+      await userEvent.click(closeButton)
+
+      expect(onRequestCloseMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not call onRequestClose when clicking outside the diaglog', async () => {
+      const onRequestCloseMock = jest.fn()
+      const {getByRole} = render(
+        <ExternalToolModalLauncher {...generateProps({ onRequestClose: onRequestCloseMock, isOpen: true })} />
+      )
+
+      const backdrop = getByRole('dialog').parentElement
+      if (!backdrop) throw new Error('No div element found')
+      await userEvent.click(backdrop)
+
+      expect(onRequestCloseMock).not.toHaveBeenCalled()
     })
   })
 

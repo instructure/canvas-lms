@@ -20,7 +20,7 @@
 require "active_model"
 
 module LtiAdvantage::Claims
-  # Class represeting an LTI 1.3 message "activity" claim.
+  # Class representing an LTI 1.3 message "activity" claim.
   # https://purl.imsglobal.org/spec/lti/claim/activity
   class Activity
     include ActiveModel::Model

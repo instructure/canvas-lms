@@ -251,6 +251,8 @@ module Translation
                                                  })
 
       check_same_language(result)
+      tags = ["source_language:#{result.source_language_code}", "dest_language:#{result.target_language_code}"]
+      InstStatsd::Statsd.increment("translation.inbox_compose.invocations", tags: tags)
       result.translated_text
     end
 
@@ -268,6 +270,8 @@ module Translation
                                                      })
 
       check_same_language(result)
+      tags = ["source_language:#{result.source_language_code}", "dest_language:#{result.target_language_code}"]
+      InstStatsd::Statsd.increment("translation.discussions.invocations", tags: tags)
       result.translated_document.content
     end
 

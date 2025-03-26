@@ -25,6 +25,7 @@ export type RubricFormProps = {
   accountId?: string
   courseId?: string
   criteria: RubricCriterion[]
+  criteriaViaLlm: boolean // currently POST data only
   pointsPossible: number
   buttonDisplay: string
   ratingOrder: string

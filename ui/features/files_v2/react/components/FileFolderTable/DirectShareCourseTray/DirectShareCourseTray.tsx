@@ -87,7 +87,7 @@ const DirectShareCourseTray = ({open, onDismiss, courseId, file}: DirectShareCou
   }, [file.id, selectedCourse?.id, selectedModule?.id, selectedPosition, courseId])
 
   const sendSuccessful = useCallback(() => {
-    showFlashSuccess(I18n.t('Copy operation started successfully'))()
+    showFlashSuccess(I18n.t('Copy operation started successfully.'))()
     onDismiss()
   }, [onDismiss])
 

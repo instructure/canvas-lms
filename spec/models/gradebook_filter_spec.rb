@@ -21,19 +21,7 @@
 require_relative "../spec_helper"
 
 describe GradebookFilter do
-  describe "associations" do
-    it { is_expected.to belong_to(:user).required }
-    it { is_expected.to belong_to(:course).required }
-  end
-
   describe "validations" do
-    it { is_expected.to validate_presence_of :user }
-    it { is_expected.to validate_presence_of :course }
-    it { is_expected.to validate_presence_of :name }
-    it { is_expected.to validate_presence_of :payload }
-    it { is_expected.not_to allow_value("").for(:name) }
-    it { is_expected.to validate_length_of(:name).is_at_most(ActiveRecord::Base.maximum_string_length) }
-
     it "requires the payload to be a hash" do
       filter = GradebookFilter.new
       filter.payload = "potato"

@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.15.8 - 2025-02-20
+
+### Fixed
+
+- Fixed invalid `querySelectorAll` selector (`:not(.not_external, .external)`)
+  that caused errors in older Chrome versions (87 and below). Updated to
+  `:not(.not_external):not(.external)` for improved browser compatibility
+- Improved external link handling logic in canvas-rce
+
+### Added
+
+- Jest test to ensure the fix does not introduce regressions
+
 ## 5.15.0 - 2025-02-12
 
 - Lazy load iframe and images by default

@@ -32,6 +32,12 @@
     "additional_considerations_f3801683": {
         "message": "其他考虑事项"
     },
+    "address_applied_64269b0b": {
+        "message": "已应用地址"
+    },
+    "address_removed_fcb496e0": {
+        "message": "已移除地址"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "具有相同 URL 的相邻链接应该为一个单链接。"
     },
@@ -202,6 +208,12 @@
     },
     "blue_daf8fea9": {
         "message": "蓝色"
+    },
+    "bold_applied_42d547b7": {
+        "message": "已应用粗体"
+    },
+    "bold_removed_da474a5c": {
+        "message": "已移除粗体"
     },
     "border_5b08b06d": {
         "message": "边框"
@@ -595,6 +607,12 @@
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "显示文本链接（在新标签页中打开）"
+    },
+    "div_applied_49ad83fc": {
+        "message": "已应用分区"
+    },
+    "div_removed_d13f8e17": {
+        "message": "已移除分区"
     },
     "division_sign_72190870": {
         "message": "除号"
@@ -992,6 +1010,12 @@
     "heading_4_b2e74be7": {
         "message": "标题 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "已应用标题 { h }"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "已移除标题 { h }"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "不得跳过标题级别。"
     },
@@ -1198,6 +1222,12 @@
     },
     "italian_bd3c792d": {
         "message": "意大利语"
+    },
+    "italic_applied_8f59a684": {
+        "message": "已应用斜体"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "已移除斜体"
     },
     "japanese_b5721ca7": {
         "message": "日语"
@@ -1690,6 +1720,12 @@
     },
     "paragraph_5e5ad8eb": {
         "message": "段落"
+    },
+    "paragraph_applied_959b3fe5": {
+        "message": "已应用段落"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "已移除段落"
     },
     "paragraph_starting_with_start_a59923f8": {
         "message": "以{ start }开始的段落"
@@ -2470,6 +2506,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "无法确定资源选择 url"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "已应用下划线"
+    },
+    "underline_removed_3693e17c": {
+        "message": "已移除下划线"
     },
     "union_e6b57a53": {
         "message": "并集"

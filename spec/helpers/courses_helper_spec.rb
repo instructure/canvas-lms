@@ -344,7 +344,7 @@ describe CoursesHelper do
   describe "#recent_event_url" do
     before(:once) do
       course_with_teacher(active_all: true)
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @assignment = @course.assignments.create!(assignment_valid_attributes.merge({ points_possible: 10,
                                                                                     submission_types: "online_text_entry" }))
       @checkpoint_topic, @checkpoint_entry = graded_discussion_topic_with_checkpoints(context: @course)

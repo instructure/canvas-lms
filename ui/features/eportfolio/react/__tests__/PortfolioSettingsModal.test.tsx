@@ -47,7 +47,7 @@ describe('PortfolioSettingsModal', () => {
     expect(checkbox).toBeChecked()
   })
 
-  it('sets focus to text field if blank', () => {
+  it('sets focus and shows error if name is blank', async () => {
     const {getByTestId, getByText} = render(
       <PortfolioSettingsModal
         portfolio={{...portfolio, name: ''}}
@@ -58,7 +58,10 @@ describe('PortfolioSettingsModal', () => {
     const textInput = getByTestId('portfolio-name-field')
     const saveButton = getByText('Save')
     saveButton.click()
-    expect(textInput).toHaveFocus()
+    await waitFor(() => {
+      expect(textInput).toHaveFocus()
+      expect(getByText('Name is required.')).toBeInTheDocument()
+    })
   })
 
   it('updates portfolio after saving', async () => {

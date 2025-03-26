@@ -21,6 +21,7 @@
 class AttachmentAssociation < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :context, polymorphic: %i[conversation_message submission course group]
+  belongs_to :user
 
   before_create :set_root_account_id
 

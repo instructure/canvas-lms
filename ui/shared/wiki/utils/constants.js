@@ -17,3 +17,5 @@
  */
 
 export const TITLE_MAX_LENGTH = 255
+
+export const BODY_MAX_LENGTH = 511999 // (500 * 1024 - 1) - 500kb

@@ -175,7 +175,7 @@ module Api::V1::Assignment
     hash["grades_published"] = assignment.grades_published? if opts[:include_grades_published]
     hash["graded_submissions_exist"] = assignment.graded_submissions_exist?
 
-    if opts[:include_checkpoints] && assignment.root_account.feature_enabled?(:discussion_checkpoints)
+    if opts[:include_checkpoints] && assignment.context.discussion_checkpoints_enabled?
       hash["has_sub_assignments"] = assignment.has_sub_assignments?
       hash["checkpoints"] = assignment.sub_assignments.map { |sub_assignment| Checkpoint.new(sub_assignment, user).as_json }
     end
@@ -427,13 +427,29 @@ module Api::V1::Assignment
 
       if submission.is_a?(Array)
         ActiveRecord::Associations.preload(submission, :quiz_submission) if assignment.quiz?
-        hash["submission"] = submission.map { |s| submission_json(s, assignment, user, session, assignment.context, params[:include], params) }
+        hash["submission"] = submission.map do |s|
+          submission_json(s,
+                          assignment,
+                          user,
+                          session,
+                          assignment.context,
+                          params[:include],
+                          params,
+                          preloaded_enrollments_by_user_id: opts[:preloaded_enrollments_by_user_id])
+        end
         should_show_statistics &&= submission.any? do |s|
           s.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
           s.eligible_for_showing_score_statistics?
         end
       else
-        hash["submission"] = submission_json(submission, assignment, user, session, assignment.context, params[:include], params)
+        hash["submission"] = submission_json(submission,
+                                             assignment,
+                                             user,
+                                             session,
+                                             assignment.context,
+                                             params[:include],
+                                             params,
+                                             preloaded_enrollments_by_user_id: opts[:preloaded_enrollments_by_user_id])
         submission.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
         should_show_statistics &&= submission.eligible_for_showing_score_statistics?
       end
@@ -1103,6 +1119,8 @@ module Api::V1::Assignment
     end
 
     apply_external_tool_settings(assignment, assignment_params)
+    apply_asset_processor_settings(assignment, assignment_params) if assignment.root_account.feature_enabled?(:lti_asset_processor)
+
     overrides = pull_overrides_from_params(assignment_params)
 
     if assignment_params[:allowed_extensions].present? && assignment_params[:allowed_extensions].length > Assignment.maximum_string_length
@@ -1232,6 +1250,16 @@ module Api::V1::Assignment
     end
   end
 
+  def apply_asset_processor_settings(assignment, assignment_params)
+    # I'm limiting this for create because updating is a can of worms right now
+    if assignment.new_record? && assignment_params["asset_processors"].present? && asset_processor_capable?(assignment_params)
+      assignment_params["asset_processors"].flatten.each do |content_item|
+        ap = Lti::AssetProcessor.build_for_assignment(content_item)
+        assignment.lti_asset_processors << ap
+      end
+    end
+  end
+
   def assignment_configuration_tool(assignment_params)
     tool_id = assignment_params["similarityDetectionTool"].split("_").last.to_i
     tool = nil
@@ -1260,6 +1288,12 @@ module Api::V1::Assignment
       assignment_params["submission_types"].present? &&
       (assignment_params["submission_types"].include?("online_upload") ||
       assignment_params["submission_types"].include?("online_text_entry"))
+  end
+
+  def asset_processor_capable?(assignment_params)
+    assignment_params["submission_type"] == "online" &&
+      assignment_params["submission_types"].present? &&
+      assignment_params["submission_types"].include?("online_upload")
   end
 
   def submissions_download_url(context, assignment)

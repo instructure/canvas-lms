@@ -83,7 +83,7 @@ describe "submission_graded" do
     end
 
     it "show which sub assignment was graded" do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
       @reply_to_topic.submit_homework @student, body: "Test reply to topic for student"
       submission = @reply_to_topic.grade_student(@student, grade: 5, grader: @teacher).first

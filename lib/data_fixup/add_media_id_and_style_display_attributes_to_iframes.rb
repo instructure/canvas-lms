@@ -33,7 +33,7 @@ module DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes
   ].freeze
 
   def self.fix_html(html)
-    doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, { max_tree_depth: 10_000 })
+    doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
 
     doc.css("iframe").map do |e|
       next unless e.get_attribute("src")&.match?('(.*\/)?media_attachments_iframe\/([^\/\?]*)(.*)')

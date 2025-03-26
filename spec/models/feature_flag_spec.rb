@@ -44,7 +44,7 @@ describe FeatureFlag do
     it "validates the feature exists" do
       flag = t_root_account.feature_flags.build(feature: "xyzzy")
       expect(flag).not_to be_valid
-      expect(flag.errors.to_h).to eq({ feature: "does not exist" })
+      expect(flag.errors[:feature].first).to eq("does not exist")
     end
 
     it "allows 'allowed' state only in accounts" do
@@ -61,7 +61,7 @@ describe FeatureFlag do
 
       flag = t_sub_account.feature_flags.build(feature: "root_account_feature")
       expect(flag).not_to be_valid
-      expect(flag.errors.to_h).to eq({ feature: "does not apply to context" })
+      expect(flag.errors[:feature].first).to eq("does not apply to context")
     end
   end
 

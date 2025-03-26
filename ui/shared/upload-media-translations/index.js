@@ -72,6 +72,9 @@ const UploadMediaStrings = {
   NO_FILE_CHOSEN: I18n.t('No file selected'),
   SUPPORTED_FILE_TYPES: I18n.t('Supported file types: .vtt, .srt'),
   ADD_NEW_CAPTION_OR_SUBTITLE: I18n.t('Add new caption or subtitle'),
+  SELECT_SUPPORTED_FILE_TYPE: I18n.t('Please select a file of a supported type'),
+  CHOOSE_FILE_TO_UPLOAD: I18n.t('Please choose a file'),
+  ENTER_FILE_NAME: I18n.t('Please enter a file name'),
 }
 
 const SelectStrings = {

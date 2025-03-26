@@ -16,30 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {IconAddLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
+import CreateFolderModal from './CreateFolderModal'
 
 const I18n = createI18nScope('files_v2')
 
 interface CreateFolderButtonProps {
   buttonDisplay: 'block' | 'inline-block'
-  onClick: () => void
 }
 
-const CreateFolderButton = ({buttonDisplay, onClick}: CreateFolderButtonProps) => {
+const CreateFolderButton = ({buttonDisplay}: CreateFolderButtonProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
   return (
-    <Button
-      color="secondary"
-      margin="none x-small small none"
-      renderIcon={<IconAddLine />}
-      display={buttonDisplay}
-      onClick={onClick}
-      data-testid="create-folder-button"
-    >
-      {I18n.t('Folder')}
-    </Button>
+    <>
+      <CreateFolderModal isOpen={isModalOpen} onRequestClose={handleCloseModal} />
+      <Button
+        color="secondary"
+        margin="none x-small small none"
+        renderIcon={<IconAddLine />}
+        display={buttonDisplay}
+        onClick={handleOpenModal}
+        data-testid="create-folder-button"
+      >
+        {I18n.t('Folder')}
+      </Button>
+    </>
   )
 }
 

@@ -37,6 +37,8 @@ module Lti
       end
       return if lti_assets.empty?
 
+      lti_assets.each(&:calculate_sha256_checksum!)
+
       asset_processors.each do |ap|
         params = notice_params(submission, lti_assets, ap)
         builder = Pns::LtiAssetProcessorSubmissionNoticeBuilder.new(params)
@@ -51,13 +53,14 @@ module Lti
         assets: assets.map do |asset|
           attachment = asset.attachment
           {
-            title: submission.assignment.title,
-            size: attachment.size,
             asset_id: asset.uuid,
-            url: asset_url(asset_processor, asset),
-            sha256_checksum: "todo",
+            content_type: attachment.content_type,
+            filename: attachment.display_name,
+            sha256_checksum: asset.sha256_checksum,
+            size: attachment.size,
             timestamp: attachment.modified_at.iso8601,
-            content_type: attachment.content_type
+            title: submission.assignment.title,
+            url: asset_url(asset_processor, asset),
           }
         end,
         custom: asset_processor.custom || {},

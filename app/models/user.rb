@@ -2458,6 +2458,27 @@ class User < ActiveRecord::Base
     instances
   end
 
+  def can_current_user_view_as_user(course, user)
+    # User is viewing as themselves (always allowed)
+    return true if user.id == id
+
+    # Check if current user has admin rights in the course
+    has_admin_rights = course.grants_right?(self, :read_as_admin)
+
+    # Check if current user can masquerade as the user (handles cross-shard/tenant security)
+    can_masquerade = can_masquerade?(user, course.account)
+
+    # Check if the user has enrollments in this course (to prevent viewing users from other courses)
+    has_enrollment = user.enrollments.where(course_id: course.id).exists?
+
+    # Observer permissions - can view students they're observing
+    observer_permissions = ObserverEnrollment.observed_students(course, self, include_restricted_access: false)
+                                             .keys.any? { |observed_user| observed_user.id == user.id }
+
+    # Allow if admin with user enrolled in course, or has masquerade permission, or is an observer
+    (has_admin_rights && has_enrollment) || can_masquerade || observer_permissions
+  end
+
   # NOTE: excludes submission stream items
   def cached_recent_stream_items(opts = {})
     expires_in = 1.day

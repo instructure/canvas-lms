@@ -18,6 +18,15 @@
 
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 
+const tools = [
+  {
+    id: 'tool1',
+    title: 'Test Tool',
+    base_url: 'http://example.com/tool1',
+    icon_url: 'http://example.com/tool1/icon.png',
+  },
+]
+
 const setupFilesEnvWithAllContexts = () => {
   filesEnv.showingAllContexts = true
   filesEnv.contexts = [
@@ -28,6 +37,8 @@ const setupFilesEnvWithAllContexts = () => {
       asset_string: 'user_1',
       permissions: {},
       name: 'My Files',
+      file_menu_tools: tools,
+      file_index_menu_tools: tools,
     },
     {
       contextType: 'courses',
@@ -36,6 +47,8 @@ const setupFilesEnvWithAllContexts = () => {
       asset_string: 'course_1',
       permissions: {},
       name: 'Course 1',
+      file_menu_tools: tools,
+      file_index_menu_tools: tools,
     },
   ]
   filesEnv.contextsDictionary = {
@@ -54,6 +67,8 @@ const setupFilesEnvWithSingleContext = () => {
       asset_string: 'course_1',
       permissions: {},
       name: 'Course 1',
+      file_menu_tools: tools,
+      file_index_menu_tools: tools,
     },
   ]
   filesEnv.contextsDictionary = {

@@ -20,6 +20,8 @@ import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
+import { Text } from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 
 interface RatingButtonProps {
   action: 'like' | 'dislike'
@@ -68,7 +70,12 @@ interface DiscussionSummaryRatingsProps {
 
 export const DiscussionSummaryRatings: React.FC<DiscussionSummaryRatingsProps> = props => {
   return (
-    <>
+    <Flex>
+      {props.liked || props.disliked ? (
+        <Flex.Item margin="0 small 0 0"><Text color="secondary" size="small">{I18n.t('Thank you for sharing!')}</Text></Flex.Item>
+      ) : (
+        <Flex.Item margin="0 small 0 0"><Text color="secondary" size="small">{I18n.t('Do you like this summary?')}</Text></Flex.Item>
+      )}
       <RatingButton
         action="like"
         // @ts-expect-error
@@ -87,7 +94,7 @@ export const DiscussionSummaryRatings: React.FC<DiscussionSummaryRatingsProps> =
         screenReaderText={I18n.t('Dislike summary')}
         dataTestId="summary-dislike-button"
       />
-    </>
+    </Flex>
   )
 }
 

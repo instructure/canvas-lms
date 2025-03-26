@@ -35,12 +35,20 @@ module CanvasSecurity
     end
 
     def self.get(label)
-      @workflows ? @workflows[label.to_sym] : nil
+      @workflows&.dig(label.to_sym, :workflow)
     end
 
-    def self.register(label, &)
+    def self.register(label, requires_context: false, requires_symmetric_encryption: false, &)
       @workflows ||= {}
-      @workflows[label.to_sym] = JWTWorkflow.new(&)
+      @workflows[label.to_sym] = { workflow: JWTWorkflow.new(&), requires_context:, requires_symmetric_encryption: }
+    end
+
+    def self.workflow_requires_context?(workflow)
+      !!@workflows&.dig(workflow.to_sym, :requires_context)
+    end
+
+    def self.workflow_requires_symmetric_encryption?(workflow)
+      !!@workflows&.dig(workflow.to_sym, :requires_symmetric_encryption)
     end
   end
 end

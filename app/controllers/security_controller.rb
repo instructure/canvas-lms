@@ -48,7 +48,7 @@ class SecurityController < ApplicationController
       Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type]
       .reject { |p| p == :resource_selection }
       .reject { |p| p == :ActivityAssetProcessor unless account.root_account.feature_enabled?(:lti_asset_processor) }
-      .map { |p| Lti::ResourcePlacement::STANDARD_PLACEMENTS.include?(p) ? p : Lti::ResourcePlacement.add_extension_prefix(p) }
+      .map { |p| Lti::ResourcePlacement.add_extension_prefix_if_necessary(p) }
     ) + [Lti::ResourcePlacement::CONTENT_AREA] + (
       (message_type == LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE) ? [Lti::ResourcePlacement::RICH_TEXT_EDITOR] : []
     )

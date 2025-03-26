@@ -35,12 +35,11 @@ const props = (overrides = {}) => {
 
 it('renders form', () => {
   render(<ManualConfiguration {...props()} />)
-  expect(screen.getByLabelText('* Title')).toBeInTheDocument()
-  expect(screen.getByLabelText('* Title')).toBeInTheDocument()
-  expect(screen.getByLabelText('* Description')).toBeInTheDocument()
-  expect(screen.getByLabelText('* Target Link URI')).toBeInTheDocument()
-  expect(screen.getByLabelText('* OpenID Connect Initiation Url')).toBeInTheDocument()
-  expect(screen.getByLabelText('* JWK Method')).toBeInTheDocument()
+  expect(screen.getByLabelText('Title *')).toBeInTheDocument()
+  expect(screen.getByLabelText('Description *')).toBeInTheDocument()
+  expect(screen.getByLabelText('Target Link URI *')).toBeInTheDocument()
+  expect(screen.getByLabelText('OpenID Connect Initiation Url *')).toBeInTheDocument()
+  expect(screen.getByLabelText('JWK Method *')).toBeInTheDocument()
 })
 
 it('generates the toolConfiguration', () => {
@@ -48,5 +47,5 @@ it('generates the toolConfiguration', () => {
   render(<ManualConfiguration {...props()} ref={ref} />)
   const toolConfig = ref.current.generateToolConfiguration()
   expect(toolConfig.scopes).toBeDefined()
-  expect(toolConfig.extensions.length).toEqual(1)
+  expect(toolConfig.extensions).toHaveLength(1)
 })

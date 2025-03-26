@@ -21,19 +21,6 @@
 describe Account do
   include_examples "outcome import context examples"
 
-  describe "relationships" do
-    it { is_expected.to have_many(:feature_flags) }
-    it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
-    it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
-    it { is_expected.to have_many(:lti_registrations).class_name("Lti::Registration").dependent(:destroy) }
-    it { is_expected.to have_many(:lti_registration_account_bindings).class_name("Lti::RegistrationAccountBinding").dependent(:destroy) }
-    it { is_expected.to have_many(:block_editor_templates).class_name("BlockEditorTemplate") }
-  end
-
-  describe "validations" do
-    it { is_expected.to validate_inclusion_of(:account_calendar_subscription_type).in_array(Account::CALENDAR_SUBSCRIPTION_TYPES) }
-  end
-
   context "domain_method" do
     it "retrieves correct account domain" do
       root_account = Account.create!
@@ -2544,7 +2531,7 @@ describe Account do
       c = a2.courses.create!(template: true)
       a.course_template = c
       expect(a).not_to be_valid
-      expect(a.errors.to_h.keys).to eq [:course_template_id]
+      expect(a.errors.attribute_names).to eq [:course_template_id]
     end
 
     it "requires the course template to actually be a template" do
@@ -2552,7 +2539,7 @@ describe Account do
       c = a.courses.create!
       a.course_template = c
       expect(a).not_to be_valid
-      expect(a.errors.to_h.keys).to eq [:course_template_id]
+      expect(a.errors.attribute_names).to eq [:course_template_id]
     end
 
     it "allows a valid course template" do

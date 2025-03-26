@@ -24,19 +24,10 @@ RSpec.describe DeveloperKeyAccountBindingsController do
   let(:sub_account) { account_model(parent_account: root_account) }
   let(:sub_account_admin) { account_admin_user(account: sub_account) }
   let(:root_account_developer_key) do
-    DeveloperKey.create!(
-      account: root_account,
-      lti_registration: root_account_lti_registration
-    )
+    lti_developer_key_model(account: root_account, lti_registration: root_account_lti_registration)
   end
   let(:root_account_lti_registration) do
-    Lti::Registration.create!(
-      account: root_account,
-      name: "lti registration",
-      admin_nickname: "lti registration",
-      created_by: sub_account_admin,
-      updated_by: sub_account_admin
-    )
+    lti_registration_model(account: root_account)
   end
 
   let(:valid_parameters) do

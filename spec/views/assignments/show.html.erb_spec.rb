@@ -128,7 +128,7 @@ describe "assignments/show" do
       allow(view).to receive(:show_confetti).and_return(false)
     end
 
-    it "renders the eula url if present" do
+    it "includes the eula url if present" do
       tool_proxy.raw_data["tool_profile"]["service_offered"] << eula_service
       tool_proxy.resources << resource_handler
       tool_proxy.save!
@@ -143,7 +143,7 @@ describe "assignments/show" do
       assign(:external_tools, [])
 
       render "assignments/show"
-      expect(rendered).to include "<a href='https://www.test.com/eula'>End-User License Agreement.</a>"
+      expect(rendered).to include "<div id='turnitin_pledge_container_online_upload' data-eulaurl='https://www.test.com/eula' data-pledge='' style='margin:10px 0px'</div>"
     end
   end
 

@@ -111,7 +111,7 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
   end
 
   def self.fix_html(active_record, html)
-    doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, { max_tree_depth: 10_000 })
+    doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
 
     # media comments
     doc.css("a.instructure_inline_media_comment").each do |e|

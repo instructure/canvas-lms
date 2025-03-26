@@ -714,14 +714,16 @@ describe "as a student" do
         wait_for_ajaximations
       end
 
-      it "displays similarity pledge checkbox and disables submit button until checked" do
+      it "displays similarity pledge checkbox and shows error message if student submits with it un-checked" do
         StudentAssignmentPageV2.create_url_draft("www.google.com")
 
         expect(StudentAssignmentPageV2.similarity_pledge).to include_text("This assignment submission is my own, original work")
-        expect(StudentAssignmentPageV2.submit_button).to be_disabled
+        StudentAssignmentPageV2.submit_button.click
+        expect(StudentAssignmentPageV2.similarity_pledge).to include_text("You must agree to the submission pledge before you can submit the assignment")
 
         scroll_to(StudentAssignmentPageV2.similarity_pledge)
         StudentAssignmentPageV2.similarity_pledge.click
+        expect(StudentAssignmentPageV2.similarity_pledge).to_not include_text("You must agree to the submission pledge before you can submit the assignment")
 
         expect(StudentAssignmentPageV2.submit_button).to_not be_disabled
       end

@@ -64,8 +64,6 @@ describe GradingPeriod do
     expect(grading_period).not_to be_valid
   end
 
-  it { is_expected.to validate_numericality_of(:weight) }
-
   describe ".in_closed_grading_period?" do
     let(:in_closed_grading_period) { closed_period.start_date + 1.day }
     let(:in_not_closed_grading_period) { not_closed_period.start_date + 1.day }

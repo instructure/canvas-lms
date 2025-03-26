@@ -18,14 +18,22 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useMemo} from 'react'
 
 import {Pagination} from '@instructure/ui-pagination'
 
 const I18n = createI18nScope('discussion_posts')
 
-export const ThreadPagination = props => (
-  <span className="discussion-pagination-section">
+export const NAV_BAR_HEIGHT = 64
+
+export const ThreadPagination = props => {
+
+  const paddingBottom = useMemo(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return ENV?.SEQUENCE && urlParams.get('embed') !== 'true' ? NAV_BAR_HEIGHT : 0;
+  }, [])
+
+  return <div className="discussion-pagination-section" style={{paddingBottom}}>
     <Pagination
       margin="small"
       variant="compact"
@@ -43,8 +51,8 @@ export const ThreadPagination = props => (
         </Pagination.Page>
       ))}
     </Pagination>
-  </span>
-)
+  </div>
+}
 
 ThreadPagination.propTypes = {
   setPage: PropTypes.func.isRequired,

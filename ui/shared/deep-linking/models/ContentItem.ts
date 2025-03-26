@@ -26,12 +26,14 @@ import {
 import {type ImageContentItem, imageContentItemToHtmlString} from './ImageContentItem'
 import {type LinkContentItem, linkContentItemToHtmlString} from './LinkContentItem'
 import {captureException} from '@sentry/react'
+import {AssetProcessorContentItem} from './AssetProcessorContentItem'
 
 export type ContentItem =
   | ResourceLinkContentItem
   | LinkContentItem
   | HtmlFragmentContentItem
   | ImageContentItem
+  | AssetProcessorContentItem
 
 const assertNever = (item: never): void => {
   const errorMessage = 'Could not process content item'
@@ -56,6 +58,8 @@ export const contentItemToHtmlString =
           context.ltiEndpoint,
           context.editorSelection,
         )
+      case 'ltiAssetProcessor':
+        return '[Asset processor not supported in this context]'
       default:
         assertNever(item)
         return ''

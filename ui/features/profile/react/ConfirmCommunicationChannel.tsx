@@ -35,14 +35,15 @@ const I18n = createI18nScope('profile')
 
 const defaultValues = {code: ''}
 
-const validationSchema = z.object({
-  code: z
-    .string()
-    .min(1, I18n.t('Code is required.'))
-    .length(4, I18n.t('Code must be four characters.')),
-})
+const createValidationSchema = () =>
+  z.object({
+    code: z
+      .string()
+      .min(1, I18n.t('Code is required.'))
+      .length(4, I18n.t('Code must be four characters.')),
+  })
 
-type FormValues = z.infer<typeof validationSchema>
+type FormValues = z.infer<ReturnType<typeof createValidationSchema>>
 
 interface ConfirmChannelResponse {
   communication_channel: {id: string; pseudonym_id: string}
@@ -71,7 +72,7 @@ const ConfirmCommunicationChannel = ({
     handleSubmit,
   } = useForm({
     defaultValues,
-    resolver: zodResolver(validationSchema),
+    resolver: zodResolver(createValidationSchema()),
   })
   const title = I18n.t('Confirm Communication Channel')
   const buttonText = isSubmitting ? I18n.t('Confirming...') : I18n.t('Confirm')

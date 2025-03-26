@@ -24,7 +24,13 @@ import {IconDiscussionLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import canvas from '@instructure/ui-themes'
-import type {Attachment, SubmissionComment, MediaSource, MediaTrack} from '../../../api.d'
+import type {
+  Attachment,
+  SubmissionComment,
+  MediaSource,
+  MediaTrack,
+  MediaObject,
+} from '../../../api.d'
 import useStore from './stores'
 import {Badge} from '@instructure/ui-badge'
 import {Link} from '@instructure/ui-link'
@@ -33,8 +39,15 @@ import {MediaPlayer} from '@instructure/ui-media-player'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
+import {StudioPlayer, type StudioPlayerProps} from '@instructure/studio-player'
+import {GlobalEnv} from '../../../shared/global/env/GlobalEnv'
+import {Spacing} from '@instructure/emotion'
 
 const I18n = createI18nScope('grade_summary')
+
+declare const ENV: GlobalEnv & {
+  consolidated_media_player?: boolean
+}
 
 type AttachmentProps = Pick<Attachment, 'id' | 'mime_class' | 'display_name' | 'url'>
 type SubmissionCommentProps = Pick<
@@ -88,39 +101,21 @@ export default function SubmissionAttempts({attempts}: SubmissionAttemptsProps) 
 type SubmissionAttemptProps = {
   comments?: SubmissionCommentProps[]
 }
+
 function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
   if (!comments) return null
 
   const {borders, colors, spacing} = canvas
+  const isNewMediaPlayer = ENV.consolidated_media_player ?? false
 
   return (
     <>
       {comments.map((comment, i) => {
-        // @ts-expect-error
-        let mediaTracks: MediaTrack[] = null
-        // @ts-expect-error
-        let mediaSources: MediaSource[] = null
         const mediaObject = comment.media_object
-        if (mediaObject) {
-          mediaSources = mediaObject.media_sources.map(mediaSource => {
-            mediaSource.label = `${mediaSource.width}x${mediaSource.height}`
-            mediaSource.src = mediaSource.url
-            return mediaSource
-          })
-          // @ts-expect-error
-          mediaTracks = mediaObject.media_tracks.map(track => {
-            return {
-              id: track.id,
-              src: `/media_objects/${mediaObject.id}/media_tracks/${track.id}`,
-              label: track.locale,
-              type: track.kind,
-              language: track.locale,
-            }
-          })
-        }
         const formattedComment = containsHtmlTags(comment.comment)
           ? sanitizeHtml(comment.comment)
           : formatMessage(comment.comment)
+
         return (
           <Flex as="div" direction="column" key={comment.id} data-testid="submission-comment">
             <div
@@ -171,11 +166,12 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
                 </Link>
               </View>
             ))}
-            {mediaObject && (
-              <View data-testid="submission-comment-media" as="span">
-                <MediaPlayer tracks={mediaTracks} sources={mediaSources} />
-              </View>
-            )}
+            {mediaObject &&
+              (isNewMediaPlayer ? (
+                <CommentStudioPlayer mediaObject={mediaObject} />
+              ) : (
+                <CommentMediaPlayer mediaObject={mediaObject} />
+              ))}
             <View as="div" textAlign="end" margin="0 medium 0 0">
               <Text weight="bold" size="small" data-testid="submission-comment-author">
                 - {I18n.t('%{display_name}', {display_name: comment.author_name})}
@@ -185,5 +181,75 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
         )
       })}
     </>
+  )
+}
+
+type CommentMediaPlayerProps = {
+  mediaObject: MediaObject
+}
+function CommentMediaPlayer({mediaObject}: CommentMediaPlayerProps) {
+  const mediaSources: MediaSource[] = []
+  const mediaTracks: MediaTrack[] = []
+
+  for (const it of mediaObject.media_sources) {
+    mediaSources.push({
+      ...it,
+      src: it.url,
+      label: `${it.width}x${it.height}`,
+    })
+  }
+
+  for (const it of mediaObject.media_tracks) {
+    mediaTracks.push({
+      ...it,
+      src: `/media_objects/${mediaObject.id}/media_tracks/${it.id}`,
+      label: it.locale,
+      type: it.kind,
+      language: it.locale,
+    })
+  }
+
+  const styles = {
+    padding: '0 small' as Spacing,
+  }
+  return (
+    <View data-testid="submission-comment-media" as="span" {...styles}>
+      <MediaPlayer sources={mediaSources} tracks={mediaTracks} />
+    </View>
+  )
+}
+
+function CommentStudioPlayer({mediaObject}: CommentMediaPlayerProps) {
+  const mediaSources: StudioPlayerProps['src'] = []
+  const mediaCaptions: StudioPlayerProps['captions'] = []
+
+  for (const it of mediaObject.media_sources) {
+    mediaSources.push({
+      src: it.url,
+      type: it.content_type as any,
+      width: Number(it.width),
+      height: Number(it.height),
+    })
+  }
+
+  for (const it of mediaObject.media_tracks) {
+    mediaCaptions.push({
+      src: `/media_objects/${mediaObject.id}/media_tracks/${it.id}`,
+      label: it.locale,
+      type: it.kind as any,
+      language: it.locale,
+    })
+  }
+
+  const styles = {height: '300px', padding: '0 small' as Spacing}
+
+  return (
+    <View data-testid="submission-comment-media" as="span" {...styles}>
+      <StudioPlayer
+        src={mediaSources}
+        captions={mediaCaptions}
+        title={I18n.t('Play Media Comment')}
+      />
+    </View>
   )
 }

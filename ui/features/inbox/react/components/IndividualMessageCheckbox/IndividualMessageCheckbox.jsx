@@ -44,7 +44,6 @@ export const IndividualMessageCheckbox = ({checked, checkedAndDisabled, ...props
         <Checkbox
           data-testid={responsiveProps.dataTestId}
           label={I18n.t('Send an individual message to each recipient')}
-          size="small"
           variant={responsiveProps.variant}
           {...props}
           checked={checked || checkedAndDisabled}

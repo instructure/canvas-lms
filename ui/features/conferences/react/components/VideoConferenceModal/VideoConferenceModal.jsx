@@ -27,6 +27,8 @@ import BBBModalOptions from '../BBBModalOptions/BBBModalOptions'
 import BaseModalOptions from '../BaseModalOptions/BaseModalOptions'
 import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../util/constants'
 import {Spinner} from '@instructure/ui-spinner'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('video_conference')
 
@@ -96,10 +98,26 @@ export const VideoConferenceModal = ({
     setEndCalendarDate(newValue)
   }
 
+  const retrieveErrorMessage = error => (
+    <span>
+      <View as="span" display="inline-block" margin="0 xxx-small xx-small 0">
+        <IconWarningSolid />
+      </View>
+      &nbsp;
+      {error}
+    </span>
+  )
+
   const setAndValidateName = nameToBeValidated => {
     if (nameToBeValidated.length > 255) {
       setNameValidationMessages([
-        {text: I18n.t('Name must be less than 255 characters'), type: 'error'},
+        {text: retrieveErrorMessage(I18n.t('Name must not exceed 255 characters')), type: 'error'},
+      ])
+    }
+    else if (nameToBeValidated.length === 0) {
+      setName("")
+      setNameValidationMessages([
+        {text: retrieveErrorMessage(I18n.t('Please fill this field')), type: 'error'},
       ])
     } else {
       setNameValidationMessages([])
@@ -109,12 +127,17 @@ export const VideoConferenceModal = ({
 
   const setAndValidateDuration = durationToBeValidated => {
     if (durationToBeValidated.toString().length > 8) {
+      setDurationValidationMessages([
+        {text: retrieveErrorMessage(I18n.t('Duration must be less than or equal to 99,999,999 minutes')), type: 'error'},
+      ])
       if (durationValidationMessages.length === 0) {
         setDuration(durationToBeValidated)
       }
+    } else if (Number(durationToBeValidated) === 0) {
       setDurationValidationMessages([
-        {text: I18n.t('Duration must be less than 99,999,999 minutes'), type: 'error'},
+        {text: retrieveErrorMessage(I18n.t('Duration must be greater than 0 minute')), type: 'error'},
       ])
+      setDuration(durationToBeValidated)
     } else {
       setDurationValidationMessages([])
       setDuration(durationToBeValidated)
@@ -124,7 +147,7 @@ export const VideoConferenceModal = ({
   const setAndValidateDescription = descriptionToBeValidated => {
     if (descriptionToBeValidated.length > 2500) {
       setDescriptionValidationMessages([
-        {text: I18n.t('Description must be less than 2500 characters'), type: 'error'},
+        {text: retrieveErrorMessage(I18n.t('Description must not exceed 2500 characters')), type: 'error'},
       ])
     } else {
       setDescriptionValidationMessages([])

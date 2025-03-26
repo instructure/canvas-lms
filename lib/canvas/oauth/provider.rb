@@ -74,8 +74,8 @@ module Canvas::OAuth
     # user
     def authorized_token?(user, real_user: nil)
       unless self.class.is_oob?(redirect_uri)
-        return true if Token.find_reusable_access_token(user, key, scopes, purpose, real_user:)
         return true if key.trusted?
+        return true if Token.find_reusable_access_token(user, key, scopes, purpose, real_user:)
       end
 
       false
@@ -109,7 +109,7 @@ module Canvas::OAuth
     end
 
     def session_hash
-      { client_id: key.id, redirect_uri:, scopes:, purpose:, code_challenge:, code_challenge_method: }
+      { client_id: @client_id, redirect_uri:, scopes:, purpose:, code_challenge:, code_challenge_method: }
     end
 
     def valid_scopes?

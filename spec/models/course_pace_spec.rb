@@ -205,25 +205,22 @@ describe CoursePace do
     end
 
     it "respects the course timezone" do
-      @course.update! time_zone: "Abu Dhabi"
-      @course_pace.reload.publish
-      abu_due_at = @course.reload.assignments.last.assignment_overrides.last.due_at
+      timezones = ["Abu Dhabi", "Brasilia", "Mountain Time (US & Canada)"]
 
-      @course.update! time_zone: "Brasilia"
-      @course_pace.reload.publish
-      br_due_at = @course.reload.assignments.last.assignment_overrides.last.due_at
+      timezones.each do |tz|
+        @course.update!(time_zone: tz)
+        @course_pace.reload.publish
 
-      @course.update! time_zone: "Mountain Time (US & Canada)"
-      @course_pace.reload.publish
-      mt_due_at = @course.reload.assignments.last.assignment_overrides.last.due_at
+        Time.use_zone(@course.time_zone) do
+          due_at = @course.reload.assignments.last.assignment_overrides.last.due_at.in_time_zone(@course.time_zone)
+          expected_due_at = CanvasTime.fancy_midnight(@course.start_at)
+                                      .end_of_day
+                                      .change(usec: 999_999)
+                                      .in_time_zone(@course.time_zone)
 
-      expected_abu_due_at = CanvasTime.fancy_midnight(@course.start_at).change(usec: 999_999) - 4.hours
-      expected_br_due_at  = CanvasTime.fancy_midnight(@course.start_at).change(usec: 999_999) + 3.hours
-
-      # DST, otherwise it'd be +7 (-0700)
-      expected_mt_due_at  = CanvasTime.fancy_midnight(@course.start_at).change(usec: 999_999) + 6.hours
-
-      expect([abu_due_at, br_due_at, mt_due_at]).to eq([expected_abu_due_at, expected_br_due_at, expected_mt_due_at])
+          expect(due_at).to eq(expected_due_at), "Failed for timezone: #{tz}"
+        end
+      end
     end
 
     it "creates an override for students" do

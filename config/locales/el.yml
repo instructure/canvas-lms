@@ -1633,6 +1633,8 @@ el:
   add_group_set_f9809e11: "Προσθήκη Σετ Ομάδων"
   add_help_menu_links_de9fc34f: "Προσθέστε συνδέσμους στο μενού βοήθειας"
   add_icon_567dbcaa: "προσθήκη εικονιδίου"
+  add_item_75b67d07: "Προσθήκη Αντικειμένου"
+  add_item_to_module_3d7a05b2: "Προσθήκη Στοιχείου στην Ενότητα"
   add_link_5c01c1e8: "Προσθήκη Συνδέσμου"
   add_link_fc336ed6: "Προσθήκη συνδέσμου"
   add_login_f871148: "Προσθήκη Σύνδεσης"
@@ -1781,6 +1783,7 @@ el:
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Παρουσιάστηκε σφάλμα κατά τον ορισμό του δικαιώματος χρήσης του αρχείου %{filename}"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Ένα σφάλμα συνέβη κατά την αφαίρεση της ομάδας ραντεβού."
   an_export_is_already_in_progress_54270f01: "Μια εξαγωγή δεδομέων βρίσκεται σε εξέλιξη."
+  an_external_identity_provider_is_enabled_7859c6fb: "Ένας εξωτερικός πάροχος αναγνωριστικού ταυτότητας έχει ενεργοποιηθεί"
   an_integer_value_is_required_e073bd46: "Μια τιμή ακέραιου απαιτείται"
   an_internal_error_occurred_83b8a685: "Παρουσιάστηκε ένα εσωτερικό σφάλμα"
   an_item_named_name_already_exists_in_this_location_147b7312: "Ένα στοιχείο που ονομάζεται «%{name}» υπάρχει ήδη σε αυτή την τοποθεσία. Θέλετε να αντικαταστήσετε το υπάρχον αρχείο;"
@@ -1968,6 +1971,7 @@ el:
   are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "Είστε σίγουρος/η ότι επιθυμείτε να διαγράψετε το αντίγραφο αυτού του μηνύματος; Αυτή η πράξη δεν μπορεί να αναιρεθεί."
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Είστε σίγουρος/η ότι θέλετε να το κάνετε; Δεν μπορεί να αναιρεθεί και θα παρακάμψει τους υπάρχοντες βαθμούς στο βιβλίο βαθμών."
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "<mrk mid=\"2424\" mtype=\"seg\">Είστε σίγουρος/η ότι θέλετε να δημιουργήσετε εκ νέου αυτό το token;</mrk>  <mrk mid=\"2425\" mtype=\"seg\">Οτιδήποτε χρησιμοποιεί αυτό το token θα πρέπει να ενημερωθεί.</mrk>"
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "Είστε σίγουρος/η ότι επιθυμείτε να αφαιρέσετε αυτό το στοιχείο από την ενότητα;"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Είστε βέβαιος ότι επιθυμείτε να αφαιρέσετε αυτό το εργαλείο;"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Είστε βέβαιος ότι επιθυμείτε να αφαιρέσετε την εικόνα από το προφιλ αυτού του χρήστη;"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Είστε σίγουρος/η ότι θέλετε να αναφέρετε αυτή την εικόνα προφίλ;"
@@ -3429,8 +3433,10 @@ el:
       buttons: 
         cancel: Ακύρωση
         update: "Ενημέρωση συνεργασίας"
+      is_required: "Αυτό το πεδίο είναι υποχρεωτικό"
       labels: 
         description: "Περιγραφή:"
+        document_name: "Όνομα αρχείου:"
         title: "Τίτλος συνεργασίας"
     errors: 
       cannot_load_collaboration: "Αδυναμία φόρτωσης συνεργασίας"
@@ -3455,6 +3461,7 @@ el:
             <mrk mid="340" mtype="seg">Τα Google Docs είναι μια πολύ καλή λύση για να συνεργαστείτε σε ομαδικό πρότζεκτ.</mrk>  <mrk mid="341" mtype="seg">Είναι σαν το Microsoft Word, αλλά σας επιτρέπει να εργαστείτε μαζί με άλλους στο ίδιο αρχείο την ίδια στιγμή χωρίς να χρειάζεται να το στέλνετε με email από τον έναν στον άλλον.</mrk>
             
             <mrk mid="342" mtype="seg">**Προειδοποίηση**: Εσείς (και όλοι οι συνεργάτες σας) χρειάζεται να έχουν έναν λογαριασμό Google για να μπορέσουν να συμμετάσχουν στις συνεργασίες με Google Docs.</mrk>
+      is_required: "Αυτό το πεδίο είναι υποχρεωτικό"
       labels: 
         collaboration_type: "Συνεργαστείτε χρησιμοποιώντας:"
         description: "Περιγραφή:"
@@ -3664,6 +3671,7 @@ el:
   configuration_location_ee0f6592: "Τοποθεσία Ρύθμισης"
   configuration_type_25a084a4: "Τύπος Ρυθμίσεων"
   configure_ecb97e30: Ρύθμιση
+  configure_report_91ed07f9: "Ρύθμιση Αναφοράς"
   configure_toolname_app_651371be: "Ρύθμιση Εφαρμογής %{toolName}"
   confirm_6556b3a6: Επιβεβαιώστε
   confirm_contact_method_29d6fe4b: "Επιβεβαίωση τρόπου επικοινωνίας"
@@ -4145,6 +4153,8 @@ el:
     index: 
       titles: 
         course_modules: "Αρθρώματα Μαθήματος"
+    links: 
+      student_progress: "Εμφάνιση Προόδου"
     module_complete: Ολοκλήρωση
     module_empty: "Δεν υπάρχουν στοιχεία στην ενότητα «%{module}»"
     module_item_next: 
@@ -4214,6 +4224,7 @@ el:
   continue_ac067716: Συνέχεια
   continue_typing_to_find_additional_sections_or_stu_49786085: "Συνεχίστε να πληκτρολογείτε για να βρείτε περισσότερους τομείς ή σπουδαστές."
   contribute_4730e633: Συνεισφορά
+  contributed_fadcc2b9: Συνεισέφερε
   conversation_dialog: 
     message_sent: "Μήνυμα εστάλη!"
     no_course: "Κανένα μάθημα"
@@ -4395,6 +4406,9 @@ el:
     zero: "Δεν υπάρχουν Εργασίες με Σφάλματα, Κάνετε Κλικ για Συνέχεια"
   count_attempts_d23c69a0: 
     zero: "Απεριόριστες Προσπάθειες"
+  count_courses_609dc3b8: 
+    one: "1 Μάθημα"
+    other: "%{count} Μαθήματα"
   count_days_de0c6a32: 
     one: "1 ημέρα"
     other: "%{count} ημέρες"
@@ -4433,6 +4447,9 @@ el:
   count_students_c9920376: 
     one: "%{count} Φοιτητές/ιες"
     other: "%{count} Φοιτητές/ιες"
+  count_sub_accounts_345f48ea: 
+    one: "1 Υπο-λογαριασμός"
+    other: "%{count} Υπο-λογαριασμοί"
   count_submissions_need_grading_d34bae25: 
     one: "1 υποβολή χρειάζεται βαθμολόγηση"
     other: "%{count} υποβολές χρειάζονται βαθμολόγηση"
@@ -5850,6 +5867,7 @@ el:
   does_not_meet_expectations_b0736d20: "Δεν Ικανοποιεί τις Προσδοκίες"
   domain_3b54c511: Domain
   domain_is_required_1d4c8b25: "Απαιτείται domain"
+  don_t_indent_b35ae9fb: "Χωρίς Εσοχή Κειμένου"
   don_t_move_lti_query_params_to_post_body_5c80e037: "Μην Μετακινείτε τις Παραμέτρους Αναζήτησης LTI στο Κύριο Μέρος POST"
   done_54e3d4b6: Ολοκληρώθηκε
   done_8af51c9b: Ολοκληρώθηκε.
@@ -6077,6 +6095,8 @@ el:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Εισάγετε έναν εξαψήφιο κωδικό/hex εδώ για να χρησιμοποιήσετε ένα προσαρμοσμένο χρώμα."
   enter_a_score_to_test_c6f89f4a: "Εισαγωγή βαθμολογίας για έλεγχο"
   enter_a_section_name_adbe3099: "Εισάγετε ένα όνομα τμήματος"
+  enter_a_shorter_category_name_4befe0da: "Πληκτρολογήστε ένα συντομότερο όνομα κατηγορίας"
+  enter_a_shorter_group_name_8f7fc42c: "Πληκτρολογήστε ένα συντομότερο όνομα ομάδας"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Εισαγάγετε «{{ACCOUNT_DOMAIN}}» για να υποκαταστήσετε τον τομέα λογαριασμού ρίζας του χρήστη"
   enter_or_find_an_external_tool_url_6aebbd0d: "Εισαγωγή ή εύρεση URL Εξωτερικού Εργαλείου"
   enter_the_date_you_would_like_to_navigate_to_a712de47: "Εισαγάγετε την ημερομηνία στην οποία θα θέλατε να πλοηγηθείτε."
@@ -6480,6 +6500,7 @@ el:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "Δεν βρέθηκαν εργαλεία"
   external_tools_6e77821: "Εξωτερικά Εργαλεία"
+  external_url_4752767f: "Εξωτερικό URL"
   external_url_e9b87215: "Εξωτερικό Url"
   external_urls_62082a38: "Εξωτερικά URL"
   failed_307449e1: "Απέτυχε:"
@@ -7553,6 +7574,8 @@ el:
   increase_indent_6af90f7c: "Αύξηση Εσοχής Κειμένου"
   increase_indent_6d550a4a: "Αύξηση Εσοχής Κειμένου"
   incremental_update_successfully_generated_against__db3f3f06: "Η αυξητική ενημέρωση ολοκληρώθηκε επιτυχώς σε αντιπαραβολή με προηγούμενη Εισαγωγή προς το SIS."
+  indent_1_level_e7b18c1e: "Εσοχή Κειμένου Επίπεδο 1"
+  indentation_3c6081d5: "Προσθήκη εσοχής κειμένου"
   india_91_6c290107: "Ινδία (+91)"
   indigo_2035fc55: Λουλακί
   individual_2033c005: Μεμονωμένη
@@ -8003,6 +8026,7 @@ el:
   lock_date_cannot_be_after_section_end_d37da70c: "Η ημερομηνία κλειδώματος δεν μπορεί να είναι μετά το τέλος του τομέα"
   lock_date_cannot_be_after_term_end_cf1a188f: "Η ημερομηνία κλειδώματος δεν μπορεί να είναι μετά το τέλος του εξαμήνου"
   lock_date_cannot_be_before_due_date_ac30f54: "Η ημερομηνία κλειδώματος δεν μπορεί να είναι πριν την καταληκτική ημερομηνία"
+  lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "Κλείδωμα αυτής της ρύθμισης για δευτερεύοντες λογαριασμούς και μαθήματα"
   lock_until_549bb904: "Κλείδωμα Μέχρι"
   locked_762f138b: Κλειδωμένο
   locked_at_cda02889: "Κλειδώθηκε Στις"
@@ -12628,6 +12652,9 @@ el:
         attempt_number: "Προσπάθεια %{att_no}"
         kept: ΔΙΑΤΗΡΗΘΗΚΕ
         latest: "ΠΙΟ ΠΡΟΣΦΑΤΟ"
+        time: Χρόνος
+      submission_version_score: 
+        score: Βαθμολογία
       submission_versions: 
         attempt: Προσπάθεια
         attempt_history: "Ιστορικό Προσπαθειών"
@@ -12911,6 +12938,9 @@ el:
         three_chars: "Εισαγάγετε τουλάχιστον 3 γράμματα στο κουτάκι αναζήτησης."
         your_search: "Δεν βρέθηκαν αρχεία για την αναζήτησή σας - «%{search_term}»."
     files: Αρχεία
+    files_legacy_delete: 
+      one: "%{name} διαγράφηκε επιτυχώς."
+      other: "%{count} στοιχεία διαγράφηκαν επιτυχώς."
     folder_browsing_tree: "Δέντρο Προσπέλασης Φακέλου"
     folder_name: "Όνομα Φακέλου"
     modified_by: "Τροποποιήθηκε Από"
@@ -13321,6 +13351,7 @@ el:
   score_muted_82eef66: "<mrk mid=\"4347\" mtype=\"seg\">Βαθμολογία:</mrk> <mrk mid=\"4348\" mtype=\"seg\">(σε σίγαση)</mrk>"
   score_of_score_view_in_speedgrader_a7c1c954: "<mrk mid=\"1488\" mtype=\"seg\">Βαθμολογία %{score}.</mrk> <mrk mid=\"1489\" mtype=\"seg\">Προβολή στο SpeedGrader</mrk>"
   score_out_of_points_possible_88f370fd: "%{score} από %{points_possible}"
+  scored_at_least_score_e2272f6d: "Πέτυχε βαθμολογία τουλάχιστον %{score}"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -14511,6 +14542,7 @@ el:
       other: "%{count} Υπο-λογαριασμοί"
     titles: 
       sub_accounts: Υπο-λογαρισμοί
+  sub_accounts_e1b196a9: Υπο-λογαρισμοί
   sub_assignment: 
     atom_no_author: "Δεν υπάρχει Συγγραφέας"
     labels: 
@@ -14868,6 +14900,7 @@ el:
   text_document_eacbcdb7: "Έγγραφο κειμένου"
   text_entry_e1808b2f: "Καταχώριση Κειμένου"
   text_entry_submission_cannot_be_empty_3d187cae: "Η υποβολή καταχώρισης κειμένου δεν μπορεί να είναι κενή"
+  text_header_48fa9c37: "Επικεφαλίδα Κειμένου"
   text_input_d3480b8c: "Εισαγωγή κειμένου"
   text_sms_4e2d82a7: "Κείμενο (SMS)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "<mrk mid=\"3666\" mtype=\"seg\">Ο λογαριασμός αυτού του χρήστη έχει διαγραφεί.</mrk>  <mrk mid=\"3667\" mtype=\"seg\">Παρακαλώ επικοινωνήστε με τον διαχειριστή των υπολογιστικών συστημάτων σας για την επανενεργοποίηση του λογαριασμού σας.</mrk>"
@@ -15785,6 +15818,7 @@ el:
   view_next_file_a8a4a885: "Προβολή επόμενου αρχείου"
   view_notifications_6aea09a2: "Προβολή Ειδοποιήσεων"
   view_previous_file_b846db4f: "Προβολή προηγούμενου αρχείου"
+  view_progress_2d61dd4: "Εμφάνιση Προόδου"
   view_question_banks_188a9e0f: "Προβολή Τραπεζών Ερωτήσεων"
   view_registered_services_6c8cd301: "Προβολή Υπηρεσιών στις οποίες έχετε Εγγραφεί"
   view_rubric_d71cce10: "Εμφάνιση Ρουμπρίκας Αξιολόγισης"
@@ -15799,6 +15833,7 @@ el:
       unpublish: "Απενεργοποιήστε τη Δημοσίευση"
     context_modules: 
       publish: Δημοσίευση
+  visibility_f62e7f12: Ορατότητα
   visit_864b4060: Επίσκεψη
   visit_group_group_name_7a816081: "Επισκεφθείτε την ομάδα %{group_name}"
   waiting_for_attempted_login_6d00cb49: "Σε αναμονή για την προσπάθεια σύνδεσης"

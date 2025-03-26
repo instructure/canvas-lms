@@ -23,7 +23,7 @@
   completion_criteria ||= nil
   can_direct_share = can_do(@context, @current_user, :direct_share)
   criterion = completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
-  show_checkpoints = @context.root_account.feature_enabled?(:discussion_checkpoints) && module_item && module_item.content_type == 'DiscussionTopic' && module_item.content.checkpoints?
+  show_checkpoints = @context.discussion_checkpoints_enabled? && module_item && module_item.content_type == 'DiscussionTopic' && module_item.content.checkpoints?
   item_restrictions ||= nil
 
   @module_item_image_tags ||= {
@@ -445,7 +445,7 @@
       </div>
     <% end %>
   </div>
-  <% if @is_student && @context.root_account.feature_enabled?(:discussion_checkpoints) && module_item && module_item.content_type == 'DiscussionTopic' && module_item.content.checkpoints? %>
+  <% if @is_student && @context.discussion_checkpoints_enabled? && module_item && module_item.content_type == 'DiscussionTopic' && module_item.content.checkpoints? %>
     <div class="context_module_item indent_<%= module_item.try_rescue(:indent) || '0' %>">
       <% checkpoints = [module_item.content.reply_to_topic_checkpoint, module_item.content.reply_to_entry_checkpoint] %>
       <% checkpoints.each do |checkpoint| %>

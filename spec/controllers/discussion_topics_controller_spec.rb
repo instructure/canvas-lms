@@ -810,6 +810,17 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:current_page]).to eq(0)
       end
 
+      it "last and first entry of page are paginated" do
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.first.id + 19 }
+        expect(assigns[:js_env][:current_page]).to eq(0)
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.first.id + 20 }
+        expect(assigns[:js_env][:current_page]).to eq(1)
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.first.id + 39 }
+        expect(assigns[:js_env][:current_page]).to eq(1)
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.first.id + 40 }
+        expect(assigns[:js_env][:current_page]).to eq(2)
+      end
+
       it "top level entry are paginated when desc" do
         participant = @topic.participant(@student)
         participant.sort_order = DiscussionTopic::SortOrder::DESC
@@ -817,6 +828,20 @@ describe DiscussionTopicsController do
         get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.last.id }
         expect(assigns[:js_env][:current_page]).to eq(0)
         get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.first.id }
+        expect(assigns[:js_env][:current_page]).to eq(2)
+      end
+
+      it "last and first entry of page are paginated when desc" do
+        participant = @topic.participant(@student)
+        participant.sort_order = DiscussionTopic::SortOrder::DESC
+        participant.save!
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.last.id - 19 }
+        expect(assigns[:js_env][:current_page]).to eq(0)
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.last.id - 20 }
+        expect(assigns[:js_env][:current_page]).to eq(1)
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.last.id - 39 }
+        expect(assigns[:js_env][:current_page]).to eq(1)
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.last.id - 40 }
         expect(assigns[:js_env][:current_page]).to eq(2)
       end
 
@@ -1852,7 +1877,7 @@ describe DiscussionTopicsController do
 
     it "js_env DISCUSSION_CHECKPOINTS_ENABLED is set to true when creating a discussion and discussion checkpoints ff is on" do
       user_session(@teacher)
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       get :new, params: { course_id: @course.id }
       expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
     end
@@ -2079,7 +2104,7 @@ describe DiscussionTopicsController do
 
     it "js_env DISCUSSION_CHECKPOINTS_ENABLED is set to true when editing a discussion and discussion checkpoints ff is on" do
       user_session(@teacher)
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
     end

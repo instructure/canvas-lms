@@ -354,11 +354,11 @@ describe('ComposeModalContainer', () => {
     const button = component.getByTestId('send-button')
     fireEvent.click(button)
     expect(mockedSetOnFailure).toHaveBeenCalledWith(
-      'Please insert a message body., Please select a recipient.',
+      'Please insert a message, Please select a recipient',
       true,
     )
 
-    expect(component.findByText('Please select a recipient.')).toBeTruthy()
+    expect(component.findByText('Please select a recipient')).toBeTruthy()
 
     // Write something...
     fireEvent.change(component.getByTestId('compose-modal-header-address-book-input'), {

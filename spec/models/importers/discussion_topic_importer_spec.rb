@@ -117,7 +117,7 @@ describe Importers::DiscussionTopicImporter do
 
     context "when discussion_checkpoints feature is enabled" do
       before do
-        context.root_account.enable_feature!(:discussion_checkpoints)
+        context.account.enable_feature!(:discussion_checkpoints)
       end
 
       it "saves the sub assignments" do

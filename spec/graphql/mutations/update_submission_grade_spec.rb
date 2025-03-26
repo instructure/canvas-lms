@@ -105,7 +105,7 @@ RSpec.describe Mutations::UpdateSubmissionGrade do
   context "when submission is for a child assignment" do
     before(:once) do
       @parent_assignment = @course.assignments.create!(title: "Parent Assignment", has_sub_assignments: true)
-      @parent_assignment.root_account.enable_feature!(:discussion_checkpoints)
+      @parent_assignment.course.account.enable_feature!(:discussion_checkpoints)
 
       @reply_to_topic = SubAssignment.new(
         name: "Reply to Topic",

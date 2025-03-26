@@ -564,8 +564,6 @@ paths:
                     - has_expansion
                   workflow_state:
                     type: string
-                  vendor_help_link:
-                    nullable: true
                   account_navigation:
                     type: object
                     properties:
@@ -730,7 +728,6 @@ paths:
                 - privacy_level
                 - custom_fields
                 - workflow_state
-                - vendor_help_link
                 - account_navigation
                 - assignment_edit
                 - assignment_group_menu
@@ -800,8 +797,6 @@ paths:
                       nullable: true
                     workflow_state:
                       type: string
-                    vendor_help_link:
-                      nullable: true
                     account_navigation:
                       nullable: true
                     assignment_edit:
@@ -896,7 +891,6 @@ paths:
                   - privacy_level
                   - custom_fields
                   - workflow_state
-                  - vendor_help_link
                   - account_navigation
                   - assignment_edit
                   - assignment_group_menu
@@ -950,7 +944,6 @@ paths:
                 privacy_level: public
                 custom_fields:
                 workflow_state: public
-                vendor_help_link:
                 account_navigation:
                 assignment_edit:
                 assignment_group_menu:
@@ -1152,7 +1145,6 @@ paths:
                     nullable: true
                   workflow_state:
                     type: string
-                  vendor_help_link:
                     nullable: true
                   account_navigation:
                     nullable: true
@@ -1248,7 +1240,6 @@ paths:
                 - privacy_level
                 - custom_fields
                 - workflow_state
-                - vendor_help_link
                 - account_navigation
                 - assignment_edit
                 - assignment_group_menu
@@ -1302,7 +1293,6 @@ paths:
                 privacy_level: deleted
                 custom_fields:
                 workflow_state: deleted
-                vendor_help_link:
                 account_navigation:
                 assignment_edit:
                 assignment_group_menu:

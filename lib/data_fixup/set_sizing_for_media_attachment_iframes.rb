@@ -47,7 +47,7 @@ module DataFixup::SetSizingForMediaAttachmentIframes
   end
 
   def self.fix_html(html)
-    doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, { max_tree_depth: 10_000 })
+    doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
     doc.css("iframe").select do |e|
       next unless e.get_attribute("style")&.match?("width: px; height: px;") || e.get_attribute("style")&.match?("width:px; height:px;")
 

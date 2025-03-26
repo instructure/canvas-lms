@@ -16,18 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState, useCallback } from 'react'
-import { Modal } from '@instructure/ui-modal'
-import { Button, CloseButton } from '@instructure/ui-buttons'
-import { Heading } from '@instructure/ui-heading'
-import { Text } from '@instructure/ui-text'
-import { Flex } from '@instructure/ui-flex'
-import { useScope as createI18nScope } from '@canvas/i18n'
-import { type File, type Folder } from '../../../interfaces/File'
-import { isFile } from '../../../utils/fileFolderUtils'
-import { showFlashSuccess, showFlashError } from '@canvas/alerts/react/FlashAlert'
+import React, {useState, useCallback} from 'react'
+import {Modal} from '@instructure/ui-modal'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {type File, type Folder} from '../../../interfaces/File'
+import {isFile} from '../../../utils/fileFolderUtils'
+import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import getCookie from '@instructure/get-cookie'
-import { queryClient } from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import FileFolderInfo from '../shared/FileFolderInfo'
 
 const I18n = createI18nScope('files_v2')
@@ -38,7 +37,7 @@ interface DeleteModalProps {
   onClose: () => void
 }
 
-const DeleteModal = ({ open, items, onClose }: DeleteModalProps) => {
+const DeleteModal = ({open, items, onClose}: DeleteModalProps) => {
   const [isDeleting, setIsDeleting] = useState(false)
   const isMultiple = items.length > 1
 
@@ -54,7 +53,7 @@ const DeleteModal = ({ open, items, onClose }: DeleteModalProps) => {
               'Content-Type': 'application/json',
               'X-CSRF-Token': getCookie('_csrf_token'),
             },
-          }
+          },
         )
 
         if (!response.ok) {
@@ -66,12 +65,12 @@ const DeleteModal = ({ open, items, onClose }: DeleteModalProps) => {
       await Promise.all(deletePromises)
 
       const successMessage = isMultiple
-        ? I18n.t('%{count} items deleted successfully', { count: items.length })
-        : I18n.t('1 item deleted successfully')
+        ? I18n.t('%{count} items deleted successfully.', {count: items.length})
+        : I18n.t('1 item deleted successfully.')
 
       showFlashSuccess(successMessage)()
-      await queryClient.refetchQueries({ queryKey: ['files'], type: 'active' })
-    } catch (error) {
+      await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+    } catch (_error) {
       const errorMessage = I18n.t('Failed to delete items. Please try again.')
       showFlashError(errorMessage)
     } finally {
@@ -84,7 +83,12 @@ const DeleteModal = ({ open, items, onClose }: DeleteModalProps) => {
   }
 
   return (
-    <Modal open={open} onDismiss={onClose} onExited={() => setIsDeleting(false)} label={I18n.t('Delete Confirmation')}>
+    <Modal
+      open={open}
+      onDismiss={onClose}
+      onExited={() => setIsDeleting(false)}
+      label={I18n.t('Delete Confirmation')}
+    >
       <Modal.Header>
         <CloseButton
           placement="end"
@@ -106,7 +110,13 @@ const DeleteModal = ({ open, items, onClose }: DeleteModalProps) => {
         <Button onClick={onClose} disabled={isDeleting}>
           {I18n.t('Cancel')}
         </Button>
-        <Button data-testid="modal-delete-button" onClick={handleConfirmDelete} color="danger" margin="none none none small" disabled={isDeleting}>
+        <Button
+          data-testid="modal-delete-button"
+          onClick={handleConfirmDelete}
+          color="danger"
+          margin="none none none small"
+          disabled={isDeleting}
+        >
           {isDeleting ? I18n.t('Deleting...') : I18n.t('Delete')}
         </Button>
       </Modal.Footer>

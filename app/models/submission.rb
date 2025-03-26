@@ -1942,6 +1942,14 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def self.bulk_load_attachments_and_previews(submissions)
+    bulk_load_versioned_attachments(submissions)
+    attachments = submissions.flat_map(&:versioned_attachments)
+    ActiveRecord::Associations.preload(attachments,
+                                       [:canvadoc, :crocodoc_document])
+    Version.preload_version_number(submissions)
+  end
+
   # use this method to pre-load the versioned_originality_reports for a bunch of
   # submissions (avoids having O(N) originality report queries)
   # NOTE: all submissions must belong to the same shard
@@ -3214,7 +3222,7 @@ class Submission < ActiveRecord::Base
   end
 
   def checkpoint_submission?
-    assignment.present? && assignment.checkpoint? && !!root_account&.feature_enabled?(:discussion_checkpoints)
+    assignment.present? && assignment.checkpoint? && !!assignment.context.discussion_checkpoints_enabled?
   end
 
   def checkpoint_attributes_changed?

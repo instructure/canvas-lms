@@ -128,6 +128,7 @@ export const saveRubric = async (
     freeFormCriterionComments,
     accountId,
     courseId,
+    criteriaViaLlm,
     ratingOrder,
     buttonDisplay,
     workflowState,
@@ -147,27 +148,29 @@ export const saveRubric = async (
   }
   const method = id ? 'PATCH' : 'POST'
 
-  const criteria = rubric.criteria.map(criterion => {
-    return {
-      id: criterion.id,
-      description: criterion.description,
-      long_description: criterion.longDescription,
-      points: criterion.points,
-      outcome: {
-        display_name: criterion.outcome?.displayName,
-        title: criterion.outcome?.title,
-      },
-      learning_outcome_id: criterion.learningOutcomeId,
-      ignore_for_scoring: criterion.ignoreForScoring,
-      criterion_use_range: criterion.criterionUseRange,
-      ratings: criterion.ratings.map(rating => ({
-        description: rating.description,
-        long_description: rating.longDescription,
-        points: rating.points,
-        id: rating.id,
-      })),
-    }
-  })
+  const criteria = criteriaViaLlm
+    ? undefined
+    : rubric.criteria.map(criterion => {
+        return {
+          id: criterion.id,
+          description: criterion.description,
+          long_description: criterion.longDescription,
+          points: criterion.points,
+          outcome: {
+            display_name: criterion.outcome?.displayName,
+            title: criterion.outcome?.title,
+          },
+          learning_outcome_id: criterion.learningOutcomeId,
+          ignore_for_scoring: criterion.ignoreForScoring,
+          criterion_use_range: criterion.criterionUseRange,
+          ratings: criterion.ratings.map(rating => ({
+            description: rating.description,
+            long_description: rating.longDescription,
+            points: rating.points,
+            id: rating.id,
+          })),
+        }
+      })
 
   const response = await fetch(url, {
     method,
@@ -182,6 +185,7 @@ export const saveRubric = async (
         hide_points: hidePoints,
         free_form_criterion_comments: freeFormCriterionComments ? 1 : 0,
         criteria,
+        criteria_via_llm: criteriaViaLlm,
         button_display: buttonDisplay,
         rating_order: ratingOrder,
         workflow_state: workflowState,

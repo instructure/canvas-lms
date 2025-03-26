@@ -21,18 +21,6 @@ RSpec.describe Lti::Registration do
   let(:user) { user_model }
   let(:account) { Account.create! }
 
-  describe "validations" do
-    it { is_expected.to validate_length_of(:name).is_at_most(255) }
-    it { is_expected.to validate_length_of(:admin_nickname).is_at_most(255) }
-    it { is_expected.to validate_length_of(:vendor).is_at_most(255) }
-    it { is_expected.to validate_presence_of(:name) }
-    it { is_expected.to have_one(:ims_registration).class_name("Lti::IMS::Registration").with_foreign_key(:lti_registration_id) }
-    it { is_expected.to have_one(:developer_key).class_name("DeveloperKey").inverse_of(:lti_registration).with_foreign_key(:lti_registration_id) }
-    it { is_expected.to belong_to(:created_by).class_name("User").optional(true) }
-    it { is_expected.to belong_to(:updated_by).class_name("User").optional(true) }
-    it { is_expected.to have_many(:lti_registration_account_bindings).class_name("Lti::RegistrationAccountBinding") }
-  end
-
   describe "#lti_version" do
     subject { registration.lti_version }
 

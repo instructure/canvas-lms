@@ -82,7 +82,9 @@ class Mutations::UpdateAssignment < Mutations::AssignmentBase::Mutation
     if [:ok, :created].include? result
       { assignment: @working_assignment }
     else
-      { errors: @working_assignment.errors.entries }
+      { errors: @working_assignment.errors.entries.map do |error|
+        [error.attribute, error.message]
+      end }
     end
   end
 end

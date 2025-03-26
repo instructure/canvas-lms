@@ -52,7 +52,7 @@ describe('DirectShareSendToDialog', () => {
   let ariaLive
 
   beforeAll(async () => {
-    window.ENV = {COURSE_ID: '123'}
+    window.ENV = {COURSE_ID: '123', FEATURES: {validate_call_to_action: false}}
     ariaLive = document.createElement('div')
     ariaLive.id = 'flash_screenreader_holder'
     ariaLive.setAttribute('role', 'alert')

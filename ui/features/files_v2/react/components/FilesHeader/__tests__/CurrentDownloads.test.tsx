@@ -17,28 +17,29 @@
  */
 
 import React from 'react'
-import { render, screen, waitFor, act } from '@testing-library/react'
+import {render, screen, waitFor, act} from '@testing-library/react'
 import CurrentDownloads from '../CurrentDownloads'
-import { FileManagementContext } from '../../Contexts'
-import { showFlashError } from '@canvas/alerts/react/FlashAlert'
-import { performRequest } from '../../../../utils/downloadUtils'
+import {FileManagementProvider} from '../../Contexts'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {performRequest} from '../../../../utils/downloadUtils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: jest.fn(() => jest.fn()),
 }))
 
 jest.mock('../../../../utils/downloadUtils', () => ({
-  addDownloadListener: jest.fn((fn) => window.addEventListener('download_utils_event', fn)),
-  removeDownloadListener: jest.fn((fn) => window.removeEventListener('download_utils_event', fn)),
+  addDownloadListener: jest.fn(fn => window.addEventListener('download_utils_event', fn)),
+  removeDownloadListener: jest.fn(fn => window.removeEventListener('download_utils_event', fn)),
   performRequest: jest.fn(),
   downloadFile: jest.fn(),
 }))
 
 const renderComponent = () => {
   return render(
-    <FileManagementContext.Provider value={{ contextId: '1', contextType: 'course', folderId: '0', showingAllContexts: false }}>
+    <FileManagementProvider value={createMockFileManagementContext()}>
       <CurrentDownloads rows={[]} />
-    </FileManagementContext.Provider>
+    </FileManagementProvider>,
   )
 }
 
@@ -54,12 +55,11 @@ describe('CurrentDownloads', () => {
 
   it('does not render when downloading just one file', async () => {
     renderComponent()
-
     ;(performRequest as jest.Mock).mockReturnValue(false)
 
     act(() => {
       window.dispatchEvent(
-        new CustomEvent('download_utils_event', { detail: { items: new Set(['file']) } })
+        new CustomEvent('download_utils_event', {detail: {items: new Set(['file'])}}),
       )
     })
 
@@ -71,12 +71,11 @@ describe('CurrentDownloads', () => {
 
   it('shows flash error if download already in progress', async () => {
     renderComponent()
-
     ;(performRequest as jest.Mock).mockReturnValue(true)
 
     act(() => {
       window.dispatchEvent(
-        new CustomEvent('download_utils_event', { detail: { items: new Set(['1']) } })
+        new CustomEvent('download_utils_event', {detail: {items: new Set(['1'])}}),
       )
     })
 
@@ -86,7 +85,7 @@ describe('CurrentDownloads', () => {
 
     act(() => {
       window.dispatchEvent(
-        new CustomEvent('download_utils_event', { detail: { items: new Set(['2', 'file2']) } })
+        new CustomEvent('download_utils_event', {detail: {items: new Set(['2', 'file2'])}}),
       )
     })
 
@@ -95,19 +94,18 @@ describe('CurrentDownloads', () => {
 
   it('calls performRequest with correct parameters', async () => {
     renderComponent()
-
     ;(performRequest as jest.Mock).mockReturnValue(true)
 
     act(() => {
       window.dispatchEvent(
-        new CustomEvent('download_utils_event', { detail: { items: new Set(['1']) } })
+        new CustomEvent('download_utils_event', {detail: {items: new Set(['1'])}}),
       )
     })
 
     await waitFor(() => {
       expect(performRequest).toHaveBeenCalledWith({
         contextType: 'courses',
-        contextId: '1',
+        contextId: '2',
         items: new Set(['1']),
         rows: [],
         onProgress: expect.any(Function),

@@ -372,4 +372,16 @@ describe "CanvasHttp" do
       expect { CanvasHttp.validate_url("http://example.com/whät", allowed_schemes: ["https"]) }.to raise_error(ArgumentError)
     end
   end
+
+  describe "::ALL_HTTP_ERRORS" do
+    it "comprises all the HTTP network errors and 'CanvasHttp::Error's" do
+      expect(CanvasHttp::ALL_HTTP_ERRORS).to match_array([
+                                                           CanvasHttp::Error,
+                                                           Timeout::Error,
+                                                           SocketError,
+                                                           SystemCallError,
+                                                           OpenSSL::SSL::SSLError
+                                                         ])
+    end
+  end
 end

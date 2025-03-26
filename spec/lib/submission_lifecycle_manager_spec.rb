@@ -106,7 +106,7 @@ describe SubmissionLifecycleManager do
 
     context "discussion_checkpoints" do
       before do
-        Account.site_admin.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
         @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: topic,

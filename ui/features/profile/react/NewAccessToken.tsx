@@ -47,20 +47,21 @@ const defaultValues = {
 
 export const PURPOSE_MAX_LENGTH = 255
 
-const validationSchema = z.object({
-  purpose: z
-    .string()
-    .min(1, I18n.t('Purpose is required.'))
-    .max(
-      PURPOSE_MAX_LENGTH,
-      I18n.t('Exceeded the maximum length (%{purposeMaxLength} characters).', {
-        purposeMaxLength: PURPOSE_MAX_LENGTH,
-      }),
-    ),
-  expires_at: z.string().optional(),
-})
+const createValidationSchema = () =>
+  z.object({
+    purpose: z
+      .string()
+      .min(1, I18n.t('Purpose is required.'))
+      .max(
+        PURPOSE_MAX_LENGTH,
+        I18n.t('Exceeded the maximum length (%{purposeMaxLength} characters).', {
+          purposeMaxLength: PURPOSE_MAX_LENGTH,
+        }),
+      ),
+    expires_at: z.string().optional(),
+  })
 
-type FormValues = z.infer<typeof validationSchema>
+type FormValues = z.infer<ReturnType<typeof createValidationSchema>>
 
 interface NewAccessTokenProps {
   onSubmit: (token: Token) => void
@@ -75,7 +76,7 @@ const NewAccessToken = ({onSubmit, onClose}: NewAccessTokenProps) => {
     setFocus,
   } = useForm({
     defaultValues,
-    resolver: zodResolver(validationSchema),
+    resolver: zodResolver(createValidationSchema()),
   })
   const expiresAtInputRef = useRef<DateTimeInput>(null)
   const title = I18n.t('New Access Token')

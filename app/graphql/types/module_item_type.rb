@@ -63,6 +63,9 @@ module Types
       )
     end
 
+    field :indent, Integer, null: true
+    delegate :indent, to: :object
+
     field :next, Types::ModuleItemType, null: true, resolver_method: :next_resolver
     def next_resolver
       Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
@@ -134,6 +137,13 @@ module Types
         content_tag
       else
         Loaders::AssociationLoader.for(ContentTag, :content).load(content_tag)
+      end
+    end
+
+    field :estimated_duration, GraphQL::Types::ISO8601Duration, null: true
+    def estimated_duration
+      Loaders::AssociationLoader.for(ContentTag, :estimated_duration).load(content_tag).then do |estimated_duration|
+        estimated_duration&.duration&.iso8601
       end
     end
   end

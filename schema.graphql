@@ -3,8 +3,6 @@ type Account implements LegacyIDInterface & Node {
   legacy canvas id
   """
   _id: ID!
-  accountDomainLookups: [AccountDomainLookup!]
-  accountDomains: [AccountDomain!]
   coursesConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -178,28 +176,6 @@ type AccountConnection {
   Information to aid in pagination.
   """
   pageInfo: PageInfo!
-}
-
-type AccountDomain implements LegacyIDInterface & Timestamped {
-  """
-  legacy canvas id
-  """
-  _id: ID!
-  createdAt: DateTime
-  host: String!
-  updatedAt: DateTime
-}
-
-type AccountDomainLookup implements LegacyIDInterface & Timestamped {
-  """
-  legacy canvas id
-  """
-  _id: ID!
-  accountDomain: AccountDomain
-  authenticationProvider: String
-  createdAt: DateTime
-  name: String
-  updatedAt: DateTime
 }
 
 """
@@ -587,8 +563,10 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   submissionsDownloads: Int
   supportsGradeByQuestion: Boolean!
   timeZoneEdited: String
+  title: String
   totalGradedSubmissions: Int
   totalSubmissions: Int
+  type: String
 
   """
   the unlock date (assignment is unlocked after this date)
@@ -673,6 +651,11 @@ input AssignmentFilter {
   (irrespective of the assignment's grading period)
   """
   gradingPeriodId: ID
+
+  """
+  only return assignments whose title matches this search term
+  """
+  searchTerm: String
 
   """
   only return assignments for the given user. Defaults to
@@ -1501,7 +1484,7 @@ type ConversationParticipantEdge {
   node: ConversationParticipant
 }
 
-type Course implements AssetString & AssignmentsConnectionInterface & LegacyIDInterface & Node & Timestamped {
+type Course implements AssetString & AssignmentsConnectionInterface & DiscussionsConnectionInterface & FilesConnectionInterface & LegacyIDInterface & Node & PagesConnectionInterface & QuizzesConnectionInterface & Timestamped {
   """
   legacy canvas id
   """
@@ -1644,6 +1627,32 @@ type Course implements AssetString & AssignmentsConnectionInterface & LegacyIDIn
   returns dashboard card information for this course
   """
   dashboardCard: CourseDashboardCard
+
+  """
+  returns a list of discussions.
+  """
+  discussionsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: DiscussionFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): DiscussionConnection
   enrollmentsConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -1688,6 +1697,32 @@ type Course implements AssetString & AssignmentsConnectionInterface & LegacyIDIn
     """
     last: Int
   ): ExternalToolConnection
+
+  """
+  returns a list of files.
+  """
+  filesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: FileFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): FileConnection
   gradeStatuses: [CourseGradeStatus!]!
   gradingPeriodsConnection(
     """
@@ -1799,6 +1834,32 @@ type Course implements AssetString & AssignmentsConnectionInterface & LegacyIDIn
   outcomeProficiency: OutcomeProficiency
 
   """
+  returns a list of wiki pages.
+  """
+  pagesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: PageFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): PageConnection
+
+  """
   returns permission information for the current user in this course
   """
   permissions: CoursePermissions
@@ -1807,6 +1868,32 @@ type Course implements AssetString & AssignmentsConnectionInterface & LegacyIDIn
   A course-specific post policy
   """
   postPolicy: PostPolicy
+
+  """
+  returns a list of quizzes.
+  """
+  quizzesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: QuizFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): QuizConnection
   relevantGradingPeriodGroup: GradingPeriodGroup
   rootOutcomeGroup: LearningOutcomeGroup!
   rubricsConnection(
@@ -2118,23 +2205,6 @@ enum CourseWorkflowState {
   completed
   created
   deleted
-}
-
-"""
-Autogenerated input type of CreateAccountDomainLookup
-"""
-input CreateAccountDomainLookupInput {
-  accountDomainId: ID!
-  authenticationProvider: String
-  name: String!
-}
-
-"""
-Autogenerated return type of CreateAccountDomainLookup.
-"""
-type CreateAccountDomainLookupPayload {
-  accountDomainLookup: AccountDomainLookup
-  errors: [ValidationError!]
 }
 
 """
@@ -2617,21 +2687,6 @@ input DateTimeRange {
 }
 
 """
-Autogenerated input type of DeleteAccountDomainLookup
-"""
-input DeleteAccountDomainLookupInput {
-  id: ID!
-}
-
-"""
-Autogenerated return type of DeleteAccountDomainLookup.
-"""
-type DeleteAccountDomainLookupPayload {
-  accountDomainLookupId: ID
-  errors: [ValidationError!]
-}
-
-"""
 Autogenerated input type of DeleteCommentBankItem
 """
 input DeleteCommentBankItemInput {
@@ -2965,6 +3020,7 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
   permissions: DiscussionPermissions
   podcastEnabled: Boolean
   podcastHasStudentPosts: Boolean
+  pointsPossible: Float
   position: Int
   postedAt: DateTime
   published: Boolean!
@@ -2980,6 +3036,7 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
   subscriptionDisabledForUser: Boolean
   title: String
   todoDate: ISO8601DateTime
+  type: String
   ungradedDiscussionOverrides(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -3040,6 +3097,41 @@ input DiscussionCheckpoints {
   dates: [DiscussionCheckpointDate!]!
   pointsPossible: Float!
   repliesRequired: Int
+}
+
+"""
+The connection type for Discussion.
+"""
+type DiscussionConnection {
+  """
+  A list of edges.
+  """
+  edges: [DiscussionEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [Discussion]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type DiscussionEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: Discussion
 }
 
 type DiscussionEntry implements LegacyIDInterface & Node & Timestamped {
@@ -3119,7 +3211,7 @@ type DiscussionEntry implements LegacyIDInterface & Node & Timestamped {
   reportTypeCounts: DiscussionEntryReportTypeCounts
   rootEntry: DiscussionEntry
   rootEntryId: ID
-  rootEntryPageNumber(perPage: Int, sortOrder: DiscussionSortOrderType): Int
+  rootEntryPageNumber(perPage: Int): Int
   rootEntryParticipantCounts: DiscussionEntryCounts
   subentriesCount: Int
   updatedAt: DateTime
@@ -3247,6 +3339,19 @@ type DiscussionEntryVersion implements LegacyIDInterface & Timestamped {
   version: Int!
 }
 
+input DiscussionFilter {
+  """
+  only return discussions whose title matches this search term
+  """
+  searchTerm: String
+
+  """
+  only return discussions for the given user. Defaults to
+  the current user.
+  """
+  userId: ID
+}
+
 """
 Search types that can be associated with discussions
 """
@@ -3319,6 +3424,34 @@ enum DiscussionTopicDiscussionType {
   not_threaded
   side_comment
   threaded
+}
+
+interface DiscussionsConnectionInterface {
+  """
+  returns a list of discussions.
+  """
+  discussionsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: DiscussionFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): DiscussionConnection
 }
 
 """
@@ -3439,12 +3572,25 @@ type ExternalTool implements LegacyIDInterface & ModuleItemInterface & Timestamp
   legacy canvas id
   """
   _id: ID!
+
+  """
+  Whether the module item can be unpublished
+  """
+  canUnpublish: Boolean
   createdAt: DateTime
   description: String
   modules: [Module!]
   name: String
+  pointsPossible: Float
+
+  """
+  Whether the module item is published
+  """
+  published: Boolean
   settings: ExternalToolSettings
   state: ExternalToolState
+  title: String
+  type: String
   updatedAt: DateTime
   url: URL
 }
@@ -3527,9 +3673,21 @@ type ExternalUrl implements LegacyIDInterface & ModuleItemInterface & Timestampe
   legacy canvas id
   """
   _id: ID!
+
+  """
+  Whether the module item can be unpublished
+  """
+  canUnpublish: Boolean
   createdAt: DateTime
   modules: [Module!]
+  pointsPossible: Float
+
+  """
+  Whether the module item is published
+  """
+  published: Boolean
   title: String
+  type: String
   updatedAt: DateTime
   url: String
 }
@@ -3539,15 +3697,28 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   legacy canvas id
   """
   _id: ID!
+
+  """
+  Whether the module item can be unpublished
+  """
+  canUnpublish: Boolean
   contentType: String
   createdAt: DateTime
   displayName: String
   id: ID!
   mimeClass: String
   modules: [Module!]
+  pointsPossible: Float
+
+  """
+  Whether the module item is published
+  """
+  published: Boolean
   size: String
   submissionPreviewUrl(submissionId: ID): URL
   thumbnailUrl: URL
+  title: String
+  type: String
   updatedAt: DateTime
   url: URL
   usageRights: UsageRights
@@ -3587,6 +3758,47 @@ type FileEdge {
   The item at the end of the edge.
   """
   node: File
+}
+
+input FileFilter {
+  """
+  only return files whose name matches this search term
+  """
+  searchTerm: String
+
+  """
+  only return files for the given user. Defaults to
+  the current user.
+  """
+  userId: ID
+}
+
+interface FilesConnectionInterface {
+  """
+  returns a list of files.
+  """
+  filesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: FileFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): FileConnection
 }
 
 enum GradeState {
@@ -4586,8 +4798,21 @@ type ModuleExternalTool implements LegacyIDInterface & ModuleItemInterface & Tim
   legacy canvas id
   """
   _id: ID!
+
+  """
+  Whether the module item can be unpublished
+  """
+  canUnpublish: Boolean
   createdAt: DateTime
   modules: [Module!]
+  pointsPossible: Float
+
+  """
+  Whether the module item is published
+  """
+  published: Boolean
+  title: String
+  type: String
   updatedAt: DateTime
   url: String
 }
@@ -4600,6 +4825,7 @@ type ModuleItem implements LegacyIDInterface & Node & Timestamped {
   content: ModuleItemInterface
   createdAt: DateTime
   id: ID!
+  indent: Int
   module: Module
   next: ModuleItem
 
@@ -4696,7 +4922,19 @@ type ModuleItemEdge {
 An item that can be in context modules
 """
 interface ModuleItemInterface {
+  """
+  Whether the module item can be unpublished
+  """
+  canUnpublish: Boolean
   modules: [Module!]
+  pointsPossible: Float
+
+  """
+  Whether the module item is published
+  """
+  published: Boolean
+  title: String
+  type: String
 }
 
 type ModuleProgression {
@@ -4796,12 +5034,6 @@ type Mutation {
     """
     input: AddConversationMessageInput!
   ): AddConversationMessagePayload
-  createAccountDomainLookup(
-    """
-    Parameters for CreateAccountDomainLookup
-    """
-    input: CreateAccountDomainLookupInput!
-  ): CreateAccountDomainLookupPayload
   createAssignment(
     """
     Parameters for CreateAssignment
@@ -4914,12 +5146,6 @@ type Mutation {
     """
     input: CreateUserInboxLabelInput!
   ): CreateUserInboxLabelPayload
-  deleteAccountDomainLookup(
-    """
-    Parameters for DeleteAccountDomainLookup
-    """
-    input: DeleteAccountDomainLookupInput!
-  ): DeleteAccountDomainLookupPayload
   deleteCommentBankItem(
     """
     Parameters for DeleteCommentBankItem
@@ -5108,12 +5334,6 @@ type Mutation {
     """
     input: SubscribeToDiscussionTopicInput!
   ): SubscribeToDiscussionTopicPayload
-  updateAccountDomainLookup(
-    """
-    Parameters for UpdateAccountDomainLookup
-    """
-    input: UpdateAccountDomainLookupInput!
-  ): UpdateAccountDomainLookupPayload
   updateAssignment(
     """
     Parameters for UpdateAssignment
@@ -5593,11 +5813,71 @@ type Page implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   legacy canvas id
   """
   _id: ID!
+
+  """
+  Whether the module item can be unpublished
+  """
+  canUnpublish: Boolean
   createdAt: DateTime
   id: ID!
   modules: [Module!]
+  pointsPossible: Float
+
+  """
+  Whether the module item is published
+  """
+  published: Boolean
   title: String
+  type: String
   updatedAt: DateTime
+}
+
+"""
+The connection type for Page.
+"""
+type PageConnection {
+  """
+  A list of edges.
+  """
+  edges: [PageEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [Page]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type PageEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: Page
+}
+
+input PageFilter {
+  """
+  only return pages whose title matches this search term
+  """
+  searchTerm: String
+
+  """
+  only return pages for the given user. Defaults to
+  the current user.
+  """
+  userId: ID
 }
 
 """
@@ -5640,6 +5920,34 @@ type PageViewAnalysis {
   The number of views/participations this student has
   """
   total: Int
+}
+
+interface PagesConnectionInterface {
+  """
+  returns a list of wiki pages.
+  """
+  pagesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: PageFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): PageConnection
 }
 
 """
@@ -6068,15 +6376,98 @@ type Quiz implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   legacy canvas id
   """
   _id: ID!
+
+  """
+  Whether the module item can be unpublished
+  """
+  canUnpublish: Boolean
   createdAt: DateTime
   id: ID!
   modules: [Module!]
+  pointsPossible: Float
+
+  """
+  Whether the module item is published
+  """
+  published: Boolean
+  title: String
+  type: String
   updatedAt: DateTime
+}
+
+"""
+The connection type for Quiz.
+"""
+type QuizConnection {
+  """
+  A list of edges.
+  """
+  edges: [QuizEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [Quiz]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type QuizEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: Quiz
+}
+
+input QuizFilter {
+  """
+  only return quizzes whose title matches this search term
+  """
+  searchTerm: String
 }
 
 type QuizItem {
   _id: ID!
   title: String!
+}
+
+interface QuizzesConnectionInterface {
+  """
+  returns a list of quizzes.
+  """
+  quizzesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: QuizFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): QuizConnection
 }
 
 enum RatingInputType {
@@ -6650,8 +7041,19 @@ type SubAssignmentSubmission {
 }
 
 type SubHeader implements ModuleItemInterface {
+  """
+  Whether the module item can be unpublished
+  """
+  canUnpublish: Boolean
   modules: [Module!]
+  pointsPossible: Float
+
+  """
+  Whether the module item is published
+  """
+  published: Boolean
   title: String
+  type: String
 }
 
 type Submission implements LegacyIDInterface & Node & SubmissionInterface & Timestamped {
@@ -7549,24 +7951,6 @@ type TurnitinData {
 scalar URL
 
 """
-Autogenerated input type of UpdateAccountDomainLookup
-"""
-input UpdateAccountDomainLookupInput {
-  accountDomainId: ID
-  accountDomainLookupId: ID!
-  authenticationProvider: String
-  name: String
-}
-
-"""
-Autogenerated return type of UpdateAccountDomainLookup.
-"""
-type UpdateAccountDomainLookupPayload {
-  accountDomainLookup: AccountDomainLookup
-  errors: [ValidationError!]
-}
-
-"""
 Autogenerated input type of UpdateAssignment
 """
 input UpdateAssignmentInput {
@@ -8229,7 +8613,7 @@ type User implements LegacyIDInterface & Node & Timestamped {
     excludeConcluded: Boolean
 
     """
-    Whether or not to include or exclude Horizon courses
+    Whether or not to include or exclude Canvas Career courses
     """
     horizonCourses: Boolean
 

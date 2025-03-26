@@ -361,6 +361,7 @@ $(() => {
         contextAssetString={ENV.context_asset_string}
         courseId={ENV.COURSE_ID}
         rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
+        aiRubricsEnabled={ENV.ai_rubrics_enabled}
       />,
     )
   }

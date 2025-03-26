@@ -87,6 +87,27 @@ const enrollmentsByCourse = [
   },
 ]
 
+const enrollmentsByCoursePage2 = [
+  {
+    id: '2',
+    name: 'Battle Axe Lessons',
+    workflow_state: 'available',
+    account_id: '1',
+    enrollments: [
+      {
+        role_id: '92',
+      },
+    ],
+    sections: [
+      {
+        id: '2',
+        name: 'Section 2',
+        enrollment_role: 'TeacherEnrollment',
+      },
+    ],
+  },
+]
+
 const additionalRecipient = {
   email: 'ross@email.com',
   id: '6',
@@ -130,6 +151,10 @@ const props: Props = {
 
 const ENROLLMENTS_URI = encodeURI(
   `/api/v1/users/${props.user.id}/courses?enrollment_state=active&include[]=sections&include[]=term&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCourse[0].account_id}`,
+)
+
+const ENROLLMENTS_URI_PAGE_2 = encodeURI(
+  `/api/v1/users/${props.user.id}/courses?enrollment_state=active&include[]=sections&include[]=term&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCoursePage2[0].account_id}&page=2`,
 )
 
 function formatDateToLocalString(utcDateStr: string) {
@@ -423,12 +448,42 @@ describe('TempEnrollAssign', () => {
       fetchMock.get(ENROLLMENTS_URI, 500)
     })
 
+    afterEach(() => {
+      fetchMock.reset()
+    })
+
     it('shows error for failed enrollments fetch', async () => {
       const {findAllByText} = render(<TempEnrollAssign {...props} />)
       const errorMessage = await findAllByText(
         /There was an error while requesting user enrollments, please try again/i,
       )
       expect(errorMessage).toBeTruthy()
+    })
+  })
+
+  describe('pagination', () => {
+    beforeEach(() => {
+      fetchMock.get(ENROLLMENTS_URI, {
+        status: 200,
+        headers: {
+          Link: `<${ENROLLMENTS_URI_PAGE_2}>; rel="next"`,
+        },
+        body: enrollmentsByCourse
+      })
+      fetchMock.get(ENROLLMENTS_URI_PAGE_2, {
+        status: 200,
+        body: enrollmentsByCoursePage2
+      })
+    })
+
+    afterEach(() => {
+      fetchMock.reset()
+    })
+
+    it('aggregates results from multiple pages', async () => {
+      const {findByText} = render(<TempEnrollAssign {...props} />)
+      expect(await findByText('Apple Music - Section 1')).toBeInTheDocument()
+      expect(await findByText('Battle Axe Lessons - Section 2')).toBeInTheDocument()
     })
   })
 })

@@ -335,7 +335,7 @@ module SIS
                   p_data = SisBatchRollBackData.build_data(sis_batch: @batch, context: pseudo)
                   @roll_back_data << p_data if p_data
                 elsif !pseudo.errors.empty?
-                  message = generate_user_warning(pseudo.errors.first.join(" "), user_row.user_id, user_row.login_id)
+                  message = generate_user_warning(pseudo.errors.first.full_message, user_row.user_id, user_row.login_id)
                   raise ImportError, message
                 end
               end
@@ -578,7 +578,7 @@ module SIS
       end
 
       ERRORS_TO_REASONS = {
-        "unique_id is invalid" => "Invalid login_id: '%{login_id}'",
+        "Unique ID is invalid" => "Invalid login_id: '%{login_id}'",
       }.freeze
       DEFAULT_REASON = "Unknown reason: %{message}"
       private_constant :ERRORS_TO_REASONS, :DEFAULT_REASON

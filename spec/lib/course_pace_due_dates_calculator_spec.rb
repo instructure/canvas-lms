@@ -159,6 +159,24 @@ describe CoursePaceDueDatesCalculator do
           { @course_pace_module_item.id => Date.parse("2021-09-09") }
         )
       end
+
+      it "correctly calculates due dates when the enrollment start date is just after midnight UTC" do
+        @course.update! time_zone: "Mountain Time (US & Canada)"
+        Time.use_zone(@course.time_zone) do
+          enrollment = Enrollment.new(start_at: Time.parse("2025-03-08 00:10:00 UTC"))
+
+          @course_pace_module_item.update duration: 5
+
+          @course_pace.update exclude_weekends: true
+          @course_pace.reload
+
+          expected_due_date = Date.parse("2025-03-14")
+
+          expect(@calculator.get_due_dates(@course_pace_module_items, enrollment)).to eq(
+            { @course_pace_module_item.id => expected_due_date }
+          )
+        end
+      end
     end
   end
 end

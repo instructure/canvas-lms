@@ -1012,18 +1012,6 @@ I18n.backend.class.prepend(I18nStubs)
 
 Rails.root.glob("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb") { |file| require file }
 
-Shoulda::Matchers.configure do |config|
-  config.integrate do |with|
-    with.test_framework :rspec
-    with.library :active_record
-    with.library :active_model
-    # Disable the action_controller matchers until shoulda-matchers supports new compound matchers
-    # with.library :action_controller
-    # Or, choose the following (which implies all of the above):
-    # with.library :rails
-  end
-end
-
 module DeveloperKeyStubs
   @@original_get_special_key = DeveloperKey.method(:get_special_key)
 

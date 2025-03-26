@@ -64,13 +64,6 @@ describe TranslationController do
       end
     end
 
-    it "logs the metric" do
-      post :translate, params: { course_id: @course.id, inputs: params }
-
-      expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("translation.discussions")
-    end
-
     it "responds with translated message" do
       post :translate, params: { course_id: @course.id, inputs: params }
 
@@ -91,13 +84,6 @@ describe TranslationController do
 
         expect(response).to have_http_status(:unauthorized)
       end
-    end
-
-    it "logs the metric" do
-      post :translate_paragraph, params: { course_id: @course.id, inputs: params }
-
-      expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("translation.inbox_compose")
     end
 
     it "responds with translated message" do

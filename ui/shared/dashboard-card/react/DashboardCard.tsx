@@ -100,6 +100,7 @@ export type DashboardCardProps = {
   pagesUrl?: string
   frontPageTitle?: string
   onPublishedCourse?: (id: string) => void
+  headingLevel?: string
 }
 
 export const DashboardCard = ({
@@ -131,6 +132,7 @@ export const DashboardCard = ({
   pagesUrl,
   frontPageTitle,
   onPublishedCourse = () => {},
+  headingLevel = 'h3',
 }: DashboardCardProps) => {
   // @ts-expect-error
   const handleNicknameChange = nickname => setNicknameInfo(getNicknameInfo(nickname))
@@ -304,6 +306,8 @@ export const DashboardCard = ({
     )
   }
 
+  const CardHeading = headingLevel as keyof JSX.IntrinsicElements;
+
   const dashboardCard = (
     <div
       className="ic-DashboardCard"
@@ -327,13 +331,13 @@ export const DashboardCard = ({
         />
         <a href={href} className="ic-DashboardCard__link">
           <div className="ic-DashboardCard__header_content">
-            <h3
+            <CardHeading
               className="ic-DashboardCard__header-title ellipsis"
               title={originalName}
               data-testid="dashboard-card-title"
             >
               <span style={{color: backgroundColor}}>{nicknameInfo.nickname}</span>
-            </h3>
+            </CardHeading>
             <div className="ic-DashboardCard__header-subtitle ellipsis" title={courseCode}>
               {courseCode}
             </div>

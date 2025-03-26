@@ -33,7 +33,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   private
 
   def validate_flag_enabled
-    unless @discussion_topic.context.root_account.feature_enabled?(:discussion_checkpoints)
+    unless @discussion_topic.context.discussion_checkpoints_enabled?
       raise Checkpoints::FlagDisabledError, "discussion_checkpoints feature flag must be enabled"
     end
   end

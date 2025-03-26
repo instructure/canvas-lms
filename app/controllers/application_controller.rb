@@ -360,6 +360,7 @@ class ApplicationController < ActionController::Base
     account_level_blackout_dates
     render_both_to_do_lists
     commons_new_quizzes
+    consolidated_media_player
     course_paces_redesign
     course_paces_for_students
     explicit_latex_typesetting
@@ -376,6 +377,7 @@ class ApplicationController < ActionController::Base
     discussion_checkpoints
     discussion_default_sort
     discussion_default_expand
+    discussion_permalink
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
     horizon_course_setting
@@ -390,6 +392,7 @@ class ApplicationController < ActionController::Base
     lti_deep_linking_module_index_menu_modal
     lti_registrations_next
     lti_registrations_page
+    lti_registrations_usage_data
     lti_asset_processor
     buttons_and_icons_root_account
     extended_submission_state
@@ -416,14 +419,13 @@ class ApplicationController < ActionController::Base
     course_pace_pacing_with_mastery_paths
     course_pace_weighted_assignments
     modules_requirements_allow_percentage
-    discussion_checkpoints
     course_pace_allow_bulk_pace_assign
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
     embedded_release_notes
-    consolidated_media_player
     discussions_speedgrader_revisit
+    discussion_checkpoints
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest(
     [
@@ -1492,7 +1494,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get_upcoming_assignments(course)
-    include_discussion_checkpoints = course.root_account.feature_enabled?(:discussion_checkpoints)
+    include_discussion_checkpoints = course.discussion_checkpoints_enabled?
     visible_assignments = AssignmentGroup.visible_assignments(
       @current_user,
       course,
@@ -2053,9 +2055,7 @@ class ApplicationController < ActionController::Base
   def api_error_json(exception, status_code)
     case exception
     when ActiveRecord::RecordInvalid
-      errors = exception.record.errors
-      errors.set_reporter(:hash, Api::Errors::Reporter)
-      data = errors.to_hash
+      data = Api::Errors::Reporter.to_hash(exception.record.errors)
     when ActiveRecord::RecordNotFound
       data = { errors: [{ message: "The specified resource does not exist." }] }
     when AuthenticationMethods::RevokedAccessTokenError
@@ -3057,12 +3057,18 @@ class ApplicationController < ActionController::Base
 
     current_user_has_been_observer_in_this_course = @context.user_has_been_observer?(@current_user)
 
+    # as of the time of this writing, there are only 2 places where set_js_assignment_data is called:
+    # 1. assignments_controller (context of this will be Course)
+    # 2. courses_controller (context of this will be Account)
+    # discussion_checkpoints_enabled? works for either context
+    account_has_discussion_checkpoints_enabled = @context.discussion_checkpoints_enabled?
+
     prefetch_xhr(api_v1_course_assignment_groups_url(
                    @context,
                    include: [
                      "assignments",
                      "discussion_topic",
-                     @domain_root_account.feature_enabled?(:discussion_checkpoints) && "checkpoints",
+                     account_has_discussion_checkpoints_enabled && "checkpoints",
                      (permissions[:manage] || current_user_has_been_observer_in_this_course) && "all_dates",
                      permissions[:manage] && "module_ids",
                      peer_reviews_for_a2_enabled? && "assessment_requests"
@@ -3097,7 +3103,7 @@ class ApplicationController < ActionController::Base
              current_user_has_been_observer_in_this_course:,
              observed_student_ids: ObserverEnrollment.observed_student_ids(@context, @current_user),
              apply_assignment_group_weights: @context.apply_group_weights?,
-             DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
+             DISCUSSION_CHECKPOINTS_ENABLED: account_has_discussion_checkpoints_enabled
            })
 
     conditional_release_js_env(includes: :active_rules)
@@ -3121,7 +3127,7 @@ class ApplicationController < ActionController::Base
                              }
                            end,
              DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
-             DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
+             DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
            })
     js_env(active_grading_periods: GradingPeriod.json_for(@context, @current_user)) if @context.grading_periods?
   end
@@ -3294,6 +3300,11 @@ class ApplicationController < ActionController::Base
       %r{^/courses/\d+(/assignments|/quizzes|/modules|.?)$}.match?(request.path)
   end
   helper_method :should_show_migration_limitation_message
+
+  def show_migration_text_no_question_warning?
+    !Account.site_admin.feature_enabled?(:hide_quiz_migration_text_no_question_warning)
+  end
+  helper_method :show_migration_text_no_question_warning?
 
   def k5_disabled?
     K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).k5_disabled?

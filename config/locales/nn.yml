@@ -2289,6 +2289,8 @@ nn:
   add_help_menu_links_de9fc34f: "Legg til hjelpemeny-lenker"
   add_hostname_as_an_allowed_domain_1f58c38d: "Legg til %{hostname} som eit tillate domene"
   add_icon_567dbcaa: "legg til ikon"
+  add_item_75b67d07: "Legg til element"
+  add_item_to_module_3d7a05b2: "Legg element til modul"
   add_items_44913315: "Legg til element"
   add_items_into_scoring_range_title_be08104e: "Legg element i %{scoring_range_title}"
   add_items_to_score_range_297d413b: "Legg element til i vurderingsintervall"
@@ -3402,6 +3404,7 @@ nn:
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Ein eksisterande Canvas-brukar med SIS-ID %{user_id}har allereie gjort krav på %{other_user_id} sin integration_id"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "Ein eksisterande brukar matchar ingen brukar-ID-ar som skal nyttast til innlogging med SIS-ID %{user_id}, hoppar over"
   an_export_is_already_in_progress_54270f01: "Ein eksport er allereie i gang."
+  an_external_identity_provider_is_enabled_7859c6fb: "Ein ekstern  identitetsleverandør er aktivert"
   an_integer_value_is_required_e073bd46: "Ein heiltalverdi er nødvendig"
   an_internal_error_occurred_83b8a685: "Det oppstod ein feil"
   an_item_named_name_already_exists_in_this_location_147b7312: "Eit element med namnet \"%{name}\" finst allereie.\" Vil du erstatte den eksisterande fila?"
@@ -3765,6 +3768,7 @@ nn:
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Er du sikker på at du vil generere dette teiknet på nytt? Alt som brukar dette teiknet må oppdaterast."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Er du sikker på at du vil fjerne karaktersetjingsperioden?"
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Er du sikker på at du vil fjerne dette elementet? "
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "Er du sikker på at du vil fjerne elementet frå modulen?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på at du vil fjerne verktøyet?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Er du sikker på at du vil fjerne denne brukaren?"
   are_you_sure_you_want_to_remove_this_user_from_all_85fb8eb4: "Er du sikker på at du vil fjerne denne brukeren fra ALLE kontoar? Brukeren vil ikkje berre bli sletta, men vil også bli merka for PERMANENT sletting."
@@ -6273,8 +6277,10 @@ nn:
       buttons: 
         cancel: Avbryt
         update: "Oppdater samarbeid"
+      is_required: "Dette feltet er obligatorisk"
       labels: 
         description: "Skildring:"
+        document_name: "Dokumentnamn:"
         title: Samarbeidstittel
     edit_button: 
       links: 
@@ -6306,6 +6312,7 @@ nn:
             Google Docs er ei fantastisk plattform for samarbeid i gruppeprosjekt.  Det liknar på Microsoft Word, men du kan arbeide saman med andre på same fila til same tid utan å måtte sende ho rundt med e-post.
             
             **Åtvaring**: du (og alle samarbeidspartnarane) treng ein Google-konto for å kunne ta del i alt samarbeid gjennom Google Docs.
+      is_required: "Dette feltet er obligatorisk"
       labels: 
         collaboration_type: "Samarbeid ved å bruke:"
         description: "Skildring:"
@@ -6754,6 +6761,7 @@ nn:
   configure_ecb97e30: Konfigurer
   configure_impact_integration_9bd1189f: "Konfigurer Impact-integrering"
   configure_individual_learning_paths_for_students_b_e2fce294: "Sett opp individuelle læringsstiar for studentar basert på resultat av vurdering"
+  configure_report_91ed07f9: "Konfigurer rapport"
   configure_tool_app_3b1bb50b: "Vil du konfigurere %{tool}-appen?"
   configure_toolname_app_651371be: "Konfigurer %{toolName}-appen"
   confirm_6556b3a6: Stadfest
@@ -7345,6 +7353,8 @@ nn:
     index: 
       titles: 
         course_modules: Emnemodular
+    links: 
+      student_progress: "Vis framdrift"
     module_complete: Fullført
     module_empty: "Det finst ikkje element i modulen \"%{module}\""
     module_item_next: 
@@ -7440,6 +7450,7 @@ nn:
   continue_typing_to_find_additional_sections_or_stu_49786085: "Hald fram med å skrive for å finne fleire seksjonar eller studentar."
   contribute_4730e633: Bidra
   contribute_to_the_page_2116bf3b: "Bidra til sida"
+  contributed_fadcc2b9: Bidrog
   contributed_to_this_module_item_and_is_complete_2799d5c: "Bidratt til denne delen av modulen og har fullført"
   conversation_dialog: 
     message_sent: "Meldinga er send"
@@ -7726,6 +7737,9 @@ nn:
     one: "1 fullført element"
     other: "%{count} fullførte element"
   count_conversation_messages_loaded_1a4811ff: "%{count} samtalemeldingar lasta"
+  count_courses_609dc3b8: 
+    one: "1 emne"
+    other: "%{count} emne"
   count_criteria_22927713: 
     one: "1 kriterium"
     other: "%{count} kriterium"
@@ -7909,6 +7923,9 @@ nn:
   count_students_will_get_num_points_c970fc01: 
     one: "1 student får %{num} poeng"
     other: "%{count} studentar får %{num} poeng"
+  count_sub_accounts_345f48ea: 
+    one: "1 underkonto"
+    other: "%{count} underkontoar"
   count_sub_modules_3373a1c4: 
     one: "%{count} submodul"
     other: "%{count} submodular"
@@ -10320,6 +10337,7 @@ nn:
   domains_count_max_a52b7947: "Domene (%{count}/%{max})"
   dominican_republic_1_3cef4021: "Den dominikanske republikk (+1)"
   don_t_add_this_user_for_now_32912974: "Ikkje legg til brukaren akkurat no."
+  don_t_indent_b35ae9fb: "Ingen innrykk"
   don_t_miss_notifications_from_your_students_900e9e30: "Ikkje gå glipp av varslar frå studentane dine"
   don_t_move_lti_query_params_to_post_body_5c80e037: "Ikkje flytt LTI-spørjeparametrar til POST-meldingstekst"
   don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Ikkje post resultat av læringsmål til vurderingsoversikta for meistringslæring"
@@ -10887,6 +10905,8 @@ nn:
   enter_a_letter_grade_536a8cef: "Skriv inn bokstavkarakter"
   enter_a_score_to_test_c6f89f4a: "Oppgi eit resultat du vil teste"
   enter_a_section_name_adbe3099: "Oppgi eit seksjonsnamn"
+  enter_a_shorter_category_name_4befe0da: "Oppgi eit kortare kategorinamn"
+  enter_a_shorter_group_name_8f7fc42c: "Oppgi eit kortare gruppenamn"
   enter_a_student_pairing_code_below_to_add_a_studen_15789251: "Skriv inn ein paringskode under for å leggje til ein student å observere"
   enter_a_valid_date_46d77547: "Legg inn ein gyldig dato"
   enter_a_what_if_score_668c91a3: "Oppgi eit kva-skjer-dersom-resultat."
@@ -11508,6 +11528,7 @@ nn:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "Finn ikkje verktøy"
   external_tools_6e77821: "Eksterne verktøy"
+  external_url_4752767f: "Ekstern URL"
   external_url_e9b87215: "Ekstern URL"
   external_urls_62082a38: "Eksterne URL-ar"
   extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "Det er ikkje tillate å gi ekstra utbyte for læringsmål. Resultat må justerast til det høgast moglege for %{outcome}"
@@ -14230,6 +14251,8 @@ nn:
   increase_indent_6af90f7c: "Auk innrykk"
   increase_indent_6d550a4a: "Auk innrykk"
   incremental_update_successfully_generated_against__db3f3f06: "Trinnvis oppdatering er generert mot ein tidlegare SIS-import."
+  indent_1_level_e7b18c1e: "Innrykk 1 nivå"
+  indentation_3c6081d5: Innrykk
   indexing_in_progress_6ce56f27: "Indeksering i gang"
   india_91_6c290107: "India (+91)"
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Bildet har berre ein dekorativ funksjon og lesast ikkje av skjermlesarar"
@@ -15250,6 +15273,7 @@ nn:
   lock_questions_after_answering_5aecef9d: "Lås spørsmåla etter at svara er gitte"
   lock_selected_announcements_33740f80: "Lås utvalde kunngjeringar"
   lock_this_setting_for_sub_accounts_2ae5af17: "Lås innstillinga for underkontoar"
+  lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "Lås innstillinga for underkontoar og emne"
   lock_until_549bb904: "Lås fram til"
   locked_1d1eaa8c: Låst
   locked_762f138b: Låst
@@ -21886,6 +21910,9 @@ nn:
         attempt_number: "Forsøk %{att_no}"
         kept: VALT
         latest: SISTE
+        time: Tidspunkt
+      submission_version_score: 
+        score: Resultat
       submission_versions: 
         attempt: Forsøk
         attempt_history: Forsøkhistorikk
@@ -22694,6 +22721,7 @@ nn:
   restored_course_association_course_c9e16045: "Gjenopprett emneforbindelse %{course}"
   restrict_push_notifications_to_select_types_941d9da3: "Avgrens push-varsel til utvalde typar"
   restrict_quantitative_data_72411674: "Begrens kvantitativ data"
+  restrict_quantitative_data_fcd08bb0: "Begrens kvantitativ data"
   restrict_sms_to_select_types_9dd6399c: "Begrens SMS til nokre valde typar."
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Studentar skal ikkje få tilgang til emne etter sluttdato"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Studentar skal ikkje få tilgang til emne før startdato"
@@ -23107,6 +23135,7 @@ nn:
   scope_c59afc8a: Omfang
   score_68107950: "%{score}%"
   score_at_least_1141bb81: "Resultat på minst"
+  score_at_least_score_8668a54a: "Oppnå minst %{score}"
   score_change_notifications_6b94f27f: "Varsel om resultatendring"
   score_details_2995369: Resultatdetaljar
   score_does_not_include_groups_because_they_have_no_80d12f42: 
@@ -23135,6 +23164,7 @@ nn:
   score_to_ungraded_process_failed_reason_788f9030: "Prosessen med å gje verdi til ikkje-vurderte feila: %{reason}"
   score_to_ungraded_process_finished_successfully_6689b418: "Prosessen med å gje verdi til ikkje-vurderte vart vellukka"
   scored_187e6983: skåra
+  scored_at_least_score_e2272f6d: "Har oppnådd minst %{score}"
   scored_less_than_2427896c: "Skåra lågare enn"
   scored_less_than_cutoff_on_assignment_5f5c4303: "Skåra lågare enn %{cutoff} på %{assignment}"
   scored_less_than_score_on_assignmenttitle_5a011033: "Skåra lågare enn %{score} på %{assignmentTitle}"
@@ -25423,6 +25453,7 @@ nn:
       other: "%{count} underkontoar"
     titles: 
       sub_accounts: Underkontoar
+  sub_accounts_e1b196a9: Underkontoar
   sub_assignment: 
     atom_no_author: "Utan forfattar"
     labels: 
@@ -26087,6 +26118,7 @@ nn:
   text_entry_submission_7b0ae0c5: "Send inn teksten"
   text_entry_submission_cannot_be_empty_3d187cae: "Tekstboksen kan ikkje vere tom"
   text_file_73d8d08c: Tekstfil
+  text_header_48fa9c37: Overskrift
   text_input_d3480b8c: Tekstoppføring
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Spørsmålstypen Utan Spørsmål har blitt gjort om til eit Stimulusspørsmål; ver god og legg til eit spørsmål så det kan visast i quizen."
   text_sms_4e2d82a7: "Tekst (SMS)"
@@ -28856,6 +28888,7 @@ nn:
   view_previous_submission_2b57bb85: "Vis tidlegare innlevering"
   view_previous_week_6f83849f: "Vis førre veke"
   view_prior_enrollments_9b519b25: "Vis tidlegare påmeldingar"
+  view_progress_2d61dd4: "Vis framdrift"
   view_question_banks_188a9e0f: "Vis spørsmålsbankar"
   view_range_student_details_8116d68a: "Sjå studentdetaljar innan området"
   view_registered_services_6c8cd301: "Vis registrerte tenester"
@@ -28892,6 +28925,7 @@ nn:
   violation_log_tray_d4eff9f4: Bruddloggmeny
   virtual_lectures_in_real_time_a1778dea: "Virtuelle førelesingar i sanntid"
   visibility_3ad7b08d: "Synlegheit:"
+  visibility_f62e7f12: Synlegheit
   visibility_selector_866f70df: Synlegheitsveljar
   visit_864b4060: Besøk
   visit_canvas_guides_to_learn_more_8c7361ad: "Gå til *Canvas Guides* for å lære meir"
@@ -29066,6 +29100,7 @@ nn:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Det er kun lesetilgang til emnet utanfor desse datoane dersom valet er slått på."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Når denne er vald er emnet ikkje tilgjengeleg utanfor emnedatoane. Dersom emnedatoane er blanke, gjeld start- og sluttdatoen som semesterdatoar."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Det er kun lesetilgang til seksjonane utanfor desse datoane dersom valet er slått på."
+  when_selected_this_setting_will_limit_the_view_of__40af593a: "Når valgt vil denne innstillinga begrense visninga av kvantitativ (numerisk) vurderingsdata for nye emner. Studentar og observatørar vil kun sjå kvalitative data, som inkluderar bokstavkarakterar og kommentarar."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Når denne funksjonen er slått på vil emnemenyen forbli komprimert eller utvida
       medan brukar navigerer mellom sider avhengig av kva brukar har valgt, i staden for å

@@ -45,15 +45,13 @@ module Lti
       it "requires a shared_secret" do
         subject.shared_secret = nil
         subject.save
-        error = subject.errors.find { |e| e == [:shared_secret, "can't be blank"] }
-        expect(error).not_to be_nil
+        expect(subject.errors[:shared_secret]).to include("can't be blank")
       end
 
       it "requires a guid" do
         subject.guid = nil
         subject.save
-        error = subject.errors.find { |e| e == [:guid, "can't be blank"] }
-        expect(error).not_to be_nil
+        expect(subject.errors[:guid]).to include("can't be blank")
       end
 
       it "must have a unique guid" do

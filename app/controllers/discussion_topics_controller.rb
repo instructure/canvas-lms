@@ -459,9 +459,9 @@ class DiscussionTopicsController < ApplicationController
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
           FEATURE_FLAGS_URL: feature_flags_url,
-          DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
           ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
           CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
+          DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
           HAS_SIDE_COMMENT_DISCUSSIONS: Account.site_admin.feature_enabled?(:disallow_threaded_replies_fix_alert) ? @context.active_discussion_topics.only_discussion_topics.where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT).exists? : false,
           totalDiscussions: scope.count,
           permissions: {
@@ -679,7 +679,7 @@ class DiscussionTopicsController < ApplicationController
       context_is_not_group: !@context.is_a?(Group),
       GRADING_SCHEME_UPDATES_ENABLED: Account.site_admin.feature_enabled?(:grading_scheme_updates),
       ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
-      DISCUSSION_CHECKPOINTS_ENABLED: @context.root_account.feature_enabled?(:discussion_checkpoints),
+      DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
       ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: Account.site_admin.feature_enabled?(:assignment_edit_placement_not_on_announcements),
       ANNOUNCEMENTS_COMMENTS_DISABLED: Announcement.new(context: @context).comments_disabled?,
       DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),
@@ -849,11 +849,10 @@ class DiscussionTopicsController < ApplicationController
 
         entry = entry.highest_level_parent_or_self
         sort_order = @topic.sort_order_for_user(@current_user)
-        condition = (sort_order == DiscussionTopic::SortOrder::DESC) ? ">=" : "<="
-        count_before = (sort_order == DiscussionTopic::SortOrder::ASC) ? 1 : 0
-        count_before += @topic.root_discussion_entries
-                              .where(parent_id: nil)
-                              .where("created_at #{condition}?", entry.created_at).count
+        condition = (sort_order == DiscussionTopic::SortOrder::DESC) ? ">" : "<"
+        count_before = @topic.root_discussion_entries
+                             .where(parent_id: nil)
+                             .where("created_at #{condition}?", entry.created_at).count
         env_hash[:current_page] = (count_before / env_hash[:per_page]).ceil
 
       end
@@ -955,8 +954,8 @@ class DiscussionTopicsController < ApplicationController
                discussion_cache_key: @current_user &&
                  Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg"),
                checkpointed_discussion_without_feature_flag:
-                 @topic.assignment&.has_sub_assignments? && !@domain_root_account&.feature_enabled?(:discussion_checkpoints),
-               DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
+                 @topic.assignment&.has_sub_assignments? && !@context.discussion_checkpoints_enabled?,
+               DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
                DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),
                DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
              })

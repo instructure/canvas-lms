@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render, fireEvent, waitFor, screen, cleanup} from '@testing-library/react'
+import {act, render, fireEvent, waitFor, cleanup} from '@testing-library/react'
 import ComputerPanel from '../ComputerPanel'
 import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
 import {vi} from 'vitest'
@@ -41,6 +41,9 @@ const uploadMediaTranslations = {
     SUBMIT_TEXT: 'Submit',
     UPLOADING_ERROR: 'Upload Error',
     UPLOAD_MEDIA_LABEL: 'Upload Media',
+    SELECT_SUPPORTED_FILE_TYPE: 'Please select a file of a supported type',
+    CHOOSE_FILE_TO_UPLOAD: 'Please choose a file',
+    ENTER_FILE_NAME: 'Please enter a file name',
   },
   SelectStrings: {
     USE_ARROWS: 'Use arrow keys to navigate options.',
@@ -66,9 +69,10 @@ interface ComputerPanelProps {
   useStudioPlayer: boolean
 }
 
-function createPanel(overrideProps: Partial<ComputerPanelProps>) {
+function createPanel(overrideProps: Partial<ComputerPanelProps>, ref?: React.Ref<any>) {
   return (
     <ComputerPanel
+      ref={ref}
       theFile={null}
       setFile={() => {}}
       hasUploadedFile={false}
@@ -123,7 +127,7 @@ describe('UploadMedia: ComputerPanel', () => {
         files: [notAMediaFile],
       },
     })
-    expect(getByText('Invalid File')).toBeVisible()
+    expect(getByText('Please select a file of a supported type')).toBeVisible()
   })
 
   it('shows an editable text input for title if a valid file is added', async () => {

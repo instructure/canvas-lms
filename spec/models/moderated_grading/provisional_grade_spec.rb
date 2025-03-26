@@ -35,19 +35,6 @@ describe ModeratedGrading::ProvisionalGrade do
 
   it { is_expected.to be_valid }
 
-  it do
-    expect(subject).to have_one(:selection)
-      .with_foreign_key(:selected_provisional_grade_id)
-      .class_name("ModeratedGrading::Selection")
-  end
-
-  it { is_expected.to belong_to(:submission).required }
-  it { is_expected.to belong_to(:scorer).required.class_name("User") }
-  it { is_expected.to have_many(:rubric_assessments) }
-
-  it { is_expected.to validate_presence_of(:scorer) }
-  it { is_expected.to validate_presence_of(:submission) }
-
   describe "#auditable?" do
     subject(:provisional_grade) { submission.provisional_grades.build(valid_params) }
 

@@ -32,6 +32,12 @@
     "additional_considerations_f3801683": {
         "message": "Considérations supplémentaires"
     },
+    "address_applied_64269b0b": {
+        "message": "Adresse appliquée"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Adresse supprimée"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Liens adjacents avec la même URL devrait être une liaison unique."
     },
@@ -202,6 +208,12 @@
     },
     "blue_daf8fea9": {
         "message": "Bleu"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Caractères gras appliqués"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Caractères gras supprimés"
     },
     "border_5b08b06d": {
         "message": "Frontière"
@@ -595,6 +607,12 @@
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Afficher le lien texte (s’ouvre dans un nouvel onglet)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Div appliquée"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Div supprimée"
     },
     "division_sign_72190870": {
         "message": "Signe de division"
@@ -992,6 +1010,12 @@
     "heading_4_b2e74be7": {
         "message": "En-tête 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "En-tête { h } appliqué"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "En-tête { h } supprimé"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Les niveaux d''entête ne doivent pas être ignorés."
     },
@@ -1198,6 +1222,12 @@
     },
     "italian_bd3c792d": {
         "message": "Italien"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Italique appliqué"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Italique supprimé"
     },
     "japanese_b5721ca7": {
         "message": "Japonais"
@@ -1690,6 +1720,12 @@
     },
     "paragraph_5e5ad8eb": {
         "message": "Paragraphe"
+    },
+    "paragraph_applied_959b3fe5": {
+        "message": "Paragraphe appliqué"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Paragraphe supprimé"
     },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Paragraphe commençant par { start }"
@@ -2470,6 +2506,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Impossible de déterminer l’URL de sélection des ressources"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Soulignement appliqué"
+    },
+    "underline_removed_3693e17c": {
+        "message": "Soulignement supprimé"
     },
     "union_e6b57a53": {
         "message": "Union"

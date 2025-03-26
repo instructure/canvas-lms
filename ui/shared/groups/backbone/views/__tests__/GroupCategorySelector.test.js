@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GroupCategorySelector from '../GroupCategorySelector'
+import GroupCategorySelector, {GROUP_CATEGORY_SELECT} from '../GroupCategorySelector'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from '@canvas/test-utils/fakeENV'
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
@@ -71,34 +70,38 @@ describe('GroupCategorySelector selection', () => {
     strictEqual($('#create_group_category_id:disabled').length, 0)
   })
 
+  it('returns an error if no group was selected', () => {
+    const errors = groupCategorySelector.validateBeforeSave({group_category_id: 'blank'}, {})
+    expect(errors).toEqual({[GROUP_CATEGORY_SELECT]: [{message: 'Please select a group set for this assignment'}]})
+  })
+
   describe('GroupCategorySelector, no groups', () => {
     beforeEach(() => {
-      fakeENV.setup()
       ENV.PERMISSIONS = {can_manage_groups: false}
       assignment = new Assignment()
       groupCategorySelector = new GroupCategorySelector({
         parentModel: assignment,
         groupCategories: [],
+        showNewErrors: true
       })
       groupCategorySelector.render()
       return $('#fixtures').append(groupCategorySelector.$el)
     })
 
     afterEach(() => {
-      fakeENV.teardown()
       groupCategorySelector.remove()
       $('#fixtures').empty()
     })
 
-    // :disabled psuedoselector doesn't work in Jest
-    test.skip('group category select is hidden when there are no group sets', () => {
-      const $group_category = $('#fixtures #assignment_group_category')
-      strictEqual($group_category.css('display'), 'none')
+    it('returns an error if no group set was created', () => {
+      ENV.PERMISSIONS = {can_manage_groups: true}
+      const errors = groupCategorySelector.validateBeforeSave({group_category_id: 'blank'}, {})
+      expect(errors).toEqual({[GROUP_CATEGORY_SELECT]: [{message: 'Please create a group set'}]})
     })
 
-    // :disabled psuedoselector doesn't work in Jest
-    test.skip('New Group Category button is disabled when cannot manage groups', () => {
-      strictEqual($('#create_group_category_id:disabled').length, 1)
+    it('returns an error if user does not have create group permissions', () => {
+      const errors = groupCategorySelector.validateBeforeSave({group_category_id: 'blank'}, {})
+      expect(errors).toEqual({[GROUP_CATEGORY_SELECT]: [{message: 'Group Add permission is needed to create a New Group Category'}]})
     })
   })
 })

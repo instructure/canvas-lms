@@ -19,6 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {type File, type Folder} from '../interfaces/File'
+import {Tool} from '@canvas/files_v2/react/modules/filesEnv.types'
 
 const I18n = createI18nScope('files_v2')
 
@@ -52,4 +53,16 @@ export const generatePreviewUrlPath = (item: File | Folder) => {
     throw new Error('Invalid context_asset_string format')
   }
   return `?preview=${item.id}`
+}
+
+export const externalToolEnabled = (file: File, tool: Tool) => {
+  if (tool.accept_media_types && tool.accept_media_types.length > 0) {
+    const content_type = file?.['content-type']
+    return tool.accept_media_types.split(',').some(t => {
+      const regex = new RegExp('^' + t.replace('*', '.*') + '$')
+      return content_type?.match(regex)
+    })
+  } else {
+    return true
+  }
 }

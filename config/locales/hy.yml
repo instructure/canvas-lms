@@ -1657,6 +1657,8 @@ hy:
   add_group_c84f9e9d: "Ավելացնել խումբ"
   add_group_set_f9809e11: "Ավելացնել խմբերի շարք"
   add_icon_567dbcaa: "ավելացնել պատկերանշան"
+  add_item_75b67d07: "Ավելացնել տարր"
+  add_item_to_module_3d7a05b2: "Տարր ավելացնել մոդուլին"
   add_login_f871148: "Ավելացնել մուտքանուն"
   add_moderator_review_copy_1st_a484c813: "Ավելացնել մոդերատորի կարգավիճակ ունեցող կարծիք ներկայացող (1-ին պատճե)"
   add_moderator_review_copy_2nd_e80d458f: "Ավելացնել մոդերատորի կարգավիճակ ունեցող կարծիք ներկայացնող (2-րդ պատճե)"
@@ -1786,6 +1788,7 @@ hy:
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Թեմայի ստեղծման ժամանակ սխալ է տեղի ունեցել, խնդրում ենք փորձել կրկին:"
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Ներբեռնմանը պատրաստվելու ժամանակ սխալ է տեղի ունեցել, փորձեք կրկին:"
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Սխալ է տեղի ունեցել %{filename} -ի օգտագործման իրավունքը սահմանելիս"
+  an_external_identity_provider_is_enabled_7859c6fb: "Արտաքին նույնականացման պրովայդերը միացված է"
   an_integer_value_is_required_e073bd46: "Պահանջվում է մուտքագրել ամբողջ թիվ"
   an_item_named_name_already_exists_in_this_location_147b7312: "\"%{name}\" անունը կրող տարր արդեն իսկ առկա է: Արդյո՚ք Դուք ցանկանում եք փոխարինել արդեն իսկ առկա ֆայլը նոր ֆայլով: "
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Սերվերի անհայտ սխալ: Կրկին փորձեք:"
@@ -1964,6 +1967,7 @@ hy:
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Դուք իսկապե՞ս ցանկանում եք ապաակտիվացնել այս օգտատիրոջը: Ապաակտիվացման դեպքում նա չի կարող մասնակցել դասընթացին:"
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Դուք իսկապե՞ս ցանկանում եք կրկին ստեղծել այս token-ը: Անհրաժեշտ կլինի թարմացնել token-ն օգտագործող ամեն ինչ:"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Դուք իսկապե՞ս ցանկանում եք ջնջել գնահատման այս ժամանակահատվածը:"
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "Դուք իսկապե՞ս ցանկանում եք հանել այս տարրը մոդուլից:"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս գործիքը:"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Դուք իսկապե՞ս ցանկանում եք հեռացնել այս օգտատիրոջ պրոֆիլի պատկերը:"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Դուք իսկապե՞ս ցանկանում եք հայտնել պրոֆիլի այս նկարի մասին:"
@@ -3564,8 +3568,10 @@ hy:
       buttons: 
         cancel: "Չեղյալ համարել"
         update: "Թարմացնել համատեղ աշխատանքը"
+      is_required: "Անհրաժեշտ է լրացնել այս դաշտը"
       labels: 
         description: Նկարագրություն
+        document_name: "Փաստաթղթի անվանումը"
         title: "Համատեղ աշխատանքի անվանումը"
     errors: 
       cannot_load_collaboration: "Հնարավոր չէ բեռնել համատեղ աշխատանքը"
@@ -3591,6 +3597,7 @@ hy:
             Google Docs-ը գերազանց գործիք է խմբային նախագծի շրջանակում համագործակցելու համար: Այն նման է Microsoft Word-ին, սակայն թույլ է տալիս ձեզ աշխատել մյուսների հետ միասին նույն ֆայլի վրա միաժամանակ, առանց ստիպված լինելու այն էլ.փոստով ուղարկելու:
             
             **Նախազգուշացում **. դուք (և ձեզ հետ համագործակցող անձինք) պետք է ունենան Google-ի հաշվառման գրառում՝ Google Docs-ի համատեղ աշխատանքներում մասնակցելու համար:
+      is_required: "Անհրաժեշտ է լրացնել այս դաշտը"
       labels: 
         collaboration_type: "Համատեղ աշխատանք, օգտագործելով"
         description: Նկարագրություն
@@ -3807,6 +3814,7 @@ hy:
   configurate_tool_app_5a721f2c: "Կարգաբերե՞լ %{tool} հավելվածը"
   configuration_type_25a084a4: "Կարգաբերման տեսակ"
   configure_ecb97e30: Կարգաբերել
+  configure_report_91ed07f9: "Կարգաբերել հաշվետվությունը"
   configure_toolname_app_651371be: "Կարգաբերել %{toolName} հավելվածը"
   confirm_6556b3a6: Հաստատել
   confirm_contact_method_29d6fe4b: "Հաստատել կապ հաստատելու եղանակը"
@@ -4350,6 +4358,8 @@ hy:
     index: 
       titles: 
         course_modules: "Դասընթացի մոդուլներ"
+    links: 
+      student_progress: "Դիտել կատարման ընթացքը"
     module_complete: Ավարտել
     module_empty: "\"%{module}\" մոդուլում տարրեր չկան"
     module_item_next: 
@@ -4447,6 +4457,7 @@ hy:
   continue_ac067716: Շարունակել
   continue_typing_to_find_additional_sections_or_stu_49786085: "Շարունակել մուտքագրել` լրացուցիչ բաժիններ կամ ունկնդիրներ գտնելու համար"
   contribute_4730e633: " Ներառել"
+  contributed_fadcc2b9: "Ներառված է"
   conversation_dialog: 
     errors: 
       field_is_required: "Անհրաժեշտ է լրացնել այս դաշտը"
@@ -4645,6 +4656,9 @@ hy:
     zero: "Սխալներ պարունակող հանձնարարություններ առկա չեն: Սեղմել «Շարունակել» կոճակը"
   count_attempts_d23c69a0: 
     zero: "Անսահմանափակ փորձեր"
+  count_courses_609dc3b8: 
+    one: "1 դասընթաց"
+    other: "%{count} դասընթաց"
   count_days_de0c6a32: 
     one: "1 օր"
     other: "%{count} օր"
@@ -4689,6 +4703,9 @@ hy:
   count_students_will_get_num_points_c970fc01: 
     one: "1 ուսանող կստանա %{num} միավոր"
     other: "%{count} ունկնդիր կստանան %{num} միավոր"
+  count_sub_accounts_345f48ea: 
+    one: "1 ենթահաշիվ"
+    other: "%{count} ենթահաշիվ"
   country_is_required_b0afbf52: "Պետությունը նշելը պարտադիր է"
   course: 
     access_denied: "Հասանելիությունը մերժվել է"
@@ -6313,6 +6330,7 @@ hy:
   does_not_meet_expectations_b0736d20: "Չի համապատասխանում սպասումներին"
   domain_3b54c511: Դոմեն
   domain_is_required_1d4c8b25: "Անհրաժեշտ է նշել դոմենը"
+  don_t_indent_b35ae9fb: "Ներսի տողագլխից չսկսել"
   don_t_move_lti_query_params_to_post_body_21744487: "Մի տեղափոխեք LTI հարցման պարամետրերը POST տեսքտային մաս:"
   don_t_show_again_15d8253e: "Նորից ցույց չտալ"
   done_54e3d4b6: "Պատրաստ է"
@@ -6563,6 +6581,8 @@ hy:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Մուտքագրել hexcode լրացուցիչ գույն օգտագործելու համար"
   enter_a_score_to_test_c6f89f4a: "Մուտքագրեք գնահատականը թեստի համար"
   enter_a_section_name_adbe3099: "Մուտքագրել բաժնի անվանումը"
+  enter_a_shorter_category_name_4befe0da: "Մուտքագրեք կատեգորիայի ավելի կարճ անվանում"
+  enter_a_shorter_group_name_8f7fc42c: "Մուտքագրեք խմբի ավելի կարճ անուն"
   enter_the_date_you_would_like_to_navigate_to_a712de47: "Մուտքագրեք այն ամսաթիվը, որին կցանկանայիք անցնել"
   enter_your_question_and_multiple_answers_31370054: "Մուտքագրեք Ձեր հարցը եւ պատասխանների տարբերակները:"
   enter_your_question_text_4729b886: "Մուտքագրեք Ձեր հարցը"
@@ -7064,6 +7084,7 @@ hy:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "Գործիքներ չեն գտնվել"
   external_tools_6e77821: "Արտաքին գործիքներ"
+  external_url_4752767f: "Արտաքին URL-հասցե"
   external_url_e9b87215: "Արտաքին url"
   external_urls_62082a38: "Արտաքին URL հասցեներ "
   failed_307449e1: "Չհաջողված փորձ."
@@ -8556,6 +8577,8 @@ hy:
   incorrect_username_and_or_password_2de73abb: "Սխալ օգտատիրոջ անուն և/կամ գաղտնաբառ"
   increase_indent_6af90f7c: "Մեծացնել ներսի տողագլուխը"
   incremental_update_successfully_generated_against__db3f3f06: "Նախկինում SIS ներմուծման հիման վրա հաջողությամբ իրականացվել է լրացուցիչ թարմացում: "
+  indent_1_level_e7b18c1e: "Ներսի տողագլուխ 1 մակարդակ"
+  indentation_3c6081d5: "Ներսի տողագլուխ թողնել"
   indigo_2035fc55: Indigo
   individual_2033c005: Անհատ
   info: 
@@ -8994,6 +9017,7 @@ hy:
   lock_date_cannot_be_after_term_end_cf1a188f: "Արգելափակման ամսաթիվը չի կարող սեմեստրի ավարտից հետո լինել"
   lock_date_cannot_be_before_due_date_ac30f54: "Արգելափակման ամսաթիվը չի կարող նախորդել կատարման վերջնաժամկետին"
   lock_icon_a9916601: "արգելափակել պատկերը"
+  lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "Այս կարգաբերումը արգելափակել ենթահաշիվների և դասընթացների համար"
   locked_762f138b: "Արգելափակված է"
   locked_at_cda02889: "Արգելափակված է ___________ին"
   locked_by_983c07f7: "Արգելափակված է ______________կողմից"
@@ -14148,6 +14172,9 @@ hy:
         attempt_number: "%{att_no} փորձ"
         kept: ՊԱՀՊԱՆՎԱԾ
         latest: ՎԵՐՋԻՆ
+        time: Ժամը
+      submission_version_score: 
+        score: Գնահատական
       submission_versions: 
         attempt: Փորձ
         attempt_history: "Փորձի պատմություն"
@@ -14872,6 +14899,7 @@ hy:
   score_of_score_view_in_speedgrader_a7c1c954: "%{score} միավոր: Դիտել «Արագ գնահատման համակարգ»-ում"
   score_out_of_points_possible_88f370fd: "%{points_possible} -ից  %{score} "
   score_score_6f81e8c8: "Գնահատական՝ %{score}"
+  scored_at_least_score_e2272f6d: "Գնահատված առնվազն %{score}"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -16288,6 +16316,7 @@ hy:
       other: "%{count} ենթահաշիվ"
     titles: 
       sub_accounts: Ենթահաշիվներ
+  sub_accounts_e1b196a9: Ենթահաշիվներ
   sub_assignment: 
     atom_no_author: "Հեղինակ չկա"
     labels: 
@@ -16666,6 +16695,7 @@ hy:
   text_document_eacbcdb7: "Տեքստային փաստաթուղթ"
   text_entry_e1808b2f: "Տեքստի մուտքագրում"
   text_entry_submission_cannot_be_empty_3d187cae: "Տեքստային դաշտը չի կարող դատարկ լինել"
+  text_header_48fa9c37: "Տեքստի վերնագիր"
   text_input_d3480b8c: "Տեքստի մուտք"
   text_sms_4e2d82a7: "Տեքստ (SMS)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Օգտատիրոջ այդ հաշիվը ջնջվել է: Խնդրում ենք դիմել ձեր համակարգի ադմինիստրատորին կրկին ակտիվացնելու ձեր հաշիվը:"
@@ -17634,6 +17664,7 @@ hy:
   view_next_file_a8a4a885: "Դիտել հաջորդ ֆայլը"
   view_notifications_6aea09a2: "Դիտել ծանուցումները"
   view_previous_file_b846db4f: "Դիտել նախորդ ֆայլը"
+  view_progress_2d61dd4: "Դիտել կատարման ընթացքը"
   view_question_banks_188a9e0f: "Դիտել հարցերի շտեմարանները"
   view_registered_services_6c8cd301: "Դիտել գրանցված ծառայությունները"
   view_rubric_d71cce10: "Դիտել ռուբրիկը"
@@ -17649,6 +17680,7 @@ hy:
       unpublish: "Չեղարկել հրապարակումը"
     context_modules: 
       publish: Հրապարակել
+  visibility_f62e7f12: Տեսանելիություն
   visit_864b4060: Այցելել
   visit_group_group_name_7a816081: "Այցելել %{group_name} խումբը"
   waiting_for_attempted_login_6d00cb49: "Համակարգ մուտք գործելու սպասում "

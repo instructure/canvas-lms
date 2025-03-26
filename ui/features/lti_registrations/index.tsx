@@ -18,7 +18,7 @@
 import * as React from 'react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {createRoot} from 'react-dom/client'
-import {createBrowserRouter, RouterProvider} from 'react-router-dom'
+import {createBrowserRouter, RouterProvider, Navigate} from 'react-router-dom'
 import ProductDetail from '../../shared/lti-apps/components/ProductDetail/ProductDetail'
 import {DiscoverRoute} from './discover'
 import {LtiAppsLayout} from './layout/LtiAppsLayout'
@@ -53,6 +53,9 @@ import {ZAccountId} from './manage/model/AccountId'
 import type {JsonUrlWizardService} from './manage/registration_wizard/JsonUrlWizardService'
 import {RegistrationWizardModal} from './manage/registration_wizard/RegistrationWizardModal'
 import {ProductConfigureButton} from './discover/ProductConfigureButton'
+import {route as MonitorRoute} from './monitor/route'
+import {isLtiRegistrationsUsageEnabled} from './monitor/utils'
+import {isLtiRegistrationsDiscoverEnabled} from './discover/utils'
 
 const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
 
@@ -60,14 +63,26 @@ const queryClient = new QueryClient()
 
 // window.ENV.lti_registrations_discover_page
 
+const getLayoutChildren = () => {
+  const layoutRoutes = [...ManageRoutes]
+
+  if (isLtiRegistrationsDiscoverEnabled()) {
+    layoutRoutes.push(DiscoverRoute)
+  }
+
+  if (isLtiRegistrationsUsageEnabled()) {
+    layoutRoutes.push(MonitorRoute)
+  }
+
+  return layoutRoutes;
+}
+
 const router = createBrowserRouter(
   [
     {
       path: '/',
       element: <LtiAppsLayout />,
-      children: window.ENV.FEATURES.lti_registrations_discover_page
-        ? [DiscoverRoute, ...ManageRoutes]
-        : [...ManageRoutes],
+      children: getLayoutChildren(),
     },
     {
       path: 'product_detail/:id',
@@ -85,6 +100,9 @@ const router = createBrowserRouter(
         />
       ),
     },
+    {
+      path: '*', element: <Navigate to="/" replace />
+    }
   ],
 
   {

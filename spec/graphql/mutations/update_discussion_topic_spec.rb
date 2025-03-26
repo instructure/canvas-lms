@@ -740,7 +740,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     let(:creator_service) { Checkpoints::DiscussionCheckpointCreatorService }
 
     before do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
 
       @due_at1 = 2.days.from_now

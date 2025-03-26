@@ -26,6 +26,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {List} from '@instructure/ui-list'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('files_v2')
 
@@ -54,7 +55,7 @@ const SubTableContent = ({isLoading, isEmpty, searchString}: SubTableContentProp
         </div>
         <div>
           <Text>
-            {I18n.t('We could not find anything that matches "{{searchString}}" in files.', {
+            {I18n.t('We could not find anything that matches "%{searchString}" in files.', {
               searchString,
             })}
           </Text>
@@ -75,6 +76,14 @@ const SubTableContent = ({isLoading, isEmpty, searchString}: SubTableContentProp
             <Text>{I18n.t('Enter at least 2 letters in the search box')}</Text>
           </List.Item>
         </List>
+        <Alert
+          liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+          liveRegionPoliteness="assertive"
+          screenReaderOnly
+          data-testid="search-announcement"
+        >
+          {I18n.t('No results found')}
+        </Alert>
       </View>
     )
   }

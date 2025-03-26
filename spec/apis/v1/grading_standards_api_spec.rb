@@ -199,7 +199,7 @@ describe GradingStandardsApiController, type: :request do
       it "returns error if no grading scheme provided" do
         post_params = { "title" => "account grading standard" }
         json = api_call(:post, account_resources_path, account_create_params, post_params, {}, { expected_status: 400 })
-        expect(json).to eq({ "errors" => { "data" => [{ "attribute" => "data", "type" => "blank", "message" => "blank" }] } })
+        expect(json).to eq({ "errors" => { "data" => [{ "attribute" => "data", "type" => "blank", "message" => "can't be blank" }] } })
       end
 
       it "returns error if grading scheme does not contain a grade for 0%" do

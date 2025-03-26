@@ -25,6 +25,7 @@ import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
 const defaultProps = {
   isStacked: false,
   item: {...FAKE_FILES[0]},
+  collection: [...FAKE_FILES],
 }
 
 const renderComponent = (props = {}) => {

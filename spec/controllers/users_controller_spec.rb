@@ -2187,37 +2187,40 @@ describe UsersController do
   end
 
   describe "GET 'admin_merge'" do
-    let(:account) { Account.create! }
+    it "sets the env" do
+      allow_any_instance_of(Account).to receive(:grants_any_right?).and_return(true)
+      account_admin_user
+      @admin.associated_accounts.create!({ name: "A account" })
+      @admin.associated_accounts.create!({ name: "B account" })
+      user_session(@admin)
+      user = user_with_pseudonym
+      get "admin_merge", params: { user_id: user.id }
+      expect(assigns[:js_env][:ADMIN_MERGE_ACCOUNT_OPTIONS]).to match_array(@admin.associated_accounts.map { |a| { id: a.id, name: a.name } })
+    end
+  end
 
-    before do
+  describe "GET 'user_for_merge'" do
+    it "return user with enrollments, pseudonyms and CCs display values" do
       account_admin_user
       user_session(@admin)
-    end
+      user = user_with_pseudonym
+      user.pseudonym.update_attribute(:sis_user_id, "sis_user_id")
+      user.pseudonym.update_attribute(:integration_id, "integration_id")
+      user.pseudonym.update_attribute(:unique_id, "login_id")
+      course_with_student(active_all: true, user: user)
+      user.communication_channels.create(path: "user_cc@instructure.com").confirm!
 
-    describe "as site admin" do
-      before { Account.site_admin.account_users.create!(user: @admin) }
+      get "user_for_merge", params: { user_id: user.id }
 
-      it "warns about merging a user with itself" do
-        user = User.create!
-        pseudonym(user)
-        get "admin_merge", params: { user_id: user.id, pending_user_id: user.id }
-        expect(flash[:error]).to eq "You can't merge an account with itself."
-      end
-
-      it "does not issue warning if the users are different" do
-        user = User.create!
-        other_user = User.create!
-        get "admin_merge", params: { user_id: user.id, pending_user_id: other_user.id }
-        expect(flash[:error]).to be_nil
-      end
-    end
-
-    it "does not allow you to view any user by id" do
-      pseudonym(@admin)
-      user_with_pseudonym(account:)
-      get "admin_merge", params: { user_id: @admin.id, pending_user_id: @user.id }
-      expect(response).to be_successful
-      expect(assigns[:pending_other_user]).to be_nil
+      parsed_response = response.parsed_body
+      expect(parsed_response["name"]).to eq user.name
+      expect(parsed_response["short_name"]).to eq user.short_name
+      expect(parsed_response["sis_user_id"]).to eq user.pseudonym.sis_user_id
+      expect(parsed_response["login_id"]).to eq user.pseudonym.unique_id
+      expect(parsed_response["integration_id"]).to eq user.pseudonym.integration_id
+      expect(parsed_response["enrollments"]).to match_array(user.enrollments.current.map { |e| "#{e.course.name} (#{e.readable_type})" })
+      expect(parsed_response["pseudonyms"]).to match_array(user.pseudonyms.active.map { |p| "#{p.unique_id} (#{p.account.name})" })
+      expect(parsed_response["communication_channels"]).to match_array(user.communication_channels.unretired.email.map(&:path).uniq)
     end
   end
 

@@ -32,6 +32,12 @@
     "additional_considerations_f3801683": {
         "message": "Breithnithe breise"
     },
+    "address_applied_64269b0b": {
+        "message": "Cuireadh an seoladh i bhfeidhm"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Baineadh an seoladh"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Ba cheart go mbeadh naisc in aice leis an URL céanna ina nasc amháin."
     },
@@ -202,6 +208,12 @@
     },
     "blue_daf8fea9": {
         "message": "Gorm"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Cuireadh cló trom i bhfeidhm"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Baineadh cló trom"
     },
     "border_5b08b06d": {
         "message": "Teorainn"
@@ -595,6 +607,12 @@
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Taispeáin Nasc Téacs (Osclaítear i táb nua é)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Cuireadh Div i bhfeidhm"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Baineadh div"
     },
     "division_sign_72190870": {
         "message": "Comhartha Rannóige"
@@ -992,6 +1010,12 @@
     "heading_4_b2e74be7": {
         "message": "Ceannteideal 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "Cuireadh ceannteideal { h } i bhfeidhm"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "Baineadh ceannteideal { h }"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Níor cheart leibhéil ceannteidil a scipeáil."
     },
@@ -1198,6 +1222,12 @@
     },
     "italian_bd3c792d": {
         "message": "Iodáilise"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Cuireadh cló iodálach i bhfeidhm"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Baineadh cló iodálach"
     },
     "japanese_b5721ca7": {
         "message": "Seapáinise"
@@ -1690,6 +1720,12 @@
     },
     "paragraph_5e5ad8eb": {
         "message": "Alt"
+    },
+    "paragraph_applied_959b3fe5": {
+        "message": "Cuireadh alt i bhfeidhm"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Baineadh alt"
     },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Alt ag tosú le { start }"
@@ -2470,6 +2506,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Ní féidir an url roghnú acmhainní a chinneadh"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Cuireadh folíne i bhfeidhm"
+    },
+    "underline_removed_3693e17c": {
+        "message": "Baineadh folíne"
     },
     "union_e6b57a53": {
         "message": "Aontas"

@@ -19,11 +19,10 @@
     <div class="control-group">
       <div class="controls">
         {{#if ENV.SIMILARITY_PLEDGE}}
-          <label class="checkbox">
-            <input type="checkbox" class="turnitin_pledge external-tool" name="turnitin_pledge">
-              {{ENV.SIMILARITY_PLEDGE}}
-            </input>
-          </label>
+          <div class="turnitin_pledge_container_external_homework_url"
+               data-pledge="{{ENV.SIMILARITY_PLEDGE}}"
+               style="margin:0px 0px 10px 0px">
+          </div>
         {{/if}}
       </div>
     </div>

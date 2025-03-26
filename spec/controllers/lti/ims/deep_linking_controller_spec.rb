@@ -152,12 +152,13 @@ module Lti
           let(:errorlog) { { html: "some error log" } }
 
           it "turns them into strings before calling js_env to prevent HTML injection" do
+            separator = (RUBY_VERSION >= "3.4.0") ? " => " : "=>"
             expect(controller).to receive(:js_env).with({
                                                           deep_link_response: hash_including(
-                                                            msg: '{"html"=>"some message"}',
-                                                            log: '{"html"=>"some log"}',
-                                                            errormsg: '{"html"=>"some error message"}',
-                                                            errorlog: '{"html"=>"some error log"}'
+                                                            msg: %({"html"#{separator}"some message"}),
+                                                            log: %({"html"#{separator}"some log"}),
+                                                            errormsg: %({"html"#{separator}"some error message"}),
+                                                            errorlog: %({"html"#{separator}"some error log"})
                                                           )
                                                         })
             subject
@@ -326,44 +327,41 @@ module Lti
         end
 
         context "when a url is used to get public key" do
+          include WebMock::API
+
           let(:rsa_key_pair) { CanvasSecurity::RSAKeyPair.new }
           let(:url) { "https://get.public.jwk" }
-          let(:public_jwk_url_response) do
+          let(:public_jwk_url_response_code) { 200 }
+          let(:public_jwk_url_response_string) do
             {
               keys: [
                 public_jwk
               ]
-            }
+            }.to_json
           end
-          let(:stubbed_response) { double(success?: true, parsed_response: public_jwk_url_response) }
 
           before do
-            allow(HTTParty).to receive(:get).with(url).and_return(stubbed_response)
+            stub_request(:get, url).to_return(
+              status: public_jwk_url_response_code,
+              body: public_jwk_url_response_string
+            )
+
+            developer_key.update!(public_jwk_url: url)
           end
 
           context "when there is no public jwk" do
-            before do
-              developer_key.update!(public_jwk: nil, public_jwk_url: url)
-            end
+            before { developer_key.update!(public_jwk: nil) }
 
             it { is_expected.to be_successful }
           end
 
           context "when there is a public jwk" do
-            before do
-              developer_key.update!(public_jwk_url: url)
-            end
-
             it { is_expected.to be_successful }
           end
 
           context "when an empty object is returned" do
-            let(:public_jwk_url_response) { {} }
+            let(:public_jwk_url_response_string) { {}.to_json }
             let(:response_message) { "JWT verification failure" }
-
-            before do
-              developer_key.update!(public_jwk_url: url)
-            end
 
             it do
               subject
@@ -371,22 +369,31 @@ module Lti
             end
           end
 
-          context "when the url is not valid giving a 404" do
-            let(:stubbed_response) { double(success?: false, parsed_response: public_jwk_url_response.to_json) }
-            let(:response_message) { "JWT verification failure" }
-            let(:public_jwk_url_response) do
-              {
-                success?: false, code: "404"
-              }
-            end
+          context "when the url returns a non-2xx response but the JWT is still valid" do
+            # Historical behavior. Judging from old specs, possibly not
+            # intended, but it's been like this since 2019 (see fa1b233eff),
+            # so tools may be relying on it...
+            let(:public_jwk_url_response_code) { 404 }
 
-            before do
-              developer_key.update!(public_jwk_url: url)
-            end
+            it { is_expected.to be_successful }
+          end
+
+          context "when the url response is not a valid JWT" do
+            let(:public_jwk_url_response_string) { "foo" }
+            let(:response_message) { "JWT verification failure" }
 
             it do
               subject
               expect(json_parse["errors"].to_s).to include response_message
+            end
+          end
+
+          context "when there is a socket error fetching the public_jwk_url" do
+            it "returns an error" do
+              expect(CanvasHttp).to receive(:get).with(url).and_raise(Socket::ResolutionError.new)
+              subject
+
+              expect(json_parse["errors"].to_s).to include "JWT verification failure"
             end
           end
         end
@@ -1129,6 +1136,46 @@ module Lti
               expected_js_env_attributes = {
                 tool_id: context_external_tool.id,
                 content_items:
+              }
+
+              expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
+            end
+          end
+
+          context "when a content item for a ActivityAssetProcessor is received" do
+            before do
+              course
+              user_session(@user)
+              context_external_tool
+            end
+
+            let(:content_items) do
+              [
+                { type: "ltiAssetProcessor", url: launch_url, title: "Asset Processor 1" },
+                { type: "ltiResourceLink", url: launch_url, title: "Item 1" }
+              ]
+            end
+
+            let(:return_url_params) { super().merge(placement: "ActivityAssetProcessor") }
+
+            it "does not create a resource link" do
+              expect do
+                subject
+              end.to_not change { Lti::ResourceLink.count }
+            end
+
+            it "does not create an Lti::AssetProcessor" do
+              expect do
+                subject
+              end.to_not change { Lti::AssetProcessor.count }
+            end
+
+            it "includes tool_id and ltiAssetProcessor type content items in the js_env deep_link_response" do
+              allow(controller).to receive(:js_env)
+              subject
+              expected_js_env_attributes = {
+                tool_id: context_external_tool.id,
+                content_items: content_items.reject { |item| item[:type] == "ltiResourceLink" }
               }
 
               expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))

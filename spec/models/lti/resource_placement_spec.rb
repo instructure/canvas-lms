@@ -23,7 +23,7 @@ module Lti
     describe "validations" do
       it "requires a resource_handler" do
         subject.save
-        expect(subject.errors.first).to eq [:message_handler, "can't be blank"]
+        expect(subject.errors[:message_handler].first).to eq "can't be blank"
       end
 
       it "accepts types in PLACEMENT_LOOKUP" do
@@ -156,11 +156,24 @@ module Lti
       end
     end
 
-    describe ".add_extension_prefix" do
-      it "is returning a valid extension" do
+    describe ".add_extension_prefix_if_necessary" do
+      it "returns a valid extension" do
         placement = "assignment_edit"
         expected_placement_name_with_prefix = "https://canvas.instructure.com/lti/assignment_edit"
-        expect(described_class.add_extension_prefix(placement)).to eq(expected_placement_name_with_prefix)
+        expect(described_class.add_extension_prefix_if_necessary(placement)).to eq(expected_placement_name_with_prefix)
+      end
+
+      it "doesn't add a prefix to standard placements" do
+        placement = "ActivityAssetProcessor"
+        expect(described_class.add_extension_prefix_if_necessary(placement)).to eq(placement)
+      end
+
+      it "can handle symbols" do
+        placement = :assignment_edit
+        expected_placement_name_with_prefix = "https://canvas.instructure.com/lti/assignment_edit"
+        expect(described_class.add_extension_prefix_if_necessary(placement)).to eq(expected_placement_name_with_prefix)
+        placement = :ActivityAssetProcessor
+        expect(described_class.add_extension_prefix_if_necessary(placement)).to eq(placement)
       end
     end
   end

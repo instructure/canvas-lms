@@ -41,7 +41,12 @@ describe UserMerge do
       merger = user_model
       mergeme = UserMerge.from(user2)
       mergeme.into(user1, merger:, source: "this spec")
-      expect(mergeme.merge_data.items.find_by(item_type: "logs").item).to eq "{:merger_id=>#{merger.id}, :source=>\"this spec\"}"
+      expected_result = if RUBY_VERSION >= "3.4.0"
+                          "{merger_id: #{merger.id}, source: \"this spec\"}"
+                        else
+                          "{:merger_id=>#{merger.id}, :source=>\"this spec\"}"
+                        end
+      expect(mergeme.merge_data.items.find_by(item_type: "logs").item).to eq expected_result
     end
 
     it "marks as failed on merge failures" do

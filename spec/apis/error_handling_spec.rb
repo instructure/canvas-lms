@@ -28,11 +28,6 @@ describe "API Error Handling", type: :request do
   end
 
   describe "ActiveRecord Error JSON override" do
-    it "does not return the base object in ErrorMessage.to_json" do
-      err = ActiveModel::BetterErrors::ErrorMessage.new(@user, :name, :invalid, "invalid name")
-      expect(JSON.parse(err.to_json)).to eq({ "attribute" => "name", "type" => "invalid", "message" => "invalid name", "options" => {} })
-    end
-
     it "does not return the base object in ActiveRecord::Errors.to_json" do
       assmt = Assignment.new
       expect(assmt.valid?).to be_falsey

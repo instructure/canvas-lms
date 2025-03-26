@@ -24,6 +24,7 @@ import CanvasAsyncSelect, {
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import useContentShareUserSearchApi from '../effects/useContentShareUserSearchApi'
 import UserSearchSelectorItem from './UserSearchSelectorItem'
+import './ContentShareUserSearchSelector.css'
 
 const I18n = createI18nScope('user_search_selector')
 
@@ -46,12 +47,16 @@ type Props = {
   courseId: string
   onUserSelected: (user: any) => void
   selectedUsers: BasicUser[]
+  selectedUsersError?: boolean
+  userSelectInputRef?: (ref: HTMLInputElement | null) => void
 } & Omit<CanvasAsyncSelectProps, 'renderLabel'>
 
 export default function ContentShareUserSearchSelector({
   courseId,
   onUserSelected,
   selectedUsers,
+  selectedUsersError = false,
+  userSelectInputRef,
   ...restOfSelectProps
 }: Props) {
   const [searchedUsers, setSearchedUsers] = useState<BasicUser[] | null>(null)
@@ -61,6 +66,8 @@ export default function ContentShareUserSearchSelector({
   const {searchTerm, setSearchTerm, searchTermIsPending} = useDebouncedSearchTerm('', {
     isSearchableTerm,
   })
+
+  const shouldValidateCallToAction = window.ENV.FEATURES?.validate_call_to_action || false
 
   const userSearchParams: {
     search_term?: string
@@ -92,6 +99,10 @@ export default function ContentShareUserSearchSelector({
     ? I18n.t('No Results')
     : I18n.t('Enter at least %{count} characters', {count: MINIMUM_SEARCH_LENGTH})
 
+  const requredErrorMessages = selectedUsersError
+    ? [{type: 'newError', text: I18n.t('You must select at least one user')}]
+    : []
+
   const selectProps = {
     inputValue,
     isLoading: isLoading || searchTermIsPending,
@@ -101,6 +112,10 @@ export default function ContentShareUserSearchSelector({
     noOptionsLabel,
     onInputChange: handleInputChanged,
     onOptionSelected: handleUserSelected,
+    messages: requredErrorMessages,
+    id: 'content-share-user-search',
+    isRequired: shouldValidateCallToAction,
+    inputRef: userSelectInputRef
   }
 
   let userOptions: any = []
@@ -116,7 +131,10 @@ export default function ContentShareUserSearchSelector({
   }
 
   return (
-    <CanvasAsyncSelect {...restOfSelectProps} {...selectProps}>
+    <CanvasAsyncSelect
+      {...restOfSelectProps}
+      {...selectProps}
+    >
       {userOptions}
     </CanvasAsyncSelect>
   )

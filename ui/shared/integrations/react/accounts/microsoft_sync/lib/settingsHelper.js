@@ -38,7 +38,7 @@ export const SYNC_SETTINGS = [
  */
 export async function doUpdateSettings(state) {
   await doFetchApi({
-    path: `/api/v1/${ENV.CONTEXT_BASE_URL}`,
+    path: `/api/v1${ENV.CONTEXT_BASE_URL}`,
     method: 'PUT',
     body: {
       account: {

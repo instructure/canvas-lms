@@ -23,8 +23,8 @@ import FileFolderTable, {type FileFolderTableProps} from '..'
 import {BrowserRouter} from 'react-router-dom'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
-import {FileManagementContext} from '../../Contexts'
-
+import {FileManagementProvider} from '../../Contexts'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 export const defaultProps: FileFolderTableProps = {
   size: 'large',
   userCanEditFilesForContext: true,
@@ -44,11 +44,9 @@ export const renderComponent = (props = {}) => {
   return render(
     <BrowserRouter>
       <MockedQueryClientProvider client={queryClient}>
-        <FileManagementContext.Provider
-          value={{contextType: 'course', contextId: '1', folderId: '1', showingAllContexts: false}}
-        >
+        <FileManagementProvider value={createMockFileManagementContext()}>
           <FileFolderTable {...defaultProps} {...props} />
-        </FileManagementContext.Provider>
+        </FileManagementProvider>
       </MockedQueryClientProvider>
     </BrowserRouter>,
   )

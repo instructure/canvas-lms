@@ -17,27 +17,33 @@
  */
 
 import React from 'react'
-import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import ActionMenuButton from '../ActionMenuButton'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
-import {FileManagementContext} from '../../Contexts'
+import {FileManagementProvider, FileManagementContextProps} from '../../Contexts'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import fetchMock from 'fetch-mock'
+import userEvent from '@testing-library/user-event'
+import {assignLocation} from '@canvas/util/globalUtils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: jest.fn(),
 }))
 
-let defaultProps: any
-let defaultContext: any
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
-const renderComponent = (props = {}, context = {}) => {
+let defaultProps: any
+
+const renderComponent = (props = {}, context: Partial<FileManagementContextProps> = {}) => {
   return render(
     <Router>
-      <FileManagementContext.Provider value={{...defaultContext, ...context}}>
+      <FileManagementProvider value={createMockFileManagementContext(context)}>
         <ActionMenuButton {...defaultProps} {...props} />
-      </FileManagementContext.Provider>
+      </FileManagementProvider>
     </Router>,
   )
 }
@@ -50,12 +56,6 @@ describe('ActionMenuButton', () => {
       userCanDeleteFilesForContext: true,
       usageRightsRequiredForContext: true,
       row: FAKE_FILES[0],
-    }
-    defaultContext = {
-      contextType: 'course',
-      contextId: '1',
-      folderId: '1',
-      showingAllContexts: false,
     }
   })
 
@@ -70,12 +70,13 @@ describe('ActionMenuButton', () => {
     })
 
     it('renders all items for file type', async () => {
+      const user = userEvent.setup()
       renderComponent()
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
 
-      fireEvent.click(button)
+      await user.click(button)
       await waitFor(() => {
         expect(screen.getByText('Rename')).toBeInTheDocument()
         expect(screen.getByText('Download')).toBeInTheDocument()
@@ -89,12 +90,13 @@ describe('ActionMenuButton', () => {
     })
 
     it('renders items when context is groups', async () => {
+      const user = userEvent.setup()
       renderComponent({}, {contextType: 'groups'})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
 
-      fireEvent.click(button)
+      await user.click(button)
       await waitFor(() => {
         expect(screen.getByText('Rename')).toBeInTheDocument()
         expect(screen.getByText('Download')).toBeInTheDocument()
@@ -108,12 +110,13 @@ describe('ActionMenuButton', () => {
     })
 
     it('does not render items when userCanEditFilesForContext is false', async () => {
+      const user = userEvent.setup()
       renderComponent({userCanEditFilesForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
 
-      fireEvent.click(button)
+      await user.click(button)
       await waitFor(() => {
         expect(screen.queryByText('Rename')).toBeNull()
         expect(screen.getByText('Download')).toBeInTheDocument()
@@ -127,12 +130,13 @@ describe('ActionMenuButton', () => {
     })
 
     it('does not render items when userCanDeleteFilesForContext is false', async () => {
+      const user = userEvent.setup()
       renderComponent({userCanDeleteFilesForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
 
-      fireEvent.click(button)
+      await user.click(button)
       await waitFor(() => {
         expect(screen.getByText('Rename')).toBeInTheDocument()
         expect(screen.getByText('Download')).toBeInTheDocument()
@@ -146,12 +150,13 @@ describe('ActionMenuButton', () => {
     })
 
     it('does not render items when usageRightsRequiredForContext is false', async () => {
+      const user = userEvent.setup()
       renderComponent({usageRightsRequiredForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
 
-      fireEvent.click(button)
+      await user.click(button)
       await waitFor(() => {
         expect(screen.getByText('Rename')).toBeInTheDocument()
         expect(screen.getByText('Download')).toBeInTheDocument()
@@ -165,6 +170,7 @@ describe('ActionMenuButton', () => {
     })
 
     it('does not render items when locked by blueprint', async () => {
+      const user = userEvent.setup()
       renderComponent({
         row: {
           ...FAKE_FILES[0],
@@ -175,7 +181,7 @@ describe('ActionMenuButton', () => {
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
 
-      fireEvent.click(button)
+      await user.click(button)
       await waitFor(() => {
         expect(screen.queryByText('Rename')).toBeNull()
         expect(screen.getByText('Download')).toBeInTheDocument()
@@ -196,17 +202,75 @@ describe('ActionMenuButton', () => {
     })
 
     it('opens the rename modal', async () => {
+      const user = userEvent.setup()
       renderComponent()
 
       const button = screen.getByTestId('action-menu-button-large')
-      fireEvent.click(button)
+      await user.click(button)
 
       const renameButton = await screen.findByText('Rename')
-      fireEvent.click(renameButton)
+      await user.click(renameButton)
 
       await waitFor(() => {
         expect(screen.getByRole('heading', {name: 'Rename'})).toBeInTheDocument()
       })
+    })
+
+    it('closes and reopens the rename modal without clearing the name', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+      const menuButton = await screen.findByRole('button', {name: 'Actions'})
+      await user.click(menuButton)
+      // can't just re-use the variable because it gets removed from DOM
+      const renameButton = async () => await screen.findByRole('menuitem', {name: 'Rename'})
+      await user.click(await renameButton())
+
+      const input = async () => await screen.findByRole('textbox', {name: 'File Name *'})
+      expect(await input()).toHaveValue(FAKE_FILES[0].name)
+
+      const cancelButton = screen.getByRole('button', {name: 'Cancel'})
+      await user.click(cancelButton)
+      // necessary for onExited to fire
+      await waitFor(() => {
+        expect(screen.queryByRole('heading', {name: 'Rename', hidden: true})).toBeNull()
+      })
+
+      await user.click(menuButton)
+      await user.click(await renameButton())
+      expect(await input()).toHaveValue(FAKE_FILES[0].name)
+    })
+
+    it('launches LTI on click', async () => {
+      const user = userEvent.setup()
+      const fileMenuTools = [
+        {
+          id: '1',
+          title: 'Tool',
+          base_url: 'http://example.com',
+          icon_url: '',
+        },
+      ]
+      renderComponent({}, {fileMenuTools})
+      const menuButton = screen.getByTestId('action-menu-button-large')
+      await user.click(menuButton)
+
+      const toolButton = await screen.findByText('Tool')
+      await user.click(toolButton)
+
+      expect(assignLocation).toHaveBeenCalledWith(`http://example.com&files[]=${FAKE_FILES[0].id}`)
+    })
+
+    it('displays multiple LTI tools', async () => {
+      const user = userEvent.setup()
+      const fileMenuTools = [
+        {id: '1', title: 'Tool1', base_url: 'http://toolone.com', icon_url: ''},
+        {id: '2', title: 'Tool2', base_url: 'http://tooltwo.com', icon_url: ''},
+      ]
+      renderComponent({}, {fileMenuTools})
+      const menuButton = screen.getByTestId('action-menu-button-large')
+      await user.click(menuButton)
+      expect(await screen.findByText('Tool1')).toBeInTheDocument()
+      expect(await screen.findByText('Tool2')).toBeInTheDocument()
     })
   })
 
@@ -216,12 +280,13 @@ describe('ActionMenuButton', () => {
     })
 
     it('renders all items for folder type', async () => {
+      const user = userEvent.setup()
       renderComponent()
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
 
-      fireEvent.click(button)
+      await user.click(button)
       await waitFor(() => {
         expect(screen.getByText('Rename')).toBeInTheDocument()
         expect(screen.getByText('Download')).toBeInTheDocument()
@@ -233,44 +298,63 @@ describe('ActionMenuButton', () => {
     })
 
     it('opens the rename modal', async () => {
+      const user = userEvent.setup()
       renderComponent()
 
       const button = screen.getByTestId('action-menu-button-large')
-      fireEvent.click(button)
+      await user.click(button)
 
       const renameButton = await screen.findByText('Rename')
-      fireEvent.click(renameButton)
+      await user.click(renameButton)
 
       await waitFor(() => {
         expect(screen.getByRole('heading', {name: 'Rename'})).toBeInTheDocument()
       })
     })
+
+    it('does not display LTI button', async () => {
+      const user = userEvent.setup()
+      const fileMenuTools = [
+        {id: '1', title: 'Tool1', base_url: 'http://toolone.com', icon_url: ''},
+      ]
+      renderComponent({}, {fileMenuTools})
+      const menuButton = screen.getByTestId('action-menu-button-large')
+      await user.click(menuButton)
+      // necessary to make sure the menu is open
+      expect(await screen.findByText('Rename')).toBeInTheDocument()
+      expect(screen.queryByText('Tool1')).not.toBeInTheDocument()
+    })
   })
+
   describe('Delete behavior', () => {
     it('opens delete modal when delete button is clicked', async () => {
+      const user = userEvent.setup()
       renderComponent()
 
       const button = screen.getByTestId('action-menu-button-large')
-      fireEvent.click(button)
+      await user.click(button)
 
       const deleteButton = await screen.findByText('Delete')
-      fireEvent.click(deleteButton)
+      await user.click(deleteButton)
 
-      expect(await screen.findByText('Deleting this item cannot be undone. Do you want to continue?')).toBeInTheDocument()
+      expect(
+        await screen.findByText('Deleting this item cannot be undone. Do you want to continue?'),
+      ).toBeInTheDocument()
     })
 
     it('renders flash error when delete fails', async () => {
-      fetchMock.delete(/.*\/files\/1\?force=true/, 500, {overwriteRoutes: true})
+      const user = userEvent.setup()
+      fetchMock.delete(/.*\/files\/178\?force=true/, 500, {overwriteRoutes: true})
       renderComponent()
 
       const button = screen.getByTestId('action-menu-button-large')
-      fireEvent.click(button)
+      await user.click(button)
 
       const deleteButton = await screen.findByText('Delete')
-      fireEvent.click(deleteButton)
+      await user.click(deleteButton)
 
       const confirmButton = await screen.getByTestId('modal-delete-button')
-      fireEvent.click(confirmButton)
+      await user.click(confirmButton)
 
       await waitFor(() => {
         expect(showFlashError).toHaveBeenCalledWith('Failed to delete items. Please try again.')
@@ -278,12 +362,13 @@ describe('ActionMenuButton', () => {
     })
 
     it('does not render "Delete" when userCanDeleteFilesForContext is false', async () => {
+      const user = userEvent.setup()
       renderComponent({userCanDeleteFilesForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
 
-      fireEvent.click(button)
+      await user.click(button)
       await waitFor(() => {
         expect(screen.queryByText('Delete')).toBeNull()
       })

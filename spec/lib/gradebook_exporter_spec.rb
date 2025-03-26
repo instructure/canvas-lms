@@ -1120,7 +1120,7 @@ describe GradebookExporter do
 
   describe "discussion_checkpoints enabled" do
     before(:once) do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       student_in_course(course: @course, active_all: true)
       @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
       @assignment.grade_student(@student, grade: 5, grader: @teacher, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)

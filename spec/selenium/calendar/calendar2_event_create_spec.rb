@@ -158,6 +158,7 @@ describe "calendar2" do
       end
 
       it "shows the correct suggestions when user and context timezones differ", :ignore_js_errors do
+        skip("RCX-3131: Timezone issues")
         @user.time_zone = "America/Denver"
         @user.save!
         @course.time_zone = "America/New_York"

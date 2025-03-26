@@ -181,69 +181,61 @@ describe "admin settings tab" do
   end
 
   context "quiz ip address filter" do
-    before do
-      get "/accounts/#{Account.default.id}/settings"
-    end
-
     def add_quiz_filter(name = "www.canvas.instructure.com", value = "192.168.217.1/24")
-      fj("#ip_filters .name[value='']:visible").send_keys name
-      fj("#ip_filters .value[value='']:visible").send_keys value
+      link = f(%(button[data-testid="add-ip-filter"]))
+      scroll_into_view(link)
+      link.click
+      fj(%(input[data-testid="ip-filter-name"]:last)).send_keys name
+      fj(%(input[data-testid="ip-filter-filter"]:last)).send_keys value
       click_submit
       filter_hash = { name => value }
       expect(Account.default.settings[:ip_filters]).to include filter_hash
-      expect(fj("#ip_filters .name[value='#{name}']")).to be_displayed
-      expect(fj("#ip_filters .value[value='#{value}']")).to be_displayed
+      expect(fj(%(input[data-testid="ip-filter-name"][value='#{name}']))).to be_displayed
+      expect(fj(%(input[data-testid="ip-filter-filter"][value='#{value}']))).to be_displayed
       filter_hash
     end
 
     def create_quiz_filter(name = "www.canvas.instructure.com", value = "192.168.217.1/24")
       Account.default.tap do |a|
-        a.settings[:ip_filters] ||= []
-        a.settings[:ip_filters] << { name => value }
+        a.settings[:ip_filters] ||= {}
+        a.settings[:ip_filters].store(name, value)
         a.save!
       end
     end
 
-    it "clicks on the quiz help link" do
-      link = f(".ip_help_link")
-      scroll_into_view(link)
-      link.click
-      expect(f("#ip_filters_dialog")).to include_text "What are Quiz IP Filters?"
-    end
-
     it "adds a quiz filter" do
+      get "/accounts/#{Account.default.id}/settings"
       add_quiz_filter
     end
 
     it "adds another quiz filter" do
       create_quiz_filter
-      link = f(".add_ip_filter_link")
-      scroll_into_view(link)
-      link.click
+      get "/accounts/#{Account.default.id}/settings"
       add_quiz_filter "www.canvas.instructure.com/tests", "129.186.127.12/4"
     end
 
     it "edits a quiz filter" do
       create_quiz_filter
+      get "/accounts/#{Account.default.id}/settings"
       new_name = "www.example.org"
       new_value = "10.192.124.12/8"
-      replace_content(fj("#ip_filters .name:visible"), new_name)
-      replace_content(fj("#ip_filters .value:visible"), new_value)
+      replace_content(f(%(input[data-testid="ip-filter-name"])), new_name)
+      replace_content(f(%(input[data-testid="ip-filter-filter"])), new_value)
       click_submit
       filter_hash = { new_name => new_value }
       expect(Account.default.settings[:ip_filters]).to include filter_hash
-      expect(fj("#ip_filters .name[value='#{new_name}']")).to be_displayed
-      expect(fj("#ip_filters .value[value='#{new_value}']")).to be_displayed
+      expect(fj(%(input[data-testid="ip-filter-name"][value='#{new_name}']))).to be_displayed
+      expect(fj(%(input[data-testid="ip-filter-filter"][value='#{new_value}']))).to be_displayed
     end
 
     it "deletes a quiz filter" do
-      filter_hash = add_quiz_filter
-      link = f("#ip_filters .delete_filter_link")
+      create_quiz_filter
+      get "/accounts/#{Account.default.id}/settings"
+      link = f(%([data-testid="delete-ip-filter"]))
       scroll_into_view(link)
       link.click
       click_submit
-      expect(f("#account_settings")).not_to contain_css("#ip_filters .value[value='#{filter_hash.values.first}']")
-      expect(f("#account_settings")).not_to contain_css("#ip_filters .name[value='#{filter_hash.keys.first}']")
+      expect(f("#account_settings_quiz_ip_filters")).to include_text "No Quiz IP filters have been set"
       expect(Account.default.settings[:ip_filters]).to be_blank
     end
   end

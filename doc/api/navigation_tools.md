@@ -143,25 +143,23 @@ All of these settings are contained under "course_navigation"
 
   The layout type to use when launching the tool. Must be one of the following:
 
-  - default
-
-    Includes Canvas global navigation, breadcrumb, and course navigation.
-
-  - full_width
-
-    Includes Canvas global navigation but does not include breadcrumb or course navigation.
-
-  - full_width_in_context
-
-    Includes Canvas global_navigation, breadcrumb, and course navigation, and gives the tool access to the rest of the horizontal screen width.
-
-  - in_nav_context
-
-    Includes Canvas global_navigation, breadcrumbs, and course navigation.
-
-  - borderless
-
-    Does not include Canvas global_navigation, course navigation, or breadcrumbs
+  <ul style="list-style-type: circle;margin-left: 1em">
+    <li>default
+      <p>Includes Canvas global navigation, breadcrumb, and course navigation.</p>
+    </li>
+    <li>full_width
+      <p>Includes Canvas global navigation but does not include breadcrumb or course navigation.</p>
+    </li>
+    <li>full_width_in_context
+      <p>Includes Canvas global_navigation, breadcrumb, and course navigation, and gives the tool access to the rest of the horizontal screen width.</p>
+    </li>
+    <li>in_nav_context
+      <p>Includes Canvas global_navigation, breadcrumbs, and course navigation.</p>
+    </li>
+    <li>borderless
+      <p>Does not include Canvas global_navigation, course navigation, or breadcrumbs.</p>
+    </li>
+  </ul>
 
 - windowTarget: \_blank (optional)
 
@@ -221,25 +219,23 @@ All of these settings are contained under "account_navigation"
 
   The layout type to use when launching the tool. Must be one of the following:
 
-  - default
-
-    Includes Canvas global navigation, breadcrumb, and account navigation.
-
-  - full_width
-
-    Includes Canvas global navigation but does not include breadcrumb or account navigation. This is the default and recommended display type for global navigation.
-
-  - full_width_in_context
-
-    Includes Canvas global navigation, breadcrumb, and account navigation, and gives the tool access to the rest of the horizontal screen width.
-
-  - in_nav_context
-
-    Includes Canvas global navigation, breadcrumbs, and course navigation.
-
-  - borderless
-
-    Does not include Canvas global navigation, account navigation, or breadcrumbs
+  <ul style="list-style-type: circle;margin-left: 1em">
+    <li>default
+      <p>Includes Canvas global navigation, breadcrumb, and account navigation.</p>
+    </li>
+    <li>full_width
+      <p>Includes Canvas global navigation but does not include breadcrumb or account navigation. This is the default and recommended display type for global navigation.</p>
+    </li>
+    <li>full_width_in_context
+      <p>Includes Canvas global navigation, breadcrumb, and account navigation, and gives the tool access to the rest of the horizontal screen width.</p>
+    </li>
+    <li>in_nav_context
+      <p>Includes Canvas global navigation, breadcrumbs, and course navigation.</p>
+    </li>
+    <li>borderless
+      <p>Does not include Canvas global navigation, account navigation, or breadcrumbs.</p>
+    </li>
+  </ul>
 
 - windowTarget: \_blank (optional)
 

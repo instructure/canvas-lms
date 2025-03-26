@@ -64,7 +64,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   # @API Create a Developer Key Account Binding
   # Create a new Developer Key Account Binding. The developer key specified
   # in the request URL must be available in the requested account or the
-  # requeted account's account chain. If the binding already exists for the
+  # requested account's account chain. If the binding already exists for the
   # specified account/key combination it will be updated.
   #
   # @argument workflow_state [String]
@@ -73,30 +73,30 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   #
   # @returns DeveloperKeyAccountBinding
   def create_or_update
-    # To simplify use of this intenral API we allow creating or updating via
+    # To simplify use of this internal API we allow creating or updating via
     # this endpoint.
-    binding = existing_binding || DeveloperKeyAccountBinding.new(create_params)
-    binding.assign_attributes workflow_state_param
-    binding.current_user = @current_user
-    binding.save!
+    binding = nil
+    if lti_registration.present?
+      Lti::AccountBindingService.call(account: account,
+                                      user: @current_user,
+                                      registration: lti_registration,
+                                      workflow_state: workflow_state_param[:workflow_state]) => {developer_key_account_binding: binding}
+    else
+      binding = existing_binding || DeveloperKeyAccountBinding.new(create_params)
+      binding.assign_attributes workflow_state_param
+      binding.save!
+    end
+
     render json: DeveloperKeyAccountBindingSerializer.new(binding, @context),
-           status: existing_binding.present? ? :ok : :created
+           status: binding.previously_new_record? ? :ok : :created
   end
 
   private
-
-  def account
-    @_account ||= api_find(Account, params[:account_id])
-  end
 
   def existing_binding
     @_existing_binding ||= account.developer_key_account_bindings.find_by(
       developer_key_id: params[:developer_key_id]
     )
-  end
-
-  def developer_key
-    @_developer_key ||= DeveloperKey.find_cached(params[:developer_key_id])
   end
 
   def create_params
@@ -112,6 +112,18 @@ class DeveloperKeyAccountBindingsController < ApplicationController
     params.require(:developer_key_account_binding).permit(
       :workflow_state
     )
+  end
+
+  def account
+    @_account ||= api_find(Account, params[:account_id])
+  end
+
+  def lti_registration
+    @_registration ||= developer_key.lti_registration
+  end
+
+  def developer_key
+    @_developer_key ||= DeveloperKey.find_cached(params[:developer_key_id])
   end
 
   def developer_key_in_account

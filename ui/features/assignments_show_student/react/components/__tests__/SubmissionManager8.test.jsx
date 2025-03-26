@@ -143,31 +143,37 @@ describe('SubmissionManager', () => {
       expect(queryByLabelText(/I agree to the tool's/)).not.toBeInTheDocument()
     })
 
-    it('disables the "Submit" button if rendered and the user has not agreed to the pledge', () => {
-      const {getByTestId} = render(
+    it('displays an error message if the user attempts to submit but has not agreed to the pledge', () => {
+      const {getByTestId, getByLabelText} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>,
       )
-
       const submitButton = getByTestId('submit-button')
-      expect(submitButton).toBeDisabled()
+      act(() => {
+        fireEvent.click(submitButton)
+      })
+      expect(getByLabelText(/You must agree to the submission pledge before you can submit the assignment/)).toBeInTheDocument()
     })
 
-    it('enables the "Submit" button after the user agrees to the pledge', () => {
-      const {getByLabelText, getByTestId} = render(
+    it('removes the error message after the user agrees to the pledge', () => {
+      const {getByTestId, getByLabelText, queryByLabelText} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>,
       )
+      const submitButton = getByTestId('submit-button')
+      act(() => {
+        fireEvent.click(submitButton)
+      })
+      expect(getByLabelText(/You must agree to the submission pledge before you can submit the assignment/)).toBeInTheDocument()
 
       const agreementCheckbox = getByLabelText(/I agree to the tool's/)
       act(() => {
         fireEvent.click(agreementCheckbox)
       })
+      expect(queryByLabelText(/You must agree to the submission pledge before you can submit the assignment/)).not.toBeInTheDocument()
 
-      const submitButton = getByTestId('submit-button')
-      expect(submitButton).not.toBeDisabled()
     })
   })
 })

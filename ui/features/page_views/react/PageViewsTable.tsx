@@ -23,6 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
+import {Tooltip} from '@instructure/ui-tooltip'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useInfiniteQuery, type QueryFunctionContext} from '@tanstack/react-query'
 import {
@@ -49,6 +50,14 @@ type APIQueryParams = {
 
 const I18n = i18nScope('page_views')
 
+function UserAgentCell({view}: {view: PageView}): React.JSX.Element {
+  return (
+    <Tooltip renderTip={view.rawUserAgentString} on={['hover', 'focus']}>
+      {view.userAgent}
+    </Tooltip>
+  )
+}
+
 export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
   const observerRef = useRef<IntersectionObserver | null>(null)
 
@@ -74,6 +83,7 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
       createdAt: new Date(v.created_at),
       participated: formatParticipated(v),
       interactionSeconds: formatInteractionTime(v),
+      rawUserAgentString: v.user_agent,
       userAgent: formatUserAgent(v),
     }))
     const nextPage = link?.next ? link.next.page : null
@@ -152,8 +162,12 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
           <Table.Row>
             <Table.ColHeader id="page-view-url">{I18n.t('URL')}</Table.ColHeader>
             <Table.ColHeader id="page-view-date">{I18n.t('Date')}</Table.ColHeader>
-            <Table.ColHeader id="page-view-participated">{I18n.t('Participated')}</Table.ColHeader>
-            <Table.ColHeader id="page-view-interaction-time">{I18n.t('Time')}</Table.ColHeader>
+            <Table.ColHeader id="page-view-participated" textAlign="center">
+              {I18n.t('Participated')}
+            </Table.ColHeader>
+            <Table.ColHeader id="page-view-interaction-time" textAlign="end">
+              {I18n.t('Time')}
+            </Table.ColHeader>
             <Table.ColHeader id="page-view-user-agent">{I18n.t('User Agent')}</Table.ColHeader>
           </Table.Row>
         </Table.Head>
@@ -170,8 +184,10 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
                 <Table.Cell>{url}</Table.Cell>
                 <Table.Cell>{formatDate(v.createdAt)}</Table.Cell>
                 <Table.Cell textAlign="center">{v.participated}</Table.Cell>
-                <Table.Cell>{v.interactionSeconds}</Table.Cell>
-                <Table.Cell>{v.userAgent}</Table.Cell>
+                <Table.Cell textAlign="end">{v.interactionSeconds}</Table.Cell>
+                <Table.Cell>
+                  <UserAgentCell view={v} />
+                </Table.Cell>
               </Table.Row>
             )
           })}

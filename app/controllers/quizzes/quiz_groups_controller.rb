@@ -199,7 +199,7 @@ class Quizzes::QuizGroupsController < ApplicationController
 
   def format_errors(group)
     group.errors.each_with_object({ errors: {} }) do |e, json|
-      json[:errors][e.first] = e.last
+      json[:errors][e.attribute] = e.message
     end
   end
 end

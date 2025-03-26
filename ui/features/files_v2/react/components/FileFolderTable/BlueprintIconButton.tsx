@@ -19,10 +19,7 @@
 import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
-import {
-  IconBlueprintLine,
-  IconBlueprintLockLine,
-} from '@instructure/ui-icons'
+import {IconBlueprintLine, IconBlueprintLockLine} from '@instructure/ui-icons'
 import {type File, type Folder} from '../../../interfaces/File'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -65,21 +62,22 @@ const BlueprintIconButton = ({item}: BlueprintIconButtonProps) => {
         restricted: !isLocked,
       },
     })
-    .then(() => setIsLocked(!isLocked))
-    .catch((error) => {
-      showFlashError(
-        I18n.t('An error occurred changing the lock state for "%{fileName}"', {fileName})
-      )(error)
-    })
-    .finally(() => {
-      setIsUpdating(false)
-    })
+      .then(() => setIsLocked(!isLocked))
+      .catch(error => {
+        showFlashError(
+          I18n.t('An error occurred changing the lock state for "%{fileName}".', {fileName}),
+        )(error)
+      })
+      .finally(() => {
+        setIsUpdating(false)
+      })
   }
 
   const title = isLocked ? I18n.t('Locked') : I18n.t('Unlocked')
   const icon = isLocked ? <IconBlueprintLockLine /> : <IconBlueprintLine />
   if (item.is_master_course_master_content) {
-    return tooltipComponent(title,
+    return tooltipComponent(
+      title,
       <IconButton
         withBackground={false}
         withBorder={false}
@@ -87,8 +85,8 @@ const BlueprintIconButton = ({item}: BlueprintIconButtonProps) => {
         shape="circle"
         screenReaderLabel={
           isLocked
-          ? I18n.t('%{fileName}  is Locked - Click to modify', {fileName})
-          : I18n.t('%{fileName}  is Unlocked - Click to modify', {fileName})
+            ? I18n.t('%{fileName}  is Locked - Click to modify', {fileName})
+            : I18n.t('%{fileName}  is Unlocked - Click to modify', {fileName})
         }
         title={title}
         onClick={handleOnClick}
@@ -96,7 +94,7 @@ const BlueprintIconButton = ({item}: BlueprintIconButtonProps) => {
         interaction={isUpdating ? 'disabled' : 'enabled'}
       >
         {icon}
-      </IconButton>
+      </IconButton>,
     )
   }
 

@@ -72,7 +72,8 @@ class GradebooksController < ApplicationController
              restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user),
              student_grade_summary_upgrade: Account.site_admin.feature_enabled?(:student_grade_summary_upgrade),
              can_clear_badge_counts: Account.site_admin.grants_right?(@current_user, :manage_students),
-             custom_grade_statuses: @context.custom_grade_statuses.as_json(include_root: false)
+             custom_grade_statuses: @context.custom_grade_statuses.as_json(include_root: false),
+             consolidated_media_player: Account.site_admin.feature_enabled?(:consolidated_media_player),
            })
     return render :grade_summary_list unless @presenter.student
 
@@ -896,7 +897,7 @@ class GradebooksController < ApplicationController
 
             submission[:dont_overwrite_grade] = dont_overwrite_grade
             submission.delete(:final) if submission[:final] && !@assignment.permits_moderation?(@current_user)
-            if params.key?(:sub_assignment_tag) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
+            if params.key?(:sub_assignment_tag) && @context.discussion_checkpoints_enabled?
               submission[:sub_assignment_tag] = params[:sub_assignment_tag]
             end
             subs = @assignment.grade_student(@user, submission.merge(skip_grader_check: is_default_grade_for_missing))
@@ -978,7 +979,7 @@ class GradebooksController < ApplicationController
           course: @context
         ).map { |c| { submission_comment: c } }
 
-        if assignment.root_account.feature_enabled?(:discussion_checkpoints)
+        if assignment.context.discussion_checkpoints_enabled?
           submission_json[:has_sub_assignment_submissions] = assignment.has_sub_assignments
           submission_json[:sub_assignment_submissions] = (assignment.has_sub_assignments &&
             assignment.sub_assignments&.map do |sub_assignment|
@@ -1046,7 +1047,12 @@ class GradebooksController < ApplicationController
                   else
                     @context.assignments.active.find(params[:assignment_id])
                   end
-    platform_service_speedgrader_enabled = platform_service_speedgrader_enabled?(params)
+
+    platform_speedgrader_param_enabled = query_params_allow_platform_service_speedgrader?(params)
+    platform_speedgrader_feature_enabled = platform_service_speedgrader_enabled?
+    track_speedgrader_metrics(platform_speedgrader_param_enabled, platform_speedgrader_feature_enabled)
+    platform_service_speedgrader_enabled = platform_speedgrader_param_enabled && platform_speedgrader_feature_enabled
+
     if platform_service_speedgrader_enabled
       InstStatsd::Statsd.increment("speedgrader.platform_service.load")
       @page_title = t("SpeedGrader")
@@ -1443,7 +1449,7 @@ class GradebooksController < ApplicationController
 
   private
 
-  def platform_service_speedgrader_enabled?(params)
+  def platform_service_speedgrader_enabled?
     return false unless @context.feature_enabled?(:platform_service_speedgrader)
 
     if @assignment.present?
@@ -1452,6 +1458,10 @@ class GradebooksController < ApplicationController
 
     return false if Services::PlatformServiceSpeedgrader.launch_url.blank?
 
+    true
+  end
+
+  def query_params_allow_platform_service_speedgrader?(params)
     params[:platform_sg].nil? || value_to_boolean(params[:platform_sg])
   end
 
@@ -1760,6 +1770,16 @@ class GradebooksController < ApplicationController
   def track_update_metrics(params, submission)
     if params.dig(:submission, :grade) && params["submission"]["grade"].to_s != submission.grade.to_s && params["originator"] == "speed_grader"
       InstStatsd::Statsd.increment("speedgrader.submission.posted_grade")
+    end
+  end
+
+  def track_speedgrader_metrics(param_enabled, feature_enabled)
+    if param_enabled && feature_enabled
+      InstStatsd::Statsd.increment("speedgrader.modernized.load")
+    elsif feature_enabled
+      InstStatsd::Statsd.increment("speedgrader.legacy.load.fallback")
+    else
+      InstStatsd::Statsd.increment("speedgrader.legacy.load")
     end
   end
 end

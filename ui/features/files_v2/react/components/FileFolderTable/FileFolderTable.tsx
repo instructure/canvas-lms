@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -30,7 +30,7 @@ import {useQuery, queryClient} from '@canvas/query'
 import {type File, type Folder} from '../../../interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {parseLinkHeader} from '../../../utils/apiUtils'
-import {isFile, getUniqueId} from '../../../utils/fileFolderUtils'
+import {getUniqueId} from '../../../utils/fileFolderUtils'
 import SubTableContent from './SubTableContent'
 import ActionMenuButton from './ActionMenuButton'
 import NameLink from './NameLink'
@@ -40,14 +40,14 @@ import renderTableHead from './RenderTableHead'
 import renderTableBody from './RenderTableBody'
 import BulkActionButtons from './BulkActionButtons'
 import Breadcrumbs from './Breadcrumbs'
-import getCookie from '@instructure/get-cookie'
 import CurrentUploads from '../FilesHeader/CurrentUploads'
 import {View} from '@instructure/ui-view'
-import {FileManagementContext} from '../Contexts'
+import {useFileManagement} from '../Contexts'
 import {FileFolderWrapper, FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
 import BlueprintIconButton from './BlueprintIconButton'
 import {Alert} from '@instructure/ui-alerts'
 import CurrentDownloads from '../FilesHeader/CurrentDownloads'
+import UsageRightsModal from './UsageRightsModal'
 
 const I18n = createI18nScope('files_v2')
 
@@ -137,6 +137,7 @@ setColumnWidths(columnHeaders)
 const columnRenderers: {
   [key: string]: ({
     row,
+    rows,
     isStacked,
     userCanEditFilesForContext,
     userCanDeleteFilesForContext,
@@ -144,8 +145,10 @@ const columnRenderers: {
     size,
     isSelected,
     toggleSelect,
-}: {
+    setModalOrTrayOptions,
+  }: {
     row: File | Folder
+    rows: (File | Folder)[]
     isStacked: boolean
     userCanEditFilesForContext: boolean
     userCanDeleteFilesForContext: boolean
@@ -153,9 +156,10 @@ const columnRenderers: {
     size: 'small' | 'medium' | 'large'
     isSelected: boolean
     toggleSelect: () => void
+    setModalOrTrayOptions: (modalOrTray: ModalOrTrayOptions | null) => () => void
   }) => React.ReactNode
 } = {
-  name: ({row, isStacked}) => <NameLink isStacked={isStacked} item={row} />,
+  name: ({row, rows, isStacked}) => <NameLink isStacked={isStacked} item={row} collection={rows} />,
   created_at: ({row}) => <FriendlyDatetime dateTime={row.created_at} />,
   updated_at: ({row}) => (
     <div style={{padding: '0 0.5em'}}>
@@ -172,11 +176,17 @@ const columnRenderers: {
     ) : null,
   size: ({row}) =>
     'size' in row ? <Text>{friendlyBytes(row.size)}</Text> : <Text>{I18n.t('--')}</Text>,
-  rights: ({row, userCanEditFilesForContext, usageRightsRequiredForContext}) =>
+  rights: ({
+    row,
+    userCanEditFilesForContext,
+    usageRightsRequiredForContext,
+    setModalOrTrayOptions,
+  }) =>
     row.folder_id && usageRightsRequiredForContext ? (
       <RightsIconButton
         usageRights={row.usage_rights}
         userCanEditFilesForContext={userCanEditFilesForContext}
+        onClick={setModalOrTrayOptions({id: 'manage-usage-rights', items: [row]})}
       />
     ) : null,
   blueprint: ({row}) => <BlueprintIconButton item={row} />,
@@ -198,6 +208,11 @@ const columnRenderers: {
       row={row}
     />
   ),
+}
+
+export type ModalOrTrayOptions = {
+  id: 'manage-usage-rights' | null
+  items: (File | Folder)[]
 }
 
 export interface FileFolderTableProps {
@@ -225,15 +240,16 @@ const FileFolderTable = ({
   onSortChange,
   searchString = '',
 }: FileFolderTableProps) => {
-  const {currentFolder} = useContext(FileManagementContext)
+  const {currentFolder} = useFileManagement()
   const isStacked = size !== 'large'
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
   const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>('')
 
   const [sortColumn, setSortColumn] = useState<string>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | 'none'>('asc')
+  const [modalOrTrayOptions, _setModalOrTrayOptions] = useState<ModalOrTrayOptions | null>(null)
 
-  const { data, error, isLoading, isFetching } = useQuery({
+  const {data, error, isLoading, isFetching} = useQuery({
     queryKey: ['files', currentUrl],
     queryFn: () => {
       setSelectedRows(new Set())
@@ -243,7 +259,7 @@ const FileFolderTable = ({
       return fetchFilesAndFolders(currentUrl, onLoadingStatusChange)
     },
     staleTime: 0,
-    onSuccess: ({ links }) => {
+    onSuccess: ({links}) => {
       onPaginationLinkChange(links)
     },
     onSettled: result => {
@@ -266,12 +282,17 @@ const FileFolderTable = ({
   }, [currentFolder])
 
   if (error) {
-    showFlashError(I18n.t('Failed to fetch files and folders'))
+    showFlashError(I18n.t('Failed to fetch files and folders.'))()
   }
 
   const rows: (File | Folder)[] = useMemo(
     () => (!isFetching && data?.rows && data.rows.length > 0 ? data.rows : []),
     [data?.rows, isFetching],
+  )
+
+  const setModalOrTrayOptions = useCallback(
+    (options: ModalOrTrayOptions | null) => () => _setModalOrTrayOptions(options),
+    [],
   )
 
   const toggleRowSelection = useCallback(
@@ -340,6 +361,19 @@ const FileFolderTable = ({
     }
   })
 
+  const renderModals = useCallback(
+    () => (
+      <>
+        <UsageRightsModal
+          open={modalOrTrayOptions?.id === 'manage-usage-rights'}
+          items={modalOrTrayOptions?.items || []}
+          onDismiss={setModalOrTrayOptions(null)}
+        />
+      </>
+    ),
+    [modalOrTrayOptions?.id, modalOrTrayOptions?.items, setModalOrTrayOptions],
+  )
+
   const renderTableActionsHead = useCallback(() => {
     const direction = size === 'small' ? 'column' : 'row'
     return (
@@ -360,14 +394,17 @@ const FileFolderTable = ({
         </Flex.Item>
       </Flex>
     )
-}, [
+  }, [
     folderBreadcrumbs,
     rows.length,
     selectedRows,
     size,
-    userCanDeleteFilesForContext,
-    userCanEditFilesForContext,
+    folderBreadcrumbs,
     searchString,
+    selectedRows,
+    rows,
+    userCanEditFilesForContext,
+    userCanDeleteFilesForContext,
   ])
 
   const tableCaption = I18n.t(
@@ -380,6 +417,7 @@ const FileFolderTable = ({
 
   return (
     <>
+      {renderModals()}
       {renderTableActionsHead()}
       <View display="block" margin="0 0 medium">
         <CurrentUploads />
@@ -415,6 +453,7 @@ const FileFolderTable = ({
             userCanEditFilesForContext,
             userCanDeleteFilesForContext,
             usageRightsRequiredForContext,
+            setModalOrTrayOptions,
           )}
         </Table.Body>
       </Table>
@@ -444,6 +483,20 @@ const FileFolderTable = ({
           sortDirection: sortDirection === 'asc' ? 'ascending' : 'descending',
         })}
       </Alert>
+      {searchString && rows.length > 0 && (
+        <Alert
+          liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+          liveRegionPoliteness="assertive"
+          screenReaderOnly
+          data-testid="search-announcement"
+        >
+          {I18n.t(
+            'file_search_count',
+            {one: 'One result found', other: '%{count} results found'},
+            {count: rows.length},
+          )}
+        </Alert>
+      )}
     </>
   )
 }

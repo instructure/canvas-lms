@@ -66,7 +66,7 @@ module Api::V1::LearningObjectDates
   private
 
   def add_checkpoint_info(hash, learning_object, overridable)
-    if learning_object.root_account.feature_enabled?(:discussion_checkpoints) && overridable.respond_to?(:has_sub_assignments?) && overridable.has_sub_assignments?
+    if learning_object.context.discussion_checkpoints_enabled? && overridable.respond_to?(:has_sub_assignments?) && overridable.has_sub_assignments?
       hash["checkpoints"] = overridable.sub_assignments.map { |sub_assignment| Checkpoint.new(sub_assignment, @current_user).as_json.except("name", "points_possible") }
     end
   end

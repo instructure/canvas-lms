@@ -38,6 +38,9 @@ const uploadMediaTranslations = {
     SUBMIT_TEXT: 'Submit',
     UPLOADING_ERROR: 'Upload Error',
     UPLOAD_MEDIA_LABEL: 'Upload Media',
+    SELECT_SUPPORTED_FILE_TYPE: 'Please select a file of a supported type',
+    CHOOSE_FILE_TO_UPLOAD: 'Please choose a file',
+    ENTER_FILE_NAME: 'Please enter a file name',
   },
   SelectStrings: {
     USE_ARROWS: 'Use arrow keys to navigate options.',
@@ -63,9 +66,10 @@ interface ComputerPanelProps {
   useStudioPlayer: boolean
 }
 
-function createPanel(overrideProps: Partial<ComputerPanelProps>) {
+function createPanel(overrideProps: Partial<ComputerPanelProps>, ref?: React.Ref<any>) {
   return (
     <ComputerPanel
+      ref={ref}
       theFile={null}
       setFile={() => {}}
       hasUploadedFile={false}
@@ -109,18 +113,6 @@ describe('UploadMedia: ComputerPanel', () => {
     }
   })
 
-  it('shows a failure message if the file is rejected', () => {
-    const notAMediaFile = new File(['foo'], 'foo.txt', {type: 'text/plain'})
-    const {getByLabelText, getByText} = renderPanel()
-    const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
-    fireEvent.change(dropZone, {
-      target: {
-        files: [notAMediaFile],
-      },
-    })
-    expect(getByText('Invalid File')).toBeVisible()
-  })
-
   it('shows an editable text input for title if a valid file is added', async () => {
     const aFile = new File(['foo'], 'foo.mov', {
       type: 'video/quicktime',
@@ -147,6 +139,48 @@ describe('UploadMedia: ComputerPanel', () => {
     expect(titleInput.value).toEqual('foo.mov')
     fireEvent.change(titleInput, {target: {value: 'Awesome video'}})
     expect(titleInput.value).toEqual('Awesome video')
+  })
+
+  describe('validation', () => {
+    describe('file', () => {
+      it('shows an error if not defined', () => {
+        const ref = React.createRef<{ updateValidationMessages: () => void }>()
+        const { getByText } = render(createPanel({}, ref))
+        act(() => ref.current?.updateValidationMessages())
+        expect(getByText('Please choose a file')).toBeVisible()
+      })
+
+      it('shows an error if rejected', () => {
+        const notAMediaFile = new File(['foo'], 'foo.txt', {type: 'text/plain'})
+        const {getByLabelText, getByText} = renderPanel()
+        const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
+        fireEvent.change(dropZone, {
+          target: {
+            files: [notAMediaFile],
+          },
+        })
+        expect(getByText('Please select a file of a supported type')).toBeVisible()
+      })
+    })
+
+    describe('file name', () => {
+      it('shows an error if blank', () => {
+        const ref = React.createRef<{ updateValidationMessages: () => void }>()
+        const aFile = new File(['foo'], 'foo.mov', {
+          type: 'video/quicktime',
+        })
+        const { getByPlaceholderText, getByText } = render(createPanel({
+          theFile: aFile,
+          hasUploadedFile: true,
+        }, ref))
+
+        const titleInput = getByPlaceholderText('File name')
+        fireEvent.change(titleInput, {target: {value: ''}})
+
+        act(() => ref.current?.updateValidationMessages())
+        expect(getByText('Please enter a file name')).toBeVisible()
+      })
+    })
   })
 
   describe('file preview', () => {

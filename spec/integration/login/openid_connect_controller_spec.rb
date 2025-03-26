@@ -29,32 +29,39 @@ describe Login::OpenidConnectController do
                                                    authorize_url: "http://somewhere/oidc",
                                                    issuer: "issuer",
                                                    client_id: "audience",
+                                                   client_secret: "secret",
                                                    jwks_uri: "http://somewhere/jwks",
                                                    jwks: [jwk].to_json)
     allow(ap).to receive(:download_jwks)
     ap.save!
     ap
   end
-  let(:sid_id_token) { JSON::JWT.new({ sub: "uid", iss: "issuer", aud: "audience", sid: "session" }).to_s }
-  let(:sub_id_token) { JSON::JWT.new({ sub: "uid", iss: "issuer", aud: "audience" }).to_s }
+  let(:sid_id_token) { JSON::JWT.new({ sub: "uid", iss: "issuer", aud: "audience", sid: "session" }) }
+  let(:sub_id_token) { JSON::JWT.new({ sub: "uid", iss: "issuer", aud: "audience" }) }
 
   before do
     allow_any_instantiation_of(Account.default).to receive(:terms_required?).and_return(false)
   end
 
-  def do_login(id_token = sid_id_token, include_sid: true)
+  def do_login(id_token = sid_id_token, include_sid: true, final_redirect: nil)
     get login_openid_connect_url
     expect(response).to be_redirect
     uri = URI.parse(response.location)
     state_jwt = Rack::Utils.parse_nested_query(uri.query)["state"]
     uri.query = nil
     expect(uri.to_s).to eql oidc_ap.authorize_url
+    state_jwt_decoded = JSON::JWT.decode(state_jwt, :skip_verification)
+    id_token["iat"] = Time.zone.now.to_i
+    id_token["exp"] = Time.zone.now.to_i + 5
+    id_token["nonce"] = state_jwt_decoded["nonce"]
+    id_token = id_token.sign(oidc_ap.client_secret).to_s
 
+    id_token = id_token.to_s
     token = instance_double(OAuth2::AccessToken, params: { "id_token" => id_token }, token: nil, options: {})
     allow_any_instantiation_of(oidc_ap).to receive(:get_token).and_return(token)
     get oauth2_login_callback_url, params: { code: "code", state: state_jwt }
 
-    expect(response).to redirect_to dashboard_url(login_success: 1)
+    expect(response).to redirect_to(final_redirect || dashboard_url(login_success: 1))
     expect(session[:oidc_id_token]).to eql id_token
     expect(session[:oidc_id_token_iss]).to eql "issuer"
     if include_sid
@@ -76,6 +83,12 @@ describe Login::OpenidConnectController do
   describe "#create" do
     it "persists id token details in session" do
       do_login
+    end
+
+    it "redirects to a specified URI" do
+      id_token = sid_id_token
+      id_token[AuthenticationProvider::OpenIDConnect::POST_LOGIN_REDIRECT_CLAIM] = "/courses"
+      do_login(id_token, final_redirect: courses_url)
     end
   end
 

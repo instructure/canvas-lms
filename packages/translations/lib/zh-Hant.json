@@ -32,6 +32,12 @@
     "additional_considerations_f3801683": {
         "message": "其他考慮因素"
     },
+    "address_applied_64269b0b": {
+        "message": "已套用位址"
+    },
+    "address_removed_fcb496e0": {
+        "message": "已移除位址"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "URL 相同的相鄰連結應為單一連結。"
     },
@@ -202,6 +208,12 @@
     },
     "blue_daf8fea9": {
         "message": "藍色"
+    },
+    "bold_applied_42d547b7": {
+        "message": "已套用粗體"
+    },
+    "bold_removed_da474a5c": {
+        "message": "已移除粗體"
     },
     "border_5b08b06d": {
         "message": "邊框"
@@ -595,6 +607,12 @@
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "顯示文字連結（在新標籤中開啟）"
+    },
+    "div_applied_49ad83fc": {
+        "message": "已套用 Div"
+    },
+    "div_removed_d13f8e17": {
+        "message": "已移除 Div"
     },
     "division_sign_72190870": {
         "message": "除號"
@@ -992,6 +1010,12 @@
     "heading_4_b2e74be7": {
         "message": "標題 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "已套用標題 { h }"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "已移除標題 { h }"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "不應跳過標題層。"
     },
@@ -1198,6 +1222,12 @@
     },
     "italian_bd3c792d": {
         "message": "義大利語"
+    },
+    "italic_applied_8f59a684": {
+        "message": "已套用斜體"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "已移除斜體 "
     },
     "japanese_b5721ca7": {
         "message": "日語"
@@ -1690,6 +1720,12 @@
     },
     "paragraph_5e5ad8eb": {
         "message": "段落"
+    },
+    "paragraph_applied_959b3fe5": {
+        "message": "已套用段落"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "已移除段落"
     },
     "paragraph_starting_with_start_a59923f8": {
         "message": "以 { start } 開始的段落"
@@ -2470,6 +2506,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "無法決定資源選擇網址"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "已套用底線"
+    },
+    "underline_removed_3693e17c": {
+        "message": "已移除底線"
     },
     "union_e6b57a53": {
         "message": "聯集"

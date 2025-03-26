@@ -242,7 +242,7 @@ describe UsersController, type: :request do
   end
 
   it "supports ignore for sub assignments" do
-    @teacher_course.root_account.enable_feature!(:discussion_checkpoints)
+    @teacher_course.account.enable_feature!(:discussion_checkpoints)
     rtt, _ = graded_discussion_topic_with_checkpoints(context: @teacher_course)
     student = @teacher_course.students.first
     rtt.submit_homework(student, body: "checkpoint submission for #{student.name}")

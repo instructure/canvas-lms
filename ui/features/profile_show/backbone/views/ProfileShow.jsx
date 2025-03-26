@@ -198,6 +198,11 @@ export default class ProfileShow extends Backbone.View {
   validateForm(event) {
     const validations = {
       property_validations: {
+        'user[short_name]': function (value) {
+          if (!value || value.trim() === '') {
+            return I18n.t('user_short_name_required', 'Please add your full name')
+          }
+        },
         'user_profile[title]': function (value) {
           if (value && value.length > 255) {
             return I18n.t('profile_title_too_long', 'Title is too long')

@@ -44,10 +44,14 @@ DirectShareUserModal.propTypes = {
 export default function DirectShareUserModal({contentShare, courseId, ...modalProps}) {
   const [selectedUsers, setSelectedUsers] = useState([])
   const [postStatus, setPostStatus] = useState(null)
+  const [selectedUsersError, setSelectedUsersError] = useState(false)
+  const userSelectInputRef = useRef(null)
   const previousOpen = useRef(modalProps.open)
+  const shouldValidateCallToAction = window.ENV.FEATURES?.validate_call_to_action || false
 
   function resetState() {
     setSelectedUsers([])
+    setSelectedUsersError(false)
     setPostStatus(null)
   }
 
@@ -73,6 +77,12 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
   }
 
   function handleSend() {
+    if (shouldValidateCallToAction && selectedUsers.length === 0) {
+      userSelectInputRef?.current.focus()
+      setSelectedUsersError(true)
+      return
+    }
+    setSelectedUsersError(false)
     setPostStatus('info')
     startSendOperation()
       .then(sendSuccessful)
@@ -90,11 +100,12 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
   }
 
   function Footer() {
+    const disabledByUserSelected = selectedUsers.length === 0 && !shouldValidateCallToAction
     return (
       <>
         <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
         <Button
-          disabled={selectedUsers.length === 0 || postStatus === 'info'}
+          disabled={disabledByUserSelected || postStatus === 'info'}
           color="primary"
           margin="0 0 0 x-small"
           onClick={handleSend}
@@ -141,6 +152,8 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
           selectedUsers={selectedUsers}
           onUserSelected={handleUserSelected}
           onUserRemoved={handleUserRemoved}
+          selectedUsersError={selectedUsersError}
+          userSelectInputRef={ref => (userSelectInputRef.current = ref)}
         />
       </Suspense>
     </CanvasModal>

@@ -45,7 +45,7 @@ class ContextExternalTool < ActiveRecord::Base
   validates :config_url, presence: { if: ->(t) { t.config_type == "by_url" } }
   validates :config_xml, presence: { if: ->(t) { t.config_type == "by_xml" } }
   validates :domain, length: { maximum: 253, allow_blank: true }
-  validates :lti_version, inclusion: { in: %w[1.1 1.3], message: -> { t("%{value} is not a valid LTI version") } }
+  validates :lti_version, inclusion: { in: %w[1.1 1.3], message: ->(_object, _data) { t("%{value} is not a valid LTI version") } }
   validate :url_or_domain_is_set
   validate :validate_urls
   attr_reader :config_type, :config_url, :config_xml
@@ -74,7 +74,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   # add_identity_hash needs to calculate off of other data in the object, so it
   # should always be the last field change callback to run
-  before_save :infer_defaults, :validate_vendor_help_link, :add_identity_hash
+  before_save :infer_defaults, :add_identity_hash
   after_save :touch_context, :check_global_navigation_cache, :clear_tool_domain_cache
   after_commit :update_unified_tool_id, if: :update_unified_tool_id?
   validate :check_for_xml_error
@@ -555,25 +555,6 @@ class ContextExternalTool < ActiveRecord::Base
     (settings[:custom_fields] || {}).map do |key, val|
       "#{key}=#{val}"
     end.sort.join("\n")
-  end
-
-  def vendor_help_link
-    settings[:vendor_help_link]
-  end
-
-  def vendor_help_link=(val)
-    settings[:vendor_help_link] = val
-  end
-
-  def validate_vendor_help_link
-    return if vendor_help_link.blank?
-
-    begin
-      _value, uri = CanvasHttp.validate_url(vendor_help_link)
-      self.vendor_help_link = uri.to_s
-    rescue URI::Error, ArgumentError
-      self.vendor_help_link = nil
-    end
   end
 
   def config_type=(val)

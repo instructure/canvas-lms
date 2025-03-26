@@ -112,7 +112,7 @@ class GradebookExporter
       @course,
       ignore_muted: false,
       grading_period:,
-      include_discussion_checkpoints: @course.root_account.feature_enabled?(:discussion_checkpoints)
+      include_discussion_checkpoints: @course.discussion_checkpoints_enabled?
     )
 
     submissions = {}
@@ -130,7 +130,7 @@ class GradebookExporter
     assignments = sort_assignments(assignments)
 
     # Insert the sub-assignments after the assignments are sorted
-    if @course.root_account.feature_enabled?(:discussion_checkpoints)
+    if @course.discussion_checkpoints_enabled?
       assignments_with_checkpoints = []
       assignments.each do |a|
         assignments_with_checkpoints << a

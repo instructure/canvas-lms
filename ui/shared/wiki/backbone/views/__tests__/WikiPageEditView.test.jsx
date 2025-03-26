@@ -20,7 +20,7 @@ import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import WikiPageEditView from '../WikiPageEditView'
 import WikiPage from '../../models/WikiPage'
-import {TITLE_MAX_LENGTH} from '../../../utils/constants'
+import {BODY_MAX_LENGTH} from '../../../utils/constants'
 
 const createView = opts => {
   const view = new WikiPageEditView({
@@ -54,26 +54,21 @@ describe('WikiPageEditView', () => {
 
   test('should show errors', () => {
     const view = createView()
-    const errors = { title: [{ type: 'required', message: 'Title is required' }] }
+    const errors = {
+      body: [{ type: 'too_long', message: 'Error...' }],
+    }
     view.showErrors(errors)
-    expect(view.$('.error')).toBeDefined()
+    expect(view.$('.body_has_errors')).toBeDefined()
   })
 
   describe('validate form data', () => {
-    test('should validate form data with no title', () => {
-      const view = createView()
-      const data = { title: '' }
-      const errors = view.validateFormData(data)
-      expect(errors.title[0].type).toBe('required')
-      expect(errors.title[0].message).toBe('A page title is required')
-    })
 
-    test('should validate form data with title too long', () => {
+    test('should validate form data with body too long', () => {
       const view = createView()
-      const data = { title: 'a'.repeat(TITLE_MAX_LENGTH + 1) }
+      const data = { body: 'a'.repeat(BODY_MAX_LENGTH + 1) }
       const errors = view.validateFormData(data)
-      expect(errors.title[0].type).toBe('too_long')
-      expect(errors.title[0].message).toBe(`Title can't exceed ${TITLE_MAX_LENGTH} characters`)
+      expect(errors.body[0].type).toBe('too_long')
+      expect(errors.body[0].message).toBe('Input exceeds 500 KB limit. Please reduce the text size.')
     })
   })
 })

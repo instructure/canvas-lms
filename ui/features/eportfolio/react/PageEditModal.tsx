@@ -47,17 +47,18 @@ interface Props {
 
 const NAME_MAX_LENGTH = 255
 
-const validationSchema = z.object({
-  name: z
-    .string()
-    .min(1, I18n.t('Name is required.'))
-    .max(
-      NAME_MAX_LENGTH,
-      I18n.t('Exceeded the maximum length (%{nameMaxLength} characters).', {
-        nameMaxLength: NAME_MAX_LENGTH,
-      }),
-    ),
-})
+const createValidationSchema = () =>
+  z.object({
+    name: z
+      .string()
+      .min(1, I18n.t('Name is required.'))
+      .max(
+        NAME_MAX_LENGTH,
+        I18n.t('Exceeded the maximum length (%{nameMaxLength} characters).', {
+          nameMaxLength: NAME_MAX_LENGTH,
+        }),
+      ),
+  })
 
 function PageEditModal(props: Props) {
   const [loading, setLoading] = useState(false)
@@ -71,7 +72,7 @@ function PageEditModal(props: Props) {
     setFocus,
     formState: {errors},
     handleSubmit,
-  } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
+  } = useForm({defaultValues, resolver: zodResolver(createValidationSchema())})
 
   useEffect(() => {
     if (props.page != null && (props.modalType === 'add' || props.modalType === 'rename')) {

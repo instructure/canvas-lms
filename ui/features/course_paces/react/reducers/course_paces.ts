@@ -50,10 +50,13 @@ import {getBlackoutDates} from '../shared/reducers/blackout_dates'
 import {type Change, summarizeChanges} from '../utils/change_tracking'
 import {
   calculatePaceDuration,
+  calculatePaceItemDuration,
   calendarDaysToPaceDuration,
   getItemsDurationFromTimeToComplete,
   getTimeToCompleteCalendarDaysFromItemsDuration,
+  getTotalDurationFromTimeToComplete,
   isTimeToCompleteCalendarDaysValid,
+  setItemsDurationFromWeightedAssignments,
 } from '../utils/utils'
 
 const initialProgress = window.ENV.COURSE_PACE_PROGRESS
@@ -713,6 +716,15 @@ export default (
         })
         return { ...module, items: newItems }
       })
+
+      return { ...state, modules }
+    }
+    case CoursePaceConstants.SET_PACE_ITEM_WEIGHTED_DURATION:{
+      const modules = setItemsDurationFromWeightedAssignments(
+        state,
+        action.payload.blackOutDays,
+        action.payload.assignmentWeightedDuration
+      )
 
       return { ...state, modules }
     }

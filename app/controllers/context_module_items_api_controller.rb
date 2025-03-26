@@ -314,9 +314,12 @@ class ContextModuleItemsApiController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :read)
       get_module_item
-      prog = @student ? @module.evaluate_for(@student) : nil
       opts = { can_view_published: @context.grants_right?((@student || @current_user), session, :read_as_admin) }
-      opts[:can_have_estimated_time] = @context.horizon_course?
+      if @context.horizon_course?
+        opts[:can_have_estimated_time] = true
+        @item.context_module_action(@current_user, :read) if @current_user
+      end
+      prog = @student ? @module.evaluate_for(@student) : nil
       render json: module_item_json(@item, @student || @current_user, session, @module, prog, Array(params[:include]), opts)
     end
   end

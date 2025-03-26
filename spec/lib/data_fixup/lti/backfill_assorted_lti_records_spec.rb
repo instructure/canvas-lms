@@ -29,7 +29,6 @@ RSpec.describe DataFixup::Lti::BackfillAssortedLtiRecords do
     tool_configuration = lti_tool_configuration_model(developer_key: key)
     tool_configuration.update(lti_registration: nil)
     reg.delete
-    key.developer_key_account_bindings.first.lti_registration_account_binding.delete
     key
   end
   let(:ims_registration) do

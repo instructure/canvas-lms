@@ -55,9 +55,10 @@ function updateLoginList({isEdit, currentPseudonym, accountSelectOptions}) {
       $(`<div>${I18n.t('Integration ID')}: <span class="integration_id"></span></div>`),
     )
     $('#login_information .add_holder').before(currentLoginElement)
-    currentPseudonym.account_name = accountSelectOptions.find(
-      ({value}) => `${value}` === currentPseudonym.account_id,
-    )?.label
+    const accountName =
+      accountSelectOptions.find(({value}) => `${value}` === currentPseudonym.account_id)?.label ??
+      ''
+    currentPseudonym.account_name = accountName
   }
   currentLoginElement.fillTemplateData({
     data: currentPseudonym,
@@ -81,7 +82,7 @@ const renderAddEditPseudonym = ({
     return
   }
 
-  const accountSelectOptions = ENV.ACCOUNT_SELECT_OPTIONS
+  const accountSelectOptions = ENV.ACCOUNT_SELECT_OPTIONS ?? []
   const accountIdPasswordPolicyMap = ENV.PASSWORD_POLICIES
   const defaultPolicy = ENV.PASSWORD_POLICY
   const userId = ENV.USER_ID

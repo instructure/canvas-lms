@@ -20,10 +20,11 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
+import {Focusable} from '@instructure/ui-focusable'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
-import React, {useRef, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useNewLogin, useNewLoginData} from '../context'
 import {ROUTES} from '../routes/routes'
@@ -43,6 +44,13 @@ const ForgotPassword = () => {
   const [submittedEmail, setSubmittedEmail] = useState('')
 
   const emailInputRef = useRef<HTMLInputElement | null>(null)
+
+  const confirmationHeadingRef = useRef<HTMLHeadingElement | null>(null)
+  useEffect(() => {
+    if (emailSent) {
+      confirmationHeadingRef.current?.focus()
+    }
+  }, [emailSent])
 
   const validateForm = (): boolean => {
     setEmailError('')
@@ -154,9 +162,22 @@ const ForgotPassword = () => {
   const confirmationMessage = (
     <>
       <Flex direction="column" gap="small">
-        <Heading as="h1" level="h2" data-testid="confirmation-heading">
-          {I18n.t('Check Your Email')}
-        </Heading>
+        <Focusable>
+          {({attachRef}) => (
+            <Heading
+              as="h1"
+              data-testid="confirmation-heading"
+              elementRef={el => {
+                attachRef(el)
+                confirmationHeadingRef.current = el as HTMLHeadingElement | null
+              }}
+              level="h2"
+              tabIndex={-1}
+            >
+              {I18n.t('Check Your Email')}
+            </Heading>
+          )}
+        </Focusable>
 
         <Text data-testid="confirmation-message">
           {I18n.t(

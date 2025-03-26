@@ -121,7 +121,7 @@ class RubricsController < ApplicationController
   # @argument id [Integer]
   #   The id of the rubric
   # @argument rubric_association_id [Integer]
-  #   The id of the object with which this rubric is associated
+  #   The id of the rubric association object (not the course/assignment itself, but the join table record id). It can be used in place of rubric_association[association_id] and rubric_association[association_type] if desired.
   # @argument rubric[title] [String]
   #   The title of the rubric
   # @argument rubric[free_form_criterion_comments] [Boolean]
@@ -140,6 +140,10 @@ class RubricsController < ApplicationController
   #   or if it's to indicate the rubric should appear in its context
   # @argument rubric[criteria] [Hash]
   #   An indexed Hash of RubricCriteria objects where the keys are integer ids and the values are the RubricCriteria objects
+  # TODO: document once feature is public: rubric[criteria_via_llm] [Boolean]
+  #   When true, rubric[criteria] will be ignored (does not need to be included
+  #   at all). Instead, rubric criteria will be automatically generated from a
+  #   large language model (llm).
   def create
     update
   end
@@ -165,7 +169,7 @@ class RubricsController < ApplicationController
   # @argument id [Integer]
   #   The id of the rubric
   # @argument rubric_association_id [Integer]
-  #   The id of the object with which this rubric is associated
+  #   The id of the rubric association object (not the course/assignment itself, but the join table record id). It can be used in place of rubric_association[association_id] and rubric_association[association_type] if desired.
   # @argument rubric[title] [String]
   #   The title of the rubric
   # @argument rubric[free_form_criterion_comments] [Boolean]

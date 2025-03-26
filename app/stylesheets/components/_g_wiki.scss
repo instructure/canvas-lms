@@ -693,3 +693,21 @@ $revision-button-color: $ic-color-dark;
     }
   }
 }
+
+#wiki_page_body_error {
+  color: #E62429;
+  margin: 12px 0 12px 0 !important;
+}
+
+.has_body_errors {
+  .RceHtmlEditor, textarea#wiki_page_body, .tox-edit-area iframe {
+    border: 1px solid #E62429 !important;
+  }
+
+  .cm-editor.cm-focused, .tox .tox-edit-area {
+    outline: none !important;
+    border: none !important;
+  }
+}
+
+

@@ -34,7 +34,7 @@ class Mutations::OutcomeCalculationMethodBase < Mutations::BaseMutation
 
   def context_taken?(record)
     error = record.errors.first
-    error && error[0] == :context_id && error[1] == "has already been taken"
+    error && error.attribute == :context_id && error.message == "has already been taken"
   end
 
   def check_permission(context)

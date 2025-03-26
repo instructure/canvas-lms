@@ -32,7 +32,6 @@ gem "switchman-inst-jobs", "~> 4.0"
 gem "irb", "~> 1.7"
 
 gem "academic_benchmarks", "~> 1.1", require: false
-gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
 gem "active_model_serializers", "~> 0.9.9"
 gem "addressable", "~> 2.8", require: false
 gem "authlogic", "~> 6.4"
@@ -51,7 +50,7 @@ gem "bigdecimal", "~> 3.1"
 gem "browser", "~> 6.0", require: false
 gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
-gem "canvas_link_migrator", "~> 1.0.16"
+gem "canvas_link_migrator", "~> 1.0"
 gem "canvas_webex", "0.18.2"
 gem "cld", "~> 0.13"
 gem "crocodoc-ruby", "0.0.1", require: false

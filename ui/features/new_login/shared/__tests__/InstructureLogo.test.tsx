@@ -16,13 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {InstructureLogo} from '..'
-import {NewLoginDataProvider, NewLoginProvider} from '../../context'
+import {NewLoginDataProvider, NewLoginProvider, useNewLogin, useNewLoginData} from '../../context'
+
+jest.mock('../assets/images/instructure.svg', () => 'mocked-image-path.svg')
+
+jest.mock('../../context', () => {
+  const originalModule = jest.requireActual('../../context')
+  return {
+    ...originalModule,
+    useNewLogin: jest.fn(),
+    useNewLoginData: jest.fn(),
+  }
+})
+
+const mockUseNewLogin = useNewLogin as jest.Mock
+const mockUseNewLoginData = useNewLoginData as jest.Mock
 
 describe('InstructureLogo', () => {
-  it('mounts without crashing', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseNewLogin.mockReturnValue({isUiActionPending: false})
+    mockUseNewLoginData.mockReturnValue({isPreviewMode: false})
+  })
+
+  jest.mock('../assets/images/instructure.svg', () => 'mocked-image-path.svg')
+
+  it('renders the InstructureLogo with correct attributes and structure', () => {
     render(
       <NewLoginProvider>
         <NewLoginDataProvider>
@@ -30,5 +53,90 @@ describe('InstructureLogo', () => {
         </NewLoginDataProvider>
       </NewLoginProvider>,
     )
+    const logoLink = screen.getByTestId('instructure-logo-link')
+    expect(logoLink).toBeInTheDocument()
+    expect(logoLink).toHaveAttribute('href', 'https://instructure.com')
+    expect(logoLink).toHaveAttribute('target', '_blank')
+    const logoImage = screen.getByTestId('instructure-logo-img')
+    expect(logoImage).toBeInTheDocument()
+    expect(logoImage).toHaveAttribute('src', 'mocked-image-path.svg')
+    expect(logoImage).toHaveAttribute('alt', '')
+  })
+
+  it('ensures link does not have role button and is a valid anchor tag', () => {
+    render(
+      <NewLoginProvider>
+        <NewLoginDataProvider>
+          <InstructureLogo />
+        </NewLoginDataProvider>
+      </NewLoginProvider>,
+    )
+    const link = screen.getByTestId('instructure-logo-link')
+    expect(link).not.toHaveAttribute('role', 'button')
+    expect(link).toHaveAttribute('href', 'https://instructure.com')
+    expect(link.tagName).toBe('A')
+  })
+
+  it('ensures link has the correct accessible name and is not hidden or disabled', () => {
+    render(
+      <NewLoginProvider>
+        <NewLoginDataProvider>
+          <InstructureLogo />
+        </NewLoginDataProvider>
+      </NewLoginProvider>,
+    )
+    const link = screen.getByLabelText('By Instructure')
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute('aria-label', 'By Instructure')
+    expect(link).not.toHaveAttribute('aria-hidden')
+    expect(link).not.toHaveAttribute('aria-disabled')
+  })
+
+  it('prevents navigation when disabled', async () => {
+    mockUseNewLogin.mockReturnValue({isUiActionPending: true})
+    mockUseNewLoginData.mockReturnValue({isPreviewMode: false})
+    render(
+      <NewLoginProvider>
+        <NewLoginDataProvider>
+          <InstructureLogo />
+        </NewLoginDataProvider>
+      </NewLoginProvider>,
+    )
+    const link = screen.getByTestId('instructure-logo-link')
+    const clickEvent = new MouseEvent('click', {bubbles: true, cancelable: true})
+    jest.spyOn(clickEvent, 'preventDefault')
+    link.dispatchEvent(clickEvent)
+    expect(clickEvent.preventDefault).toHaveBeenCalled()
+    expect(link).toHaveAttribute('href', 'https://instructure.com')
+  })
+
+  it('allows navigation when enabled', async () => {
+    mockUseNewLogin.mockReturnValue({isUiActionPending: false})
+    mockUseNewLoginData.mockReturnValue({isPreviewMode: false})
+    render(
+      <NewLoginProvider>
+        <NewLoginDataProvider>
+          <InstructureLogo />
+        </NewLoginDataProvider>
+      </NewLoginProvider>,
+    )
+    const link = screen.getByTestId('instructure-logo-link')
+    const clickEvent = new MouseEvent('click', {bubbles: true, cancelable: true})
+    jest.spyOn(clickEvent, 'preventDefault')
+    await userEvent.click(link)
+    expect(link).toHaveAttribute('href', 'https://instructure.com')
+    expect(clickEvent.preventDefault).not.toHaveBeenCalled()
+  })
+
+  it('ensures link opens in a new tab', () => {
+    render(
+      <NewLoginProvider>
+        <NewLoginDataProvider>
+          <InstructureLogo />
+        </NewLoginDataProvider>
+      </NewLoginProvider>,
+    )
+    const link = screen.getByTestId('instructure-logo-link')
+    expect(link).toHaveAttribute('target', '_blank')
   })
 })

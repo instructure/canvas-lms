@@ -104,20 +104,42 @@
 <div id="add_question_group_dialog" style="display: none;" title="<%= t('titles.add_new_question_group', "Add a New Question Group") %>">
   <h2><%= t('titles.add_new_question_group', "Add a New Question Group") %></h2>
   <a href="<%= context_url(@context, :context_quiz_quiz_groups_url, @quiz.id) %>" class="add_question_group_url" style="display: none;">&nbsp;</a>
+  <div>
+    <div class="form-control form-control--with-bottom-margin name">
+      <label class="bold form-control__label" for="found_question_group_name"><%= t('Group Name') %><span aria-hidden="true" class="asterisk">*</span></label>
+      <div>
+        <input class="form-control__input form-control__input--without-margin" id="found_question_group_name" aria-describedby="question_group_name_message" type="text" required="true" name="quiz_group[name]" />
+      </div>
+      <div class="form-control__message input-message__container hidden">
+        <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+        <span id="question_group_name_message" class="input-message__text"></span>
+      </div>
+    </div>
+
+    <div class="form-control form-control--with-bottom-margin pick">
+      <label class="bold form-control__label" for="found_question_group_pick"><%= t('Pick') %><span aria-hidden="true" class="asterisk">*</span></label>
+      <div>
+        <%= t(:group_pick_count, "%{pick_count} questions", :pick_count => raw('<input class="form-control__input form-control__input--without-margin" required="true" id="found_question_group_pick" aria-describedby="question_group_pick_message" type="text" style="width: 50px; margin-bottom: 0px;" name="quiz_group[pick_count]" />')) %>
+      </div>
+      <div class="form-control__message input-message__container hidden">
+        <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+        <span id="question_group_pick_message" class="input-message__text"></span>
+      </div>
+    </div>
+
+    <div class="form-control points">
+      <label class="bold form-control__label" for="found_question_group_points"><%= t('Points per question') %><span aria-hidden="true" class="asterisk">*</span></label>
+      <div>
+        <input class="form-control__input form-control__input--without-margin" required="true" id="found_question_group_points" aria-describedby="question_group_points_message" type="text" style="width: 50px; margin-bottom: 0px;" class="float_value" name="quiz_group[question_points]" />
+      </div>
+      <div class="form-control__message input-message__container hidden">
+        <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+        <span id="question_group_points_message" class="input-message__text"></span>
+      </div>
+    </div>
+  </div>
   <table class="formtable">
     <tr>
-      <td><label for="found_question_group_name"><%= before_label(:group_name, "Group Name") %></label></td>
-      <td><input id="found_question_group_name" type="text" name="quiz_group[name]" /></td>
-    </tr><tr>
-      <td><label for="found_question_group_pick"><%= before_label(:group_pick_count, "Pick") %></label></td>
-      <td>
-        <%= t(:group_pick_count, "%{pick_count} questions", :pick_count => raw('<input id="found_question_group_pick" type="text" style="width: 50px;" name="quiz_group[pick_count]" />')) %><br/>
-        <span style="font-size: 0.8em;">(<%= t('hints.group_pick_count', "%{pick_count} selected so far", :pick_count => raw('<span class="questions_count">&nbsp;</span>')) %>)</span>
-      </td>
-    </tr><tr>
-      <td><label for="found_question_group_points"><%= before_label(:group_points, "Points") %></label></td>
-      <td><%= t(:group_points, "%{points} per question", :points => raw('<input id="found_question_group_points" type="text" style="width: 50px;" class="float_value" name="quiz_group[question_points]" />')) %></td>
-    </tr><tr>
       <td colspan="2">
         <div class="button-container">
           <button type="button" class="btn submit_button"><%= t('buttons.create_group', "Create Group") %></button>

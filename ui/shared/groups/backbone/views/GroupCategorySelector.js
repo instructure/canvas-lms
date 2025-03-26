@@ -54,6 +54,7 @@ const GROUP_CATEGORY_ID = '#assignment_group_category_id'
 const CREATE_GROUP_CATEGORY_ID = '#create_group_category_id'
 const HAS_GROUP_CATEGORY = '#has_group_category'
 const GROUP_CATEGORY_OPTIONS = '#group_category_options'
+export const GROUP_CATEGORY_SELECT = 'assignment_group_category_id'
 
 GroupCategorySelector.prototype.els = (function () {
   const els = {}
@@ -66,7 +67,7 @@ GroupCategorySelector.prototype.els = (function () {
 
 GroupCategorySelector.prototype.events = (function () {
   const events = {}
-  events['change ' + GROUP_CATEGORY_ID] = 'groupCategorySelected'
+  events['change ' + GROUP_CATEGORY_ID] = 'handleSelectOption'
   events['click ' + CREATE_GROUP_CATEGORY_ID] = 'showGroupCategoryCreateDialog'
   events['change ' + HAS_GROUP_CATEGORY] = 'toggleGroupCategoryOptions'
   events['click ' + HAS_GROUP_CATEGORY] = 'clickGroupCategoryOptions'
@@ -75,6 +76,7 @@ GroupCategorySelector.prototype.events = (function () {
 
 GroupCategorySelector.prototype.initialize = function (options) {
   GroupCategorySelector.__super__.initialize.apply(this, arguments)
+  this.showNewErrors = options.showNewErrors
   return (this.renderSectionsAutocomplete = options.renderSectionsAutocomplete)
 }
 
@@ -109,7 +111,21 @@ GroupCategorySelector.prototype.render = function () {
     StudentGroupStore.setSelectedGroupSet(selectedID)
   }
   GroupCategorySelector.__super__.render.apply(this, arguments)
-  return this.$groupCategory.toggleAccessibly(!isEmpty(this.groupCategories))
+  if (this.showNewErrors) {
+    const createGroupSetButton = document.getElementById('create_group_category_id')
+    if (createGroupSetButton) createGroupSetButton.style.display = 'none'
+  }
+  return this.$groupCategory.toggleAccessibly(true)
+}
+
+GroupCategorySelector.prototype.handleSelectOption = function (e) {
+  const selectedValue = e.target.value
+
+  if (selectedValue === 'new') {
+    this.showGroupCategoryCreateDialog()
+  } else {
+    this.groupCategorySelected()
+  }
 }
 
 GroupCategorySelector.prototype.groupCategorySelected = function () {
@@ -153,6 +169,10 @@ GroupCategorySelector.prototype.showGroupCategoryCreateDialog = function () {
             _this.groupCategorySelected()
 
             return _this.$groupCategory.toggleAccessibly(true)
+          } else {
+            const blankOption = document.querySelector('[value="blank"]')
+            const select = blankOption.parentElement
+            select.value = blankOption.value
           }
         }
       })(this),
@@ -217,12 +237,13 @@ GroupCategorySelector.prototype.toJSON = function () {
   const groupCategoryLocked = !this.parentModel.canGroup()
   return {
     isGroupAssignment:
-      this.parentModel.groupCategoryId() && this.parentModel.groupCategoryId() !== 'blank',
+      this.parentModel.groupCategoryId() && this.parentModel.groupCategoryId() !== 'blank' && this.parentModel.groupCategoryId() !== 'new',
     groupCategoryId: this.parentModel.groupCategoryId(),
     groupCategories: this.groupCategories,
     groupCategoryUnselected:
       !this.parentModel.groupCategoryId() ||
       this.parentModel.groupCategoryId() === 'blank' ||
+      this.parentModel.groupCategoryId() === 'new' ||
       (!chain(this.groupCategories)
         .map('id')
         .includes(this.parentModel.groupCategoryId())
@@ -269,23 +290,23 @@ GroupCategorySelector.prototype.validateBeforeSave = function (data, errors) {
 
 GroupCategorySelector.prototype._validateGroupCategoryID = function (data, errors) {
   const gcid = this.nested ? data.assignment.groupCategoryId() : data.group_category_id
-  if (gcid === 'blank') {
+  if (gcid === 'blank' || gcid === 'new') {
     if (isEmpty(this.groupCategories)) {
       if (this.canManageGroups()) {
-        errors.newGroupCategory = [
+        errors[this.showNewErrors ? GROUP_CATEGORY_SELECT : 'newGroupCategory'] = [
           {
             message: I18n.t('Please create a group set'),
           },
         ]
       } else {
-        errors.newGroupCategory = [
+        errors[this.showNewErrors ? GROUP_CATEGORY_SELECT : 'newGroupCategory'] = [
           {
             message: I18n.t('Group Add permission is needed to create a New Group Category'),
           },
         ]
       }
     } else {
-      errors.groupCategorySelector = [
+      errors[GROUP_CATEGORY_SELECT] = [
         {
           message: I18n.t('Please select a group set for this assignment'),
         },

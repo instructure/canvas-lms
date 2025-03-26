@@ -21,7 +21,7 @@ describe Checkpoints::DateOverrideCreatorService do
   describe ".call" do
     before(:once) do
       course = course_model
-      course.root_account.enable_feature!(:discussion_checkpoints)
+      course.account.enable_feature!(:discussion_checkpoints)
       topic = DiscussionTopic.create_graded_topic!(course:, title: "graded topic")
       topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
       @checkpoint = topic.reply_to_topic_checkpoint

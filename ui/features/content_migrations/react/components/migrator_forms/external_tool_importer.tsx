@@ -131,7 +131,7 @@ const ExternalToolImporter = ({
       )}
       <ExternalToolModalLauncher
         tool={{
-          definition_id: selectedToolid,
+          definition_id: selectedToolid!,
         }}
         title={title}
         isOpen={isOpen}

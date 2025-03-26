@@ -210,6 +210,21 @@ describe('ForgotPassword', () => {
       )
       expect(screen.getByTestId('confirmation-back-button')).toBeInTheDocument()
     })
+
+    it('moves focus to the confirmation heading after successful submission', async () => {
+      ;(forgotPassword as jest.Mock).mockResolvedValueOnce({
+        status: 200,
+        data: {requested: true},
+      })
+      const emailInput = screen.getByTestId('email-input')
+      const submitButton = screen.getByTestId('submit-button')
+      await userEvent.type(emailInput, 'test@example.com')
+      await userEvent.click(submitButton)
+      const confirmationHeading = await screen.findByTestId('confirmation-heading')
+      await waitFor(() => {
+        expect(document.activeElement).toBe(confirmationHeading)
+      })
+    })
   })
 
   describe('api interactions', () => {

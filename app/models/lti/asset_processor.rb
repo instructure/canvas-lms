@@ -45,4 +45,22 @@ class Lti::AssetProcessor < ApplicationRecord
   def supported_types
     report.is_a?(Hash) ? report["supportedTypes"] : nil
   end
+
+  def self.build_for_assignment(content_item)
+    context_external_tool = ContextExternalTool.find_by(id: content_item["context_external_tool_id"])
+
+    return nil unless context_external_tool
+
+    new(
+      context_external_tool: context_external_tool,
+      url: content_item["url"],
+      title: content_item["title"],
+      text: content_item["text"],
+      custom: content_item["custom"],
+      icon: content_item["icon"],
+      window: content_item["window"],
+      iframe: content_item["iframe"],
+      report: content_item["report"]
+    )
+  end
 end

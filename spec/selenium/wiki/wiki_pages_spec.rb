@@ -99,12 +99,12 @@ describe "Wiki Pages" do
       expect_flash_message :info
     end
 
-    it "displays error if no title on submit", priority: "1" do
+    it "displays error if no title on submit", :ignore_js_errors, priority: "1" do
       @course.wiki_pages.create!(title: "Page1")
       get "/courses/#{@course.id}/pages/Page1/edit"
       wiki_page_title_input.clear
       f("form.edit-form button.submit").click
-      expect(f('[id*="TextInput"]')).to include_text "A page title is required"
+      expect(f('[id*="TextInput-messages"]')).to include_text "Title must contain at least one letter or number"
     end
 
     it "updates with changes made in other window", custom_timeout: 40.seconds, priority: "1" do

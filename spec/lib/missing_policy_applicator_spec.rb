@@ -263,7 +263,7 @@ describe MissingPolicyApplicator do
     end
 
     it "does not apply deductions to submissions for parents in checkpointed assignments" do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       late_policy_missing_enabled
       create_recent_assignment
       assignment = Assignment.last

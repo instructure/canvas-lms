@@ -337,7 +337,7 @@ describe ModuleAssignmentOverridesController do
 
     context "discussion checkpoints" do
       before do
-        Account.site_admin.enable_feature! :discussion_checkpoints
+        @course.account.enable_feature! :discussion_checkpoints
       end
 
       it "can add a checkpointed discussion with its own overrides to a module with ad-hoc overrides and add even more students" do

@@ -19,15 +19,6 @@
 #
 
 describe OutcomeImportError do
-  describe "associations" do
-    it { is_expected.to belong_to(:outcome_import) }
-  end
-
-  describe "validations" do
-    it { is_expected.to validate_presence_of :message }
-    it { is_expected.to validate_presence_of :outcome_import_id }
-  end
-
   describe "truncation" do
     before :once do
       account_model

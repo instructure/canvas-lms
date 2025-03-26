@@ -458,7 +458,7 @@ class UsersController < ApplicationController
     @user = api_find(User, params[:user_id])
     return render_unauthorized_action unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
 
-    if request.post?
+    if request.post? || params[:stop_acting_as_user] == "true"
       if @user == @real_current_user
         session.delete(:become_user_id)
         session.delete(:enrollment_uuid)
@@ -2366,57 +2366,47 @@ class UsersController < ApplicationController
     end
   end
 
-  def merge
-    @source_user = User.find(params[:user_id])
-    @target_user = User.where(id: params[:new_user_id]).first if params[:new_user_id]
-    @target_user ||= @current_user
-    if @source_user.grants_right?(@current_user, :merge) && @target_user.grants_right?(@current_user, :merge)
-      UserMerge.from(@source_user).into(@target_user, merger: @current_user, source: "users_controller")
-      @target_user.touch
-      flash[:notice] = t("user_merge_success", "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", first_user: @target_user.name, second_user: @source_user.name)
-      if @target_user == @current_user
-        redirect_to user_profile_url(@current_user)
-      else
-        redirect_to user_url(@target_user)
-      end
-    else
-      flash[:error] = t("user_merge_fail", "User merge failed. Please make sure you have proper permission and try again.")
-      redirect_to dashboard_url
-    end
-  end
-
   def admin_merge
     @user = User.find(params[:user_id])
-    if authorized_action(@user, @current_user, :merge)
-      if params[:clear]
-        params.delete(:new_user_id)
-        params.delete(:pending_user_id)
-      end
 
-      if params[:new_user_id].present?
-        @other_user = api_find_all(User, [params[:new_user_id]]).first
-        if !@other_user || !@other_user.grants_right?(@current_user, :merge)
-          @other_user = nil
-          flash[:error] = t("user_not_found", "No active user with that ID was found.")
-        elsif @other_user == @user
-          @other_user = nil
-          flash[:error] = t("cant_self_merge", "You can't merge an account with itself.")
-        end
-      end
+    return unless authorized_action(@user, @current_user, :merge)
 
-      if params[:pending_user_id].present?
-        @pending_other_user = api_find_all(User, [params[:pending_user_id]]).first
-        if !@pending_other_user || !@pending_other_user.grants_right?(@current_user, :merge)
-          @pending_other_user = nil
-          flash[:error] = t("user_not_found", "No active user with that ID was found.")
-        elsif @pending_other_user == @user
-          @pending_other_user = nil
-          flash[:error] = t("cant_self_merge", "You can't merge an account with itself.")
-        end
-      end
+    title = t("Merge Users")
 
-      render :admin_merge
-    end
+    @page_title = title
+    @show_left_side = true
+    @context = @domain_root_account
+
+    add_crumb(@domain_root_account.name, account_url(@domain_root_account))
+    add_crumb(title)
+
+    page_has_instui_topnav
+
+    account_options_for_merge_users = @current_user.associated_accounts.shard(Shard.current).to_a
+    account_options_for_merge_users.push(@domain_root_account) if @domain_root_account && !account_options_for_merge_users.include?(@domain_root_account)
+    account_options_for_merge_users = account_options_for_merge_users.sort_by(&:name).uniq.select { |a| a.grants_any_right?(@current_user, session, :manage_user_logins, :read_roster) }
+
+    js_env({ ADMIN_MERGE_ACCOUNT_OPTIONS: account_options_for_merge_users.map { |a| { id: a.id, name: a.name } } })
+
+    render html: '<div id="admin_merge_mount_point"></div>'.html_safe, layout: true
+  end
+
+  def user_for_merge
+    @user = User.find(params[:user_id])
+
+    return unless authorized_action(@user, @current_user, :merge)
+
+    includes = %w[email]
+    enrollments_for_display = @user.enrollments.current.map { |e| t("%{course_name} (%{enrollment_type})", course_name: e.course.name, enrollment_type: e.readable_type) }
+    pseudonyms_for_display = @user.pseudonyms.active.map { |p| t("%{unique_id} (%{account_name})", unique_id: p.unique_id, account_name: p.account.name) }
+    communication_channels_for_display = @user.communication_channels.unretired.email.map(&:path).uniq
+
+    render json: {
+      **user_json(@user, @current_user, session, includes, @domain_root_account),
+      enrollments: enrollments_for_display,
+      pseudonyms: pseudonyms_for_display,
+      communication_channels: communication_channels_for_display
+    }
   end
 
   def admin_split
@@ -2559,7 +2549,7 @@ class UsersController < ApplicationController
   #
   # Avatars:
   # When both users have avatars, only the destination_users avatar will remain.
-  # When one user has an avatar, will it will end up on the destination_user.
+  # When one user has an avatar, it will end up on the destination_user.
   #
   # Terms of Use:
   # If either user has accepted terms of use, it will be be left as accepted.

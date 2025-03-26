@@ -1390,6 +1390,8 @@ ko:
   add_feed_49ed1cb2: "피드 추가"
   add_group_c84f9e9d: "그룹 추가"
   add_group_set_f9809e11: "그룹 집합 추가"
+  add_item_75b67d07: "항목 추가"
+  add_item_to_module_3d7a05b2: "모듈에 항목 추가"
   add_login_f871148: "로그인 추가"
   add_message_10cc308c: "메시지 추가"
   add_module_5ad6fee2: "모듈 추가"
@@ -1479,6 +1481,7 @@ ko:
   always_3a59e701: 항상
   an_alert_is_generated_for_each_student_that_meets__c36e3561: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사, 계정 관리자에게 보냅니다."
   an_alert_is_generated_for_each_student_that_meets__fcd175ac: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사에게 보냅니다."
+  an_external_identity_provider_is_enabled_7859c6fb: "외부 ID 공급자를 사용"
   an_integer_value_is_required_e073bd46: "정수 값이 필요함"
   analytics: 
     course: 
@@ -1624,6 +1627,7 @@ ko:
   are_you_sure_you_want_to_delete_this_rubric_f1c9eaa2: "이 루브릭을 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "이 메시지의 사본을 삭제하시겠습니까? 이 작업은 실행을 취소할 수 없습니다."
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "이 토큰을 다시 생성하시겠습니까? 이 토큰을 사용하는 것도 업데이트해야 합니다."
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "이 항목을 모듈에서 제거하시겠습니까?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "이 도구를 제거하시겠습니까?"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "이 사용자의 프로필 사진을 제거하시겠습니까?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "이 프로필 사진을 신고하시겠습니까?"
@@ -3069,8 +3073,10 @@ ko:
       buttons: 
         cancel: 취소
         update: "협업 업데이트"
+      is_required: "이 필드가 필요함"
       labels: 
         description: "설명:"
+        document_name: "문서 이름"
         title: "협업 제목"
     errors: 
       cannot_load_collaboration: "협업을 로드할 수 없음"
@@ -3099,6 +3105,7 @@ ko:
             Google Docs는 그룹 프로젝트에서 협업하기에 좋은 곳입니다. Microsoft Word와 같으면서도 이메일을 주고 받지 않고 다른 사람들과 동시에 작업을 할 수 있게 해줍니다.
             
             **주의**: Google Docs 협업에 참여하려면 여러분과 협업자 모두 Google 계정이 필요합니다.
+      is_required: "이 필드가 필요함"
       labels: 
         collaboration_type: "협업에 사용:"
         description: "설명:"
@@ -3267,6 +3274,7 @@ ko:
     type_disabled_error: "이 Canvas 사이트에서 더 이상 이 유형의 회의를 사용하지 않음"
   configuration_type_25a084a4: "구성 유형"
   configure_ecb97e30: 구성
+  configure_report_91ed07f9: "구성 보고서"
   confirm_6556b3a6: 확인
   confirm_contact_method_29d6fe4b: "연락 방법 확인하기"
   confirm_delete_6febeafb: "삭제 확인"
@@ -3751,6 +3759,8 @@ ko:
     index: 
       titles: 
         course_modules: "과목 모듈"
+    links: 
+      student_progress: "진행 상황 보기"
     module_complete: 완료
     module_empty: "\"%{module}\" 모듈에 항목이 없음"
     module_item_next: 
@@ -4015,6 +4025,9 @@ ko:
   correct_answers_will_be_available_on_date_48137: "정답은 %{date}에 사용할 수 있습니다."
   count_attempts_d23c69a0: 
     zero: "무제한 시도"
+  count_courses_609dc3b8: 
+    one: "과목 %{count}개"
+    other: "과목 %{count}개"
   count_days_de0c6a32: 
     one: "%{count}일"
     other: "%{count}일"
@@ -4040,6 +4053,9 @@ ko:
   count_students_c9920376: 
     one: "학생(%{count})"
     other: "학생(%{count})"
+  count_sub_accounts_345f48ea: 
+    one: "하위 계정 %{count}개"
+    other: "하위 계정 %{count}개"
   course: 
     access_denied: "액세스가 거부됨"
     batch_update_message: 
@@ -5360,6 +5376,7 @@ ko:
   display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "알림 기본 설정 페이지에 팝업 경고를 한 번 표시합니다."
   does_not_meet_expectations_b0736d20: "기대치에 미치지 못함"
   domain_3b54c511: 도메인
+  don_t_indent_b35ae9fb: "들여쓰지 않음"
   done_editing_9f7379d9: "편집 마침"
   done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "마쳤습니다. 업로드한 파일을 받아 간단한 의견과 함께 각 사용자의 이 과제에 대한 제출물 페이지에 첨부했습니다. 학생은 새 의견이 추가되었다는 알림을 받게 됩니다."
   download_submissions_7454665f: "제출물 다운로드"
@@ -5517,6 +5534,8 @@ ko:
   enrollments_tas: 조교
   enrollments_teachers: 교사
   enter_a_section_name_adbe3099: "섹션 이름 입력"
+  enter_a_shorter_category_name_4befe0da: "더 짧은 범주 이름을 입력"
+  enter_a_shorter_group_name_8f7fc42c: "짧은 그룹 이름 입력"
   enter_the_date_you_would_like_to_navigate_to_a712de47: "탐색하려는 날짜를 입력하십시오."
   eportfolio: 
     buttons: 
@@ -5979,6 +5998,7 @@ ko:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "도구 없음"
   external_tools_6e77821: 외부도구
+  external_url_4752767f: "외부 URL"
   external_urls_62082a38: "외부 URL"
   failed_at_f471dfd3: "실패 시각"
   failed_please_report_the_following_error_code_to_y_42248d60: "실패했습니다. 다음 오류 코드를 시스템 관라지에게 알려주시기 바랍니다: ErrorReport:%{error};"
@@ -7151,6 +7171,8 @@ ko:
     get_started: 시작하기
     welcome_to_canvas: "Canvas에 오신 것을 환영합니다!"
   incorrect_username_and_or_password_2de73abb: "유효하지 않은 사용자 이름이나 암호"
+  indent_1_level_e7b18c1e: "한 수준 들여쓰기"
+  indentation_3c6081d5: 들여쓰기
   individual_2033c005: 개별
   info: 
     old_styleguide: 
@@ -9430,6 +9452,7 @@ ko:
     page: 페이지
     quiz: 퀴즈
     sub_header: "하위 머리글"
+  module_options_24663bfb: "모듈 옵션"
   modules: 
     add: 
       header: 
@@ -11766,6 +11789,9 @@ ko:
         attempt_number: "시도 %{att_no}"
         kept: 보관
         latest: 최신
+        time: 시간
+      submission_version_score: 
+        score: 점수
       submission_versions: 
         attempt: 시도
         attempt_history: "시도 이력"
@@ -12147,6 +12173,7 @@ ko:
       unpublish: 
         description: "게시 취소"
   result_8f971a09: 결과
+  results_7526f4f6: 결과
   resume_quiz_afeceb87: "퀴즈 다시 시작"
   resume_survey_58dce775: "설문 다시 시작"
   retrieve_timeout: "구성을 찾아올 수 없음 - 서버 응답 시간 만료"
@@ -13445,6 +13472,7 @@ ko:
       other: "하위 계정 %{count}개"
     titles: 
       sub_accounts: "하위 계정"
+  sub_accounts_e1b196a9: "하위 계정"
   sub_assignment: 
     atom_no_author: "작성자 없음"
     labels: 
@@ -13774,6 +13802,7 @@ ko:
       timespan: "%{start_at}*부터* %{end_at}까지"
   testing_state_effd4a82: "테스트 상태"
   text_entry_e1808b2f: "텍스트 항목"
+  text_header_48fa9c37: "텍스트 머리글"
   text_sms_4e2d82a7: "텍스트 (SMS)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "해당 사용자 계정은 삭제되었습니다.  계정을 다시 활성화하려면 시스템 관리자에게 문의하시기 바랍니다."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "이 계정에 구성되어 있지 않은 기관에서 로그인했습니다."
@@ -14528,6 +14557,7 @@ ko:
   view_grades_8d3bae6c: "평점 보기"
   view_grades_for_name_45aeb2f2: "%{name} 평점 보기"
   view_notifications_6aea09a2: "알림 보기"
+  view_progress_2d61dd4: "진행 상황 보기"
   view_registered_services_6c8cd301: "등록된 서비스 보기"
   view_rubric_d71cce10: "루브릭 보기"
   viewsContextModules: 
@@ -14535,6 +14565,7 @@ ko:
       unpublish: "게시 취소"
     context_modules: 
       publish: 게시
+  visibility_f62e7f12: "표시 여부"
   waiting_for_attempted_login_6d00cb49: "로그인 대기 중"
   warnings: 
     test_install: 

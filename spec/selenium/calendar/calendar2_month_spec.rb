@@ -254,7 +254,7 @@ describe "calendar2" do
         end
 
         it "prevents drag and drop for discussion checkpoints", priority: "1" do
-          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
           topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with checkpoints")
           checkpoint = create_checkpoint(topic:, due_at: @initial_time)
           get "/calendar2"
@@ -277,7 +277,7 @@ describe "calendar2" do
         end
 
         it "prevents drag and drop for discussion checkpoint overrides", priority: "2" do
-          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
           student_in_course(active_all: true)
           topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with checkpoints")
           checkpoint = create_checkpoint(topic:, override_due_at: @initial_time, override: true, student_ids: [@student.id])
@@ -340,7 +340,7 @@ describe "calendar2" do
       end
 
       it "loads discussion edit page when click on edit button in discussion checkpoint info modal" do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         due_at = Time.zone.now.utc + 1.day
         title = "graded discussion with checkpoints"
         topic = DiscussionTopic.create_graded_topic!(course: @course, title:)
@@ -354,7 +354,7 @@ describe "calendar2" do
       end
 
       it "loads discussion page when click on title in discussion checkpoint info modal", :ignore_js_errors do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         due_at = Time.zone.now.utc + 1.day
         title = "graded discussion with checkpoints"
         topic = DiscussionTopic.create_graded_topic!(course: @course, title:)
@@ -369,7 +369,7 @@ describe "calendar2" do
 
       context "discussion checkpoint titles" do
         before do
-          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
         end
 
         it "displays the full title for reply to topic checkpoint in info modal" do
@@ -431,7 +431,7 @@ describe "calendar2" do
       end
 
       it "deletes a discussion checkpoint and all checkpoints and overrides for the same discussion topic" do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         student_in_course(active_all: true)
         due_at_time1 = Time.zone.parse("2024-1-1")
         due_at_time2 = Time.zone.parse("2024-1-3")
@@ -629,7 +629,7 @@ describe "calendar2" do
       end
 
       it "strikethroughs past due discussion checkpoint", priority: "1" do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         due_at = Time.zone.now.utc - 2.days
         topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with past due checkpoint")
         create_checkpoint(topic:, due_at:)
@@ -642,7 +642,7 @@ describe "calendar2" do
       end
 
       it "strikethroughs past due discussion checkpoint override", priority: "1" do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         student_in_course(active_all: true)
         due_at = Time.zone.now.utc + 1.day
         due_at_override = due_at - 3.days

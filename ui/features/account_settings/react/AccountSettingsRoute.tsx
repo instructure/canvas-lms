@@ -22,6 +22,7 @@ import {Portal} from '@instructure/ui-portal'
 import NotificationSettings from './notification_settings'
 import FeatureFlags from '@canvas/feature-flags'
 import AlertList, {calculateUIMetadata} from '@canvas/student-alerts/react/AlertList'
+import QuizIPFilters, {type IPFilterSpec} from './components/QuizIPFilters'
 
 type PortalMount = {
   mountPoint: HTMLElement
@@ -48,6 +49,26 @@ function notificationsTab(portals: PortalMount[], accountId?: string): void {
         accountId={accountId!}
       />
     ),
+  })
+}
+
+// Quiz IP Filters section on Settings tab
+function quizIPFilters(portals: PortalMount[]): void {
+  const id = 'account_settings_quiz_ip_filters'
+  const mountPoint = document.getElementById(id)
+  if (!mountPoint) return
+  let filters: IPFilterSpec[] = []
+  try {
+    filters = JSON.parse(mountPoint.dataset.filters ?? '[]').map((e: [string, string]) => ({
+      name: e[0],
+      filter: e[1],
+    }))
+  } catch (e) {
+    console.error('Error parsing quiz IP filters:', e)
+  }
+  portals.push({
+    mountPoint,
+    component: <QuizIPFilters parentNodeId={id} filters={filters} />,
   })
 }
 
@@ -89,6 +110,7 @@ export function Component(): JSX.Element | null {
   const portals: Array<PortalMount> = []
 
   notificationsTab(portals, params.accountId)
+  quizIPFilters(portals)
   featureFlagsTab(portals)
   alertsTab(portals, params.accountId)
 

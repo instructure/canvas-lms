@@ -58,4 +58,19 @@ describe Types::ModuleType do
     item1 = mod.add_item({ type: "Assignment", id: a1.id }, nil, position: 1)
     expect(module_type.resolve("moduleItems { _id }")).to eq [item1.id.to_s, item2.id.to_s]
   end
+
+  it "has accumulated estimated duration" do
+    a1 = assignment_model({ context: course, name: "a1" })
+    a2 = assignment_model({ context: course, name: "a2" })
+    a3 = assignment_model({ context: course, name: "a3" })
+    a4 = assignment_model({ context: course, name: "a4" })
+    EstimatedDuration.create!(assignment_id: a1.id, duration: 1.hour)
+    EstimatedDuration.create!(assignment_id: a2.id, duration: 30.minutes)
+    EstimatedDuration.create!(assignment_id: a4.id, duration: 1.hour)
+    mod.add_item({ type: "Assignment", id: a1.id }, nil, position: 1)
+    mod.add_item({ type: "Assignment", id: a2.id }, nil, position: 2)
+    mod.add_item({ type: "Assignment", id: a3.id }, nil, position: 3)
+    mod.add_item({ type: "Assignment", id: a4.id }, nil, position: 4)
+    expect(module_type.resolve("estimatedDuration")).to eq "PT2H30M"
+  end
 end

@@ -2,6 +2,8 @@
 
 Placements are the "entry points" into an External Tool. They determine where an External Tool is visible to users.
 
+For placement settings, go to the <a href="file.lti_dev_key_config.html#placements-params">Tool Configuration</a> page.
+
 ## List of Supported Placements
 
 - [Account Navigation](#account-navigation)

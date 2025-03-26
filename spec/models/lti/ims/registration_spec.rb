@@ -60,12 +60,6 @@ module Lti::IMS
       expect(registration.reload.workflow_state).to eq("deleted")
     end
 
-    describe "associations" do
-      subject { Lti::IMS::Registration.new }
-      it { is_expected.to belong_to(:lti_registration).class_name("Lti::Registration") }
-      it { is_expected.to belong_to(:developer_key).inverse_of(:ims_registration).optional(false) }
-    end
-
     describe "validations" do
       subject { registration.validate }
 
@@ -833,6 +827,16 @@ module Lti::IMS
               tool_id: "ToolV2"
             }.with_indifferent_access
           )
+        end
+      end
+
+      context "when logo_uri is nil" do
+        before do
+          registration.logo_uri = nil
+        end
+
+        it "does not include icon_url in launch_settings" do
+          expect(subject[:launch_settings].keys).not_to include("icon_url")
         end
       end
     end

@@ -25,6 +25,7 @@ module Lti
   class ResourcePlacement < ActiveRecord::Base
     CANVAS_PLACEMENT_EXTENSION_PREFIX = "https://canvas.instructure.com/lti/"
 
+    # TODO: these are strings, later constants use symbols... should probably be consistent to avoid bugs
     ACCOUNT_NAVIGATION = "account_navigation"
     ASSIGNMENT_EDIT = "assignment_edit"
     ASSIGNMENT_SELECTION = "assignment_selection"
@@ -41,6 +42,8 @@ module Lti
     CONTENT_AREA = "ContentArea"
     RICH_TEXT_EDITOR = "RichTextEditor"
 
+    ASSET_PROCESSOR = "ActivityAssetProcessor"
+
     SIMILARITY_DETECTION_LTI2 = "Canvas.placements.similarityDetection"
 
     # Default placements for LTI 1 and LTI 2, ignored for LTI 1.3
@@ -52,7 +55,7 @@ module Lti
     # These placements require tools to be on an allow list
     RESTRICTED_PLACEMENTS = %i[submission_type_selection top_navigation].freeze
 
-    # These placements doesn't need the CANVAS_PLACEMENT_EXTENSION_PREFIX
+    # These placements don't need the CANVAS_PLACEMENT_EXTENSION_PREFIX
     STANDARD_PLACEMENTS = %i[ActivityAssetProcessor].freeze
 
     PLACEMENTS_BY_MESSAGE_TYPE = {
@@ -134,8 +137,12 @@ module Lti
 
     validates :placement, inclusion: { in: PLACEMENT_LOOKUP.values }
 
-    def self.add_extension_prefix(placement)
-      "#{CANVAS_PLACEMENT_EXTENSION_PREFIX}#{placement}"
+    def self.add_extension_prefix_if_necessary(placement)
+      if STANDARD_PLACEMENTS.include?(placement.to_sym)
+        placement
+      else
+        "#{CANVAS_PLACEMENT_EXTENSION_PREFIX}#{placement}"
+      end
     end
 
     def self.valid_placements(root_account)

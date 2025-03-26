@@ -5,9 +5,6 @@
   display: inline-block;
   height: 18px;
   width: 18px;
-  @include desktop-only {
-    margin-#{direction(left)}: 10px;
-  }
   margin-#{direction(right)}: 10px;
   vertical-align: text-top;
 }

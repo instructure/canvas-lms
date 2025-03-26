@@ -202,6 +202,16 @@ describe "external tool assignments" do
       expect(card.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
     end
 
+    it "validates the user selected a resource before saving if require_resource_selection is true" do
+      @t1.settings["submission_type_selection"]["require_resource_selection"] = true
+      @t1.save!
+      get "/courses/#{@course.id}/assignments/new"
+      click_option("#assignment_submission_type", @t1.name)
+      f(".btn-primary[type=\"submit\"]").click
+      wait_for_ajaximations
+      expect(f("#assignment_submission_type_selection_launch_button_errors").text).to eq("Please click above to launch the tool and select a resource.")
+    end
+
     it "displays external data for mastery connect" do
       ext_data = {
         key: "https://canvas.instructure.com/lti/mastery_connect_assessment",

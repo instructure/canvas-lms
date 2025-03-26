@@ -25,6 +25,10 @@ module FilesPage
     f("#content h1")
   end
 
+  def alert
+    f("#flashalert_message_holder")
+  end
+
   def all_my_files_button
     fxpath("//button[descendant::text()[contains(., 'All My Files')]]")
   end
@@ -35,6 +39,42 @@ module FilesPage
 
   def create_folder_button
     f("[data-testid='create-folder-button']")
+  end
+
+  def create_folder_form_selector
+    '[aria-label="Create Folder"]'
+  end
+
+  def rename_folder_form_selector
+    '[aria-label="Rename file/folder modal"]'
+  end
+
+  def rename_folder_component(name)
+    f("[data-testid='rename-modal-#{name}']")
+  end
+
+  def delete_folder_form_selector
+    '[aria-label="Delete Confirmation"]'
+  end
+
+  def delete_folder_delete_button
+    f("[data-testid='modal-delete-button']")
+  end
+
+  def move_folder_form_selector
+    '[aria-label="Copy"]'
+  end
+
+  def breadcrumb
+    f('[aria-label="You are here:"]')
+  end
+
+  def move_folder_move_button
+    f("[data-testid='move-move-button']")
+  end
+
+  def toolbox_menu_button(name)
+    f("[data-testid='bulk-actions-#{name}']")
   end
 
   def files_usage_text_selector
@@ -61,6 +101,14 @@ module FilesPage
     driver.find_element(:css, "tbody tr[data-testid='table-row']:nth-of-type(#{row_index}) td:nth-of-type(#{col_index})").text
   end
 
+  def get_item_files_table(row_index, col_index)
+    driver.find_element(:css, "tbody tr[data-testid='table-row']:nth-of-type(#{row_index}) td:nth-of-type(#{col_index})")
+  end
+
+  def get_row_header_files_table(row_index)
+    driver.find_element(:css, "tbody tr[data-testid='table-row']:nth-of-type(#{row_index}) th:first-child")
+  end
+
   def header_name_files_table
     f("[data-testid='name']")
   end
@@ -84,5 +132,77 @@ module FilesPage
 
   def search_input
     f("[data-testid='files-search-input']")
+  end
+
+  def search_button
+    f("[data-testid='files-search-button']")
+  end
+
+  def action_menu_button
+    f("[data-testid='action-menu-button-large']")
+  end
+
+  def action_menu_item_by_name(name)
+    f("[data-testid='action-menu-button-#{name}']")
+  end
+
+  def body
+    f("body")
+  end
+
+  def create_folder(name = "new folder")
+    create_folder_button.click
+    create_folder_input.send_keys(name)
+    create_folder_input.send_keys(:return)
+  end
+
+  def edit_name_from_kebab_menu(item, file_name_new)
+    get_item_files_table(item, 7).click
+    action_menu_item_by_name("Rename").click
+    expect(body).to contain_css(rename_folder_form_selector)
+    file_name_textbox_el = rename_folder_component("input-folder-name")
+    replace_content(file_name_textbox_el, file_name_new)
+    file_name_textbox_el.send_keys(:return)
+  end
+
+  def delete_file_from(item = 1, way = :kebab_menu)
+    case way
+    when :kebab_menu
+      get_item_files_table(item, 7).click
+      action_menu_item_by_name("Delete").click
+    when :toolbar_menu
+      get_row_header_files_table(item).click
+      toolbox_menu_button("delete-button").click
+    end
+    expect(body).to contain_css(delete_folder_form_selector)
+    delete_folder_delete_button.click
+  end
+
+  def move_file_from(item = 1, way = :kebab_menu)
+    case way
+    when :kebab_menu
+      get_item_files_table(item, 7).click
+      action_menu_item_by_name("Move To...").click
+    when :toolbar_menu
+      get_row_header_files_table(item).click
+      toolbox_menu_button("more-button").click
+      toolbox_menu_button("move-button").click
+    end
+    expect(body).to contain_css(move_folder_form_selector)
+    tree_selector.click
+    move_folder_move_button.click
+  end
+
+  def move_files(items)
+    items.map { |item| get_row_header_files_table(item).click }
+    toolbox_menu_button("more-button").click
+    toolbox_menu_button("move-button").click
+    expect(body).to contain_css(move_folder_form_selector)
+    tree_selector.click
+    move_folder_move_button.click
+  end
+
+  def tree_selector
+    f("ul[role='tree']")
   end
 end

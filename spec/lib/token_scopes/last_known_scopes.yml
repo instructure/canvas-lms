@@ -221,6 +221,8 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:id'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/bind'
+- verb: PUT
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/reset'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
 - verb: GET
@@ -872,6 +874,8 @@
 - verb: PUT
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/subscribed'
 - verb: GET
+  path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/summaries'
+- verb: POST
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/summaries'
 - verb: POST
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/summaries/:summary_id/feedback'
@@ -1644,6 +1648,8 @@
 - verb: PUT
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/subscribed'
 - verb: GET
+  path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/summaries'
+- verb: POST
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/summaries'
 - verb: POST
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/summaries/:summary_id/feedback'

@@ -102,32 +102,6 @@ module Schemas
       end
     end
 
-    describe "simple_validation_first_error" do
-      it "returns nil if there are no errors" do
-        good = { "some_str" => "foo", "some_num" => 42 }
-        expect(BaseSpecsTest.simple_validation_first_error(good)).to be_nil
-      end
-
-      it "returns one error string" do
-        res = BaseSpecsTest.simple_validation_first_error(bad_str_and_num)
-        expect(res).to be_a(String)
-      end
-
-      describe "with error_format: :hash" do
-        it "returns a hash with the error details" do
-          res = BaseSpecsTest.simple_validation_first_error(bad_str_and_num, error_format: :hash)
-          expect(res).to be_a(Hash)
-          expect(res.keys).to contain_exactly(*%i[error field schema])
-        end
-
-        it "returns a hash with the error details if required fields are missing" do
-          res = BaseSpecsTest.simple_validation_first_error({}, error_format: :hash)
-          expect(res).to be_a(Hash)
-          expect(res.keys).to contain_exactly(*%i[error schema details])
-        end
-      end
-    end
-
     describe "validation_errors" do
       subject { BaseSpecsTest.validation_errors(hash) }
 

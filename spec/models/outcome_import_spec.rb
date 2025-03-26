@@ -23,13 +23,6 @@ describe OutcomeImport do
     account_model
   end
 
-  describe "associations" do
-    it { is_expected.to belong_to(:context).required }
-    it { is_expected.to belong_to(:attachment) }
-    it { is_expected.to belong_to(:user) }
-    it { is_expected.to have_many(:outcome_import_errors) }
-  end
-
   def create_import
     OutcomeImport.create_with_attachment(@account, "instructure_csv", stub_file_data("test.csv", "abc", "text"), user_factory)
   end

@@ -369,5 +369,49 @@ describe('AddEditPseudonym', () => {
         }),
       ).toBeTruthy()
     })
+
+    describe('when the user is an admin but not a site admin (ENV.ACCOUNT_SELECT_OPTIONS and ENV.PASSWORD_POLICIES are not available)', () => {
+      const addPropsForNonSiteAdmin = {
+        ...addProps,
+        accountSelectOptions: [],
+        accountIdPasswordPolicyMap: undefined,
+      }
+      it('should not render the account select field', () => {
+        render(<AddEditPseudonym {...addPropsForNonSiteAdmin} />)
+        const account = screen.queryByLabelText('Account')
+
+        expect(account).not.toBeInTheDocument()
+      })
+
+      it('should be able to create a login', async () => {
+        fetchMock.post(CREATE_LOGIN_URL, {status: 200, body: pseudonym}, {overwriteRoutes: true})
+        render(<AddEditPseudonym {...addPropsForNonSiteAdmin} />)
+        const passwordValue = 'test1234%'
+        const uniqueId = screen.getByLabelText('Login *')
+        const password = screen.getByLabelText('Password')
+        const passwordConfirmation = screen.getByLabelText('Confirm Password')
+        const submit = screen.getByTestId('add-edit-pseudonym-submit')
+
+        fireEvent.change(uniqueId, {target: {value: pseudonym.unique_id}})
+        fireEvent.change(password, {target: {value: passwordValue}})
+        fireEvent.change(passwordConfirmation, {target: {value: passwordValue}})
+        await userEvent.click(submit)
+
+        expect(addProps.onSubmit).toHaveBeenCalledWith(pseudonym)
+        const expectedPayload = {
+          unique_id: pseudonym.unique_id,
+          sis_user_id: '',
+          integration_id: '',
+          password: passwordValue,
+          password_confirmation: passwordValue,
+        }
+        expect(
+          fetchMock.called(CREATE_LOGIN_URL, {
+            method: 'POST',
+            body: {pseudonym: expectedPayload},
+          }),
+        ).toBeTruthy()
+      })
+    })
   })
 })

@@ -21,7 +21,7 @@ describe Checkpoints::DiscussionCheckpointDeleterService do
   describe ".call" do
     before(:once) do
       course = course_model
-      course.root_account.enable_feature!(:discussion_checkpoints)
+      course.account.enable_feature!(:discussion_checkpoints)
       @topic = DiscussionTopic.create_graded_topic!(course:, title: "graded topic")
     end
 
@@ -134,7 +134,7 @@ describe Checkpoints::DiscussionCheckpointDeleterService do
       expect(overrides.active.count).to eq 3
       expect(adhoc_override.assignment_override_students.active.count).to eq 6
 
-      @topic.course.root_account.disable_feature!(:discussion_checkpoints)
+      @topic.course.account.disable_feature!(:discussion_checkpoints)
 
       deleter_service.call(
         discussion_topic: @topic.reload

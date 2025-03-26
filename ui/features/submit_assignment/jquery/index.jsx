@@ -23,7 +23,8 @@ import $ from 'jquery'
 import axios from '@canvas/axios'
 import HomeworkSubmissionLtiContainer from '../backbone/HomeworkSubmissionLtiContainer'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import {recordEulaAgreement, verifyPledgeIsChecked} from './helper'
+import SimilarityPledge from '@canvas/assignments/react/SimilarityPledge'
+import {recordEulaAgreement} from './helper'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.tree'
@@ -63,8 +64,44 @@ function insertEmoji(emoji) {
 
 ready(function () {
   let submitting = false
+
+  // variables for URL validation
   let shouldShowUrlError = false
   let errorRoot = null
+
+  // variables for turnitin pledge validation
+  const PLEDGE_TYPES = {
+    TEXT: 'text_entry',
+    UPLOAD: 'online_upload'
+  }
+  let shouldShowTextPledgeError = false
+  let shouldShowUploadPledgeError = false
+  const pledgeRoots = {}
+
+  const setShouldShowPledgeError = (type, shouldShow) => {
+    switch (type) {
+      case PLEDGE_TYPES.TEXT:
+        shouldShowTextPledgeError = shouldShow
+        break
+      case PLEDGE_TYPES.UPLOAD:
+        shouldShowUploadPledgeError = shouldShow
+        break
+      default:
+        break
+    }
+  }
+
+  const getShouldShowPledgeError = (type) => {
+    switch (type) {
+      case PLEDGE_TYPES.TEXT:
+        return shouldShowTextPledgeError
+      case PLEDGE_TYPES.UPLOAD:
+        return shouldShowUploadPledgeError
+      default:
+        break
+    }
+  }
+
   const submissionForm = $('.submit_assignment_form')
 
   const homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer()
@@ -74,6 +111,8 @@ ready(function () {
     'The student annotation tab includes the document for the assignment. Tabs with additional submission types may also be available.',
   )
   const alertMount = () => document.getElementById('annotated-screenreader-alert')
+  const textPledgeMount = document.getElementById('turnitin_pledge_container_text_entry')
+  const uploadPledgeMount = document.getElementById('turnitin_pledge_container_online_upload')
 
   if (alertMount()) {
     ReactDOM.render(
@@ -83,6 +122,49 @@ ready(function () {
       alertMount(),
     )
   }
+
+  const renderPledge = (mount, type) => {
+    let pledgeRoot = null
+    if (pledgeRoots[type]) {
+      pledgeRoot = pledgeRoots[type]
+    } else {
+      pledgeRoot = createRoot(mount)
+      pledgeRoots[type] = pledgeRoot
+    }
+    const eulaUrl = mount.dataset.eulaurl
+    const pledgeText = mount.dataset.pledge
+    pledgeRoot.render(
+      <SimilarityPledge
+        setShouldShowPledgeError={setShouldShowPledgeError}
+        getShouldShowPledgeError={getShouldShowPledgeError}
+        eulaUrl={eulaUrl}
+        pledgeText={pledgeText}
+        type={type}
+      />
+    )
+  }
+
+  const checkPledgeCheck = (checkbox, type) => {
+    if (checkbox && !checkbox.checked) {
+      switch (type) {
+        case PLEDGE_TYPES.TEXT:
+          shouldShowTextPledgeError = true
+          break
+        case PLEDGE_TYPES.UPLOAD:
+          shouldShowUploadPledgeError = true
+          break
+        default:
+          break
+      }
+      // focus the checkbox to trigger the error
+      checkbox.focus()
+      return false
+    }
+    return true
+  }
+
+  if (textPledgeMount) renderPledge(textPledgeMount, PLEDGE_TYPES.TEXT)
+  if (uploadPledgeMount) renderPledge(uploadPledgeMount, PLEDGE_TYPES.UPLOAD)
 
   const getShouldShowUrlError = () => shouldShowUrlError
   const setShouldShowUrlError = value => (shouldShowUrlError = value)
@@ -198,23 +280,10 @@ ready(function () {
   } else {
     submissionForm.submit(function (event) {
       const self = this
-      const $turnitin = $(this).find('.turnitin_pledge')
-      const $vericite = $(this).find('.vericite_pledge')
-      const parser = new DOMParser();
-
-      if (!verifyPledgeIsChecked($turnitin)) {
-        event.preventDefault()
-        event.stopPropagation()
-        return false
-      }
-
-      if (!verifyPledgeIsChecked($vericite)) {
-        event.preventDefault()
-        event.stopPropagation()
-        return false
-      }
+      const parser = new DOMParser()
 
       if($(this).is('#submit_online_text_entry_form')){
+        const textPledgeCheckbox = document.querySelector('#turnitin_pledge_container_text_entry [name="turnitin_pledge"]')
         const textEntryFormData = $(this).getFormData()
         const doc = parser.parseFromString(textEntryFormData['submission[body]'], 'text/html');
         const otherTags = doc.querySelectorAll('*:not(p):not(html):not(head):not(body)')
@@ -225,8 +294,7 @@ ready(function () {
           error = I18n.t('Text entry must not be empty')
         else if(textEntryFormData['submission[body]'].includes('data-placeholder-for'))
           error = I18n.t('File has not finished uploading')
-        
-        if(error) {
+        if (error) {
           $.screenReaderFlashMessage(error)
           const container = $('iframe#submission_body_ifr.tox-edit-area__iframe, #submission_body')
           const errorsContainer = document.getElementById('body_errors')
@@ -236,7 +304,6 @@ ready(function () {
               borderRadius: '3px',
             })
             .attr('aria-label', error)
-            .focus()
           }
           setTimeout(() => {
             // changing css property sometimes trigger internal textarea change event
@@ -255,7 +322,14 @@ ready(function () {
               </Flex>
             )
           })
+          checkPledgeCheck(textPledgeCheckbox, PLEDGE_TYPES.TEXT)
+          document.querySelectorAll('iframe#submission_body_ifr.tox-edit-area__iframe').forEach(function(iframe) {
+            const iframeBody = iframe.contentWindow.document.querySelector('body')
+            iframeBody.focus()
+          })
           return false
+        } else {
+          if (!checkPledgeCheck(textPledgeCheckbox, PLEDGE_TYPES.TEXT)) return false
         }
       }
 
@@ -285,14 +359,8 @@ ready(function () {
             })
           })
 
-        const emptyFiles = $(this)
-          .find('input[type=file]:visible')
-          .filter(function () {
-            return this.files[0] && this.files[0].size === 0
-          })
-
         const uploadedAttachmentIds = $(this).find('#submission_attachment_ids').val()
-  
+
         const reenableSubmitButton = function () {
           $(self)
             .find('button[type=submit]')
@@ -323,17 +391,11 @@ ready(function () {
         }
 
         const fileDrop = findEmptyFileDrop()
+        const uploadPledgeCheckbox = document.querySelector('#turnitin_pledge_container_online_upload [name="turnitin_pledge"]')
         // warn user if they haven't uploaded any files
         if (fileElements.length === 0 && uploadedAttachmentIds === '') {
           setShouldShowFileRequiredError(true)
-          fileDrop?.focus()
-          reenableSubmitButton()
-          return false
-        }
-
-        // throw error if the user tries to upload an empty file
-        // to prevent S3 from erroring
-        if (emptyFiles.length) {
+          checkPledgeCheck(uploadPledgeCheckbox, PLEDGE_TYPES.UPLOAD)
           fileDrop?.focus()
           reenableSubmitButton()
           return false
@@ -368,6 +430,11 @@ ready(function () {
               .prop('disabled', false)
             return false
           }
+        }
+
+        if (!checkPledgeCheck(uploadPledgeCheckbox, PLEDGE_TYPES.UPLOAD)) {
+          reenableSubmitButton()
+          return false
         }
 
         $.ajaxJSONPreparedFiles.call(this, {

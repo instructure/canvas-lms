@@ -83,3 +83,16 @@ export const getRoleName = (role: EnrollmentTypes | string) => {
   // @ts-expect-error
   return TYPES[role] || role
 }
+
+export const screenreaderMessageHolderId = 'flash_screenreader_holder'
+
+export const getLiveRegion = (): HTMLDivElement => {
+  let liveRegion = document.getElementById(screenreaderMessageHolderId)
+  if (!liveRegion) {
+    liveRegion = document.createElement('div')
+    liveRegion.id = screenreaderMessageHolderId
+    liveRegion.setAttribute('role', 'alert')
+    document.body.appendChild(liveRegion)
+  }
+  return liveRegion as HTMLDivElement
+}

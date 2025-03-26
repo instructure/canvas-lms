@@ -141,6 +141,17 @@ module.exports = {
       `.${process.env.INST_DOMAIN}`,
       ...(process.env.RSPACK_DEV_SERVER_ADDITIONAL_ALLOWED_HOSTS?.trim().split(',') ?? []),
     ],
+    headers:
+      process.env.RSPACK_ENABLE_CORS_HEADERS === 'true'
+        ? {
+            // Because this server is only ever used locally, these incredibly lax headers are okay.
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH',
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Expose-Headers': '*',
+            'Access-Control-Max-Age': '86400',
+          }
+        : {},
     client: {
       webSocketURL:
         process.env.RSPACK_WEBSOCKET_URL ??
@@ -148,9 +159,10 @@ module.exports = {
     },
     host: '0.0.0.0',
     port: process.env.RSPACK_DEV_SERVER_PORT || 80,
-    // Static assets must be ignored, otherwise any changes to the manifest will force a full
-    // page reload, which is definitely not what we want.
-    static: false,
+    // Don't watch static assets. Otherwise, when the manifest changes on disk, the page will completely reload,
+    // which defeats the purpose of hot reloading. Note that if you do actually change static assets and want to
+    // see the changes, you'll have to reload the page yourself.
+    static: {watch: false},
   },
 
   externalsType: 'global',

@@ -37,7 +37,9 @@ describe('RightsIconButton', () => {
 
   it('renders warning icon when usage rights is not set', () => {
     render(<RightsIconButton {...defaultProps} />)
-    expect(screen.getAllByText('Before publishing this file, you must specify usage rights')).toHaveLength(2)
+    expect(
+      screen.getAllByText('Before publishing this file, you must specify usage rights'),
+    ).toHaveLength(2)
   })
 
   it('renders own copyright icon', () => {

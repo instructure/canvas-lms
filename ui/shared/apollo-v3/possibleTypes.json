@@ -18,6 +18,12 @@
   "ContentTagContent": [
     "LearningOutcome"
   ],
+  "DiscussionsConnectionInterface": [
+    "Course"
+  ],
+  "FilesConnectionInterface": [
+    "Course"
+  ],
   "LegacyIDInterface": [
     "Account",
     "AccountDomain",
@@ -135,12 +141,18 @@
     "UsageRights",
     "User"
   ],
+  "PagesConnectionInterface": [
+    "Course"
+  ],
   "ProgressContext": [
     "Assignment",
     "Course",
     "File",
     "GroupSet",
     "User"
+  ],
+  "QuizzesConnectionInterface": [
+    "Course"
   ],
   "SubmissionInterface": [
     "Submission",

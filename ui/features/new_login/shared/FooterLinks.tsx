@@ -47,12 +47,13 @@ const FooterLinks = () => {
         {helpLink && (
           <InlineList.Item>
             <Link
-              href="https://community.canvaslms.com/"
-              target="_blank"
-              onClick={event => handleClick(event as React.MouseEvent<ViewOwnProps>, true)}
+              data-testid="help-link"
               data-track-category={helpLink.trackCategory}
               data-track-label={helpLink.trackLabel}
-              data-testid="help-link"
+              forceButtonRole={false}
+              href="https://community.canvaslms.com/"
+              onClick={event => handleClick(event as React.MouseEvent<ViewOwnProps>, true)}
+              target="_blank"
             >
               {helpLink.text}
             </Link>
@@ -60,24 +61,35 @@ const FooterLinks = () => {
         )}
 
         <InlineList.Item>
-          <Link href="/privacy_policy" onClick={handleClick} data-testid="privacy-link">
+          <Link
+            data-testid="privacy-link"
+            forceButtonRole={false}
+            onClick={handleClick}
+            href="/privacy_policy"
+          >
             {I18n.t('Privacy Policy')}
           </Link>
         </InlineList.Item>
 
         <InlineList.Item>
           <Link
-            href="https://www.instructure.com/policies/canvas-lms-cookie-notice"
-            target="_blank"
-            onClick={handleClick}
             data-testid="cookie-notice-link"
+            forceButtonRole={false}
+            href="https://www.instructure.com/policies/canvas-lms-cookie-notice"
+            onClick={handleClick}
+            target="_blank"
           >
             {I18n.t('Cookie Notice')}
           </Link>
         </InlineList.Item>
 
         <InlineList.Item>
-          <Link href="/acceptable_use_policy" onClick={handleClick} data-testid="aup-link">
+          <Link
+            data-testid="aup-link"
+            forceButtonRole={false}
+            href="/acceptable_use_policy"
+            onClick={handleClick}
+          >
             {I18n.t('Acceptable Use Policy')}
           </Link>
         </InlineList.Item>

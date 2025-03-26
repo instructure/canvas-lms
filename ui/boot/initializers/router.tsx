@@ -44,6 +44,10 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/act_as_modal/react/ActAsModalRoute')}
       />
       <Route
+        path="/users/:userId/admin_merge"
+        lazy={() => import('../../features/users_admin_merge/react/MergeUsersRoute')}
+      />
+      <Route
         path="/users/:userId"
         lazy={() => import('../../features/page_views/react/PageViewsRoute')}
       />

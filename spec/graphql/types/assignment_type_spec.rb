@@ -917,7 +917,7 @@ describe Types::AssignmentType do
 
     describe "when feature flag is enabled" do
       before do
-        course.root_account.enable_feature!(:discussion_checkpoints)
+        course.account.enable_feature!(:discussion_checkpoints)
       end
 
       it "checkpoints is [] and hasSubAssignments is false" do
@@ -984,7 +984,7 @@ describe Types::AssignmentType do
   describe "mySubAssignmentSubmissionsConnection" do
     context "when feature flag is enabled" do
       before do
-        course.root_account.enable_feature!(:discussion_checkpoints)
+        course.account.enable_feature!(:discussion_checkpoints)
         @topic = DiscussionTopic.create_graded_topic!(course:, title: "Checkpointed Discussion")
         @topic.reply_to_entry_required_count = 2
         @topic.save!
@@ -1031,7 +1031,7 @@ describe Types::AssignmentType do
   describe "sub_assignment_submissions" do
     context "when feature flag is enabled" do
       before do
-        course.root_account.enable_feature!(:discussion_checkpoints)
+        course.account.enable_feature!(:discussion_checkpoints)
         @topic = DiscussionTopic.create_graded_topic!(course:, title: "Checkpointed Discussion")
         @topic.reply_to_entry_required_count = 2
         @topic.save!

@@ -377,7 +377,7 @@ describe "Grade Detail Tray:" do
 
   context "checkpoints" do
     before do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
 
       create_checkpoint_assignment
 

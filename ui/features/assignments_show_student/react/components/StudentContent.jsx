@@ -150,6 +150,9 @@ function renderLTIToolIframe(submission) {
         src={launchURL}
         data-testid="lti-external-tool"
         title={I18n.t('Tool content')}
+        allowFullScreen="true"
+        webkitallowfullscreen="true"
+        mozallowfullscreen="true"
       />
     </>
   )

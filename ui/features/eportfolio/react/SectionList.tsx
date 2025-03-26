@@ -170,7 +170,7 @@ function SectionList(props: Props) {
         {portfolioName}
       </Text>
       <Text>{I18n.t('Sections')}</Text>
-      <View display="block" overflowY="auto" maxHeight="600px">
+      <View display="block" overflowY="auto" maxHeight="400px">
         <div id="section_list">
           <Table
             caption={I18n.t('List of sections for %{eportfolio}', {

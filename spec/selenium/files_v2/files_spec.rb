@@ -32,6 +32,7 @@ describe "files index page" do
 
   context("for a course") do
     context("as a teacher") do
+      base_file_name = "example.pdf"
       before(:once) do
         course_with_teacher(active_all: true)
       end
@@ -140,6 +141,28 @@ describe "files index page" do
         expect(get_item_content_files_table(1, 5)).to eq "194 KB"
       end
 
+      context "from cog icon" do
+        before do
+          add_file(fixture_file_upload(base_file_name, "application/pdf"),
+                   @course,
+                   base_file_name)
+          get "/courses/#{@course.id}/files"
+        end
+
+        it "edits file name", priority: "1" do
+          expect(base_file_name).to be_present
+          file_rename_to = "Example_edited.pdf"
+          edit_name_from_kebab_menu(1, file_rename_to)
+          expect(file_rename_to).to be_present
+          expect(content).not_to contain_link(base_file_name)
+        end
+
+        it "deletes file", priority: "1" do
+          delete_file_from(1, :kebab_menu)
+          expect(content).not_to contain_link(base_file_name)
+        end
+      end
+
       context "when a public course is accessed" do
         include_context "public course as a logged out user"
 
@@ -147,6 +170,55 @@ describe "files index page" do
           public_course.attachments.create!(filename: "somefile.doc", uploaded_data: StringIO.new("test"))
           get "/courses/#{public_course.id}/files"
           expect(all_files_table_rows.count).to eq 1
+        end
+      end
+
+      context "Move dialog" do
+        folder_name = "base folder"
+        file_to_move = "a_file.txt"
+        txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
+        before do
+          Folder.create!(name: folder_name, context: @course)
+          txt_files.map do |text_file|
+            add_file(fixture_file_upload(text_file.to_s, "text/plain"), @course, text_file)
+          end
+          get "/courses/#{@course.id}/files"
+        end
+
+        it "moves a file using cog icon", priority: "1" do
+          move_file_from(2, :kebab_menu)
+          expect(alert).to include_text("#{file_to_move} successfully moved to #{folder_name}")
+          get "/courses/#{@course.id}/files/folder/base%20folder"
+          expect(get_item_content_files_table(1, 1)).to eq "Text File\n#{file_to_move}"
+        end
+
+        it "moves a file using toolbar menu", priority: "1" do
+          move_file_from(2, :toolbar_menu)
+          expect(alert).to include_text("#{file_to_move} successfully moved to #{folder_name}")
+          get "/courses/#{@course.id}/files/folder/base%20folder"
+          expect(get_item_content_files_table(1, 1)).to eq "Text File\n#{file_to_move}"
+        end
+
+        it "moves multiple files", priority: "1" do
+          files_to_move = ["a_file.txt", "b_file.txt", "c_file.txt"]
+          move_files([2, 3, 4])
+          files_to_move.map { |file| expect(alert).to include_text("#{file} successfully moved to #{folder_name}") }
+          get "/courses/#{@course.id}/files/folder/base%20folder"
+          files_to_move.each_with_index do |file, index|
+            expect(get_item_content_files_table(index + 1, 1)).to eq "Text File\n#{file}"
+          end
+        end
+
+        context "Search Results" do
+          it "search and move a file" do
+            search_input.send_keys(txt_files[0])
+            search_button.click
+            expect(table_item_by_name(txt_files[0])).to be_displayed
+            move_file_from(1, :kebab_menu)
+            expect(alert).to include_text("#{file_to_move} successfully moved to #{folder_name}")
+            get "/courses/#{@course.id}/files/folder/base%20folder"
+            expect(get_item_content_files_table(1, 1)).to eq "Text File\n#{file_to_move}"
+          end
         end
       end
 
@@ -170,7 +242,6 @@ describe "files index page" do
 
       context "Directory Header" do
         it "sorts the files properly", priority: 2 do
-          # this test performs 2 sample sort combinations
           course_with_teacher_logged_in
 
           add_file(fixture_file_upload("example.pdf", "application/pdf"), @course, "a_example.pdf")
@@ -178,15 +249,24 @@ describe "files index page" do
 
           get "/courses/#{@course.id}/files"
 
-          # click name once to make it sort descending
           header_name_files_table.click
           expect(get_item_content_files_table(1, 1)).to eq "PDF File\nexample.pdf"
           expect(get_item_content_files_table(2, 1)).to eq "Text File\nb_file.txt"
 
-          # click size twice to make it sort ascending
           header_name_files_table.click
           expect(get_item_content_files_table(1, 1)).to eq "Text File\nb_file.txt"
           expect(get_item_content_files_table(2, 1)).to eq "PDF File\nexample.pdf"
+
+          header_name_files_table.click
+          expect(get_item_content_files_table(1, 1)).to eq "PDF File\nexample.pdf"
+          expect(get_item_content_files_table(2, 1)).to eq "Text File\nb_file.txt"
+        end
+
+        it "url-encodes sort header links" do
+          course_with_teacher_logged_in
+          Folder.root_folders(@course).first.sub_folders.create!(name: "eh?", context: @course)
+          get "/courses/#{@course.id}/files/folder/eh%3F"
+          expect(breadcrumb).to contain_css("li", text: "eh?")
         end
       end
 
@@ -195,6 +275,7 @@ describe "files index page" do
         file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf", folder:)
         get "/courses/#{@course.id}/files"
         search_input.send_keys(file_attachment.display_name)
+        search_button.click
         expect(table_item_by_name(file_attachment.display_name)).to be_displayed
       end
     end
@@ -254,14 +335,17 @@ describe "files index page" do
         expect(table_item_by_name(file_attachment.display_name)).to be_displayed
       end
 
-      it "Can search for files" do
-        folder = Folder.create!(name: "parent", context: @teacher)
-        file_attachment = attachment_model(content_type: "application/pdf", context: @teacher, display_name: "file1.pdf", folder:)
-        get "/files"
+      context "Search textbox" do
+        it "Can search for files" do
+          folder = Folder.create!(name: "parent", context: @teacher)
+          file_attachment = attachment_model(content_type: "application/pdf", context: @teacher, display_name: "file1.pdf", folder:)
+          get "/files"
 
-        table_item_by_name("My Files").click
-        search_input.send_keys(file_attachment.display_name)
-        expect(table_item_by_name(file_attachment.display_name)).to be_displayed
+          table_item_by_name("My Files").click
+          search_input.send_keys(file_attachment.display_name)
+          search_button.click
+          expect(table_item_by_name(file_attachment.display_name)).to be_displayed
+        end
       end
     end
   end

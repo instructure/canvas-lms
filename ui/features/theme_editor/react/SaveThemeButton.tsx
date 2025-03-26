@@ -30,9 +30,10 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('theme_editor')
 
-const validationSchema = z.object({
-  name: z.string().min(1, I18n.t('Name is required.')),
-})
+const createValidationSchema = () =>
+  z.object({
+    name: z.string().min(1, I18n.t('Name is required.')),
+  })
 
 export interface SharedBrandConfig {
   id?: string
@@ -66,7 +67,7 @@ const SaveThemeButton = ({
     watch,
   } = useForm({
     defaultValues: {name: sharedBrandConfigBeingEdited?.name ?? ''},
-    resolver: zodResolver(validationSchema),
+    resolver: zodResolver(createValidationSchema()),
   })
   const actualName = watch('name')
   const buttonText = I18n.t('Save theme')

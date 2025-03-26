@@ -32,6 +32,7 @@ type RubricCreateModalProps = {
   isOpen: boolean
   rubric?: Rubric
   rubricAssociation?: RubricAssociation
+  criteriaViaLlm: boolean
   onDismiss: () => void
   onSaveRubric: (savedRubricResponse: SaveRubricResponse) => void
 }
@@ -39,6 +40,7 @@ export const RubricCreateModal = ({
   isOpen,
   rubric,
   rubricAssociation,
+  criteriaViaLlm,
   onDismiss,
   onSaveRubric,
 }: RubricCreateModalProps) => {
@@ -72,6 +74,7 @@ export const RubricCreateModal = ({
             // @ts-expect-error
             criterionUseRangeEnabled={ENV.FEATURES.rubric_criterion_range}
             hideHeader={true}
+            criteriaViaLlm={criteriaViaLlm}
             rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP}
             showAdditionalOptions={true}
           />

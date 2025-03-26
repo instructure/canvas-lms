@@ -59,6 +59,7 @@ export interface File {
   usage_rights?: UsageRights | null
   preview_url: string
   context_asset_string: string
+  restricted_by_master_course?: boolean
   [key: string]: any
 }
 

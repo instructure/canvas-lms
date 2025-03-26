@@ -116,7 +116,7 @@ describe "ToDoListPresenter" do
 
     context "discussion checkpoints" do
       before do
-        course1.root_account.enable_feature!(:discussion_checkpoints)
+        course1.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, _reply_to_entry = graded_discussion_topic_with_checkpoints(context: course1)
         @reply_to_topic.submit_homework student, body: "checkpoint submission for #{student.name}"
       end
@@ -132,7 +132,7 @@ describe "ToDoListPresenter" do
     context "discussion checkpoints" do
       before do
         course_with_student(active_all: true)
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
       end
 

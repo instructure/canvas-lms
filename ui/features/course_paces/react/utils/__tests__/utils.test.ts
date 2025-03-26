@@ -23,9 +23,10 @@ import {
   calendarDaysToPaceDuration,
   getItemsDurationFromTimeToComplete,
   getTimeToCompleteCalendarDaysFromItemsDuration,
-  isTimeToCompleteCalendarDaysValid
+  isTimeToCompleteCalendarDaysValid,
+  setItemsDurationFromWeightedAssignments
 } from '../utils'
-import { PACE_ITEM_1, PACE_ITEM_2, PACE_ITEM_3, PRIMARY_PACE } from '../../__tests__/fixtures'
+import { PACE_ITEM_1, PACE_ITEM_2, PACE_ITEM_3, PACE_ITEM_4, PACE_MODULE_1, PACE_MODULE_2, PRIMARY_PACE } from '../../__tests__/fixtures'
 import { AssignmentWeightening, CoursePaceItem } from '../../types'
 
 describe('utils', () => {
@@ -108,7 +109,7 @@ describe('utils', () => {
       expect(result[0].duration).toEqual(assignmentWeightedDuration.assignment)
       expect(result[1].duration).toEqual(assignmentWeightedDuration.discussion)
       expect(result[2].duration).toEqual(assignmentWeightedDuration.quiz)
-      expect(result[3].duration).toEqual(6)
+      expect(result[3].duration).toEqual(0)
     })
   })
 
@@ -457,6 +458,111 @@ describe('utils', () => {
       const result = getItemsDurationFromTimeToComplete(newCoursePace, blackoutDates, 11, 3)
       expect(result.duration).toEqual(2)
       expect(result.remainder).toEqual(2)
+    })
+  })
+
+  describe('setItemsDurationFromWeightedAssignments', () => {
+    const coursePace = {
+      ...PRIMARY_PACE,
+      exclude_weekends: false,
+      start_date: '2021-09-01',
+      time_to_complete_calendar_days: 20,
+      modules: [
+        {
+          ...PACE_MODULE_1,
+          items: [
+            {
+              ...PACE_ITEM_1,
+              module_item_type: 'Assignment',
+            },
+            {
+              ...PACE_ITEM_2,
+              module_item_type: 'DiscussionTopic',
+            }
+          ]
+        },
+        {
+          ...PACE_MODULE_2,
+          items: [
+            {
+              ...PACE_ITEM_3,
+              module_item_type: 'Quizzes::Quiz',
+            },
+            {
+              ...PACE_ITEM_4,
+              module_item_type: 'Page',
+            },
+          ]
+        },
+      ]
+    }
+
+    const assignmentWeightedDuration: AssignmentWeightening = {
+      assignment: 2,
+      discussion: 3,
+      quiz: 4,
+      page: 1
+    }
+
+    it('set item durations from weighted assignments', () => {
+      const modules = setItemsDurationFromWeightedAssignments(coursePace, [], assignmentWeightedDuration)
+      const items = modules.flatMap((module) => module.items)
+
+      expect(items[0].duration).toEqual(assignmentWeightedDuration.assignment)
+      expect(items[1].duration).toEqual(assignmentWeightedDuration.discussion)
+      expect(items[2].duration).toEqual(assignmentWeightedDuration.quiz)
+      expect(items[3].duration).toEqual(assignmentWeightedDuration.page)
+    })
+
+    it('set item durations from weighted assignments, no weighteds for page or quiz', () => {
+      const newAssignmentDurations: AssignmentWeightening = {
+        assignment: 2,
+        discussion: 3
+      }
+
+      const modules = setItemsDurationFromWeightedAssignments(coursePace, [], newAssignmentDurations)
+      const items = modules.flatMap((module) => module.items)
+
+      // There is not weighted for quiz and page, then the duration for
+      // those items is calculated with the remaining days from time to complete
+      // time_to_complete_calendar_days is 20, and the duration for assignment and discussion is 5
+      // Start date is ignored so there are 14 days remaining
+      // then the duration for quiz and page is 7 .
+      expect(items[0].duration).toEqual(assignmentWeightedDuration.assignment)
+      expect(items[1].duration).toEqual(assignmentWeightedDuration.discussion)
+      expect(items[2].duration).toEqual(7)
+      expect(items[3].duration).toEqual(7)
+    })
+
+    it('set item durations from weighted assignments, blackout days', () => {
+      const newAssignmentDurations: AssignmentWeightening = {
+        assignment: 2,
+        discussion: 3
+      }
+
+      const blackoutDates = [
+        {
+          id: '30',
+          course_id: PRIMARY_PACE.course_id,
+          event_title: 'Spring break',
+          start_date: moment('2021-09-06'),
+          end_date: moment('2021-09-07'),
+        },
+      ]
+
+      const modules = setItemsDurationFromWeightedAssignments(coursePace, blackoutDates, newAssignmentDurations)
+      const items = modules.flatMap((module) => module.items)
+
+      // There is not weighted for quiz and page, then the duration for
+      // those items is calculated with the remaining days from time to complete.
+      // time_to_complete_calendar_days is 20, and the duration for assignment and discussion is 5
+      // There are 2 blackout days, so remaining days are 13
+      // then the duration for quiz and page is 6 respectively.
+
+      expect(items[0].duration).toEqual(assignmentWeightedDuration.assignment)
+      expect(items[1].duration).toEqual(assignmentWeightedDuration.discussion)
+      expect(items[2].duration).toEqual(7)
+      expect(items[3].duration).toEqual(6)
     })
   })
 })

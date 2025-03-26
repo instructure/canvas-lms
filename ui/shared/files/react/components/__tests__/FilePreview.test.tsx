@@ -199,7 +199,9 @@ describe('File Preview Rendering', () => {
     )
     const iframe = $('.ef-file-preview-frame')[0]
     expect(iframe).toBeInTheDocument()
-    expect(iframe.getAttribute('sandbox')).toBe('allow-scripts allow-same-origin')
+    expect(iframe.getAttribute('sandbox')).toMatch(/allow-scripts/)
+    expect(iframe.getAttribute('sandbox')).toMatch(/allow-same-origin/)
+    expect(iframe.getAttribute('sandbox')).toMatch(/allow-downloads/)
   })
 
   test('the file preview should not include allow-scripts in sandbox attributes for html files', () => {
@@ -214,6 +216,8 @@ describe('File Preview Rendering', () => {
     )
     const iframe = $('.ef-file-preview-frame')[0]
     expect(iframe).toBeInTheDocument()
-    expect(iframe.getAttribute('sandbox')).toBe('allow-same-origin')
+    expect(iframe.getAttribute('sandbox')).not.toMatch(/allow-scripts/)
+    expect(iframe.getAttribute('sandbox')).toMatch(/allow-same-origin/)
+    expect(iframe.getAttribute('sandbox')).toMatch(/allow-downloads/)
   })
 })

@@ -121,7 +121,7 @@ describe "discussions index" do
 
     context "discussion with checkpoints" do
       before :once do
-        Account.site_admin.enable_feature! :discussion_checkpoints
+        @course.root_account.enable_feature! :discussion_checkpoints
         @reply_to_topic, _, @topic = graded_discussion_topic_with_checkpoints(context: @course, title: "foo")
       end
 
@@ -235,7 +235,7 @@ describe "discussions index" do
     end
 
     it "duplicates a checkpointed discussion properly" do
-      Account.site_admin.enable_feature! :discussion_checkpoints
+      @course.root_account.enable_feature! :discussion_checkpoints
       checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
       checkpointed_discussion.assignment.lock_at = 3.days.from_now
       checkpointed_discussion.assignment.unlock_at = 3.days.ago
@@ -389,7 +389,7 @@ describe "discussions index" do
       end
 
       it "displays checkpointed discussion assign to tray correctly" do
-        Account.site_admin.enable_feature! :discussion_checkpoints
+        @course.root_account.enable_feature! :discussion_checkpoints
         checkpointed_discussion = create_graded_discussion(@course)
 
         Checkpoints::DiscussionCheckpointCreatorService.call(

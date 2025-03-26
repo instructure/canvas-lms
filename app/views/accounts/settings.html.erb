@@ -91,8 +91,8 @@
   <% if can_do(@context, @current_user, :manage_account_settings) %>
     <div id="tab-settings">
       <h2 class="screenreader-only"><%= t('headings.settings', "Account Settings") %></h2>
-      <%= form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings", :class => 'account_settings'} do |f| %>
-        <fieldset id="account_settings">
+      <%= form_for :account, url: account_url(@account), html: {novalidate: true, method: :put, id: "account_settings", class: "account_settings"} do |f| %>
+        <fieldset>
           <legend><%= t(:account_settings_title, "Account Settings") %></legend>
           <table class="formtable narrow">
             <tr>
@@ -567,57 +567,10 @@
 
         <% unless @account.site_admin? %>
           <fieldset>
-            <h2 class="screenreader-only"><%= t('Quiz IP Address Filters') %></h2>
-            <legend><%= t('Quiz IP Address Filters') %>
-              <button class='Button Button--icon-action ip_help_link' type='button'>
-                <i class='icon-question'></i>
-                <span class='screenreader-only'><%= t(:quiz_ip_filters_help_tooltip, "What are Quiz IP Filters?") %></span>
-              </button>
-            </legend>
-
-            <div id="ip_filters_dialog" style="display: none;">
-              <h2><%= t(:quiz_ip_filters_help_title, "What are Quiz IP Filters?") %></h2>
-              <%= mt(:quiz_ip_filters_help_message,
-              "Quiz IP filters are a way to limit access to quizzes to computers in a specified IP range.\n\n" +
-
-              "Specify a set of IP address filters that teachers can use to " +
-              "protect access to quizzes.  Filters can be a comma-separated " +
-              "list of addresses, or an address followed by a mask " +
-              "(\"192.168.217.1/24\" or \"192.168.217.1/255.255.255.0\").\"") %>
+            <legend><%= t "Quiz IP Address Filters" %><span style="padding-left: 0.5rem" id="ip_filter_explainer_portal"></span></legend>
+            <div id="account_settings_quiz_ip_filters" data-filters="<%= h((@account.settings[:ip_filters] || {}).sort_by(&:first).to_json) %>">
+              <div id="account_settings_quiz_ip_filters_data" style="display: none"></div>
             </div>
-            <table class="formtable narrow">
-              <tbody id="ip_filters">
-                <% ((@account.settings[:ip_filters] || {}).sort_by(&:first) << [nil, nil]).each do |name, filter| %>
-                  <tr class="ip_filter <%= raw ' blank" style="display: none;' if name.nil? %>">
-                    <td>
-                      <label><%= t("Name:") %>
-                        <input type="text" class="name" value="<%= name %>"/>
-                      </label>
-                    </td>
-                    <td>
-                      <label><%= t("Filter:") %>
-                        <input type="text" class="value" value="<%= filter %>" maxlength="255"/>
-                      </label>
-                      <button
-                        type="button"
-                        class="Button Button--icon-action delete_filter_link"
-                        title="<%= t(:quiz_ip_filters_delete, "Remove Quiz IP Filter") %>"
-                      >
-                        <i class="icon-end standalone-icon"></i>
-                      </button>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-            <button
-              type="button"
-              class="Button add_ip_filter_link"
-              title="<%= t("Add Quiz IP Filter") %>"
-            >
-              <i class='icon-add'></i>
-              <span aria-hidden="true"><%= t(:add_ip_filter_link, "Filter") %></span>
-            </button>
           </fieldset>
         <% end %>
 

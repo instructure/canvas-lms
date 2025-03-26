@@ -195,6 +195,11 @@ export const DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY = gql`
             ...AnonymousUser
           }
         }
+        subentriesCount
+        rootEntryParticipantCounts {
+          repliesCount
+          unreadCount
+        }
       }
     }
   }

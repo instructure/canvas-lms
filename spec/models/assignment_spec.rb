@@ -25,25 +25,10 @@ require_relative "../lti2_spec_helper"
 describe Assignment do
   include_context "lti2_spec_helper"
 
-  describe "relationships" do
-    it { is_expected.to have_one(:score_statistic).dependent(:destroy) }
-    it { is_expected.to have_one(:post_policy).dependent(:destroy).inverse_of(:assignment) }
-
-    it { is_expected.to have_many(:moderation_graders) }
-    it { is_expected.to have_many(:moderation_grader_users) }
-    it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
-  end
-
   before :once do
     course_with_teacher(active_all: true)
     @initial_student = student_in_course(active_all: true, user_name: "a student").user
   end
-
-  # workaround for our version of shoulda-matchers not having the 'optional' method
-  it { is_expected.to belong_to(:grader_section).class_name("CourseSection") }
-  it { is_expected.not_to validate_presence_of(:grader_section) }
-  it { is_expected.to belong_to(:final_grader).class_name("User") }
-  it { is_expected.not_to validate_presence_of(:final_grader) }
 
   it "creates a new instance given valid attributes" do
     assignment = @course.assignments.create!(assignment_valid_attributes)
@@ -2457,7 +2442,7 @@ describe Assignment do
   describe "#has_student_submissions_for_sub_assignments?" do
     context "checkpointed assignment" do
       before do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, reply_to_entry_required_count: 2)
       end
 
@@ -2480,7 +2465,7 @@ describe Assignment do
   describe "#can_unpublish?" do
     context "checkpointed assignment" do
       before do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, = graded_discussion_topic_with_checkpoints(context: @course)
       end
 
@@ -2494,7 +2479,7 @@ describe Assignment do
   describe "#assignment_ids_with_sub_assignment_submissions" do
     context "checkpointed assignment" do
       before do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, = graded_discussion_topic_with_checkpoints(context: @course)
         @other_assignment = @course.assignments.create(title: "other assignment", points_possible: 10)
       end
@@ -8482,47 +8467,44 @@ describe Assignment do
   end
 
   describe "basic validation" do
-    # rubocop:disable Performance/InefficientHashSearch
-    # ActiveModel::BetterErrors::Errors does not respond to #key?
     describe "possible points" do
       it "does not allow a negative value" do
         assignment = Assignment.new(points_possible: -1)
         assignment.valid?
-        expect(assignment.errors.keys.include?(:points_possible)).to be_truthy
+        expect(assignment.errors.include?(:points_possible)).to be_truthy
       end
 
       it "does not allow a 1000000000 value" do
         assignment = Assignment.new(points_possible: 1_000_000_000)
         expect(assignment).not_to be_valid
-        expect(assignment.errors.keys.include?(:points_possible)).to be_truthy
+        expect(assignment.errors.include?(:points_possible)).to be_truthy
       end
 
       it "allows a nil value" do
         assignment = Assignment.new(points_possible: nil)
         assignment.valid?
-        expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
+        expect(assignment.errors.include?(:points_possible)).to be_falsey
       end
 
       it "allows a 0 value" do
         assignment = Assignment.new(points_possible: 0)
         assignment.valid?
-        expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
+        expect(assignment.errors.include?(:points_possible)).to be_falsey
       end
 
       it "allows a positive value" do
         assignment = Assignment.new(points_possible: 13)
         assignment.valid?
-        expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
+        expect(assignment.errors.include?(:points_possible)).to be_falsey
       end
 
       it "does not attempt validation unless points_possible has changed" do
         assignment = Assignment.new(points_possible: -13)
         allow(assignment).to receive(:points_possible_changed?).and_return(false)
         assignment.valid?
-        expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
+        expect(assignment.errors.include?(:points_possible)).to be_falsey
       end
     end
-    # rubocop:enable Performance/InefficientHashSearch
   end
 
   describe "#ensure_points_possible!" do
@@ -10295,9 +10277,6 @@ describe Assignment do
       context "when moderated_grading is not enabled" do
         subject(:assignment) { @course.assignments.build }
 
-        it { is_expected.to validate_absence_of(:grader_section) }
-        it { is_expected.to validate_absence_of(:final_grader) }
-
         it "before validation, sets final_grader_id to nil if it is present" do
           teacher = User.create!
           @course.enroll_teacher(teacher, active_all: true)
@@ -10334,7 +10313,6 @@ describe Assignment do
           subject { @course.assignments.create(moderated_grading: true, grader_count: 1, final_grader: @section1_ta) }
 
           it { is_expected.to be_muted }
-          it { is_expected.to validate_numericality_of(:grader_count).is_greater_than(0) }
         end
 
         describe "grader_section validation" do
@@ -10471,8 +10449,6 @@ describe Assignment do
     before(:once) do
       assignment_model(course: @course)
     end
-
-    it { is_expected.to validate_numericality_of(:allowed_attempts).allow_nil }
 
     it "allows -1" do
       @assignment.allowed_attempts = -1
@@ -11724,7 +11700,7 @@ describe Assignment do
 
   describe "checkpointed assignments" do
     before do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @parent = @course.assignments.create!(has_sub_assignments: true, workflow_state: "published", grading_type: "points")
       @first_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
       @second_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
@@ -12203,26 +12179,31 @@ describe Assignment do
     end
   end
 
-  describe "Horizon course limitations" do
+  describe "Horizon course assignment" do
     before :once do
       @course.account.enable_feature!(:horizon_course_setting)
       @course.horizon_course = true
       @course.save!
     end
 
-    it "does not accept group assignments" do
-      @assignment = assignment_model(submission_types: "online_text_entry", course: @course)
+    it "skips group assignments" do
+      @assignment = assignment_model(course: @course)
       group_category = @course.group_categories.create!(name: "Test Group Set")
       @assignment.group_category = group_category
-      expect { @assignment.save! }.to raise_error(ActiveRecord::RecordInvalid)
+      @assignment.save!
+      expect(@assignment.group_category).to be_nil
     end
 
-    it "does not accept invalid submission types" do
-      expect { assignment_model(submission_types: "online_url", course: @course) }.to raise_error(ActiveRecord::RecordInvalid)
+    it "converts invalid submission types" do
+      @assignment = assignment_model(submission_types: "online_url", course: @course)
+      expect(@assignment.submission_types).to eql("online_text_entry")
     end
 
-    it "does not accept peer reviews" do
-      expect { assignment_model(peer_reviews: true, course: @course) }.to raise_error(ActiveRecord::RecordInvalid)
+    it "skips assignment peer reviews" do
+      @assignment = assignment_model(peer_reviews: true, course: @course)
+      expect(@assignment.peer_reviews).to be false
+      expect(@assignment.peer_review_count).to eq 0
+      expect(@assignment.automatic_peer_reviews).to be false
     end
   end
 

@@ -131,12 +131,13 @@ module ConversationsHelper
     result
   end
 
-  def normalize_recipients(recipients: nil, context_code: nil, conversation_id: nil, current_user: @current_user, session: nil, group_conversation: false)
+  def normalize_recipients(recipients: nil, context_code: nil, conversation_id: nil, current_user: @current_user, session: nil, group_conversation: false, bulk_message: false)
     if defined?(params)
       recipients ||= params[:recipients]
       context_code ||= params[:context_code]
       conversation_id ||= params[:from_conversation_id]
       group_conversation = params[:group_conversation]
+      bulk_message = params[:bulk_message]
     end
 
     return unless recipients
@@ -171,12 +172,13 @@ module ConversationsHelper
       known.concat(unknown_users.map { |id| MessageableUser.find(id) })
     end
 
+    group_context_types = ["group", "differentiation_tag"]
     contexts.each do |ctxt|
       context_type, context_id = ctxt.match(MessageableUser::Calculator::CONTEXT_RECIPIENT).captures
-      if context_type == "group"
+      if group_context_types.include?(context_type)
         group = Group.find(context_id)
         raise InsufficientPermissionsForDifferentiationTagsError if group&.non_collaborative? && !group.context.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
-        raise GroupConversationForDifferentiationTagsNotAllowedError if group&.non_collaborative? && group_conversation
+        raise GroupConversationForDifferentiationTagsNotAllowedError if group.non_collaborative? && group_conversation && !bulk_message
       end
       known.concat(current_user.address_book.known_in_context(ctxt, include_concluded: false))
     end

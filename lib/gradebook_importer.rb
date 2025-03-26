@@ -136,7 +136,7 @@ class GradebookImporter
                                .select(ASSIGNMENT_PRELOADED_FIELDS)
                                .to_a
 
-    if @context.root_account.feature_enabled?(:discussion_checkpoints)
+    if @context.discussion_checkpoints_enabled?
       checkpoint_assignments = @all_assignments.select(&:has_sub_assignments).map(&:sub_assignments).flatten
       @all_assignments += checkpoint_assignments
     end

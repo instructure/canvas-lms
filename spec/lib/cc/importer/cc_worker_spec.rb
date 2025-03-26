@@ -56,7 +56,7 @@ describe CC::Importer::CCWorker do
       let(:expected_settings) { { is_discussion_checkpoints_enabled: false } }
 
       before do
-        course.root_account.disable_feature!(:discussion_checkpoints)
+        course.account.disable_feature!(:discussion_checkpoints)
       end
 
       it "calls converter_class with proper settings" do
@@ -69,7 +69,7 @@ describe CC::Importer::CCWorker do
       let(:expected_settings) { { is_discussion_checkpoints_enabled: true } }
 
       before do
-        course.root_account.enable_feature!(:discussion_checkpoints)
+        course.account.enable_feature!(:discussion_checkpoints)
       end
 
       it "calls converter_class with proper settings" do

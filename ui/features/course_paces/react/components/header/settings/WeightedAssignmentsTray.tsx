@@ -57,7 +57,7 @@ interface StoreProps {
 
 interface DispatchProps {
   readonly setWeightedAssignments: typeof coursePaceActions.setWeightedAssignments
-  readonly setPaceItemWeightedDuration: typeof actions.setPaceItemWeightedDuration
+  readonly setPaceItemWeightedDuration: typeof coursePaceActions.setPaceItemWeightedDuration
   readonly onDismiss: typeof uiActions.hideWeightedAssignmentsTray
 }
 
@@ -113,7 +113,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
 
     onDismiss()
 
-    setPaceItemWeightedDuration(weightedAssignments)
+    setPaceItemWeightedDuration(weightedAssignments, blackoutDates)
     setWeightedAssignmentsCoursePace(weightedAssignments)
   }, [weightedAssignments, validationMessage, onDismiss, setPaceItemWeightedDuration, setWeightedAssignmentsCoursePace])
 
@@ -317,6 +317,6 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 
 export default connect(mapStateToProps, {
   setWeightedAssignments: coursePaceActions.setWeightedAssignments,
-  setPaceItemWeightedDuration: actions.setPaceItemWeightedDuration,
+  setPaceItemWeightedDuration: coursePaceActions.setPaceItemWeightedDuration,
   onDismiss: uiActions.hideWeightedAssignmentsTray,
 })(WeightedAssignmentsTray)

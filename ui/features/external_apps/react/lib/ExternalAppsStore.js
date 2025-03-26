@@ -103,7 +103,7 @@ store.togglePlacements = function ({tool, placements, onSuccess = () => {}, onEr
   }
 
   $.ajax({
-    url: `/api/v1/${tool.context.toLowerCase()}s/${tool.context_id}/external_tools/${tool.app_id}`,
+    url: `/api/v1${ENV.CONTEXT_BASE_URL}/external_tools/${tool.app_id}`,
     data,
     type: 'PUT',
     success: onSuccess.bind(this),

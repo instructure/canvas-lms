@@ -357,7 +357,7 @@ describe LearningObjectDatesController do
     end
 
     it "returns correct date details for a checkpointed discussion" do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
 
       c1_due_at = "2022-05-05T12:00:00Z"
@@ -788,7 +788,7 @@ describe LearningObjectDatesController do
 
     context "checkpointed discussions in a context module with overrides" do
       before do
-        @course.root_account.enable_feature! :discussion_checkpoints
+        @course.account.enable_feature! :discussion_checkpoints
         course_with_student(course: @course)
 
         @checkpoint_due_at = "2022-05-05T12:00:00Z"
@@ -1173,7 +1173,7 @@ describe LearningObjectDatesController do
 
     context "checkpointed discussions" do
       before do
-        @course.root_account.enable_feature! :discussion_checkpoints
+        @course.account.enable_feature! :discussion_checkpoints
 
         @default_override_due_at = "2022-01-02T05:00:00Z"
         @default_override_unlock_at = "2022-01-01T00:00:00Z"
@@ -1407,7 +1407,7 @@ describe LearningObjectDatesController do
 
     context "checkpointed discussions with dates in future" do
       before do
-        @course.root_account.enable_feature! :discussion_checkpoints
+        @course.account.enable_feature! :discussion_checkpoints
 
         @student2 = student_in_course(name: "Student 2").user
 
@@ -1482,7 +1482,7 @@ describe LearningObjectDatesController do
 
     context "basic checkpointed discussions w/all dates" do
       before do
-        @course.root_account.enable_feature! :discussion_checkpoints
+        @course.account.enable_feature! :discussion_checkpoints
 
         @reply_to_topic_due_at = 7.days.from_now
         @reply_to_entry_due_at = 14.days.from_now
@@ -1577,7 +1577,7 @@ describe LearningObjectDatesController do
 
     context "checkpointed discussions in a context module" do
       before do
-        @course.root_account.enable_feature! :discussion_checkpoints
+        @course.account.enable_feature! :discussion_checkpoints
         course_with_student(course: @course)
         @context_module = @course.context_modules.create!(name: "module")
 

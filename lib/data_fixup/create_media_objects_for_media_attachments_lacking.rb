@@ -119,7 +119,7 @@ module DataFixup::CreateMediaObjectsForMediaAttachmentsLacking
       id, field = id_and_field
       next unless field.to_s.include?("iframe") && field.to_s.include?("media_attachments_iframe")
 
-      doc = Nokogiri::HTML5::DocumentFragment.parse(field, nil, { max_tree_depth: 10_000 })
+      doc = Nokogiri::HTML5::DocumentFragment.parse(field, nil, **CanvasSanitize::SANITIZE[:parser_options])
       doc.css("iframe").map do |e|
         next unless e.get_attribute("src")&.match?('(.*\/)?media_attachments_iframe\/([^\/\?]*)(.*)')
 

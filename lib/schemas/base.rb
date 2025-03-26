@@ -38,13 +38,6 @@ module Schemas
     class << self
       delegate :validate, :valid?, to: :schema_checker
 
-      # TODO: deprecated, use simple_validation_errors instead
-      # Remove this method if the lti_report_multiple_schema_validation_errors feature flag is turned on in production
-      def simple_validation_first_error(json_hash, error_format: :string)
-        err = validate(json_hash).to_a.first
-        err && simple_validation_error(err, error_format:)
-      end
-
       # Returns nil if no errors
       def simple_validation_errors(json_hash, error_format: :string)
         validate(json_hash).to_a.presence&.map { simple_validation_error _1, error_format: }
@@ -72,7 +65,7 @@ module Schemas
           end
         end
 
-        if Account.site_admin.feature_enabled?(:lti_report_multiple_schema_validation_errors) && error_format == :hash
+        if error_format == :hash
           return {
             error: raw_error["error"],
             schema: raw_error["schema"],

@@ -45,8 +45,8 @@ describe('ExternalContentHomeworkSubmissionView#uploadFileFromUrl', () => {
     const submitSpy = jest.fn()
 
     const input = document.createElement('input')
+    input.id = 'turnitin_pledge_external_content'
     input.type = 'checkbox'
-    input.className = 'turnitin_pledge external-tool'
     input.checked = false
 
     document.getElementById('fixtures').appendChild(input)
@@ -61,8 +61,8 @@ describe('ExternalContentHomeworkSubmissionView#uploadFileFromUrl', () => {
     const submitSpy = jest.fn()
 
     const input = document.createElement('input')
+    input.id = 'turnitin_pledge_external_content'
     input.type = 'checkbox'
-    input.className = 'turnitin_pledge external-tool'
     input.checked = true
 
     document.getElementById('fixtures').appendChild(input)

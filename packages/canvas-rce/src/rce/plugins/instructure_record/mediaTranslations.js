@@ -50,6 +50,9 @@ const uploadMediaTranslations = {
     ADDED_CAPTION: 'Captions for {lang} added',
     DELETED_CAPTION: 'Deleted captions for {lang}',
     PROGRESS_LABEL: formatMessage('Uploading'),
+    SELECT_SUPPORTED_FILE_TYPE: formatMessage('Please select a file of a supported type'),
+    CHOOSE_FILE_TO_UPLOAD: formatMessage('Please choose a file'),
+    ENTER_FILE_NAME: formatMessage('Please enter a file name'),
   },
 
   SelectStrings: {

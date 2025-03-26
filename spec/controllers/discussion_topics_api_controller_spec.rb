@@ -176,6 +176,80 @@ describe DiscussionTopicsApiController do
 
       @topic = @course.discussion_topics.create!(title: "discussion", summary_enabled: true)
       user_session(@teacher)
+    end
+
+    context "when the user can summarize the topic" do
+      before do
+        expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+      end
+
+      context "and a summary exists" do
+        before do
+          @raw_summary = @topic.summaries.create!(
+            summary: "raw_summary",
+            dynamic_content_hash: Digest::SHA256.hexdigest({
+              CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
+              FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: nil),
+            }.to_json),
+            llm_config_version: "raw-V1_A",
+            user: @teacher
+          )
+          @refined_summary = @topic.summaries.create!(
+            summary: "refined_summary",
+            dynamic_content_hash: Digest::SHA256.hexdigest({
+              CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: @raw_summary.summary),
+              FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: ""),
+              LOCALE: "Magyar"
+            }.to_json),
+            llm_config_version: "refined-V1_A",
+            parent: @raw_summary,
+            locale: "hu",
+            user: @teacher
+          )
+        end
+
+        it "returns the most recent summary for the user" do
+          get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+          expect(response).to be_successful
+          expect(response.parsed_body["id"]).to eq(@refined_summary.id)
+        end
+
+        context "and no summary exists" do
+          before do
+            @refined_summary&.destroy
+            @raw_summary&.destroy
+          end
+
+          it "returns an error message" do
+            get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+            expect(response).to be_not_found
+          end
+        end
+      end
+    end
+
+    context "when the user cannot summarize the topic" do
+      before do
+        expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(false)
+      end
+
+      it "returns an unauthorized action response" do
+        get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+        expect(response).to be_forbidden
+      end
+    end
+  end
+
+  context "find_or_create_summary" do
+    before do
+      course_with_teacher(active_course: true)
+      @course.account.update!(default_locale: "hu")
+
+      @topic = @course.discussion_topics.create!(title: "discussion", summary_enabled: true)
+      user_session(@teacher)
 
       @inst_llm = double("InstLLM::Client")
       allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
@@ -229,7 +303,7 @@ describe DiscussionTopicsApiController do
 
           expect(@inst_llm).not_to receive(:chat)
 
-          get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+          post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
           expect(response).to be_successful
           expect(response.parsed_body["id"]).to eq(@refined_summary.id)
@@ -251,7 +325,7 @@ describe DiscussionTopicsApiController do
             )
           )
 
-          get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+          post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
           expect(response).to be_successful
           expect(response.parsed_body["id"]).not_to eq(@refined_summary.id)
@@ -284,7 +358,7 @@ describe DiscussionTopicsApiController do
           )
         )
 
-        get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+        post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
         expect(response).to be_successful
       end
@@ -316,7 +390,7 @@ describe DiscussionTopicsApiController do
           )
         )
 
-        get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+        post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
         expect(response).to be_successful
         expect(@topic.reload.summary_enabled).to be_truthy
@@ -344,16 +418,16 @@ describe DiscussionTopicsApiController do
         )
       )
 
-      get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, userInput: "rejected by rate limit" }, format: "json"
+      post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, userInput: "rejected by rate limit" }, format: "json"
 
-      expect(response.status).to eq(429)
+      expect(response).to have_http_status(:too_many_requests)
       expect(response.parsed_body["error"]).to include("1")
     end
 
     it "returns an error if the user can't summarize" do
       expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(false)
 
-      get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+      post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
       expect(response).to be_forbidden
     end
@@ -363,7 +437,7 @@ describe DiscussionTopicsApiController do
       expect(LLMConfigs).to receive(:config_for).and_return(nil)
       expect(LLMConfigs).to receive(:config_for).and_return(nil)
 
-      get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+      post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
       expect(response).to be_unprocessable
     end

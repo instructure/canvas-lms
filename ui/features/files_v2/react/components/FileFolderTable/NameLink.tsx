@@ -30,18 +30,21 @@ import {generatePreviewUrlPath} from '../../../utils/fileUtils'
 
 interface NameLinkProps {
   item: File | Folder
+  collection: (File | Folder)[]
   isStacked: boolean
 }
 
-const NameLink = ({item, isStacked}: NameLinkProps) => {
+const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const location = useLocation()
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
     const previewId = searchParams.get('preview')
-    if (previewId == item.id) {
+    if (previewId === item.id) {
       setIsModalOpen(true)
+    } else {
+      setIsModalOpen(false)
     }
   }, [location.search, item.id])
 
@@ -51,13 +54,19 @@ const NameLink = ({item, isStacked}: NameLinkProps) => {
       setIsModalOpen(true)
       const searchParams = new URLSearchParams(location.search)
       searchParams.set('preview', item.id)
-      window.history.pushState({}, '', urlPath())
+      const newPath = `${window.location.pathname}?${searchParams.toString()}`
+      window.history.pushState(null, '', newPath)
     }
   }
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
+    const searchParams = new URLSearchParams(location.search)
+    searchParams.delete('preview')
+    const newPath = `${window.location.pathname}${searchParams.toString() ? '?' : ''}${searchParams.toString()}`
+    window.history.pushState(null, '', newPath)
   }
+
   const isFile = 'display_name' in item
   const name = isFile ? item.display_name : item.name
   const iconUrl = isFile ? item.thumbnail_url : undefined
@@ -99,7 +108,17 @@ const NameLink = ({item, isStacked}: NameLinkProps) => {
   const renderFilePreviewModal = () => {
     if (!isFile) return null
 
-    return <FilePreviewModal isOpen={isModalOpen} onClose={handleCloseModal} item={item as File} />
+    const fileCollection = collection?.filter((item): item is File => 'display_name' in item)
+    if (!fileCollection?.length) return null
+
+    return (
+      <FilePreviewModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        item={item as File}
+        collection={fileCollection}
+      />
+    )
   }
 
   const urlPath = () => {

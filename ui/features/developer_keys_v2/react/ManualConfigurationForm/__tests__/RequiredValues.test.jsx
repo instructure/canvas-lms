@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {render} from '@testing-library/react'
 import get from 'lodash/get'
 
 import RequiredValues from '../RequiredValues'
@@ -34,7 +33,6 @@ const props = ({configOverrides = {}, overrides = {}}) => {
       public_jwk: {kty: 'RSA', alg: 'RSA256', n: '', e: '', kid: '', use: ''},
       ...configOverrides,
     },
-    flashError: () => {},
     ...overrides,
   }
 }
@@ -91,45 +89,29 @@ it('is valid when valid', () => {
 
 it('is invalid when invalid inputs', () => {
   const ref = React.createRef()
-  const flashError = jest.fn()
-  render(
-    <RequiredValues
-      {...props({overrides: {flashError, ref}, configOverrides: {target_link_uri: ''}})}
-    />,
-  )
+  render(<RequiredValues {...props({overrides: {ref}, configOverrides: {target_link_uri: ''}})} />)
   expect(ref.current.valid()).toEqual(false)
-  expect(flashError).toHaveBeenCalled()
 })
 
 it('is invalid when the public JWK is missing a field', () => {
   const ref = React.createRef()
-  const flashError = jest.fn()
-  const overrides = {
-    ref,
-    flashError,
-  }
+  const overrides = {ref}
   const configOverrides = {
     public_jwk: {kty: 'RSA', alg: 'RSA256', e: '', kid: '', use: ''}, // no 'n'
   }
   render(<RequiredValues {...props({overrides, configOverrides})} />)
   expect(ref.current.valid()).toEqual(false)
-  expect(flashError).toHaveBeenCalled()
 })
 
 it('is valid if the public JWK is empty but a URL is given', () => {
   const ref = React.createRef()
-  const flashError = jest.fn()
   const public_jwk = {}
   const public_jwk_url = 'https://www.instructure.com/public_key_url'
-  const overrides = {
-    flashError,
-    ref,
-  }
+  const overrides = {ref}
   const configOverrides = {
     public_jwk,
     public_jwk_url,
   }
   render(<RequiredValues {...props({configOverrides, overrides})} />)
   expect(ref.current.valid()).toEqual(true)
-  expect(flashError).not.toHaveBeenCalled()
 })

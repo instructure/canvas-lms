@@ -35,10 +35,6 @@ const itemsReducer = (state: CoursePaceItem[], action: CoursePaceItemAction): Co
           : item
       })
     }
-    case CoursePaceItemConstants.SET_PACE_ITEM_WEIGHTED_DURATION:
-      {
-        return calculatePaceItemDuration(state, action.payload.assignmentWeightedDuration)
-      }
     default:
       return state
   }

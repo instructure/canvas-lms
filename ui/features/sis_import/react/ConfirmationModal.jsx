@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -25,15 +24,13 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('SIS_Import')
 
-export function BatchImportAlert({margin}) {
+function BatchImportAlert({margin}) {
+  const fullBatchWarning = I18n.t(
+    'If selected, this will delete everything for this term, which includes all courses and enrollments that are not in the selected import file above. See the documentation for details.',
+  )
   return (
     <Alert variant="warning" margin={margin}>
-      <p>
-        {I18n.t(
-          `If selected, this will delete everything for this term, which includes all courses and enrollments
-                that are not in the selected import file above. See the documentation for details.`,
-        )}
-      </p>
+      {fullBatchWarning}
     </Alert>
   )
 }
@@ -70,19 +67,5 @@ export function ConfirmationModal({isOpen, onSubmit, onRequestClose}) {
         </Button>
       </Modal.Footer>
     </Modal>
-  )
-}
-
-export function renderBatchImportAlert(margin) {
-  ReactDOM.render(
-    <BatchImportAlert margin={margin} />,
-    document.getElementById('batch_import_instructions'),
-  )
-}
-
-export function openModal(onSubmit, onRequestClose) {
-  ReactDOM.render(
-    <ConfirmationModal isOpen={true} onSubmit={onSubmit} onRequestClose={onRequestClose} />,
-    document.getElementById('confirmation_modal_root'),
   )
 }

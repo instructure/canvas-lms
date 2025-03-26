@@ -2985,8 +2985,10 @@ EG = {
     $submissions_container.children().hide()
     $('.speedgrader_alert').hide()
 
-    // @ts-expect-error
-    if (this.currentStudent?.submission?.['partially_submitted?'] && ENV.discussion_checkpoints) {
+    if (
+      this.currentStudent?.submission?.['partially_submitted?'] &&
+      ENV.FEATURES.discussion_checkpoints
+    ) {
       this.renderSubmissionPreview()
       return
     }

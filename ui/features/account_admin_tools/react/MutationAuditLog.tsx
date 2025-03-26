@@ -73,13 +73,14 @@ const defaultValues = {
   endDate: undefined,
 }
 
-const validationSchema = z.object({
-  assetString: z.string().min(1, I18n.t('Asset String is required.')),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
-})
+const createValidationSchema = () =>
+  z.object({
+    assetString: z.string().min(1, I18n.t('Asset String is required.')),
+    startDate: z.date().optional(),
+    endDate: z.date().optional(),
+  })
 
-type FormValues = z.infer<typeof validationSchema>
+type FormValues = z.infer<ReturnType<typeof createValidationSchema>>
 
 interface AuditLogFormProps {
   onSubmit: (data: FormValues) => void
@@ -90,7 +91,7 @@ const AuditLogForm = ({onSubmit}: AuditLogFormProps) => {
     control,
     formState: {errors},
     handleSubmit,
-  } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
+  } = useForm({defaultValues, resolver: zodResolver(createValidationSchema())})
 
   const submit: SubmitHandler<FormValues> = ({assetString, startDate, endDate}) => {
     onSubmit({assetString, startDate, endDate})

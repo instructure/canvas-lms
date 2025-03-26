@@ -80,6 +80,7 @@ export default function deleteStuff(filesAndFolders, args) {
   return $.when(...Array.from(promises || [])).then(() => {
     $.flashMessage(
       I18n.t(
+        'files_legacy_delete',
         {
           one: '%{name} deleted successfully.',
           other: '%{count} items deleted successfully.',

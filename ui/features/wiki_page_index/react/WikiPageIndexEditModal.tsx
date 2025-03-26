@@ -26,8 +26,12 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import type {FormMessage} from '@instructure/ui-form-field'
 import type {Root} from 'react-dom/client'
 import {TITLE_MAX_LENGTH} from '@canvas/wiki/utils/constants'
+import { checkForTitleConflict } from '@canvas/wiki/utils/titleConflicts'
+import { debounce } from '@instructure/debounce'
 
 const I18n = createI18nScope('wiki_pages')
+
+const checkForTitleConflictDebounced = debounce(checkForTitleConflict, 500)
 
 interface Model {
   get: (key: string) => string | null
@@ -110,6 +114,15 @@ const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEdi
     setName(e.target.value)
   }
 
+  const onTitleBlur = () => {
+    const errors = validateFormFields()
+
+    if (errors.length === 0) {
+      const currentPageId = model.get('page_id')
+      checkForTitleConflictDebounced(name, setMessages, currentPageId)
+    }
+  }
+
   return (
     <Modal
       id="wikiTitleEditModal"
@@ -140,7 +153,7 @@ const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEdi
           disabled={saving}
           messages={messages}
           onChange={onTitleChange}
-          onBlur={validateFormFields}
+          onBlur={onTitleBlur}
           renderLabel={I18n.t('Title')}
         />
       </Modal.Body>

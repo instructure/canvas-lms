@@ -76,13 +76,13 @@ describe "settings tabs" do
       course_with_admin_logged_in
     end
 
-    it "adds and delete an announcement" do
+    it "adds and deletes an announcement" do
       get "/accounts/#{Account.default.id}/settings"
       add_announcement
       f(".delete_notification_link").click
       accept_alert
       wait_for_ajaximations
-      expect(AccountNotification.count).to eq 0
+      expect(AccountNotification.active.count).to eq 0
     end
 
     it "checks title length" do
@@ -156,7 +156,7 @@ describe "settings tabs" do
       wait_for_ajax_requests
 
       # Checking if copied content has been saved as new item
-      expect(AccountNotification.count).to eq 2
+      expect(AccountNotification.active.count).to eq 2
     end
 
     it "resets form properly on new announcement" do

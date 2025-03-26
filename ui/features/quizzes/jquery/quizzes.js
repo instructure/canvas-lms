@@ -72,10 +72,19 @@ import {underscoreString} from '@canvas/convert-case'
 import replaceTags from '@canvas/util/replaceTags'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import MasteryPathToggleView from '@canvas/mastery-path-toggle/backbone/views/MasteryPathToggle'
+import { renderError, restoreOriginalMessage } from '@canvas/quizzes/jquery/quiz_form_utils'
 
 const I18n = createI18nScope('quizzes_public')
+const QUESTIONS_NUMBER = 'questions_number'
+const QUESTION_POINTS = 'question_points'
 
-let dueDateList, overrideView, masteryPathToggle, quizModel, sectionList, correctAnswerVisibility, scoreValidation
+let dueDateList,
+  overrideView,
+  masteryPathToggle,
+  quizModel,
+  sectionList,
+  correctAnswerVisibility,
+  scoreValidation
 
 RichContentEditor.preloadRemoteModule()
 
@@ -146,10 +155,14 @@ const renderDueDates = lockedItems => {
 
     overrideView.render()
 
-    if (ENV.IN_PACED_COURSE && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths) {
+    if (
+      ENV.IN_PACED_COURSE &&
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+      ENV.FEATURES.course_pace_pacing_with_mastery_paths
+    ) {
       masteryPathToggle = window.masteryPathToggle = new MasteryPathToggleView({
         el: '.js-assignment-overrides-mastery-paths',
-        model: dueDateList
+        model: dueDateList,
       })
 
       masteryPathToggle.render()
@@ -521,6 +534,14 @@ export const quiz = (window.quiz = {
         },
         () => {
           quiz.rebindMultiChange(questionType, $questionContent[0].id, $select)
+          $form
+            .find('.question-text')
+            .find('iframe')
+            .contents()
+            .find('body')
+            .on('input', () => {
+              restoreOriginalMessage($form.find('.question-text'))
+            })
         },
       )
       $form
@@ -1054,7 +1075,7 @@ export const quiz = (window.quiz = {
       result.htmlValues = []
     }
     $formQuestion.find('.answer.hidden').remove()
-    hideAlertBox($('.answers_warning'))
+    hideAlertBox($form.find('.answers_warning'))
     $form.find("input[name='answer_selection_type']").val(result.answer_selection_type).change()
     $form.find('.add_answer_link').showIf(options.addable)
     var $answers = $formQuestion.find('.form_answers .answer')
@@ -1291,22 +1312,22 @@ scoreValidation = {
           I18n.t(
             'errors.quiz_score_not_a_number',
             'Score must be a number between 0 and 2,000,000,000.',
-          )
+          ),
         )
       })
       .on('invalid:greater_than', function () {
         renderError(
           $inputField,
-          I18n.t('errors.quiz_score_too_short', 'Score must be greater than 0.')
+          I18n.t('errors.quiz_score_too_short', 'Score must be greater than 0.'),
         )
       })
       .on('invalid:less_than', function () {
         renderError(
           $inputField,
-          I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.')
+          I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.'),
         )
       })
-      .on('valid', function() {
+      .on('valid', function () {
         restoreOriginalMessage($inputField)
       })
       .on('change', () => this.validatePoints())
@@ -1434,7 +1455,7 @@ correctAnswerVisibility = {
         I18n.t(
           'errors.invalid_show_correct_answers_range',
           'Hide date cannot be before show date.',
-        )
+        ),
       )
 
       return true
@@ -1576,7 +1597,6 @@ correctAnswerVisibility = {
 }
 
 function makeQuestion(data) {
-  const idx = $('.question_holder:visible').length + 1
   const question = $.extend(
     {},
     quiz.defaultQuestionData,
@@ -1960,7 +1980,7 @@ function renderAlertBox(inputField, message, focusedElement) {
 
   if (focusedElement) {
     $(focusedElement).attr('aria-describedby', 'answers_warning_alert_box')
-    $(focusedElement).focus().select()
+    $(focusedElement).focus(150).trigger('select')
   }
 }
 
@@ -1972,49 +1992,121 @@ function hideAlertBox(inputField) {
   $(`[aria-describedby="answers_warning_alert_box"]`).removeAttr('aria-describedby')
 }
 
-function renderError(inputContainer, message) {
-  const inputMessageContainer = inputContainer.find('.input-message__container')
-
-  if (!inputMessageContainer.length) {
-    console.warn('renderError was called on a non-message container', inputContainer)
-    return
+function getActiveInnerForms() {
+  return {
+    question: $(".question_form").not("#question_form_template"),
+    group: $(".group_top.editing").find(".quiz_group_form")
   }
+}
 
-  const inputField = inputContainer.find('input').last()
-  const inputMessageText = inputMessageContainer.find('.input-message__text')
+function submitOpenFormsAndCheckValidity() {
+  // Submit open questions and question groups
+  const $forms = $('.question_form:visible,.group_top.editing .quiz_group_form:visible')
 
+  let isValid = true
+
+  $forms.each(function () {
+    const $form = $(this)
+    $form.trigger('submit', { disableInputFocus: !isValid })
+
+    if (!isValid) {
+      return
+    }
+
+    const $invalidInputControls = $form.find('.form-control.invalid')
+
+    if ($invalidInputControls.length) {
+      const $inputs = $invalidInputControls.find('input')
+
+      if ($inputs.length > 0) {
+        isValid = false
+      }
+
+      const $iframes = $invalidInputControls.find('iframe')
+
+      if ($iframes.length > 0) {
+        isValid = false
+        const $firstIframe = $iframes.first()
+        const $drawerLayoutContent = $('#drawer-layout-content')
+        $drawerLayoutContent.scrollTo({
+          top: $drawerLayoutContent.scrollTop() + $firstIframe.get(0).getBoundingClientRect().y - 20,
+          left: 0,
+        })
+      }
+    }
+
+    const $alerts = $form.find('.answers_warning').not('.hidden')
+
+    if ($alerts.length > 0) {
+      isValid = false
+      const $firstAlert = $alerts.first()
+      const $drawerLayoutContent = $('#drawer-layout-content')
+      $drawerLayoutContent.scrollTo({
+        top: $drawerLayoutContent.scrollTop() + $firstAlert.get(0).getBoundingClientRect().y - 20,
+        left: 0,
+      })
+    }
+  })
+
+  return isValid
+}
+
+function renderQuestionGroupError(inputName, message, form) {
+  const inputField = form.find(`.${inputName}`)
+  const inputContainer = form.find(`.${inputName}_container`)
+  const inputMessageContainer = form.find(`.${inputName}_message_container`)
   inputContainer.addClass('invalid')
-  inputField.attr('aria-invalid', 'true')
   inputMessageContainer.addClass('error').removeClass('hidden')
+  inputField.attr('aria-invalid', 'true')
+  const inputMessageText = inputMessageContainer.find('.input-message__text')
   inputMessageText
     .attr({
       'aria-live': 'polite',
-      'aria-atomic': 'true'
+      'aria-atomic': 'true',
     })
     .text(message)
   inputMessageText.addClass('error_text')
-
-  inputContainer.find('.asterisk').addClass('error')
 }
 
-function restoreOriginalMessage(inputContainer) {
-  const inputMessageContainer = inputContainer.find('.input-message__container')
-  const inputField = inputContainer.find('input').last()
-  const textToRestore = inputMessageContainer.data('original-text') || ''
+function clearQuestionGroupError(inputName, form) {
+  const inputField = form.find(`.${inputName}`)
+  const inputContainer = form.find(`.${inputName}_container`)
+  const inputMessageContainer = form.find(`.${inputName}_message_container`)
   const inputMessageText = inputMessageContainer.find('.input-message__text')
 
   inputContainer.removeClass('invalid')
   inputField.removeAttr('aria-invalid')
   inputMessageContainer.removeClass('error')
+  inputMessageText.removeAttr('aria-live').removeAttr('aria-atomic').removeClass('error_text')
 
-  inputMessageText.removeAttr('aria-live').removeAttr('aria-atomic').text(textToRestore)
-    .removeClass('error_text')
+  inputMessageContainer.addClass('hidden')
+}
 
-  inputContainer.find('.asterisk').removeClass('error')
+function focusOnFirstError() {
+  const errorsOnOptionsTab = $('#options_tab .form-control.invalid input')
+  const errorsOnQuestionsTab = $('#questions_tab .form-control.invalid input')
 
-  if (textToRestore === '') {
-    inputMessageContainer.addClass('hidden')
+  if (errorsOnOptionsTab.length > 0) {
+    $('#quiz_tabs').tabs('option', 'active', 0)
+    errorsOnOptionsTab?.first()?.focus();
+  } else if (errorsOnQuestionsTab.length > 0) {
+    $('#quiz_tabs').tabs('option', 'active', 1)
+    errorsOnQuestionsTab?.first()?.focus()
   }
+}
+
+function restoreSavingButtons() {
+  $('#quiz_edit_wrapper')
+    .find('.btn.save_quiz_button')
+    .prop('disabled', false)
+    .removeClass('saving')
+    .text(I18n.t('buttons.save', 'Save'))
+
+  $('#quiz_edit_wrapper')
+    .find('.btn.save_and_publish')
+    .prop('disabled', false)
+    .removeClass('saving')
+    .text(I18n.t('buttons.save_and_publish', 'Save & Publish'))
 }
 
 function toggleConditionalReleaseTab(quizType) {
@@ -2169,7 +2261,7 @@ ready(function () {
         erratic = true
         renderError(
           $('.ip-filter'),
-          I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address')
+          I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address'),
         )
       }
     }
@@ -2179,7 +2271,7 @@ ready(function () {
         erratic = true
         renderError(
           $('.access-code'),
-          I18n.t('errors.missing_access_code', 'You must enter an access code')
+          I18n.t('errors.missing_access_code', 'You must enter an access code'),
         )
       }
     }
@@ -2217,9 +2309,33 @@ ready(function () {
     restoreOriginalMessage($('.ip-filter'))
   })
 
+  $('#question_points').on('input', function () {
+    restoreOriginalMessage($(this).closest('.form-control').first())
+  })
+
+  $('#found_question_group_name').on('input', function () {
+    restoreOriginalMessage($('#add_question_group_dialog .name'))
+  })
+
+  $('#found_question_group_pick').on('input', function () {
+    restoreOriginalMessage($('#add_question_group_dialog .pick'))
+  })
+
+  $('#found_question_group_points').on('input', function () {
+    restoreOriginalMessage($('#add_question_group_dialog .points'))
+  })
+
   $('#quiz_require_lockdown_browser').change(function () {
     $('#lockdown_browser_suboptions').showIf($(this).prop('checked'))
     $('#quiz_require_lockdown_browser_for_results').prop('checked', true).change()
+  })
+
+  $('.questions_number').on('input', function () {
+    clearQuestionGroupError(QUESTIONS_NUMBER, $(this).closest('.group_edit'))
+  })
+
+  $('.question_points').on('input', function () {
+    clearQuestionGroupError(QUESTION_POINTS, $(this).closest('.group_edit'))
   })
 
   $('#lockdown_browser_suboptions').showIf($('#quiz_require_lockdown_browser').prop('checked'))
@@ -2313,7 +2429,7 @@ ready(function () {
         if (isNaN($attemptsVal)) {
           renderError(
             $inputField,
-            I18n.t('quiz_attempts_nan_error', 'Quiz attempts can only be specified in numbers')
+            I18n.t('quiz_attempts_nan_error', 'Quiz attempts can only be specified in numbers'),
           )
           $attempts.val('')
         } else if ($attemptsVal.length > 3) {
@@ -2322,7 +2438,7 @@ ready(function () {
             I18n.t(
               'quiz_attempts_length_error',
               'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left',
-            )
+            ),
           )
           $attempts.val('')
         } else {
@@ -2342,6 +2458,29 @@ ready(function () {
     disableErrorBox: true,
 
     processData(data) {
+      const activeInnerForms = getActiveInnerForms()
+
+      if (activeInnerForms.group?.length || activeInnerForms.question?.length) {
+        alert(
+          I18n.t(
+            'errors.save_inner_forms',
+            'Save or cancel the open question/group before saving the quiz.',
+          ),
+        )
+
+        if (activeInnerForms.group.length) {
+          $('#quiz_tabs').tabs('option', 'active', 1)
+          activeInnerForms.group.find('.submit_button').first().focus(150)
+        }
+
+        if (activeInnerForms.question.length) {
+          $('#quiz_tabs').tabs('option', 'active', 1)
+          activeInnerForms.question.find('.submit_button').first().focus(150)
+        }
+
+        return false
+      }
+
       RichContentEditor.closeRCE($('#quiz_description'))
       $(this).attr('method', 'PUT')
       const quiz_title = $("input[name='quiz[title]']").val()
@@ -2378,7 +2517,7 @@ ready(function () {
       if (validationHelper.nameTooLong()) {
         renderError(
           $('.title'),
-          I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1})
+          I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1}),
         )
         return false
       }
@@ -2453,7 +2592,6 @@ ready(function () {
         }
       }
 
-
       const serializingEvent = $.Event('serializing')
 
       $(this).trigger(serializingEvent, data)
@@ -2470,17 +2608,12 @@ ready(function () {
       $quiz_edit_wrapper.find('.btn.save_and_publish').prop('disabled', true)
     },
 
-    onError() {
-        $('#quiz_edit_wrapper')
-          .find('.btn.save_quiz_button')
-          .prop('disabled', false)
-          .removeClass('saving')
-          .text(I18n.t('buttons.save', 'Save'))
+    onClientSideValidationError() {
+      restoreSavingButtons()
+      focusOnFirstError()
     },
 
-    onSubmit(promise, data) {
-      const form = this
-
+    onSubmit(promise) {
       if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
         promise = promise.pipe(promisedData => {
           if (promisedData && promisedData.quiz) {
@@ -2534,20 +2667,10 @@ ready(function () {
       }
 
       function error(data) {
-        $('#quiz_edit_wrapper')
-          .find('.btn.save_quiz_button')
-          .prop('disabled', false)
-          .removeClass('saving')
-          .text(I18n.t('buttons.save', 'Save'))
-        $('#quiz_edit_wrapper')
-          .find('.btn.save_and_publish')
-          .prop('disabled', false)
-          .removeClass('saving')
-          .text(I18n.t('buttons.save_and_publish', 'Save & Publish'))
-        $('#quiz_edit_wrapper').find('input[name="publish"]').remove()
-
         $(this).trigger('xhrError', data)
         $(this).formErrors(data)
+        restoreSavingButtons()
+        focusOnFirstError()
       }
     },
   })
@@ -2716,6 +2839,7 @@ ready(function () {
 
   $(document).on('click', '.edit_question_link', function (event) {
     event.preventDefault()
+
     var $question = $(this).parents('.question')
     setQuestionID($question)
     var questionID = $question.data('questionID')
@@ -2906,13 +3030,17 @@ ready(function () {
   })
 
   $('#question_form_template .cancel_link').click(function (event) {
-    const $displayQuestion = $(this).parents('form').prev()
+    const $form = $(this).parents('form')
+    const $displayQuestion = $form.prev()
     const isNew = $displayQuestion.attr('id') === 'question_new'
+
+    restoreOriginalMessage($form.find('.question_points_holder'))
+    restoreOriginalMessage($form.find('.question-text'))
 
     event.preventDefault()
 
     if (!isNew) {
-      $(this).parents('form').remove()
+      $form.remove()
     }
     $displayQuestion.show()
     $('html,body').scrollTo({top: $displayQuestion.offset().top - 10, left: 0})
@@ -2996,6 +3124,7 @@ ready(function () {
     event.preventDefault()
 
     const $question = $(this).parents('.question')
+    hideAlertBox($question.find('.answers_warning'))
     if (!$question.hasClass('selectable')) {
       return
     }
@@ -3182,19 +3311,22 @@ ready(function () {
 
     const $ans = $(this).parents('.answer')
     const $ansHeader = $ans.closest('.question').find('.answers_header')
-    hideAlertBox($('.answers_warning'))
+    hideAlertBox(holder.find('.answers_warning'))
     $ans.remove()
     $ansHeader.focus()
   })
 
   $('.add_question_group_link').click(function (event) {
     event.preventDefault()
+
+    const areAllOpenFormsSaved = submitOpenFormsAndCheckValidity()
+
+    if (!areAllOpenFormsSaved) {
+      return
+    }
+
     if (questionLimitReached()) return
-    $('.question_form .submit_button:visible,.quiz_group_form .submit_button:visible').each(
-      function () {
-        $(this).parents('form').trigger('submit')
-      },
-    )
+
     const $group_top = $('#group_top_template').clone(true).attr('id', 'group_top_new')
     const $group_bottom = $('#group_bottom_template').clone(true).attr('id', 'group_bottom_new')
     $('#questions').append($group_top.show()).append($group_bottom.show())
@@ -3208,8 +3340,15 @@ ready(function () {
 
   $('.add_question_link').click(function (event) {
     event.preventDefault()
+
+    const areAllOpenFormsSaved = submitOpenFormsAndCheckValidity()
+
+    if (!areAllOpenFormsSaved) {
+      return
+    }
+
     if (questionLimitReached()) return
-    $('.question_form:visible,.group_top.editing .quiz_group_form:visible').trigger('submit')
+
     const $question = makeQuestion()
     if ($(this).parents('.group_top').length > 0) {
       const groupID = $(this).parents('.group_top')[0].id.replace('group_top_', '')
@@ -3331,6 +3470,13 @@ ready(function () {
 
   $('.find_question_link').click(event => {
     event.preventDefault()
+
+    const areAllOpenFormsSaved = submitOpenFormsAndCheckValidity()
+
+    if (!areAllOpenFormsSaved) {
+      return
+    }
+
     const $dialog = $findQuestionDialog
     if (!$dialog.hasClass('loaded')) {
       $dialog.data('banks', {})
@@ -3431,6 +3577,29 @@ ready(function () {
   })
 
   $('#add_question_group_dialog .submit_button').click(event => {
+    const restoreDialogButton = (dialog) => {
+      dialog
+        .find('button')
+        .prop('disabled', false)
+        .filter('.submit_button')
+        .text(I18n.t('buttons.create_group', "Create Group"))
+    }
+
+    const renderNameError = (message) => {
+      renderError($('#add_question_group_dialog .name'), message)
+      restoreDialogButton($dialog)
+    }
+
+    const renderPickError = (message) => {
+      renderError($('#add_question_group_dialog .pick'), message)
+      restoreDialogButton($dialog)
+    }
+
+    const renderPointsError = (message) => {
+      renderError($('#add_question_group_dialog .points'), message)
+      restoreDialogButton($dialog)
+    }
+
     const $dialog = $('#add_question_group_dialog')
     $dialog
       .find('button')
@@ -3439,11 +3608,68 @@ ready(function () {
       .text(I18n.t('buttons.creating_group', 'Creating Group...'))
 
     const params = $dialog.getFormData()
+
+    let hasValidationErrors = false
+
+    const groupName = params['quiz_group[name]']
+    const groupPicks = params['quiz_group[pick_count]']
+    const groupPoints = params['quiz_group[question_points]']
+
+    // Name validation
+    if (!groupName) {
+      renderNameError(I18n.t('errors.field_is_required', 'This field is required'))
+      hasValidationErrors = true
+    }
+
+    // Picks validation
+    const parsedPickCount = Number.parseInt(groupPicks, 10)
+
+    if (Number.isNaN(parsedPickCount)) {
+      renderPickError(I18n.t('errors.must_be_number', 'Must be a number'))
+      hasValidationErrors = true
+    }
+
+    if (groupPicks == null || groupPicks === '') {
+      renderPickError(I18n.t('errors.field_is_required', 'This field is required'))
+      hasValidationErrors = true
+    }
+
+    if (parsedPickCount < 0) {
+      renderPickError(I18n.t('question.positive_points', 'Must be zero or greater'))
+      hasValidationErrors = true
+    }
+
+    // Points validation
+    const parsedPoints = Number.parseInt(groupPoints, 10)
+
+    if (Number.isNaN(parsedPoints)) {
+      renderPointsError(I18n.t('errors.must_be_number', 'Must be a number'))
+      hasValidationErrors = true
+    }
+
+    if (groupPoints == null || groupPoints === '') {
+      renderPointsError(I18n.t('errors.field_is_required', 'This field is required'))
+      hasValidationErrors = true
+    }
+
+    if (parsedPoints < 0) {
+      renderPointsError(I18n.t('question.positive_points', 'Must be zero or greater'))
+      hasValidationErrors = true
+    }
+
+    if (hasValidationErrors) {
+      $('#add_question_group_dialog .form-control.invalid input').first().focus(150)
+      return false
+    }
+
     const quizGroupQuestionPoints = numberHelper.parse(params['quiz_group[question_points]'])
+
     if (quizGroupQuestionPoints && quizGroupQuestionPoints < 0) {
-      $(this)
-        .find("input[name='quiz_group[question_points]']")
-        .errorBox(I18n.t('question.positive_points', 'Must be zero or greater'))
+      renderError(
+        $('#add_question_group_dialog .points'),
+        I18n.t('question.positive_points', 'Must be zero or greater')
+      )
+      restoreDialogButton($dialog)
       return false
     } else {
       params['quiz_group[question_points]'] = quizGroupQuestionPoints
@@ -3460,11 +3686,7 @@ ready(function () {
       'POST',
       newParams,
       data => {
-        $dialog
-          .find('button')
-          .prop('disabled', false)
-          .filter('.submit_button')
-          .text(I18n.t('buttons.create_group', 'Create Group'))
+        restoreDialogButton($dialog)
 
         const $group_top = $('#group_top_template').clone(true).attr('id', 'group_top_new')
         const $group_bottom = $('#group_bottom_template').clone(true).attr('id', 'group_bottom_new')
@@ -3483,18 +3705,19 @@ ready(function () {
 
         updateFindQuestionDialogQuizGroups(group.id)
         $dialog.dialog('close')
+        $dialog.find('input[type="text"]').val('')
       },
-      data => {
-        $dialog
-          .find('button')
-          .prop('disabled', false)
-          .filter('.submit_button')
-          .text(I18n.t('errors.creating_group_failed', 'Create Group Failed, Please Try Again'))
+      () => {
+        restoreDialogButton($dialog)
       },
     )
   })
 
   $('#add_question_group_dialog .cancel_button').click(event => {
+    restoreOriginalMessage($('#add_question_group_dialog .name'))
+    restoreOriginalMessage($('#add_question_group_dialog .pick'))
+    restoreOriginalMessage($('#add_question_group_dialog .points'))
+    $('#add_question_group_dialog').find('input[type="text"]').val('')
     $('#add_question_group_dialog').dialog('close')
     $('#quiz_group_select').val('none')
   })
@@ -3707,8 +3930,8 @@ ready(function () {
 
   $('.add_answer_link').bind('click', function (event, skipFocus) {
     event.preventDefault()
-    hideAlertBox($('.answers_warning'))
     const $question = $(this).parents('.question')
+    hideAlertBox($question.find('.answers_warning'))
     var answers = []
     let answer_type = null,
       question_type = null,
@@ -3862,13 +4085,13 @@ ready(function () {
     $(this).find('.answer_comment').slideToggle()
   })
 
-  $('#question_form_template').submit(function (event) {
+  $('#question_form_template').submit(function (event, data) {
     event.preventDefault()
     event.stopPropagation()
     const $displayQuestion = $(this).prev()
     const $form = $(this)
     $('.errorBox').not('#error_box_template').remove()
-    hideAlertBox($('.answers_warning'))
+    hideAlertBox($form.find('.answers_warning'))
     var $answers = $form.find('.answer')
     const $question = $(this).find('.question')
     const answers = []
@@ -3879,10 +4102,41 @@ ready(function () {
 
     questionData.question_points = numberHelper.parse(questionData.question_points)
     if (questionData.question_points && questionData.question_points < 0) {
-      $form
-        .find("input[name='question_points']")
-        .errorBox(I18n.t('question.positive_points', 'Must be zero or greater'))
+      renderError(
+        $form.find('.question_points_holder'),
+        I18n.t('question.positive_points', 'Must be zero or greater'),
+      )
+
+      if (!data?.disableInputFocus) {
+        // Focus on the question points input
+        $form.find('.question_points_holder.invalid').find('input').first().focus(150)
+      }
+
       return
+    } else {
+      restoreOriginalMessage($form.find('.question_points_holder'))
+    }
+
+    // This is not ideal, but our only way to ensure the validation error gets displayed before
+    // closing the panel. Additionally, this will take HTML tags into account in the length check,
+    // but that's also the case when validated on the backend.
+    const MAX_QUESTION_TEXT_LENGTH = 16_384
+
+    if (questionData.question_text.length > MAX_QUESTION_TEXT_LENGTH) {
+      renderError(
+        $form.find('.question-text'),
+        I18n.t(
+          'question.question_text_too_long',
+          'Question text is too long, max length is 16384 characters',
+        ),
+      )
+
+      if (!data?.disableInputFocus) {
+        $form.find('.question-text').find('iframe').get(0).contentDocument.body.focus()
+      }
+      return
+    } else {
+      restoreOriginalMessage($form.find('.question-text'))
     }
 
     questionData.assessment_question_bank_id = $('.question_bank_id').text() || ''
@@ -3890,10 +4144,10 @@ ready(function () {
     let focused_element = null
     if (questionData.question_type === 'calculated_question') {
       if ($form.find('.combinations_holder .combinations tbody tr').length === 0) {
-        focused_element = $form.find('input[name="min"].float_value.min.variable_setting:visible');
+        focused_element = $form.find('input[name="min"].float_value.min.variable_setting:visible')
         // if no element is visible set the focus on the RCE
         if (focused_element.length === 0 && $form.find('iframe').length > 0) {
-          focused_element =  $form.find('iframe').get(0).contentDocument.body
+          focused_element = $form.find('iframe').get(0).contentDocument.body
         }
         error_text = I18n.t(
           'errors.no_possible_solution',
@@ -3927,7 +4181,7 @@ ready(function () {
       }
       if (questionData.question_type === 'fill_in_multiple_blanks_question') {
         const $variables = $form.find('.blank_id_select > option')
-        $variables.each((i) => {
+        $variables.each(i => {
           let blankCount = 0
 
           $answers.filter('.answer_idx_' + i).each((i, element) => {
@@ -3963,7 +4217,11 @@ ready(function () {
         .val()
         .match(/survey/i)
     if (isNotSurvey && error_text) {
-      renderAlertBox($('.answers_warning'), error_text, focused_element)
+      renderAlertBox(
+        $form.find('.answers_warning'),
+        error_text,
+        !data?.disableInputFocus ? focused_element : null
+      )
       return
     }
     const question = $.extend({}, questionData)
@@ -4260,7 +4518,6 @@ ready(function () {
 
   $('.quiz_group_form').formSubmit({
     object_name: 'quiz_group',
-
     formatApiData(data) {
       const newData = {}
       forEach(data, (val, key) => {
@@ -4269,17 +4526,30 @@ ready(function () {
       return newData
     },
     // rewrite the data so that it fits the jsonapi format
-    processData(data) {
+    processData(data, extraData) {
+      const quizGroupQuestionsNumber = numberHelper.parse(data['quiz_group[pick_count]'])
       const quizGroupQuestionPoints = numberHelper.parse(data['quiz_group[question_points]'])
-      if (quizGroupQuestionPoints && quizGroupQuestionPoints < 0) {
-        // TODO: Implement on-field validation errors
-        // $(this)
-        //   .find("input[name='quiz_group[question_points]']")
-        //   .errorBox(I18n.t('question.positive_points', 'Must be zero or greater'))
+      const validationErrors = validateQuestionGroupData(
+        quizGroupQuestionsNumber,
+        quizGroupQuestionPoints
+      )
+      const $form = $(this)
+      if (validationErrors.QUESTIONS_NUMBER.length > 0 || validationErrors.QUESTION_POINTS.length > 0) {
+        if (validationErrors.QUESTIONS_NUMBER.length > 0) {
+          renderQuestionGroupError(QUESTIONS_NUMBER, validationErrors.QUESTIONS_NUMBER.join(', '), $form)
+        }
+        if (validationErrors.QUESTION_POINTS.length > 0) {
+          renderQuestionGroupError(QUESTION_POINTS, validationErrors.QUESTION_POINTS.join(', '), $form)
+        }
+        if (!extraData?.disableInputFocus) {
+          $form.find('.invalid input').first().focus(150)
+        }
         return false
-      } else {
-        data['quiz_group[question_points]'] = quizGroupQuestionPoints
       }
+      clearQuestionGroupError(QUESTION_POINTS, $form)
+      data['quiz_group[question_points]'] = quizGroupQuestionPoints
+      clearQuestionGroupError(QUESTIONS_NUMBER, $form)
+      data['quiz_group[pick_count]'] = quizGroupQuestionsNumber
       return data
     },
     beforeSubmit(formData) {
@@ -4353,6 +4623,30 @@ ready(function () {
       $form.formErrors(data)
     },
   })
+
+  function validateQuestionGroupData(questionsNumber, questionPoints) {
+    const errors = {
+      QUESTIONS_NUMBER: [],
+      QUESTION_POINTS: []
+    }
+    if (Number.isNaN(questionsNumber) || typeof questionsNumber === 'undefined') {
+      errors.QUESTIONS_NUMBER.push(I18n.t('question_group.questions_number.defined', 'Questions number must be a number'))
+    }
+    if (Number.isNaN(questionPoints) || typeof questionPoints === 'undefined') {
+      errors.QUESTION_POINTS.push(I18n.t('question_group.question_points.defined', 'Question points must be a number'))
+    }
+    if (questionsNumber < 0) {
+      errors.QUESTIONS_NUMBER.push(I18n.t(
+        'question_group.questions_number.positive_points', 'The amount of questions must be zero or greater'
+      ))
+    }
+    if (questionPoints < 0) {
+      errors.QUESTION_POINTS.push(I18n.t(
+        'question_group.question_points.positive_points', 'The amount of points must be zero or greater'
+      ))
+    }
+    return errors
+  }
 
   // accessible sortables
   const accessibleSortables = {
@@ -4795,6 +5089,7 @@ ready(function () {
         return
       }
       event.preventDefault()
+
       const $top = $(this).parents('.group_top')
       const data = $top.getTemplateData({textValues: ['name', 'pick_count', 'question_points']})
       $top.fillFormData(data, {object_name: 'quiz_group'})
@@ -4833,9 +5128,14 @@ ready(function () {
       })
     })
     .on('click', '.group_edit.cancel_button', function (event) {
-      if ($(this).closest('.group_top').length === 0) {
+      const $groupContainer = $(this).closest('.group_top')
+
+      if ($groupContainer.length === 0) {
         return
       }
+
+      clearQuestionGroupError(QUESTION_POINTS, $groupContainer)
+      clearQuestionGroupError(QUESTIONS_NUMBER, $groupContainer)
       const $top = $(this).parents('.group_top')
       $top.removeClass('editing')
       if ($top.attr('id') === 'group_top_new') {

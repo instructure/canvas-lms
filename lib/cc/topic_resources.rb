@@ -163,7 +163,7 @@ module CC
     end
 
     def discussion_checkpoints?(topic)
-      @course.root_account.feature_enabled?(:discussion_checkpoints) && topic&.assignment&.has_sub_assignments
+      @course.discussion_checkpoints_enabled? && topic&.assignment&.has_sub_assignments
     end
   end
 end

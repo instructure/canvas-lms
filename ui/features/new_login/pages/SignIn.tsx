@@ -69,7 +69,7 @@ const SignIn = () => {
 
     if (username.trim() === '') {
       setUsernameError(
-        I18n.t('Please enter your %{loginHandleName}', {
+        I18n.t('Please enter your %{loginHandleName}.', {
           loginHandleName: loginHandleName?.toLowerCase(),
         }),
       )
@@ -144,7 +144,7 @@ const SignIn = () => {
     <Flex direction="column" gap="large">
       <Flex direction="column" gap="small">
         <Heading as="h1" level="h2">
-          {I18n.t('Welcome to Canvas.')}
+          {I18n.t('Welcome to Canvas')}
         </Heading>
 
         {selfRegistrationType && (

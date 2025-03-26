@@ -294,7 +294,7 @@ describe DiscussionTopic do
   it "requires a valid discussion_type" do
     @topic = @course.discussion_topics.build(message: "test", discussion_type: "gesundheit")
     expect(@topic.save).to be false
-    expect(@topic.errors.detect { |e| e.first.to_s == "discussion_type" }).to be_present
+    expect(@topic.errors.attribute_names).to eq [:discussion_type]
   end
 
   it "updates the assignment it is associated with" do
@@ -3245,7 +3245,7 @@ describe DiscussionTopic do
 
   describe "checkpoints" do
     before do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Discussion Topic Title", user: @teacher)
     end
 
@@ -3271,7 +3271,7 @@ describe DiscussionTopic do
 
     describe "in place" do
       before do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @topic.reload
         @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 5)
       end
@@ -3893,7 +3893,7 @@ describe DiscussionTopic do
   describe "#can_unpublish?" do
     context "discussion topic with checkpoints" do
       before do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, _, @topic = graded_discussion_topic_with_checkpoints(context: @course, reply_to_entry_required_count: 2)
       end
 

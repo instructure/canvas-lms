@@ -217,7 +217,7 @@ module UserContent
     end
 
     def add_lazy_loading(html)
-      doc = Nokogiri::HTML5.fragment(html, nil, { max_tree_depth: 10_000 })
+      doc = Nokogiri::HTML5.fragment(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
 
       doc.css("img, iframe").each do |e|
         if e.attributes["src"]&.value&.match?(@toplevel_regex)
@@ -241,7 +241,7 @@ module UserContent
     end
 
     def precise_translate_content(html)
-      doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, { max_tree_depth: 10_000 })
+      doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
       attributes = %w[value href longdesc src srcset title]
 
       doc.css("img, iframe, video, audio, source, param, a").each do |e|

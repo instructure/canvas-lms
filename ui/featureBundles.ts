@@ -223,7 +223,6 @@ const featureBundles: {
   user_observees: () => import('./features/user_observees/index'),
   user_outcome_results: () => import('./features/user_outcome_results/index'),
   user: () => import('./features/user/index'),
-  users_admin_merge: () => import('./features/users_admin_merge/index'),
   users_index: () => import('./features/users_index/index'),
   visibility_help: () => import('./features/visibility_help/index'),
   webzip_export: () => import('./features/webzip_export/index'),

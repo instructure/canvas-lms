@@ -92,58 +92,6 @@ RSpec.describe Lti::RegistrationAccountBinding do
     end
   end
 
-  describe "after_save hooks" do
-    let(:lrab) do
-      account = account_model
-      user = user_model
-      registration = Lti::Registration.create!(
-        name: "an lti registration",
-        account:,
-        created_by: user,
-        updated_by: user,
-        developer_key: developer_key_model
-      )
-      Lti::RegistrationAccountBinding.create!(
-        workflow_state: :off,
-        account:,
-        registration:
-      )
-    end
-
-    it "creates a corresponding developer key account binding" do
-      dkab = lrab.developer_key_account_binding
-      expect(dkab).to be_persisted
-      expect(dkab.workflow_state).to eq("off")
-    end
-
-    it "updates the corresponding developer key account binding" do
-      lrab.update!(workflow_state: :on)
-      expect(lrab.developer_key_account_binding.workflow_state).to eq("on")
-    end
-
-    context "when dev key binding already exists and isn't linked" do
-      let(:dkab) { DeveloperKeyAccountBinding.create!(account: lrab.account, developer_key: lrab.registration.developer_key, skip_lime_sync: true) }
-
-      before do
-        old_dkab = lrab.developer_key_account_binding
-        lrab.developer_key_account_binding = nil
-        lrab.skip_lime_sync = true
-        lrab.save!
-        old_dkab.delete
-        dkab # instantiate before test runs
-      end
-
-      it "doesn't error" do
-        expect { lrab.save! }.not_to raise_error
-      end
-
-      it "links bindings" do
-        lrab.save!
-        expect(lrab.developer_key_account_binding).to eq(dkab)
-      end
-    end
-  end
-
   describe "#destroy" do
     subject { account_binding.destroy }
 

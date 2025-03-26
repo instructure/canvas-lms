@@ -1717,7 +1717,6 @@ class AccountsController < ApplicationController
 
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.order("created_at DESC").first
-      @terms = @account.enrollment_terms.active
       respond_to do |format|
         format.html
         format.json { render json: @current_batch }

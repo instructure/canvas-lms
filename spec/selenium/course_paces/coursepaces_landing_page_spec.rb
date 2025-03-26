@@ -45,6 +45,19 @@ describe "course pace landing page" do
     user_session @teacher
   end
 
+  context "with flag :course_pace_time_selection" do
+    before do
+      @course.root_account.enable_feature!(:course_pace_time_selection)
+    end
+
+    it "goes to go course pace creation page with Get Started button", custom_timeout: 30 do
+      visit_course_paces_page
+      click_get_started_button
+
+      expect(element_exists?(course_pace_modal_x_selector)).to be_truthy
+    end
+  end
+
   context "unpublished course paces landing page elements" do
     it "navigates to the course paces page when clicked" do
       get "/courses/#{@course.id}"

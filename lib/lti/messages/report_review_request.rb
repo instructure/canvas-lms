@@ -50,7 +50,7 @@ module Lti::Messages
     end
 
     def add_submissions_claim!
-      @message.submission.id = submission.lti_attempt_id
+      @message.submission.id =  submission.lti_attempt_id(@opts[:submission_attempt])
     end
 
     def add_assetreport_type_claim!

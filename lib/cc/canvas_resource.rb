@@ -231,6 +231,10 @@ module CC
         if @course.account.feature_enabled?(:course_paces)
           c.enable_course_paces(@course.enable_course_paces)
         end
+
+        if @course.course_sections.active.count > 1
+          c.hide_sections_on_course_users_page(@course.hide_sections_on_course_users_page)
+        end
       end
       course_file&.close
       rel_path

@@ -59,7 +59,9 @@ describe CC::Importer::Canvas::CourseSettings do
        show_public_context_messages
        show_total_grade_as_points
        syllabus_course_summary
-       usage_rights_required].each do |boolean_field|
+       usage_rights_required
+       conditional_release
+       hide_sections_on_course_users_page].each do |boolean_field|
       describe boolean_field do
         context "when #{boolean_field} is true" do
           let(:mock_html_meta) do

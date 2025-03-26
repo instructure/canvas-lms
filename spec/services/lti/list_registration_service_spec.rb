@@ -45,13 +45,11 @@ describe Lti::ListRegistrationService do
         lti_tool_configuration_model(account:).lti_registration
       end
       let_once(:site_admin_binding) do
-        binding = Lti::RegistrationAccountBinding.find_by!(registration: site_admin_registration, account: Account.site_admin)
-        binding.update!(workflow_state: "on")
+        binding = Lti::RegistrationAccountBinding.create!(registration: site_admin_registration, account: Account.site_admin, workflow_state: "on")
         binding
       end
       let_once(:registration_binding) do
-        binding = Lti::RegistrationAccountBinding.find_by!(registration:, account:)
-        binding.update!(workflow_state: "on")
+        binding = Lti::RegistrationAccountBinding.create!(registration:, account:, workflow_state: "on")
         binding
       end
 

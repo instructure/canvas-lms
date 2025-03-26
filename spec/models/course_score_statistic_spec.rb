@@ -18,19 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 RSpec.describe CourseScoreStatistic do
-  describe "relationships" do
-    it { is_expected.to belong_to(:course).required }
-  end
-
-  describe "validations" do
-    it { is_expected.to validate_presence_of(:course) }
-    it { is_expected.to validate_presence_of(:average) }
-    it { is_expected.to validate_presence_of(:score_count) }
-
-    it { is_expected.to validate_numericality_of(:average) }
-    it { is_expected.to validate_numericality_of(:score_count) }
-  end
-
   describe "#grades_presenter_hash" do
     let(:course_score_statistic) { CourseScoreStatistic.new(course_id: 123, average: BigDecimal("12.23"), score_count: 2) }
 

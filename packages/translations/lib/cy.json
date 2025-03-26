@@ -32,6 +32,12 @@
     "additional_considerations_f3801683": {
         "message": "Ystyriaethau ychwanegol"
     },
+    "address_applied_64269b0b": {
+        "message": "Cyfeiriad wedi’i osod"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Cyfeiriad wedi’i ddileu"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Dylai dolenni cyfagos â’r un URL fod yn un ddolen."
     },
@@ -202,6 +208,12 @@
     },
     "blue_daf8fea9": {
         "message": "Glas"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Fformat trwm wedi’i osod"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Fformat trwm wedi’i ddileu"
     },
     "border_5b08b06d": {
         "message": "Bordor"
@@ -595,6 +607,12 @@
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Dangos Dolen Testun (Yn agor mewn tab newydd)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Rhaniad wedi’i osod"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Rhaniad wed’i ddileu"
     },
     "division_sign_72190870": {
         "message": "Arwydd Rhannu"
@@ -992,6 +1010,12 @@
     "heading_4_b2e74be7": {
         "message": "Pennawd 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "Pennawd { h } wedi’i osod"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "Pennawd { h } wedi’i ddileu"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Ni ddylid anwybyddu lefelau penawdau."
     },
@@ -1198,6 +1222,12 @@
     },
     "italian_bd3c792d": {
         "message": "Eidaleg"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Fformat italig wedi’i osod"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Fformat italig wedi’i ddileu"
     },
     "japanese_b5721ca7": {
         "message": "Japaneg"
@@ -1690,6 +1720,12 @@
     },
     "paragraph_5e5ad8eb": {
         "message": "Paragraff"
+    },
+    "paragraph_applied_959b3fe5": {
+        "message": "Paragraff wedi’i osod"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Paragraff wedi’i ddileu"
     },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Paragraff yn dechrau gyda { start }"
@@ -2470,6 +2506,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Does dim modd pennu url dewis adnodd"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Tanlinell wedi’i gosod"
+    },
+    "underline_removed_3693e17c": {
+        "message": "Tanlinell wedi’i dileu"
     },
     "union_e6b57a53": {
         "message": "Uniad"

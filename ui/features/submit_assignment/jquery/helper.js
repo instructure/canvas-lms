@@ -18,7 +18,6 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/rails-flash-notifications'
-import {windowAlert} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('submit_assignment_helper')
 
@@ -27,17 +26,4 @@ export function recordEulaAgreement(querySelector, checked) {
   for (let i = 0; i < inputs.length; ++i) {
     inputs[i].value = checked ? new Date().getTime() : ''
   }
-}
-
-export function verifyPledgeIsChecked(checkbox) {
-  if (checkbox.length > 0 && !checkbox.prop('checked')) {
-    windowAlert(
-      I18n.t(
-        'messages.agree_to_pledge',
-        'You must agree to the submission pledge before you can submit this assignment.',
-      ),
-    )
-    return false
-  }
-  return true
 }

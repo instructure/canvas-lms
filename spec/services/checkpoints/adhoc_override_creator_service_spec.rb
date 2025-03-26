@@ -21,7 +21,7 @@ describe Checkpoints::AdhocOverrideCreatorService do
   describe ".call" do
     before(:once) do
       course = course_model
-      course.root_account.enable_feature!(:discussion_checkpoints)
+      course.account.enable_feature!(:discussion_checkpoints)
       @student1 = student_in_course(course:, active_all: true).user
       @student2 = student_in_course(course:, active_all: true).user
       topic = DiscussionTopic.create_graded_topic!(course:, title: "graded topic")

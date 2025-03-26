@@ -21,7 +21,6 @@ import {AssignmentWeightening, CoursePace} from '../types'
 
 export enum Constants {
   SET_PACE_ITEM_DURATION = 'COURSE_PACE_ITEMS/SET_PACE_ITEM_DURATION',
-  SET_PACE_ITEM_WEIGHTED_DURATION = 'COURSE_PACE_ITEMS/SET_PACE_ITEM_WEIGHTED_DURATION',
   SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE = 'COURSE_PACE_ITEMS/SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE'
 }
 
@@ -30,8 +29,6 @@ export enum Constants {
 export const actions = {
   setPaceItemDuration: (paceItemId: string, duration: number) =>
     createAction(Constants.SET_PACE_ITEM_DURATION, {paceItemId, duration}),
-  setPaceItemWeightedDuration: (assignmentWeightedDuration: AssignmentWeightening) =>
-    createAction(Constants.SET_PACE_ITEM_WEIGHTED_DURATION, {assignmentWeightedDuration}),
   setPaceItemsDurationFromTimeToComplete: (coursePace: CoursePace, blackOutDays: BlackoutDate[], calendarDays: number) =>
     createAction(Constants.SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE, {coursePace, blackOutDays, calendarDays})
 }

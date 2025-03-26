@@ -78,29 +78,7 @@ class Login::CasController < ApplicationController
       aac.debug_set(:validate_service_ticket, t("Validated ticket for %{username}", username: st.user)) if debugging
       reset_session_for_login
 
-      pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(st.user, aac)
-      if pseudonym
-        aac.apply_federated_attributes(pseudonym, st.extra_attributes)
-      elsif aac.jit_provisioning?
-        pseudonym = aac.provision_user(st.user, st.extra_attributes)
-      end
-
-      if pseudonym && (user = pseudonym.login_assertions_for_user)
-        # Successful login and we have a user
-
-        @domain_root_account.pseudonyms.scoping do
-          PseudonymSession.create!(pseudonym, false)
-        end
-        session[:cas_session] = params[:ticket]
-        session[:login_aac] = aac.id
-
-        pseudonym.infer_auth_provider(aac)
-        successful_login(user, pseudonym)
-      else
-        logger.warn "Received CAS login for unknown user: #{st.user}"
-        redirect_to_unknown_user_url(t("Canvas doesn't have an account for user: %{user}", user: st.user))
-        increment_statsd(:failure, reason: :unknown_user)
-      end
+      find_pseudonym(st)
     else
       if debugging
         if st.failure_code || st.failure_message
@@ -139,7 +117,33 @@ class Login::CasController < ApplicationController
     render plain: "NO SESSION FOUND", status: :not_found
   end
 
-  protected
+  private
+
+  def find_pseudonym(service_ticket)
+    pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(service_ticket.user, aac)
+    if pseudonym
+      aac.apply_federated_attributes(pseudonym, service_ticket.extra_attributes)
+    elsif aac.jit_provisioning?
+      pseudonym = aac.provision_user(service_ticket.user, service_ticket.extra_attributes)
+    end
+
+    if pseudonym && (user = pseudonym.login_assertions_for_user)
+      # Successful login and we have a user
+
+      @domain_root_account.pseudonyms.scoping do
+        PseudonymSession.create!(pseudonym, false)
+      end
+      session[:cas_session] = params[:ticket]
+      session[:login_aac] = aac.id
+
+      pseudonym.infer_auth_provider(aac)
+      successful_login(user, pseudonym)
+    else
+      logger.warn "Received CAS login for unknown user: #{service_ticket.user}"
+      redirect_to_unknown_user_url(t("Canvas doesn't have an account for user: %{user}", user: service_ticket.user))
+      increment_statsd(:failure, reason: :unknown_user)
+    end
+  end
 
   def aac
     @aac ||= begin

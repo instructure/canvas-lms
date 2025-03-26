@@ -52,10 +52,10 @@ const validationSchema = z
 
       return isToDateAfterFromDate
     },
-    {
+    () => ({
       message: I18n.t('To Date cannot come before From Date.'),
       path: ['to'],
-    },
+    }),
   )
 
 type FormValues = z.infer<typeof validationSchema>

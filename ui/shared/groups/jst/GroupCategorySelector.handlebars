@@ -78,7 +78,15 @@
               {{name}}
             </option>
             {{/each}}
+            <option value="new"
+              {{hiddenIf inClosedGradingPeriod}}
+              {{hiddenIf groupCategoryIdDisabled}}
+              {{hiddenIf cannotManageGroups}}>
+              {{#t}}[ Create New Group Set ]{{/t}}
+            </option>
           </select>
+          <div id="create-group-set-modal-mountpoint"></div>
+          <div id="assignment_group_category_id_errors"></div>
         </div>
         <span id="assignment_group_category_id_blocked_error" style="font-size: 14px; display: none; color: crimson"></span>
         <div>

@@ -61,6 +61,10 @@ describe "quizzes question creation with attempts" do
 
     it "allows a 3 digit number for a quiz attempt", priority: "2" do
       attempts = "123"
+      click_questions_tab
+      question = fj(".question_form:visible")
+      submit_form(question)
+      wait_for_ajaximations
       click_settings_tab
       f("#multiple_attempts_option").click
       f("#limit_attempts_option").click

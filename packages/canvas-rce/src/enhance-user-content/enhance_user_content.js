@@ -292,7 +292,7 @@ export function enhanceUserContent(container = document, opts = {}) {
       }
     })
 
-    unenhanced_elem.querySelectorAll('a:not(.not_external, .external)').forEach(childLink => {
+    unenhanced_elem.querySelectorAll('a:not(.not_external):not(.external)').forEach(childLink => {
       if (!isExternalLink(childLink, canvasOrigin)) return
       if (childLink.tagName === 'IMG' || childLink.querySelectorAll('img').length > 0) return
       childLink.classList.add('external')

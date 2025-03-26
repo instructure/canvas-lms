@@ -52,6 +52,7 @@ function SubmissionCommentsTray({onDismiss}: SubmissionCommentsTrayProps) {
       placement="end"
       onDismiss={handleDismiss}
       data-id="submissions-comments-tray"
+      size="regular"
     >
       <View as="div" padding="small" data-testid="submission-tray-details">
         <Flex as="div" alignItems="center" justifyItems="space-between">

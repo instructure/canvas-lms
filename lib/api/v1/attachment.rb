@@ -56,6 +56,8 @@ module Api::V1::Attachment
       hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))
     end
 
+    hash["view"] = options[:view] if options[:view]
+
     return hash if options[:only]&.include?("names")
 
     options.reverse_merge!(skip_permission_checks: false)

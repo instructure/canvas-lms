@@ -420,8 +420,6 @@ const DiscussionTopicManager = props => {
                           discussionTopic={discussionTopicQuery.data.legacyNode}
                           setUserSplitScreenPreference={setUserSplitScreenPreference}
                           userSplitScreenPreference={userSplitScreenPreference}
-                          setIsSummaryEnabled={setIsSummaryEnabled}
-                          isSummaryEnabled={isSummaryEnabled}
                           closeView={closeView}
                           breakpoints={props.breakpoints}
                         />
@@ -431,8 +429,6 @@ const DiscussionTopicManager = props => {
                         discussionTopic={discussionTopicQuery.data.legacyNode}
                         setUserSplitScreenPreference={setUserSplitScreenPreference}
                         userSplitScreenPreference={userSplitScreenPreference}
-                        setIsSummaryEnabled={setIsSummaryEnabled}
-                        isSummaryEnabled={isSummaryEnabled}
                         closeView={closeView}
                         breakpoints={props.breakpoints}
                       />

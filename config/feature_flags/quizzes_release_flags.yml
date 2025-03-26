@@ -102,3 +102,9 @@ new_quizzes_report_failed_duplicates:
   display_name: Report failed duplicates to Sentry when importing New Quizzes
   description: If enabled, Canvas will report failed duplicates to Sentry
   applies_to: SiteAdmin
+hide_quiz_migration_text_no_question_warning:
+  state: hidden
+  display_name: Hide Text No Question has moved to a Stimulus warning after quiz migration
+  description: If enabled, the "Text No Question has moved to a Stimulus" warning will be hidden after quiz migration
+  applies_to: SiteAdmin
+  shadow: true

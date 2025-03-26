@@ -21,14 +21,14 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
   describe ".call" do
     before(:once) do
       course = course_model
-      course.root_account.enable_feature!(:discussion_checkpoints)
+      course.account.enable_feature!(:discussion_checkpoints)
       @topic = DiscussionTopic.create_graded_topic!(course:, title: "graded topic")
     end
 
     let(:service) { Checkpoints::DiscussionCheckpointCreatorService }
 
     it "raises a FlagDisabledError when the checkpoints feature flag is disabled" do
-      @topic.context.root_account.disable_feature!(:discussion_checkpoints)
+      @topic.context.account.disable_feature!(:discussion_checkpoints)
 
       expect do
         service.call(

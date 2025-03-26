@@ -584,7 +584,7 @@ describe "assignments" do
       before do
         @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
         Account.site_admin.enable_feature!(:discussion_checkpoints)
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
 
         @date_in_past = 2.days.ago
         @date_in_future = 2.days.from_now

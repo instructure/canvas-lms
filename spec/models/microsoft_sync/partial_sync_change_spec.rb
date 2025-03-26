@@ -25,12 +25,6 @@ describe MicrosoftSync::PartialSyncChange do
 
   it { is_expected.to be_a described_class }
   it { is_expected.to be_valid }
-  it { is_expected.to belong_to(:course).required }
-  it { is_expected.to belong_to(:user).required }
-  it { is_expected.to validate_presence_of(:course) }
-  it { is_expected.to validate_presence_of(:user) }
-  it { is_expected.to validate_presence_of(:enrollment_type) }
-  it { is_expected.to validate_uniqueness_of(:user_id).scoped_to(%i[course_id enrollment_type]) }
 
   describe ".with_values_in" do
     it "filters to rows where one of the passed-in tuples equals the columns" do

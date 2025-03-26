@@ -273,11 +273,11 @@ export default class DatetimeField {
 
   // private API
   setFromValue(e) {
-    const inputdate = this.$field.data('inputdate');
+    const inputdate = this.$field.data('inputdate')
     if (['focus', 'blur'].includes(e?.type) && !inputdate) return
-    this.parseValue();
-    this.update();
-    this.updateSuggest(e?.type === 'keyup');
+    this.parseValue()
+    this.update()
+    this.updateSuggest(e?.type === 'keyup')
   }
 
   normalizeValue(value) {
@@ -518,11 +518,12 @@ export default class DatetimeField {
   }
 
   get parseError() {
+    if (this.valid === PARSE_RESULTS.BAD_YEAR && !this.$options.timeOnly)
+      return I18n.t('Year is too far in the past.')
     if (this.$options.newSuggestionDesign) {
       if (this.$options.dateOnly) return I18n.t('Not a valid date format')
       if (this.$options.timeOnly) return I18n.t('Not a valid time format')
     }
-    if (this.valid === PARSE_RESULTS.BAD_YEAR) return I18n.t('Year is too far in the past.')
     return I18n.t('errors.not_a_date', 'Please enter a valid format for a date')
   }
 }

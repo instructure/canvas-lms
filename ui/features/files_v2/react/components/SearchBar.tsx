@@ -16,17 +16,35 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useNavigate, useLocation} from 'react-router-dom'
+import {useState} from 'react'
+import {useNavigate} from 'react-router-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
-import {useState, useRef, useEffect} from 'react'
+import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {generateSearchNavigationUrl} from '../../utils/apiUtils'
 
 const I18n = createI18nScope('files_v2')
+
+const renderClearButton = (searchValue: string, handleClear: () => void) => {
+  if (searchValue === '') return null
+
+  return (
+    <IconButton
+      type="button"
+      size="small"
+      withBackground={false}
+      withBorder={false}
+      screenReaderLabel={I18n.t('Clear search')}
+      onClick={handleClear}
+    >
+      <IconTroubleLine />
+    </IconButton>
+  )
+}
 
 interface SearchBarProps {
   initialValue?: string
@@ -34,80 +52,51 @@ interface SearchBarProps {
 
 const SearchBar = ({initialValue = ''}: SearchBarProps) => {
   const [searchValue, setSearchValue] = useState(initialValue)
-  const timeoutRef = useRef<number | undefined>(undefined)
   const navigate = useNavigate()
-  const location = useLocation()
 
-  useEffect(() => {
-    if (!location.pathname.includes('/search')) {
-      setSearchValue('')
-    }
-  }, [location.pathname])
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, searchString: string) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    setSearchValue(searchString)
-    clearTimeout(timeoutRef.current)
-    startSearch(searchString)
-  }
+    if (searchValue === '') {
+      return
+    }
 
-  const startSearch = (searchString: string) => {
-    timeoutRef.current = window.setTimeout(() => {
-      if (searchString === '') {
-        handleClear()
-        return
-      }
-      const path = window.location.pathname
-      const context = path.split('/')[3]
-      const searchUrl = filesEnv.showingAllContexts
-        ? `/folder/${context}/search?search_term=${searchString}`
-        : `/search?search_term=${searchString}`
-      navigate(searchUrl)
-    }, 350)
+    const searchUrl = generateSearchNavigationUrl(searchValue)
+    navigate(searchUrl)
   }
 
   const handleClear = () => {
     setSearchValue('')
-    clearTimeout(timeoutRef.current)
-    const path = window.location.pathname
-    const context = path.split('/')[3]
-    const clearUrl = filesEnv.showingAllContexts ? `/folder/${context}` : '/'
-    navigate(clearUrl)
-  }
-
-  const renderClearButton = () => {
-    if (searchValue === '') return null
-
-    return (
-      <IconButton
-        type="button"
-        size="small"
-        withBackground={false}
-        withBorder={false}
-        screenReaderLabel={I18n.t('Clear search')}
-        onClick={handleClear}
-      >
-        <IconTroubleLine />
-      </IconButton>
-    )
   }
 
   return (
     <View as="div">
-      <form name="files-search" autoComplete="off">
-        <TextInput
-          renderLabel={<ScreenReaderContent>{I18n.t('Search files...')}</ScreenReaderContent>}
-          placeholder={I18n.t('Search files...')}
-          value={searchValue}
-          onChange={(e, value) => handleChange(e, value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter') e.preventDefault()
-          }}
-          shouldNotWrap
-          renderBeforeInput={<IconSearchLine inline={false} />}
-          renderAfterInput={renderClearButton}
-          data-testid="files-search-input"
-        />
+      <form name="files-search" autoComplete="off" onSubmit={handleSearch}>
+        <Flex>
+          <Flex.Item shouldGrow>
+            <TextInput
+              renderLabel={<ScreenReaderContent>{I18n.t('Search files...')}</ScreenReaderContent>}
+              placeholder={I18n.t('Search files...')}
+              value={searchValue}
+              onChange={(_e, value) => setSearchValue(value)}
+              shouldNotWrap
+              // fragment fixes a weird focus issue - INSTUI-4466
+              renderBeforeInput={<></>}
+              renderAfterInput={() => renderClearButton(searchValue, handleClear)}
+              data-testid="files-search-input"
+            />
+          </Flex.Item>
+          <Flex.Item>
+            <Button
+              color="secondary"
+              margin="0 0 0 small"
+              type="submit"
+              renderIcon={<IconSearchLine inline={false} />}
+              data-testid="files-search-button"
+            >
+              {I18n.t('Search')}
+            </Button>
+          </Flex.Item>
+        </Flex>
       </form>
     </View>
   )

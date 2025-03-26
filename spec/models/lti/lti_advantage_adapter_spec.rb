@@ -93,6 +93,39 @@ describe Lti::LtiAdvantageAdapter do
     end
   end
 
+  describe "#generate_post_payload_for_report_review" do
+    let(:login_message) { adapter.generate_post_payload_for_report_review }
+    let(:asset_processor) { lti_asset_processor_model }
+    let(:asset_report) { lti_asset_report_model(asset_processor: asset_processor) }
+    let(:opts) { { asset_report: } }
+
+    it "creates a report review request" do
+      expect(params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiReportReviewRequest"
+    end
+
+    it "includes the asset report type in the message hint" do
+      expect(params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/assetreport_type"]).to eq "originality"
+    end
+
+    it "includes the for_user claim in the id_token" do
+      expect(params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/for_user"]["user_id"]).to eq(user.lti_id)
+    end
+  end
+
+  describe "#generate_post_payload_for_asset_processor_settings" do
+    let(:login_message) { adapter.generate_post_payload_for_asset_processor_settings }
+    let(:asset_processor) { lti_asset_processor_model }
+    let(:opts) { { asset_processor: } }
+
+    it "creates a asset processor settings request" do
+      expect(params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiAssetProcessorSettingsRequest"
+    end
+
+    it "includes the activity_id claim in the id_token" do
+      expect(params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/activity"]["id"]).to eq(asset_processor.assignment.lti_context_id)
+    end
+  end
+
   describe "#generate_post_payload" do
     context 'when the message type is "LtiDeepLinkingRequest"' do
       let(:opts) { { resource_type: "editor_button", domain: "test.com" } }

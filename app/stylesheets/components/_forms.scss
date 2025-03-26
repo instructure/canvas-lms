@@ -99,6 +99,10 @@ input[type=text].loading {
   border-radius: 3px;
 }
 
+.error-text {
+  color: $ic-bg-light-danger-text !important
+}
+
 input + .hint-text {
   /* pull up into the input */
   margin-top: -8px;

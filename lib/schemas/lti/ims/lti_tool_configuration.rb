@@ -23,6 +23,8 @@
 # See also Schemas::Lti::IMS::OidcRegistration which uses this
 module Schemas::Lti::IMS
   class LtiToolConfiguration < Schemas::Base
+    VALID_DISPLAY_TYPES = [*Schemas::InternalLtiConfiguration::VALID_DISPLAY_TYPES, "new_window"].freeze
+
     CUSTOM_PARAMS_SCHEMA = {
       "type" => "object",
       "additionalProperties" => {
@@ -55,7 +57,9 @@ module Schemas::Lti::IMS
             "type" => "string",
             "enum" =>
               Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) +
-              Lti::ResourcePlacement::PLACEMENTS.map { |p| Lti::ResourcePlacement.add_extension_prefix(p) } + [
+              Lti::ResourcePlacement::PLACEMENTS.map do |p|
+                Lti::ResourcePlacement.add_extension_prefix_if_necessary(p)
+              end + [
                 Lti::ResourcePlacement::CONTENT_AREA,
                 Lti::ResourcePlacement::RICH_TEXT_EDITOR
               ]
@@ -68,7 +72,7 @@ module Schemas::Lti::IMS
         Lti::IMS::Registration::PLACEMENT_VISIBILITY_EXTENSION =>
           { type: %w[string null].freeze, enum: [nil, *Lti::IMS::Registration::PLACEMENT_VISIBILITY_OPTIONS].freeze }.freeze,
         Lti::IMS::Registration::DISPLAY_TYPE_EXTENSION =>
-          { type: %w[string null].freeze, enum: [nil, *Schemas::InternalLtiConfiguration::VALID_DISPLAY_TYPES] }.freeze,
+          { type: %w[string null].freeze, enum: [nil, *VALID_DISPLAY_TYPES] }.freeze,
         Lti::IMS::Registration::LAUNCH_WIDTH_EXTENSION =>
           { type: %w[integer string null] }.freeze,
         Lti::IMS::Registration::LAUNCH_HEIGHT_EXTENSION =>

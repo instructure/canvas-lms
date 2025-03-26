@@ -83,12 +83,9 @@ class DiscussionTopicsApiController < ApplicationController
                                             include_overrides: include_params.include?("overrides")).first)
   end
 
-  # @API Summary
+  # @API Find Summary
   #
-  # Generates a summary for a discussion topic.
-  #
-  # @argument userInput [String]
-  #   Areas or topics for the summary to focus on.
+  # Returns the last generated summary for a discussion topic and the current user
   #
   # @example_request
   #
@@ -99,9 +96,40 @@ class DiscussionTopicsApiController < ApplicationController
   #
   #     {
   #       "id": 1,
+  #       "userInput": "Give me a brief summary of the discussion.",
   #       "text": "This is a summary of the discussion topic."
   #     }
-  def summary
+  def find_summary
+    return render_unauthorized_action unless @topic.user_can_summarize?(@current_user)
+
+    summary = @topic.summaries.where(user: @current_user).order(created_at: :desc).first
+    if summary
+      render(json: { id: summary.id, text: summary.summary, userInput: summary.user_input })
+    else
+      render(json: { error: t("No summary found.") }, status: :not_found)
+    end
+  end
+
+  # @API Find or Create Summary
+  #
+  # Generates a summary for a discussion topic.
+  #
+  # @argument userInput [String]
+  #   Areas or topics for the summary to focus on.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/summaries \
+  #         -X POST \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #
+  #     {
+  #       "id": 1,
+  #       "text": "This is a summary of the discussion topic."
+  #     }
+  def find_or_create_summary
     return render_unauthorized_action unless @topic.user_can_summarize?(@current_user)
 
     llm_config_raw = LLMConfigs.config_for("discussion_topic_summary_raw")

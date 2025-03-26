@@ -117,7 +117,7 @@ module Lti
 
           it "contains a message about a missing target_link_uri" do
             tool_configuration.valid?
-            error_msgs = tool_configuration.errors[:configuration].map(&:message)
+            error_msgs = tool_configuration.errors[:configuration]
             expect(error_msgs).to include(a_string_including("target_link_uri"))
           end
 
@@ -193,7 +193,7 @@ module Lti
 
         it "includes a friendly error message" do
           subject
-          expect(tool_configuration.errors[:placements].first.message).to include("does not support message type")
+          expect(tool_configuration.errors[:placements].first).to include("does not support message type")
         end
       end
 

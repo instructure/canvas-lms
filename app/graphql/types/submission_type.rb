@@ -94,7 +94,7 @@ module Types
     end
     def submission_histories_connection(filter:, order_by: nil)
       filter = filter.to_h
-      states, include_current_submission = filter.values_at(:states, :include_current_submission)
+      filter => states:, include_current_submission:
       Promise.all([
                     load_association(:versions),
                     load_association(:assignment)

@@ -163,7 +163,7 @@ class Account < ActiveRecord::Base
 
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :error_reports
-  has_many :announcements, class_name: "AccountNotification"
+  has_many :announcements, -> { active }, class_name: "AccountNotification"
   has_many :alerts, -> { preload(:criteria) }, as: :context, inverse_of: :context
   has_many :report_snapshots
   has_many :external_integration_keys, as: :context, inverse_of: :context, dependent: :destroy
@@ -852,6 +852,10 @@ class Account < ActiveRecord::Base
     all_courses
       .where(self_enrollment_code: code)
       .first
+  end
+
+  def discussion_checkpoints_enabled?
+    root_account.feature_enabled?(:discussion_checkpoints)
   end
 
   def file_namespace
@@ -2401,7 +2405,7 @@ class Account < ActiveRecord::Base
       next unless key.grants_right?(current_user, :write)
 
       if params_keys[key_type].blank?
-        key.delete
+        key.destroy!
       else
         key.key_value = params_keys[key_type]
         key.save!

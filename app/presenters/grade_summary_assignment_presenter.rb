@@ -187,7 +187,7 @@ class GradeSummaryAssignmentPresenter
   delegate :has_sub_assignments?, to: :assignment
 
   def checkpoints_parent?
-    assignment.has_sub_assignments? && assignment.root_account.feature_enabled?(:discussion_checkpoints)
+    assignment.has_sub_assignments? && assignment.context.discussion_checkpoints_enabled?
   end
 
   def deduction_present?

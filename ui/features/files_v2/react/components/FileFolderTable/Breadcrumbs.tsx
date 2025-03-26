@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext} from 'react'
+import React from 'react'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Folder} from '../../../interfaces/File'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {IconArrowOpenStartLine} from '@instructure/ui-icons'
-import {FileManagementContext} from '../Contexts'
+import {useFileManagement} from '../Contexts'
 
 type BreadcrumData = {
   id: string
@@ -98,7 +98,7 @@ const LargeBreadcrumbs = ({items}: BreadcrumbsProps) => {
 }
 
 const ResponsiveBreadcrumbs = ({folders, size, search}: ResponsiveBreadcrumbsProps) => {
-  const {contextType, contextId, showingAllContexts} = useContext(FileManagementContext)
+  const {contextType, contextId, showingAllContexts} = useFileManagement()
 
   const breadcrumbs = folders.map((folder, index) => {
     const folderContextType = (folder.context_type || '').toLowerCase()

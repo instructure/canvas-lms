@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import RosterTable from '../RosterTable'
 import {
   INACTIVE_ENROLLMENT,
@@ -46,27 +47,30 @@ const mockUsers = [
   }),
 ]
 
+const useCoursePeopleContextMocks = {
+  courseId: '1',
+  currentUserId: '1',
+  canReadReports: true,
+  canViewLoginIdColumn: true,
+  canViewSisIdColumn: true,
+  canManageDifferentiationTags: true,
+  hideSectionsOnCourseUsersPage: false,
+  allowAssignToDifferentiationTags: true,
+  activeGranularEnrollmentPermissions: [],
+}
+
 describe('RosterTable', () => {
-  const useCoursePeopleContextMocks = {
-    courseId: '1',
-    currentUserId: '1',
-    canReadReports: true,
-    canViewLoginIdColumn: true,
-    canViewSisIdColumn: true,
-    canManageDifferentiationTags: true,
-    hideSectionsOnCourseUsersPage: false,
-    allowAssignToDifferentiationTags: true,
-    activeGranularEnrollmentPermissions: [],
-  }
+  const user = userEvent.setup()
+  const renderComponent = () => render(<RosterTable users={mockUsers} />)
 
   beforeEach(() => {
     (useCoursePeopleQuery as jest.Mock).mockReturnValue({
       data: mockUsers,
       isLoading: false,
-      isSuccess: true,
       error: null
     })
     require('../../../hooks/useCoursePeopleContext').default.mockReturnValue(useCoursePeopleContextMocks)
+    renderComponent()
   })
 
   afterEach(() => {
@@ -74,71 +78,55 @@ describe('RosterTable', () => {
   })
 
   it('renders the table with correct caption', () => {
-    const {getByTestId, getByText} = render(<RosterTable />)
-    expect(getByTestId('roster-table')).toBeInTheDocument()
-    expect(getByText('Course Roster')).toBeInTheDocument()
+    expect(screen.getByTestId('roster-table')).toBeInTheDocument()
+    expect(screen.getByText('Course Roster')).toBeInTheDocument()
   })
 
   it('renders the table with correct headers', () => {
-    const {getByTestId} = render(<RosterTable />)
-    expect(getByTestId('header-select-all')).toBeInTheDocument()
-    expect(getByTestId('header-name')).toHaveTextContent(/name/i)
-    expect(getByTestId('header-sisID')).toHaveTextContent(/sis id/i)
-    expect(getByTestId('header-section')).toHaveTextContent(/section/i)
-    expect(getByTestId('header-role')).toHaveTextContent(/role/i)
-    expect(getByTestId('header-lastActivity')).toHaveTextContent(/last activity/i)
-    expect(getByTestId('header-totalActivity')).toHaveTextContent(/total activity/i)
-    expect(getByTestId('header-admin-links')).toHaveTextContent(/administrative links/i)
+    expect(screen.getByText('Select all')).toBeInTheDocument()
+    expect(screen.getByText('Name')).toBeInTheDocument()
+    expect(screen.getByText('SIS ID')).toBeInTheDocument()
+    expect(screen.getByText('Login ID')).toBeInTheDocument()
+    expect(screen.getByText('Section')).toBeInTheDocument()
+    expect(screen.getByText('Role')).toBeInTheDocument()
+    expect(screen.getByText('Last Activity')).toBeInTheDocument()
+    expect(screen.getByText('Total Activity')).toBeInTheDocument()
+    expect(screen.getByText('Administrative Links')).toBeInTheDocument()
   })
 
   it('renders table rows with user data', () => {
-    const {getByText, getAllByTestId} = render(<RosterTable />)
-    expect(getByText(mockUsers[0].name)).toBeInTheDocument()
-    expect(getByText(mockUsers[1].name)).toBeInTheDocument()
-    expect(getByText(mockUsers[2].name)).toBeInTheDocument()
-    expect(getAllByTestId(/^table-row-/)).toHaveLength(mockUsers.length)
+    expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
+    expect(screen.getByText(mockUsers[1].name)).toBeInTheDocument()
+    expect(screen.getByText(mockUsers[2].name)).toBeInTheDocument()
+    expect(screen.getAllByTestId(/^table-row-/)).toHaveLength(mockUsers.length)
   })
 
-  it('handles selecting a single row', () => {
-    const {getAllByTestId} = render(<RosterTable />)
-    const checkboxes = getAllByTestId(/^select-user-/)
+  it('handles selecting a single row', async () => {
+    const checkboxes = screen.getAllByTestId(/^select-user-/)
     const firstRowCheckbox = checkboxes[0]
-    fireEvent.click(firstRowCheckbox)
+    await user.click(firstRowCheckbox)
     expect(firstRowCheckbox).toBeChecked()
-    fireEvent.click(firstRowCheckbox)
+    await user.click(firstRowCheckbox)
     expect(firstRowCheckbox).not.toBeChecked()
   })
 
   it('handles select all rows', async () => {
-    const {getByTestId, getAllByTestId} = render(<RosterTable />)
-    const selectAllCheckbox = getByTestId('header-select-all')
-    fireEvent.click(selectAllCheckbox)
+    const selectAllCheckbox = screen.getByTestId('header-select-all')
+    await user.click(selectAllCheckbox)
 
-    const checkboxes = getAllByTestId(/^select-user-/)
+    const checkboxes = screen.getAllByTestId(/^select-user-/)
     checkboxes.forEach(checkbox => {
       expect(checkbox).toBeChecked()
     })
 
-    fireEvent.click(selectAllCheckbox)
+    await user.click(selectAllCheckbox)
     checkboxes.forEach(checkbox => {
       expect(checkbox).not.toBeChecked()
     })
   })
 
   it('displays inactive and pending enrollment states', () => {
-    const {getByText} = render(<RosterTable />)
-    expect(getByText('Inactive')).toBeInTheDocument()
-    expect(getByText('Pending')).toBeInTheDocument()
-  })
-
-  it('displays loading state', () => {
-    (useCoursePeopleQuery as jest.Mock).mockReturnValue({
-      data: null,
-      isLoading: true,
-      isSuccess: false,
-      error: null
-    })
-    const {getByText} = render(<RosterTable />)
-    expect(getByText('Loading')).toBeInTheDocument()
+    expect(screen.getByText('Inactive')).toBeInTheDocument()
+    expect(screen.getByText('Pending')).toBeInTheDocument()
   })
 })

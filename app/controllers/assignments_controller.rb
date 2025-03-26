@@ -490,6 +490,7 @@ class AssignmentsController < ApplicationController
           OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
           assigned_rubric:,
           rubric_association:,
+          ai_rubrics_enabled: Rubric.ai_rubrics_enabled?(@context),
           rubric_self_assessment_ff_enabled: Rubric.rubric_self_assessment_enabled?(@context),
           rubric_self_assessment_enabled: @assignment.rubric_self_assessment_enabled?,
           can_update_rubric_self_assessment: @assignment.can_update_rubric_self_assessment?,

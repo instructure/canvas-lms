@@ -78,7 +78,7 @@ describe "submissions" do
     describe "checkpoints" do
       before do
         @student = student_in_course(active_all: true).user
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Discussion Topic", user: @teacher)
         @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 5, reply_to_entry_required_count: 2)
 

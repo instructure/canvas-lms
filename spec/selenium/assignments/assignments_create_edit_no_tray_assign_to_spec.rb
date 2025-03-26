@@ -260,7 +260,7 @@ describe "override assignees" do
     it "creates group assignment overrides" do
       AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @normal_assignment.id)
       AssignmentCreateEditPage.click_group_category_assignment_check
-      AssignmentCreateEditPage.select_assignment_group_category(-3)
+      AssignmentCreateEditPage.select_assignment_group_category(-4)
 
       click_add_assign_to_card
       select_module_item_assignee(1, @testgroup[0].name)
@@ -277,12 +277,12 @@ describe "override assignees" do
       expect(@group_assignment.assignment_overrides.active.count).to eq(1)
       expect(@group_assignment.assignment_overrides.active.last.title).to eq(@testgroup[0].name)
 
-      AssignmentCreateEditPage.select_assignment_group_category(-2)
+      AssignmentCreateEditPage.select_assignment_group_category(-3)
       expect(AssignmentCreateEditPage.group_error).to be_displayed
 
       click_delete_assign_to_item("Remove #{@testgroup[0].name}", 0)
 
-      AssignmentCreateEditPage.select_assignment_group_category(-2)
+      AssignmentCreateEditPage.select_assignment_group_category(-3)
       expect(AssignmentCreateEditPage.group_error).not_to be_displayed
 
       click_add_assign_to_card

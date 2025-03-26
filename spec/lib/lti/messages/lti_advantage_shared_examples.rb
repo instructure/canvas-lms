@@ -36,17 +36,20 @@ RSpec.shared_context "lti_advantage_shared_examples" do
     allow(request).to receive_messages(url: "https://localhost", host: "/my/url", scheme: "https")
     request
   end
+  let(:expander_opts) do
+    {
+      current_user: user,
+      tool:,
+      assignment:,
+      collaboration:
+    }
+  end
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
       course,
       controller,
-      {
-        current_user: user,
-        tool:,
-        assignment:,
-        collaboration:
-      }
+      expander_opts
     )
   end
   let(:collaboration) { nil }

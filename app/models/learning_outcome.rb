@@ -50,7 +50,7 @@ class LearningOutcome < ActiveRecord::Base
   validates :display_name, length: { maximum: maximum_string_length, allow_blank: true }
   validates :calculation_method, inclusion: {
     in: OutcomeCalculationMethod::CALCULATION_METHODS,
-    message: lambda do
+    message: lambda do |_object, _data|
       t(
         "calculation_method must be one of the following: %{calc_methods}",
         calc_methods: OutcomeCalculationMethod::CALCULATION_METHODS.to_s

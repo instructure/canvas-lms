@@ -33,7 +33,7 @@ const I18n = createI18nScope('discussions_posts')
 export const DiscussionSummaryDisableButton: React.FC<
   DiscussionSummaryDisableButtonProps
 > = props => {
-  const buttonText = I18n.t('Disable Summary')
+  const buttonText = I18n.t('Turn Off Summary')
   return (
     <Tooltip renderTip={buttonText} width="48px" data-testid="summary-disable-tooltip">
       <Button

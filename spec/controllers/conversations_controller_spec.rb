@@ -345,6 +345,38 @@ describe ConversationsController do
       student_in_course(active_all: true)
     end
 
+    context "when recipients include a non-collaborative group/differentiation tag" do
+      before do
+        Account.default.enable_feature!(:differentiation_tags)
+        @non_collab_group_category = @course.group_categories.create!(name: "Test non collaborative", non_collaborative: true)
+        @non_collab_group = @course.groups.create!(name: "Non Collaborative group", group_category: @non_collab_group_category)
+        @non_collab_group.add_user(@student2, "accepted")
+        user_session(@teacher)
+      end
+
+      it "raises error if group_conversation is true and bulk_message is not provided" do
+        post "create", params: {
+          recipients: [@non_collab_group.asset_string],
+          body: "Test message",
+          group_conversation: true,
+          context_code: @course.asset_string
+        }
+        expect(response).not_to be_successful
+      end
+
+      it "allows creation if bulk_message is true even when group_conversation is true" do
+        post "create", params: {
+          recipients: [@non_collab_group.asset_string],
+          body: "Test message",
+          group_conversation: true,
+          bulk_message: "1",
+          context_code: @course.asset_string
+        }
+
+        expect(response).to be_successful
+      end
+    end
+
     it "creates the conversation" do
       user_session(@student)
 

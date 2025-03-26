@@ -20,7 +20,8 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {setupFilesEnv} from '../../../../fixtures/fakeFilesEnv'
 import Breadcrumbs from '../Breadcrumbs'
-import {FileManagementContext} from '../../Contexts'
+import {FileManagementProvider, FileManagementContextProps} from '../../Contexts'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 
 const rootCourseFolder = {
   id: '1',
@@ -100,17 +101,17 @@ const defaultProps = {
   showingAllContexts: false,
 }
 
-const renderComponent = (props = {}, context = {}) => {
+const renderComponent = (props = {}, context: Partial<FileManagementContextProps> = {}) => {
   const defaultContext = {
-    contextType: 'course',
     contextId: '1',
-    folderId: '1',
-    showingAllContexts: false,
   }
+
   return render(
-    <FileManagementContext.Provider value={{...defaultContext, ...context}}>
+    <FileManagementProvider
+      value={createMockFileManagementContext({...defaultContext, ...context})}
+    >
       <Breadcrumbs {...defaultProps} {...props} />
-    </FileManagementContext.Provider>,
+    </FileManagementProvider>,
   )
 }
 

@@ -36,6 +36,27 @@ describe('useCoursePeopleQuery', () => {
     }
   })
 
+  const mockData = {
+    course: {
+      usersConnection: {
+        nodes: [
+          {_id: '1', name: 'Test User'},
+          {_id: '2', name: 'Another User'}
+        ]
+      }
+    }
+  }
+
+  const filteredMockData = {
+    course: {
+      usersConnection: {
+        nodes: [
+          {_id: '1', name: 'Test User'}
+        ]
+      }
+    }
+  }
+
   const wrapper = ({children}: {children: ReactNode}) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
@@ -50,21 +71,10 @@ describe('useCoursePeopleQuery', () => {
   })
 
   it('fetches roster data successfully', async () => {
-    const mockData = {
-      course: {
-        usersConnection: {
-          nodes: [
-            {_id: '1', name: 'Test User'},
-            {_id: '2', name: 'Another User'}
-          ]
-        }
-      }
-    }
-
     mockExecuteQuery.mockResolvedValue(mockData)
 
     const {result} = renderHook(
-      () => useCoursePeopleQuery({courseId: '123'}),
+      () => useCoursePeopleQuery({courseId: '123', searchTerm: ''}),
       {wrapper}
     )
 
@@ -72,7 +82,7 @@ describe('useCoursePeopleQuery', () => {
       expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), {courseId: '123'})
+    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), {courseId: '123', searchTerm: ''})
     expect(result.current.data).toEqual(mockData.course.usersConnection.nodes)
   })
 
@@ -80,7 +90,7 @@ describe('useCoursePeopleQuery', () => {
     mockExecuteQuery.mockResolvedValue({})
 
     const {result} = renderHook(
-      () => useCoursePeopleQuery({courseId: '123'}),
+      () => useCoursePeopleQuery({courseId: '123', searchTerm: ''}),
       {wrapper}
     )
 
@@ -88,7 +98,7 @@ describe('useCoursePeopleQuery', () => {
       expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), {courseId: '123'})
+    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), {courseId: '123', searchTerm: ''})
     expect(result.current.data).toEqual([])
   })
 
@@ -96,12 +106,59 @@ describe('useCoursePeopleQuery', () => {
     const error = new Error('Failed to fetch')
     mockExecuteQuery.mockRejectedValue(error)
 
-    const {result} = renderHook(() => useCoursePeopleQuery({courseId: '1'}), {wrapper})
+    const {result} = renderHook(
+      () => useCoursePeopleQuery({courseId: '123', searchTerm: ''}),
+      {wrapper}
+    )
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
     })
 
     expect(result.current.error).toBeDefined()
+  })
+
+  it('includes searchTerm in query parameters', async () => {
+    mockExecuteQuery.mockResolvedValue(filteredMockData)
+
+    const {result} = renderHook(
+      () => useCoursePeopleQuery({courseId: '123', searchTerm: 'Test'}),
+      {wrapper}
+    )
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+
+    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), {courseId: '123', searchTerm: 'Test'})
+  })
+
+  it('updates data when searchTerm changes', async () => {
+    mockExecuteQuery
+      .mockResolvedValueOnce(mockData)
+      .mockResolvedValueOnce(filteredMockData)
+
+    let searchTerm = ''
+    const {result, rerender} = renderHook(
+      () => useCoursePeopleQuery({courseId: '123', searchTerm}),
+      {wrapper}
+    )
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.data).toEqual(mockData.course.usersConnection.nodes)
+    })
+
+    searchTerm = 'Test'
+    rerender()
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.data).toEqual(filteredMockData.course.usersConnection.nodes)
+    })
+
+    expect(executeQuery).toHaveBeenCalledTimes(2)
+    expect(executeQuery).toHaveBeenNthCalledWith(1, expect.anything(), {courseId: '123', searchTerm: ''})
+    expect(executeQuery).toHaveBeenNthCalledWith(2, expect.anything(), {courseId: '123', searchTerm: 'Test'})
   })
 })

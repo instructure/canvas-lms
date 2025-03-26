@@ -184,6 +184,8 @@ class CommunicationChannel < ActiveRecord::Base
     end
   end
 
+  attr_reader :email # Allow adding an error to the email attribute
+
   def validate_email
     # this is not perfect and will allow for invalid emails, but it mostly works.
     # This pretty much allows anything with an "@"

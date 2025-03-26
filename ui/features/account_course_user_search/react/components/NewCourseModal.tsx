@@ -37,13 +37,13 @@ import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import {Term, Course} from '../../../../api'
 
 type Account = {
-  id: string,
-  name: string,
-  subAccounts: Account[],
+  id: string
+  name: string
+  subAccounts: Account[]
 }
 
 type TermList = {
-  data: Term[],
+  data: Term[]
   loading: boolean
 }
 
@@ -51,13 +51,13 @@ const I18n = createI18nScope('account_course_user_search')
 
 const nonBreakingSpace = '\u00a0'
 
-const renderAccountOptions = (accounts: Account[] = [], depth = 0) : {id: string, name: string}[] =>
+const renderAccountOptions = (accounts: Account[] = [], depth = 0): {id: string; name: string}[] =>
   flatten(
     accounts.map(account =>
       [{id: account.id, name: Array(2 * depth + 1).join(nonBreakingSpace) + account.name}].concat(
-        renderAccountOptions(account.subAccounts || [], depth + 1)
-      )
-    )
+        renderAccountOptions(account.subAccounts || [], depth + 1),
+      ),
+    ),
   )
 
 NewCourseModal.propTypes = {
@@ -65,14 +65,16 @@ NewCourseModal.propTypes = {
   children: node.isRequired,
 }
 
-const validationSchema = z.object({
-  name: z
-    .string()
-    .min(1, I18n.t('Course name is required.')),
-  reference_code: z.string().min(1, I18n.t('Reference code is required.')),
-})
+const createValidationSchema = () =>
+  z.object({
+    name: z.string().min(1, I18n.t('Course name is required.')),
+    reference_code: z.string().min(1, I18n.t('Reference code is required.')),
+  })
 
-export default function NewCourseModal({terms, children}: {terms: TermList, children: React.ReactNode}) {
+export default function NewCourseModal({
+  terms,
+  children,
+}: {terms: TermList; children: React.ReactNode}) {
   const [isOpen, setIsOpen] = useState(false)
   const [account, setAccount] = useState('')
   const [enrollmentTerm, setEnrollmentTerm] = useState('')
@@ -82,7 +84,7 @@ export default function NewCourseModal({terms, children}: {terms: TermList, chil
     control,
     handleSubmit,
     setFocus,
-  } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
+  } = useForm({defaultValues, resolver: zodResolver(createValidationSchema())})
 
   const accountTree = AccountsTreeStore.getTree()
 
@@ -111,15 +113,18 @@ export default function NewCourseModal({terms, children}: {terms: TermList, chil
     }
 
     const errorHandler = () => {
-      showFlashError(
-        I18n.t('Something went wrong creating the course. Please try again.')
-      )()
+      showFlashError(I18n.t('Something went wrong creating the course. Please try again.'))()
       setFocus('name')
     }
 
     const accountValue = account === '' ? undefined : account
     const enrollmentTermValue = enrollmentTerm === '' ? undefined : enrollmentTerm
-    const data = {name: name, course_code: reference_code, account_id: accountValue, enrollment_term_id: enrollmentTermValue}
+    const data = {
+      name: name,
+      course_code: reference_code,
+      account_id: accountValue,
+      enrollment_term_id: enrollmentTermValue,
+    }
     CoursesStore.create({course: data}, successHandler, errorHandler)
   }
 
@@ -197,14 +202,16 @@ export default function NewCourseModal({terms, children}: {terms: TermList, chil
           </Button>
         </Modal.Footer>
       </Modal>
-      {React.Children.map(children, child =>
-        React.isValidElement(child) &&
-        // when you click whatever is the child element to this, open the modal
-        React.cloneElement(child as React.ReactElement<any>, {
-          onClick: () => {
-            setIsOpen(true)
-          },
-        })
+      {React.Children.map(
+        children,
+        child =>
+          React.isValidElement(child) &&
+          // when you click whatever is the child element to this, open the modal
+          React.cloneElement(child as React.ReactElement<any>, {
+            onClick: () => {
+              setIsOpen(true)
+            },
+          }),
       )}
     </span>
   )

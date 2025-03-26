@@ -1817,6 +1817,8 @@ uk:
   add_group_set_f9809e11: "Додати набір груп"
   add_help_menu_links_de9fc34f: "Додати посилання на меню довідки"
   add_icon_567dbcaa: "додати піктограму"
+  add_item_75b67d07: "Додати елемент"
+  add_item_to_module_3d7a05b2: "Додати елемент до модулю"
   add_link_5c01c1e8: "Додати посилання"
   add_link_fc336ed6: "Додати посилання"
   add_login_f871148: "Додати логін"
@@ -2053,6 +2055,7 @@ uk:
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Існуючий користувач Canvas з  %{user_id} вже вимагав запитану вхідну інформацію для користувача з user_id %{other_user_id}, пропустити"
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Існуючий користувач Canvas з %{user_id} вже вимагав запитуваний integration_id %{other_user_id}, пропустити"
   an_export_is_already_in_progress_54270f01: "Експорт вже триває."
+  an_external_identity_provider_is_enabled_7859c6fb: "Постачальник зовнішньої ідентифікації  увімкнено"
   an_integer_value_is_required_e073bd46: "Вимагається ціле значення"
   an_internal_error_occurred_83b8a685: "Відбулася внутрішня помилка"
   an_item_named_name_already_exists_in_this_location_147b7312: "Елемент з ім'ям \"%{name}\" вже існує в цьому розташуванны. Ви хочете замінити існуючий файл?"
@@ -2282,6 +2285,7 @@ uk:
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Ви впевнені, що хочете вимкнути синхронізацію %{sisName} для усіх завдань?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Ви впевнені, що хочете це зробити? Це не може бути скасоване і перевизначить існуючі оцінки в заліковій книжці."
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Ви дійсно хочете перегенерувати цей token? Все, що використовує цей token, повинно бути оновлено."
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "Ви впевнені, що хочете видалити цей елемент з модуля?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Ви впевнені, що хочете видалити цей інструмент?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Ви впевнені, що хочете видалити цього користувача?"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Ви впевнені, що хочете видалити зображення профілю цього користувача?"
@@ -4001,8 +4005,10 @@ uk:
       buttons: 
         cancel: Скачувати
         update: "Оновити співробітництво"
+      is_required: "Це поле є обов'язковим."
       labels: 
         description: "Опис:"
+        document_name: "назва Документа:"
         title: "Назва співробітництва"
     edit_button: 
       links: 
@@ -4034,6 +4040,7 @@ uk:
             Документи Гугл - це гарне місце для співпраці над груповим проектом. Це схоже на Microsoft Word, але дозволяє вам працювати разом з іншими над одним файлом в один і той самий час без небхідності його відправки до усіх через електронну пошту.
             
             **Увага**: ви (та усі ваші співробітники) повинні мати Google акаунт із ціллю прийняти участь у будь-якій співпраці, використовуючи Google Docs.
+      is_required: "Це поле є обов'язковим."
       labels: 
         collaboration_type: "Взаємодія використовуючи:"
         description: "Опис:"
@@ -4275,6 +4282,7 @@ uk:
   configuration_type_25a084a4: "Тип конфігурації"
   configure_ecb97e30: Налаштувати
   configure_individual_learning_paths_for_students_b_e2fce294: "Налаштування шляхів індивідуального навчання для слухачів за результатами оцінки."
+  configure_report_91ed07f9: "Конфігурувати звіт"
   configure_tool_app_3b1bb50b: "Налаштувати %{tool} застосунок?"
   configure_toolname_app_651371be: "Налаштувати %{toolName} застосунок"
   confirm_6556b3a6: Підтвердити
@@ -4781,6 +4789,8 @@ uk:
     index: 
       titles: 
         course_modules: "Розділи курсу"
+    links: 
+      student_progress: "Переглянути прогрес"
     module_complete: Завершити
     module_empty: "Жодного пункту в модулі \"%{module}\""
     module_item_next: 
@@ -4861,6 +4871,7 @@ uk:
   continue_ac067716: Продовжити
   continue_typing_to_find_additional_sections_or_stu_49786085: "Продовжуйте набирати, щоб знайти додаткові розділи або студентів."
   contribute_4730e633: "Внести вклад"
+  contributed_fadcc2b9: "Внесено вклад"
   contributed_to_this_module_item_and_is_complete_2799d5c: "Внесли зміни до елемента цього модуля та завершили"
   conversation_dialog: 
     message_sent: "Повідомлення надіслано!"
@@ -5068,6 +5079,11 @@ uk:
     many: "%{count} коментарів"
     one: "1 коментар"
     other: "%{count} коментарів"
+  count_courses_609dc3b8: 
+    few: "%{count} Курси"
+    many: "%{count} Курсів"
+    one: "1 Курс"
+    other: "%{count} Курсів"
   count_criteria_22927713: 
     few: "%{count} критеріїв"
     many: "%{count} критеріїв"
@@ -5179,6 +5195,11 @@ uk:
     many: "%{count} студентів у відсотках %{percentile}. "
     one: "1 студент у відсотках %{percentile}. "
     other: "%{count} студентів у відсотках %{percentile}. "
+  count_sub_accounts_345f48ea: 
+    few: "%{count} додаткових облікових записи"
+    many: "%{count} додаткових облікових записів"
+    one: "1 додатковий обліковий запис"
+    other: "%{count} додаткових облікових записів"
   count_sub_modules_3373a1c4: 
     few: "%{count} підмодулів"
     many: "%{count} підмодулів"
@@ -6827,6 +6848,7 @@ uk:
   domain_is_required_1d4c8b25: "Домен обов'язковий"
   dominican_republic_1_3cef4021: "Домініканська Республіка (+1)"
   don_t_add_this_user_for_now_32912974: "Не додавати цього користувача зараз."
+  don_t_indent_b35ae9fb: "Не абзац"
   don_t_move_lti_query_params_to_post_body_5c80e037: "Не переміщуйте параметри запиту LTI до частини POST"
   done_54e3d4b6: Готово
   done_8af51c9b: Готово.
@@ -7156,6 +7178,8 @@ uk:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Введіть шістнадцятковий код тут, щоб використовувати власний колір."
   enter_a_score_to_test_c6f89f4a: "Введіть оцінку для тестування"
   enter_a_section_name_adbe3099: "Введіть назву розділу"
+  enter_a_shorter_category_name_4befe0da: "Введіть коротшу назву категорії"
+  enter_a_shorter_group_name_8f7fc42c: "Введіть коротшу назву групи"
   enter_a_what_if_score_668c91a3: "Введіть оцінку Що-якщо "
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Введіть \"{{ACCOUNT_DOMAIN}}\" для заміни домену кореневого облікового запису користувача"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Введіть \"{{CANVAS_USER_ID}}\" для заміни унікального Canvas ID користувача"
@@ -7621,6 +7645,7 @@ uk:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "Утиліти не знайдено"
   external_tools_6e77821: "Зовнішні інструменти"
+  external_url_4752767f: "Зовнішній URL"
   external_url_e9b87215: "Зовнішня URL-адреса"
   external_urls_62082a38: "Зовнішні URL"
   extract_error_error_file_names_a4989ed0: "Вилучити помилку, %{error}: %{file_names}"
@@ -8970,6 +8995,8 @@ uk:
   increase_indent_6af90f7c: "Збільшити відступ"
   increase_indent_6d550a4a: "Збільшити відступ"
   incremental_update_successfully_generated_against__db3f3f06: "Інкрементне оновлення успішно згенероване за попереднім імпортом SIS."
+  indent_1_level_e7b18c1e: "Абзац 1 рівня"
+  indentation_3c6081d5: Відступ
   india_91_6c290107: "Індія (+91)"
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Вказує, що зображення призначене лише для декоративних цілей і не має зчитуватися шпигунами екранів."
   indigo_2035fc55: Індиго
@@ -9540,6 +9567,7 @@ uk:
   lock_date_cannot_be_before_due_date_ac30f54: "Дата блокування не може бути до очікуваної дати виконання"
   lock_questions_after_answering_5aecef9d: "Блокування питань після відповідей"
   lock_this_setting_for_sub_accounts_2ae5af17: "Блокувати ці налаштування для підпорядкованих облікових записів"
+  lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "Блокувати цей параметр для субрахунків і курсів"
   locked_762f138b: Заблоковано
   locked_796957c7: "Заблоковано:"
   locked_at_cda02889: "Заблоковано в"
@@ -14727,6 +14755,9 @@ uk:
         attempt_number: "Спроба %{att_no}"
         kept: ЗБЕРЕЖЕНИЙ
         latest: ПІЗНІШЕ
+        time: Час
+      submission_version_score: 
+        score: Оцінка
       submission_versions: 
         attempt: Спроба
         attempt_history: "Iсторiя спроб"
@@ -15528,6 +15559,7 @@ uk:
   scheduler_shown_df77ca6f: "Планувальник показано"
   scheduling_5a3327e7: Планування
   school_of_rock_4b7b1fd0: "Школа рока"
+  score_at_least_score_8668a54a: "Оцінено щонайменше %{score}"
   score_change_notifications_6b94f27f: "Сповіщення після зміни балів"
   score_details_2995369: "Деталі оцінки"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
@@ -15542,6 +15574,7 @@ uk:
   score_out_of_points_possible_88f370fd: "%{score}з %{points_possible}"
   score_pts_adcb1af3: "%{score}балів"
   score_score_6f81e8c8: "Оцінка: %{score}"
+  scored_at_least_score_e2272f6d: "Оцінено щонайменше %{score}"
   scored_less_than_2427896c: "Результат менше ніж"
   scored_less_than_cutoff_on_assignment_5f5c4303: "Набрано менше ніж %{cutoff} в %{assignment}"
   scored_more_than_cutoff_on_assignment_f422fec: "Набрано більше ніж %{cutoff}в %{assignment}"
@@ -16997,6 +17030,7 @@ uk:
       other: "%{count} додаткових облікових записів"
     titles: 
       sub_accounts: "Додаткові облікові записи"
+  sub_accounts_e1b196a9: "Додаткові облікові записи"
   sub_assignment: 
     atom_no_author: "Немає автора"
     labels: 
@@ -17428,6 +17462,7 @@ uk:
   text_entry_e1808b2f: "Занесення тексту"
   text_entry_submission_7b0ae0c5: "Відправлення текстового елементу"
   text_entry_submission_cannot_be_empty_3d187cae: "Текстовий елемент відправлення не може бути пустим "
+  text_header_48fa9c37: "Текстовий заголовок"
   text_input_d3480b8c: "Поле вводу тексту"
   text_sms_4e2d82a7: "Текст (SMS)"
   thailand_66_5b3ef324: "Таїланд (+66)"
@@ -18676,6 +18711,7 @@ uk:
   view_previous_file_b846db4f: "Переглянути попередній файл"
   view_previous_student_90000459: "переглянути попереднього студента"
   view_prior_enrollments_9b519b25: "Переглянути попередні зарахування"
+  view_progress_2d61dd4: "Переглянути прогрес"
   view_question_banks_188a9e0f: "Переглянути банки запитаннь"
   view_range_student_details_8116d68a: "Переглянути детальну інформацію про студента"
   view_registered_services_6c8cd301: "Переглянути зареєстровані сервіси"
@@ -18694,6 +18730,7 @@ uk:
     context_modules: 
       publish: Опублікувати
   virtual_lectures_in_real_time_a1778dea: "Віртуальні лекції у реальному часі"
+  visibility_f62e7f12: Видимість
   visit_864b4060: Відвідайте
   visit_group_group_name_7a816081: "Відвідати групу %{group_name}"
   waiting_for_attempted_login_6d00cb49: "Очікування спроби входу"

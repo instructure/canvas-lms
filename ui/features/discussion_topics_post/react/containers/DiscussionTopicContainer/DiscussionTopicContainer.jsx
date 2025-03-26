@@ -22,7 +22,7 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useContext, useState, useCallback} from 'react'
 import {Discussion} from '../../../graphql/Discussion'
 import {
   DELETE_DISCUSSION_TOPIC,
@@ -39,7 +39,7 @@ import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {PodcastFeed} from '../../components/PodcastFeed/PodcastFeed'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import {getReviewLinkUrl, getSpeedGraderUrl, responsiveQuerySizes} from '../../utils'
-import {SearchContext} from '../../utils/constants'
+import {SearchContext,isSpeedGraderInTopUrl} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -58,6 +58,9 @@ import TopNavPortalWithDefaults, {
 import {assignLocation, openWindow} from '@canvas/util/globalUtils'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
 import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKeyboardShortcut'
+import {SummarizeButton} from './SummarizeButton'
+import { DiscussionSummaryDisableButton } from '../../components/DiscussionSummary/DiscussionSummaryDisableButton'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -73,9 +76,17 @@ export const DiscussionTopicContainer = ({
   const [sendToOpen, setSendToOpen] = useState(false)
   const [copyToOpen, setCopyToOpen] = useState(false)
   const [lastMarkAllAction, setLastMarkAllAction] = useState('')
+  const [summary, setSummary] = useState(null)
+  const [isFeedbackLoading, setIsFeedbackLoading] = useState(false)
+  const [liked, setLiked] = useState(false)
+  const [disliked, setDisliked] = useState(false)
 
   const {searchTerm, filter} = useContext(SearchContext)
   const isSearch = searchTerm || filter === 'unread'
+
+  const contextType = ENV.context_type?.toLowerCase()
+  const contextId = ENV.context_id
+  const apiUrlPrefix = `/api/v1/${contextType}s/${contextId}/discussion_topics/${ENV.discussion_topic_id}`
 
   if (ENV.DISCUSSION?.GRADED_RUBRICS_URL) {
     assignmentRubricDialog.initTriggers()
@@ -223,6 +234,52 @@ export const DiscussionTopicContainer = ({
 
   useEventHandler(KeyboardShortcuts.ON_OPEN_TOPIC_REPLY, onOpenTopicReply)
 
+  const onSummarizeClick = () => {
+    props.setIsSummaryEnabled(true)
+  }
+
+  const postDiscussionSummaryFeedback = useCallback(
+    async (action) => {
+      setIsFeedbackLoading(true)
+
+      try {
+        const {json} = await doFetchApi({
+          method: 'POST',
+          path: `${apiUrlPrefix}/summaries/${summary.id}/feedback`,
+          body: {
+            _action: action,
+          },
+        })
+        setLiked(json.liked)
+        setDisliked(json.disliked)
+      } catch (error) {
+        setOnFailure(
+          I18n.t('There was an unexpected error while submitting the discussion summary feedback.'),
+        )
+      }
+
+      setIsFeedbackLoading(false)
+    },
+    [apiUrlPrefix, summary, setOnFailure],
+  )
+
+  const handleDisableSummaryClick = async () => {
+    if (summary) {
+      await postDiscussionSummaryFeedback('disable_summary')
+    }
+
+    try {
+      await doFetchApi({
+        method: 'PUT',
+        path: `${apiUrlPrefix}/summaries/disable`,
+      })
+    } catch (error) {
+      setOnFailure(I18n.t('There was an unexpected error while disabling the discussion summary.'))
+      return
+    }
+    props.setIsSummaryEnabled(false)
+  }
+
   const podcast_url =
     document.querySelector(`link[title='${I18n.t('Discussion Podcast Feed')}' ]`) ||
     document.querySelector("link[type='application/rss+xml']")
@@ -247,6 +304,7 @@ export const DiscussionTopicContainer = ({
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
+          direction: 'column',
           alert: {
             textSize: 'small',
           },
@@ -262,6 +320,12 @@ export const DiscussionTopicContainer = ({
           },
           replyButton: {
             display: 'block',
+            padding: 'none',
+          },
+          summaryButton: {
+            padding: 'small none',
+            shouldGrow: true,
+            shouldShrink: true,
           },
           podcastButton: {
             display: 'block',
@@ -274,6 +338,7 @@ export const DiscussionTopicContainer = ({
           },
         },
         desktop: {
+          direction: 'row',
           alert: {
             textSize: 'medium',
           },
@@ -289,6 +354,12 @@ export const DiscussionTopicContainer = ({
           },
           replyButton: {
             display: 'inline-block',
+            padding: 'none xxx-small none none',
+          },
+          summaryButton: {
+            padding: '0 small',
+            shouldGrow: false,
+            shouldShrink: false,
           },
           podcastButton: {
             display: 'inline-block',
@@ -472,24 +543,38 @@ export const DiscussionTopicContainer = ({
                             )}
                             {props.discussionTopic.permissions?.reply && !expandedTopicReply && (
                               <>
-                                <View
-                                  as="div"
-                                  padding="0"
-                                  display={responsiveProps?.replyButton?.display}
-                                >
-                                  <span className="discussion-topic-reply-button">
-                                    <Button
-                                      display={responsiveProps?.replyButton?.display}
-                                      color="primary"
-                                      onClick={onOpenTopicReply}
-                                      data-testid="discussion-topic-reply"
-                                    >
-                                      <Text weight="bold" size={responsiveProps.textSize}>
-                                        {I18n.t('Reply')}
-                                      </Text>
-                                    </Button>
-                                  </span>
-                                </View>
+                                <Flex width="100%" direction={responsiveProps.direction} wrap="wrap">
+                                  <Flex.Item padding={responsiveProps?.replyButton?.padding}>
+                                    <span className="discussion-topic-reply-button">
+                                      <Button
+                                        display={responsiveProps?.replyButton?.display}
+                                        color="primary"
+                                        onClick={onOpenTopicReply}
+                                        data-testid="discussion-topic-reply"
+                                      >
+                                        <Text weight="bold" size={responsiveProps.textSize}>
+                                          {I18n.t('Reply')}
+                                        </Text>
+                                      </Button>
+                                    </span>
+                                  </Flex.Item>
+                                  {ENV.user_can_summarize && !isSpeedGraderInTopUrl && (
+                                    <Flex.Item padding={responsiveProps?.summaryButton?.padding} shouldGrow={responsiveProps?.summaryButton?.shouldGrow} shouldShrink={responsiveProps?.summaryButton?.shouldShrink}>
+                                      {!props.isSummaryEnabled ? (
+                                        <SummarizeButton
+                                        onClick={onSummarizeClick}
+                                        isMobile={matches.includes('mobile')}
+                                      />
+                                      ) : (
+                                        <DiscussionSummaryDisableButton
+                                          isMobile={matches.includes('mobile')}
+                                          onClick={handleDisableSummaryClick}
+                                          isEnabled={!isFeedbackLoading}
+                                        />
+                                      )}
+                                    </Flex.Item>
+                                  )}
+                                </Flex>
                                 {podcast_url?.href && (
                                   <View
                                     as="div"
@@ -553,6 +638,15 @@ export const DiscussionTopicContainer = ({
                         <DiscussionSummary
                           onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
                           isMobile={!!matches.includes('mobile')}
+                          summary={summary}
+                          onSetSummary={setSummary}
+                          isFeedbackLoading={isFeedbackLoading}
+                          onSetIsFeedbackLoading={setIsFeedbackLoading}
+                          liked={liked}
+                          onSetLiked={setLiked}
+                          disliked={disliked}
+                          onSetDisliked={setDisliked}
+                          postDiscussionSummaryFeedback={postDiscussionSummaryFeedback}
                         />
                       </Flex>
                     </View>

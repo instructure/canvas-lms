@@ -75,6 +75,13 @@ module Lti
             return
           end
 
+          # Asset Processor creation is handled by AssignmentApiController
+          if for_placement?(:ActivityAssetProcessor)
+            items = content_items.filter { |item| item[:type] == "ltiAssetProcessor" }
+            render_content_items(reload_page: false, extra: { tool_id: tool.id }, items:)
+            return
+          end
+
           # to prepare for further UI processing, content items that don't need resources
           # like module items or assignments created now should:
           # * have resource links associated with them

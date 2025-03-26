@@ -5,7 +5,7 @@
  *
  * Canvas is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
- * Software Foundation, version 3 of the License.
+ * Software Foundation, version 3 of the License
  *
  * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -24,7 +24,7 @@ import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeS
 import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsSelector'
 import DueDateOverrideView from '@canvas/due-dates'
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
-import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector'
+import GroupCategorySelector, {GROUP_CATEGORY_SELECT} from '@canvas/groups/backbone/views/GroupCategorySelector'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
 import Section from '@canvas/sections/backbone/models/Section'
 import {isAccessible} from '@canvas/test-utils/assertions'
@@ -86,6 +86,7 @@ const editView = (assignmentOpts = {}) => {
     parentModel: assignment,
     groupCategories: ENV?.GROUP_CATEGORIES || [],
     inClosedGradingPeriod: assignment.inClosedGradingPeriod(),
+    showNewErrors: true
   })
   const peerReviewsSelector = new PeerReviewsSelector({parentModel: assignment})
   const dueDateOverrideView = new DueDateOverrideView({
@@ -207,14 +208,14 @@ describe('EditView', () => {
     const view = editView()
     const data = {group_category_id: 'blank'}
     const errors = view.validateBeforeSave(data, {})
-    expect(errors.newGroupCategory[0].message).toBe('Please create a group set')
+    expect(errors[GROUP_CATEGORY_SELECT][0].message).toBe('Please create a group set')
   })
 
   it('rejects a letter for points_possible', () => {
     const view = editView()
     const data = {points_possible: 'a'}
     const errors = view.validateBeforeSave(data, {})
-    expect(errors.points_possible[0].message).toBe('Points possible must be a number')
+    expect(errors.points_possible[0].message).toBe('Points value must be a number')
   })
 
   it('validates presence of a final grader', () => {
@@ -285,9 +286,9 @@ describe('EditView', () => {
   it('does not allow point value of -1 or less if grading type is letter', () => {
     const view = editView()
     const data = {points_possible: '-1', grading_type: 'letter_grade'}
-    const errors = view._validatePointsRequired(data, [])
+    const errors = view._validatePointsPossible(data, [])
     expect(errors.points_possible[0].message).toBe(
-      'Points possible must be 0 or more for selected grading type',
+      'Points value must be 0 or greater',
     )
   })
 
@@ -297,15 +298,15 @@ describe('EditView', () => {
     const errors = view.validateBeforeSave(data, {})
     expect(errors.name).toBeTruthy()
     expect(errors.name).toHaveLength(1)
-    expect(errors.name[0].message).toBe('Name is required!')
+    expect(errors.name[0].message).toBe('Name is required')
   })
 
-  it('has an error when a name has 257 chars', () => {
+  it('has an error when a name has 256 chars', () => {
     const view = editView()
-    const errors = nameLengthHelper(view, 257, false, 30, '1', 'points')
+    const errors = nameLengthHelper(view, 256, false, 30, '0', 'points')
     expect(errors.name).toBeTruthy()
     expect(errors.name).toHaveLength(1)
-    expect(errors.name[0].message).toBe('Name is too long, must be under 257 characters')
+    expect(errors.name[0].message).toBe('Must be fewer than 256 characters')
   })
 
   it('allows assignment to save when a name has 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', () => {
@@ -325,7 +326,7 @@ describe('EditView', () => {
     const errors = nameLengthHelper(view, 11, true, 10, '1', 'points')
     expect(errors.name).toBeTruthy()
     expect(errors.name).toHaveLength(1)
-    expect(errors.name[0].message).toBe('Name is too long, must be under 11 characters')
+    expect(errors.name[0].message).toBe('Must be fewer than 11 characters')
   })
 
   it('allows assignment to save when name has 11 chars, MAX_NAME_LENGTH is 10 and required, but post_to_sis is false', () => {
@@ -375,9 +376,9 @@ describe('EditView', () => {
   it('does not allow point value of "" if grading type is letter', () => {
     const view = editView()
     const data = {points_possible: '', grading_type: 'letter_grade'}
-    const errors = view._validatePointsRequired(data, [])
+    const errors = view._validatePointsPossible(data, [])
     expect(errors.points_possible[0].message).toBe(
-      'Points possible must be 0 or more for selected grading type',
+      'Points value must be 0 or greater',
     )
   })
 
@@ -478,8 +479,8 @@ describe('EditView', () => {
         },
       }
       const errors = view._validateExternalTool(data, [])
-      expect(errors.assignment_submission_container[0].message).toBe(
-        'Please click below to launch the tool and select a resource.',
+      expect(errors['assignment_submission_type_selection_launch_button'][0].message).toBe(
+        'Please click above to launch the tool and select a resource.',
       )
     })
 

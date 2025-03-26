@@ -67,6 +67,7 @@ module Courses
         end
         progress&.increment_completion!(1)
 
+        # convert assignments
         errors[:assignments]&.each do |error|
           has_rubrics = error[:errors][:rubric].present?
           has_incompatible_submission_types = error[:errors][:submission_types].present?
@@ -88,9 +89,8 @@ module Courses
         progress&.increment_completion!(1)
 
         post_errors = validate_course_contents(context)
-        only_optional_errors = post_errors&.keys&.all? { |e| [:collaborations, :outcomes].include?(e) }
 
-        if post_errors.empty? || only_optional_errors
+        if post_errors.empty? || post_errors.except(:collaborations, :outcomes).empty?
           context.update!(horizon_course: true)
         end
       end

@@ -38,12 +38,14 @@ const createProps = overrides => {
     onMarkAllAsRead: jest.fn(),
     onMarkThreadAsRead: jest.fn(),
     onReport: jest.fn(),
+    permalinkId: '1',
     ...overrides,
   }
 }
 
 describe('ThreadActions', () => {
   it('renders all the expected buttons', () => {
+    window.ENV.FEATURES.discussion_permalink = true
     const props = createProps()
     const {getByTestId, queryByText} = render(<ThreadActions {...props} />)
 
@@ -59,6 +61,7 @@ describe('ThreadActions', () => {
     expect(getByTestId('delete')).toBeInTheDocument()
     expect(getByTestId('inSpeedGrader')).toBeInTheDocument()
     expect(getByTestId('report')).toBeInTheDocument()
+    expect(getByTestId('copyLink')).toBeInTheDocument()
 
     expect(queryByText('Mark All as Read')).toBeTruthy()
     expect(queryByText('Go To Topic')).toBeTruthy()
@@ -67,9 +70,11 @@ describe('ThreadActions', () => {
     expect(queryByText('Delete')).toBeTruthy()
     expect(queryByText('Open in SpeedGrader')).toBeTruthy()
     expect(queryByText('Report')).toBeTruthy()
+    expect(queryByText('Copy Link')).toBeTruthy()
   })
 
   it('does not display if callback is not provided', () => {
+    window.ENV.FEATURES.discussion_permalink = true
     const {getByTestId, queryByText} = render(<ThreadActions {...defaultRequiredProps} />)
     const menu = getByTestId('thread-actions-menu')
 
@@ -83,6 +88,7 @@ describe('ThreadActions', () => {
     expect(queryByText('Delete')).toBeFalsy()
     expect(queryByText('Open in SpeedGrader')).toBeFalsy()
     expect(queryByText('Report')).toBeFalsy()
+    expect(queryByText('Copy Link')).toBeFalsy()
   })
 
   it('should not render when is search', () => {
@@ -98,9 +104,9 @@ describe('ThreadActions', () => {
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        expect(props.onMarkAllAsRead.mock.calls.length).toBe(0)
+        expect(props.onMarkAllAsRead.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Mark All as Read'))
-        expect(props.onMarkAllAsRead.mock.calls.length).toBe(1)
+        expect(props.onMarkAllAsRead.mock.calls).toHaveLength(1)
       })
     })
 
@@ -110,9 +116,9 @@ describe('ThreadActions', () => {
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        expect(props.onMarkAllAsUnread.mock.calls.length).toBe(0)
+        expect(props.onMarkAllAsUnread.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Mark All as Unread'))
-        expect(props.onMarkAllAsUnread.mock.calls.length).toBe(1)
+        expect(props.onMarkAllAsUnread.mock.calls).toHaveLength(1)
       })
     })
 
@@ -122,9 +128,9 @@ describe('ThreadActions', () => {
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        expect(props.onMarkThreadAsRead.mock.calls.length).toBe(0)
+        expect(props.onMarkThreadAsRead.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Mark Thread as Read'))
-        expect(props.onMarkThreadAsRead.mock.calls.length).toBe(1)
+        expect(props.onMarkThreadAsRead.mock.calls).toHaveLength(1)
       })
     })
 
@@ -134,9 +140,9 @@ describe('ThreadActions', () => {
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        expect(props.onMarkThreadAsRead.mock.calls.length).toBe(0)
+        expect(props.onMarkThreadAsRead.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Mark Thread as Unread'))
-        expect(props.onMarkThreadAsRead.mock.calls.length).toBe(1)
+        expect(props.onMarkThreadAsRead.mock.calls).toHaveLength(1)
       })
     })
 
@@ -155,7 +161,7 @@ describe('ThreadActions', () => {
 
         fireEvent.click(markAsUnread)
 
-        expect(props.onToggleUnread.mock.calls.length).toBe(1)
+        expect(props.onToggleUnread.mock.calls).toHaveLength(1)
         expect(props.onToggleUnread.mock.calls[0][0]).toBe('markAsUnread')
       })
 
@@ -173,7 +179,7 @@ describe('ThreadActions', () => {
 
         fireEvent.click(markAsRead)
 
-        expect(props.onToggleUnread.mock.calls.length).toBe(1)
+        expect(props.onToggleUnread.mock.calls).toHaveLength(1)
         expect(props.onToggleUnread.mock.calls[0][0]).toBe('markAsRead')
       })
     })
@@ -191,9 +197,9 @@ describe('ThreadActions', () => {
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        expect(props.onEdit.mock.calls.length).toBe(0)
+        expect(props.onEdit.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Edit'))
-        expect(props.onEdit.mock.calls.length).toBe(1)
+        expect(props.onEdit.mock.calls).toHaveLength(1)
       })
     })
 
@@ -210,9 +216,9 @@ describe('ThreadActions', () => {
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        expect(props.onDelete.mock.calls.length).toBe(0)
+        expect(props.onDelete.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Delete'))
-        expect(props.onDelete.mock.calls.length).toBe(1)
+        expect(props.onDelete.mock.calls).toHaveLength(1)
       })
     })
 
@@ -229,9 +235,9 @@ describe('ThreadActions', () => {
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        expect(props.onOpenInSpeedGrader.mock.calls.length).toBe(0)
+        expect(props.onOpenInSpeedGrader.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Open in SpeedGrader'))
-        expect(props.onOpenInSpeedGrader.mock.calls.length).toBe(1)
+        expect(props.onOpenInSpeedGrader.mock.calls).toHaveLength(1)
       })
     })
 
@@ -248,9 +254,9 @@ describe('ThreadActions', () => {
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        expect(props.goToTopic.mock.calls.length).toBe(0)
+        expect(props.goToTopic.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Go To Topic'))
-        expect(props.goToTopic.mock.calls.length).toBe(1)
+        expect(props.goToTopic.mock.calls).toHaveLength(1)
       })
     })
 
@@ -267,9 +273,9 @@ describe('ThreadActions', () => {
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        expect(props.goToParent.mock.calls.length).toBe(0)
+        expect(props.goToParent.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Go To Parent'))
-        expect(props.goToParent.mock.calls.length).toBe(1)
+        expect(props.goToParent.mock.calls).toHaveLength(1)
       })
     })
   })
@@ -280,9 +286,9 @@ describe('ThreadActions', () => {
       const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
       fireEvent.click(getByTestId('thread-actions-menu'))
-      expect(props.onReport.mock.calls.length).toBe(0)
+      expect(props.onReport.mock.calls).toHaveLength(0)
       fireEvent.click(getByText('Report'))
-      expect(props.onReport.mock.calls.length).toBe(1)
+      expect(props.onReport.mock.calls).toHaveLength(1)
     })
 
     it('shows Reported if isReported', () => {
@@ -298,9 +304,22 @@ describe('ThreadActions', () => {
       const {getByTestId, getByText} = render(<ThreadActions {...props} isReported={true} />)
 
       fireEvent.click(getByTestId('thread-actions-menu'))
-      expect(props.onReport.mock.calls.length).toBe(0)
+      expect(props.onReport.mock.calls).toHaveLength(0)
       fireEvent.click(getByText('Reported'))
-      expect(props.onReport.mock.calls.length).toBe(0)
+      expect(props.onReport.mock.calls).toHaveLength(0)
     })
   })
+
+  it('does not display copy link if ff if off', () => {
+    window.ENV.FEATURES.discussion_permalink = false
+    const props = createProps()
+    const {getByTestId, queryByText} = render(<ThreadActions {...props} />)
+
+    const menu = getByTestId('thread-actions-menu')
+    expect(menu).toBeInTheDocument()
+    fireEvent.click(menu)
+
+    expect(queryByText('Copy Link')).toBeFalsy()
+  })
+
 })

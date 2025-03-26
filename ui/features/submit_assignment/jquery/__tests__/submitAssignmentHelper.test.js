@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {recordEulaAgreement, verifyPledgeIsChecked} from '../helper'
-import $ from 'jquery'
-import 'jquery-migrate'
+import {recordEulaAgreement} from '../helper'
 
 describe('SubmitAssignmentHelper', () => {
   let alertMock
@@ -67,47 +65,6 @@ describe('SubmitAssignmentHelper', () => {
       inputs.forEach(input => {
         expect(input.value).toBe('')
       })
-    })
-  })
-
-  describe('verifyPledgeIsChecked', () => {
-    it('returns true when checkbox does not exist', () => {
-      expect(verifyPledgeIsChecked($('#does_not_exist'))).toBe(true)
-    })
-
-    it('returns true when checkbox exists and is checked', () => {
-      const checkbox = document.createElement('input')
-      checkbox.type = 'checkbox'
-      checkbox.checked = true
-      checkbox.id = 'test-checkbox'
-      document.getElementById('fixtures').appendChild(checkbox)
-
-      expect(verifyPledgeIsChecked($('#test-checkbox'))).toBe(true)
-    })
-
-    it('returns false when checkbox exists and is not checked', () => {
-      const checkbox = document.createElement('input')
-      checkbox.type = 'checkbox'
-      checkbox.checked = false
-      checkbox.id = 'test-checkbox'
-      document.getElementById('fixtures').appendChild(checkbox)
-
-      expect(verifyPledgeIsChecked($('#test-checkbox'))).toBe(false)
-    })
-
-    it('alerts the user when checkbox is not checked', () => {
-      const errorMessage =
-        'You must agree to the submission pledge before you can submit this assignment.'
-
-      const checkbox = document.createElement('input')
-      checkbox.type = 'checkbox'
-      checkbox.checked = false
-      checkbox.id = 'test-checkbox'
-      document.getElementById('fixtures').appendChild(checkbox)
-
-      verifyPledgeIsChecked($('#test-checkbox'))
-
-      expect(alertMock).toHaveBeenCalledWith(errorMessage)
     })
   })
 })

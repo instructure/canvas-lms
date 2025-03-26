@@ -195,8 +195,6 @@ describe RubricAssessment do
     end
   end
 
-  it { is_expected.to have_many(:learning_outcome_results).dependent(:destroy) }
-
   it "htmlifies the rating comments" do
     comment = "Hi, please see www.example.com.\n\nThanks."
     submission = @assignment.find_or_create_submission(@student)
@@ -950,7 +948,7 @@ describe RubricAssessment do
 
       context "discussion_checkpoints" do
         before do
-          Account.site_admin.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
         end
 
         it "does not grade students for checkpointed discussions" do

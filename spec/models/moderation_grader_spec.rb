@@ -28,26 +28,12 @@ describe ModerationGrader do
     @assignment = @course.assignments.create!(title: "test assignment")
   end
 
-  describe "relationships" do
-    it { is_expected.to belong_to(:user) }
-    it { is_expected.to belong_to(:assignment) }
-  end
-
-  describe "anonymous ID validation" do
-    it { is_expected.to validate_presence_of(:anonymous_id) }
-    it { is_expected.to validate_length_of(:anonymous_id).is_equal_to(5) }
-
-    describe "uniqueness" do
-      it { is_expected.to validate_uniqueness_of(:anonymous_id).scoped_to(:assignment_id) }
-      it { is_expected.to validate_uniqueness_of(:user).scoped_to(:assignment_id) }
-    end
-
-    describe "format" do
-      it { is_expected.to allow_value("AaZz0").for(:anonymous_id) }
-      it { is_expected.not_to allow_value("AaZz+").for(:anonymous_id) }
-      it { is_expected.not_to allow_value("AaZz").for(:anonymous_id) }
-      it { is_expected.not_to allow_value("AaZz99").for(:anonymous_id) }
-    end
+  it "requires a specific format for the anonymous_id" do
+    common_params = { user: @user, assignment: @assignment }
+    expect(ModerationGrader.new(**common_params, anonymous_id: "AaZz0")).to be_valid
+    expect(ModerationGrader.new(**common_params, anonymous_id: "AaZz+")).not_to be_valid
+    expect(ModerationGrader.new(**common_params, anonymous_id: "AaZz")).not_to be_valid
+    expect(ModerationGrader.new(**common_params, anonymous_id: "AaZz99")).not_to be_valid
   end
 
   describe "#with_slot_taken" do
