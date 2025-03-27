@@ -2035,7 +2035,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         />
       )
     }
-    const statusBarFeatures = getStatusBarFeaturesForVariant(this.variant, this.props.ai_text_tools, tinymce.Env.desktop)
+    const statusBarFeatures = getStatusBarFeaturesForVariant(this.variant, this.props.ai_text_tools, tinymce.Env.deviceType.isDesktop())
     return (
       <>
         <style>{this.style.css}</style>
@@ -2060,7 +2060,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                 onFocus={this.handleFocusRCE}
                 onBlur={this.handleBlurRCE}
               >
-                {this.state.shouldShowOnFocusButton && tinymce.Env.desktop && (
+                {this.state.shouldShowOnFocusButton && tinymce.Env.deviceType.isDesktop() && (
                   <ShowOnFocusButton
                     id={`show-on-focus-btn-${this.id}`}
                     onClick={this.openKBShortcutModal}
