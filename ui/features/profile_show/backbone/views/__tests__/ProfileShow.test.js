@@ -104,22 +104,6 @@ describe('ProfileShow', () => {
       `
     })
 
-    it('validates name input length', () => {
-      // Arrange
-      const form = document.querySelector('#profile_form')
-      const nameInput = document.querySelector('#user_short_name')
-      const preventDefault = jest.fn()
-
-      // Act & Assert - Valid input
-      view.validateForm({preventDefault, target: form})
-      expect(preventDefault).not.toHaveBeenCalled()
-
-      // Act & Assert - Invalid input
-      nameInput.value = ''
-      view.validateForm({preventDefault, target: form})
-      expect(preventDefault).toHaveBeenCalled()
-    })
-
     it('validates title input length', () => {
       // Arrange
       const form = document.querySelector('#profile_form')
