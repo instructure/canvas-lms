@@ -1,0 +1,26 @@
+name: Sync Upstream Tags
+
+on:
+  schedule:
+    - cron: "0 0 1,15 * *"
+  workflow_dispatch:
+
+jobs:
+  sync-tags:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 'master'
+          fetch-depth: 1
+          sparse-checkout: ''
+      - name: Set committer to Bot
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+      - name: Configure Instructure as upstream.
+        run: git remote add upstream git@github.com:instructure/canvas-lms.git
+      - name: Fetch upstream tags.
+        run: git fetch --tags upstream
+      - name: Push tags to repo.
+        run: git push --tags
