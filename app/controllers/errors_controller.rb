@@ -64,9 +64,12 @@
 #   }
 #
 class ErrorsController < ApplicationController
+  include CaptchaValidation
+
   PER_PAGE = 20
 
   before_action :require_view_error_reports, except: [:create]
+  before_action :validate_captcha!, only: [:create]
   skip_before_action :verify_authenticity_token, only: [:create]
 
   def require_view_error_reports
