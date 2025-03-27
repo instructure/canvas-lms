@@ -753,31 +753,6 @@ $(document).ready(function () {
     }, 500)
   }
 
-  $('#section_list').on('click', '.edit_section_link', function (event) {
-    if ($(this).parents('li').hasClass('unsaved')) {
-      event.preventDefault()
-    }
-    if ($(this).parents('#section_list').hasClass('editing')) {
-      event.preventDefault()
-      const $li = $(this).parents('li')
-      if ($li.hasClass('just_dropped')) {
-        $li.removeClass('just_dropped')
-      }
-    }
-  })
-  $('#section_name')
-    .keydown(function (event) {
-      if (event.keyCode === 13) {
-        // enter
-        $(this).parents('li').find('.name').text($(this).val())
-        saveObject($(this).parents('li'), 'section')
-      }
-    })
-    .blur(function () {
-      const $section = $(this).parents('li.section')
-      saveObject($section, 'section')
-    })
-
   $('.download_eportfolio_link').click(function (event) {
     $(this).slideUp()
     event.preventDefault()
@@ -849,12 +824,5 @@ $(document).ready(function () {
       )
     }
     check(true)
-  })
-  $('.download_eportfolio_link').click(() => {
-    $('#downloading_eportfolio_dialog').dialog({
-      title: I18n.t('titles.download_eportfolio', 'Download ePortfolio'),
-      modal: true,
-      zIndex: 1000,
-    })
   })
 })
