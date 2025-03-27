@@ -1794,11 +1794,6 @@ describe "Files API", type: :request do
       allow(InstFS).to receive_messages(enabled?: true, app_host: "http://instfs.test")
     end
 
-    it "returns 404 if feature not enabled" do
-      Account.site_admin.disable_feature!(:rce_linked_file_urls)
-      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, {}, {}, expected_status: 404)
-    end
-
     it "allows access to course files the user has access to manage" do
       course = @course
       doc = attachment_model(context: course, display_name: "test.docx", uploaded_data: fixture_file_upload("test.docx"), instfs_uuid: "doc")

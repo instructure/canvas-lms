@@ -23,7 +23,7 @@ class FilePreviewsController < ApplicationController
   before_action :get_context
 
   def token_auth_allowed?
-    params[:action] == "show" && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
+    params[:action] == "show"
   end
 
   # renders (or redirects to) appropriate content for the file, such as
