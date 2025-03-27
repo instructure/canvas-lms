@@ -196,6 +196,21 @@ RSpec.describe DeveloperKeyAccountBinding do
     end
   end
 
+  describe ".skip_dev_key_association_cache" do
+    specs_require_cache
+
+    it "does not cache developer key associations" do
+      DeveloperKeyAccountBinding.transaction do
+        dev_key = DeveloperKey.create!(account:)
+        binding = DeveloperKeyAccountBinding.find_or_initialize_by(account:, developer_key: dev_key)
+        binding.skip_dev_key_association_cache do
+          expect(DeveloperKey).not_to receive(:find_cached)
+          expect { binding.save! }.not_to raise_error
+        end
+      end
+    end
+  end
+
   describe "find_site_admin_cached" do
     specs_require_sharding
 

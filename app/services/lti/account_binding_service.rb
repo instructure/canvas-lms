@@ -61,11 +61,12 @@ class Lti::AccountBindingService < ApplicationService
 
   def bind_to_developer_key(reg_binding)
     key_binding = DeveloperKeyAccountBinding.find_or_initialize_by(developer_key:, account:)
-    # See DeveloperKeyAccountBinding#recently_created_dev_key for why this is needed
-    key_binding.recently_created_dev_key = developer_key
-    key_binding.workflow_state = workflow_state
-    key_binding.lti_registration_account_binding = reg_binding
-    key_binding.save!
+
+    key_binding.skip_dev_key_association_cache do
+      key_binding.workflow_state = workflow_state
+      key_binding.lti_registration_account_binding = reg_binding
+      key_binding.save!
+    end
 
     key_binding
   end
