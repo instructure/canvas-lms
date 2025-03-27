@@ -235,6 +235,7 @@ export interface EnvCommon {
   DEFAULT_DUE_TIME?: string
   TIMEZONES: Array<{name: string; name_with_hour_offset: string}>
   DEFAULT_TIMEZONE_NAME: string
+  captcha_site_key: string
 
   FEATURES: Partial<
     Record<

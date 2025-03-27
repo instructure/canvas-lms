@@ -89,6 +89,16 @@ const CreateTicketForm = forwardRef(function CreateTicketForm(
 
   useEffect(() => {
     subjectInputRef?.current?.focus()
+
+    if (!window.ENV.current_user_id) {
+      const head = document.querySelector('head')
+      const script = document.createElement('script')
+      script.setAttribute('src', 'https://www.google.com/recaptcha/api.js')
+      head?.appendChild(script)
+      return () => {
+        head?.removeChild(script)
+      }
+    }
   }, [])
 
   const validateForm = (): boolean => {
@@ -147,6 +157,7 @@ const CreateTicketForm = forwardRef(function CreateTicketForm(
             context_asset_string: window.ENV.context_asset_string,
             user_roles: window.ENV.current_user_roles?.join(','),
           },
+          'g-recaptcha-response': window.grecaptcha && window.grecaptcha.getResponse(),
         },
       })
 
@@ -303,18 +314,25 @@ const CreateTicketForm = forwardRef(function CreateTicketForm(
         </SimpleSelect>
 
         {!window.ENV.current_user_id && (
-          <TextInput
-            data-testid="email-input"
-            disabled={isSubmitting}
-            inputRef={inputElement => (emailInputRef.current = inputElement)}
-            messages={emailError ? [{text: emailError, type: 'newError'}] : []}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFormData(prev => ({...prev, email: e.target.value}))
-            }
-            renderLabel={I18n.t('Your email address')}
-            type="email"
-            value={formData.email}
-          />
+          <>
+            <TextInput
+              data-testid="email-input"
+              disabled={isSubmitting}
+              inputRef={inputElement => (emailInputRef.current = inputElement)}
+              messages={emailError ? [{text: emailError, type: 'newError'}] : []}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData(prev => ({...prev, email: e.target.value}))
+              }
+              renderLabel={I18n.t('Your email address')}
+              type="email"
+              value={formData.email}
+            />
+            <Flex>
+              <Flex.Item padding="small">
+                <div className="g-recaptcha" data-sitekey={window.ENV.captcha_site_key}></div>
+              </Flex.Item>
+            </Flex>
+          </>
         )}
 
         <Flex justifyItems="end" margin="small 0">

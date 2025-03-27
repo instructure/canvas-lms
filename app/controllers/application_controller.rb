@@ -229,6 +229,7 @@ class ApplicationController < ActionController::Base
           confetti_branding_enabled: Account.site_admin.feature_enabled?(:confetti_branding),
           url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
           url_for_high_contrast_tinymce_editor_css: editor_hc_css,
+          captcha_site_key:,
           current_user_id: @current_user&.id,
           current_user_global_id: @current_user&.global_id,
           current_user_usage_metrics_id: @current_user&.usage_metrics_id,
@@ -259,7 +260,7 @@ class ApplicationController < ActionController::Base
             can_add_pronouns: @domain_root_account&.can_add_pronouns?,
             show_sections_in_course_tray: @domain_root_account&.show_sections_in_course_tray?
           },
-          RAILS_ENVIRONMENT: Canvas.environment,
+          RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.is_a?(Course)
         unless SentryExtensions::Settings.settings.blank?
@@ -3346,4 +3347,10 @@ class ApplicationController < ActionController::Base
     !!@domain_root_account&.feature_enabled?(:discussions_reporting)
   end
   helper_method :react_discussions_post_enabled_for_preferences_use?
+
+  # Similar to Account#recaptcha_key, but does not check the `self_registration_captcha?` setting.
+  def captcha_site_key
+    DynamicSettings.find(tree: :private)["recaptcha_client_key"]
+  end
+  helper_method :captcha_site_key
 end
