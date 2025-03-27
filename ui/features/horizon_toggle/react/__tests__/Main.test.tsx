@@ -26,15 +26,60 @@ jest.mock('@canvas/util/globalUtils', () => ({
 }))
 
 describe('Main', () => {
-  beforeAll(() => {
-    ENV.COURSE_ID = '3'
-  })
+  const setup = (propOverrides = {}) => {
+    const props = {
+      isAccountPage: false,
+      courseId: '3',
+      isHorizonCourse: false,
+      isHorizonAccount: false,
+      hasCourses: false,
+      accountId: '123',
+      horizonAccountLocked: false,
+      ...propOverrides,
+    }
+    return render(<Main {...props} />)
+  }
 
   it('navigates to student view on Learner Preview button click', () => {
-    render(<Main />)
-    const previewButton = screen.getByText("Learner Preview")
+    setup()
+    const previewButton = screen.getByText('Learner Preview')
     previewButton.click()
 
-    expect(assignLocation).toHaveBeenCalledWith(`/courses/${ENV.COURSE_ID}/student_view?preview=true`)
+    expect(assignLocation).toHaveBeenCalledWith(`/courses/3/student_view?preview=true`)
+  })
+
+  it('renders course-specific content when isAccountPage is false', () => {
+    setup()
+    expect(screen.getByText('Learner Preview')).toBeInTheDocument()
+  })
+
+  it('renders account-specific content when isAccountPage is true', () => {
+    setup({
+      isAccountPage: true,
+      hasCourses: true,
+    })
+    expect(screen.getByText(/Existing courses must be removed/)).toBeInTheDocument()
+  })
+
+  it('renders HorizonAccount when isHorizonAccount is false', () => {
+    setup({
+      isAccountPage: true,
+      isHorizonAccount: false,
+    })
+    expect(screen.getByText(/Canvas Career is a new LMS experience/)).toBeInTheDocument()
+    expect(screen.queryByText('Revert Sub Account')).not.toBeInTheDocument()
+  })
+
+  it('renders RevertAccount when isHorizonAccount is true', () => {
+    setup({
+      isAccountPage: true,
+      isHorizonAccount: true,
+    })
+    const revertButton = screen
+      .getAllByText('Revert Sub Account')
+      .find(element => element.tagName === 'SPAN')
+
+    expect(revertButton).not.toBeUndefined()
+    expect(screen.queryByText(/Canvas Career is a new LMS experience/)).not.toBeInTheDocument()
   })
 })

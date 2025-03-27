@@ -327,6 +327,9 @@ class ApplicationController < ActionController::Base
         @js_env[:user_cache_key] = Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg") if @current_user&.workflow_state
         @js_env[:top_navigation_tools] = external_tools_display_hashes(:top_navigation) if !!@domain_root_account&.feature_enabled?(:top_navigation_placement)
         @js_env[:horizon_course] = @context.is_a?(Course) && @context.horizon_course?
+        @js_env[:has_courses] = @context.associated_courses.not_deleted.any? if @context.is_a?(Account)
+        @js_env[:HORIZON_ACCOUNT] = @context.horizon_account? if @context.is_a?(Account)
+        @js_env[:horizon_account_locked] = @context.horizon_account_locked? if @context.is_a?(Account)
         # partner context data
         if @context&.grants_any_right?(@current_user, session, :read, :read_as_admin)
           @js_env[:current_context] = {

@@ -87,6 +87,9 @@
     <% if @account.root_account.feature_enabled?(:javascript_csp) && can_do(@context, @current_user, :manage_account_settings) && !@account.site_admin? %>
       <li><a href="#tab-security" id="tab-security-link"><%= t("Security") %></a></li>
     <% end %>
+    <% if @account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
+      <li id="canvas_career_tab"><a href="#tab-canvas-career" id="tab-canvas-career-link"><%= t('Canvas Career') %></a></li>
+    <% end %>
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
     <div id="tab-settings">
@@ -1432,6 +1435,11 @@ acknowledge that you have read and agreed to the
   <% end %>
   <% if @account.site_admin? && can_do(@context, @current_user, :manage_internal_settings) %>
     <div id="tab-internal-settings"></div>
+  <% end %>
+  <% if @account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
+    <div id="tab-canvas-career">
+      <% js_bundle :horizon_toggle %>
+    </div>
   <% end %>
 </div>
 <div id="rqd_mount"></div>
