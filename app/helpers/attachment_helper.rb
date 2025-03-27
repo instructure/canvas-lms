@@ -79,7 +79,7 @@ module AttachmentHelper
     return false unless (resource = token.jwt_payload[:resource])
     return false unless (tenant_auth = token.jwt_payload[:tenant_auth])
     return false unless InstFS.enabled?
-    return false unless params[:instfs_id] && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
+    return false unless params[:instfs_id]
 
     parsed_file_url = Rails.application.routes.recognize_path(resource)
     file_id = parsed_file_url[:attachment_id] || parsed_file_url[:file_id] || parsed_file_url[:id]

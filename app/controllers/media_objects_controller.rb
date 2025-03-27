@@ -84,7 +84,7 @@ class MediaObjectsController < ApplicationController
   protect_from_forgery only: %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
 
   def token_auth_allowed?
-    %w[media_object_redirect iframe_media_player].include?(params[:action]) && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
+    %w[media_object_redirect iframe_media_player].include?(params[:action])
   end
 
   # @{not an}API Show Media Object Details
