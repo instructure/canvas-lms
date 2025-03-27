@@ -22,6 +22,7 @@ import {CaptionMetaData, StudioPlayer} from '@instructure/studio-player'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
+import getCookie from '@instructure/get-cookie'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {type MediaTrack as Caption, type MediaSource} from 'api'
@@ -219,6 +220,21 @@ export default function CanvasStudioPlayer({
     [attachment_id, media_id, retryAttempt],
   )
 
+  const deleteCaption = useCallback(async (caption: CaptionMetaData) => {
+    const confirmed = confirm(I18n.t('Are you sure you want to delete this track?'))
+    if (!confirmed) {
+      return
+    }
+
+    await fetch(caption.src, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRF-Token': getCookie('_csrf_token'),
+      },
+    })
+    setMediaCaptions(prev => prev?.filter(c => c.src !== caption.src))
+  }, [])
+
   useEffect(() => {
     // if we just uploaded the media, notorious may still be processing it
     // and we don't have its media_sources yet
@@ -343,6 +359,8 @@ export default function CanvasStudioPlayer({
     containerStyle.maxHeight = maxHeight
   }
 
+  const hideCaptionButtons = hideUploadCaptions || !canAddCaptions
+
   return (
     <>
       {isLoading && show_loader ? (
@@ -359,8 +377,13 @@ export default function CanvasStudioPlayer({
               captions={mediaCaptions}
               hideFullScreen={!includeFullscreen}
               title={getAriaLabel()}
+              onCaptionsDelete={
+                hideCaptionButtons
+                  ? undefined
+                  : deleteCaption
+              }
               kebabMenuElements={
-                hideUploadCaptions || !canAddCaptions
+                hideCaptionButtons
                   ? undefined
                   : [
                       {
