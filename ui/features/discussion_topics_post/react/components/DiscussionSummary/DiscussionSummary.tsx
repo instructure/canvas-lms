@@ -19,6 +19,7 @@
 import React, {useState, useEffect, useCallback} from 'react'
 import type {Dispatch, SetStateAction} from 'react'
 import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Spinner} from '@instructure/ui-spinner'
@@ -215,9 +216,9 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   return (
     <Flex direction="column">
       <Flex.Item overflowX='hidden' margin={props.isMobile ? '0 0 x-small 0' : 'medium 0 x-small 0'}>
-        <Text size="large" weight="bold">
+        <Heading level="h2">
           {I18n.t('Discussion Summary')}
-        </Text>
+        </Heading>
         <span style={{float: 'right'}}>
           <IconButton
             size="small"
