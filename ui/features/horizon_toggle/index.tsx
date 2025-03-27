@@ -21,21 +21,34 @@ import ready from '@instructure/ready'
 import {createRoot} from 'react-dom/client'
 import {Main} from './react/Main'
 
-ready(() => {
-  $('#course_details_tabs').on('tabscreate tabsactivate', (_event, ui) => {
-    const selectedTab = ui.tab || ui.newTab
-    const tabId = $(selectedTab).find('a').attr('id')
-    const app = <Main />
-    if (tabId === 'tab-canvas-career-link') {
-      const element = document.getElementById('tab-canvas-career') as HTMLElement
+const renderToggle = (isAccountPage: boolean, ui: any) => {
+  const selectedTab = ui.tab || ui.newTab
+  const tabId = $(selectedTab).find('a').attr('id')
+
+  const app = (
+    <Main
+      isAccountPage={isAccountPage}
+      isHorizonCourse={window.ENV?.horizon_course || false}
+      isHorizonAccount={window.ENV?.HORIZON_ACCOUNT || false}
+      hasCourses={window.ENV?.has_courses || false}
+      courseId={window.ENV?.COURSE_ID || ''}
+      accountId={window.ENV?.ACCOUNT_ID || ''}
+      horizonAccountLocked={window.ENV?.horizon_account_locked || false}
+    />
+  )
+  const element = document.getElementById('tab-canvas-career') as HTMLElement
+  if (tabId === 'tab-canvas-career-link') {
+    const root = createRoot(element)
+    root.render(app)
+  } else {
+    if (element) {
       const root = createRoot(element)
-      root.render(app)
-    } else {
-      const element = document.getElementById('tab-canvas-career')
-      if (element) {
-        const root = createRoot(element)
-        root.unmount()
-      }
+      root.unmount()
     }
-  })
+  }
+}
+ready(() => {
+  // small duplication until course details tab is removed (JIRA CLX-1122)
+  $('#account_settings_tabs').on('tabscreate tabsactivate', (_event, ui) => renderToggle(true, ui))
+  $('#course_details_tabs').on('tabscreate tabsactivate', (_event, ui) => renderToggle(false, ui))
 })

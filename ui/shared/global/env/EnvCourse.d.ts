@@ -26,7 +26,6 @@ export type EnvCourse = EnvCourseCommon & Partial<EnvCourseCommon>
 export interface EnvCourseCommon {
   COURSE: Course
   course?: Course
-  horizon_course?: boolean
 
   /**
    * From CoursesController#index

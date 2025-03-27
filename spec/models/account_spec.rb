@@ -2958,6 +2958,36 @@ describe Account do
     end
   end
 
+  describe "horizon account" do
+    before(:once) do
+      @account = Account.default
+    end
+
+    describe "#horizon_account" do
+      it "returns false by default" do
+        expect(@account.horizon_account[:value]).to be false
+      end
+
+      it "returns the enabled inherited value if set on parent account" do
+        root_account = Account.create!
+        root_account.settings[:horizon_account] = { value: true }
+        root_account.save!
+        subaccount = root_account.sub_accounts.create!
+        expect(subaccount.horizon_account[:value]).to be true
+        expect(subaccount.horizon_account[:inherited]).to be true
+      end
+
+      it "returns the disabled inherited value if set on parent account" do
+        root_account = Account.create!
+        root_account.settings[:horizon_account] = { value: false }
+        root_account.save!
+        subaccount = root_account.sub_accounts.create!
+        expect(subaccount.horizon_account[:value]).to be false
+        expect(subaccount.horizon_account[:inherited]).to be true
+      end
+    end
+  end
+
   describe "horizon_redirect_url" do
     before :once do
       @account = Account.default

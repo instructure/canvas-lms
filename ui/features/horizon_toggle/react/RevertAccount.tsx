@@ -19,44 +19,52 @@
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useCallback, useState} from 'react'
+import {useCallback} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('horizon_toggle_page')
 
-export const HorizonEnabled = () => {
-  const [loading, setLoading] = useState(false)
+export interface RevertAccountProps {
+  accountId: string
+  isHorizonAccountLocked: boolean
+}
 
+export const RevertAccount = ({accountId, isHorizonAccountLocked}: RevertAccountProps) => {
   const onSubmit = useCallback(async () => {
-    setLoading(true)
-    const response = await doFetchApi<{success: boolean}>({
-      path: `/courses/${ENV.COURSE_ID}/canvas_career_reversion`,
-      method: 'POST',
-    })
-    if (response.json?.success) {
+    try {
+      await doFetchApi({
+        path: `/api/v1/accounts/${accountId}`,
+        method: 'PUT',
+        body: {
+          id: accountId,
+          account: {settings: {horizon_account: {value: false}}},
+        },
+      })
+
       window.location.reload()
+    } catch (e) {
+      showFlashError(I18n.t('Failed to revert sub-account. Please try again.'))
     }
   }, [])
 
   return (
     <View as="div">
-      <Pill color="success">{I18n.t('Enabled')}</Pill>
       <Flex gap="large" margin="large 0 0 0" direction="column">
         <View>
-          <Heading level="h3">{I18n.t('Revert Course')}</Heading>
+          <Heading level="h3">{I18n.t('Revert Sub Account')}</Heading>
           <Text as="p">
             {I18n.t(
-              'By reverting this course, all Canvas Career features will be disabled. Any deleted or altered content will remain as is and cannot be restored. Reverting a course will result in the loss of features, including the progress bar, notebook entries, AI Assist, Skillspace achievements, and estimated time metadata. These features will no longer be available after the course is reverted.',
+              'By reverting, all Canvas Career features will be disabled. Reverting will result in the loss of features, including the simplified user interface along with, program management, AI-driven actionable insights, and more! These features will no longer be available after the sub account is reverted.',
             )}
           </Text>
         </View>
-        <Flex gap="x-small" justifyItems="end">
-          <Button color="primary" onClick={onSubmit} disabled={loading}>
-            {I18n.t('Revert Course')}
+        <Flex justifyItems="end">
+          <Button color="primary" onClick={onSubmit} disabled={isHorizonAccountLocked}>
+            {I18n.t('Revert Sub Account')}
           </Button>
         </Flex>
       </Flex>
