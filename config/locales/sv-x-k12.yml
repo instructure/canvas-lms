@@ -638,7 +638,7 @@ sv-x-k12:
   account_proficiency_ratings_saved_292d9239: "Färdighetsbedömningar för kontot har sparats"
   account_reports: 
     default: 
-      active_terms: "Aktiva termer"
+      active_terms: "Aktiva terminer"
       all_terms: "Alla terminer"
       course_text: "För kurs: %{course};"
       description: 
@@ -1082,7 +1082,7 @@ sv-x-k12:
         one: "1 tillhörande kurs"
         other: "%{count} Tillhörande kurser"
       course_unpublished_title: "Den här kursen har inte publicerats ännu"
-      homepage_link: Hem
+      homepage_link: Startsida
       more_count: 
         one: "1 till"
         other: "%{count} fler"
@@ -2141,7 +2141,7 @@ sv-x-k12:
   active_enrollments_count_report_66bc3cae: "Rapport över antal aktiva registreringar"
   active_grading_schemes_ae18f35e: "Aktiva bedömningsscheman"
   active_students_e4c48a06: "Aktiva elever"
-  active_terms_83df727e: "Aktiva termer"
+  active_terms_83df727e: "Aktiva terminer"
   activerecord: 
     errors: 
       messages: 
@@ -8036,7 +8036,7 @@ sv-x-k12:
       edit_assignment_settings: "Redigera uppgiftsinställningar"
       speed_grader: "Speed Grader™"
     url_show: 
-      new_tab: "Den här webbplatsen öppnades i ett nytt webbläsarfönster."
+      new_tab: "Den här webbplatsen öppnas i ett nytt webbläsarfönster."
   context_modules_api: 
     invalid_position: "Ogiltig position"
   context_modulespublic: 
@@ -10801,7 +10801,7 @@ sv-x-k12:
       buttons: 
         save_and_publish: "Spara och publicera"
       delay_posting: "Senarelägg publicering"
-      enable_podcast_feed: "Aktivera podcastflöde"
+      enable_podcast_feed: "Skapa RSS-flöde"
       include_replies_in_podcast_feed: "Inkludera elevers svar i podcastflödet"
       only_graders_can_like: "Endast bedömare kan gilla"
       options: Alternativ
@@ -11653,7 +11653,7 @@ sv-x-k12:
   enable_pkce_in_oauth2_authorization_code_flow_b5521c4e: "Aktivera PKCE i OAuth2-auktoriseringskodflödet"
   enable_platform_notification_service_217f3b9e: "Aktivera aviseringstjänster för plattformen"
   enable_platform_notification_services_421105da: "Aktivera aviseringstjänster för plattform"
-  enable_podcast_feed_e67c49ac: "Aktivera podcastflöde"
+  enable_podcast_feed_e67c49ac: "Skapa RSS-flöde"
   enable_quiz_visibility_after_course_conclusion_2dff3534: "Aktivera synlighet för quiz efter slutförande av kurs"
   enable_range_fec198ac: "Aktivera omfång"
   enable_recaptcha_by_default_for_self_registration_af9d50bd: "Aktivera Recaptcha som standard vid självregistrering"
@@ -13386,7 +13386,7 @@ sv-x-k12:
   fun_quiz_47ab0b0: "Roligt quiz"
   future_5416ea92: Framtida
   future_jobs_cf2964a1: "Framtida jobb"
-  future_terms_7fba2ae6: "Framtida termer"
+  future_terms_7fba2ae6: "Kommande terminer"
   gaelic_scottish_gaelic_43b44350: "Gaeliska, skotsk gaeliska"
   galician_7e4508b5: Galiciska
   game_over_104baa: "SCHACK MATT"
@@ -16513,7 +16513,7 @@ sv-x-k12:
         external_tools: "Externa verktyg"
         groups: Elevgrupper
         learning_outcomes: Lärandemål
-        quizzes: Kunskapstest
+        quizzes: Quiz
         rubrics: Matriser
         syllabus_body: Kursöversikt
         tool_profiles: Verktygsprofiler
@@ -21383,7 +21383,7 @@ sv-x-k12:
   password_settings_saved_successfully_51c607f1: "Lösenordsinställningarna sparades."
   passwords_do_not_match_783bf99e: "Lösenorden matchar inte."
   past_14da759a: Tidigare
-  past_terms_4b6ec40e: "Förfluten termin"
+  past_terms_4b6ec40e: "Tidigare terminer"
   paste_google_meet_links_into_calendar_events_annou_2e363fc7: "Klistra in Google Meet-länkar i kalenderhändelser, meddelanden, diskussioner och överallt där du använder innehållsredigeraren (RCE)."
   paste_json_26ad8050: "Klistra in JSON"
   paste_xml_cda3a64e: "Klistra in XML"
@@ -25379,7 +25379,7 @@ sv-x-k12:
   scale_mathman_equation_images_to_match_the_size_of_2bca4e2e: "Ändra bildstorlek för MathMan-ekvationer så att de matchar storleken för omgivande teckensnitt."
   scantron_quiz_4a97a17a: Scantron-quiz
   schedule_1cab2e64: schema
-  schedule_availability_ad09a2e5: Schematillgänglighet
+  schedule_availability_ad09a2e5: "Schemalägg åtkomst"
   schedule_e5dd4c32: Schema
   schedule_preview_3bcda153: "Förhandsgranskning av scheman"
   schedule_student_availability_332154a: "Schemalägg elevens tillgänglighet"
