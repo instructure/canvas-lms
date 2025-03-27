@@ -130,7 +130,7 @@ function PortfolioSettingsModal(props: Props) {
                 />
               )}
             />
-            <Flex.Item margin="0 small">
+            <Flex.Item padding="small">
               <Controller
                 name="isPublic"
                 control={control}
