@@ -147,6 +147,7 @@ export default function ContentTypeExternalToolDrawer({
             <Flex.Item shouldGrow={true}>
               {tool && (
                 <ToolLaunchIframe
+                  className={`tool_launch tool_launch_${tool.placement}`}
                   data-testid="ltiIframe"
                   ref={iframeRef}
                   src={iframeUrl}

@@ -165,7 +165,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                 >
                   <iframe
                     allow=""
-                    class="tool_launch"
+                    class="tool_launch tool_launch_top_navigation"
                     data-lti-launch="true"
                     data-testid="ltiIframe"
                     src="https://lti1.example.com/?display=borderless&placement=top_navigation"
@@ -340,7 +340,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
               >
                 <iframe
                   allow=""
-                  class="tool_launch"
+                  class="tool_launch tool_launch_top_navigation"
                   data-lti-launch="true"
                   data-testid="ltiIframe"
                   src="https://lti1.example.com/?display=borderless&placement=top_navigation"
