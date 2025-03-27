@@ -30,6 +30,7 @@ import {SearchSpan} from '../SearchSpan/SearchSpan'
 
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Responsive} from '@instructure/ui-responsive'
+import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -140,13 +141,13 @@ export function PostMessage({...props}) {
         <View>
           {props.title ? (
             <View margin={responsiveProps.titleMargin} display={responsiveProps.titleDisplay}>
-              <Text size={responsiveProps.titleTextSize} data-testid="message_title" weight="bold">
+              <Heading level="h2" size={responsiveProps.titleTextSize} data-testid="message_title">
                 <AccessibleContent
                   alt={I18n.t('Discussion Topic: %{title}', {title: props.title})}
                 >
                   {props.title}
                 </AccessibleContent>
-              </Text>
+              </Heading>
             </View>
           ) : (
             <View as={heading} margin={responsiveProps.titleMargin}>
