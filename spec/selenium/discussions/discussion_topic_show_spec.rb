@@ -860,14 +860,13 @@ describe "Discussion Topic Show" do
         expect(Discussion.summary_like_button).to be_present
         expect(Discussion.summary_dislike_button).to be_present
         expect(Discussion.summary_generate_button).to be_present
-        expect(Discussion.summary_disable_button).to be_present
-        expect(f("body")).not_to contain_css(Discussion.summarize_button_selector)
+        expect(Discussion.summarize_button).to include_text("Turn Off Summary")
 
         scroll_into_view Discussion.summary_like_button
 
         Discussion.click_summary_like_button
         Discussion.click_summary_dislike_button
-        Discussion.click_summary_disable_button
+        Discussion.click_summarize_button
 
         expect(f("body")).not_to contain_css(Discussion.summary_text_selector)
         expect(Discussion.summarize_button).to be_present

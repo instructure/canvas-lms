@@ -687,14 +687,14 @@ describe('DiscussionTopicContainer', () => {
       expect(queryByTestId('summarize-button')).toBeTruthy()
     })
 
-    it('should not render the discussion summary button if summary is enabled', () => {
+    it('should render discussion summary button with Turn Off Summary if summary is enabled', () => {
       ENV.user_can_summarize = true
       const {queryByTestId} = setup({
         discussionTopic: Discussion.mock(),
         isSummaryEnabled: true,
       })
 
-      expect(queryByTestId('summarize-button')).toBeNull()
+      expect(queryByTestId('summarize-button').textContent).toBe('Turn Off Summary')
     })
 
     it('should not render the discussion summary button if user can not summarize', () => {

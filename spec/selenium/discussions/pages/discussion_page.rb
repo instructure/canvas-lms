@@ -119,10 +119,6 @@ class Discussion
       "[data-testid='summary-generate-button']"
     end
 
-    def summary_disable_button_selector
-      "[data-testid='summary-disable-button']"
-    end
-
     def summary_user_input_selector
       "[data-testid='summary-user-input']"
     end
@@ -228,10 +224,6 @@ class Discussion
       f(summary_generate_button_selector)
     end
 
-    def summary_disable_button
-      f(summary_disable_button_selector)
-    end
-
     def summary_user_input
       f(summary_user_input_selector)
     end
@@ -326,10 +318,6 @@ class Discussion
 
     def click_summary_generate_button
       summary_generate_button.click
-    end
-
-    def click_summary_disable_button
-      summary_disable_button.click
     end
 
     def click_sync_to_sis_checkbox
