@@ -30,8 +30,8 @@ export function reset() {
 }
 
 export function set(env) {
-  isIE = !!env.ie
-  isEdge = isIE && !!(env.edge || env.ie == 12)
+  isIE = env.browser.isIE()
+  isEdge = env.browser.isEdge()
 }
 
 export function ie() {
