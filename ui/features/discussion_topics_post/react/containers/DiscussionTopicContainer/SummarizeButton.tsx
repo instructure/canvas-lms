@@ -19,29 +19,38 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
-import {IconSyllabusLine} from '@instructure/ui-icons'
-import {Tooltip} from '@instructure/ui-tooltip'
+import {IconSyllabusLine, IconXSolid} from '@instructure/ui-icons'
 
 interface SummarizeButtonProps {
   onClick: () => void
+  isEnabled: boolean
+  isLoading: boolean
   isMobile: boolean
 }
 
 const I18n = createI18nScope('discussions_posts')
 
-export const SummarizeButton: React.FC<SummarizeButtonProps> = props => {
-  const buttonText = I18n.t('Summarize Discussion')
+export const SummarizeButton: React.FC<SummarizeButtonProps> = ({
+  isEnabled,
+  isLoading,
+  isMobile,
+  onClick,
+}) => {
+  const handleClick = () => {
+    if (!isLoading) {
+      onClick()
+    }
+  }
+
   return (
-    <Tooltip renderTip={buttonText} width="48px" data-testid="summarizeButtonTooltip">
-      <Button
-        onClick={props.onClick}
-        // TODO: choose a more appropriate AI icon as soon as it's available
-        renderIcon={<IconSyllabusLine />}
-        data-testid="summarize-button"
-        display={props.isMobile ? 'block' : 'inline-block'}
-      >
-        {buttonText}
-      </Button>
-    </Tooltip>
+    <Button
+      onClick={handleClick}
+      // TODO: choose a more appropriate AI icon as soon as it's available
+      renderIcon={isEnabled ? <IconXSolid /> : <IconSyllabusLine />}
+      data-testid="summarize-button"
+      display={isMobile ? 'block' : 'inline-block'}
+    >
+      {isEnabled ? I18n.t('Turn Off Summary') : I18n.t('Summarize Discussion')}
+    </Button>
   )
 }

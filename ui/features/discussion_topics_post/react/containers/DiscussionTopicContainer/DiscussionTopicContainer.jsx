@@ -60,7 +60,6 @@ import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
 import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKeyboardShortcut'
 import {SummarizeButton} from './SummarizeButton'
 import {DiscussionInsightsButton} from './DiscussionInsightsButton'
-import {DiscussionSummaryDisableButton} from '../../components/DiscussionSummary/DiscussionSummaryDisableButton'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('discussion_posts')
@@ -235,8 +234,27 @@ export const DiscussionTopicContainer = ({
 
   useEventHandler(KeyboardShortcuts.ON_OPEN_TOPIC_REPLY, onOpenTopicReply)
 
-  const onSummarizeClick = () => {
-    props.setIsSummaryEnabled(true)
+  const handleSummarizeClick = async () => {
+    if (props.isSummaryEnabled) {
+      props.setIsSummaryEnabled(false)
+    } else {
+      if (summary) {
+        await postDiscussionSummaryFeedback('disable_summary')
+      }
+
+      try {
+        await doFetchApi({
+          method: 'PUT',
+          path: `${apiUrlPrefix}/summaries/disable`,
+        })
+      } catch (_error) {
+        setOnFailure(
+          I18n.t('There was an unexpected error while disabling the discussion summary.'),
+        )
+        return
+      }
+      props.setIsSummaryEnabled(true)
+    }
   }
 
   const postDiscussionSummaryFeedback = useCallback(
@@ -263,23 +281,6 @@ export const DiscussionTopicContainer = ({
     },
     [apiUrlPrefix, summary, setOnFailure],
   )
-
-  const handleDisableSummaryClick = async () => {
-    if (summary) {
-      await postDiscussionSummaryFeedback('disable_summary')
-    }
-
-    try {
-      await doFetchApi({
-        method: 'PUT',
-        path: `${apiUrlPrefix}/summaries/disable`,
-      })
-    } catch (error) {
-      setOnFailure(I18n.t('There was an unexpected error while disabling the discussion summary.'))
-      return
-    }
-    props.setIsSummaryEnabled(false)
-  }
 
   const podcast_url =
     document.querySelector(`link[title='${I18n.t('Discussion Podcast Feed')}' ]`) ||
@@ -569,18 +570,12 @@ export const DiscussionTopicContainer = ({
                                       shouldGrow={responsiveProps?.summaryButton?.shouldGrow}
                                       shouldShrink={responsiveProps?.summaryButton?.shouldShrink}
                                     >
-                                      {!props.isSummaryEnabled ? (
-                                        <SummarizeButton
-                                          onClick={onSummarizeClick}
-                                          isMobile={matches.includes('mobile')}
-                                        />
-                                      ) : (
-                                        <DiscussionSummaryDisableButton
-                                          isMobile={matches.includes('mobile')}
-                                          onClick={handleDisableSummaryClick}
-                                          isEnabled={!isFeedbackLoading}
-                                        />
-                                      )}
+                                      <SummarizeButton
+                                        onClick={handleSummarizeClick}
+                                        isEnabled={props.isSummaryEnabled}
+                                        isLoading={isFeedbackLoading}
+                                        isMobile={matches.includes('mobile')}
+                                      />
                                     </Flex.Item>
                                   )}
                                   {ENV.user_can_access_insights && (
