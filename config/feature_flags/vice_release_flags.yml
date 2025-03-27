@@ -145,7 +145,7 @@ discussion_checkpoints:
     create separate due dates for the initial response and replies. The initial
     response and replies are then graded separately, and those grades are
     combined to form a final discussion grade.
-  applies_to: RootAccount
+  applies_to: Account
 
 inbox_settings:
   state: hidden
@@ -180,3 +180,10 @@ discussion_permalink:
   display_name: Discussion permalink
   description: |-
     This feature flag enables the Copy Link option in the discussions redesign
+
+discussion_insights:
+  state: hidden
+  applies_to: Course
+  display_name: Discussion Insights
+  description: |-
+    Allow access to discussion insights

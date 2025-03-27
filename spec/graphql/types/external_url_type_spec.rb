@@ -54,6 +54,22 @@ describe Types::ExternalUrlType do
     expect(result.to_h).to eq expected
   end
 
+  it "has new tab" do
+    expected = { "data" => { "moduleItem" => { "content" => { "newTab" => module_item.new_tab } } } }
+    result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher })
+      query {
+        moduleItem(id: "#{module_item.id}") {
+          content {
+            ... on ExternalUrl {
+              newTab
+            }
+          }
+        }
+      }
+    GQL
+    expect(result.to_h).to eq expected
+  end
+
   it "has modules" do
     expected = {
       "data" => {

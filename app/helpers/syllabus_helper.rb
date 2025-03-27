@@ -19,13 +19,17 @@
 #
 module SyllabusHelper
   def syllabus_user_content
-    args = [
-      @context.syllabus_body,
-      @context
-    ]
-    unless @context.grants_right?(@current_user, session, :read)
-      args += [nil, true]
+    syllabus_body = @context.syllabus_body || return
+    user = nil
+    is_public = true
+    if @context.grants_right?(@current_user, session, :read)
+      user = @current_user
+      is_public = false
     end
-    public_user_content(*args)
+    location = if @context.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+                 "course_syllabus_#{@context.id}"
+               end
+
+    public_user_content(syllabus_body, context: @context, user:, is_public:, location:)
   end
 end

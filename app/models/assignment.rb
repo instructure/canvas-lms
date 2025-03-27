@@ -118,7 +118,6 @@ class Assignment < AbstractAssignment
     end
 
     save!
-    update_sub_assignments
   end
 
   def has_student_submissions_for_sub_assignments? # rubocop:disable Naming/PredicateName
@@ -184,7 +183,7 @@ class Assignment < AbstractAssignment
   end
 
   def sync_attributes_changed?
-    previous_changes.keys.intersect?(SUB_ASSIGNMENT_SYNC_ATTRIBUTES) && saved_by != :sub_assignment
+    previous_changes.keys.intersect?(SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
   end
 
   def sync_attributes_changes

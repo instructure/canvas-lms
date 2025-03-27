@@ -17,6 +17,7 @@
  */
 
 import 'jquery-migrate'
+import $ from 'jquery'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import WikiPageEditView from '../WikiPageEditView'
 import WikiPage from '../../models/WikiPage'
@@ -26,7 +27,7 @@ const createView = opts => {
   const view = new WikiPageEditView({
     model: new WikiPage({editor: 'block_editor'}),
     wiki_pages_path: '/courses/1/pages',
-    ...opts
+    ...opts,
   })
   view.$el.appendTo(document.getElementById('fixtures'))
   return view.render()
@@ -55,20 +56,52 @@ describe('WikiPageEditView', () => {
   test('should show errors', () => {
     const view = createView()
     const errors = {
-      body: [{ type: 'too_long', message: 'Error...' }],
+      body: [{type: 'too_long', message: 'Error...'}],
     }
     view.showErrors(errors)
     expect(view.$('.body_has_errors')).toBeDefined()
   })
 
-  describe('validate form data', () => {
+  test('saveAndPublish should trigger native submit', async () => {
+    window.block_editor = false
+    const view = createView()
+    const triggerSpy = jest.spyOn(view.$el, 'trigger')
+    view.saveAndPublish()
+    expect(triggerSpy).toHaveBeenCalledWith('submit')
+  })
 
+  describe('validate form data', () => {
     test('should validate form data with body too long', () => {
       const view = createView()
-      const data = { body: 'a'.repeat(BODY_MAX_LENGTH + 1) }
+      const data = {body: 'a'.repeat(BODY_MAX_LENGTH + 1)}
       const errors = view.validateFormData(data)
       expect(errors.body[0].type).toBe('too_long')
-      expect(errors.body[0].message).toBe('Input exceeds 500 KB limit. Please reduce the text size.')
+      expect(errors.body[0].message).toBe(
+        'Input exceeds 500 KB limit. Please reduce the text size.',
+      )
+    })
+
+    test('toggleBodyError hides error when called with null', () => {
+      document.body.innerHTML = `
+        <div class="edit-content has_body_errors"></div>
+        <span id="wiki_page_body_error">Input exceeds limit</span>
+      `
+      const view = createView()
+      view.toggleBodyError(null)
+      expect($('.edit-content').hasClass('has_body_errors')).toBe(false)
+      expect($('#wiki_page_body_error').is(':visible')).toBe(false)
+    })
+
+    test('toggleBodyError shows error when called with error message', () => {
+      document.body.innerHTML = `
+        <div class="edit-content"></div>
+        <div id="wiki_page_body_statusbar"></div>
+      `
+      const view = createView()
+      const error = {message: 'Input exceeds limit'}
+      view.toggleBodyError(error)
+      expect($('.edit-content').hasClass('has_body_errors')).toBe(true)
+      expect($('#wiki_page_body_error').text()).toContain('Input exceeds limit')
     })
   })
 })

@@ -25,7 +25,7 @@ export const useUserTags = (
   userId: number,
 ) => {
   const fetchUserTags= async () => {
-    const response = await doFetchApi<Array<{id: number; name: string; group_category_name: string;}>>({
+    const response = await doFetchApi<Array<{id: number; name: string; group_category_name: string; is_single_tag: boolean;}>>({
       path: `/api/v1/courses/${courseId}/groups`,
       headers: {
         Accept: 'application/json',
@@ -46,6 +46,7 @@ export const useUserTags = (
         id: item.id,
         name: item.name,
         groupCategoryName: item.group_category_name,
+        isSingleTag: item.is_single_tag,
       }),
     )
   }

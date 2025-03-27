@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import {adjustFooterWidth} from '../../index'
+import {adjustFooter} from '../../index'
 
-describe('adjustFooterWidth', () => {
+describe('adjustFooter', () => {
   beforeEach(() => {
     document.body.innerHTML = `<div class="discussion-redesign-layout"></div>
       <div id="content"></div>
@@ -32,7 +32,7 @@ describe('adjustFooterWidth', () => {
   })
 
   it('should adjust the width and right position of the footer', () => {
-    adjustFooterWidth()
+    adjustFooter()
     setTimeout(() => {
       const footer = $('#module_sequence_footer')
       expect(footer.css('width')).toBe('calc(100px - 20px)')
@@ -42,7 +42,7 @@ describe('adjustFooterWidth', () => {
 
   it('should not adjust the footer if the container does not exist', () => {
     $('#module_sequence_footer_container').remove()
-    adjustFooterWidth()
+    adjustFooter()
     setTimeout(() => {
       const footer = $('#module_sequence_footer')
       expect(footer.css('width')).toBe('20px')

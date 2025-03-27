@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, waitFor} from '@testing-library/react'
+import {act, render, waitFor, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
-import React from 'react'
-import TextEntry from '../TextEntry'
+import React, {createRef} from 'react'
+import TextEntry, {ERROR_MESSAGE} from '../TextEntry'
 import StudentViewContext from '../../Context'
 
 jest.mock(
@@ -50,6 +50,7 @@ async function makeProps(opts = {}) {
     onContentsChanged: jest.fn(),
     submission: mockedSubmission,
     updateEditingDraft: jest.fn(),
+    submitButtonRef: createRef()
   }
 }
 
@@ -455,6 +456,36 @@ describe('TextEntry', () => {
 
       jest.advanceTimersByTime(3000)
       expect(props.createSubmissionDraft).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('validation', () => {
+    it('displays error when meetsTextEntryCriteria is false and user clicks submit', async () => {
+      const props = await makeProps({
+        submission: {
+          submissionDraft: { meetsTextEntryCriteria: false }
+        }
+      })
+      const mockButton = document.createElement('button')
+      props.submitButtonRef.current = mockButton
+      const {getByText} = await renderEditor(props)
+      fireEvent.click(props.submitButtonRef.current)
+      expect(getByText(ERROR_MESSAGE)).toBeInTheDocument()
+    })
+
+    it('clears errors when user starts typing in rce', async () => {
+      const props = await makeProps({
+        submission: {
+          submissionDraft: { meetsTextEntryCriteria: false }
+        }
+      })
+      const mockButton = document.createElement('button')
+      props.submitButtonRef.current = mockButton
+      const {getByText, queryByText} = await renderEditor(props)
+      fireEvent.click(props.submitButtonRef.current)
+      expect(getByText(ERROR_MESSAGE)).toBeInTheDocument()
+      fakeEditor.setContent('clear errors')
+      expect(queryByText(ERROR_MESSAGE)).not.toBeInTheDocument()
     })
   })
 })

@@ -87,7 +87,7 @@ module GemOverride
       super(name, path: vendor_path, **kwargs)
     elsif pinned_github_gems.key?(name)
       repo, ref = pinned_github_gems[name].split(":")
-      super(name, github: repo, ref: ref)
+      super(name, github: repo, ref:)
     else
       super
     end

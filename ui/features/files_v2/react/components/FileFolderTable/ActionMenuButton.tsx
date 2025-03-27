@@ -47,6 +47,7 @@ import DirectShareUserTray from './DirectShareUserTray'
 import DirectShareCourseTray from './DirectShareCourseTray'
 import MoveModal from './MoveModal'
 import UsageRightsModal from './UsageRightsModal'
+import PermissionsModal from './PermissionsModal'
 
 const I18n = createI18nScope('files_v2')
 
@@ -58,6 +59,15 @@ interface ActionMenuButtonProps {
   row: File | Folder
 }
 
+type ActionMenuModalOrTrayId =
+  | 'rename'
+  | 'delete'
+  | 'copy-to'
+  | 'send-to'
+  | 'move-to'
+  | 'manage-usage-rights'
+  | 'permissions'
+
 const ActionMenuButton = ({
   size,
   userCanEditFilesForContext,
@@ -65,9 +75,7 @@ const ActionMenuButton = ({
   usageRightsRequiredForContext,
   row,
 }: ActionMenuButtonProps) => {
-  const [modalOrTray, setModalOrTray] = useState<
-    'rename' | 'delete' | 'copy-to' | 'send-to' | 'move-to' | 'manage-usage-rights' | null
-  >(null)
+  const [modalOrTray, setModalOrTray] = useState<ActionMenuModalOrTrayId | null>(null)
   const actionLabel = I18n.t('Actions')
   const {contextType, fileMenuTools} = useFileManagement()
 
@@ -122,7 +130,12 @@ const ActionMenuButton = ({
         return <Menu.Separator key={key} />
       }
       return (
-        <Menu.Item key={key} onClick={onClick} disabled={disabled} data-testid={`action-menu-button-${text}`}>
+        <Menu.Item
+          key={key}
+          onClick={onClick}
+          disabled={disabled}
+          data-testid={`action-menu-button-${text}`}
+        >
           <Flex alignItems="center" gap="x-small">
             {typeof icon === 'object' ? (
               <Flex.Item>{icon}</Flex.Item>
@@ -137,6 +150,12 @@ const ActionMenuButton = ({
       )
     },
     [row.id],
+  )
+
+  const onDismissModalOrTray = useCallback(() => setModalOrTray(null), [])
+  const createSetModalOrTrayCallback = useCallback(
+    (id: ActionMenuModalOrTrayId | null) => () => setModalOrTray(id),
+    [],
   )
 
   const blueprint_locked =
@@ -156,7 +175,7 @@ const ActionMenuButton = ({
               icon: IconEditLine,
               text: I18n.t('Rename'),
               visible: rename_move_permissions,
-              onClick: () => setModalOrTray('rename'),
+              onClick: createSetModalOrTrayCallback('rename'),
             },
             {
               icon: IconDownloadLine,
@@ -167,30 +186,31 @@ const ActionMenuButton = ({
               icon: IconPermissionsLine,
               text: I18n.t('Edit Permissions'),
               visible: userCanEditFilesForContext,
+              onClick: createSetModalOrTrayCallback('permissions'),
             },
             {
               icon: IconCloudLockLine,
               text: I18n.t('Manage Usage Rights'),
               visible: has_usage_rights,
-              onClick: () => setModalOrTray('manage-usage-rights'),
+              onClick: createSetModalOrTrayCallback('manage-usage-rights'),
             },
             {
               icon: IconUserLine,
               text: I18n.t('Send To...'),
               visible: send_copy_permissions,
-              onClick: () => setModalOrTray('send-to'),
+              onClick: createSetModalOrTrayCallback('send-to'),
             },
             {
               icon: IconDuplicateLine,
               text: I18n.t('Copy To...'),
               visible: send_copy_permissions,
-              onClick: () => setModalOrTray('copy-to'),
+              onClick: createSetModalOrTrayCallback('copy-to'),
             },
             {
               icon: IconExpandItemsLine,
               text: I18n.t('Move To...'),
               visible: rename_move_permissions,
-              onClick: () => setModalOrTray('move-to'),
+              onClick: createSetModalOrTrayCallback('move-to'),
             },
             ...fileMenuTools.map(tool => {
               return {
@@ -206,7 +226,7 @@ const ActionMenuButton = ({
               icon: IconTrashLine,
               text: I18n.t('Delete'),
               visible: delete_permissions,
-              onClick: () => setModalOrTray('delete'),
+              onClick: createSetModalOrTrayCallback('delete'),
             },
           ]
         : [
@@ -215,7 +235,7 @@ const ActionMenuButton = ({
               icon: IconEditLine,
               text: I18n.t('Rename'),
               visible: rename_move_permissions,
-              onClick: () => setModalOrTray('rename'),
+              onClick: createSetModalOrTrayCallback('rename'),
             },
             {
               icon: IconDownloadLine,
@@ -226,25 +246,26 @@ const ActionMenuButton = ({
               icon: IconPermissionsLine,
               text: I18n.t('Edit Permissions'),
               visible: userCanEditFilesForContext,
+              onClick: createSetModalOrTrayCallback('permissions'),
             },
             {
               icon: IconCloudLockLine,
               text: I18n.t('Manage Usage Rights'),
               visible: has_usage_rights,
-              onClick: () => setModalOrTray('manage-usage-rights'),
+              onClick: createSetModalOrTrayCallback('manage-usage-rights'),
             },
             {
               icon: IconExpandItemsLine,
               text: I18n.t('Move To...'),
               visible: rename_move_permissions,
-              onClick: () => setModalOrTray('move-to'),
+              onClick: createSetModalOrTrayCallback('move-to'),
             },
             {separator: true, visible: delete_permissions},
             {
               icon: IconTrashLine,
               text: I18n.t('Delete'),
               visible: delete_permissions,
-              onClick: () => setModalOrTray('delete'),
+              onClick: createSetModalOrTrayCallback('delete'),
             },
           ]
       ).filter(({visible}) => visible !== false),
@@ -261,8 +282,6 @@ const ActionMenuButton = ({
       iconForTrayTool,
     ],
   )
-
-  const onDismissModalOrTray = useCallback(() => setModalOrTray(null), [])
 
   const buildTrays = useCallback(() => {
     if (!isFile(row)) return null
@@ -306,6 +325,11 @@ const ActionMenuButton = ({
         <UsageRightsModal
           items={[row]}
           open={modalOrTray === 'manage-usage-rights'}
+          onDismiss={onDismissModalOrTray}
+        />
+        <PermissionsModal
+          items={[row]}
+          open={modalOrTray === 'permissions'}
           onDismiss={onDismissModalOrTray}
         />
       </>

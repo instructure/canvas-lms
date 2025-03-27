@@ -3104,6 +3104,19 @@ describe Attachment do
         new_attachment = @merge_user_3.attachments.find_by(filename: @user_1_file.title, md5: @user_1_file.md5)
         expect(new_attachment.folder.submission_context_code).to eq @course.global_asset_string
       end
+
+      context "when the attachment is using S3 file store" do
+        let(:s3_error) { Aws::S3::Errors::NoSuchKey.new(nil, "The specified key does not exist.") }
+
+        before { s3_storage! }
+
+        it "rescues Aws::S3::Errors::NoSuchKey and logs the error" do
+          allow_any_instance_of(Attachment).to receive(:service_side_clone).and_return(false)
+          allow_any_instance_of(Aws::S3::Object).to receive(:get).and_raise(s3_error)
+          expect(Canvas::Errors).to receive(:capture_exception).with(:attachment, s3_error, :warn).once
+          expect { Attachment.migrate_attachments(@merge_user_1, @merge_user_3) }.not_to raise_error
+        end
+      end
     end
   end
 

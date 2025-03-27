@@ -54,7 +54,15 @@
         <% if export.workflow_state == 'exported' %>
           <p>
             <% date = "<span class=\"created_at time_ago_date\" data-timestamp=\"#{export.created_at.iso8601}\">#{datetime_string export.created_at}</span>".html_safe %>
-            <% wrapper = link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
+            <% if !export.attachment %>
+              <% wrapper = link_to('\1', nil) %>
+            <% else %>
+              <% if Account.site_admin.feature_enabled?(:disable_verified_content_export_links) %>
+                <% wrapper = link_to('\1', file_download_url(export.attachment)) %>
+              <% else %>
+                <% wrapper = link_to('\1', verified_file_download_url(export.attachment)) %>
+              <% end %>
+            <% end %>
             <% if export.expired? %>
               <%= t "Course Export from %{date} (file not available)", :date => date %>
             <% elsif export.export_type == ContentExport::COMMON_CARTRIDGE %>

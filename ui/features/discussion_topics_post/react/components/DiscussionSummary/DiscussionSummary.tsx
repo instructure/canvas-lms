@@ -28,17 +28,26 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconEndLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
+import {Alert} from '@instructure/ui-alerts'
+import {DiscussionSummaryUsagePill} from "./DiscussionSummaryUsagePill";
 
 interface DiscussionSummary {
   id: number;
   text: string;
   userInput?: string;
+  obsolete: boolean;
+  usage: DiscussionSummaryUsage;
+}
+
+export interface DiscussionSummaryUsage {
+    currentCount: number;
+    limit: number;
 }
 
 export interface DiscussionSummaryProps {
   onDisableSummaryClick: () => void
   isMobile: boolean
-  summary: {id: number; text: string} | null
+  summary: DiscussionSummary | null
   onSetSummary: Dispatch<SetStateAction<DiscussionSummary | null | undefined>>
   isFeedbackLoading: boolean
   onSetIsFeedbackLoading: (isFeedbackLoading: boolean) => void
@@ -62,6 +71,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   const [isInitialGeneration, setIsInitialGeneration] = useState<boolean>(true)
   const [summaryError, setSummaryError] = useState<DiscussionSummaryError | null>(null)
   const [isSummaryLoading, setIsSummaryLoading] = useState(props.summary === null)
+  const [usage, setUsage] = useState<DiscussionSummaryUsage | null>(null)
 
   // @ts-expect-error
   const contextType = ENV.context_type.toLowerCase()
@@ -100,6 +110,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   const fetchSummary = useCallback(async (initial: boolean) => {
     try {
       const result: DiscussionSummary | undefined = await getDiscussionSummary(initial)
+      if (result) { setUsage(result.usage) }
       props.onSetSummary(result)
       if(result?.userInput) {
         setUserInput(result.userInput)
@@ -107,8 +118,6 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
       } else {
         setPreviousUserInput(userInput)
       }
-
-
     } catch (error: any) {
       let errorMessage = 'An unexpected error occurred while loading the discussion summary.'
 
@@ -176,6 +185,13 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
             ))}
           </Text>
         </Flex.Item>
+        {props.summary?.obsolete && (
+          <Flex.Item margin="0 0 medium 0">
+            <Alert variant="info" margin="0" hasShadow={false} data-testid="summary-obsolete-alert">
+              {I18n.t('The discussion board has some new activity since this summary was generated.')}
+            </Alert>
+          </Flex.Item>
+        )}
         <Flex.Item margin="0 0 medium 0" align="end">
           <DiscussionSummaryRatings
             liked={props.liked}
@@ -188,6 +204,13 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
       </>
     )
   }
+    function usageLimitReached() {
+        if (!usage) {
+            return false
+        }
+
+        return usage.currentCount >= usage.limit;
+    }
 
   return (
     <Flex direction="column">
@@ -215,10 +238,10 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
           )}
         </Text>
       </Flex.Item>
-      <Flex gap="small" wrap="wrap" margin="medium 0" alignItems='end'>
+      <Flex gap="small" wrap="wrap" margin="0 0 medium 0" alignItems='end'>
         <Flex.Item width={props.isMobile ? '100%' : 'auto'} shouldGrow={true}>
           <TextInput
-            renderLabel={I18n.t('Topics to focus on')}
+            renderLabel={I18n.t('Topics to focus on (optional)')}
             placeholder={I18n.t('Enter the areas or topics you want the summary to focus on')}
             value={userInput}
             onChange={(_, value) => {
@@ -231,17 +254,27 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
         <Flex.Item width={props.isMobile ? '100%' : 'auto'}>
           <DiscussionSummaryGenerateButton
             onClick={generateSummary}
-            isEnabled={!isSummaryLoading && !props.isFeedbackLoading && (userInput !== previousUserInput || isInitialGeneration)}
+            isEnabled={
+              !isSummaryLoading &&
+              !props.isFeedbackLoading &&
+              !usageLimitReached() &&
+              (userInput !== previousUserInput || !props.summary || props.summary?.obsolete)
+            }
             isMobile={props.isMobile}
+            usage={usage}
           />
         </Flex.Item>
       </Flex>
       {!summaryError && (
-        <Flex.Item margin="0 0 x-small 0">
-          <Text size="small" weight="normal" color="secondary">
-            {I18n.t('Generated Summary')}
-          </Text>
-        </Flex.Item>
+            <Flex.Item margin="0 0 x-small 0">
+              <Text size="small" weight="normal" color="secondary">
+                {I18n.t('Generated Summary')}
+              </Text>
+                {!!usage && (<DiscussionSummaryUsagePill
+                    currentCount={usage.currentCount}
+                    limit={usage.limit}
+                />)}
+            </Flex.Item>
       )}
       {content}
     </Flex>

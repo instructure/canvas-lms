@@ -30,30 +30,28 @@
     </a>
   </td>
   <td>
-    <%= duration_in_minutes((version.finished_at || version.end_at || version.started_at) - version.started_at) %>
+    <% duration = duration_in_minutes((version.finished_at || version.end_at || version.started_at) - version.started_at) %>
+    <span aria-label="<%= t 'time', 'Time' %>: <%= duration %>">
+      <%= duration %>
+    </span>
   </td>
 
   <% if submission_has_regrade?(@submission) && version.score_before_regrade.present? %>
     <td>
-      <%= score_out_of_points_possible(version.score_before_regrade, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
-      <%= '*' if version.pending_review? %>
+      <%= render partial: 'submission_version_score', locals: {version: version, before_regrade: true} %>
     </td>
     <td class="regraded">
-      <%= score_out_of_points_possible(version.score, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
-      <%= '*' if version.pending_review? %>
+      <%= render partial: 'submission_version_score', locals: {version: version, before_regrade: false} %>
     </td>
 
   <% elsif submission_has_regrade?(@submission) %>
     <td>
-      <%= score_out_of_points_possible(version.score, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
-      <%= '*' if version.pending_review? %>
+      <%= render partial: 'submission_version_score', locals: {version: version, before_regrade: false} %>
     </td>
     <td class="regraded">-</td>
-
   <% else %>
     <td>
-      <%= score_out_of_points_possible(version.score, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
-      <%= '*' if version.pending_review? %>
+      <%= render partial: 'submission_version_score', locals: {version: version, before_regrade: false} %>
     </td>
   <% end %>
 </tr>

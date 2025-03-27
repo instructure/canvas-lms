@@ -1391,7 +1391,7 @@ describe Course do
           before do
             @test_course.account.enable_feature!(:differentiation_tags)
             @test_course.account.enable_feature!(:assign_to_differentiation_tags)
-            @test_course.account.settings[:allow_assign_to_differentiation_tags] = true
+            @test_course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
             @test_course.account.save!
             @test_course.account.reload
             @assignment1.context.account.reload
@@ -1485,7 +1485,7 @@ describe Course do
               set: @differentiation_tag_group_1
             )
 
-            @test_course.account.settings[:allow_assign_to_differentiation_tags] = false
+            @test_course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
             @test_course.account.save
             @test_course.account.reload
 

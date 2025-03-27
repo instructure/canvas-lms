@@ -1296,9 +1296,12 @@ describe "Submissions API", type: :request do
 
     student1 = user_factory(active_all: true)
     course_with_teacher(active_all: true)
+    Attachment.current_root_account = @course.root_account
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
-    submit_homework(a1, student1) { |s| s.attachments = [attachment_model(uploaded_data: stub_png_data, content_type: "image/png", context: student1)] }
+    attachment = attachment_model(uploaded_data: stub_png_data, content_type: "image/png", context: student1)
+    attachment.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
+    submit_homework(a1, student1) { |s| s.attachments = [attachment] }
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
                     { controller: "submissions_api",
@@ -1348,388 +1351,396 @@ describe "Submissions API", type: :request do
     expect(response["Location"]).to match(%r{https://kaltura.example.com/some/url})
   end
 
-  it "returns all submissions for an assignment" do
-    student1 = user_factory(active_all: true)
-    student2 = user_factory(active_all: true)
+  context "with double testing verifiers with disable_adding_uuid_verifier_in_api ff" do
+    before do
+      @student1 = user_factory(active_all: true)
+      @student2 = user_factory(active_all: true)
 
-    course_with_teacher(active_all: true)
+      course_with_teacher(active_all: true)
 
-    @course.enroll_student(student1).accept!
-    @course.enroll_student(student2).accept!
+      @course.enroll_student(@student1).accept!
+      @course.enroll_student(@student2).accept!
 
-    a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
-    rubric = rubric_model(user: @user,
-                          context: @course,
-                          data: larger_rubric_data)
-    a1.create_rubric_association(rubric:, purpose: "grading", use_for_grading: true, context: @course)
+      @a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
+      @rubric = rubric_model(user: @user,
+                             context: @course,
+                             data: larger_rubric_data)
+      @a1.create_rubric_association(rubric: @rubric, purpose: "grading", use_for_grading: true, context: @course)
 
-    submit_homework(a1, student1)
-    media_object(media_id: "54321", context: student1, user: student1)
-    submit_homework(a1, student1, media_comment_id: "54321", media_comment_type: "video")
-    sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(context: student1, folder: nil)] }
-    sub1.update!(sticker: "trophy")
+      submit_homework(@a1, @student1)
+      media_object(media_id: "54321", context: @student1, user: @student1)
+      submit_homework(@a1, @student1, media_comment_id: "54321", media_comment_type: "video")
+      @sub1 = submit_homework(@a1, @student1) { |s| s.attachments = [attachment_model(context: @student1, folder: nil)] }
+      @sub1.update!(sticker: "trophy")
 
-    sub2a1 = attachment_model(context: student2, filename: "snapshot.png", content_type: "image/png")
-    sub2 = submit_homework(a1, student2, url: "http://www.instructure.com") do |s|
-      s.attachment = sub2a1
+      @sub2a1 = attachment_model(context: @student2, filename: "snapshot.png", content_type: "image/png")
+      @sub2 = submit_homework(@a1, @student2, url: "http://www.instructure.com") do |s|
+        s.attachment = @sub2a1
+      end
+
+      media_object(media_id: "3232", context: @student1, user: @student1, media_type: "audio")
+      @a1.grade_student(@student1, { grade: "90%", grader: @teacher })
+      @a1.update_submission(@student1, { comment: "Well here's the thing...", media_comment_id: "3232", media_comment_type: "audio", commenter: @teacher })
+      @attachment = Attachment.all
     end
 
-    media_object(media_id: "3232", context: student1, user: student1, media_type: "audio")
-    a1.grade_student(student1, { grade: "90%", grader: @teacher })
-    a1.update_submission(student1, { comment: "Well here's the thing...", media_comment_id: "3232", media_comment_type: "audio", commenter: @teacher })
-    sub1.reload
-    expect(sub1.submission_comments.size).to eq 1
-    comment = sub1.submission_comments.first
-    a1.rubric_association.assess(
-      assessor: @user,
-      user: student2,
-      artifact: sub2,
-      assessment: { assessment_type: "grading", criterion_crit1: { points: 7 }, criterion_crit2: { points: 2, comments: "Hmm" } }
-    )
+    double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+      it "returns all submissions for an assignment" do
+        @sub1.reload
+        expect(@sub1.submission_comments.size).to eq 1
+        comment = @sub1.submission_comments.first
+        @a1.rubric_association.assess(
+          assessor: @user,
+          user: @student2,
+          artifact: @sub2,
+          assessment: { assessment_type: "grading", criterion_crit1: { points: 7 }, criterion_crit2: { points: 2, comments: "Hmm" } }
+        )
 
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
-                    { controller: "submissions_api",
-                      action: "index",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      assignment_id: a1.id.to_s },
-                    { include: %w[submission_history submission_comments rubric_assessment] })
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions.json",
+                        { controller: "submissions_api",
+                          action: "index",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          assignment_id: @a1.id.to_s },
+                        { include: %w[submission_history submission_comments rubric_assessment] })
 
-    sub1.reload
-    sub2.reload
+        @sub1.reload
+        @sub2.reload
 
-    res =
-      [{ "id" => sub1.id,
-         "grade" => "A-",
-         "entered_grade" => "A-",
-         "grading_period_id" => nil,
-         "excused" => sub1.excused,
-         "grader_id" => @teacher.id,
-         "graded_at" => sub1.graded_at.as_json,
-         "posted_at" => sub1.posted_at.as_json,
-         "body" => "test!",
-         "assignment_id" => a1.id,
-         "submitted_at" => "1970-01-01T03:00:00Z",
-         "cached_due_date" => nil,
-         "custom_grade_status_id" => nil,
-         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=3",
-         "redo_request" => false,
-         "grade_matches_current_submission" => true,
-         "extra_attempts" => nil,
-         "attachments" =>
-         [
-           { "content-type" => "application/unknown",
-             "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
-             "filename" => "unknown.example",
-             "display_name" => "unknown.example",
-             "upload_status" => "success",
-             "id" => sub1.attachments.first.id,
-             "uuid" => sub1.attachments.first.uuid,
-             "folder_id" => sub1.attachments.first.folder_id,
-             "size" => sub1.attachments.first.size,
-             "unlock_at" => nil,
-             "locked" => false,
-             "hidden" => false,
-             "lock_at" => nil,
-             "locked_for_user" => false,
-             "hidden_for_user" => false,
-             "created_at" => sub1.attachments.first.reload.created_at.as_json,
-             "updated_at" => sub1.attachments.first.updated_at.as_json,
-             "preview_url" => nil,
-             "modified_at" => sub1.attachments.first.modified_at.as_json,
-             "mime_class" => sub1.attachments.first.mime_class,
-             "media_entry_id" => sub1.attachments.first.media_entry_id,
-             "thumbnail_url" => nil,
-             "category" => "uncategorized" },
-         ],
-         "submission_history" =>
-         [{ "id" => sub1.id,
-            "grade" => nil,
-            "entered_grade" => nil,
-            "grading_period_id" => nil,
-            "excused" => nil,
-            "grader_id" => nil,
-            "graded_at" => nil,
-            "posted_at" => nil,
-            "body" => "test!",
-            "assignment_id" => a1.id,
-            "submitted_at" => "1970-01-01T01:00:00Z",
-            "cached_due_date" => nil,
-            "custom_grade_status_id" => nil,
-            "attempt" => 1,
-            "url" => nil,
-            "submission_type" => "online_text_entry",
-            "user_id" => student1.id,
-            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=1",
-            "redo_request" => false,
-            "grade_matches_current_submission" => true,
-            "score" => nil,
-            "entered_score" => nil,
-            "workflow_state" => "submitted",
-            "late" => false,
-            "missing" => false,
-            "late_policy_status" => nil,
-            "seconds_late" => 0,
-            "sticker" => nil,
-            "points_deducted" => nil,
-            "extra_attempts" => nil },
-          { "id" => sub1.id,
-            "grade" => nil,
-            "entered_grade" => nil,
-            "grading_period_id" => nil,
-            "excused" => nil,
-            "grader_id" => nil,
-            "graded_at" => nil,
-            "posted_at" => nil,
-            "assignment_id" => a1.id,
-            "media_comment" =>
-            { "media_type" => "video",
-              "media_id" => "54321",
-              "content-type" => "video/mp4",
-              "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
-              "display_name" => nil },
-            "body" => "test!",
-            "submitted_at" => "1970-01-01T02:00:00Z",
-            "cached_due_date" => nil,
-            "custom_grade_status_id" => nil,
-            "attempt" => 2,
-            "url" => nil,
-            "submission_type" => "online_text_entry",
-            "user_id" => student1.id,
-            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
-            "grade_matches_current_submission" => true,
-            "redo_request" => false,
-            "score" => nil,
-            "entered_score" => nil,
-            "workflow_state" => "submitted",
-            "late" => false,
-            "missing" => false,
-            "late_policy_status" => nil,
-            "seconds_late" => 0,
-            "sticker" => nil,
-            "points_deducted" => nil,
-            "extra_attempts" => nil },
-          { "id" => sub1.id,
-            "grade" => "A-",
-            "entered_grade" => "A-",
-            "grading_period_id" => nil,
-            "excused" => false,
-            "grader_id" => @teacher.id,
-            "graded_at" => sub1.graded_at.as_json,
-            "posted_at" => sub1.posted_at.as_json,
-            "assignment_id" => a1.id,
-            "media_comment" =>
-            { "media_type" => "video",
-              "media_id" => "54321",
-              "content-type" => "video/mp4",
-              "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
-              "display_name" => nil },
-            "attachments" =>
-            [
-              { "content-type" => "application/unknown",
-                "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
-                "filename" => "unknown.example",
-                "display_name" => "unknown.example",
-                "upload_status" => "success",
-                "id" => sub1.attachments.first.id,
-                "uuid" => sub1.attachments.first.uuid,
-                "folder_id" => sub1.attachments.first.folder_id,
-                "size" => sub1.attachments.first.size,
-                "unlock_at" => nil,
-                "locked" => false,
-                "hidden" => false,
-                "lock_at" => nil,
-                "locked_for_user" => false,
-                "hidden_for_user" => false,
-                "created_at" => sub1.attachments.first.created_at.as_json,
-                "updated_at" => sub1.attachments.first.updated_at.as_json,
-                "preview_url" => nil,
-                "modified_at" => sub1.attachments.first.modified_at.as_json,
-                "mime_class" => sub1.attachments.first.mime_class,
-                "media_entry_id" => sub1.attachments.first.media_entry_id,
-                "thumbnail_url" => nil,
-                "category" => "uncategorized" },
-            ],
-            "body" => "test!",
-            "submitted_at" => "1970-01-01T03:00:00Z",
-            "cached_due_date" => nil,
-            "custom_grade_status_id" => nil,
-            "attempt" => 3,
-            "url" => nil,
-            "submission_type" => "online_text_entry",
-            "user_id" => student1.id,
-            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=3",
-            "grade_matches_current_submission" => true,
-            "redo_request" => false,
-            "score" => 13.5,
-            "entered_score" => 13.5,
-            "workflow_state" => "graded",
-            "late" => false,
-            "missing" => false,
-            "late_policy_status" => nil,
-            "seconds_late" => 0,
-            "sticker" => "trophy",
-            "points_deducted" => nil,
-            "extra_attempts" => nil }],
-         "attempt" => 3,
-         "url" => nil,
-         "submission_type" => "online_text_entry",
-         "user_id" => student1.id,
-         "submission_comments" =>
-         [{ "comment" => "Well here's the thing...",
-            "attempt" => 3,
-            "media_comment" => {
-              "media_type" => "audio",
-              "media_id" => "3232",
-              "content-type" => "audio/mp4",
-              "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=3232&redirect=1&type=mp4",
-              "display_name" => nil
-            },
-            "created_at" => comment.reload.created_at.as_json,
-            "edited_at" => nil,
-            "author" => {
-              "id" => @teacher.id,
-              "anonymous_id" => @teacher.id.to_s(36),
-              "display_name" => "User",
-              "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-              "avatar_image_url" => User.avatar_fallback_url(nil, request),
-              "pronouns" => nil
-            },
-            "author_name" => "User",
-            "id" => comment.id,
-            "author_id" => @teacher.id }],
-         "media_comment" =>
-         { "media_type" => "video",
-           "media_id" => "54321",
-           "content-type" => "video/mp4",
-           "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
-           "display_name" => nil },
-         "score" => 13.5,
-         "entered_score" => 13.5,
-         "workflow_state" => "graded",
-         "late" => false,
-         "missing" => false,
-         "late_policy_status" => nil,
-         "seconds_late" => 0,
-         "sticker" => "trophy",
-         "points_deducted" => nil },
-       { "id" => sub2.id,
-         "grade" => "F",
-         "entered_grade" => "F",
-         "grading_period_id" => nil,
-         "excused" => sub2.excused,
-         "grader_id" => @teacher.id,
-         "cached_due_date" => nil,
-         "custom_grade_status_id" => nil,
-         "graded_at" => sub2.graded_at.as_json,
-         "posted_at" => sub2.posted_at.as_json,
-         "assignment_id" => a1.id,
-         "body" => nil,
-         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=1",
-         "grade_matches_current_submission" => true,
-         "submitted_at" => "1970-01-01T04:00:00Z",
-         "extra_attempts" => nil,
-         "submission_history" =>
-         [{ "id" => sub2.id,
-            "grade" => "F",
-            "entered_grade" => "F",
-            "grading_period_id" => nil,
-            "excused" => false,
-            "grader_id" => @teacher.id,
-            "graded_at" => sub2.graded_at.as_json,
-            "posted_at" => sub2.posted_at.as_json,
-            "assignment_id" => a1.id,
-            "body" => nil,
-            "submitted_at" => "1970-01-01T04:00:00Z",
-            "cached_due_date" => nil,
-            "custom_grade_status_id" => nil,
-            "attempt" => 1,
-            "url" => "http://www.instructure.com",
-            "submission_type" => "online_url",
-            "user_id" => student2.id,
-            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=1",
-            "grade_matches_current_submission" => true,
-            "attachments" =>
-            [
-              { "content-type" => "image/png",
+        res =
+          [{ "id" => @sub1.id,
+             "grade" => "A-",
+             "entered_grade" => "A-",
+             "grading_period_id" => nil,
+             "excused" => @sub1.excused,
+             "grader_id" => @teacher.id,
+             "graded_at" => @sub1.graded_at.as_json,
+             "posted_at" => @sub1.posted_at.as_json,
+             "body" => "test!",
+             "assignment_id" => @a1.id,
+             "submitted_at" => "1970-01-01T03:00:00Z",
+             "cached_due_date" => nil,
+             "custom_grade_status_id" => nil,
+             "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student1.id}?preview=1&version=3",
+             "redo_request" => false,
+             "grade_matches_current_submission" => true,
+             "extra_attempts" => nil,
+             "attachments" =>
+             [
+               { "content-type" => "application/unknown",
+                 "url" => "http://www.example.com/files/#{@sub1.attachments.first.id}/download?download_frd=1#{"&verifier=#{@sub1.attachments.first.uuid}" unless disable_adding_uuid_verifier_in_api}",
+                 "filename" => "unknown.example",
+                 "display_name" => "unknown.example",
+                 "upload_status" => "success",
+                 "id" => @sub1.attachments.first.id,
+                 "uuid" => @sub1.attachments.first.uuid,
+                 "folder_id" => @sub1.attachments.first.folder_id,
+                 "size" => @sub1.attachments.first.size,
+                 "unlock_at" => nil,
+                 "locked" => false,
+                 "hidden" => false,
+                 "lock_at" => nil,
+                 "locked_for_user" => false,
+                 "hidden_for_user" => false,
+                 "created_at" => @sub1.attachments.first.reload.created_at.as_json,
+                 "updated_at" => @sub1.attachments.first.updated_at.as_json,
+                 "preview_url" => nil,
+                 "modified_at" => @sub1.attachments.first.modified_at.as_json,
+                 "mime_class" => @sub1.attachments.first.mime_class,
+                 "media_entry_id" => @sub1.attachments.first.media_entry_id,
+                 "thumbnail_url" => nil,
+                 "category" => "uncategorized" },
+             ],
+             "submission_history" =>
+             [{ "id" => @sub1.id,
+                "grade" => nil,
+                "entered_grade" => nil,
+                "grading_period_id" => nil,
+                "excused" => nil,
+                "grader_id" => nil,
+                "graded_at" => nil,
+                "posted_at" => nil,
+                "body" => "test!",
+                "assignment_id" => @a1.id,
+                "submitted_at" => "1970-01-01T01:00:00Z",
+                "cached_due_date" => nil,
+                "custom_grade_status_id" => nil,
+                "attempt" => 1,
+                "url" => nil,
+                "submission_type" => "online_text_entry",
+                "user_id" => @student1.id,
+                "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student1.id}?preview=1&version=1",
+                "redo_request" => false,
+                "grade_matches_current_submission" => true,
+                "score" => nil,
+                "entered_score" => nil,
+                "workflow_state" => "submitted",
+                "late" => false,
+                "missing" => false,
+                "late_policy_status" => nil,
+                "seconds_late" => 0,
+                "sticker" => nil,
+                "points_deducted" => nil,
+                "extra_attempts" => nil },
+              { "id" => @sub1.id,
+                "grade" => nil,
+                "entered_grade" => nil,
+                "grading_period_id" => nil,
+                "excused" => nil,
+                "grader_id" => nil,
+                "graded_at" => nil,
+                "posted_at" => nil,
+                "assignment_id" => @a1.id,
+                "media_comment" =>
+                { "media_type" => "video",
+                  "media_id" => "54321",
+                  "content-type" => "video/mp4",
+                  "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+                  "display_name" => nil },
+                "body" => "test!",
+                "submitted_at" => "1970-01-01T02:00:00Z",
+                "cached_due_date" => nil,
+                "custom_grade_status_id" => nil,
+                "attempt" => 2,
+                "url" => nil,
+                "submission_type" => "online_text_entry",
+                "user_id" => @student1.id,
+                "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student1.id}?preview=1&version=2",
+                "grade_matches_current_submission" => true,
+                "redo_request" => false,
+                "score" => nil,
+                "entered_score" => nil,
+                "workflow_state" => "submitted",
+                "late" => false,
+                "missing" => false,
+                "late_policy_status" => nil,
+                "seconds_late" => 0,
+                "sticker" => nil,
+                "points_deducted" => nil,
+                "extra_attempts" => nil },
+              { "id" => @sub1.id,
+                "grade" => "A-",
+                "entered_grade" => "A-",
+                "grading_period_id" => nil,
+                "excused" => false,
+                "grader_id" => @teacher.id,
+                "graded_at" => @sub1.graded_at.as_json,
+                "posted_at" => @sub1.posted_at.as_json,
+                "assignment_id" => @a1.id,
+                "media_comment" =>
+                { "media_type" => "video",
+                  "media_id" => "54321",
+                  "content-type" => "video/mp4",
+                  "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+                  "display_name" => nil },
+                "attachments" =>
+                [
+                  { "content-type" => "application/unknown",
+                    "url" => "http://www.example.com/files/#{@sub1.attachments.first.id}/download?download_frd=1#{"&verifier=#{@sub1.attachments.first.uuid}" unless disable_adding_uuid_verifier_in_api}",
+                    "filename" => "unknown.example",
+                    "display_name" => "unknown.example",
+                    "upload_status" => "success",
+                    "id" => @sub1.attachments.first.id,
+                    "uuid" => @sub1.attachments.first.uuid,
+                    "folder_id" => @sub1.attachments.first.folder_id,
+                    "size" => @sub1.attachments.first.size,
+                    "unlock_at" => nil,
+                    "locked" => false,
+                    "hidden" => false,
+                    "lock_at" => nil,
+                    "locked_for_user" => false,
+                    "hidden_for_user" => false,
+                    "created_at" => @sub1.attachments.first.created_at.as_json,
+                    "updated_at" => @sub1.attachments.first.updated_at.as_json,
+                    "preview_url" => nil,
+                    "modified_at" => @sub1.attachments.first.modified_at.as_json,
+                    "mime_class" => @sub1.attachments.first.mime_class,
+                    "media_entry_id" => @sub1.attachments.first.media_entry_id,
+                    "thumbnail_url" => nil,
+                    "category" => "uncategorized" },
+                ],
+                "body" => "test!",
+                "submitted_at" => "1970-01-01T03:00:00Z",
+                "cached_due_date" => nil,
+                "custom_grade_status_id" => nil,
+                "attempt" => 3,
+                "url" => nil,
+                "submission_type" => "online_text_entry",
+                "user_id" => @student1.id,
+                "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student1.id}?preview=1&version=3",
+                "grade_matches_current_submission" => true,
+                "redo_request" => false,
+                "score" => 13.5,
+                "entered_score" => 13.5,
+                "workflow_state" => "graded",
+                "late" => false,
+                "missing" => false,
+                "late_policy_status" => nil,
+                "seconds_late" => 0,
+                "sticker" => "trophy",
+                "points_deducted" => nil,
+                "extra_attempts" => nil }],
+             "attempt" => 3,
+             "url" => nil,
+             "submission_type" => "online_text_entry",
+             "user_id" => @student1.id,
+             "submission_comments" =>
+             [{ "comment" => "Well here's the thing...",
+                "attempt" => 3,
+                "media_comment" => {
+                  "media_type" => "audio",
+                  "media_id" => "3232",
+                  "content-type" => "audio/mp4",
+                  "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=3232&redirect=1&type=mp4",
+                  "display_name" => nil
+                },
+                "created_at" => comment.reload.created_at.as_json,
+                "edited_at" => nil,
+                "author" => {
+                  "id" => @teacher.id,
+                  "anonymous_id" => @teacher.id.to_s(36),
+                  "display_name" => "User",
+                  "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
+                  "avatar_image_url" => User.avatar_fallback_url(nil, request),
+                  "pronouns" => nil
+                },
+                "author_name" => "User",
+                "id" => comment.id,
+                "author_id" => @teacher.id }],
+             "media_comment" =>
+             { "media_type" => "video",
+               "media_id" => "54321",
+               "content-type" => "video/mp4",
+               "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+               "display_name" => nil },
+             "score" => 13.5,
+             "entered_score" => 13.5,
+             "workflow_state" => "graded",
+             "late" => false,
+             "missing" => false,
+             "late_policy_status" => nil,
+             "seconds_late" => 0,
+             "sticker" => "trophy",
+             "points_deducted" => nil },
+           { "id" => @sub2.id,
+             "grade" => "F",
+             "entered_grade" => "F",
+             "grading_period_id" => nil,
+             "excused" => @sub2.excused,
+             "grader_id" => @teacher.id,
+             "cached_due_date" => nil,
+             "custom_grade_status_id" => nil,
+             "graded_at" => @sub2.graded_at.as_json,
+             "posted_at" => @sub2.posted_at.as_json,
+             "assignment_id" => @a1.id,
+             "body" => nil,
+             "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student2.id}?preview=1&version=1",
+             "grade_matches_current_submission" => true,
+             "submitted_at" => "1970-01-01T04:00:00Z",
+             "extra_attempts" => nil,
+             "submission_history" =>
+             [{ "id" => @sub2.id,
+                "grade" => "F",
+                "entered_grade" => "F",
+                "grading_period_id" => nil,
+                "excused" => false,
+                "grader_id" => @teacher.id,
+                "graded_at" => @sub2.graded_at.as_json,
+                "posted_at" => @sub2.posted_at.as_json,
+                "assignment_id" => @a1.id,
+                "body" => nil,
+                "submitted_at" => "1970-01-01T04:00:00Z",
+                "cached_due_date" => nil,
+                "custom_grade_status_id" => nil,
+                "attempt" => 1,
+                "url" => "http://www.instructure.com",
+                "submission_type" => "online_url",
+                "user_id" => @student2.id,
+                "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student2.id}?preview=1&version=1",
+                "grade_matches_current_submission" => true,
+                "attachments" =>
+                [
+                  { "content-type" => "image/png",
+                    "display_name" => "snapshot.png",
+                    "filename" => "snapshot.png",
+                    "upload_status" => "success",
+                    "url" => "http://www.example.com/files/#{@sub2a1.id}/download?download_frd=1#{"&verifier=#{@sub2a1.uuid}" unless disable_adding_uuid_verifier_in_api}",
+                    "id" => @sub2a1.id,
+                    "uuid" => @sub2a1.uuid,
+                    "folder_id" => @sub2a1.folder_id,
+                    "size" => @sub2a1.size,
+                    "unlock_at" => nil,
+                    "locked" => false,
+                    "hidden" => false,
+                    "lock_at" => nil,
+                    "locked_for_user" => false,
+                    "hidden_for_user" => false,
+                    "created_at" => @sub2a1.created_at.as_json,
+                    "updated_at" => @sub2a1.updated_at.as_json,
+                    "preview_url" => nil,
+                    "thumbnail_url" => thumbnail_image_url(@sub2a1, @sub2a1.uuid, host: "www.example.com"),
+                    "modified_at" => @sub2a1.modified_at.as_json,
+                    "mime_class" => @sub2a1.mime_class,
+                    "media_entry_id" => @sub2a1.media_entry_id,
+                    "category" => "uncategorized" },
+                ],
+                "redo_request" => false,
+                "score" => 9.0,
+                "entered_score" => 9.0,
+                "workflow_state" => "graded",
+                "late" => false,
+                "missing" => false,
+                "late_policy_status" => nil,
+                "seconds_late" => 0,
+                "sticker" => nil,
+                "points_deducted" => nil,
+                "extra_attempts" => nil }],
+             "attempt" => 1,
+             "url" => "http://www.instructure.com",
+             "submission_type" => "online_url",
+             "user_id" => @student2.id,
+             "attachments" =>
+             [{ "content-type" => "image/png",
                 "display_name" => "snapshot.png",
                 "filename" => "snapshot.png",
                 "upload_status" => "success",
-                "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
-                "id" => sub2a1.id,
-                "uuid" => sub2a1.uuid,
-                "folder_id" => sub2a1.folder_id,
-                "size" => sub2a1.size,
+                "url" => "http://www.example.com/files/#{@sub2a1.id}/download?download_frd=1#{"&verifier=#{@sub2a1.uuid}" unless disable_adding_uuid_verifier_in_api}",
+                "id" => @sub2a1.id,
+                "uuid" => @sub2a1.uuid,
+                "folder_id" => @sub2a1.folder_id,
+                "size" => @sub2a1.size,
                 "unlock_at" => nil,
                 "locked" => false,
                 "hidden" => false,
                 "lock_at" => nil,
                 "locked_for_user" => false,
                 "hidden_for_user" => false,
-                "created_at" => sub2a1.created_at.as_json,
-                "updated_at" => sub2a1.updated_at.as_json,
+                "created_at" => @sub2a1.created_at.as_json,
+                "updated_at" => @sub2a1.updated_at.as_json,
                 "preview_url" => nil,
-                "thumbnail_url" => thumbnail_image_url(sub2a1, sub2a1.uuid, host: "www.example.com"),
-                "modified_at" => sub2a1.modified_at.as_json,
-                "mime_class" => sub2a1.mime_class,
-                "media_entry_id" => sub2a1.media_entry_id,
-                "category" => "uncategorized" },
-            ],
-            "redo_request" => false,
-            "score" => 9.0,
-            "entered_score" => 9.0,
-            "workflow_state" => "graded",
-            "late" => false,
-            "missing" => false,
-            "late_policy_status" => nil,
-            "seconds_late" => 0,
-            "sticker" => nil,
-            "points_deducted" => nil,
-            "extra_attempts" => nil }],
-         "attempt" => 1,
-         "url" => "http://www.instructure.com",
-         "submission_type" => "online_url",
-         "user_id" => student2.id,
-         "attachments" =>
-         [{ "content-type" => "image/png",
-            "display_name" => "snapshot.png",
-            "filename" => "snapshot.png",
-            "upload_status" => "success",
-            "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
-            "id" => sub2a1.id,
-            "uuid" => sub2a1.uuid,
-            "folder_id" => sub2a1.folder_id,
-            "size" => sub2a1.size,
-            "unlock_at" => nil,
-            "locked" => false,
-            "hidden" => false,
-            "lock_at" => nil,
-            "locked_for_user" => false,
-            "hidden_for_user" => false,
-            "created_at" => sub2a1.created_at.as_json,
-            "updated_at" => sub2a1.updated_at.as_json,
-            "preview_url" => nil,
-            "thumbnail_url" => thumbnail_image_url(sub2a1, sub2a1.uuid, host: "www.example.com"),
-            "modified_at" => sub2a1.modified_at.as_json,
-            "mime_class" => sub2a1.mime_class,
-            "media_entry_id" => sub2a1.media_entry_id,
-            "category" => "uncategorized" },],
-         "redo_request" => false,
-         "submission_comments" => [],
-         "score" => 9.0,
-         "entered_score" => 9.0,
-         "rubric_assessment" =>
-         { "crit2" => { "comments" => "Hmm", "points" => 2.0, "rating_id" => "rat1" },
-           "crit1" => { "comments" => nil, "points" => 7.0, "rating_id" => "rat2" } },
-         "workflow_state" => "graded",
-         "late" => false,
-         "missing" => false,
-         "late_policy_status" => nil,
-         "seconds_late" => 0,
-         "sticker" => nil,
-         "points_deducted" => nil }]
-    expect(json.sort_by { |h| h["user_id"] }).to eql(res.sort_by { |h| h["user_id"] })
+                "thumbnail_url" => thumbnail_image_url(@sub2a1, @sub2a1.uuid, host: "www.example.com"),
+                "modified_at" => @sub2a1.modified_at.as_json,
+                "mime_class" => @sub2a1.mime_class,
+                "media_entry_id" => @sub2a1.media_entry_id,
+                "category" => "uncategorized" },],
+             "redo_request" => false,
+             "submission_comments" => [],
+             "score" => 9.0,
+             "entered_score" => 9.0,
+             "rubric_assessment" =>
+             { "crit2" => { "comments" => "Hmm", "points" => 2.0, "rating_id" => "rat1" },
+               "crit1" => { "comments" => nil, "points" => 7.0, "rating_id" => "rat2" } },
+             "workflow_state" => "graded",
+             "late" => false,
+             "missing" => false,
+             "late_policy_status" => nil,
+             "seconds_late" => 0,
+             "sticker" => nil,
+             "points_deducted" => nil }]
+        expect(json.sort_by { |h| h["user_id"] }).to eql(res.sort_by { |h| h["user_id"] })
+      end
+    end
   end
 
   it "paginates submissions" do
@@ -2995,6 +3006,20 @@ describe "Submissions API", type: :request do
                  course_id: @course.to_param },
                { student_ids: [@student1.to_param, @student2.to_param], grouped: "1" })
       expect(response).to be_ok
+    end
+
+    it "returns an error when an invalid grading_period_id is provided" do
+      api_call(:get,
+               "/api/v1/courses/#{@course.id}/students/submissions.json",
+               { controller: "submissions_api",
+                 action: "for_students",
+                 format: "json",
+                 course_id: @course.to_param },
+               { student_ids: [@student1.to_param, @student2.to_param],
+                 grouped: "1",
+                 grading_period_id: [@gp2.to_param] })
+      expect(response).to have_http_status :bad_request
+      expect(json_parse.fetch("error")).to eq "grading_period_id is invalid, verify the parameter and type are correct"
     end
   end
 
@@ -5448,15 +5473,23 @@ describe "Submissions API", type: :request do
           end
         end
 
-        it "creates a file upload submission" do
-          @assignment.update(submission_types: "online_upload")
-          a1 = attachment_model(context: @user)
-          a2 = attachment_model(context: @user)
-          json = do_submit(submission_type: "online_upload", file_ids: [a1.id, a2.id])
-          sub_a1 = Attachment.where(root_attachment_id: a1).first
-          sub_a2 = Attachment.where(root_attachment_id: a2).first
-          expect(json["attachments"].pluck("url")).to eq [file_download_url(sub_a1, verifier: sub_a1.uuid, download: "1", download_frd: "1"),
-                                                          file_download_url(sub_a2, verifier: sub_a2.uuid, download: "1", download_frd: "1")]
+        context "where returns verifier needs to be double tested" do
+          before do
+            @a1 = attachment_model(context: @user)
+            @a2 = attachment_model(context: @user)
+            @attachment = Attachment.all
+          end
+
+          double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+            it "creates a file upload submission" do
+              @assignment.update(submission_types: "online_upload")
+              json = do_submit(submission_type: "online_upload", file_ids: [@a1.id, @a2.id])
+              sub_a1 = Attachment.where(root_attachment_id: @a1).first
+              sub_a2 = Attachment.where(root_attachment_id: @a2).first
+              expect(json["attachments"].pluck("url")).to eq [file_download_url(sub_a1, verifier: (sub_a1.uuid unless disable_adding_uuid_verifier_in_api), download: "1", download_frd: "1"),
+                                                              file_download_url(sub_a2, verifier: (sub_a2.uuid unless disable_adding_uuid_verifier_in_api), download: "1", download_frd: "1")]
+            end
+          end
         end
 
         it "creates a media comment submission" do

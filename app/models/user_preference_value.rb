@@ -228,5 +228,9 @@ class UserPreferenceValue < ActiveRecord::Base
         preferences[gb_pref_key] = new_gb_prefs
       end
     end
+
+    def get_latest_preference_setting_by_key(key, sub_key, setting, setting_key)
+      get_preference(key, sub_key)&.dig(setting, setting_key)&.last
+    end
   end
 end

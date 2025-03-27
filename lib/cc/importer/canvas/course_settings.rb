@@ -81,7 +81,8 @@ module CC::Importer::Canvas
          banner_image_identifier_ref
          course_color
          alt_name
-         time_zone].each do |string_type|
+         time_zone
+         default_due_time].each do |string_type|
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
       end
@@ -254,6 +255,7 @@ module CC::Importer::Canvas
         event["rrule"] = get_node_val(node, "rrule")
         event["series_uuid"] = get_node_val(node, "series_uuid")
         event["series_head"] = get_node_val(node, "series_head", nil)
+        event["blackout_date"] = get_bool_val(node, "blackout_date", false)
         events << event
       end
 

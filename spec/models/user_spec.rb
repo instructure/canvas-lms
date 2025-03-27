@@ -919,21 +919,25 @@ describe User do
 
     context "discussion checkpoints" do
       before do
-        course_with_student(active_all: true)
+        root_account = Account.default
+        sub_account = root_account.sub_accounts.create!(name: "sub-account")
+        course_with_student(active_all: true, account: sub_account)
         course_with_teacher(course: @course, active_all: true)
-        @course.account.enable_feature!(:discussion_checkpoints)
+        # checkpoints are unlocked and disabled in the root account and enabled in the sub-account
+        root_account.allow_feature!(:discussion_checkpoints)
+        sub_account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
       end
 
       it "does not include checkpoint submissions without recent feedback" do
-        expect(@student.recent_feedback(exclude_parent_assignment_submissions: true)).to be_empty
+        expect(@student.recent_feedback).to be_empty
       end
 
       it "includes checkpoint submissions with recent feedback" do
         @reply_to_topic.grade_student(@student, grade: 5, grader: @teacher)
         @reply_to_entry.grade_student(@student, grade: 8, grader: @teacher)
 
-        expect(@student.recent_feedback(exclude_parent_assignment_submissions: true)).to contain_exactly(
+        expect(@student.recent_feedback).to contain_exactly(
           @reply_to_topic.submission_for_student(@student),
           @reply_to_entry.submission_for_student(@student)
         )
@@ -942,7 +946,7 @@ describe User do
       it "does not include parent assignment submission with recent feedback" do
         parent_assignment_submission = @topic.assignment.grade_student(@student, grade: 10, sub_assignment_tag: "reply_to_topic", grader: @teacher)
 
-        expect(@student.recent_feedback(exclude_parent_assignment_submissions: true)).not_to include(
+        expect(@student.recent_feedback).not_to include(
           parent_assignment_submission
         )
       end
@@ -951,7 +955,7 @@ describe User do
         assignment = @course.assignments.create!(points_possible: 10)
         assignment_submission = assignment.submissions.find_by!(user: @student)
         assignment_submission.update!(last_comment_at: 1.day.ago, posted_at: nil)
-        expect(@student.recent_feedback(exclude_parent_assignment_submissions: true)).to contain_exactly(assignment_submission)
+        expect(@student.recent_feedback).to contain_exactly(assignment_submission)
       end
 
       it "includes both assignment submissions and discussion checkpoint submissions with recent feedback" do
@@ -961,7 +965,7 @@ describe User do
 
         @reply_to_topic.grade_student(@student, grade: 5, grader: @teacher)
         @reply_to_entry.grade_student(@student, grade: 8, grader: @teacher)
-        expect(@student.recent_feedback(exclude_parent_assignment_submissions: true)).to contain_exactly(
+        expect(@student.recent_feedback).to contain_exactly(
           assignment_submission,
           @reply_to_topic.submission_for_student(@student),
           @reply_to_entry.submission_for_student(@student)
@@ -2158,6 +2162,27 @@ describe User do
       expect(@user1.menu_courses).to eq [@course]
     end
 
+    context "with Horizon courses" do
+      before :once do
+        @course = course_factory(active_all: true)
+        @course.account.enable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: true)
+      end
+
+      it "shows Horizon courses for non-students" do
+        teacher = user_factory(active_all: true)
+        account_admin_user(account: @course.root_account, user: teacher)
+        @course.enroll_teacher(teacher)
+        expect(teacher.menu_courses).to eq [@course]
+      end
+
+      it "hides Horizon courses for students" do
+        student = user_factory(active_all: true)
+        @course.enroll_student(student)
+        expect(student.menu_courses).to eq []
+      end
+    end
+
     context "with favoriting" do
       before :once do
         k5_account = Account.create!(name: "Elementary")
@@ -2598,11 +2623,20 @@ describe User do
         expect(events.first).to eq assignment2
       end
 
-      it "includes sub assignments when include_sub_assignments is true" do
+      it "includes sub assignments if checkpoints are enabled in the accounts they are in" do
+        # root account has checkpoints OFF and unlocked, while sub-account has checkpoints ON
+        @course.root_account.set_feature_flag!(:discussion_checkpoints, Feature::STATE_DEFAULT_OFF)
+        sub_account = @course.root_account.sub_accounts.create!(name: "Sub Account")
+        @course.update!(account: sub_account)
         @course.account.enable_feature!(:discussion_checkpoints)
+
+        # sanity check
+        expect(@course.account.discussion_checkpoints_enabled?).to be_truthy
+        expect(@course.root_account.discussion_checkpoints_enabled?).to be_falsey
+
         reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
         context_codes = [@user.asset_string] + @user.cached_context_codes
-        events = @user.upcoming_events(context_codes:, include_sub_assignments: true)
+        events = @user.upcoming_events(context_codes:)
         expect(events).to match_array([reply_to_topic, reply_to_entry])
       end
 

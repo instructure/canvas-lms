@@ -21,11 +21,16 @@ import MobileNavigation from '../MobileNavigation'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import axios from 'axios'
+import $ from "jquery";
 
 const render = children =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
+// This is needed for $.screenReaderFlashMessageExclusive to work.
+import '@canvas/rails-flash-notifications'
+
 jest.mock('axios')
+jest.mock('../MobileContextMenu', () => () => <></>)
 
 describe('MobileNavigation', () => {
   beforeEach(() => {
@@ -49,17 +54,58 @@ describe('MobileNavigation', () => {
     jest.clearAllMocks()
   })
 
-  it('renders the inbox badge based on incoming state', async () => {
-    queryClient.setQueryData(['unread_count', 'conversations'], 123)
-    const hamburgerMenu = document.createElement('div')
-    hamburgerMenu.setAttribute('class', 'mobile-header-hamburger')
-    document.body.appendChild(hamburgerMenu)
-    const {findByText, queryByText} = render(<MobileNavigation />)
-    await userEvent.click(hamburgerMenu)
-    await waitFor(() => {
-      expect(queryByText('Loading ...')).not.toBeInTheDocument()
+  describe('screen reader announcements for menu expand/collapse', () => {
+    beforeEach(() => {
+      document.body.insertAdjacentHTML(
+        'beforeend',
+        '<div id="flash_screenreader_holder"></div>' +
+          '<div class="mobile-header-hamburger"></div>' +
+          '<div class="mobile-header-arrow"></div>',
+      )
     })
-    const count = await findByText('123')
-    expect(count).toBeInTheDocument()
+
+    it('does not update the live region on the first render', () => {
+      const flashMock = jest.spyOn($, 'screenReaderFlashMessageExclusive')
+      render(<MobileNavigation navIsOpen={false} />)
+      expect(flashMock).toHaveBeenCalledTimes(0)
+    })
+
+    it('announces when global navigation menu expanded/collapsed', async () => {
+      const flashMock = jest.spyOn($, 'screenReaderFlashMessageExclusive')
+      render(<MobileNavigation navIsOpen={false} />)
+      const globalNavButton = document.querySelector('.mobile-header-hamburger')
+      await userEvent.click(globalNavButton)
+      expect(flashMock).toHaveBeenCalledWith('Global navigation menu is now open')
+      await userEvent.click(globalNavButton)
+      expect(flashMock).toHaveBeenCalledWith('Global navigation menu is now closed')
+    })
+
+    it('announces when context navigation menu expanded/collapsed', async () => {
+      const flashMock = jest.spyOn($, 'screenReaderFlashMessageExclusive')
+      render(<MobileNavigation navIsOpen={false} />)
+      const contextNavButton = document.querySelector('.mobile-header-arrow')
+      await userEvent.click(contextNavButton)
+      expect(flashMock).toHaveBeenCalledWith('Course menu is now open')
+      await userEvent.click(contextNavButton)
+      expect(flashMock).toHaveBeenCalledWith('Course menu is now closed')
+    })
+  })
+
+  describe('inbox badge', () => {
+    beforeEach(() => {
+      document.body.insertAdjacentHTML('beforeend', '<div class="mobile-header-hamburger"></div>')
+    })
+
+    it('renders the badge based on incoming state', async () => {
+      const {findByText, queryByText} = render(<MobileNavigation />)
+      queryClient.setQueryData(['unread_count', 'conversations'], 123)
+      const hamburgerMenu = document.querySelector('.mobile-header-hamburger')
+      await userEvent.click(hamburgerMenu)
+      await waitFor(() => {
+        expect(queryByText('Loading ...')).not.toBeInTheDocument()
+      })
+      const count = await findByText('123')
+      expect(count).toBeInTheDocument()
+    })
   })
 })

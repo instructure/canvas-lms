@@ -22,7 +22,7 @@ import {executeQuery} from '@canvas/query/graphql'
 import useCoursePeopleContext from './useCoursePeopleContext'
 import type {User} from '../../types'
 
-type CoursePeopleQueryResponse = {
+export interface CoursePeopleQueryResponse{
   course: {
     usersConnection: {
       nodes: User[]
@@ -30,16 +30,35 @@ type CoursePeopleQueryResponse = {
   }
 }
 
-const useCoursePeopleQuery = ({courseId, searchTerm}: {courseId: string, searchTerm: string}) => {
-  const {currentUserId} = useCoursePeopleContext()
+export interface QueryProps {
+  courseId: string
+  searchTerm: string
+  optionId: string
+}
+
+const useCoursePeopleQuery = ({
+  courseId,
+  searchTerm,
+  optionId
+}: QueryProps) => {
+  const {currentUserId, allRoles} = useCoursePeopleContext()
   const shouldFetch = searchTerm === '' || searchTerm.length >= 2
   const searchTermKey = shouldFetch ? searchTerm : ''
+  const allRoleIds = allRoles.map(role => role.id)
+  const enrollmentRoleIds = allRoleIds.includes(optionId) ? [optionId] : undefined
 
   return useQuery({
     // currentUserId added to key so that data is refetched when swithching between Teacher and Student Views
-    queryKey: ['course_people', courseId, currentUserId, searchTermKey],
+    queryKey: ['course_people', courseId, currentUserId, searchTermKey, enrollmentRoleIds],
     queryFn: async () => {
-      const response = await executeQuery<CoursePeopleQueryResponse>(COURSE_PEOPLE_QUERY, {courseId, searchTerm})
+      const response = await executeQuery<CoursePeopleQueryResponse>(
+        COURSE_PEOPLE_QUERY,
+        {
+          courseId,
+          searchTerm,
+          enrollmentRoleIds
+        }
+      )
       return response?.course?.usersConnection?.nodes || []
     },
     enabled: shouldFetch

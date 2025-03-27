@@ -159,7 +159,7 @@ describe "better_file_browsing" do
         fln("example.pdf").click
       end
 
-      it "tabs through all buttons in the header button bar", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "tabs through all buttons in the header button bar", priority: "1", upgrade_files_v2: "done" do
         buttons = ff(".ef-file-preview-header-buttons > *")
         buttons.first.send_keys "" # focuses on the first button
         buttons.each do |button|
@@ -168,12 +168,12 @@ describe "better_file_browsing" do
         end
       end
 
-      it "returns focus to the link that was clicked when closing with the esc key", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "returns focus to the link that was clicked when closing with the esc key", priority: "1", upgrade_files_v2: "done" do
         driver.switch_to.active_element.send_keys :escape
         check_element_has_focus(fln("example.pdf"))
       end
 
-      it "returns focus to the link when the close button is clicked", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "returns focus to the link when the close button is clicked", priority: "1", upgrade_files_v2: "done" do
         f(".ef-file-preview-header-close").click
         check_element_has_focus(fln("example.pdf"))
       end
@@ -338,7 +338,6 @@ describe "better_file_browsing" do
       course_with_teacher_logged_in
       allow_any_instance_of(MediaObject).to receive(:grants_right?).with(anything, anything, :add_captions).and_return(true)
 
-      Account.site_admin.enable_feature!(:media_links_use_attachment_id)
       @att = Attachment.create! filename: "file.mp4", context: @course, media_entry_id: "mediaentryid", uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4")
       @mo = MediaObject.create! media_id: "mediaentryid", attachment: @att
 
@@ -412,7 +411,7 @@ describe "better_file_browsing" do
       get "/courses/#{@course.id}/files"
     end
 
-    it "switches files in preview when clicking the arrows", upgrade_files_v2: "waiting for deployment (RCX-2530)" do
+    it "switches files in preview when clicking the arrows", upgrade_files_v2: "done" do
       fln("a_file.txt").click
       ff(".ef-file-preview-container-arrow-link")[0].click
       expect(f(".ef-file-preview-header-filename")).to include_text("b_file.txt")
@@ -450,7 +449,7 @@ describe "better_file_browsing" do
           Account.site_admin.disable_feature! :consolidated_media_player
         end
 
-        it "works in the user's files page", upgrade_files_v2: "waiting for deployment (RCX-2530)" do
+        it "works in the user's files page", upgrade_files_v2: "done" do
           file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @teacher, "292.mp3")
           get "/files?preview=#{file.id}"
           wait_for_ajaximations
@@ -458,7 +457,7 @@ describe "better_file_browsing" do
           expect(ff("#media_preview")[0]).to include_text("Media has been queued for conversion, please try again in a little bit.")
         end
 
-        it "works in the course's files page", upgrade_files_v2: "waiting for deployment (RCX-2530)" do
+        it "works in the course's files page", upgrade_files_v2: "done" do
           file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @course, "292.mp3")
           get "/courses/#{@course.id}/files?preview=#{file.id}"
           wait_for_ajaximations
@@ -566,7 +565,7 @@ describe "better_file_browsing" do
     end
 
     context "user files" do
-      it "updates course files from user files page", priority: "1", upgrade_files_v2: "waiting for deployment (RCX-2535)" do
+      it "updates course files from user files page", priority: "1", upgrade_files_v2: "done" do
         get "/files/folder/courses_#{@course.id}/"
         f(".UsageRightsIndicator__openModal").click
         set_usage_rights_in_modal
@@ -596,7 +595,7 @@ describe "better_file_browsing" do
   end
 
   context "When Require Usage Rights is turned-off" do
-    it "sets files to published by default", priority: "1", upgrade_files_v2: "waiting for deployment (RCX-2535)" do
+    it "sets files to published by default", priority: "1", upgrade_files_v2: "done" do
       course_with_teacher_logged_in
       @course.usage_rights_required = true
       @course.save!

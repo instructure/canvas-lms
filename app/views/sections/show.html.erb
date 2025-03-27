@@ -124,7 +124,7 @@ h3 .tally {
 <table class="formtable">
   <tr>
     <td><label for="course_section_name">Section Name<abbr>*</abbr>:</label></td>
-    <td><%= f.text_field :name %><div id="course_section_name_errors"></div></td>
+    <td><%= f.text_field :name, "aria-describedby" => "course_section_name_errors" %><div id="course_section_name_errors"></div></td>
   </tr>
   <% if @section.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
     <tr>
@@ -180,6 +180,7 @@ h3 .tally {
                        value: datetime_string(@section.end_at),
                        style: 'width: 120px;',
                        "aria-labelledby" => "section_ends_at_label",
+                       "aria-describedby" => "course_section_end_at_errors",
                        "data-tooltip" => "",
                        title: accessible_date_format %>
       <div id="course_section_end_at_errors"></div>

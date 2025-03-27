@@ -17,18 +17,20 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act, screen} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {render, cleanup, screen} from '@testing-library/react'
 import useManagedCourseSearchApi from '@canvas/direct-sharing/react/effects/useManagedCourseSearchApi'
-import useModuleCourseSearchApi, {
-  useCourseModuleItemApi,
-} from '@canvas/direct-sharing/react/effects/useModuleCourseSearchApi'
+import useModuleCourseSearchApi from '@canvas/direct-sharing/react/effects/useModuleCourseSearchApi'
 import {FAKE_FILES} from '../../../../../fixtures/fakeData'
 import DirectShareCourseTray from '../DirectShareCourseTray'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import userEvent from '@testing-library/user-event'
 
 jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
 jest.mock('@canvas/direct-sharing/react/effects/useModuleCourseSearchApi')
+jest.mock('@canvas/do-fetch-api-effect')
+
+const courseA = {id: '1', name: 'Course A', course_code: '1', term: 'default term'}
+const courseB = {id: '2', name: 'Course B', course_code: '2', term: 'default term'}
 
 const defaultProps = {
   open: true,
@@ -51,20 +53,23 @@ describe('DirectShareCourseTray', () => {
   })
 
   afterAll(() => {
-    if (ariaLive) ariaLive.remove()
+    if (ariaLive) document.body.removeChild(ariaLive)
   })
 
   beforeEach(() => {
     ;(useManagedCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
-      success([
-        {id: 'abc', name: 'abc', course_code: '1', term: 'default term'},
-        {id: 'cde', name: 'cde', course_code: '1', term: 'default term'},
-      ])
+      success([courseA, courseB])
     })
+    ;(useModuleCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
+      success([])
+    })
+    ;(doFetchApi as jest.Mock).mockResolvedValue({})
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    jest.clearAllMocks()
+    jest.resetAllMocks()
+    cleanup()
   })
 
   it('shows the overwrite warning', () => {
@@ -74,94 +79,116 @@ describe('DirectShareCourseTray', () => {
     ).toBeInTheDocument()
   })
 
-  it('calls the onDismiss property', () => {
+  it('calls the onDismiss property', async () => {
     renderComponent()
-    fireEvent.click(screen.getByText(/cancel/i))
+    await userEvent.click(screen.getByTestId('direct-share-course-cancel'))
     expect(defaultProps.onDismiss).toHaveBeenCalled()
   })
 
-  // skip due to jenkins failure LX-2248
-  it.skip('starts a copy operation and reports status', async () => {
-    fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', {
-      id: '8',
-      workflow_state: 'running',
-    })
-    fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
+  it('starts a copy operation and reports status', async () => {
     renderComponent()
+
     const input = await screen.getByLabelText(/select a course/i)
     await userEvent.click(input)
-    await userEvent.type(input, 'abc')
-    await userEvent.click(screen.getByText('abc'))
+    await userEvent.type(input, courseA.name)
+    await userEvent.click(screen.getByText(courseA.name))
     await userEvent.click(screen.getByTestId('direct-share-course-copy'))
-    const mockCall = fetchMock.lastCall()
-    const fetchOptions = mockCall?.[1] || {}
-    expect(fetchOptions.method).toBe('POST')
-    expect(JSON.parse(fetchOptions.body?.toString() || '')).toMatchObject({
-      migration_type: 'course_copy_importer',
-      select: {attachments: ['178']},
-      settings: {source_course_id: '1'},
+
+    expect(doFetchApi as jest.Mock).toHaveBeenCalledWith({
+      method: 'POST',
+      path: `/api/v1/courses/1/content_migrations`,
+      body: {
+        migration_type: 'course_copy_importer',
+        select: {attachments: ['178']},
+        settings: {
+          source_course_id: '1',
+          insert_into_module_id: null,
+          associate_with_assignment_id: null,
+          is_copy_to: true,
+          insert_into_module_type: 'attachments',
+          insert_into_module_position: null,
+        },
+      },
     })
-    expect(screen.getAllByText(/start/i)[0]).toBeInTheDocument()
-    await act(() => {
-      fetchMock.flush(true)
-    })
-    expect(screen.getAllByText(/success/i)[0]).toBeInTheDocument()
+
+    expect(await screen.getAllByText(/start/i)[0]).toBeInTheDocument()
+    expect(await screen.getAllByText(/success/i)[0]).toBeInTheDocument()
+    expect(defaultProps.onDismiss).toHaveBeenCalled()
   })
 
-  // skip due to jenkins failure LX-2248
-  it.skip('deletes the module and removes the position selector when a new course is selected', async () => {
+  it('deletes the module and removes the position selector when a new course is selected', async () => {
     ;(useModuleCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
       success([
         {id: '1', name: 'Module 1'},
         {id: '2', name: 'Module 2'},
       ])
     })
+
     renderComponent()
+
     let input = await screen.getByLabelText(/select a course/i)
     await userEvent.click(input)
-    await userEvent.type(input, 'abc')
-    await userEvent.click(screen.getByText('abc'))
+    await userEvent.type(input, courseA.name)
+    await userEvent.click(screen.getByText(courseA.name))
 
     input = await screen.getByLabelText(/select a module/i)
     await userEvent.click(input)
     await userEvent.type(input, 'Module 1')
     await userEvent.click(screen.getByText('Module 1'))
-    expect(screen.getByTestId('select-position')).toBeInTheDocument()
+
+    expect(await screen.getByTestId('select-position')).toBeInTheDocument()
+    expect(doFetchApi).toHaveBeenCalled()
     ;(useManagedCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
-      success([{id: 'ghi', name: 'foo', course_code: '3', term: 'default term'}])
+      success([courseA, courseB])
     })
-    ;(useCourseModuleItemApi as jest.Mock).mockClear()
+    ;(doFetchApi as jest.Mock).mockClear()
 
     input = await screen.getByLabelText(/select a course/i)
     await userEvent.click(input)
-    await userEvent.type(input, 'f')
-    await userEvent.click(screen.getByText('foo'))
-    expect(screen.queryByTestId('select-position')).not.toBeInTheDocument()
-    expect(useCourseModuleItemApi).not.toHaveBeenCalled()
+    await userEvent.type(input, courseB.name)
+    await userEvent.click(screen.getByText(courseB.name))
+
+    expect(await screen.queryByTestId('select-position')).not.toBeInTheDocument()
+    expect(doFetchApi).not.toHaveBeenCalled()
   })
 
-  // skip due to jenkins failure RCX-3088 & RCX-3098
-  describe.skip('errors', () => {
+  describe('errors', () => {
     it('shows an error when user tries to submit without a selected course', async () => {
       renderComponent()
       await userEvent.click(screen.getByTestId('direct-share-course-copy'))
-      expect(screen.getByLabelText(/a course needs to be selected/i)).toBeInTheDocument()
+      expect(await screen.getByLabelText(/a course needs to be selected/i)).toBeInTheDocument()
     })
 
-    it.skip('reports an error if the fetch fails', async () => {
-      fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', 400)
-      fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
+    it('reports an error if the fetch fails', async () => {
+      ;(doFetchApi as jest.Mock).mockRejectedValueOnce(() => ({}))
+
       renderComponent()
       const input = await screen.getByLabelText(/select a course/i)
       await userEvent.click(input)
-      await userEvent.type(input, 'abc')
-      await userEvent.click(screen.getByText('abc'))
+      await userEvent.type(input, courseA.name)
+      await userEvent.click(screen.getByText(courseA.name))
       await userEvent.click(screen.getByTestId('direct-share-course-copy'))
-      await act(() => {
-        fetchMock.flush(true)
+
+      expect(doFetchApi as jest.Mock).toHaveBeenCalledWith({
+        method: 'POST',
+        path: `/api/v1/courses/1/content_migrations`,
+        body: {
+          migration_type: 'course_copy_importer',
+          select: {attachments: ['178']},
+          settings: {
+            source_course_id: '1',
+            insert_into_module_id: null,
+            associate_with_assignment_id: null,
+            is_copy_to: true,
+            insert_into_module_type: 'attachments',
+            insert_into_module_position: null,
+          },
+        },
       })
-      expect(screen.getAllByText(/start/i)[0]).toBeInTheDocument()
-      expect(screen.getAllByText(/failed/i)[0]).toBeInTheDocument()
+
+      expect(await screen.getAllByText(/start/i)[0]).toBeInTheDocument()
+      expect(await screen.getAllByText(/failed/i)[0]).toBeInTheDocument()
+      expect(defaultProps.onDismiss).not.toHaveBeenCalled()
     })
   })
 })

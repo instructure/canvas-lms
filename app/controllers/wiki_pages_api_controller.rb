@@ -462,6 +462,10 @@ class WikiPagesApiController < ApplicationController
       assign_todo_date
       update_params = get_update_params(allowed_fields)
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
+
+        # This ensures the context module's UI items are updated
+        @page.context_module_tags.each { |content_tag| content_tag.context_module&.touch }
+
         log_asset_access(@page, "wiki", @wiki, "participate")
         @page.context_module_action(@current_user, @context, :contributed)
         render json: wiki_page_json(@page, @current_user, session)

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {friendlyTypeName, isSubmitted, totalAllowedAttempts} from '../SubmissionHelpers'
+import {friendlyTypeName, isSubmitted, totalAllowedAttempts, activeTypeMeetsCriteria} from '../SubmissionHelpers'
 
 describe('totalAllowedAttempts', () => {
   it('returns null if allowedAttempts on the assignment is null', () => {
@@ -67,5 +67,50 @@ describe('isSubmitted', () => {
   it('returns false when the submission state is neither "submitted" nor "graded"', () => {
     const submission = {state: 'unsubmitted', attempt: 1}
     expect(isSubmitted(submission)).toBe(false)
+  })
+})
+
+describe('activeTypeMeetsCriteria', () => {
+  const submissionMock = {
+    submissionDraft: {
+      meetsMediaRecordingCriteria: true,
+      meetsTextEntryCriteria: false,
+      meetsUploadCriteria: true,
+      meetsUrlCriteria: false,
+      meetsStudentAnnotationCriteria: true,
+      meetsBasicLtiLaunchCriteria: false,
+    }
+  }
+
+  test('returns correct value for media_recording', () => {
+    expect(activeTypeMeetsCriteria('media_recording', submissionMock)).toBe(true)
+  })
+
+  test('returns correct value for online_text_entry', () => {
+    expect(activeTypeMeetsCriteria('online_text_entry', submissionMock)).toBe(false)
+  })
+
+  test('returns correct value for online_upload', () => {
+    expect(activeTypeMeetsCriteria('online_upload', submissionMock)).toBe(true)
+  })
+
+  test('returns correct value for online_url', () => {
+    expect(activeTypeMeetsCriteria('online_url', submissionMock)).toBe(false)
+  })
+
+  test('returns correct value for student_annotation', () => {
+    expect(activeTypeMeetsCriteria('student_annotation', submissionMock)).toBe(true)
+  })
+
+  test('returns correct value for basic_lti_launch', () => {
+    expect(activeTypeMeetsCriteria('basic_lti_launch', submissionMock)).toBe(false)
+  })
+
+  test('returns undefined for an unknown submission type', () => {
+    expect(activeTypeMeetsCriteria('invalid_type', submissionMock)).toBeUndefined()
+  })
+
+  test('returns undefined if submissionDraft is missing', () => {
+    expect(activeTypeMeetsCriteria('media_recording', {})).toBeUndefined()
   })
 })

@@ -27,7 +27,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import {useNewLogin, useNewLoginData} from '../context'
 import {ROUTES} from '../routes/routes'
 import {performSignIn} from '../services'
-import {ActionPrompt, RememberMeCheckbox, SSOButtons, SignInLinks} from '../shared'
+import {ActionPrompt, ForgotPasswordLink, RememberMeCheckbox, SSOButtons} from '../shared'
 import LoginAlert from '../shared/LoginAlert'
 import {createErrorMessage} from '../shared/helpers'
 import {SelfRegistrationType} from '../types'
@@ -215,7 +215,7 @@ const SignIn = () => {
             </Button>
 
             <Flex.Item align="center" overflowX="visible" overflowY="visible">
-              <SignInLinks />
+              <ForgotPasswordLink />
             </Flex.Item>
           </Flex>
         </Flex>

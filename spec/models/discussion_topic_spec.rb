@@ -3622,6 +3622,60 @@ describe DiscussionTopic do
     end
   end
 
+  describe "user_can_access_insights" do
+    before do
+      @course = course_factory(active_all: true)
+      @admin = account_admin_user(account: @course.root_account)
+      @teacher = user_model
+      @course.enroll_teacher(@teacher, enrollment_state: "active")
+      @student = user_model
+      @course.enroll_student(@student, enrollment_state: "active")
+      @observer = user_model
+      @course.enroll_user(@observer, "ObserverEnrollment").update_attribute(:associated_user_id, @student.id)
+      @ta = user_model
+      @course.enroll_ta(@ta, enrollment_state: "active")
+      @designer = user_model
+      @course.enroll_designer(@designer, enrollment_state: "active")
+
+      @topic = @course.discussion_topics.create!(title: "topic")
+    end
+
+    it "does not allow to access insights if the feature is disabled" do
+      expect(@topic.user_can_access_insights?(@teacher)).to be false
+      expect(@topic.user_can_access_insights?(@ta)).to be false
+      expect(@topic.user_can_access_insights?(@admin)).to be false
+      expect(@topic.user_can_access_insights?(@designer)).to be false
+      expect(@topic.user_can_access_insights?(@observer)).to be false
+      expect(@topic.user_can_access_insights?(@student)).to be false
+    end
+
+    it "allows instructors and read admins to access insights if the feature is enabled" do
+      @course.enable_feature!(:discussion_insights)
+
+      expect(@topic.user_can_access_insights?(@teacher)).to be true
+      expect(@topic.user_can_access_insights?(@ta)).to be true
+      expect(@topic.user_can_access_insights?(@admin)).to be true
+      expect(@topic.user_can_access_insights?(@designer)).to be true
+
+      expect(@topic.user_can_access_insights?(@observer)).to be false
+      expect(@topic.user_can_access_insights?(@student)).to be false
+    end
+
+    it "does not crash if the topic is in the context of a group with account context" do
+      account = @course.root_account
+      account.enable_feature!(:discussion_insights)
+      group = account.groups.create!
+      topic = group.discussion_topics.create!(title: "topic")
+
+      expect(topic.user_can_access_insights?(@teacher)).to be false
+      expect(topic.user_can_access_insights?(@ta)).to be false
+      expect(topic.user_can_access_insights?(@admin)).to be false
+      expect(topic.user_can_access_insights?(@designer)).to be false
+      expect(topic.user_can_access_insights?(@observer)).to be false
+      expect(topic.user_can_access_insights?(@student)).to be false
+    end
+  end
+
   describe "low_level_locked_for?" do
     before :once do
       @topic = @course.discussion_topics.create!(title: "topic")
@@ -3931,7 +3985,11 @@ describe DiscussionTopic do
       end
 
       it "falls back to the topic's sort order if the participant's sort order is not set" do
-        expect(@topic.sort_order_for_user(@student)).to eq "asc"
+        @topic.update_or_create_participant(current_user: @student, sort_order: "inherit")
+        expect(@topic.sort_order_for_user(@student)).to eq DiscussionTopic::SortOrder::ASC
+        @topic.sort_order = DiscussionTopic::SortOrder::DESC
+        @topic.save!
+        expect(@topic.sort_order_for_user(@student)).to eq DiscussionTopic::SortOrder::DESC
       end
     end
 
@@ -3950,17 +4008,15 @@ describe DiscussionTopic do
         expanded = false
         topic1 = @course.discussion_topics.create!(user: @teacher, sort_order:, expanded:)
 
-        participant = topic1.participant(@teacher)
-        expect(participant.sort_order).to eq sort_order
-        expect(participant.expanded).to eq expanded
+        expect(topic1.sort_order_for_user(@teacher)).to eq sort_order
+        expect(topic1.expanded_for_user(@teacher)).to eq expanded
 
         sort_order = "desc"
         expanded = true
         topic2 = @course.discussion_topics.create!(user: @teacher, sort_order:, expanded:)
 
-        participant = topic2.participant(@teacher)
-        expect(participant.sort_order).to eq sort_order
-        expect(participant.expanded).to eq expanded
+        expect(topic2.sort_order_for_user(@teacher)).to eq sort_order
+        expect(topic2.expanded_for_user(@teacher)).to eq expanded
       end
     end
   end

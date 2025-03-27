@@ -30,24 +30,23 @@ describe Translation do
 
   before do
     allow(described_class).to receive(:translation_client).and_return(translation_client)
-    allow(Account.site_admin).to receive(:feature_enabled?).with(:ai_translation_improvements).and_return(true)
   end
 
   describe "available?" do
     let(:context) { double("Context", feature_enabled?: true) }
 
     it "returns true if feature flag is enabled and translation client is present" do
-      expect(described_class.available?(context, :some_flag)).to be true
+      expect(described_class.available?(context, :some_flag, true)).to be true
     end
 
     it "returns false if feature flag is disabled" do
       allow(context).to receive(:feature_enabled?).with(:some_flag).and_return(false)
-      expect(described_class.available?(context, :some_flag)).to be false
+      expect(described_class.available?(context, :some_flag, true)).to be false
     end
 
     it "returns false if translation client is not present" do
       allow(described_class).to receive(:translation_client).and_return(nil)
-      expect(described_class.available?(context, :some_flag)).to be false
+      expect(described_class.available?(context, :some_flag, true)).to be false
     end
   end
 
@@ -57,16 +56,16 @@ describe Translation do
 
     it "returns nil if translation client is not present" do
       allow(described_class).to receive(:translation_client).and_return(nil)
-      expect(described_class.translate_text(text: text, tgt_lang: "es")).to be_nil
+      expect(described_class.translate_text(text:, tgt_lang: "es")).to be_nil
     end
 
     it "returns nil if tgt_lang is nil" do
-      expect(described_class.translate_text(text: text, tgt_lang: nil)).to be_nil
+      expect(described_class.translate_text(text:, tgt_lang: nil)).to be_nil
     end
 
     it "translates text when src_lang and tgt_lang are provided" do
       allow(translation_client).to receive(:translate_text).and_return(result)
-      expect(described_class.translate_text(text: text, tgt_lang: "es")).to eq("Hola, mundo!")
+      expect(described_class.translate_text(text:, tgt_lang: "es")).to eq("Hola, mundo!")
     end
 
     context "when target language is identical to detected source language" do
@@ -74,7 +73,7 @@ describe Translation do
 
       it "raises SameLanguageTranslationError" do
         allow(translation_client).to receive(:translate_text).and_return(result)
-        expect { described_class.translate_text(text: text, tgt_lang: "es") }.to raise_error(Translation::SameLanguageTranslationError)
+        expect { described_class.translate_text(text:, tgt_lang: "es") }.to raise_error(Translation::SameLanguageTranslationError)
       end
     end
   end

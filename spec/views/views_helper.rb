@@ -46,7 +46,7 @@ RSpec.shared_context "lti_layout_spec_helper" do
     allow(tag).to receive_messages(new_tab: true, quiz_lti: true)
     allow(tool).to receive(:login_or_launch_url).with(any_args).and_return("https://example.com")
     allow(tool).to receive(:use_1_3?).and_return(true)
-    allow(ContextExternalTool).to receive(:find_external_tool).with(any_args).and_return(tool)
+    allow(Lti::ToolFinder).to receive(:from_url).with(any_args).and_return(tool)
   end
 
   let(:request) { LtiLayoutSpecHelper.create_request }

@@ -375,9 +375,10 @@ module AccountReports::ReportHelper
 
     @account_report.update(total_lines: total_runners)
 
-    args = { priority: Delayed::LOW_PRIORITY, n_strand: ["account_report_runner", root_account.global_id] }
-    # allow retries if account report runner fails
-    args[:max_attempts] = 2 if root_account.feature_enabled?(:custom_report_experimental)
+    args = { priority: Delayed::LOW_PRIORITY,
+             n_strand: ["account_report_runner", root_account.global_id],
+             max_attempts: 2,
+             on_permanent_failure: :fail_with_error }
     @account_report.account_report_runners.find_each do |runner|
       delay(**args).run_account_report_runner(runner, headers, files:)
     end
@@ -511,7 +512,6 @@ module AccountReports::ReportHelper
       Canvas::Errors.capture_exception(:account_report, error)
       @account_report.workflow_state = "error"
       @account_report.save!
-      raise error
     end
   end
 

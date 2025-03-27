@@ -610,9 +610,6 @@ export const AddressBook = ({
                   type="search"
                   aria-owns={popoverInstanceId.current}
                   aria-label={ariaAddressBookLabel}
-                  aria-labelledby={`address-book-form ${selectedMenuItems
-                    .map(u => `address-book-label-${u?.id}-${u?.itemType}`)
-                    .join(' ')}`}
                   aria-autocomplete="list"
                   autoComplete="off"
                   inputRef={ref => {

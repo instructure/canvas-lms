@@ -172,7 +172,7 @@ function generateEmptyState() {
 
 function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
   const $calendarFeedModalContent = $('#calendar_feed_box')
-  const $calendarFeedModalOpener = $('.dialog_opener[aria-controls="calendar_feed_box"]')
+  const $calendarFeedModalOpener = $('#calendar-feed .dialog_opener')
   // We need to get the modal initialized early rather than wait for
   // .dialog_opener to open it so we can attach the event to it the first
   // time.  We extend so that we still get all the magic that .dialog_opener
@@ -193,6 +193,10 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
       $calendarFeedModalOpener.data('dialogOpts'),
     ),
   )
+
+  $calendarFeedModalOpener.on('click', () => {
+    $calendarFeedModalContent.dialog('open');
+  })
 
   $calendarFeedModalContent.on('dialogclose', () => {
     forceScreenreaderToReparse($('#application')[0])

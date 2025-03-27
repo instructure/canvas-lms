@@ -22,7 +22,6 @@ import React from 'react'
 import {MemoryRouter, useNavigate} from 'react-router-dom'
 import {ActionPrompt} from '..'
 import {NewLoginDataProvider, NewLoginProvider} from '../../context'
-import {ROUTES} from '../../routes/routes'
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -65,7 +64,7 @@ describe('ActionPrompt', () => {
     expect(screen.getByText('Already have an account?')).toBeInTheDocument()
     const link = screen.getByText('Log in')
     expect(link).toBeInTheDocument()
-    expect(link).toHaveAttribute('href', ROUTES.SIGN_IN)
+    expect(link).toHaveAttribute('href', '/login/canvas')
     expect(screen.queryByText('Log in or')).not.toBeInTheDocument()
   })
 
@@ -82,7 +81,7 @@ describe('ActionPrompt', () => {
     expect(screen.getByText('Log in or')).toBeInTheDocument()
     const link = screen.getByText('create an account.')
     expect(link).toBeInTheDocument()
-    expect(link).toHaveAttribute('href', ROUTES.REGISTER)
+    expect(link).toHaveAttribute('href', '/login/canvas/register')
     expect(screen.queryByText('Already have an account?')).not.toBeInTheDocument()
   })
 
@@ -99,7 +98,7 @@ describe('ActionPrompt', () => {
     expect(screen.getByText('Have a pairing code?')).toBeInTheDocument()
     const link = screen.getByText('Create a Parent Account')
     expect(link).toBeInTheDocument()
-    expect(link).toHaveAttribute('href', ROUTES.REGISTER_PARENT)
+    expect(link).toHaveAttribute('href', '/login/canvas/register/parent')
     expect(screen.queryByText('Log in or')).not.toBeInTheDocument()
   })
 
@@ -129,7 +128,7 @@ describe('ActionPrompt', () => {
     )
     const link = screen.getByText('Log in')
     await userEvent.click(link)
-    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.SIGN_IN)
+    expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
     expect(mockNavigate).toHaveBeenCalledTimes(1)
   })
 })

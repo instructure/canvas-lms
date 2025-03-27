@@ -27,7 +27,7 @@ for authentication and authorization of the Canvas API. Additionally, Canvas use
   - [DELETE login/oauth2/token](file.oauth_endpoints.html#delete-login-oauth2-token)
   - [GET login/session_token](file.oauth_endpoints.html#get-login-session-token)
 
-### [Accessing LTI Advantage Services](#accessing-lti-advantage-services)
+### [Accessing LTI Advantage Services](#accessing-lti-advantage-services-link)
 - [Step 1: Developer Key Setup](#developer-key-setup)
 - [Step 2: Request an Access Token](#request-access-token)
 - [Step 3: Use the access token to access LTI services](#use-access-token)
@@ -297,7 +297,7 @@ refresh token is to be reused.
 
 To logout, simply send a [DELETE request to login/oauth2/token](file.oauth_endpoints.html#delete-login-oauth2-token)
 
-# [Accessing LTI Advantage Services](#accessing-lti-advantage-services) <a name="accessing-lti-advantage-services"></a>
+# [Accessing LTI Advantage Services](#accessing-lti-advantage-services) <a name="accessing-lti-advantage-services-link"></a>
 <small><a href="#top">Back to Top</a></small>
 
 <p>LTI Advantage services, such as <a href="https://www.imsglobal.org/spec/lti-nrps/v2p0" target="_blank">Names and Role Provisioning Services</a> and <a href="https://www.imsglobal.org/spec/lti-ags/v2p0/" target="_blank">Assignment and Grade Services</a>, require use of a client credentials grant flow for request authentication. This workflow is best summarized on the IMS Security Framework (specifically <a href="https://www.imsglobal.org/spec/security/v1p0/#using-oauth-2-0-client-credentials-grant" target="_blank">Section 4</a>).</p> Our goal here is to highlight some nuances that might help you access these services in Canvas, rather than describing the specification in detail.</p>

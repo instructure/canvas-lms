@@ -18,9 +18,10 @@
 #
 
 describe Attachments::S3Storage do
+  let(:attachment) { attachment_model }
+
   describe "#sign_policy" do
     # example values from http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-post-example.html
-    let(:attachment) { attachment_model }
     let(:access_key_id) { "AKIAIOSFODNN7EXAMPLE" }
     let(:secret_access_key) { "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" }
     let(:datetime) { "20151229T000000Z" }
@@ -55,6 +56,27 @@ describe Attachments::S3Storage do
       store = Attachments::S3Storage.new(attachment)
       _sig_key, sig_val = store.sign_policy(string_to_sign, datetime)
       expect(sig_val).to eq signature
+    end
+  end
+
+  describe "#open" do
+    before { s3_storage! }
+
+    context "when the attachment exists" do
+      it "returns a tempfile" do
+        result = attachment.open
+        expect(result).to be_a(Tempfile)
+      end
+
+      it "downloads the file to the tempfile" do
+        expect_any_instance_of(Aws::S3::Object).to receive(:get).once
+        attachment.open
+      end
+
+      it "validates the hash if integrity_check is true" do
+        expect(attachment).to receive(:validate_hash)
+        attachment.open(integrity_check: true)
+      end
     end
   end
 end

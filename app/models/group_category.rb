@@ -607,6 +607,10 @@ class GroupCategory < ActiveRecord::Base
     ActiveRecord::Base.connection.execute(sql).first["diff_tag_count"].to_i
   end
 
+  def single_tag?
+    groups.count == 1 && groups.first.name == name
+  end
+
   protected
 
   def validate_non_collaborative_constraints

@@ -37,6 +37,7 @@ import fetchMock from 'jest-fetch-mock'
 // ReactDOM might be required for dynamic rendering in certain scenarios.
 import ReactDOM from 'react-dom'
 import { waitFor } from '@testing-library/react'
+import {createRoot} from "react-dom/client"
 
 jest.mock('jquery-ui', () => {
   const $ = require('jquery')
@@ -50,6 +51,16 @@ jest.mock('jquery-ui', () => {
   }
   return $
 })
+
+jest.mock('../../../react/AssetProcessors', () => ({
+  attach: ({container, initialAttachedProcessors, courseId, secureParams}) => {
+    const initialJson = JSON.stringify(initialAttachedProcessors)
+    const el = <div>
+      AssetProcessors initialAttachedProcessors={initialJson} courseId={courseId} secureParams={secureParams}
+    </div>
+    createRoot(container).render(el)
+  }
+}))
 
 const s_params = 'some super secure params'
 const currentOrigin = window.location.origin
@@ -303,35 +314,59 @@ describe('EditView', () => {
     })
   })
 
-  describe('Asset Processor Modal Launcher', () => {
-    it('attaches AssetProcessorModalLauncher component when FF is on', async () => {
-      window.ENV.FEATURES = {lti_asset_processor: true}
+  describe('Asset Processors', () => {
+    function createEditViewOnlineSubmission({textEntry, onlineUpload, onlineUrl} = {}) {
       const view = createEditView()
+      view.$('#assignment_submission_type').val('online')
+      view.$('#assignment_online_upload').prop('checked', !!onlineUpload)
+      view.$('#assignment_text_entry').prop('checked', !!textEntry)
+      view.$('#assignment_online_url').prop('checked', !!onlineUrl)
+      view.handleSubmissionTypeChange()
+      return view
+    }
+
+    it('attaches AssetProcessors component when FF is on', async () => {
+      window.ENV.FEATURES = {lti_asset_processor: true}
+      const view = createEditViewOnlineSubmission({onlineUpload: true})
       await waitFor(() => {
-        expect(view.$activityAssetProcessorContainer.children()).toHaveLength(1)
+        expect(view.$assetProcessorsContainer.children()).toHaveLength(1)
+      })
+      await waitFor(() => {
+        expect(view.$assetProcessorsContainer.text()).toBe(
+        'AssetProcessors initialAttachedProcessors=[] courseId=1 secureParams=some super secure params'
+      )
       })
     })
 
-    it('does not attach AssetProcessorModalLauncher component when FF is off', async () => {
+    it('contains the correct initialAttachedProcessors', async () => {
+      window.ENV.FEATURES = {lti_asset_processor: true}
+      window.ENV.ASSET_PROCESSORS = [{id: 1}] // rest of the fields omitted here for brevity
+      const view = createEditViewOnlineSubmission({onlineUpload: true})
+      await waitFor(() => {
+        expect(view.$assetProcessorsContainer.text()).toBe(
+        'AssetProcessors initialAttachedProcessors=[{"id":1}] courseId=1 secureParams=some super secure params'
+      )
+      })
+    })
+
+    it('does not attach AssetProcessors component when FF is off', async () => {
       window.ENV.FEATURES = {lti_asset_processor: false}
-      const view = createEditView()
+      const view = createEditViewOnlineSubmission({onlineUpload: true})
       await waitFor(() => {
-        expect(view.$activityAssetProcessorContainer.children()).toHaveLength(0)
+        expect(view.$assetProcessorsContainer.children()).toHaveLength(0)
       })
       // Ensure no children are added after the initial render
       await new Promise((resolve) => setTimeout(resolve, 100))
-      expect(view.$activityAssetProcessorContainer.children()).toHaveLength(0)
+      expect(view.$assetProcessorsContainer.children()).toHaveLength(0)
     })
 
-    it('does not attach AssetProcessorModalLauncher when editing an existing assignment', async () => {
+    it('is hidden if submission type does not include online with a file upload', () => {
       window.ENV.FEATURES = {lti_asset_processor: true}
-      const view = createEditView({id: 1})
-      await waitFor(() => {
-        expect(view.$activityAssetProcessorContainer.children()).toHaveLength(0)
-      })
-      // Ensure no children are added after the initial render
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      expect(view.$activityAssetProcessorContainer.children()).toHaveLength(0)
+      let view = createEditViewOnlineSubmission({onlineUpload: true})
+      expect(view.$assetProcessorsContainer.css('display')).toBe('block')
+
+      view = createEditViewOnlineSubmission({onlineTextEntry: true, onlineUrl: true})
+      expect(view.$assetProcessorsContainer.css('display')).toBe('none')
     })
   })
 

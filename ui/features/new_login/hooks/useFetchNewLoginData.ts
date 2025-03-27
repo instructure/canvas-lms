@@ -53,15 +53,6 @@ const transformPasswordPolicy = (rawPolicy: any): PasswordPolicy => {
   }
 
   return {
-    disallowCommonPasswords: rawPolicy.disallow_common_passwords === 'true',
-    maxRepeats: rawPolicy.max_repeats ? parseInt(rawPolicy.max_repeats, 10) : undefined,
-    maxSequence: rawPolicy.max_sequence ? parseInt(rawPolicy.max_sequence, 10) : undefined,
-    maximumCharacterLength: rawPolicy.maximum_character_length
-      ? parseInt(rawPolicy.maximum_character_length, 10)
-      : undefined,
-    maximumLoginAttempts: rawPolicy.maximum_login_attempts
-      ? parseInt(rawPolicy.maximum_login_attempts, 10)
-      : undefined,
     minimumCharacterLength: rawPolicy.minimum_character_length
       ? parseInt(rawPolicy.minimum_character_length, 10)
       : undefined,

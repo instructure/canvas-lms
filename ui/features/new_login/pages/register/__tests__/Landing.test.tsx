@@ -20,7 +20,6 @@ import {fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider} from '../../../context'
-import {ROUTES} from '../../../routes/routes'
 import Landing from '../Landing'
 
 const mockNavigate = jest.fn()
@@ -70,15 +69,15 @@ describe('Landing', () => {
     renderLanding()
     expect(screen.getByLabelText('Create Teacher Account')).toHaveAttribute(
       'href',
-      ROUTES.REGISTER_TEACHER,
+      '/login/canvas/register/teacher',
     )
     expect(screen.getByLabelText('Create Student Account')).toHaveAttribute(
       'href',
-      ROUTES.REGISTER_STUDENT,
+      '/login/canvas/register/student',
     )
     expect(screen.getByLabelText('Create Parent Account')).toHaveAttribute(
       'href',
-      ROUTES.REGISTER_PARENT,
+      '/login/canvas/register/parent',
     )
   })
 
@@ -86,7 +85,7 @@ describe('Landing', () => {
     renderLanding()
     const teacherCard = screen.getByLabelText('Create Teacher Account')
     fireEvent.click(teacherCard)
-    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.REGISTER_TEACHER)
+    expect(mockNavigate).toHaveBeenCalledWith('/login/canvas/register/teacher')
   })
 
   it('prevents navigation when a “ui action” is pending', () => {

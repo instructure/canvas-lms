@@ -44,7 +44,7 @@ describe Lti::AccountBindingService do
   let_once(:overwrite_created_by) { false }
 
   it "returns a hash with the registration and developer key account bindings" do
-    expect(subject).to eq(lti_registration_account_binding: registration_account_binding, developer_key_account_binding: developer_key_account_binding)
+    expect(subject).to eq(lti_registration_account_binding: registration_account_binding, developer_key_account_binding:)
   end
 
   context "something goes wrong updating a model" do

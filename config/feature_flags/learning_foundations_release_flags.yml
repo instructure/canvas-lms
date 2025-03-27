@@ -16,6 +16,8 @@ assignments_2_teacher:
   applies_to: Course
   root_opt_in: true
   environments:
+    development:
+      state: disabled
     production:
       state: disabled
 
@@ -48,7 +50,7 @@ course_paces:
 course_paces_skip_selected_days:
   state: hidden
   display_name: 'Course Pacing Skip Selected Days'
-  description: Course pacing removes support for exclude weekends field and add the 
+  description: Course pacing removes support for exclude weekends field and add the
         ability to select specific days of the week.
   applies_to: RootAccount
   beta: true

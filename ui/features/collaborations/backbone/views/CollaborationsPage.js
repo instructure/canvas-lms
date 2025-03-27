@@ -17,16 +17,19 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {each, reject} from 'lodash'
 import {View} from '@canvas/backbone'
 import CollaborationView from './CollaborationView'
 import CollaborationFormView from './CollaborationFormView'
 
+const I18n = createI18nScope('collaborations')
+
 extend(CollaborationsPage, View)
 
 function CollaborationsPage() {
-  this.onFormError = this.onFormError.bind(this)
+  this.onFormValidate = this.onFormValidate.bind(this)
   this.onFormHide = this.onFormHide.bind(this)
   this.onCollaborationDelete = this.onCollaborationDelete.bind(this)
   this.initPageState = this.initPageState.bind(this)
@@ -73,12 +76,12 @@ CollaborationsPage.prototype.createViews = function () {
 }
 
 CollaborationsPage.prototype.attachEvents = function () {
-  this.addFormView.on('hide', this.onFormHide).on('error', this.onFormError)
+  this.addFormView.on('hide', this.onFormHide).on('validate', this.onFormValidate)
   each(
     this.collaborationViews,
     (function (_this) {
       return function (view) {
-        return view.on('delete', _this.onCollaborationDelete)
+        return view.on('delete', _this.onCollaborationDelete).on('validate', _this.onFormValidate)
       }
     })(this),
   )
@@ -106,8 +109,33 @@ CollaborationsPage.prototype.onFormHide = function () {
   return this.$addLink.focus()
 }
 
-CollaborationsPage.prototype.onFormError = function ($input, message) {
-  return $input.focus().errorBox(message)
+CollaborationsPage.prototype.onFormValidate = function (e, $form, collaborationId) {
+  let formValid = true
+  const data = $form.getFormData()
+  const titleInputId = collaborationId ? `collaboration_${collaborationId}_title` : 'collaboration_title'
+  const $titleInput = $form.find(`#${titleInputId}`)
+  if (!data['collaboration[title]']) {
+    $titleInput.focus().errorBox(I18n.t('Please add a document name'))
+    formValid = false
+  }
+  if (ENV.TITLE_MAX_LEN && data['collaboration[title]'].length > ENV.TITLE_MAX_LEN) {
+    $titleInput.focus().errorBox(
+      I18n.t('errors.title_too_long',
+        'Please use %{maxLength} characters or less for the name. Use the description for additional content.',
+        {maxLength: ENV.TITLE_MAX_LEN}
+      )
+    )
+    formValid = false
+  }
+
+  if (!formValid) {
+    e.preventDefault()
+    e.stopPropagation()
+  } else if (!collaborationId) {
+    setTimeout(function () {
+      return (window.location = window.location.pathname)
+    }, 2500)
+  }
 }
 
 export default CollaborationsPage

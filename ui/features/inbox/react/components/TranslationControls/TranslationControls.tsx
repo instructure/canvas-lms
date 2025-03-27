@@ -16,16 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Flex} from '@instructure/ui-flex'
-import {RadioInput} from '@instructure/ui-radio-input'
-import {Checkbox} from '@instructure/ui-checkbox'
+import { Flex } from '@instructure/ui-flex'
+import { Checkbox } from '@instructure/ui-checkbox'
 
-import React, {useState, useRef, useEffect, useMemo} from 'react'
-import {signatureSeparator, translationSeparator} from '../../utils/constants'
-import {stripSignature} from '../../utils/inbox_translator'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasMultiSelect from '@canvas/multi-select/react'
-import { useTranslationContext } from '../../hooks/useTranslationContext'
+import React, { useState } from 'react'
+import { useScope as createI18nScope } from '@canvas/i18n'
+import TranslationOptions from './TranslationOptions'
+import useTranslationDisplay from '../../hooks/useTranslationDisplay'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -34,122 +31,19 @@ interface TranslationControlsProps {
   signature: string
 }
 
-interface Language {
+export interface Language {
   id: string
   name: string
 }
 
 const TranslationControls = (props: TranslationControlsProps) => {
-  // @ts-expect-error
-  const languages = useRef<Language[]>(ENV?.inbox_translation_languages ?? [])
   const [includeTranslation, setIncludeTranslation] = useState(false)
-  const {
-    setMessagePosition,
-    messagePosition,
-    setTranslationTargetLanguage,
-    translateBody,
-    body,
-    setBody,
-  } = useTranslationContext()
-  const [input, setInput] = useState('English')
-  const [selected, setSelected] = useState<Language['id'] | null>(null)
 
-  // If we have a message position, the message has been translated.
-  const primary = useMemo(() => {
-    if (messagePosition === null) {
-      return null
-    }
-
-    return messagePosition === 'primary'
-  }, [messagePosition])
-
-  const translated = useMemo(() => {
-    return messagePosition !== null && body.includes(translationSeparator)
-  }, [messagePosition, body])
-
-  /**
-   * Handle placing translated message in primary or secondary position
-   * */
-  const handleChange = (isPrimary: boolean) => {
-    // If not already translated, translate the body.
-    setMessagePosition(isPrimary ? 'primary' : 'secondary')
-    if (!translated) {
-      translateBody(isPrimary)
-      return
-    }
-
-    setBody(prevBody => {
-      let newBody = prevBody
-      // Strip the signature
-      if (props.inboxSettingsFeature && props.signature !== '') {
-        newBody = stripSignature(prevBody)
-      }
-
-      // Split on the translation separator
-      const [part1, part2] = newBody.split(translationSeparator)
-      // Flip the message
-      newBody = [part2, part1].join(translationSeparator)
-
-      // Add the signature back in.
-      if (props.inboxSettingsFeature && props.signature !== '' && props.signature !== undefined) {
-        return [newBody, props.signature].join(signatureSeparator)
-      }
-
-      // No signature, return the body flipped.
-      return newBody
-    })
-  }
-
-  const handleIncludeTranslation = (shouldInclude: boolean) => setIncludeTranslation(shouldInclude)
-
-  useEffect(() => {
-    if (!includeTranslation && translated) {
-      setMessagePosition(null)
-      setBody(prevBody => {
-        if (props.inboxSettingsFeature && props.signature !== '') {
-          prevBody = stripSignature(prevBody)
-        }
-
-        const [part1, part2] = prevBody.split(translationSeparator)
-        const newBody = messagePosition === 'primary' ? part2 : part1
-
-        if (props.inboxSettingsFeature && props.signature !== '') {
-          return [newBody, props.signature].join(signatureSeparator)
-        }
-
-        return newBody
-      })
-    }
-  }, [
-    includeTranslation,
-    setMessagePosition,
-    messagePosition,
-    props.inboxSettingsFeature,
-    props.signature,
-    setBody,
-    translated,
-  ])
-
-  const handleSelect = (selectedArray: string[]) => {
-    const id = selectedArray[0]
-    const result = languages.current.find(({id: _id}) => id === _id)
-
-    if (!result) {
-      return
-    }
-
-    setInput(result.name)
-    setSelected(result.id)
-    setTranslationTargetLanguage(result.id)
-  }
-
-  const filteredLanguages: Language[] = useMemo(() => {
-    if (!input) {
-      return languages.current
-    }
-
-    return languages.current.filter(({name}) => name.toLowerCase().startsWith(input.toLowerCase()))
-  }, [languages, input])
+  const { handleIsPrimaryChange, primary } = useTranslationDisplay({
+    signature: props.signature,
+    inboxSettingsFeature: props.inboxSettingsFeature,
+    includeTranslation
+  })
 
   return (
     <>
@@ -158,52 +52,17 @@ const TranslationControls = (props: TranslationControlsProps) => {
           <Checkbox
             label={I18n.t('Include translated version of this message')}
             value="medium"
+            variant="toggle"
             checked={includeTranslation}
-            onChange={() => handleIncludeTranslation(!includeTranslation)}
+            onChange={() => setIncludeTranslation(!includeTranslation)}
           />
         </Flex.Item>
       </Flex>
       {includeTranslation && (
-        <Flex justifyItems="space-around" alignItems="center" margin="0 0 small">
-          <Flex.Item padding="small 0 0">
-            <CanvasMultiSelect
-              label={I18n.t('Select Translation Language')}
-              onChange={handleSelect}
-              inputValue={input}
-              onInputChange={e => setInput(e.target.value)}
-            >
-              {filteredLanguages.map(({id, name}) => (
-                <CanvasMultiSelect.Option
-                  key={id}
-                  label={name}
-                  id={id}
-                  value={name}
-                  isSelected={id === selected}
-                >
-                  {name}
-                </CanvasMultiSelect.Option>
-              ))}
-            </CanvasMultiSelect>
-          </Flex.Item>
-          <Flex.Item>
-            <RadioInput
-              label={I18n.t('As secondary')}
-              value="secondary"
-              name="secondary"
-              checked={primary === false}
-              onChange={() => handleChange(false)}
-            />
-          </Flex.Item>
-          <Flex.Item>
-            <RadioInput
-              label={I18n.t('As primary')}
-              value="primary"
-              name="primary"
-              checked={primary === true}
-              onChange={() => handleChange(true)}
-            />
-          </Flex.Item>
-        </Flex>
+        <TranslationOptions
+          asPrimary={primary}
+          onSetPrimary={handleIsPrimaryChange}
+        />
       )}
     </>
   )

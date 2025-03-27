@@ -156,7 +156,7 @@ describe AssignmentOverride do
 
     context "with allow_assign_to_differentiation_tags setting enabled" do
       before do
-        @course.account.settings = { allow_assign_to_differentiation_tags: true }
+        @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
         @course.account.save!
         @course.account.reload
 
@@ -189,7 +189,7 @@ describe AssignmentOverride do
       end
 
       it "rejects non collaborative group set when account setting is disabled" do
-        @course.account.settings = { allow_assign_to_differentiation_tags: false }
+        @course.account.settings = { allow_assign_to_differentiation_tags: { value: false } }
         @course.account.save!
         @course.account.reload
 

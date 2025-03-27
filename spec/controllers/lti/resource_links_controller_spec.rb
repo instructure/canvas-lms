@@ -250,7 +250,7 @@ describe Lti::ResourceLinksController, type: :request do
   describe "PUT #update" do
     subject { put "/api/v1/courses/#{course.id}/lti_resource_links/#{id}", params: }
 
-    let(:resource_link) { resource_link_model(context: course, course: course) }
+    let(:resource_link) { resource_link_model(context: course, course:) }
     let(:id) { resource_link.id }
     let(:params) { {} }
 

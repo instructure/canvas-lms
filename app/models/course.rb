@@ -1551,7 +1551,9 @@ class Course < ActiveRecord::Base
   # Allows the account to be set directly
   belongs_to :account
 
-  delegate :discussion_checkpoints_enabled?, to: :root_account
+  def discussion_checkpoints_enabled?
+    account&.discussion_checkpoints_enabled?
+  end
 
   def wiki
     return super if wiki_id
@@ -2888,7 +2890,8 @@ class Course < ActiveRecord::Base
        alt_name
        restrict_quantitative_data
        horizon_course
-       conditional_release]
+       conditional_release
+       default_due_time]
   end
 
   def student_reporting?
@@ -4253,9 +4256,7 @@ class Course < ActiveRecord::Base
   end
 
   def quiz_lti_tool
-    context_external_tools.active.quiz_lti.first ||
-      account.context_external_tools.active.quiz_lti.first ||
-      root_account.context_external_tools.active.quiz_lti.first
+    Lti::ContextToolFinder.ordered_by_context_for(self).quiz_lti.first
   end
 
   def has_new_quizzes?

@@ -143,8 +143,8 @@ of requests per token should not be limited.
 Below are some common error codes that you might encounter while using the Assignment
 and Grade Services API. Each code also comes with some advice for fixing your issue.
 
-| Code | Associated Message                                                                  | Resolution                                                                                                 | Notes |
-| ---- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----- |
+| Code | Associated Message  | Resolution |
+| ---- | --------------------| -----------|
 | 400  | \<parameter\> is missing                                                            | Ensure you're passing all required parameters                                                              |
 | 400  | Provided timestamp of \<timestamp\> not a valid timestamp                           | Ensure you're passing a correctly formatted, valid timestamp                                               |
 | 400  | Provided timestamp of \<timestamp\> before last updated timestamp of \<timestamp\>  | Ensure the timestamp you're passing isn't before when the result was last updated                          |

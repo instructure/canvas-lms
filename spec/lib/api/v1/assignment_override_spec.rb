@@ -71,7 +71,7 @@ describe Api::V1::AssignmentOverride do
           course_with_teacher(active_all: true)
           @course.account.enable_feature!(:differentiation_tags)
           @course.account.enable_feature!(:assign_to_differentiation_tags)
-          @course.account.settings[:allow_assign_to_differentiation_tags] = true
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           @course.account.save!
           @course.account.reload
 
@@ -112,7 +112,7 @@ describe Api::V1::AssignmentOverride do
         end
 
         it "returns error if account setting is disabled" do
-          @course.account.settings[:allow_assign_to_differentiation_tags] = false
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
           @course.account.save!
           @course.account.reload
 
@@ -164,7 +164,7 @@ describe Api::V1::AssignmentOverride do
         it "allows non collaborative group to be assigned to group assignment" do
           @course.account.enable_feature!(:differentiation_tags)
           @course.account.enable_feature!(:assign_to_differentiation_tags)
-          @course.account.settings[:allow_assign_to_differentiation_tags] = true
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           @course.account.save!
           @course.account.reload
 

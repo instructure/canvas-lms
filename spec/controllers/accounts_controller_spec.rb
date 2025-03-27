@@ -407,13 +407,14 @@ describe AccountsController do
             id: @account.id,
             account: {
               settings: {
-                allow_assign_to_differentiation_tags: false
+                allow_assign_to_differentiation_tags: { value: false, locked: false }
               }
             }
           }
         )
         @account.reload
-        expect(@account.settings[:allow_assign_to_differentiation_tags]).to be false
+        expect(@account.settings[:allow_assign_to_differentiation_tags][:value]).to be_falsey
+        expect(@account.settings[:allow_assign_to_differentiation_tags][:locked]).to be_falsey
 
         post(
           :update,
@@ -421,45 +422,45 @@ describe AccountsController do
             id: @account.id,
             account: {
               settings: {
-                allow_assign_to_differentiation_tags: true
+                allow_assign_to_differentiation_tags: { value: true, locked: true }
               }
             }
           }
         )
         @account.reload
-        expect(@account.settings[:allow_assign_to_differentiation_tags]).to be true
+        expect(@account.settings[:allow_assign_to_differentiation_tags][:value]).to be_truthy
+        expect(@account.settings[:allow_assign_to_differentiation_tags][:locked]).to be_truthy
       end
 
-      it "allows for setting to be updated on a sub-account" do
+      it "allows updating setting in child account after updating from inheritable value" do
         account_with_admin_logged_in
-        sub_account = @account.sub_accounts.create!
-        post(
-          :update,
-          params: {
-            id: sub_account.id,
-            account: {
-              settings: {
-                allow_assign_to_differentiation_tags: false
-              }
-            }
-          }
-        )
-        sub_account.reload
-        expect(sub_account.settings[:allow_assign_to_differentiation_tags]).to be false
+        root_account = @account.sub_accounts.create!
+        subaccount = root_account.sub_accounts.create!
 
-        post(
-          :update,
-          params: {
-            id: sub_account.id,
-            account: {
-              settings: {
-                allow_assign_to_differentiation_tags: true
-              }
-            }
-          }
-        )
-        sub_account.reload
-        expect(sub_account.settings[:allow_assign_to_differentiation_tags]).to be true
+        post "update", params: { id: subaccount.id, account: { allow_assign_to_differentiation_tags: {} } }
+        expect(subaccount.reload.settings[:allow_assign_to_differentiation_tags]).to be_nil
+        expect(subaccount.allow_assign_to_differentiation_tags[:value]).to be false
+
+        post "update", params: { id: root_account.id,
+                                 account: { settings: {
+                                   allow_assign_to_differentiation_tags: { value: true }
+                                 } } }
+        expect(subaccount.reload.settings[:allow_assign_to_differentiation_tags]).to be_nil
+        expect(subaccount.allow_assign_to_differentiation_tags[:value]).to be true
+
+        post "update", params: { id: subaccount.id,
+                                 account: { settings: {
+                                   allow_assign_to_differentiation_tags: { value: false }
+                                 } } }
+        expect(subaccount.reload.settings[:allow_assign_to_differentiation_tags][:value]).to be false
+        expect(subaccount.allow_assign_to_differentiation_tags[:value]).to be false
+
+        post "update", params: { id: subaccount.id,
+                                 account: { settings: {
+                                   allow_assign_to_differentiation_tags: { value: true }
+                                 } } }
+        expect(subaccount.reload.settings[:allow_assign_to_differentiation_tags]).to be_nil
+        expect(subaccount.allow_assign_to_differentiation_tags[:value]).to be true
       end
     end
 
@@ -2226,6 +2227,37 @@ describe AccountsController do
         get "course_creation_accounts"
         expect(response).to be_successful
         expect(json_parse(response.body).pluck("name")).to match_array(["Default Account", "Manually-Created Courses"])
+      end
+
+      context "enhanced_course_creation_account_fetching enabled" do
+        before :once do
+          @user = user_factory(active_all: true)
+          Account.site_admin.enable_feature!(:enhanced_course_creation_account_fetching)
+        end
+
+        it "adminable flag is returned for accounts where the user has manage_courses_admin permission" do
+          # sub account admin with creation rights
+          Account.create!(name: "Sub Account", parent_account: Account.default).account_users.create!(user: @user)
+
+          Account.create!(name: "Teacher Creator #2").update(settings: { teachers_can_create_courses: true, students_can_create_courses: true })
+          course_with_teacher(user: @user, active_all: true, account: Account.last)
+
+          Account.create!(name: "Teacher Creator #3").update(settings: { teachers_can_create_courses: true, students_can_create_courses: true })
+          course_with_teacher(user: @user, active_all: true, account: Account.last)
+
+          user_session @user
+          get "course_creation_accounts"
+          expect(response).to be_successful
+          accounts = json_parse(response.body)
+
+          adminable_account = accounts.find { |a| a["name"] == "Sub Account" }
+          expect(adminable_account["adminable"]).to be true
+
+          not_adminable_account = accounts.filter { |a| a["name"] != "Sub Account" }
+          not_adminable_account.each do |account|
+            expect(account["adminable"]).to be false
+          end
+        end
       end
     end
   end

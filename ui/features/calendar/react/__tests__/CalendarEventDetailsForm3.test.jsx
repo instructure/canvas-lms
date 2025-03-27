@@ -72,6 +72,8 @@ const expectFieldsToBeDisabled = (component, fieldNames) => {
 describe('CalendarEventDetailsForm', () => {
   beforeEach(() => {
     defaultProps = eventFormProps()
+    defaultProps.event.object.all_context_codes = "course_2"
+    defaultProps.event.object.context_code = "course_2"
     fakeENV.setup({
       FEATURES: {
         calendar_series: true,

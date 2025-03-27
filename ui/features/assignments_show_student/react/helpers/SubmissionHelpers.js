@@ -60,3 +60,20 @@ export function totalAllowedAttempts(assignment, submission) {
     ? assignment.allowedAttempts + (submission?.extraAttempts || 0)
     : null
 }
+
+export const activeTypeMeetsCriteria = (activeSubmissionType, submission) => {
+  switch (activeSubmissionType) {
+    case 'media_recording':
+      return submission?.submissionDraft?.meetsMediaRecordingCriteria
+    case 'online_text_entry':
+      return submission?.submissionDraft?.meetsTextEntryCriteria
+    case 'online_upload':
+      return submission?.submissionDraft?.meetsUploadCriteria
+    case 'online_url':
+      return submission?.submissionDraft?.meetsUrlCriteria
+    case 'student_annotation':
+      return submission?.submissionDraft?.meetsStudentAnnotationCriteria
+    case 'basic_lti_launch':
+      return submission?.submissionDraft?.meetsBasicLtiLaunchCriteria
+  }
+}

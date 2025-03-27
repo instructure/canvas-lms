@@ -39,7 +39,7 @@ describe Lti::Messages::ReportReviewRequest do
   let(:return_url) { nil }
   let(:tool) { external_tool_1_3_model(context:) }
   let(:assignment) { assignment_model }
-  let(:asset_processor) { lti_asset_processor_model(tool: tool, assignment:) }
+  let(:asset_processor) { lti_asset_processor_model(tool:, assignment:) }
   let(:asset_report) { lti_asset_report_model(asset_processor:) }
   let(:report_review) do
     Lti::Messages::ReportReviewRequest.new(

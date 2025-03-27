@@ -88,7 +88,10 @@ module Types
                "only include users with the given ids",
                prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
                required: false
-
+      argument :enrollment_role_ids,
+               [ID],
+               "Only return users with the specified enrollment role ids",
+               required: false
       argument :enrollment_states,
                [CourseFilterableEnrollmentWorkflowState],
                <<~MD,
@@ -99,6 +102,10 @@ module Types
       argument :enrollment_types,
                [CourseFilterableEnrollmentType],
                "Only return users with the specified enrollment types",
+               required: false
+      argument :exclude_test_students,
+               Boolean,
+               "Exclude test students from results",
                required: false
       argument :search_term,
                String,
@@ -246,7 +253,12 @@ module Types
 
     field :rubrics_connection, RubricType.connection_type, null: true
     def rubrics_connection
-      rubric_associations = course.rubric_associations.bookmarked.include_rubric.to_a
+      rubric_associations = course.rubric_associations
+                                  .bookmarked
+                                  .include_rubric
+                                  .joins(:rubric)
+                                  .where.not(rubrics: { workflow_state: "deleted" })
+                                  .to_a
       rubric_associations = Canvas::ICU.collate_by(rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
       rubric_associations.map(&:rubric)
     end
@@ -278,6 +290,7 @@ module Types
       search_params = {
         enrollment_state: filter[:enrollment_states],
         enrollment_type: filter[:enrollment_types],
+        enrollment_role_id: filter[:enrollment_role_ids],
         include_inactive_enrollments: true,
         search_term: filter[:search_term]
       }
@@ -294,6 +307,8 @@ module Types
       if user_ids.present?
         scope = scope.where(users: { id: user_ids })
       end
+
+      scope = scope.not_fake_student if filter[:exclude_test_students]
 
       scope
     end
@@ -464,7 +479,7 @@ module Types
       argument :filter, ExternalToolFilterInputType, required: false, default_value: {}
     end
     def external_tools_connection(filter:)
-      scope = Lti::ContextToolFinder.all_tools_for(course, { placements: filter.placement })
+      scope = Lti::ContextToolFinder.all_tools_for(course, placements: filter.placement)
       filter.state.nil? ? scope : scope.where(workflow_state: filter.state)
     end
 

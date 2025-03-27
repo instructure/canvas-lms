@@ -25,6 +25,10 @@ import BackboneState from './mixins/BackboneState'
 import PaginatedUserCheckList from './PaginatedUserCheckList'
 import InfiniteScroll from './mixins/InfiniteScroll'
 import '@canvas/jquery/jquery.instructure_forms'
+import {TextInput} from '@instructure/ui-text-input'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
+import {Button} from '@instructure/ui-buttons'
 
 const I18n = createI18nScope('student_groups')
 
@@ -41,18 +45,33 @@ const ManageGroupDialog = createReactClass({
       userCollection: this.props.userCollection,
       checked: this.props.checked,
       name: this.props.name,
+      errorMessages: [],
+      checkboxErrorMessage: [],
     }
   },
 
   handleFormSubmit(e) {
     e.preventDefault()
     let errors = false
-    if (this.state.name.length == 0) {
-      $(this.nameInputRef).errorBox(I18n.t('Group name is required'))
+    if (this.props.maxMembership && this.state.checked.length > this.props.maxMembership) {
+      this.setState({checkboxErrorMessage: [
+        {type: 'newError', text: I18n.t('Too many members')},
+      ]})
+      $(this.userListRef).attr("tabindex",-1).focus()
       errors = true
     }
-    if (this.props.maxMembership && this.state.checked.length > this.props.maxMembership) {
-      $(this.userListRef).errorBox(I18n.t('Too many members'))
+    if (this.state.name.trim().length === 0) {
+      this.setState({errorMessages: [
+        {type: 'newError', text: I18n.t('Group name is required')},
+      ]})
+      this.nameInputRef?.focus()
+      errors = true
+    }
+    if (this.state.name.trim().length > 200) {
+      this.setState({errorMessages: [
+        {type: 'newError', text: I18n.t('Enter a shorter group name')},
+      ]})
+      this.nameInputRef?.focus()
       errors = true
     }
     if (!errors) {
@@ -61,11 +80,10 @@ const ManageGroupDialog = createReactClass({
     }
   },
 
-  _onUserCheck(user, isChecked) {
+  _onUserCheck(checkedUsers) {
     this.setState({
-      checked: isChecked
-        ? this.state.checked.concat(user.id)
-        : without(this.state.checked, user.id),
+      checked: checkedUsers,
+      checkboxErrorMessage: [],
     })
   },
 
@@ -90,59 +108,63 @@ const ManageGroupDialog = createReactClass({
     }
 
     return (
-      <div id="manage_group_form">
+      <Flex id="manage_group_form" as="div" alignItems="center" justifyItems="start" gap="none" direction="row" width="100%">
         <form className="form-dialog" onSubmit={this.handleFormSubmit}>
           <div ref={c => (this.scrollElementRef = c)} className="form-dialog-content">
-            <table className="formtable">
-              <tr>
-                <td>
-                  <label htmlFor="group_name">{I18n.t('Group Name')}</label>
-                </td>
-                <td>
-                  <input
-                    ref={c => (this.nameInputRef = c)}
-                    id="group_name"
-                    type="text"
-                    name="name"
-                    maxLength="200"
-                    value={this.state.name}
-                    onChange={event => this.setState({name: event.target.value})}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  {}
-                  <label aria-live="polite" aria-atomic="true">
+            <Flex.Item margin="xx-small">
+              <TextInput
+                inputRef={c => (this.nameInputRef = c)}
+                id="group_name"
+                type="text"
+                name="name"
+                width="50%"
+                isRequired={true}
+                renderLabel={<Text>{I18n.t('Group Name')}</Text>}
+                value={this.state.name}
+                messages={this.state.errorMessages}
+                onChange={event => this.setState({name: event.target.value, errorMessages: []})}
+              />
+            </Flex.Item>
+            <Flex.Item
+              margin="xx-small"
+              tabindex="-1"
+              elementRef={c => (this.userListRef = c)}
+            >
+              <PaginatedUserCheckList
+                checked={this.state.checked}
+                permanentUsers={[ENV.current_user]}
+                users={users}
+                onUserCheck={this._onUserCheck}
+                messages={this.state.checkboxErrorMessage}
+                label={
+                  <Text aria-live="polite" aria-atomic="true" weight="bold">
                     {I18n.t('Members')} {inviteLimit}
-                  </label>
-                </td>
-                <td>
-                  <PaginatedUserCheckList
-                    ref={c => (this.userListRef = c)}
-                    checked={this.state.checked}
-                    permanentUsers={[ENV.current_user]}
-                    users={users}
-                    onUserCheck={this._onUserCheck}
-                  />
-                </td>
-              </tr>
-            </table>
+                  </Text>
+                }
+              />
+            </Flex.Item>
           </div>
           <div className="form-controls">
-            <button
-              type="button"
-              className="btn confirm-dialog-cancel-btn"
+            <Button
+              data-testid="manage-group-modal-cancel-button"
+              color="secondary"
+              margin="xxx-small"
               onClick={this.props.closeDialog}
             >
               {I18n.t('Cancel')}
-            </button>
-            <button className="btn btn-primary confirm-dialog-confirm-btn" type="submit">
+            </Button>
+            <Button
+              data-testid="manage-group-modal-submit-button"
+              color="primary"
+              margin="xxx-small"
+              type="submit"
+              formNoValidate
+            >
               {I18n.t('Submit')}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
+      </Flex>
     )
   },
 })

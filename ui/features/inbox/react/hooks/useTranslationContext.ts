@@ -19,6 +19,7 @@
 import { createContext, Dispatch, SetStateAction, useContext, useState } from "react"
 import { updateTranslatedModalBody, translateMessage } from "../utils/inbox_translator";
 import { useScope as createI18nScope } from '@canvas/i18n'
+import { translationSeparator } from "../utils/constants";
 
 export interface TranslationContextValue {
   body: string;
@@ -51,6 +52,14 @@ export const useTranslationContextState = ({ subject, activeSignature, setModalE
   const [translating, setTranslating] = useState(false)
   const [messagePosition, setMessagePosition] = useState<string | null>(null)
 
+  const getBodyWithoutTranslation = (isPrimary: boolean, bodyText: string) => {
+    if (bodyText.includes(translationSeparator)) {
+      return bodyText.split(translationSeparator)[isPrimary ? 1 : 0]
+    }
+
+    return bodyText
+  }
+
   const translateBody = (isPrimary: boolean) => {
     translateBodyWith(isPrimary, body)
   }
@@ -60,18 +69,20 @@ export const useTranslationContextState = ({ subject, activeSignature, setModalE
       return
     }
 
+    const strippedBody = getBodyWithoutTranslation(isPrimary, bodyText)
+
     setTranslating(true)
     try {
       const translatedText = await translateMessage({
         subject: subject,
-        body: bodyText,
+        body: strippedBody,
         signature: activeSignature,
         tgtLang: typeof tgtLang !== 'undefined' ? tgtLang : translationTargetLanguage,
       })
 
 
       // TODO: fix typescript related issue and remove the ! mark
-      updateTranslatedModalBody(translatedText!, isPrimary, setBody, activeSignature, bodyText)
+      updateTranslatedModalBody(translatedText!, isPrimary, setBody, activeSignature, strippedBody)
     } catch (_err) {
       setModalError(I18n.t('Error while trying to translate message'))
       setTimeout(() => {

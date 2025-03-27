@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
@@ -50,7 +50,7 @@ describe('FileFolderTable', () => {
     fetchMock.get(/.*\/folders/, [], {overwriteRoutes: true})
     renderComponent()
 
-    expect(await screen.findByText('Drag a file here, or')).toBeInTheDocument()
+    expect(await screen.findByText('Drop files here to upload')).toBeInTheDocument()
   })
 
   it('renders spinner and no filedrop when loading', () => {
@@ -58,7 +58,47 @@ describe('FileFolderTable', () => {
     renderComponent()
 
     expect(screen.getByText('Loading data')).toBeInTheDocument()
-    expect(screen.queryByText('Drag a file here, or')).not.toBeInTheDocument()
+    expect(screen.queryByText('Drop files here to upload')).not.toBeInTheDocument()
+  })
+
+  it('renders file drop when a file is dragged over', async () => {
+    // mock file to drag over
+    const file = new File(['file content'], 'example.txt', { type: 'text/plain' })
+    const dataTransfer = {
+      files: [file],
+      items: [{ kind: 'file', type: file.type }],
+      types: ['Files'],
+    }
+
+    renderComponent()
+    const filesTable = await screen.findByTestId('files-table')
+    const filesDirectory = await screen.findByTestId('files-directory')
+
+    filesDirectory.getBoundingClientRect = jest.fn(() => ({
+      left: 100,
+      top: 100,
+      right: 400,
+      bottom: 400,
+    } as DOMRect));
+
+    fireEvent.dragEnter(filesTable, { dataTransfer })
+    const fileUpload = await screen.findByTestId('file-upload')
+
+    // FileDrag__dragging ensures fileDrop is visible when dragging
+    expect(fileUpload).toHaveClass('FileDrag__dragging')
+    expect(fileUpload).not.toHaveClass('FileDrag__full')
+
+    // needed an event in order to correctly mock the clientX and clientY
+    // simulates client leaving the file table drop area
+    const event = new Event('dragleave', {
+      bubbles: true,
+    })
+    Object.defineProperty(event, 'clientX', { value: 500 })
+    Object.defineProperty(event, 'clientY', { value: 500 })
+
+    filesTable.dispatchEvent(event);
+    expect(fileUpload).not.toHaveClass('FileDrag__dragging')
+    expect(fileUpload).not.toHaveClass('FileDrag__full')
   })
 
   it('renders stacked when not large', async () => {

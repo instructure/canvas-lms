@@ -18,6 +18,22 @@
 
 const {floor} = Math
 import type {Enrollment} from '../types'
+import {
+  NO_PERMISSIONS,
+  ACCOUNT_MEMBERSHIP,
+  TEACHER_ENROLLMENT,
+  STUDENT_ENROLLMENT,
+  TA_ENROLLMENT,
+  OBSERVER_ENROLLMENT,
+  DESIGNER_ENROLLMENT,
+  ACCOUNT_ADMIN,
+  TEACHER_ROLE,
+  STUDENT_ROLE,
+  TA_ROLE,
+  OBSERVER_ROLE,
+  DESIGNER_ROLE
+} from './constants'
+import {EnvRole, SisRole} from '../types'
 import I18nObj, {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_people')
@@ -62,26 +78,19 @@ export const totalActivity = (enrollments: Enrollment[]) => {
   return (maxTime && maxTime > 0) ? secondsToTime(maxTime) : ''
 }
 
-export enum EnrollmentTypes {
-  StudentEnrollment,
-  TeacherEnrollment,
-  TaEnrollment,
-  ObserverEnrollment,
-  DesignerEnrollment
-}
-
-export const getRoleName = (role: EnrollmentTypes | string) => {
-  const TYPES = {
-    TeacherEnrollment: I18n.t('Teacher'),
-    StudentEnrollment: I18n.t('Student'),
-    TaEnrollment: I18n.t('TA'),
-    ObserverEnrollment: I18n.t('Observer'),
-    DesignerEnrollment: I18n.t('Designer')
+// for custom roles sis_role is the role name
+// for built-in roles, sis_role is mapped from enrollment type in Enrollment::SIS_TYPES
+export const getRoleName = (sisRole: SisRole | string) => {
+  const SIS_ROLE: Partial<Record<SisRole, string>> = {
+    [TEACHER_ROLE]: I18n.t('Teacher'),
+    [STUDENT_ROLE]: I18n.t('Student'),
+    [TA_ROLE]: I18n.t('TA'),
+    [OBSERVER_ROLE]: I18n.t('Observer'),
+    [DESIGNER_ROLE]: I18n.t('Designer')
   }
 
-  // Custom roles return as named
-  // @ts-expect-error
-  return TYPES[role] || role
+  // Custom roles are returned as named
+  return SIS_ROLE[sisRole as SisRole] || sisRole
 }
 
 export const screenreaderMessageHolderId = 'flash_screenreader_holder'
@@ -95,4 +104,41 @@ export const getLiveRegion = (): HTMLDivElement => {
     document.body.appendChild(liveRegion)
   }
   return liveRegion as HTMLDivElement
+}
+
+//   Roles are ordered by base_role_type then alphabetically within those
+//   base role types. The order that these base role types live is defined
+//   by the sortOrder array. There is a special case however. AccountAdmin
+//   role always goes first. This uses the index of the sortOrder to ensure
+//   the correct order since comparator is just using _.sort in it's
+//   underlining implementation which is just ordering based on alphabetical
+//   correctness.
+export const sortRoles = (roles: EnvRole[]) => {
+  const sortOrder = [
+    NO_PERMISSIONS,
+    ACCOUNT_MEMBERSHIP,
+    STUDENT_ENROLLMENT,
+    TA_ENROLLMENT,
+    TEACHER_ENROLLMENT,
+    DESIGNER_ENROLLMENT,
+    OBSERVER_ENROLLMENT
+  ]
+
+  const comparator = (role: EnvRole) => {
+    const {base_role_name, name: role_name} = role
+    const index = sortOrder.indexOf(base_role_name)
+
+    let position_string = `${index}_${base_role_name}_${role_name}`
+
+    if (base_role_name === role_name) {
+      position_string = `${index}_${base_role_name}`
+    }
+    if (role_name === ACCOUNT_ADMIN) {
+      position_string = `0_${base_role_name}`
+    }
+
+    return position_string
+  }
+
+  return roles.sort((a, b) => comparator(a).toLowerCase().localeCompare(comparator(b).toLowerCase()))
 }

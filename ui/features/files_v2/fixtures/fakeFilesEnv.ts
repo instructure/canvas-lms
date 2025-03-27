@@ -71,6 +71,8 @@ const setupFilesEnvWithSingleContext = () => {
       file_index_menu_tools: tools,
     },
   ]
+  filesEnv.contextType = filesEnv.contexts[0].contextType
+  filesEnv.contextId = filesEnv.contexts[0].contextId
   filesEnv.contextsDictionary = {
     courses_1: filesEnv.contexts[0],
   }

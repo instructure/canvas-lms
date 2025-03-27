@@ -174,6 +174,10 @@ describe UserSearch do
         it { is_expected.to include("Tyler Pickett") }
         it { is_expected.to include("Tyler Student") }
         it { is_expected.not_to include("Tyler Teacher") }
+
+        it "does not return results if role id is invalid" do
+          expect(UserSearch.for_user_in_context("", course, student, nil, enrollment_role_id: student_role.id + 99_999).size).to eq 0
+        end
       end
     end
 

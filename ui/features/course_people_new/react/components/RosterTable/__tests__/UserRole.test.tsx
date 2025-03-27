@@ -30,15 +30,15 @@ describe('UserRole', () => {
   const studentEnrollment: Enrollment = mockEnrollment()
   const teacherEnrollment: Enrollment = mockEnrollment({
     enrollmentId: '2',
-    enrollmentType: TEACHER_ENROLLMENT
+    sisRole: 'teacher',
   })
   const observerEnrollment: Enrollment = mockEnrollment({
-    enrollmentType: OBSERVER_ENROLLMENT,
+    sisRole: 'observer',
     hasAssociatedUser: true
   })
   const temporaryEnrollment: Enrollment = mockEnrollment({
-    enrollmentType: TEACHER_ENROLLMENT,
-    isTemporaryEnrollment: true
+    isTemporaryEnrollment: true,
+    sisRole: 'teacher',
   })
 
   it('renders single role', () => {
@@ -48,7 +48,7 @@ describe('UserRole', () => {
 
   it('renders multiple roles', () => {
     const multipleEnrollments = [studentEnrollment, teacherEnrollment]
-    const {getByText, debug} = render(<UserRole enrollments={multipleEnrollments} />)
+    const {getByText} = render(<UserRole enrollments={multipleEnrollments} />)
     expect(getByText('Student')).toBeInTheDocument()
     expect(getByText('Teacher')).toBeInTheDocument()
   })

@@ -1956,7 +1956,10 @@ class Submission < ActiveRecord::Base
   def self.bulk_load_versioned_originality_reports(submissions)
     reports = originality_reports_by_submission_id_submission_time_attachment_id(submissions)
     submissions.each do |s|
-      s.versioned_originality_reports = [] && next unless s.submitted_at
+      unless s.submitted_at
+        s.versioned_originality_reports = []
+        next
+      end
       reports_for_sub = reports.dig(s.id, :by_time, s.submitted_at.iso8601(6)) || []
 
       # nil for originality reports with no submission time
@@ -3154,6 +3157,14 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def postable_comments?
+    # This logic is also implemented in SQL in
+    # app/graphql/loaders/has_postable_comments_loader.rb
+    # to determine if a submission has any postable comments.
+    # Any changes made here should also be reflected in the loader.
+    submission_comments.any?(&:allows_posting_submission?)
+  end
+
   def word_count
     if get_word_count_from_body?
       read_or_calc_body_word_count
@@ -3179,7 +3190,7 @@ class Submission < ActiveRecord::Base
     return self if sub_assignment.nil?
 
     # TODO: see if we should be throwing an error here instead of defaulting to `submission`
-    sub_assignment.all_submissions.find_by(user: user) || self
+    sub_assignment.all_submissions.find_by(user:) || self
   end
 
   def aggregate_checkpoint_submissions

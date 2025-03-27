@@ -1602,7 +1602,7 @@ describe "threaded discussions" do
       user_session(@teacher)
 
       get "/courses/#{@course.id}/discussion_topics/#{discussion_topic.id}"
-      expect(fj("div:contains('This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled at the root account level. To enable this functionality, please contact an administrator to activate the feature flag.')")).to be_present
+      expect(fj("div:contains('This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled. To enable this functionality, please contact an administrator to activate the feature flag.')")).to be_present
     end
 
     it "should not show alert when discussion has sub assignments but the checkpoints feature flag is disabled to students" do
@@ -1632,7 +1632,7 @@ describe "threaded discussions" do
       user_session(@student)
 
       get "/courses/#{@course.id}/discussion_topics/#{discussion_topic.id}"
-      expect(f("body")).not_to contain_jqcss("div:contains('This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled at the root account level. To enable this functionality, please contact an administrator to activate the feature flag.')")
+      expect(f("body")).not_to contain_jqcss("div:contains('This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled. To enable this functionality, please contact an administrator to activate the feature flag.')")
     end
 
     context "NO header stickiness" do

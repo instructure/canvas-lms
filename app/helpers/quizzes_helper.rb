@@ -157,7 +157,7 @@ module QuizzesHelper
     end
 
     if !quiz.show_correct_answers
-      I18n.t("Correct answers are hidden.")
+      [I18n.t("Correct answers are hidden."), true]
     elsif hide_at.present? && hide_at < now
       I18n.t("Correct answers are no longer available.")
     elsif show_at.present? && hide_at.present?
@@ -542,6 +542,7 @@ module QuizzesHelper
     opts["class"] = class_array.compact.join(" ")
     opts["aria-controls"] = "js-sequential-warning-dialogue" if @quiz.cant_go_back?
     opts["data-method"] = "post" unless @quiz.cant_go_back?
+    opts["role"] = "button" if class_array.include?("btn")
     link_to(link_body, (opts["preview"] == 1) ? preview_quiz_url : take_quiz_url, opts)
   end
 

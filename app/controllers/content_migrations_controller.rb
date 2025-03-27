@@ -232,7 +232,7 @@ class ContentMigrationsController < ApplicationController
   end
 
   def fetch_external_tools
-    Lti::ContextToolFinder.all_tools_for(@context, placements: :migration_selection, root_account: @domain_root_account, current_user: @current_user) || []
+    Lti::ContextToolFinder.all_tools_for(@context, placements: :migration_selection, current_user: @current_user) || []
   end
 
   def migration_plugin_supported?(plugin)

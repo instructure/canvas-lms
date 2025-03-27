@@ -31,19 +31,30 @@ const groupFragment = gql`
   }
 `
 
+const pageInfoFragment = gql`
+  fragment PageInfoFragment on LearningOutcomeGroupConnection {
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+`
+
 const childGroupsFragment = gql`
   fragment ChildGroupsFragment on LearningOutcomeGroup {
-    childGroups {
+    childGroups (after: $childGroupsCursor) {
       nodes {
         ...GroupFragment
       }
+      ...PageInfoFragment
     }
   }
   ${groupFragment}
+  ${pageInfoFragment}
 `
 
 export const CHILD_GROUPS_QUERY = gql`
-  query LearningOutcomesGroupQuery($id: ID!, $type: NodeType!) {
+  query LearningOutcomesGroupQuery($id: ID!, $type: NodeType!, $childGroupsCursor: String) {
     context: legacyNode(type: $type, _id: $id) {
       ... on Account {
         _id

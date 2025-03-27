@@ -1197,10 +1197,12 @@ $.fn.errorBox = function (message, scroll, override_position) {
     $label[0].appendChild(icon)
     $label[0].appendChild(textNode)
 
-    const $requiredSymbol = $obj.prev('.required_symbol')
-    if ($requiredSymbol.length) {
-      $requiredSymbol.addClass('text-error')
-    }
+    // highlight the label's required symbol (postfix asterisk character)
+    let $requiredSymbol = $obj
+      .prev('.required_symbol')
+      .add($obj.prev('label').find('.required_symbol'));
+    $requiredSymbol.addClass('text-error');
+
     $obj.attr('aria-describedby', $label.attr('id'))
     $obj.data({
       associated_error_box: $label,

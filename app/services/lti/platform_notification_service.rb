@@ -81,7 +81,7 @@ module Lti
 
     def notify_tools_in_course(course, *builders)
       tool_ids = Lti::ContextToolFinder.all_tools_for(course).ids
-      notify_tools(cet_id_or_ids: tool_ids, builders: builders)
+      notify_tools(cet_id_or_ids: tool_ids, builders:)
     end
 
     def notify_tools(cet_id_or_ids:, builders:)

@@ -38,7 +38,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_utils_publishmoduleitemhelper')
 
-export function publishModule(courseId: CanvasId, moduleId: CanvasId, skipItems: boolean) {
+export function publishModule(courseId: CanvasId, moduleId: CanvasId, skipItems: boolean, onPublishComplete: () => void = () => {}) {
   const loadingMessage = skipItems
     ? I18n.t('Publishing module')
     : I18n.t('Publishing module and items')
@@ -53,10 +53,11 @@ export function publishModule(courseId: CanvasId, moduleId: CanvasId, skipItems:
     skipItems,
     loadingMessage,
     successMessage,
+    onPublishComplete,
   )
 }
 
-export function unpublishModule(courseId: CanvasId, moduleId: CanvasId, skipItems: boolean) {
+export function unpublishModule(courseId: CanvasId, moduleId: CanvasId, skipItems: boolean, onPublishComplete: () => void = () => {}) {
   const loadingMessage = skipItems
     ? I18n.t('Unpublishing module')
     : I18n.t('Unpublishing module and items')
@@ -70,6 +71,7 @@ export function unpublishModule(courseId: CanvasId, moduleId: CanvasId, skipItem
     skipItems,
     loadingMessage,
     successMessage,
+    onPublishComplete,
   )
 }
 
@@ -80,6 +82,7 @@ export function batchUpdateOneModuleApiCall(
   skipContentTags: boolean,
   loadingMessage: string,
   successMessage: string,
+  onPublishComplete?: () => void,
 ) {
   const path = `/api/v1/courses/${courseId}/modules/${moduleId}`
 
@@ -120,6 +123,7 @@ export function batchUpdateOneModuleApiCall(
             err: null,
             srOnly: true,
           })
+          onPublishComplete?.()
         })
         .finally(() => {
           exportFuncs.disableContextModulesPublishMenu(false)

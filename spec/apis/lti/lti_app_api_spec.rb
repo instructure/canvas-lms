@@ -60,6 +60,23 @@ module Lti
         expect(json.detect { |j| j["definition_type"] == @external_tool.class.name && j["definition_id"] == @external_tool.id }).not_to be_nil
       end
 
+      it "includes icon information for asset processor placements" do
+        course_with_teacher(active_all: true, user: user_with_pseudonym, account:)
+
+        tool1 = new_valid_external_tool(account)
+        tool1.settings["ActivityAssetProcessor"] = { icon_url: "http://example.com/foo.png" }
+        tool1.save!
+
+        url = "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions"
+        params = {
+          controller: "lti/lti_apps", action: "launch_definitions", course_id: @course.to_param, format: "json"
+        }
+        placements = ["ActivityAssetProcessor"]
+        json = api_call(:get, url, params, placements:)
+        icon_url = json.first["placements"]["ActivityAssetProcessor"]["icon_url"]
+        expect(icon_url).to eq "http://example.com/foo.png"
+      end
+
       it "returns authorized for a student but with no results when no placement is specified" do
         course_with_student(active_all: true, user: user_with_pseudonym, account:)
 

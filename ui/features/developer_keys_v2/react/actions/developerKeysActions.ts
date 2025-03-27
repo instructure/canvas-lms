@@ -419,17 +419,17 @@ export const actions = {
     (formData: unknown, url: string, method: string) => (dispatch: Dispatch) => {
       dispatch(actions.createOrEditDeveloperKeyStart())
 
-      // @ts-expect-error
-      return axios({
+      return axios<DeveloperKey, DeveloperKey>({
         method,
         url,
         data: formData,
       })
         .then(response => {
+          const key = response.data
           if (method === 'post') {
-            dispatch(actions.listDeveloperKeysPrepend(response.data))
+            dispatch(actions.listDeveloperKeysPrepend(key))
           } else {
-            dispatch(actions.listDeveloperKeysReplace(response.data))
+            dispatch(actions.listDeveloperKeysReplace(key))
           }
           dispatch(actions.createOrEditDeveloperKeySuccessful())
         })
@@ -507,7 +507,7 @@ export const actions = {
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
     axios
-      .put(url, {
+      .put<DeveloperKey>(url, {
         developer_key: {event: 'deactivate'},
       })
       .then(response => {
@@ -524,7 +524,7 @@ export const actions = {
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
     axios
-      .put(url, {
+      .put<DeveloperKey>(url, {
         developer_key: {event: 'activate'},
       })
       .then(response => {
@@ -540,7 +540,7 @@ export const actions = {
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
     axios
-      .put(url, {
+      .put<DeveloperKey>(url, {
         developer_key: {visible: false},
       })
       .then(response => {
@@ -555,7 +555,7 @@ export const actions = {
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
     axios
-      .put(url, {
+      .put<DeveloperKey>(url, {
         developer_key: {visible: true},
       })
       .then(response => {
@@ -647,7 +647,7 @@ export const actions = {
   ) => {
     const url = `/api/lti/developer_keys/${developerKeyId}/tool_configuration`
     return axios
-      .put(url, {
+      .put<DeveloperKey>(url, {
         developer_key: {
           name: developerKey.name,
           notes: developerKey.notes,
@@ -662,7 +662,7 @@ export const actions = {
         },
       })
       .then(data => {
-        return data.data as LtiDeveloperKeyApiResponse
+        return data.data as unknown as LtiDeveloperKeyApiResponse
       })
       .catch(err => {
         const errors = err.response.data.errors

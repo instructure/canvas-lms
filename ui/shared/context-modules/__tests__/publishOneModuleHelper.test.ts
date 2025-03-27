@@ -104,7 +104,8 @@ describe('publishOneModuleHelper', () => {
       const courseId = 1
       const moduleId = 1
       let skipItems = false
-      publishModule(courseId, moduleId, skipItems)
+      const onPublishComplete = () => {}
+      publishModule(courseId, moduleId, skipItems, onPublishComplete)
       expect(spy).toHaveBeenCalledWith(
         courseId,
         moduleId,
@@ -112,10 +113,11 @@ describe('publishOneModuleHelper', () => {
         skipItems,
         'Publishing module and items',
         'Module and items published',
+        onPublishComplete
       )
       spy.mockClear()
       skipItems = true
-      publishModule(courseId, moduleId, skipItems)
+      publishModule(courseId, moduleId, skipItems, onPublishComplete)
       expect(spy).toHaveBeenCalledWith(
         courseId,
         moduleId,
@@ -123,6 +125,7 @@ describe('publishOneModuleHelper', () => {
         skipItems,
         'Publishing module',
         'Module published',
+        onPublishComplete
       )
     })
   })
@@ -140,7 +143,8 @@ describe('publishOneModuleHelper', () => {
       const courseId = 1
       const moduleId = 1
       const skipItems = false
-      unpublishModule(courseId, moduleId, skipItems)
+      const onPublishComplete = () => {}
+      unpublishModule(courseId, moduleId, skipItems, onPublishComplete)
       expect(spy).toHaveBeenCalledWith(
         courseId,
         moduleId,
@@ -148,13 +152,14 @@ describe('publishOneModuleHelper', () => {
         skipItems,
         'Unpublishing module and items',
         'Module and items unpublished',
+        onPublishComplete
       )
     })
   })
 
   describe('batchUpdateOneModuleApiCall', () => {
     let spy: jest.SpyInstance | null = null
-    let spy2: jest.SpyInstance | null = null
+    const spy2: jest.SpyInstance | null = null
     beforeEach(() => {
       makeModuleWithItems(1, [117, 119], false)
       makeModuleWithItems(2, [217, 219], true)

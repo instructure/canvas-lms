@@ -605,13 +605,10 @@ class UsersController < ApplicationController
       return render_unauthorized_action unless course_ids.any?
     end
     courses = course_ids.present? ? api_find_all(Course, course_ids) : nil
-
     @stream_items = @user.cached_recent_stream_items(contexts: courses)
-    is_student = @user.roles(@domain_root_account).all? { |role| ["student", "user"].include?(role) }
+
     if stale?(etag: @stream_items)
-      if is_student
-        @stream_items = @stream_items.reject { |i| i&.course&.horizon_course? }
-      end
+      @stream_items = @stream_items.reject { |i| i&.course&.horizon_course? && !i.course.grants_right?(@user, :read_as_admin) }
       render partial: "shared/recent_activity", layout: false
     end
   end
@@ -637,7 +634,7 @@ class UsersController < ApplicationController
   def cached_upcoming_events(user)
     Rails.cache.fetch(["cached_user_upcoming_events", user].cache_key,
                       expires_in: 3.minutes) do
-      user.upcoming_events context_codes: ([user.asset_string] + user.cached_context_codes), include_sub_assignments: @domain_root_account.feature_enabled?(:discussion_checkpoints)
+      user.upcoming_events context_codes: ([user.asset_string] + user.cached_context_codes)
     end
   end
 
@@ -681,7 +678,7 @@ class UsersController < ApplicationController
       end
 
       if (@show_recent_feedback = @user.student_enrollments.active.exists?)
-        @recent_feedback = @user.recent_feedback(course_ids:, exclude_parent_assignment_submissions: @domain_root_account.feature_enabled?(:discussion_checkpoints)) || []
+        @recent_feedback = @user.recent_feedback(course_ids:) || []
       end
     end
 

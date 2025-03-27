@@ -32,5 +32,6 @@
     "packages/*/es/**": true
   },
   "biome.enabled": true,
-  "prettier.enable": false
+  "prettier.enable": false,
+  "typescript.preferences.importModuleSpecifier": "relative"
 }

@@ -204,7 +204,7 @@ describe "assignment groups" do
 
     fj('button[id="update-assignment-settings"]:visible').click
 
-    expect(f("#group_#{ag1.id}_weight_errors")).to include_text("Must be a valid number")
+    expect(f("#assignment_group_#{ag1.id}_weight_input")).to include_text("Must be a valid number")
   end
 
   it "hide errors when changing the input value" do
@@ -221,11 +221,11 @@ describe "assignment groups" do
 
     fj('button[id="update-assignment-settings"]:visible').click
 
-    expect(f("#group_#{ag1.id}_weight_errors")).to include_text("Must be a valid number")
+    expect(f("#assignment_group_#{ag1.id}_weight_input")).to include_text("Must be a valid number")
 
     fj('input[name="Test_group_weight"]:visible').send_keys("100")
 
-    expect(f("#group_#{ag1.id}_weight_errors")).to include_text("")
+    expect(f("#assignment_group_#{ag1.id}_weight_input")).not_to include_text("Must be a valid number")
   end
 
   # This feels like it would be better suited here than in QUnit

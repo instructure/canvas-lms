@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -48,8 +47,15 @@ import BlueprintIconButton from './BlueprintIconButton'
 import {Alert} from '@instructure/ui-alerts'
 import CurrentDownloads from '../FilesHeader/CurrentDownloads'
 import UsageRightsModal from './UsageRightsModal'
+import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
+import FileTableUpload from './FileTableUpload'
+import {UpdatedAtDate} from './UpdatedAtDate'
+import {ModifiedByLink} from './ModifiedByLink'
+import PermissionsModal from './PermissionsModal'
 
 const I18n = createI18nScope('files_v2')
+
+const MIN_HEIGHT = 450
 
 const fetchFilesAndFolders = async (
   url: string,
@@ -161,18 +167,16 @@ const columnRenderers: {
 } = {
   name: ({row, rows, isStacked}) => <NameLink isStacked={isStacked} item={row} collection={rows} />,
   created_at: ({row}) => <FriendlyDatetime dateTime={row.created_at} />,
-  updated_at: ({row}) => (
-    <div style={{padding: '0 0.5em'}}>
-      <FriendlyDatetime dateTime={row.updated_at} />
-    </div>
+  updated_at: ({row, isStacked}) => (
+    <UpdatedAtDate updatedAt={row.updated_at} isStacked={isStacked} />
   ),
-  modified_by: ({row}) =>
+  modified_by: ({row, isStacked}) =>
     'user' in row && row.user?.display_name ? (
-      <Link isWithinText={false} href={row.user.html_url}>
-        <div style={{textOverflow: 'ellipsis', overflow: 'hidden'}}>
-          <Text>{row.user.display_name}</Text>
-        </div>
-      </Link>
+      <ModifiedByLink
+        htmlUrl={row.user.html_url}
+        displayName={row.user.display_name}
+        isStacked={isStacked}
+      />
     ) : null,
   size: ({row}) =>
     'size' in row ? <Text>{friendlyBytes(row.size)}</Text> : <Text>{I18n.t('--')}</Text>,
@@ -190,8 +194,12 @@ const columnRenderers: {
       />
     ) : null,
   blueprint: ({row}) => <BlueprintIconButton item={row} />,
-  published: ({row, userCanEditFilesForContext}) => (
-    <PublishIconButton item={row} userCanEditFilesForContext={userCanEditFilesForContext} />
+  published: ({row, userCanEditFilesForContext, setModalOrTrayOptions}) => (
+    <PublishIconButton
+      item={row}
+      userCanEditFilesForContext={userCanEditFilesForContext}
+      onClick={setModalOrTrayOptions({id: 'permissions', items: [row]})}
+    />
   ),
   actions: ({
     row,
@@ -211,7 +219,7 @@ const columnRenderers: {
 }
 
 export type ModalOrTrayOptions = {
-  id: 'manage-usage-rights' | null
+  id: 'manage-usage-rights' | 'permissions'
   items: (File | Folder)[]
 }
 
@@ -248,6 +256,11 @@ const FileFolderTable = ({
   const [sortColumn, setSortColumn] = useState<string>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | 'none'>('asc')
   const [modalOrTrayOptions, _setModalOrTrayOptions] = useState<ModalOrTrayOptions | null>(null)
+
+  const [isDragging, setIsDragging] = useState(false)
+  const [directoryMinHeight, setDirectoryMinHeight] = useState('auto')
+
+  const filesDirectoryRef = useRef<HTMLDivElement | null>(null)
 
   const {data, error, isLoading, isFetching} = useQuery({
     queryKey: ['files', currentUrl],
@@ -369,6 +382,11 @@ const FileFolderTable = ({
           items={modalOrTrayOptions?.items || []}
           onDismiss={setModalOrTrayOptions(null)}
         />
+        <PermissionsModal
+          open={modalOrTrayOptions?.id === 'permissions'}
+          items={modalOrTrayOptions?.items || []}
+          onDismiss={setModalOrTrayOptions(null)}
+        />
       </>
     ),
     [modalOrTrayOptions?.id, modalOrTrayOptions?.items, setModalOrTrayOptions],
@@ -396,12 +414,9 @@ const FileFolderTable = ({
     )
   }, [
     folderBreadcrumbs,
-    rows.length,
     selectedRows,
     size,
-    folderBreadcrumbs,
     searchString,
-    selectedRows,
     rows,
     userCanEditFilesForContext,
     userCanDeleteFilesForContext,
@@ -415,6 +430,55 @@ const FileFolderTable = ({
     },
   )
 
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    if (e.dataTransfer?.types.includes('Files')) {
+      e.preventDefault()
+      if (!isDragging) {
+        if (filesDirectoryRef.current && filesDirectoryRef.current.offsetHeight < MIN_HEIGHT) {
+          setDirectoryMinHeight(MIN_HEIGHT + 'px')
+        }
+        setIsDragging(true)
+      }
+      return false
+    } else {
+      return true
+    }
+  }
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    if (filesDirectoryRef.current) {
+      const rect = filesDirectoryRef.current.getBoundingClientRect()
+      if (
+        rect &&
+        (e.clientY < rect.top ||
+          e.clientY >= rect.bottom ||
+          e.clientX < rect.left ||
+          e.clientX >= rect.right)
+      ) {
+        setIsDragging(false)
+        setDirectoryMinHeight('auto')
+      }
+    }
+  }
+
+  const handleDropState = () => {
+    setIsDragging(false)
+    setDirectoryMinHeight('auto')
+  }
+
+  const handleDrop = (
+    accepted: ArrayLike<DataTransferItem | globalThis.File>,
+    _rejected: ArrayLike<DataTransferItem | globalThis.File>,
+    e: React.DragEvent<Element>,
+  ) => {
+    e.preventDefault()
+    e.stopPropagation()
+    handleDropState()
+    FileOptionsCollection.setFolder(currentFolder)
+    FileOptionsCollection.setOptionsFromFiles(accepted, true)
+  }
+
   return (
     <>
       {renderModals()}
@@ -423,40 +487,67 @@ const FileFolderTable = ({
         <CurrentUploads />
         <CurrentDownloads rows={rows} />
       </View>
-      <Table caption={tableCaption} hover={true} layout={isStacked ? 'stacked' : 'fixed'}>
-        <Table.Head
-          renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+      <div
+        data-testid="files-directory"
+        ref={filesDirectoryRef}
+        style={{minHeight: rows.length === 0 && !isFetching && !isStacked ? MIN_HEIGHT : directoryMinHeight}}
+        className="files_directory"
+        onDragEnter={e => handleDragEnter(e as React.DragEvent<HTMLDivElement>)}
+        onDragLeave={e => handleDragLeave(e as React.DragEvent<HTMLDivElement>)}
+        onDragOver={e => e.preventDefault()}
+        onDrop={_e => handleDropState()}
+      >
+        <Table
+          caption={tableCaption}
+          hover={true}
+          layout={isStacked ? 'stacked' : 'fixed'}
+          data-testid="files-table"
         >
-          <Table.Row>
-            {renderTableHead(
-              size,
-              allRowsSelected,
-              someRowsSelected,
-              toggleSelectAll,
-              isStacked,
+          <Table.Head
+            renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+          >
+            <Table.Row>
+              {renderTableHead(
+                size,
+                allRowsSelected,
+                someRowsSelected,
+                toggleSelectAll,
+                isStacked,
+                filteredColumns,
+                sortColumn,
+                sortDirection,
+                handleColumnHeaderClick,
+              )}
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {renderTableBody(
+              rows,
               filteredColumns,
-              sortColumn,
-              sortDirection,
-              handleColumnHeaderClick,
+              selectedRows,
+              size,
+              isStacked,
+              columnRenderers,
+              toggleRowSelection,
+              userCanEditFilesForContext,
+              userCanDeleteFilesForContext,
+              usageRightsRequiredForContext,
+              setModalOrTrayOptions,
             )}
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          {renderTableBody(
-            rows,
-            filteredColumns,
-            selectedRows,
-            size,
-            isStacked,
-            columnRenderers,
-            toggleRowSelection,
-            userCanEditFilesForContext,
-            userCanDeleteFilesForContext,
-            usageRightsRequiredForContext,
-            setModalOrTrayOptions,
-          )}
-        </Table.Body>
-      </Table>
+            {!isFetching && userCanEditFilesForContext && !isStacked && (
+              <Table.Row data-upload>
+                <Table.Cell>
+                  <FileTableUpload
+                    currentFolder={currentFolder!}
+                    isDragging={isDragging}
+                    handleDrop={handleDrop}
+                  />
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table>
+      </div>
       <SubTableContent
         isLoading={isLoading || isFetching}
         isEmpty={rows.length === 0 && !isFetching}

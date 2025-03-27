@@ -94,8 +94,10 @@ module Api::V1::Attachment
         url = thumbnail_url
       else
         h = { download: "1", download_frd: "1" }
-        h[:verifier] = options[:verifier] if options[:verifier].present?
-        h[:verifier] ||= attachment.uuid unless options[:omit_verifier_in_app] && ((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
+        unless attachment.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api)
+          h[:verifier] = options[:verifier] if options[:verifier].present?
+          h[:verifier] ||= attachment.uuid unless options[:omit_verifier_in_app] && ((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
+        end
         h.merge!(options.slice(:access_token, :instfs_id)) if options[:access_token].present? && options[:instfs_id].present?
         url = file_download_url(attachment, h.merge(url_options))
       end

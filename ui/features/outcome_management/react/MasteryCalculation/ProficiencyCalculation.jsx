@@ -81,14 +81,14 @@ const CalculationIntInput = ({
 
   const errorMessages = []
   if (calculationInt === '') {
-    errorMessages.push({text: I18n.t('Must be a number'), type: 'error'})
+    errorMessages.push({text: I18n.t('Must be a number'), type: 'newError'})
   } else if (!validInt(calculationMethod, calculationInt)) {
     errorMessages.push({
       text: I18n.t('Must be between %{lower} and %{upper}', {
         lower: calculationMethod.validRange[0],
         upper: calculationMethod.validRange[1],
       }),
-      type: 'error',
+      type: 'newError',
     })
   }
 

@@ -19,7 +19,7 @@
 import React from 'react'
 import fetchMock from 'fetch-mock'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import {render, waitFor, act, cleanup} from '@testing-library/react'
+import {render, waitFor, act, cleanup, fireEvent} from '@testing-library/react'
 
 import {CreateCourseModal} from '../CreateCourseModal'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
@@ -30,14 +30,17 @@ const MANAGEABLE_COURSES = [
   {
     id: '4',
     name: 'CPMS',
+    adminable: true,
   },
   {
     id: '5',
     name: 'CS',
+    adminable: false,
   },
   {
     id: '6',
     name: 'Elementary',
+    adminable: false,
   },
 ]
 
@@ -376,7 +379,6 @@ describe('CreateCourseModal (1)', () => {
   describe('with enhanced_course_creation_picker FF ON', () => {
     beforeEach(() => {
       window.ENV.FEATURES.enhanced_course_creation_account_fetching = true
-      fetchMock.get(COURSE_CREATION_COURSES_URL, MANAGEABLE_COURSES)
     })
 
     afterEach(() => {
@@ -385,14 +387,117 @@ describe('CreateCourseModal (1)', () => {
     })
 
     it('fetches accounts from enrollments api', async () => {
+      fetchMock.get(COURSE_CREATION_COURSES_URL, MANAGEABLE_COURSES)
       render(<CreateCourseModal {...getProps()} />)
       expect(fetchMock.calls()[0][0]).toEqual('/api/v1/course_creation_accounts?per_page=100')
-      render(<CreateCourseModal {...getProps({permissions: 'teacher'})} />)
+      render(<CreateCourseModal {...getProps({ permissions: 'teacher' })} />)
       expect(fetchMock.calls()[0][0]).toEqual('/api/v1/course_creation_accounts?per_page=100')
-      render(<CreateCourseModal {...getProps({permissions: 'student'})} />)
+      render(<CreateCourseModal {...getProps({ permissions: 'student' })} />)
       expect(fetchMock.calls()[0][0]).toEqual('/api/v1/course_creation_accounts?per_page=100')
-      render(<CreateCourseModal {...getProps({permissions: 'no_enrollments'})} />)
+      render(<CreateCourseModal {...getProps({ permissions: 'no_enrollments' })} />)
       expect(fetchMock.calls()[0][0]).toEqual('/api/v1/course_creation_accounts?per_page=100')
+    })
+
+    it('account selection dropdown is shown', async () => {
+      fetchMock.get(COURSE_CREATION_COURSES_URL, ENROLLMENTS)
+      const { getByLabelText, queryByText } = render(
+        <CreateCourseModal {...getProps({ permissions: 'teacher' })} />,
+      )
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      expect(
+        queryByText('Which account will this subject be associated with?'),
+      ).toBeInTheDocument()
+    })
+
+    it('account selection dropdown is not shown when only MCC Account', async () => {
+      fetchMock.get(COURSE_CREATION_COURSES_URL, MCC_ACCOUNT)
+      const { getByLabelText, queryByText } = render(
+        <CreateCourseModal {...getProps({ permissions: 'teacher' })} />,
+      )
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      expect(
+        queryByText('Which account will this subject be associated with?'),
+      ).not.toBeInTheDocument()
+    })
+
+    it('Create button is enabled when Course name is added', async () => {
+      fetchMock.get(COURSE_CREATION_COURSES_URL, MCC_ACCOUNT)
+      const { getByLabelText, queryByText, getByRole } = render(
+        <CreateCourseModal {...getProps({ permissions: 'teacher' })} />,
+      )
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+
+      const input = getByLabelText('Subject Name')
+      const createButton = getByRole('button', { name: 'Create' })
+      expect(createButton).toBeDisabled()
+      fireEvent.change(input, { target: { value: 'New Course' } })
+
+      expect(
+        queryByText('Which account will this subject be associated with?'),
+      ).not.toBeInTheDocument()
+
+      expect(createButton).not.toBeDisabled()
+    })
+
+    it('Create button is enabled when Course name is added and account is selected', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      fetchMock.get(COURSE_CREATION_COURSES_URL, MANAGEABLE_COURSES)
+      const { getByText, getByLabelText, getByRole } = render(<CreateCourseModal {...getProps()} />)
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      const createButton = getByRole('button', { name: 'Create' })
+      expect(createButton).toBeDisabled()
+      await user.type(getByLabelText('Subject Name'), 'New course')
+      expect(createButton).toBeDisabled()
+      await user.click(getByLabelText('Which account will this subject be associated with?'))
+      await user.click(getByText('Elementary'))
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      expect(createButton).not.toBeDisabled()
+    })
+
+    it('shows form fields for account and subject name and homeroom sync after loading accounts', async () => {
+      fetchMock.get(COURSE_CREATION_COURSES_URL, MANAGEABLE_COURSES)
+      const { getByLabelText } = render(<CreateCourseModal {...getProps()} />)
+      await waitFor(() => {
+        expect(
+          getByLabelText('Which account will this subject be associated with?'),
+        ).toBeInTheDocument()
+        expect(getByLabelText('Subject Name')).toBeInTheDocument()
+        expect(
+          getByLabelText('Sync enrollments and subject start/end dates from homeroom'),
+        ).toBeInTheDocument()
+      })
+    })
+
+    it('homeroom endpoint is called when user is not administrator of the selected account', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      fetchMock.get(COURSE_CREATION_COURSES_URL, MANAGEABLE_COURSES)
+      const { getByText, getByLabelText, getByRole } = render(<CreateCourseModal {...getProps()} />)
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      const createButton = getByRole('button', { name: 'Create' })
+      expect(createButton).toBeDisabled()
+      await user.type(getByLabelText('Subject Name'), 'New course')
+      expect(createButton).toBeDisabled()
+      await user.click(getByLabelText('Which account will this subject be associated with?'))
+      await user.click(getByText('Elementary'))
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      await user.click(getByLabelText('Sync enrollments and subject start/end dates from homeroom'))
+      expect(fetchMock.calls()[1][0]).toEqual('/api/v1/users/self/courses?homeroom=true&per_page=100')
+    })
+
+    it('homeroom endpoint is called when user is administrator of the selected account', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      fetchMock.get(COURSE_CREATION_COURSES_URL, MANAGEABLE_COURSES)
+      const { getByText, getByLabelText, getByRole } = render(<CreateCourseModal {...getProps()} />)
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      const createButton = getByRole('button', { name: 'Create' })
+      expect(createButton).toBeDisabled()
+      await user.type(getByLabelText('Subject Name'), 'New course')
+      expect(createButton).toBeDisabled()
+      await user.click(getByLabelText('Which account will this subject be associated with?'))
+      await user.click(getByText('CPMS'))
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      await user.click(getByLabelText('Sync enrollments and subject start/end dates from homeroom'))
+      expect(fetchMock.calls()[2][0]).toEqual('/api/v1/accounts/4/courses?homeroom=true&per_page=100')
     })
   })
 })

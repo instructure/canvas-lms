@@ -954,31 +954,83 @@ describe Types::CourseType do
         ).to eq [other_teacher.id.to_s]
       end
 
-      it "allows filtering by enrollment state" do
-        expect(
-          course_type.resolve(<<~GQL, current_user: @teacher)
-            usersConnection(
-              filter: {enrollmentStates: [active completed]}
-            ) { edges { node { _id } } }
-          GQL
-        ).to match_array [@teacher, @student1, @student2, @concluded_user].map(&:to_param)
-      end
+      context "filtering" do
+        it "allows filtering by enrollment state" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(
+                filter: {enrollmentStates: [active completed]}
+              ) { edges { node { _id } } }
+            GQL
+          ).to match_array [@teacher, @student1, @student2, @concluded_user].map(&:to_param)
+        end
 
-      it "allows filtering by enrollment type" do
-        expect(
-          course_type.resolve(<<~GQL, current_user: @teacher)
-            usersConnection(
-              filter: {enrollmentTypes: [TeacherEnrollment]}
-            ) { edges { node { _id } } }
-          GQL
-        ).to match_array [@teacher, other_teacher].map(&:to_param)
-        expect(
-          course_type.resolve(<<~GQL, current_user: @teacher)
-            usersConnection(
-              filter: {enrollmentTypes: [StudentEnrollment]}
-            ) { edges { node { _id } } }
-          GQL
-        ).to match_array [@student1, @student2, @inactive_user].map(&:to_param)
+        it "allows filtering by enrollment type" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(
+                filter: {enrollmentTypes: [TeacherEnrollment]}
+              ) { edges { node { _id } } }
+            GQL
+          ).to match_array [@teacher, other_teacher].map(&:to_param)
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(
+                filter: {enrollmentTypes: [StudentEnrollment]}
+              ) { edges { node { _id } } }
+            GQL
+          ).to match_array [@student1, @student2, @inactive_user].map(&:to_param)
+        end
+
+        context "enrollment role ids" do
+          before(:once) do
+            root_account_id = @course.root_account.id
+            @student_role = Role.get_built_in_role("StudentEnrollment", root_account_id:)
+            @ta_role = Role.get_built_in_role("TaEnrollment", root_account_id:)
+            @teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id:)
+            @ta = course_with_ta(course: @course, active_all: true).user
+          end
+
+          it "returns only users with the specified enrollment role ids" do
+            result = course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(filter: {enrollmentRoleIds: ["#{@student_role.id}"]}) { edges { node { _id } } }
+            GQL
+            expect(result).to match_array([@student1.id, @student2.id, @inactive_user.id].map(&:to_s))
+
+            result = course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(filter: {enrollmentRoleIds: ["#{@ta_role.id}"]}) { edges { node { _id } } }
+            GQL
+            expect(result).to match_array([@ta.id.to_s])
+          end
+
+          it "does not return users when enrollment role ids are invalid" do
+            fake_role_id = (@teacher_role.id + 99_999).to_s
+            result = course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(filter: {enrollmentRoleIds: ["#{fake_role_id}"]}) { edges { node { _id } } }
+            GQL
+            expect(result).to be_empty
+          end
+        end
+
+        context "test students" do
+          before(:once) do
+            @test_student = course.student_view_student
+            @regular_student = student_in_course(active_all: true).user
+          end
+
+          it "includes test students by default" do
+            result = course_type.resolve("usersConnection { edges { node { _id } } }", current_user: @teacher)
+            expect(result).to include(@test_student.to_param, @regular_student.to_param)
+          end
+
+          it "excludes test students when exclude_test_students is true" do
+            result = course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(filter: {excludeTestStudents: true}) { edges { node { _id } } }
+            GQL
+            expect(result).not_to include(@test_student.to_param)
+            expect(result).to include(@regular_student.to_param)
+          end
+        end
       end
 
       context "loginId" do
@@ -1598,21 +1650,21 @@ describe Types::CourseType do
   describe "RubricsConnection" do
     before(:once) do
       rubric_for_course
+      deleted_rubric_for_course
       rubric_association_model(context: course, rubric: @rubric, association_object: course, purpose: "bookmark")
+      rubric_association_model(context: course, rubric: @deleted_rubric, association_object: course, purpose: "bookmark")
     end
 
     it "returns rubrics" do
       expect(
         course_type.resolve("rubricsConnection { edges { node { _id } } }")
       ).to eq [course.rubrics.first.to_param]
+    end
 
-      expect(
-        course_type.resolve("rubricsConnection { edges { node { criteriaCount } } }")
-      ).to eq [1]
+    it "returns only active rubrics, excluding those with workflow_state 'deleted'" do
+      rubrics = course_type.resolve("rubricsConnection { edges { node { _id workflowState } } }")
 
-      expect(
-        course_type.resolve("rubricsConnection { edges { node { workflowState } } }")
-      ).to eq ["active"]
+      expect(rubrics).to match_array(["active"])
     end
   end
 

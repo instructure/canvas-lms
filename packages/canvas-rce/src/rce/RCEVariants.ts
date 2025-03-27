@@ -198,27 +198,28 @@ export function getToolbarForVariant(
   ]
 }
 
+const DESKTOP_FEATURES: StatusBarFeature[] = ['keyboard_shortcuts', 'a11y_checker', 'word_count'];
+const MOBILE_FEATURES: StatusBarFeature[] = ['a11y_checker', 'word_count'];
+const EXTENDED_FEATURES: StatusBarFeature[] = ['html_view', 'fullscreen', 'resize_handle'];
+
 export function getStatusBarFeaturesForVariant(
   variant: RCEVariant,
-  ai_text_tools: boolean = false,
+  aiTextTools: boolean = false,
+  isDesktop: boolean = true,
 ): StatusBarFeature[] {
-  if (variant === 'lite' || variant === 'text-only') {
-    return ['keyboard_shortcuts', 'a11y_checker', 'word_count']
-  }
   if (variant === 'text-block') {
     return []
   }
 
-  const full_features: StatusBarFeature[] = [
-    'keyboard_shortcuts',
-    'a11y_checker',
-    'word_count',
-    'html_view',
-    'fullscreen',
-    'resize_handle',
-  ]
-  if (ai_text_tools) {
-    full_features.push('ai_tools')
+  const platformFeatures = isDesktop ? DESKTOP_FEATURES : MOBILE_FEATURES;
+
+  if (variant === 'lite' || variant === 'text-only') {
+    return platformFeatures;
   }
-  return full_features
+
+  return [
+    ...platformFeatures,
+    ...EXTENDED_FEATURES,
+    ...(aiTextTools ? ['ai_tools'] : []),
+  ] as StatusBarFeature[]
 }

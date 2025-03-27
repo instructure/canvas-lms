@@ -24,6 +24,10 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {IconInfoLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {IconButton} from '@instructure/ui-buttons'
 
 const I18n = createI18nScope('discussion_create')
 
@@ -48,6 +52,13 @@ export const ViewSettings = ({
   setSortOrder,
   setSortOrderLocked,
 }: Props) => {
+
+  const infoToolTipSortOrder = I18n.t(
+    'This setting defines the initial sort order. Students can set their preference. After they change it, future default updates won\'t alter their settings unless locked.',
+  )
+  const infoToolTipExpand = I18n.t(
+    'This setting defines the initial thread state. Students can set their preference. After they change it, future default updates won\'t alter their settings unless locked.'  )
+
   return (
     <View display="block" margin="medium 0" data-testid="discussion-view-settings">
       <Text size="large" as="h2">
@@ -57,7 +68,22 @@ export const ViewSettings = ({
         <View display="block" margin="small 0 medium">
           <RadioInputGroup
             name="expanded"
-            description={I18n.t('Default Thread State')}
+            description={
+              <View>
+               <Text as="span">{I18n.t('Default Thread State')}</Text>
+                <Tooltip renderTip={infoToolTipExpand} on={['hover', 'focus']} color="primary">
+                  <IconButton
+                    renderIcon={IconInfoLine}
+                    withBackground={false}
+                    withBorder={false}
+                    color="primary"
+                    size="small"
+                    cursor="default"
+                    screenReaderLabel={infoToolTipExpand}
+                  />
+                </Tooltip>
+              </View>
+            }
             value={expanded + ''}
             onChange={(_event, value) => {
               setExpanded(value === 'true')
@@ -101,7 +127,22 @@ export const ViewSettings = ({
         <View display="block" margin="medium 0">
           <RadioInputGroup
             name="sortOrder"
-            description={I18n.t('Default Sort Order')}
+            description={
+              <View>
+                <Text as="span">{I18n.t('Default Sort Order')}</Text>
+                <Tooltip renderTip={infoToolTipSortOrder} on={['hover', 'focus']} color="primary">
+                  <IconButton
+                    renderIcon={IconInfoLine}
+                    withBackground={false}
+                    withBorder={false}
+                    color="primary"
+                    size="small"
+                    cursor="default"
+                    screenReaderLabel={infoToolTipSortOrder}
+                  />
+                </Tooltip>
+              </View>
+            }
             value={sortOrder}
             onChange={(_event, value) => {
               setSortOrder(value)

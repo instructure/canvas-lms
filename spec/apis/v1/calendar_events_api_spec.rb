@@ -4484,7 +4484,7 @@ describe CalendarEventsApiController, type: :request do
 
   context "sub_assignments" do
     before(:once) do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic with checkpoints")
       @checkpoint_1 = create_checkpoint(topic: @topic, due_at: "2024-08-01 12:00:00")
       @checkpoint_2 = create_checkpoint(topic: @topic, type: "reply_to_entry", due_at: "2024-08-02 12:00:00")
@@ -4515,7 +4515,7 @@ describe CalendarEventsApiController, type: :request do
     context "discussion_checkpoints feature flag" do
       context "when feature flag is enabled" do
         before do
-          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
         end
 
         it "returns sub_assignments" do
@@ -4556,7 +4556,7 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "does not return sub_assignments when feature flag is disabled" do
-        @course.root_account.disable_feature!(:discussion_checkpoints)
+        @course.account.disable_feature!(:discussion_checkpoints)
         json = api_call(:get, "/api/v1/calendar_events", {
                           controller: "calendar_events_api",
                           action: "index",
@@ -4915,6 +4915,43 @@ describe CalendarEventsApiController, type: :request do
         expect(json.first["id"]).to eq "sub_assignment_#{@checkpoint_1.id}"
         expect(json.first["all_day"]).to be_falsey
         expect(json.first["all_day_date"]).to eq "2024-08-05"
+      end
+    end
+
+    context "sub-accounts" do
+      before do
+        root_account = Account.default
+        @sub_account = root_account.sub_accounts.create!(name: "sub-account")
+        @course.update!(account: @sub_account)
+        root_account.allow_feature!(:discussion_checkpoints)
+      end
+
+      it "returns sub_assignments when feature flag is enabled" do
+        @sub_account.enable_feature!(:discussion_checkpoints)
+        json = api_call(:get, "/api/v1/calendar_events", {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          type: "sub_assignment",
+                          context_codes: ["course_#{@course.id}"],
+                          start_date: "2024-08-01",
+                          end_date: "2024-08-02"
+                        })
+        expect(json.size).to be 2
+      end
+
+      it "does not return sub_assignments when feature flag is disabled" do
+        @sub_account.disable_feature!(:discussion_checkpoints)
+        json = api_call(:get, "/api/v1/calendar_events", {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          type: "sub_assignment",
+                          context_codes: ["course_#{@course.id}"],
+                          start_date: "2024-08-01",
+                          end_date: "2024-08-02"
+                        })
+        expect(json.size).to be 0
       end
     end
   end

@@ -111,6 +111,7 @@ describe "course sections" do
       wait_for_ajaximations
 
       expect(f("#course_section_name_errors")).to include_text("A section name is required")
+      expect(f("#course_section_name").attribute("class")).to include("error-outline")
     end
 
     it "validates course_section name less than 255 characters" do
@@ -124,6 +125,7 @@ describe "course sections" do
       wait_for_ajaximations
 
       expect(f("#course_section_name_errors")).to include_text("Section name is too long")
+      expect(f("#course_section_name").attribute("class")).to include("error-outline")
     end
 
     it "validates course_section start_at is before end_at" do

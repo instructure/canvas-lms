@@ -324,7 +324,25 @@ const mediaCommentActions = {
       }
 
       const $dialog = $('<div style="overflow: hidden; padding: 0;" />')
-      if (mediaType === 'audio') $dialog.css('padding-top', '120px')
+      if (mediaType === 'audio') {
+        if (ENV.FEATURES?.consolidated_media_player) {
+          $dialog.css('padding-top', '0')
+          height = 280
+        } else if(ENV.FEATURES?.speedgrader_studio_media_capture) { 
+          $dialog.css({
+            'padding-top': '105px',
+            'background-color': 'black',
+          })
+          height = 330
+          width = 450
+        } else {
+          $dialog.css({
+            'padding-top': '150px',
+            'background-color': 'black',
+          })
+        }
+      }
+
 
       $dialog.dialog({
         dialogClass: 'play_media_comment',
@@ -388,11 +406,16 @@ const mediaCommentActions = {
                   type={mediaType === 'audio' ? 'audio' : 'video'}
                 />
               ) : (
-                <MediaPlayer
-                  tracks={sourcesAndTracks.tracks}
-                  sources={sourcesAndTracks.sources}
-                  captionPosition="bottom"
-                />
+                <div style={{
+                  maxHeight: height,
+                  maxWidth: width,
+                }}>
+                  <MediaPlayer
+                    tracks={sourcesAndTracks.tracks}
+                    sources={sourcesAndTracks.sources}
+                    captionPosition="bottom"
+                  />
+                </div>
               )
 
               const root = createRoot($dialog[0])

@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import {string, func} from 'prop-types'
+import {string, func, bool, object} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
 import formatMessage from '../../../../format-message'
 
-export default function UrlPanel({fileUrl, setFileUrl}) {
+export default function UrlPanel({fileUrl, setFileUrl, urlHasError, urlRef}) {
   return (
     <>
       <TextInput
@@ -29,7 +29,9 @@ export default function UrlPanel({fileUrl, setFileUrl}) {
         renderLabel={formatMessage('File URL')}
         type="url"
         value={fileUrl}
-        onChange={(e, val) => setFileUrl(val)}
+        onChange={(_e, val) => setFileUrl(val)}
+        messages={urlHasError ? [{ text: formatMessage('Invalid URL'), type: 'error' }] : []}
+        ref={urlRef}
       />
     </>
   )
@@ -38,4 +40,6 @@ export default function UrlPanel({fileUrl, setFileUrl}) {
 UrlPanel.propTypes = {
   fileUrl: string.isRequired,
   setFileUrl: func.isRequired,
+  urlHasError: bool,
+  urlRef: object
 }

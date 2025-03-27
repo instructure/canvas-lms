@@ -65,7 +65,7 @@ module StudentVisibilityCommon
         before do
           @course.account.enable_feature!(:differentiation_tags)
           @course.account.enable_feature!(:assign_to_differentiation_tags)
-          @course.account.settings[:allow_assign_to_differentiation_tags] = true
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           @course.account.save!
 
           # additional student for testing differentiation tags
@@ -105,7 +105,7 @@ module StudentVisibilityCommon
           # https://instructure.atlassian.net/wiki/spaces/EGGWIKI/pages/86942646273/Tech+Plan+Assign+To+Hidden+Groups#Rollback-Plan
           @differentiation_tag_group_1.add_user(@student1)
           learning_object1.assignment_overrides.create!(set: @differentiation_tag_group_1)
-          @course.account.settings[:allow_assign_to_differentiation_tags] = false
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
           @course.account.save!
           expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
           expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
@@ -189,7 +189,7 @@ module StudentVisibilityCommon
         before do
           @course.account.enable_feature!(:differentiation_tags)
           @course.account.enable_feature!(:assign_to_differentiation_tags)
-          @course.account.settings[:allow_assign_to_differentiation_tags] = true
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           @course.account.save!
 
           # additional student for testing differentiation tags
@@ -229,7 +229,7 @@ module StudentVisibilityCommon
           # https://instructure.atlassian.net/wiki/spaces/EGGWIKI/pages/86942646273/Tech+Plan+Assign+To+Hidden+Groups#Rollback-Plan
           @differentiation_tag_group_1.add_user(@student1)
           @module1.assignment_overrides.create!(set: @differentiation_tag_group_1)
-          @course.account.settings[:allow_assign_to_differentiation_tags] = false
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
           @course.account.save!
 
           expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)

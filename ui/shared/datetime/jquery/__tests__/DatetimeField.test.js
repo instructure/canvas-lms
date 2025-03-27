@@ -16,10 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DatetimeField, {
-  DATETIME_FORMAT_OPTIONS,
-  PARSE_RESULTS,
-} from '../DatetimeField'
+import DatetimeField, {DATETIME_FORMAT_OPTIONS, PARSE_RESULTS} from '../DatetimeField'
 import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import $ from 'jquery'
 import 'jquery-migrate'
@@ -312,6 +309,49 @@ describe('DatetimeField', () => {
       expect(field.$suggest.text()).toBe(suggestValue)
       expect(field.$contextSuggest.text()).toBe('')
     })
+
+    describe('with showFormatExample option', () => {
+      beforeEach(() => {
+        createField({showFormatExample: true})
+        field.$formatExample = $('<div>')
+      })
+
+      it('shows example format when blank', () => {
+        field.blank = true
+        field.updateSuggest()
+        expect(field.$formatExample.text()).toBe('MM/DD/YYYY')
+      })
+
+      it('does not show example format while typing', () => {
+        field.blank = false
+        const value = '12/31/2020'
+        jest.spyOn(field, 'formatSuggest').mockReturnValue(value)
+        field.updateSuggest(true)
+        expect(field.$formatExample.text()).toBe('')
+      })
+
+      it('shows example format when contextsuggest is present', () => {
+        ENV.TIMEZONE = 'America/Detroit'
+        ENV.CONTEXT_TIMEZONE = 'America/Juneau'
+        field.blank = true
+        field.updateSuggest()
+        expect(field.$formatExample.text()).toBe('MM/DD/YYYY')
+      })
+
+      it('shows example format based on locale', () => {
+        ENV.MOMENT_LOCALE = 'es'
+        field.blank = true
+        field.updateSuggest()
+        expect(field.$formatExample.text()).toBe('DD/MM/YYYY')
+      })
+
+      it('does not show example format when timeonly is true', () => {
+        createField({showFormatExample: true, timeOnly: true})
+        field.blank = true
+        field.updateSuggest()
+        expect(field.$formatExample.text()).toBe('')
+      })
+    })
   })
 
   describe('screenreader alerts', () => {
@@ -323,7 +363,7 @@ describe('DatetimeField', () => {
     it('alerts screenreader on an invalid parse no matter what', () => {
       $field.val('invalid')
       $field.change()
-      expect(field.debouncedSRFME).toHaveBeenCalledWith("Please enter a valid format for a date")
+      expect(field.debouncedSRFME).toHaveBeenCalledWith('Please enter a valid format for a date')
     })
 
     it('flashes combined suggest text to screenreader when there is course suggest text', () => {
@@ -460,6 +500,22 @@ describe('DatetimeField', () => {
     it('formats into val() with just date', () => {
       field.setDate(challenger)
       expect($field.val()).toBe('Tue, Jan 28, 1986')
+    })
+  })
+
+  describe('getFormatExample', () => {
+    it('returns example date format', () => {
+      expect(field.getFormatExample()).toBe('MM/DD/YYYY')
+    })
+
+    it('returns example date format based on locale', () => {
+      ENV.MOMENT_LOCALE = 'es'
+      expect(field.getFormatExample()).toBe('DD/MM/YYYY')
+    })
+
+    it('returns empty string when timeOnly is true', () => {
+      createField({timeOnly: true})
+      expect(field.getFormatExample()).toBe('')
     })
   })
 })

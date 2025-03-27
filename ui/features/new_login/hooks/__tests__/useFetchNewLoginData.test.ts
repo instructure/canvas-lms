@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {waitFor} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks'
 import {useFetchNewLoginData} from '..'
 
@@ -36,6 +37,8 @@ const createMockContainer = (
   requireEmail: string | null,
   passwordPolicy: string | null,
   forgotPasswordUrl: string | null,
+  invalidLoginFaqUrl: string | null,
+  helpLink: string | null,
 ) => {
   const container = document.createElement('div')
   container.id = 'new_login_data'
@@ -87,6 +90,12 @@ const createMockContainer = (
   if (forgotPasswordUrl !== null) {
     container.setAttribute('data-forgot-password-url', forgotPasswordUrl)
   }
+  if (invalidLoginFaqUrl !== null) {
+    container.setAttribute('data-invalid-login-faq-url', invalidLoginFaqUrl)
+  }
+  if (helpLink !== null) {
+    container.setAttribute('data-help-link', helpLink)
+  }
   document.body.appendChild(container)
 }
 
@@ -101,6 +110,54 @@ describe('useFetchNewLoginData', () => {
   it('mounts without crashing', () => {
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current).toBeDefined()
+  })
+
+  it('ensures the attributes in useFetchNewLoginData match those in createMockContainer', async () => {
+    createMockContainer(
+      '', // enableCourseCatalog
+      '', // authProviders
+      '', // loginHandleName
+      '', // loginLogoUrl
+      '', // loginLogoText
+      '', // bodyBgColor
+      '', // bodyBgImage
+      '', // isPreviewMode
+      '', // selfRegistrationType
+      '', // recaptchaKey
+      '', // termsRequired
+      '', // termsOfUseUrl
+      '', // privacyPolicyUrl
+      '', // requireEmail
+      '', // passwordPolicy
+      '', // forgotPasswordUrl
+      '', // invalidLoginFaqUrl
+      '', // helpLink
+    )
+    const {result} = renderHook(() => useFetchNewLoginData())
+    await waitFor(() => {
+      const hookAttributes = Object.keys(result.current.data)
+      const expectedAttributes = [
+        'enableCourseCatalog',
+        'authProviders',
+        'loginHandleName',
+        'loginLogoUrl',
+        'loginLogoText',
+        'bodyBgColor',
+        'bodyBgImage',
+        'isPreviewMode',
+        'selfRegistrationType',
+        'recaptchaKey',
+        'termsRequired',
+        'termsOfUseUrl',
+        'privacyPolicyUrl',
+        'requireEmail',
+        'passwordPolicy',
+        'forgotPasswordUrl',
+        'invalidLoginFaqUrl',
+        'helpLink',
+      ]
+      expect(hookAttributes.sort()).toEqual(expectedAttributes.sort())
+    })
   })
 
   it('returns default undefined values when container is not present', () => {
@@ -143,20 +200,18 @@ describe('useFetchNewLoginData', () => {
       'true',
       JSON.stringify({
         minimum_character_length: 8,
-        maximum_character_length: 50,
-        max_repeats: 3,
-        max_sequence: 4,
-        maximum_login_attempts: 10,
-        allow_login_suspension: 'false',
         require_number_characters: 'false',
         require_symbol_characters: 'false',
-        disallow_common_passwords: 'true',
       }),
-      'https://example.com/privacy',
+      'https://example.com/password-reset',
+      'https://example.com/faq',
+      JSON.stringify({
+        text: 'Help Center',
+        trackCategory: 'login',
+        trackLabel: 'help',
+      }),
     )
-
     const {result} = renderHook(() => useFetchNewLoginData())
-
     expect(result.current.data).toEqual({
       enableCourseCatalog: true,
       authProviders: [{id: '1', name: 'Google', auth_type: 'google'}],
@@ -174,15 +229,16 @@ describe('useFetchNewLoginData', () => {
       requireEmail: true,
       passwordPolicy: {
         minimumCharacterLength: 8,
-        maximumCharacterLength: 50,
-        maxRepeats: 3,
-        maxSequence: 4,
-        maximumLoginAttempts: 10,
         requireNumberCharacters: false,
         requireSymbolCharacters: false,
-        disallowCommonPasswords: true,
       },
-      forgotPasswordUrl: 'https://example.com/privacy',
+      forgotPasswordUrl: 'https://example.com/password-reset',
+      invalidLoginFaqUrl: 'https://example.com/faq',
+      helpLink: {
+        text: 'Help Center',
+        trackCategory: 'login',
+        trackLabel: 'help',
+      },
     })
   })
 
@@ -191,6 +247,8 @@ describe('useFetchNewLoginData', () => {
     createMockContainer(
       null,
       'invalid JSON',
+      null,
+      null,
       null,
       null,
       null,
@@ -233,6 +291,8 @@ describe('useFetchNewLoginData', () => {
       null,
       null,
       null,
+      null,
+      null,
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data.enableCourseCatalog).toBe(false)
@@ -240,7 +300,7 @@ describe('useFetchNewLoginData', () => {
   })
 
   it('returns undefined for empty string attributes', () => {
-    createMockContainer('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')
+    createMockContainer('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data).toEqual({
       enableCourseCatalog: undefined,
@@ -259,6 +319,64 @@ describe('useFetchNewLoginData', () => {
       requireEmail: undefined,
       passwordPolicy: undefined,
       forgotPasswordUrl: undefined,
+      invalidLoginFaqUrl: undefined,
+      helpLink: undefined,
     })
+  })
+
+  it('returns empty structures for present but empty object-like attributes', () => {
+    createMockContainer(
+      null,
+      JSON.stringify({}), // authProviders
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      JSON.stringify({}), // passwordPolicy
+      null,
+      null,
+      null,
+      JSON.stringify({}), // helpLink
+    )
+    const {result} = renderHook(() => useFetchNewLoginData())
+    const data = result.current.data
+    expect(data.passwordPolicy).toBeUndefined()
+    expect(data.authProviders).toEqual({})
+    expect(data.helpLink).toEqual({text: '', trackCategory: '', trackLabel: ''})
+  })
+
+  it('returns undefined for object-like attributes that are missing from the DOM', () => {
+    createMockContainer(
+      null,
+      null, // authProviders
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null, // passwordPolicy
+      null,
+      null,
+      null,
+      null, // helpLink
+    )
+    const {result} = renderHook(() => useFetchNewLoginData())
+    const data = result.current.data
+    expect(data.passwordPolicy).toBeUndefined()
+    expect(data.authProviders).toBeUndefined()
+    expect(data.helpLink).toBeUndefined()
   })
 })

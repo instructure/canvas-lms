@@ -72,6 +72,19 @@ export const fetchRegistrations: FetchRegistrations = options =>
     ),
   )
 
+export type FetchRegistrationForId = (options: {
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId
+}) => Promise<ApiResult<LtiRegistration>>
+
+export const fetchRegistrationForId: FetchRegistrationForId = options =>
+  parseFetchResult(ZLtiRegistration)(
+    fetch(
+      `/api/v1/accounts/${options.accountId}/lti_registrations/${options.ltiRegistrationId}`,
+      defaultFetchOptions(),
+    ),
+  )
+
 export type FetchThirdPartyToolConfiguration = (
   config:
     | {

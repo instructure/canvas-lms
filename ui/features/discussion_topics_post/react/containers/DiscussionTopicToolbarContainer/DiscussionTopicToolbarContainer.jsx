@@ -170,9 +170,6 @@ const DiscussionTopicToolbarContainer = props => {
       : 'primary'
   return (
     <View as="div" padding="small" margin="0 0 x-small 0" background={background}>
-      <ScreenReaderContent>
-        <h1>{props.discussionTopic.title}</h1>
-      </ScreenReaderContent>
       {instUINavEnabled() ? (
         <>
           <Flex
@@ -240,7 +237,7 @@ const DiscussionTopicToolbarContainer = props => {
               />
             )
           ) : (
-            <Flex 
+            <Flex
               direction={props.breakpoints.mobileOnly ? 'column' : 'row'}
               wrap="wrap"
               gap={props.breakpoints.mobileOnly ? '0' : 'small'}
@@ -248,10 +245,7 @@ const DiscussionTopicToolbarContainer = props => {
               height="100%"
               padding="xxx-small 0"
             >
-              <Flex.Item
-                shouldGrow={true}
-                shouldShrink={true}
-              >
+              <Flex.Item shouldGrow={true} shouldShrink={true}>
                 {!hideStudentNames && (
                   <DiscussionPostSearchTool
                     discussionAnonymousState={props.discussionTopic.anonymousState}
@@ -262,52 +256,58 @@ const DiscussionTopicToolbarContainer = props => {
                 )}
               </Flex.Item>
               <Flex.Item
-                  shouldGrow={false}
-                  shouldShrink={true}
-                  width={props.breakpoints.mobileOnly ? "100%" : "fit-content"}
-                  padding={props.breakpoints.mobileOnly ? 'xx-small' : 'xxx-small'}
-                >
+                shouldGrow={false}
+                shouldShrink={true}
+                width={props.breakpoints.mobileOnly ? '100%' : 'fit-content'}
+                padding={props.breakpoints.mobileOnly ? 'xx-small' : 'xxx-small'}
+              >
                 {renderSort()}
               </Flex.Item>
             </Flex>
           )}
         </>
       ) : (
-        <DiscussionPostToolbar
-          isAdmin={props.discussionTopic.permissions.readAsAdmin}
-          canEdit={props.discussionTopic.permissions.update}
-          childTopics={getGroupsMenuTopics()}
-          selectedView={filter}
-          sortDirection={props.discussionTopic.participant.sortOrder}
-          searchTerm={currentSearchValue}
-          discussionAnonymousState={props.discussionTopic.anonymousState}
-          canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
-          isExpanded={props.discussionTopic.participant.expanded}
-          onSearchChange={value => setCurrentSearchValue(value)}
-          onViewFilter={onViewFilter}
-          onSortClick={onSortClick}
-          onCollapseRepliesToggle={onExpandCollapseClick}
-          onSwitchLinkClick={onSwitchLinkClick}
-          setUserSplitScreenPreference={props.setUserSplitScreenPreference}
-          userSplitScreenPreference={props.userSplitScreenPreference}
-          closeView={props.closeView}
-          discussionId={props.discussionTopic._id}
-          typeName={props.discussionTopic.__typename?.toLowerCase()}
-          discussionTitle={props.discussionTopic.title}
-          pointsPossible={props.discussionTopic.assignment?.pointsPossible}
-          isGraded={props.discussionTopic.assignment !== null}
-          manageAssignTo={props.discussionTopic.permissions.manageAssignTo}
-          isCheckpointed={props?.discussionTopic?.assignment?.checkpoints?.length > 0}
-          isSortOrderLocked={props.discussionTopic.sortOrderLocked}
-          isExpandedLocked={props.discussionTopic.expandedLocked}
-          discDefaultSortEnabled={discDefaultSortEnabled()}
-          discDefaultExpandEnabled={discDefaultExpandEnabled()}
-          showAssignTo={
-            !props.discussionTopic.isAnnouncement &&
-            props.discussionTopic.contextType === 'Course' &&
-            (props.discussionTopic.assignment !== null || !props.discussionTopic.groupSet !== null)
-          }
-        />
+        <>
+          <ScreenReaderContent>
+            <h1>{props.discussionTopic.title}</h1>
+          </ScreenReaderContent>
+          <DiscussionPostToolbar
+            isAdmin={props.discussionTopic.permissions.readAsAdmin}
+            canEdit={props.discussionTopic.permissions.update}
+            childTopics={getGroupsMenuTopics()}
+            selectedView={filter}
+            sortDirection={props.discussionTopic.participant.sortOrder}
+            searchTerm={currentSearchValue}
+            discussionAnonymousState={props.discussionTopic.anonymousState}
+            canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
+            isExpanded={props.discussionTopic.participant.expanded}
+            onSearchChange={value => setCurrentSearchValue(value)}
+            onViewFilter={onViewFilter}
+            onSortClick={onSortClick}
+            onCollapseRepliesToggle={onExpandCollapseClick}
+            onSwitchLinkClick={onSwitchLinkClick}
+            setUserSplitScreenPreference={props.setUserSplitScreenPreference}
+            userSplitScreenPreference={props.userSplitScreenPreference}
+            closeView={props.closeView}
+            discussionId={props.discussionTopic._id}
+            typeName={props.discussionTopic.__typename?.toLowerCase()}
+            discussionTitle={props.discussionTopic.title}
+            pointsPossible={props.discussionTopic.assignment?.pointsPossible}
+            isGraded={props.discussionTopic.assignment !== null}
+            manageAssignTo={props.discussionTopic.permissions.manageAssignTo}
+            isCheckpointed={props?.discussionTopic?.assignment?.checkpoints?.length > 0}
+            isSortOrderLocked={props.discussionTopic.sortOrderLocked}
+            isExpandedLocked={props.discussionTopic.expandedLocked}
+            discDefaultSortEnabled={discDefaultSortEnabled()}
+            discDefaultExpandEnabled={discDefaultExpandEnabled()}
+            showAssignTo={
+              !props.discussionTopic.isAnnouncement &&
+              props.discussionTopic.contextType === 'Course' &&
+              (props.discussionTopic.assignment !== null ||
+                !props.discussionTopic.groupSet !== null)
+            }
+          />
+        </>
       )}
       {showTranslationControl && ENV.ai_translation_improvements && (
         <DiscussionTranslationModuleContainer />

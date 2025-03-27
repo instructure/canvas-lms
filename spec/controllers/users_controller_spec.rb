@@ -2207,7 +2207,7 @@ describe UsersController do
       user.pseudonym.update_attribute(:sis_user_id, "sis_user_id")
       user.pseudonym.update_attribute(:integration_id, "integration_id")
       user.pseudonym.update_attribute(:unique_id, "login_id")
-      course_with_student(active_all: true, user: user)
+      course_with_student(active_all: true, user:)
       user.communication_channels.create(path: "user_cc@instructure.com").confirm!
 
       get "user_for_merge", params: { user_id: user.id }

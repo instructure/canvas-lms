@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
-import {useQuery} from '@apollo/client'
+import React, {useCallback, useState, useEffect} from 'react'
+import {useApolloClient} from '@apollo/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
@@ -32,15 +32,58 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const I18n = createI18nScope('MasteryScale')
 
+async function loadProficiencyRatings(client, query, contextId, controller) {
+  const queryFn = after => {
+    return client.query({
+      query,
+      variables: {
+        contextId,
+        proficiencyRatingsCursor: after
+      },
+      fetchPolicy: process.env.NODE_ENV === 'test' ? undefined : 'no-cache',
+      context: { fetchOptions: { signal: controller.signal } }
+    })
+  }
+  const {data: initialData} = JSON.parse(JSON.stringify(await queryFn(null))) // deep copy of frozen object so we can modify it
+  const proficiencyRatings = initialData.context.outcomeProficiency?.proficiencyRatingsConnection
+
+  if(!proficiencyRatings) return {data: initialData}
+
+  while (true) {
+    const after = proficiencyRatings?.pageInfo?.hasNextPage
+        && proficiencyRatings?.pageInfo?.endCursor
+    if (!after) break
+    const {data: pagedData} = await queryFn(after)
+    const pagedProficiencyRatings = pagedData.context.outcomeProficiency.proficiencyRatingsConnection
+    proficiencyRatings.nodes = proficiencyRatings.nodes.concat(pagedProficiencyRatings.nodes)
+    proficiencyRatings.pageInfo = pagedProficiencyRatings.pageInfo
+  }
+
+  return {data: initialData}
+}
+
 const MasteryScale = ({onNotifyPendingChanges}) => {
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState(null)
   const {contextType, contextId} = useCanvasContext()
+  const client = useApolloClient()
   const query =
     contextType === 'Course' ? COURSE_OUTCOME_PROFICIENCY_QUERY : ACCOUNT_OUTCOME_PROFICIENCY_QUERY
 
-  const {loading, error, data} = useQuery(query, {
-    variables: {contextId},
-    fetchPolicy: process.env.NODE_ENV === 'test' ? undefined : 'no-cache',
-  })
+  useEffect(() => {
+    const controller = new AbortController()
+    loadProficiencyRatings(
+      client,
+      query,
+      contextId,
+      controller,
+    )
+    .then(({data}) => setData(data))
+    .catch(error => setError(error))
+    .finally(() => setLoading(false))
+    return () => controller.abort()
+  }, [])
 
   const [updateProficiencyRatingsError, setUpdateProficiencyRatingsError] = useState(null)
   const updateProficiencyRatings = useCallback(

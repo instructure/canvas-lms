@@ -109,6 +109,7 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryByTestId('group-discussion-checkbox')).toBeTruthy()
     expect(document.queryAllByText('Available from')).toBeTruthy()
     expect(document.queryAllByText('Until')).toBeTruthy()
+    expect(document.queryByTestId('discussion-topic-message-editor')).toBeTruthy()
 
     // Hides announcement options
     expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
@@ -278,5 +279,11 @@ describe('DiscussionTopicForm', () => {
       })
       expect(queryByTestId('discussion-view-settings')).not.toBeInTheDocument()
     })
+  })
+
+  it('does not render rce when mastercourse is locked', () => {
+    window.ENV.DISCUSSION_CONTENT_LOCKED = true
+    const document = setup()
+    expect(document.queryByTestId('discussion-topic-message-locked')).toBeTruthy()
   })
 })

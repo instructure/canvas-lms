@@ -89,15 +89,15 @@ describe ActiveRecord::Base do
       end
 
       it "supports start" do
-        expect(do_batches(Enrollment, start: @e2.id)).to eq [[@e2, @e3, @e4, @e5, @e6]]
+        expect(do_batches(Enrollment.order(:id), start: @e2.id)).to eq [[@e2, @e3, @e4, @e5, @e6]]
       end
 
       it "supports finish" do
-        expect(do_batches(Enrollment, finish: @e3.id)).to eq [[@e1, @e2, @e3]]
+        expect(do_batches(Enrollment.order(:id), finish: @e3.id)).to eq [[@e1, @e2, @e3]]
       end
 
       it "supports start and finish with a small batch size" do
-        expect(do_batches(Enrollment, of: 2, start: @e2.id, finish: @e4.id)).to eq [[@e2, @e3], [@e4]]
+        expect(do_batches(Enrollment.order(:id), of: 2, start: @e2.id, finish: @e4.id)).to eq [[@e2, @e3], [@e4]]
       end
 
       it "respects order" do
@@ -186,6 +186,15 @@ describe ActiveRecord::Base do
 
       it "works with load: false" do
         User.in_batches(strategy: :copy) { |r| expect(r.to_a).to match_array([@u1, @u2, @u3]) }
+      end
+
+      it "handles nested queries correctly" do
+        old_connection = User.connection
+        expect(do_batches(User.order(:id), of: 1, load: false) { User.count }).to eq [0, 0, 0]
+        new_connection = User.connection
+
+        # make sure we're not holding the connection which ran COPY forever
+        expect(old_connection).to eq(new_connection)
       end
     end
 

@@ -18,8 +18,8 @@
 
 import React, {type FC} from 'react'
 import {Text} from '@instructure/ui-text'
-import {OBSERVER_ENROLLMENT} from '../../../util/constants'
 import {getRoleName} from '../../../util/utils'
+import {OBSERVER_ROLE} from '../../../util/constants'
 import type {Enrollment} from '../../../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -27,13 +27,15 @@ const I18n = createI18nScope('course_people')
 
 const UserRole: FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
   enrollments.map(enrollment => {
-    const {_id, type, associatedUser, temporaryEnrollmentSourceUserId} = enrollment
+    const {_id: id, sisRole, associatedUser, temporaryEnrollmentSourceUserId} = enrollment
 
-    let roleName = getRoleName(type)
+    let roleName = getRoleName(sisRole)
 
-    if (temporaryEnrollmentSourceUserId) roleName = I18n.t('Temporary: %{roleName}', {roleName})
+    if (temporaryEnrollmentSourceUserId) {
+      roleName = I18n.t('Temporary: %{roleName}', {roleName})
+    }
 
-    if (type === OBSERVER_ENROLLMENT){
+    if (sisRole === OBSERVER_ROLE){
       if (associatedUser) {
         roleName = I18n.t('Observing: %{userName}', {userName: associatedUser.name})
       } else {
@@ -42,7 +44,7 @@ const UserRole: FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
     }
 
     return (
-      <Text as="div" key={`enrollment-${_id}`}>
+      <Text as="div" key={`enrollment-${id}`}>
         {roleName}
       </Text>
     )

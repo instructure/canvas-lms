@@ -231,7 +231,7 @@
             </div>
             <% end %>
 
-            <% if  @assignment.active_rubric_association? || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
+            <% if @assignment.active_rubric_association? || @assignment.can_view_audit_trail?(@current_user) || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
             <div id="grades-loading-spinner"></div>
 
             <div style="display: flex;">

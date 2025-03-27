@@ -20,7 +20,6 @@ const isEmpty = obj => Object.keys(obj).length === 0
 
 /**
  * @typedef {Object} Features
- * @property {boolean} media_links_use_attachment_id
  * @property {boolean} file_verifiers_for_quiz_links
  */
 

@@ -3,25 +3,28 @@
       method="POST">
   <input type="hidden" name="_method" value="put" />
   <input type="hidden" name="authenticity_token" value="{{token}}" />
-  <div class="header">
-    <input name="collaboration[title]"
+  <div class="ic-Form-control">
+    <label for="collaboration_{{id}}_title" class="ic-Label">
+      {{#t "labels.document_name"}}Document name{{/t}}
+      <span aria-hidden="true" title="{{#t 'is_required'}}This field is required{{/t}}" class="required_symbol"> *</span>
+    </label>
+    <input id="collaboration_{{id}}_title"
+           name="collaboration[title]"
            aria-label="{{#t "labels.title"}}Collaboration title{{/t}}"
            type="text"
+           class="ic-Input labeled-error"
            value="{{title}}" />
   </div>
-
-  <div class="content">
-    <label for="collaboration_{{id}}_description">
-      {{#t "labels.description"}}Description:{{/t}}
+  <div class="ic-Form-control">
+    <label for="collaboration_{{id}}_description" class="ic-Label">
+      {{#t "labels.description"}}Description{{/t}}
     </label>
     <textarea id="collaboration_{{id}}_description"
               name="collaboration[description]"
+              class="ic-Input labeled-error"
               >{{description}}</textarea>
   </div>
-
-  <div class="footer">
-    <div class="collaborator_list"></div>
-  </div>
+  <div class="collaborator_list"></div>
 
   <div class="collaboration-actions form-actions">
     <button type="button" class="btn cancel_button">

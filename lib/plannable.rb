@@ -129,7 +129,7 @@ module Plannable
           rel_hash = nil
         end
       end
-      rel_array.reduce(object) { |val, key| val.send(key) }
+      rel_array.reduce(object) { |val, key| val&.send(key) }
     end
 
     # Grabs the value to use for the bookmark & comparison
@@ -150,15 +150,12 @@ module Plannable
       # coming from users_controller, @columns looks like ["due_at", "id"]
       # coming from planner_controller, like [[:due_at, :created_at], :id]
       #   or [[{:submission=>{:assignment=>:peer_reviews_due_at}}, {:assessor_asset=>:cached_due_date}, "created_at"], "id"]
-      @columns.flatten.each do |col|
+      @columns.each do |col|
         val = column_value(object, col)
         val = val.utc.strftime("%Y-%m-%d %H:%M:%S.%6N") if val.respond_to?(:strftime)
-        unless val.nil?
-          bookmark << val
-          break
-        end
+        bookmark << val
       end
-      bookmark << object.id
+      bookmark
     end
 
     TYPE_MAP = {
@@ -211,8 +208,17 @@ module Plannable
     # Joins the associated table & column together as a string to be used in a SQL query
     def associated_table_column_name(col)
       table, column = associated_table_column(col)
-      table_name = Object.const_defined?(table.to_s.classify) ? table.to_s.classify.constantize.quoted_table_name : table.to_s
-      [table_name, column].join(".")
+      correct_table_name =
+        if ActiveRecord::Base.connection.table_exists?(table.to_s)
+          table.to_s
+        elsif Object.const_defined?(table.to_s.classify)
+          Object.const_get(table.to_s.classify).quoted_table_name
+        else
+          inferred_table = table.to_s.tableize
+          ActiveRecord::Base.connection.table_exists?(inferred_table) ? inferred_table : table.to_s
+        end
+      # Return fully qualified column name
+      [correct_table_name, column].join(".")
     end
 
     # Finds the relevant table & column name when a hash is passed by checking if
@@ -229,7 +235,7 @@ module Plannable
         order = "COALESCE(#{col_name.map { |c| column_name(c) }.join(", ")})"
       else
         order = column_comparand(col_name)
-        if @model.columns_hash[col_name].null
+        if col_type_nullable?(col_name)
           order = "#{column_comparand(col_name, "=")} IS NULL, #{order}"
         end
       end
@@ -246,18 +252,47 @@ module Plannable
       col_name
     end
 
+    def get_column_type(table, column)
+      ActiveRecord::Base.connection.columns(table).find { |col| col.name == column.to_s }&.type
+    end
+
+    def col_type_nullable?(col)
+      if col.is_a?(Hash)
+        table, column = associated_table_column(col)
+        correct_table_name = table.to_s.tableize
+        ActiveRecord::Base.connection.columns(correct_table_name).find { |c| c.name == column.to_s }&.null
+      else
+        @model.columns_hash[col]&.null
+      end
+    end
+
     def column_comparison(column, comparator, value)
-      if value.nil? && comparator == ">"
+      if value.nil? && comparator == "="
+        ["#{column_comparand(column, "=")} IS NULL"]
+      elsif value.nil? && comparator == ">"
         # sorting by a nullable column puts nulls last, so for our sort order
         # 'column > NULL' is universally false
-        ["0=1"]
       elsif value.nil?
         # likewise only NULL values in column satisfy 'column = NULL' and
         # 'column >= NULL'
-        ["#{column_comparand(column, "=")} IS NULL"]
+        ["#{column_comparand(column, "=")} IS NOT NULL"]
       else
+        column_type = if column.is_a?(Hash)
+                        table, col = associated_table_column(column)
+                        correct_table_name = table.to_s.tableize
+                        get_column_type(correct_table_name, col)
+                      else
+                        @model.columns_hash[column]&.type
+                      end
+        # 🚀 Ensure value is cast correctly before comparison
+        if column_type == :string && value.is_a?(Integer)
+          value = value.to_s
+        elsif column_type == :integer && value.is_a?(String)
+          value = value.to_i
+        end
+
         sql = "#{column_comparand(column, comparator)} #{comparator} #{column_comparand(column, comparator, "?")}"
-        if !column.is_a?(Array) && @model.columns_hash[column].null && comparator != "="
+        if !column.is_a?(Array) && col_type_nullable?(column) && comparator != "="
           # our sort order wants "NULL > ?" to be universally true for non-NULL
           # values (we already handle NULL values above). but it is false in
           # SQL, so we need to include "column IS NULL" with > or >=
@@ -296,7 +331,8 @@ module Plannable
         end
         clause, *clause_args = column_comparison(col, comparator, val)
         clauses << clause
-        top_clauses << clauses.join(" AND ")
+        clauses.compact!
+        top_clauses << clauses.join(" AND ") if clauses.present?
         args.concat(clause_args)
         visited << [col, val]
       end

@@ -73,25 +73,28 @@ CollaborationView.prototype.handleAlertBlur = function (e) {
 CollaborationView.prototype.formTemplate = function (arg) {
   const action = arg.action
   const data = arg.data
+  const collaborationId = this.id
   const $form = $(
     editForm(
       extend(data, {
         action,
-        id: this.id,
+        id: collaborationId,
       }),
     ),
   )
+
+  const view = this
   return $form.on(
     'keydown',
-    (function (_this) {
-      return function (e) {
-        if (e.which === 27) {
-          e.preventDefault()
-          return _this.onCloseForm(e)
-        }
+    function(e) {
+      if (e.which === 27) {
+        e.preventDefault()
+        return view.onCloseForm(e)
       }
-    })(this),
-  )
+    }
+  ).on('submit', function (e) {
+    view.trigger('validate', e, $form, collaborationId)
+  })
 }
 
 CollaborationView.prototype.iframeTemplate = function (arg) {

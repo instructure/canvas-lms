@@ -67,6 +67,12 @@ describe "context modules" do
       expect(f(".context_module .content")).to be_displayed
     end
 
+    it "does not render modules page rewrite" do
+      user_session(@teacher)
+      get "/courses/#{@course.id}/modules"
+      expect(driver.execute_script("return document.querySelector('[data-testid=\"modules-rewrite-student-container\"]')")).to be_nil # rubocop:disable Specs/NoExecuteScript
+    end
+
     it "expands/collapses module with 0 items", priority: "2" do
       modules = create_modules(1, true)
       get "/courses/#{@course.id}/modules"
@@ -960,6 +966,20 @@ describe "context modules" do
         expect(module_item_assign_to_card.first).not_to contain_css(due_date_input_selector)
         expect(module_item_assign_to_card.first).to contain_css(reply_to_topic_due_date_input_selector)
         expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
+      end
+    end
+
+    context "with modules page rewrite feature flag enabled" do
+      before do
+        @course.root_account.enable_feature!(:modules_page_rewrite)
+        module_1 = @course.context_modules.create!(name: "Module 1")
+        assignment_1 = @course.assignments.create!(name: "Assignment 1")
+        module_1.add_item({ id: assignment_1.id, type: "assignment" })
+      end
+
+      it "page renders" do
+        get "/courses/#{@course.id}/modules"
+        expect(f("[data-testid='modules-rewrite-container']")).to be_present
       end
     end
   end

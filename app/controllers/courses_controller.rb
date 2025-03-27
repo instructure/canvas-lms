@@ -1647,7 +1647,6 @@ class CoursesController < ApplicationController
       @course_settings_sub_navigation_tools = Lti::ContextToolFinder.new(
         @context,
         type: :course_settings_sub_navigation,
-        root_account: @domain_root_account,
         current_user: @current_user
       ).all_tools_sorted_array(
         exclude_admin_visibility: !@context.grants_right?(@current_user, session, :read_as_admin)
@@ -2400,7 +2399,7 @@ class CoursesController < ApplicationController
         end
 
         if @current_user && (@show_recent_feedback = @context.user_is_student?(@current_user))
-          @recent_feedback = @current_user.recent_feedback(contexts: @contexts, exclude_parent_assignment_submissions: @context.discussion_checkpoints_enabled?) || []
+          @recent_feedback = @current_user.recent_feedback(contexts: @contexts) || []
         end
 
         flash.now[:notice] = t("notices.updated", "Course was successfully updated.") if params[:for_reload]
@@ -2411,7 +2410,6 @@ class CoursesController < ApplicationController
         @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
           @context,
           type: :course_home_sub_navigation,
-          root_account: @domain_root_account,
           current_user: @current_user
         ).all_tools_sorted_array(exclude_admin_visibility: !can_see_admin_tools)
 

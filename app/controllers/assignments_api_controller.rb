@@ -1197,7 +1197,7 @@ class AssignmentsApiController < ApplicationController
         include_can_submit: included_params.include?("can_submit"),
         include_webhook_info: included_params.include?("webhook_info"),
         include_ab_guid: included_params.include?("ab_guid"),
-        include_checkpoints: included_params.include?("checkpoints")
+        include_checkpoints: included_params.include?("checkpoints"),
       }
 
       result_json = if use_quiz_json?

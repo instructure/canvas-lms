@@ -860,6 +860,14 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/entry_list'
 - verb: GET
+  path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/insights'
+- verb: POST
+  path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/insights'
+- verb: GET
+  path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/insights/entries'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/insights/entries/:entry_id'
+- verb: GET
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/messageable_users'
 - verb: DELETE
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/read'
@@ -1633,6 +1641,14 @@
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/entries/:id'
 - verb: GET
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/entry_list'
+- verb: GET
+  path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/insights'
+- verb: POST
+  path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/insights'
+- verb: GET
+  path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/insights/entries'
+- verb: PUT
+  path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/insights/entries/:entry_id'
 - verb: GET
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/messageable_users'
 - verb: DELETE

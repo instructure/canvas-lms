@@ -26,6 +26,27 @@ class ActiveRecord::Base
   class << self
     delegate :distinct_on, :find_ids_in_batches, :explain, to: :all
 
+    if Rails.version < "7.2"
+      def internal_metadata
+        ActiveRecord::InternalMetadata.new(connection)
+      end
+
+      delegate :migration_context, to: :connection
+      delegate :schema_migration, to: :connection
+    else
+      def internal_metadata
+        ActiveRecord::InternalMetadata.new(connection.pool)
+      end
+
+      def migration_context
+        connection.pool.migration_context
+      end
+
+      def schema_migration
+        connection.pool.schema_migration
+      end
+    end
+
     def find_ids_in_ranges(loose: true, **, &)
       all.find_ids_in_ranges(loose:, **, &)
     end

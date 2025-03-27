@@ -1199,7 +1199,7 @@ describe GroupsController do
       it "filters out non collaborative groups when the user doesn't have permissions" do
         RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
           @course.account.role_overrides.create!(
-            permission: permission,
+            permission:,
             role: teacher_role,
             enabled: false
           )
@@ -1231,7 +1231,7 @@ describe GroupsController do
       it "errors when a user without the correct permissions tries to get only non_collaborative groups" do
         RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
           @course.account.role_overrides.create!(
-            permission: permission,
+            permission:,
             role: teacher_role,
             enabled: false
           )

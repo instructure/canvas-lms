@@ -7153,6 +7153,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   gradingPeriodId: ID
   gradingStatus: SubmissionGradingStatus
   groupId: ID
+  hasPostableComments: Boolean!
   hasUnreadRubricAssessment: Boolean!
 
   """
@@ -7472,6 +7473,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   gradedAt: DateTime
   gradingStatus: SubmissionGradingStatus
   groupId: ID
+  hasPostableComments: Boolean!
   hasUnreadRubricAssessment: Boolean!
 
   """
@@ -7658,6 +7660,7 @@ interface SubmissionInterface {
   gradedAt: DateTime
   gradingStatus: SubmissionGradingStatus
   groupId: ID
+  hasPostableComments: Boolean!
   hasUnreadRubricAssessment: Boolean!
 
   """

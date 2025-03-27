@@ -21,7 +21,6 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {MemoryRouter, useNavigate} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../context'
-import {ROUTES} from '../../routes/routes'
 import {forgotPassword} from '../../services'
 import ForgotPassword from '../ForgotPassword'
 
@@ -145,7 +144,7 @@ describe('ForgotPassword', () => {
     it('navigates back to login when cancel button is clicked', async () => {
       const cancelButton = screen.getByTestId('cancel-button')
       await userEvent.click(cancelButton)
-      expect(mockNavigate).toHaveBeenCalledWith(ROUTES.SIGN_IN)
+      expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
       expect(mockNavigate).toHaveBeenCalledTimes(1)
     })
 
@@ -161,7 +160,7 @@ describe('ForgotPassword', () => {
       await waitFor(() => expect(screen.getByTestId('confirmation-heading')).toBeInTheDocument())
       const backButton = screen.getByTestId('confirmation-back-button')
       await userEvent.click(backButton)
-      expect(mockNavigate).toHaveBeenCalledWith(ROUTES.SIGN_IN)
+      expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
       expect(mockNavigate).toHaveBeenCalledTimes(1)
     })
   })

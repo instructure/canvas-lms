@@ -39,4 +39,5 @@ export interface UserTags {
   id: number
   name: string
   groupCategoryName: string
+  isSingleTag: boolean
 }

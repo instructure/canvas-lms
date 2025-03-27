@@ -23,6 +23,7 @@ import ready from '@instructure/ready'
 import ContentTypeExternalToolDrawer from '@canvas/trays/react/ContentTypeExternalToolDrawer'
 import {TopNavigationTools, MobileTopNavigationTools} from './react/TopNavigationTools'
 import type {Tool} from '@canvas/global/env/EnvCommon'
+import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
 const I18n = createI18nScope('common')
 
@@ -62,6 +63,7 @@ ready(() => {
         onDismiss={handleDismissToolDrawer}
         onResize={handleResize}
         open={!!selectedTool}
+        iframeAllowances={iframeAllowances()}
       />,
       drawerLayoutMountPoint,
     )

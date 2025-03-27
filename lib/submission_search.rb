@@ -68,7 +68,12 @@ class SubmissionSearch
       search_scope = search_scope.where(user_id:
         @course.enrollments.select(:user_id).where(type: @options[:enrollment_types]))
     end
-
+    if @options[:apply_gradebook_group_filter] && @course.filter_speed_grader_by_student_group?
+      # namely used for SG2 filtering when the filter SG by group option is enabled
+      group_selection = SpeedGrader::StudentGroupSelection.new(current_user: @searcher, course: @course)
+      # return all submissions for the selected group
+      search_scope = search_scope.where(user_id: group_selection.initial_group.user_ids) if group_selection.initial_group.present?
+    end
     search_scope = if @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades) || @course.participating_observers.map(&:id).include?(@searcher.id)
                      # a user with manage_grades, view_all_grades, or an observer can see other users' submissions
                      # TODO: may want to add a preloader for this
@@ -135,7 +140,7 @@ class SubmissionSearch
     users = if @options[:apply_gradebook_enrollment_filters]
               if @assignment.only_visible_to_overrides? && @assignment.active_assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).none?
                 section_ids = @assignment.active_assignment_overrides.where(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).pluck(:set_id)
-                @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings, section_ids: section_ids)
+                @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings, section_ids:)
               else
                 @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
               end

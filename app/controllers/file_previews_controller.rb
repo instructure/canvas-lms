@@ -22,7 +22,7 @@ class FilePreviewsController < ApplicationController
 
   before_action :get_context
 
-  def services_jwt_auth_allowed
+  def token_auth_allowed?
     params[:action] == "show" && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
   end
 

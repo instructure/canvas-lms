@@ -332,4 +332,24 @@ describe('CalendarEventDetailsForm', () => {
   it('can change the date in eastern Brazil at 11:30 PM', async () => {
     testTimezone('Brazil/East', '2022-07-14T03:00:00.000Z', '2022-07-15T02:30:00.000Z', '11:30 PM')
   })
+
+  it('does not show FrequencyPicker when the event is section-specific', () => {
+    defaultProps.event.object.all_context_codes = "course_2"
+    defaultProps.event.object.context_code = "course_section_22"
+
+    render(<CalendarEventDetailsForm {...defaultProps} />)
+
+    const frequencyPicker = screen.queryByText('Frequency')
+    expect(frequencyPicker).not.toBeInTheDocument()
+  })
+
+  it('show FrequencyPicker when the event is not section-specific', () => {
+    defaultProps.event.object.all_context_codes = "course_2"
+    defaultProps.event.object.context_code = "course_2"
+
+    render(<CalendarEventDetailsForm {...defaultProps} />)
+
+    const frequencyPicker = screen.queryByText('Frequency')
+    expect(frequencyPicker).toBeInTheDocument()
+  })
 })

@@ -44,6 +44,7 @@ export type RubricPopoverProps = {
   freeFormCriterionComments?: boolean
   hasRubricAssociations?: boolean
   onArchiveRubricChange: () => void
+  workflowState?: string
   active: boolean
 }
 
@@ -60,6 +61,7 @@ export const RubricPopover = ({
   freeFormCriterionComments,
   hasRubricAssociations,
   onArchiveRubricChange,
+  workflowState,
   active,
 }: RubricPopoverProps) => {
   const navigate = useNavigate()
@@ -151,9 +153,11 @@ export const RubricPopover = ({
               {I18n.t('Copy To')}
             </Menu.Item>
           )}
-          <Menu.Item data-testid="archive-rubric-button" onClick={handleArchiveRubric}>
-            {active ? I18n.t('Archive') : I18n.t('Un-Archive')}
-          </Menu.Item>
+          {workflowState !== 'draft' && (
+            <Menu.Item data-testid="archive-rubric-button" onClick={handleArchiveRubric}>
+              {active ? I18n.t('Archive') : I18n.t('Un-Archive')}
+            </Menu.Item>
+          )}
           {/* <Menu.Item data-testid="download-rubric-button" onClick={() => {}}>
             {I18n.t('Download')}
           </Menu.Item>

@@ -169,7 +169,7 @@ describe DiscussionTopicsApiController do
     end
   end
 
-  context "summary" do
+  context "find_summary" do
     before do
       course_with_teacher(active_course: true)
       @course.account.update!(default_locale: "hu")
@@ -183,36 +183,93 @@ describe DiscussionTopicsApiController do
         expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
       end
 
-      context "and a summary exists" do
+      context "and config does not exist" do
         before do
-          @raw_summary = @topic.summaries.create!(
-            summary: "raw_summary",
-            dynamic_content_hash: Digest::SHA256.hexdigest({
-              CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
-              FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: nil),
-            }.to_json),
-            llm_config_version: "raw-V1_A",
-            user: @teacher
+          expect(LLMConfigs).to receive(:config_for).and_return(nil)
+        end
+
+        it "returns an error if there is no llm config" do
+          get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+          expect(response).to be_unprocessable
+        end
+      end
+
+      context "and config exists" do
+        before do
+          expect(LLMConfigs).to receive(:config_for).and_return(
+            LLMConfig.new(
+              name: "raw-V1_A",
+              model_id: "model",
+              template: "<CONTENT_PLACEHOLDER>",
+              rate_limit: { limit: 25, period: "day" }
+            )
           )
-          @refined_summary = @topic.summaries.create!(
-            summary: "refined_summary",
-            dynamic_content_hash: Digest::SHA256.hexdigest({
-              CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: @raw_summary.summary),
-              FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: ""),
-              LOCALE: "Magyar"
-            }.to_json),
-            llm_config_version: "refined-V1_A",
-            parent: @raw_summary,
-            locale: "hu",
-            user: @teacher
+          expect(LLMConfigs).to receive(:config_for).and_return(
+            LLMConfig.new(
+              name: "refined-V1_A",
+              model_id: "model",
+              template: "<CONTENT_PLACEHOLDER>"
+            )
           )
         end
 
-        it "returns the most recent summary for the user" do
-          get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+        context "and a summary exists" do
+          before do
+            @raw_summary = @topic.summaries.create!(
+              summary: "raw_summary",
+              dynamic_content_hash: Digest::SHA256.hexdigest({
+                CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
+                FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: nil),
+              }.to_json),
+              llm_config_version: "raw-V1_A",
+              user: @teacher
+            )
+            @refined_summary = @topic.summaries.create!(
+              summary: "refined_summary",
+              dynamic_content_hash: Digest::SHA256.hexdigest({
+                CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: @raw_summary.summary),
+                FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: ""),
+                LOCALE: "Magyar"
+              }.to_json),
+              llm_config_version: "refined-V1_A",
+              parent: @raw_summary,
+              locale: "hu",
+              user: @teacher
+            )
+          end
 
-          expect(response).to be_successful
-          expect(response.parsed_body["id"]).to eq(@refined_summary.id)
+          it "returns the most recent summary and usage information for the user" do
+            allow(Canvas.redis).to receive(:get).and_return("5")
+
+            get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+            expect(response).to be_successful
+            expect(response.parsed_body["id"]).to eq(@refined_summary.id)
+            expect(response.parsed_body["usage"]).to eq({ "currentCount" => 5, "limit" => 25 })
+          end
+
+          context "and the generated hash is different than the stored one" do
+            before do
+              allow(Digest::SHA256).to receive(:hexdigest).and_return("different_hash")
+            end
+
+            it "returns obsolete as true" do
+              get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+              expect(response).to be_successful
+              expect(response.parsed_body["obsolete"]).to be(true)
+            end
+          end
+
+          context "and the generated hash is the same as the stored one" do
+            it "returns obsolete as false" do
+              get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+              expect(response).to be_successful
+              expect(response.parsed_body["obsolete"]).to be(false)
+            end
+          end
         end
 
         context "and no summary exists" do
@@ -223,7 +280,7 @@ describe DiscussionTopicsApiController do
 
           it "returns an error message" do
             get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
-
+            puts("response: #{response.body}")
             expect(response).to be_not_found
           end
         end
@@ -261,7 +318,8 @@ describe DiscussionTopicsApiController do
           LLMConfig.new(
             name: "raw-V1_A",
             model_id: "model",
-            template: "<CONTENT_PLACEHOLDER>"
+            template: "<CONTENT_PLACEHOLDER>",
+            rate_limit: { limit: 11, period: "day" }
           )
         )
         expect(LLMConfigs).to receive(:config_for).and_return(
@@ -332,8 +390,9 @@ describe DiscussionTopicsApiController do
         end
       end
 
-      it "returns a new summary" do
+      it "returns a new summary with usage" do
         expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+        allow(Canvas.redis).to receive(:get).and_return("5")
 
         expect(@inst_llm).to receive(:chat).and_return(
           InstLLM::Response::ChatResponse.new(
@@ -361,6 +420,7 @@ describe DiscussionTopicsApiController do
         post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
         expect(response).to be_successful
+        expect(response.parsed_body["usage"]).to eq({ "currentCount" => 5, "limit" => 11 })
       end
 
       it "enables summary if it was disabled" do
@@ -397,7 +457,7 @@ describe DiscussionTopicsApiController do
       end
     end
 
-    it "returns rate limit exceeded error if the user has reached the max number of summaries for the day" do
+    it "returns an error if the user has reached the maximum number of summaries for the day" do
       cache_key = ["inst_llm_helper", "rate_limit", @teacher.uuid, "raw-V1_A", Time.now.utc.strftime("%Y%m%d")].cache_key
       Canvas.redis.incr(cache_key)
 
@@ -434,7 +494,6 @@ describe DiscussionTopicsApiController do
 
     it "returns an error if there is no llm config" do
       expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
-      expect(LLMConfigs).to receive(:config_for).and_return(nil)
       expect(LLMConfigs).to receive(:config_for).and_return(nil)
 
       post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"

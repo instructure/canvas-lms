@@ -887,6 +887,62 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(@checkpoint1.due_at).to be_within(1.second).of(new_due_at)
     end
 
+    it "can handle updating all due dates at once" do
+      # starting dates
+      unlock_at = 1.day.from_now
+      reply_to_topic_due_at = 2.days.from_now
+      reply_to_entry_due_at = 3.days.from_now
+      lock_at = 4.days.from_now
+
+      @graded_topic.update!(unlock_at:, lock_at:)
+
+      reply_to_topic_checkpoint = @graded_topic.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      reply_to_entry_checkpoint = @graded_topic.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+      reply_to_topic_checkpoint.update!(due_at: reply_to_topic_due_at)
+      reply_to_entry_checkpoint.update!(due_at: reply_to_entry_due_at)
+
+      # new dates
+      unlock_at += 30.days
+      reply_to_topic_due_at += 30.days
+      reply_to_entry_due_at += 30.days
+      lock_at += 30.days
+
+      result = run_mutation(
+        id: @graded_topic.id,
+        delayed_post_at: unlock_at.iso8601,
+        lock_at: lock_at.iso8601,
+        assignment: { forCheckpoints: true },
+        checkpoints: [
+          { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{
+              type: "everyone",
+              dueAt: reply_to_topic_due_at.iso8601,
+              unlockAt: unlock_at.iso8601,
+              lockAt: lock_at.iso8601,
+            }],
+            pointsPossible: 5 },
+          { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: [{
+              type: "everyone",
+              dueAt: reply_to_entry_due_at.iso8601,
+              unlockAt: unlock_at.iso8601,
+              lockAt: lock_at.iso8601,
+            }],
+            pointsPossible: 10,
+            repliesRequired: 2 }
+        ]
+      )
+      aggregate_failures do
+        expect(result["errors"]).to be_nil
+        expect(reply_to_topic_checkpoint.reload.due_at).to be_within(1.second).of(reply_to_topic_due_at)
+        expect(reply_to_entry_checkpoint.reload.due_at).to be_within(1.second).of(reply_to_entry_due_at)
+        expect(reply_to_topic_checkpoint.reload.unlock_at).to be_within(1.second).of(unlock_at)
+        expect(reply_to_entry_checkpoint.reload.unlock_at).to be_within(1.second).of(unlock_at)
+        expect(reply_to_topic_checkpoint.reload.lock_at).to be_within(1.second).of(lock_at)
+        expect(reply_to_entry_checkpoint.reload.lock_at).to be_within(1.second).of(lock_at)
+      end
+    end
+
     it "updates checkpoints with overrides due dates" do
       section = add_section("M03")
       result1 = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
@@ -1152,7 +1208,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
         @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.enable_feature!(:differentiation_tags)
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
         end
 

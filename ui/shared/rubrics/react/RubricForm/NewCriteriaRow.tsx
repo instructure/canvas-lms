@@ -56,6 +56,7 @@ export const NewCriteriaRow = ({rowIndex, onEditCriterion, onAddOutcome}: NewCri
             {I18n.t('Draft New Criterion')}
           </Button>
           <Button
+            id="create-from-outcome"
             // @ts-expect-error
             renderIcon={IconOutcomesLine}
             margin="0 0 0 small"
