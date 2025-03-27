@@ -297,7 +297,6 @@ class ContextModulesController < ApplicationController
             visible: !@last_web_export.nil?
           },
         }
-
         js_env(CONTEXT_MODULES_HEADER_PROPS: context_modules_header_props)
         js_bundle :context_modules_v2
         return render html: "", layout: true
