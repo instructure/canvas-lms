@@ -126,6 +126,10 @@ iframe.tool_launch {
   height: 100%;
   border: none;
   max-width: 100%;
+
+  &.tool_launch_top_navigation {
+    display: block;
+  }
 }
 
 @media screen and (min-height: 451px) and (max-height: 600px) {
