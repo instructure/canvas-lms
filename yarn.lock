@@ -2510,10 +2510,10 @@
   dependencies:
     prop-types "^15.8.1"
 
-"@instructure/studio-player@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-0.4.0.tgz#dd7314064bc8b19e5d43c1a8f9f5a7b4e2218d2d"
-  integrity sha512-h6kcl9zJmBna+XmOSbwAFf8neQwA6cIVRsm8xb5tZjBWrqeIuo7l09JFtwwagKipI2GKyvwAYXMUzX6GHMa7Sg==
+"@instructure/studio-player@0.4.5":
+  version "0.4.5"
+  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-0.4.5.tgz#88edd9a44db7ae0f8fb4524cea75355f117c3198"
+  integrity sha512-tTpIQvoOdq9Q1f/SihHsO4MuyE2OhdPFW1zQzLSxO6EoZ8ZoLQYV/ZZ9uGa1hBCR8bgsiXGnhOVMfmFaSS/s+Q==
   dependencies:
     "@floating-ui/react" "^0.27.3"
     "@vidstack/react" "^1.12.11"
