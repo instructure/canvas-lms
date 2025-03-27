@@ -664,7 +664,7 @@ sv:
   account_proficiency_ratings_saved_292d9239: "Färdighetsbedömningar för kontot har sparats"
   account_reports: 
     default: 
-      active_terms: "Aktiva termer"
+      active_terms: "Aktiva terminer"
       all_terms: "Alla terminer"
       course_text: "För kurs: %{course};"
       description: 
@@ -1150,7 +1150,7 @@ sv:
         other: "%{count} Tillhörande kurser"
       course_unpublished_title: "Den här kursen har inte publicerats ännu"
       course_unpublished_tooltip: Avpublicerad
-      homepage_link: Hem
+      homepage_link: Startsida
       more_count: 
         one: "1 till"
         other: "%{count} fler"
@@ -2298,7 +2298,7 @@ sv:
   active_enrollments_count_report_66bc3cae: "Rapport över antal aktiva registreringar"
   active_grading_schemes_ae18f35e: "Aktiva omdömesscheman"
   active_students_e4c48a06: "Aktiva studenter"
-  active_terms_83df727e: "Aktiva termer"
+  active_terms_83df727e: "Aktiva terminer"
   activerecord: 
     errors: 
       messages: 
@@ -8676,7 +8676,7 @@ sv:
       edit_assignment_settings: "Redigera uppgiftsinställningar"
       speed_grader: "Speed Grader™"
     url_show: 
-      new_tab: "Den här webbplatsen öppnades i ett nytt webbläsarfönster."
+      new_tab: "Den här webbplatsen öppnas i ett nytt webbläsarfönster."
   context_modules_api: 
     invalid_position: "Ogiltig position"
   context_modulespublic: 
@@ -11751,7 +11751,7 @@ sv:
         published: Publicerad
         save_and_publish: "Spara och publicera"
       delay_posting: "Senarelägg publicering"
-      enable_podcast_feed: "Aktivera podcastflöde"
+      enable_podcast_feed: "Skapa RSS-flöde"
       include_replies_in_podcast_feed: "Inkludera studenters svar i podcastflödet"
       only_graders_can_like: "Endast bedömare kan gilla"
       options: Alternativ
@@ -12095,7 +12095,7 @@ sv:
   divider_fe08b810: Avdelare
   division_cutoff_cutoff_value_e938bc9d: "Divisionsgräns %{cutoff_value}"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ta inte hänsyn till denna uppgift i slutbedömningen"
-  do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Visa inte i betygsboken eller elevens betygssida"
+  do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Visas inte i omdömesboken eller studentens omdömessida"
   do_not_include_validation_context_and_errors_claim_d9e43fe6: "Inkludera inte validation_context och felanspråk i LTI-lanseringar"
   do_not_resend_alerts_19ef6249: "Skicka inte aviseringar igen"
   do_not_resend_e8a07d6c: "Skicka inte igen."
@@ -12685,7 +12685,7 @@ sv:
   enable_pkce_in_oauth2_authorization_code_flow_b5521c4e: "Aktivera PKCE i OAuth2-auktoriseringskodflödet"
   enable_platform_notification_service_217f3b9e: "Aktivera aviseringstjänster för plattformen"
   enable_platform_notification_services_421105da: "Aktivera aviseringstjänster för plattform"
-  enable_podcast_feed_e67c49ac: "Aktivera podcastflöde"
+  enable_podcast_feed_e67c49ac: "Skapa RSS-flöde"
   enable_quiz_visibility_after_course_conclusion_2dff3534: "Aktivera synlighet för quiz efter slutförande av kurs"
   enable_range_fec198ac: "Aktivera omfång"
   enable_recaptcha_by_default_for_self_registration_af9d50bd: "Aktivera Recaptcha som standard vid självregistrering"
@@ -14621,7 +14621,7 @@ sv:
   fun_quiz_47ab0b0: "Roligt quiz"
   future_5416ea92: Framtida
   future_jobs_cf2964a1: "Framtida jobb"
-  future_terms_7fba2ae6: "Framtida termer"
+  future_terms_7fba2ae6: "Kommande terminer"
   gaelic_scottish_gaelic_43b44350: "Gaeliska, skotsk gaeliska"
   galician_7e4508b5: Galiciska
   game_over_104baa: "SCHACK MATT"
@@ -18363,7 +18363,7 @@ sv:
         external_tools: "Externa verktyg"
         groups: Studentgrupper
         learning_outcomes: Lärandemål
-        quizzes: Kunskapstest
+        quizzes: Quiz
         rubrics: Matriser
         syllabus_body: Kursöversikt
         tool_profiles: Verktygsprofiler
@@ -23711,7 +23711,7 @@ sv:
   passwords_do_not_match_783bf99e: "Lösenorden matchar inte."
   past_14da759a: Tidigare
   past_collaborations_1241938f: "Tidigare samarbeten"
-  past_terms_4b6ec40e: "Förfluten termin"
+  past_terms_4b6ec40e: "Tidigare terminer"
   paste_google_meet_links_into_calendar_events_annou_2e363fc7: "Klistra in Google Meet-länkar i kalenderhändelserP, meddelanden, diskussioner och överallt där du använder innehållsredigeraren (RCE)."
   paste_json_26ad8050: "Klistra in JSON"
   paste_url_8213b83: "Klistra in URL"
@@ -23750,7 +23750,7 @@ sv:
     errors: 
       delete_reminder_failed: "Radering misslyckades"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Kamratresponsuppgifter kan inte aktiveras för modererade uppgifter"
-  peer_reviews_e3a55964: Referentgranskningar
+  peer_reviews_e3a55964: Kamratrespons
   peer_service_6b4828b9: Peer-tjänst
   peer_services_102357e3: Referent-tjänster
   peer_submissions_ready_for_review_availablecount_3ac80091: "Kamratresponsinlämningar klara för granskning: %{availableCount}"
@@ -28144,7 +28144,7 @@ sv:
   scale_mathman_equation_images_to_match_the_size_of_2bca4e2e: "Ändra bildstorlek för MathMan-ekvationer så att de matchar storleken för omgivande teckensnitt."
   scantron_quiz_4a97a17a: Scantron-quiz
   schedule_1cab2e64: schema
-  schedule_availability_ad09a2e5: Schematillgänglighet
+  schedule_availability_ad09a2e5: "Schemalägg åtkomst"
   schedule_e5dd4c32: Schema
   schedule_preview_3bcda153: "Förhandsgranskning av scheman"
   schedule_student_availability_332154a: "Schemalägg studentens tillgänglighet"
