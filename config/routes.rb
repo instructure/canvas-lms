@@ -2943,6 +2943,8 @@ CanvasRails::Application.routes.draw do
     # 1Edtech (IMS) LTI Asset Processor Eula service
     scope(controller: "lti/ims/asset_processor_eula") do
       put "asset_processor_eulas/:context_external_tool_id/deployment", action: :update_tool_eula, as: :update_tool_eula
+      delete "asset_processor_eulas/:context_external_tool_id/user", action: :delete_acceptances, as: :delete_tool_eula_acceptances
+      post "asset_processor_eulas/:context_external_tool_id/user", action: :create_acceptance, as: :create_user_eula_acceptance
     end
 
     # Dynamic Registration Service

@@ -36,6 +36,12 @@ module Lti::IMS
       :verify_tool_belongs_to_developer_key
     )
 
+    before_action(
+      :validate_user,
+      :validate_timestamp,
+      only: [:create_acceptance]
+    )
+
     def require_feature_enabled
       render_error("not found", :not_found) unless context.root_account.feature_enabled?(:lti_asset_processor)
     end
@@ -46,6 +52,16 @@ module Lti::IMS
 
     def verify_tool_belongs_to_developer_key
       render_error("bad request", :bad_request) unless tool.developer_key_id == developer_key.id
+    end
+
+    def validate_user
+      render_error("not found", :not_found) unless user&.root_account_ids&.include?(context.root_account.id)
+    end
+
+    def validate_timestamp
+      unless requested_eula_timestamp
+        render_error("A valid ISO8601 timestamp must be provided", :bad_request)
+      end
     end
 
     # @API Update Eula Deployment Configuration
@@ -74,6 +90,75 @@ module Lti::IMS
       render json: { eulaRequired: tool.asset_processor_eula_required }, status: :ok
     end
 
+    # @API Create an Eula Acceptance
+    #
+    # The EULA user acceptance service provides a mechanism
+    # by which a tool can notify a platform of whether or not a user has accepted a EULA.
+    #
+    # @argument userId [String]
+    #  The userId represents the user who has accepted or declined the EULA,
+    #  `lti_id` of the Canvas User.
+    #
+    # @argument accepted [Boolean]
+    #   A boolean value representing whether or not the user has accepted the EULA
+    #
+    # @argument timestamp [String]
+    #   The timestamp represents the time at which the user accepted or declined the EULA.
+    #   This timestamp must be formatted as an ISO 8601 date time.
+    #
+    # @returns the input arguments as accepted and stored in the database
+    # @returns 201 Created
+    #
+    # @example_request
+    #   {
+    #     "userId": "59ed2101-0302-406c-b53f-9705ae1cb357",
+    #     "accepted": true,
+    #     "timestamp": "2022-04-16T18:54:36.736+00:00"
+    #   }
+    #
+    # @example_response
+    #   {
+    #     "userId": "59ed2101-0302-406c-b53f-9705ae1cb357",
+    #     "accepted": true,
+    #     "timestamp": "2022-04-16T18:54:36.736+00:00"
+    #   }
+    #
+    def create_acceptance
+      if user_eulas_scope.where(timestamp: requested_eula_timestamp..).exists?
+        render json: { error: "timestamp older than latest" }, status: :conflict
+        return
+      end
+      eula_acceptance = nil
+      Lti::AssetProcessorEulaAcceptance.transaction do
+        user_eulas_scope.destroy_all
+        eula_acceptance = user.lti_asset_processor_eula_acceptances.new(
+          context_external_tool_id: tool.id,
+          timestamp: requested_eula_timestamp,
+          accepted: params.require(:accepted)
+        )
+        eula_acceptance.save!
+      end
+      render json: {
+               timestamp: eula_acceptance.timestamp,
+               accepted: eula_acceptance.accepted,
+               userId: user.lti_id
+             },
+             status: :created
+    end
+
+    # @API Delete Eula Acceptances for deployment
+    #
+    # Remove the EULA acceptance status for all users within the current deployment.
+    # This will allow a tool to reset the EULA acceptance status for all users,
+    # and force them to accept the EULA again in the case that the EULA has changed.
+    #
+    # @returns 204 No Content
+    #
+    def delete_acceptances
+      tool.lti_asset_processor_eula_acceptances.destroy_all
+      head :no_content
+    end
+
     def tool
       @tool ||= ContextExternalTool.active.find_by(id: params.require(:context_external_tool_id))
     end
@@ -84,6 +169,23 @@ module Lti::IMS
 
     def context
       tool.context
+    end
+
+    def user
+      @user ||= User.active.find_by(lti_id: params.require(:userId))
+    end
+
+    def requested_eula_timestamp
+      @requested_eula_timestamp ||=
+        params.require(:timestamp).then do |timestamp|
+          Time.zone.iso8601(timestamp)
+        rescue ArgumentError
+          nil
+        end
+    end
+
+    def user_eulas_scope
+      @user_eulas_scope ||= user.lti_asset_processor_eula_acceptances.active.where(context_external_tool_id: tool.id)
     end
   end
 end
