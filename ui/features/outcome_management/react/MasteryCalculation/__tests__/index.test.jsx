@@ -89,7 +89,6 @@ describe('MasteryCalculation', () => {
   function setupSubmissionHandler(contextType, contextId, payload) {
     server.use(
       http.post(`/${contextType.toLowerCase()}s/${contextId}/outcome_calculation_method`, async ({request}) => {
-        const formData = await request.formData()
         return new Response(JSON.stringify(payload), {
           headers: {'Content-Type': 'application/json'},
         })
@@ -104,11 +103,6 @@ describe('MasteryCalculation', () => {
   })
 
   it('loads calculation data for Course', async () => {
-    setupSubmissionHandler('Course', '12', {
-      calculation_method: 'decaying_average',
-      calculation_int: 65,
-    })
-
     const {findByDisplayValue} = render(<MasteryCalculation />, {
       contextType: 'Course',
       contextId: '12',

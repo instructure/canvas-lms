@@ -22,6 +22,12 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import RubricsQuery from '../RubricsQuery'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {useAllPages} from '@canvas/query'
+
+jest.mock('@canvas/query', () => ({
+  useAllPages: jest.fn(),
+}))
+
 
 async function makeMocks() {
   const variables = {
@@ -36,7 +42,6 @@ async function makeMocks() {
     Assignment: {rubric: {}},
     Rubric: {criteria: [{}]},
     Submission: {rubricAssessmentsConnection: null},
-    Account: {outcomeProficiency: {proficiencyRatingsConnection: null}},
   }
 
   const result = await mockQuery(RUBRIC_QUERY, overrides, variables)
@@ -62,6 +67,11 @@ async function makeProps() {
 
 describe('RubricsQuery', () => {
   it('renders the rubric tab', async () => {
+    useAllPages.mockReturnValue({
+      data: {pages:[]},
+      isError: false,
+      isLoading: false,
+    })
     const mocks = await makeMocks()
     const props = await makeProps()
     const {findByTestId} = render(
@@ -73,6 +83,11 @@ describe('RubricsQuery', () => {
   })
 
   it('renders an error when the query fails', async () => {
+    useAllPages.mockReturnValue({
+      data: {},
+      isError: true,
+      isLoading: false,
+    })
     const props = await makeProps()
     const mocks = await makeMocks()
     mocks[0].error = new Error('aw shucks')
@@ -85,6 +100,11 @@ describe('RubricsQuery', () => {
   })
 
   it('renders the loading indicator when making a query', async () => {
+    useAllPages.mockReturnValue({
+      data: {},
+      isError: false,
+      isLoading: true,
+    })
     const mocks = await makeMocks()
     const props = await makeProps()
     const {getByText} = render(

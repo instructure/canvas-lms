@@ -66,10 +66,22 @@ export const RUBRIC_QUERY = gql`
         }
       }
     }
+  }
+  ${Rubric.fragment}
+  ${RubricAssessment.fragment}
+  ${RubricAssociation.fragment}
+`
+
+export const COURSE_PROFICIENCY_RATINGS_QUERY = gql`
+  query GetCourseProficiencyRatings($courseID: ID!, $cursor: String) {
     course(id: $courseID) {
       account {
         outcomeProficiency {
-          proficiencyRatingsConnection {
+          proficiencyRatingsConnection (after: $cursor) {
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
             nodes {
               ...ProficiencyRating
             }
@@ -78,9 +90,6 @@ export const RUBRIC_QUERY = gql`
       }
     }
   }
-  ${Rubric.fragment}
-  ${RubricAssessment.fragment}
-  ${RubricAssociation.fragment}
   ${ProficiencyRating.fragment}
 `
 

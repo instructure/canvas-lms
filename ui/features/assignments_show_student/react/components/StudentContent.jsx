@@ -45,6 +45,7 @@ import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Flex} from '@instructure/ui-flex'
 import {arrayOf, func, bool} from 'prop-types'
 import {Link} from '@instructure/ui-link'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('assignments_2_student_content')
 
@@ -200,6 +201,8 @@ function renderContentBaseOnAvailability(
     const onMarkAsDoneError = () =>
       alertContext.setOnFailure(I18n.t('Error updating status of module item'))
 
+    const queryClient = new QueryClient()
+
     return (
       <>
         <Flex margin="medium 0 0 0" alignItems="start">
@@ -220,12 +223,14 @@ function renderContentBaseOnAvailability(
 
             {assignment.rubric && (
               <Suspense fallback={<LoadingIndicator />}>
-                <RubricsQuery
-                  assignment={assignment}
-                  submission={submission}
-                  rubricExpanded={rubricExpanded}
-                  toggleRubricExpanded={toggleRubricExpanded}
-                />
+                <QueryClientProvider client={queryClient}>
+                  <RubricsQuery
+                    assignment={assignment}
+                    submission={submission}
+                    rubricExpanded={rubricExpanded}
+                    toggleRubricExpanded={toggleRubricExpanded}
+                  />
+                </QueryClientProvider>
               </Suspense>
             )}
           </div>

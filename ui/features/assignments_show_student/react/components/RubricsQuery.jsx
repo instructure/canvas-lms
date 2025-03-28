@@ -20,15 +20,16 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
-import React from 'react'
 import RubricTab from './RubricTab'
-import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {RUBRIC_QUERY, COURSE_PROFICIENCY_RATINGS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {useQuery} from '@apollo/client'
 import {transformRubricData, transformRubricAssessmentData} from '../helpers/RubricHelpers'
 import useStore from './stores/index'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
 import {bool, func} from 'prop-types'
+import { useAllPages } from '@canvas/query'
+import { executeQuery } from '@canvas/query/graphql'
 
 const I18n = createI18nScope('assignments_2')
 
@@ -72,17 +73,34 @@ export default function RubricsQuery(props) {
     },
   })
 
-  if (loading) {
+  const {data: ratingsData, isError: ratingsError, isLoading: ratingsLoading} = useAllPages({
+    queryKey:  ['courseProficiencyRatings', props.assignment.env.courseId],
+    queryFn: ({pageParam}) => {
+      return executeQuery(COURSE_PROFICIENCY_RATINGS_QUERY, {
+        courseID: props.assignment.env.courseId,
+        cursor: pageParam,
+      })
+    },
+    getNextPageParam: lastPage => {
+      const pageInfo = lastPage?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
+      return pageInfo?.hasNextPage ? pageInfo.endCursor : null
+    },
+    meta: {
+      fetchAtLeastOnce: true,
+    },
+  })
+
+  if (loading || ratingsLoading) {
     return <LoadingIndicator />
   }
 
-  if (error) {
+  if (error || ratingsError) {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
         errorSubject={I18n.t('Assignments 2 Student initial query error')}
         errorCategory={I18n.t('Assignments 2 Student Error Page')}
-        errorMessage={error.message}
+        errorMessage={error?.message || error}
       />
     )
   }
@@ -94,7 +112,13 @@ export default function RubricsQuery(props) {
       )}
       key={props.submission.attempt}
       proficiencyRatings={
-        data.course.account?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
+        ratingsData.pages.reduce((acc, page) => {
+          const nodes = page?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
+          if (nodes) {
+            return acc.concat(nodes)
+          }
+          return acc
+        }, [])
       }
       rubric={transformRubricData(data.assignment.rubric)}
       rubricAssociation={data.assignment.rubricAssociation}

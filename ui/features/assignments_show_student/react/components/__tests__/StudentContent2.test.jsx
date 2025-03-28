@@ -249,8 +249,8 @@ describe('Assignment Student Content View', () => {
       props.assignment.rubric = {}
 
       const variables = {
-        assignmentLid: '1',
         courseID: '1',
+        assignmentLid: '1',
         submissionAttempt: 0,
         submissionID: '1',
       }
