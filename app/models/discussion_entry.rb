@@ -37,6 +37,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_many :unordered_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "parent_id", inverse_of: :parent_entry
   has_many :flattened_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "root_entry_id", inverse_of: :root_entry
   has_many :discussion_entry_participants
+  has_many :discussion_topic_insight_entries, class_name: "DiscussionTopicInsight::Entry", inverse_of: :discussion_entry
   has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: "DiscussionEntry", foreign_key: "root_entry_id", inverse_of: :root_entry
   belongs_to :discussion_topic, inverse_of: :discussion_entries
   belongs_to :quoted_entry, class_name: "DiscussionEntry"

@@ -109,6 +109,8 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :user
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :discussion_topic
   has_many :summaries, class_name: "DiscussionTopicSummary"
+  has_many :insights, class_name: "DiscussionTopicInsight"
+  has_many :insight_entries, class_name: "DiscussionTopicInsight::Entry"
   has_one :estimated_duration, dependent: :destroy, inverse_of: :discussion_topic
 
   validates_with HorizonValidators::DiscussionsValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
