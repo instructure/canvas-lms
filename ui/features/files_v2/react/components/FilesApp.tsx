@@ -25,6 +25,7 @@ import {canvas} from '@instructure/ui-theme-tokens'
 import {View} from '@instructure/ui-view'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 
 import {FileManagementProvider} from './Contexts'
@@ -32,11 +33,10 @@ import FileFolderTable from './FileFolderTable'
 import FilesHeader from './FilesHeader'
 import FilesUsageBar from './FilesUsageBar'
 import SearchBar from './SearchBar'
-import {generateTableUrl} from '../../utils/apiUtils'
-import {BBFolderWrapper} from '../../utils/fileFolderWrappers'
-import {useSearchTerm} from '../hooks/useSearchTerm'
+import {BBFolderWrapper, FileFolderWrapper} from '../../utils/fileFolderWrappers'
 import {useGetFolders} from '../hooks/useGetFolders'
-import {Folder} from '../../interfaces/File'
+import {File, Folder} from '../../interfaces/File'
+import {useGetPaginatedFiles} from '../hooks/useGetPaginatedFiles'
 
 const I18n = createI18nScope('files_v2')
 
@@ -48,14 +48,7 @@ interface FilesAppProps {
 
 const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   const showingAllContexts = filesEnv.showingAllContexts
-  const {searchTerm, setSearchTerm} = useSearchTerm()
-  const [isTableLoading, setIsTableLoading] = useState(true)
-  const [sort, setSort] = useState({
-    sortBy: 'name',
-    sortDirection: 'asc',
-  })
-  const [currentPageNumber, setCurrentPageNumber] = useState(1)
-  const [pageQueryBookmarks, setPageQueryBookmarks] = useState<{[key: number]: string}>({1: ''})
+
   const [paginationAlert, setPaginationAlert] = useState<string>('')
   const currentFolderWrapper = useRef<BBFolderWrapper | null>(null)
 
@@ -63,61 +56,43 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   const folderId = currentFolder.id
   const contextId = currentFolder.context_id
   const contextType = currentFolder.context_type.toLowerCase()
-  const totalPageNumber = Object.keys(pageQueryBookmarks).length
 
-  const currentUrl = generateTableUrl({
-    searchTerm,
-    contextId,
-    contextType,
-    folderId,
-    sortBy: sort.sortBy,
-    sortDirection: sort.sortDirection,
-    pageQueryParam: pageQueryBookmarks[currentPageNumber],
+  const onSettled = useCallback((rows: (File | Folder)[]) => {
+    const currentFolderId = currentFolderWrapper.current?.id
+    if (currentFolderId !== currentFolder.id) {
+      currentFolderWrapper.current = new BBFolderWrapper(currentFolder)
+    }
+    currentFolderWrapper.current!.files.set(rows.map((row: any)  => new FileFolderWrapper(row)))
+  }, [currentFolder.id])
+
+  const {
+    data: rows,
+    isFetching: isLoading,
+    error,
+    page,
+    search,
+    sort,
+  } = useGetPaginatedFiles({
+    folder: currentFolder,
+    onSettled,
   })
 
   useEffect(() => {
-    setPageQueryBookmarks({1: ''})
-    setCurrentPageNumber(1)
-    currentFolderWrapper.current = new BBFolderWrapper(currentFolder)
-  }, [currentFolder])
+    if (error) {
+      showFlashError(I18n.t('Failed to fetch files and folders.'))()
+    }
+  }, [error])
 
-  const handleTableLoadingStatusChange = useCallback((isLoading: boolean) => {
-    setIsTableLoading(isLoading)
-  }, [])
-
-  const handlePaginationLinkChange = useCallback(
-    (links: Record<string, string>) => {
-      let srTotalPageNumber = Object.keys(pageQueryBookmarks).length
-      if (links.next && !pageQueryBookmarks[currentPageNumber + 1]) {
-        const url = new URL(links.next)
-        const searchParams = url.searchParams
-        const pageQueryParam = searchParams.get('page') || ''
-        setPageQueryBookmarks(prev => {
-          const newBookmarks = {...prev, [currentPageNumber + 1]: pageQueryParam}
-          return newBookmarks
-        })
-        srTotalPageNumber++
-      }
-
+  useEffect(() => {
+    if (!isLoading) {
       setPaginationAlert(
-        I18n.t('Table page %{currentPageNumber} of %{totalPageNumber}', {
-          currentPageNumber,
-          totalPageNumber: srTotalPageNumber,
-        }),
+        I18n.t('Table page %{current} of %{total}', {
+          current: page.current,
+          total: page.total,
+        })
       )
-    },
-    [currentPageNumber, pageQueryBookmarks],
-  )
-
-  const handlePageChange = useCallback((pageNumber: number) => {
-    setCurrentPageNumber(pageNumber)
-  }, [])
-
-  const handleSortChange = useCallback((newSortBy: string, newSortDirection: string) => {
-    setSort({sortBy: newSortBy, sortDirection: newSortDirection})
-    setCurrentPageNumber(1)
-    setPageQueryBookmarks({1: ''})
-  }, [])
+    }
+  }, [isLoading, page.current, page.total])
 
   const canManageFilesForContext = (permission: string) => {
     return filesEnv.userHasPermission({contextType, contextId}, permission)
@@ -152,21 +127,19 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
           isUserContext={isUserContext}
           shouldHideUploadButtons={!userCanAddFilesForContext}
         />
-        <SearchBar initialValue={searchTerm} onSearch={setSearchTerm} />
-        {currentUrl && (
-          <FileFolderTable
-            size={size}
-            folderBreadcrumbs={folders}
-            userCanEditFilesForContext={userCanEditFilesForContext}
-            userCanDeleteFilesForContext={userCanDeleteFilesForContext}
-            usageRightsRequiredForContext={usageRightsRequiredForContext}
-            currentUrl={currentUrl}
-            onPaginationLinkChange={handlePaginationLinkChange}
-            onLoadingStatusChange={handleTableLoadingStatusChange}
-            onSortChange={handleSortChange}
-            searchString={searchTerm}
-          />
-        )}
+        <SearchBar initialValue={search.term} onSearch={search.set} />
+        <FileFolderTable
+          size={size}
+          rows={isLoading ? [] : rows!}
+          isLoading={isLoading}
+          folderBreadcrumbs={folders}
+          userCanEditFilesForContext={userCanEditFilesForContext}
+          userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+          usageRightsRequiredForContext={usageRightsRequiredForContext}
+          onSortChange={sort.set}
+          sort={sort}
+          searchString={search.term}
+        />
         <Flex padding="small none none none" justifyItems="space-between">
           <Flex.Item size="50%">{userCanManageFilesForContext && <FilesUsageBar />}</Flex.Item>
           <Flex.Item size="auto" padding="none medium none none">
@@ -178,15 +151,15 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
             >
               {paginationAlert}
             </Alert>
-            {!isTableLoading && totalPageNumber > 1 && (
+            {!isLoading && page.total > 1 && (
               <Pagination
                 as="nav"
-                labelNext="Next page"
-                labelPrev="Previous page"
+                labelNext={I18n.t("Next page")}
+                labelPrev={I18n.t("Previous page")}
                 variant="compact"
-                currentPage={currentPageNumber}
-                totalPageNumber={totalPageNumber}
-                onPageChange={handlePageChange}
+                currentPage={page.current}
+                totalPageNumber={page.total}
+                onPageChange={page.set}
                 data-testid="files-pagination"
               />
             )}

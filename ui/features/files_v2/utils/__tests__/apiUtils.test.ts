@@ -21,6 +21,7 @@ import {
   generateFilesQuotaUrl,
   generateFolderPostUrl,
   parseLinkHeader,
+  parseBookmarkFromUrl,
   generateTableUrl,
   generateSearchNavigationUrl,
 } from '../apiUtils'
@@ -188,5 +189,27 @@ describe('generateSearchNavigationUrl', () => {
     setupFilesEnv(false)
     const url = generateSearchNavigationUrl('foo')
     expect(url).toBe('/?search_term=foo')
+  })
+})
+
+describe('parseBookmarkFromUrl', () => {
+  it('return null for undefined', () => {
+    const bookmark = parseBookmarkFromUrl(undefined)
+    expect(bookmark).toBe(null)
+  })
+
+  it('return null for invalid url', () => {
+    const bookmark = parseBookmarkFromUrl('invalid-url')
+    expect(bookmark).toBe(null)
+  })
+
+  it('return null for valid url without page param', () => {
+    const bookmark = parseBookmarkFromUrl('http://example.com')
+    expect(bookmark).toBe(null)
+  })
+
+  it('return page param for valid url with page param', () => {
+    const bookmark = parseBookmarkFromUrl('http://example.com?page=2')
+    expect(bookmark).toBe('2')
   })
 })

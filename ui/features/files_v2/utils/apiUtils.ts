@@ -86,6 +86,18 @@ export const parseLinkHeader = (header: string | null) => {
   return links
 }
 
+export const parseBookmarkFromUrl = (url?: string) => {
+  if (!url) {
+    return null
+  }
+  try {
+    const urlObj = new URL(url)
+    return urlObj.searchParams.get('page')
+  } catch {
+    return null
+  }
+}
+
 const generateSearchUrl = (singularContextType: string, contextId: string, searchTerm: string) => {
   return `/api/v1/${singularContextType}s/${contextId}/files?search_term=${searchTerm}&${SEARCH_AND_ALL_QUERY_PARAMS}`
 }
