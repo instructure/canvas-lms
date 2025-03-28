@@ -55,25 +55,20 @@ export type ModuleItemContent = {
   pointsPossible?: number
   published?: boolean
   canUnpublish?: boolean
+  canDuplicate?: boolean
   dueAt?: string
   lockAt?: string
   unlockAt?: string
   todoDate?: string
   url?: string
   isLockedByMasterCourse?: boolean
-  dueAt?: string
-  lockAt?: string
-  // Assignment specific
   assignmentGroupId?: string
   submissionTypes?: string[]
-  // Discussion specific
   discussionType?: string
-  // File specific
   displayName?: string
   contentType?: string
   size?: string
   thumbnailUrl?: string
-  // External URL specific
   externalUrl?: string
   newTab?: boolean
 } | null

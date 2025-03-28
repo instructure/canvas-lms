@@ -54,6 +54,8 @@ ready(() => {
             courseId={ENV.course_id}
             isMasterCourse={ENV.MASTER_COURSE_SETTINGS?.IS_MASTER_COURSE ?? false}
             isChildCourse={ENV.MASTER_COURSE_SETTINGS?.IS_CHILD_COURSE ?? false}
+            // @ts-expect-error
+            permissions={ENV.MODULES_PERMISSIONS}
           >
             {ENV.current_user_is_student
               ? <ModulesStudentContainer />
