@@ -200,12 +200,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
 const ResponsiveFilesApp = () => {
   const isUserContext = filesEnv.showingAllContexts
   const { data: folders } = useGetFolders()
-
-  const foldersRef = useRef<Folder[] | null>(null)
-  if (folders) {
-    foldersRef.current = folders
-  }
-  if (!foldersRef.current) {
+  if (!folders) {
     return null
   }
 
@@ -219,7 +214,7 @@ const ResponsiveFilesApp = () => {
       render={(_props: any, matches: string[] | undefined) => (
         <FilesApp
           isUserContext={isUserContext}
-          folders={foldersRef.current!}
+          folders={folders}
           size={(matches?.[0] as 'small' | 'medium') || 'large'}
         />
       )}
