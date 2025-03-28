@@ -159,7 +159,6 @@ const DiscussionInsights: React.FC = () => {
   const tableRows: Row[] = filteredEntries.map(item => ({
     relevance: getStatusByRelevance(
       item.relevance_ai_classification,
-      item.relevance_ai_classification_confidence,
     ),
     name: item.student_name,
     notes: item.relevance_ai_evaluation_notes,

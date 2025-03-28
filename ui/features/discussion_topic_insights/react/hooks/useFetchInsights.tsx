@@ -32,8 +32,7 @@ type InsightEntry = {
   student_id: number
   student_name: string
 
-  relevance_ai_classification: 'irrelevant' | 'relevant'
-  relevance_ai_classification_confidence: number
+  relevance_ai_classification: 'irrelevant' | 'relevant' | 'needs_review'
   relevance_ai_evaluation_notes: string
 
   relevance_human_reviewer: number | null

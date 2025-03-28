@@ -28,6 +28,7 @@ class DiscussionTopicInsight < ActiveRecord::Base
 
   WORKFLOW_STATES = %w[created in_progress completed failed].freeze
   TERMINAL_WORKFLOW_STATES = %w[completed failed].freeze
+  BATCH_SIZE = 5
 
   validates :user, presence: true
   validates :root_account, presence: true
@@ -44,27 +45,45 @@ class DiscussionTopicInsight < ActiveRecord::Base
   def generate
     update!(workflow_state: "in_progress")
 
+    llm_config = LLMConfigs.config_for("discussion_topic_insights")
+    prompt_presenter = DiscussionTopic::PromptPresenter.new(discussion_topic)
+    pretty_locale = available_locales[locale] || "English"
+
     # TODO: chunking should probably be sliced based on total tokens
-    unprocessed_entries(should_preload: true).each_slice(10) do |batch|
-      # TODO: call Cedar with batch
-      batch.each do |entry, hash|
-        entries
-          .create!(
+    unprocessed_entries(should_preload: true).each_slice(BATCH_SIZE) do |batch|
+      content = prompt_presenter.content_for_insight(entries: batch.map(&:first))
+      prompt, options = llm_config.generate_prompt_and_options(substitutions: { CONTENT: content, LOCALE: pretty_locale })
+
+      response = InstLLMHelper.client(llm_config.model_id).chat(
+        [{ role: "user", content: prompt }],
+        **options.symbolize_keys
+      )
+
+      begin
+        parsed_response = JSON.parse(response.message[:content])
+        validate_llm_response(parsed_response, batch.length)
+
+        batch.zip(parsed_response).each do |item, ai_evaluation|
+          entry, hash = item
+          entries.create!(
             discussion_topic:,
             discussion_entry: entry,
             discussion_entry_version: entry.discussion_entry_versions.first,
             locale:,
             dynamic_content_hash: hash,
-            ai_evaluation: { "relevance_classification" => "relevant", "confidence" => 4, "notes" => "Trust me, I'm a computer." },
-            ai_evaluation_human_feedback_notes: ""
+            ai_evaluation:
           )
+        end
+      rescue JSON::ParserError => e
+        Rails.logger.error("Failed to parse LLM response: #{e.message}")
+        raise
       end
     end
 
     update!(workflow_state: "completed")
   rescue => e
     update!(workflow_state: "failed")
-    Rails.logger.error "Failed to generate discussion topic insights for topic #{discussion_topic.id}: #{e}"
+    Rails.logger.error("Failed to generate discussion topic insights for topic #{discussion_topic.id}: #{e}")
     raise
   end
 
@@ -77,22 +96,62 @@ class DiscussionTopicInsight < ActiveRecord::Base
               .order("discussion_entry_id ASC, discussion_topic_insight_entries.created_at DESC")
               .to_a
 
-    result = entries
-             .group_by(&:discussion_entry_id)
-             .values
-             .map(&:first)
+    latest_insight_entries = entries
+                             .group_by(&:discussion_entry_id)
+                             .values
+                             .map(&:first)
 
-    if result.any?
+    if latest_insight_entries.any?
       ActiveRecord::Associations::Preloader.new(
-        records: result,
+        records: latest_insight_entries,
         associations: %i[discussion_entry discussion_entry_version user]
       ).call
     end
 
-    result
+    latest_insight_entries
   end
 
   private
+
+  def validate_llm_response(response, expected_length)
+    unless response.is_a?(Array)
+      raise ArgumentError, "LLM response is not an array"
+    end
+
+    if response.length != expected_length
+      raise ArgumentError, "LLM response length (#{response.length}) doesn't match expected length (#{expected_length})"
+    end
+
+    response_ids = response.pluck("id")
+    expected_sequence = (0...response.length).to_a
+
+    if response_ids != expected_sequence
+      raise ArgumentError, "Response IDs [#{response_ids.join(", ")}] are not sequential numbers starting from 0"
+    end
+
+    required_fields = %w[compliance_status relevance_score quality_score final_label feedback]
+
+    response.each_with_index do |item, index|
+      missing_fields = required_fields.select { |field| item[field].nil? }
+
+      unless missing_fields.empty?
+        raise ArgumentError, "Item #{index} in LLM response is missing required fields: #{missing_fields.join(", ")}"
+      end
+
+      unless item["relevance_score"].is_a?(Numeric)
+        raise ArgumentError, "Item #{index} has non-numeric relevance_score: #{item["relevance_score"]}"
+      end
+
+      unless item["quality_score"].is_a?(Numeric)
+        raise ArgumentError, "Item #{index} has non-numeric quality_score: #{item["quality_score"]}"
+      end
+
+      valid_labels = %w[relevant needs_review irrelevant]
+      unless valid_labels.include?(item["final_label"])
+        raise ArgumentError, "Item #{index} has invalid final_label: #{item["final_label"]}. Expected one of: #{valid_labels.join(", ")}"
+      end
+    end
+  end
 
   def locale
     discussion_topic.course.locale || I18n.default_locale.to_s || "en"
