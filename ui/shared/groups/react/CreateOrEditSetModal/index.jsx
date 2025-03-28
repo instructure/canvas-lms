@@ -88,7 +88,12 @@ function reducer(prevState, action) {
     }
     case 'selfsignup-change': {
       const {selfSignup, bySection} = action.to
-      return {...prevState, selfSignup, bySection: selfSignup ? bySection : false}
+      return {
+        ...prevState,
+        selfSignup,
+        bySection: selfSignup ? bySection : false,
+        splitGroups: selfSignup ? SPLIT.off : prevState.splitGroups,
+      }
     }
     case 'leadership-change': {
       const {enableAutoLeader, autoLeaderType} = action.to
@@ -306,7 +311,7 @@ export const CreateOrEditSetModal = ({
           direction: 'column',
         },
       }}
-      render={(props, matches) => {
+      render={(props, _) => {
         return (
           <GroupContext.Provider value={stateToContext(st)}>
             <GroupSetName
