@@ -30,6 +30,7 @@ import {formatDate, getStatusByRelevance} from '../../utils'
 import InsightsReviewRatings from '../InsightsReviewRatings/InsightsReviewRatings'
 import useInsightStore from '../../hooks/useInsightStore'
 import {Button} from '@instructure/ui-buttons'
+import NewActivityInfo from '../NewActivityInfo/NewActivityInfo'
 
 const I18n = createI18nScope('discussion_insights')
 
@@ -94,6 +95,11 @@ const DiscussionInsights: React.FC = () => {
   )
 
   let placeholderContent = null
+
+  const handleGenerateInsights = async () => {
+    // TODO: VICE-5178
+    console.log('Generate insights clicked')
+  }
 
   if (insightError) {
     placeholderContent = (
@@ -173,7 +179,13 @@ const DiscussionInsights: React.FC = () => {
   return (
     <>
       <InsightsHeader />
-      <InsightsActionBar loading={loading} entryCount={entryCount} handleSearch={handleSearch} />
+      {insight?.needs_processing && <NewActivityInfo />}
+      <InsightsActionBar
+        loading={loading}
+        entryCount={entryCount}
+        onSearch={handleSearch}
+        onGenerateInsights={handleGenerateInsights}
+      />
       {!loading && !!entryCount && !!filteredEntries.length && (
         <View as="div" margin="0 0 medium 0">
           <Text color="secondary">{searchResultsText}</Text>

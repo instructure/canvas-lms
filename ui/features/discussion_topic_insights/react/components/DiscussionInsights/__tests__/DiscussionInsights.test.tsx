@@ -118,4 +118,18 @@ describe('DiscussionInsights', () => {
       expect(screen.getByText('No results found')).toBeInTheDocument()
     })
   })
+
+  it('displays info alert when there are new replies', () => {
+    mockedUseInsight.mockReturnValue({
+      loading: false,
+      insight: {workflow_state: 'completed', needs_processing: true},
+      insightError: null,
+      entries: [{student_name: 'John Doe'}],
+    })
+
+    render(<DiscussionInsights />)
+    expect(
+      screen.getByText('There have been new replies added since the last insights generation.'),
+    ).toBeInTheDocument()
+  })
 })
