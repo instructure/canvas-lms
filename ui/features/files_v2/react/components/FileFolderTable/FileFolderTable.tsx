@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useMemo, useState, useRef} from 'react'
+import React, {useCallback, useEffect, useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
@@ -24,11 +24,9 @@ import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {useQuery, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import {type File, type Folder} from '../../../interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
-import {parseLinkHeader} from '../../../utils/apiUtils'
 import {getUniqueId} from '../../../utils/fileFolderUtils'
 import SubTableContent from './SubTableContent'
 import ActionMenuButton from './ActionMenuButton'
@@ -42,7 +40,7 @@ import Breadcrumbs from './Breadcrumbs'
 import CurrentUploads from '../FilesHeader/CurrentUploads'
 import {View} from '@instructure/ui-view'
 import {useFileManagement} from '../Contexts'
-import {FileFolderWrapper, FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
+import {FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
 import BlueprintIconButton from './BlueprintIconButton'
 import {Alert} from '@instructure/ui-alerts'
 import CurrentDownloads from '../FilesHeader/CurrentDownloads'
@@ -52,24 +50,11 @@ import FileTableUpload from './FileTableUpload'
 import {UpdatedAtDate} from './UpdatedAtDate'
 import {ModifiedByLink} from './ModifiedByLink'
 import PermissionsModal from './PermissionsModal'
+import {Sort} from '../../hooks/useGetPaginatedFiles'
 
 const I18n = createI18nScope('files_v2')
 
 const MIN_HEIGHT = 450
-
-const fetchFilesAndFolders = async (
-  url: string,
-  onLoadingStatusChange: (arg0: boolean) => void,
-) => {
-  onLoadingStatusChange(true)
-  const response = await fetch(url)
-  if (!response.ok) {
-    throw new Error('Failed to fetch files and folders')
-  }
-  const links = parseLinkHeader(response.headers.get('Link'))
-  const rows = await response.json()
-  return {rows, links}
-}
 
 const setColumnWidths = (headers: ColumnHeader[]) => {
   // Use a temporary div to calculate the width of each column
@@ -225,26 +210,26 @@ export type ModalOrTrayOptions = {
 
 export interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
+  rows: (File | Folder)[],
+  isLoading: boolean,
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
   usageRightsRequiredForContext: boolean
-  currentUrl: string
   folderBreadcrumbs: Folder[]
-  onPaginationLinkChange: (links: Record<string, string>) => void
-  onLoadingStatusChange: (isLoading: boolean) => void
-  onSortChange: (sortBy: string, sortDir: 'asc' | 'desc') => void
+  sort: Sort
+  onSortChange: (sort: Sort) => void
   searchString?: string
 }
 
 const FileFolderTable = ({
   size,
+  rows,
+  isLoading,
   userCanEditFilesForContext,
   userCanDeleteFilesForContext,
   usageRightsRequiredForContext,
-  currentUrl,
   folderBreadcrumbs,
-  onPaginationLinkChange,
-  onLoadingStatusChange,
+  sort,
   onSortChange,
   searchString = '',
 }: FileFolderTableProps) => {
@@ -252,37 +237,12 @@ const FileFolderTable = ({
   const isStacked = size !== 'large'
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
   const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>('')
-
-  const [sortColumn, setSortColumn] = useState<string>('name')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | 'none'>('asc')
   const [modalOrTrayOptions, _setModalOrTrayOptions] = useState<ModalOrTrayOptions | null>(null)
 
   const [isDragging, setIsDragging] = useState(false)
   const [directoryMinHeight, setDirectoryMinHeight] = useState('auto')
 
   const filesDirectoryRef = useRef<HTMLDivElement | null>(null)
-
-  const {data, error, isLoading, isFetching} = useQuery({
-    queryKey: ['files', currentUrl],
-    queryFn: () => {
-      setSelectedRows(new Set())
-      if (searchString.length === 1) {
-        return Promise.resolve({rows: [], links: {}})
-      }
-      return fetchFilesAndFolders(currentUrl, onLoadingStatusChange)
-    },
-    staleTime: 0,
-    onSuccess: ({links}) => {
-      onPaginationLinkChange(links)
-    },
-    onSettled: result => {
-      if (result) {
-        const foldersAndFiles = result.rows.map((row: File | Folder) => new FileFolderWrapper(row))
-        currentFolder?.files.set(foldersAndFiles)
-      }
-      onLoadingStatusChange(false)
-    },
-  })
 
   useEffect(() => {
     const listener = (event: FilesCollectionEvent) => {
@@ -294,14 +254,9 @@ const FileFolderTable = ({
     return () => currentFolder?.removeListener(listener)
   }, [currentFolder])
 
-  if (error) {
-    showFlashError(I18n.t('Failed to fetch files and folders.'))()
-  }
-
-  const rows: (File | Folder)[] = useMemo(
-    () => (!isFetching && data?.rows && data.rows.length > 0 ? data.rows : []),
-    [data?.rows, isFetching],
-  )
+  useEffect(() => {
+    setSelectedRows(new Set())
+  }, [rows])
 
   const setModalOrTrayOptions = useCallback(
     (options: ModalOrTrayOptions | null) => () => _setModalOrTrayOptions(options),
@@ -352,13 +307,13 @@ const FileFolderTable = ({
 
   const handleColumnHeaderClick = useCallback(
     (columnId: string) => {
-      const newDir = columnId === sortColumn ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'asc'
       const newCol = columnId
-      setSortColumn(newCol)
-      setSortDirection(newDir)
-      onSortChange(newCol, newDir)
+      const newDir = columnId === sort.by
+        ? (sort.direction === 'asc' ? 'desc' : 'asc')
+        : 'asc'
+      onSortChange({ by: newCol, direction: newDir })
     },
-    [onSortChange, sortColumn, sortDirection],
+    [onSortChange, sort.by, sort.direction],
   )
 
   const allRowsSelected = rows.length != 0 && selectedRows.size === rows.length
@@ -425,8 +380,8 @@ const FileFolderTable = ({
   const tableCaption = I18n.t(
     'Files and Folders: sorted by %{sortColumn} in %{sortDirection} order',
     {
-      sortColumn: columnHeaders.find(header => header.id === sortColumn)?.title || sortColumn,
-      sortDirection: sortDirection === 'asc' ? 'ascending' : 'descending',
+      sortColumn: columnHeaders.find(header => header.id === sort.by)?.title || sort.by,
+      sortDirection: sort.direction === 'asc' ? 'ascending' : 'descending',
     },
   )
 
@@ -490,7 +445,7 @@ const FileFolderTable = ({
       <div
         data-testid="files-directory"
         ref={filesDirectoryRef}
-        style={{minHeight: rows.length === 0 && !isFetching && !isStacked ? MIN_HEIGHT : directoryMinHeight}}
+        style={{minHeight: rows.length === 0 && !isLoading && !isStacked ? MIN_HEIGHT : directoryMinHeight}}
         className="files_directory"
         onDragEnter={e => handleDragEnter(e as React.DragEvent<HTMLDivElement>)}
         onDragLeave={e => handleDragLeave(e as React.DragEvent<HTMLDivElement>)}
@@ -514,8 +469,7 @@ const FileFolderTable = ({
                 toggleSelectAll,
                 isStacked,
                 filteredColumns,
-                sortColumn,
-                sortDirection,
+                sort,
                 handleColumnHeaderClick,
               )}
             </Table.Row>
@@ -534,7 +488,7 @@ const FileFolderTable = ({
               usageRightsRequiredForContext,
               setModalOrTrayOptions,
             )}
-            {!isFetching && userCanEditFilesForContext && !isStacked && (
+            {!isLoading && userCanEditFilesForContext && !isStacked && (
               <Table.Row data-upload>
                 <Table.Cell>
                   <FileTableUpload
@@ -549,8 +503,8 @@ const FileFolderTable = ({
         </Table>
       </div>
       <SubTableContent
-        isLoading={isLoading || isFetching}
-        isEmpty={rows.length === 0 && !isFetching}
+        isLoading={isLoading}
+        isEmpty={rows.length === 0 && !isLoading}
         searchString={searchString}
       />
       {selectionAnnouncement && (
@@ -570,8 +524,8 @@ const FileFolderTable = ({
         data-testid="sort-announcement"
       >
         {I18n.t('Sorted by %{sortColumn} in %{sortDirection} order', {
-          sortColumn: columnHeaders.find(header => header.id === sortColumn)?.title || sortColumn,
-          sortDirection: sortDirection === 'asc' ? 'ascending' : 'descending',
+          sortColumn: columnHeaders.find(header => header.id === sort.by)?.title || sort.by,
+          sortDirection: sort.direction === 'asc' ? 'ascending' : 'descending',
         })}
       </Alert>
       {searchString && rows.length > 0 && (

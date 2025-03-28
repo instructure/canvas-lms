@@ -20,13 +20,14 @@ import React from 'react'
 import {Table} from '@instructure/ui-table'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
+import {Sort} from '../../hooks/useGetPaginatedFiles'
 
 // TODO: when we know how to sort by modified_at and published, add them here.
 const SORTABLE_COLUMNS = ['name', 'created_at', 'updated_at', 'size', 'modified_by', 'rights']
 
 const isSortable = (column: string) => SORTABLE_COLUMNS.includes(column)
 
-const mapSortDirection = (sortDirection: 'asc' | 'desc' | 'none') => {
+const mapSortDirection = (sortDirection: Sort['direction']) => {
   switch (sortDirection) {
     case 'asc':
       return 'ascending'
@@ -44,8 +45,7 @@ const renderTableHead = (
   toggleSelectAll: () => void,
   isStacked: boolean,
   columnHeaders: ColumnHeader[],
-  sortColumn: string | null,
-  sortDirection: 'asc' | 'desc' | 'none',
+  sort: Sort,
   handleSortChange: (column: string) => void,
 ) => {
   return [
@@ -77,7 +77,7 @@ const renderTableHead = (
         onRequestSort={
           isSortable(columnHeader.id) ? () => handleSortChange(columnHeader.id) : undefined
         }
-        sortDirection={sortColumn === columnHeader.id ? mapSortDirection(sortDirection) : 'none'}
+        sortDirection={sort.by === columnHeader.id ? mapSortDirection(sort.direction) : 'none'}
         stackedSortByLabel={columnHeader.title}
       >
         {columnHeader.title}
