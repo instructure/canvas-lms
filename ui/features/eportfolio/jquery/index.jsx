@@ -763,8 +763,7 @@ $(document).ready(function () {
       .find('.message')
       .text(
         I18n.t(
-          '#eportfolios.show.headers.export_progress',
-          'Collecting ePortfolio resources. this may take a while if you have a lot of files in your ePortfolio.',
+          'Collecting ePortfolio resources. This may take a while if you have a lot of files in your ePortfolio.',
         ),
       )
     const url = $(this).attr('href')
