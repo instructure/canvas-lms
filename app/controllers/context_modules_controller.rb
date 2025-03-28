@@ -298,13 +298,24 @@ class ContextModulesController < ApplicationController
           },
         }
         js_env(CONTEXT_MODULES_HEADER_PROPS: context_modules_header_props)
-        js_bundle :context_modules_v2
-        return render html: "", layout: true
-      end
 
-      # Load legacy modules page assets
-      js_bundle :context_modules
-      render stream: can_stream_template?
+        modules_permissions = {
+          canAdd: @can_add,
+          canEdit: @can_edit,
+          canDelete: @can_delete,
+          canViewUnpublished: @can_view_unpublished,
+          canDirectShare: can_do(@context, @current_user, :direct_share),
+        }
+
+        js_env(MODULES_PERMISSIONS: modules_permissions)
+
+        js_bundle :context_modules_v2
+        render html: "", layout: true
+      else
+        # Load legacy modules page assets
+        js_bundle :context_modules
+        render stream: can_stream_template?
+      end
     end
   end
 

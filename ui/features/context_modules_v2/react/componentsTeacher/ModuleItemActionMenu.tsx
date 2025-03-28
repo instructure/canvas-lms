@@ -35,6 +35,7 @@ import {
   IconMasteryPathsLine
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {useContextModule} from '../hooks/useModuleContext'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -42,6 +43,7 @@ const basicContentTypes = ['SubHeader', 'ExternalUrl']
 
 export interface ModuleItemActionMenuProps {
   itemType: string
+  canDuplicate: boolean
   isMenuOpen: boolean
   setIsMenuOpen: (isOpen: boolean) => void
   indent: number
@@ -66,6 +68,7 @@ export interface ModuleItemActionMenuProps {
 
 const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   itemType,
+  canDuplicate,
   isMenuOpen,
   setIsMenuOpen,
   indent,
@@ -82,6 +85,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   masteryPathsData,
   handleMasteryPaths = () => {}
 }) => {
+  const { permissions } = useContextModule()
   return (
     <Menu
       onToggle={(isOpen) => setIsMenuOpen(isOpen)}
@@ -102,49 +106,49 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Edit')}</Flex.Item>
         </Flex>
       </Menu.Item>
-      {!basicContentTypes.includes(itemType) && <Menu.Item onClick={handleSpeedGrader}>
+      {permissions?.canEdit && !basicContentTypes.includes(itemType) && <Menu.Item onClick={handleSpeedGrader}>
         <Flex>
           <Flex.Item><IconSpeedGraderLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('SpeedGrader')}</Flex.Item>
         </Flex>
       </Menu.Item>}
-      {!basicContentTypes.includes(itemType) && <Menu.Item onClick={handleAssignTo}>
+      {permissions?.canEdit && !basicContentTypes.includes(itemType) && <Menu.Item onClick={handleAssignTo}>
         <Flex>
           <Flex.Item><IconPermissionsSolid /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Assign To...')}</Flex.Item>
         </Flex>
       </Menu.Item>}
-      {!basicContentTypes.includes(itemType) && <Menu.Item onClick={handleDuplicate}>
+      {permissions?.canAdd && canDuplicate && !basicContentTypes.includes(itemType) && <Menu.Item onClick={handleDuplicate}>
         <Flex>
           <Flex.Item><IconDuplicateLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Duplicate')}</Flex.Item>
         </Flex>
       </Menu.Item>}
-      <Menu.Item onClick={handleMoveTo}>
+      {permissions?.canEdit && <Menu.Item onClick={handleMoveTo}>
         <Flex>
           <Flex.Item><IconUpdownLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Move to...')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      {indent > 0 && <Menu.Item onClick={handleDecreaseIndent}>
+      </Menu.Item>}
+      {permissions?.canEdit && indent > 0 && <Menu.Item onClick={handleDecreaseIndent}>
         <Flex>
           <Flex.Item><IconArrowStartLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Decrease indent')}</Flex.Item>
         </Flex>
       </Menu.Item>}
-      {indent < 5 && <Menu.Item onClick={handleIncreaseIndent}>
+      {permissions?.canEdit && indent < 5 && <Menu.Item onClick={handleIncreaseIndent}>
         <Flex>
           <Flex.Item><IconArrowEndLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Increase indent')}</Flex.Item>
         </Flex>
       </Menu.Item>}
-      {!basicContentTypes.includes(itemType) && <Menu.Item onClick={handleSendTo}>
+      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && <Menu.Item onClick={handleSendTo}>
         <Flex>
           <Flex.Item><IconUserLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Send To...')}</Flex.Item>
         </Flex>
       </Menu.Item>}
-      {!basicContentTypes.includes(itemType) && <Menu.Item onClick={handleCopyTo}>
+      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && <Menu.Item onClick={handleCopyTo}>
         <Flex>
           <Flex.Item><IconDuplicateSolid /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Copy To...')}</Flex.Item>
@@ -162,12 +166,12 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           </Flex>
         </Menu.Item>
       )}
-      <Menu.Item onClick={handleRemove}>
+      {permissions?.canEdit && <Menu.Item onClick={handleRemove}>
         <Flex>
           <Flex.Item><IconTrashLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Remove')}</Flex.Item>
         </Flex>
-      </Menu.Item>
+      </Menu.Item>}
     </Menu>
   )
 }

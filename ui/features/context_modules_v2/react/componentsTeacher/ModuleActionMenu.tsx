@@ -45,10 +45,12 @@ import {
 } from '../handlers/moduleActionHandlers'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
+import { useModuleItems } from '../hooks/queries/useModuleItems'
 
 const I18n = createI18nScope('context_modules_v2')
 
 export interface ModuleActionMenuProps {
+  expanded?: boolean
   isMenuOpen: boolean
   setIsMenuOpen: (isOpen: boolean) => void
   id: string
@@ -65,6 +67,7 @@ export interface ModuleActionMenuProps {
 }
 
 const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
+  expanded,
   isMenuOpen,
   setIsMenuOpen,
   id,
@@ -74,8 +77,10 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
   setIsDirectShareOpen,
   setIsDirectShareCourseOpen
 }) => {
-  const {courseId} = useContextModule()
+  const {courseId, permissions} = useContextModule()
   const {data, isLoading, isError} = useModules(courseId)
+
+  const {data: moduleItems} = useModuleItems(id, expanded)
 
   const handleEditRef = useCallback(() => {
     handleEdit(id, name, prerequisites, handleOpeningModuleUpdateTray)
@@ -111,6 +116,8 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
     handleCopyTo(setIsDirectShareCourseOpen)
   }, [setIsDirectShareCourseOpen])
 
+  const canDuplicate = moduleItems?.moduleItems.every((item) => item.content?.canDuplicate) && expanded
+
   return (
     <Menu
       onToggle={(isOpen) => setIsMenuOpen(isOpen)}
@@ -126,54 +133,54 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
         />
       }
     >
-      <Menu.Item onClick={handleEditRef}>
+      {permissions?.canEdit && <Menu.Item onClick={handleEditRef}>
         <Flex>
           <Flex.Item><IconEditLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Edit')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      <Menu.Item onClick={handleMoveContentsRef}>
+      </Menu.Item>}
+      {permissions?.canEdit && <Menu.Item onClick={handleMoveContentsRef}>
         <Flex>
           <Flex.Item><IconMoveDownLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Move Contents...')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      <Menu.Item onClick={handleMoveModuleRef}>
+      </Menu.Item>}
+      {permissions?.canEdit && <Menu.Item onClick={handleMoveModuleRef}>
         <Flex>
           <Flex.Item><IconUpdownLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Move Module...')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      <Menu.Item onClick={handleAssignToRef}>
+      </Menu.Item>}
+      {permissions?.canEdit && <Menu.Item onClick={handleAssignToRef}>
         <Flex>
           <Flex.Item><IconPermissionsSolid /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Assign To...')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      <Menu.Item onClick={handleDeleteRef}>
+      </Menu.Item>}
+      {permissions?.canDelete && <Menu.Item onClick={handleDeleteRef}>
         <Flex>
           <Flex.Item><IconTrashLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Delete')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      <Menu.Item onClick={handleDuplicateRef}>
+      </Menu.Item>}
+      {permissions?.canAdd && canDuplicate && <Menu.Item onClick={handleDuplicateRef}>
         <Flex>
           <Flex.Item><IconDuplicateLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Duplicate')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      <Menu.Item onClick={handleSendToRef}>
+      </Menu.Item>}
+      {permissions?.canDirectShare && <Menu.Item onClick={handleSendToRef}>
         <Flex>
           <Flex.Item><IconUserLine /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Send To...')}</Flex.Item>
         </Flex>
-      </Menu.Item>
-      <Menu.Item onClick={handleCopyToRef}>
+      </Menu.Item>}
+      {permissions?.canDirectShare && <Menu.Item onClick={handleCopyToRef}>
         <Flex>
           <Flex.Item><IconCopySolid /></Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Copy To...')}</Flex.Item>
         </Flex>
-      </Menu.Item>
+      </Menu.Item>}
     </Menu>
   )
 }

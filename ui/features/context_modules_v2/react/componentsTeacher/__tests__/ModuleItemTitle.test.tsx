@@ -23,7 +23,12 @@ import ModuleItemTitle from '../ModuleItemTitle'
 
 const setUp = (type: string = 'Assignment', title: string = 'Test Assignment', newTab: boolean = false) => {
   return render(
-    <ContextModuleProvider courseId="1" isMasterCourse={true} isChildCourse={false}>
+    <ContextModuleProvider
+      courseId="1"
+      isMasterCourse={true}
+      isChildCourse={false}
+      permissions={{canEdit: true, canDelete: true, canAdd: true, canDirectShare: true}}
+    >
       <ModuleItemTitle content={{type, title, isLockedByMasterCourse: false, newTab}} url="https://canvas.instructure.com/courses/1/modules" />
     </ContextModuleProvider>
   )

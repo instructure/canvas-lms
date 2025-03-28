@@ -103,6 +103,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
           <ModuleHeaderActionPanel
             id={id}
             name={name}
+            expanded={expanded}
             published={published}
             prerequisites={prerequisites}
             completionRequirements={completionRequirements}

@@ -186,6 +186,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       <Flex.Item>
         <ModuleItemActionMenu
           itemType={content?.type || ''}
+          canDuplicate={content?.canDuplicate || false}
           isMenuOpen={isMenuOpen}
           setIsMenuOpen={setIsMenuOpen}
           indent={indent}
