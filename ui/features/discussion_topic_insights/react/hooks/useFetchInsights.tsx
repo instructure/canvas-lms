@@ -91,8 +91,7 @@ export const useInsight = (context: string, contextId: string, discussionId: str
   } = useQuery({
     queryKey: ['insightEntries', context, contextId, discussionId],
     queryFn: () => fetchInsightEntries(context, contextId, discussionId),
-    // TODO: remove the null version when the api is ready
-    enabled: insightData?.workflow_state === 'completed' || insightData?.workflow_state === null,
+    enabled: insightData?.workflow_state === 'completed',
   })
 
   const {data: entryCount, loading: countIsLoading} = useApolloQuery<EntryCountResponse>(

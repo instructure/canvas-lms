@@ -29,14 +29,20 @@ const I18n = createI18nScope('discussion_insights')
 type InsightsActionBarProps = {
   loading: boolean
   entryCount: number
-  handleSearch: (query: string) => void
+  onSearch: (query: string) => void
+  onGenerateInsights: () => void
 }
 
-const InsightsActionBar: React.FC<InsightsActionBarProps> = ({loading, entryCount, handleSearch}) => {
+const InsightsActionBar: React.FC<InsightsActionBarProps> = ({
+  loading,
+  entryCount,
+  onSearch,
+  onGenerateInsights,
+}) => {
   return (
     <Flex width="100%" direction="row" wrap="wrap" gap="small" margin="0 0 medium 0">
       <Flex.Item shouldGrow shouldShrink>
-        <InsightsSearchBar onSearch={handleSearch} />
+        <InsightsSearchBar onSearch={onSearch} />
       </Flex.Item>
       <Flex.Item shouldShrink shouldGrow={false} width="fit-content">
         <FilterDropDown
@@ -50,9 +56,7 @@ const InsightsActionBar: React.FC<InsightsActionBarProps> = ({loading, entryCoun
           display="inline-block"
           color="primary"
           renderIcon={<AiIcon />}
-          onClick={() => {
-            //TODO: will be implemented in VICE-5151
-          }}
+          onClick={onGenerateInsights}
           disabled={loading || entryCount === 0}
           data-testid="discussion-insights-generate-button"
         >
