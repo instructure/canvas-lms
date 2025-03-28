@@ -31,5 +31,14 @@ RSpec.describe Lti::AssetProcessorEulaAcceptance do
 
       expect(Lti::AssetProcessorEulaAcceptance.active).to eq([@eula1])
     end
+
+    it "enforces unique constraint on user_id, context_external_tool_id, and active records" do
+      expect do
+        lti_asset_processor_eula_model(
+          user: @eula1.user,
+          context_external_tool: @eula1.context_external_tool
+        )
+      end.to raise_error(ActiveRecord::RecordInvalid, /Validation failed/)
+    end
   end
 end

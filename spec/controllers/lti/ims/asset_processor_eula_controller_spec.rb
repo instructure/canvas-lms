@@ -95,4 +95,162 @@ describe Lti::IMS::AssetProcessorEulaController do
       end
     end
   end
+
+  describe "#create_acceptance" do
+    let(:action) { :create_acceptance }
+    let(:request_method) { :post }
+    let(:user) { user_model(root_account_ids: [context.root_account.id]) }
+    let(:user_id) { user.lti_id }
+    let(:timestamp) { Time.zone.now.iso8601 }
+    let(:accepted) { true }
+    let(:body_overrides) { { userId: user_id, accepted:, timestamp: } }
+
+    [true, false].each do |acc|
+      let(:accepted) { acc }
+      context "when the acceptance is successfully created and accepted is #{acc}" do
+        it "creates a new EULA acceptance and returns 201 created" do
+          send_request
+          expect(response).to have_http_status(:created)
+          expect(response.parsed_body).to eq({
+                                               "userId" => user_id,
+                                               "accepted" => accepted,
+                                               "timestamp" => timestamp
+                                             })
+          expect(user.lti_asset_processor_eula_acceptances.count).to eq(1)
+          expect(user.lti_asset_processor_eula_acceptances.first.accepted).to eq(accepted)
+        end
+      end
+    end
+
+    context "when the timestamp is older than the latest acceptance" do
+      before do
+        user.lti_asset_processor_eula_acceptances.create!(
+          context_external_tool_id: cet.id,
+          timestamp:,
+          accepted: true
+        )
+      end
+
+      it "returns 409 conflict" do
+        send_request
+        expect(response).to have_http_status(:conflict)
+        expect(response.parsed_body).to eq({ "error" => "timestamp older than latest" })
+      end
+    end
+
+    context "when the timestamp is invalid" do
+      let(:timestamp) { "invalid_timestamp" }
+
+      it "returns 400 bad request" do
+        send_request
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body).to eq({ "errors" => {
+                                             "message" => "A valid ISO8601 timestamp must be provided",
+                                             "type" => "bad_request"
+                                           } })
+      end
+    end
+
+    context "when the user is not found" do
+      let(:user_id) { "invalid_user_id" }
+
+      it "returns 404 not found" do
+        send_request
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when the tool is not found" do
+      let(:tool_id) { "invalid_id" }
+
+      it "returns 404 not found" do
+        send_request
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when the tool is invalid" do
+      before do
+        allow_any_instance_of(ContextExternalTool).to receive(:developer_key_id).and_return("mismatched_id")
+      end
+
+      it "returns 400 bad request" do
+        send_request
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
+  end
+
+  describe "#delete_acceptances" do
+    let(:action) { :delete_acceptances }
+    let(:request_method) { :delete }
+    let(:user) { user_model(root_account_ids: [context.root_account.id]) }
+    let(:user2) { user_model(root_account_ids: [context.root_account.id]) }
+    let(:cet2) do
+      ContextExternalTool.create!(
+        context: tool_context,
+        consumer_key: "key",
+        shared_secret: "secret",
+        name: "test tool",
+        url: "http://www.tool.com/launch",
+        developer_key:,
+        lti_version: "1.3",
+        workflow_state: "public"
+      )
+    end
+
+    context "when the acceptances are successfully deleted" do
+      before do
+        user.lti_asset_processor_eula_acceptances.create!(
+          context_external_tool_id: cet.id,
+          timestamp: Time.zone.now,
+          accepted: true
+        )
+        user2.lti_asset_processor_eula_acceptances.create!(
+          context_external_tool_id: cet.id,
+          timestamp: Time.zone.now,
+          accepted: true
+        )
+        user2.lti_asset_processor_eula_acceptances.create!(
+          context_external_tool_id: cet2.id,
+          timestamp: Time.zone.now,
+          accepted: true
+        )
+      end
+
+      it "deletes the user's EULA acceptances and returns 204 no content" do
+        send_request
+        expect(response).to have_http_status(:no_content)
+        expect(Lti::AssetProcessorEulaAcceptance.active.count).to eq(1)
+        expect(Lti::AssetProcessorEulaAcceptance.active.first.context_external_tool_id).to eq(cet2.id)
+      end
+    end
+
+    context "when the user has no acceptances" do
+      it "returns 204 no content" do
+        send_request
+        expect(response).to have_http_status(:no_content)
+      end
+    end
+
+    context "when the tool is not found" do
+      let(:tool_id) { "invalid_id" }
+
+      it "returns 404 not found" do
+        send_request
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when the tool is invalid" do
+      before do
+        allow_any_instance_of(ContextExternalTool).to receive(:developer_key_id).and_return("mismatched_id")
+      end
+
+      it "returns 400 bad request" do
+        send_request
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
+  end
 end

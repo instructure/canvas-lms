@@ -27,7 +27,6 @@ class Lti::AssetProcessorEulaAcceptance < ApplicationRecord
   belongs_to :context_external_tool, optional: false
 
   validates :workflow_state, length: { maximum: 255 }
-  validates :accepted, presence: true
-
-  scope :active, -> { where("workflow_state = 'active'") }
+  validates :accepted, inclusion: { in: [true, false] }
+  validates :user_id, uniqueness: { scope: :context_external_tool_id, conditions: -> { active } }
 end
