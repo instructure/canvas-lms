@@ -34,9 +34,12 @@ describe DiscussionTopic::PromptPresenter do
     @topic.course.enroll_user(@student_1, "StudentEnrollment", enrollment_state: "active")
     @topic.course.enroll_user(@student_2, "StudentEnrollment", enrollment_state: "active")
 
-    @topic.discussion_entries.create!(user: @student_1, message: "I liked the course.")
+    entry_1 = @topic.discussion_entries.create!(user: @student_1, message: "I liked the course.")
     entry_2 = @topic.discussion_entries.create!(user: @student_2, message: "My apologies <span class=\"mceNonEditable mention\" data-mention=\"#{@instructor_1.id}\" data-reactroot=\"\">@Instructor 1</span>, but I felt the course was too hard, not sure how <span class=\"mceNonEditable mention\" data-mention=\"#{@student_1.id}\" data-reactroot=\"\">@Student 1</span> was able to keep up.")
     @topic.discussion_entries.create!(user: @instructor_1, message: "I'm sorry to hear that. Could you please provide more details? Although <span class=\"mceNonEditable mention\" data-mention=\"9999999999\" data-reactroot=\"\">@Student 9999999999</span> has already left the course, he seemed to have encountered similar issues.", parent_entry: entry_2)
+
+    entry_1.update(attachment: attachment_model(uploaded_data: stub_file_data("document.pdf", "This is a document.", "application/pdf"), word_count: 4))
+    entry_2.update(attachment: attachment_model(uploaded_data: stub_file_data("image.png", "This is an image.", "image/png")))
 
     @presenter = described_class.new(@topic)
   end
@@ -102,6 +105,64 @@ describe DiscussionTopic::PromptPresenter do
         result = DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary:)
         expect(result.strip).to eq(expected_output.strip)
       end
+    end
+  end
+
+  describe "#content_for_insight" do
+    it "generates correct discussion insight" do
+      expected_output = <<~TEXT
+        <discussion>
+          <topic>
+            <title>
+        Discussion Topic Title    </title>
+            <message>
+        Discussion Topic Message    </message>
+          </topic>
+          <chunk>
+            <items>
+        <item id="0">
+          <metadata>
+            <user_enrollment_type>student</user_enrollment_type>
+            <word_count>4</word_count>
+            <attachments>
+              <attachment>
+                <filename>document.pdf</filename>
+                <content_type>application/pdf</content_type>
+                <word_count>4</word_count>
+              </attachment>
+            </attachments>
+          </metadata>
+          <content>
+        I liked the course.  </content>
+        </item>
+        <item id="1">
+          <metadata>
+            <user_enrollment_type>student</user_enrollment_type>
+            <word_count>22</word_count>
+            <attachments>
+              <attachment>
+                <filename>image.png</filename>
+                <content_type>image/png</content_type>
+              </attachment>
+            </attachments>
+          </metadata>
+          <content>
+        My apologies @instructor, but I felt the course was too hard, not sure how @student was able to keep up.  </content>
+        </item>
+        <item id="2">
+          <metadata>
+            <user_enrollment_type>instructor</user_enrollment_type>
+            <word_count>26</word_count>
+          </metadata>
+          <content>
+        I'm sorry to hear that. Could you please provide more details? Although @unknown has already left the course, he seemed to have encountered similar issues.  </content>
+        </item>
+            </items>
+          </chunk>
+        </discussion>
+      TEXT
+
+      expect(@presenter.content_for_insight(entries: @topic.discussion_entries.active)).to eq(expected_output)
     end
   end
 end

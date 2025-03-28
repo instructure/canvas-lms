@@ -231,6 +231,10 @@ class DiscussionEntry < ActiveRecord::Base
     truncate_html(message, max_length: length)
   end
 
+  def message_word_count
+    HtmlTextHelper.strip_tags(message).split.size
+  end
+
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
