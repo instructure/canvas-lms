@@ -208,6 +208,7 @@ export const CopyCourseForm = ({
             options={terms}
             onSelect={handleSelectTerm}
             disabled={isSubmitting}
+            searchable
           />
         </View>
         <View as="div" margin="medium none none none">
