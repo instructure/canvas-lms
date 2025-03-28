@@ -45,6 +45,8 @@ export const useGetFolders = () => {
 
   return useQuery({
     queryKey: ['folders', pathContext, path],
+    staleTime: 0,
+    keepPreviousData: true,
     queryFn: async () => {
       if (pathContext) {
         const [pluralContextType, contextId] = splitAssetString(pathContext)!
