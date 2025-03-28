@@ -256,5 +256,43 @@ describe Login::OAuth2Controller do
       get :create, params: { state: jwt }
       expect(response).to redirect_to(login_url)
     end
+
+    context "when the authentication provider pseudonym validation fails" do
+      let(:state) { Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob") }
+      let(:retry_url) { "https://test.instructure.com/retry" }
+
+      before do
+        allow(aac).to receive(:validate_found_pseudonym!).and_raise(RetriableOAuthValidationError)
+
+        session[:oauth2_nonce] = ["bob"]
+        allow_any_instantiation_of(aac).to receive(:get_token).and_return(token)
+        allow_any_instantiation_of(aac).to receive(:unique_id).with(token).and_return("user")
+        allow_any_instantiation_of(aac).to receive(:provider_attributes).with(token).and_return({})
+        user_with_pseudonym(username: "user", active_all: 1)
+        @pseudonym.authentication_provider = aac
+        @pseudonym.save!
+        session[:sentinel] = true
+      end
+
+      it "redirects to the specified retry_url" do
+        expect(aac).to receive(:validation_error_retry_url).and_return(retry_url)
+
+        get :create, params: { state: }
+        expect(response).to redirect_to(retry_url)
+        expect(session[:sentinel]).to be_nil
+      end
+
+      context "but the authentication provider does not specify a retry_url" do
+        before do
+          allow(aac).to receive(:validation_error_retry_url).and_return(nil)
+        end
+
+        it "redirects to the login page" do
+          get :create, params: { state: }
+          expect(response).to redirect_to(login_url)
+          expect(session[:sentinel]).to be_nil
+        end
+      end
+    end
   end
 end
