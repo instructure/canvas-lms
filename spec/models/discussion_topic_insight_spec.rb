@@ -109,6 +109,13 @@ describe DiscussionTopicInsight do
         user: @user,
         workflow_state: "created"
       )
+
+      @inst_llm = instance_double(InstLLM::Client)
+      allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
+
+      @llm_config = double("LLMConfig")
+      allow(@llm_config).to receive_messages(model_id: "anthropic.claude-3-haiku-20240307-v1:0", generate_prompt_and_options: ["test prompt", { "max_tokens" => 2000 }], name: "discussion_topic_insights")
+      allow(LLMConfigs).to receive(:config_for).with("discussion_topic_insights").and_return(@llm_config)
     end
 
     it "generates insight entries for unprocessed entries" do
@@ -190,6 +197,29 @@ describe DiscussionTopicInsight do
         ai_evaluation_human_feedback_notes: ""
       )
 
+      valid_llm_response = Array.new(3) do |i|
+        {
+          "id" => i,
+          "compliance_status" => "compliant",
+          "relevance_score" => 8,
+          "quality_score" => 9,
+          "final_label" => "relevant",
+          "feedback" => "Great response addressing core topic with clarity and depth."
+        }
+      end
+
+      expect(@inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: valid_llm_response.to_json },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 200,
+          }
+        )
+      )
+
       @insight.generate
 
       expect(@insight.entries.count).to eq(6)
@@ -204,6 +234,27 @@ describe DiscussionTopicInsight do
 
     it "generates new insight entries if discussion topic is updated" do
       @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+
+      valid_llm_response = [{
+        "id" => 0,
+        "compliance_status" => "compliant",
+        "relevance_score" => 8,
+        "quality_score" => 9,
+        "final_label" => "relevant",
+        "feedback" => "Good response."
+      }].to_json
+
+      expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: valid_llm_response },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 200,
+          }
+        )
+      )
 
       @insight.generate
 
@@ -230,6 +281,237 @@ describe DiscussionTopicInsight do
       allow(@insight).to receive(:unprocessed_entries).and_raise("error")
       expect { @insight.generate }.to raise_error("error")
       expect(@insight.workflow_state).to eq("failed")
+    end
+
+    it "handles invalid JSON responses from LLM" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+
+      expect(@inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: "This is not valid JSON" },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 50,
+          }
+        )
+      )
+
+      expect { @insight.generate }.to raise_error(JSON::ParserError)
+      expect(@insight.reload.workflow_state).to eq("failed")
+    end
+
+    it "validates that LLM response is an array" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+
+      expect(@inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: "{\"not_an_array\": true}".to_json },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 50,
+          }
+        )
+      )
+
+      expect { @insight.generate }.to raise_error(ArgumentError, /not an array/)
+      expect(@insight.reload.workflow_state).to eq("failed")
+    end
+
+    it "validates that LLM response length matches expected length" do
+      @discussion_topic.discussion_entries.create!(message: "message 1", user: @teacher)
+      @discussion_topic.discussion_entries.create!(message: "message 2", user: @teacher)
+
+      valid_response = [{
+        "id" => 0,
+        "compliance_status" => "compliant",
+        "relevance_score" => 8,
+        "quality_score" => 9,
+        "final_label" => "relevant",
+        "feedback" => "Good response."
+      }].to_json
+
+      expect(@inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: valid_response },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 50,
+          }
+        )
+      )
+
+      expect { @insight.generate }.to raise_error(ArgumentError, /response length.*doesn't match expected length/)
+      expect(@insight.reload.workflow_state).to eq("failed")
+    end
+
+    it "validates required fields in LLM response" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+
+      required_fields = %w[compliance_status relevance_score quality_score final_label feedback]
+      required_fields.each do |missing_field|
+        @insight.update!(workflow_state: "created")
+
+        valid_response = [{
+          "id" => 0,
+          "compliance_status" => "compliant",
+          "relevance_score" => 8,
+          "quality_score" => 9,
+          "final_label" => "relevant",
+          "feedback" => "Good response."
+        }]
+
+        valid_response[0].delete(missing_field)
+
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "anthropic.claude-3-haiku-20240307-v1:0",
+            message: { role: :assistant, content: valid_response.to_json },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 100,
+              output_tokens: 50,
+            }
+          )
+        )
+
+        expect { @insight.generate }.to raise_error(ArgumentError, /missing required fields.*#{missing_field}/)
+        expect(@insight.reload.workflow_state).to eq("failed")
+      end
+    end
+
+    it "validates score fields are numeric" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+
+      %w[relevance_score quality_score].each do |score_field|
+        @insight.update!(workflow_state: "created")
+
+        invalid_response = [{
+          "id" => 0,
+          "compliance_status" => "compliant",
+          "relevance_score" => 8,
+          "quality_score" => 9,
+          "final_label" => "relevant",
+          "feedback" => "Good response."
+        }]
+
+        invalid_response[0][score_field] = "not_a_number"
+
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "anthropic.claude-3-haiku-20240307-v1:0",
+            message: { role: :assistant, content: invalid_response.to_json },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 100,
+              output_tokens: 50,
+            }
+          )
+        )
+
+        expect { @insight.generate }.to raise_error(ArgumentError, /non-numeric #{score_field}/)
+        expect(@insight.reload.workflow_state).to eq("failed")
+      end
+    end
+
+    it "validates final_label has a valid value" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+
+      invalid_response = [{
+        "id" => 0,
+        "compliance_status" => "compliant",
+        "relevance_score" => 8,
+        "quality_score" => 9,
+        "final_label" => "invalid_label",
+        "feedback" => "Good response."
+      }].to_json
+
+      expect(@inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: invalid_response },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 50,
+          }
+        )
+      )
+
+      expect { @insight.generate }.to raise_error(ArgumentError, /invalid final_label/)
+      expect(@insight.reload.workflow_state).to eq("failed")
+    end
+
+    it "validates that response IDs are sequential numbers starting from 0" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+
+      invalid_response = [{
+        "id" => 5,
+        "compliance_status" => "compliant",
+        "relevance_score" => 8,
+        "quality_score" => 9,
+        "final_label" => "relevant",
+        "feedback" => "Good response."
+      }].to_json
+
+      expect(@inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: invalid_response },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 50,
+          }
+        )
+      )
+
+      expect { @insight.generate }.to raise_error(ArgumentError, /not sequential numbers starting from 0/)
+      expect(@insight.reload.workflow_state).to eq("failed")
+    end
+
+    it "validates that multiple response IDs are sequential starting from 0" do
+      @discussion_topic.discussion_entries.create!(message: "message 1", user: @teacher)
+      @discussion_topic.discussion_entries.create!(message: "message 2", user: @teacher)
+
+      wrong_sequence_response = [
+        {
+          "id" => 1,
+          "compliance_status" => "compliant",
+          "relevance_score" => 8,
+          "quality_score" => 9,
+          "final_label" => "relevant",
+          "feedback" => "Good response for entry 1."
+        },
+        {
+          "id" => 0,
+          "compliance_status" => "compliant",
+          "relevance_score" => 7,
+          "quality_score" => 8,
+          "final_label" => "relevant",
+          "feedback" => "Good response for entry 2."
+        }
+      ].to_json
+
+      expect(@inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: wrong_sequence_response },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 50,
+          }
+        )
+      )
+
+      expect { @insight.generate }.to raise_error(ArgumentError, /not sequential numbers starting from 0/)
+      expect(@insight.reload.workflow_state).to eq("failed")
     end
   end
 

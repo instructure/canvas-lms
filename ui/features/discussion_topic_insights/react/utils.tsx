@@ -21,8 +21,8 @@ import {canvas} from '@instructure/ui-theme-tokens'
 
 const honeyInstUI10 = '#B07E00'
 
-export const getStatusByRelevance = (relevance: string, confidence: number) => {
-  if (confidence < 4) {
+export const getStatusByRelevance = (relevance: string) => {
+  if (relevance === "needs_review") {
     return <IconWarningSolid style={{fill: honeyInstUI10}} />
   } else {
     if (relevance === 'relevant') {

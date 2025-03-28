@@ -354,9 +354,8 @@ class DiscussionTopicsApiController < ApplicationController
         student_id: insight_entry.discussion_entry.user_id,
         student_name: insight_entry.user.short_name,
         # TODO: these will change
-        relevance_ai_classification: insight_entry.ai_evaluation["relevance_classification"],
-        relevance_ai_classification_confidence: insight_entry.ai_evaluation["confidence"],
-        relevance_ai_evaluation_notes: insight_entry.ai_evaluation["notes"],
+        relevance_ai_classification: insight_entry.ai_evaluation["final_label"],
+        relevance_ai_evaluation_notes: insight_entry.ai_evaluation["feedback"],
         relevance_human_reviewer: insight_entry.ai_evaluation_human_reviewer_id,
         relevance_human_feedback_liked: insight_entry.ai_evaluation_human_feedback_liked,
         relevance_human_feedback_disliked: insight_entry.ai_evaluation_human_feedback_disliked,
