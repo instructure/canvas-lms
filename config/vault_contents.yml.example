@@ -29,6 +29,11 @@ development:
         signing_secret: "astringthatisactually32byteslong"
       lti_platform_storage:
         signing_secret: "astringthatisactually32byteslong"
+      cedar_client:
+        cedar_hostname: "http://cedar-api:3000"
+        cedar_audience: "cedar-local"
+        cedar_shared_secret: fake-secrete-key
+        cedar_consumer_name: "canvas"
 #     pandata_creds:
 #       canvas_key: 'INTERNAL_TEST'
 #       canvas_secret: 'internaltest'
