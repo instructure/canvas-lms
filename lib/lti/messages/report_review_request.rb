@@ -18,11 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti::Messages
-  # A "factory" class that builds an ID Token (JWT) to be used in LTI Advantage
-  # Platform Notices. These messages are sent to tools separately from the launch
-  # process to inform tools about events in the platform
+  # A "factory" class that builds an ID Token (JWT) to be used in
+  # 1EdTech LTI Asset Processor Report Review Request launches.
   #
-  # This class relies on a another class (LtiAdvantage::Messages::PnsNotice)
+  # This class relies on a another class (LtiAdvantage::Messages::ReportReviewRequest)
   # to model the data in the JWT body and produce a signature.
   class ReportReviewRequest < JwtMessage
     def initialize(tool:, context:, user:, expander:, return_url:, asset_report:, opts: {})

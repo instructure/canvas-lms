@@ -3353,4 +3353,8 @@ class ApplicationController < ActionController::Base
     DynamicSettings.find(tree: :private)["recaptcha_client_key"]
   end
   helper_method :captcha_site_key
+
+  def require_feature_enabled(feature)
+    not_found unless context&.root_account&.feature_enabled?(feature)
+  end
 end

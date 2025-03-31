@@ -9,5 +9,6 @@ module LtiAdvantage
     require_relative "messages/pns_notice"
     require_relative "messages/asset_processor_settings_request"
     require_relative "messages/report_review_request"
+    require_relative "messages/eula_request"
   end
 end

@@ -102,7 +102,7 @@ module Lti
       end
 
       def opts
-        { extra_claims: %i[roles asset_processor_eula], custom_params: @params[:custom] }
+        { extra_claims: %i[roles eulaservice], custom_params: @params[:custom] }
       end
     end
   end

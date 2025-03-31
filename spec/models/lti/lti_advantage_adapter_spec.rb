@@ -126,6 +126,19 @@ describe Lti::LtiAdvantageAdapter do
     end
   end
 
+  describe "#generate_post_payload_for_eula" do
+    let(:login_message) { adapter.generate_post_payload_for_eula }
+    let(:opts) { {} }
+
+    it "creates a eula request" do
+      expect(params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiEulaRequest"
+    end
+
+    it "includes the eulaservice" do
+      expect(params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/eulaservice"]["url"]).to eq(tool.asset_processor_eula_url)
+    end
+  end
+
   describe "#generate_post_payload" do
     context 'when the message type is "LtiDeepLinkingRequest"' do
       let(:opts) { { resource_type: "editor_button", domain: "test.com" } }
