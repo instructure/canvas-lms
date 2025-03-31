@@ -48,7 +48,7 @@ const pillStyle = {
   padding: '0 .5rem',
   borderRadius: '.75rem',
   height: '1.5rem',
-  border: '1px solid #c7cdd1',
+  border: '1px solid #E8EAEC',
   backgroundColor: '#eee',
 }
 

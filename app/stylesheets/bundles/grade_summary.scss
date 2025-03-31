@@ -780,10 +780,10 @@ $outcome-border: 1px solid #BCC2CA;
 
 #grades_summary tr.has_sub_assignments {
   border-top: 1px solid;
-  border-color: #C7CDD1;
+  border-color: #E8EAEC;
   border-collapse: collapse;
  }
- 
+
  #grades_summary tr.sub_assignment_row > td {
   border-bottom: none;
   cursor: default;
@@ -791,6 +791,6 @@ $outcome-border: 1px solid #BCC2CA;
 
  #grades_summary tr.last_sub_assignment_row {
   border-bottom: 1px solid;
-  border-color: #C7CDD1;
+  border-color: #E8EAEC;
   border-collapse: collapse;
  }

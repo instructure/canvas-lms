@@ -413,7 +413,7 @@ This is the standard form actions button bar at the bottom of every content form
 .form-actions-sticky-footer {
   text-align: direction(right);
   padding: 10px 10px 11px;
-  border-top: 1px solid #C7CDD1;
+  border-top: 1px solid #E8EAEC;
   @include clearfix(); // Adding clearfix to allow for .pull-right button containers
 }
 

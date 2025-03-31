@@ -42,7 +42,7 @@ export const ToolIconOrDefault = (
           margin,
           marginRight,
           borderRadius: '4.5px',
-          border: '0.75px solid #C7CDD1',
+          border: '0.75px solid #E8EAEC',
         }}
         src={iconUrl}
         onError={e => { (e.target as HTMLImageElement).src = `/lti/tool_default_icon?id=${toolId}&name=${toolName}`}}
