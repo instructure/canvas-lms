@@ -468,6 +468,7 @@ CanvasRails::Application.routes.draw do
       post "items" => "context_modules#add_item", :as => :add_item
       post "reorder" => "context_modules#reorder_items", :as => :reorder
       post "collapse" => "context_modules#toggle_collapse", :as => :toggle_collapse
+      get "items_html" => "context_modules#items_html", :as => :context_modules_items_html
       get "prerequisites/:code" => "context_modules#content_tag_prerequisites_needing_finishing", :as => :prerequisites_needing_finishing
       get "items/last" => "context_modules#module_redirect", :as => :last_redirect, :last => 1
       get "items/first" => "context_modules#module_redirect", :as => :first_redirect, :first => 1
