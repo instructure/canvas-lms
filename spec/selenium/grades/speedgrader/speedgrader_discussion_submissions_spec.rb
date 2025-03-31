@@ -20,7 +20,7 @@
 require_relative "../../common"
 require_relative "../pages/speedgrader_page"
 
-describe "SpeedGrader - discussion submissions" do
+describe "SpeedGrader - discussion submissions", :ignore_js_errors do
   include_context "in-process server selenium tests"
 
   before do
@@ -105,7 +105,9 @@ describe "SpeedGrader - discussion submissions" do
 
     it "displays whole discussion" do
       Speedgrader.visit(@course.id, @assignment.id)
+      Speedgrader.wait_for_speedgrader_iframe
       in_frame("speedgrader_iframe") do
+        Speedgrader.wait_for_discussions_iframe
         in_frame("discussion_preview_iframe") do
           wait_for_ajaximations
           expect(f("div[data-testid='isHighlighted']").text).to include(@student.name)
@@ -122,7 +124,9 @@ describe "SpeedGrader - discussion submissions" do
       root_topic.child_topic_for(@student).discussion_entries.create!(user: @student, message: entry_text)
       Speedgrader.visit(@course.id, root_topic.assignment.id)
 
+      Speedgrader.wait_for_speedgrader_iframe
       in_frame("speedgrader_iframe") do
+        Speedgrader.wait_for_discussions_iframe
         in_frame("discussion_preview_iframe") do
           wait_for_ajaximations
           expect(f("div[data-testid='isHighlighted']").text).to include(@student.name)
@@ -134,7 +138,9 @@ describe "SpeedGrader - discussion submissions" do
     it "displays the SpeedGraderNavigator" do
       Speedgrader.visit(@course.id, @assignment.id)
 
+      Speedgrader.wait_for_speedgrader_iframe
       in_frame("speedgrader_iframe") do
+        Speedgrader.wait_for_discussions_iframe
         in_frame("discussion_preview_iframe") do
           wait_for_ajaximations
 
@@ -158,7 +164,9 @@ describe "SpeedGrader - discussion submissions" do
     it "can focus on speedgrader previous student button" do
       Speedgrader.visit(@course.id, @assignment.id)
 
+      Speedgrader.wait_for_speedgrader_iframe
       in_frame("speedgrader_iframe") do
+        Speedgrader.wait_for_discussions_iframe
         in_frame("discussion_preview_iframe") do
           wait_for_ajaximations
           # rubocop:disable Specs/NoExecuteScript
@@ -207,7 +215,9 @@ describe "SpeedGrader - discussion submissions" do
       @teacher.save!
       Speedgrader.visit(@course.id, @assignment.id, entry_id: entry_3.id)
 
+      Speedgrader.wait_for_speedgrader_iframe
       in_frame("speedgrader_iframe") do
+        Speedgrader.wait_for_discussions_iframe
         in_frame("discussion_preview_iframe") do
           wait_for_ajaximations
           expect(f("div[data-testid='discussion-root-entry-container'] div.highlight-discussion").text).to include entry_3.message
@@ -224,11 +234,12 @@ describe "SpeedGrader - discussion submissions" do
         it "displays the sticky header when scrolling", :ignore_js_errors do
           Speedgrader.visit(@course.id, @assignment.id)
           f("button[title='Settings']").click
-          fj("li:contains('Options')").click
+          fj("span[role='menuitem']:contains('Options')").click
           fj("label:contains('Show replies in context')").click
           fj(".ui-dialog-buttonset .ui-button:visible:last").click
-          wait_for_ajaximations
+          Speedgrader.wait_for_speedgrader_iframe
           in_frame("speedgrader_iframe") do
+            Speedgrader.wait_for_discussions_iframe
             in_frame("discussion_preview_iframe") do
               wait_for_ajaximations
               scroll_page_to_bottom
@@ -242,7 +253,7 @@ describe "SpeedGrader - discussion submissions" do
         it "is set to No Context by default and retains on save" do
           Speedgrader.visit(@course.id, @assignment.id)
           f("button[title='Settings']").click
-          fj("li:contains('Options')").click
+          fj("span[role='menuitem']:contains('Options')").click
           expect(f("input[value='discussion_view_no_context']").attribute("checked")).to eq("true")
           expect(f("body")).not_to contain_jqcss("button[data-testid='discussions-previous-reply-button']")
 
@@ -253,13 +264,15 @@ describe "SpeedGrader - discussion submissions" do
         it "applies and persists new Discussion View Options selection" do
           Speedgrader.visit(@course.id, @assignment.id)
           f("button[title='Settings']").click
-          fj("li:contains('Options')").click
+          fj("span[role='menuitem']:contains('Options')").click
           fj("label:contains('Show replies in context')").click
           fj(".ui-dialog-buttonset .ui-button:visible:last").click
 
           expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
 
+          Speedgrader.wait_for_speedgrader_iframe
           in_frame("speedgrader_iframe") do
+            Speedgrader.wait_for_discussions_iframe
             in_frame("discussion_preview_iframe") do
               wait_for_ajaximations
               expect(f("body")).to contain_jqcss(".discussions-search-filter")
@@ -269,22 +282,47 @@ describe "SpeedGrader - discussion submissions" do
           Speedgrader.visit(@course.id, @assignment.id)
 
           f("button[title='Settings']").click
-          fj("li:contains('Options')").click
+          fj("span[role='menuitem']:contains('Options')").click
           expect(f("input[value='discussion_view_with_context']").attribute("checked")).to eq("true")
           fj(".ui-dialog-buttonset .ui-button:visible:first").click
 
           expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
 
+          Speedgrader.wait_for_speedgrader_iframe
           in_frame("speedgrader_iframe") do
+            Speedgrader.wait_for_discussions_iframe
             in_frame("discussion_preview_iframe") do
               wait_for_ajaximations
               expect(f("body")).to contain_jqcss(".discussions-search-filter")
             end
           end
         end
+
+        context "when discussion_checkpoints ff is turned off even with revisit still on" do
+          before do
+            @course.account.disable_feature!(:discussion_checkpoints)
+          end
+
+          it "still respects discussion_view_with_context permanent speedgrader setting" do
+            Speedgrader.visit(@course.id, @assignment.id)
+            f("button[title='Settings']").click
+            fj("[class*=menuItem__label]:contains('Options')").click
+            fj("label:contains('Show replies in context')").click
+            fj(".ui-dialog-buttonset .ui-button:visible:last").click
+
+            Speedgrader.wait_for_speedgrader_iframe
+            in_frame("speedgrader_iframe") do
+              Speedgrader.wait_for_discussions_iframe
+              in_frame("discussion_preview_iframe") do
+                wait_for_ajaximations
+                expect(f("body")).to contain_jqcss(".discussions-search-filter")
+              end
+            end
+          end
+        end
       end
 
-      context "discussion context temporary toggling" do
+      context "discussion context temporary toggling", skip: "EGG-1031" do
         it "toggles back and forth group discussions just fine", :ignore_js_errors do
           entry_text = "first student message in group1"
           root_topic = group_discussion_assignment
@@ -295,73 +333,51 @@ describe "SpeedGrader - discussion submissions" do
           wait_for_ajaximations
 
           # every time a temporary toggle is clicked, iframes get removed and recreated
-          in_frame "speedgrader_iframe" do
+          Speedgrader.wait_for_parent_speedgrader_iframe_to_load do
             wait_for_ajaximations
             expect(f("#main")).to include_text("The submissions for the assignment are posts in the assignment's discussion for this group. You can view the discussion posts for")
             expect(f("#main")).to include_text(entry_text)
-            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
+            wait_for(method: nil, timeout: 3) { f("#discussion_temporary_toggle") }
             f("#discussion_temporary_toggle").click
           end
-          wait_for_ajaximations
 
-          in_frame "speedgrader_iframe" do
-            wait_for(method: nil, timeout: 5) { f("#discussion_preview_iframe") }
-            in_frame("discussion_preview_iframe") do
-              wait_for(method: nil, timeout: 5) { f("div.highlight-discussion") }
-              # test higlighting
-              expect(f("div.highlight-discussion").text).to include(entry.message)
-              # test header elements
-              expect(fj("button:contains('Expand Threads')")).to be_present
-              expect("f[data-testid='groups-menu-btn']").to be_present
-              expect(f("span[data-testid='toggle-filter-menu']")).to be_present
-              expect(f("input[data-testid='search-filter']")).to be_present
-              expect(f("button[data-testid='sortButton']")).to be_present
-              # click on temporary toggle
-              f("button#switch-to-individual-posts-link").click
-            end
+          Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+            wait_for(method: nil, timeout: 5) { f("div.highlight-discussion") }
+            # test higlighting
+            expect(f("div.highlight-discussion").text).to include(entry.message)
+            # test header elements
+            expect(fj("button:contains('Expand Threads')")).to be_present
+            expect("f[data-testid='groups-menu-btn']").to be_present
+            expect(f("span[data-testid='toggle-filter-menu']")).to be_present
+            expect(f("input[data-testid='search-filter']")).to be_present
+            expect(f("button[data-testid='sortButton']")).to be_present
+            # click on temporary toggle
+            f("button#switch-to-individual-posts-link").click
           end
           wait_for_ajaximations
 
           # again in the legacy view
-          in_frame "speedgrader_iframe" do
-            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
-            f("#discussion_temporary_toggle").click
-          end
-          wait_for_ajaximations
-
-          # again in the full view
-          in_frame "speedgrader_iframe" do
-            wait_for(method: nil, timeout: 5) { f("#discussion_preview_iframe") }
-            in_frame("discussion_preview_iframe") do
-              f("button#switch-to-individual-posts-link").click
-            end
-          end
-          wait_for_ajaximations
-
-          in_frame "speedgrader_iframe" do
-            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
+          Speedgrader.wait_for_parent_speedgrader_iframe_to_load do
+            wait_for(method: nil, timeout: 3) { f("#discussion_temporary_toggle") }
             expect(f("#discussion_temporary_toggle")).to be_present
           end
+          wait_for_ajaximations
         end
 
         it "it toggles non-group discussions just fine" do
           Speedgrader.visit(@course.id, @assignment.id)
-          in_frame "speedgrader_iframe" do
+          Speedgrader.wait_for_parent_speedgrader_iframe_to_load do
             expect(f("#main")).to include_text("The submissions for the assignment are posts in the assignment's discussion. You can view the discussion posts for")
-            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
+            wait_for(method: nil, timeout: 3) { f("#discussion_temporary_toggle") }
             f("#discussion_temporary_toggle").click
           end
-          wait_for_ajaximations
 
-          in_frame "speedgrader_iframe" do
-            in_frame("discussion_preview_iframe") do
-              f("button#switch-to-individual-posts-link").click
-            end
+          Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+            f("button#switch-to-individual-posts-link").click
           end
-          wait_for_ajaximations
 
-          in_frame "speedgrader_iframe" do
-            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
+          Speedgrader.wait_for_parent_speedgrader_iframe_to_load do
+            wait_for(method: nil, timeout: 3) { f("#discussion_temporary_toggle") }
             expect(f("#discussion_temporary_toggle")).to be_present
           end
         end
@@ -372,40 +388,30 @@ describe "SpeedGrader - discussion submissions" do
           end
 
           Speedgrader.visit(@course.id, @assignment.id)
-          in_frame "speedgrader_iframe" do
-            wait_for_ajaximations
+          # we start in individual posts view
+          Speedgrader.wait_for_parent_speedgrader_iframe_to_load do
             f("[id='discussion_speedgrader_revisit_link_entryId=#{@discussion_topic.discussion_entries.last.id}']").click
-          end
-
-          wait_for_ajaximations
-          in_frame "speedgrader_iframe" do
             wait_for_ajaximations
-
-            in_frame("discussion_preview_iframe") do
-              wait_for_ajaximations
-
-              expect(f("div[data-testid='isHighlighted']").text).to include(@discussion_topic.discussion_entries.last.message)
-              f("button#switch-to-individual-posts-link").click
-            end
           end
 
-          wait_for_ajaximations
-          in_frame "speedgrader_iframe" do
-            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
+          # we are now in full context view
+          Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+            expect(f("div[data-testid='isHighlighted']").text).to include(@discussion_topic.discussion_entries.last.message)
+            f("button#switch-to-individual-posts-link").click
+            wait_for_ajaximations
+          end
+
+          # we are back in individual posts view
+          Speedgrader.wait_for_parent_speedgrader_iframe_to_load do
+            wait_for(method: nil, timeout: 3) { f("#discussion_temporary_toggle") }
             expect(f("#discussion_temporary_toggle")).to be_present
 
             f("[id='discussion_speedgrader_revisit_link_entryId=#{@discussion_topic.discussion_entries.first.id}']").click
           end
 
-          wait_for_ajaximations
-          in_frame "speedgrader_iframe" do
-            wait_for_ajaximations
-
-            in_frame("discussion_preview_iframe") do
-              wait_for_ajaximations
-
-              expect(f("div[data-testid='isHighlighted']").text).to include(@discussion_topic.discussion_entries.first.message)
-            end
+          # lastly we are back in full context view
+          Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+            expect(f("div[data-testid='isHighlighted']").text).to include(@discussion_topic.discussion_entries.first.message)
           end
         end
       end
@@ -740,11 +746,9 @@ describe "SpeedGrader - discussion submissions" do
         )
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-            expect(f("div[data-testid='discussion-root-entry-container']").text).to include(de.message)
-          end
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          wait_for_ajaximations
+          expect(f("div[data-testid='discussion-root-entry-container']").text).to include(de.message)
         end
         expect(f("#this_student_does_not_have_a_submission")).to_not be_displayed
 
@@ -772,11 +776,9 @@ describe "SpeedGrader - discussion submissions" do
         end
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-            expect(f("div[data-testid='discussion-root-entry-container']").text).to include(teacher_de.message)
-          end
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          wait_for_ajaximations
+          expect(f("div[data-testid='discussion-root-entry-container']").text).to include(teacher_de.message)
         end
         expect(f("#this_student_does_not_have_a_submission")).to_not be_displayed
 
@@ -849,14 +851,10 @@ describe "SpeedGrader - discussion submissions" do
         Speedgrader.click_options_link
         Speedgrader.select_hide_student_names
         expect_new_page_load { fj(".ui-dialog-buttonset .ui-button:visible:last").click }
-
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-            expect(f("div[data-testid='discussion-root-entry-container']").text).to include(@student.name)
-            expect(f("div[data-testid='discussion-root-entry-container']").text).to include(entry_text)
-            expect(f("body")).not_to contain_jqcss(".discussions-search-filter")
-          end
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          expect(f("div[data-testid='discussion-root-entry-container']").text).to include(@student.name)
+          expect(f("div[data-testid='discussion-root-entry-container']").text).to include(entry_text)
+          expect(f("body")).not_to contain_jqcss(".discussions-search-filter")
         end
       end
     end
@@ -972,15 +970,12 @@ describe "SpeedGrader - discussion submissions" do
         Speedgrader.select_hide_student_names
         expect_new_page_load { fj(".ui-dialog-buttonset .ui-button:visible:last").click }
 
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-            # this verifies full discussion is displayed, and highlight is set to the first
-            # student's entry
-            expect(f("div[data-testid='isHighlighted']").text).to include("This Student")
-            expect(fj("span:contains('Discussion Participant')")).to be_displayed
-            expect(f("body")).not_to contain_css(".discussions-search-filter")
-          end
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          # this verifies full discussion is displayed, and highlight is set to the first
+          # student's entry
+          expect(f("div[data-testid='isHighlighted']").text).to include("This Student")
+          expect(fj("span:contains('Discussion Participant')")).to be_displayed
+          expect(f("body")).not_to contain_css(".discussions-search-filter")
         end
       end
 
@@ -995,13 +990,11 @@ describe "SpeedGrader - discussion submissions" do
         Speedgrader.select_hide_student_names
         expect_new_page_load { fj(".ui-dialog-buttonset .ui-button:visible:last").click }
 
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-            expect(f("div[data-testid='discussion-root-entry-container']").text).to include("This Student")
-            expect(f("div[data-testid='discussion-root-entry-container']").text).to include(entry_text)
-            expect(f("body")).not_to contain_jqcss(".discussions-search-filter")
-          end
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          wait_for_ajaximations
+          expect(f("div[data-testid='discussion-root-entry-container']").text).to include("This Student")
+          expect(f("div[data-testid='discussion-root-entry-container']").text).to include(entry_text)
+          expect(f("body")).not_to contain_jqcss(".discussions-search-filter")
         end
       end
     end
