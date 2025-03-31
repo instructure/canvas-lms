@@ -73,6 +73,7 @@ export default class AvatarDialogView extends DialogBaseView {
       width: 600,
       modal: true,
       zIndex: 1000,
+      close: this.close.bind(this)
     }
   }
 
@@ -85,8 +86,19 @@ export default class AvatarDialogView extends DialogBaseView {
 
   show() {
     this.render()
+    const el = super.show(...arguments)
+
+    // Using the same selector as jqueryui/dialog
+    // if we don't blur it, two elements will be focused at the same time
+    const focusedElement = this.$el.find( ":tabbable" )
+    focusedElement.eq(0).blur()
+
+    // Focuses the top close button
+    this.checkFocus()
+
     each(this.children, child => this.listenTo(child, 'ready', this.onReady))
-    return super.show(...arguments)
+
+    return el
   }
 
   cancel() {
@@ -97,6 +109,8 @@ export default class AvatarDialogView extends DialogBaseView {
   close() {
     this.teardown()
     this.enableSelectButton()
+    // Focuses the trigger element if exists
+    this.triggerElement?.focus()
     return super.close(...arguments)
   }
 
