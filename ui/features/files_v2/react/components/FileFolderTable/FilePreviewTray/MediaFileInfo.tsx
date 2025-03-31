@@ -45,7 +45,9 @@ export const MediaFileInfo = ({
   canAddTracks,
 }: MediaFileInfoProps) => {
   const [showUploadForm, setShowUploadForm] = useState(false)
-  const showMediaFileInfo = canAddTracks && !attachment.restricted_by_master_course
+  const showMediaFileInfo =
+    canAddTracks &&
+    !(attachment.restricted_by_master_course && attachment.is_master_course_child_content)
   const existingLocales = mediaTracks.map((track: any) => track.locale)
 
   if (isLoading) {
