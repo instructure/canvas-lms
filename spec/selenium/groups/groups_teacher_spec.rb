@@ -32,7 +32,9 @@ describe "new groups" do
 
     context "differentiation_tags" do
       before :once do
-        Account.default.enable_feature!(:differentiation_tags)
+        Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        Account.default.save!
+        Account.default.reload
       end
 
       it "does not have Visit Group Homepage option in group actions for non_collaborative groups" do

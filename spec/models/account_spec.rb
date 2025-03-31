@@ -3019,4 +3019,22 @@ describe Account do
       expect(@account.horizon_redirect_url("/courses")).to eq("http://localhost:3002/redirect?canvas_url=%2Fcourses&preview=false&reauthenticate=false")
     end
   end
+
+  describe "allow_assign_to_differentiation_tags?" do
+    before :once do
+      @account = Account.default
+      Account.site_admin.enable_feature!(:assign_to_differentiation_tags)
+      @account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @account.save!
+    end
+
+    it "returns true if the setting is enabled and the observer_appointment_groups flag is enabled" do
+      expect(@account.allow_assign_to_differentiation_tags?).to be true
+    end
+
+    it "returns false if the observer_appointment_groups flag is disabled" do
+      Account.site_admin.disable_feature!(:assign_to_differentiation_tags)
+      expect(@account.allow_assign_to_differentiation_tags?).to be false
+    end
+  end
 end

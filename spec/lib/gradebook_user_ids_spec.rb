@@ -282,7 +282,9 @@ describe GradebookUserIds do
           }
         }
       }
-      Account.site_admin.enable_feature!(:differentiation_tags)
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
     end
 
     it "returns students in the selected differentiation tag" do

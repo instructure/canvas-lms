@@ -347,7 +347,10 @@ describe ConversationsController do
 
     context "when recipients include a non-collaborative group/differentiation tag" do
       before do
-        Account.default.enable_feature!(:differentiation_tags)
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.account.reload
         @non_collab_group_category = @course.group_categories.create!(name: "Test non collaborative", non_collaborative: true)
         @non_collab_group = @course.groups.create!(name: "Non Collaborative group", group_category: @non_collab_group_category)
         @non_collab_group.add_user(@student2, "accepted")

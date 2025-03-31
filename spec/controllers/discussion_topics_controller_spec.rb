@@ -646,7 +646,6 @@ describe DiscussionTopicsController do
     context "assign to differentiation tags" do
       before :once do
         @course.account.enable_feature! :assign_to_differentiation_tags
-        @course.account.enable_feature! :differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -908,7 +907,6 @@ describe DiscussionTopicsController do
     context "assign to differentiation tags (for discussion redesign only)" do
       before :once do
         @course.account.enable_feature! :assign_to_differentiation_tags
-        @course.account.enable_feature! :differentiation_tags
         @course.enable_feature! :react_discussions_post
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
@@ -1906,8 +1904,10 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION_DEFAULT_SORT_ENABLED]).to be_truthy
     end
 
-    it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of :differentiation_tags ff state" do
-      Account.site_admin.enable_feature!(:differentiation_tags)
+    it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of allow_assign_to_differentiation_tags setting state" do
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
 
       user_session(@teacher)
       @course.group_categories.create!(name: "non_colaborative_category", non_collaborative: true)
@@ -1917,7 +1917,9 @@ describe DiscussionTopicsController do
       get :new, params: { course_id: @course.id }
       expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
 
-      Account.site_admin.disable_feature!(:differentiation_tags)
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+      @course.account.save!
+      @course.account.reload
 
       get :new, params: { course_id: @course.id }
       expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
@@ -2027,8 +2029,10 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
-    it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of :differentiation_tags ff state" do
-      Account.site_admin.enable_feature!(:differentiation_tags)
+    it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of allow_assign_to_differentiation_tags setting state" do
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
 
       user_session(@teacher)
       @course.group_categories.create!(name: "non_colaborative_category", non_collaborative: true)
@@ -2038,7 +2042,9 @@ describe DiscussionTopicsController do
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
 
-      Account.site_admin.disable_feature!(:differentiation_tags)
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+      @course.account.save!
+      @course.account.reload
 
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
@@ -2152,7 +2158,6 @@ describe DiscussionTopicsController do
     context "assign to differentiation tags" do
       before :once do
         @course.account.enable_feature! :assign_to_differentiation_tags
-        @course.account.enable_feature! :differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!

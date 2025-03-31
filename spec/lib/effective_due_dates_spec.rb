@@ -1389,11 +1389,9 @@ describe Course do
 
         context "differentiation tag groups (aka non collaborative groups)" do
           before do
-            @test_course.account.enable_feature!(:differentiation_tags)
-            @test_course.account.enable_feature!(:assign_to_differentiation_tags)
-            @test_course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
-            @test_course.account.save!
-            @test_course.account.reload
+            @assignment1.context.account.enable_feature!(:assign_to_differentiation_tags)
+            @assignment1.context.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+            @assignment1.context.account.save!
             @assignment1.context.account.reload
 
             @module3 = @test_course.context_modules.create!(name: "Module 3 for Non-Collaborative Group")
@@ -1406,6 +1404,7 @@ describe Course do
           end
 
           it "applies group overrides for differentiation tag groups" do
+            Account.site_admin.enable_feature! :assign_to_differentiation_tags
             @differentiation_tag_group_1.add_user(@student3)
             @differentiation_tag_group_1.add_user(@student2)
 

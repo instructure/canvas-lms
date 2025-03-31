@@ -66,8 +66,10 @@ describe "ModuleVisibility" do
 
     context "with a group override" do
       before :once do
-        @course.account.enable_feature!(:differentiation_tags)
         @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.account.reload
 
         @module3 = @course.context_modules.create!(name: "Module 3 for Non-Collaborative Group")
 
@@ -82,8 +84,10 @@ describe "ModuleVisibility" do
       end
 
       it "does not consider differentiation tags when the feature is disabled" do
-        @course.account.disable_feature!(:differentiation_tags)
         @course.account.disable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        @course.account.save!
+        @course.account.reload
 
         expect(module_ids_visible_to_user(@student1)).to contain_exactly(@module1.id, @module2.id)
         expect(module_ids_visible_to_user(@student2)).to contain_exactly(@module1.id, @module2.id)

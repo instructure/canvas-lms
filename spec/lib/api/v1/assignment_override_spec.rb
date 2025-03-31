@@ -69,7 +69,6 @@ describe Api::V1::AssignmentOverride do
       describe "non collaborative group overrides" do
         before :once do
           course_with_teacher(active_all: true)
-          @course.account.enable_feature!(:differentiation_tags)
           @course.account.enable_feature!(:assign_to_differentiation_tags)
           @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           @course.account.save!
@@ -162,7 +161,6 @@ describe Api::V1::AssignmentOverride do
         end
 
         it "allows non collaborative group to be assigned to group assignment" do
-          @course.account.enable_feature!(:differentiation_tags)
           @course.account.enable_feature!(:assign_to_differentiation_tags)
           @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           @course.account.save!
@@ -413,7 +411,6 @@ describe Api::V1::AssignmentOverride do
 
     context "differentiaiton tag overrides" do
       before do
-        @course.account.enable_feature!(:differentiation_tags)
         @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!

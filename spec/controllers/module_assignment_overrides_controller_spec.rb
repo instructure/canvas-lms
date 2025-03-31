@@ -396,6 +396,7 @@ describe ModuleAssignmentOverridesController do
 
     context "differentiation tags" do
       before do
+        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
       end

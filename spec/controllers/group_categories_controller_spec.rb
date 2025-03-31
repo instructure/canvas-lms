@@ -68,7 +68,11 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to create both types of group categories by default" do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
+
       user_session(@teacher)
 
       # Can create collaborative
@@ -94,7 +98,10 @@ describe GroupCategoriesController do
     end
 
     it "prevents creating non-collaborative groups when manage_tags_add permission is revoked" do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
 
       # Explicitly remove the permission
       @course.account.role_overrides.create!(
@@ -229,7 +236,10 @@ describe GroupCategoriesController do
 
     context "differentiation_tags" do
       before do
-        Account.default.enable_feature!(:differentiation_tags)
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.account.reload
       end
 
       it "allows teachers with :manage_tags_add to create non_collaborative groups" do
@@ -258,7 +268,10 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to update both types of group categories by default" do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
 
       user_session(@teacher)
 
@@ -282,7 +295,10 @@ describe GroupCategoriesController do
     end
 
     it "prevents updating non-collaborative groups when manage_tags_manage permission is revoked" do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
 
       @course.account.role_overrides.create!(
         permission: :manage_tags_manage,
@@ -400,7 +416,10 @@ describe GroupCategoriesController do
 
   describe "POST bulk_manage_differentiation_tag" do
     before :once do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
       @collaborative_category = @course.group_categories.create!(name: "Collaborative Category", non_collaborative: false)
     end
@@ -739,7 +758,10 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to delete both types of group categories by default" do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
 
       user_session(@teacher)
 
@@ -761,7 +783,10 @@ describe GroupCategoriesController do
     end
 
     it "prevents deleting non-collaborative groups when manage_tags_delete permission is revoked" do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
 
       @course.account.role_overrides.create!(
         permission: :manage_tags_delete,
@@ -827,7 +852,10 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to view users in both types of group categories by default" do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
 
       user_session(@teacher)
 
@@ -847,7 +875,10 @@ describe GroupCategoriesController do
     end
 
     it "prevents viewing non-collaborative group users when manage_tags_manage permission is revoked" do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
 
       @course.account.role_overrides.create!(
         permission: :manage_tags_manage,
@@ -909,7 +940,10 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to import to both types of group categories by default" do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       user_session(@teacher)
 
       # Can import to collaborative
@@ -930,7 +964,10 @@ describe GroupCategoriesController do
     end
 
     it "prevents importing to non-collaborative groups when manage_tags_add permission is revoked" do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       @course.account.role_overrides.create!(
         permission: :manage_tags_add,
         role: teacher_role,
@@ -1054,7 +1091,10 @@ describe GroupCategoriesController do
 
   context "Differentiation Tags" do
     before do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       # Assuming @course, @teacher_role, @teacher, @non_collaborative_category, etc., are already set up
     end
 
@@ -1200,7 +1240,10 @@ describe GroupCategoriesController do
 
       context "with differentiation tags disabled with existing hidden groups" do
         before do
-          Account.default.disable_feature!(:differentiation_tags)
+          @course.account.disable_feature! :assign_to_differentiation_tags
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+          @course.account.save!
+          @course.account.reload
         end
 
         it "prevents teachers from creating non_collaborative groups if differentiation_tags is disabled" do

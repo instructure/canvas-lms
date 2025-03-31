@@ -1017,7 +1017,10 @@ describe Types::UserType do
 
     context "differentiation tags" do
       before do
-        Account.default.enable_feature!(:differentiation_tags)
+        Account.default.enable_feature! :assign_to_differentiation_tags
+        Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        Account.default.save!
+        Account.default.reload
         @collaborative_category = @course.group_categories.create!(name: "Collaborative Category", non_collaborative: false)
         @collaborative_group = @course.groups.create!(name: "Collaborative group", group_category: @collaborative_category)
         @collaborative_group.add_user(@student)
@@ -1049,7 +1052,10 @@ describe Types::UserType do
         end
 
         it "does not return differentiation tags when flag is off" do
-          Account.default.disable_feature!(:differentiation_tags)
+          Account.default.disable_feature! :assign_to_differentiation_tags
+          Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false }
+          Account.default.save!
+          Account.default.reload
 
           result = teacher_type.resolve("recipients(context: \"course_#{@course.id}\") { contextsConnection { nodes { name } } }")
           expect(result).not_to include("Differentiation Tags")
@@ -1387,7 +1393,9 @@ describe Types::UserType do
     end
 
     it "includes non_collaborative group when asked for by someone with permissions" do
-      Account.default.enable_feature!(:differentiation_tags)
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
       allow_any_instance_of(Course).to receive(:grants_any_right?).with(@student, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(true)
 
       @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Groups", non_collaborative: true)
@@ -1405,7 +1413,9 @@ describe Types::UserType do
     end
 
     it "excludes non_collaborative groups when asked for by someone without permissions" do
-      Account.default.enable_feature!(:differentiation_tags)
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
       @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Groups", non_collaborative: true)
       group_with_user(user: @student, active_all: true)
       favorite_group = @group
@@ -1420,7 +1430,9 @@ describe Types::UserType do
     end
 
     it "excludes non_collaborative groups when asked for by someone without permissions and no favorite groups" do
-      Account.default.enable_feature!(:differentiation_tags)
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
       @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Groups", non_collaborative: true)
 
       hidden_group_membership = group_with_user(user: @student, active_all: true, group_category: @non_collaborative_category, context: @course)

@@ -1456,7 +1456,10 @@ describe Types::CourseType do
 
     context "differentiation_tags" do
       before :once do
-        Account.site_admin.enable_feature!(:differentiation_tags)
+        Account.default.enable_feature! :assign_to_differentiation_tags
+        Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        Account.default.save!
+        Account.default.reload
         @teacher = course.enroll_teacher(user_factory, section: other_section, limit_privileges_to_course_section: false).user
       end
 
@@ -1489,7 +1492,7 @@ describe Types::CourseType do
       end
 
       it "returns only collaborative groups if the user does not have sufficient permissions" do
-        # course_type is student, keep in mind, the feature flag for :differentiation_tags is enabled
+        # course_type is student, keep in mind, the setting differentiation_tags is enabled
         expect(
           course_type.resolve("groupsConnection(includeNonCollaborative: true) { edges { node { _id } } }")
         ).to eq [@cg.to_param]
@@ -1513,7 +1516,10 @@ describe Types::CourseType do
     end
 
     it "includes non_collaborative group sets when asked for by someone with permissions" do
-      @course.account.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
         @course.account.role_overrides.create!(
           permission:,
@@ -1529,7 +1535,9 @@ describe Types::CourseType do
     end
 
     it "does not include non_collaborative group sets when asked for by someone without permissions" do
-      @course.account.enable_feature!(:differentiation_tags)
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
         @course.account.role_overrides.create!(
           permission:,
@@ -1560,7 +1568,10 @@ describe Types::CourseType do
     end
 
     it "includes non_collaborative group sets when asked for by someone with permissions" do
-      @course.account.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
         @course.account.role_overrides.create!(
           permission:,
@@ -1576,7 +1587,9 @@ describe Types::CourseType do
     end
 
     it "excludes non_collaborative group sets when asked for by someone without permissions" do
-      @course.account.enable_feature!(:differentiation_tags)
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
         @course.account.role_overrides.create!(
           permission:,

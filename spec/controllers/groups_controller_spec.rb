@@ -1172,7 +1172,10 @@ describe GroupsController do
 
   context "Differentiation Tags" do
     before do
-      Account.default.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       course_with_teacher(active_all: true, user: @user)
       @non_collaborative_group_category = @course.group_categories.create!(name: "Test non collaborative", non_collaborative: true)
       @non_collaborative_group = @course.groups.create!(name: "Non Collaborative group", group_category: @non_collaborative_group_category)

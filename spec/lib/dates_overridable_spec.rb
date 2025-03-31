@@ -66,7 +66,6 @@ shared_examples_for "learning object with due dates" do
       context "differentiation tags" do
         before do
           course.account.enable_feature!(:assign_to_differentiation_tags)
-          course.account.enable_feature!(:differentiation_tags)
           course.account.tap do |a|
             a.settings[:allow_assign_to_differentiation_tags] = { value: true }
             a.save!
@@ -100,7 +99,6 @@ shared_examples_for "learning object with due dates" do
       context "differentiation tags" do
         before do
           course.account.enable_feature!(:assign_to_differentiation_tags)
-          course.account.enable_feature!(:differentiation_tags)
           course.account.tap do |a|
             a.settings[:allow_assign_to_differentiation_tags] = { value: true }
             a.save!
