@@ -94,19 +94,19 @@ $ic-color-alert: $fire;
 
 $ic-color-dark: #2D3B45; // licorice
 $ic-color-medium-darker: #394B58; // oxford
-$ic-color-medium: #73818C; // slate
+$ic-color-medium: #6A7883; // slate
 
 @if $use_high_contrast {
   $ic-color-medium: #556572;
 }
 
-$ic-color-medium-lighter: #6B7780; // ash
+$ic-color-medium-lighter: #6A7883; // ash
 
 @if $use_high_contrast {
   $ic-color-medium-lighter: #556572;
 }
 
-$heather: #A5AFB5; // heather
+$heather: #6A7883; // heather
 
 @if $use_high_contrast {
   $ic-border-dark: #556572;
@@ -115,7 +115,7 @@ $heather: #A5AFB5; // heather
 $tiara: #C7CDD1; // tiara
 
 @if $use_high_contrast {
-  $ic-border-color: #667887;
+  $ic-border-color: #6A7883;
 }
 
 $ic-color-medium-light: #F2F4F4; // porcelain
