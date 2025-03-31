@@ -6951,6 +6951,7 @@ he:
   delete_rubric_9b66412d: "ביטול רובריקה"
   delete_section_name_a48d9d79: "ביטול סעיף  \"%{name}\""
   delete_selected_a023ccf8: "ביטול פריטים נבחרים"
+  delete_sub_account_c267a6e5: "ביטול חשבון משנה"
   delete_survey_56fddbbd: "ביטול סקר"
   delete_term_name_f707abc9: "ביטול מונח %{name}"
   delete_theme_bdb70d25: "ביטול ערכת נושא"
