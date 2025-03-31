@@ -1473,7 +1473,7 @@ sv-x-k12:
         sections: Rapporter
       links: 
         configure_report: "Konfigurera ..."
-        run_report: "Kör rapport"
+        run_report: "Skapa rapport"
       open_report_description: "Öppna rapportbeskrivning"
       report_last_run_never: Aldrig
       report_running: "Rapporten körs.*Du får ett e-postmeddelande när den är färdig.*"
@@ -2185,7 +2185,7 @@ sv-x-k12:
   add_an_attachment_b2e9092f: "Lägg till en bilaga"
   add_an_identity_provider_to_this_account_c2644478: "Lägg till en identitetsleverantör till det här kontot:"
   add_announcement_165c3b05: "Lägg till anslag"
-  add_announcement_e6de0fd: "Lägg till meddelande"
+  add_announcement_e6de0fd: "Lägg till Anslag"
   add_another_assignment_fc5c908f: "Lägg till en annan uppgift"
   add_another_tag_f8306852: "+ Lägg till ytterligare flik"
   add_app_baf540f: "Lägg till app"
@@ -13882,7 +13882,7 @@ sv-x-k12:
         discussion_view_with_context: "Visa svar i kontext"
         save_settings: "Spara inställningarna"
         show_new_sg_ui: "Använd det nya SpeedGrader användargränssnittet"
-      comment_submitted: "Din kommentar har skickats."
+      comment_submitted: "Din kommentar har sparats."
       crocodoc_pending: "Crocodoc bearbetar fortfarande dokumentet."
       headers: 
         anonymous_submission: "Den här elevens svar är dolda eftersom uppgiften är anonym."
@@ -20043,7 +20043,7 @@ sv-x-k12:
   no_graders_with_that_name_found_d8204d90: "Inga bedömare med det namnet hittades"
   no_grades_to_hide_2072bbd: "Inga omdömen att dölja"
   no_grades_to_hide_6f51fc5b: "Inga omdömen att dölja"
-  no_grades_to_post_91425bfd: "Inga omdömen att offentliggör"
+  no_grades_to_post_91425bfd: "Inga omdöme att publicera"
   no_grades_to_post_fc148c1b: "Inga omdömen att publicera"
   no_grading_periods_configured_for_this_term_ca22393e: "inga bedömningsperioder har konfigurerats för den här terminen"
   no_grading_periods_set_up_a20a8819: "Inga bedömningsperioder har ställts in"
@@ -25290,7 +25290,7 @@ sv-x-k12:
   ruler_fa692ff7: linjal
   run_at_759b47d: "Kör kl."
   run_at_92dd90df: "Kör vid"
-  run_report_743fdf5f: "Kör rapport"
+  run_report_743fdf5f: "Skapa rapport"
   run_time_370dedb6: Körningstid
   running_c5a4998d: Körs
   running_jobs_9861080e: "Kör jobb"
@@ -32712,7 +32712,7 @@ sv-x-k12:
   would_you_like_to_remove_these_count_outcomes_5075697d: 
     one: "Vill du ta bort det här lärandemålet?"
     other: "Vill du ta bort de här %{count} lärandemålen?"
-  would_you_like_to_send_a_notification_to_users_tha_d56681c9: "Vill du skicka en avisering till användare om att meddelandet har redigerats?"
+  would_you_like_to_send_a_notification_to_users_tha_d56681c9: "Vill du skicka en avisering till användare om att anslaget har redigerats?"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "Radbryt händelsetitlar i kalenderns månadsvy"
   write_something_430e346c: "Skriv något ..."
   written_feedback_88badafb: "Skriftlig återkoppling"
