@@ -17,6 +17,15 @@
  */
 import {AllLtiScopes} from '@canvas/lti/model/LtiScope'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
+import {render, screen} from '@testing-library/react'
+import {clickOrFail} from '../../../__tests__/interactionHelpers'
+import {
+  createMemoryRouter,
+  RouterProvider,
+  Outlet,
+  Route,
+  Routes
+} from 'react-router-dom'
 import {AllLtiPlacements} from '../../../../model/LtiPlacement'
 import {AllLtiPrivacyLevels} from '../../../../model/LtiPrivacyLevel'
 import {i18nLtiPlacement} from '../../../../model/i18nLtiPlacement'
@@ -25,6 +34,8 @@ import {ZLtiImsRegistrationId} from '../../../../model/lti_ims_registration/LtiI
 import {ZLtiToolConfigurationId} from '../../../../model/lti_tool_configuration/LtiToolConfigurationId'
 import {ToolConfigurationView} from '../ToolConfigurationView'
 import {mockConfiguration, renderApp} from './helpers'
+import {mockRegistrationWithAllInformation, mockSiteAdminRegistration} from '../../../manage/__tests__/helpers'
+import fetchMock from 'fetch-mock'
 
 describe('Tool Configuration View Launch Settings', () => {
   it('should render the Launch Settings for manual registrations', () => {
@@ -310,3 +321,74 @@ describe('Tool Configuration View Icon Placements', () => {
     expect(getByTestId('icon-url-editor_button')).toHaveTextContent('Default Icon')
   })
 })
+
+describe('Tool Configuration Restore Default Button', () => {
+  it('should disable the button on a site admin inherited tool', () => {
+    const registration = mockSiteAdminRegistration('site admin reg', 1)
+    const router = createMemoryRouter([
+      {
+        path: '*',
+        element: (
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Outlet
+                  context={{
+                    registration,
+                    refreshRegistration: jest.fn(),
+                  }}
+                />
+              }
+            >
+              <Route index element={<ToolConfigurationView />} />
+            </Route>
+          </Routes>
+        ),
+      },
+    ])
+    const wrapper = render(<RouterProvider router={router} />)
+
+    expect(wrapper.getByText('Restore Default').closest('button')).toHaveAttribute('disabled')
+  })
+
+  it('should call the delete endpoint when clicked', async () => {
+    fetchMock.put('/api/v1/accounts/1/lti_registrations/1/reset', {
+      __type: 'Success',
+      data: {}
+    })
+
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({
+          redirect_uris: ['http://example.com/redirect_uri_1'],
+          target_link_uri: 'https://example.com/target_link_uri',
+          oidc_initiation_url: 'http://example.com/oidc_initiation_url',
+          domain: 'domain.com',
+          public_jwk_url: 'http://example.com/public_jwk_url',
+          custom_fields: {
+            foo: 'bar',
+          },
+        }),
+      },
+    })(<ToolConfigurationView />)
+
+    const restoreBtn = getByText('Restore Default').closest('button')
+    expect(restoreBtn).not.toHaveAttribute('disabled')
+    await clickOrFail(restoreBtn)
+    const resetModalBtn = getByText('Reset').closest('button')
+    await clickOrFail(resetModalBtn)
+
+    const response = fetchMock.calls()[0]
+    const responseUrl = response[0]
+    const responseHeaders = response[1]
+    expect(responseUrl).toBe('/api/v1/accounts/1/lti_registrations/1/reset')
+    expect(responseHeaders).toMatchObject({
+      method: 'PUT'
+    })
+  })
+})
+
+

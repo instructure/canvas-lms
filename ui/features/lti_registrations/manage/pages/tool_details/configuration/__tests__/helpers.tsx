@@ -95,6 +95,7 @@ export const renderApp =
                 <Outlet
                   context={{
                     registration,
+                    refreshRegistration: jest.fn(),
                   }}
                 />
               }

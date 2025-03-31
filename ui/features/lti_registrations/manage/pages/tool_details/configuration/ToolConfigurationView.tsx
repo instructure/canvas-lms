@@ -19,9 +19,12 @@
 import * as React from 'react'
 import {useOutletContext, Link as RouterLink} from 'react-router-dom'
 import {ToolDetailsOutletContext} from '../ToolDetails'
-import {View} from '@instructure/ui-view'
+import {View, ViewProps} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
+import { Tooltip } from '@instructure/ui-tooltip'
+import { IconCopyLine, IconRefreshLine } from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Spacing} from '@instructure/emotion'
@@ -31,8 +34,12 @@ import {i18nLtiPlacement} from '../../../model/i18nLtiPlacement'
 import {DefaultLtiPrivacyLevel} from '../../../model/LtiPrivacyLevel'
 import {isLtiPlacementWithDefaultIcon, isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
 import {ltiToolDefaultIconUrl} from '../../../model/ltiToolIcons'
-import {Button} from '@instructure/ui-buttons'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
+import {isForcedOn} from '../../../model/LtiRegistration'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {resetLtiRegistration, fetchLtiRegistrationWithLegacyConfig} from '../../../api/registrations'
+import { isSuccessful } from '../../../../common/lib/apiResult/ApiResult'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -82,7 +89,7 @@ const SubSection = ({
 }
 
 export const ToolConfigurationView = () => {
-  const {registration} = useOutletContext<ToolDetailsOutletContext>()
+  const {registration, refreshRegistration} = useOutletContext<ToolDetailsOutletContext>()
 
   const customFields = Object.entries(registration.overlaid_configuration.custom_fields || {})
   const redirectUris = registration.overlaid_configuration.redirect_uris || []
@@ -93,6 +100,56 @@ export const ToolConfigurationView = () => {
   const enabledPlacementsWithIcons = enabledPlacements.filter(p =>
     isLtiPlacementWithIcon(p.placement),
   )
+
+  const [tooltipShowing, setTooltipShowing] = React.useState(false)
+  const resetAppConfiguration = async () => {
+    const result = await resetLtiRegistration(registration.account_id, registration.id)
+    await refreshRegistration()
+  }
+
+  const canRestoreDefault = !registration.inherited
+
+  const handleRestoreDefault = React.useCallback(async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
+    e.preventDefault()
+    const confirmed = await showConfirmationDialog({
+      body: I18n.t('Are you sure you want to reset this app’s settings to their default values? Once they are reverted the action cannot be undone.'),
+      confirmColor: 'danger',
+      confirmText: I18n.t('Reset'),
+      label: I18n.t('Reset App Configuration'),
+      size: 'small',
+    })
+
+    if (confirmed) {
+      resetAppConfiguration()
+    }
+  }, [])
+
+  const handleCopyJsonConfig = React.useCallback(async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
+    e.preventDefault()
+    const legacyConfigResponse = await fetchLtiRegistrationWithLegacyConfig(registration.account_id, registration.id)
+
+    if (isSuccessful(legacyConfigResponse)) {
+      const legacyConfig = legacyConfigResponse.data['overlaid_legacy_configuration']
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(legacyConfig))
+        showFlashAlert({
+          type: 'info',
+          message: I18n.t('JSON configuration copied'),
+        })
+      } catch {
+        showFlashAlert({
+          type: 'error',
+          message: I18n.t('Unable to copy JSON code to clipboard'),
+        })
+      }
+    }
+    else {
+      showFlashAlert({
+        type: 'error',
+        message: I18n.t('Unable to get JSON configuration to be copied.'),
+      })
+    }
+  }, [registration])
 
   return (
     <div>
@@ -297,7 +354,43 @@ export const ToolConfigurationView = () => {
 
       <ToolConfigurationFooter>
         <Flex direction="row" justifyItems="space-between" padding="0 small">
-          <Flex.Item>{/*Todo: add actions here */}</Flex.Item>
+          <Flex.Item>
+            <Flex gap="small">
+              <Flex.Item>
+                <Tooltip
+                  renderTip={I18n.t("This account does not own this app and therefore can't reset its configuration.")}
+                  isShowingContent={tooltipShowing}
+                  onShowContent={(e) => {
+                    // The tooltip should only be shown if they *can't* click the restore default button
+                    setTooltipShowing(!canRestoreDefault)
+                  }}
+                  onHideContent={(e) => {
+                    setTooltipShowing(false)
+                  }}
+                >
+                  <Button
+                    color="primary-inverse"
+                    interaction={canRestoreDefault ? "enabled" : "disabled"}
+                    renderIcon={<IconRefreshLine />}
+                    margin="0"
+                    onClick={handleRestoreDefault}
+                  >
+                    {I18n.t('Restore Default')}
+                  </Button>
+                </Tooltip>
+              </Flex.Item>
+              <Flex.Item>
+                <Button
+                  color="primary-inverse"
+                  renderIcon={<IconCopyLine />}
+                  margin="0"
+                  onClick={handleCopyJsonConfig}
+                >
+                  {I18n.t('Copy JSON Code')}
+                </Button>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
           <Flex.Item>
             <Button
               color="primary"

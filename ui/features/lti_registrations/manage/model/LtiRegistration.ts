@@ -20,6 +20,7 @@ import {z} from 'zod'
 import {ZAccountId} from './AccountId'
 import {ZDeveloperKeyId} from './developer_key/DeveloperKeyId'
 import {ZInternalLtiConfiguration} from './internal_lti_configuration/InternalLtiConfiguration'
+import {ZInternalBaseLaunchSettings} from './internal_lti_configuration/InternalBaseLaunchSettings'
 import {ZLtiImsRegistrationId} from './lti_ims_registration/LtiImsRegistrationId'
 import {ZLtiToolConfigurationId} from './lti_tool_configuration/LtiToolConfigurationId'
 import {ZLtiOverlay, ZLtiOverlayWithVersions} from './LtiOverlay'
@@ -27,6 +28,8 @@ import {ZLtiRegistrationAccountBinding} from './LtiRegistrationAccountBinding'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZUser} from './User'
 import {ZLtiOverlayVersion} from './LtiOverlayVersion'
+import {ZLtiPrivacyLevel} from './LtiPrivacyLevel'
+import {ZInternalPlacementConfiguration} from './internal_lti_configuration/placement_configuration/InternalPlacementConfiguration'
 
 export const ZLtiRegistration = z.object({
   id: ZLtiRegistrationId,
@@ -63,6 +66,34 @@ export const ZLtiRegistrationWithAllInformation = ZLtiRegistrationWithConfigurat
 })
 
 export type LtiRegistrationWithAllInformation = z.infer<typeof ZLtiRegistrationWithAllInformation>
+
+export const ZLtiLegacyConfiguration = ZInternalLtiConfiguration.omit({
+  launch_settings: true,
+  domain: true,
+  placements: true,
+  redirect_uris: true,
+  tool_id: true,
+  privacy_level: true,
+}).extend({
+  custom_fields: z.record(z.string()).optional(),
+  extensions: z.array(
+    z.object({
+      tool_id: z.string().nullable().optional(),
+      domain: z.string().nullable().optional(),
+      privacy_level: ZLtiPrivacyLevel.nullable().optional(),
+      platform: z.literal("canvas.instructure.com"),
+      settings: z.object({
+        placements: z.array(ZInternalPlacementConfiguration),
+      }).merge(ZInternalBaseLaunchSettings)
+    })
+  )
+})
+
+export const ZLtiRegistrationWithLegacyConfiguration = ZLtiRegistration.extend({
+  overlaid_legacy_configuration: ZLtiLegacyConfiguration
+})
+
+export type LtiRegistrationWithLegacyConfiguration = z.infer<typeof ZLtiRegistrationWithLegacyConfiguration>
 
 export const isForcedOn = (reg: LtiRegistration) =>
   reg.inherited &&

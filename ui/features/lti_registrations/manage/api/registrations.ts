@@ -19,7 +19,9 @@
 import {
   ZLtiRegistrationWithConfiguration,
   ZLtiRegistration,
+  ZLtiRegistrationWithLegacyConfiguration,
   type LtiRegistrationWithConfiguration,
+  type LtiRegistrationWithLegacyConfiguration,
   type LtiRegistration,
   LtiRegistrationWithAllInformation,
   ZLtiRegistrationWithAllInformation,
@@ -97,6 +99,44 @@ export const fetchRegistrationWithAllInfoForId: FetchRegistrationWithAllInfoForI
     fetch(
       `/api/v1/accounts/${options.accountId}/lti_registrations/${options.ltiRegistrationId}?include[]=overlaid_configuration&include[]=overlay&include[]=overlay_versions`,
       defaultFetchOptions(),
+    ),
+  )
+
+export type FetchLtiRegistrationWithLegacyConfiguration = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+) => Promise<ApiResult<LtiRegistrationWithLegacyConfiguration>>
+
+/**
+ * Fetch a single LtiRegistration with its legacy configuration included
+ * @returns
+ */
+export const fetchLtiRegistrationWithLegacyConfig: FetchLtiRegistrationWithLegacyConfiguration = (
+  accountId,
+  ltiRegistrationId,
+) =>
+  parseFetchResult(ZLtiRegistrationWithLegacyConfiguration)(
+    fetch(
+      `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}?include=overlaid_legacy_configuration`,
+      defaultFetchOptions(),
+    ),
+  )
+
+/**
+ * Reset an LtiRegistration to its default configuration, removing overlays
+ * @returns an LtiRegistration
+ */
+export const resetLtiRegistration: FetchLtiRegistration = (
+  accountId: AccountId,
+  ltiRegistrationId: LtiRegistrationId,
+) =>
+  parseFetchResult(ZLtiRegistrationWithConfiguration)(
+    fetch(
+      `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/reset`,
+      {
+        method: 'PUT',
+        ...defaultFetchOptions(),
+      },
     ),
   )
 
