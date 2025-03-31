@@ -1123,6 +1123,12 @@ CanvasRails::Application.routes.draw do
     get "asset_processors/:asset_processor_id/reports/:report_id/launch", action: :launch_report, as: :asset_report_launch
   end
 
+  scope(controller: "lti/eula_launch") do
+    %w[course account].each do |context|
+      get "#{context}s/:#{context}_id/external_tools/:context_external_tool_id/eula_launch", action: :launch_eula, as: "#{context}_tool_eula_launch"
+    end
+  end
+
   ### API routes ###
 
   # TODO: api routes can't yet take advantage of concerns for DRYness, because of

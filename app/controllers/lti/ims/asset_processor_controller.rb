@@ -28,10 +28,8 @@ module Lti::IMS
     include Concerns::AdvantageServices
     include AttachmentHelper
 
-    before_action(
-      :require_feature_enabled,
-      :verify_developer_key_owns_asset_processor
-    )
+    before_action { require_feature_enabled :lti_asset_processor }
+    before_action :verify_developer_key_owns_asset_processor
 
     before_action(
       :verify_valid_type,
@@ -286,12 +284,6 @@ module Lti::IMS
     def verify_developer_key_owns_asset_processor
       unless asset_processor.context_external_tool.developer_key_id == developer_key.id
         render_error("Asset processor not owned by this developer key", :forbidden)
-      end
-    end
-
-    def require_feature_enabled
-      unless context.root_account.feature_enabled?(:lti_asset_processor)
-        render_error("not found", :not_found)
       end
     end
 

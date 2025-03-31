@@ -74,7 +74,7 @@ module Lti::Messages
       add_names_and_roles_service_claims! if include_names_and_roles_service_claims?
       add_lti11_legacy_user_id! if include_claims?(:lti11_legacy_user_id)
       add_lti1p1_claims! if include_lti1p1_claims?
-      add_asset_processor_eula_claims! if include_asset_processor_eula_claims?
+      add_eulaservice_claims! if include_eulaservice_claims?
       add_extension("placement", @opts[:resource_type])
       add_extension("lti_student_id", @opts[:student_id].to_s) if @opts[:student_id].present?
       add_extension("student_context", { "id" => @opts[:student_lti_id] }) if @opts[:student_lti_id].present?
@@ -227,8 +227,8 @@ module Lti::Messages
         @tool.root_account.feature_enabled?(:platform_notification_service)
     end
 
-    def include_asset_processor_eula_claims?
-      include_claims?(:asset_processor_eula) &&
+    def include_eulaservice_claims?
+      include_claims?(:eulaservice) &&
         @tool.root_account.feature_enabled?(:lti_asset_processor)
     end
 
@@ -265,7 +265,7 @@ module Lti::Messages
       end
     end
 
-    def add_asset_processor_eula_claims!
+    def add_eulaservice_claims!
       @message.eulaservice.url = @tool.asset_processor_eula_url
       @message.eulaservice.scope = [TokenScopes::LTI_EULA_SCOPE]
     end

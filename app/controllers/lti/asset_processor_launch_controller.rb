@@ -19,84 +19,56 @@
 
 module Lti
   class AssetProcessorLaunchController < ApplicationController
+    include Lti::LaunchServices
+
     before_action :require_asset_processor
     before_action :require_context
-    before_action :require_feature_enabled
+    before_action { require_feature_enabled :lti_asset_processor }
     before_action :require_access_to_context
     before_action :require_asset_report, only: :launch_report
     before_action :validate_report_belongs_to_processor, only: :launch_report
 
     def launch_settings
-      init_launch
-      launch_url = tool.url_with_environment_overrides(settings_url)
-      @lti_launch.params = lti_adapter(
-        launch_url:
-      ).generate_post_payload_for_asset_processor_settings
-      @lti_launch.resource_url = lti_adapter.launch_url
-      log_launch(launch_url:, message_type: LtiAdvantage::Messages::AssetProcessorSettingsRequest::MESSAGE_TYPE)
+      @lti_launch = create_and_log_launch(
+        message_type: LtiAdvantage::Messages::AssetProcessorSettingsRequest::MESSAGE_TYPE,
+        return_url: assignment.direct_link,
+        adapter_opts: {
+          asset_processor:,
+          launch_url: settings_url
+        },
+        expander_opts: {
+          assignment:
+        },
+        log_launch_type: :content_item
+      )
       render Lti::AppUtil.display_template("borderless")
     end
 
     def launch_report
-      init_launch
-      launch_url = tool.url_with_environment_overrides(report_url)
-      @lti_launch.params = lti_adapter(
-        asset_report:,
-        launch_url:,
-        submission_attempt: params[:submission_attempt]
-      ).generate_post_payload_for_report_review
-      @lti_launch.resource_url = lti_adapter.launch_url
-      log_launch(launch_url:, message_type: LtiAdvantage::Messages::ReportReviewRequest::MESSAGE_TYPE)
+      @lti_launch = create_and_log_launch(
+        message_type: LtiAdvantage::Messages::ReportReviewRequest::MESSAGE_TYPE,
+        return_url: assignment.direct_link,
+        adapter_opts: {
+          asset_report:,
+          launch_url: report_url,
+          submission_attempt: params[:submission_attempt]
+        },
+        expander_opts: {
+          assignment:
+        },
+        log_launch_type: :content_item
+      )
       render Lti::AppUtil.display_template("borderless")
     end
 
     private
 
-    def init_launch
-      @lti_launch = Lti::Launch.new
-      @lti_launch.link_text = tool.default_label
-      @lti_launch.analytics_id = tool.tool_id
-    end
-
-    def lti_adapter(opts = {})
-      return @lti_adapter if @lti_adapter
-
-      default_opts = {
-        message_type: @launch_type,
-        asset_processor:,
-        domain: HostUrl.context_host(@domain_root_account, request.host)
-      }
-      @lti_adapter = Lti::LtiAdvantageAdapter.new(
-        tool:,
-        user: @current_user,
-        context: @context,
-        return_url: assignment.direct_link,
-        expander: variable_expander,
-        include_storage_target: !in_lti_mobile_webview?,
-        opts: default_opts.merge(opts)
-      )
-    end
-
-    def variable_expander
-      Lti::VariableExpander.new(@domain_root_account, @context, self, {
-                                  assignment:,
-                                  current_user: @current_user,
-                                  current_pseudonym: @current_pseudonym,
-                                  tool:,
-                                  launch: @lti_launch,
-                                })
-    end
-
     def report_url
-      asset_processor.report&.dig("url") || tool.launch_url
+      @report_url ||= asset_processor.report&.dig("url") || tool.launch_url
     end
 
     def settings_url
-      asset_processor.url || tool.launch_url
-    end
-
-    def launch_type
-      params.require(:launch_type)
+      @settings_url ||= asset_processor.url || tool.launch_url
     end
 
     def asset_processor
@@ -128,21 +100,11 @@ module Lti
     end
 
     def require_context
-      return not_found unless assignment&.context
-
-      @context = assignment.context
+      not_found unless assignment&.context
     end
 
-    def require_feature_enabled
-      not_found unless @context.root_account.feature_enabled?(:lti_asset_processor)
-    end
-
-    def require_access_to_context
-      if @context.is_a?(Account)
-        require_user
-      elsif !@context.grants_right?(@current_user, session, :read)
-        render_unauthorized_action
-      end
+    def context
+      @context ||= assignment.context
     end
 
     def require_asset_report
@@ -153,18 +115,6 @@ module Lti
       unless asset_report.asset_processor.id == asset_processor.id
         render status: :bad_request, plain: "invalid_request"
       end
-    end
-
-    def log_launch(launch_url:, message_type:)
-      Lti::LogService.new(
-        tool:,
-        context: @context,
-        user: @current_user,
-        session_id: session[:session_id],
-        launch_type: :content_item,
-        launch_url:,
-        message_type:
-      ).call
     end
   end
 end

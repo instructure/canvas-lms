@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2024 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,27 +19,23 @@
 
 module Lti::Messages
   # A "factory" class that builds an ID Token (JWT) to be used in
-  # 1EdTech LTI Asset Processor Asset Processor Settings Request launches.
+  # 1EdTech LTI Asset Processor Eula Message launches.
   #
-  # This class relies on a another class (LtiAdvantage::Messages::AssetProcessorSettingsRequest)
+  # This class relies on a another class (LtiAdvantage::Messages::EulaRequest)
   # to model the data in the JWT body and produce a signature.
-  class AssetProcessorSettingsRequest < JwtMessage
-    def initialize(tool:, context:, user:, expander:, return_url:, asset_processor:, opts: {})
-      super(tool:, context:, user:, expander:, return_url:, opts:)
-      raise ArgumentError, "asset_processor is required" unless asset_processor
-
-      @asset_processor = asset_processor
-      @message = LtiAdvantage::Messages::AssetProcessorSettingsRequest.new
+  class EulaRequest < JwtMessage
+    def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
+      extra_claims = opts&.delete(:extra_claims) || []
+      opts = {
+        claim_group_whitelist: %i[security context custom_params eulaservice target_link_uri roles] + extra_claims,
+        extension_blacklist: [:placement]
+      }.merge(opts || {})
+      super
+      @message = LtiAdvantage::Messages::EulaRequest.new
     end
 
     def generate_post_payload_message
-      add_activity_claim!
       super(validate_launch: true)
-    end
-
-    def add_activity_claim!
-      @message.activity.id = @asset_processor.assignment.lti_context_id
-      @message.activity.title = @asset_processor.assignment.title
     end
   end
 end

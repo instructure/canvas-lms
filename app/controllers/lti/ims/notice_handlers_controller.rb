@@ -82,7 +82,7 @@ module Lti::IMS
   class NoticeHandlersController < ApplicationController
     include Concerns::AdvantageServices
 
-    before_action :require_feature_enabled
+    before_action { require_feature_enabled :platform_notification_service }
     before_action :validate_tool_id
 
     # @API Show notice handlers
@@ -153,12 +153,6 @@ module Lti::IMS
     end
 
     private
-
-    def require_feature_enabled
-      unless tool.root_account.feature_enabled?(:platform_notification_service)
-        render_error("not found", :not_found)
-      end
-    end
 
     def validate_tool_id
       unless tool.developer_key_id == developer_key.id
