@@ -7075,6 +7075,8 @@ fa:
   count_results_displayed_ed39a0f0: 
     one: "%{count} نتیجه نمایش داده شد"
     other: "%{count} نتیجه نمایش داده شد"
+  count_results_found_for_searchterm_8d902ff2: 
+    zero: "نتیجه ای یافت نشد برای %{searchTerm}"
   count_rows_added_dacc9daf: " %{count} ردیف اضافه شد"
   count_rows_removed_c6ff7bc: "  %{count} ردیف اضافه شد"
   count_sections_466dcd5c: 
@@ -8639,6 +8641,7 @@ fa:
   delete_selected_a023ccf8: "حذف انتخاب شده"
   delete_selected_announcements_69e23710: "حذف کردن  اطلاعیه‌های انتخاب شده"
   delete_selected_pages_7bc50580: "حذف صفحات انتخاب شده"
+  delete_sub_account_c267a6e5: "حذف زیر حساب"
   delete_survey_56fddbbd: "حذف نظرسنجی"
   delete_term_name_f707abc9: "حذف نیمسال %{name}"
   delete_theme_918a7f24: "حذف زمینه؟"
