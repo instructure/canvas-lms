@@ -540,7 +540,20 @@ class Account < ActiveRecord::Base
   end
 
   def allow_assign_to_differentiation_tags?
-    allow_assign_to_differentiation_tags[:value]
+    allow_assign_to_differentiation_tags[:value] && feature_enabled?(:assign_to_differentiation_tags)
+  end
+
+  def allow_assign_to_differentiation_tags_unlocked?
+    # First, the feature flag must be enabled. If not, always false.
+    return false unless feature_enabled?(:assign_to_differentiation_tags)
+
+    dt = allow_assign_to_differentiation_tags
+
+    # If the current value is true, then it's allowed.
+    return true if dt[:value]
+
+    # If the value is false, then allow it if it is not locked.
+    !dt[:locked]
   end
 
   def allow_gradebook_show_first_last_names?

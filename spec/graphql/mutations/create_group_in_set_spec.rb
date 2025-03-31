@@ -90,7 +90,10 @@ describe Mutations::CreateGroupInSet do
 
   context "non_collaborative groups" do
     before do
-      @course.account.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       @gc_non_colab = @course.group_categories.create! name: "non collaborative group category", non_collaborative: true
     end
 
@@ -136,7 +139,9 @@ describe Mutations::CreateGroupInSet do
       end
 
       it "returns error if the differentiation tags FF is disabled" do
-        @course.account.disable_feature!(:differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        @course.account.save!
+        @course.account.reload
         result = run_mutation
         expect(group_id(result)).to be_nil
         expect_error(result, "cannot create non-collaborative groups when the differentiation tags feature flag is disabled")

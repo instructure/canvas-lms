@@ -31,19 +31,26 @@ describe "Differentiation Tag Management" do
     @course_with_tags_enabled = course_with_teacher(user: @teacher, active_course: true).course
     @course_with_tags_enabled.update!(account: @sub2_account)
     @other_student ||= student_in_course(active_all: true, name: "other_student@test.com").user
-    student_in_course(active_all: true, name: "student@test.com")
+    @third_student = student_in_course(active_all: true, name: "student@test.com").user
     ta_in_course(active_all: true)
 
-    Account.default.allow_feature!(:differentiation_tags)
-    @sub2_account.enable_feature!(:differentiation_tags)
-    @sub1_account.disable_feature!(:differentiation_tags)
+    # Enable FF
+    Account.default.enable_feature! :assign_to_differentiation_tags
+    # Set account setting to true but not locked
+    @sub2_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+    @sub2_account.save!
+
+    @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+    @sub1_account.save!
 
     @single_tag = @course.group_categories.create!(name: "single tag", non_collaborative: true)
     @single_tag_1 = @course.groups.create!(name: "single tag", group_category: @single_tag)
+    @single_tag_1.add_user(@third_student)
 
     @multiple_tags = @course.group_categories.create!(name: "Multiple Tags", non_collaborative: true)
     @multiple_tags_1 = @course.groups.create!(name: "tag variant 1", group_category: @multiple_tags)
     @multiple_tags_2 = @course.groups.create!(name: "tag variant 2", group_category: @multiple_tags)
+    @multiple_tags_3 = @course.groups.create!(name: "tag variant 2", group_category: @multiple_tags)
 
     @single_tag_with_long_name = @course.group_categories.create!(name: "tag with a really long truncated name", non_collaborative: true)
     @single_tag_with_long_name_1 = @course.groups.create!(name: "tag with a really long truncated name variant", group_category: @single_tag_with_long_name)
@@ -59,6 +66,18 @@ describe "Differentiation Tag Management" do
 
       it "renders the checkbox header" do
         expect(fj("span:contains('Select User')")).to be_truthy
+      end
+
+      it "Stops displaying differentiation tag UI if the setting is turned off" do
+        expect(f("body")).to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
+        expect(f("body")).to contain_jqcss("button[data-testid='user-diff-tag-manager-tag-as-button']")
+        expect(f("body")).to contain_jqcss("a[aria-label='View user tags']")
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        @course.account.save!
+        refresh_page
+        expect(f("body")).not_to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
+        expect(f("body")).not_to contain_jqcss("button[data-testid='user-diff-tag-manager-tag-as-button']")
+        expect(f("body")).not_to contain_jqcss("a[aria-label='View user tags']")
       end
 
       context "checkbox visibility" do
@@ -653,27 +672,80 @@ describe "Differentiation Tag Management" do
         expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
       end
 
-      it "does not display 'Manage Tags' if the feature flag is off" do
-        Account.default.disable_feature!(:differentiation_tags)
-
-        user_session @teacher
-        get "/courses/#{@course.id}/users"
-        expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
-      end
-
-      it "does not display feature if off on the sub account" do
-        user_session @teacher
-        get "/courses/#{@course_with_tags_disabled.id}/users"
-        expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
-        expect(f("body")).not_to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
-      end
-
       it "does not show selection checkboxes or 'Tag As' for TAs by default" do
         user_session @ta
         get "/courses/#{@course.id}/users"
 
         expect(f("body")).not_to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
         expect(f("body")).not_to contain_jqcss("button[data-testid='user-diff-tag-manager-tag-as-button']")
+      end
+    end
+
+    context "sub account setting and feature flag conditions" do
+      it "does not display 'Manage Tags' if the feature flag is off" do
+        Account.default.disable_feature!(:assign_to_differentiation_tags)
+
+        user_session @teacher
+        get "/courses/#{@course.id}/users"
+        expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
+      end
+
+      context "when the parent account differentiation tags setting is on and locked" do
+        before do
+          Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true, locked: true }
+          Account.default.save!
+        end
+
+        it "shows the 'Manage Tags' button" do
+          user_session @teacher
+          get "/courses/#{@course_with_tags_disabled.id}/users"
+          expect(f("body")).to contain_jqcss("button:contains('Manage Tags')")
+        end
+      end
+
+      context "when the parent account setting is on and not locked" do
+        before do
+          Account.default.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
+          Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          Account.default.save!
+        end
+
+        it "shows the 'Manage Tags' button when sub account setting is on" do
+          user_session @teacher
+          get "/courses/#{@course_with_tags_enabled.id}/users"
+          expect(f("body")).to contain_jqcss("button:contains('Manage Tags')")
+        end
+
+        it "does not show the 'Manage Tags' button when sub account setting is off" do
+          @sub1_account.disable_feature! :assign_to_differentiation_tags
+          @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+          @sub1_account.save!
+          @teacher.clear_caches
+          user_session @teacher
+          get "/courses/#{@course_with_tags_disabled.id}/users"
+          expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
+        end
+      end
+
+      context "when the parent account setting is off and not locked" do
+        before do
+          Account.default.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
+          Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false }
+          Account.default.save!
+        end
+
+        it "shows the 'Manage Tags' button when sub account setting is on" do
+          user_session @teacher
+          get "/courses/#{@course_with_tags_enabled.id}/users"
+          expect(f("body")).to contain_jqcss("button:contains('Manage Tags')")
+        end
+
+        it "does not show the 'Manage Tags' button when sub account setting is off" do
+          @sub1_account.disable_feature! :assign_to_differentiation_tags
+          user_session @teacher
+          get "/courses/#{@course_with_tags_disabled.id}/users"
+          expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
+        end
       end
     end
   end

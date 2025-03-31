@@ -409,14 +409,19 @@ describe "people" do
       expect(f(".conclude_enrollment_link")).to be_displayed
     end
 
-    it "does not show selection checkboxes for teachers when differentiation_tags feature flag is OFF" do
-      Account.site_admin.disable_feature!(:differentiation_tags)
+    it "does not show selection checkboxes for teachers when allow_assign_to_differentiation_tags setting is OFF" do
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false }
+      Account.default.save!
+      Account.default.reload
       get "/courses/#{@course.id}/users/"
       expect(f("body")).not_to contain_jqcss("input[id^='select-user-']")
     end
 
-    it "shows selection checkboxes for teachers when differentiation_tags feature flag is ON" do
-      Account.site_admin.enable_feature!(:differentiation_tags)
+    it "shows selection checkboxes for teachers when the allow_assign_to_differentiation_tags setting is ON" do
+      Account.default.enable_feature! :assign_to_differentiation_tags
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
       get "/courses/#{@course.id}/users/"
       expect(f("body")).to contain_jqcss("input[id^='select-user-']")
     end
@@ -431,8 +436,10 @@ describe "people" do
       user_session @ta
     end
 
-    it "does not show selection checkboxes for tas even when differentiation_tags feature flag is ON (they do not have differentiation tag permission by default)" do
-      Account.site_admin.enable_feature!(:differentiation_tags)
+    it "does not show selection checkboxes for tas even when allow_assign_to_differentiation_tags setting is ON (they do not have differentiation tag permission by default)" do
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
       get "/courses/#{@course.id}/users/"
       expect(f("body")).not_to contain_jqcss("input[id^='select-user-']")
     end
@@ -914,7 +921,10 @@ describe "people" do
         course_with_teacher active_user: true, active_course: true, active_enrollment: true, name: "Mrs. Commanderson"
         @student = create_user("student@test.com")
         enroll_student(@student)
-        Account.default.enable_feature!(:differentiation_tags)
+        Account.default.enable_feature! :assign_to_differentiation_tags
+        Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        Account.default.save!
+        Account.default.reload
       end
 
       before do
@@ -927,7 +937,10 @@ describe "people" do
       end
 
       it "does not render the Manage Tags Button if the FF is off" do
-        Account.default.disable_feature!(:differentiation_tags)
+        Account.default.disable_feature! :assign_to_differentiation_tags
+        Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        Account.default.save!
+        Account.default.reload
         get "/courses/#{@course.id}/users"
         expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
       end

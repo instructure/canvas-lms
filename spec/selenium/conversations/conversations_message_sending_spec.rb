@@ -366,7 +366,10 @@ describe "conversations new" do
 
       context "differentiation tags" do
         before do
-          Account.default.enable_feature!(:differentiation_tags)
+          Account.default.enable_feature! :assign_to_differentiation_tags
+          Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          Account.default.save!
+          Account.default.reload
           @non_collaborative_group_category = @course.group_categories.create!(name: "Test differentiation tag", non_collaborative: true)
           @non_collaborative_group = @course.groups.create!(name: "Test differentiation tag", group_category: @non_collaborative_group_category)
           @non_collaborative_group.add_user(@s1)

@@ -430,7 +430,10 @@ RSpec.describe Mutations::CreateConversation do
 
   context "non_collaborative groups" do
     before(:once) do
-      Account.site_admin.enable_feature!(:differentiation_tags)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       ncc = @course.group_categories.create!(name: "non-collaborative category", non_collaborative: true)
       @ncg = @course.groups.create!(name: "non-collaborative group", group_category: ncc)
       @ncg.add_user(@student, "accepted")

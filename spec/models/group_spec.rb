@@ -1011,7 +1011,10 @@ describe Group do
     context "permissions" do
       before do
         @group = Group.create!(context: @course, group_category: @non_collaborative_category, name: "Test Group", non_collaborative: true)
-        @course.account.enable_feature!(:differentiation_tags)
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.account.reload
         allow(@course).to receive(:grants_any_right?).with(@teacher, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(true)
       end
 
@@ -1093,7 +1096,9 @@ describe Group do
           Group.create!(context: @course, group_category: @c3, name: "Group #{i + 20}", non_collaborative: true)
           Group.create!(context: @course, group_category: @c4, name: "Group #{i + 30}", non_collaborative: true)
         end
-        @course.account.enable_feature!(:differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.account.reload
       end
 
       it "does not allow to create more categories/groups" do
