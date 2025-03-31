@@ -5,10 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 6.0.1 - 2025-03-20
+## 7.0.0 - 2025-03-31
+
+### Fixed
+
+- Screen readers for RCE toolbar on mobile platform
+- Axios CSRF vulnerability
+- Mailto link insertion 
 
 ### Changed
 
+- Upgraded Instui to v10
+- Refactored deprecated plugins to prepare for tinymce upgrade
 - Removed media_links_use_attachment_id feature flag
 
 ## 6.0.0 - 2025-03-20
