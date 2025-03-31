@@ -179,3 +179,11 @@ export const mockRegistrationWithAllInformation = ({
     },
   }
 }
+
+export const mockSiteAdminRegistration = (n: string, i: number) => {
+  return {
+    ...mockRegistrationWithAllInformation({n, i}),
+    inherited: true,
+  }
+}
+
