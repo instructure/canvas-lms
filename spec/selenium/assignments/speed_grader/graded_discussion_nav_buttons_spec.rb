@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative "../../common"
+require_relative "../../grades/pages/speedgrader_page"
 
 describe "Screenreader Gradebook grading" do
   include_context "in-process server selenium tests"
@@ -74,31 +75,6 @@ describe "Screenreader Gradebook grading" do
         @course.account.enable_feature!(:discussions_speedgrader_revisit)
       end
 
-      # flaky will revisit
-      xit "defaults to last-oldest entry", :ignore_js_errors do
-        dtp = @checkpointed_discussion.discussion_topic_participants.where(user_id: @teacher).first
-        dtp.sort_order = "desc"
-        dtp.save!
-        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}"
-        f("button[title='Settings']").click
-        fj("li:contains('Options')").click
-        fj("label:contains('Show replies in context')").click
-        fj(".ui-dialog-buttonset .ui-button:visible:last").click
-
-        expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
-        expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
-        expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
-        expect(f("body").text).to include("Reply 1 of 6")
-
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            sleep 3
-            wait_for_ajaximations
-            expect(f("body").text).to include("reply to entry i0")
-          end
-        end
-      end
-
       it "goes to last entry", :ignore_js_errors do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_first_entry.id}"
         f("button[title='Settings']").click
@@ -106,25 +82,26 @@ describe "Screenreader Gradebook grading" do
         fj("label:contains('Show replies in context')").click
         fj(".ui-dialog-buttonset .ui-button:visible:last").click
 
+        Speedgrader.wait_for_first_reply_button
         expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
         expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
         expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
         expect(f("body").text).to include("Reply 1 of 6")
-        sleep 5
 
         f("button[data-testid='discussions-last-reply-button']").click
         expect(f("body").text).to include("Reply 6 of 6")
 
+        # we are not doing anything inside the iframes yet, the buttons are reliant
+        # on their contents to load, though
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load
+        Speedgrader.wait_for_first_reply_button
         expect(f("button[data-testid='discussions-first-reply-button']")).to be_enabled
         expect(f("button[data-testid='discussions-previous-reply-button']")).to be_enabled
         expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
         expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
 
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-            expect(f("body").text).to include("reply to topic j2")
-          end
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          expect(f("body").text).to include("reply to topic j2")
         end
       end
 
@@ -135,12 +112,14 @@ describe "Screenreader Gradebook grading" do
         fj("label:contains('Show replies in context')").click
         fj(".ui-dialog-buttonset .ui-button:visible:last").click
 
+        Speedgrader.wait_for_first_reply_button
         expect(f("button[data-testid='discussions-next-reply-button']")).to be_present
         expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
         expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
         expect(f("body").text).to include("Reply 6 of 6")
 
-        sleep 3
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load
+        Speedgrader.wait_for_first_reply_button
         f("button[data-testid='discussions-first-reply-button']").click
         expect(f("body").text).to include("Reply 1 of 6")
 
@@ -149,12 +128,9 @@ describe "Screenreader Gradebook grading" do
         expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
         expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
 
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            sleep 3
-            wait_for_ajaximations
-            expect(f("body").text).to include("reply to entry i0")
-          end
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          wait_for(timeout: 5, method: nil) { f("div[data-testid='isHighlighted']") }
+          expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i0")
         end
       end
 
@@ -165,57 +141,44 @@ describe "Screenreader Gradebook grading" do
         fj("label:contains('Show replies in context')").click
         fj(".ui-dialog-buttonset .ui-button:visible:last").click
 
+        Speedgrader.wait_for_first_reply_button
         expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
         expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
         expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
+          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i0")
+        end
         expect(f("body").text).to include("Reply 1 of 7")
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
-            expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i0")
-          end
-        end
 
         f("button[data-testid='discussions-next-reply-button']").click
-        wait_for_ajaximations
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
+          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i1")
+        end
         expect(f("body").text).to include("Reply 2 of 7")
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
-            expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i1")
-          end
-        end
 
         f("button[data-testid='discussions-next-reply-button']").click
-        wait_for_ajaximations
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
+          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i2")
+        end
         expect(f("body").text).to include("Reply 3 of 7")
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
-            expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i2")
-          end
-        end
 
         f("button[data-testid='discussions-previous-reply-button']").click
-        wait_for_ajaximations
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
+          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i1")
+        end
         expect(f("body").text).to include("Reply 2 of 7")
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
-            expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i1")
-          end
-        end
 
         f("button[data-testid='discussions-previous-reply-button']").click
-        wait_for_ajaximations
-        expect(f("body").text).to include("Reply 1 of 7")
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
-            expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i0")
-          end
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
+          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i0")
         end
 
+        expect(f("body").text).to include("Reply 1 of 7")
         expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
         expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
       end
