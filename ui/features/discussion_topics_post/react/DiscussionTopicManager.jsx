@@ -58,6 +58,7 @@ import {
 } from './KeyboardShortcuts/useKeyboardShortcut'
 
 const I18n = createI18nScope('discussion_topics_post')
+const SEARCH_INPUT_SELECTOR = '#discussion-drawer-layout input[data-testid="search-filter"]';
 
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -281,6 +282,8 @@ const DiscussionTopicManager = props => {
     if (searchTerm && discussionTopicQuery.data) {
       const searchEntryCount = discussionTopicQuery.data.legacyNode?.searchEntryCount || 0
       setTimeout(() => {
+        const inputElement = document.querySelector(SEARCH_INPUT_SELECTOR);
+        inputElement?.focus()
         $.screenReaderFlashMessageExclusive(
           I18n.t(
             {
@@ -301,8 +304,10 @@ const DiscussionTopicManager = props => {
   useEffect(() => {
     if (previousSearchTerm.current && !searchTerm) {
       setTimeout(() => {
+        const inputElement = document.querySelector(SEARCH_INPUT_SELECTOR);
+        inputElement?.focus()
         $.screenReaderFlashMessageExclusive(I18n.t("Search cleared. No filters applied."))
-      }, 500)
+      }, 600)
     }
     previousSearchTerm.current = searchTerm;
   }, [searchTerm]);
