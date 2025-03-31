@@ -7224,6 +7224,7 @@ tr:
   delete_section_name_a48d9d79: "Bölümü Sil \"%{name}\""
   delete_selected_a023ccf8: "Seçileni Sil"
   delete_selected_announcements_69e23710: "Seçili Duyuruları Sil"
+  delete_sub_account_c267a6e5: "Alt Hesabı Sil"
   delete_survey_56fddbbd: "Anket Sil"
   delete_term_name_f707abc9: "Dönemi Sil %{name}"
   delete_theme_bdb70d25: "Temayı sil"
