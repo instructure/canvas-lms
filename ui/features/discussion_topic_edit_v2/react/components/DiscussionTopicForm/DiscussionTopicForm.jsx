@@ -829,7 +829,9 @@ function DiscussionTopicForm({
     } else if (!isGroupDiscussion && !isAnnouncement) {
       return (
         <View as="div" data-testid="discussion-assign-to-section">
-          <Text size="large">{I18n.t('Assign Access')}</Text>
+          <Text size="large" as="h2">
+            {I18n.t('Assign Access')}
+          </Text>
           <DiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
             <ItemAssignToTrayWrapper />
           </DiscussionDueDatesContext.Provider>
