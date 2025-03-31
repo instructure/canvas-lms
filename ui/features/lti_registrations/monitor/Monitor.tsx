@@ -16,30 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { getBasename } from '@canvas/lti-apps/utils/basename';
-import React from 'react';
-import { ltiUsageConfig, ltiUsageOptions } from './utils';
+import {getBasename} from '@canvas/lti-apps/utils/basename'
+import React from 'react'
+import {ltiUsageConfig, ltiUsageOptions} from './utils'
 
-import { fetchToken } from './api/jwt';
-import { fetchImpact } from './api/impact';
+import {fetchLtiUsageToken} from './api/jwt'
+import {fetchImpact} from './api/impact'
 
 export const Monitor = () => {
-  const root = React.useRef<HTMLDivElement>(null);
+  const root = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
     let unmount = () => {}
 
     import('ltiusage/AppModule').then(module => {
-      if(root.current !== null) {
+      if (root.current !== null) {
         unmount = module.render({
           basename: getBasename('apps') + '/monitor',
           mountPoint: root.current,
           config: {
             ...ltiUsageConfig(),
-            fetchToken,
+            fetchToken: fetchLtiUsageToken,
             fetchImpact,
           },
-          options: ltiUsageOptions()
+          options: ltiUsageOptions(),
         })
       } else {
         console.error('Could not find root element to mount lti usage')
@@ -49,8 +49,5 @@ export const Monitor = () => {
     return () => unmount()
   }, [])
 
-  return (
-    <div ref={root}>
-    </div>
-  )
+  return <div ref={root}></div>
 }

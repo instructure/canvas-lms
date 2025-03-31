@@ -6357,6 +6357,7 @@ uk:
   delete_rubric_9b66412d: "Видалити рубрику"
   delete_section_name_a48d9d79: "Видалити розділ \"%{name}\""
   delete_selected_a023ccf8: "Видалити обране"
+  delete_sub_account_c267a6e5: "Видалити додатковий обліковий запис"
   delete_survey_56fddbbd: "Видалити огляд"
   delete_term_name_f707abc9: "Видалити термін %{name}"
   delete_theme_bdb70d25: "Видалити тему"

@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AccountId} from '@canvas/lti-apps/models/AccountId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 
-export const fetchToken = () =>
-  fetch('/api/v1/jwts?canvas_audience=false&workflows[]=lti_usage', {
-    method: 'POST',
-    ...defaultFetchOptions(),
-  })
+export const fetchLtiUsageToken = (accountId: AccountId) =>
+  fetch(
+    `/api/v1/jwts?canvas_audience=false&workflows[]=lti_usage&context_id=${accountId}&context_type=account`,
+    {
+      method: 'POST',
+      ...defaultFetchOptions(),
+    },
+  )
     .then(resp => resp.json())
     .then(data => ({token: data.token}))

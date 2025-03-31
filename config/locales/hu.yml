@@ -8836,6 +8836,7 @@ hu:
   delete_selected_announcements_69e23710: "Kijelölt hirdetmények törlése"
   delete_selected_pages_7bc50580: "Kijelölt oldalak törlése"
   delete_status_name_b0814fc6: "Állapot törlése %{name}"
+  delete_sub_account_c267a6e5: "Alfiók törlése"
   delete_survey_56fddbbd: "Felmérés törlése"
   delete_term_name_f707abc9: "%{name} félév törlése"
   delete_theme_918a7f24: "Téma törlése?"
