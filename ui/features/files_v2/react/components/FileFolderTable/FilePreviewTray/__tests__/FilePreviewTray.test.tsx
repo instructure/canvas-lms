@@ -81,12 +81,13 @@ describe('FilePreviewTray', () => {
     expect(screen.queryByText('Media Options')).not.toBeInTheDocument()
   })
 
-  it('does not render MediaFileInfo when file is a locked blueprint item', () => {
+  it('does not render MediaFileInfo when file is a locked blueprint item in a child course', () => {
     renderComponent({
       canAddTracks: true,
       item: {
         ...defaultProps.item,
         restricted_by_master_course: true,
+        is_master_course_child_content: true,
       },
       mediaTracks: FAKE_MEDIA_TRACKS,
     })
@@ -99,5 +100,18 @@ describe('FilePreviewTray', () => {
       mediaTracks: FAKE_MEDIA_TRACKS,
     })
     expect(screen.queryByText('Media Options')).not.toBeInTheDocument()
+  })
+
+  it('does render MediaFileInfo when file is a locked blueprint item in a parent course', () => {
+    renderComponent({
+      canAddTracks: true,
+      item: {
+        ...defaultProps.item,
+        restricted_by_master_course: true,
+        is_master_course_child_content: false,
+      },
+      mediaTracks: FAKE_MEDIA_TRACKS,
+    })
+    expect(screen.getByText('Media Options')).toBeInTheDocument()
   })
 })

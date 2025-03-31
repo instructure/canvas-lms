@@ -86,11 +86,27 @@ describe('MediaFileInfo', () => {
     expect(header).not.toBeInTheDocument()
   })
 
-  it('does not render if file is restricted by master course', () => {
+  it('does not render if file is blueprint locked and in a child course', () => {
     renderComponent({
-      attachment: {...defaultProps.attachment, restricted_by_master_course: true},
+      attachment: {
+        ...defaultProps.attachment,
+        restricted_by_master_course: true,
+        is_master_course_child_content: true,
+      },
     })
     const header = screen.queryByText('Media Options')
     expect(header).not.toBeInTheDocument()
+  })
+
+  it('does render if file is blueprint locked but in the parent course', () => {
+    renderComponent({
+      attachment: {
+        ...defaultProps.attachment,
+        restricted_by_master_course: true,
+        is_master_course_child_content: false,
+      },
+    })
+    const header = screen.getByText('Media Options')
+    expect(header).toBeInTheDocument()
   })
 })
