@@ -104,7 +104,7 @@ export default function buildStyle() {
     canvasWarningColor: variables.colors.contrasts.orange4570,
     canvasInfoColor: variables.colors.contrasts.blue4570,
     canvasSuccessColor: variables.colors.contrasts.green4570,
-    canvasBorderColor: variables.colors.contrasts.grey1214,
+    canvasBorderColor: variables.colors.contrasts.grey3045,
     toolbarButtonHoverBackground: toolbarButtonHoverBackgroundConst, // copied from INSTUI "light" Button
     tinySplitButtonChevronHoverBackground: tinySplitButtonChevronHoverBackgroundConst,
     canvasBrandColor: themeCanvasBrandColor,
