@@ -257,8 +257,9 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  def create_table(table_name, id: :primary_key, primary_key: nil, force: nil, if_not_exists: nil, **options)
-    super
+  def create_table(table_name, id: :primary_key, primary_key: nil, force: nil, if_not_exists: nil, **)
+    force_opts = force ? { force: } : { if_not_exists: }
+    super(table_name, id:, primary_key:, **force_opts, **)
 
     add_guard_excessive_updates(table_name, force: if_not_exists)
   end
