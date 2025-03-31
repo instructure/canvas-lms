@@ -58,6 +58,7 @@ const ForgotPasswordLink = () => {
       <Flex.Item overflowX="visible" overflowY="visible">
         {forgotPasswordUrl ? (
           <CondensedButton
+            data-testid="forgot-password-link"
             href={forgotPasswordUrl}
             onClick={handleForgotPasswordUrl(forgotPasswordUrl)}
           >
@@ -65,6 +66,7 @@ const ForgotPasswordLink = () => {
           </CondensedButton>
         ) : (
           <CondensedButton
+            data-testid="forgot-password-link"
             href={ROUTES.FORGOT_PASSWORD}
             onClick={handleNavigate(ROUTES.FORGOT_PASSWORD)}
           >
