@@ -7891,6 +7891,8 @@ nn:
   count_results_found_da21e05c: 
     one: "1 resultat funne"
     other: "%{count} resultat funne"
+  count_results_found_for_searchterm_8d902ff2: 
+    zero: "Kunne ikkje finne resultat for %{searchTerm}"
   count_rows_added_dacc9daf: "%{count} rader lagt til"
   count_rows_removed_c6ff7bc: "%{count} rader fjerna"
   count_sections_466dcd5c: 
@@ -9555,6 +9557,7 @@ nn:
   delete_selected_announcements_69e23710: "Slett valde kunngjeringar"
   delete_selected_pages_7bc50580: "Slett valde sider"
   delete_status_name_b0814fc6: "Slett status %{name}"
+  delete_sub_account_c267a6e5: "Slett underkonto"
   delete_survey_56fddbbd: "Slett Undersøking"
   delete_term_name_f707abc9: "Slett semester %{name}"
   delete_theme_918a7f24: "Slett tema?"
