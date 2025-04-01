@@ -22,8 +22,13 @@ import {ltiUsageConfig, ltiUsageOptions} from './utils'
 
 import {fetchLtiUsageToken} from './api/jwt'
 import {fetchImpact} from './api/impact'
+import {AccountId} from '../manage/model/AccountId'
 
-export const Monitor = () => {
+export type MonitorProps = {
+  accountId: AccountId
+}
+
+export const Monitor = ({accountId}: MonitorProps) => {
   const root = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
@@ -36,7 +41,7 @@ export const Monitor = () => {
           mountPoint: root.current,
           config: {
             ...ltiUsageConfig(),
-            fetchToken: fetchLtiUsageToken,
+            fetchToken: () => fetchLtiUsageToken(accountId),
             fetchImpact,
           },
           options: ltiUsageOptions(),
