@@ -15,9 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Monitor } from "./Monitor";
+import {AccountId} from '../manage/model/AccountId'
+import {Monitor} from './Monitor'
 
-export const route = {
-    path: 'monitor/*',
-    element: <Monitor />,
-}
+export const route = (accountId: AccountId) => ({
+  path: 'monitor/*',
+  element: <Monitor accountId={accountId} />,
+})

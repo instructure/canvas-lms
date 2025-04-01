@@ -40,7 +40,7 @@ import type {DynamicRegistrationWizardService} from './manage/dynamic_registrati
 import {InheritedKeyRegistrationWizard} from './manage/inherited_key_registration_wizard/InheritedKeyRegistrationWizard'
 import type {InheritedKeyService} from './manage/inherited_key_registration_wizard/InheritedKeyService'
 import type {Lti1p3RegistrationWizardService} from './manage/lti_1p3_registration_form/Lti1p3RegistrationWizardService'
-import {ZAccountId} from './manage/model/AccountId'
+import {AccountId, ZAccountId} from './manage/model/AccountId'
 import {ToolDetails} from './manage/pages/tool_details/ToolDetails'
 import {ToolAccess} from './manage/pages/tool_details/access/ToolAccess'
 import {ToolConfiguration} from './manage/pages/tool_details/configuration/ToolConfiguration'
@@ -55,7 +55,7 @@ const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
 
 const queryClient = new QueryClient()
 
-const getLayoutChildren = () => {
+const getLayoutChildren = (accountId: AccountId) => {
   const layoutRoutes = [...ManageRoutes]
 
   if (isLtiRegistrationsDiscoverEnabled()) {
@@ -63,7 +63,7 @@ const getLayoutChildren = () => {
   }
 
   if (isLtiRegistrationsUsageEnabled()) {
-    layoutRoutes.push(MonitorRoute)
+    layoutRoutes.push(MonitorRoute(accountId))
   }
 
   return layoutRoutes
@@ -74,7 +74,7 @@ const router = createBrowserRouter(
     {
       path: '/',
       element: <LtiAppsLayout />,
-      children: getLayoutChildren(),
+      children: getLayoutChildren(accountId),
     },
     {
       path: 'product_detail/:id',
