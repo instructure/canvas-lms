@@ -344,10 +344,8 @@ export const DiscussionTopicContainer = ({
           },
           replyButton: {
             display: 'block',
-            padding: 'none',
           },
           summaryButton: {
-            padding: 'small none',
             shouldGrow: true,
             shouldShrink: true,
           },
@@ -378,10 +376,8 @@ export const DiscussionTopicContainer = ({
           },
           replyButton: {
             display: 'inline-block',
-            padding: 'none xxx-small none none',
           },
           summaryButton: {
-            padding: '0 small',
             shouldGrow: false,
             shouldShrink: false,
           },
@@ -571,8 +567,9 @@ export const DiscussionTopicContainer = ({
                                   width="100%"
                                   direction={responsiveProps.direction}
                                   wrap="wrap"
+                                  gap="small"
                                 >
-                                  <Flex.Item padding={responsiveProps?.replyButton?.padding}>
+                                  <Flex.Item overflowY="unset">
                                     <span className="discussion-topic-reply-button">
                                       <Button
                                         display={responsiveProps?.replyButton?.display}
@@ -588,9 +585,9 @@ export const DiscussionTopicContainer = ({
                                   </Flex.Item>
                                   {ENV.user_can_summarize && !isSpeedGraderInTopUrl && (
                                     <Flex.Item
-                                      padding={responsiveProps?.summaryButton?.padding}
                                       shouldGrow={responsiveProps?.summaryButton?.shouldGrow}
                                       shouldShrink={responsiveProps?.summaryButton?.shouldShrink}
+                                      overflowY="unset"
                                     >
                                         <SummarizeButton
                                           onClick={() => handleSummaryEnabled(!isSummaryEnabled)}
@@ -601,8 +598,9 @@ export const DiscussionTopicContainer = ({
                                     </Flex.Item>
                                   )}
                                   {ENV.user_can_access_insights && (
-                                    <Flex.Item>
+                                    <Flex.Item overflowY="unset">
                                       <DiscussionInsightsButton
+                                        isMobile={matches.includes('mobile')}
                                         onClick={() => {
                                           assignLocation(ENV.INSIGHTS_URL)
                                         }}
