@@ -105,17 +105,17 @@ export const PaceModalStats = ({
         <View data-testid="coursepace-date-text" as="div" margin="xxx-small 0 0 0">
           {dateValue
             ? getColoredText(
-                '#66189D',
+                '#5C1C78',
                 dateFormatter(moment.tz(dateValue, coursePaceTimezone).toDate()),
                 {weight: 'bold'},
               )
-            : getColoredText('#66189D', `${DASH} ${I18n.t('Not Specified')} ${DASH}`, {
+            : getColoredText('#5C1C78', `${DASH} ${I18n.t('Not Specified')} ${DASH}`, {
                 weight: 'bold',
               })}
         </View>
         {!shrink && (
           <div style={{whiteSpace: 'nowrap'}}>
-            {getColoredText('#66189D', <span style={{whiteSpace: 'nowrap'}}>{helpText}</span>, {
+            {getColoredText('#5C1C78', <span style={{whiteSpace: 'nowrap'}}>{helpText}</span>, {
               fontStyle: 'italic',
               size: 'small',
             })}
@@ -150,7 +150,7 @@ export const PaceModalStats = ({
             <IconCalendarClockLine
               color="alert"
               size="small"
-              themeOverride={{alertColor: '#66189D'}}
+              themeOverride={{alertColor: '#5C1C78'}}
             />
           </View>
           {renderColoredDate(
@@ -165,7 +165,7 @@ export const PaceModalStats = ({
             <IconArrowEndLine
               color="alert"
               size="x-small"
-              themeOverride={{alertColor: '#66189D'}}
+              themeOverride={{alertColor: '#5C1C78'}}
             />
           </View>
           {renderColoredDate(
