@@ -454,3 +454,9 @@ post_grades_enhanced_modal:
   description: Accessible refactor of Sync Grades dialog
   applies_to: Course
   root_opt_in: true
+project_lhotse:
+  state: hidden
+  applies_to: Course
+  display_name: Project Lhotse
+  description: Enables the new AI-assisted grading tool, codename Project Lhotse, for assignments in this course.
+  shadow: true
