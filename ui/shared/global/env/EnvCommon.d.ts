@@ -254,7 +254,7 @@ export interface EnvCommon {
     type?: string
     classes?: string
   }>
-  breadcrumbs?: {name: string; url: string | null}[]
+  breadcrumbs?: {name: string; url: string}[]
   enhanced_rubrics_enabled?: boolean
   enhanced_rubrics_copy_to?: boolean
   rubric_imports_exports?: boolean

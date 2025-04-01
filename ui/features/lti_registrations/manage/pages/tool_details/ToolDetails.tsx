@@ -16,26 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useAppendBreadcrumb} from '@canvas/breadcrumbs/useAppendBreadcrumb'
+import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
+import {Pill} from '@instructure/ui-pill'
 import {Spinner} from '@instructure/ui-spinner'
+import {Tabs} from '@instructure/ui-tabs'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import * as React from 'react'
+import {Outlet, useMatch, useNavigate} from 'react-router-dom'
+import {matchApiResultState} from '../../../common/lib/apiResult/matchApiResultState'
 import {useApiResult} from '../../../common/lib/apiResult/useApiResult'
 import {useZodParams} from '../../../common/lib/useZodParams/useZodParams'
 import {fetchRegistrationWithAllInfoForId} from '../../api/registrations'
-import {AccountId} from '../../model/AccountId'
-import {LtiRegistration, LtiRegistrationWithAllInformation} from '../../model/LtiRegistration'
-import {LtiRegistrationId, ZLtiRegistrationId} from '../../model/LtiRegistrationId'
-import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
-import {Pill} from '@instructure/ui-pill'
-import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import {Tabs} from '@instructure/ui-tabs'
-import {Outlet, useMatch, useNavigate} from 'react-router-dom'
-import {matchApiResultState} from '../../../common/lib/apiResult/matchApiResultState'
-import {useAppendBreadcrumbsToDefaults} from '@canvas/breadcrumbs/useAppendBreadcrumbsToDefaults'
+import type {AccountId} from '../../model/AccountId'
+import {LtiRegistration, type LtiRegistrationWithAllInformation} from '../../model/LtiRegistration'
+import {type LtiRegistrationId, ZLtiRegistrationId} from '../../model/LtiRegistrationId'
 import {ltiToolDefaultIconUrl} from '../../model/ltiToolIcons'
 
 const I18n = createI18nScope('lti_registrations')
@@ -113,16 +113,7 @@ const ToolDetailsInner = ({
 
   const route = useToolDetailsRoute()
 
-  useAppendBreadcrumbsToDefaults([
-    {
-      name: I18n.t('Manage'),
-      url: `/accounts/${accountId}/apps/manage`,
-    },
-    {
-      name: registration.name,
-      url: `/accounts/${accountId}/apps/manage/${registration.id}`,
-    },
-  ])
+  useAppendBreadcrumb(registration.name, `/accounts/${accountId}/apps/manage/${registration.id}`)
 
   const onTabClick = React.useCallback(
     (_: any, tab: {id?: string}) => {

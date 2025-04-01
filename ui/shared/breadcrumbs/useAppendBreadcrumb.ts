@@ -17,15 +17,12 @@
  */
 
 import {useEffect} from 'react'
-import type {Breadcrumb} from './useBreadcrumbStore'
 import {useBreadcrumbStore} from './useBreadcrumbStore'
 
 /**
  * Appends breadcrumbs to the end of the current breadcrumb list. This is useful for dynamically adding
- * breadcrumbs to a page while using React Router to handle navigation.
- *
- * When using this component, you should also use `useAppendBreadcrumbsToDefaults` in the parent component
- * to set the default breadcrumbs and prevent the breadcrumbs from growing indefinitely.
+ * breadcrumbs to a page while using React Router to handle navigation. Cleanup, removal, and syncing is
+ * handled automatically by this hook.
  *
  * @example Imagine that you had a render tree like this, with routing controlled by React Router:
  * ```
@@ -44,44 +41,46 @@ import {useBreadcrumbStore} from './useBreadcrumbStore'
  * ```
  * Default > Home > Page2
  * ```
- * Then your components would use the two breadcrumbs hooks as so:
+ * Then your components would use this hook like so:
  * ```
  * const NestedPage = () => {
- *   useAppendBreadcrumbs([{ label: 'NestedPage', href: '/page1/nested' }])
+ *   useAppendBreadcrumb([{ label: 'NestedPage', href: '/page1/nested' }])
  *   // Everything else
  * }
 
  * const Page1 = () => {
- *   useAppendBreadcrumbs([{ label: 'Page1', href: '/page1' }])
+ *   useAppendBreadcrumb([{ label: 'Page1', href: '/page1' }])
  *   // Everything else
  * }
 
  * const Page2 = () => {
- *   useAppendBreadcrumbs([{ label: 'Page2', href: '/page2' }])
+ *   useAppendBreadcrumb([{ label: 'Page2', href: '/page2' }])
  *   // Everything else
  * }
 
  * const App = () => {
- *   useAppendBreadcrumbsToDefaults([{ label: 'Home', href: '/' }])
+ *   useAppendBreadcrumb([{ label: 'Home', href: '/' }])
  *   // Everything else
  * }
  * ```
- * The App component uses `useAppendBreadcrumbsToDefaults` to set the default breadcrumbs, and the other components
- * use `useAppendBreadcrumbs` to append their breadcrumbs as needed. Notice that we need to have one component that
- * sets the default breadcrumbs, otherwise, every navigation will append to the previous breadcrumbs, resulting in an
- * ever-growing list of breadcrumbs.
  *
- * @param breadcrumbs - The breadcrumbs to append to the default breadcrumbs.
+ * @param name - The name of the breadcrumb. This is the text that will be displayed in the breadcrumb.
+ * @param url - The URL of the breadcrumb. Because breadcrumbs can be arbitrarily nested, this URL *must* be provided, so
+ * that the breadcrumb can correctly link to the intended page. This ensures proper navigation within the application.
  * @param enabled - Whether or not to append the breadcrumbs. This is useful for conditionally appending breadcrumbs,
  * such as for gating changes behind a feature flag or only appending if data has been loaded from the server.
  *
  */
-export const useAppendBreadcrumbs = (breadcrumbs: Breadcrumb | Breadcrumb[], enabled = true) => {
-  const appendCrumbs = useBreadcrumbStore(s => s.appendBreadcrumbs)
+export const useAppendBreadcrumb = (name: string, url: string, enabled = true) => {
+  const {append, pop} = useBreadcrumbStore(s => ({
+    append: s.appendBreadcrumb,
+    pop: s.popBreadcrumb,
+  }))
 
   useEffect(() => {
     if (enabled) {
-      appendCrumbs(breadcrumbs)
+      append({name, url})
+      return pop
     }
-  }, [breadcrumbs, appendCrumbs, enabled])
+  }, [name, url, append, enabled, pop])
 }

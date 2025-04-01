@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,11 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Discover} from '@canvas/lti-apps/components/Discover'
-import React from 'react'
-import type {RouteObject} from 'react-router-dom'
+import {useMatch} from 'react-router-dom'
 
-export const DiscoverRoute: RouteObject = {
-  path: '/',
-  element: <Discover />,
+export type TopLevelPage = 'manage' | 'discover' | 'monitor'
+
+/**
+ * Returns what the current top level page is. Only usable on the account level
+ * Apps page.
+ */
+export const useTopLevelPage = (): TopLevelPage => {
+  const isManage = useMatch('/manage/*')
+  const isMonitor = useMatch('/monitor/*')
+
+  return isManage ? 'manage' : isMonitor ? 'monitor' : 'discover'
 }
