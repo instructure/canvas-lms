@@ -512,7 +512,7 @@ class Lti::ResourceLinksController < ApplicationController
   end
 
   def new_tool
-    @new_tool ||= ContextExternalTool.find_by(id: params[:context_external_tool_id])
+    @new_tool ||= Lti::ToolFinder.find_by(id: params[:context_external_tool_id])
   end
 
   def update_params

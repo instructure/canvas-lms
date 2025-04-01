@@ -160,7 +160,7 @@ module Lti::IMS
     end
 
     def tool
-      @tool ||= ContextExternalTool.active.find_by(id: params.require(:context_external_tool_id))
+      @tool ||= Lti::ToolFinder.find_by(scope: ContextExternalTool.active, id: params.require(:context_external_tool_id))
     end
 
     def scopes_matcher

@@ -104,7 +104,7 @@ class WebConference < ActiveRecord::Base
       errors.add(:settings, "settings[lti_settings][tool_id] must exist for LtiConference")
       return
     end
-    tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
+    tool = Lti::ToolFinder.from_id(tool_id, context)
     if tool.blank?
       errors.add(:settings, "settings[lti_settings][tool_id] must be a ContextExternalTool instance visible in context")
       return

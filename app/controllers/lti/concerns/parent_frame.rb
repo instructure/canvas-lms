@@ -49,7 +49,7 @@ module Lti::Concerns
 
       validate_parent_frame_context
 
-      tool = ContextExternalTool.find_by(id: parent_frame_context)
+      tool = Lti::ToolFinder.find_by(id: parent_frame_context)
 
       @parent_frame_origin =
         if !tool&.active? || !tool&.developer_key&.internal_service ||

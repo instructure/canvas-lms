@@ -1024,31 +1024,6 @@ class ContextExternalTool < ActiveRecord::Base
     developer_key_id == Lti::ToolFinder.from_content_tag(content_tag, context)&.developer_key_id
   end
 
-  def self.find_active_external_tool_by_consumer_key(consumer_key, context)
-    active.where(consumer_key:, context: Lti::ContextToolFinder.contexts_to_search(context)).first
-  end
-
-  def self.find_active_external_tool_by_client_id(client_id, context)
-    active.where(developer_key_id: client_id, context: Lti::ContextToolFinder.contexts_to_search(context)).first
-  end
-
-  def self.find_external_tool_by_id(id, context)
-    where(id:, context: Lti::ContextToolFinder.contexts_to_search(context)).first
-  end
-
-  def self.find_external_tool_client_id(id, context)
-    where(id:, context: Lti::ContextToolFinder.contexts_to_search(context)).pluck(:developer_key_id).map { Shard.global_id_for _1 }
-  end
-
-  scope :having_setting, lambda { |setting|
-                           if setting
-                             joins(:context_external_tool_placements)
-                               .where(context_external_tool_placements: { placement_type: setting })
-                           else
-                             all
-                           end
-                         }
-
   scope :placements, lambda { |*placements|
     if placements.present?
       scope = ContextExternalTool.where(
@@ -1099,25 +1074,6 @@ class ContextExternalTool < ActiveRecord::Base
       where(id: valid_tools)
     end
   }
-
-  def self.find_for(id, context, type, raise_error = true)
-    id = id[Api::ID_REGEX] if id.is_a?(String)
-    unless id.present?
-      if raise_error
-        raise ActiveRecord::RecordNotFound
-      else
-        return nil
-      end
-    end
-
-    context = context.context if context.is_a?(Group)
-
-    tool = context.context_external_tools.having_setting(type).active.where(id:).first
-    tool ||= ContextExternalTool.having_setting(type).active.where(context_type: "Account", context_id: context.account_chain_ids, id:).first
-    raise ActiveRecord::RecordNotFound if !tool && raise_error
-
-    tool
-  end
 
   scope :active, lambda {
     where.not(workflow_state: ["deleted", "disabled"])

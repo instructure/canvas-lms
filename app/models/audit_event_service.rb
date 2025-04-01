@@ -32,7 +32,7 @@ class AuditEventService
   # Returns enriched version of the audit events for aggregated API response (used by SG1)
   def enrich(audit_events)
     user_data = User.find(audit_events.pluck(:user_id).compact)
-    tool_data = ContextExternalTool.find(audit_events.pluck(:context_external_tool_id).compact)
+    tool_data = Lti::ToolFinder.find(audit_events.pluck(:context_external_tool_id).compact)
     quiz_data = Quizzes::Quiz.find(audit_events.pluck(:quiz_id).compact)
 
     {
