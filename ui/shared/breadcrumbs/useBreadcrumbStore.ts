@@ -29,8 +29,8 @@ export type Breadcrumb = {
 
 export interface BreadcrumbStoreActions {
   setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void
-  appendBreadcrumbsToDefaults: (breadcrumbs: Breadcrumb | Breadcrumb[]) => void
-  appendBreadcrumbs: (breadcrumbs: Breadcrumb | Breadcrumb[]) => void
+  appendBreadcrumb: (breadcrumb: Breadcrumb) => void
+  popBreadcrumb: () => void
   resetBreadcrumbs: () => void
 }
 /**
@@ -40,7 +40,6 @@ export interface BreadcrumbStoreActions {
  */
 const defaultBreadcrumbs = (): Breadcrumb[] => {
   if (window.ENV.breadcrumbs) {
-    // @ts-expect-error
     return window.ENV.breadcrumbs
   }
 
@@ -81,19 +80,17 @@ const defaultBreadcrumbs = (): Breadcrumb[] => {
 
 export const useBreadcrumbStore = create<{state: Breadcrumb[]} & BreadcrumbStoreActions>(set => ({
   state: defaultBreadcrumbs() ?? [],
-  appendBreadcrumbsToDefaults: breadcrumbs =>
-    set({
-      // @ts-expect-error
-      state: [
-        ...(window.ENV.breadcrumbs ?? []),
-        ...(Array.isArray(breadcrumbs) ? breadcrumbs : [breadcrumbs]),
-      ],
-    }),
-  appendBreadcrumbs: breadcrumbs =>
+  appendBreadcrumb: breadcrumb =>
     set(state => {
       return {
-        state: [...state.state, ...(Array.isArray(breadcrumbs) ? breadcrumbs : [breadcrumbs])],
+        state: [...state.state, breadcrumb],
       }
+    }),
+  popBreadcrumb: () =>
+    set(state => {
+      const newState = [...state.state]
+      newState.pop()
+      return {state: newState}
     }),
   setBreadcrumbs: breadcrumbs => set({state: breadcrumbs}),
   resetBreadcrumbs: () => set({state: defaultBreadcrumbs() ?? []}),
@@ -122,7 +119,7 @@ const syncBreadcrumbs = (crumbs: Breadcrumb[]) => {
 
     const span = document.createElement('span')
     span.className = 'ellipsible'
-    span.innerText = crumb.name
+    span.textContent = crumb.name
 
     if (index < crumbs.length - 1) {
       const a = document.createElement('a')

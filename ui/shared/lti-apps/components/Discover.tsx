@@ -16,34 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useMemo, useState} from 'react'
-import {useQuery} from '@tanstack/react-query'
-import {Alert} from '@instructure/ui-alerts'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import LtiFilterTray from './apps/LtiFilterTray'
-import FilterTags from './apps/FilterTags'
-import {fetchLtiFilters, fetchProducts, fetchToolsByDisplayGroups} from '../queries/productsQuery'
-import useDiscoverQueryParams from '../hooks/useDiscoverQueryParams'
-import useCreateScreenReaderFilterMessage from '../hooks/useCreateScreenReaderFilterMessage'
-import {useAppendBreadcrumbsToDefaults} from '@canvas/breadcrumbs/useAppendBreadcrumbsToDefaults'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
-import {ZAccountId} from '../models/AccountId'
-import Disclaimer from './common/Disclaimer'
+import {Alert} from '@instructure/ui-alerts'
+import {useQuery} from '@tanstack/react-query'
+import {useMemo, useState} from 'react'
+import useCreateScreenReaderFilterMessage from '../hooks/useCreateScreenReaderFilterMessage'
+import useDiscoverQueryParams from '../hooks/useDiscoverQueryParams'
+import {fetchLtiFilters, fetchProducts, fetchToolsByDisplayGroups} from '../queries/productsQuery'
+import FilterTags from './apps/FilterTags'
+import LtiFilterTray from './apps/LtiFilterTray'
 import {Products} from './apps/Products'
 import {SearchAndFilter} from './apps/SearchAndFilter'
-
-
-const I18n = createI18nScope('lti_registrations')
+import Disclaimer from './common/Disclaimer'
 
 export const Discover = () => {
-  const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
-  useAppendBreadcrumbsToDefaults([
-    {
-      name: I18n.t('Discover'),
-      url: `/accounts/${accountId}/apps`,
-    },
-  ])
-
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const {queryParams, setQueryParams, updateQueryParams} = useDiscoverQueryParams()
   const isFilterApplied = useMemo(
