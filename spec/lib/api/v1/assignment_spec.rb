@@ -211,6 +211,7 @@ describe "Api::V1::Assignment" do
     context "checkpoints" do
       context "not in-place" do
         it "json does not have has_sub_assignments and checkpoints when FF is turned off" do
+          assignment.course.account.disable_feature!(:discussion_checkpoints)
           json = api.assignment_json(assignment, user, session, { include_checkpoints: true })
           expect(json).not_to have_key "has_sub_assignments"
           expect(json).not_to have_key "checkpoints"

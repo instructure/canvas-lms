@@ -146,6 +146,11 @@ discussion_checkpoints:
     response and replies are then graded separately, and those grades are
     combined to form a final discussion grade.
   applies_to: Account
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
 
 inbox_settings:
   state: hidden

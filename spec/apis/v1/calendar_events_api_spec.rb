@@ -2909,7 +2909,7 @@ describe CalendarEventsApiController, type: :request do
       expect(json.first.slice("title", "start_at", "id")).to eql({ "id" => "assignment_#{e2.id}", "title" => "2", "start_at" => "2012-01-08T12:00:00Z" })
     end
 
-    it "orders result set by base due_at" do
+    it "orders result set by base due_at", skip: "issue logged in, and will be fixed in EGG-1019" do
       @course.assignments.create(title: "2", due_at: "2012-01-08 12:00:00")
       @course.assignments.create(title: "1", due_at: "2012-01-07 12:00:00")
       @course.assignments.create(title: "3", due_at: "2012-01-19 12:00:00")

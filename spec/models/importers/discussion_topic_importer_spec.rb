@@ -145,9 +145,9 @@ describe Importers::DiscussionTopicImporter do
     end
 
     context "when reply_to_entry_required_count is not present" do
-      before { data.delete(:reply_to_entry_required_count) }
-
       it "defaults to 0" do
+        context.account.disable_feature!(:discussion_checkpoints)
+        data.delete(:reply_to_entry_required_count)
         expect(subject.reply_to_entry_required_count).to eq(0)
       end
     end

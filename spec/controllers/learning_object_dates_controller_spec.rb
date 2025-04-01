@@ -62,7 +62,8 @@ describe LearningObjectDatesController do
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
                                    "all_day_date" => "2022-02-01",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -92,7 +93,8 @@ describe LearningObjectDatesController do
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
                                    "all_day_date" => "2022-02-01",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -119,7 +121,8 @@ describe LearningObjectDatesController do
                                    "context_module_name" => "module",
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -158,7 +161,8 @@ describe LearningObjectDatesController do
                                    "lock_at" => "2022-04-07T12:00:00Z",
                                    "all_day" => false,
                                    "all_day_date" => "2022-04-06",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -197,7 +201,8 @@ describe LearningObjectDatesController do
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
                                    "lock_at" => "2022-01-04T12:00:00Z",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -261,7 +266,6 @@ describe LearningObjectDatesController do
 
       get :show, params: { course_id: @course.id, discussion_topic_id: discussion.id }
       expect(response).to be_successful
-
       expect(json_parse).to eq({
                                  "id" => discussion.id,
                                  "unlock_at" => "2022-01-05T12:00:00Z",
@@ -277,7 +281,8 @@ describe LearningObjectDatesController do
                                      "title" => override.title,
                                      "course_section_id" => section1.id,
                                      "lock_at" => "2022-01-04T12:00:00Z",
-                                     "unassign_item" => false
+                                     "unassign_item" => false,
+                                     "sub_assignment_due_dates" => []
                                    },
                                    {
                                      "discussion_topic_id" => discussion.id,
@@ -312,7 +317,8 @@ describe LearningObjectDatesController do
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
                                    "unlock_at" => "2022-01-04T00:00:00Z",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -351,7 +357,8 @@ describe LearningObjectDatesController do
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
                                    "unlock_at" => "2022-01-07T00:00:00Z",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -509,7 +516,8 @@ describe LearningObjectDatesController do
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
                                    "unlock_at" => "2022-01-04T00:00:00Z",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -536,7 +544,8 @@ describe LearningObjectDatesController do
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
                                    "all_day_date" => "2022-02-01",
-                                   "unassign_item" => true
+                                   "unassign_item" => true,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -725,7 +734,8 @@ describe LearningObjectDatesController do
                                        "due_at" => "2022-02-01T01:00:00Z",
                                        "all_day" => false,
                                        "all_day_date" => "2022-02-01",
-                                       "unassign_item" => false
+                                       "unassign_item" => false,
+                                       "sub_assignment_due_dates" => []
                                      },
                                      {
                                        "id" => override2.id,
@@ -738,6 +748,7 @@ describe LearningObjectDatesController do
                                        "group_id" => @group.id,
                                        "non_collaborative" => true,
                                        "group_category_id" => @group.group_category.id,
+                                       "sub_assignment_due_dates" => []
                                      }
                                    ]
                                  })
