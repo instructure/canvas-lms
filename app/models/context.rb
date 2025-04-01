@@ -224,7 +224,7 @@ module Context
 
     res = nil
     if context && klass == ContextExternalTool
-      res = klass.find_external_tool_by_id(id, context)
+      res = Lti::ToolFinder.from_id(id, context)
     elsif context && (klass.column_names & ["context_id", "context_type"]).length == 2
       res = klass.where(context:, id:).first
     else
@@ -288,7 +288,7 @@ module Context
                    ).active.take&.current_external_tool(context)
                  end
       elsif params[:id]
-        object = ContextExternalTool.find_external_tool_by_id(params[:id], context)
+        object = Lti::ToolFinder.from_id(params[:id], context)
       end
     when "context_modules"
       object = if %w[item_redirect item_redirect_mastery_paths choose_mastery_path].include?(params[:action])

@@ -1483,7 +1483,7 @@ class UsersController < ApplicationController
   def external_tool
     timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     placement = :user_navigation
-    @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, placement)
+    @tool = Lti::ToolFinder.from_id!(params[:id], @domain_root_account, placement:)
     @opaque_id = @tool.opaque_identifier_for(@current_user, context: @domain_root_account)
     @resource_type = "user_navigation"
 

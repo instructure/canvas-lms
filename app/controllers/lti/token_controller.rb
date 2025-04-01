@@ -68,7 +68,7 @@ class Lti::TokenController < ApplicationController
     @key ||= if params[:client_id]
                DeveloperKey.find params.require(:client_id)
              else
-               ContextExternalTool.find(params.require(:tool_id)).developer_key
+               Lti::ToolFinder.find(params.require(:tool_id)).developer_key
              end
   end
 

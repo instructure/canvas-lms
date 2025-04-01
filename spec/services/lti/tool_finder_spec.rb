@@ -24,6 +24,305 @@ describe Lti::ToolFinder do
     course_model(account: @account)
   end
 
+  describe ".find_by" do
+    subject { Lti::ToolFinder.find_by(id:, scope:) }
+
+    let(:tool) { external_tool_1_3_model(context: @course) }
+    let(:id) { tool.id }
+    let(:scope) { nil }
+
+    it "finds the tool by id" do
+      expect(subject).to eq tool
+    end
+
+    context "when the tool is not found" do
+      let(:id) { nil }
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "with scope" do
+      let(:scope) { ContextExternalTool.active }
+
+      context "when tool is in scope" do
+        it "finds the tool" do
+          expect(subject).to eq tool
+        end
+      end
+
+      context "when tool is not in scope" do
+        before do
+          tool.destroy
+        end
+
+        it "returns nil" do
+          expect(subject).to be_nil
+        end
+      end
+    end
+  end
+
+  describe ".find" do
+    subject { Lti::ToolFinder.find(id, scope:) }
+
+    let(:tool) { external_tool_1_3_model(context: @course) }
+    let(:id) { tool.id }
+    let(:scope) { nil }
+
+    it "finds the tool by id" do
+      expect(subject).to eq tool
+    end
+
+    context "when the tool is not found" do
+      let(:id) { nil }
+
+      it "raises an error" do
+        expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context "with scope" do
+      let(:scope) { ContextExternalTool.active }
+
+      context "when tool is in scope" do
+        it "finds the tool" do
+          expect(subject).to eq tool
+        end
+      end
+
+      context "when tool is not in scope" do
+        before do
+          tool.destroy
+        end
+
+        it "raises an error" do
+          expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
+        end
+      end
+    end
+  end
+
+  describe ".from_context" do
+    subject { Lti::ToolFinder.from_context(@course, scope:) }
+
+    let(:scope) { ContextExternalTool.where(consumer_key:) }
+    let(:tool) { external_tool_1_3_model(context: @course) }
+    let(:consumer_key) { "test" }
+
+    before do
+      tool.update!(consumer_key:)
+    end
+
+    it "returns the first tool it finds" do
+      expect(subject).to eq tool
+    end
+
+    context "when there is no matching tool" do
+      before do
+        tool.update!(consumer_key: "other")
+      end
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "when tool is installed up the context chain" do
+      let(:tool) { external_tool_1_3_model(context: @course.account) }
+
+      it "returns the tool" do
+        expect(subject).to eq tool
+      end
+    end
+  end
+
+  describe ".from_id!" do
+    # moved directly from ContextExternalTool#find_for
+    def new_external_tool(context)
+      context.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "google.com")
+    end
+
+    it "finds the tool if it's attached to the course" do
+      tool = new_external_tool @course
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
+      tool.save!
+      expect(Lti::ToolFinder.from_id!(tool.id, @course, placement: :course_navigation)).to eq tool
+      expect { Lti::ToolFinder.from_id!(tool.id, @course, placement: :user_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "finds the tool if it's attached to the course's account" do
+      tool = new_external_tool @course.account
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
+      tool.save!
+      expect(Lti::ToolFinder.from_id!(tool.id, @course, placement: :course_navigation)).to eq tool
+      expect { Lti::ToolFinder.from_id!(tool.id, @course, placement: :user_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "finds the tool if it's attached to the course's root account" do
+      tool = new_external_tool @course.root_account
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
+      tool.save!
+      expect(Lti::ToolFinder.from_id!(tool.id, @course, placement: :course_navigation)).to eq tool
+      expect { Lti::ToolFinder.from_id!(tool.id, @course, placement: :user_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "does not find the tool if it's attached to a sub-account" do
+      @account = @course.account.sub_accounts.create!(name: "sub-account")
+      tool = new_external_tool @account
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
+      tool.save!
+      expect { Lti::ToolFinder.from_id!(tool.id, @course, placement: :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "does not find the tool if it's attached to another course" do
+      @course2 = @course
+      @course = course_model
+      tool = new_external_tool @course2
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
+      tool.save!
+      expect { Lti::ToolFinder.from_id!(tool.id, @course, placement: :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "does not find the tool if it's not enabled for the correct navigation type" do
+      tool = new_external_tool @course
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
+      tool.save!
+      expect { Lti::ToolFinder.from_id!(tool.id, @course, placement: :user_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "raises RecordNotFound if the id is invalid" do
+      expect { Lti::ToolFinder.from_id!("horseshoes", @course, placement: :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "does not find a course tool with workflow_state deleted" do
+      tool = new_external_tool @course
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
+      tool.workflow_state = "deleted"
+      tool.save!
+      expect { Lti::ToolFinder.from_id!(tool.id, @course, placement: :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "does not find an account tool with workflow_state deleted" do
+      tool = new_external_tool @account
+      tool.account_navigation = { url: "http://www.example.com", text: "Example URL" }
+      tool.workflow_state = "deleted"
+      tool.save!
+      expect { Lti::ToolFinder.from_id!(tool.id, @account, placement: :account_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    context 'when the workflow state is "disabled"' do
+      let(:tool) do
+        tool = new_external_tool @account
+        tool.account_navigation = { url: "http://www.example.com", text: "Example URL" }
+        tool.workflow_state = "disabled"
+        tool.save!
+        tool
+      end
+
+      it "does not find an account tool with workflow_state disabled" do
+        expect { Lti::ToolFinder.from_id!(tool.id, @account, placement: :account_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      context "when the tool is installed in a course" do
+        let(:tool) do
+          tool = new_external_tool @course
+          tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
+          tool.workflow_state = "disabled"
+          tool.save!
+          tool
+        end
+
+        it "does not find a course tool with workflow_state disabled" do
+          expect { Lti::ToolFinder.from_id!(tool.id, @course, placement: :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+        end
+      end
+    end
+
+    context "error handling" do
+      subject { Lti::ToolFinder.from_id!(id, context) }
+
+      let(:context) { @course }
+
+      context "with invalid id" do
+        let(:id) { (ContextExternalTool.last&.id || 0) + 1 }
+
+        it "raises RecordNotFound" do
+          expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
+        end
+      end
+
+      context "with nil id" do
+        let(:id) { nil }
+
+        it "raises RecordNotFound" do
+          expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
+        end
+      end
+    end
+  end
+
+  describe ".from_id" do
+    subject { Lti::ToolFinder.from_id(id, context) }
+
+    let(:context) { @course }
+
+    context "with invalid id" do
+      let(:id) { (ContextExternalTool.last&.id || 0) + 1 }
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "with nil id" do
+      let(:id) { nil }
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "with cross-shard query" do
+      specs_require_sharding
+
+      let(:cross_shard_account) { @shard2.activate { account_model } }
+      let(:cross_shard_course) { @shard2.activate { course_model(account: cross_shard_account) } }
+      let(:should_raise) { false }
+      let(:context) { cross_shard_course }
+      let(:id) { tool.id }
+
+      context "and tool directly in context" do
+        let(:tool) { @shard2.activate { external_tool_model(context: cross_shard_course) } }
+
+        before { tool }
+
+        it "finds tool" do
+          expect(subject).to eq tool
+        end
+
+        context "with context on wrong shard" do
+          let(:context) { course_model }
+
+          it "does not find tool" do
+            expect(subject).to be_nil
+          end
+        end
+      end
+
+      context "and tool in context chain" do
+        let(:tool) { @shard2.activate { external_tool_model(context: cross_shard_account) } }
+
+        before { tool }
+
+        it "finds tool" do
+          expect(subject).to eq tool
+        end
+      end
+    end
+  end
+
   describe ".from_assignment" do
     let(:tool) do
       @course.context_external_tools.create(
@@ -790,6 +1089,7 @@ describe Lti::ToolFinder do
 
     context "with different LTI versions" do
       before do
+        tool1.destroy_permanently!
         tool3.developer_key_id = key.id
         tool3.lti_version = "1.3"
         tool3.save!
@@ -809,7 +1109,7 @@ describe Lti::ToolFinder do
         end
 
         it "sorts 1.1 tools to the front and 1.3 tools to the back" do
-          expect(subject.first).to eq tool1
+          expect(subject.first).to eq tool2
           expect(subject.last).to eq tool3
         end
       end

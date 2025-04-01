@@ -62,7 +62,7 @@ module Lti::IMS::Concerns
     end
 
     def tool
-      @tool ||= ContextExternalTool.find_active_external_tool_by_client_id(client_id, @context)
+      @tool ||= Lti::ToolFinder.from_context(@context, scope: ContextExternalTool.active.where(developer_key_id: client_id))
     end
 
     def replace_editor_contents?

@@ -44,9 +44,8 @@ class Lti::AssetProcessor < ApplicationRecord
 
   # Should match up with UI's AssetProcessorContentItemDto
   def self.build_for_assignment(content_item:, context:)
-    tool_base_scope = ContextExternalTool.where(id: content_item["context_external_tool_id"].to_i)
     # Check tool is in the course or account:
-    tool = Lti::ContextToolFinder.all_tools_scope_union(context, base_scope: tool_base_scope).take
+    tool = Lti::ToolFinder.from_id(content_item["context_external_tool_id"], context)
 
     return nil unless tool
 
