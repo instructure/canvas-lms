@@ -208,6 +208,16 @@ describe Pseudonym do
         expect(@pseudonym.auditor_records.where(action: "deleted", performing_user: performing_user.id)).to exist
       end
     end
+
+    context "with additional arguments" do
+      let(:pseudonym) { pseudonym_model }
+
+      it "passes additional arguments to #save" do
+        expect(pseudonym).to receive(:save).with(validate: false)
+
+        pseudonym.destroy(custom_deleted_at: Time.now.utc, validate: false)
+      end
+    end
   end
 
   it "allows deleting system-generated pseudonyms" do
