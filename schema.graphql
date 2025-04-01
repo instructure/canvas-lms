@@ -437,6 +437,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   id: ID!
   importantDates: Boolean
   inClosedGradingPeriod: Boolean
+  isLockedByMasterCourse: Boolean!
 
   """
   the lock date (assignment is locked after this date)
@@ -2904,6 +2905,7 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
     roleTypes: [String!]
   ): User
   availableForUser: Boolean!
+  canDuplicate: Boolean
   canGroup: Boolean
   canReplyAnonymously: Boolean!
   canUnpublish: Boolean!
@@ -2985,6 +2987,7 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
   initialPostRequiredForCurrentUser: Boolean!
   isAnnouncement: Boolean!
   isAnonymousAuthor: Boolean
+  isLockedByMasterCourse: Boolean!
   isSectionSpecific: Boolean
   lastReplyAt: DateTime
   lockAt: DateTime
@@ -3572,6 +3575,7 @@ type ExternalTool implements LegacyIDInterface & ModuleItemInterface & Timestamp
   legacy canvas id
   """
   _id: ID!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
@@ -3579,6 +3583,7 @@ type ExternalTool implements LegacyIDInterface & ModuleItemInterface & Timestamp
   canUnpublish: Boolean
   createdAt: DateTime
   description: String
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   name: String
   pointsPossible: Float
@@ -3673,13 +3678,16 @@ type ExternalUrl implements LegacyIDInterface & ModuleItemInterface & Timestampe
   legacy canvas id
   """
   _id: ID!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
   """
   canUnpublish: Boolean
   createdAt: DateTime
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
+  newTab: Boolean
   pointsPossible: Float
 
   """
@@ -3697,6 +3705,7 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   legacy canvas id
   """
   _id: ID!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
@@ -3706,6 +3715,7 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   createdAt: DateTime
   displayName: String
   id: ID!
+  isLockedByMasterCourse: Boolean!
   mimeClass: String
   modules: [Module!]
   pointsPossible: Float
@@ -4754,8 +4764,18 @@ type Module implements LegacyIDInterface & Node & Timestamped {
   moduleItems: [ModuleItem!]
   name: String
   position: Int
+  prerequisites: [ModulePrerequisite!]
+  published: Boolean
+  requirementCount: Int
   unlockAt: DateTime
   updatedAt: DateTime
+}
+
+type ModuleCompletionRequirement {
+  id: ID!
+  minPercentage: Float
+  minScore: Float
+  type: String!
 }
 
 """
@@ -4798,12 +4818,14 @@ type ModuleExternalTool implements LegacyIDInterface & ModuleItemInterface & Tim
   legacy canvas id
   """
   _id: ID!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
   """
   canUnpublish: Boolean
   createdAt: DateTime
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   pointsPossible: Float
 
@@ -4922,10 +4944,13 @@ type ModuleItemEdge {
 An item that can be in context modules
 """
 interface ModuleItemInterface {
+  canDuplicate: Boolean
+
   """
   Whether the module item can be unpublished
   """
   canUnpublish: Boolean
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   pointsPossible: Float
 
@@ -4935,6 +4960,12 @@ interface ModuleItemInterface {
   published: Boolean
   title: String
   type: String
+}
+
+type ModulePrerequisite {
+  id: ID!
+  name: String!
+  type: String!
 }
 
 type ModuleProgression {
@@ -5813,6 +5844,7 @@ type Page implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   legacy canvas id
   """
   _id: ID!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
@@ -5820,6 +5852,7 @@ type Page implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   canUnpublish: Boolean
   createdAt: DateTime
   id: ID!
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   pointsPossible: Float
 
@@ -6376,6 +6409,8 @@ type Quiz implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   legacy canvas id
   """
   _id: ID!
+  anonymousSubmissions: Boolean!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
@@ -6383,6 +6418,7 @@ type Quiz implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   canUnpublish: Boolean
   createdAt: DateTime
   id: ID!
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   pointsPossible: Float
 
@@ -7041,10 +7077,13 @@ type SubAssignmentSubmission {
 }
 
 type SubHeader implements ModuleItemInterface {
+  canDuplicate: Boolean
+
   """
   Whether the module item can be unpublished
   """
   canUnpublish: Boolean
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   pointsPossible: Float
 
