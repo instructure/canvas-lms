@@ -61,7 +61,9 @@ export const ZLtiRegistrationWithAllInformation = ZLtiRegistrationWithConfigurat
   overlaid_configuration: ZInternalLtiConfiguration,
   overlay: ZLtiOverlay.extend({
     versions: z.array(ZLtiOverlayVersion),
-  }),
+  })
+    .nullable()
+    .optional(),
 })
 
 export type LtiRegistrationWithAllInformation = z.infer<typeof ZLtiRegistrationWithAllInformation>
