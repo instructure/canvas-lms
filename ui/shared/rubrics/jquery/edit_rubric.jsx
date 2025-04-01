@@ -1316,7 +1316,7 @@ rubricEditing.init = function () {
 
     const addTitleError = () => {
       $rubric.find('.rubric_title .title_error_message').css('display', 'inline-flex')
-      $rubric.find('.rubric_title [name="title"]').css('border', '1px solid #D01A19')
+      $rubric.find('.rubric_title [name="title"]').css('border', '1px solid #AE1B1F')
     }
 
     const validTitle = () => {
