@@ -111,7 +111,8 @@ module UserLearningObjectScopes
     contexts: nil,
     include_concluded: false,
     include_ignored: false,
-    include_ungraded: false
+    include_ungraded: false,
+    discussion_checkpoints_enabled: false
   )
     original_shard = Shard.current
     shard.activate do
@@ -140,6 +141,7 @@ module UserLearningObjectScopes
               shard_course_ids,
               shard_group_ids,
               participation_type,
+              discussion_checkpoints_enabled:,
               include_ignored:,
               include_ungraded:
             ))
@@ -161,6 +163,7 @@ module UserLearningObjectScopes
                   shard_hash[:course_ids],
                   shard_hash[:group_ids],
                   participation_type,
+                  discussion_checkpoints_enabled:,
                   include_ignored:,
                   include_ungraded:
                 ))
@@ -180,6 +183,7 @@ module UserLearningObjectScopes
     shard_course_ids,
     shard_group_ids,
     participation_type,
+    discussion_checkpoints_enabled: false,
     include_ignored: false,
     include_ungraded: false
   )
@@ -192,11 +196,8 @@ module UserLearningObjectScopes
     if ["Assignment", "SubAssignment"].include?(object_type)
       scope = (participation_type == :student) ? scope.published : scope.active
       scope = scope.expecting_submission unless include_ungraded
-
-      # if we are looking at Assignments and not SubAssignments, we need to make sure
-      # parent Assignments are excluded if they have discussion checkpoints enabled
-      if object_type == "Assignment"
-        scope = scope.for_course(courses_with_checkpoints_disabled(shard_course_ids).map(&:id))
+      if object_type == "Assignment" && discussion_checkpoints_enabled
+        scope = scope.where(has_sub_assignments: false)
       end
     end
     [scope, shard_course_ids, shard_group_ids]
@@ -204,10 +205,6 @@ module UserLearningObjectScopes
 
   def courses_with_checkpoints_enabled(course_ids)
     Course.where(id: course_ids).select(&:discussion_checkpoints_enabled?)
-  end
-
-  def courses_with_checkpoints_disabled(course_ids)
-    Course.where(id: course_ids).reject(&:discussion_checkpoints_enabled?)
   end
 
   def assignments_for_student(
@@ -369,7 +366,7 @@ module UserLearningObjectScopes
               ).count
   end
 
-  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, is_sub_assignment: false, **opts)
+  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, is_sub_assignment: false, discussion_checkpoints_enabled: false, **opts)
     if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
       scope = is_sub_assignment ? SubAssignment.none : Assignment.none
       return scope_only ? scope : []
