@@ -54,7 +54,7 @@
           <span id="speed_grader_settings_mount_point"></span>
         </div>
         <div class="assignmentDetails">
-          <a id="assignment_url" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>">
+          <a id="assignment_url" role="button" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>">
             <h2 class="assignmentDetails__Title"><%= @assignment.title %></h2>
           </a>
           <p class="assignmentDetails__Info">
