@@ -539,7 +539,7 @@ describe "profile" do
     account.settings[:enable_profiles] = true
     account.save!
     get "/profile"
-    expect(fj("h1:contains('User Profile')").attribute("class")).to eq "screenreader-only"
+    expect(fj("h1:contains('User Profile')")).to be_displayed
   end
 
   it "renders empty state messages when missing information in profile" do
