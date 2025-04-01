@@ -52,6 +52,8 @@ export default function SisImportForm(props: Props) {
   const [clearChecked, setClearChecked] = useState(false)
   const [termId, setTermId] = useState('')
 
+  const fileRef = useRef<HTMLInputElement | null>(null)
+
   const fullBatchWarning = I18n.t(
     'If selected, this will delete everything for this term, which includes all courses and enrollments that are not in the selected import file above. See the documentation for details.',
   )
@@ -145,8 +147,7 @@ export default function SisImportForm(props: Props) {
       return true
     } else {
       setMessage(I18n.t('Please upload a CSV or ZIP file.'))
-      // fileRef.current?.focus()
-      // waiting on v9.11 (see FOO-5237)
+      fileRef.current?.focus()
       return false
     }
   }
@@ -214,6 +215,9 @@ export default function SisImportForm(props: Props) {
     <>
       <Flex id="sis_import_form" as="form" gap="medium" direction="column">
         <FileDrop
+          inputRef={(ref: HTMLInputElement | null) => {
+            fileRef.current = ref
+          }}
           id="choose_a_file_to_import"
           data-testid="file_drop"
           name="attachment"
@@ -229,7 +233,12 @@ export default function SisImportForm(props: Props) {
           renderLabel={
             <Flex padding="medium" direction="column" gap="x-small" alignItems="center">
               <IconUploadSolid size="medium" />
-              <Text>{I18n.t('Choose a file to import')}</Text>
+              <Flex gap="xx-small">
+                <Text>{I18n.t('Choose a file to import')}</Text>
+                <Text weight="bold" color={message === '' ? 'primary' : 'danger'}>
+                  *
+                </Text>
+              </Flex>
               <Text size="small" fontStyle="italic">
                 {file && !(file instanceof DataTransferItem) ? file.name : ''}
               </Text>
