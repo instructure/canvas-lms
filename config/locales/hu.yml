@@ -9505,6 +9505,7 @@ hu:
                 újrafelhasználásának megakadályozása érdekében).
   does_not_meet_expectations_b0736d20: "Nem teljesíti az elvárásokat"
   domain_3b54c511: Tartomány
+  domain_69fe564b: "Tartomány:"
   domain_editing_is_disabled_when_security_settings__3feb6da0: "A domain szerkesztése le van tiltva, ha a biztonsági beállításokat a szülőfióktól örökölték."
   domain_is_required_1d4c8b25: "A tartomány megadása kötelező"
   domain_lookups_d66bc148: "Domain keresések"
@@ -16904,6 +16905,7 @@ hu:
   next_month_749b1778: "Következő hónap"
   next_month_b55a387c: "Következő hónap"
   next_outcome_fe0a9299: "Következő eredmény"
+  next_page_7291376d: "Következő oldal"
   next_page_d2a39853: "Következő oldal"
   next_peer_review_3d05ef23: "Következő társértékelés"
   next_question_f37bac25: "Következő kérdés"
@@ -16952,6 +16954,7 @@ hu:
   no_courses_to_display_700f94c4: "Nincsenek megjelenítendő kurzusok"
   no_date_bfeb2df7: "Nincs dátum"
   no_date_set_25edf0c1: "Nincs dátum beállítva"
+  no_description_44c9c3f2: "Nincs leírás"
   no_description_c2554c25: "Nincs leírás"
   no_details_1ee29870: "Nincsenek részletek"
   no_details_d15fa1ec: "Nincs részlet"
@@ -17051,6 +17054,7 @@ hu:
   no_template_accounts_in_this_region_5e84955d: "Nincsenek sablon fiókok ebben a régióban"
   no_template_selected_f59e797: "Nincs kiválasztott sablon"
   no_terms_eab5ee7b: "Nincsenek félévek"
+  no_text_8ecc1274: "Nincs szöveg"
   no_time_limit_for_long_running_conferences_d49fdfad: "Nincs időkorlát (hosszú konferenciákhoz)"
   no_tls_618add1a: "Nincs TLS"
   no_unassigned_terms_deb7b76b: "Nincs hozzárendeletlen félév"
@@ -18996,6 +19000,7 @@ hu:
   previous_month_7adf1380: "Előző hónap"
   previous_month_bb1e3c84: "Előző hónap"
   previous_outcome_e05a5c3: "Előző tanulási eredmény"
+  previous_page_32bd6e2c: "Előző oldal"
   previous_page_928fc112: "Előző oldal"
   previous_question_162c4048: "Előző kérdés"
   previous_snapshots_d8cd4820: "Előző képernyőképek"
@@ -24117,6 +24122,7 @@ hu:
   support_all_lti_postmessages_from_within_active_rc_8954bc83: "Minden LTI postMessage támogatása aktív RCE-n belülről"
   support_exporting_new_quizzes_in_qti_format_ba09b465: "Új kvízek exportálásának támogatása QTI formátumban"
   support_sharing_settings_4ad422d8: "Támogatás Megosztási beállítások"
+  supported_file_types_srt_or_webvtt_7d827ed: "Támogatott fájltípusok: SRT vagy WebVTT"
   supported_file_types_vtt_srt_8cb75c13: "Támogatott fájltípusok:"
   suspend_db764978: Felfüggesztés
   suspend_user_e19fa489: "Felhasználó felfüggesztése"
