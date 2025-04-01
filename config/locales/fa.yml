@@ -9308,6 +9308,7 @@ fa:
   docviewer_strikeout_updated_f06aec74: "ابطال مستندساز به هنگام سازی شد"
   does_not_meet_expectations_b0736d20: "مطابق با انتظارات نیست"
   domain_3b54c511: دامنه
+  domain_69fe564b: "دامنه:"
   domain_is_required_1d4c8b25: "دامنه لازم است"
   domain_lookups_d66bc148: "جستجوی دامنه"
   domain_lookups_for_account_54e321a3: " جستجوی دامنه %{account}"
@@ -16509,6 +16510,7 @@ fa:
   no_courses_to_display_700f94c4: "هیچ دوره ای برای نمایش وجود ندارد"
   no_date_bfeb2df7: "تاریخ موجود نیست"
   no_date_set_25edf0c1: "تاریخ تعیین نشده است"
+  no_description_44c9c3f2: "شرح موجود نیست"
   no_description_c2554c25: "شرح موجود نیست"
   no_details_1ee29870: "اطلاعات بیشتر موجود نیست"
   no_details_d15fa1ec: "اطلاعات بیشتر موجود نیست"
@@ -16587,6 +16589,7 @@ fa:
   no_teacher_interaction_de8d91bc: "استاد تعامل نداشته است"
   no_template_selected_f59e797: "هیچ الگویی انتخاب نشده است"
   no_terms_eab5ee7b: "نیمسال موجود نیست"
+  no_text_8ecc1274: "متن موجود نیست"
   no_time_limit_for_long_running_conferences_d49fdfad: "بدون محدودیت زمانی (برای کنفرانس های طولانی مدت)"
   no_tls_618add1a: "TLS موجود نیست"
   no_unassigned_terms_deb7b76b: "هیچ نیمسال تخصیص داده نشده"

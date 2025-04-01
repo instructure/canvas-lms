@@ -6846,6 +6846,7 @@ uk:
   do_nothing_9672b478: "Нічого не робити"
   does_not_meet_expectations_b0736d20: "Не відповідає очікуванням"
   domain_3b54c511: Домен
+  domain_69fe564b: "Домен:"
   domain_is_required_1d4c8b25: "Домен обов'язковий"
   dominican_republic_1_3cef4021: "Домініканська Республіка (+1)"
   don_t_add_this_user_for_now_32912974: "Не додавати цього користувача зараз."
@@ -11954,6 +11955,7 @@ uk:
   no_courses_found_12d68a74: "Жодного курсу не знайдено"
   no_date_bfeb2df7: "Дата відсутня"
   no_date_set_25edf0c1: "Немає встановленої дати"
+  no_description_44c9c3f2: "Опис відсутній"
   no_description_c2554c25: "Опис відсутній"
   no_details_1ee29870: "Ніяких подробиць"
   no_directory_is_selected_please_select_a_directory_46ded46: "Жодна папка не вибрана, будь ласка, оберіть папку до того, як натиснете 'переміститися'"
@@ -12002,6 +12004,7 @@ uk:
   no_submission_for_assignment_a9cb6fe2: "Відсутній матеріал для %{assignment}"
   no_teacher_interaction_de8d91bc: "Відсутня взаємодія з викладачем"
   no_terms_eab5ee7b: "Немає термінів"
+  no_text_8ecc1274: "Текст відсутній"
   no_time_limit_for_long_running_conferences_d49fdfad: "Немає обмеження часу (для тривалих конференцій)"
   no_tls_618add1a: "Немає TLS"
   no_unassigned_terms_deb7b76b: "Немає невизначених термінів"
