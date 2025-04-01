@@ -189,10 +189,7 @@ module UserLearningObjectScopes
   )
     scope = object_type.constantize
     scope = scope.not_ignored_by(self, purpose) unless include_ignored
-
-    scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz"].include?(object_type)
-    scope = scope.for_course(courses_with_checkpoints_enabled(shard_course_ids).map(&:id)) if object_type == "SubAssignment"
-
+    scope = scope.for_course(shard_course_ids) if ["Assignment", "SubAssignment", "Quizzes::Quiz"].include?(object_type)
     if ["Assignment", "SubAssignment"].include?(object_type)
       scope = (participation_type == :student) ? scope.published : scope.active
       scope = scope.expecting_submission unless include_ungraded
@@ -201,10 +198,6 @@ module UserLearningObjectScopes
       end
     end
     [scope, shard_course_ids, shard_group_ids]
-  end
-
-  def courses_with_checkpoints_enabled(course_ids)
-    Course.where(id: course_ids).select(&:discussion_checkpoints_enabled?)
   end
 
   def assignments_for_student(
