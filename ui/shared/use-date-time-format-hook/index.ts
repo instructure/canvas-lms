@@ -20,7 +20,25 @@ import {useCallback, useMemo} from 'react'
 
 const DEFAULT_FORMAT = 'time.formats.default'
 
-const optionsList = {
+type AvailableFormats =
+  | 'time.formats.default'
+  | 'time.formats.medium'
+  | 'time.formats.short'
+  | 'date.formats.full'
+  | 'date.formats.date_at_time'
+  | 'date.formats.long'
+  | 'date.formats.long_with_weekday'
+  | 'date.formats.full_with_weekday'
+  | 'date.formats.medium_with_weekday'
+  | 'date.formats.short_with_weekday'
+  | 'date.formats.short'
+  | 'date.formats.short_with_time'
+  | 'date.formats.full_compact'
+  | 'date.formats.compact'
+
+type OptionsList = Readonly<Record<AvailableFormats, Intl.DateTimeFormatOptions>>
+
+const optionsList: OptionsList = Object.freeze({
   'time.formats.default': {
     // ddd, D MMM YYYY HH:mm:ss Z
     weekday: 'short',
@@ -117,23 +135,29 @@ const optionsList = {
     month: 'numeric',
     year: 'numeric',
   },
-}
+})
 
-Object.keys(optionsList).forEach(x => Object.freeze(optionsList[x]))
-Object.freeze(optionsList)
-
-export default function useDateTimeFormat(formatName, timeZone, locale) {
-  locale = locale || ENV?.LOCALE || navigator.language
+export default function useDateTimeFormat(
+  formatName: AvailableFormats | undefined,
+  providedTimeZone?: string,
+  providedLocale?: string,
+): (date: Date | string | null) => string {
+  let locale = providedLocale || ENV?.LOCALE || navigator.language
   if (locale === 'fr-CA') locale = 'fr-QB' // Français québécois time formatting is more like we want
-  timeZone = timeZone || ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone
+  const timeZone =
+    providedTimeZone || ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone
 
   const formatter = useMemo(() => {
-    const options = {...(optionsList[formatName] || optionsList[DEFAULT_FORMAT])}
-    return new Intl.DateTimeFormat(locale, {...options, timeZone})
+    // In a fully TypeScript world, formatName is guaranteed to be a key of optionsList
+    // but since this can be called from straight JS, we need to check
+    const desiredFormat = Object.keys(optionsList).includes(formatName ?? '')
+      ? formatName!
+      : DEFAULT_FORMAT
+    return new Intl.DateTimeFormat(locale, {...optionsList[desiredFormat], timeZone})
   }, [formatName, locale, timeZone])
 
   return useCallback(
-    date => {
+    (date: Date | string | null): string => {
       try {
         if (date === null) return ''
         return formatter.format(date instanceof Date ? date : new Date(date))
