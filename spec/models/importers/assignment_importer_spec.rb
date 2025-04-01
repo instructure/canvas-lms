@@ -1615,6 +1615,10 @@ describe "Importing assignments" do
     end
 
     context "when the discussion_checkpoints feature flag is off" do
+      before do
+        account.disable_feature!(:discussion_checkpoints)
+      end
+
       it "does not import sub assignments" do
         expect(subject.sub_assignments.length).to eq(0)
       end
