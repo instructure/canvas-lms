@@ -65,7 +65,7 @@ $shamrock: #03893D; // green
 $barney: #BF32A4; // magenta
 
 @if $use_high_contrast {
-  $barney: #B8309E;
+  $barney: #A31C73;
 }
 
 $crimson: #E0061F; // red
@@ -140,10 +140,10 @@ $ic-bg-light-neutral-text: #394B58;
   $ic-bg-light-neutral: #F2F4F4;
 }
 
-$ic-bg-light-primary: #E5F2F8;
+$ic-bg-light-primary: #E0EBF5;
 
 @if $use_high_contrast {
-  $ic-bg-light-primary: #E6F1F7;
+  $ic-bg-light-primary: #E0EBF5;
 }
 
 $ic-bg-light-primary-text: #0078BD;
@@ -152,10 +152,10 @@ $ic-bg-light-primary-text: #0078BD;
   $ic-bg-light-primary-text: #0770A3;
 }
 
-$ic-bg-light-success: #E8F6E9;
+$ic-bg-light-success: #DCEEE4;
 
 @if $use_high_contrast {
-  $ic-bg-light-success: #E8F2E9;
+  $ic-bg-light-success: #DCEEE4;
 }
 
 $ic-bg-light-success-text: #03893D;
@@ -164,12 +164,12 @@ $ic-bg-light-success-text: #03893D;
   $ic-bg-light-success-text: $ic-color-success;
 }
 
-$ic-bg-light-alert: #F9ECE8;
+$ic-bg-light-alert: #FCE4E5;
 $ic-bg-light-alert-text: #C23C0D;
-$ic-bg-light-danger: #FCE8E7;
+$ic-bg-light-danger: #FCE4E5;
 
 @if $use_high_contrast {
-  $ic-bg-light-danger: #FBE8E8;
+  $ic-bg-light-danger: #FCE4E5;
 }
 
 $ic-bg-light-danger-text: #E0061F;
