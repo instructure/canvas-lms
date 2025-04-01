@@ -97,19 +97,19 @@ $ic-color-medium-darker: #394B58; // oxford
 $ic-color-medium: #6A7883; // slate
 
 @if $use_high_contrast {
-  $ic-color-medium: #556572;
+  $ic-color-medium: #4A5B68;
 }
 
 $ic-color-medium-lighter: #6A7883; // ash
 
 @if $use_high_contrast {
-  $ic-color-medium-lighter: #556572;
+  $ic-color-medium-lighter: #4A5B68;
 }
 
 $heather: #6A7883; // heather
 
 @if $use_high_contrast {
-  $ic-border-dark: #556572;
+  $ic-border-dark: #4A5B68;
 }
 
 $tiara: #C7CDD1; // tiara
