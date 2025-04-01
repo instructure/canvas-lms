@@ -81,13 +81,7 @@ class ContextModulesController < ApplicationController
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 
-      @can_view = @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
-      @can_add = @context.grants_right?(@current_user, session, :manage_course_content_add)
-      @can_edit = @context.grants_right?(@current_user, session, :manage_course_content_edit)
-      @can_delete = @context.grants_right?(@current_user, session, :manage_course_content_delete)
-      @can_view_grades = can_do(@context, @current_user, :view_all_grades)
-      @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
-      @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
+      load_permissions
       @viewable_module_ids = @modules.pluck(:id)
 
       @module_ids_with_overrides = AssignmentOverride.where(context_module_id: @modules).active.distinct.pluck(:context_module_id)
@@ -100,30 +94,7 @@ class ContextModulesController < ApplicationController
         @last_web_export = @context.web_zip_exports.visible_to(@current_user).order("epub_exports.created_at").last
       end
 
-      placements = %i[
-        assignment_menu
-        discussion_topic_menu
-        file_menu
-        module_menu
-        quiz_menu
-        wiki_page_menu
-        module_index_menu
-        module_group_menu
-        module_index_menu_modal
-        module_menu_modal
-      ]
-      tools = GuardRail.activate(:secondary) do
-        Lti::ContextToolFinder.new(
-          @context,
-          placements:,
-          current_user: @current_user
-        ).all_tools_sorted_array
-      end
-
-      @menu_tools = {}
-      placements.each do |p|
-        @menu_tools[p] = tools.select { |t| t.has_placement? p }
-      end
+      load_menu_tools
 
       if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
         module_file_details = load_module_file_details
@@ -189,6 +160,44 @@ class ContextModulesController < ApplicationController
       js_env(hash)
       set_js_module_data
       conditional_release_js_env(includes: :active_rules)
+    end
+
+    def load_permissions
+      @can_view = @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+      @can_add = @context.grants_right?(@current_user, session, :manage_course_content_add)
+      @can_edit = @context.grants_right?(@current_user, session, :manage_course_content_edit)
+      @can_delete = @context.grants_right?(@current_user, session, :manage_course_content_delete)
+      @can_view_grades = can_do(@context, @current_user, :view_all_grades)
+      @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
+      @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
+    end
+
+    def load_menu_tools
+      placements = %i[
+        assignment_menu
+        discussion_topic_menu
+        file_menu
+        module_menu
+        quiz_menu
+        wiki_page_menu
+        module_index_menu
+        module_group_menu
+        module_index_menu_modal
+        module_menu_modal
+      ]
+      tools = GuardRail.activate(:secondary) do
+        Lti::ContextToolFinder.new(
+          @context,
+          placements:,
+          current_user: @current_user
+        ).all_tools_sorted_array
+      end
+
+      @menu_tools = {}
+      placements.each do |p|
+        @menu_tools[p] = tools.select { |t| t.has_placement? p }
+      end
+      @menu_tools
     end
 
     private
@@ -378,6 +387,13 @@ class ContextModulesController < ApplicationController
     end
 
     if authorized_action(@context, @current_user, :read)
+      @module = @context.modules_visible_to(@current_user).find_by(id: params[:context_module_id])
+      return render status: :not_found, template: "shared/errors/404_message" unless @module
+
+      @items = load_content_tags(@module, @current_user)
+      load_menu_tools
+      load_permissions
+
       render template: "context_modules/items_html", layout: false
     end
   end

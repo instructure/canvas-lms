@@ -298,6 +298,43 @@ describe ContextModulesHelper do
         end
       end
     end
+
+    describe "process_module_items_data" do
+      it "works with module items input" do
+        module_data = process_module_items_data([item], t_module, @student, @session, student: true)
+
+        expect(module_data[:items].length).to eq(1)
+        expect(module_data[:items].first).to eq(item)
+      end
+    end
+
+    describe "load_content_tags" do
+      let(:visible_content_tag_mock) { double("ContentTag1", content: double("Content1", hide_on_modules_view?: false)) }
+      let(:hidden_content_tag_mock) { double("ContentTag2", content: double("Content2", hide_on_modules_view?: true)) }
+
+      before do
+        allow(t_module)
+          .to receive(:content_tags_visible_to)
+          .with(@current_user)
+          .and_return(content_tags_mock)
+      end
+
+      context "when content_tags is NOT empty" do
+        let(:content_tags_mock) { [visible_content_tag_mock, hidden_content_tag_mock] }
+
+        it "returns content tags visible to the current user" do
+          expect(load_content_tags(t_module, @current_user).size).to eq(1)
+        end
+      end
+
+      context "when content_tags is empty" do
+        let(:content_tags_mock) { [] }
+
+        it "returns empty array" do
+          expect(load_content_tags(t_module, @current_user).size).to eq(0)
+        end
+      end
+    end
   end
 
   describe "add_mastery_paths_to_cache_key" do

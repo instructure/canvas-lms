@@ -120,13 +120,19 @@ module ContextModulesHelper
     preload_can_unpublish(@context, modules) if @can_view
   end
 
-  def process_module_data(mod, current_user = nil, session = nil, student: false)
-    # pre-calculated module view data can be added here
-    items = mod.content_tags_visible_to(@current_user)
-    items = items.reject do |item|
+  def load_content_tags(context_module, current_user)
+    items = context_module.content_tags_visible_to(current_user)
+    items.reject do |item|
       item.content.respond_to?(:hide_on_modules_view?) && item.content.hide_on_modules_view?
     end
+  end
 
+  def process_module_data(mod, current_user = nil, session = nil, student: false)
+    items = load_content_tags(mod, current_user)
+    process_module_items_data(items, mod, current_user, session, student:)
+  end
+
+  def process_module_items_data(items, mod, current_user = nil, session = nil, student: false)
     module_data = {
       published_status: mod.published? ? "published" : "unpublished",
       items:
