@@ -279,6 +279,7 @@ module Types
     field :anonymize_students, Boolean, method: :anonymize_students?, null: true
     field :expects_external_submission, Boolean, method: :expects_external_submission?, null: true
     field :expects_submission, Boolean, method: :expects_submission?, null: true
+    field :grades_published_at, String, null: true
     field :important_dates, Boolean, null: true
     field :in_closed_grading_period, Boolean, method: :in_closed_grading_period?, null: true
     field :non_digital_submission, Boolean, method: :non_digital_submission?, null: true
