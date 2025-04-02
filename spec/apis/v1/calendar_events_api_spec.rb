@@ -2469,6 +2469,16 @@ describe CalendarEventsApiController, type: :request do
       expect(response).to be_successful
     end
 
+    it "adds location to rendered user attachment" do
+      attachment_with_context(@user)
+      @attachment.root_account.enable_feature!(:file_association_access)
+      event = @user.calendar_events.create!(description: "/users/#{@user.id}/files/#{@attachment.id}", start_at: Time.zone.now)
+      api_call(:get, "/api/v1/calendar_events", {
+                 controller: "calendar_events_api", action: "index", format: "json"
+               })
+      expect(JSON.parse(response.body).first["description"]).to include("location=#{event.asset_string}")
+    end
+
     context "child_events" do
       let_once :event do
         event = @course.calendar_events.build(title: "event", child_event_data: { "0" => { start_at: "2012-01-01 12:00:00", end_at: "2012-01-01 13:00:00", context_code: @course.default_section.asset_string } })

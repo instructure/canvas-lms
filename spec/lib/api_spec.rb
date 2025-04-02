@@ -890,6 +890,46 @@ describe Api do
       end
     end
 
+    context "with location tag" do
+      let(:proxy_instance) { klass.new }
+
+      before do
+        proxy_instance.instance_variable_set(:@domain_root_account, Account.default)
+        proxy_instance.extend Rails.application.routes.url_helpers
+        proxy_instance.extend ActionDispatch::Routing::UrlFor
+
+        allow(proxy_instance).to receive_messages(
+          request: nil,
+          get_host_and_protocol_from_request: ["school.instructure.com", "https"],
+          url_options: {}
+        )
+      end
+
+      it "adds location to html file tags" do
+        student_in_course
+        @course.root_account.enable_feature!(:file_association_access)
+        att = attachment_model(context: @course)
+        att2 = attachment_model(context: @student)
+
+        html = <<~HTML
+          <iframe src="/media_attachments_iframe/#{att.id}"></iframe>
+          <img src="/courses/#{@course.id}/files/#{att.id}/preview">
+          <img src="/users/#{@student.id}/files/#{att2.id}/preview">
+          <img src="https://dummy-web.test/asdf">
+        HTML
+
+        location = "course_#{@course.id}"
+
+        expected = <<~HTML
+          <iframe src="https://school.instructure.com/media_attachments_iframe/#{att.id}?location=#{location}" loading="lazy"></iframe>
+          <img src="https://school.instructure.com/courses/#{@course.id}/files/#{att.id}/preview?location=#{location}" loading="lazy" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@course.id}/files/#{att.id}" data-api-returntype="File">
+          <img src="https://school.instructure.com/users/#{@student.id}/files/#{att2.id}/preview?location=#{location}" loading="lazy" data-api-endpoint="https://school.instructure.com/api/v1/users/#{@student.id}/files/#{att2.id}" data-api-returntype="File">
+          <img src="https://dummy-web.test/asdf" loading="lazy">
+        HTML
+        expect(proxy_instance.api_user_content(html, @course, @student, location: @course)).to eq expected
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 

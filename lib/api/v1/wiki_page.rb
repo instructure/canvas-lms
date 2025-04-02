@@ -60,7 +60,7 @@ module Api::V1::WikiPage
         }
         hash["body"] = wiki_page.block_editor.viewer_iframe_html
       else
-        hash["body"] = api_user_content(wiki_page.body, wiki_page.context)
+        hash["body"] = api_user_content(wiki_page.body, wiki_page.context, location: wiki_page)
       end
       wiki_page.context_module_action(current_user, wiki_page.context, :read)
     end
