@@ -78,6 +78,13 @@ describe Types::UserType do
     end
   end
 
+  context "name" do
+    it "encodes html entities" do
+      @student.update! name: "<script>alert(1)</script>"
+      expect(user_type.resolve("name")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
+    end
+  end
+
   context "shortName" do
     before(:once) do
       @student.update! short_name: "new display name"
@@ -90,6 +97,18 @@ describe Types::UserType do
     it "returns full name if shortname is not set" do
       @student.update! short_name: nil
       expect(user_type.resolve("shortName")).to eq @student.name
+    end
+
+    it "encodes html entities" do
+      @student.update! short_name: "<script>alert(1)</script>"
+      expect(user_type.resolve("shortName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
+    end
+  end
+
+  context "sortableName" do
+    it "encodes html entities" do
+      @student.update! sortable_name: "<script>alert(1)</script>"
+      expect(user_type.resolve("sortableName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
     end
   end
 
