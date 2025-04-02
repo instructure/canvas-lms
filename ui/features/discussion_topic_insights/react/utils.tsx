@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {IconCompleteSolid, IconTroubleSolid, IconWarningSolid} from '@instructure/ui-icons'
+import {IconCompleteSolid, IconTroubleSolid, IconWarningSolid,IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
 import {canvas} from '@instructure/ui-theme-tokens'
+import {IconButton} from '@instructure/ui-buttons'
 
 const honeyInstUI10 = '#B07E00'
 
@@ -42,4 +43,35 @@ export const formatDate = (date: Date) => {
     minute: 'numeric',
     hour12: true,
   })
+}
+
+type RatingButtonProps = {
+  type: 'like' | 'dislike'
+  isActive: boolean
+  onClick: () => void
+  screenReaderText: string
+  dataTestId: string
+}
+
+const RatingButton: React.FC<RatingButtonProps> = ({
+  type,
+  isActive,
+  onClick,
+  screenReaderText,
+  dataTestId,
+}) => {
+  const rotate = type === 'like' ? '0' : '180'
+
+  return (
+    <IconButton
+      onClick={onClick}
+      size="small"
+      withBackground={false}
+      withBorder={false}
+      screenReaderLabel={screenReaderText}
+      data-testid={dataTestId}
+    >
+      {isActive ? <IconLikeSolid rotate={rotate} /> : <IconLikeLine rotate={rotate} />}
+    </IconButton>
+  )
 }

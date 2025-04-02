@@ -18,7 +18,6 @@
 import React, {ReactNode} from 'react'
 import {Table} from '@instructure/ui-table'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconInfoLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('discussion_insights')
@@ -27,7 +26,6 @@ export type Row = {
   relevance: ReactNode
   name: string
   notes: string
-  review: ReactNode
   date: string
   actions: ReactNode
 }
@@ -80,10 +78,7 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
               onRequestSort={sortAble ? (_, {id}) => onSort(id as any) : undefined}
               sortDirection={id === sortBy ? direction : 'none'}
             >
-              <Flex gap="xx-small" alignItems="center">
-                <span>{text}</span>
-                {id === 'review' && <IconInfoLine />}
-              </Flex>
+              <Flex justifyItems={alignment}>{text}</Flex>
             </Table.ColHeader>
           ))}
         </Table.Row>
