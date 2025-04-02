@@ -39,7 +39,7 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
   // @ts-expect-error
   const languages = useRef<Language[]>(ENV?.inbox_translation_languages ?? [])
   const [input, setInput] = useState('')
-  const [selectedId, setSelectedId] = useState<Language['id'] | null>(null)
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null)
 
   const {
     setTranslationTargetLanguage,
@@ -55,9 +55,9 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
       return
     }
 
-    if (selectedId !== result.id) {
+    if (selectedLanguage?.id !== result.id) {
       setInput(result.name)
-      setSelectedId(result.id)
+      setSelectedLanguage(result)
       setTranslationTargetLanguage(result.id)
     }
   }
@@ -67,11 +67,11 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
       return
     }
 
-    if (!selectedId) {
+    if (!selectedLanguage) {
       const result = languages.current.find(({name}) => name === input)
 
       if (result) {
-        setSelectedId(result.id)
+        setSelectedLanguage(result)
       } else {
         // TODO: error handling
         return
@@ -114,7 +114,7 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
                     label={name}
                     id={id}
                     value={name}
-                    isSelected={id === selectedId}
+                    isSelected={id === selectedLanguage?.id}
                   >
                     {name}
                   </CanvasMultiSelect.Option>
