@@ -131,7 +131,6 @@ export default function NewCourseModal({
   return (
     <span>
       <Modal
-        as="form"
         noValidate={true}
         onSubmit={handleSubmit(onSubmit)}
         open={isOpen}
@@ -141,66 +140,68 @@ export default function NewCourseModal({
         label={I18n.t('Add a New Course')}
         shouldCloseOnDocumentClick={false}
       >
-        <Modal.Body>
-          <FormFieldGroup layout="stacked" rowSpacing="small" description="">
-            <Controller
-              name="name"
-              control={control}
-              render={({field}) => (
-                <TextInput
-                  {...field}
-                  data-testid="courseName"
-                  renderLabel={I18n.t('Course Name')}
-                  isRequired={true}
-                  messages={getFormErrorMessage(errors, 'name')}
-                />
-              )}
-            />
-            <Controller
-              name="reference_code"
-              control={control}
-              render={({field}) => (
-                <TextInput
-                  {...field}
-                  data-testid="referenceCode"
-                  renderLabel={I18n.t('Reference Code')}
-                  isRequired={true}
-                  messages={getFormErrorMessage(errors, 'reference_code')}
-                />
-              )}
-            />
-            <SearchableSelect
-              id="accountSelector"
-              label={I18n.t('Subaccount')}
-              isLoading={accountTree.loading}
-              onChange={(_e, option) => setAccount(option.id)}
-            >
-              {renderAccountOptions(accountTree.accounts).map(account => (
-                <SearchableSelect.Option key={account.id} id={account.id} value={account.id}>
-                  {account.name}
-                </SearchableSelect.Option>
-              ))}
-            </SearchableSelect>
-            <SearchableSelect
-              id="termSelector"
-              label={I18n.t('Enrollment Term')}
-              isLoading={terms.loading}
-              onChange={(_e, option) => setEnrollmentTerm(option.id)}
-            >
-              {(terms.data || []).map(term => (
-                <SearchableSelect.Option key={term.id} id={term.id} value={term.id}>
-                  {term.name}
-                </SearchableSelect.Option>
-              ))}
-            </SearchableSelect>
-          </FormFieldGroup>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={closeModal}>{I18n.t('Cancel')}</Button> &nbsp;
-          <Button data-testid="submitBtn" type="submit" color="primary">
-            {I18n.t('Add Course')}
-          </Button>
-        </Modal.Footer>
+        <form style={{marginBottom: '0px'}}>
+          <Modal.Body>
+            <FormFieldGroup layout="stacked" rowSpacing="small" description="">
+              <Controller
+                name="name"
+                control={control}
+                render={({field}) => (
+                  <TextInput
+                    {...field}
+                    data-testid="courseName"
+                    renderLabel={I18n.t('Course Name')}
+                    isRequired={true}
+                    messages={getFormErrorMessage(errors, 'name')}
+                  />
+                )}
+              />
+              <Controller
+                name="reference_code"
+                control={control}
+                render={({field}) => (
+                  <TextInput
+                    {...field}
+                    data-testid="referenceCode"
+                    renderLabel={I18n.t('Reference Code')}
+                    isRequired={true}
+                    messages={getFormErrorMessage(errors, 'reference_code')}
+                  />
+                )}
+              />
+              <SearchableSelect
+                id="accountSelector"
+                label={I18n.t('Subaccount')}
+                isLoading={accountTree.loading}
+                onChange={(_e, option) => setAccount(option.id)}
+              >
+                {renderAccountOptions(accountTree.accounts).map(account => (
+                  <SearchableSelect.Option key={account.id} id={account.id} value={account.id}>
+                    {account.name}
+                  </SearchableSelect.Option>
+                ))}
+              </SearchableSelect>
+              <SearchableSelect
+                id="termSelector"
+                label={I18n.t('Enrollment Term')}
+                isLoading={terms.loading}
+                onChange={(_e, option) => setEnrollmentTerm(option.id)}
+              >
+                {(terms.data || []).map(term => (
+                  <SearchableSelect.Option key={term.id} id={term.id} value={term.id}>
+                    {term.name}
+                  </SearchableSelect.Option>
+                ))}
+              </SearchableSelect>
+            </FormFieldGroup>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={closeModal}>{I18n.t('Cancel')}</Button> &nbsp;
+            <Button data-testid="submitBtn" type="submit" color="primary">
+              {I18n.t('Add Course')}
+            </Button>
+          </Modal.Footer>
+        </form>
       </Modal>
       {React.Children.map(
         children,
