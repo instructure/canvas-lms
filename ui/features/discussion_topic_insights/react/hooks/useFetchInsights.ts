@@ -15,9 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useQuery} from '@tanstack/react-query'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {useQuery as useApolloQuery} from '@apollo/client'
 import {EntryCountResponse, GET_ENTRY_COUNT} from '../../graphql/Queries'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useState} from 'react'
 
 type InsightResponse = {
   workflow_state: string | null
@@ -39,6 +41,21 @@ type InsightEntry = {
   relevance_human_feedback_liked: boolean
   relevance_human_feedback_disliked: boolean
   relevance_human_feedback_notes: string
+}
+
+const generateInsight = async (
+  context: string,
+  contextId: string,
+  discussionId: string,
+): Promise<void> => {
+  const {response} = await doFetchApi<void>({
+    path: `/api/v1/${context}/${contextId}/discussion_topics/${discussionId}/insights`,
+    method: 'POST',
+  })
+
+  if (!response.ok) {
+    throw new Error('Insight generation failed')
+  }
 }
 
 const fetchInsight = async (
@@ -72,6 +89,9 @@ const fetchInsightEntries = async (
 }
 
 export const useInsight = (context: string, contextId: string, discussionId: string) => {
+  const queryClient = useQueryClient()
+  const [shouldRefetch, setShouldRefetch] = useState(false)
+
   const {
     data: insightData,
     isLoading: insightIsLoading,
@@ -80,6 +100,8 @@ export const useInsight = (context: string, contextId: string, discussionId: str
   } = useQuery({
     queryKey: ['insight', context, contextId, discussionId],
     queryFn: () => fetchInsight(context, contextId, discussionId),
+    refetchInterval: shouldRefetch ? 5000 : false,
+    enabled: true,
   })
 
   const {
@@ -93,6 +115,15 @@ export const useInsight = (context: string, contextId: string, discussionId: str
     enabled: insightData?.workflow_state === 'completed',
   })
 
+  const {
+    isError: generateError,
+    isLoading: mutationLoading,
+    mutateAsync,
+  } = useMutation({
+    mutationKey: ['generate-insight', context, contextId, discussionId],
+    mutationFn: () => generateInsight(context, contextId, discussionId),
+  })
+
   const {data: entryCount, loading: countIsLoading} = useApolloQuery<EntryCountResponse>(
     GET_ENTRY_COUNT,
     {
@@ -102,13 +133,30 @@ export const useInsight = (context: string, contextId: string, discussionId: str
     },
   )
 
+  if (!shouldRefetch && ['created', 'in_progress'].includes(insightData?.workflow_state || '')) {
+    setShouldRefetch(true)
+  }
+
+  if (shouldRefetch && ['completed', 'failed'].includes(insightData?.workflow_state || '')) {
+    setShouldRefetch(false)
+  }
+
+  const handleGenerateInsight = async () => {
+    await mutateAsync()
+    queryClient.invalidateQueries(['insight', context, contextId, discussionId])
+    setShouldRefetch(true)
+  }
+
   return {
-    loading: insightIsLoading || countIsLoading || (entriesIsLoading && isFetching),
+    loading:
+      insightIsLoading || countIsLoading || (entriesIsLoading && isFetching) || mutationLoading,
     insight: insightData,
     entries,
     insightError,
     entriesError,
+    generateError,
     entryCount: entryCount?.legacyNode?.entryCounts?.repliesCount || 0,
     refetchInsight: refetch,
+    generateInsight: handleGenerateInsight,
   }
 }

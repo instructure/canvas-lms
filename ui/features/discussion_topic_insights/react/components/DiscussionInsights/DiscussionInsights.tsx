@@ -80,34 +80,34 @@ const DiscussionInsights: React.FC = () => {
 
   const setModalOpen = useInsightStore(state => state.setModalOpen)
 
-  const {loading, insight, insightError, entries, entryCount} = useInsight(
-    context,
-    contextId,
-    discussionId,
-  )
+  const {
+    loading,
+    insight,
+    insightError,
+    generateError,
+    generateInsight,
+    entries,
+    entryCount,
+    refetchInsight,
+  } = useInsight(context, contextId, discussionId)
 
   let placeholderContent = null
 
   const handleGenerateInsights = async () => {
-    // TODO: VICE-5178
-    console.log('Generate insights clicked')
+    generateInsight()
   }
 
   if (insightError) {
-    placeholderContent = (
-      <Placeholder
-        type="error"
-        errorType="loading"
-        // TODO: VICE-5178
-        onClick={() => console.log('Generate clicked')}
-      />
-    )
+    placeholderContent = <Placeholder type="error" errorType="loading" onClick={refetchInsight} />
   }
 
-  if (!placeholderContent && insight?.workflow_state === 'failed') {
+  if (!placeholderContent && !loading && entryCount === 0) {
+    placeholderContent = <Placeholder type="no-reply" />
+  }
+
+  if (!placeholderContent && (insight?.workflow_state === 'failed' || generateError)) {
     placeholderContent = (
-      // TODO: VICE-5178
-      <Placeholder type="error" errorType="generating" onClick={() => console.log('click')} />
+      <Placeholder type="error" errorType="generating" onClick={handleGenerateInsights} />
     )
   }
 
@@ -115,13 +115,12 @@ const DiscussionInsights: React.FC = () => {
     placeholderContent = <Placeholder type="loading" />
   }
 
-  if (!placeholderContent && insight && !insight.workflow_state && !entries) {
-    // TODO: VICE-5178
-    placeholderContent = <Placeholder type="no-data" onClick={() => console.log('generate')} />
+  if (!loading && ['in_progress', 'created'].includes(insight?.workflow_state || '')) {
+    placeholderContent = <Placeholder type="loading" />
   }
 
-  if (!placeholderContent && !loading && entryCount === 0) {
-    placeholderContent = <Placeholder type="no-reply" />
+  if (!placeholderContent && !loading && insight && !insight.workflow_state && !entries) {
+    placeholderContent = <Placeholder type="no-data" onClick={handleGenerateInsights} />
   }
 
   const handleSearch = (query: string) => {
@@ -149,9 +148,7 @@ const DiscussionInsights: React.FC = () => {
   )
 
   const tableRows: Row[] = filteredEntries.map(item => ({
-    relevance: getStatusByRelevance(
-      item.relevance_ai_classification,
-    ),
+    relevance: getStatusByRelevance(item.relevance_ai_classification),
     name: item.student_name,
     notes: item.relevance_ai_evaluation_notes,
     date: formatDate(new Date(item.entry_updated_at)),
@@ -171,7 +168,7 @@ const DiscussionInsights: React.FC = () => {
       <InsightsHeader />
       {insight?.needs_processing && <NewActivityInfo />}
       <InsightsActionBar
-        loading={loading}
+        loading={loading || ['created', 'in_progress'].includes(insight?.workflow_state || '')}
         entryCount={entryCount}
         onSearch={handleSearch}
         onGenerateInsights={handleGenerateInsights}
@@ -185,8 +182,7 @@ const DiscussionInsights: React.FC = () => {
       {!loading && !placeholderContent && !filteredEntries.length && (
         <Placeholder type="no-results" />
       )}
-      {/* TODO: check entryCount logic if we have real data */}
-      {!loading && !!entryCount && filteredEntries?.length > 0 && (
+      {!loading && !placeholderContent && !!entryCount && filteredEntries?.length > 0 && (
         <InsightsTable
           caption="Discussion Insights"
           rows={tableRows}

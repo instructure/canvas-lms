@@ -23,11 +23,9 @@ import DiscussionInsights from '../DiscussionInsights'
 import useInsightStore from '../../../hooks/useInsightStore'
 import {useInsight} from '../../../hooks/useFetchInsights'
 
-// Mock the useInsightStore hook
 jest.mock('../../../hooks/useInsightStore')
 const mockedUseInsightStore = useInsightStore as unknown as jest.Mock
 
-// Mock the useInsight hook
 jest.mock('../../../hooks/useFetchInsights')
 const mockedUseInsight = useInsight as jest.Mock
 
@@ -38,6 +36,7 @@ describe('DiscussionInsights', () => {
       contextId: 'test-context-id',
       discussionId: 'test-discussion-id',
       setModalOpen: jest.fn(),
+      genereteInsight: jest.fn(),
     })
   })
 
