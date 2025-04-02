@@ -926,6 +926,7 @@ RSpec.describe Lti::RegistrationsController do
         vendor:,
         configuration: internal_lti_configuration,
         name:,
+        description: "neat little description",
         workflow_state: "on"
       }
     end
@@ -945,6 +946,7 @@ RSpec.describe Lti::RegistrationsController do
     it "is successful" do
       expect(subject).to be_successful
       expect(registration.reload.admin_nickname).to eq(admin_nickname)
+      expect(registration.description).to eq(params[:description])
       expect(registration.updated_by).to eq(admin)
     end
 
@@ -1737,7 +1739,8 @@ RSpec.describe Lti::RegistrationsController do
         name: "Test Tool",
         vendor: "Test Vendor",
         configuration: internal_lti_configuration,
-        admin_nickname: "Test Nickname"
+        admin_nickname: "Test Nickname",
+        description: "A great little description for this tool"
       }
     end
     let(:account) { account_model }
@@ -1781,6 +1784,10 @@ RSpec.describe Lti::RegistrationsController do
 
     it "creates a new LTI registration" do
       expect { subject }.to change { Lti::Registration.count }.by(1)
+      values = %w[name vendor admin_nickname description]
+      expect(Lti::Registration.last.attributes.values_at(*values)).to eql(
+        params.with_indifferent_access.values_at(*values)
+      )
     end
 
     it "creates a new Developer Key" do

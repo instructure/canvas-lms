@@ -41,6 +41,7 @@ class Lti::Registration < ActiveRecord::Base
   has_many :lti_overlays, class_name: "Lti::Overlay", inverse_of: :registration
 
   validates :name, :admin_nickname, :vendor, length: { maximum: 255 }
+  validates :description, length: { maximum: 2048 }, allow_blank: true
   validates :name, presence: true
 
   scope :active, -> { where(workflow_state: "active") }

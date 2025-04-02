@@ -21,6 +21,22 @@ RSpec.describe Lti::Registration do
   let(:user) { user_model }
   let(:account) { Account.create! }
 
+  describe "validations" do
+    subject { registration.valid? }
+
+    let(:registration) { described_class.new(account: Account.new, name: "Test Registration") }
+
+    it "doesn't let the description be too long" do
+      registration.description = "a" * 2049
+      expect(subject).to be false
+    end
+
+    it "doesn't require a description" do
+      registration.description = nil
+      expect(subject).to be true
+    end
+  end
+
   describe "#lti_version" do
     subject { registration.lti_version }
 
