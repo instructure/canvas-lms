@@ -1569,8 +1569,9 @@ class Lti::RegistrationsController < ApplicationController
                canvasBaseUrl: request.base_url,
                firstName: @current_user.short_name,
                locale: @current_user.browser_locale,
-               rootAccountId: @domain_root_account.id,
-               rootAccountUuid: @domain_root_account.uuid,
+               rootAccountId: @account.root_account.id,
+               rootAccountUuid: @account.root_account.uuid,
+               isPremiumAccount: @account.root_account.feature_enabled?(:lti_usage_premium)
              },
            })
 
