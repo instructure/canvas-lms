@@ -436,7 +436,7 @@ const Grid = {
         return ['rating_1', ENV.use_high_contrast ? '#127A1B' : '#03893D', I18n.t('Meets Mastery')]
       }
       if (score >= nearMastery) {
-        return ['rating_2', ENV.use_high_contrast ? '#C23C0D' : '#FC5E13', I18n.t('Near Mastery')]
+        return ['rating_2', ENV.use_high_contrast ? '#C23C0D' : '#F06E26', I18n.t('Near Mastery')]
       }
       return ['rating_3', '#E0061F', I18n.t('Well Below Mastery')]
     },
