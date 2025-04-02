@@ -70,7 +70,7 @@ export default class ProficiencyTable extends React.Component {
         this.createRating('Mastery', 3, '03893D'),
         this.createRating('Near Mastery', 2, 'FAB901'),
         this.createRating('Below Mastery', 1, 'FD5D10'),
-        this.createRating('Well Below Mastery', 0, 'E0061F'),
+        this.createRating('Well Below Mastery', 0, 'E62429'),
       ]),
     }
   }

@@ -101,7 +101,7 @@ class OutcomeProficiency < ApplicationRecord
     ratings << { description: I18n.t("Mastery"), points: 3, mastery: true, color: "03893D" }
     ratings << { description: I18n.t("Near Mastery"), points: 2, mastery: false, color: "FAB901" }
     ratings << { description: I18n.t("Below Mastery"), points: 1, mastery: false, color: "D97900" }
-    ratings << { description: I18n.t("No Evidence"), points: 0, mastery: false, color: "E0061F" }
+    ratings << { description: I18n.t("No Evidence"), points: 0, mastery: false, color: "E62429" }
     ratings
   end
 
