@@ -26,7 +26,7 @@ module Api::V1::Lti::Registration
   include Api::V1::Lti::RegistrationAccountBinding
 
   JSON_ATTRS = %w[
-    id account_id root_account_id internal_service vendor name admin_nickname workflow_state created_at updated_at
+    id account_id root_account_id internal_service vendor name admin_nickname workflow_state created_at updated_at description
   ].freeze
 
   OVERLAY_VERSION_DEFAULT_LIMIT = 5

@@ -1109,6 +1109,7 @@ class Lti::RegistrationsController < ApplicationController
   # @argument name [String] The name of the tool
   # @argument admin_nickname [String] A friendly nickname set by admins to override the tool name
   # @argument vendor [String] The vendor of the tool
+  # @argument description [String] A description of the tool. Cannot exceed 2048 bytes.
   # @argument configuration [Required, Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool
   # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration.
   # @argument unified_tool_id [String] The unique identifier for the tool, used for analytics. If not provided, one will be generated.
@@ -1151,12 +1152,14 @@ class Lti::RegistrationsController < ApplicationController
       vendor = params[:vendor]
       name = params[:name] || configuration_params[:title]
       admin_nickname = params[:admin_nickname]
+      description = params[:description]
       scopes = configuration_params[:scopes]
 
       registration = Lti::Registration.create!(
         name:,
         admin_nickname:,
         vendor:,
+        description:,
         account: @context,
         workflow_state: "active",
         created_by: @current_user,
@@ -1250,6 +1253,7 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @argument name [String] The name of the tool
   # @argument admin_nickname [String] The admin-configured friendly display name for the registration
+  # @argument description [String] A description of the tool. Cannot exceed 2048 bytes.
   # @argument configuration [Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool. Note that updating the base tool configuration of a registration associated with a Dynamic Registration is not allowed.
   # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration. Note that updating the overlay of a registration associated with a Dynamic Registration IS allowed.
   # @argument workflow_state [String, "on" | "off" | "allow"]
@@ -1286,7 +1290,7 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @returns Lti::Registration
   def update
-    registration_params = params.permit(:admin_nickname, :vendor, :name).to_h
+    registration_params = params.permit(:admin_nickname, :vendor, :name, :description).to_h
 
     binding_params = {
       workflow_state: params[:workflow_state],

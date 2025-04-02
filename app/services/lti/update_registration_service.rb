@@ -31,7 +31,8 @@ module Lti
   # {
   #   name: "string",
   #   admin_nickname: "string",
-  #   vendor: "string"
+  #   vendor: "string",
+  #   description: "string",
   # }
   # ```
   #
