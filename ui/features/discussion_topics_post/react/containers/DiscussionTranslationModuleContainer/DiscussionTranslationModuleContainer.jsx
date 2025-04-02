@@ -24,10 +24,9 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {IconRefreshLine, IconEndLine} from '@instructure/ui-icons'
-import AiIcon from '@canvas/ai-icon'
+import {IconRefreshLine, IconEndLine,IconAiLine} from '@instructure/ui-icons'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
-import {TranslationTriggerModal} from "../../components/TranslationTriggerModal/TranslationTriggerModal";
+import {TranslationTriggerModal} from '../../components/TranslationTriggerModal/TranslationTriggerModal'
 
 export const DiscussionTranslationModuleContainer = () => {
   const I18n = useI18nScope('discussions_posts')
@@ -42,25 +41,22 @@ export const DiscussionTranslationModuleContainer = () => {
     setTranslateTargetLanguage,
     setShowTranslationControl,
     entryTranslatingSet,
-  } = useContext(
-    DiscussionManagerUtilityContext,
-  )
-
+  } = useContext(DiscussionManagerUtilityContext)
 
   const closeTranslationModule = () => {
-    if(translateTargetLanguage){
+    if (translateTargetLanguage) {
       setModalOpen(true)
     } else {
       setShowTranslationControl(false)
     }
   }
 
-  const closeModalAndKeepTranslations = () =>{
+  const closeModalAndKeepTranslations = () => {
     setModalOpen(false)
     setShowTranslationControl(false)
   }
 
-  const closeModalAndRemoveTranslations = () =>{
+  const closeModalAndRemoveTranslations = () => {
     setModalOpen(false)
     setShowTranslationControl(false)
     setTranslateTargetLanguage(null)
@@ -99,9 +95,12 @@ export const DiscussionTranslationModuleContainer = () => {
     >
       <TranslationTriggerModal
         isModalOpen={isModalOpen}
-        closeModal={() => {setModalOpen(false)}}
+        closeModal={() => {
+          setModalOpen(false)
+        }}
         closeModalAndKeepTranslations={closeModalAndKeepTranslations}
-        closeModalAndRemoveTranslations={closeModalAndRemoveTranslations}/>
+        closeModalAndRemoveTranslations={closeModalAndRemoveTranslations}
+      />
       <Heading level="h3">
         {I18n.t('Translate Discussion')}
         <span style={{float: 'right'}}>
@@ -123,9 +122,7 @@ export const DiscussionTranslationModuleContainer = () => {
       </Text>
       <View as="div" margin="medium 0 x-small 0">
         <label id="translate-select-label">
-          <Text weight="bold">
-            {I18n.t('Translate to')}
-          </Text>
+          <Text weight="bold">{I18n.t('Translate to')}</Text>
         </label>
       </View>
       <Flex direction="row" alignItems="start" gap="small" wrap="wrap">
@@ -146,7 +143,7 @@ export const DiscussionTranslationModuleContainer = () => {
             onClick={translateDiscussion}
             disabled={entryTranslatingSet.size > 0}
             margin="0 small 0 0"
-            renderIcon={<AiIcon />}
+            renderIcon={<IconAiLine />}
             color="primary"
           >
             {I18n.t('Translate')}
@@ -163,4 +160,3 @@ export const DiscussionTranslationModuleContainer = () => {
     </View>
   )
 }
-
