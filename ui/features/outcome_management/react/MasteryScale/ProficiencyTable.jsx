@@ -82,7 +82,7 @@ class ProficiencyTable extends React.Component {
           createRating(I18n.t('Mastery'), 3, '03893D', true),
           createRating(I18n.t('Near Mastery'), 2, 'FAB901'),
           createRating(I18n.t('Below Mastery'), 1, 'FD5D10'),
-          createRating(I18n.t('Well Below Mastery'), 0, 'E0061F'),
+          createRating(I18n.t('Well Below Mastery'), 0, 'E62429'),
         ],
       },
     },

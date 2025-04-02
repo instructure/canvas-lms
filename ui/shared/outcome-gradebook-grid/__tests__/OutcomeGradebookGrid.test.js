@@ -123,7 +123,7 @@ describe('OutcomeGradebookGrid', () => {
     ])
     expect(Grid.View.legacyMasteryDetails(1, outcome)).toEqual([
       'rating_3',
-      '#E0061F',
+      '#E62429',
       'Well Below Mastery',
     ])
   })

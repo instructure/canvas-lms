@@ -50,7 +50,7 @@ const Dictionary = {
     label: I18n.t('Near Mastery'),
   },
   remedial: {
-    color: '#E0061F',
+    color: '#E62429',
     label: I18n.t('Well Below Mastery'),
   },
 }

@@ -68,7 +68,7 @@ $barney: #C54396; // magenta
   $barney: #A31C73;
 }
 
-$crimson: #E0061F; // red
+$crimson: #E62429; // red
 
 @if $use_high_contrast {
   $crimson: #AE1B1F;
@@ -172,7 +172,7 @@ $ic-bg-light-danger: #FCE4E5;
   $ic-bg-light-danger: #FCE4E5;
 }
 
-$ic-bg-light-danger-text: #E0061F;
+$ic-bg-light-danger-text: #E62429;
 
 @if $use_high_contrast {
   $ic-bg-light-danger-text: $ic-color-danger;

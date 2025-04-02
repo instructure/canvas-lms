@@ -63,7 +63,7 @@ WithErrors.args = {
     createRating('Mastery', 3, '03893D', true),
     createRating('', 2, 'FAB901'),
     createRating('Below Mastery', 1, 'FD5D10'),
-    createRating('Well Below Mastery', 0, 'E0061F'),
+    createRating('Well Below Mastery', 0, 'E62429'),
   ],
 }
 
