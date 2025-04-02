@@ -735,6 +735,27 @@ describe AssignmentVisibility::AssignmentVisibilityService do
         visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id, assignment_ids: []).map(&:assignment_id)
         expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsey
       end
+
+      it "produces cached result when queried with same keys" do
+        course_with_differentiated_assignments_enabled
+        assignment_with_false_only_visible_to_overrides
+        visible_assignment_ids_1 = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:assignment_id)
+        make_assignment
+        visible_assignment_ids_2 = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:assignment_id)
+
+        expect(visible_assignment_ids_1).to eq(visible_assignment_ids_2)
+      end
+
+      it "produces updated result when cache is invalidated" do
+        course_with_differentiated_assignments_enabled
+        assignment_with_false_only_visible_to_overrides
+        visible_assignment_ids_1 = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:assignment_id)
+        make_assignment
+        AssignmentVisibility::AssignmentVisibilityService.invalidate_cache(user_ids: @user.id, course_ids: @course.id)
+        visible_assignment_ids_2 = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:assignment_id)
+
+        expect(visible_assignment_ids_1).not_to eq(visible_assignment_ids_2)
+      end
     end
 
     describe AssignmentVisibility do
