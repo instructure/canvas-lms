@@ -138,9 +138,18 @@ describe UserContent do
     end
 
     describe "precise_translate_content" do
+      before do
+        Account.site_admin.enable_feature!(:precise_link_replacements)
+      end
+
       it "deals properly with non-href anchors and nodes too deep" do
-        expect { rewriter.precise_translate_content("<a title='/courses/#{rewriter.context.id}/assignments/5'>non-href link</a>") }.not_to raise_error
-        expect { rewriter.precise_translate_content("<!DOCTYPE html>" + ("<div>" * 1000)) }.not_to raise_error
+        course_with_teacher
+        rewriter = UserContent::HtmlRewriter.new(@course, @teacher)
+        html = "<a title='/courses/#{rewriter.context.id}/assignments/5'>non-href link</a>"
+        parsed_html = Nokogiri::HTML5.fragment(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
+        expect { rewriter.precise_translate_content(parsed_html) }.not_to raise_error
+        rewriter.translate_content("<!DOCTYPE html>" + ("<div>" * 1000))
+        expect { rewriter.precise_translate_content(parsed_html) }.not_to raise_error
       end
     end
 

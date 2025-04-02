@@ -172,7 +172,7 @@ module UserContent
       @user = user
       @contextless_types = contextless_types
       @context_prefix = "/#{context.class.name.tableize}/#{context.id}"
-      @context_regex = %r{(?:/(#{context.class.name.tableize})/(#{context.id})|/(assessment_questions)/(\d+))}
+      @context_regex = %r{(?:/(#{context.class.name.tableize})/(#{context.id})|/(assessment_questions|users)/(\d+))}
       @absolute_part = '(https?://[\w-]+(?:\.[\w-]+)*(?:\:\d{1,5})?)?'
       @toplevel_regex = %r{#{@absolute_part}#{@context_regex}?/(\w+)(?:/([^\s"<'?/]*)([^\s"<']*))?}
       @handlers = {}
@@ -209,22 +209,21 @@ module UserContent
     def translate_content(html)
       return html if html.blank?
 
-      html = add_lazy_loading(html)
+      parsed_html = Nokogiri::HTML5.fragment(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
+      html = add_lazy_loading(parsed_html)
 
-      return precise_translate_content(html) if Account.site_admin.feature_enabled?(:precise_link_replacements)
+      return precise_translate_content(parsed_html) if Account.site_admin.feature_enabled?(:precise_link_replacements)
 
       html.gsub(@toplevel_regex) { |url| replacement(url) }
     end
 
-    def add_lazy_loading(html)
-      doc = Nokogiri::HTML5.fragment(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
-
-      doc.css("img, iframe").each do |e|
+    def add_lazy_loading(parsed_html)
+      parsed_html.css("img, iframe").each do |e|
         if e.attributes["src"]&.value&.match?(@toplevel_regex)
           e.set_attribute("loading", "lazy")
         end
       end
-      doc.to_html
+      parsed_html.to_html
     end
 
     def translate_blocks(block_editor)
@@ -240,20 +239,21 @@ module UserContent
       end
     end
 
-    def precise_translate_content(html)
-      doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
+    def precise_translate_content(parsed_html)
       attributes = %w[value href longdesc src srcset title]
 
-      doc.css("img, iframe, video, audio, source, param, a").each do |e|
+      parsed_html.css("img, iframe, video, audio, source, param, a").each do |e|
         attributes.each do |attr|
           attribute_value = e.attributes[attr]&.value
-          if attribute_value&.match?(@toplevel_regex)
-            e.inner_html = e.inner_html.gsub(@toplevel_regex) { |url| replacement(url) } if e.name == "a" && e["href"] && e.inner_html.delete("\n").strip.include?(e["href"].strip)
-            e.set_attribute(attr, attribute_value.gsub(@toplevel_regex) { |url| replacement(url) })
-          end
+          next unless attribute_value&.match?(@toplevel_regex)
+
+          e.inner_html = e.inner_html.gsub(@toplevel_regex) { |url| replacement(url) } if e.name == "a" && e["href"] && e.inner_html.delete("\n").strip.include?(e["href"].strip)
+          processed_url = attribute_value.gsub(@toplevel_regex) { |url| replacement(url) }
+
+          e.set_attribute(attr, processed_url)
         end
       end
-      doc.inner_html
+      parsed_html.inner_html
     end
 
     def replacement(url)
@@ -264,7 +264,7 @@ module UserContent
       context_id   = matched[3] || matched[5]
       type, obj_id, rest = matched.values_at(6, 7, 8)
       prefix = "/#{context_type}/#{context_id}" if context_type && context_id
-      return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix
+      return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix && context_type != "users"
 
       if type != "wiki" && type != "pages"
         if obj_id.to_i > 0
