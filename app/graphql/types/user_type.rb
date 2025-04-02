@@ -47,13 +47,13 @@ module Types
 
     global_id_field :id
 
-    field :name, String, null: true
+    field :name, HtmlEncodedStringType, null: true
     field :short_name,
-          String,
+          HtmlEncodedStringType,
           "A short name the user has selected, for use in conversations or other less formal places through the site.",
           null: true
     field :sortable_name,
-          String,
+          HtmlEncodedStringType,
           "The name of the user that is should be used for sorting groups of users, such as in the gradebook.",
           null: true
 
