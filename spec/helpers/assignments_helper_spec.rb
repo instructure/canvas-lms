@@ -122,7 +122,7 @@ describe AssignmentsHelper do
 
   describe "#assignment_submission_button" do
     before do
-      student_in_course
+      student_in_course(active_all: true)
       assignment_model(course: @course)
       @assignment.update_attribute(:submission_types, "online_upload")
       allow(self).to receive(:can_do).and_return true

@@ -335,5 +335,9 @@ class StudentAssignmentPageV2
     def textarea_div_container
       f("#textarea-emoji-container")
     end
+
+    def view
+      f('[data-testid="assignments-2-student-view"]')
+    end
   end
 end

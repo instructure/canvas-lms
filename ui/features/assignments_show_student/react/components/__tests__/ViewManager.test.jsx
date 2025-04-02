@@ -98,6 +98,7 @@ describe('ViewManager', () => {
       COURSE_ID: '1',
       current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},
       enrollment_state: 'active',
+      can_submit_assignment_from_section: true,
       PREREQS: {},
       current_user_roles: ['user', 'student'],
     }
@@ -199,6 +200,18 @@ describe('ViewManager', () => {
 
       it('is not displayed if the enrollment state is something other than active', async () => {
         window.ENV.enrollment_state = 'completed'
+
+        const props = await makeProps({currentAttempt: 1})
+        const {queryByText} = render(
+          <MockedProvider>
+            <ViewManager {...props} />
+          </MockedProvider>,
+        )
+        expect(queryByText('New Attempt')).toBeNull()
+      })
+
+      it('is not displayed if the student is concluded in the section the assignment is assigned to', async () => {
+        window.ENV.can_submit_assignment_from_section = false
 
         const props = await makeProps({currentAttempt: 1})
         const {queryByText} = render(

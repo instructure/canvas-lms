@@ -31,6 +31,20 @@ describe SubmissionsController do
       assert_unauthorized
     end
 
+    it "does not allow a student to submit an assignment that is assigned to a section they are concluded in" do
+      course_with_student_logged_in(active_all: true)
+      sec1 = @course.course_sections.create!(name: "section 1")
+      sec2 = @course.course_sections.create!(name: "section 2")
+      @course.enroll_student(@student, enrollment_state: "active", section: sec1, allow_multiple_enrollments: true)
+      concluded_enrollment = @course.enroll_student(@student, enrollment_state: "active", section: sec2, allow_multiple_enrollments: true)
+      concluded_enrollment.conclude
+      @course.account.enable_service(:avatars)
+      @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
+      create_section_override_for_assignment(@assignment, course_section: sec2)
+      post "create", params: { course_id: @course.id, assignment_id: @assignment.id, submission: { submission_type: "online_url", url: "url" } }
+      assert_unauthorized
+    end
+
     it "allows submitting homework" do
       course_with_student_logged_in(active_all: true)
       @course.account.enable_service(:avatars)

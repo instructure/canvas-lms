@@ -255,6 +255,7 @@ class ViewManager extends React.Component {
         value={{
           allowChangesToSubmission:
             ENV.enrollment_state === 'active' &&
+            ENV.can_submit_assignment_from_section &&
             !ENV.ISOBSERVER &&
             submission.gradingStatus !== 'excused',
           // we want to continue allowing peer review commenting for excused assignments

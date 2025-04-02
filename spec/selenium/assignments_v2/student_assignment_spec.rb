@@ -1303,5 +1303,38 @@ describe "as a student" do
         end
       end
     end
+
+    context "with an active and concluded enrollment" do
+      before do
+        @assignment = @course.assignments.create!
+        @sec1 = @course.course_sections.create!(name: "section 1")
+        @sec2 = @course.course_sections.create!(name: "section 2")
+        @sec3 = @course.course_sections.create!(name: "section 3")
+
+        @student = student_in_course(course: @course, active_all: true, user_name: "student").user
+        @course.enroll_student(@student, enrollment_state: "active", section: @sec1, allow_multiple_enrollments: true)
+        concluded_enrollment = @course.enroll_student(@student, enrollment_state: "active", section: @sec2, allow_multiple_enrollments: true)
+        deleted_enrollment = @course.enroll_student(@student, enrollment_state: "active", section: @sec3, allow_multiple_enrollments: true)
+
+        concluded_enrollment.conclude
+        deleted_enrollment.destroy
+      end
+
+      it "does not allow student to submit for assignment assigned to concluded section" do
+        create_section_override_for_assignment(@assignment, course_section: @sec2)
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
+        expect(StudentAssignmentPageV2.view).to include_text("You are unable to submit to this assignment as your enrollment in this section has been concluded.")
+      end
+
+      it "allows student to submit for assignment assigned to active section" do
+        create_section_override_for_assignment(@assignment, course_section: @sec1)
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
+        expect(StudentAssignmentPageV2.view).to_not include_text("You are unable to submit to this assignment as your enrollment in this section has been concluded.")
+      end
+    end
   end
 end

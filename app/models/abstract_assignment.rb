@@ -2032,7 +2032,8 @@ class AbstractAssignment < ActiveRecord::Base
         context.grants_right?(user, session, :participate_as_student) &&
         !locked_for?(user) &&
         visible_to_user?(user) &&
-        !excused_for?(user)
+        !excused_for?(user) &&
+        enrollment_active_for_assignment?(user)
     end
     can :submit
 
@@ -3799,6 +3800,40 @@ class AbstractAssignment < ActiveRecord::Base
                                              .merge(Enrollment.active_or_pending)
                                              .exists?
                                 end
+  end
+
+  def enrollment_active_for_assignment?(user)
+    # A user can have multiple section enrollments. If any are concluded, they shouldn't submit assignments for those sections.
+    user_active_enrollments = Enrollment.where(user_id: user.global_id)
+                                        .where(course_id: context_id)
+                                        .where(Enrollment.active_student_conditions)
+                                        .pluck(:course_section_id)
+
+    return false if user_active_enrollments.empty?
+
+    # Collect both module and assignment overrides
+    all_overrides = (context_modules.flat_map(&:assignment_overrides) + assignment_overrides)
+    return true if all_overrides.empty?
+
+    # If there's a "Course" override, meaning we are using "Everyone Else" with a module override, return true
+    return true if all_overrides.any? { |o| o.set_type == "Course" }
+
+    override_priority_order = %w[ADHOC Group CourseSection]
+    # Sort overrides based on priority
+    grouped_overrides = all_overrides.group_by(&:set_type)
+    sorted_overrides = override_priority_order.flat_map { |type| grouped_overrides[type] || [] }
+
+    # Process overrides in order
+    sorted_overrides.each do |override|
+      case override.set_type
+      when "ADHOC", "Group"
+        return true if override.applies_to_students.include?(user)
+      when "CourseSection"
+        return true if user_active_enrollments.include?(override.set_id)
+      end
+    end
+
+    false
   end
 
   # simply versioned models are always marked new_record, but for our purposes
