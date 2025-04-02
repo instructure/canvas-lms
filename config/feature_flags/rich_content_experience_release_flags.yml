@@ -46,6 +46,10 @@ buttons_and_icons_root_account:
   description: |-
     Manage a library of custom icons from the RCE.
   environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
     production:
       state: hidden
 
