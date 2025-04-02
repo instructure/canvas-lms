@@ -17,31 +17,10 @@
  */
 
 import React from 'react'
-import {fireEvent, render, waitFor, within} from '@testing-library/react'
-import {
-  defaultRoleChoice,
-  deleteMultipleEnrollmentsByNoMatch,
-  getEnrollmentAndUserProps,
-  getStoredData,
-  isEnrollmentMatch,
-  isMatchFound,
-  type Props,
-  TempEnrollAssign,
-  tempEnrollAssignData,
-} from '../TempEnrollAssign'
+import {fireEvent, render, waitFor} from '@testing-library/react'
+import {type Props, TempEnrollAssign} from '../TempEnrollAssign'
 import fetchMock from 'fetch-mock'
-import {
-  type Enrollment,
-  MAX_ALLOWED_COURSES_PER_PAGE,
-  PROVIDER,
-  RECIPIENT,
-  type Role,
-  type User,
-} from '../types'
-import {deleteEnrollment, getTemporaryEnrollmentPairing} from '../api/enrollment'
-import * as localStorageUtils from '../util/helpers'
-import {getDayBoundaries} from '../util/helpers'
-import MockDate from 'mockdate'
+import {MAX_ALLOWED_COURSES_PER_PAGE, PROVIDER, type User} from '../types'
 
 const backCall = jest.fn()
 
@@ -156,14 +135,6 @@ const ENROLLMENTS_URI = encodeURI(
 const ENROLLMENTS_URI_PAGE_2 = encodeURI(
   `/api/v1/users/${props.user.id}/courses?enrollment_state=active&include[]=sections&include[]=term&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCoursePage2[0].account_id}&page=2`,
 )
-
-function formatDateToLocalString(utcDateStr: string) {
-  const date = new Date(utcDateStr)
-  return {
-    date: new Intl.DateTimeFormat('en-US', {dateStyle: 'long'}).format(date),
-    time: new Intl.DateTimeFormat('en-US', {timeStyle: 'short', hour12: true}).format(date),
-  }
-}
 
 describe('TempEnrollAssign', () => {
   beforeEach(() => {
@@ -326,134 +297,6 @@ describe('TempEnrollAssign', () => {
         <TempEnrollAssign {...props} rolePermissions={falsePermissions} />,
       )
       expect(queryByText('No roles available')).not.toBeInTheDocument()
-    })
-
-    describe('localStorage interactions', () => {
-      it('sets state from localStorage on mount', async () => {
-        const mockData = {
-          roleChoice: {id: '92', name: 'TeacherEnrollment'},
-        }
-        localStorage.setItem(tempEnrollAssignData, JSON.stringify(mockData))
-
-        const screen = render(<TempEnrollAssign {...props} />)
-
-        // wait for the component to load
-        await waitFor(() => {
-          const loadingElement = screen.queryByText(/Retrieving user enrollments/)
-          expect(loadingElement).not.toBeInTheDocument()
-        })
-
-        const input = screen.getByPlaceholderText('Select a Role')
-        expect(input).toHaveValue('Teacher')
-      })
-
-      it('saves to localStorage on role select', async () => {
-        const screen = render(<TempEnrollAssign {...props} />)
-        const roleSelect = await screen.findByPlaceholderText('Select a Role')
-        fireEvent.click(roleSelect)
-
-        const options = await screen.findAllByRole('option')
-        fireEvent.click(options[1]) // select the "Custom Teacher Role" option
-
-        const storedData = localStorage.getItem(tempEnrollAssignData) as string
-        const parsedData = JSON.parse(storedData)
-        expect(parsedData).toEqual({roleChoice: {id: '92', name: 'Teacher'}})
-      })
-
-      it('saves to localStorage on state select', async () => {
-        const screen = render(<TempEnrollAssign {...props} />)
-        const stateSelect = await screen.findByPlaceholderText('Begin typing to search')
-        fireEvent.click(stateSelect)
-        const options = await screen.findAllByRole('option')
-        fireEvent.click(options[0]) // select the “Deleted” option
-        const storedData = localStorage.getItem(tempEnrollAssignData) as string
-        const parsedData = JSON.parse(storedData)
-        expect(parsedData).toEqual({stateChoice: 'deleted'})
-      })
-
-      // SKIPPED as part of the InstUI 10 upgrade, for some reason this test
-      // winds up in an infinite loop and/or fails to complete its Promise
-      // Ticket: FOO-5281
-      it.skip('FOO-5281 skipped; saves to localStorage on START date change', async () => {
-        const expectedStartDateDisplay = 'Apr 15 2023'
-        const expectedStartDateISO = '2023-04-15'
-        const expectedStartTime12Hr = '1:00 PM'
-
-        const {findByLabelText, getByText} = render(<TempEnrollAssign {...props} />)
-
-        const startDate = await findByLabelText('Begins On *')
-        fireEvent.input(startDate, {target: {value: expectedStartDateDisplay}})
-        fireEvent.blur(startDate)
-
-        const startDateContainer = getByText('Start Date for Melvin').closest('fieldset')
-
-        const {findByLabelText: findByLabelTextWithinStartDate} = within(
-          startDateContainer as HTMLElement,
-        )
-        const startTime = await findByLabelTextWithinStartDate('Time *')
-
-        fireEvent.input(startTime, {target: {value: expectedStartTime12Hr}})
-        fireEvent.blur(startTime)
-
-        await waitFor(() => {
-          const storedDataRaw = localStorage.getItem(tempEnrollAssignData) as string
-          expect(storedDataRaw).toBeTruthy()
-
-          const storedData = JSON.parse(storedDataRaw)
-
-          // extract date and time parts
-          const [datePart, timeFragment] = storedData.startDate.split('T')
-
-          // check date
-          expect(datePart).toBe(expectedStartDateISO)
-
-          // check time
-          const localTime = formatDateToLocalString(`${datePart} ${timeFragment}`).time
-          expect(localTime).toBe(expectedStartTime12Hr)
-        })
-      })
-
-      // SKIPPED as part of the InstUI 10 upgrade, for some reason this test
-      // winds up in an infinite loop and/or fails to complete its Promise
-      // Ticket: FOO-5281
-      it.skip('FOO-5281 skipped; saves to localStorage on END date change', async () => {
-        const expectedEndDateDisplay = 'Apr 16 2023'
-        const expectedEndDateISO = '2023-04-16'
-        const expectedEndTime12Hr = '2:00 PM'
-
-        const {findByLabelText, getByText} = render(<TempEnrollAssign {...props} />)
-
-        const endDate = await findByLabelText('Until *')
-        fireEvent.input(endDate, {target: {value: expectedEndDateDisplay}})
-        fireEvent.blur(endDate)
-
-        const endDateContainer = getByText('End Date for Melvin').closest('fieldset')
-
-        const {findByLabelText: findByLabelTextWithinEndDate} = within(
-          endDateContainer as HTMLElement,
-        )
-        const endTime = await findByLabelTextWithinEndDate('Time *')
-
-        fireEvent.input(endTime, {target: {value: expectedEndTime12Hr}})
-        fireEvent.blur(endTime)
-
-        await waitFor(() => {
-          const storedDataRaw = localStorage.getItem(tempEnrollAssignData) as string
-          expect(storedDataRaw).toBeTruthy()
-
-          const storedData = JSON.parse(storedDataRaw)
-
-          // extract date and time parts
-          const [datePart, timeFragment] = storedData.endDate.split('T')
-
-          // check date
-          expect(datePart).toBe(expectedEndDateISO)
-
-          // check time
-          const localTime = formatDateToLocalString(`${datePart} ${timeFragment}`).time
-          expect(localTime).toBe(expectedEndTime12Hr) // 2 p.m.
-        })
-      })
     })
   })
 
