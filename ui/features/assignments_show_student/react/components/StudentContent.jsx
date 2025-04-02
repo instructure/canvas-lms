@@ -67,13 +67,13 @@ const RubricsQuery = lazy(
     ),
 )
 
-function EnrollmentConcludedNotice() {
+function EnrollmentConcludedNotice({hasActiveEnrollment}) {
   return (
     <View as="div" textAlign="center" margin="auto" padding="small">
       <Text fontStyle="italic" size="large">
-        {I18n.t(
-          'You are unable to submit to this assignment as your enrollment in this course has been concluded.',
-        )}
+        {hasActiveEnrollment
+          ? I18n.t('You are unable to submit to this assignment as your enrollment in this section has been concluded.')
+          : I18n.t('You are unable to submit to this assignment as your enrollment in this course has been concluded.')}
       </Text>
     </View>
   )
@@ -256,7 +256,7 @@ function renderContentBaseOnAvailability(
           <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
         )}
         {renderLTIToolIframe(assignment, submission)}
-        {ENV.enrollment_state === 'completed' && <EnrollmentConcludedNotice />}
+        {(ENV.enrollment_state === 'completed' || !ENV.can_submit_assignment_from_section) && <EnrollmentConcludedNotice hasActiveEnrollment={ENV.enrollment_state === 'active'} />}
       </>
     )
   }

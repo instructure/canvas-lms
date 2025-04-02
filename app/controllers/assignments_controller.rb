@@ -337,6 +337,7 @@ class AssignmentsController < ApplicationController
           if student_to_view.present?
             js_env({
                      enrollment_state: active_enrollment&.state_based_on_date,
+                     can_submit_assignment_from_section: @assignment.enrollment_active_for_assignment?(student_to_view),
                      stickers_enabled: @context.feature_enabled?(:submission_stickers)
                    })
             rce_js_env
