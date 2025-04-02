@@ -111,7 +111,20 @@ class AnonymousOrModerationEvent < ApplicationRecord
   end
 
   def self.events_for_submission(assignment_id:, submission_id:)
-    where(assignment_id:, submission_id: [nil, submission_id]).order(:created_at)
+    events_for_submissions([{ assignment_id:, submission_id: }])
+  end
+
+  def self.events_for_submissions(ids)
+    query = nil
+    grouped_ids = ids.group_by { |id_pair| id_pair[:assignment_id] }
+                     .transform_values { |pairs| pairs.map { |pair| pair[:submission_id] } }
+
+    grouped_ids.each do |assignment_id, submission_ids|
+      condition = where(assignment_id:, submission_id: [nil, *submission_ids]).order(:created_at)
+      query = query.nil? ? condition : query.or(condition)
+    end
+
+    query
   end
 
   EVENT_TYPES.each do |event_type|
