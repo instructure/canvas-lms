@@ -89,7 +89,7 @@ const Error = ({errorType, onClick}: ErrorProps) => (
         : I18n.t('There was an error loading the insights')
     }
     description={I18n.t('Please try again')}
-    buttonText={errorType === 'generating' ? I18n.t('Reload results') : I18n.t('Generate Insights')}
+    buttonText={errorType === 'generating' ? I18n.t('Generate Insights') : I18n.t('Reload results')}
     onClick={onClick}
     Icon={errorType === 'generating' ? <IconRefreshLine /> : <IconAiLine />}
   />
