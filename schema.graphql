@@ -1027,6 +1027,126 @@ interface AssignmentsConnectionInterface {
   ): AssignmentConnection
 }
 
+type AuditEvent implements LegacyIDInterface & Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  contextExternalTool: AuditEventExternalTool
+  createdAt: DateTime
+  eventType: AuditEventType!
+  payload: JSON
+  quiz: AuditEventQuiz
+  updatedAt: DateTime
+  user: AuditEventUser
+}
+
+"""
+The connection type for AuditEvent.
+"""
+type AuditEventConnection {
+  """
+  A list of edges.
+  """
+  edges: [AuditEventEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [AuditEvent]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type AuditEventEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: AuditEvent
+}
+
+type AuditEventExternalTool implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  name: String!
+  role: AuditEventRole!
+}
+
+type AuditEventQuiz implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  name: String!
+  role: AuditEventRole!
+}
+
+enum AuditEventRole {
+  admin
+  final_grader
+  grader
+  student
+}
+
+enum AuditEventType {
+  assignment_created
+  assignment_updated
+  docviewer_area_created
+  docviewer_area_deleted
+  docviewer_area_updated
+  docviewer_comment_created
+  docviewer_comment_deleted
+  docviewer_comment_updated
+  docviewer_free_draw_created
+  docviewer_free_draw_deleted
+  docviewer_free_draw_updated
+  docviewer_free_text_created
+  docviewer_free_text_deleted
+  docviewer_free_text_updated
+  docviewer_highlight_created
+  docviewer_highlight_deleted
+  docviewer_highlight_updated
+  docviewer_point_created
+  docviewer_point_deleted
+  docviewer_point_updated
+  docviewer_strikeout_created
+  docviewer_strikeout_deleted
+  docviewer_strikeout_updated
+  grades_posted
+  provisional_grade_created
+  provisional_grade_selected
+  provisional_grade_updated
+  rubric_created
+  rubric_deleted
+  rubric_updated
+  submission_comment_created
+  submission_comment_deleted
+  submission_comment_updated
+  submission_updated
+}
+
+type AuditEventUser implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  name: String!
+  role: AuditEventRole!
+}
+
 type AuditLogs {
   """
   A list of all recent graphql mutations run on the specified object
@@ -7107,6 +7227,27 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   attachment: File
   attachments: [File!]
   attempt: Int!
+  auditEventsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): AuditEventConnection
   body: String
   cachedDueDate: DateTime
   commentsConnection(

@@ -128,5 +128,15 @@ module Types
 
       nil
     end
+
+    field :audit_events_connection, AuditEventType.connection_type, null: true
+    def audit_events_connection
+      return unless object.assignment.context.grants_right?(current_user, :view_audit_trail)
+
+      scoped_ctx = context.scoped
+      scoped_ctx.set!(:parent_submission, object)
+
+      object.audit_events
+    end
   end
 end
