@@ -34,7 +34,6 @@ import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/u
 import {LATEST_BLOCK_DATA_VERSION} from '@canvas/block-editor/react/utils'
 import {BODY_MAX_LENGTH} from '../../utils/constants'
 import MasteryPathToggle from '@canvas/mastery-path-toggle/react/MasteryPathToggle'
-import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
 
 const I18n = createI18nScope('pages')
 
@@ -559,7 +558,6 @@ export default class WikiPageEditView extends ValidatedFormView {
 
   saveAndPublish(_event) {
     this.shouldPublish = true
-    this.$el.trigger('submit')
   }
 
   onSaveFail(xhr) {
