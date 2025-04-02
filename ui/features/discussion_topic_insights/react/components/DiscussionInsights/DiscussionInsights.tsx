@@ -27,7 +27,6 @@ import InsightsActionBar from '../InsightsActionBar/InsightsActionBar'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useInsight} from '../../hooks/useFetchInsights'
 import {formatDate, getStatusByRelevance} from '../../utils'
-import InsightsReviewRatings from '../InsightsReviewRatings/InsightsReviewRatings'
 import useInsightStore from '../../hooks/useInsightStore'
 import {Button} from '@instructure/ui-buttons'
 import NewActivityInfo from '../NewActivityInfo/NewActivityInfo'
@@ -55,13 +54,6 @@ const headers: Header[] = [
     width: '45%',
     alignment: 'start',
     sortAble: false,
-  },
-  {
-    id: 'review',
-    text: I18n.t('Review'),
-    width: 'fit-content',
-    alignment: 'center',
-    sortAble: true,
   },
   {
     id: 'date',
@@ -162,7 +154,6 @@ const DiscussionInsights: React.FC = () => {
     ),
     name: item.student_name,
     notes: item.relevance_ai_evaluation_notes,
-    review: <InsightsReviewRatings />,
     date: formatDate(new Date(item.entry_updated_at)),
     actions: (
       <Button size="small" onClick={() => setModalOpen(true)}>
