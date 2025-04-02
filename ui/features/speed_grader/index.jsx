@@ -159,6 +159,7 @@ ready(() => {
           commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled ?? false,
           lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
           ltiIframeAllowances: iframeAllowances(),
+          permissions: { canViewAuditTrail: window.ENV.can_view_audit_trail ?? false },
           gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
         },
         features: {

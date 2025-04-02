@@ -1080,6 +1080,7 @@ class GradebooksController < ApplicationController
         course_id: @context.id,
         late_policy: @context.late_policy&.as_json(include_root: false),
         gradebook_group_filter_id: @current_user.get_latest_preference_setting_by_key(:gradebook_settings, @context.global_id, "filter_rows_by", "student_group_ids"),
+        can_view_audit_trail: @assignment.present? && @assignment.can_view_audit_trail?(@current_user),
       }
       js_env(env)
 
