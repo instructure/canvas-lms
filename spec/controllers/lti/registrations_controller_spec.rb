@@ -132,9 +132,23 @@ RSpec.describe Lti::RegistrationsController do
 
       it "sets ltiUsage configuration in env" do
         get :index, params: { account_id: account.id }
-        expect(assigns.dig(:js_env, :LTI_USAGE)).to include(
-          :env, :region, :canvasBaseUrl, :firstName, :locale, :rootAccountId, :rootAccountUuid
+        values = assigns.dig(:js_env, :LTI_USAGE)
+        expect(values).to include(
+          :env, :region, :canvasBaseUrl, :firstName, :locale, :rootAccountId, :rootAccountUuid, :isPremiumAccount
         )
+        expect(values[:rootAccountId]).to eq(account.root_account.id)
+        expect(values[:rootAccountUuid]).to eq(account.root_account.uuid)
+      end
+
+      context "with lti_usage_premium enabled" do
+        before do
+          account.enable_feature!(:lti_usage_premium)
+        end
+
+        it "says the account is a premium one" do
+          get :index, params: { account_id: account.id }
+          expect(assigns.dig(:js_env, :LTI_USAGE, :isPremiumAccount)).to be true
+        end
       end
     end
   end
