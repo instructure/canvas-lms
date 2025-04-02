@@ -22,6 +22,8 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import WikiPageEditView from '../WikiPageEditView'
 import WikiPage from '../../models/WikiPage'
 import {BODY_MAX_LENGTH} from '../../../utils/constants'
+import {screen} from '@testing-library/dom'
+import userEvent from '@testing-library/user-event'
 
 const createView = opts => {
   const view = new WikiPageEditView({
@@ -46,6 +48,7 @@ describe('WikiPageEditView', () => {
   afterEach(() => {
     container.remove()
     fakeENV.teardown()
+    jest.restoreAllMocks()
   })
 
   test('should render the view', () => {
@@ -62,12 +65,16 @@ describe('WikiPageEditView', () => {
     expect(view.$('.body_has_errors')).toBeDefined()
   })
 
-  test('saveAndPublish should trigger native submit', async () => {
-    window.block_editor = false
-    const view = createView()
-    const triggerSpy = jest.spyOn(view.$el, 'trigger')
-    view.saveAndPublish()
-    expect(triggerSpy).toHaveBeenCalledWith('submit')
+  test('should only make 1 request when save & publish is clicked', async () => {
+    const submitSpy = jest
+      .spyOn(WikiPageEditView.prototype, 'submit')
+      .mockImplementation(function (e) {
+        // stops not implemented error from cluttering logs
+        e?.preventDefault()
+      })
+    createView({WIKI_RIGHTS: {publish_page: true}})
+    await userEvent.click(screen.getByRole('button', {name: 'Save & Publish'}))
+    expect(submitSpy.mock.calls).toHaveLength(1)
   })
 
   describe('validate form data', () => {
