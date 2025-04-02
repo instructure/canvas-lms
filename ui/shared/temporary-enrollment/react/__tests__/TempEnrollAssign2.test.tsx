@@ -87,14 +87,6 @@ const enrollmentsByCourse = [
   },
 ]
 
-const additionalRecipient = {
-  email: 'ross@email.com',
-  id: '6',
-  login_id: 'mel123',
-  name: 'Melvin',
-  sis_user_id: '11',
-}
-
 const props: Props = {
   enrollments: [
     {
