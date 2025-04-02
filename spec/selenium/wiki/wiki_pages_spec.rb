@@ -104,6 +104,16 @@ describe "Wiki Pages" do
       get "/courses/#{@course.id}/pages/Page1/edit"
       wiki_page_title_input.clear
       f("form.edit-form button.submit").click
+      wait_for_ajaximations
+      expect(f('[id*="TextInput-messages"]')).to include_text "Title must contain at least one letter or number"
+    end
+
+    it "displays error if no title on save and publish", :ignore_js_errors, priority: "1" do
+      @course.wiki_pages.create!(title: "Page1", workflow_state: "unpublished")
+      get "/courses/#{@course.id}/pages/Page1/edit"
+      wiki_page_title_input.clear
+      f(".save_and_publish").click
+      wait_for_ajaximations
       expect(f('[id*="TextInput-messages"]')).to include_text "Title must contain at least one letter or number"
     end
 
