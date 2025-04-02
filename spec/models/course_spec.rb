@@ -8309,4 +8309,48 @@ describe Course do
       expect(@course.active_differentiation_tags).to contain_exactly(@differentiation_tag)
     end
   end
+
+  describe "#set_horizon_course" do
+    it "does not set horizon_course when account is not a horizon account" do
+      account = Account.create!
+
+      course = account.courses.create!
+      expect(course.horizon_course).to be_falsey
+    end
+
+    it "sets horizon_course when creating a course in a horizon account" do
+      account = Account.create!
+      account.enable_feature!(:horizon_course_setting)
+      account.horizon_account = true
+      account.save!
+
+      course = account.courses.create!
+      course.save!
+      expect(course.horizon_course).to be true
+    end
+
+    it "updates horizon_course when moving a course to a horizon account" do
+      regular_account = Account.create!
+
+      horizon_account = Account.create!
+      horizon_account.enable_feature!(:horizon_course_setting)
+      horizon_account.horizon_account = true
+      horizon_account.save!
+
+      course = regular_account.courses.create!
+      expect(course.horizon_course).to be_falsey
+
+      course.account = horizon_account
+      course.save!
+      expect(course.horizon_course).to be true
+    end
+
+    it "does not run the callback on regular course updates" do
+      course = Account.default.courses.create!
+      expect(course).not_to receive(:set_horizon_course)
+
+      course.name = "New Course Name"
+      course.save!
+    end
+  end
 end
