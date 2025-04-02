@@ -29,7 +29,7 @@ import {
   IconGroupLine,
   IconMoreSolid,
   IconPermissionsLine,
-} from '@instructure/ui-icons'
+IconAiLine} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import {
   CURRENT_USER,
@@ -46,7 +46,6 @@ import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/
 import {breakpointsShape} from '@canvas/with-breakpoints'
 import {Drilldown} from '@instructure/ui-drilldown'
 import {getGroupDiscussionUrl} from '../../utils'
-import AiIcon from '@canvas/ai-icon'
 import SortOrderDropDown from './SortOrderDropDown'
 
 const I18n = createI18nScope('discussions_posts')
@@ -227,7 +226,7 @@ const DiscussionPostButtonsToolbar = props => {
           onOptionClick={props.onSummarizeClick}
         >
           <Flex gap="small">
-            <AiIcon />
+            <IconAiLine />
             {I18n.t('Summarize')}
           </Flex>
         </Drilldown.Option>,
@@ -243,7 +242,7 @@ const DiscussionPostButtonsToolbar = props => {
           onOptionClick={toggleTranslateText}
         >
           <Flex gap="small">
-            <AiIcon />
+            <IconAiLine />
             {translationOptionText}
           </Flex>
         </Drilldown.Option>,

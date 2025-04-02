@@ -21,8 +21,7 @@ import EmptyDesert from '@canvas/images/react/EmptyDesert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
-import AiIcon from '@canvas/ai-icon'
-import {IconRefreshLine} from '@instructure/ui-icons'
+import {IconAiLine,IconRefreshLine} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
@@ -69,7 +68,7 @@ const Template = ({
     </View>
     {buttonText && (
       <View as="div">
-        <Link onClick={onClick} renderIcon={Icon || AiIcon}>
+        <Link onClick={onClick} renderIcon={Icon || IconAiLine}>
           {buttonText}
         </Link>
       </View>
@@ -92,7 +91,7 @@ const Error = ({errorType, onClick}: ErrorProps) => (
     description={I18n.t('Please try again')}
     buttonText={errorType === 'generating' ? I18n.t('Reload results') : I18n.t('Generate Insights')}
     onClick={onClick}
-    Icon={errorType === 'generating' ? <IconRefreshLine /> : <AiIcon />}
+    Icon={errorType === 'generating' ? <IconRefreshLine /> : <IconAiLine />}
   />
 )
 
