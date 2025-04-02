@@ -111,8 +111,7 @@ module UserLearningObjectScopes
     contexts: nil,
     include_concluded: false,
     include_ignored: false,
-    include_ungraded: false,
-    discussion_checkpoints_enabled: false
+    include_ungraded: false
   )
     original_shard = Shard.current
     shard.activate do
@@ -141,7 +140,6 @@ module UserLearningObjectScopes
               shard_course_ids,
               shard_group_ids,
               participation_type,
-              discussion_checkpoints_enabled:,
               include_ignored:,
               include_ungraded:
             ))
@@ -163,7 +161,6 @@ module UserLearningObjectScopes
                   shard_hash[:course_ids],
                   shard_hash[:group_ids],
                   participation_type,
-                  discussion_checkpoints_enabled:,
                   include_ignored:,
                   include_ungraded:
                 ))
@@ -183,18 +180,29 @@ module UserLearningObjectScopes
     shard_course_ids,
     shard_group_ids,
     participation_type,
-    discussion_checkpoints_enabled: false,
     include_ignored: false,
     include_ungraded: false
   )
     scope = object_type.constantize
     scope = scope.not_ignored_by(self, purpose) unless include_ignored
-    scope = scope.for_course(shard_course_ids) if ["Assignment", "SubAssignment", "Quizzes::Quiz"].include?(object_type)
+    scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz"].include?(object_type)
+
+    course_ids_by_account_id = Course.where(id: shard_course_ids).group(:account_id).pluck(Arel.sql("account_id, ARRAY_AGG(id)")).to_h
+    accounts_with_checkpoints, accounts_without_checkpoints = Account.where(id: course_ids_by_account_id.keys).partition(&:discussion_checkpoints_enabled?)
+    course_ids_with_checkpoints_enabled = accounts_with_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] }
+    course_ids_with_checkpoints_disabled = accounts_without_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] }
+
+    scope = scope.for_course(course_ids_with_checkpoints_enabled) if object_type == "SubAssignment"
+
     if ["Assignment", "SubAssignment"].include?(object_type)
       scope = (participation_type == :student) ? scope.published : scope.active
       scope = scope.expecting_submission unless include_ungraded
-      if object_type == "Assignment" && discussion_checkpoints_enabled
-        scope = scope.where(has_sub_assignments: false)
+
+      if object_type == "Assignment"
+        # if checkopoints is enabled for a course, only include non-checkpointed assignments
+        # if checkpoints is disabled, include all assignments
+        scope = scope.for_course(course_ids_with_checkpoints_enabled).where(has_sub_assignments: false)
+                     .or(scope.for_course(course_ids_with_checkpoints_disabled))
       end
     end
     [scope, shard_course_ids, shard_group_ids]
@@ -359,7 +367,7 @@ module UserLearningObjectScopes
               ).count
   end
 
-  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, is_sub_assignment: false, discussion_checkpoints_enabled: false, **opts)
+  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, is_sub_assignment: false, **opts)
     if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
       scope = is_sub_assignment ? SubAssignment.none : Assignment.none
       return scope_only ? scope : []

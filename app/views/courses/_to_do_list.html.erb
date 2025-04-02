@@ -33,7 +33,7 @@ additional_title_context ||= false
     cache_opts = (contexts.present? ? {} : { :expires_in => 3.minutes })
     cache(safe_cache_key([@current_user, @current_user&.cache_key(:todo_list), contexts, show_legacy_todo_list, 'to_do_list_view']), cache_opts) do
       hidden_todos = 0
-      presenter = ToDoListPresenter.new(self, @current_user, contexts, root_account)
+      presenter = ToDoListPresenter.new(self, @current_user, contexts)
   %>
     <% if presenter.any_assignments? %>
       <h2 class="todo-list-header" tabindex="-1">
