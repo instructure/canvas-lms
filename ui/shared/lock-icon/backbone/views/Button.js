@@ -204,6 +204,17 @@ LockButton.prototype.reset = function () {
 }
 
 LockButton.prototype.closeTooltip = function () {
+  var now = new Date().getTime()
+  if (!window.closeTooltipDebouncer) {
+    window.closeTooltipDebouncer = now - 200
+  }
+
+  if (window.closeTooltipDebouncer > now - 200) {
+    return
+  }
+
+  window.closeTooltipDebouncer = now
+
   return $('.ui-tooltip').remove()
 }
 
