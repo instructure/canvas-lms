@@ -46,7 +46,7 @@ const Dictionary = {
     label: I18n.t('Meets Mastery'),
   },
   nearMastery: {
-    color: ENV.use_high_contrast ? '#C23C0D' : '#FC5E13',
+    color: ENV.use_high_contrast ? '#C23C0D' : '#F06E26',
     label: I18n.t('Near Mastery'),
   },
   remedial: {

@@ -631,7 +631,7 @@ describe "outcome gradebook" do
           select_learning_mastery
           wait_for_ajax_requests
 
-          expect(selected_values_colors).to contain_exactly("#FC5E13")
+          expect(selected_values_colors).to contain_exactly("#F06E26")
         end
       end
 
