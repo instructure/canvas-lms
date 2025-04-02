@@ -134,9 +134,15 @@ module Types
       return unless object.assignment.context.grants_right?(current_user, :view_audit_trail)
 
       scoped_ctx = context.scoped
-      scoped_ctx.set!(:parent_submission, object)
-
-      object.audit_events
+      Loaders::AuditEventsLoader.load(object.id).then do |audit_events|
+        # The current submission is required for resolving the AuditEvent > User > Role field, and
+        # as such, it needs to be passed down through the context. Although some AuditEvents may
+        # have a `null` value for `submission_id`, these events are still included in the results
+        # if their `assignment_id` matches. In this case, the calculation for the AuditEvent > User
+        # > Role field relies on the current submission to determine the correct role.
+        scoped_ctx.set!(:parent_submission, object)
+        audit_events
+      end
     end
   end
 end

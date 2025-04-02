@@ -113,48 +113,84 @@ describe AnonymousOrModerationEvent do
     end
   end
 
-  describe "#events_for_submission" do
-    let(:course) { Course.create! }
-    let(:student) { course_with_user("StudentEnrollment", name: "Student", course:, active_all: true).user }
-    let(:assignment) { course.assignments.create!(name: "anonymous", anonymous_grading: true, updating_user: teacher) }
-    let(:submission) { assignment.submit_homework(student, body: "please give good grade") }
-    let(:events) do
-      AnonymousOrModerationEvent.events_for_submission(assignment_id: assignment.id, submission_id: submission.id)
-    end
+  describe "#events_for" do
+    let(:student_1) { course_with_user("StudentEnrollment", name: "Student 1", course:, active_all: true).user }
+    let(:student_2) { course_with_user("StudentEnrollment", name: "Student 2", course:, active_all: true).user }
+
+    let(:assignment_1) { course.assignments.create!(name: "anonymous", anonymous_grading: true, updating_user: teacher) }
+    let(:submission_1_1) { assignment_1.submit_homework(student_1, body: "Submission for Assignment 1 by Student 1") }
+    let(:submission_1_2) { assignment_1.submit_homework(student_2, body: "Submission for Assignment 1 by Student 2") }
+
+    let(:assignment_2) { course.assignments.create!(name: "anonymous2", anonymous_grading: true, updating_user: teacher) }
+    let(:submission_2_1) { assignment_2.submit_homework(student_1, body: "Submission for Assignment 2 by Student 1") }
 
     before do
-      submission.submission_comments.create!(author: teacher, comment: "no")
+      submission_1_1.submission_comments.create!(author: teacher, comment: "no")
+      submission_1_2.submission_comments.create!(author: teacher, comment: "no")
+      submission_2_1.submission_comments.create!(author: teacher, comment: "no")
     end
 
-    it "returns events ordered by created_at ASC" do
-      expect(events[0].created_at).to be < events[1].created_at
+    describe "submission" do
+      let(:events) do
+        AnonymousOrModerationEvent.events_for_submission(assignment_id: assignment_1.id, submission_id: submission_1_1.id)
+      end
+
+      it "returns events ordered by created_at ASC" do
+        expect(events[0].created_at).to be < events[1].created_at
+      end
+
+      it "includes AnonymousOrModerationEvents related to assignment [1] and submission [1]" do
+        expect(events.count).to be 2
+      end
+
+      it "calls events_for_submissions with the correct parameters" do
+        allow(AnonymousOrModerationEvent).to receive(:events_for_submissions).and_call_original
+        AnonymousOrModerationEvent
+          .events_for_submission(assignment_id: 1, submission_id: 2)
+
+        expect(AnonymousOrModerationEvent).to have_received(:events_for_submissions)
+          .with([{ assignment_id: 1, submission_id: 2 }])
+      end
     end
 
-    it "includes AnonymousOrModerationEvents related to assignment and submission" do
-      expect(events.count).to be 2
-    end
+    describe "submissions" do
+      let(:events) do
+        ids = [{ assignment_id: assignment_1.id, submission_id: submission_1_1.id },
+               { assignment_id: assignment_1.id, submission_id: submission_1_2.id },
+               { assignment_id: assignment_2.id, submission_id: submission_2_1.id }]
+        AnonymousOrModerationEvent.events_for_submissions(ids)
+      end
 
-    it "includes AnonymousOrModerationEvents of event_type assignment_*" do
-      assignment_events = events.select { |event| event.event_type.include?("assignment_") }
-      expect(assignment_events.count).to be 1
-    end
+      it "returns events ordered by created_at ASC" do
+        expect(events[0].created_at).to be < events[1].created_at
+      end
 
-    it "includes AnonymousOrModerationEvents of event_type submission_comment_*" do
-      submission_comment_events = events.select { |event| event.event_type.include?("submission_comment_") }
-      expect(submission_comment_events.count).to be 1
-    end
+      it "includes AnonymousOrModerationEvents related to assignment [1, 2] and submission [1, 2]" do
+        expect(events.count).to be 5
+      end
 
-    it "does not include AnonymousOrModerationEvents not related to assignment" do
-      expect do
-        course.assignments.create!(name: "another assignment", anonymous_grading: true, updating_user: teacher)
-      end.not_to change { events.count }
-    end
+      it "includes AnonymousOrModerationEvents of event_type assignment_*" do
+        assignment_events = events.select { |event| event.event_type.include?("assignment_") }
+        expect(assignment_events.count).to be 2
+      end
 
-    it "does not include AnonymousOrModerationEvents not related to submission" do
-      second_student = course_with_user("StudentEnrollment", name: "Student", course:, active_all: true).user
-      expect do
-        assignment.submit_homework(second_student, body: "please give bad grade")
-      end.not_to change { events.count }
+      it "includes AnonymousOrModerationEvents of event_type submission_comment_*" do
+        submission_comment_events = events.select { |event| event.event_type.include?("submission_comment_") }
+        expect(submission_comment_events.count).to be 3
+      end
+
+      it "does not include AnonymousOrModerationEvents not related to assignment" do
+        expect do
+          course.assignments.create!(name: "another assignment", anonymous_grading: true, updating_user: teacher)
+        end.not_to change { events.count }
+      end
+
+      it "does not include AnonymousOrModerationEvents not related to submission" do
+        second_student = course_with_user("StudentEnrollment", name: "Student", course:, active_all: true).user
+        expect do
+          assignment_1.submit_homework(second_student, body: "please give bad grade")
+        end.not_to change { events.count }
+      end
     end
   end
 end
