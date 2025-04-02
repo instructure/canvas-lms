@@ -75,10 +75,6 @@ describe "RCE next tests" do
     end
 
     context "Full RCE" do
-      before do
-        Account.site_admin.enable_feature!(:buttons_and_icons_root_account)
-      end
-
       it "has all the UI" do
         create_wiki_page(@course, "full")
 
