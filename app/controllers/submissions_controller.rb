@@ -399,53 +399,12 @@ class SubmissionsController < SubmissionsBaseController
 
     submission = Submission.find(params[:submission_id])
 
-    audit_events = AnonymousOrModerationEvent.events_for_submission(
-      assignment_id: params[:assignment_id],
-      submission_id: params[:submission_id]
-    )
-
-    user_data = User.find(audit_events.pluck(:user_id).compact)
-    tool_data = ContextExternalTool.find(audit_events.pluck(:context_external_tool_id).compact)
-    quiz_data = Quizzes::Quiz.find(audit_events.pluck(:quiz_id).compact)
-
     respond_to do |format|
       format.json do
-        render json: {
-                 audit_events: audit_events.as_json(include_root: false),
-                 users: audit_event_data(data: user_data, submission:),
-                 tools: audit_event_data(data: tool_data, role: "grader"),
-                 quizzes: audit_event_data(data: quiz_data, role: "grader", name_field: :title),
-               },
-               status: :ok
+        render json: submission.enriched_audit_events, status: :ok
       end
     end
   end
-
-  def audit_event_data(data:, submission: nil, role: nil, name_field: :name)
-    data.map do |datum|
-      {
-        id: datum.id,
-        name: datum.public_send(name_field),
-        role: role.presence || auditing_user_role(user: datum, submission:)
-      }
-    end
-  end
-  private :audit_event_data
-
-  def auditing_user_role(user:, submission:)
-    assignment = submission.assignment
-
-    if submission.user == user
-      "student"
-    elsif assignment.moderated_grading? && assignment.final_grader == user
-      "final_grader"
-    elsif assignment.course.account_membership_allows(user)
-      "admin"
-    else
-      "grader"
-    end
-  end
-  private :auditing_user_role
 
   def lookup_existing_attachments
     attachment_ids = if params[:submission][:file_ids].is_a?(Array)

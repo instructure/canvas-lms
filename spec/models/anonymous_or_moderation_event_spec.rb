@@ -19,32 +19,33 @@
 #
 
 describe AnonymousOrModerationEvent do
-  subject { AnonymousOrModerationEvent.new(params) }
-
-  let(:params) do
-    {
-      user_id: user.id,
-      assignment_id: assignment.id,
-      event_type: :assignment_created,
-      payload: { foo: :bar }
-    }
-  end
   let(:course) { Course.create! }
-  let(:user) { course_with_user("TeacherEnrollment", name: "Teacher", course:, active_all: true).user }
-  let(:assignment) { course.assignments.create!(name: "assignment") }
-  let(:quiz) { quiz_model }
-  let(:external_tool) do
-    Account.default.context_external_tools.create!(
-      name: "Undertow",
-      url: "http://www.example.com",
-      consumer_key: "12345",
-      shared_secret: "secret"
-    )
-  end
-
-  it { is_expected.to be_valid }
+  let(:teacher) { course_with_user("TeacherEnrollment", name: "Teacher", course:, active_all: true).user }
 
   describe "validations" do
+    subject { AnonymousOrModerationEvent.new(params) }
+
+    let(:params) do
+      {
+        user_id: teacher.id,
+        assignment_id: assignment.id,
+        event_type: :assignment_created,
+        payload: { foo: :bar }
+      }
+    end
+    let(:assignment) { course.assignments.create!(name: "assignment") }
+    let(:quiz) { quiz_model }
+    let(:external_tool) do
+      Account.default.context_external_tools.create!(
+        name: "Undertow",
+        url: "http://www.example.com",
+        consumer_key: "12345",
+        shared_secret: "secret"
+      )
+    end
+
+    it { is_expected.to be_valid }
+
     it { expect { AnonymousOrModerationEvent.new.validate }.not_to raise_error }
 
     context "event ownership validations" do
@@ -114,7 +115,6 @@ describe AnonymousOrModerationEvent do
 
   describe "#events_for_submission" do
     let(:course) { Course.create! }
-    let(:teacher) { course_with_user("TeacherEnrollment", name: "Teacher", course:, active_all: true).user }
     let(:student) { course_with_user("StudentEnrollment", name: "Student", course:, active_all: true).user }
     let(:assignment) { course.assignments.create!(name: "anonymous", anonymous_grading: true, updating_user: teacher) }
     let(:submission) { assignment.submit_homework(student, body: "please give good grade") }
@@ -124,6 +124,10 @@ describe AnonymousOrModerationEvent do
 
     before do
       submission.submission_comments.create!(author: teacher, comment: "no")
+    end
+
+    it "returns events ordered by created_at ASC" do
+      expect(events[0].created_at).to be < events[1].created_at
     end
 
     it "includes AnonymousOrModerationEvents related to assignment and submission" do
