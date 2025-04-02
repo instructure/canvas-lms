@@ -26,6 +26,7 @@ class Progress < ActiveRecord::Base
     :group_category,
     :content_export,
     :assignment,
+    :submission,
     :attachment,
     :epub_export,
     :sis_batch,
