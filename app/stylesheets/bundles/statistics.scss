@@ -58,6 +58,18 @@ table.numbers_table {
     padding-top: 2px;
     border-bottom: 1px dotted #ccc;
   }
+  button.over_time_link {
+    background: none;
+    color: var(--ic-link-color);
+    border: none;
+    padding: 0;
+    font: inherit;
+    text-decoration: none;
+    &:hover {
+      color: var(--ic-link-color);
+      text-decoration: underline;
+    }
+  }
 }
 
 .stats table {

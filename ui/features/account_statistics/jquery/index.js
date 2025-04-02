@@ -25,6 +25,30 @@ import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 const I18n = createI18nScope('accounts.statistics')
 
+function focusAndAddAriaAttributesToCloseButton() {
+  const closeButton = $('.ui-dialog-titlebar-close')
+  closeButton.attr('role', 'button')
+  closeButton.focus()
+}
+
+function addAriaAttributesToDialog() {
+  const dialog = $('.ui-dialog')
+
+  if (!dialog.attr('aria-modal')) {
+    dialog.attr('aria-modal', 'true')
+  }
+}
+
+function updateChartAriaLabels(label) {
+  const chartContainer = $(
+    '#over_time_AnnotationChart_chartContainer > div > div > div, #over_time_AnnotationChart_chartContainer svg, #over_time_AnnotationChart_rangeControlContainer > div > div > div, #over_time_AnnotationChart_rangeControlContainer svg',
+  )
+  chartContainer.removeAttr('aria-label')
+
+  const chart = $('#over_time_AnnotationChart_chartContainer > div > div > div > div')
+  chart.attr('aria-label', label)
+}
+
 function populateDialog(data_points, axis, $link) {
   $('#over_time_dialog').dialog({
     width: 630,
@@ -35,6 +59,10 @@ function populateDialog(data_points, axis, $link) {
     },
     modal: true,
     zIndex: 1000,
+    open: () => {
+      focusAndAddAriaAttributesToCloseButton()
+      addAriaAttributesToDialog()
+    },
   })
 
   // google dependencies declared in views/acccounts/statistics since google.load uses document.write :(
@@ -59,6 +87,18 @@ function populateDialog(data_points, axis, $link) {
 
   const chart = new google.visualization.AnnotatedTimeLine(document.getElementById('over_time'))
   chart.draw(data, {displayAnnotations: false})
+
+  const checkInterval = setInterval(function () {
+    const chart = $('#over_time_AnnotationChart_chartContainer')
+
+    // Check if the chart has been drawn
+    if (chart.length) {
+      const label = I18n.t('Graph of %{data_point} Over Time', {data_point: axis})
+      updateChartAriaLabels(label)
+
+      clearInterval(checkInterval)
+    }
+  }, 100)
 }
 
 $(document).ready(() => {
