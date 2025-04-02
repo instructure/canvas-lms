@@ -1938,7 +1938,11 @@ class Attachment < ActiveRecord::Base
     return unless filename
 
     if instfs_hosted?
-      InstFS.delete_file(instfs_uuid)
+      begin
+        InstFS.delete_file(instfs_uuid)
+      rescue InstFS::DeletionError => e
+        Rails.logger.warn("InstFS file deletion failed for attachment #{id}: #{e.message}")
+      end
       self.instfs_uuid = nil
     elsif Attachment.s3_storage?
       s3object.delete unless ApplicationController.test_cluster?

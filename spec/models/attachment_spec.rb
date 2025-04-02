@@ -714,6 +714,15 @@ describe Attachment do
       a.destroy_content
     end
 
+    it "logs and continues when InstFS file deletion fails" do
+      a = attachment_model
+      allow(a).to receive_messages(instfs_hosted?: true, instfs_uuid: "some-uuid")
+      expect(a).to receive(:instfs_uuid=).with(nil)
+      allow(InstFS).to receive(:delete_file).and_raise(InstFS::DeletionError, "deletion failed")
+      expect(Rails.logger).to receive(:warn).with("InstFS file deletion failed for attachment #{a.id}: deletion failed")
+      expect { a.destroy_content }.not_to raise_error
+    end
+
     it "allows destroy_content_and_replace when s3object is already deleted" do
       s3_storage!
       a = attachment_model(uploaded_data: default_uploaded_data)
