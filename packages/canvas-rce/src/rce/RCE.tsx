@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {forwardRef, useState} from 'react'
+import React, {forwardRef, useEffect, useState} from 'react'
 import formatMessage from '../format-message'
 import RCEWrapper from './RCEWrapper'
 import type {ExternalToolsConfig, LtiToolsPropType} from './RCEWrapperProps'
@@ -71,17 +71,14 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
   useState(() => {
     formatMessage.setup({locale: normalizeLocale(props.language)})
   })
-  const [translations, setTranslations] = useState<Promise<void> | boolean>(() => {
+
+  const [isTranslationLoading, setIsTranslationLoading] = useState(true)
+
+  useEffect(() => {
     const locale = normalizeLocale(props.language)
-    const p = getTranslations(locale)
-      .then(() => {
-        setTranslations(true)
-      })
-      .catch(err => {
-        console.error('Failed loading the language file for', locale, '\n Cause:', err)
-        setTranslations(false)
-      })
-    return p
+    getTranslations(locale)
+      .catch(err => console.error('Failed loading the language file for', locale, '\n Cause:', err))
+      .finally(() => setIsTranslationLoading(false))
   })
 
   // some properties are only used on initialization
@@ -117,7 +114,7 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
     return iProps
   })
 
-  if (typeof translations !== 'boolean') {
+  if (isTranslationLoading) {
     return <>{formatMessage('Loading...')}</>
   } else {
     return (
