@@ -2707,7 +2707,7 @@ describe AssignmentsApiController, type: :request do
       context "when no tool association exists" do
         let(:assignment) { assignment_model(course: @course) }
         let(:update_response) do
-          put "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}", params: {
+          put "/api/v1/courses/#{assignment.course.id}/assignments/#{assignment.id}", params: {
             assignment: { name: "banana" }
           }
         end
@@ -2726,7 +2726,7 @@ describe AssignmentsApiController, type: :request do
           a
         end
         let(:update_response) do
-          put "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}", params:
+          put "/api/v1/courses/#{assignment.course.id}/assignments/#{assignment.id}", params:
         end
         let(:lookups) { assignment.assignment_configuration_tool_lookups }
 
@@ -2774,6 +2774,16 @@ describe AssignmentsApiController, type: :request do
           it "does not attempt to clear tool associations" do
             expect(assignment).not_to receive(:clear_tool_settings_tools)
             update_response
+          end
+
+          it "does not delete asset processors" do
+            ap = assignment.lti_asset_processors.create!(
+              context_external_tool: external_tool_1_3_model
+            )
+            assignment.update! submission_types: "online_upload"
+
+            update_response
+            expect(ap.reload.workflow_state).to eq("active")
           end
         end
 

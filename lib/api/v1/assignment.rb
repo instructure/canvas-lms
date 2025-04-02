@@ -1250,17 +1250,19 @@ module Api::V1::Assignment
   end
 
   def apply_asset_processor_settings(assignment, assignment_params)
-    # Remove APs if the assignment is no longer capable.
-    # We only need to do this (and incur the DB hit) if the assignment _was_
-    # capable.
-    unless asset_processor_capable?(submission_types: assignment_params["submission_types"])
-      if asset_processor_capable?(submission_types: assignment.submission_types_array)
-        assignment.lti_asset_processors.active.destroy_all
-      end
+    # Ignore unless truly an edit (e.g. ignore publish/unpublish, which should really be a PATCH, but the API doesn't work that way...)
+    submission_types = assignment_params["submission_types"]
+    return unless submission_types.present?
 
-      return
+    if asset_processor_capable?(submission_types:)
+      add_or_remove_asset_processors(assignment, assignment_params)
+    elsif asset_processor_capable?(submission_types: assignment.submission_types_array)
+      # Remove APs if the assignment is no longer capable.
+      assignment.lti_asset_processors.active.destroy_all
     end
+  end
 
+  def add_or_remove_asset_processors(assignment, assignment_params)
     asset_processors = assignment_params["asset_processors"] || []
     existing_ids_to_keep = asset_processors.filter_map { |ap| ap["existing_id"] }
     content_items_to_create = asset_processors.filter_map { |ap| ap["new_content_item"] }
