@@ -22,7 +22,7 @@ module ConditionalRelease
     class << self
       # handle the parts of the service that was making API calls back to canvas to create/remove assignment overrides
 
-      def handle_grade_change(submission)
+      def handle_grade_change(progress, submission)
         return unless submission.graded? && submission.posted? # sanity check
 
         sets_to_assign, sets_to_unassign = find_assignment_sets(submission)
@@ -33,6 +33,8 @@ module ConditionalRelease
                                                                  student_id: submission.user_id,
                                                                  actor_id: submission.grader_id,
                                                                  source: "grade_change")
+
+        progress.update_completion!(100)
       end
 
       def handle_assignment_set_selection(student, trigger_assignment, assignment_set_id)
@@ -130,7 +132,20 @@ module ConditionalRelease
           end
         end
         if course
-          SubmissionLifecycleManager.recompute_users_for_course([student_id], course, assignments_to_assign.concat(assignments_to_unassign))
+          affected_assignments = assignments_to_assign.concat(assignments_to_unassign)
+          SubmissionLifecycleManager.recompute_users_for_course([student_id], course, affected_assignments)
+          affected_context_modules = ContextModule.active.joins(:content_tags).where(content_tags: { content_type: "Assignment", content_id: affected_assignments }).distinct
+
+          student = User.find(student_id)
+          affected_context_modules.each do |context_module|
+            progression = context_module.find_or_create_progression(student)
+            progression.mark_as_outdated
+            progression.evaluate
+          end
+
+          if course.root_account.feature_enabled? :mastery_path_invalidate_assignment_visibility_cache
+            AssignmentVisibility::AssignmentVisibilityService.invalidate_cache(course_ids: [course.id], user_ids: [student_id])
+          end
         end
       end
 

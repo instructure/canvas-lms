@@ -79,6 +79,20 @@ module AssignmentVisibility
           )
         end
       end
+
+      def invalidate_cache(course_ids: nil, user_ids: nil, assignment_ids: nil)
+        unless course_ids || assignment_ids
+          raise ArgumentError, "at least one non nil course_id or assignment_id is required (for query performance reasons)"
+        end
+
+        course_ids = Array(course_ids) if course_ids
+        user_ids = Array(user_ids) if user_ids
+        assignment_ids = Array(assignment_ids) if assignment_ids
+
+        key = service_cache_key(service: name, course_ids:, user_ids:, additional_ids: assignment_ids)
+
+        Rails.cache.delete(key)
+      end
     end
   end
 end

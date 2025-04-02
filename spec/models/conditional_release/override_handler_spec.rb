@@ -31,10 +31,12 @@ module ConditionalRelease
         @rule.destroy!
         expect(ConditionalRelease::OverrideHandler).to_not receive(:handle_grade_change)
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
       end
 
       it "automatically assigns to the proper assignment set when graded" do
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher) # should automatically assign to top set
+        run_jobs
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to include(@set1_assmt1)
         expect(visible_assmts).to_not include(@set2_assmt1) # and only the top set
@@ -42,9 +44,13 @@ module ConditionalRelease
 
       it "automatically unassigns if the grade changes" do
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher) # should automatically assign to top set
+        run_jobs
         @trigger_assmt.grade_student(@student, grade: 5, grader: @teacher) # actually nvm should automatically assign to middle set
+        run_jobs
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher) # should automatically assign to top set
+        run_jobs
         @trigger_assmt.grade_student(@student, grade: 5, grader: @teacher) # actually nvm should automatically assign to middle set
+        run_jobs
 
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to_not include(@set1_assmt1)
@@ -56,17 +62,21 @@ module ConditionalRelease
         old_student = @student
         student_in_course(course: @course, active_all: true)
         @trigger_assmt.grade_student(old_student, grade: 9, grader: @teacher)
+        run_jobs
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
         expect(@set1_assmt1.assignment_overrides.count).to eq 1
         expect(@set1_assmt1.assignment_overrides.first.assignment_override_students.count).to eq 2
 
         @trigger_assmt.grade_student(@student, grade: 5, grader: @teacher) # now unassign
+        run_jobs
         expect(DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a).to_not include(@set1_assmt1)
         expect(DifferentiableAssignment.scope_filter(@course.assignments, old_student, @course).to_a).to include(@set1_assmt1)
       end
 
       it "does not automatically assign when there are multiple applicable sets for the student to choose from" do
         @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher)
+        run_jobs
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to_not include(@set3a_assmt)
         expect(visible_assmts).to_not include(@set3b_assmt)
@@ -77,10 +87,12 @@ module ConditionalRelease
         @set2.assignment_set_associations.create!(assignment: @set1_assmt1) # add the set1 assignment to set2 for inexplicable reasons
 
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher) # should automatically assign to top set
+        run_jobs
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to include(@set1_assmt1) # should still unlock
 
         @trigger_assmt.grade_student(@student, grade: 5, grader: @teacher) # actually nvm should automatically assign to middle set
+        run_jobs
         visible_assmts2 = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts2).to include(@set1_assmt1) # should stay unlocked even though we technically dropped set1
       end
@@ -89,6 +101,7 @@ module ConditionalRelease
     context "handle_assignment_set_selection" do
       before :once do
         @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher) # set up the choice
+        run_jobs
         @set_a = @set3a_assmt.conditional_release_associations.first.assignment_set
         @set_b = @set3b_assmt.conditional_release_associations.first.assignment_set
         @invalid_set = @set1_assmt1.conditional_release_associations.first.assignment_set
@@ -135,6 +148,7 @@ module ConditionalRelease
         ConditionalRelease::OverrideHandler.handle_assignment_set_selection(old_student, @trigger_assmt, @set_a.id)
         student_in_course(course: @course, active_all: true)
         @trigger_assmt.grade_student(@student, grade: 3, grader: @teacher)
+        run_jobs
         ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
 
         expect(@set3a_assmt.assignment_overrides.count).to eq 1
