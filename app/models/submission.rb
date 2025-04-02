@@ -959,6 +959,14 @@ class Submission < ActiveRecord::Base
     versioned_originality_reports.present?
   end
 
+  def audit_events
+    AuditEventService.new(self).call
+  end
+
+  def enriched_audit_events
+    AuditEventService.new(self).enrich(audit_events)
+  end
+
   def all_versioned_attachments
     attachment_ids = submission_history.map(&:attachment_ids_for_version).flatten.uniq
     Attachment.where(id: attachment_ids)

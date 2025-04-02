@@ -118,6 +118,42 @@ class AnonymousOrModerationEvent < ApplicationRecord
     scope event_type, -> { where(event_type:) }
   end
 
+  # Determines the user's role in relation to a submission and assignment for auditing purposes.
+  #
+  # WARNING: This method makes critical assumptions about authorization. It will default to
+  # returning "grader" for any user who doesn't match the explicit conditions, WITHOUT
+  # actually verifying if the user has grading permissions.
+  #
+  # Proper authorization checks MUST be performed before calling this method to ensure
+  # the user actually has a valid role in this context.
+  #
+  # Example misuse case:
+  #   course = Course.find(1)
+  #   assignment = course.assignments.first
+  #   submission1 = assignment.submissions.first
+  #   submission2 = assignment.submissions.second
+  #
+  #   # This would incorrectly return "grader" for a student who has no grading permissions
+  #   AnonymousOrModerationEvent.auditing_user_role(user: submission1.user,
+  #                                                submission: submission2,
+  #                                                assignment: assignment)
+  #
+  # @param user [User] The user whose role is being determined
+  # @param submission [Submission] The submission being considered
+  # @param assignment [Assignment] The assignment containing the submission
+  # @return [String] One of: "student", "final_grader", "admin", or "grader"
+  def self.auditing_user_role(user:, submission:, assignment:)
+    if submission.user == user
+      "student"
+    elsif assignment.moderated_grading? && assignment.final_grader == user
+      "final_grader"
+    elsif assignment.course.account_membership_allows(user)
+      "admin"
+    else
+      "grader"
+    end
+  end
+
   private
 
   %w[id student_id annotation_body].each do |key|
