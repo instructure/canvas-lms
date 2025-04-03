@@ -21,7 +21,7 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {LaunchSettings} from '../components/LaunchSettings'
 import {mockInternalConfiguration} from './helpers'
-import {createLti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
+import {createLti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 
 describe('LaunchSettings', () => {
   beforeEach(() => {

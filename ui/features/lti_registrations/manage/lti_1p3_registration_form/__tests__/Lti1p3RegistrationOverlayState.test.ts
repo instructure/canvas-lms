@@ -19,10 +19,10 @@
 import type {LtiConfigurationOverlay} from '../../model/internal_lti_configuration/LtiConfigurationOverlay'
 import {
   createLti1p3RegistrationOverlayStore,
-  type Lti1p3RegistrationOverlayState,
   type Lti1p3RegistrationOverlayStore,
-} from '../Lti1p3RegistrationOverlayState'
-import {convertToLtiConfigurationOverlay} from '../Lti1p3RegistrationOverlayStateHelpers'
+} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
+import {type Lti1p3RegistrationOverlayState} from '../../registration_overlay/Lti1p3RegistrationOverlayState'
+import {convertToLtiConfigurationOverlay} from '../../registration_overlay/Lti1p3RegistrationOverlayStateHelpers'
 import {mockInternalConfiguration} from './helpers'
 
 describe('Lti1p3RegistrationOverlayState', () => {
