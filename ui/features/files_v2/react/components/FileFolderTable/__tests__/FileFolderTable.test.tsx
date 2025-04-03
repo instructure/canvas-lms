@@ -33,6 +33,7 @@ describe('FileFolderTable', () => {
   beforeEach(() => {
     flashElements = document.createElement('div')
     flashElements.setAttribute('id', 'flash_screenreader_holder')
+    flashElements.setAttribute('data-testid', 'flash_screenreader_holder')
     flashElements.setAttribute('role', 'alert')
     document.body.appendChild(flashElements)
   })
@@ -132,71 +133,119 @@ describe('FileFolderTable', () => {
     })
   })
 
-  describe('selection behavior', () => {
+  describe('highlights', () => {
     let user: UserEvent
     beforeEach(() => {
       user = userEvent.setup()
-      renderComponent({ rows: [FAKE_FILES[0], FAKE_FILES[1]] })
+      renderComponent({ rows: FAKE_FOLDERS_AND_FILES })
     })
 
-    it('allows row selection and highlights selected rows', async () => {
-      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
-      // Select first row
-      await user.click(rowCheckboxes[0])
-
+    it('no highlight by default', async () => {
       const firstRow = screen.getAllByTestId('table-row')[0]
+      expect(firstRow).toHaveStyle({borderColor: ''})
+    })
+
+    it('highlight when row is hovered', async () => {
+      const firstRow = screen.getAllByTestId('table-row')[0]
+      await user.hover(firstRow)
       expect(firstRow).toHaveStyle({borderColor: 'brand'})
     })
 
-    it('allows "Select All" functionality', async () => {
-      const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
-      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+    it('highlight when row is clicked', async () => {
+      const firstRow = screen.getAllByTestId('table-row')[0]
+      await user.click(firstRow)
+      expect(firstRow).toHaveStyle({borderColor: 'brand'})
+    })
+  })
 
-      // Select all rows
-      await user.click(selectAllCheckbox)
-      rowCheckboxes.forEach(checkbox => expect(checkbox).toBeChecked())
+  describe('selection behavior', () => {
+    let user: UserEvent
+    let setSelectedRows: jest.Mock
 
-      // Unselect all rows
-      await user.click(selectAllCheckbox)
-      rowCheckboxes.forEach(checkbox => expect(checkbox).not.toBeChecked())
+    beforeEach(() => {
+      user = userEvent.setup()
+      setSelectedRows = jest.fn()
     })
 
-    it('sets "Select All" checkbox to indeterminate when some rows are selected', async () => {
-      const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
-      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+    describe('when there is no selection', () => {
+      beforeEach(() => {
+        renderComponent({ rows: [FAKE_FILES[0], FAKE_FILES[1]], selectedRows: new Set(), setSelectedRows })
+      })
 
-      // Select the first row only
-      await user.click(rowCheckboxes[0])
+      it('does not check any checkboxes', async () => {
+        const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+        rowCheckboxes.forEach(checkbox => expect(checkbox).not.toBeChecked())
+      })
 
-      await waitFor(() => {
-        expect(selectAllCheckbox).toBeDefined()
-        expect((selectAllCheckbox as HTMLInputElement).indeterminate).toBe(true)
+      it('does not check "Select All" checkbox', async () => {
+        const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
+        expect(selectAllCheckbox).not.toBeChecked()
+        expect((selectAllCheckbox as HTMLInputElement).indeterminate).toBe(false)
+      })
+
+      it('calls setSelectedRows with the correct value when a row is selected', async () => {
+        const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+        await user.click(rowCheckboxes[0])
+        expect(setSelectedRows).toHaveBeenCalledWith(new Set([FAKE_FILES[0].uuid]))
+      })
+
+      it('calls setSelectedRows with all values when "Select All" is clicked', async () => {
+        const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
+        await user.click(selectAllCheckbox)
+        expect(setSelectedRows).toHaveBeenCalledWith(new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]))
       })
     })
 
-    it('updates "Select All" checkbox correctly when all rows are selected', async () => {
-      const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
-      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+    describe('when all rows are selected', () => {
+      beforeEach(() => {
+        renderComponent({ rows: [FAKE_FILES[0], FAKE_FILES[1]], selectedRows: new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]), setSelectedRows })
+      })
 
-      expect(selectAllCheckbox).toBeDefined()
-      // Select all rows
-      await user.click(selectAllCheckbox)
-      expect(selectAllCheckbox).toBeChecked()
+      it('checks all checkboxes', async () => {
+        const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+        rowCheckboxes.forEach(checkbox => expect(checkbox).toBeChecked())
+      })
 
-      // Unselect one row
-      await user.click(rowCheckboxes[0])
-      await waitFor(() => {
+      it('checks "Select All" checkbox', async () => {
+        const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
+        expect(selectAllCheckbox).toBeChecked()
+        expect((selectAllCheckbox as HTMLInputElement).indeterminate).toBe(false)
+      })
+
+      it('calls setSelectedRows with the correct value when a row is unselected', async () => {
+        const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+        await user.click(rowCheckboxes[0])
+        expect(setSelectedRows).toHaveBeenCalledWith(new Set([FAKE_FILES[1].uuid]))
+      })
+
+      it('calls setSelectedRows with empty when "Select All" is clicked', async () => {
+        const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
+        await user.click(selectAllCheckbox)
+        expect(setSelectedRows).toHaveBeenCalledWith(new Set())
+      })
+    })
+
+    describe('when some rows are selected', () => {
+      beforeEach(() => {
+        renderComponent({ rows: [FAKE_FILES[0], FAKE_FILES[1]], selectedRows: new Set([FAKE_FILES[0].uuid]), setSelectedRows })
+      })
+      
+      it('checks the "Select All" checkbox', async () => {
+        const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
         expect(selectAllCheckbox).not.toBeChecked()
         expect((selectAllCheckbox as HTMLInputElement).indeterminate).toBe(true)
       })
-    })
 
-    it('updates select screen reader alert when rows are selected', async () => {
-      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
-      await user.click(rowCheckboxes[0])
+      it('calls setSelectedRows with all values when "Select All" is clicked', async () => {
+        const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
+        await user.click(selectAllCheckbox)
+        expect(setSelectedRows).toHaveBeenCalledWith(new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]))
+      })
 
-      // includes alert and the visible text
-      expect(screen.getAllByText('1 of 2 selected')).toHaveLength(2)
+      it('updates select screen reader alert', async () => {
+        const screenReader = screen.getByTestId('flash_screenreader_holder')
+        expect(screenReader).toHaveTextContent('1 of 2 selected')
+      })
     })
   })
 
@@ -223,27 +272,6 @@ describe('FileFolderTable', () => {
       expect(
         rows[0].getElementsByTagName('td')[5].getElementsByTagName('button')[0],
       ).toBeInTheDocument()
-    })
-  })
-
-  describe('bulk actions behavior', () => {
-    it('disabled buttons when elements are not selected', async () => {
-      renderComponent({ rows: [FAKE_FILES[0], FAKE_FILES[1]] })
-
-      expect(screen.queryByText('0 selected')).toBeInTheDocument()
-    })
-
-    it('display enabled buttons when one or more elements are selected', async () => {
-      const user = userEvent.setup()
-      renderComponent({ rows: [FAKE_FILES[0]] })
-
-      const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
-      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
-
-      await user.click(selectAllCheckbox)
-      rowCheckboxes.forEach(checkbox => expect(checkbox).toBeChecked())
-
-      expect(screen.getAllByText('1 of 1 selected')).toHaveLength(2)
     })
   })
 
