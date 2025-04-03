@@ -24,6 +24,7 @@ const submit = (
   setFileError: React.Dispatch<React.SetStateAction<boolean>>,
   onSubmit: onSubmitMigrationFormCallback,
   file: File | null,
+  fileInputRef: React.RefObject<HTMLInputElement | null> | null = null,
 ) => {
   if (file) {
     setFileError(false)
@@ -34,6 +35,7 @@ const submit = (
     }
     onSubmit(formData, file)
   } else {
+    fileInputRef?.current?.focus()
     setFileError(true)
   }
 }
@@ -47,7 +49,10 @@ const isFormInvalid = (formData: any, setFileError: Dispatch<SetStateAction<bool
   return false
 }
 
-const useSubmitHandler = (onSubmit: onSubmitMigrationFormCallback) => {
+const useSubmitHandler = (
+  onSubmit: onSubmitMigrationFormCallback,
+  fileInputRef: React.RefObject<HTMLInputElement | null> | null = null,
+) => {
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<boolean>(false)
 
@@ -58,9 +63,9 @@ const useSubmitHandler = (onSubmit: onSubmitMigrationFormCallback) => {
         return
       }
 
-      submit(formData, setFileError, onSubmit, file)
+      submit(formData, setFileError, onSubmit, file, fileInputRef)
     },
-    [onSubmit, file],
+    [onSubmit, file, fileInputRef],
   )
 
   return {
@@ -71,7 +76,10 @@ const useSubmitHandler = (onSubmit: onSubmitMigrationFormCallback) => {
   }
 }
 
-const useSubmitHandlerWithQuestionBank = (onSubmit: onSubmitMigrationFormCallback) => {
+const useSubmitHandlerWithQuestionBank = (
+  onSubmit: onSubmitMigrationFormCallback,
+  fileInputRef: React.RefObject<HTMLInputElement | null> | null = null,
+) => {
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<boolean>(false)
   const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>(
@@ -89,9 +97,9 @@ const useSubmitHandlerWithQuestionBank = (onSubmit: onSubmitMigrationFormCallbac
         formData.settings = {...formData.settings, ...(questionBankSettings || {})}
       }
 
-      submit(formData, setFileError, onSubmit, file)
+      submit(formData, setFileError, onSubmit, file, fileInputRef)
     },
-    [onSubmit, file, questionBankSettings],
+    [onSubmit, file, questionBankSettings, fileInputRef],
   )
 
   return {

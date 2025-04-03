@@ -270,6 +270,12 @@ describe('ZipFileImporter', () => {
   })
 
   describe('focus after error', () => {
+    it('focuses on input after file error', async () => {
+      renderComponent()
+      await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+      expect(screen.getByTestId('migrationFileUpload')).toHaveFocus()
+    })
+
     it('focuses on input after folder error', async () => {
       renderComponent()
       const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})

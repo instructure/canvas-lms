@@ -37,6 +37,7 @@ type MigrationFileInputProps = {
   isSubmitting?: boolean
   externalFormMessage?: FormMessage
   isRequired?: boolean
+  inputRef?: (inputElement: HTMLInputElement | null) => void
 }
 
 const getHintMessage = (text: string): FormMessage => ({text, type: 'hint'})
@@ -51,6 +52,7 @@ const MigrationFileInput = ({
   isSubmitting,
   externalFormMessage,
   isRequired,
+  inputRef,
 }: MigrationFileInputProps) => {
   const [formMessage, setFormMessage] = useState<FormMessage>(
     externalFormMessage || {text: I18n.t('No file chosen'), type: 'hint'},
@@ -116,6 +118,7 @@ const MigrationFileInput = ({
         interaction={isSubmitting ? 'disabled' : 'enabled'}
         data-testid="migrationFileUpload"
         onDropRejected={handleDropRejected}
+        inputRef={inputRef}
         messages={[formMessage]}
         renderLabel={
           <View as="div" textAlign="center" padding="x-large large">
