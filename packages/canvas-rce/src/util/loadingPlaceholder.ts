@@ -188,7 +188,7 @@ export async function insertPlaceholder(
     placeholderElem.appendChild(labelElem)
 
     Object.assign(labelElem.style, {
-      color: '#2D3B45',
+      color: '#273540',
       zIndex: '1000',
 
       /* Restrict text to one line */

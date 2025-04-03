@@ -78,7 +78,7 @@ class ProficiencyTable extends React.Component {
     proficiency: {
       proficiencyRatingsConnection: {
         nodes: [
-          createRating(I18n.t('Exceeds Mastery'), 4, '127A1B'),
+          createRating(I18n.t('Exceeds Mastery'), 4, '02672D'),
           createRating(I18n.t('Mastery'), 3, '03893D', true),
           createRating(I18n.t('Near Mastery'), 2, 'FAB901'),
           createRating(I18n.t('Below Mastery'), 1, 'FD5D10'),

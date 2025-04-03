@@ -128,7 +128,7 @@ function getCourseColor(
   {K5_USER, K5_SUBJECT_COURSE, PREFERENCES: {custom_colors = {}}},
 ) {
   if (K5_USER || K5_SUBJECT_COURSE) {
-    return color || '#394B58'
+    return color || '#334451'
   } else {
     return custom_colors[assetString]
   }
@@ -292,7 +292,7 @@ export function createPlannerApp() {
 createPlannerApp.scrollEventsRegistered = false
 
 function renderApp(element) {
-   
+
   const root = createRoot(element)
   root.render(createPlannerApp())
 }
@@ -302,7 +302,7 @@ function renderHeader(element, auxElement) {
   const ariaHideElement = document.getElementById('application')
 
   // Using this pattern because default params don't merge objects
-   
+
   const root = createRoot(element)
   root.render(
     <DynamicUiProvider manager={dynamicUiManager}>
@@ -334,7 +334,7 @@ export function renderToDoSidebar(element) {
     initializedOptions.env.current_user_roles.includes('teacher') &&
     initializedOptions.env.current_user_roles.includes('student')
 
-   
+
   const root = createRoot(element)
   root.render(
     <Provider store={store}>

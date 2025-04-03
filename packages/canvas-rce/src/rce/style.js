@@ -298,7 +298,7 @@ export default function buildStyle() {
     color: ${theme.canvasButtonHoverColor};
   }
   .tox .tox-checkbox__icons .tox-checkbox-icon__unchecked svg {
-    fill: rgba(45, 59, 69, 0.3);
+    fill: rgba(39, 53, 64, 0.3);
   }
   .tox .tox-checkbox__icons .tox-checkbox-icon__indeterminate svg {
     fill: ${theme.canvasTextColor};
@@ -314,7 +314,7 @@ export default function buildStyle() {
   }
   .tox .tox-collection__group-heading {
     background-color: #e3e6e8;
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-collection__item {
     color: ${theme.canvasTextColor};
@@ -355,7 +355,7 @@ export default function buildStyle() {
     margin-right: 8px;
   }
   .tox .tox-collection__item-accessory {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-sv-palette {
     border: 1px solid black;
@@ -381,19 +381,19 @@ export default function buildStyle() {
   .tox .tox-comment {
     background: ${theme.canvasBackgroundColor};
     border-color: ${theme.canvasBorderColor};
-    box-shadow: 0 4px 8px 0 rgba(45, 59, 69, 0.1);
+    box-shadow: 0 4px 8px 0 rgba(39, 53, 64, 0.1);
   }
   .tox .tox-comment__header {
     color: ${theme.canvasTextColor};
   }
   .tox .tox-comment__date {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-comment__body {
     color: ${theme.canvasTextColor};
   }
   .tox .tox-comment__expander p {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-comment-thread__overlay::after {
     background: ${theme.canvasBackgroundColor};
@@ -412,10 +412,10 @@ export default function buildStyle() {
     background-color: ${theme.canvasBackgroundColor};
   }
   .tox .tox-user__avatar svg {
-    fill: rgba(45, 59, 69, 0.6);
+    fill: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-user__name {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-dialog-wrap__backdrop {
     background-color: rgba(255, 255, 255, 0.75);
@@ -442,7 +442,7 @@ export default function buildStyle() {
     padding: ${theme.canvasModalBodyPadding};
   }
   .tox .tox-dialog__body-nav-item {
-    color: rgba(45, 59, 69, 0.75);
+    color: rgba(39, 53, 64, 0.75);
   }
   .tox .tox-dialog__body-nav-item:focus {
     box-shadow: ${theme.canvasFocusBoxShadow};
@@ -465,7 +465,7 @@ export default function buildStyle() {
     border: 2px dashed ${theme.canvasBorderColor};
   }
   .tox .tox-dropzone p {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-edit-area {
     border: 1px solid ${theme.canvasBorderColor};
@@ -494,14 +494,14 @@ export default function buildStyle() {
     fill: ${theme.canvasSuccessColor};
   }
   .tox .tox-color-input span {
-    border-color: rgba(45, 59, 69, 0.2);
+    border-color: rgba(39, 53, 64, 0.2);
   }
   .tox .tox-color-input span:focus {
     border-color: ${theme.canvasBrandColor};
   }
   .tox .tox-label,
   .tox .tox-toolbar-label {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-form__group {
     margin: ${theme.canvasFormElementMargin};
@@ -629,7 +629,7 @@ export default function buildStyle() {
     background-color: ${theme.canvasBrandColor};
   }
   .tox .tox-spinner > div {
-    background-color: rgba(45, 59, 69, 0.6);
+    background-color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-tbtn {
     border-style: none;
@@ -713,7 +713,7 @@ export default function buildStyle() {
   }
   .tox .tox-tooltip__body {
     background-color: ${theme.canvasTextColor};
-    box-shadow: 0 2px 4px rgba(45, 59, 69, 0.3);
+    box-shadow: 0 2px 4px rgba(39, 53, 64, 0.3);
     color: rgba(255, 255, 255, 0.75);
   }
   .tox .tox-tooltip--down .tox-tooltip__arrow {

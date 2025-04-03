@@ -643,7 +643,7 @@
     flex: 0 1 100%;
     padding: 0px;
     flex-shrink: 1.3;
-    border-bottom: 0.125rem solid rgb(45, 59, 69);
+    border-bottom: 0.125rem solid rgb(39, 53, 64);
   }
 
   .matching-question__right {

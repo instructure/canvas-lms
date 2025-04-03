@@ -43,7 +43,7 @@ describe('ThemeEditor', () => {
       md5: '9e3c6d00c73e0fa989896e63077b45a8',
       variables: {
         'ic-brand-primary': '#0374B5',
-        'ic-brand-font-color-dark': '#2D3B45',
+        'ic-brand-font-color-dark': '#273540',
       },
     },
     sharedBrandConfigs: [],
@@ -69,7 +69,7 @@ describe('ThemeEditor', () => {
             variable_name: 'ic-brand-font-color-dark',
             type: 'color',
             human_name: 'Main Text Color',
-            default: '#2D3B45',
+            default: '#273540',
           },
         ],
       },

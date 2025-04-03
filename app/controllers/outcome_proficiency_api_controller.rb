@@ -44,7 +44,7 @@
 #         },
 #         "color": {
 #           "description": "The hex color code of the rating",
-#           "example": "127A1B",
+#           "example": "02672D",
 #           "type": "string"
 #         }
 #       }
@@ -93,7 +93,7 @@ class OutcomeProficiencyApiController < ApplicationController
   #        -X POST \
   #        -F 'ratings[][description]=Exceeds Mastery' \
   #        -F 'ratings[][points]=4' \
-  #        -F 'ratings[][color]=127A1B' \
+  #        -F 'ratings[][color]=02672D' \
   #        -F 'ratings[][mastery]=false' \
   #        -F 'ratings[][description]=Mastery' \
   #        -F 'ratings[][points]=3' \

@@ -38,15 +38,15 @@ const I18n = createI18nScope('gradebookOutcomeGradebookView')
 
 const Dictionary = {
   exceedsMastery: {
-    color: '#127A1B',
+    color: '#02672D',
     label: I18n.t('Exceeds Mastery'),
   },
   mastery: {
-    color: ENV.use_high_contrast ? '#127A1B' : '#03893D',
+    color: ENV.use_high_contrast ? '#02672D' : '#03893D',
     label: I18n.t('Meets Mastery'),
   },
   nearMastery: {
-    color: ENV.use_high_contrast ? '#C23C0D' : '#F06E26',
+    color: ENV.use_high_contrast ? '#CF4A00' : '#F06E26',
     label: I18n.t('Near Mastery'),
   },
   remedial: {

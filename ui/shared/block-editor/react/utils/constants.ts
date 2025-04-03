@@ -17,6 +17,6 @@
  */
 
 const white = '#ffffff'
-const black = '#2d3b45'
+const black = '#273540'
 
 export {white, black}

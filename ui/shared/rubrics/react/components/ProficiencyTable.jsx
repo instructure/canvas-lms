@@ -66,7 +66,7 @@ export default class ProficiencyTable extends React.Component {
       loading: true,
       masteryIndex: 1,
       rows: List([
-        this.createRating('Exceeds Mastery', 4, '127A1B'),
+        this.createRating('Exceeds Mastery', 4, '02672D'),
         this.createRating('Mastery', 3, '03893D'),
         this.createRating('Near Mastery', 2, 'FAB901'),
         this.createRating('Below Mastery', 1, 'FD5D10'),

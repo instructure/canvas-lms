@@ -275,7 +275,7 @@ class OfficialNotFoundGame extends React.Component {
           style={{
             border: '2px',
             borderStyle: 'solid',
-            borderColor: '#394B58',
+            borderColor: '#334451',
           }}
         />
       </div>
