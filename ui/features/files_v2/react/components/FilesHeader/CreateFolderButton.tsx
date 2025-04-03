@@ -53,6 +53,7 @@ const CreateFolderButton = ({buttonDisplay}: CreateFolderButtonProps) => {
         display={buttonDisplay}
         onClick={handleOpenModal}
         data-testid="create-folder-button"
+        elementRef={elt => elt?.setAttribute('aria-label', I18n.t('Add Folder'))}
       >
         {I18n.t('Folder')}
       </Button>

@@ -115,7 +115,7 @@ describe('FilesApp', () => {
   it('does render Upload File or Create Folder buttons when user has permission', async () => {
     renderComponent()
     const uploadButton = await screen.findByRole('button', {name: 'Upload'})
-    const createFolderButton = await screen.findByRole('button', {name: 'Folder'})
+    const createFolderButton = await screen.findByRole('button', {name: /add folder/i})
     expect(uploadButton).toBeInTheDocument()
     expect(createFolderButton).toBeInTheDocument()
   })
