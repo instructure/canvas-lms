@@ -22,6 +22,7 @@ class PageView
   class Pv4Client
     class Pv4Timeout < StandardError; end
     class Pv4EmptyResponse < StandardError; end
+    class Pv4TooManyRequests < StandardError; end
 
     def initialize(uri, access_token)
       uri = URI.parse(uri) if uri.is_a?(String)
@@ -47,6 +48,11 @@ class PageView
         @uri.merge("users/#{user.global_id}/page_views?#{params}").to_s,
         { "Authorization" => "Bearer #{@access_token}" }
       )
+
+      if response.code == 429
+        raise Pv4TooManyRequests, "rate limit exceeded"
+      end
+
       json =
         begin
           response.body.empty? ? {} : JSON.parse(response.body)

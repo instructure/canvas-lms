@@ -110,6 +110,18 @@ describe HistoryController, type: :request do
         expect(json.pluck("asset_name")).to eq(["Course People", "Assign 1"])
       end
 
+      it "gracefully handles a rate limit exceeded response" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4TooManyRequests)
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self",
+                        expected_status: :too_many_requests)
+        expect(json["error"]).to_not be_nil
+      end
+
       it "gracefully handles a pv4 timeout" do
         allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4Timeout)
         json = api_call(:get,
