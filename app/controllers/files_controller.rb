@@ -670,7 +670,7 @@ class FilesController < ApplicationController
         @attachment ||= attachment_or_replacement(@context, params[:id])
       end
 
-      if @attachment.inline_content? && params[:sf_verifier]
+      if @attachment.inline_content? && params[:sf_verifier] && redirect_for_inline?(params[:sf_verifier])
         return redirect_to url_for(params.to_unsafe_h.except(:sf_verifier))
       end
 
@@ -1730,5 +1730,11 @@ class FilesController < ApplicationController
 
   def strong_attachment_params
     params.require(:attachment).permit(:display_name, :locked, :lock_at, :unlock_at, :uploaded_data, :hidden, :visibility_level)
+  end
+
+  def redirect_for_inline?(sf_verifier)
+    Canvas::Security.decode_jwt(sf_verifier, ignore_expiration: true)[:skip_redirect_for_inline_content].blank?
+  rescue Canvas::Security::InvalidToken
+    true
   end
 end
