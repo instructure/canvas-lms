@@ -28,6 +28,7 @@ import {
 import {Tooltip} from '@instructure/ui-tooltip'
 import {type File, type Folder} from '../../../interfaces/File'
 import {getRestrictedText, isPublished, isRestricted, isHidden} from '../../../utils/fileUtils'
+import {getName} from '../../../utils/fileFolderUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -73,7 +74,7 @@ const PublishTooltipButton = ({
 }
 
 const PublishIconButton = ({item, userCanEditFilesForContext, onClick}: PublishIconButtonProps) => {
-  const fileName = 'name' in item ? item.name : item.display_name
+  const fileName = getName(item)
   const published = isPublished(item)
   const restricted = isRestricted(item)
   const hidden = isHidden(item)

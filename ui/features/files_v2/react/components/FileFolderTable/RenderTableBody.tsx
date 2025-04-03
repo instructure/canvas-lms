@@ -20,8 +20,9 @@ import {Table} from '@instructure/ui-table'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {File, Folder} from 'features/files_v2/interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
-import {getUniqueId} from '../../../utils/fileFolderUtils'
+import {getName, getUniqueId} from '../../../utils/fileFolderUtils'
 import {ModalOrTrayOptions} from './FileFolderTable'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 // Need to render in this manner to satisfy TypeScript and make sure headers are rendered in stacked view
 const renderTableBody = (
@@ -43,7 +44,7 @@ const renderTableBody = (
     const rowHead = [
       <Table.RowHeader key="select">
         <Checkbox
-          label=""
+          label={<ScreenReaderContent>{getName(row)}</ScreenReaderContent>}
           scope="row"
           size={size}
           checked={isSelected}

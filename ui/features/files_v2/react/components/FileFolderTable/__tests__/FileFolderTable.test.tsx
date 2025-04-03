@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {screen, waitFor, fireEvent} from '@testing-library/react'
+import {screen, fireEvent} from '@testing-library/react'
 import userEvent, {UserEvent} from '@testing-library/user-event'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
 import {renderComponent} from './testUtils'
@@ -45,13 +45,13 @@ describe('FileFolderTable', () => {
   })
 
   it('renders filedrop when no results and not loading', async () => {
-    renderComponent({ rows: [], isLoading: false })
+    renderComponent({rows: [], isLoading: false})
 
     expect(await screen.findByText('Drop files here to upload')).toBeInTheDocument()
   })
 
   it('renders spinner and no filedrop when loading', () => {
-    renderComponent({ isLoading: true })
+    renderComponent({isLoading: true})
 
     expect(screen.getByText('Loading data')).toBeInTheDocument()
     expect(screen.queryByText('Drop files here to upload')).not.toBeInTheDocument()
@@ -59,10 +59,10 @@ describe('FileFolderTable', () => {
 
   it('renders file drop when a file is dragged over', async () => {
     // mock file to drag over
-    const file = new File(['file content'], 'example.txt', { type: 'text/plain' })
+    const file = new File(['file content'], 'example.txt', {type: 'text/plain'})
     const dataTransfer = {
       files: [file],
-      items: [{ kind: 'file', type: file.type }],
+      items: [{kind: 'file', type: file.type}],
       types: ['Files'],
     }
 
@@ -70,14 +70,17 @@ describe('FileFolderTable', () => {
     const filesTable = await screen.findByTestId('files-table')
     const filesDirectory = await screen.findByTestId('files-directory')
 
-    filesDirectory.getBoundingClientRect = jest.fn(() => ({
-      left: 100,
-      top: 100,
-      right: 400,
-      bottom: 400,
-    } as DOMRect));
+    filesDirectory.getBoundingClientRect = jest.fn(
+      () =>
+        ({
+          left: 100,
+          top: 100,
+          right: 400,
+          bottom: 400,
+        }) as DOMRect,
+    )
 
-    fireEvent.dragEnter(filesTable, { dataTransfer })
+    fireEvent.dragEnter(filesTable, {dataTransfer})
     const fileUpload = await screen.findByTestId('file-upload')
 
     // FileDrag__dragging ensures fileDrop is visible when dragging
@@ -89,10 +92,10 @@ describe('FileFolderTable', () => {
     const event = new Event('dragleave', {
       bubbles: true,
     })
-    Object.defineProperty(event, 'clientX', { value: 500 })
-    Object.defineProperty(event, 'clientY', { value: 500 })
+    Object.defineProperty(event, 'clientX', {value: 500})
+    Object.defineProperty(event, 'clientY', {value: 500})
 
-    filesTable.dispatchEvent(event);
+    filesTable.dispatchEvent(event)
     expect(fileUpload).not.toHaveClass('FileDrag__dragging')
     expect(fileUpload).not.toHaveClass('FileDrag__full')
   })
@@ -106,16 +109,32 @@ describe('FileFolderTable', () => {
   })
 
   it('renders file/folder rows when results', async () => {
-    renderComponent({ rows: FAKE_FOLDERS_AND_FILES })
+    renderComponent({rows: FAKE_FOLDERS_AND_FILES})
 
     expect(await screen.findAllByTestId('table-row')).toHaveLength(FAKE_FOLDERS_AND_FILES.length)
-    expect(screen.getByText(FAKE_FOLDERS_AND_FILES[0].name)).toBeInTheDocument()
+    const link = screen.getByRole('link', {
+      name: FAKE_FOLDERS_AND_FILES[0].name,
+    })
+    expect(link).toBeInTheDocument()
+  })
+
+  it('has labels for checkboxes', async () => {
+    renderComponent({rows: [FAKE_FILES[0], FAKE_FOLDERS[0]]})
+
+    const selectAllCheckbox = screen.getByLabelText('Select all items')
+    expect(selectAllCheckbox).toBeInTheDocument()
+
+    const fileCheckbox = screen.getByLabelText(FAKE_FILES[0].display_name)
+    expect(fileCheckbox).toBeInTheDocument()
+
+    const folderCheckbox = screen.getByLabelText(FAKE_FOLDERS[0].name)
+    expect(folderCheckbox).toBeInTheDocument()
   })
 
   describe('modified_by column', () => {
     it('renders link with user profile of file rows when modified by user', async () => {
       const {display_name, html_url} = FAKE_FILES[0].user || {}
-      renderComponent({ rows: [FAKE_FILES[0]] })
+      renderComponent({rows: [FAKE_FILES[0]]})
 
       const userLink = await screen.findByText(display_name!)
       expect(userLink).toBeInTheDocument()
@@ -123,7 +142,7 @@ describe('FileFolderTable', () => {
     })
 
     it('does not render link when folder', () => {
-      renderComponent({ rows: [FAKE_FOLDERS[0]] })
+      renderComponent({rows: [FAKE_FOLDERS[0]]})
 
       const userLinks = screen.queryAllByText((_, element) => {
         if (!element) return false
@@ -137,7 +156,7 @@ describe('FileFolderTable', () => {
     let user: UserEvent
     beforeEach(() => {
       user = userEvent.setup()
-      renderComponent({ rows: FAKE_FOLDERS_AND_FILES })
+      renderComponent({rows: FAKE_FOLDERS_AND_FILES})
     })
 
     it('no highlight by default', async () => {
@@ -169,7 +188,11 @@ describe('FileFolderTable', () => {
 
     describe('when there is no selection', () => {
       beforeEach(() => {
-        renderComponent({ rows: [FAKE_FILES[0], FAKE_FILES[1]], selectedRows: new Set(), setSelectedRows })
+        renderComponent({
+          rows: [FAKE_FILES[0], FAKE_FILES[1]],
+          selectedRows: new Set(),
+          setSelectedRows,
+        })
       })
 
       it('does not check any checkboxes', async () => {
@@ -192,13 +215,19 @@ describe('FileFolderTable', () => {
       it('calls setSelectedRows with all values when "Select All" is clicked', async () => {
         const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
         await user.click(selectAllCheckbox)
-        expect(setSelectedRows).toHaveBeenCalledWith(new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]))
+        expect(setSelectedRows).toHaveBeenCalledWith(
+          new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]),
+        )
       })
     })
 
     describe('when all rows are selected', () => {
       beforeEach(() => {
-        renderComponent({ rows: [FAKE_FILES[0], FAKE_FILES[1]], selectedRows: new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]), setSelectedRows })
+        renderComponent({
+          rows: [FAKE_FILES[0], FAKE_FILES[1]],
+          selectedRows: new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]),
+          setSelectedRows,
+        })
       })
 
       it('checks all checkboxes', async () => {
@@ -227,9 +256,13 @@ describe('FileFolderTable', () => {
 
     describe('when some rows are selected', () => {
       beforeEach(() => {
-        renderComponent({ rows: [FAKE_FILES[0], FAKE_FILES[1]], selectedRows: new Set([FAKE_FILES[0].uuid]), setSelectedRows })
+        renderComponent({
+          rows: [FAKE_FILES[0], FAKE_FILES[1]],
+          selectedRows: new Set([FAKE_FILES[0].uuid]),
+          setSelectedRows,
+        })
       })
-      
+
       it('checks the "Select All" checkbox', async () => {
         const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
         expect(selectAllCheckbox).not.toBeChecked()
@@ -239,7 +272,9 @@ describe('FileFolderTable', () => {
       it('calls setSelectedRows with all values when "Select All" is clicked', async () => {
         const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
         await user.click(selectAllCheckbox)
-        expect(setSelectedRows).toHaveBeenCalledWith(new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]))
+        expect(setSelectedRows).toHaveBeenCalledWith(
+          new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]),
+        )
       })
 
       it('updates select screen reader alert', async () => {
@@ -301,7 +336,7 @@ describe('FileFolderTable', () => {
     // TODO: the scope of this test overextends unit test
     it.skip('opens delete modal when delete button is clicked', async () => {
       const user = userEvent.setup()
-      renderComponent({ rows: [FAKE_FILES[0]] })
+      renderComponent({rows: [FAKE_FILES[0]]})
 
       const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
       await user.click(rowCheckboxes[0])

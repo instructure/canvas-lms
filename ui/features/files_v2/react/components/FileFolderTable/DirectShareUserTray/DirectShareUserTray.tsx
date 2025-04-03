@@ -30,6 +30,7 @@ import DirectShareUserPanel from './DirectShareUserPanel'
 import FileFolderTray from '../../shared/TrayWrapper'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
+import {getName} from '../../../../utils/fileFolderUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -73,7 +74,7 @@ const DirectShareUserTrayBody = ({
         <Spinner
           data-testid="send-to-spinner"
           renderTitle={I18n.t('Sending %{file}', {
-            file: file.display_name || file.filename,
+            file: getName(file),
           })}
           margin="0 0 0 medium"
           aria-live="polite"
