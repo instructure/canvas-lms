@@ -42,5 +42,11 @@ describe Types::OutcomeProficiencyType do
         account_type.resolve("outcomeProficiency { proficiencyRatingsConnection { nodes { _id } } }").sort
       ).to eq(@outcome_proficiency.outcome_proficiency_ratings.map { |r| r.id.to_s })
     end
+
+    it "masteryPoints" do
+      expect(
+        account_type.resolve("outcomeProficiency { masteryPoints }")
+      ).to eq(@outcome_proficiency.mastery_points)
+    end
   end
 end
