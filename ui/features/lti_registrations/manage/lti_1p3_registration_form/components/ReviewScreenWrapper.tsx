@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {ReviewScreen} from '../../registration_wizard_forms/ReviewScreen'
-import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
+import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {Lti1p3RegistrationWizardStep} from '../Lti1p3RegistrationWizardState'
 import {toUndefined} from '../../../common/lib/toUndefined'

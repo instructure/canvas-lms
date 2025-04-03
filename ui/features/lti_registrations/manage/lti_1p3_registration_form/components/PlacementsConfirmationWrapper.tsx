@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import { PlacementsConfirmation } from '../../registration_wizard_forms/PlacementsConfirmation'
-import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
+import {PlacementsConfirmation} from '../../registration_wizard_forms/PlacementsConfirmation'
+import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
-import {AllLtiPlacements, InternalOnlyLtiPlacements } from '../../model/LtiPlacement'
+import {AllLtiPlacements, InternalOnlyLtiPlacements} from '../../model/LtiPlacement'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 
 export type PlacementsConfirmationProps = {
@@ -37,8 +37,9 @@ export const PlacementsConfirmationWrapper = ({
   const {state, ...actions} = overlayStore()
 
   const internalConfigPlacements = internalConfig.placements.map(p => p.placement)
-  const availablePlacements = allPlacements
-    .filter(p => !InternalOnlyLtiPlacements.includes(p as any) || internalConfigPlacements.includes(p))
+  const availablePlacements = allPlacements.filter(
+    p => !InternalOnlyLtiPlacements.includes(p as any) || internalConfigPlacements.includes(p),
+  )
 
   return (
     <RegistrationModalBody>

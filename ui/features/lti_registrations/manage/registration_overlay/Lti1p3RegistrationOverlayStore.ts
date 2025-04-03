@@ -25,52 +25,10 @@ import {create} from 'zustand'
 import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
 import {initialOverlayStateFromInternalConfig} from './Lti1p3RegistrationOverlayStateHelpers'
 import {filterEmptyString} from '../../common/lib/filterEmptyString'
+import {Lti1p3RegistrationOverlayState} from './Lti1p3RegistrationOverlayState'
 
-type PlacementLabelOverride = string
-type IconUrlOverride = string
-
-export type Lti1p3RegistrationOverlayState = {
-  launchSettings: Partial<{
-    redirectURIs: string
-    targetLinkURI: string
-    openIDConnectInitiationURL: string
-    JwkMethod: 'public_jwk_url' | 'public_jwk'
-    JwkURL: string
-    Jwk: string
-    domain: string
-    customFields: string
-  }>
-  permissions: {
-    scopes?: LtiScope[]
-  }
-  data_sharing: {
-    privacy_level?: LtiPrivacyLevel
-  }
-  placements: {
-    placements?: LtiPlacement[]
-    courseNavigationDefaultDisabled?: boolean
-  }
-  override_uris: {
-    placements: Partial<
-      Record<
-        LtiPlacement,
-        {
-          message_type?: LtiMessageType
-          uri?: string
-        }
-      >
-    >
-  }
-  naming: {
-    nickname?: string
-    description?: string
-    notes?: string
-    placements: Partial<Record<LtiPlacement, PlacementLabelOverride>>
-  }
-  icons: {
-    placements: Partial<Record<LtiPlacementWithIcon, IconUrlOverride>>
-  }
-}
+export type PlacementLabelOverride = string
+export type IconUrlOverride = string
 
 export interface Lti1p3RegistrationOverlayActions {
   setRedirectURIs: (redirectURIs: string) => void
@@ -148,19 +106,6 @@ const updateMessageType = (placement: LtiPlacement, messageType: LtiMessageType)
       },
     }
   })
-}
-
-export const computeCourseNavDefaultValue = (
-  state: Lti1p3RegistrationOverlayState,
-  internalConfig?: InternalLtiConfiguration,
-): 'enabled' | 'disabled' | undefined => {
-  const courseNavConfig = internalConfig?.placements.find(p => p.placement === 'course_navigation')
-  if (typeof state.placements.courseNavigationDefaultDisabled !== 'undefined') {
-    const overlayState = state.placements.courseNavigationDefaultDisabled ? 'disabled' : 'enabled'
-    return courseNavConfig?.default === overlayState ? undefined : overlayState
-  } else {
-    return undefined
-  }
 }
 
 export const createLti1p3RegistrationOverlayStore = (
@@ -288,18 +233,4 @@ export const createLti1p3RegistrationOverlayStore = (
     },
   }))
 
-export const keys = <T>(object?: T): Array<keyof T> => {
-  return (object ? Object.keys(object) : []) as Array<keyof T>
-}
-
 export type Lti1p3RegistrationOverlayStore = ReturnType<typeof createLti1p3RegistrationOverlayStore>
-
-export const formatCustomFields = (
-  customFields: Record<string, string> | null | undefined,
-): string | undefined => {
-  return customFields
-    ? Object.entries(customFields).reduce((acc, [key, value]) => {
-        return acc + `${key}=${value}\n`
-      }, '')
-    : undefined
-}

@@ -21,7 +21,7 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {PermissionConfirmationWrapper} from '../components/PermissionConfirmationWrapper'
 import {mockInternalConfiguration} from './helpers'
-import {createLti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
+import {createLti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 

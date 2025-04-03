@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
+import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {LtiPrivacyLevels} from '../../model/LtiPrivacyLevel'
 import {PrivacyConfirmation} from '../../registration_wizard_forms/PrivacyConfirmation'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'

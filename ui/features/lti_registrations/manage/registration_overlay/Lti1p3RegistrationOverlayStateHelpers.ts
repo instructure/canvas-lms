@@ -25,12 +25,7 @@ import {
   isLtiPlacementWithIcon,
   type LtiPlacementWithIcon,
 } from '../model/LtiPlacement'
-import {
-  type Lti1p3RegistrationOverlayState,
-  keys,
-  formatCustomFields,
-  computeCourseNavDefaultValue,
-} from './Lti1p3RegistrationOverlayState'
+import {type Lti1p3RegistrationOverlayState} from './Lti1p3RegistrationOverlayState'
 
 export const initialOverlayStateFromInternalConfig = (
   internalConfig: InternalLtiConfiguration,
@@ -249,4 +244,31 @@ const recordsAreEqual = (a: Record<string, string>, b: Record<string, string>) =
     return false
   }
   return keys.every(key => a[key] === b[key])
+}
+
+export const keys = <T>(object?: T): Array<keyof T> => {
+  return (object ? Object.keys(object) : []) as Array<keyof T>
+}
+
+export const formatCustomFields = (
+  customFields: Record<string, string> | null | undefined,
+): string | undefined => {
+  return customFields
+    ? Object.entries(customFields).reduce((acc, [key, value]) => {
+        return acc + `${key}=${value}\n`
+      }, '')
+    : undefined
+}
+
+export const computeCourseNavDefaultValue = (
+  state: Lti1p3RegistrationOverlayState,
+  internalConfig?: InternalLtiConfiguration,
+): 'enabled' | 'disabled' | undefined => {
+  const courseNavConfig = internalConfig?.placements.find(p => p.placement === 'course_navigation')
+  if (typeof state.placements.courseNavigationDefaultDisabled !== 'undefined') {
+    const overlayState = state.placements.courseNavigationDefaultDisabled ? 'disabled' : 'enabled'
+    return courseNavConfig?.default === overlayState ? undefined : overlayState
+  } else {
+    return undefined
+  }
 }
