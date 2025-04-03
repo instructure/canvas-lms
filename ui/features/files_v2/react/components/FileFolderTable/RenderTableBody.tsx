@@ -52,11 +52,7 @@ const renderTableBody = (
         />
       </Table.RowHeader>,
       ...columnHeaders.map(column => (
-        <Table.Cell
-          scope="row"
-          key={column.id}
-          textAlign={isStacked ? undefined : column.textAlign}
-        >
+        <Table.Cell key={column.id} textAlign={isStacked ? undefined : column.textAlign}>
           {columnRenderers[column.id]({
             row: row,
             rows: rows,
@@ -73,10 +69,7 @@ const renderTableBody = (
       )),
     ]
     return (
-      <Table.Row
-        key={getUniqueId(row)}
-        data-testid="table-row"
-      >
+      <Table.Row key={getUniqueId(row)} data-testid="table-row">
         {...rowHead}
       </Table.Row>
     )
