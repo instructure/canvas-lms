@@ -715,8 +715,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     if (this.editor) {
       return this.editor
     }
-    const editors = this.props.tinymce.editors || []
-    return editors.filter(ed => ed.id === this.props.textareaId)[0]
+    return this.props.tinymce.get(this.props.textareaId!)!
   }
 
   // @ts-expect-error

@@ -68,7 +68,7 @@ describe('ContentTabs', () => {
     if (props.assignment.submissionTypes.includes('online_text_entry')) {
       await waitFor(
         () => {
-          expect(tinymce?.editors[0]).toBeDefined()
+          expect(tinymce.get('textentry_text')).toBeDefined()
         },
         {timeout: 4000},
       )
@@ -279,7 +279,7 @@ describe('ContentTabs', () => {
         <TextEntry focusOnInit={false} submission={{id: '1', _id: '1', state: 'unsubmitted'}} submitButtonRef={submitButtonRef} />,
       )
       await waitFor(() => {
-        expect(tinymce.editors[0]).toBeDefined()
+        expect(tinymce.get('textentry_text')).toBeDefined()
       })
       unmount()
     })

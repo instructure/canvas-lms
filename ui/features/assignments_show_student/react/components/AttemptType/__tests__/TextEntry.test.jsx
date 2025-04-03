@@ -80,9 +80,9 @@ describe('TextEntry', () => {
     const propsToRender = props || (await makeProps())
     const retval = render(<TextEntry {...propsToRender} />)
     await waitFor(() => {
-      expect(tinymce.editors[0]).toBeDefined()
+      expect(tinymce.get('textentry_text')).toBeDefined()
     })
-    fakeEditor = tinymce.editors[0]
+    fakeEditor = tinymce.get('textentry_text')
     return retval
   }
 
@@ -114,9 +114,9 @@ describe('TextEntry', () => {
             </StudentViewContext.Provider>,
           )
           await waitFor(() => {
-            expect(tinymce.editors[0]).toBeDefined()
+            expect(tinymce.get('textentry_text')).toBeDefined()
           })
-          fakeEditor = tinymce.editors[0]
+          fakeEditor = tinymce.get('textentry_text')
           await waitFor(() => {
             expect(fakeEditor.readonly).toStrictEqual(true)
           })
