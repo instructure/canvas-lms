@@ -47,6 +47,35 @@ class AttachmentAssociation < ActiveRecord::Base
     end
   end
 
+  def self.verify_access(location_param, attachment_id, user, session = nil)
+    splat = location_param.split("_")
+    return false unless splat.length >= 2
+
+    context_id = splat.pop
+    context_type = splat.join("_").camelize
+    field_name = nil
+    right_to_check = :read
+
+    if context_type == "CourseSyllabus"
+      field_name = "syllabus_body"
+      context_type = "Course"
+      right_to_check = :read_syllabus
+    end
+
+    association = AttachmentAssociation.find_by(
+      attachment: attachment_id,
+      context_id:,
+      context_type:,
+      field_name:
+    )
+
+    return false unless association
+
+    root_account = Account.find_by(id: association.root_account_id)
+    root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus) &&
+      association.context&.grants_right?(user, session, right_to_check)
+  end
+
   def set_root_account_id
     self.root_account_id ||=
       if context_type == "ConversationMessage" || context.nil?
