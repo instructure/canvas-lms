@@ -17,12 +17,9 @@
  */
 
 import {ContentChanges} from './contents/ContentChanges'
-import {useCallback, useEffect, useMemo, useState} from 'react'
-import {CanvasCareerValidationResponse, CompletionProgressResponse} from './types'
 import {HorizonToggleContext} from './HorizonToggleContext'
 import {ContentUnsupported} from './contents/ContentUnsupported'
 import {LoadingContainer} from './LoadingContainer'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
@@ -30,110 +27,20 @@ import {Menu} from '@instructure/ui-menu'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useCanvasCareer} from './hooks/useCanvasCareer'
 
 const I18n = createI18nScope('horizon_toggle_page')
 
-const timeout = (delay: number) => {
-  return new Promise(resolve => setTimeout(resolve, delay))
-}
-
 export const HorizonToggle = () => {
-  const [data, setData] = useState<CanvasCareerValidationResponse>({errors: {}})
-  const [progress, setProgress] = useState<Partial<CompletionProgressResponse>>({url: ''})
-  const [loadingText, setLoadingText] = useState<string>(I18n.t('Checking course content...'))
-  const [isTermsAccepted, setTermsAccepted] = useState(false)
-
-  useEffect(() => {
-    doFetchApi<CanvasCareerValidationResponse>({
-      path: `/courses/${ENV.COURSE_ID}/canvas_career_validation`,
-    })
-      .then(response => setData(response.json!))
-      .catch(err => showFlashAlert({message: err.message}))
-      .finally(() => setLoadingText(''))
-  }, [])
-
-  const hasUnsupportedContent = useMemo(() => {
-    return (
-      data?.errors?.discussions ||
-      data?.errors?.groups ||
-      data?.errors?.outcomes ||
-      data?.errors?.collaborations ||
-      data?.errors?.quizzes
-    )
-  }, [data])
-
-  const hasChangesNeededContent = useMemo(() => {
-    return data?.errors?.assignments
-  }, [data])
-
-  const fetchProgress = useCallback(async () => {
-    if (!progress?.url) return
-    try {
-      const response = await doFetchApi<CompletionProgressResponse>({
-        path: progress?.url!,
-        method: 'GET',
-      })
-      const json = response.json!
-      await timeout(1000)
-      if (json.workflow_state === 'completed' || json.workflow_state === 'failed') {
-        window.location.reload()
-      } else {
-        await fetchProgress()
-      }
-      setProgress(json)
-    } catch (e: any) {
-      showFlashAlert({
-        message: I18n.t('Could not convert course to Canvas Career. Please try again.'),
-        type: 'error',
-      })
-    }
-  }, [progress])
-
-  const onSubmit = useCallback(async () => {
-    setLoadingText(I18n.t('Converting course to Canvas Career...'))
-    try {
-      const response = await doFetchApi<CompletionProgressResponse>({
-        path: `/courses/${ENV.COURSE_ID}/canvas_career_conversion`,
-        method: 'POST',
-      })
-      const json = response.json!
-      if (json.success) {
-        window.location.reload()
-      }
-      if (json.errors) {
-        showFlashAlert({
-          message: json.errors,
-          type: 'error',
-        })
-        setLoadingText('')
-      }
-      if (json.workflow_state) {
-        setProgress(json)
-      }
-    } catch (e: any) {
-      showFlashAlert({
-        message: I18n.t('Could not convert course to Canvas Career. Please try again.'),
-        type: 'error',
-      })
-      setLoadingText('')
-    }
-  }, [])
-
-  useEffect(() => {
-    if (
-      progress &&
-      progress?.workflow_state !== 'completed' &&
-      progress?.workflow_state !== 'failed'
-    ) {
-      fetchProgress()
-    } else if (
-      (progress && progress?.workflow_state === 'completed') ||
-      progress?.workflow_state === 'failed'
-    ) {
-      window.location.reload()
-    }
-  }, [progress, fetchProgress])
+  const {
+    data,
+    hasUnsupportedContent,
+    hasChangesNeededContent,
+    loadingText,
+    isTermsAccepted,
+    setTermsAccepted,
+    onSubmit,
+  } = useCanvasCareer({onConversionCompleted: () => window.location.reload()})
 
   return (
     <View as="div">
