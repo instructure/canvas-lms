@@ -221,7 +221,7 @@ export const Discussion = {
       id: '1',
       sortOrder: 'desc',
       expanded: false,
-      summaryEnaled: false,
+      summaryEnabled: false,
       __typename: 'DiscussionParticipant',
     },
     sortOrderLocked = false,
