@@ -188,9 +188,14 @@ module Lti::IMS
 
     def lti_asset_show
       render_error("not found", :not_found) unless download_asset&.attachment
-      render_or_redirect_to_stored_file(
-        attachment: download_asset.attachment
-      )
+      attachment = download_asset&.attachment
+      # Set for sf_verifier token generation
+      @advantage_token_developer_key = developer_key
+      @attachment_authorization = {
+        attachment:,
+        permission: "download"
+      }
+      render_or_redirect_to_stored_file(attachment:)
     end
 
     private

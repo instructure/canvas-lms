@@ -1176,16 +1176,27 @@ module ApplicationHelper
   end
 
   def generate_access_verifier(return_url: nil, fallback_url: nil, authorization: nil)
-    Users::AccessVerifier.generate(
-      authorization:,
-      user: @current_user,
-      real_user: logged_in_user,
-      developer_key: @access_token&.developer_key,
-      root_account: @domain_root_account,
-      oauth_host: request.host_with_port,
-      return_url:,
-      fallback_url:
-    )
+    if @advantage_token_developer_key.present?
+      DeveloperKeys::AccessVerifier.generate(
+        authorization:,
+        developer_key: @advantage_token_developer_key,
+        root_account: @domain_root_account,
+        oauth_host: request.host_with_port,
+        return_url:,
+        fallback_url:
+      )
+    else
+      Users::AccessVerifier.generate(
+        authorization:,
+        user: @current_user,
+        real_user: logged_in_user,
+        developer_key: @access_token&.developer_key,
+        root_account: @domain_root_account,
+        oauth_host: request.host_with_port,
+        return_url:,
+        fallback_url:
+      )
+    end
   end
 
   def validate_access_verifier
