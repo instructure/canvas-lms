@@ -47,12 +47,14 @@
    .tool_content_wrapper {
      display: flex;
      flex: 1;
+     flex-direction: column;
    }
 
    .tool_launch {
      height: initial !important;
      min-height: initial !important;
-     width: 100% !important
+     width: 100% !important;
+     flex: 1;
    }
 
    .ic-app-course-menu {
@@ -60,8 +62,8 @@
    }
 
    .ic-app-nav-toggle-and-crumbs {
-     margin: 0 0 0 $ic-sp * 2;
-     padding-right: 16px
+     margin: 0;
+     padding: 0 $ic-sp * 2;
    }
  }
 
