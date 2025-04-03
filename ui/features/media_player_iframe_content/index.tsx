@@ -24,22 +24,34 @@ import {parse} from 'url'
 import ready from '@instructure/ready'
 import CanvasMediaPlayer from '@canvas/canvas-media-player'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player'
+import {MediaInfo} from '@canvas/canvas-studio-player/react/types'
 import {captionLanguageForLocale} from '@instructure/canvas-media'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+
+declare const ENV: GlobalEnv & {
+  media_object: MediaInfo
+  attachment_id?: string
+  attachment?: boolean
+  FEATURES: {
+    consolidated_media_player_iframe?: boolean
+  }
+}
 
 const isStandalone = () => {
-  return !window.frameElement && window.location === window.top.location
+  return !window.frameElement && window.location === window?.top?.location
 }
 
 ready(() => {
   const container = document.getElementById('player_container')
-  const root = createRoot(container)
+  const root = createRoot(container!)
   // get the media_id from something like
   //  `http://canvas.example.com/media_objects_iframe/m-48jGWTHdvcV5YPdZ9CKsqbtRzu1jURgu?type=video`
   // or
   //  `http://canvas.example.com/media_objects_iframe/?type=video&mediahref=url/to/file.mov`
   // or
   //  `http://canvas.example.com/media_attachments_iframe/12345678
-  const media_id = ENV?.media_object?.media_id || window.location.pathname.split('media_objects_iframe/').pop()
+  const media_id =
+    ENV.media_object?.media_id || window.location.pathname.split('media_objects_iframe/').pop()
   const attachment_id = ENV.attachment_id
   const media_href_match = window.location.search.match(/mediahref=([^&]+)/)
   const media_object = ENV.media_object || {}
@@ -87,9 +99,9 @@ ready(() => {
           inherited: t.inherited,
         }))
         if (tracks)
-          event.source.postMessage(
+          event?.source?.postMessage(
             {subject: 'media_tracks_response', payload: tracks},
-            event.origin,
+            {targetOrigin: event.origin},
           )
       }
     },
@@ -105,19 +117,19 @@ ready(() => {
     // we're standalone mode
     if (is_video) {
       // CanvasMediaPlayer leaves room for the 16px vertical margin.
-      div.setAttribute('style', 'width: 640px; max-width: 100%; margin: 16px auto;')
+      div?.setAttribute('style', 'width: 640px; max-width: 100%; margin: 16px auto;')
     } else {
-      div.setAttribute('style', 'width: 320px; height: 14.25rem; margin: 1rem auto;')
+      div?.setAttribute('style', 'width: 320px; height: 14.25rem; margin: 1rem auto;')
     }
   }
 
   const aria_label = !media_object.title ? undefined : media_object.title
-  if (window.ENV.FEATURES?.consolidated_media_player_iframe) {
+  if (ENV.FEATURES?.consolidated_media_player_iframe) {
     root.render(
       <CanvasStudioPlayer
-        media_id={media_id}
+        media_id={media_id || ''}
         media_sources={href_source || media_object.media_sources}
-        media_tracks={mediaTracks}
+        media_tracks={media_object?.media_tracks}
         type={is_video ? 'video' : 'audio'}
         aria_label={aria_label}
         is_attachment={is_attachment}

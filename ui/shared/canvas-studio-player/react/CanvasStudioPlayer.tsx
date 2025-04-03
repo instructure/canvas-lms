@@ -65,17 +65,20 @@ const convertAndSortMediaSources = (sources: CanvasMediaSource[] | string) => {
   return sources.map(convertMediaSource).sort(byBitrate)
 }
 
-const convertMediaTracks = (
-  tracks: {locale: string; inherited: boolean; url: string}[],
+const convertMediaTracksIfNeeded = (
+  tracks: MediaTrack[] | CaptionMetaData[],
 ): CaptionMetaData[] => {
-  return tracks.map(track => ({
-    locale: track.locale,
-    language: captionLanguageForLocale(track.locale),
-    inherited: track.inherited,
-    label: captionLanguageForLocale(track.locale),
-    src: track.url,
-    type: 'srt',
-  }))
+  return tracks.map(track => {
+    if ('src' in track) return track
+    return {
+      locale: track.locale,
+      language: captionLanguageForLocale(track.locale),
+      inherited: track.inherited,
+      label: captionLanguageForLocale(track.locale),
+      src: track.url,
+      type: 'srt',
+    }
+  })
 }
 
 // It can take a while for notorious to process a newly uploaded video
@@ -87,8 +90,8 @@ const DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS = 3
 interface CanvasStudioPlayerProps {
   media_id: string
   // TODO: we've asked studio to export definitions for PlayerSrc and CaptionMetaData
-  media_sources?: any[]
-  media_tracks?: MediaTrack[]
+  media_sources?: string | any[]
+  media_tracks?: MediaTrack[] | CaptionMetaData[]
   type?: 'audio' | 'video'
   MAX_RETRY_ATTEMPTS?: number
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS?: number
@@ -120,7 +123,7 @@ export default function CanvasStudioPlayer({
   hideUploadCaptions = false,
 }: CanvasStudioPlayerProps) {
   const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
-    ? convertMediaTracks(media_captions)
+    ? convertMediaTracksIfNeeded(media_captions)
     : undefined
   const [mediaSources, setMediaSources] = useState(() => convertAndSortMediaSources(media_sources))
   const [mediaCaptions, setMediaCaptions] = useState<CaptionMetaData[] | undefined>(captions)
@@ -212,16 +215,7 @@ export default function CanvasStudioPlayer({
       if (resp?.media_sources?.length) {
         setMediaSources(convertAndSortMediaSources(resp.media_sources))
         if (!media_captions) {
-          setMediaCaptions(
-            resp.media_tracks.map((caption: MediaTrack) => ({
-              locale: caption.locale,
-              language: captionLanguageForLocale(caption.locale),
-              inherited: caption.inherited,
-              label: captionLanguageForLocale(caption.locale),
-              src: caption.url,
-              type: 'srt',
-            })),
-          )
+          setMediaCaptions(convertMediaTracksIfNeeded(resp.media_tracks))
         }
         setIsLoading(false)
       } else {
