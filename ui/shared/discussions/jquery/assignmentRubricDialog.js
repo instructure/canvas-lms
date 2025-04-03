@@ -23,6 +23,7 @@ import 'jquery-tinypubsub'
 const I18n = createI18nScope('assignmentRubricDialog')
 
 const assignmentRubricDialog = {
+  focusTrapHandler: null,
   // the markup for the trigger should look like:
   // <a class="rubric_dialog_trigger" href="#" data-rubric-exists="<%= !!attached_rubric %>" data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>">
   //   <%= attached_rubric ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
@@ -31,7 +32,7 @@ const assignmentRubricDialog = {
     const $trigger = $('.rubric_dialog_trigger')
     if ($trigger) {
       this.noRubricExists = $trigger.data('noRubricExists')
-      const selector = $trigger.data('focusReturnsTo')
+      const selector = $trigger.data('focusReturnsTo') ?? '[data-testid="discussion-post-menu-trigger"]'
       try {
         this.$focusReturnsTo = $(document.querySelector(selector))
       } catch (err) {
@@ -54,7 +55,20 @@ const assignmentRubricDialog = {
       modal: false,
       resizable: true,
       autoOpen: false,
-      close: () => this.$focusReturnsTo.focus(),
+      close: () => {
+        if (this.focusTrapHandler) {
+          document.removeEventListener('focusin', this.focusTrapHandler, true)
+          this.focusTrapHandler = null
+        }
+
+        this.$focusReturnsTo?.focus()
+      },
+      open: () => {
+        const $container = this.$dialog.dialog('widget')
+        $container.attr('aria-modal', 'true')
+        $container.find('.ui-dialog-titlebar-close').attr('tabindex', '0')
+        $container.find('.add_rubric_link').attr('tabindex', '0')
+      },
       zIndex: 1000,
     })
 
@@ -63,7 +77,7 @@ const assignmentRubricDialog = {
       // since that is the point of why they clicked the link.
       if (assignmentRubricDialog.noRubricExists) {
         $.subscribe('edit_rubric/initted', () =>
-          assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click(),
+            assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click(),
         )
       }
 
@@ -76,7 +90,17 @@ const assignmentRubricDialog = {
   openDialog() {
     if (!this.dialogInited) this.initDialog()
     this.$dialog.dialog('open')
+
+    this.focusTrapHandler = this.trapFocus.bind(this)
+    document.addEventListener('focusin', this.focusTrapHandler)
   },
+
+  trapFocus(e) {
+    const $container = this.$dialog?.dialog('widget')
+    if (!$container[0] || $container[0].contains(e.target)) return
+
+    $container.find('.ui-dialog-titlebar-close')?.focus()
+  }
 }
 
 export default assignmentRubricDialog
