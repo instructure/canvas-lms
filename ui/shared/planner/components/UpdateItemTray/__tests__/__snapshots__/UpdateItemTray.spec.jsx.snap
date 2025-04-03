@@ -42,6 +42,7 @@ exports[`renders the item to update if provided 1`] = `
           </ScreenReaderContent>
         }
         disabled={false}
+        isGroup={true}
         rowSpacing="small"
         vAlign="middle"
       >
@@ -93,6 +94,7 @@ exports[`renders the item to update if provided 1`] = `
           constrain="window"
           id="to-do-item-course-select"
           isInline={false}
+          isOptionContentAppliedToInput={false}
           isRequired={false}
           onChange={[Function]}
           placement="bottom stretch"
@@ -230,6 +232,7 @@ exports[`updates state when new note is passed in 1`] = `
           </ScreenReaderContent>
         }
         disabled={false}
+        isGroup={true}
         rowSpacing="small"
         vAlign="middle"
       >
@@ -281,6 +284,7 @@ exports[`updates state when new note is passed in 1`] = `
           constrain="window"
           id="to-do-item-course-select"
           isInline={false}
+          isOptionContentAppliedToInput={false}
           isRequired={false}
           onChange={[Function]}
           placement="bottom stretch"
@@ -426,6 +430,7 @@ exports[`updates state when new note is passed in 2`] = `
           </ScreenReaderContent>
         }
         disabled={false}
+        isGroup={true}
         rowSpacing="small"
         vAlign="middle"
       >
@@ -477,6 +482,7 @@ exports[`updates state when new note is passed in 2`] = `
           constrain="window"
           id="to-do-item-course-select"
           isInline={false}
+          isOptionContentAppliedToInput={false}
           isRequired={false}
           onChange={[Function]}
           placement="bottom stretch"

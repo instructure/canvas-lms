@@ -17,23 +17,23 @@
  */
 
 import React from 'react'
-import {Avatar} from '@instructure/ui-avatar'
-import {Link} from '@instructure/ui-link'
+import {Avatar, type AvatarProps} from '@instructure/ui-avatar'
+import {Link, type LinkProps} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 
-export default function UserLink({
-  size,
-  avatar_url,
-  name,
-  pronouns,
-  avatarName,
-  ...propsToPassOnToLink
-}) {
+export interface UserLinkProps {
+  size: AvatarProps['size']
+  href: LinkProps['href']
+  name: string
+  pronouns?: string
+  avatar_url: string
+  avatarName: AvatarProps['name']
+}
+
+export default function UserLink(props: UserLinkProps): JSX.Element {
+  const {size, name, avatarName, avatar_url, pronouns, href} = props
   return (
-    <Link
-      themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: '1rem'}}
-      {...propsToPassOnToLink}
-    >
+    <Link href={href}>
       <Avatar
         size={size}
         name={avatarName}
@@ -44,12 +44,4 @@ export default function UserLink({
       {name} {pronouns && <Text fontStyle="italic">({pronouns})</Text>}
     </Link>
   )
-}
-
-UserLink.propTypes = {
-  size: Avatar.propTypes.size,
-  href: Link.propTypes.href,
-  name: Avatar.propTypes.name,
-  avatarName: Avatar.propTypes.name,
-  avatar_url: Avatar.propTypes.src,
 }

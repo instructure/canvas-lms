@@ -59,7 +59,7 @@ describe('RecurrenceEndPicker', () => {
     const props = {...defaultProps()}
     const {getByDisplayValue, getByText, getAllByText} = render(<RecurrenceEndPicker {...props} />)
 
-    expect(getAllByText('Ends:')).toHaveLength(2)
+    expect(getAllByText('Ends:')).toHaveLength(1)
     // the radio buttons
     expect(getByText('on')).toBeInTheDocument()
     expect(getByDisplayValue('ON')).toBeInTheDocument()

@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Img} from '@instructure/ui-img'
 import {Responsive} from '@instructure/ui-responsive'
-import {canvas} from '@instructure/ui-theme-tokens'
+import {canvas} from '@instructure/ui-themes'
 import {TopNavBar} from '@instructure/ui-top-nav-bar'
 import React from 'react'
 import {useNewLoginData} from '../context'

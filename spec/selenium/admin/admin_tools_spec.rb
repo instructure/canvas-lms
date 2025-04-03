@@ -225,8 +225,8 @@ describe "admin_tools" do
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
 
-          expect(ff('[class$="formFieldMessage"')[3].text).to eq "Invalid date and time."
-          expect(ff('[class$="formFieldMessage"')[7].text).to eq "Invalid date and time."
+          expect(ff('[class$="formFieldMessage"')[0].text).to eq "Invalid date and time."
+          expect(ff('[class$="formFieldMessage"')[1].text).to eq "Invalid date and time."
         end
 
         it "hides tab if account setting disabled" do

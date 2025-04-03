@@ -11,12 +11,12 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
       >
         <div
           class="css-1mr0ucn-drawerLayout"
-          data-drawer-layout="DrawerLayout_0"
+          data-drawer-layout="DrawerLayout___0"
         >
           <div
             aria-label="page-content-title"
             class="css-1c66oc-drawerLayout__content"
-            data-drawer-content="DrawerLayout_0"
+            data-drawer-content="DrawerLayout___0"
             id="drawer-layout-content"
             role="region"
             style="margin-left: 0px; margin-right: 0px;"
@@ -31,7 +31,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
           </div>
           <div
             class="css-1bzuhml-drawerTray transition--fade-entered"
-            data-drawer-tray="DrawerLayout_0"
+            data-drawer-tray="DrawerLayout___0"
             data-testid="drawer-layout-tray"
           >
             <div
@@ -66,7 +66,6 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                           class="css-11auhcu-view--inlineBlock-baseButton"
                           cursor="pointer"
                           dir="ltr"
-                          tabindex="0"
                           type="button"
                         >
                           <span
@@ -186,12 +185,12 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
     >
       <div
         class="css-1mr0ucn-drawerLayout"
-        data-drawer-layout="DrawerLayout_0"
+        data-drawer-layout="DrawerLayout___0"
       >
         <div
           aria-label="page-content-title"
           class="css-1c66oc-drawerLayout__content"
-          data-drawer-content="DrawerLayout_0"
+          data-drawer-content="DrawerLayout___0"
           id="drawer-layout-content"
           role="region"
           style="margin-left: 0px; margin-right: 0px;"
@@ -206,7 +205,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
         </div>
         <div
           class="css-1bzuhml-drawerTray transition--fade-entered"
-          data-drawer-tray="DrawerLayout_0"
+          data-drawer-tray="DrawerLayout___0"
           data-testid="drawer-layout-tray"
         >
           <div
@@ -241,7 +240,6 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                         class="css-11auhcu-view--inlineBlock-baseButton"
                         cursor="pointer"
                         dir="ltr"
-                        tabindex="0"
                         type="button"
                       >
                         <span

@@ -103,11 +103,11 @@ class NewCourseCopyPage
     end
 
     def migration_type_options
-      ff("#Selectable_0-list > li")
+      ff("#Selectable___0-list > li")
     end
 
     def migration_type_options_values
-      ff("#Selectable_0-list > li > span")
+      ff("#Selectable___0-list > li > span")
     end
 
     def cancel_copy_button

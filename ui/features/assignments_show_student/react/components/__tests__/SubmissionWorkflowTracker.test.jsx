@@ -48,7 +48,7 @@ describe('when a submission is graded', () => {
 
       const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
       expect(getByTestId('submission-workflow-tracker-subtitle')).toHaveStyle(
-        `color: ${canvas.colors.contrasts.green4570}`,
+        `color: ${canvas.colors.contrasts.green5782}`,
       )
     })
 

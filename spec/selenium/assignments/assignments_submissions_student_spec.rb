@@ -234,7 +234,7 @@ describe "submissions" do
 
       f(".submit_assignment_link").click
       f("#submit_file_button").click
-      expect(f("#FileDrop-messages_0")).to include_text "A file is required to make a submission."
+      expect(f("#FileDrop-messages___0")).to include_text "A file is required to make a submission."
     end
 
     it "does not allow a user to submit a file-submission assignment with an empty file", priority: "1" do
@@ -246,7 +246,7 @@ describe "submissions" do
 
       f(".submit_assignment_link").click
       f(".submission_attachment input").send_keys(fullpath)
-      expect(f("#FileDrop-messages_0")).to include_text "Attached files must be greater than 0 bytes."
+      expect(f("#FileDrop-messages___0")).to include_text "Attached files must be greater than 0 bytes."
     end
 
     it "does not allow a user to submit a file-submission assignment with an illegal file extension", priority: "1" do
@@ -262,7 +262,7 @@ describe "submissions" do
       f(".submission_attachment input").send_keys(fullpath)
 
       # Check that the error is being reported
-      expect(f("#FileDrop-messages_0")).to include_text "This file type is not allowed. Accepted file types are: bash."
+      expect(f("#FileDrop-messages___0")).to include_text "This file type is not allowed. Accepted file types are: bash."
     end
 
     describe "allows user to add another file input" do
@@ -311,7 +311,7 @@ describe "submissions" do
       f("#submission_file_tag_0").click
 
       f("#submit_file_button").click
-      expect(f("#FileDrop-messages_1")).to include_text "A file is required to make a submission."
+      expect(f("#FileDrop-messages___1")).to include_text "A file is required to make a submission."
     end
 
     it "shows as not turned in when submission was auto created in speedgrader", priority: "1" do

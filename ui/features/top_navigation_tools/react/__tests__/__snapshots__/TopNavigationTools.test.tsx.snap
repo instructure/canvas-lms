@@ -159,6 +159,7 @@ exports[`TopNavigationTools renders 1`] = `
           offsetX={0}
           offsetY={0}
           placement="top"
+          preventTooltip={false}
           renderTip="LTI Tools Menu"
         >
           <Button
@@ -236,6 +237,7 @@ exports[`TopNavigationTools renders 1`] = `
       offsetX={0}
       offsetY={0}
       placement="top"
+      preventTooltip={false}
       renderTip="Tool 1"
     >
       <IconButton
@@ -305,6 +307,7 @@ exports[`TopNavigationTools renders with no pinned tools 1`] = `
           offsetX={0}
           offsetY={0}
           placement="top"
+          preventTooltip={false}
           renderTip="LTI Tools Menu"
         >
           <Button

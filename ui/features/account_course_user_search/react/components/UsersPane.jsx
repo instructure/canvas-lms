@@ -144,6 +144,8 @@ export default class UsersPane extends React.Component {
 
   render() {
     const {links, accountId, users, isLoading, errors, searchFilter} = this.state.userList
+    const includeDeleted =
+      this.props.store.getState().userList.searchFilter.include_deleted_users ?? false
     return (
       <div>
         <ScreenReaderContent>
@@ -170,9 +172,7 @@ export default class UsersPane extends React.Component {
             handleSubmitEditUserForm={this.handleSubmitEditUserForm}
             permissions={this.state.userList.permissions}
             sortColumnHeaderRef={this.handleSetSortColumnHeaderRef}
-            includeDeletedUsers={
-              this.props.store.getState().userList.searchFilter.include_deleted_users
-            }
+            includeDeletedUsers={includeDeleted}
           />
         )}
 

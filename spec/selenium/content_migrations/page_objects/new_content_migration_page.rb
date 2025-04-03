@@ -40,7 +40,7 @@ class NewContentMigrationPage
 
     # Selectors
     def migration_type_dropdown
-      f("#Select_0")
+      f("#Select___0")
     end
 
     def migration_type_option_by_id(id)
@@ -96,7 +96,7 @@ class NewContentMigrationPage
     end
 
     def course_search_result(id)
-      f('#Selectable_1-list > li > [id="' + id + '"]')
+      f('#Selectable___1-list > li > [id="' + id + '"]')
     end
 
     def ui_auto_complete
@@ -108,7 +108,7 @@ class NewContentMigrationPage
     end
 
     def course_search_results
-      ff("Selectable_1-list > li")
+      ff("Selectable___1-list > li")
     end
 
     def course_search_results_visible

@@ -115,7 +115,6 @@ export const Module = (props: ComponentProps) => {
           aria-labelledby="due-date-column-title"
           alignItems="center"
           justifyItems="center"
-          // @ts-expect-error
           padding={headerPadding}
         >
           {props.compression > 0 && (
@@ -210,7 +209,6 @@ export const Module = (props: ComponentProps) => {
               <Table.Head>
                 <Table.Row>
                   <Table.ColHeader id={`module-${props.module.id}-assignments`} width="100%">
-                    {/* @ts-expect-error */}
                     <View as="div" padding={headerPadding}>
                       {I18n.t('Item')}
                     </View>
@@ -224,7 +222,6 @@ export const Module = (props: ComponentProps) => {
                       aria-labelledby="days-column-title"
                       alignItems="center"
                       justifyItems="center"
-                      // @ts-expect-error
                       padding={headerPadding}
                     >
                       <View id="days-column-title" as="span">
@@ -249,7 +246,6 @@ export const Module = (props: ComponentProps) => {
                     id={`module-${props.module.id}-status`}
                     textAlign="center"
                   >
-                    {/* @ts-expect-error */}
                     <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
                       {I18n.t('Status')}
                     </Flex>

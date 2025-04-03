@@ -179,7 +179,6 @@ exports[`renders the base component correctly 1`] = `
         class="css-11auhcu-view--inlineBlock-baseButton"
         cursor="pointer"
         dir="ltr"
-        tabindex="0"
         type="button"
       >
         <span
@@ -408,7 +407,6 @@ exports[`renders the base component correctly with 0 points 1`] = `
         class="css-11auhcu-view--inlineBlock-baseButton"
         cursor="pointer"
         dir="ltr"
-        tabindex="0"
         type="button"
       >
         <span
@@ -623,7 +621,6 @@ exports[`renders the base component correctly without points 1`] = `
         class="css-11auhcu-view--inlineBlock-baseButton"
         cursor="pointer"
         dir="ltr"
-        tabindex="0"
         type="button"
       >
         <span
