@@ -59,7 +59,7 @@ $electric: #0374B5; // blue
 $shamrock: #03893D; // green
 
 @if $use_high_contrast {
-  $shamrock: #127A1B;
+  $shamrock: #02672D;
 }
 
 $barney: #C54396; // magenta
@@ -77,7 +77,7 @@ $crimson: #E62429; // red
 $fire: #F06E26; // orange
 
 @if $use_high_contrast {
-  $fire: #C23C0D;
+  $fire: #CF4A00;
 }
 
 //====================================
@@ -92,8 +92,8 @@ $ic-color-alert: $fire;
 // Gray-ish Scale
 //====================================
 
-$ic-color-dark: #2D3B45; // licorice
-$ic-color-medium-darker: #394B58; // oxford
+$ic-color-dark: #273540; // licorice
+$ic-color-medium-darker: #334451; // oxford
 $ic-color-medium: #6A7883; // slate
 
 @if $use_high_contrast {
@@ -134,7 +134,7 @@ $ic-color-light: #FFFFFF; // white
 // and meet our contrast needs when used with our main color variables
 
 $ic-bg-light-neutral: $ic-color-medium-light;
-$ic-bg-light-neutral-text: #394B58;
+$ic-bg-light-neutral-text: #334451;
 
 @if $use_high_contrast {
   $ic-bg-light-neutral: #F2F4F4;
@@ -165,7 +165,7 @@ $ic-bg-light-success-text: #03893D;
 }
 
 $ic-bg-light-alert: #FCE4E5;
-$ic-bg-light-alert-text: #C23C0D;
+$ic-bg-light-alert-text: #CF4A00;
 $ic-bg-light-danger: #FCE4E5;
 
 @if $use_high_contrast {

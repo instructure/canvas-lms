@@ -468,7 +468,7 @@ export const FOCUS_TARGETS = {
   MISSING_ITEMS: 'missing-items',
 }
 
-export const DEFAULT_COURSE_COLOR = '#394B58'
+export const DEFAULT_COURSE_COLOR = '#334451'
 
 export const GradingPeriodShape = {
   id: PropTypes.string.isRequired,

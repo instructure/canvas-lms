@@ -27,7 +27,7 @@ const getPresetTooltip = (preset: HTMLElement) => {
   return document.getElementById(preset.getAttribute('aria-describedby')!)
 }
 
-const DEFAULT_FONT_COLOR = '#2d3b45'
+const DEFAULT_FONT_COLOR = '#273540'
 
 const baseTabs = {
   foreground: {

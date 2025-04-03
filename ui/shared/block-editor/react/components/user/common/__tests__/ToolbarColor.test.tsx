@@ -23,7 +23,7 @@ import {Editor} from '@craftjs/core'
 import {render, screen} from '@testing-library/react'
 import {ToolbarColor} from '../ToolbarColor'
 
-const DEFAULT_FONT_COLOR = '#2d3b45'
+const DEFAULT_FONT_COLOR = '#273540'
 
 const baseTabs = {
   foreground: {

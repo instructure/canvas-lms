@@ -32,7 +32,7 @@ describe "section tabs on the left side" do
         # make sure to mouse off the link so the :hover and :focus styles do not apply
         driver.action.move_to(element_that_is_not_left_side).perform
         menu_link = f("#section-tabs .#{feature}")
-        expect(menu_link.css_value("border-left")).to eq("2px solid rgb(45, 59, 69)")
+        expect(menu_link.css_value("border-left")).to eq("2px solid rgb(39, 53, 64)")
       end
     end
   end

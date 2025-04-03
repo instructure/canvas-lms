@@ -71,7 +71,7 @@ class OutcomePopover extends React.Component {
 
   defaultProficiency = _.memoize(mastery_points => ({
     ratings: [
-      {points: mastery_points * 1.5, color: '127A1B', description: I18n.t('Exceeds Mastery')},
+      {points: mastery_points * 1.5, color: '02672D', description: I18n.t('Exceeds Mastery')},
       {points: mastery_points, color: '03893D', description: I18n.t('Meets Mastery')},
       {points: mastery_points / 2, color: 'FAB901', description: I18n.t('Near Mastery')},
       {points: 0, color: 'E62429', description: I18n.t('Well Below Mastery')},
