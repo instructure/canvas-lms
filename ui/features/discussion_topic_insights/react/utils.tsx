@@ -23,7 +23,7 @@ import {
   IconLikeSolid,
   IconLikeLine,
 } from '@instructure/ui-icons'
-import {canvas} from '@instructure/ui-theme-tokens'
+import {canvas} from '@instructure/ui-themes'
 import {IconButton} from '@instructure/ui-buttons'
 
 const honeyInstUI10 = '#B07E00'
@@ -33,9 +33,9 @@ export const getStatusByRelevance = (relevance: string) => {
     return <IconWarningSolid style={{fill: honeyInstUI10}} />
   } else {
     if (relevance === 'relevant') {
-      return <IconCompleteSolid style={{fill: canvas.colors.shamrock}} />
+      return <IconCompleteSolid style={{fill: canvas.colors.contrasts.green5782}} />
     } else {
-      return <IconTroubleSolid style={{fill: canvas.colors.crimson}} />
+      return <IconTroubleSolid style={{fill: canvas.colors.contrasts.red5782}} />
     }
   }
 }

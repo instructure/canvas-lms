@@ -2064,9 +2064,9 @@ describe "assignments" do
       expect(f("[data-testid='assignment-name-input']")).not_to be_disabled
       expect(f("[data-testid='points-input']")).to be_disabled
       # Date
-      expect(f("#Selectable_0")).to be_disabled
+      expect(f("#Selectable___0")).to be_disabled
       # Time
-      expect(f("#Select_0")).to be_disabled
+      expect(f("#Select___0")).to be_disabled
     end
 
     it "displays the correct date input fields in the assign to tray" do

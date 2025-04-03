@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {arrayOf, func, object, shape, string} from 'prop-types'
+import {arrayOf, bool, func, object, shape, string} from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -163,7 +163,7 @@ UsersListRow.propTypes = {
       label: string.isRequired,
     }),
   ).isRequired,
-  includeDeletedUsers: string,
+  includeDeletedUsers: bool,
 }
 
 UsersListRow.displayName = 'Row'

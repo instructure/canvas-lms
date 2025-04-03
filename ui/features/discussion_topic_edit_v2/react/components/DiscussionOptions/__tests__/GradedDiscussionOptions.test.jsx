@@ -55,7 +55,7 @@ describe('GradedDiscussionOptions', () => {
     expect(getByText('Points Possible')).toBeInTheDocument()
     expect(getByText('Display Grade As')).toBeInTheDocument()
     expect(getByText('Assignment Group')).toBeInTheDocument()
-    expect(getAllByText('Peer Reviews')).toHaveLength(2)
+    expect(getAllByText('Peer Reviews')).toHaveLength(1)
     expect(getByText('Assignment Settings')).toBeInTheDocument()
   })
 
@@ -64,7 +64,7 @@ describe('GradedDiscussionOptions', () => {
     expect(getByText('Points Possible')).toBeInTheDocument()
     expect(getByText('Display Grade As')).toBeInTheDocument()
     expect(getByText('Assignment Group')).toBeInTheDocument()
-    expect(getAllByText('Peer Reviews')).toHaveLength(2)
+    expect(getAllByText('Peer Reviews')).toHaveLength(1)
     expect(getByText('Assignment Settings')).toBeInTheDocument()
   })
 

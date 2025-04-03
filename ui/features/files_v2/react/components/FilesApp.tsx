@@ -20,7 +20,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Pagination} from '@instructure/ui-pagination'
 import {Responsive} from '@instructure/ui-responsive'
-import {canvas} from '@instructure/ui-theme-tokens'
+import {canvas} from '@instructure/ui-themes'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -60,13 +60,16 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   const contextId = currentFolder.context_id
   const contextType = currentFolder.context_type.toLowerCase()
 
-  const onSettled = useCallback((rows: (File | Folder)[]) => {
-    const currentFolderId = currentFolderWrapper.current?.id
-    if (currentFolderId !== currentFolder.id) {
-      currentFolderWrapper.current = new BBFolderWrapper(currentFolder)
-    }
-    currentFolderWrapper.current!.files.set(rows.map((row: any)  => new FileFolderWrapper(row)))
-  }, [currentFolder.id])
+  const onSettled = useCallback(
+    (rows: (File | Folder)[]) => {
+      const currentFolderId = currentFolderWrapper.current?.id
+      if (currentFolderId !== currentFolder.id) {
+        currentFolderWrapper.current = new BBFolderWrapper(currentFolder)
+      }
+      currentFolderWrapper.current!.files.set(rows.map((row: any) => new FileFolderWrapper(row)))
+    },
+    [currentFolder.id],
+  )
 
   const {
     data: rows,
@@ -92,7 +95,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
         I18n.t('Table page %{current} of %{total}', {
           current: page.current,
           total: page.total,
-        })
+        }),
       )
     }
   }, [isLoading, page.current, page.total])
@@ -140,13 +143,8 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
             shouldHideUploadButtons={!userCanAddFilesForContext  || search.term.length > 0}
           />
         }
-        search={<SearchBar
-          initialValue={search.term}
-          onSearch={search.set}
-        />}
-        breadcrumbs={
-          <Breadcrumbs folders={folders} size={size} search={search.term} />
-        }
+        search={<SearchBar initialValue={search.term} onSearch={search.set} />}
+        breadcrumbs={<Breadcrumbs folders={folders} size={size} search={search.term} />}
         bulkActions={
           <BulkActionButtons
             size={size}
@@ -182,9 +180,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
             setSelectedRows={setSelectedRows}
           />
         }
-        usageBar={
-          userCanManageFilesForContext && <FilesUsageBar />
-        }
+        usageBar={userCanManageFilesForContext && <FilesUsageBar />}
         pagination={
           <>
             <Alert
@@ -195,20 +191,18 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
             >
               {paginationAlert}
             </Alert>
-            {
-              !isLoading && page.total > 1 && (
-                <Pagination
-                  as="nav"
-                  labelNext={I18n.t("Next page")}
-                  labelPrev={I18n.t("Previous page")}
-                  variant="compact"
-                  currentPage={page.current}
-                  totalPageNumber={page.total}
-                  onPageChange={page.set}
-                  data-testid="files-pagination"
-                />
-              )
-            }
+            {!isLoading && page.total > 1 && (
+              <Pagination
+                as="nav"
+                labelNext={I18n.t('Next page')}
+                labelPrev={I18n.t('Previous page')}
+                variant="compact"
+                currentPage={page.current}
+                totalPageNumber={page.total}
+                onPageChange={page.set}
+                data-testid="files-pagination"
+              />
+            )}
           </>
         }
       />
@@ -218,7 +212,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
 
 const ResponsiveFilesApp = () => {
   const isUserContext = filesEnv.showingAllContexts
-  const { data: folders } = useGetFolders()
+  const {data: folders} = useGetFolders()
   if (!folders) {
     return null
   }

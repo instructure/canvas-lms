@@ -23,9 +23,7 @@ import {ColorPicker} from '../ColorPicker'
 
 const user = userEvent.setup()
 
-const getPresetTooltip = (preset: HTMLElement) => {
-  return document.getElementById(preset.getAttribute('aria-describedby')!)
-}
+const getPresetTooltip = (p: HTMLElement) => p.attributes.getNamedItem('aria-label')!.value
 
 const DEFAULT_FONT_COLOR = '#273540'
 
@@ -120,7 +118,7 @@ describe('ColorPicker', () => {
     expect(constrast.textContent).toContain('21:1')
   })
 
-  it('uses colors on the page for presets', async () => {
+  it('uses colors on the page for presets', () => {
     const tabs = cloneBaseTabs()
     delete tabs.foreground
     delete tabs.border
@@ -129,9 +127,9 @@ describe('ColorPicker', () => {
 
     const presets = getByTestId('color-preset').querySelectorAll('button')
     expect(presets).toHaveLength(3)
-    expect(getPresetTooltip(presets[0])?.textContent).toEqual('#ffffff')
-    expect(getPresetTooltip(presets[1])?.textContent).toEqual('#ababab')
-    expect(getPresetTooltip(presets[2])?.textContent).toEqual('#cdcdcd')
+    expect(getPresetTooltip(presets[0])).toEqual('#ffffff')
+    expect(getPresetTooltip(presets[1])).toEqual('#ababab')
+    expect(getPresetTooltip(presets[2])).toEqual('#cdcdcd')
   })
 
   it('calls onCancel when the cancel button is clicked', () => {

@@ -36,7 +36,7 @@ const renderPeerReviewOptions = (props = {}) => {
 describe('PeerReviewOptions', () => {
   it('renders', () => {
     const {getAllByText, getByText, queryByText} = renderPeerReviewOptions(defaultProps)
-    expect(getAllByText('Peer Reviews')).toHaveLength(2)
+    expect(getAllByText('Peer Reviews')).toHaveLength(1)
     expect(getByText('Off')).toBeInTheDocument()
     expect(getByText('Assign manually')).toBeInTheDocument()
     expect(getByText('Automatically assign')).toBeInTheDocument()
@@ -51,7 +51,7 @@ describe('PeerReviewOptions', () => {
       ...defaultProps,
       peerReviewAssignment: 'automatically',
     })
-    expect(getAllByText('Peer Reviews')).toHaveLength(2)
+    expect(getAllByText('Peer Reviews')).toHaveLength(1)
     expect(getByText('Off')).toBeInTheDocument()
     expect(getByText('Reviews Per Student')).toBeInTheDocument()
     expect(getByTestId('peer-review-due-date-container')).toBeInTheDocument()
@@ -64,7 +64,7 @@ describe('PeerReviewOptions', () => {
       ...defaultProps,
       peerReviewAssignment: 'manually',
     })
-    expect(getAllByText('Peer Reviews')).toHaveLength(2)
+    expect(getAllByText('Peer Reviews')).toHaveLength(1)
     expect(getByText('Off')).toBeInTheDocument()
     // Expect these options to not exist for manually set peer reviews
     expect(queryByText('Reviews Per Student')).not.toBeInTheDocument()

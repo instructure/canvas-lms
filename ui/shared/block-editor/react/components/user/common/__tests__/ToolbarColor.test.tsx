@@ -138,14 +138,11 @@ describe('ToolbarColor', () => {
     // change to custom colors to enable ColorPresets
     screen.getByDisplayValue('custom').click()
 
-    const c1 = document.getElementById(
-      // @ts-expect-error
-      document
-        .getElementById('foreground')
-        ?.querySelectorAll('button')[0]
-        ?.getAttribute('aria-describedby'),
-    )
-    expect(c1).toHaveTextContent(DEFAULT_FONT_COLOR)
+    const c1 = document
+      .getElementById('foreground')
+      ?.querySelectorAll('button')[0]
+      ?.getAttribute('aria-label')
+    expect(c1).toMatch(DEFAULT_FONT_COLOR)
   })
 
   describe('color tab', () => {

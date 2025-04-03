@@ -51,10 +51,10 @@ export default class CoursesListRow extends React.Component {
     total_students: number.isRequired,
     teachers: arrayOf(
       shape({
-        size: UserLink.propTypes.size,
-        href: UserLink.propTypes.href,
-        display_name: UserLink.propTypes.name,
-        avatar_url: UserLink.propTypes.avatar_url,
+        size: string,
+        href: string,
+        display_name: string.isRequired,
+        avatar_url: string,
       }),
     ),
     teacher_count: number,

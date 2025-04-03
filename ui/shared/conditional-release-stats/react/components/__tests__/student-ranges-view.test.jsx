@@ -116,7 +116,7 @@ describe('StudentRangesView', () => {
     expect(firstButton).toHaveAttribute('aria-expanded', 'true')
 
     // Verify first range content is visible
-    const firstRangeContent = document.getElementById('Expandable_0')
+    const firstRangeContent = document.getElementById('Expandable___0')
     expect(firstRangeContent).toHaveClass('css-1u67g6d-toggleDetails__details')
   })
 })

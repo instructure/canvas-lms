@@ -47,6 +47,6 @@ describe('RequiredFormLabel', () => {
     const {getByText} = render(
       <RequiredFormLabel showErrorState={true}>Test Label</RequiredFormLabel>,
     )
-    expect(getByText('*')).toHaveStyle('color: rgb(230,36,41)')
+    expect(getByText('*')).toHaveStyle('color: rgb(199, 31, 35)')
   })
 })
