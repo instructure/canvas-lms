@@ -506,7 +506,17 @@ class MessageableUser
           # bail early if user doesn't have permission to message group members
           return if group&.context.is_a?(Course) && !group.grants_right?(@user, nil, :send_messages)
 
-          group_user_scope.where("group_memberships.group_id" => group.id).merge(active_users_in_group_context.except(:joins))
+          scope = group_user_scope.where("group_memberships.group_id" => group.id)
+                                  .merge(active_users_in_group_context.except(:joins))
+          return scope unless options[:show_teachers]
+
+          course = course_index[group.context_id]
+          visible_users_ids = scope.pluck(:id)
+          visible_users_ids |= enrollment_scope({ common_group_column: group.id }.merge(options))
+                               .where(enrollments: { course_id: course.id, type: ["TeacherEnrollment", "TaEnrollment"] })
+                               .pluck(:id)
+          # we need to convert two incompatible scopes into a single one
+          MessageableUser.where(id: visible_users_ids)
         elsif section_visible_group_ids.include?(group.id)
           # group.context is guaranteed to be a course from
           # section_visible_courses at this point
@@ -518,6 +528,12 @@ class MessageableUser
                     GroupMembership.where(group_id: group, workflow_state: "accepted").where("user_id=users.id").merge(active_users_in_group_context).arel.exists
                   )
           scope = scope.where(observer_restriction_clause) if student_courses.present?
+          if options[:show_teachers]
+            scope = scope.or(
+              enrollment_scope({ common_group_column: group.id }.merge(options))
+              .where(enrollments: { course_id: course.id, type: ["TeacherEnrollment", "TaEnrollment"] })
+            )
+          end
           scope
         end
       end
