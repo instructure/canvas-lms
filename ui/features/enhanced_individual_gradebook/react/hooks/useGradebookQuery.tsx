@@ -24,6 +24,7 @@ import {useEnrollmentsQuery} from './useEnrollmentsQuery'
 import {useSectionsQuery} from './useSectionsQuery'
 import {useSubmissionsQuery} from './useSubmissionsQuery'
 import {useOutcomesQuery} from './useOutcomesQuery'
+import {useCourseOutcomeMasteryScales} from './useCourseOutcomeMasteryScales'
 
 export const useGradebookQuery = (courseId: string) => {
   const {enrollments, enrollmentsLoading, enrollmentsSuccessful} = useEnrollmentsQuery(courseId)
@@ -31,6 +32,13 @@ export const useGradebookQuery = (courseId: string) => {
   const {sections, sectionsLoading, sectionsSuccessful} = useSectionsQuery(courseId)
 
   const {outcomes, outcomesLoading, outcomesSuccessful} = useOutcomesQuery(courseId)
+
+  const {
+    outcomeCalculationMethod,
+    outcomeProficiency,
+    courseOutcomeMasteryScalesLoading,
+    courseOutcomeMasteryScalesSuccessful,
+  } = useCourseOutcomeMasteryScales(courseId)
 
   const {submissions, submissionsLoading, submissionsSuccessful} = useSubmissionsQuery(courseId)
 
@@ -45,14 +53,16 @@ export const useGradebookQuery = (courseId: string) => {
     outcomesSuccessful &&
     submissionsSuccessful &&
     assignmentGroupsSuccessful &&
-    assignmentsSuccessful
+    assignmentsSuccessful &&
+    courseOutcomeMasteryScalesSuccessful
   const isLoading =
     enrollmentsLoading &&
     sectionsLoading &&
     outcomesLoading &&
     submissionsLoading &&
     assignmentGroupsLoading &&
-    assignmentsLoading
+    assignmentsLoading &&
+    courseOutcomeMasteryScalesLoading
 
   const courseData: GradebookQueryResponse | undefined = useMemo(() => {
     if (!isSuccess) {
@@ -81,6 +91,8 @@ export const useGradebookQuery = (courseId: string) => {
         submissionsConnection: {
           nodes: submissions,
         },
+        outcomeCalculationMethod,
+        outcomeProficiency,
       },
     }
   }, [isSuccess, enrollments, assignmentGroups, outcomes, sections, submissions, assignments])

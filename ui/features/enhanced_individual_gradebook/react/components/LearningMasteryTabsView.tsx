@@ -44,7 +44,7 @@ import ContentSelection from './ContentSelectionLearningMastery'
 import EnhancedIndividualGradebook from './EnhancedIndividualGradebook'
 import GlobalSettings from './GlobalSettingsLearningMastery'
 import OutcomeInformation from './OutcomeInformation'
-import OutcomeReult from './OutcomeResult'
+import OutcomeResult from './OutcomeResult'
 import fetchOutcomeResult from './OutcomeResult/OutcomeResultQuery'
 import StudentInformation from './StudentInformation'
 import {useGradebookQuery} from '../hooks/useGradebookQuery'
@@ -304,12 +304,13 @@ export default function LearningMasteryTabsView() {
 
             <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
-            <OutcomeReult
+            <OutcomeResult
               outcomeScore={outcomeScore}
               outcome={selectedOutcome}
               selectedStudentId={selectedStudentId}
               selectedOutcomeRollup={selectedOutcomeRollup}
               isLoading={isLoading}
+              courseOutcomeProficiency={courseData?.course.outcomeProficiency}
             />
 
             <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
@@ -326,7 +327,11 @@ export default function LearningMasteryTabsView() {
 
             <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
-            <OutcomeInformation outcome={selectedOutcome} outcomeScore={outcomeScore} />
+            <OutcomeInformation
+              outcome={selectedOutcome}
+              outcomeScore={outcomeScore}
+              courseOutcomeCalculationMethod={courseData?.course.outcomeCalculationMethod}
+            />
 
             <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
           </View>

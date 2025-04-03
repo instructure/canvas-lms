@@ -165,6 +165,8 @@ export type GradebookQueryResponse = {
     assignmentGroupsConnection: {
       nodes: AssignmentGroupConnection[]
     }
+    outcomeCalculationMethod: GradebookCourseOutcomeCalculationMethod | null
+    outcomeProficiency: GradebookCourseOutcomeProficiency | null
   }
 }
 
@@ -239,4 +241,13 @@ export type GradebookSubmissionCommentsResponse = {
       nodes: CommentConnection[]
     }
   }
+}
+
+export type GradebookCourseOutcomeCalculationMethod = {
+  calculationInt: number | null
+  calculationMethod: string | null
+}
+
+export type GradebookCourseOutcomeProficiency = {
+  masteryPoints: number
 }

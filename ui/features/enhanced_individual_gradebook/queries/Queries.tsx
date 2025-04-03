@@ -22,6 +22,8 @@ import type {
   AssignmentConnection,
   AssignmentGroupConnection,
   EnrollmentConnection,
+  GradebookCourseOutcomeCalculationMethod,
+  GradebookCourseOutcomeProficiency,
   GradebookStudentQueryResponse,
   GradebookSubmissionCommentsResponse,
   Outcome,
@@ -447,6 +449,21 @@ export const GRADEBOOK_ASSIGNMENTS_QUERY = gql`
   }
 `
 
+export const GRADEBOOK_COURSE_OUTCOME_MASTERY_SCALES_QUERY = gql`
+  query GradebookCourseOutcomeMasteryScalesQuery($courseId:ID!) {
+    course(id: $courseId){
+      outcomeCalculationMethod {
+        _id
+        calculationInt
+        calculationMethod
+      }
+      outcomeProficiency {
+        masteryPoints
+      }
+    }
+  }
+`
+
 const COURSE_ID_INDEX = 1
 
 type PageInfo = {
@@ -516,6 +533,21 @@ export const fetchOutcomes = async ({pageParam, queryKey}: FetchRequestParams) =
 export const getNextOutcomesPage = (lastPage: FetchOutcomesResponse) => {
   const {pageInfo} = lastPage.course.rootOutcomeGroup.outcomes
   return pageInfo.hasNextPage ? pageInfo.endCursor : null
+}
+
+type FetchCourseOutcomeMasteryScalesResponse = {
+  course: {
+    outcomeCalculationMethod: GradebookCourseOutcomeCalculationMethod
+    outcomeProficiency: GradebookCourseOutcomeProficiency
+  }
+}
+export const fetchCourseOutcomeMasteryScales = async ({queryKey}: FetchRequestParams) => {
+  return executeQuery<FetchCourseOutcomeMasteryScalesResponse>(
+    GRADEBOOK_COURSE_OUTCOME_MASTERY_SCALES_QUERY,
+    {
+      courseId: queryKey[COURSE_ID_INDEX],
+    },
+  )
 }
 
 type FetchSubmissionsResponse = {
