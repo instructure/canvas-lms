@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import {CommonMigratorControls, noFileSelectedFormMessage} from '@canvas/content-migrations'
 import type {onSubmitMigrationFormCallback} from '../types'
 import QuestionBankSelector from './question_bank_selector'
@@ -40,9 +40,10 @@ const QTIZipImporter = ({
   isSubmitting,
 }: QTIZipImporterProps) => {
   const [isQuestionBankDisabled, setIsQuestionBankDisabled] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const {setFile, fileError, questionBankSettings, setQuestionBankSettings, handleSubmit} =
-    useSubmitHandlerWithQuestionBank(onSubmit)
+    useSubmitHandlerWithQuestionBank(onSubmit, fileInputRef)
 
   return (
     <>
@@ -52,6 +53,7 @@ const QTIZipImporter = ({
         isSubmitting={isSubmitting}
         externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
         isRequired={true}
+        inputRef={ref => (fileInputRef.current = ref)}
       />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}

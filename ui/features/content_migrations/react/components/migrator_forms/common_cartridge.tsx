@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import {
   CommonMigratorControls,
   parseDateToISOString,
@@ -44,8 +44,9 @@ const CommonCartridgeImporter = ({
   isSubmitting,
 }: CommonCartridgeImporterProps) => {
   const [isQuestionBankDisabled, setIsQuestionBankDisabled] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const {setFile, fileError, questionBankSettings, setQuestionBankSettings, handleSubmit} =
-    useSubmitHandlerWithQuestionBank(onSubmit)
+    useSubmitHandlerWithQuestionBank(onSubmit, fileInputRef)
 
   return (
     <>
@@ -55,6 +56,7 @@ const CommonCartridgeImporter = ({
         isSubmitting={isSubmitting}
         externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
         isRequired={true}
+        inputRef={ref => (fileInputRef.current = ref)}
       />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
