@@ -92,6 +92,7 @@ class AssignmentsController < ApplicationController
           FLAGS: {
             newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
             show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
+            new_quizzes_by_default: @context.feature_enabled?(:new_quizzes_by_default)
           },
           grading_scheme: grading_standard.data,
           points_based: grading_standard.points_based?,
@@ -778,7 +779,7 @@ class AssignmentsController < ApplicationController
       @assignment.lti_context_id = secure_params[:lti_context_id]
     end
 
-    @assignment.quiz_lti! if params.key?(:quiz_lti)
+    @assignment.quiz_lti! if params.key?(:quiz_lti) || params[:assignment][:quiz_lti]
 
     @assignment.workflow_state = "unpublished"
     @assignment.updating_user = @current_user

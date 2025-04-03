@@ -73,7 +73,11 @@ const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}
 
     // If this is a new assignment, we need to add the appropriate submission type
     if (isNewAssignment) {
-      mappedData.submission_types =  getSubmissionType(data)
+      mappedData.submission_types = getSubmissionType(data)
+    }
+
+    if (ENV.FLAGS.new_quizzes_by_default && data.type === 'online_quiz') {
+      mappedData.quiz_lti = 1
     }
 
     // Save the assignment model (Should fire backend call)
@@ -144,8 +148,12 @@ const redirectTo = url => {
 }
 
 const launchQuizNew = async data => {
-  const response = await axios.post(newQuizUrl(), data)
-  redirectTo(response.data.url)
+  if (ENV.FLAGS.new_quizzes_by_default) {
+    redirectTo(newAssignmentUrl() + '?quiz_lti&' + encodeQueryString(data))
+  } else {
+    const response = await axios.post(newQuizUrl(), data)
+    redirectTo(response.data.url)
+  }
 }
 
 const launchQuizEdit = (assignment, data) => {
@@ -193,8 +201,10 @@ const launchDiscussionTopicEdit = (assignment, assignmentGroup, data, isNewAssig
 }
 
 const getSubmissionType = (formData) => {
-  if (['discussion_topic', 'online_quiz', 'external_tool', 'not_graded'].includes(formData.type)) {
+  if (['discussion_topic', 'external_tool', 'not_graded'].includes(formData.type)) {
     return [formData.type]
+  } else if (formData.type === 'online_quiz') {
+    return [ENV.FLAGS.new_quizzes_by_default ? 'external_tool' : formData.type]
   } else {
     return ['online_text_entry']
   }
