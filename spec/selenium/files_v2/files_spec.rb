@@ -64,7 +64,7 @@ describe "files index page" do
       it "Displays the file usage bar if user has permission" do
         allow(Attachment).to receive(:get_quota).with(@course).and_return({ quota: 50_000_000, quota_used: 25_000_000 })
         get "/courses/#{@course.id}/files"
-        expect(files_usage_text.text).to include("50% of 50 MB used")
+        expect(files_usage_text.text).to include("25 MB of 50 MB used")
       end
 
       it "Can create a new folder" do

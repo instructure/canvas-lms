@@ -26,6 +26,7 @@ import formatMessage from '../../../../../packages/canvas-media/src/format-messa
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {generateFilesQuotaUrl} from '../../utils/apiUtils'
 import {useFileManagement} from './Contexts'
+import { Flex } from '@instructure/ui-flex'
 
 const I18n = createI18nScope('files_v2')
 
@@ -55,23 +56,26 @@ const FilesUsageBar = () => {
   }
 
   const {quota_used = 0, quota = 1} = data || {quota_used: 0, quota: 1}
-  const percentage = Math.round((quota_used / quota) * 100)
-
-  const filesUsageString = I18n.t('%{percentUsed} of %{quota} used', {
-    percentUsed: I18n.n(percentage, {percentage: true}),
+  const filesUsageString = I18n.t('%{used} of %{quota} used', {
+    used: friendlyBytes(quota_used),
     quota: friendlyBytes(data?.quota) || 0,
   })
 
   return (
-    <ProgressBar
-      meterColor="brand"
-      screenReaderLabel={formatMessage('File Storage Quota Used')}
-      formatScreenReaderValue={() => filesUsageString}
-      renderValue={<Text data-testid="files-usage-text">{filesUsageString}</Text>}
-      size="x-small"
-      valueMax={quota}
-      valueNow={quota_used}
-    />
+    <Flex
+      direction='column'
+      gap='x-small'
+    >
+      <ProgressBar
+        meterColor="brand"
+        screenReaderLabel={formatMessage('File Storage Quota Used')}
+        formatScreenReaderValue={() => filesUsageString}
+        size="x-small"
+        valueMax={quota}
+        valueNow={quota_used}
+      />
+      <Text data-testid="files-usage-text">{filesUsageString}</Text>
+    </Flex>
   )
 }
 
