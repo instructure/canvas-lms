@@ -29,7 +29,7 @@ import type {InternalLtiConfiguration} from '../model/internal_lti_configuration
 import {toUndefined} from '../../common/lib/toUndefined'
 import type {InternalPlacementConfiguration} from '../model/internal_lti_configuration/placement_configuration/InternalPlacementConfiguration'
 
-export interface RegistrationOverlayActions {
+export interface DynamicRegistrationOverlayActions {
   updateDevKeyName: (name: string) => void
   updateRegistrationTitle: (s: string) => void
   toggleDisabledScope: (scope: LtiScope) => void
@@ -43,7 +43,7 @@ export interface RegistrationOverlayActions {
   updateIconUrl: (placement: LtiPlacement, iconUrl?: string) => void
 }
 
-export type RegistrationOverlayState = {
+export type DynamicRegistrationOverlayState = {
   developerKeyName?: string
   adminNickname?: string
   overlay: LtiConfigurationOverlay
@@ -63,11 +63,11 @@ const updatePlacement =
       },
     }))
 
-const stateFor = (state: RegistrationOverlayState) => ({state})
+const stateFor = (state: DynamicRegistrationOverlayState) => ({state})
 
 const updateState =
-  (f: (state: RegistrationOverlayState) => RegistrationOverlayState) =>
-  (fullState: {state: RegistrationOverlayState}): {state: RegistrationOverlayState} =>
+  (f: (state: DynamicRegistrationOverlayState) => DynamicRegistrationOverlayState) =>
+  (fullState: {state: DynamicRegistrationOverlayState}): {state: DynamicRegistrationOverlayState} =>
     stateFor(f(fullState.state))
 
 const updateDevKeyName = (name: string) =>
@@ -112,21 +112,21 @@ const updateAdminNickname = (nickname: string) =>
     return {...state, adminNickname: nickname}
   })
 
-export type RegistrationOverlayStore = StoreApi<
+export type DynamicRegistrationOverlayStore = StoreApi<
   {
-    state: RegistrationOverlayState
-  } & RegistrationOverlayActions
+    state: DynamicRegistrationOverlayState
+  } & DynamicRegistrationOverlayActions
 >
 
-export const createRegistrationOverlayStore = (
+export const createDynamicRegistrationOverlayStore = (
   developerKeyName: string | null,
   ltiRegistration: LtiRegistrationWithConfiguration,
 ): StoreApi<
   {
-    state: RegistrationOverlayState
-  } & RegistrationOverlayActions
+    state: DynamicRegistrationOverlayState
+  } & DynamicRegistrationOverlayActions
 > =>
-  createStore<{state: RegistrationOverlayState} & RegistrationOverlayActions>()(
+  createStore<{state: DynamicRegistrationOverlayState} & DynamicRegistrationOverlayActions>()(
     subscribeWithSelector(set => ({
       state: initialOverlayStateFromLtiRegistration(
         ltiRegistration,
@@ -163,7 +163,7 @@ const initialOverlayStateFromLtiRegistration = (
   registration: LtiRegistrationWithConfiguration,
   overlay?: LtiConfigurationOverlay | null,
   developerKeyName?: string | null,
-): RegistrationOverlayState => {
+): DynamicRegistrationOverlayState => {
   return {
     adminNickname: toUndefined(registration.admin_nickname),
     developerKeyName: developerKeyName || '',

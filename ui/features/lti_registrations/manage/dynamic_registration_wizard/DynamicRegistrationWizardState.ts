@@ -20,9 +20,9 @@ import {create} from 'zustand'
 import type {AccountId} from '../model/AccountId'
 import type {DynamicRegistrationToken} from '../model/DynamicRegistrationToken'
 import {
-  createRegistrationOverlayStore,
-  type RegistrationOverlayStore,
-} from './RegistrationOverlayState'
+  createDynamicRegistrationOverlayStore,
+  type DynamicRegistrationOverlayStore,
+} from './DynamicRegistrationOverlayState'
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
 import {
   formatApiResultError,
@@ -170,7 +170,7 @@ export const isReviewingState = (
 export type ConfirmationState<Tag extends string> = {
   _type: Tag
   registration: LtiRegistrationWithConfiguration
-  overlayStore: RegistrationOverlayStore
+  overlayStore: DynamicRegistrationOverlayStore
   reviewing: boolean
 }
 
@@ -209,7 +209,7 @@ const confirmationState =
   <Tag extends ConfirmationStateType>(_type: Tag) =>
   (
     registration: LtiRegistrationWithConfiguration,
-    overlayStore: RegistrationOverlayStore,
+    overlayStore: DynamicRegistrationOverlayStore,
     reviewing = false,
   ): DynamicRegistrationWizardState => ({
     _type,
@@ -306,10 +306,8 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
 
                   service.getRegistrationByUUID(accountId, resp.data.uuid).then(reg => {
                     if (isSuccessful(reg)) {
-                      const store: RegistrationOverlayStore = createRegistrationOverlayStore(
-                        reg.data.name,
-                        reg.data,
-                      )
+                      const store: DynamicRegistrationOverlayStore =
+                        createDynamicRegistrationOverlayStore(reg.data.name, reg.data)
                       set(stateFor(confirmationState('PermissionConfirmation')(reg.data, store)))
                     } else {
                       set(stateFor(errorState(formatApiResultError(reg))))
@@ -334,7 +332,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
         const reg = await service.fetchLtiRegistration(accountId, registrationId)
 
         if (isSuccessful(reg)) {
-          const store: RegistrationOverlayStore = createRegistrationOverlayStore(
+          const store: DynamicRegistrationOverlayStore = createDynamicRegistrationOverlayStore(
             reg.data.name,
             reg.data,
           )

@@ -22,7 +22,7 @@ import {PermissionConfirmationWrapper} from '../components/PermissionConfirmatio
 import {mockRegistration, mockToolConfiguration} from './helpers'
 import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
-import {createRegistrationOverlayStore} from '../RegistrationOverlayState'
+import {createDynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 
 describe('PermissionConfirmationWrapper', () => {
   const registration = mockRegistration({
@@ -32,7 +32,7 @@ describe('PermissionConfirmationWrapper', () => {
     }),
   })
 
-  const overlayStore = createRegistrationOverlayStore(registration.name, registration)
+  const overlayStore = createDynamicRegistrationOverlayStore(registration.name, registration)
 
   it('renders the PermissionConfirmation component with the correct props', () => {
     render(

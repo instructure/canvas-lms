@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {mockRegistration, mockToolConfiguration} from './helpers'
-import {createRegistrationOverlayStore} from '../RegistrationOverlayState'
+import {createDynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import {PrivacyConfirmationWrapper} from '../components/PrivacyConfirmationWrapper'
 import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {i18nLtiPrivacyLevel, i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
@@ -33,7 +33,7 @@ describe('PrivacyConfirmationWrapper', () => {
       }),
       name: 'Test App',
     })
-    const overlayStore = createRegistrationOverlayStore(registration.name, registration)
+    const overlayStore = createDynamicRegistrationOverlayStore(registration.name, registration)
 
     render(<PrivacyConfirmationWrapper overlayStore={overlayStore} toolName={registration.name} />)
 
@@ -48,7 +48,7 @@ describe('PrivacyConfirmationWrapper', () => {
       }),
       name: 'Test App',
     })
-    const overlayStore = createRegistrationOverlayStore(registration.name, registration)
+    const overlayStore = createDynamicRegistrationOverlayStore(registration.name, registration)
     render(<PrivacyConfirmationWrapper overlayStore={overlayStore} toolName={registration.name} />)
     expect(screen.getByLabelText(/User Data Shared With This App/i)).toHaveValue(
       i18nLtiPrivacyLevel('public'),
@@ -70,7 +70,7 @@ describe('PrivacyConfirmationWrapper', () => {
       }),
       name: 'Test App',
     })
-    const overlayStore = createRegistrationOverlayStore(registration.name, registration)
+    const overlayStore = createDynamicRegistrationOverlayStore(registration.name, registration)
     render(<PrivacyConfirmationWrapper overlayStore={overlayStore} toolName={registration.name} />)
 
     expect(screen.getByText(i18nLtiPrivacyLevelDescription('public'))).toBeInTheDocument()

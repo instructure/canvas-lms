@@ -18,12 +18,12 @@
 
 import React from 'react'
 import {NamingConfirmation} from '../../registration_wizard_forms/NamingConfirmation'
-import type {RegistrationOverlayStore} from '../RegistrationOverlayState'
+import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 
 export type NamingConfirmationWrapperProps = {
-  overlayStore: RegistrationOverlayStore
+  overlayStore: DynamicRegistrationOverlayStore
   registration: LtiRegistrationWithConfiguration
 }
 
