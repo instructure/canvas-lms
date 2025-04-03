@@ -28,7 +28,7 @@ class Loaders::MentionableUserLoader < GraphQL::Batch::Loader
   def perform(objects)
     objects.each do |object|
       calculator = ::MessageableUser::Calculator.new(@curent_user)
-      fulfill(object, calculator.search_in_context_scope(context: object, search: @search_term))
+      fulfill(object, calculator.search_in_context_scope(context: object, search: @search_term, show_teachers: true))
     end
   end
 end
