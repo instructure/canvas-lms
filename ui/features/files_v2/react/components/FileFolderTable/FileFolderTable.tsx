@@ -217,8 +217,8 @@ export type ModalOrTrayOptions = {
 
 export interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
-  rows: (File | Folder)[],
-  isLoading: boolean,
+  rows: (File | Folder)[]
+  isLoading: boolean
   contextType: string
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
@@ -226,8 +226,8 @@ export interface FileFolderTableProps {
   usageRightsRequiredForContext: boolean
   sort: Sort
   onSortChange: (sort: Sort) => void
-  searchString?: string,
-  selectedRows: Set<string>,
+  searchString?: string
+  selectedRows: Set<string>
   setSelectedRows: React.Dispatch<React.SetStateAction<Set<string>>>
 }
 
@@ -298,13 +298,21 @@ const FileFolderTable = ({
     }
   }, [rows, selectedRows.size])
 
+  enum SortOrder {
+    ASCENDING = 'asc',
+    DESCENDING = 'desc',
+  }
+
   const handleColumnHeaderClick = useCallback(
     (columnId: string) => {
       const newCol = columnId
-      const newDir = columnId === sort.by
-        ? (sort.direction === 'asc' ? 'desc' : 'asc')
-        : 'asc'
-      onSortChange({ by: newCol, direction: newDir })
+      const newDirection =
+        columnId === sort.by
+          ? sort.direction === SortOrder.ASCENDING
+            ? SortOrder.DESCENDING
+            : SortOrder.ASCENDING
+          : SortOrder.ASCENDING
+      onSortChange({by: newCol, direction: newDirection})
     },
     [onSortChange, sort.by, sort.direction],
   )
@@ -347,14 +355,16 @@ const FileFolderTable = ({
     'Files and Folders: sorted by %{sortColumn} in %{sortDirection} order',
     {
       sortColumn: columnHeaders.find(header => header.id === sort.by)?.title || sort.by,
-      sortDirection: sort.direction === 'asc' ? 'ascending' : 'descending',
+      sortDirection: sort.direction === SortOrder.ASCENDING ? 'ascending' : 'descending',
     },
   )
+
+  const showDrop = !isLoading && !searchString && !isStacked
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     if (e.dataTransfer?.types.includes('Files')) {
       e.preventDefault()
-      if (!isDragging) {
+      if (!isDragging && showDrop) {
         if (filesDirectoryRef.current && filesDirectoryRef.current.offsetHeight < MIN_HEIGHT) {
           setDirectoryMinHeight(MIN_HEIGHT + 'px')
         }
@@ -407,7 +417,7 @@ const FileFolderTable = ({
         <div
           data-testid="files-directory"
           ref={filesDirectoryRef}
-          style={{minHeight: rows.length === 0 && !isLoading && !isStacked ? MIN_HEIGHT : directoryMinHeight}}
+          style={{minHeight: rows.length === 0 && showDrop ? MIN_HEIGHT : directoryMinHeight}}
           className="files_directory"
           onDragEnter={e => handleDragEnter(e as React.DragEvent<HTMLDivElement>)}
           onDragLeave={e => handleDragLeave(e as React.DragEvent<HTMLDivElement>)}
@@ -451,7 +461,7 @@ const FileFolderTable = ({
                 usageRightsRequiredForContext,
                 setModalOrTrayOptions,
               )}
-              {!isLoading && userCanEditFilesForContext && !isStacked && (
+              {userCanEditFilesForContext && showDrop && (
                 <Table.Row data-upload>
                   <Table.Cell>
                     <FileTableUpload
@@ -487,7 +497,7 @@ const FileFolderTable = ({
         >
           {I18n.t('Sorted by %{sortColumn} in %{sortDirection} order', {
             sortColumn: columnHeaders.find(header => header.id === sort.by)?.title || sort.by,
-            sortDirection: sort.direction === 'asc' ? 'ascending' : 'descending',
+            sortDirection: sort.direction === SortOrder.ASCENDING ? 'ascending' : 'descending',
           })}
         </Alert>
         {searchString && rows.length > 0 && (

@@ -57,6 +57,13 @@ describe('FileFolderTable', () => {
     expect(screen.queryByText('Drop files here to upload')).not.toBeInTheDocument()
   })
 
+  it('renders no filedrop when searching', () => {
+    renderComponent({ searchString: 'fileDoesNotExist' })
+
+    expect(screen.getByText('No Results')).toBeInTheDocument()
+    expect(screen.queryByText('Drop files here to upload')).not.toBeInTheDocument()
+  })
+
   it('renders file drop when a file is dragged over', async () => {
     // mock file to drag over
     const file = new File(['file content'], 'example.txt', {type: 'text/plain'})

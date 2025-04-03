@@ -137,7 +137,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
           <TopLevelButtons
             size={size}
             isUserContext={isUserContext}
-            shouldHideUploadButtons={!userCanAddFilesForContext}
+            shouldHideUploadButtons={!userCanAddFilesForContext  || search.term.length > 0}
           />
         }
         search={<SearchBar
