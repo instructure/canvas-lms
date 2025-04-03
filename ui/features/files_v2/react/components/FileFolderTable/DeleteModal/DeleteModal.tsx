@@ -22,23 +22,26 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {type File, type Folder} from '../../../interfaces/File'
-import {isFile} from '../../../utils/fileFolderUtils'
+import {type File, type Folder} from '../../../../interfaces/File'
+import {isFile} from '../../../../utils/fileFolderUtils'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import getCookie from '@instructure/get-cookie'
 import {queryClient} from '@canvas/query'
-import FileFolderInfo from '../shared/FileFolderInfo'
+import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
+import FileFolderInfo from '../../shared/FileFolderInfo'
 
 const I18n = createI18nScope('files_v2')
 
-interface DeleteModalProps {
+export interface DeleteModalProps {
   open: boolean
   items: (File | Folder)[]
   onClose: () => void
 }
 
-const DeleteModal = ({open, items, onClose}: DeleteModalProps) => {
+export function DeleteModal({open, items, onClose}: DeleteModalProps) {
   const [isDeleting, setIsDeleting] = useState(false)
+  const isDeletingOrLoading = isDeleting || items.length === 0
   const isMultiple = items.length > 1
 
   const handleConfirmDelete = useCallback(async () => {
@@ -78,12 +81,9 @@ const DeleteModal = ({open, items, onClose}: DeleteModalProps) => {
     }
   }, [items, isMultiple, onClose])
 
-  if (items.length === 0) {
-    return null
-  }
-
   return (
     <Modal
+      size="small"
       open={open}
       onDismiss={onClose}
       onExited={() => setIsDeleting(false)}
@@ -99,15 +99,28 @@ const DeleteModal = ({open, items, onClose}: DeleteModalProps) => {
         <Heading>{I18n.t('Delete Items')}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <FileFolderInfo items={items} />
-        <Text>
-          {isMultiple
-            ? I18n.t('Deleting these items cannot be undone. Do you want to continue?')
-            : I18n.t('Deleting this item cannot be undone. Do you want to continue?')}
-        </Text>
+        {isDeletingOrLoading ? (
+          <View as="div" textAlign="center">
+            <Spinner
+              renderTitle={() => I18n.t('Deleting...')}
+              margin="0 0 0 medium"
+              aria-live="polite"
+              data-testid="delete-spinner"
+            />
+          </View>
+        ) : (
+          <>
+            <FileFolderInfo items={items} />
+            <Text>
+              {isMultiple
+                ? I18n.t('Deleting these items cannot be undone. Do you want to continue?')
+                : I18n.t('Deleting this item cannot be undone. Do you want to continue?')}
+            </Text>
+          </>
+        )}
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onClose} disabled={isDeleting}>
+        <Button onClick={onClose} disabled={isDeletingOrLoading} data-testid="modal-cancel-button">
           {I18n.t('Cancel')}
         </Button>
         <Button
@@ -115,13 +128,11 @@ const DeleteModal = ({open, items, onClose}: DeleteModalProps) => {
           onClick={handleConfirmDelete}
           color="danger"
           margin="none none none small"
-          disabled={isDeleting}
+          disabled={isDeletingOrLoading}
         >
-          {isDeleting ? I18n.t('Deleting...') : I18n.t('Delete')}
+          {isDeletingOrLoading ? I18n.t('Deleting...') : I18n.t('Delete')}
         </Button>
       </Modal.Footer>
     </Modal>
   )
 }
-
-export default DeleteModal
