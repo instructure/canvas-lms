@@ -50,7 +50,7 @@ describe('PublishIconButton', () => {
         visibility_level: 'file',
         preview_url: 'https://example.com/file',
       },
-      userCanEditFilesForContext: true,
+      userCanRestrictFilesForContext: true,
     }
   })
 
@@ -79,7 +79,7 @@ describe('PublishIconButton', () => {
   })
 
   it('renders restricted icon when user cannot edit and item is restricted', () => {
-    defaultProps.userCanEditFilesForContext = false
+    defaultProps.userCanRestrictFilesForContext = false
     defaultProps.item.lock_at = '2024-12-31T23:59:59Z'
     render(<PublishIconButton {...defaultProps} />)
     const tooltip = screen.getByRole('tooltip')
@@ -87,7 +87,7 @@ describe('PublishIconButton', () => {
   })
 
   it('renders nothing when user cannot edit and item is not restricted', () => {
-    defaultProps.userCanEditFilesForContext = false
+    defaultProps.userCanRestrictFilesForContext = false
     const {container} = render(<PublishIconButton {...defaultProps} />)
     expect(container).toBeEmptyDOMElement()
   })

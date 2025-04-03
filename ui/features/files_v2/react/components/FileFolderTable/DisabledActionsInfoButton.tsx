@@ -36,7 +36,7 @@ const lockedFilesText = I18n.t(
   },
 )
 
-const foldersText = I18n.t("You can't *manage usage rights or view* folders.", {
+const foldersText = I18n.t("You can't *view* folders.", {
   wrappers: [`<strong>$1</strong>`],
 })
 

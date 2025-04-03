@@ -128,6 +128,7 @@ const columnRenderers: {
     isStacked,
     userCanEditFilesForContext,
     userCanDeleteFilesForContext,
+    userCanRestrictFilesForContext,
     usageRightsRequiredForContext,
     size,
     isSelected,
@@ -139,6 +140,7 @@ const columnRenderers: {
     isStacked: boolean
     userCanEditFilesForContext: boolean
     userCanDeleteFilesForContext: boolean
+    userCanRestrictFilesForContext: boolean
     usageRightsRequiredForContext: boolean
     size: 'small' | 'medium' | 'large'
     isSelected: boolean
@@ -175,10 +177,10 @@ const columnRenderers: {
       />
     ) : null,
   blueprint: ({row}) => <BlueprintIconButton item={row} />,
-  published: ({row, userCanEditFilesForContext, setModalOrTrayOptions}) => (
+  published: ({row, userCanRestrictFilesForContext, setModalOrTrayOptions}) => (
     <PublishIconButton
       item={row}
-      userCanEditFilesForContext={userCanEditFilesForContext}
+      userCanRestrictFilesForContext={userCanRestrictFilesForContext}
       onClick={setModalOrTrayOptions({id: 'permissions', items: [row]})}
     />
   ),
@@ -187,12 +189,14 @@ const columnRenderers: {
     size,
     userCanEditFilesForContext,
     userCanDeleteFilesForContext,
+    userCanRestrictFilesForContext,
     usageRightsRequiredForContext,
   }) => (
     <ActionMenuButton
       size={size}
       userCanEditFilesForContext={userCanEditFilesForContext}
       userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+      userCanRestrictFilesForContext={userCanRestrictFilesForContext}
       usageRightsRequiredForContext={usageRightsRequiredForContext}
       row={row}
     />
@@ -215,8 +219,10 @@ export interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
   rows: (File | Folder)[],
   isLoading: boolean,
+  contextType: string
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
+  userCanRestrictFilesForContext: boolean
   usageRightsRequiredForContext: boolean
   sort: Sort
   onSortChange: (sort: Sort) => void
@@ -229,8 +235,10 @@ const FileFolderTable = ({
   size,
   rows,
   isLoading,
+  contextType,
   userCanEditFilesForContext,
   userCanDeleteFilesForContext,
+  userCanRestrictFilesForContext,
   usageRightsRequiredForContext,
   sort,
   onSortChange,
@@ -309,6 +317,8 @@ const FileFolderTable = ({
         return usageRightsRequiredForContext
       case 'blueprint':
         return !!ENV.BLUEPRINT_COURSES_DATA
+      case 'published':
+        return contextType !== 'group'
       default:
         return true
     }
@@ -437,6 +447,7 @@ const FileFolderTable = ({
                 toggleRowSelection,
                 userCanEditFilesForContext,
                 userCanDeleteFilesForContext,
+                userCanRestrictFilesForContext,
                 usageRightsRequiredForContext,
                 setModalOrTrayOptions,
               )}

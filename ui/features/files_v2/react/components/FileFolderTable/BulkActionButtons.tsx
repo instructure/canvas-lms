@@ -50,6 +50,8 @@ interface BulkActionButtonsProps {
   totalRows: number
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
+  userCanRestrictFilesForContext: boolean
+  usageRightsRequiredForContext: boolean
   rows: (File | Folder)[]
 }
 
@@ -61,6 +63,8 @@ const BulkActionButtons = ({
   totalRows,
   userCanEditFilesForContext,
   userCanDeleteFilesForContext,
+  userCanRestrictFilesForContext,
+  usageRightsRequiredForContext,
   rows,
 }: BulkActionButtonsProps) => {
   const [modalOrTray, setModalOrTray] = useState<BulkActionModalOrTrayId | null>(null)
@@ -226,7 +230,7 @@ const BulkActionButtons = ({
                     </Flex.Item>
                   </Flex>
                 </Menu.Item>
-                {userCanEditFilesForContext && (
+                {userCanRestrictFilesForContext && (
                   <Menu.Item
                     disabled={containsLockedBPItems}
                     data-testid="bulk-actions-edit-permissions-button"
@@ -242,9 +246,9 @@ const BulkActionButtons = ({
                     </Flex>
                   </Menu.Item>
                 )}
-                {userCanEditFilesForContext && (
+                {userCanEditFilesForContext && usageRightsRequiredForContext && (
                   <Menu.Item
-                    disabled={containsFolders || containsLockedBPItems}
+                    disabled={containsLockedBPItems}
                     data-testid="bulk-actions-manage-usage-rights-button"
                     onClick={createSetModalOrTrayCallback('manage-usage-rights')}
                   >
