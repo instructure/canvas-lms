@@ -33,7 +33,7 @@ let fakeTinyMCE, editorCommandSpy, editor, rce
 
 function createBasicElement(opts) {
   editor = new FakeEditor({id: textareaId})
-  fakeTinyMCE.editors[0] = editor
+  fakeTinyMCE.get = () => editor
   editorCommandSpy = jest.spyOn(editor, 'execCommand')
 
   const props = {textareaId, tinymce: fakeTinyMCE, ...trayProps(), ...defaultProps(), ...opts}
@@ -125,7 +125,6 @@ describe('RCEWrapper', () => {
       plugins: {
         AccessibilityChecker: {},
       },
-      editors: [editor],
     }
     global.tinymce = fakeTinyMCE
   })

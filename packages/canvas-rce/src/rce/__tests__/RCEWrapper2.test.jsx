@@ -23,13 +23,7 @@ import Bridge from '../../bridge'
 import * as indicateModule from '../../common/indicate'
 import * as contentInsertion from '../contentInsertion'
 
-import RCEWrapper, {
-  mergeMenu,
-  mergeMenuItems,
-  mergePlugins,
-  mergeToolbar,
-  parsePluginsToExclude,
-} from '../RCEWrapper'
+import RCEWrapper from '../RCEWrapper'
 import {jsdomInnerText} from '../../util/__tests__/jsdomInnerText'
 
 const textareaId = 'myUniqId'
@@ -39,7 +33,7 @@ let fakeTinyMCE, editor, rce
 
 function createBasicElement(opts) {
   editor = new FakeEditor({id: textareaId})
-  fakeTinyMCE.editors[0] = editor
+  fakeTinyMCE.get = () => editor
 
   const props = {textareaId, tinymce: fakeTinyMCE, ...trayProps(), ...defaultProps(), ...opts}
   rce = new RCEWrapper(props)
@@ -129,7 +123,7 @@ describe('RCEWrapper', () => {
       plugins: {
         AccessibilityChecker: {},
       },
-      editors: [editor],
+      get: () => editor,
     }
     global.tinymce = fakeTinyMCE
   })

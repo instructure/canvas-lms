@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, act, waitFor} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 
 import RCEWrapper from '../RCEWrapper'
 
@@ -89,7 +89,7 @@ describe('RCEWrapper', () => {
       plugins: {
         AccessibilityChecker: {},
       },
-      editors: [editor],
+      get: () => editor,
     }
     global.tinymce = fakeTinyMCE
   })

@@ -19,18 +19,8 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import FakeEditor from './FakeEditor'
-import Bridge from '../../bridge'
-import * as indicateModule from '../../common/indicate'
-import * as contentInsertion from '../contentInsertion'
 
-import RCEWrapper, {
-  mergeMenu,
-  mergeMenuItems,
-  mergePlugins,
-  mergeToolbar,
-  parsePluginsToExclude,
-} from '../RCEWrapper'
-import {jsdomInnerText} from '../../util/__tests__/jsdomInnerText'
+import RCEWrapper from '../RCEWrapper'
 
 const textareaId = 'myUniqId'
 const canvasOrigin = 'https://canvas:3000'
@@ -43,7 +33,7 @@ let fakeTinyMCE, editorCommandSpy, editor, rce
 
 function createBasicElement(opts) {
   editor = new FakeEditor({id: textareaId})
-  fakeTinyMCE.editors[0] = editor
+  fakeTinyMCE.get = () => editor
   editorCommandSpy = jest.spyOn(editor, 'execCommand')
 
   const props = {textareaId, tinymce: fakeTinyMCE, ...trayProps(), ...defaultProps(), ...opts}
@@ -132,10 +122,10 @@ describe('RCEWrapper', () => {
       PluginManager: {
         add: () => {},
       },
+      get: () => editor,
       plugins: {
         AccessibilityChecker: {},
       },
-      editors: [editor],
     }
     global.tinymce = fakeTinyMCE
   })

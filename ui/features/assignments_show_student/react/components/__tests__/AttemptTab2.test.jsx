@@ -67,7 +67,7 @@ describe('ContentTabs', () => {
     if (props.assignment.submissionTypes.includes('online_text_entry')) {
       await waitFor(
         () => {
-          expect(tinymce?.editors[0]).toBeDefined()
+          expect(tinymce.get('textentry_text')).toBeDefined()
         },
         {timeout: 4000},
       )
