@@ -36,6 +36,7 @@ const renderTableBody = (
   toggleRowSelection: (id: string) => void,
   userCanEditFilesForContext: boolean,
   userCanDeleteFilesForContext: boolean,
+  userCanRestrictFilesForContext: boolean,
   usageRightsRequiredForContext: boolean,
   setModalOrTrayOptions: (modalOrTray: ModalOrTrayOptions | null) => () => void,
 ) => {
@@ -60,6 +61,7 @@ const renderTableBody = (
             isStacked: isStacked,
             userCanEditFilesForContext: userCanEditFilesForContext,
             userCanDeleteFilesForContext: userCanDeleteFilesForContext,
+            userCanRestrictFilesForContext: userCanRestrictFilesForContext,
             usageRightsRequiredForContext: usageRightsRequiredForContext,
             size: size,
             isSelected: isSelected,

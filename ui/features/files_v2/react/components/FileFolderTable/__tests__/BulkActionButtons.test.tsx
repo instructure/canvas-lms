@@ -41,6 +41,8 @@ describe('BulkActionButtons', () => {
       totalRows: 10,
       userCanEditFilesForContext: true,
       userCanDeleteFilesForContext: true,
+      userCanRestrictFilesForContext: true,
+      usageRightsRequiredForContext: true,
       rows: [
         {id: '1', uuid: '1a', display_name: 'File 1'} as File,
         {id: '2', uuid: '2a', display_name: 'File 2'} as File,
@@ -68,8 +70,17 @@ describe('BulkActionButtons', () => {
     expect(screen.queryByTestId('bulk-actions-delete-button')).toBeNull()
   })
 
+  it('does not render permissions button when userCanRestrictFilesForContext is false', async () => {
+    renderComponent({userCanEditFilesForContext: true, userCanRestrictFilesForContext: false})
+    const moreButton = screen.getByTestId('bulk-actions-more-button')
+    fireEvent.click(moreButton)
+    await waitFor(() => {
+      expect(screen.queryByTestId('bulk-actions-edit-permissions-button')).toBeNull()
+    })
+  })
+
   it('does not render manage access and move to when userCanEditFilesForContext is false', async () => {
-    renderComponent({userCanEditFilesForContext: false})
+    renderComponent({userCanEditFilesForContext: false, userCanRestrictFilesForContext: false})
 
     const moreButton = screen.getByTestId('bulk-actions-more-button')
     fireEvent.click(moreButton)
@@ -78,6 +89,15 @@ describe('BulkActionButtons', () => {
       expect(screen.queryByTestId('bulk-actions-manage-usage-rights-button')).toBeNull()
       expect(screen.queryByTestId('bulk-actions-edit-permissions-button')).toBeNull()
       expect(screen.queryByTestId('bulk-actions-move-button')).toBeNull()
+    })
+  })
+
+  it('does not render manage access when usageRightsRequiredForContext is false', async () => {
+    renderComponent({usageRightsRequiredForContext: false})
+    const moreButton = screen.getByTestId('bulk-actions-more-button')
+    fireEvent.click(moreButton)
+    await waitFor(() => {
+      expect(screen.queryByTestId('bulk-actions-manage-usage-rights-button')).toBeNull()
     })
   })
 
@@ -160,32 +180,53 @@ describe('BulkActionButtons', () => {
     renderComponent({
       rows: [
         {id: '1', uuid: '1a', display_name: 'File 1', restricted_by_master_course: true} as File,
-        {id: '2', uuid: '2a', display_name: 'File 2'} as File
-      ]
+        {id: '2', uuid: '2a', display_name: 'File 2'} as File,
+      ],
     })
     const moreButton = screen.getByTestId('bulk-actions-more-button')
     fireEvent.click(moreButton)
     await waitFor(() => {
       expect(screen.queryByTestId('bulk-actions-delete-button')).toHaveAttribute('disabled')
-      expect(screen.queryByTestId('bulk-actions-manage-usage-rights-button')).toHaveAttribute('aria-disabled', 'true')
-      expect(screen.queryByTestId('bulk-actions-edit-permissions-button')).toHaveAttribute('aria-disabled', 'true')
-      expect(screen.queryByTestId('bulk-actions-move-button')).toHaveAttribute('aria-disabled', 'true')
+      expect(screen.queryByTestId('bulk-actions-manage-usage-rights-button')).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      )
+      expect(screen.queryByTestId('bulk-actions-edit-permissions-button')).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      )
+      expect(screen.queryByTestId('bulk-actions-move-button')).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      )
     })
   })
 
-  it('disables View and Manage Usage Rights when a folder is selected', async () => {
-    renderComponent({
-      rows: [
-        {id: '1', name: 'Folder 1'} as Folder,
-        {id: '2', name: 'Folder 2'} as Folder,
-      ],
-      selectedRows: new Set(['1', '2'])
+  describe('Folders', () => {
+    beforeEach(() => {
+      renderComponent({
+        rows: [{id: '1', name: 'Folder 1'} as Folder, {id: '2', name: 'Folder 2'} as Folder],
+        selectedRows: new Set(['1', '2']),
+      })
     })
-    const moreButton = screen.getByTestId('bulk-actions-more-button')
-    fireEvent.click(moreButton)
-    await waitFor(() => {
-      expect(screen.queryByTestId('bulk-actions-manage-usage-rights-button')).toHaveAttribute('aria-disabled', 'true')
-      expect(screen.queryByTestId('bulk-actions-view-button')).toHaveAttribute('aria-disabled', 'true')
+
+    it('renders the manage access button for folders', async () => {
+      const moreButton = screen.getByTestId('bulk-actions-more-button')
+      fireEvent.click(moreButton)
+      await waitFor(() => {
+        expect(screen.getByTestId('bulk-actions-manage-usage-rights-button')).toBeInTheDocument()
+      })
+    })
+
+    it('disables View when a folder is selected', async () => {
+      const moreButton = screen.getByTestId('bulk-actions-more-button')
+      fireEvent.click(moreButton)
+      await waitFor(() => {
+        expect(screen.queryByTestId('bulk-actions-view-button')).toHaveAttribute(
+          'aria-disabled',
+          'true',
+        )
+      })
     })
   })
 })

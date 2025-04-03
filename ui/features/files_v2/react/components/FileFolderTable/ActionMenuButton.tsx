@@ -56,6 +56,7 @@ interface ActionMenuButtonProps {
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
   usageRightsRequiredForContext: boolean
+  userCanRestrictFilesForContext: boolean
   row: File | Folder
 }
 
@@ -73,6 +74,7 @@ const ActionMenuButton = ({
   userCanEditFilesForContext,
   userCanDeleteFilesForContext,
   usageRightsRequiredForContext,
+  userCanRestrictFilesForContext,
   row,
 }: ActionMenuButtonProps) => {
   const [modalOrTray, setModalOrTray] = useState<ActionMenuModalOrTrayId | null>(null)
@@ -161,8 +163,7 @@ const ActionMenuButton = ({
 
   const blueprint_locked =
     row.folder_id && row.restricted_by_master_course && row.is_master_course_child_content
-  const has_usage_rights =
-    contextType !== 'groups' && userCanEditFilesForContext && usageRightsRequiredForContext
+  const has_usage_rights = userCanEditFilesForContext && usageRightsRequiredForContext
   const send_copy_permissions = contextType === 'course' && userCanEditFilesForContext
   const rename_move_permissions = userCanEditFilesForContext && !blueprint_locked
   const delete_permissions = userCanDeleteFilesForContext && !blueprint_locked
@@ -186,7 +187,7 @@ const ActionMenuButton = ({
             {
               icon: IconPermissionsLine,
               text: I18n.t('Edit Permissions'),
-              visible: userCanEditFilesForContext,
+              visible: userCanRestrictFilesForContext,
               onClick: createSetModalOrTrayCallback('permissions'),
             },
             {
@@ -246,7 +247,7 @@ const ActionMenuButton = ({
             {
               icon: IconPermissionsLine,
               text: I18n.t('Edit Permissions'),
-              visible: userCanEditFilesForContext,
+              visible: userCanRestrictFilesForContext,
               onClick: createSetModalOrTrayCallback('permissions'),
             },
             {
@@ -278,7 +279,7 @@ const ActionMenuButton = ({
       row.id,
       row.url,
       send_copy_permissions,
-      userCanEditFilesForContext,
+      userCanRestrictFilesForContext,
       fileMenuTools,
       iconForTrayTool,
     ],

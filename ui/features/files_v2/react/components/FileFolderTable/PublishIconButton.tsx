@@ -34,7 +34,7 @@ const I18n = createI18nScope('files_v2')
 
 interface PublishIconButtonProps {
   item: File | Folder
-  userCanEditFilesForContext: boolean
+  userCanRestrictFilesForContext: boolean
   onClick: () => void
 }
 
@@ -73,13 +73,13 @@ const PublishTooltipButton = ({
   )
 }
 
-const PublishIconButton = ({item, userCanEditFilesForContext, onClick}: PublishIconButtonProps) => {
+const PublishIconButton = ({item, userCanRestrictFilesForContext, onClick}: PublishIconButtonProps) => {
   const fileName = getName(item)
   const published = isPublished(item)
   const restricted = isRestricted(item)
   const hidden = isHidden(item)
 
-  if (userCanEditFilesForContext) {
+  if (userCanRestrictFilesForContext) {
     if (published && restricted) {
       return (
         <PublishTooltipButton

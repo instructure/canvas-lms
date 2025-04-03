@@ -103,6 +103,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   const userCanAddFilesForContext = canManageFilesForContext('manage_files_add')
   const userCanEditFilesForContext = canManageFilesForContext('manage_files_edit')
   const userCanDeleteFilesForContext = canManageFilesForContext('manage_files_delete')
+  const userCanRestrictFilesForContext = userCanEditFilesForContext && contextType !== 'group'
   const userCanManageFilesForContext =
     userCanAddFilesForContext || userCanEditFilesForContext || userCanDeleteFilesForContext
   const usageRightsRequiredForContext =
@@ -154,6 +155,8 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
             totalRows={rows?.length ?? 0}
             userCanEditFilesForContext={userCanEditFilesForContext}
             userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+            userCanRestrictFilesForContext={userCanRestrictFilesForContext}
+            usageRightsRequiredForContext={usageRightsRequiredForContext}
           />
         }
         progress={
@@ -167,8 +170,10 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
             size={size}
             rows={isLoading ? [] : rows!}
             isLoading={isLoading}
+            contextType={contextType}
             userCanEditFilesForContext={userCanEditFilesForContext}
             userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+            userCanRestrictFilesForContext={userCanRestrictFilesForContext}
             usageRightsRequiredForContext={usageRightsRequiredForContext}
             onSortChange={sort.set}
             sort={sort}

@@ -54,6 +54,7 @@ describe('ActionMenuButton', () => {
       size: 'large',
       userCanEditFilesForContext: true,
       userCanDeleteFilesForContext: true,
+      userCanRestrictFilesForContext: true,
       usageRightsRequiredForContext: true,
       row: FAKE_FILES[0],
     }
@@ -91,7 +92,7 @@ describe('ActionMenuButton', () => {
 
     it('renders items when context is groups', async () => {
       const user = userEvent.setup()
-      renderComponent({}, {contextType: 'groups'})
+      renderComponent({userCanRestrictFilesForContext: false}, {contextType: 'groups'})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
@@ -100,8 +101,8 @@ describe('ActionMenuButton', () => {
       await waitFor(() => {
         expect(screen.getByText('Rename')).toBeInTheDocument()
         expect(screen.getByText('Download')).toBeInTheDocument()
-        expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
-        expect(screen.queryByText('Manage Usage Rights')).toBeNull()
+        expect(screen.queryByText('Edit Permissions')).toBeNull()
+        expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
         expect(screen.queryByText('Send To...')).toBeNull()
         expect(screen.queryByText('Copy To...')).toBeNull()
         expect(screen.getByText('Move To...')).toBeInTheDocument()
@@ -111,7 +112,8 @@ describe('ActionMenuButton', () => {
 
     it('does not render items when userCanEditFilesForContext is false', async () => {
       const user = userEvent.setup()
-      renderComponent({userCanEditFilesForContext: false})
+      // if userCanEditFilesForContext is false, userCanRestrictFilesForContext will also be false
+      renderComponent({userCanEditFilesForContext: false, userCanRestrictFilesForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
