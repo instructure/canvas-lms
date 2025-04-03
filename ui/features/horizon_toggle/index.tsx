@@ -20,6 +20,7 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 import {createRoot} from 'react-dom/client'
 import {Main} from './react/Main'
+import {initAccountSelectModal} from './react/HorizonModal/InitHorizonModal'
 
 const renderToggle = (isAccountPage: boolean, ui: any) => {
   const selectedTab = ui.tab || ui.newTab
@@ -51,4 +52,6 @@ ready(() => {
   // small duplication until course details tab is removed (JIRA CLX-1122)
   $('#account_settings_tabs').on('tabscreate tabsactivate', (_event, ui) => renderToggle(true, ui))
   $('#course_details_tabs').on('tabscreate tabsactivate', (_event, ui) => renderToggle(false, ui))
+
+  initAccountSelectModal()
 })
