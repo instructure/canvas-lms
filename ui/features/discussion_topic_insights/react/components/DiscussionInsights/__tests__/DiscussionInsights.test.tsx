@@ -31,13 +31,16 @@ const mockedUseInsight = useInsight as jest.Mock
 
 describe('DiscussionInsights', () => {
   beforeEach(() => {
-    mockedUseInsightStore.mockReturnValue({
+    mockedUseInsightStore.mockReturnValue(() => ({
       context: 'test-context',
       contextId: 'test-context-id',
       discussionId: 'test-discussion-id',
       setModalOpen: jest.fn(),
       genereteInsight: jest.fn(),
-    })
+      setEntry: jest.fn(),
+      setEntries: jest.fn(),
+      setFeedback: jest.fn(),
+    }))
   })
 
   it('displays loading placeholder when loading', () => {

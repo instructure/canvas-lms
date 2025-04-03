@@ -25,7 +25,7 @@ import Placeholder from './Placeholder'
 import InsightsHeader from '../InsightsHeader/InsightsHeader'
 import InsightsActionBar from '../InsightsActionBar/InsightsActionBar'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useInsight} from '../../hooks/useFetchInsights'
+import {InsightEntry, useInsight} from '../../hooks/useFetchInsights'
 import {formatDate, getStatusByRelevance} from '../../utils'
 import useInsightStore from '../../hooks/useInsightStore'
 import {Button} from '@instructure/ui-buttons'
@@ -79,6 +79,8 @@ const DiscussionInsights: React.FC = () => {
   const discussionId = useInsightStore(state => state.discussionId)
 
   const setModalOpen = useInsightStore(state => state.setModalOpen)
+  const setEntry = useInsightStore(state => state.setEntry)
+  const setEntries = useInsightStore(state => state.setEntries)
 
   const {
     loading,
@@ -127,17 +129,26 @@ const DiscussionInsights: React.FC = () => {
     setQuery(query)
   }
 
+  const handleSeeReply = (entry: InsightEntry) => {
+    setModalOpen(true)
+    setEntry(entry)
+  }
+
   const filteredEntries = useMemo(() => {
     if (!entries) {
       return []
     }
 
     if (!query) {
+      setEntries(entries)
       return entries
     }
-
-    return entries.filter(row => row.student_name.toLowerCase().includes(query.toLowerCase()))
-  }, [entries, query])
+    const filteredValues = entries.filter(row =>
+      row.student_name.toLowerCase().includes(query.toLowerCase()),
+    )
+    setEntries(filteredValues)
+    return filteredValues
+  }, [entries, query, setEntries])
 
   const searchResultsText = I18n.t(
     {
@@ -153,7 +164,7 @@ const DiscussionInsights: React.FC = () => {
     notes: item.relevance_ai_evaluation_notes,
     date: formatDate(new Date(item.entry_updated_at)),
     actions: (
-      <Button size="small" onClick={() => setModalOpen(true)}>
+      <Button size="small" onClick={() => handleSeeReply(item)}>
         {I18n.t('See Reply')}
       </Button>
     ),

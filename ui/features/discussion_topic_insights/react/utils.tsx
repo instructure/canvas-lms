@@ -16,14 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {IconCompleteSolid, IconTroubleSolid, IconWarningSolid,IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
+import {
+  IconCompleteSolid,
+  IconTroubleSolid,
+  IconWarningSolid,
+  IconLikeSolid,
+  IconLikeLine,
+} from '@instructure/ui-icons'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {IconButton} from '@instructure/ui-buttons'
 
 const honeyInstUI10 = '#B07E00'
 
 export const getStatusByRelevance = (relevance: string) => {
-  if (relevance === "needs_review") {
+  if (relevance === 'needs_review') {
     return <IconWarningSolid style={{fill: honeyInstUI10}} />
   } else {
     if (relevance === 'relevant') {
@@ -53,7 +59,7 @@ type RatingButtonProps = {
   dataTestId: string
 }
 
-const RatingButton: React.FC<RatingButtonProps> = ({
+export const RatingButton: React.FC<RatingButtonProps> = ({
   type,
   isActive,
   onClick,
