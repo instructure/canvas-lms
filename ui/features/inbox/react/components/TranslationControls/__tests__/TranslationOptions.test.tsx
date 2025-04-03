@@ -61,7 +61,7 @@ describe('TranslationOptions', () => {
   it('initial state is correct', () => {
     render(<TranslationOptions asPrimary={null} onSetPrimary={jest.fn()} />)
     expect(screen.getByPlaceholderText(/Select a language.../i)).toHaveValue('')
-    expect(screen.getByText(/^Translate$/i).closest("button")).toBeDisabled()
+    expect(screen.getByText(/^Translate$/i).closest("button")).toBeEnabled()
   })
 
   it('calls translateBody on clicking on translate button', () => {
