@@ -19,7 +19,8 @@
 #
 
 class AttachmentAssociation < ActiveRecord::Base
-  enum :field_name, %i[syllabus_body]
+  # removing this definition until we figure out how to unbreak rake db:set_ignored_columns
+  # enum :field_name, %i[syllabus_body]
 
   belongs_to :attachment
   belongs_to :context, polymorphic: %i[conversation_message submission course group]
