@@ -702,7 +702,8 @@ class FilesController < ApplicationController
         if params[:download]
           if jwt_resource_match(@attachment) ||
              (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, @domain_root_account, session)) ||
-             @attachment.grants_right?(@current_user, session, :download)
+             @attachment.grants_right?(@current_user, session, :download) ||
+             access_via_location?(@attachment, @current_user, :download)
             disable_page_views if params[:preview]
             begin
               send_attachment(@attachment)
@@ -1717,7 +1718,7 @@ class FilesController < ApplicationController
   end
 
   def access_allowed(attachment, user, access_type)
-    return true if jwt_resource_match(attachment)
+    return true if jwt_resource_match(attachment) || access_via_location?(attachment, user, access_type)
 
     if params[:verifier]
       verifier_checker = Attachments::Verification.new(attachment)
@@ -1728,6 +1729,14 @@ class FilesController < ApplicationController
     return true if submissions.any? { |submission| submission.grants_right?(user, session, access_type) }
 
     authorized_action(attachment, user, access_type)
+  end
+
+  def access_via_location?(attachment, user, access_type)
+    if params[:location] && [:read, :download].include?(access_type)
+      return AttachmentAssociation.verify_access(params[:location], attachment.id, user, session)
+    end
+
+    false
   end
 
   def strong_attachment_params

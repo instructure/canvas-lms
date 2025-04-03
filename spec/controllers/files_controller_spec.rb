@@ -471,6 +471,194 @@ describe FilesController do
       end
     end
 
+    describe "access via location parameter" do
+      def valid_download_response(response)
+        expect(response.status).to equal(302)
+        expect(response.headers["location"]).to include("download_frd")
+      end
+
+      def valid_denied_access_response(response)
+        expect(response).to have_http_status(:forbidden).or have_http_status(:unauthorized)
+      end
+
+      context "for a deleted file" do
+        before do
+          @course.is_public = false
+          @course.public_syllabus = true
+          @course.save!
+
+          course_file
+
+          AttachmentAssociation.update_associations(@course, [@file.id], @teacher, nil, "syllabus_body")
+
+          @file.destroy
+        end
+
+        let(:params_with_location) { { course_id: @course.id, id: @file.id, download: 1, location: "course_syllabus_#{@course.id}" } }
+
+        context "with disable_file_verifiers_in_public_syllabus enabled" do
+          before do
+            @course.account.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          end
+
+          it "denies access even with location" do
+            user_session(@other_user)
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+        end
+      end
+
+      context "for a private user file attached to a public course syllabus" do
+        before do
+          @course.is_public = false
+          @course.public_syllabus = true
+          @course.save!
+
+          user_session(@student)
+          user_file
+
+          AttachmentAssociation.update_associations(@course, [@file.id], @student, nil, "syllabus_body")
+        end
+
+        let(:params_with_location) { { user_id: @student.id, id: @file.id, download: 1, location: "course_syllabus_#{@course.id}" } }
+
+        context "with disable_file_verifiers_in_public_syllabus enabled" do
+          before do
+            @course.account.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          end
+
+          it "allows access for student/file owner" do
+            user_session(@student)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for teacher/course owner" do
+            user_session(@teacher)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for unassociated user" do
+            user_session(@other_user)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for anonymous user" do
+            remove_user_session
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+        end
+
+        context "with disable_file_verifiers_in_public_syllabus disabled" do
+          before do
+            @course.account.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
+          end
+
+          it "allows access for student/file owner" do
+            user_session(@student)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "denies access for teacher/course owner" do
+            user_session(@teacher)
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+
+          it "denies access for unassociated user" do
+            user_session(@other_user)
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+
+          it "denies access for anonymous user" do
+            remove_user_session
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+        end
+      end
+
+      context "for a course file attached to a public course syllabus" do
+        before do
+          @course.is_public = false
+          @course.public_syllabus = true
+          @course.save!
+
+          course_file
+
+          AttachmentAssociation.update_associations(@course, [@file.id], @teacher, nil, "syllabus_body")
+        end
+
+        let(:params_with_location) { { course_id: @course.id, id: @file.id, download: 1, location: "course_syllabus_#{@course.id}" } }
+
+        context "with disable_file_verifiers_in_public_syllabus enabled" do
+          before do
+            @course.account.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          end
+
+          it "allows access for student/file owner" do
+            user_session(@student)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for teacher/course owner" do
+            user_session(@teacher)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for unassociated user" do
+            user_session(@other_user)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for anonymous user" do
+            remove_user_session
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+        end
+
+        context "with disable_file_verifiers_in_public_syllabus disabled" do
+          before do
+            @course.account.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
+          end
+
+          it "allows access for student/file owner" do
+            user_session(@student)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for teacher/course owner" do
+            user_session(@teacher)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "denies access for unassociated user" do
+            user_session(@other_user)
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+
+          it "denies access for anonymous user" do
+            remove_user_session
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+        end
+      end
+    end
+
     describe "sets the X-Robots-Tag" do
       it "sets the X-Robots-Tag header to noindex, nofollow" do
         verifier = Attachments::Verification.new(@file).verifier_for_user(nil)

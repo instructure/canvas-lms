@@ -25,6 +25,11 @@ describe Context do
       expect(Context.find_by_asset_string(course.asset_string)).to eql(course)
     end
 
+    it "finds a valid course by course_syllabus_N" do
+      course = Course.create!
+      expect(Context.find_by_asset_string("course_syllabus_#{course.id}")).to eql(course)
+    end
+
     it "does not find an invalid course" do
       expect(Context.find_by_asset_string("course_0")).to be_nil
     end
