@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { create } from 'zustand'
+import {create} from 'zustand'
+import {InsightEntry} from './useFetchInsights'
+
+type ActionFromState<T> = {
+  [K in keyof T as `set${Capitalize<string & K>}`]: (value: T[K]) => void
+}
 
 type GlobalEnv = {
   context_type: string
@@ -26,6 +31,21 @@ type GlobalEnv = {
 
 declare const ENV: GlobalEnv
 
+const emptyInsightEntry: InsightEntry = {
+  id: 0,
+  entry_content: '',
+  entry_url: '',
+  entry_updated_at: '',
+  student_id: 0,
+  student_name: '',
+  relevance_ai_classification: 'irrelevant',
+  relevance_ai_evaluation_notes: '',
+  relevance_human_reviewer: null,
+  relevance_human_feedback_liked: false,
+  relevance_human_feedback_disliked: false,
+  relevance_human_feedback_notes: '',
+}
+
 type ReadOnlyState = Readonly<{
   context: string
   contextId: string
@@ -34,18 +54,25 @@ type ReadOnlyState = Readonly<{
 
 type State = {
   modalOpen: boolean
+  entry: InsightEntry
+  entries: InsightEntry[] | []
+  feedback: boolean | null
 }
 
-type Action = {
-  setModalOpen: (isOpen: boolean) => void
-}
+type Action = ActionFromState<State>
 
-const useInsightStore = create<ReadOnlyState & State & Action>((set) => ({
+const useInsightStore = create<ReadOnlyState & State & Action>(set => ({
   context: ENV.context_type === 'Course' ? 'courses' : 'groups',
   contextId: ENV.context_id,
   discussionId: ENV.discussion_topic_id,
   modalOpen: false,
-  setModalOpen: (isOpen) => set(() => ({ modalOpen: isOpen })),
+  entry: emptyInsightEntry,
+  entries: [],
+  feedback: null,
+  setModalOpen: isOpen => set(() => ({modalOpen: isOpen})),
+  setEntry: entry => set(() => ({entry})),
+  setEntries: entries => set(() => ({entries})),
+  setFeedback: feedback => set(() => ({feedback})),
 }))
 
 export default useInsightStore

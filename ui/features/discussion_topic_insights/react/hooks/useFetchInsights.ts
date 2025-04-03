@@ -26,7 +26,7 @@ type InsightResponse = {
   needs_processing?: boolean
 }
 
-type InsightEntry = {
+export type InsightEntry = {
   id: number
   entry_content: string
   entry_url: string

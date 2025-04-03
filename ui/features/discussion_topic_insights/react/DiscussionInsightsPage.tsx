@@ -18,13 +18,12 @@
 
 import React from 'react'
 import DiscussionInsights from './components/DiscussionInsights/DiscussionInsights'
-import ReviewModal from './components/ReviewModal/ReviewModal'
+import ReviewModal from './components/InsightsModal/ReviewModal'
 import useInsightStore from './hooks/useInsightStore'
 
-
 const DiscussionInsightsPage: React.FC = () => {
-  const modalOpen = useInsightStore((state) => state.modalOpen)
-  const setModalOpen = useInsightStore((state) => state.setModalOpen)
+  const modalOpen = useInsightStore(state => state.modalOpen)
+  const setModalOpen = useInsightStore(state => state.setModalOpen)
 
   return (
     <>
