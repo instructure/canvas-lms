@@ -21,6 +21,10 @@ import {Table} from '@instructure/ui-table'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {Sort} from '../../hooks/useGetPaginatedFiles'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+const I18n = createI18nScope('files_v2')
 
 // TODO: when we know how to sort by modified_at and published, add them here.
 const SORTABLE_COLUMNS = ['name', 'created_at', 'updated_at', 'size', 'modified_by', 'rights']
@@ -58,7 +62,7 @@ const renderTableHead = (
       data-testid="select"
     >
       <Checkbox
-        label=""
+        label={<ScreenReaderContent>{I18n.t('Select all items')}</ScreenReaderContent>}
         size={size}
         checked={allRowsSelected}
         indeterminate={someRowsSelected}

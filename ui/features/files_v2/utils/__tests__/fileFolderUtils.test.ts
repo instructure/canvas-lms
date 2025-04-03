@@ -57,4 +57,12 @@ describe('getName', () => {
   it('returns the correct name for a folder', () => {
     expect(getName(FAKE_FOLDERS[0])).toBe(FAKE_FOLDERS[0].name)
   })
+
+  it('returns filename if no display_name for file', () => {
+    const file = {
+      ...FAKE_FILES[0],
+      display_name: '',
+    }
+    expect(getName(file)).toBe(file.filename)
+  })
 })

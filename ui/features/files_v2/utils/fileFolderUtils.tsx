@@ -53,5 +53,7 @@ export const getIcon = (
 }
 
 export const getName = (item: File | Folder) => {
-  return isFile(item) ? item.display_name : item.name
+  // files can have display_name or filename but prefer display_name
+  // folders just have name
+  return isFile(item) ? item.display_name || item.filename : item.name
 }
