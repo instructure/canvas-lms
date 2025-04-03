@@ -20,6 +20,9 @@ import { createContext, Dispatch, SetStateAction, useContext, useState } from "r
 import { updateTranslatedModalBody, translateMessage } from "../utils/inbox_translator";
 import { useScope as createI18nScope } from '@canvas/i18n'
 import { translationSeparator } from "../utils/constants";
+import {showFlashAlert} from "@canvas/alerts/react/FlashAlert";
+
+
 
 export interface TranslationContextValue {
   body: string;
@@ -80,14 +83,13 @@ export const useTranslationContextState = ({ subject, activeSignature, setModalE
         tgtLang: typeof tgtLang !== 'undefined' ? tgtLang : translationTargetLanguage,
       })
 
-
       // TODO: fix typescript related issue and remove the ! mark
       updateTranslatedModalBody(translatedText!, isPrimary, setBody, activeSignature, strippedBody)
     } catch (_err) {
-      setModalError(I18n.t('Error while trying to translate message'))
-      setTimeout(() => {
-        setModalError(null)
-      }, 2500)
+        showFlashAlert({
+            message: (I18n.t('There was an unexpected error while translating this message. Please try again.')),
+            type: 'error'
+        });
     } finally {
       setTranslating(false)
     }
