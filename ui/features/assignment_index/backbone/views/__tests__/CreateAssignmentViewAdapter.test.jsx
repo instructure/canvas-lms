@@ -83,6 +83,7 @@ describe('CreateAssignmentViewAdapter', () => {
   }
 
   beforeEach(() => {
+    window.ENV.FLAGS = { new_quizzes_by_default: false }
     closeHandlerMock = jest.fn()
     jest.clearAllMocks()
   })

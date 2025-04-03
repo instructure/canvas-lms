@@ -238,6 +238,49 @@ describe AssignmentsController do
       expect(assigns[:js_env][:FLAGS][:newquizzes_on_quiz_page]).to be_falsey
     end
 
+    it "sets FLAGS/new_quizzes_by_default in js_env if 'new_quizzes_by_default' is enabled" do
+      user_session @teacher
+      @course.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+      @course.root_account.settings[:provision] = { "lti" => "lti url" }
+      @course.root_account.save!
+      @course.root_account.enable_feature! :quizzes_next
+      @course.enable_feature! :quizzes_next
+      @course.enable_feature!(:new_quizzes_by_default)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_by_default]).to be_truthy
+    end
+
+    it "does not set FLAGS/new_quizzes_by_default in js_env if 'new_quizzes_by_default' is disabled" do
+      user_session @teacher
+      @course.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+      @course.root_account.settings[:provision] = { "lti" => "lti url" }
+      @course.root_account.save!
+      @course.root_account.enable_feature! :quizzes_next
+      @course.enable_feature! :quizzes_next
+      @course.disable_feature!(:new_quizzes_by_default)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_by_default]).to be_falsey
+    end
+
+    it "does not set FLAGS/new_quizzes_by_default in js_env if new quizzes isn't set up and enabled" do
+      user_session @teacher
+      @course.enable_feature!(:new_quizzes_by_default)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_by_default]).to be_falsey
+    end
+
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
