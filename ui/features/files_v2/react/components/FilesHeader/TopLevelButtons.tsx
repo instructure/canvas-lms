@@ -23,6 +23,7 @@ import {IconUploadLine} from '@instructure/ui-icons'
 import CreateFolderButton from './CreateFolderButton'
 import ExternalToolsButton from './ExternalToolsButton'
 import UploadButton from './UploadButton'
+import { Flex } from '@instructure/ui-flex'
 
 const I18n = createI18nScope('files_v2')
 interface TopLevelButtonsProps {
@@ -56,7 +57,6 @@ const TopLevelButtons = ({
     return (
       <UploadButton
         color="primary"
-        margin="none none small none"
         renderIcon={<IconUploadLine />}
         display={buttonDisplay}
       >
@@ -69,7 +69,7 @@ const TopLevelButtons = ({
     if (isUserContext) return null
     return (
       <a href="/files" tabIndex={-1}>
-        <Button color="secondary" margin="none x-small small none" display={buttonDisplay}>
+        <Button color="secondary" display={buttonDisplay}>
           {I18n.t('All My Files')}
         </Button>
       </a>
@@ -78,22 +78,22 @@ const TopLevelButtons = ({
 
   if (size === 'small') {
     return (
-      <>
+      <Flex as='div' gap='small'>
         {uploadButton()}
         {createFolderButton()}
         {allMyFilesButton()}
         {externalToolsButton()}
-      </>
+      </Flex>
     )
   }
 
   return (
-    <>
+    <Flex as='div' gap='small'>
       {externalToolsButton()}
       {allMyFilesButton()}
       {createFolderButton()}
       {uploadButton()}
-    </>
+    </Flex>
   )
 }
 

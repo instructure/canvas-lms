@@ -25,6 +25,7 @@ import FileRenameForm from './FileRenameForm'
 import ZipFileOptionsForm from './ZipFileOptionsForm'
 import {pluralizeContextTypeString} from '../../../../utils/fileFolderUtils'
 import {type FileOptionsResults} from './FileOptions'
+import {createPortal} from 'react-dom'
 
 type UploadButtonProps = ButtonProps
 
@@ -51,24 +52,24 @@ const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) =
     const nameCollisions = fileOptions.nameCollisions
 
     if (zipOptions.length)
-      return (
+      return createPortal(
         <ZipFileOptionsForm
           open={!!zipOptions.length}
           onClose={formRef.current?.onClose}
           fileOptions={zipOptions[0]}
           onZipOptionsResolved={formRef.current?.onZipOptionsResolved}
-        />
+        />,
+        document.body
       )
     else if (nameCollisions.length)
-      return (
-        <>
-          <FileRenameForm
-            open={!!nameCollisions.length}
-            onClose={formRef.current?.onClose}
-            fileOptions={nameCollisions[0]}
-            onNameConflictResolved={formRef.current?.onNameConflictResolved}
-          />
-        </>
+      return createPortal(
+        <FileRenameForm
+          open={!!nameCollisions.length}
+          onClose={formRef.current?.onClose}
+          fileOptions={nameCollisions[0]}
+          onNameConflictResolved={formRef.current?.onNameConflictResolved}
+        />,
+        document.body
       )
     else return null
   }, [fileOptions])
@@ -81,7 +82,7 @@ const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) =
   return (
     <>
       {/* contextType and contextId are null on All My Files page */}
-      {contextType && (
+      { contextType && createPortal(
         <UploadForm
           allowSkip={true}
           ref={formRef}
@@ -90,7 +91,8 @@ const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) =
           contextType={pluralizeContextTypeString(contextType)}
           useCanvasModals={false}
           onFileOptionsChange={(fileOptions: FileOptionsResults) => setFileOptions(fileOptions)}
-        />
+        />,
+        document.body
       )}
 
       <Button

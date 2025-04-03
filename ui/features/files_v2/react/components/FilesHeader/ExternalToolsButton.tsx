@@ -51,7 +51,6 @@ const ExternalToolsButton = ({buttonDisplay, size}: ExternalToolsButtonProps) =>
     return (
       <Button
         display={buttonDisplay}
-        margin="none x-small small none"
         data-testid="lti-index-button"
       >
         <View as="span" margin="0 x-small 0 0">
@@ -67,7 +66,6 @@ const ExternalToolsButton = ({buttonDisplay, size}: ExternalToolsButtonProps) =>
     return (
       <IconButton
         renderIcon={IconMoreLine}
-        margin="none x-small small none"
         screenReaderLabel={I18n.t('External Tools Menu')}
         data-testid="lti-index-button"
       />

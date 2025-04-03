@@ -32,13 +32,14 @@ export const defaultProps: FileFolderTableProps = {
   userCanEditFilesForContext: true,
   userCanDeleteFilesForContext: true,
   usageRightsRequiredForContext: false,
-  folderBreadcrumbs: [],
   onSortChange: jest.fn(),
   sort: {
     by: 'name',
     direction: 'asc'
   },
   searchString: '',
+  selectedRows: new Set<string>(),
+  setSelectedRows: jest.fn(),
 }
 
 export const renderComponent = (props?: Partial<FileFolderTableProps>) => {

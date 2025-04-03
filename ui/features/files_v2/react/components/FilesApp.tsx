@@ -18,11 +18,9 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {Alert} from '@instructure/ui-alerts'
-import {Flex} from '@instructure/ui-flex'
 import {Pagination} from '@instructure/ui-pagination'
 import {Responsive} from '@instructure/ui-responsive'
 import {canvas} from '@instructure/ui-theme-tokens'
-import {View} from '@instructure/ui-view'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -30,13 +28,18 @@ import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 
 import {FileManagementProvider} from './Contexts'
 import FileFolderTable from './FileFolderTable'
-import FilesHeader from './FilesHeader'
 import FilesUsageBar from './FilesUsageBar'
 import SearchBar from './SearchBar'
 import {BBFolderWrapper, FileFolderWrapper} from '../../utils/fileFolderWrappers'
 import {useGetFolders} from '../hooks/useGetFolders'
 import {File, Folder} from '../../interfaces/File'
 import {useGetPaginatedFiles} from '../hooks/useGetPaginatedFiles'
+import {FilesLayout} from '../layouts/FilesLayout'
+import TopLevelButtons from './FilesHeader/TopLevelButtons'
+import Breadcrumbs from './FileFolderTable/Breadcrumbs'
+import BulkActionButtons from './FileFolderTable/BulkActionButtons'
+import CurrentUploads from './FilesHeader/CurrentUploads'
+import CurrentDownloads from './FilesHeader/CurrentDownloads'
 
 const I18n = createI18nScope('files_v2')
 
@@ -108,6 +111,11 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
     filesEnv.contextFor({contextType, contextId})?.file_index_menu_tools || []
   const fileMenuTools = filesEnv.contextFor({contextType, contextId})?.file_menu_tools || []
 
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
+  useEffect(() => {
+    setSelectedRows(new Set())
+  }, [rows])
+
   return (
     <FileManagementProvider
       value={{
@@ -121,28 +129,59 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
         fileMenuTools,
       }}
     >
-      <View as="div">
-        <FilesHeader
-          size={size}
-          isUserContext={isUserContext}
-          shouldHideUploadButtons={!userCanAddFilesForContext}
-        />
-        <SearchBar initialValue={search.term} onSearch={search.set} />
-        <FileFolderTable
-          size={size}
-          rows={isLoading ? [] : rows!}
-          isLoading={isLoading}
-          folderBreadcrumbs={folders}
-          userCanEditFilesForContext={userCanEditFilesForContext}
-          userCanDeleteFilesForContext={userCanDeleteFilesForContext}
-          usageRightsRequiredForContext={usageRightsRequiredForContext}
-          onSortChange={sort.set}
-          sort={sort}
-          searchString={search.term}
-        />
-        <Flex padding="small none none none" justifyItems="space-between">
-          <Flex.Item size="50%">{userCanManageFilesForContext && <FilesUsageBar />}</Flex.Item>
-          <Flex.Item size="auto" padding="none medium none none">
+      <FilesLayout
+        size={size}
+        title={I18n.t('Files')}
+        headerActions={
+          <TopLevelButtons
+            size={size}
+            isUserContext={isUserContext}
+            shouldHideUploadButtons={!userCanAddFilesForContext}
+          />
+        }
+        search={<SearchBar
+          initialValue={search.term}
+          onSearch={search.set}
+        />}
+        breadcrumbs={
+          <Breadcrumbs folders={folders} size={size} search={search.term} />
+        }
+        bulkActions={
+          <BulkActionButtons
+            size={size}
+            selectedRows={selectedRows}
+            rows={rows ?? []}
+            totalRows={rows?.length ?? 0}
+            userCanEditFilesForContext={userCanEditFilesForContext}
+            userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+          />
+        }
+        progress={
+          <>
+            <CurrentUploads />
+            <CurrentDownloads rows={rows ?? []} />
+          </>
+        }
+        table={
+          <FileFolderTable
+            size={size}
+            rows={isLoading ? [] : rows!}
+            isLoading={isLoading}
+            userCanEditFilesForContext={userCanEditFilesForContext}
+            userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+            usageRightsRequiredForContext={usageRightsRequiredForContext}
+            onSortChange={sort.set}
+            sort={sort}
+            searchString={search.term}
+            selectedRows={selectedRows}
+            setSelectedRows={setSelectedRows}
+          />
+        }
+        usageBar={
+          userCanManageFilesForContext && <FilesUsageBar />
+        }
+        pagination={
+          <>
             <Alert
               liveRegion={() => document.getElementById('flash_screenreader_holder')!}
               liveRegionPoliteness="polite"
@@ -151,21 +190,23 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
             >
               {paginationAlert}
             </Alert>
-            {!isLoading && page.total > 1 && (
-              <Pagination
-                as="nav"
-                labelNext={I18n.t("Next page")}
-                labelPrev={I18n.t("Previous page")}
-                variant="compact"
-                currentPage={page.current}
-                totalPageNumber={page.total}
-                onPageChange={page.set}
-                data-testid="files-pagination"
-              />
-            )}
-          </Flex.Item>
-        </Flex>
-      </View>
+            {
+              !isLoading && page.total > 1 && (
+                <Pagination
+                  as="nav"
+                  labelNext={I18n.t("Next page")}
+                  labelPrev={I18n.t("Previous page")}
+                  variant="compact"
+                  currentPage={page.current}
+                  totalPageNumber={page.total}
+                  onPageChange={page.set}
+                  data-testid="files-pagination"
+                />
+              )
+            }
+          </>
+        }
+      />
     </FileManagementProvider>
   )
 }
