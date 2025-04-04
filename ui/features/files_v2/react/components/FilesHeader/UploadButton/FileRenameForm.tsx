@@ -41,7 +41,6 @@ const FileRenameForm = ({
   fileOptions,
   onNameConflictResolved,
 }: FileRenameFormProps) => {
-  const defaultFocusElement = useRef<Element | null>(null)
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const [renameFileInput, setRenameFileInput] = useState<string>('')
 
@@ -107,7 +106,7 @@ const FileRenameForm = ({
       return (
         <Text>
           {I18n.t(
-            'An file named "%{fileName}" already exists in this location. Do you want to replace the existing file?',
+            'A file named "%{fileName}" already exists in this location. Do you want to replace the existing file?',
             {fileName},
           )}
         </Text>
@@ -136,7 +135,6 @@ const FileRenameForm = ({
           data-testid="rename-change-button"
           color="primary"
           onClick={handleChangeClick}
-          elementRef={element => (defaultFocusElement.current = element)}
         >
           {I18n.t('Change')}
         </Button>
@@ -158,7 +156,6 @@ const FileRenameForm = ({
             data-testid="rename-replace-button"
             color="primary"
             onClick={handleReplaceClick}
-            elementRef={element => (defaultFocusElement.current = element)}
           >
             {I18n.t('Replace')}
           </Button>
@@ -174,7 +171,6 @@ const FileRenameForm = ({
             data-testid="rename-change-button"
             color="primary"
             onClick={handleChangeClick}
-            elementRef={element => (defaultFocusElement.current = element)}
           >
             {I18n.t('Change')}
           </Button>
@@ -208,7 +204,6 @@ const FileRenameForm = ({
       size="small"
       label={I18n.t('Copy')}
       shouldCloseOnDocumentClick={false}
-      defaultFocusElement={() => defaultFocusElement.current}
     >
       <Modal.Header>{renderHeader()}</Modal.Header>
       <Modal.Body>{renderBody()}</Modal.Body>
