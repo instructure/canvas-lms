@@ -20,9 +20,12 @@
 
 class PageView
   class Pv4Client
-    class Pv4Timeout < StandardError; end
+    class Pv4BadRequest < StandardError; end
     class Pv4EmptyResponse < StandardError; end
+    class Pv4NotFound < StandardError; end
+    class Pv4Timeout < StandardError; end
     class Pv4TooManyRequests < StandardError; end
+    class Pv4Unauthorized < StandardError; end
 
     def initialize(uri, access_token)
       uri = URI.parse(uri) if uri.is_a?(String)
@@ -49,7 +52,14 @@ class PageView
         { "Authorization" => "Bearer #{@access_token}" }
       )
 
-      if response.code == 429
+      case response.code.to_i
+      when 400
+        raise Pv4BadRequest, "invalid request"
+      when 401
+        raise Pv4Unauthorized, "unauthorized request"
+      when 404
+        raise Pv4NotFound, "resource not found"
+      when 429
         raise Pv4TooManyRequests, "rate limit exceeded"
       end
 
