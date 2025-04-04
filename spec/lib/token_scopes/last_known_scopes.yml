@@ -1091,6 +1091,8 @@
   path: '/api/v1/courses/:course_id/modules/:context_module_id/assignment_overrides'
 - verb: PUT
   path: '/api/v1/courses/:course_id/modules/:context_module_id/assignment_overrides'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/modules/:context_module_id/assignment_overrides/convert_tag_overrides'
 - verb: GET
   path: '/api/v1/courses/:course_id/modules/:context_module_id/date_details'
 - verb: DELETE
@@ -2353,3 +2355,4 @@
   path: '/api/v1/users/self/todo_item_count'
 - verb: GET
   path: '/api/v1/users/self/upcoming_events'
+
