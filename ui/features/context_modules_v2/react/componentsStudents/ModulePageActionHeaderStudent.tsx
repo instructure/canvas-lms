@@ -52,7 +52,6 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
       <Flex justifyItems="space-between" gap="small">
         <Flex.Item>
           <Button
-            renderIcon={anyModuleExpanded ? <IconCollapseLine /> : <IconExpandLine />}
             onClick={handleCollapseExpandClick}
           >
             {anyModuleExpanded ? I18n.t('Collapse All') : I18n.t('Expand All')}

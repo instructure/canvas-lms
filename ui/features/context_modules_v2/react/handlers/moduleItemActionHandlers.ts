@@ -22,7 +22,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {getItemType, renderItemAssignToManager} from '../utils/assignToUtils'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {QueryClient} from '@tanstack/react-query'
-import type { ModuleItemContent, MasteryPathsData } from '../utils/types'
+import type { ModuleItemContent, MasteryPathsData, ModuleAction } from '../utils/types'
+import React from 'react'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -135,11 +136,37 @@ export const handleDuplicate = (
 }
 
 export const handleMoveTo = (
-  setIsMenuOpen?: (isOpen: boolean) => void
+  moduleId: string,
+  moduleTitle: string,
+  itemId: string,
+  content: ModuleItemContent | null,
+  setModuleAction: React.Dispatch<React.SetStateAction<ModuleAction | null>>,
+  setSelectedModuleItem: (item: { id: string, title: string } | null) => void,
+  setIsManageModuleContentTrayOpen: (isOpen: boolean) => void,
+  setIsMenuOpen?: (isOpen: boolean) => void,
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string, title: string} | null>>
 ) => {
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }
+
+  setModuleAction('move_module_item')
+
+  if (content && itemId) {
+    setSelectedModuleItem({
+      id: itemId,
+      title: content.title || ''
+    })
+  }
+
+  if (setSourceModule && moduleId) {
+    setSourceModule({
+      id: moduleId,
+      title: moduleTitle
+    })
+  }
+
+  setIsManageModuleContentTrayOpen(true)
 }
 
 export const updateIndent = async (

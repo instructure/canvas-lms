@@ -17,16 +17,38 @@
  */
 
 import React from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import ModulesList from './componentsTeacher/ModulesList'
+import {Button} from '@instructure/ui-buttons'
 
-const ModulesContainer: React.FC = () => {
+const I18n = createI18nScope('context_modules_v2')
+
+export interface TrayFooterProps {
+  onClose: () => void
+  onMove: () => void
+}
+
+const TrayFooter: React.FC<TrayFooterProps> = ({
+  onClose,
+  onMove,
+}) => {
   return (
-    <View as="div" data-testid="modules-rewrite-container">
-      <ModulesList />
-      <div id="differentiated-modules-mount-point" />
+    <View as="div" textAlign="end" margin="medium 0 0 0">
+      <hr aria-hidden="true" />
+      <Button
+        margin="0 x-small 0 0"
+        onClick={onClose}
+      >
+        {I18n.t('Cancel')}
+      </Button>
+      <Button
+        color="primary"
+        onClick={onMove}
+      >
+        {I18n.t('Move')}
+      </Button>
     </View>
   )
 }
 
-export default ModulesContainer
+export default TrayFooter

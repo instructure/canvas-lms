@@ -149,3 +149,5 @@ export interface ModuleItem {
   indent: number
   content: ModuleItemContent
 }
+
+export type ModuleAction = 'move_module' | 'move_module_item' | 'move_module_contents'

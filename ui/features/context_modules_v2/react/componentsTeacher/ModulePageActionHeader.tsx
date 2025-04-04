@@ -75,7 +75,6 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   }) => {
     return (
       <Button
-        renderIcon={anyModuleExpanded ? <IconCollapseLine /> : <IconExpandLine />}
         onClick={handleCollapseExpandClick}
         display={displayOptions?.display}
         aria-expanded={displayOptions?.ariaExpanded}

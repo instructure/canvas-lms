@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import ModuleHeader from '../componentsTeacher/ModuleHeader'
 import ModuleItemList from '../componentsTeacher/ModuleItemList'
 import {useModuleItems} from '../hooks/queries/useModuleItems'
-import {ModuleItem,Prerequisite, CompletionRequirement} from '../utils/types'
+import {ModuleItem, Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
 
 export interface ModuleProps {
   id: string
@@ -35,6 +35,10 @@ export interface ModuleProps {
   dragHandleProps?: any
   expanded?: boolean
   onToggleExpand?: (id: string) => void
+  setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
+  setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setSelectedModuleItem?: (item: { id: string, title: string } | null) => void
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string, title: string} | null>>
 }
 
 const Module: React.FC<ModuleProps> = ({
@@ -48,6 +52,10 @@ const Module: React.FC<ModuleProps> = ({
   dragHandleProps,
   expanded: propExpanded,
   onToggleExpand,
+  setModuleAction,
+  setIsManageModuleContentTrayOpen,
+  setSelectedModuleItem,
+  setSourceModule: setSourceModule,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
   const {data, isLoading, error} = useModuleItems(id, !!isExpanded)
@@ -95,23 +103,31 @@ const Module: React.FC<ModuleProps> = ({
             name={name}
             expanded={isExpanded}
             onToggleExpand={toggleExpanded}
-            dragHandleProps={dragHandleProps}
             published={published}
             prerequisites={prerequisites}
-            handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
             completionRequirements={completionRequirements}
-            requirementCount={requirementCount ?? 0}
-            itemCount={moduleItems.length}
+            requirementCount={requirementCount || 0}
+            dragHandleProps={dragHandleProps}
+            handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
+            itemCount={moduleItems?.length || 0}
+            setModuleAction={setModuleAction}
+            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+            setSourceModule={setSourceModule}
           />
         </Flex.Item>
       {isExpanded && (
         <Flex.Item>
           <ModuleItemList
             moduleId={id}
+            moduleTitle={name}
             moduleItems={moduleItems}
             completionRequirements={completionRequirements}
             isLoading={isLoading}
             error={error}
+            setModuleAction={setModuleAction}
+            setSelectedModuleItem={setSelectedModuleItem}
+            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+            setSourceModule={setSourceModule}
           />
         </Flex.Item>
       )}

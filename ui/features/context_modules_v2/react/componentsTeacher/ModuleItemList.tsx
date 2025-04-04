@@ -23,25 +23,34 @@ import {Text} from '@instructure/ui-text'
 import ModuleItem from './ModuleItem'
 import {Droppable, Draggable} from 'react-beautiful-dnd'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {CompletionRequirement} from '../utils/types'
-import {ModuleItem as ModuleItemType} from '../utils/types'
+import type {CompletionRequirement, ModuleItem as ModuleItemType, ModuleAction} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
 export interface ModuleItemListProps {
   moduleId: string
+  moduleTitle?: string
   moduleItems: ModuleItemType[]
   completionRequirements?: CompletionRequirement[]
   isLoading: boolean
   error: any
+  setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
+  setSelectedModuleItem?: (item: { id: string, title: string } | null) => void
+  setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string, title: string} | null>>
 }
 
 const ModuleItemList: React.FC<ModuleItemListProps> = ({
   moduleId,
+  moduleTitle = '',
   moduleItems,
   completionRequirements,
   isLoading,
   error,
+  setModuleAction,
+  setSelectedModuleItem,
+  setIsManageModuleContentTrayOpen,
+  setSourceModule
 }) => {
   return (
     <View
@@ -94,12 +103,17 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
                           <ModuleItem
                             {...item}
                             moduleId={moduleId}
+                            moduleTitle={moduleTitle}
                             index={index}
                             id={item.id}
                             published={item.content?.published ?? false}
                             canUnpublish={item.content?.canUnpublish ?? true}
                             completionRequirements={completionRequirements}
                             dragHandleProps={dragProvided.dragHandleProps}
+                            setModuleAction={setModuleAction}
+                            setSelectedModuleItem={setSelectedModuleItem}
+                            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+                            setSourceModule={setSourceModule}
                           />
                         </View>
                       </View>
