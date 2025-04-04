@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {IconButton} from '@instructure/ui-buttons'
@@ -27,7 +27,7 @@ import {
 } from '@instructure/ui-icons'
 import { View } from '@instructure/ui-view'
 import ModuleHeaderActionPanel from './ModuleHeaderActionPanel'
-import { CompletionRequirement, Prerequisite } from '../utils/types'
+import { CompletionRequirement, Prerequisite, ModuleAction } from '../utils/types'
 
 interface ModuleHeaderProps {
   id: string
@@ -46,6 +46,9 @@ interface ModuleHeaderProps {
   requirementCount: number
   dragHandleProps?: any // For react-beautiful-dnd drag handle
   itemCount: number
+  setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
+  setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string, title: string} | null>>
 }
 
 const ModuleHeader: React.FC<ModuleHeaderProps> = ({
@@ -59,7 +62,10 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
   handleOpeningModuleUpdateTray,
   requirementCount,
   dragHandleProps,
-  itemCount
+  itemCount,
+  setModuleAction,
+  setIsManageModuleContentTrayOpen,
+  setSourceModule
 }) => {
   const onToggleExpandRef = useCallback(() => {
     onToggleExpand(id)
@@ -110,6 +116,9 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             requirementCount={requirementCount || undefined}
             handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
             itemCount={itemCount}
+            setModuleAction={setModuleAction}
+            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+            setSourceModule={setSourceModule}
           />
         </Flex.Item>
       </Flex>

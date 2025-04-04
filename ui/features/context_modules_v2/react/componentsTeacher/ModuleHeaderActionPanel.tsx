@@ -31,7 +31,7 @@ import {
   handlePublishComplete,
 } from '../handlers/moduleActionHandlers'
 import { Pill } from '@instructure/ui-pill'
-import {Prerequisite, CompletionRequirement} from '../utils/types'
+import {Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import AddItemModal from './AddItemModalComponents/AddItemModal'
 
@@ -47,6 +47,10 @@ interface ModuleHeaderActionPanelProps {
   requirementCount?: number
   handleOpeningModuleUpdateTray?: (moduleId?: string, moduleName?: string, prerequisites?: {id: string, name: string, type: string}[], openTab?: 'settings' | 'assign-to') => void
   itemCount?: number
+  // Add props for managing module content tray
+  setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
+  setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string, title: string} | null>>
 }
 
 const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
@@ -58,7 +62,10 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   completionRequirements,
   requirementCount = null,
   handleOpeningModuleUpdateTray,
-  itemCount
+  itemCount,
+  setModuleAction,
+  setIsManageModuleContentTrayOpen,
+  setSourceModule
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDirectShareOpen, setIsDirectShareOpen] = useState(false)
@@ -68,7 +75,7 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
 
   const onPublishCompleteRef = useCallback(() => {
     handlePublishComplete(queryClient, id, courseId)
-  }, [queryClient, id, courseId])
+  }, [id, courseId])
 
   return (
     <>
@@ -116,6 +123,9 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
             handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
             setIsDirectShareOpen={setIsDirectShareOpen}
             setIsDirectShareCourseOpen={setIsDirectShareCourseOpen}
+            setModuleAction={setModuleAction}
+            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+            setSourceModule={setSourceModule}
           />
         </Flex.Item>
       </Flex>

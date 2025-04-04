@@ -28,7 +28,7 @@ import {INDENT_LOOKUP, getItemIcon} from '../utils/utils'
 import ModuleItemActionPanel from './ModuleItemActionPanel'
 import ModuleItemTitle from './ModuleItemTitle'
 import ModuleItemSupplementalInfo from '../components/ModuleItemSupplementalInfo'
-import {CompletionRequirement, MasteryPathsData, ModuleItemContent} from '../utils/types'
+import {ModuleItemContent, MasteryPathsData, ModuleAction, CompletionRequirement} from '../utils/types'
 
 export interface ModuleItemProps {
   id: string
@@ -36,6 +36,7 @@ export interface ModuleItemProps {
   url: string
   indent: number
   moduleId: string
+  moduleTitle?: string
   index: number
   content: ModuleItemContent
   onClick?: () => void
@@ -46,6 +47,10 @@ export interface ModuleItemProps {
   onDuplicate?: (id: string) => void
   onRemove?: (id: string) => void
   completionRequirements?: CompletionRequirement[]
+  setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
+  setSelectedModuleItem?: (item: { id: string, title: string } | null) => void
+  setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string, title: string} | null>>
 }
 
 const ModuleItem: React.FC<ModuleItemProps> = ({
@@ -53,6 +58,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
   id,
   url,
   moduleId,
+  moduleTitle = '',
   indent,
   content,
   onClick,
@@ -60,6 +66,10 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
   published,
   canUnpublish,
   dragHandleProps,
+  setModuleAction,
+  setSelectedModuleItem,
+  setIsManageModuleContentTrayOpen,
+  setSourceModule
 }) => {
   const getMasteryPathsData = (): MasteryPathsData | null => {
     if (!content || !content._id || !CyoeHelper.isEnabled()) {
@@ -133,6 +143,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
         <Flex.Item shouldGrow>
           <ModuleItemActionPanel
             moduleId={moduleId}
+            moduleTitle={moduleTitle}
             itemId={_id}
             id={id}
             indent={indent}
@@ -140,6 +151,10 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
             published={published || false}
             canBeUnpublished={canUnpublish || false}
             masteryPathsData={masteryPathsData}
+            setModuleAction={setModuleAction}
+            setSelectedModuleItem={setSelectedModuleItem}
+            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+            setSourceModule={setSourceModule}
           />
         </Flex.Item>
       </Flex>

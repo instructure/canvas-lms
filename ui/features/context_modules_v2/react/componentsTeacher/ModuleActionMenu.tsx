@@ -35,8 +35,6 @@ import {
 } from '@instructure/ui-icons'
 import {
   handleEdit,
-  handleMoveContents,
-  handleMoveModule,
   handleAssignTo,
   handleDelete,
   handleDuplicate,
@@ -46,13 +44,14 @@ import {
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
 import { useModuleItems } from '../hooks/queries/useModuleItems'
+import {ModuleAction} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
 export interface ModuleActionMenuProps {
-  expanded?: boolean
+  expanded: boolean
   isMenuOpen: boolean
-  setIsMenuOpen: (isOpen: boolean) => void
+  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>
   id: string
   name: string
   prerequisites?: {id: string, name: string, type: string}[]
@@ -64,6 +63,9 @@ export interface ModuleActionMenuProps {
   ) => void
   setIsDirectShareOpen: React.Dispatch<React.SetStateAction<boolean>>
   setIsDirectShareCourseOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
+  setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string, title: string} | null>>
 }
 
 const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
@@ -75,7 +77,10 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
   prerequisites,
   handleOpeningModuleUpdateTray,
   setIsDirectShareOpen,
-  setIsDirectShareCourseOpen
+  setIsDirectShareCourseOpen,
+  setModuleAction,
+  setIsManageModuleContentTrayOpen,
+  setSourceModule
 }) => {
   const {courseId, permissions} = useContextModule()
   const {data, isLoading, isError} = useModules(courseId)
@@ -87,14 +92,28 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
   }, [id, name, prerequisites, handleOpeningModuleUpdateTray])
 
   const handleMoveContentsRef = useCallback(() => {
-    if (!data) return
-    handleMoveContents(id, name, data, queryClient, courseId)
-  }, [id, name, data, queryClient, courseId])
+    if (!data || !setModuleAction || !setIsManageModuleContentTrayOpen) return
+
+    if (setSourceModule) {
+      setSourceModule({id, title: name})
+    }
+
+    setModuleAction('move_module_contents')
+    setIsManageModuleContentTrayOpen(true)
+    setIsMenuOpen(false)
+  }, [data, id, name, setModuleAction, setIsManageModuleContentTrayOpen, setIsMenuOpen, setSourceModule])
 
   const handleMoveModuleRef = useCallback(() => {
-    if (!data || !queryClient) return
-    handleMoveModule(id, name, data, courseId, queryClient)
-  }, [id, name, data, courseId, queryClient])
+    if (!data || !setModuleAction || !setIsManageModuleContentTrayOpen) return
+
+    if (setSourceModule) {
+      setSourceModule({id, title: name})
+    }
+
+    setModuleAction('move_module')
+    setIsManageModuleContentTrayOpen(true)
+    setIsMenuOpen(false)
+  }, [data, id, name, setModuleAction, setIsManageModuleContentTrayOpen, setIsMenuOpen, setSourceModule])
 
   const handleAssignToRef = useCallback(() => {
     handleAssignTo(id, name, prerequisites, handleOpeningModuleUpdateTray)
@@ -102,11 +121,11 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
 
   const handleDeleteRef = useCallback(() => {
     handleDelete(id, name, queryClient, courseId, setIsMenuOpen)
-  }, [id, name, queryClient, courseId, setIsMenuOpen])
+  }, [id, name, courseId, setIsMenuOpen])
 
   const handleDuplicateRef = useCallback(() => {
     handleDuplicate(id, name, queryClient, courseId, setIsMenuOpen)
-  }, [id, name, queryClient, courseId, setIsMenuOpen])
+  }, [id, name, courseId, setIsMenuOpen])
 
   const handleSendToRef = useCallback(() => {
     handleSendTo(setIsDirectShareOpen)

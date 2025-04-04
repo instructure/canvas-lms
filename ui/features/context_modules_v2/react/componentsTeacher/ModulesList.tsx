@@ -29,7 +29,7 @@ import {
   handleToggleExpand,
   handleOpeningModuleUpdateTray,
 } from '../handlers/modulePageActionHandlers'
-
+import ManageModuleContentTray from './ManageModuleContent/ManageModuleContentTray'
 import {useModules} from '../hooks/queries/useModules'
 import {useReorderModuleItems} from '../hooks/mutations/useReorderModuleItems'
 import {useReorderModules} from '../hooks/mutations/useReorderModules'
@@ -38,6 +38,7 @@ import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import { handleMoveItem as dndHandleMoveItem, handleDragEnd as dndHandleDragEnd } from '../utils/dndUtils'
+import {ModuleAction} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -49,6 +50,12 @@ const ModulesList: React.FC = () => {
 
   // Initialize with an empty Map - all modules will be collapsed by default
   const [expandedModules, setExpandedModules] = useState<Map<string, boolean>>(new Map())
+
+  // State for managing the module content tray
+  const [isManageModuleContentTrayOpen, setIsManageModuleContentTrayOpen] = useState(false)
+  const [moduleAction, setModuleAction] = useState<ModuleAction | null>(null)
+  const [selectedModuleItem, setSelectedModuleItem] = useState<{id: string, title: string} | null>(null)
+  const [sourceModule, setSourceModule] = useState<{id: string, title: string} | null>(null)
 
   // Set initial expanded state for modules when data is loaded
   useEffect(() => {
@@ -117,15 +124,15 @@ const ModulesList: React.FC = () => {
     prerequisites?: {id: string, name: string, type: string}[],
     openTab: 'settings' | 'assign-to' = 'settings') => (
       handleOpeningModuleUpdateTray(data, courseId, moduleId, moduleName, prerequisites, openTab)
-    ), [handleOpeningModuleUpdateTray, data])
+    ), [data, courseId])
 
   const onToggleExpandRef = useCallback((moduleId: string) => {
     handleToggleExpand(moduleId, setExpandedModules)
-  }, [handleToggleExpand, setExpandedModules])
+  }, [setExpandedModules])
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <View as="div" margin="medium">
+      <View as="div">
         <ModulePageActionHeader
           onCollapseAll={handleCollapseAllRef}
           onExpandAll={handleExpandAllRef}
@@ -178,6 +185,10 @@ const ModulesList: React.FC = () => {
                             expanded={!!expandedModules.get(module._id)}
                             onToggleExpand={onToggleExpandRef}
                             dragHandleProps={dragProvided.dragHandleProps}
+                            setModuleAction={setModuleAction}
+                            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+                            setSelectedModuleItem={setSelectedModuleItem}
+                            setSourceModule={setSourceModule}
                           />
                         </div>
                       )}
@@ -189,6 +200,20 @@ const ModulesList: React.FC = () => {
             )}
           </Droppable>
         )}
+        <ManageModuleContentTray
+          sourceModuleId={sourceModule?.id || ''}
+          sourceModuleTitle={sourceModule?.title || ''}
+          sourceModuleItemId={selectedModuleItem?.id}
+          isOpen={isManageModuleContentTrayOpen}
+          onClose={() => {
+            setIsManageModuleContentTrayOpen(false)
+            setModuleAction(null)
+            setSelectedModuleItem(null)
+          }}
+          moduleAction={moduleAction}
+          moduleItemId={selectedModuleItem?.id}
+          moduleItemTitle={selectedModuleItem?.title}
+        />
       </View>
     </DragDropContext>
   )
