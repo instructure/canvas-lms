@@ -120,7 +120,7 @@ describe('FileFolderTable', () => {
 
     expect(await screen.findAllByTestId('table-row')).toHaveLength(FAKE_FOLDERS_AND_FILES.length)
     const link = screen.getByRole('link', {
-      name: FAKE_FOLDERS_AND_FILES[0].name,
+      name: `Folder ${FAKE_FOLDERS_AND_FILES[0].name}`,
     })
     expect(link).toBeInTheDocument()
   })
