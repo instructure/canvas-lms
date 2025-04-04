@@ -511,7 +511,11 @@ class Rubric < ActiveRecord::Base
     CriteriaData.new(criteria, points_possible, title)
   end
 
-  def generate_criteria_via_llm(association_object)
+  DEFAULT_GENERATE_OPTIONS = {
+    criteria_count: 5,
+    rating_count: 4,
+  }.freeze
+  def generate_criteria_via_llm(association_object, generate_options = {})
     unless association_object.is_a?(AbstractAssignment)
       raise "LLM generation is only available for rubrics associated with an Assignment"
     end
@@ -533,7 +537,9 @@ class Rubric < ActiveRecord::Base
         description: assignment.description,
         grading_type: assignment.grading_type,
         submission_types: assignment.submission_types,
-      }.to_json
+      }.to_json,
+      CRITERIA_COUNT: generate_options[:criteria_count] || DEFAULT_GENERATE_OPTIONS[:criteria_count],
+      RATING_COUNT: generate_options[:rating_count] || DEFAULT_GENERATE_OPTIONS[:rating_count],
     }
 
     prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
@@ -555,19 +561,21 @@ class Rubric < ActiveRecord::Base
     #   response.usage[:output_tokens],
     #   time.real.round(2)
     # ]
+    # logger.info(response.message[:content])
 
     ai_rubric = JSON.parse(response.message[:content], symbolize_names: true)
 
     criteria = []
-    ai_rubric[:data].each do |criterion_data|
+    ai_rubric[:criteria].each do |criterion_data|
       criterion = {}
       criterion[:id] = unique_item_id
-      criterion[:description] = (criterion_data[:description].presence || t("no_description", "No Description")).strip
-      criterion[:long_description] = criterion_data[:long_description].presence
+      criterion[:description] = (criterion_data[:name].presence || t("no_description", "No Description")).strip
+      criterion[:long_description] = criterion_data[:description].presence
 
       ratings = criterion_data[:ratings].map do |rating_data|
         {
-          description: (rating_data[:description].presence || t("no_description", "No Description")).strip,
+          description: (rating_data[:title].presence || t("no_description", "No Description")).strip,
+          long_description: rating_data[:description].presence,
           points: rating_data[:points].to_f || 0,
           criterion_id: criterion[:id],
           id: unique_item_id
