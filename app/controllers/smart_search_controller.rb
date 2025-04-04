@@ -118,6 +118,7 @@ class SmartSearchController < ApplicationController
 
   def show
     return render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
+    return unless tab_enabled?(Course::TAB_SEARCH)
 
     set_active_tab("search")
     @show_left_side = true
