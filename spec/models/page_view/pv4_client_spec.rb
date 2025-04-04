@@ -95,6 +95,33 @@ describe PageView::Pv4Client do
       end
     end
 
+    it "raises Pv4BadRequest when response code is 400" do
+      response = double(body: "", code: 400)
+      allow(CanvasHttp).to receive(:get).and_return(response)
+
+      expect { client.fetch(user) }.to raise_error(
+        PageView::Pv4Client::Pv4BadRequest, "invalid request"
+      )
+    end
+
+    it "raises Pv4Unauthorized when response code is 401" do
+      response = double(body: "", code: 401)
+      allow(CanvasHttp).to receive(:get).and_return(response)
+
+      expect { client.fetch(user) }.to raise_error(
+        PageView::Pv4Client::Pv4Unauthorized, "unauthorized request"
+      )
+    end
+
+    it "raises Pv4NotFound when response code is 404" do
+      response = double(body: "", code: 404)
+      allow(CanvasHttp).to receive(:get).and_return(response)
+
+      expect { client.fetch(user) }.to raise_error(
+        PageView::Pv4Client::Pv4NotFound, "resource not found"
+      )
+    end
+
     it "raises Pv4TooManyRequests when response code is 429" do
       response = double(body: "", code: 429)
       allow(CanvasHttp).to receive(:get).and_return(response)

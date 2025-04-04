@@ -112,6 +112,12 @@ class HistoryController < ApplicationController
     render json: page_views
       .select { |pv| auas.key?(pv.asset_user_access_id) }
       .map { |pv| history_entry_json(pv, auas[pv.asset_user_access_id], @current_user, session) }
+  rescue PageView::Pv4Client::Pv4BadRequest => e
+    Canvas::Errors.capture_exception(:pv4, e, :warn)
+    render json: { error: t("Page Views received an invalid or malformed request.") }, status: :bad_request
+  rescue PageView::Pv4Client::Pv4NotFound, PageView::Pv4Client::Pv4Unauthorized => e
+    Canvas::Errors.capture_exception(:pv4, e, :warn)
+    render json: { error: t("Page Views resource not found.") }, status: :not_found
   rescue PageView::Pv4Client::Pv4TooManyRequests => e
     Canvas::Errors.capture_exception(:pv4, e, :warn)
     render json: { error: t("Page Views rate limit exceeded. Please wait and try again.") }, status: :too_many_requests
