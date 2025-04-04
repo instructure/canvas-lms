@@ -1124,7 +1124,7 @@ describe "Api::V1::Assignment" do
           "icon" => "{\"url\":\"https://img.icons8.com/metro/1600/unicorn.png\",\"width\":64,\"height\":64}",
           "window" => "",
           "iframe" => "",
-          "report" => "{\"supportedTypes\":[\"originality\",\"ai_detection\"],\"released\":true,\"indicator\":false,\"custom\":{\"some_setting\":\"az-123\"}}",
+          "report" => "{\"released\":true,\"indicator\":false,\"custom\":{\"some_setting\":\"az-123\"}}",
           "context_external_tool_id" => tool.id,
         }
       end

@@ -27,7 +27,7 @@ module Factories
       icon: { url: "https://example.com/icon.png", width: 32, height: 32 },
       window: { targetName: "mytoolwin", width: 500, height: 400, windowFeatures: "left=100,top=100" },
       iframe: { width: 500, height: 400 },
-      report: { supportedTypes: ["originality"], released: false, indicator: true, url: "https://example.com/my_special_target_uri", custom: {} },
+      report: { released: false, indicator: true, url: "https://example.com/my_special_target_uri", custom: {} },
     }.with_indifferent_access.merge(overrides)
     props[:context_external_tool] ||=
       props.delete(:tool) || external_tool_1_3_model(context: external_tool_context)
