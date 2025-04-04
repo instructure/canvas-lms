@@ -441,6 +441,7 @@ CanvasRails::Application.routes.draw do
     get "lti_collaborations/*all" => "collaborations#lti_index"
     resources :gradebook_uploads
     resources :rubrics
+    post "rubrics/llm_criteria", controller: :rubrics, action: :llm_criteria
     resources :rubric_associations do
       post "remind/:assessment_request_id" => "rubric_assessments#remind", :as => :remind_assessee
       resources :rubric_assessments, path: "assessments"
