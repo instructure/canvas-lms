@@ -208,7 +208,7 @@ class PlannerController < ApplicationController
                    ungraded_discussion_collection,
                    calendar_events_collection,
                    peer_reviews_collection]
-    collections << sub_assignment_collection if @domain_root_account.feature_enabled?(:discussion_checkpoints)
+    collections << sub_assignment_collection if sub_assignment_collection.present?
 
     BookmarkedCollection.merge(*collections)
   end
@@ -216,7 +216,7 @@ class PlannerController < ApplicationController
   def unread_items
     collections = [unread_discussion_topic_collection,
                    unread_assignment_collection]
-    collections << unread_sub_assignment_collection if @domain_root_account.feature_enabled?(:discussion_checkpoints)
+    collections << unread_sub_assignment_collection if unread_sub_assignment_collection.present?
 
     BookmarkedCollection.merge(*collections)
   end
