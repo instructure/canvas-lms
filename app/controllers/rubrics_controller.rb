@@ -244,7 +244,33 @@ class RubricsController < ApplicationController
     end
   end
 
-  # @API Delete a single rubric
+  def llm_criteria
+    @association_object = RubricAssociation.get_association_object(params[:rubric_association])
+    generate_options = (params[:generate_options] || {}).permit(:criteria_count, :rating_count, :points_per_criterion)
+    if generate_options[:criteria_count].present? && !(2..8).cover?(generate_options[:criteria_count].to_i)
+      return render json: { error: "criteria_count must be between 2 and 8 inclusive" }, status: :bad_request
+    end
+    if generate_options[:rating_count].present? && !(2..8).cover?(generate_options[:rating_count].to_i)
+      return render json: { error: "rating_count must be between 2 and 8 inclusive" }, status: :bad_request
+    end
+    return render_unauthorized_action unless Rubric.ai_rubrics_enabled?(context)
+
+    if can_manage_rubrics_or_association_object?(@association_object)
+      @rubric = @context.rubrics.build
+      @rubric.user = @current_user
+
+      if @rubric.grants_right?(@current_user, session, :update)
+        @rubric.data = @rubric.generate_criteria_via_llm(@association_object, generate_options)
+
+        return render json: { error: true, messages: @association.errors.to_a } if @rubric.data.nil?
+      end
+      json_res = {}
+      json_res[:rubric] = @rubric.as_json(methods: :criteria, include_root: false)
+      render json: json_res
+    end
+  end
+
+  # @API Delete a single
   #
   # Deletes a Rubric and removes all RubricAssociations.
   #
