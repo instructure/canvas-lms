@@ -27,6 +27,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
 import React from 'react'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 injectGlobalAlertContainers()
 
@@ -82,11 +83,13 @@ describe('DiscussionsSplitScreenView', () => {
 
   const setup = mocks => {
     return render(
-      <MockedProvider mocks={mocks}>
-        <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <DiscussionTopicManager discussionTopicId="Discussion-default-mock" />
-        </AlertManagerContext.Provider>
-      </MockedProvider>,
+      <MockedQueryProvider>
+        <MockedProvider mocks={mocks}>
+          <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
+            <DiscussionTopicManager discussionTopicId="Discussion-default-mock" />
+          </AlertManagerContext.Provider>
+        </MockedProvider>
+      </MockedQueryProvider>,
     )
   }
 

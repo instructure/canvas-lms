@@ -27,6 +27,7 @@ import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react'
 import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
 import {useKeyboardShortcuts} from './KeyboardShortcuts/useKeyboardShortcut'
+import {QueryProvider} from '@canvas/query'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -54,20 +55,22 @@ export const DiscussionTopicsPost = props => {
   }
 
   return (
-    <ApolloProvider client={client}>
-      <ErrorBoundary
-        errorComponent={
-          <GenericErrorPage
-            imageUrl={errorShipUrl}
-            errorCategory={I18n.t('Discussion Topic Post Error Page')}
-          />
-        }
-      >
-        <AlertManager>
-          <DiscussionTopicManager discussionTopicId={props.discussionTopicId} />
-        </AlertManager>
-      </ErrorBoundary>
-    </ApolloProvider>
+    <QueryProvider>
+      <ApolloProvider client={client}>
+        <ErrorBoundary
+          errorComponent={
+            <GenericErrorPage
+              imageUrl={errorShipUrl}
+              errorCategory={I18n.t('Discussion Topic Post Error Page')}
+            />
+          }
+        >
+          <AlertManager>
+            <DiscussionTopicManager discussionTopicId={props.discussionTopicId} />
+          </AlertManager>
+        </ErrorBoundary>
+      </ApolloProvider>
+    </QueryProvider>
   )
 }
 
