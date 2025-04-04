@@ -21,6 +21,9 @@ import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import React from 'react'
 import {IconFolderLockedSolid, IconFolderSolid} from '@instructure/ui-icons'
 import {SVGIconProps} from '@instructure/ui-svg-images'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('files_v2')
 
 export const isFile = (item: File | Folder): item is File => {
   return 'display_name' in item
@@ -45,9 +48,19 @@ export const getIcon = (
     }
   } else {
     return item.for_submissions ? (
-      <IconFolderLockedSolid data-testid="locked-folder-icon" color="primary" {...iconProps} />
+      <IconFolderLockedSolid
+        title={I18n.t('Folder Locked')}
+        data-testid="locked-folder-icon"
+        color="primary"
+        {...iconProps}
+      />
     ) : (
-      <IconFolderSolid data-testid="folder-icon" color="primary" {...iconProps} />
+      <IconFolderSolid
+        title={I18n.t('Folder')}
+        data-testid="folder-icon"
+        color="primary"
+        {...iconProps}
+      />
     )
   }
 }

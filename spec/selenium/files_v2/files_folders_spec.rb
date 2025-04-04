@@ -79,7 +79,7 @@ describe "files index page" do
         move_file_from(2, :kebab_menu)
         expect(alert).to include_text("#{folder_to_move} successfully moved to #{folder_name}")
         get "/courses/#{@course.id}/files/folder/base%20folder"
-        expect(get_item_content_files_table(1, 1)).to eq folder_to_move
+        expect(get_item_content_files_table(1, 1)).to include(folder_to_move)
       end
 
       it "deletes a folder from cog icon", priority: "1" do
@@ -101,7 +101,7 @@ describe "files index page" do
         expect(folder).to_not be_nil
         file_name = "some silly file"
         @course.attachments.create!(display_name: file_name, uploaded_data: default_uploaded_data, folder:)
-        folder_link = fln(test_folder_name, content)
+        folder_link = flnpt(test_folder_name, content)
         expect(folder_link).to be_present
         folder_link.click
         wait_for_ajaximations
