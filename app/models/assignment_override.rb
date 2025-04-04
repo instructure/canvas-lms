@@ -283,6 +283,8 @@ class AssignmentOverride < ActiveRecord::Base
 
   scope :active, -> { where(workflow_state: "active") }
 
+  scope :adhoc, -> { where(set_type: "ADHOC") }
+
   scope :visible_students_only, lambda { |visible_ids|
     scope = select("assignment_overrides.*")
             .joins(:assignment_override_students)

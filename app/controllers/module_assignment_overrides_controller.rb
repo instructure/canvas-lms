@@ -73,6 +73,7 @@
 #     }
 class ModuleAssignmentOverridesController < ApplicationController
   include Api::V1::ModuleAssignmentOverride
+  include DifferentiationTag
 
   before_action :require_user
   before_action :require_context
@@ -160,6 +161,20 @@ class ModuleAssignmentOverridesController < ApplicationController
     end
 
     bulk_update_overrides(override_list)
+    head :no_content
+  end
+
+  def convert_tag_overrides_to_adhoc_overrides
+    errors = OverrideConverterService.convert_tags_to_adhoc_overrides_for(
+      learning_object: @context_module,
+      course: @context,
+      executing_user: @current_user
+    )
+
+    if errors
+      return render json: { errors: }, status: :bad_request
+    end
+
     head :no_content
   end
 
