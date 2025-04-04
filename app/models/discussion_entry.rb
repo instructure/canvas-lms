@@ -443,6 +443,7 @@ class DiscussionEntry < ActiveRecord::Base
   scope :all_for_user, ->(user) { active.where(user_id: user) }
   scope :top_level_for_user, ->(user) { all_for_user(user).where(root_entry_id: nil) }
   scope :non_top_level_for_user, ->(user) { all_for_user(user).where.not(root_entry_id: nil) }
+  scope :not_anonymous, -> { where(is_anonymous_author: false) }
 
   def self.participant_join_sql(current_user)
     sanitize_sql(["LEFT OUTER JOIN #{DiscussionEntryParticipant.quoted_table_name} ON discussion_entries.id = discussion_entry_participants.discussion_entry_id

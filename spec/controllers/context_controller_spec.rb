@@ -403,6 +403,21 @@ describe ContextController do
           get "roster_user", params: { course_id: @course.id, id: @student.id }
           expect(assigns[:messages]).to be_nil
         end
+
+        it "excludes anonymous discussion topics" do
+          @course.discussion_topics.last.update(anonymous_state: "full_anonymity")
+          get "roster_user", params: { course_id: @course.id, id: @student.id }
+          messages = assigns[:messages]
+          expect(messages.count).to eq(0)
+        end
+
+        it "excludes anonymous discussion entries in partially anonymous discussion topics" do
+          @course.discussion_topics.last.update(anonymous_state: "partial_anonymity")
+          @course.discussion_topics.last.discussion_entries.where(message: %w[1 3 5 7]).update_all(is_anonymous_author: true)
+          get "roster_user", params: { course_id: @course.id, id: @student.id }
+          messages = assigns[:messages]
+          expect(messages.pluck(:message)).to eq(%w[11 10 9 8 6 4 2])
+        end
       end
     end
   end
