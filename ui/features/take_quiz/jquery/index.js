@@ -720,12 +720,11 @@ $(function () {
       const $this = $(this)
       if ($this.hasClass('numerical_question_input')) {
         const val = numberHelper.parse($this.val())
-        if(Number.isNaN(Number(val))){
-          restoreOriginalMessage($('.numerical-question-holder'))
+        restoreOriginalMessage($('.numerical-question-holder'))
+        if (Number.isNaN(Number(val))) {
           $this.val('')
-        }
-        else{
-          $this.val(val)
+        } else {
+          $this.val(I18n.n(val.toFixed(4), {strip_insignificant_zeros: true}))
         }
       }
       if ($this.hasClass('precision_question_input')) {
