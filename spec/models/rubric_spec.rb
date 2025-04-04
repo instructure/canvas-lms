@@ -606,13 +606,10 @@ describe Rubric do
         association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
 
         llm_response = {
-          id: "xd143",
-          title: "Test LLM Rubric",
-          points_possible: 100,
-          data: [
-            { description: "d1", long_description: "ld1", ratings: [{ description: "rd1.1", points: 3 }, { description: "rd1.2", points: 2 }, { description: "rd1.3", points: 1 }] },
-            { description: "d2", long_description: "ld2", ratings: [{ description: "rd2.1", points: 3 }, { description: "rd2.2", points: 2 }, { description: "rd2.3", points: 1 }] },
-            { description: "d3", long_description: "ld3", ratings: [{ description: "rd3.1", points: 3 }, { description: "rd3.2", points: 2 }, { description: "rd3.3", points: 1 }] },
+          criteria: [
+            { name: "n1", description: "d1", ratings: [{ title: "rt1.1", description: "rd1.1", points: 3 }, { title: "rt1.2", description: "rd1.2", points: 2 }, { title: "rt1.3", description: "rd1.3", points: 1 }] },
+            { name: "n2", description: "d2", ratings: [{ title: "rt2.1", description: "rd2.1", points: 3 }, { title: "rt2.2", description: "rd2.2", points: 2 }, { title: "rt2.3", description: "rd2.3", points: 1 }] },
+            { name: "n3", description: "d3", ratings: [{ title: "rt3.1", description: "rd3.1", points: 3 }, { title: "rt3.2", description: "rd3.2", points: 2 }, { title: "rt3.3", description: "rd3.3", points: 1 }] },
           ]
         }
         expect(@inst_llm).to receive(:chat).and_return(
@@ -631,7 +628,8 @@ describe Rubric do
         association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
 
         expect(association).to be_present
-        expect(llm_rubric.data[0][:description]).to eq "d1"
+        expect(llm_rubric.data[0][:description]).to eq "n1"
+        expect(llm_rubric.data[0][:ratings][0][:long_description]).to eq "rd1.1"
       end
 
       it "still creates the normal way if requested" do

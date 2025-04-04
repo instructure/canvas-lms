@@ -21,17 +21,61 @@ rate_limit:
   limit: 25
   period: day
 template: |
-  Use the following rubric as an example: { "id": 540526, "title": "Game Concept Document", "points_possible": 100, "data": [ { "description": "Game Concept Overview", "long_description": "Clearly articulates the core game idea, unique selling proposition, and primary gameplay experience.", "points": 20, "ratings": [ { "description": "Exceptional", "points": 20 }, { "description": "Satisfactory", "points": 15 }, { "description": "Inadequate", "points": 10 }, { "description": "No Marks", "points": 0 } ] }, { "description": "Gameplay Mechanics", "long_description": "Provides detailed explanation of core gameplay systems, player interactions, and fundamental game design principles.", "points": 20, "ratings": [ { "description": "Exceptional", "points": 20 }, { "description": "Satisfactory", "points": 15 }, { "description": "Inadequate", "points": 10 }, { "description": "No Marks", "points": 0 } ] }, { "description": "Target Audience", "long_description": "Demonstrates comprehensive understanding of potential player demographics, market positioning, and competitive landscape.", "points": 15, "ratings": [ { "description": "Exceptional", "points": 15 }, { "description": "Satisfactory", "points": 10 }, { "description": "Inadequate", "points": 5 }, { "description": "No Marks", "points": 0 } ] }, { "description": "World Building", "long_description": "Develops a rich, immersive narrative framework with compelling characters, setting, and storytelling approach.", "points": 15, "ratings": [ { "description": "Exceptional", "points": 15 }, { "description": "Satisfactory", "points": 10 }, { "description": "Inadequate", "points": 5 }, { "description": "No Marks", "points": 0 } ] }, { "description": "Visual and Audio Design", "long_description": "Outlines aesthetic vision, art style, sound design, and overall sensory experience of the game.", "points": 10, "ratings": [ { "description": "Exceptional", "points": 10 }, { "description": "Satisfactory", "points": 7 }, { "description": "Rating Exceptional", "points": 4 }, { "description": "No Marks", "points": 0 } ] }, { "description": "Technical Considerations", "long_description": "Addresses potential technical challenges, platform considerations, and implementation strategies.", "points": 10, "ratings": [ { "description": "Exceptional", "points": 10 }, { "description": "Satisfactory", "points": 7 }, { "description": "Inadequate", "points": 4 }, { "description": "No Marks", "points": 0 } ] }, { "description": "Business Model", "long_description": "Presents a clear strategy for game monetization, potential revenue streams, and market entry.", "points": 10, "ratings": [ { "description": "Exceptional", "points": 10 }, { "description": "Satisfactory", "points": 7 }, { "description": "Inadequate", "points": 4 }, { "description": "No Marks", "points": 0 } ] } ] }
-  Use the following rubric as an example: { "id": 31329, "title": "Architectural Design Project Final Packet Rubric", "points_possible": 90, "data": [ { "description": "Site Analysis", "long_description": "Comprehensive examination of site topography, environmental conditions, solar orientation, and contextual landscape integration", "points": 20, "ratings": [ { "description": "Exceptional", "points": 20 }, { "description": "Satisfactory", "points": 15 }, { "description": "Inadequate", "points": 10 }, { "description": "No Marks", "points": 0 } ] }, { "description": "Schematic Design Drawings", "long_description": "Clear, professionally rendered floor plans, site plans, elevations, and preliminary conceptual sketches demonstrating design intent", "points": 20, "ratings": [ { "description": "Exceptional", "points": 20 }, { "description": "Satisfactory", "points": 15 }, { "description": "Inadequate", "points": 10 }, { "description": "No Marks", "points": 0 } ] }, { "description": "Structural Considerations", "long_description": "Detailed structural system analysis, load-bearing elements, material selections, and engineering considerations", "points": 15, "ratings": [ { "description": "Exceptional", "points": 15 }, { "description": "Satisfactory", "points": 10 }, { "description": "Inadequate", "points": 5 }, { "description": "No Marks", "points": 0 } ] }, { "description": "Sustainability Integration", "long_description": "Innovative environmental design strategies, energy efficiency planning, and green building principles", "points": 15, "ratings": [ { "description": "Exceptional", "points": 15 }, { "description": "Satisfactory", "points": 10 }, { "description": "Inadequate", "points": 5 }, { "description": "No Marks", "points": 0 } ] }, { "description": "Technical Specifications", "long_description": "Detailed technical documentation including material specifications, construction techniques, and system integrations", "points": 10, "ratings": [ { "description": "Exceptional", "points": 10 }, { "description": "Satisfactory", "points": 7 }, { "description": "Rating Exceptional", "points": 4 }, { "description": "No Marks", "points": 0 } ] }, { "description": "Presentation Quality", "long_description": "Professional graphic presentation, clean layout, visual communication clarity, and overall design packet aesthetics", "points": 10, "ratings": [ { "description": "Exceptional", "points": 10 }, { "description": "Satisfactory", "points": 7 }, { "description": "Inadequate", "points": 4 }, { "description": "No Marks", "points": 0 } ] } ] }
+  You are an experienced educator tasked with creating a rubric based on an assignment description. This rubric will be used to evaluate student submissions. Your goal is to create a comprehensive, clear, and fair rubric that aligns with the assignment objectives.
 
-  Please generate a rubric record given the following assignment: <CONTENT_PLACEHOLDER>
+  Here's the assignment description you'll be working with:
 
-  Return only the plain rubric json record in the response without any headers or footers.
-  Take specific note to craft the rubric based on the submission types and grading type of the assignment.
-  There should be about 5 criteria in the rubric.
-  The rubric should be classified using following Bloom Taxonony Level: Understanding.
-  The rubric shoud focus on the following Webb's Depth of Knowledge level: Skill/Concept.
-  The rubric criterion should include a long description: true.
-  The rubric criterion rating long description should be null.
+  <assignment_description>
+  <CONTENT_PLACEHOLDER>
+  </assignment_description>
+
+  Please follow these steps to create a rubric:
+
+  1. Analyze the assignment description. Identify the main objectives of the assignment, note specific requirements or criteria mentioned, and determine key skills or knowledge areas being assessed.
+
+  2. Create rubric criteria. Brainstorm potential criteria based on your analysis, then select the best <CRITERIA_COUNT_PLACEHOLDER> criteria that encompass the essential elements of the assignment. Ensure these criteria align with the assignment's objectives and requirements. Make sure criteria are clear, concise, and mutually exclusive
+
+  3. Develop the rating scale for each criterion:
+  - For each criterion, create ratings for <RATING_COUNT_PLACEHOLDER> performance levels.
+  - Describe what constitutes each level of performance in clear, specific, and succinct terms
+  - Ensure that each rating is measurable and observable
+
+  4. Format the final rubric:
+  Present the final rubric in a JSON structure. Here's an example of how the structure should look (do not use this content, it's just to illustrate the format):
+
+  {
+    "criteria": [
+      {
+        "name": "Game Concept Overview",
+        "description": "Clearly articulates the core game idea, unique selling proposition, and primary gameplay experience.",
+        "ratings": [
+          {
+            "title": "Exceptional",
+            "description": "Presents an innovative, clearly defined game concept with compelling unique selling points and a detailed vision of the player experience, supported by concrete examples and thorough analysis.",
+            "points": 30
+          },
+          {
+            "title": "Satisfactory",
+            "description": "Provides a coherent game concept with identifiable unique elements and a basic understanding of the intended gameplay experience, though lacking some depth or distinction.",
+            "points": 2
+          },
+          {
+            "title": "Inadequate",
+            "description": "Presents a vague or derivative game concept lacking clear differentiation, with minimal explanation of unique features or intended player experience.",
+            "points": 10
+          },
+          {
+            "title": "No Marks",
+            "description": "Fails to provide a game concept, or presents an incomprehensible or incomplete concept lacking basic required elements.",
+            "points": 0
+          }
+        ]
+      }
+    ]
+  }
+
+  Ensure that your rubric is comprehensive, covering all major aspects of the assignment, and that it provides clear guidance for evaluating student work at different performance levels. The JSON structure should be consistent and properly formatted for easy parsing.
+
+  Now, please create the rubric based on the assignment description provided earlier. Your final output should only include the JSON structure with no extra explanation.
 options:
   max_tokens: 5000
