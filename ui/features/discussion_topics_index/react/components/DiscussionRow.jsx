@@ -833,22 +833,41 @@ class DiscussionRow extends Component {
 
   renderCheckpointInfo = (size, timestampStyleOverride) => {
     const {assignment} = this.props.discussion
-    let dueDateString = null
+    if (
+      !assignment ||
+      !Array.isArray(assignment.checkpoints) ||
+      assignment.checkpoints.length === 0
+    ) {
+      return null
+    }
 
-    if (assignment && assignment?.checkpoints?.length > 0) {
-      const replyToTopic = assignment.checkpoints.find(e => e.tag === REPLY_TO_TOPIC).due_at
-      const replyToEntry = assignment.checkpoints.find(e => e.tag === REPLY_TO_ENTRY).due_at
-      const noDate = I18n.t('No Due Date')
+    const replyToTopicCheckpoint = assignment.checkpoints.find(e => e.tag === REPLY_TO_TOPIC)
+    const replyToEntryCheckpoint = assignment.checkpoints.find(e => e.tag === REPLY_TO_ENTRY)
 
-      dueDateString = I18n.t(
-        ' Reply to topic: %{topicDate}  Required replies (%{count}): %{entryDate}',
-        {
-          topicDate: replyToTopic ? this.props.dateFormatter(replyToTopic) : noDate,
-          entryDate: replyToEntry ? this.props.dateFormatter(replyToEntry) : noDate,
-          count: this.props.discussion.reply_to_entry_required_count,
-        },
+    if (
+      (replyToTopicCheckpoint && !replyToEntryCheckpoint) ||
+      (!replyToTopicCheckpoint && replyToEntryCheckpoint)
+    ) {
+      console.error(
+        I18n.t(
+          'Error: Inconsistent checkpoints - Only one of the reply-to-topic or reply-to-entry checkpoint exists.',
+        ),
       )
     }
+
+    const replyToTopic = replyToTopicCheckpoint ? replyToTopicCheckpoint.due_at : null
+    const replyToEntry = replyToEntryCheckpoint ? replyToEntryCheckpoint.due_at : null
+    const noDate = I18n.t('No Due Date')
+
+    const dueDateString = I18n.t(
+      ' Reply to topic: %{topicDate}  Required replies (%{count}): %{entryDate}',
+      {
+        topicDate: replyToTopic ? this.props.dateFormatter(replyToTopic) : noDate,
+        entryDate: replyToEntry ? this.props.dateFormatter(replyToEntry) : noDate,
+        count: this.props.discussion.reply_to_entry_required_count,
+      },
+    )
+
     return (
       dueDateString && (
         <Grid.Row>
@@ -1106,8 +1125,7 @@ const mapState = (state, ownProps) => {
       (state.DIRECT_SHARE_ENABLED && state.permissions.read_as_admin),
     displayPinMenuItem: state.permissions.moderate,
     displayDifferentiatedModulesTray:
-      discussion.permissions.manage_assign_to &&
-      state.contextType === 'course',
+      discussion.permissions.manage_assign_to && state.contextType === 'course',
     masterCourseData: state.masterCourseData,
     isMasterCourse: masterCourse,
     DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED,

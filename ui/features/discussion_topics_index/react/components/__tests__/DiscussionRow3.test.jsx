@@ -182,6 +182,34 @@ describe('DiscussionRow', () => {
     ).toBeInTheDocument()
   })
 
+  it('renders checkpoint information without crashing when only one checkpoint exists', () => {
+    const props = makeProps({
+      discussion: {
+        reply_to_entry_required_count: 1,
+        assignment: {
+          checkpoints: [
+            {
+              tag: 'reply_to_topic',
+              points_possible: 20,
+              due_at: '2024-09-14T05:59:00Z',
+            },
+            // Missing the reply_to_entry checkpoint to simulate the error condition.
+          ],
+        },
+      },
+    })
+    render(<DiscussionRow {...props} />)
+
+    // Ensure that the component renders the available checkpoint correctly,
+    // and falls back to "No Due Date" for the missing checkpoint.
+    expect(screen.queryByText('Reply to topic:', {exact: false})).toBeInTheDocument()
+    expect(screen.queryByText('Required replies (1):', {exact: false})).toBeInTheDocument()
+    expect(
+      screen.queryByText(props.dateFormatter('2024-09-14T05:59:00Z'), {exact: false}),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('No Due Date', {exact: false})).toBeInTheDocument()
+  })
+
   it('renders to do date if ungraded with a to do date', () => {
     const props = makeProps({
       discussion: {
