@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -37,9 +36,7 @@ import '@canvas/context-cards/react/StudentContextCardTrigger'
 import replaceTags from '@canvas/util/replaceTags'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import {createRoot} from 'react-dom/client'
-import {Flex} from '@instructure/ui-flex'
-import {IconWarningSolid} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-text'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 
 const I18n = createI18nScope('section')
 
@@ -75,14 +72,11 @@ $(document).ready(function () {
       const root = errorRoots[formError.containerId] ?? createRoot(errorsContainer)
       errorRoots[formError.containerId] = root
       root.render(
-        <Flex as="div" alignItems="center" margin="0 0 xx-small 0">
-          <Flex.Item as="div" margin="0 xx-small xxx-small 0">
-            <IconWarningSolid color="error" />
-          </Flex.Item>
-          <Text size="small" color="danger">
-            {I18n.t('%{errorText}',{errorText: formError.errorText})}
-          </Text>
-        </Flex>
+        <FormattedErrorMessage
+          message={I18n.t('%{errorText}',{errorText: formError.errorText})}
+          margin="0 0 xx-small 0"
+          iconMargin="0 xx-small xxx-small 0"
+        />
       )
     })
   }

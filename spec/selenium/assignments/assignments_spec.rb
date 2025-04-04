@@ -296,7 +296,7 @@ describe "assignments" do
           create_text_file(txt_file_1, "This is the content of file1.")
 
           f('input[name="submissions_zip"]').send_keys(txt_file_1)
-          expect(f("#file_type_error_text")).to be_displayed
+          expect(f("[data-testid='error-message-container']")).to be_displayed
         end
       end
     end

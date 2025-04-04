@@ -17,7 +17,6 @@
  */
 
 import React, {useState} from 'react'
-import {IconWarningSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
@@ -43,19 +42,10 @@ const OnlineUrlSubmission = ({
   }
 
   const showErrors = () => {
-    const errorMessage = (
-      <Flex as="div" alignItems="center" justifyItems="start" margin="x-small 0 0 0">
-        <Flex.Item as="div" margin="0 xx-small xxx-small 0">
-          <IconWarningSolid color="error" />
-        </Flex.Item>
-        <Text size="small" color="danger">
-          {I18n.t('A valid URL is required')}
-        </Text>
-      </Flex>
-    )
+    const errorMessage = I18n.t('A valid URL is required')
     setOnlineUrlErrors([
       {
-        type: 'error',
+        type: 'newError',
         text: errorMessage,
       },
     ])

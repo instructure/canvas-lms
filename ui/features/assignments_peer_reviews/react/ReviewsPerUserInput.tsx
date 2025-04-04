@@ -46,30 +46,19 @@ const ReviewsPerUserInput = ({
     onChange(value)
   }
 
-  const errorMessage = (text: string) => (
-    <Flex as="div" alignItems="center" justifyItems="start">
-      <Flex.Item as="div" margin="0 xx-small xxx-small 0">
-        <IconWarningSolid color="error" />
-      </Flex.Item>
-      <Text size="small" color="danger">
-        {text}
-      </Text>
-    </Flex>
-  )
-
   const validateCount = () => {
     const newErrors: FormMessage[] = []
     if (count) {
       const input = Number(count)
       if (!Number.isInteger(input)) {
         newErrors.push({
-          type: 'error',
-          text: errorMessage(I18n.t('Must be a whole number')),
+          type: 'newError',
+          text: I18n.t('Must be a whole number'),
         })
       } else if (input <= 0) {
         newErrors.push({
-          type: 'error',
-          text: errorMessage(I18n.t('Must be greater than 0')),
+          type: 'newError',
+          text: I18n.t('Must be greater than 0'),
         })
       }
       setErrors(newErrors)
