@@ -242,25 +242,27 @@
 
   <div class="content" id="context_module_content_<%= context_module && context_module.id %>">
     <%# This part of code is copied to items_html.html.erb as a temporary solution %>
-    <ul class="ig-list items context_module_items <%= 'manageable' if @can_view %>">
-      <% if context_module && module_data[:items] %>
-        <% module_data[:items].each do |item| %>
-          <%
-            item_data = module_data[:items_data][item.id]
-            locals = {
-              item_restrictions: module_data.dig(:items_restrictions, item.id),
-              completion_criteria: context_module.completion_requirements,
-              item_data: item_data,
-              viewable: @can_view,
-            }
-          %>
-          <%= render :partial => 'context_modules/module_item_next', :object => item, :as => :module_item, :locals => locals %>
-          <% if item_data[:show_cyoe_placeholder] %>
-            <%= render :partial => 'context_modules/module_item_conditional_next', :object => item, :as => :module_item, :locals => locals %>
+    <% unless module_performance_improvement_is_enabled?(@context) %>
+      <ul class="ig-list items context_module_items <%= 'manageable' if @can_view %>">
+        <% if context_module && module_data[:items] %>
+          <% module_data[:items].each do |item| %>
+            <%
+              item_data = module_data[:items_data][item.id]
+              locals = {
+                item_restrictions: module_data.dig(:items_restrictions, item.id),
+                completion_criteria: context_module.completion_requirements,
+                item_data: item_data,
+                viewable: @can_view,
+              }
+            %>
+            <%= render :partial => 'context_modules/module_item_next', :object => item, :as => :module_item, :locals => locals %>
+            <% if item_data[:show_cyoe_placeholder] %>
+              <%= render :partial => 'context_modules/module_item_conditional_next', :object => item, :as => :module_item, :locals => locals %>
+            <% end %>
           <% end %>
         <% end %>
-      <% end %>
-    </ul>
+      </ul>
+    <% end %>
     <% if !context_module || @can_view && module_data[:items]&.empty? %>
       <div class='module_dnd' data-context-module-id="<%= context_module&.id %>"></div>
     <% end %>

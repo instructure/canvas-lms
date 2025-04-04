@@ -223,5 +223,39 @@ describe "context_modules/index" do
       page = Nokogiri("<document>" + response.body + "</document>")
       expect(page.css("#module_student_view_peer_reviews_#{@module_item.content_id}_#{@module_item.context_module_id}").length).to eq 0
     end
+
+    describe "turning off the module item rendering" do
+      subject do
+        render "context_modules/index"
+        Nokogiri("<document>" + response.body + "</document>")
+      end
+
+      before do
+        course_factory
+        @course.context_modules.create!
+        view_context(@course, @user)
+        assign(:modules, @course.context_modules.active)
+      end
+
+      context "when modules_perf FF is on" do
+        before do
+          @course.account.enable_feature!(:modules_perf)
+        end
+
+        it "should NOT render the module items" do
+          expect(subject.css(".context_module_items").length).to eq 0
+        end
+      end
+
+      context "when modules_perf FF is off" do
+        before do
+          @course.account.disable_feature!(:modules_perf)
+        end
+
+        it "should render the module items" do
+          expect(subject.css(".context_module_items").length).to eq 1
+        end
+      end
+    end
   end
 end
