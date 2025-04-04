@@ -607,9 +607,9 @@ describe Rubric do
 
         llm_response = {
           criteria: [
-            { name: "n1", description: "d1", ratings: [{ title: "rt1.1", description: "rd1.1", points: 3 }, { title: "rt1.2", description: "rd1.2", points: 2 }, { title: "rt1.3", description: "rd1.3", points: 1 }] },
-            { name: "n2", description: "d2", ratings: [{ title: "rt2.1", description: "rd2.1", points: 3 }, { title: "rt2.2", description: "rd2.2", points: 2 }, { title: "rt2.3", description: "rd2.3", points: 1 }] },
-            { name: "n3", description: "d3", ratings: [{ title: "rt3.1", description: "rd3.1", points: 3 }, { title: "rt3.2", description: "rd3.2", points: 2 }, { title: "rt3.3", description: "rd3.3", points: 1 }] },
+            { name: "n1", description: "d1", ratings: [{ title: "rt1.1", description: "rd1.1" }, { title: "rt1.2", description: "rd1.2" }, { title: "rt1.3", description: "rd1.3" }] },
+            { name: "n2", description: "d2", ratings: [{ title: "rt2.1", description: "rd2.1" }, { title: "rt2.2", description: "rd2.2" }, { title: "rt2.3", description: "rd2.3" }] },
+            { name: "n3", description: "d3", ratings: [{ title: "rt3.1", description: "rd3.1" }, { title: "rt3.2", description: "rd3.2" }, { title: "rt3.3", description: "rd3.3" }] },
           ]
         }
         expect(@inst_llm).to receive(:chat).and_return(
@@ -630,6 +630,7 @@ describe Rubric do
         expect(association).to be_present
         expect(llm_rubric.data[0][:description]).to eq "n1"
         expect(llm_rubric.data[0][:ratings][0][:long_description]).to eq "rd1.1"
+        expect(llm_rubric.data[0][:ratings][1][:points]).to eq 10 # halfway between 20 (per-criteria default) and 0
       end
 
       it "still creates the normal way if requested" do

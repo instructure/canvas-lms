@@ -51,23 +51,19 @@ template: |
         "ratings": [
           {
             "title": "Exceptional",
-            "description": "Presents an innovative, clearly defined game concept with compelling unique selling points and a detailed vision of the player experience, supported by concrete examples and thorough analysis.",
-            "points": 30
+            "description": "Presents an innovative, clearly defined game concept with compelling unique selling points and a detailed vision of the player experience, supported by concrete examples and thorough analysis."
           },
           {
             "title": "Satisfactory",
-            "description": "Provides a coherent game concept with identifiable unique elements and a basic understanding of the intended gameplay experience, though lacking some depth or distinction.",
-            "points": 2
+            "description": "Provides a coherent game concept with identifiable unique elements and a basic understanding of the intended gameplay experience, though lacking some depth or distinction."
           },
           {
             "title": "Inadequate",
-            "description": "Presents a vague or derivative game concept lacking clear differentiation, with minimal explanation of unique features or intended player experience.",
-            "points": 10
+            "description": "Presents a vague or derivative game concept lacking clear differentiation, with minimal explanation of unique features or intended player experience."
           },
           {
             "title": "No Marks",
-            "description": "Fails to provide a game concept, or presents an incomprehensible or incomplete concept lacking basic required elements.",
-            "points": 0
+            "description": "Fails to provide a game concept, or presents an incomprehensible or incomplete concept lacking basic required elements."
           }
         ]
       }

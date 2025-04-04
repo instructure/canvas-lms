@@ -514,6 +514,7 @@ class Rubric < ActiveRecord::Base
   DEFAULT_GENERATE_OPTIONS = {
     criteria_count: 5,
     rating_count: 4,
+    points_per_criterion: 20
   }.freeze
   def generate_criteria_via_llm(association_object, generate_options = {})
     unless association_object.is_a?(AbstractAssignment)
@@ -572,11 +573,13 @@ class Rubric < ActiveRecord::Base
       criterion[:description] = (criterion_data[:name].presence || t("no_description", "No Description")).strip
       criterion[:long_description] = criterion_data[:description].presence
 
-      ratings = criterion_data[:ratings].map do |rating_data|
+      points = (generate_options[:points_per_criterion] || DEFAULT_GENERATE_OPTIONS[:points_per_criterion]).to_f
+      points_decrement = points / [(criterion_data[:ratings].length - 1), 1].max
+      ratings = criterion_data[:ratings].each_with_index.map do |rating_data, index|
         {
           description: (rating_data[:title].presence || t("no_description", "No Description")).strip,
           long_description: rating_data[:description].presence,
-          points: rating_data[:points].to_f || 0,
+          points: (points - (points_decrement * index)).round,
           criterion_id: criterion[:id],
           id: unique_item_id
         }
