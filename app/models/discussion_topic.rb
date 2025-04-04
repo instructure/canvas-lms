@@ -826,6 +826,8 @@ class DiscussionTopic < ActiveRecord::Base
       .where("asset_id=discussion_topics.id").arel.exists)
   }
 
+  scope :not_fully_anonymous, -> { where(anonymous_state: [nil, "partial_anonymity"]) }
+
   scope :todo_date_between, lambda { |starting, ending|
     where("(discussion_topics.type = 'Announcement' AND posted_at BETWEEN :start_at and :end_at)
            OR todo_date BETWEEN :start_at and :end_at",
