@@ -46,6 +46,12 @@ module ContextModulesHelper
     end
   end
 
+  def module_performance_improvement_is_enabled?(context)
+    return false unless context
+
+    context.account.feature_enabled?(:modules_perf)
+  end
+
   def add_menu_tools_to_cache_key(cache_key)
     tool_key = @menu_tools ? @menu_tools.values.flatten.map(&:cache_key).join("/") : ""
     cache_key += Digest::SHA256.hexdigest(tool_key) if tool_key.present?

@@ -442,4 +442,30 @@ describe ContextModulesHelper do
       expect(cyoe_able?(item)).to be false
     end
   end
+
+  describe "module_performance_improvement_is_enabled?" do
+    subject { module_performance_improvement_is_enabled?(context) }
+
+    context "when provided context is falsey" do
+      let(:context) { nil }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context "when provided context exist" do
+      let(:context) { t_course }
+
+      context "when modules_perf FF is on" do
+        before { context.account.enable_feature!(:modules_perf) }
+
+        it { is_expected.to be_truthy }
+      end
+
+      context "when modules_perf FF is off" do
+        before { context.account.disable_feature!(:modules_perf) }
+
+        it { is_expected.to be_falsey }
+      end
+    end
+  end
 end
