@@ -25,6 +25,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {mediaExtension} from '../../mimetypes'
 
+import {Spinner} from '@instructure/ui-spinner'
 import {IconRecordSolid, IconStopLine} from '@instructure/ui-icons'
 
 import {Button} from '@instructure/ui-buttons'
@@ -136,7 +137,39 @@ export default class CanvasMediaRecorder extends React.Component {
     onSaveFile: () => {},
   }
 
+  renderSavingSpinner = () => {
+    const dialog = document.querySelector('.ui-dialog:not([style*="display: none"])')
+    const dialogContent = dialog?.querySelector('.ui-dialog-content')
+
+    if (dialogContent) {
+      const dialogButtons = dialog.querySelector('.ui-dialog-buttonpane')
+      if (dialogButtons) {
+        dialogButtons.style.display = 'none'
+      }
+
+      const spinnerContainer = document.createElement('div')
+      spinnerContainer.id = 'media-spinner-container'
+      dialogContent.innerHTML = ''
+      dialogContent.appendChild(spinnerContainer)
+
+      ReactDOM.render(
+        <div style={{padding: '2rem', textAlign: 'center'}}>
+          <div style={{marginBottom: '1rem'}}>
+            <Spinner renderTitle={I18n.t('Saving media file')} size="large" />
+          </div>
+          <div style={{fontSize: '16px', color: '#333'}}>
+            {I18n.t(
+              'Saving your file. Please wait and the modal will close when the upload is finished.',
+            )}
+          </div>
+        </div>,
+        spinnerContainer,
+      )
+    }
+  }
+
   saveFile = _file => {
+    this.renderSavingSpinner()
     const file = fileWithExtension(_file)
     this.props.onSaveFile(file)
   }
