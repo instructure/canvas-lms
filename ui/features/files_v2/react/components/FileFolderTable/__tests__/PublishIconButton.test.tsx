@@ -84,6 +84,7 @@ describe('PublishIconButton', () => {
     render(<PublishIconButton {...defaultProps} />)
     const tooltip = screen.getByRole('tooltip')
     expect(tooltip).toHaveTextContent(/Available until .* at \d{1,2}:\d{2}(am|pm)/i)
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
   it('renders nothing when user cannot edit and item is not restricted', () => {
