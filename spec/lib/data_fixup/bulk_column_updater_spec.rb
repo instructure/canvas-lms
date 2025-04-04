@@ -187,20 +187,14 @@ describe DataFixup::BulkColumnUpdater do
     end
   end
 
-  it "drops the temp table after the block is done" do
-    expect(ContextExternalTool.connection).to receive(:disconnect!).once.and_call_original
+  it "creates a temporary table to be dropped on transaction commit" do
+    allow(ContextExternalTool.connection).to receive(:create_table).and_call_original
 
     bcu = described_class.new(ContextExternalTool, :unified_tool_id)
-    temp_table_name = nil
-    bcu.update! do |_add_rows_fn|
-      temp_table_name = bcu.send(:quoted_temp_table_name)
-      expect do
-        ContextExternalTool.connection.execute("SELECT 1 FROM #{temp_table_name}")
-      end.not_to raise_error
+    bcu.update! do
+      nil
     end
 
-    expect do
-      ContextExternalTool.connection.execute("SELECT 1 FROM #{temp_table_name}")
-    end.to raise_error(ActiveRecord::StatementInvalid)
+    expect(ContextExternalTool.connection).to have_received(:create_table).with(/context_external_tools_/, temporary: true, id: an_instance_of(String), options: "ON COMMIT DROP")
   end
 end
