@@ -133,14 +133,14 @@ describe "assignments turn it in" do
     f("#exclude_small_matches_words_value").click
     f("#exclude_small_matches_words_value").send_keys([:backspace, "abc"])
     submit_dialog_form("#assignment_turnitin_settings")
-    expect(f("#error_text")).to be_displayed
+    expect(f("[data-testid='error-message-container']")).to be_displayed
 
     # validation is run on percent input
     f("#exclude_small_matches_type_r2").click
     f("#exclude_small_matches_percent_value").click
     f("#exclude_small_matches_percent_value").send_keys([:backspace, "abc"])
     submit_dialog_form("#assignment_turnitin_settings")
-    expect(f("#error_text")).to be_displayed
+    expect(f("[data-testid='error-message-container']")).to be_displayed
   end
 
   it "does not allow edits to turnitin settings after submissions have been made" do

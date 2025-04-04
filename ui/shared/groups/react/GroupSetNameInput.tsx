@@ -43,23 +43,12 @@ const GroupSetNameInput = ({
   const [nameValue, setNameValue] = useState<string>(initialValue)
   const [errorMessages, setErrorMessages] = useState<FormMessage[]>([])
 
-  const formatErrorMessage = (message: string) => (
-    <Flex as="div" alignItems="center">
-      <Flex as="div" alignItems="center" margin="0 xx-small 0 0">
-        <IconWarningSolid color="error" />
-      </Flex>
-      <Text size="small" color="danger">
-        {message}
-      </Text>
-    </Flex>
-  )
-
   const handleFocus = (_event: React.FocusEvent<HTMLInputElement>) => {
     if (getShouldShowEmptyNameError && getShouldShowEmptyNameError()) {
       // reset the value
       if (setShouldShowEmptyNameError) setShouldShowEmptyNameError(false)
-      const errorText = formatErrorMessage(I18n.t('Name is required'))
-      setErrorMessages([{ text: errorText, type: 'error' }])
+      const errorText = I18n.t('Name is required')
+      setErrorMessages([{ text: errorText, type: 'newError' }])
     }
   }
 
@@ -67,9 +56,9 @@ const GroupSetNameInput = ({
     if (nameValue) {
       let errorText
       if (nameValue.length > 255) {
-        errorText = formatErrorMessage(I18n.t('Name must be 255 characters or less'))
+        errorText = I18n.t('Name must be 255 characters or less')
       }
-      if (errorText) setErrorMessages([{ text: errorText, type: 'error' }])
+      if (errorText) setErrorMessages([{ text: errorText, type: 'newError' }])
     }
   }
 

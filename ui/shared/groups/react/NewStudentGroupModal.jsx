@@ -23,7 +23,6 @@ import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {IconWarningSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
@@ -53,17 +52,8 @@ export default function NewStudentGroupModal({onSave, ...modalProps}) {
 
   const validateName = (newName, shouldFocus) => {
     if (newName.trim().length === 0) {
-      const nameErrorText = (
-        <Flex as="div" alignItems="center" justifyItems="end" margin="x-small 0 0 0">
-          <Flex.Item as="div" margin="0 xx-small xxx-small 0">
-            <IconWarningSolid color="error" />
-          </Flex.Item>
-          <Text size="small" color="danger">
-            {I18n.t('A group name is required.')}
-          </Text>
-        </Flex>
-      )
-      setNameValidationMessages([{text: nameErrorText, type: 'error'}])
+      const nameErrorText = I18n.t('A group name is required.')
+      setNameValidationMessages([{text: nameErrorText, type: 'newError'}])
       if (shouldFocus) {
         const input = document.getElementById(`group-name`)
         input?.focus()
@@ -71,17 +61,8 @@ export default function NewStudentGroupModal({onSave, ...modalProps}) {
       }
       return false
     } else if (newName.length > 255) {
-      const nameErrorText = (
-        <Flex as="div" alignItems="center" justifyItems="end" margin="x-small 0 0 0">
-          <Flex.Item as="div" margin="0 xx-small xxx-small 0">
-            <IconWarningSolid color="error" />
-          </Flex.Item>
-          <Text size="small" color="danger">
-            {I18n.t('Group name must be less than 255 characters.')}
-          </Text>
-        </Flex>
-      )
-      setNameValidationMessages([{text: nameErrorText, type: 'error'}])
+      const nameErrorText = I18n.t('Group name must be less than 255 characters.')
+      setNameValidationMessages([{text: nameErrorText, type: 'newError'}])
       if (shouldFocus) {
         const input = document.getElementById(`group-name`)
         input?.focus()
