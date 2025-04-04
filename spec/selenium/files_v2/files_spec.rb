@@ -286,7 +286,7 @@ describe "files index page" do
 
         it "sets files to published by default", priority: "1" do
           get "/courses/#{@course.id}/files"
-          expect(get_item_content_files_table(1, 6)).to eq "#{a_txt_file_name} is Published - Click to modify"
+          expect(item_has_permissions_icon?(1, 6, "published-button")).to be true
         end
       end
 
@@ -363,7 +363,7 @@ describe "files index page" do
         end
 
         it "validates that file is published by default", priority: "1" do
-          expect(get_item_content_files_table(1, 6)).to eq "a_file.txt is Published - Click to modify"
+          expect(item_has_permissions_icon?(1, 6, "published-button")).to be true
         end
       end
 

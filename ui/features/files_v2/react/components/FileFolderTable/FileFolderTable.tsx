@@ -111,8 +111,8 @@ const columnHeaders: ColumnHeader[] = [
     width: undefined,
   },
   {
-    id: 'published',
-    title: I18n.t('Published'),
+    id: 'permissions',
+    title: I18n.t('Status'),
     textAlign: 'center',
     width: undefined,
   },
@@ -177,7 +177,7 @@ const columnRenderers: {
       />
     ) : null,
   blueprint: ({row}) => <BlueprintIconButton item={row} />,
-  published: ({row, userCanRestrictFilesForContext, setModalOrTrayOptions}) => (
+  permissions: ({row, userCanRestrictFilesForContext, setModalOrTrayOptions}) => (
     <PublishIconButton
       item={row}
       userCanRestrictFilesForContext={userCanRestrictFilesForContext}
@@ -325,7 +325,7 @@ const FileFolderTable = ({
         return usageRightsRequiredForContext
       case 'blueprint':
         return !!ENV.BLUEPRINT_COURSES_DATA
-      case 'published':
+      case 'permissions':
         return contextType !== 'group'
       default:
         return true
