@@ -219,7 +219,7 @@ describe('ActionMenuButton', () => {
     it('closes and reopens the rename modal without clearing the name', async () => {
       const user = userEvent.setup()
       renderComponent()
-      const menuButton = await screen.findByRole('button', {name: 'Actions'})
+      const menuButton = await screen.findByRole('button', {name: `Actions for "${FAKE_FILES[0].display_name}"`})
       await user.click(menuButton)
       // can't just re-use the variable because it gets removed from DOM
       const renameButton = async () => await screen.findByRole('menuitem', {name: 'Rename'})

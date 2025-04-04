@@ -28,7 +28,7 @@ import {type File, type Folder} from '../../../interfaces/File'
 import {RenameModal} from '../RenameModal'
 import DeleteModal from './DeleteModal'
 import {downloadFile, downloadZip} from '../../../utils/downloadUtils'
-import {isFile} from '../../../utils/fileFolderUtils'
+import {getName, isFile} from '../../../utils/fileFolderUtils'
 import {externalToolEnabled} from '../../../utils/fileUtils'
 
 import {
@@ -76,7 +76,8 @@ const ActionMenuButton = ({
   row,
 }: ActionMenuButtonProps) => {
   const [modalOrTray, setModalOrTray] = useState<ActionMenuModalOrTrayId | null>(null)
-  const actionLabel = I18n.t('Actions')
+  const name = getName(row)
+  const actionLabel = I18n.t('Actions for "%{name}"', {name})
   const {contextType, fileMenuTools} = useFileManagement()
 
   const iconForTrayTool = useCallback((tool: {canvas_icon_class?: string; icon_url?: string}) => {
