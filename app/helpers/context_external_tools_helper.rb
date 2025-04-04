@@ -57,15 +57,16 @@ module ContextExternalToolsHelper
 
     link_attrs[:id] = options[:link_id] if options[:link_id]
     link_attrs[:class] = options[:link_class] if options[:link_class]
+    # When raw_output is true, we don't need to render the icon as we're just returning attributes
+    if options[:raw_output]
+      link_attrs[:title] = tool[:title]
+      return link_attrs
+    end
+
+    # Only render the icon if we're not in raw_output mode
     if options[:show_icon]
       rendered_icon = render(partial: "external_tools/helpers/icon", locals: { tool: })
       rendered_icon = sanitize(rendered_icon.squish) if options[:remove_space_between_icon_and_text]
-    end
-
-    if options[:raw_output]
-      link_attrs[:icon] = rendered_icon if rendered_icon
-      link_attrs[:title] = tool[:title]
-      return link_attrs
     end
 
     link = content_tag(:a, link_attrs) do
