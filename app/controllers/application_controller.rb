@@ -155,6 +155,7 @@ class ApplicationController < ActionController::Base
   def page_has_instui_topnav
     return unless @domain_root_account.try(:feature_enabled?, :instui_nav)
 
+    yield if block_given?
     @instui_topnav = true
     js_env breadcrumbs: crumbs[1..]&.map { |crumb| { name: crumb[0], url: crumb[1] } }
   end

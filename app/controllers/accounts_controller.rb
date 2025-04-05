@@ -309,7 +309,6 @@ class AccountsController < ApplicationController
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
-  before_action :page_has_instui_topnav, only: %i[show users]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
@@ -463,6 +462,7 @@ class AccountsController < ApplicationController
 
     respond_to do |format|
       format.html do
+        page_has_instui_topnav { add_crumb t("Courses") }
         @redirect_on_unauth = true
         return course_user_search
       end
@@ -1810,6 +1810,7 @@ class AccountsController < ApplicationController
     get_context
     unless params.key?(:term)
       @account ||= @context
+      page_has_instui_topnav { add_crumb t("People") }
       return course_user_search
     end
     return unless authorized_action(@context, @current_user, :read_roster)
