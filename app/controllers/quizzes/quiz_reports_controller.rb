@@ -172,7 +172,7 @@ class Quizzes::QuizReportsController < ApplicationController
     end
 
     statistics.abort_csv_generation if statistics.csv_generation_failed?
-    statistics.generate_csv_in_background
+    statistics.generate_csv_in_background(@current_user)
 
     expose statistics, backward_compatible_includes
   end
