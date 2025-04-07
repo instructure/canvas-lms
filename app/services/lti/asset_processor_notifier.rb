@@ -33,7 +33,7 @@ module Lti
       return if asset_processors.empty?
 
       lti_assets = submission.attachments.map do |attachment|
-        Lti::Asset.find_or_create_by(attachment:, submission:)
+        Lti::Asset.find_or_create_by!(attachment:, submission:)
       end
       return if lti_assets.empty?
 
