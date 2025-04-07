@@ -48,7 +48,7 @@ module PandataEvents
   # since it's always available for specific dev keys
   # in UsersController#pandata_events_token
   def self.enabled?
-    !!config[:enabled_for_canvas]
+    ActiveModel::Type::Boolean.new.cast(config[:enabled_for_canvas])
   end
 
   # Send data to the PandataEvents service, partitioned by `event_type`.
