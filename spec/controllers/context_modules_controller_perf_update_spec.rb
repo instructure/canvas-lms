@@ -150,6 +150,99 @@ describe ContextModulesController do
             assert_status(404)
           end
         end
+
+        describe "pagination" do
+          let(:context_module) do
+            context_module = @course.context_modules.create!
+            30.times do |i|
+              context_module.add_item({ type: "wiki_page", id: page1.id }, nil, position: i)
+            end
+            context_module
+          end
+
+          describe "pagination header" do
+            subject do
+              super()
+              arrays = response.headers["Link"].split(",").map do |row|
+                elements = row.split("; ")
+                [elements.second.split("=")[1].slice(1..-2), elements.first.slice(1..-2)]
+              end
+              arrays.to_h
+            end
+
+            def expected_page_url(course, context_module, page_number)
+              "courses/#{course.id}/modules/#{context_module.id}/items_html?page=#{page_number}&per_page=10"
+            end
+
+            it "should return the 'current' page info in the header" do
+              subject
+
+              expect(subject["current"]).to end_with(expected_page_url(@course, context_module, 1))
+            end
+
+            it "should return the 'next' page info in the header" do
+              subject
+
+              expect(subject["next"]).to end_with(expected_page_url(@course, context_module, 2))
+            end
+
+            it "should return the 'first' page info in the header" do
+              subject
+
+              expect(subject["first"]).to end_with(expected_page_url(@course, context_module, 1))
+            end
+
+            it "should return the 'last' page info in the header" do
+              subject
+
+              expect(subject["last"]).to end_with(expected_page_url(@course, context_module, 3))
+            end
+          end
+
+          it "has the default size 10 element @items list" do
+            subject
+
+            expect(assigns(:items).length).to be(10)
+          end
+
+          context "when change the page size" do
+            subject do
+              get "items_html", params: {
+                course_id: @course.id,
+                context_module_id: context_module.id,
+                per_page: 5
+              }
+            end
+
+            it "has the 5 element @items list" do
+              subject
+
+              expect(assigns(:items).length).to be(5)
+            end
+          end
+
+          context "when turning off the pagination" do
+            subject do
+              get "items_html", params: {
+                course_id: @course.id,
+                context_module_id: context_module.id,
+                no_pagination: true
+              }
+            end
+
+            it "has the all element @items list" do
+              subject
+
+              expect(assigns(:items).length).to be(30)
+            end
+
+            it "should not return header with pagination info" do
+              subject
+
+              expect(response.headers["Link"]).to be_nil
+            end
+          end
+        end
       end
     end
 
