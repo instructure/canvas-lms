@@ -181,7 +181,7 @@ describe "submissions" do
       expect(f(".record_media_comment_link")).not_to be_displayed
 
       # submit the assignment so the "are you sure?!" message doesn't freeze up selenium
-      submit_form("#submit_media_recording_form")
+      expect_new_page_load { submit_form("#submit_media_recording_form") }
     end
 
     it "does not allow blank media submission", priority: "1" do
@@ -195,6 +195,34 @@ describe "submissions" do
       # leave so the "are you sure?!" message doesn't freeze up selenium
       f("#section-tabs .home").click
       driver.switch_to.alert.accept
+    end
+
+    it "does not break when submitting a media recording with url online entry as an option" do
+      stub_kaltura
+      # pending("failing because it is dependant on an external kaltura system")
+
+      create_assignment_and_go_to_page("online_url,media_recording")
+
+      f(".submit_assignment_link").click
+      f(".submit_media_recording_option").click
+      open_button = f(".record_media_comment_link")
+
+      open_button.click
+      sleep 1
+      close_visible_dialog
+
+      # fire the callback that the flash object fires
+      driver.execute_script("window.mediaCommentCallback([{entryId:1, entryType:1}]);")
+
+      # see if the confirmation element and submit button shows up
+      expect(f("#media_media_recording_ready")).to be_displayed
+      expect(f("#media_comment_submit_button")).to be_displayed
+
+      # confirm the record button is now hidden
+      expect(f(".record_media_comment_link")).not_to be_displayed
+
+      # submit the assignment so the "are you sure?!" message doesn't freeze up selenium
+      expect_new_page_load { submit_form("#submit_media_recording_form") }
     end
 
     it "allows you to submit a file", priority: "1" do
