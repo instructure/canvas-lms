@@ -30,7 +30,9 @@ describe ContextModulesController do
 
     context "when modules_perf enabled" do
       before do
-        @course.account.enable_feature!(:modules_perf)
+        allow_any_instance_of(ContextModulesHelper)
+          .to receive(:module_performance_improvement_is_enabled?)
+          .and_return(true)
       end
 
       it "exports proper environment variable with the flag ON" do
@@ -41,7 +43,9 @@ describe ContextModulesController do
 
     context "when modules_perf disabled" do
       before do
-        @course.account.disable_feature!(:modules_perf)
+        allow_any_instance_of(ContextModulesHelper)
+          .to receive(:module_performance_improvement_is_enabled?)
+          .and_return(false)
       end
 
       it "exports proper environment variable with the flag OFF" do

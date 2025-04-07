@@ -242,7 +242,7 @@
 
   <div class="content" id="context_module_content_<%= context_module && context_module.id %>">
     <%# This part of code is copied to items_html.html.erb as a temporary solution %>
-    <% unless module_performance_improvement_is_enabled?(@context) %>
+    <% unless module_performance_improvement_is_enabled?(@context, @current_user) %>
       <ul class="ig-list items context_module_items <%= 'manageable' if @can_view %>">
         <% if context_module && module_data[:items] %>
           <% module_data[:items].each do |item| %>
