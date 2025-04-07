@@ -650,8 +650,11 @@ describe DiscussionTopicsApiController do
     it "returns failed insight" do
       expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
 
+      student = user_factory(active_all: true)
+      @course.enroll_student(student, enrollment_state: "active")
+
       @topic.insights.create!(user: @teacher, workflow_state: "failed")
-      @topic.discussion_entries.create!(message: "message", user: @teacher)
+      @topic.discussion_entries.create!(message: "message", user: student)
 
       get "insight", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 

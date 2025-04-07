@@ -18,8 +18,13 @@
 
 describe DiscussionTopicInsight do
   before do
-    @discussion_topic = course_model.discussion_topics.create!
+    @course = course_model
+    @discussion_topic = @course.discussion_topics.create!
     @user = user_model
+    @student = user_model
+    @teacher = user_model
+    @course.enroll_student(@student, enrollment_state: "active")
+    @course.enroll_teacher(@teacher, enrollment_state: "active")
   end
 
   describe "associations" do
@@ -70,7 +75,7 @@ describe DiscussionTopicInsight do
     end
 
     it "returns true if there are unprocessed active entries" do
-      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student)
 
       expect(@insight.needs_processing?).to be true
     end
@@ -120,19 +125,22 @@ describe DiscussionTopicInsight do
 
     it "generates insight entries for unprocessed entries" do
       # active entry, that should be processed
-      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student)
 
       # deleted entry, that should not be processed
-      @discussion_topic.discussion_entries.create!(message: "message_2", user: @teacher, workflow_state: "deleted")
+      @discussion_topic.discussion_entries.create!(message: "message_2", user: @student, workflow_state: "deleted")
 
       # processed entry, that should not be processed
-      processed_entry = @discussion_topic.discussion_entries.create!(message: "message_3", user: @teacher)
+      processed_entry = @discussion_topic.discussion_entries.create!(message: "message_3", user: @student)
 
       # processed entry with a new version, that should be processed
-      processed_entry_with_new_version = @discussion_topic.discussion_entries.create!(message: "message_4", user: @teacher)
+      processed_entry_with_new_version = @discussion_topic.discussion_entries.create!(message: "message_4", user: @student)
 
       # processed entry with a different locale, that should be processed
-      processed_entry_with_different_locale = @discussion_topic.discussion_entries.create!(message: "message_5", user: @teacher)
+      processed_entry_with_different_locale = @discussion_topic.discussion_entries.create!(message: "message_5", user: @student)
+
+      # teacher entry, that should not be processed
+      @discussion_topic.discussion_entries.create!(message: "teacher message", user: @teacher)
 
       prompt_presenter = DiscussionTopic::PromptPresenter.new(@discussion_topic)
 
@@ -199,10 +207,7 @@ describe DiscussionTopicInsight do
 
       valid_llm_response = Array.new(3) do |i|
         {
-          "id" => i,
-          "compliance_status" => "compliant",
-          "relevance_score" => 8,
-          "quality_score" => 9,
+          "id" => i.to_s,
           "final_label" => "relevant",
           "feedback" => "Great response addressing core topic with clarity and depth."
         }
@@ -233,13 +238,10 @@ describe DiscussionTopicInsight do
     end
 
     it "generates new insight entries if discussion topic is updated" do
-      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student)
 
       valid_llm_response = [{
-        "id" => 0,
-        "compliance_status" => "compliant",
-        "relevance_score" => 8,
-        "quality_score" => 9,
+        "id" => "0",
         "final_label" => "relevant",
         "feedback" => "Good response."
       }].to_json
@@ -283,10 +285,10 @@ describe DiscussionTopicInsight do
       expect(@insight.workflow_state).to eq("failed")
     end
 
-    it "handles invalid JSON responses from LLM" do
-      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+    it "handles invalid JSON responses from LLM with retries" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student)
 
-      expect(@inst_llm).to receive(:chat).and_return(
+      expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
           model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: "This is not valid JSON" },
@@ -302,10 +304,10 @@ describe DiscussionTopicInsight do
       expect(@insight.reload.workflow_state).to eq("failed")
     end
 
-    it "validates that LLM response is an array" do
-      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+    it "validates that LLM response is an array with retries" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student)
 
-      expect(@inst_llm).to receive(:chat).and_return(
+      expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
           model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: "{\"not_an_array\": true}".to_json },
@@ -321,20 +323,17 @@ describe DiscussionTopicInsight do
       expect(@insight.reload.workflow_state).to eq("failed")
     end
 
-    it "validates that LLM response length matches expected length" do
-      @discussion_topic.discussion_entries.create!(message: "message 1", user: @teacher)
-      @discussion_topic.discussion_entries.create!(message: "message 2", user: @teacher)
+    it "validates that LLM response length matches expected length with retries" do
+      @discussion_topic.discussion_entries.create!(message: "message 1", user: @student)
+      @discussion_topic.discussion_entries.create!(message: "message 2", user: @student)
 
       valid_response = [{
-        "id" => 0,
-        "compliance_status" => "compliant",
-        "relevance_score" => 8,
-        "quality_score" => 9,
+        "id" => "0",
         "final_label" => "relevant",
         "feedback" => "Good response."
       }].to_json
 
-      expect(@inst_llm).to receive(:chat).and_return(
+      expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
           model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: valid_response },
@@ -350,25 +349,21 @@ describe DiscussionTopicInsight do
       expect(@insight.reload.workflow_state).to eq("failed")
     end
 
-    it "validates required fields in LLM response" do
-      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+    it "validates required fields in LLM response with retries" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student)
 
-      required_fields = %w[compliance_status relevance_score quality_score final_label feedback]
+      required_fields = %w[final_label feedback]
       required_fields.each do |missing_field|
         @insight.update!(workflow_state: "created")
-
         valid_response = [{
-          "id" => 0,
-          "compliance_status" => "compliant",
-          "relevance_score" => 8,
-          "quality_score" => 9,
+          "id" => "0",
           "final_label" => "relevant",
           "feedback" => "Good response."
         }]
 
         valid_response[0].delete(missing_field)
 
-        expect(@inst_llm).to receive(:chat).and_return(
+        expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
           InstLLM::Response::ChatResponse.new(
             model: "anthropic.claude-3-haiku-20240307-v1:0",
             message: { role: :assistant, content: valid_response.to_json },
@@ -385,53 +380,16 @@ describe DiscussionTopicInsight do
       end
     end
 
-    it "validates score fields are numeric" do
-      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
-
-      %w[relevance_score quality_score].each do |score_field|
-        @insight.update!(workflow_state: "created")
-
-        invalid_response = [{
-          "id" => 0,
-          "compliance_status" => "compliant",
-          "relevance_score" => 8,
-          "quality_score" => 9,
-          "final_label" => "relevant",
-          "feedback" => "Good response."
-        }]
-
-        invalid_response[0][score_field] = "not_a_number"
-
-        expect(@inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "anthropic.claude-3-haiku-20240307-v1:0",
-            message: { role: :assistant, content: invalid_response.to_json },
-            stop_reason: "stop_reason",
-            usage: {
-              input_tokens: 100,
-              output_tokens: 50,
-            }
-          )
-        )
-
-        expect { @insight.generate }.to raise_error(ArgumentError, /non-numeric #{score_field}/)
-        expect(@insight.reload.workflow_state).to eq("failed")
-      end
-    end
-
-    it "validates final_label has a valid value" do
-      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+    it "validates final_label has a valid value with retries" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student)
 
       invalid_response = [{
-        "id" => 0,
-        "compliance_status" => "compliant",
-        "relevance_score" => 8,
-        "quality_score" => 9,
+        "id" => "0",
         "final_label" => "invalid_label",
         "feedback" => "Good response."
       }].to_json
 
-      expect(@inst_llm).to receive(:chat).and_return(
+      expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
           model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: invalid_response },
@@ -447,19 +405,90 @@ describe DiscussionTopicInsight do
       expect(@insight.reload.workflow_state).to eq("failed")
     end
 
-    it "validates that response IDs are sequential numbers starting from 0" do
-      @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+    it "successfully retries after JSON parsing failures" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student)
 
-      invalid_response = [{
-        "id" => 5,
-        "compliance_status" => "compliant",
-        "relevance_score" => 8,
-        "quality_score" => 9,
+      invalid_json = "This is not valid JSON"
+      valid_response = [{
+        "id" => "0",
         "final_label" => "relevant",
         "feedback" => "Good response."
       }].to_json
 
-      expect(@inst_llm).to receive(:chat).and_return(
+      expect(@inst_llm).to receive(:chat).exactly(2).times.and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: invalid_json },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 50,
+          }
+        ),
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: valid_response },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 200,
+          }
+        )
+      )
+
+      @insight.generate
+
+      expect(@insight.entries.count).to eq(1)
+      expect(@insight.workflow_state).to eq("completed")
+    end
+
+    it "successfully retries after validation failures" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student)
+
+      invalid_response = {}.to_json
+      valid_response = [{
+        "id" => "0",
+        "final_label" => "relevant",
+        "feedback" => "Good response."
+      }].to_json
+
+      expect(@inst_llm).to receive(:chat).exactly(2).times.and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: invalid_response },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 50,
+          }
+        ),
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: valid_response },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 100,
+            output_tokens: 200,
+          }
+        )
+      )
+
+      @insight.generate
+
+      expect(@insight.entries.count).to eq(1)
+      expect(@insight.workflow_state).to eq("completed")
+    end
+
+    it "validates that response IDs are sequential numbers starting from 0 with retries" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student)
+
+      invalid_response = [{
+        "id" => "5",
+        "final_label" => "relevant",
+        "feedback" => "Good response."
+      }].to_json
+
+      expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
           model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: invalid_response },
@@ -475,30 +504,24 @@ describe DiscussionTopicInsight do
       expect(@insight.reload.workflow_state).to eq("failed")
     end
 
-    it "validates that multiple response IDs are sequential starting from 0" do
-      @discussion_topic.discussion_entries.create!(message: "message 1", user: @teacher)
-      @discussion_topic.discussion_entries.create!(message: "message 2", user: @teacher)
+    it "validates that multiple response IDs are sequential starting from 0 with retries" do
+      @discussion_topic.discussion_entries.create!(message: "message 1", user: @student)
+      @discussion_topic.discussion_entries.create!(message: "message 2", user: @student)
 
       wrong_sequence_response = [
         {
-          "id" => 1,
-          "compliance_status" => "compliant",
-          "relevance_score" => 8,
-          "quality_score" => 9,
+          "id" => "1",
           "final_label" => "relevant",
           "feedback" => "Good response for entry 1."
         },
         {
-          "id" => 0,
-          "compliance_status" => "compliant",
-          "relevance_score" => 7,
-          "quality_score" => 8,
+          "id" => "0",
           "final_label" => "relevant",
           "feedback" => "Good response for entry 2."
         }
       ].to_json
 
-      expect(@inst_llm).to receive(:chat).and_return(
+      expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
           model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: wrong_sequence_response },
@@ -524,7 +547,7 @@ describe DiscussionTopicInsight do
     end
 
     it "returns the latest processed entry for each discussion entry" do
-      entry = @discussion_topic.discussion_entries.create!(message: "message", user: @teacher)
+      entry = @discussion_topic.discussion_entries.create!(message: "message", user: @student)
       old_version = entry.discussion_entry_versions.first
       entry.update!(message: "message_2")
       new_version = entry.discussion_entry_versions.first
@@ -567,7 +590,7 @@ describe DiscussionTopicInsight do
     end
 
     it "returns a deleted entry if it points to this insight" do
-      entry = @discussion_topic.discussion_entries.create!(message: "message", user: @teacher, workflow_state: "deleted")
+      entry = @discussion_topic.discussion_entries.create!(message: "message", user: @student, workflow_state: "deleted")
       @insight.entries.create!(
         discussion_topic: @discussion_topic,
         discussion_entry: entry,
@@ -589,7 +612,7 @@ describe DiscussionTopicInsight do
     end
 
     it "does not return a deleted entry if it points to another insight" do
-      entry = @discussion_topic.discussion_entries.create!(message: "message", user: @teacher, workflow_state: "deleted")
+      entry = @discussion_topic.discussion_entries.create!(message: "message", user: @student, workflow_state: "deleted")
       other_insight = @discussion_topic.insights.create!(
         user: @user,
         workflow_state: "completed"
