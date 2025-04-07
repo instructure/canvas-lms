@@ -444,27 +444,83 @@ describe ContextModulesHelper do
   end
 
   describe "module_performance_improvement_is_enabled?" do
-    subject { module_performance_improvement_is_enabled?(context) }
+    subject { module_performance_improvement_is_enabled?(context, current_user) }
 
-    context "when provided context is falsey" do
+    context "when provided context and user are falsey" do
       let(:context) { nil }
+      let(:current_user) { nil }
 
       it { is_expected.to be_falsey }
     end
 
-    context "when provided context exist" do
-      let(:context) { t_course }
+    context "when provided context is falsey" do
+      let(:context) { nil }
+      let(:current_user) { double }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context "when provided current_user is falsey" do
+      let(:context) { double }
+      let(:current_user) { nil }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context "when provided context and user exist" do
+      let(:current_user) { double("current_user") }
+      let(:visible_items) { double("count_mock", count: items_count) }
+      let(:items_count) { 100 }
+      let(:context) do
+        course = course_model
+        allow(course).to receive(:module_items_visible_to).with(current_user).and_return(visible_items)
+        course
+      end
 
       context "when modules_perf FF is on" do
-        before { context.account.enable_feature!(:modules_perf) }
+        before { allow(context.account).to receive(:feature_enabled?).with(:modules_perf).and_return(true) }
 
-        it { is_expected.to be_truthy }
+        it "should call the module_items_visible_to" do
+          expect(context).to receive(:module_items_visible_to).with(current_user)
+
+          subject
+        end
+
+        it "should call the Settings.get with correct key and default value" do
+          expect(Setting).to receive(:get).with("module_perf_threshold", 100)
+
+          subject
+        end
+
+        context "when there is more than 100 modules" do
+          let(:items_count) { 101 }
+
+          it { is_expected.to be_truthy }
+        end
+
+        context "when there is less than 100 modules" do
+          let(:items_count) { 99 }
+
+          it { is_expected.to be_falsey }
+        end
+
+        context "when there are 100 modules" do
+          let(:items_count) { 100 }
+
+          it { is_expected.to be_falsey }
+        end
       end
 
       context "when modules_perf FF is off" do
-        before { context.account.disable_feature!(:modules_perf) }
+        before { allow(context.account).to receive(:feature_enabled?).with(:modules_perf).and_return(false) }
 
         it { is_expected.to be_falsey }
+
+        it "should not call the module_items_visible_to" do
+          expect(context).to_not receive(:module_items_visible_to).with(current_user)
+
+          subject
+        end
       end
     end
   end

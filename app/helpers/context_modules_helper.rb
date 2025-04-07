@@ -46,10 +46,17 @@ module ContextModulesHelper
     end
   end
 
-  def module_performance_improvement_is_enabled?(context)
+  def module_performance_improvement_is_enabled?(context, current_user)
     return false unless context
+    return false unless current_user
 
-    context.account.feature_enabled?(:modules_perf)
+    feature_flag = context.account.feature_enabled?(:modules_perf)
+    return false unless feature_flag
+
+    tags_count = GuardRail.activate(:secondary) { context.module_items_visible_to(current_user).count }
+    module_perf_threshold = Setting.get("module_perf_threshold", 100).to_i
+
+    feature_flag && (tags_count > module_perf_threshold)
   end
 
   def add_menu_tools_to_cache_key(cache_key)

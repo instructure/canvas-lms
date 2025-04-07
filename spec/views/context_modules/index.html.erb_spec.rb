@@ -239,7 +239,9 @@ describe "context_modules/index" do
 
       context "when modules_perf FF is on" do
         before do
-          @course.account.enable_feature!(:modules_perf)
+          allow_any_instance_of(ContextModulesHelper)
+            .to receive(:module_performance_improvement_is_enabled?)
+            .and_return(true)
         end
 
         it "should NOT render the module items" do
@@ -249,7 +251,9 @@ describe "context_modules/index" do
 
       context "when modules_perf FF is off" do
         before do
-          @course.account.disable_feature!(:modules_perf)
+          allow_any_instance_of(ContextModulesHelper)
+            .to receive(:module_performance_improvement_is_enabled?)
+            .and_return(false)
         end
 
         it "should render the module items" do
