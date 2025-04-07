@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getIconByType, DEFAULT_ICON, ICON_TYPES} from '../mimeClassIconHelper'
+import {getIconByType, DEFAULT_ICON, ICON_TYPES, ICON_TITLES} from '../mimeClassIconHelper'
 
 describe('GetIconByType', () => {
   Object.entries(ICON_TYPES).forEach(([type, icon]) => {
@@ -27,5 +27,18 @@ describe('GetIconByType', () => {
 
   it('returns the default icon when a mime class cannot be found', () => {
     expect(getIconByType('fakeclass')).toBe(DEFAULT_ICON)
+  })
+
+  it.each(Object.entries(ICON_TITLES))(
+    'returns the correct icon title for mime class "%s"',
+    (mimeClass, expectedTitle) => {
+      const icon = getIconByType(mimeClass)
+      expect(icon.props.title).toBe(expectedTitle)
+    },
+  )
+
+  it('returns the DEFAULT_ICON for an unknown mime class', () => {
+    const icon = getIconByType('unknown_class')
+    expect(icon.props.title).toBe(DEFAULT_ICON.props.title)
   })
 })
