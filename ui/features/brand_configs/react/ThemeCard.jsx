@@ -155,20 +155,21 @@ export default function ThemeCard(props) {
       </div>
       {props.isBeingDeleted && (
         <Modal
-          as="form"
           open={true}
           onDismiss={props.cancelDeleting}
           onSubmit={props.onDelete}
           label={I18n.t('Delete Theme?')}
         >
-          <Modal.Body>{I18n.t('Delete %{themeName}?', {themeName: props.name})}</Modal.Body>
-          <Modal.Footer>
-            <Button onClick={props.cancelDeleting}>{I18n.t('Cancel')}</Button>
-            &nbsp;
-            <Button color="primary" type="submit">
-              {I18n.t('Delete')}
-            </Button>
-          </Modal.Footer>
+          <form style={{margin: '0'}}>
+            <Modal.Body>{I18n.t('Delete %{themeName}?', {themeName: props.name})}</Modal.Body>
+            <Modal.Footer>
+              <Button onClick={props.cancelDeleting}>{I18n.t('Cancel')}</Button>
+              &nbsp;
+              <Button color="primary" type="submit">
+                {I18n.t('Delete')}
+              </Button>
+            </Modal.Footer>
+          </form>
         </Modal>
       )}
       {props.isActiveBrandConfig && (
