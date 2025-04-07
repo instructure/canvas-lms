@@ -243,4 +243,6 @@ Rails.application.config.after_initialize do
   ]
 
   Switchman.config[:region] = Canvas.region
+
+  Canvas::CrossRegionQueryMetrics.attach_to(:active_record)
 end
