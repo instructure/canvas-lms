@@ -549,7 +549,7 @@ export function openExternalTool(ev) {
 }
 
 let externalToolRoot = null
-const getExternalToolRoot = function() {
+const getExternalToolRoot = function () {
   if (!externalToolRoot) {
     externalToolRoot = createRoot($('#external-tool-mount-point')[0])
   }
