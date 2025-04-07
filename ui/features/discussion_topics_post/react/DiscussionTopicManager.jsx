@@ -34,7 +34,7 @@ import {
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
 import {useQuery} from '@apollo/client'
 import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
@@ -49,11 +49,9 @@ import useNavigateEntries from './hooks/useNavigateEntries'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import DiscussionTopicToolbarContainer from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 import StickyToolbarWrapper from './containers/StickyToolbarWrapper/StickyToolbarWrapper'
-import $ from 'jquery'
-import {
-  DiscussionTranslationModuleContainer
-} from "./containers/DiscussionTranslationModuleContainer/DiscussionTranslationModuleContainer";
-import {TranslationControls} from "./components/TranslationControls/TranslationControls";
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {DiscussionTranslationModuleContainer} from './containers/DiscussionTranslationModuleContainer/DiscussionTranslationModuleContainer'
+import {TranslationControls} from './components/TranslationControls/TranslationControls'
 import useHighlightStore from './hooks/useHighlightStore'
 import {
   KeyboardShortcuts,
@@ -62,9 +60,11 @@ import {
 } from './KeyboardShortcuts/useKeyboardShortcut'
 
 const I18n = createI18nScope('discussion_topics_post')
-const SEARCH_INPUT_SELECTOR = '#discussion-drawer-layout input[data-testid="search-filter"]';
+const SEARCH_INPUT_SELECTOR = '#discussion-drawer-layout input[data-testid="search-filter"]'
 
 const DiscussionTopicManager = props => {
+  const {setOnSuccess} = useContext(AlertManagerContext)
+
   const [searchTerm, setSearchTerm] = useState('')
   const [filter, setFilter] = useState('all')
   const [unreadBefore, setUnreadBefore] = useState('')
@@ -80,20 +80,20 @@ const DiscussionTopicManager = props => {
   const [showTranslationControl, setShowTranslationControl] = useState(false)
   // Start as null, populate when ready.
   const [translateTargetLanguage, setTranslateTargetLanguage] = useState(null)
-  const [entryTranslatingSet, setEntryTranslatingSet] = useState(new Set());
+  const [entryTranslatingSet, setEntryTranslatingSet] = useState(new Set())
   const [focusSelector, setFocusSelector] = useState('')
 
   const setEntryTranslating = useCallback((id, isTranslating) => {
-    setEntryTranslatingSet((prevSet) => {
-      const newSet = new Set(prevSet);
+    setEntryTranslatingSet(prevSet => {
+      const newSet = new Set(prevSet)
       if (isTranslating) {
-        newSet.add(id);
+        newSet.add(id)
       } else {
-        newSet.delete(id);
+        newSet.delete(id)
       }
-      return newSet;
-    });
-  }, []);
+      return newSet
+    })
+  }, [])
 
   const searchContext = {
     searchTerm,
@@ -159,7 +159,7 @@ const DiscussionTopicManager = props => {
 
   const usedThreadingToolbarChildRef = useRef(null)
 
-  const previousSearchTerm = useRef(null);
+  const previousSearchTerm = useRef(null)
 
   const [isSummaryEnabled, setIsSummaryEnabled] = useState(ENV.discussion_summary_enabled || false)
 
@@ -261,8 +261,12 @@ const DiscussionTopicManager = props => {
     skip: waitForUnreadFilter,
   })
 
-  useEventHandler(KeyboardShortcuts.ON_PREV_REPLY, () => highlightPrev(userSplitScreenPreference, isSplitScreenViewOpen))
-  useEventHandler(KeyboardShortcuts.ON_NEXT_REPLY, () => highlightNext(userSplitScreenPreference, isSplitScreenViewOpen))
+  useEventHandler(KeyboardShortcuts.ON_PREV_REPLY, () =>
+    highlightPrev(userSplitScreenPreference, isSplitScreenViewOpen),
+  )
+  useEventHandler(KeyboardShortcuts.ON_NEXT_REPLY, () =>
+    highlightNext(userSplitScreenPreference, isSplitScreenViewOpen),
+  )
 
   useEffect(() => {
     if (
@@ -289,35 +293,34 @@ const DiscussionTopicManager = props => {
     if (searchTerm && discussionTopicQuery.data) {
       const searchEntryCount = discussionTopicQuery.data.legacyNode?.searchEntryCount || 0
       setTimeout(() => {
-        const inputElement = document.querySelector(SEARCH_INPUT_SELECTOR);
+        const inputElement = document.querySelector(SEARCH_INPUT_SELECTOR)
         inputElement?.focus()
-        $.screenReaderFlashMessageExclusive(
-          I18n.t(
-            {
-              one: '1 result found for %{searchTerm}',
-              other: '%{count} results found for %{searchTerm}',
-              zero: 'No results found for %{searchTerm}',
-            },
-            {
-              count: searchEntryCount,
-              searchTerm: searchTerm,
-            },
-          ),
+        const message = I18n.t(
+          {
+            one: '1 result found for %{searchTerm}',
+            other: '%{count} results found for %{searchTerm}',
+            zero: 'No results found for %{searchTerm}',
+          },
+          {
+            count: searchEntryCount,
+            searchTerm: searchTerm,
+          },
         )
+        setOnSuccess(message, true)
       }, 500)
     }
-  }, [searchTerm, discussionTopicQuery])
+  }, [searchTerm, discussionTopicQuery, setOnSuccess])
 
   useEffect(() => {
     if (previousSearchTerm.current && !searchTerm) {
       setTimeout(() => {
-        const inputElement = document.querySelector(SEARCH_INPUT_SELECTOR);
+        const inputElement = document.querySelector(SEARCH_INPUT_SELECTOR)
         inputElement?.focus()
-        $.screenReaderFlashMessageExclusive(I18n.t("Search cleared. No filters applied."))
+        setOnSuccess(I18n.t('Search cleared. No filters applied.'), true)
       }, 600)
     }
-    previousSearchTerm.current = searchTerm;
-  }, [searchTerm]);
+    previousSearchTerm.current = searchTerm
+  }, [searchTerm, setOnSuccess])
 
   // Unread filter
   // This introduces a double query for DISCUSSION_QUERY when filter changes
@@ -393,11 +396,10 @@ const DiscussionTopicManager = props => {
         // add the new entry to the current entries in the cache
         if (currentDiscussion.legacyNode.participant.sortOrder === 'desc') {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.unshift(newDiscussionEntry)
-          addRootEntryId(newDiscussionEntry._id, "first")
-
+          addRootEntryId(newDiscussionEntry._id, 'first')
         } else {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
-          addRootEntryId(newDiscussionEntry._id, "last")
+          addRootEntryId(newDiscussionEntry._id, 'last')
         }
         cache.writeQuery({...options, data: currentDiscussion})
       }
@@ -521,7 +523,9 @@ const DiscussionTopicManager = props => {
                     {showTranslationControl && ENV.ai_translation_improvements && (
                       <DiscussionTranslationModuleContainer />
                     )}
-                    {showTranslationControl && !ENV.ai_translation_improvements && <TranslationControls />}
+                    {showTranslationControl && !ENV.ai_translation_improvements && (
+                      <TranslationControls />
+                    )}
                     <DiscussionTopicContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       expandedTopicReply={expandedTopicReply}
