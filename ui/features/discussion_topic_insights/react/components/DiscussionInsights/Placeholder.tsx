@@ -68,7 +68,7 @@ const Template = ({
     </View>
     {buttonText && (
       <View as="div">
-        <Link onClick={onClick} renderIcon={Icon || IconAiLine}>
+        <Link data-testid="placeholder-action-button" onClick={onClick} renderIcon={Icon || IconAiLine}>
           {buttonText}
         </Link>
       </View>

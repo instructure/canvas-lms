@@ -569,7 +569,7 @@ export const DiscussionTopicContainer = ({
                                   wrap="wrap"
                                   gap="small"
                                 >
-                                  <Flex.Item overflowY="unset">
+                                  <Flex.Item overflowY="visible">
                                     <span className="discussion-topic-reply-button">
                                       <Button
                                         display={responsiveProps?.replyButton?.display}
@@ -587,7 +587,7 @@ export const DiscussionTopicContainer = ({
                                     <Flex.Item
                                       shouldGrow={responsiveProps?.summaryButton?.shouldGrow}
                                       shouldShrink={responsiveProps?.summaryButton?.shouldShrink}
-                                      overflowY="unset"
+                                      overflowY="visible"
                                     >
                                         <SummarizeButton
                                           onClick={() => handleSummaryEnabled(!isSummaryEnabled)}
@@ -598,7 +598,7 @@ export const DiscussionTopicContainer = ({
                                     </Flex.Item>
                                   )}
                                   {ENV.user_can_access_insights && (
-                                    <Flex.Item overflowY="unset">
+                                    <Flex.Item overflowY="visible">
                                       <DiscussionInsightsButton
                                         isMobile={matches.includes('mobile')}
                                         onClick={() => {

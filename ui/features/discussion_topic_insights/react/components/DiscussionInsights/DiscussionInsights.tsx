@@ -184,11 +184,14 @@ const DiscussionInsights: React.FC = () => {
         onSearch={handleSearch}
         onGenerateInsights={handleGenerateInsights}
       />
-      {!loading && !!entryCount && !!filteredEntries.length && (
-        <View as="div" margin="0 0 medium 0">
-          <Text color="secondary">{searchResultsText}</Text>
-        </View>
-      )}
+      {!loading &&
+        !['created', 'in_progress'].includes(insight?.workflow_state || '') &&
+        !!entryCount &&
+        !!filteredEntries.length && (
+          <View as="div" margin="0 0 medium 0">
+            <Text color="secondary" data-testid="insight-result-counter">{searchResultsText}</Text>
+          </View>
+        )}
       {placeholderContent}
       {!loading && !placeholderContent && !filteredEntries.length && (
         <Placeholder type="no-results" />
