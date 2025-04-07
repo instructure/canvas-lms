@@ -46,8 +46,8 @@ describe('ThemeCard Component', () => {
   test('Renders the name', () => {
     const wrapper = shallow(<ThemeCard {...props} />)
     equal(
-      wrapper.find('.ic-ThemeCard-name-button').text(),
-      `Edit this theme in Theme Editor${props.name}`,
+      wrapper.find({'data-testid': 'themecard-name-button-name'}).text(),
+      props.name,
       'renders the name',
     )
   })
