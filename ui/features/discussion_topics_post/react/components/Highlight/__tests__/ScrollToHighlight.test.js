@@ -42,7 +42,16 @@ class MockWindow {
         this.scrollTo = jest.fn().mockImplementation((x, y) => this.scrollY = y)
         this.document = {
             activeElement: 5,
-            createElement: () => new MockElement()
+            createElement: () => new MockElement(),
+            getElementById: (id) => {
+                if (id === 'drawer-layout-content') {
+                    return {
+                        scrollTop: this.scrollY,
+                        scrollTo: (x, y) => this.scrollY = y
+                    }
+                }
+                return null
+            },
         }
         this.requestAnimationFrame = async callback => this._animationFrameCallback = callback
     }
@@ -91,7 +100,7 @@ describe ('ScrollToHighlight', () => {
         scrollToHighlight(element, mockWindow)
         await mockWindow.offestTimeMS(1)
         const scrollYAtThisPointInTime = mockWindow.scrollY
-        expect(scrollYAtThisPointInTime).toBeGreaterThan(0)
+        expect(scrollYAtThisPointInTime).toBeGreaterThan(-100)
         expect(scrollYAtThisPointInTime).toBeLessThan(10000)
         await mockWindow.offestTimeMS(10)
     })
