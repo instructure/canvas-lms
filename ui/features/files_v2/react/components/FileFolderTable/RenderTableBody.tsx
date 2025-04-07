@@ -20,7 +20,7 @@ import {Table} from '@instructure/ui-table'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {File, Folder} from 'features/files_v2/interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
-import {getName, getUniqueId} from '../../../utils/fileFolderUtils'
+import {getCheckboxLabel, getUniqueId} from '../../../utils/fileFolderUtils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ModalOrTrayOptions} from '../../../interfaces/FileFolderTable'
 import {columnRenderers} from './FileFolderTableUtils'
@@ -43,7 +43,7 @@ const renderTableBody = (
     const rowHead = [
       <Table.RowHeader key="select">
         <Checkbox
-          label={<ScreenReaderContent>{getName(row)}</ScreenReaderContent>}
+          label={<ScreenReaderContent>{getCheckboxLabel(row)}</ScreenReaderContent>}
           scope="row"
           size={size}
           checked={isSelected}

@@ -106,8 +106,8 @@ describe('FilesApp', () => {
     renderComponent()
     // necessary to make sure table has finished loading
     // otherwise test is false positive because button would never be rendered
-    const folderName = await screen.findAllByText(FAKE_FOLDERS[1].name)
-    expect(folderName).toHaveLength(2)
+    const folderName = await screen.findByText(FAKE_FOLDERS[1].name)
+    expect(folderName).toBeInTheDocument()
     const nextPageButton = screen.queryByRole('button', {name: '1'})
     expect(nextPageButton).not.toBeInTheDocument()
   })

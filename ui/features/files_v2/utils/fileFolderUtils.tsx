@@ -17,7 +17,11 @@
  */
 
 import {type Folder, type File} from '../interfaces/File'
-import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
+import {
+  getIconByType,
+  ICON_TITLES,
+  DEFAULT_ICON_TITLE,
+} from '@canvas/mime/react/mimeClassIconHelper'
 import React from 'react'
 import {IconFolderLockedSolid, IconFolderSolid} from '@instructure/ui-icons'
 import {SVGIconProps} from '@instructure/ui-svg-images'
@@ -63,6 +67,17 @@ export const getIcon = (
       />
     )
   }
+}
+
+export const getCheckboxLabel = (item: File | Folder): string => {
+  let type
+  if (isFile(item)) {
+    type = ICON_TITLES[item.mime_class as keyof typeof ICON_TITLES] || DEFAULT_ICON_TITLE
+  } else {
+    type = item.for_submissions ? ICON_TITLES['folder-locked'] : ICON_TITLES['folder']
+  }
+  const name = getName(item)
+  return I18n.t('%{type} %{name}', {type, name})
 }
 
 export const getName = (item: File | Folder) => {
