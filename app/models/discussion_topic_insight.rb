@@ -54,29 +54,41 @@ class DiscussionTopicInsight < ActiveRecord::Base
       content = prompt_presenter.content_for_insight(entries: batch.map(&:first))
       prompt, options = llm_config.generate_prompt_and_options(substitutions: { CONTENT: content, LOCALE: pretty_locale })
 
-      response = InstLLMHelper.client(llm_config.model_id).chat(
-        [{ role: "user", content: prompt }],
-        **options.symbolize_keys
-      )
+      max_attempts = 3
+      attempts = 0
 
-      begin
-        parsed_response = JSON.parse(response.message[:content])
-        validate_llm_response(parsed_response, batch.length)
+      while attempts < max_attempts
+        attempts += 1
+        response = InstLLMHelper.client(llm_config.model_id).chat(
+          [{ role: "user", content: prompt }],
+          **options.symbolize_keys
+        )
 
-        batch.zip(parsed_response).each do |item, ai_evaluation|
-          entry, hash = item
-          entries.create!(
-            discussion_topic:,
-            discussion_entry: entry,
-            discussion_entry_version: entry.discussion_entry_versions.first,
-            locale:,
-            dynamic_content_hash: hash,
-            ai_evaluation:
-          )
+        begin
+          parsed_response = JSON.parse(response.message[:content])
+          validate_llm_response(parsed_response, batch.length)
+
+          break
+        rescue JSON::ParserError, ArgumentError => e
+          Rails.logger.error("Attempt #{attempts}/#{max_attempts}: Failed to parse or validate LLM response: #{e.message}")
+
+          if attempts >= max_attempts
+            Rails.logger.error("Max retry attempts reached for JSON parsing/validation")
+            raise
+          end
         end
-      rescue JSON::ParserError => e
-        Rails.logger.error("Failed to parse LLM response: #{e.message}")
-        raise
+      end
+
+      batch.zip(parsed_response).each do |item, ai_evaluation|
+        entry, hash = item
+        entries.create!(
+          discussion_topic:,
+          discussion_entry: entry,
+          discussion_entry_version: entry.discussion_entry_versions.first,
+          locale:,
+          dynamic_content_hash: hash,
+          ai_evaluation:
+        )
       end
     end
 
@@ -123,27 +135,19 @@ class DiscussionTopicInsight < ActiveRecord::Base
     end
 
     response_ids = response.pluck("id")
-    expected_sequence = (0...response.length).to_a
+    expected_sequence = (0...response.length).to_a.map(&:to_s)
 
     if response_ids != expected_sequence
-      raise ArgumentError, "Response IDs [#{response_ids.join(", ")}] are not sequential numbers starting from 0"
+      raise ArgumentError, "Response ids [#{response_ids.join(", ")}] are not sequential numbers starting from 0"
     end
 
-    required_fields = %w[compliance_status relevance_score quality_score final_label feedback]
+    required_fields = %w[final_label feedback]
 
     response.each_with_index do |item, index|
       missing_fields = required_fields.select { |field| item[field].nil? }
 
       unless missing_fields.empty?
         raise ArgumentError, "Item #{index} in LLM response is missing required fields: #{missing_fields.join(", ")}"
-      end
-
-      unless item["relevance_score"].is_a?(Numeric)
-        raise ArgumentError, "Item #{index} has non-numeric relevance_score: #{item["relevance_score"]}"
-      end
-
-      unless item["quality_score"].is_a?(Numeric)
-        raise ArgumentError, "Item #{index} has non-numeric quality_score: #{item["quality_score"]}"
       end
 
       valid_labels = %w[relevant needs_review irrelevant]
@@ -158,7 +162,11 @@ class DiscussionTopicInsight < ActiveRecord::Base
   end
 
   def unprocessed_entries(should_preload: false)
-    entries = discussion_topic.root_discussion_entries
+    student_user_ids = discussion_topic.course.enrollments.active
+                                       .where(enrollments: { type: "StudentEnrollment" })
+                                       .pluck(:user_id).to_set
+
+    entries = discussion_topic.root_discussion_entries.where(user_id: student_user_ids)
     if should_preload
       entries = entries.preload(:discussion_entry_versions, :user, :attachment)
     end

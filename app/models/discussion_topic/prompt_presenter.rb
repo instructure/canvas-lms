@@ -42,7 +42,7 @@ class DiscussionTopic
     #   </entries>
     # </discussion>
     def content_for_summary
-      anonymized_user_ids = get_anonimized_user_ids(with_index: true)
+      anonymized_user_ids = get_anonymized_user_ids(with_index: true)
       entries_for_parent_id = @topic.discussion_entries.active.to_a.group_by(&:parent_id)
 
       xml = Builder::XmlMarkup.new(indent: 2)
@@ -113,14 +113,23 @@ class DiscussionTopic
       xml.target!
     end
 
-    def get_anonimized_user_ids(with_index:)
+    def get_anonymized_user_ids(with_index:)
       anonymized_user_ids = {}
       instructor_count = 0
       student_count = 0
 
-      @topic.course.enrollments.active.find_each do |enrollment|
-        user_id = enrollment.user_id
-        if @topic.course.user_is_instructor?(enrollment.user)
+      enrollments_by_user = {}
+      instructor_types = ["TeacherEnrollment", "TaEnrollment"]
+
+      @topic.course.enrollments.active.select(:user_id, :type).each do |enrollment|
+        enrollments_by_user[enrollment.user_id] ||= []
+        enrollments_by_user[enrollment.user_id] << enrollment.type
+      end
+
+      enrollments_by_user.each do |user_id, types|
+        is_instructor = types.any? { |type| instructor_types.include?(type) }
+
+        if is_instructor
           instructor_count += 1
           anonymized_user_ids[user_id] = with_index ? "instructor_#{instructor_count}" : "instructor"
         else
@@ -140,7 +149,7 @@ class DiscussionTopic
     end
 
     def contents_for_insight_entries(entries:)
-      anonymized_user_ids = get_anonimized_user_ids(with_index: false)
+      anonymized_user_ids = get_anonymized_user_ids(with_index: false)
 
       entries.map.with_index do |entry, index|
         anonymized_user_ids[entry.user_id]
