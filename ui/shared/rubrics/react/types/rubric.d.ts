@@ -50,6 +50,7 @@ export type RubricCriterion = {
   ratings: RubricRating[]
   learningOutcomeId?: string
   outcome?: RubricOutcome
+  isGenerated?: boolean // frontend only, for tracking LLM generated criteria
 }
 
 export type RubricRating = {

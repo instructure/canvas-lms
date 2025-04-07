@@ -19,8 +19,8 @@
 import {gql} from '@apollo/client'
 import qs from 'qs'
 import {executeQuery} from '@canvas/query/graphql'
-import type {RubricFormProps} from '../types/RubricForm'
-import type {Rubric, RubricAssociation} from '@canvas/rubrics/react/types/rubric'
+import type {RubricFormProps, GenerateCriteriaFormProps} from '../types/RubricForm'
+import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {
   mapRubricAssociationUnderscoredKeysToCamelCase,
   mapRubricUnderscoredKeysToCamelCase,
@@ -128,7 +128,6 @@ export const saveRubric = async (
     freeFormCriterionComments,
     accountId,
     courseId,
-    criteriaViaLlm,
     ratingOrder,
     buttonDisplay,
     workflowState,
@@ -148,29 +147,27 @@ export const saveRubric = async (
   }
   const method = id ? 'PATCH' : 'POST'
 
-  const criteria = criteriaViaLlm
-    ? undefined
-    : rubric.criteria.map(criterion => {
-        return {
-          id: criterion.id,
-          description: criterion.description,
-          long_description: criterion.longDescription,
-          points: criterion.points,
-          outcome: {
-            display_name: criterion.outcome?.displayName,
-            title: criterion.outcome?.title,
-          },
-          learning_outcome_id: criterion.learningOutcomeId,
-          ignore_for_scoring: criterion.ignoreForScoring,
-          criterion_use_range: criterion.criterionUseRange,
-          ratings: criterion.ratings.map(rating => ({
-            description: rating.description,
-            long_description: rating.longDescription,
-            points: rating.points,
-            id: rating.id,
-          })),
-        }
-      })
+  const criteria = rubric.criteria.map(criterion => {
+    return {
+      id: criterion.id,
+      description: criterion.description,
+      long_description: criterion.longDescription,
+      points: criterion.points,
+      outcome: {
+        display_name: criterion.outcome?.displayName,
+        title: criterion.outcome?.title,
+      },
+      learning_outcome_id: criterion.learningOutcomeId,
+      ignore_for_scoring: criterion.ignoreForScoring,
+      criterion_use_range: criterion.criterionUseRange,
+      ratings: criterion.ratings.map(rating => ({
+        description: rating.description,
+        long_description: rating.longDescription,
+        points: rating.points,
+        id: rating.id,
+      })),
+    }
+  })
 
   const response = await fetch(url, {
     method,
@@ -185,7 +182,6 @@ export const saveRubric = async (
         hide_points: hidePoints,
         free_form_criterion_comments: freeFormCriterionComments ? 1 : 0,
         criteria,
-        criteria_via_llm: criteriaViaLlm,
         button_display: buttonDisplay,
         rating_order: ratingOrder,
         workflow_state: workflowState,
@@ -221,5 +217,57 @@ export const saveRubric = async (
       association_count: savedRubric.association_count,
     },
     rubricAssociation: mapRubricAssociationUnderscoredKeysToCamelCase(rubric_association),
+  }
+}
+
+export type GenerateCriteriaResponse = {
+  rubric: {
+    criteria: RubricCriterion[]
+  }
+}
+export const generateCriteria = async (
+  courseId: string,
+  assignmentId: string,
+  generateCriteriaProps: GenerateCriteriaFormProps,
+): Promise<GenerateCriteriaResponse> => {
+  const url = `/courses/${courseId}/rubrics/llm_criteria`
+  const method = 'POST'
+
+  const response = await fetch(url, {
+    method,
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    },
+    body: qs.stringify({
+      _method: method,
+      rubric_association: {
+        association_id: assignmentId,
+        association_type: 'Assignment',
+      },
+      generate_options: {
+        criteria_count: generateCriteriaProps.criteriaCount,
+        rating_count: generateCriteriaProps.ratingCount,
+        points_per_criterion: generateCriteriaProps.pointsPerCriterion,
+      },
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to generate criteria: ${response.statusText}`)
+  }
+
+  const {rubric: generatedRubric, error} = await response.json()
+
+  if (error) {
+    throw new Error(`Failed to generate criteria`)
+  }
+
+  const transformed = mapRubricUnderscoredKeysToCamelCase(generatedRubric)
+
+  return {
+    rubric: {
+      criteria: transformed.criteria ?? [],
+    },
   }
 }
