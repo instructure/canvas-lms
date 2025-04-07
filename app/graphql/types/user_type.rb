@@ -166,6 +166,10 @@ module Types
                [String],
                "The fields to order the results by",
                required: false
+      argument :sort,
+               EnrollmentsSortInputType,
+               "The sort field and direction for the results. Secondary sort is by section name",
+               required: false
     end
 
     field :login_id, String, null: true
@@ -186,14 +190,15 @@ module Types
       pseudonym.unique_id
     end
 
-    def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil)
+    def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {})
       course_ids = [course_id].compact
       Loaders::UserCourseEnrollmentLoader.for(
         course_ids:,
         order_by:,
         current_only:,
         exclude_concluded:,
-        horizon_courses:
+        horizon_courses:,
+        sort:
       ).load(object.id).then do |enrollments|
         (enrollments || []).select do |enrollment|
           object == context[:current_user] ||
@@ -584,7 +589,7 @@ end
 
 module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
-    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true, horizon_courses: nil)
+    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true, horizon_courses: nil, sort: {})
       scope = if horizon_courses
                 Enrollment.horizon
               elsif horizon_courses == false
@@ -607,6 +612,37 @@ module Loaders
       scope = scope.excluding_pending if exclude_pending_enrollments
 
       order_by.each { |o| scope = scope.order(o) }
+
+      if sort.present?
+        sort_direction = (sort[:direction] == "desc") ? "DESC" : "ASC"
+        reversed_sort_direction = (sort[:direction] == "desc") ? "ASC" : "DESC"
+
+        case sort[:field]
+        when "last_activity_at"
+          # The order for last_activity_at is intentionally reversed because last activity is
+          # a timestamp and we want the most recent activity to appear first in ascending order
+          scope = scope.joins(:course_section)
+                       .select("enrollments.*, course_sections.name as section_name")
+                       .order("last_activity_at #{reversed_sort_direction} NULLS LAST, section_name ASC")
+        when "section_name"
+          scope = scope.joins(:course_section)
+                       .select("enrollments.*, course_sections.name as section_name")
+                       .order("section_name #{sort_direction} NULLS LAST")
+        when "role"
+          # use the same role ordering as the one in lib/user_search.rb
+          scope = scope.joins(:course_section)
+                       .select("enrollments.*, course_sections.name as section_name,
+                                (CASE
+                                  WHEN type = 'TeacherEnrollment' THEN 0
+                                  WHEN type = 'TaEnrollment' THEN 1
+                                  WHEN type = 'StudentEnrollment' THEN 2
+                                  WHEN type = 'ObserverEnrollment' THEN 3
+                                  WHEN type = 'DesignerEnrollment' THEN 4
+                                  ELSE NULL
+                                END) as role")
+                       .order("role #{sort_direction} NULLS LAST, section_name ASC")
+        end
+      end
 
       super(scope, :user_id)
     end
