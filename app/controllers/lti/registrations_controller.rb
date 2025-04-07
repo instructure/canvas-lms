@@ -1100,7 +1100,7 @@ class Lti::RegistrationsController < ApplicationController
   # To install/create using Dynamic Registration, please use the
   # <a href="/doc/api/registration.html">Dynamic Registration API.</a>
   #
-  # @argument name [String] The name of the tool
+  # @argument name [String] The name of the tool. If one isn't provided, it will be inferred from the configuration's title.
   # @argument admin_nickname [String] A friendly nickname set by admins to override the tool name
   # @argument vendor [String] The vendor of the tool
   # @argument description [String] A description of the tool. Cannot exceed 2048 bytes.
@@ -1142,62 +1142,22 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @returns Lti::Registration
   def create
-    registration = Lti::Registration.transaction do
-      vendor = params[:vendor]
-      name = params[:name] || configuration_params[:title]
-      admin_nickname = params[:admin_nickname]
-      description = params[:description]
-      scopes = configuration_params[:scopes]
+    registration_params = {
+      name: configuration_params[:title],
+    }.with_indifferent_access.merge(params.permit(:vendor, :name, :admin_nickname, :description))
+    create_params = {
+      account: @context,
+      created_by: @current_user,
+      unified_tool_id: params[:unified_tool_id],
+      registration_params:,
+      configuration_params:,
+      overlay_params:,
+      binding_params: {
+        workflow_state:,
+      }
+    }
 
-      registration = Lti::Registration.create!(
-        name:,
-        admin_nickname:,
-        vendor:,
-        description:,
-        account: @context,
-        workflow_state: "active",
-        created_by: @current_user,
-        updated_by: @current_user
-      )
-
-      if overlay_params.present?
-        overlay = Lti::Overlay.create!(
-          registration:,
-          account: @context,
-          updated_by: @current_user,
-          data: overlay_params
-        )
-        scopes = overlay.apply_to(configuration_params)[:scopes]
-      end
-
-      dk = DeveloperKey.create!(
-        account: @context.site_admin? ? nil : @context,
-        icon_url: configuration_params.dig(:launch_settings, :icon_url),
-        name:,
-        public_jwk: configuration_params[:public_jwk],
-        public_jwk_url: configuration_params[:public_jwk_url],
-        redirect_uris: configuration_params[:redirect_uris] || [configuration_params[:target_link_uri]],
-        visible: !@context.site_admin?,
-        scopes:,
-        lti_registration: registration,
-        workflow_state: "active",
-        is_lti_key: true
-      )
-
-      Lti::ToolConfiguration.create!(
-        developer_key: dk,
-        lti_registration: registration,
-        unified_tool_id: params[:unified_tool_id],
-        **configuration_params
-      )
-
-      Lti::AccountBindingService.call(account: @context,
-                                      registration:,
-                                      user: @current_user,
-                                      overwrite_created_by: true,
-                                      workflow_state: workflow_state || :off)
-      registration
-    end
+    registration = Lti::CreateRegistrationService.call(**create_params)
 
     render status: :created, json: lti_registration_json(registration,
                                                          @current_user,
@@ -1423,7 +1383,7 @@ class Lti::RegistrationsController < ApplicationController
       @configuration_params = Schemas::InternalLtiConfiguration.from_lti_configuration(@configuration_params)
     end
 
-    @configuration_params = @configuration_params&.slice(*Schemas::InternalLtiConfiguration.schema[:properties].keys)
+    @configuration_params = @configuration_params&.slice(*Schemas::InternalLtiConfiguration.allowed_base_properties)
 
     @configuration_params
   end

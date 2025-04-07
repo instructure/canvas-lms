@@ -142,11 +142,12 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         end
       end
 
-      it 'sets the "disabled_placements"' do
+      it "disables placements" do
         subject
-        expect(config_from_response.disabled_placements).to match_array(
-          params.dig(:tool_configuration, :disabled_placements)
-        )
+        config = config_from_response.lti_registration.internal_lti_configuration(context: account)
+        params.dig(:tool_configuration, :disabled_placements).each do |placement|
+          expect(config[:placements].find { |p| p[:placement] == placement }[:enabled]).to be false
+        end
       end
 
       it 'sets the "custom_fields"' do
@@ -439,6 +440,34 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         allow_any_instance_of(Lti::RegistrationAccountBinding).to receive(:save!).and_raise(ActiveRecord::RecordInvalid)
         expect { subject }.not_to change { Lti::ToolConfiguration.count }
       end
+
+      context "with no scopes provided" do
+        before do
+          params.dig(:tool_configuration, :settings)[:scopes] = nil
+          dev_key_params[:scopes] = nil
+        end
+
+        it "defaults scopes to an empty array" do
+          expect(subject).to be_successful
+
+          expect(config_from_response.developer_key.scopes).to eql([])
+          expect(config_from_response.scopes).to eql([])
+        end
+      end
+
+      context "with an attempt at mass assignment" do
+        let(:params) do
+          p = super()
+          p.dig(:tool_configuration, :settings, :extensions, 0)[:updated_at] = updated_at
+          p
+        end
+        let(:updated_at) { 1.hour.from_now }
+
+        it "filters out the parameter" do
+          subject
+          expect(Lti::ToolConfiguration.last.updated_at).not_to be_within(1.minute).of(updated_at)
+        end
+      end
     end
 
     it_behaves_like "an endpoint that accepts a settings_url" do
@@ -455,11 +484,26 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       let(:bad_scope_request) { post :create, params: params.merge(bad_scope_params) }
     end
 
-    context "without a redirect_uri present" do
+    context "with manual_custom_fields present" do
+      let(:params) do
+        p = super()
+        p[:tool_configuration][:custom_fields] = "unique_key=unique_value\nneato=mydude"
+        p
+      end
+
+      it "merges them with the custom fields on the tool configuration" do
+        expect(subject).to be_ok
+        expect(config_from_response.internal_lti_configuration[:custom_fields])
+          .to include({ "unique_key" => "unique_value", "neato" => "mydude" })
+      end
+    end
+
+    context "without redirect_uris present" do
       let(:dev_key_params) { super().merge(redirect_uris: nil) }
 
-      it "returns a 400" do
-        expect(post(:create, params:)).to have_http_status :bad_request
+      it "infers the redirect_uris from the settings" do
+        expect(post(:create, params:)).to be_ok
+        expect(config_from_response.developer_key.redirect_uris).to eq(config_from_response.redirect_uris)
       end
     end
   end

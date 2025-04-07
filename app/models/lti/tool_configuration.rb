@@ -34,52 +34,6 @@ module Lti
     validate :validate_placements
     validate :validate_oidc_initiation_urls
 
-    def self.create_tool_config_and_key!(account, tool_configuration_params, redirect_uris = nil)
-      settings = if tool_configuration_params[:settings_url].present? && tool_configuration_params[:settings].blank?
-                   retrieve_and_extract_configuration(tool_configuration_params[:settings_url])
-                 elsif tool_configuration_params[:settings].present?
-                   tool_configuration_params[:settings]&.try(:to_unsafe_hash) || tool_configuration_params[:settings]
-                 end
-
-      default_redirect_uris = [settings[:target_link_uri]]
-      redirect_uris = redirect_uris.presence || default_redirect_uris
-
-      raise_error(:configuration, "Configuration must be present") if settings.blank?
-      transaction do
-        dk = DeveloperKey.create!(
-          account: (account.site_admin? ? nil : account),
-          is_lti_key: true,
-          public_jwk_url: settings[:public_jwk_url],
-          public_jwk: settings[:public_jwk],
-          redirect_uris:,
-          scopes: settings[:scopes] || []
-        )
-
-        manual_custom_fields = ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
-        internal_config = Schemas::InternalLtiConfiguration.from_lti_configuration(settings)
-        create!(
-          developer_key: dk,
-          lti_registration: dk.lti_registration,
-          disabled_placements: tool_configuration_params[:disabled_placements],
-          privacy_level: tool_configuration_params[:privacy_level] || internal_config[:privacy_level],
-          title: internal_config[:title],
-          description: internal_config[:description],
-          domain: internal_config[:domain],
-          tool_id: internal_config[:tool_id],
-          target_link_uri: internal_config[:target_link_uri],
-          oidc_initiation_url: internal_config[:oidc_initiation_url],
-          oidc_initiation_urls: internal_config[:oidc_initiation_urls] || {},
-          public_jwk_url: internal_config[:public_jwk_url],
-          public_jwk: internal_config[:public_jwk],
-          custom_fields: internal_config[:custom_fields]&.merge(manual_custom_fields) || {},
-          scopes: internal_config[:scopes],
-          redirect_uris:,
-          launch_settings: internal_config[:launch_settings] || {},
-          placements: internal_config[:placements] || {}
-        )
-      end
-    end
-
     # @return [String | nil] A warning message about any disallowed placements
     def verify_placements
       placements_to_verify = placements.filter_map { |p| p["placement"] if Lti::ResourcePlacement::RESTRICTED_PLACEMENTS.include? p["placement"].to_sym }
@@ -136,8 +90,6 @@ module Lti
       }
     end
 
-    private
-
     def self.retrieve_and_extract_configuration(url)
       response = CanvasHttp.get(url)
 
@@ -148,7 +100,8 @@ module Lti
     rescue Timeout::Error
       raise_error(:configuration_url, "Could not retrieve settings, the server response timed out.")
     end
-    private_class_method :retrieve_and_extract_configuration
+
+    private
 
     def self.raise_error(type, message)
       tool_config_obj = new

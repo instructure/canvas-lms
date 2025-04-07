@@ -1832,6 +1832,17 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
+    context "without a name" do
+      before do
+        params.delete(:name)
+      end
+
+      it "infers the name from the configuration" do
+        expect(subject).to be_successful
+        expect(response_json[:name]).to eql(internal_lti_configuration[:title])
+      end
+    end
+
     context "setting the unified_tool_id" do
       let(:params) do
         super().tap do |p|
