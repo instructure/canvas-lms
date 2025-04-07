@@ -348,7 +348,7 @@ describe ContextController do
     end
 
     context "profiles enabled" do
-      before do
+      before :once do
         account_admin_user
         course_with_student(active_all: true)
 
@@ -384,10 +384,13 @@ describe ContextController do
       end
 
       context "show_recent_messages_on_new_roster_user_page enabled" do
-        before do
+        before :once do
           Account.site_admin.enable_feature!(:show_recent_messages_on_new_roster_user_page)
           topic = @course.discussion_topics.create!(user: @student, message: "Discussion")
           (1..11).each { |number| topic.discussion_entries.create!(message: number, user: @student) }
+        end
+
+        before do
           user_session(@admin)
         end
 
@@ -423,11 +426,14 @@ describe ContextController do
   end
 
   describe "POST 'object_snippet'" do
-    before do
+    before :once do
       @obj = "<object data='test'></object>"
-      allow(HostUrl).to receive(:is_file_host?).and_return(true)
       @data = Base64.encode64(@obj)
       @hmac = Canvas::Security.hmac_sha1(@data)
+    end
+
+    before do
+      allow(HostUrl).to receive(:is_file_host?).and_return(true)
     end
 
     it "requires a valid HMAC" do
@@ -443,10 +449,13 @@ describe ContextController do
   end
 
   describe "GET 'prior_users" do
-    before do
-      user_session(@teacher)
+    before :once do
       create_users_in_course(@course, 21)
       @course.student_enrollments.update_all(workflow_state: "completed")
+    end
+
+    before do
+      user_session(@teacher)
     end
 
     it "paginates" do
