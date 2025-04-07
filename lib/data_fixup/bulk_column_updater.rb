@@ -38,7 +38,7 @@
 #
 module DataFixup
   class BulkColumnUpdater
-    attr_reader :model_class, :allow_nils, :allow_empty_strings
+    attr_reader :model_class, :allow_nils, :allow_empty_strings, :temp_table_name, :column_name
 
     def initialize(model_class, column_name, log_filename: nil, allow_nils: false, allow_empty_strings: false)
       raise ArgumentError, "model_class not a class" unless model_class.is_a?(Class)
@@ -62,11 +62,13 @@ module DataFixup
     #   end
     # @return [Integer] number of rows updated
     def update!(&)
-      @temp_table_name = generate_temp_table_name
-      @logger = Logger.new(@log_filename) if @log_filename
-      create_temp_table!
-      yield method(:write_to_temp_table!)
-      flush_temp_table!
+      model_class.transaction do
+        @temp_table_name = generate_temp_table_name
+        @logger = Logger.new(@log_filename) if @log_filename
+        create_temp_table!
+        yield method(:write_to_temp_table!)
+        flush_temp_table!
+      end
     rescue => e
       if @logger
         log "ERROR: #{e.inspect}"
@@ -76,17 +78,8 @@ module DataFixup
       end
     ensure
       @temp_table_name = nil
-      force_close_session_to_delete_temp_table!
       @logger&.close
       @logger = nil
-    end
-
-    def force_close_session_to_delete_temp_table!
-      model_class.connection.disconnect!
-
-      log "Disconnected from DB"
-    rescue => e
-      log "ERROR reconnecting: #{e.inspect}"
     end
 
     def log(line)
@@ -140,17 +133,20 @@ module DataFixup
     end
 
     def quoted_column_name
-      model_class.connection.quote_column_name(@column_name)
+      model_class.connection.quote_column_name(column_name)
     end
 
     def create_temp_table!
-      model_class.connection.execute(<<~SQL.squish)
-        CREATE TEMP TABLE #{quoted_temp_table_name} (
-          id #{model_class.columns_hash["id"].sql_type} PRIMARY KEY,
-          #{quoted_column_name} #{model_class.columns_hash[@column_name].sql_type}
-        )
-      SQL
-      log "Created temp table #{quoted_temp_table_name}"
+      model_class.connection.create_table(
+        "pg_temp.#{temp_table_name}",
+        temporary: true,
+        id: model_class.columns_hash["id"].sql_type,
+        options: "ON COMMIT DROP"
+      ) do |t|
+        t.column column_name, model_class.columns_hash[column_name].sql_type
+      end
+
+      log "Created temp table #{temp_table_name}"
     end
 
     def quote(*)
