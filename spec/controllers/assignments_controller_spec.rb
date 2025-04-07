@@ -1901,6 +1901,16 @@ describe AssignmentsController do
           expect(assigns[:js_env][:assigned_rubric]).to be_nil
           expect(assigns[:js_env][:rubric_association]).to be_nil
         end
+
+        it "sets assigned_rubric and rubric_association for external_tool assignments" do
+          @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+          expect(assigns[:js_env][:assigned_rubric][:id]).to eq @assignment.rubric_association.rubric_id
+          expect(assigns[:js_env][:assigned_rubric][:title]).to eq "Unnamed Course Rubric"
+          expect(assigns[:js_env][:assigned_rubric][:can_update]).to be_truthy
+          expect(assigns[:js_env][:assigned_rubric][:association_count]).to eq 1
+          expect(assigns[:js_env][:rubric_association][:id]).to eq @assignment.rubric_association.id
+        end
       end
     end
 
