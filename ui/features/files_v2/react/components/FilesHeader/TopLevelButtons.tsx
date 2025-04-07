@@ -78,7 +78,7 @@ const TopLevelButtons = ({
 
   if (size === 'small') {
     return (
-      <Flex as='div' gap='small'>
+      <Flex as='div' gap='small' direction='column'>
         {uploadButton()}
         {createFolderButton()}
         {allMyFilesButton()}

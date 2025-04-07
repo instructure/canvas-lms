@@ -30,13 +30,14 @@ export const HeaderLayout = (props: {
       justifyItems='space-between'
       direction={props.size === 'large' ? 'row' : 'column'}
       gap='small'
+      wrap="wrap"
     >
       <Flex.Item as='div'>
         <Heading level='h1'>
           {props.title}
         </Heading>
       </Flex.Item>
-      <Flex.Item as='div'>
+      <Flex.Item as='div' overflowY='visible'>
         {props.actions}
       </Flex.Item>
     </Flex>
