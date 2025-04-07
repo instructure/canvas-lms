@@ -31,6 +31,12 @@ module PostgreSQLAdapterExtensions
     @max_update_limit = DEFAULT_MAX_UPDATE_LIMIT
   end
 
+  if Rails.version >= "7.2"
+    def get_database_version # rubocop:disable Naming/AccessorMethodName -- original method name in Rails
+      with_raw_connection(materialize_transactions: false, &:server_version)
+    end
+  end
+
   def configure_connection
     super
 
