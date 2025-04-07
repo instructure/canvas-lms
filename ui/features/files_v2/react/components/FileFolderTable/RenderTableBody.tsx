@@ -21,9 +21,9 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {File, Folder} from 'features/files_v2/interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {getName, getUniqueId} from '../../../utils/fileFolderUtils'
-import {ModalOrTrayOptions} from './FileFolderTable'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-
+import {ModalOrTrayOptions} from '../../../interfaces/FileFolderTable'
+import {columnRenderers} from './FileFolderTableUtils'
 // Need to render in this manner to satisfy TypeScript and make sure headers are rendered in stacked view
 const renderTableBody = (
   rows: (File | Folder)[],
@@ -31,8 +31,6 @@ const renderTableBody = (
   selectedRows: Set<string>,
   size: 'small' | 'medium' | 'large',
   isStacked: boolean,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  columnRenderers: Record<string, Function>,
   toggleRowSelection: (id: string) => void,
   userCanEditFilesForContext: boolean,
   userCanDeleteFilesForContext: boolean,

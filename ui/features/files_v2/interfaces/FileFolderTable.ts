@@ -16,9 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {type File, type Folder} from './File'
+
 export interface ColumnHeader {
   id: string
   title: string
   textAlign: 'start' | 'center' | 'end'
   width?: string
+}
+
+export type ModalOrTrayOptions = {
+  id: 'manage-usage-rights' | 'permissions'
+  items: (File | Folder)[]
 }
