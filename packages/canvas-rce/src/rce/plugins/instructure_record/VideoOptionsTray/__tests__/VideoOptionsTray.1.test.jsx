@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 
 import VideoOptionsTray from '..'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
-
+import RCEGlobals from '../../../../../rce/RCEGlobals'
 jest.useFakeTimers()
 
 describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
@@ -150,7 +150,63 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       renderComponent()
       // I don't know why, but getByText does not find the string,
       // though I can prove it's there
-      expect(/Pixels must be at least 320/.test(tray.messageText())).toBeTruthy()
+      expect(/Pixels must be at least 320 x 186px/.test(tray.messageText())).toBeTruthy()
+    })
+
+    describe('when consolidated_media_player feature flag is enabled', () => {
+      beforeEach(() => {
+        jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({consolidated_media_player: true})
+      })
+      it('can be set to "Small"', async () => {
+        renderComponent()
+        await tray.setSize('Small')
+        expect(tray.size).toEqual('Small')
+        expect(screen.getByText(/320 x 254px/i)).toBeInTheDocument()
+      })
+
+      it('can be set to "Medium"', async () => {
+        renderComponent()
+        await tray.setSize('Medium')
+        expect(tray.size).toEqual('Medium')
+        expect(screen.getByText(/480 x 300px/i)).toBeInTheDocument()
+      })
+
+      it('can be set to "Large"', async () => {
+        renderComponent()
+        await tray.setSize('Large')
+        expect(tray.size).toEqual('Large')
+        expect(screen.getByText(/700 x 441px/i)).toBeInTheDocument()
+      })
+
+      it('can be set to "Custom"', async () => {
+        renderComponent()
+        await tray.setSize('Custom')
+        expect(tray.size).toEqual('Custom')
+      })
+
+      it('properly sets default size option', async () => {
+        props.videoOptions.videoSize = 'large'
+        renderComponent()
+        await waitFor(() => {
+          expect(tray.size).toEqual('Large')
+        })
+      })
+
+      it('requires 320px custom width', () => {
+        props.videoOptions.videoSize = 'custom'
+        props.videoOptions.appliedWidth = 319
+        props.videoOptions.appliedHeight = 254
+        renderComponent()
+        expect(/Pixels must be at least 320 x 254px/.test(tray.messageText())).toBeTruthy()
+      })
+
+      it('requires 254px custom height', () => {
+        props.videoOptions.videoSize = 'custom'
+        props.videoOptions.appliedWidth = 320
+        props.videoOptions.appliedHeight = 253
+        renderComponent()
+        expect(/Pixels must be at least 320 x 254px/.test(tray.messageText())).toBeTruthy()
+      })
     })
   })
 
