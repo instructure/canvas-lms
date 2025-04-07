@@ -17,6 +17,19 @@
  */
 
 async function scrollToHighlight(element, _window = window) {
+  const scrollableParent = (() => {
+    const drawerLayoutContent = _window.document.getElementById('drawer-layout-content')
+    if (drawerLayoutContent) {
+      return {
+        get scrollY() { return drawerLayoutContent.scrollTop },
+        scrollToY(y) { drawerLayoutContent.scrollTo(drawerLayoutContent.scrollLeft, y) },
+      }
+    }
+    return {
+      get scrollY() { return _window.scrollY },
+      scrollToY(y) { _window.scrollTo(_window.scrollX, y) },
+    }
+  })()
   const EXPIRE_AFTER_MS = 10_000
   const SCROLL_MAGNITUDE_MULTIPLIER = 2.6
   const SCROLL_MAGNITUDE_MIN = 600
@@ -44,15 +57,15 @@ async function scrollToHighlight(element, _window = window) {
       const now = _window.Date.now()
       await new Promise(resolve => _window.requestAnimationFrame(resolve))
       const deltaTimeSeconds = (_window.Date.now() - now) / 1000
-      const yDifference = element.offsetTop - _window.scrollY
+      const yDifference = element.offsetTop - SCROLL_MARGIN_TOP - scrollableParent.scrollY
       const magnitude = Math.max(
         Math.abs(yDifference) * SCROLL_MAGNITUDE_MULTIPLIER,
         SCROLL_MAGNITUDE_MIN) * deltaTimeSeconds * Math.sign(yDifference)
       const targetY = yDifference >= 0
-        ? Math.min(element.offsetTop - SCROLL_MARGIN_TOP, _window.scrollY + magnitude)
-        : Math.max(element.offsetTop - SCROLL_MARGIN_TOP, _window.scrollY + magnitude)
-      _window.scrollTo(_window.scrollX, targetY)
-      if (elementPreviousOffsetTop === element.offsetTop && targetY === _window.scrollY) {
+        ? Math.min(element.offsetTop - SCROLL_MARGIN_TOP, scrollableParent.scrollY + magnitude)
+        : Math.max(element.offsetTop - SCROLL_MARGIN_TOP, scrollableParent.scrollY + magnitude)
+      scrollableParent.scrollToY(targetY)
+      if (elementPreviousOffsetTop === element.offsetTop && targetY === scrollableParent.scrollY) {
         waitForAdditionalScrollSecondsLeft -= deltaTimeSeconds
       } else {
         elementPreviousOffsetTop = element.offsetTop
