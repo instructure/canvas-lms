@@ -168,6 +168,7 @@ ready(() => {
           emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
           enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED ?? false,
           commentLibraryEnabled: window.ENV.COMMENT_LIBRARY_FEATURE_ENABLED ?? false,
+          consolidatedMediaPlayerEnabled: window.ENV.FEATURES.consolidated_media_player ?? false,
           restrictQuantitativeDataEnabled: window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED ?? false,
           gradeByStudentEnabled: window.ENV.GRADE_BY_STUDENT_ENABLED ?? false,
           discussionCheckpointsEnabled: window.ENV.FEATURES.discussion_checkpoints ?? false,
