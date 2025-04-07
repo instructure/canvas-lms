@@ -55,8 +55,7 @@ module ContextModulesHelper
 
     tags_count = GuardRail.activate(:secondary) { context.module_items_visible_to(current_user).count }
     module_perf_threshold = Setting.get("module_perf_threshold", 100).to_i
-
-    feature_flag && (tags_count > module_perf_threshold)
+    feature_flag && (tags_count > module_perf_threshold) # && request.path.include?("/modules")
   end
 
   def add_menu_tools_to_cache_key(cache_key)

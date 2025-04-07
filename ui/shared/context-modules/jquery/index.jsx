@@ -79,6 +79,10 @@ import {addModuleElement} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {fetchModuleItems} from '../utils/fetchModuleItems'
+import {Alert} from '@instructure/ui-alerts'
+import {Flex} from '@instructure/ui-flex'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconRefreshLine} from '@instructure/ui-icons'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -220,7 +224,7 @@ window.modules = (function () {
       })
     },
 
-    updateModuleItemPositions(event, ui) {
+    updateModuleItemPositions(_event, ui) {
       const $module = ui.item.parents('.context_module')
       const moduleId = $module.attr('id').substring('context_module_'.length)
       const url = `${ENV.CONTEXT_URL_ROOT}/modules/${moduleId}/reorder`
@@ -253,7 +257,7 @@ window.modules = (function () {
           },
         ),
       )
-      $('.context_module').each(function () {
+      $('.context_module .module_header_items').each(function () {
         refreshDuplicateLinkStatus($(this))
       })
     },
@@ -575,15 +579,38 @@ window.modules = (function () {
       return $item
     },
 
-    addItemToModule2(moduleId, html) {
+    addItemsToModule2(moduleId, html, _links, error) {
       const moduleItemContainer = document.querySelector(`#context_module_content_${moduleId}`)
       if (!moduleItemContainer) return
-      moduleItemContainer.outerHTML = html
+      if (error) {
+        ReactDOM.render(
+          <Alert variant="error" data-testid="items-failed-to-load">
+            <Flex justifyItems="space-between">
+              {I18n.t('Items failed to load')}
+              <IconButton
+                data-testid="retry-items-failed-to-load"
+                screenReaderLabel={I18n.t('Retry')}
+                withBackground={false}
+                withBorder={false}
+                onClick={() => modules.lazyLoadItems([moduleId])}
+              >
+                <IconRefreshLine />
+              </IconButton>
+            </Flex>
+          </Alert>,
+          moduleItemContainer,
+        )
+      } else {
+        moduleItemContainer.innerHTML = html
+        initContextModuleItems(moduleId)
+      }
     },
 
     lazyLoadItems(moduleIds) {
-      fetchModuleItems(ENV.COURSE_ID, moduleIds, modules.addItemToModule2, 3).then(() => {
-        initContextModules()
+      fetchModuleItems(ENV.COURSE_ID, moduleIds, modules.addItemsToModule2, 3).then(() => {
+        if ($('#context_modules').hasClass('editable')) {
+          modules.loadMasterCourseData()
+        }
         return modules.updateAssignmentData()
       })
     },
@@ -915,6 +942,7 @@ const updatePublishMenuDisabledState = function (disabled) {
 }
 
 modules.updatePublishMenuDisabledState = updatePublishMenuDisabledState
+modules.relock_modules_dialog = new RelockModulesDialog()
 
 modules.initModuleManagement = async function (duplicate) {
   const moduleItems = {}
@@ -924,7 +952,7 @@ modules.initModuleManagement = async function (duplicate) {
     el: $('#content'),
     modules,
   })
-  const relock_modules_dialog = new RelockModulesDialog()
+  const relock_modules_dialog = modules.relock_modules_dialog
 
   const $context_module_unlocked_at = $('#context_module_unlock_at')
   let valCache = ''
@@ -1354,53 +1382,6 @@ modules.initModuleManagement = async function (duplicate) {
       })
   })
 
-  $('.move_module_item_link').on('click keyclick', function (event) {
-    event.preventDefault()
-
-    const currentItem = $(this).parents('.context_module_item')[0]
-    const modules = document.querySelectorAll('#context_modules .context_module')
-    const groups = Array.prototype.map.call(modules, module => {
-      const id = module.getAttribute('id').substring('context_module_'.length)
-      const title = module.querySelector('.header > .collapse_module_link > .name').textContent
-      const moduleItems = module.querySelectorAll('.context_module_item')
-      const items = Array.prototype.map.call(moduleItems, item => ({
-        id: item.getAttribute('id').substring('context_module_item_'.length),
-        title: item.querySelector('.title').textContent.trim(),
-      }))
-      return {id, title, items}
-    })
-
-    const moveTrayProps = {
-      title: I18n.t('Move Module Item'),
-      items: [
-        {
-          id: currentItem.getAttribute('id').substring('context_module_item_'.length),
-          title: currentItem.querySelector('.title').textContent.trim(),
-        },
-      ],
-      moveOptions: {
-        groupsLabel: I18n.t('Modules'),
-        groups,
-      },
-      formatSaveUrl: ({groupId}) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
-      onMoveSuccess: ({data, itemIds, groupId}) => {
-        const itemId = itemIds[0]
-        const $container = $(`#context_module_${groupId} .ui-sortable`)
-        $container.sortable('disable')
-
-        const item = document.querySelector(`#context_module_item_${itemId}`)
-        $container[0].appendChild(item)
-
-        const order = data.context_module.content_tags.map(item => item.content_tag.id)
-        reorderElements(order, $container[0], id => `#context_module_item_${id}`)
-        $container.sortable('enable').sortable('refresh')
-      },
-      focusOnExit: () => currentItem.querySelector('.al-trigger'),
-    }
-
-    renderTray(moveTrayProps, document.getElementById('not_right_side'))
-  })
-
   $('.move_module_link').on('click keyclick', function (event) {
     event.preventDefault()
 
@@ -1780,16 +1761,6 @@ modules.initModuleManagement = async function (duplicate) {
     }
   }
 
-  const parent = duplicate || $('#context_modules')
-
-  parent.find('.publish-icon').each((index, el) => {
-    const $el = $(el)
-    if ($el.data('id')) {
-      const view = initPublishButton($el)
-      overrideModel(moduleItems, relock_modules_dialog, view.model, view)
-    }
-  })
-
   if (duplicate && duplicate.length) {
     const modulePublishIcon = duplicate[0].querySelector('.module-publish-icon')
     if (modulePublishIcon) {
@@ -1937,7 +1908,7 @@ if (!ENV.FEATURE_MODULES_PERF) {
       if (window.location.hash && !window.location.hash.startsWith('#!')) {
         try {
           scrollTo($(window.location.hash))
-        } catch (error) {
+        } catch (_error) {
           // no-op
         }
       } else {
@@ -1956,6 +1927,179 @@ if (!ENV.FEATURE_MODULES_PERF) {
   })
 }
 
+// Post process lazy loaded module items ----------------------
+function initContextModuleItems(moduleId) {
+  const $module = moduleId ? $(`#context_module_${moduleId}`) : $('#context_modules')
+
+  if (ENV.IS_STUDENT) {
+    $module.find('.context_module_item .ig-row').addClass('student-view')
+  }
+
+  $module.find('.context_module_item').each((_i, $item) => {
+    modules.evaluateItemCyoe($item)
+  })
+
+  $module.find('.publish-icon').each((_index, el) => {
+    const $el = $(el)
+    if ($el.data('id')) {
+      const view = initPublishButton($el)
+      overrideModel({}, modules.relock_modules_dialog, view.model, view)
+    }
+  })
+
+  const opts = modules.sortable_module_options
+  opts.update = modules.updateModuleItemPositions
+  $module.find('.context_module_items').sortable(opts)
+  // NOTE: This takes an extraordinary amount of time, and without it
+  //       I have not seen any issues with drag-and-drop ordering
+  //       of module items
+  // $('#context_modules.ui-sortable').sortable('refresh')
+  // $('#context_modules .context_module .context_module_items.ui-sortable').each(function () {
+  //   $(this).sortable('refresh')
+  //   $(this).sortable('option', 'connectWith', '.context_module_items')
+  // })
+
+  $module.find('.move_module_item_link').on('click keyclick', function (event) {
+    event.preventDefault()
+
+    const currentItem = $(this).parents('.context_module_item')[0]
+    const modules = document.querySelectorAll('#context_modules .context_module')
+    const groups = Array.prototype.map.call(modules, module => {
+      const id = module.getAttribute('id').substring('context_module_'.length)
+      const title = module.querySelector('.header > .collapse_module_link > .name').textContent
+      const moduleItems = module.querySelectorAll('.context_module_item')
+      const items = Array.prototype.map.call(moduleItems, item => ({
+        id: item.getAttribute('id').substring('context_module_item_'.length),
+        title: item.querySelector('.title').textContent.trim(),
+      }))
+      return {id, title, items}
+    })
+
+    const moveTrayProps = {
+      title: I18n.t('Move Module Item'),
+      items: [
+        {
+          id: currentItem.getAttribute('id').substring('context_module_item_'.length),
+          title: currentItem.querySelector('.title').textContent.trim(),
+        },
+      ],
+      moveOptions: {
+        groupsLabel: I18n.t('Modules'),
+        groups,
+      },
+      formatSaveUrl: ({groupId}) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
+      onMoveSuccess: ({data, itemIds, groupId}) => {
+        const itemId = itemIds[0]
+        const $container = $(`#context_module_${groupId} .ui-sortable`)
+        $container.sortable('disable')
+
+        const item = document.querySelector(`#context_module_item_${itemId}`)
+        $container[0].appendChild(item)
+
+        const order = data.context_module.content_tags.map(item => item.content_tag.id)
+        reorderElements(order, $container[0], id => `#context_module_item_${id}`)
+        $container.sortable('enable').sortable('refresh')
+      },
+      focusOnExit: () => currentItem.querySelector('.al-trigger'),
+    }
+
+    renderTray(moveTrayProps, document.getElementById('not_right_side'))
+  })
+}
+
+// TODO: call this on the current page when getting a new page of items
+function cleanupContextModuleItems(moduleId) {
+  const $module = $(`#context_module_content_${moduleId}`)
+  $module.off('mouseover focus', '.context_module_item')
+  $('.context_module_item_hover').removeClass('context_module_item_hover')
+
+  // TODO: do we need to remove item handlers? or is it sufficient for the elements to go away
+}
+
+// I don't think this is a long-term solution. We're going to need access
+// to all the assignment's data (due due dates, availability, etc)
+function parseModuleItemElement(element) {
+  const pointsPossibleElem = element?.querySelector('.points_possible_display')
+  const points = parseFloat(pointsPossibleElem?.textContent)
+
+  return {pointsPossible: isNaN(points) ? undefined : points}
+}
+
+function handleRemoveDueDateInput(itemProps) {
+  switch (itemProps.moduleItemType) {
+    case 'discussion':
+    case 'discussion_topic':
+      if (itemProps.moduleItemHasAssignment === 'true') {
+        return false
+      } else return true
+    case 'page':
+    case 'wiki_page':
+      return true
+    default:
+      return false
+  }
+}
+
+function renderItemAssignToTray(open, returnFocusTo, itemProps) {
+  const container = document.getElementById('differentiated-modules-mount-point')
+  if (container.reactRoot) container.reactRoot.unmount()
+  container.reactRoot = createRoot(container)
+  container.reactRoot.render(
+    <ItemAssignToManager
+      open={open}
+      onClose={() => {
+        container.reactRoot.unmount()
+      }}
+      onDismiss={() => {
+        container.reactRoot.unmount()
+        returnFocusTo.focus()
+      }}
+      courseId={itemProps.courseId}
+      itemName={itemProps.moduleItemName}
+      itemType={itemProps.moduleItemType}
+      iconType={itemProps.moduleItemType}
+      itemContentId={itemProps.moduleItemContentId}
+      pointsPossible={itemProps.pointsPossible}
+      locale={ENV.LOCALE || 'en'}
+      timezone={ENV.TIMEZONE || 'UTC'}
+      removeDueDateInput={handleRemoveDueDateInput(itemProps)}
+      isCheckpointed={itemProps.moduleItemHasCheckpoint === 'true'}
+    />,
+  )
+}
+
+function renderCopyToTray(open, contentSelection, returnFocusTo) {
+  ReactDOM.render(
+    <DirectShareCourseTray
+      open={open}
+      sourceCourseId={ENV.COURSE_ID}
+      contentSelection={contentSelection}
+      onDismiss={() => {
+        renderCopyToTray(false, contentSelection, returnFocusTo)
+        returnFocusTo.focus()
+      }}
+    />,
+    document.getElementById('direct-share-mount-point'),
+  )
+}
+
+function renderSendToTray(open, contentSelection, returnFocusTo) {
+  ReactDOM.render(
+    <DirectShareUserModal
+      open={open}
+      sourceCourseId={ENV.COURSE_ID}
+      contentShare={contentSelection}
+      onDismiss={() => {
+        renderSendToTray(false, contentSelection, returnFocusTo)
+        returnFocusTo.focus()
+      }}
+    />,
+    document.getElementById('direct-share-mount-point'),
+  )
+}
+
+// --------------------------------------------------------
+
 function initContextModules() {
   $('.context_module').each(function () {
     refreshDuplicateLinkStatus($(this))
@@ -1963,18 +2107,21 @@ function initContextModules() {
 
   if (ENV.IS_STUDENT) {
     $('.context_module').addClass('student-view')
-    $('.context_module_item .ig-row').addClass('student-view')
   }
 
   if (ENV.horizon_course) {
     modules.updateEstimatedDurations()
   }
 
-  $('.external_url_link').click(function (event) {
-    Helper.externalUrlLinkClick(event, $(this))
-  })
+  // I cannot find anywhere that these classname is added to the modules dom
+  // Skipping this when lazy loading items
+  if (!ENV.FEATURE_MODULES_PERF) {
+    $('.external_url_link').click(function (event) {
+      Helper.externalUrlLinkClick(event, $(this))
+    })
 
-  renderDatetimeField($('.datetime_field'))
+    renderDatetimeField($('.datetime_field'))
+  }
 
   $(document).on('mouseover', '.context_module', function () {
     $('.context_module_hover').removeClass('context_module_hover')
@@ -1984,10 +2131,6 @@ function initContextModules() {
   $(document).on('mouseover focus', '.context_module_item', function () {
     $('.context_module_item_hover').removeClass('context_module_item_hover')
     $(this).addClass('context_module_item_hover')
-  })
-
-  $('.context_module_item').each((i, $item) => {
-    modules.evaluateItemCyoe($item)
   })
 
   if (ENV.FEATURES.instui_header) {
@@ -2156,13 +2299,12 @@ function initContextModules() {
     requestAnimationFrame(() => {
       modules.initModuleManagement()
     })
-    modules.loadMasterCourseData()
   }
 
   $('.context_module')
     .find('.expand_module_link,.collapse_module_link')
     .bind('click keyclick', toggleModuleCollapse)
-  $(document).fragmentChange((event, hash) => {
+  $(document).fragmentChange((_event, hash) => {
     if (hash === '#student_progressions') {
       $('.module_progressions_link').trigger('click')
     } else if (!hash.startsWith('#!')) {
@@ -2202,36 +2344,6 @@ function initContextModules() {
     $('.menu_tray_tool_link').click(openExternalTool)
   }
 
-  function renderCopyToTray(open, contentSelection, returnFocusTo) {
-    ReactDOM.render(
-      <DirectShareCourseTray
-        open={open}
-        sourceCourseId={ENV.COURSE_ID}
-        contentSelection={contentSelection}
-        onDismiss={() => {
-          renderCopyToTray(false, contentSelection, returnFocusTo)
-          returnFocusTo.focus()
-        }}
-      />,
-      document.getElementById('direct-share-mount-point'),
-    )
-  }
-
-  function renderSendToTray(open, contentSelection, returnFocusTo) {
-    ReactDOM.render(
-      <DirectShareUserModal
-        open={open}
-        sourceCourseId={ENV.COURSE_ID}
-        contentShare={contentSelection}
-        onDismiss={() => {
-          renderSendToTray(false, contentSelection, returnFocusTo)
-          returnFocusTo.focus()
-        }}
-      />,
-      document.getElementById('direct-share-mount-point'),
-    )
-  }
-
   function renderHeaderComponent() {
     const root = $('#context-modules-header-root')
     if (root[0]) {
@@ -2255,6 +2367,26 @@ function initContextModules() {
     renderSendToTray(true, selection, returnFocusTo)
   })
 
+  $(document).on('click', '.assign_module_link, .view_assign_link', function (event) {
+    event.preventDefault()
+    const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
+    const moduleElement = $(event.target).parents('.context_module')[0]
+    const settingsProps = parseModule(moduleElement)
+    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
+      initialTab: 'assign-to',
+    })
+  })
+
+  $(document).on('click', '.edit_module_link', function (event) {
+    event.preventDefault()
+    const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
+    const moduleElement = $(event.target).parents('.context_module')[0]
+    const settingsProps = parseModule(moduleElement)
+    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
+      initialTab: 'settings',
+    })
+  })
+
   $(document).on('click', '.module_item_copy_to', event => {
     event.preventDefault()
     const select_id = $(event.target).data('select-id')
@@ -2273,23 +2405,28 @@ function initContextModules() {
     renderSendToTray(true, selection, returnFocusTo)
   })
 
-  $(document).on('click', '.assign_module_link, .view_assign_link', function (event) {
+  $(document).on('click keyclick', '.module-item-assign-to-link', function (event) {
     event.preventDefault()
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
-    const moduleElement = $(event.target).parents('.context_module')[0]
-    const settingsProps = parseModule(moduleElement)
-    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
-      initialTab: 'assign-to',
-    })
-  })
+    const moduleItemId = event.target.getAttribute('data-item-id')
+    const moduleItemName = event.target.getAttribute('data-item-name')
+    const moduleItemType = event.target.getAttribute('data-item-type')
+    const courseId = event.target.getAttribute('data-item-context-id')
+    const moduleItemContentId = event.target.getAttribute('data-item-content-id')
+    const moduleItemHasAssignment = event.target.getAttribute('data-item-has-assignment')
+    const moduleItemHasCheckpoint = event.target.getAttribute('data-item-has-assignment-checkpoint')
 
-  $(document).on('click', '.edit_module_link', function (event) {
-    event.preventDefault()
-    const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
-    const moduleElement = $(event.target).parents('.context_module')[0]
-    const settingsProps = parseModule(moduleElement)
-    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
-      initialTab: 'settings',
+    const itemProps = parseModuleItemElement(
+      document.getElementById(`context_module_item_${moduleItemId}`),
+    )
+    renderItemAssignToTray(true, returnFocusTo, {
+      courseId,
+      moduleItemName,
+      moduleItemType,
+      moduleItemContentId,
+      moduleItemHasAssignment,
+      moduleItemHasCheckpoint,
+      ...itemProps,
     })
   })
 
@@ -2321,95 +2458,23 @@ function initContextModules() {
     })
   }
 
-  function handleRemoveDueDateInput(itemProps) {
-    switch (itemProps.moduleItemType) {
-      case 'discussion':
-      case 'discussion_topic':
-        if (itemProps.moduleItemHasAssignment === 'true') {
-          return false
-        } else return true
-      case 'page':
-      case 'wiki_page':
-        return true
-      default:
-        return false
-    }
-  }
+  initContextModuleItems()
+}
 
-  function renderItemAssignToTray(open, returnFocusTo, itemProps) {
-    const container = document.getElementById('differentiated-modules-mount-point')
-    if (container.reactRoot) container.reactRoot.unmount()
-    container.reactRoot = createRoot(container)
-    container.reactRoot.render(
-      <ItemAssignToManager
-        open={open}
-        onClose={() => {
-          container.reactRoot.unmount()
-        }}
-        onDismiss={() => {
-          container.reactRoot.unmount()
-          returnFocusTo.focus()
-        }}
-        courseId={itemProps.courseId}
-        itemName={itemProps.moduleItemName}
-        itemType={itemProps.moduleItemType}
-        iconType={itemProps.moduleItemType}
-        itemContentId={itemProps.moduleItemContentId}
-        pointsPossible={itemProps.pointsPossible}
-        locale={ENV.LOCALE || 'en'}
-        timezone={ENV.TIMEZONE || 'UTC'}
-        removeDueDateInput={handleRemoveDueDateInput(itemProps)}
-        isCheckpointed={itemProps.moduleItemHasCheckpoint === 'true'}
-      />,
-    )
-  }
-
-  // I don't think this is a long-term solution. We're going to need access
-  // to all the assignment's data (due due dates, availability, etc)
-  function parseModuleItemElement(element) {
-    const pointsPossibleElem = element?.querySelector('.points_possible_display')
-    const points = parseFloat(pointsPossibleElem?.textContent)
-
-    return {pointsPossible: isNaN(points) ? undefined : points}
-  }
-
-  $('.module-item-assign-to-link').on('click keyclick', function (event) {
-    event.preventDefault()
-    const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
-    const moduleItemId = event.target.getAttribute('data-item-id')
-    const moduleItemName = event.target.getAttribute('data-item-name')
-    const moduleItemType = event.target.getAttribute('data-item-type')
-    const courseId = event.target.getAttribute('data-item-context-id')
-    const moduleItemContentId = event.target.getAttribute('data-item-content-id')
-    const moduleItemHasAssignment = event.target.getAttribute('data-item-has-assignment')
-    const moduleItemHasCheckpoint = event.target.getAttribute('data-item-has-assignment-checkpoint')
-
-    const itemProps = parseModuleItemElement(
-      document.getElementById(`context_module_item_${moduleItemId}`),
-    )
-    renderItemAssignToTray(true, returnFocusTo, {
-      courseId,
-      moduleItemName,
-      moduleItemType,
-      moduleItemContentId,
-      moduleItemHasAssignment,
-      moduleItemHasCheckpoint,
-      ...itemProps,
+$(() => {
+  if (ENV.FEATURE_MODULES_PERF) {
+    const moduleIds = []
+    $('.context_module').each(function () {
+      const moduleId = $(this).data('moduleId')
+      if (!isNaN(parseInt(moduleId, 10))) {
+        moduleIds.push(moduleId)
+      }
     })
-  })
-}
-
-if (ENV.FEATURE_MODULES_PERF) {
-  const moduleIds = []
-  $('.context_module').each(function () {
-    const moduleId = $(this).data('moduleId')
-    if (!isNaN(parseInt(moduleId, 10))) {
-      moduleIds.push(moduleId)
-    }
-  })
-  modules.lazyLoadItems(moduleIds)
-} else {
-  $(document).ready(initContextModules)
-}
+    modules.lazyLoadItems(moduleIds)
+  } else {
+    modules.loadMasterCourseData()
+  }
+  initContextModules()
+})
 
 export default modules
