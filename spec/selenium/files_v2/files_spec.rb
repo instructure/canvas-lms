@@ -136,8 +136,8 @@ describe "files index page" do
         time_current = format_time_only(@course.attachments.first.updated_at).strip
         expect(table_item_by_name("example.pdf")).to be_displayed
         expect(get_item_content_files_table(1, 1)).to eq "PDF File\nexample.pdf"
-        expect(get_item_content_files_table(1, 2)).to eq time_current + "\n" + time_current
-        expect(get_item_content_files_table(1, 3)).to eq time_current + "\n" + time_current
+        expect(get_item_content_files_table(1, 2)).to eq time_current
+        expect(get_item_content_files_table(1, 3)).to eq time_current
         expect(get_item_content_files_table(1, 5)).to eq "194 KB"
       end
 

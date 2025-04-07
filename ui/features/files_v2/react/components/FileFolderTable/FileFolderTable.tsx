@@ -149,7 +149,7 @@ const columnRenderers: {
   }) => React.ReactNode
 } = {
   name: ({row, rows, isStacked}) => <NameLink isStacked={isStacked} item={row} collection={rows} />,
-  created_at: ({row}) => <FriendlyDatetime dateTime={row.created_at} />,
+  created_at: ({row}) => <FriendlyDatetime dateTime={row.created_at} includeScreenReaderContent={false}/>,
   updated_at: ({row, isStacked}) => (
     <UpdatedAtDate updatedAt={row.updated_at} isStacked={isStacked} />
   ),
