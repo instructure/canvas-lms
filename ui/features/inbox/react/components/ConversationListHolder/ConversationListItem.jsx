@@ -263,7 +263,7 @@ export const ConversationListItem = ({...props}) => {
                   )}
                 </Grid.Col>
               </Grid.Row>
-              <Grid.Row>
+              <Grid.Row role='button'>
                 <Grid.Col>
                   <Focusable>
                     {({focused}) => {
