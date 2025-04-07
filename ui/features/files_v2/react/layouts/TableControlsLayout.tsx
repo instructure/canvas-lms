@@ -21,13 +21,19 @@ import { Flex } from "@instructure/ui-flex"
 export const TableControlsLayout = (props: {
   breadcrumbs: React.ReactNode
   bulkActions: React.ReactNode
+  size: 'small' | 'medium' | 'large'
 }) => {
   return (
-    <Flex as='div' justifyItems='space-between'>
+    <Flex
+      as='div'
+      justifyItems='end'
+      direction={props.size === 'small' ? 'column' : 'row'}
+      wrap="wrap"
+    >
       <Flex.Item as='div' shouldGrow>
         {props.breadcrumbs}
       </Flex.Item>
-      <Flex.Item as='div'>
+      <Flex.Item as='div' overflowY='visible'>
         {props.bulkActions}
       </Flex.Item>
     </Flex>

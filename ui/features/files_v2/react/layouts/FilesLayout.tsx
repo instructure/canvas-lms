@@ -43,6 +43,7 @@ export const FilesLayout = (props: {
   const tableControls = <TableControlsLayout
     breadcrumbs={props.breadcrumbs}
     bulkActions={props.bulkActions}
+    size={props.size}
   />
   const footer = <FooterLayout
     usageBar={props.usageBar}
