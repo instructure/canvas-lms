@@ -35,7 +35,7 @@ function makeMockTool(
         message_type: "LtiDeepLinkingRequest",
         url,
         title: name,
-        selection_width: 500,
+        selection_width: 600,
         selection_height: 500
       }
     }

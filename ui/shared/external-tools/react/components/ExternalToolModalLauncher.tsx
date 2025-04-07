@@ -28,15 +28,11 @@ import {handleExternalContentMessages} from '../../messages'
 
 const I18n = createI18nScope('external_toolsModalLauncher')
 
-type Dimensions = {
-  width: number,
-  height: number,
-}
-
 type ExternalToolModalLauncherState = {
   modalLaunchStyle: {
-    border?: string,
+    border: string,
     width?: number,
+    height?: number,
   },
   beforeExternalContentAlertClass?: string,
   afterExternalContentAlertClass?: string,
@@ -78,17 +74,7 @@ export default class ExternalToolModalLauncher extends React.Component<ExternalT
   state: ExternalToolModalLauncherState = {
     beforeExternalContentAlertClass: 'screenreader-only',
     afterExternalContentAlertClass: 'screenreader-only',
-    modalLaunchStyle: {},
-  }
-
-  getDimensions = () => {
-    const dimensions = this.getLaunchDimensions()
-
-    return {
-      modalStyle: this.getModalStyle(dimensions),
-      modalBodyStyle: this.getModalBodyStyle(dimensions),
-      modalLaunchStyle: this.getModalLaunchStyle(dimensions),
-    }
+    modalLaunchStyle: {border: 'none'},
   }
 
   componentDidMount() {
@@ -149,22 +135,6 @@ export default class ExternalToolModalLauncher extends React.Component<ExternalT
     return dimensions
   }
 
-  getModalLaunchStyle = (dimensions: Dimensions) => ({
-    ...dimensions,
-    border: 'none',
-  })
-
-  getModalBodyStyle = (dimensions: Dimensions) => ({
-    ...dimensions,
-    padding: 0,
-    display: 'flex',
-    flexDirection: 'column',
-  })
-
-  getModalStyle = (dimensions: Dimensions) => ({
-    width: dimensions.width,
-  })
-
   handleAlertBlur = (event: React.FocusEvent<HTMLDivElement>) => {
     const newState: ExternalToolModalLauncherState = {
       modalLaunchStyle: {
@@ -203,9 +173,11 @@ export default class ExternalToolModalLauncher extends React.Component<ExternalT
   render() {
     const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
     const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
-    const styles = this.getDimensions()
 
-    styles.modalLaunchStyle = {...styles.modalLaunchStyle, ...this.state.modalLaunchStyle}
+    const modalLaunchStyle = {
+      ...this.getLaunchDimensions(),
+      ...this.state.modalLaunchStyle
+    }
 
     return (
       <CanvasModal
@@ -235,7 +207,7 @@ export default class ExternalToolModalLauncher extends React.Component<ExternalT
         </div>
         <ToolLaunchIframe
           src={this.getIframeSrc()}
-          style={styles.modalLaunchStyle}
+          style={modalLaunchStyle}
           title={this.props.title}
           ref={e => {
             this.iframe = e
