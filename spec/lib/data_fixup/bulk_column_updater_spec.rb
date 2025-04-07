@@ -62,7 +62,10 @@ describe DataFixup::BulkColumnUpdater do
       end
     end
 
-    it "logs to a file if given one" do
+    it "chunks in insertions of INSERT_CHUNK_SIZE and transactions of TRANSACTION_CHUNK_SIZE" do
+      stub_const("DataFixup::BulkColumnUpdater::INSERT_CHUNK_SIZE", 1)
+      stub_const("DataFixup::BulkColumnUpdater::TRANSACTION_CHUNK_SIZE", 2)
+
       log_lines = with_temp_file do |log_file|
         log_filename = log_file.path
         bcu = described_class.new(ContextExternalTool, :unified_tool_id, log_filename:)
@@ -72,10 +75,15 @@ describe DataFixup::BulkColumnUpdater do
         end
       end
 
+      expect(log_lines).not_to include(a_string_matching(/ERROR/))
+
       expect(log_lines).to include(a_string_matching(/Created temp table.*context_external_tools_/))
-      expect(log_lines).to include(a_string_matching(/Flush .*context_external_tools_.* to .*context_external_tools.*complete: 3 rows updated/))
+
       expect(log_lines).to include(a_string_matching(/Wrote 1 rows to temp table/))
-      expect(log_lines).to include(a_string_matching(/Wrote 2 rows to temp table/))
+      expect(log_lines).not_to include(a_string_matching(/Wrote 2 rows to temp table/))
+
+      expect(log_lines).not_to include(a_string_matching(/Flush .*context_external_tools_.* to .*context_external_tools.*complete: 3 rows updated/))
+      expect(log_lines).to include(a_string_matching(/Flush .*context_external_tools_.* to .*context_external_tools.*complete: 2 rows updated/))
     end
 
     it "reads from a TSV file" do
@@ -100,8 +108,7 @@ describe DataFixup::BulkColumnUpdater do
       end
 
       expect_values %w[one two three]
-      expect(log_lines).to include(a_string_matching(/Wrote 1 rows to temp table/))
-      expect(log_lines).to_not include(a_string_matching(/Wrote 2 rows to temp table/))
+      expect(log_lines).to include(a_string_matching(/Wrote 3 rows to temp table/))
     end
   end
 
@@ -191,8 +198,8 @@ describe DataFixup::BulkColumnUpdater do
     allow(ContextExternalTool.connection).to receive(:create_table).and_call_original
 
     bcu = described_class.new(ContextExternalTool, :unified_tool_id)
-    bcu.update! do
-      nil
+    bcu.update! do |add_rows|
+      add_rows.call [[tools[0].id, "one"]]
     end
 
     expect(ContextExternalTool.connection).to have_received(:create_table).with(/context_external_tools_/, temporary: true, id: an_instance_of(String), options: "ON COMMIT DROP")
