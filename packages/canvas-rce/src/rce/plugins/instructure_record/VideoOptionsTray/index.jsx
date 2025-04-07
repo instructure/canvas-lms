@@ -37,8 +37,12 @@ import {
   MIN_WIDTH_VIDEO,
   MIN_PERCENTAGE,
   videoSizes,
+  studioPlayerSizes,
   labelForImageSize,
+  scaleVideoSize,
   scaleToSize,
+  MIN_WIDTH_STUDIO_PLAYER,
+  MIN_HEIGHT_STUDIO_PLAYER,
 } from '../../instructure_image/ImageEmbedOptions'
 import Bridge from '../../../../bridge'
 import RceApiSource from '../../../../rcs/api'
@@ -47,7 +51,7 @@ import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 import {getTrayHeight} from '../../shared/trayUtils'
 import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 import {parsedStudioOptionsPropType} from '../../shared/StudioLtiSupportUtils'
-
+import RCEGlobals from '../../../../rce/RCEGlobals'
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 
 export default function VideoOptionsTray({
@@ -63,6 +67,7 @@ export default function VideoOptionsTray({
   studioOptions = null,
   forBlockEditorUse = false,
 }) {
+  const isConsolidatedMediaPlayer = RCEGlobals.getFeatures()?.consolidated_media_player
   const {naturalHeight, naturalWidth} = videoOptions
   const currentHeight = videoOptions.appliedHeight || naturalHeight
   const currentWidth = videoOptions.appliedWidth || naturalWidth
@@ -72,8 +77,12 @@ export default function VideoOptionsTray({
   const [videoHeight, setVideoHeight] = useState(currentHeight)
   const [videoWidth, setVideoWidth] = useState(currentWidth)
   const [subtitles, setSubtitles] = useState(videoOptions.tracks || [])
-  const [minWidth] = useState(MIN_WIDTH_VIDEO)
-  const [minHeight] = useState(Math.round((videoHeight / videoWidth) * MIN_WIDTH_VIDEO))
+  const [minWidth] = useState(isConsolidatedMediaPlayer ? MIN_WIDTH_STUDIO_PLAYER : MIN_WIDTH_VIDEO)
+  const [minHeight] = useState(
+    isConsolidatedMediaPlayer
+      ? MIN_HEIGHT_STUDIO_PLAYER
+      : Math.round((videoHeight / videoWidth) * MIN_WIDTH_VIDEO),
+  )
   const [minPercentage] = useState(MIN_PERCENTAGE)
   const [editLocked, setEditLocked] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -83,6 +92,7 @@ export default function VideoOptionsTray({
   const showSizeControls = (!isStudio || studioOptions.resizable) && !forBlockEditorUse
   const dimensionsState = useDimensionsState(videoOptions, {minHeight, minWidth, minPercentage})
   const api = new RceApiSource(trayProps)
+  const videoSizeOptions = isConsolidatedMediaPlayer ? studioPlayerSizes : videoSizes
 
   useEffect(() => {
     if (videoOptions.attachmentId) {
@@ -94,7 +104,7 @@ export default function VideoOptionsTray({
           )
           setLoading(false)
         })
-        .catch(error => {
+        .catch(_error => {
           setLoading(false)
         })
     }
@@ -113,13 +123,16 @@ export default function VideoOptionsTray({
     setDisplayAs(event.target.value)
   }
 
-  function handleVideoSizeChange(event, selectedOption) {
+  function handleVideoSizeChange(_event, selectedOption) {
     setVideoSize(selectedOption.value)
     if (selectedOption.value === CUSTOM) {
       setVideoHeight(currentHeight)
       setVideoWidth(currentWidth)
     } else {
-      const {height, width} = scaleToSize(selectedOption.value, naturalWidth, naturalHeight)
+      const {height, width} = isConsolidatedMediaPlayer
+        ? scaleVideoSize(selectedOption.value, naturalWidth, naturalHeight)
+        : scaleToSize(selectedOption.value, naturalWidth, naturalHeight)
+
       setVideoHeight(height)
       setVideoWidth(width)
     }
@@ -288,7 +301,7 @@ export default function VideoOptionsTray({
                               onChange={handleVideoSizeChange}
                               value={videoSize}
                             >
-                              {videoSizes.map(size => (
+                              {videoSizeOptions.map(size => (
                                 <SimpleSelect.Option
                                   id={`${id}-size-${size}`}
                                   key={size}
