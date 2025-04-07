@@ -96,8 +96,9 @@ const ActionMenuButton = ({
       <Button
         display={size == 'small' ? 'block' : 'inline-block'}
         data-testid="action-menu-button-small"
+        elementRef={elt => elt?.setAttribute('aria-label', actionLabel)}
       >
-        {actionLabel} <IconArrowOpenDownLine />
+        {I18n.t('Actions')} <IconArrowOpenDownLine />
       </Button>
     ) : (
       <IconButton
@@ -272,15 +273,14 @@ const ActionMenuButton = ({
           ]
       ).filter(({visible}) => visible !== false),
     [
-      delete_permissions,
-      has_usage_rights,
+      row,
       rename_move_permissions,
-      row.folder_id,
-      row.id,
-      row.url,
-      send_copy_permissions,
+      createSetModalOrTrayCallback,
       userCanRestrictFilesForContext,
+      has_usage_rights,
+      send_copy_permissions,
       fileMenuTools,
+      delete_permissions,
       iconForTrayTool,
     ],
   )
