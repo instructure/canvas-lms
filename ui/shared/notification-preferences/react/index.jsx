@@ -92,7 +92,16 @@ const NotificationPreferences = props => {
 
   const renderNotificationInfoAlert = () => (
     <Flex.Item>
-      <Alert transition="none" variant="info" renderCloseButtonLabel={I18n.t('Close')}>
+      <Alert
+        transition="none"
+        variant="info"
+        renderCloseButtonLabel={props.contextType === 'course'
+          ? I18n.t(
+              'Dismiss course-level notification information',
+            )
+          : I18n.t(
+              'Dismiss account-level notification information',
+            )}>
         {props.contextType === 'course'
           ? I18n.t(
               'Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level.',
@@ -120,7 +129,7 @@ const NotificationPreferences = props => {
       ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.start_time &&
       ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.end_time && (
         <Flex.Item data-testid="notification_times">
-          <Alert transition="none" variant="info" renderCloseButtonLabel={I18n.t('Close')}>
+          <Alert transition="none" variant="info" renderCloseButtonLabel={I18n.t('Dismiss notification schedule information')}>
             {globalTimeText}
           </Alert>
         </Flex.Item>
