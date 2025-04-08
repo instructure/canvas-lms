@@ -269,22 +269,23 @@ describe "assignments" do
       end
 
       it "validates file upload restrictions" do
-        _filename_txt, fullpath_txt, _data_txt, _tempfile_txt = get_file("testfile4.txt")
         _filename_zip, fullpath_zip, _data_zip, _tempfile_zip = get_file("testfile5.zip")
         @assignment.update(submission_types: "online_upload", allowed_extensions: ".txt")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f(".submit_assignment_link").click
-
-        submit_file_button = f("#submit_file_button")
         submission_input = f(".submission_attachment input")
-        ext_error = f(".bad_ext_msg")
-
-        submission_input.send_keys(fullpath_txt)
-        expect(ext_error).not_to be_displayed
-        expect(submit_file_button["disabled"]).to be_nil
         submission_input.send_keys(fullpath_zip)
-        expect(ext_error).to be_displayed
-        expect(submit_file_button).to be_disabled
+        expect(f(".submission_attachment")).to include_text("This file type is not allowed.")
+      end
+
+      it "accepts valid file upload extensions" do
+        _filename_txt, fullpath_txt, _data_txt, _tempfile_txt = get_file("testfile4.txt")
+        @assignment.update(submission_types: "online_upload", allowed_extensions: ".txt")
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        f(".submit_assignment_link").click
+        submission_input = f(".submission_attachment input")
+        submission_input.send_keys(fullpath_txt)
+        expect(f(".submission_attachment")).not_to include_text("This file type is not allowed.")
       end
     end
 

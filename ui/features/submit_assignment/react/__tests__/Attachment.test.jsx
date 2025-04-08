@@ -63,6 +63,18 @@ describe('Attachment', () => {
     expect(getByTestId('submission_file_tag_0')).toBeInTheDocument()
   })
 
+  test('removes uploaded file when clearing the input', async () => {
+    const {getByTestId, queryByTestId} = render(<Attachment {...getProps()} />)
+    const fileInput = getByTestId('file-upload-0')
+    const file = new File(['file content'], 'example.txt', { type: 'text/plain' })
+
+    fireEvent.change(fileInput, { target: { files: [file] } })
+    expect(getByTestId('submission_file_tag_0')).toBeInTheDocument()
+
+    fireEvent.change(fileInput, { target: { files: [] } })
+    expect(queryByTestId('submission_file_tag_0')).not.toBeInTheDocument()
+  })
+
   test('displays an error if an empty file is uploaded', () => {
     const {getByTestId, getByText} = render(<Attachment {...getProps()} />)
     const fileInput = getByTestId('file-upload-0')
