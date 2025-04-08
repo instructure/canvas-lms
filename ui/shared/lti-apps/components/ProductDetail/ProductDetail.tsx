@@ -385,7 +385,7 @@ const ProductDetail = (props: ProductDetailProps) => {
               )}
             </Flex>
             <ExternalLinks product={product} />
-            <LtiConfigurationDetail integrationData={relevantIntegration} />
+            <LtiConfigurationDetail badges={product.integration_badges} integrationData={relevantIntegration} />
             <Flex margin="medium 0 0 0">
               <Flex.Item margin="0 0 small 0">
                 <Heading level="h2" themeOverride={{h2FontWeight: 700}}>

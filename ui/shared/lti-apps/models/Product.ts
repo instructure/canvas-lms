@@ -26,7 +26,9 @@ export type Product = {
   description: string
   updated_at: string
   canvas_lti_configurations: Lti[]
-  badges: Badges[]
+  privacy_and_security_badges: Badges[]
+  accessibility_badges: Badges[]
+  integration_badges: Badges[]
   screenshots: string[]
   terms_of_service_url: string
   privacy_policy_url: string
@@ -72,6 +74,7 @@ export type Badges = {
   name: string
   image_url: string
   link: string
+  description: string
 }
 
 export type TagGroup = {

@@ -36,7 +36,7 @@ const canvas_lti_configurations: Lti[] = [
   },
 ]
 
-const badges: Badges[] = [{name: 'badge1', image_url: 'google.com', link: 'google.com'}]
+const badges: Badges[] = [{name: 'badge1', image_url: 'google.com', link: 'google.com', description: 'Badge 1 description'}]
 
 const tags: Tag[] = [{id: '1', name: 'tag1'}]
 
@@ -52,7 +52,9 @@ const product: Product[] = [
     updated_at: '2024-01-01',
     canvas_lti_configurations,
     integration_resources: {comments: null, resources: []},
-    badges,
+    privacy_and_security_badges: badges,
+    accessibility_badges: badges,
+    integration_badges: badges,
     screenshots: ['greatimage'],
     terms_of_service_url: 'tos.com',
     privacy_policy_url: 'privacypolicy.com',

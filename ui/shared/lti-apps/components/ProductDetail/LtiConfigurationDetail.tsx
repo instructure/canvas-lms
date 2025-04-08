@@ -17,19 +17,22 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React from 'react'
+import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
+import Badges from './Badges'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
-import type {Lti} from '../../models/Product'
+import type {Lti, Product} from '../../models/Product'
 
 const I18n = createI18nScope('lti_registrations')
 interface LtiConfigurationDetailProps {
   integrationData: Lti | undefined
+  badges: Product["integration_badges"]
 }
 
 const LtiConfigurationDetail = (props: LtiConfigurationDetailProps) => {
+  const {isMobile} = useBreakpoints()
   const description = I18n.t('Description')
   const placements = I18n.t('Placements')
   const services = I18n.t('Services')
@@ -62,7 +65,8 @@ const LtiConfigurationDetail = (props: LtiConfigurationDetailProps) => {
             </Heading>
           </Flex.Item>
         </Flex>
-        <Flex direction="column">
+        <Flex direction="column" width={isMobile ? '70%' : '90%'}>
+          <Badges badges={props.badges[0]} />
           <Flex direction="column" margin="x-small 0 0 0">
             <Flex.Item margin="0 0 0 x-small">
               <Heading level="h4" as="h3">
