@@ -20,6 +20,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {IconArrowEndLine, IconArrowStartLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('files_v2')
 
@@ -45,7 +46,9 @@ export const FilePreviewNavigationButtons = ({
             <Flex.Item>
               <IconArrowStartLine />
             </Flex.Item>
-            <Flex.Item>{I18n.t('Previous')}</Flex.Item>
+            <Flex.Item>
+              {I18n.t('Previous')} <ScreenReaderContent>{I18n.t('File')}</ScreenReaderContent>
+            </Flex.Item>
           </Flex>
         </Button>
       </Flex.Item>
@@ -57,7 +60,9 @@ export const FilePreviewNavigationButtons = ({
           data-testid="next-button"
         >
           <Flex gap="x-small">
-            <Flex.Item>{I18n.t('Next')}</Flex.Item>
+            <Flex.Item>
+              {I18n.t('Next')} <ScreenReaderContent>{I18n.t('File')}</ScreenReaderContent>
+            </Flex.Item>
             <Flex.Item>
               <IconArrowEndLine />
             </Flex.Item>
