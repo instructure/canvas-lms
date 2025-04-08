@@ -33,7 +33,7 @@ describe FeatureFlags do
   before do
     silence_undefined_feature_flag_errors
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
-    allow(InstStatsd::Statsd).to receive(:increment)
+    allow(InstStatsd::Statsd).to receive(:distributed_increment)
     allow(Feature).to receive(:definitions).and_return({
                                                          "site_admin_feature" => Feature.new(feature: "site_admin_feature", applies_to: "SiteAdmin", state: "allowed"),
                                                          "root_account_feature" => Feature.new(feature: "root_account_feature", applies_to: "RootAccount", state: "off"),
@@ -66,16 +66,16 @@ describe FeatureFlags do
 
     it "logs feature enablement" do
       t_sub_account.feature_enabled?(:course_feature)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", tags: {
-                                                                     feature: :course_feature,
-                                                                     enabled: "false"
-                                                                   }).exactly(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("feature_flag_check", tags: {
+                                                                                 feature: :course_feature,
+                                                                                 enabled: "false"
+                                                                               }).exactly(:once)
 
       t_sub_account.feature_enabled?(:account_feature)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", tags: {
-                                                                     feature: :account_feature,
-                                                                     enabled: "true"
-                                                                   }).exactly(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("feature_flag_check", tags: {
+                                                                                 feature: :account_feature,
+                                                                                 enabled: "true"
+                                                                               }).exactly(:once)
     end
   end
 

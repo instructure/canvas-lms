@@ -121,7 +121,7 @@ module LiveEvents
 
       unless pusher.push(event, partition_key)
         LiveEvents.logger.error("Error queueing job for live event: #{event.to_json}")
-        LiveEvents.statsd&.increment("#{statsd_prefix}.queue_full_errors", tags:)
+        LiveEvents.statsd&.distributed_increment("#{statsd_prefix}.queue_full_errors", tags:)
       end
     end
   end

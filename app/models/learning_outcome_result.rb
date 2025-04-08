@@ -98,7 +98,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   end
 
   def save_to_version(attempt)
-    InstStatsd::Statsd.increment("learning_outcome_result.create") if new_record?
+    InstStatsd::Statsd.distributed_increment("learning_outcome_result.create") if new_record?
     current_version = versions.current.try(:model)
     if current_version.try(:attempt) && attempt < current_version.attempt
       versions = self.versions.sort_by(&:created_at).reverse.select { |v| v.model.attempt == attempt }

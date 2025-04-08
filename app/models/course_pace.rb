@@ -199,7 +199,7 @@ class CoursePace < ActiveRecord::Base
 
               # If the assignment has already been submitted we are going to log that and continue
               if assignment.submissions.find_by(user_id:)&.submitted?
-                InstStatsd::Statsd.increment("course_pacing.submitted_assignment_date_change")
+                InstStatsd::Statsd.distributed_increment("course_pacing.submitted_assignment_date_change")
               end
 
               # If it exists let's just add the student to it and remove them from the other
@@ -401,11 +401,11 @@ class CoursePace < ActiveRecord::Base
 
   def log_pace_counts
     if course_section_id.present?
-      InstStatsd::Statsd.increment("course_pacing.section_paces.count")
+      InstStatsd::Statsd.distributed_increment("course_pacing.section_paces.count")
     elsif user_id.present?
-      InstStatsd::Statsd.increment("course_pacing.user_paces.count")
+      InstStatsd::Statsd.distributed_increment("course_pacing.user_paces.count")
     else
-      InstStatsd::Statsd.increment("course_pacing.course_paces.count")
+      InstStatsd::Statsd.distributed_increment("course_pacing.course_paces.count")
     end
   end
 
@@ -434,11 +434,11 @@ class CoursePace < ActiveRecord::Base
 
   def log_pace_deletes
     if course_section_id.present?
-      InstStatsd::Statsd.increment("course_pacing.deleted_section_pace")
+      InstStatsd::Statsd.distributed_increment("course_pacing.deleted_section_pace")
     elsif user_id.present?
-      InstStatsd::Statsd.increment("course_pacing.deleted_user_pace")
+      InstStatsd::Statsd.distributed_increment("course_pacing.deleted_user_pace")
     else
-      InstStatsd::Statsd.increment("course_pacing.deleted_course_pace")
+      InstStatsd::Statsd.distributed_increment("course_pacing.deleted_course_pace")
     end
   end
 
