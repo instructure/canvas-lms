@@ -75,7 +75,7 @@ describe "content migrations", :non_parallel do
 
   def test_search_course_field(course)
     input_canvas_select(NewContentMigrationPage.course_search_input, course.name)
-    option_text = instui_select_option(NewContentMigrationPage.course_search_input, course.id, select_by: :value).text
+    option_text = instui_select_option(NewContentMigrationPage.course_search_input, course.id, select_by: :id).text
     expect(option_text).to eq "#{course.name}\nTerm: #{course.term_name}"
   end
 
@@ -293,8 +293,8 @@ describe "content migrations", :non_parallel do
       input_canvas_select(NewContentMigrationPage.course_search_input, @copy_from.name)
       expect(NewContentMigrationPage.course_search_input_has_options?).to be true
 
-      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name, option_exists: false)
-      expect(NewContentMigrationPage.course_search_input_has_options?).to be false
+      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name)
+      expect(driver.find_elements(css: '[id="empty-option"]').any?).to be true
 
       user_logged_in(active_all: true)
       @course.enroll_teacher(@user, enrollment_state: "active")
@@ -304,8 +304,8 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name, option_exists: false)
-      expect(NewContentMigrationPage.course_search_input_has_options?).to be false
+      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name)
+      expect(driver.find_elements(css: '[id="empty-option"]').any?).to be true
     end
 
     it "includes completed courses when checked", priority: "1" do
@@ -322,8 +322,8 @@ describe "content migrations", :non_parallel do
 
       NewContentMigrationPage.include_completed_courses_checkbox.click
       wait_for_ajaximations
-      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name, option_exists: false)
-      expect(NewContentMigrationPage.course_search_input_has_options?).to be false
+      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name)
+      expect(driver.find_elements(css: '[id="empty-option"]').any?).to be true
     end
 
     it "finds courses in other accounts", priority: "1" do
@@ -371,7 +371,7 @@ describe "content migrations", :non_parallel do
         select_migration_type
         wait_for_ajaximations
 
-        search_for_option("#course-copy-select-course", @copy_from.name, @copy_from.id.to_s)
+        search_for_option(NewContentMigrationPage.course_search_input_selector, @copy_from.name, @copy_from.id.to_s, :id)
         submit
 
         run_migration
@@ -391,7 +391,7 @@ describe "content migrations", :non_parallel do
         select_migration_type
         wait_for_ajaximations
 
-        search_for_option(NewContentMigrationPage.course_search_input_selector, @copy_from.name, @copy_from.id.to_s)
+        search_for_option(NewContentMigrationPage.course_search_input_selector, @copy_from.name, @copy_from.id.to_s, :id)
         NewContentMigrationPage.specific_content_radio.click
         submit
 
@@ -418,7 +418,7 @@ describe "content migrations", :non_parallel do
         select_migration_type
         wait_for_ajaximations
 
-        search_for_option(NewContentMigrationPage.course_search_input_selector, @copy_from.name, @copy_from.id.to_s)
+        search_for_option(NewContentMigrationPage.course_search_input_selector, @copy_from.name, @copy_from.id.to_s, :id)
         NewContentMigrationPage.specific_content_radio.click
         submit
 
@@ -433,7 +433,7 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type
       wait_for_ajaximations
-      search_for_option("#course-copy-select-course", new_course.name, new_course.id.to_s)
+      search_for_option(NewContentMigrationPage.course_search_input_selector, new_course.name, new_course.id.to_s, :id)
 
       NewContentMigrationPage.date_adjust_checkbox.click
       3.times { NewContentMigrationPage.add_day_substitution_button.click }
@@ -478,7 +478,7 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type
       wait_for_ajaximations
-      search_for_option("#course-copy-select-course", new_course.name, new_course.id.to_s)
+      search_for_option(NewContentMigrationPage.course_search_input_selector, new_course.name, new_course.id.to_s, :id)
 
       NewContentMigrationPage.date_adjust_checkbox.click
       NewContentMigrationPage.all_content_radio.click
@@ -506,7 +506,7 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type
       wait_for_ajaximations
-      search_for_option(NewContentMigrationPage.course_search_input_selector, new_course.name, new_course.id.to_s)
+      search_for_option(NewContentMigrationPage.course_search_input_selector, new_course.name, new_course.id.to_s, :id)
 
       NewContentMigrationPage.date_adjust_checkbox.click
       NewContentMigrationPage.date_remove_radio.click
@@ -526,7 +526,7 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type
       wait_for_ajaximations
-      search_for_option("#course-copy-select-course", @copy_from.name, @copy_from.id.to_s)
+      search_for_option(NewContentMigrationPage.course_search_input_selector, @copy_from.name, @copy_from.id.to_s, :id)
       NewContentMigrationPage.all_content_radio.click
       submit
       run_jobs
@@ -547,7 +547,7 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type
       wait_for_ajaximations
-      search_for_option(NewContentMigrationPage.course_search_input_selector, @copy_from.name, @copy_from.id.to_s)
+      search_for_option(NewContentMigrationPage.course_search_input_selector, @copy_from.name, @copy_from.id.to_s, :id)
       NewContentMigrationPage.all_content_radio.click
       submit
       run_jobs
