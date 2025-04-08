@@ -167,6 +167,8 @@ function DiscussionTopicForm({
 
   const allSectionsOption = {id: 'all', name: 'All Sections'}
 
+  const isAlreadyAGroupDiscussion = !!currentDiscussionTopic?.groupSet?._id
+
   const isCheckpointsForbidden =
     currentDiscussionTopic?.assignment?.hasSubmittedSubmissions ||
     currentDiscussionTopic?.entryCounts?.repliesCount > 0
@@ -509,6 +511,7 @@ function DiscussionTopicForm({
     isStudent,
     published,
     isCheckpoints,
+    isAlreadyAGroupDiscussion,
   )
 
   const canGroupDiscussion = !isEditing || currentDiscussionTopic?.canGroup || false

@@ -91,8 +91,8 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       err_message = validate_possible_points_with_checkpoints(input)
       return validation_error(err_message) unless err_message.nil?
 
-      # If discussion topic has checkpoints, it cannot also be assigned to a group category
-      return validation_error(I18n.t("Group discussions cannot have checkpoints.")) if input[:group_category_id].present?
+      # checkpointed group discussions can only be created if checkpoints_group_discussions feature flag is enabled
+      return validation_error(I18n.t("Group discussions cannot have checkpoints.")) if input[:group_category_id].present? && !discussion_topic_context.checkpoints_group_discussions_enabled?
     end
 
     # TODO: On update, we load here instead of creating a new one.
