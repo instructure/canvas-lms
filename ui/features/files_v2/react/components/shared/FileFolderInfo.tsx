@@ -79,7 +79,7 @@ const FileFolderInfo = ({items}: FileFolderInfoProps) => {
   return (
     <View as="div" borderWidth="small" borderRadius="medium" padding="xxx-small">
       <Flex padding="x-small" gap="small">
-        <Flex.Item>{renderIcon()}</Flex.Item>
+        <Flex.Item aria-hidden={true}>{renderIcon()}</Flex.Item>
         <Flex.Item shouldGrow={true} shouldShrink={true}>
           {renderTitle()}
           {renderSubtitle()}
