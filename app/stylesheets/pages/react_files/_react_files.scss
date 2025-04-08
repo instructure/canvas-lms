@@ -338,7 +338,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   margin-#{direction(left)}: 5px;
 }
 
-.ef-links-col, 
+.ef-links-col,
 .ef-select-col {
   display: flex;
   flex: 2 0 63px;
@@ -390,6 +390,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 {
   tbody {
     position: relative;
+    transform: translateZ(0);
   }
   [data-upload] {
     height: 0px;
@@ -406,7 +407,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   height: 100%;
   width: 100%;
   display: none;
-  label{
+  label {
     padding: 30px;
   }
   z-index: 1000;
