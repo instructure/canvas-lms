@@ -78,9 +78,8 @@ const DiscussionInsights: React.FC = () => {
   const contextId = useInsightStore(state => state.contextId)
   const discussionId = useInsightStore(state => state.discussionId)
 
-  const setModalOpen = useInsightStore(state => state.setModalOpen)
-  const setEntry = useInsightStore(state => state.setEntry)
   const setEntries = useInsightStore(state => state.setEntries)
+  const openEvaluationModal = useInsightStore(state => state.openEvaluationModal)
 
   const {
     loading,
@@ -130,8 +129,7 @@ const DiscussionInsights: React.FC = () => {
   }
 
   const handleSeeReply = (entry: InsightEntry) => {
-    setModalOpen(true)
-    setEntry(entry)
+    openEvaluationModal(entry.id, entry.relevance_human_feedback_notes)
   }
 
   const filteredEntries = useMemo(() => {

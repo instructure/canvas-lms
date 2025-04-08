@@ -29,7 +29,7 @@ type InsightResponse = {
 export type InsightEntry = {
   id: number
   entry_content: string
-  entry_url: string
+  entry_id: number
   entry_updated_at: string
   student_id: number
   student_name: string

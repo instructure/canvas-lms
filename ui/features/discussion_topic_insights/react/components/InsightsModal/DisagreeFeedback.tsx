@@ -21,16 +21,40 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex, FlexItem} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
+import {useUpdateEntry} from '../../hooks/useUpdateEntry'
+import useInsightStore from '../../hooks/useInsightStore'
 
 const I18n = createI18nScope('discussion_insights')
 
-const DisagreeFeedback = () => {
+type DisagreeFeedbackProps = {
+  entryId: number
+}
+
+const DisagreeFeedback: React.FC<DisagreeFeedbackProps> = ({entryId}) => {
+  const feedbackNotes = useInsightStore(state => state.feedbackNotes)
+  const setFeedbackNotes = useInsightStore(state => state.setFeedbackNotes)
+  const {loading, updateEntry} = useUpdateEntry()
+
   const inputRef = useRef<HTMLInputElement | null>(null)
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus()
     }
-  }, [])
+  }, [entryId])
+
+  const handleSubmit = () => {
+    if (!feedbackNotes) {
+      return
+    }
+
+    updateEntry({
+      entryId,
+      entryFeedback: {
+        action: 'dislike',
+        notes: feedbackNotes,
+      },
+    })
+  }
 
   return (
     <Flex gap="mediumSmall" direction="column">
@@ -45,13 +69,21 @@ const DisagreeFeedback = () => {
             renderLabel={I18n.t('Explanation')}
             id="disagree-feedback"
             placeholder={I18n.t('Start typing...')}
+            value={feedbackNotes}
+            onChange={e => setFeedbackNotes(e.target.value)}
             inputRef={inputElement => {
               inputRef.current = inputElement
             }}
           />
         </Flex.Item>
         <FlexItem width={'fit-content'} align="end">
-          <Button type="submit">{I18n.t('Send Feedback')}</Button>
+          <Button
+            id="send-insights-feedback"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {I18n.t('Send Feedback')}
+          </Button>
         </FlexItem>
       </Flex>
     </Flex>

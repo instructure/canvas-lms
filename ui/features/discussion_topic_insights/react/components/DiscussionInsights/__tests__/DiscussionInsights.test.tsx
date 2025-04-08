@@ -37,9 +37,9 @@ describe('DiscussionInsights', () => {
       discussionId: 'test-discussion-id',
       setModalOpen: jest.fn(),
       genereteInsight: jest.fn(),
-      setEntry: jest.fn(),
+      setEntryId: jest.fn(),
       setEntries: jest.fn(),
-      setFeedback: jest.fn(),
+      setFeedbackNotes: jest.fn(),
     }))
   })
 
