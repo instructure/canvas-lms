@@ -137,6 +137,24 @@ describe "Differentiation Tag Management" do
           expect(f("[data-testid='tag-name-input']")).to have_value(@single_tag.name)
         end
 
+        it "updates the name of a single tag" do
+          f("button[aria-label='Edit tag set: #{@single_tag.name}']").click
+          wait_for_ajaximations
+
+          # Update the tag name in the input field
+          tag_input = f("[data-testid='tag-name-input']")
+          tag_input.send_keys("update")
+          # Submit the form
+          fj("button:contains('Save')").click
+          wait_for_ajaximations
+
+          expect(f("body")).not_to contain_jqcss("h2:contains('Edit Tag')")
+          expect(fj("span:contains('#{@single_tag.name}update')")).to be_displayed
+
+          # Verify that the Group Category and Group name is the same
+          expect(@single_tag.reload.name).to eq @single_tag.groups.first.name
+        end
+
         it "displays correct modal data when editing a multiple tag" do
           f("button[aria-label='Edit tag set: #{@multiple_tags.name}']").click
           wait_for_ajaximations
