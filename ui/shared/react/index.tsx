@@ -78,10 +78,15 @@ export function render(
   if (!(container instanceof HTMLElement)) {
     throw new Error('Container must be an HTMLElement')
   }
+
+  // Check for high contrast mode from either options, ENV variable, or URL query parameter
+  const urlParams = new URLSearchParams(window.location.search)
+  const hasHighContrastQueryParam = urlParams.get('instui_theme') === 'canvas_high_contrast'
+
   const highContrast =
     typeof options.highContrast === 'boolean'
       ? options.highContrast
-      : Boolean(ENV.use_high_contrast)
+      : Boolean(ENV.use_high_contrast || hasHighContrastQueryParam)
 
   // @ts-expect-error
   const brandVariables = options.brandVariables || window.CANVAS_ACTIVE_BRAND_VARIABLES || EMPTY_OBJ
