@@ -450,10 +450,10 @@ module CustomSeleniumActions
     end
   end
 
-  def search_for_option(select_css, option_text, option_value)
+  def search_for_option(select_css, option_text, option_value, match_by = :value)
     element = canvas_select(select_css)
     input_canvas_select(element, option_text)
-    click_INSTUI_Select_option(element, option_value, :value)
+    click_INSTUI_Select_option(element, option_value, match_by)
   end
 
   def click_option(select_css, option_text, select_by = :text)
