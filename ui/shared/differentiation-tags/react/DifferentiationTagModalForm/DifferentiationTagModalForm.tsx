@@ -101,7 +101,10 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
         mode === EDIT_MODE && differentiationTagSet?.groups
           ? computedTagMode === SINGLE_TAG
             ? differentiationTagSet.groups.slice(0, 1).map((t: any) => ({id: t.id, name: t.name}))
-            : differentiationTagSet.groups.map((t: any) => ({id: t.id, name: t.name}))
+            : differentiationTagSet.groups.map((t: any) => ({
+                id: t.id,
+                name: t.name,
+              }))
           : [{id: Date.now(), name: ''}],
       previousTags: undefined as {id: number; name: string}[] | undefined,
     }
@@ -210,6 +213,9 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
         return newErrors
       })
     }
+    if (mode === EDIT_MODE && tagMode === SINGLE_TAG) {
+      setTagSetName(value)
+    }
   }
 
   const resetForm = () => {
@@ -252,14 +258,14 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
       // Focus the first error field
       setTimeout(() => {
         if (mode === EDIT_MODE && newErrors.hasOwnProperty('tagSetName')) {
-          tagSetNameRef.current?.focus();
+          tagSetNameRef.current?.focus()
         } else {
           const firstErrorKey = Object.keys(newErrors)[0]
           if (firstErrorKey === 'tagSetName') {
-            tagSetNameRef.current?.focus();
+            tagSetNameRef.current?.focus()
           } else {
-            const tagId = parseInt(firstErrorKey, 10);
-            inputRefs.current[tagId]?.focus();
+            const tagId = parseInt(firstErrorKey, 10)
+            inputRefs.current[tagId]?.focus()
           }
         }
       }, 0)
@@ -299,13 +305,8 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
         if (differentiationTagSet?.id) {
           groupCategoryId = differentiationTagSet.id
         }
-        if (tagMode === SINGLE_TAG) {
-          // do NOT update the name
-          groupCategoryName = undefined
-        } else {
-          // MULTIPLE_TAGS -> rename with the user-provided name
-          groupCategoryName = tagSetName
-        }
+        // For both SINGLE_TAG and MULTIPLE_TAGS in edit mode, update the group category name
+        groupCategoryName = tagSetName
       }
 
       // ----------------------------------------------------------
