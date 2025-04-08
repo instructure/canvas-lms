@@ -1199,6 +1199,9 @@
     "intersection_cd4590e4": {
         "message": "交集"
     },
+    "invalid_description_991e23bb": {
+        "message": "無效的描述"
+    },
     "invalid_entry_f7d2a0f5": {
         "message": "無效的輸入項目。"
     },
@@ -1808,8 +1811,17 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "請允許 Canvas 存取您的麥克風和網路攝影機。"
     },
+    "please_choose_a_file_c2449cc": {
+        "message": "請選擇一個檔案"
+    },
     "please_decribe_what_you_would_like_to_compose_27a51be5": {
         "message": "請描述您想創作什麼。"
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "請輸入一個檔案名稱"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "請選取支援類型的檔案"
     },
     "plus_d43cd4ec": {
         "message": "+"

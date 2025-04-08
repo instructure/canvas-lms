@@ -1199,6 +1199,9 @@
     "intersection_cd4590e4": {
         "message": "प्रतिच्छेदन"
     },
+    "invalid_description_991e23bb": {
+        "message": "अमान्य विवरण"
+    },
     "invalid_entry_f7d2a0f5": {
         "message": "अमान्य प्रविष्टि।"
     },
@@ -1808,8 +1811,17 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "कृपया Canvas को अपने माइक्रोफ़ोन और वेबकैम के लिए एक्सेस की अनुमति दें।"
     },
+    "please_choose_a_file_c2449cc": {
+        "message": "कृपया कोई फ़ाइल चुनें"
+    },
     "please_decribe_what_you_would_like_to_compose_27a51be5": {
         "message": "कृपया बताएं कि आप क्या लिखना चाहेंगे।"
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "कृपया फ़ाइल नाम दर्ज करें"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "कृपया समर्थित प्रकार की फ़ाइल चुनें"
     },
     "plus_d43cd4ec": {
         "message": "घन"

@@ -1199,6 +1199,9 @@
     "intersection_cd4590e4": {
         "message": "相交"
     },
+    "invalid_description_991e23bb": {
+        "message": "无效的描述"
+    },
     "invalid_entry_f7d2a0f5": {
         "message": "无效的输入。"
     },
@@ -1808,8 +1811,17 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "请允许 Canvas 访问您的麦克风和网络摄像头。"
     },
+    "please_choose_a_file_c2449cc": {
+        "message": "请选择文件"
+    },
     "please_decribe_what_you_would_like_to_compose_27a51be5": {
         "message": "请描述您要撰写的内容。"
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "请输入一个文件名"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "请选择支持类型的文件"
     },
     "plus_d43cd4ec": {
         "message": "加号"
