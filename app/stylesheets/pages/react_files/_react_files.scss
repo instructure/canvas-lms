@@ -427,6 +427,15 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   margin-bottom: 25px;
 }
 
+.modified-by-link {
+  a {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+  }
+}
+
 .ef-breadcrumb-popover {
   display: block;
   #{direction(left)}: -9999px;
