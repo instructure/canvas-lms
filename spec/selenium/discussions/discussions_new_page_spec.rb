@@ -1657,7 +1657,8 @@ describe "discussions" do
             expect(sub_assignment2.points_possible).to eq 7
           end
 
-          it "disallows setting the group discussion checkbox" do
+          it "disallows setting the group discussion checkbox when checkpoints_group_discussions ff is disabled" do
+            course.account.disable_feature!(:checkpoints_group_discussions)
             get "/courses/#{course.id}/discussion_topics/new"
 
             expect(element_exists?("input[data-testid='group-discussion-checkbox']")).to be_truthy
@@ -1668,6 +1669,48 @@ describe "discussions" do
             force_click_native('input[type=checkbox][value="checkpoints"]')
 
             expect(element_exists?("input[data-testid='group-discussion-checkbox']")).to be_falsey
+          end
+
+          it "successfully creates a checkpointed graded group discussion" do
+            group_category
+            group
+
+            get "/courses/#{course.id}/discussion_topics/new"
+
+            title = "Graded Discussion Topic with checkpoints"
+
+            f("input[placeholder='Topic Title']").send_keys title
+
+            force_click_native('input[type=checkbox][value="graded"]')
+            wait_for_ajaximations
+
+            force_click_native('input[type=checkbox][value="checkpoints"]')
+
+            f("input[data-testid='points-possible-input-reply-to-topic']").send_keys "5"
+            f("input[data-testid='reply-to-entry-required-count']").send_keys :backspace
+            f("input[data-testid='reply-to-entry-required-count']").send_keys 3
+            f("input[data-testid='points-possible-input-reply-to-entry']").send_keys "7"
+            force_click_native("input[data-testid='group-discussion-checkbox']")
+            f("input[placeholder='Select a group category']").click
+            force_click_native("[data-testid='group-category-opt-#{group_category.id}']")
+
+            f("button[data-testid='save-and-publish-button']").click
+            wait_for_ajaximations
+
+            dt = DiscussionTopic.joins(:child_topics).group("discussion_topics.id").order("discussion_topics.id DESC").first
+            expect(dt.reply_to_entry_required_count).to eq 3
+
+            assignment = Assignment.last
+            expect(assignment.has_sub_assignments?).to be true
+
+            sub_assignments = SubAssignment.where(parent_assignment_id: assignment.id)
+            sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+            sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+            expect(sub_assignment1.sub_assignment_tag).to eq "reply_to_topic"
+            expect(sub_assignment1.points_possible).to eq 5
+            expect(sub_assignment2.sub_assignment_tag).to eq "reply_to_entry"
+            expect(sub_assignment2.points_possible).to eq 7
           end
 
           it "successfully creates ADHOC overrides if a student is enrolled in multiple sections" do

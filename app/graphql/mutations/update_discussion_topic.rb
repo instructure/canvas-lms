@@ -101,6 +101,9 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       return validation_error(I18n.t("Cannot set default thread state locked, when threads are collapsed"))
     end
 
+    #  we need this to be set before the process commands since those will add group_category_id from the input
+    is_already_a_group_discussion = discussion_topic.group_category_id.present?
+
     process_common_inputs(input, discussion_topic.is_announcement, discussion_topic)
     process_future_date_inputs(input.slice(:delayed_post_at, :lock_at), discussion_topic)
     process_locked_parameter(input[:locked], discussion_topic) unless input[:locked].nil?
@@ -109,8 +112,22 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       # If discussion topic has checkpoints, the sum of possible points cannot exceed the max for the assignment
       err_message = validate_possible_points_with_checkpoints(input)
       return validation_error(err_message) unless err_message.nil?
-      # If discussion topic has checkpoints, it cannot also be assigned to a group category
-      return validation_error(I18n.t("Group discussions cannot have checkpoints.")) if input[:group_category_id].present?
+
+      if input[:checkpoints].present?
+        # If discussion topic has checkpoints, the sum of possible points cannot exceed the max for the assignment
+        err_message = validate_possible_points_with_checkpoints(input)
+        return validation_error(err_message) unless err_message.nil?
+
+        if is_already_a_group_discussion
+          # Already a group discussion
+          if !discussion_topic.checkpoints? && !discussion_topic.context.checkpoints_group_discussions_enabled?
+            return validation_error(I18n.t("Group discussions cannot have checkpoints."))
+          end
+        elsif input[:group_category_id].present? && !discussion_topic.context.checkpoints_group_discussions_enabled?
+          # Not already a group discussion, but trying to make it one
+          return validation_error(I18n.t("Group discussions cannot have checkpoints."))
+        end
+      end
     end
 
     # Save the discussion topic before updating the assignment if the group category is being updated,

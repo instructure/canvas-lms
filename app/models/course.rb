@@ -1578,6 +1578,10 @@ class Course < ActiveRecord::Base
     account&.discussion_checkpoints_enabled?
   end
 
+  def checkpoints_group_discussions_enabled?
+    account&.checkpoints_group_discussions_enabled?
+  end
+
   def wiki
     return super if wiki_id
 
