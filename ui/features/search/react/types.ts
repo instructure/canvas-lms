@@ -23,6 +23,11 @@ export type Result = {
   title: string
   body: string
   html_url: string
-  distance?: number
-  relevance?: number
+  distance: number
+  relevance: number
+}
+
+export type IndexProgress = {
+  progress: number
+  status: string
 }

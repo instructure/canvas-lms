@@ -131,7 +131,13 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
   const [feedback, setFeedback] = useState()
 
   return (
-    <View as="li" borderColor="primary" borderWidth="small 0 0 0" padding="medium 0">
+    <View
+      as="li"
+      borderColor="primary"
+      borderWidth="small 0 0 0"
+      padding="medium 0"
+      data-testid="search-result"
+    >
       <Flex alignItems="start" as="div" gap="large" justifyItems="space-between">
         <Flex.Item shouldShrink={true} size="85%">
           <Heading as="h2" level="h3">

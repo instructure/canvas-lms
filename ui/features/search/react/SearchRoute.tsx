@@ -19,6 +19,7 @@
 import {Portal} from '@instructure/ui-portal'
 import {useParams} from 'react-router-dom'
 import SearchApp from './SearchApp'
+import EnhancedSmartSearch from './enhanced_ui/EnhancedSmartSearch'
 
 export function Component(): JSX.Element | null {
   const {courseId} = useParams()
@@ -28,6 +29,13 @@ export function Component(): JSX.Element | null {
     return null
   }
 
+  if (ENV.enhanced_ui_enabled) {
+    return (
+      <Portal open={true} mountNode={mountPoint}>
+        <EnhancedSmartSearch courseId={courseId ?? ''} />
+      </Portal>
+    )
+  }
   return (
     <Portal open={true} mountNode={mountPoint}>
       <SearchApp courseId={courseId} />
