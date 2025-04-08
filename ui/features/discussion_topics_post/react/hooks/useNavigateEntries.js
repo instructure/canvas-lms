@@ -166,7 +166,6 @@ export default function useNavigateEntries({
   // if highlightEntryId isn't in the list, pick the "first" item (per sorted order).
   useEffect(() => {
     if (!isInSpeedGrader || studentEntriesQuery.isLoading) return
-    console.log('highlightEntryId: ',highlightEntryId)
 
     const currentEntryIndex = sortedStudentEntries.findIndex(e => e._id === highlightEntryId)
     if (currentEntryIndex < 0 && sortedStudentEntries.length > 0) {
