@@ -20,18 +20,44 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {getStatusByRelevance, RatingButton} from '../../utils'
 import {Text} from '@instructure/ui-text'
-import useInsightStore from '../../hooks/useInsightStore'
+import {useUpdateEntry} from '../../hooks/useUpdateEntry'
 
 const I18n = createI18nScope('discussion_insights')
 
 type EvaluationFeedbackProps = {
   relevance: string
   relevanceNotes: string
+  entryId: number
+  feedback: boolean | null
 }
 
-const EvaluationFeedback: React.FC<EvaluationFeedbackProps> = ({relevance, relevanceNotes}) => {
-  const feedback = useInsightStore(state => state.feedback)
-  const setFeedback = useInsightStore(state => state.setFeedback)
+const EvaluationFeedback: React.FC<EvaluationFeedbackProps> = ({
+  relevance,
+  relevanceNotes,
+  entryId,
+  feedback,
+}) => {
+  const {loading, updateEntry} = useUpdateEntry()
+
+  const handleFeedbackChange = (newFeedback: boolean) => {
+    if (feedback === newFeedback) {
+      updateEntry({
+        entryId,
+        entryFeedback: {
+          action: 'reset_like',
+          notes: '',
+        },
+      })
+      return
+    }
+
+    updateEntry({
+      entryId,
+      entryFeedback: {
+        action: newFeedback ? 'like' : 'dislike',
+      },
+    })
+  }
 
   const relevanceText = (relevance: string) => {
     if (relevance === 'needs_review') {
@@ -75,15 +101,17 @@ const EvaluationFeedback: React.FC<EvaluationFeedbackProps> = ({relevance, relev
         )}
         <RatingButton
           type="like"
+          disabled={loading}
           isActive={!!feedback}
-          onClick={() => setFeedback(feedback === true ? null : true)}
+          onClick={() => handleFeedbackChange(true)}
           screenReaderText={I18n.t('Like review')}
           dataTestId="insights-like-modal-button"
         />
         <RatingButton
           type="dislike"
+          disabled={loading}
           isActive={feedback === false}
-          onClick={() => setFeedback(feedback === false ? null : false)}
+          onClick={() => handleFeedbackChange(false)}
           screenReaderText={I18n.t('Dislike review')}
           dataTestId="insights-dislike-modal-button"
         />

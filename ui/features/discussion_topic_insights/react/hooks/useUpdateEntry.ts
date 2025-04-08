@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMutation} from '@tanstack/react-query'
+import {useMutation, useQueryClient} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import useInsightStore from './useInsightStore'
 
@@ -34,7 +34,7 @@ const updateEntry = async (
   context: string,
   contextId: string,
   discussionId: string,
-  entryId: string,
+  entryId: number,
   entryFeedback: EntryFeedback,
 ) => {
   const body: RequestBody = {
@@ -54,13 +54,18 @@ const updateEntry = async (
 }
 
 export const useUpdateEntry = () => {
+  const queryClient = useQueryClient()
+
   const context = useInsightStore(state => state.context)
   const contextId = useInsightStore(state => state.contextId)
   const discussionId = useInsightStore(state => state.discussionId)
 
   const {isLoading, isError, mutateAsync} = useMutation({
-    mutationFn: ({entryId, entryFeedback}: { entryId: string, entryFeedback: EntryFeedback}) =>
+    mutationFn: ({entryId, entryFeedback}: {entryId: number; entryFeedback: EntryFeedback}) =>
       updateEntry(context, contextId, discussionId, entryId, entryFeedback),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['insightEntries', context, contextId, discussionId])
+    },
   })
 
   return {

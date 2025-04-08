@@ -31,21 +31,6 @@ type GlobalEnv = {
 
 declare const ENV: GlobalEnv
 
-const emptyInsightEntry: InsightEntry = {
-  id: 0,
-  entry_content: '',
-  entry_url: '',
-  entry_updated_at: '',
-  student_id: 0,
-  student_name: '',
-  relevance_ai_classification: 'irrelevant',
-  relevance_ai_evaluation_notes: '',
-  relevance_human_reviewer: null,
-  relevance_human_feedback_liked: false,
-  relevance_human_feedback_disliked: false,
-  relevance_human_feedback_notes: '',
-}
-
 type ReadOnlyState = Readonly<{
   context: string
   contextId: string
@@ -54,25 +39,29 @@ type ReadOnlyState = Readonly<{
 
 type State = {
   modalOpen: boolean
-  entry: InsightEntry
+  entryId: number
   entries: InsightEntry[] | []
-  feedback: boolean | null
+  feedbackNotes: string
 }
 
-type Action = ActionFromState<State>
+type Action = ActionFromState<State> & {
+  openEvaluationModal: (entryId: number, feedbackNotes: string) => void
+}
 
 const useInsightStore = create<ReadOnlyState & State & Action>(set => ({
   context: ENV.context_type === 'Course' ? 'courses' : 'groups',
   contextId: ENV.context_id,
   discussionId: ENV.discussion_topic_id,
   modalOpen: false,
-  entry: emptyInsightEntry,
+  entryId: 0,
   entries: [],
-  feedback: null,
+  feedbackNotes: '',
   setModalOpen: isOpen => set(() => ({modalOpen: isOpen})),
-  setEntry: entry => set(() => ({entry})),
+  setEntryId: entryId => set(() => ({entryId})),
   setEntries: entries => set(() => ({entries})),
-  setFeedback: feedback => set(() => ({feedback})),
+  setFeedbackNotes: feedbackNotes => set(() => ({feedbackNotes})),
+  openEvaluationModal: (entryId, feedbackNotes) =>
+    set(() => ({entryId, feedbackNotes, modalOpen: true})),
 }))
 
 export default useInsightStore

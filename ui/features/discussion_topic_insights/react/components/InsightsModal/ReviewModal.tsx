@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
@@ -31,38 +31,64 @@ import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('discussion_insights')
 
-type ReviewModalProps = {
-  isOpen: boolean
-  onClose: () => void
-}
-
-const ReviewModal: React.FC<ReviewModalProps> = ({isOpen, onClose}) => {
-  const entry = useInsightStore(state => state.entry)
+const ReviewModal = () => {
+  const isOpen = useInsightStore(state => state.modalOpen)
+  const setModalOpen = useInsightStore(state => state.setModalOpen)
+  const entryId = useInsightStore(state => state.entryId)
   const entries = useInsightStore(state => state.entries)
-  const setEntry = useInsightStore(state => state.setEntry)
+  const openEvaluationModal = useInsightStore(state => state.openEvaluationModal)
+  const contextId = useInsightStore(state => state.contextId)
+  const discussionId = useInsightStore(state => state.discussionId)
+
   const [currentPage, setCurrentPage] = useState(1)
-  const feedback = useInsightStore(state => state.feedback)
 
   useEffect(() => {
-    if (entries && entry) {
-      const initialPage = entries.findIndex(e => e.id === entry.id) + 1
+    if (entries && entryId) {
+      const initialPage = entries.findIndex(e => e.id === entryId) + 1
       if (initialPage > 0) {
         setCurrentPage(initialPage)
       }
     }
-  }, [entries, entry])
+  }, [entries, entryId])
+
+  const {entry, feedback} = useMemo(() => {
+    const entry = entries.find(e => e.id === entryId)
+
+    let feedback = null
+
+    if (entry?.relevance_human_feedback_liked) {
+      feedback = true
+    } else if (entry?.relevance_human_feedback_disliked) {
+      feedback = false
+    }
+
+    return {entry, feedback}
+  }, [entries, entryId])
+
+  if (!entry) {
+    return null
+  }
+
+  const handleClose = () => {
+    setModalOpen(false)
+  }
 
   const handlePageChange = (nextPage: number) => {
     const nextEntry = entries[nextPage - 1]
-    setEntry(nextEntry)
-    setCurrentPage(nextPage)
+
+    if (nextEntry) {
+      openEvaluationModal(nextEntry.id, nextEntry.relevance_human_feedback_notes)
+      setCurrentPage(nextPage)
+    }
   }
+
+  const replyUrl = `/courses/${contextId}/discussion_topics/${discussionId}?entry_id=${entry.entry_id}`
 
   return (
     <Modal
       as="form"
       open={isOpen}
-      onDismiss={onClose}
+      onDismiss={handleClose}
       size="large"
       label={I18n.t('Review Evaluation')}
       shouldCloseOnDocumentClick
@@ -72,7 +98,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({isOpen, onClose}) => {
           <CloseButton
             placement="end"
             offset="medium"
-            onClick={onClose}
+            onClick={handleClose}
             screenReaderLabel={I18n.t('Close')}
           />
         </Flex>
@@ -89,7 +115,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({isOpen, onClose}) => {
                 <Text color="secondary">{formatDate(new Date(entry.entry_updated_at))}</Text>
               </FlexItem>
             </Flex>
-            <Button size="small">{I18n.t('See Reply in Context')}</Button>
+            <Button as="a" href={replyUrl} size="small">{I18n.t('See Reply in Context')}</Button>
           </Flex>
           <FlexItem size="150px" shouldGrow={false} shouldShrink={true}>
             <div dangerouslySetInnerHTML={{__html: entry.entry_content}} />
@@ -97,10 +123,12 @@ const ReviewModal: React.FC<ReviewModalProps> = ({isOpen, onClose}) => {
           <View borderWidth="small" borderRadius="medium" borderColor="primary" as="div">
             <Flex direction="column" padding="medium" gap="mediumSmall">
               <EvaluationFeedback
+                entryId={entryId}
                 relevance={entry.relevance_ai_classification}
                 relevanceNotes={entry.relevance_ai_evaluation_notes}
+                feedback={feedback}
               />
-              {feedback === false && <DisagreeFeedback />}
+              {feedback === false && <DisagreeFeedback entryId={entryId} />}
             </Flex>
           </View>
           <Pagination

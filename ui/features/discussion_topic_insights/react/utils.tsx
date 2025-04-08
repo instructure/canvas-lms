@@ -53,6 +53,7 @@ export const formatDate = (date: Date) => {
 
 type RatingButtonProps = {
   type: 'like' | 'dislike'
+  disabled: boolean
   isActive: boolean
   onClick: () => void
   screenReaderText: string
@@ -61,6 +62,7 @@ type RatingButtonProps = {
 
 export const RatingButton: React.FC<RatingButtonProps> = ({
   type,
+  disabled,
   isActive,
   onClick,
   screenReaderText,
@@ -76,6 +78,7 @@ export const RatingButton: React.FC<RatingButtonProps> = ({
       withBorder={false}
       screenReaderLabel={screenReaderText}
       data-testid={dataTestId}
+      disabled={disabled}
     >
       {isActive ? <IconLikeSolid rotate={rotate} /> : <IconLikeLine rotate={rotate} />}
     </IconButton>
