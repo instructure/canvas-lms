@@ -24,6 +24,7 @@ describe AccountsController do
   context "SAML meta data" do
     before do
       skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
+      allow_any_instance_of(Account).to receive(:environment_specific_domain)
       @account = Account.create!(name: "test")
     end
 

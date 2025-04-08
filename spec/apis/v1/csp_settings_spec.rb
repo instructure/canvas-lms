@@ -26,6 +26,7 @@ describe "CSP Settings API", type: :request do
 
   before do
     allow(HostUrl).to receive(:context_host).with(Account.default, anything).and_return("example1.com")
+    allow(HostUrl).to receive(:context_host).with(->(arg) { arg != Account.default }, anything).and_call_original
   end
 
   before :once do
