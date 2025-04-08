@@ -21,10 +21,25 @@ import {render} from '@testing-library/react'
 import LtiConfigurationDetail from '../LtiConfigurationDetail'
 import {canvas_lti_configurations} from '../../common/__tests__/data'
 
+// Mock window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+})
+
 describe('LtiConfigurationDetail renders as expected', () => {
   it('Component renders as expected', () => {
     const {getByText} = render(
-      <LtiConfigurationDetail integrationData={canvas_lti_configurations[0]} />
+      <LtiConfigurationDetail integrationData={canvas_lti_configurations[0]} badges={[]} />
     )
     expect(getByText('great product!')).toBeInTheDocument()
     expect(getByText('this is a piece of placement data')).toBeInTheDocument()
