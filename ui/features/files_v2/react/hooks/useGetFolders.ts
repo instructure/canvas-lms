@@ -18,7 +18,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { useParams } from "react-router-dom"
-import splitAssetString from '@canvas/util/splitAssetString'
+import splitAssetString from "@canvas/util/splitAssetString"
 import filesEnv from "../../../../shared/files_v2/react/modules/filesEnv"
 import { createStubRootFolder } from "../../utils/folderUtils"
 import { generateFolderByPathUrl } from "../../utils/apiUtils"
@@ -42,19 +42,18 @@ export const useGetFolders = () => {
   const pathParams = useParams()
   const pathContext = pathParams.context
   const path = pathParams['*']
+  const [contextType, contextId] = pathContext
+    ? splitAssetString(pathContext)!
+    : [filesEnv.contextType, filesEnv.contextId]
 
   return useQuery({
-    queryKey: ['folders', pathContext, path],
+    queryKey: ['folders', pathContext, path, contextType, contextId],
     staleTime: 0,
     keepPreviousData: true,
     queryFn: async () => {
-      if (pathContext) {
-        const [pluralContextType, contextId] = splitAssetString(pathContext)!
-        return await loadFolders(pluralContextType, contextId, path)
-      }
       return path
-        ? await loadFolders(filesEnv.contextType, filesEnv.contextId, path)
-        : [getRootFolder(filesEnv.contextType, filesEnv.contextId)]
+        ? await loadFolders(contextType, contextId, path)
+        : [getRootFolder(contextType, contextId)]
     }
   })
 }
