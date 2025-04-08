@@ -877,6 +877,7 @@ function renderCheckpoints(submission: Submission) {
   if (mountPoint) {
     ReactDOM.render(
       <SpeedGraderCheckpointsWrapper
+        EG={EG}
         courseId={ENV.course_id}
         // @ts-expect-error
         assignmentId={submission.assignment_id}
