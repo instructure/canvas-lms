@@ -303,9 +303,10 @@ describe "context modules" do
 
       get "/courses/#{@course.id}/modules"
       sleep 2 # not sure what we are waiting on but drag and drop will not work, unless we wait
+      wait_for_ajax_requests
 
       m1_handle = fj("#context_modules .context_module:first-child .reorder_module_link .icon-drag-handle")
-      m2_handle = fj("#context_modules .context_module:last-child .reorder_module_link .icon-drag-handle")
+      m2_handle = fj("#context_modules .context_module:last-child .content")
       driver.action.drag_and_drop(m1_handle, m2_handle).perform
       wait_for_ajax_requests
 

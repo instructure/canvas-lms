@@ -579,39 +579,14 @@ window.modules = (function () {
       return $item
     },
 
-    addItemsToModule2(moduleId, html, _links, error) {
-      const moduleItemContainer = document.querySelector(`#context_module_content_${moduleId}`)
-      if (!moduleItemContainer) return
-      if (error) {
-        ReactDOM.render(
-          <Alert variant="error" data-testid="items-failed-to-load">
-            <Flex justifyItems="space-between">
-              {I18n.t('Items failed to load')}
-              <IconButton
-                data-testid="retry-items-failed-to-load"
-                screenReaderLabel={I18n.t('Retry')}
-                withBackground={false}
-                withBorder={false}
-                onClick={() => modules.lazyLoadItems([moduleId])}
-              >
-                <IconRefreshLine />
-              </IconButton>
-            </Flex>
-          </Alert>,
-          moduleItemContainer,
-        )
-      } else {
-        moduleItemContainer.innerHTML = html
-        initContextModuleItems(moduleId)
-      }
-    },
-
     lazyLoadItems(moduleIds) {
-      fetchModuleItems(ENV.COURSE_ID, moduleIds, modules.addItemsToModule2, 3).then(() => {
+      fetchModuleItems(ENV.COURSE_ID, moduleIds, moduleId => {
+        initContextModuleItems(moduleId)
+      }).then(() => {
+        modules.updateAssignmentData()
         if ($('#context_modules').hasClass('editable')) {
           modules.loadMasterCourseData()
         }
-        return modules.updateAssignmentData()
       })
     },
 

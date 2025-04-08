@@ -17,14 +17,14 @@
  */
 
 import fetchMock from 'fetch-mock'
-import parseLinkHeader, {type Links} from '@canvas/parse-link-header'
 import {
-  fetchItemsForModule,
+  fetchModuleItemsHtml,
   fetchModuleItems,
-  type ModuleId,
-  type ModuleItems,
-  type ModuleItemFetchError,
+  type ModuleId
 } from '../utils/fetchModuleItems'
+
+const courseId = '23'
+const pageSize = 2
 
 const modules: Record<ModuleId, {items: string; api: string; link: string}> = {
   '1083': {
@@ -44,104 +44,170 @@ const modules: Record<ModuleId, {items: string; api: string; link: string}> = {
   },
 }
 
+const createMockContainer = (moduleId: string) => {
+  const div = document.createElement('div')
+  div.id = `context_module_content_${moduleId}`
+  document.body.appendChild(div)
+}
+
+Object.keys(modules).forEach((moduleId: string) => {
+  createMockContainer(moduleId)
+
+  fetchMock.mock(modules[moduleId].api, {
+    body: modules[moduleId].items,
+    headers: {
+      link: modules[moduleId].link,
+    },
+  })
+})
+
 const badModule = {
   moduleId: '1086',
   api: '/courses/23/modules/1086/items_html?per_page=2',
   response: new Response('', {status: 500}),
 }
 
-describe('fetchModuleItems utility', () => {
-  beforeAll(() => {
-    fetchMock.mock(modules['1083'].api, {
-      body: modules['1083'].items,
-      headers: {
-        link: modules['1083'].link,
-      },
-    })
-    fetchMock.mock(modules['1084'].api, {
-      body: modules['1084'].items,
-      headers: {
-        link: modules['1084'].link,
-      },
-    })
-    fetchMock.mock(modules['1085'].api, {
-      body: modules['1085'].items,
-      headers: {
-        link: modules['1085'].link,
-      },
-    })
-    fetchMock.mock(badModule.api, badModule.response)
-  })
+fetchMock.mock(badModule.api, badModule.response)
 
+createMockContainer(badModule.moduleId)
+
+describe('fetchModuleItems utility', () => {
   afterEach(() => {
     fetchMock.resetHistory()
-  })
-
-  describe('fetchItemsForModule', () => {
-    it('fetches items for a module', async () => {
-      const callback = jest.fn()
-      await fetchItemsForModule('1083', modules['1083'].api, callback)
-      expect(callback).toHaveBeenCalledWith(
-        '1083',
-        modules['1083'].items,
-        parseLinkHeader(modules['1083'].link),
-      )
-    })
-
-    it('handles fetch failures', async () => {
-      const callback = jest.fn()
-      await fetchItemsForModule(badModule.moduleId, badModule.api, callback)
-      expect(callback).toHaveBeenCalledWith(badModule.moduleId, '', undefined, {
-        moduleId: badModule.moduleId,
-        error: expect.any(Error),
-      })
+    Object.keys(modules).forEach((moduleId: string) => {
+      const container = document.querySelector(`#context_module_content_${moduleId}`)
+      if (container) {
+        container.innerHTML = ''
+      }
     })
   })
 
   describe('fetchModuleItems', () => {
-    it('fetches batches of items', async () => {
-      await fetchModuleItems('23', ['1083', '1084', '1085'], () => {}, 2)
+    it('does nothing if no modules are provided', async () => {
+      const callback = jest.fn()
+      await fetchModuleItems(courseId, [], callback, pageSize)
+      expect(callback).not.toHaveBeenCalled()
+    })
+
+    it('does nothing if the provided moduleIds not exist in the dom', async () => {
+      await fetchModuleItems(courseId, ['noop'], jest.fn(), pageSize)
+      expect(fetchMock.calls()).toHaveLength(0)
+    })
+
+    it('construct the api urls correctly', async () => {
+      await fetchModuleItems(courseId, Object.keys(modules), jest.fn(), pageSize)
+      const calls = fetchMock.calls()
+      expect(calls[0][0]).toBe(`/courses/${courseId}/modules/1083/items_html?per_page=${pageSize}`)
+      expect(calls[1][0]).toBe(`/courses/${courseId}/modules/1084/items_html?per_page=${pageSize}`)
+      expect(calls[2][0]).toBe(`/courses/${courseId}/modules/1085/items_html?per_page=${pageSize}`)
+    })
+
+    it('fetches the items', async () => {
+      await fetchModuleItems(courseId, Object.keys(modules), jest.fn(), pageSize)
       expect(fetchMock.calls()).toHaveLength(3)
     })
 
-    it("calls the callback for each module's items", async () => {
-      const callback = jest.fn((moduleId: ModuleId, itemHTML: string, link?: Links) => {
-        expect(itemHTML).toEqual(modules[moduleId].items)
-        expect(link).toBeDefined()
-        expect(link).toEqual(parseLinkHeader(modules[moduleId].link))
+    describe('success responses', () => {
+      it('set the htmls in the containers with the results', async () => {
+        await fetchModuleItems(courseId, Object.keys(modules), jest.fn(), pageSize)
+        Object.keys(modules).forEach(moduleId => {
+          expect(document.querySelector(`#context_module_content_${moduleId}`)?.innerHTML)
+            .toEqual(modules[moduleId].items)
+        })
       })
-      await fetchModuleItems('23', ['1083', '1084', '1085'], callback, 2)
-      ;['1083', '1084', '1085'].forEach(id =>
-        expect(callback).toHaveBeenCalledWith(
-          id,
-          modules[id].items,
-          parseLinkHeader(modules[id].link),
-        ),
-      )
+
+      it("calls the callback for each module's items", async () => {
+        const callback = jest.fn()
+        await fetchModuleItems(courseId, Object.keys(modules), callback, pageSize)
+        Object.keys(modules)
+          .forEach(moduleId => expect(callback).toHaveBeenCalledWith(moduleId))
+      })
     })
 
-    it('calls the callback with an error for a bad module', async () => {
-      const callback = jest.fn(
-        (moduleId: ModuleId, itemHTML: string, link?: Links, error?: ModuleItemFetchError) => {
-          expect(moduleId).toEqual('1086')
-          expect(itemHTML).toEqual('')
-          expect(link).toBeUndefined()
-          expect(error?.moduleId).toEqual('1086')
-          expect(error?.error.message).toEqual(
-            'doFetchApi received a bad response: 500 Internal Server Error',
-          )
-          expect(error?.error.response.status).toEqual(500)
-        },
-      )
-      await fetchModuleItems('23', ['1086'], callback, 2)
-      expect(callback).toHaveBeenCalled()
+    describe('failed responses', () => {
+      const badModuleId = badModule.moduleId
+
+      it('does not set the htmls', async () => {
+        await fetchModuleItems(courseId, [badModuleId], jest.fn(), pageSize)
+        expect(document.querySelector(`#context_module_content_${badModuleId}`)?.innerHTML)
+          .toContain('Items failed to load')
+      })
+
+      it('does not call the callback', async () => {
+        const callback = jest.fn()
+        await fetchModuleItems(courseId, [badModuleId], callback, pageSize)
+        expect(callback).not.toHaveBeenCalled()
+      })
     })
 
-    it('does nothing if no modules are provided', async () => {
-      const callback = jest.fn()
-      const result = await fetchModuleItems('23', [], callback, 2)
-      expect(result).toEqual([])
-      expect(callback).not.toHaveBeenCalled()
+    describe('mixed responses', () => {
+      const badModuleId = badModule.moduleId
+      const goodModuleId = '1083'
+
+      it('does set the html for successful responses', async () => {
+        await fetchModuleItems(courseId, [badModuleId, goodModuleId], jest.fn(), pageSize)
+        expect(document.querySelector(`#context_module_content_${goodModuleId}`)?.innerHTML)
+          .toEqual(modules[goodModuleId].items)
+        expect(document.querySelector(`#context_module_content_${badModuleId}`)?.innerHTML)
+          .toContain('Items failed to load')
+      })
+
+      it('does call the callback for successful responses', async () => {
+        const callback = jest.fn()
+        await fetchModuleItems(courseId, [badModuleId, goodModuleId], callback, pageSize)
+        expect(callback).toHaveBeenCalledWith(goodModuleId)
+        expect(callback).not.toHaveBeenCalledWith(badModuleId)
+      })
+    })
+  })
+
+  describe('fetchModuleItemsHtml', () => {
+    const moduleId = '1083'
+
+    it('does nothing if the provided moduleId not exist in the dom', async () => {
+      await fetchModuleItemsHtml(courseId, 'noop', jest.fn(), pageSize)
+      expect(fetchMock.calls()).toHaveLength(0)
+    })
+
+    it('construct the api url correctly', async () => {
+      await fetchModuleItemsHtml(courseId, moduleId, jest.fn(), pageSize)
+      const calls = fetchMock.calls()
+      expect(calls[0][0]).toBe(`/courses/${courseId}/modules/1083/items_html?per_page=${pageSize}`)
+    })
+
+    it('fetches the item', async () => {
+      await fetchModuleItemsHtml(courseId, moduleId, jest.fn(), pageSize)
+      expect(fetchMock.calls()).toHaveLength(1)
+    })
+
+    describe('success response', () => {
+      it('set the htmls in the container with the result', async () => {
+        await fetchModuleItemsHtml(courseId, moduleId, jest.fn(), pageSize)
+        expect(document.querySelector(`#context_module_content_${moduleId}`)?.innerHTML)
+          .toEqual(modules[moduleId].items)
+      })
+
+      it("calls the callback for the module's item", async () => {
+        const callback = jest.fn()
+        await fetchModuleItemsHtml(courseId, moduleId, callback, pageSize)
+        expect(callback).toHaveBeenCalledWith(moduleId)
+      })
+    })
+
+    describe('failed response', () => {
+      const badModuleId = badModule.moduleId
+
+      it('does not set the html', async () => {
+        await fetchModuleItemsHtml(courseId, badModuleId, jest.fn(), pageSize)
+        expect(document.querySelector(`#context_module_content_${badModuleId}`)?.innerHTML)
+          .toContain('Items failed to load')
+      })
+
+      it('does not call the callback', async () => {
+        const callback = jest.fn()
+        await fetchModuleItemsHtml(courseId, badModuleId, callback, pageSize)
+        expect(callback).not.toHaveBeenCalled()
+      })
     })
   })
 })
