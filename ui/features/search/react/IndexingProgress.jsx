@@ -38,6 +38,7 @@ export default function IndexingProgress({progress}) {
         )}
       </Text>
       <ProgressBar
+        data-testid="indexing_progress"
         screenReaderLabel={I18n.t('Indexing in progress')}
         valueNow={progress}
         valueMax={100}
