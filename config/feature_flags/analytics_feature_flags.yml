@@ -12,12 +12,12 @@ analytics_2:
       Community.
   after_state_change_proc: analytics_2_after_state_change_hook
   beta: false
-attendance_on_dap_model:
+analytics_2_attendance_config_v2:
   state: hidden
   applies_to: Account
-  display_name: Attendance on DAP
+  display_name: New Analytics - Attendance Config V2
   description:
-    attendance_on_dap_model_description: Enable attendance on looker_canvas_attendance on DAP data
+    analytics_2_attendance_config_v2_description: Use dynamo for attendance config - course analytics
   root_opt_in: true
   beta: true
   shadow: true
