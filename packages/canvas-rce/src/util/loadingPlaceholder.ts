@@ -39,13 +39,12 @@ export async function placeholderInfoFor(
     fileName: fileName ?? 'unknown filename',
   })
 
-  if (typeof fileMetaProps.contentType !== 'string') {
-    throw new Error('Invalid fileMetaProps.contentType')
+  const type = fileMetaProps.contentType || fileMetaProps.type
+  if (typeof type !== 'string') {
+    throw new Error('Invalid type: ' + type)
   }
 
-  const type = fileMetaProps.contentType || fileMetaProps.type
-
-  if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
+  if (isImage(type) && fileMetaProps.displayAs !== 'link') {
     const imageUrl =
       trimmedOrNull((fileMetaProps.domObject as {preview: string}).preview) ??
       URL.createObjectURL(fileMetaProps.domObject as File | Blob)
@@ -65,7 +64,7 @@ export async function placeholderInfoFor(
       image.onerror = () => reject(new Error('Failed to load image: ' + imageUrl))
       image.src = imageUrl
     })
-  } else if (typeof type === 'string' && isVideo(type)) {
+  } else if (isVideo(type)) {
     const videoSize = videoDefaultSize()
     return {
       type: 'block',
@@ -75,7 +74,7 @@ export async function placeholderInfoFor(
       height: videoSize.height,
       vAlign: 'bottom',
     }
-  } else if (typeof type === 'string' && isAudio(type)) {
+  } else if (isAudio(type)) {
     return {
       type: 'block',
       visibleLabel,

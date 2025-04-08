@@ -136,7 +136,7 @@ describe('placeholderInfoFor', () => {
 
   // -------------------------------------------------------------------------------------------------------------------
 
-  it('should handle video files', async () => {
+  it('should handle video files with "contentType"', async () => {
     const expectedVideoSize = { width: '200px', height: '100px' }
     const mockVideoDefaultSize = videoDefaultSize as jest.Mock
     mockVideoDefaultSize.mockReturnValue(expectedVideoSize)
@@ -146,6 +146,27 @@ describe('placeholderInfoFor', () => {
         name: 'video.mp4',
         domObject: {},
         contentType: 'video/mp4',
+      }),
+    ).toEqual({
+      type: 'block',
+      ariaLabel: 'Loading placeholder for video.mp4',
+      visibleLabel: 'video.mp4',
+      width: expectedVideoSize.width,
+      height: expectedVideoSize.height,
+      vAlign: 'bottom',
+    })
+  })
+
+  it('should handle video files with "type"', async () => {
+    const expectedVideoSize = { width: '200px', height: '100px' }
+    const mockVideoDefaultSize = videoDefaultSize as jest.Mock
+    mockVideoDefaultSize.mockReturnValue(expectedVideoSize)
+
+    expect(
+      await placeholderInfoFor({
+        name: 'video.mp4',
+        domObject: {},
+        type: 'video/mp4',
       }),
     ).toEqual({
       type: 'block',
