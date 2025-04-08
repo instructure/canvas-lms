@@ -37,9 +37,9 @@
     }
   }
   .course-list-sort-icon {
-    color: #E8EAEC;
+    color: $ic-color-medium;
     &.sorted {
-      color: $ic-font-color-dark;
+      color: $electric;
     }
   }
   .course-list-column-header {
