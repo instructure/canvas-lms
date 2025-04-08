@@ -613,6 +613,7 @@ const rubricEditing = {
     }
   },
   updateRubric($rubric, rubric) {
+    const rubricCreated = $rubric.attr('id') === 'rubric_adding'
     $rubric.find('.criterion:not(.blank)').remove()
     const $rating_template = $rubric.find('.rating:first').clone(true).removeAttr('id')
     $rubric.fillTemplateData({
@@ -711,6 +712,13 @@ const rubricEditing = {
       .find('.custom_ratings')
       .showIf(rubric.free_form_criterion_comments)
     $rubric.find('.rubric_title .title').focus()
+    showFlashAlert({
+      type: 'info',
+      message: rubricCreated
+        ? I18n.t('Rubric was successfully created')
+        : I18n.t('Rubric was successfully updated'),
+      srOnly: true,
+    })
   },
 }
 rubricEditing.sizeRatings = debounce(rubricEditing.originalSizeRatings, 10)
@@ -981,6 +989,11 @@ rubricEditing.init = function () {
               callback()
             }
             useStore.setState({rubricId: undefined})
+            showFlashAlert({
+              type: 'info',
+              message: I18n.t('Rubric was successfully deleted'),
+              srOnly: true,
+            })
           })
         },
       })
