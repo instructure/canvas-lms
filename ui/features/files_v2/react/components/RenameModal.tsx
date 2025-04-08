@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {ChangeEvent, useState} from 'react'
+import React, {ChangeEvent, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -54,6 +54,7 @@ export const RenameModal = ({
   const [newItemName, setNewItemName] = useState<string>(getName(renamingItem))
   const [errorMessages, setErrorMessages] = useState<FormMessage[]>()
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
+  const inputRef = useRef<TextInput>(null)
 
   const handleSave = () => {
     const trimmedNewItemName = newItemName.trim()
@@ -79,6 +80,7 @@ export const RenameModal = ({
             : [{text: I18n.t('Folder name cannot contain /'), type: 'newError'}],
         )
       }
+      inputRef.current?.focus()
       return
     }
 
@@ -154,6 +156,7 @@ export const RenameModal = ({
             <div style={{paddingTop: '1.5rem'}}>
               <TextInput
                 value={newItemName}
+                ref={inputRef}
                 data-testid="rename-modal-input-folder-name"
                 onChange={(_e: ChangeEvent<HTMLInputElement>, new_value: string) => {
                   setNewItemName(new_value)

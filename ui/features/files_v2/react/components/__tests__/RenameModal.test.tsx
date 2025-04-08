@@ -82,6 +82,7 @@ describe('RenameModal', () => {
       await user.clear(input)
       await user.click(screen.getByRole('button', {name: 'Save'}))
       expect(await screen.findByText(`File name cannot be blank`)).toBeInTheDocument()
+      expect(input).toHaveFocus()
     })
 
     it('validates a name of all spaces correctly', async () => {
@@ -179,6 +180,7 @@ describe('RenameModal', () => {
       await user.clear(input)
       await user.click(screen.getByRole('button', {name: 'Save'}))
       expect(await screen.findByText(`Folder name cannot be blank`)).toBeInTheDocument()
+      expect(input).toHaveFocus()
     })
 
     it('validates a name of all spaces correctly', async () => {
