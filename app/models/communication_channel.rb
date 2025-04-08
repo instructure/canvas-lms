@@ -436,7 +436,7 @@ class CommunicationChannel < ActiveRecord::Base
     # can be used for any root_account, so just set root_account_ids from user.
     self.root_account_ids = user.root_account_ids
     if root_account_ids_changed? && log
-      InstStatsd::Statsd.increment("communication_channel.root_account_ids_set", short_stat: "communication_channel.root_account_ids_set")
+      InstStatsd::Statsd.distributed_increment("communication_channel.root_account_ids_set")
     end
     save! if persist_changes && root_account_ids_changed?
   end

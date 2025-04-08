@@ -396,11 +396,11 @@ describe OutcomeResultsController do
       end
 
       it "increments statsd if a student is viewing their own sLMGB results" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         user_session(@student)
         fetch_student_lmgb_data
         expect(response).to be_successful
-        expect(InstStatsd::Statsd).to have_received(:increment).with(
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "outcomes_page_views",
           tags: { type: "student_lmgb" }
         ).once
@@ -408,33 +408,33 @@ describe OutcomeResultsController do
 
       it "increments statsd if an observer is viewing a linked student\"s sLMGB results" do
         @observer.enrollments.find_by(course_id: @course.id).update!(associated_user_id: @student)
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         user_session(@observer)
         fetch_student_lmgb_data
         expect(response).to be_successful
-        expect(InstStatsd::Statsd).to have_received(:increment).with(
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "outcomes_page_views",
           tags: { type: "student_lmgb" }
         ).once
       end
 
       it "doesnt increment statsd if an observer is viewing a non-linked student\"s sLMGB results" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         user_session(@observer)
         fetch_student_lmgb_data
         expect(response).not_to be_successful
-        expect(InstStatsd::Statsd).not_to have_received(:increment).with(
+        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with(
           "outcomes_page_views",
           tags: { type: "student_lmgb" }
         )
       end
 
       it "doesnt increment a statsd if a teacher is viewing a student\"s sLMGB results" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         user_session(@teacher)
         fetch_student_lmgb_data
         expect(response).to be_successful
-        expect(InstStatsd::Statsd).not_to have_received(:increment).with(
+        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with(
           "outcomes_page_views",
           tags: { type: "student_lmgb" }
         )

@@ -315,7 +315,7 @@ class UserMerge
   rescue ActiveRecord::RecordNotUnique
     # if we fail to move lti ids after a retry, put the source user's ids back and fall back on the old behavior
     from_user.update! lti_context_id: from_lti_context_id, lti_id: from_lti_id, uuid: from_uuid
-    InstStatsd::Statsd.increment("user_merge.move_lti_ids.unique_constraint_failure")
+    InstStatsd::Statsd.distributed_increment("user_merge.move_lti_ids.unique_constraint_failure")
     populate_past_lti_ids
   end
 

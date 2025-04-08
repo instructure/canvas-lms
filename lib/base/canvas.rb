@@ -66,7 +66,7 @@ module Canvas
         end
 
         Rails.logger.error("  [REDIS] Query failure #{exception.inspect} (#{redis_name})")
-        InstStatsd::Statsd.increment("redis.errors.all")
+        InstStatsd::Statsd.distributed_increment("redis.errors.all")
         InstStatsd::Statsd.increment("redis.errors.#{InstStatsd::Statsd.escape(redis_name)}",
                                      short_stat: "redis.errors",
                                      tags: { redis_name: InstStatsd::Statsd.escape(redis_name) })

@@ -34,7 +34,7 @@ describe TranslationController do
   end
 
   before do
-    allow(InstStatsd::Statsd).to receive(:increment)
+    allow(InstStatsd::Statsd).to receive(:distributed_increment)
     allow(Account.site_admin).to receive(:feature_enabled?).and_return(false)
     allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(true)
     user_session(@user)
