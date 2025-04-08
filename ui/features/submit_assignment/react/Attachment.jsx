@@ -27,7 +27,7 @@ import {direction} from '@canvas/i18n/rtlHelper'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
 import {hasMediaFeature} from '../util/mediaUtils'
-import {IconImageLine, IconTrashLine, IconWarningSolid} from '@instructure/ui-icons'
+import {IconImageLine, IconTrashLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
@@ -51,6 +51,11 @@ const Attachment = ({
   const useWebcamRef = useRef(null)
   const fileInputPlaceholderRef = useRef(null)
 
+  const fileTypeError = () => {
+    const fileTypes = validFileTypes.join(", ")
+    return I18n.t('This file type is not allowed. Accepted file types are: %{fileTypes}.', {fileTypes})
+  }
+
   // TODO: When we upgrade to InstUI 10, the inputRef prop will be available to use.
   // For now, we query for the input by its id
   const getFileDropInput = () => document.getElementById(`submission_file_drop_${index}`)
@@ -64,6 +69,23 @@ const Attachment = ({
         setShouldShowFileRequiredError(false)
       }
     }
+    // There is a case where the user drags and drops a file while the native file browser
+    // is open. When this is the case, we can't rely on handleAcceptFile to update the
+    // state and need to observe changes on the input.
+    const handleChange = (e) => {
+      const files = e.target.files
+      const fileDropInput = getFileDropInput()
+      if (file && files.length === 0 && fileDropInput) {
+        // If the user clicks "Cancel", the input will be cleared and we should update the UI to reflect that.
+        clearInputFile()
+      } else if (files.length > 0 && fileDropInput) {
+        // If the user clicks "Open", the input will be updated and we should update the UI to reflect that.
+        const newFile = files[0]
+        if (newFile !== file && isValidFileType(newFile) && isValidFileSize(newFile)) {
+          setFile(newFile)
+        }
+      }
+    }
     const fileDropInput = getFileDropInput()
     if (fileDropInput) {
       // set these values from the legacy input on the FileDrop's input
@@ -72,10 +94,14 @@ const Attachment = ({
       fileDropInput.setAttribute("data-testid", `file-upload-${index}`)
       // set up focus listener
       fileDropInput.addEventListener("focus", handleFocus)
+      fileDropInput.addEventListener("change", handleChange)
     }
 
     return () => {
-      if (fileDropInput) fileDropInput.removeEventListener("focus", handleFocus)
+      if (fileDropInput) {
+        fileDropInput.removeEventListener("focus", handleFocus)
+        fileDropInput.removeEventListener("change", handleChange)
+      }
     }
   }, [file])
 
@@ -96,13 +122,34 @@ const Attachment = ({
     setFile(null)
   }
 
-  const handleAcceptFile = ([file], e) => {
+  const getFileExtension = (file) => {
+    const name = file.name
+    const match = name.match(/\.([^.]+)$/)
+    return match ? match[1] : ''
+  }
+
+  const isValidFileType = (file) => {
+    const type = getFileExtension(file)
+    if (!validFileTypes.includes(type)) {
+      setErrorMessages([{ text: fileTypeError(), type: 'newError' }])
+      return false
+    }
+    return true
+  }
+
+  const isValidFileSize = (file) => {
     if (file.size === 0) {
       const errorText = I18n.t('Attached files must be greater than 0 bytes.')
       setErrorMessages([{ text: errorText, type: 'newError' }])
       // Clear the file from the input since we are not accepting it
       clearInputFile()
-    } else {
+      return false
+    }
+    return true
+  }
+
+  const handleAcceptFile = ([file], e) => {
+    if (isValidFileSize(file)) {
       // We want the input element from the FileDrop component to persist
       const fileDropInput = getFileDropInput()
       // With drag and drop, the value of the input is not updated. We need to
@@ -118,9 +165,7 @@ const Attachment = ({
   }
 
   const handleRejectedFile = (_file) => {
-    const fileTypes = validFileTypes.join(", ")
-    const errorText = I18n.t('This file type is not allowed. Accepted file types are: %{fileTypes}.', {fileTypes})
-    setErrorMessages([{ text: errorText, type: 'newError' }])
+    setErrorMessages([{ text: fileTypeError(), type: 'newError' }])
   }
 
   const useWebcamButton = (
