@@ -1199,6 +1199,9 @@
     "intersection_cd4590e4": {
         "message": "Persilangan"
     },
+    "invalid_description_991e23bb": {
+        "message": "Perihalan tidak sah"
+    },
     "invalid_entry_f7d2a0f5": {
         "message": "Masukan tidak sah."
     },
@@ -1808,8 +1811,17 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Sila benarkan Canvas mengakses mikrofon dan kamera web anda."
     },
+    "please_choose_a_file_c2449cc": {
+        "message": "Sila pilih fail"
+    },
     "please_decribe_what_you_would_like_to_compose_27a51be5": {
         "message": "Sila terangkan apa yang ingin anda karang."
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "Sila masukkan nama fail"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "Sila pilih fail daripada jenis yang disokong"
     },
     "plus_d43cd4ec": {
         "message": "Tambah"

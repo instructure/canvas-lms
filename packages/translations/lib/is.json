@@ -1199,6 +1199,9 @@
     "intersection_cd4590e4": {
         "message": "Sniðmengi"
     },
+    "invalid_description_991e23bb": {
+        "message": "Ógild lýsing"
+    },
     "invalid_entry_f7d2a0f5": {
         "message": "Ógild færsla."
     },
@@ -1808,8 +1811,17 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Leyfðu Canvas að fá aðgang að hljóðnemanum og vefmyndavélinni."
     },
+    "please_choose_a_file_c2449cc": {
+        "message": "Veldu skrá"
+    },
     "please_decribe_what_you_would_like_to_compose_27a51be5": {
         "message": "Lýstu því sem þú vilt semja."
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "Settu inn skráarheiti"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "Veldu skrá af studdri tegund"
     },
     "plus_d43cd4ec": {
         "message": "Plús"

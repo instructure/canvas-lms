@@ -1199,6 +1199,9 @@
     "intersection_cd4590e4": {
         "message": "Genomskärning"
     },
+    "invalid_description_991e23bb": {
+        "message": "Ogiltig beskrivning"
+    },
     "invalid_entry_f7d2a0f5": {
         "message": "Ogiltig inmatning."
     },
@@ -1808,8 +1811,17 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Ge Canvas åtkomst till din mikrofon och webbkamera."
     },
+    "please_choose_a_file_c2449cc": {
+        "message": "Välj en fil"
+    },
     "please_decribe_what_you_would_like_to_compose_27a51be5": {
         "message": "Beskriv vad du vill komponera."
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "Ange ett filnamn"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "Välj en fil som stöds."
     },
     "plus_d43cd4ec": {
         "message": "Plus"
