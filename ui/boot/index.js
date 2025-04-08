@@ -41,7 +41,6 @@ window.Buffer = Buffer
 try {
   initSentry()
 } catch (e) {
-  // eslint-disable-next-line no-console
   console.error('Failed to init Sentry, errors will not be captured', e)
 }
 
@@ -60,7 +59,6 @@ let runOnceAfterLocaleFiles = () => {
   import('@canvas/enhanced-user-content')
     .then(({enhanceTheEntireUniverse}) => enhanceTheEntireUniverse())
     .catch(e => {
-      // eslint-disable-next-line no-console
       console.error('Failed to init @canvas/enhanced-user-content', e)
     })
 }
@@ -80,7 +78,6 @@ if (process.env.NODE_ENV !== 'production') {
     try {
       filterUselessConsoleMessages(console)
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error(`ERROR: could not set up console log filtering: ${e.message}`)
     }
   }
@@ -95,7 +92,11 @@ const typography = {
   fontFamily: 'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif',
 }
 
-if (ENV.use_high_contrast) {
+// Check for high contrast mode from either ENV variable or URL query parameter
+const urlParams = new URLSearchParams(window.location.search)
+const hasHighContrastQueryParam = urlParams.get('instui_theme') === 'canvas_high_contrast'
+
+if (ENV.use_high_contrast || hasHighContrastQueryParam) {
   canvasHighContrastTheme.use({overrides: {typography}})
 } else {
   const brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
@@ -131,7 +132,7 @@ if (ENV.use_high_contrast) {
   window.fetch = function () {
     window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__++
     const promise = fetch.apply(this, arguments)
-    // eslint-disable-next-line promise/catch-or-return
+
     promise.finally(() => {
       window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__--
     })
