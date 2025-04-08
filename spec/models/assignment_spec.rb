@@ -11596,7 +11596,7 @@ describe Assignment do
         end
 
         it "inherits setting to sub account" do
-          expect(@sub_account.restrict_quantitative_data?).to be true
+          expect(@sub_account.reload.restrict_quantitative_data?).to be true
         end
 
         it "does not inherit setting to course" do

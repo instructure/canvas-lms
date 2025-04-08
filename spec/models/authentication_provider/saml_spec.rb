@@ -21,6 +21,7 @@
 describe AuthenticationProvider::SAML do
   before do
     skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
+    allow_any_instance_of(Account).to receive(:environment_specific_domain)
     @account = Account.create!(name: "account")
     @file_that_exists = File.expand_path(__FILE__)
   end

@@ -26,6 +26,7 @@ describe Csp do
 
   before do
     allow(HostUrl).to receive(:context_host).with(Account.default, anything).and_return(nil)
+    allow(HostUrl).to receive(:context_host).with(->(arg) { arg != Account.default }, anything).and_call_original
   end
 
   describe "account setting inheritance" do

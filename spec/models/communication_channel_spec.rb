@@ -227,7 +227,7 @@ describe CommunicationChannel do
 
   it "provides a confirmation url" do
     expect(HostUrl).to receive(:protocol).and_return("https")
-    expect(HostUrl).to receive(:context_host).and_return("test.canvas.com")
+    expect(HostUrl).to receive(:context_host).and_return("test.canvas.com").at_least(:once)
     expect(CanvasSlug).to receive(:generate).and_return("abc123")
     communication_channel_model
     mock_request = instance_double(ActionDispatch::Request, host_with_port: "test.canvas.com")
