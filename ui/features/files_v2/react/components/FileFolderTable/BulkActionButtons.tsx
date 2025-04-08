@@ -215,7 +215,7 @@ const BulkActionButtons = ({
                     {isSmallScreen ? (
                       I18n.t('More')
                     ) : (
-                      <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
+                      <ScreenReaderContent>{I18n.t('Bulk Actions')}</ScreenReaderContent>
                     )}
                   </Button>
                 }
