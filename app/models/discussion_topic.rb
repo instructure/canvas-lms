@@ -63,8 +63,13 @@ class DiscussionTopic < ActiveRecord::Base
   module SortOrder
     DESC = "desc"
     ASC = "asc"
+    DEFAULT = DESC
+    # Inherit is not a real sort order but a placeholder meaning participant's should follow discussion's
+    INHERIT = "inherit"
     TYPES = SortOrder.constants.map { |c| SortOrder.const_get(c) }
   end
+
+  DEFAULT_EXPANDED_STATE = false
 
   module Errors
     class LockBeforeDueDate < StandardError; end
@@ -478,9 +483,7 @@ class DiscussionTopic < ActiveRecord::Base
       discussion_topic_participants.create(user:,
                                            workflow_state: "read",
                                            unread_entry_count: 0,
-                                           subscribed: !subscription_hold(user, nil),
-                                           expanded:,
-                                           sort_order:)
+                                           subscribed: !subscription_hold(user, nil))
     end
   end
 
@@ -782,13 +785,11 @@ class DiscussionTopic < ActiveRecord::Base
                                                                     unread_entry_count: unread_count(current_user, lock: true),
                                                                     workflow_state: "unread",
                                                                     subscribed: current_user == user && !subscription_hold(current_user, nil),
-                                                                    expanded: expanded,
-                                                                    sort_order: sort_order)
+                                                                    sort_order: DiscussionTopic::SortOrder::INHERIT)
           topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
           topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
           topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
-
           topic_participant.expanded = opts[:expanded] if opts.key?(:expanded)
           topic_participant.sort_order = opts[:sort_order] if opts.key?(:sort_order)
           topic_participant.save
@@ -2180,19 +2181,21 @@ class DiscussionTopic < ActiveRecord::Base
     return sort_order if Account.site_admin.feature_enabled?(:discussion_default_sort) && sort_order_locked
 
     current_user ||= self.current_user
-    participant(current_user)&.sort_order || sort_order || DiscussionTopic::SortOrder::DESC
+    participant_sort_order = participant(current_user)&.sort_order
+    participant_sort_order = sort_order if participant_sort_order == DiscussionTopic::SortOrder::INHERIT
+    participant_sort_order || DiscussionTopic::SortOrder::DEFAULT
   end
 
   def expanded_for_user(current_user = nil)
     return expanded if Account.site_admin.feature_enabled?(:discussion_default_expand) && expanded_locked
 
     current_user ||= self.current_user
-
-    if participant(current_user).nil?
-      expanded || false
-    else
-      participant(current_user)&.expanded || false
+    participant_expanded = participant(current_user)&.expanded
+    if participant_expanded.nil?
+      return expanded
     end
+
+    participant_expanded
   end
 
   private
