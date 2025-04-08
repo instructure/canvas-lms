@@ -175,6 +175,7 @@ ready(() => {
           stickersEnabled: window.ENV.STICKERS_ENABLED_FOR_ASSIGNMENT ?? false,
           filterSpeedGraderByStudentGroupEnabled:
             window.ENV.FILTER_SPEEDGRADER_BY_STUDENT_GROUP_ENABLED ?? false,
+          projectLhotseEnabled: window.ENV.PROJECT_LHOTSE_ENABLED ?? false,
         },
       })
     })
