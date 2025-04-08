@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState, useEffect} from 'react'
-import {useApolloClient} from '@apollo/client'
+import React, {useCallback, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
@@ -28,62 +27,41 @@ import {
   ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
   COURSE_OUTCOME_PROFICIENCY_QUERY,
 } from '@canvas/outcomes/graphql/MasteryScale'
+import {useAllPages} from '@canvas/query'
+import {executeQuery} from '@canvas/query/graphql'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const I18n = createI18nScope('MasteryScale')
 
-async function loadProficiencyRatings(client, query, contextId, controller) {
-  const queryFn = after => {
-    return client.query({
-      query,
-      variables: {
-        contextId,
-        proficiencyRatingsCursor: after
-      },
-      fetchPolicy: process.env.NODE_ENV === 'test' ? undefined : 'no-cache',
-      context: { fetchOptions: { signal: controller.signal } }
-    })
-  }
-  const {data: initialData} = JSON.parse(JSON.stringify(await queryFn(null))) // deep copy of frozen object so we can modify it
-  const proficiencyRatings = initialData.context.outcomeProficiency?.proficiencyRatingsConnection
-
-  if(!proficiencyRatings) return {data: initialData}
-
-  while (true) {
-    const after = proficiencyRatings?.pageInfo?.hasNextPage
-        && proficiencyRatings?.pageInfo?.endCursor
-    if (!after) break
-    const {data: pagedData} = await queryFn(after)
-    const pagedProficiencyRatings = pagedData.context.outcomeProficiency.proficiencyRatingsConnection
-    proficiencyRatings.nodes = proficiencyRatings.nodes.concat(pagedProficiencyRatings.nodes)
-    proficiencyRatings.pageInfo = pagedProficiencyRatings.pageInfo
-  }
-
-  return {data: initialData}
-}
-
 const MasteryScale = ({onNotifyPendingChanges}) => {
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [data, setData] = useState(null)
   const {contextType, contextId} = useCanvasContext()
-  const client = useApolloClient()
   const query =
     contextType === 'Course' ? COURSE_OUTCOME_PROFICIENCY_QUERY : ACCOUNT_OUTCOME_PROFICIENCY_QUERY
 
-  useEffect(() => {
-    const controller = new AbortController()
-    loadProficiencyRatings(
-      client,
-      query,
+  const {
+    data,
+    isError: error,
+    isLoading: loading,
+    hasNextPage,
+  } = useAllPages({
+    queryKey: [
+      contextType === 'Course' ? 'courseProficiencyRatings' : 'accountProficiencyRatings',
       contextId,
-      controller,
-    )
-    .then(({data}) => setData(data))
-    .catch(error => setError(error))
-    .finally(() => setLoading(false))
-    return () => controller.abort()
-  }, [])
+    ],
+    queryFn: ({pageParam}) => {
+      return executeQuery(query, {
+        contextId,
+        proficiencyRatingsCursor: pageParam,
+      })
+    },
+    getNextPageParam: lastPage => {
+      const pageInfo = lastPage?.context.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
+      return pageInfo?.hasNextPage ? pageInfo.endCursor : null
+    },
+    meta: {
+      fetchAtLeastOnce: true,
+    },
+  })
 
   const [updateProficiencyRatingsError, setUpdateProficiencyRatingsError] = useState(null)
   const updateProficiencyRatings = useCallback(
@@ -106,7 +84,7 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
     [contextType, contextId],
   )
 
-  if (loading) {
+  if (loading || hasNextPage) {
     return (
       <div style={{textAlign: 'center'}}>
         <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
@@ -120,7 +98,17 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
       </Text>
     )
   }
-  const {outcomeProficiency} = data.context
+
+  const getOutcomeProficiency = () => {
+    return data.pages.reduce((acc, page) => {
+      if (!acc) return page
+      acc.context.outcomeProficiency.proficiencyRatingsConnection.nodes = [
+        ...acc.context.outcomeProficiency.proficiencyRatingsConnection.nodes,
+        ...page.context.outcomeProficiency.proficiencyRatingsConnection.nodes,
+      ]
+      return acc
+    }, null).context.outcomeProficiency
+  }
 
   const roles = ENV.PROFICIENCY_SCALES_ENABLED_ROLES || []
   const accountRoles = roles.filter(role => role.is_account_role)
@@ -140,7 +128,7 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
 
       <ProficiencyTable
         contextType={contextType}
-        proficiency={outcomeProficiency || undefined} // send undefined when value is null
+        proficiency={getOutcomeProficiency() || undefined} // send undefined when value is null
         update={updateProficiencyRatings}
         updateError={updateProficiencyRatingsError}
         onNotifyPendingChanges={onNotifyPendingChanges}
