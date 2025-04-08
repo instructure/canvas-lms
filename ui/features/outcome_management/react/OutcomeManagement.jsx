@@ -34,6 +34,7 @@ import {
 } from '@canvas/outcomes/react/OutcomesImporter'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {windowConfirm} from '@canvas/util/globalUtils'
+import {QueryProvider} from '@canvas/query'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -254,7 +255,9 @@ const OutcomeManagement = ({breakpoints}) => {
 
   return (
     <ApolloProvider client={client}>
-      <OutcomeManagementWithoutGraphql breakpoints={breakpoints} />
+      <QueryProvider>
+        <OutcomeManagementWithoutGraphql breakpoints={breakpoints} />
+      </QueryProvider>
     </ApolloProvider>
   )
 }
