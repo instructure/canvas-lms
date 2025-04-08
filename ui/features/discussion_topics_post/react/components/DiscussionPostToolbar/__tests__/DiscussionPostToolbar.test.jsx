@@ -74,13 +74,13 @@ afterEach(() => {
   jest.clearAllMocks()
 })
 
-const setup = (props, mocks) => {
+const setup = (props, mocks, discussionManagerProviderValues = {translationLanguages: {current: []}}) => {
   return render(
     <MockedProvider mocks={mocks}>
       <AlertManagerContext.Provider
         value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
       >
-        <DiscussionManagerUtilityContext.Provider value={{translationLanguages: {current: []}}}>
+        <DiscussionManagerUtilityContext.Provider value={discussionManagerProviderValues}>
           <DiscussionPostToolbar {...props} />
         </DiscussionManagerUtilityContext.Provider>
       </AlertManagerContext.Provider>
@@ -278,6 +278,61 @@ describe('DiscussionPostToolbar', () => {
         isGroupDiscussion: true,
       })
       expect(queryByTestId('manage-assign-to')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Translate Button', () => {
+    describe('when translationLanguages is empty', () => {
+      it('does not render the translate button if translationLanguages is empty', () => {
+        const {queryByTestId} = setup()
+        expect(queryByTestId('translate-button')).toBeNull()
+      })
+    })
+
+    describe('when the improvement flag is turned on', () => {
+      beforeEach(() => {
+        ENV.ai_translation_improvements = true
+      })
+
+      afterEach(() => {
+        ENV.ai_translation_improvements = false
+      })
+
+      it('does render the translate button with improved text', () => {
+        const {getByText} = setup(null, null, {
+          translationLanguages: {current: ['en', 'es']}
+        })
+
+        expect(getByText('Translate Discussion')).toBeTruthy()
+      })
+
+      it('does render the translate button with improved text when the translation controls are on', () => {
+        const {getByText} = setup(null, null, {
+          translationLanguages: {current: ['en', 'es']},
+          showTranslationControl: true,
+        })
+
+        expect(getByText('Turn off Translation')).toBeTruthy()
+      })
+    })
+
+    it('does render the translate button', () => {
+      const {getByTestId} = setup(null, null, {
+        translationLanguages: {current: ['en', 'es']}
+      })
+
+      expect(getByTestId('translate-button')).toBeTruthy()
+    })
+
+    it('does call setShowTranslationControl when clicked', () => {
+      const setShowTranslationControl = jest.fn()
+      const {getByTestId} = setup(null, null, {
+        translationLanguages: {current: ['en', 'es']},
+        setShowTranslationControl,
+      })
+      const translateButton = getByTestId('translate-button')
+      fireEvent.click(translateButton)
+      expect(setShowTranslationControl).toHaveBeenCalled()
     })
   })
 })

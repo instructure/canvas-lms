@@ -46,7 +46,6 @@ import {View} from '@instructure/ui-view'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
-import MoreMenuButton from './MoreMenuButton'
 import {TranslationTriggerModal} from '../TranslationTriggerModal/TranslationTriggerModal'
 import SortOrderDropDown from './SortOrderDropDown'
 
@@ -126,24 +125,19 @@ export const DiscussionPostToolbar = props => {
     }
   }
 
-  const renderMore = () => {
-    const menuOptions = []
-    if (translationLanguages.current.length > 0) {
-      const text = showTranslate ? I18n.t('Hide Translate Text') : I18n.t('Translate Text')
-      const translationMenuOption = {text, clickItem: toggleTranslateText}
+  const renderTranslate = () => {
+    const text = showTranslate ? I18n.t('Hide Translate Text') : I18n.t('Translate Text')
+    const improvedText = showTranslationControl ? I18n.t('Turn off Translation') : I18n.t('Translate Discussion')
 
-      if (ENV.ai_translation_improvements) {
-        const improvedText = showTranslationControl
-          ? I18n.t('Turn off Translation')
-          : I18n.t('Translate Discussion')
-        translationMenuOption.text = improvedText
-        translationMenuOption.buttonIcon = IconAiLine
-      }
-
-      menuOptions.push(translationMenuOption)
-    }
-
-    return menuOptions.length > 0 && <MoreMenuButton menuOptions={menuOptions} />
+    return (
+      <Button
+        onClick={toggleTranslateText}
+        data-testid="translate-button"
+        renderIcon={<IconAiLine />}
+      >
+        {ENV.ai_translation_improvements ? improvedText : text}
+      </Button>
+    )
   }
 
   const closeModalAndKeepTranslations = () => {
@@ -403,7 +397,7 @@ export const DiscussionPostToolbar = props => {
                   )}
                   {translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
                     <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                      {renderMore()}
+                      {renderTranslate()}
                     </Flex.Item>
                   )}
                   {isSpeedGraderInTopUrl &&
