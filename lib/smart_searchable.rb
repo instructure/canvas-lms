@@ -79,6 +79,8 @@ module SmartSearchable
       embedding = SmartSearch.generate_embedding(chunk)
       embeddings.create!(embedding: embedding.to_json, version: SmartSearch::EMBEDDING_VERSION)
     end
+  rescue Aws::BedrockRuntime::Errors::ServiceUnavailableException => e
+    Canvas::Errors.capture_exception(:smart_search, e, :warn)
   end
   handle_asynchronously :generate_embeddings, priority: Delayed::LOW_PRIORITY
 
