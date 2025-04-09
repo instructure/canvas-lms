@@ -93,7 +93,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     end
 
     # Validating default expand input data
-    if input.key?(:expanded) && input.key?(:expanded_locked) && (!input[:expanded] && input[:expanded_locked])
+    if input.key?(:expanded) && input.key?(:expanded_locked) && !input[:expanded] && input[:expanded_locked]
       return validation_error(I18n.t("Cannot set default thread state locked, when threads are collapsed"))
     end
 

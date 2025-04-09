@@ -1601,7 +1601,7 @@ class ApplicationController < ActionController::Base
       end
       if !@context
         @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid."
-      elsif (@context.respond_to?(:is_public) && !@context.is_public) && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
+      elsif @context.respond_to?(:is_public) && !@context.is_public && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
         @problem = case @context_type
                    when "course"
                      t "#application.errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."

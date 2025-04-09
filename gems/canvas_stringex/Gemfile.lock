@@ -79,7 +79,6 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
-  bundler (>= 1.5, < 3)
   canvas_stringex!
   rake
   rspec (~> 3.12)

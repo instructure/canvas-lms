@@ -66,7 +66,6 @@ PLATFORMS
 
 DEPENDENCIES
   adheres_to_policy!
-  bundler (~> 2.2)
   rake
   rspec (~> 3.12)
   simplecov (~> 0.22)

@@ -235,7 +235,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (>= 1.5, < 3)
   canvas_cache!
   canvas_http!
   canvas_panda_pub!

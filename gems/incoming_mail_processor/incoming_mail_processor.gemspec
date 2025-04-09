@@ -23,10 +23,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency "net-pop"
   spec.add_dependency "net-smtp"
   spec.add_dependency "utf8_cleaner"
-
-  spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "debug"
-  spec.add_development_dependency "rspec", "~> 3.12"
-  spec.add_development_dependency "timecop", "~> 0.9.5"
-  spec.add_development_dependency "webrick"
 end

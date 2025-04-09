@@ -138,7 +138,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler
   config_file!
   debug
   rspec

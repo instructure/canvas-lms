@@ -247,7 +247,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler
   canvas_cache!
   canvas_security!
   config_file!

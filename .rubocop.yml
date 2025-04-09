@@ -1,5 +1,4 @@
 require:
-  - rubocop-graphql
   # this odd relative path is so that rubocop works when run without "bundle
   # exec", such as from most editors/IDEs.
   - ./gems/rubocop-canvas/lib/rubocop_canvas
@@ -7,6 +6,7 @@ require:
 
 plugins:
   - rubocop-factory_bot
+  - rubocop-graphql
   - rubocop-rails
   - rubocop-rake
   - rubocop-rspec

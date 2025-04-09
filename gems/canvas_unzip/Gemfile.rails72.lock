@@ -64,7 +64,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler
   canvas_mimetype_fu!
   canvas_unzip!
   rake

@@ -75,7 +75,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   canvas_sanitize!
   debug
   rake

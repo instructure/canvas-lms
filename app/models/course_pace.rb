@@ -335,7 +335,7 @@ class CoursePace < ActiveRecord::Base
     # by default in the UI, courses end on midnight of the date selected
     # in this case back it up to fancy_midnight the previous day
     # previous day
-    if range_end && (range_end.hour == 0 && range_end.min == 0)
+    if range_end && range_end.hour == 0 && range_end.min == 0
       range_end = CanvasTime.fancy_midnight(range_end - 1.minute)
     end
 

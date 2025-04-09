@@ -173,7 +173,6 @@ PLATFORMS
 
 DEPENDENCIES
   bookmarked_collection!
-  bundler (~> 2.2)
   debug
   json_token!
   paginated_collection!

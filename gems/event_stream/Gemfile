@@ -12,3 +12,7 @@ gem "paginated_collection", path: "../paginated_collection"
 # rubocop:enable Bundler/OrderedGems
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "rspec", "~> 3.12"
+gem "simplecov", "~> 0.22"
+gem "sqlite3"

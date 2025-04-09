@@ -127,7 +127,7 @@ module ApplicationHelper
       opts["#{context_name}_id"] = context.id
       res = url_for opts
     else
-      res = context_name.to_s + opts.to_json.to_s
+      res = context_name.to_s + opts.to_json
     end
     @context_url_lookup[lookup] = res
   end

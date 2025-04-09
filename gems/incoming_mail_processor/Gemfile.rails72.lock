@@ -270,7 +270,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   canvas_errors!
   canvas_text_helper!
   debug

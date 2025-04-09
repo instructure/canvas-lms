@@ -7,3 +7,6 @@ gemspec
 gem "i18nliner", "~> 0.2.4"
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "rake"
+gem "rspec", "~> 3.12"

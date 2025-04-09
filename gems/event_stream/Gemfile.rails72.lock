@@ -202,7 +202,6 @@ PLATFORMS
 
 DEPENDENCIES
   bookmarked_collection!
-  bundler (~> 2.2)
   config_file!
   event_stream!
   json_token!

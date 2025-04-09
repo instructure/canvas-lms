@@ -150,7 +150,7 @@ describe Lti::LogService do
             context_id: context.id.to_s,
             context_type: context.class.name,
             user_id: user.id.to_s,
-            session_id: session_id,
+            session_id:,
             shard_id: Shard.current.id.to_s
           ),
           for_user_id: user.global_id

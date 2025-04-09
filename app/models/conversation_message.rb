@@ -104,7 +104,7 @@ class ConversationMessage < ActiveRecord::Base
 
     p.dispatch :conversation_created
     p.to { [author] }
-    p.whenever { |record| record.cc_author && ((record.just_created || @re_send_message) && !record.generated && !record.submission) }
+    p.whenever { |record| record.cc_author && (record.just_created || @re_send_message) && !record.generated && !record.submission }
   end
 
   on_create_send_to_streams do

@@ -4,3 +4,6 @@ source "https://rubygems.org"
 
 # Specify your gem's dependencies in canvas_crummy.gemspec
 gemspec
+
+gem "rake"
+gem "simplecov", "~> 0.22"

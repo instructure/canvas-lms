@@ -84,7 +84,6 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport-suspend_callbacks!
-  bundler (~> 2.2)
   debug
   rake
   rspec (~> 3.12)
