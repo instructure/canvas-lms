@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState, useRef} from 'react'
 import {func, shape, string} from 'prop-types'
-import {statuses} from '../constants/statuses'
+import {getStatuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
 import type {StatusColors} from '../constants/colors'
 
@@ -78,7 +78,7 @@ export default function StatusColorPanel({
 
   return (
     <ul className="Gradebook__StatusModalList">
-      {statuses.map(status => (
+      {getStatuses().map(status => (
         <StatusColorListItem
           key={status}
           status={status}
