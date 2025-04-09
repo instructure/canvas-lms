@@ -105,7 +105,7 @@ const ReviewModal = () => {
         <Heading>{I18n.t('Review Evaluation')}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <Flex direction="column">
+        <Flex direction="column" gap="medium">
           <Flex display="flex" justifyItems="space-between">
             <Flex direction="column">
               <FlexItem>
@@ -115,10 +115,15 @@ const ReviewModal = () => {
                 <Text color="secondary">{formatDate(new Date(entry.entry_updated_at))}</Text>
               </FlexItem>
             </Flex>
-            <Button as="a" href={replyUrl} size="small">{I18n.t('See Reply in Context')}</Button>
+            <Button as="a" href={replyUrl} size="small">
+              {I18n.t('See Reply in Context')}
+            </Button>
           </Flex>
-          <FlexItem size="150px" shouldGrow={false} shouldShrink={true}>
-            <div dangerouslySetInnerHTML={{__html: entry.entry_content}} />
+          <FlexItem>
+            <div
+              dangerouslySetInnerHTML={{__html: entry.entry_content.replace(/<\/?p>/g, '')}}
+              style={{maxHeight: '150px', overflowY: 'auto', margin: '0'}}
+            />
           </FlexItem>
           <View borderWidth="small" borderRadius="medium" borderColor="primary" as="div">
             <Flex direction="column" padding="medium" gap="mediumSmall">
@@ -128,7 +133,9 @@ const ReviewModal = () => {
                 relevanceNotes={entry.relevance_ai_evaluation_notes}
                 feedback={feedback}
               />
-              {feedback === false && <DisagreeFeedback entryId={entryId} />}
+              {feedback === false && !entry.relevance_human_feedback_notes && (
+                <DisagreeFeedback entryId={entryId} />
+              )}
             </Flex>
           </View>
           <Pagination

@@ -23,6 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {useUpdateEntry} from '../../hooks/useUpdateEntry'
 import useInsightStore from '../../hooks/useInsightStore'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('discussion_insights')
 
@@ -42,18 +43,29 @@ const DisagreeFeedback: React.FC<DisagreeFeedbackProps> = ({entryId}) => {
     }
   }, [entryId])
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!feedbackNotes) {
       return
     }
 
-    updateEntry({
-      entryId,
-      entryFeedback: {
-        action: 'dislike',
-        notes: feedbackNotes,
-      },
-    })
+    try {
+      await updateEntry({
+        entryId,
+        entryFeedback: {
+          action: 'dislike',
+          notes: feedbackNotes,
+        },
+      })
+      showFlashAlert({
+        type: 'success',
+        message: I18n.t('Thanks for your input, your explanation has been recorded!'),
+      })
+    } catch (_error) {
+      showFlashAlert({
+        type: 'error',
+        message: I18n.t('We couldn’t save your explanation. Please try again.'),
+      })
+    }
   }
 
   return (
@@ -77,11 +89,7 @@ const DisagreeFeedback: React.FC<DisagreeFeedbackProps> = ({entryId}) => {
           />
         </Flex.Item>
         <FlexItem width={'fit-content'} align="end">
-          <Button
-            id="send-insights-feedback"
-            onClick={handleSubmit}
-            disabled={loading}
-          >
+          <Button id="send-insights-feedback" onClick={handleSubmit} disabled={loading}>
             {I18n.t('Send Feedback')}
           </Button>
         </FlexItem>

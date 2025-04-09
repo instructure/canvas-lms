@@ -46,7 +46,7 @@ const PaginatedTable: React.FC<PaginatedTableProps> = ({caption, headers, rows, 
   }
 
   return (
-    <Flex width="100%" direction="row" wrap="wrap" justifyItems="end">
+    <Flex width="100%" direction="column" wrap="wrap" alignItems="center">
       <SortableTable
         caption={caption}
         headers={headers}
