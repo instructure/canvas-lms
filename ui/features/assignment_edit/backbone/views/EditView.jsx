@@ -1021,6 +1021,11 @@ EditView.prototype.handleSubmissionTypeChange = function (_ev) {
   const subVal = this.$submissionType.val()
   this.$onlineSubmissionTypes.toggleAccessibly(subVal === 'online')
   this.$externalToolSettings.toggleAccessibly(subVal === 'external_tool')
+  if (subVal === 'external_tool' && this.$peerReviewsBox.prop('checked')) {
+    this.$peerReviewsBox.prop('checked', false)
+    this.togglePeerReviewsAndGroupCategoryEnabled()
+    $('#peer_reviews_details')?.toggleAccessibly(false)
+  }
   const isPlacementTool = subVal.includes('external_tool_placement')
   this.$externalToolPlacementLaunchContainer.toggleAccessibly(isPlacementTool)
 
