@@ -24,7 +24,9 @@ import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeS
 import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsSelector'
 import DueDateOverrideView from '@canvas/due-dates'
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
-import GroupCategorySelector, {GROUP_CATEGORY_SELECT} from '@canvas/groups/backbone/views/GroupCategorySelector'
+import GroupCategorySelector, {
+  GROUP_CATEGORY_SELECT,
+} from '@canvas/groups/backbone/views/GroupCategorySelector'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
 import Section from '@canvas/sections/backbone/models/Section'
 import {isAccessible} from '@canvas/test-utils/assertions'
@@ -86,7 +88,7 @@ const editView = (assignmentOpts = {}) => {
     parentModel: assignment,
     groupCategories: ENV?.GROUP_CATEGORIES || [],
     inClosedGradingPeriod: assignment.inClosedGradingPeriod(),
-    showNewErrors: true
+    showNewErrors: true,
   })
   const peerReviewsSelector = new PeerReviewsSelector({parentModel: assignment})
   const dueDateOverrideView = new DueDateOverrideView({
@@ -112,7 +114,7 @@ const editView = (assignmentOpts = {}) => {
         <input type="hidden" id="secure_params" value="${s_params}" />
         <div id="annotatable_attachment_input"></div>
         <label for="submission_type">Submission Type</label>
-        <select id="assignment_submission_type" aria-label="Submission Type" aria-expanded="false">
+        <select id="assignment_submission_type" aria-label="Submission Type">
           <option value="none">None</option>
           <option value="online_text_entry">Text Entry</option>
           <option value="online_url">URL</option>
@@ -120,7 +122,7 @@ const editView = (assignmentOpts = {}) => {
           <option value="external_tool">External Tool</option>
           <option value="external_tool_placement_123">External Tool Placement</option>
         </select>
-        <div id="point_change_warning" aria-expanded="false" role="alert"></div>
+        <div id="point_change_warning" role="alert"></div>
         <label for="assignment_points_possible">Points Possible</label>
         <input type="text" id="assignment_points_possible" aria-label="Points Possible" />
         <label for="assignment_name">Assignment Name</label>
@@ -287,9 +289,7 @@ describe('EditView', () => {
     const view = editView()
     const data = {points_possible: '-1', grading_type: 'letter_grade'}
     const errors = view._validatePointsPossible(data, [])
-    expect(errors.points_possible[0].message).toBe(
-      'Points value must be 0 or greater',
-    )
+    expect(errors.points_possible[0].message).toBe('Points value must be 0 or greater')
   })
 
   it('requires name to save assignment', () => {
@@ -358,28 +358,25 @@ describe('EditView', () => {
   it('does show error message on assignment point change with submissions', () => {
     const view = editView({has_submitted_submissions: true})
     view.$el.appendTo($('#fixtures'))
-    view.$el.find('#point_change_warning').attr('aria-expanded', 'false')
     view.$el.find('#assignment_points_possible').val(1).trigger('change')
-    expect(view.$el.find('#point_change_warning').attr('aria-expanded')).toBe('true')
+    expect(view.$el.find('#point_change_warning')[0]).toBeVisible()
     view.$el.find('#assignment_points_possible').val(0).trigger('change')
-    expect(view.$el.find('#point_change_warning').attr('aria-expanded')).toBe('false')
+    expect(view.$el.find('#point_change_warning')[0]).not.toBeVisible()
   })
 
   it('does not show error message on assignment point change without submissions', () => {
     const view = editView({has_submitted_submissions: false})
     view.$el.appendTo($('#fixtures'))
-    expect(view.$el.find('#point_change_warning:visible').attr('aria-expanded')).toBeFalsy()
+    expect(view.$el.find('#point_change_warning:visible')[0]).not.toBeDefined()
     view.$el.find('#assignment_points_possible').val(1).trigger('change')
-    expect(view.$el.find('#point_change_warning:visible').attr('aria-expanded')).toBeFalsy()
+    expect(view.$el.find('#point_change_warning:visible')[0]).not.toBeDefined()
   })
 
   it('does not allow point value of "" if grading type is letter', () => {
     const view = editView()
     const data = {points_possible: '', grading_type: 'letter_grade'}
     const errors = view._validatePointsPossible(data, [])
-    expect(errors.points_possible[0].message).toBe(
-      'Points value must be 0 or greater',
-    )
+    expect(errors.points_possible[0].message).toBe('Points value must be 0 or greater')
   })
 
   it('does not allow blank default external tool url', () => {
