@@ -45,11 +45,7 @@ const InsightsActionBar: React.FC<InsightsActionBarProps> = ({
         <InsightsSearchBar onSearch={onSearch} />
       </Flex.Item>
       <Flex.Item shouldShrink shouldGrow={false} width="fit-content">
-        <FilterDropDown
-          onFilterClick={() => {
-            //TODO: will be implemented in VICE-5147
-          }}
-        />
+        <FilterDropDown />
       </Flex.Item>
       <Flex.Item>
         <Button

@@ -26,7 +26,7 @@ import InsightsHeader from '../InsightsHeader/InsightsHeader'
 import InsightsActionBar from '../InsightsActionBar/InsightsActionBar'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {InsightEntry, useInsight} from '../../hooks/useFetchInsights'
-import {formatDate, getStatusByRelevance} from '../../utils'
+import {formatDate} from '../../utils'
 import useInsightStore from '../../hooks/useInsightStore'
 import {Button} from '@instructure/ui-buttons'
 import NewActivityInfo from '../NewActivityInfo/NewActivityInfo'
@@ -71,6 +71,13 @@ const headers: Header[] = [
   },
 ]
 
+const filterEntriesbyRelevance = (relevanceFilterType: string, entries: InsightEntry[]) => {
+  if (relevanceFilterType === 'all') {
+    return entries
+  }
+  return entries.filter(entry => entry.relevance_ai_classification === relevanceFilterType)
+}
+
 const DiscussionInsights: React.FC = () => {
   const [query, setQuery] = useState('')
 
@@ -80,6 +87,9 @@ const DiscussionInsights: React.FC = () => {
 
   const setEntries = useInsightStore(state => state.setEntries)
   const openEvaluationModal = useInsightStore(state => state.openEvaluationModal)
+  const relevanceFilterType = useInsightStore(state => state.filterType)
+
+  const setIsFilteredTable = useInsightStore(state => state.setIsFilteredTable)
 
   const {
     loading,
@@ -133,20 +143,23 @@ const DiscussionInsights: React.FC = () => {
   }
 
   const filteredEntries = useMemo(() => {
-    if (!entries) {
-      return []
-    }
+    if (!entries) return []
 
-    if (!query) {
-      setEntries(entries)
-      return entries
+    const relevanceFilteredValues = filterEntriesbyRelevance(relevanceFilterType, entries)
+    if (relevanceFilteredValues != entries) {
+      setIsFilteredTable(true)
     }
-    const filteredValues = entries.filter(row =>
+    if (!query) {
+      setEntries(relevanceFilteredValues)
+      return relevanceFilteredValues
+    }
+    const filteredValues = relevanceFilteredValues.filter(row =>
       row.student_name.toLowerCase().includes(query.toLowerCase()),
     )
+    setIsFilteredTable(true)
     setEntries(filteredValues)
     return filteredValues
-  }, [entries, query, setEntries])
+  }, [entries, query, setEntries, relevanceFilterType, setIsFilteredTable])
 
   const searchResultsText = I18n.t(
     {
@@ -157,7 +170,7 @@ const DiscussionInsights: React.FC = () => {
   )
 
   const tableRows: Row[] = filteredEntries.map(item => ({
-    relevance: getStatusByRelevance(item.relevance_ai_classification),
+    relevance: item.relevance_ai_classification,
     name: item.student_name,
     notes: item.relevance_ai_evaluation_notes,
     date: formatDate(new Date(item.entry_updated_at)),
@@ -187,7 +200,9 @@ const DiscussionInsights: React.FC = () => {
         !!entryCount &&
         !!filteredEntries.length && (
           <View as="div" margin="0 0 medium 0">
-            <Text color="secondary" data-testid="insight-result-counter">{searchResultsText}</Text>
+            <Text color="secondary" data-testid="insight-result-counter">
+              {searchResultsText}
+            </Text>
           </View>
         )}
       {placeholderContent}

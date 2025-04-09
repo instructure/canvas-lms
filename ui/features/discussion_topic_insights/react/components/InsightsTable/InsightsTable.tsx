@@ -16,16 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import SortableTable from './SortableTable'
-import { BaseTableProps } from './SimpleTable'
+import PaginatedTable, {PaginatedTableProps} from './PaginatedTable'
 
-export type InsightsTableProps = BaseTableProps & {
-  perPage: number
-}
-
-
-const InsightsTable: React.FC<InsightsTableProps> = ({ caption, rows, headers, perPage }) => {
-  return <SortableTable caption={caption} headers={headers} rows={rows} perPage={perPage} />
+const InsightsTable: React.FC<PaginatedTableProps> = ({caption, rows, headers, perPage}) => {
+  return <PaginatedTable caption={caption} headers={headers} rows={rows} perPage={perPage} />
 }
 
 export default InsightsTable
