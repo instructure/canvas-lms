@@ -21,7 +21,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconRssLine} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -29,15 +28,12 @@ export const PodcastFeed = ({...props}) => {
   return (
     <span className="discussion-podcast-feed">
       <Button
-        color="secondary"
-        display={props.responsiveProps?.display}
+        display={props.isMobile ? 'block' : 'inline-block'}
         renderIcon={IconRssLine}
         href={props.linkUrl}
         data-testid="post-rssfeed"
       >
-        <Text weight="bold" size={props.responsiveProps?.textSize}>
-          {I18n.t('Topic: Podcast Feed')}
-        </Text>
+        {I18n.t('Topic: Podcast Feed')}
       </Button>
     </span>
   )
@@ -48,5 +44,5 @@ PodcastFeed.propTypes = {
    * Link to discussions RSS feed
    */
   linkUrl: PropTypes.string.isRequired,
-  responsiveProps: PropTypes.object,
+  isMobile: PropTypes.bool,
 }
