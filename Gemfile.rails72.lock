@@ -864,7 +864,7 @@ GEM
       racc
     parslet (2.0.0)
     pdf-core (0.10.0)
-    pdf-reader (2.13.0)
+    pdf-reader (2.14.1)
       Ascii85 (>= 1.0, < 3.0, != 2.0.0)
       afm (~> 0.2.1)
       hashery (~> 2.0)
