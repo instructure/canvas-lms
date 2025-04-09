@@ -395,7 +395,7 @@ export const DiscussionPostToolbar = props => {
                       />
                     </Flex.Item>
                   )}
-                  {translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
+                  {!props.isAnnouncement && translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
                     <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                       {renderTranslate()}
                     </Flex.Item>
@@ -588,6 +588,7 @@ DiscussionPostToolbar.propTypes = {
   manageAssignTo: PropTypes.bool,
   isCheckpointed: PropTypes.bool,
   isExpanded: PropTypes.bool,
+  isAnnouncement: PropTypes.bool,
   showAssignTo: PropTypes.bool,
   isSortOrderLocked: PropTypes.bool,
   isExpandedLocked: PropTypes.bool,
