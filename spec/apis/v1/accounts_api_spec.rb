@@ -195,6 +195,17 @@ describe "Accounts API", type: :request do
                                         "Account 2"]
     end
 
+    it "returns child accounts in order by name" do
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@a1.id}/sub_accounts?order=name",
+                      { controller: "accounts",
+                        action: "sub_accounts",
+                        account_id: @a1.id.to_s,
+                        format: "json",
+                        order: "name" })
+      expect(json.pluck("name")).to eq ["Account 1", "Account 2", "implicit-access", "subby"]
+    end
+
     it "includes course count if requested" do
       2.times { course_factory(active_all: true, account: @a1.sub_accounts.find_by(name: "subby")) }
       json = api_call(:get,
