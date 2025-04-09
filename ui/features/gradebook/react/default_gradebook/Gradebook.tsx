@@ -104,7 +104,6 @@ import type {
   StudentGrade,
 } from '@canvas/grading/grading.d'
 import type {
-  ColumnFilterKey,
   FilterRowsBy,
   GridColumn,
   GridData,
@@ -118,7 +117,6 @@ import type {StatusColors} from './constants/colors'
 import type {ProxyDetails} from '@canvas/proxy-submission/react/ProxyUploadModal'
 import type TotalGradeColumnHeader from './GradebookGrid/headers/TotalGradeColumnHeader'
 import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
-import {QueryProvider} from '@canvas/query'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import KeyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
@@ -260,6 +258,8 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {RubricAssessmentImport} from './RubricAssessmentImport'
 import {RubricAssessmentExportModal} from './RubricAssessmentExport/RubricAssessmentExportModal'
 import PostGradesFrameModal from './components/PostGradesFrameModal'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('gradebook')
 
@@ -5417,15 +5417,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         )}
 
         {this.options.rubric_assessment_imports_exports_enabled && (
-          <QueryProvider>
+          <QueryClientProvider client={queryClient}>
             <RubricAssessmentImport />
-          </QueryProvider>
+          </QueryClientProvider>
         )}
 
         {this.options.rubric_assessment_imports_exports_enabled && (
-          <QueryProvider>
+          <QueryClientProvider client={queryClient}>
             <RubricAssessmentExportModal />
-          </QueryProvider>
+          </QueryClientProvider>
         )}
 
         {this.options.post_grades_enhanced_modal && (

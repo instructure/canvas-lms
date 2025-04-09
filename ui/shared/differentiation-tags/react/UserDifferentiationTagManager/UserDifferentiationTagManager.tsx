@@ -127,7 +127,7 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
   const manageTagsRefButton = useRef<HTMLElement | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const {mutate, isLoading: isAdding, isSuccess, isError, error: errorAdd} = useAddTagMembership()
+  const {mutate, isSuccess, isError, error: errorAdd} = useAddTagMembership()
   const courseStudentCount = Number(ENV.course?.course_student_count ?? 0)
   const selectedCount = allInCourse
     ? courseStudentCount - (userExceptions ? userExceptions.length : 0)

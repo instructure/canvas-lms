@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import { QueryProvider } from '@canvas/query'
 import useStore from '@canvas/rubrics/stores'
-import { RubricSelfAssessmentSettings } from '@canvas/rubrics/react/RubricAssignment'
+import {RubricSelfAssessmentSettings} from '@canvas/rubrics/react/RubricAssignment'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 type RubricSelfAssessmentSettingsWrapperProps = {
   assignmentId: string
@@ -30,11 +31,8 @@ export const RubricSelfAssessmentSettingsWrapper = ({
   const rubricId = useStore(state => state.rubricId)
 
   return (
-    <QueryProvider>
-      <RubricSelfAssessmentSettings
-        assignmentId={assignmentId}
-        rubricId={rubricId}
-      />
-    </QueryProvider>
+    <QueryClientProvider client={queryClient}>
+      <RubricSelfAssessmentSettings assignmentId={assignmentId} rubricId={rubricId} />
+    </QueryClientProvider>
   )
 }

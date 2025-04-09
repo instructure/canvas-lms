@@ -64,8 +64,8 @@ const ModulesList: React.FC = () => {
 
   // Set initial expanded state for modules when data is loaded
   useEffect(() => {
-    if (data?.pages) {
-      const allModules = data.pages.flatMap(page => page.modules)
+    if (data) {
+      const allModules = data.pages?.flatMap(page => page.modules) || []
 
       // Create a Map with all modules collapsed by default
       const initialExpandedState = new Map<string, boolean>()
@@ -91,7 +91,7 @@ const ModulesList: React.FC = () => {
         return initialExpandedState
       })
     }
-  }, [data?.pages])
+  }, [data])
 
   const handleMoveItem = (
     dragIndex: number,

@@ -24,7 +24,8 @@ import DeveloperKeysApp from './App'
 import actions from './actions/developerKeysActions'
 import storeCreator from './store/store'
 import {RegistrationSettings} from './RegistrationSettings/RegistrationSettings'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const store = storeCreator()
 
@@ -79,9 +80,9 @@ function renderShowDeveloperKeys(ctx) {
 
 const renderDeveloperKeySettings = ctx => {
   ReactDOM.render(
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <RegistrationSettings ctx={ctx} />
-    </QueryProvider>,
+    </QueryClientProvider>,
     reactRoot(),
   )
 }

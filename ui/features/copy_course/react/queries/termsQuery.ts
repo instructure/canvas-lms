@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {QueryFunctionContext} from '@tanstack/react-query'
+import type {QueryFunctionContext, InfiniteData} from '@tanstack/react-query'
 import type {EnrollmentTerms} from '../../../../api'
 import type {NextPageTerms, Term} from '../types'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
@@ -38,24 +38,38 @@ export const termsQuery = async ({
   signal,
   queryKey,
   pageParam,
-}: QueryFunctionContext<[string, string, string], NextPageTerms>): Promise<
+}: QueryFunctionContext<[string, string, string], unknown>): Promise<
   DoFetchApiResults<EnrollmentTerms>
 > => {
   const [, , accountId] = queryKey
   const fetchOpts = {signal}
-  const page = pageParam?.page || '1'
-  const perPage = pageParam?.per_page || '10'
+
+  // Handle the pageParam which might be unknown
+  let page = '1'
+  let perPage = '10'
+
+  if (pageParam && typeof pageParam === 'object' && pageParam !== null) {
+    const params = pageParam as Partial<NextPageTerms>
+    page = params.page || '1'
+    perPage = params.per_page || '10'
+  }
+
   const path = `/api/v1/accounts/${accountId}/terms?page=${page}&per_page=${perPage}`
 
   return doFetchApi<EnrollmentTerms>({path, fetchOpts})
 }
 
 export const useTermsQuery = (rootAccountId: string) => {
-  const {isLoading, isError, data, hasNextPage} = useAllPages({
+  const {isLoading, isError, data, hasNextPage} = useAllPages<
+    DoFetchApiResults<EnrollmentTerms>,
+    Error,
+    InfiniteData<DoFetchApiResults<EnrollmentTerms>>,
+    [string, string, string]
+  >({
     queryKey: [courseCopyRootKey, enrollmentTermsFetchKey, rootAccountId],
     queryFn: termsQuery,
     getNextPageParam: getTermsNextPage,
-    meta: {fetchAtLeastOnce: true},
+    initialPageParam: undefined,
   })
 
   const terms: Term[] = useMemo(

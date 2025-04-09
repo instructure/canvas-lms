@@ -23,7 +23,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Avatar} from '@instructure/ui-avatar'
 import {Flex, FlexItem} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {useQuery} from '@canvas/query'
+import {useQuery} from '@tanstack/react-query'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import {useScope as createI18nScope} from '@canvas/i18n'
 

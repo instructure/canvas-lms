@@ -18,7 +18,8 @@
 
 import {Portal} from '@instructure/ui-portal'
 import MergeUsers from './MergeUsers'
-import {QueryProvider} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 export function Component() {
   const mountPoint = document.getElementById('admin_merge_mount_point')
@@ -32,9 +33,9 @@ export function Component() {
 
   return (
     <Portal open={true} mountNode={mountPoint}>
-      <QueryProvider>
+      <QueryClientProvider client={queryClient}>
         <MergeUsers accountSelectOptions={accountSelectOptions} currentUserId={currentUserId} />
-      </QueryProvider>
+      </QueryClientProvider>
     </Portal>
   )
 }

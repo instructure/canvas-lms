@@ -21,7 +21,7 @@ import {executeQuery} from '@canvas/query/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Folder} from '../../utils/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useQuery} from '@canvas/query'
+import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('context_modules_v2')
 

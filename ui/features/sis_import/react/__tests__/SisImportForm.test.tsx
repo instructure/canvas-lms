@@ -18,14 +18,14 @@
 
 import {render, waitFor} from '@testing-library/react'
 import SisImportForm from '../SisImportForm'
-import {queryClient} from '@canvas/query'
-import {MockedQueryProvider} from '@canvas/test-utils/query'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import userEvent, {UserEvent} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 
 const ACCOUNT_ID = '100'
 const SIS_IMPORT_URI = `/sis_imports`
+const TERMS_API_URI = `/api/v1/accounts/${ACCOUNT_ID}/terms`
 
 const uploadFile = async (user: UserEvent, fileDrop: HTMLElement) => {
   const file = new File(['users'], 'users.csv', {type: 'file/csv'})
@@ -36,22 +36,40 @@ const uploadFile = async (user: UserEvent, fileDrop: HTMLElement) => {
 const enrollmentTerms = {enrollment_terms: [{id: '1', name: 'Term 1'}]}
 
 describe('SisImportForm', () => {
-  beforeAll(() => {
-    fakeENV.setup({ACCOUNT_ID: ACCOUNT_ID})
-    queryClient.setQueryData(['terms_list', ACCOUNT_ID], {
-      pages: [{json: enrollmentTerms}],
+  let queryClient: QueryClient
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
+    fakeENV.setup({ACCOUNT_ID})
+
+    // Mock the terms API endpoint
+    fetchMock.get(`${TERMS_API_URI}?per_page=50&page=1`, {
+      body: enrollmentTerms,
+      headers: {
+        Link: '<>; rel="current"',
+      },
     })
   })
 
   afterEach(() => {
     fetchMock.restore()
+    queryClient.clear()
+    fakeENV.teardown()
   })
 
+  const renderWithClient = (ui: React.ReactElement) => {
+    return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
+  }
+
   it('should render checkboxes and descriptions', () => {
-    const {queryByText, queryByTestId, getByTestId, getByText} = render(
-      <MockedQueryProvider>
-        <SisImportForm onSuccess={jest.fn()} />
-      </MockedQueryProvider>,
+    const {queryByText, queryByTestId, getByTestId, getByText} = renderWithClient(
+      <SisImportForm onSuccess={jest.fn()} />,
     )
     expect(getByText('Choose a file to import')).toBeInTheDocument()
 
@@ -76,24 +94,23 @@ describe('SisImportForm', () => {
 
   it('should show term select if full batch checked', async () => {
     const user = userEvent.setup()
-    const {getByTestId, getByText} = render(
-      <MockedQueryProvider>
-        <SisImportForm onSuccess={jest.fn()} />
-      </MockedQueryProvider>,
+    const {getByTestId, findByText, findByTestId} = renderWithClient(
+      <SisImportForm onSuccess={jest.fn()} />,
     )
 
     await user.click(getByTestId('batch_mode'))
-    expect(getByText(/this will delete everything for this term/)).toBeInTheDocument()
-    expect(getByTestId('term_select')).toBeInTheDocument()
+
+    // Use findByText instead of getByText to wait for the async rendering
+    const warningText = await findByText(/this will delete everything for this term/)
+    expect(warningText).toBeInTheDocument()
+
+    const termSelect = await findByTestId('term_select')
+    expect(termSelect).toBeInTheDocument()
   })
 
   it('should show additional checkboxes if override sis', async () => {
     const user = userEvent.setup()
-    const {getByText, getByTestId} = render(
-      <MockedQueryProvider>
-        <SisImportForm onSuccess={jest.fn()} />
-      </MockedQueryProvider>,
-    )
+    const {getByText, getByTestId} = renderWithClient(<SisImportForm onSuccess={jest.fn()} />)
 
     await user.click(getByTestId('override_sis_stickiness'))
     expect(getByTestId('add_sis_stickiness')).toBeInTheDocument()
@@ -105,11 +122,7 @@ describe('SisImportForm', () => {
 
   it('disables override checkboxes based on check status', async () => {
     const user = userEvent.setup()
-    const {getByTestId} = render(
-      <MockedQueryProvider>
-        <SisImportForm onSuccess={jest.fn()} />
-      </MockedQueryProvider>,
-    )
+    const {getByTestId} = renderWithClient(<SisImportForm onSuccess={jest.fn()} />)
 
     await user.click(getByTestId('override_sis_stickiness'))
     const addCheck = getByTestId('add_sis_stickiness')
@@ -132,11 +145,7 @@ describe('SisImportForm', () => {
     const onSuccess = jest.fn()
     const user = userEvent.setup()
     fetchMock.post(SIS_IMPORT_URI, 200)
-    const {getByText, getByTestId} = render(
-      <MockedQueryProvider>
-        <SisImportForm onSuccess={onSuccess} />
-      </MockedQueryProvider>,
-    )
+    const {getByText, getByTestId} = renderWithClient(<SisImportForm onSuccess={onSuccess} />)
 
     const file = await uploadFile(user, getByTestId('file_drop'))
 
@@ -156,13 +165,14 @@ describe('SisImportForm', () => {
   describe('opens confirmation modal', () => {
     it('if full batch checked', async () => {
       const user = userEvent.setup()
-      const {getByTestId, getByText} = render(
-        <MockedQueryProvider>
-          <SisImportForm onSuccess={jest.fn()} />
-        </MockedQueryProvider>,
+      const {getByTestId, getByText, findByTestId} = renderWithClient(
+        <SisImportForm onSuccess={jest.fn()} />,
       )
       await uploadFile(user, getByTestId('file_drop'))
       await user.click(getByTestId('batch_mode'))
+
+      // Wait for the term select to appear
+      await findByTestId('term_select')
 
       getByText('Process Data').click()
       expect(getByText('Confirm Changes')).toBeInTheDocument()
@@ -172,13 +182,14 @@ describe('SisImportForm', () => {
       const onSuccess = jest.fn()
       const user = userEvent.setup()
       fetchMock.post(SIS_IMPORT_URI, 200)
-      const {getByText, getByTestId} = render(
-        <MockedQueryProvider>
-          <SisImportForm onSuccess={onSuccess} />
-        </MockedQueryProvider>,
+      const {getByText, getByTestId, findByTestId} = renderWithClient(
+        <SisImportForm onSuccess={onSuccess} />,
       )
       await uploadFile(user, getByTestId('file_drop'))
       await user.click(getByTestId('batch_mode'))
+
+      // Wait for the term select to appear
+      await findByTestId('term_select')
 
       getByText('Process Data').click()
       getByText('Confirm').click()
@@ -195,13 +206,14 @@ describe('SisImportForm', () => {
     it('does not call onSuccess if cancelled', async () => {
       const onSuccess = jest.fn()
       const user = userEvent.setup()
-      const {getByText, getByTestId, queryByText} = render(
-        <MockedQueryProvider>
-          <SisImportForm onSuccess={onSuccess} />
-        </MockedQueryProvider>,
+      const {getByText, getByTestId, queryByText, findByTestId} = renderWithClient(
+        <SisImportForm onSuccess={onSuccess} />,
       )
       await uploadFile(user, getByTestId('file_drop'))
       await user.click(getByTestId('batch_mode'))
+
+      // Wait for the term select to appear
+      await findByTestId('term_select')
 
       getByText('Process Data').click()
       getByText('Cancel').click()

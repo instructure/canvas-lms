@@ -17,22 +17,22 @@
  */
 
 import React, {useState, useEffect, useRef} from 'react'
-import {QueryProvider} from '@canvas/query'
 import {useUserTags} from '../hooks/useUserTags'
-import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import {Tag} from "@instructure/ui-tag"
+import {Tag} from '@instructure/ui-tag'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Modal} from '@instructure/ui-modal'
 import {CloseButton} from '@instructure/ui-buttons'
 import {RemoveTagWarningModal} from '../WarningModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useDeleteTagMembership} from '../hooks/useDeleteTagMembership'
-import { Alert } from '@instructure/ui-alerts'
+import {Alert} from '@instructure/ui-alerts'
 import MessageBus from '@canvas/util/MessageBus'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -48,22 +48,27 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
   const {isOpen, courseId, userId, userName, onClose} = props
   const [isWarningModalOpen, setIsWarningModalOpen] = useState(false)
   const [selectedTagId, setSelectedTagId] = useState<number>(0)
-  const { mutate, isLoading: isDeleting, isSuccess, isError, error: errorDelete, } = useDeleteTagMembership()
-  const { data: userTagList, isLoading, isSuccess: isDone, error, refetch } = useUserTags(courseId, userId)
+  const {
+    mutate,
+    isPending: isDeleting,
+    isSuccess,
+    isError,
+    error: errorDelete,
+  } = useDeleteTagMembership()
+  const {data: userTagList, isPending, error, refetch} = useUserTags(courseId, userId)
   const tagRefs = useRef<Tag[]>([])
   const removeTagMembership = (userId: number, selectedTagId: number) => {
     mutate({groupId: selectedTagId, userId, refetch})
     setIsWarningModalOpen(false)
   }
   useEffect(() => {
-    if(userTagList && userTagList?.length === 0) {
+    if (userTagList && userTagList?.length === 0) {
       MessageBus.trigger('removeUserTagIcon', {userId})
     }
-    if(isSuccess && userTagList && userTagList?.length > 0) {
+    if (isSuccess && userTagList && userTagList?.length > 0) {
       delete tagRefs.current[selectedTagId]
       tagRefs.current[userTagList[0].id]?.focus()
     }
-    
   }, [userTagList])
   return (
     <>
@@ -82,17 +87,26 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
             onClick={() => onClose(userId, userName)}
             type="button"
             as="button"
-            screenReaderLabel={I18n.t("Close the user tags modal")}
+            screenReaderLabel={I18n.t('Close the user tags modal')}
           />
         </Modal.Header>
         <Modal.Body>
-          <Flex as="div" alignItems="start" justifyItems="start" gap="none" direction="column" width="100%" >
+          <Flex
+            as="div"
+            alignItems="start"
+            justifyItems="start"
+            gap="none"
+            direction="column"
+            width="100%"
+          >
             {isSuccess && (
               <Alert
                 variant="success"
                 renderCloseButtonLabel={I18n.t('Close')}
                 timeout={3000}
-                liveRegion={() => document.getElementById('flash_screenreader_holder') as HTMLElement}
+                liveRegion={() =>
+                  document.getElementById('flash_screenreader_holder') as HTMLElement
+                }
                 liveRegionPoliteness="polite"
               >
                 {I18n.t('Tag removed successfully')}
@@ -102,13 +116,15 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
               <Alert
                 variant="error"
                 timeout={5000}
-                liveRegion={() => document.getElementById('flash_screenreader_holder') as HTMLElement}
+                liveRegion={() =>
+                  document.getElementById('flash_screenreader_holder') as HTMLElement
+                }
                 liveRegionPoliteness="assertive"
               >
                 {I18n.t('Error:')} {errorDelete.message}
               </Alert>
             )}
-            {isLoading ? (
+            {isPending ? (
               <Flex.Item shouldGrow shouldShrink margin="medium">
                 <Spinner renderTitle={I18n.t('Loading...')} size="small" />
               </Flex.Item>
@@ -123,38 +139,45 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
                 <Spinner renderTitle={I18n.t('Removing user from tag...')} size="small" />
               </Flex.Item>
             ) : userTagList.length === 0 ? (
-                <Flex.Item shouldGrow shouldShrink margin="medium">
-                  <Text>{I18n.t('No tags available for this user')}</Text>
-                </Flex.Item>
+              <Flex.Item shouldGrow shouldShrink margin="medium">
+                <Text>{I18n.t('No tags available for this user')}</Text>
+              </Flex.Item>
             ) : (
-                userTagList.map( tag =>(
-                  <Flex.Item key={`tag-flex-${tag.id}`} margin="0" overflowY="hidden" overflowX="hidden" padding="xx-small">
-                    <Tag
-                      ref={el => el && (tagRefs.current[tag.id] = el)}
-                      data-testid={`user-tag-${tag.id}`}
-                      text={
-                        <AccessibleContent alt="Remove dismissible tag">
-                          {tag.isSingleTag ? tag.groupCategoryName : `${tag.groupCategoryName} | ${tag.name}`}
-                        </AccessibleContent>
-                      }
-                      dismissible={true}
-                      margin="auto"
-                      size="medium"
-                      onClick={function (e) {
-                        setSelectedTagId(tag.id)
-                        setIsWarningModalOpen(true)
-                      }}
-                      themeOverride={{
-                        maxWidth: '100%'
-                      }}
-                      />
-                  </Flex.Item>
-                ))
-              )}
+              userTagList.map(tag => (
+                <Flex.Item
+                  key={`tag-flex-${tag.id}`}
+                  margin="0"
+                  overflowY="hidden"
+                  overflowX="hidden"
+                  padding="xx-small"
+                >
+                  <Tag
+                    ref={el => el && (tagRefs.current[tag.id] = el)}
+                    data-testid={`user-tag-${tag.id}`}
+                    text={
+                      <AccessibleContent alt="Remove dismissible tag">
+                        {tag.isSingleTag
+                          ? tag.groupCategoryName
+                          : `${tag.groupCategoryName} | ${tag.name}`}
+                      </AccessibleContent>
+                    }
+                    dismissible={true}
+                    margin="auto"
+                    size="medium"
+                    onClick={function (e) {
+                      setSelectedTagId(tag.id)
+                      setIsWarningModalOpen(true)
+                    }}
+                    themeOverride={{
+                      maxWidth: '100%',
+                    }}
+                  />
+                </Flex.Item>
+              ))
+            )}
           </Flex>
         </Modal.Body>
-        <Modal.Footer>
-        </Modal.Footer>
+        <Modal.Footer></Modal.Footer>
       </Modal>
       <RemoveTagWarningModal
         open={isWarningModalOpen}
@@ -167,8 +190,8 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
 
 export default function UserTaggedModal(props: UserTaggedModalProps) {
   return (
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <UserTagModalContainer {...props} />
-    </QueryProvider>
+    </QueryClientProvider>
   )
 }

@@ -24,9 +24,10 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
-import {useQuery} from '@canvas/query'
 import groupsQuery from '../queries/groupsQuery'
 import type {AccessibleGroup} from '../../../../api.d'
+import {useQuery} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
 
 const I18n = createI18nScope('GroupsTray')
 
@@ -34,9 +35,7 @@ export default function GroupsTray() {
   const {data, isLoading, isSuccess} = useQuery<AccessibleGroup[], Error>({
     queryKey: ['groups', 'self', 'can_access'],
     queryFn: groupsQuery,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    persister: sessionStoragePersister,
   })
 
   return (

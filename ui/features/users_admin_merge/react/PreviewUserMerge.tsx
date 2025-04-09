@@ -24,7 +24,6 @@ import {IconCheckLine, IconWarningLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {createUserToMergeQueryKey, fetchUserWithRelations, User} from './common'
-import {useQuery} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useState} from 'react'
@@ -32,6 +31,7 @@ import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 import {Spinner} from '@instructure/ui-spinner'
+import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('merge_users')
 

@@ -27,13 +27,16 @@ import {formatTimeAgoDate, formatTimeAgoTitle} from '@canvas/enhanced-user-conte
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
 import {useInfiniteQuery} from '@tanstack/react-query'
+import type {QueryFunctionContext} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
 
 const I18n = createI18nScope('new_nav')
 
 export default function HistoryList() {
   const [lastItem, setLastItem] = useState<Element | null>(null)
 
-  const fetchHistory = useCallback(async ({pageParam = '/api/v1/users/self/history'}) => {
+  const fetchHistory = useCallback(async (context: QueryFunctionContext<string[], string>) => {
+    const {pageParam = '/api/v1/users/self/history'} = context
     const {json, link} = await doFetchApi({path: pageParam})
     const nextPage = link?.next ? link.next.url : null
     return {json, nextPage}
@@ -42,10 +45,8 @@ export default function HistoryList() {
   const {data, fetchNextPage, isLoading, hasNextPage, error} = useInfiniteQuery({
     queryKey: ['history'],
     queryFn: fetchHistory,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
-    getNextPageParam: lastPage => lastPage.nextPage,
+    getNextPageParam: lastPage => lastPage.nextPage || undefined,
+    initialPageParam: '/api/v1/users/self/history',
   })
 
   // @ts-expect-error

@@ -25,6 +25,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {sessionStoragePersister} from '@canvas/query'
 
 declare global {
   interface Window {
@@ -55,6 +56,7 @@ const MobileNavigation: React.FC<{navIsOpen?: boolean}> = ({navIsOpen = false}) 
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
+    persister: sessionStoragePersister,
   })
 
   useEffect(() => {

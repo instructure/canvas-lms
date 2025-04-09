@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useQuery} from '@canvas/query'
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/query/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ModuleItemsResponse, ModuleItemsGraphQLResult, ModuleItem} from '../../utils/types.d'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('context_modules_v2')
 

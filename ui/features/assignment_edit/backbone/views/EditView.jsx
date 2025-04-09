@@ -36,7 +36,9 @@ import File from '@canvas/files/backbone/models/File'
 import TurnitinSettingsDialog from './TurnitinSettingsDialog'
 import MissingDateDialog from '@canvas/due-dates/backbone/views/MissingDateDialogView'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
-import GroupCategorySelector, {GROUP_CATEGORY_SELECT} from '@canvas/groups/backbone/views/GroupCategorySelector'
+import GroupCategorySelector, {
+  GROUP_CATEGORY_SELECT,
+} from '@canvas/groups/backbone/views/GroupCategorySelector'
 import ConditionalRelease from '@canvas/conditional-release-editor'
 import deparam from 'deparam'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
@@ -307,7 +309,8 @@ EditView.prototype.events = {
     events['input ' + `[name="${ASSIGNMENT_NAME_INPUT_NAME}"]`] = 'validateInput'
     events['input ' + `[name="${ALLOWED_EXTENSIONS_INPUT_NAME}"]`] = 'validateInput'
     events['input ' + `[name="${POINTS_POSSIBLE_INPUT_NAME}"]`] = 'validateInput'
-    events['change #assignment_online_submission_types input[type="checkbox"]'] = 'handleOnlineSubmissionCheckboxToggle'
+    events['change #assignment_online_submission_types input[type="checkbox"]'] =
+      'handleOnlineSubmissionCheckboxToggle'
     events['change #' + GROUP_CATEGORY_SELECT] = 'clearGroupSetErrors'
     if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
       events.change = 'onChange'
@@ -762,7 +765,7 @@ EditView.prototype.showExternalToolsDialog = function () {
 
 EditView.prototype.clearAllowedExtensionsAndErrors = function () {
   this.getElement(ALLOWED_EXTENSIONS_INPUT_NAME).value = ''
-  this.hideErrors("allowed_extensions_errors")
+  this.hideErrors('allowed_extensions_errors')
 }
 
 EditView.prototype.toggleRestrictFileUploads = function () {
@@ -772,7 +775,7 @@ EditView.prototype.toggleRestrictFileUploads = function () {
 }
 
 EditView.prototype.toggleAnnotatedDocument = function () {
-  this.hideErrors("online_submission_types[student_annotation]_errors")
+  this.hideErrors('online_submission_types[student_annotation]_errors')
   const isAnonymous = this.$anonymousGradingBox.prop('checked')
   this.$annotatedDocumentOptions.toggleAccessibly(this.$allowAnnotatedDocument.prop('checked'))
   if (this.$allowAnnotatedDocument.prop('checked')) {
@@ -821,7 +824,7 @@ EditView.prototype.getAnnotatedDocument = function () {
 }
 
 EditView.prototype.renderAnnotatedDocumentSelector = function () {
-  this.hideErrors("online_submission_types[student_annotation]_errors")
+  this.hideErrors('online_submission_types[student_annotation]_errors')
   const props = {
     attachment: this.getAnnotatedDocument(),
     defaultUploadFolderId: ENV.ROOT_FOLDER_ID,
@@ -991,7 +994,7 @@ EditView.prototype.renderDefaultExternalTool = function () {
     toolButtonText: ENV.DEFAULT_ASSIGNMENT_TOOL_BUTTON_TEXT,
     toolInfoMessage: ENV.DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE,
     previouslySelected: this.assignment.defaultToolSelected(),
-    hideErrors: this.hideErrors
+    hideErrors: this.hideErrors,
   }
   // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(
@@ -1223,10 +1226,9 @@ EditView.prototype.handleOnlineSubmissionTypeChange = function (_env) {
 
   const showConfigTools =
     ENV.PLAGIARISM_DETECTION_PLATFORM &&
-    this.$submissionType.val() === 'online' && (
-      this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked') ||
-      this.$onlineSubmissionTypes.find(ALLOW_TEXT_ENTRY).prop('checked')
-    )
+    this.$submissionType.val() === 'online' &&
+    (this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked') ||
+      this.$onlineSubmissionTypes.find(ALLOW_TEXT_ENTRY).prop('checked'))
   return this.$similarityDetectionTools.toggleAccessibly(
     showConfigTools && ENV.PLAGIARISM_DETECTION_PLATFORM,
   )
@@ -1324,7 +1326,9 @@ EditView.prototype.toJSON = function () {
         : void 0) || false,
     coursePaceWithMasteryPath:
       (typeof ENV !== 'undefined' && ENV !== null
-        ? ENV.IN_PACED_COURSE && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths
+        ? ENV.IN_PACED_COURSE &&
+          ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+          ENV.FEATURES.course_pace_pacing_with_mastery_paths
         : void 0) || false,
     lockedItems: this.lockedItems,
     cannotEditGrades: this.cannotEditGrades,
@@ -1338,7 +1342,7 @@ EditView.prototype.toJSON = function () {
       (typeof ENV !== 'undefined' && ENV !== null
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
-    is_horizon_course: !!ENV.horizon_course
+    is_horizon_course: !!ENV.horizon_course,
   })
 }
 
@@ -1596,23 +1600,50 @@ EditView.prototype.showErrors = function (errors) {
     const errorsContainer = document.getElementById(errorsContainerID)
     if (errorsContainer) {
       const root = this.errorRoots[errorsContainerID] ?? createRoot(errorsContainer)
-      const noMargin = ['allowed_attempts', 'final_grader_id', 'grader_count', ONLINE_SUBMISSION_CHECKBOXES_GROUP, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON].includes(key)
-      const marginTop = [EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, DEFAULT_TOOL_LAUNCH_BUTTON].includes(key)
+      const noMargin = [
+        'allowed_attempts',
+        'final_grader_id',
+        'grader_count',
+        ONLINE_SUBMISSION_CHECKBOXES_GROUP,
+        SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON,
+      ].includes(key)
+      const marginTop = [
+        EXTERNAL_TOOL_URL_INPUT_NAME,
+        ASSIGNMENT_NAME_INPUT_NAME,
+        POINTS_POSSIBLE_INPUT_NAME,
+        ALLOWED_EXTENSIONS_INPUT_NAME,
+        GROUP_CATEGORY_SELECT,
+        DEFAULT_TOOL_LAUNCH_BUTTON,
+      ].includes(key)
       root.render(
         <FormattedErrorMessage
           message={value[0].message}
           margin={noMargin ? '0' : marginTop ? 'xx-small 0 0 0' : '0 0 0 medium'}
           iconMargin={value[0].longMessage ? '0 xx-small medium 0' : '0 xx-small xxx-small 0'}
-        />
+        />,
       )
       this.errorRoots[errorsContainerID] = root
       delete errors[key]
       const element = this.getElement(key)
       if (element) {
-        element.setAttribute("aria-describedby", errorsContainerID)
+        element.setAttribute('aria-describedby', errorsContainerID)
 
-        if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, DEFAULT_TOOL_LAUNCH_BUTTON, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON, USAGE_RIGHTS_SELECT].includes(key)) {
-          const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
+        if (
+          [
+            EXTERNAL_TOOL_URL_INPUT_NAME,
+            ASSIGNMENT_NAME_INPUT_NAME,
+            POINTS_POSSIBLE_INPUT_NAME,
+            ALLOWED_EXTENSIONS_INPUT_NAME,
+            GROUP_CATEGORY_SELECT,
+            DEFAULT_TOOL_LAUNCH_BUTTON,
+            SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON,
+            USAGE_RIGHTS_SELECT,
+          ].includes(key)
+        ) {
+          const selector =
+            key === EXTERNAL_TOOL_URL_INPUT_NAME
+              ? 'assignment_external_tool_tag_attributes_url_container'
+              : key
           this.getElement(selector)?.classList.add('error-outline')
         }
 
@@ -1631,7 +1662,6 @@ EditView.prototype.showErrors = function (errors) {
       }
     }
   })
-
 
   // override view handles displaying override errors, remove them
   // before calling super
@@ -1653,7 +1683,7 @@ EditView.prototype.sortErrorsByVerticalScreenPosition = function (errors) {
 
       const elementRect = errorElement.getBoundingClientRect()
       const verticalPosition = elementRect.top + window.scrollY
-      return { errorKey, errorMessage, verticalPosition }
+      return {errorKey, errorMessage, verticalPosition}
     })
     .filter(errorEntry => errorEntry !== null)
     .sort((firstError, secondError) => firstError.verticalPosition - secondError.verticalPosition)
@@ -1667,14 +1697,14 @@ EditView.prototype.getElement = function (key) {
   const byId = document.getElementById(key)
   if (byId) return byId
 
-  // This check is necessary because some elements may share the same name attribute 
-  // but have the `hidden` attribute set. 
-  // These hidden elements should be excluded from the selection to ensure 
+  // This check is necessary because some elements may share the same name attribute
+  // but have the `hidden` attribute set.
+  // These hidden elements should be excluded from the selection to ensure
   // we only target visible elements in the DOM.
   const byName = document.querySelector(`[name="${key}"]:not([type="hidden"])`)
   if (byName) return byName
 
-  const byCustomSelector =  document.querySelector(EditView.prototype.fieldSelectors[key])
+  const byCustomSelector = document.querySelector(EditView.prototype.fieldSelectors[key])
   if (byCustomSelector) return byCustomSelector
 
   return null
@@ -1691,8 +1721,21 @@ EditView.prototype.hideErrors = function (containerId) {
     delete this.errorRoots[containerId]
 
     const key = containerId.replace(/_errors$/, '')
-    if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON, USAGE_RIGHTS_SELECT].includes(key)) {
-      const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
+    if (
+      [
+        EXTERNAL_TOOL_URL_INPUT_NAME,
+        ASSIGNMENT_NAME_INPUT_NAME,
+        POINTS_POSSIBLE_INPUT_NAME,
+        ALLOWED_EXTENSIONS_INPUT_NAME,
+        GROUP_CATEGORY_SELECT,
+        SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON,
+        USAGE_RIGHTS_SELECT,
+      ].includes(key)
+    ) {
+      const selector =
+        key === EXTERNAL_TOOL_URL_INPUT_NAME
+          ? 'assignment_external_tool_tag_attributes_url_container'
+          : key
       const element = this.getElement(selector)
       element?.classList.remove('error-outline')
     }
@@ -1756,11 +1799,11 @@ EditView.prototype.validateGraderCount = function (data) {
     message = I18n.t('Must have at least one grader')
   } else if (data.grader_count > ENV.MODERATED_GRADING_GRADER_LIMIT) {
     message = I18n.t('Only a maximum of %{max} graders can be assigned', {
-          max: ENV.MODERATED_GRADING_GRADER_LIMIT,
-        })
+      max: ENV.MODERATED_GRADING_GRADER_LIMIT,
+    })
   }
 
-  if(message) {
+  if (message) {
     errors.grader_count = [{message}]
     $(document).trigger('validateGraderCountNumber', {error: true})
   }
@@ -1821,7 +1864,10 @@ EditView.prototype._validateTitle = function (data, errors) {
         message: I18n.t('name_is_required', 'Name is required'),
       },
     ]
-  } else if ((post_to_sis && validationHelper.nameTooLong()) || (!post_to_sis && data.name.length > max_name_length)) {
+  } else if (
+    (post_to_sis && validationHelper.nameTooLong()) ||
+    (!post_to_sis && data.name.length > max_name_length)
+  ) {
     errors.name = [
       {
         message: I18n.t('Must be fewer than %{length} characters', {
@@ -1908,7 +1954,11 @@ EditView.prototype._validateAllowedExtensions = function (data, errors) {
 }
 
 EditView.prototype._validatePointsPossible = function (data, errors) {
-  if (includes(this.model.frozenAttributes(), 'points_possible') || this.lockedItems.points || data.grading_type === 'not_graded') {
+  if (
+    includes(this.model.frozenAttributes(), 'points_possible') ||
+    this.lockedItems.points ||
+    data.grading_type === 'not_graded'
+  ) {
     return errors
   }
   if (this.lockedItems.points) {
@@ -1918,7 +1968,7 @@ EditView.prototype._validatePointsPossible = function (data, errors) {
   if ([undefined, '', null].includes(data.points_possible) || data.points_possible < 0) {
     errors.points_possible = [
       {
-        message: I18n.t('points_possible_positive', 'Points value must be 0 or greater')
+        message: I18n.t('points_possible_positive', 'Points value must be 0 or greater'),
       },
     ]
   } else if (typeof data.points_possible !== 'number' || isNaN(data.points_possible)) {
@@ -1930,7 +1980,7 @@ EditView.prototype._validatePointsPossible = function (data, errors) {
   } else if (data.points_possible > 999999999) {
     errors.points_possible = [
       {
-        message: I18n.t('points_possible_max', 'Points value must be 999999999 or less')
+        message: I18n.t('points_possible_max', 'Points value must be 999999999 or less'),
       },
     ]
   }
@@ -2024,7 +2074,7 @@ EditView.prototype.locationAfterSave = function (params) {
     queryClient.invalidateQueries({
       queryKey: ['assignment-self-assessment-settings', this.assignment.id],
       exact: false,
-    });
+    })
   } catch (error) {
     console.error('Error invalidating query, error:', error)
   }

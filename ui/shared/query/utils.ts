@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,58 +16,111 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect} from 'react'
-import {useQuery, QueryClient, type QueryKey} from '@tanstack/react-query'
+import {useEffect, useRef} from 'react'
+import {useQueryClient, hashKey} from '@tanstack/react-query'
 
-export function useReception({
-  queryKey,
-  hashedKey,
-  queryClient,
-  channel,
-  enabled,
-}: {
-  queryKey?: QueryKey
-  hashedKey: string
-  queryClient: QueryClient
-  channel: BroadcastChannel
-  enabled?: boolean
-}) {
-  useEffect(() => {
-    if (!enabled || !queryKey) return
-    function handleChannelMessage(event: MessageEvent<{hashedKey: string; data: unknown}>) {
-      if (queryKey && event.data.hashedKey === hashedKey) {
-        queryClient.setQueryData(queryKey, event.data.data)
-      }
-    }
-
-    channel.addEventListener('message', handleChannelMessage)
-
-    return () => channel.removeEventListener('message', handleChannelMessage)
-  }, [queryKey, hashedKey, enabled, channel, queryClient])
+interface UseBroadcastQueryOptions {
+  /**
+   * The query key to synchronize across browser tabs.
+   * This should be the same query key used in useQuery or similar hooks.
+   */
+  queryKey: unknown[]
+  /**
+   * Optional channel name for the BroadcastChannel.
+   * Defaults to 'tanstack-query'.
+   */
+  broadcastChannel?: string
 }
 
-export function useBroadcastWhenFetched({
-  queryResult,
-  enabled,
-  hashedKey,
-  channel,
-}: {
-  hashedKey: string
-  queryResult: ReturnType<typeof useQuery>
-  channel: BroadcastChannel
-  enabled?: boolean
-}) {
-  const {isSuccess, isFetching} = queryResult
-  const [wasFetching, setWasFetching] = useState(isFetching)
+/**
+ * Synchronizes TanStack Query cache across browser tabs for a specific query key.
+ *
+ * This hook enables real-time synchronization of query data between different tabs
+ * of the same browser using the BroadcastChannel API. When a query is updated in one tab,
+ * the changes will be reflected in all other tabs using this hook with the same query key.
+ *
+ * @example
+ * ```tsx
+ * function TodoList() {
+ *   const todosQuery = useQuery({
+ *     queryKey: ['todos'],
+ *     queryFn: fetchTodos,
+ *   })
+ *
+ *   useBroadcastQuery({
+ *     queryKey: ['todos'],
+ *   })
+ *
+ *   return (
+ *     <div>
+ *       {todosQuery.data?.map(todo => (
+ *         <TodoItem key={todo.id} todo={todo} />
+ *       ))}
+ *     </div>
+ *   )
+ * }
+ * ```
+ *
+ * @param options - Configuration options for the broadcast query
+ * @returns void
+ */
+export function useBroadcastQuery({
+  queryKey,
+  broadcastChannel = 'tanstack-query',
+}: UseBroadcastQueryOptions) {
+  const queryClient = useQueryClient()
+  const transactionRef = useRef(false)
+  const channelRef = useRef<BroadcastChannel>()
+  const queryKeyHash = hashKey(queryKey)
 
   useEffect(() => {
-    // If it was fetching and now it's not, and the fetch was successful
-    if (wasFetching && !isFetching && isSuccess && enabled) {
-      channel.postMessage({
-        hashedKey,
-        data: queryResult.data,
+    const channel = new BroadcastChannel(broadcastChannel)
+    channelRef.current = channel
+
+    const qc = queryClient.getQueryCache()
+    const tx = (cb: () => void) => {
+      transactionRef.current = true
+      cb()
+      transactionRef.current = false
+    }
+
+    const unsubscribe = qc.subscribe(event => {
+      if (transactionRef.current) return
+      const {
+        query: {queryHash, queryKey: eventQueryKey, state},
+      } = event
+
+      if (queryHash !== queryKeyHash) return
+
+      if (event.type === 'updated' && event.action.type === 'success') {
+        channel.postMessage({type: 'updated', queryHash, queryKey: eventQueryKey, state})
+      }
+      if (event.type === 'removed') {
+        channel.postMessage({type: 'removed', queryHash, queryKey: eventQueryKey})
+      }
+    })
+
+    channel.onmessage = event => {
+      const action = event.data
+      if (!action?.type) return
+      if (action.queryHash !== queryKeyHash) return
+
+      tx(() => {
+        const {type, queryHash, state} = action
+        const query = qc.get(queryHash)
+        if (!query) return
+
+        if (type === 'updated') {
+          query.setState(state)
+        } else if (type === 'removed') {
+          qc.remove(query)
+        }
       })
     }
-    setWasFetching(isFetching)
-  }, [wasFetching, isFetching, isSuccess, enabled, hashedKey, channel, queryResult.data])
+
+    return () => {
+      unsubscribe()
+      channel.close()
+    }
+  }, [queryClient, broadcastChannel, queryKeyHash])
 }

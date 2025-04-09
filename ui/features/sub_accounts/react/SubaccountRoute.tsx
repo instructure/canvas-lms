@@ -17,7 +17,7 @@
  */
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useQuery} from '@canvas/query'
+import {useQuery} from '@tanstack/react-query'
 import SubaccountTree from './SubaccountTree'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'

@@ -117,7 +117,7 @@ export const useInsight = (context: string, contextId: string, discussionId: str
 
   const {
     isError: generateError,
-    isLoading: mutationLoading,
+    isPending: mutationLoading,
     mutateAsync,
   } = useMutation({
     mutationKey: ['generate-insight', context, contextId, discussionId],
@@ -143,7 +143,9 @@ export const useInsight = (context: string, contextId: string, discussionId: str
 
   const handleGenerateInsight = async () => {
     await mutateAsync()
-    queryClient.invalidateQueries(['insight', context, contextId, discussionId])
+    queryClient.invalidateQueries({
+      queryKey: ['insight', context, contextId, discussionId],
+    })
     setShouldRefetch(true)
   }
 

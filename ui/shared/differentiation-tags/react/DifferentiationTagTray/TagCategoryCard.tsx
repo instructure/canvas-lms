@@ -155,7 +155,7 @@ function TagCategoryCard({category, onEditCategory, onDeleteFocusFallback}: TagC
         open={isWarningModalOpen}
         onClose={handleCancelDelete}
         onContinue={handleConfirmDelete}
-        isLoading={deleteMutation.isLoading}
+        isLoading={deleteMutation.isPending}
       >
         {deleteError && <Text color="danger">{deleteError}</Text>}
       </DeleteTagWarningModal>

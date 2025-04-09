@@ -20,11 +20,12 @@ import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {List} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
-import {useQuery} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import coursesQuery, {hideHomeroomCourseIfK5Student} from '../queries/coursesQuery'
 import {Text} from '@instructure/ui-text'
 import {ActiveText} from './utils'
+import {useQuery} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
 
 const I18n = createI18nScope('CoursesTray')
 
@@ -32,9 +33,7 @@ export default function CoursesList() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['courses'],
     queryFn: coursesQuery,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    persister: sessionStoragePersister,
     select: courses => courses.filter(hideHomeroomCourseIfK5Student),
   })
 

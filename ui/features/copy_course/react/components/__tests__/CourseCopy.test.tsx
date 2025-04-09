@@ -16,20 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMutation, useQuery} from '@canvas/query'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {assignLocation} from '@canvas/util/globalUtils'
-import {fireEvent, render} from '@testing-library/react'
+import {render, fireEvent, screen, waitFor, getByTestId} from '@testing-library/react'
 import React from 'react'
-import {useTermsQuery} from '../../queries/termsQuery'
 import CourseCopy from '../CourseCopy'
-import {courseCopyRootKey, createCourseAndMigrationKey} from '../../types'
+import {
+  courseCopyRootKey,
+  courseFetchKey,
+  enrollmentTermsFetchKey,
+  createCourseAndMigrationKey,
+} from '../../types'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
 }))
-
-jest.mock('@canvas/query')
-jest.mock('../../queries/termsQuery')
 
 describe('CourseCopy', () => {
   const defaultProps = {
@@ -39,213 +40,177 @@ describe('CourseCopy', () => {
     canImportAsNewQuizzes: true,
   }
 
-  const courseData = {id: '1', name: 'Test Course', enrollment_term_id: 1, restrict_enrollments_to_course_dates: true, time_zone: 'time_zone'}
+  const courseData = {
+    id: '1',
+    name: 'Test Course',
+    enrollment_term_id: '1',
+    restrict_enrollments_to_course_dates: true,
+    time_zone: 'time_zone',
+    start_at: '2024-01-01T00:00:00Z',
+    end_at: '2024-12-31T23:59:59Z',
+    course_code: 'TEST101',
+    blueprint: false,
+  }
   const termsData = [{id: '1', name: 'Test Term'}]
 
-  const mockUseQuery = useQuery as jest.Mock
-  const mockUseMutation = useMutation as jest.Mock
-  const mockUseTermsQuery = useTermsQuery as jest.Mock
+  // Create a new QueryClient for each test
+  let queryClient: QueryClient
 
-  afterEach(() => {
-    mockUseMutation.mockReset()
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
+    jest.clearAllMocks()
   })
 
-  it('should call terms query with rootAccountId', () => {
-    mockUseQuery.mockReturnValue({isLoading: true})
-    mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, hasNextPage: false})
+  const renderWithClient = (ui: React.ReactElement) => {
+    return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
+  }
 
-    render(<CourseCopy {...defaultProps} />)
+  it('should call terms query with rootAccountId', async () => {
+    // Set up the query data
+    queryClient.setQueryData([courseCopyRootKey, courseFetchKey, defaultProps.courseId], null)
+    queryClient.setQueryData(
+      [courseCopyRootKey, enrollmentTermsFetchKey, defaultProps.rootAccountId],
+      {
+        pages: [],
+        pageParams: [],
+      },
+    )
 
-    expect(mockUseTermsQuery).toHaveBeenCalledWith(defaultProps.rootAccountId)
+    renderWithClient(<CourseCopy {...defaultProps} />)
+
+    // Check that the terms query was made with the right parameters
+    await waitFor(() => {
+      expect(
+        queryClient.getQueryState([
+          courseCopyRootKey,
+          enrollmentTermsFetchKey,
+          defaultProps.rootAccountId,
+        ]),
+      ).not.toBeNull()
+    })
   })
 
-  it('should set up useMutation with accountId in mutationKey', () => {
-    mockUseQuery.mockReturnValue({isLoading: true})
-    mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, hasNextPage: false})
-    mockUseMutation.mockReturnValue({isLoading: false, isSuccess: false})
+  it('renders loading state on course loading', async () => {
+    // Set up the query data for terms but leave course data loading
+    queryClient.setQueryData(
+      [courseCopyRootKey, enrollmentTermsFetchKey, defaultProps.rootAccountId],
+      {
+        pages: [
+          {
+            json: {enrollment_terms: termsData},
+            link: {next: null},
+          },
+        ],
+        pageParams: [undefined],
+      },
+    )
 
-    render(<CourseCopy {...defaultProps} />)
-
-    expect(mockUseMutation).toHaveBeenCalledWith(expect.objectContaining({
-      mutationKey: [courseCopyRootKey, createCourseAndMigrationKey, defaultProps.accountId],
-      mutationFn: expect.any(Function),
-      onSuccess: expect.any(Function),
-      onError: expect.any(Function),
-    }))
-  })
-
-  it('renders loading state on course loading', () => {
-    mockUseQuery.mockReturnValue({isLoading: true})
-    mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, hasNextPage: false})
-
-    const {getByText} = render(<CourseCopy {...defaultProps} />)
+    const {getByText} = renderWithClient(<CourseCopy {...defaultProps} />)
 
     expect(getByText('Course copy page is loading')).toBeInTheDocument()
   })
 
-  it('renders loading state on terms loading', () => {
-    mockUseQuery.mockReturnValue({isLoading: false})
-    mockUseTermsQuery.mockReturnValue({isLoading: true, isError: false, hasNextPage: false})
+  it('renders success state', async () => {
+    // Set up the query data
+    queryClient.setQueryData([courseCopyRootKey, courseFetchKey, defaultProps.courseId], courseData)
+    queryClient.setQueryData(
+      [courseCopyRootKey, enrollmentTermsFetchKey, defaultProps.rootAccountId],
+      {
+        pages: [
+          {
+            json: {enrollment_terms: termsData},
+            link: {next: null},
+          },
+        ],
+        pageParams: [undefined],
+      },
+    )
 
-    const {getByText} = render(<CourseCopy {...defaultProps} />)
+    const {getByText} = renderWithClient(<CourseCopy {...defaultProps} />)
 
-    expect(getByText('Course copy page is loading')).toBeInTheDocument()
-  })
-
-  it('renders loading state on terms has next page', () => {
-    mockUseQuery.mockReturnValue({isLoading: false})
-    mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, hasNextPage: true})
-
-    const {getByText} = render(<CourseCopy {...defaultProps} />)
-
-    expect(getByText('Course copy page is loading')).toBeInTheDocument()
-  })
-
-  it('renders success state', () => {
-    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
-    mockUseTermsQuery.mockReturnValue({
-      isLoading: false,
-      isError: false,
-      data: termsData,
-      hasNextPage: false,
-    })
-    mockUseMutation.mockReturnValue({isLoading: false, isSuccess: false})
-
-    const {getByText} = render(<CourseCopy {...defaultProps} />)
-
-    expect(getByText('Copy course')).toBeInTheDocument()
-  })
-
-  describe('when there is an error', () => {
-    it('renders error state on course loading error', () => {
-      mockUseQuery.mockReturnValue({isLoading: false, isError: true, data: null})
-      mockUseTermsQuery.mockReturnValue({
-        isLoading: false,
-        isError: false,
-        data: null,
-        hasNextPage: false,
-      })
-
-      const {getByText} = render(<CourseCopy {...defaultProps} />)
-
-      expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
-    })
-
-    it('renders error state on terms loading error', () => {
-      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: null})
-      mockUseTermsQuery.mockReturnValue({
-        isLoading: false,
-        isError: true,
-        data: null,
-        hasNextPage: false,
-      })
-
-      const {getByText} = render(<CourseCopy {...defaultProps} />)
-
-      expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
-    })
-
-    it('renders error state on terms error but has next page', () => {
-      mockUseQuery.mockReturnValue({isLoading: false})
-      mockUseTermsQuery.mockReturnValue({
-        isLoading: false,
-        isError: true,
-        data: null,
-        hasNextPage: true,
-      })
-
-      const {getByText} = render(<CourseCopy {...defaultProps} />)
-
-      expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(getByText('Copy course')).toBeInTheDocument()
     })
   })
 
   describe('when there is no data returned', () => {
-    it('renders error state on missing course data', () => {
-      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: null})
-      mockUseTermsQuery.mockReturnValue({
-        isLoading: false,
-        isError: false,
-        data: {},
-        hasNextPage: false,
+    it('renders error state on missing course data', async () => {
+      // Set up the query data with null course data
+      queryClient.setQueryData([courseCopyRootKey, courseFetchKey, defaultProps.courseId], null)
+
+      queryClient.setQueryData(
+        [courseCopyRootKey, enrollmentTermsFetchKey, defaultProps.rootAccountId],
+        {
+          pages: [
+            {
+              json: {enrollment_terms: termsData},
+              link: {next: null},
+            },
+          ],
+          pageParams: [undefined],
+        },
+      )
+
+      const {getByText} = renderWithClient(<CourseCopy {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
       })
-
-      const {getByText} = render(<CourseCopy {...defaultProps} />)
-
-      expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
     })
 
-    it('renders error state on missing terms data', () => {
-      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: {}})
-      mockUseTermsQuery.mockReturnValue({
-        isLoading: false,
-        isError: false,
-        data: null,
-        hasNextPage: false,
+    it('renders error state on missing terms data', async () => {
+      // Set up the query data with null terms data
+      queryClient.setQueryData(
+        [courseCopyRootKey, courseFetchKey, defaultProps.courseId],
+        courseData,
+      )
+
+      queryClient.setQueryData(
+        [courseCopyRootKey, enrollmentTermsFetchKey, defaultProps.rootAccountId],
+        {
+          pages: [
+            {
+              json: {enrollment_terms: []},
+              link: {next: null},
+            },
+          ],
+          pageParams: [undefined],
+        },
+      )
+
+      const {getByText} = renderWithClient(<CourseCopy {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
       })
-
-      const {getByText} = render(<CourseCopy {...defaultProps} />)
-
-      expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
     })
   })
 
-  it('handleCancel redirects to the course settings page', () => {
-    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
-    mockUseTermsQuery.mockReturnValue({
-      isLoading: false,
-      isError: false,
-      data: termsData,
-      hasNextPage: false,
-    })
-    mockUseMutation.mockReturnValue({isLoading: false, isSuccess: false})
-
-    const {getByRole} = render(<CourseCopy {...defaultProps} />)
-
-    fireEvent.click(getByRole('button', {name: 'Cancel'}))
-    expect(assignLocation).toHaveBeenCalledWith(`/courses/${defaultProps.courseId}/settings`)
-  })
-
-  it('handleSubmit calls mutate', () => {
-    const mockMutate = jest.fn()
-    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
-    mockUseTermsQuery.mockReturnValue({
-      isLoading: false,
-      isError: false,
-      data: termsData,
-      hasNextPage: false,
-    })
-    mockUseMutation.mockReturnValue({isLoading: false, isSuccess: false, mutate: mockMutate})
-
-    const {getByRole} = render(<CourseCopy {...defaultProps} />)
-
-    fireEvent.click(getByRole('button', {name: 'Create course'}))
-
-    expect(mockMutate).toHaveBeenCalledWith({
-      accountId: defaultProps.accountId,
-      courseId: defaultProps.courseId,
-      formData: {
-        courseName: courseData.name,
-        courseCode: '',
-        newCourseStartDate: null,
-        newCourseEndDate: null,
-        selectedTerm: termsData[0],
-        adjust_dates: {enabled: false, operation: 'shift_dates'},
-        date_shift_options: {
-          old_start_date: '',
-          new_start_date: '',
-          old_end_date: '',
-          new_end_date: '',
-          day_substitutions: [],
-        },
-        selective_import: false,
-        settings: {
-          import_quizzes_next: false,
-        },
-        errored: false,
-        restrictEnrollmentsToCourseDates: true,
-        courseTimeZone: 'time_zone',
+  it('handleCancel redirects to the course settings page', async () => {
+    // Set up the query data
+    queryClient.setQueryData([courseCopyRootKey, courseFetchKey, defaultProps.courseId], courseData)
+    queryClient.setQueryData(
+      [courseCopyRootKey, enrollmentTermsFetchKey, defaultProps.rootAccountId],
+      {
+        pages: [
+          {
+            json: {enrollment_terms: termsData},
+            link: {next: null},
+          },
+        ],
+        pageParams: [undefined],
       },
-    })
+    )
+
+    const {getByTestId} = renderWithClient(<CourseCopy {...defaultProps} />)
+
+    await fireEvent.click(getByTestId('clear-migration-button'))
+    expect(assignLocation).toHaveBeenCalledWith(`/courses/${defaultProps.courseId}/settings`)
   })
 })

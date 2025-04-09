@@ -18,19 +18,23 @@
 
 import React from 'react'
 import {createRoot} from 'react-dom/client'
-import {QueryProvider} from '@canvas/query'
 import {ApolloClient, ApolloProvider} from '@apollo/client'
 import TeacherEditQuery from './components/TeacherEditQuery'
 import TeacherCreateQuery from './components/TeacherCreateQuery'
 import {createClient} from '@canvas/apollo-v3'
 import type {InMemoryCache} from '@apollo/client'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 export default function renderEditAssignmentsApp(elt: HTMLElement | null) {
   const client: ApolloClient<InMemoryCache> = createClient()
-  // @ts-expect-error
+  if (!elt) {
+    throw new Error('element is required for renderEditAssignmentsApp')
+  }
+
   const root = createRoot(elt)
   root.render(
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <ApolloProvider client={client}>
         {ENV.ASSIGNMENT_ID ? (
           // @ts-expect-error
@@ -40,6 +44,6 @@ export default function renderEditAssignmentsApp(elt: HTMLElement | null) {
           <TeacherCreateQuery courseId={ENV.COURSE_ID} />
         )}
       </ApolloProvider>
-    </QueryProvider>,
+    </QueryClientProvider>,
   )
 }

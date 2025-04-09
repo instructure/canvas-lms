@@ -17,13 +17,9 @@
  */
 
 import React from 'react'
-import {render as testingLibraryRender} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import HistoryList from '../HistoryList'
-import {queryClient} from '@canvas/query'
-import {MockedQueryProvider} from '@canvas/test-utils/query'
-
-const render = (children: unknown) =>
-  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 describe('HistoryList', () => {
   const historyPage1 = [
@@ -66,34 +62,54 @@ describe('HistoryList', () => {
   ]
 
   // infinite query inserts queryFn output into an array of pages
-  const historyQuery = {
+  const historyData = {
     pages: [
       {
         json: historyPage1,
+        nextPage: '/api/v1/users/self/history?page=2',
       },
       {
         json: historyPage2,
+        nextPage: null,
       },
     ],
+    pageParams: ['', '/api/v1/users/self/history?page=2'],
   }
 
-  beforeAll(() => {
-    queryClient.setQueryData(['history'], historyQuery)
+  let queryClient: QueryClient
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
+    queryClient.setQueryData(['history'], historyData)
   })
 
+  afterEach(() => {
+    queryClient.clear()
+  })
+
+  const renderWithClient = (ui: React.ReactElement) => {
+    return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
+  }
+
   it('renders a history item with the link', () => {
-    const {getByText} = render(<HistoryList />)
+    const {getByText} = renderWithClient(<HistoryList />)
     const discussionLink = getByText('Longitude vs Latitude')
     expect(discussionLink).toHaveAttribute('href', historyPage1[0].visited_url)
   })
 
   it('renders context', () => {
-    const {getByText} = render(<HistoryList />)
+    const {getByText} = renderWithClient(<HistoryList />)
     expect(getByText('Cartography 100')).toBeInTheDocument()
   })
 
   it('renders most recent visited between duplicates', () => {
-    const {getAllByText, getByTestId} = render(<HistoryList />)
+    const {getAllByText, getByTestId} = renderWithClient(<HistoryList />)
     const discussions = getAllByText('Longitude vs Latitude')
     const dates = getByTestId('discussion_topic_1_time_ago')
     // time ago is formatted according to 'time from current date'

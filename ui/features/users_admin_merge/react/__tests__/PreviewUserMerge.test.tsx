@@ -18,11 +18,12 @@
 
 import {render, screen} from '@testing-library/react'
 import PreviewUserMerge, {type PreviewMergeProps} from '../PreviewUserMerge'
-import {queryClient, QueryProvider} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
 import {createUserToMergeQueryKey} from '../common'
 import userEvent from '@testing-library/user-event'
 import {sourceUser, destinationUser} from './test-data'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 describe('PreviewUserMerge', () => {
   const props: PreviewMergeProps = {
@@ -50,9 +51,9 @@ describe('PreviewUserMerge', () => {
 
   const renderComponent = () =>
     render(
-      <QueryProvider>
+      <QueryClientProvider client={queryClient}>
         <PreviewUserMerge {...props} />
-      </QueryProvider>,
+      </QueryClientProvider>,
     )
 
   it('should render the users data correctly', () => {

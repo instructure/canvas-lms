@@ -26,7 +26,8 @@ import 'jqueryui/progressbar'
 
 import ReactDOM from 'react-dom/client'
 import SisImportForm from '../react/SisImportForm'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('sis_import')
 
@@ -34,9 +35,9 @@ $(document).ready(function (_event) {
   const mountNode = document.getElementById('attachment_mount')
   const root = ReactDOM.createRoot(mountNode)
   root.render(
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <SisImportForm onSuccess={onSuccess} />
-    </QueryProvider>,
+    </QueryClientProvider>,
   )
   let state = 'nothing'
 

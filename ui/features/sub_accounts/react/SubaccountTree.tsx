@@ -25,10 +25,11 @@ import SubaccountItem from './SubaccountItem'
 import type {AccountWithCounts} from './types'
 import {Flex} from '@instructure/ui-flex'
 import SubaccountNameForm from './SubaccountNameForm'
-import {calculateIndent, fetchSubAccounts, useFocusContext} from './util'
+import {calculateIndent, fetchSubAccounts, FetchSubAccountsResponse, useFocusContext} from './util'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {queryClient, useAllPages} from '@canvas/query'
 import DeleteSubaccountModal from './DeleteSubaccountModal'
+import {InfiniteData} from '@tanstack/react-query'
 
 const I18n = createI18nScope('sub_accounts')
 
@@ -50,14 +51,20 @@ export default function SubaccountTree(props: Props) {
   const [subaccounts, setSubaccounts] = useState([] as AccountWithCounts[])
   const {focusId} = useFocusContext()
   const [showForm, setShowForm] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(true)
   const [displayConfirmation, setDisplayConfirmation] = useState(false)
 
-  const {data, isFetching, isLoading, hasNextPage, isFetchingNextPage, error} = useAllPages({
+  const {data, isFetching, isLoading, hasNextPage, isFetchingNextPage, error} = useAllPages<
+    FetchSubAccountsResponse,
+    unknown,
+    InfiniteData<FetchSubAccountsResponse>,
+    [string, string]
+  >({
     queryKey: ['subAccountList', props.rootAccount.id],
-    queryFn: context => fetchSubAccounts(context),
+    queryFn: fetchSubAccounts,
     getNextPageParam: lastPage => lastPage.nextPage,
     enabled: isExpanded && subCount.current > 0,
+    initialPageParam: '1',
   })
 
   useEffect(() => {
@@ -66,7 +73,7 @@ export default function SubaccountTree(props: Props) {
         data.pages.reduce((acc, page) => {
           return acc.concat(page.json)
         }, [] as AccountWithCounts[]) || []
-      setSubaccounts(subaccounts)
+      setSubaccounts(subaccounts || [])
     }
   }, [data, isFetching])
 
@@ -158,7 +165,9 @@ export default function SubaccountTree(props: Props) {
             props.handleParent(json, false)
           } else {
             // root node should just be re-fetched
-            queryClient.invalidateQueries(['account', props.rootAccount.id])
+            queryClient.invalidateQueries({
+              queryKey: ['account', props.rootAccount.id],
+            })
           }
         }}
         isExpanded={isExpanded}

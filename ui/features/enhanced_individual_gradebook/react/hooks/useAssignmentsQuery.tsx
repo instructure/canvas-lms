@@ -16,21 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMemo, useState} from 'react'
+import {useMemo} from 'react'
 import {useAllPages} from '@canvas/query'
 import {fetchAssignments, getNextAssignmentsPage} from '../../queries/Queries'
 import _ from 'lodash'
+import type {InfiniteData} from '@tanstack/react-query'
+import type {FetchAssignmentsResponse} from '../../queries/Queries'
 
 export const useAssignmentsQuery = (courseId: string) => {
-  const [queryKey] = useState(['individual-gradebook-assignments', courseId])
+  const queryKey: [string, string] = ['individual-gradebook-assignments', courseId]
 
-  const {data, hasNextPage, isError, isLoading} = useAllPages({
+  const {data, hasNextPage, isError, isLoading} = useAllPages<
+    FetchAssignmentsResponse,
+    Error,
+    InfiniteData<FetchAssignmentsResponse>,
+    [string, string]
+  >({
     queryKey,
     queryFn: fetchAssignments,
     getNextPageParam: getNextAssignmentsPage,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    initialPageParam: null,
   })
 
   const flatAssignments = useMemo(

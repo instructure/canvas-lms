@@ -23,7 +23,7 @@ import type {
   SubmissionGradeChange,
 } from '../../types'
 import {fetchStudentSubmission} from '../../queries/Queries'
-import {useQuery} from '@canvas/query'
+import {useQuery} from '@tanstack/react-query'
 
 type Response = {
   currentStudent?: GradebookStudentDetails
@@ -35,7 +35,12 @@ type Response = {
 export const useCurrentStudentInfo = (courseId: string, userId?: string | null): Response => {
   const [currentStudent, setCurrentStudent] = useState<GradebookStudentDetails>()
   const [studentSubmissions, setStudentSubmissions] = useState<GradebookUserSubmissionDetails[]>()
-  const queryKey = ['individual-gradebook-student', courseId, userId ?? '']
+
+  const queryKey: [string, string, string] = [
+    'individual-gradebook-student',
+    courseId,
+    userId ?? '',
+  ]
 
   const {data, error, isLoading} = useQuery({
     queryKey,
