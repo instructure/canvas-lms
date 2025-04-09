@@ -36,7 +36,8 @@ import {TempEnrollNavigation} from './TempEnrollNavigation'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {captureException} from '@sentry/browser'
-import {useQuery, queryClient, useMutation} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {useMutation, useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('temporary_enrollment')
 
@@ -270,7 +271,6 @@ export function TempEnrollView(props: Props) {
   }
 
   if (error) {
-    // @ts-expect-error
     const errorMsg = error.message
 
     console.error(`Failed to fetch enrollments for user ${props.user.id}:`, errorMsg)

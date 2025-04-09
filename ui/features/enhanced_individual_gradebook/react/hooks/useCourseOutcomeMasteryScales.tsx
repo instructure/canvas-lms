@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useQuery} from '@tanstack/react-query'
 import {fetchCourseOutcomeMasteryScales} from '../../queries/Queries'
-import {useQuery} from '@canvas/query'
 
 export const useCourseOutcomeMasteryScales = (courseId: string) => {
   const isAccountLevelMasteryScalesEnabled = window.ENV?.FEATURES?.account_level_mastery_scales

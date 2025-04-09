@@ -33,11 +33,6 @@ describe('MergeUsers', () => {
   }
   const createUserForMergeUrl = (userId: string) => `/users/${userId}/user_for_merge`
   const queryClient = new QueryClient({
-    logger: {
-      log: () => {},
-      warn: () => {},
-      error: () => {},
-    },
     defaultOptions: {
       queries: {
         retry: false,

@@ -20,9 +20,8 @@ import {renderHook} from '@testing-library/react-hooks'
 import {getTermsNextPage, termsQuery, useTermsQuery} from '../termsQuery'
 import {useAllPages} from '@canvas/query'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
-import type {QueryFunctionContext} from '@tanstack/react-query'
+import type {QueryFunctionContext, InfiniteData} from '@tanstack/react-query'
 import type {EnrollmentTerms} from '../../../../../api'
-import type {NextPageTerms} from '../../types'
 
 jest.mock('@canvas/query', () => ({
   useAllPages: jest.fn(),
@@ -30,19 +29,30 @@ jest.mock('@canvas/query', () => ({
 jest.mock('@canvas/do-fetch-api-effect')
 
 describe('useTermsQuery', () => {
-  const mockData: any = {
+  const mockData: InfiniteData<DoFetchApiResults<EnrollmentTerms>> = {
     pages: [
       {
         json: {
-          enrollment_terms: [{id: 1, name: 'Term 1', start_at: '2024-01-01', end_at: '2024-01-02'}],
+          enrollment_terms: [
+            {id: '1', name: 'Term 1', start_at: '2024-01-01', end_at: '2024-01-02'},
+          ],
         },
+        response: new Response(),
+        text: '',
+        link: {},
       },
       {
         json: {
-          enrollment_terms: [{id: 2, name: 'Term 2', start_at: '2024-01-03', end_at: '2024-01-04'}],
+          enrollment_terms: [
+            {id: '2', name: 'Term 2', start_at: '2024-01-03', end_at: '2024-01-04'},
+          ],
         },
+        response: new Response(),
+        text: '',
+        link: {},
       },
     ],
+    pageParams: [null, {page: '2', per_page: '10'}],
   }
 
   const mockUseAllPages = useAllPages as jest.Mock
@@ -62,8 +72,8 @@ describe('useTermsQuery', () => {
     const {result} = renderHook(() => useTermsQuery('accountId'))
 
     expect(result.current.data).toEqual([
-      {id: 1, name: 'Term 1', startAt: '2024-01-01', endAt: '2024-01-02'},
-      {id: 2, name: 'Term 2', startAt: '2024-01-03', endAt: '2024-01-04'},
+      {id: '1', name: 'Term 1', startAt: '2024-01-01', endAt: '2024-01-02'},
+      {id: '2', name: 'Term 2', startAt: '2024-01-03', endAt: '2024-01-04'},
     ])
     expect(result.current.isLoading).toBe(false)
     expect(result.current.isError).toBe(false)
@@ -123,15 +133,19 @@ describe('termsQuery', () => {
   const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
 
   it('should fetch terms with correct parameters', async () => {
-    const mockResponse: any = {json: {enrollment_terms: []}, link: {}}
+    const mockResponse: DoFetchApiResults<EnrollmentTerms> = {
+      json: {enrollment_terms: []},
+      link: {},
+      response: new Response(),
+      text: '',
+    }
     mockDoFetchApi.mockResolvedValue(mockResponse)
 
-    const context: QueryFunctionContext<[string, string, string], NextPageTerms> = {
-      meta: undefined,
+    const context = {
       signal: new AbortController().signal,
       queryKey: ['copy_course', 'enrollment_terms', '1'],
       pageParam: {page: '2', per_page: '20'},
-    }
+    } as unknown as QueryFunctionContext<[string, string, string], unknown>
 
     const result = await termsQuery(context)
 
@@ -143,15 +157,18 @@ describe('termsQuery', () => {
   })
 
   it('should use default page and per_page if pageParam is missing', async () => {
-    const mockResponse: any = {json: {enrollment_terms: []}, link: {}}
+    const mockResponse: DoFetchApiResults<EnrollmentTerms> = {
+      json: {enrollment_terms: []},
+      link: {},
+      response: new Response(),
+      text: '',
+    }
     mockDoFetchApi.mockResolvedValue(mockResponse)
 
-    const context: QueryFunctionContext<[string, string, string], NextPageTerms> = {
-      meta: undefined,
+    const context = {
       signal: new AbortController().signal,
       queryKey: ['copy_course', 'enrollment_terms', '1'],
-      pageParam: undefined,
-    }
+    } as unknown as QueryFunctionContext<[string, string, string], unknown>
 
     const result = await termsQuery(context)
 

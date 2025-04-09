@@ -58,7 +58,7 @@ import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
 import {calculateMasqueradeHeight} from '../../utils/miscHelpers'
 import MasteryPathToggle from '@canvas/mastery-path-toggle/react/MasteryPathToggle'
-import { FormField } from '@instructure/ui-form-field'
+import {FormField} from '@instructure/ui-form-field'
 
 const I18n = createI18nScope('differentiated_modules')
 
@@ -208,7 +208,8 @@ export default function ItemAssignToTray({
   isTray = true,
 }: ItemAssignToTrayProps) {
   const isPacedCourse = ENV.IN_PACED_COURSE
-  const isMasteryPathCourse = !!ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths
+  const isMasteryPathCourse =
+    !!ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths
   const initialLoadRef = useRef(false)
   const cardsRefs = useRef<{[cardId: string]: RefObject<ItemAssignToCardRef>}>({})
   const [isLoading, setIsLoading] = useState(false)
@@ -483,7 +484,7 @@ export default function ItemAssignToTray({
     return (
       <Flex.Item data-testid="module-item-edit-tray-footer" width="100%" padding={padding}>
         <TrayFooter
-          disableSave={isPacedCourse && !isMasteryPathCourse }
+          disableSave={isPacedCourse && !isMasteryPathCourse}
           saveButtonLabel={useApplyButton ? I18n.t('Apply') : I18n.t('Save')}
           onDismiss={handleDismiss}
           onUpdate={handleUpdate}
@@ -512,21 +513,19 @@ export default function ItemAssignToTray({
           {isPacedCourse ? (
             <Flex.Item padding="large medium small medium" shouldGrow={true} shouldShrink={true}>
               <CoursePacingNotice courseId={courseId} />
-              {
-                isMasteryPathCourse && (
-                  <FormField id="mastery-path-toggle" label={I18n.t('Mastery Paths')}>
-                    <MasteryPathToggle
-                      overrides={assignToCards}
-                      onSync={setAssignToCards}
-                      courseId={courseId}
-                      itemType={itemType}
-                      itemContentId={itemContentId}
-                      useCards
-                      fetchOwnOverrides={false}
-                    />
-                  </FormField>
-                )
-              }
+              {isMasteryPathCourse && (
+                <FormField id="mastery-path-toggle" label={I18n.t('Mastery Paths')}>
+                  <MasteryPathToggle
+                    overrides={assignToCards}
+                    onSync={setAssignToCards}
+                    courseId={courseId}
+                    itemType={itemType}
+                    itemContentId={itemContentId}
+                    useCards
+                    fetchOwnOverrides={false}
+                  />
+                </FormField>
+              )}
             </Flex.Item>
           ) : (
             <ItemAssignToTrayContent

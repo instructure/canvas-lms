@@ -33,7 +33,7 @@ import {
   fetchUserWithRelations,
   User,
 } from './common'
-import {useQuery, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {Controller, SubmitHandler, useForm} from 'react-hook-form'
@@ -41,6 +41,7 @@ import * as z from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('merge_users')
 
@@ -125,7 +126,7 @@ const FindUserToMerge = ({sourceUserId, accountSelectOptions, onFind}: FindUserT
         {I18n.t('Failed to load user to merge. Please try again later.')}
       </Alert>
     )
-  } else {
+  } else if (sourceUser) {
     content = (
       <>
         <Text

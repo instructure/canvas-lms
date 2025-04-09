@@ -130,7 +130,7 @@ describe('TagCategoryCard', () => {
     it('displays a loading state in the modal when deletion is in progress', async () => {
       ;(useDeleteDifferentiationTagCategory as jest.Mock).mockReturnValue({
         mutate: jest.fn(),
-        isLoading: true,
+        isPending: true,
       })
       renderComponent()
       const deleteButton = screen.getByText('Delete').closest('button')

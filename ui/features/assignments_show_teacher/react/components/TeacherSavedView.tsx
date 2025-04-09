@@ -19,9 +19,10 @@
 import React from 'react'
 import type {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 import AssignmentHeader from '@canvas/assignments/react/AssignmentHeader'
-import {QueryProvider} from '@canvas/query'
 import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints'
 import {ASSIGNMENT_VIEW_TYPES} from '@canvas/assignments/react/AssignmentTypes'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 interface TeacherViewProps {
   assignment: TeacherAssignmentType
@@ -30,13 +31,13 @@ interface TeacherViewProps {
 
 const TeacherSavedView: React.FC<TeacherViewProps> = ({assignment, breakpoints = {}}) => {
   return (
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <AssignmentHeader
         type={ASSIGNMENT_VIEW_TYPES.SAVED}
         assignment={assignment}
         breakpoints={breakpoints}
       />
-    </QueryProvider>
+    </QueryClientProvider>
   )
 }
 

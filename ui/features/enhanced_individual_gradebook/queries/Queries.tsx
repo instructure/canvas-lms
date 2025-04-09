@@ -18,6 +18,7 @@
 
 import {executeQuery} from '@canvas/query/graphql'
 import {gql} from '@apollo/client'
+import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {
   AssignmentConnection,
   AssignmentGroupConnection,
@@ -476,7 +477,7 @@ export type FetchRequestParams = {
   queryKey: (string | number)[]
 }
 
-type FetchEnrollmentsResponse = {
+export type FetchEnrollmentsResponse = {
   course: {
     enrollmentsConnection: {
       nodes: EnrollmentConnection[]
@@ -484,7 +485,9 @@ type FetchEnrollmentsResponse = {
     }
   }
 }
-export const fetchEnrollments = async ({pageParam, queryKey}: FetchRequestParams) => {
+
+export const fetchEnrollments = async (context: QueryFunctionContext<(string | number)[]>) => {
+  const {pageParam, queryKey} = context
   return executeQuery<FetchEnrollmentsResponse>(GRADEBOOK_ENROLLMENTS_QUERY, {
     courseId: queryKey[COURSE_ID_INDEX],
     cursor: pageParam,
@@ -503,10 +506,20 @@ type FetchSectionsResponse = {
     }
   }
 }
-export const fetchSections = async ({pageParam, queryKey}: FetchRequestParams) => {
+export const fetchSections = async ({
+  pageParam,
+  queryKey,
+}: QueryFunctionContext<[string, string], unknown>): Promise<FetchSectionsResponse> => {
+  let cursor: string | null = null
+  if (pageParam === null) {
+    cursor = null
+  } else if (typeof pageParam === 'string') {
+    cursor = pageParam
+  }
+
   return executeQuery<FetchSectionsResponse>(GRADEBOOK_SECTIONS_QUERY, {
-    courseId: queryKey[COURSE_ID_INDEX],
-    cursor: pageParam,
+    courseId: queryKey[1],
+    cursor,
   })
 }
 export const getNextSectionsPage = (lastPage: FetchSectionsResponse) => {
@@ -514,7 +527,7 @@ export const getNextSectionsPage = (lastPage: FetchSectionsResponse) => {
   return pageInfo.hasNextPage ? pageInfo.endCursor : null
 }
 
-type FetchOutcomesResponse = {
+export type FetchOutcomesResponse = {
   course: {
     rootOutcomeGroup: {
       outcomes: {
@@ -524,10 +537,20 @@ type FetchOutcomesResponse = {
     }
   }
 }
-export const fetchOutcomes = async ({pageParam, queryKey}: FetchRequestParams) => {
+export const fetchOutcomes = async ({
+  pageParam,
+  queryKey,
+}: QueryFunctionContext<[string, string], unknown>): Promise<FetchOutcomesResponse> => {
+  let cursor: string | null = null
+  if (pageParam === null) {
+    cursor = null
+  } else if (typeof pageParam === 'string') {
+    cursor = pageParam
+  }
+
   return executeQuery<FetchOutcomesResponse>(GRADEBOOK_OUTCOMES_QUERY, {
-    courseId: queryKey[COURSE_ID_INDEX],
-    cursor: pageParam,
+    courseId: queryKey[1],
+    cursor,
   })
 }
 export const getNextOutcomesPage = (lastPage: FetchOutcomesResponse) => {
@@ -541,7 +564,11 @@ type FetchCourseOutcomeMasteryScalesResponse = {
     outcomeProficiency: GradebookCourseOutcomeProficiency
   }
 }
-export const fetchCourseOutcomeMasteryScales = async ({queryKey}: FetchRequestParams) => {
+export const fetchCourseOutcomeMasteryScales = async ({
+  queryKey,
+}: {
+  queryKey: FetchRequestParams['queryKey']
+}) => {
   return executeQuery<FetchCourseOutcomeMasteryScalesResponse>(
     GRADEBOOK_COURSE_OUTCOME_MASTERY_SCALES_QUERY,
     {
@@ -550,7 +577,7 @@ export const fetchCourseOutcomeMasteryScales = async ({queryKey}: FetchRequestPa
   )
 }
 
-type FetchSubmissionsResponse = {
+export type FetchSubmissionsResponse = {
   course: {
     submissionsConnection: {
       nodes: SubmissionConnection[]
@@ -558,10 +585,20 @@ type FetchSubmissionsResponse = {
     }
   }
 }
-export const fetchSubmissions = async ({pageParam, queryKey}: FetchRequestParams) => {
+export const fetchSubmissions = async ({
+  pageParam,
+  queryKey,
+}: QueryFunctionContext<[string, string], unknown>): Promise<FetchSubmissionsResponse> => {
+  let cursor: string | null = null
+  if (pageParam === null) {
+    cursor = null
+  } else if (typeof pageParam === 'string') {
+    cursor = pageParam
+  }
+
   return executeQuery<FetchSubmissionsResponse>(GRADEBOOK_SUBMISSIONS_QUERY, {
-    courseId: queryKey[COURSE_ID_INDEX],
-    cursor: pageParam,
+    courseId: queryKey[1],
+    cursor,
   })
 }
 export const getNextSubmissionsPage = (lastPage: FetchSubmissionsResponse) => {
@@ -569,21 +606,30 @@ export const getNextSubmissionsPage = (lastPage: FetchSubmissionsResponse) => {
   return pageInfo.hasNextPage ? pageInfo.endCursor : null
 }
 
-export const fetchStudentSubmission = async ({queryKey}: FetchRequestParams) => {
+export const fetchStudentSubmission = async ({
+  queryKey,
+}: QueryFunctionContext<
+  [string, string, string],
+  never
+>): Promise<GradebookStudentQueryResponse> => {
   return executeQuery<GradebookStudentQueryResponse>(GRADEBOOK_STUDENT_QUERY, {
-    courseId: queryKey[COURSE_ID_INDEX],
+    courseId: queryKey[1],
     userIds: queryKey[2] ? [queryKey[2]] : [],
   })
 }
 
-export const fetchStudentSubmissionComments = async ({queryKey}: FetchRequestParams) => {
+export const fetchStudentSubmissionComments = async ({
+  queryKey,
+}: {
+  queryKey: FetchRequestParams['queryKey']
+}) => {
   return executeQuery<GradebookSubmissionCommentsResponse>(GRADEBOOK_SUBMISSION_COMMENTS, {
     courseId: queryKey[COURSE_ID_INDEX],
     submissionId: queryKey[2],
   })
 }
 
-type FetchAssignmentGroupsResponse = {
+export type FetchAssignmentGroupsResponse = {
   course: {
     assignmentGroupsConnection: {
       nodes: AssignmentGroupConnection[]
@@ -591,7 +637,8 @@ type FetchAssignmentGroupsResponse = {
     }
   }
 }
-export const fetchAssignmentGroups = async ({pageParam, queryKey}: FetchRequestParams) => {
+export const fetchAssignmentGroups = async (context: QueryFunctionContext<(string | number)[]>) => {
+  const {pageParam, queryKey} = context
   return executeQuery<FetchAssignmentGroupsResponse>(GRADEBOOK_ASSIGNMENT_GROUPS_QUERY, {
     courseId: queryKey[COURSE_ID_INDEX],
     cursor: pageParam,
@@ -602,7 +649,7 @@ export const getNextAssignmentGroupsPage = (lastPage: FetchAssignmentGroupsRespo
   return pageInfo.hasNextPage ? pageInfo.endCursor : null
 }
 
-type FetchAssignmentsResponse = {
+export type FetchAssignmentsResponse = {
   course: {
     assignmentsConnection: {
       nodes: AssignmentConnection[]
@@ -610,10 +657,20 @@ type FetchAssignmentsResponse = {
     }
   }
 }
-export const fetchAssignments = async ({pageParam, queryKey}: FetchRequestParams) => {
+export const fetchAssignments = async ({
+  pageParam,
+  queryKey,
+}: QueryFunctionContext<[string, string], unknown>): Promise<FetchAssignmentsResponse> => {
+  let cursor: string | null = null
+  if (pageParam === null) {
+    cursor = null
+  } else if (typeof pageParam === 'string') {
+    cursor = pageParam
+  }
+
   return executeQuery<FetchAssignmentsResponse>(GRADEBOOK_ASSIGNMENTS_QUERY, {
-    courseId: queryKey[COURSE_ID_INDEX],
-    cursor: pageParam,
+    courseId: queryKey[1],
+    cursor,
   })
 }
 export const getNextAssignmentsPage = (lastPage: FetchAssignmentsResponse) => {

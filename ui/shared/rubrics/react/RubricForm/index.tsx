@@ -21,7 +21,7 @@ import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator/react'
-import {useQuery, useMutation, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {colors} from '@instructure/canvas-theme'
 import {Alert} from '@instructure/ui-alerts'
@@ -57,6 +57,7 @@ import type {GroupOutcome} from '@canvas/global/env/EnvCommon'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import {reorder, stripPTags, translateRubricData, translateRubricQueryResponse} from './utils'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {useMutation, useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('rubrics-form')
 
@@ -156,7 +157,7 @@ export const RubricForm = ({
   })
 
   const {
-    isLoading: saveLoading,
+    isPending: savePending,
     isSuccess: saveSuccess,
     isError: saveError,
     mutate,
@@ -169,11 +170,17 @@ export const RubricForm = ({
       const rubricsForContextQueryKey = accountId
         ? `accountRubrics-${accountId}`
         : `courseRubrics-${courseId}`
-      await queryClient.invalidateQueries(queryKey, {}, {cancelRefetch: true})
-      await queryClient.invalidateQueries([rubricsForContextQueryKey], undefined, {
-        cancelRefetch: true,
-      })
-      await queryClient.invalidateQueries([`rubric-preview-${rubricId}`], {}, {cancelRefetch: true})
+      await queryClient.invalidateQueries({queryKey}, {cancelRefetch: true})
+      await queryClient.invalidateQueries(
+        {queryKey: [rubricsForContextQueryKey]},
+        {
+          cancelRefetch: true,
+        },
+      )
+      await queryClient.invalidateQueries(
+        {queryKey: [`rubric-preview-${rubricId}`]},
+        {cancelRefetch: true},
+      )
     },
   })
 
@@ -298,7 +305,7 @@ export const RubricForm = ({
   }
 
   const {
-    isLoading: generateLoading,
+    isPending: generatePending,
     isSuccess: _generateSuccess,
     isError: _generateError,
     mutate: generateCriteriaMutation,
@@ -673,7 +680,7 @@ export const RubricForm = ({
           )}
         </Flex.Item>
 
-        {generateLoading && (
+        {generatePending && (
           <Flex.Item shouldGrow={true}>
             <LoadingIndicator />
           </Flex.Item>
@@ -741,7 +748,7 @@ export const RubricForm = ({
               {!rubricForm.hasRubricAssociations && !assignmentId && (
                 <Button
                   margin="0 0 0 small"
-                  disabled={saveLoading || !formValid()}
+                  disabled={savePending || !formValid()}
                   onClick={handleSaveAsDraft}
                   data-testid="save-as-draft-button"
                 >
@@ -753,7 +760,7 @@ export const RubricForm = ({
                 margin="0 0 0 small"
                 color="primary"
                 onClick={handleSave}
-                disabled={saveLoading || !formValid()}
+                disabled={savePending || !formValid()}
                 data-testid="save-rubric-button"
               >
                 {rubric?.id ? I18n.t('Save Rubric') : I18n.t('Create Rubric')}

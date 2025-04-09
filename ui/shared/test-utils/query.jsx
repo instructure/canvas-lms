@@ -18,13 +18,13 @@
 
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
-import {QueryProvider} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 export function MockedQueryProvider({children}) {
   return (
     <MockedProvider>
-      <QueryProvider>{children}</QueryProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </MockedProvider>
   )
 }

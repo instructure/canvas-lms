@@ -21,31 +21,36 @@ import {useEffect} from 'react'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {LtiLaunchDefinition} from "@canvas/select-content-dialog/jquery/select_content_dialog"
+import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('asset_processors_selection')
 
-export function useAssetProcessorsToolsList(courseId: number): UseQueryResult<LtiLaunchDefinition[], Error> {
+const queryFn = async ({queryKey}: {queryKey: [string, number]}) => {
+  const courseId = queryKey[1]
+  const {response, json} = await doFetchApi<LtiLaunchDefinition[]>({
+    path: `/api/v1/courses/${courseId}/lti_apps/launch_definitions`,
+    params: {'placements[]': 'ActivityAssetProcessor'},
+  })
+  if (!response.ok) {
+    throw new Error(response.statusText)
+  }
+  return json
+}
+
+export function useAssetProcessorsToolsList(
+  courseId: number,
+): UseQueryResult<LtiLaunchDefinition[], Error> {
   const res: UseQueryResult<LtiLaunchDefinition[], Error> = useQuery({
     queryKey: ['assetProcessors', courseId],
-    queryFn: async () => {
-      const {response, json} = await doFetchApi<LtiLaunchDefinition[]>({
-        path: `/api/v1/courses/${courseId}/lti_apps/launch_definitions`, 
-        params: { 'placements[]': 'ActivityAssetProcessor' },
-      })
-      if (!response.ok) {
-        throw new Error(response.statusText)
-      }
-      return json
-    }
+    queryFn,
   })
 
-  const errorMsg = res.error?.message;
+  const errorMsg = res.error?.message
   useEffect(() => {
-    errorMsg && showFlashError(
-      I18n.t('Failed to load document processing apps: %{errorMsg}', {errorMsg})
-    )
+    if (errorMsg) {
+      showFlashError(I18n.t('Failed to load document processing apps: %{errorMsg}', {errorMsg}))
+    }
   }, [errorMsg])
 
   return res

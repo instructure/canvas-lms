@@ -21,7 +21,8 @@ import ReactDOM from 'react-dom'
 
 import K5Dashboard from './react/K5Dashboard'
 import {registerK5Theme} from '@canvas/k5/react/k5-theme'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 import ready from '@instructure/ready'
 
 registerK5Theme()
@@ -30,7 +31,7 @@ ready(() => {
   const dashboardContainer = document.getElementById('dashboard-app-container')
   if (dashboardContainer) {
     ReactDOM.render(
-      <QueryProvider>
+      <QueryClientProvider client={queryClient}>
         <K5Dashboard
           currentUser={ENV.current_user}
           currentUserRoles={ENV.current_user_roles}
@@ -46,7 +47,7 @@ ready(() => {
           openTodosInNewTab={ENV.OPEN_TEACHER_TODOS_IN_NEW_TAB}
           accountCalendarContexts={ENV.ACCOUNT_CALENDAR_CONTEXTS}
         />
-      </QueryProvider>,
+      </QueryClientProvider>,
       dashboardContainer,
     )
   }

@@ -18,7 +18,7 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {queryClient, useAllPages, useQuery} from '@canvas/query'
+import {queryClient, useAllPages} from '@canvas/query'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
@@ -47,7 +47,7 @@ import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {type FetchUsedLocationResponse, UsedLocationsModal} from './UsedLocationsModal'
 import {ImportRubric} from './ImportRubric'
 import {colors} from '@instructure/canvas-theme'
-import {InfiniteData} from '@tanstack/react-query'
+import {InfiniteData, useQuery} from '@tanstack/react-query'
 
 const {Item: FlexItem} = Flex
 
@@ -156,12 +156,17 @@ export const ViewRubrics = ({
     return pageInfo.hasNextPage ? pageInfo.endCursor : null
   }
 
-  const {data: paginatedRubrics, isLoading} = useAllPages({
+  const {data: paginatedRubrics, isLoading} = useAllPages<
+    RubricQueryResponse,
+    unknown,
+    InfiniteData<RubricQueryResponse>,
+    [string]
+  >({
     queryKey: [queryKey],
-    queryFn: async ({pageParam}) => fetchQuery(pageParam, queryVariables),
-    meta: {fetchAtLeastOnce: true},
+    queryFn: async ({pageParam}) => fetchQuery(String(pageParam), queryVariables),
     refetchOnMount: true,
     getNextPageParam,
+    initialPageParam: null,
   })
 
   const {data: rubricPreview, isLoading: isLoadingPreview} = useQuery({
@@ -274,7 +279,12 @@ export const ViewRubrics = ({
 
   const handleImportSuccess = async (importedRubrics: Rubric[]) => {
     setActiveRubrics(prevState => [...prevState, ...importedRubrics])
-    await queryClient.invalidateQueries([queryKey], undefined, {cancelRefetch: true})
+    await queryClient.invalidateQueries(
+      {
+        queryKey: [queryKey],
+      },
+      {cancelRefetch: true},
+    )
   }
 
   return (
@@ -376,7 +386,10 @@ export const ViewRubrics = ({
       </Tabs>
 
       {canImportExportRubrics && (
-        <div id="enhanced-rubric-builder-footer" style={{backgroundColor: colors.contrasts.white1010}}>
+        <div
+          id="enhanced-rubric-builder-footer"
+          style={{backgroundColor: colors.contrasts.white1010}}
+        >
           <View
             as="div"
             margin="small large"

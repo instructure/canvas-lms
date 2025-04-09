@@ -33,6 +33,7 @@ import {QueryFunctionContext, useInfiniteQuery} from '@tanstack/react-query'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {generatePageListKey} from './utils'
+import {assignLocation} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('eportfolio')
 
@@ -94,7 +95,7 @@ export default function SubmissionModal(props: Props) {
         body,
       })
       // redirect
-      window.location.href = json!.entry_url
+      assignLocation(json!.entry_url)
     }
   }
 
@@ -122,7 +123,7 @@ export default function SubmissionModal(props: Props) {
     pageParam = '1',
   }: QueryFunctionContext): Promise<{json: ePortfolioPage[]; nextPage: string | null}> => {
     const params = {
-      page: pageParam,
+      page: String(pageParam),
       per_page: '10',
     }
     const {json, link} = await doFetchApi<ePortfolioPage[]>({
@@ -143,6 +144,7 @@ export default function SubmissionModal(props: Props) {
       queryFn: fetchPages,
       staleTime: 10 * 60 * 1000, // 10 minutes
       getNextPageParam: lastPage => lastPage.nextPage,
+      initialPageParam: null,
     })
 
   useEffect(() => {

@@ -17,7 +17,6 @@
  */
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {type AssigneeOption} from '../../react/Item/types'
 import {getStudentsByCourse} from './getStudentsByCourse'
@@ -56,7 +55,7 @@ export const processResult = async (
       }: {
         id: string
         name: string
-        group_category: {id: string, name: string}
+        group_category: {id: string; name: string}
       }) => {
         const parsedId = `${key.toLowerCase()}-${id}`
         // if an existing override exists for this asignee, use it so we have its overrideId
@@ -111,9 +110,10 @@ export const getSections = async ({queryKey}: {queryKey: any}) => {
 
 export const getCourseSettings = async ({queryKey}: {queryKey: any}) => {
   const [, currentCourseId] = queryKey
-  return doFetchApi({
+  const {json} = await doFetchApi<{conditional_release: boolean}>({
     path: `/api/v1/courses/${currentCourseId}/settings`,
   })
+  return json
 }
 
 export const getGroups = async ({queryKey}: {queryKey: any}) => {

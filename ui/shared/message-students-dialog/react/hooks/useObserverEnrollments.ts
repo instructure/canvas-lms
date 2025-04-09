@@ -24,11 +24,26 @@ import {
   OBSERVER_ENROLLMENTS_QUERY,
   ObserverEnrollmentQueryResult,
 } from '@canvas/message-students-dialog/graphql/Queries'
+import type {InfiniteData} from '@tanstack/react-query'
+
+const getNextPageParam = (lastPage: ObserverEnrollmentQueryResult) => {
+  const {hasNextPage, endCursor} = lastPage.course.enrollmentsConnection.pageInfo
+
+  if (hasNextPage && endCursor) {
+    return endCursor
+  }
+
+  return null
+}
 
 export const useObserverEnrollments = (courseId: string | undefined, students: Student[]) => {
   const studentIds = students.map(student => student.id)
   const keyStudentIds = studentIds.sort().join(',')
-  const {data, isLoading, isFetchingNextPage} = useAllPages({
+  const {data, isLoading, isFetchingNextPage} = useAllPages<
+    ObserverEnrollmentQueryResult,
+    unknown,
+    InfiniteData<ObserverEnrollmentQueryResult>
+  >({
     enabled: courseId !== undefined,
     queryKey: ['ObserversForStudents', courseId, keyStudentIds],
     queryFn: async ({pageParam}) => {
@@ -38,16 +53,8 @@ export const useObserverEnrollments = (courseId: string | undefined, students: S
         studentIds,
       })
     },
-    getNextPageParam: lastPage => {
-      const {hasNextPage, endCursor} = lastPage.course.enrollmentsConnection.pageInfo
-
-      if (hasNextPage && endCursor) {
-        return endCursor
-      }
-
-      return null
-    },
-    meta: {fetchAtLeastOnce: true},
+    initialPageParam: null,
+    getNextPageParam,
   })
 
   const loading = isLoading || isFetchingNextPage

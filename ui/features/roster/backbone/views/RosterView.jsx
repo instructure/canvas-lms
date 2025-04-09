@@ -29,7 +29,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 import UserDifferentiationTagManager from '@canvas/differentiation-tags/react/UserDifferentiationTagManager/UserDifferentiationTagManager'
 import MessageBus from '@canvas/util/MessageBus'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 import {union} from 'lodash'
 
 const I18n = createI18nScope('RosterView')
@@ -271,14 +272,14 @@ export default class RosterView extends Backbone.View {
         this.userDTManager = createRoot(userDTManager)
       }
       this.userDTManager.render(
-        <QueryProvider>
+        <QueryClientProvider client={queryClient}>
           <UserDifferentiationTagManager
             courseId={ENV.course.id}
             users={users}
             allInCourse={allInCourse}
             userExceptions={exceptions}
           />
-        </QueryProvider>,
+        </QueryClientProvider>,
       )
     }
   }

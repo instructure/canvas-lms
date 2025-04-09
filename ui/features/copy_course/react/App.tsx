@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {QueryProviderWithoutPersist} from '@canvas/query'
 import CourseCopy from './components/CourseCopy'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 export const App = ({
   courseId,
@@ -35,7 +36,7 @@ export const App = ({
   canImportAsNewQuizzes: boolean
 }) => {
   return (
-    <QueryProviderWithoutPersist>
+    <QueryClientProvider client={queryClient}>
       <CourseCopy
         canImportAsNewQuizzes={canImportAsNewQuizzes}
         courseId={courseId}
@@ -44,7 +45,7 @@ export const App = ({
         courseTimeZone={courseTimeZone}
         userTimeZone={userTimeZone}
       />
-    </QueryProviderWithoutPersist>
+    </QueryClientProvider>
   )
 }
 export default App

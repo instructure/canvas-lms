@@ -22,13 +22,14 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
-import {useMutation, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import {useFileManagement} from '../Contexts'
 import {generateFolderPostUrl} from '../../../utils/apiUtils'
 import getCookie from '@instructure/get-cookie'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
+import {useMutation} from '@tanstack/react-query'
 
 const I18n = createI18nScope('files_v2')
 

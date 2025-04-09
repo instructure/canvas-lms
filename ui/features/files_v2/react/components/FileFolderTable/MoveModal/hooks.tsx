@@ -19,26 +19,41 @@
 import {useMemo} from 'react'
 import {useAllPages} from '@canvas/query'
 import {parseAllPagesResponse} from './utils'
-import {fetchFolders, type MultiPageResponse} from '../../../queries/folders'
+import {
+  fetchFolders,
+  type MultiPageResponse,
+  type MultiPagePartialResponse,
+} from '../../../queries/folders'
+import {QueryFunctionContext} from '@tanstack/react-query'
+
+type FoldersQueryKey = readonly ['folders', string]
+
+const queryFn = async ({
+  queryKey,
+  pageParam,
+}: {
+  queryKey: FoldersQueryKey
+  pageParam: QueryFunctionContext['pageParam']
+}) => {
+  const [_key, folderID] = queryKey
+  return fetchFolders(folderID, pageParam as string | null)
+}
 
 export const useFoldersQuery = (openedFolderID: string) => {
-  const {data, hasNextPage, isLoading, isError} = useAllPages({
+  const {data, hasNextPage, isLoading, isError} = useAllPages<
+    MultiPagePartialResponse,
+    unknown,
+    MultiPageResponse,
+    FoldersQueryKey
+  >({
     queryKey: ['folders', openedFolderID] as const,
-    queryFn: async ({ queryKey, pageParam }) => {
-      const [_key, openedFolderID] = queryKey
-      return fetchFolders(openedFolderID, pageParam)
-    },
-    getNextPageParam: (lastPage) => lastPage.nextPage,
-    refetchOnMount: "always",
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    queryFn,
+    getNextPageParam: lastPage => lastPage.nextPage,
+    refetchOnMount: 'always',
+    initialPageParam: null,
   })
 
-  const folders = useMemo(
-    () => data ? parseAllPagesResponse(data as MultiPageResponse) : null,
-    [data],
-  )
+  const folders = useMemo(() => (data ? parseAllPagesResponse(data) : null), [data])
 
   return {
     folders,

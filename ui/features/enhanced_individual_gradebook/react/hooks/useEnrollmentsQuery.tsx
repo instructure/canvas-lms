@@ -19,18 +19,25 @@
 import {useMemo, useState} from 'react'
 import {fetchEnrollments, getNextEnrollmentPage} from '../../queries/Queries'
 import {useAllPages} from '@canvas/query'
+import type {FetchEnrollmentsResponse} from '../../queries/Queries'
+import type {InfiniteData} from '@tanstack/react-query'
 
 export const useEnrollmentsQuery = (courseId: string) => {
   const [queryKey] = useState(['individual-gradebook-enrollments', courseId])
 
-  const {data, hasNextPage, isError, isLoading} = useAllPages({
+  const result = useAllPages<
+    FetchEnrollmentsResponse,
+    unknown,
+    InfiniteData<FetchEnrollmentsResponse>,
+    (string | number)[]
+  >({
     queryKey,
     queryFn: fetchEnrollments,
     getNextPageParam: getNextEnrollmentPage,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    initialPageParam: '',
   })
+
+  const {data, hasNextPage, isError, isLoading} = result
 
   const enrollments = useMemo(
     () => data?.pages.flatMap(page => page.course.enrollmentsConnection.nodes) ?? [],

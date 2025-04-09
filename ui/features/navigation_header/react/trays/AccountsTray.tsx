@@ -23,17 +23,16 @@ import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
-import {useQuery} from '@canvas/query'
 import getAccounts from '@canvas/api/accounts/getAccounts'
+import {useQuery} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
 
 const I18n = createI18nScope('AccountsTray')
 export default function AccountsTray() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['accounts', {pageIndex: 1}],
     queryFn: getAccounts,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    persister: sessionStoragePersister,
   })
 
   return (

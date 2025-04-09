@@ -25,13 +25,22 @@ export const calculateIndent = (indent: number) => {
   return indent * 3
 }
 
-export const fetchSubAccounts = async (
-  context: QueryFunctionContext,
-): Promise<{json: AccountWithCounts[]; nextPage: string | null}> => {
-  const accountId = context.queryKey[1] as string
+export type FetchSubAccountsResponse = {
+  json: AccountWithCounts[]
+  nextPage: unknown
+}
+
+export const fetchSubAccounts = async ({
+  queryKey,
+  pageParam,
+}: {
+  queryKey: [string, string]
+  pageParam: unknown
+}): Promise<FetchSubAccountsResponse> => {
+  const accountId = queryKey[1]
   const params = {
     per_page: '100',
-    page: context.pageParam || '1',
+    page: (pageParam || '1').toString(),
     include: ['course_count', 'sub_account_count'],
     order: 'name',
   }

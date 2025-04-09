@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useQuery} from '@tanstack/react-query'
 import {fetchAssignmentRubricAssessments, type RubricAssessmentsResponse} from '../queries/Queries'
-import {useQuery} from '@canvas/query'
 
 type useAssignmentRubricAssessmentsParams = {
   assignmentId: string | undefined
@@ -29,9 +29,6 @@ export const useAssignmentRubricAssessments = ({
   const {data: rubricAssessments} = useQuery({
     queryKey: ['assignment-rubric-assessments', assignmentId ?? 0],
     queryFn: fetchAssignmentRubricAssessments,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
     enabled: !!assignmentId,
   })
 

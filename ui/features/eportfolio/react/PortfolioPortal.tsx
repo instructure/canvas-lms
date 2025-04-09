@@ -17,7 +17,7 @@
  */
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useQuery} from '@canvas/query'
+import {useQuery} from '@tanstack/react-query'
 import {Portal} from '@instructure/ui-portal'
 import PageContainer from './PageContainer'
 import {ePortfolio, ePortfolioPage} from './types'

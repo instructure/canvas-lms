@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useQuery} from '@tanstack/react-query'
+import {useQuery, keepPreviousData} from '@tanstack/react-query'
 import {useParams} from 'react-router-dom'
 import splitAssetString from '@canvas/util/splitAssetString'
 import filesEnv from '../../../../shared/files_v2/react/modules/filesEnv'
@@ -76,7 +76,7 @@ export const useGetFolders = () => {
   return useQuery<Folder[], Error, Folder[], typeof queryKey>({
     queryKey,
     staleTime: 0,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     queryFn: async ({queryKey}) => {
       const [, {path, contextType, contextId}] = queryKey
       return path

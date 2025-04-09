@@ -37,7 +37,8 @@ import type {
 import {MODULE_NAME, RECIPIENT} from './types'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
-import {QueryProvider} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('temporary_enrollment')
 
@@ -236,7 +237,7 @@ export function TempEnrollModal(props: Props) {
   const renderBody = () => {
     if (props.isEditMode) {
       return (
-        <QueryProvider>
+        <QueryClientProvider client={queryClient}>
           <TempEnrollView
             user={props.user}
             onAddNew={handleModalReset}
@@ -245,7 +246,7 @@ export function TempEnrollModal(props: Props) {
             modifyPermissions={props.modifyPermissions}
             disableModal={(isDisabled: boolean) => setButtonsDisabled(isDisabled)}
           />
-        </QueryProvider>
+        </QueryClientProvider>
       )
     } else {
       if (page >= 2) {

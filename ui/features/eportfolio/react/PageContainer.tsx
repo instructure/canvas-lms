@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {type ePortfolio, ePortfolioPage, ePortfolioSection} from './types'
-import {useQuery} from '@canvas/query'
+import {useQuery} from '@tanstack/react-query'
 import {Alert} from '@instructure/ui-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PageList from './PageList'

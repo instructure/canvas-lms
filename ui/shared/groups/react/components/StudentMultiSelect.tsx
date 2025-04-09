@@ -18,13 +18,13 @@
 
 import React, {useState, useEffect, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useQuery} from '@canvas/query'
 import CanvasMultiSelect from '@canvas/multi-select'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {debounce} from '@instructure/debounce'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {Tag} from '@instructure/ui-tag'
 import {studentsQuery, Student} from '../queries/studentsQuery'
+import {useQuery} from '@tanstack/react-query'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 

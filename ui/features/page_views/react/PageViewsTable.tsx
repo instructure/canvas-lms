@@ -25,7 +25,7 @@ import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useInfiniteQuery, type QueryFunctionContext} from '@tanstack/react-query'
+import {useInfiniteQuery, type QueryFunctionContext, type InfiniteData} from '@tanstack/react-query'
 import {
   type APIPageView,
   type PageView,
@@ -64,9 +64,12 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
   const formatDate = useDateTimeFormat('time.formats.short')
   async function fetchPageViews({
     pageParam = '1',
-  }: QueryFunctionContext): Promise<{views: Array<PageView>; nextPage: string | null}> {
+  }: QueryFunctionContext<[string, string, Date?], string>): Promise<{
+    views: Array<PageView>
+    nextPage: string | null
+  }> {
     const params: APIQueryParams = {
-      page: pageParam,
+      page: typeof pageParam === 'string' ? pageParam : '1',
       per_page: '50',
     }
     if (props.startDate) {
@@ -109,11 +112,18 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
   }
 
   const {data, fetchNextPage, isFetching, isFetchingNextPage, hasNextPage, isSuccess, error} =
-    useInfiniteQuery({
+    useInfiniteQuery<
+      {views: Array<PageView>; nextPage: string | null},
+      Error,
+      InfiniteData<{views: Array<PageView>; nextPage: string | null}>,
+      [string, string, Date?],
+      string
+    >({
       queryKey: ['page_views', props.userId, props.startDate],
       queryFn: fetchPageViews,
       staleTime: 10 * 60 * 1000, // 10 minutes
       getNextPageParam: lastPage => lastPage.nextPage,
+      initialPageParam: '1',
     })
 
   if (isFetching && !isFetchingNextPage) return <Spinner renderTitle={I18n.t('Loading')} />

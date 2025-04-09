@@ -42,11 +42,6 @@ describe('FilesUsageBar', () => {
 
   const renderComponent = () => {
     const queryClient = new QueryClient({
-      logger: {
-        log: () => {},
-        warn: () => {},
-        error: () => {},
-      },
       defaultOptions: {
         queries: {
           retryDelay: 1,
@@ -65,8 +60,8 @@ describe('FilesUsageBar', () => {
   }
 
   it('renders progress bar with quota data when fetch is successful', async () => {
-    (useGetQuota as jest.Mock).mockImplementation(() => ({
-      data: { quota_used: 500_000, quota: 1_000_000 },
+    ;(useGetQuota as jest.Mock).mockImplementation(() => ({
+      data: {quota_used: 500_000, quota: 1_000_000},
       error: null,
       isLoading: false,
     }))
@@ -82,7 +77,7 @@ describe('FilesUsageBar', () => {
   })
 
   it('displays error message if quota fetch fails', async () => {
-    (useGetQuota as jest.Mock).mockImplementation(() => ({
+    ;(useGetQuota as jest.Mock).mockImplementation(() => ({
       data: null,
       error: new Error('Failed to fetch quota'),
       isLoading: false,

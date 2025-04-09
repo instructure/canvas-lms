@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useMutation, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useMutation} from '@tanstack/react-query'
 
 export const useAddTagMembership = () => {
   return useMutation<

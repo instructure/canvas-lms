@@ -20,15 +20,16 @@ import React from 'react'
 import {createRoot} from 'react-dom/client'
 import ready from '@instructure/ready'
 import UserObservees from './react/UserObservees'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 ready(() => {
   const mountPoint = document.getElementById('content')
   const root = createRoot(mountPoint)
 
   root.render(
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <UserObservees userId={ENV.current_user_id} />
-    </QueryProvider>,
+    </QueryClientProvider>,
   )
 })

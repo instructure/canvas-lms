@@ -34,7 +34,8 @@ import {
 } from '@canvas/outcomes/react/OutcomesImporter'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {windowConfirm} from '@canvas/util/globalUtils'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -255,9 +256,9 @@ const OutcomeManagement = ({breakpoints}) => {
 
   return (
     <ApolloProvider client={client}>
-      <QueryProvider>
+      <QueryClientProvider client={queryClient}>
         <OutcomeManagementWithoutGraphql breakpoints={breakpoints} />
-      </QueryProvider>
+      </QueryClientProvider>
     </ApolloProvider>
   )
 }

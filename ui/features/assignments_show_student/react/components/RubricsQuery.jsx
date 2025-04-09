@@ -21,15 +21,18 @@ import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import RubricTab from './RubricTab'
-import {RUBRIC_QUERY, COURSE_PROFICIENCY_RATINGS_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {
+  RUBRIC_QUERY,
+  COURSE_PROFICIENCY_RATINGS_QUERY,
+} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {useQuery} from '@apollo/client'
 import {transformRubricData, transformRubricAssessmentData} from '../helpers/RubricHelpers'
 import useStore from './stores/index'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
 import {bool, func} from 'prop-types'
-import { useAllPages } from '@canvas/query'
-import { executeQuery } from '@canvas/query/graphql'
+import {useAllPages} from '@canvas/query'
+import {executeQuery} from '@canvas/query/graphql'
 
 const I18n = createI18nScope('assignments_2')
 
@@ -73,8 +76,12 @@ export default function RubricsQuery(props) {
     },
   })
 
-  const {data: ratingsData, isError: ratingsError, isLoading: ratingsLoading} = useAllPages({
-    queryKey:  ['courseProficiencyRatings', props.assignment.env.courseId],
+  const {
+    data: ratingsData,
+    isError: ratingsError,
+    isLoading: ratingsLoading,
+  } = useAllPages({
+    queryKey: ['courseProficiencyRatings', props.assignment.env.courseId],
     queryFn: ({pageParam}) => {
       return executeQuery(COURSE_PROFICIENCY_RATINGS_QUERY, {
         courseID: props.assignment.env.courseId,
@@ -82,11 +89,9 @@ export default function RubricsQuery(props) {
       })
     },
     getNextPageParam: lastPage => {
-      const pageInfo = lastPage?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
+      const pageInfo =
+        lastPage?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
       return pageInfo?.hasNextPage ? pageInfo.endCursor : null
-    },
-    meta: {
-      fetchAtLeastOnce: true,
     },
   })
 
@@ -111,15 +116,13 @@ export default function RubricsQuery(props) {
         transformRubricAssessmentData(assessment),
       )}
       key={props.submission.attempt}
-      proficiencyRatings={
-        ratingsData.pages.reduce((acc, page) => {
-          const nodes = page?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
-          if (nodes) {
-            return acc.concat(nodes)
-          }
-          return acc
-        }, [])
-      }
+      proficiencyRatings={ratingsData.pages.reduce((acc, page) => {
+        const nodes = page?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
+        if (nodes) {
+          return acc.concat(nodes)
+        }
+        return acc
+      }, [])}
       rubric={transformRubricData(data.assignment.rubric)}
       rubricAssociation={data.assignment.rubricAssociation}
       peerReviewModeEnabled={props.assignment.env.peerReviewModeEnabled}
