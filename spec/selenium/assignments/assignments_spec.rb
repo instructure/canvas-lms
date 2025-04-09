@@ -797,6 +797,25 @@ describe "assignments" do
       end
     end
 
+    it "deselects peer reviews option when peer review box gets hidden" do
+      get "/courses/#{@course.id}/assignments/new"
+
+      f("#assignment_name").send_keys("Test Assignment")
+
+      # selects peer reviews option
+      f("#assignment_peer_reviews").click
+      expect(f("#assignment_peer_reviews")).to be_checked
+
+      # select external tool submission type which will hide the peer review box
+      click_option("#assignment_submission_type", "External Tool")
+      # select another submission type to display the peer review box
+      click_option("#assignment_submission_type", "Online")
+      f("#assignment_text_entry").click
+
+      # peer reviews option should be deselected
+      expect(f("#assignment_peer_reviews")).not_to be_checked
+    end
+
     it "keeps erased field on more options click", priority: "2" do
       enable_cache do
         middle_number = "15"
