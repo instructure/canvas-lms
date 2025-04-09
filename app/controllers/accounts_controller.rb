@@ -561,6 +561,9 @@ class AccountsController < ApplicationController
   #   this account will be returned (though still paginated). If false, only
   #   direct sub-accounts of this account will be returned. Defaults to false.
   #
+  # @argument order [String, "id"|"name"] Sorts the accounts by id or name.
+  #   Only applies when recursive is false. Defaults to id.
+  #
   # @argument include[] [String, "course_count"|"sub_account_count"]
   #   Array of additional information to include.
   #
@@ -590,7 +593,8 @@ class AccountsController < ApplicationController
                     pager.replace sub_accounts
                   end
                 else
-                  @account.sub_accounts.order(:id)
+                  sort_key = (params[:order] == "name") ? Account.best_unicode_collation_key("name") : :id
+                  @account.sub_accounts.order(sort_key)
                 end
 
     @accounts = Api.paginate(@accounts,

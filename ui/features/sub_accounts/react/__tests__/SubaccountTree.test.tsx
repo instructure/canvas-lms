@@ -44,7 +44,7 @@ const props = {
 
 const SUBACCOUNT_FETCH = (account: AccountWithCounts) => {
   return encodeURI(
-    `/api/v1/accounts/${account.id}/sub_accounts?per_page=100&page=1&include[]=course_count&include[]=sub_account_count`,
+    `/api/v1/accounts/${account.id}/sub_accounts?per_page=100&page=1&include[]=course_count&include[]=sub_account_count&order=name`,
   )
 }
 
