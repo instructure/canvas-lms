@@ -20,6 +20,7 @@ import {render} from '@testing-library/react'
 import BestResults from '../BestResults'
 
 const props = {
+  courseId: '1',
   searchTerm: 'writing outlines',
   results: [
     {
@@ -61,5 +62,11 @@ describe('BestResults', () => {
 
     expect(getByText('No best matches for "writing outlines"')).toBeInTheDocument()
     expect(getByText('Try a similar result below or start over.')).toBeInTheDocument()
+  })
+
+  it('renders Feedback component', () => {
+    const {getByText} = render(<BestResults {...props} />)
+
+    expect(getByText('Feedback')).toBeInTheDocument()
   })
 })
