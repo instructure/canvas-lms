@@ -37,6 +37,17 @@ import replaceTags from '@canvas/util/replaceTags'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import {createRoot} from 'react-dom/client'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
+import StartDateTimeInput from '../react/StartDateTimeInput'
+import EndDateTimeInput from '../react/EndDateTimeInput'
+import {
+  validateDateTime,
+  parseDateTimeToISO,
+  validateStartDateAfterEnd,
+  START_AT_DATE,
+  START_AT_TIME,
+  END_AT_DATE,
+  END_AT_TIME,
+} from '../utils'
 
 const I18n = createI18nScope('section')
 
@@ -56,49 +67,84 @@ $(document).ready(function () {
     url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed',
   })
 
-  const errorRoots = {
+  const renderStartAt = () => {
+    const startDateTimeInput = document.getElementById('course_section_start_datetime_input')
+    if (startDateTimeInput) {
+      const startDateTimeValue = document.getElementById('start_datetime_value')
+      let value
+      if (startDateTimeValue) {
+        value = startDateTimeValue.value
+      }
+      const root = createRoot(startDateTimeInput)
+      root.render(<StartDateTimeInput initialValue={value}></StartDateTimeInput>)
+    }
   }
 
-  const renderFormErrors = (formErrors, shouldFocus = false)=>{
-    formErrors.forEach((formError)=> {
-      const container = $(formError.containerId)
+  const renderEndAt = () => {
+    const endDateTimeInput = document.getElementById('course_section_end_datetime_input')
+    if (endDateTimeInput) {
+      const endDateTimeValue = document.getElementById('end_datetime_value')
+      let value
+      if (endDateTimeValue) {
+        value = endDateTimeValue.value
+      }
+      const root = createRoot(endDateTimeInput)
+      root.render(<EndDateTimeInput initialValue={value}></EndDateTimeInput>)
+    }
+  }
+
+  renderStartAt()
+  renderEndAt()
+
+  const errorRoots = {}
+
+  const renderFormErrors = (formErrors, shouldFocus = false) => {
+    formErrors.forEach(formError => {
+      let container = $(formError.containerId)
+      if (!container.length) container = $(`[name="${formError.containerName}"]`)
       const errorsContainer = $(formError.errorsContainerId)[0]
       if (container) {
-        container.addClass('error-outline')
-        if (shouldFocus && document.activeElement !== container){
+        if (!formError.instUIControlled) container.addClass('error-outline')
+
+        if (shouldFocus && document.activeElement !== container) {
           container.focus()
+          // just focus the first element in the form
+          shouldFocus = false
         }
       }
-      const root = errorRoots[formError.containerId] ?? createRoot(errorsContainer)
-      errorRoots[formError.containerId] = root
-      root.render(
-        <FormattedErrorMessage
-          message={I18n.t('%{errorText}',{errorText: formError.errorText})}
-          margin="0 0 xx-small 0"
-          iconMargin="0 xx-small xxx-small 0"
-        />
-      )
+      // For inst-ui components error message is handled by messages prop
+      if (!formError.instUIControlled) {
+        const root = errorRoots[formError.containerId] ?? createRoot(errorsContainer)
+        errorRoots[formError.containerId] = root
+        root.render(
+          <FormattedErrorMessage
+            message={I18n.t('%{errorText}', {errorText: formError.errorText})}
+            margin="0 0 xx-small 0"
+            iconMargin="0 xx-small xxx-small 0"
+          />,
+        )
+      }
     })
   }
 
   const validateSectionFormName = () => {
     const sectionNameValue = $edit_section_form.find('#course_section_name')[0].value
     const nameErrors = []
-    if(!(sectionNameValue?.trim())){
+    if (!sectionNameValue?.trim()) {
       const error = {}
       error.containerId = '#course_section_name'
       error.errorsContainerId = '#course_section_name_errors'
       error.errorText = I18n.t('A section name is required')
       nameErrors.push(error)
     }
-    if((sectionNameValue?.length > 255)){
+    if (sectionNameValue?.length > 255) {
       const error = {}
       error.containerId = '#course_section_name'
       error.errorsContainerId = '#course_section_name_errors'
       error.errorText = I18n.t('Section name is too long')
       nameErrors.push(error)
     }
-    if(nameErrors.length > 0){
+    if (nameErrors.length > 0) {
       $('label[for="course_section_name"] > abbr').addClass('text-error')
     } else {
       $('label[for="course_section_name"] > abbr').removeClass('text-error')
@@ -107,39 +153,53 @@ $(document).ready(function () {
   }
 
   const validateSectionFormDates = () => {
-    const sectionStartAt =  $('.datetime_suggest')[0].textContent
-    const sectionEndAt = $('.datetime_suggest')[1].textContent
-    const dateErrors = []
+    return [...validateSectionStart(), ...validateSectionEnd()]
+  }
 
-    if(sectionStartAt && sectionEndAt && (new Date(sectionStartAt) > new Date(sectionEndAt) ) ){
-      const error = {}
-      error.containerId = '#course_section_end_at'
-      error.errorsContainerId = '#course_section_end_at_errors'
-      error.errorText = I18n.t('End date cannot be before start date')
-      dateErrors.push(error)
+  const validateSectionStart = () => {
+    const startDate = document.querySelector(`[name="${START_AT_DATE}"]`).value
+    const startTime = document.querySelector(`[name="${START_AT_TIME}"]`).value
+    return validateDateTime(startDate, startTime, START_AT_DATE)
+  }
+
+  const validateSectionEnd = () => {
+    let errors = []
+    const endDate = document.querySelector(`[name="${END_AT_DATE}"]`).value
+    const endTime = document.querySelector(`[name="${END_AT_TIME}"]`).value
+
+    errors = validateDateTime(endDate, endTime, END_AT_DATE)
+    if (errors.length > 0) {
+      return errors
     }
-    return dateErrors
+
+    const startDate = document.querySelector(`[name="${START_AT_DATE}"]`).value
+    const startTime = document.querySelector(`[name="${START_AT_TIME}"]`).value
+    errors = validateStartDateAfterEnd(startDate, startTime, endDate, endTime)
+    return errors
   }
 
   const validateCrossListForm = courseName => {
     const courseLookupValue = $('#course_autocomplete_id').val()
     const autocompleteValue = $('#course_autocomplete_id_lookup').val()
-    const courseIdValue = $("#course_id").val()
+    const courseIdValue = $('#course_id').val()
     const error = {}
     clearCrossListFormErrors()
     if (courseIdValue && !courseLookupValue && !autocompleteValue) {
-        error.containerId = '#course_id'
-        error.errorsContainerId = '#course_id_errors'
-        error.errorText = I18n.t(
-          'errors.course_not_authorized_for_crosslist',
-          '%{course_name} not authorized for cross-listing',
-          {course_name: courseName ||
-            I18n.t('default_course_name', 'Course ID "%{course_id}"', {course_id: $('#course_id').val()})
-          },
-        )
-        renderFormErrors([error], true)
-    }
-    else if (courseName && !courseLookupValue) {
+      error.containerId = '#course_id'
+      error.errorsContainerId = '#course_id_errors'
+      error.errorText = I18n.t(
+        'errors.course_not_authorized_for_crosslist',
+        '%{course_name} not authorized for cross-listing',
+        {
+          course_name:
+            courseName ||
+            I18n.t('default_course_name', 'Course ID "%{course_id}"', {
+              course_id: $('#course_id').val(),
+            }),
+        },
+      )
+      renderFormErrors([error], true)
+    } else if (courseName && !courseLookupValue) {
       error.containerId = '#course_autocomplete_id_lookup'
       error.errorsContainerId = '#course_autocomplete_id_lookup_errors'
       error.errorText = I18n.t(
@@ -150,9 +210,7 @@ $(document).ready(function () {
       renderFormErrors([error], true)
       $('#sis_id_holder,#account_name_holder').hide()
       $('#course_autocomplete_name').text('')
-
-    }
-    else if (!courseLookupValue && !courseName && !courseIdValue) {
+    } else if (!courseLookupValue && !courseName && !courseIdValue) {
       error.containerId = '#course_autocomplete_id_lookup'
       error.errorsContainerId = '#course_autocomplete_id_lookup_errors'
       error.errorText = I18n.t(
@@ -160,8 +218,7 @@ $(document).ready(function () {
         'Not a valid course name',
       )
       renderFormErrors([error], true)
-    }
-    else if (courseLookupValue) {
+    } else if (courseLookupValue) {
       return true
     }
 
@@ -170,18 +227,18 @@ $(document).ready(function () {
 
   const clearCrossListFormErrors = () => {
     errorRoots['#course_autocomplete_id_lookup']?.unmount()
-      errorRoots['#course_autocomplete_id_lookup'] = null
-      errorRoots['#course_id']?.unmount()
-      errorRoots['#course_id'] = null
-      $("#course_autocomplete_id_lookup, #course_id").removeClass('error-outline')
+    errorRoots['#course_autocomplete_id_lookup'] = null
+    errorRoots['#course_id']?.unmount()
+    errorRoots['#course_id'] = null
+    $('#course_autocomplete_id_lookup, #course_id').removeClass('error-outline')
   }
 
   // remove course_section_name errors if you begin to type.
-  $edit_section_form.find('#course_section_name').on("input", function (e) {
+  $edit_section_form.find('#course_section_name').on('input', function (e) {
     const container = $(this)
-      if (container) {
-        container.removeClass('error-outline')
-      }
+    if (container) {
+      container.removeClass('error-outline')
+    }
     errorRoots['#course_section_name']?.unmount()
     errorRoots['#course_section_name'] = null
     $('label[for="course_section_name"] > abbr').removeClass('text-error')
@@ -189,10 +246,9 @@ $(document).ready(function () {
 
   $edit_section_form.find('#course_section_name').blur(function (e) {
     const validateFormErrors = validateSectionFormName()
-    if(validateFormErrors.length > 0){
+    if (validateFormErrors.length > 0) {
       renderFormErrors(validateFormErrors)
-    }
-    else {
+    } else {
       const container = $(this)
       if (container) {
         container.removeClass('error-outline')
@@ -202,38 +258,22 @@ $(document).ready(function () {
     }
   })
 
-  $edit_section_form.find('.datetime_field').on("input", function (e) {
-    const container = $('#course_section_end_at')
-      if (container) {
-        container.removeClass('error-outline')
-      }
-      errorRoots['#course_section_end_at']?.unmount()
-      errorRoots['#course_section_end_at'] = null
-  })
-
-  $edit_section_form.find('.datetime_field').blur(function (e) {
-    const validateFormErrors = validateSectionFormDates()
-    if(validateFormErrors.length > 0){
-      renderFormErrors(validateFormErrors)
-    }
-    else {
-      const container = $('#course_section_end_at')
-      if (container) {
-        container.removeClass('error-outline')
-      }
-      errorRoots['#course_section_end_at']?.unmount()
-      errorRoots['#course_section_end_at'] = null
-    }
-  })
-
   $edit_section_form
     .formSubmit({
       beforeSubmit(data) {
-        const validateFormErrors = [...validateSectionFormName(), ...validateSectionFormDates()];
-        if (validateFormErrors.length > 0){
+        const validateFormErrors = [...validateSectionFormName(), ...validateSectionFormDates()]
+        if (validateFormErrors.length > 0) {
           renderFormErrors(validateFormErrors, true)
           return false
         } else {
+          const startDate = document.querySelector(`[name="${START_AT_DATE}"]`).value
+          const startTime = document.querySelector(`[name="${START_AT_TIME}"]`).value
+          data['course_section[start_at]'] = parseDateTimeToISO(startDate, startTime)
+
+          const endDate = document.querySelector(`[name="${END_AT_DATE}"]`).value
+          const endTime = document.querySelector(`[name="${END_AT_TIME}"]`).value
+          data['course_section[end_at]'] = parseDateTimeToISO(endDate, endTime)
+
           $edit_section_form.hide()
           $edit_section_form.find('.name').text(data['course_section[name]']).show()
           $edit_section_form.loadingImage({image_size: 'small'})
@@ -360,20 +400,22 @@ $(document).ready(function () {
     event.preventDefault()
     $(this).change()
   })
-  $('#course_autocomplete_id_lookup').on('input', function (event) {
-    const container = $(this)
-    if (container) {
-      container.removeClass('error-outline')
-    }
-    $("#course_autocomplete_id").val('')
-    $("#course_id").val('')
-    clearCrossListFormErrors()
-  }).on('blur', function (event) {
-    const CourseLookupValue = $('#course_autocomplete_id_lookup').val()
-    if (CourseLookupValue) {
-      validateCrossListForm()
-    }
-  })
+  $('#course_autocomplete_id_lookup')
+    .on('input', function (event) {
+      const container = $(this)
+      if (container) {
+        container.removeClass('error-outline')
+      }
+      $('#course_autocomplete_id').val('')
+      $('#course_id').val('')
+      clearCrossListFormErrors()
+    })
+    .on('blur', function (event) {
+      const CourseLookupValue = $('#course_autocomplete_id_lookup').val()
+      if (CourseLookupValue) {
+        validateCrossListForm()
+      }
+    })
 
   $('#course_id').on('input', function (event) {
     const container = $(this)
@@ -455,10 +497,10 @@ $(document).ready(function () {
       },
     )
   })
-  $("#crosslist_course_form button[type='submit']").on('click', function(e){
+  $("#crosslist_course_form button[type='submit']").on('click', function (e) {
     e.preventDefault()
     if (validateCrossListForm()) {
-      $("#crosslist_course_form").trigger('submit')
+      $('#crosslist_course_form').trigger('submit')
     }
   })
 })
