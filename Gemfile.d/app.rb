@@ -100,9 +100,8 @@ gem "parallel", "~> 1.23", require: false
 gem "pdf-reader", "~> 2.11"
 gem "pg_query", "~> 6.0", require: false
 gem "pragmatic_segmenter", "~> 0.3"
-gem "prawn-emoji", "~> 5.3", require: false
+gem "prawn-emoji", "~> 6.0", require: false
 gem "prawn-rails", "~> 1.4"
-  gem "matrix", "0.4.2" # Used to be a default gem but is no more, but prawn depends on it implicitly
 gem "prosopite", "~> 1.3"
 gem "puma", "~> 6.3", require: false
 gem "rack3-brotli", "~> 1.0", require: "rack/brotli"
