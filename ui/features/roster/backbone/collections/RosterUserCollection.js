@@ -16,10 +16,15 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
-
 import RosterUser from '../models/RosterUser'
 
 export default class RosterUserCollection extends PaginatedCollection {
+  constructor(models, options = {}) {
+    super(models, options)
+    // Keep track of selected user IDs in this collection
+    this.selectedUserIds = []
+  }
+
   url() {
     return `/api/v1/courses/${this.options.course_id}/users?include_inactive=true`
   }

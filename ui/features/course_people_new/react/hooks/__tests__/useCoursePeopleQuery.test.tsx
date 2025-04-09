@@ -16,18 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {ReactNode} from 'react'
+import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks'
-import useCoursePeopleQuery from '../useCoursePeopleQuery'
+import useCoursePeopleQuery, {CoursePeopleQueryResponse, QueryProps} from '../useCoursePeopleQuery'
 import {executeQuery} from '@canvas/query/graphql'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {DEFAULT_OPTION} from '../../../util/constants'
+import type {User} from '../../../types'
 
+jest.mock('../useCoursePeopleContext')
 jest.mock('@canvas/query/graphql')
-
 const mockExecuteQuery = executeQuery as jest.Mock
 
 describe('useCoursePeopleQuery', () => {
+  const allRoles = [
+    {...DEFAULT_OPTION, id: '1', label: 'Teacher', count: 1},
+    {...DEFAULT_OPTION, id: '2', label: 'Student', count: 2},
+  ]
+  const filterOptions = [DEFAULT_OPTION, ...allRoles]
+  const [defaultRole, otherRole,] = filterOptions
+
+  const defaultProps: QueryProps = {
+    courseId: '123',
+    searchTerm: '',
+    optionId: defaultRole.id
+  }
+
+  const useCoursePeopleContextMocks = {
+    allRoles
+  }
+
+  const defaultQueryProps = {
+    courseId: '123',
+    searchTerm: ''
+  }
+
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -36,32 +60,33 @@ describe('useCoursePeopleQuery', () => {
     }
   })
 
-  const mockData = {
+  const mockData: CoursePeopleQueryResponse = {
     course: {
       usersConnection: {
         nodes: [
-          {_id: '1', name: 'Test User'},
-          {_id: '2', name: 'Another User'}
+          {_id: '1', name: 'Test User'} as User,
+          {_id: '2', name: 'Another User'} as User
         ]
       }
     }
   }
 
-  const filteredMockData = {
+  const filteredMockData: CoursePeopleQueryResponse = {
     course: {
       usersConnection: {
         nodes: [
-          {_id: '1', name: 'Test User'}
+          {_id: '1', name: 'Test User'} as User
         ]
       }
     }
   }
 
-  const wrapper = ({children}: {children: ReactNode}) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  const wrapper = (props: any) => (
+    <QueryClientProvider client={queryClient}>{props.children}</QueryClientProvider>
   )
 
   beforeEach(() => {
+    require('../useCoursePeopleContext').default.mockReturnValue(useCoursePeopleContextMocks)
     mockExecuteQuery.mockClear()
     queryClient.clear()
   })
@@ -74,7 +99,7 @@ describe('useCoursePeopleQuery', () => {
     mockExecuteQuery.mockResolvedValue(mockData)
 
     const {result} = renderHook(
-      () => useCoursePeopleQuery({courseId: '123', searchTerm: ''}),
+      () => useCoursePeopleQuery(defaultProps),
       {wrapper}
     )
 
@@ -82,7 +107,7 @@ describe('useCoursePeopleQuery', () => {
       expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), {courseId: '123', searchTerm: ''})
+    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), defaultQueryProps)
     expect(result.current.data).toEqual(mockData.course.usersConnection.nodes)
   })
 
@@ -90,7 +115,7 @@ describe('useCoursePeopleQuery', () => {
     mockExecuteQuery.mockResolvedValue({})
 
     const {result} = renderHook(
-      () => useCoursePeopleQuery({courseId: '123', searchTerm: ''}),
+      () => useCoursePeopleQuery(defaultProps),
       {wrapper}
     )
 
@@ -98,7 +123,7 @@ describe('useCoursePeopleQuery', () => {
       expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), {courseId: '123', searchTerm: ''})
+    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), defaultQueryProps)
     expect(result.current.data).toEqual([])
   })
 
@@ -107,7 +132,7 @@ describe('useCoursePeopleQuery', () => {
     mockExecuteQuery.mockRejectedValue(error)
 
     const {result} = renderHook(
-      () => useCoursePeopleQuery({courseId: '123', searchTerm: ''}),
+      () => useCoursePeopleQuery(defaultProps),
       {wrapper}
     )
 
@@ -122,7 +147,7 @@ describe('useCoursePeopleQuery', () => {
     mockExecuteQuery.mockResolvedValue(filteredMockData)
 
     const {result} = renderHook(
-      () => useCoursePeopleQuery({courseId: '123', searchTerm: 'Test'}),
+      () => useCoursePeopleQuery({...defaultProps, searchTerm: 'Test'}),
       {wrapper}
     )
 
@@ -130,7 +155,7 @@ describe('useCoursePeopleQuery', () => {
       expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), {courseId: '123', searchTerm: 'Test'})
+    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), {...defaultQueryProps, searchTerm: 'Test'})
   })
 
   it('updates data when searchTerm changes', async () => {
@@ -138,10 +163,12 @@ describe('useCoursePeopleQuery', () => {
       .mockResolvedValueOnce(mockData)
       .mockResolvedValueOnce(filteredMockData)
 
-    let searchTerm = ''
-    const {result, rerender} = renderHook(
-      () => useCoursePeopleQuery({courseId: '123', searchTerm}),
-      {wrapper}
+    const {result, rerender} = renderHook<{searchTerm: string}, ReturnType<typeof useCoursePeopleQuery>>(
+      ({searchTerm}) => useCoursePeopleQuery({...defaultProps, searchTerm}),
+      {
+        wrapper,
+        initialProps: {searchTerm: ''}
+      }
     )
 
     await waitFor(() => {
@@ -149,16 +176,48 @@ describe('useCoursePeopleQuery', () => {
       expect(result.current.data).toEqual(mockData.course.usersConnection.nodes)
     })
 
-    searchTerm = 'Test'
-    rerender()
+    rerender({searchTerm: 'Test'})
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true)
       expect(result.current.data).toEqual(filteredMockData.course.usersConnection.nodes)
     })
+  })
 
-    expect(executeQuery).toHaveBeenCalledTimes(2)
-    expect(executeQuery).toHaveBeenNthCalledWith(1, expect.anything(), {courseId: '123', searchTerm: ''})
-    expect(executeQuery).toHaveBeenNthCalledWith(2, expect.anything(), {courseId: '123', searchTerm: 'Test'})
+  it('does not fetch when search term is one character', () => {
+    mockExecuteQuery.mockResolvedValue(mockData)
+
+    const {result} = renderHook(
+      () => useCoursePeopleQuery({...defaultProps, searchTerm: 'a'}),
+      {wrapper}
+    )
+
+    expect(result.current.isFetching).toBe(false)
+    expect(executeQuery).not.toHaveBeenCalled()
+  })
+
+  it('updates data when filter role changes', async () => {
+    mockExecuteQuery.mockResolvedValue(mockData)
+
+    const {result, rerender} = renderHook<{optionId: string}, ReturnType<typeof useCoursePeopleQuery>>(
+      ({optionId}) => useCoursePeopleQuery({...defaultProps, optionId}),
+      {
+        wrapper,
+        initialProps: {optionId: defaultRole.id}
+      }
+    )
+
+    rerender({optionId: otherRole.id})
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+
+    expect(executeQuery).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        enrollmentRoleIds: [otherRole.id]
+      })
+    )
   })
 })

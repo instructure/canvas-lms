@@ -18,7 +18,7 @@
 
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {fireEvent, render} from '@testing-library/react'
-import React from 'react'
+import React, {createRef} from 'react'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/client/testing'
 import StudentViewContext from '../../Context'
@@ -63,6 +63,7 @@ async function makeProps(overrides) {
     createSubmissionDraft: jest.fn().mockResolvedValue({}),
     updateEditingDraft: jest.fn(),
     focusOnInit: false,
+    errorMessage: ''
   }
   return props
 }
@@ -205,6 +206,68 @@ describe('UrlEntry', () => {
       )
 
       expect(getByText('Please enter a valid url (e.g. https://example.com)')).toBeInTheDocument()
+    })
+
+    it('renders an error message when the user tries to submit an empty url', async () => {
+      const props = await makeProps({
+        Submission: {
+          submissionDraft: {
+            activeSubmissionType: 'online_url',
+            attachments: [],
+            body: null,
+            meetsUrlCriteria: false,
+            url: '',
+          },
+        },
+      })
+      const submitButton = document.createElement('button')
+      props.submitButtonRef = createRef()
+      props.submitButtonRef.current = submitButton
+      const overrides = {
+        ExternalToolConnection: {
+          nodes: [{}],
+        },
+      }
+      const mocks = await createGraphqlMocks(overrides)
+      const {getByText} = render(
+        <MockedProvider mocks={mocks}>
+          <UrlEntry {...props} />
+        </MockedProvider>,
+      )
+      fireEvent.click(props.submitButtonRef.current)
+      expect(getByText('Please enter a valid url (e.g. https://example.com)')).toBeInTheDocument()
+    })
+
+    it('clears error message when the user starts typing in the url input', async () => {
+      const props = await makeProps({
+        Submission: {
+          submissionDraft: {
+            activeSubmissionType: 'online_url',
+            attachments: [],
+            body: null,
+            meetsUrlCriteria: false,
+            url: '',
+          },
+        },
+      })
+      const submitButton = document.createElement('button')
+      props.submitButtonRef = createRef()
+      props.submitButtonRef.current = submitButton
+      const overrides = {
+        ExternalToolConnection: {
+          nodes: [{}],
+        },
+      }
+      const mocks = await createGraphqlMocks(overrides)
+      const {getByText, getByTestId, queryByText, debug} = render(
+        <MockedProvider mocks={mocks}>
+          <UrlEntry {...props} />
+        </MockedProvider>,
+      )
+      fireEvent.click(props.submitButtonRef.current)
+      expect(getByText('Please enter a valid url (e.g. https://example.com)')).toBeInTheDocument()
+      fireEvent.change(getByTestId('url-input'), {target: {value: 'https://url.com'}})
+      expect(queryByText('Please enter a valid url (e.g. https://example.com)')).not.toBeInTheDocument()
     })
 
     it('renders the preview button when the url is considered valid', async () => {

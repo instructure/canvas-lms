@@ -96,7 +96,7 @@ describe Lti::LtiAdvantageAdapter do
   describe "#generate_post_payload_for_report_review" do
     let(:login_message) { adapter.generate_post_payload_for_report_review }
     let(:asset_processor) { lti_asset_processor_model }
-    let(:asset_report) { lti_asset_report_model(asset_processor: asset_processor) }
+    let(:asset_report) { lti_asset_report_model(asset_processor:) }
     let(:opts) { { asset_report: } }
 
     it "creates a report review request" do

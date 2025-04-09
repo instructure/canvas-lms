@@ -6951,6 +6951,7 @@ he:
   delete_rubric_9b66412d: "ביטול רובריקה"
   delete_section_name_a48d9d79: "ביטול סעיף  \"%{name}\""
   delete_selected_a023ccf8: "ביטול פריטים נבחרים"
+  delete_sub_account_c267a6e5: "ביטול חשבון משנה"
   delete_survey_56fddbbd: "ביטול סקר"
   delete_term_name_f707abc9: "ביטול מונח %{name}"
   delete_theme_bdb70d25: "ביטול ערכת נושא"
@@ -7493,6 +7494,7 @@ he:
   do_nothing_9672b478: "אין צורך לנקוט בפעולה"
   does_not_meet_expectations_b0736d20: "אינו עונה על הציפיות"
   domain_3b54c511: דומיין
+  domain_69fe564b: דומיין
   domain_is_required_1d4c8b25: "נדרש דומיין"
   don_t_add_this_user_for_now_32912974: "אין להוסיף משתמש זה כרגע"
   don_t_indent_b35ae9fb: "אין לעמד"
@@ -13402,6 +13404,7 @@ he:
   no_courses_found_12d68a74: "לא נמצאו קורסים"
   no_date_bfeb2df7: "אין תאריך"
   no_date_set_25edf0c1: "לא נקבע תאריך "
+  no_description_44c9c3f2: "אין תיאור"
   no_description_c2554c25: "אין תיאור"
   no_details_1ee29870: "אין פרטים"
   no_details_d15fa1ec: "אין פרטים"
@@ -13447,6 +13450,7 @@ he:
   no_submission_fb131a40: "אין הגשה"
   no_submission_for_assignment_a9cb6fe2: "אין הגשה עבור %{assignment}"
   no_teacher_interaction_de8d91bc: "אין מעורבות מורה"
+  no_text_8ecc1274: "אין תוכן"
   no_time_limit_for_long_running_conferences_d49fdfad: "אין מגבלת זמן (לשיחות ועידה ארוכות)"
   no_tls_618add1a: "אין TLS"
   no_unassigned_terms_deb7b76b: "אין תקופות שלא שויכו"

@@ -27,7 +27,7 @@
 # 3. Create a Consul setting private/canvas/rails_version with <supported version> as the contents
 
 # the default version (corresponding to the bare Gemfile.lock) must be listed first
-SUPPORTED_RAILS_VERSIONS = %w[7.1].freeze
+SUPPORTED_RAILS_VERSIONS = %w[7.1 7.2].freeze
 
 unless defined?($canvas_rails)
   file_path = File.expand_path("RAILS_VERSION", __dir__)
@@ -48,19 +48,18 @@ unless defined?($canvas_rails)
 
         environment = File.read(consul_environment)
 
-        keys.push(
+        keys = [
           ["private/canvas", environment, "rails_version"].compact.join("/"),
           ["private/canvas", "rails_version"].compact.join("/"),
           ["global/private/canvas", environment, "rails_version"].compact.join("/"),
           ["global/private/canvas", "rails_version"].compact.join("/")
-        )
-        keys.uniq!
+        ].uniq
 
         result = nil
         Gem::Net::HTTP.start("localhost", 8500, connect_timeout: 1, read_timeout: 1) do |http|
           keys.each do |key|
             result = http.request_get("/v1/kv/#{key}?stale&raw")
-            result = nil unless result.is_a?(Net::HTTPSuccess)
+            result = nil unless result.is_a?(Gem::Net::HTTPSuccess)
             if result
               source = "the Consul key #{key}"
               break
@@ -74,7 +73,8 @@ unless defined?($canvas_rails)
                       else
                         SUPPORTED_RAILS_VERSIONS.first
                       end
-    rescue
+    rescue => e
+      puts "Error Loading Rails Version: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}" # rubocop:disable Rails/Output -- rails is not available here
       $canvas_rails = SUPPORTED_RAILS_VERSIONS.first
     end
   end

@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MediaAttempt from '../MediaAttempt'
 // eslint-disable-next-line import/default
 import MediaPlayer from '@instructure/ui-media-player'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
-import React from 'react'
+import React, {createRef} from 'react'
 import StudentViewContext from '../../Context'
 import {enableFetchMocks} from 'jest-fetch-mock'
 
@@ -65,6 +65,7 @@ const makeProps = async overrides => {
     setIframeURL: jest.fn(),
     uploadingFiles: false,
     focusOnInit: false,
+    submitButtonRef: createRef()
   }
 }
 
@@ -137,6 +138,42 @@ describe('MediaAttempt', () => {
           activeSubmissionType: 'media_recording',
           attempt: 1,
         },
+      })
+    })
+
+    describe('validation', () => {
+      it('displays an error if the user has not uploaded media and tries to submit', async () => {
+        const props = await makeProps()
+        props.submission = { submissionDraft: { meetsMediaRecordingCriteria: false } }
+        const submitButton = document.createElement('button')
+        props.submitButtonRef.current = submitButton
+        const {getByText} = render(<MediaAttempt {...props} />)
+        fireEvent.click(props.submitButtonRef.current)
+        expect(getByText('At least one submission type is required')).toBeInTheDocument()
+      })
+
+      it('clears the error when the user clicks the record media button', async () => {
+        const props = await makeProps()
+        props.submission = { submissionDraft: { meetsMediaRecordingCriteria: false } }
+        const submitButton = document.createElement('button')
+        props.submitButtonRef.current = submitButton
+        const {getByText, queryByText, getByTestId} = render(<MediaAttempt {...props} />)
+        fireEvent.click(props.submitButtonRef.current)
+        expect(getByText('At least one submission type is required')).toBeInTheDocument()
+        fireEvent.click(getByTestId('open-record-media-modal-button'))
+        expect(queryByText('At least one submission type is required')).not.toBeInTheDocument()
+      })
+
+      it('clears the error when the user clicks the upload media button', async () => {
+        const props = await makeProps()
+        props.submission = { submissionDraft: { meetsMediaRecordingCriteria: false } }
+        const submitButton = document.createElement('button')
+        props.submitButtonRef.current = submitButton
+        const {getByText, queryByText, getByTestId} = render(<MediaAttempt {...props} />)
+        fireEvent.click(props.submitButtonRef.current)
+        expect(getByText('At least one submission type is required')).toBeInTheDocument()
+        fireEvent.click(getByTestId('open-upload-media-modal-button'))
+        expect(queryByText('At least one submission type is required')).not.toBeInTheDocument()
       })
     })
   })

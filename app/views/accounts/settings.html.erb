@@ -141,19 +141,7 @@
                  <% end %>
               <% end %>
             <% end %>
-            <% if !@account.site_admin? && @account.feature_enabled?(:differentiation_tags) && @account.feature_enabled?(:assign_to_differentiation_tags) %>
-              <%= f.fields_for :settings do |settings| %>
-                <tr id="differentiation_tags">
-                  <td><%= settings.blabel :differentiation_tags, t("Differentiation Tags") %></td>
-                  <td>
-                    <p>
-                      <%= settings.check_box :allow_assign_to_differentiation_tags, :checked => @account.allow_assign_to_differentiation_tags?  %>
-                      <%= settings.label :allow_assign_to_differentiation_tags, t("When selected, Differentiation Tags will allow instructors to categorize and tailor content for specific groups of students, making it easier to customize learning experiences."), :style => "display: inline;" %>
-                    </p>
-                  </td>
-                </tr>
-              <% end %>
-            <% end %>
+
             <% if @account.primary_settings_root_account? %>
               <tr>
                 <td><%= f.blabel :default_time_zone, :en => "Default Time Zone" %></td>
@@ -312,10 +300,6 @@
                             <i class='icon-info'></i>
                             <span class='screenreader-only'><%= t(:rqd_screenreader, "About restrict quantitative data") %></span>
                           </button>
-                          <div id="rqd_dialog" style="display: none;">
-                            <%= t(:rqd_help_message,
-                            "When selected, this setting will limit the view of new courses' quantitative (numeric) grading data. Students and observers will only see qualitative data, which includes letter grades and comments.") %>
-                          </div>
                       </td>
                     </tr>
                     <% unless disabled %>
@@ -611,6 +595,28 @@
               </div>
             </div>
 
+            <% if !@account.site_admin? && @account.feature_enabled?(:differentiation_tags) && @account.feature_enabled?(:assign_to_differentiation_tags) %>
+              <div>
+                <% diff_tags = @account.allow_assign_to_differentiation_tags %>
+                <% disabled = diff_tags[:locked] && diff_tags[:inherited] %>
+                <%= settings.fields_for :allow_assign_to_differentiation_tags do |diff| %>
+                  <%= diff.check_box :value, checked: diff_tags[:value], disabled: disabled %>
+                  <%= diff.label :value, t("Differentiation Tags") %>
+                <% end %>
+                <div class="account_settings__help-text">
+                  <%= t("Differentiation Tags allow instructors to organize students by tags for a more personalized learning experience.") %>
+                </div>
+                <% unless disabled %>
+                  <div class="sub_checkbox" style="margin-left: 20px;">
+                    <%= settings.fields_for :allow_assign_to_differentiation_tags do |diff_lock| %>
+                      <%= diff_lock.check_box :locked, checked: diff_tags[:locked] %>
+                      <%= diff_lock.label :locked, t("Lock this setting for sub-accounts and courses") %>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+
             <% if @account.grants_right?(@current_user, :manage_account_settings) && @account.root_account.feature_enabled?(:allow_limited_access_for_students)%>
               <div>
                 <%= settings.check_box :enable_limited_access_for_students, :checked => @account.enable_limited_access_for_students? %>
@@ -697,19 +703,12 @@
                   <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
                   <%= settings.label :open_registration, :en => "Open Registration" %>
                   <% if @account.delegated_authentication? %>
-                    <legend>
-                      <%= link_to(image_tag('warning.png', :alt => ''), '#',
-                                  :class => 'open_registration_delegated_warning_link no-hover',
-                                  :title => t(:open_registration_delegated_warning_tooltip,
-                                  "An External Identity Provider is Enabled"))
-                                %>
-                    </legend>
+                    <button data-url="<%= canvas_login_url %>" type="button" class='Button Button--icon-action open_registration_delegated_warning_btn'>
+                      <%= image_tag "warning.png", :alt => '' %>
+                      <span class='screenreader-only'><%= t(:open_registration_screenreader, "Warning about Open Registration") %></span>
+                    </button>
 
-                    <div id="open_registration_delegated_warning_dialog" style="display: none;">
-                        <%= t(:open_registration_delegated_warning_message,
-                        "An external identity provider is enabled, and users created via open registration may not be able to log in unless
-                        the external identity provider's login form has a link back to %{url}.", :url => canvas_login_url) %>
-                    </div>
+                    <div id="open_registration_mount"></div>
                   <% end %>
                 </div>
               <% end %>
@@ -1416,12 +1415,12 @@ acknowledge that you have read and agreed to the
   <% end %>
   <% if can_do(@context, @current_user, :read_as_admin) %>
       <div id="tab-tools">
-        <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
+        <%= render :partial => 'external_tools/external_tools' %>
       </div>
   <% end %>
   <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
       <div id="tab-alerts">
-        <div id="alerts_mount_point"></div> 
+        <div id="alerts_mount_point"></div>
       </div>
   <% end %>
   <% if can_do(@context, @current_user, :view_feature_flags) %>
@@ -1434,3 +1433,5 @@ acknowledge that you have read and agreed to the
     <div id="tab-internal-settings"></div>
   <% end %>
 </div>
+<div id="rqd_mount"></div>
+

@@ -117,12 +117,8 @@ module Importers
             end
           end
 
-          if (!migration.for_course_copy? || Account.site_admin.feature_enabled?(:media_links_use_attachment_id)) &&
-             (migration.canvas_import? || migration.for_master_course_import?)
-            migration.update_import_progress(30)
-            Importers::MediaTrackImporter.process_migration(data[:media_tracks], migration)
-          end
-
+          migration.update_import_progress(30)
+          Importers::MediaTrackImporter.process_migration(data[:media_tracks], migration)
           migration.update_import_progress(35)
           unless migration.quizzes_next_banks_migration?
             question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration)
@@ -452,9 +448,9 @@ module Importers
           if tab["id"].is_a?(String) && tab["id"].start_with?("context_external_tool_")
             tool_mig_id = tab["id"].sub("context_external_tool_", "")
             all_tools ||= if migration.cross_institution?
-                            course.context_external_tools.having_setting("course_navigation")
+                            Lti::ContextToolFinder.only_for(course).placements(:course_navigation)
                           else
-                            ContextExternalTool.find_all_for(course, :course_navigation)
+                            Lti::ContextToolFinder.all_tools_for(course, placements: :course_navigation)
                           end
             if (tool = all_tools.detect { |t| t.migration_id == tool_mig_id } ||
                 all_tools.detect do |t|

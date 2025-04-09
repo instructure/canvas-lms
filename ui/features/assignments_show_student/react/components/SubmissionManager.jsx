@@ -59,6 +59,7 @@ import {
   isSubmitted,
   multipleTypesDrafted,
   totalAllowedAttempts,
+  activeTypeMeetsCriteria
 } from '../helpers/SubmissionHelpers'
 import AttemptTab from './AttemptTab'
 import StudentViewContext from './Context'
@@ -214,6 +215,7 @@ const SubmissionManager = ({
   const apolloClient = useApolloClient()
 
   const similarityPledgeCheckboxRef = useRef(null)
+  const submitButtonRef = useRef(null)
 
   const updateSubmissionDraftCache = (cache, result) => {
     if (!result.data.createSubmissionDraft.errors) {
@@ -544,6 +546,10 @@ const SubmissionManager = ({
       return
     }
 
+    if (!activeTypeMeetsCriteria(activeSubmissionType, submission)) {
+      return
+    }
+
     if (multipleTypesDrafted(submission)) {
       const confirmed = await showConfirmationDialog({
         body: I18n.t(
@@ -755,6 +761,7 @@ const SubmissionManager = ({
           updateEditingDraft={updateEditingDraft}
           updateUploadingFiles={updateUploadingFiles}
           uploadingFiles={uploadingFiles}
+          submitButtonRef={submitButtonRef}
         />
       </View>
     )
@@ -877,40 +884,14 @@ const SubmissionManager = ({
   }
 
   const renderSubmitButton = () => {
-    let activeTypeMeetsCriteria = false
-    switch (activeSubmissionType) {
-      case 'media_recording':
-        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsMediaRecordingCriteria
-        break
-      case 'online_text_entry':
-        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsTextEntryCriteria
-        break
-      case 'online_upload':
-        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsUploadCriteria
-        break
-      case 'online_url':
-        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsUrlCriteria
-        break
-      case 'student_annotation':
-        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsStudentAnnotationCriteria
-        break
-      case 'basic_lti_launch':
-        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsBasicLtiLaunchCriteria
-        break
-    }
-
     return (
       <Button
         id="submit-button"
         data-testid="submit-button"
-        disabled={
-          !submission.submissionDraft ||
-          draftStatus === 'saving' ||
-          isSubmitting ||
-          !activeTypeMeetsCriteria
-        }
+        disabled={draftStatus === 'saving' || isSubmitting}
         color="primary"
         onClick={() => handleSubmitButton()}
+        elementRef={(element) => submitButtonRef.current = element}
       >
         {I18n.t('Submit Assignment')}
       </Button>

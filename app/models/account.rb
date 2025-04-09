@@ -432,7 +432,7 @@ class Account < ActiveRecord::Base
                                                                         common_passwords_folder_id]
 
   add_setting :enable_limited_access_for_students, boolean: true, root_only: false, default: false, inheritable: false
-  add_setting :allow_assign_to_differentiation_tags, boolean: true, root_only: false, default: false, inheritable: false
+  add_setting :allow_assign_to_differentiation_tags, boolean: true, root_only: false, default: false, inheritable: true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -535,6 +535,10 @@ class Account < ActiveRecord::Base
 
   def allow_observers_in_appointment_groups?
     allow_observers_in_appointment_groups[:value] && Account.site_admin.feature_enabled?(:observer_appointment_groups)
+  end
+
+  def allow_assign_to_differentiation_tags?
+    allow_assign_to_differentiation_tags[:value]
   end
 
   def allow_gradebook_show_first_last_names?
@@ -855,7 +859,7 @@ class Account < ActiveRecord::Base
   end
 
   def discussion_checkpoints_enabled?
-    root_account.feature_enabled?(:discussion_checkpoints)
+    feature_enabled?(:discussion_checkpoints)
   end
 
   def file_namespace
@@ -2639,7 +2643,7 @@ class Account < ActiveRecord::Base
 
     protocol = horizon_domain.include?("localhost") ? "http" : "https"
     uri = Addressable::URI.parse("#{protocol}://#{horizon_domain}/redirect")
-    uri.query_values = { canvas_url: canvas_url, reauthenticate: reauthenticate, preview: preview }
+    uri.query_values = { canvas_url:, reauthenticate:, preview: }
     uri.to_s
   end
 end

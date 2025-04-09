@@ -1167,7 +1167,7 @@ describe SubmissionsController do
       OriginalityReport.create!(attachment:,
                                 submission:,
                                 originality_score: 0.5,
-                                originality_report_url: "http://www.instructure.com")
+                                originality_report_url: "http://www.external.com")
     end
 
     before do
@@ -1175,6 +1175,10 @@ describe SubmissionsController do
     end
 
     describe "GET originality_report" do
+      before do
+        allow(PandataEvents).to receive(:send_event)
+      end
+
       it "redirects to the originality report URL if it exists" do
         get "originality_report", params: { course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id, asset_string: attachment.asset_string }
         expect(response).to redirect_to originality_report.originality_report_url
@@ -1240,6 +1244,50 @@ describe SubmissionsController do
           asset_string: attachment.asset_string
         }
         expect(flash[:error]).to be_present
+      end
+
+      it "creates an lti launch log for external report URLs" do
+        originality_report.update!(originality_report_url: "http://www.turnitin.com/report")
+
+        expect(PandataEvents).to receive(:send_event).with(
+          :lti_launch,
+          hash_including(
+            user_id: test_teacher.id.to_s,
+            context_id: test_course.id.to_s,
+            message_type: "basic-lti_launch-request",
+            launch_url: originality_report.originality_report_url,
+            launch_type: "direct_link"
+          ),
+          for_user_id: test_teacher.global_id
+        )
+
+        get "originality_report", params: {
+          course_id: assignment.context_id,
+          assignment_id: assignment.id,
+          submission_id: test_student.id,
+          asset_string: attachment.asset_string
+        }
+        expect(response).to be_redirect
+      end
+
+      it "does not create an lti launch log for internal URLs" do
+        mock_link = Lti::Link.new(
+          resource_url: "http://canvas.test/internal_url",
+          resource_type_code: "originality_report",
+          resource_link_id: "resource_link_id"
+        )
+        originality_report.update!(originality_report_url: nil)
+        allow_any_instance_of(OriginalityReport).to receive(:lti_link).and_return(mock_link)
+
+        expect(PandataEvents).not_to receive(:send_event)
+
+        get "originality_report", params: {
+          course_id: assignment.context_id,
+          assignment_id: assignment.id,
+          submission_id: test_student.id,
+          asset_string: attachment.asset_string
+        }
+        expect(response).to be_redirect
       end
     end
 

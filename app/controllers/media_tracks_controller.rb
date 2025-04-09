@@ -51,7 +51,7 @@ class MediaTracksController < ApplicationController
 
   TRACK_SETTABLE_ATTRIBUTES = %i[kind locale content].freeze
 
-  def services_jwt_auth_allowed
+  def token_auth_allowed?
     params[:action] == "show" && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
   end
 

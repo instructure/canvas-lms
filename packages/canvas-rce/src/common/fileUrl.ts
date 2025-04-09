@@ -33,6 +33,17 @@ interface ParsedUrl {
   slashes?: boolean
 }
 
+const CONTACT_PROTOCOLS = ['mailto:', 'tel:', 'skype:'];
+
+function parseUrl(url: string, canvasOrigin: string = window.location.origin): URL {
+  try {
+    // If the URL is already absolute, use it as-is
+    return new URL(url)
+  } catch {
+    return new URL(`${canvasOrigin}${url.startsWith('/') ? '' : '/'}${url}`)
+  }
+}
+
 function parseCanvasUrl(
   url: string | undefined | null,
   canvasOrigin: string = window.location.origin,
@@ -42,14 +53,14 @@ function parseCanvasUrl(
   }
 
   try {
-    // For absolute URLs
-    const fullUrl = url.startsWith('http')
-      ? url
-      : `${canvasOrigin}${url.startsWith('/') ? '' : '/'}${url}`
-    const parsed = new URL(fullUrl)
+    const parsed = parseUrl(url, canvasOrigin)
     const canvasUrl = new URL(canvasOrigin)
 
     if (parsed.host && canvasUrl.host !== parsed.host) {
+      return null
+    }
+
+    if (CONTACT_PROTOCOLS.includes(parsed.protocol)) {
       return null
     }
 

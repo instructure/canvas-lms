@@ -60,6 +60,7 @@ export type SettingsPanelProps = {
   mountNodeRef: React.RefObject<HTMLElement>
   updateParentData?: (data: SettingsPanelState, changed: boolean) => void
   onDidSubmit?: () => void
+  onComplete?: () => void
 }
 
 const doRequest = (
@@ -95,11 +96,11 @@ const doRequest = (
       }),
     )
 
-export const updateModule = ({moduleId, moduleElement, data}: any) => {
+export const updateModule = ({moduleId, moduleElement, data, onComplete}: any) => {
   if (!moduleId) return Promise.reject(I18n.t('Invalid module id.'))
 
   return doRequest(
-    `/courses/${ENV.COURSE_ID}/modules/${moduleId}`,
+    `/courses/${ENV.COURSE_ID || ENV.course_id}/modules/${moduleId}`,
     'PUT',
     data,
     responseJSON => {
@@ -115,12 +116,12 @@ export const updateModule = ({moduleId, moduleElement, data}: any) => {
       moduleName: data.moduleName,
     }),
     I18n.t('Error updating %{moduleName} settings.', {moduleName: data.moduleName}),
-  )
+  ).then(() => onComplete?.())
 }
 
-export const createModule = ({moduleElement, addModuleUI, data}: any) =>
+export const createModule = ({moduleElement, addModuleUI, data, onComplete}: any) =>
   doRequest(
-    `/courses/${ENV.COURSE_ID}/modules/`,
+    `/courses/${ENV.COURSE_ID || ENV.course_id}/modules/`,
     'POST',
     data,
     res => addModuleUI(res, moduleElement),
@@ -128,7 +129,7 @@ export const createModule = ({moduleElement, addModuleUI, data}: any) =>
       moduleName: data.moduleName,
     }),
     I18n.t('Error creating %{moduleName}.', {moduleName: data.moduleName}),
-  )
+  ).then(() => onComplete?.())
 
 export default function SettingsPanel({
   moduleElement,
@@ -151,6 +152,7 @@ export default function SettingsPanel({
   mountNodeRef,
   updateParentData,
   onDidSubmit,
+  onComplete,
 }: SettingsPanelProps) {
   const [state, dispatch] = useReducer(reducer, {
     ...defaultState,
@@ -296,7 +298,7 @@ export default function SettingsPanel({
 
     setLoading(true)
 
-    handleRequest({ moduleId, moduleElement, addModuleUI, data: state })
+    handleRequest({ moduleId, moduleElement, addModuleUI, data: state, onComplete })
       .finally(() => setLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
   }, [

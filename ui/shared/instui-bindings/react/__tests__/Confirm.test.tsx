@@ -62,18 +62,20 @@ describe('confirm', () => {
     expect(success).toBe(false)
   })
 
-  it('allows setting of heading, message, title, and confirm text', async () => {
+  it('allows setting of heading, message, messageDangerouslySetInnerHTML, title, and confirm text', async () => {
     const success = await runAndWaitUntilClosed(
       {
         title: 'Custom Title',
         message: 'Custom Message',
+        messageDangerouslySetInnerHTML: {__html: 'Custom <div>Dangerous Message</div>'},
         heading: 'Custom Heading',
         confirmButtonLabel: 'Custom Confirm',
       },
       async () => {
         expect(await waitTextElem('Custom Title')).toBeInTheDocument()
         expect(await waitTextElem('Custom Heading')).toBeInTheDocument()
-        expect(await waitTextElem('Custom Message')).toBeInTheDocument()
+        expect(await waitTextElem('Custom Heading')).toBeInTheDocument()
+        expect(await waitTextElem('Dangerous Message')).toBeInTheDocument()
 
         await waitNoTextElem('Confirm')
         fireEvent.click(await waitTextElem('Custom Confirm'))

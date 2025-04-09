@@ -416,7 +416,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       new_math_equation_handling = false,
       explicit_latex_typesetting = false,
       rce_transform_loaded_content = false,
-      media_links_use_attachment_id = false,
       rce_find_replace = false,
       file_verifiers_for_quiz_links = false,
       consolidated_media_player = false,
@@ -426,7 +425,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       new_math_equation_handling,
       explicit_latex_typesetting,
       rce_transform_loaded_content,
-      media_links_use_attachment_id,
       file_verifiers_for_quiz_links,
       rce_find_replace,
       consolidated_media_player,
@@ -1090,13 +1088,11 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     if (event.code === 'F9' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
-      this.setFocusAbilityForHeader(true)
       // @ts-expect-error
       focusFirstMenuButton(this._elementRef.current)
     } else if (event.code === 'F10' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
-      this.setFocusAbilityForHeader(true)
       // @ts-expect-error
       focusToolbar(this._elementRef.current)
     } else if (event.code === 'F8' && event.altKey) {
@@ -1137,6 +1133,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     // @ts-expect-error
     textarea.value = this.getCode()
     textarea.style.height = this.state.height
+    textarea.removeAttribute('aria-hidden')
 
     if (document.body.classList.contains('Underline-All-Links__enabled')) {
       if (this.iframe?.contentDocument) {
@@ -1153,20 +1150,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       tinyapp.setAttribute('role', 'document')
       tinyapp.setAttribute('tabIndex', '-1')
     }
-
-    // Adds a focusout event listener for handling screen reader navigation focus
-    const header = this._elementRef.current?.querySelector('.tox-editor-header')
-    if (header) {
-      // @ts-expect-error
-      header.addEventListener('focusout', (e: FocusEvent) => {
-        // @ts-expect-error
-        const leavingHeader = !header.contains(e.relatedTarget)
-        if (leavingHeader) {
-          this.setFocusAbilityForHeader(false)
-        }
-      })
-    }
-    this.setFocusAbilityForHeader(false)
 
     // Probably should do this in tinymce.scss, but we only want it in new rce
     textarea.style.resize = 'none'
@@ -1686,14 +1669,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         }
   }
 
-  setFocusAbilityForHeader = (focusable: boolean) => {
-    // Sets aria-hidden to prevent screen readers focus in RCE menus and toolbar
-    const header = this._elementRef.current?.querySelector('.tox-editor-header')
-    if (header) {
-      header.setAttribute('aria-hidden', focusable ? 'false' : 'true')
-    }
-  }
-
   componentWillUnmount() {
     if (this.state.shouldShowEditor) {
       window.clearTimeout(this.blurTimer)
@@ -2060,7 +2035,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         />
       )
     }
-    const statusBarFeatures = getStatusBarFeaturesForVariant(this.variant, this.props.ai_text_tools)
+    const statusBarFeatures = getStatusBarFeaturesForVariant(this.variant, this.props.ai_text_tools, tinymce.Env.deviceType.isDesktop())
     return (
       <>
         <style>{this.style.css}</style>
@@ -2085,7 +2060,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                 onFocus={this.handleFocusRCE}
                 onBlur={this.handleBlurRCE}
               >
-                {this.state.shouldShowOnFocusButton && (
+                {this.state.shouldShowOnFocusButton && tinymce.Env.deviceType.isDesktop() && (
                   <ShowOnFocusButton
                     id={`show-on-focus-btn-${this.id}`}
                     onClick={this.openKBShortcutModal}

@@ -648,7 +648,7 @@ describe DiscussionTopicsController do
         @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.enable_feature! :differentiation_tags
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
         end
       end
@@ -925,7 +925,7 @@ describe DiscussionTopicsController do
         @course.account.enable_feature! :differentiation_tags
         @course.enable_feature! :react_discussions_post
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
         end
       end
@@ -2144,7 +2144,7 @@ describe DiscussionTopicsController do
         @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.enable_feature! :differentiation_tags
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
         end
       end
@@ -2209,6 +2209,25 @@ describe DiscussionTopicsController do
         before { @course.update!(usage_rights_required: false) }
 
         include_examples "no usage rights returned"
+      end
+    end
+  end
+
+  describe "GET 'insights'" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @topic = @course.discussion_topics.create!(title: "Test Topic")
+    end
+
+    context "when the feature flag is enabled" do
+      before do
+        @course.root_account.enable_feature!(:discussion_insights)
+      end
+
+      it "renders the insights page" do
+        user_session(@teacher)
+        get :insights, params: { course_id: @course.id, id: @topic.id }
+        expect(response).to have_http_status(:ok)
       end
     end
   end

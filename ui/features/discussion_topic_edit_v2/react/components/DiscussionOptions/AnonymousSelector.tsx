@@ -49,6 +49,7 @@ export const AnonymousSelector = ({
 }: Props) => {
   return (
     <View display="block" margin="medium 0">
+      {/* Title should not be read by screen readers as "dimmed", single inputs are disabled instead */}
       <RadioInputGroup
         name="anonymous"
         description={I18n.t('Anonymous Discussion')}
@@ -61,7 +62,6 @@ export const AnonymousSelector = ({
           }
           setDiscussionAnonymousState(value)
         }}
-        disabled={isSelectDisabled}
         data-testid="anonymous-discussion-options"
       >
         <RadioInput
@@ -70,16 +70,19 @@ export const AnonymousSelector = ({
           label={I18n.t(
             'Off: student names and profile pictures will be visible to other members of this course',
           )}
+          disabled={isSelectDisabled}
         />
         <RadioInput
           key="partial_anonymity"
           value="partial_anonymity"
           label={I18n.t('Partial: students can choose to reveal their name and profile picture')}
+          disabled={isSelectDisabled}
         />
         <RadioInput
           key="full_anonymity"
           value="full_anonymity"
           label={I18n.t('Full: student names and profile pictures will be hidden')}
+          disabled={isSelectDisabled}
         />
       </RadioInputGroup>
       {shouldShowPartialAnonymousSelector && (

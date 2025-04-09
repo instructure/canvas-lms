@@ -26,6 +26,27 @@ class ActiveRecord::Base
   class << self
     delegate :distinct_on, :find_ids_in_batches, :explain, to: :all
 
+    if Rails.version < "7.2"
+      def internal_metadata
+        ActiveRecord::InternalMetadata.new(connection)
+      end
+
+      delegate :migration_context, to: :connection
+      delegate :schema_migration, to: :connection
+    else
+      def internal_metadata
+        ActiveRecord::InternalMetadata.new(connection.pool)
+      end
+
+      def migration_context
+        connection.pool.migration_context
+      end
+
+      def schema_migration
+        connection.pool.schema_migration
+      end
+    end
+
     def find_ids_in_ranges(loose: true, **, &)
       all.find_ids_in_ranges(loose:, **, &)
     end
@@ -65,7 +86,7 @@ class ActiveRecord::Base
 
       if transaction_index
         # we wrap a transaction around controller actions, so try to see if this call came from that
-        if wrap_index && (transaction_index..wrap_index).all? { |i| stacktrace[i].match?(/transaction|synchronize|unguard/) }
+        if wrap_index && (transaction_index..wrap_index).all? { |i| stacktrace[i].match?(/transaction|synchronize|unguard|with_connection/) }
           false
         else
           # check if this is being run through an after_transaction_commit since the last transaction
@@ -503,7 +524,7 @@ class ActiveRecord::Base
     polymorphic_prefix = options.delete(:polymorphic_prefix)
     exhaustive = options.delete(:exhaustive)
 
-    reflection = super[name.to_s]
+    reflection = super[(::Rails.version < "7.2") ? name.to_s : name.to_sym]
 
     if name.to_s == "developer_key"
       reflection.instance_eval do
@@ -756,20 +777,29 @@ class ActiveRecord::Base
     self.updated_at = Time.now.utc if touch
     if new_record?
       self.created_at = updated_at if touch
-      returning_columns = self.class._returning_columns_for_insert
-      returning_values = self.class._insert_record(
-        attributes_with_values(attribute_names_for_partial_inserts)
-          .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr },
-        returning_columns
-      )
+      block = lambda do |connection|
+        returning_columns = self.class._returning_columns_for_insert(*[connection].compact)
+        returning_values = self.class._insert_record(
+          *[connection].compact,
+          attributes_with_values(attribute_names_for_partial_inserts)
+            .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr },
+          returning_columns
+        )
 
-      if returning_values
-        returning_columns.zip(returning_values).each do |column, value|
-          _write_attribute(column, value) unless _read_attribute(column)
+        if returning_values
+          returning_columns.zip(returning_values).each do |column, value|
+            _write_attribute(column, value) unless _read_attribute(column)
+          end
         end
+        @new_record = false
+        @previously_new_record = true
       end
-      @new_record = false
-      @previously_new_record = true
+
+      if Rails.version < "7.2"
+        block.call(nil)
+      else
+        self.class.with_connection(&block)
+      end
     else
       update_columns(
         attributes_with_values(attribute_names_for_partial_updates)
@@ -783,7 +813,7 @@ class ActiveRecord::Base
     configurations.configurations.each do |config|
       config.instance_variable_set(:@configuration_hash, config.configuration_hash.merge(override).freeze)
     end
-    clear_all_connections!(nil)
+    connection_handler.clear_all_connections!(nil)
 
     # Just return something that isn't an ar connection object so consoles don't explode
     override
@@ -2045,7 +2075,13 @@ module RestoreConnectionConnectionPool
     synchronize do
       adopt_connection(conn)
       # check if a new connection was checked out in the meantime, and check it back in
-      if (old_conn = @thread_cached_conns[connection_cache_key(current_thread)]) && old_conn != conn
+      old_conn = if Rails.version < "7.2"
+                   @thread_cached_conns[connection_cache_key(current_thread)]
+                 else
+                   connection_lease.connection
+                 end
+
+      if old_conn && old_conn != conn
         # this is just the necessary parts of #checkin
         old_conn.lock.synchronize do
           old_conn._run_checkin_callbacks do
@@ -2055,7 +2091,12 @@ module RestoreConnectionConnectionPool
           @available.add old_conn
         end
       end
-      @thread_cached_conns[connection_cache_key(current_thread)] = conn
+
+      if Rails.version < "7.2"
+        @thread_cached_conns[connection_cache_key(current_thread)] = conn
+      else
+        connection_lease.connection = conn
+      end
     end
   end
 end
@@ -2132,7 +2173,7 @@ Rails.application.config.after_initialize do
     cache = MultiCache.fetch("schema_cache")
     next if cache.nil?
 
-    connection_pool.schema_reflection.set_schema_cache(cache)
+    connection_pool.schema_reflection.instance_variable_set(:@cache, cache)
     LoadAccount.schema_cache_loaded!
   end
 end

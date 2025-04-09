@@ -443,7 +443,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     scope =
       case content_type
       when "external_tool"
-        @course.context_external_tools.active
+        Lti::ContextToolFinder.only_for(@course).active
       when "attachment"
         @course.attachments.not_deleted
       when "lti-quiz"
@@ -492,8 +492,6 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     items = []
     GuardRail.activate(:secondary) do
       MasterCourses::CONTENT_TYPES_FOR_UNSYNCED_CHANGES.each do |klass|
-        next if klass == "MediaTrack" && !Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
-
         item_scope = case klass
                      when "Attachment"
                        @course.attachments

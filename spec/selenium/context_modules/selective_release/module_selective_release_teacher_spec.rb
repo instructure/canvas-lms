@@ -401,7 +401,7 @@ describe "selective_release module set up" do
         @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.enable_feature!(:differentiation_tags)
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
         end
 
@@ -439,7 +439,7 @@ describe "selective_release module set up" do
 
       it "differentiation tags will not show as assignee option if the account setting is disabled" do
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = false
+          a.settings[:allow_assign_to_differentiation_tags] = { value: false }
           a.save!
         end
 

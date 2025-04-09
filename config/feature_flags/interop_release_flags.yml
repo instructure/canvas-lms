@@ -285,6 +285,21 @@ lti_tools_from_federated_parents:
     If enabled, LTI tools installed in federated parent accounts will be
     available / visible in child accounts.
   applies_to: SiteAdmin
+lti_v2_turnitin_usage_log:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: "Send Turnitin LTI V2 usage logs to Pandata"
+  description: >-
+    If enabled, we'll send usage data about Turnitin LTI V2 launches to Pandata the same way
+    as we send usage data about LTI 1.3 launches.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_variable_expansions_use_group_course_as_course:
   state: hidden
   shadow: true
@@ -301,6 +316,7 @@ lti_variable_expansions_use_group_course_as_course:
       state: allowed_on
     ci:
       state: allowed_on
+
 microsoft_group_enrollments_syncing:
   state: hidden
   display_name: Microsoft Group enrollment syncing

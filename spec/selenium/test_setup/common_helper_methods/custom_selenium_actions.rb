@@ -522,7 +522,7 @@ module CustomSeleniumActions
   # (tested with the CanvasSelect wrapper and instui SimpleSelect,
   # untested with a raw instui Select)
   def click_INSTUI_Select_option(select, option_text, select_by = :text)
-    instui_select_option(select, option_text, select_by: select_by).click
+    instui_select_option(select, option_text, select_by:).click
   end
 
   def INSTUI_Select_options(select)
@@ -699,6 +699,11 @@ module CustomSeleniumActions
   def move_to_click(selector)
     el = driver.find_element :css, selector
     driver.action.move_to(el).click.perform
+  end
+
+  def scroll_to_click_element(element)
+    scroll_into_view(element)
+    element.click
   end
 
   def move_to_click_element(element)

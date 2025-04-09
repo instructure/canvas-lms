@@ -32,6 +32,8 @@ interface Props {
 
 export interface ReCaptchaSectionRef {
   validate: () => boolean
+  reset: () => void
+  focus: () => void
 }
 
 const ReCaptchaSection = forwardRef<ReCaptchaSectionRef, Props>(({recaptchaKey, onVerify}, ref) => {
@@ -45,10 +47,23 @@ const ReCaptchaSection = forwardRef<ReCaptchaSectionRef, Props>(({recaptchaKey, 
     validate: () => {
       setValidationTriggered(true)
       if (captchaError || !captchaToken) {
-        wrapperRef.current?.focus()
+        setCaptchaError(true)
         return false
       }
       return true
+    },
+    reset: () => {
+      setCaptchaToken(null)
+      setCaptchaError(false)
+      setValidationTriggered(false)
+      if (window.grecaptcha) {
+        window.grecaptcha.reset()
+      } else {
+        console.warn('window.grecaptcha is not available!')
+      }
+    },
+    focus: () => {
+      wrapperRef.current?.focus()
     },
   }))
 

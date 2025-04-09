@@ -92,15 +92,6 @@ export default class RequiredValues extends React.Component {
     return true
   }
 
-  isValidURL = url => {
-    try {
-      new URL(url)
-      return true
-    } catch (e) {
-      return false
-    }
-  }
-
   invalidate = (fieldStateKey, fieldRef) => {
     this.setState({[fieldStateKey]: false})
     if (this.isValid) {
@@ -110,7 +101,7 @@ export default class RequiredValues extends React.Component {
   }
 
   validateField = (fieldValue, fieldStateKey, fieldRef, isUrl) => {
-    if (!fieldValue || (isUrl && !this.isValidURL(fieldValue))) {
+    if (!fieldValue || (isUrl && !URL.canParse(fieldValue))) {
       this.invalidate(fieldStateKey, fieldRef)
     } else {
       this.setState({[fieldStateKey]: true})
@@ -152,11 +143,13 @@ export default class RequiredValues extends React.Component {
   handleTitleChange = e => {
     const value = e.target.value
     this.setState(state => ({toolConfiguration: {...state.toolConfiguration, title: value}}))
+    this.validateField(value, 'isTitleValid', this.titleRef, false)
   }
 
   handleDescriptionChange = e => {
     const value = e.target.value
     this.setState(state => ({toolConfiguration: {...state.toolConfiguration, description: value}}))
+    this.validateField(value, 'isDescriptionValid', this.descriptionRef, false)
   }
 
   handleTargetLinkUriChange = e => {
@@ -164,6 +157,7 @@ export default class RequiredValues extends React.Component {
     this.setState(state => ({
       toolConfiguration: {...state.toolConfiguration, target_link_uri: value},
     }))
+    this.validateField(value, 'isTargetLinkUriValid', this.targetLinkUriRef, true)
   }
 
   handleOidcInitiationUrlChange = e => {
@@ -171,11 +165,13 @@ export default class RequiredValues extends React.Component {
     this.setState(state => ({
       toolConfiguration: {...state.toolConfiguration, oidc_initiation_url: value},
     }))
+    this.validateField(value, 'isOidcInitiationUrlValid', this.oidcInitiationUrlRef, true)
   }
 
   handlePublicJwkChange = e => {
     const value = e.target.value
     this.setState(state => ({toolConfiguration: {...state.toolConfiguration, public_jwk: value}}))
+    this.validateJwkField(value, 'isPublicJwkValid', this.publicJwkRef)
   }
 
   handlePublicJwkUrlChange = e => {
@@ -183,6 +179,7 @@ export default class RequiredValues extends React.Component {
     this.setState(state => ({
       toolConfiguration: {...state.toolConfiguration, public_jwk_url: value},
     }))
+    this.validateField(value, 'isPublicJwkUrlValid', this.publicJwkUrlRef, true)
   }
 
   handleConfigTypeChange = (e, option) => {

@@ -44,12 +44,13 @@ interface Props {
   readonly courseId: CanvasId
   readonly runningProgressId: string | null
   readonly disabled: boolean
+  readonly onPublishComplete?: () => void
 }
 
 // TODO: remove and replace MenuItem with Menu.Item below when on v8
 const {Item: MenuItem} = Menu as any
 
-const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Props) => {
+const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled, onPublishComplete}: Props) => {
   const [isPublishing, setIsPublishing] = useState<boolean>(!!runningProgressId)
   const [isCanceling, setIsCanceling] = useState<boolean>(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -122,8 +123,11 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
       .finally(() => reset())
   }
 
-  const onPublishComplete = () => {
-    refreshPublishStates(true).then(() => reset())
+  const handlePublishComplete = () => {
+    refreshPublishStates(true).then(() => {
+      reset()
+      onPublishComplete?.()
+    })
   }
 
   function updateCurrentProgress(progress: CanvasProgress) {
@@ -136,7 +140,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
         srOnly: true,
         politeness: 'polite',
       })
-      onPublishComplete()
+      handlePublishComplete()
     } else if (progress.workflow_state === 'failed') {
       if (progress.message === 'canceled') {
         showFlashAlert({

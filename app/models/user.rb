@@ -265,6 +265,7 @@ class User < ActiveRecord::Base
            inverse_of: :updated_by
   has_many :lti_overlays, class_name: "Lti::Overlay", foreign_key: :updated_by_id, inverse_of: :updated_by
   has_many :lti_overlay_versions, class_name: "Lti::OverlayVersion", inverse_of: :created_by, dependent: :destroy
+  has_many :lti_asset_processor_eula_acceptances, class_name: "Lti::AssetProcessorEulaAcceptance", inverse_of: :user, dependent: :destroy
 
   has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
   has_many :microsoft_sync_partial_sync_changes, class_name: "MicrosoftSync::PartialSyncChange", dependent: :destroy, inverse_of: :user
@@ -2384,7 +2385,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def submissions_for_course_ids(course_ids, start_at: nil, limit: 20, exclude_parent_assignment_submissions: false)
+  def submissions_for_course_ids(course_ids, start_at: nil, limit: 20)
     return [] unless course_ids.present?
 
     shard.activate do
@@ -2414,10 +2415,12 @@ class User < ActiveRecord::Base
 
           ActiveRecord::Associations.preload(submissions, [{ assignment: :context }, :user, :submission_comments])
 
-          if exclude_parent_assignment_submissions
-            submissions.delete_if { |s| s.assignment.has_sub_assignments? }
-          else
-            submissions
+          # when discussion_checkpoints FF is enabled, we filter out parent assignment submissions
+          # when that FF is disabled, we filter out sub_assignment submissions
+          course_ids_with_active_checkpoints = Course.where(id: course_ids).select(&:discussion_checkpoints_enabled?).map(&:id)
+          submissions.delete_if do |sub|
+            (sub.assignment.has_sub_assignments? && course_ids_with_active_checkpoints.include?(sub.course_id)) ||
+              (sub.assignment.is_a?(SubAssignment) && !course_ids_with_active_checkpoints.include?(sub.course_id))
           end
         end
       end
@@ -2578,9 +2581,9 @@ class User < ActiveRecord::Base
       )
     end
 
-    if opts[:include_sub_assignments]
+    if course_ids_with_checkpoints_enabled.any?
       sub_assignments = SubAssignment.published
-                                     .for_context_codes(context_codes)
+                                     .for_course(course_ids_with_checkpoints_enabled)
                                      .due_between_with_overrides(now, opts[:end_at])
                                      .include_submitted_count.to_a
 
@@ -2606,6 +2609,10 @@ class User < ActiveRecord::Base
     end
 
     sorted_events.uniq.first(opts[:limit])
+  end
+
+  def course_ids_with_checkpoints_enabled
+    courses.select(&:discussion_checkpoints_enabled?).map(&:id)
   end
 
   def select_available_assignments(assignments, include_concluded: false)
@@ -3014,11 +3021,9 @@ class User < ActiveRecord::Base
                       favorites + courses.reject { |c| can_favorite.call(c) }
                     end
     ActiveRecord::Associations.preload(@menu_courses, :enrollment_term)
-    @menu_courses = @menu_courses.reject do |c|
-      is_student = roles(c.root_account).all? { |role| ["student", "user"].include?(role) }
-      is_student && c.horizon_course?
+    @menu_courses.reject do |c|
+      c.horizon_course? && !c.grants_right?(self, :read_as_admin)
     end
-    @menu_courses
   end
 
   def user_can_edit_name?

@@ -628,7 +628,7 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type(import_tool.asset_string)
       NewContentMigrationPage.external_tool_launch_button.click
-      expect(NewContentMigrationPage.lti_title.text).to eq import_tool.label_for(:migration_selection)
+      expect(NewContentMigrationPage.lti_title(import_tool.migration_selection["text"]).text).to eq import_tool.label_for(:migration_selection)
       tool_iframe = NewContentMigrationPage.lti_iframe
 
       in_frame(tool_iframe, "#basic_lti_link") do

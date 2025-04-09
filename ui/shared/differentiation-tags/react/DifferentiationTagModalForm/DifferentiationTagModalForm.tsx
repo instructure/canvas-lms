@@ -251,13 +251,15 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
       handleSetErrors(newErrors)
       // Focus the first error field
       setTimeout(() => {
-        const firstErrorKey = Object.keys(newErrors)[0]
-        if (firstErrorKey) {
+        if (mode === EDIT_MODE && newErrors.hasOwnProperty('tagSetName')) {
+          tagSetNameRef.current?.focus();
+        } else {
+          const firstErrorKey = Object.keys(newErrors)[0]
           if (firstErrorKey === 'tagSetName') {
-            tagSetNameRef.current?.focus()
+            tagSetNameRef.current?.focus();
           } else {
-            const tagId = parseInt(firstErrorKey, 10)
-            inputRefs.current[tagId]?.focus()
+            const tagId = parseInt(firstErrorKey, 10);
+            inputRefs.current[tagId]?.focus();
           }
         }
       }, 0)
@@ -474,7 +476,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
                 value={tagSetName}
                 onChange={e => handleSetTagSetName(e.target.value)}
                 messages={
-                  errors.tagSetName ? [{text: errors.tagSetName, type: 'error'}] : undefined
+                  errors.tagSetName ? [{text: errors.tagSetName, type: 'newError'}] : undefined
                 }
                 isRequired
                 data-testid="tag-set-name"
@@ -530,7 +532,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
                 value={tagSetName}
                 onChange={e => handleSetTagSetName(e.target.value)}
                 messages={
-                  errors.tagSetName ? [{text: errors.tagSetName, type: 'error'}] : undefined
+                  errors.tagSetName ? [{text: errors.tagSetName, type: 'newError'}] : undefined
                 }
                 isRequired
               />

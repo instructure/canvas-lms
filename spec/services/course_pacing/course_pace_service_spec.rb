@@ -24,8 +24,8 @@ describe CoursePacing::CoursePaceService do
   describe ".off_pace_counts_by_user" do
     let(:student) { user_factory }
     let(:student2) { user_factory }
-    let!(:student_enrollment) { StudentEnrollment.create!(user: student, course: course, workflow_state: "active") }
-    let!(:student_enrollment2) { StudentEnrollment.create!(user: student2, course: course) }
+    let!(:student_enrollment) { StudentEnrollment.create!(user: student, course:, workflow_state: "active") }
+    let!(:student_enrollment2) { StudentEnrollment.create!(user: student2, course:) }
     let(:section) { course.course_sections.create!(name: "Test Section") }
 
     before do

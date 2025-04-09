@@ -115,6 +115,16 @@ describe Canvas::Security::PasswordPolicy do
       expect(@pseudonym).to be_valid
     end
 
+    it "does not raise or error when password is shorter than or equal to max_sequence" do
+      pseudonym_with_policy(max_sequence: 4)
+      @pseudonym.password = @pseudonym.password_confirmation = "abc"
+      expect { @pseudonym.valid? }.not_to raise_error
+      expect(@pseudonym.errors[:password]).not_to include("sequence")
+      @pseudonym.password = @pseudonym.password_confirmation = "abcd"
+      expect { @pseudonym.valid? }.not_to raise_error
+      expect(@pseudonym.errors[:password]).not_to include("sequence")
+    end
+
     it "rejects passwords longer than 255 characters" do
       pseudonym_with_policy({})
       @pseudonym.password = @pseudonym.password_confirmation = "a" * 255

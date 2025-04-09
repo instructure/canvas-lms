@@ -5010,6 +5010,7 @@ ko:
   delete_grading_scheme_6b308832: "평가 구성표 삭제"
   delete_my_account_41060aad: "내 계정 삭제"
   delete_quiz_142b8099: "퀴즈 삭제"
+  delete_sub_account_c267a6e5: "하위 계정 삭제"
   delete_survey_56fddbbd: "설문 삭제"
   delete_this_file_683804a1: "이 파일 삭제"
   delete_time_range_e14461a0: "시간 범위 삭제"
@@ -5376,6 +5377,7 @@ ko:
   display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "알림 기본 설정 페이지에 팝업 경고를 한 번 표시합니다."
   does_not_meet_expectations_b0736d20: "기대치에 미치지 못함"
   domain_3b54c511: 도메인
+  domain_69fe564b: "도메인:"
   don_t_indent_b35ae9fb: "들여쓰지 않음"
   done_editing_9f7379d9: "편집 마침"
   done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "마쳤습니다. 업로드한 파일을 받아 간단한 의견과 함께 각 사용자의 이 과제에 대한 제출물 페이지에 첨부했습니다. 학생은 새 의견이 추가되었다는 알림을 받게 됩니다."
@@ -9619,6 +9621,7 @@ ko:
   no_content_5dbc9acf: "내용 없음"
   no_conversations_selected_ebcd9226: "선택한 대화 없음"
   no_date_set_25edf0c1: "날짜 설정 안 됨"
+  no_description_44c9c3f2: "설명 없음"
   no_description_c2554c25: "설명 없음"
   no_details_1ee29870: "세부 정보 없음"
   no_details_d15fa1ec: "세부 정보 없음"
@@ -9642,6 +9645,7 @@ ko:
   no_students_have_taken_the_survey_yet_d378cd35: "어떤 학생도 이 설문을 치르지 않음"
   no_submission_fb131a40: "제출물 없음"
   no_teacher_interaction_de8d91bc: "교사 상호 작용 없음"
+  no_text_8ecc1274: "텍스트 없음"
   no_time_limit_for_long_running_conferences_d49fdfad: "시간 제한 없음(장기 회의)"
   not_deleted_2a7f63ef: "(삭제 안 됨)"
   not_installed_37a21a76: "설치 안 됨"
@@ -13331,6 +13335,7 @@ ko:
   site_admin_d0417171: "사이트 관리자"
   size_b30e1077: 크기
   size_size_a77bd760: "크기: %{size}"
+  skip_to_content_22ad1d00: "내용으로 건너 뛰기"
   skype_18850ba7: Skype
   skype_name_9eb890df: "Skype 이름"
   skype_offers_free_online_voice_and_video_calls_lot_35295baa: "Skype는 무료 온라인 음성 및 화상 통화를 제공합니다. 많은 학생이 Skype를 손쉬운 의사소통 방법으로 사용하고 있습니다. Skype 이름을 등록하고 표시하도록 설정하면 다른 학생이 연락처를 쉽게 찾아 Skype에 추가하거나 통화할 수 있습니다."

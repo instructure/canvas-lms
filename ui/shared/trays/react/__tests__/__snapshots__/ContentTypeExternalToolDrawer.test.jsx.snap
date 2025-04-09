@@ -164,6 +164,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                   dir="ltr"
                 >
                   <iframe
+                    allow=""
                     class="tool_launch"
                     data-lti-launch="true"
                     data-testid="ltiIframe"
@@ -338,6 +339,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                 dir="ltr"
               >
                 <iframe
+                  allow=""
                   class="tool_launch"
                   data-lti-launch="true"
                   data-testid="ltiIframe"

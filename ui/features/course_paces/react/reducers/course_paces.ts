@@ -67,8 +67,8 @@ export const initialState: CoursePacesState = ({
   publishingProgress: initialProgress,
 }) as CoursePacesState
 
-const getModuleItems = (modules: Module[]) =>
-  ([] as CoursePaceItem[]).concat(...modules.map(m => m.items))
+export const getModuleItems = (modules: Module[]) =>
+  ([] as CoursePaceItem[]).concat(...modules.map(m => m.items.sort((a, b) => a.position - b.position)))
 
 /* Selectors */
 

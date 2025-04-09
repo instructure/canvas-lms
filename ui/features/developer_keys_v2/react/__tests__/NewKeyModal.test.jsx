@@ -17,13 +17,15 @@
  */
 
 import React from 'react'
-import {screen, render, cleanup} from '@testing-library/react'
+import {screen, render, cleanup, waitFor, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DeveloperKeyModal from '../NewKeyModal'
 import devKeyActions from '../actions/developerKeysActions'
 import moxios from 'moxios'
 import {successfulLtiKeySaveResponse} from './fixtures/responses'
 import $ from '@canvas/rails-flash-notifications'
+
+const user = userEvent.setup()
 
 describe('NewKeyModal', () => {
   let oldEnv
@@ -96,7 +98,7 @@ describe('NewKeyModal', () => {
         settings: {
           text: 'test',
           use_1_3: true,
-          icon_url: '/img/default-icon-16x16.png',
+          icon_url: 'http://test.testcloud.org/img/default-icon-16x16.png',
           selection_width: 500,
           selection_height: 500,
           placements: [
@@ -283,6 +285,55 @@ describe('NewKeyModal', () => {
       const sentDevKey = submitForm(editDeveloperKeyState2)
 
       expect(sentDevKey.test_cluster_only).toBeFalsy()
+    })
+
+    describe('and the context is site admin', () => {
+      const createOrEditSpy = jest.fn()
+      const props = {
+        ctx: {
+          params: {
+            contextId: 'site_admin',
+          },
+        },
+        createOrEditDeveloperKeyState: createDeveloperKeyState,
+        actions: {...fakeActions, createOrEditDeveloperKey: createOrEditSpy},
+      }
+
+      let oldEnv
+
+      beforeEach(() => {
+        oldEnv = window.ENV
+        window.ENV = {...oldEnv, RAILS_ENVIRONMENT: 'production'}
+      })
+
+      afterEach(() => {
+        window.ENV = oldEnv
+      })
+
+      it('renders a confirmation modal to prevent accidental updates', async () => {
+        renderDeveloperKeyModal(props)
+
+        await user.click(screen.getByRole('button', {name: /Save/i}))
+
+        expect(await screen.findByText('Environment Confirmation')).toBeInTheDocument()
+
+        const input = screen.getByTestId('confirm-prompt-input')
+
+        await user.click(input)
+        await user.paste('beta')
+        await user.click(screen.getByText(/^Confirm/i).closest('button'))
+
+        expect(await screen.findByText(/The provided value is incorrect/i)).toBeInTheDocument()
+
+        await user.click(input)
+        await user.clear(input)
+        await user.paste('production')
+        await user.click(screen.getByText(/^Confirm/i).closest('button'))
+
+        await waitFor(() => {
+          expect(screen.queryByText(/Environment Confirmation/i)).not.toBeInTheDocument()
+        })
+      })
     })
   })
 
@@ -543,25 +594,6 @@ describe('NewKeyModal', () => {
     expect(ltiStub).toHaveBeenCalled()
   })
 
-  it('flashes an error if redirect_uris is empty', () => {
-    const flashStub = jest.spyOn($, 'flashError')
-    const createOrEditSpy = jest.fn()
-    const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
-    const developerKey2 = {...developerKey, require_scopes: true, scopes: [], redirect_uris: ''}
-    const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
-    const {ref} = renderDeveloperKeyModal({
-      createLtiKeyState,
-      createOrEditDeveloperKeyState: editDeveloperKeyState2,
-      listDeveloperKeyScopesState,
-      actions: mergedFakeActions,
-      selectedScopes: [],
-    })
-
-    ref.current.saveLtiToolConfiguration()
-
-    expect(flashStub).toHaveBeenCalledWith('A redirect_uri is required, please supply one.')
-  })
-
   describe('redirect_uris is too long', () => {
     let flashStub
     const createOrEditSpy = jest.fn()
@@ -772,11 +804,11 @@ describe('NewKeyModal', () => {
     })
 
     it('updates `redirect_uris` when updating the tool configuration', async () => {
-      const redirectUris = screen.getByLabelText('* Redirect URIs:')
+      const redirectUris = screen.getByLabelText('Redirect URIs: *')
       await userEvent.clear(redirectUris)
       expect(redirectUris).toHaveValue('')
 
-      const config = screen.getByLabelText('LTI 1.3 Configuration', {hidden: true})
+      const config = screen.getByLabelText('LTI 1.3 Configuration *', {hidden: true})
       await userEvent.clear(config)
       await userEvent.click(config)
       await userEvent.paste(JSON.stringify(validToolConfig))
@@ -785,12 +817,12 @@ describe('NewKeyModal', () => {
     })
 
     it('does not update `redirect_uris` if already set when updating the tool configuration', async () => {
-      const redirectUris = screen.getByLabelText('* Redirect URIs:')
+      const redirectUris = screen.getByLabelText('Redirect URIs: *')
       await userEvent.clear(redirectUris)
       await userEvent.click(redirectUris)
       await userEvent.paste('http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com')
 
-      const config = screen.getByLabelText('LTI 1.3 Configuration')
+      const config = screen.getByLabelText('LTI 1.3 Configuration *')
       await userEvent.clear(config)
       await userEvent.click(config)
       await userEvent.paste(JSON.stringify(validToolConfig))
@@ -801,44 +833,20 @@ describe('NewKeyModal', () => {
     })
 
     it('does update `redirect_uris` if already set when using the `Sync URIs` button', async () => {
-      const redirectUris = screen.getByLabelText('* Redirect URIs:')
+      const redirectUris = screen.getByLabelText('Redirect URIs: *')
       await userEvent.clear(redirectUris)
 
-      const config = screen.getByLabelText('LTI 1.3 Configuration')
+      const config = screen.getByLabelText('LTI 1.3 Configuration *')
       await userEvent.clear(config)
       await userEvent.click(config)
       await userEvent.paste(JSON.stringify(validToolConfig))
 
       await userEvent.click(screen.getByRole('button', {name: /sync uris/i}))
 
-      expect(screen.getByLabelText(/\* Redirect URIs:/i)).toHaveValue(
+      expect(screen.getByLabelText(/Redirect URIs: */i)).toHaveValue(
         validToolConfig.target_link_uri,
       )
     })
-  })
-
-  it('does not flash an error if configurationMethod is url', () => {
-    const flashStub = jest.spyOn($, 'flashError')
-    const saveLtiToolConfigurationSpy = jest.fn()
-    const actions = {
-      ...fakeActions,
-      saveLtiToolConfiguration: () => () => ({then: saveLtiToolConfigurationSpy}),
-    }
-    const {ref} = renderDeveloperKeyModal({
-      createLtiKeyState: {},
-      createOrEditDeveloperKeyState: editDeveloperKeyState,
-      listDeveloperKeyScopesState,
-      actions,
-      selectedScopes: [],
-      state: {},
-    })
-
-    ref.current.updateConfigurationMethod('url')
-    ref.current.updateToolConfigurationUrl('http://foo.com')
-    ref.current.saveLtiToolConfiguration()
-
-    expect(saveLtiToolConfigurationSpy).toHaveBeenCalled()
-    expect(flashStub).not.toHaveBeenCalledWith('A redirect_uri is required, please supply one.')
   })
 
   describe('saving a LTI key in json view', () => {

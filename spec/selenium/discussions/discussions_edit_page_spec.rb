@@ -1564,7 +1564,7 @@ describe "discussions" do
               @course.account.enable_feature! :assign_to_differentiation_tags
               @course.account.enable_feature! :differentiation_tags
               @course.account.tap do |a|
-                a.settings[:allow_assign_to_differentiation_tags] = true
+                a.settings[:allow_assign_to_differentiation_tags] = { value: true }
                 a.save!
               end
 
@@ -2178,7 +2178,7 @@ describe "discussions" do
               @course.save!
 
               assignment = create_assignment(@course, "Mastery Path Main Assignment", 10)
-              discussion = @course.discussion_topics.create!(assignment: assignment, title: "graded discussion")
+              discussion = @course.discussion_topics.create!(assignment:, title: "graded discussion")
 
               get "/courses/#{@course.id}/discussion_topics/#{discussion.id}/edit"
               Discussion.mastery_path_toggle.click
@@ -2195,7 +2195,7 @@ describe "discussions" do
               @course.save!
 
               assignment = create_assignment(@course, "Mastery Path Main Assignment", 10)
-              discussion = @course.discussion_topics.create!(assignment: assignment, title: "graded discussion")
+              discussion = @course.discussion_topics.create!(assignment:, title: "graded discussion")
               assignment.assignment_overrides.create(set_id: AssignmentOverride::NOOP_MASTERY_PATHS, set_type: AssignmentOverride::SET_TYPE_NOOP)
 
               get "/courses/#{@course.id}/discussion_topics/#{discussion.id}/edit"

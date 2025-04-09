@@ -194,6 +194,21 @@ describe('DifferentiationTagModalForm', () => {
       // And the Tag Set Name input should still be visible.
       expect(screen.getByTestId('tag-set-name')).toBeInTheDocument()
     })
+
+    it("focuses on the first element on error on edit mode", async () => {
+      renderComponent({mode: EDIT_MODE, differentiationTagSet: multipleTagsCategory})
+      const tagSetNameInput = screen.getByTestId('tag-set-name')
+      await user.clear(tagSetNameInput)
+      const tagInput = screen.getByDisplayValue('Variant A')
+      await user.clear(tagInput)
+      const saveButton = screen.getByLabelText('Save')
+      await user.click(saveButton)
+      await waitFor(() => {
+        expect(screen.getByText('Tag Set Name is required')).toBeInTheDocument()
+        expect(screen.getByText('Tag Name is required')).toBeInTheDocument()
+      })
+      expect(document.activeElement).toBe(tagSetNameInput)
+    })
   })
 
   it('displays info alert about tag visibility', () => {

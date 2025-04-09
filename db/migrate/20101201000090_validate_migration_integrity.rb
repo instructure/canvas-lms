@@ -33,7 +33,7 @@ class ValidateMigrationIntegrity < ActiveRecord::Migration[7.0]
     initial_migration_version = "20101210192618"
     last_squashed_migration_version = "20240926011200"
 
-    versions = ActiveRecord::SchemaMigration.new(ActiveRecord::Base.connection).versions
+    versions = ActiveRecord::Base.schema_migration.versions
     initial_migration_has_run = versions.include?(initial_migration_version)
     last_squashed_migration_has_run = versions.include?(last_squashed_migration_version)
 

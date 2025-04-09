@@ -20,7 +20,11 @@
 # NOTE: Indented gems are meant to indicate optional dependencies of parent gems
 
 gem "bootsnap", "~> 1.16", require: false
-gem "rails", "~> 7.1.3"
+if $canvas_rails == "7.1"
+  gem "rails", "~> 7.1.3"
+else
+  gem "rails", "~> 7.2.0"
+end
   # can't upgrade to 3.1 until Rails 7.2
   # if rack is updated, please remove gems/autoextend/lib/rack/
   gem "rack", "~> 3.0.11" if $canvas_rails == "7.1"
@@ -34,7 +38,7 @@ gem "irb", "~> 1.7"
 gem "academic_benchmarks", "~> 1.1", require: false
 gem "active_model_serializers", "~> 0.9.9"
 gem "addressable", "~> 2.8", require: false
-gem "authlogic", "~> 6.4"
+gem "authlogic", github: "binarylogic/authlogic", ref: "d155fff4672595af99cb3488d9731f1efc595049"
   gem "scrypt", "~> 3.0"
 gem "aws-sdk-bedrockruntime", "~> 1.7", require: false
 gem "aws-sdk-kinesis", "~> 1.45", require: false

@@ -62,10 +62,12 @@ describe Api::V1::ExternalTools do
     it "generates json with 1.3 version" do
       tool.use_1_3 = true
       tool.developer_key_id = 1
+      tool.lti_registration_id = 1
       tool.save!
       json = controller.external_tool_json(tool, @course, @student, nil)
       expect(json["version"]).to eq "1.3"
       expect(json["developer_key_id"]).to eq 1
+      expect(json["lti_registration_id"]).to eq 1
     end
 
     it "gets default extension settings" do

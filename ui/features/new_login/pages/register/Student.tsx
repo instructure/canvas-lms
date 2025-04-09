@@ -54,7 +54,7 @@ const Student = () => {
     termsRequired,
   } = useNewLoginData()
   const validatePassword = usePasswordValidator(passwordPolicy)
-  const serverErrorsMap = useServerErrorsMap(passwordPolicy)
+  const serverErrorsMap = useServerErrorsMap()
   const navigate = useNavigate()
 
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -160,6 +160,7 @@ const Student = () => {
     if (recaptchaKey) {
       const recaptchaValid = recaptchaSectionRef.current?.validate() ?? true
       if (!recaptchaValid) {
+        recaptchaSectionRef.current?.focus()
         hasValidationError = true
       }
     }
@@ -241,10 +242,11 @@ const Student = () => {
     }
 
     // reCAPTCHA
-    if (recaptchaKey && errors.recaptcha) {
+    if (recaptchaKey) {
+      recaptchaSectionRef.current?.reset()
       recaptchaSectionRef.current?.validate()
       if (!hasFocusedError) {
-        // TODO: handle reCAPTCHA errors …
+        recaptchaSectionRef.current?.focus()
       }
     }
   }
@@ -302,6 +304,10 @@ const Student = () => {
     }
   }
 
+  const handleNameChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    setName(value)
+  }
+
   const handleUsernameChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setUsername(value.trim())
   }
@@ -351,10 +357,11 @@ const Student = () => {
         <Flex direction="column" gap="large">
           <Flex direction="column" gap="small">
             <TextInput
+              autoCorrect="none"
               disabled={isUiActionPending}
               inputRef={inputElement => (nameInputRef.current = inputElement)}
               messages={createErrorMessage(nameError)}
-              onChange={(_, value) => setName(value)}
+              onChange={handleNameChange}
               renderLabel={I18n.t('Full Name')}
               value={name}
               isRequired={true}

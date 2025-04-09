@@ -575,10 +575,10 @@ class ApplicationController < ActionController::Base
 
     context = context.account if context.is_a?(User)
     tools = GuardRail.activate(:secondary) do
-      Lti::ContextToolFinder.all_tools_for(context, { placements: type,
-                                                      root_account: @domain_root_account,
-                                                      current_user: @current_user,
-                                                      tool_ids: }).to_a
+      Lti::ContextToolFinder.all_tools_for(context,
+                                           placements: type,
+                                           current_user: @current_user,
+                                           tool_ids:).to_a
     end
 
     tools.select! do |tool|
@@ -2626,20 +2626,23 @@ class ApplicationController < ActionController::Base
   end
   helper_method :user_content
 
-  def public_user_content(str, context = @context, user = @current_user, is_public = false)
+  def public_user_content(str, context: @context, user: @current_user, is_public: false, location: nil)
     return nil unless str
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
-    rewriter.set_handler("files") do |match|
+    file_handler = proc do |match|
       UserContent::FilesHandler.new(
         match:,
         context:,
         user:,
         preloaded_attachments: {},
         in_app: in_app?,
-        is_public:
+        is_public:,
+        location:
       ).processed_url
     end
+    rewriter.set_handler("files", &file_handler)
+    rewriter.set_handler("media_attachments_iframe", &file_handler)
     UserContent.escape(rewriter.translate_content(str), request.host_with_port, use_new_math_equation_handling?)
   end
   helper_method :public_user_content

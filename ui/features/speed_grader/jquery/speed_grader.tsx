@@ -902,20 +902,14 @@ function renderRubricsCheckpointsInfo() {
 }
 
 function getDefaultDiscussionView() {
-  // logic:
-  // when the discussion_checkpoints feature is disabled, the default view should be discussion_view_no_context
-  // when the discussion_checkpoints feature is enabled, we check for the following things:
-  // - if the discussions_speedgrader_revisit feature is disabled, the default view should be discussion_view_with_context
-  // - if the discussions_speedgrader_revisit feature is enabled, we check for even more things:
-  //   - if userSettings.get('default_discussion_view') exists, we use that, otherwise we default to discussion_view_no_context
   const discussionCheckpointsEnabled = ENV.FEATURES?.discussion_checkpoints
   const discussionsSpeedgraderRevisitEnabled = ENV.FEATURES?.discussions_speedgrader_revisit
-  if (!discussionCheckpointsEnabled) {
-    return 'discussion_view_no_context'
-  } else if (!discussionsSpeedgraderRevisitEnabled) {
+  if (discussionsSpeedgraderRevisitEnabled) {
+    return userSettings.get('default_discussion_view') || 'discussion_view_no_context'
+  } else if (discussionCheckpointsEnabled) {
     return 'discussion_view_with_context'
   } else {
-    return userSettings.get('default_discussion_view') || 'discussion_view_no_context'
+    return 'discussion_view_no_context'
   }
 }
 
@@ -3567,6 +3561,7 @@ EG = {
     commentElement.find('span.comment').html(formattedComment)
 
     deleteCommentLinkText = I18n.t('Delete comment: %{commentText}', {commentText: spokenComment})
+    commentElement.find('.delete_comment_link').attr('role', 'button')
     commentElement.find('.delete_comment_link .screenreader-only').text(deleteCommentLinkText)
 
     if (comment.avatar_path && !hideStudentName) {

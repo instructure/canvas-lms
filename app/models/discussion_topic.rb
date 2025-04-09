@@ -1493,6 +1493,22 @@ class DiscussionTopic < ActiveRecord::Base
     )
   end
 
+  def user_can_access_insights?(user)
+    if is_announcement
+      return false
+    end
+
+    # course can be an account in case the topic context is group
+    # and the group context is account
+    unless course.is_a?(Course)
+      return false
+    end
+
+    course.feature_enabled?(:discussion_insights) && (
+      course.user_is_instructor?(user) || course.grants_right?(user, :read_as_admin)
+    )
+  end
+
   def discussion_topic_id
     id
   end

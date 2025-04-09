@@ -138,7 +138,7 @@ module AccountReports
 
     def user_query
       root_account.shard.activate do
-        root_account.pseudonyms.except(:preload).joins(:user).select(
+        root_account.pseudonyms.not_instructure_identity.except(:preload).joins(:user).select(
           "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
            pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
            pseudonyms.workflow_state, users.sortable_name,users.updated_at AS user_updated_at,

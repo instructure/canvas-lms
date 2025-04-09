@@ -20,7 +20,7 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useRef} from 'react'
 import {Form} from 'react-final-form'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {InstUISettingsProvider} from '@instructure/emotion'
@@ -45,12 +45,13 @@ const componentOverrides = {
 }
 
 const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
+  const titleRef = useRef(null)
   return (
     <Form
       onSubmit={onSubmit}
       initialValues={initialValues}
       render={({handleSubmit, form}) => {
-        const {valid, dirty} = form.getState()
+        const {valid} = form.getState()
 
         return (
           <InstUISettingsProvider theme={{componentOverrides}}>
@@ -68,10 +69,12 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
                   <Flex.Item size="50%" padding="0 xx-small 0 0">
                     <LabeledTextField
                       name="title"
+                      isRequired={true}
                       renderLabel={I18n.t('Group Name')}
                       type="text"
                       size="medium"
                       validate={titleValidator}
+                      elementRef={ref => titleRef.current = ref}
                       data-testid="group-name-input"
                     />
                   </Flex.Item>
@@ -96,11 +99,16 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
                 </Button>
                 &nbsp;
                 <Button
-                  onClick={handleSubmit}
+                  onClick={() => {
+                    if (!valid) {
+                      titleRef.current.focus()
+                      return
+                    }
+                    handleSubmit()
+                  }}
                   type="button"
                   color="primary"
                   margin="0 x-small 0 0"
-                  interaction={valid && dirty ? 'enabled' : 'disabled'}
                   data-testid="group-edit-submit-button"
                 >
                   {I18n.t('Save')}

@@ -21,6 +21,7 @@ import {showFlashAlert} from '../common/FlashAlert'
 import {isPreviewable, loadDocPreview, removeLoadingImage, showLoadingImage} from './doc_previews'
 import {show} from './jqueryish_funcs'
 import {parseUrlOrNull} from '../util/url-util'
+import psl from 'psl'
 
 const youTubeRegEx = /^https?:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/
 export function youTubeID(path) {
@@ -33,9 +34,13 @@ export function youTubeID(path) {
 
 export function getTld(hostname) {
   hostname = (hostname || '').split(':')[0]
-  const parts = hostname.split('.'),
-    length = parts.length
-  return (length > 1 ? [parts[length - 2], parts[length - 1]] : parts).join('.')
+  if (hostname.includes('inseng.test')) {
+    const parts = hostname.split('.')
+    return parts.slice(-3).join('.')
+  }
+
+  const parsed = psl.parse(hostname)
+  return parsed.domain || hostname
 }
 
 export function isExternalLink(element, canvasOrigin = window.location.origin) {
@@ -196,7 +201,7 @@ export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews
         message: formatMessage('Failed getting file contents'),
         type: 'error',
       })
-       
+
       console.error(ex)
       resetInlinePreview($link)
 

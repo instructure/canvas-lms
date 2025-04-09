@@ -21,22 +21,26 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconSyllabusLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {DiscussionSummaryUsage} from './DiscussionSummary'
 
 interface DiscussionSummaryGenerateButtonProps {
   onClick: () => void
   isEnabled: boolean
   isMobile: boolean
+  usage: DiscussionSummaryUsage | null
 }
 
 const I18n = createI18nScope('discussions_posts')
 
-export const DiscussionSummaryGenerateButton: React.FC<
-  DiscussionSummaryGenerateButtonProps
-> = props => {
-  const buttonText = I18n.t('Generate Summary')
+export const DiscussionSummaryGenerateButton: React.FC<DiscussionSummaryGenerateButtonProps> = props => {
+    const buttonText = I18n.t('Generate Summary')
+    const limitReached = !!props.usage && props.usage.currentCount >= props.usage.limit
+    const toolTipText = limitReached
+        ? !!props.usage && I18n.t('Sorry, you have reached the maximum number of summary generations allowed (%{limit}) per day. Please try again tomorrow.', {limit: props.usage.limit})
+        : buttonText
 
   return (
-    <Tooltip renderTip={buttonText} width="48px" data-testid="summary-generate-tooltip">
+    <Tooltip renderTip={toolTipText} width="48px" data-testid="summary-generate-tooltip">
       <Button
         display={props.isMobile ? 'block' : 'inline-block'}
         onClick={props.onClick}

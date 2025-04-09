@@ -35,7 +35,7 @@ module Canvas::Security
       # same char repeated
       record.errors.add attr, "repeated" if policy[:max_repeats] && value =~ /(.)\1{#{policy[:max_repeats]},}/
       # long sequence/run of chars
-      if policy[:max_sequence]
+      if policy[:max_sequence] && value.length > policy[:max_sequence]
         candidates = Array.new(value.length - policy[:max_sequence]) do |i|
           Regexp.new(Regexp.escape(value[i, policy[:max_sequence] + 1]))
         end

@@ -367,7 +367,7 @@ describe AssignmentsController do
         @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.enable_feature! :differentiation_tags
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
         end
       end
@@ -380,7 +380,7 @@ describe AssignmentsController do
 
       it "is false if account setting is off" do
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = false
+          a.settings[:allow_assign_to_differentiation_tags] = { value: false }
           a.save!
         end
 
@@ -1866,7 +1866,7 @@ describe AssignmentsController do
         @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.enable_feature! :differentiation_tags
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
         end
       end
@@ -1879,7 +1879,7 @@ describe AssignmentsController do
 
       it "is false if account setting is off" do
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = false
+          a.settings[:allow_assign_to_differentiation_tags] = { value: false }
           a.save!
         end
 
@@ -2002,6 +2002,67 @@ describe AssignmentsController do
 
         get "syllabus", params: { course_id: @course.id }
         expect(assigns[:course_home_sub_navigation_tools].size).to eq 0
+      end
+    end
+
+    context "with file links in syllabus body" do
+      before :once do
+        @image = attachment_model(context: @course, display_name: "file.jpg")
+        @video = attachment_model(context: @course, display_name: "file.mp4", media_entry_id: "cat_hugs")
+        @doc = attachment_model(context: @course, display_name: "file.docx")
+        @course.public_syllabus = true
+        @course.syllabus_body = <<~HTML
+          <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview" alt="test-1.jpg" /></p>
+          <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
+          <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?wrap=1" target="_blank" rel="noopener" data-canvas-previewable="true">#{@doc.display_name}</a></p>
+        HTML
+        @course.save!
+      end
+
+      shared_examples "with 'disable_file_verifiers_in_public_syllabus' feature flag enabled" do
+        before :once do
+          # The course is using the site_admin account by default, and it was having
+          # caching issues if I tried to enable the feature flag on the course's root account.
+          @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+        end
+
+        it "adds location tags to file URLs instead of verifiers" do
+          get "syllabus", params: { course_id: @course.id }
+          expect(assigns[:syllabus_body]).to eql(<<~HTML)
+            <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview?location=course_syllabus_#{@course.id}" alt="test-1.jpg" loading="lazy"></p>
+            <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}?location=course_syllabus_#{@course.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
+            <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?location=course_syllabus_#{@course.id}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
+          HTML
+        end
+      end
+
+      context "when context grants :read permission to current_user" do
+        it_behaves_like "with 'disable_file_verifiers_in_public_syllabus' feature flag enabled"
+
+        it "doesn't make files publicly available" do
+          user_session(@student)
+
+          get "syllabus", params: { course_id: @course.id }
+          expect(assigns[:syllabus_body]).to eql(<<~HTML)
+            <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview" alt="test-1.jpg" loading="lazy"></p>
+            <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
+            <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
+          HTML
+        end
+      end
+
+      context "when context does not grant :read permission to current_user" do
+        it_behaves_like "with 'disable_file_verifiers_in_public_syllabus' feature flag enabled"
+
+        it "does make files publicly available with public syllabus when user does not have access" do
+          @image.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
+          get "syllabus", params: { course_id: @course.id }
+          expect(assigns[:syllabus_body]).to eql(<<~HTML)
+            <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview?verifier=#{@image.uuid}" alt="test-1.jpg" loading="lazy"></p>
+            <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}?verifier=#{@video.uuid}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
+            <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?verifier=#{@doc.uuid}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
+          HTML
+        end
       end
     end
   end
@@ -2851,7 +2912,7 @@ describe AssignmentsController do
 
       it "is true if account setting is on" do
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
         end
 
@@ -2862,13 +2923,40 @@ describe AssignmentsController do
 
       it "is false if account setting is off" do
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = false
+          a.settings[:allow_assign_to_differentiation_tags] = { value: false }
           a.save!
         end
 
         user_session(@teacher)
         get "edit", params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be false
+      end
+    end
+
+    describe "ASSET_PROCESSORS" do
+      before { user_session(@teacher) }
+
+      it "includes the existing asset processors" do
+        tool = external_tool_1_3_model(context: @course)
+        ap1 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 1")
+        ap2 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 2")
+        get :edit, params: { course_id: @course.id, id: @assignment.id }
+
+        aps = assigns[:js_env][:ASSET_PROCESSORS].map do |ap|
+          ap.slice(:id, :title, :context_external_tool_id)
+        end
+
+        expected = [
+          { id: ap1.id, title: "ap 1", context_external_tool_id: tool.id },
+          { id: ap2.id, title: "ap 2", context_external_tool_id: tool.id }
+        ]
+
+        expect(aps).to match_array(expected)
+      end
+
+      it "is an empty array when there are no asset processors" do
+        get :edit, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ASSET_PROCESSORS]).to eq []
       end
     end
   end

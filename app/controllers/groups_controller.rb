@@ -139,6 +139,10 @@
 #           "description": "optional: A list of users that are members in the group. Returned only if include[]=users. WARNING: this collection's size is capped (if there are an extremely large number of users in the group (thousands) not all of them will be returned).  If you need to capture all the users in a group with certainty consider using the paginated /api/v1/groups/<group_id>/memberships endpoint.",
 #           "type": "array",
 #           "items": { "$ref": "User" }
+#         },
+#         "non_collaborative": {
+#           "description": "Indicates whether this group category is non-collaborative. A value of true means these group categories rely on the manage_tags permissions and do not have collaborative features",
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -439,6 +443,7 @@ class GroupsController < ApplicationController
                      include: Array(params[:include]),
                      include_inactive_users:).tap do |json|
             json[:group_category_name] = g.group_category.name if collaboration_state == "non_collaborative" && params[:user_id]
+            json[:is_single_tag] = g.group_category.single_tag? if collaboration_state == "non_collaborative" && params[:user_id]
           end
         }
       end

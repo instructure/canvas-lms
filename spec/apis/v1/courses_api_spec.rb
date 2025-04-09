@@ -4867,20 +4867,22 @@ describe CoursesController, type: :request do
     describe "/preview_html" do
       before :once do
         course_with_teacher(active_all: true)
+        attachment_model(context: @course)
       end
 
-      it "sanitizes html and process links" do
-        @user = @teacher
-        attachment_model(context: @course)
-        html = %(<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>)
-        json = api_call(:post,
-                        "/api/v1/courses/#{@course.id}/preview_html",
-                        { controller: "courses", action: "preview_html", course_id: @course.to_param, format: "json" },
-                        { html: })
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "sanitizes html and process links" do
+          @user = @teacher
+          html = %(<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>)
+          json = api_call(:post,
+                          "/api/v1/courses/#{@course.id}/preview_html",
+                          { controller: "courses", action: "preview_html", course_id: @course.to_param, format: "json" },
+                          { html: })
 
-        returned_html = json["html"]
-        expect(returned_html).not_to include("<script>")
-        expect(returned_html).to include("/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}")
+          returned_html = json["html"]
+          expect(returned_html).not_to include("<script>")
+          expect(returned_html).to include("/courses/#{@course.id}/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}")
+        end
       end
 
       it "requires permission to preview" do

@@ -106,7 +106,7 @@ module Schemas
     def self.base_properties
       {
         title: { type: "string", description: "Overridable by 'text' in settings and placements" },
-        description: { type: "string", description: "Displayed only in assignment_selection and link_selection" },
+        description: { type: "string", description: "Displayed only in assignment_selection, link_selection, and ActivityAssetProcessor" },
         custom_fields: { oneOf: [{ type: "object" }, { type: "string" }], description: "Overridable in settings and placements. String for legacy purposes." },
         target_link_uri: { type: "string", description: "Overridable in settings and placements" },
         oidc_initiation_url: { type: "string" },

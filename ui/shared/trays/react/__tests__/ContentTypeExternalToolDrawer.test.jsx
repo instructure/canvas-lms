@@ -20,6 +20,8 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import ContentTypeExternalToolDrawer from '../ContentTypeExternalToolDrawer'
 import MutexManager from '@canvas/mutex-manager/MutexManager'
+import { fallbackIframeAllowances } from '../constants'
+
 
 describe('ContentTypeExternalToolDrawer', () => {
   const tool = {
@@ -108,12 +110,22 @@ describe('ContentTypeExternalToolDrawer', () => {
     })
   })
 
-  it('constructs iframe src url', () => {
-    expect(tool.base_url).not.toContain('?')
-    const {getByTestId} = renderTray()
-    const src = getByTestId('ltiIframe').src
-    expect(src).toContain(`${tool.base_url}?`)
-    expect(getByTestId('ltiIframe')).toBeInTheDocument()
+  describe('when constructing iframe src url', () => {
+    const origEnv = {...window.ENV}
+    beforeAll(() => {
+      window.ENV.LTI_LAUNCH_FRAME_ALLOWANCES = fallbackIframeAllowances
+    })
+    afterAll(() => (window.ENV = origEnv))
+
+    it('constructs src url and contains allowances', () => {
+      expect(tool.base_url).not.toContain('?')
+      const {getByTestId} = renderTray()
+      const iframe = getByTestId('ltiIframe')
+      expect(iframe).toBeInTheDocument()
+      const src = iframe.src
+      expect(src).toContain(`${tool.base_url}?`)
+      expect(iframe.getAttribute("allow")).toContain('clipboard-write')
+    })
   })
 
   it('does not render ToolLaunchIframe when there is no tool', () => {

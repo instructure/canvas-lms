@@ -57,8 +57,7 @@ class SessionToken
 
   def valid?
     now = Time.now.utc
-    created_at >= now - VALIDITY_PERIOD.seconds &&
-      created_at <= now + VALIDITY_PERIOD.seconds &&
+    created_at.between?(now - VALIDITY_PERIOD.seconds, now + VALIDITY_PERIOD.seconds) &&
       Canvas::Security.verify_hmac_sha1(signature, signature_string)
   end
 

@@ -87,7 +87,7 @@ module GemOverride
       super(name, path: vendor_path, **kwargs)
     elsif pinned_github_gems.key?(name)
       repo, ref = pinned_github_gems[name].split(":")
-      super(name, github: repo, ref: ref)
+      super(name, github: repo, ref:)
     else
       super
     end
@@ -99,8 +99,11 @@ module GemOverride
     @pinned_github_gems ||= ENV.fetch("CANVAS_PINNED_GITHUB_GEMS", "").split(",").each_with_object({}) do |entry, hash|
       owner_repo, branch = entry.split(":")
       owner, repo = owner_repo.split("/")
-      hash[repo] = "#{owner}/#{repo}:#{branch}"
+      repo, repo_as = repo.split("@")
+      repo_as ||= repo
+      hash[repo_as] = "#{owner}/#{repo}:#{branch}"
     end
+    @pinned_github_gems
   end
 end
 Bundler::Dsl.prepend(GemOverride)

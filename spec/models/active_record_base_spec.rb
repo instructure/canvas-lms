@@ -89,15 +89,15 @@ describe ActiveRecord::Base do
       end
 
       it "supports start" do
-        expect(do_batches(Enrollment, start: @e2.id)).to eq [[@e2, @e3, @e4, @e5, @e6]]
+        expect(do_batches(Enrollment.order(:id), start: @e2.id)).to eq [[@e2, @e3, @e4, @e5, @e6]]
       end
 
       it "supports finish" do
-        expect(do_batches(Enrollment, finish: @e3.id)).to eq [[@e1, @e2, @e3]]
+        expect(do_batches(Enrollment.order(:id), finish: @e3.id)).to eq [[@e1, @e2, @e3]]
       end
 
       it "supports start and finish with a small batch size" do
-        expect(do_batches(Enrollment, of: 2, start: @e2.id, finish: @e4.id)).to eq [[@e2, @e3], [@e4]]
+        expect(do_batches(Enrollment.order(:id), of: 2, start: @e2.id, finish: @e4.id)).to eq [[@e2, @e3], [@e4]]
       end
 
       it "respects order" do
@@ -195,6 +195,29 @@ describe ActiveRecord::Base do
           Account.group(:id).find_each(strategy: :id, start: 0) { nil }
         end.to raise_error(ArgumentError)
       end
+    end
+  end
+
+  # once-ler really does not like running with teardown_fixtures in the same context
+  # so this has been moved into its own block
+  context "in_batches copy without a transaction" do
+    it "handles nested queries correctly" do
+      teardown_fixtures
+
+      Setting.create!(name: "spec1")
+      Setting.create!(name: "spec2")
+      Setting.create!(name: "spec3")
+
+      old_connection = Setting.connection
+      Setting.where("name LIKE 'spec%'").in_batches(strategy: :copy, of: 1, load: false) do
+        expect(Setting.where("name LIKE 'spec%'").count).to eq(3)
+      end
+      new_connection = Setting.connection
+
+      # make sure we're not holding the connection which ran COPY forever
+      expect(old_connection).to eq(new_connection)
+    ensure
+      Setting.where("name LIKE 'spec%'").delete_all
     end
   end
 
@@ -1064,30 +1087,46 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
     ActiveRecord::ConnectionAdapters::PoolConfig.new(ActiveRecord::Base, config, :primary, :test)
   end
   let(:pool) { ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec) }
+  let(:connection_method) { (Rails.version < "7.2") ? :connection : :lease_connection }
 
   it "doesn't evict a normal cycle" do
-    conn1 = pool.connection
+    conn1 = pool.public_send(connection_method)
+    conn1.connect
     pool.checkin(conn1)
     expect(pool).to be_connected
-    conn2 = pool.connection
+    conn2 = pool.public_send(connection_method)
+    expect(conn2).to eql conn1
+  end
+
+  it "doesn't evict a normal cycle that is almost over" do
+    allow(Process).to receive(:clock_gettime).and_return(0)
+
+    conn1 = pool.public_send(connection_method)
+    conn1.connect
+    pool.checkin(conn1)
+
+    allow(Process).to receive(:clock_gettime).and_return(29)
+    conn2 = pool.public_send(connection_method)
     expect(conn2).to eql conn1
   end
 
   it "evicts connections on checkout" do
     allow(Process).to receive(:clock_gettime).and_return(0)
 
-    conn1 = pool.connection
+    conn1 = pool.public_send(connection_method)
+    conn1.connect
     pool.checkin(conn1)
 
     allow(Process).to receive(:clock_gettime).and_return(60)
-    conn2 = pool.connection
+    conn2 = pool.public_send(connection_method)
     expect(conn2).not_to eql conn1
   end
 
   it "evicts connections on checkin" do
     allow(Process).to receive(:clock_gettime).and_return(0)
 
-    conn1 = pool.connection
+    conn1 = pool.public_send(connection_method)
+    conn1.connect
     expect(conn1.runtime).to eq 0
 
     allow(Process).to receive(:clock_gettime).and_return(60)
@@ -1101,7 +1140,8 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   it "evicts connections if you call flush" do
     allow(Process).to receive(:clock_gettime).and_return(0)
 
-    conn1 = pool.connection
+    conn1 = pool.public_send(connection_method)
+    conn1.connect
     pool.checkin(conn1)
 
     allow(Process).to receive(:clock_gettime).and_return(60)

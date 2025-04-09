@@ -119,7 +119,7 @@ describe ModuleAssignmentOverridesController do
 
     describe "differentiation tags" do
       before do
-        @course.account.settings[:allow_assign_to_differentiation_tags] = true
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
       end
 
@@ -396,7 +396,7 @@ describe ModuleAssignmentOverridesController do
 
     context "differentiation tags" do
       before do
-        @course.account.settings[:allow_assign_to_differentiation_tags] = true
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
       end
 
@@ -428,7 +428,7 @@ describe ModuleAssignmentOverridesController do
       end
 
       it "returns 400 if allow_assign_to_differentiation_tags setting is disabled and group_id is present" do
-        @course.account.settings[:allow_assign_to_differentiation_tags] = false
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
         @course.account.save!
         put :bulk_update, params: { course_id: @course.id,
                                     context_module_id: @module1.id,

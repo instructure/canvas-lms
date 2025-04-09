@@ -89,4 +89,13 @@ module Factories
     props[:submission] ||= submission_model
     Lti::Asset.create!(**props)
   end
+
+  def lti_asset_processor_eula_model(overrides = {})
+    props = overrides.dup
+    props[:context_external_tool] ||= external_tool_1_3_model
+    props[:user] ||= user_model
+    props[:timestamp] ||= Time.zone.now
+    props[:accepted] = true if props[:accepted].nil?
+    Lti::AssetProcessorEulaAcceptance.create!(**props)
+  end
 end

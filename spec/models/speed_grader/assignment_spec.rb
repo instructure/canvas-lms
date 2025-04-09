@@ -733,7 +733,7 @@ describe SpeedGrader::Assignment do
         expect(json["GROUP_GRADING_MODE"]).to be false
       end
 
-      context "when a course has new gradeook and filter by student group enabled" do
+      context "when a course has new gradebook and filter by student group enabled" do
         before(:once) do
           @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
           @course.update!(filter_speed_grader_by_student_group: true)
@@ -742,7 +742,7 @@ describe SpeedGrader::Assignment do
         context "when no group filter is present" do
           it "returns all students" do
             @teacher.preferences.deep_merge!(gradebook_settings: {
-                                               @course.id => { "filter_rows_by" => { "student_group_id" => nil } }
+                                               @course.id => { "filter_rows_by" => { "student_group_ids" => [] } }
                                              })
             json = SpeedGrader::Assignment.new(@assignment, @teacher).json
             json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments, :fake_student) }
@@ -757,7 +757,7 @@ describe SpeedGrader::Assignment do
 
           before(:once) do
             @teacher.preferences.deep_merge!(gradebook_settings: {
-                                               @course.global_id => { "filter_rows_by" => { "student_group_id" => group.id.to_s } }
+                                               @course.global_id => { "filter_rows_by" => { "student_group_ids" => [group.id.to_s] } }
                                              })
           end
 
@@ -787,9 +787,20 @@ describe SpeedGrader::Assignment do
           context "when the second group filter is present" do
             let(:group) { @second_group }
 
-            it "returns only students that belong to the second group" do
+            it "returns only students that belong to the second group when only the second group is selected" do
               @teacher.preferences.deep_merge!(gradebook_settings: {
-                                                 @course.global_id => { "filter_rows_by" => { "student_group_id" => group.id.to_s } }
+                                                 @course.global_id => { "filter_rows_by" => { "student_group_ids" => [group.id.to_s] } }
+                                               })
+              json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+              json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments, :fake_student) }
+              group_students = group.users.as_json(include_root: false, only: %i[id name sortable_name])
+              StringifyIds.recursively_stringify_ids(group_students)
+              expect(json_students).to match_array(group_students)
+            end
+
+            it "returns only students from the second group/most recently selected group when both groups are selected" do
+              @teacher.preferences.deep_merge!(gradebook_settings: {
+                                                 @course.global_id => { "filter_rows_by" => { "student_group_ids" => [@first_group.id.to_s, group.id.to_s] } }
                                                })
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments, :fake_student) }
@@ -804,7 +815,7 @@ describe SpeedGrader::Assignment do
 
             it "returns all students rather than attempting to filter by the deleted group" do
               @teacher.preferences.deep_merge!(gradebook_settings: {
-                                                 @course.global_id => { "filter_rows_by" => { "student_group_id" => group.id.to_s } }
+                                                 @course.global_id => { "filter_rows_by" => { "student_group_ids" => [group.id.to_s] } }
                                                })
               group.destroy!
 

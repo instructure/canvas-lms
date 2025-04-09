@@ -249,6 +249,7 @@ class Pseudonym < ActiveRecord::Base
 
   scope :by_unique_id, ->(unique_id) { where("LOWER(unique_id)=LOWER(?)", unique_id.to_s) }
   scope :sis, -> { where.not(sis_user_id: nil) }
+  scope :not_instructure_identity, -> { all }
 
   def self.custom_find_by_unique_id(unique_id)
     return unless unique_id

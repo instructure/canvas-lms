@@ -133,7 +133,7 @@ describe CanvasCache::Redis do
 
         it "does not fail cache.write" do
           override_cache(cache) do
-            expect(Rails.cache.write("blah", "someval")).to be false
+            expect(Rails.cache.write("blah", "someval")).to be_falsey
           end
         end
 

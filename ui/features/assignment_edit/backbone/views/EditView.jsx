@@ -47,7 +47,7 @@ import {AssignmentSubmissionTypeContainer} from '../../react/AssignmentSubmissio
 import DefaultToolForm from '../../react/DefaultToolForm'
 import UsageRightsSelectBox from '@canvas/files/react/components/UsageRightsSelectBox'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
-import {attach as assetProcessorModalAttach} from '../../react/AssetProcessorModalLauncher'
+import {attach as assetProcessorsAttach} from '../../react/AssetProcessors'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import setUsageRights from '@canvas/files/util/setUsageRights'
@@ -129,11 +129,12 @@ const DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE = 'context_external_tool'
 const ASSIGNMENT_NAME_INPUT_NAME = 'name'
 const POINTS_POSSIBLE_INPUT_NAME = 'points_possible'
 const EXTERNAL_TOOL_URL_INPUT_NAME = 'external_tool_tag_attributes[url]'
-const ACTIVITY_ASSET_PROCESSOR_CONTAINER = '#activity_asset_processor_container'
+const ASSET_PROCESSORS_CONTAINER = '#asset_processors_container'
 const ALLOWED_EXTENSIONS_INPUT_NAME = 'allowed_extensions'
 const ONLINE_SUBMISSION_CHECKBOXES_GROUP = 'online_submission_types[online_text_entry]'
 const DEFAULT_TOOL_LAUNCH_BUTTON = 'default-tool-launch-button'
 const SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON = 'assignment_submission_type_selection_launch_button'
+const USAGE_RIGHTS_SELECT = 'usage_rights_use_justification'
 
 /*
 xsslint safeString.identifier srOnly
@@ -271,7 +272,7 @@ EditView.prototype.els = {
     els['' + ANONYMOUS_GRADING_BOX] = '$anonymousGradingBox'
     els['' + POST_TO_SIS_BOX] = '$postToSisBox'
     els['' + ASSIGNMENT_EXTERNAL_TOOLS] = '$assignmentExternalTools'
-    els['' + ACTIVITY_ASSET_PROCESSOR_CONTAINER] = '$activityAssetProcessorContainer'
+    els['' + ASSET_PROCESSORS_CONTAINER] = '$assetProcessorsContainer'
     els['' + HIDE_ZERO_POINT_QUIZZES_BOX] = '$hideZeroPointQuizzesBox'
     els['' + HIDE_ZERO_POINT_QUIZZES_OPTION] = '$hideZeroPointQuizzesOption'
     els['' + OMIT_FROM_FINAL_GRADE_BOX] = '$omitFromFinalGradeBox'
@@ -919,12 +920,15 @@ EditView.prototype.renderAnnotatedDocumentUsageRightsSelectBox = function () {
   if (annotatedDocument) {
     contextType = annotatedDocument.contextType
     contextId = annotatedDocument.contextId
-    const hideErrors = this.hideErrors
+    const clearUsageRightsErrors = () => {
+      $(document).trigger('validateUsageRightsSelectedValue', {error: false})
+      this.hideErrors('usage_rights_use_justification_errors')
+    }
     ReactDOM.render(
       React.createElement(UsageRightsSelectBox, {
         contextType,
         contextId,
-        hideErrors
+        hideErrors: clearUsageRightsErrors,
       }),
       document.querySelector(USAGE_RIGHTS_CONTAINER),
     )
@@ -1024,16 +1028,11 @@ EditView.prototype.handleSubmissionTypeChange = function (_ev) {
   }
   this.$groupCategorySelector.toggleAccessibly(subVal !== 'external_tool' && !isPlacementTool)
   this.$peerReviewsFields.toggleAccessibly(subVal !== 'external_tool' && !isPlacementTool)
-  this.$similarityDetectionTools.toggleAccessibly(
-    subVal === 'online' && ENV.PLAGIARISM_DETECTION_PLATFORM,
-  )
   this.$defaultExternalToolContainer.toggleAccessibly(subVal === 'default_external_tool')
   this.$allowedAttemptsContainer.toggleAccessibly(
     subVal === 'online' || subVal === 'external_tool' || isPlacementTool,
   )
-  if (subVal === 'online') {
-    this.handleOnlineSubmissionTypeChange()
-  }
+  this.handleOnlineSubmissionTypeChange()
   return this.$externalToolNewTabContainer.toggleAccessibly(subVal.includes('external_tool'))
 }
 
@@ -1201,9 +1200,18 @@ EditView.prototype.handleExternalContentReady = function (data) {
 }
 
 EditView.prototype.handleOnlineSubmissionTypeChange = function (_env) {
+  const showAssetProcessors =
+    window.ENV?.FEATURES?.lti_asset_processor &&
+    this.$submissionType.val() === 'online' &&
+    this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked')
+  this.$assetProcessorsContainer.toggleAccessibly(showAssetProcessors)
+
   const showConfigTools =
-    this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked') ||
-    this.$onlineSubmissionTypes.find(ALLOW_TEXT_ENTRY).prop('checked')
+    ENV.PLAGIARISM_DETECTION_PLATFORM &&
+    this.$submissionType.val() === 'online' && (
+      this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked') ||
+      this.$onlineSubmissionTypes.find(ALLOW_TEXT_ENTRY).prop('checked')
+    )
   return this.$similarityDetectionTools.toggleAccessibly(
     showConfigTools && ENV.PLAGIARISM_DETECTION_PLATFORM,
   )
@@ -1232,15 +1240,17 @@ EditView.prototype.afterRender = function () {
     parseInt(ENV.COURSE_ID, 10),
     parseInt(this.assignment.id, 10),
   )
-  if (this.assignment.isNew() && window.ENV?.FEATURES?.lti_asset_processor) {
-    this.AssetProcessorModalLauncher = assetProcessorModalAttach({
-      container: this.$activityAssetProcessorContainer.get(0),
+  if (window.ENV?.FEATURES?.lti_asset_processor) {
+    assetProcessorsAttach({
+      container: this.$assetProcessorsContainer.get(0),
+      courseId: ENV.COURSE_ID,
       secureParams: this.$secureParams.val(),
+      initialAttachedProcessors: ENV.ASSET_PROCESSORS || [],
     })
   }
+
   this._attachEditorToDescription()
   this.togglePeerReviewsAndGroupCategoryEnabled()
-  this.handleOnlineSubmissionTypeChange()
   this.handleSubmissionTypeChange()
   this.handleGroupCategoryChange()
   this.handleAnonymousGradingChange()
@@ -1388,7 +1398,7 @@ EditView.prototype.getFormData = function () {
     data.lock_at = null
     data.unlock_at = null
   }
-  
+
   if (ENV.COURSE_PACE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths) {
     data.assignment_overrides = this.masteryPathToggleView.getOverrides()
     data.only_visible_to_overrides = this.masteryPathToggleView.setOnlyVisibleToOverrides()
@@ -1419,20 +1429,8 @@ EditView.prototype.getFormData = function () {
       data.external_tool_tag_attributes.line_item,
     )
   }
-  function parseContentItem(item) {
-    item.custom = tryJsonParse(item.custom);
-    item.icon = tryJsonParse(item.icon);
-    item.window = tryJsonParse(item.window);
-    item.iframe = tryJsonParse(item.iframe);
-    item.report = tryJsonParse(item.report);
-    return item;
-  }
-  
-  if (data.asset_processors && data.asset_processors.length > 0) {
-    data.asset_processors = data.asset_processors.map(asset_processor =>
-      asset_processor.map(parseContentItem)
-    );
-  }
+
+  data.asset_processors = data.asset_processors?.map(tryJsonParse)
 
   if ($grader_count.length > 0) {
     data.grader_count = numberHelper.parse($grader_count[0].value)
@@ -1593,7 +1591,7 @@ EditView.prototype.showErrors = function (errors) {
       if (element) {
         element.setAttribute("aria-describedby", errorsContainerID)
 
-        if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, DEFAULT_TOOL_LAUNCH_BUTTON, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON].includes(key)) {
+        if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, DEFAULT_TOOL_LAUNCH_BUTTON, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON, USAGE_RIGHTS_SELECT].includes(key)) {
           const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
           this.getElement(selector)?.classList.add('error-outline')
         }
@@ -1631,7 +1629,6 @@ EditView.prototype.sortErrorsByVerticalScreenPosition = function (errors) {
 
       const elementRect = errorElement.getBoundingClientRect()
       const verticalPosition = elementRect.top + window.scrollY
-
       return { errorKey, errorMessage, verticalPosition }
     })
     .filter(errorEntry => errorEntry !== null)
@@ -1646,7 +1643,11 @@ EditView.prototype.getElement = function (key) {
   const byId = document.getElementById(key)
   if (byId) return byId
 
-  const byName = document.querySelector(`[name="${key}"]`)
+  // This check is necessary because some elements may share the same name attribute 
+  // but have the `hidden` attribute set. 
+  // These hidden elements should be excluded from the selection to ensure 
+  // we only target visible elements in the DOM.
+  const byName = document.querySelector(`[name="${key}"]:not([type="hidden"])`)
   if (byName) return byName
 
   const byCustomSelector =  document.querySelector(EditView.prototype.fieldSelectors[key])
@@ -1666,7 +1667,7 @@ EditView.prototype.hideErrors = function (containerId) {
     delete this.errorRoots[containerId]
 
     const key = containerId.replace(/_errors$/, '')
-    if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON].includes(key)) {
+    if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON, USAGE_RIGHTS_SELECT].includes(key)) {
       const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
       const element = this.getElement(selector)
       element?.classList.remove('error-outline')
@@ -1850,11 +1851,12 @@ EditView.prototype._validateSubmissionTypes = function (data, errors) {
   ) {
     annotatedDocumentUsageRights = this.getAnnotatedDocumentUsageRights()
     if (annotatedDocumentUsageRights.use_justification === 'choose') {
-      errors.usage_rights_use_justification = [
+      errors[USAGE_RIGHTS_SELECT] = [
         {
           message: I18n.t('Identifying the usage rights is required'),
         },
       ]
+      $(document).trigger('validateUsageRightsSelectedValue', {error: true})
     }
   }
   return errors

@@ -500,6 +500,10 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def allows_posting_submission?
+    # This logic is also implemented in SQL in
+    # app/graphql/loaders/has_postable_comments_loader.rb
+    # to determine if a submission has any postable comments.
+    # Any changes made here should also be reflected in the loader.
     hidden? && !draft?
   end
 

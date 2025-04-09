@@ -445,10 +445,12 @@ describe('ContentTabs', () => {
       const props = await generatePropsWithAttempt(2)
       const {container} = renderWithProps(props)
 
-      await submitFiles(container, [
-        new File(['foo'], 'file1.pdf', {type: 'application/pdf'}),
-        new File(['foo2'], 'file2.pdf', {type: 'application/pdf'}),
-      ])
+      const file = new Blob(['foo'], { type: 'application/pdf' })
+      file.name = 'file1.pdf'
+      const file2 = new Blob(['foo'], { type: 'application/pdf' })
+      file2.name = 'file2.pdf'
+
+      await submitFiles(container, [file, file2])
 
       const {calls} = uploadFileModule.uploadFile.mock
       expect(calls).toHaveLength(2)
@@ -469,7 +471,9 @@ describe('ContentTabs', () => {
       props.assignment.groupSet = null
       const {container} = renderWithProps(props)
 
-      await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
+      const file = new Blob(['foo'], { type: 'application/pdf' })
+      file.name = 'file1.pdf'
+      await submitFiles(container, [file])
       const {calls} = uploadFileModule.uploadFile.mock
       expect(calls[0][0]).toEqual(
         `/api/v1/courses/1/assignments/${props.assignment._id}/submissions/1/files`,
@@ -487,7 +491,9 @@ describe('ContentTabs', () => {
 
       const {container} = renderWithProps(props)
 
-      await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
+      const file = new Blob(['foo'], { type: 'application/pdf' })
+      file.name = 'file1.pdf'
+      await submitFiles(container, [file])
       const {calls} = uploadFileModule.uploadFile.mock
       expect(calls[0][0]).toEqual(
         `/api/v1/groups/${props.assignment.groupSet.currentGroup._id}/files`,
@@ -500,7 +506,9 @@ describe('ContentTabs', () => {
       const props = await generatePropsWithAttempt(2)
       const {container} = renderWithProps(props)
 
-      await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
+      const file = new Blob(['foo'], { type: 'application/pdf' })
+      file.name = 'file1.pdf'
+      await submitFiles(container, [file])
 
       await waitFor(() => {
         expect(props.createSubmissionDraft).toHaveBeenCalledWith({
@@ -518,7 +526,9 @@ describe('ContentTabs', () => {
       const props = await generatePropsWithAttempt(0)
       const {container} = renderWithProps(props)
 
-      await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
+      const file = new Blob(['foo'], { type: 'application/pdf' })
+      file.name = 'file1.pdf'
+      await submitFiles(container, [file])
 
       await waitFor(() => {
         expect(props.createSubmissionDraft).toHaveBeenCalledWith({
@@ -548,10 +558,11 @@ describe('ContentTabs', () => {
 
       const props = await generatePropsWithAttempt(0)
       const {container, findAllByRole} = renderWithProps(props)
-      await submitFiles(container, [
-        new File(['asdf'], 'file1.pdf', {type: 'application/pdf'}),
-        new File(['sdfg'], 'file2.pdf', {type: 'application/pdf'}),
-      ])
+      const file = new Blob(['foo'], { type: 'application/pdf' })
+      file.name = 'file1.pdf'
+      const file2 = new Blob(['foo'], { type: 'application/pdf' })
+      file2.name = 'file2.pdf'
+      await submitFiles(container, [file, file2])
 
       progressHandlers[0]({loaded: 10, total: 100})
       progressHandlers[1]({loaded: 50, total: 250})

@@ -12,6 +12,7 @@ translate_inbox_messages:
 
 ai_translation_improvements:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: RootAccount
   display_name: AI Translation Improvements
   description: Improve the ui and ux around AI translation features.
+  shadow: true

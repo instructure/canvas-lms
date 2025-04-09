@@ -122,7 +122,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
   if (friendlyDescriptionChanged && friendlyDescription.length > 255) {
     friendlyDescriptionMessages.push({
       text: I18n.t('Must be 255 characters or less'),
-      type: 'error',
+      type: 'newError',
     })
   }
 
@@ -226,7 +226,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   type="text"
                   size="medium"
                   value={title}
-                  messages={invalidTitle ? [{text: invalidTitle, type: 'error'}] : []}
+                  messages={invalidTitle ? [{text: invalidTitle, type: 'newError'}] : []}
                   renderLabel={I18n.t('Name')}
                   onChange={titleChangeHandler}
                   data-testid="name-input"
@@ -247,7 +247,9 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   type="text"
                   size="medium"
                   value={displayName}
-                  messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'error'}] : []}
+                  messages={invalidDisplayName
+                    ? [{text: invalidDisplayName, type: 'newError'}]
+                    : []}
                   renderLabel={I18n.t('Friendly Name')}
                   onChange={displayNameChangeHandler}
                   data-testid="display-name-input"

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe Lti::AssetProcessor, type: :model do
+describe Lti::AssetProcessor do
   describe "create" do
     context "validations" do
       subject { lti_asset_processor_model }
@@ -70,7 +70,11 @@ describe Lti::AssetProcessor, type: :model do
   end
 
   describe ".build_for_assignment" do
-    let(:context_external_tool) { external_tool_1_3_model }
+    subject do
+      Lti::AssetProcessor.build_for_assignment(content_item:, context:)
+    end
+
+    let(:context_external_tool) { external_tool_1_3_model(context: course_model) }
 
     let(:content_item) do
       {
@@ -86,30 +90,74 @@ describe Lti::AssetProcessor, type: :model do
       }
     end
 
+    let(:context) { context_external_tool.context }
+
     context "when context_external_tool is found" do
       it "returns a new Lti::AssetProcessor instance with the correct attributes" do
-        asset_processor = Lti::AssetProcessor.build_for_assignment(content_item)
-
-        expect(asset_processor).to be_a(Lti::AssetProcessor)
-        expect(asset_processor.context_external_tool).to eq(context_external_tool)
-        expect(asset_processor.url).to eq("http://example.com")
-        expect(asset_processor.title).to eq("Example Title")
-        expect(asset_processor.text).to eq("Example Text")
-        expect(asset_processor.custom).to eq({ "key" => "value" })
-        expect(asset_processor.icon).to eq({ "icon_key" => "icon_value" })
-        expect(asset_processor.window).to eq({ "window_key" => "window_value" })
-        expect(asset_processor.iframe).to eq({ "iframe_key" => "iframe_value" })
-        expect(asset_processor.report).to eq({ "report_key" => "report_value" })
+        expect(subject).to be_a(Lti::AssetProcessor)
+        expect(subject.context_external_tool).to eq(context_external_tool)
+        expect(subject.url).to eq("http://example.com")
+        expect(subject.title).to eq("Example Title")
+        expect(subject.text).to eq("Example Text")
+        expect(subject.custom).to eq({ "key" => "value" })
+        expect(subject.icon).to eq({ "icon_key" => "icon_value" })
+        expect(subject.window).to eq({ "window_key" => "window_value" })
+        expect(subject.iframe).to eq({ "iframe_key" => "iframe_value" })
+        expect(subject.report).to eq({ "report_key" => "report_value" })
       end
     end
 
     context "when context_external_tool is not found" do
       it "returns nil" do
-        content_item["context_external_tool_id"] = nil
-        asset_processor = Lti::AssetProcessor.build_for_assignment(content_item)
-
-        expect(asset_processor).to be_nil
+        content_item["context_external_tool_id"] = ContextExternalTool.maximum(:id) + 1
+        expect(subject).to be_nil
       end
+    end
+
+    context "when context_external_tool is in the wrong context" do
+      let(:context) { course_model }
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+  end
+
+  describe ".processors_info_for_assignment_edit_page" do
+    subject do
+      Lti::AssetProcessor.processors_info_for_assignment_edit_page(assignment_id: assignment.id)
+    end
+
+    let(:assignment) { assignment_model }
+
+    def make_ap(context_external_tool, num)
+      icon = { url: "https://example.com/icon#{num}.png" }
+      title = "title#{num}"
+      text = "text#{num}"
+      lti_asset_processor_model(context_external_tool:, assignment:, title:, text:, icon:)
+    end
+
+    it "contains the fields needed for the assignment edit page" do
+      tool1 = external_tool_1_3_model(opts: { name: "my tool" })
+      tool2 = external_tool_1_3_model(opts: { name: "my other tool" })
+      ap1 = make_ap(tool1, 1)
+      ap2 = make_ap(tool2, 2)
+      expect(subject).to eq([{
+                              id: ap1.id,
+                              title: "title1",
+                              text: "text1",
+                              icon: ap1.icon,
+                              context_external_tool_name: tool1.name,
+                              context_external_tool_id: tool1.id,
+                            },
+                             {
+                               id: ap2.id,
+                               title: "title2",
+                               text: "text2",
+                               icon: ap2.icon,
+                               context_external_tool_name: tool2.name,
+                               context_external_tool_id: tool2.id,
+                             }])
     end
   end
 end

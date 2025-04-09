@@ -24,8 +24,4 @@ export const ManageRoutes: ReadonlyArray<RouteObject> = [
     path: 'manage',
     element: <ManagePage />,
   },
-  {
-    path: 'manage/:registration_id',
-    element: <div>TODO: registration detail</div>,
-  },
 ]

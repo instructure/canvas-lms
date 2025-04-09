@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import $ from 'jquery'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
@@ -41,6 +41,7 @@ const MobileGlobalMenu = React.lazy(() => import('./MobileGlobalMenu'))
 const MobileNavigation: React.FC<{navIsOpen?: boolean}> = ({navIsOpen = false}) => {
   const [globalNavIsOpen, setGlobalNavIsOpen] = useState(navIsOpen)
   const [contextNavIsOpen, setContextNavIsOpen] = useState(false)
+  const firstRender = useRef(true)
 
   const countsEnabled = Boolean(
     window.ENV.current_user_id && !window.ENV.current_user?.fake_student,
@@ -87,7 +88,29 @@ const MobileNavigation: React.FC<{navIsOpen?: boolean}> = ({navIsOpen = false}) 
     if (mobileContextNavContainer) {
       mobileContextNavContainer.setAttribute('aria-expanded', contextNavIsOpen.toString())
     }
+
+    if (!firstRender.current) {
+      $.screenReaderFlashMessageExclusive(
+        contextNavIsOpen
+          ? I18n.t('Course menu is now open')
+          : I18n.t('Course menu is now closed')
+      )
+    }
   }, [contextNavIsOpen])
+
+  useEffect(() => {
+    if (!firstRender.current) {
+      $.screenReaderFlashMessageExclusive(
+        globalNavIsOpen
+          ? I18n.t('Global navigation menu is now open')
+          : I18n.t('Global navigation menu is now closed')
+      )
+    }
+  }, [globalNavIsOpen])
+
+  useEffect(() => {
+    firstRender.current = false
+  }, [])
 
   const spinner = (
     <View display="block" textAlign="center">

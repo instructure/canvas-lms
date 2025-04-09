@@ -97,8 +97,8 @@ class Enrollment < ActiveRecord::Base
   scope :current_and_future, -> { joins(:course).where(QueryBuilder.new(:current_and_future).conditions).readonly(false) }
   scope :concluded, -> { joins(:course).where(QueryBuilder.new(:completed).conditions).readonly(false) }
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
-  scope :horizon, -> { joins(:course).where("courses.horizon_course = true") }
-  scope :not_horizon, -> { joins(:course).where("courses.horizon_course = false") }
+  scope :horizon, -> { joins(:course).where(courses: { horizon_course: true }) }
+  scope :not_horizon, -> { joins(:course).where(courses: { horizon_course: false }) }
 
   def ensure_role_id
     self.role_id ||= role.id
@@ -435,6 +435,16 @@ class Enrollment < ActiveRecord::Base
       # by leaving the section he/she is completely leaving the course so remove the
       # user from any group related to the course.
       membership = group.group_memberships.where(user_id:).first
+      membership&.destroy
+    end
+
+    user.differentiation_tags.preload(:group_category).where(
+      context_type: "Course", context_id: section.course_id
+    ).find_each do |tag|
+      # Only remove differentiation tag memberships if the enrollment is being deleted/rejected
+      next unless is_deleted
+
+      membership = tag.group_memberships.where(user_id:).first
       membership&.destroy
     end
   end

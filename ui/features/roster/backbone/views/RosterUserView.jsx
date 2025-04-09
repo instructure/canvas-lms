@@ -33,6 +33,7 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import RosterDialogMixin from './RosterDialogMixin'
 import UserTaggedModal from '@canvas/differentiation-tags/react/UserTaggedModal/UserTaggedModal'
 import MessageBus from '@canvas/util/MessageBus'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('RosterUserView')
 
@@ -78,6 +79,8 @@ export default class RosterUserView extends View {
     this.permissionsJSON(json)
     this.observerJSON(json)
     this.contextCardJSON(json)
+    // Set flag based on whether the user is selected in the collection
+    json.isSelected = this.model.collection?.selectedUserIds?.includes(this.model.id) ?? false
     return json
   }
 
@@ -91,6 +94,7 @@ export default class RosterUserView extends View {
   permissionsJSON(json) {
     json.url = `${ENV.COURSE_ROOT_URL}/users/${this.model.get('id')}`
     json.isObserver = this.model.hasEnrollmentType('ObserverEnrollment')
+    json.isStudent = this.model.hasEnrollmentType('StudentEnrollment')
     json.isPending = this.model.pending(this.model.currentRole)
     json.isInactive = this.model.inactive()
     if (!json.isInactive) {
@@ -305,6 +309,16 @@ export default class RosterUserView extends View {
       // TODO: change the count on the search roles drop down
       $.flashMessage(I18n.t('User successfully removed.'))
       const $previousRow = this.$el.prev(':visible')
+
+      try {
+        queryClient.invalidateQueries({
+          queryKey: ['differentiationTagCategories'],
+          exact: false,
+        })
+      } catch (error) {
+        console.error('Error invalidating query, error:', error)
+      }
+
       const $focusElement = $previousRow.length
         ? $previousRow.find('.al-trigger')
         : // For some reason, VO + Safari sends the virtual cursor to the window
@@ -335,23 +349,23 @@ export default class RosterUserView extends View {
     return this[method].call(this, e)
   }
 
-  // you can access the selected users through RosterUserView.selectedUsers
-  static selectedUsers = []
-
   handleCheckboxChange(e) {
     const isChecked = $(e.currentTarget).is(':checked')
     const userId = this.model.id
+    const selectedUserIds = this.model.collection.selectedUserIds
 
     if (isChecked) {
-      RosterUserView.selectedUsers.push(userId)
+      if (!selectedUserIds.includes(userId)) {
+        selectedUserIds.push(userId)
+      }
     } else {
-      RosterUserView.selectedUsers = RosterUserView.selectedUsers.filter(id => id !== userId)
+      this.model.collection.selectedUserIds = selectedUserIds.filter(id => id !== userId)
     }
 
     MessageBus.trigger('userSelectionChanged', {
       model: this.model,
       selected: isChecked,
-      selectedUsers: RosterUserView.selectedUsers,
+      selectedUsers: this.model.collection.selectedUserIds,
     })
   }
 

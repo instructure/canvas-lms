@@ -25,7 +25,7 @@ import useManagedCourseSearchApi, {
   isSearchableTerm,
   MINIMUM_SEARCH_LENGTH,
 } from '@canvas/direct-sharing/react/effects/useManagedCourseSearchApi'
-import SearchItemSelector from '@canvas/search-item-selector/react/SearchItemSelector'
+import SearchItemSelector from '../../../components/shared/SearchItemSelector'
 import useModuleCourseSearchApi from '@canvas/direct-sharing/react/effects/useModuleCourseSearchApi'
 import ModulePositionPicker from './ModulePositionPicker'
 import {type Module, type Course} from './DirectShareCourseTray'
@@ -34,9 +34,9 @@ const I18n = createI18nScope('files_v2')
 
 type DirectShareCoursePanelProps = {
   selectedCourseId?: string | null
-  onSelectCourse?: (course: Course) => void
+  onSelectCourse: (course: Course | null) => void
   selectedModuleId?: string | null
-  onSelectModule?: (module: Module) => void
+  onSelectModule: (module: Module | null) => void
   onSelectPosition?: (position: number | null) => void
 }
 
@@ -66,7 +66,7 @@ const DirectShareCoursePanel = forwardRef<
   const handleInputChanged = useCallback(() => setError(null), [])
 
   const handleSelectCourse = useCallback(
-    (course: Course) => {
+    (course: Course | null) => {
       onSelectCourse?.(course)
       setError(null)
     },
@@ -105,7 +105,7 @@ const DirectShareCoursePanel = forwardRef<
   return (
     <>
       <View as="div" margin="0 0 small 0">
-        <SearchItemSelector
+        <SearchItemSelector<Course>
           isRequired={true}
           messages={error ? [{text: error, type: 'newError'}] : []}
           inputRef={handleInputRef}
@@ -118,12 +118,13 @@ const DirectShareCoursePanel = forwardRef<
           minimumSearchLength={MINIMUM_SEARCH_LENGTH}
           isSearchableTerm={isSearchableTerm}
           renderOption={renderCourseOption}
+          fetchErrorMessage={I18n.t('Error retrieving courses')}
         />
       </View>
 
       {selectedCourseId && (
         <View as="div" margin="0 0 small 0">
-          <SearchItemSelector
+          <SearchItemSelector<Module>
             onItemSelected={onSelectModule}
             renderLabel={I18n.t('Select a Module (optional)')}
             // eslint-disable-next-line react-compiler/react-compiler
@@ -132,6 +133,7 @@ const DirectShareCoursePanel = forwardRef<
             minimumSearchLength={MINIMUM_SEARCH_LENGTH}
             isSearchableTerm={isSearchableTerm}
             additionalParams={{include: '', enforce_manage_grant_requirement: true, per_page: 50}}
+            fetchErrorMessage={I18n.t('Error retrieving modules')}
           />
         </View>
       )}

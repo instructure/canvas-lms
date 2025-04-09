@@ -20,8 +20,7 @@ import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {windowPathname} from '@canvas/util/globalUtils'
 
 const SEARCH_AND_ALL_QUERY_PARAMS =
-  'include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status'
-
+  'per_page=25&include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status'
 interface TableUrlParams {
   searchTerm: string
   contextType: string
@@ -32,23 +31,14 @@ interface TableUrlParams {
   pageQueryParam?: string
 }
 
-export const generateFolderByPathUrl = (path: string) => {
-  let contextType = filesEnv.contexts[0].contextType
-  let contextId = filesEnv.contexts[0].contextId
-  let uriEscapedPath = encodeURIComponent(path).replace(/%2F/g, '/')
-
-  if (filesEnv.showingAllContexts) {
-    const LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^/]*/
-    // users_1 or courses_102
-    const pluralAssetString = uriEscapedPath.split('/')[1]
-    const context = filesEnv.contextsDictionary[pluralAssetString] || filesEnv.contexts[0]
-    // this removes users_1 or course_102 from the path for the correct api call
-    uriEscapedPath = uriEscapedPath.replace(LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH, '')
-    contextType = context.contextType
-    contextId = context.contextId
+export const generateFolderByPathUrl = (pluralContextType: string, contextId: string, path?: string) => {
+  const baseUrl = `/api/v1/${pluralContextType}/${contextId}/folders/by_path`
+  if (!path) {
+    return baseUrl
   }
 
-  return `/api/v1/${contextType}/${contextId}/folders/by_path${uriEscapedPath}`
+  const encodedPath = encodeURIComponent(path).replace(/%2F/g, '/')
+  return `${baseUrl}/${encodedPath}`
 }
 
 export const generateFilesQuotaUrl = (singularContextType: string, contextId: string) => {
@@ -79,8 +69,8 @@ export const generateSearchNavigationUrl = (searchValue: string) => {
   const path = windowPathname()
   const pluralContext = path.split('/')[3]
   return filesEnv.showingAllContexts
-    ? `/folder/${pluralContext}/search?search_term=${searchValue}`
-    : `/search?search_term=${searchValue}`
+    ? `/folder/${pluralContext}?search_term=${searchValue}`
+    : `/?search_term=${searchValue}`
 }
 
 export const parseLinkHeader = (header: string | null) => {
@@ -97,7 +87,7 @@ export const parseLinkHeader = (header: string | null) => {
 }
 
 const generateSearchUrl = (singularContextType: string, contextId: string, searchTerm: string) => {
-  return `/api/v1/${singularContextType}s/${contextId}/files?search_term=${searchTerm}&per_page=50&${SEARCH_AND_ALL_QUERY_PARAMS}`
+  return `/api/v1/${singularContextType}s/${contextId}/files?search_term=${searchTerm}&${SEARCH_AND_ALL_QUERY_PARAMS}`
 }
 
 const generateFetchAllUrl = (folderId: string) => {

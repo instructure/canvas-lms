@@ -79,45 +79,47 @@ describe DiscussionTopic::MaterializedView do
     expect(view.reload.entry_ids_array).to match_array(@topic.discussion_entries.map(&:id))
   end
 
-  it "builds a materialized view of the structure, participants and entry ids" do
-    view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
-    view.update_materialized_view(synchronous: true)
-    structure, participant_ids, entry_ids = @topic.materialized_view
-    expect(view.materialized_view_json).to eq [structure, participant_ids, entry_ids, []]
-    expect(participant_ids.sort).to eq [@student.id, @teacher.id].sort
-    expect(entry_ids.sort).to eq @topic.discussion_entries.map(&:id).sort
-    json = JSON.parse(structure)
-    expect(json.size).to eq 2
-    expect(json.pluck("id")).to eq [@root1.id.to_s, @root2.id.to_s]
-    expect(json.pluck("parent_id")).to eq [nil, nil]
-    deleted = json[0]["replies"][0]
-    expect(deleted["deleted"]).to be true
-    expect(deleted["user_id"]).to be_nil
-    expect(deleted["message"]).to be_nil
-    expect(json[0]["replies"][1]["replies"][0]["attachment"]["url"]).to eq "https://placeholder.invalid/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
-    # verify the api_user_content functionality in a non-request context
-    html_message = json[0]["replies"][1]["message"]
-    html = Nokogiri::HTML5.fragment(html_message)
-    expect(html.at_css("a")["href"]).to eq "https://placeholder.invalid/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
-    expect(html.at_css("video")["src"]).to eq "https://placeholder.invalid/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
+  double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+    it "builds a materialized view of the structure, participants and entry ids" do
+      view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
+      view.update_materialized_view(synchronous: true)
+      structure, participant_ids, entry_ids = @topic.materialized_view
+      expect(view.materialized_view_json).to eq [structure, participant_ids, entry_ids, []]
+      expect(participant_ids.sort).to eq [@student.id, @teacher.id].sort
+      expect(entry_ids.sort).to eq @topic.discussion_entries.map(&:id).sort
+      json = JSON.parse(structure)
+      expect(json.size).to eq 2
+      expect(json.pluck("id")).to eq [@root1.id.to_s, @root2.id.to_s]
+      expect(json.pluck("parent_id")).to eq [nil, nil]
+      deleted = json[0]["replies"][0]
+      expect(deleted["deleted"]).to be true
+      expect(deleted["user_id"]).to be_nil
+      expect(deleted["message"]).to be_nil
+      expect(json[0]["replies"][1]["replies"][0]["attachment"]["url"]).to eq "https://placeholder.invalid/files/#{@attachment.id}/download?download_frd=1#{disable_adding_uuid_verifier_in_api ? "" : "&verifier=#{@attachment.uuid}"}"
+      # verify the api_user_content functionality in a non-request context
+      html_message = json[0]["replies"][1]["message"]
+      html = Nokogiri::HTML5.fragment(html_message)
+      expect(html.at_css("a")["href"]).to eq "https://placeholder.invalid/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
+      expect(html.at_css("video")["src"]).to eq "https://placeholder.invalid/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
 
-    # the deleted entry will be marked deleted and have no summary
-    simple_json = recursively_slice_with_replies(json, ["id"])
-    expect(simple_json).to eq [
-      {
-        "id" => @root1.id.to_s,
-        "replies" => [
-          { "id" => @reply1.id.to_s, "replies" => [{ "id" => @reply_reply2.id.to_s, "replies" => [] }], },
-          { "id" => @reply2.id.to_s, "replies" => [{ "id" => @reply_reply1.id.to_s, "replies" => [] }], },
-        ],
-      },
-      {
-        "id" => @root2.id.to_s,
-        "replies" => [
-          { "id" => @reply3.id.to_s, "replies" => [], },
-        ],
-      },
-    ]
+      # the deleted entry will be marked deleted and have no summary
+      simple_json = recursively_slice_with_replies(json, ["id"])
+      expect(simple_json).to eq [
+        {
+          "id" => @root1.id.to_s,
+          "replies" => [
+            { "id" => @reply1.id.to_s, "replies" => [{ "id" => @reply_reply2.id.to_s, "replies" => [] }], },
+            { "id" => @reply2.id.to_s, "replies" => [{ "id" => @reply_reply1.id.to_s, "replies" => [] }], },
+          ],
+        },
+        {
+          "id" => @root2.id.to_s,
+          "replies" => [
+            { "id" => @reply3.id.to_s, "replies" => [], },
+          ],
+        },
+      ]
+    end
   end
 
   it "works with media track tags" do

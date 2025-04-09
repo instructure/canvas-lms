@@ -25,12 +25,27 @@ describe Types::ModuleType do
     course_with_student(active_all: true)
     @course
   end
-  let_once(:mod) { course.context_modules.create! name: "module", unlock_at: 1.week.from_now }
+  let_once(:assignment) { assignment_model({ context: course }) }
+  let_once(:mod) { course.context_modules.create! name: "module1", unlock_at: 1.week.from_now, position: 1 }
+  let_once(:mod2) do
+    course.context_modules.create!(
+      name: "module2",
+      unlock_at: 2.weeks.from_now,
+      position: 2,
+      prerequisites: [{ id: mod.id, name: mod.name, type: "context_module" }]
+    )
+  end
+  let_once(:content_tag) { mod2.content_tags.create!(content: assignment, context: course) }
   let(:module_type) { GraphQLTypeTester.new(mod, current_user: @student) }
+  let(:module2_type) { GraphQLTypeTester.new(mod2, current_user: @student) }
 
   it "works" do
     expect(module_type.resolve("name")).to eq mod.name
     expect(module_type.resolve("unlockAt")).to eq mod.unlock_at.iso8601
+  end
+
+  it "has requirementCount" do
+    expect(module_type.resolve("requirementCount")).to eq mod.requirement_count
   end
 
   it "has module items" do
@@ -72,5 +87,24 @@ describe Types::ModuleType do
     mod.add_item({ type: "Assignment", id: a3.id }, nil, position: 3)
     mod.add_item({ type: "Assignment", id: a4.id }, nil, position: 4)
     expect(module_type.resolve("estimatedDuration")).to eq "PT2H30M"
+  end
+
+  it "returns published state" do
+    expect(module_type.resolve("published")).to be true
+  end
+
+  it "returns prerequisites" do
+    expect(module2_type.resolve("prerequisites { id }")).to eq [mod.id.to_s]
+    expect(module2_type.resolve("prerequisites { name }")).to eq [mod.name]
+    expect(module2_type.resolve("prerequisites { type }")).to eq ["context_module"]
+  end
+
+  it "returns completion requirements" do
+    mod2.completion_requirements = [{ id: content_tag.id, type: "must_submit" }]
+    mod2.save!
+    expect(module2_type.resolve("completionRequirements { id }")).to eq [content_tag.id.to_s]
+    expect(module2_type.resolve("completionRequirements { type }")).to eq ["must_submit"]
+    expect(module2_type.resolve("completionRequirements { minScore }")).to match [be_nil]
+    expect(module2_type.resolve("completionRequirements { minPercentage }")).to match [be_nil]
   end
 end

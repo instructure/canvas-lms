@@ -985,7 +985,7 @@
 
   <% if can_do(@context, @current_user, :read_as_admin) && !@context.elementary_homeroom_course? %>
     <div id="tab-tools">
-      <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
+      <%= render :partial => 'external_tools/external_tools' %>
     </div>
   <% end %>
 

@@ -18,7 +18,6 @@
 
 import * as contentInsertion from '../contentInsertion'
 import {audioFromTray, audioFromUpload, videoFromTray, videoFromUpload} from './contentHelpers'
-import RCEGlobals from '../RCEGlobals'
 
 describe('contentInsertion', () => {
   let editor, node
@@ -507,94 +506,6 @@ describe('contentInsertion', () => {
       }
     })
 
-    it('inserts video from upload into iframe', () => {
-      jest.spyOn(editor, 'insertContent')
-      const video = videoFromUpload()
-      const result = contentInsertion.insertVideo(editor, video, canvasOrigin)
-      expect(editor.execCommand).toHaveBeenCalledWith(
-        'mceInsertContent',
-        false,
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" loading="lazy" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
-        {skip_focus: true},
-      )
-      expect(result).toEqual('the inserted iframe')
-    })
-
-    it('inserts video from the course content tray', () => {
-      jest.spyOn(editor, 'insertContent')
-      const video = videoFromTray()
-      const result = contentInsertion.insertVideo(editor, video, canvasOrigin)
-      expect(editor.execCommand).toHaveBeenCalledWith(
-        'mceInsertContent',
-        false,
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" loading="lazy" src="/media_objects_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
-        {skip_focus: true},
-      )
-      expect(result).toEqual('the inserted iframe')
-    })
-
-    it('links video if user has made a selection', () => {
-      editor.selectionContent = 'link me'
-      const video = videoFromTray()
-      contentInsertion.insertVideo(editor, video, canvasOrigin)
-      expect(editor.execCommand).toHaveBeenCalledWith('mceInsertLink', false, {
-        class: 'instructure_file_link',
-        'data-canvas-previewable': undefined,
-        href: '/media_objects_iframe/17?type=video',
-        id: 17,
-        rel: 'noopener noreferrer',
-        target: '_blank',
-        title: 'filename.mov',
-      })
-    })
-  })
-
-  describe('insertAudio', () => {
-    beforeEach(() => {
-      // this is what's returned from editor.seletion.getEnd()
-      node = {
-        querySelector: () => 'the inserted iframe',
-      }
-    })
-
-    it('inserts audio from upload into iframe', () => {
-      const audio = audioFromUpload()
-      const result = contentInsertion.insertAudio(editor, audio, canvasOrigin)
-      expect(editor.execCommand).toHaveBeenCalledWith(
-        'mceInsertContent',
-        false,
-        '<iframe data-media-id="m-media-id" data-media-type="audio" loading="lazy" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
-        {skip_focus: true},
-      )
-      expect(result).toEqual('the inserted iframe')
-    })
-
-    it('inserts audio from the course content tray', () => {
-      const audio = audioFromTray()
-      const result = contentInsertion.insertAudio(editor, audio, canvasOrigin)
-      expect(editor.execCommand).toHaveBeenCalledWith(
-        'mceInsertContent',
-        false,
-        '<iframe data-media-id="29" data-media-type="audio" loading="lazy" src="/media_objects_iframe?mediahref=/url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
-        {skip_focus: true},
-      )
-      expect(result).toEqual('the inserted iframe')
-    })
-  })
-
-  describe('insertVideo with attachment', () => {
-    beforeEach(() => {
-      RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
-      // this is what's returned from editor.selection.getEnd()
-      node = {
-        querySelector: () => 'the inserted iframe',
-      }
-    })
-
-    afterAll(() => {
-      RCEGlobals.getFeatures.mockRestore()
-    })
-
     it('inserts video from the course content tray with attachmentId', () => {
       jest.spyOn(editor, 'insertContent')
       const video = videoFromTray()
@@ -621,17 +532,12 @@ describe('contentInsertion', () => {
       expect(result).toEqual('the inserted iframe')
     })
   })
-  describe('insertAudio with attachment', () => {
+  describe('insertAudio', () => {
     beforeEach(() => {
-      RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
       // this is what's returned from editor.selection.getEnd()
       node = {
         querySelector: () => 'the inserted iframe',
       }
-    })
-
-    afterAll(() => {
-      RCEGlobals.getFeatures.mockRestore()
     })
 
     it('inserts audio from upload into iframe with attachmentId', () => {

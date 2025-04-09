@@ -66,7 +66,9 @@ const ContentLayout = ({children}: Props) => {
           [styles['contentLayout__content--tablet']]: isTablet,
         })}
         background="primary"
+        borderRadius={isTablet ? 'small' : undefined}
         position="relative"
+        shadow={isTablet ? 'resting' : undefined}
         stacking="above"
       >
         {isDataLoading ? (

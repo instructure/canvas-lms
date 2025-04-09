@@ -30,6 +30,49 @@ module Interfaces::ModuleItemInterface
     end
   end
 
+  field :is_locked_by_master_course, Boolean, null: false
+  def is_locked_by_master_course
+    # First check if we're in a course context
+    course = @object.context if @object.respond_to?(:context)
+    return false unless course.is_a?(Course)
+
+    # Check if this is a master course or child course
+    is_master_course = MasterCourses::MasterTemplate.is_master_course?(course)
+    is_child_course = MasterCourses::ChildSubscription.is_child_course?(course)
+    return false unless is_master_course || is_child_course
+
+    # For master courses, find the master content tag directly
+    if is_master_course
+      master_template = MasterCourses::MasterTemplate.full_template_for(course)
+      return false unless master_template
+
+      # Find the content tag for this item
+      master_tag = master_template.content_tag_for(@object)
+      return false unless master_tag
+
+      return master_tag.restrictions.present? && master_tag.restrictions.values.any?
+    end
+
+    # For child courses, we need to find the child subscription and then the master content tag
+    if is_child_course
+      # Check if this item has a migration_id (which links it to the master course item)
+      return false unless @object.respond_to?(:migration_id) && @object.migration_id.present?
+
+      # Find the child subscription
+      child_subscription = MasterCourses::ChildSubscription.find_by(child_course_id: course.id)
+      return false unless child_subscription
+
+      # Get the master template and find the master content tag through the migration_id
+      master_template = child_subscription.master_template
+      master_tag = master_template.master_content_tags.find_by(migration_id: @object.migration_id)
+      return false unless master_tag
+
+      return master_tag.restrictions.present? && master_tag.restrictions.values.any?
+    end
+
+    false
+  end
+
   field :title, String, null: true
   delegate :title, to: :@object
 
@@ -47,31 +90,13 @@ module Interfaces::ModuleItemInterface
     description "Whether the module item is published"
   end
   def published
-    # Handle different content types
-    case object
-    when ContentTag
-      object.content.published?
-    when Assignment, DiscussionTopic, WikiPage, Quizzes::Quiz, Attachment
-      object.published?
-    else
-      # Default fallback
-      true
-    end
+    object.published?
   end
 
   field :can_unpublish, Boolean, null: true do
     description "Whether the module item can be unpublished"
   end
   def can_unpublish
-    # Handle different content types
-    case object
-    when ContentTag
-      object.content.can_unpublish?
-    when Assignment, DiscussionTopic, WikiPage, Quizzes::Quiz, Attachment
-      object.can_unpublish?
-    else
-      # Default fallback
-      true
-    end
+    object.respond_to?(:can_unpublish?) ? object.can_unpublish? : true
   end
 end

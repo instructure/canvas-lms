@@ -31,6 +31,12 @@ module PostgreSQLAdapterExtensions
     @max_update_limit = DEFAULT_MAX_UPDATE_LIMIT
   end
 
+  if Rails.version >= "7.2"
+    def get_database_version # rubocop:disable Naming/AccessorMethodName -- original method name in Rails
+      with_raw_connection(materialize_transactions: false, &:server_version)
+    end
+  end
+
   def configure_connection
     super
 
@@ -257,8 +263,9 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  def create_table(table_name, id: :primary_key, primary_key: nil, force: nil, if_not_exists: nil, **options)
-    super
+  def create_table(table_name, id: :primary_key, primary_key: nil, force: nil, if_not_exists: nil, **)
+    force_opts = force ? { force: } : { if_not_exists: }
+    super(table_name, id:, primary_key:, **force_opts, **)
 
     add_guard_excessive_updates(table_name, force: if_not_exists)
   end
@@ -268,7 +275,7 @@ module PostgreSQLAdapterExtensions
     # internal_metadata to exist and this guard isn't really useful there either
     return if [ActiveRecord::Base.internal_metadata_table_name, ActiveRecord::Base.schema_migrations_table_name].include?(table_name)
     # If the function doesn't exist yet it will be backfilled
-    return unless ::ActiveRecord::InternalMetadata.new(self)[:guard_dangerous_changes_installed]
+    return unless ::ActiveRecord::Base.internal_metadata[:guard_dangerous_changes_installed]
 
     ["UPDATE", "DELETE"].each do |operation|
       trigger_name = "guard_excessive_#{operation.downcase}s"

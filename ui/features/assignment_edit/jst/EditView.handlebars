@@ -145,8 +145,6 @@
       {{/if}}
     {{/if}}
 
-    <div id="activity_asset_processor_container"></div> 
-
     {{>ui/features/assignment_edit/jst/_submission_types_form.handlebars}}
 
     {{#if assignment_attempts}}
@@ -269,6 +267,8 @@
     </div>
   {{/if}}
 </div>
+
+<div id="asset_processors_container" style="margin-bottom: 14px"></div>
 
 {{#if conditionalReleaseServiceEnabled}}
 <div id="mastery-paths-editor" style="display: none">

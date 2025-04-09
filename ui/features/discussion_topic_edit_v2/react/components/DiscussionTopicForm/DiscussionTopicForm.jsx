@@ -960,27 +960,41 @@ function DiscussionTopicForm({
             messages={titleValidationMessages}
             autoFocus={true}
             width={inputWidth}
+            disabled={ENV?.DISCUSSION_CONTENT_LOCKED}
           />
           <View>
-            <span className="discussions-editor">
-              <CanvasRce
-                textareaId="discussion-topic-message-body"
-                onFocus={() => {}}
-                onBlur={() => {}}
-                onInit={() => {}}
-                ref={rceRef}
-                onContentChange={setRceContent}
-                editorOptions={{
-                  focus: false,
-                  plugins: [],
-                }}
-                height={300}
-                defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
-                autosave={false}
-                resourceType={isAnnouncement ? 'announcement.body' : 'discussion_topic.body'}
-                resourceId={currentDiscussionTopic?._id}
-              />
-            </span>
+              {!ENV?.DISCUSSION_CONTENT_LOCKED ? (
+                <span className="discussions-editor" data-testid="discussion-topic-message-editor">
+                  <CanvasRce
+                    textareaId="discussion-topic-message-body"
+                    onFocus={() => {}}
+                    onBlur={() => {}}
+                    onInit={() => {}}
+                    ref={rceRef}
+                    onContentChange={setRceContent}
+                    editorOptions={{
+                      focus: false,
+                      plugins: []
+                    }}
+                    height={300}
+                    defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
+                    autosave={false}
+                    resourceType={isAnnouncement ? 'announcement.body' : 'discussion_topic.body'}
+                    resourceId={currentDiscussionTopic?._id}
+                  />
+                </span>
+              ) : (
+                <View
+                  className="user_content discussion-post-content"
+                  data-testid="discussion-topic-message-locked"
+                >
+                  <Text
+                    dangerouslySetInnerHTML={{
+                      __html: currentDiscussionTopic?.message || ''
+                    }}
+                  />
+                </View>
+              )}
           </View>
           {ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH && (
             <AttachmentDisplay

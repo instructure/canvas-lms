@@ -202,7 +202,9 @@ module CC
         file_path = file.sub(@export_dir + "/", "")
         next if file_path.starts_with? ZIP_DIR
 
-        @zip_file.add(file_path, file)
+        unless @zip_file.find_entry(file_path)
+          @zip_file.add(file_path, file)
+        end
       end
     end
 

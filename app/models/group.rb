@@ -91,7 +91,7 @@ class Group < ActiveRecord::Base
   delegate :time_zone, to: :context
   delegate :usage_rights_required?, to: :context
   delegate :allow_student_anonymous_discussion_topics, to: :context
-  delegate :discussion_checkpoints_enabled?, to: :root_account
+  delegate :discussion_checkpoints_enabled?, to: :account
 
   include StickySisFields
   are_sis_sticky :name

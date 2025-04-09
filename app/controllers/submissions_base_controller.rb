@@ -308,6 +308,18 @@ class SubmissionsBaseController < ApplicationController
             end
 
       if url
+        # Filter out internal URLs here, which are redirects to the LTI/message controller
+        unless url.start_with?("/")
+          Lti::LogService.new(
+            context: @context,
+            launch_type: "direct_link",
+            launch_url: url,
+            session_id: session[:session_id],
+            tool: nil,
+            user: @current_user,
+            lti2: true
+          ).call
+        end
         redirect_to url
       else
         flash[:error] = t("errors.no_report", "Couldn't find a report for that submission item")

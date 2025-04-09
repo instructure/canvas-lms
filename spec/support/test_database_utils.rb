@@ -21,18 +21,18 @@ module TestDatabaseUtils
   class << self
     def check_migrations!
       if ENV["SKIP_MIGRATION_CHECK"] != "1"
-        migrations = ActiveRecord::Base.connection.migration_context.migrations
+        migrations = ActiveRecord::Base.migration_context.migrations
         skipped_migrations = ActiveRecord::Migrator.new(
           :up,
           migrations,
-          ActiveRecord::Base.connection.schema_migration,
-          ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
+          ActiveRecord::Base.schema_migration,
+          ActiveRecord::Base.internal_metadata
         ).skipped_migrations
 
         # total migration - all run migrations - all skipped migrations
         needs_migration =
           migrations.map(&:version) -
-          ActiveRecord::Base.connection.migration_context.get_all_versions -
+          ActiveRecord::Base.migration_context.get_all_versions -
           skipped_migrations.map(&:version)
 
         unless needs_migration.empty?

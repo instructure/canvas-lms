@@ -56,6 +56,21 @@ describe('Common file url utils', () => {
       expect(absoluteToRelativeUrl(undefined, canvasOrigin)).toEqual(undefined)
     })
 
+    it('returns original url if the protocol is mailto', () => {
+      const mailtoUrl = 'mailto:admin@instructure.com'
+      expect(absoluteToRelativeUrl(mailtoUrl, canvasOrigin)).toEqual(mailtoUrl)
+    })
+
+    it('returns original url if the protocol is tel', () => {
+      const telUrl = 'tel:555-555-5555'
+      expect(absoluteToRelativeUrl(telUrl, canvasOrigin)).toEqual(telUrl)
+    })
+
+    it('returns original url if the protocol is skype', () => {
+      const skypeUrl = 'skype:instructure'
+      expect(absoluteToRelativeUrl(skypeUrl, canvasOrigin)).toEqual(skypeUrl)
+    })
+
     it('handles URLs with special characters in query params', () => {
       const absoluteUrl = 'https://mycanvas.com:3000/path?param=hello%20world#hash'
       expect(absoluteToRelativeUrl(absoluteUrl, canvasOrigin)).toEqual(

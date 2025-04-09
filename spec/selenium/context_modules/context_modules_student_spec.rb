@@ -81,6 +81,12 @@ describe "context modules" do
       expect(context_modules[2].find_element(:css, ".prerequisites_message")).to include_text(@module_2.name)
     end
 
+    it "does not render modules page rewrite" do
+      user_session(@student)
+      get "/courses/#{@course.id}/modules"
+      expect(driver.execute_script("return document.querySelector('[data-testid=\"modules-rewrite-student-container\"]')")).to be_nil # rubocop:disable Specs/NoExecuteScript
+    end
+
     it "does not lock modules for observers" do
       @course.enroll_user(user_factory, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student.id)
       user_session(@user)
@@ -320,6 +326,36 @@ describe "context modules" do
       it "shows previous and next buttons for external urls", custom_timeout: 25 do
         get_page_with_footer("/courses/#{@course.id}/modules/items/#{@external_url_tag.id}")
         verify_next_and_previous_buttons_display
+      end
+    end
+
+    context "shows previous and next buttons buttons on the discussion page in student view", priority: "2" do
+      before do
+        user_session(@teacher)
+      end
+
+      before :once do
+        Account.site_admin.enable_feature!(:react_discussions_post)
+        Account.site_admin.enable_feature!(:discussion_create)
+      end
+
+      before :once do
+        @course = course_model.tap(&:offer!)
+        @discussion1 = @course.discussion_topics.create!(title: "Test Discussion 1", message: "Discussion Content 1")
+        @discussion2 = @course.discussion_topics.create!(title: "Test Discussion 2", message: "Discussion Content 2")
+        @discussion3 = @course.discussion_topics.create!(title: "Test Discussion 3", message: "Discussion Content 3")
+        @module = create_context_module("Test Module")
+        @module.add_item(id: @discussion1.id, type: "discussion_topic")
+        @module.add_item(id: @discussion2.id, type: "discussion_topic")
+        @module.add_item(id: @discussion3.id, type: "discussion_topic")
+        @module.save!
+      end
+
+      it "shows previous and next buttons for discussions" do
+        enter_student_view
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion2.id}"
+        expect(f(".module-sequence-footer-left")).to be_displayed
+        expect(f(".module-sequence-footer-right")).to be_displayed
       end
     end
 
@@ -740,7 +776,9 @@ describe "context modules" do
 
   context "discussion_checkpoints" do
     before :once do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      sub_account = Account.create!(name: "sub account", parent_account: Account.default)
+      @course.update!(account: sub_account)
+      @course.account.enable_feature!(:discussion_checkpoints)
       modules = create_modules(1, true)
 
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
@@ -862,6 +900,21 @@ describe "context modules" do
       checkpoints = ff("div[data-testid='checkpoint']")
       expect(checkpoints[0].text).to include("Reply to Topic\n#{datetime_string(reply_to_topic_new_due_date)}")
       expect(checkpoints[1].text).to include("Required Replies (#{@topic.reply_to_entry_required_count})\n#{datetime_string(reply_to_entry_new_due_date)}")
+    end
+  end
+
+  context "with modules page rewrite feature flag enabled" do
+    before do
+      @course.root_account.enable_feature!(:modules_page_rewrite)
+      module_1 = @course.context_modules.create!(name: "Module 1")
+      assignment_1 = @course.assignments.create!(name: "Assignment 1")
+      module_1.add_item({ id: assignment_1.id, type: "assignment" })
+    end
+
+    it "page renders" do
+      user_session(@student)
+      get "/courses/#{@course.id}/modules"
+      expect(f("[data-testid='modules-rewrite-student-container']")).to be_present
     end
   end
 end

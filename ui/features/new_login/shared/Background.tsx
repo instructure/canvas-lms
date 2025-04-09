@@ -31,7 +31,7 @@ const Background = ({className}: Props) => {
     () => ({
       backgroundColor: bodyBgColor || undefined,
       backgroundImage: bodyBgImage ? `url(${bodyBgImage})` : undefined,
-      backgroundPosition: 'left center',
+      backgroundAttachment: 'fixed',
       backgroundRepeat: 'no-repeat',
       backgroundSize: 'cover',
     }),

@@ -17,33 +17,34 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act, screen} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {render, cleanup, screen, waitFor} from '@testing-library/react'
 import DirectShareUserTray from '../DirectShareUserTray'
-import {enableFetchMocks} from 'jest-fetch-mock'
 import useContentShareUserSearchApi from '@canvas/direct-sharing/react/effects/useContentShareUserSearchApi'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import userEvent from '@testing-library/user-event'
 import {FAKE_FILES} from '../../../../../fixtures/fakeData'
 
-enableFetchMocks()
-
 jest.mock('@canvas/direct-sharing/react/effects/useContentShareUserSearchApi')
+jest.mock('@canvas/do-fetch-api-effect')
 
-const flushAllTimersAndPromises = async () => {
-  while (jest.getTimerCount() > 0) {
-    await act(async () => {
-      jest.runAllTimers()
-    })
-  }
+const userA = {
+  id: '1',
+  name: 'Jack Dawson',
+  short_name: 'Jack',
+  sortable_name: 'Dawson, Jack',
+  avatar_url: '',
+  email: '',
+  created_at: '',
 }
 
-async function selectUser(name = 'abc') {
-  fireEvent.change(await screen.findByLabelText(/select at least one person/i), {
-    target: {value: name},
-  })
-  await act(async () => {
-    jest.runAllTimers()
-  }) // let the debounce happen
-  await fireEvent.click(screen.getByText(name))
+const userB = {
+  id: '2',
+  name: 'Rose DeWitt Bukater',
+  short_name: 'Rose',
+  sortable_name: 'DeWitt Bukater, Rose',
+  avatar_url: '',
+  email: '',
+  created_at: '',
 }
 
 const defaultProps = {
@@ -71,69 +72,91 @@ describe('DirectShareUserTray', () => {
   afterAll(() => {
     // @ts-expect-error
     delete window.ENV
-    if (ariaLive) ariaLive.remove()
+    if (ariaLive) document.body.removeChild(ariaLive)
   })
 
   beforeEach(() => {
-    jest.useFakeTimers()
     ;(useContentShareUserSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
-      success([
-        {id: 'abc', name: 'abc'},
-        {id: 'cde', name: 'cde'},
-      ])
+      success([userA, userB])
     })
+    ;(doFetchApi as jest.Mock).mockResolvedValue({})
   })
 
   afterEach(async () => {
-    await flushAllTimersAndPromises()
-    fetchMock.restore()
+    jest.clearAllMocks()
+    jest.resetAllMocks()
+    cleanup()
   })
 
   it('renders', () => {
     renderComponent()
     expect(screen.getByText(/send to.../i)).toBeInTheDocument()
     expect(screen.getByText(/select at least one person/i)).toBeInTheDocument()
-    expect(screen.getByText(/cancel/i)).toBeInTheDocument()
-    expect(screen.getByText('Send')).toBeInTheDocument()
+    expect(screen.getByTestId('direct-share-user-cancel')).toBeInTheDocument()
+    expect(screen.getByTestId('direct-share-user-send')).toBeInTheDocument()
   })
 
   it('shows an error message after trying to submit with an blank selector', async () => {
     renderComponent()
-    fireEvent.click(screen.getByText('Send'))
+    await userEvent.click(screen.getByTestId('direct-share-user-send'))
     expect(screen.getByText(/at least one person should be selected/i)).toBeInTheDocument()
   })
 
   describe('shows an alert message', () => {
     it('when fetch is made successfully', async () => {
-      fetchMock.postOnce('path:/api/v1/users/self/content_shares', 200)
       renderComponent()
-      await selectUser()
-      fireEvent.click(screen.getByText('Send'))
-      const mockCall = fetchMock.lastCall()
-      const fetchOptions = mockCall?.[1] || {}
-      expect(fetchOptions.method).toBe('POST')
-      expect(JSON.parse(fetchOptions.body?.toString() || '')).toMatchObject({
-        receiver_ids: ['abc'],
-        content_type: 'attachment',
-        content_id: '178',
+
+      const input = await screen.findByLabelText(/select at least one person/i)
+      await userEvent.click(input)
+      await userEvent.type(input, userA.name)
+      await waitFor(() => {
+        expect(screen.queryByText(userA.name)).toBeInTheDocument()
       })
-      await act(() => {
-        fetchMock.flush(true)
+      await userEvent.click(screen.getByText(userA.name))
+      await userEvent.click(screen.getByTestId('direct-share-user-send'))
+
+      expect(doFetchApi as jest.Mock).toHaveBeenCalledWith({
+        method: 'POST',
+        path: '/api/v1/users/self/content_shares',
+        body: {
+          receiver_ids: ['1'],
+          content_type: 'attachment',
+          content_id: '178',
+        },
       })
-      expect(screen.getAllByText(/success/i)).toHaveLength(2) // visible and sr alert
+
+      expect(await screen.getAllByText(/start/i)[0]).toBeInTheDocument()
+      expect(await screen.getAllByText(/success/i)[0]).toBeInTheDocument()
       expect(defaultProps.onDismiss).toHaveBeenCalled()
     })
 
     it('when fetch fails', async () => {
-      fetchMock.postOnce('path:/api/v1/users/self/content_shares', 400)
-      const {getByText, getAllByText} = renderComponent()
-      await selectUser()
-      fireEvent.click(getByText('Send'))
-      await act(() => {
-        fetchMock.flush(true)
+      ;(doFetchApi as jest.Mock).mockRejectedValueOnce(() => ({}))
+
+      renderComponent()
+
+      const input = await screen.findByLabelText(/select at least one person/i)
+      await userEvent.click(input)
+      await userEvent.type(input, userA.name)
+      await waitFor(() => {
+        expect(screen.queryByText(userA.name)).toBeInTheDocument()
       })
-      expect(getAllByText(/error/i)).toHaveLength(2) // visible and sr alert
-      expect(defaultProps.onDismiss).toHaveBeenCalled()
+      await userEvent.click(screen.getByText(userA.name))
+      await userEvent.click(screen.getByTestId('direct-share-user-send'))
+
+      expect(doFetchApi as jest.Mock).toHaveBeenCalledWith({
+        method: 'POST',
+        path: '/api/v1/users/self/content_shares',
+        body: {
+          receiver_ids: ['1'],
+          content_type: 'attachment',
+          content_id: '178',
+        },
+      })
+
+      expect(await screen.getAllByText(/start/i)[0]).toBeInTheDocument()
+      expect(await screen.getAllByText(/error/i)[0]).toBeInTheDocument()
+      expect(defaultProps.onDismiss).not.toHaveBeenCalled()
     })
   })
 })

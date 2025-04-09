@@ -17,7 +17,7 @@
  */
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {createRef} from 'react'
 
 import {Heading} from '@instructure/ui-heading'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -31,12 +31,21 @@ import ManualConfigurationForm from './ManualConfigurationForm/index'
 
 const I18n = createI18nScope('react_developer_keys')
 
-const validationMessageInvalidJson = [
-  {text: I18n.t('Json is not valid. Please submit properly formatted json.'), type: 'error'},
-]
-const validationMessageRequiredField = [{text: I18n.t('Field cannot be blank.'), type: 'error'}]
+const validationMessage = {
+  text: [{text: I18n.t('Field cannot be blank.'), type: 'error'}],
+  url: [{text: I18n.t('Please enter a valid URL (e.g. https://example.com)'), type: 'error'}],
+  json: [
+    {text: I18n.t('Json is not valid. Please submit properly formatted json.'), type: 'error'},
+  ],
+}
 
 export default class ToolConfigurationForm extends React.Component {
+  state = {
+    isUrlValid: true,
+    jsonUrl: this.props.toolConfigurationUrl || '',
+    showMessages: false,
+  }
+
   get toolConfiguration() {
     if (this.props.invalidJson !== null && this.props.invalidJson !== undefined) {
       return this.props.invalidJson
@@ -52,12 +61,37 @@ export default class ToolConfigurationForm extends React.Component {
     return this.manualConfigRef.generateToolConfiguration()
   }
 
+  jsonRef = createRef()
+  urlRef = createRef()
+
+  validateUrlField = (fieldValue, fieldStateKey, fieldRef) => {
+    if (!fieldValue || (fieldValue && !URL.canParse(fieldValue))) {
+      this.setState({[fieldStateKey]: false})
+      if (this.isValid) {
+        fieldRef.current.focus()
+        this.isValid = false
+      }
+    } else {
+      this.setState({[fieldStateKey]: true})
+    }
+  }
+
   valid = () => {
+    this.isValid = true
+
     if (this.isManual()) {
       return this.manualConfigRef.valid()
     } else if (this.isJson()) {
-      return !this.props.invalidJson
+      if (this.props.invalidJson || this.toolConfiguration === '{}') {
+        this.jsonRef.current.focus()
+        this.isValid = false
+        this.setState({showMessages: true})
+      }
+    } else if (this.isUrl()) {
+      this.validateUrlField(this.state.jsonUrl, 'isUrlValid', this.urlRef)
     }
+
+    return this.isValid
   }
 
   isManual = () => {
@@ -68,12 +102,32 @@ export default class ToolConfigurationForm extends React.Component {
     return this.props.configurationMethod === 'json'
   }
 
+  isUrl = () => {
+    return this.props.configurationMethod === 'url'
+  }
+
   updatePastedJson = e => {
     this.props.updatePastedJson(e.target.value, e.target.selectionEnd === e.target.value.length)
   }
 
-  updateToolConfigurationUrl = e => {
-    this.props.updateToolConfigurationUrl(e.target.value)
+  handleJsonChange = e => {
+    try {
+      JSON.parse(e.target.value)
+      this.setState({showMessages: false})
+      this.updatePastedJson(e)
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        this.setState({showMessages: true})
+        this.updatePastedJson(e)
+      }
+    }
+  }
+
+  handleToolConfigUrlChange = e => {
+    const value = e.target.value
+    this.setState({jsonUrl: value})
+    this.validateUrlField(value, 'isUrlValid', this.urlRef)
+    this.props.updateToolConfigurationUrl(value)
   }
 
   handleConfigTypeChange = (e, option) => {
@@ -92,14 +146,14 @@ export default class ToolConfigurationForm extends React.Component {
           <TextArea
             name="tool_configuration"
             value={this.toolConfiguration}
-            onChange={this.updatePastedJson}
+            onChange={this.handleJsonChange}
             label={I18n.t('LTI 1.3 Configuration')}
+            textareaRef={ref => {
+              this.jsonRef.current = ref
+            }}
             maxHeight="20rem"
-            messages={
-              this.props.showRequiredMessages && this.props.invalidJson
-                ? validationMessageInvalidJson
-                : []
-            }
+            required={this.props.configurationMethod === 'json'}
+            messages={this.state.showMessages ? validationMessage.json : []}
           />
         </Grid.Col>
       </Grid.Row>
@@ -119,10 +173,16 @@ export default class ToolConfigurationForm extends React.Component {
   urlConfigurationInput = () => (
     <TextInput
       name="tool_configuration_url"
-      value={this.props.toolConfigurationUrl || ''}
-      onChange={this.updateToolConfigurationUrl}
+      value={this.state.jsonUrl}
+      isRequired={this.props.configurationMethod === 'url'}
+      inputRef={ref => {
+        this.urlRef.current = ref
+      }}
+      onChange={this.handleToolConfigUrlChange}
       renderLabel={I18n.t('JSON URL')}
-      messages={this.props.showRequiredMessages ? validationMessageRequiredField : []}
+      messages={
+        this.props.showRequiredMessages && !this.state.isUrlValid ? validationMessage.url : []
+      }
     />
   )
 

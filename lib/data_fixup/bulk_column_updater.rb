@@ -32,13 +32,17 @@
 # Where example is a TSV file with two columns: `id` and a value for the
 # `unified_tool_id` column for that row
 #
-# DBAs recommend much less than 1,000,000 rows per update! call. Recommended to
-# stay well under this limit (note that you will get a warning above 1000 rows,
-# but we should be able to handle way more than that)
-#
+# This is chunked in two ways:
+# 1. The rows are written to a temporary table in chunks of INSERT_CHUNK_SIZE
+# 2. The temporary table is flushed to the real table in chunks of
+#    TRANSACTION_CHUNK_SIZE
+# All values are written into a buffer, then chunked to be fed into the DB
 module DataFixup
   class BulkColumnUpdater
-    attr_reader :model_class, :allow_nils, :allow_empty_strings
+    TRANSACTION_CHUNK_SIZE = 10_000
+    INSERT_CHUNK_SIZE = 1_000
+
+    attr_reader :model_class, :allow_nils, :allow_empty_strings, :column_name
 
     def initialize(model_class, column_name, log_filename: nil, allow_nils: false, allow_empty_strings: false)
       raise ArgumentError, "model_class not a class" unless model_class.is_a?(Class)
@@ -54,19 +58,19 @@ module DataFixup
       @allow_empty_strings = allow_empty_strings
     end
 
-    # @param blk -- unary function. The argument passed to blk is a function.
-    # Call that function with an array of [id, value] tuples (to update multiple rows)
+    # @param blk -- unary function, for backwards-compatibility with scripts.
+    #   The argument passed to blk is a function. Call that function with an
+    #   array of [id, value] tuples (to update multiple rows)
     # Example:
     #   DataFixup::BulkColumnUpdater.new(User, :name).update! do |fn|
     #     fn.call [[1, "Alice"], [2, "Bob"]]
     #   end
     # @return [Integer] number of rows updated
     def update!(&)
-      @temp_table_name = generate_temp_table_name
       @logger = Logger.new(@log_filename) if @log_filename
-      create_temp_table!
-      yield method(:write_to_temp_table!)
-      flush_temp_table!
+      @rows_buffer = []
+      yield method(:add_to_rows_buffer!)
+      flush_rows_buffer!
     rescue => e
       if @logger
         log "ERROR: #{e.inspect}"
@@ -75,18 +79,8 @@ module DataFixup
         raise
       end
     ensure
-      @temp_table_name = nil
-      force_close_session_to_delete_temp_table!
       @logger&.close
       @logger = nil
-    end
-
-    def force_close_session_to_delete_temp_table!
-      model_class.connection.disconnect!
-
-      log "Disconnected from DB"
-    rescue => e
-      log "ERROR reconnecting: #{e.inspect}"
     end
 
     def log(line)
@@ -128,29 +122,29 @@ module DataFixup
       end
     end
 
-    def generate_temp_table_name
-      model_class.table_name[0..50] + "_#{SecureRandom.base36(10)}"
-    end
-
-    def quoted_temp_table_name
-      # quote_table_name adds schema, which we don't want
-      model_class.connection.quote_column_name(
-        @temp_table_name || raise(ArgumentError)
-      )
-    end
-
     def quoted_column_name
-      model_class.connection.quote_column_name(@column_name)
+      model_class.connection.quote_column_name(column_name)
     end
 
     def create_temp_table!
-      model_class.connection.execute(<<~SQL.squish)
-        CREATE TEMP TABLE #{quoted_temp_table_name} (
-          id #{model_class.columns_hash["id"].sql_type} PRIMARY KEY,
-          #{quoted_column_name} #{model_class.columns_hash[@column_name].sql_type}
-        )
-      SQL
-      log "Created temp table #{quoted_temp_table_name}"
+      if @temp_table_name
+        raise ArgumentError, "Flush old temp table before creating new"
+      end
+
+      @temp_table_name = model_class.table_name[0..50] + "_#{SecureRandom.base36(10)}"
+      # quote_table_name adds schema, which we don't want
+      @quoted_temp_table_name = '"pg_temp".' + model_class.connection.quote_column_name(@temp_table_name)
+
+      model_class.connection.create_table(
+        "pg_temp.#{@temp_table_name}",
+        temporary: true,
+        id: model_class.columns_hash["id"].sql_type,
+        options: "ON COMMIT DROP"
+      ) do |t|
+        t.column column_name, model_class.columns_hash[column_name].sql_type
+      end
+
+      log "Created temp table #{@temp_table_name}"
     end
 
     def quote(*)
@@ -179,8 +173,29 @@ module DataFixup
       end
     end
 
-    def write_to_temp_table!(rows)
+    def add_to_rows_buffer!(rows)
       validate_rows!(rows)
+      @rows_buffer.concat(rows)
+    end
+
+    def flush_rows_buffer!
+      n_written = 0
+
+      @rows_buffer.each_slice(TRANSACTION_CHUNK_SIZE) do |transaction_chunk|
+        model_class.transaction do
+          create_temp_table!
+          transaction_chunk.each_slice(INSERT_CHUNK_SIZE) do |insert_chunk|
+            write_to_temp_table!(insert_chunk)
+          end
+          n_written += flush_temp_table!
+        end
+      end
+
+      n_written
+    end
+
+    def write_to_temp_table!(rows)
+      raise ArgumentError unless @quoted_temp_table_name
 
       sql_values = rows.map do |row|
         id, value = row
@@ -188,24 +203,33 @@ module DataFixup
       end
 
       model_class.connection.execute(<<~SQL.squish)
-        INSERT INTO #{quoted_temp_table_name} (id, #{quoted_column_name})
+        INSERT INTO #{@quoted_temp_table_name} (id, #{quoted_column_name})
         VALUES #{sql_values.join(",")}
       SQL
-      log "Wrote #{rows.length} rows to temp table #{quoted_temp_table_name}"
+
+      log "Wrote #{rows.length} rows to temp table #{@quoted_temp_table_name}"
     end
 
     def flush_temp_table!
+      raise ArgumentError unless @quoted_temp_table_name
+
       # take values we stored in the temp table and write them into the real
       # table
       result = model_class.connection.execute(<<~SQL.squish)
         UPDATE #{model_class.quoted_table_name} AS t
         SET #{quoted_column_name} = tt.#{quoted_column_name}
-        FROM #{quoted_temp_table_name} AS tt
+        FROM #{@quoted_temp_table_name} AS tt
         WHERE t.id = tt.id
       SQL
-      log "Flush #{quoted_temp_table_name} to #{model_class.quoted_table_name} complete: #{result.cmd_tuples} rows updated"
+      log "Flush #{@quoted_temp_table_name} to #{model_class.quoted_table_name} complete: #{result.cmd_tuples} rows updated"
 
       result.cmd_tuples
+    rescue
+      log "ERROR! Flush to #{@quoted_temp_table_name} FAILED, abandoning temp table, these rows will be lost!"
+      raise
+    ensure
+      @temp_table_name = nil
+      @quoted_temp_table_name = nil
     end
   end
 end

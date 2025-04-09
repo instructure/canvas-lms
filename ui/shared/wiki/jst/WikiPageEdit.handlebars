@@ -25,8 +25,8 @@
   {{/if}}
 
   {{#if CAN.EDIT_ROLES}}
-    <div class="responsive-control-group options">
-      <label class="control-label"><strong>{{#t "options_label"}}Options{{/t}}</strong></label>
+    <fieldset class="responsive-control-group options">
+      <legend class="control-label control-legend"><strong>{{#t "options_label"}}Options{{/t}}</strong></legend>
       <div class="controls">
         {{#if CAN.SELECT_ROLES}}
           <label id="editing_roles_label"  for="editing_roles">{{t "Users allowed to edit this page"}}</label>
@@ -64,14 +64,14 @@
           {{/if}}
         {{/if}}
       </div>
-    </div>
+    </fieldset>
     {{#if show_assign_to}}
-    <div class="responsive-control-group options">
-      <label class="control-label"><strong>{{#t "assign_to_label"}}Assign Access{{/t}}</strong></label>
+    <fieldset class="responsive-control-group options">
+      <legend class="control-label control-legend"><strong>{{#t "assign_to_label"}}Assign Access{{/t}}</strong></legend>
       <div class="controls">
         <div id="assign-to-mount-point-edit-page"></div>
       </div>
-    </div>
+    </fieldset>
 
       {{#if course_pace_with_mastery_paths}}
       <div class="responsive-control-group options">

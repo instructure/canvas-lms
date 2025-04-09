@@ -178,7 +178,7 @@ class ContextModuleProgression < ActiveRecord::Base
       # instead return vis for student enrollment only -> hence ignore_observer_logic below
 
       # create the hash inside the loop in case the completion_requirements is empty (performance)
-      tags_hash ||= context_module.content_tags_visible_to(user, is_teacher: false, ignore_observer_logic: true).index_by(&:id)
+      tags_hash ||= context_module.content_tags_for(user, is_teacher: false, ignore_observer_logic: true).index_by(&:id)
 
       tag = tags_hash[req[:id]]
       next unless tag

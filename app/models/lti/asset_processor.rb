@@ -46,13 +46,16 @@ class Lti::AssetProcessor < ApplicationRecord
     report.is_a?(Hash) ? report["supportedTypes"] : nil
   end
 
-  def self.build_for_assignment(content_item)
-    context_external_tool = ContextExternalTool.find_by(id: content_item["context_external_tool_id"])
+  # Should match up with UI's AssetProcessorContentItemDto
+  def self.build_for_assignment(content_item:, context:)
+    tool_base_scope = ContextExternalTool.where(id: content_item["context_external_tool_id"].to_i)
+    # Check tool is in the course or account:
+    tool = Lti::ContextToolFinder.all_tools_scope_union(context, base_scope: tool_base_scope).take
 
-    return nil unless context_external_tool
+    return nil unless tool
 
     new(
-      context_external_tool: context_external_tool,
+      context_external_tool: tool,
       url: content_item["url"],
       title: content_item["title"],
       text: content_item["text"],
@@ -62,5 +65,22 @@ class Lti::AssetProcessor < ApplicationRecord
       iframe: content_item["iframe"],
       report: content_item["report"]
     )
+  end
+
+  PROCESSORS_INFO_FOR_ASSIGNMENT_EDIT_PAGE_FIELDS = {
+    id: "lti_asset_processors.id",
+    title: "lti_asset_processors.title",
+    text: "lti_asset_processors.text",
+    icon: "lti_asset_processors.icon",
+    context_external_tool_name: "context_external_tools.name",
+    context_external_tool_id: "context_external_tools.id",
+  }.freeze
+
+  # should match with ExistingAttachedAssetProcessor in UI
+  def self.processors_info_for_assignment_edit_page(assignment_id:)
+    scope = active.where(assignment_id:).joins(:context_external_tool)
+    scope.pluck(PROCESSORS_INFO_FOR_ASSIGNMENT_EDIT_PAGE_FIELDS.values).map do |row|
+      PROCESSORS_INFO_FOR_ASSIGNMENT_EDIT_PAGE_FIELDS.keys.zip(row).to_h.compact
+    end
   end
 end

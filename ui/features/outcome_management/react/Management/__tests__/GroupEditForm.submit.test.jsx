@@ -58,10 +58,10 @@ describe('GroupEditForm - Submit', () => {
     }
     const {getByLabelText, getByText} = render(<GroupEditForm {...defaultProps({initialValues})} />)
     await act(async () => jest.runAllTimers())
-    
-    focusChange(getByLabelText('Group Name'), 'New group name')
+
+    focusChange(getByLabelText('Group Name *'), 'New group name')
     await act(async () => jest.runAllTimers())
-    
+
     fireEvent.click(getByText('Save'))
     await act(async () => jest.runAllTimers())
 
@@ -75,44 +75,22 @@ describe('GroupEditForm - Submit', () => {
     )
   })
 
-  it('disables submission if form is invalid', async () => {
+  it('does not save if form is invalid', async () => {
     const {getByLabelText, getByText} = render(<GroupEditForm {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
-
-    focusChange(getByLabelText('Group Name'), 'a'.repeat(256))
+    const groupTitle = getByLabelText('Group Name *')
+    fireEvent.change(groupTitle, {target: {value: 'a'.repeat(256)}})
     await act(async () => jest.runAllTimers())
-
-    expect(getByText('Save').closest('button')).toBeDisabled()
-  })
-
-  it('only enable submission if form is edited', async () => {
-    const initialValues = {
-      title: 'The Group Name',
-      description: 'The Group Description',
-    }
-    const {getByLabelText, getByText} = render(<GroupEditForm {...defaultProps({initialValues})} />)
+    expect(groupTitle.value).toBe('a'.repeat(256))
+    getByText('Save').closest('button').click()
     await act(async () => jest.runAllTimers())
-
-    expect(getByText('Save').closest('button')).toBeDisabled()
-
-    focusChange(getByLabelText('Group Name'), 'New Group Name')
+    expect(onSubmit).not.toHaveBeenCalled()
+    fireEvent.change(groupTitle, {target: {value: 'a'.repeat(255)}})
     await act(async () => jest.runAllTimers())
-
-    expect(getByText('Save').closest('button')).toBeEnabled()
-
-    focusChange(getByLabelText('Group Name'), initialValues.title)
+    expect(groupTitle.value).toBe('a'.repeat(255))
+    getByText('Save').closest('button').click()
     await act(async () => jest.runAllTimers())
+    expect(onSubmit).toHaveBeenCalled()
 
-    expect(getByText('Save').closest('button')).toBeDisabled()
-  })
-
-  it('enables submission if form is valid', async () => {
-    const {getByLabelText, getByText} = render(<GroupEditForm {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
-
-    focusChange(getByLabelText('Group Name'), 'Group Name value')
-    await act(async () => jest.runAllTimers())
-
-    expect(getByText('Save').closest('button')).toBeEnabled()
   })
 })

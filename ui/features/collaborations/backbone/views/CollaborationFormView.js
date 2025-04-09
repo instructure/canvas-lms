@@ -17,29 +17,13 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@canvas/backbone'
 import CollaboratorPickerView from './CollaboratorPickerView'
-
-const I18n = createI18nScope('collaborations')
 
 extend(CollaborationFormView, View)
 
 function CollaborationFormView() {
   return CollaborationFormView.__super__.constructor.apply(this, arguments)
-}
-
-CollaborationFormView.prototype.translations = {
-  errors: {
-    noName: I18n.t('errors.no_name', 'Please enter a name for this collaboration.'),
-    titleTooLong: I18n.t(
-      'errors.title_too_long',
-      'Please use %{maxLength} characters or less for the name. Use the description for additional content.',
-      {
-        maxLength: ENV.TITLE_MAX_LEN,
-      },
-    ),
-  },
 }
 
 CollaborationFormView.prototype.events = {
@@ -54,7 +38,6 @@ CollaborationFormView.prototype.initialize = function () {
   this.picker = new CollaboratorPickerView({
     el: this.$collaborators,
   })
-  return (this.titleMaxLength = ENV.TITLE_MAX_LEN)
 }
 
 CollaborationFormView.prototype.cacheElements = function () {
@@ -77,20 +60,7 @@ CollaborationFormView.prototype.render = function (focus) {
 }
 
 CollaborationFormView.prototype.onSubmit = function (e) {
-  const data = this.$el.getFormData()
-  if (!data['collaboration[title]']) {
-    e.preventDefault()
-    e.stopPropagation()
-    return this.raiseTitleError()
-  }
-  if (this.titleMaxLength && data['collaboration[title]'].length > this.titleMaxLength) {
-    e.preventDefault()
-    e.stopPropagation()
-    return this.raiseTitleLengthError()
-  }
-  return setTimeout(function () {
-    return (window.location = window.location.pathname)
-  }, 2500)
+  this.trigger('validate', e, this.$el)
 }
 
 CollaborationFormView.prototype.onCancel = function (e) {
@@ -103,16 +73,6 @@ CollaborationFormView.prototype.onKeydown = function (e) {
   if (e.which === 27) {
     return this.onCancel(e)
   }
-}
-
-CollaborationFormView.prototype.raiseTitleError = function () {
-  this.trigger('error', this.$titleInput, this.translations.errors.noName)
-  return false
-}
-
-CollaborationFormView.prototype.raiseTitleLengthError = function () {
-  this.trigger('error', this.$titleInput, this.translations.errors.titleTooLong)
-  return false
 }
 
 export default CollaborationFormView

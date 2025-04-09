@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
-import React from 'react'
-import {ReCaptchaSection} from '../index'
+import {act, render, screen, waitFor} from '@testing-library/react'
+import React, {createRef} from 'react'
+import {ReCaptchaSection, type ReCaptchaSectionRef} from '../index'
 
 beforeAll(() => {
   window.grecaptcha = {
     ready: jest.fn(callback => callback()),
     render: jest.fn(() => 1),
+    reset: jest.fn(),
   }
 })
 
@@ -41,5 +42,73 @@ describe('ReCaptchaSection', () => {
     expect(container).toBeInTheDocument()
     expect(window.grecaptcha.ready).toHaveBeenCalled()
     expect(window.grecaptcha.render).toHaveBeenCalled()
+  })
+
+  it('validates reCAPTCHA and triggers error state if missing', () => {
+    const props = {
+      onVerify: jest.fn(),
+      recaptchaKey: 'test-site-key',
+    }
+    const ref = createRef<ReCaptchaSectionRef>()
+    render(<ReCaptchaSection ref={ref} {...props} />)
+    act(() => {
+      expect(ref.current?.validate()).toBe(false)
+    })
+    expect(screen.getByText(/please complete the verification/i)).toBeInTheDocument()
+  })
+
+  it('resets reCAPTCHA and clears error state', () => {
+    const props = {
+      onVerify: jest.fn(),
+      recaptchaKey: 'test-site-key',
+    }
+    const ref = createRef<ReCaptchaSectionRef>()
+    render(<ReCaptchaSection ref={ref} {...props} />)
+    act(() => {
+      ref.current?.validate()
+    })
+    expect(screen.getByText(/please complete the verification/i)).toBeInTheDocument()
+    act(() => {
+      ref.current?.reset()
+    })
+    expect(screen.queryByText(/please complete the verification/i)).not.toBeInTheDocument()
+    expect(window.grecaptcha.reset).toHaveBeenCalled()
+  })
+
+  it('sets error when an invalid token is received', async () => {
+    const props = {
+      onVerify: jest.fn(),
+      recaptchaKey: 'test-site-key',
+    }
+    const ref = createRef<ReCaptchaSectionRef>()
+    render(<ReCaptchaSection ref={ref} {...props} />)
+    expect(screen.queryByText('Please complete the verification.')).not.toBeInTheDocument()
+    act(() => {
+      ref.current?.validate()
+    })
+    await waitFor(() => {
+      expect(screen.getByText('Please complete the verification.')).toBeInTheDocument()
+    })
+  })
+
+  it('removes error when a valid token is received', async () => {
+    const props = {
+      onVerify: jest.fn(),
+      recaptchaKey: 'test-site-key',
+    }
+    const ref = createRef<ReCaptchaSectionRef>()
+    render(<ReCaptchaSection ref={ref} {...props} />)
+    act(() => {
+      ref.current?.validate()
+    })
+    await waitFor(() => {
+      expect(screen.getByText(/please complete the verification/i)).toBeInTheDocument()
+    })
+    act(() => {
+      ref.current?.reset()
+    })
+    await waitFor(() => {
+      expect(screen.queryByText(/please complete the verification/i)).not.toBeInTheDocument()
+    })
   })
 })

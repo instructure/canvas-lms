@@ -1213,18 +1213,25 @@ describe "Groups API", type: :request do
       user_session @teacher
     end
 
-    it "sanitizes html and process links" do
-      @user = @teacher
-      attachment_model(context: @group)
-      html = %(<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>)
-      json = api_call(:post,
-                      "/api/v1/groups/#{@group.id}/preview_html",
-                      { controller: "groups", action: "preview_html", group_id: @group.to_param, format: "json" },
-                      { html: })
+    context "with double testing verifiers with disable_adding_uuid_verifier_in_api ff" do
+      before do
+        attachment_model(context: @group)
+      end
 
-      returned_html = json["html"]
-      expect(returned_html).not_to include("<script>")
-      expect(returned_html).to include("/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}")
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "sanitizes html and process links" do
+          @user = @teacher
+          html = %(<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>)
+          json = api_call(:post,
+                          "/api/v1/groups/#{@group.id}/preview_html",
+                          { controller: "groups", action: "preview_html", group_id: @group.to_param, format: "json" },
+                          { html: })
+
+          returned_html = json["html"]
+          expect(returned_html).not_to include("<script>")
+          expect(returned_html).to include("/groups/#{@group.id}/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}")
+        end
+      end
     end
 
     it "requires permission to preview" do

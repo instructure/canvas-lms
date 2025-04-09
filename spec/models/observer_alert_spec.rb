@@ -550,6 +550,43 @@ describe ObserverAlert do
       expect(alerts.count).to eq 0
     end
 
+    context "checkpointed discussions" do
+      before do
+        @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        due_at = 2.days.from_now
+        replies_required = 2
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: }],
+          points_possible: 10
+        )
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: }],
+          points_possible: 10,
+          replies_required:
+        )
+      end
+
+      it "creates an alert when threshold is met" do
+        student = student_in_course(course: @course).user
+        observer_in_course(active_all: true).tap do |enrollment|
+          enrollment.update_attribute(:associated_user_id, student.id)
+        end
+        t1 = ObserverAlertThreshold.create(observer: @observer, student:, alert_type: "assignment_grade_high", threshold: 80)
+        rtt = @checkpointed_discussion.assignment.sub_assignments.find { |sa| sa.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC }
+        rtt.grade_student(student, score: 10, grader: @teacher)
+
+        alert1 = ObserverAlert.where(context: rtt, alert_type: "assignment_grade_high").first
+        expect(alert1.observer_alert_threshold).to eq t1
+        expect(alert1.title).to include("Assignment graded: ")
+      end
+    end
+
     it "creates an alert if the threshold is met" do
       @assignment1.grade_student(@threshold1.student, score: 100, grader: @teacher)
       @assignment1.grade_student(@threshold2.student, score: 10, grader: @teacher)

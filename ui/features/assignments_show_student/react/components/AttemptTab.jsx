@@ -21,7 +21,7 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import axios from '@canvas/axios'
 import LazyLoad, {lazy} from '@canvas/lazy-load'
 
-import {bool, func, string} from 'prop-types'
+import {bool, func, string, object} from 'prop-types'
 import {EXTERNAL_TOOLS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {ExternalTool} from '@canvas/assignments/graphql/student/ExternalTool'
 import ExternalToolOptions from './ExternalToolOptions'
@@ -203,6 +203,7 @@ export default class AttemptTab extends Component {
     updateEditingDraft: func,
     updateUploadingFiles: func,
     uploadingFiles: bool,
+    submitButtonRef: object,
   }
 
   state = {
@@ -221,6 +222,7 @@ export default class AttemptTab extends Component {
           submission={this.props.submission}
           onCanvasFileRequested={this.onCanvasFileRequested}
           onUploadRequested={this.onUploadRequested}
+          submitButtonRef={this.props.submitButtonRef}
         />
       </LazyLoad>
     )
@@ -375,6 +377,7 @@ export default class AttemptTab extends Component {
           readOnly={readOnly}
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
+          submitButtonRef={this.props.submitButtonRef}
         />
       </LazyLoad>
     )
@@ -389,6 +392,7 @@ export default class AttemptTab extends Component {
           focusOnInit={this.props.focusAttemptOnInit}
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
+          submitButtonRef={this.props.submitButtonRef}
         />
       </LazyLoad>
     )
@@ -407,6 +411,7 @@ export default class AttemptTab extends Component {
           uploadingFiles={this.props.uploadingFiles}
           iframeURL={this.state.mediaRecordingIframURL}
           setIframeURL={this.setMediaRecordingIframeURL}
+          submitButtonRef={this.props.submitButtonRef}
         />
       </LazyLoad>
     )
@@ -444,6 +449,7 @@ export default class AttemptTab extends Component {
         }}
         submission={this.props.submission}
         tool={externalTool}
+        submitButtonRef={this.props.submitButtonRef}
       />
     </LazyLoad>
   )

@@ -187,7 +187,7 @@ class JwtsController < ApplicationController
   end
 
   def render_error(error_message, status = :bad_request)
-    render json: { error: error_message }, status: status
+    render json: { error: error_message }, status:
   end
 
   def render_unauthorized
@@ -217,7 +217,7 @@ class JwtsController < ApplicationController
   def encrypt?
     return false if audience_requested?
 
-    params[:canvas_audience].nil? ? true : value_to_boolean(params[:canvas_audience])
+    params[:canvas_audience].nil? || value_to_boolean(params[:canvas_audience])
   end
 
   def symmetric?

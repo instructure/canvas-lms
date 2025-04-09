@@ -125,7 +125,7 @@
     </a>
     <% end %>
 
-    <%= render :partial => '/courses/to_do_list', :locals => {:contexts => [@context], :show_legacy_todo_list => !@context_enrollment&.student?, root_account: @context.root_account} %>
+    <%= render :partial => '/courses/to_do_list', :locals => {:contexts => [@context], :show_legacy_todo_list => !@context_enrollment&.student?} %>
     <%= render :partial => "/courses/group_list", :locals => {:group_list => @user_groups} %>
     <%= nbsp unless @current_user %>
   </div>

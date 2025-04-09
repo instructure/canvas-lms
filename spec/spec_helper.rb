@@ -167,7 +167,7 @@ module TimeComparisonWithRounding
     if nsec % 1_000 == 0
       super
     else
-      change(usec: usec) <=> other
+      change(usec:) <=> other
     end
   end
 end
@@ -589,6 +589,45 @@ RSpec.configure do |config|
       GuardRail.activate(:deploy) { CanvasCache::Redis.redis.flushdb(failsafe: nil) }
     end
     CanvasCache::Redis.redis_used = false
+    @last_error_report_id = ErrorReport.maximum(:id)
+  end
+
+  class ErrorReportExceptionWrapper
+    class ExceptionClassWrapper < SimpleDelegator
+      attr_reader :name
+
+      def initialize(klass, name)
+        super(klass)
+        @name = name
+      end
+    end
+
+    def initialize(error_report)
+      @error_report = error_report
+      @klass = ExceptionClassWrapper.new(self.class, error_report.category)
+    end
+
+    delegate :message, to: :@error_report
+
+    def class
+      @klass
+    end
+
+    def cause; end
+
+    def backtrace
+      @error_report.backtrace.split("\n")
+    end
+  end
+
+  config.after do |example|
+    if %i[controller request].include?(example.metadata[:type]) &&
+       example.exception &&
+       !(errors = @last_error_report_id.nil? ? ErrorReport.all.to_a : ErrorReport.where(id: @last_error_report_id).to_a).empty?
+      errors.each do |er|
+        example.set_exception(ErrorReportExceptionWrapper.new(er))
+      end
+    end
   end
 
   # ****************************************************************
@@ -1059,3 +1098,21 @@ Mime::SET.select { |t| t.to_s.end_with?("+json") }.map(&:ref).each do |type|
 end
 
 # rubocop:enable Lint/ConstantDefinitionInBlock
+
+module FileUpdateCheckerIgnoreTimecop
+  private
+
+  # Prevent Timecop from interfering with file update checking or we
+  # can see weird Zeitwerk issues due to inappropriate constant reloading.
+  def max_mtime(...)
+    if Timecop.travelled? || Timecop.frozen?
+      Timecop.return do
+        super
+      end
+    else
+      super
+    end
+  end
+end
+
+ActiveSupport::FileUpdateChecker.prepend(FileUpdateCheckerIgnoreTimecop)

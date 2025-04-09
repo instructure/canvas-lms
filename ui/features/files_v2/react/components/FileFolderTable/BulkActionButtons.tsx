@@ -39,6 +39,7 @@ import {downloadZip} from '../../../utils/downloadUtils'
 import MoveModal from './MoveModal'
 import UsageRightsModal from './UsageRightsModal'
 import DisabledActionsInfoButton from './DisabledActionsInfoButton'
+import PermissionsModal from './PermissionsModal'
 
 const I18n = createI18nScope('files_v2')
 
@@ -51,6 +52,8 @@ interface BulkActionButtonsProps {
   rows: (File | Folder)[]
 }
 
+type BulkActionModalOrTrayId = 'delete' | 'move-to' | 'manage-usage-rights' | 'permissions'
+
 const BulkActionButtons = ({
   size,
   selectedRows,
@@ -59,9 +62,7 @@ const BulkActionButtons = ({
   userCanDeleteFilesForContext,
   rows,
 }: BulkActionButtonsProps) => {
-  const [modalOrTray, setModalOrTray] = useState<
-    'delete' | 'move-to' | 'manage-usage-rights' | null
-  >(null)
+  const [modalOrTray, setModalOrTray] = useState<BulkActionModalOrTrayId | null>(null)
   const isEnabled = selectedRows.size >= 1
 
   const containsLockedBPItems = useMemo(
@@ -85,6 +86,10 @@ const BulkActionButtons = ({
   const justifyItems = size === 'small' ? 'space-between' : 'end'
 
   const onDismissModalOrTray = useCallback(() => setModalOrTray(null), [])
+  const createSetModalOrTrayCallback = useCallback(
+    (id: BulkActionModalOrTrayId | null) => () => setModalOrTray(id),
+    [],
+  )
 
   const handleDownload = useCallback(() => downloadZip(selectedRows), [selectedRows])
 
@@ -106,6 +111,11 @@ const BulkActionButtons = ({
         <UsageRightsModal
           items={selectedItems}
           open={modalOrTray === 'manage-usage-rights'}
+          onDismiss={onDismissModalOrTray}
+        />
+        <PermissionsModal
+          items={selectedItems}
+          open={modalOrTray === 'permissions'}
           onDismiss={onDismissModalOrTray}
         />
       </>
@@ -148,6 +158,7 @@ const BulkActionButtons = ({
             <Flex.Item>
               {renderTooltip(
                 <IconButton
+                  data-testid="bulk-actions-download-button"
                   disabled={!isEnabled}
                   renderIcon={<IconDownloadLine />}
                   screenReaderLabel={I18n.t('Download')}
@@ -164,7 +175,7 @@ const BulkActionButtons = ({
                     disabled={!isEnabled || containsLockedBPItems}
                     renderIcon={<IconTrashLine />}
                     screenReaderLabel={I18n.t('Delete')}
-                    onClick={() => setModalOrTray('delete')}
+                    onClick={createSetModalOrTrayCallback('delete')}
                   />,
                   !isEnabled || containsLockedBPItems,
                 )}
@@ -197,6 +208,7 @@ const BulkActionButtons = ({
                     <Menu.Item
                       disabled={containsLockedBPItems}
                       data-testid="bulk-actions-edit-permissions-button"
+                      onClick={createSetModalOrTrayCallback('permissions')}
                     >
                       <Flex alignItems="center" gap="x-small">
                         <Flex.Item>
@@ -212,7 +224,7 @@ const BulkActionButtons = ({
                     <Menu.Item
                       disabled={containsFolders || containsLockedBPItems}
                       data-testid="bulk-actions-manage-usage-rights-button"
-                      onClick={() => setModalOrTray('manage-usage-rights')}
+                      onClick={createSetModalOrTrayCallback('manage-usage-rights')}
                     >
                       <Flex alignItems="center" gap="x-small">
                         <Flex.Item>
@@ -228,7 +240,7 @@ const BulkActionButtons = ({
                     <Menu.Item
                       disabled={containsLockedBPItems}
                       data-testid="bulk-actions-move-button"
-                      onClick={() => setModalOrTray('move-to')}
+                      onClick={createSetModalOrTrayCallback('move-to')}
                     >
                       <Flex alignItems="center" gap="x-small">
                         <Flex.Item>

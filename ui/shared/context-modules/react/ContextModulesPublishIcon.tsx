@@ -36,6 +36,7 @@ interface Props {
   readonly published: boolean | undefined
   readonly isPublishing: boolean
   readonly loadingMessage?: string
+  readonly onPublishComplete?: () => void
 }
 
 // TODO: remove and replace MenuItem with Menu.Item below when on v8
@@ -48,6 +49,7 @@ const ContextModulesPublishIcon = ({
   published,
   isPublishing,
   loadingMessage,
+  onPublishComplete,
 }: Props) => {
   const statusIcon = () => {
     const iconStyles = {
@@ -74,22 +76,22 @@ const ContextModulesPublishIcon = ({
 
   const unpublishAll = () => {
     if (isPublishing) return
-    unpublishModule(courseId, moduleId, false)
+    unpublishModule(courseId, moduleId, false, onPublishComplete)
   }
 
   const publishAll = () => {
     if (isPublishing) return
-    publishModule(courseId, moduleId, false)
+    publishModule(courseId, moduleId, false, onPublishComplete)
   }
 
   const publishModuleOnly = () => {
     if (isPublishing) return
-    publishModule(courseId, moduleId, true)
+    publishModule(courseId, moduleId, true, onPublishComplete)
   }
 
   const unpublishModuleOnly = () => {
     if (isPublishing) return
-    unpublishModule(courseId, moduleId, true)
+    unpublishModule(courseId, moduleId, true, onPublishComplete)
   }
 
   const publishedStatus = published ? I18n.t('published') : I18n.t('unpublished')

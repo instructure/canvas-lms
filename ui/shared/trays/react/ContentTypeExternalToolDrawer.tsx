@@ -29,6 +29,7 @@ import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 import MutexManager from '@canvas/mutex-manager/MutexManager'
 import type {Tool} from '@canvas/global/env/EnvCommon'
+import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
 type Props = {
   tool: Tool | null
@@ -150,6 +151,7 @@ export default function ContentTypeExternalToolDrawer({
                   ref={iframeRef}
                   src={iframeUrl}
                   title={toolTitle}
+                  allow={iframeAllowances()}
                 />
               )}
             </Flex.Item>

@@ -605,6 +605,44 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
+  def content_tags_for(user, opts = {})
+    is_teacher = opts[:is_teacher] != false && grants_right?(user, :read_as_admin)
+    mastery_path_unreleased_items_block_progression = context.root_account.feature_enabled?(:mastery_path_unreleased_items_block_progression)
+
+    return content_tags_visible_to(user, opts) if !context.conditional_release || is_teacher || !mastery_path_unreleased_items_block_progression
+
+    user_ungraded_assignment_ids = user.submissions.active.for_course(context).ungraded.having_submission.pluck(:assignment_id)
+
+    course_trigger_assignments_ids = context.conditional_release_rules
+                                            .active
+                                            .joins(assignment_sets: :assignment_set_associations)
+                                            .group("conditional_release_rules.trigger_assignment_id")
+                                            .having("count(conditional_release_assignment_set_associations.id) >= 3")
+                                            .pluck(:trigger_assignment_id)
+                                            .uniq
+
+    trigger_assignment_ids = course_trigger_assignments_ids & user_ungraded_assignment_ids
+
+    target_assignment_ids = context.conditional_release_rules
+                                   .active
+                                   .where(trigger_assignment_id: trigger_assignment_ids)
+                                   .preload(assignment_sets: :assignment_set_associations)
+                                   .flat_map(&:assignment_sets)
+                                   .flat_map(&:assignment_set_associations)
+                                   .map(&:assignment_id)
+                                   .uniq
+
+    tags = cached_active_tags.filter do |tag|
+      if tag.content_type == "Assignment"
+        target_assignment_ids.include? tag.content_id
+      else
+        target_assignment_ids.include? tag.content.assignment_id
+      end
+    end
+
+    (tags + content_tags_visible_to(user, opts)).uniq
+  end
+
   def visibility_for_user(user, session = nil)
     opts = {}
     opts[:can_read] = context.grants_right?(user, session, :read)

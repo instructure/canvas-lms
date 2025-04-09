@@ -1071,8 +1071,10 @@ class GradebooksController < ApplicationController
         RESTRICT_QUANTITATIVE_DATA_ENABLED: @context.restrict_quantitative_data?(@current_user),
         GRADE_BY_STUDENT_ENABLED: @context.root_account.feature_enabled?(:speedgrader_grade_by_student),
         STICKERS_ENABLED_FOR_ASSIGNMENT: @assignment.present? && @assignment.stickers_enabled?(@current_user),
+        FILTER_SPEEDGRADER_BY_STUDENT_GROUP_ENABLED: @context.filter_speed_grader_by_student_group?,
         course_id: @context.id,
         late_policy: @context.late_policy&.as_json(include_root: false),
+        gradebook_group_filter_id: @current_user.get_latest_preference_setting_by_key(:gradebook_settings, @context.global_id, "filter_rows_by", "student_group_ids"),
       }
       js_env(env)
 
@@ -1191,7 +1193,7 @@ class GradebooksController < ApplicationController
             context_settings = gradebook_settings(context.global_id)
             context_settings.deep_merge!({
                                            "filter_rows_by" => {
-                                             "student_group_id" => new_group_id
+                                             "student_group_ids" => new_group_id.present? ? [new_group_id] : []
                                            }
                                          })
             @current_user.set_preference(:gradebook_settings, context.global_id, context_settings)
@@ -1398,7 +1400,7 @@ class GradebooksController < ApplicationController
 
       percent_value = params[:percent].to_f
 
-      unless percent_value >= 0 && percent_value <= 100
+      unless percent_value.between?(0, 100)
         return render json: { error: :invalid_percent_value }, status: :bad_request
       end
     end

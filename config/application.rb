@@ -364,8 +364,20 @@ module CanvasRails
         %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
     end
 
+    # for Rails 7.1
     def validate_secret_key_base(_)
-      # no validation; we don't use Rails' CookieStore session middleware, so we
+      # we don't use Rails' CookieStore session middleware, so we
+      # don't care about secret_key_base
+    end
+
+    # for Rails 7.2
+    def secret_key_base
+      # we don't use Rails' CookieStore session middleware, so we
+      # don't care about secret_key_base
+    end
+
+    def secret_key_base=(_)
+      # we don't use Rails' CookieStore session middleware, so we
       # don't care about secret_key_base
     end
 

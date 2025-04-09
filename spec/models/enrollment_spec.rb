@@ -2704,6 +2704,92 @@ describe Enrollment do
     end
   end
 
+  context "audit_groups_for_deleted_enrollments with differentiation tags" do
+    before do
+      Account.default.enable_feature!(:differentiation_tags)
+      course_with_teacher(active_all: true)
+    end
+
+    it "removes the user from the differentiation tag when the enrollment is deleted" do
+      student = user_model
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section1.enroll_user(student, "StudentEnrollment")
+
+      # Set up non-collaborative group (differentiation tag)
+      non_collab_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+      diff_tag = non_collab_category.groups.create!(context: @course)
+      diff_tag.add_user(student)
+      expect(diff_tag.users).to include(student)
+
+      # Delete enrollment to trigger audit removal
+      enrollment = student.enrollments.where(course_section_id: section1.id).first
+      enrollment.destroy
+      diff_tag.reload
+
+      expect(diff_tag.users).not_to include(student)
+    end
+
+    it "removes the differentiation tag membership when the enrollment is rejected" do
+      student = user_model
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section1.enroll_user(student, "StudentEnrollment")
+
+      non_collab_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+      gm = non_collab_category.groups.create!(context: @course).add_user(student)
+
+      enrollment = student.enrollments.where(course_section_id: section1.id).first
+      enrollment.reject!
+
+      expect(gm.reload).to be_deleted
+    end
+
+    it "does not remove the differentiation tag when a user's section is updated" do
+      # Set up course with two users in one section
+      student1 = user_model
+      student2 = user_model
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section1.enroll_user(student1, "StudentEnrollment")
+      section1.enroll_user(student2, "StudentEnrollment")
+
+      # Set up a non-collaborative group category with restricted self sign-up
+      non_collab_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+
+      diff_tag = non_collab_category.groups.create!(context: @course)
+      diff_tag.add_user(student1)
+      diff_tag.add_user(student2)
+      # Move student2 to a new section
+      section2 = @course.course_sections.create!(name: "Section 2")
+      enrollment = student2.enrollments.where(course_section_id: section1.id).first
+      enrollment.course_section = section2
+      enrollment.save!
+      diff_tag.reload
+      non_collab_category.reload
+
+      expect(diff_tag.users.size).to eq 2
+      expect(diff_tag.users).to include(student2)
+    end
+
+    it "ignores previously deleted differentiation tag memberships" do
+      student = user_model
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section1.enroll_user(student, "StudentEnrollment")
+
+      non_collab_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+      diff_tag = non_collab_category.groups.create!(context: @course)
+      diff_tag.add_user(student)
+
+      # Mark the differentiation tag membership as deleted
+      membership = diff_tag.group_memberships.where(user_id: student.id).first
+      membership.update!(workflow_state: "deleted")
+
+      enrollment = student.enrollments.where(course_section_id: section1.id).first
+      expect { enrollment.destroy }.not_to raise_error
+      diff_tag.reload
+
+      expect(diff_tag.users).not_to include(student)
+    end
+  end
+
   describe "for_email" do
     before :once do
       course_factory(active_all: true)

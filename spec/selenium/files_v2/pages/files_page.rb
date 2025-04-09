@@ -37,6 +37,14 @@ module FilesPage
     fxpath("//button[descendant::text()[contains(., 'Upload')]]")
   end
 
+  def create_folder_button_selector
+    "[data-testid='create-folder-button']"
+  end
+
+  def upload_button_selector
+    "[data-testid='upload-button']"
+  end
+
   def create_folder_button
     f("[data-testid='create-folder-button']")
   end
@@ -97,6 +105,10 @@ module FilesPage
     driver.find_elements(:css, "tr[data-testid='table-row']")
   end
 
+  def all_files_table_row
+    "[data-testid='table-row']"
+  end
+
   def get_item_content_files_table(row_index, col_index)
     driver.find_element(:css, "tbody tr[data-testid='table-row']:nth-of-type(#{row_index}) td:nth-of-type(#{col_index})").text
   end
@@ -142,8 +154,20 @@ module FilesPage
     f("[data-testid='action-menu-button-large']")
   end
 
+  def action_menu_item_by_name_selector(name)
+    "[data-testid='action-menu-button-#{name}']"
+  end
+
   def action_menu_item_by_name(name)
     f("[data-testid='action-menu-button-#{name}']")
+  end
+
+  def bulk_actions_by_name_selector(name)
+    "[data-testid='bulk-actions-#{name}-button']"
+  end
+
+  def bulk_actions_by_name(name)
+    f(bulk_actions_by_name_selector(name))
   end
 
   def body
@@ -178,10 +202,10 @@ module FilesPage
     delete_folder_delete_button.click
   end
 
-  def move_file_from(item = 1, way = :kebab_menu)
+  def move_file_from(item = 1, way = :kebab_menu, index = 0)
     case way
     when :kebab_menu
-      get_item_files_table(item, 7).click
+      get_item_files_table(item, 7 + index).click
       action_menu_item_by_name("Move To...").click
     when :toolbar_menu
       get_row_header_files_table(item).click
@@ -204,5 +228,74 @@ module FilesPage
 
   def tree_selector
     f("ul[role='tree']")
+  end
+
+  def preview_file_info_button
+    f("#file-info-button")
+  end
+
+  def preview_print_button
+    f("#print-button")
+  end
+
+  def preview_download_icon_button
+    f("#download-icon-button")
+  end
+
+  def preview_close_button
+    f("#close-button")
+  end
+
+  def preview_previous_button
+    f("[data-testid='previous-button']")
+  end
+
+  def preview_next_button
+    f("[data-testid='next-button']")
+  end
+
+  def preview_file_header
+    f("[data-testid='file-header']")
+  end
+
+  def preview_file_preview
+    f('[aria-label="File Preview"]')
+  end
+
+  def preview_file_transition
+    f('data-cid="Transition"')
+  end
+
+  def preview_file_preview_modal_alert
+    f("#file-preview-modal-alert")
+  end
+
+  def file_usage_rights_justification_selector
+    '[data-testid="usage-rights-justification-selector"]'
+  end
+
+  def file_usage_rights_justification
+    f(file_usage_rights_justification_selector)
+  end
+
+  def file_usage_rights_save_button
+    f('[data-testid="usage-rights-save-button"]')
+  end
+
+  def set_usage_rights_in_modal
+    file_usage_rights_justification.click
+    file_usage_rights_justification.send_keys(:arrow_down, :return)
+    file_usage_rights_save_button.click
+    expect(body).not_to contain_css(file_usage_rights_justification_selector)
+  end
+
+  def verify_usage_rights_ui_updates(type = "Own Copyright")
+    expect(get_item_content_files_table(1, 6)).to eq type
+  end
+
+  def verify_hidden_item_not_searchable_as_student(search_text)
+    search_input.send_keys(search_text)
+    search_button.click
+    expect(body).not_to contain_css(all_files_table_row)
   end
 end

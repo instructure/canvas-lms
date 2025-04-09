@@ -77,7 +77,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
     # this endpoint.
     binding = nil
     if lti_registration.present?
-      Lti::AccountBindingService.call(account: account,
+      Lti::AccountBindingService.call(account:,
                                       user: @current_user,
                                       registration: lti_registration,
                                       workflow_state: workflow_state_param[:workflow_state]) => {developer_key_account_binding: binding}

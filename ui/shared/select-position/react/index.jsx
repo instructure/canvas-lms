@@ -20,7 +20,7 @@ import React from 'react'
 import {string, func, bool, arrayOf, node, shape} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ConnectorIcon from './ConnectorIcon'
-import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 import {FormField} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -115,7 +115,7 @@ export default function SelectPosition({
   function renderPlaceTitle() {
     const title =
       items.length === 1 ? I18n.t('Place "%{title}"', {title: items[0].title}) : I18n.t('Place')
-    return <Text weight="bold">{title}</Text>
+    return <Heading level="h4">{title}</Heading>
   }
 
   return (

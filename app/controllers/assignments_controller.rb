@@ -451,7 +451,7 @@ class AssignmentsController < ApplicationController
         end
 
         @external_tools = if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
-                            Lti::ContextToolFinder.all_tools_for(@context, user: @current_user, placements: :homework_submission)
+                            Lti::ContextToolFinder.all_tools_for(@context, current_user: @current_user, placements: :homework_submission)
                           else
                             []
                           end
@@ -720,7 +720,6 @@ class AssignmentsController < ApplicationController
     @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
       @context,
       type: :course_home_sub_navigation,
-      root_account: @domain_root_account,
       current_user: @current_user
     ).all_tools_sorted_array(exclude_admin_visibility: !can_see_admin_tools)
 
@@ -958,10 +957,12 @@ class AssignmentsController < ApplicationController
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
       hash[:NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED] = Account.site_admin.feature_enabled?(:anonymous_grading_with_new_quizzes)
-      hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(:submission_type_selection,
-                                                                             @context,
-                                                                             %i[base_title external_url selection_width selection_height])
-
+      hash[:ASSET_PROCESSORS] = Lti::AssetProcessor.processors_info_for_assignment_edit_page(assignment_id: @assignment.id)
+      hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(
+        :submission_type_selection,
+        @context,
+        %i[base_title external_url selection_width selection_height]
+      )
       append_sis_data(hash)
       if context.is_a?(Course)
         hash[:allow_self_signup] = true # for group creation
