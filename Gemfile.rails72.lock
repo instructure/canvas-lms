@@ -953,7 +953,7 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.2.1)
-    rbs (3.8.1)
+    rbs (3.9.2)
       logger
     rchardet (1.9.0)
     rdiscount (2.2.7.3)
