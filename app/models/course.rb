@@ -2408,6 +2408,47 @@ class Course < ActiveRecord::Base
     create_attachment(attachment, csv)
   end
 
+  def auto_grade_submission_in_background(submission)
+    user = submission.user
+    progress = progresses.create!(tag: "auto_grade_submission", user:)
+
+    progress.process_job(
+      self,
+      :run_auto_grader,
+      { priority: Delayed::HIGH_PRIORITY },
+      submission
+    )
+
+    { progress_id: progress.id }
+  end
+
+  def run_auto_grader(progress, submission)
+    if submission.blank? || submission.body.blank?
+      progress&.message = { error: "No essay submission found" }.to_json
+      progress&.complete!
+      return
+    end
+
+    assignment = submission.assignment
+    assignment_text = ActionView::Base.full_sanitizer.sanitize(assignment.description || "")
+    essay = ActionView::Base.full_sanitizer.sanitize(submission.body || "")
+    rubric = assignment.rubric_association&.rubric
+
+    begin
+      enriched_result = AutoGradeService.new(
+        assignment: assignment_text,
+        essay:,
+        rubric: rubric.data
+      ).call
+
+      progress&.message = enriched_result.to_json
+    rescue => e
+      progress.message = { error: "Grading failed: #{e.message}" }.to_json
+    ensure
+      progress.complete!
+    end
+  end
+
   def create_attachment(attachment, csv)
     Attachments::Storage.store_for_attachment(attachment, StringIO.new(csv))
     attachment.content_type = "text/csv"
