@@ -55,6 +55,7 @@ export default function SubaccountTree(props: Props) {
       per_page: '100',
       page: context.pageParam || '1',
       include: ['course_count', 'sub_account_count'],
+      order: 'name',
     }
     const {json, link} = await doFetchApi({
       path: `/api/v1/accounts/${props.rootAccount.id}/sub_accounts`,
