@@ -99,6 +99,16 @@ describe "new login Sign In page" do
   end
 
   describe "/login/ldap" do
+    context "when no LDAP authentication provider is configured" do
+      it "returns 404" do
+        get "/login/ldap"
+        expect(ff("h1").map(&:text)).to include(
+          "Whoops... Looks like nothing is here!",
+          "Page Not Found"
+        )
+      end
+    end
+
     context "when an LDAP authentication provider is configured" do
       before do
         Account.default.authentication_providers.create!(
@@ -120,6 +130,24 @@ describe "new login Sign In page" do
         form = f("form")
         expect(form.attribute("action")).to include("/login/ldap")
       end
+    end
+  end
+
+  describe "front-end mount gating" do
+    it "renders the React login app when #new_login_safe_to_mount is present" do
+      get "/login/canvas"
+      expect(element_exists?("#new_login_safe_to_mount")).to be true
+      expect(f('[data-testid="username-input"]')).to be_displayed
+    end
+
+    it "does not render the React login app when #new_login_safe_to_mount is missing (e.g. 404)" do
+      get "/login/bad"
+      expect(ff("h1").map(&:text)).to include(
+        "Whoops... Looks like nothing is here!",
+        "Page Not Found"
+      )
+      expect(element_exists?("#new_login_safe_to_mount")).to be false
+      expect(element_exists?('[data-testid="username-input"]')).to be false
     end
   end
 end

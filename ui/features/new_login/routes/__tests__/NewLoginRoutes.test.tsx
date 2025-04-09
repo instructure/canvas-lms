@@ -49,10 +49,18 @@ const mockUseNewLoginData = useNewLoginData as jest.Mock
 
 describe('NewLoginRoutes', () => {
   beforeEach(() => {
+    const marker = document.createElement('div')
+    marker.setAttribute('id', 'new_login_safe_to_mount')
+    document.body.appendChild(marker)
+
     mockUseNewLoginData.mockReturnValue({
       selfRegistrationType: 'all',
     })
     jest.clearAllMocks()
+  })
+
+  afterEach(() => {
+    document.getElementById('new_login_safe_to_mount')?.remove()
   })
 
   it('renders SignIn component at /login/canvas', async () => {
