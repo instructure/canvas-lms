@@ -19,6 +19,8 @@
   <% js_bundle :edit_rubric %>
   <% css_bundle :learning_outcomes %>
 
+  <% should_show_sequence_footer = true if should_show_sequence_footer.nil? %>
+
   <% if can_do(@assignment, @current_user, :update) %>
     <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
     <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
@@ -49,4 +51,4 @@
       <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link rubric" style="<%= hidden if @assignment.active_rubric_association? %>"><%= t 'links.assign_rubric', 'Assign Rubric' %></a>
     </div>
   <% end %>
-  <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? %>
+  <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? && should_show_sequence_footer %>

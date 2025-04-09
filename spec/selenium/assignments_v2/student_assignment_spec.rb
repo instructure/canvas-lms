@@ -569,6 +569,38 @@ describe "as a student" do
         expect(f("[data-testid='previous-assignment-btn']")).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@item_before.id}")
         expect(f("[data-testid='next-assignment-btn']")).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@item_after.id}")
       end
+
+      it "does not show the legacy sequence footer" do
+        expect(f("body")).not_to contain_css("#sequence_footer")
+      end
+
+      it "does not show the legacy sequence footer for lti assignments" do
+        tool = @course.context_external_tools.create!(
+          name: "LTI Test Tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          use_1_3: true,
+          developer_key: DeveloperKey.create!,
+          tool_id: "LTI Test Tool",
+          url: "http://lti13testtool.docker/launch"
+        )
+        tag = ContentTag.new(url: tool.url, content: tool, new_tab: true)
+        lti_assignment = @course.assignments.create!(
+          title: "LTI assignment",
+          submission_types: "external_tool",
+          context: @course,
+          points_possible: 10,
+          external_tool_tag: tag,
+          workflow_state: "published"
+        )
+        @module.add_item(type: "assignment", id: lti_assignment.id)
+
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, lti_assignment)
+        wait_for_ajaximations
+
+        expect(f("body")).not_to contain_css("#sequence_footer")
+      end
     end
 
     context "media assignments" do
