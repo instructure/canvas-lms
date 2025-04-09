@@ -133,7 +133,7 @@ const ProductDetail = (props: ProductDetailProps) => {
     return (
       <Flex margin={buttonMargins}>
         <Flex.Item shouldGrow={true} margin={tabletMargin}>
-          {props.renderConfigureButton && ltiConfiguration
+          {props.renderConfigureButton
             ? props.renderConfigureButton(buttonWidth, product?.canvas_lti_configurations)
             : null}
         </Flex.Item>
