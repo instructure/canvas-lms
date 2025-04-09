@@ -969,7 +969,7 @@ GEM
     rdiscount (2.2.7.3)
     rdoc (6.13.1)
       psych (>= 4.0.0)
-    redcarpet (3.6.0)
+    redcarpet (3.6.1)
     redis (5.3.0)
       redis-client (>= 0.22.0)
     redis-client (0.23.0)
