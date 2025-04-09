@@ -763,7 +763,9 @@ GEM
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
-    mini_magick (5.0.1)
+    mini_magick (5.2.0)
+      benchmark
+      logger
     mini_mime (1.1.5)
     mini_portile2 (2.8.8)
     minitest (5.25.5)
