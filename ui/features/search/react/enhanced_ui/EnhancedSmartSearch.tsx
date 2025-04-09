@@ -56,8 +56,6 @@ export default function EnhancedSmartSearch(props: Props) {
       return <Alert variant="error">{I18n.t('Failed to execute search')}</Alert>
     } else if (indexingProgress !== null) {
       return <IndexingProgress progress={indexingProgress?.progress} />
-    } else if (searchResults.length === 0) {
-      return null
     } else {
       // only grab the first 25 results, then split into best and similar
       const results =
@@ -68,7 +66,11 @@ export default function EnhancedSmartSearch(props: Props) {
       const similarResults = results.filter(result => result.relevance < RELEVANCE_THRESHOLD)
       return (
         <>
-          <BestResults searchTerm={previousSearch.current} results={bestResults} />
+          <BestResults
+            searchTerm={previousSearch.current}
+            results={bestResults}
+            courseId={props.courseId}
+          />
           <SimilarResults searchTerm={previousSearch.current} results={similarResults} />
         </>
       )
