@@ -32,11 +32,13 @@ import type {AccountId} from '../manage/model/AccountId'
 import {ZDeveloperKeyId} from '../manage/model/developer_key/DeveloperKeyId'
 import {ZUnifiedToolId} from '../manage/model/UnifiedToolId'
 import {
+  openRegistrationWizard,
   openDynamicRegistrationWizard,
   openJsonRegistrationWizard,
   openJsonUrlRegistrationWizard,
   type JsonFetchStatus,
 } from '../manage/registration_wizard/RegistrationWizardModalState'
+import {refreshRegistrations} from '../manage/pages/manage/ManagePageLoadingState'
 import type {LtiRegistrationWithConfiguration} from '../manage/model/LtiRegistration'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
@@ -136,6 +138,22 @@ export const ProductConfigureButton = ({
               )
             }
             break
+          case undefined:
+            openRegistrationWizard({
+              jsonUrl: '',
+              jsonCode: '',
+              unifiedToolId: undefined,
+              dynamicRegistrationUrl: '',
+              lti_version: '1p3',
+              method: 'manual',
+              registering: false,
+              exitOnCancel: false,
+              onSuccessfulInstallation: () => {
+                refreshRegistrations()
+              },
+              jsonFetch: {_tag: 'initial'},
+            })
+            break
         }
       }}
     >
@@ -148,7 +166,10 @@ const buttonIsEnabled = (
   integration: PreferredLtiIntegration | undefined,
   jsonFetchStatus: JsonFetchStatus,
 ) => {
-  if (jsonFetchStatus._tag === 'loading') {
+  if (integration === undefined) {
+    return true
+  }
+  else if (jsonFetchStatus._tag === 'loading') {
     return false
   } else if (integration?.integration_type === 'lti_13_dynamic_registration') {
     return true
