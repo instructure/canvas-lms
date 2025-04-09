@@ -1617,6 +1617,10 @@ EditView.prototype.showErrors = function (errors) {
         }
       }
 
+      if (key === ASSIGNMENT_NAME_INPUT_NAME) {
+        document.getElementById('assignment_name_asterisk')?.classList.add('error-text')
+      }
+
       if (key === ONLINE_SUBMISSION_CHECKBOXES_GROUP) {
         document.getElementById('online_entry_options_asterisk')?.classList.add('error-text')
       }
@@ -1686,6 +1690,9 @@ EditView.prototype.hideErrors = function (containerId) {
       const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
       const element = this.getElement(selector)
       element?.classList.remove('error-outline')
+    }
+    if (key === ASSIGNMENT_NAME_INPUT_NAME) {
+      document.getElementById('assignment_name_asterisk')?.classList.remove('error-text')
     }
   }
 }
