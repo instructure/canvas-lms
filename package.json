@@ -275,7 +275,7 @@
     "babel-plugin-typescript-to-proptypes": "^2.1.0",
     "chai-assert-change": "^2.0.0",
     "change-case": "3.0.1",
-    "concurrently": "^4",
+    "concurrently": "^7.2.0",
     "core-js": "^3.20.3",
     "core-js-builder": "^3",
     "css-loader": "^3",
