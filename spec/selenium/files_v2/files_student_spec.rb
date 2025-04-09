@@ -80,16 +80,11 @@ describe "better_file_browsing" do
         expect(content).not_to contain_css(action_menu_item_by_name_selector("Delete"))
       end
 
-      it "only sees View and Download options on toolbar menu", priority: "1" do
+      it "only sees Download options on toolbar menu", priority: "1" do
         get "/courses/#{@course.id}/files"
         get_row_header_files_table(1).click
         expect(bulk_actions_by_name("download")).to be_displayed
-        bulk_actions_by_name("more").click
-        expect(bulk_actions_by_name("view")).to be_displayed
-        expect(content).not_to contain_css(action_menu_item_by_name_selector("move"))
-        expect(content).not_to contain_css(action_menu_item_by_name_selector("manage-usage-rights"))
-        expect(content).not_to contain_css(action_menu_item_by_name_selector("edit-permissions"))
-        expect(content).not_to contain_css(action_menu_item_by_name_selector("delete"))
+        expect(content).not_to contain_css(bulk_actions_by_name_selector("more"))
       end
 
       it "sees calendar icon on restricted files within a given timeframe", priority: "1" do

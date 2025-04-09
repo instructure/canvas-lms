@@ -79,17 +79,9 @@ describe('BulkActionButtons', () => {
     })
   })
 
-  it('does not render manage access and move to when userCanEditFilesForContext is false', async () => {
+  it('does not render more actions when userCanEditFilesForContext is false', async () => {
     renderComponent({userCanEditFilesForContext: false, userCanRestrictFilesForContext: false})
-
-    const moreButton = screen.getByTestId('bulk-actions-more-button')
-    fireEvent.click(moreButton)
-
-    await waitFor(() => {
-      expect(screen.queryByTestId('bulk-actions-manage-usage-rights-button')).toBeNull()
-      expect(screen.queryByTestId('bulk-actions-edit-permissions-button')).toBeNull()
-      expect(screen.queryByTestId('bulk-actions-move-button')).toBeNull()
-    })
+    expect(screen.queryByTestId('bulk-actions-more-button')).toBeNull()
   })
 
   it('does not render manage access when usageRightsRequiredForContext is false', async () => {
@@ -149,30 +141,12 @@ describe('BulkActionButtons', () => {
     })
   })
 
-  it('does not render the manage access button when userCanEditFilesForContext is false', async () => {
-    renderComponent({userCanEditFilesForContext: false})
-    const moreButton = screen.getByTestId('bulk-actions-more-button')
-    fireEvent.click(moreButton)
-    await waitFor(() => {
-      expect(screen.queryByTestId('bulk-actions-manage-usage-rights-button')).toBeNull()
-    })
-  })
-
   it('renders the move button when userCanEditFilesForContext is true', async () => {
     renderComponent()
     const moreButton = screen.getByTestId('bulk-actions-more-button')
     fireEvent.click(moreButton)
     await waitFor(() => {
       expect(screen.getByTestId('bulk-actions-move-button')).toBeInTheDocument()
-    })
-  })
-
-  it('does not render the move button when userCanEditFilesForContext is false', async () => {
-    renderComponent({userCanEditFilesForContext: false})
-    const moreButton = screen.getByTestId('bulk-actions-more-button')
-    fireEvent.click(moreButton)
-    await waitFor(() => {
-      expect(screen.queryByTestId('bulk-actions-move-button')).toBeNull()
     })
   })
 
@@ -215,17 +189,6 @@ describe('BulkActionButtons', () => {
       fireEvent.click(moreButton)
       await waitFor(() => {
         expect(screen.getByTestId('bulk-actions-manage-usage-rights-button')).toBeInTheDocument()
-      })
-    })
-
-    it('disables View when a folder is selected', async () => {
-      const moreButton = screen.getByTestId('bulk-actions-more-button')
-      fireEvent.click(moreButton)
-      await waitFor(() => {
-        expect(screen.queryByTestId('bulk-actions-view-button')).toHaveAttribute(
-          'aria-disabled',
-          'true',
-        )
       })
     })
   })

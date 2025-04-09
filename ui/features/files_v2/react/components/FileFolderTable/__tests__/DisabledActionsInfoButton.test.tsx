@@ -25,7 +25,6 @@ import {
 
 const defaultProps: DisabledActionsInfoButtonProps = {
   size: 'large',
-  isBlueprintChildCourse: false,
 }
 
 const renderComponent = (props = {}) => {
@@ -54,25 +53,13 @@ describe('DisabledActionsInfoButton', () => {
     expect(screen.queryByText('Disabled actions')).not.toBeInTheDocument()
   })
 
-  it('renders component with all disabled actions when BP child course', async () => {
-    renderComponent({isBlueprintChildCourse: true})
+  it('renders component with all disabled actions for a blue print child course', async () => {
+    renderComponent()
 
     const infoButton = screen.getByTestId('disabled-actions-info-button')
     await userEvent.click(infoButton)
 
     expect(screen.getByText('Folders containing locked content')).toBeInTheDocument()
     expect(screen.getByText('Locked files')).toBeInTheDocument()
-    expect(screen.getByText('Folders')).toBeInTheDocument()
-  })
-
-  it('only renders relevant info when not a BP child course', async () => {
-    renderComponent({isBlueprintChildCourse: false})
-
-    const infoButton = screen.getByTestId('disabled-actions-info-button')
-    await userEvent.click(infoButton)
-
-    expect(screen.queryByText('Folders containing locked content')).not.toBeInTheDocument()
-    expect(screen.queryByText('Locked files')).not.toBeInTheDocument()
-    expect(screen.getByText('Folders')).toBeInTheDocument()
   })
 })
