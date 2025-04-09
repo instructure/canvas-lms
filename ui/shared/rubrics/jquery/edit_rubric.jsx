@@ -100,7 +100,8 @@ const rubricEditing = {
     const $criterion = $blank.clone(true)
     $criterion.addClass('new_criterion')
     $criterion.removeClass('blank')
-    $rubric.find('.summary').before($criterion.show())
+    // $rubric.find('table.rubric_table tbody tr.criterion').last().after($criterion.show())
+    $rubric.find('tbody').append($criterion.show())
     const focusTarget = $criterion.hasClass('learning_outcome_criterion') ? '.icon-plus' : null
     rubricEditing.updateCriteria($rubric)
     rubricEditing.sizeRatings($criterion)
@@ -111,7 +112,7 @@ const rubricEditing = {
     const $rubric = $this.parents('.rubric')
     $this.addClass('add_column')
     if ($rubric.hasClass('editing')) {
-      const $td = $this.clone(true).removeClass('edge_rating'),
+      const $rating = $this.clone(true).removeClass('edge_rating'),
         pts = numberHelper.parse($this.find('.points').text()),
         $criterion = $this.parents('.criterion'),
         data = {description: '', rating_long_description: '', min_points: pts},
@@ -130,7 +131,7 @@ const rubricEditing = {
           data.points = less_points
         }
       }
-      $td.fillTemplateData({
+      $rating.fillTemplateData({
         data: {
           ...data,
           min_points: rubricEditing.localizedPoints(data.min_points),
@@ -138,16 +139,16 @@ const rubricEditing = {
         },
       })
       rubricEditing.flagInfinitesimalRating(
-        $td,
+        $rating,
         $criterion.find('.criterion_use_range').prop('checked'),
       )
       if (hasClassAddLeft) {
-        $this.before($td)
+        $this.before($rating)
       } else {
-        $td.addClass('new_rating')
-        $this.after($td)
+        $rating.addClass('new_rating')
+        $this.after($rating)
       }
-      const $previousRating = $td.prev('.rating')
+      const $previousRating = $rating.prev('.rating')
       if ($previousRating) {
         $previousRating.fillTemplateData({data: {min_points: data.points}})
       }
@@ -187,7 +188,8 @@ const rubricEditing = {
     }
 
     // multiple rubrics can be open for editing but only the active one will have Find Outcome link
-    const $rubric = $('#add_learning_outcome_link').closest('.rubric table.rubric_table:visible')
+    // const $rubric = $('#add_learning_outcome_link').closest('.rubric table.rubric_table:visible')
+    const $rubric = $('#add_learning_outcome_link').closest('.rubric').find('table.rubric_table:visible')
     $rubric
       .find('.criterion.learning_outcome_' + outcome.id)
       .find('.delete_criterion_link')
@@ -478,9 +480,13 @@ const rubricEditing = {
   addRubric() {
     const $rubric = $('#default_rubric').clone(true).attr('id', 'rubric_new').addClass('editing')
     $rubric.find('.edit_rubric').remove()
-    const $tr = $('#edit_rubric').clone(true).show().removeAttr('id').addClass('edit_rubric')
-    const $form = $tr.find('#edit_rubric_form')
-    $rubric.find('.rubric_table').append($tr)
+    const $editRubric = $('#edit_rubric')
+      .clone(true)
+      .show()
+      .removeAttr('id')
+      .addClass('edit_rubric')
+    const $form = $editRubric.find('#edit_rubric_form')
+    $rubric.append($editRubric)
     $form.attr('method', 'POST').attr('action', $('#add_rubric_url').attr('href'))
     // I believe this should only be visible on the assignment page (not
     // rubric page or quiz page) but we need to audit uses of the add rubric
@@ -547,10 +553,14 @@ const rubricEditing = {
       rubricEditing.updateMasteryScale($rubric)
     }
 
-    const $tr = $('#edit_rubric').clone(true).show().removeAttr('id').addClass('edit_rubric')
-    const $form = $tr.find('#edit_rubric_form')
-    $rubric.find('.rubric_table').append($tr)
+    const $editRubricFormContainer = $('#edit_rubric')
+      .clone(true)
+      .show()
+      .removeAttr('id')
+      .addClass('edit_rubric')
+    $rubric.append($editRubricFormContainer.clone(true).show())
 
+    const $form = $rubric.find('#edit_rubric_form')
     $rubric.find(':text:first').focus().select()
     $form
       .find('.grading_rubric_checkbox')
@@ -689,7 +699,7 @@ const rubricEditing = {
         $criterion.find('.edit_criterion_link').remove()
         $criterion.find('.rating .links').remove()
       }
-      $rubric.find('.summary').before($criterion)
+      $rubric.find('table.rubric_table tbody').append($criterion)
       $criterion.find('.criterion_points').val(rubricEditing.localizedPoints(criterion.points))
       $criterion.data('criterion_points', numberHelper.parse(criterion.points))
     })
@@ -722,8 +732,8 @@ rubricEditing.init = function () {
   const rubricVisible = !$('.add_rubric_link').is(':visible')
   if (rubricContainer && rubricVisible) {
     const containerId = rubricContainer.attr('id') ?? ''
-    const rubricId = containerId.split('rubric_')[1];
-    useStore.setState({ rubricId });
+    const rubricId = containerId.split('rubric_')[1]
+    useStore.setState({rubricId})
   }
 
   $('#rubrics')
@@ -835,7 +845,7 @@ rubricEditing.init = function () {
       if ($rating.parents('.criterion').hasClass('learning_outcome_criterion')) {
         return
       }
-      const $nextRating = $rating.closest('td').next('.rating')
+      const $nextRating = $rating.closest('div').next('.rating')
       const use_range = $rating.parents('.criterion').find('.criterion_use_range').prop('checked')
       $rubric_rating_dialog.find('.range_rating').showIf(use_range)
       $rubric_rating_dialog.find('.min_points').prop('disabled', !$nextRating.length)
@@ -953,8 +963,6 @@ rubricEditing.init = function () {
       }
     })
 
-  // cant use delegate because events bound to a .delegate wont get triggered when you do .triggerHandler('click') because it wont bubble up.
-  // TODO is this still true at jQuery 3.0?
   $('.rubric .delete_rubric_link').on('click', function (event, callback) {
     event.preventDefault()
     let message = I18n.t('prompts.confirm_delete', 'Are you sure you want to delete this rubric?')
@@ -1202,7 +1210,7 @@ rubricEditing.init = function () {
                   $criterion.find('.ratings').append($rating.show())
                 })
                 $criterion.find('.rating_holder.blank').remove()
-                $rubric.find('.rubric.rubric_summary tr.summary').before($criterion.show())
+                $rubric.find('.rubric.rubric_summary tbody').append($criterion.show())
               })
               $rubric_dialog.find('.rubrics_dialog_rubrics').append($rubric)
             }
@@ -1448,7 +1456,7 @@ rubricEditing.init = function () {
         } else {
           $rubric.prev('.rubric').remove()
         }
-        $(this).parents('tr').hide()
+        $(this).parents('div.edit_rubric').hide()
 
         const rubric = data.rubric
         useStore.setState({rubricId: rubric.id})
@@ -1542,11 +1550,11 @@ rubricEditing.init = function () {
       }
     })
     .on('click', '.delete_rating_link', function (event) {
-      const $rating_cell = $(this).closest('td')
-      const $target = $rating_cell.prev().find('.add_rating_link_after')
-      const $previousRating = $rating_cell.prev('.rating')
+      const $current_rating = $(this).closest('div.rating')
+      const $target = $current_rating.prev().find('.add_rating_link_after')
+      const $previousRating = $current_rating.prev('.rating')
       const previous_data = {
-        min_points: $rating_cell.next('.rating').find('.points').text(),
+        min_points: $current_rating.next('.rating').find('.points').text(),
       }
       $previousRating.fillTemplateData({data: previous_data})
       event.preventDefault()
@@ -1566,7 +1574,7 @@ rubricEditing.init = function () {
     })
     .on('click', '.add_rating_link_after', function (event) {
       event.preventDefault()
-      const $this = $(this).parents('td.rating')
+      const $this = $(this).parents('div.rating')
       $this.addClass('add_right')
       rubricEditing.addNewRatingColumn($this)
     })
@@ -1584,9 +1592,9 @@ rubricEditing.init = function () {
       rubricEditing.updateCriterionPoints($(this).parents('.criterion'))
     })
   $('#edit_rating').on('click', '.cancel_button', function () {
-    $(this).closest('td.rating').find('.edit_rating_link')
+    $(this).closest('div.rating').find('.edit_rating_link')
   })
-  $('#edit_rubric_form .rubric_custom_rating')
+  $('#edit_rubric_form #rubric_custom_rating')
     .change(function () {
       $(this)
         .parents('.rubric')
@@ -1679,9 +1687,7 @@ if (
   const contextId = ENV.context_asset_string.split('_')[1]
 
   const root = createRoot(document.getElementById('rubric_management'))
-  root.render(
-    <RubricManagement accountId={contextId} />,
-  )
+  root.render(<RubricManagement accountId={contextId} />)
 }
 
 const getEditRubricPrompt = useMasteryScale => {
@@ -1718,18 +1724,18 @@ const shouldUseMasteryScale = $rubric => {
 }
 
 const showDescriptionError = $form => {
-  $form.find('.description_error_message').show();
-  $form.find('[name="description"]').css('border', '1px solid red');
+  $form.find('.description_error_message').show()
+  $form.find('[name="description"]').css('border', '1px solid red')
 
-  clearTimeout($form.data('ratingTitleErrorDisplayed'));
+  clearTimeout($form.data('ratingTitleErrorDisplayed'))
 
-  const ratingTitleErrorDisplayed = setTimeout(() => removeDescriptionError($form), 5000);
-  $form.data('ratingTitleErrorDisplayed', ratingTitleErrorDisplayed);
-};
+  const ratingTitleErrorDisplayed = setTimeout(() => removeDescriptionError($form), 5000)
+  $form.data('ratingTitleErrorDisplayed', ratingTitleErrorDisplayed)
+}
 
 const removeDescriptionError = $form => {
-  $form.find('.description_error_message').hide();
-  $form.find('[name="description"]').css('border', '1px solid #ccc');
-};
+  $form.find('.description_error_message').hide()
+  $form.find('[name="description"]').css('border', '1px solid #ccc')
+}
 
 export default rubricEditing

@@ -69,7 +69,7 @@ describe "assignment rubrics" do
       end.to change(Rubric, :count).by(1)
       expect(f(".rubric_table tbody tr:nth-of-type(3) .description_title"))
         .to include_text("criterion 1")
-      expect(f(".rubric_table tbody tr:nth-of-type(3) .ratings td:nth-of-type(2) .rating_description_value"))
+      expect(f(".rubric_table tbody tr:nth-of-type(3) div.ratings div.rating:nth-of-type(2) .rating_description_value"))
         .to include_text("rating 1")
     end
 
@@ -197,14 +197,14 @@ describe "assignment rubrics" do
 
         it "uses the course mastery scale for outcome criterion when editing account rubrics within an assignment" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-          points_before_edit = ff("tr.learning_outcome_criterion td.rating .points").map(&:text)
+          points_before_edit = ff("tr.learning_outcome_criterion div.rating .points").map(&:text)
           f("#rubric_#{@rubric.id} .edit_rubric_link").click
           driver.switch_to.alert.accept
           wait_for_ajax_requests
-          expect(ff("tr.learning_outcome_criterion td.rating .points").map(&:text).reject!(&:empty?)).to eq @proficiency_rating_points
+          expect(ff("tr.learning_outcome_criterion div.rating .points").map(&:text).reject!(&:empty?)).to eq @proficiency_rating_points
           f(".cancel_button").click
           wait_for_ajaximations
-          expect(ff("tr.learning_outcome_criterion td.rating .points").map(&:text)).to eq points_before_edit
+          expect(ff("tr.learning_outcome_criterion div.rating .points").map(&:text)).to eq points_before_edit
         end
       end
 
@@ -215,11 +215,11 @@ describe "assignment rubrics" do
 
         it "does not change existing outcome criterion when editing account rubrics within an assignment" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-          points_before_edit = ff("tr.learning_outcome_criterion td.rating .points").map(&:text)
+          points_before_edit = ff("tr.learning_outcome_criterion div.rating .points").map(&:text)
           f("#rubric_#{@rubric.id} .edit_rubric_link").click
           driver.switch_to.alert.accept
           wait_for_ajax_requests
-          expect(ff("tr.learning_outcome_criterion td.rating .points").map(&:text).reject!(&:empty?)).to eq points_before_edit
+          expect(ff("tr.learning_outcome_criterion div.rating .points").map(&:text).reject!(&:empty?)).to eq points_before_edit
         end
       end
     end
@@ -370,7 +370,7 @@ describe "assignment rubrics" do
       f(".rubric_title .icon-edit").click
       wait_for_ajaximations
 
-      hover_and_click(".criterion:nth-of-type(1) tbody tr td:nth-of-type(1) .edit_rating_link")
+      hover_and_click(".criterion:nth-of-type(1) div.ratings div.rating:nth-of-type(1) .edit_rating_link")
       wait_for_ajaximations
 
       set_value(f("#edit_rating_form .rating_long_description"), "long description")
@@ -413,11 +413,11 @@ describe "assignment rubrics" do
       it "hides range option when using custom ratings", priority: "1" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-        f(" .rubric_title .icon-edit").click
+        f(".rubric_title .icon-edit").click
         wait_for_ajaximations
 
         expect(ffj(".criterion_use_range:visible").count).to eq 1
-        f(".rubric_custom_rating").click
+        f(".rubric-custom-rating").click
         wait_for_ajaximations
 
         expect(f(".rubric_container")).not_to contain_jqcss(".criterion_use_range:visible")
@@ -426,7 +426,7 @@ describe "assignment rubrics" do
       it "hides range option when using learning outcomes", priority: "1" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-        f(" .rubric_title .icon-edit").click
+        f(".rubric_title .icon-edit").click
         wait_for_ajaximations
 
         expect(f(".criterion:nth-of-type(1) .criterion_use_range_div").css_value("display")).to eq "none"
@@ -450,16 +450,16 @@ describe "assignment rubrics" do
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-        f(" .rubric_title .icon-edit").click
+        f(".rubric_title .icon-edit").click
         wait_for_ajaximations
 
         # The min points of the rating being edited should start at 3.
         expect(ffj(".range_rating:visible .min_points")[0]).to include_text "3"
 
         # The max points of the rating to the right should start at 3.
-        expect(ff(".criterion:nth-of-type(2) tbody tr td:nth-of-type(2) .points")[1]).to include_text "3"
+        expect(ff(".criterion:nth-of-type(2) div.ratings div.rating:nth-of-type(2) .points")[1]).to include_text "3"
 
-        hover_and_click(".criterion:nth-of-type(2) tbody tr td:nth-of-type(1) .edit_rating_link")
+        hover_and_click(".criterion:nth-of-type(2) div.ratings div.rating:nth-of-type(1) .edit_rating_link")
         wait_for_ajaximations
 
         set_value(f("#edit_rating_form .min_points"), "2")
@@ -528,9 +528,9 @@ describe "assignment rubrics" do
         f(" .rubric_title .icon-edit").click
         wait_for_ajaximations
 
-        range_rating_element = ".criterion:nth-of-type(2) tbody tr td:nth-of-type(1) .range_rating"
+        range_rating_element = ".criterion:nth-of-type(2) div.ratings div.rating:nth-of-type(1) .range_rating"
         expect(f(range_rating_element).css_value("display")).to eq "inline"
-        hover_and_click(".criterion:nth-of-type(2) tbody tr td:nth-of-type(1) .edit_rating_link")
+        hover_and_click(".criterion:nth-of-type(2) div.ratings div.rating:nth-of-type(1) .edit_rating_link")
         wait_for_ajaximations
 
         set_value(f("#edit_rating_form .min_points"), "2")
@@ -539,7 +539,7 @@ describe "assignment rubrics" do
         f(".ui-dialog-buttonset .save_button").click
         wait_for_ajaximations
 
-        range_rating_element = ".criterion:nth-of-type(3) tbody tr td:nth-of-type(1) .range_rating"
+        range_rating_element = ".criterion:nth-of-type(3) div.ratings div.rating:nth-of-type(1) .range_rating"
         expect(f(range_rating_element).css_value("display")).to eq "none"
       end
 
@@ -552,7 +552,7 @@ describe "assignment rubrics" do
         f(" .rubric_title .icon-edit").click
         wait_for_ajaximations
 
-        hover_and_click(".criterion:nth-of-type(2) tbody tr td:nth-of-type(2) .edit_rating_link")
+        hover_and_click(".criterion:nth-of-type(2) div.ratings div.rating:nth-of-type(2) .edit_rating_link")
         wait_for_ajaximations
 
         set_value(f("#edit_rating_form .min_points"), "-1")

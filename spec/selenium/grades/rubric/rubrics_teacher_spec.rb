@@ -133,8 +133,8 @@ describe "course rubrics" do
       import_outcome
 
       expect(f("tr.learning_outcome_criterion .criterion_description .description").text).to eq @outcome.title
-      expect(ff("tr.learning_outcome_criterion td.rating .description").map(&:text)).to eq @outcome.data[:rubric_criterion][:ratings].pluck(:description)
-      expect(ff("tr.learning_outcome_criterion td.rating .points").map(&:text)).to eq(@outcome.data[:rubric_criterion][:ratings].map { |c| round_if_whole(c[:points]).to_s })
+      expect(ff("tr.learning_outcome_criterion div.rating .description").map(&:text)).to eq @outcome.data[:rubric_criterion][:ratings].pluck(:description)
+      expect(ff("tr.learning_outcome_criterion div.rating .points").map(&:text)).to eq(@outcome.data[:rubric_criterion][:ratings].map { |c| round_if_whole(c[:points]).to_s })
       # important to check this both before and after submit, thanks to the super janky
       # way edit_rubric.js and the .erb template work
       expect(f("tr.learning_outcome_criterion .outcome_sr_content")).to have_attribute("aria-hidden", "false")
@@ -196,7 +196,7 @@ describe "course rubrics" do
         wait_for_ajaximations
         import_outcome
         points = proficiency.outcome_proficiency_ratings.map { |rating| round_if_whole(rating.points).to_s }
-        expect(ff("tr.learning_outcome_criterion td.rating .points").map(&:text)).to eq points
+        expect(ff("tr.learning_outcome_criterion div.rating .points").map(&:text)).to eq points
       end
 
       it "defaults to the the default account proficiency if no outcome proficiecy exists" do
@@ -209,7 +209,7 @@ describe "course rubrics" do
         points = OutcomeProficiency.find_or_create_default!(@course.account).outcome_proficiency_ratings.map do |rating|
           round_if_whole(rating.points).to_s
         end
-        expect(ff("tr.learning_outcome_criterion td.rating .points").map(&:text)).to eq points
+        expect(ff("tr.learning_outcome_criterion div.rating .points").map(&:text)).to eq points
       end
 
       it "rubrics are updated after mastery scales are modified" do
@@ -222,11 +222,11 @@ describe "course rubrics" do
         import_outcome
         current_points = current_proficiency.outcome_proficiency_ratings.map { |rating| rating.points.to_f }
         # checks if they are equal after adding outcome
-        expect(ff("tr.learning_outcome_criterion td.rating .points").map { |e| e.text.to_f }).to eq current_points
+        expect(ff("tr.learning_outcome_criterion div.rating .points").map { |e| e.text.to_f }).to eq current_points
         submit_form("#edit_rubric_form")
         wait_for_ajaximations
         # check if they are equal after submission
-        expect(ff("tr.learning_outcome_criterion td.rating .points").map { |e| e.text.to_f }).to eq current_points
+        expect(ff("tr.learning_outcome_criterion div.rating .points").map { |e| e.text.to_f }).to eq current_points
 
         # Update proficiency's first rating with new point value of 30
         ratings_hash_map = current_proficiency.ratings_hash
@@ -238,7 +238,7 @@ describe "course rubrics" do
         wait_for_ajaximations
         updated_points = current_proficiency.outcome_proficiency_ratings.map { |rating| rating.points.to_f }
         # checks if they are equal after update
-        expect(ff("tr.learning_outcome_criterion td.rating .points").map { |e| e.text.to_f }).to eq updated_points
+        expect(ff("tr.learning_outcome_criterion div.rating .points").map { |e| e.text.to_f }).to eq updated_points
       end
     end
   end
