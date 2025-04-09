@@ -42,6 +42,8 @@ type State = {
   entryId: number
   entries: InsightEntry[] | []
   feedbackNotes: string
+  filterType: string
+  isFilteredTable: boolean
 }
 
 type Action = ActionFromState<State> & {
@@ -56,6 +58,10 @@ const useInsightStore = create<ReadOnlyState & State & Action>(set => ({
   entryId: 0,
   entries: [],
   feedbackNotes: '',
+  filterType: 'all',
+  isFilteredTable: false,
+  setIsFilteredTable: isFilteredTable => set(() => ({isFilteredTable})),
+  setFilterType: filterType => set(() => ({filterType})),
   setModalOpen: isOpen => set(() => ({modalOpen: isOpen})),
   setEntryId: entryId => set(() => ({entryId})),
   setEntries: entries => set(() => ({entries})),

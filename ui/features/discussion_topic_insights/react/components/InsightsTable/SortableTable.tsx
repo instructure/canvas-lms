@@ -16,26 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState, useMemo} from 'react'
-import PaginatedTable from './PaginatedTable'
-import {Header} from './SimpleTable'
-import {InsightsTableProps} from './InsightsTable'
 
-const SortableTable: React.FC<InsightsTableProps> = ({caption, headers, rows, perPage}) => {
+import SimpleTable, {Header, BaseTableProps} from './SimpleTable'
+
+type SortableTableProps = BaseTableProps & {
+  perPage: number
+  page: number
+}
+
+const SortableTable: React.FC<SortableTableProps> = ({caption, headers, rows, perPage, page}) => {
   const [sortBy, setSortBy] = useState<Header['id'] | undefined>(undefined)
   const [ascending, setAscending] = useState(true)
 
   const sortedRows = useMemo(() => {
     if (!sortBy) return rows
-    if (sortBy === 'relevance') {
-      //TODO: Implement sorting by relevance
-      return rows
+
+    const sortTypes: Record<string, (a: any, b: any) => number> = {
+      relevance: (a, b) => {
+        const relevanceOrder = {relevant: 1, needs_review: 2, irrelevant: 3}
+        return (
+          relevanceOrder[a[sortBy] as keyof typeof relevanceOrder] -
+          relevanceOrder[b[sortBy] as keyof typeof relevanceOrder]
+        )
+      },
+      date: (a, b) => (a[sortBy] as string).localeCompare(b[sortBy] as string),
+      name: (a, b) => (a[sortBy] as string).localeCompare(b[sortBy] as string),
     }
-    const sorted = [...rows].sort((a, b) => {
-      return (a[sortBy] as string).localeCompare(b[sortBy] as string)
-    })
+    const sorted = [...rows].sort(sortTypes[sortBy])
 
     return ascending ? sorted : sorted.reverse()
   }, [sortBy, ascending, rows])
+
+  const startIndex = page * perPage
+  const slicedRows = sortedRows.slice(startIndex, startIndex + perPage)
 
   const handleSort = (id: Header['id']) => {
     if (id === sortBy) {
@@ -47,14 +60,13 @@ const SortableTable: React.FC<InsightsTableProps> = ({caption, headers, rows, pe
   }
 
   return (
-    <PaginatedTable
+    <SimpleTable
       caption={caption}
       headers={headers}
-      rows={sortedRows}
+      rows={slicedRows}
       onSort={handleSort}
       sortBy={sortBy}
       ascending={ascending}
-      perPage={perPage}
     />
   )
 }

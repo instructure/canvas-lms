@@ -15,34 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Pagination} from '@instructure/ui-pagination'
 import {Flex} from '@instructure/ui-flex'
-import SimpleTable, {SimpleTableProps, Header} from './SimpleTable'
+import {BaseTableProps} from './SimpleTable'
+import SortableTable from './SortableTable'
+import useInsightStore from '../../hooks/useInsightStore'
 
-type PaginatedTableProps = SimpleTableProps & {
+export type PaginatedTableProps = BaseTableProps & {
   perPage: number
 }
 
-const PaginatedTable: React.FC<PaginatedTableProps> = ({
-  caption,
-  headers,
-  rows,
-  onSort,
-  sortBy,
-  ascending,
-  perPage,
-}) => {
+const PaginatedTable: React.FC<PaginatedTableProps> = ({caption, headers, rows, perPage}) => {
   const [page, setPage] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
+  const isFilteredTable = useInsightStore(state => state.isFilteredTable)
+  const setIsFilteredTable = useInsightStore(state => state.setIsFilteredTable)
 
-  const handleSort = (id: Header['id']) => {
+  useEffect(() => {
+    setIsFilteredTable(false)
     setPage(0)
-    onSort(id)
-  }
+    setCurrentPage(1)
+  }, [isFilteredTable, setIsFilteredTable])
 
-  const startIndex = page * perPage
-  const slicedRows = rows.slice(startIndex, startIndex + perPage)
   const pageCount = perPage && Math.ceil(rows.length / perPage)
 
   const handlePageChange = (nextPage: number) => {
@@ -52,13 +47,12 @@ const PaginatedTable: React.FC<PaginatedTableProps> = ({
 
   return (
     <Flex width="100%" direction="row" wrap="wrap" justifyItems="end">
-      <SimpleTable
+      <SortableTable
         caption={caption}
         headers={headers}
-        rows={slicedRows}
-        onSort={handleSort}
-        sortBy={sortBy}
-        ascending={ascending}
+        rows={rows}
+        perPage={perPage}
+        page={page}
       />
       {pageCount > 1 && (
         <Flex.Item>

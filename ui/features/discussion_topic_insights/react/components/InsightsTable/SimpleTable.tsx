@@ -19,11 +19,12 @@ import React, {ReactNode} from 'react'
 import {Table} from '@instructure/ui-table'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
+import {getStatusByRelevance} from '../../utils'
 
 const I18n = createI18nScope('discussion_insights')
 
 export type Row = {
-  relevance: ReactNode
+  relevance: string
   name: string
   notes: string
   date: string
@@ -88,7 +89,7 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
           <Table.Row key={index}>
             {headers.map(({id, alignment, width}) => (
               <Table.Cell key={id} textAlign={alignment} style={{width}}>
-                {row[id]}
+                {id === 'relevance' ? getStatusByRelevance(row[id]) : row[id]}
               </Table.Cell>
             ))}
           </Table.Row>
