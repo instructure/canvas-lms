@@ -127,7 +127,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2024.1203)
     mini_portile2 (2.8.8)
-    minitest (5.25.4)
+    minitest (5.25.5)
     mutex_m (0.3.0)
     nokogiri (1.18.7)
       mini_portile2 (~> 2.8.2)
