@@ -43,7 +43,7 @@ GEM
       ruby_parser (~> 3.10)
       sexp_processor (~> 4.10)
       ya2yaml (= 0.31)
-    logger (1.6.6)
+    logger (1.7.0)
     mini_portile2 (2.8.8)
     minitest (5.25.4)
     nokogiri (1.18.7)
