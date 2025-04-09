@@ -78,7 +78,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   lti_outbound!
   rake
   rspec (~> 3.12)

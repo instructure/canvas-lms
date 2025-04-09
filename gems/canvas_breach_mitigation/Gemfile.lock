@@ -64,7 +64,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   canvas_breach_mitigation!
   rspec (~> 3.12)
   simplecov (~> 0.22)

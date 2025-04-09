@@ -123,7 +123,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   debug
   live_events!
   nokogiri

@@ -52,7 +52,6 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (>= 3.2, < 8.0)
-  bundler (~> 2.2)
   rake
   workflow!
 

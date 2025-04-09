@@ -403,7 +403,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # NOTE: We don't have a submission user when the teacher is previewing the
     # quiz and displaying the results'
     return true if grants_right?(user, :grade) &&
-                   (submission&.user && submission.user != user)
+                   submission&.user && submission.user != user
 
     return false unless show_correct_answers
 

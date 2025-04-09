@@ -41,7 +41,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   paginated_collection!
   rake
   rspec (~> 3.12)

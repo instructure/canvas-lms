@@ -15,6 +15,4 @@ Gem::Specification.new do |s|
 
   s.add_dependency "activesupport"
   s.add_dependency "after_transaction_commit"
-  s.add_development_dependency "debug"
-  s.add_development_dependency "rspec", "~> 3.12"
 end

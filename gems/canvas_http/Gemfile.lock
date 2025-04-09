@@ -207,7 +207,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   canvas_cache!
   canvas_http!
   canvas_slug!

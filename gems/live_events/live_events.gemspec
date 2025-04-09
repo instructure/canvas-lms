@@ -14,10 +14,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activesupport"
   spec.add_dependency "aws-sdk-kinesis"
   spec.add_dependency "inst_statsd"
-
-  spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "debug"
-  spec.add_development_dependency "nokogiri"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "~> 3.12"
 end

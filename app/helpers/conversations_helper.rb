@@ -188,7 +188,7 @@ module ConversationsHelper
   end
 
   def get_invalid_recipients(context, recipients, current_user)
-    if context.is_a?(Course) && context.available? && !recipients.nil? && (context.user_is_student?(current_user) && !context.user_is_instructor?(current_user) && !context.user_is_admin?(current_user))
+    if context.is_a?(Course) && context.available? && !recipients.nil? && context.user_is_student?(current_user) && !context.user_is_instructor?(current_user) && !context.user_is_admin?(current_user)
       valid_student_recipients = context.current_users.pluck(:id, :name)
       recipients.map { |recipient| [recipient.id, recipient.name] } - valid_student_recipients
     end

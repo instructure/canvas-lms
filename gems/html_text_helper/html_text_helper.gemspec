@@ -18,8 +18,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency "twitter-text", "~> 3.1"
 
   spec.add_dependency "activesupport"
-
-  spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "rspec", "~> 3.12"
-  spec.add_development_dependency "simplecov", "~> 0.22"
 end

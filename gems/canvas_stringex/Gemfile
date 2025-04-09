@@ -5,3 +5,9 @@ source "https://rubygems.org"
 gemspec
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "activerecord"
+gem "rake"
+gem "rspec", "~> 3.12"
+gem "simplecov", "~> 0.22"
+gem "sqlite3"

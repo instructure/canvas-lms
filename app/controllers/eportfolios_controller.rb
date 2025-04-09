@@ -249,7 +249,7 @@ class EportfoliosController < ApplicationController
   def recent_submissions
     if authorized_action(@portfolio, @current_user, :read)
 
-      if @portfolio.grants_right?(@current_user, session, :manage) && (@current_user && @current_user == @portfolio.user)
+      if @portfolio.grants_right?(@current_user, session, :manage) && @current_user && @current_user == @portfolio.user
         recent_submissions = Submission.joins(:course).joins(:assignment)
                                        .where(user_id: @current_user, workflow_state: %w[submitted graded])
                                        .where.not(course: { workflow_state: %w[created claimed deleted] })

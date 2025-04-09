@@ -305,8 +305,15 @@ class RoleOverride < ActiveRecord::Base
   EMPTY_ARRAY = [].freeze
   private_constant :EMPTY_ARRAY
 
-  def self.uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key,
-                                   default_data, no_caching = false, preloaded_overrides: nil)
+  def self.uncached_permission_for(context,
+                                   permission,
+                                   role_or_role_id,
+                                   role_context,
+                                   account,
+                                   permissionless_base_key,
+                                   default_data,
+                                   no_caching = false,
+                                   preloaded_overrides: nil)
     role = role_or_role_id.is_a?(Role) ? role_or_role_id : Role.get_role_by_id(role_or_role_id)
 
     true_for_custom_site_admin_role =

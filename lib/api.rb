@@ -201,7 +201,8 @@ module Api
     (flattened_array_of_columns - not_scoped_to_account_columns).empty?
   end
 
-  def self.sis_parse_id(id, _current_user = nil,
+  def self.sis_parse_id(id,
+                        _current_user = nil,
                         root_account: nil)
     # returns sis_column_name, column_value
     return "id", id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)

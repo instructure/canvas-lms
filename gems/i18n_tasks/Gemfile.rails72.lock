@@ -114,7 +114,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   i18n_extraction!
   i18n_tasks!
   i18nliner (~> 0.2.4)

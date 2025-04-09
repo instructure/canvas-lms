@@ -120,7 +120,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler
   debug
   google_drive!
   rake

@@ -173,7 +173,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler
   canvas_cache!
   config_file!
   debug

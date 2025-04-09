@@ -32,7 +32,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (>= 1.5, < 3)
   canvas_slug!
   rake
   rspec (~> 3.12)
