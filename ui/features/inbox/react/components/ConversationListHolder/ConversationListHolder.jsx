@@ -267,7 +267,7 @@ export const ConversationListHolder = ({
   }
 
   return (
-    <View as="div" height="100%" overflowX="hidden" overflowY="auto" data-testid={props.datatestid}>
+    <View as="div" height="100%" overflowX="hidden" overflowY="auto" data-testid={props.datatestid} borderColor="secondary">
       {isLoading && !isLoadingMoreMenuData && renderLoading()}
       {(!isLoading || isLoadingMoreMenuData) && (
         <View
@@ -276,6 +276,7 @@ export const ConversationListHolder = ({
           overflowX="hidden"
           overflowY="auto"
           borderWidth="0 small small small"
+          borderColor="secondary"
         >
           {renderedItems}
           {isLoadingMoreMenuData && renderLoading()}

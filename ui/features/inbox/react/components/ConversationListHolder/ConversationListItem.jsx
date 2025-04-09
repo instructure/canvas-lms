@@ -108,6 +108,7 @@ export const ConversationListItem = ({...props}) => {
             data-testid="conversation"
             as="div"
             borderWidth="none none small none"
+            borderColor="secondary"
             padding="small medium small x-small"
           >
             <Grid
