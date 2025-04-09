@@ -16,10 +16,10 @@ GEM
   specs:
     diff-lcs (1.6.1)
     logger (1.7.0)
-    mime-types (3.6.0)
+    mime-types (3.6.2)
       logger
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2024.1203)
+    mime-types-data (3.2025.0408)
     rack (2.2.9)
     rack-test (2.2.0)
       rack (>= 1.3)
