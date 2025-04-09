@@ -40,7 +40,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     logger (1.7.0)
-    minitest (5.25.4)
+    minitest (5.25.5)
     mutex_m (0.3.0)
     pp (0.6.2)
       prettyprint
