@@ -39,7 +39,7 @@ GEM
       reline (>= 0.3.8)
     diff-lcs (1.6.0)
     drb (2.2.1)
-    i18n (1.14.6)
+    i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     io-console (0.8.0)
     irb (1.15.2)

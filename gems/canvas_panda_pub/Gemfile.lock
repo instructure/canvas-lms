@@ -113,7 +113,7 @@ GEM
       activerecord (>= 6.1, < 8.0)
       railties (>= 6.1, < 8.0)
     hashdiff (1.1.2)
-    i18n (1.14.6)
+    i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     io-console (0.8.0)
     irb (1.15.2)

@@ -119,7 +119,7 @@ GEM
     guardrail (3.0.4)
       activerecord (>= 6.1, < 8.0)
       railties (>= 6.1, < 8.0)
-    i18n (1.14.6)
+    i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     inst-jobs (3.1.18.1)
       activerecord (>= 7.0)

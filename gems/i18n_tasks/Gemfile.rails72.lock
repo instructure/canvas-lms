@@ -47,7 +47,7 @@ GEM
     drb (2.2.1)
     erubi (1.13.1)
     globby (0.1.2)
-    i18n (1.14.6)
+    i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     i18nliner (0.2.4)
       activesupport (>= 6.0)
