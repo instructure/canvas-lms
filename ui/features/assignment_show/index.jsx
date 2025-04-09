@@ -105,13 +105,14 @@ function onStudentGroupSelected(selectedStudentGroupId) {
     axios
       .put(
         `/api/v1/courses/${ENV.COURSE_ID}/gradebook_settings`,
-        qs.stringify({
+        {
           gradebook_settings: {
             filter_rows_by: {
               student_group_id: selectedStudentGroupId,
+              student_group_ids: [selectedStudentGroupId],
             },
           },
-        }),
+        }
       )
       .finally(() => {
         studentGroupSelectionRequestTrackers = studentGroupSelectionRequestTrackers.filter(
