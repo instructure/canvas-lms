@@ -58,9 +58,10 @@ describe('FileFolderTable', () => {
   })
 
   it('renders no filedrop when searching', () => {
-    renderComponent({ searchString: 'fileDoesNotExist' })
+    renderComponent({searchString: 'fileDoesNotExist'})
 
-    expect(screen.getByText('No Results')).toBeInTheDocument()
+    const noResultsElements = screen.getAllByText('No results found')
+    expect(noResultsElements.length).toBeGreaterThan(0)
     expect(screen.queryByText('Drop files here to upload')).not.toBeInTheDocument()
   })
 
