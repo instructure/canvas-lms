@@ -31,6 +31,13 @@ export class UnauthorizedError extends Error {
   }
 }
 
+export class NotFoundError extends Error {
+  constructor(message: string = 'Not found') {
+    super(message)
+    this.name = 'NotFoundError'
+  }
+}
+
 function getRootFolder(pluralContextType: string, contextId: string) {
   return createStubRootFolder(filesEnv.contextsDictionary[`${pluralContextType}_${contextId}`])
 }
@@ -41,9 +48,15 @@ async function loadFolders(pluralContextType: string, contextId: string, path?: 
   if (resp.status === 401) {
     throw new UnauthorizedError()
   }
+
+  if (resp.status === 404) {
+    throw new NotFoundError(url)
+  }
+
   if (!resp.ok) {
     throw new Error(`Request failed with status ${resp.status}`)
   }
+
   const folders = await resp.json()
   if (!folders || folders.length === 0) {
     throw new Error('Error fetching by_path')

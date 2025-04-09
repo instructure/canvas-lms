@@ -31,7 +31,7 @@ import FileFolderTable from './FileFolderTable'
 import FilesUsageBar from './FilesUsageBar'
 import SearchBar from './SearchBar'
 import {BBFolderWrapper, FileFolderWrapper} from '../../utils/fileFolderWrappers'
-import {UnauthorizedError, useGetFolders} from '../hooks/useGetFolders'
+import {NotFoundError, UnauthorizedError, useGetFolders} from '../hooks/useGetFolders'
 import {File, Folder} from '../../interfaces/File'
 import {useGetPaginatedFiles} from '../hooks/useGetPaginatedFiles'
 import {FilesLayout} from '../layouts/FilesLayout'
@@ -40,6 +40,7 @@ import Breadcrumbs from './FileFolderTable/Breadcrumbs'
 import BulkActionButtons from './FileFolderTable/BulkActionButtons'
 import CurrentUploads from './FilesHeader/CurrentUploads'
 import CurrentDownloads from './FilesHeader/CurrentDownloads'
+import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
 
 const I18n = createI18nScope('files_v2')
 
@@ -68,7 +69,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
       }
       currentFolderWrapper.current!.files.set(rows.map((row: any) => new FileFolderWrapper(row)))
     },
-    [currentFolder.id],
+    [currentFolder],
   )
 
   const {
@@ -221,6 +222,11 @@ const ResponsiveFilesApp = () => {
       window.location.href = '/login'
     }
   }, [error])
+
+  const isNotFoundError = error instanceof NotFoundError
+  if (isNotFoundError) {
+    return <NotFoundArtwork />
+  }
 
   if (!folders) {
     return null
