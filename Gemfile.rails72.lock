@@ -871,7 +871,7 @@ GEM
       ruby-rc4
       ttfunk
     pg (1.5.9)
-    pg_query (6.0.0)
+    pg_query (6.1.0)
       google-protobuf (>= 3.25.3)
     pp (0.6.2)
       prettyprint
