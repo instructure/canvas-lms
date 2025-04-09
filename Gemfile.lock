@@ -1090,7 +1090,7 @@ GEM
     ruby-progressbar (1.13.0)
     ruby-rc4 (0.1.5)
     ruby-rtf (0.0.5)
-    ruby2ruby (2.5.1)
+    ruby2ruby (2.5.2)
       ruby_parser (~> 3.1)
       sexp_processor (~> 4.6)
     ruby_parser (3.21.1)

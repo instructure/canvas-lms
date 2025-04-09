@@ -90,7 +90,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.2)
-    ruby2ruby (2.5.1)
+    ruby2ruby (2.5.2)
       ruby_parser (~> 3.1)
       sexp_processor (~> 4.6)
     ruby_parser (3.21.1)
