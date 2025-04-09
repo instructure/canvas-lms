@@ -76,12 +76,14 @@
       </div>
 
       <div class="editing">
-        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link icon-search"
-          style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>">
+        <a href="<%= search_rubrics_url(:q => "") %>"
+           class="find_rubric_link icon-search"
+           role="button"
+           style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>">
           <%= t 'links.find_a_rubric', "Find a Rubric" %>
         </a>
       </div>
-      
+
       <div class="displaying">
         <span class="title" tabindex="-1"><%= rubric.try(:title) || t(:rubric_title, "Title") %></span>
       </div>
@@ -186,11 +188,10 @@
       </tbody>
     </table>
 
-    <div class="rubric-footer">
+    <div class="rubric-footer" aria-label="<%= t "Rubric criteria configuration" %>">
       <div class="editing pull-left">
         <span id="add_criterion_holder" class="criterion_link"></span>
       </div>
-
       <div class="total_points_holder toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>"
         style="<%= hidden if rubric_association && rubric_association.hide_score_total %>">
         <span role="text"><%= before_label :total_points, "Total Points" %>
@@ -210,7 +211,7 @@
     </div>
   </div>
   <div id="edit_rubric" style="display: none;">
-    <form id="edit_rubric_form" class="edit-rubric-form no-margin-bottom">
+    <form id="edit_rubric_form" class="edit-rubric-form no-margin-bottom" aria-label="<%= t "Rubric configuration" %>">
       <div class="rubric_custom_ratings" style="<%= hidden unless @assignment %>">
         <label>
           <input type="checkbox" id="rubric_custom_rating" class="rubric_custom_rating" <%= 'checked' if rubric && rubric.free_form_criterion_comments %>/>
