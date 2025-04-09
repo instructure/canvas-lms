@@ -29,7 +29,6 @@ import {
   IconImageSolid,
   IconInfoSolid,
   IconDownloadSolid,
-  IconPrinterSolid,
   IconXSolid,
 } from '@instructure/ui-icons'
 import {type File} from '../../../interfaces/File'
@@ -152,16 +151,6 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
               margin="0 x-small 0 0"
               id="file-info-button"
               onClick={() => handleOverlayTrayChange(true)}
-            />
-            <IconButton
-              color="primary-inverse"
-              withBackground={false}
-              withBorder={false}
-              renderIcon={IconPrinterSolid}
-              screenReaderLabel={I18n.t('Print')}
-              margin="0 x-small 0 0"
-              onClick={() => window.print()}
-              id="print-button"
             />
             <IconButton
               color="primary-inverse"

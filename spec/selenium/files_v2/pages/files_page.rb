@@ -239,10 +239,6 @@ module FilesPage
     f("#file-info-button")
   end
 
-  def preview_print_button
-    f("#print-button")
-  end
-
   def preview_download_icon_button
     f("#download-icon-button")
   end

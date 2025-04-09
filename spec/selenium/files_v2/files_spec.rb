@@ -173,7 +173,7 @@ describe "files index page" do
         end
 
         it "tabs through all buttons in the header button bar", priority: "1" do
-          buttons = [preview_file_info_button, preview_print_button, preview_download_icon_button]
+          buttons = [preview_file_info_button, preview_download_icon_button]
           buttons[0].send_keys "" # focuses on the first button
           buttons.each do |button|
             check_element_has_focus(button)
