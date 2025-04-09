@@ -1177,6 +1177,15 @@ rubricEditing.init = function () {
     $rubric_rating_dialog.dialog('close')
   })
 
+  $(
+    '.add_rubric_link, .find_rubric_link, .edit_criterion_link, .delete_criterion_link, .add_criterion_button',
+  ).on('keydown', e => {
+    if (e.code === 'Space' || e.code === 'Enter') {
+      e.preventDefault()
+      $(e.currentTarget).click()
+    }
+  })
+
   $('.add_rubric_link').click(event => {
     event.preventDefault()
     if ($('#rubric_new').length > 0) {
