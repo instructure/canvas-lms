@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {statuses} from '../constants/statuses'
+import {getStatuses} from '../constants/statuses'
 import {darken} from '../constants/colors'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
@@ -68,7 +68,7 @@ function GridColor(props: Props) {
 }
 
 GridColor.defaultProps = {
-  statuses,
+  statuses: getStatuses(),
   customStatuses: [],
 }
 

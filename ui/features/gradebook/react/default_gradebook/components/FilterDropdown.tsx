@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {type MouseEvent, useState, useRef, useEffect} from 'react'
+import type React from 'react'
+import {type MouseEvent, useState, useRef, useEffect} from 'react'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Popover} from '@instructure/ui-popover'
 import {Button} from '@instructure/ui-buttons'
