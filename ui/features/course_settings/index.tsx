@@ -31,8 +31,10 @@ import './jquery/index'
 import '@canvas/grading-standards'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
-import QuantitativeDataOptions from './react/components/QuantitativeDataOptions'
-import CourseDefaultDueTime from './react/components/CourseDefaultDueTime'
+
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {EnvCourseSettings} from '@canvas/global/env/EnvCourse'
+declare const ENV: GlobalEnv & EnvCourseSettings
 
 const I18n = createI18nScope('course_settings')
 
@@ -41,11 +43,15 @@ const CourseTemplateDetails = React.lazy(() => import('./react/components/Course
 const CourseAvailabilityOptions = React.lazy(
   () => import('./react/components/CourseAvailabilityOptions'),
 )
+const QuantitativeDataOptions = React.lazy(
+  () => import('./react/components/QuantitativeDataOptions'),
+)
+const CourseDefaultDueTime = React.lazy(() => import('./react/components/CourseDefaultDueTime'))
 const Integrations = React.lazy(() => import('@canvas/integrations/react/courses/Integrations'))
 const CourseApps = React.lazy(() => import('./react/components/CourseApps'))
 
 const Loading = () => <Spinner size="x-small" renderTitle={I18n.t('Loading')} />
-const Error = () => (
+const ErrorMessage = () => (
   <div className="bcs_check-box">
     <Text color="danger">{I18n.t('Unable to load this control')}</Text>
   </div>
@@ -57,7 +63,7 @@ ready(() => {
     const blueprintRoot = createRoot(blueprint)
     blueprintRoot.render(
       <Suspense fallback={<Loading />}>
-        <ErrorBoundary errorComponent={<Error />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
           <BlueprintLockOptions
             isMasterCourse={ENV.IS_MASTER_COURSE}
             disabledMessage={ENV.DISABLED_BLUEPRINT_MESSAGE}
@@ -77,15 +83,17 @@ ready(() => {
     const courseTemplateRoot = createRoot(courseTemplate)
     courseTemplateRoot.render(
       <Suspense fallback={<Loading />}>
-        <ErrorBoundary errorComponent={<Error />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
           <CourseTemplateDetails isEditable={isEditable} />
         </ErrorBoundary>
       </Suspense>,
     )
   }
 
+  // @ts-expect-error
   const navView = new NavigationView({el: $('#tab-navigation')})
 
+  // @ts-expect-error
   $(() => navView.render())
 
   const imageSelectorRoot = createRoot($('.CourseImageSelector__Container')[0])
@@ -115,7 +123,7 @@ ready(() => {
     const availabilityOptionsRoot = createRoot(availabilityOptionsContainer)
     availabilityOptionsRoot.render(
       <Suspense fallback={<Loading />}>
-        <ErrorBoundary errorComponent={<Error />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
           <CourseAvailabilityOptions
             canManage={ENV.PERMISSIONS.edit_course_availability}
             viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
@@ -140,10 +148,16 @@ ready(() => {
 
   const defaultDueTimeContainer = document.getElementById('default_due_time_container')
   if (defaultDueTimeContainer) {
+    const defaultValue = defaultDueTimeContainer.dataset.defaultDueTime
+    if (!defaultValue) throw new Error('attr data-default-due-time is missing on container')
     const defaultDueTimeRoot = createRoot(defaultDueTimeContainer)
     defaultDueTimeRoot.render(
       <Suspense fallback={<Loading />}>
-        <CourseDefaultDueTime canManage={ENV.PERMISSIONS.manage} />
+        <CourseDefaultDueTime
+          canManage={ENV.PERMISSIONS.manage}
+          container={defaultDueTimeContainer}
+          value={defaultValue}
+        />
       </Suspense>,
     )
   }
@@ -152,7 +166,7 @@ ready(() => {
     const courseColorPickerContainer = document.getElementById('course_color_picker_container')
     if (courseColorPickerContainer) {
       const courseColorRoot = createRoot(courseColorPickerContainer)
-      courseColorRoot.render(<CourseColorSelector courseColor={ENV.COURSE_COLOR} />)
+      courseColorRoot.render(<CourseColorSelector courseColor={ENV.COURSE_COLOR || undefined} />)
     }
   }
 
@@ -161,7 +175,7 @@ ready(() => {
     const integrationsRoot = createRoot(integrationsContainer)
     integrationsRoot.render(
       <Suspense fallback={<Loading />}>
-        <ErrorBoundary errorComponent={<Error />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
           <Integrations />
         </ErrorBoundary>
       </Suspense>,
@@ -173,7 +187,7 @@ ready(() => {
     const appsRoot = createRoot(appsMountpoint)
     appsRoot.render(
       <Suspense fallback={<Loading />}>
-        <ErrorBoundary errorComponent={<Error />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
           <CourseApps />
         </ErrorBoundary>
       </Suspense>,

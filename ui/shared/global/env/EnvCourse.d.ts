@@ -47,6 +47,7 @@ export interface EnvCourseCommon {
  * From CoursesController#settings
  */
 export interface EnvCourseSettings {
+  CAN_EDIT_RESTRICT_QUANTITATIVE_DATA: boolean
   COURSE_ID: string
   /**
    * From "/api/v1/courses/#{@context.id}/users"
@@ -89,7 +90,7 @@ export interface EnvCourseSettings {
         permissions: Record<string, boolean>
       }
     >
-    groups: Record<string, {}>
+    groups: Record<string, object>
     sections: Record<
       string,
       {

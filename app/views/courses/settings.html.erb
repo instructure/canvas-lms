@@ -350,8 +350,12 @@
         <div class="form-label"><%= f.blabel :default_due_time, en: "Default due time" %></div>
         <div class="tall-row">
           <% if Account.site_admin.feature_enabled?(:customizable_default_due_time) %>
-            <div id="default_due_time_container" style="width: 350px"></div>
-            <%= f.hidden_field :default_due_time %>
+            <div
+              id="default_due_time_container"
+              data-default-due-time=<%= @context.default_due_time || inherited_default_due_time(@context) %>
+              style="width: 350px"
+            >
+            </div>
           <% else %>
             <%= f.select :default_due_time, options_for_select(default_due_time_options(@context), default_due_time_key(@context)), {}, {'aria-describedby' => 'due-time-description', :disabled => !can_manage} %>
           <% end %>
