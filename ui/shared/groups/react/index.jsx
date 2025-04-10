@@ -35,7 +35,6 @@ import PaginatedGroupList from './PaginatedGroupList'
 import Filter from './Filter'
 import NewStudentGroupModal from './NewStudentGroupModal'
 import ManageGroupDialog from './ManageGroupDialog'
-import 'jqueryui/dialog'
 import PropTypes from 'prop-types'
 
 const I18n = createI18nScope('student_groups')
@@ -52,6 +51,7 @@ const StudentView = createReactClass({
   getInitialState() {
     return {
       showNewStudentGroupModal: false,
+      groupToManage: null,
       userCollection: new UserCollection(null, {
         params: {enrollment_type: 'student', per_page: 15, sort: 'username'},
       }),
@@ -62,31 +62,11 @@ const StudentView = createReactClass({
     }
   },
 
-  openManageGroupDialog(group) {
-    const mountPoint = document.createElement("div")
-    const $dialog = $(mountPoint).dialog({
-      id: 'manage_group_form',
-      title: I18n.t('Manage Student Group'),
-      height: 500,
-      width: 700,
-      'fix-dialog-buttons': false,
-
-      close: _e => {
-        this.modalContainer.unmount()
-        this.modalContainer = null
-        $(this).remove()
-      },
-      modal: true,
-      zIndex: 1000,
-    })
-
-    const closeDialog = e => {
-      e.preventDefault()
-      $dialog.dialog('close')
+  renderManageGroupDialog(group) {
+    if (group == null) {
+      return null
     }
-    if(!this.modalContainer)
-      this.modalContainer = createRoot(mountPoint)
-    this.modalContainer.render(
+    return (
       <ManageGroupDialog
         userCollection={this.state.userCollection}
         checked={group.users.map(u => u.id)}
@@ -94,7 +74,9 @@ const StudentView = createReactClass({
         name={group.name}
         maxMembership={group.max_membership}
         updateGroup={this.updateGroup}
-        closeDialog={closeDialog}
+        closeDialog={() => {
+          this.setState({groupToManage: null})
+        }}
         loadMore={() => this._loadMore(this.state.userCollection)}
       />
     )
@@ -213,10 +195,6 @@ const StudentView = createReactClass({
     $(ReactDOM.findDOMNode(this.panelRef)).disableWhileLoading(dfd)
   },
 
-  manage(group) {
-    this.openManageGroupDialog(group)
-  },
-
   renderGroupList(groups) {
     const debouncedSetState = debounce((...args) => this.setState(...args), 500)
     return (
@@ -240,8 +218,11 @@ const StudentView = createReactClass({
           loadMore={() => this._loadMore(this.state.groupCollection)}
           onLeave={this.leave}
           onJoin={this.join}
-          onManage={this.manage}
+          onManage={group => {
+            this.setState({groupToManage: group})
+          }}
         />
+        <div id="manage-group-dialog" />
       </>
     )
   },
@@ -329,6 +310,7 @@ const StudentView = createReactClass({
               <div className="pull-right group-categories-actions">{newGroupButton}</div>
             )}
             {this.state.showNewStudentGroupModal ? this.renderNewStudentGroupModal() : null}
+            {this.renderManageGroupDialog(this.state.groupToManage)}
             <div
               className="roster-tab tab-panel"
               ref={ref => {
