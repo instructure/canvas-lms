@@ -204,6 +204,7 @@ export default class AttemptTab extends Component {
     updateUploadingFiles: func,
     uploadingFiles: bool,
     submitButtonRef: object,
+    newAttemptButtonRef: object,
   }
 
   state = {
@@ -393,6 +394,7 @@ export default class AttemptTab extends Component {
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
           submitButtonRef={this.props.submitButtonRef}
+          newAttemptButtonRef={this.props.newAttemptButtonRef}
         />
       </LazyLoad>
     )

@@ -548,6 +548,21 @@ describe "as a student" do
         refresh_page
         expect(StudentAssignmentPageV2.url_text_box.attribute("value")).to include(url_text)
       end
+
+      it "clears any errors when starting a new attempt" do
+        url_text = "www.google.com"
+        StudentAssignmentPageV2.create_url_draft(url_text)
+        StudentAssignmentPageV2.submit_assignment
+        wait_for_ajaximations
+        StudentAssignmentPageV2.new_attempt_button.click
+        wait_for_ajaximations
+        StudentAssignmentPageV2.submit_assignment
+        expect(StudentAssignmentPageV2.url_entry).to include_text("Please enter a valid url")
+        StudentAssignmentPageV2.cancel_attempt_button.click
+        wait_for_ajaximations
+        StudentAssignmentPageV2.new_attempt_button.click
+        expect(StudentAssignmentPageV2.url_entry).to_not include_text("Please enter a valid url")
+      end
     end
 
     context "moduleSequenceFooter" do

@@ -123,6 +123,10 @@ class StudentAssignmentPageV2
       f("span[data-testid='url-submission-text")
     end
 
+    def url_entry
+      f('[data-testid="url-entry"]')
+    end
+
     def start_text_entry_button
       f("button[data-testid='start-text-entry']")
     end
