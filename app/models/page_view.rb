@@ -209,12 +209,13 @@ class PageView < ActiveRecord::Base
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
   def self.for_user(user, options = {})
+    client = options.delete(:client) || pv4_client
     viewer = options.delete(:viewer)
     viewer = nil if viewer == user
     viewer = nil if viewer && Account.site_admin.grants_any_right?(viewer, :view_statistics, :manage_students)
     user.shard.activate do
       if PageView.pv4?
-        result = pv4_client.for_user(user, **options)
+        result = client.for_user(user, **options)
         result = AccountFilter.filter(result, viewer) if viewer
         result
       else
