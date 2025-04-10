@@ -16,20 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
-import React from 'react'
-import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
-import {List} from '@instructure/ui-list'
-import {Heading} from '@instructure/ui-heading'
-import {Spinner} from '@instructure/ui-spinner'
-import {Link} from '@instructure/ui-link'
-import {useQuery} from '@canvas/query'
-import {SplitCoursesList, CourseListItemContent} from '../lists/SplitCoursesList'
-import coursesQuery, {hideHomeroomCourseIfK5Student} from '../queries/coursesQuery'
-import {hideHorizonCourseIfStudent} from '../../../../shared/horizon/react/index'
-import type {Course} from '../../../../api.d'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {useQuery} from '@canvas/query'
+import {Heading} from '@instructure/ui-heading'
+import {Link} from '@instructure/ui-link'
+import {List} from '@instructure/ui-list'
+import {Spinner} from '@instructure/ui-spinner'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import React from 'react'
+import type {Course} from '../../../../api.d'
+import {CourseListItemContent, SplitCoursesList} from '../lists/SplitCoursesList'
+import coursesQuery, {hideHomeroomCourseIfK5Student} from '../queries/coursesQuery'
 
 declare const window: Window & {ENV: GlobalEnv}
 
@@ -44,8 +43,7 @@ export default function CoursesTray() {
       fetchAtLeastOnce: true,
     },
     refetchOnMount: false,
-    select: courses =>
-      courses.filter(hideHomeroomCourseIfK5Student).filter(hideHorizonCourseIfStudent),
+    select: courses => courses.filter(hideHomeroomCourseIfK5Student),
   })
   const k5User = window.ENV.K5_USER
 
