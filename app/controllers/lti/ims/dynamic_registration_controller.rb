@@ -198,6 +198,7 @@ module Lti
           ActiveRecord::Base.transaction do
             developer_key.save!
             registration.save!
+            registration.lti_registration.update!(vendor: registration.vendor)
           end
 
           render_registration(registration, developer_key) if registration.persisted?
