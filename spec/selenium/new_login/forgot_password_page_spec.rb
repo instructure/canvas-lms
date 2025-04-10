@@ -65,4 +65,31 @@ describe "new login Forgot Password page" do
     expect(f('[data-testid="confirmation-heading"]').text).to include("Check Your Email")
     expect(f('[data-testid="confirmation-message"]').text).to include("forgotme@example.com")
   end
+
+  describe "back navigation behavior" do
+    it "returns to login page from confirmation screen" do
+      user_with_pseudonym(active_user: true, unique_id: "forgotme@example.com")
+      get "/login/canvas/forgot-password"
+      f('[data-testid="email-input"]').send_keys("forgotme@example.com")
+      f('[data-testid="submit-button"]').click
+      expect(f('[data-testid="confirmation-heading"]').text).to include("Check Your Email")
+      f('[data-testid="confirmation-back-button"]').click
+      wait_for_selector("h1")
+      expect(f("h1").text).to include("Welcome to Canvas")
+    end
+
+    it "goes back to login if user navigated from login → forgot-password" do
+      get "/login/canvas"
+      f('[data-testid="forgot-password-link"]').click
+      expect(f("h1").text).to include("Forgot password?")
+      f('[data-testid="cancel-button"]').click
+      expect(f("h1").text).to include("Welcome to Canvas")
+    end
+
+    it "returns to login page from Forgot Password" do
+      get "/login/canvas/forgot-password"
+      f('[data-testid="cancel-button"]').click
+      expect(f("h1").text).to include("Welcome to Canvas")
+    end
+  end
 end

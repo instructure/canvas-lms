@@ -67,6 +67,26 @@ describe "new login Student Registration page" do
       expect(user.initial_enrollment_type).to eq("student")
       expect(user.pseudonym.unique_id).to eq("student_test_user")
     end
+
+    describe "back navigation behavior" do
+      it "returns to login page from Student registration form" do
+        get "/login/canvas/register/student"
+        f('[data-testid="back-button"]').click
+        wait_for_selector("h1")
+        expect(f("h1").text).to include("Welcome to Canvas")
+      end
+
+      it "goes back to registration landing page if user navigated from login → registration landing page → student registration" do
+        get "/login/canvas"
+        f('[data-testid="create-account-link"]').click
+        expect(f("h1").text).to include("Create Your Account")
+        f('[data-testid="student-card-link"]').click
+        expect(f("h1").text).to include("Create a Student Account")
+        f('[data-testid="back-button"]').click
+        wait_for_selector("h1")
+        expect(f("h1").text).to include("Create Your Account")
+      end
+    end
   end
 
   describe "access control" do

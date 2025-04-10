@@ -92,4 +92,25 @@ describe "new login OTP page" do
     error = fxpath("//*[contains(text(), 'Invalid verification code')]")
     expect(error).to be_displayed
   end
+
+  it "returns to login page when clicking Cancel on the OTP form" do
+    user = user_with_pseudonym(
+      active_user: true,
+      username: "tuwmfac",
+      password: "CfWtyAWtwfQtHeGRTx9BnaU4N"
+    )
+    user.update!(
+      otp_secret_key: ROTP::Base32.random,
+      otp_communication_channel: user.communication_channels.sms.create!(path: "1234567890")
+    )
+    Account.default.settings[:mfa_settings] = :required
+    Account.default.save!
+    get "/login/canvas"
+    f('[data-testid="username-input"]').send_keys(@pseudonym.unique_id)
+    f('[data-testid="password-input"]').send_keys("CfWtyAWtwfQtHeGRTx9BnaU4N")
+    f('[data-testid="login-button"]').click
+    expect(f("h1").text).to include("Multi-Factor Authentication")
+    f('[data-testid="cancel-button"]').click
+    expect(f("h1").text).to include("Welcome to Canvas")
+  end
 end
