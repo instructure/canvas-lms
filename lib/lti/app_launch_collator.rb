@@ -25,6 +25,8 @@ module Lti
       LtiDeepLinkingRequest
     ].freeze
 
+    TARGET_LINK_URI_PRIORITY_PLACEMENTS = [:assignment_edit, :assignment_view].freeze
+
     class << self
       include Rails.application.routes.url_helpers
 
@@ -111,6 +113,13 @@ module Lti
           definition[:placements][p.to_sym].merge!(global_nav_info(tool)) if p == "global_navigation"
           definition[:placements][p.to_sym].merge!(asset_processor_info(tool)) if p == Lti::ResourcePlacement::ASSET_PROCESSOR
 
+          # Overwrite the URL with the target_link_uri if it is set
+          # and the placement is assignment_edit or assignment_view
+          if TARGET_LINK_URI_PRIORITY_PLACEMENTS.include?(p.to_sym) && Account.site_admin.feature_enabled?(:lti_target_link_uri_for_assignment_edit_view)
+            placement_target_link_uri = tool.extension_setting(p, :target_link_uri)
+            definition[:placements][p.to_sym][:url] = placement_target_link_uri unless placement_target_link_uri.blank?
+          end
+
           message_type = definition.dig(:placements, p.to_sym, :message_type)
 
           if (width = selection_property_value(:selection_width, tool, p, message_type))
@@ -121,7 +130,8 @@ module Lti
             definition[:placements][p.to_sym][:selection_height] = height
           end
 
-          %i[launch_width launch_height].each do |property|
+          launch_properties = %i[launch_width launch_height]
+          launch_properties.each do |property|
             if tool.extension_setting(p, property)
               definition[:placements][p.to_sym][property] = tool.extension_setting(p, property)
             end
