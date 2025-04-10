@@ -28,6 +28,7 @@ const featureBundles: {
   account_search: () => import('./features/account_search/index'),
   account_settings: () => import('./features/account_settings/index'),
   account_statistics: () => import('./features/account_statistics/index'),
+  accessibility_checker: () => import('./features/accessibility_checker/index'),
   admin_split: () => import('./features/admin_split/index'),
   all_courses: () => import('./features/all_courses/index'),
   analytics_hub: () => import('./features/analytics_hub/index'),
