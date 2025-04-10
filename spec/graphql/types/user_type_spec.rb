@@ -653,6 +653,42 @@ describe Types::UserType do
       ).to eq c.conversation.conversation_messages.first.body
     end
 
+    context "with horizon courses" do
+      before do
+        # Create a horizon course and conversation
+        @course.update!(horizon_course: true)
+        @course.account.enable_feature!(:horizon_course_setting)
+        @course.enroll_student(@student, enrollment_state: "active")
+        @course.save!
+        # Pass the actual course object as context
+        @horizon_convo = conversation(@student, @teacher, body: "Horizon")
+      end
+
+      after do
+        @course.update!(horizon_course: false)
+        @course.account.disable_feature!(:horizon_course_setting)
+        @horizon_convo.destroy
+      end
+
+      it "excludes horizon conversations by default" do
+        type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+        result = type.resolve("conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
+        expect(result.flatten).not_to include(@horizon_convo.conversation.conversation_messages.first.body)
+      end
+
+      it "excludes horizon conversations if showHorizonConversations is false" do
+        type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+        result = type.resolve("conversationsConnection(showHorizonConversations: false) { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
+        expect(result.flatten).not_to include(@horizon_convo.conversation.conversation_messages.first.body)
+      end
+
+      it "includes horizon conversations when explicitly requested" do
+        type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+        result = type.resolve("conversationsConnection(showHorizonConversations: true) { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
+        expect(result.flatten).to include(@horizon_convo.conversation.conversation_messages.first.body)
+      end
+    end
+
     context "recipient user deleted" do
       def delete_recipient
         # The short issue is CP and CMP are not fk attached to the user, but our code expects an associated user.

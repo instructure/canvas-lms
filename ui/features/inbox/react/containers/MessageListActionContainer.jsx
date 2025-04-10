@@ -31,7 +31,6 @@ import {View} from '@instructure/ui-view'
 import {AddressBookContainer} from './AddressBookContainer/AddressBookContainer'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../util/utils'
-import {hideHorizonCourseIfStudent} from '../../../../shared/horizon/react/index'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -56,7 +55,10 @@ const MessageListActionContainer = props => {
   const hasSelectedConversations = () => props.selectedConversations.length > 0
 
   const {loading, error, data} = useQuery(COURSES_QUERY, {
-    variables: {userID},
+    variables: {
+      userID,
+      horizonCourses: false,
+    },
   })
 
   const uniqueCourses = reduceDuplicateCourses(
@@ -82,11 +84,9 @@ const MessageListActionContainer = props => {
         assetString: 'all_courses',
       },
     ],
-    favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes.filter(
-      hideHorizonCourseIfStudent,
-    ),
-    moreCourses: moreCourses.filter(hideHorizonCourseIfStudent),
-    concludedCourses: concludedCourses.filter(hideHorizonCourseIfStudent),
+    favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes,
+    moreCourses: moreCourses,
+    concludedCourses: concludedCourses,
     groups: data?.legacyNode?.favoriteGroupsConnection?.nodes,
   }
 
