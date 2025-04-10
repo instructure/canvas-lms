@@ -29,9 +29,13 @@ describe GroupAndMembershipImporter do
     end
   end
 
-  def create_group_import(data)
+  def create_group_import(data, error: false)
     Dir.mktmpdir("sis_rspec") do |tmpdir|
-      path = "#{tmpdir}/csv_0.csv"
+      path = if error
+               "#{tmpdir}/csv_0.invalid"
+             else
+               "#{tmpdir}/csv_0.csv"
+             end
       File.write(path, data)
 
       import = File.open(path, "rb") do |tmp|
@@ -47,8 +51,8 @@ describe GroupAndMembershipImporter do
     end
   end
 
-  def import_csv_data(data)
-    create_group_import(data) do |progress|
+  def import_csv_data(data, error: false)
+    create_group_import(data, error:) do |progress|
       run_jobs
       progress.reload
     end
@@ -71,6 +75,43 @@ describe GroupAndMembershipImporter do
       expect(import).to receive(:progress).exactly(3).and_return(progress)
       import.fail_import("some error")
       expect(import.reload.workflow_state).to eq "failed"
+    end
+
+    describe "progress.message" do
+      it "contains the number of imported groups and users when import succeeds" do
+        progress = import_csv_data(%(user_id,group_name
+                                    user_0, first group
+                                    user_1, second group
+                                    user_2, third group
+                                    user_3, third group
+                                    user_4, first group))
+        message = {
+          type: "import_groups",
+          groups: 3,
+          users: 5,
+          error: nil
+        }.to_json
+        expect(progress.workflow_state).to eq "completed"
+        expect(progress.message).to eq message
+      end
+
+      it "contains an error message when import fails" do
+        progress = import_csv_data(%(user_id,group_name
+                                    user_0, first group
+                                    user_1, second group
+                                    user_2, third group
+                                    user_3, third group
+                                    user_4, first group),
+                                   error: true)
+        message = {
+          type: "import_groups",
+          groups: 0,
+          users: 0,
+          error: "Only CSV files are supported."
+        }.to_json
+        expect(progress.workflow_state).to eq "failed"
+        expect(progress.message).to eq message
+      end
     end
 
     it "works" do

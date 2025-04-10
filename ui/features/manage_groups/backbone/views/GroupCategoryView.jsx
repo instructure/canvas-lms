@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-
+import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import {debounce} from 'lodash'
 import GroupCategoryDetailView from './GroupCategoryDetailView'
@@ -114,6 +114,29 @@ export default class GroupCategoryView extends View {
     })
     this.model.progressModel.on('change', this.render, this)
     return this.model.on('progressResolved', () => {
+      const status = this.model.progressModel.get('workflow_state')
+      const progressMessage = this.model.progressModel.get('message')
+      let message
+      try {
+        message = progressMessage ? JSON.parse(progressMessage) : null
+      } catch (_err) {
+        message = null
+      }
+
+      if (message && message.type === "import_groups") {
+        if (status === 'completed') {
+          if (message.groups > 0) {
+            $.flashMessage(I18n.t("Your %{groups} groups and %{users} students were successfully uploaded",
+            { groups: message.groups, users: message.users }))
+          } else {
+            $.flashError(I18n.t("No groups were found in the uploaded file."))
+          }
+        }
+        if (status === 'failed') {
+          $.flashError(I18n.t('Your groups could not be uploaded. Check formatting and try again.'))
+        }
+      }
+
       return this.model.fetch({
         success: () => {
           this.model.groups().fetch()
