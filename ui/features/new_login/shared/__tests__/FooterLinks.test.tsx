@@ -18,7 +18,6 @@
 
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {FooterLinks} from '..'
 import {
@@ -44,11 +43,7 @@ const mockUseHelpTray = useHelpTray as jest.Mock
 const mockUseNewLogin = useNewLogin as jest.Mock
 
 describe('FooterLinks', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  const renderFooterLinks = () => {
+  const renderFooterLinks = () =>
     render(
       <MemoryRouter>
         <NewLoginProvider>
@@ -58,7 +53,10 @@ describe('FooterLinks', () => {
         </NewLoginProvider>
       </MemoryRouter>,
     )
-  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
 
   it('renders without crashing', () => {
     mockUseNewLoginData.mockReturnValue({
@@ -208,5 +206,19 @@ describe('FooterLinks', () => {
     })
     renderFooterLinks()
     expect(screen.getByTestId('help-link')).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('ensures all links open in the same window (no target="_blank")', () => {
+    mockUseNewLoginData.mockReturnValue({
+      isPreviewMode: false,
+      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+    })
+    mockUseNewLogin.mockReturnValue({isUiActionPending: false})
+    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    renderFooterLinks()
+    const links = screen.getAllByTestId(/-link$/)
+    links.forEach(link => {
+      expect(link).not.toHaveAttribute('target', '_blank')
+    })
   })
 })
