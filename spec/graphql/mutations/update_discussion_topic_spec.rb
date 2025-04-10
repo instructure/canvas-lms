@@ -1237,7 +1237,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect_error(result, "Group discussions cannot have checkpoints.")
     end
 
-    it "returns an error when attempting to add checkpoins to a discussion with student submissions" do
+    it "returns an error when attempting to add checkpoins to a graded discussion with student submissions" do
       discussion_assignment = @course.assignments.create!(
         title: "Topic 1",
         submission_types: "discussion_topic"
@@ -1250,7 +1250,56 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
                               { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
                             ])
 
-      expect_error(result, "If there are submissions, checkpoints cannot be enabled.")
+      expect_error(result, "If there are replies, checkpoints cannot be enabled.")
+    end
+
+    it "returns an error when attemting to add checkpoints to an ungraded discussion with replies" do
+      my_topic = discussion_topic_model({ context: @course, attachment: @attachment })
+      my_topic.discussion_entries.create!(message: "first message", user: @teacher)
+
+      result = run_mutation(id: my_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+      expect(my_topic.assignment).to be_nil
+      expect(my_topic.reply_to_entry_required_count).to eq 0
+      expect_error(result, "If there are replies, checkpoints cannot be enabled.")
+    end
+
+    it "graded discussions with only deleted replies can still become checkpointed" do
+      student = student_in_course.user
+      graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+      entry = graded_topic.discussion_entries.create!(message: "delete me", user: student)
+      entry.destroy
+      expect(graded_topic.discussion_entries.active).to be_empty
+
+      result = run_mutation(id: graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+
+      expect(result["errors"]).to be_nil
+
+      assignment = Assignment.last
+      expect(assignment.has_sub_assignments?).to be true
+      expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 5
+    end
+
+    it "ungraded discussions with only deleted replies can still become checkpointed" do
+      my_topic = discussion_topic_model({ context: @course, attachment: @attachment })
+      entry = my_topic.discussion_entries.create!(message: "first message", user: @teacher)
+      entry.destroy
+      expect(my_topic.discussion_entries.active).to be_empty
+      result = run_mutation(id: my_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+
+      expect(result["errors"]).to be_nil
+
+      assignment = Assignment.last
+      expect(assignment.has_sub_assignments?).to be true
+      expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 5
     end
 
     context "with differentiation tag overrides" do
