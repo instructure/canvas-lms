@@ -31,7 +31,7 @@ import FileFolderTable from './FileFolderTable'
 import FilesUsageBar from './FilesUsageBar'
 import SearchBar from './SearchBar'
 import {BBFolderWrapper, FileFolderWrapper} from '../../utils/fileFolderWrappers'
-import {useGetFolders} from '../hooks/useGetFolders'
+import {UnauthorizedError, useGetFolders} from '../hooks/useGetFolders'
 import {File, Folder} from '../../interfaces/File'
 import {useGetPaginatedFiles} from '../hooks/useGetPaginatedFiles'
 import {FilesLayout} from '../layouts/FilesLayout'
@@ -84,7 +84,9 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   })
 
   useEffect(() => {
-    if (error) {
+    if (error instanceof UnauthorizedError) {
+      window.location.href = '/login'
+    } else if (error) {
       showFlashError(I18n.t('Failed to fetch files and folders.'))()
     }
   }, [error])
@@ -140,7 +142,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
           <TopLevelButtons
             size={size}
             isUserContext={isUserContext}
-            shouldHideUploadButtons={!userCanAddFilesForContext  || search.term.length > 0}
+            shouldHideUploadButtons={!userCanAddFilesForContext || search.term.length > 0}
           />
         }
         search={<SearchBar initialValue={search.term} onSearch={search.set} />}
@@ -212,7 +214,14 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
 
 const ResponsiveFilesApp = () => {
   const isUserContext = filesEnv.showingAllContexts
-  const {data: folders} = useGetFolders()
+  const {data: folders, error} = useGetFolders()
+
+  useEffect(() => {
+    if (error instanceof UnauthorizedError) {
+      window.location.href = '/login'
+    }
+  }, [error])
+
   if (!folders) {
     return null
   }
