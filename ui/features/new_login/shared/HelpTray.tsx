@@ -43,6 +43,7 @@ const HelpTray = () => {
       open={isHelpTrayOpen}
       placement="start"
       shouldCloseOnDocumentClick={true}
+      id="helpTray"
     >
       <View as="div" padding="medium">
         <Flex direction="column" gap="medium">
