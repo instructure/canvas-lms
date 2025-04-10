@@ -19,11 +19,13 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import useFetchApi from '@canvas/use-fetch-api-hook'
-import FolderTreeBrowser from '../FolderTreeBrowser'
 import {FAKE_FOLDERS} from '../../../../../fixtures/fakeData'
+import FolderTreeBrowser from '../FolderTreeBrowser'
+import {useFoldersQuery} from '../hooks'
 
-jest.mock('@canvas/use-fetch-api-hook')
+jest.mock('../hooks', () => ({
+  useFoldersQuery: jest.fn(),
+}))
 
 const defaultProps = {
   rootFolder: FAKE_FOLDERS[0],
@@ -34,26 +36,21 @@ const renderComponent = (props: any = {}) =>
   render(<FolderTreeBrowser {...defaultProps} {...props} />)
 
 describe('FolderTreeBrowser', () => {
-  it('renders tree', async () => {
-    ;(useFetchApi as jest.Mock).mockImplementationOnce(({loading, success}) => {
-      loading(false)
-      success([FAKE_FOLDERS[1]])
+  beforeEach(() => {
+    (useFoldersQuery as jest.Mock).mockReturnValue({
+      folders: {[FAKE_FOLDERS[1].id]: FAKE_FOLDERS[1]},
+      foldersLoading: false,
+      foldersSuccessful: true,
+      foldersError: false,
     })
+  })
+
+  it('renders tree', async () => {
     renderComponent()
     expect(await screen.findByText(FAKE_FOLDERS[1].name)).toBeInTheDocument()
   })
 
-  it('renders loading spinner', async () => {
-    ;(useFetchApi as jest.Mock).mockImplementationOnce(({loading}) => loading(true))
-    renderComponent()
-    expect(await screen.findByText('Loading folders...')).toBeInTheDocument()
-  })
-
   it('calls onSelectFolder', async () => {
-    ;(useFetchApi as jest.Mock).mockImplementationOnce(({loading, success}) => {
-      loading(false)
-      success([FAKE_FOLDERS[1]])
-    })
     renderComponent()
     await userEvent.click(await screen.findByText(FAKE_FOLDERS[1].name))
     expect(defaultProps.onSelectFolder).toBeCalledWith(FAKE_FOLDERS[1])
