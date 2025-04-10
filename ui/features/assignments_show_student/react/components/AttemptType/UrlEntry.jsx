@@ -53,7 +53,7 @@ class UrlEntry extends React.Component {
   _urlInputRef = createRef()
 
   componentDidUpdate(prevProps) {
-    const {submission, submitButtonRef} = this.props
+    const {submission, submitButtonRef, newAttemptButtonRef} = this.props
     if (
       submission?.submissionDraft?.url &&
       submission.submissionDraft.url !== prevProps.submission?.submissionDraft?.url
@@ -62,10 +62,11 @@ class UrlEntry extends React.Component {
     }
 
     submitButtonRef?.current?.addEventListener('click', this.handleSubmitClick)
+    newAttemptButtonRef?.current?.addEventListener('click', this.handleNewAttemptClick)
   }
 
   componentDidMount() {
-    const { submission, focusOnInit, submitButtonRef } = this.props
+    const { submission, focusOnInit, submitButtonRef, newAttemptButtonRef } = this.props
     window.addEventListener('beforeunload', this.beforeunload)
     if (submission?.submissionDraft?.url) {
       this.updateInputState()
@@ -73,6 +74,7 @@ class UrlEntry extends React.Component {
     window.addEventListener('message', this.handleLTIURLs)
 
     submitButtonRef?.current?.addEventListener('click', this.handleSubmitClick)
+    newAttemptButtonRef?.current?.addEventListener('click', this.handleNewAttemptClick)
 
     if (focusOnInit && !isSubmitted(submission)) {
       this._urlInputRef.current.focus()
@@ -83,6 +85,12 @@ class UrlEntry extends React.Component {
     if (!this.props.submission.submissionDraft?.meetsUrlCriteria) {
       this._urlInputRef.current.focus()
       this.setState({messages: ERROR_MESSAGE})
+    }
+  }
+
+  handleNewAttemptClick = () => {
+    if (this.state.messages.length > 0) {
+      this.setState({messages: []})
     }
   }
 
@@ -100,6 +108,7 @@ class UrlEntry extends React.Component {
     window.removeEventListener('beforeunload', this.beforeunload)
     window.removeEventListener('message', this.handleLTIURLs)
     this.props.submitButtonRef?.current?.removeEventListener('click', this.handleSubmitClick)
+    this.props.newAttemptButtonRef?.current?.removeEventListener('click', this.handleNewAttemptClick)
   }
 
   handleLTIURLs = async e => {
@@ -136,7 +145,10 @@ class UrlEntry extends React.Component {
     if (this.state.typingTimeout) {
       clearTimeout(this.state.typingTimeout)
     }
-    this.createSubmissionDraft(e.target.value)
+
+    if (e.target.value || this.props.submission?.submissionDraft?.url) {
+      this.createSubmissionDraft(e.target.value)
+    }
   }
 
   handleChange = e => {
@@ -273,6 +285,7 @@ UrlEntry.propTypes = {
   submission: Submission.shape,
   updateEditingDraft: func,
   submitButtonRef: object,
+  newAttemptButtonRef: object,
 }
 
 UrlEntry.contextType = AlertManagerContext
