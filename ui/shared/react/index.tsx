@@ -19,8 +19,8 @@
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import {
-  canvas as canvasBaseTheme,
-  canvasHighContrast as canvasHighContrastTheme,
+  canvasThemeLocal as canvasBaseTheme,
+  canvasHighContrastThemeLocal as canvasHighContrastTheme,
 } from '@instructure/ui-themes'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {memoize} from 'lodash'
