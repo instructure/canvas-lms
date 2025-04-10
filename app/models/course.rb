@@ -3361,6 +3361,7 @@ class Course < ActiveRecord::Base
   TAB_SCHEDULE = 19
   TAB_COURSE_PACES = 20
   TAB_SEARCH = 21
+  TAB_ACCESSIBILITY = 22
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3557,6 +3558,16 @@ class Course < ActiveRecord::Base
                    else
                      Course.default_tabs
                    end
+
+    if feature_enabled?(:accessibility_tab_enable)
+      default_tabs.insert(1,
+                          {
+                            id: TAB_ACCESSIBILITY,
+                            label: t("#tabs.accessibility", "Accessibility"),
+                            css_class: "accessibility",
+                            href: :course_accessibility_path
+                          })
+    end
 
     if SmartSearch.smart_search_available?(self)
       default_tabs.insert(1,
