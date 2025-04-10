@@ -27,6 +27,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {Link} from '@instructure/ui-link'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {Menu} from '@instructure/ui-menu'
 import {IconAddSolid, IconQuestionLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-popover'
@@ -241,20 +242,19 @@ export default function CollectionView(props) {
       {cards.globalThemes && (
         <div className="ic-ThemeCard-container" data-testid="container-templates-section">
           <h2 className="ic-ThemeCard-container__Heading">
-            <span className="ic-ThemeCard-container__Heading-text">
+            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+            <span className="ic-ThemeCard-container__Heading-text" tabIndex={0}>
               {I18n.t('Templates')}
-              <Popover
-                renderTrigger={
-                  <Link size="small" renderIcon={IconQuestionLine}>
-                    <ScreenReaderContent>{explainerText}</ScreenReaderContent>
-                  </Link>
-                }
-                placement="top center"
+              <Tooltip
+                placement="top"
+                margin="small 0 0 0"
+                renderTip={explainerText}
+                color="primary"
               >
-                <View display="block" padding="small" maxWidth="15rem">
-                  {explainerText}
-                </View>
-              </Popover>
+                <Link size="small" renderIcon={IconQuestionLine}>
+                  <ScreenReaderContent>{explainerText}</ScreenReaderContent>
+                </Link>
+              </Tooltip>
             </span>
           </h2>
 
