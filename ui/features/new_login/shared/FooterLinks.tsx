@@ -28,7 +28,7 @@ const I18n = createI18nScope('new_login')
 const FooterLinks = () => {
   const {isUiActionPending} = useNewLogin()
   const {isPreviewMode, helpLink} = useNewLoginData()
-  const {openHelpTray} = useHelpTray()
+  const {openHelpTray, isHelpTrayOpen} = useHelpTray()
 
   const isDisabled = isPreviewMode || isUiActionPending
 
@@ -47,13 +47,13 @@ const FooterLinks = () => {
         {helpLink && (
           <InlineList.Item>
             <Link
+              aria-controls="helpTray"
+              aria-expanded={isHelpTrayOpen}
+              as="button"
               data-testid="help-link"
               data-track-category={helpLink.trackCategory}
               data-track-label={helpLink.trackLabel}
-              forceButtonRole={false}
-              href="https://community.canvaslms.com/"
               onClick={event => handleClick(event as React.MouseEvent<ViewOwnProps>, true)}
-              target="_blank"
             >
               {helpLink.text}
             </Link>
