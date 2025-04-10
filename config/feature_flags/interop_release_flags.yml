@@ -96,6 +96,22 @@ import_numeric_lti_custom_params_as_string:
       state: allowed_on
     ci:
       state: allowed_on
+lti_target_link_uri_for_assignment_edit_view:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Assignment Edit or Assignment View tool should launch target_link_uri
+  description: |-
+    When the target_link_uri on the Assignment Edit or Assignment View placement
+    is set differently than the default, the tool launch from those placements
+    uses the target_link_uri set at the placement level instead of the default.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_apps_page_instructors:
   state: hidden
   shadow: true
