@@ -131,7 +131,7 @@ describe('DiscussionInsights', () => {
 
     render(<DiscussionInsights />)
     expect(
-      screen.getByText('There have been new replies added since the last insights generation.'),
+      screen.getByText('The discussion board has some new activity since the last insights were generated.'),
     ).toBeInTheDocument()
   })
 })
