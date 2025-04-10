@@ -551,6 +551,18 @@ describe "Default Account Reports" do
         expect(parsed).to eq([@user6, @user7, @user9, @user1, @user2, @user3, @user4].map { |u| expected_user(u, format: "provisioning") })
       end
 
+      it "interprets created_by_sis=0 correctly in a provisioning report" do
+        parameters = {}
+        parameters["users"] = "1"
+        parameters["created_by_sis"] = "0"
+        parsed = read_report("provisioning_csv", { params: parameters, order: [1, 2], header: true })
+
+        headers = parsed.shift
+        expect(headers).to eq user_headers(format: "provisioning")
+        expect(parsed.length).to eq 7
+        expect(parsed).to eq([@user6, @user7, @user9, @user1, @user2, @user3, @user4].map { |u| expected_user(u, format: "provisioning") })
+      end
+
       it "runs provisioning report including deleted users for course" do
         c = Course.create(name: "course1")
         c.student_view_student
