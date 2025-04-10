@@ -45,7 +45,6 @@ const InstructureLogo = () => {
       forceButtonRole={false}
       href="https://instructure.com"
       onClick={handleClick}
-      target="_blank"
     >
       <Img
         // Img is decorative by default

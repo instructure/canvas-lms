@@ -17,7 +17,6 @@
  */
 
 import {render, screen} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {InstructureLogo} from '..'
 import {NewLoginDataProvider, NewLoginProvider, useNewLogin, useNewLoginData} from '../../context'
@@ -37,6 +36,15 @@ const mockUseNewLogin = useNewLogin as jest.Mock
 const mockUseNewLoginData = useNewLoginData as jest.Mock
 
 describe('InstructureLogo', () => {
+  const renderInstructureLogo = () =>
+    render(
+      <NewLoginProvider>
+        <NewLoginDataProvider>
+          <InstructureLogo />
+        </NewLoginDataProvider>
+      </NewLoginProvider>,
+    )
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
@@ -46,17 +54,11 @@ describe('InstructureLogo', () => {
   jest.mock('../assets/images/instructure.svg', () => 'mocked-image-path.svg')
 
   it('renders the InstructureLogo with correct attributes and structure', () => {
-    render(
-      <NewLoginProvider>
-        <NewLoginDataProvider>
-          <InstructureLogo />
-        </NewLoginDataProvider>
-      </NewLoginProvider>,
-    )
+    renderInstructureLogo()
     const logoLink = screen.getByTestId('instructure-logo-link')
     expect(logoLink).toBeInTheDocument()
     expect(logoLink).toHaveAttribute('href', 'https://instructure.com')
-    expect(logoLink).toHaveAttribute('target', '_blank')
+    expect(logoLink).not.toHaveAttribute('target', '_blank')
     const logoImage = screen.getByTestId('instructure-logo-img')
     expect(logoImage).toBeInTheDocument()
     expect(logoImage).toHaveAttribute('src', 'mocked-image-path.svg')
@@ -64,13 +66,7 @@ describe('InstructureLogo', () => {
   })
 
   it('ensures link does not have role button and is a valid anchor tag', () => {
-    render(
-      <NewLoginProvider>
-        <NewLoginDataProvider>
-          <InstructureLogo />
-        </NewLoginDataProvider>
-      </NewLoginProvider>,
-    )
+    renderInstructureLogo()
     const link = screen.getByTestId('instructure-logo-link')
     expect(link).not.toHaveAttribute('role', 'button')
     expect(link).toHaveAttribute('href', 'https://instructure.com')
@@ -78,13 +74,7 @@ describe('InstructureLogo', () => {
   })
 
   it('ensures link has the correct accessible name and is not hidden or disabled', () => {
-    render(
-      <NewLoginProvider>
-        <NewLoginDataProvider>
-          <InstructureLogo />
-        </NewLoginDataProvider>
-      </NewLoginProvider>,
-    )
+    renderInstructureLogo()
     const link = screen.getByLabelText('By Instructure')
     expect(link).toBeInTheDocument()
     expect(link).toHaveAttribute('aria-label', 'By Instructure')
@@ -95,13 +85,7 @@ describe('InstructureLogo', () => {
   it('prevents navigation when disabled', async () => {
     mockUseNewLogin.mockReturnValue({isUiActionPending: true})
     mockUseNewLoginData.mockReturnValue({isPreviewMode: false})
-    render(
-      <NewLoginProvider>
-        <NewLoginDataProvider>
-          <InstructureLogo />
-        </NewLoginDataProvider>
-      </NewLoginProvider>,
-    )
+    renderInstructureLogo()
     const link = screen.getByTestId('instructure-logo-link')
     const clickEvent = new MouseEvent('click', {bubbles: true, cancelable: true})
     jest.spyOn(clickEvent, 'preventDefault')
@@ -110,33 +94,22 @@ describe('InstructureLogo', () => {
     expect(link).toHaveAttribute('href', 'https://instructure.com')
   })
 
-  it('allows navigation when enabled', async () => {
+  it('allows navigation when enabled', () => {
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseNewLoginData.mockReturnValue({isPreviewMode: false})
-    render(
-      <NewLoginProvider>
-        <NewLoginDataProvider>
-          <InstructureLogo />
-        </NewLoginDataProvider>
-      </NewLoginProvider>,
-    )
+    renderInstructureLogo()
     const link = screen.getByTestId('instructure-logo-link')
     const clickEvent = new MouseEvent('click', {bubbles: true, cancelable: true})
     jest.spyOn(clickEvent, 'preventDefault')
-    await userEvent.click(link)
+    link.dispatchEvent(clickEvent)
     expect(link).toHaveAttribute('href', 'https://instructure.com')
     expect(clickEvent.preventDefault).not.toHaveBeenCalled()
   })
 
-  it('ensures link opens in a new tab', () => {
-    render(
-      <NewLoginProvider>
-        <NewLoginDataProvider>
-          <InstructureLogo />
-        </NewLoginDataProvider>
-      </NewLoginProvider>,
-    )
+  it('ensures link navigates to the correct URL without opening a new tab', () => {
+    renderInstructureLogo()
     const link = screen.getByTestId('instructure-logo-link')
-    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('href', 'https://instructure.com')
+    expect(link).not.toHaveAttribute('target')
   })
 })

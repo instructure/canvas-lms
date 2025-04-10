@@ -42,7 +42,7 @@ const FooterLinks = () => {
   }
 
   return (
-    <View as="div" textAlign="center">
+    <View as="div" textAlign="center" data-testid="footer-links">
       <InlineList delimiter="pipe" size="small">
         {helpLink && (
           <InlineList.Item>
@@ -77,7 +77,6 @@ const FooterLinks = () => {
             forceButtonRole={false}
             href="https://www.instructure.com/policies/canvas-lms-cookie-notice"
             onClick={handleClick}
-            target="_blank"
           >
             {I18n.t('Cookie Notice')}
           </Link>
