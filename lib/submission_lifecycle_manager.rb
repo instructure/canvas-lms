@@ -97,7 +97,7 @@ class SubmissionLifecycleManager
     SQL_FRAGMENT
   end
 
-  def self.recompute(assignment, update_grades: false, executing_user: nil, create_sub_assignment_submissions: false)
+  def self.recompute(assignment, update_grades: false, executing_user: nil, create_sub_assignment_submissions: true)
     current_caller = caller(1..1).first
     Rails.logger.debug "DDC.recompute(#{assignment&.id}) - #{current_caller}"
     return unless assignment.persisted? && assignment.active?
@@ -120,7 +120,7 @@ class SubmissionLifecycleManager
     recompute_course(assignment.context, **opts)
   end
 
-  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false, create_sub_assignment_submissions: false)
+  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false, create_sub_assignment_submissions: true)
     Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{original_caller}"
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:max_attempts] ||= 10
@@ -240,9 +240,10 @@ class SubmissionLifecycleManager
             assignment.sub_assignments.each do |sub_assignment|
               values << [sub_assignment.id, student_id, "NULL", grading_period_id, sql_ready_anonymous_id, quiz_lti, @course.root_account_id]
             end
-          else
-            values << [assignment_id, student_id, due_date, grading_period_id, sql_ready_anonymous_id, quiz_lti, @course.root_account_id]
           end
+
+          # checkpoints or not, we always want to create submissions for the Assignment
+          values << [assignment_id, student_id, due_date, grading_period_id, sql_ready_anonymous_id, quiz_lti, @course.root_account_id]
         end
       end
 
