@@ -237,9 +237,11 @@ module Types
     field :conversations_connection, Types::ConversationParticipantType.connection_type, null: true do
       argument :filter, [String], required: false
       argument :scope, String, required: false
+      argument :show_horizon_conversations, Boolean, required: false
     end
-    def conversations_connection(scope: nil, filter: nil)
+    def conversations_connection(scope: nil, filter: nil, show_horizon_conversations: false)
       if object == context[:current_user]
+
         conversations_scope = case scope
                               when "unread"
                                 InstStatsd::Statsd.increment("inbox.visit.scope.unread.pages_loaded.react")
@@ -258,14 +260,29 @@ module Types
                                 object.conversations.default
                               end
 
+        # Filter out conversations from horizon courses unless explicitly shown
+        unless show_horizon_conversations
+          # Get IDs of horizon courses where the user is a student
+          horizon_student_course_ids = object.enrollments
+                                             .where(type: "StudentEnrollment")
+                                             .joins(:course)
+                                             .where(courses: { workflow_state: "available" })
+                                             .horizon
+                                             .pluck(:course_id)
+          # Get IDs of conversations that have messages from horizon courses
+          horizon_conversation_ids = conversations_scope
+                                     .where(
+                                       tags: horizon_student_course_ids.map { |c| "course_#{c}" }
+                                     )
+                                     .pluck(:id)
+          conversations_scope = conversations_scope.where.not(id: horizon_conversation_ids) if horizon_student_course_ids.present? && horizon_conversation_ids.present?
+        end
+
         filter_mode = :and
         filter = filter.presence || []
         filters = filter.select(&:presence)
         conversations_scope = conversations_scope.tagged(*filters, mode: filter_mode) if filters.present?
-        conversations_scope.preload(conversation: :context).reject do |cs|
-          c = cs.conversation
-          c&.context.is_a?(Course) && c.context.horizon_course? && !c.context.grants_right?(context[:current_user], :read_as_admin)
-        end
+        conversations_scope
       end
     end
 
