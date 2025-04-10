@@ -163,7 +163,7 @@ module CanvasRails
                                 Rails.root.join("app/stylesheets"),
                                 Rails.root.join("ui")]
 
-    config.middleware.insert_before Rack::ETag, Rack::Chunked
+    config.middleware.insert_before Rack::ETag, Rack::Chunked if $canvas_rails == "7.1"
     config.middleware.insert_before Rack::ETag, Rack::Deflater, if: lambda { |*|
       ::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
     }
