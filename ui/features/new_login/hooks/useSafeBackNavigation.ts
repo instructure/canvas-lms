@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {useFetchNewLoginData} from './useFetchNewLoginData'
-export {usePasswordValidator} from './usePasswordValidator'
-export {useSafeBackNavigation} from './useSafeBackNavigation'
-export {useServerErrorsMap} from './useServerErrorsMap'
+import {useLocation, useNavigate, useNavigationType} from 'react-router-dom'
+
+export function useSafeBackNavigation(fallbackPath: string) {
+  const navigate = useNavigate()
+  const navigationType = useNavigationType()
+  const location = useLocation()
+
+  return () => {
+    if (navigationType === 'PUSH' && location.key !== 'default') {
+      navigate(-1)
+    } else {
+      navigate(fallbackPath)
+    }
+  }
+}

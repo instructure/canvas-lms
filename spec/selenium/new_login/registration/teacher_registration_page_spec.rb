@@ -56,6 +56,26 @@ describe "new login Teacher Registration page" do
       expect(user.initial_enrollment_type).to eq("teacher")
       expect(user.pseudonym.unique_id).to eq("teacher_test@example.com")
     end
+
+    describe "back navigation behavior" do
+      it "returns to login page from Teacher registration form" do
+        get "/login/canvas/register/teacher"
+        f('[data-testid="back-button"]').click
+        wait_for_selector("h1")
+        expect(f("h1").text).to include("Welcome to Canvas")
+      end
+
+      it "goes back to registration landing page if user navigated from login → registration landing page → teacher registration" do
+        get "/login/canvas"
+        f('[data-testid="create-account-link"]').click
+        expect(f("h1").text).to include("Create Your Account")
+        f('[data-testid="teacher-card-link"]').click
+        expect(f("h1").text).to include("Create a Teacher Account")
+        f('[data-testid="back-button"]').click
+        wait_for_selector("h1")
+        expect(f("h1").text).to include("Create Your Account")
+      end
+    end
   end
 
   describe "access control" do

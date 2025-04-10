@@ -24,13 +24,12 @@ import {FormMessage} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
 import React, {useRef, useState} from 'react'
-import {useNavigate} from 'react-router-dom'
 import {useNewLogin, useNewLoginData} from '../../context'
-import {usePasswordValidator, useServerErrorsMap} from '../../hooks'
+import {usePasswordValidator, useSafeBackNavigation, useServerErrorsMap} from '../../hooks'
 import {ROUTES} from '../../routes/routes'
 import {createStudentAccount} from '../../services'
 import {ActionPrompt, TermsAndPolicyCheckbox} from '../../shared'
-import {EMAIL_REGEX, createErrorMessage, handleRegistrationRedirect} from '../../shared/helpers'
+import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
 import {ReCaptchaSection, ReCaptchaSectionRef} from '../../shared/recaptcha'
 
 const I18n = createI18nScope('new_login')
@@ -55,7 +54,6 @@ const Student = () => {
   } = useNewLoginData()
   const validatePassword = usePasswordValidator(passwordPolicy)
   const serverErrorsMap = useServerErrorsMap()
-  const navigate = useNavigate()
 
   const [confirmPassword, setConfirmPassword] = useState('')
   const [confirmPasswordError, setConfirmPasswordError] = useState('')
@@ -332,13 +330,7 @@ const Student = () => {
     setTermsAccepted(checked)
   }
 
-  const handleCancel = () => {
-    if (window.history.length > 1) {
-      navigate(-1)
-    } else {
-      navigate(ROUTES.SIGN_IN)
-    }
-  }
+  const handleCancel = useSafeBackNavigation(ROUTES.SIGN_IN)
 
   const handleReCaptchaVerify = (token: string | null) => {
     if (!token) console.error('Failed to get a valid reCAPTCHA token')
