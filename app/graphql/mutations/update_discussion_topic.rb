@@ -48,6 +48,10 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       return validation_error(I18n.t("Anonymity settings are locked due to a posted reply"))
     end
 
+    if !discussion_topic.checkpoints? && input.dig(:assignment, :for_checkpoints) && (discussion_topic.discussion_entries&.active&.any? || discussion_topic.assignment&.has_student_submissions?)
+      return validation_error(I18n.t("If there are replies, checkpoints cannot be enabled."))
+    end
+
     unless input[:anonymous_state].nil?
       unless input[:anonymous_state] == "off"
         locked = input[:group_category_id].present?
@@ -164,7 +168,6 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       # Assignment must be present to set checkpoints
       if discussion_topic.assignment && input[:checkpoints]&.count == DiscussionTopic::REQUIRED_CHECKPOINT_COUNT
         return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
-        return validation_error(I18n.t("If there are submissions, checkpoints cannot be enabled.")) if input.dig(:assignment, :for_checkpoints) && discussion_topic.assignment.has_submitted_submissions?
 
         # on the case of changing an ungraded discussion to a graded, checkpointed discussion, at this stage
         # has_sub_assignments? returns true, but sub_assignments is empty. We will want the creator service when this happens

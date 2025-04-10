@@ -167,9 +167,15 @@ function DiscussionTopicForm({
 
   const allSectionsOption = {id: 'all', name: 'All Sections'}
 
-  const checkpointsToolTipText = I18n.t(
-    'Checkpoints can be set to have different due dates and point values for the initial response and the subsequent replies.',
-  )
+  const isCheckpointsForbidden =
+    currentDiscussionTopic?.assignment?.hasSubmittedSubmissions ||
+    currentDiscussionTopic?.entryCounts?.repliesCount > 0
+
+  const checkPointsToolTipText = isCheckpointsForbidden
+    ? I18n.t('Checkpoints cannot be toggled after replies have been made.')
+    : I18n.t(
+        'Checkpoints can be set to have different due dates and point values for the initial response and the subsequent replies.',
+      )
 
   const inputWidth = '100%'
 
@@ -1158,21 +1164,21 @@ function DiscussionTopicForm({
                     value="checkpoints"
                     inline={true}
                     checked={isCheckpoints}
-                    disabled={currentDiscussionTopic?.assignment?.hasSubmittedSubmissions}
+                    disabled={isCheckpointsForbidden}
                     onChange={() => {
                       setIsCheckpoints(!isCheckpoints)
                       setIsThreaded(true)
                     }}
                   />
                 </View>
-                <Tooltip renderTip={checkpointsToolTipText} on={['hover', 'focus']} color="primary">
+                <Tooltip renderTip={checkPointsToolTipText} on={['hover', 'focus']} color="primary">
                   <div
                     style={{display: 'inline-block', marginLeft: theme.spacing.xxSmall}}
                     // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                     tabIndex="0"
                   >
                     <IconInfoLine color="primary" />
-                    <ScreenReaderContent>{checkpointsToolTipText}</ScreenReaderContent>
+                    <ScreenReaderContent>{checkPointsToolTipText}</ScreenReaderContent>
                   </div>
                 </Tooltip>
               </>
