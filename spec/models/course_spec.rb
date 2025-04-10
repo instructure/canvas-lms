@@ -8379,5 +8379,42 @@ describe Course do
       course.name = "New Course Name"
       course.save!
     end
+
+    it "disables horizon_course when a course disables horizon_account" do
+      account = Account.create!
+      account.enable_feature!(:horizon_course_setting)
+      account.horizon_account = true
+      account.save!
+
+      course = account.courses.create!
+      course.save!
+      expect(course.horizon_course).to be true
+
+      account.horizon_account = false
+      account.save!
+      expect(account.horizon_account[:value]).to be false
+      expect(course.reload.horizon_course).to be_falsey
+
+      course2 = account.courses.create!
+      course2.save!
+      expect(course2.horizon_course).to be_falsey
+    end
+
+    it "disables horizon_course for a sub-account course when horizon_account is disabled for parent account" do
+      parent_account = Account.create!
+      parent_account.enable_feature!(:horizon_course_setting)
+      parent_account.horizon_account = true
+      parent_account.save!
+
+      sub_account = parent_account.sub_accounts.create!
+      course = sub_account.courses.create!
+      course.save!
+      expect(course.horizon_course).to be true
+
+      parent_account.horizon_account = false
+      parent_account.save!
+      expect(parent_account.horizon_account[:value]).to be false
+      expect(course.reload.horizon_course).to be_falsey
+    end
   end
 end
