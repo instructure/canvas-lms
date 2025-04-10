@@ -1450,12 +1450,12 @@ class Course < ActiveRecord::Base
   end
 
   def set_horizon_course
+    return if dummy?
+
     new_account = Account.find(account_id)
     return unless new_account
 
-    if new_account.horizon_account?
-      self.horizon_course = true
-    end
+    self.horizon_course = new_account.horizon_account?
   end
 
   # to ensure permissions on the root folder are updated after hiding or showing the files tab

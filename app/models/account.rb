@@ -2675,5 +2675,8 @@ class Account < ActiveRecord::Base
       locked: value,
       value:
     }
+    if value == false
+      associated_courses&.not_deleted&.update_all(horizon_course: false)
+    end
   end
 end
