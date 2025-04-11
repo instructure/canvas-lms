@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {possibleString, possibleStringRange} from '@canvas/rubrics/react/Points'
@@ -35,6 +35,7 @@ import {
   IconOutcomesLine,
   IconTrashLine,
   IconLockLine,
+  IconAiSolid,
 } from '@instructure/ui-icons'
 import {Draggable} from 'react-beautiful-dnd'
 import './drag-and-drop/styles.css'
@@ -47,6 +48,7 @@ type RubricCriteriaRowProps = {
   hidePoints: boolean
   rowIndex: number
   unassessed: boolean
+  isGenerated?: boolean
   onDeleteCriterion: () => void
   onDuplicateCriterion: () => void
   onEditCriterion: () => void
@@ -55,9 +57,10 @@ type RubricCriteriaRowProps = {
 export const RubricCriteriaRow = ({
   criterion,
   freeFormCriterionComments,
-  rowIndex,
   hidePoints,
+  rowIndex,
   unassessed,
+  isGenerated,
   onDeleteCriterion,
   onDuplicateCriterion,
   onEditCriterion,
@@ -126,17 +129,19 @@ export const RubricCriteriaRow = ({
                       {/* html sanitized by server */}
                       <Text dangerouslySetInnerHTML={{__html: longDescription ?? ''}} />
                     </View>
-                    {
-                      !hidePoints && (
-                        <View as="div" margin="small 0 0 0" data-testid="rubric-criteria-row-threshold">
-                          <Text>
-                            {I18n.t('Threshold: %{threshold}', {
-                              threshold: possibleString(masteryPoints),
-                            })}
-                          </Text>
-                        </View>
-                      )
-                    }
+                    {!hidePoints && (
+                      <View
+                        as="div"
+                        margin="small 0 0 0"
+                        data-testid="rubric-criteria-row-threshold"
+                      >
+                        <Text>
+                          {I18n.t('Threshold: %{threshold}', {
+                            threshold: possibleString(masteryPoints),
+                          })}
+                        </Text>
+                      </View>
+                    )}
                   </>
                 ) : (
                   <>
@@ -145,26 +150,31 @@ export const RubricCriteriaRow = ({
                       margin="xxx-small 0 0 0"
                       data-testid="rubric-criteria-row-description"
                     >
-                      <Text weight="bold">{description}</Text>
+                      <Flex alignItems="center" gap="x-small">
+                        {isGenerated && (
+                          <IconAiSolid data-testid="rubric-criteria-row-ai-icon" color="brand" />
+                        )}
+                        <Text weight="bold">{description}</Text>
+                      </Flex>
                     </View>
                     <View as="div" data-testid="rubric-criteria-row-long-description">
                       <Text>{longDescription}</Text>
                     </View>
                   </>
                 )}
-                {
-                  freeFormCriterionComments && (
-                    <View
-                      as="div"
-                      margin="small 0 0 0"
-                      data-testid="rubric-criteria-row-freeform-comment"
-                    >
-                      <Text>
-                        {I18n.t('This area will be used by the assessor to leave comments related to this criterion.')}
-                      </Text>
-                    </View>
-                  )
-                }
+                {freeFormCriterionComments && (
+                  <View
+                    as="div"
+                    margin="small 0 0 0"
+                    data-testid="rubric-criteria-row-freeform-comment"
+                  >
+                    <Text>
+                      {I18n.t(
+                        'This area will be used by the assessor to leave comments related to this criterion.',
+                      )}
+                    </Text>
+                  </View>
+                )}
               </Flex.Item>
               <Flex.Item align="start">
                 {!ignoreForScoring && !hidePoints && (
@@ -232,15 +242,14 @@ export const RubricCriteriaRow = ({
                 )}
               </Flex.Item>
             </Flex>
-            {
-              !freeFormCriterionComments && (
-                <RatingScaleAccordion
-                  hidePoints={hidePoints}
-                  ratings={criterion.ratings}
-                  criterionUseRange={criterion.criterionUseRange}
-                />
-              )
-            }
+            {!freeFormCriterionComments && (
+              <RatingScaleAccordion
+                hidePoints={hidePoints}
+                ratings={criterion.ratings}
+                criterionUseRange={criterion.criterionUseRange}
+                isGenerated={isGenerated}
+              />
+            )}
             <View
               as="hr"
               margin="medium 0 medium 0"
@@ -261,11 +270,13 @@ type RatingScaleAccordionProps = {
   hidePoints: boolean
   ratings: RubricRating[]
   criterionUseRange: boolean
+  isGenerated?: boolean
 }
 const RatingScaleAccordion = ({
   hidePoints,
   ratings,
   criterionUseRange,
+  isGenerated = false,
 }: RatingScaleAccordionProps) => {
   return (
     <View
@@ -275,6 +286,7 @@ const RatingScaleAccordion = ({
     >
       <ToggleDetails
         data-testid="criterion-row-rating-accordion"
+        defaultExpanded={isGenerated}
         summary={`${I18n.t('Rating Scale: %{ratingsLength}', {ratingsLength: ratings.length})}`}
       >
         {ratings.map((rating, index) => {

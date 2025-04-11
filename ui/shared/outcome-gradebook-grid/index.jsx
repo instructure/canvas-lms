@@ -430,15 +430,15 @@ const Grid = {
       const nearMastery = mastery / 2
       const exceedsMastery = mastery + mastery / 2
       if (score >= exceedsMastery) {
-        return ['rating_0', '#127A1B', I18n.t('Exceeds Mastery')]
+        return ['rating_0', '#02672D', I18n.t('Exceeds Mastery')]
       }
       if (score >= mastery) {
-        return ['rating_1', ENV.use_high_contrast ? '#127A1B' : '#0B874B', I18n.t('Meets Mastery')]
+        return ['rating_1', ENV.use_high_contrast ? '#02672D' : '#03893D', I18n.t('Meets Mastery')]
       }
       if (score >= nearMastery) {
-        return ['rating_2', ENV.use_high_contrast ? '#C23C0D' : '#FC5E13', I18n.t('Near Mastery')]
+        return ['rating_2', ENV.use_high_contrast ? '#CF4A00' : '#F06E26', I18n.t('Near Mastery')]
       }
-      return ['rating_3', '#E0061F', I18n.t('Well Below Mastery')]
+      return ['rating_3', '#E62429', I18n.t('Well Below Mastery')]
     },
     getColumnResults(data, column) {
       return chain(data).map(column.field).filter(isObject).value()

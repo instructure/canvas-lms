@@ -36,6 +36,12 @@ module HorizonValidators
       if record.active_rubric_association?
         record.errors.add(:rubric, "Rubric is not supported")
       end
+
+      # invalid if not in a module or only in a published module
+      if record.workflow_state == "published" &&
+         record.context_module_tags.none? { |t| t.tag_type == "context_module" && t.context_module&.published? }
+        record.errors.add(:workflow_state, "Assignment must have a published module")
+      end
     end
   end
 

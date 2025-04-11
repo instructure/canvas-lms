@@ -40,7 +40,7 @@ module AccountReports
       @account_report = account_report
       @reports = SIS_CSV_REPORTS & @account_report.parameters.select { |_k, v| value_to_boolean(v) }.keys
       @sis_format = params[:sis_format]
-      @created_by_sis = @account_report.parameters["created_by_sis"]
+      @created_by_sis = value_to_boolean(@account_report.parameters["created_by_sis"])
       extra_text_term(@account_report)
       include_deleted_objects
       include_enrollment_filter

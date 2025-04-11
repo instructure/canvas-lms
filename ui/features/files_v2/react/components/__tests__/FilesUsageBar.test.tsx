@@ -28,8 +28,8 @@ import {FileManagementProvider} from '../Contexts'
 import {createMockFileManagementContext} from '../../__tests__/createMockContext'
 
 const FILES_USAGE_RESULT = {
-  quota_used: 500,
-  quota: 1000,
+  quota_used: 500_000,
+  quota: 1_000_000,
 }
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
@@ -72,11 +72,10 @@ describe('FilesUsageBar', () => {
 
   it('renders progress bar with quota data when fetch is successful', async () => {
     renderComponent()
-    const quota = '1 KB'
-    const percentageText = await screen.findByText(`50% of ${quota} used`)
-    expect(percentageText).toBeInTheDocument()
+    const usageText = await screen.findByText(`500 KB of 1 MB used`)
+    expect(usageText).toBeInTheDocument()
 
-    const progressBar = screen.getByLabelText(/File Storage Quota Used/i)
+    const progressBar = document.querySelector('progress[aria-valuetext="File Storage Quota Used 500 KB of 1 MB used"]');
     expect(progressBar).toBeInTheDocument()
   })
 

@@ -32,6 +32,7 @@ export type errorTypes =
   | 'discussion_type'
   | 'quiz_type'
   | 'rubric'
+  | 'workflow_state'
 
 export type CanvasCareerValidationResponse = {
   errors: ValidationErrors

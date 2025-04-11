@@ -964,7 +964,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def duplicated_in_context?
-    duplicate_tool = self.class.find_external_tool(url, context, nil, id)
+    duplicate_tool = Lti::ToolFinder.from_url(url, context, exclude_tool_id: id)
 
     # If tool with same launch URL is found in the context
     return true if url.present? && duplicate_tool.present?
@@ -1021,7 +1021,7 @@ class ContextExternalTool < ActiveRecord::Base
     context = content_tag.context
     context = context.context if context.is_a?(Assignment)
 
-    developer_key_id == ContextExternalTool.from_content_tag(content_tag, context)&.developer_key_id
+    developer_key_id == Lti::ToolFinder.from_content_tag(content_tag, context)&.developer_key_id
   end
 
   def self.find_active_external_tool_by_consumer_key(consumer_key, context)
@@ -1038,32 +1038,6 @@ class ContextExternalTool < ActiveRecord::Base
 
   def self.find_external_tool_client_id(id, context)
     where(id:, context: Lti::ContextToolFinder.contexts_to_search(context)).pluck(:developer_key_id).map { Shard.global_id_for _1 }
-  end
-
-  def self.from_assignment(assignment)
-    Lti::ToolFinder.from_assignment(assignment)
-  end
-
-  def self.from_content_tag(tag, context)
-    Lti::ToolFinder.from_content_tag(tag, context)
-  end
-
-  def self.find_external_tool(
-    url,
-    context,
-    preferred_tool_id = nil, exclude_tool_id = nil, preferred_client_id = nil,
-    only_1_3: false,
-    prefer_1_1: false
-  )
-    Lti::ToolFinder.from_url(
-      url,
-      context,
-      preferred_tool_id:,
-      exclude_tool_id:,
-      preferred_client_id:,
-      only_1_3:,
-      prefer_1_1:
-    )
   end
 
   scope :having_setting, lambda { |setting|
@@ -1249,7 +1223,7 @@ class ContextExternalTool < ActiveRecord::Base
     return unless use_1_3?
 
     # is there a 1.1 tool that matches this one?
-    matching_1_1_tool = self.class.find_external_tool(url || domain, context, nil, id, prefer_1_1: true)
+    matching_1_1_tool = Lti::ToolFinder.from_url(url || domain, context, exclude_tool_id: id, prefer_1_1: true)
 
     return if matching_1_1_tool.nil? || matching_1_1_tool.use_1_3?
 
@@ -1373,10 +1347,6 @@ class ContextExternalTool < ActiveRecord::Base
     [Canvas::ICU.collation_key(name), global_id]
   end
 
-  def associated_1_1_tool(context, launch_url = nil)
-    Lti::ToolFinder.associated_1_1_tool(self, context, launch_url || url || domain)
-  end
-
   # Icon for tools which don't provide one, based on the DeveloperKey or tool
   # id, and the tool name
   def default_icon_path
@@ -1401,6 +1371,13 @@ class ContextExternalTool < ActiveRecord::Base
 
   def on_by_default?(on_by_default_ids)
     on_by_default_ids.include?(global_developer_key_id)
+  end
+
+  def asset_processor_eula_url
+    Rails.application.routes.url_helpers.update_tool_eula_url(
+      context_external_tool_id: id,
+      host: context.root_account.environment_specific_domain
+    ).delete_suffix("/deployment")
   end
 
   private

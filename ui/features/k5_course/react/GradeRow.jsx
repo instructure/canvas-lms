@@ -159,8 +159,8 @@ export const GradeRow = ({
         href={url}
         isWithinText={false}
         themeOverride={{
-          color: k5ThemeVariables.colors.textDarkest,
-          hoverColor: k5ThemeVariables.colors.textDarkest,
+          color: k5ThemeVariables.colors.contrasts.grey125125,
+          hoverColor: k5ThemeVariables.colors.contrasts.grey125125,
         }}
       >
         {assignmentName}

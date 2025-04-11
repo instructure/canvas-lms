@@ -426,6 +426,19 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         key = DeveloperKey.find(json_parse.dig("tool_configuration", "developer_key_id"))
         expect(key.account).to eq account
       end
+
+      it "creates default account bindings" do
+        subject
+        key = DeveloperKey.find(json_parse.dig("tool_configuration", "developer_key_id"))
+        registration = key.lti_registration
+        expect(key.account_binding_for(account)).to be_present
+        expect(registration.account_binding_for(account)).to be_present
+      end
+
+      it "doesn't create the configuration if something goes wrong creating the bindings" do
+        allow_any_instance_of(Lti::RegistrationAccountBinding).to receive(:save!).and_raise(ActiveRecord::RecordInvalid)
+        expect { subject }.not_to change { Lti::ToolConfiguration.count }
+      end
     end
 
     it_behaves_like "an endpoint that accepts a settings_url" do

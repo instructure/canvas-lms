@@ -95,6 +95,7 @@ function mockContext(children) {
 
 describe('CommentTextArea', () => {
   beforeAll(() => {
+    ENV.current_user = {id: '1'}
     $('body').append('<div role="alert" id="flash_screenreader_holder" />')
   })
 

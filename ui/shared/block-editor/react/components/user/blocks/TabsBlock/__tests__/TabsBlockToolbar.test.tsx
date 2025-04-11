@@ -65,8 +65,8 @@ describe('TabsBlockToolbar', () => {
     expect(modern).toBeInTheDocument()
     expect(classic).toBeInTheDocument()
 
-    const li = modern.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
+    const li = modern?.parentElement?.parentElement as HTMLLIElement
+    expect(li?.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
   })
 
   it('calls changes the level prop on changing the style', async () => {

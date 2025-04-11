@@ -37,6 +37,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_many :unordered_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "parent_id", inverse_of: :parent_entry
   has_many :flattened_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "root_entry_id", inverse_of: :root_entry
   has_many :discussion_entry_participants
+  has_many :discussion_topic_insight_entries, class_name: "DiscussionTopicInsight::Entry", inverse_of: :discussion_entry
   has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: "DiscussionEntry", foreign_key: "root_entry_id", inverse_of: :root_entry
   belongs_to :discussion_topic, inverse_of: :discussion_entries
   belongs_to :quoted_entry, class_name: "DiscussionEntry"
@@ -229,6 +230,10 @@ class DiscussionEntry < ActiveRecord::Base
 
   def plaintext_message(length = 250)
     truncate_html(message, max_length: length)
+  end
+
+  def message_word_count
+    HtmlTextHelper.strip_tags(message).split.size
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -438,6 +443,7 @@ class DiscussionEntry < ActiveRecord::Base
   scope :all_for_user, ->(user) { active.where(user_id: user) }
   scope :top_level_for_user, ->(user) { all_for_user(user).where(root_entry_id: nil) }
   scope :non_top_level_for_user, ->(user) { all_for_user(user).where.not(root_entry_id: nil) }
+  scope :not_anonymous, -> { where(is_anonymous_author: false) }
 
   def self.participant_join_sql(current_user)
     sanitize_sql(["LEFT OUTER JOIN #{DiscussionEntryParticipant.quoted_table_name} ON discussion_entries.id = discussion_entry_participants.discussion_entry_id

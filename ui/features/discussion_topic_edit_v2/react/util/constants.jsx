@@ -106,17 +106,13 @@ export const useShouldShowContent = (
   const shouldShowAnnouncementOnlyOptions = isAnnouncement && !isGroupContext
 
   const shouldShowGroupOptions =
-    discussionAnonymousState === 'off' &&
     !isAnnouncement &&
     !isGroupContext &&
     ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP &&
     !isCheckpoints
 
   const shouldShowGradedDiscussionOptions =
-    discussionAnonymousState === 'off' &&
-    !isAnnouncement &&
-    !isGroupContext &&
-    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
+    !isAnnouncement && !isGroupContext && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
 
   const shouldShowUsageRightsOption =
     ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH && ENV?.USAGE_RIGHTS_REQUIRED

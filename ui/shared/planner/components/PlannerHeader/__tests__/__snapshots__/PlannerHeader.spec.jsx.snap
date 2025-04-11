@@ -8,7 +8,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     font-size: 1rem;
     font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
-    color: #394B58;
+    color: #334451;
     background: #FFFFFF;
     white-space: nowrap;
   }
@@ -294,7 +294,7 @@ exports[`new activity button shows when there is new activity 1`] = `
     font-size: 1rem;
     font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
-    color: #394B58;
+    color: #334451;
     background: #FFFFFF;
     white-space: nowrap;
   }
@@ -580,7 +580,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     font-size: 1rem;
     font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
-    color: #394B58;
+    color: #334451;
     background: #FFFFFF;
     white-space: nowrap;
   }

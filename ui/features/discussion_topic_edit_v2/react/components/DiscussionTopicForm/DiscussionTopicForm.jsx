@@ -24,7 +24,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
-import {FormFieldGroup} from '@instructure/ui-form-field'
+import {FormField, FormFieldGroup} from '@instructure/ui-form-field'
 import {
   IconAddLine,
   IconPublishSolid,
@@ -145,7 +145,10 @@ function DiscussionTopicForm({
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
   const published = currentDiscussionTopic?.published ?? false
   const shouldMasteryPathsBeVisible = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement
-  const masteryPathsWithCoursePaces = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.IN_PACED_COURSE && ENV.FEATURES.course_pace_pacing_with_mastery_paths
+  const masteryPathsWithCoursePaces =
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+    ENV.IN_PACED_COURSE &&
+    ENV.FEATURES.course_pace_pacing_with_mastery_paths
 
   const announcementAlertProps = () => {
     if (isUnpublishedAnnouncement) {
@@ -963,8 +966,9 @@ function DiscussionTopicForm({
             disabled={ENV?.DISCUSSION_CONTENT_LOCKED}
           />
           <View>
-              {!ENV?.DISCUSSION_CONTENT_LOCKED ? (
-                <span className="discussions-editor" data-testid="discussion-topic-message-editor">
+            {!ENV?.DISCUSSION_CONTENT_LOCKED ? (
+              <span className="discussions-editor" data-testid="discussion-topic-message-editor">
+                <FormField label={I18n.t('Topic content')} id="discussion-topic-message-body">
                   <CanvasRce
                     textareaId="discussion-topic-message-body"
                     onFocus={() => {}}
@@ -974,7 +978,7 @@ function DiscussionTopicForm({
                     onContentChange={setRceContent}
                     editorOptions={{
                       focus: false,
-                      plugins: []
+                      plugins: [],
                     }}
                     height={300}
                     defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
@@ -982,19 +986,20 @@ function DiscussionTopicForm({
                     resourceType={isAnnouncement ? 'announcement.body' : 'discussion_topic.body'}
                     resourceId={currentDiscussionTopic?._id}
                   />
-                </span>
-              ) : (
-                <View
-                  className="user_content discussion-post-content"
-                  data-testid="discussion-topic-message-locked"
-                >
-                  <Text
-                    dangerouslySetInnerHTML={{
-                      __html: currentDiscussionTopic?.message || ''
-                    }}
-                  />
-                </View>
-              )}
+                </FormField>
+              </span>
+            ) : (
+              <View
+                className="user_content discussion-post-content"
+                data-testid="discussion-topic-message-locked"
+              >
+                <Text
+                  dangerouslySetInnerHTML={{
+                    __html: currentDiscussionTopic?.message || '',
+                  }}
+                />
+              </View>
+            )}
           </View>
           {ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH && (
             <AttachmentDisplay
@@ -1058,7 +1063,9 @@ function DiscussionTopicForm({
               discussionAnonymousState={discussionAnonymousState}
               setDiscussionAnonymousState={setDiscussionAnonymousState}
               isSelectDisabled={
-                (isEditing && currentDiscussionTopic?.entryCounts?.repliesCount > 0) || isGraded
+                (isEditing && currentDiscussionTopic?.entryCounts?.repliesCount > 0) ||
+                isGraded ||
+                isGroupDiscussion
               }
               setIsGraded={setIsGraded}
               setIsGroupDiscussion={setIsGroupDiscussion}
@@ -1136,6 +1143,7 @@ function DiscussionTopicForm({
                 inline={true}
                 checked={isGraded}
                 onChange={handleGradedCheckboxChange}
+                disabled={discussionAnonymousState !== 'off'}
                 // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
               />
             )}
@@ -1260,7 +1268,7 @@ function DiscussionTopicForm({
                   setGroupCategoryId(!isGroupDiscussion ? '' : groupCategoryId)
                   setIsGroupDiscussion(!isGroupDiscussion)
                 }}
-                disabled={!canGroupDiscussion}
+                disabled={!canGroupDiscussion || discussionAnonymousState !== 'off'}
               />
             )}
             {shouldShowGroupOptions && isGroupDiscussion && (
@@ -1358,13 +1366,6 @@ function DiscussionTopicForm({
                 </View>
               )}
           </FormFieldGroup>
-          {discussionAnonymousState.includes('anonymity') && !isEditing && (
-            <View width="580px" display="block" data-testid="groups_grading_not_allowed">
-              <Alert variant="info" margin="small">
-                {I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}
-              </Alert>
-            </View>
-          )}
           {shouldShowViewSettings && (
             <ViewSettings
               expanded={expanded}

@@ -92,7 +92,7 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
            to the theme to the rendered menu item.
         */
         themeOverride={
-          currentAssessmentIndex === index + 1 ? {background: '#6B7780', labelColor: 'white'} : {}
+          currentAssessmentIndex === index + 1 ? {background: '#6A7883', labelColor: 'white'} : {}
         }
         data-testid={`${testId}-${assessment.assetId}`}
       >

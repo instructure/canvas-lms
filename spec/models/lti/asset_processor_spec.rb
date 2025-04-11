@@ -57,18 +57,6 @@ describe Lti::AssetProcessor do
     end
   end
 
-  describe "supported_types" do
-    it "returns supported types from the 'report' hash" do
-      model = lti_asset_processor_model(report: { "supportedTypes" => ["a", "b"] })
-      expect(model.supported_types).to eq(["a", "b"])
-    end
-
-    it "returns nil when 'report' is not a present" do
-      model = lti_asset_processor_model(report: nil)
-      expect(model.supported_types).to be_nil
-    end
-  end
-
   describe ".build_for_assignment" do
     subject do
       Lti::AssetProcessor.build_for_assignment(content_item:, context:)

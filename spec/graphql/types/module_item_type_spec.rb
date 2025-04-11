@@ -231,6 +231,7 @@ describe Types::ModuleItemType do
       expect(resolver.resolve("content { pointsPossible }")).to eq module_item.content.points_possible
       expect(resolver.resolve("content { published }")).to eq module_item.content.published?
       expect(resolver.resolve("content { canUnpublish }")).to eq module_item.content.can_unpublish?
+      expect(resolver.resolve("content { canDuplicate }")).to eq module_item.content.can_duplicate?
     end
   end
 
@@ -244,6 +245,7 @@ describe Types::ModuleItemType do
       expect(resolver.resolve("content { type }")).to eq "DiscussionTopic"
       expect(resolver.resolve("content { published }")).to eq module_item.content.published?
       expect(resolver.resolve("content { canUnpublish }")).to eq module_item.content.can_unpublish?
+      expect(resolver.resolve("content { canDuplicate }")).to be true
     end
 
     context "graded discussions" do
@@ -256,6 +258,7 @@ describe Types::ModuleItemType do
         expect(resolver.resolve("content { title }")).to eq module_item.title
         expect(resolver.resolve("content { type }")).to eq "DiscussionTopic"
         expect(resolver.resolve("content { pointsPossible }")).to eq module_item.content.assignment.points_possible
+        expect(resolver.resolve("content { canDuplicate }")).to be true
       end
     end
   end
@@ -269,6 +272,7 @@ describe Types::ModuleItemType do
       expect(resolver.resolve("content { title }")).to eq module_item.title
       expect(resolver.resolve("content { type }").to_s).to eq "Quizzes::Quiz"
       expect(resolver.resolve("content { pointsPossible }")).to eq module_item.content.points_possible
+      expect(resolver.resolve("content { canDuplicate }")).to be false
     end
   end
 
@@ -281,6 +285,7 @@ describe Types::ModuleItemType do
       expect(resolver.resolve("content { type }")).to eq "ContentTag"
       expect(resolver.resolve("content { published }")).to be module_item.active?
       expect(resolver.resolve("content { canUnpublish }")).to be true
+      expect(resolver.resolve("content { canDuplicate }")).to be false
     end
   end
 
@@ -293,6 +298,7 @@ describe Types::ModuleItemType do
       expect(resolver.resolve("content { type }")).to eq "ContentTag"
       expect(resolver.resolve("content { published }")).to be module_item.active?
       expect(resolver.resolve("content { canUnpublish }")).to be true
+      expect(resolver.resolve("content { canDuplicate }")).to be false
     end
   end
 

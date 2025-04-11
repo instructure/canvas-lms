@@ -122,7 +122,7 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
               style={{
                 margin: `${spacing.small}`,
                 ...(i > 0 && {
-                  borderTop: `${borders.widthSmall} solid ${colors.borderMedium}`,
+                  borderTop: `${borders.widthSmall} solid ${colors.contrasts.grey1214}`,
                   paddingTop: `${spacing.small}`,
                 }),
               }}

@@ -1158,6 +1158,98 @@ describe AssignmentOverride do
     end
   end
 
+  describe "as_hash_for" do
+    let(:due_at) { 3.days.from_now }
+    let(:unlock_at) { 2.days.from_now }
+    let(:lock_at) { 4.days.from_now }
+    let(:id) { 1 }
+    let(:title) { "Assignment Override" }
+    let(:override) do
+      override = AssignmentOverride.new
+      override.title = title
+      override.due_at = due_at
+      override.unlock_at = unlock_at
+      override.lock_at = lock_at
+      override.id = id
+      override
+    end
+
+    def all_common_fields_match(hash, set)
+      expect(hash[:due_at]).to eq due_at
+      expect(hash[:unlock_at]).to eq unlock_at
+      expect(hash[:lock_at]).to eq lock_at
+      expect(hash[:id]).to eq id
+      expect(hash[:set_type]).to eq "Group"
+      expect(hash[:set_id]).to eq set.id
+    end
+
+    context "group overrides" do
+      before do
+        @group = @course.groups.create!(name: "Group")
+        @group.add_user(@student, "accepted")
+        override.set = @group
+      end
+
+      it "teacher sees all fields" do
+        hash = override.as_hash_for(@teacher)
+        all_common_fields_match(hash, @group)
+        expect(hash[:title]).to eq title
+      end
+
+      it "student in group sees all fields" do
+        hash = override.as_hash_for(@student)
+        all_common_fields_match(hash, @group)
+        expect(hash[:title]).to eq title
+      end
+
+      it "student not in group cannot see title" do
+        # remove the student from the group
+        @group.set_users([])
+
+        hash = override.as_hash_for(@student)
+        all_common_fields_match(hash, @group)
+        expect(hash[:title]).to be_nil
+      end
+    end
+
+    context "differentiation tag overrides" do
+      before do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.enable_feature!(:differentiation_tags)
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          a.save!
+        end
+
+        @tag_category = @course.group_categories.create!(name: "Tag Category", non_collaborative: true)
+        @tag = @course.groups.create!(name: "Tag", group_category: @tag_category, non_collaborative: true)
+        @tag.add_user(@student, "accepted")
+        override.set = @tag
+      end
+
+      it "teacher sees all fields" do
+        hash = override.as_hash_for(@teacher)
+        all_common_fields_match(hash, @tag)
+        expect(hash[:title]).to eq title
+      end
+
+      it "student in differentiation tag should not see title" do
+        hash = override.as_hash_for(@student)
+        all_common_fields_match(hash, @tag)
+        expect(hash[:title]).to be_nil
+      end
+
+      it "student not in differentiation tag should not see title" do
+        # remove the student from the tag
+        @tag.set_users([])
+
+        hash = override.as_hash_for(@student)
+        all_common_fields_match(hash, @tag)
+        expect(hash[:title]).to be_nil
+      end
+    end
+  end
+
   describe "destroy_if_empty_set" do
     before do
       @override = assignment_override_model

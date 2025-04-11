@@ -26,8 +26,8 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import type {FormMessage} from '@instructure/ui-form-field'
 import type {Root} from 'react-dom/client'
 import {TITLE_MAX_LENGTH} from '@canvas/wiki/utils/constants'
-import { checkForTitleConflict } from '@canvas/wiki/utils/titleConflicts'
-import { debounce } from '@instructure/debounce'
+import {checkForTitleConflict} from '@canvas/wiki/utils/titleConflicts'
+import {debounce} from '@instructure/debounce'
 
 const I18n = createI18nScope('wiki_pages')
 
@@ -59,8 +59,6 @@ const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEdi
       setSaving(false)
     }
   }, [model, modalOpen])
-
-
 
   const handleSubmit = async (e: React.SyntheticEvent<unknown, unknown>) => {
     e.preventDefault()
@@ -119,7 +117,8 @@ const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEdi
 
     if (errors.length === 0) {
       const currentPageId = model.get('page_id')
-      checkForTitleConflictDebounced(name, setMessages, currentPageId)
+      if (name !== null)
+        checkForTitleConflictDebounced(name, setMessages, currentPageId ?? undefined)
     }
   }
 
@@ -161,7 +160,13 @@ const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEdi
         <Button onClick={handleClose} margin="0 x-small 0 0" disabled={saving}>
           {I18n.t('Cancel')}
         </Button>
-        <Button color="primary" type="submit" onClick={handleSubmit} data-testid="save-button" disabled={saving}>
+        <Button
+          color="primary"
+          type="submit"
+          onClick={handleSubmit}
+          data-testid="save-button"
+          disabled={saving}
+        >
           {I18n.t('Save')}
         </Button>
       </Modal.Footer>
@@ -169,7 +174,10 @@ const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEdi
   )
 }
 
-export default function renderWikiPageIndexEditModal(root: Root, props: WikiPageIndexEditModalProps) {
+export default function renderWikiPageIndexEditModal(
+  root: Root,
+  props: WikiPageIndexEditModalProps,
+) {
   const titleComponent = <WikiPageIndexEditModal {...props} />
   root.render(titleComponent)
   return titleComponent

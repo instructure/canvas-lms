@@ -119,12 +119,19 @@ module Lti
       global_id = generate_notification_uuid
       notice_objects = builders.map { |builder| builder.build(tool) }
       webhook_body = { notices: notice_objects }.to_json
-      Services::NotificationService.process(
-        global_id,
-        webhook_body,
-        "webhook",
-        { url: notice_handler.url }.to_json
-      )
+
+      if Rails.env.development? && !Services::NotificationService.configured?
+        CanvasHttp
+          .delay(strand: "lti_platform_notification_service_development")
+          .post(notice_handler.url, body: webhook_body, content_type: "application/json")
+      else
+        Services::NotificationService.process(
+          global_id,
+          webhook_body,
+          "webhook",
+          { url: notice_handler.url }.to_json
+        )
+      end
     end
     private_class_method :send_notice_batch
 

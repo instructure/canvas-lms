@@ -265,6 +265,7 @@ class AbstractAssignment < ActiveRecord::Base
     self.group_category_id = nil
     self.rubric_association = nil
     self.submission_types = "online_text_entry" unless HORIZON_SUBMISSION_TYPES.include?(submission_types)
+    self.workflow_state = "unpublished" if context_module_tags.none? { |t| t.tag_type == "context_module" && t.context_module&.published? }
   end
 
   def queue_conditional_release_grade_change_handler?
@@ -1350,7 +1351,7 @@ class AbstractAssignment < ActiveRecord::Base
       .find_each do |a|
         # again, look for the 1.1 tool by excluding the new tool from this query.
         # a (currently) unavoidable N+1, sadly
-        a_tool = ContextExternalTool.find_external_tool(a.external_tool_tag.url, a, nil, new_tool_id)
+        a_tool = Lti::ToolFinder.from_url(a.external_tool_tag.url, a, exclude_tool_id: new_tool_id)
         next if a_tool.nil? || a_tool.id != tool_id
 
         yield a
@@ -1487,7 +1488,7 @@ class AbstractAssignment < ActiveRecord::Base
   private :lti_1_3_external_tool_tag?
 
   def tool_from_external_tool_tag
-    @tool_from_external_tool_tag = ContextExternalTool.from_content_tag(
+    @tool_from_external_tool_tag = Lti::ToolFinder.from_content_tag(
       external_tool_tag,
       context
     )

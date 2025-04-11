@@ -22,12 +22,14 @@ const ContextModule = createContext<{
   courseId: string
   isMasterCourse: boolean
   isChildCourse: boolean
+  permissions: Record<string, boolean>
   state: Record<string, any>
   setState: (state: Record<string, any>) => void
 }>({} as {
   courseId: string
   isMasterCourse: boolean
   isChildCourse: boolean
+  permissions: Record<string, boolean>
   state: Record<string, any>
   setState: (state: Record<string, any>) => void
 })
@@ -36,17 +38,19 @@ export const ContextModuleProvider = ({
   children,
   courseId,
   isMasterCourse,
-  isChildCourse
+  isChildCourse,
+  permissions
 }: {
   children: React.ReactNode
   courseId: string
   isMasterCourse: boolean
   isChildCourse: boolean
+  permissions: Record<string, boolean>
 }) => {
   const [state, setState] = useState({})
 
   return (
-    <ContextModule.Provider value={{ courseId, isMasterCourse, isChildCourse, state, setState }}>
+    <ContextModule.Provider value={{ courseId, isMasterCourse, isChildCourse, permissions, state, setState }}>
       {children}
     </ContextModule.Provider>
   );

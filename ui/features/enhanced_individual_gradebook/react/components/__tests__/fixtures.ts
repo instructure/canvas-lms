@@ -453,6 +453,19 @@ const GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE = {
   },
 }
 
+export const GRADEBOOK_COURSE_OUTCOME_MASTERY_SCALES_QUERY_MOCK_RESPONSE = {
+  course: {
+    outcomeCalculationMethod: {
+      _id: '1',
+      calculationInt: 5,
+      calculationMethod: 'n_mastery',
+    },
+    outcomeProficiency: {
+      masteryPoints: 5,
+    },
+  },
+}
+
 export const setupCanvasQueries = () => {
   queryClient.setQueryData(
     ['individual-gradebook-student', '1', '5'],
@@ -488,6 +501,10 @@ export const setupCanvasQueries = () => {
     ['individual-gradebook-sections', '1'],
     GRADEBOOK_SECTIONS_QUERY_MOCK_RESPONSE,
   )
+  queryClient.setQueryData(
+    ['individual-gradebook-course-outcome-mastery-scales', '1'],
+    GRADEBOOK_COURSE_OUTCOME_MASTERY_SCALES_QUERY_MOCK_RESPONSE,
+  )
   queryClient.setQueryData(['individual-gradebook-student-comments', '1', '1'], {})
   queryClient.setQueryData(['individual-gradebook-student-comments', '1', '13'], {})
   queryClient.setQueryData(['individual-gradebook-student-comments', '1', '14'], {})
@@ -513,6 +530,10 @@ export const setupCanvasQueries = () => {
     staleTime: 1000,
   })
   queryClient.setQueryDefaults(['individual-gradebook-submissions'], {
+    refetchOnMount: false,
+    staleTime: 1000,
+  })
+  queryClient.setQueryDefaults(['individual-gradebook-course-outcome-mastery-scales'], {
     refetchOnMount: false,
     staleTime: 1000,
   })

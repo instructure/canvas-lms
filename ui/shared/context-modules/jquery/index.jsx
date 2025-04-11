@@ -78,6 +78,7 @@ import {parseModule, parseModuleList} from '../differentiated-modules/utils/modu
 import {addModuleElement} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {fetchModuleItems} from '../utils/fetchModuleItems'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -162,58 +163,61 @@ window.modules = (function () {
     },
 
     updateEstimatedDurations() {
-      if (!ENV.horizon_course){
+      if (!ENV.horizon_course) {
         return
       }
-      return $.ajaxJSON(
-        ENV.CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL,
-        'GET',
-        {},
-        data => {
-          $(() => {
-            $.each(data, (module_id, durations_by_id) => {
-              let estimatedDurationSum = 0
-              let $context_module_item
+      return $.ajaxJSON(ENV.CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL, 'GET', {}, data => {
+        $(() => {
+          $.each(data, (module_id, durations_by_id) => {
+            let estimatedDurationSum = 0
+            let $context_module_item
 
-              $.each(durations_by_id, (id, info) => {
-                $context_module_item = $('#context_module_item_' + id)
-                const data = {
-                  estimated_duration_minutes: info.estimated_duration_minutes,
-                  can_set_estimated_duration: info.can_set_estimated_duration,
-                  estimated_duration_display: '',
-                }
-                if (info.estimated_duration_minutes != null && info.estimated_duration_minutes > 0) {
-                  estimatedDurationSum += info.estimated_duration_minutes
-                  $context_module_item.find('.ig-row').removeClass('no-estimated-duration')
-                  data.estimated_duration_display = I18n.t('%{minutes} Mins', {minutes: info.estimated_duration_minutes})
-                } else {
-                  $context_module_item.find('.ig-row').addClass('no-estimated-duration')
-                }
-                $context_module_item.fillTemplateData({
-                  data,
-                  htmlValues: ['estimated_duration_display', 'estimated_duration_minutes', 'can_set_estimated_duration'],
+            $.each(durations_by_id, (id, info) => {
+              $context_module_item = $('#context_module_item_' + id)
+              const data = {
+                estimated_duration_minutes: info.estimated_duration_minutes,
+                can_set_estimated_duration: info.can_set_estimated_duration,
+                estimated_duration_display: '',
+              }
+              if (info.estimated_duration_minutes != null && info.estimated_duration_minutes > 0) {
+                estimatedDurationSum += info.estimated_duration_minutes
+                $context_module_item.find('.ig-row').removeClass('no-estimated-duration')
+                data.estimated_duration_display = I18n.t('%{minutes} Mins', {
+                  minutes: info.estimated_duration_minutes,
                 })
-              })
-
-              const $moduleHeader = $('#context_module_' + module_id).find('.ig-header')
-              const headerData = {
-                estimated_duration_header_title: '',
-                estimated_duration_header_minutes: ''
+              } else {
+                $context_module_item.find('.ig-row').addClass('no-estimated-duration')
               }
-
-              if (estimatedDurationSum > 0) {
-                headerData.estimated_duration_header_title = I18n.t('Time to Complete:')
-                headerData.estimated_duration_header_minutes = I18n.t('%{minutes} Mins', {minutes: estimatedDurationSum})
-              }
-
-              $moduleHeader.fillTemplateData({
-                data: headerData,
-                htmlValues: ['estimated_duration_header_title', 'estimated_duration_header_minutes'],
+              $context_module_item.fillTemplateData({
+                data,
+                htmlValues: [
+                  'estimated_duration_display',
+                  'estimated_duration_minutes',
+                  'can_set_estimated_duration',
+                ],
               })
             })
+
+            const $moduleHeader = $('#context_module_' + module_id).find('.ig-header')
+            const headerData = {
+              estimated_duration_header_title: '',
+              estimated_duration_header_minutes: '',
+            }
+
+            if (estimatedDurationSum > 0) {
+              headerData.estimated_duration_header_title = I18n.t('Time to Complete:')
+              headerData.estimated_duration_header_minutes = I18n.t('%{minutes} Mins', {
+                minutes: estimatedDurationSum,
+              })
+            }
+
+            $moduleHeader.fillTemplateData({
+              data: headerData,
+              htmlValues: ['estimated_duration_header_title', 'estimated_duration_header_minutes'],
+            })
           })
-        },
-      )
+        })
+      })
     },
 
     updateModuleItemPositions(event, ui) {
@@ -569,6 +573,19 @@ window.modules = (function () {
       }
       refreshDuplicateLinkStatus($module)
       return $item
+    },
+
+    addItemToModule2(moduleId, html) {
+      const moduleItemContainer = document.querySelector(`#context_module_content_${moduleId}`)
+      if (!moduleItemContainer) return
+      moduleItemContainer.outerHTML = html
+    },
+
+    lazyLoadItems(moduleIds) {
+      fetchModuleItems(ENV.COURSE_ID, moduleIds, modules.addItemToModule2, 3).then(() => {
+        initContextModules()
+        return modules.updateAssignmentData()
+      })
     },
 
     evaluateItemCyoe($item, data) {
@@ -1203,7 +1220,15 @@ modules.initModuleManagement = async function (duplicate) {
     event.preventDefault()
     const $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger')
     const $item = $(this).parents('.context_module_item')
-    const data = $item.getTemplateData({textValues: ['url', 'indent', 'new_tab', 'estimated_duration_minutes', 'can_set_estimated_duration']})
+    const data = $item.getTemplateData({
+      textValues: [
+        'url',
+        'indent',
+        'new_tab',
+        'estimated_duration_minutes',
+        'can_set_estimated_duration',
+      ],
+    })
     data.title = $item.find('.title').attr('title')
     data.indent = modules.currentIndent($item)
     $('#edit_item_form')
@@ -1219,7 +1244,7 @@ modules.initModuleManagement = async function (duplicate) {
     $titleInput.prop('disabled', isDisabled)
 
     if (ENV.horizon_course) {
-      if(data.can_set_estimated_duration === 'false') {
+      if (data.can_set_estimated_duration === 'false') {
         $('#estimated_duration_edit').css({display: 'none'})
       } else {
         $('#estimated_duration_edit').css({display: 'table-row'})
@@ -1581,10 +1606,10 @@ modules.initModuleManagement = async function (duplicate) {
           onComplete() {
             if (focusLink) {
               $module.find('.add_module_item_link').focus()
-            } else if(returnToFileDrop) {
-              const itemList =$module.find('ul.context_module_items');
-              const focusItem =  itemList.find("a[role='button']")
-              focusItem ?.focus()
+            } else if (returnToFileDrop) {
+              const itemList = $module.find('ul.context_module_items')
+              const focusItem = itemList.find("a[role='button']")
+              focusItem?.focus()
             }
           },
         },
@@ -1906,40 +1931,42 @@ function updateSubAssignmentData(contextModuleItem, subAssignments) {
 }
 
 // need the assignment data to check past due state
-modules.updateAssignmentData(() => {
-  modules.updateProgressions(function afterUpdateProgressions() {
-    if (window.location.hash && !window.location.hash.startsWith('#!')) {
-      try {
-        scrollTo($(window.location.hash))
-      } catch (error) {
-        // no-op
+if (!ENV.FEATURE_MODULES_PERF) {
+  modules.updateAssignmentData(() => {
+    modules.updateProgressions(function afterUpdateProgressions() {
+      if (window.location.hash && !window.location.hash.startsWith('#!')) {
+        try {
+          scrollTo($(window.location.hash))
+        } catch (error) {
+          // no-op
+        }
+      } else {
+        const firstContextModuleContent = document
+          .querySelector('.context_module')
+          ?.querySelector('.content')
+        if (!firstContextModuleContent || moduleContentIsHidden(firstContextModuleContent)) {
+          const firstVisibleModuleContent = [
+            ...document.querySelectorAll('.context_module .content'),
+          ].find(el => !moduleContentIsHidden(el))
+          if (firstVisibleModuleContent)
+            scrollTo($(firstVisibleModuleContent).parents('.context_module'))
+        }
       }
-    } else {
-      const firstContextModuleContent = document
-        .querySelector('.context_module')
-        ?.querySelector('.content')
-      if (!firstContextModuleContent || moduleContentIsHidden(firstContextModuleContent)) {
-        const firstVisibleModuleContent = [
-          ...document.querySelectorAll('.context_module .content'),
-        ].find(el => !moduleContentIsHidden(el))
-        if (firstVisibleModuleContent)
-          scrollTo($(firstVisibleModuleContent).parents('.context_module'))
-      }
-    }
+    })
   })
-})
+}
 
-
-$(document).ready(function () {
+function initContextModules() {
   $('.context_module').each(function () {
     refreshDuplicateLinkStatus($(this))
   })
+
   if (ENV.IS_STUDENT) {
     $('.context_module').addClass('student-view')
     $('.context_module_item .ig-row').addClass('student-view')
   }
 
-  if (ENV.horizon_course){
+  if (ENV.horizon_course) {
     modules.updateEstimatedDurations()
   }
 
@@ -2370,6 +2397,19 @@ $(document).ready(function () {
       ...itemProps,
     })
   })
-})
+}
+
+if (ENV.FEATURE_MODULES_PERF) {
+  const moduleIds = []
+  $('.context_module').each(function () {
+    const moduleId = $(this).data('moduleId')
+    if (!isNaN(parseInt(moduleId, 10))) {
+      moduleIds.push(moduleId)
+    }
+  })
+  modules.lazyLoadItems(moduleIds)
+} else {
+  $(document).ready(initContextModules)
+}
 
 export default modules

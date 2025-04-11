@@ -24,8 +24,6 @@ class Lti::Registration < ActiveRecord::Base
   extend RootAccountResolver
   include Canvas::SoftDeletable
 
-  attr_accessor :skip_lti_sync
-
   belongs_to :account, inverse_of: :lti_registrations, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registrations, optional: true
   belongs_to :updated_by, class_name: "User", inverse_of: :updated_lti_registrations, optional: true
@@ -42,9 +40,8 @@ class Lti::Registration < ActiveRecord::Base
   has_many :lti_registration_account_bindings, class_name: "Lti::RegistrationAccountBinding", inverse_of: :registration
   has_many :lti_overlays, class_name: "Lti::Overlay", inverse_of: :registration
 
-  after_update :update_developer_key
-
   validates :name, :admin_nickname, :vendor, length: { maximum: 255 }
+  validates :description, length: { maximum: 2048 }, allow_blank: true
   validates :name, presence: true
 
   scope :active, -> { where(workflow_state: "active") }
@@ -248,14 +245,6 @@ class Lti::Registration < ActiveRecord::Base
     developer_key&.destroy
     lti_registration_account_bindings.each(&:destroy)
     manual_configuration&.destroy
-  end
-
-  def update_developer_key
-    return if skip_lti_sync
-
-    developer_key&.update!(name: admin_nickname,
-                           workflow_state:,
-                           skip_lti_sync: true)
   end
 
   # Overridden in MRA, where federated consortia are supported

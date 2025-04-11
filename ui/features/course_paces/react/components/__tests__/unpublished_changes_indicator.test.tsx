@@ -40,7 +40,7 @@ describe('UnpublishedChangesIndicator', () => {
   it('pluralizes and formats correctly', () => {
     expect(
       render(<UnpublishedChangesIndicator {...defaultProps} changeCount={0} />).getByText(
-        'All changes published',
+        'No pending changes',
       ),
     ).toBeInTheDocument()
     expect(
@@ -73,7 +73,7 @@ describe('UnpublishedChangesIndicator', () => {
         <UnpublishedChangesIndicator {...defaultProps} changeCount={0} onClick={onClick} />,
       )
 
-      await userEvent.click(getByText('All changes published'))
+      await userEvent.click(getByText('No pending changes'))
       expect(onClick).not.toHaveBeenCalled()
     })
   })
@@ -114,15 +114,8 @@ describe('UnpublishedChangesIndicator', () => {
     expect(getByText('Pace is new and unpublished')).toBeInTheDocument()
   })
 
-  describe('with course_paces_redesign flag enabled', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_redesign = true
-    })
-
-    it('renders "No pending changes" text', () => {
-      const {getByText} = render(<UnpublishedChangesIndicator {...defaultProps} changeCount={0} />)
-      expect(getByText('No pending changes')).toBeInTheDocument()
-    })
+  it('renders "No pending changes" text', () => {
+    const {getByText} = render(<UnpublishedChangesIndicator {...defaultProps} changeCount={0} />)
+    expect(getByText('No pending changes')).toBeInTheDocument()
   })
 })

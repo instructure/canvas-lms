@@ -45,6 +45,21 @@ class GraphQLController < ApplicationController
     render :graphiql, layout: "bare"
   end
 
+  def get_context # rubocop:disable Naming/AccessorMethodName
+    case subject&.pick(:context_type, :context_id)
+    in nil
+      return
+    in ["Course", id]
+      params[:course_id] = id
+    in ["Group", id]
+      params[:group_id] = id
+    in [context_type, _]
+      raise "Can not handle #{context_type} in GraphQL context"
+    end
+
+    super
+  end
+
   private
 
   def execute_on(schema)
@@ -98,7 +113,6 @@ class GraphQLController < ApplicationController
     return unless params[:operationName] == "CreateSubmission"
 
     assignment = ::Assignment.active.find(params[:variables][:assignmentLid])
-    get_context
     log_asset_access(assignment, "assignments", nil, "participate")
   end
 
@@ -106,7 +120,17 @@ class GraphQLController < ApplicationController
     return unless params[:operationName] == "CreateDiscussionEntry"
 
     topic = DiscussionTopic.find(params[:variables][:discussionTopicId])
-    get_context
     log_asset_access(topic, "topics", "topics", "participate")
+  end
+
+  def subject
+    case params[:operationName]
+    when "CreateSubmission"
+      id = params[:variables][:assignmentLid]
+      ::Assignment.active.where(id:)
+    when "CreateDiscussionEntry"
+      id = params[:variables][:discussionTopicId]
+      ::DiscussionTopic.where(id:)
+    end
   end
 end

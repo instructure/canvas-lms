@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {RegistrationOverlayStore} from '../RegistrationOverlayState'
+import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import type {ConfirmationStateType} from '../DynamicRegistrationWizardState'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {ReviewScreen} from '../../registration_wizard_forms/ReviewScreen'
@@ -24,7 +24,7 @@ import type {LtiPlacement} from '../../model/LtiPlacement'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 export type ReviewScreenWrapperProps = {
   registration: LtiRegistrationWithConfiguration
-  overlayStore: RegistrationOverlayStore
+  overlayStore: DynamicRegistrationOverlayStore
   transitionToConfirmationState: (from: ConfirmationStateType, to: ConfirmationStateType) => void
 }
 

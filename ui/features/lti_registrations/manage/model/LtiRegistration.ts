@@ -26,6 +26,7 @@ import {ZLtiOverlay} from './LtiOverlay'
 import {ZLtiRegistrationAccountBinding} from './LtiRegistrationAccountBinding'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZUser} from './User'
+import {ZLtiOverlayVersion} from './LtiOverlayVersion'
 
 export const ZLtiRegistration = z.object({
   id: ZLtiRegistrationId,
@@ -58,6 +59,11 @@ export type LtiRegistrationWithConfiguration = z.infer<typeof ZLtiRegistrationWi
 
 export const ZLtiRegistrationWithAllInformation = ZLtiRegistrationWithConfiguration.extend({
   overlaid_configuration: ZInternalLtiConfiguration,
+  overlay: ZLtiOverlay.extend({
+    versions: z.array(ZLtiOverlayVersion),
+  })
+    .nullable()
+    .optional(),
 })
 
 export type LtiRegistrationWithAllInformation = z.infer<typeof ZLtiRegistrationWithAllInformation>

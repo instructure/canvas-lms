@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {canvas} from '@instructure/ui-theme-tokens'
+import {canvas} from '@instructure/ui-themes'
 import {Table} from '@instructure/ui-table'
 import {Heading} from '@instructure/ui-heading'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -71,22 +71,24 @@ export const ContentMigrationsTable = ({
   updateMigrationItem,
 }: ContentMigrationsTableProps) => {
   const loadMore = () => {
-    if (isLoading || !hasMore) return;
-    fetchNext();
+    if (isLoading || !hasMore) return
+    fetchNext()
   }
 
-  const migrationsExpireDays = ENV.CONTENT_MIGRATIONS_EXPIRE_DAYS;
+  const migrationsExpireDays = ENV.CONTENT_MIGRATIONS_EXPIRE_DAYS
 
   return (
-    <View as="div" borderWidth='small 0 0 0' padding='small 0 0 0'>
+    <View as="div" borderWidth="small 0 0 0" padding="small 0 0 0">
       <Heading level="h3" as="h3" margin="small 0">
         {I18n.t('Content imports')}
       </Heading>
-      {!!migrationsExpireDays && <View as="div" margin="small 0 medium 0">
-        {I18n.t(
-          'Content import files cannot be downloaded after %{days} days.', { days: migrationsExpireDays }
-        )}
-      </View>}
+      {!!migrationsExpireDays && (
+        <View as="div" margin="small 0 medium 0">
+          {I18n.t('Content import files cannot be downloaded after %{days} days.', {
+            days: migrationsExpireDays,
+          })}
+        </View>
+      )}
       <Responsive
         match="media"
         query={{
@@ -95,16 +97,17 @@ export const ContentMigrationsTable = ({
         render={(_, matches) => {
           const layout = matches?.includes('expanded') ? 'auto' : 'stacked'
           return (
-            <InfiniteScroll
-              pageStart={1}
-              loadMore={loadMore}
-              hasMore={!isLoading && hasMore}
-            >
+            <InfiniteScroll pageStart={1} loadMore={loadMore} hasMore={!isLoading && hasMore}>
               <Table caption={I18n.t('Content Migrations')} layout={layout}>
                 <Table.Head>
                   <Table.Row>
-                    {headerData.map((header) => (
-                      <Table.ColHeader key={header.id} id={header.id} themeOverride={{padding: '0.6rem 0'}} textAlign={header.textAlign || 'start'}>
+                    {headerData.map(header => (
+                      <Table.ColHeader
+                        key={header.id}
+                        id={header.id}
+                        themeOverride={{padding: '0.6rem 0'}}
+                        textAlign={header.textAlign || 'start'}
+                      >
                         {header.label}
                       </Table.ColHeader>
                     ))}

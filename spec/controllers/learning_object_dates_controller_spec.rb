@@ -62,7 +62,8 @@ describe LearningObjectDatesController do
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
                                    "all_day_date" => "2022-02-01",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -92,7 +93,8 @@ describe LearningObjectDatesController do
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
                                    "all_day_date" => "2022-02-01",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -119,7 +121,8 @@ describe LearningObjectDatesController do
                                    "context_module_name" => "module",
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -158,7 +161,8 @@ describe LearningObjectDatesController do
                                    "lock_at" => "2022-04-07T12:00:00Z",
                                    "all_day" => false,
                                    "all_day_date" => "2022-04-06",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -197,7 +201,8 @@ describe LearningObjectDatesController do
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
                                    "lock_at" => "2022-01-04T12:00:00Z",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -261,7 +266,6 @@ describe LearningObjectDatesController do
 
       get :show, params: { course_id: @course.id, discussion_topic_id: discussion.id }
       expect(response).to be_successful
-
       expect(json_parse).to eq({
                                  "id" => discussion.id,
                                  "unlock_at" => "2022-01-05T12:00:00Z",
@@ -277,7 +281,8 @@ describe LearningObjectDatesController do
                                      "title" => override.title,
                                      "course_section_id" => section1.id,
                                      "lock_at" => "2022-01-04T12:00:00Z",
-                                     "unassign_item" => false
+                                     "unassign_item" => false,
+                                     "sub_assignment_due_dates" => []
                                    },
                                    {
                                      "discussion_topic_id" => discussion.id,
@@ -312,7 +317,8 @@ describe LearningObjectDatesController do
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
                                    "unlock_at" => "2022-01-04T00:00:00Z",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -351,7 +357,8 @@ describe LearningObjectDatesController do
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
                                    "unlock_at" => "2022-01-07T00:00:00Z",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -509,7 +516,8 @@ describe LearningObjectDatesController do
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
                                    "unlock_at" => "2022-01-04T00:00:00Z",
-                                   "unassign_item" => false
+                                   "unassign_item" => false,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -536,7 +544,8 @@ describe LearningObjectDatesController do
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
                                    "all_day_date" => "2022-02-01",
-                                   "unassign_item" => true
+                                   "unassign_item" => true,
+                                   "sub_assignment_due_dates" => []
                                  }]
                                })
     end
@@ -700,47 +709,55 @@ describe LearningObjectDatesController do
         @group.add_user(@student, "accepted")
       end
 
-      def returns_non_collaborative_field_for_group_overrides
+      def returns_non_collaborative_field_for_group_overrides(hide_group_name: false)
         due_at = 7.days.from_now
         # to properly override a due date, due_at_overridden needs to be true
         override2 = @assignment.assignment_overrides.create!(set: @group, due_at_overridden: true, due_at:)
 
         get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
         expect(response).to be_successful
-        expect(json_parse).to eq({
-                                   "id" => @assignment.id,
-                                   "due_at" => "2022-01-02T00:00:00Z",
-                                   "unlock_at" => "2022-01-01T00:00:00Z",
-                                   "lock_at" => "2022-01-03T01:00:00Z",
-                                   "only_visible_to_overrides" => true,
-                                   "group_category_id" => nil,
-                                   "graded" => true,
-                                   "visible_to_everyone" => false,
-                                   "overrides" => [
-                                     {
-                                       "id" => @override.id,
-                                       "assignment_id" => @assignment.id,
-                                       "title" => "Unnamed Course",
-                                       "course_section_id" => @course.default_section.id,
-                                       "due_at" => "2022-02-01T01:00:00Z",
-                                       "all_day" => false,
-                                       "all_day_date" => "2022-02-01",
-                                       "unassign_item" => false
-                                     },
-                                     {
-                                       "id" => override2.id,
-                                       "assignment_id" => @assignment.id,
-                                       "title" => "Non-Collaborative Group 1",
-                                       "due_at" => due_at.iso8601,
-                                       "all_day" => false,
-                                       "all_day_date" => due_at.to_date.to_s,
-                                       "unassign_item" => false,
-                                       "group_id" => @group.id,
-                                       "non_collaborative" => true,
-                                       "group_category_id" => @group.group_category.id,
-                                     }
-                                   ]
-                                 })
+        expected_response = {
+          "id" => @assignment.id,
+          "due_at" => "2022-01-02T00:00:00Z",
+          "unlock_at" => "2022-01-01T00:00:00Z",
+          "lock_at" => "2022-01-03T01:00:00Z",
+          "only_visible_to_overrides" => true,
+          "group_category_id" => nil,
+          "graded" => true,
+          "visible_to_everyone" => false,
+          "overrides" => [
+            {
+              "id" => @override.id,
+              "assignment_id" => @assignment.id,
+              "title" => "Unnamed Course",
+              "course_section_id" => @course.default_section.id,
+              "due_at" => "2022-02-01T01:00:00Z",
+              "all_day" => false,
+              "all_day_date" => "2022-02-01",
+              "unassign_item" => false,
+              "sub_assignment_due_dates" => []
+            },
+            {
+              "id" => override2.id,
+              "assignment_id" => @assignment.id,
+              "title" => "Non-Collaborative Group 1",
+              "due_at" => due_at.iso8601,
+              "all_day" => false,
+              "all_day_date" => due_at.to_date.to_s,
+              "unassign_item" => false,
+              "group_id" => @group.id,
+              "non_collaborative" => true,
+              "group_category_id" => @group.group_category.id,
+              "sub_assignment_due_dates" => []
+            }
+          ]
+        }
+
+        if hide_group_name
+          expected_response["overrides"][1].delete("title")
+        end
+
+        expect(json_parse).to eq(expected_response)
       end
 
       it "returns the non_collaborative field for group overrides" do
@@ -756,7 +773,8 @@ describe LearningObjectDatesController do
         end
 
         it "returns the non_collaborative field for group overrides" do
-          returns_non_collaborative_field_for_group_overrides
+          # TA should not see the group name for non-collaborative groups
+          returns_non_collaborative_field_for_group_overrides(hide_group_name: true)
         end
       end
     end
@@ -1954,6 +1972,47 @@ describe LearningObjectDatesController do
         RoleOverride.create!(context: @course.account, permission: "manage_wiki_update", role: teacher_role, enabled: false)
         put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
         expect(response).to be_unauthorized
+      end
+    end
+
+    describe "create_wiki_page_mastery_path_overrides feature enabled" do
+      before do
+        Account.site_admin.enable_feature! :create_wiki_page_mastery_path_overrides
+        @course.conditional_release = true
+        @course.save!
+      end
+
+      context "pages without an assignment" do
+        let_once(:learning_object) do
+          page = @course.wiki_pages.create!(title: "My Page", lock_at: "2022-01-03T01:00:00Z")
+          page.save!
+          page
+        end
+
+        let_once(:default_params) do
+          {
+            course_id: @course.id,
+            url_or_id: learning_object.id
+          }
+        end
+
+        let_once(:differentiable) do
+          learning_object
+        end
+
+        include_examples "learning object updates", false
+
+        it "does not create assignment" do
+          put :update, params: { **default_params, assignment_overrides: [{ noop_id: 1 }] }
+          expect(learning_object.reload.assignment).to be_nil
+        end
+
+        it "creates assignment override and links it to wiki page" do
+          put :update, params: { **default_params, assignment_overrides: [{ noop_id: 1 }] }
+          expect(learning_object.assignment_overrides.active.count).to eq 1
+          assignment_override = learning_object.assignment_overrides.active.first
+          expect(assignment_override).to be_present
+        end
       end
     end
 

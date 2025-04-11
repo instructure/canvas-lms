@@ -115,7 +115,8 @@ class TranslationController < ApplicationController
       end
       text.append(passage.join)
     end
-    { translated_text: text.join("\n") }
+
+    text.join("\n")
   end
 
   def required_params

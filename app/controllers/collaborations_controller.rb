@@ -225,7 +225,7 @@ class CollaborationsController < ApplicationController
           @collaboration.authorize_user(@current_user)
           log_asset_access(@collaboration, "collaborations", "other", "participate")
           url = if @collaboration.is_a? ExternalToolCollaboration
-                  tool = ContextExternalTool.find_external_tool(@collaboration.url, @context)
+                  tool = Lti::ToolFinder.from_url(@collaboration.url, @context)
                   @collaboration.migrate_to_1_3_if_needed!(tool)
                   resource_link_lookup_uuid = @collaboration.resource_link_lookup_uuid if tool.use_1_3?
 
@@ -460,7 +460,7 @@ class CollaborationsController < ApplicationController
 
     if (tool_id = params[:tool_id]).present?
       # Make sure we are using a tool compatible with this URL and that the user can access
-      tool = ContextExternalTool.find_external_tool(collaboration.url, @context, tool_id, only_1_3: true)
+      tool = Lti::ToolFinder.from_url(collaboration.url, @context, preferred_tool_id: tool_id, only_1_3: true)
       raise NoCompatibleTool unless tool
 
       if collaboration.resource_link_lookup_uuid

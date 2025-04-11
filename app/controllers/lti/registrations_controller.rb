@@ -283,6 +283,7 @@
 #                       "default",
 #                       "full_width",
 #                       "full_width_in_context",
+#                       "full_width_with_nav",
 #                       "in_nav_context",
 #                       "borderless"
 #                     ]
@@ -518,6 +519,7 @@
 #             "default",
 #             "full_width",
 #             "full_width_in_context",
+#             "full_width_with_nav",
 #             "in_nav_context",
 #             "borderless"
 #           ]
@@ -701,6 +703,7 @@
 #             "default",
 #             "full_width",
 #             "full_width_in_context",
+#             "full_width_with_nav",
 #             "in_nav_context",
 #             "borderless"
 #           ]
@@ -908,12 +911,6 @@ class Lti::RegistrationsController < ApplicationController
 
   def index
     set_active_tab "apps"
-    breadcrumb_path = if @account.feature_enabled?(:lti_registrations_discover_page)
-                        account_lti_registrations_path(account_id: @account.id)
-                      else
-                        account_lti_manage_registrations_path(account_id: @account.id)
-                      end
-    add_crumb(t("#crumbs.apps", "Apps"), breadcrumb_path)
 
     inject_lti_usage_env
 
@@ -1106,6 +1103,7 @@ class Lti::RegistrationsController < ApplicationController
   # @argument name [String] The name of the tool
   # @argument admin_nickname [String] A friendly nickname set by admins to override the tool name
   # @argument vendor [String] The vendor of the tool
+  # @argument description [String] A description of the tool. Cannot exceed 2048 bytes.
   # @argument configuration [Required, Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool
   # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration.
   # @argument unified_tool_id [String] The unique identifier for the tool, used for analytics. If not provided, one will be generated.
@@ -1148,12 +1146,14 @@ class Lti::RegistrationsController < ApplicationController
       vendor = params[:vendor]
       name = params[:name] || configuration_params[:title]
       admin_nickname = params[:admin_nickname]
+      description = params[:description]
       scopes = configuration_params[:scopes]
 
       registration = Lti::Registration.create!(
         name:,
         admin_nickname:,
         vendor:,
+        description:,
         account: @context,
         workflow_state: "active",
         created_by: @current_user,
@@ -1247,6 +1247,7 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @argument name [String] The name of the tool
   # @argument admin_nickname [String] The admin-configured friendly display name for the registration
+  # @argument description [String] A description of the tool. Cannot exceed 2048 bytes.
   # @argument configuration [Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool. Note that updating the base tool configuration of a registration associated with a Dynamic Registration is not allowed.
   # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration. Note that updating the overlay of a registration associated with a Dynamic Registration IS allowed.
   # @argument workflow_state [String, "on" | "off" | "allow"]
@@ -1283,59 +1284,24 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @returns Lti::Registration
   def update
-    Lti::Registration.transaction do
-      name = params[:name]
-      reg_params = params.permit(:admin_nickname, :vendor, :name).to_h
-      registration.update!(reg_params.merge({ updated_by: @current_user })) if reg_params.present?
+    registration_params = params.permit(:admin_nickname, :vendor, :name, :description).to_h
 
-      updated_overlay = if overlay_params.present?
-                          overlay = Lti::Overlay.find_or_initialize_by(registration:, account: @context)
-                          overlay.updated_by = @current_user
-                          overlay.data = overlay_params
-                          overlay.save!
-                          overlay
-                        end
+    binding_params = {
+      workflow_state: params[:workflow_state],
+    }.compact
 
-      scopes = if updated_overlay.present? && configuration_params.present?
-                 updated_overlay.apply_to(configuration_params)[:scopes]
-               elsif updated_overlay.blank? && configuration_params.present?
-                 configuration_params[:scopes]
-               elsif updated_overlay.present?
-                 # Get the result of applying the overlay to the existing configuration.
-                 registration.internal_lti_configuration(include_overlay: true)[:scopes]
-               else
-                 nil
-               end
+    update_params = {
+      id: params[:id],
+      account: @context,
+      registration_params:,
+      configuration_params:,
+      overlay_params:,
+      binding_params:,
+      updated_by: @current_user
+    }
 
-      if configuration_params.present?
-        tool_configuration.update!(**configuration_params) if configuration_params.present?
-      elsif overlay_params.present?
-        # Ensure that if only the overlay changes we still propagate the changes to all
-        # associated external tools
-        registration.developer_key.update_external_tools!
-      end
+    registration = Lti::UpdateRegistrationService.call(**update_params)
 
-      developer_key_update_params = {
-        icon_url: configuration_params&.dig(:launch_settings, :icon_url),
-        name:,
-        public_jwk: configuration_params&.dig(:public_jwk),
-        public_jwk_url: configuration_params&.dig(:public_jwk_url),
-        redirect_uris: configuration_params&.dig(:redirect_uris),
-        scopes:,
-      }.compact
-
-      registration.developer_key.update!(developer_key_update_params) if developer_key_update_params.present?
-
-      if workflow_state.present?
-        Lti::AccountBindingService
-          .call(
-            account: @context,
-            registration:,
-            workflow_state:,
-            user: @current_user
-          )
-      end
-    end
     render json: lti_registration_json(registration,
                                        @current_user,
                                        session,
@@ -1538,17 +1504,7 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def registration
-    @registration ||= Lti::Registration.active
-                                       .eager_load(:ims_registration, :manual_configuration, :developer_key)
-                                       .find(params[:id])
-  end
-
-  def overlay
-    @overlay ||= registration.overlay_for(@context)
-  end
-
-  def tool_configuration
-    @tool_configuration ||= registration.manual_configuration
+    @registration ||= Lti::Registration.active.find(params[:id])
   end
 
   def require_account_context_instrumented
@@ -1611,13 +1567,14 @@ class Lti::RegistrationsController < ApplicationController
                canvasBaseUrl: request.base_url,
                firstName: @current_user.short_name,
                locale: @current_user.browser_locale,
-               rootAccountId: @domain_root_account.id,
-               rootAccountUuid: @domain_root_account.uuid,
+               rootAccountId: @account.root_account.id,
+               rootAccountUuid: @account.root_account.uuid,
+               isPremiumAccount: @account.root_account.feature_enabled?(:lti_usage_premium)
              },
            })
 
     remote_env({
-                 ltiUsage: DynamicSettings.find("lti")["canvas_apps_lti_usage_url"] || nil
+                 ltiUsage: DynamicSettings.find("lti")["canvas_apps_lti_usage_url", failsafe: nil]
                })
   end
 end

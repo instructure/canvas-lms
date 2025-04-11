@@ -51,4 +51,10 @@ describe('CreateFolderButton', () => {
       expect(modalElement).not.toBeInTheDocument()
     })
   })
+
+  it('has descriptive screen reader label', () => {
+    renderComponent()
+    const createFolderButton = screen.getByLabelText(/Add Folder/i)
+    expect(createFolderButton).toBeInTheDocument()
+  })
 })

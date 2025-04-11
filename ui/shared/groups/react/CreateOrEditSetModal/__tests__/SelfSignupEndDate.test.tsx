@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import SelfSignupEndDate from '../SelfSignupEndDate'
 
 const onDatechangeMock = jest.fn()
@@ -44,6 +44,8 @@ describe('CreateOrEditSetModal::SelfSignup::', () => {
     const option = await findByText(/30 October 2024/i)
     option.click()
 
-    expect(onDatechangeMock).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(onDatechangeMock).toHaveBeenCalled()
+    });
   })
 })

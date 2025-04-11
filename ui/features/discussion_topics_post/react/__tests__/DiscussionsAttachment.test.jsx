@@ -116,7 +116,7 @@ describe('DiscussionsAttachment', () => {
       fireEvent.click(container.getByTestId('edit'))
 
       await waitFor(() => {
-        expect(tinymce.editors[0]).toBeDefined()
+        expect(tinymce.get('1337')).toBeDefined()
       })
 
       document.querySelectorAll('textarea')[0].value = ''

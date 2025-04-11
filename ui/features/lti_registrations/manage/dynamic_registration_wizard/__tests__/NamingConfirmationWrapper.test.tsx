@@ -25,7 +25,7 @@ import {
   mockToolConfiguration,
   mockOverlay,
 } from './helpers'
-import {createRegistrationOverlayStore} from '../RegistrationOverlayState'
+import {createDynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import userEvent from '@testing-library/user-event'
 import {LtiPlacements} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
@@ -33,7 +33,7 @@ import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 describe('NamingConfirmation', () => {
   it('renders the NamingConfirmation', () => {
     const reg = mockRegistration()
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(<NamingConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
@@ -43,7 +43,7 @@ describe('NamingConfirmation', () => {
 
   it("let's users change the nickname", async () => {
     const reg = mockRegistration()
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
     overlayStore.getState().updateAdminNickname('Foo')
 
     render(<NamingConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
@@ -62,7 +62,7 @@ describe('NamingConfirmation', () => {
     const reg = mockRegistration({
       configuration: mockToolConfiguration({description: 'Foo'}),
     })
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(<NamingConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
@@ -80,7 +80,7 @@ describe('NamingConfirmation', () => {
     const reg = mockRegistration({
       admin_nickname: 'Foo',
     })
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(<NamingConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
@@ -95,7 +95,7 @@ describe('NamingConfirmation', () => {
         },
       }),
     })
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(<NamingConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
@@ -117,7 +117,7 @@ describe('NamingConfirmation', () => {
       config,
     )
 
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     overlayStore.getState().toggleDisabledPlacement(LtiPlacements.CourseAssignmentsMenu)
 
@@ -141,7 +141,7 @@ describe('NamingConfirmation', () => {
       },
       config,
     )
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(<NamingConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 

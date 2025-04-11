@@ -76,8 +76,8 @@ describe('IconBlockToolbar', () => {
     expect(medMenuItem).toBeInTheDocument()
     expect(lgMenuItem).toBeInTheDocument()
 
-    const li = smMenuItem.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
+    const li = smMenuItem?.parentElement?.parentElement as HTMLLIElement
+    expect(li?.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
   })
 
   it('changes the size prop', async () => {

@@ -30,8 +30,8 @@
   transition: transform 0.3s;
 
   &:focus {
-    box-shadow: inset 0 0 0 1px var(--ic-brand-global-nav-bgd),
-    inset 0 0 0 2px var(--ic-brand-global-nav-menu-item__text-color);
+    box-shadow: inset 0 0 0 0.125rem var(--ic-brand-global-nav-bgd),
+    inset 0 0 0 0.25rem var(--ic-brand-global-nav-menu-item__text-color);
     outline-style: none;
   }
 

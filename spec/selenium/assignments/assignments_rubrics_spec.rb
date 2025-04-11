@@ -640,7 +640,7 @@ describe "assignment rubrics" do
         wait_for_ajaximations
 
         f("#add_criterion_container a:nth-of-type(1)").click
-        f("#criterion_duplicate_menu ul li:nth-of-type(2)").click
+        ff("#criterion_duplicate_menu [class*='menuItem__label']")[1].click
         wait_for_ajaximations
         f(".ui-dialog-buttonset .save_button").click
 
@@ -656,7 +656,7 @@ describe "assignment rubrics" do
         wait_for_ajaximations
 
         f("#add_criterion_container a:nth-of-type(1)").click
-        f("#criterion_duplicate_menu ul li:nth-of-type(1)").click
+        ff("#criterion_duplicate_menu [class*='menuItem__label']")[0].click
         wait_for_ajaximations
 
         expect(ffj(".criterion:visible .description_title")[2]).to include_text "Outcome row"

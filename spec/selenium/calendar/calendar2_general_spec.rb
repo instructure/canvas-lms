@@ -166,7 +166,6 @@ describe "calendar2" do
 
       it "course pacing calendars' assignments should not appear on teachers' calendars" do
         Account.site_admin.enable_feature! :account_level_blackout_dates
-        Account.site_admin.enable_feature! :course_paces
         @course.enable_course_paces = true
         @course.save!
         @course.active_assignments.create!(name: "cp assignment", due_at: Time.zone.now)

@@ -24,7 +24,7 @@ describe HorizonController do
     it "should success when course has no errors" do
       course_factory(active_all: true)
       @course.announcements.create!(title: "Announcement 1", message: "Message 1")
-      @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry")
+      @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry", workflow_state: "unpublished")
 
       account_admin_user
       user_session(@admin)
@@ -148,7 +148,7 @@ describe HorizonController do
       course_factory(active_all: true)
       @course.discussion_topics.create!(title: "Discussion 1")
       @course.announcements.create!(title: "Announcement 1", message: "Message 1")
-      a1 = @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry")
+      a1 = @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry", workflow_state: "unpublished")
       a2 = @course.assignments.create!(name: "Assignment 2", points_possible: 20)
       a3 = @course.assignments.create!(name: "Assignment 3", points_possible: 30, peer_reviews: true)
 
@@ -184,11 +184,11 @@ describe HorizonController do
       @course.account.enable_feature!(:horizon_course_setting)
       @course.discussion_topics.create!(title: "Discussion 1")
       @course.announcements.create!(title: "Announcement 1", message: "Message 1")
-      @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry")
-      a2 = @course.assignments.create!(name: "Assignment 2", points_possible: 20)
-      a3 = @course.assignments.create!(name: "Assignment 3", points_possible: 30, submission_types: "online_text_entry")
-      @course.assignments.create!(name: "Assignment 4", points_possible: 20)
-      @course.assignments.create!(name: "Assignment 5", points_possible: 20)
+      @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry", workflow_state: "unpublished")
+      a2 = @course.assignments.create!(name: "Assignment 2", points_possible: 20, workflow_state: "unpublished")
+      a3 = @course.assignments.create!(name: "Assignment 3", points_possible: 30, submission_types: "online_text_entry", workflow_state: "unpublished")
+      @course.assignments.create!(name: "Assignment 4", points_possible: 20, workflow_state: "unpublished")
+      @course.assignments.create!(name: "Assignment 5", points_possible: 20, workflow_state: "unpublished")
       @course.groups.create!(name: "Group 1")
       @course.groups.create!(name: "Group 2")
       @course.groups.create!(name: "Group 3")
@@ -219,8 +219,9 @@ describe HorizonController do
       # not calling the endpoint directly because it's delayed
       Courses::HorizonService.convert_course_to_horizon(context: @course, errors: json[:errors])
 
+      @course.reload
       expect(@course.discussion_topics.only_discussion_topics.count).to eq(0)
-      expect(@course.assignments.all { |a| a.submission_types == "online_text_entry" && !a.peer_reviews && !a.active_rubric_association? }).to be_truthy
+      expect(@course.assignments.all? { |a| a.submission_types == "online_text_entry" && !a.peer_reviews && !a.active_rubric_association? }).to be_truthy
       expect(@course.groups.count).to eq(3)
       expect(@course.groups.active.count).to eq(0)
       expect(@course.horizon_course?).to be_truthy
@@ -233,13 +234,43 @@ describe HorizonController do
       user_session(@admin)
 
       @course.account.enable_feature!(:horizon_course_setting)
-      @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry")
+      @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry", workflow_state: "unpublished")
 
       post "convert_course", params: { course_id: @course.id }, format: :json
 
       json = JSON.parse(response.body, { symbolize_names: true })
       @course.reload
       expect(json[:success]).to be_truthy
+      expect(@course.horizon_course?).to be_truthy
+    end
+
+    it "unpublishes already published assignments" do
+      course_factory(active_all: true)
+      module1 = @course.context_modules.create!(name: "Module 1")
+      module2 = @course.context_modules.create!(name: "Module 2", workflow_state: "unpublished")
+
+      account_admin_user
+      user_session(@admin)
+
+      @course.account.enable_feature!(:horizon_course_setting)
+      a1 = assignment_model(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry", course: @course, workflow_state: "published")
+      a2 = assignment_model(name: "Assignment 2", points_possible: 10, submission_types: "online_text_entry", course: @course, workflow_state: "published")
+      a3 = assignment_model(name: "Assignment 3", points_possible: 10, submission_types: "online_text_entry", course: @course, workflow_state: "published")
+      a4 = assignment_model(name: "Assignment 3", points_possible: 10, submission_types: "online_text_entry", course: @course, workflow_state: "published")
+      a1.context_module_tags.create!(context_module: module1, context: a1.course, tag_type: "context_module", workflow_state: "active")
+      a2.context_module_tags.create!(context_module: module2, context: a2.course, tag_type: "context_module", workflow_state: "active")
+      a3.context_module_tags.create!(context_module: module1, context: a2.course, tag_type: "learning_outcome", workflow_state: "active")
+
+      get "validate_course", params: { course_id: @course.id }
+
+      json = JSON.parse(response.body, { symbolize_names: true })
+
+      Courses::HorizonService.convert_course_to_horizon(context: @course, errors: json[:errors])
+      @course.reload
+      expect(a1.reload.workflow_state).to eq("published")
+      expect(a2.reload.workflow_state).to eq("unpublished")
+      expect(a3.reload.workflow_state).to eq("unpublished")
+      expect(a4.reload.workflow_state).to eq("unpublished")
       expect(@course.horizon_course?).to be_truthy
     end
   end

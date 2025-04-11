@@ -129,7 +129,6 @@ describe "wiki pages edit page assign to" do
 
     context "with course pacing" do
       before do
-        Account.site_admin.enable_feature! :course_paces
         @course.enable_course_paces = true
         @course.save!
       end

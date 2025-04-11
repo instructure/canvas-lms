@@ -3434,23 +3434,32 @@ describe ContextExternalTool do
 
       it "returns true if the 1.3 tool matches on developer_key (module item)" do
         content_tag = ContentTag.create!(context: @course, content: old_tool, url:)
-        expect(ContextExternalTool).to receive(:from_content_tag).with(content_tag, content_tag.context).and_return(new_tool1)
+        expect(Lti::ToolFinder).to receive(:from_content_tag).with(content_tag, content_tag.context).and_return(new_tool1)
         expect(new_tool2.can_access_content_tag?(content_tag)).to be true
       end
 
       it "returns true if the 1.3 tool matches on developer_key (assignment)" do
         assignment = assignment_model(context: @course, submission_types: "external_tool")
         content_tag = ContentTag.create!(context: assignment, content: old_tool, url:)
-        expect(ContextExternalTool).to receive(:from_content_tag).with(content_tag, content_tag.context.context).and_return(new_tool1)
+        expect(Lti::ToolFinder).to receive(:from_content_tag).with(content_tag, content_tag.context.context).and_return(new_tool1)
         expect(new_tool2.can_access_content_tag?(content_tag)).to be true
       end
 
       it "returns false if the 1.3 tool does not match on developer_key" do
         content_tag = ContentTag.create!(context: @course, content: old_tool, url:)
         new_tool1.update!(developer_key: DeveloperKey.create!)
-        expect(ContextExternalTool).to receive(:from_content_tag).with(content_tag, content_tag.context).and_return(new_tool1)
+        expect(Lti::ToolFinder).to receive(:from_content_tag).with(content_tag, content_tag.context).and_return(new_tool1)
         expect(new_tool2.can_access_content_tag?(content_tag)).to be false
       end
+    end
+  end
+
+  describe "#asset_processor_eula_url" do
+    let(:tool) { external_tool_model }
+
+    it "returns the correct EULA URL for the tool" do
+      expected_url = "http://#{tool.context.root_account.environment_specific_domain}/api/lti/asset_processor_eulas/#{tool.id}"
+      expect(tool.asset_processor_eula_url).to eq(expected_url)
     end
   end
 end

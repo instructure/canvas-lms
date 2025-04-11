@@ -387,7 +387,7 @@ export const Events = {
           origIframeHeightStr = $iframe.css('height')
           const iframeWidth = parseInt(origIframeWidthStr, 10)
           const iframeHeight = parseInt(origIframeHeightStr, 10)
-          $iframe.css('border', '2px solid #0374B5')
+          $iframe.css('border', '2px solid #2B7ABC')
           $(this).removeClass('screenreader-only')
           const alertHeight = numberOrZero($(this).outerHeight(true))
 

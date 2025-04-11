@@ -18,6 +18,12 @@
 
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 
+export type GenerateCriteriaFormProps = {
+  criteriaCount: number
+  ratingCount: number
+  pointsPerCriterion: string
+}
+
 export type RubricFormProps = {
   id?: string
   title: string
@@ -25,7 +31,6 @@ export type RubricFormProps = {
   accountId?: string
   courseId?: string
   criteria: RubricCriterion[]
-  criteriaViaLlm: boolean // currently POST data only
   pointsPossible: number
   buttonDisplay: string
   ratingOrder: string

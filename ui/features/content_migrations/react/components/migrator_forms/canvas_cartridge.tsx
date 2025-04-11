@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useRef} from 'react'
 import {CommonMigratorControls, noFileSelectedFormMessage} from '@canvas/content-migrations'
 import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
@@ -39,7 +39,8 @@ const CanvasCartridgeImporter = ({
   fileUploadProgress,
   isSubmitting,
 }: CanvasCartridgeImporterProps) => {
-  const {setFile, fileError, handleSubmit} = useSubmitHandler(onSubmit)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const {setFile, fileError, handleSubmit} = useSubmitHandler(onSubmit, fileInputRef)
 
   return (
     <>
@@ -49,6 +50,7 @@ const CanvasCartridgeImporter = ({
         isSubmitting={isSubmitting}
         externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
         isRequired={true}
+        inputRef={ref => (fileInputRef.current = ref)}
       />
       <CommonMigratorControls
         fileUploadProgress={fileUploadProgress}

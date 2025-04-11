@@ -137,7 +137,10 @@ module Lti
       # @param context [Context] search in all contexts up the chain from this
       # @param launch_url [String] the specific URL to match against
       def associated_1_1_tool(tool, context, launch_url)
-        return nil unless launch_url && tool.use_1_3?
+        return nil unless tool&.use_1_3?
+
+        launch_url ||= tool.url || tool.domain
+        return nil unless launch_url
 
         # Finding tools is expensive and this relationship doesn't change very often, so
         # it's worth it to maintain this possibly "incorrect" relationship for 5 minutes.

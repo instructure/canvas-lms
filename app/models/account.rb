@@ -434,6 +434,8 @@ class Account < ActiveRecord::Base
   add_setting :enable_limited_access_for_students, boolean: true, root_only: false, default: false, inheritable: false
   add_setting :allow_assign_to_differentiation_tags, boolean: true, root_only: false, default: false, inheritable: true
 
+  add_setting :horizon_account, boolean: true, default: false, inheritable: true
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
@@ -2645,5 +2647,20 @@ class Account < ActiveRecord::Base
     uri = Addressable::URI.parse("#{protocol}://#{horizon_domain}/redirect")
     uri.query_values = { canvas_url:, reauthenticate:, preview: }
     uri.to_s
+  end
+
+  def horizon_account_locked?
+    horizon_account[:locked] && horizon_account[:inherited]
+  end
+
+  def horizon_account?
+    feature_enabled?(:horizon_course_setting) && horizon_account[:value]
+  end
+
+  def horizon_account=(value)
+    settings[:horizon_account] = {
+      locked: value,
+      value:
+    }
   end
 end

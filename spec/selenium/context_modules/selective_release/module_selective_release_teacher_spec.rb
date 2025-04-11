@@ -392,7 +392,7 @@ describe "selective_release module set up" do
 
       click_clear_all
 
-      error_message = f("#TextInput-messages_0")
+      error_message = f("#TextInput-messages___0")
       expect(error_message.text).to eq("A student or section must be selected")
     end
 
@@ -464,7 +464,7 @@ describe "selective_release module set up" do
 
         click_clear_all
 
-        error_message = f("#TextInput-messages_0")
+        error_message = f("#TextInput-messages___0")
         expect(error_message.text).to eq("A student, section, or tag must be selected")
       end
     end

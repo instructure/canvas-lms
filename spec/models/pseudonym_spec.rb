@@ -208,6 +208,16 @@ describe Pseudonym do
         expect(@pseudonym.auditor_records.where(action: "deleted", performing_user: performing_user.id)).to exist
       end
     end
+
+    context "with additional arguments" do
+      let(:pseudonym) { pseudonym_model }
+
+      it "passes additional arguments to #save" do
+        expect(pseudonym).to receive(:save).with(validate: false)
+
+        pseudonym.destroy(custom_deleted_at: Time.now.utc, validate: false)
+      end
+    end
   end
 
   it "allows deleting system-generated pseudonyms" do
@@ -475,7 +485,7 @@ describe Pseudonym do
 
     it "expires a cas ticket" do
       expect(Canvas.redis).to receive(:set).once.and_return(true)
-      expect(Pseudonym.expire_cas_ticket(cas_ticket)).to be_truthy
+      expect(Pseudonym.expire_cas_ticket(cas_ticket, nil)).to be_truthy
     end
   end
 

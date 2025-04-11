@@ -135,7 +135,12 @@ module Api::V1::StreamItem
           # the old join doesn't work for cross-shard stream items, so we basically have to pre-calculate everything
           scope = scope.where(stream_item_id: filtered_stream_item_ids(opts))
         else
-          scope = scope.eager_load(:stream_item).where("stream_items.asset_type=?", opts[:asset_type])
+          scope = scope.eager_load(:stream_item).where(stream_items: { asset_type: opts[:asset_type] })
+          # join table for submissions when there are more asset types is different
+          if opts[:asset_type].is_a?(Array) && opts[:asset_type].include?("Submission")
+            scope = scope.joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id AND submissions.workflow_state <> 'deleted' AND submissions.submission_comments_count>0")
+            scope = scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.key?(:submission_user_id)
+          end
           if opts[:asset_type] == "Submission"
             scope = scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
             # just because there are comments doesn't mean the user can see them.
@@ -144,6 +149,10 @@ module Api::V1::StreamItem
             scope = scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.key?(:submission_user_id)
           end
         end
+      end
+      if opts.key?(:notification_categories) && opts[:notification_categories].is_a?(Array)
+        notification_categories = opts[:notification_categories].map { |c| (c == "null") ? nil : c }
+        scope = scope.eager_load(:stream_item).where(stream_items: { notification_category: notification_categories })
       end
       Api.paginate(scope, self, send(opts[:paginate_url], @context), default_per_page: 21).to_a
     end

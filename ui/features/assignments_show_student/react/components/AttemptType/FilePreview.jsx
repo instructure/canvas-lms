@@ -122,7 +122,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
   }
 
   const renderFileIcons = () => {
-    const cellTheme = {background: theme.colors.backgroundLight}
+    const cellTheme = {background: theme.colors.contrasts.grey1111}
     return (
       <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
         <Table.Head>
@@ -210,7 +210,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
       width: '100%',
       height: '100%',
       position: 'absolute',
-      borderLeft: `1px solid ${theme.colors.borderMedium}`,
+      borderLeft: `1px solid ${theme.colors.contrasts.grey1214}`,
     }
     const selectedFile = submission.attachments[selectedFileIndex]
     if (selectedFile && !selectedFile.submissionPreviewUrl) {
@@ -219,7 +219,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
           style={{
             textAlign: 'center',
             padding: `${theme.spacing.medium} 0 0 0`,
-            borderLeft: `1px solid ${theme.colors.borderMedium}`,
+            borderLeft: `1px solid ${theme.colors.contrasts.grey1214}`,
           }}
         >
           <div style={{display: 'block'}}>

@@ -615,5 +615,406 @@ describe UserSearch do
         it { is_expected.not_to include("not enrolled 02") }
       end
     end
+
+    describe "sorting" do
+      before do
+        @test_teacher = User.create!(name: "Woody Walton")
+        TeacherEnrollment.create!(user: @test_teacher, course:, workflow_state: "active")
+        @sorted_by_name = ["Ĭńşŧřůćƭǜȑȩ Person", "Jon Stewart", "Martha Jones", "Martha Stewart", "Rose Tyler", "Rosemary Giver", "Stewart Little", "Tyler Pickett", "Woody Walton"]
+      end
+
+      describe "single value columns" do
+        context "name" do
+          it "sorts by name ascending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "name", order: "asc").to_a
+            expect(users.map(&:name)).to eq @sorted_by_name
+          end
+
+          it "sorts by name descending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "name", order: "desc").to_a
+            expect(users.map(&:name)).to eq @sorted_by_name.reverse
+          end
+        end
+
+        context "login_id" do
+          before do
+            User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "tyler@example.com", account_id: course.root_account_id)
+            User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "pickett@example.com", account_id: course.root_account_id)
+          end
+
+          it "sorts by login_id ascending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "login_id", order: "asc").to_a
+            login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+            expect(login_ids).to include("pickett@example.com")
+            expect(login_ids).to include("tyler@example.com")
+            expect(login_ids[0..1]).to eq ["pickett@example.com", "tyler@example.com"]
+          end
+
+          it "sorts by login_id descending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "login_id", order: "desc").to_a
+            login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+            expect(login_ids).to include("tyler@example.com")
+            expect(login_ids).to include("pickett@example.com")
+            expect(login_ids[0..1]).to eq ["tyler@example.com", "pickett@example.com"]
+          end
+
+          context "with include_deleted_users" do
+            before do
+              @deleted_user = User.create!(name: "Deleted User")
+              User.find_by(name: "Deleted User").pseudonyms.create!(unique_id: "deleted@example.com", account_id: course.root_account_id)
+              @deleted_user.remove_from_root_account(course.root_account)
+            end
+
+            describe "when include_deleted_users is true" do
+              it "includes deleted users when sorting by login_id ascending" do
+                users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "asc", include_deleted_users: true).to_a
+                login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+                expect(login_ids).to include("deleted@example.com")
+                expect(login_ids).to include("pickett@example.com")
+                expect(login_ids).to include("tyler@example.com")
+                expect(login_ids[0..2]).to eq ["deleted@example.com", "pickett@example.com", "tyler@example.com"]
+              end
+
+              it "includes deleted users when sorting by login_id descending" do
+                users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "desc", include_deleted_users: true).to_a
+                login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+                expect(login_ids).to include("tyler@example.com")
+                expect(login_ids).to include("pickett@example.com")
+                expect(login_ids).to include("deleted@example.com")
+                expect(login_ids[0..2]).to eq ["tyler@example.com", "pickett@example.com", "deleted@example.com"]
+              end
+            end
+
+            describe "when include_deleted_users is false (default)" do
+              it "excludes deleted users when sorting by login_id ascending" do
+                users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "asc").to_a
+                login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+                expect(login_ids).not_to include("deleted@example.com")
+                expect(login_ids).to include("pickett@example.com")
+                expect(login_ids).to include("tyler@example.com")
+                expect(login_ids[0..1]).to eq ["pickett@example.com", "tyler@example.com"]
+              end
+
+              it "excludes deleted users when sorting by login_id descending" do
+                users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "desc").to_a
+                login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+                expect(login_ids).not_to include("deleted@example.com")
+                expect(login_ids).to include("pickett@example.com")
+                expect(login_ids).to include("tyler@example.com")
+                expect(login_ids[0..1]).to eq ["tyler@example.com", "pickett@example.com"]
+              end
+            end
+          end
+        end
+
+        context "total_activity_time" do
+          before do
+            User.find_by(name: "Rose Tyler").enrollments&.first&.update!(total_activity_time: 100)
+            User.find_by(name: "Tyler Pickett").enrollments&.first&.update!(total_activity_time: 200)
+          end
+
+          it "sorts by total activity time ascending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "total_activity_time", order: "asc").to_a
+            total_activity_times = users.map { |u| u.enrollments&.first&.total_activity_time }
+
+            expect(total_activity_times[0..1]).to eq [100, 200]
+          end
+
+          it "sorts by total activity time descending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "total_activity_time", order: "desc").to_a
+            total_activity_times = users.map { |u| u.enrollments&.first&.total_activity_time }
+
+            expect(total_activity_times[0..1]).to eq [200, 100]
+          end
+
+          it "raises an error when context is not a course" do
+            account = Account.create!
+            expect do
+              UserSearch.scope_for(account, @test_teacher, sort: "total_activity_time", order: "asc")
+            end.to raise_error(RequestError, "Sorting by total_activity_time is only available within a course context")
+          end
+        end
+      end
+
+      describe "multiple value columns" do
+        let(:course2) { Course.create! }
+        let(:teacher1) { user_model(name: "Teacher One") }
+        let(:ta1) { user_model(name: "TA One") }
+        let(:student1) { user_model(name: "Student One") }
+        let(:student2) { user_model(name: "Student Two") }
+        let(:observer1) { user_model(name: "Observer One") }
+        let(:designer1) { user_model(name: "Designer One") }
+        let(:section1) { course2.course_sections.create!(name: "A Section") }
+        let(:section2) { course2.course_sections.create!(name: "B Section") }
+        let(:section3) { course2.course_sections.create!(name: "C Section") }
+        let(:section4) { course2.course_sections.create!(name: "D Section") }
+        let(:section5) { course2.course_sections.create!(name: "E Section") }
+        let(:section6) { course2.course_sections.create!(name: "F Section") }
+        let(:one_day_ago) { 1.day.ago }
+        let(:two_days_ago) { 2.days.ago }
+        let(:three_days_ago) { 3.days.ago }
+
+        before do
+          StudentEnrollment
+            .create!(user: student1, course: course2, course_section: section3)
+            .update!(last_activity_at: three_days_ago)
+          StudentEnrollment
+            .create!(user: student2, course: course2, course_section: section4)
+            .update!(last_activity_at: two_days_ago)
+          TeacherEnrollment
+            .create!(user: teacher1, course: course2, course_section: section1)
+            .update!(last_activity_at: one_day_ago)
+          TaEnrollment.create!(user: ta1, course: course2, course_section: section2)
+        end
+
+        def sort_user_ids(sort, order = "asc")
+          UserSearch.scope_for(course2, teacher1, sort:, order:).map(&:id)
+        end
+
+        context "last_activity_at" do
+          context "single value per user" do
+            it "sorts by last_activity_at ascending" do
+              # teacher1 - 1 day ago
+              # student2 - 2 days ago
+              # student1 - 3 days ago
+              # ta1 - none
+              expect(sort_user_ids("last_activity_at")).to eq [teacher1.id, student2.id, student1.id, ta1.id]
+            end
+
+            it "sorts by last_activity_at descending" do
+              # student1 - 3 days ago
+              # student2 - 2 days ago
+              # teacher1 - 1 day ago
+              # ta1 - none
+              expect(sort_user_ids("last_activity_at", "desc")).to eq [student1.id, student2.id, teacher1.id, ta1.id]
+            end
+
+            context "multiple users with the same last_activity_at" do
+              it "sorts by last_activity_at ascending and then by user id ascending" do
+                student1.enrollments.where(course_section: section3).update!(last_activity_at: two_days_ago)
+                # teacher1 - 1 day ago
+                # student1 - 2 days ago, student1.id < student2.id as student1 was created before student2
+                # student2 - 2 days ago
+                # ta1 - none
+                expect(sort_user_ids("last_activity_at")).to eq [teacher1.id, student1.id, student2.id, ta1.id]
+              end
+
+              it "sorts by last_activity_at descending and then by user id descending" do
+                student1.enrollments.where(course_section: section3).update!(last_activity_at: two_days_ago)
+                # student2 - 2 days ago, student2.id > student1.id as student2 was created after student1
+                # student1 - 2 days ago
+                # teacher1 - 1 day ago
+                # ta1 - none
+                expect(sort_user_ids("last_activity_at", "desc")).to eq [student2.id, student1.id, teacher1.id, ta1.id]
+              end
+            end
+
+            it "ignores last_activity_at for observers" do
+              ObserverEnrollment
+                .create!(user: observer1, course: course2)
+                .update!(last_activity_at: 1.day.ago)
+              # teacher1 - 1 day ago
+              # student2 - 2 days ago
+              # student1 - 3 days ago
+              # ta1 - none (ta1 ranks before observer1 in ascending order because ta1.id < observer1.id as ta1 was created before observer1)
+              # observer1 - none (even though observer1 has a last_activity_at, it is ignored)
+              expect(sort_user_ids("last_activity_at")).to eq [teacher1.id, student2.id, student1.id, ta1.id, observer1.id]
+
+              # student1 - 3 days ago
+              # student2 - 2 days ago
+              # teacher1 - 1 day ago
+              # observer1 - none (even though observer1 has a last_activity_at, it is ignored)
+              # ta1 - none (ta1 ranks after observer1 in descending order because ta1.id < observer1.id as ta1 was created before observer1)
+              expect(sort_user_ids("last_activity_at", "desc")).to eq [student1.id, student2.id, teacher1.id, observer1.id, ta1.id]
+            end
+          end
+
+          it "raises an error when context is not a course" do
+            account = Account.create!
+            expect do
+              UserSearch.scope_for(account, teacher1, sort: "last_activity_at")
+            end.to raise_error(RequestError, "Sorting by last_activity_at is only available within a course context")
+          end
+
+          context "multiple values per user" do
+            before do
+              # student1 - 3 days ago, 4 days ago
+              # student2 - 2 days ago, 5 days ago
+              # teacher1 - 1 day ago
+              # ta1 - none
+              enrollment4 = StudentEnrollment.create!(user: student1, course: course2)
+              enrollment4.update!(last_activity_at: 4.days.ago)
+
+              enrollment5 = StudentEnrollment.create!(user: student2, course: course2)
+              enrollment5.update!(last_activity_at: 5.days.ago)
+            end
+
+            it "sorts by last_activity_at ascending" do
+              # teacher1 - 1 day ago
+              # student2 - 2 days ago
+              # student1 - 3 days ago
+              # ta1 - none
+              expect(sort_user_ids("last_activity_at")).to eq [teacher1.id, student2.id, student1.id, ta1.id]
+            end
+
+            it "sorts by last_activity_at descending" do
+              # student2 - 5 days ago
+              # student1 - 4 days ago
+              # teacher1 - 1 day ago
+              # ta1 - none
+              expect(sort_user_ids("last_activity_at", "desc")).to eq [student2.id, student1.id, teacher1.id, ta1.id]
+            end
+          end
+        end
+
+        context "section_name" do
+          context "single value per user" do
+            it "sorts by section_name ascending" do
+              # teacher1 - A Section
+              # ta1 - B Section
+              # student1 - C Section
+              # student2 - D Section
+              expect(sort_user_ids("section_name")).to eq [teacher1.id, ta1.id, student1.id, student2.id]
+            end
+
+            it "sorts by section_name descending" do
+              # student2 - D Section
+              # student1 - C Section
+              # ta1 - B Section
+              # teacher1 - A Section
+              expect(sort_user_ids("section_name", "desc")).to eq [student2.id, student1.id, ta1.id, teacher1.id]
+            end
+
+            it "ignores section_name for observers" do
+              # observer1 - A Section
+              ObserverEnrollment.create!(user: observer1, course: course2, course_section: section1)
+
+              # teacher1 - A Section
+              # ta1 - B Section
+              # student1 - C Section
+              # student2 - D Section
+              # observer1 - none (even though observer1 has section_name, it is ignored)
+              expect(sort_user_ids("section_name")).to eq [teacher1.id, ta1.id, student1.id, student2.id, observer1.id]
+
+              # student2 - D Section
+              # student1 - C Section
+              # ta1 - B Section
+              # teacher1 - A Section
+              # observer1 - none (even though observer1 has section_name, it is ignored)
+              expect(sort_user_ids("section_name", "desc")).to eq [student2.id, student1.id, ta1.id, teacher1.id, observer1.id]
+            end
+          end
+
+          context "multiple values per user" do
+            before do
+              # teacher1 - A Section
+              # ta1 - B Section, E Section
+              # student1 - C Section, D Section
+              # student2 - D Section, F Section
+              StudentEnrollment.create!(user: student1, course: course2, course_section: section4)
+              StudentEnrollment.create!(user: student2, course: course2, course_section: section6)
+              TaEnrollment.create!(user: ta1, course: course2, course_section: section5)
+            end
+
+            it "sorts by section_name ascending" do
+              # teacher1 - A Section
+              # ta1 - B Section
+              # student1 - C Section
+              # student2 - D Section
+              expect(sort_user_ids("section_name")).to eq [teacher1.id, ta1.id, student1.id, student2.id]
+            end
+
+            it "sorts by section_name descending" do
+              # student2 - F Section
+              # ta1 - E Section
+              # student1 - D Section
+              # teacher1 - A Section
+              expect(sort_user_ids("section_name", "desc")).to eq [student2.id, ta1.id, student1.id, teacher1.id]
+            end
+          end
+
+          it "raises an error when context is not a course" do
+            account = Account.create!
+            expect do
+              UserSearch.scope_for(account, teacher1, sort: "section_name")
+            end.to raise_error(RequestError, "Sorting by section_name is only available within a course context")
+          end
+        end
+
+        context "role" do
+          before do
+            # student2 from course to reduce test flakiness (there is no guaranteed order of multiple users with the same role)
+            student2.enrollments.first.destroy
+            ObserverEnrollment.create!(user: observer1, course: course2)
+            DesignerEnrollment.create!(user: designer1, course: course2)
+          end
+
+          context "single value per user" do
+            it "sorts by role ascending" do
+              # teacher1 - teacher role
+              # ta1 - ta role
+              # student1 - student role
+              # observer1 - observer role
+              # designer1 - designer role
+              expect(sort_user_ids("role")).to eq [teacher1.id, ta1.id, student1.id, observer1.id, designer1.id]
+            end
+
+            it "sorts by role descending" do
+              # designer1 - designer role
+              # observer1 - observer role
+              # student1 - student role
+              # ta1 - ta role
+              # teacher1 - teacher role
+              expect(sort_user_ids("role", "desc")).to eq [designer1.id, observer1.id, student1.id, ta1.id, teacher1.id]
+            end
+          end
+
+          context "multiple values per user" do
+            before do
+              # teacher1 - teacher role, designer role
+              # ta1 - ta role, student role
+              # student1 - student role, observer role
+              # observer1 - observer role
+              # designer1 - designer role
+              StudentEnrollment.create!(user: ta1, course: course2, course_section: section5)
+              ObserverEnrollment.create!(user: student1, course: course2, course_section: section5)
+              DesignerEnrollment.create!(user: teacher1, course: course2, course_section: section5)
+            end
+
+            it "sorts by role ascending" do
+              # teacher1 - teacher role
+              # ta1 - ta role
+              # student1 - student role
+              # observer1 - observer role
+              # designer1 - designer role
+              expect(sort_user_ids("role")).to eq [teacher1.id, ta1.id, student1.id, observer1.id, designer1.id]
+            end
+
+            it "sorts by role descending" do
+              # users with the same role are ordered by their id in the same sort order
+              # designer1 - designer role (designer1.id > teacher1.id since designer1 was created after teacher1)
+              # teacher1 - designer role
+              # observer1 - observer role (observer1.id > student1.id since observer1 was created after student1)
+              # student1 - observer role
+              # ta1 - student role
+              expect(sort_user_ids("role", "desc")).to eq [designer1.id, teacher1.id, observer1.id, student1.id, ta1.id]
+            end
+          end
+
+          it "raises an error when context is not a course" do
+            account = Account.create!
+            expect do
+              UserSearch.scope_for(account, teacher1, sort: "role")
+            end.to raise_error(RequestError, "Sorting by role is only available within a course context")
+          end
+        end
+      end
+    end
   end
 end

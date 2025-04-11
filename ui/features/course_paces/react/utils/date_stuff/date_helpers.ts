@@ -193,11 +193,7 @@ export const getEndDateValue = (coursePace: CoursePace, plannedEndDate: Optional
   const enrollmentType = coursePace.context_type === 'Enrollment'
 
   if (enrollmentType) {
-    if (window.ENV.FEATURES.course_paces_for_students) {
-      return coursePace.end_date || plannedEndDate
-    } else {
-      return plannedEndDate
-    }
+    return coursePace.end_date || plannedEndDate
   } else {
     return coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
   }
@@ -206,7 +202,7 @@ export const getEndDateValue = (coursePace: CoursePace, plannedEndDate: Optional
 const getStartDateCaption = (startDateValue: OptionalDate, coursePace: CoursePace, contextType: string) => {
   if (startDateValue && coursePace.start_date_context !== 'hypothetical') {
 
-    const contextTypeValue: string = contextType === 'enrollment' && window.ENV.FEATURES.course_pace_time_selection 
+    const contextTypeValue: string = contextType === 'enrollment' && window.ENV.FEATURES.course_pace_time_selection
       ? 'enrollment_time_selection'
       : contextType
 

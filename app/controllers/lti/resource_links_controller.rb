@@ -249,7 +249,7 @@ class Lti::ResourceLinksController < ApplicationController
   #
   # @returns Lti::ResourceLink
   def create
-    tool = ContextExternalTool.find_external_tool(create_params[:url], @context, only_1_3: true)
+    tool = Lti::ToolFinder.from_url(create_params[:url], @context, only_1_3: true)
     return render_error(:invalid_url, "No tool found for the provided URL") unless tool
 
     resource_link = Lti::ResourceLink.create_with(
@@ -297,7 +297,7 @@ class Lti::ResourceLinksController < ApplicationController
     end
 
     possible_links = bulk_create_params[:_json].map do |link_params|
-      tool = ContextExternalTool.find_external_tool(link_params[:url], @context, only_1_3: true)
+      tool = Lti::ToolFinder.from_url(link_params[:url], @context, only_1_3: true)
       link_params.merge(tool:)
     end
 

@@ -121,6 +121,11 @@ module FilesPage
     driver.find_element(:css, "tbody tr[data-testid='table-row']:nth-of-type(#{row_index}) th:first-child")
   end
 
+  def item_has_permissions_icon?(row_index, col_index, icon_type)
+    element = driver.find_element(:css, "tbody tr[data-testid='table-row']:nth-of-type(#{row_index}) td:nth-of-type(#{col_index})")
+    element.find_elements(:css, "[data-testid='#{icon_type}-icon']").any?
+  end
+
   def header_name_files_table
     f("[data-testid='name']")
   end

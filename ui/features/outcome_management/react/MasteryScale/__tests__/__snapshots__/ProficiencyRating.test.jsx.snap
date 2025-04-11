@@ -24,12 +24,12 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
         class="description"
       >
         <span
-          class="css-s6xkut-text"
+          class="css-rf2qwm-text"
           letter-spacing="normal"
           wrap="normal"
         >
           <span
-            class="css-1sr5vj2-screenReaderContent"
+            class="css-r9cwls-screenReaderContent"
           >
             Description for mastery level 1: Stellar
           </span>
@@ -53,7 +53,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
           dir="ltr"
         >
           <span
-            class="css-1sr5vj2-screenReaderContent"
+            class="css-r9cwls-screenReaderContent"
           >
             Points for mastery level 1: 10.0
           </span>
@@ -82,7 +82,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
           style="background: rgb(0, 255, 0); margin-left: 2rem;"
         >
           <span
-            class="css-1sr5vj2-screenReaderContent"
+            class="css-r9cwls-screenReaderContent"
           >
             Color #00ff00 for mastery level 1
           </span>

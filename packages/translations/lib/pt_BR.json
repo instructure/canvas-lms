@@ -1199,6 +1199,9 @@
     "intersection_cd4590e4": {
         "message": "Interseção"
     },
+    "invalid_description_991e23bb": {
+        "message": "Descrição inválida"
+    },
     "invalid_entry_f7d2a0f5": {
         "message": "Entrada inválida."
     },
@@ -1808,8 +1811,17 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Permita que o Canvas acesse o seu microfone e sua webcam."
     },
+    "please_choose_a_file_c2449cc": {
+        "message": "Por favor, escolha um arquivo"
+    },
     "please_decribe_what_you_would_like_to_compose_27a51be5": {
         "message": "Por favor, descreva o que você gostaria de compor."
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "Por favor insira o nome do arquivo."
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "Selecione um arquivo de um tipo compatível"
     },
     "plus_d43cd4ec": {
         "message": "Mais"

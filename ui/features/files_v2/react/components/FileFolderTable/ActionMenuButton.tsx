@@ -26,9 +26,9 @@ import {Text} from '@instructure/ui-text'
 import {useFileManagement} from '../Contexts'
 import {type File, type Folder} from '../../../interfaces/File'
 import {RenameModal} from '../RenameModal'
-import DeleteModal from './DeleteModal'
+import {DeleteModal} from './DeleteModal'
 import {downloadFile, downloadZip} from '../../../utils/downloadUtils'
-import {isFile} from '../../../utils/fileFolderUtils'
+import {getName, isFile} from '../../../utils/fileFolderUtils'
 import {externalToolEnabled} from '../../../utils/fileUtils'
 
 import {
@@ -56,6 +56,7 @@ interface ActionMenuButtonProps {
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
   usageRightsRequiredForContext: boolean
+  userCanRestrictFilesForContext: boolean
   row: File | Folder
 }
 
@@ -73,10 +74,12 @@ const ActionMenuButton = ({
   userCanEditFilesForContext,
   userCanDeleteFilesForContext,
   usageRightsRequiredForContext,
+  userCanRestrictFilesForContext,
   row,
 }: ActionMenuButtonProps) => {
   const [modalOrTray, setModalOrTray] = useState<ActionMenuModalOrTrayId | null>(null)
-  const actionLabel = I18n.t('Actions')
+  const name = getName(row)
+  const actionLabel = I18n.t('Actions for "%{name}"', {name})
   const {contextType, fileMenuTools} = useFileManagement()
 
   const iconForTrayTool = useCallback((tool: {canvas_icon_class?: string; icon_url?: string}) => {
@@ -93,8 +96,9 @@ const ActionMenuButton = ({
       <Button
         display={size == 'small' ? 'block' : 'inline-block'}
         data-testid="action-menu-button-small"
+        elementRef={elt => elt?.setAttribute('aria-label', actionLabel)}
       >
-        {actionLabel} <IconArrowOpenDownLine />
+        {I18n.t('Actions')} <IconArrowOpenDownLine />
       </Button>
     ) : (
       <IconButton
@@ -160,8 +164,7 @@ const ActionMenuButton = ({
 
   const blueprint_locked =
     row.folder_id && row.restricted_by_master_course && row.is_master_course_child_content
-  const has_usage_rights =
-    contextType !== 'groups' && userCanEditFilesForContext && usageRightsRequiredForContext
+  const has_usage_rights = userCanEditFilesForContext && usageRightsRequiredForContext
   const send_copy_permissions = contextType === 'course' && userCanEditFilesForContext
   const rename_move_permissions = userCanEditFilesForContext && !blueprint_locked
   const delete_permissions = userCanDeleteFilesForContext && !blueprint_locked
@@ -185,7 +188,7 @@ const ActionMenuButton = ({
             {
               icon: IconPermissionsLine,
               text: I18n.t('Edit Permissions'),
-              visible: userCanEditFilesForContext,
+              visible: userCanRestrictFilesForContext,
               onClick: createSetModalOrTrayCallback('permissions'),
             },
             {
@@ -245,7 +248,7 @@ const ActionMenuButton = ({
             {
               icon: IconPermissionsLine,
               text: I18n.t('Edit Permissions'),
-              visible: userCanEditFilesForContext,
+              visible: userCanRestrictFilesForContext,
               onClick: createSetModalOrTrayCallback('permissions'),
             },
             {
@@ -270,15 +273,14 @@ const ActionMenuButton = ({
           ]
       ).filter(({visible}) => visible !== false),
     [
-      delete_permissions,
-      has_usage_rights,
+      row,
       rename_move_permissions,
-      row.folder_id,
-      row.id,
-      row.url,
+      createSetModalOrTrayCallback,
+      userCanRestrictFilesForContext,
+      has_usage_rights,
       send_copy_permissions,
-      userCanEditFilesForContext,
       fileMenuTools,
+      delete_permissions,
       iconForTrayTool,
     ],
   )

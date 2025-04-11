@@ -33,7 +33,7 @@ const MATH_CONTEXT = {
   id: 'Math',
   type: 'Course',
   title: I18n.t('Math'),
-  color: '#BF32A4',
+  color: '#C54396',
 }
 
 export const SINGLE_COURSE_ITEMS = [

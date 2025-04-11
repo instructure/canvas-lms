@@ -65,13 +65,18 @@ const makeProps = async overrides => {
     setIframeURL: jest.fn(),
     uploadingFiles: false,
     focusOnInit: false,
-    submitButtonRef: createRef()
+    submitButtonRef: createRef(),
   }
 }
 
 // LS-1339  created to figure out why these are failing
 describe('MediaAttempt', () => {
-  global.ENV = {current_user: {id: '1'}}
+  beforeEach(() => {
+    global.ENV = {current_user: {id: '1'}}
+    global.ENV.FEATURES = {}
+    global.ENV.FEATURES.consolidated_media_player = false
+  })
+
   describe('unsubmitted', () => {
     it('renders record and upload buttons', async () => {
       const props = await makeProps()
@@ -144,7 +149,7 @@ describe('MediaAttempt', () => {
     describe('validation', () => {
       it('displays an error if the user has not uploaded media and tries to submit', async () => {
         const props = await makeProps()
-        props.submission = { submissionDraft: { meetsMediaRecordingCriteria: false } }
+        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
         const submitButton = document.createElement('button')
         props.submitButtonRef.current = submitButton
         const {getByText} = render(<MediaAttempt {...props} />)
@@ -154,7 +159,7 @@ describe('MediaAttempt', () => {
 
       it('clears the error when the user clicks the record media button', async () => {
         const props = await makeProps()
-        props.submission = { submissionDraft: { meetsMediaRecordingCriteria: false } }
+        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
         const submitButton = document.createElement('button')
         props.submitButtonRef.current = submitButton
         const {getByText, queryByText, getByTestId} = render(<MediaAttempt {...props} />)
@@ -166,7 +171,7 @@ describe('MediaAttempt', () => {
 
       it('clears the error when the user clicks the upload media button', async () => {
         const props = await makeProps()
-        props.submission = { submissionDraft: { meetsMediaRecordingCriteria: false } }
+        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
         const submitButton = document.createElement('button')
         props.submitButtonRef.current = submitButton
         const {getByText, queryByText, getByTestId} = render(<MediaAttempt {...props} />)
@@ -282,6 +287,46 @@ describe('MediaAttempt', () => {
       })
       const {queryByTestId} = render(<MediaAttempt {...props} />)
       expect(queryByTestId('media-recording')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('StudioPlayer', () => {
+    it('renders StudioPlayer', async () => {
+      global.ENV.FEATURES.consolidated_media_player = true
+      const props = await makeProps({
+        Submission: {
+          mediaObject: {
+            _id: 'm-123456',
+            id: '1',
+            title: 'dope_vid.mov',
+            mediaTracks: [
+              {
+                _id: 1,
+                locale: 'en',
+                kind: 'captions',
+              },
+              {
+                _id: 2,
+                locale: 'es',
+                kind: 'captions',
+              },
+            ],
+          },
+          state: 'submitted',
+        },
+      })
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+      expect(getByTestId('canvas-studio-player')).toBeInTheDocument()
+    })
+
+    it('does not render StudioPlayer when mediaObject is null', async () => {
+      const props = await makeProps({
+        Submission: {
+          mediaObject: null,
+        },
+      })
+      const {queryByTestId} = render(<MediaAttempt {...props} />)
+      expect(queryByTestId('canvas-studio-player')).not.toBeInTheDocument()
     })
   })
 

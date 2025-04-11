@@ -29,7 +29,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
           <h1 id="quiz_title" class="title"><%= @quiz.title.html_safe %></h1>
           <input type="hidden" name="quiz[title]" value="<%=@quiz.title%>"/>
         <% else %>
-          <label for="quiz_title" class="bold form-control__label"><%= t('Quiz Title') %><span class="asterisk">*</span></label>
+          <label for="quiz_title" class="bold form-control__label"><%= t('Quiz Title') %><span aria-hidden="true" class="asterisk"> *</span></label>
           <%= text_field :quiz, :title, :maxlength => "254", :autofocus => true, :required => true,
                          :class => "form-control__input", "aria-describedby" => "quiz_title_message" %>
           <div class="form-control__message input-message__container hidden">
@@ -313,7 +313,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
 
               <div class="options control-group form-control access-code screenreader-only">
                 <label for="quiz_access_code" class="bold form-control__label">
-                  <%= t("Required access code") %><span class="asterisk">*</span>
+                  <%= t("Required access code") %><span aria-hidden="true" class="asterisk"> *</span>
                 </label>
                 <input type="text" tabindex="-1" name="quiz[access_code]" id="quiz_access_code"
                        value="<%= @quiz.access_code %>" aria-describedby="access_code_message"
@@ -331,7 +331,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
               </label>
               <div class="form-control ip-filter options control-group screenreader-only" aria-hidden="<%= !@quiz.ip_filter.blank? %>">
                 <label for="quiz_ip_filter" class="bold form-control__label">
-                  <%= t("Filter by IP address") %><span class="asterisk">*</span>
+                  <%= t("Filter by IP address") %><span aria-hidden="true" class="asterisk"> *</span>
                 </label>
                 <div class="form-control__wrapper">
                   <input type="text" class="form-control__input" tabindex="-1" name="quiz[ip_filter]"
@@ -374,7 +374,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
       <% if (
         @context.root_account.feature_enabled?(:course_pace_pacing_with_mastery_paths) &&
         ConditionalRelease::Service.enabled_in_context?(@context) &&
-        @context.is_a?(Course) && @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces?
+        @context.is_a?(Course) && @context.enable_course_paces?
       ) %>
         <div>
           <label class="control-label">

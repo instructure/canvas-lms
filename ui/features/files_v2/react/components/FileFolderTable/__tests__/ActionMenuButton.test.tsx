@@ -54,6 +54,7 @@ describe('ActionMenuButton', () => {
       size: 'large',
       userCanEditFilesForContext: true,
       userCanDeleteFilesForContext: true,
+      userCanRestrictFilesForContext: true,
       usageRightsRequiredForContext: true,
       row: FAKE_FILES[0],
     }
@@ -91,7 +92,7 @@ describe('ActionMenuButton', () => {
 
     it('renders items when context is groups', async () => {
       const user = userEvent.setup()
-      renderComponent({}, {contextType: 'groups'})
+      renderComponent({userCanRestrictFilesForContext: false}, {contextType: 'groups'})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
@@ -100,8 +101,8 @@ describe('ActionMenuButton', () => {
       await waitFor(() => {
         expect(screen.getByText('Rename')).toBeInTheDocument()
         expect(screen.getByText('Download')).toBeInTheDocument()
-        expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
-        expect(screen.queryByText('Manage Usage Rights')).toBeNull()
+        expect(screen.queryByText('Edit Permissions')).toBeNull()
+        expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
         expect(screen.queryByText('Send To...')).toBeNull()
         expect(screen.queryByText('Copy To...')).toBeNull()
         expect(screen.getByText('Move To...')).toBeInTheDocument()
@@ -111,7 +112,8 @@ describe('ActionMenuButton', () => {
 
     it('does not render items when userCanEditFilesForContext is false', async () => {
       const user = userEvent.setup()
-      renderComponent({userCanEditFilesForContext: false})
+      // if userCanEditFilesForContext is false, userCanRestrictFilesForContext will also be false
+      renderComponent({userCanEditFilesForContext: false, userCanRestrictFilesForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
@@ -219,13 +221,13 @@ describe('ActionMenuButton', () => {
     it('closes and reopens the rename modal without clearing the name', async () => {
       const user = userEvent.setup()
       renderComponent()
-      const menuButton = await screen.findByRole('button', {name: 'Actions'})
+      const menuButton = await screen.findByRole('button', {name: `Actions for "${FAKE_FILES[0].display_name}"`})
       await user.click(menuButton)
       // can't just re-use the variable because it gets removed from DOM
       const renameButton = async () => await screen.findByRole('menuitem', {name: 'Rename'})
       await user.click(await renameButton())
 
-      const input = async () => await screen.findByRole('textbox', {name: 'File Name *'})
+      const input = async () => await screen.findByRole('textbox', {name: 'File Name'})
       expect(await input()).toHaveValue(FAKE_FILES[0].name)
 
       const cancelButton = screen.getByRole('button', {name: 'Cancel'})

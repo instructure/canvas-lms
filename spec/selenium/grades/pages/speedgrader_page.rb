@@ -86,7 +86,7 @@ class Speedgrader
     end
 
     def keyboard_shortcuts_link
-      fxpath('//ul[@role = "menu"]//span[text() = "Keyboard Shortcuts"]')
+      fj("div[role='menu'] span:contains('Keyboard Shortcuts')")
     end
 
     def post_or_hide_grades_button

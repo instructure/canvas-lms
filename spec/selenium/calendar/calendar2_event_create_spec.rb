@@ -366,14 +366,12 @@ describe "calendar2" do
       context "with course pacing" do
         before do
           Account.site_admin.enable_feature! :account_level_blackout_dates
-          Account.site_admin.enable_feature! :course_paces
           @course.enable_course_paces = true
           @course.save!
         end
 
         after do
           Account.site_admin.disable_feature! :account_level_blackout_dates
-          Account.site_admin.disable_feature! :course_paces
         end
 
         it "creates a blackout calendar event in when feature is enabled" do

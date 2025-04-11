@@ -44,7 +44,7 @@ const layoutStyle = {
 const ruleStyle = {
   display: 'block',
   height: theme.borders.widthSmall,
-  color: theme.colors.borderMedium,
+  color: theme.colors.contrasts.grey1214,
   margin: 0,
 }
 

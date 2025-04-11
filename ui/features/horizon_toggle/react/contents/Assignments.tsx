@@ -28,7 +28,8 @@ const I18n = createI18nScope('horizon_toggle_page')
 
 export const Assignments = () => {
   const data = useContext(HorizonToggleContext)
-  if (!data?.errors?.assignments) {
+  const assignments = data?.errors?.assignments?.filter(item => !item.errors.workflow_state)
+  if (!assignments || assignments.length === 0) {
     return null
   }
   return (
@@ -48,10 +49,10 @@ export const Assignments = () => {
             one: 'Assignments with Revisions (%{count} item)',
             other: 'Assignments with Revisions (%{count} items)',
           },
-          {count: data.errors.assignments.length},
+          {count: assignments.length},
         )}
         screenReaderLabel={I18n.t('Assignments with Revisions')}
-        contents={data.errors.assignments}
+        contents={assignments}
       />
     </View>
   )

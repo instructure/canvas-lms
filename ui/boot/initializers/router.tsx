@@ -72,6 +72,10 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/course_settings/react/CourseSettingsRoute')}
       />
       <Route
+        path="/courses/:courseId/search"
+        lazy={() => import('../../features/search/react/SearchRoute')}
+      />
+      <Route
         path="/accounts/:accountId/sub_accounts"
         lazy={() => import('../../features/sub_accounts/react/SubaccountRoute')}
       />

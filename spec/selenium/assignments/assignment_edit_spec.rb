@@ -155,7 +155,6 @@ describe "assignment" do
   describe "for assignments in a course with both mastery paths and course pacing" do
     before(:once) do
       course_with_teacher(active_all: true)
-      @course.account.enable_feature!(:course_paces)
       @course.root_account.enable_feature!(:course_pace_pacing_with_mastery_paths)
       @course.update(
         enable_course_paces: true,

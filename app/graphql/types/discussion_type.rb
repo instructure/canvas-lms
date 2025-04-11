@@ -162,12 +162,10 @@ module Types
       load_association(:root_topic)
     end
 
-    # TODO : After VICE-4808 gets merged, the sort_order field should be removed, we kept it to not cause alerts on deploy
     field :discussion_entries_connection, Types::DiscussionEntryType.connection_type, null: true do
       argument :filter, Types::DiscussionFilterType, required: false
       argument :root_entries, Boolean, required: false
       argument :search_term, String, required: false
-      argument :sort_order, Types::DiscussionSortOrderType, required: false
       argument :unread_before, String, required: false
       argument :user_search_id, String, required: false
     end
@@ -419,8 +417,7 @@ module Types
       argument :sort, Types::DiscussionSortOrderType, required: false
     end
 
-    # TODO, sort parameter is there to avoid alerts on deploy, it should be removed in the next deploy cycke
-    def sort_order(sort: nil)
+    def sort_order
       object.sort_order.to_sym || DiscussionTopic::SortOrder::DESC.to_sym
     end
 

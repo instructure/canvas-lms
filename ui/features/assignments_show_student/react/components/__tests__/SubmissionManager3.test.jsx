@@ -73,15 +73,6 @@ function gradedOverrides() {
         ],
       },
     },
-    Course: {
-      account: {
-        outcomeProficiency: {
-          proficiencyRatingsConnection: {
-            nodes: [{}],
-          },
-        },
-      },
-    },
   }
 }
 

@@ -228,9 +228,7 @@ module CC
           c.allow_final_grade_override(@course.allow_final_grade_override?)
         end
 
-        if @course.account.feature_enabled?(:course_paces)
-          c.enable_course_paces(@course.enable_course_paces)
-        end
+        c.enable_course_paces(@course.enable_course_paces)
 
         if @course.course_sections.active.count > 1
           c.hide_sections_on_course_users_page(@course.hide_sections_on_course_users_page)

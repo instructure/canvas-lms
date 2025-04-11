@@ -40,6 +40,7 @@ const I18n = createI18nScope('context_modules_v2')
 interface ModuleHeaderActionPanelProps {
   id: string
   name: string
+  expanded?: boolean
   published?: boolean
   prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
@@ -51,6 +52,7 @@ interface ModuleHeaderActionPanelProps {
 const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   id,
   name,
+  expanded = false,
   published = false,
   prerequisites,
   completionRequirements,
@@ -105,6 +107,7 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
         </Flex.Item>
         <Flex.Item>
           <ModuleActionMenu
+            expanded={expanded}
             isMenuOpen={isMenuOpen}
             setIsMenuOpen={setIsMenuOpen}
             id={id}

@@ -99,8 +99,6 @@ async function makeProps(opts = {}) {
   const assessments = result.data.submission.rubricAssessmentsConnection?.nodes
   return {
     assessments: assessments?.map(assessment => transformRubricAssessmentData(assessment)) || [],
-    proficiencyRatings:
-      result.data.course.account.outcomeProficiency?.proficiencyRatingsConnection?.nodes,
     rubric: transformRubricData(result.data.assignment.rubric),
   }
 }

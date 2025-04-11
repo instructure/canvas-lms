@@ -27,19 +27,18 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
+import {isSuccessful} from '../../../common/lib/apiResult/ApiResult'
 import {formatSearchParamErrorMessages} from '../../../common/lib/useZodParams/ParamsParseResult'
 import {
   deleteRegistration as apiDeleteRegistration,
   fetchRegistrations as apiFetchRegistrations,
   unbindGlobalLtiRegistration as apiUnbindGlobalRegistration,
 } from '../../api/registrations'
-import {ZAccountId, type AccountId} from '../../model/AccountId'
+import {type AccountId, ZAccountId} from '../../model/AccountId'
 import type {LtiRegistration} from '../../model/LtiRegistration'
 import {AppsTable} from './AppsTable'
 import {mkUseManagePageState} from './ManagePageLoadingState'
-import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
-import {isSuccessful} from '../../../common/lib/apiResult/ApiResult'
-import {useAppendBreadcrumbsToDefaults} from '@canvas/breadcrumbs/useAppendBreadcrumbsToDefaults'
+import {type ManageSearchParams, useManageSearchParams} from './ManageSearchParams'
 
 const SEARCH_DEBOUNCE_MS = 250
 
@@ -47,12 +46,6 @@ const I18n = createI18nScope('lti_registrations')
 
 export const ManagePage = () => {
   const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
-  useAppendBreadcrumbsToDefaults(
-    {
-      name: I18n.t('Manage'),
-      url: `/accounts/${accountId}/apps/manage`,
-    }
-  )
   const [searchParams] = useManageSearchParams()
 
   return searchParams.success ? (

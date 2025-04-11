@@ -27,7 +27,7 @@ const FilePreviewIframe = ({item}: {item: File}) => (
     sandbox={item.mime_class == 'html' ? 'allow-same-origin' : 'allow-scripts allow-same-origin'}
     src={item.preview_url}
     style={{
-      ...(item.mime_class === 'html' ? {backgroundColor: '#f5f5f5'} : {}),
+      ...(item.mime_class === 'html' ? {backgroundColor: '#F2F4F4'} : {}),
       border: 'none',
       display: 'block',
       height: '100%',

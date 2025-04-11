@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
-import {createRegistrationOverlayStore} from '../RegistrationOverlayState'
+import {createDynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import {IconConfirmationWrapper} from '../components/IconConfirmationWrapper'
 import {render, screen} from '@testing-library/react'
 import * as ue from '@testing-library/user-event'
@@ -43,7 +43,7 @@ describe('IconConfirmation', () => {
 
   it('should render', () => {
     const reg = mockRegistration()
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(
       <IconConfirmationWrapper
@@ -64,7 +64,7 @@ describe('IconConfirmation', () => {
       LtiPlacements.CourseNavigation,
     ])
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(
       <IconConfirmationWrapper
@@ -89,7 +89,7 @@ describe('IconConfirmation', () => {
     const iconPlacement = LtiPlacementsWithIcons[0]
     const config = mockConfigWithPlacements([iconPlacement])
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(
       <IconConfirmationWrapper
@@ -122,7 +122,7 @@ describe('IconConfirmation', () => {
       LtiPlacements.GlobalNavigation,
     ])
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
     render(
       <IconConfirmationWrapper
         registration={reg}
@@ -158,7 +158,7 @@ describe('IconConfirmation', () => {
     config.placements!.find(p => p.placement === 'file_index_menu')!.icon_url =
       'http://example.com/icon2.png'
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
     render(
       <IconConfirmationWrapper
         registration={reg}
@@ -189,7 +189,7 @@ describe('IconConfirmation', () => {
       LtiPlacements.FileIndexMenu,
     ])
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
     render(
       <IconConfirmationWrapper
         registration={reg}
@@ -220,7 +220,7 @@ describe('IconConfirmation', () => {
     ])
 
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
     render(
       <IconConfirmationWrapper
         registration={reg}
@@ -252,7 +252,7 @@ describe('IconConfirmation', () => {
       LtiPlacements.FileIndexMenu,
     ])
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
     render(
       <IconConfirmationWrapper
         registration={reg}
@@ -288,7 +288,7 @@ describe('IconConfirmation', () => {
     ])
 
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
     render(
       <IconConfirmationWrapper
         registration={reg}
@@ -324,7 +324,7 @@ describe('IconConfirmation', () => {
     ])
 
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(
       <IconConfirmationWrapper

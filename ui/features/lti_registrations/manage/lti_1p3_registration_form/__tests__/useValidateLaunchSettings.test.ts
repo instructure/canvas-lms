@@ -18,7 +18,7 @@
 
 import {renderHook} from '@testing-library/react-hooks'
 import {useValidateLaunchSettings} from '../hooks/useValidateLaunchSettings'
-import type {Lti1p3RegistrationOverlayState} from '../Lti1p3RegistrationOverlayState'
+import type {Lti1p3RegistrationOverlayState} from '../../registration_overlay/Lti1p3RegistrationOverlayState'
 import {mockInternalConfiguration} from './helpers'
 
 describe('useValidateLaunchSettings', () => {

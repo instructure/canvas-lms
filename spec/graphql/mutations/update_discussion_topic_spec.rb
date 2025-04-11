@@ -323,43 +323,93 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     end
   end
 
-  it "allow to update the anonymous state if there is no reply" do
-    @topic.anonymous_state = nil
-    @topic.save!
-    result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity" })
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to eq "full_anonymity"
-    @topic.reload
-    expect(@topic.anonymous_state).to eq "full_anonymity"
-  end
+  context "anonymous state" do
+    it "allow to update the anonymous state if there is no reply" do
+      @topic.anonymous_state = nil
+      @topic.save!
+      result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity" })
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to eq "full_anonymity"
+      @topic.reload
+      expect(@topic.anonymous_state).to eq "full_anonymity"
+    end
 
-  it "should save the anonymous state as NULL when the input value is 'off'" do
-    @topic.anonymous_state = "full_anonymity"
-    @topic.save!
-    result = run_mutation({ id: @topic.id, anonymous_state: "off" })
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to be_nil
-    @topic.reload
-    expect(@topic.anonymous_state).to be_nil
-  end
+    it "should save the anonymous state as NULL when the input value is 'off'" do
+      @topic.anonymous_state = "full_anonymity"
+      @topic.save!
+      result = run_mutation({ id: @topic.id, anonymous_state: "off" })
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to be_nil
+      @topic.reload
+      expect(@topic.anonymous_state).to be_nil
+    end
 
-  it "should keep the previous anonymous state if the input value is nil" do
-    @topic.anonymous_state = "full_anonymity"
-    @topic.save!
-    result = run_mutation({ id: @topic.id, anonymous_state: nil })
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to eq "full_anonymity"
-    @topic.reload
-    expect(@topic.anonymous_state).to eq "full_anonymity"
-  end
+    it "should keep the previous anonymous state if the input value is nil" do
+      @topic.anonymous_state = "full_anonymity"
+      @topic.save!
+      result = run_mutation({ id: @topic.id, anonymous_state: nil })
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to eq "full_anonymity"
+      @topic.reload
+      expect(@topic.anonymous_state).to eq "full_anonymity"
+    end
 
-  it "does not allow to update the anonymous state if there is a reply" do
-    create_valid_discussion_entry
-    @topic.anonymous_state = nil
-    @topic.save!
-    result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity" })
-    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic")).to be_nil
-    expect(@topic.anonymous_state).to be_nil
+    it "does not allow to update the anonymous state if there is a reply" do
+      create_valid_discussion_entry
+      @topic.anonymous_state = nil
+      @topic.save!
+      result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity" })
+      expect(result.dig("data", "updateDiscussionTopic", "discussionTopic")).to be_nil
+      expect(@topic.anonymous_state).to be_nil
+    end
+
+    context "group discussion" do
+      it "does not allow to set the anonymous state to 'full_anonymity' if the discussion is changed to group" do
+        gc = @course.group_categories.create!(name: "My Group Category")
+        result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity", group_category_id: gc.id })[:data][:updateDiscussionTopic]
+        expect(result["discussionTopic"]).to be_nil
+        expect(result["errors"][0]["message"]).to eq "Anonymity settings are locked for group and/or graded discussions"
+      end
+
+      it "allows to set the anonymous state to 'full_anonymity' if the discussion is changed to ungrouped" do
+        gc = @course.group_categories.create!(name: "My Group Category")
+        @topic.update!(group_category: gc)
+        result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity", group_category_id: nil })[:data][:updateDiscussionTopic]
+        expect(result["errors"]).to be_nil
+        expect(result.dig("discussionTopic", "anonymousState")).to eq "full_anonymity"
+        @topic.reload
+        expect(@topic.anonymous_state).to eq "full_anonymity"
+      end
+    end
+
+    context "graded discussion" do
+      it "does not allow to set the anonymous state to 'full_anonymity' if the discussion is graded" do
+        result = run_mutation({
+                                id: @topic.id,
+                                anonymous_state: "full_anonymity",
+                                assignment: {
+                                  title: "Graded Topic 1",
+                                  setAssignment: true,
+                                }
+                              })[:data][:updateDiscussionTopic]
+        expect(result["discussionTopic"]).to be_nil
+        expect(result["errors"][0]["message"]).to eq "Anonymity settings are locked for group and/or graded discussions"
+      end
+
+      it "allows to set the anonymous state to 'full_anonymity' if the discussion is changed to ungraded" do
+        @discussion_assignment = @course.assignments.create!(
+          title: "Graded Topic 1",
+          submission_types: "discussion_topic"
+        )
+        @topic = @discussion_assignment.discussion_topic
+
+        result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity", assignment: { setAssignment: false } })[:data][:updateDiscussionTopic]
+        expect(result["errors"]).to be_nil
+        expect(result.dig("discussionTopic", "anonymousState")).to eq "full_anonymity"
+        @topic.reload
+        expect(@topic.anonymous_state).to eq "full_anonymity"
+      end
+    end
   end
 
   it "publishes the discussion topic" do

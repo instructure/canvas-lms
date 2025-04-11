@@ -55,7 +55,6 @@ export const HorizonEnabled = () => {
           </Text>
         </View>
         <Flex gap="x-small" justifyItems="end">
-          <Button>{I18n.t('Provide Feedback')}</Button>
           <Button color="primary" onClick={onSubmit} disabled={loading}>
             {I18n.t('Revert Course')}
           </Button>

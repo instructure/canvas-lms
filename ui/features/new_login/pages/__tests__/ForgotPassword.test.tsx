@@ -104,7 +104,7 @@ describe('ForgotPassword', () => {
         const requiredLabels = screen.getAllByText(/\*$/)
         requiredLabels.forEach(label => {
           const style = window.getComputedStyle(label)
-          expect(style.color).toBe('rgb(224, 6, 31)')
+          expect(style.color).toBe('rgb(199, 31, 35)')
         })
       })
 
@@ -141,11 +141,29 @@ describe('ForgotPassword', () => {
   })
 
   describe('navigation behavior', () => {
-    it('navigates back to login when cancel button is clicked', async () => {
-      const cancelButton = screen.getByTestId('cancel-button')
-      await userEvent.click(cancelButton)
-      expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
-      expect(mockNavigate).toHaveBeenCalledTimes(1)
+    describe('when the cancel button is clicked', () => {
+      it('navigates back to the login page', async () => {
+        const cancelButton = screen.getByTestId('cancel-button')
+        await userEvent.click(cancelButton)
+        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+      })
+
+      it('navigates back to the previous page when history exists', async () => {
+        const originalHistoryLength = window.history.length
+        Object.defineProperty(window, 'history', {
+          value: {length: 2},
+          writable: true,
+        })
+        const cancelButton = screen.getByTestId('cancel-button')
+        await userEvent.click(cancelButton)
+        expect(mockNavigate).toHaveBeenCalledWith(-1)
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+        Object.defineProperty(window, 'history', {
+          value: {length: originalHistoryLength},
+          writable: true,
+        })
+      })
     })
 
     it('renders the confirmation back button and navigates back to login after successful submission', async () => {

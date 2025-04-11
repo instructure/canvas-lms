@@ -72,11 +72,10 @@ describe('QuizIPFilters', () => {
   it('shows the explainer tip only when the info icon is focussed', async () => {
     renderComponent([])
     await new Promise(resolve => requestAnimationFrame(resolve)) // wait for InstUI to settle down
-    const helpBlock = screen.getByText('filters are a way to limit access', {exact: false})
-    expect(helpBlock).not.toBeVisible()
+    expect(screen.getByText('filters are a way to limit access', {exact: false})).not.toBeVisible()
     screen.getByTestId('ip-filter-help-toggle')?.focus()
     await new Promise(resolve => requestAnimationFrame(resolve)) // wait for InstUI to settle down
-    expect(helpBlock).toBeVisible()
+    expect(screen.getByText('filters are a way to limit access', {exact: false})).toBeVisible()
   })
 
   it('adds the validation hook onto the parent div', () => {

@@ -1580,10 +1580,6 @@ describe "RCE next tests", :ignore_js_errors do
     end
 
     context "Icon Maker Tray" do
-      before do
-        Account.site_admin.enable_feature!(:buttons_and_icons_root_account)
-      end
-
       it "can add image" do
         skip("Works IRL but fails in selenium. Fix with MAT-1127")
         rce_wysiwyg_state_setup(@course)

@@ -20,8 +20,9 @@ import {Table} from '@instructure/ui-table'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {File, Folder} from 'features/files_v2/interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
-import {getUniqueId} from '../../../utils/fileFolderUtils'
+import {getName, getUniqueId} from '../../../utils/fileFolderUtils'
 import {ModalOrTrayOptions} from './FileFolderTable'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 // Need to render in this manner to satisfy TypeScript and make sure headers are rendered in stacked view
 const renderTableBody = (
@@ -35,6 +36,7 @@ const renderTableBody = (
   toggleRowSelection: (id: string) => void,
   userCanEditFilesForContext: boolean,
   userCanDeleteFilesForContext: boolean,
+  userCanRestrictFilesForContext: boolean,
   usageRightsRequiredForContext: boolean,
   setModalOrTrayOptions: (modalOrTray: ModalOrTrayOptions | null) => () => void,
 ) => {
@@ -43,7 +45,7 @@ const renderTableBody = (
     const rowHead = [
       <Table.RowHeader key="select">
         <Checkbox
-          label=""
+          label={<ScreenReaderContent>{getName(row)}</ScreenReaderContent>}
           scope="row"
           size={size}
           checked={isSelected}
@@ -52,17 +54,14 @@ const renderTableBody = (
         />
       </Table.RowHeader>,
       ...columnHeaders.map(column => (
-        <Table.Cell
-          scope="row"
-          key={column.id}
-          textAlign={isStacked ? undefined : column.textAlign}
-        >
+        <Table.Cell key={column.id} textAlign={isStacked ? undefined : column.textAlign}>
           {columnRenderers[column.id]({
             row: row,
             rows: rows,
             isStacked: isStacked,
             userCanEditFilesForContext: userCanEditFilesForContext,
             userCanDeleteFilesForContext: userCanDeleteFilesForContext,
+            userCanRestrictFilesForContext: userCanRestrictFilesForContext,
             usageRightsRequiredForContext: usageRightsRequiredForContext,
             size: size,
             isSelected: isSelected,
@@ -73,11 +72,7 @@ const renderTableBody = (
       )),
     ]
     return (
-      <Table.Row
-        key={getUniqueId(row)}
-        data-testid="table-row"
-        themeOverride={isSelected ? {borderColor: 'brand'} : undefined}
-      >
+      <Table.Row key={getUniqueId(row)} data-testid="table-row">
         {...rowHead}
       </Table.Row>
     )

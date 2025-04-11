@@ -20,10 +20,15 @@ import {assignLocation} from '@canvas/util/globalUtils'
 import {cleanup, render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import {MemoryRouter} from 'react-router-dom'
+import {MemoryRouter, useNavigate} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../../context'
 import {createStudentAccount} from '../../../services'
 import Student from '../Student'
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: jest.fn(),
+}))
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -55,6 +60,11 @@ describe('Student', () => {
       </MemoryRouter>,
     )
   }
+
+  const mockNavigate = jest.fn()
+  beforeAll(() => {
+    ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
+  })
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -328,6 +338,35 @@ describe('Student', () => {
       await userEvent.click(screen.getByTestId('submit-button'))
       await waitFor(() => {
         expect(assignLocation).toHaveBeenCalledWith('/?registration_success=1')
+      })
+    })
+  })
+
+  describe('navigation behavior', () => {
+    describe('when the cancel button is clicked', () => {
+      it('navigates back to login when there is no previous history', async () => {
+        setup()
+        const backButton = screen.getByTestId('back-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+      })
+
+      it('navigates back to the previous page when history exists', async () => {
+        const originalHistoryLength = window.history.length
+        Object.defineProperty(window, 'history', {
+          value: {length: 2},
+          writable: true,
+        })
+        setup()
+        const backButton = screen.getByTestId('back-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith(-1)
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+        Object.defineProperty(window, 'history', {
+          value: {length: originalHistoryLength},
+          writable: true,
+        })
       })
     })
   })

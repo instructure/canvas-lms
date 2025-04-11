@@ -46,11 +46,13 @@ const createValidationSchema = (
       sis_user_id: z.string().optional(),
       integration_id: z.string().optional(),
       account_id: z.number().optional(),
-      password: z.string().optional(),
-      password_confirmation: z.string().optional(),
+      password: z.string(),
+      password_confirmation: z.string(),
     })
     .superRefine(({account_id, password, password_confirmation}, ctx) => {
-      if (!isEdit && password != null && password_confirmation != null) {
+      const anyPasswordProvided = password.length || password_confirmation.length
+
+      if (!isEdit && anyPasswordProvided) {
         const policy =
           accountIdPasswordPolicyMap && account_id
             ? (accountIdPasswordPolicyMap[account_id] ?? defaultPolicy)
@@ -132,8 +134,8 @@ const AddEditPseudonym = ({
     sis_user_id: pseudonym?.sis_user_id ?? '',
     integration_id: pseudonym?.integration_id ?? '',
     account_id: pseudonym?.account_id ?? accountSelectOptions?.[0]?.value,
-    password: isEdit ? undefined : '',
-    password_confirmation: isEdit ? undefined : '',
+    password: '',
+    password_confirmation: '',
   }
   const {
     control,
@@ -156,11 +158,12 @@ const AddEditPseudonym = ({
   }, [setFocus])
 
   const handleFormSubmit: SubmitHandler<FormValues> = async data => {
-    const payload = {...data}
+    const payload: Partial<FormValues> = {...data}
     const path = `/users/${userId}/pseudonyms${isEdit ? `/${pseudonym?.id}` : ''}`
     const method = isEdit ? 'PUT' : 'POST'
+    const arePasswordsEmpty = !payload.password && !payload.password_confirmation
 
-    if (!shouldShowPasswordFields) {
+    if (!shouldShowPasswordFields || arePasswordsEmpty) {
       delete payload.password
       delete payload.password_confirmation
     }

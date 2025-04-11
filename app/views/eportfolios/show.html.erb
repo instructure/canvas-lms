@@ -336,25 +336,6 @@
   <% end %>
 
 <% end %>
-<%= form_for @portfolio, :url => eportfolio_path(@portfolio), :html => {:style => "display: none; position: relative;", :id => "edit_eportfolio_form"} do |f| %>
-<table class="formtable">
-  <tr>
-    <td><%= f.label :name, before_label(:eportfolio_name, "ePortfolio Name") %></td>
-    <td><%= f.text_field :name %></td>
-  </tr><tr>
-    <td colspan="2">
-      <%= f.check_box :public %>
-      <%= f.label :public, t('labels.make_public', "Make it Public") %>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2" class="button-container">
-      <button type="submit" class="btn btn-primary"><%= t('buttons.update_eportfolio', "Update ePortfolio") %></button>
-      <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
-    </td>
-  <td>
-</table>
-<% end %>
 <% if !@owner_view %>
 <div id="page_comments_holder" style="margin-top: 50px;">
   <h2 style="<%= hidden unless @page.show_comments || @page.allow_comments || can_do(@portfolio, @current_user, :update) %>"><%= t 'headings.page_comments', 'Page Comments' %></h2>
@@ -401,7 +382,7 @@
     <a href="<%= eportfolio_export_portfolio_path(@portfolio.id) %>" class="download_eportfolio_link icon-zipped"><%= t('links.download_eportfolio', "Download the contents of this ePortfolio as a zip file") %></a>
     <div style="display: none; font-size: 1.2em;" id="downloading_eportfolio_message">
       <span class="message">
-        <%= t('headers.export_progress', "Collecting ePortfolio resources. this may take a while if you have a lot of files in your ePortfolio.") %>
+        <%= t("Collecting ePortfolio resources. This may take a while if you have a lot of files in your ePortfolio.") %>
       </span>
       <div style="margin: 20px 10px;">
         <div id="export_progress"></div>

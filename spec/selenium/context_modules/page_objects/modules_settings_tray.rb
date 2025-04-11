@@ -122,7 +122,7 @@ module ModulesSettingsTray
   end
 
   def number_input_selector(requirement_number)
-    "#NumberInput_#{requirement_number}"
+    "#NumberInput___#{requirement_number}"
   end
 
   def prerequisites_dropdown_selector

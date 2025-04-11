@@ -19,13 +19,23 @@
 import {gql} from '@apollo/client'
 
 export const COURSE_PEOPLE_QUERY = gql`
-  query getCoursePeopleQuery($courseId: ID!, $searchTerm: String, $enrollmentRoleIds: [ID!]) {
+  query getCoursePeopleQuery(
+    $courseId: ID!,
+    $searchTerm: String,
+    $enrollmentRoleIds: [ID!],
+    $sortField: CourseUsersSortFieldType!,
+    $sortDirection: CourseUsersSortDirectionType
+  ) {
     course(id: $courseId) {
       usersConnection(
         filter: {
           searchTerm: $searchTerm
           enrollmentRoleIds: $enrollmentRoleIds
           excludeTestStudents: true
+        }
+        sort: {
+          field: $sortField,
+          direction: $sortDirection
         }
       ) {
         nodes {

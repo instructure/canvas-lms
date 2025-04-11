@@ -47,8 +47,7 @@ import {captureException} from '@sentry/react'
 import ready from '@instructure/ready'
 import {Flex} from '@instructure/ui-flex'
 import OnlineUrlSubmission from '../react/OnlineUrlSubmission'
-import {IconWarningSolid} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-text'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 
 const I18n = createI18nScope('submit_assignment')
 
@@ -312,14 +311,11 @@ ready(function () {
             const root = errorRoot ?? createRoot(errorsContainer)
             errorRoot = root
             root.render(
-              <Flex as="div" alignItems="center" margin="0 0 xx-small 0">
-                <Flex.Item as="div" margin="0 xx-small xxx-small 0">
-                  <IconWarningSolid color="error" />
-                </Flex.Item>
-                <Text size="small" color="danger">
-                  {I18n.t('%{errorText}',{errorText: error})}
-                </Text>
-              </Flex>
+              <FormattedErrorMessage
+                message= {I18n.t('%{errorText}',{errorText: error})}
+                margin="0 0 xx-small 0"
+                iconMargin="0 xx-small xxx-small 0"
+              />
             )
           })
           checkPledgeCheck(textPledgeCheckbox, PLEDGE_TYPES.TEXT)

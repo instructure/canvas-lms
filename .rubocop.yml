@@ -123,6 +123,8 @@ Rails/DynamicFindBy:
     - find_by_asset_string # ApplicationRecord
     - find_by_pseudonym_credentials # SessionPersistenceToken
     - find_by_quiz # Quizzes::OutstandingQuizSubmissionManager
+Rails/EnumHash:
+  Enabled: false # we override Rails' enum method to only take a string array, see why at lib/extensions/active_record/enum.rb
 Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/HelperInstanceVariable:

@@ -102,7 +102,7 @@ describe('PaceModal', () => {
     it('set weighted assignment duration tray is shown', () => {
       const {getByTestId, getByRole} = renderConnected(<PaceModal {...defaultProps} coursePace={STUDENT_PACE} />)
 
-      const settingsButton = getByRole('button', {name: 'Modify Settings'})
+      const settingsButton = getByRole('button', {name: 'Settings'})
       act(() => settingsButton.click())
 
       const weightedAssignmentsOpgion = getByTestId('weighted-assignment-duration-option')

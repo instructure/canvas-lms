@@ -910,6 +910,7 @@ describe Types::AssignmentType do
   describe "checkpoints" do
     describe "when feature flag is disabled" do
       it "checkpoints is nil and hasSubAssignments is false" do
+        @course.account.disable_feature!(:discussion_checkpoints)
         expect(assignment_type.resolve("checkpoints {tag}")).to be_nil
         expect(assignment_type.resolve("hasSubAssignments")).to be_falsey
       end

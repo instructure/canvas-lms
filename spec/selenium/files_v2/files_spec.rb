@@ -64,7 +64,7 @@ describe "files index page" do
       it "Displays the file usage bar if user has permission" do
         allow(Attachment).to receive(:get_quota).with(@course).and_return({ quota: 50_000_000, quota_used: 25_000_000 })
         get "/courses/#{@course.id}/files"
-        expect(files_usage_text.text).to include("50% of 50 MB used")
+        expect(files_usage_text.text).to include("25 MB of 50 MB used")
       end
 
       it "Can create a new folder" do
@@ -136,8 +136,8 @@ describe "files index page" do
         time_current = format_time_only(@course.attachments.first.updated_at).strip
         expect(table_item_by_name("example.pdf")).to be_displayed
         expect(get_item_content_files_table(1, 1)).to eq "PDF File\nexample.pdf"
-        expect(get_item_content_files_table(1, 2)).to eq time_current + "\n" + time_current
-        expect(get_item_content_files_table(1, 3)).to eq time_current + "\n" + time_current
+        expect(get_item_content_files_table(1, 2)).to eq time_current
+        expect(get_item_content_files_table(1, 3)).to eq time_current
         expect(get_item_content_files_table(1, 5)).to eq "194 KB"
       end
 
@@ -286,7 +286,7 @@ describe "files index page" do
 
         it "sets files to published by default", priority: "1" do
           get "/courses/#{@course.id}/files"
-          expect(get_item_content_files_table(1, 6)).to eq "#{a_txt_file_name} is Published - Click to modify"
+          expect(item_has_permissions_icon?(1, 6, "published-button")).to be true
         end
       end
 
@@ -363,7 +363,7 @@ describe "files index page" do
         end
 
         it "validates that file is published by default", priority: "1" do
-          expect(get_item_content_files_table(1, 6)).to eq "a_file.txt is Published - Click to modify"
+          expect(item_has_permissions_icon?(1, 6, "published-button")).to be true
         end
       end
 

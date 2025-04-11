@@ -598,18 +598,4 @@ describe.skip('CanvasStudioPlayer', () => {
       })
     })
   })
-
-  describe('formatTracksForMediaPlayer', () => {
-    it('returns an object with id, src, label, type, and language', () => {
-      const rawTracks = [{id: '456', media_object_id: '123', locale: 'en', kind: 'subtitles'}]
-      const track = formatTracksForMediaPlayer(rawTracks)[0]
-      expect(track).toEqual({
-        id: '456',
-        src: '/media_objects/123/media_tracks/456',
-        label: 'en',
-        type: 'subtitles',
-        language: 'en',
-      })
-    })
-  })
 })

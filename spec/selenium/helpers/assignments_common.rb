@@ -55,13 +55,13 @@ module AssignmentsCommon
       f("[data-testid='points-input']").send_keys opts[:points]
     end
     if opts[:due_at]
-      date_input = f("#Selectable_1")
+      date_input = f("#Selectable___1")
       clear_input_field(date_input)
       date_input.send_keys opts[:due_at]
       driver.action.send_keys(:enter).perform
 
       if opts[:due_time]
-        time_input = f("#Select_1")
+        time_input = f("#Select___1")
         clear_input_field(time_input)
         time_input.send_keys opts[:due_time]
         driver.action.send_keys(:enter).perform
@@ -92,13 +92,13 @@ module AssignmentsCommon
       f("[data-testid='points-input']").send_keys opts[:points]
     end
     if opts[:due_at]
-      date_input = f("#Selectable_1")
+      date_input = f("#Selectable___1")
       clear_input_field(date_input)
       date_input.send_keys opts[:due_at]
       driver.action.send_keys(:enter).perform
 
       if opts[:due_time]
-        time_input = f("#Select_1")
+        time_input = f("#Select___1")
         clear_input_field(time_input)
         time_input.send_keys opts[:due_time]
         driver.action.send_keys(:enter).perform

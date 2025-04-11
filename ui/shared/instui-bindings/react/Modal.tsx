@@ -73,7 +73,6 @@ function CanvasModal({
           offset="medium"
         />
       </Modal.Header>
-      {/* @ts-expect-error */}
       <Modal.Body padding={padding}>
         <View as="div" height="100%">
           <ErrorBoundary

@@ -43,7 +43,6 @@ import {Link} from '@instructure/ui-link'
 import {SelfAssessmentComment} from './SelfAssessmentComment'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
-const {shamrock, tiara} = colors
 
 export type TraditionalViewProps = {
   criteria: RubricCriterion[]
@@ -431,9 +430,9 @@ const CriterionRow = ({
                     ? rangingFrom(criterionRatings, index, ratingOrder)
                     : undefined
 
-                  const primaryBorderColor = `${tiara} ${
-                    isLastRatingIndex ? tiara : 'transparent'
-                  } ${tiara} ${tiara}`
+                  const primaryBorderColor = `${colors.contrasts.grey1214} ${
+                    isLastRatingIndex ? colors.contrasts.grey1214 : 'transparent'
+                  } ${colors.contrasts.grey1214} ${colors.contrasts.grey1214}`
 
                   return (
                     <Flex.Item
@@ -452,7 +451,7 @@ const CriterionRow = ({
                         padding="0"
                         margin="0"
                         themeOverride={{
-                          borderColorBrand: shamrock,
+                          borderColorBrand: colors.contrasts.green4570,
                           borderColorPrimary: primaryBorderColor,
                         }}
                         elementRef={ref => {
@@ -480,7 +479,7 @@ const CriterionRow = ({
                           onClick={() => onClickRating(rating.id)}
                           themeOverride={{
                             borderWidthSmall: '0.125rem',
-                            borderColorBrand: shamrock,
+                            borderColorBrand: colors.contrasts.green4570,
                             borderColorPrimary: 'transparent',
                           }}
                           data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
@@ -491,8 +490,8 @@ const CriterionRow = ({
                                 position: 'absolute',
                                 inset: '2px',
                                 backgroundColor: 'transparent',
-                                color: shamrock,
-                                border: '2px dashed #0B874B',
+                                color: colors.contrasts.green4570,
+                                border: '2px dashed #03893D',
                                 borderRadius: '4px',
                                 pointerEvents: 'none',
                               }}
@@ -546,7 +545,7 @@ const CriterionRow = ({
                                       left: '50%',
                                       borderLeft: '12px solid transparent',
                                       borderRight: '12px solid transparent',
-                                      borderBottom: `12px solid ${shamrock}`,
+                                      borderBottom: `12px solid ${colors.contrasts.green4570}`,
                                       transform: 'translateX(-50%)',
                                     }}
                                   />

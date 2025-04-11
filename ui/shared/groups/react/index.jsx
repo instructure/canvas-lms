@@ -102,17 +102,13 @@ const StudentView = createReactClass({
 
   renderNewStudentGroupModal(open = true) {
     return (
-      <>
-        <NewStudentGroupModal
-          userCollection={this.state.userCollection}
-          loadMore={() => this._loadMore(this.state.userCollection)}
-          onSave={() => this._onNewStudentGroupSave()}
-          open={open}
-          onDismiss={() => {
-            this.setState({showNewStudentGroupModal: false})
-          }}
-        />
-      </>
+      <NewStudentGroupModal
+        onSave={() => this._onNewStudentGroupSave()}
+        open={open}
+        onDismiss={() => {
+          this.setState({showNewStudentGroupModal: false})
+        }}
+      />
     )
   },
 

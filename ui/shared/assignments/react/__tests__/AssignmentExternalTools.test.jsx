@@ -1,4 +1,4 @@
- 
+
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
  *
@@ -22,7 +22,7 @@ import {render} from '@testing-library/react'
 import AssignmentExternalTools from '../AssignmentExternalTools'
 import fetchMock from 'fetch-mock'
 
- 
+
 var toolDefinitions = [
   {
     definition_type: 'ContextExternalTool',
@@ -160,7 +160,7 @@ describe('AssignmentExternalTools', () => {
     ref.current.setState({tools: toolDefinitions})
     wrapper.container.querySelector('.before_external_content_info_alert').focus()
     expect(ref.current.state.beforeExternalContentAlertClass).toEqual('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
+    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
   })
 
   test('shows ending info alert and adds styles to iframe', () => {
@@ -176,7 +176,7 @@ describe('AssignmentExternalTools', () => {
     ref.current.setState({tools: toolDefinitions})
     wrapper.container.querySelector('.after_external_content_info_alert').focus()
     expect(ref.current.state.afterExternalContentAlertClass).toEqual('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
+    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
   })
 
   test('hides beginning info alert and adds styles to iframe', () => {

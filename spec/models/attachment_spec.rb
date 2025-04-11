@@ -714,6 +714,15 @@ describe Attachment do
       a.destroy_content
     end
 
+    it "logs and continues when InstFS file deletion fails" do
+      a = attachment_model
+      allow(a).to receive_messages(instfs_hosted?: true, instfs_uuid: "some-uuid")
+      expect(a).to receive(:instfs_uuid=).with(nil)
+      allow(InstFS).to receive(:delete_file).and_raise(InstFS::DeletionError, "deletion failed")
+      expect(Rails.logger).to receive(:warn).with("InstFS file deletion failed for attachment #{a.id}: deletion failed")
+      expect { a.destroy_content }.not_to raise_error
+    end
+
     it "allows destroy_content_and_replace when s3object is already deleted" do
       s3_storage!
       a = attachment_model(uploaded_data: default_uploaded_data)
@@ -1864,6 +1873,7 @@ describe Attachment do
     end
 
     it "allows custom ttl for root_account" do
+      Attachment.current_root_account = @course.root_account
       attachment = attachment_with_context(@course, display_name: "foo")
       root = @course.root_account
       root.settings[:s3_url_ttl_seconds] = 3.days.seconds.to_s
@@ -1918,29 +1928,21 @@ describe Attachment do
       @a = attachment_with_context(@course)
     end
 
-    it "returns account id for normal namespaces" do
-      @a.namespace = "account_#{@account.id}"
-      expect(@a.root_account_id).to eq @account.id
-    end
-
-    it "returns account id for localstorage namespaces" do
-      @a.namespace = "_localstorage_/#{@account.file_namespace}"
-      expect(@a.root_account_id).to eq @account.id
+    before do
+      Attachment.current_root_account = @account
     end
 
     it "immediately infers the namespace if not yet set" do
-      Attachment.current_root_account = nil
       @a = Attachment.new(context: @course)
       expect(@a).to be_new_record
       expect(@a["namespace"]).to be_nil
       expect(@a.namespace).not_to be_nil
-      @a.set_root_account_id
+      @a.set_root_account
       expect(@a["namespace"]).not_to be_nil
-      expect(@a.root_account_id).to eq @account.id
+      expect(@a.root_account.id).to eq @account.id
     end
 
     it "does not infer the namespace if it's not a new record" do
-      Attachment.current_root_account = nil
       attachment_model(context: submission_model)
       original_namespace = @attachment.namespace
       @attachment.context = @course
@@ -1958,11 +1960,11 @@ describe Attachment do
         Attachment.current_root_account = Account.default
         att = Attachment.new
         att.infer_namespace
-        att.set_root_account_id
+        att.set_root_account
         expect(att.namespace).to eq Account.default.asset_string
-        expect(att.root_account_id).to eq Account.default.local_id
+        expect(att.root_account.id).to eq Account.default.local_id
         @shard1.activate do
-          expect(att.root_account_id).to eq Account.default.global_id
+          expect(att.root_account.id).to eq Account.default.global_id
         end
       end
 
@@ -1974,11 +1976,11 @@ describe Attachment do
           Attachment.current_root_account = a
           att = Attachment.new
           att.infer_namespace
-          att.set_root_account_id
+          att.set_root_account
           expect(att.namespace).to eq a.global_asset_string
-          expect(att.root_account_id).to eq a.local_id
+          expect(att.root_account.id).to eq a.local_id
         end
-        expect(att.root_account_id).to eq a.global_id
+        expect(att.root_account.id).to eq a.global_id
       end
 
       it "interprets root_account_id correctly, even when local on not the birth shard" do
@@ -1986,12 +1988,13 @@ describe Attachment do
         att = nil
         @shard1.activate do
           a = Account.create!
+          Attachment.current_root_account = a
           att = Attachment.new
           att.namespace = a.asset_string
-          att.set_root_account_id
-          expect(att.root_account_id).to eq a.local_id
+          att.set_root_account
+          expect(att.root_account.id).to eq a.local_id
         end
-        expect(att.root_account_id).to eq a.global_id
+        expect(att.root_account.id).to eq a.global_id
       end
 
       it "stores ID for a cross-shard attachment" do
@@ -2000,11 +2003,11 @@ describe Attachment do
         @shard1.activate do
           att = Attachment.new
           att.infer_namespace
-          att.set_root_account_id
+          att.set_root_account
           expect(att.namespace).to eq Account.default.global_asset_string
-          expect(att.root_account_id).to eq Account.default.global_id
+          expect(att.root_account.id).to eq Account.default.global_id
         end
-        expect(att.root_account_id).to eq Account.default.local_id
+        expect(att.root_account.id).to eq Account.default.local_id
       end
 
       it "links a cross-shard cloned_item correctly" do
@@ -3295,14 +3298,17 @@ describe Attachment do
 
   context "create" do
     it "sets the root_account_id using course context" do
-      attachment_model filename: "test.txt"
-      expect(@attachment.root_account_id).to eq @course.root_account_id
+      Attachment.current_root_account = Account.default
+      course_model
+      attachment_model filename: "test.txt", context: @course
+      expect(@attachment.root_account.id).to eq @course.root_account.id
     end
 
     it "sets the root_account_id using account context" do
       account_model
+      Attachment.current_root_account = @account
       attachment_model filename: "test.txt", context: @account
-      expect(@attachment.root_account_id).to eq @account.id
+      expect(@attachment.root_account.id).to eq @account.id
     end
 
     describe "word count" do

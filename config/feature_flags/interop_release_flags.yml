@@ -285,6 +285,14 @@ lti_tools_from_federated_parents:
     If enabled, LTI tools installed in federated parent accounts will be
     available / visible in child accounts.
   applies_to: SiteAdmin
+lti_usage_premium:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: "LTI Premium Usage"
+  description: >-
+    This flag controls if an instance has access to premium LTI usage features.
+    It should only be enabled in schools which have a contract paying for these features.
 lti_v2_turnitin_usage_log:
   state: hidden
   shadow: true

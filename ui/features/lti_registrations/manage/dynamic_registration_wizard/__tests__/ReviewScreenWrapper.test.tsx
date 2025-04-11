@@ -23,7 +23,7 @@ import {ReviewScreenWrapper} from '../components/ReviewScreenWrapper'
 import {mockConfigWithPlacements, mockRegistration, mockToolConfiguration} from './helpers'
 import {LtiPlacements, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
-import {createRegistrationOverlayStore} from '../RegistrationOverlayState'
+import {createDynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
 
@@ -34,7 +34,7 @@ describe('ReviewScreen', () => {
       LtiPlacements.GlobalNavigation,
     ])
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(
       <ReviewScreenWrapper
@@ -53,7 +53,7 @@ describe('ReviewScreen', () => {
       LtiPlacements.GlobalNavigation,
     ])
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(
       <ReviewScreenWrapper
@@ -78,7 +78,7 @@ describe('ReviewScreen', () => {
     ])
     config.privacy_level = 'public'
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
     render(
       <ReviewScreenWrapper
         registration={reg}
@@ -103,7 +103,7 @@ describe('ReviewScreen', () => {
     const config = mockConfigWithPlacements(placements)
 
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
     render(
       <ReviewScreenWrapper
@@ -130,7 +130,7 @@ describe('ReviewScreen', () => {
       LtiPlacements.GlobalNavigation,
     ])
     const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
     overlayStore.setState(s => {
       return {
         ...s,
@@ -180,7 +180,7 @@ describe('ReviewScreen', () => {
 
       const reg = mockRegistration({}, config)
 
-      const overlayStore = createRegistrationOverlayStore('Foo', reg)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
       render(
         <ReviewScreenWrapper
@@ -215,7 +215,7 @@ describe('ReviewScreen', () => {
         }),
       })
 
-      const overlayStore = createRegistrationOverlayStore('Foo', reg)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
       render(
         <ReviewScreenWrapper
@@ -241,7 +241,7 @@ describe('ReviewScreen', () => {
 
       const reg = mockRegistration({}, config)
 
-      const overlayStore = createRegistrationOverlayStore('Foo', reg)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
       overlayStore.setState(s => {
         return {
@@ -290,7 +290,7 @@ describe('ReviewScreen', () => {
       const reg = mockRegistration({}, config)
       reg.configuration.launch_settings!.icon_url = ''
 
-      const overlayStore = createRegistrationOverlayStore('Foo', reg)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
       render(
         <ReviewScreenWrapper
@@ -317,7 +317,7 @@ describe('ReviewScreen', () => {
       const reg = mockRegistration({}, config)
       reg.configuration.launch_settings!.icon_url = ''
 
-      const overlayStore = createRegistrationOverlayStore('Foo', reg)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
       render(
         <ReviewScreenWrapper

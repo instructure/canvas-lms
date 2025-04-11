@@ -929,7 +929,7 @@ describe('groupImportantDates', () => {
 
   it('uses default color if item does not supply a context_color', () => {
     const items = groupImportantDates([MOCK_ASSIGNMENTS[0]], [], mountainTime)
-    expect(items[0].items[0].color).toBe('#394B58')
+    expect(items[0].items[0].color).toBe('#334451')
   })
 
   it('renames variables properly for assignment types', () => {

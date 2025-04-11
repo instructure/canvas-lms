@@ -27,9 +27,7 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import {Flex} from '@instructure/ui-flex'
-import {IconWarningSolid} from '@instructure/ui-icons'
 import {Tag} from '@instructure/ui-tag'
-import {Text} from '@instructure/ui-text'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
 import {datetimeString} from '@canvas/datetime/date-functions'
@@ -43,6 +41,7 @@ import '@canvas/rubrics/jquery/rubric_assessment'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 import CheckpointGradeRoot from '../react/CheckpointGradeRoot'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 
 const I18n = createI18nScope('submissions')
 /* global rubricAssessment */
@@ -378,14 +377,11 @@ export function setup() {
         const textAreaErrorContainer = document.getElementById('textarea-error-container')
         textAreaErrorRoot = createRoot(textAreaErrorContainer)
         textAreaErrorRoot.render(
-          <Flex id="error_text" as="div" alignItems="center" justifyItems="start" margin="xx-small 0 small 0">
-            <Flex.Item as="div" margin="0 xx-small xxx-small 0">
-              <IconWarningSolid color="error" />
-            </Flex.Item>
-            <Text size="small" color="danger">
-              {message}
-            </Text>
-          </Flex>
+          <FormattedErrorMessage
+            message={message}
+            margin="xx-small 0 small 0"
+            iconMargin="0 xx-small xxx-small 0"
+          />
         )
         return
       }

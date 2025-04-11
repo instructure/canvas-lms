@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import {getByText as domGetByText} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -81,9 +81,11 @@ describe('ButtonBlockToolbar', () => {
     expect(smMenuItem).toBeInTheDocument()
     expect(medMenuItem).toBeInTheDocument()
     expect(lgMenuItem).toBeInTheDocument()
+    const li = medMenuItem.parentElement as HTMLLIElement
 
-    const li = medMenuItem.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
+    })
   })
 
   it('changes the size prop', async () => {
@@ -114,7 +116,7 @@ describe('ButtonBlockToolbar', () => {
     expect(outlinedMenuItem).toBeInTheDocument()
     expect(filledMenuItem).toBeInTheDocument()
 
-    const li = filledMenuItem.closest('li') as HTMLLIElement
+    const li = filledMenuItem.parentElement as HTMLLIElement
     expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
   })
 

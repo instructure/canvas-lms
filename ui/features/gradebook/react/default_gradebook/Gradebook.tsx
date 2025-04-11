@@ -259,6 +259,7 @@ import {TotalGradeOverrideTrayProvider} from './components/TotalGradeOverrideTra
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {RubricAssessmentImport} from './RubricAssessmentImport'
 import {RubricAssessmentExportModal} from './RubricAssessmentExport/RubricAssessmentExportModal'
+import PostGradesFrameModal from './components/PostGradesFrameModal'
 
 const I18n = createI18nScope('gradebook')
 
@@ -339,6 +340,7 @@ type GradebookState = {
     filename?: string
   }
   exportManager: any
+  selectedLtiId: string | null
 }
 
 class Gradebook extends React.Component<GradebookProps, GradebookState> {
@@ -482,6 +484,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   scoreToUngradedManager: ScoreToUngradedManager | null
 
+  returnFocusTo: HTMLButtonElement | null
+
   constructor(props: GradebookProps) {
     super(props)
     this.options = {...(props.gradebookEnv || {}), ...props}
@@ -506,6 +510,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       isStatusesModalOpen: false,
       exportState: undefined,
       exportManager: undefined,
+      selectedLtiId: null,
     }
     // @ts-expect-error
     this.course = getCourseFromOptions(this.options)
@@ -596,6 +601,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
     this.setStudentGroups(this.options.student_groups)
     this.gradebookSettingsModal = React.createRef()
+
+    this.returnFocusTo = (
+      this.options.enhanced_gradebook_filters
+        ? this.props.enhancedActionMenuNode
+        : this.props.actionMenuNode
+    ).querySelector('button')
   }
 
   bindGridEvents = () => {
@@ -1869,24 +1880,33 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         id: lti.id,
         name: lti.name,
         onSelect: () => {
-          const postGradesDialog = new PostGradesFrameDialog({
-            returnFocusTo: this.props.actionMenuNode.querySelector('button'),
-            baseUrl: lti.data_url,
-          })
-          // 10 ms delay left over from original coffeescript implementation
-          setTimeout(() => postGradesDialog.open(), 10)
-          handleExternalContentMessages({
-            service: 'external_tool_redirect',
-            ready: () => {
-              postGradesDialog.close()
-            },
-            cancel: () => {
-              postGradesDialog.close()
-            },
-          })
+          if (this.options.post_grades_enhanced_modal) {
+            this.setState({selectedLtiId: lti.id})
+          } else {
+            // DEPRECATE
+            const postGradesDialog = new PostGradesFrameDialog({
+              returnFocusTo: this.returnFocusTo,
+              baseUrl: lti.data_url,
+            })
+            // 10 ms delay left over from original coffeescript implementation
+            setTimeout(() => postGradesDialog.open(), 10)
+            handleExternalContentMessages({
+              service: 'external_tool_redirect',
+              ready: () => {
+                postGradesDialog.close()
+              },
+              cancel: () => {
+                postGradesDialog.close()
+              },
+            })
+          }
         },
       }
     })
+  }
+
+  onSyncDialogClose = () => {
+    this.setState({selectedLtiId: null})
   }
 
   updatePostGradesFeatureButton = () => {
@@ -5406,6 +5426,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           <QueryProvider>
             <RubricAssessmentExportModal />
           </QueryProvider>
+        )}
+
+        {this.options.post_grades_enhanced_modal && (
+          <PostGradesFrameModal
+            postGradesLtis={this.options.post_grades_ltis}
+            selectedLtiId={this.state.selectedLtiId}
+            onClose={this.onSyncDialogClose}
+          />
         )}
       </>
     )

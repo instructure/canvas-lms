@@ -193,6 +193,55 @@ module Api
           HTML
         end
       end
+
+      describe "#self.collect_attachment_ids" do
+        it "collects relevant attachment ids from html" do
+          string = <<~HTML
+            <html>
+              <body>
+              <div>
+                <a href="/courses/2323/files/1/download">link</a>
+                <a href="/users/4567282/files/15~8723/download?verifier=123">link</a>
+                <a href="/files/3/download?wrap=1">link</a>
+                <iframe src="/media_attachments_iframe/4">
+                <a href="#">/files/no1/download</a>
+                <div src="files/9/preview"></div>
+              </div>
+              </body>
+            </html>
+          HTML
+
+          results = Content.collect_attachment_ids(string)
+
+          expect(results).to include("1", "3", "4", "15~8723")
+          expect(results).not_to include("no1", "9")
+        end
+
+        it "it returns an empty array if no collectable ids are found" do
+          string1 = ""
+          expect(Content.collect_attachment_ids(string1)).to eq([])
+
+          string2 = "<html><body><div>no attachments here</div><div>neither here</div>/files/2323/bob</body></html>"
+          expect(Content.collect_attachment_ids(string2)).to eq([])
+
+          string3 = <<~HTML
+            <html>
+              <body>
+              <div>
+                <a href="http://holi.day/index.html">link</a>
+                <a href="/users/4567282/files/abcdef/download?verifier=123">link</a>
+                <a href="#">nada /medi</a>
+                <img src="/courses/5/pfiles/4/preview">
+              </div>
+              </body>
+            </html>
+          HTML
+          expect(Content.collect_attachment_ids(string3)).to eq([])
+
+          notastring = { bob: "is your uncle" }
+          expect(Content.collect_attachment_ids(notastring)).to eq([])
+        end
+      end
     end
   end
 end

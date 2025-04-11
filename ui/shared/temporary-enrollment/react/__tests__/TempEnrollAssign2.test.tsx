@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render, waitFor, within} from '@testing-library/react'
+import {render, within} from '@testing-library/react'
 import {
   defaultRoleChoice,
   deleteMultipleEnrollmentsByNoMatch,
@@ -86,14 +86,6 @@ const enrollmentsByCourse = [
     ],
   },
 ]
-
-const additionalRecipient = {
-  email: 'ross@email.com',
-  id: '6',
-  login_id: 'mel123',
-  name: 'Melvin',
-  sis_user_id: '11',
-}
 
 const props: Props = {
   enrollments: [
@@ -257,13 +249,13 @@ describe('TempEnrollAssign', () => {
 
     it('should set the start date and time correctly', async () => {
       const localStartDate = formatDateToLocalString(startAt)
-      const {findByLabelText, getByText} = render(<TempEnrollAssign {...tempProps} />)
+      const {findByLabelText, getByText, debug} = render(<TempEnrollAssign {...tempProps} />)
       const startDate = (await findByLabelText('Begins On *')) as HTMLInputElement
       const startDateContainer = getByText('Start Date for Melvin').closest('fieldset')
       const {findByLabelText: findByLabelTextWithinStartDate} = within(
         startDateContainer as HTMLElement,
       )
-      const startTime = (await findByLabelTextWithinStartDate('Time')) as HTMLInputElement
+      const startTime = (await findByLabelTextWithinStartDate('Time *')) as HTMLInputElement
       expect(startDate.value).toBe(localStartDate.date)
       expect(startTime.value).toBe(localStartDate.time)
     })
@@ -276,7 +268,7 @@ describe('TempEnrollAssign', () => {
       const {findByLabelText: findByLabelTextWithinEndDate} = within(
         endDateContainer as HTMLElement,
       )
-      const endTime = (await findByLabelTextWithinEndDate('Time')) as HTMLInputElement
+      const endTime = (await findByLabelTextWithinEndDate('Time *')) as HTMLInputElement
       expect(endDate.value).toBe(localEndDate.date)
       expect(endTime.value).toBe(localEndDate.time)
     })

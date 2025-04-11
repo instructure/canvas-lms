@@ -1199,6 +1199,9 @@
     "intersection_cd4590e4": {
         "message": "Trasnú"
     },
+    "invalid_description_991e23bb": {
+        "message": "Cur síos neamhbhailí"
+    },
     "invalid_entry_f7d2a0f5": {
         "message": "Iontráil neamhbhailí."
     },
@@ -1808,8 +1811,17 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Tabhair cead do Canvas rochtain a fháil ar do mhicreafón agus ceamara gréasáin."
     },
+    "please_choose_a_file_c2449cc": {
+        "message": "Roghnaigh comhad le do thoil"
+    },
     "please_decribe_what_you_would_like_to_compose_27a51be5": {
         "message": "Déan cur síos le do thoil ar cad ba mhaith leat a chumadh."
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "Cuir isteach ainm comhaid le do thoil"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "Roghnaigh comhad den chineál a dtacaítear leis"
     },
     "plus_d43cd4ec": {
         "message": "Móide"

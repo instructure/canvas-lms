@@ -264,8 +264,8 @@ const Columns: ReadonlyArray<Column> = [
             isForcedOn(r) ? (
               <Menu.Item
                 themeOverride={{
-                  labelColor: colors.textDanger,
-                  activeBackground: colors.backgroundDanger,
+                  labelColor: colors.contrasts.red4570,
+                  activeBackground: colors.contrasts.red4570,
                 }}
                 onClick={() => {
                   alert({
@@ -280,8 +280,8 @@ const Columns: ReadonlyArray<Column> = [
             ) : (
               <Menu.Item
                 themeOverride={{
-                  labelColor: colors.textDanger,
-                  activeBackground: colors.backgroundDanger,
+                  labelColor: colors.contrasts.red4570,
+                  activeBackground: colors.contrasts.red4570,
                 }}
                 onClick={() => deleteApp(r)}
               >

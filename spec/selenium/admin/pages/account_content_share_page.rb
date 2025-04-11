@@ -46,11 +46,11 @@ module AccountContentSharePage
   end
 
   def received_item_actions_menu
-    ff("ul[role='menu'] li")
+    ff("div[role='menu'] span[class*='-menuItem__label']")
   end
 
   def remove_received_item
-    fj("li:contains('Remove')")
+    fj("span[class*='-menuItem__label']:contains('Remove')")
   end
 
   def unread_item_button_icon(item_name)
@@ -66,7 +66,7 @@ module AccountContentSharePage
   end
 
   def preview_received_item
-    fj("li:contains('Preview')")
+    fj("[class$='menuItem__label']:contains('Preview')")
   end
 
   def import_received_item

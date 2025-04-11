@@ -130,36 +130,28 @@ describe Lti::IMS::AssetProcessorController do
       end
     end
 
-    context "when the asset processor does not support the report type" do
-      let(:body_overrides) { super().merge(type: "unsupported") }
-
-      it { expect_no_creation(:unprocessable_entity, /invalid report type/i) }
-    end
-
-    context "when the asset processor has a nil/not present 'report'" do
+    context "when an arbitrary string type is given" do
       let(:body_overrides) { super().merge(type: "anything") }
 
-      before { asset_processor.update!(report: nil) }
-
-      it "allows any type" do
-        expect_successful_creation
-      end
+      it { expect_successful_creation }
     end
 
-    context "when the asset processor has a nil/not present supportedTypes" do
-      let(:body_overrides) { super().merge(type: "anything") }
+    context "when no type is given" do
+      let(:body_overrides) { super().except(:type) }
 
-      before { asset_processor.update!(report: { "supportedTypes" => nil }) }
-
-      it "allows any type" do
-        expect_successful_creation
-      end
+      it { expect_no_creation(:bad_request, "type is missing") }
     end
 
-    context "when the asset processor has an invalid supportedTypes" do
-      before { asset_processor.update!(report: { "supportedTypes" => "bad value" }) }
+    context "when a non-string type is given" do
+      let(:body_overrides) { super().merge(type: { abc: 123 }) }
 
-      it { expect_no_creation(:bad_request, /invalid supportedtypes on asset proc/i) }
+      it { expect_no_creation(:bad_request, "type must be a non-empty string") }
+    end
+
+    context "when an empty string type is given" do
+      let(:body_overrides) { super().merge(type: "") }
+
+      it { expect_no_creation(:bad_request, "type is missing") }
     end
 
     context "when an invalid timestamp is provided" do

@@ -11,12 +11,12 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
       >
         <div
           class="css-1mr0ucn-drawerLayout"
-          data-drawer-layout="DrawerLayout_0"
+          data-drawer-layout="DrawerLayout___0"
         >
           <div
             aria-label="page-content-title"
             class="css-1c66oc-drawerLayout__content"
-            data-drawer-content="DrawerLayout_0"
+            data-drawer-content="DrawerLayout___0"
             id="drawer-layout-content"
             role="region"
             style="margin-left: 0px; margin-right: 0px;"
@@ -30,8 +30,8 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
             </div>
           </div>
           <div
-            class="css-1wbrhzw-drawerTray transition--fade-entered"
-            data-drawer-tray="DrawerLayout_0"
+            class="css-1bzuhml-drawerTray transition--fade-entered"
+            data-drawer-tray="DrawerLayout___0"
             data-testid="drawer-layout-tray"
           >
             <div
@@ -63,14 +63,13 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                         class="css-btw693-closeButton"
                       >
                         <button
-                          class="css-1hj8nz2-view--inlineBlock-baseButton"
+                          class="css-11auhcu-view--inlineBlock-baseButton"
                           cursor="pointer"
                           dir="ltr"
-                          tabindex="0"
                           type="button"
                         >
                           <span
-                            class="css-1leqwnv-baseButton__content"
+                            class="css-19dh8cm-baseButton__content"
                           >
                             <span
                               class="css-qi8ml9-baseButton__childrenLayout"
@@ -103,7 +102,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                                   </svg>
                                 </span>
                                 <span
-                                  class="css-1sr5vj2-screenReaderContent"
+                                  class="css-r9cwls-screenReaderContent"
                                 >
                                   Close
                                 </span>
@@ -165,7 +164,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                 >
                   <iframe
                     allow=""
-                    class="tool_launch"
+                    class="tool_launch tool_launch_top_navigation"
                     data-lti-launch="true"
                     data-testid="ltiIframe"
                     src="https://lti1.example.com/?display=borderless&placement=top_navigation"
@@ -186,12 +185,12 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
     >
       <div
         class="css-1mr0ucn-drawerLayout"
-        data-drawer-layout="DrawerLayout_0"
+        data-drawer-layout="DrawerLayout___0"
       >
         <div
           aria-label="page-content-title"
           class="css-1c66oc-drawerLayout__content"
-          data-drawer-content="DrawerLayout_0"
+          data-drawer-content="DrawerLayout___0"
           id="drawer-layout-content"
           role="region"
           style="margin-left: 0px; margin-right: 0px;"
@@ -205,8 +204,8 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
           </div>
         </div>
         <div
-          class="css-1wbrhzw-drawerTray transition--fade-entered"
-          data-drawer-tray="DrawerLayout_0"
+          class="css-1bzuhml-drawerTray transition--fade-entered"
+          data-drawer-tray="DrawerLayout___0"
           data-testid="drawer-layout-tray"
         >
           <div
@@ -238,14 +237,13 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                       class="css-btw693-closeButton"
                     >
                       <button
-                        class="css-1hj8nz2-view--inlineBlock-baseButton"
+                        class="css-11auhcu-view--inlineBlock-baseButton"
                         cursor="pointer"
                         dir="ltr"
-                        tabindex="0"
                         type="button"
                       >
                         <span
-                          class="css-1leqwnv-baseButton__content"
+                          class="css-19dh8cm-baseButton__content"
                         >
                           <span
                             class="css-qi8ml9-baseButton__childrenLayout"
@@ -278,7 +276,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                                 </svg>
                               </span>
                               <span
-                                class="css-1sr5vj2-screenReaderContent"
+                                class="css-r9cwls-screenReaderContent"
                               >
                                 Close
                               </span>
@@ -340,7 +338,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
               >
                 <iframe
                   allow=""
-                  class="tool_launch"
+                  class="tool_launch tool_launch_top_navigation"
                   data-lti-launch="true"
                   data-testid="ltiIframe"
                   src="https://lti1.example.com/?display=borderless&placement=top_navigation"

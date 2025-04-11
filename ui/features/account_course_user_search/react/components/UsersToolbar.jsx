@@ -35,9 +35,8 @@ const I18n = createI18nScope('account_course_user_search')
 export default function UsersToolbar(props) {
   const [recipientsFilterChecked, setRecipientFilterChecked] = useState(false)
   const [providersFilterChecked, setProvidersFilterChecked] = useState(false)
-  const [includeDeletedUsers, setIncludeDeletedUsers] = useState(false)
 
-  function handleRoleSelect(event, value) {
+  function handleRoleSelect(_event, value) {
     props.onUpdateFilters({role_filter_id: value})
   }
 
@@ -153,7 +152,7 @@ export default function UsersToolbar(props) {
                       size="small"
                       checked={props.include_deleted_users}
                       onChange={e =>
-                        props.onUpdateFilters({include_deleted_users: event.target.checked})
+                        props.onUpdateFilters({include_deleted_users: e.target.checked})
                       }
                       label={I18n.t('Include deleted users in search results')}
                     />

@@ -17,6 +17,7 @@
  */
 import * as z from 'zod'
 import {LtiDeepLinkingRequest, LtiResourceLinkRequest} from './LtiMessageType'
+import {DeveloperKeyId} from './developer_key/DeveloperKeyId'
 
 // TODO: this list is duplicated in ui/features/external_apps/react/components/ExternalToolPlacementList.jsx
 // We should consolidate some of the lti "models" into a shared package that both features depend on
@@ -198,6 +199,11 @@ export const LtiPlacementsWithIcons = [
   LtiPlacements.TopNavigation,
 ] as const
 
+export const LtiPlacementsWithDefaultIcon = [
+  LtiPlacements.EditorButton,
+  LtiPlacements.TopNavigation,
+] as const
+
 /**
  * A record where the keys are message type identifiers
  * and the values are the placements that support that message type.
@@ -290,4 +296,12 @@ export const isLtiPlacement = (placement: unknown): placement is LtiPlacement =>
 
 export const isLtiPlacementWithIcon = (placement: unknown): placement is LtiPlacementWithIcon => {
   return LtiPlacementsWithIcons.includes(placement as LtiPlacementWithIcon)
+}
+
+export type LtiPlacementWithDefaultIcon = (typeof LtiPlacementsWithDefaultIcon)[number]
+
+export const isLtiPlacementWithDefaultIcon = (
+  placement: unknown,
+): placement is LtiPlacementWithDefaultIcon => {
+  return LtiPlacementsWithDefaultIcon.includes(placement as LtiPlacementWithDefaultIcon)
 }

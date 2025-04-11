@@ -23,10 +23,8 @@ import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextArea} from '@instructure/ui-text-area'
 import {useValidateLaunchSettings} from '../hooks/useValidateLaunchSettings'
-import {
-  formatCustomFields,
-  type Lti1p3RegistrationOverlayStore,
-} from '../Lti1p3RegistrationOverlayState'
+import {type Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
+import {formatCustomFields} from '../../registration_overlay/Lti1p3RegistrationOverlayStateHelpers'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'

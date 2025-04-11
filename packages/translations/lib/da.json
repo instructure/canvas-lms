@@ -1199,6 +1199,9 @@
     "intersection_cd4590e4": {
         "message": "Fællesmængde"
     },
+    "invalid_description_991e23bb": {
+        "message": "Ugyldig beskrivelse"
+    },
     "invalid_entry_f7d2a0f5": {
         "message": "Ugyldig indtastning."
     },
@@ -1808,8 +1811,17 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Lad Canvas få adgang til din mikrofon og webcam."
     },
+    "please_choose_a_file_c2449cc": {
+        "message": "Vælg en fil"
+    },
     "please_decribe_what_you_would_like_to_compose_27a51be5": {
         "message": "Beskriv, hvad du gerne vil komponere."
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "Venligst indtast et filnavn"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "Vælg en fil af en understøttet type"
     },
     "plus_d43cd4ec": {
         "message": "Plus"

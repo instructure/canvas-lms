@@ -20,7 +20,8 @@ import {useQuery} from '@tanstack/react-query'
 import {COURSE_PEOPLE_QUERY} from '../../graphql/Queries'
 import {executeQuery} from '@canvas/query/graphql'
 import useCoursePeopleContext from './useCoursePeopleContext'
-import type {User} from '../../types'
+import {User, SortField, SortDirection} from '../../types'
+import {DEFAULT_SORT_FIELD, DEFAULT_SORT_DIRECTION} from '../../util/constants'
 
 export interface CoursePeopleQueryResponse{
   course: {
@@ -34,12 +35,16 @@ export interface QueryProps {
   courseId: string
   searchTerm: string
   optionId: string
+  sortField: SortField
+  sortDirection: SortDirection
 }
 
 const useCoursePeopleQuery = ({
   courseId,
   searchTerm,
-  optionId
+  optionId,
+  sortField = DEFAULT_SORT_FIELD,
+  sortDirection = DEFAULT_SORT_DIRECTION
 }: QueryProps) => {
   const {currentUserId, allRoles} = useCoursePeopleContext()
   const shouldFetch = searchTerm === '' || searchTerm.length >= 2
@@ -49,14 +54,16 @@ const useCoursePeopleQuery = ({
 
   return useQuery({
     // currentUserId added to key so that data is refetched when swithching between Teacher and Student Views
-    queryKey: ['course_people', courseId, currentUserId, searchTermKey, enrollmentRoleIds],
+    queryKey: ['course_people', courseId, currentUserId, searchTermKey, enrollmentRoleIds, sortField, sortDirection],
     queryFn: async () => {
       const response = await executeQuery<CoursePeopleQueryResponse>(
         COURSE_PEOPLE_QUERY,
         {
           courseId,
           searchTerm,
-          enrollmentRoleIds
+          enrollmentRoleIds,
+          sortField,
+          sortDirection
         }
       )
       return response?.course?.usersConnection?.nodes || []

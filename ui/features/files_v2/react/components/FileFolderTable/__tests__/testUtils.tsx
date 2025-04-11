@@ -27,19 +27,24 @@ import {FileManagementProvider} from '../../Contexts'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 export const defaultProps: FileFolderTableProps = {
   size: 'large',
+  rows: [],
+  isLoading: false,
+  contextType: 'course',
   userCanEditFilesForContext: true,
   userCanDeleteFilesForContext: true,
+  userCanRestrictFilesForContext: true,
   usageRightsRequiredForContext: false,
-  currentUrl:
-    '/api/v1/folders/1/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string',
-  folderBreadcrumbs: [],
-  onPaginationLinkChange: jest.fn(),
-  onLoadingStatusChange: jest.fn(),
   onSortChange: jest.fn(),
+  sort: {
+    by: 'name',
+    direction: 'asc'
+  },
   searchString: '',
+  selectedRows: new Set<string>(),
+  setSelectedRows: jest.fn(),
 }
 
-export const renderComponent = (props = {}) => {
+export const renderComponent = (props?: Partial<FileFolderTableProps>) => {
   const queryClient = new QueryClient()
   return render(
     <BrowserRouter>

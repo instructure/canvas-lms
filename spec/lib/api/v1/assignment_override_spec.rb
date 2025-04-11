@@ -411,6 +411,54 @@ describe Api::V1::AssignmentOverride do
       end
     end
 
+    context "differentiaiton tag overrides" do
+      before do
+        @course.account.enable_feature!(:differentiation_tags)
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.account.reload
+
+        @group_category = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
+        @group_category.create_groups(2)
+        @differentiation_tag_group_1 = @group_category.groups.first
+        @differentiation_tag_group_2 = @group_category.groups.second
+      end
+
+      it "correctly includes differentiation tag overrides for an assignment" do
+        @assignment = @course.assignments.create!(title: "Assignment 1")
+        @override = @assignment.assignment_overrides.create!(set_type: "Group", set_id: @differentiation_tag_group_1.id)
+        expected_result = {
+          "id" => @override.id,
+          "assignment_id" => @assignment.id,
+          "group_id" => @differentiation_tag_group_1.id,
+          "group_category_id" => @group_category.id,
+          "non_collaborative" => true,
+          "title" => @differentiation_tag_group_1.name,
+          "unassign_item" => false
+        }
+        test = test_class.new
+        test.current_user = @teacher
+        expect(test.assignment_overrides_json([@override], @teacher).first).to eq expected_result
+      end
+
+      it "removes the 'title' of the override for users without differentiation tag read permissions" do
+        @assignment = @course.assignments.create!(title: "Assignment 1")
+        @override = @assignment.assignment_overrides.create!(set_type: "Group", set_id: @differentiation_tag_group_1.id)
+        expected_result = {
+          "id" => @override.id,
+          "assignment_id" => @assignment.id,
+          "group_id" => @differentiation_tag_group_1.id,
+          "group_category_id" => @group_category.id,
+          "non_collaborative" => true,
+          "unassign_item" => false
+        }
+        test = test_class.new
+        test.current_user = @student
+        expect(test.assignment_overrides_json([@override], @student).first).to eq expected_result
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 

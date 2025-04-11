@@ -100,6 +100,7 @@ describe('CreateEditAssignmentModal', () => {
 
     fireEvent.click(getByPlaceholderText('Choose a date'))
     fireEvent.click(getByText('15'))
+    jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
     fireEvent.click(getByTestId('more-options-button'))
 
@@ -215,14 +216,17 @@ describe('CreateEditAssignmentModal', () => {
       expect(queryByTestId('points-input')).not.toBeInTheDocument()
       fireEvent.click(getByTestId('save-button'))
 
-      expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'not_graded',
-        name: 'Test Assignment',
-        dueAt: '',
-        points: 0,
-        publish: false,
-        syncToSIS: false,
-      }, true)
+      expect(onSaveHandlerMock).toHaveBeenCalledWith(
+        {
+          type: 'not_graded',
+          name: 'Test Assignment',
+          dueAt: '',
+          points: 0,
+          publish: false,
+          syncToSIS: false,
+        },
+        true,
+      )
     })
 
     it('does not populate fields with assignment data in create mode', () => {
@@ -251,14 +255,17 @@ describe('CreateEditAssignmentModal', () => {
       fireEvent.change(getByTestId('points-input'), {target: {value: '100'}})
       fireEvent.click(getByTestId('save-button'))
 
-      expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'none',
-        name: 'Test Assignment',
-        dueAt: '',
-        points: 100,
-        publish: false,
-        syncToSIS: false,
-      }, true)
+      expect(onSaveHandlerMock).toHaveBeenCalledWith(
+        {
+          type: 'none',
+          name: 'Test Assignment',
+          dueAt: '',
+          points: 100,
+          publish: false,
+          syncToSIS: false,
+        },
+        true,
+      )
     })
 
     it('calls onSaveHandler with correct data when save and publish button is clicked', () => {
@@ -268,14 +275,17 @@ describe('CreateEditAssignmentModal', () => {
       fireEvent.change(getByTestId('points-input'), {target: {value: '100'}})
       fireEvent.click(getByTestId('save-and-publish-button'))
 
-      expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'none',
-        name: 'Test Assignment',
-        dueAt: '',
-        points: 100,
-        publish: true,
-        syncToSIS: false,
-      }, true)
+      expect(onSaveHandlerMock).toHaveBeenCalledWith(
+        {
+          type: 'none',
+          name: 'Test Assignment',
+          dueAt: '',
+          points: 100,
+          publish: true,
+          syncToSIS: false,
+        },
+        true,
+      )
     })
 
     it('sets time to 11:59 PM when date is selected (and no time is present)', () => {
@@ -289,17 +299,20 @@ describe('CreateEditAssignmentModal', () => {
       // open the calendar picker (Select January 15th)
       fireEvent.click(getByPlaceholderText('Choose a date'))
       fireEvent.click(getByText('15'))
-
+      jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
       fireEvent.click(getByTestId('save-button'))
 
-      expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'none',
-        name: 'Test Assignment',
-        dueAt: '2024-01-15T23:59:00.000Z',
-        points: 100,
-        publish: false,
-        syncToSIS: false,
-      }, true)
+      expect(onSaveHandlerMock).toHaveBeenCalledWith(
+        {
+          type: 'none',
+          name: 'Test Assignment',
+          dueAt: '2024-01-15T23:59:00.000Z',
+          points: 100,
+          publish: false,
+          syncToSIS: false,
+        },
+        true,
+      )
     })
 
     it('set time to DEFAULT_DUE_TIME if provided by props', () => {
@@ -313,17 +326,21 @@ describe('CreateEditAssignmentModal', () => {
       // open the calendar picker (Select January 15th)
       fireEvent.click(getByPlaceholderText('Choose a date'))
       fireEvent.click(getByText('15'))
+      jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
       fireEvent.click(getByTestId('save-button'))
 
-      expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'none',
-        name: 'Test Assignment',
-        dueAt: '2024-01-15T03:00:00.000Z',
-        points: 100,
-        publish: false,
-        syncToSIS: false,
-      }, true)
+      expect(onSaveHandlerMock).toHaveBeenCalledWith(
+        {
+          type: 'none',
+          name: 'Test Assignment',
+          dueAt: '2024-01-15T03:00:00.000Z',
+          points: 100,
+          publish: false,
+          syncToSIS: false,
+        },
+        true,
+      )
     })
 
     it('allows saving when point input contains decimal values', () => {
@@ -333,14 +350,17 @@ describe('CreateEditAssignmentModal', () => {
       fireEvent.change(getByTestId('points-input'), {target: {value: '35.35'}})
       fireEvent.click(getByTestId('save-button'))
 
-      expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'none',
-        name: 'Test Assignment',
-        dueAt: '',
-        points: 35.35,
-        publish: false,
-        syncToSIS: false,
-      }, true)
+      expect(onSaveHandlerMock).toHaveBeenCalledWith(
+        {
+          type: 'none',
+          name: 'Test Assignment',
+          dueAt: '',
+          points: 35.35,
+          publish: false,
+          syncToSIS: false,
+        },
+        true,
+      )
     })
 
     it('allows users to enter "0" for points input', () => {
@@ -350,18 +370,23 @@ describe('CreateEditAssignmentModal', () => {
       fireEvent.change(getByTestId('points-input'), {target: {value: '0'}})
       fireEvent.click(getByTestId('save-button'))
 
-      expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'none',
-        name: 'Test Assignment',
-        dueAt: '',
-        points: 0,
-        publish: false,
-        syncToSIS: false,
-      }, true)
+      expect(onSaveHandlerMock).toHaveBeenCalledWith(
+        {
+          type: 'none',
+          name: 'Test Assignment',
+          dueAt: '',
+          points: 0,
+          publish: false,
+          syncToSIS: false,
+        },
+        true,
+      )
     })
 
     it('does not display points input field when type is not_graded', () => {
-      const {queryByTestId} = render(<CreateEditAssignmentModal {...defaultProps({assignment: notGradedAssignmentData})} />)
+      const {queryByTestId} = render(
+        <CreateEditAssignmentModal {...defaultProps({assignment: notGradedAssignmentData})} />,
+      )
       expect(queryByTestId('points-input')).not.toBeInTheDocument()
     })
   })
@@ -416,17 +441,21 @@ describe('CreateEditAssignmentModal', () => {
       // open the calendar picker (Select January 15th)
       fireEvent.click(getByPlaceholderText('Choose a date'))
       fireEvent.click(getByText('15'))
+      jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
       fireEvent.click(getByTestId('save-button'))
 
-      expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'none',
-        name: 'Test Assignment',
-        dueAt: '2024-01-15T00:00:00.000Z',
-        points: 100,
-        publish: false,
-        syncToSIS: false,
-      }, false)
+      expect(onSaveHandlerMock).toHaveBeenCalledWith(
+        {
+          type: 'none',
+          name: 'Test Assignment',
+          dueAt: '2024-01-15T00:00:00.000Z',
+          points: 100,
+          publish: false,
+          syncToSIS: false,
+        },
+        false,
+      )
     })
 
     it('Default due time Does not overwrite due date time if time is already present', () => {
@@ -437,14 +466,17 @@ describe('CreateEditAssignmentModal', () => {
 
       fireEvent.click(getByTestId('save-button'))
 
-      expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'none',
-        name: 'Test Assignment',
-        dueAt: '2024-01-14T23:00:00Z',
-        points: 100,
-        publish: false,
-        syncToSIS: false,
-      }, false)
+      expect(onSaveHandlerMock).toHaveBeenCalledWith(
+        {
+          type: 'none',
+          name: 'Test Assignment',
+          dueAt: '2024-01-14T23:00:00Z',
+          points: 100,
+          publish: false,
+          syncToSIS: false,
+        },
+        false,
+      )
     })
 
     it('preserves submission type when editing an assignment', () => {
@@ -455,14 +487,17 @@ describe('CreateEditAssignmentModal', () => {
 
       fireEvent.click(getByTestId('save-button'))
 
-      expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'online_upload',
-        name: 'Test Assignment',
-        dueAt: '2024-01-14T00:00:00Z',
-        points: 100,
-        publish: false,
-        syncToSIS: false,
-      }, false)
+      expect(onSaveHandlerMock).toHaveBeenCalledWith(
+        {
+          type: 'online_upload',
+          name: 'Test Assignment',
+          dueAt: '2024-01-14T00:00:00Z',
+          points: 100,
+          publish: false,
+          syncToSIS: false,
+        },
+        false,
+      )
     })
 
     describe('Due Date Validation', () => {
@@ -485,6 +520,7 @@ describe('CreateEditAssignmentModal', () => {
         const datePicker = getByPlaceholderText('Choose a date')
         fireEvent.click(datePicker)
         fireEvent.click(getByText('21'))
+        jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
         // Try to save
         fireEvent.click(getByTestId('save-button'))
@@ -502,6 +538,7 @@ describe('CreateEditAssignmentModal', () => {
         const datePicker = getByPlaceholderText('Choose a date')
         fireEvent.click(datePicker)
         fireEvent.click(getByText('11'))
+        jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
         // Try to save
         fireEvent.click(getByTestId('save-button'))
@@ -521,6 +558,7 @@ describe('CreateEditAssignmentModal', () => {
         const datePicker = getByPlaceholderText('Choose a date')
         fireEvent.click(datePicker)
         fireEvent.click(getByText('21'))
+        jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
         // Try to save
         fireEvent.click(getByTestId('save-button'))
@@ -540,6 +578,7 @@ describe('CreateEditAssignmentModal', () => {
         const datePicker = getByPlaceholderText('Choose a date')
         fireEvent.click(datePicker)
         fireEvent.click(getByText('11'))
+        jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
         // Try to save
         fireEvent.click(getByTestId('save-button'))

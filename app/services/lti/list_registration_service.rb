@@ -20,16 +20,12 @@
 module Lti
   class ListRegistrationService < ApplicationService
     PRELOAD_MODELS = [
-      { lti_registration_account_bindings: [:created_by, :updated_by] },
       :ims_registration,
       :manual_configuration,
       :developer_key,
       :created_by, # registration's created_by
       :updated_by  # registration's updated_by
     ].freeze
-
-    # eager loaded instead of preloaded for use in where queries
-    EAGER_LOAD_MODELS = [:lti_registration_account_bindings].freeze
 
     attr_reader :account, :search_terms, :sort_field, :sort_direction, :preload_overlays
 
@@ -97,6 +93,7 @@ module Lti
     # since they will apply to this account (and all accounts)
     def forced_on_in_site_admin
       base_query
+        .joins(:lti_registration_account_bindings)
         .shard(Shard.default)
         .where(account: Account.site_admin)
         .where(lti_registration_account_bindings: { workflow_state: "on", account_id: Account.site_admin.id })
@@ -111,6 +108,7 @@ module Lti
 
       consortium_parent = account.root_account.consortium_parent_account
       base_query
+        .joins(:lti_registration_account_bindings)
         .shard(consortium_parent.shard)
         .where(account: consortium_parent)
         .where(lti_registration_account_bindings: { workflow_state: "on", account: consortium_parent })
@@ -137,7 +135,7 @@ module Lti
     end
 
     def base_query
-      Lti::Registration.active.preload(PRELOAD_MODELS).eager_load(EAGER_LOAD_MODELS)
+      Lti::Registration.active.preload(PRELOAD_MODELS)
     end
 
     def filter_registrations_by_search_query(registrations)

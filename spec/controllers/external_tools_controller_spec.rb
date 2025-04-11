@@ -1324,18 +1324,18 @@ describe ExternalToolsController do
       end
     end
 
-    it "passes prefer_1_1=false to find_external_tool by default when looking up by URL" do
+    it "passes prefer_1_1=false to tool finder by default when looking up by URL" do
       user_session(@teacher)
-      expect(ContextExternalTool).to receive(:find_external_tool).with(
-        anything, anything, anything, anything, anything, prefer_1_1: false
+      expect(Lti::ToolFinder).to receive(:from_url).with(
+        anything, anything, hash_including(prefer_1_1: false)
       )
       get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti" }
     end
 
-    it "passes prefer_1_1=false to find_external_tool only when the prefer_1_1 param is set" do
+    it "passes prefer_1_1=true to tool finder only when the prefer_1_1 param is set" do
       user_session(@teacher)
-      expect(ContextExternalTool).to receive(:find_external_tool).with(
-        anything, anything, anything, anything, anything, prefer_1_1: true
+      expect(Lti::ToolFinder).to receive(:from_url).with(
+        anything, anything, hash_including(prefer_1_1: true)
       )
       get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti", prefer_1_1: true }
     end

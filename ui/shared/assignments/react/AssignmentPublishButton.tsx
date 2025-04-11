@@ -133,7 +133,7 @@ const AssignmentPublishButton = ({
     borderStyle: 'none',
   }
   if (assignmentPublished) {
-    buttonThemeOverride = {...buttonThemeOverride, primaryInverseColor: '#0B874B'}
+    buttonThemeOverride = {...buttonThemeOverride, primaryInverseColor: '#03893D'}
   }
   return (
     <Menu
@@ -167,7 +167,7 @@ const AssignmentPublishButton = ({
         onClick={() => handlePublish(true)}
         value="Publish"
         themeOverride={{
-          labelColor: '#0B874B',
+          labelColor: '#03893D',
         }}
         data-testid="publish-option"
       >

@@ -38,6 +38,8 @@ import {EnvPortfolio} from './EnvPortfolio'
 import {EnvReleaseNotes} from './EnvReleaseNotes'
 import {EnvUserMerge} from './EnvUserMerge'
 import {EnvLtiRegistrations} from './EnvLtiRegistrations'
+import {EnvSmartSearch} from './EnvSmartSearch'
+import {EnvHorizon} from './EnvHorizon'
 
 /**
  * Top level ENV variable.
@@ -74,5 +76,7 @@ export type GlobalEnv =
         EnvReleaseNotes &
         EnvPortfolio &
         EnvUserMerge &
-        EnvLtiRegistrations
+        EnvLtiRegistrations &
+        EnvSmartSearch &
+        EnvHorizon
     >

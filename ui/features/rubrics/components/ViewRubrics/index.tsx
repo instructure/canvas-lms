@@ -376,7 +376,7 @@ export const ViewRubrics = ({
       </Tabs>
 
       {canImportExportRubrics && (
-        <div id="enhanced-rubric-builder-footer" style={{backgroundColor: colors.white}}>
+        <div id="enhanced-rubric-builder-footer" style={{backgroundColor: colors.contrasts.white1010}}>
           <View
             as="div"
             margin="small large"

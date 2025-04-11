@@ -87,6 +87,9 @@
     <% if @account.root_account.feature_enabled?(:javascript_csp) && can_do(@context, @current_user, :manage_account_settings) && !@account.site_admin? %>
       <li><a href="#tab-security" id="tab-security-link"><%= t("Security") %></a></li>
     <% end %>
+    <% if @account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
+      <li id="canvas_career_tab"><a href="#tab-canvas-career" id="tab-canvas-career-link"><%= t('Canvas Career') %></a></li>
+    <% end %>
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
     <div id="tab-settings">
@@ -944,6 +947,7 @@ acknowledge that you have read and agreed to the
               </div>
             </div>
           </fieldset>
+          <div id="service_mount"></div>
         <% end %>
 
         <% if @account.root_account.feature_enabled?(:course_templates) %>
@@ -1185,14 +1189,14 @@ acknowledge that you have read and agreed to the
           </div>
         <% end %>
         <div class="ic-Form-control">
-          <div class="ic-Label" id="aria-announcements-send-to-group">
+          <div class="ic-Label">
             <%= t "Show to" %>
             <%= roles_message(@account) %>
           </div>
           <div class="grid-row">
             <div class="col-xs-12 col-lg-4">
-              <i><%= t "Course roles" %></i>
-              <div class="ic-Checkbox-group" role="group" aria-labelledby="aria-announcements-send-to-group">
+              <i id="course-roles-label"><%= t "Course roles" %></i>
+              <div class="ic-Checkbox-group" role="radiogroup" aria-labelledby="course-roles-label">
                 <% @course_roles.each do |r| %>
                   <div class="ic-Form-control ic-Form-control--checkbox">
                     <%= check_box_tag "account_notification_roles[]", r[:id], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx" } %>
@@ -1218,8 +1222,8 @@ acknowledge that you have read and agreed to the
               </div>
             </div>
             <div class="col-xs-12 col-lg-4">
-              <i><%= t "Account roles" %></i>
-              <div class="ic-Checkbox-group" role="group" aria-labelledby="aria-announcements-send-to-group">
+              <i id="account-roles-label"><%= t "Account roles" %></i>
+              <div class="ic-Checkbox-group" role="radiogroup" aria-labelledby="account-roles-label">
                 <% @account_roles.each do |r| %>
                   <div class="ic-Form-control ic-Form-control--checkbox">
                     <%= check_box_tag "account_notification_roles[]", r[:id], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx" } %>
@@ -1431,6 +1435,11 @@ acknowledge that you have read and agreed to the
   <% end %>
   <% if @account.site_admin? && can_do(@context, @current_user, :manage_internal_settings) %>
     <div id="tab-internal-settings"></div>
+  <% end %>
+  <% if @account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
+    <div id="tab-canvas-career">
+      <% js_bundle :horizon_toggle %>
+    </div>
   <% end %>
 </div>
 <div id="rqd_mount"></div>

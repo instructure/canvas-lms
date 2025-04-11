@@ -90,29 +90,11 @@ describe('course_paces reducer', () => {
       expect(isNewPace({coursePace: {id: '1'}})).toBe(false)
     })
 
-    it('is not new if it is a student pace', () => {
-      // because we don't have student paces in the db yet
-      // the api always returns an unsaved pace with no id
-      // but we need it for the start_date to show the user's
-      // assignment due dates in their pace
+    it('is new if it is a student pace', () => {
       expect(
         // @ts-expect-error
         isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}}),
-      ).toBe(false)
-    })
-
-    describe('with course paces for students', () => {
-      beforeAll(() => {
-        window.ENV.FEATURES ||= {}
-        window.ENV.FEATURES.course_paces_for_students = true
-      })
-
-      it('is new if it is a student pace', () => {
-        expect(
-          // @ts-expect-error
-          isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}}),
-        ).toBe(true)
-      })
+      ).toBe(true)
     })
   })
 

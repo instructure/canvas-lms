@@ -23,6 +23,8 @@ module Types
     graphql_name "DiscussionParticipant"
 
     global_id_field :id
+    field :summary_enabled, Boolean, null: true
+
     field :expanded, Boolean, null: true
     def expanded
       object.discussion_topic.expanded_for_user(current_user)

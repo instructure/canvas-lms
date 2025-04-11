@@ -34,10 +34,10 @@ export default function buildStyle() {
       break
     case 'canvas-a11y':
     case 'modern-a11y':
-      themeCourseColor = variables.colors.licorice
+      themeCourseColor = variables.colors.contrasts.grey125125
       break
     default:
-      themeCourseColor = variables.colors.brand
+      themeCourseColor = variables.colors.contrasts.blue4570
   }
 
   const classNames = {

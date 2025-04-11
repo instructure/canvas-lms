@@ -117,7 +117,7 @@ describe "course settings/blueprint" do
       get "/courses/#{@course.id}/settings"
 
       expect(f(".bcs_radio_input-group")).to be_displayed
-      ff(".bcs_radio_input-group")[1].click
+      ff('[class$="radioInput__control"')[1].click
 
       fj(".bcs__object-tab:contains('Assignments') .bcs_tab_indicator-icon button").click
       fj(".bcs__object-tab:contains('Assignments') .bcs_check_box-group label:contains('Content')").click

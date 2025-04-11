@@ -49,6 +49,8 @@ class TokensController < ApplicationController
   # @argument token[purpose] [Required, String] The purpose of the token.
   # @argument token[expires_at] [DateTime] The time at which the token will expire.
   # @argument token[scopes][] [Array] The scopes to associate with the token.
+  #   Ignored if the default developer key does not have the "enable scopes" option enabled.
+  #   In such cases, the token will inherit the user's permissions instead.
   #
   def create
     token_params = access_token_params

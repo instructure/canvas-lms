@@ -155,11 +155,11 @@ describe('Outcome Tests', () => {
         },
       }
       ratings = [
-        {description: 'Exceeds Mastery', points: 4.0, mastery: false, color: '127A1B'},
-        {description: 'Mastery', points: 3.0, mastery: true, color: '0B874B'},
+        {description: 'Exceeds Mastery', points: 4.0, mastery: false, color: '02672D'},
+        {description: 'Mastery', points: 3.0, mastery: true, color: '03893D'},
         {description: 'Near Mastery', points: 2.0, mastery: false, color: 'FAB901'},
         {description: 'Below Mastery', points: 1.0, mastery: false, color: 'FD5D10'},
-        {description: 'Well Below Mastery', points: 0.0, mastery: false, color: 'E0061F'},
+        {description: 'Well Below Mastery', points: 0.0, mastery: false, color: 'E62429'},
       ]
       fakeENV.setup()
       ENV.PERMISSIONS = {manage_outcomes: true}

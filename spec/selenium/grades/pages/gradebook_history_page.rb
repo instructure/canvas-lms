@@ -195,7 +195,7 @@ class GradeBookHistory
     end
 
     def error_text_invalid_dates
-      fxpath("(//span[contains(text(), 'date must be before')])[2]")
+      fxpath("(//span[contains(text(), 'date must be before')])[1]")
     end
 
     def filter_button

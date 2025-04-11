@@ -106,7 +106,10 @@ describe('ContentMigrationForm', () => {
     fetchMock.mock('/api/v1/courses/0/content_migrations', postResponseMock, {
       overwriteRoutes: true,
     })
-    fetchMock.mock(/users\/1\/manageable_courses\?term=(.*)/, [{id: '3', label: 'MyCourse'}])
+    fetchMock.mock(
+      /users\/1\/manageable_courses\?(.*&)?term=.*(&.*)?current_course_id=.*|current_course_id=.*(&.*)?term=.*/,
+      [{ id: '3', label: 'MyCourse' }]
+    )
   })
 
   afterEach(() => {

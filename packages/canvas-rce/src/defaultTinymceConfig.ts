@@ -88,7 +88,6 @@ const defaultTinymceConfig = {
   language_url: 'none',
 
   toolbar_mode: 'floating',
-  toolbar_ticky: true,
 
   mobile: {theme: 'silver'},
   preview_styles:

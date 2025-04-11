@@ -33,7 +33,7 @@ class Login::OpenidConnectController < Login::OAuth2Controller
       increment_statsd(:failure, reason: :invalid_signature)
       return render plain: "Invalid signature: #{signature_error}", status: :bad_request
     end
-    unless Pseudonym.expire_oidc_session(logout_token)
+    unless Pseudonym.expire_oidc_session(logout_token, request)
       increment_statsd(:failure, reason: :no_session)
       return render plain: "No session found", status: :not_found
     end

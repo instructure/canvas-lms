@@ -23,7 +23,7 @@ export default {
   title: 'Examples/Outcomes/ProficiencyRating',
   component: ProficiencyRating,
   args: {
-    color: '127A1B',
+    color: '02672D',
     description: 'Exceeds Mastery',
     descriptionError: undefined,
     disableDelete: false,

@@ -54,7 +54,7 @@ function ColorPreview({color = '#FFF'}) {
       style={{
         display: 'block',
         backgroundColor: color,
-        border: '1px solid #73818C',
+        border: '1px solid #6A7883',
         borderRadius: '3px',
         height: `${PREVIEW_SIZE}px`,
         width: `${PREVIEW_SIZE}px`,

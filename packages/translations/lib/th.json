@@ -1199,6 +1199,9 @@
     "intersection_cd4590e4": {
         "message": "ตัดกัน"
     },
+    "invalid_description_991e23bb": {
+        "message": "รายละเอียดไม่ถูกต้อง"
+    },
     "invalid_entry_f7d2a0f5": {
         "message": "รายการไม่ถูกต้อง"
     },
@@ -1808,8 +1811,17 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "กรุณาให้อนุญาต Canvas ในการใช้งานไมโครโฟนและเว็บแคมของคุณ"
     },
+    "please_choose_a_file_c2449cc": {
+        "message": "กรุณาเลือกไฟล์"
+    },
     "please_decribe_what_you_would_like_to_compose_27a51be5": {
         "message": "กรุณาระบุรายละเอียดสิ่งที่คุณต้องการเขียน"
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "กรุณากรอกชื่อไฟล์"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "กรุณาเลือกประเภทไฟล์ที่รองรับ"
     },
     "plus_d43cd4ec": {
         "message": "บวก"

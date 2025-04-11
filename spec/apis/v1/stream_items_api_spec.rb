@@ -193,6 +193,86 @@ describe UsersController, type: :request do
     end
   end
 
+  it "returns correct data for notification_category filter" do
+    @student = user_factory(active_all: true)
+    announcement_model
+    assignment_model(course: @course)
+    message_model(user: @user, to: "dashboard", notification: Notification.create(notification_valid_attributes.merge(category: "Due Date")))
+    message_model(user: @user, to: "dashboard", notification: Notification.create(notification_valid_attributes.merge(category: "Due Date")))
+    message_model(user: @user, to: "dashboard", notification: Notification.create(notification_valid_attributes.merge(category: "Message")))
+    message_model(user: @user, to: "dashboard", notification: Notification.create(notification_valid_attributes.merge(category: "Test")))
+    json = api_call(:get,
+                    "/api/v1/users/self/activity_stream?notification_categories[]=Due Date",
+                    { controller: "users", action: "activity_stream", format: "json", notification_categories: ["Due Date"] })
+
+    expect(json.count).to eq(2)
+
+    json = api_call(:get,
+                    "/api/v1/users/self/activity_stream?notification_categories[]=Test",
+                    { controller: "users", action: "activity_stream", format: "json", notification_categories: ["Test"] })
+
+    expect(json.count).to eq(1)
+
+    json = api_call(:get,
+                    "/api/v1/users/self/activity_stream?notification_categories[]=Test&notification_categories[]=null",
+                    { controller: "users", action: "activity_stream", format: "json", notification_categories: ["Test", "null"] })
+
+    expect(json.count).to eq(2)
+  end
+
+  it "handles empty filter results" do
+    @student = user_factory(active_all: true)
+    announcement_model
+    assignment_model(course: @course)
+    message_model(user: @user, to: "dashboard", notification: Notification.create(notification_valid_attributes.merge(category: "Due Date")))
+
+    json = api_call(:get,
+                    "/api/v1/users/self/activity_stream?notification_categories[]=Message",
+                    { controller: "users", action: "activity_stream", format: "json", notification_categories: ["Message"] })
+
+    expect(json.count).to eq(0)
+
+    json = api_call(:get,
+                    "/api/v1/users/self/activity_stream?notification_categories[]=null&notification_categories[]=Message",
+                    { controller: "users", action: "activity_stream", format: "json", notification_categories: ["null", "Message"] })
+
+    expect(json.count).to eq(1)
+  end
+
+  it "returns correct data for asset_type array" do
+    @student = user_factory(active_all: true)
+    @teacher = User.create!(name: "teacher")
+    announcement_model
+    message_model(user: @user, to: "dashboard", notification: Notification.create(notification_valid_attributes.merge(category: "Due Date")))
+    @conversation = Conversation.initiate([@student, @user], false)
+    @message = @conversation.add_message(@student, "hello")
+    @assignment = @course.assignments.create!(title: "assignment 1", description: "test", points_possible: "14.2", submission_types: "online_text_entry")
+    @course.enroll_teacher(@teacher)
+    @course.enroll_student(@user)
+    @sub = @assignment.grade_student(@user, { grade: "12", grader: @teacher }).first
+    @sub.workflow_state = "submitted"
+    @sub.submission_comments.create!(comment: "c1", author: @teacher)
+    @sub.submission_comments.create!(comment: "c2", author: @user)
+    @sub.save!
+    json = api_call(:get,
+                    "/api/v1/users/self/activity_stream?asset_type[]=Submission&asset_type[]=Conversation",
+                    { controller: "users", action: "activity_stream", format: "json", asset_type: ["Submission", "Conversation"] })
+
+    expect(json.count).to eq(2)
+
+    json = api_call(:get,
+                    "/api/v1/users/self/activity_stream?asset_type[]=DiscussionTopic",
+                    { controller: "users", action: "activity_stream", format: "json", asset_type: ["DiscussionTopic"] })
+
+    expect(json.count).to eq(1)
+
+    json = api_call(:get,
+                    "/api/v1/users/self/activity_stream?asset_type=DiscussionTopic",
+                    { controller: "users", action: "activity_stream", format: "json", asset_type: "DiscussionTopic" })
+
+    expect(json.count).to eq(1)
+  end
+
   it "formats DiscussionTopic" do
     @context = @course
     discussion_topic_model

@@ -126,10 +126,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
   }
 
   renderManageBlackoutDates = () => {
-    if (
-      !window.ENV.FEATURES.course_paces_redesign ||
-      this.props.coursePace.context_type === 'Course'
-    ) {
+    if (this.props.coursePace.context_type === 'Course') {
       return (
         <MenuItem
           type="button"
@@ -145,23 +142,9 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
     }
   }
 
-  menuPlacement = () => {
-    if (window.ENV.FEATURES.course_paces_redesign) {
-      return 'bottom end'
-    } else {
-      return 'bottom start'
-    }
-  }
-
   /* Renderers */
 
   render() {
-    if (
-      this.props.coursePace.context_type === 'Enrollment' &&
-      !window.ENV.FEATURES.course_paces_for_students
-    ) {
-      return null
-    }
     return (
       <div style={{display: 'inline-block'}}>
         <Tooltip
@@ -180,7 +163,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
             isSyncing={this.props.isSyncing}
             responsiveSize={this.props.responsiveSize}
             margin={this.props.margin}
-            menuPlacement={this.menuPlacement}
+            menuPlacement={() => 'bottom end'}
             coursePace={this.props.coursePace}
             showSettingsPopover={this.state.showSettingsPopover}
             showBlackoutDatesModal={this.showBlackoutDatesModal}

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {renderConnected} from '../../../__tests__/utils'
 import {
@@ -57,68 +56,10 @@ describe('Course paces header', () => {
     jest.resetAllMocks()
   })
 
-  it('renders', () => {
-    const {getByRole, getByText} = renderConnected(<Header {...defaultProps} />)
-    expect(getByRole('button', {name: 'Course Pacing'})).toBeInTheDocument()
-    expect(getByRole('button', {name: 'Modify Settings'})).toBeInTheDocument()
-    expect(getByText('All changes published')).toBeInTheDocument()
-  })
-
   describe('new paces alert', () => {
-    it('renders an alert for new course paces', () => {
-      const {getByText} = renderConnected(<Header {...defaultProps} newPace={true} />)
-      expect(
-        getByText(
-          'This is a new course pace and all changes are unpublished. Publish to save any changes and create the pace.',
-        ),
-      ).toBeInTheDocument()
-    })
-
-    it('renders an alert for new section paces', () => {
-      const {getByText} = renderConnected(
-        <Header {...defaultProps} context_type="Section" newPace={true} />,
-      )
-      expect(
-        getByText(
-          'This is a new section pace and all changes are unpublished. Publish to save any changes and create the pace.',
-        ),
-      ).toBeInTheDocument()
-    })
-
-    it('renders an alert for new student paces', () => {
-      const {getByText} = renderConnected(
-        <Header {...defaultProps} context_type="Enrollment" newPace={true} />,
-      )
-      expect(
-        getByText(
-          'This is a new student pace and all changes are unpublished. Publish to save any changes and create the pace.',
-        ),
-      ).toBeInTheDocument()
-    })
-
     it('does not render publishing changes for student paces', () => {
       const {queryByText} = renderConnected(<Header {...defaultProps} context_type="Enrollment" />)
-      expect(queryByText('All changes published')).not.toBeInTheDocument()
-    })
-  })
-
-  it('renders the unpublished changes message for a new pace', () => {
-    const {getByText} = renderConnected(<Header {...defaultProps} newPace={true} />)
-    expect(getByText('Pace is new and unpublished')).toBeInTheDocument()
-  })
-
-  describe('with course paces for students', () => {
-    beforeEach(() => {
-      fakeENV.setup({
-        FEATURES: {
-          course_paces_for_students: true,
-        },
-      })
-    })
-
-    it('does render publishing changes for student paces', () => {
-      const {queryByText} = renderConnected(<Header {...defaultProps} context_type="Enrollment" />)
-      expect(queryByText('All changes published')).toBeInTheDocument()
+      expect(queryByText('No pending changes')).not.toBeInTheDocument()
     })
   })
 
@@ -127,10 +68,7 @@ describe('Course paces header', () => {
 
     beforeEach(() => {
       fakeENV.setup({
-        COURSE_ID: '30',
-        FEATURES: {
-          course_paces_redesign: true,
-        },
+        COURSE_ID: '30'
       })
 
       // Setup the fetch mock with proper headers

@@ -1105,7 +1105,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [true]
-          expect(ratings.pluck(:color)).to eq %w[0B874B]
+          expect(ratings.pluck(:color)).to eq %w[03893D]
         end
 
         it "2 ratings" do
@@ -1113,7 +1113,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [true, false]
-          expect(ratings.pluck(:color)).to eq %w[0B874B 555555]
+          expect(ratings.pluck(:color)).to eq %w[03893D 555555]
         end
 
         it "3 ratings" do
@@ -1121,7 +1121,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [true, false, false]
-          expect(ratings.pluck(:color)).to eq %w[0B874B FAB901 555555]
+          expect(ratings.pluck(:color)).to eq %w[03893D FAB901 555555]
         end
 
         it "4 ratings" do
@@ -1129,7 +1129,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [true, false, false, false]
-          expect(ratings.pluck(:color)).to eq %w[0B874B FAB901 E0061F 555555]
+          expect(ratings.pluck(:color)).to eq %w[03893D FAB901 E62429 555555]
         end
 
         it "5 ratings" do
@@ -1137,7 +1137,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [false, true, false, false, false]
-          expect(ratings.pluck(:color)).to eq %w[0374B5 0B874B FAB901 E0061F 555555]
+          expect(ratings.pluck(:color)).to eq %w[2B7ABC 03893D FAB901 E62429 555555]
         end
 
         it "6 ratings" do
@@ -1145,7 +1145,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [false, true, false, false, false, false]
-          expect(ratings.pluck(:color)).to eq %w[0374B5 0B874B FAB901 D97900 E0061F 555555]
+          expect(ratings.pluck(:color)).to eq %w[2B7ABC 03893D FAB901 D97900 E62429 555555]
         end
 
         context "mastery points do not exactly match ratings" do
@@ -1155,7 +1155,7 @@ describe LearningOutcome do
             @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
             ratings = @outcome.rubric_criterion[:ratings]
             expect(ratings.pluck(:mastery)).to eq [true, false, false]
-            expect(ratings.pluck(:color)).to eq %w[0B874B FAB901 555555]
+            expect(ratings.pluck(:color)).to eq %w[03893D FAB901 555555]
           end
 
           it "5 ratings" do
@@ -1164,7 +1164,7 @@ describe LearningOutcome do
             @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
             ratings = @outcome.rubric_criterion[:ratings]
             expect(ratings.pluck(:mastery)).to eq [false, true, false, false, false]
-            expect(ratings.pluck(:color)).to eq %w[0374B5 0B874B FAB901 E0061F 555555]
+            expect(ratings.pluck(:color)).to eq %w[2B7ABC 03893D FAB901 E62429 555555]
           end
         end
 

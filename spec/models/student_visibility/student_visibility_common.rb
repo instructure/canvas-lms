@@ -27,6 +27,15 @@ module StudentVisibilityCommon
     end
   end
 
+  def ids_visible_to_user_without_course_ids(user, learning_object_type)
+    case learning_object_type
+    when "discussion_topic"
+      UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(course_ids: nil, user_ids: user.id).map(&:discussion_topic_id)
+    when "wiki_page"
+      WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(course_ids: nil, user_ids: user.id).map(&:wiki_page_id)
+    end
+  end
+
   shared_examples_for "student visibility models" do
     context "table" do
       it "returns objects" do
@@ -50,7 +59,7 @@ module StudentVisibilityCommon
     end
   end
 
-  shared_examples_for "learning object visiblities" do
+  shared_examples_for "learning object visibilities" do
     it "includes all objects by default" do
       expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
     end
@@ -93,6 +102,14 @@ module StudentVisibilityCommon
           expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object2.id)
           expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
           expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object2.id)
+        end
+
+        it "does include object with non collaborative group if course_ids is not present" do
+          @differentiation_tag_group_1.add_user(@student1)
+          learning_object1.assignment_overrides.create!(set: @differentiation_tag_group_1)
+          expect(ids_visible_to_user_without_course_ids(@student1, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user_without_course_ids(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user_without_course_ids(@student3, learning_object_type)).to contain_exactly(learning_object2.id)
         end
 
         it "does include object with a non collaborative group if account setting is disabled" do
@@ -145,7 +162,7 @@ module StudentVisibilityCommon
     end
   end
 
-  shared_examples_for "learning object visiblities with modules" do
+  shared_examples_for "learning object visibilities with modules" do
     context "with module overrides" do
       before :once do
         learning_object1.update!(only_visible_to_overrides: false)

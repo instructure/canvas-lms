@@ -24,7 +24,6 @@ describe CoursePace do
   before :once do
     course_with_student active_all: true
     @course.update start_at: "2021-06-30", restrict_enrollments_to_course_dates: true, time_zone: "UTC"
-    @course.root_account.enable_feature!(:course_paces)
     @course.enable_course_paces = true
     @course.save!
     @module = @course.context_modules.create!
@@ -456,11 +455,13 @@ describe CoursePace do
     end
 
     it "compresses to hard end dates" do
-      @course_pace.course_pace_module_items.update(duration: 900)
+      @course_pace.update!(end_date: Date.new(2021, 9, 30))
+      @course_pace.course_pace_module_items.update_all(duration: 900)
       expect(AssignmentOverride.count).to eq(0)
       expect(@course_pace.publish).to be(true)
       expect(AssignmentOverride.count).to eq(2)
-      expect(AssignmentOverride.last.due_at).to eq(fancy_midnight_rounded_to_last_second(@course_pace.end_date.to_s))
+      expected_due_date = fancy_midnight_rounded_to_last_second("2021-09-30")
+      expect(AssignmentOverride.last.due_at.to_i).to eq(expected_due_date.to_i)
       expect(@course_pace.course_pace_module_items.reload.pluck(:duration)).to eq([900, 900])
     end
 
@@ -632,7 +633,6 @@ describe CoursePace do
   context "course pace creates" do
     before :once do
       course_with_student active_all: true
-      @course.root_account.enable_feature!(:course_paces)
       @course.enable_course_paces = true
       @course.save!
       @module = @course.context_modules.create!
@@ -662,9 +662,7 @@ describe CoursePace do
 
   context "course pace deletes" do
     before :once do
-      Account.site_admin.enable_feature!(:course_paces_redesign)
       course_with_student active_all: true
-      @course.root_account.enable_feature!(:course_paces)
       @course.enable_course_paces = true
       @course.save!
       @module = @course.context_modules.create!
@@ -700,7 +698,6 @@ describe CoursePace do
   context "course pace publish logs statsd for various values" do
     before :once do
       course_with_student active_all: true
-      @course.root_account.enable_feature!(:course_paces)
       @course.enable_course_paces = true
       @course.save!
       @module = @course.context_modules.create!
@@ -880,7 +877,6 @@ describe CoursePace do
     before do
       Account.site_admin.enable_feature! :account_level_blackout_dates
       course_with_student active_all: true
-      @course.root_account.enable_feature!(:course_paces)
       @course.enable_course_paces = true
       @course.save!
       @module = @course.context_modules.create!
@@ -952,7 +948,6 @@ describe CoursePace do
     it "creates a course in a subaccount with its own calendar events and counts all the account calendar events" do
       allow(InstStatsd::Statsd).to receive(:count)
       @subaccount1 = Account.find(@course.root_account.id).sub_accounts.create!
-      @subaccount1.enable_feature!(:course_paces)
       @course1 = course_factory(account: @subaccount1, active_all: true)
       @course1.enable_course_paces = true
       @course1.save!

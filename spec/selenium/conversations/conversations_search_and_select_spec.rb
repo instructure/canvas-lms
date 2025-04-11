@@ -91,7 +91,7 @@ describe "conversations index page" do
         convos[0].click
         driver.action.key_down(:shift).move_to(convos[2]).click.key_up(:shift).perform
         f("button[data-testid='settings']").click
-        fj("li:contains('Star')").click
+        fj("span[class*='-menuItem__label']:contains('Star')").click
         wait_for_ajaximations
         f("input[title='Inbox']").click
         fj("li:contains('Starred')").click
@@ -105,7 +105,7 @@ describe "conversations index page" do
         convos[0].click
         driver.action.key_down(:shift).move_to(convos[2]).click.key_up(:shift).perform
         f("button[data-testid='settings']").click
-        fj("li:contains('Mark all as unread')").click
+        fj("span[class*='-menuItem__label']:contains('Mark all as unread')").click
         wait_for_ajaximations
         f("input[title='Inbox']").click
         fj("li:contains('Unread')").click

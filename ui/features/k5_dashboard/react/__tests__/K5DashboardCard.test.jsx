@@ -157,7 +157,7 @@ describe('K-5 Dashboard Card', () => {
   it('defaults color if no course color or image are provided', () => {
     const {getByTestId} = render(<K5DashboardCard {...defaultProps} />)
     expect(getByTestId('k5-dashboard-card-hero').style.getPropertyValue('background-color')).toBe(
-      'rgb(57, 75, 88)',
+      'rgb(51, 68, 81)',
     )
   })
 })

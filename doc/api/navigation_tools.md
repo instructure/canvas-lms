@@ -153,6 +153,9 @@ All of these settings are contained under "course_navigation"
     <li>full_width_in_context
       <p>Includes Canvas global_navigation, breadcrumb, and course navigation, and gives the tool access to the rest of the horizontal screen width.</p>
     </li>
+    <li>full_width_with_nav
+      <p>Includes Canvas global_navigation, breadcrumb, and course navigation, and gives the tool access to the rest of the horizontal screen width.</p>
+    </li>
     <li>in_nav_context
       <p>Includes Canvas global_navigation, breadcrumbs, and course navigation.</p>
     </li>
@@ -227,6 +230,9 @@ All of these settings are contained under "account_navigation"
       <p>Includes Canvas global navigation but does not include breadcrumb or account navigation. This is the default and recommended display type for global navigation.</p>
     </li>
     <li>full_width_in_context
+      <p>Includes Canvas global navigation, breadcrumb, and account navigation, and gives the tool access to the rest of the horizontal screen width.</p>
+    </li>
+    <li>full_width_with_nav
       <p>Includes Canvas global navigation, breadcrumb, and account navigation, and gives the tool access to the rest of the horizontal screen width.</p>
     </li>
     <li>in_nav_context

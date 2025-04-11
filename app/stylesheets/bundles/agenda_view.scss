@@ -367,12 +367,12 @@ span.agendaView--no-assignments {
 @if $use_high_contrast {
   #edit_assignment_form, #edit_appointment_form, #edit_planner_note_form_holder {
     input[type="text"], input[type="number"], select, textarea, button, a.Button{
-      border: 0.0625rem solid #556572;
+      border: 0.0625rem solid #4A5B68;
     }
     .ui-datepicker-trigger{
-      border-bottom: 0.0625rem solid #556572;
-      border-right: 0.0625rem solid #556572;
-      border-top: 0.0625rem solid #556572;
+      border-bottom: 0.0625rem solid #4A5B68;
+      border-right: 0.0625rem solid #4A5B68;
+      border-top: 0.0625rem solid #4A5B68;
     }
   }
 }

@@ -45,6 +45,7 @@ import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Flex} from '@instructure/ui-flex'
 import {arrayOf, func, bool} from 'prop-types'
 import {Link} from '@instructure/ui-link'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('assignments_2_student_content')
 
@@ -130,11 +131,18 @@ function renderAttemptsAndAvailability(assignment) {
   )
 }
 
-function renderLTIToolIframe(submission) {
+function renderLTIToolIframe(assignment, submission) {
+  const showTool = ENV.LTI_TOOL === 'true'
+  const showSubmissionDetailsLink =
+    submission.state === 'graded' && assignment.submissionTypes?.includes('external_tool')
+
+  // render nothing new if neither is true
+  if (!showTool && !showSubmissionDetailsLink) {
+    return null
+  }
+
   const launchURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/tool_launch`
   const submissionDetailsURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/submissions/${ENV.current_user_id}`
-
-  const showSubmissionDetailsLink = submission.state === 'graded'
 
   return (
     <>
@@ -145,15 +153,17 @@ function renderLTIToolIframe(submission) {
           </Link>
         </View>
       )}
-      <ToolLaunchIframe
-        allow={iframeAllowances()}
-        src={launchURL}
-        data-testid="lti-external-tool"
-        title={I18n.t('Tool content')}
-        allowFullScreen="true"
-        webkitallowfullscreen="true"
-        mozallowfullscreen="true"
-      />
+      {showTool && (
+        <ToolLaunchIframe
+          allow={iframeAllowances()}
+          src={launchURL}
+          data-testid="lti-external-tool"
+          title={I18n.t('Tool content')}
+          allowFullScreen="true"
+          webkitallowfullscreen="true"
+          mozallowfullscreen="true"
+        />
+      )}
     </>
   )
 }
@@ -191,6 +201,8 @@ function renderContentBaseOnAvailability(
     const onMarkAsDoneError = () =>
       alertContext.setOnFailure(I18n.t('Error updating status of module item'))
 
+    const queryClient = new QueryClient()
+
     return (
       <>
         <Flex margin="medium 0 0 0" alignItems="start">
@@ -211,12 +223,14 @@ function renderContentBaseOnAvailability(
 
             {assignment.rubric && (
               <Suspense fallback={<LoadingIndicator />}>
-                <RubricsQuery
-                  assignment={assignment}
-                  submission={submission}
-                  rubricExpanded={rubricExpanded}
-                  toggleRubricExpanded={toggleRubricExpanded}
-                />
+                <QueryClientProvider client={queryClient}>
+                  <RubricsQuery
+                    assignment={assignment}
+                    submission={submission}
+                    rubricExpanded={rubricExpanded}
+                    toggleRubricExpanded={toggleRubricExpanded}
+                  />
+                </QueryClientProvider>
               </Suspense>
             )}
           </div>
@@ -241,7 +255,7 @@ function renderContentBaseOnAvailability(
         ) : (
           <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
         )}
-        {ENV.LTI_TOOL === 'true' && renderLTIToolIframe(submission)}
+        {renderLTIToolIframe(assignment, submission)}
         {ENV.enrollment_state === 'completed' && <EnrollmentConcludedNotice />}
       </>
     )

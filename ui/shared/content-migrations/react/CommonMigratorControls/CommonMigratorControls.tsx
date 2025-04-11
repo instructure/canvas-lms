@@ -23,7 +23,7 @@ import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
-import {canvas} from '@instructure/ui-theme-tokens'
+import {canvas} from '@instructure/ui-themes'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {InfoButton} from './InfoButton'
@@ -251,6 +251,7 @@ export const CommonMigratorControls = ({
             value={adjustDatesCheckboxId}
             disabled={isSubmitting}
             label={I18n.t('Adjust events and due dates')}
+            data-testid="date-adjust-checkbox"
             onChange={({target}) => {
               setShowAdjustDates(target.checked)
               const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
@@ -287,7 +288,11 @@ export const CommonMigratorControls = ({
             description={I18n.t('Content')}
             defaultValue="non_selective"
             isRequired
-            messages={contentError ? [{text: I18n.t('You must choose a content option'), type: 'newError'}] : []}
+            messages={
+              contentError
+                ? [{text: I18n.t('You must choose a content option'), type: 'newError'}]
+                : []
+            }
           >
             <RadioInput
               value="non_selective"
@@ -366,9 +371,8 @@ export const CommonMigratorControls = ({
                   onClick={onCancel}
                   color="secondary"
                   width={isMobileView ? '100%' : '8.5rem'}
-                  margin={isMobileView ? "none none small none" : "none small none none"}
+                  margin={isMobileView ? 'none none small none' : 'none small none none'}
                   textAlign="center"
-                  
                 >
                   <CancelLabel />
                 </Button>
@@ -381,13 +385,13 @@ export const CommonMigratorControls = ({
                   textAlign="center"
                 >
                   {isSubmitting ? (
-                  <>
-                    <Spinner size="x-small" renderTitle={<SubmittingLabel />} /> &nbsp;
-                    <SubmittingLabel />
-                  </>
-                ) : (
-                  <SubmitLabel />
-                )}
+                    <>
+                      <Spinner size="x-small" renderTitle={<SubmittingLabel />} /> &nbsp;
+                      <SubmittingLabel />
+                    </>
+                  ) : (
+                    <SubmitLabel />
+                  )}
                 </Button>
               </Flex>
             )

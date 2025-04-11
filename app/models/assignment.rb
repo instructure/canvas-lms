@@ -28,8 +28,9 @@ class Assignment < AbstractAssignment
 
   before_save :before_soft_delete, if: -> { will_save_change_to_workflow_state?(to: "deleted") }
 
-  SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[workflow_state unlock_at lock_at grading_type].freeze
-  after_commit :update_sub_assignments, if: :sync_attributes_changed?
+  SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[workflow_state grading_type].freeze
+  after_save :sync_sub_assignments, if: :sync_attributes_changed?
+  after_commit :sync_sub_assignments_after_commit, if: :sync_attributes_changed_after_commit?
 
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
@@ -164,10 +165,20 @@ class Assignment < AbstractAssignment
     true
   end
 
-  def update_sub_assignments
+  def sync_sub_assignments
     return unless has_sub_assignments?
 
-    changed_attributes = previous_changes.slice(*SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
+    update_sub_assignments(previous_changes.slice(*SUB_ASSIGNMENT_SYNC_ATTRIBUTES))
+  end
+
+  def sync_sub_assignments_after_commit
+    return unless has_sub_assignments?
+
+    update_sub_assignments(previous_changes.slice(*SubAssignment::SUB_ASSIGNMENT_SYNC_ATTRIBUTES))
+  end
+
+  def update_sub_assignments(changed_attributes)
+    return unless has_sub_assignments?
 
     sub_assignments.active.each do |checkpoint|
       updates = {}
@@ -186,8 +197,8 @@ class Assignment < AbstractAssignment
     previous_changes.keys.intersect?(SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
   end
 
-  def sync_attributes_changes
-    previous_changes.slice(*SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
+  def sync_attributes_changed_after_commit?
+    previous_changes.keys.intersect?(SubAssignment::SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
   end
 
   def unpublish_ok?

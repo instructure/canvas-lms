@@ -34,8 +34,8 @@ module Lti::IMS
     )
 
     before_action(
+      :verify_valid_type,
       :verify_valid_report_timestamp,
-      :verify_asset_processor_supports_report_type,
       :verify_report_compatible_with_asset,
       :verify_no_newer_report,
       only: :create_report
@@ -124,9 +124,7 @@ module Lti::IMS
     #   A human-readable title for the report, to be displayed to the user.
     #
     # @argument type [String]
-    #   An opaque value representing the type of report. If the Asset Processor
-    #   tool has previously declared a `supportedTypes` list, the type value here
-    #   must be one of those types.
+    #   An opaque value representing the type of report.
     #
     # @returns the input arguments, as accepted and stored in the database.
     # Returns an HTTP 201 (Created) on success.
@@ -239,18 +237,9 @@ module Lti::IMS
       end
     end
 
-    def verify_asset_processor_supports_report_type
-      supported = asset_processor.supported_types
-
-      case supported
-      when nil
-        # Accept all types
-      when Array
-        unless supported.include?(report_type)
-          render_error "Invalid report type, must be one of: #{supported.to_json}", :unprocessable_entity
-        end
-      else
-        render_error "Invalid supportedTypes on asset processor's 'report' object; this processor is broken and cannot accept reports", :bad_request
+    def verify_valid_type
+      unless report_type.is_a?(String) && report_type.present?
+        render_error("type must be a non-empty string", :bad_request)
       end
     end
 

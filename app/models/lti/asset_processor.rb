@@ -42,10 +42,6 @@ class Lti::AssetProcessor < ApplicationRecord
     end
   end
 
-  def supported_types
-    report.is_a?(Hash) ? report["supportedTypes"] : nil
-  end
-
   # Should match up with UI's AssetProcessorContentItemDto
   def self.build_for_assignment(content_item:, context:)
     tool_base_scope = ContextExternalTool.where(id: content_item["context_external_tool_id"].to_i)

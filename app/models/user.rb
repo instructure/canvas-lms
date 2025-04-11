@@ -3530,26 +3530,31 @@ class User < ActiveRecord::Base
     super(untranslate_pronouns(pronouns))
   end
 
-  def create_courses_right(account)
+  def create_courses_right(account, check_subaccounts: false)
     return :admin if account.cached_account_users_for(self).any? do |au|
                        au.permission_check(account, :manage_courses_add).success?
                      end
     return nil if fake_student? || account.root_account.site_admin?
 
+    mcc = account.root_account.manually_created_courses_account
     scope = account.root_account.enrollments.active.where(user_id: self)
-    course_scope = Enrollment.joins(:course).merge(Course.where(account:))
+    course_scope = if check_subaccounts && mcc != account
+                     Enrollment.joins(:course).merge(Course.where(root_account: account).where.not(account: mcc))
+                   else
+                     Enrollment.joins(:course).merge(Course.where(account:))
+                   end
 
     teacher_right = account.root_account.teachers_can_create_courses?
     teacher_scope = scope.where(type: %w[TeacherEnrollment DesignerEnrollment])
     # k5 users can still create courses anywhere, even if the setting restricts them to the manually created courses account
     return :teacher if teacher_right && teacher_scope.merge(course_scope).exists? && (account.root_account.teachers_can_create_courses_anywhere? || active_k5_enrollments?)
-    return :teacher if teacher_right && teacher_scope.exists? && account == account.root_account.manually_created_courses_account
+    return :teacher if teacher_right && teacher_scope.exists? && account == mcc
 
     student_right = account.root_account.students_can_create_courses?
     student_scope = scope.where(type: %w[StudentEnrollment ObserverEnrollment])
     return :student if student_right && student_scope.merge(course_scope).exists? && (account.root_account.students_can_create_courses_anywhere? || active_k5_enrollments?)
-    return :student if student_right && student_scope.exists? && account == account.root_account.manually_created_courses_account
-    return :no_enrollments if account.root_account.no_enrollments_can_create_courses? && !scope.exists? && account == account.root_account.manually_created_courses_account
+    return :student if student_right && student_scope.exists? && account == mcc
+    return :no_enrollments if account.root_account.no_enrollments_can_create_courses? && !scope.exists? && account == mcc
 
     nil
   end

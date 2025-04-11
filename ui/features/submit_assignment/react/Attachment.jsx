@@ -55,20 +55,11 @@ const Attachment = ({
   // For now, we query for the input by its id
   const getFileDropInput = () => document.getElementById(`submission_file_drop_${index}`)
 
-  const formatErrorMessage = (message) => (
-    <Text size="small" color="danger">
-      <View margin="0 xx-small 0 0">
-        <IconWarningSolid color="error" />
-      </View>
-      {message}
-    </Text>
-  )
-
   useEffect(() => {
     const handleFocus = () => {
       if (getShouldShowFileRequiredError()) {
-        const errorText = formatErrorMessage(I18n.t('A file is required to make a submission.'))
-        setErrorMessages([{ text: errorText, type: 'error' }])
+        const errorText = I18n.t('A file is required to make a submission.')
+        setErrorMessages([{ text: errorText, type: 'newError' }])
         // reset the value
         setShouldShowFileRequiredError(false)
       }
@@ -107,8 +98,8 @@ const Attachment = ({
 
   const handleAcceptFile = ([file], e) => {
     if (file.size === 0) {
-      const errorText = formatErrorMessage(I18n.t('Attached files must be greater than 0 bytes.'))
-      setErrorMessages([{ text: errorText, type: 'error' }])
+      const errorText = I18n.t('Attached files must be greater than 0 bytes.')
+      setErrorMessages([{ text: errorText, type: 'newError' }])
       // Clear the file from the input since we are not accepting it
       clearInputFile()
     } else {
@@ -128,8 +119,8 @@ const Attachment = ({
 
   const handleRejectedFile = (_file) => {
     const fileTypes = validFileTypes.join(", ")
-    const errorText = formatErrorMessage(I18n.t('This file type is not allowed. Accepted file types are: %{fileTypes}.', {fileTypes}))
-    setErrorMessages([{ text: errorText, type: 'error' }])
+    const errorText = I18n.t('This file type is not allowed. Accepted file types are: %{fileTypes}.', {fileTypes})
+    setErrorMessages([{ text: errorText, type: 'newError' }])
   }
 
   const useWebcamButton = (

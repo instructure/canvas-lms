@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import type {RegistrationOverlayStore} from '../RegistrationOverlayState'
+import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import type {DynamicRegistrationActions} from '../DynamicRegistrationWizardState'
 import {IconConfirmation} from '../../registration_wizard_forms/IconConfirmation'
@@ -28,7 +28,7 @@ import {
   type LtiPlacementWithIcon,
 } from '../../model/LtiPlacement'
 export type IconConfirmationProps = {
-  overlayStore: RegistrationOverlayStore
+  overlayStore: DynamicRegistrationOverlayStore
   registration: LtiRegistrationWithConfiguration
   reviewing: boolean
   transitionToConfirmationState: DynamicRegistrationActions['transitionToConfirmationState']

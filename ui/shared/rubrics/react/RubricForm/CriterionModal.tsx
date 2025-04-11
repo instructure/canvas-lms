@@ -716,7 +716,7 @@ const DragVerticalLineBreak = ({criterionUseRange}: DragVerticalLineBreakProps) 
         position: 'absolute',
         width: '1px',
         height: 'auto',
-        backgroundColor: '#C7CDD1',
+        backgroundColor: '#E8EAEC',
         left: criterionUseRange ? '13.75rem' : '10.313rem',
         top: '1.688rem',
         bottom: '1.688rem',

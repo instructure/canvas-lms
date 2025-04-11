@@ -155,6 +155,7 @@ class ApplicationController < ActionController::Base
   def page_has_instui_topnav
     return unless @domain_root_account.try(:feature_enabled?, :instui_nav)
 
+    yield if block_given?
     @instui_topnav = true
     js_env breadcrumbs: crumbs[1..]&.map { |crumb| { name: crumb[0], url: crumb[1] } }
   end
@@ -260,7 +261,7 @@ class ApplicationController < ActionController::Base
           },
           RAILS_ENVIRONMENT: Canvas.environment,
         }
-        @js_env[:IN_PACED_COURSE] = @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces? if @context.is_a?(Course)
+        @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.is_a?(Course)
         unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {
             dsn: SentryExtensions::Settings.settings[:frontend_dsn],
@@ -326,6 +327,9 @@ class ApplicationController < ActionController::Base
         @js_env[:user_cache_key] = Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg") if @current_user&.workflow_state
         @js_env[:top_navigation_tools] = external_tools_display_hashes(:top_navigation) if !!@domain_root_account&.feature_enabled?(:top_navigation_placement)
         @js_env[:horizon_course] = @context.is_a?(Course) && @context.horizon_course?
+        @js_env[:has_courses] = @context.associated_courses.not_deleted.any? if @context.is_a?(Account)
+        @js_env[:HORIZON_ACCOUNT] = @context.horizon_account? if @context.is_a?(Account)
+        @js_env[:horizon_account_locked] = @context.horizon_account_locked? if @context.is_a?(Account)
         # partner context data
         if @context&.grants_any_right?(@current_user, session, :read, :read_as_admin)
           @js_env[:current_context] = {
@@ -361,8 +365,6 @@ class ApplicationController < ActionController::Base
     render_both_to_do_lists
     commons_new_quizzes
     consolidated_media_player
-    course_paces_redesign
-    course_paces_for_students
     explicit_latex_typesetting
     media_links_use_attachment_id
     permanent_page_links
@@ -384,6 +386,8 @@ class ApplicationController < ActionController::Base
     new_quizzes_media_type
     differentiation_tags
     validate_call_to_action
+    new_quizzes_navigation_updates
+    create_wiki_page_mastery_path_overrides
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -1263,8 +1267,6 @@ class ApplicationController < ActionController::Base
 
   MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS = 3
 
-  GET_CONTEXT_GRAPHQL_OPERATION_NAMES = %w[CreateSubmission CreateDiscussionEntry].freeze
-
   # Can be used as a before_action, or just called from controller code.
   # Assigns the variable @context to whatever context the url is scoped
   # to.  So /courses/5/assignments would have a @context=Course.find(5).
@@ -1273,11 +1275,9 @@ class ApplicationController < ActionController::Base
   def get_context(user_scope: nil)
     GuardRail.activate(:secondary) do
       unless @context
-        if params[:course_id] || (request.url.include?("/graphql") && GET_CONTEXT_GRAPHQL_OPERATION_NAMES.include?(params[:operationName]))
+        if params[:course_id]
           course_scope = @token ? Course : Course.active
-          @context = params[:course_id] ? api_find(course_scope, params[:course_id]) : pull_context_course
-          return if @context.nil? # When doing pull_context_course it's possible to get a nil context, if that happen, we don't want to continue.
-
+          @context = api_find(course_scope, params[:course_id])
           @context.root_account = @domain_root_account if @context.root_account_id == @domain_root_account.id # no sense in refetching it
           params[:context_id] = params[:course_id]
           params[:context_type] = "Course"
@@ -2205,7 +2205,7 @@ class ApplicationController < ActionController::Base
         @resource_title = @tag.title
       end
       @resource_url = @tag.url
-      @tool = ContextExternalTool.from_content_tag(tag, context)
+      @tool = Lti::ToolFinder.from_content_tag(tag, context)
 
       @assignment&.migrate_to_1_3_if_needed!(@tool)
       tag.migrate_to_1_3_if_needed!(@tool)
@@ -2383,12 +2383,16 @@ class ApplicationController < ActionController::Base
   private :external_tool_redirect_display_type
 
   def render_external_tool_prepend_template?
-    !%w[full_width in_nav_context borderless].include?(external_tool_redirect_display_type)
+    display_types = %w[full_width in_nav_context borderless full_width_with_nav]
+
+    !display_types.include?(external_tool_redirect_display_type)
   end
   private :render_external_tool_prepend_template?
 
   def render_external_tool_append_template?
-    !%w[full_width borderless].include?(external_tool_redirect_display_type)
+    display_types = %w[full_width borderless full_width_with_nav]
+
+    !display_types.include?(external_tool_redirect_display_type)
   end
   private :render_external_tool_append_template?
 
@@ -3274,10 +3278,20 @@ class ApplicationController < ActionController::Base
   def show_student_view_button?
     return false unless @context.is_a?(Course) && can_do(@context, @current_user, :use_student_view)
 
+    return false if new_quizzes_navigation_updates? && new_quizzes_lti_tool?
+
     controller_action = "#{params[:controller]}##{params[:action]}"
     STUDENT_VIEW_PAGES.key?(controller_action) && (STUDENT_VIEW_PAGES[controller_action].nil? || !@context.tab_hidden?(STUDENT_VIEW_PAGES[controller_action]))
   end
   helper_method :show_student_view_button?
+
+  def new_quizzes_navigation_updates?
+    Account.site_admin.feature_enabled?(:new_quizzes_navigation_updates)
+  end
+
+  def new_quizzes_lti_tool?
+    @tool&.quiz_lti?
+  end
 
   def show_blueprint_button?
     @context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(@context)
@@ -3323,18 +3337,6 @@ class ApplicationController < ActionController::Base
     K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).use_classic_font?
   end
   helper_method :use_classic_font?
-
-  def pull_context_course
-    if params[:operationName] == "CreateSubmission"
-      assignment_id = params[:variables][:assignmentLid]
-      return ::Assignment.active.find(assignment_id).course
-    elsif params[:operationName] == "CreateDiscussionEntry"
-      discussion_topic_id = params[:variables][:discussionTopicId]
-      return DiscussionTopic.find(discussion_topic_id).course
-    end
-
-    nil
-  end
 
   def react_discussions_post_enabled_for_preferences_use?
     !!@domain_root_account&.feature_enabled?(:discussions_reporting)

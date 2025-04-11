@@ -37,6 +37,10 @@ module Services
     end
 
     class << self
+      def configured?
+        notification_sqs.present?
+      end
+
       private
 
       QUEUE_NAME_KEYS = {

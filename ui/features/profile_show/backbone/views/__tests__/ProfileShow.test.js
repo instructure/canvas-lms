@@ -104,6 +104,48 @@ describe('ProfileShow', () => {
       `
     })
 
+    describe('name', () => {
+      describe('valid input', () => {
+        it('succeeds', () => {
+          // Arrange
+          const form = document.querySelector('#profile_form')
+          const preventDefault = jest.fn()
+
+          // Act & Assert
+          view.validateForm({preventDefault, target: form})
+          expect(preventDefault).not.toHaveBeenCalled()
+        })
+      })
+
+      describe('invalid input', () => {
+        it('fails', () => {
+          // Arrange
+          const form = document.querySelector('#profile_form')
+          const nameInput = document.querySelector('#user_short_name')
+          nameInput.value = ''
+          const preventDefault = jest.fn()
+
+          // Act & Assert
+          view.validateForm({preventDefault, target: form})
+          expect(preventDefault).toHaveBeenCalled()
+        })
+      })
+
+      describe('input field is not in the DOM', () => {
+        it('succeeds', () => {
+          // Arrange
+          const form = document.querySelector('#profile_form')
+          const nameInput = document.querySelector('#user_short_name')
+          nameInput.remove()
+          const preventDefault = jest.fn()
+
+          // Act & Assert
+          view.validateForm({preventDefault, target: form})
+          expect(preventDefault).not.toHaveBeenCalled()
+        })
+      })
+    })
+
     it('validates title input length', () => {
       // Arrange
       const form = document.querySelector('#profile_form')

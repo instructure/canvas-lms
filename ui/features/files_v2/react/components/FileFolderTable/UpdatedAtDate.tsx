@@ -25,11 +25,11 @@ interface UpdatedAtDateProps {
 
 export const UpdatedAtDate = ({updatedAt, isStacked}: UpdatedAtDateProps) => {
   if (isStacked) {
-    return <FriendlyDatetime dateTime={updatedAt} />
+    return <FriendlyDatetime dateTime={updatedAt} includeScreenReaderContent={false}/>
   } else {
     return (
       <div style={{padding: '0 0.5em'}}>
-        <FriendlyDatetime dateTime={updatedAt} />
+        <FriendlyDatetime dateTime={updatedAt} includeScreenReaderContent={false}/>
       </div>
     )
   }

@@ -441,6 +441,7 @@ CanvasRails::Application.routes.draw do
     get "lti_collaborations/*all" => "collaborations#lti_index"
     resources :gradebook_uploads
     resources :rubrics
+    post "rubrics/llm_criteria", controller: :rubrics, action: :llm_criteria
     resources :rubric_associations do
       post "remind/:assessment_request_id" => "rubric_assessments#remind", :as => :remind_assessee
       resources :rubric_assessments, path: "assessments"
@@ -468,6 +469,7 @@ CanvasRails::Application.routes.draw do
       post "items" => "context_modules#add_item", :as => :add_item
       post "reorder" => "context_modules#reorder_items", :as => :reorder
       post "collapse" => "context_modules#toggle_collapse", :as => :toggle_collapse
+      get "items_html" => "context_modules#items_html", :as => :context_modules_items_html
       get "prerequisites/:code" => "context_modules#content_tag_prerequisites_needing_finishing", :as => :prerequisites_needing_finishing
       get "items/last" => "context_modules#module_redirect", :as => :last_redirect, :last => 1
       get "items/first" => "context_modules#module_redirect", :as => :first_redirect, :first => 1
@@ -2938,6 +2940,13 @@ CanvasRails::Application.routes.draw do
     scope(controller: "lti/ims/asset_processor") do
       post "asset_processors/:asset_processor_id/reports", action: :create_report, as: :lti_asset_processor_create_report
       get "asset_processors/:asset_processor_id/assets/:asset_id", action: :lti_asset_show, as: :lti_asset_processor_asset_show
+    end
+
+    # 1Edtech (IMS) LTI Asset Processor Eula service
+    scope(controller: "lti/ims/asset_processor_eula") do
+      put "asset_processor_eulas/:context_external_tool_id/deployment", action: :update_tool_eula, as: :update_tool_eula
+      delete "asset_processor_eulas/:context_external_tool_id/user", action: :delete_acceptances, as: :delete_tool_eula_acceptances
+      post "asset_processor_eulas/:context_external_tool_id/user", action: :create_acceptance, as: :create_user_eula_acceptance
     end
 
     # Dynamic Registration Service

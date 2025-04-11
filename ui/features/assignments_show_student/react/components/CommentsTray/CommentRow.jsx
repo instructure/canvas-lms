@@ -27,6 +27,7 @@ import {SubmissionHtmlComment} from '@canvas/assignments/graphql/student/Submiss
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {Link} from '@instructure/ui-link'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
+import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
 const I18n = createI18nScope('assignments_2')
@@ -101,7 +102,15 @@ export default function CommentRow(props) {
             {attachment.displayName}
           </Link>
         ))}
-        {mediaObject && <MediaPlayer tracks={mediaTracks} sources={mediaSources} />}
+        {mediaObject &&
+          (ENV.FEATURES?.consolidated_media_player ? (
+            <CanvasStudioPlayer
+              media_id={mediaObject._id}
+              explicitSize={{width: 368, height: 206}}
+            />
+          ) : (
+            <MediaPlayer tracks={mediaTracks} sources={mediaSources} />
+          ))}
       </div>
     </div>
   )

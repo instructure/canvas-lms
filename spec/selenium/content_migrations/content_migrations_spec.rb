@@ -98,6 +98,7 @@ end
 describe "content migrations", :non_parallel do
   before(:once) do
     Account.site_admin.disable_feature! :instui_for_import_page
+    Account.site_admin.disable_feature! :instui_for_course_copy_page
   end
 
   include_context "in-process server selenium tests"

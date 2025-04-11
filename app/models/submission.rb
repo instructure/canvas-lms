@@ -959,6 +959,14 @@ class Submission < ActiveRecord::Base
     versioned_originality_reports.present?
   end
 
+  def audit_events
+    AuditEventService.new(self).call
+  end
+
+  def enriched_audit_events
+    AuditEventService.new(self).enrich(audit_events)
+  end
+
   def all_versioned_attachments
     attachment_ids = submission_history.map(&:attachment_ids_for_version).flatten.uniq
     Attachment.where(id: attachment_ids)
@@ -1001,7 +1009,7 @@ class Submission < ActiveRecord::Base
   end
 
   def retrieve_lti_tii_score
-    if (tool = ContextExternalTool.from_assignment(assignment))
+    if (tool = Lti::ToolFinder.from_assignment(assignment))
       turnitin_data.select { |_, v| v.try(:key?, :outcome_response) }.each do |k, v|
         Turnitin::OutcomeResponseProcessor.new(tool, assignment, user, v[:outcome_response].as_json).resubmit(self, k)
       end

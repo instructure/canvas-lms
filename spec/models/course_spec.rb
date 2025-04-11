@@ -2745,23 +2745,13 @@ describe Course do
 
       describe "TAB_COURSE_PACES" do
         it "is included when course paces is enabled" do
-          @course.account.enable_feature!(:course_paces)
           @course.enable_course_paces = true
           @course.save!
           tabs = @course.tabs_available(@user).pluck(:id)
           expect(tabs).to include(Course::TAB_COURSE_PACES)
         end
 
-        it "is not included if the flag is off" do
-          @course.account.disable_feature!(:course_paces)
-          @course.enable_course_paces = true
-          @course.save!
-          tabs = @course.tabs_available(@user).pluck(:id)
-          expect(tabs).not_to include(Course::TAB_COURSE_PACES)
-        end
-
         it "is not included if the course has it disabled" do
-          @course.account.enable_feature!(:course_paces)
           @course.enable_course_paces = false
           @course.save!
           tabs = @course.tabs_available(@user).pluck(:id)
@@ -3162,6 +3152,7 @@ describe Course do
         end
 
         it "renames the syllabus tab to overview" do
+          @course.enable_course_paces = true
           syllabus_tab = @course.tabs_available(@user).find { |t| t[:id] == Course::TAB_SYLLABUS }
           expect(syllabus_tab[:label]).to eq("Overview")
         end
@@ -3175,7 +3166,6 @@ describe Course do
 
       describe "TAB_COURSE_PACES" do
         it "is not included" do
-          @course.account.enable_feature!(:course_paces)
           @course.enable_course_paces = true
           @course.save!
           tabs = @course.tabs_available(@user).pluck(:id)
@@ -7363,10 +7353,6 @@ describe Course do
     context "timing when course is published" do
       let(:publish_time) { 300_000 }
 
-      before :once do
-        Account.default.enable_feature!(:course_paces)
-      end
-
       it "logs the timing of a course to statsd with course pacing enabled" do
         allow(InstStatsd::Statsd).to receive(:timing)
 
@@ -7472,7 +7458,6 @@ describe Course do
 
     context "assignment count when course is published" do
       before do
-        Account.default.enable_feature!(:course_paces)
         allow(InstStatsd::Statsd).to receive(:count)
         @course = Course.create!
         create_assignments([@course.id], 2)
@@ -7549,7 +7534,6 @@ describe Course do
 
     context "course with course pacing on or off" do
       before do
-        Account.default.enable_feature!(:course_paces)
         allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
         @course = Course.create!
@@ -7616,7 +7600,6 @@ describe Course do
 
     context "course format logging" do
       before do
-        Account.default.enable_feature!(:course_paces)
         allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
         @course = Course.create!

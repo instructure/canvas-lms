@@ -32,7 +32,7 @@ export type MediaTrack = {
   created_at: string
   id: string
   inherited: boolean
-  kind: "subtitles"
+  kind: string
   locale: string
   updated_at: string
   url: string

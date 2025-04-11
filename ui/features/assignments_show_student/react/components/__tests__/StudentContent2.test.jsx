@@ -160,25 +160,39 @@ describe('Assignment Student Content View', () => {
       expect(queryByTestId('assignment-2-student-content-tabs')).not.toBeInTheDocument()
     })
 
-    it('renders View Submission link when LTI_TOOL is true and the submission is graded', async () => {
-      window.ENV.LTI_TOOL = 'true'
-
+    it('renders only View Submission link when assignment accepts lti tool submissions and the submission is graded but LTI_TOOL is falsy', async () => {
+      props.assignment.submissionTypes = ['external_tool']
       props.submission.state = 'graded'
+      // in this case, LTI_TOOL is null
 
-      const {getByTestId} = render(
+      const {getByTestId, queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
         </MockedProvider>,
       )
       const submissionDetailsLink = getByTestId('view-submission-link')
       expect(submissionDetailsLink).toBeInTheDocument()
+      expect(queryByTestId('lti-external-tool')).not.toBeInTheDocument()
     })
 
-    it('does not render the View Submission link when LTI_TOOL is true and the submission is not graded', async () => {
+    it('only the LTI tool iframe LTI_TOOL is true and the submission is not graded', async () => {
       window.ENV.LTI_TOOL = 'true'
-
       props.submission.state = 'unsubmitted'
 
+      const {queryByTestId, getByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>,
+      )
+
+      expect(queryByTestId('view-submission-link')).not.toBeInTheDocument()
+      expect(getByTestId('lti-external-tool')).toBeInTheDocument()
+    })
+
+    it('neither renders the View Submission link nor the LTI iframe when LTI_TOOL is false, and assignment does not accept external_tool', async () => {
+      props.submission.state = 'graded'
+      props.assignment.submissionTypes = ['file_upload']
+
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
@@ -186,21 +200,13 @@ describe('Assignment Student Content View', () => {
       )
 
       expect(queryByTestId('view-submission-link')).not.toBeInTheDocument()
+      expect(queryByTestId('lti-external-tool')).not.toBeInTheDocument()
     })
 
-    it('does not render the View Submission link when LTI_TOOL is false', async () => {
-      const {queryByTestId} = render(
-        <MockedProvider>
-          <StudentContent {...props} />
-        </MockedProvider>,
-      )
-
-      expect(queryByTestId('view-submission-link')).not.toBeInTheDocument()
-    })
-
-    it('renders LTI Launch Iframe when LTI_TOOL is true', async () => {
+    it('both LTI Iframe and submission link when all their requirements are true', async () => {
+      props.assignment.submissionTypes = ['external_tool']
+      props.submission.state = 'graded'
       window.ENV.LTI_TOOL = 'true'
-
       const {getByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
@@ -208,15 +214,8 @@ describe('Assignment Student Content View', () => {
       )
       const lti_external_tool = getByTestId('lti-external-tool')
       expect(lti_external_tool).toBeInTheDocument()
-    })
-
-    it('does not render LTI Launch Iframe when LTI_TOOL is false', async () => {
-      const {queryByTestId} = render(
-        <MockedProvider>
-          <StudentContent {...props} />
-        </MockedProvider>,
-      )
-      expect(queryByTestId('lti-external-tool')).not.toBeInTheDocument()
+      const view_submission_link = getByTestId('view-submission-link')
+      expect(view_submission_link).toBeInTheDocument()
     })
 
     it('renders a "Mark as Done" button if the assignment is part of a module with a mark-as-done requirement', async () => {
@@ -250,8 +249,8 @@ describe('Assignment Student Content View', () => {
       props.assignment.rubric = {}
 
       const variables = {
-        assignmentLid: '1',
         courseID: '1',
+        assignmentLid: '1',
         submissionAttempt: 0,
         submissionID: '1',
       }

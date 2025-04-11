@@ -30,6 +30,15 @@ module Interfaces::ModuleItemInterface
     end
   end
 
+  field :can_duplicate, Boolean, null: true
+  def can_duplicate
+    if object.respond_to?(:can_duplicate?)
+      object.can_duplicate?
+    else
+      object.is_a?(DiscussionTopic) || object.is_a?(WikiPage)
+    end
+  end
+
   field :is_locked_by_master_course, Boolean, null: false
   def is_locked_by_master_course
     # First check if we're in a course context

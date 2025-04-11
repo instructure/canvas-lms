@@ -1214,4 +1214,109 @@ describe RubricsController do
       end
     end
   end
+
+  describe "POST 'llm_criteria'" do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @assignment = @course.assignments.create!(assignment_valid_attributes)
+
+      @course.enable_feature!(:enhanced_rubrics)
+      @course.enable_feature!(:ai_rubrics)
+
+      @inst_llm = double("InstLLM::Client")
+      allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
+    end
+
+    it "generates criteria via LLM when features are enabled" do
+      llm_response = {
+        criteria: [
+          {
+            name: "Critical Analysis",
+            description: "Demonstrates thorough understanding and analysis",
+            ratings: [
+              { title: "Excellent", description: "Thoroughly demonstrated understanding" },
+              { title: "Good", description: "Partially demonstrated understanding" },
+              { title: "Needs Improvement", description: "Failed to demonstrate understanding" }
+            ]
+          },
+          {
+            name: "Detailed Diagrams",
+            description: "Demonstrates diagramming ability ",
+            ratings: [
+              { title: "Excellent", description: "Thoroughly demonstrated diagramming" },
+              { title: "Good", description: "Partially demonstrated diagramming" },
+              { title: "Needs Improvement", description: "Failed to demonstrate diagramming" }
+            ]
+          }
+        ]
+      }
+
+      expect(@inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "model",
+          message: { role: :assistant, content: llm_response.to_json },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 10,
+            output_tokens: 20,
+          }
+        )
+      )
+
+      post "llm_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5 }
+           },
+           format: :json
+
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json["rubric"]).to be_present
+      expect(json["rubric"]["criteria"]).to be_present
+      expect(json["rubric"]["criteria"].length).to eq 2
+    end
+
+    it "returns error when features are disabled" do
+      @course.disable_feature!(:enhanced_rubrics)
+      @course.disable_feature!(:ai_rubrics)
+
+      post "llm_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5 }
+           },
+           format: :json
+
+      expect(response).to be_forbidden
+    end
+
+    it "returns error when user lacks permissions" do
+      course_with_student_logged_in(active_all: true, course: @course)
+
+      post "llm_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5 }
+           },
+           format: :json
+
+      expect(response).to be_forbidden
+    end
+
+    it "returns error when user specifies out-of-bounds parameters" do
+      post "llm_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             generate_options: { criteria_count: 1, rating_count: 3, points_per_criterion: 5 }
+           },
+           format: :json
+
+      expect(response).to be_bad_request
+    end
+  end
 end

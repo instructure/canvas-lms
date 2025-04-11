@@ -101,6 +101,7 @@ class Attachment < ActiveRecord::Base
          quiz: "Quizzes::Quiz",
          quiz_statistics: "Quizzes::QuizStatistics",
          quiz_submission: "Quizzes::QuizSubmission" }]
+  belongs_to :root_account, class_name: "Account"
   belongs_to :cloned_item
   belongs_to :folder
   belongs_to :user
@@ -132,7 +133,7 @@ class Attachment < ActiveRecord::Base
   has_one :estimated_duration, dependent: :destroy, inverse_of: :attachment
   has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :attachment, dependent: :destroy
 
-  before_save :set_root_account_id
+  before_save :set_root_account
   before_save :infer_display_name
   before_save :truncate_display_name
   before_save :default_values
@@ -592,8 +593,16 @@ class Attachment < ActiveRecord::Base
   end
   protected :default_values
 
-  def set_root_account_id
-    self.root_account_id = infer_root_account_id if namespace_changed? || new_record?
+  def set_root_account
+    if root_account_id.nil?
+      # If we don't have root_account set, use Attachment.current_root_account which should be set by the load account
+      # middlewear. If for some reason, we don't have that, first see if we a child attachment and get the root from
+      # that, otherwise, try to use the context to get to the root account.
+      self.root_account = Attachment.current_root_account
+      self.root_account ||= root_attachment.try(:root_account)
+      self.root_account ||= context.try(:root_account)
+      self.root_account ||= context.try(:account)&.root_account
+    end
   end
 
   def set_word_count
@@ -610,29 +619,6 @@ class Attachment < ActiveRecord::Base
     update_column(:word_count, calculate_words)
   end
 
-  def infer_root_account_id
-    # see note in infer_namespace below
-    splits = namespace.try(:split, /_/)
-    return nil if splits.blank?
-
-    # when creating a cross-shard attachment on the birth shard, it will set a local ID
-    # due to account.rb:file_namespace, but it needs to be a global ID or we will reference
-    # the incorrect account
-    if Attachment.current_root_account && Attachment.current_root_account.shard != Shard.current && Shard.current == Shard.birth
-      Attachment.current_root_account.global_id
-    elsif splits[1] == "localstorage"
-      splits[3].to_i
-    else
-      splits[1].to_i
-    end
-  end
-
-  def root_account
-    root_account_id && Account.find_cached(root_account_id)
-  rescue ::Canvas::AccountCacheError
-    nil
-  end
-
   def namespace
     super || (new_record? ? self.namespace = infer_namespace : nil)
   end
@@ -643,9 +629,6 @@ class Attachment < ActiveRecord::Base
       # code relies on the namespace as a hacky way to efficiently get the
       # attachment's account id. Look for anybody who is accessing namespace and
       # splitting the string, etc.
-      #
-      # The infer_root_account_id accessor is still present above, but I didn't verify there
-      # isn't any code still accessing the namespace for the account id directly.
       ns = root_attachment.try(:namespace) if root_attachment_id
       ns ||= Attachment.current_namespace
       ns ||= context.try(:root_account)&.file_namespace
@@ -1938,7 +1921,11 @@ class Attachment < ActiveRecord::Base
     return unless filename
 
     if instfs_hosted?
-      InstFS.delete_file(instfs_uuid)
+      begin
+        InstFS.delete_file(instfs_uuid)
+      rescue InstFS::DeletionError => e
+        Rails.logger.warn("InstFS file deletion failed for attachment #{id}: #{e.message}")
+      end
       self.instfs_uuid = nil
     elsif Attachment.s3_storage?
       s3object.delete unless ApplicationController.test_cluster?

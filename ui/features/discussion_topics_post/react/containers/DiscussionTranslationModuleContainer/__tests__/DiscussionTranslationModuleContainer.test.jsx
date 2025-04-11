@@ -26,8 +26,7 @@ const mockContextValue = {
   translateTargetLanguage: null,
   setTranslateTargetLanguage: jest.fn(),
   setShowTranslationControl: jest.fn(),
-  translationLoading: false,
-  setTranslationLoading: jest.fn(),
+  entryTranslatingSet: new Set(),
   translationLanguages: { current: [
     { id: 'en', name: 'English', translated_to_name: 'Translated to English' },
     { id: 'es', name: 'Spanish', translated_to_name: 'Translated to Spanish' },
@@ -185,7 +184,6 @@ describe('DiscussionTranslationModuleContainer', () => {
     const translateButton = screen.getByRole('button', { name: /translate/i })
     await userEvent.click(translateButton)
 
-    expect(mockContextValue.setTranslationLoading).toHaveBeenCalledWith(true)
     expect(mockContextValue.setTranslateTargetLanguage).toHaveBeenCalledWith('es')
   })
 

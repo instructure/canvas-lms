@@ -83,7 +83,7 @@ function getMenuItemWithLabel($parent: Element, label: any) {
 }
 
 function getFlyoutWithLabel($parent: Element, label: any) {
-  const $children = Array.from($parent.querySelectorAll('[role="button"]'))
+  const $children = Array.from($parent.querySelectorAll('[role="menuitem"]'))
   return $children.find($child => $child.textContent?.trim() === label)
 }
 

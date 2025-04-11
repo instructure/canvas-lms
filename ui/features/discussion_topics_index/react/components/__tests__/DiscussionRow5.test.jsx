@@ -126,7 +126,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll('li')
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Delete')).toBe(true)
   })
@@ -142,7 +142,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll('li')
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Close for comments')).toBe(true)
   })
@@ -161,7 +161,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll('li')
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Edit')).toBe(true)
 
@@ -185,7 +185,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll('li')
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Mastery Paths')).toBe(true)
   })
@@ -224,7 +224,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll('li')
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('discussion_topic_menu Text')).toBe(true)
   })
@@ -253,7 +253,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll('li')
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
     expect(allKeys).toHaveLength(2)
     expect(allKeys[0].textContent.includes('discussion_topic_menu Text')).toBe(true)
     expect(allKeys[1].textContent.includes('discussion_topic_menu otherText')).toBe(true)

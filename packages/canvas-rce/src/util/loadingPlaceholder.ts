@@ -39,13 +39,12 @@ export async function placeholderInfoFor(
     fileName: fileName ?? 'unknown filename',
   })
 
-  if (typeof fileMetaProps.contentType !== 'string') {
-    throw new Error('Invalid fileMetaProps.contentType')
+  const type = fileMetaProps.contentType || fileMetaProps.type
+  if (typeof type !== 'string') {
+    throw new Error('Invalid type: ' + type)
   }
 
-  const type = fileMetaProps.contentType || fileMetaProps.type
-
-  if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
+  if (isImage(type) && fileMetaProps.displayAs !== 'link') {
     const imageUrl =
       trimmedOrNull((fileMetaProps.domObject as {preview: string}).preview) ??
       URL.createObjectURL(fileMetaProps.domObject as File | Blob)
@@ -65,7 +64,7 @@ export async function placeholderInfoFor(
       image.onerror = () => reject(new Error('Failed to load image: ' + imageUrl))
       image.src = imageUrl
     })
-  } else if (typeof type === 'string' && isVideo(type)) {
+  } else if (isVideo(type)) {
     const videoSize = videoDefaultSize()
     return {
       type: 'block',
@@ -75,7 +74,7 @@ export async function placeholderInfoFor(
       height: videoSize.height,
       vAlign: 'bottom',
     }
-  } else if (typeof type === 'string' && isAudio(type)) {
+  } else if (isAudio(type)) {
     return {
       type: 'block',
       visibleLabel,
@@ -188,7 +187,7 @@ export async function insertPlaceholder(
     placeholderElem.appendChild(labelElem)
 
     Object.assign(labelElem.style, {
-      color: '#2D3B45',
+      color: '#273540',
       zIndex: '1000',
 
       /* Restrict text to one line */
@@ -209,7 +208,7 @@ export async function insertPlaceholder(
           padding: '5px',
           verticalAlign: 'baseline',
           gap: '8px',
-          backgroundColor: '#F5F5F5',
+          backgroundColor: '#F2F4F4',
         } as CSSStyleDeclaration)
         break
 
@@ -359,8 +358,8 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 					position: relative;
 					box-sizing: border-box;
 					overflow: hidden;
-					--Spinner-trackColor: #F5F5F5;
-					--Spinner-color: #0374B5;
+					--Spinner-trackColor: #F2F4F4;
+					--Spinner-color: #2B7ABC;
 					--Spinner-xSmallSize: 1.5em;
 					--Spinner-xSmallBorderWidth: 0.25em;
 					--Spinner-smallSize: 3em;
@@ -369,7 +368,7 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 					--Spinner-mediumBorderWidth: 0.5em;
 					--Spinner-largeSize: 7em;
 					--Spinner-largeBorderWidth: 0.75em;
-					--Spinner-inverseColor: #0374B5;
+					--Spinner-inverseColor: #2B7ABC;
 				}
 
 				.Spinner-circleTrack {

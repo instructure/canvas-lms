@@ -35,7 +35,11 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {submissionCommentAttachmentsUpload} from '@canvas/upload-file'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import {UploadMediaStrings, MediaCaptureStrings} from '@canvas/upload-media-translations'
+import {
+  UploadMediaStrings,
+  MediaCaptureStrings,
+  SelectStrings,
+} from '@canvas/upload-media-translations'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 
 const I18n = createI18nScope('assignments_2')
@@ -52,7 +56,7 @@ export default class CommentTextArea extends Component {
   state = {
     commentText: '',
     currentFiles: [],
-    commentTextErrors:[],
+    commentTextErrors: [],
     hasError: false,
     mediaModalOpen: false,
     mediaObject: null,
@@ -60,11 +64,13 @@ export default class CommentTextArea extends Component {
     bottomValue: '0px',
   }
 
-  componentDidUpdate(){
-    if(this.state.commentTextErrors.length > 0 && this.state.bottomValue === '0px') {
-      this.setState({bottomValue: this._commentTextBox.ref.children[0].lastChild.getBoundingClientRect().height + 'px'})
-    }
-    else if(this.state.commentTextErrors.length === 0 && this.state.bottomValue !== '0px') {
+  componentDidUpdate() {
+    if (this.state.commentTextErrors.length > 0 && this.state.bottomValue === '0px') {
+      this.setState({
+        bottomValue:
+          this._commentTextBox.ref.children[0].lastChild.getBoundingClientRect().height + 'px',
+      })
+    } else if (this.state.commentTextErrors.length === 0 && this.state.bottomValue !== '0px') {
       this.setState({bottomValue: '0px'})
     }
   }
@@ -127,7 +133,10 @@ export default class CommentTextArea extends Component {
     selectedFiles.forEach(file => {
       file.id = ++currIndex
     })
-    this.setState(prevState => ({currentFiles: [...prevState.currentFiles, ...selectedFiles], commentTextErrors: []}))
+    this.setState(prevState => ({
+      currentFiles: [...prevState.currentFiles, ...selectedFiles],
+      commentTextErrors: [],
+    }))
   }
 
   onMediaModalDismiss = (err, mediaObject) => {
@@ -367,29 +376,36 @@ export default class CommentTextArea extends Component {
                     }}
                     open={this.state.mediaModalOpen}
                     rcsConfig={{
-                      contextId: this.props.assignment.env.courseId,
-                      contextType: 'course',
+                      contextId: ENV.current_user.id,
+                      contextType: 'user',
                     }}
                     tabs={{embed: false, record: true, upload: true}}
-                    uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
+                    uploadMediaTranslations={{
+                      UploadMediaStrings,
+                      MediaCaptureStrings,
+                      SelectStrings,
+                    }}
                     userLocale={ENV.LOCALE}
                     disableSubmitWhileUploading={true}
+                    useStudioPlayer={ENV.FEATURES?.consolidated_media_player}
                   />
                   <Button
                     onClick={() => {
-                      if (this.state.commentText.trim().length > 0 || this.state.currentFiles.length > 0) {
+                      if (
+                        this.state.commentText.trim().length > 0 ||
+                        this.state.currentFiles.length > 0
+                      ) {
                         this.onSendComment(createSubmissionComment)
                       } else {
                         const errorMessage = I18n.t('Comment or file required to save')
                         this._commentTextBox.focus()
                         this.setState({
                           commentTextErrors: [
-                            { text: errorMessage, type: 'newError' },
-                            { text: errorMessage, type: 'screenreader-only' },
-                          ]
+                            {text: errorMessage, type: 'newError'},
+                            {text: errorMessage, type: 'screenreader-only'},
+                          ],
                         })
                       }
-
                     }}
                     data-testid="send-button"
                   >

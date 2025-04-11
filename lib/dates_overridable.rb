@@ -327,7 +327,7 @@ module DatesOverridable
             courses_user_has_been_enrolled_in[:admin].include?(context_id) ||
             courses_user_has_been_enrolled_in[:observer].include?(context_id)
         overrides = overrides_for(user)
-        overrides = overrides.map(&:as_hash)
+        overrides = overrides_to_hash(user, overrides)
         if !differentiated_assignments_applies? &&
            (overrides.empty? || courses_user_has_been_enrolled_in[:admin].include?(context_id))
           overrides << base_due_date_hash
@@ -342,13 +342,19 @@ module DatesOverridable
           context.user_has_been_admin?(user) ||
           context.user_has_been_observer?(user)
       overrides = overrides_for(user)
-      overrides = overrides.map(&:as_hash)
+      overrides = overrides_to_hash(user, overrides)
       if !differentiated_assignments_applies? && (overrides.empty? || context.user_has_been_admin?(user))
         overrides << base_due_date_hash
       end
       overrides
     else
       all_due_dates
+    end
+  end
+
+  def overrides_to_hash(user, overrides)
+    overrides.map do |override|
+      override.as_hash_for(user)
     end
   end
 

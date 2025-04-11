@@ -218,7 +218,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   # @API Disable summary
-  #
+  # Deprecated, to remove after VICE-5047 gets merged
   # Disables the summary for a discussion topic.
   #
   # @example_request
@@ -295,71 +295,103 @@ class DiscussionTopicsApiController < ApplicationController
     render(json: { liked: feedback.liked, disliked: feedback.disliked })
   end
 
-  # TODO: this is only mock implementation for now
   def insight
     return render_unauthorized_action unless @topic.user_can_access_insights?(@current_user)
 
-    workflow_state = nil
-    valid_states = %w[created in_progress failed completed]
-    if valid_states.include?(params[:mock_workflow_state])
-      workflow_state = params[:mock_workflow_state]
+    insight = @topic.insights.order(created_at: :desc).first
+    if insight.nil?
+      return render(json: { workflow_state: nil })
     end
 
-    if ["failed", "completed"].include?(workflow_state)
-      needs_processing = params[:mock_needs_processing] == "true"
+    data = {
+      workflow_state: insight.workflow_state,
+    }
 
-      return render(json: { workflow_state:, needs_processing: })
+    if DiscussionTopicInsight::TERMINAL_WORKFLOW_STATES.include?(insight.workflow_state)
+      data[:needs_processing] = insight.needs_processing?
     end
 
-    render(json: { workflow_state: })
+    render(json: data)
   end
 
-  # TODO: this is only mock implementation for now
   def insight_generation
     return render_unauthorized_action unless @topic.user_can_access_insights?(@current_user)
 
+    DiscussionTopicInsight.transaction do
+      insight = @topic.insights.create!(
+        workflow_state: "created",
+        user: @current_user
+      )
+
+      # delay will fail if the job is already queued, because the job is a singleton
+      insight.delay(
+        priority: Delayed::HIGH_PRIORITY,
+        singleton: "discussion_topic:insight_generation_for_topic:#{@topic.id}",
+        n_strand: ["discussion_topic:insight_generation:#{Shard.current.database_server.region}", 1]
+      ).generate
+    end
+
     render json: {}
+  rescue => e
+    logger.error("Error generating insight for discussion topic: #{e.class} - #{e.message}")
+    render json: { error: "Failed to generate insight for discussion topic." }, status: :unprocessable_entity
   end
 
-  # TODO: this is only mock implementation for now
   def insight_entries
     return render_unauthorized_action unless @topic.user_can_access_insights?(@current_user)
 
-    entry_count = 20
-    if params[:mock_entry_count]
-      entry_count = params[:mock_entry_count].to_i
+    insight = @topic.insights.order(created_at: :desc).first
+    if insight.nil?
+      return render(json: [])
     end
 
-    entries = Array.new(entry_count) do |i|
+    insight_entries = insight.processed_entries.map do |insight_entry|
       {
-        id: i,
-        entry_content: "Mock discussion entry content #{i + 1}",
-        entry_url: "https://example.com/entries/#{i + 1}",
-        entry_updated_at: Time.now.utc - i.hours,
-        student_id: i,
-        student_name: "Student #{i + 1}",
-        relevance_ai_classification: ["relevant", "irrelevant"].sample,
-        relevance_ai_classification_confidence: rand(1..5),
-        relevance_ai_evaluation_notes: "AI evaluation notes for entry #{i + 1}",
-        relevance_human_reviewer: (i % 3 == 0) ? nil : (entry_count + i),
-        relevance_human_feedback_liked: [false, false, true][i % 3],
-        relevance_human_feedback_disliked: [false, true, false][i % 3],
-        relevance_human_feedback_notes: (i % 3 == 0) ? nil : ["Human feedback notes #{i + 1}", ""].sample,
+        id: insight_entry.id,
+        entry_id: insight_entry.discussion_entry.id,
+        entry_content: insight_entry.discussion_entry_version.message,
+        entry_updated_at: insight_entry.discussion_entry_version.updated_at,
+        student_id: insight_entry.discussion_entry.user_id,
+        student_name: insight_entry.user.short_name,
+        # TODO: these will change
+        relevance_ai_classification: insight_entry.ai_evaluation["final_label"],
+        relevance_ai_evaluation_notes: insight_entry.ai_evaluation["feedback"],
+        relevance_human_reviewer: insight_entry.ai_evaluation_human_reviewer_id,
+        relevance_human_feedback_liked: insight_entry.ai_evaluation_human_feedback_liked,
+        relevance_human_feedback_disliked: insight_entry.ai_evaluation_human_feedback_disliked,
+        relevance_human_feedback_notes: insight_entry.ai_evaluation_human_feedback_notes,
       }
     end
 
-    render json: entries
+    render json: insight_entries
   end
 
-  # TODO: this is only mock implementation for now
   def insight_entry_update
     return render_unauthorized_action unless @topic.user_can_access_insights?(@current_user)
 
-    params[:entry_id]
+    insight_entry = @topic.insight_entries.find(params[:entry_id])
+    if insight_entry.nil?
+      return render(json: { error: "Entry not found." }, status: :not_found)
+    end
 
-    unless %w[like dislike reset_like].include?(params[:relevance_human_feedback_action])
+    # TODO: this parameter will change
+    action = params[:relevance_human_feedback_action]
+    unless %w[like dislike reset_like].include?(action)
       return render(json: { error: "Invalid action." }, status: :bad_request)
     end
+
+    # TODO: this parameter will change
+    notes = params[:relevance_human_feedback_notes]
+    if notes.nil?
+      return render(json: { error: "Missing notes." }, status: :bad_request)
+    end
+
+    insight_entry.update!(
+      ai_evaluation_human_reviewer: @current_user,
+      ai_evaluation_human_feedback_liked: action == "like",
+      ai_evaluation_human_feedback_disliked: action == "dislike",
+      ai_evaluation_human_feedback_notes: notes
+    )
 
     render json: {}
   end

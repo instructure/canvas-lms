@@ -24,6 +24,7 @@
     :COURSE_ID => @context.id,
     :PUBLISH_MENU_PROGRESS_ID => @progress&.id,
     :NO_MODULE_PROGRESSIONS => @context.large_roster,
+    :FEATURE_MODULES_PERF => module_performance_improvement_is_enabled?(@context, @current_user)
   })
 %>
 <% js_bundle :module_student_view_peer_reviews %>

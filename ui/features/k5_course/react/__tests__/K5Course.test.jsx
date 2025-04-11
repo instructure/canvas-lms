@@ -267,7 +267,7 @@ describe('K-5 Subject Course', () => {
       const {getByTestId} = render(<K5Course {...defaultProps} />)
       const hero = getByTestId('k5-course-header-hero')
 
-      expect(hero.style.getPropertyValue('background-color')).toBe('rgb(57, 75, 88)')
+      expect(hero.style.getPropertyValue('background-color')).toBe('rgb(51, 68, 81)')
     })
 
     it('displays the course name', () => {
