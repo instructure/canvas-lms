@@ -296,7 +296,7 @@ class AssignmentsController < ApplicationController
         if @assignment.external_tool? && Account.site_admin.feature_enabled?(:external_tools_for_a2) && @unlocked
           @tool = Lti::ToolFinder.from_assignment(@assignment)
 
-          js_env({ LTI_TOOL: "true" })
+          js_env({ LTI_TOOL: "true", LTI_TOOL_ID: @tool&.id })
         end
 
         if @assignment.external_tool?

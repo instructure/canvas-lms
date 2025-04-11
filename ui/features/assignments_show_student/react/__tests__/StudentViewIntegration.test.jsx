@@ -20,7 +20,7 @@ import * as uploadFileModule from '@canvas/upload-file'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CREATE_SUBMISSION_DRAFT} from '@canvas/assignments/graphql/student/Mutations'
 import {createCache} from '@canvas/apollo-v3'
-import {fireEvent, render, waitFor,act} from '@testing-library/react'
+import {fireEvent, render, waitFor, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
@@ -51,11 +51,18 @@ describe('student view integration tests', () => {
       PREREQS: {},
       current_user_roles: ['user', 'student'],
     })
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve([]),
+      }),
+    )
   })
 
   afterEach(() => {
     fakeENV.teardown()
     jest.clearAllMocks()
+    jest.restoreAllMocks()
   })
 
   describe('StudentViewQuery', () => {

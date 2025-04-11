@@ -102,10 +102,17 @@ describe('ViewManager', () => {
       PREREQS: {},
       current_user_roles: ['user', 'student'],
     }
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve([]),
+      }),
+    )
   })
 
   afterEach(() => {
     window.ENV = originalEnv
+    jest.restoreAllMocks()
   })
 
   describe('New Attempt Button', () => {
