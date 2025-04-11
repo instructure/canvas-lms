@@ -61,6 +61,7 @@ class SVGWrapper extends React.Component {
         }
 
         this.svg.setAttribute('focusable', false)
+        this.rootSpan.innerHTML = ''
         this.rootSpan.appendChild(this.svg)
       },
     })
