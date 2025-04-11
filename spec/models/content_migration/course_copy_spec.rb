@@ -1450,7 +1450,7 @@ describe ContentMigration do
       let(:home_page) do
         course1.wiki_pages.create(
           title: "Javascript",
-          body: "<a title='Home' href=\"/courses/#{course1.id}\" data-course-type='navigation'>Home</a>"
+          body: "<a title='Home' href=\"/courses/#{course1.id}\" data-course-type='navigation'>Home</a><iframe src='https://www.google.com//' width='800' height='600' title='Google'></iframe>"
         )
       end
 
@@ -1471,15 +1471,27 @@ describe ContentMigration do
         worker = Canvas::Migration::Worker::CourseCopyWorker.new
         worker.perform(@cm)
       end
+
       it "updates home link when copying the page between courses" do
         run_course_copy(course1, course2)
         copied_page1 = course2.wiki_pages.find_by(title: "Javascript")
         expect(copied_page1).not_to be_nil
-        expect(copied_page1.body).to include("/courses/#{course2.id}/")
+        expect(copied_page1.body).to include("/courses/#{course2.id}")
         run_course_copy(course2, course3)
         copied_page2 = course3.wiki_pages.find_by(title: "Javascript")
         expect(copied_page2).not_to be_nil
-        expect(copied_page2.body).to include("/courses/#{course3.id}/")
+        expect(copied_page2.body).to include("/courses/#{course3.id}")
+      end
+
+      it "does not update iframe links when copying the page between courses" do
+        run_course_copy(course1, course2)
+        copied_page1 = course2.wiki_pages.find_by(title: "Javascript")
+        expect(copied_page1).not_to be_nil
+        expect(copied_page1.body).to include("https://www.google.com//")
+        run_course_copy(course2, course3)
+        copied_page2 = course3.wiki_pages.find_by(title: "Javascript")
+        expect(copied_page2).not_to be_nil
+        expect(copied_page2.body).to include("https://www.google.com//")
       end
     end
   end

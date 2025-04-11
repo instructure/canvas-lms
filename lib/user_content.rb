@@ -257,12 +257,13 @@ module UserContent
     end
 
     def replacement(url)
-      url = url.sub(%r{/$}, "")
       matched = url.match(@toplevel_regex)
       asset_types = AssetTypes.slice(*@allowed_types)
       context_type = matched[2] || matched[4]
       context_id   = matched[3] || matched[5]
       type, obj_id, rest = matched.values_at(6, 7, 8)
+      home_link = url.match(%r{(/courses/\d+/?(?=\b|[^/\w]|$))})
+      url = url.sub(%r{/$}, "") if home_link
       prefix = "/#{context_type}/#{context_id}" if context_type && context_id
       return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix && context_type != "users"
 
