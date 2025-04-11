@@ -32,7 +32,7 @@ import {LoadingContainer} from '../LoadingContainer'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 
-const I18n = createI18nScope('account_change_modal')
+const I18n = createI18nScope('horizon_toggle_page')
 
 type AccountChangeModalProps = {
   isOpen: boolean
