@@ -529,6 +529,10 @@ class Course < ActiveRecord::Base
     DifferentiableAssignment.scope_filter(scope, user, self)
   end
 
+  def visible_module_items_by_module(user, context_module)
+    module_items_visible_to(user).where(context_modules: { id: context_module.id })
+  end
+
   def module_items_visible_to(user)
     tags = if (user_is_teacher = grants_right?(user, :view_unpublished_items))
              context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")

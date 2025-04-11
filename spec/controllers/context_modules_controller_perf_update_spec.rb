@@ -257,4 +257,91 @@ describe ContextModulesController do
       end
     end
   end
+
+  describe "GET assignment_info" do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @module1 = @course.context_modules.create!
+      @context_module1_item1 = @module1.add_item(type: "sub_header", title: "item 1")
+      @module2 = @course.context_modules.create!
+      @context_module2_item1 = @module2.add_item(type: "sub_header", title: "item 2")
+    end
+
+    context "when context_module_id is provided" do
+      subject do
+        get "content_tag_assignment_data", params: { course_id: @course.id, context_module_id: module_id }, format: "json"
+        json_parse(response.body)
+      end
+
+      let(:module_id) { @module1.id }
+
+      context "when FF is off" do
+        before do
+          @course.account.disable_feature!(:modules_perf)
+        end
+
+        it "should render unfiltered result" do
+          subject
+
+          expect(subject.keys).to match_array([@context_module1_item1.id.to_s, @context_module2_item1.id.to_s])
+        end
+      end
+
+      context "when FF is on" do
+        before do
+          @course.account.enable_feature!(:modules_perf)
+        end
+
+        context "when provided module id is exist" do
+          it "should render filtered result" do
+            subject
+
+            expect(subject.keys).to match_array([@context_module1_item1.id.to_s])
+          end
+        end
+
+        context "when provided module is is not exist" do
+          let(:module_id) { "noop" }
+
+          it "should render 404" do
+            subject
+
+            expect(subject).to be_empty
+            assert_status(404)
+          end
+        end
+      end
+    end
+
+    context "when context_module_id is not provided" do
+      subject do
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+        json_parse(response.body)
+      end
+
+      context "when FF is off" do
+        before do
+          @course.account.disable_feature!(:modules_perf)
+        end
+
+        it "should render unfiltered result" do
+          subject
+
+          expect(subject.keys).to match_array([@context_module1_item1.id.to_s, @context_module2_item1.id.to_s])
+        end
+      end
+
+      context "when FF is on" do
+        before do
+          @course.account.enable_feature!(:modules_perf)
+        end
+
+        it "should render unfiltered result" do
+          subject
+
+          expect(subject.keys).to match_array([@context_module1_item1.id.to_s, @context_module2_item1.id.to_s])
+        end
+      end
+    end
+  end
 end
