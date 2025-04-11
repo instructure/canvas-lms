@@ -213,7 +213,7 @@
     "swc-plugin-coverage-instrument": "^0.0.21",
     "swfobject": "^2.2.1",
     "tablesorter": "2.32.0",
-    "timezone": "npm:@instructure/timezone@1.0.30",
+    "timezone": "npm:@instructure/timezone@1.0.32",
     "tinycolor2": "^1.6.0",
     "twitter-text": "^3.1.0",
     "underscore": "^1.13.6",
