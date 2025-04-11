@@ -118,6 +118,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def broadcast_data
+    @root_account ||= Account.find_by(id: root_account_ids.first) || user.associated_root_accounts.first
     return unless @root_account
 
     { root_account_id: @root_account.global_id, from_host: HostUrl.context_host(@root_account) }
