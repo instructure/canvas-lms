@@ -622,7 +622,16 @@ class ContextModulesController < ApplicationController
 
       if is_child_course || is_master_course
         tag_ids = GuardRail.activate(:secondary) do
-          tag_scope = @context.module_items_visible_to(@current_user).where(content_type: %w[Assignment Attachment DiscussionTopic Quizzes::Quiz WikiPage])
+          if context.account.feature_enabled?(:modules_perf) && params[:context_module_id]
+            @module = @context.modules_visible_to(@current_user).find_by(id: params[:context_module_id])
+            return render json: { tag_restrictions: {} }, status: :not_found unless @module
+
+            tag_scope = @context.visible_module_items_by_module(@current_user, @module)
+          else
+            tag_scope = @context.module_items_visible_to(@current_user)
+          end
+
+          tag_scope = tag_scope.where(content_type: %w[Assignment Attachment DiscussionTopic Quizzes::Quiz WikiPage])
           tag_scope = tag_scope.where(id: params[:tag_id]) if params[:tag_id]
           tag_scope.pluck(:id)
         end
