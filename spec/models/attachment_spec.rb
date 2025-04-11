@@ -2152,6 +2152,24 @@ describe Attachment do
     end
   end
 
+  describe "make_rootless" do
+    before do
+      local_storage!
+    end
+
+    before :once do
+      @root = attachment_model(uploaded_data: default_uploaded_data)
+      @child = attachment_model(root_attachment: @root)
+    end
+
+    it "makes independent copy from root attachment" do
+      @child.make_rootless
+      expect(@child.reload.root_attachment_id).to be_nil
+      expect(@child.filename).not_to eq @root.filename
+      expect(@child.open.read).to eq @root.open.read
+    end
+  end
+
   context "s3 storage with sharding" do
     let(:sz) { "640x>" }
 

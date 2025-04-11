@@ -74,7 +74,7 @@ class Attachment < ActiveRecord::Base
   restrict_columns :settings, %i[folder_id locked lock_at unlock_at usage_rights_id]
   restrict_columns :state, [:locked, :file_state]
 
-  attr_accessor :podcast_associated_asset, :export_id, :instfs_tenant_auth
+  attr_accessor :podcast_associated_asset, :export_id, :instfs_tenant_auth, :avoid_linking_to_root_attachment
 
   # this is a gross hack to work around freaking SubmissionComment#attachments=
   attr_accessor :ok_for_submission_comment
@@ -1980,24 +1980,8 @@ class Attachment < ActiveRecord::Base
       destination.md5 = md5
       destination.workflow_state = "processed"
     else
-      begin
-        if split_root_attachment
-          old_content_type = content_type
-          scope = Attachment.where(md5:, namespace:, root_attachment_id: nil)
-          # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
-          scope.where.not(content_type: "invalid/invalid")
-               .in_batches
-               .update_all(content_type: "invalid/invalid")
-        end
-        Attachments::Storage.store_for_attachment(destination, open)
-      ensure
-        if split_root_attachment
-          scope.where.not(id: destination)
-               .where.not(content_type: old_content_type)
-               .in_batches
-               .update_all(content_type: old_content_type)
-        end
-      end
+      destination.avoid_linking_to_root_attachment = true if split_root_attachment
+      Attachments::Storage.store_for_attachment(destination, open)
     end
   end
 
