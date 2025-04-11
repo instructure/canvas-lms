@@ -924,7 +924,7 @@ describe Api do
           <img src="https://school.instructure.com/users/#{@student.id}/files/#{att2.id}/preview?location=#{location}" loading="lazy" data-api-endpoint="https://school.instructure.com/api/v1/users/#{@student.id}/files/#{att2.id}" data-api-returntype="File">
           <img src="https://dummy-web.test/asdf" loading="lazy">
         HTML
-        expect(proxy_instance.api_user_content(html, @course, @student, location: @course)).to eq expected
+        expect(proxy_instance.api_user_content(html, @course, @student, location: @course.asset_string)).to eq expected
       end
     end
 

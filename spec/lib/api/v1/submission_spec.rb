@@ -82,6 +82,23 @@ describe Api::V1::Submission do
   end
 
   describe "#submission_json" do
+    context "when file_association_access feature flag is enabled" do
+      let(:attachment) { attachment_model(content_type: "application/pdf", context: teacher) }
+
+      before do
+        attachment.root_account.enable_feature!(:file_association_access)
+        fake_controller.instance_variable_set(:@domain_root_account, attachment.root_account)
+      end
+
+      it "should add asset location tag to the submission json body" do
+        student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
+        submission = assignment.submit_homework(student, submission_type: "online_upload", body: "<img src='/users/#{teacher.id}/files/#{attachment.id}'>", attachments: [attachment])
+        json = fake_controller.submission_json(submission, assignment, teacher, session, context)
+
+        expect(json["body"]).to include("location=#{submission.asset_string}")
+      end
+    end
+
     context "when discussion_checkpoints feature flag is enabled" do
       let(:field) { "sub_assignment_submissions" }
 

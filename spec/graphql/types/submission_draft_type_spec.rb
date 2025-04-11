@@ -30,12 +30,12 @@ RSpec.describe Types::SubmissionDraftType do
     @media_object = MediaObject.create!(media_id: "m-123456", title: "CreedThoughts")
   end
 
-  def resolve_submission_draft(body_rewrite_urls: nil)
+  def resolve_submission_draft(body_rewrite_urls: nil, root_account: nil)
     body_args = ""
     unless body_rewrite_urls.nil?
       body_args = "(rewriteUrls: #{body_rewrite_urls})"
     end
-    result = CanvasSchema.execute(<<~GQL, context: { current_user: @student, request: ActionDispatch::TestRequest.create })
+    result = CanvasSchema.execute(<<~GQL, context: { current_user: @student, request: ActionDispatch::TestRequest.create, domain_root_account: root_account })
       query {
         submission(id: "#{@submission.id}") {
           submissionDraft {
@@ -102,6 +102,19 @@ RSpec.describe Types::SubmissionDraftType do
 
     submission_draft = resolve_submission_draft body_rewrite_urls: false
     expect(submission_draft["body"]).to eq('<a href="/somewhere">Somewhere</a>')
+  end
+
+  it "adds location tagging to body attachments urls when file_association_access FF is enabled" do
+    attachment_model(context: @student)
+    @attachment.root_account.enable_feature!(:file_association_access)
+    @submission_draft.body = "<img src='/users/#{@student.id}/files/#{@attachment.id}'>"
+    @submission_draft.attachments = [
+      @attachment
+    ]
+    @submission_draft.save!
+    submission_draft = resolve_submission_draft body_rewrite_urls: true, root_account: @attachment.root_account
+
+    expect(submission_draft["body"]).to eq("<img src=\"http://test.host/users/#{@student.id}/files/#{@attachment.id}?location=#{@submission_draft.asset_string}\" loading=\"lazy\" data-api-endpoint=\"http://test.host/api/v1/users/#{@student.id}/files/#{@attachment.id}\" data-api-returntype=\"File\">")
   end
 
   it "returns the meetsAssignmentCriteria field" do

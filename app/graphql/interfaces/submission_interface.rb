@@ -327,7 +327,11 @@ module Interfaces::SubmissionInterface
                     in_app: context[:in_app],
                     request: context[:request],
                     preloaded_attachments:,
-                    user: current_user
+                    user: current_user,
+                    options: {
+                      domain_root_account: context[:domain_root_account],
+                    },
+                    location: object.asset_string
                   )
                 end
             end

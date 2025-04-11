@@ -111,6 +111,51 @@ describe Types::DiscussionEntryType do
     end
   end
 
+  describe "when file_association_access ff is enabled" do
+    before do
+      # we need to make the Promise based loader synchronous for the sake of tests to get them running and evaluate the result
+      Types::DiscussionEntryType.class_eval do
+        def message
+          return nil if object.deleted?
+
+          if object.message&.include?("instructure_inline_media_comment")
+            load_association(:discussion_topic).then do |topic|
+              Loaders::ApiContentAttachmentLoader.for(topic.context).load(object.message).then do |preloaded_attachments|
+                object.message = GraphQLHelpers::UserContent.process(
+                  object.message,
+                  context: topic.context,
+                  in_app: true,
+                  request:,
+                  preloaded_attachments:,
+                  user: current_user,
+                  options: { rewrite_api_urls: true, domain_root_account: context[:domain_root_account] },
+                  location: object.asset_string
+                )
+              end
+            end.sync
+          end
+
+          object.message
+        end
+      end
+    end
+
+    it "adds attachment location tag to the message" do
+      attachment = attachment_model(filename: "test.test")
+      attachment.root_account.enable_feature!(:file_association_access)
+
+      message = "<img class='instructure_inline_media_comment' src='/users/#{@teacher.id}/files/#{attachment.id}/download'>"
+      new_entry = discussion_entry.discussion_topic.discussion_entries.create!(message:, user: @teacher, parent_id: discussion_entry.id, editor: @teacher)
+      discussion_entry.attachment = attachment
+      discussion_entry.save!
+
+      type = GraphQLTypeTester.new(discussion_entry, current_user: @teacher, domain_root_account: @course.root_account)
+      expect(
+        type.resolve("discussionSubentriesConnection { nodes { message } }", request: ActionDispatch::TestRequest.create).first
+      ).to include "location=#{new_entry.asset_string}"
+    end
+  end
+
   describe "quoted entry" do
     it "returns the quoted_entry if reply_preview is false but quoted_entry is populated" do
       message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71

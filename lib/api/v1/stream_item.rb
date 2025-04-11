@@ -48,7 +48,7 @@ module Api::V1::StreamItem
       case stream_item.asset_type
       when "DiscussionTopic", "Announcement"
         context = stream_item.context
-        hash["message"] = api_user_content(data.message, context)
+        hash["message"] = api_user_content(data.message, context, location: stream_item.asset_string)
         if stream_item.data.instance_of?(DiscussionTopic)
           hash["discussion_topic_id"] = stream_item.asset_id
           hash["html_url"] = send(:"#{context_type}_discussion_topic_url", context_id, stream_item.asset_id)
@@ -65,7 +65,7 @@ module Api::V1::StreamItem
               "user_id" => entry.user_id,
               "user_name" => entry.user_short_name,
             },
-            "message" => api_user_content(entry.message, context),
+            "message" => api_user_content(entry.message, context, location: stream_item.asset_string),
           }
         end
       when "ContextMessage"
