@@ -22,17 +22,14 @@ import {createRoot} from 'react-dom/client'
 import {Main} from './react/Main'
 import {initAccountSelectModal} from './react/HorizonModal/InitHorizonModal'
 
-const renderToggle = (isAccountPage: boolean, ui: any) => {
+const renderToggle = (ui: any) => {
   const selectedTab = ui.tab || ui.newTab
   const tabId = $(selectedTab).find('a').attr('id')
 
   const app = (
     <Main
-      isAccountPage={isAccountPage}
-      isHorizonCourse={window.ENV?.horizon_course || false}
       isHorizonAccount={window.ENV?.HORIZON_ACCOUNT || false}
       hasCourses={window.ENV?.has_courses || false}
-      courseId={window.ENV?.COURSE_ID || ''}
       accountId={window.ENV?.ACCOUNT_ID || ''}
       horizonAccountLocked={window.ENV?.horizon_account_locked || false}
     />
@@ -49,9 +46,7 @@ const renderToggle = (isAccountPage: boolean, ui: any) => {
   }
 }
 ready(() => {
-  // small duplication until course details tab is removed (JIRA CLX-1122)
-  $('#account_settings_tabs').on('tabscreate tabsactivate', (_event, ui) => renderToggle(true, ui))
-  $('#course_details_tabs').on('tabscreate tabsactivate', (_event, ui) => renderToggle(false, ui))
+  $('#account_settings_tabs').on('tabscreate tabsactivate', (_event, ui) => renderToggle(ui))
 
   initAccountSelectModal()
 })

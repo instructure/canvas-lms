@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {assignLocation} from '@canvas/util/globalUtils'
 import {render, screen} from '@testing-library/react'
 import {Main} from '../Main'
 
@@ -39,19 +38,6 @@ describe('Main', () => {
     }
     return render(<Main {...props} />)
   }
-
-  it('navigates to student view on Learner Preview button click', () => {
-    setup()
-    const previewButton = screen.getByText('Learner Preview')
-    previewButton.click()
-
-    expect(assignLocation).toHaveBeenCalledWith(`/courses/3/student_view?preview=true`)
-  })
-
-  it('renders course-specific content when isAccountPage is false', () => {
-    setup()
-    expect(screen.getByText('Learner Preview')).toBeInTheDocument()
-  })
 
   it('renders account-specific content when isAccountPage is true', () => {
     setup({
