@@ -24,6 +24,7 @@ import userEvent from '@testing-library/user-event'
 const innerHtml = `<form>
   <h1>Test HTML</h1>
   <input type="checkbox" name="parameter[checkbox]" data-testid="checkbox" />
+  <input type="checkbox" name="parameter[unchecked]" data-testid="unchecked" />
   <select name="parameter[select]" data-testid="select">
       <option value="option_1" data-testid="option_1">Option 1</option>
       <option value="option_2" data-testid="option_2">Option 2</option>
@@ -52,6 +53,7 @@ describe('RunReportForm', () => {
 
     expect(getByText('Test HTML')).toBeInTheDocument()
     expect(getByTestId('checkbox')).toBeInTheDocument()
+    expect(getByTestId('unchecked')).toBeInTheDocument()
     expect(getByTestId('select')).toBeInTheDocument()
   })
 
@@ -77,6 +79,7 @@ describe('RunReportForm', () => {
       expect(request?.method).toBe('POST')
       expect(formData.get('parameter[checkbox]')).toBeTruthy()
       expect(formData.get('parameter[select]')).toBe('option_1')
+      expect(formData.has('parameter[unchecked]')).toBeFalsy()
     })
   })
 

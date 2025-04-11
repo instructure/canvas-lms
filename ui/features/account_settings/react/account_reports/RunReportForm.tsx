@@ -44,7 +44,7 @@ const getElementValue = (element: Element) => {
   let value
   const type = element.getAttribute('type')
   if (type === 'checkbox') {
-    value = (element as HTMLInputElement).checked ? '1' : '0'
+    value = (element as HTMLInputElement).checked ? '1' : null
   } else {
     value = (element as HTMLInputElement).value
   }
@@ -61,7 +61,7 @@ const getFormData = (form: HTMLDivElement) => {
       ? element.getAttribute('name')
       : element.dataset.testid
     const value = getElementValue(element)
-    if (name) {
+    if (name && value !== null) {
       formData.append(name, value)
     }
   }, {})
