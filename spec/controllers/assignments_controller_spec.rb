@@ -1374,6 +1374,12 @@ describe AssignmentsController do
     end
 
     it "sets 'ROOT_OUTCOME_GROUP' for external tool assignments in the teacher view" do
+      @course.context_external_tools.create!(
+        shared_secret: "test_secret",
+        consumer_key: "test_key",
+        name: "test tool",
+        domain: "example.com"
+      )
       user_session(@teacher)
       @assignment.submission_types = "external_tool"
       @assignment.build_external_tool_tag(url: "http://example.com/test")
@@ -1381,6 +1387,7 @@ describe AssignmentsController do
 
       get "show", params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).not_to be_nil
+      expect(assigns[:js_env][:LTI_TOOL_ID]).not_to be_nil
     end
 
     it "sets first_annotation_submission to true if it's the first submission and the assignment is annotatable" do
@@ -1497,7 +1504,16 @@ describe AssignmentsController do
             end
 
             it "is included when assignment is an external tool type" do
-              @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+              @course.context_external_tools.create!(
+                shared_secret: "test_secret",
+                consumer_key: "test_key",
+                name: "test tool",
+                domain: "example.com"
+              )
+              @assignment.submission_types = "external_tool"
+              @assignment.build_external_tool_tag(url: "http://example.com/test")
+              @assignment.save!
+
               get :show, params: { course_id: @course.id, id: @assignment.id }
               expect(assigns[:js_env][:SETTINGS]).to have_key(:filter_speed_grader_by_student_group)
             end
@@ -1577,13 +1593,29 @@ describe AssignmentsController do
           end
 
           it "includes group_categories when assignment is an external tool type" do
-            @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+            @course.context_external_tools.create!(
+              shared_secret: "test_secret",
+              consumer_key: "test_key",
+              name: "test tool",
+              domain: "example.com"
+            )
+            @assignment.submission_types = "external_tool"
+            @assignment.build_external_tool_tag(url: "http://example.com/test")
+            @assignment.save!
             get :show, params: { course_id: @course.id, id: @assignment.id }
             expect(assigns[:js_env]).to have_key(:group_categories)
           end
 
           it "includes selected_student_group_id when assignment is an external tool type" do
-            @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+            @course.context_external_tools.create!(
+              shared_secret: "test_secret",
+              consumer_key: "test_key",
+              name: "test tool",
+              domain: "example.com"
+            )
+            @assignment.submission_types = "external_tool"
+            @assignment.build_external_tool_tag(url: "http://example.com/test")
+            @assignment.save!
             first_group_id = @course.groups.first.id.to_s
             @teacher.preferences[:gradebook_settings] = {
               @course.global_id => {
@@ -1670,7 +1702,15 @@ describe AssignmentsController do
         end
 
         it "includes speed_grader_url when assignment is an external tool type" do
-          @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+          @course.context_external_tools.create!(
+            shared_secret: "test_secret",
+            consumer_key: "test_key",
+            name: "test tool",
+            domain: "example.com"
+          )
+          @assignment.submission_types = "external_tool"
+          @assignment.build_external_tool_tag(url: "http://example.com/test")
+          @assignment.save!
           get :show, params: { course_id: @course.id, id: @assignment.id }
           expect(assigns[:js_env]).to have_key(:speed_grader_url)
         end
@@ -1905,7 +1945,15 @@ describe AssignmentsController do
         end
 
         it "sets assigned_rubric and rubric_association for external_tool assignments" do
-          @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+          @course.context_external_tools.create!(
+            shared_secret: "test_secret",
+            consumer_key: "test_key",
+            name: "test tool",
+            domain: "example.com"
+          )
+          @assignment.submission_types = "external_tool"
+          @assignment.build_external_tool_tag(url: "http://example.com/test")
+          @assignment.save!
           get :show, params: { course_id: @course.id, id: @assignment.id }
           expect(assigns[:js_env][:assigned_rubric][:id]).to eq @assignment.rubric_association.rubric_id
           expect(assigns[:js_env][:assigned_rubric][:title]).to eq "Unnamed Course Rubric"
