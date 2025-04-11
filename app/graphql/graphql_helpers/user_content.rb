@@ -17,9 +17,10 @@ module GraphQLHelpers
                      user:,
                      in_app:,
                      preloaded_attachments: {},
-                     options: {})
+                     options: {},
+                     location: nil)
       new(request:, context:, user:, in_app:)
-        .api_user_content(content, preloaded_attachments, options)
+        .api_user_content(content, preloaded_attachments, options, location:)
     end
 
     def initialize(request:, context:, user:, in_app:)
@@ -29,8 +30,8 @@ module GraphQLHelpers
       @in_app = in_app
     end
 
-    def api_user_content(html, preloaded_attachments = {}, options = {})
-      super(html, context, user, preloaded_attachments, options)
+    def api_user_content(html, preloaded_attachments = {}, options = {}, location: nil)
+      super(html, context, user, preloaded_attachments, options, location:)
     end
 
     def in_app?

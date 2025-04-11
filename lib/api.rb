@@ -636,7 +636,8 @@ module Api
       host = HostUrl.context_host(context, @account_domain.try(:host))
       protocol = HostUrl.protocol
     end
-    no_verifiers = @domain_root_account&.feature_enabled?(:disable_adding_uuid_verifier_in_api) || (params[:no_verifiers] if defined?(params))
+    domain_root_account = @domain_root_account || options[:domain_root_account]
+    no_verifiers = domain_root_account&.feature_enabled?(:disable_adding_uuid_verifier_in_api) || (params[:no_verifiers] if defined?(params))
     html = context.shard.activate do
       rewriter = UserContent::HtmlRewriter.new(context, user)
       file_handler = proc do |match|
@@ -648,7 +649,7 @@ module Api
           is_public:,
           in_app: respond_to?(:in_app?, true) && in_app?,
           no_verifiers:,
-          location: (location.asset_string if @domain_root_account&.feature_enabled?(:file_association_access))
+          location: (location if domain_root_account&.feature_enabled?(:file_association_access))
         ).processed_url
       end
       rewriter.set_handler("files", &file_handler)

@@ -259,7 +259,7 @@ module Api::V1::Submission
 
     attempt.assignment = assignment
     hash = api_json(attempt, user, session, only: json_fields, methods: json_methods)
-    hash["body"] = api_user_content(hash["body"], context, user) if hash["body"].present?
+    hash["body"] = api_user_content(hash["body"], context, user, location: attempt.asset_string) if hash["body"].present?
 
     hash["group"] = submission_minimal_group_json(attempt) if includes.include?("group")
     if hash.key?("grade_matches_current_submission")

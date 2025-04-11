@@ -155,6 +155,25 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
   end
 
+  context "when file_association_access is enabled" do
+    it "tags attachment urls with asset location" do
+      attachment = attachment_model(context: @course)
+      attachment.root_account.enable_feature!(:file_association_access)
+      discussion_topic = DiscussionTopic.create!(title: "Welcome whoever you are",
+                                                 message: "<img src='/courses/#{@course.id}/files/#{attachment.id}'>",
+                                                 anonymous_state: "partial_anonymity",
+                                                 context: @course,
+                                                 user: @teacher,
+                                                 editor: @teacher,
+                                                 attachment:,
+                                                 is_anonymous_author: true)
+      discussion_type = GraphQLTypeTester.new(discussion_topic, current_user: @teacher, domain_root_account: attachment.root_account)
+
+      result = discussion_type.resolve("message", request: ActionDispatch::TestRequest.create)
+      expect(result).to include("location=#{discussion_topic.asset_string}")
+    end
+  end
+
   it "returns if the current user requires an initial post" do
     discussion.update!(require_initial_post: true)
     student_in_course(active_all: true)

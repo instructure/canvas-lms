@@ -71,7 +71,7 @@ module Api::V1::Quiz
   end
 
   def quiz_json(quiz, context, user, session, options = {}, serializer = nil)
-    options[:description_formatter] = description_formatter(context, user) unless options[:description_formatter]
+    options[:description_formatter] = description_formatter(context, user, {}, quiz) unless options[:description_formatter]
     if accepts_jsonapi?
       Canvas::APIArraySerializer.new([quiz],
                                      scope: user,
@@ -90,11 +90,11 @@ module Api::V1::Quiz
     end
   end
 
-  def description_formatter(context, user, preloaded_attachments = {})
+  def description_formatter(context, user, preloaded_attachments = {}, quiz = nil)
     # adds verifiers - lambda here (as opposed to
     # inside the serializer) to capture context
     lambda do |description|
-      api_user_content(description, context, user, preloaded_attachments)
+      api_user_content(description, context, user, preloaded_attachments, location: quiz&.asset_string)
     end
   end
 

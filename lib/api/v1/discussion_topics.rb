@@ -274,7 +274,7 @@ module Api::V1::DiscussionTopics
         elsif opts[:text_only]
           html_to_text(topic.message, preserve_links: true)
         else
-          api_user_content(topic.message, context)
+          api_user_content(topic.message, context, location: topic.asset_string)
         end
     end
 
@@ -325,7 +325,7 @@ module Api::V1::DiscussionTopics
     if entry.deleted?
       json[:deleted] = true
     else
-      json[:message] = api_user_content(entry.message, context, user)
+      json[:message] = api_user_content(entry.message, context, user, location: entry.asset_string)
     end
 
     json[:user] = user_display_json(entry.user, context) if includes.include?(:display_user)
