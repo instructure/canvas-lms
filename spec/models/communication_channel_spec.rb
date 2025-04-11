@@ -178,6 +178,13 @@ describe CommunicationChannel do
     expect(cc.reload.confirmation_sent_count).to eq conf_count
   end
 
+  it "does not break with missing context" do
+    @u1 = User.create!
+    cc = communication_channel(@u1, { username: "mortgage@tomnook.com" })
+    cc.send_confirmation!(nil)
+    expect(cc.reload.confirmation_sent_count).to eq 1
+  end
+
   it "is able to reset a confirmation code" do
     communication_channel_model
     old_cc = @cc.confirmation_code
