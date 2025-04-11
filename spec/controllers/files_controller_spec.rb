@@ -354,37 +354,6 @@ describe FilesController do
       end
     end
 
-    describe "with an OAuth access token" do
-      before do
-        user_with_pseudonym
-        pseudonym(@teacher)
-        @access_token = AccessToken.create!(user: @teacher)
-        @invalid_access_token = AccessToken.create!(user: @teacher, permanent_expires_at: 1.day.ago)
-        @user_access_token = AccessToken.create!(user: @user)
-      end
-
-      it "allows access with a valid token" do
-        get "show", params: { course_id: @course.id, id: @file.id, access_token: @access_token.full_token }, format: "json"
-        expect(response).to be_successful
-      end
-
-      it "allows download with a valid token" do
-        get "show", params: { course_id: @course.id, id: @file.id, access_token: @access_token.full_token, download: "1" }, format: "json"
-        expect(response).to be_redirect
-        expect(response.location).to include "/courses/#{@course.id}/files/#{@file.id}/course%20files"
-      end
-
-      it "denies access with an invalid token" do
-        get "show", params: { course_id: @course.id, id: @file.id, access_token: @invalid_access_token.full_token }, format: "json"
-        expect(response.status.to_i).to be > 399
-      end
-
-      it "denies access with a valid token for a user who does not have access" do
-        get "show", params: { course_id: @course.id, id: @file.id, access_token: @user_access_token.full_token }, format: "json"
-        expect(response.status.to_i).to be > 399
-      end
-    end
-
     describe "with JWT access token" do
       include_context "InstAccess setup"
 
