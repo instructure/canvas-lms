@@ -37,7 +37,6 @@ const I18n = createI18nScope('context_modules_v2')
 interface ModulePageActionHeaderProps {
   onCollapseAll: () => void
   onExpandAll: () => void
-  onViewProgress: () => void
   handleOpeningModuleUpdateTray?: (moduleId: string | undefined) => void
   anyModuleExpanded?: boolean
 }
@@ -45,7 +44,6 @@ interface ModulePageActionHeaderProps {
 const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   onCollapseAll,
   onExpandAll,
-  onViewProgress,
   handleOpeningModuleUpdateTray,
   anyModuleExpanded = true,
 }) => {
@@ -89,7 +87,7 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
     )
   }, [anyModuleExpanded, handleCollapseExpandClick])
 
-  return ENV.FEATURES.instui_header ? (
+  return (
     <ContextModulesHeader
       // @ts-expect-error
       {...ENV.CONTEXT_MODULES_HEADER_PROPS}
@@ -101,44 +99,6 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
         handleAddModule: handleAddModule
       }}
     />
-  ) : (
-    <View as="div" padding="small">
-      <Flex justifyItems="space-between" wrap='wrap'>
-        <Flex.Item>
-          <Flex gap="small" wrap='wrap'>
-            <Flex.Item>
-              {renderExpandCollapseAll()}
-            </Flex.Item>
-            <Flex.Item>
-              <Button
-                renderIcon={<IconEyeLine />}
-                onClick={onViewProgress}
-              >
-                {I18n.t('View Progress')}
-              </Button>
-            </Flex.Item>
-            <Flex.Item>
-              <ContextModulesPublishMenu
-                courseId={courseId}
-                runningProgressId={null}
-                disabled={false}
-                onPublishComplete={handlePublishComplete}
-              />
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
-        <Flex.Item>
-          <Button
-            color="primary"
-            renderIcon={<IconPlusLine />}
-            onClick={handleAddModule}
-            className="add-module-button"
-          >
-            {I18n.t('Module')}
-          </Button>
-        </Flex.Item>
-      </Flex>
-    </View>
   )
 }
 
