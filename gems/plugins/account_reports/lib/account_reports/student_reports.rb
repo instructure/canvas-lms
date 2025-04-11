@@ -61,7 +61,7 @@ module AccountReports
 
     def include_enrollment_state
       if @account_report.value_for_param("include_enrollment_state")
-        state = @account_report.parameters["include_enrollment_state"]
+        state = value_to_boolean(@account_report.parameters["include_enrollment_state"])
       end
       state
     end
