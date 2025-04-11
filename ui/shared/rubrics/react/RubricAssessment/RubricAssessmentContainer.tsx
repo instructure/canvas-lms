@@ -38,6 +38,7 @@ import {findCriterionMatchingRatingIndex} from './utils/rubricUtils'
 import {SelfAssessmentInstructorScore} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentInstructorScore'
 import {SelfAssessmentInstructions} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentInstructions'
 import {Checkbox} from '@instructure/ui-checkbox'
+import { Heading } from '@instructure/ui-heading'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
@@ -396,9 +397,14 @@ const AssessmentHeader = ({
     >
       <Flex>
         <Flex.Item align="end">
-          <Text weight="bold" size="large" data-testid="rubric-assessment-header">
+          <Heading 
+            level="h2" 
+            data-testid="rubric-assessment-header"
+            margin="xxx-small 0"
+            themeOverride={{h2FontSize: "1.375rem", h2FontWeight: 700}}
+          >
             {rubricHeader}
-          </Text>
+          </Heading>
         </Flex.Item>
         {!isStandaloneContainer && (
           <Flex.Item align="end">
