@@ -119,10 +119,6 @@ const ModulesList: React.FC = () => {
       handleOpeningModuleUpdateTray(data, courseId, moduleId, moduleName, prerequisites, openTab)
     ), [handleOpeningModuleUpdateTray, data])
 
-  const handleViewProgressRef = useCallback(() => {
-    window.location.href = `/courses/${courseId}/modules/progressions`
-  }, [])
-
   const onToggleExpandRef = useCallback((moduleId: string) => {
     handleToggleExpand(moduleId, setExpandedModules)
   }, [handleToggleExpand, setExpandedModules])
@@ -133,7 +129,6 @@ const ModulesList: React.FC = () => {
         <ModulePageActionHeader
           onCollapseAll={handleCollapseAllRef}
           onExpandAll={handleExpandAllRef}
-          onViewProgress={handleViewProgressRef}
           handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTrayRef}
           anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
         />
