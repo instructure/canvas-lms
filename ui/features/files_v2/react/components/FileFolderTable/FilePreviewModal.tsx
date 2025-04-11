@@ -33,9 +33,8 @@ import {
 } from '@instructure/ui-icons'
 import {type File} from '../../../interfaces/File'
 import {generatePreviewUrlPath} from '../../../utils/fileUtils'
-import {FilePreview, mediaTypes} from './FilePreview'
+import {FilePreview} from './FilePreview'
 import {FilePreviewNavigationButtons} from './FilePreviewNavigationButtons'
-import {useFetchMedia} from './useFetchMedia'
 
 const I18n = createI18nScope('files_v2')
 
@@ -46,19 +45,11 @@ export interface FilePreviewModalProps {
   collection: File[]
 }
 
-const previewableTypes = ['image', 'pdf', 'html', 'doc', 'text']
-
 export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePreviewModalProps) => {
   const [currentItem, setCurrentItem] = useState<File>(item)
   const [currentIndex, setCurrentIndex] = useState<number>(collection.indexOf(item))
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const name = currentItem.display_name
-  const isFilePreview = !!(
-    currentItem.preview_url && previewableTypes.includes(currentItem.mime_class)
-  )
-  const isMediaPreview = !isFilePreview && mediaTypes.includes(currentItem.mime_class)
-  const isQueryEnabled = isMediaPreview && isOpen
-  const {data, isFetching} = useFetchMedia({attachmentId: currentItem.id, enabled: isQueryEnabled})
 
   // Reset state when the modal is opened or item changes
   useEffect(() => {
@@ -181,15 +172,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
             id="file-preview-modal-drawer-layout"
             label={I18n.t('File Preview')}
           >
-            <FilePreview
-              item={currentItem}
-              mediaId={data?.media_id ?? ''}
-              mediaSources={data?.media_sources ?? []}
-              mediaTracks={data?.media_tracks ?? []}
-              isFilePreview={isFilePreview}
-              isMediaPreview={isMediaPreview}
-              isFetchingMedia={isFetching}
-            />
+            <FilePreview item={currentItem} />
           </DrawerLayout.Content>
           <DrawerLayout.Tray
             open={isTrayOpen}
@@ -197,13 +180,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
             placement="end"
             label={I18n.t('File Information')}
           >
-            <FilePreviewTray
-              onDismiss={() => setIsTrayOpen(false)}
-              item={currentItem}
-              mediaTracks={data?.media_tracks ?? []}
-              canAddTracks={data?.can_add_captions ?? false}
-              isFetchingTracks={isFetching}
-            />
+            <FilePreviewTray onDismiss={() => setIsTrayOpen(false)} item={currentItem} />
           </DrawerLayout.Tray>
         </DrawerLayout>
       </Modal.Body>

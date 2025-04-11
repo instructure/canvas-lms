@@ -16,29 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {View} from '@instructure/ui-view'
 import {CloseButton} from '@instructure/ui-buttons'
 import CommonFileInfo from './CommonFileInfo'
-import {MediaFileInfo} from './MediaFileInfo'
 import type {File} from '../../../../interfaces/File'
-import {MediaTrack} from '@canvas/canvas-studio-player/react/types'
 
 export interface FilePreviewTrayProps {
   onDismiss: () => void
   item: File
-  mediaTracks: MediaTrack[]
-  isFetchingTracks: boolean
-  canAddTracks: boolean
 }
 
-export const FilePreviewTray = ({
-  onDismiss,
-  item,
-  mediaTracks,
-  isFetchingTracks,
-  canAddTracks,
-}: FilePreviewTrayProps) => {
+export const FilePreviewTray = ({onDismiss, item}: FilePreviewTrayProps) => {
   return (
     <View
       as="div"
@@ -58,13 +46,6 @@ export const FilePreviewTray = ({
         data-testid="tray-close-button"
       />
       <CommonFileInfo item={item} />
-      <MediaFileInfo
-        attachment={item}
-        mediaTracks={mediaTracks}
-        key={item.id}
-        isLoading={isFetchingTracks}
-        canAddTracks={canAddTracks}
-      />
     </View>
   )
 }
