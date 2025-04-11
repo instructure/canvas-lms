@@ -77,6 +77,21 @@ describe AutoGradeService do
   end
 
   describe "#call" do
+    let(:rubric) do
+      [
+        {
+          description: "Content",
+          points: 10,
+          ratings: [
+            { long_description: "Excellent content", points: 10 },
+            { long_description: "Good content", points: 7 },
+            { long_description: "Poor content", points: 3 }
+          ]
+        }
+      ]
+    end
+    let(:assignment) { "Write an essay about your favorite book." }
+
     it "calls Cedar and returns enriched response" do
       mock_response = double("HTTPResponse", is_a?: true, body: mock_graphql_response.to_json)
       mock_request = double("HTTPRequest")
@@ -143,7 +158,7 @@ describe AutoGradeService do
           essay:,
           rubric: rubric_data
         ).call
-      end.to raise_error(/Cedar GraphQL error/)
+      end.to raise_error(CedarAIGraderError, /Invalid request/)
     end
   end
 
@@ -203,6 +218,155 @@ describe AutoGradeService do
       expect do
         service.send(:map_criteria_ids_to_grades, invalid_response, rubric)
       end.to raise_error(CedarAIGraderError, /Missing Criterion 'Missing' from Rubric Category 'Content'/)
+    end
+  end
+
+  describe "#sanitize_essay" do
+    let(:service) { described_class.new(assignment: "Test Assignment", essay: "", rubric: []) }
+
+    context "when validating essay length" do
+      it "raises an error for essays with less than 5 words" do
+        short_essay = "Too short essay"
+        expect do
+          service.send(:validate_essay_length, short_essay)
+        end.to raise_error("Submission must be at least 5 words long")
+      end
+
+      it "does not raise an error for essays with 5 or more words" do
+        valid_essay = "This is a valid essay text"
+        expect do
+          service.send(:validate_essay_length, valid_essay)
+        end.not_to raise_error
+      end
+    end
+
+    it "removes content between HTML tags" do
+      sanitized = service.send(:sanitize_essay, "<script>alert('Injected!')</script>This is safe.")
+      expect(sanitized).to eq("This is safe.")
+    end
+
+    it "removes lines starting with more than 3 # characters" do
+      sanitized = service.send(:sanitize_essay, "#### This line should be removed\nThis line should stay.")
+      expect(sanitized).to eq("This line should stay.")
+    end
+
+    it "removes extra spaces and trims the text" do
+      sanitized = service.send(:sanitize_essay, "   This   has   extra   spaces.   ")
+      expect(sanitized).to eq("This has extra spaces.")
+    end
+  end
+
+  describe "#rubric_matches_default_template" do
+    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric:) }
+
+    context "when rubric matches a default template" do
+      it "returns true for Exit Ticket template" do
+        rubric = [
+          { description: "Exit Ticket Prompt" },
+          { description: "Preparation" },
+          { description: "Time" },
+          { description: "Participation" }
+        ]
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:)
+        expect(service.send(:rubric_matches_default_template)).to be true
+      end
+
+      it "returns true for Peer Review template" do
+        rubric = [{ description: "Peer Review" }]
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:)
+        expect(service.send(:rubric_matches_default_template)).to be true
+      end
+
+      it "returns true for generic criterion template" do
+        rubric = [{ description: "Description of criterion" }]
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:)
+        expect(service.send(:rubric_matches_default_template)).to be true
+      end
+    end
+
+    context "when rubric does not match any default template" do
+      it "returns false for custom criteria" do
+        rubric = [
+          { description: "Custom Criterion 1" },
+          { description: "Custom Criterion 2" }
+        ]
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:)
+        expect(service.send(:rubric_matches_default_template)).to be false
+      end
+
+      it "returns false for partial template match" do
+        rubric = [
+          { description: "Exit Ticket Prompt" },
+          { description: "Custom Criterion" }
+        ]
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:)
+        expect(service.send(:rubric_matches_default_template)).to be false
+      end
+    end
+  end
+
+  describe "#filter_repeating_keys" do
+    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric: []) }
+
+    context "when JSON array contains duplicate criteria" do
+      let(:json_array) do
+        [
+          {
+            "rubric_category" => "Content",
+            "reasoning" => "First reasoning",
+            "criterion" => "Meets requirements"
+          },
+          {
+            "rubric_category" => "Grammar",
+            "reasoning" => "Second reasoning",
+            "criterion" => "Meets requirements" # Duplicate criterion
+          },
+          {
+            "rubric_category" => "Style",
+            "reasoning" => "Third reasoning",
+            "criterion" => "Unique criterion"
+          }
+        ]
+      end
+
+      it "removes entries with duplicate criterion values" do
+        filtered_array = service.send(:filter_repeating_keys, json_array)
+
+        expect(filtered_array.length).to eq(2)
+        expect(filtered_array.map { |item| item["criterion"] }).to match_array(["Meets requirements", "Unique criterion"])
+      end
+
+      it "keeps the first occurrence of duplicate criteria" do
+        filtered_array = service.send(:filter_repeating_keys, json_array)
+
+        duplicate_entry = filtered_array.find { |item| item["criterion"] == "Meets requirements" }
+        expect(duplicate_entry["reasoning"]).to eq("First reasoning")
+        expect(duplicate_entry["rubric_category"]).to eq("Content")
+      end
+    end
+
+    context "when JSON array has no duplicates" do
+      let(:unique_array) do
+        [
+          {
+            "rubric_category" => "Content",
+            "reasoning" => "First reasoning",
+            "criterion" => "Criterion 1"
+          },
+          {
+            "rubric_category" => "Grammar",
+            "reasoning" => "Second reasoning",
+            "criterion" => "Criterion 2"
+          }
+        ]
+      end
+
+      it "returns the original array unchanged" do
+        filtered_array = service.send(:filter_repeating_keys, unique_array)
+
+        expect(filtered_array).to eq(unique_array)
+        expect(filtered_array.length).to eq(2)
+      end
     end
   end
 end
