@@ -39,17 +39,18 @@ shared_examples_for "context modules for teachers" do
   it "does not render modules page rewrite" do
     user_session(@teacher)
     get "/courses/#{@course.id}/modules"
-    expect(driver.execute_script("return document.querySelector('[data-testid=\"modules-rewrite-student-container\"]')")).to be_nil # rubocop:disable Specs/NoExecuteScript
+    expect(driver.execute_script("return document.querySelector('[data-testid=\"modules-rewrite-container\"]')")).to be_nil # rubocop:disable Specs/NoExecuteScript
   end
 
   it "expands/collapses module with 0 items", priority: "2" do
     modules = create_modules(1, true)
     get "/courses/#{@course.id}/modules"
+    expect(module_content(modules[0].id)).to be_displayed
     f(".collapse_module_link[aria-controls='context_module_content_#{modules[0].id}']").click
-    expect(f(".icon-mini-arrow-down")).to be_displayed
+    expect(module_content(modules[0].id)).to be_displayed
   end
 
-  it "hides module items", priority: "1" do
+  it "collapses module items", priority: "1" do
     module_with_two_items
     wait_for_animations
     expect(f(".context_module .content")).not_to be_displayed
@@ -185,7 +186,7 @@ shared_examples_for "context modules for teachers" do
     expect(ig_rows).not_to be_empty
   end
 
-  it "adds a new quiz to a module in a specific assignment group" do
+  it "adds a new classic quiz to a module in a specific assignment group" do
     @course.context_modules.create!(name: "Quiz")
     get "/courses/#{@course.id}/modules"
 
