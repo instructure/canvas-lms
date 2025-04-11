@@ -66,7 +66,7 @@ describe "context modules" do
       modules[0].add_item({ id: @assignment.id, type: "assignment" })
       modules[0].add_item({ id: @assignment2.id, type: "assignment" })
       get "/courses/#{@course.id}/modules"
-      f(".collapse_module_link[aria-controls='context_module_content_#{modules[0].id}']").click
+      collapse_module_link(modules[0].id).click
       wait_for_ajaximations
     end
 
@@ -83,6 +83,79 @@ describe "context modules" do
         retry_button.click
         wait_for_ajax_requests
         expect(ff(".context_module .content .context_module_item")).to have_size(2)
+      end
+    end
+
+    context "when module item actions are selected" do
+      it "shows the module item assign to tray" do
+        module_with_two_items
+        module_item = ContentTag.last
+        first_module = ContextModule.last
+
+        expand_module_link(first_module.id).click
+        wait_for_ajaximations
+
+        manage_module_item_button(module_item).click
+        click_manage_module_item_assign_to(module_item)
+
+        expect(item_tray_exists?).to be true
+      end
+
+      it "duplicates the module item" do
+        module_with_two_items
+        module_item = ContentTag.last
+        first_module = ContextModule.last
+
+        expand_module_link(first_module.id).click
+
+        manage_module_item_button(module_item).click
+        click_module_item_duplicate(module_item)
+        wait_for_ajaximations
+
+        module_item = ContentTag.last
+        expect(module_item.title).to eq("assignment 2 Copy")
+      end
+
+      it "bring up the module item move tray" do
+        module_with_two_items
+        module_item = ContentTag.last
+        first_module = ContextModule.last
+
+        expand_module_link(first_module.id).click
+
+        manage_module_item_button(module_item).click
+        click_module_item_move(module_item)
+        wait_for_ajaximations
+
+        expect(move_tray_exists?).to be true
+      end
+
+      it "bring up the module item send to tray" do
+        module_with_two_items
+        module_item = ContentTag.last
+        first_module = ContextModule.last
+
+        expand_module_link(first_module.id).click
+
+        manage_module_item_button(module_item).click
+        click_module_item_send_to(module_item)
+        wait_for_ajaximations
+
+        expect(send_to_dialog_exists?).to be true
+      end
+
+      it "bring up the module item copy to tray", :ignore_js_errors do
+        module_with_two_items
+        module_item = ContentTag.last
+        first_module = ContextModule.last
+
+        expand_module_link(first_module.id).click
+
+        manage_module_item_button(module_item).click
+        click_module_item_copy_to(module_item)
+        wait_for_ajaximations
+
+        expect(copy_to_tray_exists?).to be true
       end
     end
   end

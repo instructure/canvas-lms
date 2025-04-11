@@ -21,6 +21,10 @@ require_relative "../../common"
 
 module ModulesIndexPage
   #------------------------------ Selectors -----------------------------
+  def collapse_module_link_selector(module_id)
+    ".collapse_module_link[aria-controls='context_module_content_#{module_id}']"
+  end
+
   def context_module_selector(module_id)
     "#context_module_#{module_id}"
   end
@@ -29,8 +33,20 @@ module ModulesIndexPage
     "[data-testid = 'delete-card-button']"
   end
 
+  def expand_module_link_selector(module_id)
+    ".expand_module_link[aria-controls='context_module_content_#{module_id}']"
+  end
+
   def manage_module_item_assign_to_selector(module_item_id)
     "#context_module_item_#{module_item_id} .module-item-assign-to-link"
+  end
+
+  def module_item_copy_to_selector(module_item_id)
+    "#context_module_item_#{module_item_id} .module_item_copy_to"
+  end
+
+  def module_item_copy_to_tray_selector
+    "[role='dialog'][aria-label='Copy To...']"
   end
 
   def manage_module_item_indent_selector(module_item_id)
@@ -41,8 +57,28 @@ module ModulesIndexPage
     "//button[.//*[contains(text(), 'Create a new Module')]]"
   end
 
+  def module_content_selector(module_id)
+    "#context_module_content_#{module_id}"
+  end
+
   def module_item_selector(module_item_id)
     "#context_module_item_#{module_item_id}"
+  end
+
+  def module_item_duplicate_selector(module_item_id)
+    "#context_module_item_#{module_item_id} .duplicate_item_link"
+  end
+
+  def module_item_move_selector(module_item_id)
+    "#context_module_item_#{module_item_id} .move_module_item_link"
+  end
+
+  def module_item_send_to_selector(module_item_id)
+    "#context_module_item_#{module_item_id} .module_item_send_to"
+  end
+
+  def module_item_move_tray_selector
+    "[role='dialog'][aria-label='Move Module Item']"
   end
 
   def new_module_link_selector
@@ -59,6 +95,10 @@ module ModulesIndexPage
 
   def require_sequential_progress_selector(module_id)
     "#context_module_#{module_id} .module_header_items .require_sequential_progress"
+  end
+
+  def send_to_dialog_selector
+    "[role='dialog'][aria-label='Send To...']"
   end
 
   def unlock_details_selector(module_id)
@@ -102,12 +142,20 @@ module ModulesIndexPage
   end
 
   #------------------------------ Elements ------------------------------
+  def collapse_module_link(module_id)
+    f(collapse_module_link_selector(module_id))
+  end
+
   def context_module(module_id)
     f(context_module_selector(module_id))
   end
 
   def delete_card_button
     ff(delete_card_button_selector)
+  end
+
+  def expand_module_link(module_id)
+    f(expand_module_link_selector(module_id))
   end
 
   def manage_module_item_assign_to(module_item_id)
@@ -126,12 +174,36 @@ module ModulesIndexPage
     fj(module_index_menu_tool_link_selector(tool_text))
   end
 
+  def module_item_copy_to(module_item_id)
+    f(module_item_copy_to_selector(module_item_id))
+  end
+
   def module_create_button
     fxpath(module_create_button_selector)
   end
 
+  def module_content(module_id)
+    f(module_content_selector(module_id))
+  end
+
   def module_item(module_item_id)
     f(module_item_selector(module_item_id))
+  end
+
+  def module_item_duplicate(module_item_id)
+    f(module_item_duplicate_selector(module_item_id))
+  end
+
+  def module_item_move(module_item_id)
+    f(module_item_move_selector(module_item_id))
+  end
+
+  def module_item_move_tray
+    f(module_item_move_tray_selector)
+  end
+
+  def module_item_send_to(module_item_id)
+    f(module_item_send_to_selector(module_item_id))
   end
 
   def module_row(module_id)
@@ -245,6 +317,22 @@ module ModulesIndexPage
     manage_module_item_assign_to(module_item.id).click
   end
 
+  def click_module_item_copy_to(module_item)
+    module_item_copy_to(module_item.id).click
+  end
+
+  def click_module_item_duplicate(module_item)
+    module_item_duplicate(module_item.id).click
+  end
+
+  def click_module_item_move(module_item)
+    module_item_move(module_item.id).click
+  end
+
+  def click_module_item_send_to(module_item)
+    module_item_send_to(module_item.id).click
+  end
+
   def click_manage_module_item_indent(module_item)
     manage_module_item_indent(module_item.id).click
   end
@@ -255,6 +343,22 @@ module ModulesIndexPage
 
   def click_new_module_link
     new_module_link.click
+  end
+
+  def copy_to_tray_exists?
+    element_exists?(module_item_copy_to_tray_selector)
+  end
+
+  def module_content_style(module_id)
+    element_value_for_attr(module_content(module_id), "style")
+  end
+
+  def move_tray_exists?
+    element_exists?(module_item_move_tray_selector)
+  end
+
+  def send_to_dialog_exists?
+    element_exists?(send_to_dialog_selector)
   end
 
   def retrieve_assignment_content_tag(content_module, assignment)
