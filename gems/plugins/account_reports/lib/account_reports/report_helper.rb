@@ -21,6 +21,10 @@
 module AccountReports::ReportHelper
   include ::Api
 
+  def self.included(base)
+    base.singleton_class.delegate :value_to_boolean, to: :"Canvas::Plugin"
+  end
+
   class DatabaseReplicationError < StandardError; end
 
   def parse_utc_string(datetime)
