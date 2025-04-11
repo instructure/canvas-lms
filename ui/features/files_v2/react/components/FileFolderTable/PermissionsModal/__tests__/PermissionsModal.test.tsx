@@ -136,6 +136,76 @@ describe('UsageRightsModal', () => {
         expect(await screen.getByText(/available from/i)).toBeInTheDocument()
         expect(await screen.getByText(/until/i)).toBeInTheDocument()
       })
+
+      describe('with date errors', () => {
+        it('shows an error there are invalid dates', async () => {
+          renderComponent({
+            items: [
+              {
+                ...FAKE_FILES[0],
+                unlock_at: '2025-04-12T00:00:00Z',
+                lock_at: '2025-04-15T00:00:00Z',
+              },
+            ],
+          })
+          let input = await screen.getByLabelText(/available from/i)
+          await userEvent.click(input)
+          await userEvent.clear(input)
+          await userEvent.type(input, 'banana')
+          input = await screen.getByLabelText(/until/i)
+          await userEvent.click(input)
+          await userEvent.clear(input)
+          await userEvent.type(input, 'avocado')
+          await userEvent.click(screen.getByTestId('permissions-save-button'))
+          const messages = await screen.getAllByText('Invalid date')
+          expect(messages[0]).toBeInTheDocument()
+          expect(messages[1]).toBeInTheDocument()
+        })
+
+        it('shows error when unlock date is after lock date', async () => {
+          renderComponent({
+            items: [
+              {
+                ...FAKE_FILES[0],
+                unlock_at: '2026-04-12T00:00:00Z',
+                lock_at: '2025-04-15T00:00:00Z',
+              },
+            ],
+          })
+          const availableInput = screen.getByLabelText(/available from/i)
+          await userEvent.click(screen.getByTestId('permissions-save-button'))
+          expect(
+            await screen.findByText('Unlock date cannot be after lock date.')
+          ).toBeInTheDocument()
+          expect(availableInput).toHaveFocus()
+        })
+
+        it('shows error when both lock_at and unlock_at are blank', async () => {
+          renderComponent({
+            items: [
+              {
+                ...FAKE_FILES[0],
+                hidden: false,
+                locked: false,
+                unlock_at: '2025-04-12T00:00:00Z',
+                lock_at: '2025-04-15T00:00:00Z',
+              },
+            ],
+          })
+          const availableInput = screen.getByLabelText(/available from/i)
+          await userEvent.click(availableInput)
+          await userEvent.clear(availableInput)
+          const untilInput = screen.getByLabelText(/until/i)
+          await userEvent.click(untilInput)
+          await userEvent.clear(untilInput)
+          await userEvent.click(untilInput)
+
+          await userEvent.click(screen.getByTestId('permissions-save-button'))
+
+          expect(await screen.findByText('Please enter at least one date.')).toBeInTheDocument()
+          expect(availableInput).toHaveFocus()
+        })
+      })
     })
 
     describe('with visibility options', () => {
@@ -198,30 +268,6 @@ describe('UsageRightsModal', () => {
     renderComponent()
     expect(await screen.getByTestId('permissions-cancel-button')).toBeInTheDocument()
     expect(await screen.getByTestId('permissions-save-button')).toBeInTheDocument()
-  })
-
-  it('shows an error there are invalid dates', async () => {
-    renderComponent({
-      items: [
-        {
-          ...FAKE_FILES[0],
-          unlock_at: '2025-04-12T00:00:00Z',
-          lock_at: '2025-04-15T00:00:00Z',
-        },
-      ],
-    })
-    let input = await screen.getByLabelText(/available from/i)
-    await userEvent.click(input)
-    await userEvent.clear(input)
-    await userEvent.type(input, 'banana')
-    input = await screen.getByLabelText(/until/i)
-    await userEvent.click(input)
-    await userEvent.clear(input)
-    await userEvent.type(input, 'avocado')
-    await userEvent.click(screen.getByTestId('permissions-save-button'))
-    const messages = await screen.getAllByText('Invalid date')
-    expect(messages[0]).toBeInTheDocument()
-    expect(messages[1]).toBeInTheDocument()
   })
 
   it('performs fetch request and shows alert', async () => {
