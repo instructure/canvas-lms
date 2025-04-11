@@ -16,43 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {waitFor} from '@testing-library/react'
+import {screen} from '@testing-library/dom'
 import fetchMock from 'fetch-mock'
-import {
-  fetchModuleItemsHtml,
-  fetchModuleItems,
-  type ModuleId
-} from '../utils/fetchModuleItems'
+import {LazyLoadModuleItems, type ModuleId} from '../utils/fetchModuleItems'
 
 const courseId = '23'
 const pageSize = 2
 
 const modules: Record<ModuleId, {items: string; api: string; link: string}> = {
   '1083': {
-    items: '<ul id="17"></ul><ul id="18"></ul>',
-    api: '/courses/23/modules/1083/items_html?per_page=2',
-    link: '</courses/23/modules/1083/items_html?per_page=2>; rel="current",</courses/23/modules/1083/items_html?page=2&per_page=2>; rel="next",</courses/23/modules/1083/items_html?page=1&per_page=2>; rel="first",</courses/23/modules/1083/items_html?page=2&per_page=2>; rel="last"',
+    items: '<ul><li id="17"></li><li id="18"></li></ul>',
+    api: '/courses/23/modules/1083/items_html?page=1&per_page=2',
+    link: '</courses/23/modules/1083/items_html?page=1&per_page=2>; rel="current",</courses/23/modules/1083/items_html?page=2&per_page=2>; rel="next",</courses/23/modules/1083/items_html?page=1&per_page=2>; rel="first",</courses/23/modules/1083/items_html?page=2&per_page=2>; rel="last"',
   },
   '1084': {
-    items: '<ul id="19"></ul><ul id="20"></ul>',
-    api: '/courses/23/modules/1084/items_html?per_page=2',
-    link: '</courses/23/modules/1084/items_html?per_page=2>; rel="current",</courses/23/modules/1084/items_html?page=2&per_page=2>; rel="next",</courses/23/modules/1084/items_html?page=1&per_page=2>; rel="first",</courses/23/modules/1084/items_html?page=2&per_page=2>; rel="last"',
+    items: '<ul><li id="19"></li><li id="20"></li></ul>',
+    api: '/courses/23/modules/1084/items_html?page=1&per_page=2',
+    link: '</courses/23/modules/1084/items_html?page=1&per_page=2>; rel="current",</courses/23/modules/1084/items_html?page=2&per_page=2>; rel="next",</courses/23/modules/1084/items_html?page=1&per_page=2>; rel="first",</courses/23/modules/1084/items_html?page=2&per_page=2>; rel="last"',
   },
   '1085': {
-    items: '<ul id="21"></ul><ul id="22"></ul>',
-    api: '/courses/23/modules/1085/items_html?per_page=2',
-    link: '</courses/23/modules/1085/items_html?per_page=2>; rel="current",</courses/23/modules/1085/items_html?page=2&per_page=2>; rel="next",</courses/23/modules/1085/items_html?page=1&per_page=2>; rel="first",</courses/23/modules/1085/items_html?page=2&per_page=2>; rel="last"',
+    items: '<ul><li id="21"></li><li id="22"></li></ul>',
+    api: '/courses/23/modules/1085/items_html?page=1&per_page=2',
+    link: '</courses/23/modules/1085/items_html?page=1&per_page=2>; rel="current",</courses/23/modules/1085/items_html?page=2&per_page=2>; rel="next",</courses/23/modules/1085/items_html?page=1&per_page=2>; rel="first",</courses/23/modules/1085/items_html?page=2&per_page=2>; rel="last"',
   },
-}
-
-const createMockContainer = (moduleId: string) => {
-  const div = document.createElement('div')
-  div.id = `context_module_content_${moduleId}`
-  document.body.appendChild(div)
 }
 
 Object.keys(modules).forEach((moduleId: string) => {
-  createMockContainer(moduleId)
-
   fetchMock.mock(modules[moduleId].api, {
     body: modules[moduleId].items,
     headers: {
@@ -61,9 +51,17 @@ Object.keys(modules).forEach((moduleId: string) => {
   })
 })
 
+const createMockContainer = (moduleId: string) => {
+  const div = document.createElement('div')
+  div.id = `context_module_content_${moduleId}`
+  const footer = document.createElement('footer')
+  footer.className = 'footer'
+  div.appendChild(footer)
+  document.body.appendChild(div)
+}
 const badModule = {
   moduleId: '1086',
-  api: '/courses/23/modules/1086/items_html?per_page=2',
+  api: '/courses/23/modules/1086/items_html?page=1&per_page=2',
   response: new Response('', {status: 500}),
 }
 
@@ -71,7 +69,22 @@ fetchMock.mock(badModule.api, badModule.response)
 
 createMockContainer(badModule.moduleId)
 
+let lazyLoadModuleItems: LazyLoadModuleItems
+
 describe('fetchModuleItems utility', () => {
+  beforeEach(() => {
+    lazyLoadModuleItems = new LazyLoadModuleItems()
+    lazyLoadModuleItems.courseId = courseId
+    lazyLoadModuleItems.callback = jest.fn()
+    lazyLoadModuleItems.perPage = pageSize
+
+    document.body.innerHTML = ''
+    Object.keys(modules).forEach((moduleId: string) => {
+      createMockContainer(moduleId)
+    })
+    createMockContainer(badModule.moduleId)
+  })
+
   afterEach(() => {
     fetchMock.resetHistory()
     Object.keys(modules).forEach((moduleId: string) => {
@@ -85,57 +98,86 @@ describe('fetchModuleItems utility', () => {
   describe('fetchModuleItems', () => {
     it('does nothing if no modules are provided', async () => {
       const callback = jest.fn()
-      await fetchModuleItems(courseId, [], callback, pageSize)
+      await lazyLoadModuleItems.fetchModuleItems(courseId, [], callback, pageSize)
       expect(callback).not.toHaveBeenCalled()
     })
 
     it('does nothing if the provided moduleIds not exist in the dom', async () => {
-      await fetchModuleItems(courseId, ['noop'], jest.fn(), pageSize)
+      await lazyLoadModuleItems.fetchModuleItems(courseId, ['noop'], jest.fn(), pageSize)
       expect(fetchMock.calls()).toHaveLength(0)
     })
 
     it('construct the api urls correctly', async () => {
-      await fetchModuleItems(courseId, Object.keys(modules), jest.fn(), pageSize)
+      await lazyLoadModuleItems.fetchModuleItems(
+        courseId,
+        Object.keys(modules),
+        jest.fn(),
+        pageSize,
+      )
       const calls = fetchMock.calls()
-      expect(calls[0][0]).toBe(`/courses/${courseId}/modules/1083/items_html?per_page=${pageSize}`)
-      expect(calls[1][0]).toBe(`/courses/${courseId}/modules/1084/items_html?per_page=${pageSize}`)
-      expect(calls[2][0]).toBe(`/courses/${courseId}/modules/1085/items_html?per_page=${pageSize}`)
+      expect(calls[0][0]).toBe(
+        `/courses/${courseId}/modules/1083/items_html?page=1&per_page=${pageSize}`,
+      )
+      expect(calls[1][0]).toBe(
+        `/courses/${courseId}/modules/1084/items_html?page=1&per_page=${pageSize}`,
+      )
+      expect(calls[2][0]).toBe(
+        `/courses/${courseId}/modules/1085/items_html?page=1&per_page=${pageSize}`,
+      )
     })
 
     it('fetches the items', async () => {
-      await fetchModuleItems(courseId, Object.keys(modules), jest.fn(), pageSize)
+      await lazyLoadModuleItems.fetchModuleItems(
+        courseId,
+        Object.keys(modules),
+        jest.fn(),
+        pageSize,
+      )
       expect(fetchMock.calls()).toHaveLength(3)
     })
 
     describe('success responses', () => {
-      it('set the htmls in the containers with the results', async () => {
-        await fetchModuleItems(courseId, Object.keys(modules), jest.fn(), pageSize)
+      it('set the html in the containers with the results', async () => {
+        await lazyLoadModuleItems.fetchModuleItems(
+          courseId,
+          Object.keys(modules),
+          jest.fn(),
+          pageSize,
+        )
         Object.keys(modules).forEach(moduleId => {
-          expect(document.querySelector(`#context_module_content_${moduleId}`)?.innerHTML)
-            .toEqual(modules[moduleId].items)
+          expect(
+            document.querySelector(`#context_module_content_${moduleId} ul`)?.outerHTML,
+          ).toEqual(modules[moduleId].items)
         })
       })
 
       it("calls the callback for each module's items", async () => {
         const callback = jest.fn()
-        await fetchModuleItems(courseId, Object.keys(modules), callback, pageSize)
-        Object.keys(modules)
-          .forEach(moduleId => expect(callback).toHaveBeenCalledWith(moduleId))
+        await lazyLoadModuleItems.fetchModuleItems(
+          courseId,
+          Object.keys(modules),
+          callback,
+          pageSize,
+        )
+        Object.keys(modules).forEach(moduleId => expect(callback).toHaveBeenCalledWith(moduleId))
       })
     })
 
     describe('failed responses', () => {
       const badModuleId = badModule.moduleId
 
-      it('does not set the htmls', async () => {
-        await fetchModuleItems(courseId, [badModuleId], jest.fn(), pageSize)
-        expect(document.querySelector(`#context_module_content_${badModuleId}`)?.innerHTML)
-          .toContain('Items failed to load')
+      it('does not set the html', async () => {
+        await lazyLoadModuleItems.fetchModuleItems(courseId, [badModuleId], jest.fn(), pageSize)
+        await waitFor(() => {
+          expect(
+            document.querySelector(`#context_module_content_${badModuleId}`)?.innerHTML,
+          ).toContain('Items failed to load')
+        })
       })
 
       it('does not call the callback', async () => {
         const callback = jest.fn()
-        await fetchModuleItems(courseId, [badModuleId], callback, pageSize)
+        await lazyLoadModuleItems.fetchModuleItems(courseId, [badModuleId], callback, pageSize)
         expect(callback).not.toHaveBeenCalled()
       })
     })
@@ -145,16 +187,32 @@ describe('fetchModuleItems utility', () => {
       const goodModuleId = '1083'
 
       it('does set the html for successful responses', async () => {
-        await fetchModuleItems(courseId, [badModuleId, goodModuleId], jest.fn(), pageSize)
-        expect(document.querySelector(`#context_module_content_${goodModuleId}`)?.innerHTML)
-          .toEqual(modules[goodModuleId].items)
-        expect(document.querySelector(`#context_module_content_${badModuleId}`)?.innerHTML)
-          .toContain('Items failed to load')
+        await lazyLoadModuleItems.fetchModuleItems(
+          courseId,
+          [badModuleId, goodModuleId],
+          jest.fn(),
+          pageSize,
+        )
+        await waitFor(() => {
+          expect(
+            document.querySelector(`#context_module_content_${goodModuleId} ul`)?.outerHTML,
+          ).toEqual(modules[goodModuleId].items)
+        })
+        await waitFor(() => {
+          expect(
+            document.querySelector(`#context_module_content_${badModuleId}`)?.outerHTML,
+          ).toContain('Items failed to load')
+        })
       })
 
       it('does call the callback for successful responses', async () => {
         const callback = jest.fn()
-        await fetchModuleItems(courseId, [badModuleId, goodModuleId], callback, pageSize)
+        await lazyLoadModuleItems.fetchModuleItems(
+          courseId,
+          [badModuleId, goodModuleId],
+          callback,
+          pageSize,
+        )
         expect(callback).toHaveBeenCalledWith(goodModuleId)
         expect(callback).not.toHaveBeenCalledWith(badModuleId)
       })
@@ -165,32 +223,39 @@ describe('fetchModuleItems utility', () => {
     const moduleId = '1083'
 
     it('does nothing if the provided moduleId not exist in the dom', async () => {
-      await fetchModuleItemsHtml(courseId, 'noop', jest.fn(), pageSize)
+      await lazyLoadModuleItems.fetchModuleItemsHtml('noop', 1)
       expect(fetchMock.calls()).toHaveLength(0)
     })
 
     it('construct the api url correctly', async () => {
-      await fetchModuleItemsHtml(courseId, moduleId, jest.fn(), pageSize)
+      // use page=2 here
+      fetchMock.mock(
+        `/courses/${courseId}/modules/${moduleId}/items_html?page=2&per_page=${pageSize}`,
+        200,
+      )
+      await lazyLoadModuleItems.fetchModuleItemsHtml(moduleId, 2)
       const calls = fetchMock.calls()
-      expect(calls[0][0]).toBe(`/courses/${courseId}/modules/1083/items_html?per_page=${pageSize}`)
+      expect(calls[0][0]).toBe(
+        `/courses/${courseId}/modules/${moduleId}/items_html?page=2&per_page=${pageSize}`,
+      )
     })
 
     it('fetches the item', async () => {
-      await fetchModuleItemsHtml(courseId, moduleId, jest.fn(), pageSize)
+      await lazyLoadModuleItems.fetchModuleItemsHtml(moduleId, 1)
       expect(fetchMock.calls()).toHaveLength(1)
     })
 
     describe('success response', () => {
       it('set the htmls in the container with the result', async () => {
-        await fetchModuleItemsHtml(courseId, moduleId, jest.fn(), pageSize)
-        expect(document.querySelector(`#context_module_content_${moduleId}`)?.innerHTML)
-          .toEqual(modules[moduleId].items)
+        await lazyLoadModuleItems.fetchModuleItemsHtml(moduleId, 1)
+        expect(document.querySelector(`#context_module_content_${moduleId} ul`)?.outerHTML).toEqual(
+          modules[moduleId].items,
+        )
       })
 
       it("calls the callback for the module's item", async () => {
-        const callback = jest.fn()
-        await fetchModuleItemsHtml(courseId, moduleId, callback, pageSize)
-        expect(callback).toHaveBeenCalledWith(moduleId)
+        await lazyLoadModuleItems.fetchModuleItemsHtml(moduleId, 1)
+        expect(lazyLoadModuleItems.callback).toHaveBeenCalledWith(moduleId)
       })
     })
 
@@ -198,15 +263,48 @@ describe('fetchModuleItems utility', () => {
       const badModuleId = badModule.moduleId
 
       it('does not set the html', async () => {
-        await fetchModuleItemsHtml(courseId, badModuleId, jest.fn(), pageSize)
-        expect(document.querySelector(`#context_module_content_${badModuleId}`)?.innerHTML)
-          .toContain('Items failed to load')
+        await lazyLoadModuleItems.fetchModuleItemsHtml(badModuleId, 1)
+        await waitFor(() => {
+          expect(
+            document.querySelector(`#context_module_content_${badModuleId}`)?.outerHTML,
+          ).toContain('Items failed to load')
+        })
       })
 
       it('does not call the callback', async () => {
-        const callback = jest.fn()
-        await fetchModuleItemsHtml(courseId, badModuleId, callback, pageSize)
-        expect(callback).not.toHaveBeenCalled()
+        await lazyLoadModuleItems.fetchModuleItemsHtml(badModuleId, 1)
+        expect(lazyLoadModuleItems.callback).not.toHaveBeenCalled()
+      })
+
+      it('retries on clicking the retry button', async () => {
+        await lazyLoadModuleItems.fetchModuleItemsHtml(badModuleId, 1)
+        await waitFor(() => {
+          expect(screen.getByTestId('retry-items-failed-to-load')).toBeInTheDocument()
+        })
+        expect(fetchMock.calls()).toHaveLength(1)
+        const retryButton = screen.getByTestId('retry-items-failed-to-load').closest('button')
+        retryButton?.click()
+        expect(fetchMock.calls()).toHaveLength(2)
+      })
+    })
+
+    describe('pagination', () => {
+      it('renders the Pagination component if there are more than one page', async () => {
+        await lazyLoadModuleItems.fetchModuleItemsHtml('1083', 1)
+        await waitFor(() => {
+          expect(screen.getByTestId('module-1083-pagination')).toBeInTheDocument()
+        })
+      })
+
+      it('does not render the Pagination component if there is only one page', async () => {
+        fetchMock.mock('/courses/23/modules/1083/items_html?page=1&per_page=10', {
+          body: modules['1083'].items,
+        })
+        await lazyLoadModuleItems.fetchModuleItemsHtml('1083', 1)
+        expect(document.querySelector(`#context_module_content_1083 ul`)?.outerHTML).toEqual(
+          modules['1083'].items,
+        )
+        expect(screen.queryByTestId('module-1083-pagination')).not.toBeInTheDocument()
       })
     })
   })

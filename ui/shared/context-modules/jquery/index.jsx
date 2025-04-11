@@ -78,11 +78,7 @@ import {parseModule, parseModuleList} from '../differentiated-modules/utils/modu
 import {addModuleElement} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {fetchModuleItems} from '../utils/fetchModuleItems'
-import {Alert} from '@instructure/ui-alerts'
-import {Flex} from '@instructure/ui-flex'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconRefreshLine} from '@instructure/ui-icons'
+import lazyLoadModuleItems from '../utils/fetchModuleItems'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -580,14 +576,16 @@ window.modules = (function () {
     },
 
     lazyLoadItems(moduleIds) {
-      fetchModuleItems(ENV.COURSE_ID, moduleIds, moduleId => {
-        initContextModuleItems(moduleId)
-      }).then(() => {
-        modules.updateAssignmentData()
-        if ($('#context_modules').hasClass('editable')) {
-          modules.loadMasterCourseData()
-        }
-      })
+      lazyLoadModuleItems
+        .fetchModuleItems(ENV.COURSE_ID, moduleIds, moduleId => {
+          initContextModuleItems(moduleId)
+        })
+        .then(() => {
+          modules.updateAssignmentData()
+          if ($('#context_modules').hasClass('editable')) {
+            modules.loadMasterCourseData()
+          }
+        })
     },
 
     evaluateItemCyoe($item, data) {
