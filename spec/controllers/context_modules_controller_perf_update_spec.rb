@@ -324,22 +324,12 @@ describe ContextModulesController do
     end
   end
 
-  describe "GET assignment_info" do
-    before do
-      course_with_teacher_logged_in(active_all: true)
-      @module1 = @course.context_modules.create!
-      @context_module1_item1 = @module1.add_item(type: "sub_header", title: "item 1")
-      @module2 = @course.context_modules.create!
-      @context_module2_item1 = @module2.add_item(type: "sub_header", title: "item 2")
-    end
-
+  RSpec.shared_examples "rendering when context_module_id is provided" do
     context "when context_module_id is provided" do
       subject do
-        get "content_tag_assignment_data", params: { course_id: @course.id, context_module_id: module_id }, format: "json"
-        json_parse(response.body)
+        get action, params: { course_id: @course.id, context_module_id: module_id }, format: "json"
+        parsed_json
       end
-
-      let(:module_id) { @module1.id }
 
       context "when FF is off" do
         before do
@@ -347,8 +337,6 @@ describe ContextModulesController do
         end
 
         it "should render unfiltered result" do
-          subject
-
           expect(subject.keys).to match_array([@context_module1_item1.id.to_s, @context_module2_item1.id.to_s])
         end
       end
@@ -360,8 +348,6 @@ describe ContextModulesController do
 
         context "when provided module id is exist" do
           it "should render filtered result" do
-            subject
-
             expect(subject.keys).to match_array([@context_module1_item1.id.to_s])
           end
         end
@@ -370,19 +356,19 @@ describe ContextModulesController do
           let(:module_id) { "noop" }
 
           it "should render 404" do
-            subject
-
             expect(subject).to be_empty
             assert_status(404)
           end
         end
       end
     end
+  end
 
+  RSpec.shared_examples "rendering when context_module_id is not provided" do
     context "when context_module_id is not provided" do
       subject do
-        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
-        json_parse(response.body)
+        get action, params: { course_id: @course.id }, format: "json"
+        parsed_json
       end
 
       context "when FF is off" do
@@ -408,6 +394,47 @@ describe ContextModulesController do
           expect(subject.keys).to match_array([@context_module1_item1.id.to_s, @context_module2_item1.id.to_s])
         end
       end
+    end
+  end
+
+  describe "filter for module id" do
+    describe "GET assignment_info" do
+      before do
+        course_with_teacher_logged_in(active_all: true)
+        @module1 = @course.context_modules.create!
+        @context_module1_item1 = @module1.add_item(type: "sub_header", title: "item 1")
+        @module2 = @course.context_modules.create!
+        @context_module2_item1 = @module2.add_item(type: "sub_header", title: "item 2")
+      end
+
+      let(:action) { "content_tag_assignment_data" }
+      let(:module_id) { @module1.id }
+      let(:parsed_json) { json_parse(response.body) }
+
+      it_behaves_like "rendering when context_module_id is provided"
+
+      it_behaves_like "rendering when context_module_id is not provided"
+    end
+
+    describe "GET master_course_info" do
+      before do
+        course_with_teacher_logged_in(active_all: true)
+        @assignment = @course.assignments.create!(title: "some assignment", points_possible: 12)
+        @module1 = @course.context_modules.create!
+        @context_module1_item1 = @module1.add_item({ id: @assignment.id, type: "assignment" })
+        @module2 = @course.context_modules.create!
+        @context_module2_item1 = @module2.add_item({ id: @assignment.id, type: "assignment" })
+        @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+        MasterCourses::MasterContentTag.create!(master_template: @template, content: @assignment)
+      end
+
+      let(:action) { "content_tag_master_course_data" }
+      let(:module_id) { @module1.id }
+      let(:parsed_json) { json_parse(response.body)["tag_restrictions"] }
+
+      it_behaves_like "rendering when context_module_id is provided"
+
+      it_behaves_like "rendering when context_module_id is not provided"
     end
   end
 end
