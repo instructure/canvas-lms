@@ -16,11 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {queryClient, useQuery} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import {createContext, useContext, useState} from 'react'
-import {AccountWithCounts} from './types'
-import {Account} from 'api'
 
 export const calculateIndent = (indent: number) => {
   return indent * 3
@@ -36,7 +33,6 @@ interface FocusContextType {
   focusId: string
   setFocusRef: React.Dispatch<React.SetStateAction<HTMLElement | null>>
   setFocusId: React.Dispatch<React.SetStateAction<string>>
-  overMax: boolean
 }
 
 const Context = createContext<FocusContextType>({
@@ -44,47 +40,14 @@ const Context = createContext<FocusContextType>({
   focusId: '',
   setFocusId: () => {},
   setFocusRef: () => {},
-  overMax: true,
 })
 
-const fetchTotalCount = async (id: string): Promise<Account[]> => {
-  const params = {
-    recursive: true,
-    page: '1',
-    per_page: '100',
-  }
-  const {json} = await doFetchApi<Account[]>({
-    path: `/api/v1/accounts/${id}/sub_accounts`,
-    params,
-    method: 'GET',
-  })
-  return json as Account[]
-}
-
-export function FocusProvider({
-  children,
-  accountId,
-}: {children: React.ReactNode; accountId: string}) {
+export function FocusProvider({children}: {children: React.ReactNode}) {
   const [focusId, setFocusId] = useState('')
   const [focusRef, setFocusRef] = useState<HTMLElement | null>(null)
 
-  const {data} = useQuery({
-    queryKey: ['subaccountTotalCount', accountId],
-    queryFn: () => fetchTotalCount(accountId),
-  })
-
-  // if under max:
-  //   - all account trees auto-expand
-  //   - fetches are done immediately for all accounts
-  // if over max:
-  //   - all account trees are collapsed
-  //   - fetches are done on expansion
-  let overMax = true
-  if (data) {
-    overMax = data.length >= 100
-  }
   return (
-    <Context.Provider value={{focusRef, setFocusRef, focusId, setFocusId, overMax}}>
+    <Context.Provider value={{focusRef, setFocusRef, focusId, setFocusId}}>
       {children}
     </Context.Provider>
   )
