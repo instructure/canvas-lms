@@ -25,7 +25,6 @@ import OutcomesContext, {
   ROOT_GROUP_ID,
 } from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo-v3'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
 import {
   findOutcomesMocks,
@@ -38,6 +37,10 @@ import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {ROOT_GROUP} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 
 jest.mock('@canvas/progress/resolve_progress')
 jest.useFakeTimers({legacyFakeTimers: true})
@@ -79,7 +82,7 @@ const defaultTreeGroupMocks = () =>
   })
 
 // passes locally, flaky on Jenkins
-describe.skip('FindOutcomesModal', () => {
+describe('FindOutcomesModal', () => {
   let cache
   let onCloseHandlerMock
   let setTargetGroupIdsToRefetchMock
@@ -256,7 +259,10 @@ describe.skip('FindOutcomesModal', () => {
       expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
     })
 
-    it('debounces the search string entered by the user', async () => {
+    // Skipping this test because something appears to be wrong with the mocks
+    // and they aren't getting called properly.  This will be resolved in:
+    // https://instructure.atlassian.net/browse/EGG-1064
+    it.skip('debounces the search string entered by the user', async () => {
       const {getByText, getByLabelText, queryByText} = render(
         <FindOutcomesModal {...defaultProps()} />,
         {
@@ -317,7 +323,10 @@ describe.skip('FindOutcomesModal', () => {
       })
     })
 
-    it('should not disable search input and clear search button if there are no results', async () => {
+    // Skipping this test because something appears to be wrong with the mocks
+    // and they aren't getting called properly.  This will be resolved in:
+    // https://instructure.atlassian.net/browse/EGG-1064
+    it.skip('should not disable search input and clear search button if there are no results', async () => {
       const {getByText, getByLabelText, queryByTestId, queryByText} = render(
         <FindOutcomesModal {...defaultProps()} />,
         {
@@ -439,11 +448,10 @@ describe.skip('FindOutcomesModal', () => {
         expect(setImportsTargetGroupMock).toHaveBeenCalledTimes(1)
         expect(setImportsTargetGroupMock).toHaveBeenCalledWith({300: ROOT_GROUP})
         expect(setTargetGroupIdsToRefetchMock).toHaveBeenCalledTimes(1)
-        expect(
-          getAllByText(
-            'All outcomes from Group 300 have been successfully added to this account.',
-          )[0],
-        ).toBeInTheDocument()
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'All outcomes from Group 300 have been successfully added to this account.',
+          type: 'success',
+        })
       })
 
       it('imports group without ConfirmationBox if Add All Outcomes button is clicked in Course context and outcomes <= 50', async () => {
@@ -470,11 +478,10 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Root Account Outcome Group 0'))
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
-        expect(
-          getAllByText(
-            'All outcomes from Group 300 have been successfully added to this course.',
-          )[0],
-        ).toBeInTheDocument()
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'All outcomes from Group 300 have been successfully added to this course.',
+          type: 'success',
+        })
       })
 
       it('disables Add All Outcomes button during/after group import', async () => {
@@ -520,7 +527,11 @@ describe.skip('FindOutcomesModal', () => {
         expect(getByText('You are about to add 51 outcomes to this course.')).toBeInTheDocument()
       })
 
-      it('returns focus on Add All Outcomes button if Cancel button of ConfirmationBox is clicked', async () => {
+      // Skipping because the "Import Anyway" button is in the confirmation box which is in
+      // the `#flashalert_message_holder` div. The test is not able to find the button.
+      // We need to figure out a better way to test this.
+      // https://instructure.atlassian.net/browse/EGG-1064
+      it.skip('returns focus on Add All Outcomes button if Cancel button of ConfirmationBox is clicked', async () => {
         const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           contextType: 'Course',
           mocks: courseImportMocks,
@@ -537,7 +548,11 @@ describe.skip('FindOutcomesModal', () => {
         expect(AddAllButton).toHaveFocus()
       })
 
-      it('returns focus on Done button if Import Anyway button of ConfirmationBox is clicked', async () => {
+      // Skipping because the "Import Anyway" button is in the confirmation box which is in
+      // the `#flashalert_message_holder` div. The test is not able to find the button.
+      // We need to figure out a better way to test this.
+      // https://instructure.atlassian.net/browse/EGG-1064
+      it.skip('returns focus on Done button if Import Anyway button of ConfirmationBox is clicked', async () => {
         const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           contextType: 'Course',
           mocks: courseImportMocks,
@@ -554,7 +569,11 @@ describe.skip('FindOutcomesModal', () => {
         expect(DoneButton).toHaveFocus()
       })
 
-      it('enables Add All Outcomes button if group import fails', async () => {
+      // Skipping because the "Import Anyway" button is in the confirmation box which is in
+      // the `#flashalert_message_holder` div. The test is not able to find the button.
+      // We need to figure out a better way to test this.
+      // https://instructure.atlassian.net/browse/EGG-1064
+      it.skip('enables Add All Outcomes button if group import fails', async () => {
         const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           contextType: 'Course',
           mocks: [
@@ -576,7 +595,11 @@ describe.skip('FindOutcomesModal', () => {
         expect(AddAllButton).toBeEnabled()
       })
 
-      it('replaces Add buttons of individual outcomes with loading spinner during group import', async () => {
+      // Skipping because the "Import Anyway" button is in the confirmation box which is in
+      // the `#flashalert_message_holder` div. The test is not able to find the button.
+      // We need to figure out a better way to test this.
+      // https://instructure.atlassian.net/browse/EGG-1064
+      it.skip('replaces Add buttons of individual outcomes with loading spinner during group import', async () => {
         const doResolveProgress = delayImportOutcomesProgress()
         const {getByText, getAllByText, queryByText} = render(
           <FindOutcomesModal {...defaultProps()} />,
@@ -754,7 +777,11 @@ describe.skip('FindOutcomesModal', () => {
         expect(localStorage.latestImport).toBeUndefined()
       })
 
-      it('changes button text of individual outcomes from Add to Added after group import completes', async () => {
+      // Skipping because the "Import Anyway" button is in the confirmation box which is in
+      // the `#flashalert_message_holder` div. The test is not able to find the button.
+      // We need to figure out a better way to test this.
+      // https://instructure.atlassian.net/browse/EGG-1064
+      it.skip('changes button text of individual outcomes from Add to Added after group import completes', async () => {
         const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           contextType: 'Course',
           mocks: [
@@ -775,7 +802,11 @@ describe.skip('FindOutcomesModal', () => {
         expect(getAllByText('Added')).toHaveLength(2)
       })
 
-      it('displays flash confirmation with proper message if group import to Course succeeds', async () => {
+      // Skipping because the "Import Anyway" button is in the confirmation box which is in
+      // the `#flashalert_message_holder` div. The test is not able to find the button.
+      // We need to figure out a better way to test this.
+      // https://instructure.atlassian.net/browse/EGG-1064
+      it.skip('displays flash confirmation with proper message if group import to Course succeeds', async () => {
         const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           contextType: 'Course',
           mocks: [
@@ -792,11 +823,10 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
         await clickEl(getByText('Import Anyway'))
-        expect(
-          getAllByText(
-            'All outcomes from Group 300 have been successfully added to this course.',
-          )[0],
-        ).toBeInTheDocument()
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'All outcomes from Group 300 have been successfully added to this course.',
+          type: 'success',
+        })
       })
 
       it('displays flash confirmation with proper message if group import to Account succeeds', async () => {
@@ -814,11 +844,10 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Root Account Outcome Group 0'))
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
-        expect(
-          getAllByText(
-            'All outcomes from Group 300 have been successfully added to this account.',
-          )[0],
-        ).toBeInTheDocument()
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'All outcomes from Group 300 have been successfully added to this account.',
+          type: 'success',
+        })
       })
 
       it('displays flash confirmation with proper message if group import to targetGroup succeeds', async () => {
@@ -846,14 +875,17 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Root Account Outcome Group 0'))
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
-        expect(
-          getAllByText(
-            'All outcomes from Group 300 have been successfully added to The Group Title.',
-          )[0],
-        ).toBeInTheDocument()
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'All outcomes from Group 300 have been successfully added to The Group Title.',
+          type: 'success',
+        })
       })
 
-      it('displays flash alert with custom error message if group import fails', async () => {
+      // Skipping because the "Import Anyway" button is in the confirmation box which is in
+      // the `#flashalert_message_holder` div. The test is not able to find the button.
+      // We need to figure out a better way to test this.
+      // https://instructure.atlassian.net/browse/EGG-1064
+      it.skip('displays flash alert with custom error message if group import fails', async () => {
         const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           contextType: 'Course',
           mocks: [
@@ -876,7 +908,11 @@ describe.skip('FindOutcomesModal', () => {
         ).toBeInTheDocument()
       })
 
-      it('displays flash alert with generic error message if group import fails and no error message', async () => {
+      // Skipping because the "Import Anyway" button is in the confirmation box which is in
+      // the `#flashalert_message_holder` div. The test is not able to find the button.
+      // We need to figure out a better way to test this.
+      // https://instructure.atlassian.net/browse/EGG-1064
+      it.skip('displays flash alert with generic error message if group import fails and no error message', async () => {
         const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           contextType: 'Course',
           mocks: [
@@ -1117,9 +1153,10 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Root Account Outcome Group 0'))
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getAllByText('Add')[0].closest('button'))
-        expect(
-          getAllByText('An error occurred while importing this outcome: Network error.')[0],
-        ).toBeInTheDocument()
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'An error occurred while importing this outcome: Network error.',
+          type: 'error',
+        })
       })
 
       it('displays flash alert with generic error message if outcome import fails and no error message', async () => {
@@ -1141,9 +1178,10 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Root Account Outcome Group 0'))
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getAllByText('Add')[0].closest('button'))
-        expect(
-          getAllByText('An error occurred while importing this outcome.')[0],
-        ).toBeInTheDocument()
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'An error occurred while importing this outcome.',
+          type: 'error',
+        })
       })
     })
   })
