@@ -85,3 +85,13 @@ export const getName = (item: File | Folder) => {
   // folders just have name
   return isFile(item) ? item.display_name || item.filename : item.name
 }
+
+export const isLockedBlueprintItem = (item: File | Folder) => {
+  // only files can be locked, folders contain locked files
+  if (!isFile(item)) return false
+  return !!(
+    item.folder_id &&
+    item.restricted_by_master_course &&
+    item.is_master_course_child_content
+  )
+}
