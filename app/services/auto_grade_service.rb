@@ -56,18 +56,25 @@ class AutoGradeService
     {"properties": {"rubric_category": {"title": "Rubric Category", "description": "The name of the rubric category for which the criterion is selected", "type": "string"}, "reasoning": {"title": "Reasoning", "description": "A detailed explanation of how you arrived at the awarded score, including reference to the threshold criteria that were met.", "type": "string"}, "criterion": {"title": "Criterion", "description": "The specific rubric criterion (i.e., the highest threshold met) that best fits your evaluation.", "type": "string"}}, "required": ["rubric_category", "reasoning", "criterion"]}
     ```
     For each rubric category, select the most appropriate criterion that matches the essay.
-    Please output only the JSON array in your final response, without any additional commentary or explanation, to ensure that it is easily parsable by Python code.
+    Your response must contain ONLY the JSON array - no additional text, explanations, or formatting. Any non-JSON content will cause parsing errors.
     </INSTRUCTIONS>
   TEXT
 
   def initialize(assignment:, essay:, rubric:)
-    @assignment = assignment
-    @essay = essay
+    @assignment = assignment.to_s
+    @essay = essay.to_s
     @rubric = rubric
     @rubric_prompt_format = self.class.normalize_rubric_for_prompt(@rubric)
   end
 
   def call
+    @essay = sanitize_essay(@essay)
+    validate_essay_length(@essay)
+
+    if rubric_matches_default_template
+      raise "Rubric criteria not descriptive enough"
+    end
+
     uri = URI(setting["cedar_uri"])
     prompt = build_prompt
 
@@ -95,16 +102,15 @@ class AutoGradeService
         body = JSON.parse(response.body)
         raw_result = body.dig("data", "answerPrompt")
         parsed_result = JSON.parse(raw_result)
+        parsed_result = filter_repeating_keys(parsed_result)
 
         map_criteria_ids_to_grades(parsed_result, @rubric)
       rescue => e
-        raise "Invalid JSON response - #{e.message}"
+        raise CedarAIGraderError, "Invalid JSON response: #{e.message}"
       end
     else
-      raise CedarAIGraderError, "Cedar GraphQL error: #{response.body}"
+      raise CedarAIGraderError, response.body.to_s
     end
-  rescue => e
-    raise CedarAIGraderError, "Cedar GraphQL error: #{e.message}"
   end
 
   def self.normalize_rubric_for_prompt(rubric_data)
@@ -123,6 +129,51 @@ class AutoGradeService
   end
 
   private
+
+  def sanitize_essay(text)
+    # First decode any HTML entities
+    text = CGI.unescapeHTML(text)
+    text = ActionView::Base.full_sanitizer.sanitize(text)
+
+    # Remove any remaining HTML tags and their content
+    text = text.gsub(%r{<[^>]*>.*?</[^>]*>}, "")                          # Remove content between other opening and closing tags
+               .gsub(/<[^>]*>/, "")                                       # Remove any remaining opening tags
+               .gsub(%r{</[^>]*>}, "")                                    # Remove any remaining closing tags
+
+    # Remove any content between \&lt; and \&gt; (including the entities themselves)
+    text = text.gsub(%r{\\&lt;[^&]*\\&gt;.*?\\&lt;/[^&]*\\&gt;}, "")      # Remove content between encoded opening and closing tags
+               .gsub(/\\&lt;[^&]*\\&gt;/, "")                             # Remove any remaining encoded opening tags
+               .gsub(%r{\\&lt;/[^&]*\\&gt;}, "")                          # Remove any remaining encoded closing tags
+
+    raise "No essay submission found after removing text between <>" if text.blank?
+
+    # Remove lines starting with more than 3 # characters
+    text = text.split("\n").reject { |line| line.strip.start_with?("####") }.join("\n")
+
+    # Clean up any resulting double spaces and trim
+    text.gsub(/\s+/, " ").strip
+  end
+
+  def validate_essay_length(text)
+    raise "Submission must be at least 5 words long" if text.split.size < 5
+  end
+
+  def rubric_matches_default_template
+    predefined_criteria_templates = [
+      ["Exit Ticket Prompt", "Preparation", "Time", "Participation"],
+      ["Peer Review"],
+      ["Description of criterion"]
+    ]
+
+    submitted_criteria = @rubric.pluck(:description)
+
+    predefined_criteria_templates.each do |template_criteria|
+      criteria_not_in_submission = submitted_criteria - template_criteria
+      return true if criteria_not_in_submission.empty?
+    end
+
+    false
+  end
 
   def map_criteria_ids_to_grades(grader_response_array, rubric_data)
     grader_response_array.map do |item|
@@ -148,10 +199,14 @@ class AutoGradeService
     end
   end
 
+  def filter_repeating_keys(json_array)
+    json_array.uniq { |item| item["criterion"] }
+  end
+
   def build_prompt
     GRADING_PROMPT
-      .gsub("{{assignment}}", @assignment.to_s.encode(xml: :text))
-      .gsub("{{essay}}", @essay.to_s.encode(xml: :text))
+      .gsub("{{assignment}}", @assignment.encode(xml: :text))
+      .gsub("{{essay}}", @essay.encode(xml: :text))
       .gsub("{{rubric}}", @rubric_prompt_format.to_json)
   end
 

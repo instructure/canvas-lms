@@ -2508,7 +2508,7 @@ class Course < ActiveRecord::Base
       begin
         autograde_error_handling(submission, auto_grade_result, progress, error_message)
       rescue
-        progress&.results = {}
+        progress&.results = []
         progress&.message = "Grading failed. Please try again later or grade manually."
         progress&.complete!
         return
@@ -2528,7 +2528,7 @@ class Course < ActiveRecord::Base
       begin
         autograde_error_handling(submission, auto_grade_result, progress, error_message)
       rescue
-        progress&.results = {}
+        progress&.results = []
         progress&.message = "Grading failed. Please try again later or grade manually."
       end
 
@@ -2551,7 +2551,7 @@ class Course < ActiveRecord::Base
       grading_attempts: auto_grade_result.grading_attempts + 1
     )
 
-    progress&.results = {}
+    progress&.results = []
     progress&.message = error_message
   end
 
