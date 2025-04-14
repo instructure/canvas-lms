@@ -295,6 +295,30 @@ describe('UsageRightsModal', () => {
     expect(await screen.getByTestId('permissions-save-button')).toBeInTheDocument()
   })
 
+  it.skip('shows an error there are invalid dates', async () => {
+    renderComponent({
+      items: [
+        {
+          ...FAKE_FILES[0],
+          unlock_at: '2025-04-12T00:00:00Z',
+          lock_at: '2025-04-15T00:00:00Z',
+        },
+      ],
+    })
+    let input = await screen.getByLabelText(/available from/i)
+    await userEvent.click(input)
+    await userEvent.clear(input)
+    await userEvent.type(input, 'banana')
+    input = await screen.getByLabelText(/until/i)
+    await userEvent.click(input)
+    await userEvent.clear(input)
+    await userEvent.type(input, 'avocado')
+    await userEvent.click(screen.getByTestId('permissions-save-button'))
+    const messages = await screen.getAllByText('Invalid date')
+    expect(messages[0]).toBeInTheDocument()
+    expect(messages[1]).toBeInTheDocument()
+  })
+
   it('performs fetch request and shows alert', async () => {
     renderComponent({
       items: [Object.assign({}, FAKE_FILES[0], {usage_rights: {}})],

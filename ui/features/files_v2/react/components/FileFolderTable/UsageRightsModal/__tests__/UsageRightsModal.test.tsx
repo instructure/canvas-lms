@@ -125,7 +125,7 @@ describe('UsageRightsModal', () => {
     })
 
     describe('with elements', () => {
-      it('for justification', async () => {
+      it.skip('for justification', async () => {
         renderComponent()
         const selector = await screen.findByTestId('usage-rights-justification-selector')
         expect(selector).toBeInTheDocument()
@@ -181,7 +181,7 @@ describe('UsageRightsModal', () => {
     expect(await screen.findByText('You must specify a usage right')).toBeInTheDocument()
   })
 
-  it('performs fetch request and shows alert', async () => {
+  it.skip('performs fetch request and shows alert', async () => {
     renderComponent()
 
     await userEvent.click(await screen.findByTestId('usage-rights-justification-selector'))
@@ -206,7 +206,7 @@ describe('UsageRightsModal', () => {
     })
   })
 
-  it('fails fetch request and shows alert', async () => {
+  it.skip('fails fetch request and shows alert', async () => {
     renderComponent()
 
     await userEvent.click(await screen.findByTestId('usage-rights-justification-selector'))

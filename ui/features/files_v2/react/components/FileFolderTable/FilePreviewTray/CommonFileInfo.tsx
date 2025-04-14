@@ -21,6 +21,9 @@ import {getRestrictedText, isHidden, isPublished, isRestricted} from "../../../.
 import {Flex} from "@instructure/ui-flex";
 import {Heading} from "@instructure/ui-heading";
 import {Text} from "@instructure/ui-text";
+import {Tooltip} from "@instructure/ui-tooltip";
+import {TruncateText} from "@instructure/ui-truncate-text";
+import {View} from "@instructure/ui-view";
 import {formatFileSize} from "@canvas/util/fileHelper";
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from "react";
@@ -45,7 +48,13 @@ const CommonFileInfo = ({item} : {item: File}) => {
       <Flex.Item>
         <Text weight="bold">{I18n.t('Name')}</Text>
         <br/>
-        <Text>{name}</Text>
+        <View as="div" display="inline-block" width="250px">
+          <Tooltip renderTip={name}>
+            <Text data-testid="file-display-name">
+              <TruncateText>{name}</TruncateText>
+            </Text>
+          </Tooltip>
+        </View>
       </Flex.Item>
       {'locked' in item && (
         <Flex.Item>
