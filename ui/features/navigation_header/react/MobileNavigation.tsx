@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useContext, useEffect, useState, useRef} from 'react'
 import $ from 'jquery'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
@@ -24,6 +24,7 @@ import {useQuery} from '@tanstack/react-query'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getUnreadCount} from './queries/unreadCountQuery'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 declare global {
   interface Window {
@@ -39,6 +40,8 @@ const MobileContextMenu = React.lazy(() => import('./MobileContextMenu'))
 const MobileGlobalMenu = React.lazy(() => import('./MobileGlobalMenu'))
 
 const MobileNavigation: React.FC<{navIsOpen?: boolean}> = ({navIsOpen = false}) => {
+  const {setOnSuccess} = useContext(AlertManagerContext)
+
   const [globalNavIsOpen, setGlobalNavIsOpen] = useState(navIsOpen)
   const [contextNavIsOpen, setContextNavIsOpen] = useState(false)
   const firstRender = useRef(true)
@@ -90,23 +93,21 @@ const MobileNavigation: React.FC<{navIsOpen?: boolean}> = ({navIsOpen = false}) 
     }
 
     if (!firstRender.current) {
-      $.screenReaderFlashMessageExclusive(
-        contextNavIsOpen
-          ? I18n.t('Course menu is now open')
-          : I18n.t('Course menu is now closed')
-      )
+      const message = contextNavIsOpen
+        ? I18n.t('Navigation menu is now open')
+        : I18n.t('Navigation menu is now closed')
+      setOnSuccess(message, true)
     }
-  }, [contextNavIsOpen])
+  }, [contextNavIsOpen, setOnSuccess])
 
   useEffect(() => {
     if (!firstRender.current) {
-      $.screenReaderFlashMessageExclusive(
-        globalNavIsOpen
-          ? I18n.t('Global navigation menu is now open')
-          : I18n.t('Global navigation menu is now closed')
-      )
+      const message = globalNavIsOpen
+        ? I18n.t('Global navigation menu is now open')
+        : I18n.t('Global navigation menu is now closed')
+      setOnSuccess(message, true)
     }
-  }, [globalNavIsOpen])
+  }, [globalNavIsOpen, setOnSuccess])
 
   useEffect(() => {
     firstRender.current = false
