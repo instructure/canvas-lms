@@ -138,7 +138,7 @@
     "graphiql": "1.7.2",
     "graphiql-explorer": "^0.4.2",
     "graphql": "^16",
-    "graphql-request": "^6.1.0",
+    "graphql-request": "^7.1.2",
     "html2canvas": "^1.4.1",
     "i18n-js": "^3",
     "ic-ajax": "~2.0.1",
