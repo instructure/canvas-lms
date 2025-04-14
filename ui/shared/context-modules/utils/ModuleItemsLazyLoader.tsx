@@ -37,7 +37,7 @@ type ModuleData = {
   root?: Root
 }
 
-class LazyLoadModuleItems {
+class ModuleItemsLazyLoader {
   courseId: string = ''
   modules: Record<ModuleId, ModuleData> = {}
   callback: ModuleItemsCallback = () => {}
@@ -184,7 +184,7 @@ class LazyLoadModuleItems {
 }
 
 // a singleton
-const lazyLoadModuleItems = new LazyLoadModuleItems()
+const moduleItemsLazyLoader = new ModuleItemsLazyLoader()
 
-export default lazyLoadModuleItems
-export {LazyLoadModuleItems, type ModuleId, type ModuleItems, type ModuleItemsCallback}
+export default moduleItemsLazyLoader
+export {ModuleItemsLazyLoader, type ModuleId, type ModuleItems, type ModuleItemsCallback}

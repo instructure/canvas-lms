@@ -19,7 +19,7 @@
 import {waitFor} from '@testing-library/react'
 import {screen} from '@testing-library/dom'
 import fetchMock from 'fetch-mock'
-import {LazyLoadModuleItems, type ModuleId} from '../utils/fetchModuleItems'
+import {ModuleItemsLazyLoader, type ModuleId} from '../utils/ModuleItemsLazyLoader'
 
 const courseId = '23'
 const pageSize = 2
@@ -69,14 +69,14 @@ fetchMock.mock(badModule.api, badModule.response)
 
 createMockContainer(badModule.moduleId)
 
-let lazyLoadModuleItems: LazyLoadModuleItems
+let moduleItemsLazyLoader: ModuleItemsLazyLoader
 
 describe('fetchModuleItems utility', () => {
   beforeEach(() => {
-    lazyLoadModuleItems = new LazyLoadModuleItems()
-    lazyLoadModuleItems.courseId = courseId
-    lazyLoadModuleItems.callback = jest.fn()
-    lazyLoadModuleItems.perPage = pageSize
+    moduleItemsLazyLoader = new ModuleItemsLazyLoader()
+    moduleItemsLazyLoader.courseId = courseId
+    moduleItemsLazyLoader.callback = jest.fn()
+    moduleItemsLazyLoader.perPage = pageSize
 
     document.body.innerHTML = ''
     Object.keys(modules).forEach((moduleId: string) => {
@@ -98,17 +98,17 @@ describe('fetchModuleItems utility', () => {
   describe('fetchModuleItems', () => {
     it('does nothing if no modules are provided', async () => {
       const callback = jest.fn()
-      await lazyLoadModuleItems.fetchModuleItems(courseId, [], callback, pageSize)
+      await moduleItemsLazyLoader.fetchModuleItems(courseId, [], callback, pageSize)
       expect(callback).not.toHaveBeenCalled()
     })
 
     it('does nothing if the provided moduleIds not exist in the dom', async () => {
-      await lazyLoadModuleItems.fetchModuleItems(courseId, ['noop'], jest.fn(), pageSize)
+      await moduleItemsLazyLoader.fetchModuleItems(courseId, ['noop'], jest.fn(), pageSize)
       expect(fetchMock.calls()).toHaveLength(0)
     })
 
     it('construct the api urls correctly', async () => {
-      await lazyLoadModuleItems.fetchModuleItems(
+      await moduleItemsLazyLoader.fetchModuleItems(
         courseId,
         Object.keys(modules),
         jest.fn(),
@@ -127,7 +127,7 @@ describe('fetchModuleItems utility', () => {
     })
 
     it('fetches the items', async () => {
-      await lazyLoadModuleItems.fetchModuleItems(
+      await moduleItemsLazyLoader.fetchModuleItems(
         courseId,
         Object.keys(modules),
         jest.fn(),
@@ -138,7 +138,7 @@ describe('fetchModuleItems utility', () => {
 
     describe('success responses', () => {
       it('set the html in the containers with the results', async () => {
-        await lazyLoadModuleItems.fetchModuleItems(
+        await moduleItemsLazyLoader.fetchModuleItems(
           courseId,
           Object.keys(modules),
           jest.fn(),
@@ -153,7 +153,7 @@ describe('fetchModuleItems utility', () => {
 
       it("calls the callback for each module's items", async () => {
         const callback = jest.fn()
-        await lazyLoadModuleItems.fetchModuleItems(
+        await moduleItemsLazyLoader.fetchModuleItems(
           courseId,
           Object.keys(modules),
           callback,
@@ -167,7 +167,7 @@ describe('fetchModuleItems utility', () => {
       const badModuleId = badModule.moduleId
 
       it('does not set the html', async () => {
-        await lazyLoadModuleItems.fetchModuleItems(courseId, [badModuleId], jest.fn(), pageSize)
+        await moduleItemsLazyLoader.fetchModuleItems(courseId, [badModuleId], jest.fn(), pageSize)
         await waitFor(() => {
           expect(
             document.querySelector(`#context_module_content_${badModuleId}`)?.innerHTML,
@@ -177,7 +177,7 @@ describe('fetchModuleItems utility', () => {
 
       it('does not call the callback', async () => {
         const callback = jest.fn()
-        await lazyLoadModuleItems.fetchModuleItems(courseId, [badModuleId], callback, pageSize)
+        await moduleItemsLazyLoader.fetchModuleItems(courseId, [badModuleId], callback, pageSize)
         expect(callback).not.toHaveBeenCalled()
       })
     })
@@ -187,7 +187,7 @@ describe('fetchModuleItems utility', () => {
       const goodModuleId = '1083'
 
       it('does set the html for successful responses', async () => {
-        await lazyLoadModuleItems.fetchModuleItems(
+        await moduleItemsLazyLoader.fetchModuleItems(
           courseId,
           [badModuleId, goodModuleId],
           jest.fn(),
@@ -207,7 +207,7 @@ describe('fetchModuleItems utility', () => {
 
       it('does call the callback for successful responses', async () => {
         const callback = jest.fn()
-        await lazyLoadModuleItems.fetchModuleItems(
+        await moduleItemsLazyLoader.fetchModuleItems(
           courseId,
           [badModuleId, goodModuleId],
           callback,
@@ -223,7 +223,7 @@ describe('fetchModuleItems utility', () => {
     const moduleId = '1083'
 
     it('does nothing if the provided moduleId not exist in the dom', async () => {
-      await lazyLoadModuleItems.fetchModuleItemsHtml('noop', 1)
+      await moduleItemsLazyLoader.fetchModuleItemsHtml('noop', 1)
       expect(fetchMock.calls()).toHaveLength(0)
     })
 
@@ -233,7 +233,7 @@ describe('fetchModuleItems utility', () => {
         `/courses/${courseId}/modules/${moduleId}/items_html?page=2&per_page=${pageSize}`,
         200,
       )
-      await lazyLoadModuleItems.fetchModuleItemsHtml(moduleId, 2)
+      await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, 2)
       const calls = fetchMock.calls()
       expect(calls[0][0]).toBe(
         `/courses/${courseId}/modules/${moduleId}/items_html?page=2&per_page=${pageSize}`,
@@ -241,21 +241,21 @@ describe('fetchModuleItems utility', () => {
     })
 
     it('fetches the item', async () => {
-      await lazyLoadModuleItems.fetchModuleItemsHtml(moduleId, 1)
+      await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, 1)
       expect(fetchMock.calls()).toHaveLength(1)
     })
 
     describe('success response', () => {
       it('set the htmls in the container with the result', async () => {
-        await lazyLoadModuleItems.fetchModuleItemsHtml(moduleId, 1)
+        await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, 1)
         expect(document.querySelector(`#context_module_content_${moduleId} ul`)?.outerHTML).toEqual(
           modules[moduleId].items,
         )
       })
 
       it("calls the callback for the module's item", async () => {
-        await lazyLoadModuleItems.fetchModuleItemsHtml(moduleId, 1)
-        expect(lazyLoadModuleItems.callback).toHaveBeenCalledWith(moduleId)
+        await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, 1)
+        expect(moduleItemsLazyLoader.callback).toHaveBeenCalledWith(moduleId)
       })
     })
 
@@ -263,7 +263,7 @@ describe('fetchModuleItems utility', () => {
       const badModuleId = badModule.moduleId
 
       it('does not set the html', async () => {
-        await lazyLoadModuleItems.fetchModuleItemsHtml(badModuleId, 1)
+        await moduleItemsLazyLoader.fetchModuleItemsHtml(badModuleId, 1)
         await waitFor(() => {
           expect(
             document.querySelector(`#context_module_content_${badModuleId}`)?.outerHTML,
@@ -272,12 +272,12 @@ describe('fetchModuleItems utility', () => {
       })
 
       it('does not call the callback', async () => {
-        await lazyLoadModuleItems.fetchModuleItemsHtml(badModuleId, 1)
-        expect(lazyLoadModuleItems.callback).not.toHaveBeenCalled()
+        await moduleItemsLazyLoader.fetchModuleItemsHtml(badModuleId, 1)
+        expect(moduleItemsLazyLoader.callback).not.toHaveBeenCalled()
       })
 
       it('retries on clicking the retry button', async () => {
-        await lazyLoadModuleItems.fetchModuleItemsHtml(badModuleId, 1)
+        await moduleItemsLazyLoader.fetchModuleItemsHtml(badModuleId, 1)
         await waitFor(() => {
           expect(screen.getByTestId('retry-items-failed-to-load')).toBeInTheDocument()
         })
@@ -290,7 +290,7 @@ describe('fetchModuleItems utility', () => {
 
     describe('pagination', () => {
       it('renders the Pagination component if there are more than one page', async () => {
-        await lazyLoadModuleItems.fetchModuleItemsHtml('1083', 1)
+        await moduleItemsLazyLoader.fetchModuleItemsHtml('1083', 1)
         await waitFor(() => {
           expect(screen.getByTestId('module-1083-pagination')).toBeInTheDocument()
         })
@@ -300,7 +300,7 @@ describe('fetchModuleItems utility', () => {
         fetchMock.mock('/courses/23/modules/1083/items_html?page=1&per_page=10', {
           body: modules['1083'].items,
         })
-        await lazyLoadModuleItems.fetchModuleItemsHtml('1083', 1)
+        await moduleItemsLazyLoader.fetchModuleItemsHtml('1083', 1)
         expect(document.querySelector(`#context_module_content_1083 ul`)?.outerHTML).toEqual(
           modules['1083'].items,
         )
