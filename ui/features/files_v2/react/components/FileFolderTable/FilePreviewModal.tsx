@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {IconButton, Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {FilePreviewTray} from './FilePreviewTray'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {IconButton, Button} from '@instructure/ui-buttons'
 import {
   IconImageSolid,
   IconInfoSolid,
@@ -46,6 +46,7 @@ export interface FilePreviewModalProps {
 }
 
 export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePreviewModalProps) => {
+  const closeButton = useRef<HTMLElement | null>(null)
   const [currentItem, setCurrentItem] = useState<File>(item)
   const [currentIndex, setCurrentIndex] = useState<number>(collection.indexOf(item))
   const [isTrayOpen, setIsTrayOpen] = useState(false)
@@ -62,6 +63,11 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
   const handleOverlayTrayChange = (isTrayOpen: boolean) => {
     setIsTrayOpen(isTrayOpen)
   }
+
+  useEffect(() => {
+    const timeoutID = isOpen ? setTimeout(() => closeButton.current?.focus(), 50) : undefined;
+    return timeoutID ? () => clearTimeout(timeoutID) : undefined;
+  }, [isOpen])
 
   useEffect(() => {
     const handlePopState = () => {
@@ -116,7 +122,6 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
       shouldCloseOnDocumentClick={false}
       variant="inverse"
       overflow="fit"
-      defaultFocusElement={() => document.getElementById('download-button')}
     >
       <Modal.Header>
         <Flex>
@@ -161,6 +166,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
               screenReaderLabel={I18n.t('Close')}
               onClick={onClose}
               id="close-button"
+              ref={e => (closeButton.current = e as HTMLElement | null)}
               data-testid="close-button"
             />
           </Flex.Item>
