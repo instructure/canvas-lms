@@ -24,6 +24,7 @@ import {FilePreviewTray} from './FilePreviewTray'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {
   IconImageSolid,
@@ -131,9 +132,11 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
                 <IconImageSolid size="x-small" />
               </Flex.Item>
               <Flex.Item shouldGrow shouldShrink>
-                <Heading level="h2" data-testid="file-header">
-                  <TruncateText>{name}</TruncateText>
-                </Heading>
+                <Tooltip renderTip={name}>
+                  <Heading level="h2" data-testid="file-header" width='30%'>
+                    <TruncateText>{name}</TruncateText>
+                  </Heading>
+                </Tooltip>
               </Flex.Item>
             </Flex>
           </Flex.Item>

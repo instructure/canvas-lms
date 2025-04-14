@@ -20,6 +20,8 @@ import {Flex} from "@instructure/ui-flex";
 import {View} from "@instructure/ui-view";
 import {IconDownloadSolid, IconOffLine} from "@instructure/ui-icons";
 import {Text} from "@instructure/ui-text";
+import {Tooltip} from '@instructure/ui-tooltip'
+import {TruncateText} from "@instructure/ui-truncate-text";
 import {formatFileSize} from "@canvas/util/fileHelper";
 import {Button} from "@instructure/ui-buttons";
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -52,7 +54,17 @@ const NoFilePreviewAvailable = ({item}: {item: File }) => (
           <Flex.Item>
             <Flex gap="small">
               <Flex.Item>
-                <Text>{item.display_name}</Text>
+                <View
+                  as="div"
+                  display="inline-block"
+                  maxWidth="350px"
+                >
+                  <Tooltip renderTip={item.display_name}>
+                    <Text data-testid="file-display-name">
+                      <TruncateText>{item.display_name}</TruncateText>
+                    </Text>
+                  </Tooltip>
+                </View>
               </Flex.Item>
               {'size' in item && (
                 <Flex.Item>

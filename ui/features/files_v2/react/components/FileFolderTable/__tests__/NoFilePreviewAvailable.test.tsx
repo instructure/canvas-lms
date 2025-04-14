@@ -31,10 +31,10 @@ describe('NoFilePreviewAvailable', () => {
       size: 1024,
     };
 
-    const { getByText } = render(<NoFilePreviewAvailable item={item} />);
+    const { getByText, getByTestId } = render(<NoFilePreviewAvailable item={item} />);
 
     expect(getByText('No Preview Available')).toBeInTheDocument();
-    expect(getByText('example.pdf')).toBeInTheDocument();
+    expect(getByTestId('file-display-name')).toBeInTheDocument();
     expect(getByText('1 KB')).toBeInTheDocument();
   });
 

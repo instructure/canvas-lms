@@ -68,7 +68,7 @@ describe('FilePreviewModal', () => {
 
   it('renders the modal when open', () => {
     renderComponent()
-    expect(screen.getAllByText(defaultProps.item.display_name)).toHaveLength(2)
+    expect(screen.getAllByText(defaultProps.item.display_name)).toHaveLength(4)
   })
 
   it('calls onClose when close button is clicked', async () => {
@@ -109,7 +109,7 @@ describe('FilePreviewModal', () => {
   it('navigates to next file when next button is clicked', async () => {
     renderComponent()
     await userEvent.click(screen.getByRole('button', {name: /next/i}))
-    const header = screen.getByText(FAKE_FILES[1].display_name)
+    const header = screen.getAllByText(FAKE_FILES[1].display_name)[0]
     expect(header).toBeInTheDocument()
     expect(window.history.replaceState).toHaveBeenCalled()
   })
@@ -117,7 +117,7 @@ describe('FilePreviewModal', () => {
   it('navigates to previous file when previous button is clicked', async () => {
     renderComponent()
     await userEvent.click(screen.getByRole('button', {name: /previous/i}))
-    const header = screen.getByText(FAKE_FILES[FAKE_FILES.length - 1].display_name)
+    const header = screen.getAllByText(FAKE_FILES[FAKE_FILES.length - 1].display_name)[0]
     expect(header).toBeInTheDocument()
     expect(window.history.replaceState).toHaveBeenCalled()
   })
