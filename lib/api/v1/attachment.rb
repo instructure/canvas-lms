@@ -39,6 +39,9 @@ module Api::V1::Attachment
     if options[:can_view_hidden_files] && options[:context]
       options[:master_course_status] = setup_master_course_restrictions(files, options[:context])
     end
+
+    ActiveRecord::Associations::Preloader.new(records: files, associations: [:root_account]).call
+
     files.map do |f|
       attachment_json(f, user, url_options, options)
     end
