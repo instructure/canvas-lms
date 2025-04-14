@@ -67,7 +67,7 @@ export default function SubaccountRoute(props: Props) {
     return <SubaccountTree rootAccount={data} depth={1} />
   }
 
-  return <FocusProvider accountId={props.rootAccountId}>{renderTree()}</FocusProvider>
+  return <FocusProvider>{renderTree()}</FocusProvider>
 }
 
 export function Component(): JSX.Element | null {
