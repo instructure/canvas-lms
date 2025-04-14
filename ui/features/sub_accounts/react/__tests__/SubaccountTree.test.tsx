@@ -54,7 +54,8 @@ describe('SubaccountTree', () => {
     jest.clearAllMocks()
   })
 
-  it('renders only root initially', async () => {
+  // the only time this doesn't happen is if the subaccount count is over 100
+  it('renders sub-accounts automatically', async () => {
     fetchMock.get(SUBACCOUNT_FETCH(rootAccount), subAccounts)
     const {getByText, queryByText} = render(
       <MockedQueryClientProvider client={queryClient}>
@@ -63,10 +64,10 @@ describe('SubaccountTree', () => {
     )
 
     await waitFor(() => {
-      expect(fetchMock.called(SUBACCOUNT_FETCH(rootAccount), 'GET')).toBe(false)
+      expect(fetchMock.called(SUBACCOUNT_FETCH(rootAccount), 'GET')).toBe(true)
       expect(getByText('Root Account')).toBeInTheDocument()
-      expect(queryByText('Child 1')).toBeNull()
-      expect(queryByText('Child 2')).toBeNull()
+      expect(queryByText('Child 1')).toBeInTheDocument()
+      expect(queryByText('Child 2')).toBeInTheDocument()
     })
   })
 
@@ -94,17 +95,13 @@ describe('SubaccountTree', () => {
       </MockedQueryClientProvider>,
     )
 
-    // expand
-    await user.click(getByTestId(`expand-${rootAccount.id}`))
-    await waitFor(() => {
-      expect(fetchMock.called(SUBACCOUNT_FETCH(rootAccount), 'GET')).toBe(true)
-      expect(getByText('Child 1')).toBeInTheDocument()
-      expect(getByText('Child 2')).toBeInTheDocument()
-    })
-
     // collapse
     await user.click(getByTestId(`collapse-${rootAccount.id}`))
     expect(queryByText('Child 1')).toBeNull()
     expect(queryByText('Child 2')).toBeNull()
+
+    await user.click(getByTestId(`expand-${rootAccount.id}`))
+    expect(getByText('Child 1')).toBeInTheDocument()
+    expect(getByText('Child 2')).toBeInTheDocument()
   })
 })

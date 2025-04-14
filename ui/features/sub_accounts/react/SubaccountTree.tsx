@@ -33,6 +33,11 @@ import DeleteSubaccountModal from './DeleteSubaccountModal'
 
 const I18n = createI18nScope('sub_accounts')
 
+// if any account has over 100 subaccounts
+// we will not auto expand themselves or their children
+// this also applies to top-level accounts
+const THRESHOLD_FOR_AUTO_EXPAND = 100
+
 interface Props {
   parentAccount?: AccountWithCounts
   handleParent?: (decreaseCount: boolean) => void
@@ -43,9 +48,9 @@ interface Props {
 
 export default function SubaccountTree(props: Props) {
   const subCount = useRef(props.rootAccount.sub_account_count)
-  const {setFocusId, focusRef, overMax} = useFocusContext()
+  const {setFocusId, focusRef} = useFocusContext()
   const [showForm, setShowForm] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(!overMax && subCount.current > 0 && props.depth < 3)
+  const [isExpanded, setIsExpanded] = useState(false)
   const [displayConfirmation, setDisplayConfirmation] = useState(false)
 
   const fetchSubAccounts = async (
@@ -96,12 +101,11 @@ export default function SubaccountTree(props: Props) {
     }
   }, [isFetchingNextPage, isFetching, fetchNextPage, hasNextPage])
 
-  // should only trigger when overMax is set at the start
-  // otherwise, adding/deleting will effect expanded/collapsed state
-  // of the tree
   useEffect(() => {
-    setIsExpanded(!overMax && subCount.current > 0 && props.depth < 3)
-  }, [overMax])
+    setIsExpanded(
+      subCount.current < THRESHOLD_FOR_AUTO_EXPAND && subCount.current > 0 && props.depth < 3,
+    )
+  }, [props.depth])
 
   const deleteAccount = async () => {
     await doFetchApi({
