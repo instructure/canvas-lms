@@ -78,7 +78,7 @@ import {parseModule, parseModuleList} from '../differentiated-modules/utils/modu
 import {addModuleElement} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import lazyLoadModuleItems from '../utils/fetchModuleItems'
+import moduleItemsLazyLoader from '../utils/ModuleItemsLazyLoader'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -576,7 +576,7 @@ window.modules = (function () {
     },
 
     lazyLoadItems(moduleIds) {
-      lazyLoadModuleItems
+      moduleItemsLazyLoader
         .fetchModuleItems(ENV.COURSE_ID, moduleIds, moduleId => {
           initContextModuleItems(moduleId)
         })
