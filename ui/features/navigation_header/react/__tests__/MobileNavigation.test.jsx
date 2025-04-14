@@ -20,14 +20,17 @@ import userEvent from '@testing-library/user-event'
 import MobileNavigation from '../MobileNavigation'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import axios from 'axios'
-import $ from "jquery";
+
+const setOnSuccess = jest.fn()
 
 const render = children =>
-  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
-
-// This is needed for $.screenReaderFlashMessageExclusive to work.
-import '@canvas/rails-flash-notifications'
+  testingLibraryRender(
+    <MockedQueryProvider>
+      <AlertManagerContext.Provider value={{setOnSuccess}}>{children}</AlertManagerContext.Provider>
+    </MockedQueryProvider>,
+  )
 
 jest.mock('axios')
 jest.mock('../MobileContextMenu', () => () => <></>)
@@ -58,36 +61,31 @@ describe('MobileNavigation', () => {
     beforeEach(() => {
       document.body.insertAdjacentHTML(
         'beforeend',
-        '<div id="flash_screenreader_holder"></div>' +
-          '<div class="mobile-header-hamburger"></div>' +
-          '<div class="mobile-header-arrow"></div>',
+        '<div class="mobile-header-hamburger"></div>' + '<div class="mobile-header-arrow"></div>',
       )
     })
 
-    it('does not update the live region on the first render', () => {
-      const flashMock = jest.spyOn($, 'screenReaderFlashMessageExclusive')
-      render(<MobileNavigation navIsOpen={false} />)
-      expect(flashMock).toHaveBeenCalledTimes(0)
+    it('does not announce anything on the first render', () => {
+      render(<MobileNavigation navIsOpen={false} />, setOnSuccess)
+      expect(setOnSuccess).toHaveBeenCalledTimes(0)
     })
 
     it('announces when global navigation menu expanded/collapsed', async () => {
-      const flashMock = jest.spyOn($, 'screenReaderFlashMessageExclusive')
-      render(<MobileNavigation navIsOpen={false} />)
+      render(<MobileNavigation navIsOpen={false} />, setOnSuccess)
       const globalNavButton = document.querySelector('.mobile-header-hamburger')
       await userEvent.click(globalNavButton)
-      expect(flashMock).toHaveBeenCalledWith('Global navigation menu is now open')
+      expect(setOnSuccess).toHaveBeenCalledWith('Global navigation menu is now open', true)
       await userEvent.click(globalNavButton)
-      expect(flashMock).toHaveBeenCalledWith('Global navigation menu is now closed')
+      expect(setOnSuccess).toHaveBeenCalledWith('Global navigation menu is now closed', true)
     })
 
-    it('announces when context navigation menu expanded/collapsed', async () => {
-      const flashMock = jest.spyOn($, 'screenReaderFlashMessageExclusive')
-      render(<MobileNavigation navIsOpen={false} />)
-      const contextNavButton = document.querySelector('.mobile-header-arrow')
-      await userEvent.click(contextNavButton)
-      expect(flashMock).toHaveBeenCalledWith('Course menu is now open')
-      await userEvent.click(contextNavButton)
-      expect(flashMock).toHaveBeenCalledWith('Course menu is now closed')
+    it('announces when navigation menu expanded/collapsed', async () => {
+      render(<MobileNavigation navIsOpen={false} />, setOnSuccess)
+      const navButton = document.querySelector('.mobile-header-arrow')
+      await userEvent.click(navButton)
+      expect(setOnSuccess).toHaveBeenCalledWith('Navigation menu is now open', true)
+      await userEvent.click(navButton)
+      expect(setOnSuccess).toHaveBeenCalledWith('Navigation menu is now closed', true)
     })
   })
 

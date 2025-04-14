@@ -27,6 +27,7 @@ import ready from '@instructure/ready'
 import NewTabIndicator from './react/NewTabIndicator'
 import {QueryProvider} from '@canvas/query'
 import {getExternalTools} from './react/utils'
+import AlertManager from '@canvas/alerts/react/AlertManager'
 
 const I18n = createI18nScope('common')
 
@@ -86,7 +87,9 @@ ready(() => {
       const mobileNavRoot = createRoot(mobileContextNavContainer)
       mobileNavRoot.render(
         <QueryProvider>
-          <MobileNavigation navIsOpen={globalNavIsOpen} />
+          <AlertManager breakpoints={{}}>
+            <MobileNavigation navIsOpen={globalNavIsOpen} />
+          </AlertManager>
         </QueryProvider>,
       )
     }
@@ -105,7 +108,9 @@ ready(() => {
         const mobileNavRoot = createRoot(mobileContextNavContainer)
         mobileNavRoot.render(
           <QueryProvider>
-            <MobileNavigation />
+            <AlertManager breakpoints={{}}>
+              <MobileNavigation />
+            </AlertManager>
           </QueryProvider>,
         )
       }
