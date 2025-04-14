@@ -31,8 +31,8 @@
 
     <div class="form" style="<%= hidden if @current_batch && @current_batch.importing? %>">
       <p class="instruction"><%= mt(:select_file_instructions,
-                                    "Select the zip file that you want imported.  \n" +
-                                        "For a description of how to generate these zip files, [please see this documentation](%{url}).",
+                                    "Select the CSV or zip file that you want imported.  \n" +
+                                        "For a description of how to generate these files, [please see this documentation](%{url}).",
                                     :url => "/doc/api/file.sis_csv.html") %></p>
       <div id="attachment_mount"></div>
     </div>
