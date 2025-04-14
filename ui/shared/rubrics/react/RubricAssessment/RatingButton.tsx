@@ -22,6 +22,7 @@ import {colors} from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
+import {rubricSelectedAriaLabel} from './utils/rubricUtils'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
@@ -42,7 +43,7 @@ export const RatingButton = ({
   onClick,
 }: RatingButtonProps) => {
   const unselectedColor = isPreviewMode ? colors.contrasts.grey1214 : colors.contrasts.green4570
-  const selectedText = isSelected ? I18n.t('Selected') : ''
+  const selectedText = rubricSelectedAriaLabel(isSelected, isSelfAssessmentSelected)
 
   return (
     <View
@@ -68,7 +69,9 @@ export const RatingButton = ({
           themeOverride={{
             largeFontSize: '1rem',
             borderWidth: isSelected ? '3px' : '1px',
-            primaryInverseBorderColor: isSelected ? colors.contrasts.green4570 : 'rgb(219, 219, 219)',
+            primaryInverseBorderColor: isSelected
+              ? colors.contrasts.green4570
+              : 'rgb(219, 219, 219)',
             primaryInverseColor: isSelected ? colors.contrasts.green4570 : unselectedColor,
           }}
         >
