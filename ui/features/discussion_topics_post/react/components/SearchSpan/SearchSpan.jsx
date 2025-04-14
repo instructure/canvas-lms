@@ -106,7 +106,7 @@ SearchSpan.propTypes = {
   /**
    * String containing displayable message
    */
-  text: PropTypes.string.isRequired,
+  text: PropTypes.string,
   isSplitView: PropTypes.bool,
   isAnnouncement: PropTypes.bool,
   isTopic: PropTypes.bool,
