@@ -816,6 +816,37 @@ describe "assignments" do
       expect(f("#assignment_peer_reviews")).not_to be_checked
     end
 
+    context "when user and course are in different timezones" do
+      before do
+        @teacher.time_zone = "America/New_York"
+        @teacher.save!
+        @course.time_zone = "America/Los_Angeles"
+        @course.save!
+      end
+
+      it "does not shift peer reviews assign at date when editing an assignment" do
+        peer_reviews_assign_at = (Time.now.utc + 3.days).change(sec: 0)
+
+        get "/courses/#{@course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys "assignment with peer reviews"
+        click_option("#assignment_submission_type", "Online")
+        f("#assignment_text_entry").click
+        f("#assignment_peer_reviews").click
+        f("#assignment_automatic_peer_reviews").click
+        f("#assignment_peer_reviews_assign_at").send_keys peer_reviews_assign_at.strftime("%Y-%m-%d %H:%M") # rubocop:disable Specs/NoStrftime
+        f(".save_and_publish").click
+        wait_for_ajaximations
+
+        assignment = @course.assignments.order(:id).last
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        expect(f("#assignment_peer_reviews_assign_at").attribute("value")).to eq format_time_for_view(peer_reviews_assign_at, "%b %d, %Y")
+      end
+    end
+
     it "keeps erased field on more options click", priority: "2" do
       enable_cache do
         middle_number = "15"
