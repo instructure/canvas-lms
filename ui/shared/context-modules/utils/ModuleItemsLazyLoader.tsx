@@ -16,73 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {createRoot, type Root} from 'react-dom/client'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {type Links} from '@canvas/parse-link-header'
 import {FetchError} from '@canvas/context-modules/utils/FetchError'
 import {ModuleItemPaging} from '@canvas/context-modules/utils/ModuleItemPaging'
+import {ModuleItemLoadingData, type ModuleId} from './ModuleItemLoadingData'
 
 const DEFAULT_PAGE_SIZE = 10
 const BATCH_SIZE = 6
 const DEFAULT_PAGE = 1
 
-type ModuleId = number | string
 type ModuleItems = string
 type ModuleItemsCallback = (moduleId: ModuleId, links?: Links) => void
 
-type ModuleData = {
-  moduleId: ModuleId
-  links?: Links
-  root?: Root
-}
-
 class ModuleItemsLazyLoader {
-  courseId: string = ''
-  modules: Record<ModuleId, ModuleData> = {}
-  callback: ModuleItemsCallback = () => {}
-  perPage: number = DEFAULT_PAGE_SIZE
+  private courseId: string = ''
+  private loadingData: ModuleItemLoadingData = new ModuleItemLoadingData()
+  private callback: ModuleItemsCallback = () => {}
+  private perPage: number = DEFAULT_PAGE_SIZE
 
-  getRoot(moduleId: ModuleId) {
-    const moduleData = this.getModuleData(moduleId)
-    if (moduleData.root) {
-      return moduleData.root
-    }
-
-    const moduleItemContainer = document.querySelector(`#context_module_content_${moduleId}`)
-    if (!moduleItemContainer) {
-      return null
-    }
-
-    const pagingDiv = document.createElement('div')
-    pagingDiv.className = 'paging'
-    moduleItemContainer.insertAdjacentElement('beforeend', pagingDiv)
-    const root = createRoot(pagingDiv)
-    this.setModuleData(moduleId, {root})
-
-    return root
-  }
-
-  clearRoot(moduleId: ModuleId) {
-    const root = this.getModuleData(moduleId)?.root
-    if (root) {
-      root.unmount()
-      this.setModuleData(moduleId, {root: undefined})
-    }
-  }
-
-  getModuleData(moduleId: ModuleId): ModuleData {
-    if (!this.modules[moduleId]) {
-      this.modules[moduleId] = {
-        moduleId,
-      }
-    }
-    return this.modules[moduleId]
-  }
-
-  setModuleData(moduleId: ModuleId, moduleData: Partial<ModuleData>) {
-    this.getModuleData(moduleId)
-    this.modules[moduleId] = {...this.modules[moduleId], ...moduleData}
+  constructor(
+    courseId: string,
+    callback: ModuleItemsCallback,
+    perPage: number = DEFAULT_PAGE_SIZE,
+  ) {
+    this.courseId = courseId
+    this.callback = callback
+    this.perPage = perPage
   }
 
   emptyModuleOfItems(moduleItemContainer: Element) {
@@ -101,7 +61,7 @@ class ModuleItemsLazyLoader {
       const currentPage = parseInt(links.current.page, 10) || DEFAULT_PAGE
       const lastPage = parseInt(links.last.page, 10) || DEFAULT_PAGE
       if (lastPage > firstPage) {
-        const root = this.getRoot(moduleId)
+        const root = this.loadingData.getModuleRoot(moduleId)
         if (!root) return
 
         root.render(
@@ -116,8 +76,10 @@ class ModuleItemsLazyLoader {
           />,
         )
       } else {
-        this.clearRoot(moduleId)
+        this.loadingData.unmountModuleRoot(moduleId)
       }
+    } else {
+      this.loadingData.unmountModuleRoot(moduleId)
     }
   }
 
@@ -126,7 +88,7 @@ class ModuleItemsLazyLoader {
   }
 
   renderError(moduleId: ModuleId, page: number) {
-    const root = this.getRoot(moduleId)
+    const root = this.loadingData.getModuleRoot(moduleId)
     if (!root) return
     root.render(
       <FetchError
@@ -142,7 +104,7 @@ class ModuleItemsLazyLoader {
     if (!moduleItemContainer) return
 
     try {
-      const root = this.getRoot(moduleId)
+      const root = this.loadingData.getModuleRoot(moduleId)
       if (root) {
         root.render(<ModuleItemPaging isLoading={true} />)
       }
@@ -153,29 +115,19 @@ class ModuleItemsLazyLoader {
           accept: 'text/html',
         },
       })
-      this.setModuleData(moduleId, {links: result.link})
 
       this.renderResult(moduleId, moduleItemContainer, result.text, result.link)
       this.callback(moduleId)
-    } catch {
+    } catch (_e) {
       this.renderError(moduleId, page)
     }
   }
 
-  async fetchModuleItems(
-    courseId: string,
-    moduleIds: ModuleId[],
-    callback: ModuleItemsCallback,
-    perPage = DEFAULT_PAGE_SIZE,
-  ): Promise<void> {
-    this.courseId = courseId
-    this.callback = callback
-    this.perPage = perPage
+  async fetchModuleItems(moduleIds: ModuleId[]): Promise<void> {
     for (let i = 0; i < moduleIds.length; i += BATCH_SIZE) {
       const batch = moduleIds.slice(i, i + BATCH_SIZE)
       await Promise.all(
         batch.map(moduleId => {
-          this.setModuleData(moduleId, {moduleId})
           return this.fetchModuleItemsHtml(moduleId, 1)
         }),
       )
@@ -183,8 +135,4 @@ class ModuleItemsLazyLoader {
   }
 }
 
-// a singleton
-const moduleItemsLazyLoader = new ModuleItemsLazyLoader()
-
-export default moduleItemsLazyLoader
 export {ModuleItemsLazyLoader, type ModuleId, type ModuleItems, type ModuleItemsCallback}
