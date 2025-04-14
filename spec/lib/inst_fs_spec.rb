@@ -551,6 +551,54 @@ describe InstFS do
         expect(new_uuid).to eq "new uuid"
         expect(uploaded_data.size).to eq 1000
       end
+
+      context "filesize" do
+        context "when file_object responds to size" do
+          it "includes filesize in the JWT payload" do
+            expect(CanvasHttp)
+              .to receive(:post)
+              .with(
+                satisfy { |url|
+                  token = url.match(/token=(.*)$/)[1]
+                  payload = Canvas::Security.decode_jwt(token, [secret])
+                  payload[:filesize] == 264
+                },
+                anything
+              )
+              .and_return(
+                instance_double(Net::HTTPCreated, code: "201", body: { instfs_uuid: "dummy" }.to_json)
+              )
+
+            InstFS.direct_upload(
+              file_name: "a.png",
+              file_object: File.open("public/images/a.png")
+            )
+          end
+        end
+
+        context "when file_object does not respond to size" do
+          it "does not include filesize in the JWT payload" do
+            expect(CanvasHttp)
+              .to receive(:post)
+              .with(
+                satisfy { |url|
+                  token = url.match(/token=(.*)$/)[1]
+                  payload = Canvas::Security.decode_jwt(token, [secret])
+                  payload.keys.exclude?("filesize")
+                },
+                anything
+              )
+              .and_return(
+                instance_double(Net::HTTPCreated, code: "201", body: { instfs_uuid: "dummy" }.to_json)
+              )
+
+            InstFS.direct_upload(
+              file_name: "std.in",
+              file_object: $stdin
+            )
+          end
+        end
+      end
     end
 
     context "duplicate" do
