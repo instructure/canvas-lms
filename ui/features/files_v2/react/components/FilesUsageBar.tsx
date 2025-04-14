@@ -26,7 +26,7 @@ import formatMessage from '../../../../../packages/canvas-media/src/format-messa
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {generateFilesQuotaUrl} from '../../utils/apiUtils'
 import {useFileManagement} from './Contexts'
-import { Flex } from '@instructure/ui-flex'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('files_v2')
 
@@ -44,14 +44,12 @@ const FilesUsageBar = () => {
     queryKey: ['quota'],
     queryFn: () => fetchQuota(contextType, contextId),
     staleTime: 0,
+    onError: () => {
+      showFlashError(I18n.t('An error occurred while loading files usage data.'))()
+    },
   })
 
-  if (error) {
-    showFlashError(I18n.t('An error occurred while loading files usage data.'))(error as Error)
-    return null
-  }
-
-  if (isLoading) {
+  if (isLoading || error) {
     return null
   }
 
@@ -62,10 +60,7 @@ const FilesUsageBar = () => {
   })
 
   return (
-    <Flex
-      direction='column'
-      gap='x-small'
-    >
+    <Flex direction="column" gap="x-small">
       <ProgressBar
         meterColor="brand"
         screenReaderLabel={formatMessage('File Storage Quota Used')}
