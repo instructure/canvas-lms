@@ -8,12 +8,7 @@
   },
   "private": true,
   "workspaces": {
-    "packages": [
-      "gems/plugins/*",
-      "packages/*",
-      "ui/engine",
-      "ui/shared/*"
-    ]
+    "packages": ["gems/plugins/*", "packages/*", "ui/engine", "ui/shared/*"]
   },
   "dependencies": {
     "@apollo/client": "3.12.4",
@@ -342,7 +337,7 @@
     "mockdate": "^2.0.2",
     "moment-timezone-data-webpack-plugin": "^1.5.1",
     "moxios": "^0.4",
-    "msw": "^2.0.12",
+    "msw": "^2.7",
     "nyc": "^13",
     "patch-package": "^8.0.0",
     "qunitjs": "^1.23.0",
@@ -382,9 +377,7 @@
     "@storybook/manager-webpack5": "^6.5.9",
     "@storybook/react": "^6.5.9"
   },
-  "browserslist": [
-    "extends @instructure/browserslist-config-canvas-lms"
-  ],
+  "browserslist": ["extends @instructure/browserslist-config-canvas-lms"],
   "repository": "instructure/canvas-lms",
   "scripts": {
     "test": "jest --color",
