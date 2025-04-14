@@ -32,7 +32,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
-import {IconWarningSolid,IconAiLine} from '@instructure/ui-icons'
+import {IconWarningSolid, IconAiLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -303,7 +303,7 @@ PostMessage.propTypes = {
   /**
    * Display text for the post's message
    */
-  message: PropTypes.string.isRequired,
+  message: PropTypes.string,
   /*
    * Display attachment for the post's message
    */

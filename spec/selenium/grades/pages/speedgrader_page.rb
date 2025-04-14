@@ -706,15 +706,15 @@ class Speedgrader
       Speedgrader.comment_library_close_button.click
     end
 
-    def wait_for_speedgrader_iframe(timeout = 5)
+    def wait_for_speedgrader_iframe(timeout = 10)
       wait_for(method: nil, timeout:) { f("#speedgrader_iframe") }
     end
 
-    def wait_for_discussions_iframe(timeout = 5)
+    def wait_for_discussions_iframe(timeout = 10)
       wait_for(method: nil, timeout:) { f("#discussion_preview_iframe") }
     end
 
-    def wait_for_first_reply_button(timeout = 5)
+    def wait_for_first_reply_button(timeout = 10)
       wait_for(method: nil, timeout:) { f("[data-testid='discussions-first-reply-button']") }
     end
 

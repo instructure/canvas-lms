@@ -581,6 +581,8 @@ export type SpeedGrader = {
   emptyIframeHolder: (element?: JQuery) => void
   showGrade: () => void
   toggleFullRubric: (opt?: string) => void
+  addCommentTextAreaFocus: () => void
+  gradeFocus: () => void
   updateWordCount: (count?: number | null) => void
   populateTurnitin: (
     submission: HistoricalSubmission,

@@ -220,9 +220,10 @@ export function initKeyCodes(
     } else if (keyString === 'j' || keyString === 'n') {
       EG.next() // goto Next Student
     } else if (keyString === 'c') {
-      $add_a_comment_textarea.focus() // add comment
+      EG.addCommentTextAreaFocus() // focus comment text area
+      // $add_a_comment_textarea.focus() // add comment
     } else if (keyString === 'g') {
-      $grade.focus() // focus on grade
+      EG.gradeFocus() // focus grade text area
     } else if (keyString === 'r') {
       EG.toggleFullRubric() // focus rubric
     }
