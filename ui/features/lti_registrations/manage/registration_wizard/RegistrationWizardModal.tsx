@@ -29,6 +29,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {ProgressBar} from '@instructure/ui-progress'
 import {DynamicRegistrationWizard} from '../dynamic_registration_wizard/DynamicRegistrationWizard'
@@ -343,9 +344,19 @@ const InitializationModal = (props: InitializationModalBodyProps) => {
         )}
         {props.state.lti_version === '1p1' && (
           <View display="block" margin="medium 0" padding="small" background="secondary">
-            {I18n.t(
-              'Thank you for your interest in 1.1. We are exploring implementing this feature in future releases',
-            )}
+            <Text
+              dangerouslySetInnerHTML={{
+                __html: I18n.t(
+                  "Thank you for your interest in 1.1. We are exploring the possibility of enabling 1.1 installs from the new apps page in future releases. For now, you can install 1.1 tools from the *%{legacyAppPage}*.",
+                  {
+                    legacyAppPage: "legacy apps page",
+                    wrappers: [
+                      `<a href=/accounts/${props.accountId}/settings/configurations#tab-tools>$1</a>`
+                    ]
+                  }
+                )
+              }}
+            />
           </View>
         )}
       </RegistrationModalBody>
