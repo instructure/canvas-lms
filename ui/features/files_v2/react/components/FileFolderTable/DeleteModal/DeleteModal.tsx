@@ -72,6 +72,7 @@ export function DeleteModal({open, items, onClose}: DeleteModalProps) {
         : I18n.t('1 item deleted successfully.')
 
       showFlashSuccess(successMessage)()
+      queryClient.refetchQueries({queryKey: ['quota'], type: 'active'})
       await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
     } catch (_error) {
       const errorMessage = I18n.t('Failed to delete items. Please try again.')
