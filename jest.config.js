@@ -19,7 +19,7 @@
 const {defaults} = require('jest-config')
 const {swc} = require('./ui-build/webpack/webpack.rules')
 
-const esModules = ['mime', 'react-dnd', 'dnd-core', '@react-dnd'].join('|')
+const esModules = ['mime', 'react-dnd', 'dnd-core', '@react-dnd', 'graphql-request'].join('|')
 
 const baseSetupFilesAfterEnv = ['<rootDir>/jest/stubInstUi.js', '@testing-library/jest-dom']
 const setupFilesAfterEnv = process.env.LOG_PLAYGROUND_URL_ON_FAILURE
