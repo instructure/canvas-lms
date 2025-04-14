@@ -66,7 +66,7 @@
 
 <!--Show partial rubrics ERB if enhanced_rubrics_assignments is not enabled or in Student View-->
 <% if !Rubric.enhanced_rubrics_assignments_enabled?(@context) || !can_do(@context, @current_user, :read_as_admin)%>
-  <%= render :partial => "shared/rubrics_component", :locals => {:should_show_sequence_footer => !(@assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin)) } if @assignment.present? && !@assignment.quiz_lti? %>
+  <%= render :partial => "shared/rubrics_component", :locals => {:is_a2_student_view => @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) } if @assignment.present? && !@assignment.quiz_lti? %>
 
   <% if Rubric.rubric_self_assessment_enabled?(@context) && can_do(@context, @current_user, :read_as_admin) %>
     <div id="enhanced-rubric-self-assessment-edit"></div>
