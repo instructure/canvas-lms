@@ -283,6 +283,10 @@ class PageView < ActiveRecord::Base
   end
 
   def app_name
-    DeveloperKey.find_cached(developer_key_id).try(:name) if developer_key_id
+    return nil unless developer_key_id
+
+    DeveloperKey.find_cached(developer_key_id).try(:name)
+  rescue ActiveRecord::RecordNotFound
+    developer_key_id.to_s
   end
 end
