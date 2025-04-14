@@ -1030,6 +1030,12 @@ describe "as a student" do
           @association = @rubric.associate_with(@peer_review_assignment, @course, purpose: "grading", use_for_grading: true)
         end
 
+        it "does not show legacy rubrics partial view" do
+          StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+          wait_for_ajaximations
+          expect(f("body")).not_to contain_css("#rubrics")
+        end
+
         it "shows a modal reminding the student that they have 2 peer reviews and 1 is availible after submitting" do
           @peer_review_assignment.assign_peer_review(@student1, @student2)
           @peer_review_assignment.submit_homework(
