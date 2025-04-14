@@ -62,6 +62,7 @@ import {queryClient} from '@canvas/query'
 import {createRoot} from 'react-dom/client'
 import YAML from 'yaml'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
+import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 const I18n = createI18nScope('assignment_editview')
 
@@ -1411,6 +1412,10 @@ EditView.prototype.getFormData = function () {
     data.due_at = null
     data.lock_at = null
     data.unlock_at = null
+  }
+
+  if (data.peer_reviews_assign_at) {
+    data.peer_reviews_assign_at = unfudgeDateForProfileTimezone(data.peer_reviews_assign_at)
   }
 
   if (ENV.COURSE_PACE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths) {
