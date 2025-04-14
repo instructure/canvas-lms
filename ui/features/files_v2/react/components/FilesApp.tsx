@@ -231,7 +231,7 @@ const ResponsiveFilesApp = () => {
       match="media"
       query={{
         small: {maxWidth: canvas.breakpoints.small},
-        medium: {maxWidth: canvas.breakpoints.tablet},
+        medium: {maxWidth: '1140px'},
       }}
       render={(_props: any, matches: string[] | undefined) => (
         <FilesApp
