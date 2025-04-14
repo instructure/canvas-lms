@@ -197,7 +197,7 @@ class PageView < ActiveRecord::Base
   scope :for_context, ->(ctx) { where(context_type: ctx.class.name, context_id: ctx) }
   scope :for_users, ->(users) { where(user_id: users) }
 
-  def self.pv4_client
+  def self.pv4_client(**)
     ConfigFile.cache_object("pv4") do |config|
       creds = Rails.application.credentials.pv4_creds
 
