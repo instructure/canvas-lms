@@ -36,7 +36,12 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
 import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
 import {Button} from '@instructure/ui-buttons'
-import {escapeNewLineText, rangingFrom, findCriterionMatchingRatingId} from './utils/rubricUtils'
+import {
+  escapeNewLineText,
+  rangingFrom,
+  findCriterionMatchingRatingId,
+  rubricSelectedAriaLabel,
+} from './utils/rubricUtils'
 import {OutcomeTag} from './OutcomeTag'
 import {LongDescriptionModal} from './LongDescriptionModal'
 import {Link} from '@instructure/ui-link'
@@ -405,9 +410,9 @@ const CriterionRow = ({
               <Flex alignItems="stretch" height="100%">
                 {criterionRatings.map((rating, index) => {
                   const isHovered = hoveredRatingIndex === index
-                  const isSelected = rating.id && selectedRatingId === rating.id
+                  const isSelected = !!rating.id && selectedRatingId === rating.id
                   const isSelfAssessmentSelected =
-                    rating.id && selectedSelfAssessmentRatingId === rating.id
+                    !!rating.id && selectedSelfAssessmentRatingId === rating.id
                   const isLastRatingIndex = criterionRatings.length - 1 === index
 
                   const borderColor = isHovered || isSelected ? 'brand' : 'primary'
@@ -433,6 +438,8 @@ const CriterionRow = ({
                   const primaryBorderColor = `${colors.contrasts.grey1214} ${
                     isLastRatingIndex ? colors.contrasts.grey1214 : 'transparent'
                   } ${colors.contrasts.grey1214} ${colors.contrasts.grey1214}`
+
+                  const selectedText = rubricSelectedAriaLabel(isSelected, isSelfAssessmentSelected)
 
                   return (
                     <Flex.Item
@@ -469,8 +476,8 @@ const CriterionRow = ({
                           width="100%"
                           borderWidth="small"
                           borderColor={borderColor}
-                          overflowX="hidden"
-                          overflowY="hidden"
+                          overflowX="visible"
+                          overflowY="visible"
                           cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
                           padding="xxx-small x-small 0 x-small"
                           position="relative"
@@ -484,6 +491,8 @@ const CriterionRow = ({
                           }}
                           data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
                         >
+                          <ScreenReaderContent>{selectedText}</ScreenReaderContent>
+
                           {isSelfAssessmentSelected && (
                             <div
                               style={{
