@@ -34,7 +34,7 @@ import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import React from 'react'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
-import fetchMock from 'jest-fetch-mock'
+import fetchMock from 'fetch-mock'
 
 jest.mock('@canvas/rce/serviceRCELoader')
 jest.mock('@canvas/external-tools/react/components/ExternalToolModalLauncher')
@@ -146,6 +146,17 @@ const disableCheckbox = id => {
   document.getElementById(id).disabled = true
 }
 
+beforeEach(() => {
+  fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, [])
+  fetchMock.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, [])
+  fetchMock.get(/\/api\/v1\/courses\/\d+\/settings/, {})
+  fetchMock.get(/\/api\/v1\/courses\/\d+\/sections/, [])
+})
+
+afterEach(() => {
+  fetchMock.reset()
+})
+
 describe('EditView#handleModeratedGradingChanged', () => {
   let view
 
@@ -188,20 +199,12 @@ describe('EditView#handleModeratedGradingChanged', () => {
       ROOT_FOLDER_ID: '1',
     })
 
-    fetchMock.mockIf(/^\/api\/v1\/courses\/\d+\/assignments\/\d+$/, () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([]),
-      }),
-    )
-
     view = createEditView()
   })
 
   afterEach(() => {
     fakeENV.teardown()
     document.body.innerHTML = ''
-    fetchMock.resetMocks()
   })
 
   it('sets the moderated grading attribute on the assignment', () => {
@@ -246,7 +249,6 @@ describe('EditView#handleModeratedGradingChanged', () => {
   })
 
   it('hides the moderated grading form fields when Moderated Grading is disabled', () => {
-    view = createEditView()
     view.afterRender()
     view.handleModeratedGradingChanged({target: {checked: false}})
 
@@ -300,12 +302,7 @@ describe('EditView#handleMessageEvent', () => {
       ROOT_FOLDER_ID: '1',
     })
 
-    fetchMock.mockIf(/^\/api\/v1\/courses\/\d+\/assignments\/\d+$/, () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([]),
-      }),
-    )
+    fetchMock.mock(/^\/api\/v1\/courses\/\d+\/assignments\/\d+$/, [])
 
     view = createEditView()
   })
@@ -313,7 +310,6 @@ describe('EditView#handleMessageEvent', () => {
   afterEach(() => {
     fakeENV.teardown()
     document.body.innerHTML = ''
-    fetchMock.resetMocks()
   })
 
   it('sets ab_guid when subject is assignment.set_ab_guid and the ab_guid is formatted correctly', () => {

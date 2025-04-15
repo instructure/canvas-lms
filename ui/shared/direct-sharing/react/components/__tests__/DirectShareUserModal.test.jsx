@@ -21,15 +21,11 @@ import {render, fireEvent, act} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import useContentShareUserSearchApi from '../../effects/useContentShareUserSearchApi'
 import DirectShareUserModal from '../DirectShareUserModal'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 jest.mock('../../effects/useContentShareUserSearchApi')
 
 const flushAllTimersAndPromises = async () => {
   while (jest.getTimerCount() > 0) {
-     
     await act(async () => {
       jest.runAllTimers()
     })
@@ -117,7 +113,7 @@ describe('DirectShareUserModal', () => {
     })
 
     afterEach(() => {
-      console.error.mockRestore()  
+      console.error.mockRestore()
     })
 
     it('reports an error if the fetch fails', async () => {
@@ -155,6 +151,7 @@ describe('DirectShareUserModal', () => {
       })
 
       it('disables the send button when a search has started UNDER TEST', async () => {
+        fetchMock.postOnce('/api/v1/users/self/content_shares', 200)
         const {getByText, findByLabelText} = render(
           <DirectShareUserModal open={true} courseId="1" onDismiss={Function.prototype} />,
         )
@@ -164,7 +161,9 @@ describe('DirectShareUserModal', () => {
       })
 
       it('focuses on user select after error', () => {
-        const {getByText, getByLabelText} = render(<DirectShareUserModal open={true} courseId="1" />)
+        const {getByText, getByLabelText} = render(
+          <DirectShareUserModal open={true} courseId="1" />,
+        )
         fireEvent.click(getByText('Send'))
         expect(getByLabelText(/send to:/i)).toHaveFocus()
       })
