@@ -41,19 +41,23 @@ unless defined?($canvas_rails)
   else
     begin
       consul_environment = File.expand_path("consul_environment.txt", __dir__)
+      consul_canary = File.expand_path("consul_canary.txt", __dir__)
       if File.exist?(consul_environment)
         # have to do the consul communication without any gems, because
         # we're in the context of loading the gemfile
         require "bundler/vendored_net_http"
 
         environment = File.read(consul_environment)
+        canary = (File.exist?(consul_canary) ? File.read(consul_canary).strip : nil) == "true"
 
         keys = [
+          canary ? ["private/canvas", environment, "canary", "rails_version"].compact.join("/") : nil,
           ["private/canvas", environment, "rails_version"].compact.join("/"),
           ["private/canvas", "rails_version"].compact.join("/"),
+          canary ? ["global/private/canvas", environment, "canary", "rails_version"].compact.join("/") : nil,
           ["global/private/canvas", environment, "rails_version"].compact.join("/"),
           ["global/private/canvas", "rails_version"].compact.join("/")
-        ].uniq
+        ].compact.uniq
 
         result = nil
         Gem::Net::HTTP.start("localhost", 8500, connect_timeout: 1, read_timeout: 1) do |http|
