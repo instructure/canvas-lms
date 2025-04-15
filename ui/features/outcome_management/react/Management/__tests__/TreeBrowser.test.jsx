@@ -145,6 +145,14 @@ describe('TreeBrowser', () => {
       expect(getByLabelText('Enter new group name')).toHaveFocus()
     })
 
+    it('on ArrowLeft it navigates up and does not lose focus', async () => {
+      const {getByText} = render(<TreeBrowser {...defaultProps()} />)
+      const element = getByText('Create New Group')
+      fireEvent.keyDown(getByText('Create New Group').closest('li'), {key: 'ArrowLeft', code: 'ArrowLeft'})
+      await act(async () => jest.runAllTimers())
+      expect(getByText('Leaf folder').closest('li')).toHaveFocus()
+    })
+
     it('calls onCreateGroup when a group is saved', () => {
       const {getByText, getByLabelText} = render(<TreeBrowser {...defaultProps()} />)
       fireEvent.click(getByText('Create New Group'))
