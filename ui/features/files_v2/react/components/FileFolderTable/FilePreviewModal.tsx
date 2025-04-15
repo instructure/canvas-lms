@@ -26,16 +26,12 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {
-  IconImageSolid,
-  IconInfoSolid,
-  IconDownloadSolid,
-  IconXSolid,
-} from '@instructure/ui-icons'
+import {IconImageSolid, IconInfoSolid, IconDownloadSolid, IconXSolid} from '@instructure/ui-icons'
 import {type File} from '../../../interfaces/File'
 import {generatePreviewUrlPath} from '../../../utils/fileUtils'
 import {FilePreview} from './FilePreview'
 import {FilePreviewNavigationButtons} from './FilePreviewNavigationButtons'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('files_v2')
 
@@ -66,9 +62,19 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
   }
 
   useEffect(() => {
-    const timeoutID = isOpen ? setTimeout(() => closeButton.current?.focus(), 50) : undefined;
-    return timeoutID ? () => clearTimeout(timeoutID) : undefined;
+    const timeoutID = isOpen ? setTimeout(() => closeButton.current?.focus(), 50) : undefined
+    return timeoutID ? () => clearTimeout(timeoutID) : undefined
   }, [isOpen])
+
+  useEffect(() => {
+    if (isOpen) {
+      showFlashAlert({
+        message: I18n.t('Previewing file %{name}', {name}),
+        srOnly: true,
+        politeness: 'assertive',
+      })
+    }
+  }, [isOpen, name])
 
   useEffect(() => {
     const handlePopState = () => {
@@ -114,6 +120,17 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
     window.history.replaceState(null, '', generatePreviewUrlPath(collection[previousIndex] as File))
   }
 
+  const handleKeyboardNavigation = (event: React.KeyboardEvent) => {
+    if (ENV.disable_keyboard_shortcuts) return
+
+    const {key} = event
+    if (key === 'ArrowRight') {
+      handleNext()
+    } else if (key === 'ArrowLeft') {
+      handlePrevious()
+    }
+  }
+
   return (
     <Modal
       open={isOpen}
@@ -123,6 +140,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
       shouldCloseOnDocumentClick={false}
       variant="inverse"
       overflow="fit"
+      onKeyDown={handleKeyboardNavigation}
     >
       <Modal.Header>
         <Flex>
