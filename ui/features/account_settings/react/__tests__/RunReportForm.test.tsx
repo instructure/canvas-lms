@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import RunReportForm from '../account_reports/RunReportForm'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 
-const innerHtml = `<form>
+const innerHtml1 = `<form>
   <h1>Test HTML</h1>
   <input type="checkbox" name="parameter[checkbox]" data-testid="checkbox" />
   <input type="checkbox" name="parameter[unchecked]" data-testid="unchecked" />
@@ -31,8 +31,15 @@ const innerHtml = `<form>
   </select>
   </form>`
 
+const innerHtml2 = `<form>
+  <h1>Test HTML</h1>
+  <input type="radio" name="parameter[radio]" data-testid="radio_unchecked" value="Unchecked"/>
+  <input type="radio" name="parameter[radio]" data-testid="radio_checked" value="Checked"/>
+  <textarea name="parameter[textarea]" data-testid="textarea"></textarea>
+  </form>`
+
 const props = {
-  formHTML: innerHtml,
+  formHTML: innerHtml1,
   path: '/api/fake_post',
   reportName: 'test_report_csv',
   closeModal: jest.fn(),
@@ -57,7 +64,7 @@ describe('RunReportForm', () => {
     expect(getByTestId('select')).toBeInTheDocument()
   })
 
-  it('makes api call with input values', async () => {
+  it('makes api call with checkboxes and select', async () => {
     const user = userEvent.setup()
     fetchMock.post(props.path, {
       status: 200,
@@ -80,6 +87,38 @@ describe('RunReportForm', () => {
       expect(formData.get('parameter[checkbox]')).toBeTruthy()
       expect(formData.get('parameter[select]')).toBe('option_1')
       expect(formData.has('parameter[unchecked]')).toBeFalsy()
+    })
+  })
+
+  // custom reports use both these field types
+  it('makes api call with textarea and radio inputs', async () => {
+    const user = userEvent.setup()
+    fetchMock.post(props.path, {
+      status: 200,
+    })
+    const {getByTestId} = render(<RunReportForm {...props} formHTML={innerHtml2} />)
+
+    const radio = getByTestId('radio_checked')
+    await user.click(radio)
+    expect(radio).toBeChecked()
+
+    const textarea = getByTestId('textarea')
+    fireEvent.input(textarea, {target: {value: 'test text'}})
+    await waitFor(() => {
+      expect(textarea).toHaveValue('test text')
+    })
+
+    const submitButton = getByTestId('run-report')
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(props.onSuccess).toHaveBeenCalled()
+      expect(fetchMock.called(props.path, 'POST')).toBeTruthy()
+      const request = fetchMock.lastOptions()
+      const formData = request?.body as FormData
+      expect(request?.method).toBe('POST')
+      expect(formData.get('parameter[textarea]')).toBe('test text')
+      expect(formData.get('parameter[radio]')).toBe('Checked')
     })
   })
 
