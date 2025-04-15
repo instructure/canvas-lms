@@ -16,21 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {File} from "../../../../interfaces/File";
-import {getRestrictedText, isHidden, isPublished, isRestricted} from "../../../../utils/fileUtils";
-import {Flex} from "@instructure/ui-flex";
-import {Heading} from "@instructure/ui-heading";
-import {Text} from "@instructure/ui-text";
-import {Tooltip} from "@instructure/ui-tooltip";
-import {TruncateText} from "@instructure/ui-truncate-text";
-import {View} from "@instructure/ui-view";
-import {formatFileSize} from "@canvas/util/fileHelper";
+import type {File} from '../../../../interfaces/File'
+import {getRestrictedText, isHidden, isPublished, isRestricted} from '../../../../utils/fileUtils'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React from "react";
+import friendlyBytes from '@canvas/files/util/friendlyBytes'
 
 const I18n = createI18nScope('files_v2')
 
-const CommonFileInfo = ({item} : {item: File}) => {
+const CommonFileInfo = ({item}: {item: File}) => {
   const name = item.display_name
   const published = isPublished(item)
   const restricted = isRestricted(item)
@@ -47,7 +46,7 @@ const CommonFileInfo = ({item} : {item: File}) => {
       <Heading margin="0 0 large">{I18n.t('File Info')}</Heading>
       <Flex.Item>
         <Text weight="bold">{I18n.t('Name')}</Text>
-        <br/>
+        <br />
         <View as="div" display="inline-block" width="250px">
           <Tooltip renderTip={name}>
             <Text data-testid="file-display-name">
@@ -59,42 +58,42 @@ const CommonFileInfo = ({item} : {item: File}) => {
       {'locked' in item && (
         <Flex.Item>
           <Text weight="bold">{I18n.t('Status')}</Text>
-          <br/>
+          <br />
           <Text>{statusText()}</Text>
         </Flex.Item>
       )}
       {'usage_rights' in item && item.usage_rights && (
         <Flex.Item>
           <Text weight="bold">{I18n.t('License')}</Text>
-          <br/>
+          <br />
           <Text>{item.usage_rights.license_name}</Text>
         </Flex.Item>
       )}
       {'content-type' in item && (
         <Flex.Item>
           <Text weight="bold">{I18n.t('Type')}</Text>
-          <br/>
+          <br />
           <Text>{item['content-type']}</Text>
         </Flex.Item>
       )}
       {'size' in item && (
         <Flex.Item>
           <Text weight="bold">{I18n.t('Size')}</Text>
-          <br/>
-          <Text>{formatFileSize(item.size)}</Text>
+          <br />
+          <Text>{friendlyBytes(item.size)}</Text>
         </Flex.Item>
       )}
       {'created_at' in item && (
         <Flex.Item>
           <Text weight="bold">{I18n.t('Date Created')}</Text>
-          <br/>
+          <br />
           <Text>{new Date(item.created_at).toLocaleString()}</Text>
         </Flex.Item>
       )}
       {'updated_at' in item && (
         <Flex.Item>
           <Text weight="bold">{I18n.t('Date Modified')}</Text>
-          <br/>
+          <br />
           <Text>{new Date(item.updated_at).toLocaleString()}</Text>
         </Flex.Item>
       )}
