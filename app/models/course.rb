@@ -2438,7 +2438,8 @@ class Course < ActiveRecord::Base
 
   def run_auto_grader(progress, submission)
     if submission.blank? || submission.body.blank?
-      progress&.message = { error: "No essay submission found" }.to_json
+      progress&.message = "No essay submission found"
+      progress&.results = {}
       progress&.complete!
       return
     end
@@ -2449,15 +2450,17 @@ class Course < ActiveRecord::Base
     rubric = assignment.rubric_association&.rubric
 
     begin
-      enriched_result = AutoGradeService.new(
+      grade_data = AutoGradeService.new(
         assignment: assignment_text,
         essay:,
         rubric: rubric.data
       ).call
 
-      progress&.message = enriched_result.to_json
+      progress&.results = grade_data
+      progress&.message = nil
     rescue => e
-      progress.message = { error: "Grading failed: #{e.message}" }.to_json
+      progress&.results = {}
+      progress&.message = "Grading failed: #{e.message}"
     ensure
       progress.complete!
     end
