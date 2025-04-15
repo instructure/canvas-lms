@@ -95,6 +95,14 @@ describe ErrorsController do
       expect(ErrorReport.last.user_id).to eq user.id
     end
 
+    it "infers user_roles" do
+      student_in_course(active_all: true)
+      user_session(@student)
+      post "create", params: { error: { id: 1, message: "it broke :(" } }
+      assert_recorded_error
+      expect(ErrorReport.order(:id).last.data["user_roles"]).to eq("user,student")
+    end
+
     it "records the real user if they are in student view" do
       authenticate_user!
       svs = course_factory.student_view_student
