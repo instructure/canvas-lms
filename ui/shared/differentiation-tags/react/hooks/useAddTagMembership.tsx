@@ -44,9 +44,12 @@ export const useAddTagMembership = () => {
       // We are invalidating all queries that start with 'differentiationTagCategories'
       // undefined: we aren't using any other query filters to determine what to invalidate
       // cancelRefetch: tells the query client to cancel any ongoing refetch for the matching queries
-      await queryClient.invalidateQueries(['differentiationTagCategories'], undefined, {
-        cancelRefetch: true,
-      })
+      await queryClient.invalidateQueries(
+        {
+          queryKey: ['differentiationTagCategories'],
+        },
+        {cancelRefetch: true},
+      )
     },
     onError: error => {
       console.error('Error adding users membership:', error)
