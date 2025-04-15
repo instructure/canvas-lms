@@ -18,11 +18,10 @@
 
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
+import fetchMock from 'fetch-mock'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 import userEvent from '@testing-library/user-event'
 import HomeroomPage from '../HomeroomPage'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 describe('HomeroomPage', () => {
   const user = userEvent.setup()
@@ -38,15 +37,18 @@ describe('HomeroomPage', () => {
   })
 
   beforeEach(() => {
-    window.ENV = {
+    fetchMock.put(/.*\/api\/v1\/users\/\d+\/colors/, {})
+    fetchMock.get(/api\/v1\/manageable_accounts/, [])
+    fetchMock.get(/api\/v1\/users\/self\/courses/, [])
+    fakeEnv.setup({
       INITIAL_NUM_K5_CARDS: 3,
-    }
-    fetch.resetMocks()
+    })
   })
 
   afterEach(() => {
     localStorage.clear()
-    window.ENV = {}
+    fetchMock.restore()
+    fakeEnv.teardown()
     jest.clearAllMocks()
   })
 

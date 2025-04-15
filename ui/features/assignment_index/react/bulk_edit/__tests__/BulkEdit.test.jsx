@@ -23,13 +23,13 @@ import tzInTest from '@instructure/moment-utils/specHelpers'
 import tokyo from 'timezone/Asia/Tokyo'
 import anchorage from 'timezone/America/Anchorage'
 import moment from 'moment-timezone'
+import fetchMock from 'fetch-mock'
 import BulkEdit from '../BulkEdit'
-import {enableFetchMocks} from 'jest-fetch-mock'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 
-enableFetchMocks()
-
-const responseOpts = {headers: {'Content-Type': 'application/json'}}
+const BULK_EDIT_ENDPOINT = /api\/v1\/courses\/\d+\/assignments\/bulk_update/
+const ASSIGNMENTS_ENDPOINT = /api\/v1\/courses\/\d+\/assignments/
+const PROGRESS_ENDPOINT = /progress/
 
 // grab this before fake timers replace it
 const realSetTimeout = setTimeout
@@ -97,7 +97,7 @@ function tooManyDatesResponse() {
 }
 
 function mockAssignmentsResponse(assignments) {
-  fetch.mockResponse(JSON.stringify(assignments), responseOpts)
+  fetchMock.once('*', assignments)
   return assignments
 }
 
@@ -117,7 +117,7 @@ function renderBulkEdit(overrides = {}) {
 }
 
 async function renderBulkEditAndWait(overrides = {}, assignments = standardAssignmentResponse()) {
-  fetch.mockResponseOnce(JSON.stringify(assignments), responseOpts)
+  fetchMock.getOnce(ASSIGNMENTS_ENDPOINT, assignments)
   const result = renderBulkEdit(overrides)
   await flushPromises()
   result.assignments = assignments
@@ -130,12 +130,16 @@ function changeAndBlurInput(input, newValue) {
 }
 
 beforeEach(() => {
+  fetchMock.put(/api\/v1\/courses\/\d+\/assignments\/bulk_update/, {})
   jest.useFakeTimers()
-  fetch.resetMocks()
+})
+
+afterEach(() => {
+  fetchMock.reset()
 })
 
 describe('Assignment Bulk Edit Dates', () => {
-  const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null })
+  const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null})
   let oldEnv
   beforeEach(() => {
     oldEnv = window.ENV
@@ -361,15 +365,13 @@ describe('Assignment Bulk Edit Dates', () => {
       const overrideDueAtInput = getAllByLabelText('Due At')[1]
       const dueAtDate = '2020-04-01'
       changeAndBlurInput(overrideDueAtInput, dueAtDate)
+      fetchMock.putOnce('/api/v1/courses/42/assignments/bulk_update', {})
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      expect(fetch).toHaveBeenCalledWith(
-        '/api/v1/courses/42/assignments/bulk_update',
-        expect.objectContaining({
-          method: 'PUT',
-        }),
-      )
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const [url, options] = fetchMock.calls()[1]
+      expect(url).toBe('/api/v1/courses/42/assignments/bulk_update')
+      expect(options.method).toBe('PUT')
+      const body = JSON.parse(options.body)
       expect(body).toMatchObject([
         {
           id: 'assignment_1',
@@ -393,7 +395,7 @@ describe('Assignment Bulk Edit Dates', () => {
       changeAndBlurInput(getAllByLabelText('Due At')[2], dueAtDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_1',
@@ -441,7 +443,7 @@ describe('Assignment Bulk Edit Dates', () => {
       changeAndBlurInput(dueAtInput, '')
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_1',
@@ -468,7 +470,7 @@ describe('Assignment Bulk Edit Dates', () => {
       changeAndBlurInput(lockAtInput, lockAtDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_2',
@@ -510,7 +512,7 @@ describe('Assignment Bulk Edit Dates', () => {
       changeAndBlurInput(unlockAtInput, unlockDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_2',
@@ -539,7 +541,7 @@ describe('Assignment Bulk Edit Dates', () => {
       changeAndBlurInput(lockAtInput, lockAtDate)
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_2',
@@ -567,7 +569,7 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(dueAtInput.value).toMatch('Wed, Apr 1, 2020, 4:00 PM')
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_2',
@@ -594,7 +596,7 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(dueAtInput.value).toMatch('Wed, Apr 1, 2020, 11:11 AM')
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_2',
@@ -619,7 +621,7 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(availableAtInput.value).toMatch('Sun, Nov 7, 2021, 4:00 PM')
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_2',
@@ -645,7 +647,7 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(availableAtInput.value).toMatch('Mon, Nov 1, 2021, 4:00 PM')
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_2',
@@ -670,7 +672,7 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(availableAtInput.value).toMatch('Tue, Nov 2, 2021, 4:00 PM')
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_2',
@@ -694,7 +696,7 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(unlockAtInput.value).toMatch('Wed, Apr 1, 2020, 4:00 PM')
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_2',
@@ -719,7 +721,7 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(unlockAtInput.value).toMatch('Wed, Apr 1, 2020, 1:00 PM')
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toMatchObject([
         {
           id: 'assignment_2',
@@ -738,9 +740,18 @@ describe('Assignment Bulk Edit Dates', () => {
     it('displays an error if starting the save fails', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
       changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-01')
-      fetch.mockResponseOnce(JSON.stringify({errors: [{message: 'something bad happened'}]}), {
-        status: 401,
-      })
+      fetchMock.putOnce(
+        /api\/v1\/courses\/\d+\/assignments\/bulk_update/,
+        {
+          body: {
+            errors: [{message: 'something bad happened'}],
+          },
+          status: 401,
+        },
+        {
+          overwriteRoutes: true,
+        },
+      )
       fireEvent.click(getByText('Save'))
       await flushPromises()
       expect(getByText(/something bad happened/)).toBeInTheDocument()
@@ -759,13 +770,17 @@ describe('Assignment Bulk Edit Dates', () => {
     async function renderBulkEditAndSave() {
       const fns = await renderBulkEditAndWait()
       changeAndBlurInput(fns.getAllByLabelText('Due At')[0], '2020-04-01')
-      fetch.mockResponses(
-        [JSON.stringify({url: 'progress url'}), responseOpts],
-        [
-          JSON.stringify({url: 'progress url', workflow_state: 'queued', completion: 0}),
-          responseOpts,
-        ],
-      )
+      fetchMock
+        .putOnce(
+          /api\/v1\/courses\/\d+\/assignments\/bulk_update/,
+          {url: 'progress'},
+          {overwriteRoutes: true},
+        )
+        .get(/progress/, {
+          url: 'progress',
+          workflow_state: 'queued',
+          completion: 0,
+        })
       fireEvent.click(fns.getByText('Save'))
       await flushPromises()
       return fns
@@ -773,40 +788,61 @@ describe('Assignment Bulk Edit Dates', () => {
 
     it('polls for progress and updates a progress bar', async () => {
       const {getByText} = await renderBulkEditAndSave()
-      expect(fetch).toHaveBeenCalledWith('progress url', expect.anything())
+      const [url] = fetchMock.calls()[2]
+      expect(url).toBe('/progress')
       expect(getByText('0%')).toBeInTheDocument()
 
-      fetch.mockResponses(
-        [
-          JSON.stringify({url: 'progress url', workflow_state: 'running', completion: 42}),
-          responseOpts,
-        ],
-        [
-          JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100}),
-          responseOpts,
-        ],
+      fetchMock.getOnce(
+        PROGRESS_ENDPOINT,
+        {
+          url: '/progress',
+          workflow_state: 'running',
+          completion: 42,
+        },
+        {
+          overwriteRoutes: true,
+        },
       )
 
       act(jest.runOnlyPendingTimers)
       await flushPromises()
       expect(getByText('42%')).toBeInTheDocument()
 
+      fetchMock.getOnce(
+        PROGRESS_ENDPOINT,
+        {
+          url: '/progress',
+          workflow_state: 'complete',
+          completion: 100,
+        },
+        {
+          overwriteRoutes: true,
+        },
+      )
+
       act(jest.runOnlyPendingTimers)
       await flushPromises()
       expect(getByText(/saved successfully/)).toBeInTheDocument()
       expect(getByText('Close')).toBeInTheDocument()
       // complete, expect no more polling
-      fetch.resetMocks()
+      fetchMock.resetHistory()
       act(jest.runAllTimers)
       await flushPromises()
-      expect(fetch).not.toHaveBeenCalled()
+      expect(fetchMock.calls()).toHaveLength(0)
     })
 
     it('displays an error if the progress fetch fails', async () => {
       const {getByText} = await renderBulkEditAndSave()
-      fetch.mockResponseOnce(JSON.stringify({errors: [{message: 'could not get progress'}]}), {
-        status: 401,
-      })
+      fetchMock.get(
+        /progress/,
+        {
+          body: {errors: [{message: 'could not get progress'}]},
+          status: 401,
+        },
+        {
+          overwriteRoutes: true,
+        },
+      )
       act(jest.runAllTimers)
       await flushPromises()
       expect(getByText(/could not get progress/)).toBeInTheDocument()
@@ -815,15 +851,18 @@ describe('Assignment Bulk Edit Dates', () => {
 
     it('displays an error if the job fails', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndSave()
-      fetch.mockResponseOnce(
-        JSON.stringify({
+      fetchMock.get(
+        /progress/,
+        {
           completion: 42,
           workflow_state: 'failed',
           results: [
             {assignment_id: 'assignment_1', errors: {due_at: [{message: 'some bad dates'}]}},
           ],
-        }),
-        responseOpts,
+        },
+        {
+          overwriteRoutes: true,
+        },
       )
       act(jest.runAllTimers)
       await flushPromises()
@@ -837,9 +876,18 @@ describe('Assignment Bulk Edit Dates', () => {
 
     it('can start a second save operation', async () => {
       const {getByText, queryByText, getAllByLabelText} = await renderBulkEditAndSave()
-      fetch.mockResponseOnce(
-        JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100}),
-        responseOpts,
+      fetchMock.get(
+        /progress/,
+        {
+          body: {
+            url: 'progress',
+            workflow_state: 'complete',
+            completion: 100,
+          },
+        },
+        {
+          overwriteRoutes: true,
+        },
       )
       act(jest.runAllTimers)
       await flushPromises()
@@ -848,12 +896,16 @@ describe('Assignment Bulk Edit Dates', () => {
       changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-02')
       expect(queryByText(/saved successfully/)).toBe(null)
 
-      fetch.mockResponses(
-        [JSON.stringify({url: 'progress url'}), responseOpts],
-        [
-          JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100}),
-          responseOpts,
-        ],
+      fetchMock.putOnce(BULK_EDIT_ENDPOINT, {url: 'progress url'}, {overwriteRoutes: true}).getOnce(
+        PROGRESS_ENDPOINT,
+        {
+          url: 'progress url',
+          workflow_state: 'complete',
+          completion: 0,
+        },
+        {
+          overwriteRoutes: true,
+        },
       )
       fireEvent.click(getByText('Save'))
       await flushPromises()
@@ -1101,7 +1153,9 @@ describe('Assignment Bulk Edit Dates', () => {
       await renderBulkEditAndWait()
       const batchEditButton = await screen.findByText('Batch Edit')
       await user.click(batchEditButton)
-      const errorMessage = await screen.findByText('Use checkboxes to select one or more assignments to batch edit.')
+      const errorMessage = await screen.findByText(
+        'Use checkboxes to select one or more assignments to batch edit.',
+      )
       expect(errorMessage).toBeInTheDocument()
     })
 
@@ -1120,7 +1174,7 @@ describe('Assignment Bulk Edit Dates', () => {
       jest.runAllTimers() // required for modal to actually close
       await user.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toHaveLength(1) // second assignment was not selected
       expect(body).toMatchObject([
         {
@@ -1175,7 +1229,7 @@ describe('Assignment Bulk Edit Dates', () => {
       jest.runAllTimers() // required for modal to actually close
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toHaveLength(1) // second assignment was not selected
       expect(body).toMatchObject([
         {
@@ -1206,7 +1260,7 @@ describe('Assignment Bulk Edit Dates', () => {
       jest.runAllTimers() // required for modal to actually close
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toHaveLength(1) // second assignment was not selected
       expect(body).toMatchObject([
         {
@@ -1237,7 +1291,7 @@ describe('Assignment Bulk Edit Dates', () => {
       jest.runAllTimers() // required for modal to actually close
       fireEvent.click(getByText('Save'))
       await flushPromises()
-      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      const body = JSON.parse(fetchMock.calls()[1][1].body)
       expect(body).toHaveLength(1) // second assignment was not selected
       expect(body).toMatchObject([
         {
@@ -1314,7 +1368,7 @@ describe('in a timezone that does DST', () => {
     fireEvent.click(button7)
     fireEvent.click(getByText('Save'))
     await flushPromises()
-    const body = JSON.parse(fetch.mock.calls[1][1].body)
+    const body = JSON.parse(fetchMock.calls()[1][1].body)
     const newMoment = moment.tz(body[0].all_dates[0].due_at, 'America/Anchorage')
     expect(newMoment.format('YYYY-MM-DD h:mm:ss.S')).toEqual('2021-11-07 5:37:14.5')
   })

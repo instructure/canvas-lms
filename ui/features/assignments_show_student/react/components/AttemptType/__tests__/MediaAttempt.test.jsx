@@ -24,9 +24,6 @@ import MediaPlayer from '@instructure/ui-media-player'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React, {createRef} from 'react'
 import StudentViewContext from '../../Context'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 // We need to set up a mock, as for some reason, jest.spyOn does not work on the original MediaPlayer
 jest.mock('@instructure/ui-media-player', () => {

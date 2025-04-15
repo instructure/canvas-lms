@@ -35,10 +35,7 @@ import {
 } from '../../__tests__/fixtures'
 import {SyncState} from '../../shared/types'
 import {paceContextsActions} from '../pace_contexts'
-import {enableFetchMocks} from 'jest-fetch-mock'
 import type {CoursePace, CoursePacesState, StoreState} from '../../types'
-
-enableFetchMocks()
 
 const CREATE_API = `/api/v1/courses/${COURSE.id}/course_pacing`
 const UPDATE_API = `/api/v1/courses/${COURSE.id}/course_pacing/${PRIMARY_PACE.id}`
@@ -362,6 +359,7 @@ describe('Course paces actions', () => {
       const updatedPace = {...PRIMARY_PACE}
       const getState = mockGetState(updatedPace, PRIMARY_PACE)
 
+      fetchMock.deleteOnce(DESTROY_API, {course_pace: {...PRIMARY_PACE}})
       const thunkedAction = coursePaceActions.removePace()
       await thunkedAction(asyncDispatch, getState)
 
@@ -393,6 +391,8 @@ describe('Course paces actions', () => {
           searchTerm,
         },
       })
+
+      fetchMock.deleteOnce(DESTROY_API, {course_pace: {...PRIMARY_PACE}})
 
       await coursePaceActions.removePace()(asyncDispatch, getState)
       expect(paceContextsActions.fetchPaceContexts).toHaveBeenCalledTimes(1)

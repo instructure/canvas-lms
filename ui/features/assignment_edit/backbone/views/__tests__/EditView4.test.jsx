@@ -33,11 +33,11 @@ import React from 'react'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
-import fetchMock from 'jest-fetch-mock'
+import fetchMock from 'fetch-mock'
 // ReactDOM might be required for dynamic rendering in certain scenarios.
 import ReactDOM from 'react-dom'
-import { waitFor } from '@testing-library/react'
-import {createRoot} from "react-dom/client"
+import {waitFor} from '@testing-library/react'
+import {createRoot} from 'react-dom/client'
 
 jest.mock('jquery-ui', () => {
   const $ = require('jquery')
@@ -55,11 +55,14 @@ jest.mock('jquery-ui', () => {
 jest.mock('../../../react/AssetProcessors', () => ({
   attach: ({container, initialAttachedProcessors, courseId, secureParams}) => {
     const initialJson = JSON.stringify(initialAttachedProcessors)
-    const el = <div>
-      AssetProcessors initialAttachedProcessors={initialJson} courseId={courseId} secureParams={secureParams}
-    </div>
+    const el = (
+      <div>
+        AssetProcessors initialAttachedProcessors={initialJson} courseId={courseId} secureParams=
+        {secureParams}
+      </div>
+    )
     createRoot(container).render(el)
-  }
+  },
 }))
 
 const s_params = 'some super secure params'
@@ -150,7 +153,10 @@ describe('EditView', () => {
       context_asset_string: 'course_1',
     }
 
-    fetchMock.mockResponse(JSON.stringify({}))
+    fetchMock.get('/api/v1/courses/1/settings', {})
+    fetchMock.get('/api/v1/courses/1/sections?per_page=100', [])
+    fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions*/, [])
+    fetchMock.post(/.*\/api\/graphql/, {})
     RCELoader.RCE = null
     return RCELoader.loadRCE()
   })
@@ -160,7 +166,7 @@ describe('EditView', () => {
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
-    fetchMock.resetMocks()
+    fetchMock.reset()
     jest.resetModules()
     window.ENV = null
   })
@@ -202,7 +208,6 @@ describe('EditView', () => {
         },
         context_asset_string: 'course_1',
       }
-      fetchMock.mockResponse(JSON.stringify({}))
     })
 
     it('attaches assignment configuration component', () => {
@@ -258,7 +263,6 @@ describe('EditView', () => {
   describe('Assignment External Tools', () => {
     beforeEach(() => {
       window.ENV.COURSE_ID = 1
-      fetchMock.mockResponse(JSON.stringify({}))
     })
 
     it('attaches assignment external tools component', () => {
@@ -333,8 +337,8 @@ describe('EditView', () => {
       })
       await waitFor(() => {
         expect(view.$assetProcessorsContainer.text()).toBe(
-        'AssetProcessors initialAttachedProcessors=[] courseId=1 secureParams=some super secure params'
-      )
+          'AssetProcessors initialAttachedProcessors=[] courseId=1 secureParams=some super secure params',
+        )
       })
     })
 
@@ -344,8 +348,8 @@ describe('EditView', () => {
       const view = createEditViewOnlineSubmission({onlineUpload: true})
       await waitFor(() => {
         expect(view.$assetProcessorsContainer.text()).toBe(
-        'AssetProcessors initialAttachedProcessors=[{"id":1}] courseId=1 secureParams=some super secure params'
-      )
+          'AssetProcessors initialAttachedProcessors=[{"id":1}] courseId=1 secureParams=some super secure params',
+        )
       })
     })
 
@@ -356,7 +360,7 @@ describe('EditView', () => {
         expect(view.$assetProcessorsContainer.children()).toHaveLength(0)
       })
       // Ensure no children are added after the initial render
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 100))
       expect(view.$assetProcessorsContainer.children()).toHaveLength(0)
     })
 
@@ -403,7 +407,6 @@ describe('EditView', () => {
         HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED: true,
         CANCEL_TO: currentOrigin + '/cancel',
       }
-      fetchMock.mockResponse(JSON.stringify({}))
     })
 
     let view
