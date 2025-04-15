@@ -168,6 +168,7 @@ export const CONVERSATIONS_QUERY = gql`
     $filter: [String!]
     $scope: String = ""
     $afterConversation: String
+    $showHorizonConversations: Boolean = false
   ) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
@@ -178,6 +179,7 @@ export const CONVERSATIONS_QUERY = gql`
           filter: $filter # e.g. [user_1, course_1]
           first: 20
           after: $afterConversation
+          showHorizonConversations: $showHorizonConversations
         ) {
           nodes {
             _id
