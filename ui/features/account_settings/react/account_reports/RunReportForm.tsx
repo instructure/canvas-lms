@@ -45,6 +45,12 @@ const getElementValue = (element: Element) => {
   const type = element.getAttribute('type')
   if (type === 'checkbox') {
     value = (element as HTMLInputElement).checked ? '1' : null
+  } else if (type === 'radio') {
+    if ((element as HTMLInputElement).checked) {
+      value = (element as HTMLInputElement).value
+    } else {
+      value = null
+    }
   } else {
     value = (element as HTMLInputElement).value
   }
@@ -53,7 +59,7 @@ const getElementValue = (element: Element) => {
 
 const getFormData = (form: HTMLDivElement) => {
   // get all the form elements
-  const formElements = form.querySelectorAll<HTMLInputElement>('input, select')
+  const formElements = form.querySelectorAll<HTMLInputElement>('input, select, textarea')
   const formArray = Array.from(formElements)
   const formData = new FormData()
   formArray.forEach(element => {
