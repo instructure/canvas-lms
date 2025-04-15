@@ -254,6 +254,7 @@ const PermissionsModalBody = ({
           variant="error"
           renderCloseButtonLabel={I18n.t('Close warning message')}
           onDismiss={onDismissAlert}
+          data-testid="permissions-error-alert"
         >
           {error}
         </Alert>
@@ -295,6 +296,7 @@ const PermissionsModalBody = ({
               timeInputRef={unlockAtTimeInputRef}
               onChange={onChangeUnlockAt}
               messages={unlockAtError}
+              data-testid="permissions-unlock-at-input"
             />
           </View>
 
@@ -312,6 +314,7 @@ const PermissionsModalBody = ({
               timeInputRef={lockAtTimeInputRef}
               onChange={onChangeLockAt}
               messages={lockAtError}
+              data-testid="permissions-lock-at-input"
             />
           </View>
         </>
