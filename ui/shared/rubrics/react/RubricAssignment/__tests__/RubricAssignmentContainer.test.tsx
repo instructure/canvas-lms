@@ -54,14 +54,27 @@ describe('RubricAssignmentContainer Tests', () => {
       ['fetchGradingRubricsForContext', '1', 'course_2'],
       RUBRICS_FOR_CONTEXT,
     )
+
     const rubricSelfAssessmentSettings = {
       canUpdateRubricSelfAssessment: true,
       rubricSelfAssessmentEnabled: true,
     }
+
     queryClient.setQueryData(
       ['assignment-self-assessment-settings', '1', RUBRIC.id],
       rubricSelfAssessmentSettings,
     )
+
+    queryClient.setQueryData(
+      ['assignment-self-assessment-settings', '1', '1'],
+      rubricSelfAssessmentSettings,
+    )
+
+    queryClient.setDefaultOptions({
+      queries: {
+        retry: false,
+      },
+    })
   })
 
   afterEach(() => {
@@ -140,10 +153,11 @@ describe('RubricAssignmentContainer Tests', () => {
     }
 
     it('will render the rubric title, edit, preview, and remove buttons when rubric is attached to assignment', () => {
-      const {getByTestId} = getAssociatedComponent()
+      const {getByTestId, getByText} = getAssociatedComponent()
       expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
       expect(getByTestId('edit-assignment-rubric-button')).toBeInTheDocument()
       expect(getByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
+      expect(getByText('Rubric 1')).toBeInTheDocument() // Check for the text directly
     })
 
     it('will not render the edit button when can_manage_rubrics is false', () => {
@@ -157,7 +171,7 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
     })
 
-    it('should render the create modal when the edit button is clicked', () => {
+    it('should render the edit modal when the edit button is clicked', () => {
       const {getByTestId} = renderComponent({
         assignmentRubric: RUBRIC,
         assignmentRubricAssociation: RUBRIC_ASSOCIATION,
@@ -185,7 +199,7 @@ describe('RubricAssignmentContainer Tests', () => {
         assignmentRubricAssociation: RUBRIC_ASSOCIATION,
       })
       fireEvent.click(getByTestId('remove-assignment-rubric-button'))
-      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(getByTestId('delete-confirm-modal')).toBeInTheDocument()
       fireEvent.click(getByTestId('delete-confirm-btn'))
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(getByTestId('create-assignment-rubric-button')).toBeInTheDocument()
@@ -224,7 +238,7 @@ describe('RubricAssignmentContainer Tests', () => {
 
       getByTestId('edit-assignment-rubric-button').click()
       getByTestId('copy-edit-cancel-btn').click()
-      expect(queryByTestId('rubric-assignment-create-modal')).not.toBeInTheDocument()
+      expect(queryByTestId('rubric-assignment-create-modal')).toBeNull()
     })
 
     it('should continue to the edit modal when the user confirms in the copy edit modal', () => {
@@ -292,7 +306,7 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByTestId('rubric-search-tray')).toBeInTheDocument()
 
       const comboBox = getByTestId('rubric-context-select') as HTMLInputElement
-      expect(comboBox.value).toEqual('Account 1 (Account)')
+      expect(comboBox.value).toEqual('Course 1 (Course)')
 
       fireEvent.click(comboBox)
       expect(getByText('Course 1 (Course)')).toBeInTheDocument()
@@ -306,7 +320,7 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByTestId('rubric-search-tray')).toBeInTheDocument()
 
       const comboBox = getByTestId('rubric-context-select') as HTMLInputElement
-      expect(comboBox.value).toEqual('Account 1 (Account)')
+      expect(comboBox.value).toEqual('Course 1 (Course)')
 
       fireEvent.click(comboBox)
 
@@ -334,7 +348,7 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByTestId('rubric-search-tray')).toBeInTheDocument()
 
       const comboBox = getByTestId('rubric-context-select') as HTMLInputElement
-      expect(comboBox.value).toEqual('Account 1 (Account)')
+      expect(comboBox.value).toEqual('Course 1 (Course)')
 
       fireEvent.click(comboBox)
 
