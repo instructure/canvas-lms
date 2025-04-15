@@ -99,7 +99,7 @@ export function PostMessage({...props}) {
           setTranslationError(e.translationError)
         } else {
           setTranslationError({
-            type: 'error',
+            type: 'newError',
             message: I18n.t('There was an unexpected error during translation.'),
           })
         }
@@ -230,7 +230,7 @@ export function PostMessage({...props}) {
                 )}
                 {!isTranslating &&
                   translateTargetLanguage &&
-                  translationError?.type === 'error' && (
+                  (translationError?.type === 'error' || translationError?.type === 'newError') && (
                     <Flex direction="row" alignItems="center" margin="0 0 small 0" gap="x-small">
                       <IconWarningSolid color="error" title="warning" />
                       <Text color="danger" data-testid="error_type_error">
