@@ -20,13 +20,13 @@ import React, {useCallback} from 'react'
 import {type File, type Folder} from '../../../interfaces/File'
 import {getIcon} from '../../../utils/fileFolderUtils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {formatFileSize} from '@canvas/util/fileHelper'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {IconCollectionLine} from '@instructure/ui-icons'
+import friendlyBytes from '@canvas/files/util/friendlyBytes'
 
 const I18n = createI18nScope('files_v2')
 
@@ -71,7 +71,7 @@ const FileFolderInfo = ({items}: FileFolderInfoProps) => {
     if (multiple) return null
 
     const item = items[0]
-    return <Text size="small">{item.size ? formatFileSize(item.size) : I18n.t('Folder')}</Text>
+    return <Text size="small">{item.size ? friendlyBytes(item.size) : I18n.t('Folder')}</Text>
   }, [items, multiple])
 
   if (items.length === 0) return null
