@@ -67,7 +67,9 @@ module FeatureFlags
     end
 
     def self.docviewer_enable_iwork_visible_on_hook(context)
-      DocviewerIworkPredicate.new(context, Shard.current.database_server.config[:region]).call
+      @docviewer_enable_iwork_visible_on_hook_cache ||= {}
+      @docviewer_enable_iwork_visible_on_hook_cache[context.global_asset_string] ||=
+        DocviewerIworkPredicate.new(context, Shard.current.database_server.config[:region]).call
     end
 
     def self.usage_metrics_allowed_hook(context)
