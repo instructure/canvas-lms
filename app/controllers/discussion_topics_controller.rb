@@ -391,7 +391,7 @@ class DiscussionTopicsController < ApplicationController
       end
     end
 
-    if params[:only_announcements] && !@context.grants_any_right?(@current_user, :manage, :read_course_content)
+    if params[:only_announcements] && !@context.grants_any_right?(@current_user, :manage, :read_as_admin)
       scope = scope.active.where("((unlock_at IS NULL AND delayed_post_at IS NULL) OR (unlock_at<? OR delayed_post_at<?)) AND ( lock_at IS NULL OR lock_at>?)", Time.now.utc, Time.now.utc, Time.now.utc)
     end
 
