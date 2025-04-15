@@ -888,6 +888,22 @@ describe Types::SubmissionType do
         )
       ).to eq [[], [@rubric_assessment.id.to_s], []]
     end
+
+    it "returns empty assessments if there is not a matching rubric assessment for the latest attempt" do
+      @assignment.submit_homework(@student, body: "bar", submitted_at: 1.hour.since)
+      @assignment.submit_homework(@student, body: "bar2", submitted_at: 1.hour.since)
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { _id } }")
+      ).to eq []
+    end
+
+    it "returns all assessment if for_all_attempts is true" do
+      @assignment.submit_homework(@student, body: "bar", submitted_at: 1.hour.since)
+      @assignment.submit_homework(@student, body: "bar2", submitted_at: 1.hour.since)
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection(filter: {forAllAttempts: true}) { nodes { _id } }")
+      ).to eq [@rubric_assessment.id.to_s]
+    end
   end
 
   describe "turnitin_data" do
