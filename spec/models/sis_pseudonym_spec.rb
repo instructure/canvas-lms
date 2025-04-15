@@ -223,7 +223,7 @@ describe SisPseudonym do
         p.workflow_state = "active"
         p.sis_user_id = "SIS2"
       end
-      u.pseudonyms.create!(pseud_params("alphabet@example.com")) do |p|
+      u.pseudonyms.create!(pseud_params("alphabet2@example.com")) do |p|
         p.workflow_state = "active"
         p.sis_user_id = "SIS3"
         p.authentication_provider = ldap_ap
