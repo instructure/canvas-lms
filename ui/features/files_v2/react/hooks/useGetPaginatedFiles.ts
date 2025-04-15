@@ -16,25 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useRef, useState } from 'react'
-import { useQuery } from '@canvas/query'
-import { File, Folder } from '../../interfaces/File'
-import { generateTableUrl, parseBookmarkFromUrl, parseLinkHeader } from '../../utils/apiUtils'
-import { useSearchTerm } from './useSearchTerm'
+import {useRef, useState} from 'react'
+import {useQuery} from '@canvas/query'
+import {File, Folder} from '../../interfaces/File'
+import {generateTableUrl, parseBookmarkFromUrl, parseLinkHeader} from '../../utils/apiUtils'
+import {useSearchTerm} from './useSearchTerm'
 
-const fetchFilesAndFolders = async (
-  url: string,
-) => {
+const fetchFilesAndFolders = async (url: string) => {
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error()
   }
   const links = parseLinkHeader(response.headers.get('Link'))
-  const rows = await response.json() as (File | Folder)[]
+  const rows = (await response.json()) as (File | Folder)[]
   return {rows, links}
 }
 
-type BookmarkByPage = { [key: number]: string }
+type BookmarkByPage = {[key: number]: string}
 
 export type Sort = {
   by: string
@@ -46,11 +44,7 @@ export type PaginatedFiles = {
   onSettled: (rows: (File | Folder)[]) => void
 }
 
-export const useGetPaginatedFiles = ({
-  folder,
-  onSettled,
-}: PaginatedFiles) => {
-
+export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
   const {searchTerm, setSearchTerm} = useSearchTerm()
   const [sort, setSort] = useState<Sort>({
     by: 'name',
@@ -74,17 +68,22 @@ export const useGetPaginatedFiles = ({
   const query = useQuery({
     staleTime: 0,
     keepPreviousData: false,
-    queryKey: ['files', url],
-    queryFn: async () => {
-      const state = JSON.stringify([folder.id, searchTerm, sort])
-      const { bookmarkState, pageState } = prevState.current !== state
-        ? { bookmarkState: {1: ''}, pageState: 1 }
-        : { bookmarkState: bookmarkByPage, pageState: currentPage }
+    queryKey: [
+      'files',
+      {url, folderId: folder.id, searchTerm, sort, bookmarkByPage, currentPage},
+    ] as const,
+    queryFn: async ({queryKey}) => {
+      const [, {url, folderId, searchTerm, sort, bookmarkByPage, currentPage}] = queryKey
+      const state = JSON.stringify([folderId, searchTerm, sort])
+      const {bookmarkState, pageState} =
+        prevState.current !== state
+          ? {bookmarkState: {1: ''}, pageState: 1}
+          : {bookmarkState: bookmarkByPage, pageState: currentPage}
       prevState.current = state
       setBookmarkByPage(bookmarkState)
       setCurrentPage(pageState)
 
-      const { rows, links } = await fetchFilesAndFolders(url)
+      const {rows, links} = await fetchFilesAndFolders(url)
       const bookmark = parseBookmarkFromUrl(links.next)
       if (bookmark && !bookmarkState[pageState + 1]) {
         setBookmarkByPage({
@@ -103,15 +102,15 @@ export const useGetPaginatedFiles = ({
     page: {
       current: currentPage,
       total: Object.keys(bookmarkByPage).length,
-      set: setCurrentPage
+      set: setCurrentPage,
     },
     search: {
       term: searchTerm,
-      set: setSearchTerm
+      set: setSearchTerm,
     },
     sort: {
       ...sort,
-      set: setSort
+      set: setSort,
     },
   }
 }
