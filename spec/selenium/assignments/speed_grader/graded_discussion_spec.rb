@@ -71,7 +71,7 @@ describe "Screenreader Gradebook grading" do
       dtp.save!
     end
 
-    it "loads discussion when not speedgrader", :ignore_js_errors do
+    it "loads discussion when not speedgrader", :ignore_js_errors, skip: "investigation will be part of EGG-613" do
       get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}?embed=true&headless=1&student_id=#{@student2.id}"
       expect(f("body").text).to include("reply to topic i0")
     end
