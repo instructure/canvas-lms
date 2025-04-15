@@ -24,12 +24,19 @@ describe "Differentiation Tag Management" do
   include_context "in-process server selenium tests"
 
   before :once do
-    course_with_teacher active_user: true, active_course: true, active_enrollment: true, name: "Teacher Example"
+    @sub1_account = Account.create!(name: "sub1", parent_account: Account.default)
+    @sub2_account = Account.create!(name: "sub2", parent_account: Account.default)
+    @course_with_tags_disabled = course_with_teacher(active_user: true, active_course: true, active_enrollment: true, name: "Teacher Example").course
+    @course_with_tags_disabled.update!(account: @sub1_account)
+    @course_with_tags_enabled = course_with_teacher(user: @teacher, active_course: true).course
+    @course_with_tags_enabled.update!(account: @sub2_account)
     @other_student ||= student_in_course(active_all: true, name: "other_student@test.com").user
     student_in_course(active_all: true, name: "student@test.com")
     ta_in_course(active_all: true)
 
-    Account.default.enable_feature!(:differentiation_tags)
+    Account.default.allow_feature!(:differentiation_tags)
+    @sub2_account.enable_feature!(:differentiation_tags)
+    @sub1_account.disable_feature!(:differentiation_tags)
 
     @single_tag = @course.group_categories.create!(name: "single tag", non_collaborative: true)
     @single_tag_1 = @course.groups.create!(name: "single tag", group_category: @single_tag)
@@ -609,9 +616,8 @@ describe "Differentiation Tag Management" do
           # Check first student on the initial people page
           f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
           expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
-
           # Use the role filter dropdown (assumed to have id 'role-filter') to filter by "Student"
-          student_role_id = Role.where(name: "StudentEnrollment", root_account_id: @course.account.id).first.id
+          student_role_id = Role.where(name: "StudentEnrollment", root_account_id: @course.account.root_account.id).first.id
           click_option("select[name=enrollment_role_id]", student_role_id.to_s, :value)
           wait_for_ajaximations
 
@@ -653,6 +659,13 @@ describe "Differentiation Tag Management" do
         user_session @teacher
         get "/courses/#{@course.id}/users"
         expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
+      end
+
+      it "does not display feature if off on the sub account" do
+        user_session @teacher
+        get "/courses/#{@course_with_tags_disabled.id}/users"
+        expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
+        expect(f("body")).not_to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
       end
 
       it "does not show selection checkboxes or 'Tag As' for TAs by default" do

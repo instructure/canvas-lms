@@ -179,16 +179,16 @@ export default class RosterView extends Backbone.View {
 
   mountUserDiffTagManager(users) {
     const userDTManager = this.$el.find('#userDiffTagManager')[0]
-    if (userDTManager && ENV.permissions.can_manage_differentiation_tags) {
-      if(!this.userDTManager)
-        this.userDTManager = createRoot(userDTManager)
+    if (
+      userDTManager &&
+      ENV.permissions.can_manage_differentiation_tags &&
+      ENV.FEATURES.differentiation_tags
+    ) {
+      if (!this.userDTManager) this.userDTManager = createRoot(userDTManager)
       this.userDTManager.render(
         <QueryProvider>
-          <UserDifferentiationTagManager
-            courseId={ENV.course.id}
-            users={users}
-          />
-        </QueryProvider>
+          <UserDifferentiationTagManager courseId={ENV.course.id} users={users} />
+        </QueryProvider>,
       )
     }
   }
