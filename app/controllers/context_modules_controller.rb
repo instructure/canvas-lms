@@ -604,7 +604,16 @@ class ContextModulesController < ApplicationController
   def content_tag_estimated_duration_data
     if authorized_action(@context, @current_user, :read)
       info = {}
-      all_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).to_a }
+      all_tags = GuardRail.activate(:secondary) do
+        if context.account.feature_enabled?(:modules_perf) && params[:context_module_id]
+          @module = @context.modules_visible_to(@current_user).find_by(id: params[:context_module_id])
+          return render json: {}, status: :not_found unless @module
+
+          @context.visible_module_items_by_module(@current_user, @module).to_a
+        else
+          @context.module_items_visible_to(@current_user).to_a
+        end
+      end
 
       all_tags.each do |tag|
         info[tag.context_module_id] ||= {}

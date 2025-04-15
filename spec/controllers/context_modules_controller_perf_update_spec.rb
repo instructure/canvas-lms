@@ -398,15 +398,16 @@ describe ContextModulesController do
   end
 
   describe "filter for module id" do
-    describe "GET assignment_info" do
-      before do
-        course_with_teacher_logged_in(active_all: true)
-        @module1 = @course.context_modules.create!
-        @context_module1_item1 = @module1.add_item(type: "sub_header", title: "item 1")
-        @module2 = @course.context_modules.create!
-        @context_module2_item1 = @module2.add_item(type: "sub_header", title: "item 2")
-      end
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @assignment = @course.assignments.create!(title: "some assignment", points_possible: 12)
+      @module1 = @course.context_modules.create!
+      @context_module1_item1 = @module1.add_item({ id: @assignment.id, type: "assignment" })
+      @module2 = @course.context_modules.create!
+      @context_module2_item1 = @module2.add_item({ id: @assignment.id, type: "assignment" })
+    end
 
+    describe "GET assignment_info" do
       let(:action) { "content_tag_assignment_data" }
       let(:module_id) { @module1.id }
       let(:parsed_json) { json_parse(response.body) }
@@ -418,12 +419,6 @@ describe ContextModulesController do
 
     describe "GET master_course_info" do
       before do
-        course_with_teacher_logged_in(active_all: true)
-        @assignment = @course.assignments.create!(title: "some assignment", points_possible: 12)
-        @module1 = @course.context_modules.create!
-        @context_module1_item1 = @module1.add_item({ id: @assignment.id, type: "assignment" })
-        @module2 = @course.context_modules.create!
-        @context_module2_item1 = @module2.add_item({ id: @assignment.id, type: "assignment" })
         @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
         MasterCourses::MasterContentTag.create!(master_template: @template, content: @assignment)
       end
@@ -431,6 +426,16 @@ describe ContextModulesController do
       let(:action) { "content_tag_master_course_data" }
       let(:module_id) { @module1.id }
       let(:parsed_json) { json_parse(response.body)["tag_restrictions"] }
+
+      it_behaves_like "rendering when context_module_id is provided"
+
+      it_behaves_like "rendering when context_module_id is not provided"
+    end
+
+    describe "GET content_tag_estimated_duration_data" do
+      let(:action) { "content_tag_estimated_duration_data" }
+      let(:module_id) { @module1.id }
+      let(:parsed_json) { json_parse(response.body).values.each_with_object({}) { |item, hash| hash.merge!(item) } }
 
       it_behaves_like "rendering when context_module_id is provided"
 
