@@ -384,7 +384,6 @@ class ApplicationController < ActionController::Base
     disallow_threaded_replies_fix_alert
     horizon_course_setting
     new_quizzes_media_type
-    differentiation_tags
     validate_call_to_action
     new_quizzes_navigation_updates
     create_wiki_page_mastery_path_overrides
@@ -430,6 +429,7 @@ class ApplicationController < ActionController::Base
     embedded_release_notes
     discussions_speedgrader_revisit
     discussion_checkpoints
+    differentiation_tags
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest(
     [
