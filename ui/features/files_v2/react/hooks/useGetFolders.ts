@@ -72,11 +72,13 @@ export const useGetFolders = () => {
     ? splitAssetString(pathContext)!
     : [filesEnv.contextType, filesEnv.contextId]
 
-  return useQuery<Folder[], Error>({
-    queryKey: ['folders', pathContext, path, contextType, contextId],
+  const queryKey = ['folders', {path, contextType, contextId}] as const
+  return useQuery<Folder[], Error, Folder[], typeof queryKey>({
+    queryKey,
     staleTime: 0,
     keepPreviousData: true,
-    queryFn: async () => {
+    queryFn: async ({queryKey}) => {
+      const [, {path, contextType, contextId}] = queryKey
       return path
         ? await loadFolders(contextType, contextId, path)
         : [getRootFolder(contextType, contextId)]
