@@ -225,6 +225,18 @@ describe DiscussionTopicsController do
         expect(assigns["topics"]).to include(@inactive_ann1)
         expect(assigns["topics"]).to include(@inactive_ann2)
       end
+
+      it "allows the teacher to see the announcement even if it is locked in a concluded course" do
+        @course.complete!
+        user_session(@teacher)
+
+        get :index, params: { course_id: @course.id, only_announcements: true }, format: :json
+        expect(assigns["topics"].size).to eq(4)
+        expect(assigns["topics"]).to include(@active_ann1)
+        expect(assigns["topics"]).to include(@active_ann2)
+        expect(assigns["topics"]).to include(@inactive_ann1)
+        expect(assigns["topics"]).to include(@inactive_ann2)
+      end
     end
 
     context "cross-sharding" do

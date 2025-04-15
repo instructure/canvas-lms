@@ -1831,7 +1831,7 @@ class DiscussionTopic < ActiveRecord::Base
       end
       # user is an admin in the context (teacher/ta/designer) OR
       # user is an account admin with appropriate permission
-      next true if context.grants_any_right?(user, :manage, :read_course_content)
+      next true if context.grants_any_right?(user, :manage, :read_as_admin)
 
       # assignment exists and isn't assigned to user (differentiated assignments)
       if for_assignment?
