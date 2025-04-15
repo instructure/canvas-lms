@@ -63,7 +63,7 @@ class TranslationController < ApplicationController
 
   def handle_same_language_error
     InstStatsd::Statsd.distributed_increment("translation.errors", tags: ["error:same_language"])
-    render json: { translationError: { type: "info", message: I18n.t("Translation is identical to source language.") } }, status: :unprocessable_entity
+    render json: { translationError: { type: "info", message: I18n.t("Looks like you're trying to translate into the same language.") } }, status: :unprocessable_entity
   end
 
   def handle_generic_error(exception)
@@ -95,6 +95,9 @@ class TranslationController < ApplicationController
     end
 
     InstStatsd::Statsd.distributed_increment("translation.errors", tags:)
+
+    render(json: { translationErrorTextTooLong: { type: "error", message: } }, status:) and return if action_name == "translate_paragraph" && tags == ["error:text_size_limit"]
+
     render json: { translationError: { type: "error", message: } }, status:
   end
 

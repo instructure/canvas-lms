@@ -105,7 +105,7 @@ describe TranslationController do
         post :translate, params: { course_id: @course.id, inputs: params }
 
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "info", message: "Translation is identical to source language." } })
+        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "info", message: "Looks like you're trying to translate into the same language." } })
       end
     end
 
@@ -149,19 +149,37 @@ describe TranslationController do
     end
 
     context "when Aws::Translate::Errors::TextSizeLimitExceededException is raised" do
-      before do
-        error = Aws::Translate::Errors::TextSizeLimitExceededException.new(
+      let(:error) do
+        Aws::Translate::Errors::TextSizeLimitExceededException.new(
           Aws::EmptyStructure.new, "Couldn’t translate because the text is too long."
         )
-
-        allow_any_instance_of(TranslationController).to receive(:translate).and_raise(error)
       end
 
-      it "renders a text size limit exceeded error response" do
-        post :translate, params: { course_id: @course.id, inputs: params }
+      context "when the translate method is called" do
+        before do
+          allow_any_instance_of(TranslationController).to receive(:translate).and_raise(error)
+        end
 
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Couldn’t translate because the text is too long." } })
+        it "renders a text size limit exceeded error response" do
+          post :translate, params: { course_id: @course.id, inputs: params }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Couldn’t translate because the text is too long." } })
+        end
+      end
+
+      context "when the translate_paragraph method is called" do
+        before do
+          allow_any_instance_of(TranslationController).to receive(:translate_paragraph).and_raise(error)
+          allow(Translation).to receive_messages(available?: true, translate_text: "translated.")
+        end
+
+        it "renders the correct JSON response with translationErrorTextTooLong" do
+          post :translate_paragraph, params: { course_id: @course.id, inputs: params }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.parsed_body.deep_symbolize_keys).to eq({ translationErrorTextTooLong: { type: "error", message: "Couldn’t translate because the text is too long." } })
+        end
       end
     end
 

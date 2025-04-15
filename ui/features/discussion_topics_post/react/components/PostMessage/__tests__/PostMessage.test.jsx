@@ -65,54 +65,53 @@ const setup = (props, {searchTerm = ''} = {}) => {
   )
 }
 
-const setupWithTranslationLanguageSelected = (props, {
-  searchTerm = '',
-  loading = false,
-  translateTargetLanguage = 'en',
-} = {}) => {
+const setupWithTranslationLanguageSelected = (
+  props,
+  {searchTerm = '', loading = false, translateTargetLanguage = 'en'} = {},
+) => {
   const entryId = 'asdasd'
-  const Wrapper = ({ children }) => {
+  const Wrapper = ({children}) => {
     const initSet = new Set()
     initSet.add(entryId)
-    const [entryTranslatingSet, setEntryTranslatingSet] = useState(initSet);
+    const [entryTranslatingSet, setEntryTranslatingSet] = useState(initSet)
 
     return (
       <DiscussionManagerUtilityContext.Provider
         value={{
           translationLanguages: {
-            current: [{ id: 'en', name: 'English', translated_to_name: 'Translated to English' }],
+            current: [{id: 'en', name: 'English', translated_to_name: 'Translated to English'}],
           },
           translateTargetLanguage,
           entryTranslatingSet,
           setEntryTranslating: () => {
-            const newSet = new Set(entryTranslatingSet);
+            const newSet = new Set(entryTranslatingSet)
             if (loading) {
-              newSet.add(entryId);
+              newSet.add(entryId)
             } else {
-              newSet.delete(entryId);
+              newSet.delete(entryId)
             }
 
-            setEntryTranslatingSet(newSet);
+            setEntryTranslatingSet(newSet)
           },
         }}
       >
-        <SearchContext.Provider value={{ searchTerm }}>{children}</SearchContext.Provider>
+        <SearchContext.Provider value={{searchTerm}}>{children}</SearchContext.Provider>
       </DiscussionManagerUtilityContext.Provider>
-    );
-  };
+    )
+  }
 
   return render(
     <Wrapper>
       <PostMessage
-        discussionEntry={{ id: entryId }}
+        discussionEntry={{id: entryId}}
         author={User.mock()}
         timingDisplay="Jan 1 2000"
         message="Posts are fun"
         title="Thoughts"
         {...props}
       />
-    </Wrapper>
-  );
+    </Wrapper>,
+  )
 }
 
 describe('PostMessage', () => {
@@ -198,10 +197,13 @@ describe('PostMessage', () => {
     it('should display loading spinner and text while translation is in progress', async () => {
       getTranslation.mockImplementation(() => Promise.resolve('<p>Translated message</p>'))
 
-      const { findByText} = setupWithTranslationLanguageSelected({
-        message: '<p>Leforditando uzenet<p/>',
-        title: 'Gondolatok',
-      }, {loading: true})
+      const {findByText} = setupWithTranslationLanguageSelected(
+        {
+          message: '<p>Leforditando uzenet<p/>',
+          title: 'Gondolatok',
+        },
+        {loading: true},
+      )
 
       expect(getTranslation).toHaveBeenCalled()
       const spinner = await findByText('Translating')
@@ -213,10 +215,13 @@ describe('PostMessage', () => {
     it('should not display separator and translated message while translation is in progress', async () => {
       getTranslation.mockImplementation(() => Promise.resolve('<p>Translated message</p>'))
 
-      const { queryByText, queryByTestId } = setupWithTranslationLanguageSelected({
-        message: '<p>Leforditando uzenet<p/>',
-        title: 'Gondolatok',
-      }, {loading: true})
+      const {queryByText, queryByTestId} = setupWithTranslationLanguageSelected(
+        {
+          message: '<p>Leforditando uzenet<p/>',
+          title: 'Gondolatok',
+        },
+        {loading: true},
+      )
 
       await waitFor(() => expect(getTranslation).toHaveBeenCalled())
       expect(queryByTestId('post-title-translated')).not.toBeInTheDocument()
@@ -261,7 +266,6 @@ describe('PostMessage', () => {
         .mockImplementationOnce(() => Promise.resolve('<p>Translated message</p>'))
         .mockImplementationOnce(() => Promise.resolve(''))
 
-
       const {findByTestId, findByText, queryByTestId} = setupWithTranslationLanguageSelected({
         message: '',
         title: 'Gondolatok',
@@ -280,7 +284,6 @@ describe('PostMessage', () => {
       getTranslation
         .mockImplementationOnce(() => Promise.resolve(''))
         .mockImplementationOnce(() => Promise.resolve('<p>Translated message</p>'))
-
 
       const {findByTestId, findByText, queryByTestId} = setupWithTranslationLanguageSelected({
         message: '<p>Leforditando uzenet<p/>',
@@ -315,10 +318,13 @@ describe('PostMessage', () => {
     it('should not display separator and translated message if language is not set or reset', async () => {
       getTranslation.mockImplementation(() => Promise.resolve('<p>Translated message</p>'))
 
-      const {queryByTestId, queryByText} = setupWithTranslationLanguageSelected({
-        message: '<p>Leforditando uzenet<p/>',
-        title: 'Gondolatok',
-      }, {translateTargetLanguage: null})
+      const {queryByTestId, queryByText} = setupWithTranslationLanguageSelected(
+        {
+          message: '<p>Leforditando uzenet<p/>',
+          title: 'Gondolatok',
+        },
+        {translateTargetLanguage: null},
+      )
 
       expect(queryByTestId('post-title-translated')).not.toBeInTheDocument()
       expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
@@ -345,7 +351,7 @@ describe('PostMessage', () => {
     it('should display separator and error with error_type message if translation fails with specific error with error type', async () => {
       const message = 'very big error happened'
       const error = new Error()
-      Object.assign(error, {translationError: {type: 'error', message}})
+      Object.assign(error, {translationError: {type: 'newError', message}})
       getTranslation.mockImplementation(() => Promise.reject(error))
 
       const {findByText, findByTestId, queryByTestId} = setupWithTranslationLanguageSelected({

@@ -27,7 +27,6 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {IconAiLine} from '@instructure/ui-icons'
 import {useTranslationContext} from '../../hooks/useTranslationContext'
-import {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -41,12 +40,13 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
   const languages = useRef<Language[]>(ENV?.inbox_translation_languages ?? [])
   const [input, setInput] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null)
-  const [errorMessages, setErrorMessages] = useState<FormMessage[]>([])
 
   const {
     setTranslationTargetLanguage,
     translateBody,
     translating: translationLoading,
+    errorMessages,
+    setErrorMessages,
   } = useTranslationContext()
 
   const handleChange = (selectedArray: string[]) => {
@@ -66,15 +66,20 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
 
   const handleSubmit = () => {
     if (!input) {
-        setErrorMessages([{type: "newError", text: I18n.t("Please select a language")}])
-        return
+      setErrorMessages([{type: 'newError', text: I18n.t('Please select a language')}])
+      return
     }
 
     if (!selectedLanguage) {
       const result = languages.current.find(({name}) => name === input)
 
       if (!result) {
-        setErrorMessages([{type: "newError", text: I18n.t("There was an error selecting the language. Please try another language.")}])
+        setErrorMessages([
+          {
+            type: 'newError',
+            text: I18n.t('There was an error selecting the language. Please try another language.'),
+          },
+        ])
         return
       }
 
@@ -100,15 +105,13 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
   return (
     <View>
       <Flex direction="column">
-          <View as="div" margin="xx-small 0 0 xx-small">
-              <label id="langauge-selector-label">
-                  <Text weight="bold">
-                      {I18n.t('Translate To')}
-                  </Text>
-              </label>
-          </View>
-          <Flex.Item overflowY="visible" padding="small small 0 small">
-            <Flex margin="0 0 medium 0" gap="mediumSmall" alignItems="start">
+        <View as="div" margin="xx-small 0 0 xx-small">
+          <label id="langauge-selector-label">
+            <Text weight="bold">{I18n.t('Translate To')}</Text>
+          </label>
+        </View>
+        <Flex.Item overflowY="visible" padding="small small 0 small">
+          <Flex margin="0 0 medium 0" gap="mediumSmall" alignItems="start">
             <Flex.Item shouldGrow>
               <CanvasMultiSelect
                 label=""

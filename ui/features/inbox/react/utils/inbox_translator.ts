@@ -34,7 +34,7 @@ interface TranslateArgs {
 /**
  * Translate the message based on the parameters
  * */
-export function translateMessage(args: TranslateArgs) {
+export async function translateMessage(args: TranslateArgs) {
   if (!args.body) {
     return
   }
@@ -56,23 +56,29 @@ export function translateMessage(args: TranslateArgs) {
   return translateText(args, payload)
 }
 
-/**
- * Call the translate paragraph action, using the concocted payload as the string. The result should be
- * exactly the text to place into the TextArea.
- * */
 export async function translateText(args: TranslateArgs, text: string): Promise<string> {
-  const result = await doFetchApi({
-    method: 'POST',
-    path: `/courses/${ENV.course_id}/translate/paragraph`,
-    body: {
-      inputs: {
-        tgt_lang: args.tgtLang,
-        text,
+  const apiPath = `/courses/${ENV.course_id}/translate/paragraph`
+
+  try {
+    const {json} = await doFetchApi({
+      method: 'POST',
+      path: apiPath,
+      body: {
+        inputs: {
+          tgt_lang: args.tgtLang,
+          text,
+        },
       },
-    },
-  })
-  // @ts-expect-error
-  return result.json.translated_text
+    })
+
+    return (json as {translated_text: string}).translated_text
+  } catch (e) {
+    // @ts-expect-error
+    const response = await e.response.json()
+    const error = new Error()
+    Object.assign(error, {...response})
+    throw error
+  }
 }
 
 /**
