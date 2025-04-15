@@ -1570,6 +1570,7 @@ describe ContextModule do
         expect(@page.reload).to be_locked_for @student
 
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
 
         # the released assignment is now available and the page is now locked behind the set assignment
         expect(@set1_assmt1.reload).not_to be_locked_for @student
@@ -1806,6 +1807,38 @@ describe ContextModule do
 
       it "includes unreleased items if at least one of them will be released" do
         expect(@module1.content_tags_for(@student)).to include(@tag_m1_2)
+      end
+    end
+
+    describe "when the trigger assignment is graded and conditional release handler is pending" do
+      before :once do
+        @tag_m1_1 = @module1.add_item(type: "assignment", id: @trigger_assmt.id)
+        @module1.completion_requirements = { id: @tag_m1_1.id, type: "must_submit" }
+        @module1.save
+        @tag_m2_1 = @module2.add_item(type: "assignment", id: @set1_assmt1.id)
+        @tag_m2_2 = @module2.add_item(type: "assignment", id: @set2_assmt1.id)
+        @tag_m2_3 = @module2.add_item(type: "assignment", id: @set2_assmt2.id)
+        @tag_m2_4 = @module2.add_item(type: "assignment", id: @set3a_assmt.id)
+        @tag_m2_5 = @module2.add_item(type: "assignment", id: @set3b_assmt.id)
+        @module2.completion_requirements = [
+          { id: @tag_m2_1.id, type: "must_view" },
+          { id: @tag_m2_2.id, type: "must_view" },
+          { id: @tag_m2_3.id, type: "must_view" },
+          { id: @tag_m2_4.id, type: "must_view" },
+          { id: @tag_m2_5.id, type: "must_view" },
+        ]
+        @module2.save
+        @m3_assmt = @course.assignments.create!
+        @module3.add_item(type: "assignment", id: @m3_assmt.id)
+
+        course_with_student(course: @course)
+
+        @trigger_assmt.submit_homework(@student, body: "hi")
+        @trigger_assmt.grade_student(@student, grade: 0, grader: @teacher)
+      end
+
+      it "includes unreleased items if at least one of them will be released" do
+        expect(@module2.content_tags_for(@student)).to include(@tag_m2_1)
       end
     end
   end

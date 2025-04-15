@@ -432,7 +432,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
     # for an observer/student combo user we don't want to filter based on the
     # normal observer logic, instead return vis for student enrollment only
-    context_module.content_tags_visible_to(user, is_teacher: false, ignore_observer_logic: true).each do |tag|
+    context_module.content_tags_for(user, is_teacher: false, ignore_observer_logic: true).each do |tag|
       self.current_position = tag.position if tag.position
       all_met = completion_requirements.select { |r| r[:id] == tag.id }.all? do |req|
         requirements_met.any? { |r| r[:id] == req[:id] && r[:type] == req[:type] }
