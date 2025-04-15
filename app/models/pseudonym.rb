@@ -110,6 +110,46 @@ class Pseudonym < ActiveRecord::Base
     def crypted_password_field
       :crypted_password
     end
+
+    # See https://datatracker.ietf.org/doc/rfc4518/
+
+    # This is a superset of RFC3454 B.1
+    MAP_TO_NOTHING = /[\u{00ad 1806 034f}\u{180b}-\u{180d}\u{fe00}-\u{fe0f}\u{fffc}\u{0000}-\u{0008}\u{000e}-\u{001f}\u{007f}-\u{0084}\u{0086}-\u{009f}\u{06dd 070f 180e}\u{200c}-\u{200f}\u{202a}-\u{202e}\u{2060}-\u{2063}\u{206a}-\u{206f}\u{feff}\u{fff9}-\u{fffb}\u{1d173}-\u{1d17a}\u{e0001}\u{e0020}-\u{e007f}\u{200b}]/
+    MAP_TO_SPACE = /[\u{0009}-\u{000d}\u{0085 00a0 1680}\u{2000}-\u{200a}\u{2028}-\u{2029}\u{202f 205f 3000}]/
+
+    mappings = Net::IMAP::StringPrep::Tables::MAPPINGS.dup
+    mappings["RFC4518 Nothings"] = [MAP_TO_NOTHING, ""].freeze
+    mappings["RFC4518 Spaces"] = [MAP_TO_SPACE, " "].freeze
+    Net::IMAP::StringPrep::Tables.send(:remove_const, :MAPPINGS)
+    Net::IMAP::StringPrep::Tables.const_set(:MAPPINGS, mappings.freeze)
+
+    # Mn, Mc, and Me (as of Unicode 3.2), with a couple characters added and removed
+    # to match RFC 4518 Appendix A
+    FOLD_SPACES_REGEX = /( (?![\p{Mn}\p{Mc}\p{Me}\u{06de 094e 094f}&&\p{AGE=3.2}&&^\u{05bd 1885 1886}]))+/
+    TRIM_REGEX = /\A ?([^ ].*?) ?\z/
+    private_constant :MAP_TO_NOTHING,
+                     :MAP_TO_SPACE,
+                     :FOLD_SPACES_REGEX,
+                     :TRIM_REGEX
+
+    # Normalize a username
+    #
+    # It applies the following transformations:
+    #  - Unicode normalization (NFKC)
+    #  - Remove all "ignorable" characters (RTL marks, directional formatting, NBSP, etc.)
+    #  - Collapse all whitespace to a single space
+    #  - Trim leading and trailing spaces (but only if there are non-spaces in the string)
+    # The space collapsing matches the first section of Appendix B of the above RFC.
+    def normalize(unique_id)
+      unique_id = Net::IMAP::StringPrep.stringprep(unique_id,
+                                                   maps: ["RFC4518 Nothings", "RFC4518 Spaces", "B.2"], # B.2 is case folding
+                                                   normalization: :nfkc,
+                                                   prohibited: ["A.1", "C.3", "C.4", "C.5", /\ufffd/])
+      # Section 2.6.1, but see Appendix B on the simplification because this is for comparison only
+      unique_id.gsub!(FOLD_SPACES_REGEX, " ")
+      unique_id.gsub!(TRIM_REGEX, "\\1")
+      unique_id
+    end
   end
 
   acts_as_authentic do |config|
@@ -247,7 +287,22 @@ class Pseudonym < ActiveRecord::Base
     update!(unique_id: unique_ids[login_attribute])
   end
 
-  scope :by_unique_id, ->(unique_id) { where("LOWER(unique_id)=LOWER(?)", unique_id.to_s) }
+  scope :by_unique_id, lambda { |unique_id|
+    # only do normalized lookups once the migration has completed on this shard
+    if ((s = primary_shard).is_a?(Shard) && s.settings["pseudonyms_normalized"]) ||
+       s.is_a?(Switchman::DefaultShard)
+      unique_id = if unique_id.is_a?(Array)
+                    unique_id.map { |uid| Pseudonym.normalize(uid) }
+                  else
+                    Pseudonym.normalize(unique_id.to_s)
+                  end
+      where(unique_id_normalized: unique_id)
+    elsif unique_id.is_a?(Array)
+      where("LOWER(unique_id) IN (?)", unique_id)
+    else
+      where("LOWER(unique_id)=LOWER(?)", unique_id.to_s)
+    end
+  }
   scope :sis, -> { where.not(sis_user_id: nil) }
   scope :not_instructure_identity, -> { all }
 
@@ -334,7 +389,6 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def infer_defaults
-    self.account ||= Account.default
     if (!crypted_password || crypted_password == "") && !@require_password
       generate_temporary_password
       # this helps us differentiate between a generated password and one that was
@@ -387,13 +441,16 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def invalid_email?
-    (!account || account.email_pseudonyms) &&
-      !deleted? &&
-      (unique_id.blank? ||
-        !EmailAddressValidator.valid?(unique_id))
+    account.email_pseudonyms && !deleted? &&
+      (unique_id.blank? || !EmailAddressValidator.valid?(unique_id))
   end
 
   def validate_unique_id
+    self.account ||= Account.default
+
+    if unique_id && unique_id_changed?
+      self.unique_id_normalized = self.class.normalize(unique_id)
+    end
     if invalid_email?
       errors.add(:unique_id, "not_email")
       throw :abort
@@ -402,10 +459,15 @@ class Pseudonym < ActiveRecord::Base
 
     unless deleted?
       shard.activate do
-        existing_pseudo = Pseudonym.active.by_unique_id(unique_id).where(account_id:,
-                                                                         authentication_provider_id:,
-                                                                         login_attribute:).where.not(id: self).exists?
-        if existing_pseudo
+        scope = Pseudonym.active.by_unique_id(unique_id).where(account_id:, login_attribute:)
+        scope = scope.where.not(id: self) unless new_record?
+        scope = if authentication_provider.nil?
+                  scope.left_joins(:authentication_provider)
+                       .where(authentication_providers: { auth_type: [nil, "canvas", "cas", "ldap", "saml"] })
+                else
+                  scope.where(authentication_provider: authentication_provider.auth_provider_filter)
+                end
+        if scope.exists?
           errors.add(:unique_id,
                      :taken,
                      message: t("ID already in use for this account and authentication provider"))

@@ -114,7 +114,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def pseudonym
-    user.pseudonyms.where(unique_id: path).first if user
+    user.pseudonyms.by_unique_id(path).first if user
   end
 
   def broadcast_data

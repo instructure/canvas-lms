@@ -19,6 +19,25 @@
 #
 
 describe Pseudonym do
+  describe ".normalize" do
+    delegate :normalize, to: :Pseudonym
+
+    it "normalizes according to RFC4518" do
+      # Ⅳ ligature gets decomposed to IV (and downcased)
+      expect(normalize("Ⅳ")).to eql "iv"
+      expect(normalize("interior  spaces")).to eql "interior spaces"
+      expect(normalize("  leading")).to eql "leading"
+      expect(normalize("trailing  ")).to eql "trailing"
+      expect(normalize("  leading  trailing Ⅳ  ")).to eql "leading trailing iv"
+      expect(normalize(" ")).to eql " "
+      expect(normalize("   ")).to eql " "
+      expect(normalize("\u200fcody")).to eql "cody"
+      expect(normalize("cody\u200f")).to eql "cody"
+      expect(normalize("\u202a\u202a\u202acody\u202c\u202c\u202c")).to eql "cody"
+      expect(normalize("\u200f\u202acody\u202c\u200f")).to eql "cody"
+    end
+  end
+
   it "creates a new instance given valid attributes" do
     user_model
     expect { Pseudonym.create!(valid_pseudonym_attributes) }.to change(Pseudonym, :count).by(1)
@@ -44,6 +63,17 @@ describe Pseudonym do
                               password_confirmation: "password")
     pseudonym.user_id = 1
     expect(pseudonym).to be_valid
+  end
+
+  it "normalizes on validation (preserving the original input)" do
+    # Ⅳ ligature gets decomposed to IV
+    pseudonym = Pseudonym.new(unique_id: "HenryⅣ@instructure.com",
+                              password: "password",
+                              password_confirmation: "password")
+    pseudonym.user_id = 1
+    expect(pseudonym).to be_valid
+    expect(pseudonym.unique_id).to eql "HenryⅣ@instructure.com"
+    expect(pseudonym.unique_id_normalized).to eql "henryiv@instructure.com"
   end
 
   it "validates the presence of user and infer default account" do
@@ -75,6 +105,19 @@ describe Pseudonym do
     p1.save!
     # Should allow creating a new active one if the others are deleted
     Pseudonym.create!(unique_id: "cody@instructure.com", user: u)
+
+    # Failed; conflicts with the nil auth provider version
+    p3 = Pseudonym.create(unique_id: "cody@instructure.com",
+                          user: u,
+                          authentication_provider: Account.default.canvas_authentication_provider)
+    expect(p3).to be_new_record
+
+    Pseudonym.create!(unique_id: "cody2@instructure.com",
+                      user: u,
+                      authentication_provider: Account.default.canvas_authentication_provider)
+    # Failed; conflicts with the canvas auth provider version
+    p4 = Pseudonym.create(unique_id: "cody2@instructure.com", user: u)
+    expect(p4).to be_new_record
   end
 
   it "does not allow a login_attribute without an authentication provider" do
@@ -92,18 +135,72 @@ describe Pseudonym do
     expect(p.reload.login_attribute).to be_nil
   end
 
-  it "finds the correct pseudonym for logins" do
-    user = User.create!
-    p1 = Pseudonym.create!(unique_id: "Cody@instructure.com", user:)
-    Pseudonym.create!(unique_id: "codY@instructure.com", user:) { |p| p.workflow_state = "deleted" }
-    expect(Pseudonym.active.by_unique_id("cody@instructure.com").first).to eq p1
-    account = Account.create!
-    p3 = Pseudonym.create!(unique_id: "cOdy@instructure.com", account:, user:)
-    expect(Pseudonym.active.by_unique_id("cody@instructure.com").sort).to eq [p1, p3]
+  it "populates auth_type automatically" do
+    u = User.create!
+    ap = Account.default.authentication_providers.create!(auth_type: "microsoft", tenant: "microsoft")
+    p = u.pseudonyms.create!(unique_id: "a@b.com", authentication_provider: ap)
+    expect(p.reload.auth_type).to eql "microsoft"
   end
 
-  it "does not blow up if by_unique_id is passed a non-string" do
-    expect(Pseudonym.active.by_unique_id(123)).to eq []
+  def check_auth_type_not_set_directly(&block)
+    expect do
+      Pseudonym.transaction(requires_new: true, &block)
+    end.to raise_error(include("pseudonyms.auth_type cannot be set directly"))
+  end
+
+  it "does not allow you to populate auth type" do
+    u = User.create!
+    ap = Account.default.authentication_providers.create!(auth_type: "microsoft", tenant: "microsoft")
+    check_auth_type_not_set_directly do
+      u.pseudonyms.create!(unique_id: "a@b.com", authentication_provider: ap, auth_type: "microsoft")
+    end
+
+    p = u.pseudonyms.create!(unique_id: "a@b.com", authentication_provider: ap)
+    check_auth_type_not_set_directly do
+      Pseudonym.where(id: p.id).update_all(auth_type: "something else")
+    end
+    check_auth_type_not_set_directly do
+      Pseudonym.where(id: p.id).update_all(authentication_provider_id: nil, auth_type: nil)
+    end
+    check_auth_type_not_set_directly do
+      u.pseudonyms.create!(unique_id: "b@b.com", auth_type: "microsoft")
+    end
+    p = u.pseudonyms.create!(unique_id: "b@b.com")
+    check_auth_type_not_set_directly do
+      Pseudonym.where(id: p.id).update_all(auth_type: "something else")
+    end
+  end
+
+  describe ".by_unique_id" do
+    it "finds the correct pseudonym for logins" do
+      user = User.create!
+      p1 = Pseudonym.create!(unique_id: "Cody@instructure.com", user:)
+      Pseudonym.create!(unique_id: "codY@instructure.com", user:) { |p| p.workflow_state = "deleted" }
+      expect(Pseudonym.active.by_unique_id("cody@instructure.com").first).to eq p1
+      account = Account.create!
+      p3 = Pseudonym.create!(unique_id: "cOdy@instructure.com", account:, user:)
+      expect(Pseudonym.active.by_unique_id("cody@instructure.com").sort).to eq [p1, p3]
+      p4 = Pseudonym.create!(unique_id: "c①dy@instructure.com", account:, user:)
+      expect(Pseudonym.active.by_unique_id("c①dy@instructure.com")).to eq [p4]
+
+      scope = Pseudonym.active
+      shard = instance_double(Shard)
+      allow(shard).to receive(:settings).and_return({})
+      allow(shard).to receive(:is_a?).with(Shard).and_return(true)
+      allow(shard).to receive(:is_a?).with(Switchman::DefaultShard).and_return(false)
+      # return our double once for the named scope, then the real thing for the query
+      allow(scope).to receive(:primary_shard).and_return(shard, Shard.default)
+      expect(scope.by_unique_id("c1dy@instructure.com")).not_to exist
+
+      # mark the migration as complete, and it will start doing a normalized lookup
+      allow(shard).to receive(:settings).and_return({ "pseudonyms_normalized" => true })
+      allow(scope).to receive(:primary_shard).and_return(shard, Shard.default)
+      expect(scope.by_unique_id("c1dy@instructure.com")).to eq [p4]
+    end
+
+    it "does not blow up if by_unique_id is passed a non-string" do
+      expect(Pseudonym.active.by_unique_id(123)).to eq []
+    end
   end
 
   it "associates to another user" do

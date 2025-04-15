@@ -574,6 +574,69 @@ describe ActiveRecord::Base do
     end
   end
 
+  describe ".update_many" do
+    it "works with a single column" do
+      u1 = User.create!
+      u2 = User.create!
+
+      User.all.update_many({ u1.id => "bob", u2.id => "alice" }, :name)
+      expect(u1.reload.name).to eq "bob"
+      expect(u2.reload.name).to eq "alice"
+    end
+
+    it "works with multiple columns" do
+      u1 = User.create!
+      u2 = User.create!
+
+      User.all.update_many({ u1.id => ["bob", "bobby"], u2.id => ["alice", "al"] },
+                           :name,
+                           :short_name)
+      expect(u1.reload.name).to eq "bob"
+      expect(u1.short_name).to eq "bobby"
+      expect(u2.reload.name).to eq "alice"
+      expect(u2.short_name).to eq "al"
+    end
+
+    it "doesn't update rows that aren't mentioned" do
+      u1 = User.create!
+      u2 = User.create!(name: "alice")
+
+      User.all.update_many({ u1.id => "bob" }, :name)
+      expect(u1.reload.name).to eq "bob"
+      expect(u2.reload.name).to eq "alice"
+    end
+
+    it "doesn't fail with no updates" do
+      User.all.update_many({}, :name)
+    end
+
+    it "errors if you don't specify any columns" do
+      expect { User.all.update_many({}) }.to raise_error(ArgumentError)
+    end
+
+    it "errors if any of the hash values have a different number of columns" do
+      expect do
+        User.all.update_many({ 1 => ["bob", "bobby"], 2 => ["alice", 3, 4] }, :name, :short_name)
+      end.to raise_error(ArgumentError)
+    end
+
+    it "errors if any of the hash values aren't an array for a multi-column update" do
+      expect do
+        User.all.update_many({ 1 => ["bob", "bobby"], 2 => "alice" }, :name, :short_name)
+      end.to raise_error(ArgumentError)
+    end
+
+    it "works with conditions" do
+      u1 = User.create!
+      u2 = User.create!(name: "george")
+
+      r = User.where(id: u1)
+      r.update_many({ u1.id => "bob", u2.id => "alice" }, :name)
+      expect(u1.reload.name).to eq "bob"
+      expect(u2.reload.name).to eq "george"
+    end
+  end
+
   describe "delete_all with_limit" do
     it "works" do
       u = User.create!
