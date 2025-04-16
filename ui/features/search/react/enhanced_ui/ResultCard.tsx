@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
@@ -26,9 +27,12 @@ import {
   IconDocumentLine,
   IconAnnouncementLine,
   IconDiscussionLine,
+  IconModuleLine,
 } from '@instructure/ui-icons'
 import stopwords from '../stopwords'
-import {Result} from '../types'
+import type {Module, Result} from '../types'
+
+const I18n = createI18nScope('SmartSearch')
 
 const icon_class = (content_type: string) => {
   switch (content_type) {
@@ -42,6 +46,8 @@ const icon_class = (content_type: string) => {
       return <IconDocumentLine color="brand" size="x-small" data-testid="document_icon" />
   }
 }
+
+const MAX_MODULES_SHOWN = 5
 
 interface Props {
   result: Result
@@ -115,6 +121,36 @@ export default function ResultCard(props: Props) {
     )
   }
 
+  const renderModuleList = (modules: Module[]) => {
+    let trimmedModules = modules
+    let extraModuleText = null
+    if (modules.length > MAX_MODULES_SHOWN) {
+      trimmedModules = modules.slice(0, MAX_MODULES_SHOWN)
+      extraModuleText = I18n.t(
+        {one: '%{count} other module', other: '%{count} other modules'},
+        {
+          count: modules.length - MAX_MODULES_SHOWN,
+        },
+      )
+    }
+    return (
+      <Flex gap="xx-small">
+        {trimmedModules.map((module: Module, index: number) => (
+          <Flex key={module.id} gap="xx-small">
+            <IconModuleLine data-testid="module_icon" />
+            <Text size="small">{module.name}</Text>
+            {index < modules.length - 1 || extraModuleText != null ? <span> | </span> : null}
+          </Flex>
+        ))}
+        {extraModuleText != null ? (
+          <Text key="extra-modules" size="small">
+            {extraModuleText}
+          </Text>
+        ) : null}
+      </Flex>
+    )
+  }
+
   return (
     <Flex
       alignItems="start"
@@ -140,6 +176,7 @@ export default function ResultCard(props: Props) {
           __html: addSearchHighlighting(props.searchTerm, body),
         }}
       />
+      {props.result.modules && renderModuleList(props.result.modules)}
     </Flex>
   )
 }

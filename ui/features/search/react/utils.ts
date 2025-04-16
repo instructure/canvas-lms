@@ -16,33 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type Result = {
-  content_id: string
-  content_type: string
-  readable_type: string
-  title: string
-  body: string
-  html_url: string
-  distance: number
-  relevance: number
-  // added in follow-up API call
-  modules?: Module[]
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import type {ModuleSequence, Result} from './types'
+
+export async function fetchAllModules(courseId: string, searchResults: Result[]) {
+  const promises = searchResults.map(async result => {
+    return await fetchModule(courseId, result.content_id, result.content_type)
+  })
+  return await Promise.all(promises)
 }
 
-export type IndexProgress = {
-  progress: number
-  status: string
-}
-
-export type ModuleSequence = {
-  modules: Module[]
-}
-
-export type Module = {
-  id: number
-  name: string
-  position: number
-  prerequisite_module_ids: number[]
-  published: boolean
-  items_url: string
+async function fetchModule(courseId: string, assetId: string, assetType: string) {
+  const params = {
+    asset_type: assetType,
+    asset_id: assetId,
+  }
+  const {json} = await doFetchApi<ModuleSequence>({
+    path: `/api/v1/courses/${courseId}/module_item_sequence`,
+    params,
+  })
+  return {modules: json?.modules, assetId}
 }

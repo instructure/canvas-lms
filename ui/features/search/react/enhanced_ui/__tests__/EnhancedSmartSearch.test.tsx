@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render, waitFor, within} from '@testing-library/react'
 import EnhancedSmartSearch from '../EnhancedSmartSearch'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
@@ -37,16 +37,49 @@ const results = [
     relevance: 0.99,
   },
   {
-    content_id: '3',
-    content_type: 'Page',
-    readable_type: 'page',
+    content_id: '2',
+    content_type: 'Assignment',
+    readable_type: 'assignment',
     title: 'Growing fruit trees',
     body: 'Trees need water and sunlight to grow.',
-    html_url: '/courses/1/pages/3',
+    html_url: '/courses/1/assignments/2',
     distance: 0.9,
     relevance: 0.2,
   },
 ]
+
+const modules1 = [
+  {
+    id: 1,
+    name: 'Module 1',
+    position: 0,
+    prerequisite_module_ids: [],
+    published: true,
+    items_url: '',
+  },
+]
+
+const modules2 = [
+  {
+    id: 2,
+    name: 'Module 2',
+    position: 0,
+    prerequisite_module_ids: [],
+    published: true,
+    items_url: '',
+  },
+]
+
+const SEARCH_TERM = 'apple'
+
+const INDEX_URL = `/api/v1/courses/${props.courseId}/smartsearch/index_status`
+const SEARCH_URL = `/api/v1/courses/${props.courseId}/smartsearch?q=${SEARCH_TERM}&per_page=25`
+const MODULE1_URL = encodeURI(
+  `/api/v1/courses/${props.courseId}/module_item_sequence?asset_type=${results[0].content_type}&asset_id=${results[0].content_id}`,
+)
+const MODULE2_URL = encodeURI(
+  `/api/v1/courses/${props.courseId}/module_item_sequence?asset_type=${results[1].content_type}&asset_id=${results[1].content_id}`,
+)
 
 describe('EnhancedSmartSearch', () => {
   afterEach(() => {
@@ -54,7 +87,7 @@ describe('EnhancedSmartSearch', () => {
   })
 
   it('should render progress bar when indexing', async () => {
-    fetchMock.get(`/api/v1/courses/${props.courseId}/smartsearch/index_status`, {
+    fetchMock.get(INDEX_URL, {
       status: 'indexing',
       progress: 75,
     })
@@ -69,7 +102,7 @@ describe('EnhancedSmartSearch', () => {
   })
 
   it('should render nothing when no search has been made', async () => {
-    fetchMock.get(`/api/v1/courses/${props.courseId}/smartsearch/index_status`, {
+    fetchMock.get(INDEX_URL, {
       status: 'complete',
       progress: 100,
     })
@@ -83,45 +116,80 @@ describe('EnhancedSmartSearch', () => {
     expect(queryByText(/wait a moment while we get Smart Search ready/)).toBeNull()
   })
 
-  it('should render results after a search has been made', async () => {
-    const user = userEvent.setup()
-    const searchTerm = 'apple'
-    fetchMock.get(`/api/v1/courses/${props.courseId}/smartsearch/index_status`, {
-      status: 'complete',
-      progress: 100,
+  describe('after a successful search', () => {
+    beforeEach(() => {
+      fetchMock.get(INDEX_URL, {
+        status: 'complete',
+        progress: 100,
+      })
+      fetchMock.get(SEARCH_URL, {
+        results: results,
+      })
+      fetchMock.get(MODULE1_URL, {
+        modules: modules1,
+      })
+      fetchMock.get(MODULE2_URL, {
+        modules: modules2,
+      })
     })
-    fetchMock.get(`/api/v1/courses/${props.courseId}/smartsearch?q=${searchTerm}&per_page=25`, {
-      results: results,
-    })
-    const {getByTestId, getByText} = render(<EnhancedSmartSearch {...props} />)
 
-    const searchInput = getByTestId('search-input')
-    fireEvent.change(searchInput, {
-      target: {value: searchTerm},
+    afterEach(() => {
+      fetchMock.restore()
     })
-    user.click(getByTestId('search-button'))
 
-    await waitFor(() => {
-      expect(getByText('Similar Results')).toBeInTheDocument()
-      expect(getByText('Best Matches')).toBeInTheDocument()
-      expect(getByText(results[0].title)).toBeInTheDocument()
-      expect(getByText(results[1].title)).toBeInTheDocument()
+    it('should render results', async () => {
+      const user = userEvent.setup()
+      const {getByTestId, getByText} = render(<EnhancedSmartSearch {...props} />)
+
+      const searchInput = getByTestId('search-input')
+      fireEvent.change(searchInput, {
+        target: {value: SEARCH_TERM},
+      })
+      user.click(getByTestId('search-button'))
+
+      await waitFor(() => {
+        expect(getByText('Similar Results')).toBeInTheDocument()
+        expect(getByText('Best Matches')).toBeInTheDocument()
+        expect(getByText(results[0].title)).toBeInTheDocument()
+        expect(getByText(results[1].title)).toBeInTheDocument()
+      })
+    })
+
+    it('should render modules for each result', async () => {
+      const user = userEvent.setup()
+      const {getByTestId, getAllByTestId} = render(<EnhancedSmartSearch {...props} />)
+
+      const searchInput = getByTestId('search-input')
+      fireEvent.change(searchInput, {
+        target: {value: SEARCH_TERM},
+      })
+      user.click(getByTestId('search-button'))
+
+      await waitFor(() => {
+        expect(getAllByTestId('search-result')).toHaveLength(2)
+      })
+      const resultCards = getAllByTestId('search-result')
+      const firstCard = resultCards[0]
+      const secondCard = resultCards[1]
+      expect(within(firstCard).getByText('Module 1')).toBeInTheDocument()
+      expect(within(secondCard).queryByText('Module 1')).not.toBeInTheDocument()
+      expect(within(secondCard).getByText('Module 2')).toBeInTheDocument()
+      expect(within(firstCard).queryByText('Module 2')).not.toBeInTheDocument()
     })
   })
 
   it('should render error message after failing to get results', async () => {
     const user = userEvent.setup()
-    const searchTerm = 'apple'
     fetchMock.get(`/api/v1/courses/${props.courseId}/smartsearch/index_status`, {
       status: 'complete',
       progress: 100,
     })
-    fetchMock.get(`/api/v1/courses/${props.courseId}/smartsearch?q=${searchTerm}&per_page=25`, 404)
+    fetchMock.get(`/api/v1/courses/${props.courseId}/smartsearch?q=${SEARCH_TERM}&per_page=25`, 404)
     const {getByTestId, getByText} = render(<EnhancedSmartSearch {...props} />)
 
     const searchInput = getByTestId('search-input')
     fireEvent.change(searchInput, {
-      target: {value: searchTerm},
+      target: {value: SEARCH_TERM},
     })
     user.click(getByTestId('search-button'))
 
