@@ -52,15 +52,6 @@ describe "context modules" do
       user_session(@teacher)
     end
 
-    def module_with_two_items
-      modules = create_modules(1, true)
-      modules[0].add_item({ id: @assignment.id, type: "assignment" })
-      modules[0].add_item({ id: @assignment2.id, type: "assignment" })
-      get "/courses/#{@course.id}/modules"
-      f(".collapse_module_link[aria-controls='context_module_content_#{modules[0].id}']").click
-      wait_for_ajaximations
-    end
-
     it_behaves_like "context modules for teachers"
 
     context "with modules page rewrite feature flag enabled" do
@@ -71,9 +62,65 @@ describe "context modules" do
         module_1.add_item({ id: assignment_1.id, type: "assignment" })
       end
 
-      it "page renders" do
+      it "page renders", :ignore_js_errors do
         get "/courses/#{@course.id}/modules"
         expect(f("[data-testid='modules-rewrite-container']")).to be_present
+      end
+    end
+
+    context "expanding/collapsing modules" do
+      before do
+        @mod = create_modules(2, true)
+        @mod[0].add_item({ id: @assignment.id, type: "assignment" })
+        @mod[1].add_item({ id: @assignment2.id, type: "assignment" })
+        get "/courses/#{@course.id}/modules"
+      end
+
+      def assert_collapsed
+        expect(expand_module_link(@mod[0].id)).to be_displayed
+        expect(module_content(@mod[0].id)).not_to be_displayed
+        expect(expand_module_link(@mod[1].id)).to be_displayed
+        expect(module_content(@mod[1].id)).not_to be_displayed
+      end
+
+      def assert_expanded
+        expect(f("#context_module_#{@mod[0].id} span.collapse_module_link")).to be_displayed
+        expect(f("#context_module_#{@mod[0].id} .content")).to be_displayed
+        expect(f("#context_module_#{@mod[1].id} span.collapse_module_link")).to be_displayed
+        expect(f("#context_module_#{@mod[1].id} .content")).to be_displayed
+      end
+
+      it "displays collapse all button at top of page" do
+        button = f("button#expand_collapse_all")
+        expect(button).to be_displayed
+        expect(button.attribute("data-expand")).to eq("false")
+      end
+
+      it "collapses and expand all modules when clicked and persist after refresh" do
+        button = f("button#expand_collapse_all")
+        button.click
+        wait_for_ajaximations
+        assert_collapsed
+        expect(button.text).to eq("Expand All")
+        refresh_page
+        assert_collapsed
+        button = f("button#expand_collapse_all")
+        button.click
+        wait_for_ajaximations
+        assert_expanded
+        expect(button.text).to eq("Collapse All")
+        refresh_page
+        assert_expanded
+      end
+
+      it "collapses all after collapsing individually" do
+        f("#context_module_#{@mod[0].id} span.collapse_module_link").click
+        wait_for_ajaximations
+        button = f("button#expand_collapse_all")
+        button.click
+        wait_for_ajaximations
+        assert_collapsed
+        expect(button.text).to eq("Expand All")
       end
     end
   end

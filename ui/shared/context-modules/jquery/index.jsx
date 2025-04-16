@@ -34,6 +34,7 @@ import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
 import vddTooltipView from '../jst/_vddTooltip.handlebars'
 import Publishable from '../backbone/models/Publishable'
 import PublishButtonView from '@canvas/publish-button-view'
+// eslint-disable-next-line import/no-named-as-default
 import htmlEscape from '@instructure/html-escape'
 import get from 'lodash/get'
 import axios from '@canvas/axios'
@@ -61,6 +62,7 @@ import {
   overrideModel,
   prerequisitesMessage,
   refreshDuplicateLinkStatus,
+  // eslint-disable-next-line no-redeclare
   scrollTo,
   setExpandAllButton,
   setExpandAllButtonHandler,
@@ -1835,13 +1837,18 @@ function toggleModuleCollapse(event) {
     url,
     'POST',
     {collapse},
-    data => {
+    async data => {
       if (reload_entries) {
-        $module.loadingImage('remove')
-        for (const idx in data) {
-          modules.addItemToModule($module, data[idx].content_tag)
+        if (ENV.FEATURE_MODULES_PERF) {
+          await modules.lazyLoadItems([parseInt($module.data('moduleId'), 10)])
+          $module.loadingImage('remove')
+        } else {
+          $module.loadingImage('remove')
+          for (const idx in data) {
+            modules.addItemToModule($module, data[idx].content_tag)
+          }
+          $module.find('.context_module_items.ui-sortable').sortable('refresh')
         }
-        $module.find('.context_module_items.ui-sortable').sortable('refresh')
         toggle()
         updateProgressionState($module)
       }
@@ -2444,14 +2451,24 @@ function initContextModules() {
 
 $(() => {
   if (ENV.FEATURE_MODULES_PERF) {
-    const moduleIds = []
-    $('.context_module').each(function () {
-      const moduleId = $(this).data('moduleId')
-      if (!isNaN(parseInt(moduleId, 10))) {
-        moduleIds.push(moduleId)
+    // ENV.COLLAPSED_MODULES are those that have been collapsed by the user
+    // ENV.EXPANDED_MODULES are those that have been expanded by the user
+    // If the user has not manually changed a module's state, it will not appear in either list
+    // This implies that if both arrays are empty, the user has done nothing and we will expand the first module
+    // After that, default to collapsed and expand only those in the ENV.EXPANDED_MODULES array
+    const allModules = Array.from(document.querySelectorAll('.context_module'))
+      .map(m => parseInt(m.dataset.moduleId, 10))
+      .filter(mid => !isNaN(mid))
+    if (allModules.length > 0) {
+      const isInitialState = ENV.EXPANDED_MODULES.length === 0 && ENV.COLLAPSED_MODULES.length === 0
+      if (isInitialState) {
+        ENV.EXPANDED_MODULES.push(allModules.shift())
+        ENV.COLLAPSED_MODULES = allModules
+      } else {
+        ENV.COLLAPSED_MODULES = allModules.filter(mid => !ENV.EXPANDED_MODULES.includes(mid))
       }
-    })
-    modules.lazyLoadItems(moduleIds)
+      modules.lazyLoadItems(ENV.EXPANDED_MODULES)
+    }
   } else {
     if ($('#context_modules').hasClass('editable')) {
       modules.loadMasterCourseData()

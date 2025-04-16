@@ -197,6 +197,7 @@ module ContextModulesCommon
   def add_existing_module_item(module_name, module_assignment)
     new_module = @course.context_modules.create!(name: module_name, workflow_state: "active")
     new_module.add_item(id: module_assignment.id, type: "assignment")
+    new_module
   end
 
   def add_existing_module_file_items(item_select_selector, file_names)
@@ -402,5 +403,28 @@ module ContextModulesCommon
     @already_waited_for_modules_ui = false
     super
     wait_for_modules_ui if %r{\A/courses/\d+/modules\z}.match?(url)
+  end
+
+  def create_module_with_two_items
+    modules = create_modules(1, true)
+    modules[0].add_item({ id: @assignment.id, type: "assignment" })
+    modules[0].add_item({ id: @assignment2.id, type: "assignment" })
+    modules[0]
+  end
+
+  def module_with_two_items
+    mod = create_module_with_two_items
+    get "/courses/#{@course.id}/modules"
+    mod
+  end
+
+  def uncollapse_all_modules(course, user)
+    uncollapse_modules(course.context_modules, user)
+  end
+
+  def uncollapse_modules(modules, user)
+    modules.each do |mod|
+      mod.find_or_create_progression(user)&.uncollapse!
+    end
   end
 end

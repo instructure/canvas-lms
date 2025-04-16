@@ -154,6 +154,18 @@ module ModulesIndexPage
     f(context_module_selector(module_id))
   end
 
+  def all_context_modules
+    ff(".context_module:not(#context_module_blank)")
+  end
+
+  def collapsed_module(module_id)
+    f("#context_module_#{module_id}.collapsed_module")
+  end
+
+  def all_collapsed_modules
+    ff(".context_module.collapsed_module")
+  end
+
   def delete_card_button
     ff(delete_card_button_selector)
   end
