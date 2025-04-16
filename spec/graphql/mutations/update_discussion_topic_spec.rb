@@ -1156,6 +1156,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     end
 
     it "can edit a non-checkpointed discussion to a checkpointed discussion" do
+      @course.enroll_student(User.create!, enrollment_state: "active")
       @discussion_assignment = @course.assignments.create!(
         title: "Graded Topic 1",
         submission_types: "discussion_topic",
@@ -1167,14 +1168,17 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       )
 
       @non_checkpoint_topic = @discussion_assignment.discussion_topic
+      assignment = Assignment.last
+
+      expect(assignment.due_at).to be_within(1.minute).of(3.months.from_now)
+      expect(assignment.submissions.first.cached_due_date).to be_within(1.minute).of(3.months.from_now)
 
       run_mutation(id: @non_checkpoint_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
                      { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
                      { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
                    ])
 
-      assignment = Assignment.last
-
+      assignment.reload
       expect(assignment.has_sub_assignments?).to be true
       expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 5
 
@@ -1187,6 +1191,8 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(sub_assignment2.sub_assignment_tag).to eq "reply_to_entry"
       expect(sub_assignment2.points_possible).to eq 8
       expect(assignment.points_possible).to eq 14
+      expect(assignment.due_at).to be_nil
+      expect(assignment.submissions.first.cached_due_date).to be_nil
     end
 
     it "can turn a graded checkpointed discussion into a non-graded discussion" do

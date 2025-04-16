@@ -128,6 +128,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
           updated_assignment_args = input[:assignment].to_h.merge(
             id: assignment_id.to_s
           )
+
           set_discussion_assignment_association(updated_assignment_args, discussion_topic)
 
           # Instantiate and execute UpdateAssignment mutation

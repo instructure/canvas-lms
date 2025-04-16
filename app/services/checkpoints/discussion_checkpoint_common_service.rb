@@ -79,7 +79,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   end
 
   def assignment_attributes
-    { only_visible_to_overrides: only_visible_to_overrides?, has_sub_assignments: true }
+    { only_visible_to_overrides: only_visible_to_overrides?, has_sub_assignments: true, due_at: nil }
   end
 
   def checkpoint_attributes
