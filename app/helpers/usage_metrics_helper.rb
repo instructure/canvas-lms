@@ -19,7 +19,10 @@
 
 module UsageMetricsHelper
   def load_usage_metrics?
-    usage_metrics_api_key && @domain_root_account&.feature_enabled?(:send_usage_metrics)
+    if @domain_root_account&.feature_enabled?(:send_usage_metrics) && usage_metrics_api_key.present?
+      js_env(PENDO_APP_ID: usage_metrics_api_key)
+      true
+    end
   end
 
   def usage_metrics_api_key
