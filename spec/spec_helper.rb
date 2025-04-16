@@ -510,6 +510,7 @@ RSpec.configure do |config|
     MultiCache.reset
     TermsOfService.skip_automatic_terms_creation = true
     LiveEvents.clear_context!
+    PageView.reset_cache! if PageView.respond_to?(:reset_cache!)
     $spec_api_tokens = {}
 
     remove_user_session
