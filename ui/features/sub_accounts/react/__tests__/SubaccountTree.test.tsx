@@ -22,7 +22,7 @@ import fetchMock from 'fetch-mock'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import userEvent from '@testing-library/user-event'
-import {AccountWithCounts} from '../types'
+import type {AccountWithCounts} from '../types'
 
 const rootAccount = {
   id: '1',
@@ -55,9 +55,10 @@ describe('SubaccountTree', () => {
   })
 
   // the only time this doesn't happen is if the subaccount count is over 100
-  it('renders sub-accounts automatically', async () => {
+  it('fetches sub-accounts and expands collapses', async () => {
+    const user = userEvent.setup()
     fetchMock.get(SUBACCOUNT_FETCH(rootAccount), subAccounts)
-    const {getByText, queryByText} = render(
+    const {getByText, getByTestId, queryByText} = render(
       <MockedQueryClientProvider client={queryClient}>
         <SubaccountTree {...props} />
       </MockedQueryClientProvider>,
@@ -66,9 +67,19 @@ describe('SubaccountTree', () => {
     await waitFor(() => {
       expect(fetchMock.called(SUBACCOUNT_FETCH(rootAccount), 'GET')).toBe(true)
       expect(getByText('Root Account')).toBeInTheDocument()
-      expect(queryByText('Child 1')).toBeInTheDocument()
-      expect(queryByText('Child 2')).toBeInTheDocument()
+      expect(getByText('2 Sub-Accounts')).toBeInTheDocument()
+      expect(getByText('Child 1')).toBeInTheDocument()
+      expect(getByText('Child 2')).toBeInTheDocument()
     })
+
+    // collapse
+    await user.click(getByTestId(`collapse-${rootAccount.id}`))
+    expect(queryByText('Child 1')).toBeNull()
+    expect(queryByText('Child 2')).toBeNull()
+
+    await user.click(getByTestId(`expand-${rootAccount.id}`))
+    expect(getByText('Child 1')).toBeInTheDocument()
+    expect(getByText('Child 2')).toBeInTheDocument()
   })
 
   it('does not fetch more subaccounts if subaccount count is 0', async () => {
@@ -84,24 +95,5 @@ describe('SubaccountTree', () => {
       expect(fetchMock.called(SUBACCOUNT_FETCH(rootAccount), 'GET')).toBe(false)
       expect(getByText('Root Account')).toBeInTheDocument()
     })
-  })
-
-  it('expands and collapses subaccounts', async () => {
-    const user = userEvent.setup()
-    fetchMock.get(SUBACCOUNT_FETCH(rootAccount), subAccounts)
-    const {getByTestId, getByText, queryByText} = render(
-      <MockedQueryClientProvider client={queryClient}>
-        <SubaccountTree {...props} />
-      </MockedQueryClientProvider>,
-    )
-
-    // collapse
-    await user.click(getByTestId(`collapse-${rootAccount.id}`))
-    expect(queryByText('Child 1')).toBeNull()
-    expect(queryByText('Child 2')).toBeNull()
-
-    await user.click(getByTestId(`expand-${rootAccount.id}`))
-    expect(getByText('Child 1')).toBeInTheDocument()
-    expect(getByText('Child 2')).toBeInTheDocument()
   })
 })
