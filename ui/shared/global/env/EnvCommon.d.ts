@@ -117,6 +117,7 @@ export interface EnvCommon {
   csp?: string
   current_user_id: string | null
   current_user_global_id: string
+  current_user_usage_metrics_id: string
   COURSE_ROLES: Role[]
   COURSE_USERS_PATH?: string
   current_user_roles: string[]
@@ -133,7 +134,9 @@ export interface EnvCommon {
   }[]
   ACCOUNT_ID: string
   DOMAIN_ROOT_ACCOUNT_ID: string
+  DOMAIN_ROOT_ACCOUNT_UUID: string
   ROOT_ACCOUNT_ID: string
+  PENDO_APP_ID: string
   ROOT_OUTCOME_GROUP: GroupOutcome
   k12: false
   help_link_name: string
@@ -238,7 +241,11 @@ export interface EnvCommon {
 
   FEATURES: Partial<
     Record<
-      SiteAdminFeatureId | RootAccountFeatureId | BrandAccountFeatureId | OtherFeatureId,
+      | SiteAdminFeatureId
+      | RootAccountFeatureId
+      | RootAccountServiceId
+      | BrandAccountFeatureId
+      | OtherFeatureId,
       boolean
     >
   >
@@ -324,6 +331,11 @@ export type RootAccountFeatureId =
   | 'course_pace_weighted_assignments'
   | 'course_pace_allow_bulk_pace_assign'
   | 'disable_iframe_sandbox_file_show'
+
+/**
+ * From ApplicationController#JS_ENV_ROOT_ACCOUNT_SERVICES
+ */
+export type RootAccountServiceId = 'account_survey_notifications'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
