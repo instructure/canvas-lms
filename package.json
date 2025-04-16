@@ -20,7 +20,7 @@
     "@instructure/emotion": "10.15.2",
     "@instructure/media-capture": "^9.0.0",
     "@instructure/media-capture-new": "npm:@instructure/media-capture@10.2.1-snapshot-543",
-    "@instructure/outcomes-ui": "3.2.3",
+    "@instructure/outcomes-ui": "3.2.4",
     "@instructure/react-crop": "^5.0.1",
     "@instructure/reactour": "https://github.com/instructure/reactour#b908434fe544703e26bc67c67c4111252c401f92",
     "@instructure/ready": "*",
