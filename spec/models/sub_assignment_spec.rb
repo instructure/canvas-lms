@@ -183,6 +183,12 @@ describe SubAssignment do
       expect(@sub_assignment).not_to receive(:sync_with_parent)
       @sub_assignment.reload.run_callbacks(:commit)
     end
+
+    it "does not trigger a sync when updated by a transaction" do
+      @sub_assignment.saved_by = :transaction
+      expect(@parent_assignment).not_to receive(:update_from_sub_assignment)
+      @sub_assignment.update!(unlock_at: 1.day.from_now)
+    end
   end
 
   describe "synchronization from parent assignment" do

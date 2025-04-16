@@ -262,8 +262,10 @@ class LearningObjectDatesController < ApplicationController
     checkpoint_service.call(
       discussion_topic: discussion,
       checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
-      dates: checkpoint_dates[:reply_to_topic][:dates]
+      dates: checkpoint_dates[:reply_to_topic][:dates],
+      saved_by: :transaction
     )
+
     checkpoint_service.call(
       discussion_topic: discussion,
       checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
