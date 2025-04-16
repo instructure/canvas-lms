@@ -24,8 +24,9 @@ import {Flex} from '@instructure/ui-flex'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {AccountWithCounts} from './types'
-import {calculateIndent, useFocusContext} from './util'
+import type {AccountWithCounts} from './types'
+import {calculateIndent} from './util'
+import {Account} from 'api'
 
 const I18n = createI18nScope('sub_accounts')
 
@@ -33,7 +34,7 @@ interface Props {
   accountName: string
   accountId: string
   depth?: number
-  onSuccess: () => void
+  onSuccess: (json: AccountWithCounts) => void
   onCancel: () => void
 }
 
@@ -42,7 +43,6 @@ export default function SubaccountNameForm(props: Props) {
   const [name, setName] = useState(isNew ? '' : props.accountName)
   const [validation, setValidation] = useState('')
   const [isSaving, setIsSaving] = useState(false)
-  const {setFocusId} = useFocusContext()
   const textRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
@@ -71,12 +71,10 @@ export default function SubaccountNameForm(props: Props) {
         let json = null
         if (props.accountName != '') {
           json = await updateName()
-          setFocusId(json.account.id)
         } else {
           json = await createSubaccount()
-          setFocusId(json.id)
         }
-        props.onSuccess()
+        props.onSuccess(json)
       }
     } catch (_e) {
       showFlashError(I18n.t('There was an error saving the account.'))()
@@ -84,8 +82,8 @@ export default function SubaccountNameForm(props: Props) {
     setIsSaving(false)
   }
 
-  const updateName = async (): Promise<{account: AccountWithCounts}> => {
-    const {json} = await doFetchApi<{account: AccountWithCounts}>({
+  const updateName = async (): Promise<AccountWithCounts> => {
+    const {json} = await doFetchApi<{account: Account}>({
       path: `/accounts/${props.accountId}`,
       body: {
         account: {
@@ -94,7 +92,7 @@ export default function SubaccountNameForm(props: Props) {
       },
       method: 'PUT',
     })
-    return json!
+    return {...json!.account, sub_account_count: 0, course_count: 0}
   }
 
   const createSubaccount = async (): Promise<AccountWithCounts> => {
@@ -107,7 +105,7 @@ export default function SubaccountNameForm(props: Props) {
         },
       },
     })
-    return json!
+    return {...json!, sub_account_count: 0, course_count: 0}
   }
 
   const indent = props.depth ? calculateIndent(props.depth) : undefined

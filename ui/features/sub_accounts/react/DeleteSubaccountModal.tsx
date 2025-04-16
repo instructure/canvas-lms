@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {AccountWithCounts} from './types'
+import type {AccountWithCounts} from './types'
 import {Flex} from '@instructure/ui-flex'
 import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'

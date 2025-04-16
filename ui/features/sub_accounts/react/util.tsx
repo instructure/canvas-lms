@@ -16,41 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {queryClient} from '@canvas/query'
-import {createContext, useContext, useState} from 'react'
+import {createContext, type MutableRefObject, useContext, useRef} from 'react'
 
 export const calculateIndent = (indent: number) => {
   return indent * 3
 }
 
-export const resetQuery = (id: string) => {
-  const queryKey = ['subAccountList', id]
-  queryClient.invalidateQueries({queryKey})
-}
-
 interface FocusContextType {
-  focusRef: HTMLElement | null
-  focusId: string
-  setFocusRef: React.Dispatch<React.SetStateAction<HTMLElement | null>>
-  setFocusId: React.Dispatch<React.SetStateAction<string>>
+  focusId: MutableRefObject<string>
 }
 
 const Context = createContext<FocusContextType>({
-  focusRef: null,
-  focusId: '',
-  setFocusId: () => {},
-  setFocusRef: () => {},
+  focusId: {current: ''},
 })
 
 export function FocusProvider({children}: {children: React.ReactNode}) {
-  const [focusId, setFocusId] = useState('')
-  const [focusRef, setFocusRef] = useState<HTMLElement | null>(null)
+  const focusId = useRef('')
 
-  return (
-    <Context.Provider value={{focusRef, setFocusRef, focusId, setFocusId}}>
-      {children}
-    </Context.Provider>
-  )
+  return <Context.Provider value={{focusId}}>{children}</Context.Provider>
 }
 
 export const useFocusContext = () => useContext(Context)
