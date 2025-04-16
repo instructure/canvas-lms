@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// TODO: if editing this file, please consider removing/resolving some of the "any" references
+
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
@@ -186,6 +188,28 @@ export default class ExternalToolModalLauncher extends React.Component<
     if (this.iframe) {
       this.iframe.setAttribute('allow', iframeAllowances())
     }
+
+    const observer = new MutationObserver(() => {
+      const closeButton = document.querySelector(
+        '[role="dialog"] button[data-cid="BaseButton"]',
+      ) as HTMLButtonElement | null
+
+      if (closeButton) {
+        observer.disconnect()
+
+        setTimeout(() => {
+          requestAnimationFrame(() => {
+            closeButton.setAttribute('tabindex', '-1')
+            closeButton.focus()
+          })
+        }, 100)
+      }
+    })
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    })
   }
 
   render() {

@@ -413,6 +413,7 @@ class ApplicationController < ActionController::Base
     new_quizzes_navigation_updates
     create_wiki_page_mastery_path_overrides
     remove_rce_resize_button
+    create_external_apps_side_tray_overrides
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
