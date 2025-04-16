@@ -122,7 +122,7 @@ export const LtiAppsLayout = React.memo(() => {
       </Flex>
       <Text>
         {I18n.t(
-          'Enhance your Canvas experience with apps that offer content libraries, collaboration tools, analytics, and more. This page is your hub for all app features! Use the Discover page to find and install new apps, and the Manage page to review and modify your installed apps.',
+          'Apps is the central hub to discover, manage, and monitor integrated apps. Extend and enhance your digital teaching and learning experience with powerful apps that provide and/or enrich your content, assessment, multimedia, collaboration, analytics, accessibility, and more. Select Discover to explore and install new apps, Manage to review and manage installed apps, and Monitor to view and understand usage.',
         )}
       </Text>
       {isMobile ? (
