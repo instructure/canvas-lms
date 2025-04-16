@@ -1,5 +1,6 @@
 {
   "name": "canvas-lms",
+  "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu-22.04",
   "dockerComposeFile": [],
   "service": "web",
   "workspaceFolder": "/usr/src/app",
