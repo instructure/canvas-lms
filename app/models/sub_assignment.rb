@@ -116,7 +116,10 @@ class SubAssignment < AbstractAssignment
   private
 
   def sync_with_parent
-    return if [:parent_assignment, :discussion_topic].include?(saved_by) # saved by discussion_topic happens during assignment importer, where update from sub assignment breaks the import of the asset
+    # saved by discussion_topic happens during assignment importer, where update from sub assignment breaks the import of the asset
+    # saved by transaction happens when we update the dates for both checkpoints at the same time (e.g. via learning object dates controller)
+    # in such case we want to wait until both checkpoints are updated before syncing with the parent assignment to avoid date validation errors
+    return if %i[parent_assignment discussion_topic transaction].include?(saved_by)
 
     changed_attributes = previous_changes.slice(*SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
     parent_assignment.update_from_sub_assignment(changed_attributes)
