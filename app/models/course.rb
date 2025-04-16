@@ -2437,32 +2437,61 @@ class Course < ActiveRecord::Base
   end
 
   def run_auto_grader(progress, submission)
-    if submission.blank? || submission.body.blank?
-      progress&.message = "No essay submission found"
-      progress&.results = {}
-      progress&.complete!
-      return
-    end
-
     assignment = submission.assignment
     assignment_text = ActionView::Base.full_sanitizer.sanitize(assignment.description || "")
     essay = ActionView::Base.full_sanitizer.sanitize(submission.body || "")
     rubric = assignment.rubric_association&.rubric
 
-    begin
-      grade_data = AutoGradeService.new(
-        assignment: assignment_text,
-        essay:,
-        rubric: rubric.data
-      ).call
+    auto_grade_result = nil # declare outside begin block
 
-      progress&.results = grade_data
+    begin
+      # Check if the submission is blank
+      if submission.blank? || submission.body.blank? || submission.attempt < 1
+        raise "No essay submission found"
+      end
+
+      auto_grade_result = AutoGradeResult.find_or_initialize_by(
+        submission:,
+        attempt: submission.attempt
+      )
+
+      if auto_grade_result.grade_data.blank?
+        grade_data = AutoGradeService.new(
+          assignment: assignment_text,
+          essay:,
+          rubric: rubric.data
+        ).call
+
+        auto_grade_result.update!(
+          root_account_id: submission.course.root_account_id,
+          grade_data:,
+          error_message: nil,
+          grading_attempts: auto_grade_result.grading_attempts + 1
+          # TODO: add number of retries istead of +1 after implementing retry mechanism
+        )
+      end
+
+      progress&.results = auto_grade_result.grade_data
       progress&.message = nil
     rescue => e
+      error_message = "Grading failed: #{e.message}"
+      if auto_grade_result.nil?
+        auto_grade_result = AutoGradeResult.find_or_initialize_by(
+          submission:,
+          attempt: submission.attempt
+        )
+      end
+
+      auto_grade_result&.update!(
+        root_account_id: submission.course.root_account_id,
+        grade_data: {},
+        error_message:,
+        grading_attempts: auto_grade_result.grading_attempts + 1
+      )
       progress&.results = {}
-      progress&.message = "Grading failed: #{e.message}"
+      progress&.message = error_message
     ensure
-      progress.complete!
+      progress&.complete!
     end
   end
 
