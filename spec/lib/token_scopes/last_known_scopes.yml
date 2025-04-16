@@ -223,6 +223,12 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/bind'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/reset'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments'
+- verb: DELETE
+  path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
 - verb: GET

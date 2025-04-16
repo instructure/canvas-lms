@@ -1979,6 +1979,12 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/lti_registrations/:id/bind", action: :bind
     end
 
+    scope(controller: "lti/deployments") do
+      get "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :list
+      post "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :create
+      delete "accounts/:account_id/lti_registrations/:registration_id/deployments/:id", action: :destroy
+    end
+
     scope(controller: "lti/resource_links") do
       get "courses/:course_id/lti_resource_links", action: :index
       post "courses/:course_id/lti_resource_links", action: :create

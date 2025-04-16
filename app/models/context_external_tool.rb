@@ -1108,6 +1108,18 @@ class ContextExternalTool < ActiveRecord::Base
     ContextExternalTool.opaque_identifier_for(asset, shard, context:)
   end
 
+  # Invalidate the navigation cache for this tool if it has a placement
+  # in the user, course, or account navigation.
+  # This should be called when a tool is updated or deleted.
+  # @param tool [ContextExternalTool] The tool to check for placements
+  # @param domain_root_account [Account] The root account to invalidate the cache for
+  # @return [void]
+  def self.invalidate_nav_tabs_cache(tool, domain_root_account)
+    if tool.has_placement?(:user_navigation) || tool.has_placement?(:course_navigation) || tool.has_placement?(:account_navigation)
+      Lti::NavigationCache.new(domain_root_account).invalidate_cache_key
+    end
+  end
+
   def self.opaque_identifier_for(asset, shard, context: nil)
     return if asset.blank?
 
