@@ -15283,6 +15283,7 @@ el:
   true_false_823761a9: Σωστό/Λάθος
   truncated_56b1a661: Ελλιπές
   try_again_6ca44338: "Δοκιμάστε Ξανά"
+  try_again_ad656c3c: "Δοκιμάστε ξανά"
   turned_in_submission_date_e9180b8b: "υποβλήθηκε στις: %{submission_date}"
   turnitin: 
     error_1007: "Το αρχείο που μεταφορτώθηκε είναι πολύ μεγάλο."
