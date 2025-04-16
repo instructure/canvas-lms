@@ -125,14 +125,13 @@ export const CreateOrEditSetModal = ({
   context,
   contextId,
   allowSelfSignup,
-  mockApi, // used for Storybook only
 }) => {
   const [st, dispatch] = useReducer(reducer, INITIAL_STATE)
   const topElement = useRef(null)
   const creationJSON = useRef(undefined)
   const [selfSignupEndDate, setSelfSignupEndDate] = useState(null)
   const areErrors = Object.keys(st.errors).length > 0
-  const apiCall = mockApi || doFetchApi
+  const apiCall = doFetchApi
   const isApiActive = st.apiState !== API_STATE.inactive
   const isApiAssigning = st.apiState === API_STATE.assigning && creationJSON.current
 
@@ -416,7 +415,7 @@ CreateOrEditSetModal.defaultProps = {
 
 // Brings up the create groupset modal and returns a Promise that resolves when it is dismissed.
 // The resolution value is either null if the dialog was dismissed without action or if an error
-// occurred, or contains the object returned by the create API call. For testing and Storybook
+// occurred, or contains the object returned by the create API call. For testing
 // purposes, it's also possible to pass in a function which will stand in for doFetchApi to mock
 // the API call process. Note that it must return a Promise that resolves to the same data
 // structure that doFetchApi returns.

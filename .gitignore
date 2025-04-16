@@ -46,7 +46,6 @@ npm-debug.log
 /public/doc/api_md/
 /public/javascripts/translations/*
 !/public/javascripts/translations/en.json
-/storybook-static/
 /tmp/*
 !/tmp/.keep
 /vendor

@@ -188,6 +188,7 @@
     "react-moveable": "0.56.0",
     "react-popper": "^2.2.5",
     "react-redux": "^5.1.1",
+    "react-refresh": "^0.17.0",
     "react-router-dom": "^6.16.0",
     "react-slick": "^0.30.2",
     "react-tokeninput": "^2.5.0",
@@ -366,15 +367,7 @@
     "xsslint": "instructure/xsslint#babel7",
     "yaml-loader": "^0.5"
   },
-  "optionalDependencies": {
-    "@storybook/addon-actions": "^6.5.9",
-    "@storybook/addon-essentials": "^6.5.9",
-    "@storybook/addon-links": "^6.5.9",
-    "@storybook/addon-storyshots": "^6.5.9",
-    "@storybook/builder-webpack5": "^6.5.9",
-    "@storybook/manager-webpack5": "^6.5.9",
-    "@storybook/react": "^6.5.9"
-  },
+  "optionalDependencies": {},
   "browserslist": ["extends @instructure/browserslist-config-canvas-lms"],
   "repository": "instructure/canvas-lms",
   "scripts": {
@@ -422,13 +415,10 @@
     "upgrade-and-dedupe": "rm -rf yarn.lock node_modules && yes 1 | yarn install --flat --production --ignore-scripts && git checkout package.json && yarn install && git add yarn.lock",
     "upgrade-instructure-ui": "script/upgrade-instructure-ui",
     "dedupe-yarn": "yarn yarn-deduplicate",
-    "clean": "wsrun --serial --exclude-missing -c clean",
-    "storybook": "start-storybook -p 6006 --no-dll --static-dir ./public/javascripts,./public",
-    "test-storybook": "yarn jest --roots .storybook --testMatch **/storybook.test.js"
+    "clean": "wsrun --serial --exclude-missing -c clean"
   },
   "resolutions": {
     "graphael": "https://github.com/instructure/graphael.git",
-    "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0",
     "@instructure/emotion": "10.15.2",
     "@instructure/ui-a11y-content": "10.15.2",
     "@instructure/ui-alerts": "10.15.2",
