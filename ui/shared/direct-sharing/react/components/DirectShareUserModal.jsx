@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Suspense, lazy, useState, useRef} from 'react'
-import {oneOf, shape, string} from 'prop-types'
+import {number, oneOf, oneOfType, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
@@ -27,6 +26,7 @@ import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {CONTENT_SHARE_TYPES} from '@canvas/content-sharing/react/proptypes/contentShare'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/react'
 
 const I18n = createI18nScope('direct_share_user_modal')
@@ -35,7 +35,7 @@ const DirectShareUserPanel = lazy(() => import('./DirectShareUserPanel'))
 
 DirectShareUserModal.propTypes = {
   contentShare: shape({
-    content_id: string,
+    content_id: oneOfType([string, number]),
     content_type: oneOf(CONTENT_SHARE_TYPES),
   }),
   courseId: string,

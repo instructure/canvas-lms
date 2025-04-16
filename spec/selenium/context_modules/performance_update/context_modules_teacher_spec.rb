@@ -68,15 +68,6 @@ describe "context modules" do
       user_session(@teacher)
     end
 
-    def module_with_two_items
-      modules = create_modules(1, true)
-      modules[0].add_item({ id: @assignment.id, type: "assignment" })
-      modules[0].add_item({ id: @assignment2.id, type: "assignment" })
-      get "/courses/#{@course.id}/modules"
-      collapse_module_link(modules[0].id).click
-      wait_for_ajaximations
-    end
-
     it_behaves_like "context modules for teachers"
 
     context "when lazy loading fails" do
@@ -97,9 +88,7 @@ describe "context modules" do
       it "shows the module item assign to tray" do
         module_with_two_items
         module_item = ContentTag.last
-        first_module = ContextModule.last
 
-        expand_module_link(first_module.id).click
         wait_for_ajaximations
 
         manage_module_item_button(module_item).click
@@ -111,9 +100,6 @@ describe "context modules" do
       it "duplicates the module item" do
         module_with_two_items
         module_item = ContentTag.last
-        first_module = ContextModule.last
-
-        expand_module_link(first_module.id).click
 
         manage_module_item_button(module_item).click
         click_module_item_duplicate(module_item)
@@ -126,9 +112,6 @@ describe "context modules" do
       it "bring up the module item move tray" do
         module_with_two_items
         module_item = ContentTag.last
-        first_module = ContextModule.last
-
-        expand_module_link(first_module.id).click
 
         manage_module_item_button(module_item).click
         click_module_item_move(module_item)
@@ -140,10 +123,6 @@ describe "context modules" do
       it "bring up the module item send to tray" do
         module_with_two_items
         module_item = ContentTag.last
-        first_module = ContextModule.last
-
-        expand_module_link(first_module.id).click
-
         manage_module_item_button(module_item).click
         click_module_item_send_to(module_item)
         wait_for_ajaximations
@@ -154,9 +133,6 @@ describe "context modules" do
       it "bring up the module item copy to tray", :ignore_js_errors do
         module_with_two_items
         module_item = ContentTag.last
-        first_module = ContextModule.last
-
-        expand_module_link(first_module.id).click
 
         manage_module_item_button(module_item).click
         click_module_item_copy_to(module_item)

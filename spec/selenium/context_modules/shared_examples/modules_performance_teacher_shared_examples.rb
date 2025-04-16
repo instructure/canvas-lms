@@ -50,16 +50,19 @@ shared_examples_for "module performance for teachers" do |context|
   end
 
   it "loads 11 module items with pagination" do
+    uncollapse_all_modules(@mod_course, @user)
     get @mod_url
     expect(pagination_exists?(@module_list[2].id)).to be_truthy
   end
 
   it "loads <10 module items with pagination" do
+    uncollapse_all_modules(@mod_course, @user)
     get @mod_url
     expect(pagination_exists?(@module_list[0].id)).to be_falsey
   end
 
   it "loads 10 module items with pagination" do
+    uncollapse_all_modules(@mod_course, @user)
     get @mod_url
     expect(pagination_exists?(@module_list[1].id)).to be_falsey
   end

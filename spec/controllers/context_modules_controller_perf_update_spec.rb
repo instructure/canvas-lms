@@ -41,16 +41,18 @@ describe ContextModulesController do
         end
       end
 
-      describe "EXPANDED_MODULES" do
+      describe "EXPANDED_MODULES and COLLAPSED_MODULES" do
         context "when we don't have context module progression" do
-          it "should assign empty array to @expanded_modules" do
+          it "should assign empty array to @expanded_modules and @collapsed_modules" do
             subject
             expect(assigns(:expanded_modules)).to be_empty
+            expect(assigns(:collapsed_modules)).to be_empty
           end
 
-          it "should assign empty array to EXPANDED_MODULES js env" do
+          it "should assign empty array to EXPANDED_MODULES and COLLAPSED_MODULES js env" do
             subject
             expect(assigns[:js_env][:EXPANDED_MODULES]).to be_empty
+            expect(assigns[:js_env][:COLLAPSED_MODULES]).to be_empty
           end
         end
 
@@ -66,11 +68,13 @@ describe ContextModulesController do
             it "should assign empty array to @expanded_modules" do
               subject
               expect(assigns(:expanded_modules)).to be_empty
+              expect(assigns(:collapsed_modules)).to eql([context_module.id])
             end
 
             it "should assign empty array to EXPANDED_MODULES js env" do
               subject
               expect(assigns[:js_env][:EXPANDED_MODULES]).to be_empty
+              expect(assigns[:js_env][:COLLAPSED_MODULES]).to eql([context_module.id])
             end
           end
 
@@ -82,11 +86,31 @@ describe ContextModulesController do
             it "should assign empty array to @expanded_modules" do
               subject
               expect(assigns(:expanded_modules)).to eql([context_module.id])
+              expect(assigns(:collapsed_modules)).to be_empty
             end
 
-            it "should assign empty array to EXPANDED_MODULES js env" do
+            it "should assign empty array to EXPANDED_MODULES and COLLAPSED_MODULES js env" do
               subject
               expect(assigns[:js_env][:EXPANDED_MODULES]).to eql([context_module.id])
+              expect(assigns[:js_env][:COLLAPSED_MODULES]).to be_empty
+            end
+          end
+
+          context "when progression is nil" do
+            before do
+              progression.update!(collapsed: nil)
+            end
+
+            it "should assign empty array to @expanded_modules and @collapsed_modules" do
+              subject
+              expect(assigns(:expanded_modules)).to be_empty
+              expect(assigns(:collapsed_modules)).to be_empty
+            end
+
+            it "should assign empty array to EXPANDED_MODULES and COLLAPSED_MODULES js env" do
+              subject
+              expect(assigns[:js_env][:EXPANDED_MODULES]).to be_empty
+              expect(assigns[:js_env][:COLLAPSED_MODULES]).to be_empty
             end
           end
         end

@@ -31,8 +31,7 @@ shared_examples_for "context modules for teachers" do
 
   it "shows all module items", priority: "1" do
     module_with_two_items
-    f(".expand_module_link").click
-    wait_for_animations
+
     expect(f(".context_module .content")).to be_displayed
   end
 
@@ -51,8 +50,9 @@ shared_examples_for "context modules for teachers" do
   end
 
   it "collapses module items", priority: "1" do
-    module_with_two_items
-    wait_for_animations
+    mod = module_with_two_items
+    collapse_module_link(mod.id).click
+    wait_for_ajaximations
     expect(f(".context_module .content")).not_to be_displayed
   end
 
@@ -75,6 +75,7 @@ shared_examples_for "context modules for teachers" do
 
   it "rearranges child object to new module", priority: "1" do
     modules = create_modules(2, true)
+    uncollapse_modules(modules, @user)
     # attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
     item1_mod1 = modules[0].add_item({ id: @assignment.id, type: "assignment" })
     item1_mod2 = modules[1].add_item({ id: @assignment2.id, type: "assignment" })
@@ -125,6 +126,7 @@ shared_examples_for "context modules for teachers" do
     2.times do
       add_existing_module_item("AssignmentModule", @assignment)
     end
+    uncollapse_all_modules(@course, @user)
 
     get "/courses/#{@course.id}/modules"
 
@@ -142,7 +144,8 @@ shared_examples_for "context modules for teachers" do
     @assignment.context_module_tags.each { |cmtag| expect(cmtag.title).to eq "renamed assignment" }
 
     # reload the page and renaming should still work on existing items
-    add_existing_module_item("AssignmentModule", @assignment)
+    mod = add_existing_module_item("AssignmentModule", @assignment)
+    uncollapse_modules([mod], @user)
 
     get "/courses/#{@course.id}/modules"
     tag = ContentTag.last
@@ -222,6 +225,7 @@ shared_examples_for "context modules for teachers" do
   it "allows adding an item twice" do
     item1 = add_existing_module_item("AssignmentModule", @assignment)
     item2 = add_existing_module_item("AssignmentModule", @assignment)
+    uncollapse_all_modules(@course, @user)
 
     get "/courses/#{@course.id}/modules"
 
@@ -261,6 +265,7 @@ shared_examples_for "context modules for teachers" do
   it "rearranges modules" do
     m1 = @course.context_modules.create!(name: "module 1")
     m2 = @course.context_modules.create!(name: "module 2")
+    uncollapse_all_modules(@course, @user)
 
     get "/courses/#{@course.id}/modules"
     sleep 2 # not sure what we are waiting on but drag and drop will not work, unless we wait
@@ -566,62 +571,6 @@ shared_examples_for "context modules for teachers" do
     module2 = @course.context_modules.reload.last
     add_module_item_button(module2).click
     expect(f("body")).to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
-  end
-
-  context "expanding/collapsing modules" do
-    before do
-      @mod = create_modules(2, true)
-      @mod[0].add_item({ id: @assignment.id, type: "assignment" })
-      @mod[1].add_item({ id: @assignment2.id, type: "assignment" })
-      get "/courses/#{@course.id}/modules"
-    end
-
-    def assert_collapsed
-      expect(f("#context_module_#{@mod[0].id} span.expand_module_link")).to be_displayed
-      expect(f("#context_module_#{@mod[0].id} .content")).to_not be_displayed
-      expect(f("#context_module_#{@mod[1].id} span.expand_module_link")).to be_displayed
-      expect(f("#context_module_#{@mod[1].id} .content")).to_not be_displayed
-    end
-
-    def assert_expanded
-      expect(f("#context_module_#{@mod[0].id} span.collapse_module_link")).to be_displayed
-      expect(f("#context_module_#{@mod[0].id} .content")).to be_displayed
-      expect(f("#context_module_#{@mod[1].id} span.collapse_module_link")).to be_displayed
-      expect(f("#context_module_#{@mod[1].id} .content")).to be_displayed
-    end
-
-    it "displays collapse all button at top of page" do
-      button = f("button#expand_collapse_all")
-      expect(button).to be_displayed
-      expect(button.attribute("data-expand")).to eq("false")
-    end
-
-    it "collapses and expand all modules when clicked and persist after refresh" do
-      button = f("button#expand_collapse_all")
-      button.click
-      wait_for_ajaximations
-      assert_collapsed
-      expect(button.text).to eq("Expand All")
-      refresh_page
-      assert_collapsed
-      button = f("button#expand_collapse_all")
-      button.click
-      wait_for_ajaximations
-      assert_expanded
-      expect(button.text).to eq("Collapse All")
-      refresh_page
-      assert_expanded
-    end
-
-    it "collapses all after collapsing individually" do
-      f("#context_module_#{@mod[0].id} span.collapse_module_link").click
-      wait_for_ajaximations
-      button = f("button#expand_collapse_all")
-      button.click
-      wait_for_ajaximations
-      assert_collapsed
-      expect(button.text).to eq("Expand All")
-    end
   end
 
   context "load in a new tab checkbox" do
