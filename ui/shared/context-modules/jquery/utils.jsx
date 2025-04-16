@@ -517,8 +517,16 @@ export function openExternalTool(ev) {
   const tool = findToolFromEvent(ENV.MODULE_TOOLS[launchType], idAttribute, ev)
 
   const currentModule = $(ev.target).parents('.context_module')
-  const currentModuleId =
-    currentModule.length > 0 && currentModule.attr('id').substring('context_module_'.length)
+  let currentModuleId =
+    currentModule.length > 0 ? currentModule.attr('id').substring('context_module_'.length) : null
+
+  if (window.ENV.FEATURES?.create_external_apps_side_tray_overrides) {
+    currentModuleId = $(ev.target).attr('id').substring('ui-id-'.length).split('-')[0]
+  }
+
+  const returnFocusTo = currentModuleId
+    ? $(`#context_module_${currentModuleId} .al-trigger`)[0]
+    : $('.al-trigger')[0]
 
   if (launchType === 'module_index_menu_modal') {
     setExternalToolModal({tool, launchType, returnFocusTo: $('.al-trigger')[0]})
@@ -529,7 +537,7 @@ export function openExternalTool(ev) {
     setExternalToolModal({
       tool,
       launchType,
-      returnFocusTo: $(`#context_module_${currentModuleId} .al-trigger`)[0],
+      returnFocusTo: returnFocusTo,
       contextModuleId: currentModuleId,
     })
     return
@@ -582,6 +590,25 @@ function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', 
       open={tool !== null}
     />,
   )
+
+  const observer = new MutationObserver(() => {
+    const closeButton = document?.querySelector('button[data-cid="BaseButton"]')
+    if (closeButton) {
+      observer.disconnect()
+
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          closeButton.setAttribute('tabindex', '-1')
+          closeButton.focus()
+        })
+      }, 100)
+    }
+  })
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  })
 }
 
 function setExternalToolModal({

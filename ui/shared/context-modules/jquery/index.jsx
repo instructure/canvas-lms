@@ -56,6 +56,7 @@ import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
+import ExternalAppsMenuTray from '@canvas/external-apps/react/components/ExternalAppsMenuTray'
 import {
   initPublishButton,
   onContainerOverlapped,
@@ -2105,6 +2106,22 @@ function renderSendToTray(open, contentSelection, returnFocusTo) {
   )
 }
 
+function renderExternalAppsTray(open, contentSelection, moduleId, returnFocusTo) {
+  ReactDOM.render(
+    <ExternalAppsMenuTray
+      open={open}
+      sourceCourseId={ENV.COURSE_ID}
+      contentSelection={contentSelection}
+      moduleId={moduleId}
+      onDismiss={() => {
+        renderExternalAppsTray(false, contentSelection, moduleId, returnFocusTo)
+        returnFocusTo.focus()
+      }}
+    />,
+    document.getElementById('direct-share-mount-point'),
+  )
+}
+
 // --------------------------------------------------------
 
 function initContextModules() {
@@ -2379,6 +2396,17 @@ function initContextModules() {
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
     renderCopyToTray(true, selection, returnFocusTo)
   })
+
+  if (window.ENV.FEATURES?.create_external_apps_side_tray_overrides) {
+    $(document).on('click', '.module_external_apps', event => {
+      event.preventDefault()
+      const $target = $(event.target)
+      const moduleId = $target.closest('.context_module').data('module-id')?.toString()
+      const data = $target.data('externalTools')
+      const returnFocusTo = $(`#context_module_${moduleId} .al-trigger`)[0]
+      renderExternalAppsTray(true, data, moduleId, returnFocusTo)
+    })
+  }
 
   $(document).on('click', '.module_send_to', event => {
     event.preventDefault()

@@ -96,4 +96,35 @@ module ContextExternalToolsHelper
                                 })
     end.flatten
   end
+
+  def external_tools_menu_items_grouped_json(tools_hash, url_params_by_group = {})
+    result = {}
+
+    tools_hash.each do |group, tools|
+      next if tools.blank?
+
+      result[group.to_s] = tools.map do |tool|
+        params = url_params_by_group[group.to_sym] || {}
+
+        display_tool =
+          if tool.respond_to?(:extension_setting)
+            external_tool_display_hash(tool, group, params)
+          else
+            base_url = tool[:base_url]
+            if base_url.present?
+              parsed = URI.parse(base_url)
+              merged_query = Rack::Utils.parse_nested_query(parsed.query).merge(params)
+              parsed.query = merged_query.to_query
+              tool = tool.merge(base_url: parsed.to_s)
+            end
+            tool
+          end
+        {
+          context_external_tool: display_tool
+        }
+      end
+    end
+
+    result
+  end
 end

@@ -215,22 +215,28 @@ describe ContextModulesController do
             expect(assigns(:modules).first).to eql(context_module)
           end
 
-          it "has the @menu_tools variable" do
-            finder_double = double("Lti::ContextToolFinder")
-            tool_double_1 = double("Tool 1", has_placement?: true, cache_key: "key")
-            tool_double_2 = double("Tool 2", has_placement?: false, cache_key: "key")
+          context "when create_external_apps_side_tray_overrides FF is disabled" do
+            before(:once) do
+              Account.site_admin.disable_feature!(:create_external_apps_side_tray_overrides)
+            end
 
-            allow_any_instance_of(ContextExternalToolsHelper)
-              .to receive(:external_tool_menu_item_tag).and_return("mocked_value")
-            allow(Lti::ContextToolFinder)
-              .to receive(:new)
-              .with(@course, placements: anything, current_user: anything)
-              .and_return(finder_double)
-            allow(finder_double).to receive(:all_tools_sorted_array).and_return([tool_double_1, tool_double_2])
+            it "has the @menu_tools variable" do
+              finder_double = double("Lti::ContextToolFinder")
+              tool_double_1 = double("Tool 1", has_placement?: true, cache_key: "key")
+              tool_double_2 = double("Tool 2", has_placement?: false, cache_key: "key")
 
-            subject
+              allow_any_instance_of(ContextExternalToolsHelper)
+                .to receive(:external_tool_menu_item_tag).and_return("mocked_value")
+              allow(Lti::ContextToolFinder)
+                .to receive(:new)
+                .with(@course, placements: anything, current_user: anything)
+                .and_return(finder_double)
+              allow(finder_double).to receive(:all_tools_sorted_array).and_return([tool_double_1, tool_double_2])
 
-            expect(assigns(:menu_tools).values).to all(eq([tool_double_1]))
+              subject
+
+              expect(assigns(:menu_tools).values).to all(eq([tool_double_1]))
+            end
           end
 
           describe "rights load" do

@@ -299,7 +299,7 @@ export type SiteAdminFeatureId =
   | 'validate_call_to_action'
   | 'new_quizzes_navigation_updates'
   | 'create_wiki_page_mastery_path_overrides'
-
+  | 'create_external_apps_side_tray_overrides'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
