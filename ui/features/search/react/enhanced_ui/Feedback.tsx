@@ -22,7 +22,6 @@ import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
-import {Result} from '../types'
 import PositiveFeedbackModal from './PositiveFeedbackModal'
 import NegativeFeedbackModal from './NegativeFeedbackModal'
 
