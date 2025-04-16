@@ -20,54 +20,32 @@
 describe "usage_metrics_helper" do
   include UsageMetricsHelper
 
+  before :once do
+    @domain_root_account = Account.default
+  end
+
   before do
-    Account.site_admin.enable_feature!(:send_usage_metrics)
-    @domain_root_account = Account.new
-    @domain_root_account.settings[:enable_usage_metrics] = true
-    @domain_root_account.save!
+    allow(@domain_root_account).to receive(:feature_enabled?).with(:send_usage_metrics).and_return(true)
+    allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return("some_api_key")
+    allow(self).to receive(:js_env)
   end
 
-  context "with feature enabled" do
-    it "returns false if there is no usage_metrics_api_key" do
-      allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return(nil)
-
-      expect(load_usage_metrics?).to be_falsey
-    end
-
-    it "returns false if the feature is not eanbled" do
-      Account.site_admin.disable_feature!(:send_usage_metrics)
-
-      expect(load_usage_metrics?).to be_falsey
-    end
-
-    it "is disabled if the dynamic settings are missing" do
-      allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return(nil)
-
-      override_dynamic_settings(config: { canvas: nil }) do
-        expect(load_usage_metrics?).to be_falsey
-      end
-    end
+  it "returns true if the feature is enabled and usage_metrics_api_key is present" do
+    expect(load_usage_metrics?).to be_truthy
   end
 
-  context "with feature disabled" do
-    before do
-      Account.site_admin.disable_feature!(:send_usage_metrics)
-    end
-
-    it "returns false if the feature is disabled" do
-      allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return("some_api_key")
-
-      expect(load_usage_metrics?).to be_falsey
-    end
+  it "returns false when domain_root_account doesn't have the feature enabled" do
+    allow(@domain_root_account).to receive(:feature_enabled?).with(:send_usage_metrics).and_return(false)
+    expect(load_usage_metrics?).to be_falsey
   end
 
-  context "with usage_metrics_api_key present" do
-    before do
-      allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return("some_api_key")
-    end
+  it "returns false if there is no usage_metrics_api_key" do
+    allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return(nil)
+    expect(load_usage_metrics?).to be_falsey
+  end
 
-    it "returns true if the feature is enabled and usage_metrics_api_key is present" do
-      expect(load_usage_metrics?).to be_truthy
-    end
+  it "calls js_env with the correct parameters" do
+    expect(self).to receive(:js_env).with(PENDO_APP_ID: "some_api_key")
+    load_usage_metrics?
   end
 end
