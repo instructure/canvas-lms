@@ -1186,7 +1186,7 @@ class ExternalToolsController < ApplicationController
     @tool.check_for_duplication(params.dig(:external_tool, :verify_uniqueness).present?)
     if @tool.errors.blank? && @tool.save
       @tool.migrate_content_to_1_3_if_needed!
-      invalidate_nav_tabs_cache(@tool)
+      ContextExternalTool.invalidate_nav_tabs_cache(@tool, @domain_root_account)
       if api_request?
         render json: external_tool_json(@tool, @context, @current_user, session)
       else
@@ -1235,7 +1235,7 @@ class ExternalToolsController < ApplicationController
       set_tool_attributes(@tool, external_tool_params)
       respond_to do |format|
         if @tool.save
-          invalidate_nav_tabs_cache(@tool)
+          ContextExternalTool.invalidate_nav_tabs_cache(@tool, @domain_root_account)
           format.json { render json: external_tool_json(@tool, @context, @current_user, session) }
         else
           format.json { render json: @tool.errors, status: :bad_request }
@@ -1265,7 +1265,7 @@ class ExternalToolsController < ApplicationController
       respond_to do |format|
         set_tool_attributes(@tool, external_tool_params)
         if @tool.save
-          invalidate_nav_tabs_cache(@tool)
+          ContextExternalTool.invalidate_nav_tabs_cache(@tool, @domain_root_account)
           if api_request?
             format.json { render json: external_tool_json(@tool, @context, @current_user, session) }
           else
@@ -1718,12 +1718,6 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  def invalidate_nav_tabs_cache(tool)
-    if tool.has_placement?(:user_navigation) || tool.has_placement?(:course_navigation) || tool.has_placement?(:account_navigation)
-      Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
-    end
-  end
-
   def require_access_to_context
     if @context.is_a?(Account)
       require_user
@@ -1762,7 +1756,7 @@ class ExternalToolsController < ApplicationController
       respond_to do |format|
         if tool.destroy
           if api_request?
-            invalidate_nav_tabs_cache(tool)
+            ContextExternalTool.invalidate_nav_tabs_cache(tool, @domain_root_account)
             format.json { render json: external_tool_json(tool, @context, @current_user, session) }
           else
             format.json { render json: tool.as_json(methods: [:readable_state, :custom_fields_string], include_root: false) }
