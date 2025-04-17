@@ -582,9 +582,14 @@ window.modules = (function () {
 
       const moduleItemsLazyLoader = new ModuleItemsLazyLoader(ENV.COURSE_ID, itemsCallback)
       moduleItemsLazyLoader.fetchModuleItems(moduleIds).then(() => {
-        modules.updateAssignmentData()
+        modules.updateAssignmentData(() => {
+          modules.updateProgressions(modules.afterUpdateProgressions)
+        })
         if ($('#context_modules').hasClass('editable')) {
           modules.loadMasterCourseData()
+        }
+        if (ENV.horizon_course) {
+          modules.updateEstimatedDurations()
         }
       })
     },
@@ -767,6 +772,27 @@ window.modules = (function () {
 
       const view = new LockIconView(viewOptions)
       view.render()
+    },
+
+    afterUpdateProgressions() {
+      if (window.location.hash && !window.location.hash.startsWith('#!')) {
+        try {
+          scrollTo($(window.location.hash))
+        } catch (_error) {
+          // no-op
+        }
+      } else {
+        const firstContextModuleContent = document
+          .querySelector('.context_module')
+          ?.querySelector('.content')
+        if (!firstContextModuleContent || moduleContentIsHidden(firstContextModuleContent)) {
+          const firstVisibleModuleContent = [
+            ...document.querySelectorAll('.context_module .content'),
+          ].find(el => !moduleContentIsHidden(el))
+          if (firstVisibleModuleContent)
+            scrollTo($(firstVisibleModuleContent).parents('.context_module'))
+        }
+      }
     },
   }
 })()
@@ -1878,26 +1904,7 @@ function updateSubAssignmentData(contextModuleItem, subAssignments) {
 // need the assignment data to check past due state
 if (!ENV.FEATURE_MODULES_PERF) {
   modules.updateAssignmentData(() => {
-    modules.updateProgressions(function afterUpdateProgressions() {
-      if (window.location.hash && !window.location.hash.startsWith('#!')) {
-        try {
-          scrollTo($(window.location.hash))
-        } catch (_error) {
-          // no-op
-        }
-      } else {
-        const firstContextModuleContent = document
-          .querySelector('.context_module')
-          ?.querySelector('.content')
-        if (!firstContextModuleContent || moduleContentIsHidden(firstContextModuleContent)) {
-          const firstVisibleModuleContent = [
-            ...document.querySelectorAll('.context_module .content'),
-          ].find(el => !moduleContentIsHidden(el))
-          if (firstVisibleModuleContent)
-            scrollTo($(firstVisibleModuleContent).parents('.context_module'))
-        }
-      }
-    })
+    modules.updateProgressions(modules.afterUpdateProgressions)
   })
 }
 
