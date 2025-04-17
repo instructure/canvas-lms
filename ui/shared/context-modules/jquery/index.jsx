@@ -2446,7 +2446,9 @@ $(() => {
     })
     modules.lazyLoadItems(moduleIds)
   } else {
-    modules.loadMasterCourseData()
+    if ($('#context_modules').hasClass('editable')) {
+      modules.loadMasterCourseData()
+    }
   }
   initContextModules()
 })
