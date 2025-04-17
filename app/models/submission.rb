@@ -1932,7 +1932,7 @@ class Submission < ActiveRecord::Base
   # use this method to pre-load the versioned_attachments for a bunch of
   # submissions (avoids having O(N) attachment queries)
   # NOTE: all submissions must belong to the same shard
-  def self.bulk_load_versioned_attachments(submissions, preloads: %i[thumbnail media_object folder attachment_upload_statuses])
+  def self.bulk_load_versioned_attachments(submissions, preloads: %i[thumbnail media_object folder attachment_upload_statuses context])
     attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
     bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
 
