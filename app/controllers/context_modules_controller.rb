@@ -74,10 +74,13 @@ class ContextModulesController < ApplicationController
     def load_modules
       @modules = @context.modules_visible_to(@current_user).limit(1000)
       @modules.each(&:check_for_stale_cache_after_unlocking!)
-      @collapsed_modules = ContextModuleProgression.for_user(@current_user)
-                                                   .for_modules(@modules)
-                                                   .pluck(:context_module_id, :collapsed)
-                                                   .select { |_cm_id, collapsed| collapsed }.map(&:first)
+      module_collapsed_base = ContextModuleProgression.for_user(@current_user)
+                                                      .for_modules(@modules)
+                                                      .pluck(:context_module_id, :collapsed)
+      @collapsed_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed }.map(&:first)
+      if module_performance_improvement_is_enabled?(@context, @current_user)
+        @expanded_modules = module_collapsed_base.reject { |_cm_id, collapsed| collapsed }.map(&:first)
+      end
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 
