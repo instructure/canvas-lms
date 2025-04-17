@@ -264,7 +264,7 @@ module Api::V1::Attachment
   end
 
   def validate_on_duplicate(params)
-    if params[:on_duplicate] && !%w[rename overwrite].include?(params[:on_duplicate])
+    if params[:on_duplicate] && !%w[rename overwrite error].include?(params[:on_duplicate])
       render status: :bad_request, json: {
         message: "invalid on_duplicate option"
       }
@@ -342,6 +342,10 @@ module Api::V1::Attachment
                        else
                          current_user
                        end
+
+    if params[:on_duplicate] == "error" && folder.active_file_attachments.where(display_name: infer_upload_filename(params)).exists?
+      return render json: { message: "file already exists; use on_duplicate='overwrite' or 'rename'" }, status: :conflict
+    end
 
     if InstFS.enabled?
       additional_capture_params = {}

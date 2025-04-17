@@ -59,7 +59,7 @@ const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) =
           fileOptions={zipOptions[0]}
           onZipOptionsResolved={formRef.current?.onZipOptionsResolved}
         />,
-        document.body
+        document.body,
       )
     else if (nameCollisions.length)
       return createPortal(
@@ -69,7 +69,7 @@ const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) =
           fileOptions={nameCollisions[0]}
           onNameConflictResolved={formRef.current?.onNameConflictResolved}
         />,
-        document.body
+        document.body,
       )
     else return null
   }, [fileOptions])
@@ -82,18 +82,20 @@ const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) =
   return (
     <>
       {/* contextType and contextId are null on All My Files page */}
-      { contextType && createPortal(
-        <UploadForm
-          allowSkip={true}
-          ref={formRef}
-          currentFolder={currentFolder}
-          contextId={contextId}
-          contextType={pluralizeContextTypeString(contextType)}
-          useCanvasModals={false}
-          onFileOptionsChange={(fileOptions: FileOptionsResults) => setFileOptions(fileOptions)}
-        />,
-        document.body
-      )}
+      {contextType &&
+        createPortal(
+          <UploadForm
+            allowSkip={true}
+            errorOnDuplicate={true}
+            ref={formRef}
+            currentFolder={currentFolder}
+            contextId={contextId}
+            contextType={pluralizeContextTypeString(contextType)}
+            useCanvasModals={false}
+            onFileOptionsChange={(fileOptions: FileOptionsResults) => setFileOptions(fileOptions)}
+          />,
+          document.body,
+        )}
 
       <Button
         {...buttonProps}

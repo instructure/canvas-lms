@@ -124,7 +124,7 @@ describe('FileRenameForm', () => {
       await userEvent.click(screen.getByTestId('rename-change-button'))
 
       expect(defaultProps.onNameConflictResolved).toHaveBeenCalledWith({
-        dup: 'rename',
+        dup: 'error',
         expandZip: false,
         file: textFile,
         name: 'foo2.txt',
