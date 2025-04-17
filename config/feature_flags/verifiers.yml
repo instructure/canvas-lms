@@ -35,3 +35,13 @@ disable_verified_content_export_links:
       state: allowed_on
     ci:
       state: allowed_on
+enable_file_access_with_api_tokens:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Enable File Access with API Tokens
+  description: Allow file authorization with API tokens.  This will allow API users to download files without a file verifier.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

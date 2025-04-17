@@ -141,7 +141,8 @@ module AuthenticationMethods
   end
 
   def load_pseudonym_from_access_token
-    return unless api_request? ||
+    tokens_allowed = token_auth_allowed? if Account.site_admin.feature_enabled?(:enable_file_access_with_api_tokens)
+    return unless api_request? || tokens_allowed ||
                   (params[:controller] == "oauth2_provider" && params[:action] == "destroy") ||
                   (params[:controller] == "login" && params[:action] == "session_token")
 
