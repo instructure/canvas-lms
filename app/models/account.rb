@@ -176,6 +176,7 @@ class Account < ActiveRecord::Base
   before_save :remove_template_id, if: ->(a) { a.workflow_state_changed? && a.deleted? }
   before_create :enable_sis_imports, if: :root_account?
   after_save :update_account_associations_if_changed
+  after_save :update_lti_context_controls_if_necessary
   after_save :check_downstream_caches
 
   before_save :setup_cache_invalidation
@@ -702,6 +703,13 @@ class Account < ActiveRecord::Base
       shard.activate do
         delay_if_production.update_account_associations
       end
+    end
+  end
+
+  def update_lti_context_controls_if_necessary
+    # if the account structure changed, but this is _not_ a new object
+    if saved_change_to_parent_account_id? && !saved_change_to_id?
+      Lti::ContextControl.update_paths_for_reparent(self, parent_account_id_before_last_save, parent_account_id)
     end
   end
 
