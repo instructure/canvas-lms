@@ -45,9 +45,11 @@ export const LtiAppsLayout = React.memo(() => {
   const isMobile = useMedia('(max-width: 767px)')
 
   const tabSelected = React.useMemo(() => {
-    return isManage ?
-      LtiRegistrationsTab.manage : isMonitor ?
-      LtiRegistrationsTab.monitor : LtiRegistrationsTab.discover
+    return isManage
+      ? LtiRegistrationsTab.manage
+      : isMonitor
+        ? LtiRegistrationsTab.monitor
+        : LtiRegistrationsTab.discover
   }, [isManage, isMonitor])
 
   const {isTabManage, isTabDiscover, isTabMonitor} = React.useMemo(() => {
@@ -120,23 +122,26 @@ export const LtiAppsLayout = React.memo(() => {
       </Flex>
       <Text>
         {I18n.t(
-          'Enhance your Canvas experience with apps that offer content libraries, collaboration tools, analytics, and more. This page is your hub for all app features! Use the Discover page to find and install new apps, and the Manage page to review and modify your installed apps.',
+          'Apps is the central hub to discover, manage, and monitor integrated apps. Extend and enhance your digital teaching and learning experience with powerful apps that provide and/or enrich your content, assessment, multimedia, collaboration, analytics, accessibility, and more. Select Discover to explore and install new apps, Manage to review and manage installed apps, and Monitor to view and understand usage.',
         )}
       </Text>
       {isMobile ? (
         <>
           <View margin="small 0" display="block">
-            <SimpleSelect
-              renderLabel=""
-              onChange={onTabClick}
-              value={tabSelected}
-            >
-              <SimpleSelect.Option id="discover" value="discover">
-                {I18n.t('Discover')}
-              </SimpleSelect.Option>
+            <SimpleSelect renderLabel="" onChange={onTabClick} value={tabSelected}>
+              {isLtiRegistrationsDiscoverEnabled() && (
+                <SimpleSelect.Option id="discover" value="discover">
+                  {I18n.t('Discover')}
+                </SimpleSelect.Option>
+              )}
               <SimpleSelect.Option id="manage" value="manage">
                 {I18n.t('Manage')}
               </SimpleSelect.Option>
+              {isLtiRegistrationsUsageEnabled() && (
+                <SimpleSelect.Option id="monitor" value="monitor">
+                  {I18n.t('Monitor')}
+                </SimpleSelect.Option>
+              )}
             </SimpleSelect>
           </View>
           <Outlet />
@@ -174,7 +179,9 @@ export const LtiAppsLayout = React.memo(() => {
           {isLtiRegistrationsUsageEnabled() ? (
             <Tabs.Panel
               renderTitle={
-                <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Monitor')}</Text>
+                <Text style={{color: 'initial', textDecoration: 'initial'}}>
+                  {I18n.t('Monitor')}
+                </Text>
               }
               id={LtiRegistrationsTab.monitor}
               active={isTabMonitor}
@@ -182,7 +189,7 @@ export const LtiAppsLayout = React.memo(() => {
             >
               <Outlet />
             </Tabs.Panel>
-          ): undefined}
+          ) : undefined}
         </Tabs>
       )}
     </>
