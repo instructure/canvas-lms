@@ -301,6 +301,7 @@ class Course < ActiveRecord::Base
   before_save :set_horizon_course, if: -> { account_id_changed? || new_record? }
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
+  after_save :update_lti_context_controls_if_necessary
   after_save :update_enrollment_states_if_necessary
   after_save :clear_caches_if_necessary
   after_save :log_published_assignment_count
@@ -469,6 +470,13 @@ class Course < ActiveRecord::Base
   def update_account_associations_if_changed
     if (saved_change_to_root_account_id? || saved_change_to_account_id?) && !self.class.skip_updating_account_associations?
       delay(synchronous: !Rails.env.production? || saved_change_to_id?).update_account_associations
+    end
+  end
+
+  def update_lti_context_controls_if_necessary
+    # course has been reparented, and this is not a new record
+    if saved_change_to_account_id? && !saved_change_to_id?
+      Lti::ContextControl.update_paths_for_reparent(self, account_id_before_last_save, account_id)
     end
   end
 

@@ -2709,6 +2709,32 @@ describe Course do
     end
   end
 
+  describe "#update_lti_context_controls" do
+    let(:course) { course_model(account:) }
+    let(:account) { account_model }
+    let(:new_parent_account) { account_model }
+
+    before do
+      allow(Lti::ContextControl).to receive(:update_paths_for_reparent)
+    end
+
+    describe "when course parent changes" do
+      it "updates paths for Controls" do
+        course.update!(account: new_parent_account)
+        expect(Lti::ContextControl).to have_received(:update_paths_for_reparent).with(course, account.id, new_parent_account.id)
+      end
+    end
+
+    describe "with new course" do
+      let(:new_course) { course_model }
+
+      it "does not update paths" do
+        new_course
+        expect(Lti::ContextControl).not_to have_received(:update_paths_for_reparent)
+      end
+    end
+  end
+
   describe "#tabs_available" do
     context "teachers" do
       before :once do

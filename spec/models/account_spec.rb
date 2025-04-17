@@ -1583,6 +1583,32 @@ describe Account do
     end
   end
 
+  describe "#update_lti_context_controls" do
+    let(:account) { account_model(parent_account:) }
+    let(:parent_account) { account_model }
+    let(:new_parent_account) { account_model }
+
+    before do
+      allow(Lti::ContextControl).to receive(:update_paths_for_reparent)
+    end
+
+    describe "when account parent changes" do
+      it "updates paths for Controls" do
+        account.update!(parent_account: new_parent_account)
+        expect(Lti::ContextControl).to have_received(:update_paths_for_reparent).with(account, parent_account.id, new_parent_account.id)
+      end
+    end
+
+    describe "with new account" do
+      let(:new_account) { account_model }
+
+      it "does not update paths" do
+        new_account
+        expect(Lti::ContextControl).not_to have_received(:update_paths_for_reparent)
+      end
+    end
+  end
+
   describe "default_time_zone" do
     context "root account" do
       before :once do

@@ -39,6 +39,7 @@ class Lti::Registration < ActiveRecord::Base
 
   has_many :lti_registration_account_bindings, class_name: "Lti::RegistrationAccountBinding", inverse_of: :registration
   has_many :lti_overlays, class_name: "Lti::Overlay", inverse_of: :registration
+  has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :registration
 
   validates :name, :admin_nickname, :vendor, length: { maximum: 255 }
   validates :description, length: { maximum: 2048 }, allow_blank: true

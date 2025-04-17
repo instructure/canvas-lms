@@ -30,6 +30,7 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :lti_notice_handlers, class_name: "Lti::NoticeHandler"
   has_many :lti_asset_processors, class_name: "Lti::AssetProcessor"
   has_many :lti_asset_processor_eula_acceptances, class_name: "Lti::AssetProcessorEulaAcceptance", inverse_of: :context_external_tool, dependent: :destroy
+  has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :deployment
 
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
