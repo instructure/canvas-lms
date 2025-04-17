@@ -26,7 +26,7 @@ import {useMutation, queryClient} from '@canvas/query'
 import {useFileManagement} from '../Contexts'
 import {generateFolderPostUrl} from '../../../utils/apiUtils'
 import getCookie from '@instructure/get-cookie'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 
@@ -35,11 +35,13 @@ const I18n = createI18nScope('files_v2')
 interface CreateFolderModalProps {
   isOpen: boolean
   onRequestClose: () => void
+  onExited: (wasSuccessful?: boolean) => void
 }
 
-const CreateFolderModal = ({isOpen, onRequestClose}: CreateFolderModalProps) => {
+const CreateFolderModal = ({isOpen, onRequestClose, onExited}: CreateFolderModalProps) => {
   const [folderName, setFolderName] = useState('')
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
+  const [wasRequestSuccessful, setWasRequestSuccessful] = useState(false)
   const {folderId: parentFolderId} = useFileManagement()
 
   const createFolderMutation = useMutation({
@@ -59,14 +61,12 @@ const CreateFolderModal = ({isOpen, onRequestClose}: CreateFolderModalProps) => 
       }
     },
     onSuccess: async () => {
-      showFlashSuccess(I18n.t('Folder was successfully created.'))()
+      setWasRequestSuccessful(true)
       onRequestClose()
       await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
     },
     onError: () => {
-      showFlashError(I18n.t('There was an error creating the folder. Please try again.'))(
-        new Error(),
-      )
+      showFlashError(I18n.t('There was an error creating the folder. Please try again.'))()
     },
     onSettled: () => {
       setIsRequestInFlight(false)
@@ -80,6 +80,8 @@ const CreateFolderModal = ({isOpen, onRequestClose}: CreateFolderModalProps) => 
   const handleExited = () => {
     setFolderName('')
     setIsRequestInFlight(false)
+    onExited(wasRequestSuccessful)
+    setWasRequestSuccessful(false)
   }
 
   return (
@@ -92,6 +94,7 @@ const CreateFolderModal = ({isOpen, onRequestClose}: CreateFolderModalProps) => 
       label={I18n.t('Create Folder')}
       shouldCloseOnDocumentClick
       size="small"
+      shouldReturnFocus={false}
     >
       <Modal.Header>
         <CloseButton

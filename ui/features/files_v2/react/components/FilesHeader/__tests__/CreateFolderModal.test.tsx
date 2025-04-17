@@ -29,6 +29,7 @@ import {createMockFileManagementContext} from '../../../__tests__/createMockCont
 const defaultProps = {
   isOpen: true,
   onRequestClose: jest.fn(),
+  onExited: jest.fn(),
 }
 
 const renderComponent = (props = {}) => {
