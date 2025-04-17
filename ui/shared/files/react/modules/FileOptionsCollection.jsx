@@ -37,6 +37,7 @@ class FileOptionsCollection {
     this.uploadOptions = {
       alwaysRename: false,
       alwaysUploadZips: false,
+      errorOnDuplicate: false,
     }
   }
 
@@ -115,6 +116,9 @@ class FileOptionsCollection {
             file.cannotOverwrite = true
           }
           collisions.push(file)
+        } else if (this.uploadOptions.errorOnDuplicate && file.dup == null) {
+          file.dup = 'error'
+          resolved.push(file)
         } else {
           file.replacingFileId = matchingFile?.id
           resolved.push(file)
@@ -211,6 +215,7 @@ class FileOptionsCollection {
   setUploadOptions(options) {
     this.uploadOptions.alwaysRename = !!options.alwaysRename
     this.uploadOptions.alwaysUploadZips = !!options.alwaysUploadZips
+    this.uploadOptions.errorOnDuplicate = !!options.errorOnDuplicate
   }
 
   // noop

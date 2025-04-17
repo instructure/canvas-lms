@@ -34,6 +34,7 @@ export const UploadFormPropTypes = {
   disabled: bool,
   alwaysRename: bool, // if false offer to rename files
   alwaysUploadZips: bool, // if false offer to expand zip files
+  errorOnDuplicate: bool,
   onChange: func,
   onEmptyOrClose: func,
   onRenameFileMessage: func,
@@ -103,8 +104,8 @@ class UploadForm extends React.Component {
     this.setState({showResolveModals: false})
   }
 
-  setUploadOptions({alwaysRename, alwaysUploadZips}) {
-    FileOptionsCollection.setUploadOptions({alwaysRename, alwaysUploadZips})
+  setUploadOptions({alwaysRename, alwaysUploadZips, errorOnDuplicate}) {
+    FileOptionsCollection.setUploadOptions({alwaysRename, alwaysUploadZips, errorOnDuplicate})
   }
 
   _actualQueueUploads() {
