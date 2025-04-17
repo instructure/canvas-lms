@@ -13534,6 +13534,7 @@ fa:
   load_bank: 
     error_loading_banks: "خطا در بارگزاری مخزن ها"
     loading_banks: "در حال بارگذاری مخزن ها..."
+  load_in_a_new_tab_829731ab: "بارگذاری در یک زبانه جدید"
   load_more_9ca37ccc: "بارگذاری بیشتر..."
   load_more_a36f9cf9: "بارگذاری بیشتر"
   load_more_results_460f49a9: "Load more results"
@@ -16223,6 +16224,7 @@ fa:
   move_group_3dd7f76e: "انتقال گروه"
   move_group_77ae285d: "انتقال گروه ..."
   move_grouptitle_20927676: "انتقال \"%{groupTitle}\""
+  move_item_e94a8103: "انتقال مورد"
   move_item_failed_8e4c1db6: "انتقال مورد ناموفق بود."
   move_module_346b8112: "انتقال ماژول ..."
   move_module_90e6927e: "انتقال ماژول"
