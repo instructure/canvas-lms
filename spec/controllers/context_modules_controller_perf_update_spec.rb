@@ -25,32 +25,98 @@ describe ContextModulesController do
 
     before do
       course_with_teacher_logged_in(active_all: true)
-      @course.context_modules.create!(name: "Test Module")
     end
 
-    context "when modules_perf enabled" do
+    context "when module_performance_improvement_is_enabled? enabled" do
       before do
         allow_any_instance_of(ContextModulesHelper)
           .to receive(:module_performance_improvement_is_enabled?)
           .and_return(true)
       end
 
-      it "exports proper environment variable with the flag ON" do
-        subject
-        expect(assigns[:js_env][:FEATURE_MODULES_PERF]).to be_truthy
+      describe "FEATURE_MODULES_PERF" do
+        it "exports proper environment variable with the flag ON" do
+          subject
+          expect(assigns[:js_env][:FEATURE_MODULES_PERF]).to be_truthy
+        end
+      end
+
+      describe "EXPANDED_MODULES" do
+        context "when we don't have context module progression" do
+          it "should assign empty array to @expanded_modules" do
+            subject
+            expect(assigns(:expanded_modules)).to be_empty
+          end
+
+          it "should assign empty array to EXPANDED_MODULES js env" do
+            subject
+            expect(assigns[:js_env][:EXPANDED_MODULES]).to be_empty
+          end
+        end
+
+        context "when we have context module progression" do
+          let(:context_module) { @course.context_modules.create! }
+          let(:progression) { @user.context_module_progressions.create!(context_module:) }
+
+          context "when progression is collapsed" do
+            before do
+              progression.update!(collapsed: true)
+            end
+
+            it "should assign empty array to @expanded_modules" do
+              subject
+              expect(assigns(:expanded_modules)).to be_empty
+            end
+
+            it "should assign empty array to EXPANDED_MODULES js env" do
+              subject
+              expect(assigns[:js_env][:EXPANDED_MODULES]).to be_empty
+            end
+          end
+
+          context "when progression is expanded" do
+            before do
+              progression.update!(collapsed: false)
+            end
+
+            it "should assign empty array to @expanded_modules" do
+              subject
+              expect(assigns(:expanded_modules)).to eql([context_module.id])
+            end
+
+            it "should assign empty array to EXPANDED_MODULES js env" do
+              subject
+              expect(assigns[:js_env][:EXPANDED_MODULES]).to eql([context_module.id])
+            end
+          end
+        end
       end
     end
 
-    context "when modules_perf disabled" do
+    context "when module_performance_improvement_is_enabled? disabled" do
       before do
         allow_any_instance_of(ContextModulesHelper)
           .to receive(:module_performance_improvement_is_enabled?)
           .and_return(false)
       end
 
-      it "exports proper environment variable with the flag OFF" do
-        subject
-        expect(assigns[:js_env][:FEATURE_MODULES_PERF]).to be_falsey
+      describe "FEATURE_MODULES_PERF" do
+        it "exports proper environment variable with the flag OFF" do
+          subject
+          expect(assigns[:js_env][:FEATURE_MODULES_PERF]).to be_falsey
+        end
+      end
+
+      describe "EXPANDED_MODULES" do
+        it "should not assign the @expanded_modules" do
+          subject
+          expect(assigns(:expanded_modules)).to be_nil
+        end
+
+        it "should have empty EXPANDED_MODULES js env" do
+          subject
+          expect(assigns[:js_env][:EXPANDED_MODULES]).to be_empty
+        end
       end
     end
   end
