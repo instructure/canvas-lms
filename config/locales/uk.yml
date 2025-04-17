@@ -9519,6 +9519,7 @@ uk:
   load_bank: 
     error_loading_banks: "Помилка при завантаженні банків"
     loading_banks: "Завантаження банків..."
+  load_in_a_new_tab_829731ab: "Завантажити у новій вкладці"
   load_more_a36f9cf9: "Завантажити більше"
   load_more_results_460f49a9: "Завантажити більше результатів"
   load_prior_dates_f2b0f6f0: "Завантажте попередні дати"
@@ -11743,6 +11744,7 @@ uk:
   move_from_ef79aa53: "Перехід від"
   move_group_3dd7f76e: "Перемістити Групу"
   move_group_77ae285d: "Перемістити Групу…"
+  move_item_e94a8103: "Перемістити пункт"
   move_item_failed_8e4c1db6: "Невдале переміщення елементу "
   move_module_346b8112: "Перемістити Модуль..."
   move_module_90e6927e: "Перемістити Модуль"
