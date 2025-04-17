@@ -54,19 +54,11 @@
   ],
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
-  "browserslist": [
-    "extends @instructure/browserslist-config-canvas-lms"
-  ],
+  "browserslist": ["extends @instructure/browserslist-config-canvas-lms"],
   "nyc": {
-    "include": [
-      "shared/**/*.js",
-      "src/**/*.js"
-    ],
+    "include": ["shared/**/*.js", "src/**/*.js"],
     "exclude": [],
-    "require": [
-      "@babel/register",
-      "@instructure/canvas-theme"
-    ],
+    "require": ["@babel/register", "@instructure/canvas-theme"],
     "sourceMap": false,
     "instrument": false
   },
@@ -204,7 +196,7 @@
     "nyc": "^13",
     "proxyquire": "1.7.4",
     "shelljs": "^0.8.3",
-    "sinon": "^7",
+    "sinon": "^20",
     "skin-deep": "^1",
     "source-map-support": "0.5.21",
     "testcafe-browser-provider-selenium": "^1.2.0",

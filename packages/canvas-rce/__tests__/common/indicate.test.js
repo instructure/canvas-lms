@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from 'sinon'
+const sinon = require('sinon/pkg/sinon.js')
+
 import indicate from '../../src/common/indicate'
 
 describe('indicate function', () => {
