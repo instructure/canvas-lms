@@ -159,37 +159,45 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
             </Flex>
           </Flex.Item>
           <Flex.Item>
-            <IconButton
-              color="primary-inverse"
-              withBackground={false}
-              withBorder={false}
-              renderIcon={IconInfoSolid}
-              screenReaderLabel={I18n.t('Open file info panel')}
-              margin="0 x-small 0 0"
-              id="file-info-button"
-              onClick={() => handleOverlayTrayChange(true)}
-            />
-            <IconButton
-              color="primary-inverse"
-              withBackground={false}
-              withBorder={false}
-              renderIcon={IconDownloadSolid}
-              screenReaderLabel={I18n.t('Download')}
-              margin="0 x-small 0 0"
-              id="download-icon-button"
-              href={currentItem.url}
-            />
-            <IconButton
-              color="primary-inverse"
-              withBackground={false}
-              withBorder={false}
-              renderIcon={IconXSolid}
-              screenReaderLabel={I18n.t('Close')}
-              onClick={onClose}
-              id="close-button"
-              ref={e => (closeButton.current = e as HTMLElement | null)}
-              data-testid="close-button"
-            />
+            <div style={{display: 'grid', gridTemplate: "'info download close'"}}>
+              <div style={{gridArea: 'close'}}>
+                <IconButton
+                  color="primary-inverse"
+                  withBackground={false}
+                  withBorder={false}
+                  renderIcon={IconXSolid}
+                  screenReaderLabel={I18n.t('Close')}
+                  onClick={onClose}
+                  id="close-button"
+                  ref={e => (closeButton.current = e as HTMLElement | null)}
+                  data-testid="close-button"
+                />
+              </div>
+              <div style={{gridArea: 'info'}}>
+                <IconButton
+                  color="primary-inverse"
+                  withBackground={false}
+                  withBorder={false}
+                  renderIcon={IconInfoSolid}
+                  screenReaderLabel={I18n.t('Open file info panel')}
+                  margin="0 x-small 0 0"
+                  id="file-info-button"
+                  onClick={() => handleOverlayTrayChange(true)}
+                />
+              </div>
+              <div style={{gridArea: 'download'}}>
+                <IconButton
+                  color="primary-inverse"
+                  withBackground={false}
+                  withBorder={false}
+                  renderIcon={IconDownloadSolid}
+                  screenReaderLabel={I18n.t('Download')}
+                  margin="0 x-small 0 0"
+                  id="download-icon-button"
+                  href={currentItem.url}
+                />
+              </div>
+            </div>
           </Flex.Item>
         </Flex>
       </Modal.Header>
