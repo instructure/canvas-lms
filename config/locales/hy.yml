@@ -9000,6 +9000,7 @@ hy:
       feedback: "Սեղմեք այստեղ պատահածի մասին մեզ հայտնելու համար: "
     show_me_where: "Ցույց տվեք որտեղ"
   links_14b70841: Հղումներ
+  load_in_a_new_tab_829731ab: "Բեռնել նոր ներդիրում"
   load_more_9ca37ccc: "Բեռնել ավելին..."
   load_more_a36f9cf9: "Բեռնել լրացուցիչ"
   load_more_results_460f49a9: "Load more results"
@@ -11292,6 +11293,7 @@ hy:
   move_dialog_select: 
     move_to_end: "-- Ներքևում--"
   move_from_ef79aa53: Տեղափոխել
+  move_item_e94a8103: "Տեղափոխել տարրը"
   move_module_item_77754119: "Տեղափոխել Մոդուլ/Տարր"
   move_name_to_a_new_group_acabed4e: " %{name} տեղափոխել նոր խումբ"
   move_outcome_ce497e6c: "Տեղափոխել արդյունքը"

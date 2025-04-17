@@ -10936,6 +10936,7 @@ tr:
   list_view_430aecce: "Liste Görünümü"
   load_bank: 
     loading_banks: "Soru bankaları yükleniyor..."
+  load_in_a_new_tab_829731ab: "Yeni sekmede yükle"
   load_more_35d33c7: "Daha Fazla Yükle"
   load_more_9ca37ccc: "Daha fazla yükle..."
   load_more_a36f9cf9: "Daha fazla yükle"
@@ -13352,6 +13353,7 @@ tr:
   move_from_ef79aa53: "Şuraya taşı"
   move_group_3dd7f76e: "Grubu Taşı"
   move_group_77ae285d: "Grubu Taşı"
+  move_item_e94a8103: "Öğeyi Taşı"
   move_module_346b8112: "Modülü Taşı"
   move_module_90e6927e: "Modülü Taşı"
   move_module_contents_74fa15d5: "Modül içeriklerini taşı"
