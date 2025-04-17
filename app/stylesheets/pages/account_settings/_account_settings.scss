@@ -25,6 +25,7 @@
   max-width: 300px;
   padding: 2px 5px;
   margin-bottom: 5px;
+  position: relative;
 }
 
 .admins_list li:hover {
@@ -52,10 +53,11 @@
 }
 
 .admins_list .remove_account_user_link {
-  float: direction(right);
+  #{direction(right)}: 0;
+  position: absolute;
+  top: 0;
   border: none;
   background: none;
-  padding: 0;
 }
 
 #account_notification_icon {
