@@ -13896,6 +13896,7 @@ hu:
   load_bank: 
     error_loading_banks: "Hiba lépett fel a bankok betöltése közben"
     loading_banks: "Bankok betöltése..."
+  load_in_a_new_tab_829731ab: "Betöltés új lapon"
   load_more_35d33c7: "Továbbiak betöltése"
   load_more_a36f9cf9: "Továbbiak betöltése"
   load_more_results_460f49a9: "További eredmények betöltése"
@@ -16542,6 +16543,7 @@ hu:
   move_group_3dd7f76e: "Csoport áthelyezése"
   move_group_77ae285d: "Csoport áthelyezése..."
   move_grouptitle_20927676: "\"%{groupTitle} áthelyezése\""
+  move_item_e94a8103: "Elem áthelyezése"
   move_item_failed_8e4c1db6: "Elem áthelyezése sikertelen"
   move_module_346b8112: "Modul áthelyezése..."
   move_module_90e6927e: "Modul áthelyezése"
