@@ -22,7 +22,7 @@
 # return an array of hashes containing +url+, +icon_class+, and +text+
 module CustomSidebarLinksHelper
   # LTI tools we will insert custom links for
-  TOOL_IDS = [ContextExternalTool::ANALYTICS_2].freeze
+  TOOL_IDS = [ContextExternalTool::ANALYTICS_2, ContextExternalTool::ADMIN_ANALYTICS].freeze
 
   # add a link to the account page sidebar
   # @account is the account

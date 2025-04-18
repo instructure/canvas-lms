@@ -119,7 +119,6 @@ class ContextExternalTool < ActiveRecord::Base
   QUIZ_LTI = "Quizzes 2"
   ANALYTICS_2 = "fd75124a-140e-470f-944c-114d2d93bb40"
   ADMIN_ANALYTICS = "admin-analytics"
-  TOOL_FEATURE_MAPPING = { ANALYTICS_2 => :analytics_2, ADMIN_ANALYTICS => :admin_analytics }.freeze
   PREFERRED_LTI_VERSION = "1_3"
 
   workflow do
@@ -1159,8 +1158,19 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def feature_flag_enabled?(context = nil)
-    feature = TOOL_FEATURE_MAPPING[tool_id]
-    !feature || (context || self.context).feature_enabled?(feature)
+    context ||= self.context
+
+    if tool_id == ANALYTICS_2
+      context.feature_enabled?(:analytics_2) && !context.feature_enabled?(:analytics_2_lti_13_enabled)
+    elsif tool_id == ADMIN_ANALYTICS
+      if context.is_a?(Course) && context.feature_enabled?(:analytics_2_lti_13_enabled)
+        true
+      else
+        context.feature_enabled?(:admin_analytics)
+      end
+    else
+      true
+    end
   end
 
   # Add new types to this as we finish their migration methods
