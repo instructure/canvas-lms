@@ -194,7 +194,6 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         {/* BlueprintLockIcon */}
         {(isMasterCourse || isChildCourse) && (
           <BlueprintLockIcon
-            isChildCourse={isChildCourse}
             initialLockState={content?.isLockedByMasterCourse || false}
             contentId={content?._id}
             contentType={content?.type?.toLowerCase() || ''}

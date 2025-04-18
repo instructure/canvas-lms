@@ -19,23 +19,14 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import BlueprintLockIcon, {LOCK_ICON_CLASS} from '../BlueprintLockIcon'
-import {ContextModuleProvider} from '../../hooks/useModuleContext'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 
 const setUpMasterCourse = (initialLockState: boolean = false) => {
   return render(
     <ContextModuleProvider
-      courseId="1"
-      isMasterCourse={true}
-      isChildCourse={false}
-      permissions={{
-        canEdit: true,
-        canDelete: true,
-        canAdd: true,
-        canDirectShare: true,
-      }}
+      {...contextModuleDefaultProps} isMasterCourse={true}
     >
       <BlueprintLockIcon
-        isChildCourse={false}
         initialLockState={initialLockState}
         contentId=""
         contentType=""
@@ -47,13 +38,9 @@ const setUpMasterCourse = (initialLockState: boolean = false) => {
 const setUpChildCourse = (initialLockState: boolean = false) => {
   return render(
     <ContextModuleProvider
-      courseId="1"
-      isMasterCourse={false}
-      isChildCourse={true}
-      permissions={{canEdit: true, canDelete: true, canAdd: true, canDirectShare: true}}
+      {...contextModuleDefaultProps} isChildCourse={true}
     >
       <BlueprintLockIcon
-        isChildCourse={true}
         initialLockState={initialLockState}
         contentId=""
         contentType=""

@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
-import {ContextModuleProvider} from '../../hooks/useModuleContext'
+import {render} from '@testing-library/react'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemTitle from '../ModuleItemTitle'
 
 const setUp = (
@@ -28,10 +28,7 @@ const setUp = (
 ) => {
   return render(
     <ContextModuleProvider
-      courseId="1"
-      isMasterCourse={true}
-      isChildCourse={false}
-      permissions={{canEdit: true, canDelete: true, canAdd: true, canDirectShare: true}}
+      {...contextModuleDefaultProps}
     >
       <ModuleItemTitle
         content={{type, title, isLockedByMasterCourse: false, newTab}}

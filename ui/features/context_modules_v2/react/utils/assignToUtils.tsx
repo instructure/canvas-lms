@@ -77,7 +77,6 @@ export const renderItemAssignToManager = (
   if ((container as any).reactRoot) {
     ;(container as any).reactRoot.unmount()
   }
-
   ;(container as any).reactRoot = createRoot(container)
   ;(container as any).reactRoot.render(
     <ItemAssignToManager

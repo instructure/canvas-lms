@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createContext} from 'react'
+import React from 'react'
 import {createRoot} from 'react-dom/client'
 import ModulesContainer from './react/ModulesContainer'
 import ModulesStudentContainer from './react/ModulesStudentContainer'
@@ -59,6 +59,10 @@ ready(() => {
             isChildCourse={ENV.MASTER_COURSE_SETTINGS?.IS_CHILD_COURSE ?? false}
             // @ts-expect-error
             permissions={ENV.MODULES_PERMISSIONS}
+            // @ts-expect-error
+            NEW_QUIZZES_BY_DEFAULT={ENV.NEW_QUIZZES_BY_DEFAULT}
+            // @ts-expect-error
+            DEFAULT_POST_TO_SIS={ENV.DEFAULT_POST_TO_SIS}
           >
             {ENV.current_user_is_student ? <ModulesStudentContainer /> : <ModulesContainer />}
           </ContextModuleProvider>

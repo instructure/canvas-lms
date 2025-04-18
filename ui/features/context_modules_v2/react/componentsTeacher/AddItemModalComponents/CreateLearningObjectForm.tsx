@@ -33,7 +33,7 @@ const I18n = createI18nScope('context_modules_v2')
 interface CreateLearningObjectFormProps {
   itemType: string
   onChange: (field: string, value: any) => void
-  assignmentGroups?: {id: string; name: string}[]
+  assignmentGroups?: {id: string; name: string; _id: string}[]
   folders?: {id: string; name: string}[]
 }
 
@@ -91,7 +91,7 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
           placeholder="Select assignment group"
         >
           {assignmentGroups.map(group => (
-            <SimpleSelect.Option id={group.id} key={group.id} value={group.id}>
+            <SimpleSelect.Option id={group._id} key={group._id} value={group._id}>
               {group.name}
             </SimpleSelect.Option>
           ))}

@@ -18,16 +18,13 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import {ContextModuleProvider} from '../../hooks/useModuleContext'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemActionMenu from '../ModuleItemActionMenu'
 
 const setUp = (itemType: string = 'Assignment') => {
   return render(
     <ContextModuleProvider
-      courseId="1"
-      isMasterCourse={true}
-      isChildCourse={false}
-      permissions={{canEdit: true, canDelete: true, canAdd: true, canDirectShare: true}}
+      {...contextModuleDefaultProps}
     >
       <ModuleItemActionMenu
         itemType={itemType}
