@@ -199,3 +199,15 @@ visibility_performance_improvements:
       state: allowed_on
     development:
       state: allowed_on
+
+deprecate_uuid_in_files_api:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Remove UUID from the response of the files API
+  description: This will remove the UUID from the response of the files API. This is an internal only field, and not sending it over the wire will be a network optimization.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
