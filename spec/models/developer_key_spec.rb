@@ -157,8 +157,8 @@ describe DeveloperKey do
 
         it { is_expected.to be false }
 
-        context "and the key is an internal service" do
-          let(:key_attributes) { { service_user:, account: nil, internal_service: true } }
+        context "and the key allows service user client credentials" do
+          let(:key_attributes) { { service_user:, account: nil, authorized_flows: ["service_user_client_credentials"] } }
 
           it { is_expected.to be true }
         end
@@ -1504,6 +1504,31 @@ describe DeveloperKey do
 
       expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to be true
       expect(developer_key_not_saved.redirect_domain_matches?("intents://www.example.com/a/b")).to be false
+    end
+  end
+
+  describe "authorized_flows" do
+    it "defaults to []" do
+      key = DeveloperKey.create!(name: "Test", email: "test@test.com", redirect_uri: "http://test.com", account_id: account.id)
+      expect(key.authorized_flows).to eq([])
+    end
+
+    it "allows only allowed authorized flows" do
+      key = DeveloperKey.new(name: "Test", email: "test@test.com", redirect_uri: "http://test.com", account_id: account.id, authorized_flows: ["service_user_client_credentials"])
+      key.validate
+      expect(key.errors[:authorized_flows]).to be_empty
+    end
+
+    it "rejects invalid authorized flows" do
+      key = DeveloperKey.new(name: "Test", email: "test@test.com", redirect_uri: "http://test.com", account_id: account.id, authorized_flows: ["foo", "service_user_client_credentials"])
+      key.validate
+      expect(key.errors[:authorized_flows].join).to match(/contains invalid values: foo/)
+    end
+
+    it "rejects duplicate authorized flows" do
+      key = DeveloperKey.new(name: "Test", email: "test@test.com", redirect_uri: "http://test.com", account_id: account.id, authorized_flows: ["service_user_client_credentials", "service_user_client_credentials"])
+      key.validate
+      expect(key.errors[:authorized_flows].join).to match(/contains duplicate values/)
     end
   end
 
