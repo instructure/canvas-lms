@@ -232,7 +232,6 @@ describe "Files API", type: :request do
         @attachment.reload
         expect(json).to eq({
                              "id" => @attachment.id,
-                             "uuid" => @attachment.uuid,
                              "folder_id" => @attachment.folder_id,
                              "url" => file_download_url(@attachment, verifier: (@attachment.uuid unless disable_adding_uuid_verifier_in_api), download: "1", download_frd: "1"),
                              "content-type" => "text/plain",
@@ -274,7 +273,6 @@ describe "Files API", type: :request do
         file_download_url(@attachment, verifier: @attachment.uuid, download: "1", download_frd: "1")
         expect(json).to eq({
                              "id" => @attachment.id,
-                             "uuid" => @attachment.uuid,
                              "folder_id" => @attachment.folder_id,
                              "url" => file_download_url(@attachment, verifier: (@attachment.uuid unless disable_adding_uuid_verifier_in_api), download: "1", download_frd: "1"),
                              "content-type" => "text/plain",
@@ -1109,7 +1107,6 @@ describe "Files API", type: :request do
     def attachment_json
       {
         "id" => @att.id,
-        "uuid" => @att.uuid,
         "folder_id" => @att.folder_id,
         "url" => file_download_url(@att, verifier: @att.uuid, download: "1", download_frd: "1"),
         "content-type" => "image/png",

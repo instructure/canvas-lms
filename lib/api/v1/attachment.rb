@@ -48,7 +48,10 @@ module Api::V1::Attachment
   end
 
   def attachment_json(attachment, user, url_options = {}, options = {})
-    hash = attachment.slice("id", "uuid", "folder_id", "display_name", "filename")
+    hash = attachment.slice("id", "folder_id", "display_name", "filename")
+
+    hash["uuid"] = attachment.uuid unless Account.site_admin.feature_enabled?(:deprecate_uuid_in_files_api)
+
     hash["upload_status"] = AttachmentUploadStatus.upload_status(attachment)
 
     if options[:can_view_hidden_files] && options[:context] && options[:include]&.include?("blueprint_course_status") && !options[:master_course_status]

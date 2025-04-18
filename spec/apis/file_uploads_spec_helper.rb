@@ -43,7 +43,6 @@ shared_examples_for "file uploads api" do
   def attachment_json(attachment, options = {})
     json = {
       "id" => attachment.id,
-      "uuid" => attachment.uuid,
       "folder_id" => attachment.folder_id,
       "url" => file_download_url(attachment, verifier: attachment.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api) ? nil : attachment.uuid, download: "1", download_frd: "1"),
       "content-type" => attachment.content_type,
@@ -120,7 +119,6 @@ shared_examples_for "file uploads api" do
         json = json_parse(response.body)
         expected_json = {
           "id" => attachment.id,
-          "uuid" => attachment.uuid,
           "folder_id" => attachment.folder_id,
           "url" => file_download_url(attachment, verifier: (attachment.uuid unless disable_adding_uuid_verifier_in_api), download: "1", download_frd: "1"),
           "content-type" => attachment.content_type,

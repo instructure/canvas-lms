@@ -22,6 +22,8 @@
 # An API for managing files and folders
 # See the File Upload Documentation for details on the file upload workflow.
 #
+# @deprecated_response_field uuid NOTICE 2025-05-07 EFFECTIVE 2025-08-05
+#
 # @model File
 #     {
 #       "id": "File",
