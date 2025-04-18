@@ -73,6 +73,7 @@ import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
+import {LtiAssetReports, joinAttachmentsAndReports} from '../react/LtiAssetReports'
 import useStore from '../stores/index'
 import type {
   Attachment,
@@ -177,6 +178,7 @@ declare const ENV: GlobalEnv & EnvGradebookSpeedGrader
 const I18n = createI18nScope('speed_grader')
 
 const selectors = new JQuerySelectorCache()
+const SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT = 'speed_grader_lti_asset_reports_mount_point'
 const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point'
 const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT =
   'speed_grader_submission_comments_download_mount_point'
@@ -867,6 +869,30 @@ function renderHiddenSubmissionPill(submission: Submission) {
       </Pill>,
       mountPoint,
     )
+  } else {
+    ReactDOM.unmountComponentAtNode(mountPoint)
+  }
+}
+
+function renderLtiAssetReports(
+  submission: Submission,
+  historicalSubmission: HistoricalSubmission,
+  jsonData: SpeedGraderResponse,
+) {
+  if (!ENV.FEATURES?.lti_asset_processor) return
+  if (!jsonData.lti_asset_processors) return
+
+  const mountPoint = document.getElementById(SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT)
+  if (!mountPoint) throw new Error('LTI Asset Reports mount point not found')
+
+  const attachmentsAndReports = joinAttachmentsAndReports(
+    historicalSubmission?.versioned_attachments,
+    submission.lti_asset_reports?.by_attachment,
+  )
+
+  if (attachmentsAndReports) {
+    const props = {attachmentsAndReports, assetProcessors: jsonData.lti_asset_processors}
+    ReactDOM.render(<LtiAssetReports {...props} />, mountPoint)
   } else {
     ReactDOM.unmountComponentAtNode(mountPoint)
   }
@@ -2503,6 +2529,8 @@ EG = {
         submissionHistory[currentSelectedIndex].submission ||
         submissionHistory[currentSelectedIndex]
     }
+
+    renderLtiAssetReports(submissionHolder, submission, window.jsonData)
 
     const turnitinEnabled =
       submission.turnitin_data && typeof submission.turnitin_data.provider === 'undefined'
