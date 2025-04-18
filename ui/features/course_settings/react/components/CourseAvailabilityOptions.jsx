@@ -17,7 +17,6 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import * as tz from '@instructure/moment-utils'
 import {isMidnight} from '@instructure/moment-utils'
 import moment from 'moment'
 import React, {useState} from 'react'
@@ -30,12 +29,14 @@ import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
 import {IconWarningSolid} from '@instructure/ui-icons'
-import {changeTimezone} from '@instructure/moment-utils/changeTimezone'
 import {View} from '@instructure/ui-view'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 const I18n = createI18nScope('CourseAvailabilityOptions')
 
 export default function CourseAvailabilityOptions({canManage, viewPastLocked, viewFutureLocked}) {
+  const formatDateLocal = useDateTimeFormat('date.formats.full', ENV.TIMEZONE)
+  const formatDateCourse = useDateTimeFormat('date.formats.full', ENV.CONTEXT_TIMEZONE)
   const FORM_IDS = {
     RESTRICT_ENROLLMENTS: 'course_restrict_enrollments_to_course_dates',
     START_DATE: 'course_start_at',
@@ -49,6 +50,9 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
       window.ENV.STUDENTS_ENROLLMENT_DATES?.start_at || window.ENV.DEFAULT_TERM_DATES?.start_at,
     END_DATE: window.ENV.STUDENTS_ENROLLMENT_DATES?.end_at || window.ENV.DEFAULT_TERM_DATES?.end_at,
   }
+
+  const localDate = date => `${I18n.t('Local')}: ${formatDateLocal(date)}`
+  const courseDate = date => `${I18n.t('Course')}: ${formatDateCourse(date)}`
 
   const setFormValue = (id, value) => {
     const field = document.getElementById(id)
@@ -77,14 +81,6 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
 
   const datesInteraction = () =>
     canManage && selectedApplicabilityValue === 'course' ? 'enabled' : 'disabled'
-
-  const formatDate = date => tz.format(date, 'date.formats.full')
-
-  const parseDate = (date, originTZ) => {
-    const dateObj = new Date(date)
-    const parsedDate = changeTimezone(dateObj, {originTZ, desiredTZ: ENV.TIMEZONE})
-    return formatDate(parsedDate)
-  }
 
   const participationExplanationText = () => {
     return selectedApplicabilityValue === 'term'
@@ -139,7 +135,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
           isInline={true}
           width="350px"
           value={selectedApplicabilityValue}
-          onChange={(e, {value}) => {
+          onChange={(_e, {value}) => {
             if (value !== 'course') {
               // Discard course dates, if they are removed from the Date inputs when Participation is different to course,
               // in order to avoid saving these changes if they are not on the screen at the moment of submitting the form
@@ -177,7 +173,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
               <ScreenReaderContent>{I18n.t('Course Start Date')}</ScreenReaderContent>
               <CanvasDateInput
                 renderLabel={I18n.t('Start')}
-                formatDate={formatDate}
+                formatDate={formatDateLocal}
                 interaction={datesInteraction()}
                 width="16rem"
                 selectedDate={startDateInputValue}
@@ -190,16 +186,14 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
               {startDateInputValue && (
                 <>
                   <View as="div" margin="x-small none xx-small small">
-                    <Text size="x-small" weight="light">{`${I18n.t('Local')}: ${parseDate(
-                      startDateInputValue,
-                      ENV.TIMEZONE,
-                    )}`}</Text>
+                    <Text size="x-small" weight="light">
+                      {localDate(startDateInputValue)}
+                    </Text>
                   </View>
                   <View as="div" margin="none none none small">
-                    <Text size="x-small" weight="light">{`${I18n.t('Course')}: ${parseDate(
-                      startDateInputValue,
-                      ENV.CONTEXT_TIMEZONE,
-                    )}`}</Text>
+                    <Text size="x-small" weight="light">
+                      {courseDate(startDateInputValue)}
+                    </Text>
                   </View>
                 </>
               )}
@@ -209,7 +203,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
               <CanvasDateInput
                 messages={endDateErrors(startDate, endDate)}
                 renderLabel={I18n.t('End')}
-                formatDate={formatDate}
+                formatDate={formatDateLocal}
                 interaction={datesInteraction()}
                 width="16rem"
                 selectedDate={endDateInputValue}
@@ -222,16 +216,14 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
               {endDateInputValue && (
                 <>
                   <View as="div" margin="x-small none xx-small small">
-                    <Text size="x-small" weight="light">{`${I18n.t('Local')}: ${parseDate(
-                      endDateInputValue,
-                      ENV.TIMEZONE,
-                    )}`}</Text>
+                    <Text size="x-small" weight="light">
+                      {localDate(endDateInputValue)}
+                    </Text>
                   </View>
                   <View as="div" margin="none none xx-small small">
-                    <Text size="x-small" weight="light">{`${I18n.t('Course')}: ${parseDate(
-                      endDateInputValue,
-                      ENV.CONTEXT_TIMEZONE,
-                    )}`}</Text>
+                    <Text size="x-small" weight="light">
+                      {courseDate(endDateInputValue)}
+                    </Text>
                   </View>
                 </>
               )}
