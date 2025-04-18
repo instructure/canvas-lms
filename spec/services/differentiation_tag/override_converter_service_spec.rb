@@ -32,7 +32,6 @@ describe DifferentiationTag::OverrideConverterService do
 
     def enable_differentiation_tags_for_context
       @course.account.enable_feature!(:assign_to_differentiation_tags)
-      @course.account.enable_feature!(:differentiation_tags)
       @course.account.settings[:allow_assignment_to_differentiation_tags] = { value: true }
       @course.account.save!
     end
