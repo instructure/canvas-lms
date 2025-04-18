@@ -89,6 +89,10 @@ module ModulesIndexPage
     "#no_context_modules_message"
   end
 
+  def pagination_selector(module_id)
+    "[data-testid='module-#{module_id}-pagination']"
+  end
+
   def pill_message_selector(module_id)
     "#context_module_#{module_id} .requirements_message li"
   end
@@ -226,6 +230,10 @@ module ModulesIndexPage
     f(no_context_modules_message_selector)
   end
 
+  def pagination(module_id)
+    f(pagination_selector(module_id))
+  end
+
   def pill_message(module_id)
     f(pill_message_selector(module_id))
   end
@@ -309,6 +317,28 @@ module ModulesIndexPage
     wait_for_ajax_requests
   end
 
+  def big_course_setup
+    course_modules = create_modules(3)
+    course_assignments = create_assignments([@course.id], 30)
+
+    9.times do |i|
+      course_modules[0].add_item({ type: "Assignment", id: course_assignments[i + 21] }, nil, position: i + 1)
+      course_modules[0].save!
+    end
+
+    10.times do |i|
+      course_modules[1].add_item({ type: "Assignment", id: course_assignments[i] }, nil, position: i + 1)
+      course_modules[1].save!
+    end
+
+    11.times do |i|
+      course_modules[2].add_item({ type: "Assignment", id: course_assignments[i + 10] }, nil, position: i + 1)
+      course_modules[2].save!
+    end
+
+    course_modules
+  end
+
   def click_delete_card_button(button_number)
     delete_card_button[button_number].click
   end
@@ -347,6 +377,10 @@ module ModulesIndexPage
 
   def copy_to_tray_exists?
     element_exists?(module_item_copy_to_tray_selector)
+  end
+
+  def pagination_exists?(module_id)
+    element_exists?(pagination_selector(module_id))
   end
 
   def module_content_style(module_id)
