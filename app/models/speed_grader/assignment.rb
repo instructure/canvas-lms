@@ -307,6 +307,8 @@ module SpeedGrader
             )
             .merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
 
+          ::SpeedGrader::AssetProcessor.merge_mock_lti_asset_reports_data!(assignment:, submission_hash: json)
+
           if provisional_grader_or_moderator?
             provisional_grade =
               sub.provisional_grade(current_user, preloaded_grades: preloaded_provisional_grades)
@@ -492,6 +494,9 @@ module SpeedGrader
 
       res[:GROUP_GRADING_MODE] = assignment.grade_as_group?
       res[:quiz_lti] = assignment.quiz_lti?
+
+      ::SpeedGrader::AssetProcessor.merge_mock_lti_asset_processor_data!(assignment:, response_hash: res)
+
       StringifyIds.recursively_stringify_ids(res)
     ensure
       Attachment.skip_thumbnails = nil
