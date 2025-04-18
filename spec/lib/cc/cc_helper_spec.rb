@@ -345,6 +345,16 @@ describe CC::CCHelper do
         translated = @exporter.html_content(question_text)
         expect(translated).to eq "<p><img src=\"http://localhost/assessment_questions/0/files/#{@attachment.id}\" loading=\"lazy\"></p>"
       end
+
+      it "will ignore links if the file is locked for the exporting user" do
+        student_in_course(active_all: true, course: @course)
+        @course.offer!
+        attachment_model(uploaded_data: stub_png_data, context: @course, unlock_at: 1.year.from_now)
+        question_text = "<p><img src=\"/assessment_questions/0/files/#{@attachment.id}\"/></p>"
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @student, for_course_copy: false)
+        translated = @exporter.html_content(question_text)
+        expect(translated).not_to include "$IMS-CC-FILEBASE$"
+      end
     end
 
     context "assessment_question file links" do

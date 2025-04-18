@@ -308,7 +308,7 @@ module UserContent
       return false if user.blank? && content.respond_to?(:locked?) && content.locked?
       return true unless user
 
-      return content.grants_right?(user, :read) if content.is_a?(Attachment) && content.context != context
+      return content.grants_right?(user, :download) if content.is_a?(Attachment) && content.context != context
 
       # if user given, check that the user is allowed to manage all
       # context content, or read that specific item (and it's not locked)
