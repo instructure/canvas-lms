@@ -19241,7 +19241,7 @@ ga:
   publish_5211dca3: Foilsigh
   publish_aa888e3c: "Foilsigh:"
   publish_all_3860b220: "Foilsigh Gach"
-  publish_all_modules_and_items_8e954cb3: "Foilsigh gach modúil agus míreanna"
+  publish_all_modules_and_items_8e954cb3: "Foilsigh na modúil agus na míreanna uile"
   publish_announcement_fec6d7e2: "Foilsigh fógra"
   publish_at_3fd340d1: "Foilsigh Ag"
   publish_btn_module: 
@@ -19255,7 +19255,7 @@ ga:
   publish_final_grade_for_the_student_when_this_modu_f3b521ab: "Foilsigh an marc deiridh don mhac léinn nuair a bheidh an modúl seo críochnaithe"
   publish_module_and_all_items_d263682e: "Foilsigh an modúl agus na míreanna go léir"
   publish_module_only_bb43f612: "Foilsigh an modúl amháin"
-  publish_modules_only_c638f88: "Foilsigh modúil amháin"
+  publish_modules_only_c638f88: "Foilsigh na modúil amháin"
   publish_pace_cf08a09d: "Foilsigh Luas"
   publish_the_course_f2f6ef80: "Foilsigh an Cúrsa"
   publish_title_102f2d90: "Foilsigh %{title}"
@@ -25646,7 +25646,7 @@ ga:
   top_navigation_favorite_eb8ff09e: "An Rogha Nascleanúint ar Bharr"
   top_navigation_placement_78239065: "Socrúchán Nascleanúna Barr"
   topic_podcast_feed_9ab6f5ac: "Topaic: Fotha Podchraoladh"
-  topic_title_85384ce8: "Teideal an Topaice"
+  topic_title_85384ce8: "Teideal na Topaice"
   topics_to_focus_on_32de1c56: "Topaicí le díriú orthu"
   topics_to_focus_on_optional_daff2de8: "Topaicí le díriú orthu (roghnach)"
   total_71a4807: Iomlán
@@ -26086,11 +26086,11 @@ ga:
   unprovisioning_will_terminate_your_catalog_account_eaa723c7: "Cuirfidh dísholáthar deireadh le do chuntas Catalóg. Caillfear na sonraí go léir sa Chatalóg lena n-áirítear liostaí, rolluithe agus sonraí mac léinn agus ní bheidh siad in-aisghabhála."
   unprovisioning_your_catalog_account_7780ee2b: "Do Chuntas Catalóg a dhísholáthar"
   unpublish_9f2d730b: Dífhoilsiú
-  unpublish_all_modules_and_items_ba0291f4: "Dífhoilsigh na modúil agus na míreanna go léir"
+  unpublish_all_modules_and_items_ba0291f4: "Dífhoilsigh na modúil agus na míreanna uile"
   unpublish_and_save_af140caa: "Dífhoilsigh agus Sábháil"
   unpublish_module_and_all_items_e6dd35e5: "Dífhoilsigh an modúl agus na míreanna go léir"
   unpublish_module_only_1987d840: "Dífhoilsigh an modúl"
-  unpublish_modules_only_934a9ab: "Dífhoilsigh na modúil"
+  unpublish_modules_only_934a9ab: "Dífhoilsigh na modúil amháin"
   unpublish_progress_503dfcfa: "Dífhoilsigh Dul Chun Cinn"
   unpublish_title_26ae9667: "Dífhoilsigh %{title}"
   unpublished_8b6107d6: Neamhfhoilsithe
