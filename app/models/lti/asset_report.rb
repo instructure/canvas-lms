@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# A report created by an Lti::AssetProcessor, under the 1EdTech Asset
+# Processor spec.
 class Lti::AssetReport < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
@@ -92,7 +94,6 @@ class Lti::AssetReport < ApplicationRecord
 
   validate :validate_extensions
   validate :validate_asset_compatible_with_processor
-  before_save :set_default_processing_progress_if_unrecognized
 
   def validate_asset_compatible_with_processor
     unless asset&.compatible_with_processor?(asset_processor)
@@ -114,10 +115,5 @@ class Lti::AssetReport < ApplicationRecord
     if bad_extensions.present?
       errors.add(:extensions, "unrecognized fields #{bad_extensions.to_json} -- extensions property keys must be namespaced (URIs)")
     end
-  end
-
-  def set_default_processing_progress_if_unrecognized
-    # Per spec.
-    self.processing_progress = PROGRESS_NOT_READY unless PROGRESSES.include?(processing_progress)
   end
 end

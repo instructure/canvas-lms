@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.describe Lti::AssetReport, type: :model do
+RSpec.describe Lti::AssetReport do
   describe "validations" do
     subject { lti_asset_report_model }
 
@@ -96,10 +96,6 @@ RSpec.describe Lti::AssetReport, type: :model do
       attrs = ar.slice("asset_processor", "asset", "report_type")
       ar.update!(workflow_state: "deleted")
       expect(lti_asset_report_model(attrs)).to be_valid
-    end
-
-    it "sets the default processing progress if the given progress is not recognized" do
-      expect(lti_asset_report_model(processing_progress: "Unrecognized")).to have_attributes(processing_progress: "NotReady")
     end
   end
 

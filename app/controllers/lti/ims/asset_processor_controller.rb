@@ -97,9 +97,10 @@ module Lti::IMS
     #   use the value 0.
     #
     # @argument processingProgress [String]
-    #   Indicates the status of the report. Must be one of the following:
+    #   Indicates the status of the report. Should be one of the following:
     #   Processed, Processing, PendingManual, Failed, NotProcessed, NotReady.
-    #   If an unrecognized value is given, Canvas will assume `NotReady`.
+    #   If an unrecognized value is given, the value will be stored, but will
+    #   be treated by Canvas as `NotReady`.
     #
     # @argument scoreGiven [Optional, Float]
     #   The report's score. Must be greater or equal to zero. Required
