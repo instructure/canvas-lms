@@ -26,7 +26,6 @@ const I18n = createI18nScope('context_modules_v2')
 
 // Types for props
 interface ExternalItemFormProps {
-  itemType: string
   onChange: (field: string, value: any) => void
   externalUrlValue?: string
   externalUrlName?: string
@@ -34,7 +33,6 @@ interface ExternalItemFormProps {
 }
 
 export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
-  itemType,
   onChange,
   externalUrlValue = '',
   externalUrlName = '',

@@ -23,6 +23,8 @@ const ContextModule = createContext<{
   isMasterCourse: boolean
   isChildCourse: boolean
   permissions: Record<string, boolean>
+  NEW_QUIZZES_BY_DEFAULT: boolean
+  DEFAULT_POST_TO_SIS: boolean
   state: Record<string, any>
   setState: (state: Record<string, any>) => void
 }>(
@@ -31,6 +33,8 @@ const ContextModule = createContext<{
     isMasterCourse: boolean
     isChildCourse: boolean
     permissions: Record<string, boolean>
+    NEW_QUIZZES_BY_DEFAULT: boolean
+    DEFAULT_POST_TO_SIS: boolean
     state: Record<string, any>
     setState: (state: Record<string, any>) => void
   },
@@ -42,18 +46,31 @@ export const ContextModuleProvider = ({
   isMasterCourse,
   isChildCourse,
   permissions,
+  NEW_QUIZZES_BY_DEFAULT,
+  DEFAULT_POST_TO_SIS,
 }: {
   children: React.ReactNode
   courseId: string
   isMasterCourse: boolean
   isChildCourse: boolean
   permissions: Record<string, boolean>
+  NEW_QUIZZES_BY_DEFAULT: boolean
+  DEFAULT_POST_TO_SIS: boolean
 }) => {
   const [state, setState] = useState({})
 
   return (
     <ContextModule.Provider
-      value={{courseId, isMasterCourse, isChildCourse, permissions, state, setState}}
+      value={{
+        courseId,
+        isMasterCourse,
+        isChildCourse,
+        permissions,
+        NEW_QUIZZES_BY_DEFAULT,
+        DEFAULT_POST_TO_SIS,
+        state,
+        setState,
+      }}
     >
       {children}
     </ContextModule.Provider>
@@ -62,4 +79,21 @@ export const ContextModuleProvider = ({
 
 export function useContextModule() {
   return useContext(ContextModule)
+}
+
+export const contextModuleDefaultProps = {
+  courseId: '',
+  isMasterCourse: false,
+  isChildCourse: false,
+  permissions: {
+    canAdd: true,
+    canEdit: true,
+    canDelete: true,
+    canViewUnpublished: true,
+    canDirectShare: true
+  },
+  NEW_QUIZZES_BY_DEFAULT: false,
+  DEFAULT_POST_TO_SIS: false,
+  state: {},
+  setState: () => {},
 }

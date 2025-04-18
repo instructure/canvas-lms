@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {ContextModuleProvider} from '../../hooks/useModuleContext'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemSupplementalInfo from '../ModuleItemSupplementalInfo'
 import type {ModuleItemContent, CompletionRequirement} from '../../utils/types'
 
@@ -42,15 +42,7 @@ const setUp = (
 ) => {
   return render(
     <ContextModuleProvider
-      courseId="1"
-      isMasterCourse={true}
-      isChildCourse={false}
-      permissions={{
-        canEdit: true,
-        canDelete: true,
-        canAdd: true,
-        canDirectShare: true,
-      }}
+      {...contextModuleDefaultProps}
     >
       <ModuleItemSupplementalInfo
         content={content}

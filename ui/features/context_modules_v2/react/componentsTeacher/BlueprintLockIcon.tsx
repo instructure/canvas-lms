@@ -28,7 +28,6 @@ import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 const I18n = createI18nScope('context_modules_v2')
 
 interface BlueprintLockIconProps {
-  isChildCourse: boolean
   initialLockState: boolean
   contentId?: string
   contentType: string
@@ -37,9 +36,9 @@ interface BlueprintLockIconProps {
 export const LOCK_ICON_CLASS = {locked: 'lock-icon-locked', unlocked: 'lock-icon-unlock'}
 
 const BlueprintLockIcon: React.FC<BlueprintLockIconProps> = props => {
-  const {isChildCourse, initialLockState, contentId, contentType} = props
+  const {initialLockState, contentId, contentType} = props
 
-  const {courseId} = useContextModule()
+  const {courseId, isChildCourse} = useContextModule()
   const lockText = I18n.t('Locked. Click to unlock.')
   const unlockText = I18n.t('Unlocked. Click to lock.')
 
