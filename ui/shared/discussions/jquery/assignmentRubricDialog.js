@@ -63,6 +63,7 @@ const assignmentRubricDialog = {
         $container.attr('aria-modal', 'true')
         $container.find('.ui-dialog-titlebar-close').attr('tabindex', '0')
         $container.find('.add_rubric_link').attr('tabindex', '0')
+        $container.find('.ui-dialog-title').attr('role', 'heading').attr('aria-level', '2')
       },
       zIndex: 1000,
     })
