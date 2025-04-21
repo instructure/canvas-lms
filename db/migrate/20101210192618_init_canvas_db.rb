@@ -1895,6 +1895,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                    foreign_key: { to_table: :lti_registrations },
                    null: true
       t.string :client_type, null: false, default: "confidential"
+      t.string :allowed_audiences, array: true, default: [], null: false, limit: 4096
 
       t.replica_identity_index
     end
@@ -2752,6 +2753,18 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:assessment_id, :user_id], unique: true
     end
 
+    create_table :lti_assets do |t|
+      t.uuid :uuid, null: false, index: { unique: true }
+      t.references :attachment, null: false, foreign_key: true
+      t.references :submission, null: false, foreign_key: true
+      t.index %i[attachment_id submission_id], unique: true
+      t.string :workflow_state, limit: 255, null: false, default: "active"
+      t.timestamps
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.replica_identity_index
+    end
+
     create_table :lti_asset_processors do |t|
       t.string :url, limit: 4.kilobytes
       t.string :title, limit: 255
@@ -2768,6 +2781,36 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
 
       t.replica_identity_index
+    end
+
+    create_table :lti_asset_reports do |t|
+      t.string :report_type, null: false
+      t.timestamp :timestamp, null: false
+      t.string :title
+      t.string :comment
+      t.float :score_given
+      t.float :score_maximum
+      t.string :indication_color, limit: 255
+      t.string :indication_alt, limit: 255
+      t.string :processing_progress, null: false
+      t.string :error_code
+      t.integer :priority, null: false
+      t.jsonb :extensions, null: false, default: {}
+      t.references :lti_asset, null: false, foreign_key: true
+      t.references :lti_asset_processor, null: false, foreign_key: true
+      t.string :workflow_state, limit: 255, null: false
+      t.timestamps
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.check_constraint <<~SQL.squish, name: "score_maximum_present_if_score_given_present"
+        (score_maximum IS NOT NULL) OR (score_given IS NULL)
+      SQL
+
+      t.replica_identity_index
+      t.index %i[lti_asset_id lti_asset_processor_id report_type],
+              unique: true,
+              where: "workflow_state = 'active'",
+              name: "idx_on_lti_asset_id_lti_asset_processor_id_report_t_a649bf83c5"
     end
 
     create_table :lti_ims_registrations do |t|
@@ -2793,7 +2836,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                    null: true
       t.string :workflow_state, limit: 255, default: "active"
       t.string :unified_tool_id, limit: 255
-      t.string :registration_url, limit: 255
+      t.string :registration_url, limit: 4096
 
       t.replica_identity_index
     end
