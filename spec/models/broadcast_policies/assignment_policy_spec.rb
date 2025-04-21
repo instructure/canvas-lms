@@ -33,7 +33,7 @@ module BroadcastPolicies
              due_at: Time.zone.now,
              points_possible: 100,
              assignment_changed: false,
-             just_created: false,
+             previously_new_record?: false,
              workflow_state: "published",
              due_at_before_last_save: 7.days.ago,
              saved_change_to_points_possible?: true,
@@ -47,7 +47,7 @@ module BroadcastPolicies
 
     describe "#should_dispatch_assignment_created?" do
       before do
-        allow(assignment).to receive(:just_created).and_return true
+        allow(assignment).to receive(:previously_new_record?).and_return true
       end
 
       it "is true when an assignment is published on creation" do
@@ -55,7 +55,7 @@ module BroadcastPolicies
       end
 
       it "is true when the prior version was unpublished" do
-        allow(assignment).to receive_messages(just_created: false, workflow_state_before_last_save: "unpublished", saved_change_to_workflow_state?: true)
+        allow(assignment).to receive_messages(previously_new_record?: false, workflow_state_before_last_save: "unpublished", saved_change_to_workflow_state?: true)
         expect(policy.should_dispatch_assignment_created?).to be_truthy
       end
 
@@ -66,7 +66,7 @@ module BroadcastPolicies
 
       specify do
         wont_send_when do
-          allow(assignment).to receive_messages(just_created: false, workflow_state_before_last_save: "published", saved_change_to_workflow_state?: false)
+          allow(assignment).to receive_messages(previously_new_record?: false, workflow_state_before_last_save: "published", saved_change_to_workflow_state?: false)
         end
       end
 
@@ -100,7 +100,7 @@ module BroadcastPolicies
 
       specify { wont_send_when { allow(context).to receive(:available?).and_return false } }
       specify { wont_send_when { allow(context).to receive(:concluded?).and_return true } }
-      specify { wont_send_when { allow(assignment).to receive(:just_created).and_return true } }
+      specify { wont_send_when { allow(assignment).to receive(:previously_new_record?).and_return true } }
       specify { wont_send_when { allow(assignment).to receive(:changed_in_state).and_return false } }
       specify { wont_send_when { allow(assignment).to receive(:due_at).and_return assignment.due_at_before_last_save } }
 
@@ -131,7 +131,7 @@ module BroadcastPolicies
 
       specify { wont_send_when { allow(context).to receive(:available?).and_return false } }
       specify { wont_send_when { allow(context).to receive(:concluded?).and_return true } }
-      specify { wont_send_when { allow(assignment).to receive(:just_created).and_return true } }
+      specify { wont_send_when { allow(assignment).to receive(:previously_new_record?).and_return true } }
       specify { wont_send_when { allow(assignment).to receive(:published?).and_return false } }
       specify { wont_send_when { allow(assignment).to receive(:muted?).and_return true } }
       specify { wont_send_when { allow(assignment).to receive(:saved_change_to_points_possible?).and_return false } }

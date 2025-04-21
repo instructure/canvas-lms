@@ -524,6 +524,7 @@ class Quizzes::QuizzesController < ApplicationController
             old_assignment = nil
             if @quiz.assignment.present?
               old_assignment = @quiz.assignment.clone
+              old_assignment.instance_variable_set(:@new_record, false)
               old_assignment.id = @quiz.assignment.id
 
               @quiz.assignment.post_to_sis = params[:post_to_sis] == "1"

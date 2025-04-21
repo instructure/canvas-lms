@@ -132,14 +132,14 @@ class DiscussionEntry < ActiveRecord::Base
     p.dispatch :new_discussion_entry
     p.to { discussion_topic.subscribers - [user] - mentioned_users }
     p.whenever do |record|
-      record.just_created && record.active?
+      record.previously_new_record? && record.active?
     end
     p.data { course_broadcast_data }
 
     p.dispatch :announcement_reply
     p.to { discussion_topic.user }
     p.whenever do |record|
-      record.discussion_topic.is_announcement && record.just_created && record.active?
+      record.discussion_topic.is_announcement && record.previously_new_record? && record.active?
     end
     p.data { course_broadcast_data }
   end

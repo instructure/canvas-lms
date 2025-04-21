@@ -1104,6 +1104,7 @@ module Api::V1::Assignment
     unless assignment.new_record?
       assignment.restore_attributes
       old_assignment = assignment.clone
+      old_assignment.instance_variable_set(:@new_record, false)
       old_assignment.id = assignment.id
     end
 

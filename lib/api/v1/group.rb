@@ -101,7 +101,7 @@ module Api::V1::Group
     includes = options[:include] || []
     hash = api_json(membership, user, session, API_GROUP_MEMBERSHIP_JSON_OPTS)
     if includes.include?("just_created")
-      hash["just_created"] = membership.just_created || false
+      hash["just_created"] = membership.previously_new_record? || false
     end
     if membership.group.root_account.grants_any_right?(user, session, :read_sis, :manage_sis)
       hash["sis_group_id"] = membership.group.sis_source_id
