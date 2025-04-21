@@ -26,7 +26,7 @@ bbb_avatar:
   applies_to: RootAccount
 
 react_discussions_post:
-  state: hidden
+  state: 'on'
   beta: true
   display_name: Discussions/Announcements Redesign
   description:
@@ -37,9 +37,6 @@ react_discussions_post:
       For full details, please see the *Discussions/Announcements Redesign user group*
       in the Canvas Community
   applies_to: Course
-  environments:
-    development:
-      state: allowed_on # default to on for local development
 
 discussions_reporting:
   state: hidden

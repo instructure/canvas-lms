@@ -6122,7 +6122,7 @@ describe AssignmentsApiController, type: :request do
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                                                  "attachments" => [],
                                                  "permissions" => { "attach" => true, "update" => true, "reply" => true, "delete" => true, "manage_assign_to" => true },
-                                                 "discussion_type" => "not_threaded",
+                                                 "discussion_type" => "threaded",
                                                  "group_category_id" => nil,
                                                  "can_group" => true,
                                                  "allow_rating" => false,

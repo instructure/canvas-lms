@@ -227,6 +227,14 @@ describe('DiscussionTopicContainer', () => {
     expect(queryByTestId('delete')).toBeNull()
   })
 
+  it('renders Speed Grader button in the menu', () => {
+    const props = {discussionTopic: Discussion.mock()}
+    const {getByTestId, getByText} = setup(props)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+
+    expect(getByText('Open in SpeedGrader')).toBeTruthy()
+  })
+
   it('Should be able to open SpeedGrader', async () => {
     const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
@@ -583,6 +591,14 @@ describe('DiscussionTopicContainer', () => {
   })
 
   describe('Peer Reviews', () => {
+    it('renders Peer Reviews button in the menu', () => {
+      const props = {discussionTopic: Discussion.mock()}
+      const {getByTestId, getByText} = setup(props)
+      fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+
+      expect(getByText('Peer Reviews')).toBeTruthy()
+    })
+
     it('renders with a due date', () => {
       const props = {discussionTopic: Discussion.mock()}
       const {getByText} = setup(props)
