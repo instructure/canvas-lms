@@ -36,6 +36,23 @@ export type Product = {
   support_url: string
   tags: Tag[]
   integration_resources: IntegrationResources
+  tool_integration_configurations: {
+    lti_11?: IntegrationConfiguration[]
+    lti_13?: IntegrationConfiguration[]
+  }
+}
+
+type IntegrationConfiguration = {
+  integration_type:
+    | 'lti_13_global_inherited_key'
+    | 'lti_13_configuration'
+    | 'lti_13_url'
+    | 'lti_13_dynamic_registration'
+    | 'lti_11_configuration'
+    | 'lti_11_url'
+    | 'lti_11_legacy_backfill'
+    | 'lti_13_legacy_backfill'
+    | 'lti_2_legacy_backfill'
 }
 
 export type ToolStatus = {

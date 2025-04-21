@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {Lti} from '@canvas/lti-apps/models/Product'
+import type {Product} from '@canvas/lti-apps/models/Product'
 import {
   pickPreferredIntegration,
   type PreferredLtiIntegration,
@@ -44,17 +44,35 @@ import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 export type ConfigureButtonProps = {
   buttonWidth: 'block' | 'inline-block'
-  ltiConfiguration: Lti[]
+  product: Product
   accountId: AccountId
 }
 
 const I18n = createI18nScope('lti_registrations')
 
-export const ProductConfigureButton = ({
-  buttonWidth,
-  ltiConfiguration,
-  accountId,
-}: ConfigureButtonProps) => {
+export const findLtiVersion = (
+  toolIntegrationConfigurations: Product['tool_integration_configurations'],
+): '1p1' | '1p3' => {
+  // We want to ignore any configs whose "integration_type" is either
+  // lti_11_legacy_backfill or lti_13_legacy_backfill.
+  const lti11Configs = toolIntegrationConfigurations.lti_11?.filter(config => {
+    return !config['integration_type'].endsWith('_legacy_backfill')
+  })
+
+  const lti13Configs = toolIntegrationConfigurations.lti_13?.filter(config => {
+    return !config['integration_type'].endsWith('_legacy_backfill')
+  })
+
+  if (lti13Configs && lti13Configs.length > 0) {
+    return '1p3'
+  } else if (lti11Configs && lti11Configs.length > 0) {
+    return '1p1'
+  }
+
+  return '1p3'
+}
+
+export const ProductConfigureButton = ({buttonWidth, product, accountId}: ConfigureButtonProps) => {
   const navigate = useNavigate()
 
   const onSuccessfulInstall = React.useCallback(() => {
@@ -68,7 +86,9 @@ export const ProductConfigureButton = ({
     [navigate],
   )
 
-  const integration = ltiConfiguration ? pickPreferredIntegration(ltiConfiguration) : undefined
+  const integration = product.canvas_lti_configurations
+    ? pickPreferredIntegration(product.canvas_lti_configurations)
+    : undefined
 
   const [jsonFetchStatus, setJsonFetchStatus] = React.useState<JsonFetchStatus>({_tag: 'initial'})
 
@@ -144,7 +164,7 @@ export const ProductConfigureButton = ({
               jsonCode: '',
               unifiedToolId: undefined,
               dynamicRegistrationUrl: '',
-              lti_version: '1p3',
+              lti_version: findLtiVersion(product.tool_integration_configurations),
               method: 'manual',
               registering: false,
               exitOnCancel: false,
@@ -168,8 +188,7 @@ const buttonIsEnabled = (
 ) => {
   if (integration === undefined) {
     return true
-  }
-  else if (jsonFetchStatus._tag === 'loading') {
+  } else if (jsonFetchStatus._tag === 'loading') {
     return false
   } else if (integration?.integration_type === 'lti_13_dynamic_registration') {
     return true
