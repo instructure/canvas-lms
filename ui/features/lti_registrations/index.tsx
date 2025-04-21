@@ -52,7 +52,7 @@ import {RegistrationWizardModal} from './manage/registration_wizard/Registration
 import {route as MonitorRoute} from './monitor/route'
 import {isLtiRegistrationsUsageEnabled} from './monitor/utils'
 
-const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
+const accountId = ZAccountId.parse(window.ENV.ACCOUNT_ID)
 
 const queryClient = new QueryClient()
 
