@@ -1190,7 +1190,7 @@ describe DiscussionTopic do
         @topic.refresh_subtopics
         subtopics = @topic.reload.child_topics
         subtopics.each do |st|
-          expect(st.discussion_type).to eq "not_threaded"
+          expect(st.discussion_type).to eq "threaded"
           expect(st.attachment_id).to be_nil
         end
 
