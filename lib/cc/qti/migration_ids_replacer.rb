@@ -22,7 +22,7 @@ module CC
     class MigrationIdsReplacer
       REPLACEABLE_ATTRS = %w[identifier href ident].freeze
       REPLACEABLE_OBJECTS = %w[resource file quiz assessment].freeze
-      REPLACEABLE_CONTENT = "quiz_identifierref"
+      REPLACEABLE_CONTENTS = %w[quiz_identifierref assignment_group_identifierref].freeze
 
       def initialize(manifest, new_quizzes_migration_ids_map)
         @manifest = manifest
@@ -38,7 +38,7 @@ module CC
 
               node[attr] = replace_in_string(node[attr])
             end
-          elsif node.node_name == REPLACEABLE_CONTENT
+          elsif REPLACEABLE_CONTENTS.include?(node.node_name)
             node.content = replace(node.content)
           end
         end
@@ -65,19 +65,21 @@ module CC
 
       private
 
+      def find_and_map_to_canvas_id(entity_class, external_id)
+        return unless external_id
+
+        entity = entity_class.find_by(id: external_id)
+        return unless entity
+
+        @manifest.create_key(entity)
+      end
+
       def migration_ids_map
-        @migration_ids_map ||= @new_quizzes_migration_ids_map.filter_map do |mig_id, properties|
-          assignment_id = properties["external_assignment_id"]
-          next unless assignment_id
-
-          assignment = Assignment.find_by(id: assignment_id)
-          next unless assignment
-
-          canvas_mig_id = @manifest.create_key(assignment)
-
-          {
-            mig_id => canvas_mig_id
-          }
+        @migration_ids_map ||= @new_quizzes_migration_ids_map.filter_map do |mig_id, props|
+          canvas_id =
+            find_and_map_to_canvas_id(Assignment, props["external_assignment_id"]) ||
+            find_and_map_to_canvas_id(AssignmentGroup, props["external_assignment_group_id"])
+          { mig_id => canvas_id } if canvas_id
         end.reduce({}, :merge)
       end
     end
