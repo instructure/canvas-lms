@@ -227,6 +227,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :homeroom_course, index: { where: "homeroom_course_id IS NOT NULL" }
       t.timestamp :deleted_at, precision: 6
       t.datetime :archived_at
+      t.boolean :horizon_course, null: false, default: false
 
       t.replica_identity_index
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
@@ -322,6 +323,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :merged_into_user,
                    foreign_key: { to_table: :users },
                    index: { where: "merged_into_user_id IS NOT NULL" }
+      t.string :instructure_identity_id, limit: 255, index: { unique: true }
 
       t.replica_identity_index :root_account_ids
       t.index [:avatar_state, :avatar_image_updated_at]
@@ -719,6 +721,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :type, null: false, limit: 255, default: "Assignment"
       t.string :sub_assignment_tag, limit: 255
       t.boolean :has_sub_assignments, null: false, default: false
+      t.boolean :rubric_self_assessment_enabled, null: false, default: false
 
       t.index [:context_id, :context_type]
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
@@ -774,7 +777,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL" }
       t.references :parent_override, foreign_key: { to_table: :assignment_overrides }, index: { where: "parent_override_id IS NOT NULL" }
 
-      t.check_constraint <<~SQL.squish, name: "require_association"
+      t.check_constraint <<~SQL.squish, name: "chk_require_context"
         workflow_state='deleted' OR
         assignment_id IS NOT NULL OR
         quiz_id IS NOT NULL OR context_module_id IS NOT NULL OR
@@ -2034,6 +2037,10 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :only_visible_to_overrides, null: false, default: false
       t.boolean :summary_enabled, default: false, null: false
       t.timestamp :edited_at, precision: 6
+      t.string :sort_order, null: false, default: DiscussionTopic::SortOrder::DESC
+      t.boolean :sort_order_locked, null: false, default: false
+      t.boolean :expanded, null: false, default: false
+      t.boolean :expanded_locked, null: false, default: false
 
       t.replica_identity_index
       t.index [:context_id, :position]
@@ -2116,7 +2123,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.index %i[discussion_topic_summary_id user_id], unique: true, name: "index_feedback_on_summary_id_and_user_id"
 
-      t.check_constraint "NOT (liked AND disliked)"
+      t.check_constraint "NOT (liked AND disliked)", name: "chk_liked_disliked_disjunction"
     end
 
     create_table :enrollment_dates_overrides do |t|
@@ -2365,7 +2372,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :root_account_ids, array: true, default: [], null: false
 
       t.check_constraint "context_type IN ('Account', 'User', 'Course')",
-                         name: "feature_flags_context_type_check"
+                         name: "chk_context_type_enum"
 
       t.index %i[context_id context_type feature], unique: true, name: "index_feature_flags_on_context_and_feature"
     end
@@ -2509,6 +2516,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.replica_identity_index
       t.index [:context_id, :context_type], name: "index_group_categories_on_context"
       t.index [:root_account_id, :sis_source_id], where: "sis_source_id IS NOT NULL", unique: true
+      t.index :non_collaborative
     end
 
     create_table :groups do |t|
@@ -2541,6 +2549,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.replica_identity_index
       t.index [:context_id, :context_type]
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
+      t.index :non_collaborative
     end
 
     create_table :group_memberships do |t|
@@ -2743,6 +2752,24 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:assessment_id, :user_id], unique: true
     end
 
+    create_table :lti_asset_processors do |t|
+      t.string :url, limit: 4.kilobytes
+      t.string :title, limit: 255
+      t.string :text, limit: 255
+      t.jsonb :custom
+      t.jsonb :icon
+      t.jsonb :window
+      t.jsonb :iframe
+      t.jsonb :report
+      t.references :assignment, null: false, foreign_key: true
+      t.references :context_external_tool, null: false, foreign_key: true
+      t.string :workflow_state, limit: 255, null: false
+      t.timestamps
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.replica_identity_index
+    end
+
     create_table :lti_ims_registrations do |t|
       t.jsonb :lti_tool_configuration, null: false
       t.references :developer_key, null: false, foreign_key: true
@@ -2829,6 +2856,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
       t.references :context_external_tool, null: false, foreign_key: true
       t.timestamps
+      t.integer :max_batch_size
 
       t.replica_identity_index
       t.index %i[account_id context_external_tool_id], name: "idx_on_account_id_context_external_tool_id_6c0590594f"
@@ -3758,7 +3786,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       # login_attribute can only be set if authentication_provider_id is set
       # conversely, if authentication_provider_id IS NULL, login_attribute MUST be NULL
-      t.check_constraint <<~SQL.squish, name: "check_login_attribute_authentication_provider_id"
+      t.check_constraint <<~SQL.squish, name: "chk_login_attribute_authentication_provider_id"
         authentication_provider_id IS NOT NULL OR login_attribute IS NULL
       SQL
 
@@ -4045,8 +4073,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :button_display, default: "numeric", null: false
       t.references :rubric_imports, foreign_key: true
 
-      t.check_constraint "rating_order IN ('descending', 'ascending')", name: "check_rating_order"
-      t.check_constraint "button_display IN ('numeric', 'emoji', 'letter')", name: "check_button_display"
+      t.check_constraint "rating_order IN ('descending', 'ascending')", name: "chk_rating_order_enum"
+      t.check_constraint "button_display IN ('numeric', 'emoji', 'letter')", name: "chk_button_display_enum"
 
       t.index [:context_id, :context_type]
     end
@@ -4140,7 +4168,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :account, foreign_key: true, index: { where: "account_id IS NOT NULL" }
       t.references :course, foreign_key: true, index: { where: "course_id IS NOT NULL" }
 
-      t.check_constraint <<~SQL.squish, name: "require_context"
+      t.check_constraint <<~SQL.squish, name: "chk_require_association"
         (account_id IS NOT NULL OR
         course_id IS NOT NULL) AND NOT
         (account_id IS NOT NULL AND course_id IS NOT NULL)
@@ -4359,6 +4387,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :proxy_submitter, foreign_key: { to_table: :users }
       t.references :custom_grade_status, foreign_key: true, index: { where: "custom_grade_status_id IS NOT NULL" }
       t.string :sticker, limit: 255
+      t.integer :body_word_count
 
       t.index [:assignment_id, :submission_type]
       t.index [:user_id, :assignment_id], unique: true
