@@ -24,7 +24,13 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_v2')
 
-const CompletionRequirementInfo = ({type, minScore, minPercentage, completed, fulfillmentStatus}: CompletionRequirement) => {
+const CompletionRequirementInfo = ({
+  type,
+  minScore,
+  minPercentage,
+  completed,
+  fulfillmentStatus,
+}: CompletionRequirement) => {
   switch (type) {
     case 'min_score':
       return (
@@ -35,8 +41,12 @@ const CompletionRequirementInfo = ({type, minScore, minPercentage, completed, fu
               : I18n.t('Score at least %{score}', {score: minScore?.toFixed(1)})}
             <ScreenReaderContent>
               {completed
-                ? I18n.t('Module item has been completed by scoring at least %{score}', {score: minScore?.toFixed(1)})
-                : I18n.t('Must score at least %{score} to complete this module item', {score: minScore?.toFixed(1)})}
+                ? I18n.t('Module item has been completed by scoring at least %{score}', {
+                    score: minScore?.toFixed(1),
+                  })
+                : I18n.t('Must score at least %{score} to complete this module item', {
+                    score: minScore?.toFixed(1),
+                  })}
             </ScreenReaderContent>
           </Text>
         </Flex.Item>
@@ -50,8 +60,12 @@ const CompletionRequirementInfo = ({type, minScore, minPercentage, completed, fu
               : I18n.t('Score at least %{score}%', {score: minPercentage})}
             <ScreenReaderContent>
               {completed
-                ? I18n.t('Module item has been completed by scoring at least %{score}%', {score: minPercentage})
-                : I18n.t('Must score at least %{score}% to complete this module item', {score: minPercentage})}
+                ? I18n.t('Module item has been completed by scoring at least %{score}%', {
+                    score: minPercentage,
+                  })
+                : I18n.t('Must score at least %{score}% to complete this module item', {
+                    score: minPercentage,
+                  })}
             </ScreenReaderContent>
           </Text>
         </Flex.Item>

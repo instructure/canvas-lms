@@ -16,140 +16,140 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ModuleItem, Module } from '../../utils/types'
+import {ModuleItem, Module} from '../../utils/types'
 
 export const defaultModuleItems: ModuleItem[] = [
-    {
-      _id: '0',
-      id: '',
-      url: '',
-      indent: 0,
-      content: null
-    },
-    {
-      _id: '1',
-      id: '',
-      url: '',
-      indent: 0,
-      content: null
-    },
-    {
-      _id: '2',
-      id: '',
-      url: '',
-      indent: 0,
-      content: null
-    },
-    {
-      _id: '3',
-      id: '',
-      url: '',
-      indent: 0,
-      content: null
-    },
-    {
-      _id: '4',
-      id: '',
-      url: '',
-      indent: 0,
-      content: null
-    },
-    {
-      _id: '5',
-      id: '',
-      url: '',
-      indent: 0,
-      content: null
-    },
-    {
-      _id: '6',
-      id: '',
-      url: '',
-      indent: 0,
-      content: null
-    },
-    {
-      _id: '7',
-      id: '',
-      url: '',
-      indent: 0,
-      content: null
-    },
-    {
-      _id: '8',
-      id: '',
-      url: '',
-      indent: 0,
-      content: null
-    },
-    {
-      _id: '9',
-      id: '',
-      url: '',
-      indent: 0,
-      content: null
-    }
+  {
+    _id: '0',
+    id: '',
+    url: '',
+    indent: 0,
+    content: null,
+  },
+  {
+    _id: '1',
+    id: '',
+    url: '',
+    indent: 0,
+    content: null,
+  },
+  {
+    _id: '2',
+    id: '',
+    url: '',
+    indent: 0,
+    content: null,
+  },
+  {
+    _id: '3',
+    id: '',
+    url: '',
+    indent: 0,
+    content: null,
+  },
+  {
+    _id: '4',
+    id: '',
+    url: '',
+    indent: 0,
+    content: null,
+  },
+  {
+    _id: '5',
+    id: '',
+    url: '',
+    indent: 0,
+    content: null,
+  },
+  {
+    _id: '6',
+    id: '',
+    url: '',
+    indent: 0,
+    content: null,
+  },
+  {
+    _id: '7',
+    id: '',
+    url: '',
+    indent: 0,
+    content: null,
+  },
+  {
+    _id: '8',
+    id: '',
+    url: '',
+    indent: 0,
+    content: null,
+  },
+  {
+    _id: '9',
+    id: '',
+    url: '',
+    indent: 0,
+    content: null,
+  },
 ]
 
 export const defaultModules: Module[] = [
-    {
-      id: '0',
-      _id: '0',
-      name: '',
-      position: 0,
-      published: false,
-      prerequisites: [],
-      completionRequirements: [],
-      requirementCount: 0,
-      unlockAt: null,
-      moduleItems: []
-    },
-    {
-      id: '1',
-      _id: '1',
-      name: '',
-      position: 0,
-      published: false,
-      prerequisites: [],
-      completionRequirements: [],
-      requirementCount: 0,
-      unlockAt: null,
-      moduleItems: []
-    },
-    {
-      id: '2',
-      _id: '2',
-      name: '',
-      position: 0,
-      published: false,
-      prerequisites: [],
-      completionRequirements: [],
-      requirementCount: 0,
-      unlockAt: null,
-      moduleItems: []
-    },
-    {
-      id: '3',
-      _id: '3',
-      name: '',
-      position: 0,
-      published: false,
-      prerequisites: [],
-      completionRequirements: [],
-      requirementCount: 0,
-      unlockAt: null,
-      moduleItems: []
-    },
-    {
-      id: '4',
-      _id: '4',
-      name: '',
-      position: 0,
-      published: false,
-      prerequisites: [],
-      completionRequirements: [],
-      requirementCount: 0,
-      unlockAt: null,
-      moduleItems: []
-    }
+  {
+    id: '0',
+    _id: '0',
+    name: '',
+    position: 0,
+    published: false,
+    prerequisites: [],
+    completionRequirements: [],
+    requirementCount: 0,
+    unlockAt: null,
+    moduleItems: [],
+  },
+  {
+    id: '1',
+    _id: '1',
+    name: '',
+    position: 0,
+    published: false,
+    prerequisites: [],
+    completionRequirements: [],
+    requirementCount: 0,
+    unlockAt: null,
+    moduleItems: [],
+  },
+  {
+    id: '2',
+    _id: '2',
+    name: '',
+    position: 0,
+    published: false,
+    prerequisites: [],
+    completionRequirements: [],
+    requirementCount: 0,
+    unlockAt: null,
+    moduleItems: [],
+  },
+  {
+    id: '3',
+    _id: '3',
+    name: '',
+    position: 0,
+    published: false,
+    prerequisites: [],
+    completionRequirements: [],
+    requirementCount: 0,
+    unlockAt: null,
+    moduleItems: [],
+  },
+  {
+    id: '4',
+    _id: '4',
+    name: '',
+    position: 0,
+    published: false,
+    prerequisites: [],
+    completionRequirements: [],
+    requirementCount: 0,
+    unlockAt: null,
+    moduleItems: [],
+  },
 ]

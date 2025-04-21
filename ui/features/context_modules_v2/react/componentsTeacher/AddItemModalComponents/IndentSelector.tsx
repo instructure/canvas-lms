@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import { SimpleSelect } from '@instructure/ui-simple-select'
-import { useScope as createI18nScope } from '@canvas/i18n'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -28,12 +28,12 @@ interface IndentSelectorProps {
   label?: string
 }
 
-const IndentSelector: React.FC<IndentSelectorProps> = ({ value, onChange, label }) => {
+const IndentSelector: React.FC<IndentSelectorProps> = ({value, onChange, label}) => {
   return (
     <SimpleSelect
       renderLabel={label || I18n.t('Indentation')}
       value={value}
-      onChange={(_e, { value }) => onChange(value as number)}
+      onChange={(_e, {value}) => onChange(value as number)}
     >
       <SimpleSelect.Option id="0" value={0}>
         {I18n.t("Don't indent")}

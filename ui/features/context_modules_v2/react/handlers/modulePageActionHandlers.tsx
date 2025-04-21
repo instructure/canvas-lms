@@ -17,16 +17,16 @@
  */
 
 import React from 'react'
-import { createRoot } from 'react-dom/client'
-import { Module as ModuleType } from '@canvas/context-modules/differentiated-modules/react/types'
+import {createRoot} from 'react-dom/client'
+import {Module as ModuleType} from '@canvas/context-modules/differentiated-modules/react/types'
 import DifferentiatedModulesTray from '@canvas/context-modules/differentiated-modules/react/DifferentiatedModulesTray'
-import { queryClient } from '@canvas/query'
-import { InfiniteData } from '@tanstack/react-query'
-import type { ModulesResponse } from '../utils/types'
+import {queryClient} from '@canvas/query'
+import {InfiniteData} from '@tanstack/react-query'
+import type {ModulesResponse} from '../utils/types'
 
 export const handleCollapseAll = (
   data: InfiniteData<ModulesResponse> | undefined,
-  setExpandedModules: React.Dispatch<React.SetStateAction<Map<string, boolean>>>
+  setExpandedModules: React.Dispatch<React.SetStateAction<Map<string, boolean>>>,
 ) => {
   if (data?.pages) {
     const allModules = data.pages.flatMap(page => page.modules)
@@ -40,7 +40,7 @@ export const handleCollapseAll = (
 
 export const handleExpandAll = (
   data: InfiniteData<ModulesResponse> | undefined,
-  setExpandedModules: React.Dispatch<React.SetStateAction<Map<string, boolean>>>
+  setExpandedModules: React.Dispatch<React.SetStateAction<Map<string, boolean>>>,
 ) => {
   if (data?.pages) {
     const allModules = data.pages.flatMap(page => page.modules)
@@ -54,7 +54,7 @@ export const handleExpandAll = (
 
 export const handleToggleExpand = (
   moduleId: string,
-  setExpandedModules: React.Dispatch<React.SetStateAction<Map<string, boolean>>>
+  setExpandedModules: React.Dispatch<React.SetStateAction<Map<string, boolean>>>,
 ) => {
   setExpandedModules(prev => {
     const newState = new Map(prev)
@@ -68,21 +68,24 @@ export const handleOpeningModuleUpdateTray = (
   courseId: string,
   moduleId?: string,
   moduleName?: string,
-  prerequisites?: {id: string, name: string, type: string}[],
-  openTab: 'settings' | 'assign-to' = 'settings'
+  prerequisites?: {id: string; name: string; type: string}[],
+  openTab: 'settings' | 'assign-to' = 'settings',
 ) => {
   const moduleElement = document.createElement('div')
   moduleElement.id = moduleId ? `context_module_${moduleId}` : 'context_module_new'
   moduleElement.style.display = 'none'
   document.getElementById('context_modules_sortable_container')?.appendChild(moduleElement)
 
-  const moduleList: ModuleType[] = data?.pages.flatMap(page => page.modules).map(module => ({
-    id: module._id,
-    name: module.name
-  })) || []
+  const moduleList: ModuleType[] =
+    data?.pages
+      .flatMap(page => page.modules)
+      .map(module => ({
+        id: module._id,
+        name: module.name,
+      })) || []
 
   const onComplete = () => {
-    queryClient.invalidateQueries({ queryKey: ['modules', courseId || ''] })
+    queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
   }
 
   const container = document.getElementById('differentiated-modules-mount-point')
@@ -110,7 +113,7 @@ export const handleOpeningModuleUpdateTray = (
       moduleName={moduleName ?? undefined}
       prerequisites={prerequisites}
       onComplete={onComplete}
-    />
+    />,
   )
 }
 
@@ -119,7 +122,7 @@ export const handleAddItem = (
   data: InfiniteData<ModulesResponse> | undefined,
   setSelectedModuleId: React.Dispatch<React.SetStateAction<string>>,
   setSelectedModuleName: React.Dispatch<React.SetStateAction<string>>,
-  setIsAddItemModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsAddItemModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
   const module = data?.pages.flatMap(page => page.modules).find(m => m._id === moduleId)
   if (module) {

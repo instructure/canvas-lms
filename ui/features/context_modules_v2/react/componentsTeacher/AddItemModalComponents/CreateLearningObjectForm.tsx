@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import {Billboard} from '@instructure/ui-billboard'
-import { FileDrop } from '@instructure/ui-file-drop'
-import { Flex } from '@instructure/ui-flex'
-import { TextInput } from '@instructure/ui-text-input'
-import { RocketSVG } from '@instructure/canvas-media'
-import { SimpleSelect } from '@instructure/ui-simple-select'
-import { Text } from '@instructure/ui-text'
-import { View } from '@instructure/ui-view'
+import {FileDrop} from '@instructure/ui-file-drop'
+import {Flex} from '@instructure/ui-flex'
+import {TextInput} from '@instructure/ui-text-input'
+import {RocketSVG} from '@instructure/canvas-media'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_v2')
@@ -33,8 +33,8 @@ const I18n = createI18nScope('context_modules_v2')
 interface CreateLearningObjectFormProps {
   itemType: string
   onChange: (field: string, value: any) => void
-  assignmentGroups?: { id: string; name: string }[]
-  folders?: { id: string; name: string }[]
+  assignmentGroups?: {id: string; name: string}[]
+  folders?: {id: string; name: string}[]
 }
 
 const FILE_DROP_HEIGHT = 350
@@ -75,16 +75,16 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
           onChange={(_e, val) => {
             setName(val)
             onChange('name', val)
-        }}
-        margin="0 0 medium 0"
-        required
-      />
+          }}
+          margin="0 0 medium 0"
+          required
+        />
       )}
       {itemType === 'quiz' && (
         <SimpleSelect
           renderLabel="Assignment Group"
           value={assignmentGroup}
-          onChange={(_e, { value }) => {
+          onChange={(_e, {value}) => {
             setAssignmentGroup(String(value))
             onChange('assignmentGroup', value)
           }}
@@ -93,9 +93,9 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
           {assignmentGroups.map(group => (
             <SimpleSelect.Option id={group.id} key={group.id} value={group.id}>
               {group.name}
-          </SimpleSelect.Option>
-        ))}
-      </SimpleSelect>
+            </SimpleSelect.Option>
+          ))}
+        </SimpleSelect>
       )}
       {itemType === 'file' && (
         <>
@@ -123,7 +123,7 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
             <SimpleSelect
               renderLabel="Folder"
               value={folder}
-              onChange={(_e, { value }) => {}}
+              onChange={(_e, {value}) => {}}
               placeholder="Select folder"
             >
               {folders.map(f => (

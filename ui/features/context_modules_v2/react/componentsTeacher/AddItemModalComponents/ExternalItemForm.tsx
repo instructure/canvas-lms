@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState, useEffect } from 'react'
-import { TextInput } from '@instructure/ui-text-input'
-import { Checkbox } from '@instructure/ui-checkbox'
-import { View } from '@instructure/ui-view'
-import { useScope as createI18nScope } from '@canvas/i18n'
+import React, {useState, useEffect} from 'react'
+import {TextInput} from '@instructure/ui-text-input'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -38,7 +38,7 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
   onChange,
   externalUrlValue = '',
   externalUrlName = '',
-  newTab = false
+  newTab = false,
 }) => {
   const [url, setUrl] = useState(externalUrlValue)
   const [pageName, setPageName] = useState(externalUrlName)

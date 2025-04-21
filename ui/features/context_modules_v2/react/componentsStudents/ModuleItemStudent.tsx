@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useMemo } from 'react'
+import React, {useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -59,24 +59,19 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
     >
       <Flex>
         {/* Item Type Icon */}
-        {itemIcon && <Flex.Item margin="0 small 0 0">
-          <div style={{ padding: `0 0 0 ${itemLeftMargin}` }}>
-            {itemIcon}
-          </div>
-        </Flex.Item>}
+        {itemIcon && (
+          <Flex.Item margin="0 small 0 0">
+            <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>{itemIcon}</div>
+          </Flex.Item>
+        )}
         <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`}>
-          <div style={itemIcon ? {} : { padding: `0 0 0 ${itemLeftMargin}` }}>
-            <Flex
-              alignItems="start"
-              justifyItems="start"
-              wrap="no-wrap"
-              direction="column"
-            >
+          <div style={itemIcon ? {} : {padding: `0 0 0 ${itemLeftMargin}`}}>
+            <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
               {/* Item Title */}
               <Flex.Item>
                 <Flex.Item shouldGrow={true}>
                   <Link href={url} isWithinText={false} onClick={onClick}>
-                    <Text weight="bold" color='primary'>
+                    <Text weight="bold" color="primary">
                       {content?.title || 'Untitled Item'}
                     </Text>
                   </Link>
@@ -84,7 +79,11 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
               </Flex.Item>
               {/* Due Date and Points Possible */}
               <Flex.Item>
-                <ModuleItemSupplementalInfo contentTagId={_id} content={content} completionRequirement={completionRequirements?.find(req => req.id === _id)} />
+                <ModuleItemSupplementalInfo
+                  contentTagId={_id}
+                  content={content}
+                  completionRequirement={completionRequirements?.find(req => req.id === _id)}
+                />
               </Flex.Item>
             </Flex>
           </div>

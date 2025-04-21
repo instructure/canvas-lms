@@ -28,14 +28,14 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {useModuleItemContent, ModuleItemContentType} from '../../hooks/queries/useModuleItemContent'
 import {useContextModule} from '../../hooks/useModuleContext'
 import doFetchApi from '../../../../../shared/do-fetch-api-effect'
-import { queryClient } from '../../../../../shared/query'
+import {queryClient} from '../../../../../shared/query'
 import AddItemTypeSelector from './AddItemTypeSelector'
-import { ScreenReaderContent } from '@instructure/ui-a11y-content'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import IndentSelector from './IndentSelector'
-import { Tabs } from '@instructure/ui-tabs'
+import {Tabs} from '@instructure/ui-tabs'
 import CreateLearningObjectForm from './CreateLearningObjectForm'
 import ExternalItemForm from './ExternalItemForm'
-import { Spinner } from '@instructure/ui-spinner'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -52,7 +52,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   onRequestClose,
   moduleName,
   moduleId,
-  itemCount
+  itemCount,
 }) => {
   const [itemType, setItemType] = useState<ModuleItemContentType>('assignment')
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -67,13 +67,17 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [searchText, setSearchText] = useState<string>('')
   const [debouncedSearchText, setDebouncedSearchText] = useState<string>('')
 
-  const { courseId } = useContextModule()
+  const {courseId} = useContextModule()
 
-  const { data, isLoading: isLoadingContent, isError } = useModuleItemContent(
+  const {
+    data,
+    isLoading: isLoadingContent,
+    isError,
+  } = useModuleItemContent(
     itemType,
     courseId,
     debouncedSearchText,
-    isOpen && itemType !== 'context_module_sub_header' && itemType !== 'external_url'
+    isOpen && itemType !== 'context_module_sub_header' && itemType !== 'external_url',
   )
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -105,13 +109,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       'item[type]': itemType,
       'item[position]': itemCount + 1,
       'item[indent]': indentation,
-      'quiz_lti': false,
+      quiz_lti: false,
       'content_details[]': 'items',
-      'id': 'new',
-      'type': itemType,
-      'new_tab': 0,
-      'graded': 0,
-      '_method': 'POST'
+      id: 'new',
+      type: itemType,
+      new_tab: 0,
+      graded: 0,
+      _method: 'POST',
     }
 
     if (itemType === 'context_module_sub_header') {
@@ -147,7 +151,9 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     submitItemData(itemData)
   }
 
-  const submitItemData = (_itemData: Record<string, string | number | string[] | undefined | boolean>) => {
+  const submitItemData = (
+    _itemData: Record<string, string | number | string[] | undefined | boolean>,
+  ) => {
     const body = new FormData()
     Object.entries(_itemData).forEach(([key, value]) => {
       body.append(key, String(value))
@@ -157,14 +163,14 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       method: 'POST',
       body,
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     })
       .then(() => {
         setIsLoading(false)
         queryClient.invalidateQueries({
           queryKey: ['moduleItems', moduleId],
-          exact: false
+          exact: false,
         })
         onRequestClose()
       })
@@ -211,9 +217,9 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
   const contentItems = useMemo(() => {
     if (itemType === 'context_module_sub_header') {
-      return [{ id: 'new_header', name: I18n.t('Create a new header') }]
+      return [{id: 'new_header', name: I18n.t('Create a new header')}]
     } else if (itemType === 'external_url') {
-      return [{ id: 'new_url', name: I18n.t('Create a new URL') }]
+      return [{id: 'new_url', name: I18n.t('Create a new URL')}]
     } else {
       return [...(data?.items || [])]
     }
@@ -230,25 +236,19 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
     return (
       <SimpleSelect
-        renderLabel={I18n.t('Select %{itemType}', { itemType: itemTypeLabel })}
+        renderLabel={I18n.t('Select %{itemType}', {itemType: itemTypeLabel})}
         assistiveText={I18n.t('Type or use arrow keys to navigate options.')}
         value={inputValue}
         onChange={(_e, {value}) => setInputValue(value as string)}
-        renderAfterInput={
-          isLoadingContent && (
-            <Spinner label={I18n.t('Loading')} size='x-small' />
-          )
-        }
+        renderAfterInput={isLoadingContent && <Spinner label={I18n.t('Loading')} size="x-small" />}
       >
-        {contentItems.sort((a, b) => a.name.localeCompare(b.name)).map((option) => (
-          <SimpleSelect.Option
-            id={option.id}
-            key={option.id}
-            value={option.id}
-          >
-            {option.name}
-          </SimpleSelect.Option>
-        ))}
+        {contentItems
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(option => (
+            <SimpleSelect.Option id={option.id} key={option.id} value={option.id}>
+              {option.name}
+            </SimpleSelect.Option>
+          ))}
       </SimpleSelect>
     )
   }
@@ -266,80 +266,74 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       label={I18n.t('Add Item to Module')}
       shouldCloseOnDocumentClick
       size="medium"
-      title={I18n.t('Add an item to %{module}', { module: moduleName })}
-      footer={(
+      title={I18n.t('Add an item to %{module}', {module: moduleName})}
+      footer={
         <>
           <Button onClick={onRequestClose} disabled={isLoading} margin="0 x-small 0 0">
             {I18n.t('Cancel')}
           </Button>
-          <Button
-            color="primary"
-            type="submit"
-            disabled={isLoading}
-          >
+          <Button color="primary" type="submit" disabled={isLoading}>
             {I18n.t('Add Item')}
           </Button>
         </>
-      )}
+      }
     >
-        <View as="div" margin="0 0 medium 0">
-          <AddItemTypeSelector
-            itemType={itemType}
-            onChange={(value) => setItemType(value)}
-          />
-        </View>
-        <FormFieldGroup
-          description={<ScreenReaderContent>{I18n.t('Add an item to %{module}', { module: moduleName })}</ScreenReaderContent>}
-        >
-          {["assignment", "quiz", "file", "page", "discussion"].includes(itemType) &&
-            <Tabs onRequestTabChange={(_event, tabData) => setSelectedTabIndex(tabData.index)}>
-              <Tabs.Panel
-                id="add-item-form"
-                renderTitle={I18n.t('Add Item')}
-                isSelected={selectedTabIndex === 0}
-              >
-                {renderContentItems()}
-              </Tabs.Panel>
-              <Tabs.Panel
-                id="create-item-form"
-                renderTitle={I18n.t('Create Item')}
-                isSelected={selectedTabIndex === 1}
-              >
-                <CreateLearningObjectForm
-                  itemType={itemType}
-                  onChange={(_e, value) => setItemType(value)}
-                />
-              </Tabs.Panel>
-            </Tabs>
-          }
-          {itemType === 'context_module_sub_header' && (
-            <View as="div" margin="medium 0">
-              <TextInput
-                renderLabel={I18n.t('Header text')}
-                placeholder={I18n.t('Enter header text')}
-                value={textHeaderValue}
-                onChange={(_e, value) => setTextHeaderValue(value)}
+      <View as="div" margin="0 0 medium 0">
+        <AddItemTypeSelector itemType={itemType} onChange={value => setItemType(value)} />
+      </View>
+      <FormFieldGroup
+        description={
+          <ScreenReaderContent>
+            {I18n.t('Add an item to %{module}', {module: moduleName})}
+          </ScreenReaderContent>
+        }
+      >
+        {['assignment', 'quiz', 'file', 'page', 'discussion'].includes(itemType) && (
+          <Tabs onRequestTabChange={(_event, tabData) => setSelectedTabIndex(tabData.index)}>
+            <Tabs.Panel
+              id="add-item-form"
+              renderTitle={I18n.t('Add Item')}
+              isSelected={selectedTabIndex === 0}
+            >
+              {renderContentItems()}
+            </Tabs.Panel>
+            <Tabs.Panel
+              id="create-item-form"
+              renderTitle={I18n.t('Create Item')}
+              isSelected={selectedTabIndex === 1}
+            >
+              <CreateLearningObjectForm
+                itemType={itemType}
+                onChange={(_e, value) => setItemType(value)}
               />
-            </View>
-          )}
-          {['external_url', 'external_tool'].includes(itemType) &&
-            <ExternalItemForm
-              itemType={itemType}
-              onChange={(field, value) => {
-                if (field === 'url') setExternalUrlValue(value)
-                if (field === 'name') setExternalUrlName(value)
-                if (field === 'newTab') setExternalUrlNewTab(value)
-              }}
-              externalUrlValue={externalUrlValue}
-              externalUrlName={externalUrlName}
-              newTab={externalUrlNewTab}
+            </Tabs.Panel>
+          </Tabs>
+        )}
+        {itemType === 'context_module_sub_header' && (
+          <View as="div" margin="medium 0">
+            <TextInput
+              renderLabel={I18n.t('Header text')}
+              placeholder={I18n.t('Enter header text')}
+              value={textHeaderValue}
+              onChange={(_e, value) => setTextHeaderValue(value)}
             />
-          }
-          <IndentSelector
-            value={indentation}
-            onChange={setIndentation}
+          </View>
+        )}
+        {['external_url', 'external_tool'].includes(itemType) && (
+          <ExternalItemForm
+            itemType={itemType}
+            onChange={(field, value) => {
+              if (field === 'url') setExternalUrlValue(value)
+              if (field === 'name') setExternalUrlName(value)
+              if (field === 'newTab') setExternalUrlNewTab(value)
+            }}
+            externalUrlValue={externalUrlValue}
+            externalUrlName={externalUrlName}
+            newTab={externalUrlNewTab}
           />
-        </FormFieldGroup>
+        )}
+        <IndentSelector value={indentation} onChange={setIndentation} />
+      </FormFieldGroup>
     </CanvasModal>
   )
 }

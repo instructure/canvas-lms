@@ -35,13 +35,18 @@ const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({content, url, onClick}
       <Flex direction="row" gap="small" alignItems="center" wrap="no-wrap">
         <Flex.Item>
           <Link href={url} isWithinText={false} onClick={onClick}>
-            <Text weight={content?.newTab ? 'normal' : 'bold'} color={content?.newTab ? 'brand' : 'primary'}>
+            <Text
+              weight={content?.newTab ? 'normal' : 'bold'}
+              color={content?.newTab ? 'brand' : 'primary'}
+            >
               {content?.title || 'Untitled Item'}
             </Text>
           </Link>
         </Flex.Item>
         <Flex.Item padding="0 0 xxx-small 0">
-          {content?.newTab && <IconExternalLinkLine size="x-small" color="brand" data-testid="external-link-icon" />}
+          {content?.newTab && (
+            <IconExternalLinkLine size="x-small" color="brand" data-testid="external-link-icon" />
+          )}
         </Flex.Item>
       </Flex>
     )

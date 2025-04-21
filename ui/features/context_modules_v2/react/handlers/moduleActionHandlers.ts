@@ -22,22 +22,31 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import type {InfiniteData, QueryClient} from '@tanstack/react-query'
 import type {ModulesResponse} from '../utils/types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import { showFlashError, showFlashSuccess } from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('context_modules_v2')
 
 const ENV = window.ENV as GlobalEnv
 
-export const handlePublishComplete = (queryClient: QueryClient, moduleId: string, courseId: string) => {
-  queryClient.invalidateQueries({ queryKey: ['modules', courseId || ''] })
-  queryClient.invalidateQueries({ queryKey: ['moduleItems', moduleId || ''] })
+export const handlePublishComplete = (
+  queryClient: QueryClient,
+  moduleId: string,
+  courseId: string,
+) => {
+  queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
+  queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId || '']})
 }
 
 export const handleEdit = (
   id: string,
   name: string,
-  prerequisites?: {id: string, name: string, type: string}[],
-  handleOpeningModuleUpdateTray?: (moduleId?: string, moduleName?: string, prerequisites?: {id: string, name: string, type: string}[], openTab?: 'settings' | 'assign-to') => void
+  prerequisites?: {id: string; name: string; type: string}[],
+  handleOpeningModuleUpdateTray?: (
+    moduleId?: string,
+    moduleName?: string,
+    prerequisites?: {id: string; name: string; type: string}[],
+    openTab?: 'settings' | 'assign-to',
+  ) => void,
 ) => {
   handleOpeningModuleUpdateTray?.(id, name, prerequisites, 'settings')
 }
@@ -45,23 +54,36 @@ export const handleEdit = (
 export const handleAssignTo = (
   id: string,
   name: string,
-  prerequisites?: {id: string, name: string, type: string}[],
-  handleOpeningModuleUpdateTray?: (moduleId?: string, moduleName?: string, prerequisites?: {id: string, name: string, type: string}[], openTab?: 'settings' | 'assign-to') => void
+  prerequisites?: {id: string; name: string; type: string}[],
+  handleOpeningModuleUpdateTray?: (
+    moduleId?: string,
+    moduleName?: string,
+    prerequisites?: {id: string; name: string; type: string}[],
+    openTab?: 'settings' | 'assign-to',
+  ) => void,
 ) => {
   handleOpeningModuleUpdateTray?.(id, name, prerequisites, 'assign-to')
 }
 
-export const handleDelete = (id: string, name: string, queryClient: QueryClient, courseId: string, setIsMenuOpen?: (isOpen: boolean) => void) => {
+export const handleDelete = (
+  id: string,
+  name: string,
+  queryClient: QueryClient,
+  courseId: string,
+  setIsMenuOpen?: (isOpen: boolean) => void,
+) => {
   if (window.confirm(I18n.t('Are you sure you want to remove this module?'))) {
     doFetchApi({
       path: `/courses/${courseId}/modules/${id}`,
-      method: 'DELETE'
+      method: 'DELETE',
     })
       .then(() => {
-        showFlashSuccess(I18n.t('%{name} was successfully removed.', {
-          name: name
-        }))
-        queryClient.invalidateQueries({ queryKey: ['modules', courseId || ''] })
+        showFlashSuccess(
+          I18n.t('%{name} was successfully removed.', {
+            name: name,
+          }),
+        )
+        queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
       })
       .catch(() => {
         showFlashError(I18n.t('Failed to remove module'))
@@ -72,16 +94,24 @@ export const handleDelete = (id: string, name: string, queryClient: QueryClient,
   }
 }
 
-export const handleDuplicate = (id: string, name: string, queryClient: QueryClient, courseId: string, setIsMenuOpen?: (isOpen: boolean) => void) => {
+export const handleDuplicate = (
+  id: string,
+  name: string,
+  queryClient: QueryClient,
+  courseId: string,
+  setIsMenuOpen?: (isOpen: boolean) => void,
+) => {
   doFetchApi({
     path: `/api/v1/courses/${courseId}/modules/${id}/duplicate`,
-    method: 'POST'
+    method: 'POST',
   })
     .then(() => {
-      showFlashSuccess(I18n.t('%{name} was successfully duplicated.', {
-        name: name
-      }))
-      queryClient.invalidateQueries({ queryKey: ['modules', courseId || ''] })
+      showFlashSuccess(
+        I18n.t('%{name} was successfully duplicated.', {
+          name: name,
+        }),
+      )
+      queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
     })
     .catch(() => {
       showFlashError(I18n.t('Failed to duplicate module'))
@@ -92,14 +122,10 @@ export const handleDuplicate = (id: string, name: string, queryClient: QueryClie
   }
 }
 
-export const handleSendTo = (
-  setIsDirectShareOpen: (isOpen: boolean) => void
-) => {
+export const handleSendTo = (setIsDirectShareOpen: (isOpen: boolean) => void) => {
   setIsDirectShareOpen(true)
 }
 
-export const handleCopyTo = (
-  setIsDirectShareCourseOpen: (isOpen: boolean) => void
-) => {
+export const handleCopyTo = (setIsDirectShareCourseOpen: (isOpen: boolean) => void) => {
   setIsDirectShareCourseOpen(true)
 }

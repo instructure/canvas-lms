@@ -27,7 +27,10 @@ const I18n = createI18nScope('context_modules_v2')
 export interface ModuleSelectProps {
   modules: Module[]
   selectedModule: string
-  onModuleChange: (event: React.SyntheticEvent<Element, Event>, data: {value?: string | number}) => void
+  onModuleChange: (
+    event: React.SyntheticEvent<Element, Event>,
+    data: {value?: string | number},
+  ) => void
   sourceModuleId: string
   moduleAction: string
 }
@@ -37,7 +40,7 @@ const ModuleSelect: React.FC<ModuleSelectProps> = ({
   selectedModule,
   onModuleChange,
   sourceModuleId,
-  moduleAction
+  moduleAction,
 }) => {
   return (
     <View as="div" margin="medium 0 0 0">
@@ -47,11 +50,13 @@ const ModuleSelect: React.FC<ModuleSelectProps> = ({
         value={selectedModule}
         onChange={onModuleChange}
       >
-        {modules.filter(module => moduleAction === 'move_module_item' || module._id !== sourceModuleId).map((module: Module) => (
-          <SimpleSelect.Option key={module._id} id={module._id} value={module._id}>
-            {module.name}
-          </SimpleSelect.Option>
-        ))}
+        {modules
+          .filter(module => moduleAction === 'move_module_item' || module._id !== sourceModuleId)
+          .map((module: Module) => (
+            <SimpleSelect.Option key={module._id} id={module._id} value={module._id}>
+              {module.name}
+            </SimpleSelect.Option>
+          ))}
       </SimpleSelect>
     </View>
   )

@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { defaultModuleItems, defaultModules } from './dataMocks'
+import {defaultModuleItems, defaultModules} from './dataMocks'
 import {
-    createTopOrder,
-    createBottomOrder,
-    createBeforeOrder,
-    createAfterOrder,
-    createModuleItemOrder,
-    createModuleContentsOrder,
-    createModuleOrder,
-    getErrorMessage,
-    getTrayTitle,
+  createTopOrder,
+  createBottomOrder,
+  createBeforeOrder,
+  createAfterOrder,
+  createModuleItemOrder,
+  createModuleContentsOrder,
+  createModuleOrder,
+  getErrorMessage,
+  getTrayTitle,
 } from '../manageModuleContentsHandlers'
 
 describe('manageModuleContentsHandlers', () => {
@@ -96,7 +96,12 @@ describe('manageModuleContentsHandlers', () => {
       const moduleItems = defaultModuleItems
       const selectedPosition = 'top'
       const selectedItem = '1'
-      const result = createModuleItemOrder(moduleItemId, moduleItems, selectedPosition, selectedItem)
+      const result = createModuleItemOrder(
+        moduleItemId,
+        moduleItems,
+        selectedPosition,
+        selectedItem,
+      )
       expect(result).toEqual(['5', '0', '1', '2', '3', '4', '6', '7', '8', '9'])
     })
 
@@ -105,7 +110,12 @@ describe('manageModuleContentsHandlers', () => {
       const moduleItems = defaultModuleItems
       const selectedPosition = 'top'
       const selectedItem = '1'
-      const result = createModuleItemOrder(moduleItemId, moduleItems, selectedPosition, selectedItem)
+      const result = createModuleItemOrder(
+        moduleItemId,
+        moduleItems,
+        selectedPosition,
+        selectedItem,
+      )
       expect(result).toEqual(['10', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
     })
   })
@@ -116,7 +126,12 @@ describe('manageModuleContentsHandlers', () => {
       const moduleItems = defaultModuleItems
       const selectedPosition = 'top'
       const selectedItem = '1'
-      const result = createModuleContentsOrder(sourceItems, moduleItems, selectedPosition, selectedItem)
+      const result = createModuleContentsOrder(
+        sourceItems,
+        moduleItems,
+        selectedPosition,
+        selectedItem,
+      )
       expect(result).toEqual(['5', '0', '1', '2', '3', '4', '6', '7', '8', '9'])
     })
   })
@@ -126,7 +141,12 @@ describe('manageModuleContentsHandlers', () => {
       const sourceModuleId = '5'
       const selectedPosition = 'top'
       const selectedItem = '1'
-      const result = createModuleOrder(sourceModuleId, defaultModules, selectedPosition, selectedItem)
+      const result = createModuleOrder(
+        sourceModuleId,
+        defaultModules,
+        selectedPosition,
+        selectedItem,
+      )
       expect(result).toEqual(['5', '0', '1', '2', '3', '4'])
     })
   })
@@ -150,7 +170,7 @@ describe('manageModuleContentsHandlers', () => {
       expect(result).toEqual('Move Module')
     })
 
-    it('should return \'move\' when moduleAction is not recognized', () => {
+    it("should return 'move' when moduleAction is not recognized", () => {
       const moduleAction = null
       const result = getTrayTitle(moduleAction)
       expect(result).toEqual('Move')
@@ -176,7 +196,7 @@ describe('manageModuleContentsHandlers', () => {
       expect(result).toEqual('Error moving module')
     })
 
-    it('should return \'error moving\' when moduleAction is not recognized', () => {
+    it("should return 'error moving' when moduleAction is not recognized", () => {
       const moduleAction = null
       const result = getErrorMessage(moduleAction)
       expect(result).toEqual('Error moving')

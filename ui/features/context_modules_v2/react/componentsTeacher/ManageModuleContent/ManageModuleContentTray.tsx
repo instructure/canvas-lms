@@ -34,7 +34,7 @@ import {
   createModuleContentsOrder,
   createModuleOrder,
   getTrayTitle,
-  getErrorMessage
+  getErrorMessage,
 } from '../../handlers/manageModuleContentsHandlers'
 
 import ModuleSelect from './ModuleSelect'
@@ -74,14 +74,21 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
 
   const {data: modulesData} = useModules(courseId || '')
 
-  const {data: moduleItemsData} = useModuleItems(selectedModule,
+  const {data: moduleItemsData} = useModuleItems(
+    selectedModule,
     !!selectedModule &&
-    (moduleAction === 'move_module_item' || moduleAction === 'move_module_contents' || moduleAction === 'move_module'))
+      (moduleAction === 'move_module_item' ||
+        moduleAction === 'move_module_contents' ||
+        moduleAction === 'move_module'),
+  )
 
   // Also fetch module items for the source module when moving module contents
   // or when moving an individual module item (to get its source module)
-  const {data: sourceModuleItemsData} = useModuleItems(sourceModuleId,
-    !!sourceModuleId && (moduleAction === 'move_module_contents' || moduleAction === 'move_module_item'))
+  const {data: sourceModuleItemsData} = useModuleItems(
+    sourceModuleId,
+    !!sourceModuleId &&
+      (moduleAction === 'move_module_contents' || moduleAction === 'move_module_item'),
+  )
 
   // Reset selections when tray opens
   useEffect(() => {
@@ -99,8 +106,17 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
   }, [isOpen, moduleAction, moduleItemTitle, sourceModuleTitle])
 
   useEffect(() => {
-    if (isOpen && modulesData?.pages?.[0]?.modules && modulesData.pages[0].modules.length > 0 && !selectedModule) {
-      if (moduleAction === 'move_module_item' || (modulesData.pages[0].modules.length > 0 && modulesData.pages[0].modules[0]._id !== sourceModuleId)) {
+    if (
+      isOpen &&
+      modulesData?.pages?.[0]?.modules &&
+      modulesData.pages[0].modules.length > 0 &&
+      !selectedModule
+    ) {
+      if (
+        moduleAction === 'move_module_item' ||
+        (modulesData.pages[0].modules.length > 0 &&
+          modulesData.pages[0].modules[0]._id !== sourceModuleId)
+      ) {
         setSelectedModule(modulesData.pages[0].modules[0]._id)
       } else if (modulesData.pages[0].modules.length > 0) {
         setSelectedModule(modulesData.pages[0].modules[1]._id)
@@ -110,49 +126,70 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
     }
   }, [modulesData, selectedModule, sourceModuleId, moduleAction, isOpen])
 
-  const handleModuleChange = useCallback((_event: React.SyntheticEvent<Element, Event>, data: {value?: string | number}) => {
-    if (data.value) {
-      const moduleId = String(data.value)
-      setSelectedModule(moduleId)
-      setSelectedItem('')
-
-      // If the selected module has no items, set position to 'top'
-      if ((moduleAction === 'move_module_item' || moduleAction === 'move_module_contents') &&
-          (!moduleItemsData?.moduleItems || moduleItemsData.moduleItems.length === 0)) {
-        setSelectedPosition('top')
-      }
-
-      // If we're moving a module and the position is 'before' or 'after',
-      // we need to set the selected module as the target module
-      if (moduleAction === 'move_module' &&
-          (selectedPosition === 'before' || selectedPosition === 'after')) {
-        setSelectedItem(moduleId)
-      }
-    }
-  }, [moduleAction, selectedPosition, moduleItemsData])
-
-  const handlePositionChange = useCallback((_event: React.SyntheticEvent<Element, Event>, data: {value?: string | number}) => {
-    if (data.value) {
-      const position = String(data.value)
-      setSelectedPosition(position)
-
-      if (position === 'top' || position === 'bottom') {
+  const handleModuleChange = useCallback(
+    (_event: React.SyntheticEvent<Element, Event>, data: {value?: string | number}) => {
+      if (data.value) {
+        const moduleId = String(data.value)
+        setSelectedModule(moduleId)
         setSelectedItem('')
+
+        // If the selected module has no items, set position to 'top'
+        if (
+          (moduleAction === 'move_module_item' || moduleAction === 'move_module_contents') &&
+          (!moduleItemsData?.moduleItems || moduleItemsData.moduleItems.length === 0)
+        ) {
+          setSelectedPosition('top')
+        }
+
+        // If we're moving a module and the position is 'before' or 'after',
+        // we need to set the selected module as the target module
+        if (
+          moduleAction === 'move_module' &&
+          (selectedPosition === 'before' || selectedPosition === 'after')
+        ) {
+          setSelectedItem(moduleId)
+        }
       }
-    }
-  }, [])
+    },
+    [moduleAction, selectedPosition, moduleItemsData],
+  )
 
-  const handleItemChange = useCallback((_event: React.SyntheticEvent<Element, Event> | null, data: {value?: string | number}) => {
-    if (data.value) {
-      setSelectedItem(String(data.value))
-    }
-  }, [])
+  const handlePositionChange = useCallback(
+    (_event: React.SyntheticEvent<Element, Event>, data: {value?: string | number}) => {
+      if (data.value) {
+        const position = String(data.value)
+        setSelectedPosition(position)
 
-  const modules = useMemo(() => modulesData?.pages?.flatMap(page => page.modules) || [], [modulesData])
+        if (position === 'top' || position === 'bottom') {
+          setSelectedItem('')
+        }
+      }
+    },
+    [],
+  )
+
+  const handleItemChange = useCallback(
+    (_event: React.SyntheticEvent<Element, Event> | null, data: {value?: string | number}) => {
+      if (data.value) {
+        setSelectedItem(String(data.value))
+      }
+    },
+    [],
+  )
+
+  const modules = useMemo(
+    () => modulesData?.pages?.flatMap(page => page.modules) || [],
+    [modulesData],
+  )
 
   const moduleItemOrder = useMemo(() => {
     return moduleItemsData?.moduleItems
-      ? createModuleItemOrder(moduleItemId, moduleItemsData.moduleItems, selectedPosition, selectedItem)
+      ? createModuleItemOrder(
+          moduleItemId,
+          moduleItemsData.moduleItems,
+          selectedPosition,
+          selectedItem,
+        )
       : []
   }, [moduleItemId, moduleItemsData?.moduleItems, selectedPosition, selectedItem])
 
@@ -163,8 +200,18 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
       ? sourceModuleItemsData.moduleItems.map(item => item._id)
       : []
 
-    return createModuleContentsOrder(sourceItems, moduleItemsData.moduleItems, selectedPosition, selectedItem)
-  }, [moduleItemsData?.moduleItems, sourceModuleItemsData?.moduleItems, selectedPosition, selectedItem])
+    return createModuleContentsOrder(
+      sourceItems,
+      moduleItemsData.moduleItems,
+      selectedPosition,
+      selectedItem,
+    )
+  }, [
+    moduleItemsData?.moduleItems,
+    sourceModuleItemsData?.moduleItems,
+    selectedPosition,
+    selectedItem,
+  ])
 
   const moduleOrder = useMemo(() => {
     return createModuleOrder(sourceModuleId, modules, selectedPosition, selectedItem)
@@ -175,8 +222,8 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
       path: url,
       method: 'POST',
       body: {
-        order: order.join(',')
-      }
+        order: order.join(','),
+      },
     })
   }
 
@@ -184,22 +231,28 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
     if (!courseId) return
 
     if (moduleAction === 'move_module_item' || moduleAction === 'move_module_contents') {
-      queryClient.invalidateQueries({ queryKey: ['moduleItems', selectedModule] })
+      queryClient.invalidateQueries({queryKey: ['moduleItems', selectedModule]})
       if (sourceModuleId !== selectedModule) {
-        queryClient.invalidateQueries({ queryKey: ['moduleItems', sourceModuleId] })
+        queryClient.invalidateQueries({queryKey: ['moduleItems', sourceModuleId]})
       }
     } else if (moduleAction === 'move_module') {
-      queryClient.invalidateQueries({ queryKey: ['modules', courseId] })
+      queryClient.invalidateQueries({queryKey: ['modules', courseId]})
     }
   }
 
   const handleMove = async () => {
     try {
       if (moduleAction === 'move_module_item') {
-        await submitReorderRequest(`${ENV.CONTEXT_URL_ROOT}/modules/${selectedModule}/reorder`, moduleItemOrder)
+        await submitReorderRequest(
+          `${ENV.CONTEXT_URL_ROOT}/modules/${selectedModule}/reorder`,
+          moduleItemOrder,
+        )
         showFlashSuccess(I18n.t('Item moved successfully'))
       } else if (moduleAction === 'move_module_contents') {
-        await submitReorderRequest(`${ENV.CONTEXT_URL_ROOT}/modules/${selectedModule}/reorder`, moduleContentsOrder)
+        await submitReorderRequest(
+          `${ENV.CONTEXT_URL_ROOT}/modules/${selectedModule}/reorder`,
+          moduleContentsOrder,
+        )
         showFlashSuccess(I18n.t('Module contents moved successfully'))
       } else if (moduleAction === 'move_module') {
         await submitReorderRequest(`${ENV.CONTEXT_URL_ROOT}/modules/reorder`, moduleOrder)
@@ -216,13 +269,7 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
   const getTitle = useMemo(() => getTrayTitle(moduleAction || null), [moduleAction])
 
   return (
-    <Tray
-      label={getTitle}
-      open={isOpen}
-      onDismiss={onClose}
-      placement="end"
-      size="small"
-    >
+    <Tray label={getTitle} open={isOpen} onDismiss={onClose} placement="end" size="small">
       <View as="div" padding="medium">
         <View as="div" textAlign="end">
           <CloseButton
@@ -233,7 +280,9 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
           />
         </View>
 
-        <Heading as="h2" level="h3">{getTitle}</Heading>
+        <Heading as="h2" level="h3">
+          {getTitle}
+        </Heading>
 
         {/* Module Selection - only show for non-module moves */}
         {moduleAction !== 'move_module' && (
@@ -273,10 +322,7 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
         )}
 
         {/* Footer with Action Buttons */}
-        <TrayFooter
-          onClose={onClose}
-          onMove={handleMove}
-        />
+        <TrayFooter onClose={onClose} onMove={handleMove} />
       </View>
     </Tray>
   )
