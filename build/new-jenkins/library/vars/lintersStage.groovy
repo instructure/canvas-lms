@@ -26,7 +26,7 @@ def nodeRequirementsTemplate() {
     ]
   ]
 
-  def containers = ['bundle', 'gergichLinters', 'ESLint', 'TypeScript', 'miscJsChecks', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
+  def containers = ['bundle', 'gergichLinters', 'ESLint', 'TypeScript', 'Biome', 'miscJsChecks', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
     baseTestContainer + [name: containerName]
   }
 
@@ -88,6 +88,20 @@ def eslintStage(stages) {
       name: 'ESLint',
       envVars: codeEnvVars,
       command: './build/new-jenkins/linters/run-eslint.sh'
+    )
+  }
+}
+
+def biomeStage(stages, buildConfig) {
+  { ->
+    def codeEnvVars = [
+      "SKIP_BIOME=${commitMessageFlag('skip-biome') as Boolean}",
+    ]
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'Biome',
+      envVars: codeEnvVars,
+      command: './build/new-jenkins/linters/run-gergich-biome.sh',
+      required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasJsFiles(buildConfig),
     )
   }
 }
