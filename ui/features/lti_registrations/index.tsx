@@ -53,7 +53,7 @@ import {route as MonitorRoute} from './monitor/route'
 import {isLtiRegistrationsUsageEnabled} from './monitor/utils'
 import {ToolConfigurationEdit} from './manage/pages/tool_details/configuration/ToolConfigurationEdit'
 
-const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
+const accountId = ZAccountId.parse(window.ENV.ACCOUNT_ID)
 
 const queryClient = new QueryClient()
 
