@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createContext, useContext, useState } from "react";
+import {createContext, useContext, useState} from 'react'
 
 const ContextModule = createContext<{
   courseId: string
@@ -25,21 +25,23 @@ const ContextModule = createContext<{
   permissions: Record<string, boolean>
   state: Record<string, any>
   setState: (state: Record<string, any>) => void
-}>({} as {
-  courseId: string
-  isMasterCourse: boolean
-  isChildCourse: boolean
-  permissions: Record<string, boolean>
-  state: Record<string, any>
-  setState: (state: Record<string, any>) => void
-})
+}>(
+  {} as {
+    courseId: string
+    isMasterCourse: boolean
+    isChildCourse: boolean
+    permissions: Record<string, boolean>
+    state: Record<string, any>
+    setState: (state: Record<string, any>) => void
+  },
+)
 
 export const ContextModuleProvider = ({
   children,
   courseId,
   isMasterCourse,
   isChildCourse,
-  permissions
+  permissions,
 }: {
   children: React.ReactNode
   courseId: string
@@ -50,12 +52,14 @@ export const ContextModuleProvider = ({
   const [state, setState] = useState({})
 
   return (
-    <ContextModule.Provider value={{ courseId, isMasterCourse, isChildCourse, permissions, state, setState }}>
+    <ContextModule.Provider
+      value={{courseId, isMasterCourse, isChildCourse, permissions, state, setState}}
+    >
       {children}
     </ContextModule.Provider>
-  );
+  )
 }
 
 export function useContextModule() {
-  return useContext(ContextModule);
+  return useContext(ContextModule)
 }

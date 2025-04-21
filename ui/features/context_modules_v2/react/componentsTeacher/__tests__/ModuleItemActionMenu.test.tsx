@@ -45,10 +45,15 @@ const setUp = (itemType: string = 'Assignment') => {
         handleSendTo={() => {}}
         handleCopyTo={() => {}}
         handleRemove={() => {}}
-        masteryPathsData={{isCyoeAble: false, isTrigger: false, isReleased: false, releasedLabel: null}}
+        masteryPathsData={{
+          isCyoeAble: false,
+          isTrigger: false,
+          isReleased: false,
+          releasedLabel: null,
+        }}
         handleMasteryPaths={() => {}}
       />
-    </ContextModuleProvider>
+    </ContextModuleProvider>,
   )
 }
 
@@ -61,7 +66,7 @@ describe('ModuleItemActionMenu', () => {
   it('renders menu with correct props', () => {
     const container = setUp()
     // Check that the Menu button is rendered
-    const menuButton = container.getByRole('button', { name: 'Module Item Options' })
+    const menuButton = container.getByRole('button', {name: 'Module Item Options'})
     expect(menuButton).toBeInTheDocument()
     fireEvent.click(menuButton)
 
@@ -81,7 +86,7 @@ describe('ModuleItemActionMenu', () => {
     const container = setUp('SubHeader')
 
     // Check that the Menu button is rendered
-    const menuButton = container.getByRole('button', { name: 'Module Item Options' })
+    const menuButton = container.getByRole('button', {name: 'Module Item Options'})
     expect(menuButton).toBeInTheDocument()
     fireEvent.click(menuButton)
 

@@ -26,7 +26,10 @@ const I18n = createI18nScope('context_modules_v2')
 
 export interface PositionSelectProps {
   selectedPosition: string
-  onPositionChange: (event: React.SyntheticEvent<Element, Event>, data: {value?: string | number}) => void
+  onPositionChange: (
+    event: React.SyntheticEvent<Element, Event>,
+    data: {value?: string | number},
+  ) => void
   hasItems: boolean
   moduleAction: ModuleAction | null
   itemTitle: string
@@ -37,15 +40,15 @@ const PositionSelect: React.FC<PositionSelectProps> = ({
   onPositionChange,
   hasItems,
   moduleAction,
-  itemTitle
+  itemTitle,
 }) => {
   const title = useMemo(() => {
     if (moduleAction === 'move_module_item') {
-      return I18n.t('Place "%{itemTitle}"', { itemTitle: itemTitle || I18n.t('Item') })
+      return I18n.t('Place "%{itemTitle}"', {itemTitle: itemTitle || I18n.t('Item')})
     } else if (moduleAction === 'move_module_contents') {
       return I18n.t('Place Contents')
     } else if (moduleAction === 'move_module') {
-      return I18n.t('Place "%{moduleName}"', { moduleName: itemTitle || I18n.t('Module') })
+      return I18n.t('Place "%{moduleName}"', {moduleName: itemTitle || I18n.t('Module')})
     } else {
       return I18n.t('Place Module')
     }

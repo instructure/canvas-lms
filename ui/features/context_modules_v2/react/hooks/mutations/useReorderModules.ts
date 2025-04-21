@@ -32,13 +32,13 @@ export const useReorderModules = () => {
         method: 'POST',
         body: `order=${order.join(',')}`,
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
       })
       return json
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['modules', variables?.courseId || ''] })
+      queryClient.invalidateQueries({queryKey: ['modules', variables?.courseId || '']})
     },
   })
 }

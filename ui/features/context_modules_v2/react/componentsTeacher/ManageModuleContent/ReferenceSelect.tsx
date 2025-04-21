@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useEffect } from 'react'
+import React, {useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -27,7 +27,10 @@ const I18n = createI18nScope('context_modules_v2')
 export interface ReferenceSelectProps {
   moduleAction: ModuleAction | null
   selectedItem: string
-  onItemChange: (event: React.SyntheticEvent<Element, Event> | null, data: {value?: string | number}) => void
+  onItemChange: (
+    event: React.SyntheticEvent<Element, Event> | null,
+    data: {value?: string | number},
+  ) => void
   modules: Module[]
   moduleItems?: ModuleItem[]
   sourceModuleId: string
@@ -43,39 +46,51 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
   moduleItems,
   sourceModuleId,
   selectedModule,
-  sourceModuleItemId
+  sourceModuleItemId,
 }) => {
   useEffect(() => {
     if (moduleAction !== 'move_module' && !moduleItems?.find(item => item._id === selectedItem)) {
-      onItemChange(null, {value: moduleItems?.filter(item =>
-        !(item._id === sourceModuleItemId)
-      )[0]?._id || ''})
-    } else if (moduleAction === 'move_module' && !modules?.find(module => module._id === selectedItem)) {
-      onItemChange(null, {value: modules?.filter(module =>
-        !(module._id === sourceModuleId)
-      )[0]?._id || ''})
+      onItemChange(null, {
+        value: moduleItems?.filter(item => !(item._id === sourceModuleItemId))[0]?._id || '',
+      })
+    } else if (
+      moduleAction === 'move_module' &&
+      !modules?.find(module => module._id === selectedItem)
+    ) {
+      onItemChange(null, {
+        value: modules?.filter(module => !(module._id === sourceModuleId))[0]?._id || '',
+      })
     }
-  }, [moduleItems, modules, selectedItem, sourceModuleId, selectedModule, sourceModuleItemId, moduleAction, onItemChange])
+  }, [
+    moduleItems,
+    modules,
+    selectedItem,
+    sourceModuleId,
+    selectedModule,
+    sourceModuleItemId,
+    moduleAction,
+    onItemChange,
+  ])
   const hasItems = moduleItems && moduleItems.length > 0
 
   return (
     <View as="div" margin="medium 0 0 0">
-        {/* When moving a module, show modules as options
+      {/* When moving a module, show modules as options
          When moving items or contents, show module items as options*/}
-        {moduleAction === 'move_module' ? (
+      {moduleAction === 'move_module' ? (
         <SimpleSelect
           renderLabel={hasItems && I18n.t('Select Reference Module')}
           assistiveText={I18n.t('Select a module')}
           value={selectedItem}
           onChange={onItemChange}
         >
-          {modules.filter(module =>
-            module._id !== sourceModuleId
-          ).map((module: Module) => (
-            <SimpleSelect.Option key={module._id} id={module._id} value={module._id}>
-              {module.name}
-            </SimpleSelect.Option>
-          ))}
+          {modules
+            .filter(module => module._id !== sourceModuleId)
+            .map((module: Module) => (
+              <SimpleSelect.Option key={module._id} id={module._id} value={module._id}>
+                {module.name}
+              </SimpleSelect.Option>
+            ))}
         </SimpleSelect>
       ) : (
         hasItems && (
@@ -87,9 +102,8 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
           >
             {moduleItems
               // Filter out the source item when in the same module
-              .filter(item =>
-                !(item._id === sourceModuleItemId)
-              ).map((item: ModuleItem) => (
+              .filter(item => !(item._id === sourceModuleItemId))
+              .map((item: ModuleItem) => (
                 <SimpleSelect.Option key={item._id} id={item._id} value={item._id}>
                   {item.content?.title || 'Untitled Item'}
                 </SimpleSelect.Option>

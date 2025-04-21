@@ -32,7 +32,10 @@ export interface ModuleItemSupplementalInfoProps {
   completionRequirement?: CompletionRequirement
 }
 
-const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({content, completionRequirement}) => {
+const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
+  content,
+  completionRequirement,
+}) => {
   if (!content) return null
 
   const hasDueOrLockDate = content.dueAt || content.lockAt
@@ -47,14 +50,16 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
     const {type, minScore, minPercentage, completed = false} = completionRequirement
     const fulfillmentStatus = completed ? 'fulfilled' : 'unfulfilled'
 
-    return <CompletionRequirementInfo
-      type={type}
-      minScore={minScore}
-      minPercentage={minPercentage}
-      completed={completed}
-      fulfillmentStatus={fulfillmentStatus}
-      id={content.id || ''}
-    />
+    return (
+      <CompletionRequirementInfo
+        type={type}
+        minScore={minScore}
+        minPercentage={minPercentage}
+        completed={completed}
+        fulfillmentStatus={fulfillmentStatus}
+        id={content.id || ''}
+      />
+    )
   }
 
   return (
@@ -73,21 +78,25 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
 
       {hasDueOrLockDate && (hasPointsPossible || hasCompletionRequirement) && (
         <Flex.Item>
-          <Text weight="normal" size="x-small">|</Text>
+          <Text weight="normal" size="x-small">
+            |
+          </Text>
         </Flex.Item>
       )}
 
       {hasPointsPossible && (
         <Flex.Item>
           <Text weight="normal" size="x-small">
-            {I18n.t("%{points} pts", { points: content.pointsPossible })}
+            {I18n.t('%{points} pts', {points: content.pointsPossible})}
           </Text>
         </Flex.Item>
       )}
 
       {hasPointsPossible && hasCompletionRequirement && (
         <Flex.Item>
-          <Text weight="normal" size="x-small">|</Text>
+          <Text weight="normal" size="x-small">
+            |
+          </Text>
         </Flex.Item>
       )}
 

@@ -28,10 +28,7 @@ interface AddItemTypeSelectorProps {
   onChange: (value: ModuleItemContentType) => void
 }
 
-const AddItemTypeSelector: React.FC<AddItemTypeSelectorProps> = ({
-  itemType,
-  onChange
-}) => {
+const AddItemTypeSelector: React.FC<AddItemTypeSelectorProps> = ({itemType, onChange}) => {
   return (
     <SimpleSelect
       renderLabel={I18n.t('Add')}

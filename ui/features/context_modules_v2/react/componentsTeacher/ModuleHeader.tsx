@@ -23,11 +23,11 @@ import {IconButton} from '@instructure/ui-buttons'
 import {
   IconDragHandleLine,
   IconMiniArrowEndSolid,
-  IconMiniArrowDownLine
+  IconMiniArrowDownLine,
 } from '@instructure/ui-icons'
-import { View } from '@instructure/ui-view'
+import {View} from '@instructure/ui-view'
 import ModuleHeaderActionPanel from './ModuleHeaderActionPanel'
-import { CompletionRequirement, Prerequisite, ModuleAction } from '../utils/types'
+import {CompletionRequirement, Prerequisite, ModuleAction} from '../utils/types'
 
 interface ModuleHeaderProps {
   id: string
@@ -40,15 +40,15 @@ interface ModuleHeaderProps {
   handleOpeningModuleUpdateTray?: (
     moduleId?: string,
     moduleName?: string,
-    prerequisites?: {id: string, name: string, type: string}[],
-    openTab?: 'settings' | 'assign-to'
+    prerequisites?: {id: string; name: string; type: string}[],
+    openTab?: 'settings' | 'assign-to',
   ) => void
   requirementCount: number
   dragHandleProps?: any // For react-beautiful-dnd drag handle
   itemCount: number
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
-  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string, title: string} | null>>
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
 }
 
 const ModuleHeader: React.FC<ModuleHeaderProps> = ({
@@ -65,22 +65,15 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
   itemCount,
   setModuleAction,
   setIsManageModuleContentTrayOpen,
-  setSourceModule
+  setSourceModule,
 }) => {
   const onToggleExpandRef = useCallback(() => {
     onToggleExpand(id)
   }, [onToggleExpand, id])
 
   return (
-    <View as="div"
-      background="secondary"
-      borderWidth="0 0 small 0"
-    >
-      <Flex
-        padding="small"
-        justifyItems="space-between"
-        wrap="wrap"
-      >
+    <View as="div" background="secondary" borderWidth="0 0 small 0">
+      <Flex padding="small" justifyItems="space-between" wrap="wrap">
         <Flex.Item>
           <Flex gap="small" alignItems="center">
             <Flex.Item>
@@ -92,16 +85,14 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
               <IconButton
                 size="small"
                 withBorder={false}
-                screenReaderLabel={expanded ? "Collapse module" : "Expand module"}
+                screenReaderLabel={expanded ? 'Collapse module' : 'Expand module'}
                 renderIcon={expanded ? IconMiniArrowDownLine : IconMiniArrowEndSolid}
                 withBackground={false}
                 onClick={onToggleExpandRef}
               />
             </Flex.Item>
             <Flex.Item>
-              <Heading level="h3">
-                {name}
-              </Heading>
+              <Heading level="h3">{name}</Heading>
             </Flex.Item>
           </Flex>
         </Flex.Item>

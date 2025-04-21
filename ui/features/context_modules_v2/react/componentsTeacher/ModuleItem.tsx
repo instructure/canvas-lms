@@ -19,16 +19,19 @@
 import React, {useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {
-  IconDragHandleLine,
-} from '@instructure/ui-icons'
+import {IconDragHandleLine} from '@instructure/ui-icons'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import {INDENT_LOOKUP, getItemIcon} from '../utils/utils'
 
 import ModuleItemActionPanel from './ModuleItemActionPanel'
 import ModuleItemTitle from './ModuleItemTitle'
 import ModuleItemSupplementalInfo from '../components/ModuleItemSupplementalInfo'
-import {ModuleItemContent, MasteryPathsData, ModuleAction, CompletionRequirement} from '../utils/types'
+import {
+  ModuleItemContent,
+  MasteryPathsData,
+  ModuleAction,
+  CompletionRequirement,
+} from '../utils/types'
 
 export interface ModuleItemProps {
   id: string
@@ -48,9 +51,9 @@ export interface ModuleItemProps {
   onRemove?: (id: string) => void
   completionRequirements?: CompletionRequirement[]
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
-  setSelectedModuleItem?: (item: { id: string, title: string } | null) => void
+  setSelectedModuleItem?: (item: {id: string; title: string} | null) => void
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
-  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string, title: string} | null>>
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
 }
 
 const ModuleItem: React.FC<ModuleItemProps> = ({
@@ -69,7 +72,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
   setModuleAction,
   setSelectedModuleItem,
   setIsManageModuleContentTrayOpen,
-  setSourceModule
+  setSourceModule,
 }) => {
   const getMasteryPathsData = (): MasteryPathsData | null => {
     if (!content || !content._id || !CyoeHelper.isEnabled()) {
@@ -86,7 +89,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
       isCyoeAble: !!data?.isCyoeAble,
       isTrigger: !!data?.isTrigger,
       isReleased: !!data?.isReleased,
-      releasedLabel: data?.releasedLabel || null
+      releasedLabel: data?.releasedLabel || null,
     }
   }
 
@@ -104,8 +107,8 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
       overflowX="hidden"
       data-item-id={_id}
     >
-      <Flex wrap='wrap'>
-        <Flex.Item margin='0 small 0 0'>
+      <Flex wrap="wrap">
+        <Flex.Item margin="0 small 0 0">
           {/* Drag Handle */}
           <div {...dragHandleProps}>
             <IconDragHandleLine />
@@ -114,26 +117,25 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
         <Flex.Item>
           <Flex>
             {/* Item Type Icon */}
-            {itemIcon && <Flex.Item margin="0 small 0 0">
-              <div style={{ padding: `0 0 0 ${itemLeftMargin}` }}>
-                {itemIcon}
-              </div>
-            </Flex.Item>}
+            {itemIcon && (
+              <Flex.Item margin="0 small 0 0">
+                <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>{itemIcon}</div>
+              </Flex.Item>
+            )}
             <Flex.Item>
-              <div style={itemIcon ? {} : { padding: `0 0 0 ${itemLeftMargin}` }}>
-                <Flex
-                  alignItems="start"
-                  justifyItems="start"
-                  wrap="no-wrap"
-                  direction="column"
-                >
+              <div style={itemIcon ? {} : {padding: `0 0 0 ${itemLeftMargin}`}}>
+                <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
                   {/* Item Title */}
                   <Flex.Item shouldGrow={true}>
                     <ModuleItemTitle content={content} url={url} onClick={onClick} />
                   </Flex.Item>
                   {/* Due Date and Points Possible */}
                   <Flex.Item>
-                    <ModuleItemSupplementalInfo contentTagId={_id} content={content} completionRequirement={completionRequirements?.find(req => req.id === _id)} />
+                    <ModuleItemSupplementalInfo
+                      contentTagId={_id}
+                      content={content}
+                      completionRequirement={completionRequirements?.find(req => req.id === _id)}
+                    />
                   </Flex.Item>
                 </Flex>
               </div>

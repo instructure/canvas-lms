@@ -37,8 +37,8 @@ export interface ModuleProps {
   onToggleExpand?: (id: string) => void
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
-  setSelectedModuleItem?: (item: { id: string, title: string } | null) => void
-  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string, title: string} | null>>
+  setSelectedModuleItem?: (item: {id: string; title: string} | null) => void
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
 }
 
 const Module: React.FC<ModuleProps> = ({
@@ -115,22 +115,22 @@ const Module: React.FC<ModuleProps> = ({
             setSourceModule={setSourceModule}
           />
         </Flex.Item>
-      {isExpanded && (
-        <Flex.Item>
-          <ModuleItemList
-            moduleId={id}
-            moduleTitle={name}
-            moduleItems={moduleItems}
-            completionRequirements={completionRequirements}
-            isLoading={isLoading}
-            error={error}
-            setModuleAction={setModuleAction}
-            setSelectedModuleItem={setSelectedModuleItem}
-            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
-            setSourceModule={setSourceModule}
-          />
-        </Flex.Item>
-      )}
+        {isExpanded && (
+          <Flex.Item>
+            <ModuleItemList
+              moduleId={id}
+              moduleTitle={name}
+              moduleItems={moduleItems}
+              completionRequirements={completionRequirements}
+              isLoading={isLoading}
+              error={error}
+              setModuleAction={setModuleAction}
+              setSelectedModuleItem={setSelectedModuleItem}
+              setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+              setSourceModule={setSourceModule}
+            />
+          </Flex.Item>
+        )}
       </Flex>
     </View>
   )

@@ -25,7 +25,7 @@ export const createTopOrder = (
   itemToMove: string | string[],
   items: any[],
   itemKey = '_id',
-  excludeId = ''
+  excludeId = '',
 ): string[] => {
   const itemsToMove = Array.isArray(itemToMove) ? [...itemToMove] : [itemToMove]
   const order: string[] = [...itemsToMove]
@@ -48,7 +48,7 @@ export const createBottomOrder = (
   itemToMove: string | string[],
   items: any[],
   itemKey = '_id',
-  excludeId = ''
+  excludeId = '',
 ): string[] => {
   const itemsToMove = Array.isArray(itemToMove) ? [...itemToMove] : [itemToMove]
   const order: string[] = []
@@ -73,7 +73,7 @@ export const createBeforeOrder = (
   items: any[],
   referenceId: string,
   itemKey = '_id',
-  excludeId = ''
+  excludeId = '',
 ): string[] => {
   const itemsToMove = Array.isArray(itemToMove) ? [...itemToMove] : [itemToMove]
   const order: string[] = []
@@ -110,7 +110,7 @@ export const createAfterOrder = (
   items: any[],
   referenceId: string,
   itemKey = '_id',
-  excludeId = ''
+  excludeId = '',
 ): string[] => {
   const itemsToMove = Array.isArray(itemToMove) ? [...itemToMove] : [itemToMove]
   const order: string[] = []
@@ -146,7 +146,7 @@ export const createModuleItemOrder = (
   moduleItemId: string,
   moduleItems: ModuleItem[] | undefined,
   selectedPosition: string,
-  selectedItem: string
+  selectedItem: string,
 ): string[] => {
   if (!moduleItems) return []
 
@@ -167,7 +167,7 @@ export const createModuleContentsOrder = (
   sourceItems: string[],
   moduleItems: ModuleItem[] | undefined,
   selectedPosition: string,
-  selectedItem: string
+  selectedItem: string,
 ): string[] => {
   if (!moduleItems) return []
 
@@ -188,7 +188,7 @@ export const createModuleOrder = (
   sourceModuleId: string,
   modules: Module[] | undefined,
   selectedPosition: string,
-  selectedItem: string
+  selectedItem: string,
 ): string[] => {
   if (!modules) return []
 

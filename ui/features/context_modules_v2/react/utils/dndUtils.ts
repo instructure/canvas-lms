@@ -16,19 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { DropResult } from 'react-beautiful-dnd'
-import { InfiniteData, QueryClient } from '@tanstack/react-query'
-import type { ModulesResponse } from './types'
+import {DropResult} from 'react-beautiful-dnd'
+import {InfiniteData, QueryClient} from '@tanstack/react-query'
+import type {ModulesResponse} from './types'
 
 const getModuleItemsFromDOM = (moduleId: string): any[] => {
   const moduleElement = document.querySelector(`[data-module-id="${moduleId}"]`)
   const itemElements = moduleElement?.querySelectorAll('[data-item-id]') || []
 
-  return Array.from(itemElements).map((el, index) => ({
-    id: el.getAttribute('data-item-id'),
-    _id: el.getAttribute('data-item-id'),
-    content: { title: el.textContent?.trim() || `Item ${index + 1}` }
-  })).filter((item, index, self) => index === self.findIndex(t => t._id === item._id))
+  return Array.from(itemElements)
+    .map((el, index) => ({
+      id: el.getAttribute('data-item-id'),
+      _id: el.getAttribute('data-item-id'),
+      content: {title: el.textContent?.trim() || `Item ${index + 1}`},
+    }))
+    .filter((item, index, self) => index === self.findIndex(t => t._id === item._id))
 }
 
 const uniqueItems = (items: any[]): any[] =>
@@ -41,22 +43,25 @@ export const handleMoveItem = (
   hoverModuleId: string,
   data: InfiniteData<ModulesResponse> | undefined,
   courseId: string,
-  reorderItemsMutation: any
+  reorderItemsMutation: any,
 ) => {
   if (!data?.pages) return
 
   const allModules = data.pages.flatMap(page => page.modules)
   const updatedModules = JSON.parse(JSON.stringify(allModules))
 
-  const dragModule = updatedModules.find((m: { _id: string }) => m._id === dragModuleId)
-  const hoverModule = updatedModules.find((m: { _id: string }) => m._id === hoverModuleId)
+  const dragModule = updatedModules.find((m: {_id: string}) => m._id === dragModuleId)
+  const hoverModule = updatedModules.find((m: {_id: string}) => m._id === hoverModuleId)
 
   if (!dragModule || !hoverModule) return
 
   if (!dragModule.moduleItems?.length) {
     dragModule.moduleItems = getModuleItemsFromDOM(dragModuleId)
   }
-  if ((!hoverModule.moduleItems?.length && hoverModuleId !== dragModuleId) || !hoverModule.moduleItems) {
+  if (
+    (!hoverModule.moduleItems?.length && hoverModuleId !== dragModuleId) ||
+    !hoverModule.moduleItems
+  ) {
     hoverModule.moduleItems = getModuleItemsFromDOM(hoverModuleId)
   }
 
@@ -72,14 +77,14 @@ export const handleMoveItem = (
     dragModule.moduleItems.splice(hoverIndex, 0, draggedItem)
   }
 
-  const itemIds = hoverModule.moduleItems.map((item: { _id: string }) => item._id).filter(Boolean)
+  const itemIds = hoverModule.moduleItems.map((item: {_id: string}) => item._id).filter(Boolean)
 
   if (itemIds.length) {
     reorderItemsMutation.mutate({
       courseId,
       moduleId: hoverModuleId,
       oldModuleId: dragModuleId,
-      order: itemIds
+      order: itemIds,
     })
   } else {
     console.error('No valid item IDs to reorder')
@@ -96,8 +101,8 @@ export const handleDragEnd = (
     sourceIndex: number,
     destinationIndex: number,
     sourceModuleId: string,
-    destinationModuleId: string
-  ) => void
+    destinationModuleId: string,
+  ) => void,
 ) => {
   if (!result.destination || !data?.pages) {
     return
@@ -127,13 +132,11 @@ export const handleDragEnd = (
       ...oldData,
       pages: oldData.pages.map((page: any) => ({
         ...page,
-        modules: newModules
-      }))
+        modules: newModules,
+      })),
     }))
 
-    const moduleIds = newModules
-      .filter(m => m && m._id)
-      .map(m => m._id)
+    const moduleIds = newModules.filter(m => m && m._id).map(m => m._id)
 
     if (moduleIds.length > 0) {
       reorderModulesMutation.mutate({

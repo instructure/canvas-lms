@@ -296,9 +296,12 @@ function getQueryForContentType(contentType: ModuleItemContentType) {
 }
 
 // Function to transform the query result into a standardized format
-function transformQueryResult(contentType: ModuleItemContentType, result: GraphQLResponse): ContentItemsResponse {
+function transformQueryResult(
+  contentType: ModuleItemContentType,
+  result: GraphQLResponse,
+): ContentItemsResponse {
   if (!result || result.errors) {
-    return { items: [] }
+    return {items: []}
   }
 
   const course = result.course
@@ -306,77 +309,83 @@ function transformQueryResult(contentType: ModuleItemContentType, result: GraphQ
   switch (contentType) {
     case 'assignment':
       return {
-        items: course?.assignmentsConnection?.nodes?.map((node: any) => ({
-          id: node._id,
-          name: node.name,
-          pointsPossible: node.pointsPossible,
-          dueAt: node.dueAt,
-          published: node.published
-        })) || [],
-        pageInfo: course?.assignmentsConnection?.pageInfo
+        items:
+          course?.assignmentsConnection?.nodes?.map((node: any) => ({
+            id: node._id,
+            name: node.name,
+            pointsPossible: node.pointsPossible,
+            dueAt: node.dueAt,
+            published: node.published,
+          })) || [],
+        pageInfo: course?.assignmentsConnection?.pageInfo,
       }
     case 'quiz':
       return {
-        items: course?.quizzesConnection?.nodes?.map((node: any) => ({
-          id: node._id,
-          name: node.title,
-          pointsPossible: node.pointsPossible,
-          published: node.published
-        })) || [],
-        pageInfo: course?.quizzesConnection?.pageInfo
+        items:
+          course?.quizzesConnection?.nodes?.map((node: any) => ({
+            id: node._id,
+            name: node.title,
+            pointsPossible: node.pointsPossible,
+            published: node.published,
+          })) || [],
+        pageInfo: course?.quizzesConnection?.pageInfo,
       }
     case 'file':
       return {
-        items: course?.filesConnection?.nodes?.map((node: any) => ({
-          id: node._id,
-          name: node.displayName,
-          contentType: node.contentType,
-          size: node.size,
-          published: node.published
-        })) || [],
-        pageInfo: course?.filesConnection?.pageInfo
+        items:
+          course?.filesConnection?.nodes?.map((node: any) => ({
+            id: node._id,
+            name: node.displayName,
+            contentType: node.contentType,
+            size: node.size,
+            published: node.published,
+          })) || [],
+        pageInfo: course?.filesConnection?.pageInfo,
       }
     case 'page':
       return {
-        items: course?.pagesConnection?.nodes?.map((node: any) => ({
-          id: node._id,
-          name: node.title,
-          published: node.published
-        })) || [],
-        pageInfo: course?.pagesConnection?.pageInfo
+        items:
+          course?.pagesConnection?.nodes?.map((node: any) => ({
+            id: node._id,
+            name: node.title,
+            published: node.published,
+          })) || [],
+        pageInfo: course?.pagesConnection?.pageInfo,
       }
     case 'discussion':
       return {
-        items: course?.discussionsConnection?.nodes?.map((node: any) => ({
-          id: node._id,
-          name: node.title,
-          published: node.published
-        })) || [],
-        pageInfo: course?.discussionsConnection?.pageInfo
+        items:
+          course?.discussionsConnection?.nodes?.map((node: any) => ({
+            id: node._id,
+            name: node.title,
+            published: node.published,
+          })) || [],
+        pageInfo: course?.discussionsConnection?.pageInfo,
       }
     case 'external_tool':
       return {
-        items: course?.externalToolsConnection?.nodes?.map((node: any) => ({
-          id: node._id,
-          name: node.name,
-          url: node.url
-        })) || [],
-        pageInfo: course?.externalToolsConnection?.pageInfo
+        items:
+          course?.externalToolsConnection?.nodes?.map((node: any) => ({
+            id: node._id,
+            name: node.name,
+            url: node.url,
+          })) || [],
+        pageInfo: course?.externalToolsConnection?.pageInfo,
       }
     case 'context_module_sub_header':
       // Text headers don't need to fetch data
-      return { items: [] }
+      return {items: []}
     case 'external_url':
       // External URLs don't need to fetch data
-      return { items: [] }
+      return {items: []}
     default:
-      return { items: [] }
+      return {items: []}
   }
 }
 
 // Main function to fetch content items based on type
 export async function getModuleItemContent({
-  queryKey
+  queryKey,
 }: {
   queryKey: [string, ModuleItemContentType, string, string?]
 }): Promise<ContentItemsResponse> {
@@ -384,22 +393,22 @@ export async function getModuleItemContent({
 
   // Special cases that don't require API calls
   if (contentType === 'context_module_sub_header' || contentType === 'external_url') {
-    return { items: [] }
+    return {items: []}
   }
 
   const query = getQueryForContentType(contentType)
   if (!query) {
-    return { items: [] }
+    return {items: []}
   }
 
   try {
     const result = await executeQuery<GraphQLResponse>(query, {
       courseId,
-      searchTerm: searchTerm || ''
+      searchTerm: searchTerm || '',
     })
 
     if (result.errors) {
-      throw new Error(result.errors.map((err) => err.message).join(', '))
+      throw new Error(result.errors.map(err => err.message).join(', '))
     }
 
     return transformQueryResult(contentType, result)
@@ -408,8 +417,8 @@ export async function getModuleItemContent({
     showFlashError(
       I18n.t('Failed to load %{contentType}: %{error}', {
         contentType: contentType,
-        error: errorMessage
-      })
+        error: errorMessage,
+      }),
     )
     throw error
   }
@@ -419,12 +428,13 @@ export function useModuleItemContent(
   contentType: ModuleItemContentType,
   courseId: string,
   searchTerm?: string,
-  enabled: boolean = true
+  enabled: boolean = true,
 ) {
   return useQuery({
     queryKey: ['moduleItemContent', contentType, courseId, searchTerm],
     queryFn: getModuleItemContent,
-    enabled: enabled && contentType !== 'context_module_sub_header' && contentType !== 'external_url',
+    enabled:
+      enabled && contentType !== 'context_module_sub_header' && contentType !== 'external_url',
     staleTime: 10 * 60 * 1000, // 10 minutes
   })
 }

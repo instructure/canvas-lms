@@ -28,23 +28,14 @@ export interface TrayFooterProps {
   onMove: () => void
 }
 
-const TrayFooter: React.FC<TrayFooterProps> = ({
-  onClose,
-  onMove,
-}) => {
+const TrayFooter: React.FC<TrayFooterProps> = ({onClose, onMove}) => {
   return (
     <View as="div" textAlign="end" margin="medium 0 0 0">
       <hr aria-hidden="true" />
-      <Button
-        margin="0 x-small 0 0"
-        onClick={onClose}
-      >
+      <Button margin="0 x-small 0 0" onClick={onClose}>
         {I18n.t('Cancel')}
       </Button>
-      <Button
-        color="primary"
-        onClick={onMove}
-      >
+      <Button color="primary" onClick={onMove}>
         {I18n.t('Move')}
       </Button>
     </View>

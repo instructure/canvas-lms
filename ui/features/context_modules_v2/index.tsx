@@ -45,10 +45,13 @@ ready(() => {
     const root = createRoot(container)
     root.render(
       <ErrorBoundary
-        errorComponent={<GenericErrorPage
-          imageUrl={errorShipUrl}
-          errorCategory={I18n.t('Context Modules Error Page')}
-        />}>
+        errorComponent={
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorCategory={I18n.t('Context Modules Error Page')}
+          />
+        }
+      >
         <QueryProvider>
           <ContextModuleProvider
             courseId={ENV.course_id}
@@ -57,12 +60,10 @@ ready(() => {
             // @ts-expect-error
             permissions={ENV.MODULES_PERMISSIONS}
           >
-            {ENV.current_user_is_student
-              ? <ModulesStudentContainer />
-              : <ModulesContainer />}
+            {ENV.current_user_is_student ? <ModulesStudentContainer /> : <ModulesContainer />}
           </ContextModuleProvider>
         </QueryProvider>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
   }
 })

@@ -36,13 +36,8 @@ interface BlueprintLockIconProps {
 
 export const LOCK_ICON_CLASS = {locked: 'lock-icon-locked', unlocked: 'lock-icon-unlock'}
 
-const BlueprintLockIcon: React.FC<BlueprintLockIconProps> = (props) => {
-  const {
-    isChildCourse,
-    initialLockState,
-    contentId,
-    contentType,
-  } = props
+const BlueprintLockIcon: React.FC<BlueprintLockIconProps> = props => {
+  const {isChildCourse, initialLockState, contentId, contentType} = props
 
   const {courseId} = useContextModule()
   const lockText = I18n.t('Locked. Click to unlock.')
@@ -82,7 +77,7 @@ const BlueprintLockIcon: React.FC<BlueprintLockIconProps> = (props) => {
     doFetchApi({
       path: `/api/v1/courses/${courseId}/blueprint_templates/default/restrict_item`,
       method: 'POST',
-      body: formData
+      body: formData,
     })
       .then((response: DoFetchApiResults<unknown>) => {
         if (response.response.ok) {
@@ -133,7 +128,8 @@ const BlueprintLockIcon: React.FC<BlueprintLockIconProps> = (props) => {
   const disabledClass = isChildCourse ? 'disabled' : ''
 
   return (
-    <View as="span"
+    <View
+      as="span"
       className={`lock-icon ${iconClass} ${disabledClass}`}
       data-testid={iconClass}
       onClick={handleClick}
@@ -153,9 +149,7 @@ const BlueprintLockIcon: React.FC<BlueprintLockIconProps> = (props) => {
         on={['hover', 'focus']}
       >
         {getIcon()}
-        <ScreenReaderContent>
-          {isLocked ? lockText : unlockText}
-        </ScreenReaderContent>
+        <ScreenReaderContent>{isLocked ? lockText : unlockText}</ScreenReaderContent>
       </Tooltip>
     </View>
   )

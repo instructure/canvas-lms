@@ -34,15 +34,17 @@ export const useReorderModuleItems = () => {
         method: 'POST',
         body: `order=${order.join(',')}`,
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
       })
       return json
     },
     onSuccess: (_data, variables) => {
-      if (variables?.moduleId) queryClient.invalidateQueries({ queryKey: ['moduleItems', variables?.moduleId || ''] })
-      if (variables?.moduleId !== variables?.oldModuleId) queryClient.invalidateQueries({ queryKey: ['moduleItems', variables?.oldModuleId || ''] })
-      queryClient.invalidateQueries({ queryKey: ['modules', variables?.courseId || ''] })
+      if (variables?.moduleId)
+        queryClient.invalidateQueries({queryKey: ['moduleItems', variables?.moduleId || '']})
+      if (variables?.moduleId !== variables?.oldModuleId)
+        queryClient.invalidateQueries({queryKey: ['moduleItems', variables?.oldModuleId || '']})
+      queryClient.invalidateQueries({queryKey: ['modules', variables?.courseId || '']})
     },
   })
 }

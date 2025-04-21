@@ -31,7 +31,7 @@ const setUpMasterCourse = (initialLockState: boolean = false) => {
         canEdit: true,
         canDelete: true,
         canAdd: true,
-        canDirectShare: true
+        canDirectShare: true,
       }}
     >
       <BlueprintLockIcon
@@ -40,15 +40,25 @@ const setUpMasterCourse = (initialLockState: boolean = false) => {
         contentId=""
         contentType=""
       />
-    </ContextModuleProvider>
+    </ContextModuleProvider>,
   )
 }
 
 const setUpChildCourse = (initialLockState: boolean = false) => {
   return render(
-    <ContextModuleProvider courseId="1" isMasterCourse={false} isChildCourse={true} permissions={{canEdit: true, canDelete: true, canAdd: true, canDirectShare: true}}>
-      <BlueprintLockIcon isChildCourse={true} initialLockState={initialLockState} contentId="" contentType="" />
-    </ContextModuleProvider>
+    <ContextModuleProvider
+      courseId="1"
+      isMasterCourse={false}
+      isChildCourse={true}
+      permissions={{canEdit: true, canDelete: true, canAdd: true, canDirectShare: true}}
+    >
+      <BlueprintLockIcon
+        isChildCourse={true}
+        initialLockState={initialLockState}
+        contentId=""
+        contentType=""
+      />
+    </ContextModuleProvider>,
   )
 }
 
