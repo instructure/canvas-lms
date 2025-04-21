@@ -938,7 +938,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def needs_to_update_submissions?
-    !id_before_last_save.nil? &&
+    !previously_new_record? &&
       (saved_change_to_points_possible? || saved_change_to_grading_type? || saved_change_to_grading_standard_id?) &&
       submissions.graded.exists?
   end
@@ -965,7 +965,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def needs_to_recompute_grade?
-    !id_before_last_save.nil? && (
+    !previously_new_record? && (
       saved_change_to_points_possible? ||
       saved_change_to_workflow_state? ||
       saved_change_to_assignment_group_id? ||
@@ -984,7 +984,7 @@ class AbstractAssignment < ActiveRecord::Base
   private :update_grades_if_details_changed
 
   def update_grading_period_grades
-    return true unless saved_change_to_due_at? && !saved_change_to_id? && context.grading_periods? && saved_by != :migration
+    return true unless saved_change_to_due_at? && !previously_new_record? && context.grading_periods? && saved_by != :migration
 
     grading_period_was = GradingPeriod.for_date_in_course(date: due_at_before_last_save, course: context)
     grading_period = GradingPeriod.for_date_in_course(date: due_at, course: context)
@@ -3627,7 +3627,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def update_cached_due_dates?
-    new_record? || just_created ||
+    new_record? || previously_new_record? ||
       will_save_change_to_due_at? || saved_change_to_due_at? ||
       will_save_change_to_workflow_state? || saved_change_to_workflow_state? ||
       will_save_change_to_only_visible_to_overrides? ||

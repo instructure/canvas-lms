@@ -396,7 +396,7 @@ class CoursePace < ActiveRecord::Base
 
   def logging_for_weekends_required?
     saved_change_to_exclude_weekends? || saved_change_to_selected_days_to_skip? ||
-      (saved_change_to_id? && weekends_excluded)
+      (previously_new_record? && weekends_excluded)
   end
 
   def log_pace_counts
@@ -414,7 +414,7 @@ class CoursePace < ActiveRecord::Base
       InstStatsd::Statsd.increment("course_pacing.weekends_excluded")
     else
       # Only decrementing during an update (not initial create)
-      InstStatsd::Statsd.decrement("course_pacing.weekends_excluded") unless saved_change_to_id?
+      InstStatsd::Statsd.decrement("course_pacing.weekends_excluded") unless previously_new_record?
     end
   end
 

@@ -232,7 +232,7 @@ class Pseudonym < ActiveRecord::Base
   def update_account_associations_if_account_changed
     return unless user && !User.skip_updating_account_associations?
 
-    if id_before_last_save.nil?
+    if previously_new_record?
       return if %w[creation_pending deleted].include?(user.workflow_state)
 
       user.update_account_associations(incremental: true, precalculated_associations: { account_id => 0 })

@@ -1629,7 +1629,7 @@ class DiscussionTopic < ActiveRecord::Base
     p.to { users_with_permissions(active_participants_with_visibility) }
     p.whenever do |record|
       record.send_notification_for_context? and
-        ((record.just_created && record.active?) || record.changed_state(:active, record.is_announcement ? :post_delayed : :unpublished))
+        ((record.previously_new_record? && record.active?) || record.changed_state(:active, record.is_announcement ? :post_delayed : :unpublished))
     end
     p.data { course_broadcast_data }
   end

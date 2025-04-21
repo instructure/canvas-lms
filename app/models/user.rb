@@ -627,7 +627,7 @@ class User < ActiveRecord::Base
   end
 
   def update_account_associations_if_necessary
-    update_account_associations if !self.class.skip_updating_account_associations? && saved_change_to_workflow_state? && id_before_last_save
+    update_account_associations if !self.class.skip_updating_account_associations? && saved_change_to_workflow_state? && !previously_new_record?
   end
 
   def update_account_associations(opts = nil)

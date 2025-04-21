@@ -146,7 +146,7 @@ class StudentEnrollment < Enrollment
   end
 
   def republish_course_pace_if_needed
-    return unless saved_change_to_id? || saved_change_to_start_at? || (saved_change_to_workflow_state? && workflow_state != "deleted")
+    return unless previously_new_record? || saved_change_to_start_at? || (saved_change_to_workflow_state? && workflow_state != "deleted")
     return unless course.enable_course_paces?
 
     pace = course.course_paces.published.where(course_section_id:).last

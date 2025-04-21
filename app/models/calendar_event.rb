@@ -472,7 +472,7 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :new_event_created
     to { participants(include_observers: true) - [@updating_user] }
     whenever do
-      !appointment_group && !account && context.available? && just_created && !hidden? && !series_tail?
+      !appointment_group && !account && context.available? && previously_new_record? && !hidden? && !series_tail?
     end
     data { course_broadcast_data }
 
@@ -495,7 +495,7 @@ class CalendarEvent < ActiveRecord::Base
     end
     whenever do
       @updating_user && appointment_group && parent_event &&
-        just_created &&
+        previously_new_record? &&
         context == appointment_group.participant_for(@updating_user)
     end
     data { { updating_user_name: @updating_user.name }.merge(course_broadcast_data) }
@@ -518,7 +518,7 @@ class CalendarEvent < ActiveRecord::Base
     to { participants(include_observers: true) - [@updating_user] }
     whenever do
       appointment_group && parent_event &&
-        just_created
+        previously_new_record?
     end
     data { { updating_user_name: @updating_user.name }.merge(course_broadcast_data) }
 

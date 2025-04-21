@@ -470,7 +470,7 @@ class Course < ActiveRecord::Base
 
   def update_account_associations_if_changed
     if (saved_change_to_root_account_id? || saved_change_to_account_id?) && !self.class.skip_updating_account_associations?
-      delay(synchronous: !Rails.env.production? || saved_change_to_id?).update_account_associations
+      delay(synchronous: !Rails.env.production? || previously_new_record?).update_account_associations
     end
   end
 
@@ -482,7 +482,7 @@ class Course < ActiveRecord::Base
   end
 
   def update_enrollment_states_if_necessary
-    return if saved_change_to_id # new object, nothing to possibly invalidate
+    return if previously_new_record? # new object, nothing to possibly invalidate
 
     # a lot of things can change the date logic here :/
     if (saved_changes.keys.intersect?(%w[restrict_enrollments_to_course_dates account_id enrollment_term_id]) ||
@@ -1089,7 +1089,7 @@ class Course < ActiveRecord::Base
     p.to { root_account.account_users.active }
     p.whenever do |record|
       record.root_account &&
-        ((record.just_created && record.name != Course.default_name) ||
+        ((record.previously_new_record? && record.name != Course.default_name) ||
          (record.name_before_last_save == Course.default_name &&
            record.name != Course.default_name)
         )

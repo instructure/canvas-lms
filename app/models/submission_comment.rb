@@ -242,7 +242,7 @@ class SubmissionComment < ActiveRecord::Base
     p.whenever do |record|
       # allows broadcasting when this record is initially saved (assuming draft == false) and also when it gets updated
       # from draft to final
-      !record.draft? && (record.just_created || record.saved_change_to_draft?) &&
+      !record.draft? && (record.previously_new_record? || record.saved_change_to_draft?) &&
         record.provisional_grade_id.nil? &&
         record.submission.assignment &&
         record.submission.assignment.context.available? &&
@@ -255,7 +255,7 @@ class SubmissionComment < ActiveRecord::Base
     p.dispatch :submission_comment_for_teacher
     p.to { submission.assignment.context.instructors_in_charge_of(author_id) - [author] }
     p.whenever do |record|
-      !record.draft? && (record.just_created || record.saved_change_to_draft?) &&
+      !record.draft? && (record.previously_new_record? || record.saved_change_to_draft?) &&
         record.provisional_grade_id.nil? &&
         record.submission.user_id == record.author_id
     end
@@ -480,8 +480,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def update_participation
-    # id_changed? because new_record? is false in after_save callbacks
-    if saved_change_to_id? || (saved_change_to_hidden? && !hidden?)
+    if previously_new_record? || (saved_change_to_hidden? && !hidden?)
       return if draft? || submission.user_id == author_id || submission.assignment.deleted? || provisional_grade_id.present?
 
       self.class.connection.after_transaction_commit do
@@ -517,7 +516,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def updating_user_present?
     # For newly-created comments, the updating user is always the commenter
-    updating_user = saved_change_to_id? ? author : @updating_user
+    updating_user = previously_new_record? ? author : @updating_user
     updating_user.present?
   end
 
@@ -532,7 +531,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def record_save_audit_event
-    updating_user = saved_change_to_id? ? author : @updating_user
+    updating_user = previously_new_record? ? author : @updating_user
     event_type = event_type_for_save
     changes_to_save = auditable_changes(event_type:)
     return if changes_to_save.empty?
@@ -550,7 +549,7 @@ class SubmissionComment < ActiveRecord::Base
     # We don't track draft comments, so publishing a draft comment is
     # considered to be a "creation" event.
     publishing_draft = saved_change_to_draft? && !draft?
-    treat_as_created = saved_change_to_id? || publishing_draft
+    treat_as_created = previously_new_record? || publishing_draft
     if treat_as_created
       :submission_comment_created
     else
