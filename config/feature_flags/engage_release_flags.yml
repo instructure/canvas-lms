@@ -15,6 +15,11 @@ assign_to_differentiation_tags:
   shadow: true
   display_name: Assign to Differentiation Tags
   description: Allows instructors to assign course content to differentiation tags via Account/Sub-account setting.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 self_signup_deadline:
   state: hidden
   applies_to: Account
