@@ -90,12 +90,12 @@ const router = createBrowserRouter(
           path: 'product_detail/:id',
           element: (
             <ProductDetail
-              renderConfigureButton={(buttonWidth, ltiConfiguration) => {
+              renderConfigureButton={(buttonWidth, product) => {
                 return (
                   <ProductConfigureButton
                     accountId={accountId}
                     buttonWidth={buttonWidth}
-                    ltiConfiguration={ltiConfiguration}
+                    product={product}
                   />
                 )
               }}
