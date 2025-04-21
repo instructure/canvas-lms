@@ -3529,7 +3529,8 @@ describe CoursesController, type: :request do
               "sis_user_id" => nil,
               "integration_id" => nil,
               "email" => "ta@ta.com",
-              "bio" => "hey"
+              "bio" => "hey",
+              "has_non_collaborative_groups" => false
             }
           ]
         end
