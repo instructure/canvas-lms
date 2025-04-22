@@ -24,7 +24,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('edit_rubricCommentButton')
 
 const CommentButton = ({onClick}) => (
-  <div>
+  <div className="add-comment-button-wrapper">
     <IconButton
       renderIcon={<IconFeedbackLine />}
       withBackground={false}
@@ -32,6 +32,7 @@ const CommentButton = ({onClick}) => (
       margin="0 x-small 0 0"
       onClick={onClick}
       screenReaderLabel={I18n.t('Add Additional Comments')}
+      data-testid="add-comment-button"
     />
   </div>
 )
