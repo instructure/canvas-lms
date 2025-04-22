@@ -161,6 +161,20 @@ describe CourseProgress do
                              })
     end
 
+    describe("when the student cannot be evalualated for the course") do
+      it "returns partial progress for student" do
+        allow_any_instance_of(ContextModule).to receive(:evaluate_for).and_return(nil)
+        progress = CourseProgress.new(@course, @user).to_json
+
+        expect(progress).to eq({
+                                 requirement_count: 5,
+                                 requirement_completed_count: 0,
+                                 next_requirement_url: nil,
+                                 completed_at: nil
+                               })
+      end
+    end
+
     describe "#current_module" do
       it "returns the first incomplete module" do
         # turn in first two assignments (module 1)
