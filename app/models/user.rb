@@ -3559,6 +3559,23 @@ class User < ActiveRecord::Base
     nil
   end
 
+  def create_courses_permissions(root_account)
+    # things needed on both k5 and classic dashboards
+    create_permission_root_account = create_courses_right(root_account, check_subaccounts: true)
+    create_permission_mcc_account = create_courses_right(root_account.manually_created_courses_account)
+    # alternate account already checks if the user is an admin + can create courses in the account
+    create_permission_alternate_account = :admin if alternate_account_for_course_creation
+
+    mcc_only = if create_permission_alternate_account
+                 # admin can always create courses in other accounts/subaccounts
+                 false
+               else
+                 !(create_permission_root_account && root_account.feature_enabled?(:create_course_subaccount_picker))
+               end
+    can_create = create_permission_root_account || create_permission_alternate_account || create_permission_mcc_account
+    { can_create:, restrict_to_mcc: mcc_only }
+  end
+
   def all_account_calendars
     account_user_account_ids = []
     active_account_users = account_users.active
