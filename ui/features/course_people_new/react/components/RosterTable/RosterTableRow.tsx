@@ -45,20 +45,8 @@ export type RosterTableRowProps = {
   handleSelectRow: (selected: boolean, id: string) => void
 }
 
-const RosterTableRow: React.FC<RosterTableRowProps> = ({
-  user,
-  isSelected,
-  handleSelectRow
-}) => {
-  const {
-    _id: uid,
-    name,
-    loginId,
-    sisId,
-    avatarUrl,
-    customLinks,
-    pronouns
-  } = user
+const RosterTableRow: React.FC<RosterTableRowProps> = ({user, isSelected, handleSelectRow}) => {
+  const {_id: uid, name, loginId, sisId, avatarUrl, customLinks, pronouns} = user
 
   const {
     canViewLoginIdColumn,
@@ -68,7 +56,7 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
     canManageDifferentiationTags,
     canAllowCourseAdminActions,
     canManageStudents,
-    allowAssignToDifferentiationTags
+    allowAssignToDifferentiationTags,
   } = useCoursePeopleContext()
 
   const enrollments = user?.enrollments || []
@@ -100,24 +88,19 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
 
   return (
     <Table.Row data-testid={`table-row-${uid}`}>
-      {allowAssignToDifferentiationTags && canManageDifferentiationTags
-        ? (
-            <Table.RowHeader>
-              <Checkbox
-                label={
-                  <ScreenReaderContent>
-                    {I18n.t('Select %{name}', {name})}
-                  </ScreenReaderContent>
-                }
-                onChange={() => handleSelectRow(isSelected, uid)}
-                checked={isSelected}
-                data-testid={`select-user-${uid}`}
-              />
-            </Table.RowHeader>
-          )
-        : <></>
-      }
-      <Table.Cell>
+      {allowAssignToDifferentiationTags && canManageDifferentiationTags ? (
+        <Table.RowHeader>
+          <Checkbox
+            label={<ScreenReaderContent>{I18n.t('Select %{name}', {name})}</ScreenReaderContent>}
+            onChange={() => handleSelectRow(isSelected, uid)}
+            checked={isSelected}
+            data-testid={`select-user-${uid}`}
+          />
+        </Table.RowHeader>
+      ) : (
+        <></>
+      )}
+      <Table.Cell data-testid={`name-user-${uid}`}>
         <UserLink
           uid={uid}
           htmlUrl={htmlUrl}
@@ -127,75 +110,65 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
           enrollments={enrollments}
         />
       </Table.Cell>
-      {canViewLoginIdColumn
-        ? (
-            <Table.Cell data-testid={`login-id-user-${uid}`}>
-              <Text>{loginId}</Text>
-            </Table.Cell>
-          )
-        : <></>
-      }
-      {canViewSisIdColumn
-        ? (
-            <Table.Cell data-testid={`sis-id-user-${uid}`}>
-              <Text>{sisId}</Text>
-            </Table.Cell>
-          )
-        : <></>
-      }
-      {!hideSectionsOnCourseUsersPage
-        ? (
-            <Table.Cell data-testid={`sections-user-${uid}`}>
-              {renderSections()}
-            </Table.Cell>
-          )
-        : <></>
-      }
-      <Table.Cell>
+      {canViewLoginIdColumn ? (
+        <Table.Cell data-testid={`login-id-user-${uid}`}>
+          <Text>{loginId}</Text>
+        </Table.Cell>
+      ) : (
+        <></>
+      )}
+      {canViewSisIdColumn ? (
+        <Table.Cell data-testid={`sis-id-user-${uid}`}>
+          <Text>{sisId}</Text>
+        </Table.Cell>
+      ) : (
+        <></>
+      )}
+      {!hideSectionsOnCourseUsersPage ? (
+        <Table.Cell data-testid={`section-name-user-${uid}`}>{renderSections()}</Table.Cell>
+      ) : (
+        <></>
+      )}
+      <Table.Cell data-testid={`role-user-${uid}`}>
         <UserRole enrollments={enrollments} />
       </Table.Cell>
-      {canReadReports
-        ? (
-            <Table.Cell data-testid={`last-activity-user-${uid}`}>
-              <UserLastActivity enrollments={enrollments} />
-            </Table.Cell>
-          )
-        : <></>
-      }
-      {canReadReports
-        ? (
-            <Table.Cell data-testid={`total-activity-user-${uid}`}>
-              <View as="div">
-                {totalActivity(enrollments)}
-              </View>
-            </Table.Cell>
-          )
-        : <></>
-      }
-      {canRemoveUsers || canManage
-        ? (
-            <Table.Cell textAlign="end">
-              <UserMenu
-                uid={uid}
-                name={name}
-                htmlUrl={htmlUrl}
-                enrollments={enrollments}
-                customLinks={customLinks}
-                canManage={canManage}
-                canRemoveUsers={canRemoveUsers}
-                onResendInvitation={onResendInvitationHandler}
-                onLinkStudents={onLinkStudentsHandler}
-                onEditSections={onEditSectionsHandler}
-                onEditRoles={onEditRolesHandler}
-                onReactivateUser={onReactivateUserHandler}
-                onDeactivateUser={onDeactivateUserHandler}
-                onRemoveUser={onRemoveUserHandler}
-                onCustomLinkSelect={onCustomLinkSelectHandler}
-              />
-            </Table.Cell>
-          )
-        : <></>
-      }
+      {canReadReports ? (
+        <Table.Cell data-testid={`last-activity-user-${uid}`}>
+          <UserLastActivity enrollments={enrollments} />
+        </Table.Cell>
+      ) : (
+        <></>
+      )}
+      {canReadReports ? (
+        <Table.Cell data-testid={`total-activity-user-${uid}`}>
+          <View as="div">{totalActivity(enrollments)}</View>
+        </Table.Cell>
+      ) : (
+        <></>
+      )}
+      {canRemoveUsers || canManage ? (
+        <Table.Cell textAlign="end">
+          <UserMenu
+            uid={uid}
+            name={name}
+            htmlUrl={htmlUrl}
+            enrollments={enrollments}
+            customLinks={customLinks}
+            canManage={canManage}
+            canRemoveUsers={canRemoveUsers}
+            onResendInvitation={onResendInvitationHandler}
+            onLinkStudents={onLinkStudentsHandler}
+            onEditSections={onEditSectionsHandler}
+            onEditRoles={onEditRolesHandler}
+            onReactivateUser={onReactivateUserHandler}
+            onDeactivateUser={onDeactivateUserHandler}
+            onRemoveUser={onRemoveUserHandler}
+            onCustomLinkSelect={onCustomLinkSelectHandler}
+          />
+        </Table.Cell>
+      ) : (
+        <></>
+      )}
     </Table.Row>
   )
 }

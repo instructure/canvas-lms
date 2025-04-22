@@ -54,8 +54,23 @@ export const DEFAULT_OPTION: EnvRole = {
   id: 'all_roles',
   label: I18n.t('All Roles'),
   name: I18n.t('All Roles'),
-  plural_label: I18n.t('All Roles')
+  plural_label: I18n.t('All Roles'),
 }
+
+export const SORTABLE_FIELDS = [
+  'name',
+  'login_id',
+  'sis_id',
+  'section_name',
+  'role',
+  'last_activity_at',
+  'total_activity_time',
+] as SortField[]
 
 export const DEFAULT_SORT_FIELD = 'name' as SortField
 export const DEFAULT_SORT_DIRECTION = 'asc' as SortDirection
+
+export const DEFAULT_ENROLLMENTS_SORT_FIELD = 'section_name' as SortField
+export const DEFAULT_ENROLLMENTS_SORT_DIRECTION = 'asc' as SortDirection
+
+export const MULTI_VALUE_SORT_FIELDS = ['section_name', 'last_activity_at', 'role'] as SortField[]
