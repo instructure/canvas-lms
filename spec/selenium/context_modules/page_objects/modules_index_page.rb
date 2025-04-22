@@ -359,7 +359,7 @@ module ModulesIndexPage
   end
 
   def big_course_setup
-    course_modules = create_modules(3)
+    course_modules = create_modules(3, true)
     course_assignments = create_assignments([@course.id], 30)
 
     9.times do |i|
