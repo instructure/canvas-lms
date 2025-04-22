@@ -4658,6 +4658,120 @@ describe User do
     end
   end
 
+  describe "create_courses_permissions" do
+    before do
+      @account = Account.default
+      @account.enable_feature!(:create_course_subaccount_picker)
+      @account.settings[:teachers_can_create_courses] = true
+      @account.settings[:students_can_create_courses] = true
+      @account.save!
+    end
+
+    context "as a teacher" do
+      before do
+        @user = user_factory(active_all: true)
+      end
+
+      it "teachers can create without restriction" do
+        @account.settings[:teachers_can_create_courses_anywhere] = true
+        @account.save!
+        course_with_teacher_logged_in(user: @user, active_all: true)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be(:teacher)
+        expect(permissions[:restrict_to_mcc]).to be_falsey
+      end
+
+      it "teacher enrollments can only create in MCC" do
+        @account.settings[:teachers_can_create_courses_anywhere] = false
+        @account.save!
+        course_with_teacher_logged_in(user: @user, active_all: true)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be(:teacher)
+        expect(permissions[:restrict_to_mcc]).to be_truthy
+      end
+    end
+
+    context "as a student" do
+      before do
+        @user = user_factory(active_all: true)
+      end
+
+      it "students can create without restriction" do
+        @account.settings[:students_can_create_courses_anywhere] = true
+        @account.save!
+        course_with_student_logged_in(user: @user, active_all: true)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be(:student)
+        expect(permissions[:restrict_to_mcc]).to be_falsey
+      end
+
+      it "student enrollments can only create in MCC" do
+        @account.settings[:students_can_create_courses_anywhere] = false
+        @account.save!
+        course_with_student_logged_in(user: @user, active_all: true)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be(:student)
+        expect(permissions[:restrict_to_mcc]).to be_truthy
+      end
+    end
+
+    context "as non-enrolled user" do
+      before do
+        @user = user_factory(active_all: true)
+      end
+
+      it "non-enrolled users can only create in MCC" do
+        @account.settings[:no_enrollments_can_create_courses] = true
+        @account.save!
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be(:no_enrollments)
+        expect(permissions[:restrict_to_mcc]).to be_truthy
+      end
+
+      it "non-enrolled users cannot create courses" do
+        @account.settings[:no_enrollments_can_create_courses] = false
+        @account.save!
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be_nil
+        expect(permissions[:restrict_to_mcc]).to be_truthy
+      end
+    end
+
+    it "admin users can always create under a sub-account" do
+      @user = user_factory(active_all: true)
+      account_admin_user(account: @account, user: @user)
+
+      permissions = @user.create_courses_permissions(@account)
+
+      expect(permissions[:can_create]).to be(:admin)
+      expect(permissions[:restrict_to_mcc]).to be_falsey
+    end
+
+    it "enrolled users can create courses under a sub-account" do
+      @account.settings[:students_can_create_courses_anywhere] = true
+      @account.save!
+      @subaccount = @account.sub_accounts.create!(name: "SA")
+      course_with_student_logged_in(active_all: true, account: @subaccount)
+
+      permissions = @user.create_courses_permissions(@account)
+
+      expect(permissions[:can_create]).to be(:student)
+      expect(permissions[:restrict_to_mcc]).to be_falsey
+    end
+  end
+
   it "destroys associated gradebook filters when the user is soft-deleted" do
     course_with_teacher(active_all: true)
     @course.gradebook_filters.create!(user: @teacher, course: @course, name: "First filter", payload: { foo: :bar })
