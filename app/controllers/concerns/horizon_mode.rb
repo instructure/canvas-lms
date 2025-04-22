@@ -20,6 +20,7 @@
 module HorizonMode
   # Use this function after @context is set
   def redirect_student_to_horizon
+    return if params[:invitation].present?
     return unless @context.is_a?(Course) && @context.horizon_course?
     return if @context.user_is_admin?(@current_user) || @context.cached_account_users_for(@current_user).any?
 

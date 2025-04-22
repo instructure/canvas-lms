@@ -2235,7 +2235,7 @@ class CoursesController < ApplicationController
 
       @context ||= api_find(Course.active, params[:id])
 
-      if @context.horizon_course? && !request.path.include?("/modules")
+      if @context.horizon_course? && !request.path.include?("/modules") && params[:invitation].blank?
         redirect_to course_context_modules_path(@context.id)
         return
       end
