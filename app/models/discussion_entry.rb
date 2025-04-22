@@ -642,7 +642,9 @@ class DiscussionEntry < ActiveRecord::Base
   def broadcast_report_notification(report_type)
     return unless root_account.feature_enabled?(:discussions_reporting)
 
-    to_list = context.instructors_in_charge_of(user_id)
+    course = context.is_a?(Group) ? context.course : context
+
+    to_list = course.instructors_in_charge_of(user_id)
 
     notification_type = "Reported Reply"
     notification = BroadcastPolicy.notification_finder.by_name(notification_type)
