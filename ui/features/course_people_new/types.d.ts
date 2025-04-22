@@ -29,7 +29,7 @@ import {
   STUDENT_ROLE,
   TA_ROLE,
   OBSERVER_ROLE,
-  DESIGNER_ROLE
+  DESIGNER_ROLE,
 } from './react/util/constants'
 
 interface EnvPermissions {
@@ -61,7 +61,12 @@ interface EnvCourse {
   concluded: boolean
 }
 
-export type EnrollmentType = typeof TEACHER_ENROLLMENT | typeof STUDENT_ENROLLMENT | typeof TA_ENROLLMENT | typeof OBSERVER_ENROLLMENT | typeof DESIGNER_ENROLLMENT
+export type EnrollmentType =
+  | typeof TEACHER_ENROLLMENT
+  | typeof STUDENT_ENROLLMENT
+  | typeof TA_ENROLLMENT
+  | typeof OBSERVER_ENROLLMENT
+  | typeof DESIGNER_ENROLLMENT
 
 export interface EnvRole {
   addable_by_user: boolean
@@ -108,7 +113,10 @@ export interface CoursePeopleContextType {
   currentUserId: string
 }
 
-export type EnrollmentState = typeof ACTIVE_ENROLLMENT | typeof INACTIVE_ENROLLMENT | typeof PENDING_ENROLLMENT
+export type EnrollmentState =
+  | typeof ACTIVE_ENROLLMENT
+  | typeof INACTIVE_ENROLLMENT
+  | typeof PENDING_ENROLLMENT
 
 export type Enrollment = {
   _id: string
@@ -148,9 +156,21 @@ export type User = {
   customLinks: CustomLink[] | null
 }
 
-export type SisRole = typeof TEACHER_ROLE | typeof STUDENT_ROLE | typeof TA_ROLE | typeof OBSERVER_ROLE | typeof DESIGNER_ROLE
+export type SisRole =
+  | typeof TEACHER_ROLE
+  | typeof STUDENT_ROLE
+  | typeof TA_ROLE
+  | typeof OBSERVER_ROLE
+  | typeof DESIGNER_ROLE
 
-export type SortField = 'name' | 'sis_id' | 'login_id' | 'total_activity_time'
+export type SortField =
+  | 'name'
+  | 'sis_id'
+  | 'login_id'
+  | 'section_name'
+  | 'role'
+  | 'last_activity_at'
+  | 'total_activity_time'
 
 export type SortDirection = 'asc' | 'desc'
 

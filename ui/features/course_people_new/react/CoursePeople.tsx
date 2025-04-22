@@ -34,7 +34,8 @@ import {
   DESC,
   DEFAULT_OPTION,
   DEFAULT_SORT_FIELD,
-  DEFAULT_SORT_DIRECTION
+  DEFAULT_SORT_DIRECTION,
+  SORTABLE_FIELDS,
 } from '../util/constants'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SortField, SortDirection} from '../types'
@@ -46,7 +47,7 @@ const CoursePeople: FC = () => {
     search: rawSearchTerm,
     debouncedSearch: searchTerm,
     onChangeHandler,
-    onClearHandler
+    onClearHandler,
   } = useSearch()
 
   const [optionId, setOptionId] = useState<string>(DEFAULT_OPTION.id)
@@ -54,16 +55,19 @@ const CoursePeople: FC = () => {
   const [sortField, setSortField] = useState<SortField>(DEFAULT_SORT_FIELD)
   const [sortDirection, setSortDirection] = useState<SortDirection>(DEFAULT_SORT_DIRECTION)
 
-  const {data: users, isLoading, error} = useCoursePeopleQuery({
+  const {
+    data: users,
+    isLoading,
+    error,
+  } = useCoursePeopleQuery({
     courseId,
     searchTerm,
     optionId,
     sortField,
-    sortDirection
+    sortDirection,
   })
 
   const numberOfResults = users ? users.length : 0
-  const sortableFields = ['name', 'login_id', 'sis_id', 'total_activity_time']
 
   useEffect(() => {
     if (error) {
@@ -75,10 +79,10 @@ const CoursePeople: FC = () => {
   }, [error])
 
   const handleSort = (_event: SyntheticEvent<Element, Event>, {id}: {id: string}) => {
-    if (sortableFields.includes(id)) {
+    if (SORTABLE_FIELDS.includes(id as SortField)) {
       if (sortField === id) {
         // toggle sort direction for the same field
-        setSortDirection(direction => direction === ASC ? DESC : ASC)
+        setSortDirection(direction => (direction === ASC ? DESC : ASC))
       } else {
         setSortField(id as SortField)
         setSortDirection(DEFAULT_SORT_DIRECTION)
@@ -93,7 +97,7 @@ const CoursePeople: FC = () => {
     <View as="div" margin="medium 0">
       <CoursePeopleHeader />
       <Flex as="div" margin="medium 0">
-        <Flex.Item as="div" margin="0 small 0 0" width={"30%"}>
+        <Flex.Item as="div" margin="0 small 0 0" width={'30%'}>
           <PeopleSearchBar
             searchTerm={rawSearchTerm}
             numberOfResults={numberOfResults}
@@ -102,7 +106,7 @@ const CoursePeople: FC = () => {
             onClearHandler={onClearHandler}
           />
         </Flex.Item>
-        <Flex.Item as="div" margin="0 small 0 0" width={"30%"}>
+        <Flex.Item as="div" margin="0 small 0 0" width={'30%'}>
           <PeopleFilter onOptionSelect={setOptionId} />
         </Flex.Item>
       </Flex>
@@ -121,9 +125,7 @@ const CoursePeople: FC = () => {
           handleSort={handleSort}
         />
       )}
-      {!isLoading && numberOfResults === 0 && (
-        <NoPeopleFound />
-      )}
+      {!isLoading && numberOfResults === 0 && <NoPeopleFound />}
     </View>
   )
 }

@@ -21,9 +21,15 @@ import {COURSE_PEOPLE_QUERY} from '../../graphql/Queries'
 import {executeQuery} from '@canvas/query/graphql'
 import useCoursePeopleContext from './useCoursePeopleContext'
 import {User, SortField, SortDirection} from '../../types'
-import {DEFAULT_SORT_FIELD, DEFAULT_SORT_DIRECTION} from '../../util/constants'
+import {
+  DEFAULT_SORT_FIELD,
+  DEFAULT_SORT_DIRECTION,
+  DEFAULT_ENROLLMENTS_SORT_FIELD,
+  DEFAULT_ENROLLMENTS_SORT_DIRECTION,
+  MULTI_VALUE_SORT_FIELDS,
+} from '../../util/constants'
 
-export interface CoursePeopleQueryResponse{
+export interface CoursePeopleQueryResponse {
   course: {
     usersConnection: {
       nodes: User[]
@@ -44,31 +50,47 @@ const useCoursePeopleQuery = ({
   searchTerm,
   optionId,
   sortField = DEFAULT_SORT_FIELD,
-  sortDirection = DEFAULT_SORT_DIRECTION
+  sortDirection = DEFAULT_SORT_DIRECTION,
 }: QueryProps) => {
   const {currentUserId, allRoles} = useCoursePeopleContext()
   const shouldFetch = searchTerm === '' || searchTerm.length >= 2
   const searchTermKey = shouldFetch ? searchTerm : ''
   const allRoleIds = allRoles.map(role => role.id)
   const enrollmentRoleIds = allRoleIds.includes(optionId) ? [optionId] : undefined
+  let enrollmentsSortField = DEFAULT_ENROLLMENTS_SORT_FIELD
+  let enrollmentsSortDirection = DEFAULT_ENROLLMENTS_SORT_DIRECTION
+  if (MULTI_VALUE_SORT_FIELDS.includes(sortField)) {
+    enrollmentsSortField = sortField
+    enrollmentsSortDirection = sortDirection
+  }
 
   return useQuery({
     // currentUserId added to key so that data is refetched when swithching between Teacher and Student Views
-    queryKey: ['course_people', courseId, currentUserId, searchTermKey, enrollmentRoleIds, sortField, sortDirection],
+    queryKey: [
+      'course_people',
+      courseId,
+      currentUserId,
+      searchTermKey,
+      enrollmentRoleIds,
+      sortField,
+      sortDirection,
+      enrollmentsSortField,
+      enrollmentsSortDirection,
+    ],
     queryFn: async () => {
-      const response = await executeQuery<CoursePeopleQueryResponse>(
-        COURSE_PEOPLE_QUERY,
-        {
-          courseId,
-          searchTerm,
-          enrollmentRoleIds,
-          sortField,
-          sortDirection
-        }
-      )
+      const response = await executeQuery<CoursePeopleQueryResponse>(COURSE_PEOPLE_QUERY, {
+        courseId,
+        searchTerm,
+        enrollmentRoleIds,
+        sortField,
+        sortDirection,
+        enrollmentsSortField,
+        enrollmentsSortDirection,
+      })
       return response?.course?.usersConnection?.nodes || []
     },
-    enabled: shouldFetch
+    enabled: shouldFetch,
+    staleTime: 1000 * 60 * 1, // 1 minute
   })
 }
 
