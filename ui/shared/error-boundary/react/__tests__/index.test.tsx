@@ -63,4 +63,18 @@ describe('ErrorBoundary', () => {
     )
     expect(getByText('Making sure this does not work')).toBeInTheDocument()
   })
+
+  test('calls "beforeCapture" when provided', () => {
+    const beforeCaptureMock = jest.fn()
+    render(
+      <ErrorBoundary
+        errorComponent={<></>}
+        beforeCapture={beforeCaptureMock}
+      >
+        <ThrowsErrorComponent />
+      </ErrorBoundary>
+    )
+
+    expect(beforeCaptureMock).toHaveBeenCalled()
+  })
 })
