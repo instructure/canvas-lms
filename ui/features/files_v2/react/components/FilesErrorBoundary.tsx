@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,20 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {createRoot} from 'react-dom/client'
-import {RouterProvider} from 'react-router-dom'
-import {QueryProvider} from '@canvas/query'
-import {router} from './routes/router'
-import {FilesErrorBoundary} from './react/components/FilesErrorBoundary'
+import ErrorBoundary from "@canvas/error-boundary/react"
+import { PropsWithChildren } from "react"
+import { FilesGenericErrorPage } from "./FilesGenericErrorPage"
 
-const root = createRoot(document.getElementById('content')!)
-root.render(
-  <React.StrictMode>
-    <FilesErrorBoundary>
-      <QueryProvider>
-        <RouterProvider router={router} />
-      </QueryProvider>
-    </FilesErrorBoundary>
-  </React.StrictMode>
-)
+export const FilesErrorBoundary = (props: PropsWithChildren) => {
+  return (
+    <ErrorBoundary
+      errorComponent={FilesGenericErrorPage}
+      beforeCapture={(scope) => {
+        scope.setTag("feature", "files_v2")
+      }}
+    >
+      {props.children}
+    </ErrorBoundary>
+  )
+}
