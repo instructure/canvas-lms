@@ -738,5 +738,12 @@ class Speedgrader
         yield if block_given?
       end
     end
+
+    def permanently_set_to_show_replies_in_context
+      f("button[title='Settings']").click
+      fj("[class*='menuItem__label']:contains('Options')").click
+      fj("label:contains('Show replies in context')").click
+      fj(".ui-dialog-buttonset .ui-button:visible:last").click
+    end
   end
 end

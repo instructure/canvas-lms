@@ -720,7 +720,6 @@ describe "submissions" do
     it "still displays the submission without full discussion context no matter the feature flags set" do
       Account.default.enable_feature! :react_discussions_post
       Account.default.enable_feature! :discussion_checkpoints
-      Account.default.enable_feature! :discussions_speedgrader_revisit
 
       teacher_in_course(active_all: true)
       @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
@@ -751,7 +750,6 @@ describe "submissions" do
 
       Account.default.enable_feature! :react_discussions_post
       Account.default.disable_feature! :discussion_checkpoints
-      Account.default.disable_feature! :discussions_speedgrader_revisit
 
       get "/courses/#{@course.id}/assignments/#{@checkpointed_discussion.assignment.id}/submissions/#{@student.id}"
 

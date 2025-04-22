@@ -17,9 +17,9 @@
 
 import $ from 'jquery'
 import '@canvas/media-comments'
-import React from 'react';
-import {createRoot} from 'react-dom/client'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player'
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 
 function isConsolidatedMediaPlayerEnabled() {
   return ENV?.FEATURES?.consolidated_media_player
@@ -28,7 +28,11 @@ function isConsolidatedMediaPlayerEnabled() {
 function renderStudioMediaPlayer(domId, media_id, type) {
   const root = createRoot(document.getElementById(domId))
   root?.render(
-    React.createElement(CanvasStudioPlayer, { media_id: media_id, type: type === 'audio' ? 'audio' : 'video', explicitSize: { width: 480, height: 300 }})
+    React.createElement(CanvasStudioPlayer, {
+      media_id: media_id,
+      type: type === 'audio' ? 'audio' : 'video',
+      explicitSize: {width: 480, height: 300},
+    }),
   )
 }
 
@@ -50,7 +54,7 @@ $(document).ready(() => {
 
   $('.play_media_recording_link').mediaCommentThumbnail()
 
-  if (ENV.FEATURES?.discussions_speedgrader_revisit) {
+  if (ENV.FEATURES?.discussion_checkpoints) {
     $('#discussion_temporary_toggle').click(function (event) {
       event.preventDefault()
       window.parent.postMessage(
@@ -67,8 +71,8 @@ $(document).ready(() => {
     return match ? match[1] : null
   }
 
-  if (ENV.FEATURES?.discussions_speedgrader_revisit) {
-    $("a[id^='discussion_speedgrader_revisit_link_entryId']").click(function (event) {
+  if (ENV.FEATURES?.discussion_checkpoints) {
+    $("a[id^='discussion_link_entryId']").click(function (event) {
       const entryId = getEntryId(event.target.id)
       if (entryId) {
         window.parent.postMessage(

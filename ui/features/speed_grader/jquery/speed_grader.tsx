@@ -49,7 +49,7 @@ import type JQuery from 'jquery'
 import $ from 'jquery'
 import {filter, find, includes, isEqual, keyBy, map, reject, some, values} from 'lodash'
 import qs from 'qs'
-import React from 'react'
+import React, {useRef} from 'react'
 import ReactDOM from 'react-dom'
 import JQuerySelectorCache from '../JQuerySelectorCache'
 import QuizzesNextSpeedGrading from '../QuizzesNextSpeedGrading'
@@ -904,11 +904,8 @@ function renderRubricsCheckpointsInfo() {
 
 function getDefaultDiscussionView() {
   const discussionCheckpointsEnabled = ENV.FEATURES?.discussion_checkpoints
-  const discussionsSpeedgraderRevisitEnabled = ENV.FEATURES?.discussions_speedgrader_revisit
-  if (discussionsSpeedgraderRevisitEnabled) {
+  if (discussionCheckpointsEnabled) {
     return userSettings.get('default_discussion_view') || 'discussion_view_no_context'
-  } else if (discussionCheckpointsEnabled) {
-    return 'discussion_view_with_context'
   } else {
     return 'discussion_view_no_context'
   }
@@ -921,29 +918,21 @@ function renderDiscussionsNavigation(temporaryDiscussionContextView = null) {
     if (temporaryDiscussionContextView === 'discussion_view_no_context') {
       return
     } else if (temporaryDiscussionContextView === 'discussion_view_with_context' && mountPoint) {
-      if (ENV.FEATURES.discussions_speedgrader_revisit) {
-        const currentUrl = new URL(window.location.href)
-        const params = new URLSearchParams(currentUrl.search)
-        ReactDOM.render(
-          <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
-          mountPoint,
-        )
-      } else {
-        ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
-      }
-      return
-    }
-  } else if (getDefaultDiscussionView() === 'discussion_view_with_context' && mountPoint) {
-    if (ENV.FEATURES.discussions_speedgrader_revisit) {
       const currentUrl = new URL(window.location.href)
       const params = new URLSearchParams(currentUrl.search)
       ReactDOM.render(
         <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
         mountPoint,
       )
-    } else {
-      ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
+      return
     }
+  } else if (getDefaultDiscussionView() === 'discussion_view_with_context' && mountPoint) {
+    const currentUrl = new URL(window.location.href)
+    const params = new URLSearchParams(currentUrl.search)
+    ReactDOM.render(
+      <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
+      mountPoint,
+    )
     return
   } else {
     return
@@ -3087,8 +3076,8 @@ EG = {
           : ''
     }
     // since we are in speedgrader, and not the student submission page, we want to use the toggler version of the link
-    // when the discussions_speedgrader_revisit feature flag is enabled
-    const useDiscussionToggleLink = ENV.FEATURES?.discussions_speedgrader_revisit
+    // when the discussion_checkpoints feature flag is enabled
+    const useDiscussionToggleLink = ENV.FEATURES?.discussion_checkpoints
       ? `&use_discussion_toggle_link=1`
       : ''
     const queryParams = `${iframePreviewVersion}${hideStudentNames}${entryId}${showFullDiscussionImmediately}${useDiscussionToggleLink}`
