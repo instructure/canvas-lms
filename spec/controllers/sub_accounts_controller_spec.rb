@@ -20,47 +20,73 @@
 
 describe SubAccountsController do
   describe "POST 'create'" do
-    it "creates sub-accounts with the right root account when inside the root account" do
-      root_account = Account.default
+    before :once do
+      @root_account = Account.default
       account_admin_user(active_all: true)
-      user_session(@user)
+    end
 
-      post "create", params: { account_id: root_account.id, account: { parent_account_id: root_account.id, name: "sub account" } }
+    before { user_session(@user) }
+
+    it "creates sub-accounts with the right root account when inside the root account" do
+      post "create", params: { account_id: @root_account.id,
+                               account: { parent_account_id: @root_account.id, name: "sub account" } }
+
       sub_account = assigns[:sub_account]
       expect(sub_account).not_to be_nil
 
-      post "create", params: { account_id: root_account.id, account: { parent_account_id: sub_account.id, name: "sub sub account 1" } }
+      post "create", params: { account_id: @root_account.id,
+                               account: { parent_account_id: sub_account.id, name: "sub sub account 1" } }
       sub_sub_account_1 = assigns[:sub_account]
       expect(sub_sub_account_1).not_to be_nil
       expect(sub_sub_account_1.name).to eq "sub sub account 1"
       expect(sub_sub_account_1.parent_account).to eq sub_account
-      expect(sub_sub_account_1.root_account).to eq root_account
+      expect(sub_sub_account_1.root_account).to eq @root_account
     end
 
     it "creates sub-accounts with the right root account when inside a sub account" do
-      root_account = Account.default
-      account_admin_user(active_all: true)
-      user_session(@user)
+      sub_account = @root_account.sub_accounts.create(name: "sub account")
 
-      sub_account = root_account.sub_accounts.create(name: "sub account")
-
-      post "create", params: { account_id: sub_account.id, account: { parent_account_id: sub_account.id, name: "sub sub account 2" } }
+      post "create", params: { account_id: sub_account.id,
+                               account: { parent_account_id: sub_account.id, name: "sub sub account 2" } }
       sub_sub_account_2 = assigns[:sub_account]
       expect(sub_sub_account_2).not_to be_nil
       expect(sub_sub_account_2.name).to eq "sub sub account 2"
       expect(sub_sub_account_2.parent_account).to eq sub_account
-      expect(sub_sub_account_2.root_account).to eq root_account
+      expect(sub_sub_account_2.root_account).to eq @root_account
     end
 
     it "reports errors encountered while creating a sub account" do
-      root_account = Account.default
-      account_admin_user(active_all: true)
-      user_session(@user)
-      post "create", params: { account_id: root_account.id, account: { sis_account_id: "C001", name: "sub account 1" } }
+      post "create", params: { account_id: @root_account.id,
+                               account: { sis_account_id: "C001", name: "sub account 1" } }
       expect(response).to have_http_status(:ok)
-      post "create", params: { account_id: root_account.id, account: { sis_account_id: "C001", name: "sub account 2" } }
+      post "create", params: { account_id: @root_account.id,
+                               account: { sis_account_id: "C001", name: "sub account 2" } }
       expect(response).to have_http_status(:bad_request)
       expect(response.parsed_body).to have_key("errors")
+    end
+
+    it "infers the parent account_id from the URL" do
+      post "create", params: { account_id: @root_account.id,
+                               account: { name: "Sub Account" } }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json["id"]).to be_present
+      expect(json["parent_account_id"]).to eq @root_account.id
+      expect(json["name"]).to eq "Sub Account"
+    end
+
+    it "supports sis_account_id object reference when inferring parent account_id" do
+      sub_account = @root_account.sub_accounts.create!(name: "Sub Account")
+      sub_account.update(sis_source_id: "sis_account_id")
+      post "create", params: { account_id: "sis_account_id:#{sub_account.sis_source_id}",
+                               account: { name: "Sub Sub-Account" } }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json["id"]).to be_present
+      expect(json["parent_account_id"]).to eq sub_account.id
+      expect(json["name"]).to eq "Sub Sub-Account"
     end
   end
 
