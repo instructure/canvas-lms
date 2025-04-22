@@ -2696,16 +2696,21 @@ class Attachment < ActiveRecord::Base
   def service_side_clone(destination)
     return false unless shard.region == destination.shard.region
 
-    if Attachment.s3_storage? && filename && s3object.exists?
+    if instfs_hosted?
+      begin
+        destination.instfs_uuid = InstFS.duplicate_file(instfs_uuid)
+        true
+      rescue InstFS::DuplicationError => e
+        Canvas::Errors.capture_exception(:attachment, e, :warn)
+        false
+      end
+    elsif Attachment.s3_storage? && filename && s3object.exists?
       if destination.new_record? # the attachment id is part of the s3 object name
         destination.content_type ||= content_type # needed for the validation
         destination.save_without_broadcasting!
       end
       s3object.copy_to(destination.s3object) unless destination.s3object.exists?
       destination.run_after_attachment_saved
-      true
-    elsif instfs_hosted?
-      destination.instfs_uuid = InstFS.duplicate_file(instfs_uuid)
       true
     else
       false

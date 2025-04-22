@@ -1085,6 +1085,18 @@ describe Attachment do
           expect(attachment.instfs_uuid).to eq "more_uuid"
         end
       end
+
+      it "handles a duplication error and attempts to re-upload instead" do
+        expect(InstFS).to receive(:duplicate_file).with("instfs_uuid").and_raise(InstFS::DuplicationError)
+        expect(@attachment).to receive(:open).and_return(StringIO.new("fake content"))
+        expect(InstFS).to receive(:direct_upload) { |args| args[:file_object].read == "fake content" }
+        @shard1.activate do
+          account_model
+          course_model(account: @account)
+          attachment = @attachment.clone_for(@course, nil, { force_copy: true })
+          attachment.save!
+        end
+      end
     end
 
     it "clones to another context" do
