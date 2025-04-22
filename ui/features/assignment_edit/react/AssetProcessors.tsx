@@ -16,28 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot} from "react-dom/client"
-import {Button} from "@instructure/ui-buttons"
+import {Button} from '@instructure/ui-buttons'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {createRoot} from 'react-dom/client'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {AssetProcessorsAddModal} from "./AssetProcessorsAddModal"
-import {AssetProcessorsAttachedProcessorCard} from "./AssetProcessorsCards"
-import {Flex} from "@instructure/ui-flex"
-import {useAssetProcessorsAddModalState} from "./hooks/AssetProcessorsAddModalState"
-import {useAssetProcessorsToolsList} from "./hooks/useAssetProcessorsToolsList"
-import {ExistingAttachedAssetProcessor, useAssetProcessorsState} from "./hooks/AssetProcessorsState"
-import {useEffect} from "react"
+import {Flex} from '@instructure/ui-flex'
+import {useEffect} from 'react'
+import {AssetProcessorsAddModal} from './AssetProcessorsAddModal'
+import {AssetProcessorsAttachedProcessorCard} from './AssetProcessorsCards'
+import {useAssetProcessorsAddModalState} from './hooks/AssetProcessorsAddModalState'
+import {ExistingAttachedAssetProcessor, useAssetProcessorsState} from './hooks/AssetProcessorsState'
+import {useAssetProcessorsToolsList} from './hooks/useAssetProcessorsToolsList'
 
 const I18n = createI18nScope('asset_processors_selection')
 
 const queryClient = new QueryClient()
 
 export type AssetProcessorsProps = {
-  courseId: number,
-  secureParams: string,
-  initialAttachedProcessors: ExistingAttachedAssetProcessor[],
+  courseId: number
+  secureParams: string
+  initialAttachedProcessors: ExistingAttachedAssetProcessor[]
 }
 
 /**
@@ -49,23 +49,25 @@ export type AssetProcessorsProps = {
  * This method is a shim to mount the React component to integrate it with the
  * EditView backbone code
  */
-export function attach(
-  {container, ...elemParams}: {container: HTMLElement} & AssetProcessorsProps
-) {
+export function attach({
+  container,
+  ...elemParams
+}: {container: HTMLElement} & AssetProcessorsProps) {
   createRoot(container).render(
     <QueryClientProvider client={queryClient}>
       <AssetProcessors {...elemParams} />
-    </QueryClientProvider>
+    </QueryClientProvider>,
   )
 }
 
-export function AssetProcessors(
-  props: AssetProcessorsProps
-) {
+export function AssetProcessors(props: AssetProcessorsProps) {
   const openAddDialog = useAssetProcessorsAddModalState(s => s.actions.showToolList)
-  const toolsAvailable = !! useAssetProcessorsToolsList(props.courseId).data?.length;
+  const toolsAvailable = !!useAssetProcessorsToolsList(props.courseId).data?.length
   const {
-    attachedProcessors, addAttachedProcessors, deleteAttachedProcessor, setFromExistingAttachedProcessors,
+    attachedProcessors,
+    addAttachedProcessors,
+    deleteAttachedProcessor,
+    setFromExistingAttachedProcessors,
   } = useAssetProcessorsState(s => s)
 
   useEffect(() => {
@@ -80,26 +82,26 @@ export function AssetProcessors(
 
   return (
     <div>
-      <div className="form-column-left">
-        {I18n.t('Document processing apps')}
-      </div>
+      <div className="form-column-left">{I18n.t('Document processing apps')}</div>
       <div className="form-column-right">
         <div className="border border-trbl border-round">
           <Flex direction="column" gap="small">
             {attachedProcessors.map((processor, index) => (
               <AssetProcessorsAttachedProcessorCard
+                assetProcessorId={processor.id}
                 key={index}
                 icon={{
                   toolId: processor.toolId,
                   toolName: processor.toolName || '',
-                  url: processor.iconUrl
+                  url: processor.iconUrl,
                 }}
                 title={processor.title}
                 description={processor.text}
-                onModify={() => {}}
+                windowSettings={processor.window}
+                iframeSettings={processor.iframe}
                 onDelete={() => deleteAttachedProcessor(index)}
               >
-                <input 
+                <input
                   data-testid={`asset_processors[${index}]`}
                   type="hidden"
                   name={`asset_processors[${index}]`}
@@ -107,12 +109,15 @@ export function AssetProcessors(
                 />
               </AssetProcessorsAttachedProcessorCard>
             ))}
-            <span><Button color="secondary" onClick={openAddDialog}>{I18n.t("Add Document Processing App")}</Button></span>
+            <span>
+              <Button color="secondary" onClick={openAddDialog}>
+                {I18n.t('Add Document Processing App')}
+              </Button>
+            </span>
           </Flex>
-          {
-            toolsAvailable && 
+          {toolsAvailable && (
             <AssetProcessorsAddModal onProcessorResponse={addAttachedProcessors} {...props} />
-          }
+          )}
         </div>
       </div>
     </div>

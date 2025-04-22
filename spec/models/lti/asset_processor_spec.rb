@@ -137,6 +137,8 @@ describe Lti::AssetProcessor do
                               icon: ap1.icon,
                               context_external_tool_name: tool1.name,
                               context_external_tool_id: tool1.id,
+                              window: ap1.window,
+                              iframe: ap1.iframe,
                             },
                              {
                                id: ap2.id,
@@ -145,6 +147,8 @@ describe Lti::AssetProcessor do
                                icon: ap2.icon,
                                context_external_tool_name: tool2.name,
                                context_external_tool_id: tool2.id,
+                               window: ap2.window,
+                               iframe: ap2.iframe,
                              }])
     end
   end

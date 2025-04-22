@@ -3000,17 +3000,17 @@ describe AssignmentsController do
 
       it "includes the existing asset processors" do
         tool = external_tool_1_3_model(context: @course)
-        ap1 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 1")
-        ap2 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 2")
+        ap1 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 1", iframe: { width: 100, height: 200 }, window: nil)
+        ap2 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 2", window: { width: 300, height: 400 }, iframe: nil)
         get :edit, params: { course_id: @course.id, id: @assignment.id }
 
         aps = assigns[:js_env][:ASSET_PROCESSORS].map do |ap|
-          ap.slice(:id, :title, :context_external_tool_id)
+          ap.slice(:id, :title, :context_external_tool_id, :iframe, :window).deep_symbolize_keys
         end
 
         expected = [
-          { id: ap1.id, title: "ap 1", context_external_tool_id: tool.id },
-          { id: ap2.id, title: "ap 2", context_external_tool_id: tool.id }
+          { id: ap1.id, title: "ap 1", context_external_tool_id: tool.id, iframe: { width: 100, height: 200 } },
+          { id: ap2.id, title: "ap 2", context_external_tool_id: tool.id, window: { width: 300, height: 400 } }
         ]
 
         expect(aps).to match_array(expected)
