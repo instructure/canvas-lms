@@ -100,9 +100,7 @@ class ScoringRange extends React.Component {
       return (
         <ScoreInput
           score={this.props.range.get('lower_bound')}
-          label={I18n.t('Division cutoff %{cutoff_value}', {
-            cutoff_value: this.props.path.range + 1,
-          })}
+          label={I18n.t('Cutoff Points')}
           error={this.props.range.get('error')}
           onScoreChanged={this.props.onScoreChanged}
           triggerAssignment={this.props.triggerAssignment}

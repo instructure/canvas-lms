@@ -117,12 +117,14 @@ describe "native canvas conditional release" do
       assignment = assignment_model(course: @course, points_possible: 100)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff1, "70", "72")
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff2, "40", "47")
-      ConditionalReleaseObjects.division_cutoff2.send_keys :tab
+      division_cutoff1 = ConditionalReleaseObjects.division_cutoff(0)
+      division_cutoff2 = ConditionalReleaseObjects.division_cutoff(1)
+      ConditionalReleaseObjects.replace_mastery_path_scores(division_cutoff1, "70", "72")
+      ConditionalReleaseObjects.replace_mastery_path_scores(division_cutoff2, "40", "47")
+      division_cutoff2.send_keys :tab
 
-      expect(ConditionalReleaseObjects.division_cutoff1.attribute("value")).to eq("72 pts")
-      expect(ConditionalReleaseObjects.division_cutoff2.attribute("value")).to eq("47 pts")
+      expect(division_cutoff1.attribute("value")).to eq("72 pts")
+      expect(division_cutoff2.attribute("value")).to eq("47 pts")
     end
 
     it "is able to add an assignment to a range", :ignore_js_errors do
@@ -178,11 +180,12 @@ describe "native canvas conditional release" do
       assignment = assignment_model(course: @course, points_possible: 100)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
+      division_cutoff1 = ConditionalReleaseObjects.division_cutoff(0)
 
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff1, "70", "")
+      ConditionalReleaseObjects.replace_mastery_path_scores(division_cutoff1, "70", "")
       expect(ConditionalReleaseObjects.scoring_input_error[0].text).to include("Please enter a score")
 
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff1, "", "35")
+      ConditionalReleaseObjects.replace_mastery_path_scores(division_cutoff1, "", "35")
       expect(ConditionalReleaseObjects.scoring_input_error[0].text).to include("Please adjust score order")
     end
 
@@ -190,8 +193,10 @@ describe "native canvas conditional release" do
       assignment = assignment_model(course: @course, points_possible: 4)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
-      replace_content(ConditionalReleaseObjects.division_cutoff1, "2")
-      replace_content(ConditionalReleaseObjects.division_cutoff2, "0")
+      division_cutoff1 = ConditionalReleaseObjects.division_cutoff(0)
+      division_cutoff2 = ConditionalReleaseObjects.division_cutoff(1)
+      replace_content(division_cutoff1, "2")
+      replace_content(division_cutoff2, "0")
 
       expect(element_exists?(ConditionalReleaseObjects.scoring_input_error_selector)).to be_falsey
     end
