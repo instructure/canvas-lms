@@ -67,8 +67,9 @@ describe UsersController do
     context "ENV.LTI_TOOL_FORM_ID" do
       it "sets a random id" do
         expect(controller).to receive(:random_lti_tool_form_id).and_return("1")
-        allow(controller).to receive(:js_env).with(anything).and_call_original
-        expect(controller).to receive(:js_env).with(LTI_TOOL_FORM_ID: "1")
+        allow(controller).to receive(:js_env)
+        expect(controller).to receive(:js_env).with(hash_including(LTI_TOOL_FORM_ID: "1"))
+
         get :external_tool, params: { id: tool.id, user_id: user.id }
       end
     end

@@ -20,32 +20,32 @@
 describe "usage_metrics_helper" do
   include UsageMetricsHelper
 
-  before :once do
-    @domain_root_account = Account.default
-  end
-
   before do
-    allow(@domain_root_account).to receive(:feature_enabled?).with(:send_usage_metrics).and_return(true)
+    allow(self).to receive(:js_env).and_return({ FEATURES: { send_usage_metrics: true } })
     allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return("some_api_key")
-    allow(self).to receive(:js_env)
   end
 
   it "returns true if the feature is enabled and usage_metrics_api_key is present" do
     expect(load_usage_metrics?).to be_truthy
   end
 
-  it "returns false when domain_root_account doesn't have the feature enabled" do
-    allow(@domain_root_account).to receive(:feature_enabled?).with(:send_usage_metrics).and_return(false)
+  it "returns false when send_usage_metrics is false" do
+    allow(self).to receive(:js_env).and_return({ FEATURES: { send_usage_metrics: false } })
+    expect(load_usage_metrics?).to be_falsey
+  end
+
+  it "returns false when js_env[:FEATURES] doesn't contain the feature" do
+    allow(self).to receive(:js_env).and_return({ FEATURES: {} })
+    expect(load_usage_metrics?).to be_falsey
+  end
+
+  it "returns false if js_env is not set" do
+    allow(self).to receive(:js_env).and_return(nil)
     expect(load_usage_metrics?).to be_falsey
   end
 
   it "returns false if there is no usage_metrics_api_key" do
     allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return(nil)
     expect(load_usage_metrics?).to be_falsey
-  end
-
-  it "calls js_env with the correct parameters" do
-    expect(self).to receive(:js_env).with(PENDO_APP_ID: "some_api_key")
-    load_usage_metrics?
   end
 end
