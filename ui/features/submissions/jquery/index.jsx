@@ -42,6 +42,7 @@ import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 import CheckpointGradeRoot from '../react/CheckpointGradeRoot'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
+import theme from '@instructure/canvas-theme'
 
 const I18n = createI18nScope('submissions')
 /* global rubricAssessment */
@@ -207,30 +208,85 @@ function closeRubric() {
   })
 }
 function openRubric() {
+  validateComments();
   $('#rubric_holder').fadeIn(function () {
     toggleRubric($(this))
-    toggleSaveCommentButton($(this))
+    refreshEventHandlers()
     $(this).find('.hide_rubric_link').focus()
   })
 }
-function toggleSaveCommentButton($rubricHolder) {
-  const $rubric = $rubricHolder.find('.rubric')
-  const rubricData = rubricAssessment.assessmentData($rubric)
-  const complete = isRubricComplete(rubricData)
 
-  $('.save_rubric_button').prop('disabled', !complete)
+function validateComments(){
+  $('.rubric-comment textarea').each(function(){
+    validateComment($(this))
+  });
 }
-function isRubricComplete(rubricData) {
-  return Object.keys(rubricData).some(key => {
-    return hasPoints(key, rubricData) || hasComments(key, rubricData)
+
+function validateComment($commentTextArea){
+  const newValue = $commentTextArea.val().trim();
+  if (newValue !== '') {
+    handleValidationClear($commentTextArea);
+  }else{
+    const $wrapper = $commentTextArea.closest('.rubric-comment');
+    showErrorMessage($wrapper, I18n.t('A comment is required.'));
+  }
+}
+
+function handleValidationClear($textArea) {
+  const $wrapper = $textArea.closest('.rubric-comment')
+  if ($wrapper.find('.error-message').length) {
+    setTimeout(() => {
+      $wrapper.find('.error-message').remove();
+      $textArea.removeClass('error-textarea');
+      $textArea.next('span').css('border-color', theme.colors?.ui?.surfaceAttention);
+    }, 100);
+  }
+}
+
+
+function refreshEventHandlers() {
+  $('.add-comment-button-wrapper button')
+    .off('click.commentHandler')
+    .on('click.commentHandler', function () {
+      const $row = $(this).closest('tr[data-testid="rubric-criterion"]');
+      setTimeout(() => {
+        const $comment = $row.find('.rubric-comment textarea');
+        addEvents($comment);
+      }, 500);
+    });
+
+  function addEvents($textAreas = $('.rubric-comment textarea')) {
+    $textAreas
+      .off('input.commentHandler blur.commentHandler') // avoid multiple bindings
+      .on('input.commentHandler blur.commentHandler', function () {
+        const $commentTextArea = $(this);
+        validateComment($commentTextArea);
+      });
+  }
+
+  addEvents();
+}
+function showErrorMessage(selector, message) {
+  let errorContainer = selector.find('.error-message')
+  if (errorContainer.length) return
+  errorContainer = $('<div />', {
+    class: 'error-message',
+    tabindex: '-1',
+  }).appendTo(selector)
+  $('<i />', {
+    class: 'icon-warning icon-Solid',
+  }).appendTo(errorContainer)
+  $('<span />', {
+    role: 'alert',
+    'aria-live': 'polite',
+    tabindex: '-1',
   })
+    .text(message)
+    .appendTo(errorContainer)
+    selector.find('textarea').addClass('error-textarea');
+    selector.find('.error-textarea').next('span').css('border-color', theme.colors?.ui?.surfaceError);
 }
-function hasComments(key, data) {
-  return key.indexOf('[comments]') !== -1 && data[key].trim() !== ''
-}
-function hasPoints(key, data) {
-  return key.indexOf('[points]') !== -1 && isNumber(data[key])
-}
+
 function windowResize() {
   const $frame = $('#preview_frame')
   const margin_top = 20
@@ -484,11 +540,30 @@ export function setup() {
     })
     $('.save_rubric_button').click(function () {
       const $rubric = $(this).parents('#rubric_holder').find('.rubric')
-      const submitted_data = rubricAssessment.assessmentData($rubric)
+      const submitted_data = rubricAssessment.assessmentData($rubric)      
+      const $rubricComments = $('.rubric-comment');
 
-      if (!isRubricComplete(submitted_data)) {
-        $('.save_rubric_button').prop('disabled', true)
-        return false
+      let hasError = false;
+      $rubricComments.each(function () {
+        const $wrapper = $(this);
+        const $commentTextArea = $wrapper.find('textarea');
+      
+        if ($commentTextArea.length > 0 && $commentTextArea.val().trim() === '') {
+          showErrorMessage($wrapper, I18n.t('A comment is required.'));
+          hasError = true;
+        } else {
+          // If the textarea has a value, remove any existing error styles/messages
+          setTimeout(() => {
+            $wrapper.find('.error-message').remove();
+            $commentTextArea.removeClass('error-textarea');
+            $commentTextArea.next('span').removeClass('error-textarea__outline');
+          }, 1000);
+        }
+      });
+
+      // If any comment is invalid, prevent submission
+      if (hasError) {
+        return false;
       }
 
       const url = $('.update_rubric_assessment_url').attr('href')
@@ -576,22 +651,6 @@ export function setup() {
         $('#rubric_holder .save_rubric_button').showIf(current_user)
       })
       .change()
-    $('#rubric_holder .rubric tbody input').on('change', () => {
-      const $rubricHolder = $('#rubric_holder')
-      toggleSaveCommentButton($rubricHolder)
-    })
-    // uses event delegation since the text area isn't on the DOM until you click on the comment icon
-    $('#rubric_holder .rubric tbody').on('change', 'textarea', () => {
-      const $rubricHolder = $('#rubric_holder')
-      toggleSaveCommentButton($rubricHolder)
-    })
-    $('#rubric_holder .rubric .rating-tier').on('click', () => {
-      // wait for next tick so that rubric data is populated with latest change
-      setTimeout(() => {
-        const $rubricHolder = $('#rubric_holder')
-        toggleSaveCommentButton($rubricHolder)
-      }, 0)
-    })
     $('.media_comment_link').click(event => {
       event.preventDefault()
       $('#media_media_recording').show()

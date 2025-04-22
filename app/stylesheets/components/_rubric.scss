@@ -190,6 +190,13 @@
 
 .rating-all-footer {
     border-top: 1px solid #E8EAEC;
+    .error-message {
+      color: $ic-color-danger;
+      line-height: 1.75;
+      i {
+        margin: 0 0.5rem;
+      }
+    }
 }
 
 .react-rubric .graded-points {
