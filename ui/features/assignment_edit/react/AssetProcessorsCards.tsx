@@ -16,26 +16,62 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Text} from '@instructure/ui-text'
-import {Flex} from "@instructure/ui-flex"
-import {View} from "@instructure/ui-view"
-
+import {AssetProcessorWindowSettings} from '@canvas/deep-linking/models/AssetProcessorContentItem'
+import {ContentItemIframeDimensions} from '@canvas/deep-linking/models/helpers'
+import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import TruncateWithTooltip from "@canvas/lti-apps/components/common/TruncateWithTooltip"
-import {ToolIconOrDefault} from "@canvas/lti-apps/components/common/ToolIconOrDefault"
+import {ToolIconOrDefault} from '@canvas/lti-apps/components/common/ToolIconOrDefault'
+import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
 import {Spacing} from '@instructure/emotion'
-import {Menu} from '@instructure/ui-menu'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconMoreLine} from '@instructure/ui-icons'
+import {Flex} from '@instructure/ui-flex'
+import {IconExternalLinkLine, IconMoreLine} from '@instructure/ui-icons'
+import {Menu} from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import {isNil} from 'lodash'
+import {useState} from 'react'
 
 const I18n = createI18nScope('asset_processors_selection')
 
 type AttachedAssetProcessorsMenuProps = {
+  modifyInNewWindow: boolean
   nameForScreenReader: string
+  onModify?: () => void
   onDelete: () => void
 }
 
-const AttachedAssetProcessorsMenu = ({nameForScreenReader, onDelete}: AttachedAssetProcessorsMenuProps) => {
+type AssetProcessorsCardCommonProps = {
+  icon: {
+    url: string | null | undefined
+    toolName: string
+    toolId: number | string
+  }
+  description?: string
+  margin?: Spacing
+  children?: React.ReactNode
+}
+
+type AssetProcessorsCardProps = AssetProcessorsCardCommonProps & {
+  title: string
+  extraColumns?: React.ReactNode
+  onClick?: () => void
+}
+
+type AssetProcessorsAttachedProcessorCardProps = AssetProcessorsCardCommonProps & {
+  assetProcessorId?: number
+  title?: string
+  onDelete: () => void
+  iframeSettings?: ContentItemIframeDimensions
+  windowSettings?: AssetProcessorWindowSettings
+}
+
+const AttachedAssetProcessorsMenu = ({
+  modifyInNewWindow,
+  nameForScreenReader,
+  onModify,
+  onDelete,
+}: AttachedAssetProcessorsMenuProps) => {
   return (
     <Menu
       trigger={
@@ -43,89 +79,130 @@ const AttachedAssetProcessorsMenu = ({nameForScreenReader, onDelete}: AttachedAs
           renderIcon={IconMoreLine}
           withBackground={false}
           withBorder={false}
-          screenReaderLabel={
-            I18n.t('Actions for document processing app: %{documentProcessingAppName}',
-            {documentProcessingAppName: nameForScreenReader}
+          screenReaderLabel={I18n.t(
+            'Actions for document processing app: %{documentProcessingAppName}',
+            {documentProcessingAppName: nameForScreenReader},
           )}
         />
       }
       onSelect={(_e, value) => {
         if (value === 'delete') {
           onDelete()
+        } else if (value === 'modify') {
+          onModify?.()
         }
       }}
     >
-      <Menu.Item value="modify">
-        <View padding="0 x-large 0 small">
-          {I18n.t('Modify')}
-        </View>
-      </Menu.Item>
+      {onModify && (
+        <Menu.Item value="modify">
+          <View padding="0 x-large 0 small">
+            {I18n.t('Modify')}
+            {modifyInNewWindow && (
+              <IconExternalLinkLine
+                size="x-small"
+                data-testid="external-link-icon"
+                style={{marginLeft: '.5rem'}}
+              />
+            )}
+          </View>
+        </Menu.Item>
+      )}
       <Menu.Item value="delete">
-        <View padding="0 x-large 0 small">
-          {I18n.t('Delete')}
-        </View>
+        <View padding="0 x-large 0 small">{I18n.t('Delete')}</View>
       </Menu.Item>
     </Menu>
   )
 }
 
-export const AssetProcessorsAttachedProcessorCard = (
-  {onModify, onDelete, title, ...commonProps}: AssetProcessorsAttachedProcessorCardProps
-) => {
+export const AssetProcessorsAttachedProcessorCard = ({
+  assetProcessorId,
+  iframeSettings,
+  onDelete,
+  title,
+  windowSettings,
+  ...commonProps
+}: AssetProcessorsAttachedProcessorCardProps) => {
+  const [settingsLaunchModalVisible, setSettingsLaunchModalVisible] = useState<boolean>(false)
   const {toolName} = commonProps.icon
+  const modifyInNewWindow = !isNil(windowSettings)
+
+  function onModify() {
+    if (modifyInNewWindow) {
+      const url = `/asset_processors/${assetProcessorId}/launch`
+      const targetName = windowSettings.targetName || '_blank'
+
+      let features = ''
+      if (windowSettings.windowFeatures) {
+        features = windowSettings.windowFeatures
+      } else {
+        // Build default window features if none provided
+        const featureParts = []
+        if (windowSettings.width) featureParts.push(`width=${windowSettings.width}`)
+        if (windowSettings.height) featureParts.push(`height=${windowSettings.height}`)
+        features = featureParts.join(',')
+      }
+
+      window.open(url, targetName, features)
+      return // Don't show the modal if we opened a window
+    }
+
+    // If no window settings or opening the window failed, fall back to modal
+    setSettingsLaunchModalVisible(true)
+  }
+
   let completeTitle: string
   if (title && toolName && title !== toolName) {
-    completeTitle = (`${toolName} · ${title}`)
+    completeTitle = `${toolName} · ${title}`
   } else {
     completeTitle = title || toolName
   }
 
   return (
-    <AssetProcessorsCard
-      {...commonProps}
-      title={completeTitle}
-      extraColumns={
-        <div style={{flex: "none"}}>
-          <AttachedAssetProcessorsMenu nameForScreenReader={completeTitle} onDelete={onDelete} />
-        </div>
-      }
-    />
+    <>
+      <ExternalToolModalLauncher
+        isOpen={settingsLaunchModalVisible}
+        title={I18n.t('Modify settings for %{documentProcessingAppName}', {
+          documentProcessingAppName: completeTitle,
+        })}
+        onRequestClose={() => setSettingsLaunchModalVisible(false)}
+        iframeSrc={`/asset_processors/${assetProcessorId}/launch`}
+        width={iframeSettings?.width}
+        height={iframeSettings?.height}
+      />
+      <AssetProcessorsCard
+        {...commonProps}
+        title={completeTitle}
+        extraColumns={
+          <div style={{flex: 'none'}}>
+            <AttachedAssetProcessorsMenu
+              nameForScreenReader={completeTitle}
+              onModify={isNil(assetProcessorId) ? undefined : onModify}
+              modifyInNewWindow={modifyInNewWindow}
+              onDelete={onDelete}
+            />
+          </div>
+        }
+      />
+    </>
   )
 }
 
-type AssetProcessorsCardCommonProps = {
-  icon: {
-    url: string | null | undefined,
-    toolName: string,
-    toolId: number | string
-  },
-  description?: string,
-  margin?: Spacing,
-  children?: React.ReactNode,
-}
-
-type AssetProcessorsCardProps = AssetProcessorsCardCommonProps & {
-  title: string,
-  extraColumns?: React.ReactNode
-  onClick?: () => void,
-}
-
-type AssetProcessorsAttachedProcessorCardProps = AssetProcessorsCardCommonProps & {
-  title?: string,
-  onModify: () => void,
-  onDelete: () => void,
-}
-
-export const AssetProcessorsCard = (
-  {icon, title, description, children, onClick, extraColumns: extraColumns, margin}: AssetProcessorsCardProps
-) => (
+export const AssetProcessorsCard = ({
+  icon,
+  title,
+  description,
+  children,
+  onClick,
+  extraColumns: extraColumns,
+  margin,
+}: AssetProcessorsCardProps) => (
   <View
     aria-label={title}
     as="div"
     background="secondary"
     borderRadius="medium"
     borderWidth="none"
-    {...onClick ? {cursor: "pointer"} : undefined}
+    {...(onClick ? {cursor: 'pointer'} : undefined)}
     margin={margin}
     onClick={onClick}
     padding="mediumSmall"
@@ -135,35 +212,44 @@ export const AssetProcessorsCard = (
   >
     <Flex direction="column" height="100%">
       <Flex
-        margin="0" {...{
-          alignItems: description ? "start" : undefined
-        }}>
-        <div style={{borderRadius: '8px', overflow: 'hidden', flex: "none"}}>
-          <ToolIconOrDefault size={36} toolId={icon.toolId} margin={1} marginRight="1.4em" toolName={icon.toolName} iconUrl={icon.url} />
+        margin="0"
+        {...{
+          alignItems: description ? 'start' : undefined,
+        }}
+      >
+        <div style={{borderRadius: '8px', overflow: 'hidden', flex: 'none'}}>
+          <ToolIconOrDefault
+            size={36}
+            toolId={icon.toolId}
+            margin={1}
+            marginRight="1.4em"
+            toolName={icon.toolName}
+            iconUrl={icon.url}
+          />
         </div>
-        <div style={{overflow: "hidden", flex: 1}}>
-          <div style={{marginRight: "1.4em"}}>
+        <div style={{overflow: 'hidden', flex: 1}}>
+          <div style={{marginRight: '1.4em'}}>
             <TruncateWithTooltip
-               linesAllowed={2}
-               horizontalOffset={0}
-               backgroundColor="primary-inverse"
-             >
+              linesAllowed={2}
+              horizontalOffset={0}
+              backgroundColor="primary-inverse"
+            >
               <Text weight="bold" size="medium">
                 {title}
               </Text>
             </TruncateWithTooltip>
           </div>
-          {description ?
-            <div style={{marginTop: "0.75em", marginRight: "1.4em"}}>
+          {description ? (
+            <div style={{marginTop: '0.75em', marginRight: '1.4em'}}>
               <TruncateWithTooltip
-                 linesAllowed={4}
-                 horizontalOffset={0}
-                 backgroundColor="primary-inverse"
-               >
-               {description}
+                linesAllowed={4}
+                horizontalOffset={0}
+                backgroundColor="primary-inverse"
+              >
+                {description}
               </TruncateWithTooltip>
-            </div> : null
-          }
+            </div>
+          ) : null}
           {children}
         </div>
         {extraColumns}

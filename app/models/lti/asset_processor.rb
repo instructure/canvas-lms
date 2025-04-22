@@ -67,8 +67,10 @@ class Lti::AssetProcessor < ApplicationRecord
     title: "lti_asset_processors.title",
     text: "lti_asset_processors.text",
     icon: "lti_asset_processors.icon",
+    iframe: "lti_asset_processors.iframe",
     context_external_tool_name: "context_external_tools.name",
     context_external_tool_id: "context_external_tools.id",
+    window: "lti_asset_processors.window",
   }.freeze
 
   # should match with ExistingAttachedAssetProcessor in UI

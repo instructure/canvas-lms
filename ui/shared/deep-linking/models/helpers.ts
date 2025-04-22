@@ -19,14 +19,14 @@
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
 export type ContentItemIframeDimensions = {
-  width?: string | number
-  height?: string | number
+  width?: number
+  height?: number
 }
 
 export type ContentItemIframe = {
   src: string
-  width?: string | number
-  height?: string | number
+  width?: number
+  height?: number
 }
 export type ContentItemThumbnail =
   | string

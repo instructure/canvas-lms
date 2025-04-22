@@ -16,35 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {create} from "zustand"
+import {create} from 'zustand'
 
-import {AssetProcessorContentItemDto, AssetProcessorContentItem, assetProcessorContentItemToDto} from "@canvas/deep-linking/models/AssetProcessorContentItem"
-import {LtiLaunchDefinition} from "@canvas/select-content-dialog/jquery/select_content_dialog"
+import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
+import {
+  AssetProcessorContentItem,
+  AssetProcessorContentItemDto,
+  AssetProcessorWindowSettings,
+  assetProcessorContentItemToDto,
+} from '@canvas/deep-linking/models/AssetProcessorContentItem'
+import {ContentItemIframeDimensions} from '@canvas/deep-linking/models/helpers'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {confirmDanger} from "@canvas/instui-bindings/react/Confirm"
-import {DeepLinkResponse} from "@canvas/deep-linking/DeepLinkResponse"
-import {showFlashAlert, showFlashError} from "@canvas/alerts/react/FlashAlert"
+import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
+import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
 
 const I18n = createI18nScope('asset_processors_selection')
 
 export type AssetProcessorsState = {
-  attachedProcessors: AttachedAssetProcessor[],
+  attachedProcessors: AttachedAssetProcessor[]
 
-  addAttachedProcessors:
-    ({ tool, data }: { tool: LtiLaunchDefinition, data: DeepLinkResponse }) => void,
-  deleteAttachedProcessor: (index: number) => Promise<void>,
-  setFromExistingAttachedProcessors: (processors: ExistingAttachedAssetProcessor[]) => void,
+  addAttachedProcessors: ({tool, data}: {tool: LtiLaunchDefinition; data: DeepLinkResponse}) => void
+  deleteAttachedProcessor: (index: number) => Promise<void>
+  setFromExistingAttachedProcessors: (processors: ExistingAttachedAssetProcessor[]) => void
 }
 
 /**
  * Object sent to server when saving (creating/updating) an assignment. Needs to match up
  * with the format expected by the ruby code.
  */
-type AttachedAssetProcessorDto = {
-  existing_id: number
-} | {
-  new_content_item: AssetProcessorContentItemDto
-}
+type AttachedAssetProcessorDto =
+  | {
+      existing_id: number
+    }
+  | {
+      new_content_item: AssetProcessorContentItemDto
+    }
 
 // Ensure types, while avoiding serializing JSON every render
 const jsonStringifyDto: (blob: AttachedAssetProcessorDto) => string = JSON.stringify
@@ -55,14 +62,17 @@ const jsonStringifyDto: (blob: AttachedAssetProcessorDto) => string = JSON.strin
  * added from a tool launch
  */
 export type AttachedAssetProcessor = {
-  toolName?: string,
-  toolId: string,
-  iconUrl?: string,
-  title?: string,
-  text?: string,
+  id?: number
+  toolName?: string
+  toolId: string
+  iconUrl?: string
+  title?: string
+  text?: string
+  window?: AssetProcessorWindowSettings
+  iframe?: ContentItemIframeDimensions
 
   // JSON-serialized Asset Processor (AttachedAssetProcessorDto) to be sent to server
-  dtoJson: string,
+  dtoJson: string
 }
 
 /**
@@ -70,26 +80,31 @@ export type AttachedAssetProcessor = {
  * See Lti::AssetProcessors.processors_info_for_assignment_edit_page
  */
 export type ExistingAttachedAssetProcessor = {
-  id: number,
-  title?: string,
-  text?: string,
-  icon?: AssetProcessorContentItem['icon'],
+  id: number
+  title?: string
+  text?: string
+  icon?: AssetProcessorContentItem['icon']
   context_external_tool_id: number
-  context_external_tool_name?: string,
+  context_external_tool_name?: string
+  iframe?: ContentItemIframeDimensions
+  window?: AssetProcessorWindowSettings
 }
 
-function newAttachedAssetProcessor(
-  {tool, contentItem}: {tool: LtiLaunchDefinition, contentItem: AssetProcessorContentItem }
-): AttachedAssetProcessor {
+function newAttachedAssetProcessor({
+  tool,
+  contentItem,
+}: {tool: LtiLaunchDefinition; contentItem: AssetProcessorContentItem}): AttachedAssetProcessor {
   return {
-    toolName: tool.name,
-    toolId: tool.definition_id,
     iconUrl: safeDigIconUrl(contentItem.icon) || tool.placements?.ActivityAssetProcessor?.icon_url,
-    title: contentItem.title,
     text: contentItem.text,
+    title: contentItem.title,
+    toolId: tool.definition_id,
+    toolName: tool.name,
+    iframe: contentItem.iframe,
+    window: contentItem.window,
     dtoJson: jsonStringifyDto({
-      new_content_item: assetProcessorContentItemToDto(contentItem, tool.definition_id)
-    })
+      new_content_item: assetProcessorContentItemToDto(contentItem, tool.definition_id),
+    }),
   }
 }
 
@@ -102,29 +117,42 @@ function safeDigIconUrl(icon: any): string | undefined {
 }
 
 function existingAttachedAssetProcessor(
-  processor: ExistingAttachedAssetProcessor
+  processor: ExistingAttachedAssetProcessor,
 ): AttachedAssetProcessor {
   return {
+    id: processor.id,
     toolName: processor.context_external_tool_name,
     toolId: processor.context_external_tool_id.toString(),
     iconUrl: processor.icon?.url,
     title: processor.title,
     text: processor.text,
-    dtoJson: jsonStringifyDto({existing_id: processor.id})
+    iframe: processor.iframe,
+    window: processor.window,
+    dtoJson: jsonStringifyDto({existing_id: processor.id}),
   }
 }
 
 function showFlashMessagesFromDeepLinkingResponse(data: DeepLinkResponse) {
   if (data.errormsg) {
-    showFlashError(I18n.t("Error from document processing app: %{errorFromTool}", {errorFromTool: data.errormsg}))()
+    showFlashError(
+      I18n.t('Error from document processing app: %{errorFromTool}', {
+        errorFromTool: data.errormsg,
+      }),
+    )()
   }
 
   if (data.msg) {
-    showFlashAlert({message: I18n.t("Message from document processing app: %{messageFromTool}", {messageFromTool: data.msg})})
+    showFlashAlert({
+      message: I18n.t('Message from document processing app: %{messageFromTool}', {
+        messageFromTool: data.msg,
+      }),
+    })
   }
 
   if (!data.msg && !data.errormsg && !data.content_items?.length) {
-    showFlashAlert({message: I18n.t("The document processing app returned with no processors to attach.")})
+    showFlashAlert({
+      message: I18n.t('The document processing app returned with no processors to attach.'),
+    })
   }
 }
 
@@ -135,7 +163,9 @@ export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) =
     showFlashMessagesFromDeepLinkingResponse(data)
 
     const items = data.content_items.filter(item => item.type === 'ltiAssetProcessor')
-    const newProcessors: AttachedAssetProcessor[] = items.map(contentItem => newAttachedAssetProcessor({tool, contentItem}))
+    const newProcessors: AttachedAssetProcessor[] = items.map(contentItem =>
+      newAttachedAssetProcessor({tool, contentItem}),
+    )
     set({attachedProcessors: [...get().attachedProcessors, ...newProcessors]})
   },
 
@@ -143,18 +173,25 @@ export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) =
     const attachedProcessors = get().attachedProcessors
     const processor = attachedProcessors[index]
 
-    const title = I18n.t("Confirm Delete")
+    const title = I18n.t('Confirm Delete')
     const msg = I18n.t(
       "Are you sure you'd like to delete *%{title}*? Deleting %{title} will will prevent future submissions from being processed by them as well as removing any existing reports by %{title} from your Speedgrader view.",
-      {title: processor.title, wrapper: '<strong>$1</strong>'}
+      {title: processor.title, wrapper: '<strong>$1</strong>'},
     )
-    const messageDangerouslySetInnerHTML = { __html: msg }
-    const confirmButtonLabel = I18n.t("Delete")
-    if (await confirmDanger({ title, message: null, messageDangerouslySetInnerHTML, confirmButtonLabel })) {
+    const messageDangerouslySetInnerHTML = {__html: msg}
+    const confirmButtonLabel = I18n.t('Delete')
+    if (
+      await confirmDanger({
+        title,
+        message: null,
+        messageDangerouslySetInnerHTML,
+        confirmButtonLabel,
+      })
+    ) {
       set({attachedProcessors: get().attachedProcessors.filter((_, i) => i !== index)})
     }
   },
 
-  setFromExistingAttachedProcessors: (processors) =>
+  setFromExistingAttachedProcessors: processors =>
     set({attachedProcessors: processors.map(existingAttachedAssetProcessor)}),
 }))

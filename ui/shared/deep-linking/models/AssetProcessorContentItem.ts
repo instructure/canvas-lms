@@ -22,7 +22,15 @@ export type AssetProcessorContentItemReport = {
   custom?: Record<string, string>
 }
 
-export type AssetProcessorContentItem = { 
+// Window configuration for opening asset processor settings in new window/tab
+export type AssetProcessorWindowSettings = {
+  targetName?: string // Name of window to open, allows sharing a target
+  width?: number // Width in pixels of the new window
+  height?: number // Height in pixels of the new window
+  windowFeatures?: string // Comma-separated list of window features for window.open()
+}
+
+export type AssetProcessorContentItem = {
   type: 'ltiAssetProcessor'
   // Not sure where this comes from. Cargo cult from ResourceLinkContentItem, needed by usages of ContentItem.
   // presumably Canvas is adding it somewhere
@@ -32,7 +40,7 @@ export type AssetProcessorContentItem = {
 // Part of the the JSON sent to the API when saving (creating/editing) assignments
 // Should match up with ruby app/models/lti/asset_processor.rb#build_for_assignment
 export type AssetProcessorContentItemDto = {
-  context_external_tool_id: number | string,
+  context_external_tool_id: number | string
 } & AssetProcessorCommonFields
 
 export type AssetProcessorCommonFields = {
@@ -55,12 +63,7 @@ export type AssetProcessorCommonFields = {
     height?: number
   }
   // The window property indicates how to open the asset processor settings in a new window/tab.
-  window?: {
-    targetName?: string
-    width?: number
-    height?: number
-    windowFeatures?: string
-  }
+  window?: AssetProcessorWindowSettings
   // The iframe property indicates the asset processor settings can be embedded using an iframe.
   iframe?: ContentItemIframeDimensions
   // A map of key/value custom parameters.
@@ -70,7 +73,7 @@ export type AssetProcessorCommonFields = {
 }
 
 export function assetProcessorContentItemToDto(
-  contentItem: AssetProcessorContentItem, 
+  contentItem: AssetProcessorContentItem,
   toolId: number | string,
 ): AssetProcessorContentItemDto {
   const {type, errors, ...commonFields} = contentItem
