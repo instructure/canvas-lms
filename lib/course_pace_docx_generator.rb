@@ -27,11 +27,12 @@ class CoursePaceDocxGenerator
     @course = course_report.course
   end
 
-  def generate
+  def generate(progress)
     files_by_name = {}
 
     loaded_sections = course.course_sections.where(id: section_ids)
-    loaded_sections.each do |section|
+    loaded_sections.each_with_index do |section, idx|
+      progress.calculate_completion!(idx, loaded_sections.count + 1)
       course_pace = CoursePace.pace_for_context(course, section)
 
       docx_stream = CoursePacePresenter.new(course_pace).as_docx(section)
@@ -44,7 +45,8 @@ class CoursePaceDocxGenerator
     end
 
     loaded_enrollments = course.enrollments.where(id: enrollment_ids)
-    loaded_enrollments.each do |enrollment|
+    loaded_enrollments.each_with_index do |enrollment, idx|
+      progress.calculate_completion!(idx, loaded_enrollments.count + 1)
       course_pace = CoursePace.pace_for_context(course, enrollment)
 
       docx_stream = CoursePacePresenter.new(course_pace).as_docx(enrollment)

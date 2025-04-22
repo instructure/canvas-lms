@@ -26,6 +26,7 @@ class CourseReport < ActiveRecord::Base
   belongs_to :user, inverse_of: :course_reports
   belongs_to :attachment, inverse_of: :course_report
   belongs_to :root_account, class_name: "Account"
+  has_one :progress, inverse_of: :context
 
   validates :course_id, :user_id, :workflow_state, presence: true
 
@@ -60,36 +61,37 @@ class CourseReport < ActiveRecord::Base
     created? || running?
   end
 
-  def run_report
+  def run_report(progress)
     shard.activate do
-      generate_report
-    rescue
-      mark_as_errored
+      generate_report(progress)
+    rescue => e
+      mark_as_errored(progress, e)
     end
   end
-  handle_asynchronously :run_report,
-                        priority: Delayed::LOW_PRIORITY,
-                        on_permanent_failure: :mark_as_errored
 
-  def mark_as_errored(error = nil)
+  def mark_as_errored(progress, error = nil)
     Rails.logger.error("CourseReport failed with error: #{error}") if error
 
     self.workflow_state = :error
     save!
+    progress.fail!
   end
 
-  def generate_report
+  def generate_report(progress)
+    progress.start
     capture_job_id
     update(workflow_state: "running", start_at: Time.zone.now)
 
     begin
       case report_type
       when "course_pace_docx"
-        CoursePaceDocxGenerator.new(self, parameters[:section_ids], parameters[:enrollment_ids]).generate
+        CoursePaceDocxGenerator.new(self, parameters[:section_ids], parameters[:enrollment_ids]).generate(progress)
       end
       update(workflow_state: "complete", end_at: Time.zone.now)
+      progress.update_completion!(100)
     rescue => e
       update(workflow_state: "error", end_at: Time.zone.now, message: "Generating the report, #{report_type}, failed\n#{e.message}\n#{e.backtrace}")
+      progress.fail
     end
   end
 

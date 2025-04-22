@@ -64,6 +64,11 @@
 #           "description": "The report parameters",
 #           "example": {"course_id": 2, "start_at": "2012-07-13T10:55:20-06:00", "end_at": "2012-07-13T10:55:20-06:00"},
 #           "$ref": "ReportParameters"
+#         },
+#         "progress": {
+#           "description": "The progress of the report",
+#           "example": "100",
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -124,7 +129,11 @@ class CourseReportsController < ApplicationController
       parameters = params[:parameters].permit(enrollment_ids: [], section_ids: []).to_h
 
       report = @context.course_reports.create(user: @current_user, course: @context, report_type: params.require(:report_type), root_account: @context.account.root_account, parameters:)
-      report.run_report
+      progress = Progress.create!(context: report, tag: "course_report", completion: 0)
+      strand = "course_report:#{@context.id}"
+      progress.process_job(report,
+                           :run_report,
+                           { priority: Delayed::LOW_PRIORITY, strand: })
 
       render json: course_report_json(report, @current_user)
     end

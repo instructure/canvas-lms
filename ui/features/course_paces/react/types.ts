@@ -97,10 +97,10 @@ export interface PaceDuration {
 }
 
 export type AssignmentWeightening = {
-  assignment?: number | undefined,
-  quiz?: number | undefined,
-  discussion?: number | undefined,
-  page?: number | undefined,
+  assignment?: number | undefined
+  quiz?: number | undefined
+  discussion?: number | undefined
+  page?: number | undefined
 }
 
 export interface CoursePace {
@@ -145,6 +145,7 @@ export interface CourseReport {
   readonly file_url?: string
   readonly parameters?: any
   readonly status?: string
+  readonly progress: number
 }
 
 /* Redux state types */
@@ -163,8 +164,8 @@ export type OriginalState = {
 
 export type MasteryPathsData = {
   isCyoeAble?: boolean
-  isTrigger?: boolean,
-  isReleased?: boolean,
+  isTrigger?: boolean
+  isReleased?: boolean
   releasedLabel?: string
 }
 
@@ -263,8 +264,8 @@ export interface PaceContextsApiResponse {
 }
 
 export type BulkStudentsApiResponse = {
-  students: Student[],
-  sections: Section[],
+  students: Student[]
+  sections: Section[]
   pages: number
 }
 

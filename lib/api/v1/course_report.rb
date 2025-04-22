@@ -40,6 +40,13 @@ module Api::V1::CourseReport
     if report.attachment
       json[:attachment] = attachment_json(report.attachment, user)
     end
+    json[:progress] = if report.progress
+                        report.progress.completion.to_i
+                      elsif report.complete?
+                        100
+                      else
+                        0
+                      end
     json
   end
 end
