@@ -83,12 +83,10 @@ class ConditionalReleaseObjects
       f("[title='Lower Bound']")
     end
 
-    def division_cutoff1
-      f("[title='Division cutoff 1']")
-    end
+    def division_cutoff(index)
+      return unless (0..1).cover?(index)
 
-    def division_cutoff2
-      f("[title='Division cutoff 2']")
+      ff(".cr-scoring-range")[index].find("input[title='Cutoff Points']")
     end
 
     # Common Selectors
