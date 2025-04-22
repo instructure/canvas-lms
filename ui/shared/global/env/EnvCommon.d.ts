@@ -344,7 +344,6 @@ export type RootAccountServiceId = 'account_survey_notifications'
 export type BrandAccountFeatureId =
   | 'embedded_release_notes'
   | 'consolidated_media_player'
-  | 'discussions_speedgrader_revisit'
   | 'discussion_checkpoints'
 
 /**

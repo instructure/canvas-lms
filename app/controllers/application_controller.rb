@@ -434,10 +434,8 @@ class ApplicationController < ActionController::Base
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
     embedded_release_notes
-    discussions_speedgrader_revisit
     discussion_checkpoints
     assign_to_differentiation_tags
-
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest(
     [

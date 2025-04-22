@@ -15,39 +15,41 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {Button, IconButton} from '@instructure/ui-buttons'
-import {ChildTopic} from '../../../graphql/ChildTopic'
-import {Flex} from '@instructure/ui-flex'
-import {GroupsMenu} from '../GroupsMenu/GroupsMenu'
+
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Button, IconButton} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import {
+  IconAiLine,
   IconArrowDownLine,
   IconArrowUpLine,
+  IconPermissionsLine,
   IconSearchLine,
   IconTroubleLine,
-  IconPermissionsLine,
-IconAiLine} from '@instructure/ui-icons'
+} from '@instructure/ui-icons'
+import {Responsive} from '@instructure/ui-responsive'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {TextInput} from '@instructure/ui-text-input'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {View} from '@instructure/ui-view'
 import PropTypes from 'prop-types'
+import React, {useContext, useState} from 'react'
+import {ChildTopic} from '../../../graphql/ChildTopic'
+import {hideStudentNames, responsiveQuerySizes} from '../../utils'
 import {
   CURRENT_USER,
   DiscussionManagerUtilityContext,
   isSpeedGraderInTopUrl,
 } from '../../utils/constants'
-import React, {useContext, useState} from 'react'
-import {Responsive} from '@instructure/ui-responsive'
-import {hideStudentNames, responsiveQuerySizes} from '../../utils'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {SimpleSelect} from '@instructure/ui-simple-select'
-import {SplitScreenButton} from './SplitScreenButton'
+import {GroupsMenu} from '../GroupsMenu/GroupsMenu'
 import SwitchToIndividualPostsLink from '../SwitchToIndividualPostsLink/SwitchToIndividualPostsLink'
-import {TextInput} from '@instructure/ui-text-input'
-import {Tooltip} from '@instructure/ui-tooltip'
-import {View} from '@instructure/ui-view'
-import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
-import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
-import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {TranslationTriggerModal} from '../TranslationTriggerModal/TranslationTriggerModal'
+import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 import SortOrderDropDown from './SortOrderDropDown'
+import {SplitScreenButton} from './SplitScreenButton'
 
 const I18n = createI18nScope('discussions_posts')
 
@@ -127,7 +129,9 @@ export const DiscussionPostToolbar = props => {
 
   const renderTranslate = () => {
     const text = showTranslate ? I18n.t('Hide Translate Text') : I18n.t('Translate Text')
-    const improvedText = showTranslationControl ? I18n.t('Turn off Translation') : I18n.t('Translate Discussion')
+    const improvedText = showTranslationControl
+      ? I18n.t('Turn off Translation')
+      : I18n.t('Translate Discussion')
 
     return (
       <Button
@@ -395,22 +399,23 @@ export const DiscussionPostToolbar = props => {
                       />
                     </Flex.Item>
                   )}
-                  {!props.isAnnouncement && translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
-                    <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                      {renderTranslate()}
-                    </Flex.Item>
-                  )}
-                  {isSpeedGraderInTopUrl &&
-                    window?.ENV?.FEATURES?.discussions_speedgrader_revisit && (
-                      <Flex.Item
-                        margin="0 small 0 0"
-                        padding={responsiveProps.padding}
-                        textAlign="end"
-                        shouldGrow={true}
-                      >
-                        {renderSwitchLink()}
+                  {!props.isAnnouncement &&
+                    translationLanguages.current.length > 0 &&
+                    !isSpeedGraderInTopUrl && (
+                      <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
+                        {renderTranslate()}
                       </Flex.Item>
                     )}
+                  {isSpeedGraderInTopUrl && window?.ENV?.FEATURES?.discussion_checkpoints && (
+                    <Flex.Item
+                      margin="0 small 0 0"
+                      padding={responsiveProps.padding}
+                      textAlign="end"
+                      shouldGrow={true}
+                    >
+                      {renderSwitchLink()}
+                    </Flex.Item>
+                  )}
                   {props.discussionAnonymousState &&
                     ENV.current_user_roles?.includes('student') && (
                       <Flex.Item shouldGrow={true}>

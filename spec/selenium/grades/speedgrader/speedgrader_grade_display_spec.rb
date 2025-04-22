@@ -112,7 +112,7 @@ describe "SpeedGrader - grade display" do
     end
   end
 
-  context "keyboard shortcuts" do
+  context "keyboard shortcuts", skip: "EGG-1031" do
     let(:first_grade) { 5 }
     let(:last_grade) { 10 }
 

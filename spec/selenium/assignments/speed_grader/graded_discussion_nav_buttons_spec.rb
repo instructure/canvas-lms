@@ -76,139 +76,9 @@ describe "Screenreader Gradebook grading" do
       expect(f("body").text).to include("reply to topic i0")
     end
 
-    context "discussions_speedgrader_revisit" do
-      before do
-        @course.account.enable_feature!(:discussions_speedgrader_revisit)
-      end
-
-      context "sort_order asc" do
-        it "goes to last entry", :ignore_js_errors do
-          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_first_entry.id}"
-          f("button[title='Settings']").click
-          fj("[class*='menuItem__label']:contains('Options')").click
-          fj("label:contains('Show replies in context')").click
-          fj(".ui-dialog-buttonset .ui-button:visible:last").click
-
-          Speedgrader.wait_for_first_reply_button
-          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
-          expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
-          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
-          expect(f("body").text).to include("Reply 1 of 6")
-
-          f("button[data-testid='discussions-last-reply-button']").click
-          expect(f("body").text).to include("Reply 6 of 6")
-
-          # we are not doing anything inside the iframes yet, the buttons are reliant
-          # on their contents to load, though
-          Speedgrader.wait_for_all_speedgrader_iframes_to_load
-          Speedgrader.wait_for_first_reply_button
-          expect(f("button[data-testid='discussions-first-reply-button']")).to be_enabled
-          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_enabled
-          expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
-          expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
-
-          Speedgrader.wait_for_all_speedgrader_iframes_to_load do
-            expect(f("body").text).to include("reply to topic j2")
-          end
-        end
-
-        it "goes to first entry", :ignore_js_errors do
-          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_last_entry.id}"
-          f("button[title='Settings']").click
-          fj("[class*='menuItem__label']:contains('Options')").click
-          fj("label:contains('Show replies in context')").click
-          fj(".ui-dialog-buttonset .ui-button:visible:last").click
-
-          Speedgrader.wait_for_first_reply_button
-          expect(f("button[data-testid='discussions-next-reply-button']")).to be_present
-          expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
-          expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
-          expect(f("body").text).to include("Reply 6 of 6")
-
-          Speedgrader.wait_for_all_speedgrader_iframes_to_load
-          Speedgrader.wait_for_first_reply_button
-          f("button[data-testid='discussions-first-reply-button']").click
-          expect(f("body").text).to include("Reply 1 of 6")
-
-          expect(f("button[data-testid='discussions-last-reply-button']")).to be_enabled
-          expect(f("button[data-testid='discussions-next-reply-button']")).to be_enabled
-          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
-          expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
-
-          Speedgrader.wait_for_all_speedgrader_iframes_to_load do
-            wait_for(timeout: 5, method: nil) { f("div[data-testid='isHighlighted']") }
-            expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i0")
-          end
-        end
-      end
-
-      context "sort_order desc" do
-        it "goes to last entry", :ignore_js_errors do
-          @dtp.sort_order = "desc"
-          @dtp.save!
-          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_first_entry.id}"
-          f("button[title='Settings']").click
-          fj("[class*='menuItem__label']:contains('Options')").click
-          fj("label:contains('Show replies in context')").click
-          fj(".ui-dialog-buttonset .ui-button:visible:last").click
-
-          Speedgrader.wait_for_first_reply_button
-          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
-          expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
-          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
-          expect(f("body").text).to include("Reply 1 of 6")
-
-          f("button[data-testid='discussions-last-reply-button']").click
-          expect(f("body").text).to include("Reply 6 of 6")
-
-          # we are not doing anything inside the iframes yet, the buttons are reliant
-          # on their contents to load, though
-          Speedgrader.wait_for_all_speedgrader_iframes_to_load
-          Speedgrader.wait_for_first_reply_button
-          expect(f("button[data-testid='discussions-first-reply-button']")).to be_enabled
-          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_enabled
-          expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
-          expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
-
-          Speedgrader.wait_for_all_speedgrader_iframes_to_load do
-            expect(f("body").text).to include("reply to topic j2")
-          end
-        end
-
-        it "goes to first entry", :ignore_js_errors do
-          @dtp.sort_order = "desc"
-          @dtp.save!
-          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_last_entry.id}"
-          f("button[title='Settings']").click
-          fj("[class*='menuItem__label']:contains('Options')").click
-          fj("label:contains('Show replies in context')").click
-          fj(".ui-dialog-buttonset .ui-button:visible:last").click
-
-          Speedgrader.wait_for_first_reply_button
-          expect(f("button[data-testid='discussions-next-reply-button']")).to be_present
-          expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
-          expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
-          expect(f("body").text).to include("Reply 6 of 6")
-
-          Speedgrader.wait_for_all_speedgrader_iframes_to_load
-          Speedgrader.wait_for_first_reply_button
-          f("button[data-testid='discussions-first-reply-button']").click
-          expect(f("body").text).to include("Reply 1 of 6")
-
-          expect(f("button[data-testid='discussions-last-reply-button']")).to be_enabled
-          expect(f("button[data-testid='discussions-next-reply-button']")).to be_enabled
-          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
-          expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
-
-          Speedgrader.wait_for_all_speedgrader_iframes_to_load do
-            wait_for(timeout: 5, method: nil) { f("div[data-testid='isHighlighted']") }
-            expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i0")
-          end
-        end
-      end
-
-      it "can navigate prev and next", :ignore_js_errors do
-        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student1.id}&entry_id=#{@student_2_first_entry.id}"
+    context "sort_order asc" do
+      it "goes to last entry", :ignore_js_errors do
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_first_entry.id}"
         f("button[title='Settings']").click
         fj("[class*='menuItem__label']:contains('Options')").click
         fj("label:contains('Show replies in context')").click
@@ -218,43 +88,167 @@ describe "Screenreader Gradebook grading" do
         expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
         expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
         expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
-        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
-          expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
-          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i0")
-        end
-        expect(f("body").text).to include("Reply 1 of 7")
+        expect(f("body").text).to include("Reply 1 of 6")
 
-        f("button[data-testid='discussions-next-reply-button']").click
-        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
-          expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
-          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i1")
-        end
-        expect(f("body").text).to include("Reply 2 of 7")
+        f("button[data-testid='discussions-last-reply-button']").click
+        expect(f("body").text).to include("Reply 6 of 6")
 
-        f("button[data-testid='discussions-next-reply-button']").click
-        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
-          expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
-          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i2")
-        end
-        expect(f("body").text).to include("Reply 3 of 7")
+        # we are not doing anything inside the iframes yet, the buttons are reliant
+        # on their contents to load, though
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load
+        Speedgrader.wait_for_first_reply_button
+        expect(f("button[data-testid='discussions-first-reply-button']")).to be_enabled
+        expect(f("button[data-testid='discussions-previous-reply-button']")).to be_enabled
+        expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
+        expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
 
-        f("button[data-testid='discussions-previous-reply-button']").click
         Speedgrader.wait_for_all_speedgrader_iframes_to_load do
-          expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
-          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i1")
+          expect(f("body").text).to include("reply to topic j2")
         end
-        expect(f("body").text).to include("Reply 2 of 7")
+      end
 
-        f("button[data-testid='discussions-previous-reply-button']").click
+      it "goes to first entry", :ignore_js_errors do
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_last_entry.id}"
+        f("button[title='Settings']").click
+        fj("[class*='menuItem__label']:contains('Options')").click
+        fj("label:contains('Show replies in context')").click
+        fj(".ui-dialog-buttonset .ui-button:visible:last").click
+
+        Speedgrader.wait_for_first_reply_button
+        expect(f("button[data-testid='discussions-next-reply-button']")).to be_present
+        expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
+        expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
+        expect(f("body").text).to include("Reply 6 of 6")
+
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load
+        Speedgrader.wait_for_first_reply_button
+        f("button[data-testid='discussions-first-reply-button']").click
+        expect(f("body").text).to include("Reply 1 of 6")
+
+        expect(f("button[data-testid='discussions-last-reply-button']")).to be_enabled
+        expect(f("button[data-testid='discussions-next-reply-button']")).to be_enabled
+        expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
+        expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
+
         Speedgrader.wait_for_all_speedgrader_iframes_to_load do
-          expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
-          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i0")
+          wait_for(timeout: 5, method: nil) { f("div[data-testid='isHighlighted']") }
+          expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i0")
         end
+      end
+    end
 
-        expect(f("body").text).to include("Reply 1 of 7")
+    context "sort_order desc" do
+      it "goes to last entry", :ignore_js_errors do
+        @dtp.sort_order = "desc"
+        @dtp.save!
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_first_entry.id}"
+        f("button[title='Settings']").click
+        fj("[class*='menuItem__label']:contains('Options')").click
+        fj("label:contains('Show replies in context')").click
+        fj(".ui-dialog-buttonset .ui-button:visible:last").click
+
+        Speedgrader.wait_for_first_reply_button
+        expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
         expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
         expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
+        expect(f("body").text).to include("Reply 1 of 6")
+
+        f("button[data-testid='discussions-last-reply-button']").click
+        expect(f("body").text).to include("Reply 6 of 6")
+
+        # we are not doing anything inside the iframes yet, the buttons are reliant
+        # on their contents to load, though
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load
+        Speedgrader.wait_for_first_reply_button
+        expect(f("button[data-testid='discussions-first-reply-button']")).to be_enabled
+        expect(f("button[data-testid='discussions-previous-reply-button']")).to be_enabled
+        expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
+        expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
+
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          expect(f("body").text).to include("reply to topic j2")
+        end
       end
+
+      it "goes to first entry", :ignore_js_errors do
+        @dtp.sort_order = "desc"
+        @dtp.save!
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_last_entry.id}"
+        f("button[title='Settings']").click
+        fj("[class*='menuItem__label']:contains('Options')").click
+        fj("label:contains('Show replies in context')").click
+        fj(".ui-dialog-buttonset .ui-button:visible:last").click
+
+        Speedgrader.wait_for_first_reply_button
+        expect(f("button[data-testid='discussions-next-reply-button']")).to be_present
+        expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
+        expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
+        expect(f("body").text).to include("Reply 6 of 6")
+
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load
+        Speedgrader.wait_for_first_reply_button
+        f("button[data-testid='discussions-first-reply-button']").click
+        expect(f("body").text).to include("Reply 1 of 6")
+
+        expect(f("button[data-testid='discussions-last-reply-button']")).to be_enabled
+        expect(f("button[data-testid='discussions-next-reply-button']")).to be_enabled
+        expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
+        expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
+
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          wait_for(timeout: 5, method: nil) { f("div[data-testid='isHighlighted']") }
+          expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i0")
+        end
+      end
+    end
+
+    it "can navigate prev and next", :ignore_js_errors do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student1.id}&entry_id=#{@student_2_first_entry.id}"
+      f("button[title='Settings']").click
+      fj("[class*='menuItem__label']:contains('Options')").click
+      fj("label:contains('Show replies in context')").click
+      fj(".ui-dialog-buttonset .ui-button:visible:last").click
+
+      Speedgrader.wait_for_first_reply_button
+      expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
+      expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
+      expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
+      Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+        expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
+        expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i0")
+      end
+      expect(f("body").text).to include("Reply 1 of 7")
+
+      f("button[data-testid='discussions-next-reply-button']").click
+      Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+        expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
+        expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i1")
+      end
+      expect(f("body").text).to include("Reply 2 of 7")
+
+      f("button[data-testid='discussions-next-reply-button']").click
+      Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+        expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
+        expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i2")
+      end
+      expect(f("body").text).to include("Reply 3 of 7")
+
+      f("button[data-testid='discussions-previous-reply-button']").click
+      Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+        expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
+        expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i1")
+      end
+      expect(f("body").text).to include("Reply 2 of 7")
+
+      f("button[data-testid='discussions-previous-reply-button']").click
+      Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+        expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
+        expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i0")
+      end
+
+      expect(f("body").text).to include("Reply 1 of 7")
+      expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
+      expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
     end
   end
 end
