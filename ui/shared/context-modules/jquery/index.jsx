@@ -2328,10 +2328,24 @@ function initContextModules() {
 
   setExpandAllButton()
 
+  // NOTE: when instui_header flag is on, it's the ContextModulesHeader
+  //       that calls setExpandAllButtonHandler. For now, it does not
+  //       pass in the callback, so items won't get lazy loaded.
+  //       I plan on having the react module page out before this
+  //       flag is ever turned on.
   if (!ENV.FEATURES.instui_header) {
     // set the click handler for the expand/collapse all button
     // if the instui header is not enabled
-    setExpandAllButtonHandler()
+    setExpandAllButtonHandler(() => {
+      const moduleIds = Array.from(
+        document.querySelectorAll(
+          '.context_module:not(:has(.context_module_item)):not(#context_module_blank)',
+        ),
+      ).map(d => d.dataset.moduleId)
+      if (moduleIds.length) {
+        modules.lazyLoadItems(moduleIds)
+      }
+    })
   }
 
   if (!ENV.FEATURES.instui_header) {

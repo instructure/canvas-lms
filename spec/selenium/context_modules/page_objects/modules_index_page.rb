@@ -21,6 +21,19 @@ require_relative "../../common"
 
 module ModulesIndexPage
   #------------------------------ Selectors -----------------------------
+
+  def all_collapsed_modules_selector
+    ".context_module.collapsed_module:not(#context_module_blank)"
+  end
+
+  def all_expanded_modules_selector
+    ".context_module:not(.collapsed_module):not(#context_module_blank)"
+  end
+
+  def expand_collapse_all_button_selector
+    "#expand_collapse_all"
+  end
+
   def collapse_module_link_selector(module_id)
     ".collapse_module_link[aria-controls='context_module_content_#{module_id}']"
   end
@@ -59,6 +72,10 @@ module ModulesIndexPage
 
   def module_content_selector(module_id)
     "#context_module_content_#{module_id}"
+  end
+
+  def module_items_selector(module_id)
+    "#context_module_content_#{module_id} .context_module_item"
   end
 
   def module_item_selector(module_item_id)
@@ -130,7 +147,7 @@ module ModulesIndexPage
   end
 
   def all_modules_selector
-    "#context_modules .context_module"
+    "#context_modules .context_module:not(#context_module_blank)"
   end
 
   def duplicate_module_button_selector(context_module)
@@ -146,6 +163,10 @@ module ModulesIndexPage
   end
 
   #------------------------------ Elements ------------------------------
+  def expand_collapse_all_button
+    f(expand_collapse_all_button_selector)
+  end
+
   def collapse_module_link(module_id)
     f(collapse_module_link_selector(module_id))
   end
@@ -163,11 +184,15 @@ module ModulesIndexPage
   end
 
   def all_collapsed_modules
-    ff(".context_module.collapsed_module")
+    ff(all_collapsed_modules_selector)
+  rescue
+    []
   end
 
   def all_expanded_modules
-    ff(".context_module:not(.collapsed_module):not(#context_module_blank)")
+    ff(all_expanded_modules_selector)
+  rescue
+    []
   end
 
   def delete_card_button
