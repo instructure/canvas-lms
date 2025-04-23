@@ -163,6 +163,54 @@ describe "files index page" do
         end
       end
 
+      context "from cloud icon" do
+        before do
+          add_file(fixture_file_upload(base_file_name, "application/pdf"),
+                   @course,
+                   base_file_name)
+          get "/courses/#{@course.id}/files"
+        end
+
+        it "unpublishes and publish a file", priority: "1" do
+          published_status_button.click
+          edit_item_permissions(:unpublished)
+          expect(unpublished_status_button).to be_present
+          unpublished_status_button.click
+          edit_item_permissions(:published)
+          expect(published_status_button).to be_present
+        end
+
+        it "makes file available to student with link", priority: "1" do
+          published_status_button.click
+          edit_item_permissions(:available_with_link)
+          expect(link_only_status_button).to be_present
+        end
+      end
+
+      context "from toolbar menu" do
+        before do
+          add_file(fixture_file_upload(base_file_name, "application/pdf"),
+                   @course,
+                   base_file_name)
+          get "/courses/#{@course.id}/files"
+        end
+
+        it "unpublishes and publish a file", priority: "1" do
+          select_item_to_edit_permissions_from_kebab_menu(1)
+          edit_item_permissions(:unpublished)
+          expect(unpublished_status_button).to be_present
+          select_item_to_edit_permissions_from_kebab_menu(1)
+          edit_item_permissions(:published)
+          expect(published_status_button).to be_present
+        end
+
+        it "makes file available to student with link from toolbar", priority: "1" do
+          select_item_to_edit_permissions_from_kebab_menu(1)
+          edit_item_permissions(:available_with_link)
+          expect(link_only_status_button).to be_present
+        end
+      end
+
       context "accessibility tests for preview" do
         before do
           add_file(fixture_file_upload(base_file_name, "application/pdf"),
@@ -364,6 +412,14 @@ describe "files index page" do
 
         it "validates that file is published by default", priority: "1" do
           expect(item_has_permissions_icon?(1, 6, "published-button")).to be true
+        end
+
+        it "sets focus to the close button when opening the dialog", priority: "1" do
+          published_status_button.click
+          wait_for_ajaximations
+          element = driver.switch_to.active_element
+          should_focus = permissions_dialog_close_button
+          expect(element).to eq(should_focus)
         end
       end
 
