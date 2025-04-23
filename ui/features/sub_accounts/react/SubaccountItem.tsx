@@ -32,6 +32,7 @@ import {Text} from '@instructure/ui-text'
 import type {AccountWithCounts} from './types'
 import SubaccountNameForm from './SubaccountNameForm'
 import {calculateIndent} from './util'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('sub_accounts')
 
@@ -81,18 +82,29 @@ export default function SubaccountItem(props: Props) {
     {count: props.account.sub_account_count},
   )
 
-  const renderRowContents = (id: string) => {
+  const renderRowContents = () => {
+    const addTip = I18n.t("Add subaccount to '%{account}'", {
+      account: props.account.name,
+    })
+    const collapseTip = I18n.t("Collapse subaccount list for '%{account}'", {
+      account: props.account.name,
+    })
+    const expandTip = I18n.t("Expand subaccount list for '%{account}'", {
+      account: props.account.name,
+    })
+    const editTip = I18n.t("Edit account '%{account}'", {
+      account: props.account.name,
+    })
+    const deleteTip = I18n.t("Delete account '%{account}'", {
+      account: props.account.name,
+    })
     const collapsedProps = {
-      screenReaderLabel: I18n.t('Collapse subaccount list for %{account}', {
-        account: props.account.name,
-      }),
+      screenReaderLabel: collapseTip,
       renderIcon: <IconArrowUpLine />,
       onClick: props.onCollapse,
     }
     const expandProps = {
-      screenReaderLabel: I18n.t('Expand subaccount list for %{account}', {
-        account: props.account.name,
-      }),
+      screenReaderLabel: expandTip,
       renderIcon: <IconArrowDownLine />,
       onClick: props.onExpand,
     }
@@ -136,42 +148,44 @@ export default function SubaccountItem(props: Props) {
         <Flex.Item size="20%" shouldGrow>
           <Flex gap="x-small" justifyItems="end" alignItems="end">
             {props.account.sub_account_count > 0 ? (
-              <IconButton
-                {...buttonProps}
-                withBorder={false}
-                data-testid={
-                  props.isExpanded ? `collapse-${props.account.id}` : `expand-${props.account.id}`
-                }
-              />
+              <Tooltip renderTip={props.isExpanded ? collapseTip : expandTip}>
+                <IconButton
+                  {...buttonProps}
+                  withBorder={false}
+                  data-testid={
+                    props.isExpanded ? `collapse-${props.account.id}` : `expand-${props.account.id}`
+                  }
+                />
+              </Tooltip>
             ) : null}
-            <IconButton
-              withBorder={false}
-              screenReaderLabel={I18n.t('Add subaccount to %{account}', {
-                account: props.account.name,
-              })}
-              renderIcon={<IconAddLine />}
-              onClick={props.onAdd}
-              data-testid={`add-${props.account.id}`}
-            />
-            <IconButton
-              withBorder={false}
-              screenReaderLabel={I18n.t("Edit account '%{account}'", {
-                account: props.account.name,
-              })}
-              renderIcon={<IconEditLine />}
-              onClick={() => setIsEditing(true)}
-              data-testid={`edit-${props.account.id}`}
-            />
-            <IconButton
-              withBorder={false}
-              screenReaderLabel={I18n.t("Delete account '%{account}'", {
-                account: props.account.name,
-              })}
-              renderIcon={<IconTrashLine />}
-              disabled={!props.canDelete}
-              onClick={props.onDelete}
-              data-testid={`delete-${props.account.id}`}
-            />
+            <Tooltip renderTip={addTip}>
+              <IconButton
+                withBorder={false}
+                screenReaderLabel={addTip}
+                renderIcon={<IconAddLine />}
+                onClick={props.onAdd}
+                data-testid={`add-${props.account.id}`}
+              />
+            </Tooltip>
+            <Tooltip renderTip={editTip}>
+              <IconButton
+                withBorder={false}
+                screenReaderLabel={editTip}
+                renderIcon={<IconEditLine />}
+                onClick={() => setIsEditing(true)}
+                data-testid={`edit-${props.account.id}`}
+              />
+            </Tooltip>
+            <Tooltip renderTip={deleteTip}>
+              <IconButton
+                withBorder={false}
+                screenReaderLabel={deleteTip}
+                renderIcon={<IconTrashLine />}
+                disabled={!props.canDelete}
+                onClick={props.onDelete}
+                data-testid={`delete-${props.account.id}`}
+              />
+            </Tooltip>
           </Flex>
         </Flex.Item>
       </>
@@ -183,7 +197,7 @@ export default function SubaccountItem(props: Props) {
     return (
       <Flex key={`${props.account.id}_header`}>
         <Flex.Item width={`${indent}%`} />
-        {renderRowContents(props.account.id)}
+        {renderRowContents()}
       </Flex>
     )
   } else if (props.show) {

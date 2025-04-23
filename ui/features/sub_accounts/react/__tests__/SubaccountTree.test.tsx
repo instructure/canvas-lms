@@ -41,6 +41,7 @@ const props = {
   rootAccount,
   depth: 0,
   isTopAccount: false,
+  defaultExpanded: true,
 }
 
 const SUBACCOUNT_FETCH = (account: AccountWithCounts) => {
