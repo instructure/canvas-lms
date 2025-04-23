@@ -585,6 +585,8 @@
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/date_details'
 - verb: PUT
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/date_details'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/assignments/:assignment_id/date_details/convert_tag_overrides'
 - verb: POST
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/duplicate'
 - verb: POST
@@ -841,6 +843,8 @@
   path: '/api/v1/courses/:course_id/discussion_topics/:discussion_topic_id/date_details'
 - verb: PUT
   path: '/api/v1/courses/:course_id/discussion_topics/:discussion_topic_id/date_details'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/discussion_topics/:discussion_topic_id/date_details/convert_tag_overrides'
 - verb: DELETE
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id'
 - verb: GET
@@ -1201,6 +1205,8 @@
   path: '/api/v1/courses/:course_id/pages/:url_or_id/date_details'
 - verb: PUT
   path: '/api/v1/courses/:course_id/pages/:url_or_id/date_details'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/pages/:url_or_id/date_details/convert_tag_overrides'
 - verb: POST
   path: '/api/v1/courses/:course_id/pages/:url_or_id/duplicate'
 - verb: GET
@@ -1243,6 +1249,8 @@
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/date_details'
 - verb: PUT
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/date_details'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/quizzes/:quiz_id/date_details/convert_tag_overrides'
 - verb: POST
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/extensions'
 - verb: POST

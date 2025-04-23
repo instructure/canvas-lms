@@ -1920,6 +1920,113 @@ describe LearningObjectDatesController do
       end
     end
 
+    context "PUT convert differentiation tags to ADHOC overrides" do
+      before do
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+
+        @diff_tag_category = @course.group_categories.create!(name: "Learning Levels", non_collaborative: true)
+        @honors_tag = @course.groups.create!(name: "Honors", group_category: @diff_tag_category, non_collaborative: true)
+        @standard_tag = @course.groups.create!(name: "Standard", group_category: @diff_tag_category, non_collaborative: true)
+
+        @student1 = student_in_course(name: "Student 1").user
+        @student2 = student_in_course(name: "Student 2").user
+        @student3 = student_in_course(name: "Student 3").user
+
+        # Add student 1 to honors
+        @honors_tag.add_user(@student1, "accepted")
+
+        # Add students 2 and 3 to standard
+        @standard_tag.add_user(@student2, "accepted")
+        @standard_tag.add_user(@student3, "accepted")
+      end
+
+      def create_diff_tag_override_for(learning_object, tag, dates)
+        learning_object.assignment_overrides.create!(
+          set_type: "Group",
+          set: tag,
+          unlock_at: dates[:unlock_at],
+          due_at: dates[:due_at],
+          lock_at: dates[:lock_at]
+        )
+      end
+
+      def successfully_removes_diff_tag_overrides(learning_object, honors_dates, standard_dates, date_key)
+        adhoc_overrides = learning_object.assignment_overrides.adhoc
+        expect(adhoc_overrides.count).to eq 2
+
+        honors_override = adhoc_overrides.find { |o| o.send(date_key) == honors_dates[date_key] }
+        expect(honors_override.assignment_override_students.pluck(:user_id)).to eq [@student1.id]
+
+        standard_override = adhoc_overrides.find { |o| o.due_at == standard_dates[:due_at] }
+        expect(standard_override.assignment_override_students.pluck(:user_id)).to eq([@student2.id, @student3.id])
+      end
+
+      it "converts diff tags for Assignments" do
+        assignment = @course.assignments.create!(name: "Assignment")
+
+        honors_dates = { unlock_at: 1.day.from_now, due_at: 2.days.from_now, lock_at: 3.days.from_now }
+        standard_dates = { unlock_at: 4.days.from_now, due_at: 5.days.from_now, lock_at: 6.days.from_now }
+
+        create_diff_tag_override_for(assignment, @honors_tag, honors_dates)
+        create_diff_tag_override_for(assignment, @standard_tag, standard_dates)
+
+        put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, assignment_id: assignment.id }
+
+        expect(response).to be_no_content
+
+        successfully_removes_diff_tag_overrides(assignment, honors_dates, standard_dates, :due_at)
+      end
+
+      it "converts diff tags for Quizzes" do
+        quiz = @course.quizzes.create!(title: "My Quiz")
+
+        honors_dates = { unlock_at: 1.day.from_now, due_at: 2.days.from_now, lock_at: 3.days.from_now }
+        standard_dates = { unlock_at: 4.days.from_now, due_at: 5.days.from_now, lock_at: 6.days.from_now }
+
+        create_diff_tag_override_for(quiz, @honors_tag, honors_dates)
+        create_diff_tag_override_for(quiz, @standard_tag, standard_dates)
+
+        put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, quiz_id: quiz.id }
+
+        expect(response).to be_no_content
+
+        successfully_removes_diff_tag_overrides(quiz, honors_dates, standard_dates, :due_at)
+      end
+
+      it "converts diff tags for Discussions" do
+        discussion = @course.discussion_topics.create!(title: "Discussion")
+
+        honors_dates = { unlock_at: 1.day.from_now, lock_at: 3.days.from_now }
+        standard_dates = { unlock_at: 4.days.from_now, lock_at: 6.days.from_now }
+
+        create_diff_tag_override_for(discussion, @honors_tag, honors_dates)
+        create_diff_tag_override_for(discussion, @standard_tag, standard_dates)
+
+        put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, discussion_topic_id: discussion.id }
+
+        expect(response).to be_no_content
+
+        successfully_removes_diff_tag_overrides(discussion, honors_dates, standard_dates, :lock_at)
+      end
+
+      it "converts diff tags for Wiki Pages" do
+        page = @course.wiki_pages.create!(title: "My Page")
+
+        honors_dates = { unlock_at: 1.day.from_now, lock_at: 3.days.from_now }
+        standard_dates = { unlock_at: 4.days.from_now, lock_at: 6.days.from_now }
+
+        create_diff_tag_override_for(page, @honors_tag, honors_dates)
+        create_diff_tag_override_for(page, @standard_tag, standard_dates)
+
+        put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, url_or_id: page.id }
+
+        expect(response).to be_no_content
+
+        successfully_removes_diff_tag_overrides(page, honors_dates, standard_dates, :lock_at)
+      end
+    end
+
     context "pages with an assignment" do
       let_once(:learning_object) do
         page = @course.wiki_pages.create!(title: "My Page")

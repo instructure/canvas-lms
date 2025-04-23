@@ -20,19 +20,15 @@
 module DifferentiationTag
   class AdhocOverrideCreatorService
     class << self
-      def create_adhoc_override(course, learning_object, override_data, executing_user)
-        errors = validate_params(course, learning_object, override_data, executing_user)
+      def create_adhoc_override(course, learning_object, override_data)
+        errors = validate_params(course, learning_object, override_data)
         return errors if errors.present?
 
-        # based off of learning_object type, delegate to appropriate service
-        # Current ticket is only focused on Context Modules but will be handled
-        # in the next ticket (https://instructure.atlassian.net/browse/EGG-870)
-        #  - Context modules are done here
-        #  - Checkpoints have their own service to make these adhoc overrides
-        #  - Everything else will be handled by the submission lifecycle manager in lib/assignment_overrides.rb
-
-        # Create brand new override for learning object
-        create_context_module_adhoc_override(learning_object, override_data)
+        if learning_object.is_a?(ContextModule)
+          create_context_module_adhoc_override(learning_object, override_data)
+        else
+          create_general_adhoc_override(learning_object, override_data)
+        end
 
         # no errors so return nil
         nil
@@ -43,6 +39,27 @@ module DifferentiationTag
       def create_context_module_adhoc_override(context_module, override_data)
         override = context_module.assignment_overrides.create!(set_type: "ADHOC")
         add_students_to_override(override, override_data[:student_ids])
+      end
+
+      def create_general_adhoc_override(learning_object, override_data)
+        data = override_data[:override]
+        adhoc_override = learning_object.assignment_overrides.create!(
+          set_type: "ADHOC",
+          assignment_id: data.assignment_id,
+          quiz_id: data.quiz_id,
+          wiki_page_id: data.wiki_page_id,
+          discussion_topic_id: data.discussion_topic_id,
+          attachment_id: data.attachment_id,
+          context_module_id: data.context_module_id,
+          due_at: data.due_at,
+          due_at_overridden: data.due_at.present?,
+          unlock_at: data.unlock_at,
+          unlock_at_overridden: data.unlock_at.present?,
+          lock_at: data.lock_at,
+          lock_at_overridden: data.lock_at.present?
+        )
+
+        add_students_to_override(adhoc_override, override_data[:student_ids])
       end
 
       def add_students_to_override(override, students_ids)
@@ -65,11 +82,10 @@ module DifferentiationTag
         end
       end
 
-      def validate_params(course, learning_object, override_data, executing_user)
+      def validate_params(course, learning_object, override_data)
         errors = []
 
         errors.append("Invalid course provided") unless course.present? && course.is_a?(Course)
-        errors.append("Invalid user provided") unless executing_user.present? && executing_user.is_a?(User)
         errors.append("Invalid learning object provided") unless learning_object.present? && overridable?(learning_object)
         errors.append("Invalid override data provided") unless override_data[:student_ids].present?
 
