@@ -21,18 +21,13 @@ module DifferentiationTag
   class OverrideConverterService
     class << self
       # For now this method only handles context modules but will be expanded in the next ticket
-      def convert_tags_to_adhoc_overrides_for(learning_object:, course:, executing_user:)
+      def convert_tags_to_adhoc_overrides_for(learning_object:, course:)
         errors = validate_params(learning_object, course)
         return errors if errors.present?
 
-        tag_overrides = differentiation_tags(learning_object)
-        return unless tag_overrides.present?
-
-        begin
-          convert_tags_to_adhoc(learning_object, course, executing_user, tag_overrides)
-        rescue DifferentiationTagServiceError => e
-          return e.message
-        end
+        converter = get_converter(learning_object)
+        errors = converter.convert_tags_to_adhoc_overrides(learning_object, course)
+        return errors if errors.present?
 
         # no errors
         nil
@@ -40,62 +35,14 @@ module DifferentiationTag
 
       private
 
-      def convert_tags_to_adhoc(learning_object, course, executing_user, tag_overrides)
-        ActiveRecord::Base.transaction do
-          errors = handle_context_module(learning_object, course, executing_user, tag_overrides)
-          raise(DifferentiationTagServiceError, errors) if errors.present?
-
-          destroy_differentiation_tag_overrides(tag_overrides)
+      def get_converter(learning_object)
+        # We will add Checkpointed Discussions as their own converter in a future ticket
+        # https://instructure.atlassian.net/browse/EGG-1183
+        if learning_object.is_a?(ContextModule)
+          Converters::ContextModuleOverrideConverter
+        else
+          Converters::GeneralAssignmentOverrideConverter
         end
-      end
-
-      def handle_context_module(context_module, course, executing_user, tag_overrides)
-        tags = tag_overrides.map(&:set)
-        students = find_students_to_override(context_module, tags)
-
-        return unless students.present?
-
-        override_data = { student_ids: students }
-        AdhocOverrideCreatorService.create_adhoc_override(course, context_module, override_data, executing_user)
-      end
-
-      def differentiation_tags(learning_object)
-        group_table = Group.quoted_table_name
-        override_table = AssignmentOverride.quoted_table_name
-
-        learning_object.assignment_overrides
-                       .active
-                       .where(set_type: "Group")
-                       .joins("JOIN #{group_table} ON #{group_table}.id = #{override_table}.set_id")
-                       .where("#{group_table}.non_collaborative = true")
-      end
-
-      def destroy_differentiation_tag_overrides(overrides)
-        overrides.destroy_all
-      end
-
-      def find_students_to_override(learning_object, tags)
-        students = find_students_in_tags(tags)
-        filter_out_students_already_overriden(learning_object, students)
-      end
-
-      def find_students_in_tags(tags)
-        students = Set.new
-        tags.each do |tag|
-          students.merge(tag.users.map(&:id))
-        end
-        students
-      end
-
-      def filter_out_students_already_overriden(learning_object, students)
-        adhoc_overrides = learning_object.assignment_overrides.adhoc
-        return students if adhoc_overrides.empty?
-
-        students_with_overrides = Set.new
-        adhoc_overrides.each do |adhoc_override|
-          students_with_overrides.merge(adhoc_override.assignment_override_students.map(&:user_id))
-        end
-        (students - students_with_overrides).to_a
       end
 
       def validate_params(learning_object, course)
