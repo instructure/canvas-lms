@@ -125,9 +125,7 @@ module CanvasPartman::Concerns
         end
       end
 
-      def _insert_record(*args)
-        selected_connection = (Rails.version < "7.2") ? connection : args.shift
-        values = args.shift
+      def _insert_record(selected_connection, values, returning)
         prev_table = @arel_table
         prev_builder = @predicate_builder
         @arel_table = arel_table_from_key_values(values)
@@ -140,7 +138,7 @@ module CanvasPartman::Concerns
           end
         end
         @predicate_builder = nil
-        super(*[(Rails.version >= "7.2") ? selected_connection : nil, values, *args].compact)
+        super
       ensure
         @arel_table = prev_table
         @predicate_builder = prev_builder

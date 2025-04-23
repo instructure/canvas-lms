@@ -26,11 +26,7 @@ class LoadAccount
       MultiCache.fetch("schema_cache", expires_in: 1.week) do
         reflection = ActiveRecord::Base.connection_pool.schema_reflection
         cache = reflection.send(:empty_cache)
-        if Rails.version < "7.2"
-          cache.add_all(ActiveRecord::Base.connection)
-        else
-          cache.add_all(ActiveRecord::Base.connection_pool)
-        end
+        cache.add_all(ActiveRecord::Base.connection_pool)
         reflection.instance_variable_set(:@cache, cache)
         cache
       end
