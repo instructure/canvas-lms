@@ -32,6 +32,7 @@ import {Text} from '@instructure/ui-text'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
 import {IconEyeLine, IconAiSolid} from '@instructure/ui-icons'
+import {IgniteAiIcon} from '@canvas/ignite-ai-icon/react/IgniteAiIcon'
 import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {RubricCriteriaRow} from './RubricCriteriaRow'
@@ -588,7 +589,7 @@ export const RubricForm = ({
             >
               <Heading level="h4">
                 <Flex alignItems="center" gap="small">
-                  <IconAiSolid />
+                  <IgniteAiIcon />
                   <Text>{I18n.t('Auto-Generate Criteria')}</Text>
                 </Flex>
               </Heading>
@@ -656,14 +657,16 @@ export const RubricForm = ({
                   />
                 </Flex.Item>
                 <Flex.Item>
-                  <Button
-                    onClick={handleGenerateButton}
-                    data-testid="generate-criteria-button"
-                    color="primary"
-                    renderIcon={<IconAiSolid />}
-                  >
-                    {I18n.t('Generate Criteria')}
-                  </Button>
+                  <span className="instui-button-ignite-ai-gradient">
+                    <Button
+                      onClick={handleGenerateButton}
+                      data-testid="generate-criteria-button"
+                      color="primary"
+                      renderIcon={<IconAiSolid />}
+                    >
+                      {I18n.t('Generate Criteria')}
+                    </Button>
+                  </span>
                 </Flex.Item>
               </Flex>
             </View>
