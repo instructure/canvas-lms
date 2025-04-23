@@ -195,14 +195,14 @@ describe AutoGradeService do
       invalid_response = [{ "rubric_category" => "Nonexistent", "criterion" => "X" }]
       expect do
         service.send(:map_criteria_ids_to_grades, invalid_response, rubric)
-      end.to raise_error("Rubric category 'Nonexistent' not found.")
+      end.to raise_error(CedarAIGraderError, /Missing Rubric Category 'Nonexistent'/)
     end
 
     it "raises error if criterion is not found" do
       invalid_response = [{ "rubric_category" => "Content", "criterion" => "Missing" }]
       expect do
         service.send(:map_criteria_ids_to_grades, invalid_response, rubric)
-      end.to raise_error("Criterion 'Missing' not found in rubric category 'Content'.")
+      end.to raise_error(CedarAIGraderError, /Missing Criterion 'Missing' from Rubric Category 'Content'/)
     end
   end
 end

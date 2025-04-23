@@ -2425,27 +2425,56 @@ class Course < ActiveRecord::Base
   def auto_grade_submission_in_background(submission)
     user = submission.user
     progress = progresses.create!(tag: "auto_grade_submission", user:)
+    singleton_key = "Course#run_auto_grader:#{submission.global_id}:#{submission.attempt}"
+    max_attempts = 3 # Default max attempts
 
     progress.process_job(
       self,
       :run_auto_grader,
-      { priority: Delayed::HIGH_PRIORITY },
-      submission
+      {
+        priority: Delayed::HIGH_PRIORITY,
+        n_strand: "Course#run_auto_grader:#{global_root_account_id}",
+        singleton: singleton_key,
+        on_conflict: :use_earliest,
+        preserve_method_args: true,
+        max_attempts:
+      },
+      progress,
+      submission,
+      max_attempts
     )
 
-    { progress_id: progress.id }
+    # Find all unlocked jobs with the same singleton key
+    matching_jobs = Delayed::Job.where(singleton: singleton_key, locked_at: nil)
+
+    # Check if any of those jobs already have associated progress
+    existing_progress = Progress.where(delayed_job_id: matching_jobs.pluck(:id))
+                                .where.not(id: progress.id)
+                                .first
+
+    if existing_progress
+      # If progress exists for any similar job, mark current progress as skipped
+      progress.update!(
+        workflow_state: "failed",
+        completion: 0,
+        message: "Skipped: a similar job is already queued or running."
+      )
+      { progress_id: existing_progress.id }
+    else
+      # No existing progress found, continue with current progress
+      { progress_id: progress.id }
+    end
   end
 
-  def run_auto_grader(progress, submission)
+  def run_auto_grader(progress, submission, max_attempts)
     assignment = submission.assignment
     assignment_text = ActionView::Base.full_sanitizer.sanitize(assignment.description || "")
     essay = ActionView::Base.full_sanitizer.sanitize(submission.body || "")
     rubric = assignment.rubric_association&.rubric
 
-    auto_grade_result = nil # declare outside begin block
+    auto_grade_result = nil
 
     begin
-      # Check if the submission is blank
       if submission.blank? || submission.body.blank? || submission.attempt < 1
         raise "No essay submission found"
       end
@@ -2467,32 +2496,63 @@ class Course < ActiveRecord::Base
           grade_data:,
           error_message: nil,
           grading_attempts: auto_grade_result.grading_attempts + 1
-          # TODO: add number of retries istead of +1 after implementing retry mechanism
         )
       end
 
       progress&.results = auto_grade_result.grade_data
       progress&.message = nil
-    rescue => e
-      error_message = "Grading failed: #{e.message}"
-      if auto_grade_result.nil?
-        auto_grade_result = AutoGradeResult.find_or_initialize_by(
-          submission:,
-          attempt: submission.attempt
-        )
+      progress&.complete!
+    rescue CedarAIGraderError => e
+      error_message = e.message
+
+      begin
+        autograde_error_handling(submission, auto_grade_result, progress, error_message)
+      rescue
+        progress&.results = {}
+        progress&.message = "Grading failed. Please try again later or grade manually."
+        progress&.complete!
+        return
       end
 
-      auto_grade_result&.update!(
-        root_account_id: submission.course.root_account_id,
-        grade_data: {},
-        error_message:,
-        grading_attempts: auto_grade_result.grading_attempts + 1
-      )
-      progress&.results = {}
-      progress&.message = error_message
-    ensure
+      current_attempts = progress&.delayed_job&.attempts&.+ 1
+      if current_attempts < max_attempts
+        raise Delayed::RetriableError, error_message
+      else
+        progress&.message = "The AI is unavailable. Please try again later or grade manually."
+      end
+
+      progress&.complete!
+    rescue => e
+      error_message = "Grading failed: #{e.message}"
+
+      begin
+        autograde_error_handling(submission, auto_grade_result, progress, error_message)
+      rescue
+        progress&.results = {}
+        progress&.message = "Grading failed. Please try again later or grade manually."
+      end
+
       progress&.complete!
     end
+  end
+
+  def autograde_error_handling(submission, auto_grade_result, progress, error_message)
+    if auto_grade_result.nil?
+      auto_grade_result = AutoGradeResult.find_or_initialize_by(
+        submission:,
+        attempt: submission.attempt
+      )
+    end
+
+    auto_grade_result&.update!(
+      root_account_id: submission.course.root_account_id,
+      grade_data: {},
+      error_message:,
+      grading_attempts: auto_grade_result.grading_attempts + 1
+    )
+
+    progress&.results = {}
+    progress&.message = error_message
   end
 
   def create_attachment(attachment, csv)
