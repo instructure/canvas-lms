@@ -99,14 +99,14 @@ describe "better_file_browsing" do
         get "/courses/#{@course.id}/files"
       end
 
-      it "unpublishes and publish a file", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "unpublishes and publish a file", priority: "1", upgrade_files_v2: "done" do
         set_item_permissions(:unpublish, :cloud_icon)
         expect(f(".btn-link.published-status.unpublished")).to be_displayed
         set_item_permissions(:publish, :cloud_icon)
         expect(f(".btn-link.published-status.published")).to be_displayed
       end
 
-      it "makes file available to student with link", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "makes file available to student with link", priority: "1", upgrade_files_v2: "done" do
         set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
         expect(f(".btn-link.published-status.hiddenState")).to be_displayed
       end
@@ -125,7 +125,7 @@ describe "better_file_browsing" do
         expect(f("body")).not_to contain_css(".ef-item-row")
       end
 
-      it "unpublishes and publish a file", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "unpublishes and publish a file", priority: "1", upgrade_files_v2: "done" do
         get "/courses/#{@course.id}/files"
         set_item_permissions(:unpublish, :toolbar_menu)
         expect(f(".btn-link.published-status.unpublished")).to be_displayed
@@ -133,7 +133,7 @@ describe "better_file_browsing" do
         expect(f(".btn-link.published-status.published")).to be_displayed
       end
 
-      it "makes file available to student with link from toolbar", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "makes file available to student with link from toolbar", priority: "1", upgrade_files_v2: "done" do
         get "/courses/#{@course.id}/files"
         set_item_permissions(:restricted_access, :available_with_link, :toolbar_menu)
         expect(f(".btn-link.published-status.hiddenState")).to be_displayed
@@ -324,7 +324,7 @@ describe "better_file_browsing" do
       expect(f(".btn-link.published-status.published")).to be_displayed
     end
 
-    it "sets focus to the close button when opening the dialog", priority: "1", upgrade_files_v2: "waiting for deployment" do
+    it "sets focus to the close button when opening the dialog", priority: "1", upgrade_files_v2: "done" do
       f(".btn-link.published-status").click
       wait_for_ajaximations
       should_focus = f(".ui-dialog-titlebar-close")

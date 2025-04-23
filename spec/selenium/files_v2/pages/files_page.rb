@@ -175,6 +175,65 @@ module FilesPage
     f(bulk_actions_by_name_selector(name))
   end
 
+  def published_status_button
+    f("[data-testid='published-button-icon']")
+  end
+
+  def unpublished_status_button
+    f("[data-testid='unpublished-button-icon']")
+  end
+
+  def link_only_status_button
+    f("[data-testid='link-only-button-icon']")
+  end
+
+  def restricted_status_button
+    f("button[data-testid='restricted-button-icon']")
+  end
+
+  def permission_availablability_selector_listbox
+    f("input[role='combobox']:nth-of-type(1)")
+  end
+
+  def permission_selector_publish
+    f("#published")
+  end
+
+  def permission_selector_unpublish
+    f("#unpublished")
+  end
+
+  def permission_selector_only_with_link
+    f("#link_only")
+  end
+
+  def permission_save_button
+    fxpath("//button[.//span[contains(text(), 'Save')]]")
+  end
+
+  def permissions_dialog_close_button
+    fxpath("//button[.//span[text()='Close']]")
+  end
+
+  def edit_item_permissions(availability)
+    permission_availablability_selector_listbox.click
+    case availability
+    when :published
+      permission_selector_publish.click
+    when :unpublished
+      permission_selector_unpublish.click
+    when :available_with_link
+      permission_selector_only_with_link.click
+    end
+    permission_save_button.click
+  end
+
+  def select_item_to_edit_permissions_from_kebab_menu(item)
+    get_row_header_files_table(item).click
+    toolbox_menu_button("more-button").click
+    toolbox_menu_button("edit-permissions-button").click
+  end
+
   def body
     f("body")
   end
