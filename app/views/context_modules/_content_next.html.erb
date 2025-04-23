@@ -213,6 +213,7 @@ context_modules_header_props = {
     class="ig-list <%= 'editable' if @can_add || @can_edit %>"
   >
     <% cache(@modules_cache_key) do %>
+      <%# This part of code is copied to module_html.html.erb as a temporary solution %>
       <% modules_to_show = @module_show_setting ?  @modules.select { |m| m.id == @module_show_setting } : @modules %>
       <% preload_modules_content(modules_to_show) %>
       <% modules_to_show.each do |m| %>

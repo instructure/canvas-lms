@@ -1107,12 +1107,15 @@ modules.initModuleManagement = async function (duplicate) {
       // This is terrible but then so is the whole file so it fits in
       const contextId = response.data.context_module.context_id
       const moduleName = response.data.context_module.name
-      const modulesPage = `/courses/${contextId}/modules`
+      const modulesPage = ENV.FEATURE_MODULES_PERF
+        ? `/courses/${contextId}/modules/${newModuleId}/module_html`
+        : `/courses/${contextId}/modules`
       axios
         .get(modulesPage)
-        .then(getResponse => {
-          const $newContent = $(getResponse.data)
-          const $newModule = $newContent.find(`#context_module_${newModuleId}`)
+        .then(async getResponse => {
+          const $newModule = ENV.FEATURE_MODULES_PERF
+            ? $(getResponse.data)
+            : $(getResponse.data).find(`#context_module_${newModuleId}`)
           $tempElement.remove()
           $newModule.insertAfter(duplicatedModuleElement)
           const module_dnd = $newModule.find('.module_dnd')[0]
@@ -1130,8 +1133,12 @@ modules.initModuleManagement = async function (duplicate) {
             )
           }
           $newModule.find('.collapse_module_link').focus()
-          modules.updateAssignmentData()
-          modules.updateEstimatedDurations()
+          if (ENV.FEATURE_MODULES_PERF) {
+            await modules.lazyLoadItems([parseInt(newModuleId, 10)])
+          } else {
+            modules.updateAssignmentData()
+            modules.updateEstimatedDurations()
+          }
           // Unbind event handlers with 'off' because they will get re-bound in initModuleManagement
           // and we don't want them to be called twice on click.
           $(document).off('click', '.delete_module_link')

@@ -17,10 +17,11 @@
 %>
 
 <%
-  module_to_render = nil
+  modules = @modules || []
+  modules_to_show = @module_show_setting ?  modules.select { |m| m.id == @module_show_setting } : modules
+  preload_modules_content(modules_to_show)
 %>
 
-<%# preload_modules_content([module_to_render]) %>
-<% if module_to_render %>
-  <%= render :partial => 'context_modules/context_module_next', :object => module_to_render, :as => :context_module %>
+<% modules_to_show.each do |m| %>
+  <%= render :partial => 'context_modules/context_module_next', :object => m, :as => :context_module %>
 <% end %>
