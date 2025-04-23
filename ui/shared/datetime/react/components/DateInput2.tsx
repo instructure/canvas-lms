@@ -19,6 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useRef, useCallback, useEffect, useMemo, useState} from 'react'
 import moment, {type Moment} from 'moment-timezone'
+import * as tz from '@instructure/moment-utils'
 import {DateInput2} from '@instructure/ui-date-input'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
@@ -66,12 +67,6 @@ export type CanvasDateInput2Props = {
    */
   formatDate: (date: Date) => string
   /**
-   * A function which is called to format the date into `DateTime`'s text box when it is selected. There is no default
-   * (this must be provided), but it's usually sufficient to provide something like this:
-   * `date => tz.format(date, 'date.formats.medium_with_weekday')`
-   */
-  parseDate: (dateString: string) => Date | null
-  /**
    * A callback function which is called when a date has been selected, either by typing it in and tabbing out of the
    * field, or by clicking on a date in the calendar. It is called with one argument, a JS `Date` object. If the input
    * is a bad date (such as if the user types something unparseable) the value passed will evaluate to Boolean `false`.
@@ -83,10 +78,14 @@ export type CanvasDateInput2Props = {
   onBlur?: (event: BlurReturn) => void // see comment above the type definition for BlurReturn
   onFocus?: React.FocusEventHandler<DateInput2Props & Element> | undefined
   /**
-   * Passed along to `DateInput2`. Specifies if interaction with the input is enabled, disabled, or read-only. Read-only
+   * Passed down to `DateInput2`. Specifies if interaction with the input is enabled, disabled, or read-only. Read-only
    * prevents interactions, but is styled as if it were enabled.
    */
   interaction: DateInput2Props['interaction']
+  /**
+   * Passed down to `DateInput2`.
+   */
+  locale?: string
   onRequestValidateDate?: (event: SyntheticEvent<EventTarget>) => boolean
   /**
    * Controls whether or not a message continually appears at the bottom of the field showing what date WOULD be
@@ -150,11 +149,11 @@ export default function CanvasDateInput2({
   defaultToToday,
   disabledDates,
   formatDate,
-  parseDate,
   isInline,
   inputRef,
   interaction = 'enabled',
   invalidDateMessage,
+  locale,
   messages = [], // message type 'newError' to be used for validation error messages
   onBlur,
   onFocus,
@@ -198,6 +197,9 @@ export default function CanvasDateInput2({
     [],
   )
 
+  const parseDate = (timezone: string) => (formattedDate: string) =>
+    tz.parse(formattedDate, timezone)
+
   const syncInput = useCallback(
     (newMoment: Moment | null) => {
       const newInputValue = newMoment && newMoment.isValid() ? formatDate(newMoment.toDate()) : ''
@@ -233,7 +235,7 @@ export default function CanvasDateInput2({
 
   function handleChange(event: React.SyntheticEvent, inputValue: string, _utcDateString: string) {
     setInputValue(inputValue)
-    const newDate = parseDate(inputValue)
+    const newDate = parseDate(timezone)(inputValue)
     if (newDate) {
       const year = newDate.getFullYear()
       if (year < EARLIEST_YEAR) {
@@ -295,6 +297,7 @@ export default function CanvasDateInput2({
   return (
     <DateInput2
       renderLabel={renderLabel}
+      locale={locale || ENV?.LOCALE || navigator.language}
       value={inputValue}
       onChange={handleChange}
       isInline={isInline}
@@ -309,7 +312,7 @@ export default function CanvasDateInput2({
       disabledDates={disabledDates}
       data-testid={dataTestid}
       placeholder={placeholder}
-      dateFormat={{formatter: formatDate, parser: parseDate}}
+      dateFormat={{formatter: formatDate, parser: parseDate(timezone)}}
       screenReaderLabels={{
         calendarIcon: I18n.t('Choose a date'),
         prevMonthButton: I18n.t('Previous month'),
