@@ -81,6 +81,10 @@ module FilesPage
     f("[data-testid='move-move-button']")
   end
 
+  def rename_change_button
+    f("[data-testid='rename-change-button']")
+  end
+
   def toolbox_menu_button(name)
     f("[data-testid='bulk-actions-#{name}']")
   end
