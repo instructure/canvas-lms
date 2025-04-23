@@ -18,9 +18,10 @@
 
 require "spec_helper"
 
-describe AutoGradeService do
+RSpec.describe AutoGradeService do
   let(:assignment_text) { "Write an essay about your summer vacation" }
   let(:essay) { "I went to the beach and had a great time..." }
+  let(:root_account_uuid) { "mock-root-uuid" }
 
   let(:rubric_data) do
     [
@@ -58,58 +59,44 @@ describe AutoGradeService do
     ]
   end
 
-  let(:mock_graphql_response) do
-    {
-      "data" => {
-        "answerPrompt" => mock_cedar_response.to_json
-      }
-    }
-  end
-
   before do
-    allow(DynamicSettings).to receive(:find).with("project_lhotse", default_ttl: 5.minutes).and_return(
-      {
-        "cedar_uri" => "https://cedar.example.com/graphql",
-        "cedar_auth_token" => "mock_token"
-      }
-    )
     allow(Rails.env).to receive(:test?).and_return(true)
+
+    stub_const("CedarClient", Class.new do
+      def self.prompt(*)
+        [
+          {
+            "rubric_category" => "Content",
+            "reasoning" => "Well developed ideas",
+            "criterion" => "Meets requirements"
+          },
+          {
+            "rubric_category" => "Grammar",
+            "reasoning" => "Flawless grammar",
+            "criterion" => "Excellent grammar"
+          }
+        ].to_json
+      end
+    end)
   end
 
   describe "#call" do
-    let(:rubric) do
-      [
-        {
-          description: "Content",
-          points: 10,
-          ratings: [
-            { long_description: "Excellent content", points: 10 },
-            { long_description: "Good content", points: 7 },
-            { long_description: "Poor content", points: 3 }
-          ]
-        }
-      ]
-    end
-    let(:assignment) { "Write an essay about your favorite book." }
+    let(:rubric) { rubric_data }
+    let(:assignment) { assignment_text }
 
-    it "calls Cedar and returns enriched response" do
-      mock_response = double("HTTPResponse", is_a?: true, body: mock_graphql_response.to_json)
-      mock_request = double("HTTPRequest")
-      allow(mock_request).to receive(:body=)
-      mock_http = double("HTTPClient")
-      allow(mock_http).to receive(:use_ssl=)
-      allow(mock_http).to receive(:ssl_timeout=)
-      allow(mock_http).to receive(:open_timeout=)
-      allow(mock_http).to receive(:read_timeout=)
-      allow(mock_http).to receive(:request).with(mock_request).and_return(mock_response)
-
-      allow(Net::HTTP).to receive(:new).and_return(mock_http)
-      allow(Net::HTTP::Post).to receive(:new).and_return(mock_request)
+    it "calls CedarClient and returns enriched response" do
+      expect(CedarClient).to receive(:prompt).with(
+        prompt: kind_of(String),
+        model: "anthropic.claude-3-haiku-20240307-v1:0",
+        feature_slug: "grading-assistance",
+        root_account_uuid: "mock-root"
+      ).and_return(mock_cedar_response.to_json)
 
       result = described_class.new(
-        assignment: assignment_text,
+        assignment:,
         essay:,
-        rubric: rubric_data
+        rubric:,
+        root_account_uuid: "mock-root"
       ).call
 
       expect(result).to eq(
@@ -138,31 +125,21 @@ describe AutoGradeService do
       )
     end
 
-    it "raises an error when Cedar returns a failure response" do
-      mock_response = double("HTTPResponse", is_a?: false, body: { error: "Invalid request" }.to_json)
-      mock_request = double("HTTPRequest")
-      allow(mock_request).to receive(:body=)
-      mock_http = double("HTTPClient")
-      allow(mock_http).to receive(:use_ssl=)
-      allow(mock_http).to receive(:ssl_timeout=)
-      allow(mock_http).to receive(:open_timeout=)
-      allow(mock_http).to receive(:read_timeout=)
-      allow(mock_http).to receive(:request).with(mock_request).and_return(mock_response)
-
-      allow(Net::HTTP).to receive(:new).and_return(mock_http)
-      allow(Net::HTTP::Post).to receive(:new).and_return(mock_request)
+    it "raises an error when CedarClient returns malformed JSON" do
+      allow(CedarClient).to receive(:prompt).and_return("not-valid-json")
 
       expect do
         described_class.new(
-          assignment: assignment_text,
+          assignment:,
           essay:,
-          rubric: rubric_data
+          rubric:,
+          root_account_uuid:
         ).call
-      end.to raise_error(CedarAIGraderError, /Invalid request/)
+      end.to raise_error(CedarAIGraderError, /Invalid JSON response/)
     end
   end
 
-  describe "#map_criteria_ids_to_grades (instance method)" do
+  describe "#map_criteria_ids_to_grades" do
     let(:grader_response) do
       [
         {
@@ -185,7 +162,7 @@ describe AutoGradeService do
       ]
     end
 
-    let(:service) { described_class.new(assignment: "", essay: "", rubric:) }
+    let(:service) { described_class.new(assignment: "", essay: "", rubric:, root_account_uuid:) }
 
     it "maps grader response to rubric structure" do
       result = service.send(:map_criteria_ids_to_grades, grader_response, rubric)
@@ -222,7 +199,7 @@ describe AutoGradeService do
   end
 
   describe "#sanitize_essay" do
-    let(:service) { described_class.new(assignment: "Test Assignment", essay: "", rubric: []) }
+    let(:service) { described_class.new(assignment: "Test Assignment", essay: "", rubric: [], root_account_uuid: "mock-root") }
 
     context "when validating essay length" do
       it "raises an error for essays with less than 5 words" do
@@ -257,7 +234,7 @@ describe AutoGradeService do
   end
 
   describe "#rubric_matches_default_template" do
-    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric:) }
+    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric:, root_account_uuid:) }
 
     context "when rubric matches a default template" do
       it "returns true for Exit Ticket template" do
@@ -267,19 +244,19 @@ describe AutoGradeService do
           { description: "Time" },
           { description: "Participation" }
         ]
-        service = described_class.new(assignment: "Test", essay: "Test", rubric:)
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:)
         expect(service.send(:rubric_matches_default_template)).to be true
       end
 
       it "returns true for Peer Review template" do
         rubric = [{ description: "Peer Review" }]
-        service = described_class.new(assignment: "Test", essay: "Test", rubric:)
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:)
         expect(service.send(:rubric_matches_default_template)).to be true
       end
 
       it "returns true for generic criterion template" do
         rubric = [{ description: "Description of criterion" }]
-        service = described_class.new(assignment: "Test", essay: "Test", rubric:)
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:)
         expect(service.send(:rubric_matches_default_template)).to be true
       end
     end
@@ -290,7 +267,7 @@ describe AutoGradeService do
           { description: "Custom Criterion 1" },
           { description: "Custom Criterion 2" }
         ]
-        service = described_class.new(assignment: "Test", essay: "Test", rubric:)
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:)
         expect(service.send(:rubric_matches_default_template)).to be false
       end
 
@@ -299,14 +276,14 @@ describe AutoGradeService do
           { description: "Exit Ticket Prompt" },
           { description: "Custom Criterion" }
         ]
-        service = described_class.new(assignment: "Test", essay: "Test", rubric:)
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:)
         expect(service.send(:rubric_matches_default_template)).to be false
       end
     end
   end
 
   describe "#filter_repeating_keys" do
-    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric: []) }
+    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric: [], root_account_uuid: "mock-root") }
 
     context "when JSON array contains duplicate criteria" do
       let(:json_array) do
@@ -319,7 +296,7 @@ describe AutoGradeService do
           {
             "rubric_category" => "Grammar",
             "reasoning" => "Second reasoning",
-            "criterion" => "Meets requirements" # Duplicate criterion
+            "criterion" => "Meets requirements" # Duplicate
           },
           {
             "rubric_category" => "Style",
@@ -330,18 +307,18 @@ describe AutoGradeService do
       end
 
       it "removes entries with duplicate criterion values" do
-        filtered_array = service.send(:filter_repeating_keys, json_array)
+        filtered = service.send(:filter_repeating_keys, json_array)
 
-        expect(filtered_array.length).to eq(2)
-        expect(filtered_array.map { |item| item["criterion"] }).to match_array(["Meets requirements", "Unique criterion"])
+        expect(filtered.length).to eq(2)
+        expect(filtered.map { |item| item["criterion"] }).to match_array(["Meets requirements", "Unique criterion"])
       end
 
       it "keeps the first occurrence of duplicate criteria" do
-        filtered_array = service.send(:filter_repeating_keys, json_array)
+        filtered = service.send(:filter_repeating_keys, json_array)
 
-        duplicate_entry = filtered_array.find { |item| item["criterion"] == "Meets requirements" }
-        expect(duplicate_entry["reasoning"]).to eq("First reasoning")
-        expect(duplicate_entry["rubric_category"]).to eq("Content")
+        dup = filtered.find { |item| item["criterion"] == "Meets requirements" }
+        expect(dup["reasoning"]).to eq("First reasoning")
+        expect(dup["rubric_category"]).to eq("Content")
       end
     end
 
@@ -362,10 +339,10 @@ describe AutoGradeService do
       end
 
       it "returns the original array unchanged" do
-        filtered_array = service.send(:filter_repeating_keys, unique_array)
+        filtered = service.send(:filter_repeating_keys, unique_array)
 
-        expect(filtered_array).to eq(unique_array)
-        expect(filtered_array.length).to eq(2)
+        expect(filtered).to eq(unique_array)
+        expect(filtered.length).to eq(2)
       end
     end
   end
