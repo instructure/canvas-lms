@@ -328,6 +328,42 @@ shared_examples_for "context modules for teachers" do
     expect(tag.indent).to eq 1
   end
 
+  describe "expand|collapse all" do
+    before do
+      @modules = create_modules(2, true)
+      @modules[0].add_item({ id: @assignment.id, type: "assignment" })
+      @modules[1].add_item({ id: @assignment2.id, type: "assignment" })
+    end
+
+    it "collapses all modules" do
+      go_to_modules
+      wait_for_dom_ready
+      expect(all_expanded_modules.size).to be > 0
+      expand_collapse_all_button.click
+      wait_for_ajaximations
+      expect(all_collapsed_modules).to have_size(2)
+      expect(f("#context_modules")).not_to contain_css(all_expanded_modules_selector)
+    end
+
+    it "expands all modules" do
+      progression = @modules[0].find_or_create_progression(@teacher)
+      progression.collapse!
+      progression = @modules[1].find_or_create_progression(@teacher)
+      progression.collapse!
+
+      go_to_modules
+      wait_for_dom_ready
+      expect(all_collapsed_modules).to have_size(2)
+      expect(f("#context_modules")).not_to contain_css(all_expanded_modules_selector)
+      expand_collapse_all_button.click
+      wait_for_ajaximations
+      expect(all_expanded_modules).to have_size(2)
+      expect(f("#context_modules")).not_to contain_css(all_collapsed_modules_selector)
+      expect(ff(module_items_selector(@modules[0].id)).size).to be > 0
+      expect(ff(module_items_selector(@modules[1].id)).size).to be > 0
+    end
+  end
+
   context "multiple overridden due dates", priority: "2" do
     def create_section_override(section, due_at)
       override = assignment_override_model(assignment: @assignment)
