@@ -681,8 +681,7 @@ describe Api do
     end
 
     it "properly generates an escaped arg string" do
-      separator = (Rails.version < "7.2") ? "" : " "
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => { ids: ["1", 2, 3] } }, { root_account_id_column: "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND \(id IN \('1',#{separator}2,#{separator}3\)\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => { ids: ["1", 2, 3] } }, { root_account_id_column: "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND \(id IN \('1', 2, 3\)\)\)/)
     end
 
     it "works with no columns" do
@@ -694,8 +693,7 @@ describe Api do
     end
 
     it "works with a few different column types and account scopings" do
-      separator = (Rails.version < "7.2") ? "" : " "
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => { ids: [1, 2, 3] }, "id2" => { ids: %w[a b c] }, "id3" => { ids: %w[s1 s2 s3] } }, { root_account_id_column: "some_scope", is_not_scoped_to_account: ["id3"] }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND \(id1 IN \(1,#{separator}2,#{separator}3\)\)\) OR \(some_scope = #{Account.default.id} AND \(id2 IN \('a',#{separator}'b',#{separator}'c'\)\)\) OR id3 IN \('s1',#{separator}'s2',#{separator}'s3'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => { ids: [1, 2, 3] }, "id2" => { ids: %w[a b c] }, "id3" => { ids: %w[s1 s2 s3] } }, { root_account_id_column: "some_scope", is_not_scoped_to_account: ["id3"] }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND \(id1 IN \(1, 2, 3\)\)\) OR \(some_scope = #{Account.default.id} AND \(id2 IN \('a', 'b', 'c'\)\)\) OR id3 IN \('s1', 's2', 's3'\)\)/)
     end
 
     it "fails if we're scoping to an account and the scope isn't provided" do

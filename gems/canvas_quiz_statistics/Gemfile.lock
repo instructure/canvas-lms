@@ -24,19 +24,18 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (7.1.5.1)
+    activesupport (7.2.2.1)
       base64
       benchmark (>= 0.3)
       bigdecimal
-      concurrent-ruby (~> 1.0, >= 1.0.2)
+      concurrent-ruby (~> 1.0, >= 1.3.1)
       connection_pool (>= 2.2.5)
       drb
       i18n (>= 1.6, < 2)
       logger (>= 1.4.2)
       minitest (>= 5.1)
-      mutex_m
       securerandom (>= 0.3)
-      tzinfo (~> 2.0)
+      tzinfo (~> 2.0, >= 2.0.5)
     base64 (0.2.0)
     benchmark (0.4.0)
     bigdecimal (3.1.9)
@@ -61,7 +60,6 @@ GEM
     logger (1.7.0)
     mini_portile2 (2.8.8)
     minitest (5.25.5)
-    mutex_m (0.3.0)
     nokogiri (1.18.7)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)

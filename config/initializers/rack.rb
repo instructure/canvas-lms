@@ -19,13 +19,3 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Rack::Utils.multipart_part_limit = 256 # default is 128
-
-module EnableRackChunking
-  def chunkable_version?(*)
-    return false if defined?(PactConfig)
-    return super if ::Rails.env.test? || ::DynamicSettings.find(tree: :private)["enable_rack_chunking", failsafe: true]
-
-    false
-  end
-end
-Rack::Chunked.prepend(EnableRackChunking) if $canvas_rails == "7.1"

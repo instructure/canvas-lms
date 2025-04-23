@@ -8,7 +8,6 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.6.1)
-    mini_portile2 (2.8.8)
     rake (13.2.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -23,12 +22,10 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.2)
-    sqlite3 (1.7.3)
-      mini_portile2 (~> 2.8.0)
-    sqlite3 (1.7.3-aarch64-linux)
-    sqlite3 (1.7.3-arm64-darwin)
-    sqlite3 (1.7.3-x86_64-darwin)
-    sqlite3 (1.7.3-x86_64-linux)
+    sqlite3 (2.6.0-aarch64-linux-gnu)
+    sqlite3 (2.6.0-arm64-darwin)
+    sqlite3 (2.6.0-x86_64-darwin)
+    sqlite3 (2.6.0-x86_64-linux-gnu)
 
 PLATFORMS
   aarch64-linux
