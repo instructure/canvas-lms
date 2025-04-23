@@ -21,15 +21,6 @@
 class CedarAIGraderError < StandardError; end
 
 class AutoGradeService
-  CEDAR_QUERY = <<~TEXT
-    mutation($prompt: String!) {
-      answerPrompt(input: {
-        model: "anthropic.claude-3-haiku-20240307-v1:0"
-        prompt: $prompt
-      })
-    }
-  TEXT
-
   GRADING_PROMPT = <<~TEXT
     Human: <TASK>
     You are a strict yet fair teacher who is difficult to impress when grading a student's essay based on an assignment. You will be provided with the following variables:
@@ -60,10 +51,11 @@ class AutoGradeService
     </INSTRUCTIONS>
   TEXT
 
-  def initialize(assignment:, essay:, rubric:)
+  def initialize(assignment:, essay:, rubric:, root_account_uuid:)
     @assignment = assignment.to_s
     @essay = essay.to_s
     @rubric = rubric
+    @root_account_uuid = root_account_uuid
     @rubric_prompt_format = self.class.normalize_rubric_for_prompt(@rubric)
   end
 
@@ -75,41 +67,21 @@ class AutoGradeService
       raise "Rubric criteria not descriptive enough"
     end
 
-    uri = URI(setting["cedar_uri"])
     prompt = build_prompt
 
-    payload = {
-      query: CEDAR_QUERY,
-      variables: { prompt: }
-    }.to_json
+    begin
+      response = CedarClient.prompt(
+        prompt:,
+        model: "anthropic.claude-3-haiku-20240307-v1:0",
+        feature_slug: "grading-assistance",
+        root_account_uuid: @root_account_uuid
+      )
 
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-
-    request = Net::HTTP::Post.new(
-      uri.path,
-      {
-        "Content-Type" => "application/json",
-        "X-AUTH-TOKEN" => setting["cedar_auth_token"]
-      }
-    )
-    request.body = payload
-
-    response = http.request(request)
-
-    if response.is_a?(Net::HTTPSuccess)
-      begin
-        body = JSON.parse(response.body)
-        raw_result = body.dig("data", "answerPrompt")
-        parsed_result = JSON.parse(raw_result)
-        parsed_result = filter_repeating_keys(parsed_result)
-
-        map_criteria_ids_to_grades(parsed_result, @rubric)
-      rescue => e
-        raise CedarAIGraderError, "Invalid JSON response: #{e.message}"
-      end
-    else
-      raise CedarAIGraderError, response.body.to_s
+      body = JSON.parse(response)
+      parsed_result = filter_repeating_keys(body)
+      map_criteria_ids_to_grades(parsed_result, @rubric)
+    rescue => e
+      raise CedarAIGraderError, "Invalid JSON response: #{e.message}"
     end
   end
 
@@ -208,9 +180,5 @@ class AutoGradeService
       .gsub("{{assignment}}", @assignment.encode(xml: :text))
       .gsub("{{essay}}", @essay.encode(xml: :text))
       .gsub("{{rubric}}", @rubric_prompt_format.to_json)
-  end
-
-  def setting
-    DynamicSettings.find("project_lhotse", default_ttl: 5.minutes)
   end
 end
