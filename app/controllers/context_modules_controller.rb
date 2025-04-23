@@ -406,6 +406,19 @@ class ContextModulesController < ApplicationController
     end
   end
 
+  def module_html
+    unless @context.account.feature_enabled?(:modules_perf)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    if authorized_action(@context, @current_user, :read)
+      @module = @context.modules_visible_to(@current_user).find_by(id: params[:context_module_id])
+      return render status: :not_found, template: "shared/errors/404_message" unless @module
+
+      render template: "context_modules/module_html", layout: false
+    end
+  end
+
   def item_redirect
     if authorized_action(@context, @current_user, :read)
       @tag = @context.context_module_tags.not_deleted.find(params[:id])
