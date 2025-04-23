@@ -311,6 +311,12 @@ pipeline {
     stage('Environment') {
       steps {
         script {
+          def canvasRailsOverrideValue = commitMessageFlag('canvas-rails') as String
+
+          if (canvasRailsOverrideValue) {
+            env.CANVAS_RAILS = canvasRailsOverrideValue
+          }
+
           lock(label: 'canvas_build_global_mutex', quantity: 1) {
             timeout(60) {
               // Skip translation builds for patchsets uploaded by svc.cloudjenkins
