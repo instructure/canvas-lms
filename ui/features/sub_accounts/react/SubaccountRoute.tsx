@@ -16,43 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useQuery} from '@tanstack/react-query'
 import SubaccountTree from './SubaccountTree'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {AccountWithCounts} from './types'
 import {Heading} from '@instructure/ui-heading'
 import {useParams} from 'react-router-dom'
 import {Portal} from '@instructure/ui-portal'
-import {calculateIndent, FocusProvider} from './util'
+import {calculateIndent, fetchRootAccount} from './util'
 import {Flex} from '@instructure/ui-flex'
+import {AccountWithCounts} from './types'
 
 const I18n = createI18nScope('sub_accounts')
 
-interface Props {
-  rootAccountId: string
-}
+export function Component(): JSX.Element | null {
+  const {accountId} = useParams()
+  const mountPoint = document.getElementById('sub_account_mount')
 
-const fetchRootAccount = async (id: string): Promise<AccountWithCounts> => {
-  const params = {
-    includes: ['course_count', 'sub_account_count'],
-  }
-  const {json} = await doFetchApi({
-    path: `/api/v1/accounts/${id}`,
-    method: 'GET',
-    params,
-  })
-  return json as AccountWithCounts
-}
-
-const queryFn = ({queryKey}: {queryKey: string[]}) => fetchRootAccount(queryKey[1])
-
-export default function SubaccountRoute(props: Props) {
-  const {data, isLoading, error} = useQuery({
-    queryKey: ['account', props.rootAccountId],
-    queryFn,
+  const {error, isLoading, data} = useQuery<AccountWithCounts>({
+    queryKey: ['account', accountId],
+    queryFn: ({queryKey}) => fetchRootAccount(queryKey[1] as string),
   })
 
   const renderTree = () => {
@@ -66,15 +50,8 @@ export default function SubaccountRoute(props: Props) {
         </Flex>
       )
     }
-    return <SubaccountTree rootAccount={data} depth={1} />
+    return <SubaccountTree rootAccount={data} depth={1} defaultExpanded={true} />
   }
-
-  return <FocusProvider>{renderTree()}</FocusProvider>
-}
-
-export function Component(): JSX.Element | null {
-  const params = useParams()
-  const mountPoint = document.getElementById('sub_account_mount')
 
   if (!mountPoint) {
     return null
@@ -85,7 +62,7 @@ export function Component(): JSX.Element | null {
         <Heading level="h2" as="h1">
           {I18n.t('Sub-Accounts')}
         </Heading>
-        <SubaccountRoute rootAccountId={params.accountId!} />
+        {renderTree()}
       </Flex>
     </Portal>
   )
