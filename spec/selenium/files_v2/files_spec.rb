@@ -360,7 +360,7 @@ describe "files index page" do
         file_to_move = "a_file.txt"
         txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
         before do
-          Folder.create!(name: folder_name, context: @course)
+          @base_folder = Folder.create!(name: folder_name, context: @course)
           txt_files.map do |text_file|
             add_file(fixture_file_upload(text_file.to_s, "text/plain"), @course, text_file)
           end
@@ -389,6 +389,28 @@ describe "files index page" do
           files_to_move.each_with_index do |file, index|
             expect(get_item_content_files_table(index + 1, 1)).to eq "Text File\n#{file}"
           end
+        end
+
+        it "catches a collision error", priority: "1" do
+          add_file(fixture_file_upload("a_file.txt", "text/plain"),
+                   @course,
+                   "a_file.txt",
+                   @base_folder)
+          move_file_from(2, :kebab_menu)
+          expect(rename_change_button).to be_displayed
+        end
+
+        it "catches a collision error for multiple files", priority: "1" do
+          add_file(fixture_file_upload("a_file.txt", "text/plain"),
+                   @course,
+                   "a_file.txt",
+                   @base_folder)
+          add_file(fixture_file_upload("b_file.txt", "text/plain"),
+                   @course,
+                   "b_file.txt",
+                   @base_folder)
+          move_files([2, 3, 4])
+          expect(rename_change_button).to be_displayed
         end
 
         context "Search Results" do
