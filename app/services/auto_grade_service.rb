@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+class CedarAIGraderError < StandardError; end
+
 class AutoGradeService
   CEDAR_QUERY = <<~TEXT
     mutation($prompt: String!) {
@@ -89,16 +91,20 @@ class AutoGradeService
     response = http.request(request)
 
     if response.is_a?(Net::HTTPSuccess)
-      body = JSON.parse(response.body)
-      raw_result = body.dig("data", "answerPrompt")
-      parsed_result = JSON.parse(raw_result)
+      begin
+        body = JSON.parse(response.body)
+        raw_result = body.dig("data", "answerPrompt")
+        parsed_result = JSON.parse(raw_result)
 
-      map_criteria_ids_to_grades(parsed_result, @rubric)
+        map_criteria_ids_to_grades(parsed_result, @rubric)
+      rescue => e
+        raise "Invalid JSON response - #{e.message}"
+      end
     else
-      raise "Cedar GraphQL error: #{response.body}"
+      raise CedarAIGraderError, "Cedar GraphQL error: #{response.body}"
     end
   rescue => e
-    raise "Failed to call Cedar grader: #{e.message}"
+    raise CedarAIGraderError, "Cedar GraphQL error: #{e.message}"
   end
 
   def self.normalize_rubric_for_prompt(rubric_data)
@@ -124,10 +130,10 @@ class AutoGradeService
       selected_description = item["criterion"]
 
       criterion_data = rubric_data.find { |c| c[:description] == rubric_category }
-      raise "Rubric category '#{rubric_category}' not found." unless criterion_data
+      raise CedarAIGraderError, "Cedar GraphQL error: Missing Rubric Category '#{rubric_category}'" unless criterion_data
 
       matched_rating = (criterion_data[:ratings] || []).find { |r| r[:long_description] == selected_description }
-      raise "Criterion '#{selected_description}' not found in rubric category '#{rubric_category}'." unless matched_rating
+      raise CedarAIGraderError, "Cedar GraphQL error: Missing Criterion '#{selected_description}' from Rubric Category '#{rubric_category}'" unless matched_rating
 
       {
         "id" => criterion_data[:id],
