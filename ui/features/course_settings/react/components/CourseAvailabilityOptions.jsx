@@ -182,6 +182,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
                   setFormValue(FORM_IDS.START_DATE, start)
                   setStartDate(start)
                 }}
+                hideMessagesWhenFocused
               />
               {startDateInputValue && (
                 <>
@@ -212,6 +213,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
                   setFormValue(FORM_IDS.END_DATE, end)
                   setEndDate(end)
                 }}
+                hideMessagesWhenFocused
               />
               {endDateInputValue && (
                 <>

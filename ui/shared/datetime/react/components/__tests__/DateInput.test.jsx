@@ -390,3 +390,17 @@ describe('with defaultToToday set to true', () => {
     expect(getByText('This is the hint')).toBeInTheDocument()
   })
 })
+
+describe('with hideMessagesWhenFocused set to true', () => {
+  it('does not show messages while input is focused', () => {
+    const {getInput, queryByText} = renderAndDirtyInput('invaliddate', {
+      hideMessagesWhenFocused: true,
+    })
+    fireEvent.focus(getInput())
+    // When input is focused, we don't expect to see any error messages
+    expect(queryByText('Invalid date format')).toBeNull()
+    fireEvent.blur(getInput())
+    // When input once its blurred, error messages should appear
+    expect(queryByText('Invalid date format')).toBeInTheDocument()
+  })
+})
