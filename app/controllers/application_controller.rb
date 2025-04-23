@@ -408,6 +408,7 @@ class ApplicationController < ActionController::Base
     scheduled_page_publication
     send_usage_metrics
     rce_transform_loaded_content
+    disable_iframe_sandbox_file_show
     mobile_offline_mode
     react_discussions_post
     instui_nav
