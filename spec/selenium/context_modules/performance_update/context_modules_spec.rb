@@ -56,6 +56,22 @@ describe "context modules, performance update" do
     it "expands just the first module if no modules are expanded or collapsed" do
       go_to_modules
       wait_for_dom_ready
+      # expand the second module
+      f(".collapsed_module .expand_module_link").click
+      wait_for_ajax_requests
+      go_to_modules
+      wait_for_dom_ready
+      modules = all_context_modules
+      # now expect the first and second module to be expanded
+      expect(modules).to have_size(2)
+      expect(all_expanded_modules).to have_size(2)
+    end
+
+    it "remembers the first module was auto expanded" do
+      go_to_modules
+      wait_for_dom_ready
+      wait_for_ajax_requests
+      go_to_modules
       modules = all_context_modules
       expect(modules).to have_size(2)
       expect(all_collapsed_modules).to have_size(1)

@@ -166,6 +166,10 @@ module ModulesIndexPage
     ff(".context_module.collapsed_module")
   end
 
+  def all_expanded_modules
+    ff(".context_module:not(.collapsed_module):not(#context_module_blank)")
+  end
+
   def delete_card_button
     ff(delete_card_button_selector)
   end

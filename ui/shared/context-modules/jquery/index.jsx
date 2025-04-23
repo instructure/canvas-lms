@@ -2464,6 +2464,11 @@ $(() => {
       if (isInitialState) {
         ENV.EXPANDED_MODULES.push(allModules.shift())
         ENV.COLLAPSED_MODULES = allModules
+        $.ajaxJSON(
+          `/courses/${ENV.COURSE_ID}/modules/${ENV.EXPANDED_MODULES[0]}/collapse`,
+          'POST',
+          {collapse: 0},
+        )
       } else {
         ENV.COLLAPSED_MODULES = allModules.filter(mid => !ENV.EXPANDED_MODULES.includes(mid))
       }
