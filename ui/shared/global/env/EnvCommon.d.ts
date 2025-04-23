@@ -323,6 +323,7 @@ export type RootAccountFeatureId =
   | 'lti_asset_processor'
   | 'course_pace_weighted_assignments'
   | 'course_pace_allow_bulk_pace_assign'
+  | 'disable_iframe_sandbox_file_show'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES

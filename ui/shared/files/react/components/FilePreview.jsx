@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Suspense } from 'react'
+import React, {Suspense} from 'react'
 import page from 'page'
 import $ from 'jquery'
 import {each, find} from 'lodash'
@@ -224,10 +224,10 @@ export default class FilePreview extends React.PureComponent {
     )
   }
 
-  renderStudioPlayer = (item) => {
+  renderStudioPlayer = item => {
     const containerClasses = classnames({
       'ef-file-studio-player-container': true,
-    });
+    })
     return (
       <div className={containerClasses}>
         <Suspense>
@@ -250,32 +250,33 @@ export default class FilePreview extends React.PureComponent {
     )
   }
 
-  renderCanvasPlayer = (item) => {
+  renderCanvasPlayer = item => {
     const html = item.get('content-type') === 'text/html'
     const iFrameClasses = classnames({
       'ef-file-preview-frame': true,
       'ef-file-preview-frame-html': html,
       'attachment-html-iframe': html,
     })
-    const sandbox = classnames('allow-same-origin', 'allow-downloads', { 'allow-scripts': !html })
+    const disableSandboxing = ENV.FEATURES?.disable_iframe_sandbox_file_show
+    const sandbox = classnames('allow-same-origin', 'allow-downloads', {'allow-scripts': !html})
     return (
       <iframe
         allowFullScreen={true}
         title={I18n.t('File Preview')}
         src={item.get('preview_url')}
         className={iFrameClasses}
-        sandbox={sandbox}
+        {...(disableSandboxing ? {} : {sandbox})}
       />
     )
   }
 
   renderPreview = () => {
-    const item = this.state.displayedItem;
+    const item = this.state.displayedItem
     if (item && item.get('preview_url')) {
-      const isNewStudioPlayer = ENV.FEATURES?.consolidated_media_player;
+      const isNewStudioPlayer = ENV.FEATURES?.consolidated_media_player
       return isNewStudioPlayer && ['video', 'audio'].includes(item.get('mime_class'))
         ? this.renderStudioPlayer(item)
-        : this.renderCanvasPlayer(item);
+        : this.renderCanvasPlayer(item)
     } else {
       return (
         <div className="ef-file-not-found ef-file-preview-frame">
