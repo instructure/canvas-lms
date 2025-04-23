@@ -31,12 +31,20 @@ import FakeEditor from '../__tests__/FakeEditor'
 export function Editor(props) {
   const editorRef = useRef(null)
   const textareaRef = useRef(null)
-  const tinymceEditor = useRef(new FakeEditor(props))
-  window.tinymce.editors[0] = tinymceEditor.current
 
   useEffect(() => {
-    tinymceEditor.current.on('change', handleChange)
-    props.onInit && props.onInit({}, tinymceEditor.current)
+    const tinymceEditor = new FakeEditor(props)
+    const originalGet = window.tinymce.get
+
+    window.tinymce.get = (id) => {
+      if (id === props.id) {
+        return tinymceEditor
+      }
+      return originalGet.apply(window.tinymce, id)
+    }
+
+    tinymceEditor.on('change', handleChange)
+    props.onInit && props.onInit({}, tinymceEditor)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

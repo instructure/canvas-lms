@@ -40,6 +40,7 @@ import ReportDescription from '../react/account_reports/ReportDescription'
 import RunReportForm from '../react/account_reports/RunReportForm'
 import RQDModal from '../react/components/RQDModal'
 import OpenRegistrationWarning from '../react/components/OpenRegistrationWarning'
+import ServiceDescriptionModal from '../react/components/ServiceDescriptionModal'
 
 const I18n = createI18nScope('account_settings')
 
@@ -90,6 +91,12 @@ $(document).ready(function () {
   let openRegRoot
   if (openRegMount) {
     openRegRoot = ReactDOM.createRoot(openRegMount)
+  }
+  // for service description modals (always in settings)
+  const serviceMount = document.getElementById('service_mount')
+  let serviceRoot
+  if (serviceMount) {
+    serviceRoot = ReactDOM.createRoot(serviceMount)
   }
 
   const settingsTabs = document
@@ -553,15 +560,9 @@ $(document).ready(function () {
   $('.add_users_link').click(addUsersLink)
 
   $('.service_help_dialog').each(function (_index) {
-    const $dialog = $(this),
-      serviceName = $dialog.attr('id').replace('_help_dialog', '')
-
-    $dialog.dialog({
-      autoOpen: false,
-      width: 560,
-      modal: true,
-      zIndex: 1000,
-    })
+    const serviceName = $(this).attr('id').replace('_help_dialog', '')
+    const serviceTitle = $(this).attr('title')
+    const descHTML = $(this).html()
 
     $(`<button class="Button Button--icon-action" type="button">
         <i class="icon-question"></i>
@@ -569,7 +570,18 @@ $(document).ready(function () {
       </button>`)
       .click(event => {
         event.preventDefault()
-        $dialog.dialog('open')
+
+        const closeModal = () => {
+          serviceRoot.render(null)
+        }
+
+        serviceRoot.render(
+          <ServiceDescriptionModal
+            descHTML={descHTML}
+            serviceTitle={serviceTitle}
+            closeModal={closeModal}
+          />,
+        )
       })
       .appendTo('label[for="account_services_' + serviceName + '"]')
   })

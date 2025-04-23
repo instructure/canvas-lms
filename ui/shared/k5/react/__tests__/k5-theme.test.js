@@ -35,7 +35,7 @@ describe('k5-theme', () => {
     it('is based off of the standard canvas theme', () => {
       const k5ThemeVariables = getK5ThemeVars()
       registerK5Theme()
-      expect(k5ThemeVariables.colors.brand).toBe('#0374B5')
+      expect(k5ThemeVariables.colors.contrasts.blue4570).toBe('#2B7ABC')
     })
 
     it('is based off of the high contrast canvas theme when ENV.use_high_contrast is set', () => {
@@ -43,7 +43,7 @@ describe('k5-theme', () => {
       const k5ThemeVariables = getK5ThemeVars()
       registerK5Theme()
 
-      expect(k5ThemeVariables.colors.brand).toBe('#0770A3')
+      expect(k5ThemeVariables.colors.contrasts.blue4570).toBe('#0A5A9E')
     })
 
     it('overrides base variables with K-5-specific values', () => {

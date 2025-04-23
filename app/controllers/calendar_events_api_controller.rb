@@ -1709,7 +1709,9 @@ class CalendarEventsApiController < ApplicationController
       # because due dates and other relevant info is stored in the sub_assignments/checkpoints
       courses_with_active_checkpoints = courses_with_checkpoints_enabled(@selected_contexts)
       if courses_with_active_checkpoints.present?
-        scope = scope.where(context: courses_with_active_checkpoints, has_sub_assignments: false).union(scope.where.not(context: courses_with_active_checkpoints))
+        scope1 = scope.where(context: courses_with_active_checkpoints, has_sub_assignments: false)
+        scope2 = scope.where.not(context: courses_with_active_checkpoints)
+        scope = scope1.or(scope2)
       end
 
       scope = scope.order(:due_at, :id)

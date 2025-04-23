@@ -21,7 +21,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
-import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
@@ -66,36 +65,33 @@ const SearchBar = ({initialValue = '', onSearch}: SearchBarProps) => {
   }
 
   return (
-    <View as="div">
-      <form name="files-search" autoComplete="off" onSubmit={handleSearch}>
-        <Flex>
-          <Flex.Item shouldGrow shouldShrink>
-            <TextInput
-              renderLabel={<ScreenReaderContent>{I18n.t('Search files...')}</ScreenReaderContent>}
-              placeholder={I18n.t('Search files...')}
-              value={searchValue}
-              onChange={(_e, value) => setSearchValue(value)}
-              shouldNotWrap
-              // fragment fixes a weird focus issue - INSTUI-4466
-              renderBeforeInput={<></>}
-              renderAfterInput={() => renderClearButton(searchValue, handleClear)}
-              data-testid="files-search-input"
-            />
-          </Flex.Item>
-          <Flex.Item>
-            <Button
-              color="secondary"
-              margin="0 0 0 small"
-              type="submit"
-              renderIcon={<IconSearchLine inline={false} />}
-              data-testid="files-search-button"
-            >
-              {I18n.t('Search')}
-            </Button>
-          </Flex.Item>
-        </Flex>
-      </form>
-    </View>
+    <form style={{margin: 0}} name="files-search" autoComplete="off" onSubmit={handleSearch}>
+      <Flex gap='small'>
+        <Flex.Item shouldGrow shouldShrink>
+          <TextInput
+            renderLabel={<ScreenReaderContent>{I18n.t('Search files...')}</ScreenReaderContent>}
+            placeholder={I18n.t('Search files...')}
+            value={searchValue}
+            onChange={(_e, value) => setSearchValue(value)}
+            shouldNotWrap
+            // fragment fixes a weird focus issue - INSTUI-4466
+            renderBeforeInput={<></>}
+            renderAfterInput={() => renderClearButton(searchValue, handleClear)}
+            data-testid="files-search-input"
+          />
+        </Flex.Item>
+        <Flex.Item>
+          <Button
+            color="secondary"
+            type="submit"
+            renderIcon={<IconSearchLine inline={false} />}
+            data-testid="files-search-button"
+          >
+            {I18n.t('Search')}
+          </Button>
+        </Flex.Item>
+      </Flex>
+    </form>
   )
 }
 

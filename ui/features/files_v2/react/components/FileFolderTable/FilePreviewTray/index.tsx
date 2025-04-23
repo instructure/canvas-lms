@@ -16,6 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FilePreviewTray from "./FilePreviewTray";
+import {FilePreviewTray} from './FilePreviewTray'
 
-export default FilePreviewTray
+export {FilePreviewTray}

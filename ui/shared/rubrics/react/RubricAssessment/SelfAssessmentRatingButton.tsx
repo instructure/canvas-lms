@@ -25,7 +25,6 @@ import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
-const {shamrock, tiara} = colors
 type SelfAssessmentRatingButtonProps = {
   buttonDisplay: string
   isPreviewMode: boolean
@@ -70,8 +69,8 @@ export const SelfAssessmentRatingButton = ({
                     height: '30px',
                     width: '30px',
                     backgroundColor: '#F3F9F6',
-                    color: shamrock,
-                    border: '2px dashed #0B874B',
+                    color: colors.contrasts.green4570,
+                    border: '2px dashed #03893D',
                     borderRadius: '4px',
                     display: 'flex',
                     alignItems: 'center',

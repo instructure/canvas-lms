@@ -20,7 +20,7 @@ import React, {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {datetimeString} from '@canvas/datetime/date-functions'
-import {canvas} from '@instructure/ui-theme-tokens'
+import {canvas} from '@instructure/ui-themes'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -80,7 +80,7 @@ export const DateAdjustments = ({
   const setSubstitution = (id: number, data: any, to_or_from: 'to' | 'from') => {
     const tmp = cloneDeep(dateAdjustmentConfig)
     const subIndex = tmp.date_shift_options.day_substitutions.findIndex(
-      (sub: DaySub) => sub.id === id
+      (sub: DaySub) => sub.id === id,
     )
     tmp.date_shift_options.day_substitutions[subIndex][to_or_from] = data.value
     setDateAdjustments(tmp)
@@ -90,7 +90,7 @@ export const DateAdjustments = ({
     const tmp = cloneDeep(dateAdjustmentConfig)
     tmp.date_shift_options.day_substitutions =
       dateAdjustmentConfig.date_shift_options.day_substitutions.filter(
-        (sub: DaySub) => sub.id !== substitution.id
+        (sub: DaySub) => sub.id !== substitution.id,
       )
     setDateAdjustments(tmp)
   }
@@ -140,6 +140,7 @@ export const DateAdjustments = ({
               <RadioInput
                 name="date_operation"
                 value="remove_dates"
+                data-testid="remove-dates"
                 label={I18n.t('Remove dates')}
                 checked={dateOperation === 'remove_dates'}
               />
@@ -266,6 +267,7 @@ export const DateAdjustments = ({
                 ))}
                 <Flex as="div" direction={isMobileView ? 'column' : 'row'}>
                   <Button
+                    data-testid="substitution-button"
                     margin="medium none none none"
                     onClick={() => {
                       const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
@@ -286,7 +288,9 @@ export const DateAdjustments = ({
                 </Flex>
               </>
             ) : null}
-            { isMobileView && <hr role="presentation" aria-hidden="true" style={{margin: '1.5rem 0 0 0'}} />}
+            {isMobileView && (
+              <hr role="presentation" aria-hidden="true" style={{margin: '1.5rem 0 0 0'}} />
+            )}
           </View>
         )
       }}

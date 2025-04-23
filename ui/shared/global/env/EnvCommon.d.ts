@@ -254,7 +254,7 @@ export interface EnvCommon {
     type?: string
     classes?: string
   }>
-  breadcrumbs?: {name: string; url: string | null}[]
+  breadcrumbs?: {name: string; url: string}[]
   enhanced_rubrics_enabled?: boolean
   enhanced_rubrics_copy_to?: boolean
   rubric_imports_exports?: boolean
@@ -274,8 +274,6 @@ export interface EnvCommon {
 export type SiteAdminFeatureId =
   | 'account_calendar_events'
   | 'account_level_blackout_dates'
-  | 'course_paces_for_students'
-  | 'course_paces_redesign'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'
   | 'instui_for_import_page'
@@ -290,6 +288,8 @@ export type SiteAdminFeatureId =
   | 'dashboard_graphql_integration'
   | 'speedgrader_studio_media_capture'
   | 'validate_call_to_action'
+  | 'new_quizzes_navigation_updates'
+  | 'create_wiki_page_mastery_path_overrides'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES

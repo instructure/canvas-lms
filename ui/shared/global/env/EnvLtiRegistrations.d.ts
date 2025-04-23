@@ -17,13 +17,14 @@
  */
 
 interface LtiUsage {
-  env: string;
+  env: string
   region: string
-  canvasBaseUrl: string;
-  firstName: string;
-  locale: string;
-  rootAccountId: number;
-  rootAccountUuid: string;
+  canvasBaseUrl: string
+  firstName: string
+  locale: string
+  rootAccountId: number
+  rootAccountUuid: string
+  isPremiumAccount: boolean
 }
 
 export interface EnvLtiRegistrations {

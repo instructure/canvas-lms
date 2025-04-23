@@ -28,6 +28,7 @@ module Lti
       "in_nav_context" => { template: "lti/full_width_in_context" }.freeze,
       "default" => { template: "lti/framed_launch" }.freeze,
       "full_width_in_context" => { template: "lti/full_width_in_context" }.freeze,
+      "full_width_with_nav" => { template: "lti/full_width_with_nav" }.freeze,
     }.freeze
     BLACKLIST_WILDCARD = "*" # to set up 'deny all' rules
 

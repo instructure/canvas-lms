@@ -69,7 +69,6 @@ describe('ContentItems', () => {
     render(<ContentItems {...defaultProps} />)
     const toggle = screen.getByText('Test Items')
     toggle.click()
-    screen.debug()
     const link1 = screen.getByText('Item 1')
     const link2 = screen.getByText('Item 2')
     expect(link1).toHaveAttribute('href', '/item/1')

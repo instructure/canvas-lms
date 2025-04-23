@@ -437,6 +437,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   id: ID!
   importantDates: Boolean
   inClosedGradingPeriod: Boolean
+  isLockedByMasterCourse: Boolean!
 
   """
   the lock date (assignment is locked after this date)
@@ -1024,6 +1025,126 @@ interface AssignmentsConnectionInterface {
     """
     last: Int
   ): AssignmentConnection
+}
+
+type AuditEvent implements LegacyIDInterface & Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  contextExternalTool: AuditEventExternalTool
+  createdAt: DateTime
+  eventType: AuditEventType!
+  payload: JSON
+  quiz: AuditEventQuiz
+  updatedAt: DateTime
+  user: AuditEventUser
+}
+
+"""
+The connection type for AuditEvent.
+"""
+type AuditEventConnection {
+  """
+  A list of edges.
+  """
+  edges: [AuditEventEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [AuditEvent]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type AuditEventEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: AuditEvent
+}
+
+type AuditEventExternalTool implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  name: String!
+  role: AuditEventRole!
+}
+
+type AuditEventQuiz implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  name: String!
+  role: AuditEventRole!
+}
+
+enum AuditEventRole {
+  admin
+  final_grader
+  grader
+  student
+}
+
+enum AuditEventType {
+  assignment_created
+  assignment_updated
+  docviewer_area_created
+  docviewer_area_deleted
+  docviewer_area_updated
+  docviewer_comment_created
+  docviewer_comment_deleted
+  docviewer_comment_updated
+  docviewer_free_draw_created
+  docviewer_free_draw_deleted
+  docviewer_free_draw_updated
+  docviewer_free_text_created
+  docviewer_free_text_deleted
+  docviewer_free_text_updated
+  docviewer_highlight_created
+  docviewer_highlight_deleted
+  docviewer_highlight_updated
+  docviewer_point_created
+  docviewer_point_deleted
+  docviewer_point_updated
+  docviewer_strikeout_created
+  docviewer_strikeout_deleted
+  docviewer_strikeout_updated
+  grades_posted
+  provisional_grade_created
+  provisional_grade_selected
+  provisional_grade_updated
+  rubric_created
+  rubric_deleted
+  rubric_updated
+  submission_comment_created
+  submission_comment_deleted
+  submission_comment_updated
+  submission_updated
+}
+
+type AuditEventUser implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  name: String!
+  role: AuditEventRole!
 }
 
 type AuditLogs {
@@ -2904,6 +3025,7 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
     roleTypes: [String!]
   ): User
   availableForUser: Boolean!
+  canDuplicate: Boolean
   canGroup: Boolean
   canReplyAnonymously: Boolean!
   canUnpublish: Boolean!
@@ -2985,6 +3107,7 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
   initialPostRequiredForCurrentUser: Boolean!
   isAnnouncement: Boolean!
   isAnonymousAuthor: Boolean
+  isLockedByMasterCourse: Boolean!
   isSectionSpecific: Boolean
   lastReplyAt: DateTime
   lockAt: DateTime
@@ -3572,6 +3695,7 @@ type ExternalTool implements LegacyIDInterface & ModuleItemInterface & Timestamp
   legacy canvas id
   """
   _id: ID!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
@@ -3579,6 +3703,7 @@ type ExternalTool implements LegacyIDInterface & ModuleItemInterface & Timestamp
   canUnpublish: Boolean
   createdAt: DateTime
   description: String
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   name: String
   pointsPossible: Float
@@ -3673,13 +3798,16 @@ type ExternalUrl implements LegacyIDInterface & ModuleItemInterface & Timestampe
   legacy canvas id
   """
   _id: ID!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
   """
   canUnpublish: Boolean
   createdAt: DateTime
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
+  newTab: Boolean
   pointsPossible: Float
 
   """
@@ -3697,6 +3825,7 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   legacy canvas id
   """
   _id: ID!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
@@ -3706,6 +3835,7 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   createdAt: DateTime
   displayName: String
   id: ID!
+  isLockedByMasterCourse: Boolean!
   mimeClass: String
   modules: [Module!]
   pointsPossible: Float
@@ -4754,8 +4884,18 @@ type Module implements LegacyIDInterface & Node & Timestamped {
   moduleItems: [ModuleItem!]
   name: String
   position: Int
+  prerequisites: [ModulePrerequisite!]
+  published: Boolean
+  requirementCount: Int
   unlockAt: DateTime
   updatedAt: DateTime
+}
+
+type ModuleCompletionRequirement {
+  id: ID!
+  minPercentage: Float
+  minScore: Float
+  type: String!
 }
 
 """
@@ -4798,12 +4938,14 @@ type ModuleExternalTool implements LegacyIDInterface & ModuleItemInterface & Tim
   legacy canvas id
   """
   _id: ID!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
   """
   canUnpublish: Boolean
   createdAt: DateTime
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   pointsPossible: Float
 
@@ -4922,10 +5064,13 @@ type ModuleItemEdge {
 An item that can be in context modules
 """
 interface ModuleItemInterface {
+  canDuplicate: Boolean
+
   """
   Whether the module item can be unpublished
   """
   canUnpublish: Boolean
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   pointsPossible: Float
 
@@ -4935,6 +5080,12 @@ interface ModuleItemInterface {
   published: Boolean
   title: String
   type: String
+}
+
+type ModulePrerequisite {
+  id: ID!
+  name: String!
+  type: String!
 }
 
 type ModuleProgression {
@@ -5813,6 +5964,7 @@ type Page implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   legacy canvas id
   """
   _id: ID!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
@@ -5820,6 +5972,7 @@ type Page implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   canUnpublish: Boolean
   createdAt: DateTime
   id: ID!
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   pointsPossible: Float
 
@@ -6376,6 +6529,8 @@ type Quiz implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   legacy canvas id
   """
   _id: ID!
+  anonymousSubmissions: Boolean!
+  canDuplicate: Boolean
 
   """
   Whether the module item can be unpublished
@@ -6383,6 +6538,7 @@ type Quiz implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   canUnpublish: Boolean
   createdAt: DateTime
   id: ID!
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   pointsPossible: Float
 
@@ -7041,10 +7197,13 @@ type SubAssignmentSubmission {
 }
 
 type SubHeader implements ModuleItemInterface {
+  canDuplicate: Boolean
+
   """
   Whether the module item can be unpublished
   """
   canUnpublish: Boolean
+  isLockedByMasterCourse: Boolean!
   modules: [Module!]
   pointsPossible: Float
 
@@ -7068,6 +7227,27 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   attachment: File
   attachments: [File!]
   attempt: Int!
+  auditEventsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): AuditEventConnection
   body: String
   cachedDueDate: DateTime
   commentsConnection(

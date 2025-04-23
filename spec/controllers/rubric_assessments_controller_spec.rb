@@ -589,7 +589,7 @@ describe RubricAssessmentsController do
 
   describe "student self assessments" do
     before do
-      setup_assignmennt_self_assessment
+      setup_assignment_self_assessment
       @assignment.update(rubric_self_assessment_enabled: true)
     end
 
@@ -664,7 +664,7 @@ describe RubricAssessmentsController do
     @rubric_association.assessment_requests.create!(user: @student1, asset: student1_asset, assessor: @student3, assessor_asset: student3_asset)
   end
 
-  def setup_assignmennt_self_assessment
+  def setup_assignment_self_assessment
     course_with_teacher_logged_in(active_all: true)
     @student1 = User.create!(name: "student 1", workflow_state: "registered")
     @student2 = User.create!(name: "student 2", workflow_state: "registered")

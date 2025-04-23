@@ -118,7 +118,7 @@ const CreateEditAssignmentModal = ({
   )
   const [name, setName] = useState<string>(isEditMode ? assignment.name : '')
   const [dueAt, setDueAt] = useState<string>(isEditMode && assignment.dueAt ? assignment.dueAt : '')
-  const [points, setPoints] = useState<string>(isEditMode ? String(assignment.points) : "0")
+  const [points, setPoints] = useState<string>(isEditMode ? String(assignment.points) : '0')
   const [syncToSIS, setSyncToSIS] = useState<boolean>(shouldSyncGradesToSIS)
 
   const [saveDisabled, setSaveDisabled] = useState<boolean>(false)
@@ -229,7 +229,9 @@ const CreateEditAssignmentModal = ({
       ])
     }
     if (errors.lock_at) {
-      setDueDateInputMessage([{text: I18n.t('Due date cannot be after lock date'), type: 'newError'}])
+      setDueDateInputMessage([
+        {text: I18n.t('Due date cannot be after lock date'), type: 'newError'},
+      ])
     }
     if (errors.due_at) {
       setDueDateInputMessage([{text: errors.due_at, type: 'newError'}])
@@ -286,7 +288,7 @@ const CreateEditAssignmentModal = ({
       setFieldWithError(null)
     }
   }, [fieldWithError, inputElRefs])
-  
+
   const validForm = () => {
     const validType = isEditMode ? true : validateAssignmentType(assignmentType)
     const validName = validateAssignmentName(name)
@@ -313,7 +315,7 @@ const CreateEditAssignmentModal = ({
 
   const onAssignmentTypeInputChange = (
     _event: React.SyntheticEvent,
-    { id, value }: { id?: string; value?: string | number }
+    {value}: {value?: string | number},
   ) => {
     setAssignmentType(String(value))
     // reset the points input if the assignment changes to not graded
@@ -324,7 +326,8 @@ const CreateEditAssignmentModal = ({
   }
 
   const onNameInputChange = (_event: React.SyntheticEvent, value: string) => {
-    value.length === 0 ? setName('') : setName(value)
+    if (value.length === 0) setName('')
+    else setName(value)
 
     // Don't validate if there is no error message present
     if (nameInputMessage.length > 0) {
@@ -383,14 +386,17 @@ const CreateEditAssignmentModal = ({
 
     setSaveDisabled(true)
 
-    await onSaveHandler({
-      type: assignmentType,
-      points: Number(points),
-      name,
-      dueAt,
-      syncToSIS,
-      publish: false,
-    }, !isEditMode)
+    await onSaveHandler(
+      {
+        type: assignmentType,
+        points: Number(points),
+        name,
+        dueAt,
+        syncToSIS,
+        publish: false,
+      },
+      !isEditMode,
+    )
 
     onCloseHandler()
   }
@@ -402,14 +408,17 @@ const CreateEditAssignmentModal = ({
 
     setSaveDisabled(true)
 
-    await onSaveHandler({
-      type: assignmentType,
-      points: Number(points),
-      name,
-      dueAt,
-      syncToSIS,
-      publish: true,
-    }, !isEditMode)
+    await onSaveHandler(
+      {
+        type: assignmentType,
+        points: Number(points),
+        name,
+        dueAt,
+        syncToSIS,
+        publish: true,
+      },
+      !isEditMode,
+    )
 
     onCloseHandler()
   }
@@ -521,7 +530,7 @@ const CreateEditAssignmentModal = ({
           )}
           <br />
         </View>
-        {(assignmentType !== 'not_graded') && (
+        {assignmentType !== 'not_graded' && (
           <View as="div">
             <NumberInput
               renderLabel={I18n.t('Points')}
@@ -533,7 +542,7 @@ const CreateEditAssignmentModal = ({
               messages={pointsInputMessage}
               data-testid="points-input"
             />
-        </View>
+          </View>
         )}
         {syncGradesToSISFF && (
           <View>

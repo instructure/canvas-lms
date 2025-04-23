@@ -170,6 +170,12 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             ensure_user_sees_assignment
           end
 
+          it "does show the assignment if course_ids is not present" do
+            student_in_course_with_adhoc_override(@assignment)
+            visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, assignment_ids: @assignment.id, course_ids: nil).map(&:assignment_id)
+            expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
+          end
+
           it "works with course section and return a single visibility" do
             student_in_course_with_adhoc_override(@assignment)
             give_section_due_date(@assignment, @section_foo)
@@ -264,6 +270,11 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             it "shows the assignment to the user" do
               ensure_user_sees_assignment
             end
+
+            it "does show the assignment if course_ids is not present" do
+              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, assignment_ids: @assignment.id, course_ids: nil).map(&:assignment_id)
+              expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
+            end
           end
 
           context "user is non-collaborative group" do
@@ -302,6 +313,11 @@ describe AssignmentVisibility::AssignmentVisibilityService do
               @course.account.disable_feature!(:assign_to_differentiation_tags)
 
               visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map(&:assignment_id)
+              expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsy
+            end
+
+            it "does not show the assignment if course_ids is not present" do
+              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, assignment_ids: @assignment.id, course_ids: nil).map(&:assignment_id)
               expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsy
             end
           end
@@ -364,6 +380,11 @@ describe AssignmentVisibility::AssignmentVisibilityService do
 
             it "shows the assignment to the user" do
               ensure_user_sees_assignment
+            end
+
+            it "does show the assignment if course_ids is not present" do
+              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, assignment_ids: @assignment.id, course_ids: nil).map(&:assignment_id)
+              expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
             end
 
             it "does not show unpublished assignments" do
@@ -622,6 +643,11 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             ensure_user_sees_assignment
           end
 
+          it "does show the assignment if course_ids is not present" do
+            visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, assignment_ids: @assignment.id, course_ids: nil).map(&:assignment_id)
+            expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
+          end
+
           it "does not show unpublished assignments" do
             @assignment.workflow_state = "unpublished"
             @assignment.save!
@@ -708,6 +734,27 @@ describe AssignmentVisibility::AssignmentVisibilityService do
         # with passing an empty array to assignment_ids
         visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id, assignment_ids: []).map(&:assignment_id)
         expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsey
+      end
+
+      it "produces cached result when queried with same keys" do
+        course_with_differentiated_assignments_enabled
+        assignment_with_false_only_visible_to_overrides
+        visible_assignment_ids_1 = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:assignment_id)
+        make_assignment
+        visible_assignment_ids_2 = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:assignment_id)
+
+        expect(visible_assignment_ids_1).to eq(visible_assignment_ids_2)
+      end
+
+      it "produces updated result when cache is invalidated" do
+        course_with_differentiated_assignments_enabled
+        assignment_with_false_only_visible_to_overrides
+        visible_assignment_ids_1 = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:assignment_id)
+        make_assignment
+        AssignmentVisibility::AssignmentVisibilityService.invalidate_cache(user_ids: @user.id, course_ids: @course.id)
+        visible_assignment_ids_2 = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:assignment_id)
+
+        expect(visible_assignment_ids_1).not_to eq(visible_assignment_ids_2)
       end
     end
 

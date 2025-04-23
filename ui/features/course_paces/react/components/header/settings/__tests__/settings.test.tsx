@@ -67,7 +67,7 @@ afterEach(() => {
 describe('Settings', () => {
   it('renders a settings menu with toggles and a button to open the blackout dates modal', () => {
     renderConnected(<Settings {...defaultProps} />)
-    const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+    const settingsButton = screen.getByRole('button', {name: 'Settings'})
     act(() => settingsButton.click())
 
     expect(screen.getByRole('menuitem', {name: 'Skip Selected Days'})).toBeInTheDocument()
@@ -76,18 +76,18 @@ describe('Settings', () => {
 
   it('disables all settings while syncing', () => {
     renderConnected(<Settings {...{...defaultProps, isSyncing: true}} />)
-    const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+    const settingsButton = screen.getByRole('button', {name: 'Settings'})
     act(() => settingsButton.click())
 
     const skipSelectedDays = screen.getByTestId('skip-selected-days')
-    expect(skipSelectedDays).toHaveClass('css-vjrpp3-menuItem')
+    expect(skipSelectedDays).toHaveClass('css-1pj8lp9-menuItem')
     const blackoutDatesBtn = screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})
-    expect(blackoutDatesBtn).toHaveClass('css-1rkb7b1-menuItem')
+    expect(blackoutDatesBtn).toHaveClass('css-1mh06e9-menuItem')
   })
 
   it('shows and hides the blackout dates modal correctly', () => {
     const {getByRole} = renderConnected(<Settings {...defaultProps} />)
-    const settingsButton = getByRole('button', {name: 'Modify Settings'})
+    const settingsButton = getByRole('button', {name: 'Settings'})
     act(() => settingsButton.click())
 
     act(() => screen.getByRole('menuitem', {name: 'Manage Blackout Dates'}).click())
@@ -102,7 +102,7 @@ describe('Settings', () => {
 
   it('saves blackout dates from modal correctly', () => {
     const {getByRole} = renderConnected(<Settings {...defaultProps} />)
-    const settingsButton = getByRole('button', {name: 'Modify Settings'})
+    const settingsButton = getByRole('button', {name: 'Settings'})
     act(() => settingsButton.click())
 
     act(() => screen.getByRole('menuitem', {name: 'Manage Blackout Dates'}).click())
@@ -119,7 +119,7 @@ describe('Settings', () => {
   describe('course_paces_skip_selected_days is enabled', () => {
     it('toggles the associated setting when the checkboxes are clicked', () => {
       renderConnected(<Settings {...defaultProps} />)
-      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+      const settingsButton = screen.getByRole('button', {name: 'Settings'})
       act(() => settingsButton.click())
 
       const skipSelectedDaysOption = screen.getByRole('menuitem', {name: 'Skip Selected Days'})
@@ -146,7 +146,7 @@ describe('Settings', () => {
       const state = {...DEFAULT_STORE_STATE, coursePace}
 
       renderConnected(<Settings {...defaultProps} />, state)
-      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+      const settingsButton = screen.getByRole('button', {name: 'Settings'})
       act(() => settingsButton.click())
 
       const selectedDaysCounterPill = screen.getByTestId('selected_days_counter')
@@ -162,7 +162,7 @@ describe('Settings', () => {
       const state = {...DEFAULT_STORE_STATE, coursePace}
 
       renderConnected(<Settings {...defaultProps} />, state)
-      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+      const settingsButton = screen.getByRole('button', {name: 'Settings'})
       act(() => settingsButton.click())
 
       const skipSelectedDaysOption = screen.getByRole('menuitem', {name: /Skip Selected Days/i})
@@ -182,7 +182,7 @@ describe('Settings', () => {
       const state = {...DEFAULT_STORE_STATE, coursePace}
 
       renderConnected(<Settings {...defaultProps} />, state)
-      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+      const settingsButton = screen.getByRole('button', {name: 'Settings'})
       act(() => settingsButton.click())
 
       const skipSelectedDaysOption = screen.getByRole('menuitem', {name: /Skip Selected Days/i})
@@ -206,7 +206,7 @@ describe('Settings', () => {
     })
     it('toggles the associated setting when the checkboxes are clicked', () => {
       renderConnected(<Settings {...defaultProps} />)
-      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+      const settingsButton = screen.getByRole('button', {name: 'Settings'})
       act(() => settingsButton.click())
 
       const skipWeekendsToggle = screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})
@@ -222,9 +222,6 @@ describe('Settings', () => {
         VALID_DATE_RANGE: {
           end_at: {date: COURSE.start_at, date_context: 'course'},
           start_at: {date: COURSE.end_at, date_context: 'course'},
-        },
-        FEATURES: {
-          course_paces_redesign: true,
         },
       })
     })
@@ -266,7 +263,7 @@ describe('Settings', () => {
 
     it('renders set weighted assignment duration menu option', () => {
       renderConnected(<Settings {...defaultProps} />)
-      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+      const settingsButton = screen.getByRole('button', {name: 'Settings'})
       act(() => settingsButton.click())
 
       const weightedAssignmentsOption = screen.getByTestId('weighted-assignment-duration-option')
@@ -276,7 +273,7 @@ describe('Settings', () => {
 
   it('set weighted assignment duration menu option is not displayed', () => {
     renderConnected(<Settings {...defaultProps} />)
-    const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+    const settingsButton = screen.getByRole('button', {name: 'Settings'})
     act(() => settingsButton.click())
 
     expect(screen.queryByTestId('weighted-assignment-duration-option')).not.toBeInTheDocument()

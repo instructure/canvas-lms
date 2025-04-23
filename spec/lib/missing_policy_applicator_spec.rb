@@ -570,6 +570,7 @@ describe MissingPolicyApplicator do
         @trigger_assignment.submissions.update_all(late_policy_status: "missing")
         Timecop.travel(2.hours.from_now(now)) do
           applicator.apply_missing_deductions
+          run_jobs
           cr_action = ConditionalRelease::AssignmentSetAction.where(student_id: @student.id).first
           expect(cr_action).not_to be_nil
         end

@@ -115,8 +115,8 @@ export default function K5AppLink({app}) {
                   href={launchUrl(course.id)}
                   isWithinText={false}
                   themeOverride={{
-                    color: k5ThemeVariables.colors.textDarkest,
-                    hoverColor: k5ThemeVariables.colors.textDarkest,
+                    color: k5ThemeVariables.colors.contrasts.grey125125,
+                    hoverColor: k5ThemeVariables.colors.contrasts.grey125125,
                   }}
                   target={app.windowTarget}
                 >

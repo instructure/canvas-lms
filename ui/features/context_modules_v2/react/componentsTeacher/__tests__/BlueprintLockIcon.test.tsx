@@ -23,15 +23,30 @@ import {ContextModuleProvider} from '../../hooks/useModuleContext'
 
 const setUpMasterCourse = (initialLockState: boolean = false) => {
   return render(
-    <ContextModuleProvider courseId="1" isMasterCourse={true} isChildCourse={false}>
-      <BlueprintLockIcon isChildCourse={false} initialLockState={initialLockState} contentId="" contentType="" />
+    <ContextModuleProvider
+      courseId="1"
+      isMasterCourse={true}
+      isChildCourse={false}
+      permissions={{
+        canEdit: true,
+        canDelete: true,
+        canAdd: true,
+        canDirectShare: true
+      }}
+    >
+      <BlueprintLockIcon
+        isChildCourse={false}
+        initialLockState={initialLockState}
+        contentId=""
+        contentType=""
+      />
     </ContextModuleProvider>
   )
 }
 
 const setUpChildCourse = (initialLockState: boolean = false) => {
   return render(
-    <ContextModuleProvider courseId="1" isMasterCourse={false} isChildCourse={true}>
+    <ContextModuleProvider courseId="1" isMasterCourse={false} isChildCourse={true} permissions={{canEdit: true, canDelete: true, canAdd: true, canDirectShare: true}}>
       <BlueprintLockIcon isChildCourse={true} initialLockState={initialLockState} contentId="" contentType="" />
     </ContextModuleProvider>
   )

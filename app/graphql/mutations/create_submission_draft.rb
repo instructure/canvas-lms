@@ -62,10 +62,10 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
     when "basic_lti_launch"
       raise SubmissionError if input[:lti_launch_url].blank? || input[:external_tool_id].blank?
 
-      external_tool = ContextExternalTool.find_external_tool(
+      external_tool = Lti::ToolFinder.from_url(
         input[:lti_launch_url],
         submission.course,
-        input[:external_tool_id]
+        preferred_tool_id: input[:external_tool_id]
       )
       raise SubmissionError, I18n.t("no matching external tool found") if external_tool.blank?
 

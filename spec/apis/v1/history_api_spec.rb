@@ -110,6 +110,71 @@ describe HistoryController, type: :request do
         expect(json.pluck("asset_name")).to eq(["Course People", "Assign 1"])
       end
 
+      it "removes verifier from file preview url" do
+        page_view_for url: "http://example.com/courses/X/files/A/file_preview?annotate=B&verifier=C",
+                      context: @course,
+                      created_at: @dates[3],
+                      asset_category: "files",
+                      asset_code: "attachment_1"
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self")
+        expect(json[3]["visited_url"]).to eq "http://example.com/courses/X/files/A/file_preview?annotate=B"
+      end
+    end
+
+    context "Page Views service client errors" do
+      it "gracefully handles an invalid request" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4BadRequest)
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self",
+                        expected_status: :bad_request)
+        expect(json["error"]).to_not be_nil
+      end
+
+      it "gracefully handles an unauthorized request" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4Unauthorized)
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self",
+                        expected_status: :not_found)
+        expect(json["error"]).to_not be_nil
+      end
+
+      it "gracefully handles not found request" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4NotFound)
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self",
+                        expected_status: :not_found)
+        expect(json["error"]).to_not be_nil
+      end
+
+      it "gracefully handles rate limit exceeded" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4TooManyRequests)
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self",
+                        expected_status: :too_many_requests)
+        expect(json["error"]).to_not be_nil
+      end
+
       it "gracefully handles a pv4 timeout" do
         allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4Timeout)
         json = api_call(:get,
@@ -132,21 +197,6 @@ describe HistoryController, type: :request do
                         user_id: "self",
                         expected_status: :service_unavailable)
         expect(json["error"]).to_not be_nil
-      end
-
-      it "removes verifier from file preview url" do
-        page_view_for url: "http://example.com/courses/X/files/A/file_preview?annotate=B&verifier=C",
-                      context: @course,
-                      created_at: @dates[3],
-                      asset_category: "files",
-                      asset_code: "attachment_1"
-        json = api_call(:get,
-                        "/api/v1/users/self/history",
-                        controller: "history",
-                        action: "index",
-                        format: "json",
-                        user_id: "self")
-        expect(json[3]["visited_url"]).to eq "http://example.com/courses/X/files/A/file_preview?annotate=B"
       end
     end
 

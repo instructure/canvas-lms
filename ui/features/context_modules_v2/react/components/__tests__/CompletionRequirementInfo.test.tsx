@@ -23,7 +23,7 @@ import CompletionRequirementInfo from '../CompletionRequirementInfo'
 
 const setUp = (type: string = 'must_view', completed: boolean = false, options: {minScore?: number, minPercentage?: number} = {minScore: undefined, minPercentage: undefined}) => {
   return render(
-    <ContextModuleProvider courseId="1" isMasterCourse={true} isChildCourse={false}>
+    <ContextModuleProvider courseId="1" isMasterCourse={true} isChildCourse={false} permissions={{canEdit: true, canDelete: true, canAdd: true, canDirectShare: true}}>
       <CompletionRequirementInfo id="19" type={type} minScore={options.minScore} minPercentage={options.minPercentage} completed={completed} />
     </ContextModuleProvider>
   )

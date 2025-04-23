@@ -21,6 +21,8 @@ import {
   ZLtiRegistration,
   type LtiRegistrationWithConfiguration,
   type LtiRegistration,
+  LtiRegistrationWithAllInformation,
+  ZLtiRegistrationWithAllInformation,
 } from '../model/LtiRegistration'
 import {type ApiResult, parseFetchResult, mapApiResult} from '../../common/lib/apiResult/ApiResult'
 import {ZPaginatedList, type PaginatedList} from './PaginatedList'
@@ -73,7 +75,7 @@ export const fetchRegistrations: FetchRegistrations = options =>
   )
 
 export type FetchRegistrationForId = (options: {
-  ltiRegistrationId: LtiRegistrationId,
+  ltiRegistrationId: LtiRegistrationId
   accountId: AccountId
 }) => Promise<ApiResult<LtiRegistration>>
 
@@ -81,6 +83,19 @@ export const fetchRegistrationForId: FetchRegistrationForId = options =>
   parseFetchResult(ZLtiRegistration)(
     fetch(
       `/api/v1/accounts/${options.accountId}/lti_registrations/${options.ltiRegistrationId}`,
+      defaultFetchOptions(),
+    ),
+  )
+
+export type FetchRegistrationWithAllInfoForId = (options: {
+  ltiRegistrationId: LtiRegistrationId
+  accountId: AccountId
+}) => Promise<ApiResult<LtiRegistrationWithAllInformation>>
+
+export const fetchRegistrationWithAllInfoForId: FetchRegistrationWithAllInfoForId = options =>
+  parseFetchResult(ZLtiRegistrationWithAllInformation)(
+    fetch(
+      `/api/v1/accounts/${options.accountId}/lti_registrations/${options.ltiRegistrationId}?include[]=overlaid_configuration&include[]=overlay&include[]=overlay_versions`,
       defaultFetchOptions(),
     ),
   )

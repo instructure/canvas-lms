@@ -16,41 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React, {useState} from 'react'
-import {useLocation} from 'react-router-dom'
 import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
-import useSimilarProducts from '../../queries/useSimilarProducts'
-import useProduct from '../../queries/useProduct'
 import {pickPreferredIntegration} from '@canvas/lti-apps/utils/pickPreferredIntegration'
-import {Breadcrumb} from '@instructure/ui-breadcrumb'
-import {Heading} from '@instructure/ui-heading'
-import {Spinner} from '@instructure/ui-spinner'
-import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
-import {Tag} from '@instructure/ui-tag'
-import {View, ContextView} from '@instructure/ui-view'
+import {instructorAppsRoute} from '@canvas/lti-apps/utils/routes'
 import {IconButton} from '@instructure/ui-buttons'
-import {Img} from '@instructure/ui-img'
-import {TruncateText} from '@instructure/ui-truncate-text'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {
   IconExpandStartLine,
   IconExternalLinkLine,
-  IconMessageLine,
   IconImageLine,
+  IconMessageLine,
 } from '@instructure/ui-icons'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import TruncateWithTooltip from '../common/TruncateWithTooltip'
-import {stripHtmlTags} from '../common/stripHtmlTags'
-import LtiConfigurationDetail from './LtiConfigurationDetail'
+import {Img} from '@instructure/ui-img'
+import {Link} from '@instructure/ui-link'
+import {Spinner} from '@instructure/ui-spinner'
+import {Tag} from '@instructure/ui-tag'
+import {Text} from '@instructure/ui-text'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {ContextView, View} from '@instructure/ui-view'
+import React, {useState} from 'react'
+import {useLocation} from 'react-router-dom'
+import {useAppendBreadcrumb} from '../../../breadcrumbs/useAppendBreadcrumb'
+import type {Lti, Product} from '../../models/Product'
+import useProduct from '../../queries/useProduct'
+import useSimilarProducts from '../../queries/useSimilarProducts'
 import ImageCarouselModal from '../common/Carousels/ImageCarouselModal'
-import IntegrationDetailModal from './IntegrationDetailModal'
-import ExternalLinks from './ExternalLinks'
 import ProductCarousel from '../common/Carousels/ProductCarousel'
 import Disclaimer from '../common/Disclaimer'
-import type {Lti, Product} from '../../models/Product'
-import {instructorAppsRoute} from '@canvas/lti-apps/utils/routes'
+import TruncateWithTooltip from '../common/TruncateWithTooltip'
+import {stripHtmlTags} from '../common/stripHtmlTags'
+import ExternalLinks from './ExternalLinks'
+import IntegrationDetailModal from './IntegrationDetailModal'
+import LtiConfigurationDetail from './LtiConfigurationDetail'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -79,6 +79,7 @@ const ProductDetail = (props: ProductDetailProps) => {
   const {product, isLoading, isError} = useProduct({
     productId: currentProductId,
   })
+  useAppendBreadcrumb(product?.name, previousPath, !!product?.name)
   const productDescription = stripHtmlTags(product?.description)
 
   const params = () => {
@@ -132,7 +133,7 @@ const ProductDetail = (props: ProductDetailProps) => {
     return (
       <Flex margin={buttonMargins}>
         <Flex.Item shouldGrow={true} margin={tabletMargin}>
-          {props.renderConfigureButton && ltiConfiguration
+          {props.renderConfigureButton
             ? props.renderConfigureButton(buttonWidth, product?.canvas_lti_configurations)
             : null}
         </Flex.Item>
@@ -283,10 +284,6 @@ const ProductDetail = (props: ProductDetailProps) => {
       ) : (
         product && (
           <>
-            <Breadcrumb label={I18n.t('Apps')}>
-              <Breadcrumb.Link href={previousPath}>{I18n.t('Apps')}</Breadcrumb.Link>
-              <Breadcrumb.Link>{product.name}</Breadcrumb.Link>
-            </Breadcrumb>
             {renderHeader()}
             {renderBylineAndUpdatedAt()}
             <Flex
@@ -344,48 +341,48 @@ const ProductDetail = (props: ProductDetailProps) => {
                   <Text>{productDescription}</Text>
                 </TruncateText>
               </Flex.Item>
-            
-            {isTruncated && (
-              <Link
-                margin="0 medium medium 0"
-                forceButtonRole={true}
-                isWithinText={false}
-                onClick={() => setShowTruncatedDescription(!showTrucatedDescription)}
-                themeOverride={{
-                  focusOutlineColor: 'transparent',
-                  fontWeight: 600,
-                }}
-              >
-                {showTrucatedDescription ? 'See more' : 'See less'}
-              </Link>
-            )}
-            {product.screenshots.length > 0 && (
-              <Flex.Item>
-                <IconButton
-                  size="large"
-                  themeOverride={{largeHeight: '5rem'}}
-                  screenReaderLabel="View decorative image carousel"
-                  onClick={() => {
-                    imageModalClickHandler(product?.screenshots)
+
+              {isTruncated && (
+                <Link
+                  margin="0 medium medium 0"
+                  forceButtonRole={true}
+                  isWithinText={false}
+                  onClick={() => setShowTruncatedDescription(!showTrucatedDescription)}
+                  themeOverride={{
+                    focusOutlineColor: 'transparent',
+                    fontWeight: 600,
                   }}
                 >
-                  <Img display="block" loading="lazy" src={product?.screenshots[0]}></Img>
-                </IconButton>
-                <div style={{position: 'relative', bottom: 30, zIndex: 10}}>
-                  <ContextView
-                    width={80}
-                    padding="xxx-small"
-                    textAlign='end'
-                    placement="bottom"
-                    themeOverride={{arrowSize: '0'}}
+                  {showTrucatedDescription ? 'See more' : 'See less'}
+                </Link>
+              )}
+              {product.screenshots.length > 0 && (
+                <Flex.Item>
+                  <IconButton
+                    size="large"
+                    themeOverride={{largeHeight: '5rem'}}
+                    screenReaderLabel="View decorative image carousel"
+                    onClick={() => {
+                      imageModalClickHandler(product?.screenshots)
+                    }}
                   >
-                    <Text size={product?.screenshots.length > 9 ? 'x-small' : 'small'}>
-                      <IconImageLine /> {product?.screenshots.length} images
-                    </Text>
-                  </ContextView>
-                </div>
-              </Flex.Item>
-            )}
+                    <Img display="block" loading="lazy" src={product?.screenshots[0]}></Img>
+                  </IconButton>
+                  <div style={{position: 'relative', bottom: 30, zIndex: 10}}>
+                    <ContextView
+                      width={80}
+                      padding="xxx-small"
+                      textAlign="end"
+                      placement="bottom"
+                      themeOverride={{arrowSize: '0'}}
+                    >
+                      <Text size={product?.screenshots.length > 9 ? 'x-small' : 'small'}>
+                        <IconImageLine /> {product?.screenshots.length} images
+                      </Text>
+                    </ContextView>
+                  </div>
+                </Flex.Item>
+              )}
             </Flex>
             <ExternalLinks product={product} />
             <LtiConfigurationDetail integrationData={relevantIntegration} />

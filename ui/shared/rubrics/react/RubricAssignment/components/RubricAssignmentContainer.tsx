@@ -170,10 +170,10 @@ export const RubricAssignmentContainer = ({
               </IconButton>
             </Tooltip>
 
-            <Tooltip renderTip={I18n.t('Change Rubric')}>
+            <Tooltip renderTip={I18n.t('Replace Rubric')}>
               <IconButton
                 margin="0 0 0 small"
-                screenReaderLabel={I18n.t('Find New Rubric')}
+                screenReaderLabel={I18n.t('Replace Rubric')}
                 data-testid="find-assignment-rubric-icon-button"
                 onClick={() => setIsSearchTrayOpen(true)}
               >
@@ -204,18 +204,6 @@ export const RubricAssignmentContainer = ({
                 >
                   {I18n.t('Create Rubric')}
                 </Button>
-                {aiRubricsEnabled && (
-                  <Button
-                    margin="0 0 0 small"
-                    data-testid="create-assignment-ai-rubric-button"
-                    onClick={() => {
-                      setCriteriaViaLlm(true)
-                      setRubricCreateModalOpen(true)
-                    }}
-                  >
-                    {I18n.t('Create AI Rubric')}
-                  </Button>
-                )}
               </>
             )}
             <Button
@@ -252,7 +240,7 @@ export const RubricAssignmentContainer = ({
         isOpen={rubricCreateModalOpen}
         rubric={rubric}
         rubricAssociation={rubricAssociation}
-        criteriaViaLlm={criteriaViaLlm}
+        aiRubricsEnabled={aiRubricsEnabled}
         onDismiss={() => {
           setCriteriaViaLlm(false)
           setRubricCreateModalOpen(false)

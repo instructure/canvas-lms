@@ -235,9 +235,11 @@ class ContextController < ApplicationController
             @aua_expiration_date = AssetUserAccess.expiration_date
             js_env(context_url: context_url(@context, :context_user_usage_url, @user, format: :json),
                    accesses_total_pages: @accesses.total_pages)
+            @accesses.reject!(&:bad_discussion_context?)
           end
           format.json do
             @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
+            @accesses.reject!(&:bad_discussion_context?)
             render json: @accesses.map { |a| a.as_json(methods: %i[readable_name asset_class_name icon]) }
           end
         end
@@ -309,8 +311,10 @@ class ContextController < ApplicationController
       if (!enable_profiles || (enable_profiles && show_recent_messages_on_new_roster_user_page)) &&
          @user.grants_right?(@current_user, session, :read_profile)
 
-        @topics = @context.active_discussion_topics.reject { |dt| dt.locked_for?(@current_user, check_policies: true) }
-        entries = DiscussionEntry.all_for_user(@user).all_for_topics(@topics).newest_first
+        @topics = @context.active_discussion_topics
+                          .not_fully_anonymous
+                          .reject { |dt| dt.locked_for?(@current_user, check_policies: true) }
+        entries = DiscussionEntry.not_anonymous.all_for_user(@user).all_for_topics(@topics).newest_first
         filtered_entries = entries.select { |entry| entry.grants_right?(@current_user, session, :read) }
 
         @messages = filtered_entries.take(MAX_MESSAGES_ON_PROFILE)

@@ -59,7 +59,7 @@ const MainMenu = (props: MainMenuProps) => {
   const showWeightedAssignments = props.isPrincipal && window.ENV.FEATURES.course_pace_weighted_assignments
 
   const menuButton = () => {
-    if (window.ENV.FEATURES.course_paces_redesign && props.responsiveSize !== 'small') {
+    if (props.responsiveSize !== 'small') {
       return (
         <Button
           data-testid="course-pace-settings"
@@ -87,7 +87,7 @@ const MainMenu = (props: MainMenuProps) => {
 
     if (!props.isPrincipal) return null
 
-    if (!window.ENV.FEATURES.course_paces_redesign || context_type === 'Course') {
+    if (context_type === 'Course') {
       return (
         <Menu.Item
           type="button"

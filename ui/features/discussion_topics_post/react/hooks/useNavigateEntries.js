@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useState, useCallback} from 'react'
-import {STUDENT_DISCUSSION_QUERY} from '../../graphql/Queries'
-import {useQuery} from '@apollo/client'
+import {useEffect, useState, useCallback, useMemo} from 'react'
+import {useStudentEntries} from './useStudentEntries'
 import useSpeedGrader from './useSpeedGrader'
 
 export default function useNavigateEntries({
@@ -34,152 +33,126 @@ export default function useNavigateEntries({
 } = {}) {
   const {isInSpeedGrader} = useSpeedGrader()
   const [currentStudentId, setCurrentStudentId] = useState(null)
+  const STUDENT_ENTRIES_PER_PAGE = 100
 
   useEffect(() => {
     const currentUrl = new URL(window.location.href)
     const params = new URLSearchParams(currentUrl.search)
-    if (params.get('student_id') !== currentStudentId) {
-      setCurrentStudentId(params.get('student_id'))
+    const studentIdParam = params.get('student_id')
+    if (studentIdParam !== currentStudentId) {
+      setCurrentStudentId(studentIdParam)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [currentStudentId])
 
-  // perPage should match discussionTopicQuery
-  const studentTopicVariables = {
+  const studentEntriesQuery = useStudentEntries(
     discussionID,
-    userSearchId: currentStudentId,
+    STUDENT_ENTRIES_PER_PAGE,
     perPage,
-  }
+    currentStudentId,
+  )
 
-  const studentTopicQuery = useQuery(STUDENT_DISCUSSION_QUERY, {
-    variables: studentTopicVariables,
-    fetchPolicy: 'cache-and-network',
-    skip: !(isInSpeedGrader && currentStudentId && studentTopicVariables.discussionID)
-  })
-
-  const getStudentEntries = useCallback(() => {
-    if (!currentStudentId) {
-      return []
+  useEffect(() => {
+    if (!studentEntriesQuery.isLoading && sort) {
+      studentEntriesQuery.refetch();
     }
+  }, [sort, studentEntriesQuery]);
 
-    if (studentTopicQuery?.loading) {
-      return []
-    }
+  // Combine pages from your query and sort them based on `sort` ("asc"/"desc").
+  const sortedStudentEntries = useMemo(() => {
+    if (!currentStudentId || studentEntriesQuery.isLoading) return []
 
-    let studentEntries = studentTopicQuery?.data?.legacyNode?.discussionEntriesConnection?.nodes
-    if (studentEntries) {
-      studentEntries = [...studentEntries]
-       // sortOrder should always be asc, that way first entry is always oldest.
-      // Due to VICE-4808 sortOrder param is disabled.
-      studentEntries.sort((a, b) => {
-        return parseInt(a._id, 10) - parseInt(b._id, 10);
-      })
-    }
+    const pages = studentEntriesQuery.data?.pages || []
+    const combined = pages.flatMap(page => page.entries) || []
 
-    return studentEntries
-  }, [studentTopicQuery, currentStudentId])
+    // Sort by numeric value of _id, ascending or descending
+    return combined.sort((a, b) => {
+      const aNum = Number(a._id)
+      const bNum = Number(b._id)
+      return sort === 'desc' ? bNum - aNum : aNum - bNum
+    })
+  }, [currentStudentId, studentEntriesQuery.data, studentEntriesQuery.isLoading, sort])
 
   const navigateToEntry = useCallback(
     newEntry => {
-      setHighlightEntryId(newEntry?._id || highlightEntryId)
-      setPageNumber(newEntry?.rootEntryPageNumber)
-      if (newEntry?.rootEntryId) {
+      if (!newEntry) return
+      setHighlightEntryId(newEntry._id)
+      setPageNumber(newEntry.rootEntryPageNumber)
+      if (newEntry.rootEntryId) {
         setExpandedThreads([...expandedThreads, newEntry.rootEntryId])
       }
     },
-    [expandedThreads, highlightEntryId, setExpandedThreads, setHighlightEntryId, setPageNumber],
+    [expandedThreads, setExpandedThreads, setHighlightEntryId, setPageNumber],
   )
 
   const getStudentFirstEntry = useCallback(() => {
-    const studentEntries = getStudentEntries(studentTopicQuery)
-    const firstEntry = studentEntries[0]
+    const firstEntry = sortedStudentEntries[0]
     navigateToEntry(firstEntry)
-  }, [getStudentEntries, studentTopicQuery, highlightEntryId, navigateToEntry])
+  }, [sortedStudentEntries, navigateToEntry])
 
   const getStudentLastEntry = useCallback(() => {
-    const studentEntries = getStudentEntries(studentTopicQuery)
-    const studentEntriesIds = studentEntries.map(entry => entry._id)
-    const lastEntry = studentEntries[studentEntriesIds.length - 1]
+    const lastEntry = sortedStudentEntries[sortedStudentEntries.length - 1]
     navigateToEntry(lastEntry)
-  }, [getStudentEntries, studentTopicQuery, highlightEntryId, navigateToEntry])
+  }, [sortedStudentEntries, navigateToEntry])
 
   const getStudentPreviousEntry = useCallback(() => {
-    const studentEntries = getStudentEntries(studentTopicQuery)
-    const studentEntriesIds = studentEntries.map(entry => entry._id)
+    if (!highlightEntryId) return
+    const studentEntriesIds = sortedStudentEntries.map(entry => entry._id)
     const currentEntryIndex = studentEntriesIds.indexOf(highlightEntryId)
-
-    if(ENV?.FEATURES?.discussions_speedgrader_revisit) {
-      if (currentEntryIndex > 0) {
-        const prevEntryIndex = currentEntryIndex - 1
-        const previousEntry = studentEntries[prevEntryIndex]
-        navigateToEntry(previousEntry)
-      }
+    if (currentEntryIndex <= 0) {
+      const wrapIndex = sortedStudentEntries.length - 1
+      navigateToEntry(sortedStudentEntries[wrapIndex])
     } else {
-      let prevEntryIndex = currentEntryIndex - 1
-      if (currentEntryIndex === 0) {
-        prevEntryIndex = studentEntriesIds.length - 1
-      }
-      const previousEntry = studentEntries[prevEntryIndex]
-      navigateToEntry(previousEntry)
+      navigateToEntry(sortedStudentEntries[currentEntryIndex - 1])
     }
-  }, [getStudentEntries, studentTopicQuery, highlightEntryId, navigateToEntry])
+  }, [sortedStudentEntries, highlightEntryId, navigateToEntry])
 
   const getStudentNextEntry = useCallback(() => {
-    const studentEntries = getStudentEntries(studentTopicQuery)
-    const studentEntriesIds = studentEntries.map(entry => entry._id)
+    if (!highlightEntryId) return
+    const studentEntriesIds = sortedStudentEntries.map(entry => entry._id)
     const currentEntryIndex = studentEntriesIds.indexOf(highlightEntryId)
-
-    if(ENV?.FEATURES?.discussions_speedgrader_revisit) {
-      if (currentEntryIndex < studentEntriesIds.length - 1) {
-        const nextEntryIndex = currentEntryIndex + 1
-        const nextEntry = studentEntries[nextEntryIndex]
-        navigateToEntry(nextEntry)
-      }
+    if (currentEntryIndex < 0 || currentEntryIndex === studentEntriesIds.length - 1) {
+      navigateToEntry(sortedStudentEntries[0])
     } else {
-      let nextEntryIndex = currentEntryIndex + 1
-      if (currentEntryIndex === studentEntriesIds.length - 1) {
-        nextEntryIndex = 0
-      }
-      const nextEntry = studentEntries[nextEntryIndex]
-      navigateToEntry(nextEntry)
+      navigateToEntry(sortedStudentEntries[currentEntryIndex + 1])
     }
-  }, [getStudentEntries, studentTopicQuery, highlightEntryId, navigateToEntry])
+  }, [sortedStudentEntries, highlightEntryId, navigateToEntry])
 
   const onMessage = useCallback(
     e => {
       const message = e.data
       if (highlightEntryId) {
         switch (message.subject) {
-          case 'DT.firstStudentReply': {
+          case 'DT.firstStudentReply':
             getStudentFirstEntry()
             break
-          }
-          case 'DT.lastStudentReply': {
+          case 'DT.lastStudentReply':
             getStudentLastEntry()
             break
-          }
-          case 'DT.previousStudentReply': {
+          case 'DT.previousStudentReply':
             getStudentPreviousEntry()
             break
-          }
-          case 'DT.nextStudentReply': {
+          case 'DT.nextStudentReply':
             getStudentNextEntry()
             break
-          }
-          case 'DT.previousStudentReplyTab': {
+          case 'DT.previousStudentReplyTab':
             setFocusSelector('#previous-in-speedgrader')
             getStudentPreviousEntry()
             break
-          }
-          case 'DT.nextStudentReplyTab': {
+          case 'DT.nextStudentReplyTab':
             setFocusSelector('#next-in-speedgrader')
             getStudentNextEntry()
             break
-          }
         }
       }
     },
-    [highlightEntryId, getStudentPreviousEntry, getStudentNextEntry, setFocusSelector],
+    [
+      highlightEntryId,
+      getStudentFirstEntry,
+      getStudentLastEntry,
+      getStudentPreviousEntry,
+      getStudentNextEntry,
+      setFocusSelector,
+    ],
   )
 
   useEffect(() => {
@@ -189,24 +162,21 @@ export default function useNavigateEntries({
     }
   }, [highlightEntryId, onMessage])
 
-  // Set highlight default entry; we already set this in iframe for new student. only trigger on new student.
+  // When the student changes, or sort changes, or entries finish loading,
+  // if highlightEntryId isn't in the list, pick the "first" item (per sorted order).
   useEffect(() => {
-    if (!isInSpeedGrader) {
-      return
-    }
+    if (!isInSpeedGrader || studentEntriesQuery.isLoading) return
 
-    if (studentTopicQuery?.loading) {
-      return
+    const currentEntryIndex = sortedStudentEntries.findIndex(e => e._id === highlightEntryId)
+    if (currentEntryIndex < 0 && sortedStudentEntries.length > 0) {
+      // highlightEntryId not found -> go to the "first" entry in sorted order
+      navigateToEntry(sortedStudentEntries[0])
     }
-    const studentEntries = getStudentEntries()
-    if(studentEntries) {
-      const studentEntriesIds = studentEntries.map(entry => entry._id)
-      let currentEntryIndex = studentEntriesIds.indexOf(highlightEntryId)
-      currentEntryIndex = currentEntryIndex >= 0 ? currentEntryIndex : studentEntriesIds.indexOf(`${Math.min(...studentEntriesIds)}`)
-      if(studentEntries[currentEntryIndex]){
-        navigateToEntry(studentEntries[currentEntryIndex])
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getStudentEntries, sort])
+  }, [
+    isInSpeedGrader,
+    studentEntriesQuery.isLoading,
+    highlightEntryId,
+    sortedStudentEntries,
+    navigateToEntry,
+  ])
 }

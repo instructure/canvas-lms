@@ -93,17 +93,10 @@ export const STUDENT_DISCUSSION_QUERY = gql`
   ) {
     legacyNode(_id: $discussionID, type: Discussion) {
       ... on Discussion {
-        ...Discussion
-        anonymousAuthor {
-          ...AnonymousUser
-        }
         discussionEntriesConnection(userSearchId: $userSearchId) {
           nodes {
             _id
             rootEntryId
-            anonymousAuthor {
-              ...AnonymousUser
-            }
             rootEntryPageNumber(perPage: $perPage)
           }
           pageInfo {
@@ -113,8 +106,6 @@ export const STUDENT_DISCUSSION_QUERY = gql`
       }
     }
   }
-  ${AnonymousUser.fragment}
-  ${Discussion.fragment}
   ${PageInfo.fragment}
 `
 

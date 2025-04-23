@@ -16,19 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {IconCompleteSolid, IconTroubleSolid, IconWarningSolid} from '@instructure/ui-icons'
-import {canvas} from '@instructure/ui-theme-tokens'
+import {
+  IconCompleteSolid,
+  IconTroubleSolid,
+  IconWarningSolid,
+  IconLikeSolid,
+  IconLikeLine,
+} from '@instructure/ui-icons'
+import {canvas} from '@instructure/ui-themes'
+import {IconButton} from '@instructure/ui-buttons'
 
 const honeyInstUI10 = '#B07E00'
 
-export const getStatusByRelevance = (relevance: string, confidence: number) => {
-  if (confidence < 4) {
+export const getStatusByRelevance = (relevance: string) => {
+  if (relevance === 'needs_review') {
     return <IconWarningSolid style={{fill: honeyInstUI10}} />
   } else {
     if (relevance === 'relevant') {
-      return <IconCompleteSolid style={{fill: canvas.colors.shamrock}} />
+      return <IconCompleteSolid style={{fill: canvas.colors.contrasts.green5782}} />
     } else {
-      return <IconTroubleSolid style={{fill: canvas.colors.crimson}} />
+      return <IconTroubleSolid style={{fill: canvas.colors.contrasts.red5782}} />
     }
   }
 }
@@ -42,4 +49,38 @@ export const formatDate = (date: Date) => {
     minute: 'numeric',
     hour12: true,
   })
+}
+
+type RatingButtonProps = {
+  type: 'like' | 'dislike'
+  disabled: boolean
+  isActive: boolean
+  onClick: () => void
+  screenReaderText: string
+  dataTestId: string
+}
+
+export const RatingButton: React.FC<RatingButtonProps> = ({
+  type,
+  disabled,
+  isActive,
+  onClick,
+  screenReaderText,
+  dataTestId,
+}) => {
+  const rotate = type === 'like' ? '0' : '180'
+
+  return (
+    <IconButton
+      onClick={onClick}
+      size="small"
+      withBackground={false}
+      withBorder={false}
+      screenReaderLabel={screenReaderText}
+      data-testid={dataTestId}
+      disabled={disabled}
+    >
+      {isActive ? <IconLikeSolid rotate={rotate} /> : <IconLikeLine rotate={rotate} />}
+    </IconButton>
+  )
 }

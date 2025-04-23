@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import type {RegistrationOverlayStore} from '../RegistrationOverlayState'
+import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import {PlacementsConfirmation} from '../../registration_wizard_forms/PlacementsConfirmation'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
@@ -25,7 +25,7 @@ import {InternalOnlyLtiPlacements} from '../../model/LtiPlacement'
 
 export type PlacementsConfirmationProps = {
   registration: LtiRegistrationWithConfiguration
-  overlayStore: RegistrationOverlayStore
+  overlayStore: DynamicRegistrationOverlayStore
 }
 
 export const PlacementsConfirmationWrapper = ({

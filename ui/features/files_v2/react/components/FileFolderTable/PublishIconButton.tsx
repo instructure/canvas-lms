@@ -28,12 +28,13 @@ import {
 import {Tooltip} from '@instructure/ui-tooltip'
 import {type File, type Folder} from '../../../interfaces/File'
 import {getRestrictedText, isPublished, isRestricted, isHidden} from '../../../utils/fileUtils'
+import {getName} from '../../../utils/fileFolderUtils'
 
 const I18n = createI18nScope('files_v2')
 
 interface PublishIconButtonProps {
   item: File | Folder
-  userCanEditFilesForContext: boolean
+  userCanRestrictFilesForContext: boolean
   onClick: () => void
 }
 
@@ -41,6 +42,7 @@ type PublishTooltipButtonProps = {
   icon: React.ReactNode
   screenReaderLabel: string
   tooltip: string
+  permissionType: 'restricted' | 'link-only' | 'published' | 'unpublished'
   onClick: () => void
 }
 
@@ -48,6 +50,7 @@ const PublishTooltipButton = ({
   icon,
   screenReaderLabel,
   tooltip,
+  permissionType,
   onClick,
 }: PublishTooltipButtonProps) => {
   return (
@@ -65,6 +68,7 @@ const PublishTooltipButton = ({
         shape="circle"
         screenReaderLabel={screenReaderLabel}
         onClick={onClick}
+        data-testid={`${permissionType}-button-icon`}
       >
         {icon}
       </IconButton>
@@ -72,23 +76,26 @@ const PublishTooltipButton = ({
   )
 }
 
-const PublishIconButton = ({item, userCanEditFilesForContext, onClick}: PublishIconButtonProps) => {
-  const fileName = 'name' in item ? item.name : item.display_name
+const PublishIconButton = ({
+  item,
+  userCanRestrictFilesForContext,
+  onClick,
+}: PublishIconButtonProps) => {
+  const fileName = getName(item)
   const published = isPublished(item)
   const restricted = isRestricted(item)
   const hidden = isHidden(item)
+  const screenReaderLabel = I18n.t('%{fileName} - Click to modify', {fileName})
 
-  if (userCanEditFilesForContext) {
+  if (userCanRestrictFilesForContext) {
     if (published && restricted) {
       return (
         <PublishTooltipButton
           icon={<IconCalendarMonthLine />}
           tooltip={getRestrictedText(item)}
-          screenReaderLabel={I18n.t('%{fileName} is %{restricted} - Click to modify', {
-            fileName,
-            restricted: getRestrictedText(item),
-          })}
+          screenReaderLabel={screenReaderLabel}
           onClick={onClick}
+          permissionType="restricted"
         />
       )
     } else if (published && hidden) {
@@ -96,13 +103,9 @@ const PublishIconButton = ({item, userCanEditFilesForContext, onClick}: PublishI
         <PublishTooltipButton
           icon={<IconOffLine />}
           tooltip={I18n.t('Only available to students with link')}
-          screenReaderLabel={I18n.t(
-            '%{fileName} is only available to students with the link - Click to modify',
-            {
-              fileName,
-            },
-          )}
+          screenReaderLabel={screenReaderLabel}
           onClick={onClick}
+          permissionType="link-only"
         />
       )
     } else if (published) {
@@ -110,8 +113,9 @@ const PublishIconButton = ({item, userCanEditFilesForContext, onClick}: PublishI
         <PublishTooltipButton
           icon={<IconPublishSolid color="success" />}
           tooltip={I18n.t('Published')}
-          screenReaderLabel={I18n.t('%{fileName} is Published - Click to modify', {fileName})}
+          screenReaderLabel={screenReaderLabel}
           onClick={onClick}
+          permissionType="published"
         />
       )
     } else {
@@ -119,22 +123,30 @@ const PublishIconButton = ({item, userCanEditFilesForContext, onClick}: PublishI
         <PublishTooltipButton
           icon={<IconUnpublishedLine />}
           tooltip={I18n.t('Unpublished')}
-          screenReaderLabel={I18n.t('%{fileName} is Unpublished - Click to modify', {fileName})}
+          screenReaderLabel={screenReaderLabel}
           onClick={onClick}
+          permissionType="unpublished"
         />
       )
     }
   } else if (published && restricted) {
+    // if the user cannot edit files, we only show the icon, not a button
     return (
-      <PublishTooltipButton
-        icon={<IconCalendarMonthLine color="warning" />}
-        tooltip={getRestrictedText(item)}
-        screenReaderLabel={I18n.t('%{fileName} is %{restricted}', {
-          fileName,
-          restricted: getRestrictedText(item),
-        })}
-        onClick={onClick}
-      />
+      <Tooltip
+        renderTip={getRestrictedText(item)}
+        on={['hover', 'focus']}
+        themeOverride={{
+          fontSize: '0.75rem',
+        }}
+      >
+        <IconCalendarMonthLine
+          color="warning"
+          title={I18n.t('%{fileName}', {
+            fileName,
+          })}
+          data-testid="restricted-icon"
+        />
+      </Tooltip>
     )
   }
   return null

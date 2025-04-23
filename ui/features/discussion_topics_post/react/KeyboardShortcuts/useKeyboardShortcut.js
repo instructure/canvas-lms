@@ -25,6 +25,8 @@ export const KeyboardShortcuts = {
   ON_DELETE_KEYBOARD: 'onDeleteKeyboard',
   ON_EDIT_KEYBOARD: 'onEditKeyboard',
   ON_OPEN_TOPIC_REPLY: 'onOpenTopicReply',
+  ON_NEXT_REPLY: 'onNextReply',
+  ON_PREV_REPLY: 'onPrevReply',
 }
 
 export function useEventHandler(eventName, callback) {
@@ -66,6 +68,8 @@ export function useKeyboardShortcuts() {
         e: () => dispatchCustomEvent(KeyboardShortcuts.ON_EDIT_KEYBOARD, entryId),
         d: () => dispatchCustomEvent(KeyboardShortcuts.ON_DELETE_KEYBOARD, entryId),
         x: () => dispatchCustomEvent(KeyboardShortcuts.ON_SHOW_REPLIES_KEYBOARD, entryId),
+        k: () => dispatchCustomEvent(KeyboardShortcuts.ON_PREV_REPLY, entryId),
+        j: () => dispatchCustomEvent(KeyboardShortcuts.ON_NEXT_REPLY, entryId),
       }
 
       if (keyEventMap[e.key]) {

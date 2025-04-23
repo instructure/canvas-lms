@@ -82,7 +82,7 @@ export const RubricAssessmentImport = () => {
             setImportErrorModalOpen(true)
           }
         }
-      } catch (error) {
+      } catch (_e) {
         clearInterval(intervalId)
         showFlashError(I18n.t('Error retrieving import status'))()
       }

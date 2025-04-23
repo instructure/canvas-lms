@@ -39,17 +39,6 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   after_update :clear_cache_if_site_admin
   after_update :update_tools!
 
-  attr_accessor :recently_created_dev_key
-  # Because DeveloperKey aggressively caches itself (see DeveloperKey#CacheOnAssociation) and uses the
-  # secondary database, when creating a new Developer Key in a transaction,
-  # the developer_key attribute is not available until after the transaction is committed. However,
-  # we'd still like to be able to update DKAB within a transaction. This ensures the just-created dev key
-  # can be made available for use without needing to skip callbacks or other such shenanigans.
-  alias_method :referenced_developer_key, :developer_key
-  def developer_key
-    referenced_developer_key || recently_created_dev_key
-  end
-
   # -- BEGIN SoftDeleteable --
   # adapting SoftDeleteable, but with no "active" state
   scope :active, -> { where.not(workflow_state: :deleted) }
@@ -68,6 +57,25 @@ class DeveloperKeyAccountBinding < ApplicationRecord
     true
   end
   # -- END SoftDeleteable --
+
+  # The association with developer keys is heavily cached to prevent performance
+  # issues. However, this cache occasionally presents problems, such as when you
+  # create a developer key within a transaction and immediately try to use it.
+  # Use this method to skip the cache for the duration of the block. Avoid
+  # using this method unless you are sure you need to.
+  #
+  # @param [Proc] block The block to execute while the cache is skipped.
+  # @return [Object] The result of the block.
+  # @example
+  #   binding.skip_dev_key_cache do
+  #     binding.developer_key.update!() # Not cached, will be fetched from the database if not already loaded
+  #   end
+  def skip_dev_key_association_cache(&)
+    @skip_dev_key_cache = true
+    yield(self)
+  ensure
+    @skip_dev_key_cache = false
+  end
 
   # Find a DeveloperKeyAccountBinding in order of accounts. The search for a binding will
   # be prioritized by the order of accounts. If a binding is found for the first account

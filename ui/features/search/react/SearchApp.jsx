@@ -35,7 +35,7 @@ import IndexingProgress from './IndexingProgress'
 
 const I18n = createI18nScope('SmartSearch')
 
-export default function SearchApp() {
+export default function SearchApp({courseId}) {
   const [previousSearch, setPreviousSearch] = useState(null)
   const searchInput = useRef(null)
   const [error, setError] = useState(null)
@@ -61,7 +61,7 @@ export default function SearchApp() {
   }, [])
 
   const checkIndexStatus = useCallback(() => {
-    fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch/index_status`).then(res => {
+    fetch(`/api/v1/courses/${courseId}/smartsearch/index_status`).then(res => {
       res.json().then(({status, progress}) => {
         if (status === 'indexing') {
           setIndexingProgress(progress)
@@ -122,7 +122,7 @@ export default function SearchApp() {
     console.debug('submit feedback', feedback)
 
     fetch(
-      `/api/v1/courses/${ENV.COURSE_ID}/smartsearch/log?q=${encodeURIComponent(previousSearch)}&a=${
+      `/api/v1/courses/${courseId}/smartsearch/log?q=${encodeURIComponent(previousSearch)}&a=${
         feedback.action
       }&oid=${feedback.objectId}&ot=${feedback.objectType}&c=${encodeURIComponent(
         feedback.comment,
@@ -153,7 +153,7 @@ export default function SearchApp() {
       window.history.pushState({}, '', url)
     }
 
-    fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch?q=${searchTerm}&per_page=25`)
+    fetch(`/api/v1/courses/${courseId}/smartsearch?q=${searchTerm}&per_page=25`)
       .then(res => {
         if (!res.ok) {
           throw new Error(I18n.t('Failed to execute search: ') + res.statusText)
@@ -225,7 +225,7 @@ export default function SearchApp() {
         </Alert>
       )}
 
-      <Heading level="h1" margin="0 0 medium 0">
+      <Heading level="h1" margin="0 0 medium 0" data-testid="smart-search-heading">
         <Flex justifyItems="space-between">
           <Flex.Item>
             {I18n.t('Smart Search')}
@@ -242,6 +242,7 @@ export default function SearchApp() {
       <form action="#" method="get" onSubmit={onSearch}>
         <fieldset>
           <TextInput
+            data-testid="search-input"
             inputRef={el => (searchInput.current = el)}
             placeholder={I18n.t('Food that a panda eats')}
             renderAfterInput={

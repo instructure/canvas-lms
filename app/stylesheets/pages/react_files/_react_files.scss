@@ -388,7 +388,6 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 
 .files_directory
 {
-  padding-bottom: 25px;
   tbody {
     position: relative;
   }
@@ -426,6 +425,15 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   position: absolute;
   display: block;
   margin-bottom: 25px;
+}
+
+.modified-by-link {
+  a {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+  }
 }
 
 .ef-breadcrumb-popover {

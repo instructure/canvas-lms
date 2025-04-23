@@ -133,7 +133,7 @@ export default class PermissionsTable extends Component {
             <th
               key={role.id}
               scope="col"
-              aria-label={role.label}
+              data-role-name={role.label}
               className="ic-permissions__top-header__col-wrapper-th"
             >
               <div className="ic-permissions__top-header__col-wrapper">

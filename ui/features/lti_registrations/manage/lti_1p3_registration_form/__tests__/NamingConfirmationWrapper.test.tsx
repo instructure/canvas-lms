@@ -21,7 +21,7 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {NamingConfirmationWrapper} from '../components/NamingConfirmationWrapper'
 import {mockInternalConfiguration} from './helpers'
-import {createLti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
+import {createLti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 import type {LtiPlacement} from '../../model/LtiPlacement'
 
@@ -89,7 +89,6 @@ describe('NamingConfirmationWrapper', () => {
       await userEvent.clear(el)
       // eslint-disable-next-line no-await-in-loop
       await userEvent.type(el, 'New Name')
-
       expect(el).toHaveValue('New Name')
     }
   })

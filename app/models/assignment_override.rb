@@ -462,6 +462,17 @@ class AssignmentOverride < ActiveRecord::Base
       override: self }
   end
 
+  def as_hash_for(user)
+    hash = as_hash
+
+    # Remove sensitive information if appropriate
+    if set_type == "Group" && !set.grants_right?(user, :read)
+      hash.delete(:title)
+    end
+
+    hash
+  end
+
   def applies_to_students
     # FIXME: exclude students for whom this override does not apply
     # because a higher-priority override exists

@@ -488,13 +488,6 @@ describe Course do
         expect(@course.enable_course_paces).to be true
       end
 
-      it "is set to false when originally true, but with the FF off" do
-        import_data = { course: { enable_course_paces: "true" } }.with_indifferent_access
-        @course.root_account.disable_feature!(:course_paces)
-        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
-        expect(@course.enable_course_paces).to be false
-      end
-
       it "is set to false when originally false" do
         import_data = { course: { enable_course_paces: "false" } }.with_indifferent_access
         Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)

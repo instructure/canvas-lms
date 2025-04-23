@@ -52,7 +52,7 @@ class MediaTracksController < ApplicationController
   TRACK_SETTABLE_ATTRIBUTES = %i[kind locale content].freeze
 
   def token_auth_allowed?
-    params[:action] == "show" && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
+    params[:action] == "show"
   end
 
   # @API List media tracks for a Media Object or Attachment

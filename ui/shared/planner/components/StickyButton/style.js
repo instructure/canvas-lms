@@ -52,9 +52,9 @@ export default function buildStyle() {
     fontSize: variables.typography.fontSizeXSmall,
     fontFamily: variables.typography.fontFamily,
     fontWeight: variables.typography.fontWeightNormal,
-    color: variables.colors.white,
-    background: variables.colors.brand,
-    backgroundHover: darken(variables.colors.brand, 5),
+    color: variables.colors.contrasts.white1010,
+    background: variables.colors.contrasts.blue4570,
+    backgroundHover: darken(variables.colors.contrasts.blue4570, 5),
     padding: `0 ${variables.spacing.small}`,
     textTransform: 'uppercase',
     lineHeight: variables.spacing.medium,
@@ -62,7 +62,7 @@ export default function buildStyle() {
     hasIconRightPadding: variables.spacing.xSmall,
     borderRadius: variables.borders.radiusMedium,
     focusRingWidth: variables.borders.widthSmall,
-    focusRingColor: variables.colors.brand,
+    focusRingColor: variables.colors.contrasts.blue4570,
     ...themeAdditionalStyles,
   }
 

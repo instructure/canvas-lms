@@ -189,8 +189,8 @@ describe('AddEditPseudonym', () => {
       expect(passwordConfirmation).toBeInTheDocument()
     })
 
-    describe('and validating the Login field', () => {
-      it('should show an error when the field is empty', async () => {
+    describe('and validating fields', () => {
+      it('should show an error when the login field is empty', async () => {
         render(<AddEditPseudonym {...addProps} />)
         const submit = screen.getByTestId('add-edit-pseudonym-submit')
 
@@ -200,7 +200,7 @@ describe('AddEditPseudonym', () => {
         expect(error).toBeInTheDocument()
       })
 
-      it('should show an error when Login is already in use', async () => {
+      it('should show an error when the value of the login field is already in use', async () => {
         fetchMock.post(
           CREATE_LOGIN_URL,
           {
@@ -236,11 +236,42 @@ describe('AddEditPseudonym', () => {
         expect(error).toBeInTheDocument()
       })
 
-      it('should show an error when the password field is empty', async () => {
+      it('should allow password fields to be empty', async () => {
+        fetchMock.put(CREATE_LOGIN_URL, 200, {overwriteRoutes: true})
         render(<AddEditPseudonym {...addProps} />)
-        const minCharacterLength = policy.minimum_character_length
+        const uniqueIdValue = 'unique id'
+        const uniqueId = screen.getByLabelText('Login *')
         const submit = screen.getByTestId('add-edit-pseudonym-submit')
 
+        fireEvent.change(uniqueId, {target: {value: uniqueIdValue}})
+        await userEvent.click(submit)
+
+        expect(
+          fetchMock.called(CREATE_LOGIN_URL, {
+            method: 'POST',
+            body: {
+              pseudonym: {
+                unique_id: uniqueIdValue,
+                sis_user_id: '',
+                integration_id: '',
+                account_id: addProps.accountSelectOptions[0].value,
+              },
+            },
+          }),
+        ).toBeTruthy()
+      })
+
+      it('should show and error when the password is too short', async () => {
+        render(<AddEditPseudonym {...addProps} />)
+        const minCharacterLength = policy.minimum_character_length
+        const uniqueIdValue = 'unique id'
+        const passwordValue = 't'
+        const uniqueId = screen.getByLabelText('Login *')
+        const password = screen.getByLabelText('Password')
+        const submit = screen.getByTestId('add-edit-pseudonym-submit')
+
+        fireEvent.change(uniqueId, {target: {value: uniqueIdValue}})
+        fireEvent.change(password, {target: {value: passwordValue}})
         await userEvent.click(submit)
 
         const error = await screen.findByText(`Must be at least ${minCharacterLength} characters.`)

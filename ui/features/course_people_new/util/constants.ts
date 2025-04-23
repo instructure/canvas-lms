@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {EnvRole} from '../types'
+import {EnvRole, SortField, SortDirection} from '../types'
 
 const I18n = createI18nScope('course_people')
 
@@ -43,6 +43,8 @@ export const ACCOUNT_ADMIN = 'AccountAdmin'
 
 export const ASCENDING = 'ascending'
 export const DESCENDING = 'descending'
+export const ASC = 'asc'
+export const DESC = 'desc'
 
 export const DEFAULT_OPTION: EnvRole = {
   addable_by_user: false,
@@ -54,3 +56,6 @@ export const DEFAULT_OPTION: EnvRole = {
   name: I18n.t('All Roles'),
   plural_label: I18n.t('All Roles')
 }
+
+export const DEFAULT_SORT_FIELD = 'name' as SortField
+export const DEFAULT_SORT_DIRECTION = 'asc' as SortDirection

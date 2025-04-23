@@ -64,15 +64,10 @@ describe Lti::AccountBindingService do
   # When we create a new registration and developer key (such as in Lti::RegistrationController#create),
   # due to being in a transaction, the aggressive caching of DeveloperKey.find_cached can cause some issues with validation,
   # (it returns nil as the secondary doesn't have the just created dev key), so we need to make sure
-  # our code can handle that.
-  context "DeveloperKey#find_cached returns nothing" do
-    before do
-      allow(DeveloperKey).to receive(:find_cached).and_return(nil)
-    end
-
-    it "doesn't error" do
-      expect { subject }.not_to raise_error
-    end
+  # our code accounts for that.
+  it "skips the developer key cache" do
+    expect(DeveloperKey).not_to receive(:find_cached)
+    expect { subject }.not_to raise_error
   end
 
   context "no registration is provided" do

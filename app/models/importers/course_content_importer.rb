@@ -168,9 +168,7 @@ module Importers
           Importers::WikiPageImporter.process_migration_course_outline(data, migration)
           Importers::CalendarEventImporter.process_migration(data, migration)
           Importers::LtiResourceLinkImporter.process_migration(data, migration)
-
-          # FIXME: Eventually remove feature flag checking
-          Importers::CoursePaceImporter.process_migration(data, migration) if course.account.feature_enabled?(:course_paces)
+          Importers::CoursePaceImporter.process_migration(data, migration)
 
           everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
 
@@ -556,7 +554,7 @@ module Importers
         course.allow_final_grade_override = settings[:allow_final_grade_override]
       end
 
-      if settings.key?(:enable_course_paces) && course.account.feature_enabled?(:course_paces)
+      if settings.key?(:enable_course_paces)
         course.enable_course_paces = settings[:enable_course_paces]
       end
 

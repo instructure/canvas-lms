@@ -109,6 +109,8 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :user
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :discussion_topic
   has_many :summaries, class_name: "DiscussionTopicSummary"
+  has_many :insights, class_name: "DiscussionTopicInsight"
+  has_many :insight_entries, class_name: "DiscussionTopicInsight::Entry"
   has_one :estimated_duration, dependent: :destroy, inverse_of: :discussion_topic
 
   validates_with HorizonValidators::DiscussionsValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
@@ -785,13 +787,15 @@ class DiscussionTopic < ActiveRecord::Base
                                                                     unread_entry_count: unread_count(current_user, lock: true),
                                                                     workflow_state: "unread",
                                                                     subscribed: current_user == user && !subscription_hold(current_user, nil),
-                                                                    sort_order: DiscussionTopic::SortOrder::INHERIT)
+                                                                    sort_order: DiscussionTopic::SortOrder::INHERIT,
+                                                                    summary_enabled:)
           topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
           topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
           topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
           topic_participant.expanded = opts[:expanded] if opts.key?(:expanded)
           topic_participant.sort_order = opts[:sort_order] if opts.key?(:sort_order)
+          topic_participant.summary_enabled = opts[:summary_enabled] if opts.key?(:summary_enabled)
           topic_participant.save
         end
       end
@@ -821,6 +825,8 @@ class DiscussionTopic < ActiveRecord::Base
     where.not(Ignore.where(asset_type: "DiscussionTopic", user_id: user, purpose:)
       .where("asset_id=discussion_topics.id").arel.exists)
   }
+
+  scope :not_fully_anonymous, -> { where(anonymous_state: [nil, "partial_anonymity"]) }
 
   scope :todo_date_between, lambda { |starting, ending|
     where("(discussion_topics.type = 'Announcement' AND posted_at BETWEEN :start_at and :end_at)

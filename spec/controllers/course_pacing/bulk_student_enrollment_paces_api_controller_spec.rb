@@ -22,10 +22,7 @@ require_relative "../../spec_helper"
 
 describe CoursePacing::BulkStudentEnrollmentPacesApiController, type: :controller do
   before :once do
-    Account.site_admin.enable_feature!(:course_paces_redesign)
-
     @course = course_factory(active_all: true)
-    @course.root_account.enable_feature!(:course_paces)
     @course.enable_course_paces = true
     @course.save!
 

@@ -24,7 +24,6 @@ describe BlackoutDatesController do
 
     @course.enable_course_paces = true
     @course.save!
-    @course.account.enable_feature!(:course_paces)
 
     @blackout_date = @course.blackout_dates.create!(start_date: "2022-02-14", end_date: "2022-02-18", event_title: "Test Week Off")
   end

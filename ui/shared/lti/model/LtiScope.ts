@@ -57,7 +57,7 @@ export const LtiScopes = {
   ReplaceEditorContent: 'https://canvas.instructure.com/lti/replace_editor_contents',
 } as const
 
-const AllLtiScopes = [
+export const AllLtiScopes = [
   LtiScopes.AgsLineItem,
   LtiScopes.AgsLineItemReadonly,
   LtiScopes.AgsResultReadonly,

@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {getBasename} from '@canvas/lti-apps/utils/basename'
 import React from 'react'
+import type {AccountId} from '../manage/model/AccountId'
+import {fetchImpact} from './api/impact'
+import {fetchLtiUsageToken} from './api/jwt'
 import {ltiUsageConfig, ltiUsageOptions} from './utils'
 
-import {fetchLtiUsageToken} from './api/jwt'
-import {fetchImpact} from './api/impact'
-import {AccountId} from '../manage/model/AccountId'
+const I18n = createI18nScope('lti_registrations.monitor')
 
 export type MonitorProps = {
   accountId: AccountId

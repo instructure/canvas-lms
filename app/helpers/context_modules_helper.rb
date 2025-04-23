@@ -46,6 +46,19 @@ module ContextModulesHelper
     end
   end
 
+  def module_performance_improvement_is_enabled?(context, current_user)
+    return false unless context
+    return false unless current_user
+
+    feature_flag = context.account.feature_enabled?(:modules_perf)
+    return false unless feature_flag
+
+    tags_count = GuardRail.activate(:secondary) { context.module_items_visible_to(current_user).count }
+    module_perf_threshold = Setting.get("module_perf_threshold", 100).to_i
+
+    feature_flag && (tags_count > module_perf_threshold)
+  end
+
   def add_menu_tools_to_cache_key(cache_key)
     tool_key = @menu_tools ? @menu_tools.values.flatten.map(&:cache_key).join("/") : ""
     cache_key += Digest::SHA256.hexdigest(tool_key) if tool_key.present?
@@ -120,13 +133,19 @@ module ContextModulesHelper
     preload_can_unpublish(@context, modules) if @can_view
   end
 
-  def process_module_data(mod, current_user = nil, session = nil, student: false)
-    # pre-calculated module view data can be added here
-    items = mod.content_tags_visible_to(@current_user)
-    items = items.reject do |item|
+  def load_content_tags(context_module, current_user)
+    items = context_module.content_tags_visible_to(current_user)
+    items.reject do |item|
       item.content.respond_to?(:hide_on_modules_view?) && item.content.hide_on_modules_view?
     end
+  end
 
+  def process_module_data(mod, current_user = nil, session = nil, student: false)
+    items = load_content_tags(mod, current_user)
+    process_module_items_data(items, mod, current_user, session, student:)
+  end
+
+  def process_module_items_data(items, mod, current_user = nil, session = nil, student: false)
     module_data = {
       published_status: mod.published? ? "published" : "unpublished",
       items:

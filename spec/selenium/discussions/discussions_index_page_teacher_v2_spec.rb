@@ -239,9 +239,9 @@ describe "discussions index" do
     it "duplicates a checkpointed discussion properly" do
       @course.account.enable_feature! :discussion_checkpoints
       checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
-      checkpointed_discussion.assignment.lock_at = 3.days.from_now
-      checkpointed_discussion.assignment.unlock_at = 3.days.ago
-      checkpointed_discussion.assignment.save!
+      checkpointed_discussion.lock_at = 3.days.from_now
+      checkpointed_discussion.unlock_at = 3.days.ago
+      checkpointed_discussion.save!
 
       rtt = Checkpoints::DiscussionCheckpointCreatorService.call(
         discussion_topic: checkpointed_discussion,

@@ -23,9 +23,15 @@ import ModuleItemActionMenu from '../ModuleItemActionMenu'
 
 const setUp = (itemType: string = 'Assignment') => {
   return render(
-    <ContextModuleProvider courseId="1" isMasterCourse={true} isChildCourse={false}>
+    <ContextModuleProvider
+      courseId="1"
+      isMasterCourse={true}
+      isChildCourse={false}
+      permissions={{canEdit: true, canDelete: true, canAdd: true, canDirectShare: true}}
+    >
       <ModuleItemActionMenu
         itemType={itemType}
+        canDuplicate={true}
         isMenuOpen={false}
         setIsMenuOpen={() => {}}
         indent={1}

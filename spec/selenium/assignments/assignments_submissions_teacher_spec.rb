@@ -63,7 +63,7 @@ describe "submissions" do
         get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
 
         comment_save_button.click
-        expect(f("#error_text")).to be_displayed
+        expect(f("[data-testid='error-message-container']")).to be_displayed
       end
     end
 

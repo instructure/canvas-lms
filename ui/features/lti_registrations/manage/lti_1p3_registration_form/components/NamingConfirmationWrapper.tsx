@@ -19,7 +19,7 @@
 import React from 'react'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {NamingConfirmation} from '../../registration_wizard_forms/NamingConfirmation'
-import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
+import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 import {getDefaultPlacementTextFromConfig} from './helpers'
 

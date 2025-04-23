@@ -27,7 +27,7 @@ describe('buildSvg()', () => {
         xmlns="http://www.w3.org/2000/svg"
       >
         <rect
-          fill="#394B58"
+          fill="#334451"
           fill-opacity="0.5"
           height="350"
           width="296"
@@ -35,7 +35,7 @@ describe('buildSvg()', () => {
           y="0"
         />
         <rect
-          fill="#394B58"
+          fill="#334451"
           fill-opacity="0.5"
           height="350"
           width="296"
@@ -68,7 +68,7 @@ describe('buildSvg()', () => {
           </mask>
         </defs>
         <rect
-          fill="#394B58"
+          fill="#334451"
           fill-opacity="0.5"
           height="350"
           mask="url(#imageCropperMask)"

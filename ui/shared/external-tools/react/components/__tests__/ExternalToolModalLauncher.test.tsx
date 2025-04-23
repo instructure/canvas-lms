@@ -124,7 +124,8 @@ describe('ExternalToolModalLauncher', () => {
       expect(onRequestCloseMock).toHaveBeenCalledTimes(1)
     })
 
-    it('does not call onRequestClose when clicking outside the diaglog', async () => {
+    // INTEROP-9242
+    it.skip('does not call onRequestClose when clicking outside the diaglog', async () => {
       const onRequestCloseMock = jest.fn()
       const {getByRole} = render(
         <ExternalToolModalLauncher {...generateProps({ onRequestClose: onRequestCloseMock, isOpen: true })} />

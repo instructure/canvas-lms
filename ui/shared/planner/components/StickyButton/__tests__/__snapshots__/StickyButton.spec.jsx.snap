@@ -9,7 +9,7 @@ exports[`adds aria-hidden when specified 1`] = `
     display: block;
     border: none;
     color: #FFFFFF;
-    background-color: #0374B5;
+    background-color: #2B7ABC;
     padding: 0;
     font-size: 0.75rem;
     font-weight: 400;
@@ -33,7 +33,7 @@ exports[`adds aria-hidden when specified 1`] = `
     box-sizing: border-box;
     width: calc(100% + 0.5rem);
     height: calc(100% + 0.5rem);
-    border: 0.0625rem solid #0374B5;
+    border: 0.0625rem solid #2B7ABC;
     position: absolute;
     top: -0.25rem;
     /* the placement and radii are symetrical, so no need to replace left/right with start/end */
@@ -49,7 +49,7 @@ exports[`adds aria-hidden when specified 1`] = `
     transform: scale(1);
   }
   .StickyButton-styles__root:focus, .StickyButton-styles__root:hover {
-    background-color: rgb(3, 100, 156);
+    background-color: rgb(38, 109, 167);
   }
   .StickyButton-styles__root:focus .StickyButton-styles__icon, .StickyButton-styles__root:hover .StickyButton-styles__icon {
     transform: translate3d(0, -0.0625rem, 0) scale(1.2);
@@ -123,7 +123,7 @@ exports[`renders 1`] = `
     display: block;
     border: none;
     color: #FFFFFF;
-    background-color: #0374B5;
+    background-color: #2B7ABC;
     padding: 0;
     font-size: 0.75rem;
     font-weight: 400;
@@ -147,7 +147,7 @@ exports[`renders 1`] = `
     box-sizing: border-box;
     width: calc(100% + 0.5rem);
     height: calc(100% + 0.5rem);
-    border: 0.0625rem solid #0374B5;
+    border: 0.0625rem solid #2B7ABC;
     position: absolute;
     top: -0.25rem;
     /* the placement and radii are symetrical, so no need to replace left/right with start/end */
@@ -163,7 +163,7 @@ exports[`renders 1`] = `
     transform: scale(1);
   }
   .StickyButton-styles__root:focus, .StickyButton-styles__root:hover {
-    background-color: rgb(3, 100, 156);
+    background-color: rgb(38, 109, 167);
   }
   .StickyButton-styles__root:focus .StickyButton-styles__icon, .StickyButton-styles__root:hover .StickyButton-styles__icon {
     transform: translate3d(0, -0.0625rem, 0) scale(1.2);

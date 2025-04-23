@@ -48,7 +48,7 @@
               "description": "Exceeds Mastery",
               "points": 4.0,
               "mastery": false,
-              "color": "127A1B",
+              "color": "02672D",
               "workflow_state": "active"
             },
             {
@@ -56,9 +56,9 @@
               "description": "Mastery",
               "points": 3.0,
               "mastery": true,
-              "color": "0B874B",
+              "color": "03893D",
               "workflow_state": "active"
-            }, 
+            },
             {
               "outcome_proficiency_rating_id": "3",
               "description": "Near Mastery",
@@ -80,7 +80,7 @@
               "description": "Well Below Mastery",
               "points": 0.0,
               "mastery": false,
-              "color": "E0061F",
+              "color": "E62429",
               "workflow_state": "active"
             }
           ]

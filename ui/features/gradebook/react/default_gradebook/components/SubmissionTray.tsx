@@ -670,7 +670,6 @@ export default class SubmissionTray extends React.Component<
           />
           <div className="SubmissionTray__Container">
             <div id="SubmissionTray__Content" style={{display: 'flex', flexDirection: 'column'}}>
-              {/* @ts-expect-error */}
               <View as="div" padding={carouselContainerStyleOverride}>
                 {/* @ts-expect-error */}
                 {avatarUrl && renderAvatar(name, avatarUrl)}

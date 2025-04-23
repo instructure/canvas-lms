@@ -111,7 +111,7 @@ describe "profile communication settings" do
       focus_button = ff("tr[data-testid='grading'] button")[1]
       focus_button.click
       wait_for_ajaximations
-      menu = ff("ul[aria-labelledby='#{focus_button.attribute("data-position-target")}'] li")
+      menu = ff("div[aria-labelledby='#{focus_button.attribute("data-position-target")}'] [class*=menuItem__label]")
       expect(menu.size).to eq 2
       expect(menu[0].text).to eq "Notify immediately"
       expect(menu[1].text).to eq "Notifications off"
@@ -128,7 +128,7 @@ describe "profile communication settings" do
       focus_button = ff("tr[data-testid='submission_comment'] button")[1]
       focus_button.click
       wait_for_ajaximations
-      fj("ul li:contains('#{desired_setting}') span").click
+      fj("div[role=menu] [class*=menuItem__label]:contains('#{desired_setting}') span").click
       wait_for_ajaximations
       focus_button_changed = ff("tr[data-testid='submission_comment'] button")[1]
       expect(focus_button_changed.text).to eq desired_setting

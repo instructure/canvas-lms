@@ -44,7 +44,7 @@
 #         },
 #         "color": {
 #           "description": "The hex color code of the rating",
-#           "example": "127A1B",
+#           "example": "02672D",
 #           "type": "string"
 #         }
 #       }
@@ -93,11 +93,11 @@ class OutcomeProficiencyApiController < ApplicationController
   #        -X POST \
   #        -F 'ratings[][description]=Exceeds Mastery' \
   #        -F 'ratings[][points]=4' \
-  #        -F 'ratings[][color]=127A1B' \
+  #        -F 'ratings[][color]=02672D' \
   #        -F 'ratings[][mastery]=false' \
   #        -F 'ratings[][description]=Mastery' \
   #        -F 'ratings[][points]=3' \
-  #        -F 'ratings[][color]=0B874B' \
+  #        -F 'ratings[][color]=03893D' \
   #        -F 'ratings[][mastery]=true' \
   #        -F 'ratings[][description]=Near Mastery' \
   #        -F 'ratings[][points]=2' \
@@ -109,7 +109,7 @@ class OutcomeProficiencyApiController < ApplicationController
   #        -F 'ratings[][mastery]=false' \
   #        -F 'ratings[][description]=Well Below Mastery' \
   #        -F 'ratings[][points]=0' \
-  #        -F 'ratings[][color]=E0061F' \
+  #        -F 'ratings[][color]=E62429' \
   #        -F 'ratings[][mastery]=false' \
   #        -H "Authorization: Bearer <token>"
   #

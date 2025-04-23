@@ -36,9 +36,22 @@ const defaultContent: ModuleItemContent = {
   pointsPossible: 100,
 }
 
-const setUp = (content: ModuleItemContent = defaultContent, completionRequirement: CompletionRequirement | null = defaultCompletionRequirement) => {
+const setUp = (
+  content: ModuleItemContent = defaultContent,
+  completionRequirement: CompletionRequirement | null = defaultCompletionRequirement
+) => {
   return render(
-    <ContextModuleProvider courseId="1" isMasterCourse={true} isChildCourse={false}>
+    <ContextModuleProvider
+      courseId="1"
+      isMasterCourse={true}
+      isChildCourse={false}
+      permissions={{
+        canEdit: true,
+        canDelete: true,
+        canAdd: true,
+        canDirectShare: true
+      }}
+    >
       <ModuleItemSupplementalInfo
         content={content}
         completionRequirement={completionRequirement ?? undefined}

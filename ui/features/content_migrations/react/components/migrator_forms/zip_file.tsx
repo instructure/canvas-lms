@@ -131,9 +131,15 @@ const ZipFileImporter = ({
   const [searchValue, setSearchValue] = useState('')
   const [fileError, setFileError] = useState<boolean>(false)
   const [folderError, setFolderError] = useState<boolean>(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const folderInputRef = useRef<HTMLInputElement | null>(null)
 
-  const handleErrorFocus = (folderError: boolean) => {
+  const handleErrorFocus = (hasFileError: boolean, folderError: boolean) => {
+    if (hasFileError) {
+      fileInputRef.current?.focus()
+      return
+    }
+
     if (folderError) {
       folderInputRef.current?.focus()
     }
@@ -149,7 +155,7 @@ const ZipFileImporter = ({
       setFolderError(folderError)
 
       if (fileError || folderError) {
-        handleErrorFocus(folderError)
+        handleErrorFocus(fileError, folderError)
         return
       }
 
@@ -289,6 +295,7 @@ const ZipFileImporter = ({
         isSubmitting={isSubmitting}
         externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
         isRequired={true}
+        inputRef={ref => (fileInputRef.current = ref)}
       />
       {!isSubmitting && (
         <View as="div" margin="medium none none none" maxWidth="46.5rem">

@@ -28,8 +28,8 @@ import {testTemplates} from './testTemplates'
 const user = userEvent.setup()
 
 // from the View theme props
-const borderColorPrimary = '#c7cdd1'
-const borderColorWarning = '#fc5e13'
+const borderColorPrimary = '#e8eaec'
+const borderColorWarning = '#cf4a00'
 
 const mockAddNodeTree = jest.fn()
 const mockCreate = jest.fn((_ref, cb) => {

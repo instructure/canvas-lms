@@ -31,6 +31,7 @@ module DifferentiableAssignment
       visible_instances = DifferentiableAssignment.filter([differentiable], user, context) do |_, user_ids|
         conditions = { user_id: user_ids }
         conditions[column_name] = differentiable.id
+        conditions[:course_ids] = [context.id] if context.instance_of?(::Course)
         visible(conditions)
       end
       is_visible = true if visible_instances.any?
@@ -49,15 +50,15 @@ module DifferentiableAssignment
   def visible(conditions)
     case differentiable.class_name
     when "Assignment"
-      AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: conditions[:user_id], assignment_ids: conditions[:assignment_id])
+      AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: conditions[:user_id], assignment_ids: conditions[:assignment_id], course_ids: conditions[:course_ids])
     when "ContextModule"
-      ModuleVisibility::ModuleVisibilityService.modules_visible_to_students(user_ids: conditions[:user_id], context_module_ids: conditions[:context_module_id])
+      ModuleVisibility::ModuleVisibilityService.modules_visible_to_students(user_ids: conditions[:user_id], context_module_ids: conditions[:context_module_id], course_ids: conditions[:course_ids])
     when "WikiPage"
-      WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(user_ids: conditions[:user_id], wiki_page_ids: conditions[:wiki_page_id])
+      WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(user_ids: conditions[:user_id], wiki_page_ids: conditions[:wiki_page_id], course_ids: conditions[:course_ids])
     when "DiscussionTopic", "Announcement"
-      UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids: conditions[:user_id], discussion_topic_ids: conditions[:discussion_topic_id])
+      UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids: conditions[:user_id], discussion_topic_ids: conditions[:discussion_topic_id], course_ids: conditions[:course_ids])
     else
-      QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(quiz_ids: conditions[:quiz_id], user_ids: conditions[:user_id])
+      QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(quiz_ids: conditions[:quiz_id], user_ids: conditions[:user_id], course_ids: conditions[:course_ids])
     end
   end
 

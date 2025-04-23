@@ -759,8 +759,15 @@ EditView.prototype.showExternalToolsDialog = function () {
   })
 }
 
+EditView.prototype.clearAllowedExtensionsAndErrors = function () {
+  this.getElement(ALLOWED_EXTENSIONS_INPUT_NAME).value = ''
+  this.hideErrors("allowed_extensions_errors")
+}
+
 EditView.prototype.toggleRestrictFileUploads = function () {
-  return this.$restrictFileUploadsOptions.toggleAccessibly(this.$allowFileUploads.prop('checked'))
+  const fileUploadsAllowed = this.$allowFileUploads.prop('checked')
+  if (fileUploadsAllowed) this.clearAllowedExtensionsAndErrors()
+  return this.$restrictFileUploadsOptions.toggleAccessibly(fileUploadsAllowed)
 }
 
 EditView.prototype.toggleAnnotatedDocument = function () {
@@ -993,7 +1000,9 @@ EditView.prototype.renderDefaultExternalTool = function () {
 }
 
 EditView.prototype.handleRestrictFileUploadsChange = function () {
-  return this.$allowedExtensions.toggleAccessibly(this.$restrictFileUploads.prop('checked'))
+  const fileUploadsRestricted = this.$restrictFileUploads.prop('checked')
+  if (fileUploadsRestricted) this.clearAllowedExtensionsAndErrors()
+  return this.$allowedExtensions.toggleAccessibly(fileUploadsRestricted)
 }
 
 EditView.prototype.handleGradingTypeChange = function (gradingType) {
@@ -1534,7 +1543,8 @@ EditView.prototype._inferSubmissionTypes = function (assignmentData) {
 EditView.prototype._filterAllowedExtensions = function (data) {
   const restrictFileExtensions = data.restrict_file_extensions
   delete data.restrict_file_extensions
-  if (restrictFileExtensions === '1') {
+  const allowFileUploads = this.$allowFileUploads.prop('checked')
+  if (restrictFileExtensions === '1' && allowFileUploads) {
     data.allowed_extensions = filter(data.allowed_extensions.split(','), function (ext) {
       return $.trim(ext.toString()).length > 0
     })
@@ -2004,7 +2014,11 @@ EditView.prototype.locationAfterSave = function (params) {
 
   const htmlUrl = this.model.get('html_url')
   if (this.assignment.showBuildButton()) {
-    return htmlUrl + '?display=full_width'
+    let displayType = 'full_width'
+    if (ENV.FEATURES.new_quizzes_navigation_updates) {
+      displayType = 'full_width_with_nav'
+    }
+    return htmlUrl + `?display=${displayType}`
   } else {
     return htmlUrl
   }

@@ -45,6 +45,7 @@ module LtiAdvantage::Serializers
       submission
       asset
       assetreport_type
+      eulaservice
     ].freeze
 
     DEEP_LINKING_CLAIMS = %w[

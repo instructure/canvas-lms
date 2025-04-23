@@ -16,25 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, waitFor, screen} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
-import {FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
+import {fireEvent, screen} from '@testing-library/react'
 import {renderComponent} from './testUtils'
 
 describe('FileFolderTable', () => {
   let flashElements: any
   const onSortChange = jest.fn()
   beforeEach(() => {
-    fetchMock.get(/.*\/folders/, {
-      body: FAKE_FOLDERS_AND_FILES,
-      headers: {Link: '<p1url>; rel="current", <p2url>; rel="next", <p1url>; rel="first"'},
-      status: 200,
-    })
-    fetchMock.get('p2url', {
-      body: [],
-      headers: {Link: '<p2url>; rel="current", <p1url>; rel="first"'},
-      status: 200,
-    })
     flashElements = document.createElement('div')
     flashElements.setAttribute('id', 'flash_screenreader_holder')
     flashElements.setAttribute('role', 'alert')
@@ -42,77 +30,68 @@ describe('FileFolderTable', () => {
   })
 
   afterEach(() => {
-    fetchMock.restore()
     onSortChange.mockClear()
     document.body.removeChild(flashElements)
     flashElements = undefined
   })
 
   describe('sort functionality', () => {
-    it('sorts by Name ascending on initial load', async () => {
-      const {findByTestId} = renderComponent()
-      const nameHeader = await findByTestId('name')
-      expect(nameHeader).toHaveAttribute('aria-sort', 'ascending')
+    const title = 'name'
+
+    describe('when sort is set to ascending', () => {
+      it('displays as ascending', async () => {
+        const {findByTestId} = renderComponent({sort: {by: title, direction: 'asc'}})
+        const header = await findByTestId(title)
+        expect(header).toHaveAttribute('aria-sort', 'ascending')
+      })
+
+      it('clicking on same header calls onSortChange with descending', async () => {
+        const {findByTestId} = renderComponent({sort: {by: title, direction: 'asc'}, onSortChange})
+        const header = await findByTestId(title)
+        fireEvent.click(header.querySelector('button') as HTMLButtonElement)
+        expect(onSortChange).toHaveBeenCalledWith({ by: title, direction: 'desc' })
+      })
     })
 
-    it('sorts by column ascending when a column header is clicked', async () => {
-      const {findByTestId} = renderComponent({onSortChange})
-      const sizeHeader = await findByTestId('size')
-      expect(sizeHeader).toHaveAttribute('aria-sort', 'none')
-      fireEvent.click(sizeHeader.querySelector('button') as HTMLButtonElement)
-      await waitFor(() => {
-        expect(sizeHeader).toHaveAttribute('aria-sort', 'ascending')
+    describe('when sort is set to descending', () => {
+      it('displays as descending', async () => {
+        const {findByTestId} = renderComponent({sort: {by: title, direction: 'desc'}})
+        const header = await findByTestId(title)
+        expect(header).toHaveAttribute('aria-sort', 'descending')
       })
-      expect(onSortChange).toHaveBeenCalledWith('size', 'asc')
+
+      it('clicking on same header calls onSortChange with ascending', async () => {
+        const {findByTestId} = renderComponent({sort: {by: title, direction: 'desc'}, onSortChange})
+        const header = await findByTestId(title)
+        fireEvent.click(header.querySelector('button') as HTMLButtonElement)
+        expect(onSortChange).toHaveBeenCalledWith({ by: title, direction: 'asc' })
+      })
     })
 
-    it('sorts by column descending when clicked twice', async () => {
-      const {findByTestId} = renderComponent({onSortChange})
-      const sizeHeader = await findByTestId('size')
-      expect(sizeHeader).toHaveAttribute('aria-sort', 'none')
-      fireEvent.click(sizeHeader.querySelector('button') as HTMLButtonElement)
-      await waitFor(() => {
-        expect(sizeHeader).toHaveAttribute('aria-sort', 'ascending')
-      })
-      fireEvent.click(sizeHeader.querySelector('button') as HTMLButtonElement)
-      await waitFor(() => {
-        expect(sizeHeader).toHaveAttribute('aria-sort', 'descending')
-      })
-      expect(onSortChange).toHaveBeenCalledWith('size', 'desc')
-    })
-
-    it('calls callbacks to be called on api response', async () => {
-      const onPaginationLinkChange = jest.fn()
-      const onLoadingStatusChange = jest.fn()
-      renderComponent({
-        onPaginationLinkChange,
-        onLoadingStatusChange,
-      })
-      await waitFor(() => {
-        expect(onPaginationLinkChange).toHaveBeenCalledWith({
-          current: 'p1url',
-          next: 'p2url',
-          first: 'p1url',
-        })
+    describe('unsorted header', () => {
+      const unsortedTitle = 'created_at'
+      let findByTestId: ReturnType<typeof renderComponent>['findByTestId']
+      beforeEach(() => {
+        findByTestId = renderComponent({sort: {by: title, direction: 'desc'}, onSortChange}).findByTestId
       })
 
-      expect(onLoadingStatusChange).toHaveBeenCalledWith(false)
+      it('displays as none', async () => {
+        const header = await findByTestId(unsortedTitle)
+        expect(header).toHaveAttribute('aria-sort', 'none')
+      })
+
+      it('clicking on header calls onSortChange with ascending', async () => {
+        const header = await findByTestId(unsortedTitle)
+        fireEvent.click(header.querySelector('button') as HTMLButtonElement)
+        expect(onSortChange).toHaveBeenCalledWith({ by: unsortedTitle, direction: 'asc' })
+      })
     })
 
     it('updates sorting screenreader alert', async () => {
-      renderComponent()
+      renderComponent({ sort: { by: title, direction: 'asc' }})
       // this includes sr alert and the table caption
-      const alert = await screen.findAllByText(/sorted by name in ascending order/i)
+      const alert = await screen.findAllByText(new RegExp(`sorted by ${title} in ascending order`, 'i'))
       expect(alert).toHaveLength(2)
-
-      const sizeHeader = await screen.findByTestId('created_at')
-      expect(sizeHeader).toHaveAttribute('aria-sort', 'none')
-      fireEvent.click(sizeHeader.querySelector('button') as HTMLButtonElement)
-      await waitFor(() => {
-        expect(sizeHeader).toHaveAttribute('aria-sort', 'ascending')
-      })
-      const newAlert = await screen.findAllByText(/sorted by created in ascending order/i)
-      expect(newAlert).toHaveLength(2)
     })
   })
 })

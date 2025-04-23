@@ -194,10 +194,14 @@ module Context
     result
   end
 
-  def self.context_code_for(record)
+  def self.context_code_for(record, fieldname = nil)
     raise ArgumentError unless record.respond_to?(:context_type) && record.respond_to?(:context_id)
 
-    "#{record.context_type.underscore}_#{record.context_id}"
+    if record.is_a?(Course) && fieldname == "syllabus_body"
+      "course_syllabus_#{record.context_id}"
+    else
+      "#{record.context_type.underscore}_#{record.context_id}"
+    end
   end
 
   def self.find_by_asset_string(string)
@@ -276,7 +280,7 @@ module Context
         tool_url = query_params["url"]&.first
         resource_link_lookup_uuid = query_params["resource_link_lookup_uuid"]&.first
         object = if tool_url
-                   ContextExternalTool.find_external_tool(tool_url, context)
+                   Lti::ToolFinder.from_url(tool_url, context)
                  elsif resource_link_lookup_uuid
                    Lti::ResourceLink.where(
                      lookup_uuid: resource_link_lookup_uuid,

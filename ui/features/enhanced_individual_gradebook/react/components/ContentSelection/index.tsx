@@ -179,6 +179,7 @@ export default function ContentSelection({
         </View>
         <View as="div" className="span8">
           <select
+            id="student_select"
             className="student_select"
             onChange={handleChangeStudent}
             value={studentDropdownOptions[selectedStudentIndex]?.id}
@@ -233,6 +234,7 @@ export default function ContentSelection({
         </View>
         <View as="div" className="span8">
           <select
+            id="assignment_select"
             className="assignment_select"
             onChange={handleChangeAssignment}
             value={assignmentDropdownOptions[selectedAssignmentIndex]?.id}

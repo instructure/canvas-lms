@@ -123,14 +123,14 @@
       <label for="rubric-title"><%= t('title', "Title:") %></label>
       <input id="rubric-title" type="text" class="no-margin-bottom" name="title"
              value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>"
-             style="width: 200px;" maxlength="255" aria-label="<%= t('title', "Title:") %>"/>
+             style="width: 200px;" maxlength="255" />
       <a href="<%= search_rubrics_url(:q => "") %>" style="display: none;">
         <%= image_tag "find.png", :alt => '' %> <%= t 'links.find_rubric', "Find Rubric" %>
       </a>
       <div class="editing">
         <i class="icon-warning icon-Solid title_error_message"
            aria-hidden="true"
-           style="color: #D01A19; padding: 5px 0 5px 35px; vertical-align: middle; font-weight: normal;
+           style="color: #AE1B1F; padding: 5px 0 5px 35px; vertical-align: middle; font-weight: normal;
                   display: none; align-items: center; gap: 5px; font-size: 14px;">
           <%= t('Please include a title') %>
         </i>

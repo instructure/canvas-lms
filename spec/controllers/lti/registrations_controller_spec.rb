@@ -83,11 +83,6 @@ RSpec.describe Lti::RegistrationsController do
       expect(response).to be_successful
     end
 
-    it "sets Apps crumb" do
-      get :index, params: { account_id: account.id }
-      expect(assigns[:_crumbs].last).to include("Apps")
-    end
-
     it "sets active tab" do
       get :index, params: { account_id: account.id }
       expect(assigns[:active_tab]).to eq("apps")
@@ -132,9 +127,23 @@ RSpec.describe Lti::RegistrationsController do
 
       it "sets ltiUsage configuration in env" do
         get :index, params: { account_id: account.id }
-        expect(assigns.dig(:js_env, :LTI_USAGE)).to include(
-          :env, :region, :canvasBaseUrl, :firstName, :locale, :rootAccountId, :rootAccountUuid
+        values = assigns.dig(:js_env, :LTI_USAGE)
+        expect(values).to include(
+          :env, :region, :canvasBaseUrl, :firstName, :locale, :rootAccountId, :rootAccountUuid, :isPremiumAccount
         )
+        expect(values[:rootAccountId]).to eq(account.root_account.id)
+        expect(values[:rootAccountUuid]).to eq(account.root_account.uuid)
+      end
+
+      context "with lti_usage_premium enabled" do
+        before do
+          account.enable_feature!(:lti_usage_premium)
+        end
+
+        it "says the account is a premium one" do
+          get :index, params: { account_id: account.id }
+          expect(assigns.dig(:js_env, :LTI_USAGE, :isPremiumAccount)).to be true
+        end
       end
     end
   end
@@ -799,6 +808,28 @@ RSpec.describe Lti::RegistrationsController do
         expect(response_json[:overlay]).to have_key(:versions)
         expect(response_json[:overlay][:versions].length).to eq(5)
       end
+
+      context "and one of the user's that modified the overlay is a site admin" do
+        specs_require_cache(:redis_cache_store)
+
+        let(:site_admin) { site_admin_user(name: "Don't Show Me!") }
+        let(:site_admin_overlay_version) do
+          lti_overlay_version_model(created_by: site_admin,
+                                    lti_overlay: overlay,
+                                    diff: [["+", "disabled_scopes[0]", "https://canvas.instructure.com/lti-ags/progress/scope/show"]])
+        end
+
+        before do
+          site_admin_overlay_version
+        end
+
+        it "omits the site admin user's name" do
+          subject
+          expect(response_json[:overlay]).to have_key(:versions)
+          expect(response_json[:overlay][:versions].length).to eq(5)
+          expect(response_json[:overlay][:versions].first[:created_by]).to eq("Instructure")
+        end
+      end
     end
 
     context "with a site admin registration" do
@@ -890,6 +921,7 @@ RSpec.describe Lti::RegistrationsController do
         vendor:,
         configuration: internal_lti_configuration,
         name:,
+        description: "neat little description",
         workflow_state: "on"
       }
     end
@@ -909,6 +941,7 @@ RSpec.describe Lti::RegistrationsController do
     it "is successful" do
       expect(subject).to be_successful
       expect(registration.reload.admin_nickname).to eq(admin_nickname)
+      expect(registration.description).to eq(params[:description])
       expect(registration.updated_by).to eq(admin)
     end
 
@@ -1701,7 +1734,8 @@ RSpec.describe Lti::RegistrationsController do
         name: "Test Tool",
         vendor: "Test Vendor",
         configuration: internal_lti_configuration,
-        admin_nickname: "Test Nickname"
+        admin_nickname: "Test Nickname",
+        description: "A great little description for this tool"
       }
     end
     let(:account) { account_model }
@@ -1745,6 +1779,10 @@ RSpec.describe Lti::RegistrationsController do
 
     it "creates a new LTI registration" do
       expect { subject }.to change { Lti::Registration.count }.by(1)
+      values = %w[name vendor admin_nickname description]
+      expect(Lti::Registration.last.attributes.values_at(*values)).to eql(
+        params.with_indifferent_access.values_at(*values)
+      )
     end
 
     it "creates a new Developer Key" do

@@ -28,10 +28,10 @@ export const ZLtiOverlay = z.object({
   account_id: ZAccountId,
   registration_id: ZLtiRegistrationId,
   root_account_id: ZAccountId,
-  data: ZLtiConfigurationOverlay.nullable().optional(),
+  data: ZLtiConfigurationOverlay,
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  updated_by: ZUser,
+  updated_by: ZUser.nullable(),
 })
 
 export type LtiOverlay = z.infer<typeof ZLtiOverlay>

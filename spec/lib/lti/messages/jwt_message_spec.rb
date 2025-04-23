@@ -621,7 +621,7 @@ describe Lti::Messages::JwtMessage do
 
     shared_examples "names and roles claim check" do
       it "sets the NRPS url using the Account#domain" do
-        expect_any_instance_of(Account).to receive(:environment_specific_domain).and_return("account_host")
+        allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("account_host")
         expect(lti_advantage_service_claim["context_memberships_url"]).to eq "polymorphic_url"
         expect(controller).to have_received(:polymorphic_url).with(
           [anything, :names_and_roles], host: "account_host"
@@ -1161,6 +1161,39 @@ describe Lti::Messages::JwtMessage do
 
     it "generate_post_payload_message does not raise an error" do
       expect { jwt_message.generate_post_payload_message }.not_to raise_error
+    end
+  end
+
+  describe "#include_asset_processor_eula_claims?" do
+    context "when the feature is enabled" do
+      before do
+        tool.context.root_account.enable_feature!(:lti_asset_processor)
+      end
+
+      it "returns true" do
+        expect(jwt_message.send(:include_asset_processor_eula_claims?)).to be true
+      end
+    end
+
+    context "when the feature is disabled" do
+      before do
+        tool.context.root_account.disable_feature!(:lti_asset_processor)
+      end
+
+      it "returns false" do
+        expect(jwt_message.send(:include_asset_processor_eula_claims?)).to be false
+      end
+    end
+  end
+
+  describe "#add_asset_processor_eula_claims!" do
+    subject { decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/eulaservice"] }
+
+    it "adds the EULA service claims to the message" do
+      expect(subject).to eq({
+                              "url" => "http://localhost/api/lti/asset_processor_eulas/#{tool.id}",
+                              "scope" => ["https://purl.imsglobal.org/spec/lti/scope/eula"]
+                            })
     end
   end
 end

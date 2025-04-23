@@ -142,7 +142,7 @@ export const mapRubricAssessmentDataUnderscoredKeysToCamelCase = (
   })
 }
 
-type RubricAssociationUnderscore = {
+export type RubricAssociationUnderscore = {
   id: string
   rubric_id: string
   use_for_grading: boolean

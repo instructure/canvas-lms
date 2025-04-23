@@ -21,6 +21,8 @@ import {render, screen} from '@testing-library/react'
 import NameLink from '../NameLink'
 import {BrowserRouter} from 'react-router-dom'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {queryClient} from '@canvas/query'
 
 const defaultProps = {
   isStacked: false,
@@ -31,7 +33,9 @@ const defaultProps = {
 const renderComponent = (props = {}) => {
   return render(
     <BrowserRouter>
-      <NameLink {...defaultProps} {...props} />
+      <MockedQueryClientProvider client={queryClient}>
+        <NameLink {...defaultProps} {...props} />
+      </MockedQueryClientProvider>
     </BrowserRouter>,
   )
 }

@@ -32,13 +32,7 @@ const consoleMessagesToIgnore = {
     /.*A theme registry has already been initialized.*/,
     // from an old discussions edit page
     /Error: Not implemented: navigation \(except hash changes\)/,
-    // Until INSTUI updates FormPropTypes.message
-    // see https://github.com/instructure/instructure-ui/issues/815
-    'Invalid prop `messages[0].text` of type `object` supplied to',
     /unknown pseudo-class selector/,
-
-    // until INSTUI fixes this in v8
-    'Warning: Failed prop type: Invalid prop `color` of value `secondary` supplied to `CondensedButton`, expected one of ["primary","primary-inverse"].',
 
     /uses the legacy childContextTypes API which is no longer supported/,
     /findDOMNode is deprecated/,

@@ -16,50 +16,97 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import MediaFileInfo from '../MediaFileInfo';
-import { MediaInfo, MediaTrack } from '@canvas/canvas-studio-player/react/types';
+import {render, screen} from '@testing-library/react'
+import {MediaFileInfo, MediaFileInfoProps} from '../MediaFileInfo'
+import type {File} from '../../../../../interfaces/File'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {queryClient} from '@canvas/query'
+import userEvent from '@testing-library/user-event'
+import {FAKE_MEDIA_TRACKS} from './fixtures'
+
+const defaultProps: MediaFileInfoProps = {
+  attachment: {
+    id: '1',
+    name: 'Sample File',
+    type: 'document',
+    media_entry_id: 'something',
+  } as unknown as File,
+  mediaTracks: FAKE_MEDIA_TRACKS,
+  canAddTracks: true,
+  isLoading: false,
+}
+
+const renderComponent = (props?: Partial<MediaFileInfoProps>) => {
+  return render(
+    <MockedQueryClientProvider client={queryClient}>
+      <MediaFileInfo {...defaultProps} {...props} />
+    </MockedQueryClientProvider>,
+  )
+}
 
 describe('MediaFileInfo', () => {
-  it('renders video options heading when mediaInfo is provided', () => {
-    const mockMediaInfo: MediaInfo = {
-      can_add_captions: true,
-      media_tracks: [],
-    } as unknown as MediaInfo;
+  it('renders None when no tracks', () => {
+    renderComponent({mediaTracks: []})
+    const none = screen.getByText('None')
+    expect(none).toBeInTheDocument()
+  })
 
-    render(<MediaFileInfo mediaInfo={mockMediaInfo} />);
-    expect(screen.getByText('Video Options')).toBeInTheDocument();
-    expect(screen.getByText('None')).toBeInTheDocument();
-  });
+  it('shows upload form on click', async () => {
+    renderComponent()
+    const formLabel = screen.queryByLabelText('Choose a language *')
+    expect(formLabel).not.toBeInTheDocument()
 
-  it('renders closed captions section when media tracks exist', () => {
-    const mockMediaTracks: MediaTrack[] = [
-      { id: '1', locale: 'en' },
-      { id: '2', locale: 'es' }
-    ] as unknown as MediaTrack[];
+    const button = screen.getByRole('button', {name: 'Add Captions/Subtitles'})
+    await userEvent.click(button)
 
-    const mockMediaInfo: MediaInfo = {
-      can_add_captions: true,
-      media_tracks: mockMediaTracks,
-    } as MediaInfo;
+    const visibleFormLabel = screen.getByLabelText('Choose a language*')
+    expect(visibleFormLabel).toBeInTheDocument()
+  })
 
-    render(<MediaFileInfo mediaInfo={mockMediaInfo} />);
-    expect(screen.getByText('Closed Captions/Subtitles')).toBeInTheDocument();
-    expect(screen.getByText('English')).toBeInTheDocument();
-    expect(screen.getByText('Spanish')).toBeInTheDocument();
-  });
+  it('shows captions if present', () => {
+    renderComponent()
+    const caption = screen.getByText('English')
+    expect(caption).toBeInTheDocument()
 
-  it('renders nothing when mediaInfo is null or captions are not allowed', () => {
-    const { container } = render(<MediaFileInfo mediaInfo={{} as MediaInfo} />);
-    expect(container.firstChild).toBeNull();
+    const none = screen.queryByText('None')
+    expect(none).not.toBeInTheDocument()
+  })
 
-    const mockMediaInfo: MediaInfo = {
-      can_add_captions: false,
-      media_tracks: [{ id: '1', locale: 'en' }] as MediaTrack[],
-    } as MediaInfo;
+  it('shows Media Options header while loading', () => {
+    renderComponent({isLoading: true})
+    const header = screen.getByText('Media Options')
+    const loadingIcon = screen.getByText('Loading')
+    expect(header).toBeInTheDocument()
+    expect(loadingIcon).toBeInTheDocument()
+  })
 
-    const { container: container2 } = render(<MediaFileInfo mediaInfo={mockMediaInfo} />);
-    expect(container2.firstChild).toBeNull();
-  });
-});
+  it('does not render if canAddTracks is false', () => {
+    renderComponent({canAddTracks: false})
+    const header = screen.queryByText('Media Options')
+    expect(header).not.toBeInTheDocument()
+  })
+
+  it('does not render if file is blueprint locked and in a child course', () => {
+    renderComponent({
+      attachment: {
+        ...defaultProps.attachment,
+        restricted_by_master_course: true,
+        is_master_course_child_content: true,
+      },
+    })
+    const header = screen.queryByText('Media Options')
+    expect(header).not.toBeInTheDocument()
+  })
+
+  it('does render if file is blueprint locked but in the parent course', () => {
+    renderComponent({
+      attachment: {
+        ...defaultProps.attachment,
+        restricted_by_master_course: true,
+        is_master_course_child_content: false,
+      },
+    })
+    const header = screen.getByText('Media Options')
+    expect(header).toBeInTheDocument()
+  })
+})

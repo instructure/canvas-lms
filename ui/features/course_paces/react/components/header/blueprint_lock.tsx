@@ -55,19 +55,16 @@ export class BlueprintLock extends React.Component<PassedProps & StoreProps & Di
   // @ts-expect-error
   private isCourseLevelPace
 
-  private useRedesign
-
   constructor(props: PassedProps & StoreProps & DispatchProps) {
     super(props)
     this.lockManager = new LockManager()
     this.tooltipMessage = I18n.t('Blueprint locking is only available for published paces')
-    this.useRedesign = window.ENV.FEATURES.course_paces_redesign
   }
 
   componentDidMount() {
     this.isCourseLevelPace = this.props.coursePace.context_type === 'Course'
 
-    if (!this.lockManager.shouldInit() || (!this.isCourseLevelPace && this.useRedesign)) {
+    if (!this.lockManager.shouldInit() || (!this.isCourseLevelPace)) {
       this.props.setBlueprintLocked(false)
       return null
     }
@@ -102,7 +99,7 @@ export class BlueprintLock extends React.Component<PassedProps & StoreProps & Di
   }
 
   render() {
-    if (!this.lockManager.shouldInit() || (!this.isCourseLevelPace && this.useRedesign)) return null
+    if (!this.lockManager.shouldInit() || (!this.isCourseLevelPace)) return null
 
     const disabledLock = (this.props.newPace || this.isCourseLevelPace === false) && !this.isChild
     const disabledStyle = {pointerEvents: 'none', opacity: '0.5'}

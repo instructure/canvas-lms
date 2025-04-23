@@ -102,7 +102,7 @@ describe('UploadButton', () => {
     renderComponent()
     expect(
       await screen.getByText(
-        'An file named "foo.txt" already exists in this location. Do you want to replace the existing file?',
+        'A file named "foo.txt" already exists in this location. Do you want to replace the existing file?',
       ),
     ).toBeInTheDocument()
   })

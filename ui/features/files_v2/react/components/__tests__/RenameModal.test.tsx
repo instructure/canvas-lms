@@ -82,6 +82,7 @@ describe('RenameModal', () => {
       await user.clear(input)
       await user.click(screen.getByRole('button', {name: 'Save'}))
       expect(await screen.findByText(`File name cannot be blank`)).toBeInTheDocument()
+      expect(input).toHaveFocus()
     })
 
     it('validates a name of all spaces correctly', async () => {
@@ -113,7 +114,7 @@ describe('RenameModal', () => {
         overwriteRoutes: true,
       })
       renderComponent()
-      const input = screen.getByRole('textbox', {name: 'File Name *'})
+      const input = screen.getByRole('textbox', {name: 'File Name'})
       await user.clear(input)
       await user.type(input, 'a')
       await user.click(screen.getByRole('button', {name: 'Save'}))
@@ -126,7 +127,7 @@ describe('RenameModal', () => {
       const user = userEvent.setup()
       fetchMock.put(`/api/v1/files/${FAKE_FILES[0].id}`, 500, {overwriteRoutes: true})
       renderComponent()
-      const input = screen.getByRole('textbox', {name: 'File Name *'})
+      const input = screen.getByRole('textbox', {name: 'File Name'})
       await user.clear(input)
       await user.type(input, 'a')
       await user.click(screen.getByRole('button', {name: 'Save'}))
@@ -136,7 +137,7 @@ describe('RenameModal', () => {
     it('submits on enter', async () => {
       const user = userEvent.setup()
       renderComponent()
-      const input = screen.getByRole('textbox', {name: 'File Name *'})
+      const input = screen.getByRole('textbox', {name: 'File Name'})
       await user.clear(input)
       await user.type(input, 'validfilename')
       await user.type(input, '{enter}')
@@ -179,6 +180,7 @@ describe('RenameModal', () => {
       await user.clear(input)
       await user.click(screen.getByRole('button', {name: 'Save'}))
       expect(await screen.findByText(`Folder name cannot be blank`)).toBeInTheDocument()
+      expect(input).toHaveFocus()
     })
 
     it('validates a name of all spaces correctly', async () => {

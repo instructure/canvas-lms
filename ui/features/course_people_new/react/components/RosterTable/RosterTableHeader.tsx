@@ -22,14 +22,16 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import useCoursePeopleContext from '../../hooks/useCoursePeopleContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ASC, ASCENDING, DESCENDING} from '../../../util/constants'
+import {SortField, SortDirection, TableHeaderSortDirection} from '../../../types'
 
 const I18n = createI18nScope('course_people')
 
 export type RosterTableHeaderProps = {
   allSelected: boolean
   someSelected: boolean
-  sortBy: string
-  direction: 'ascending' | 'descending' | 'none'
+  sortField: SortField
+  sortDirection: SortDirection
   handleSelectAll: (checked: boolean) => void
   handleSort: (event: SyntheticEvent<Element, Event>, {id}: {id: string}) => void
 }
@@ -37,8 +39,8 @@ export type RosterTableHeaderProps = {
 const RosterTableHeader: FC<RosterTableHeaderProps> = ({
   allSelected,
   someSelected,
-  sortBy,
-  direction,
+  sortField,
+  sortDirection,
   handleSelectAll,
   handleSort
 }) => {
@@ -59,17 +61,24 @@ const RosterTableHeader: FC<RosterTableHeaderProps> = ({
     id,
     name,
     width
-  }) => (
-    <Table.ColHeader
-      id={id}
-      width={width}
-      onRequestSort={handleSort}
-      sortDirection={id === sortBy ? direction : 'none'}
-      data-testid={`header-${id}`}
-    >
-      {name}
-    </Table.ColHeader>
-  )
+  }) => {
+    let sortOrder: TableHeaderSortDirection = 'none'
+    if (id === sortField) {
+      sortOrder = sortDirection === ASC ? ASCENDING : DESCENDING
+    }
+
+    return (
+      <Table.ColHeader
+        id={id}
+        width={width}
+        onRequestSort={handleSort}
+        sortDirection={sortOrder}
+        data-testid={`header-${id}`}
+      >
+        {name}
+      </Table.ColHeader>
+    )
+  }
 
   return (
     <Table.Head
@@ -108,7 +117,7 @@ const RosterTableHeader: FC<RosterTableHeaderProps> = ({
         {canViewLoginIdColumn
           ? (
               <CustomColHeader
-                id="loginID"
+                id="login_id"
                 name= {I18n.t("Login ID")}
                 width="13%"
               />
@@ -118,7 +127,7 @@ const RosterTableHeader: FC<RosterTableHeaderProps> = ({
         {canViewSisIdColumn
           ? (
               <CustomColHeader
-                id="sisID"
+                id="sis_id"
                 name={I18n.t("SIS ID")}
                 width="9%"
               />
@@ -153,13 +162,13 @@ const RosterTableHeader: FC<RosterTableHeaderProps> = ({
         {canReadReports
           ? (
               <CustomColHeader
-                id="totalActivity"
+                id="total_activity_time"
                 name={I18n.t("Total Activity")}
                 width="13%"
               />
             )
           : <></>
-        } 
+        }
         <Table.ColHeader
           id="userOptionsMenu"
           width="36px"

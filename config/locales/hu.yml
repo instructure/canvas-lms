@@ -13896,6 +13896,7 @@ hu:
   load_bank: 
     error_loading_banks: "Hiba lépett fel a bankok betöltése közben"
     loading_banks: "Bankok betöltése..."
+  load_in_a_new_tab_829731ab: "Betöltés új lapon"
   load_more_35d33c7: "Továbbiak betöltése"
   load_more_a36f9cf9: "Továbbiak betöltése"
   load_more_results_460f49a9: "További eredmények betöltése"
@@ -16542,6 +16543,7 @@ hu:
   move_group_3dd7f76e: "Csoport áthelyezése"
   move_group_77ae285d: "Csoport áthelyezése..."
   move_grouptitle_20927676: "\"%{groupTitle} áthelyezése\""
+  move_item_e94a8103: "Elem áthelyezése"
   move_item_failed_8e4c1db6: "Elem áthelyezése sikertelen"
   move_module_346b8112: "Modul áthelyezése..."
   move_module_90e6927e: "Modul áthelyezése"
@@ -16827,6 +16829,7 @@ hu:
   new_opportunities_7d349c4d: "Új lehetőségek"
   new_outcome_7fba8c7d: "Új tanulási eredmény"
   new_outcome_group_af59f145: "Új tanulási eredménycsoport"
+  new_page_84b28714: "Új oldal"
   new_password_1232cbf2: "Új jelszó"
   new_question_9107c469: "Új kérdés"
   new_question_bank_732bbf83: "Új kérdésbank"
@@ -25954,6 +25957,7 @@ hu:
   trusted_account_669ba397: "Megbízható fiók"
   trusted_account_url_e6200e41: "Megbízható fiók URL címe"
   try_again_6ca44338: "Próbálja újra"
+  try_again_ad656c3c: "Próbálja újra"
   ttml_tracks_are_not_allowed_because_they_are_susce_d40b654a: "A TTML sávok nem engedélyezettek, mert fogékonyak az xss támadásokra."
   tue_bb10b386: Ke
   tuesday_698a01b: Kedd

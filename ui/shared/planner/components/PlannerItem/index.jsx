@@ -363,8 +363,8 @@ export class PlannerItem_raw extends Component {
             isWithinText={false}
             themeOverride={{
               mediumPaddingHorizontal: '0',
-              linkColor: this.props.simplifiedControls ? colors.licorice : undefined,
-              linkHoverColor: this.props.simplifiedControls ? colors.licorice : undefined,
+              linkColor: this.props.simplifiedControls ? colors.contrasts.grey125125 : undefined,
+              linkHoverColor: this.props.simplifiedControls ? colors.contrasts.grey125125 : undefined,
             }}
             elementRef={link => {
               this.itemLink = link
@@ -389,8 +389,8 @@ export class PlannerItem_raw extends Component {
         href={this.props.html_url}
         isWithinText={false}
         themeOverride={{
-          linkColor: this.props.simplifiedControls ? colors.licorice : undefined,
-          linkHoverColor: this.props.simplifiedControls ? colors.licorice : undefined,
+          ...(this.props.simplifiedControls? {color: colors.contrasts.grey125125} :{}),
+          ...(this.props.simplifiedControls? {linkHoverColor: colors.contrasts.grey125125} :{}),
         }}
         elementRef={link => {
           this.itemLink = link

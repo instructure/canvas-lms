@@ -24,8 +24,8 @@ import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/
 import {
   createLti1p3RegistrationOverlayStore,
   type Lti1p3RegistrationOverlayStore,
-} from './Lti1p3RegistrationOverlayState'
-import {convertToLtiConfigurationOverlay} from './Lti1p3RegistrationOverlayStateHelpers'
+} from '../registration_overlay/Lti1p3RegistrationOverlayStore'
+import {convertToLtiConfigurationOverlay} from '../registration_overlay/Lti1p3RegistrationOverlayStateHelpers'
 
 import type {Lti1p3RegistrationWizardService} from './Lti1p3RegistrationWizardService'
 import {create} from 'zustand'

@@ -23,9 +23,8 @@ import React from 'react'
 import {createRoot} from 'react-dom/client'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
-import {IconWarningSolid} from '@instructure/ui-icons'
 import {Tag} from '@instructure/ui-tag'
-import {Text} from '@instructure/ui-text'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 
 const I18n = createI18nScope('assignment!reupload_submissions_helper')
 
@@ -104,14 +103,11 @@ export function setupSubmitHandler(userAssetString) {
               />
             </Flex.Item>
             {!isZip && (
-              <Flex as="div" alignItems="center" margin="xx-small 0 0 0" id="file_type_error_text">
-                <Flex.Item as="div" margin="0 xx-small xxx-small 0">
-                  <IconWarningSolid color="error" />
-                </Flex.Item>
-                <Text size="small" color="danger">
-                  {I18n.t('File type must be .zip')}
-                </Text>
-              </Flex>
+              <FormattedErrorMessage
+                message={I18n.t('File type must be .zip')}
+                margin="xx-small 0 0 0"
+                iconMargin="0 xx-small xxx-small 0"
+              />
             )}
           </Flex>,
         )

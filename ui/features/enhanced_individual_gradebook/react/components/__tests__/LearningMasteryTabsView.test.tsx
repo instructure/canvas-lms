@@ -294,7 +294,7 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
     })
   })
 
-  describe('without presets on induvidual gradebook', () => {
+  describe('without presets on individual gradebook', () => {
     it('renders without error', async () => {
       const {queryByTestId, getByTestId, findByTestId} = renderLearningMasteryGradebookWrapper()
 
@@ -364,6 +364,70 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
           'Select an assignment to view additional information here.',
         ),
       ).toBeInTheDocument()
+    })
+  })
+
+  describe('learning mastery tab', () => {
+    describe('with account_level_mastery_scales turned OFF', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES = {instui_nav: true, account_level_mastery_scales: false}
+        mockSearchParams({student: '5', outcome: '1'})
+      })
+
+      it('renders student outcome rollup results with outcome mastery points', async () => {
+        const {getByText} = renderLearningMasteryGradebookWrapper()
+
+        const learningMasteryTab = getByText('Learning Mastery')
+        expect(learningMasteryTab).toBeInTheDocument()
+
+        fireEvent.click(learningMasteryTab)
+
+        const studentOutcomeRollupResult = getByText('Current Mastery Score: 5 out of 3')
+        expect(studentOutcomeRollupResult).toBeInTheDocument()
+      })
+
+      it('renders outcome information with outcome calculation method and calculation int', async () => {
+        const {getByText} = renderLearningMasteryGradebookWrapper()
+
+        const learningMasteryTab = getByText('Learning Mastery')
+        expect(learningMasteryTab).toBeInTheDocument()
+
+        fireEvent.click(learningMasteryTab)
+
+        const outcomeInformation = getByText('Calculation Method: Decaying Average - 65%/35%')
+        expect(outcomeInformation).toBeInTheDocument()
+      })
+    })
+
+    describe('with account_level_mastery_scales turned ON', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES = {instui_nav: true, account_level_mastery_scales: true}
+        mockSearchParams({student: '5', outcome: '1'})
+      })
+
+      it('renders student outcome rollup results with course outcome proficiency mastery points', async () => {
+        const {getByText} = renderLearningMasteryGradebookWrapper()
+
+        const learningMasteryTab = getByText('Learning Mastery')
+        expect(learningMasteryTab).toBeInTheDocument()
+
+        fireEvent.click(learningMasteryTab)
+
+        const studentOutcomeRollupResult = getByText('Current Mastery Score: 5 out of 5')
+        expect(studentOutcomeRollupResult).toBeInTheDocument()
+      })
+
+      it('renders outcome information with course outcome calculation method', async () => {
+        const {getByText} = renderLearningMasteryGradebookWrapper()
+
+        const learningMasteryTab = getByText('Learning Mastery')
+        expect(learningMasteryTab).toBeInTheDocument()
+
+        fireEvent.click(learningMasteryTab)
+
+        const outcomeInformation = getByText('Calculation Method: Achieve mastery 5 times')
+        expect(outcomeInformation).toBeInTheDocument()
+      })
     })
   })
 })

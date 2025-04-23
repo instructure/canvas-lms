@@ -210,9 +210,9 @@ describe "blueprint courses assignments" do
       expect(f("[data-testid='assignment-name-input']")).to be_disabled
       expect(f("[data-testid='points-input']")).to be_disabled
       # Date
-      expect(f("#Selectable_0")).to be_disabled
+      expect(f("#Selectable___0")).to be_disabled
       # Time
-      expect(f("#Select_0")).to be_disabled
+      expect(f("#Select___0")).to be_disabled
     end
 
     it "does allow popup editing of non-restricted items" do
@@ -225,9 +225,9 @@ describe "blueprint courses assignments" do
       expect(f("[data-testid='assignment-name-input']")).not_to be_disabled
       expect(f("[data-testid='points-input']")).not_to be_disabled
       # Date
-      expect(f("#Selectable_0")).not_to be_disabled
+      expect(f("#Selectable___0")).not_to be_disabled
       # Time
-      expect(f("#Select_0")).not_to be_disabled
+      expect(f("#Select___0")).not_to be_disabled
     end
 
     it "allows certain fields to be edited when allowed by blueprint course" do
@@ -241,9 +241,9 @@ describe "blueprint courses assignments" do
       expect(f("[data-testid='points-input']")).not_to be_disabled
 
       # Date
-      expect(f("#Selectable_0")).to be_disabled
+      expect(f("#Selectable___0")).to be_disabled
       # Time
-      expect(f("#Select_0")).to be_disabled
+      expect(f("#Select___0")).to be_disabled
     end
   end
 

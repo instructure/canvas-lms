@@ -348,7 +348,7 @@ describe ContextController do
     end
 
     context "profiles enabled" do
-      before do
+      before :once do
         account_admin_user
         course_with_student(active_all: true)
 
@@ -384,10 +384,13 @@ describe ContextController do
       end
 
       context "show_recent_messages_on_new_roster_user_page enabled" do
-        before do
+        before :once do
           Account.site_admin.enable_feature!(:show_recent_messages_on_new_roster_user_page)
           topic = @course.discussion_topics.create!(user: @student, message: "Discussion")
           (1..11).each { |number| topic.discussion_entries.create!(message: number, user: @student) }
+        end
+
+        before do
           user_session(@admin)
         end
 
@@ -403,16 +406,34 @@ describe ContextController do
           get "roster_user", params: { course_id: @course.id, id: @student.id }
           expect(assigns[:messages]).to be_nil
         end
+
+        it "excludes anonymous discussion topics" do
+          @course.discussion_topics.last.update(anonymous_state: "full_anonymity")
+          get "roster_user", params: { course_id: @course.id, id: @student.id }
+          messages = assigns[:messages]
+          expect(messages.count).to eq(0)
+        end
+
+        it "excludes anonymous discussion entries in partially anonymous discussion topics" do
+          @course.discussion_topics.last.update(anonymous_state: "partial_anonymity")
+          @course.discussion_topics.last.discussion_entries.where(message: %w[1 3 5 7]).update_all(is_anonymous_author: true)
+          get "roster_user", params: { course_id: @course.id, id: @student.id }
+          messages = assigns[:messages]
+          expect(messages.pluck(:message)).to eq(%w[11 10 9 8 6 4 2])
+        end
       end
     end
   end
 
   describe "POST 'object_snippet'" do
-    before do
+    before :once do
       @obj = "<object data='test'></object>"
-      allow(HostUrl).to receive(:is_file_host?).and_return(true)
       @data = Base64.encode64(@obj)
       @hmac = Canvas::Security.hmac_sha1(@data)
+    end
+
+    before do
+      allow(HostUrl).to receive(:is_file_host?).and_return(true)
     end
 
     it "requires a valid HMAC" do
@@ -428,10 +449,13 @@ describe ContextController do
   end
 
   describe "GET 'prior_users" do
-    before do
-      user_session(@teacher)
+    before :once do
       create_users_in_course(@course, 21)
       @course.student_enrollments.update_all(workflow_state: "completed")
+    end
+
+    before do
+      user_session(@teacher)
     end
 
     it "paginates" do
@@ -658,7 +682,7 @@ describe ContextController do
   describe "GET 'roster_user_usage'" do
     before(:once) do
       page = @course.wiki_pages.create(title: "some page")
-      AssetUserAccess.create!(
+      @asset_user_access_wiki = AssetUserAccess.create!(
         { user_id: @student, asset_code: page.asset_string, context: @course, category: "pages" }
       )
     end
@@ -679,6 +703,48 @@ describe ContextController do
 
       expect(response).to be_successful
       expect(json_parse(response.body).length).to eq 1
+    end
+
+    context "bad discussion topic context" do
+      before do
+        @group = @course.groups.create!
+        @group.add_user(@student, "accepted")
+
+        @course_discussion_topic = DiscussionTopic.create!(context: @course)
+        @group_discussion_topic = DiscussionTopic.create!(context: @group)
+
+        course_asset = { code: @course_discussion_topic.asset_string, category: "topics" }
+        group_asset = { code: @group_discussion_topic.asset_string, category: "topics" }
+
+        @asset_user_access_1 = AssetUserAccess.log(@student, @course, course_asset)
+        @asset_user_access_2 = AssetUserAccess.log(@student, @course, group_asset)
+        @asset_user_access_3 = AssetUserAccess.log(@student, @group, course_asset)
+        @asset_user_access_4 = AssetUserAccess.log(@student, @group, group_asset)
+      end
+
+      context "html" do
+        it "filters out bad access records" do
+          user_session(@teacher)
+
+          get :roster_user_usage, params: { course_id: @course.id, user_id: @student.id }
+
+          expect(response).to be_successful
+          expect(assigns[:accesses])
+            .to contain_exactly(@asset_user_access_wiki, @asset_user_access_1, @asset_user_access_4)
+        end
+      end
+
+      context "json" do
+        it "filters out bad access records" do
+          user_session(@teacher)
+
+          get :roster_user_usage, params: { course_id: @course.id, user_id: @student.id }, format: :json
+
+          expect(response).to be_successful
+          expect(json_parse(response.body).pluck("asset_user_access").pluck("id"))
+            .to contain_exactly(@asset_user_access_wiki.id, @asset_user_access_1.id, @asset_user_access_4.id)
+        end
+      end
     end
   end
 end

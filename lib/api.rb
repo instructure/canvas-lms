@@ -675,6 +675,13 @@ module Api
     Html::Content.process_incoming(html, host:, port:)
   end
 
+  def process_attachment_links(html, context, context_field_name = nil, user = @current_user, session = nil)
+    attachment_ids = Html::Content.collect_attachment_ids(html)
+    return if attachment_ids.blank?
+
+    AttachmentAssociation.update_associations(context, attachment_ids, user, session, context_field_name)
+  end
+
   delegate :value_to_boolean, to: :"Canvas::Plugin"
 
   # takes a comma separated string, an array, or nil and returns an array

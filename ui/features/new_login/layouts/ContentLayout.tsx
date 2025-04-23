@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Responsive} from '@instructure/ui-responsive'
-import {canvas} from '@instructure/ui-theme-tokens'
+import {canvas} from '@instructure/ui-themes'
 import {View} from '@instructure/ui-view'
 import classNames from 'classnames'
 import React, {Suspense} from 'react'

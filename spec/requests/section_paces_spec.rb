@@ -30,7 +30,6 @@ describe "Section Paces API" do
   let(:unrelated_section) { add_section("Section Three", course: course_factory) }
 
   before do
-    Account.site_admin.enable_feature!(:course_paces_redesign)
     2.times { multiple_student_enrollment(user_model, section_two, course:) }
     course.enroll_student(@user = user_factory, enrollment_state: "active")
     user_session(teacher)
@@ -269,51 +268,6 @@ describe "Section Paces API" do
     it "returns 404 if the section does not have a pace" do
       delete api_v1_delete_section_pace_path(course, section), params: { format: :json }
       expect(response).to have_http_status :not_found
-    end
-  end
-
-  context "course_paces_redesign flag is disabled" do
-    before do
-      Account.site_admin.disable_feature!(:course_paces_redesign)
-    end
-
-    describe "show" do
-      let(:section_pace) { section_pace_model(section:) }
-      let(:course_pace) { course_pace_model(course:) }
-
-      it "returns 404" do
-        get api_v1_section_pace_path(course.id, section_pace.id), params: { format: :json }
-        expect(response).to have_http_status :not_found
-      end
-    end
-
-    describe "create" do
-      it "returns 404" do
-        post api_v1_new_section_pace_path(course, section), params: { format: :json }
-        expect(response).to have_http_status :not_found
-      end
-    end
-
-    describe "update" do
-      before { section_pace_model(section:) }
-
-      it "returns 404" do
-        patch api_v1_patch_section_pace_path(course, section), params: {
-          format: :json,
-          pace: {
-            exclude_weekends: true
-          }
-        }
-        expect(response).to have_http_status :not_found
-      end
-    end
-
-    describe "delete" do
-      it "returns 404" do
-        pace = section_pace_model(section:)
-        delete api_v1_delete_section_pace_path(course, section, pace), params: { format: :json }
-        expect(response).to have_http_status :not_found
-      end
     end
   end
 end

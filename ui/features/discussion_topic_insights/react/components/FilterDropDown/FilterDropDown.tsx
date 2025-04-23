@@ -16,26 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import useInsightStore from '../../hooks/useInsightStore'
 
 const I18n = createI18nScope('discussions_insights')
 
 const filterOptions = [
   {value: 'all', label: I18n.t('All')},
   {value: 'relevant', label: I18n.t('Relevant')},
-  {value: 'needsReview', label: I18n.t('Needs Review')},
+  {value: 'needs_review', label: I18n.t('Needs Review')},
   {value: 'irrelevant', label: I18n.t('Irrelevant')},
 ]
 
-type FilterDropDownProps = {
-  onFilterClick: () => void
-}
-
-const FilterDropDown: React.FC<FilterDropDownProps> = ({onFilterClick}) => {
-  const [filterType, setFilterType] = useState('all')
+const FilterDropDown = () => {
+  const filterType = useInsightStore(state => state.filterType)
+  const setFilterType = useInsightStore(state => state.setFilterType)
 
   const handleSortOrderTypeChange = (
     _event: React.SyntheticEvent,
@@ -45,7 +43,6 @@ const FilterDropDown: React.FC<FilterDropDownProps> = ({onFilterClick}) => {
     },
   ) => {
     setFilterType(data.value as string)
-    onFilterClick?.()
   }
 
   return (

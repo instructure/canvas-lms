@@ -30,6 +30,7 @@ $(() => {
     totalPages: ENV.accesses_total_pages,
     url,
     loaderMsg: I18n.t('loading_more_results', 'Loading more results'),
+    container: $('#drawer-layout-content'),
     scrape(data) {
       if (typeof data === 'string') {
         try {

@@ -967,6 +967,9 @@ class CoursesController < ApplicationController
 
       respond_to do |format|
         if @course.save
+          if @course.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+            process_attachment_links(@course.syllabus_body, @course, "syllabus_body", @current_user)
+          end
           Auditors::Course.record_created(@course, @current_user, changes, source: (api_request? ? :api : :manual))
           @course.enroll_user(@current_user, "TeacherEnrollment", enrollment_state: "active") if params[:enroll_me].to_s == "true"
           @course.require_assignment_group
@@ -3053,7 +3056,6 @@ class CoursesController < ApplicationController
   # @argument course[enable_course_paces] [Boolean]
   #   Enable or disable Course Pacing for the course. This setting only has an effect when the Course Pacing feature flag is
   #   enabled for the sub-account. Otherwise, Course Pacing are always disabled.
-  #     Note: Course Pacing is in active development.
   #
   # @argument course[conditional_release] [Boolean]
   #   Enable or disable individual learning paths for students based on assessment
@@ -3371,7 +3373,7 @@ class CoursesController < ApplicationController
 
       # Republish course paces if the course dates have been changed
       term_changed = (@course.enrollment_term_id != enrollment_term_id) && term_id_param_was_sent
-      if @course.account.feature_enabled?(:course_paces) && (course_availability_changed || term_changed)
+      if course_availability_changed || term_changed
         @course.course_paces.find_each(&:create_publish_progress)
       end
       disable_conditional_release if changes[:conditional_release]&.last == false
@@ -3383,6 +3385,9 @@ class CoursesController < ApplicationController
         @current_user.touch
         if params[:update_default_pages]
           @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
+        end
+        if @course.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+          process_attachment_links(@course.syllabus_body, @course, "syllabus_body", @current_user)
         end
         # Sync homeroom enrollments and participation if enabled and course isn't a SIS import
         if @course.can_sync_with_homeroom?

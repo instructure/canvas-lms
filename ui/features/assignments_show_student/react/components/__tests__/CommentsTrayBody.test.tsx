@@ -149,6 +149,7 @@ const getDefaultPropsWithReviewerSubmission = async (workflowState: string) => {
 
 describe('CommentsTrayBody', () => {
   beforeAll(() => {
+    ENV.current_user = {id: '1'}
     $('body').append('<div role="alert" id=flash_screenreader_holder />')
   })
 

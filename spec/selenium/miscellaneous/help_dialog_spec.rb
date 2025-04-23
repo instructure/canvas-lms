@@ -135,7 +135,7 @@ describe "help dialog" do
       settings_menu = f("#speed_grader_settings_mount_point")
       settings_menu.click
 
-      trigger = f("ul[role=menu] span[name=help][role=menuitem]")
+      trigger = f("div[role=menu] span[name=help][role=menuitem]")
 
       trigger.location_once_scrolled_into_view
       expect(trigger).to be_displayed

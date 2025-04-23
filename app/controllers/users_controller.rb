@@ -526,10 +526,16 @@ class UsersController < ApplicationController
     js_env({ K5_USER: k5_user && !k5_disabled }, true)
 
     # things needed on both k5 and classic dashboards
-    create_permission_root_account = @current_user.create_courses_right(@domain_root_account)
+    create_permission_root_account = @current_user.create_courses_right(@domain_root_account, check_subaccounts: true)
     create_permission_mcc_account = @current_user.create_courses_right(@domain_root_account.manually_created_courses_account)
     create_permission_alternate_account = @current_user.alternate_account_for_course_creation && @current_user.create_courses_right(@current_user.alternate_account_for_course_creation)
 
+    mcc_only = if create_permission_alternate_account
+                 # admin can always create courses in other accounts/subaccounts
+                 false
+               else
+                 !(create_permission_root_account && @domain_root_account.feature_enabled?(:create_course_subaccount_picker))
+               end
     js_env({
              PREFERENCES: {
                dashboard_view: @current_user.dashboard_view(@domain_root_account),
@@ -542,7 +548,7 @@ class UsersController < ApplicationController
              ALLOW_ELEMENTARY_DASHBOARD: k5_disabled && k5_user,
              CREATE_COURSES_PERMISSIONS: {
                PERMISSION: create_permission_alternate_account || create_permission_root_account || create_permission_mcc_account,
-               RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account) && !(@domain_root_account.feature_enabled?(:create_course_subaccount_picker) && create_permission_alternate_account),
+               RESTRICT_TO_MCC_ACCOUNT: mcc_only,
              },
              OBSERVED_USERS_LIST: observed_users_list,
              CAN_ADD_OBSERVEE: @current_user
@@ -825,6 +831,7 @@ class UsersController < ApplicationController
       opts[:context] = Context.find_by_asset_string(params[:context_code]) if params[:context_code]
       opts[:submission_user_id] = params[:submission_user_id] if params.key?(:submission_user_id)
       opts[:only_active_courses] = value_to_boolean(params[:only_active_courses]) if params.key?(:only_active_courses)
+      opts[:notification_categories] = params[:notification_categories] if params.key?(:notification_categories)
       api_render_stream(opts)
     else
       render_unauthorized_action
@@ -896,9 +903,12 @@ class UsersController < ApplicationController
       @courses.select! { |c| c.grants_all_rights?(@current_user, :read_as_admin, :read) }
     end
 
+    current_course = Course.find_by(id: params[:current_course_id]) if params[:current_course_id].present?
     MasterCourses::MasterTemplate.preload_is_master_course(@courses)
+
     render json: @courses.map { |c|
-      { label: c.nickname_for(@current_user),
+      {
+        label: c.nickname_for(@current_user),
         id: c.id,
         course_code: c.course_code,
         sis_id: c.sis_source_id,
@@ -908,7 +918,8 @@ class UsersController < ApplicationController
         account_id: c.enrollment_term.root_account.id,
         start_at: datetime_string(c.start_at, :verbose, nil, true),
         end_at: datetime_string(c.conclude_at, :verbose, nil, true),
-        blueprint: MasterCourses::MasterTemplate.is_master_course?(c) }
+        blueprint: MasterCourses::MasterTemplate.is_master_course?(c)
+      }.merge(locale_dates_for(c, current_course))
     }
   end
 
@@ -3382,6 +3393,17 @@ class UsersController < ApplicationController
       nil
     else
       raise "Error connecting to recaptcha #{response}"
+    end
+  end
+
+  def locale_dates_for(course, current_course)
+    return { start_at_locale: nil, end_at_locale: nil } unless current_course&.locale.present?
+
+    I18n.with_locale(current_course.locale) do
+      {
+        start_at_locale: datetime_string(course.start_at, :verbose, nil, true),
+        end_at_locale: datetime_string(course.conclude_at, :verbose, nil, true)
+      }
     end
   end
 end

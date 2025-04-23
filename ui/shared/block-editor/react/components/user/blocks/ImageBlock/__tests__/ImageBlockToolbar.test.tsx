@@ -172,8 +172,8 @@ describe('ImageBlockToolbar', () => {
     expect(containMenuItem).toBeInTheDocument()
     expect(aspectRatioMenuItem).toBeInTheDocument()
 
-    const li = coverMenuItem.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
+    const li = coverMenuItem?.parentElement?.parentElement as HTMLLIElement
+    expect(li?.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
   })
 
   it('changes the constraint prop', async () => {
@@ -198,12 +198,12 @@ describe('ImageBlockToolbar', () => {
     fireEvent.click(btn)
 
     const coverMenuItem = screen.getByText('Cover')
-    let li = coverMenuItem.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
+    let li = coverMenuItem?.parentElement?.parentElement as HTMLLIElement
+    expect(li?.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
 
     const aspectRatioMenuItem = screen.getByText('Match Aspect Ratio')
-    li = aspectRatioMenuItem.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).not.toBeInTheDocument()
+    li = aspectRatioMenuItem?.parentElement?.parentElement as HTMLLIElement
+    expect(li?.querySelector('svg[name="IconCheck"]')).not.toBeInTheDocument()
 
     fireEvent.click(aspectRatioMenuItem)
 
@@ -224,7 +224,7 @@ describe('ImageBlockToolbar', () => {
     expect(screen.getByText('Fixed size')).toBeInTheDocument()
     expect(screen.getByText('Percent size')).toBeInTheDocument()
     expect(
-      screen.getByText('Auto').closest('li')?.querySelector('svg[name="IconCheck"'),
+      screen.getByText('Auto')?.parentElement?.parentElement?.querySelector('svg[name="IconCheck"'),
     ).toBeInTheDocument()
 
     fireEvent.click(screen.getByText('Fixed size'))

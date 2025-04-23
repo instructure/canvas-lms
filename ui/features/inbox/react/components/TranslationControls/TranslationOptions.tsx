@@ -16,47 +16,50 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState, useRef, useMemo } from 'react'
-import { Flex } from '@instructure/ui-flex'
-import { Text } from '@instructure/ui-text'
-import { RadioInput } from '@instructure/ui-radio-input'
+import React, {useState, useRef, useMemo} from 'react'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import {RadioInput} from '@instructure/ui-radio-input'
 import CanvasMultiSelect from '@canvas/multi-select/react'
-import { useScope as createI18nScope } from '@canvas/i18n'
-import { Language } from './TranslationControls'
-import { Button } from '@instructure/ui-buttons'
-import { View } from '@instructure/ui-view'
-import AiIcon from '@canvas/ai-icon'
-import { useTranslationContext } from '../../hooks/useTranslationContext'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Language} from './TranslationControls'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
+import {IconAiLine} from '@instructure/ui-icons'
+import {useTranslationContext} from '../../hooks/useTranslationContext'
 
 const I18n = createI18nScope('conversations_2')
 
 interface Props {
-  asPrimary: boolean | null,
+  asPrimary: boolean | null
   onSetPrimary: (value: boolean) => void
 }
 
-const TranslationOptions: React.FC<Props> = ({ asPrimary, onSetPrimary }) => {
+const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
   // @ts-expect-error
   const languages = useRef<Language[]>(ENV?.inbox_translation_languages ?? [])
-  const [input, setInput] = useState("")
-  const [selectedId, setSelectedId] = useState<Language['id'] | null>(null)
+  const [input, setInput] = useState('')
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null)
 
-  const { setTranslationTargetLanguage, translateBody, translating: translationLoading } = useTranslationContext()
+  const {
+    setTranslationTargetLanguage,
+    translateBody,
+    translating: translationLoading,
+  } = useTranslationContext()
 
   const handleChange = (selectedArray: string[]) => {
     const id = selectedArray[0]
-    const result = languages.current.find(({ id: _id }) => id === _id)
+    const result = languages.current.find(({id: _id}) => id === _id)
 
     if (!result) {
       return
     }
 
-    if (selectedId !== result.id) {
+    if (selectedLanguage?.id !== result.id) {
       setInput(result.name)
-      setSelectedId(result.id)
+      setSelectedLanguage(result)
       setTranslationTargetLanguage(result.id)
     }
-
   }
 
   const handleSubmit = () => {
@@ -64,15 +67,14 @@ const TranslationOptions: React.FC<Props> = ({ asPrimary, onSetPrimary }) => {
       return
     }
 
-    if (!selectedId) {
-      const result = languages.current.find(({ name }) => name === input)
+    if (!selectedLanguage) {
+      const result = languages.current.find(({name}) => name === input)
 
       if (result) {
-        setSelectedId(result.id)
+        setSelectedLanguage(result)
       } else {
-
-      // TODO: error handling
-      return
+        // TODO: error handling
+        return
       }
     }
 
@@ -83,13 +85,12 @@ const TranslationOptions: React.FC<Props> = ({ asPrimary, onSetPrimary }) => {
     translateBody(asPrimary === null ? false : asPrimary)
   }
 
-
   const filteredLanguages: Language[] = useMemo(() => {
     if (!input) {
       return languages.current
     }
 
-    return languages.current.filter(({ name }) => name.toLowerCase().startsWith(input.toLowerCase()))
+    return languages.current.filter(({name}) => name.toLowerCase().startsWith(input.toLowerCase()))
   }, [languages, input])
 
   const isDisabled = !input || translationLoading
@@ -101,19 +102,19 @@ const TranslationOptions: React.FC<Props> = ({ asPrimary, onSetPrimary }) => {
           <Flex margin="0 0 medium 0" gap="mediumSmall" alignItems="end">
             <Flex.Item shouldGrow>
               <CanvasMultiSelect
-                label={I18n.t("Translate To")}
-                placeholder={I18n.t("Select a language...")}
+                label={I18n.t('Translate To')}
+                placeholder={I18n.t('Select a language...')}
                 onChange={handleChange}
                 inputValue={input}
                 onInputChange={e => setInput(e.target.value)}
               >
-                {filteredLanguages.map(({ id, name }) => (
+                {filteredLanguages.map(({id, name}) => (
                   <CanvasMultiSelect.Option
                     key={id}
                     label={name}
                     id={id}
                     value={name}
-                    isSelected={id === selectedId}
+                    isSelected={id === selectedLanguage?.id}
                   >
                     {name}
                   </CanvasMultiSelect.Option>
@@ -121,7 +122,14 @@ const TranslationOptions: React.FC<Props> = ({ asPrimary, onSetPrimary }) => {
               </CanvasMultiSelect>
             </Flex.Item>
             <Flex.Item>
-              <Button renderIcon={AiIcon} color="secondary" disabled={isDisabled} onClick={handleSubmit}>{I18n.t("Translate")}</Button>
+              <Button
+                renderIcon={() => <IconAiLine />}
+                color="secondary"
+                disabled={isDisabled}
+                onClick={handleSubmit}
+              >
+                {I18n.t('Translate')}
+              </Button>
             </Flex.Item>
           </Flex>
         </Flex.Item>
@@ -129,7 +137,7 @@ const TranslationOptions: React.FC<Props> = ({ asPrimary, onSetPrimary }) => {
           <Flex justifyItems="start" gap="medium" margin="0 0 medium 0" padding="x-small 0">
             <Flex.Item>
               <RadioInput
-                label={I18n.t("Show translation second")}
+                label={I18n.t('Show translation second')}
                 value="secondary"
                 name="secondary"
                 checked={asPrimary === false}
@@ -138,7 +146,7 @@ const TranslationOptions: React.FC<Props> = ({ asPrimary, onSetPrimary }) => {
             </Flex.Item>
             <Flex.Item>
               <RadioInput
-                label={I18n.t("Show translation first")}
+                label={I18n.t('Show translation first')}
                 value="primary"
                 name="primary"
                 checked={asPrimary === true}
@@ -149,7 +157,11 @@ const TranslationOptions: React.FC<Props> = ({ asPrimary, onSetPrimary }) => {
         </Flex.Item>
       </Flex>
       <Flex padding="0 small">
-        <Text color="secondary" size="small">{I18n.t("This translation is generated by AI. Please note that the output may not always be accurate.")}</Text>
+        <Text color="secondary" size="small">
+          {I18n.t(
+            'This translation is generated by AI. Please note that the output may not always be accurate.',
+          )}
+        </Text>
       </Flex>
     </View>
   )

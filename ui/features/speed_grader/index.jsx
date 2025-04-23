@@ -159,6 +159,7 @@ ready(() => {
           commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled ?? false,
           lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
           ltiIframeAllowances: iframeAllowances(),
+          permissions: { canViewAuditTrail: window.ENV.can_view_audit_trail ?? false },
           gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
         },
         features: {
@@ -167,12 +168,14 @@ ready(() => {
           emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
           enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED ?? false,
           commentLibraryEnabled: window.ENV.COMMENT_LIBRARY_FEATURE_ENABLED ?? false,
+          consolidatedMediaPlayerEnabled: window.ENV.FEATURES.consolidated_media_player ?? false,
           restrictQuantitativeDataEnabled: window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED ?? false,
           gradeByStudentEnabled: window.ENV.GRADE_BY_STUDENT_ENABLED ?? false,
           discussionCheckpointsEnabled: window.ENV.FEATURES.discussion_checkpoints ?? false,
           stickersEnabled: window.ENV.STICKERS_ENABLED_FOR_ASSIGNMENT ?? false,
           filterSpeedGraderByStudentGroupEnabled:
             window.ENV.FILTER_SPEEDGRADER_BY_STUDENT_GROUP_ENABLED ?? false,
+          projectLhotseEnabled: window.ENV.PROJECT_LHOTSE_ENABLED ?? false,
         },
       })
     })

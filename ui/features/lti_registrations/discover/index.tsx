@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Discover} from '@canvas/lti-apps/components/Discover'
 import React from 'react'
 import type {RouteObject} from 'react-router-dom'
-import {Discover} from '../../../shared/lti-apps/components/Discover'
 
 export const DiscoverRoute: RouteObject = {
   path: '/',

@@ -31,7 +31,7 @@ import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import {useFileManagement} from '../../Contexts'
 import FileFolderInfo from '../../shared/FileFolderInfo'
-import {isFile} from '../../../../utils/fileFolderUtils'
+import {getName, isFile} from '../../../../utils/fileFolderUtils'
 import {type Folder, type File} from '../../../../interfaces/File'
 import FolderTreeBrowser, {FolderTreeBrowserRef} from './FolderTreeBrowser'
 import FileRenameForm from '../../FilesHeader/UploadButton/FileRenameForm'
@@ -105,7 +105,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
           .then((responseItem?: File | Folder) => {
             showFlashSuccess(
               I18n.t('%{name} successfully moved to %{folderName}.', {
-                name: responseItem?.display_name || responseItem?.filename || responseItem?.name,
+                name: responseItem ? getName(responseItem) : '',
                 folderName: selectedFolder?.name,
               }),
             )()
@@ -113,7 +113,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
           .catch(
             showFlashError(
               I18n.t('Error moving %{name} to %{folderName}.', {
-                name: item.display_name || item.filename || item.name,
+                name: getName(item),
                 folderName: selectedFolder?.name,
               }),
             ),
@@ -166,7 +166,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
           ? {
               file: {
                 ...item,
-                name: item.display_name || item.filename || item.name,
+                name: getName(item),
               },
             }
           : {

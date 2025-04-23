@@ -18,9 +18,7 @@
 
 import React, {useState} from 'react'
 import numberHelper from '@canvas/i18n/numberHelper'
-import {Flex} from '@instructure/ui-flex'
 import {FormMessage} from '@instructure/ui-form-field/types/FormPropTypes'
-import {IconWarningSolid} from '@instructure/ui-icons'
 import {NumberInput} from '@instructure/ui-number-input'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -40,27 +38,15 @@ const GroupLimitInput = ({
   const [limitValue, setLimitValue] = useState<string>(initialValue)
   const [errorMessages, setErrorMessages] = useState<FormMessage[]>([])
 
-  const formatErrorMessage = (message: string) => (
-    <Flex as="div" alignItems="center">
-      <Flex as="div" alignItems="center" margin="0 xx-small 0 0">
-        <IconWarningSolid color="error" />
-      </Flex>
-      <Text size="small" color="danger">
-        {message}
-      </Text>
-    </Flex>
-  )
-
-
   const validateInput = (_event: React.FocusEvent<HTMLInputElement>) => {
     if (limitValue) {
       let errorText
       if (Number.isNaN(Number(limitValue)) || !Number.isInteger(Number(limitValue))) {
-        errorText = formatErrorMessage(I18n.t('Value must be a whole number'))
+        errorText = I18n.t('Value must be a whole number')
       } else if (numberHelper.parse(Number(limitValue)) < 2) {
-        errorText = formatErrorMessage(I18n.t('Value must be greater than or equal to 2'))
+        errorText = I18n.t('Value must be greater than or equal to 2')
       }
-      if (errorText) setErrorMessages([{ text: errorText, type: 'error' }])
+      if (errorText) setErrorMessages([{ text: errorText, type: 'newError' }])
     }
   }
 

@@ -551,77 +551,74 @@ export const useFindOutcomeModal = open => {
     if (!isLoading || !open) {
       return
     }
-    client
-      .query({
-        query: FIND_GROUPS_QUERY,
-        variables: {
-          id: contextId,
-          type: contextType,
-          rootGroupId: globalRootId || '0',
-          includeGlobalRootGroup: !!globalRootId,
-        },
-      })
-      .then(({data}) => {
-        const {context, globalRootGroup} = data
-        let accounts
-        if (isCourse) {
-          accounts = [...context.account.parentAccountsConnection.nodes, context.account]
-        } else {
-          accounts = context.parentAccountsConnection.nodes
-        }
+    getAllParentAccounts({
+      client,
+      contextId,
+      contextType,
+      rootGroupId: globalRootId || '0',
+      includeGlobalRootGroup: !!globalRootId,
+    })
+    .then(({data}) => {
+      const {context, globalRootGroup} = data
+      let accounts
+      if (isCourse) {
+        accounts = [...context.account.parentAccountsConnection.nodes, context.account]
+      } else {
+        accounts = context.parentAccountsConnection.nodes
+      }
 
-        const rootGroups = accounts.map(account => account.rootOutcomeGroup)
-        const childGroups = []
+      const rootGroups = accounts.map(account => account.rootOutcomeGroup)
+      const childGroups = []
 
-        if (rootGroups.length > 0) {
-          childGroups.push({
-            _id: ACCOUNT_GROUP_ID,
-            title: I18n.t('Account Standards'),
+      if (rootGroups.length > 0) {
+        childGroups.push({
+          _id: ACCOUNT_GROUP_ID,
+          title: I18n.t('Account Standards'),
+          isRootGroup: true,
+        })
+      }
+
+      if (globalRootGroup) {
+        childGroups.push({
+          ...globalRootGroup,
+          isRootGroup: true,
+          title: I18n.t('State Standards'),
+          // add a different typename than LearningOutcomeGroup
+          // because useDetail will load this group with a title
+          // of "ROOT" and will update this cache. We don't want
+          // to update cache for this group
+          __typename: 'BuildGroup',
+        })
+      }
+
+      const groups = [
+        ...rootGroups.flatMap(g =>
+          extractGroups({
+            ...g,
             isRootGroup: true,
-          })
-        }
-
-        if (globalRootGroup) {
-          childGroups.push({
-            ...globalRootGroup,
-            isRootGroup: true,
-            title: I18n.t('State Standards'),
-            // add a different typename than LearningOutcomeGroup
-            // because useDetail will load this group with a title
-            // of "ROOT" and will update this cache. We don't want
-            // to update cache for this group
-            __typename: 'BuildGroup',
-          })
-        }
-
-        const groups = [
-          ...rootGroups.flatMap(g =>
-            extractGroups({
-              ...g,
-              isRootGroup: true,
-              parentOutcomeGroup: {
-                _id: ACCOUNT_GROUP_ID,
-                __typename: 'LearningOutcomeGroup',
-              },
-            }),
-          ),
-          ...extractGroups({
-            _id: ROOT_GROUP_ID,
-            isRootGroup: true,
-            title: I18n.t('Root Learning Outcome Groups'),
-            childGroups: {
-              nodes: childGroups,
+            parentOutcomeGroup: {
+              _id: ACCOUNT_GROUP_ID,
+              __typename: 'LearningOutcomeGroup',
             },
           }),
-        ]
+        ),
+        ...extractGroups({
+          _id: ROOT_GROUP_ID,
+          isRootGroup: true,
+          title: I18n.t('Root Learning Outcome Groups'),
+          childGroups: {
+            nodes: childGroups,
+          },
+        }),
+      ]
 
-        addLoadedGroups([ACCOUNT_GROUP_ID, ROOT_GROUP_ID])
-        setRootId(ROOT_GROUP_ID)
-        addGroups(groups)
-      })
-      .catch(err => {
-        setError(err.message)
-      })
+      addLoadedGroups([ACCOUNT_GROUP_ID, ROOT_GROUP_ID])
+      setRootId(ROOT_GROUP_ID)
+      addGroups(groups)
+    })
+    .catch(err => {
+      setError(err.message)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
@@ -658,6 +655,25 @@ export const useTargetGroupSelector = ({skipGroupId, initialGroupId}) => {
   }
 }
 
+const getAllPage = async (queryFn, pickFn) => {
+  const {data: initialData} = JSON.parse(JSON.stringify(await queryFn(null)))
+
+  const connection = pickFn(initialData)
+
+  while (connection?.pageInfo?.hasNextPage && connection?.pageInfo?.endCursor) {
+    const after = connection?.pageInfo?.hasNextPage
+        && connection?.pageInfo?.endCursor
+
+    const {data: pagedData} = await queryFn(after)
+
+    const nextConnection = pickFn(pagedData)
+    connection.nodes = connection.nodes.concat(nextConnection.nodes)
+    connection.pageInfo = nextConnection.pageInfo
+  }
+
+  return {data: initialData}
+}
+
 export const getAllChildGroups = async ({client, contextId, contextType}) => {
 
   const pickFn = {
@@ -677,22 +693,35 @@ export const getAllChildGroups = async ({client, contextId, contextType}) => {
       fetchPolicy: 'network-only',
     })
   }
-    const {data: initialData} = JSON.parse(JSON.stringify(await query(null)))
 
-  const groupConnection = pickFn(initialData)
+  return getAllPage(query, pickFn)
+}
 
-  while (true) {
-    const after = groupConnection?.pageInfo?.hasNextPage
-        && groupConnection?.pageInfo?.endCursor
+export const getAllParentAccounts = async ({
+    client,
+    contextId,
+    contextType,
+    rootGroupId,
+    includeGlobalRootGroup,
+}) => {
 
-    if (!after) break
+  const pickFn = {
+    'Account': data => data.context.parentAccountsConnection,
+    'Course': data => data.context.account.parentAccountsConnection,
+  }[contextType] || (data => data)
 
-    const {data: pagedData} = await query(after)
-
-    const pagedGroupConnection = pickFn(pagedData)
-    groupConnection.nodes = groupConnection.nodes.concat(pagedGroupConnection.nodes)
-    groupConnection.pageInfo = pagedGroupConnection.pageInfo
+  const query = after => {
+    return client.query({
+      query: FIND_GROUPS_QUERY,
+      variables: {
+        id: contextId,
+        type: contextType,
+        rootGroupId,
+        includeGlobalRootGroup,
+        parentAccountsCursor: after,
+      },
+    })
   }
 
-  return {data: initialData}
+  return getAllPage(query, pickFn)
 }

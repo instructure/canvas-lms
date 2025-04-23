@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useContext} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
 import { Text } from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 interface RatingButtonProps {
   action: 'like' | 'dislike'
@@ -69,6 +70,7 @@ interface DiscussionSummaryRatingsProps {
 }
 
 export const DiscussionSummaryRatings: React.FC<DiscussionSummaryRatingsProps> = props => {
+  const {setOnSuccess} = useContext(AlertManagerContext)
   return (
     <Flex>
       {props.liked || props.disliked ? (
@@ -81,8 +83,15 @@ export const DiscussionSummaryRatings: React.FC<DiscussionSummaryRatingsProps> =
         // @ts-expect-error
         isActive={props.liked}
         isEnabled={props.isEnabled}
-        onClick={props.onLikeClick}
-        screenReaderText={I18n.t('Like summary')}
+        onClick={() => {
+          if(props.liked) {
+            setOnSuccess(I18n.t('Like summary, deselected'))
+          } else {
+            setOnSuccess(I18n.t('Like summary, selected'))
+          }
+          props.onLikeClick()
+        }}
+        screenReaderText={ props.liked ? I18n.t('Like summary, selected') : I18n.t('Like summary')}
         dataTestId="summary-like-button"
       />
       <RatingButton
@@ -90,8 +99,15 @@ export const DiscussionSummaryRatings: React.FC<DiscussionSummaryRatingsProps> =
         // @ts-expect-error
         isActive={props.disliked}
         isEnabled={props.isEnabled}
-        onClick={props.onDislikeClick}
-        screenReaderText={I18n.t('Dislike summary')}
+        onClick={() => {
+          if(props.disliked) {
+            setOnSuccess(I18n.t('Dislike summary, deselected'))
+          } else {
+            setOnSuccess(I18n.t('Dislike summary, selected'))
+          }
+          props.onDislikeClick()
+        }}
+        screenReaderText={ props.disliked ? I18n.t('Dislike summary, selected') : I18n.t('Dislike summary')}
         dataTestId="summary-dislike-button"
       />
     </Flex>

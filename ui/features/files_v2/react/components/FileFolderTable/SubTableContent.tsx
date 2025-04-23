@@ -17,11 +17,9 @@
  */
 
 import React from 'react'
-import {FileDrop} from '@instructure/ui-file-drop'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {IconUploadLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'

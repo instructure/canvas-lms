@@ -130,16 +130,14 @@ export const UnpublishedChangesTrayContents = ({
             ),
         )}
       </ol>
-      {window.ENV.FEATURES.course_paces_redesign && (
-        <CondensedButton
-          data-testid="reset-all-button"
-          interaction={cancelDisabled ? 'disabled' : 'enabled'}
-          onClick={() => setResetWarningModalOpen(true)}
-          margin="small 0 0"
-        >
-          {I18n.t('Reset all')}
-        </CondensedButton>
-      )}
+      <CondensedButton
+        data-testid="reset-all-button"
+        interaction={cancelDisabled ? 'disabled' : 'enabled'}
+        onClick={() => setResetWarningModalOpen(true)}
+        margin="small 0 0"
+      >
+        {I18n.t('Reset all')}
+      </CondensedButton>
       <ResetPaceWarningModal
         open={isResetWarningModalOpen}
         onCancel={() => setResetWarningModalOpen(false)}

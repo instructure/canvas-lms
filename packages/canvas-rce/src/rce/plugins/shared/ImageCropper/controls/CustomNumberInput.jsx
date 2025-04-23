@@ -38,7 +38,7 @@ export const CustomNumberInput = ({
     formatValueCallback,
     onChange,
   })
-  const handleChange = (event, newValue) => digestNewValue(newValue.trim())
+  const handleChange = (_event, newValue) => digestNewValue(newValue.trim())
   const handleBlur = () => digestCurrentValue()
   const handleIncrement = () => onChange(processValueCallback(value + 1))
   const handleDecrement = () => onChange(processValueCallback(value - 1))

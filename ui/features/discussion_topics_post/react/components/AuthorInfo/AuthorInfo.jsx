@@ -64,9 +64,9 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
   // author is not a role found in courseroles,
   // so we can always assume that if there is 1 course role,
   // the author in this component will have to roles (author, and the course role)
-  const timestampTextSize = breakpoints.desktopNavOpen ? 'small' : 'x-small'
-  const authorNameTextSize = breakpoints.desktopNavOpen ? 'small' : 'medium'
-  const authorInfoPadding = breakpoints.mobileOnly ? '0 0 0 x-small' : '0 0 0 small'
+  const timestampTextSize = 'small'
+  const authorNameTextSize = 'medium'
+  const authorInfoPadding = '0 0 0 small'
   let avatarSize = 'small'
 
   if (breakpoints.desktopNavOpen) {
@@ -406,7 +406,6 @@ const NameLink = props => {
     classnames = 'student_context_card_trigger'
   if (props.mobileOnly) classnames += ' author_post'
 
-  const fontWeight = {fontWeight: props.mobileOnly ? 700 : 400}
   return (
     <div
       className={classnames}
@@ -424,7 +423,7 @@ const NameLink = props => {
       data-student_id={props.user?._id}
       data-course_id={ENV.course_id}
     >
-      <Link href={props.user?.htmlUrl} isWithinText={false} themeOverride={fontWeight}>
+      <Link href={props.user?.htmlUrl} isWithinText={false} themeOverride={{fontWeight: 700}}>
         {props.userType === 'author' ? (
           <>
             <SearchSpan

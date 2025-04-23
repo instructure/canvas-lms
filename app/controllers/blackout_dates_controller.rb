@@ -61,7 +61,6 @@
 #
 class BlackoutDatesController < ApplicationController
   before_action :require_context
-  before_action :require_feature_flag
   before_action :load_blackout_date, only: %i[show edit update destroy]
 
   # @API List blackout dates
@@ -196,11 +195,6 @@ class BlackoutDatesController < ApplicationController
   end
 
   private
-
-  def require_feature_flag
-    account = @context.is_a?(Account) ? @context : @context.account
-    not_found unless account.feature_enabled?(:course_paces)
-  end
 
   def load_blackout_date
     @blackout_date = @context.blackout_dates.find(params[:id])

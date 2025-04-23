@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const PREVIEW_BACKGROUND_COLOR = '#394B58'
+export const PREVIEW_BACKGROUND_COLOR = '#334451'
 export const PREVIEW_WIDTH = 942
 export const PREVIEW_HEIGHT = 350
 export const SHAPE_CONTAINER_LENGTH = 350

@@ -56,17 +56,6 @@ export default function BulkEditHeader({
     return <Text>{I18n.t('%{percent}%', {percent: valueNow})}</Text>
   }
 
-  const anyAssignmentsEdited = (() => {
-    const overrides = assignments.flatMap(a => a.all_dates)
-    return overrides.some(override =>
-      [
-        originalDateField('due_at'),
-        originalDateField('unlock_at'),
-        originalDateField('lock_at'),
-      ].some(originalField => override.hasOwnProperty(originalField)),
-    )
-  })()
-
   const validationErrorsExist = (() => {
     return assignments.some(assignment =>
       assignment.all_dates.some(override => Object.keys(override.errors || {}).length > 0),
@@ -95,8 +84,7 @@ export default function BulkEditHeader({
           <Flex.Item>
             <Button
               margin="0 0 0 small"
-              onClick={onOpenBatchEdit}
-              interaction={selectedAssignmentsCount > 0 ? 'enabled' : 'disabled'}
+              onClick={() => onOpenBatchEdit(true)}
             >
               {I18n.t('Batch Edit')}
             </Button>
@@ -111,7 +99,7 @@ export default function BulkEditHeader({
               margin="0 0 0 small"
               color="primary"
               interaction={
-                startingSave || jobRunning || !anyAssignmentsEdited || validationErrorsExist
+                startingSave || jobRunning || validationErrorsExist
                   ? 'disabled'
                   : 'enabled'
               }
@@ -168,8 +156,7 @@ export default function BulkEditHeader({
         <Flex.Item>
           <Button
             margin="0 0 0 small"
-            onClick={onOpenBatchEdit}
-            interaction={selectedAssignmentsCount > 0 ? 'enabled' : 'disabled'}
+            onClick={() => onOpenBatchEdit(true)}
           >
             {I18n.t('Batch Edit')}
           </Button>
@@ -184,7 +171,7 @@ export default function BulkEditHeader({
             margin="0 0 0 small"
             color="primary"
             interaction={
-              startingSave || jobRunning || !anyAssignmentsEdited || validationErrorsExist
+              startingSave || jobRunning || validationErrorsExist
                 ? 'disabled'
                 : 'enabled'
             }

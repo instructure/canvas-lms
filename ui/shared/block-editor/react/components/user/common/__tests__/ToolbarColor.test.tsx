@@ -23,7 +23,7 @@ import {Editor} from '@craftjs/core'
 import {render, screen} from '@testing-library/react'
 import {ToolbarColor} from '../ToolbarColor'
 
-const DEFAULT_FONT_COLOR = '#2d3b45'
+const DEFAULT_FONT_COLOR = '#273540'
 
 const baseTabs = {
   foreground: {
@@ -138,14 +138,11 @@ describe('ToolbarColor', () => {
     // change to custom colors to enable ColorPresets
     screen.getByDisplayValue('custom').click()
 
-    const c1 = document.getElementById(
-      // @ts-expect-error
-      document
-        .getElementById('foreground')
-        ?.querySelectorAll('button')[0]
-        ?.getAttribute('aria-describedby'),
-    )
-    expect(c1).toHaveTextContent(DEFAULT_FONT_COLOR)
+    const c1 = document
+      .getElementById('foreground')
+      ?.querySelectorAll('button')[0]
+      ?.getAttribute('aria-label')
+    expect(c1).toMatch(DEFAULT_FONT_COLOR)
   })
 
   describe('color tab', () => {

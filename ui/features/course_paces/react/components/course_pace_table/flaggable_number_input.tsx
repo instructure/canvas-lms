@@ -18,8 +18,7 @@
 
 import React from 'react'
 
-import canvas from '@instructure/canvas-theme'
-import canvasHighContrast from '@instructure/canvas-high-contrast-theme'
+import {canvasHighContrast, canvas} from '@instructure/ui-themes'
 import {Flex} from '@instructure/ui-flex'
 import {NumberInput} from '@instructure/ui-number-input'
 import {AccessibleContent} from '@instructure/ui-a11y-content'

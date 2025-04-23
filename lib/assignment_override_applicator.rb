@@ -147,6 +147,13 @@ module AssignmentOverrideApplicator
           if ObserverEnrollment.observed_students(context, user).empty?
             groups = group_overrides(learning_object, user)
             overrides += groups if groups
+
+            # add differentiation tag overrides if allowed in account context
+            if learning_object.context.account.allow_assign_to_differentiation_tags?
+              diff_tags = differentiation_tag_overrides(learning_object, user)
+              overrides += diff_tags if diff_tags
+            end
+
             sections = section_overrides(learning_object, user)
             overrides += sections if sections
             everyone = course_overrides(learning_object, user)
@@ -231,6 +238,17 @@ module AssignmentOverrideApplicator
       else
         learning_object.assignment_overrides.where(set_type: "Group", set_id: group.id).to_a
       end
+    end
+  end
+
+  def self.differentiation_tag_overrides(learning_object, user)
+    user_diff_tag_group_ids = user.differentiation_tags.pluck(:group_id)
+    return nil unless user_diff_tag_group_ids.any?
+
+    if learning_object.assignment_overrides.loaded?
+      learning_object.assignment_overrides.select { |o| o.set_type == "Group" && user_diff_tag_group_ids.include?(o.set_id) }
+    else
+      learning_object.assignment_overrides.where(set_type: "Group", set_id: user_diff_tag_group_ids).to_a
     end
   end
 

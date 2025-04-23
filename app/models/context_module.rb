@@ -611,6 +611,10 @@ class ContextModule < ActiveRecord::Base
 
     return content_tags_visible_to(user, opts) if !context.conditional_release || is_teacher || !mastery_path_unreleased_items_block_progression
 
+    user_graded_submissions = user.submissions.active.for_course(context).graded
+    pending_submission_ids = Progress.where(tag: "conditional_release_handler", context: user_graded_submissions).is_pending.pluck(:context_id)
+    cyoe_pending_assignment_ids = Submission.where(id: pending_submission_ids).pluck(:assignment_id)
+
     user_ungraded_assignment_ids = user.submissions.active.for_course(context).ungraded.having_submission.pluck(:assignment_id)
 
     course_trigger_assignments_ids = context.conditional_release_rules
@@ -621,7 +625,7 @@ class ContextModule < ActiveRecord::Base
                                             .pluck(:trigger_assignment_id)
                                             .uniq
 
-    trigger_assignment_ids = course_trigger_assignments_ids & user_ungraded_assignment_ids
+    trigger_assignment_ids = course_trigger_assignments_ids & (user_ungraded_assignment_ids + cyoe_pending_assignment_ids)
 
     target_assignment_ids = context.conditional_release_rules
                                    .active
@@ -761,7 +765,7 @@ class ContextModule < ActiveRecord::Base
       content = if params[:type] == "lti/message_handler"
                   Lti::MessageHandler.for_context(context).where(id: params[:id]).first
                 else
-                  ContextExternalTool.find_external_tool(params[:url], context, params[:id].to_i) || ContextExternalTool.new.tap { |tool| tool.id = 0 }
+                  Lti::ToolFinder.from_url(params[:url], context, preferred_tool_id: params[:id].to_i) || ContextExternalTool.new.tap { |tool| tool.id = 0 }
                 end
       added_item.attributes = {
         content:,

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useMemo, useState, useRef} from 'react'
+import React, {useCallback, useEffect, useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
@@ -24,11 +24,9 @@ import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {useQuery, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import {type File, type Folder} from '../../../interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
-import {parseLinkHeader} from '../../../utils/apiUtils'
 import {getUniqueId} from '../../../utils/fileFolderUtils'
 import SubTableContent from './SubTableContent'
 import ActionMenuButton from './ActionMenuButton'
@@ -37,39 +35,22 @@ import PublishIconButton from './PublishIconButton'
 import RightsIconButton from './RightsIconButton'
 import renderTableHead from './RenderTableHead'
 import renderTableBody from './RenderTableBody'
-import BulkActionButtons from './BulkActionButtons'
-import Breadcrumbs from './Breadcrumbs'
-import CurrentUploads from '../FilesHeader/CurrentUploads'
-import {View} from '@instructure/ui-view'
 import {useFileManagement} from '../Contexts'
-import {FileFolderWrapper, FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
+import {FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
 import BlueprintIconButton from './BlueprintIconButton'
 import {Alert} from '@instructure/ui-alerts'
-import CurrentDownloads from '../FilesHeader/CurrentDownloads'
 import UsageRightsModal from './UsageRightsModal'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import FileTableUpload from './FileTableUpload'
 import {UpdatedAtDate} from './UpdatedAtDate'
 import {ModifiedByLink} from './ModifiedByLink'
 import PermissionsModal from './PermissionsModal'
+import {Sort} from '../../hooks/useGetPaginatedFiles'
+import {createPortal} from 'react-dom'
 
 const I18n = createI18nScope('files_v2')
 
 const MIN_HEIGHT = 450
-
-const fetchFilesAndFolders = async (
-  url: string,
-  onLoadingStatusChange: (arg0: boolean) => void,
-) => {
-  onLoadingStatusChange(true)
-  const response = await fetch(url)
-  if (!response.ok) {
-    throw new Error('Failed to fetch files and folders')
-  }
-  const links = parseLinkHeader(response.headers.get('Link'))
-  const rows = await response.json()
-  return {rows, links}
-}
 
 const setColumnWidths = (headers: ColumnHeader[]) => {
   // Use a temporary div to calculate the width of each column
@@ -130,8 +111,8 @@ const columnHeaders: ColumnHeader[] = [
     width: undefined,
   },
   {
-    id: 'published',
-    title: I18n.t('Published'),
+    id: 'permissions',
+    title: I18n.t('Status'),
     textAlign: 'center',
     width: undefined,
   },
@@ -147,6 +128,7 @@ const columnRenderers: {
     isStacked,
     userCanEditFilesForContext,
     userCanDeleteFilesForContext,
+    userCanRestrictFilesForContext,
     usageRightsRequiredForContext,
     size,
     isSelected,
@@ -158,6 +140,7 @@ const columnRenderers: {
     isStacked: boolean
     userCanEditFilesForContext: boolean
     userCanDeleteFilesForContext: boolean
+    userCanRestrictFilesForContext: boolean
     usageRightsRequiredForContext: boolean
     size: 'small' | 'medium' | 'large'
     isSelected: boolean
@@ -166,7 +149,7 @@ const columnRenderers: {
   }) => React.ReactNode
 } = {
   name: ({row, rows, isStacked}) => <NameLink isStacked={isStacked} item={row} collection={rows} />,
-  created_at: ({row}) => <FriendlyDatetime dateTime={row.created_at} />,
+  created_at: ({row}) => <FriendlyDatetime dateTime={row.created_at} includeScreenReaderContent={false}/>,
   updated_at: ({row, isStacked}) => (
     <UpdatedAtDate updatedAt={row.updated_at} isStacked={isStacked} />
   ),
@@ -194,10 +177,10 @@ const columnRenderers: {
       />
     ) : null,
   blueprint: ({row}) => <BlueprintIconButton item={row} />,
-  published: ({row, userCanEditFilesForContext, setModalOrTrayOptions}) => (
+  permissions: ({row, userCanRestrictFilesForContext, setModalOrTrayOptions}) => (
     <PublishIconButton
       item={row}
-      userCanEditFilesForContext={userCanEditFilesForContext}
+      userCanRestrictFilesForContext={userCanRestrictFilesForContext}
       onClick={setModalOrTrayOptions({id: 'permissions', items: [row]})}
     />
   ),
@@ -206,16 +189,25 @@ const columnRenderers: {
     size,
     userCanEditFilesForContext,
     userCanDeleteFilesForContext,
+    userCanRestrictFilesForContext,
     usageRightsRequiredForContext,
   }) => (
     <ActionMenuButton
       size={size}
       userCanEditFilesForContext={userCanEditFilesForContext}
       userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+      userCanRestrictFilesForContext={userCanRestrictFilesForContext}
       usageRightsRequiredForContext={usageRightsRequiredForContext}
       row={row}
     />
   ),
+}
+
+const getSelectionScreenReaderText = (selected: number, total: number) => {
+  return I18n.t('%{selected} of %{total} selected', {
+    selected,
+    total,
+  })
 }
 
 export type ModalOrTrayOptions = {
@@ -225,64 +217,47 @@ export type ModalOrTrayOptions = {
 
 export interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
+  rows: (File | Folder)[]
+  isLoading: boolean
+  contextType: string
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
+  userCanRestrictFilesForContext: boolean
   usageRightsRequiredForContext: boolean
-  currentUrl: string
-  folderBreadcrumbs: Folder[]
-  onPaginationLinkChange: (links: Record<string, string>) => void
-  onLoadingStatusChange: (isLoading: boolean) => void
-  onSortChange: (sortBy: string, sortDir: 'asc' | 'desc') => void
+  sort: Sort
+  onSortChange: (sort: Sort) => void
   searchString?: string
+  selectedRows: Set<string>
+  setSelectedRows: React.Dispatch<React.SetStateAction<Set<string>>>
 }
 
 const FileFolderTable = ({
   size,
+  rows,
+  isLoading,
+  contextType,
   userCanEditFilesForContext,
   userCanDeleteFilesForContext,
+  userCanRestrictFilesForContext,
   usageRightsRequiredForContext,
-  currentUrl,
-  folderBreadcrumbs,
-  onPaginationLinkChange,
-  onLoadingStatusChange,
+  sort,
   onSortChange,
   searchString = '',
+  selectedRows,
+  setSelectedRows,
 }: FileFolderTableProps) => {
   const {currentFolder} = useFileManagement()
   const isStacked = size !== 'large'
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
-  const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>('')
 
-  const [sortColumn, setSortColumn] = useState<string>('name')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | 'none'>('asc')
+  const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>(() => {
+    return getSelectionScreenReaderText(selectedRows.size, rows.length)
+  })
   const [modalOrTrayOptions, _setModalOrTrayOptions] = useState<ModalOrTrayOptions | null>(null)
 
   const [isDragging, setIsDragging] = useState(false)
   const [directoryMinHeight, setDirectoryMinHeight] = useState('auto')
 
   const filesDirectoryRef = useRef<HTMLDivElement | null>(null)
-
-  const {data, error, isLoading, isFetching} = useQuery({
-    queryKey: ['files', currentUrl],
-    queryFn: () => {
-      setSelectedRows(new Set())
-      if (searchString.length === 1) {
-        return Promise.resolve({rows: [], links: {}})
-      }
-      return fetchFilesAndFolders(currentUrl, onLoadingStatusChange)
-    },
-    staleTime: 0,
-    onSuccess: ({links}) => {
-      onPaginationLinkChange(links)
-    },
-    onSettled: result => {
-      if (result) {
-        const foldersAndFiles = result.rows.map((row: File | Folder) => new FileFolderWrapper(row))
-        currentFolder?.files.set(foldersAndFiles)
-      }
-      onLoadingStatusChange(false)
-    },
-  })
 
   useEffect(() => {
     const listener = (event: FilesCollectionEvent) => {
@@ -294,15 +269,6 @@ const FileFolderTable = ({
     return () => currentFolder?.removeListener(listener)
   }, [currentFolder])
 
-  if (error) {
-    showFlashError(I18n.t('Failed to fetch files and folders.'))()
-  }
-
-  const rows: (File | Folder)[] = useMemo(
-    () => (!isFetching && data?.rows && data.rows.length > 0 ? data.rows : []),
-    [data?.rows, isFetching],
-  )
-
   const setModalOrTrayOptions = useCallback(
     (options: ModalOrTrayOptions | null) => () => _setModalOrTrayOptions(options),
     [],
@@ -310,55 +276,45 @@ const FileFolderTable = ({
 
   const toggleRowSelection = useCallback(
     (rowId: string) => {
-      setSelectedRows(prev => {
-        const newSet = new Set(prev)
-        if (newSet.has(rowId)) {
-          newSet.delete(rowId)
-        } else {
-          newSet.add(rowId)
-        }
-        setSelectionAnnouncement(
-          I18n.t('%{selected} of %{total} selected', {
-            selected: newSet.size,
-            total: rows.length,
-          }),
-        )
-
-        return newSet
-      })
+      const newSet = new Set(selectedRows)
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId)
+      } else {
+        newSet.add(rowId)
+      }
+      setSelectedRows(newSet)
+      setSelectionAnnouncement(getSelectionScreenReaderText(newSet.size, rows.length))
     },
-    [rows?.length],
+    [selectedRows, rows.length],
   )
 
   const toggleSelectAll = useCallback(() => {
     if (selectedRows.size === rows.length) {
       setSelectedRows(new Set()) // Unselect all
-      setSelectionAnnouncement(
-        I18n.t('%{selected} of %{total} selected', {
-          selected: 0,
-          total: rows.length,
-        }),
-      )
+      setSelectionAnnouncement(getSelectionScreenReaderText(0, rows.length))
     } else {
       setSelectedRows(new Set(rows.map(row => getUniqueId(row)))) // Select all
-      setSelectionAnnouncement(
-        I18n.t('%{selected} of %{total} selected', {
-          selected: rows.length,
-          total: rows.length,
-        }),
-      )
+      setSelectionAnnouncement(getSelectionScreenReaderText(rows.length, rows.length))
     }
   }, [rows, selectedRows.size])
 
+  enum SortOrder {
+    ASCENDING = 'asc',
+    DESCENDING = 'desc',
+  }
+
   const handleColumnHeaderClick = useCallback(
     (columnId: string) => {
-      const newDir = columnId === sortColumn ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'asc'
       const newCol = columnId
-      setSortColumn(newCol)
-      setSortDirection(newDir)
-      onSortChange(newCol, newDir)
+      const newDirection =
+        columnId === sort.by
+          ? sort.direction === SortOrder.ASCENDING
+            ? SortOrder.DESCENDING
+            : SortOrder.ASCENDING
+          : SortOrder.ASCENDING
+      onSortChange({by: newCol, direction: newDirection})
     },
-    [onSortChange, sortColumn, sortDirection],
+    [onSortChange, sort.by, sort.direction],
   )
 
   const allRowsSelected = rows.length != 0 && selectedRows.size === rows.length
@@ -369,13 +325,15 @@ const FileFolderTable = ({
         return usageRightsRequiredForContext
       case 'blueprint':
         return !!ENV.BLUEPRINT_COURSES_DATA
+      case 'permissions':
+        return contextType !== 'group'
       default:
         return true
     }
   })
 
   const renderModals = useCallback(
-    () => (
+    () => createPortal(
       <>
         <UsageRightsModal
           open={modalOrTrayOptions?.id === 'manage-usage-rights'}
@@ -387,53 +345,26 @@ const FileFolderTable = ({
           items={modalOrTrayOptions?.items || []}
           onDismiss={setModalOrTrayOptions(null)}
         />
-      </>
+      </>,
+      document.body,
     ),
     [modalOrTrayOptions?.id, modalOrTrayOptions?.items, setModalOrTrayOptions],
   )
 
-  const renderTableActionsHead = useCallback(() => {
-    const direction = size === 'small' ? 'column' : 'row'
-    return (
-      <Flex gap="small" margin="0 0 medium" direction={direction}>
-        <Flex.Item padding="xx-small" shouldShrink={true} shouldGrow={true}>
-          <Breadcrumbs folders={folderBreadcrumbs} size={size} search={searchString} />
-        </Flex.Item>
-
-        <Flex.Item padding="xx-small">
-          <BulkActionButtons
-            size={size}
-            selectedRows={selectedRows}
-            rows={rows}
-            totalRows={rows.length}
-            userCanEditFilesForContext={userCanEditFilesForContext}
-            userCanDeleteFilesForContext={userCanDeleteFilesForContext}
-          />
-        </Flex.Item>
-      </Flex>
-    )
-  }, [
-    folderBreadcrumbs,
-    selectedRows,
-    size,
-    searchString,
-    rows,
-    userCanEditFilesForContext,
-    userCanDeleteFilesForContext,
-  ])
-
   const tableCaption = I18n.t(
     'Files and Folders: sorted by %{sortColumn} in %{sortDirection} order',
     {
-      sortColumn: columnHeaders.find(header => header.id === sortColumn)?.title || sortColumn,
-      sortDirection: sortDirection === 'asc' ? 'ascending' : 'descending',
+      sortColumn: columnHeaders.find(header => header.id === sort.by)?.title || sort.by,
+      sortDirection: sort.direction === SortOrder.ASCENDING ? 'ascending' : 'descending',
     },
   )
+
+  const showDrop = !isLoading && !searchString && !isStacked
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     if (e.dataTransfer?.types.includes('Files')) {
       e.preventDefault()
-      if (!isDragging) {
+      if (!isDragging && showDrop) {
         if (filesDirectoryRef.current && filesDirectoryRef.current.offsetHeight < MIN_HEIGHT) {
           setDirectoryMinHeight(MIN_HEIGHT + 'px')
         }
@@ -482,112 +413,108 @@ const FileFolderTable = ({
   return (
     <>
       {renderModals()}
-      {renderTableActionsHead()}
-      <View display="block" margin="0 0 medium">
-        <CurrentUploads />
-        <CurrentDownloads rows={rows} />
-      </View>
-      <div
-        data-testid="files-directory"
-        ref={filesDirectoryRef}
-        style={{minHeight: rows.length === 0 && !isFetching && !isStacked ? MIN_HEIGHT : directoryMinHeight}}
-        className="files_directory"
-        onDragEnter={e => handleDragEnter(e as React.DragEvent<HTMLDivElement>)}
-        onDragLeave={e => handleDragLeave(e as React.DragEvent<HTMLDivElement>)}
-        onDragOver={e => e.preventDefault()}
-        onDrop={_e => handleDropState()}
-      >
-        <Table
-          caption={tableCaption}
-          hover={true}
-          layout={isStacked ? 'stacked' : 'fixed'}
-          data-testid="files-table"
+      <Flex direction='column'>
+        <div
+          data-testid="files-directory"
+          ref={filesDirectoryRef}
+          style={{minHeight: rows.length === 0 && showDrop ? MIN_HEIGHT : directoryMinHeight}}
+          className="files_directory"
+          onDragEnter={e => handleDragEnter(e as React.DragEvent<HTMLDivElement>)}
+          onDragLeave={e => handleDragLeave(e as React.DragEvent<HTMLDivElement>)}
+          onDragOver={e => e.preventDefault()}
+          onDrop={_e => handleDropState()}
         >
-          <Table.Head
-            renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+          <Table
+            caption={tableCaption}
+            hover={true}
+            layout={isStacked ? 'stacked' : 'fixed'}
+            data-testid="files-table"
           >
-            <Table.Row>
-              {renderTableHead(
-                size,
-                allRowsSelected,
-                someRowsSelected,
-                toggleSelectAll,
-                isStacked,
-                filteredColumns,
-                sortColumn,
-                sortDirection,
-                handleColumnHeaderClick,
-              )}
-            </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            {renderTableBody(
-              rows,
-              filteredColumns,
-              selectedRows,
-              size,
-              isStacked,
-              columnRenderers,
-              toggleRowSelection,
-              userCanEditFilesForContext,
-              userCanDeleteFilesForContext,
-              usageRightsRequiredForContext,
-              setModalOrTrayOptions,
-            )}
-            {!isFetching && userCanEditFilesForContext && !isStacked && (
-              <Table.Row data-upload>
-                <Table.Cell>
-                  <FileTableUpload
-                    currentFolder={currentFolder!}
-                    isDragging={isDragging}
-                    handleDrop={handleDrop}
-                  />
-                </Table.Cell>
+            <Table.Head
+              renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+            >
+              <Table.Row>
+                {renderTableHead(
+                  size,
+                  allRowsSelected,
+                  someRowsSelected,
+                  toggleSelectAll,
+                  isStacked,
+                  filteredColumns,
+                  sort,
+                  handleColumnHeaderClick,
+                )}
               </Table.Row>
-            )}
-          </Table.Body>
-        </Table>
-      </div>
-      <SubTableContent
-        isLoading={isLoading || isFetching}
-        isEmpty={rows.length === 0 && !isFetching}
-        searchString={searchString}
-      />
-      {selectionAnnouncement && (
+            </Table.Head>
+            <Table.Body>
+              {renderTableBody(
+                rows,
+                filteredColumns,
+                selectedRows,
+                size,
+                isStacked,
+                columnRenderers,
+                toggleRowSelection,
+                userCanEditFilesForContext,
+                userCanDeleteFilesForContext,
+                userCanRestrictFilesForContext,
+                usageRightsRequiredForContext,
+                setModalOrTrayOptions,
+              )}
+              {userCanEditFilesForContext && showDrop && (
+                <Table.Row data-upload>
+                  <Table.Cell>
+                    <FileTableUpload
+                      currentFolder={currentFolder!}
+                      isDragging={isDragging}
+                      handleDrop={handleDrop}
+                    />
+                  </Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table>
+        </div>
+        <SubTableContent
+          isLoading={isLoading}
+          isEmpty={rows.length === 0 && !isLoading}
+          searchString={searchString}
+        />
+        {selectionAnnouncement && (
+          <Alert
+            liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+            liveRegionPoliteness="polite"
+            screenReaderOnly
+          >
+            {selectionAnnouncement}
+          </Alert>
+        )}
         <Alert
           liveRegion={() => document.getElementById('flash_screenreader_holder')!}
           liveRegionPoliteness="polite"
           screenReaderOnly
-          data-testid="selection-announcement"
+          data-testid="sort-announcement"
         >
-          {selectionAnnouncement}
+          {I18n.t('Sorted by %{sortColumn} in %{sortDirection} order', {
+            sortColumn: columnHeaders.find(header => header.id === sort.by)?.title || sort.by,
+            sortDirection: sort.direction === SortOrder.ASCENDING ? 'ascending' : 'descending',
+          })}
         </Alert>
-      )}
-      <Alert
-        liveRegion={() => document.getElementById('flash_screenreader_holder')!}
-        liveRegionPoliteness="polite"
-        screenReaderOnly
-        data-testid="sort-announcement"
-      >
-        {I18n.t('Sorted by %{sortColumn} in %{sortDirection} order', {
-          sortColumn: columnHeaders.find(header => header.id === sortColumn)?.title || sortColumn,
-          sortDirection: sortDirection === 'asc' ? 'ascending' : 'descending',
-        })}
-      </Alert>
-      {searchString && rows.length > 0 && (
-        <Alert
-          liveRegion={() => document.getElementById('flash_screenreader_holder')!}
-          liveRegionPoliteness="assertive"
-          screenReaderOnly
-          data-testid="search-announcement"
-        >
-          {I18n.t(
-            'file_search_count',
-            {one: 'One result found', other: '%{count} results found'},
-            {count: rows.length},
-          )}
-        </Alert>
-      )}
+        {searchString && rows.length > 0 && (
+          <Alert
+            liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+            liveRegionPoliteness="assertive"
+            screenReaderOnly
+            data-testid="search-announcement"
+          >
+            {I18n.t(
+              'file_search_count',
+              {one: 'One result found', other: '%{count} results found'},
+              {count: rows.length},
+            )}
+          </Alert>
+        )}
+      </Flex>
     </>
   )
 }

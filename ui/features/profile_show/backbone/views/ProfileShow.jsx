@@ -226,6 +226,13 @@ export default class ProfileShow extends Backbone.View {
         },
       },
     }
+    if ($('input[name="user[short_name]"]').length > 0) {
+      validations['property_validations']['user[short_name]'] = function (value) {
+        if (!value || value.trim() === '') {
+          return I18n.t('user_short_name_required', 'Please add your full name')
+        }
+      }
+    }
     if (!$(event.target).validateForm(validations)) {
       return event.preventDefault()
     }

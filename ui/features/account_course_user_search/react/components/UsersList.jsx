@@ -19,7 +19,7 @@
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
-import {arrayOf, string, object, func, shape} from 'prop-types'
+import {arrayOf, bool, string, object, func, shape} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import UsersListRow from './UsersListRow'
 import UsersListHeader from './UsersListHeader'
@@ -120,5 +120,5 @@ UsersList.propTypes = {
       label: string.isRequired,
     }),
   ).isRequired,
-  includeDeletedUsers: string,
+  includeDeletedUsers: bool,
 }

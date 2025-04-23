@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import type {RegistrationOverlayStore} from '../RegistrationOverlayState'
+import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {PermissionConfirmation} from '../../registration_wizard_forms/PermissionConfirmation'
@@ -25,7 +25,7 @@ import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration
 
 export type PermissionConfirmationWrapperProps = {
   registration: LtiRegistrationWithConfiguration
-  overlayStore: RegistrationOverlayStore
+  overlayStore: DynamicRegistrationOverlayStore
 }
 
 export const PermissionConfirmationWrapper = ({

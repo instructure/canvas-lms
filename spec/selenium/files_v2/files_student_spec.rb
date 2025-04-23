@@ -96,7 +96,7 @@ describe "better_file_browsing" do
         @files[0].update unlock_at: 1.week.ago,
                          lock_at: 1.week.from_now
         get "/courses/#{@course.id}/files"
-        expect(get_item_content_files_table(1, 6)).to include "#{txt_files[0]} is Available from"
+        expect(item_has_permissions_icon?(1, 6, "restricted")).to be true
       end
     end
 

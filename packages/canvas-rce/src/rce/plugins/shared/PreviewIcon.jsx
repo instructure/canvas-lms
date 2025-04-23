@@ -43,7 +43,7 @@ const PreviewIcon = ({color, testId, variant, image, loading, checkered}) => {
     }
 
     return {
-      border: '1px solid #73818C',
+      border: '1px solid #6A7883',
       borderRadius: '3px',
       background:
         color ||

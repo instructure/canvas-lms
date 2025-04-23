@@ -10873,6 +10873,7 @@ he:
   load_bank: 
     error_loading_banks: "שגיאה בטעינת מאגרים"
     loading_banks: "טוען מאגרים..."
+  load_in_a_new_tab_829731ab: "טעינה בלשונית חדשה"
   load_more_9ca37ccc: "טעינה של עוד..."
   load_more_a36f9cf9: "טענו עוד"
   load_more_results_460f49a9: "טעינת תוצאות נוספות"
@@ -13369,6 +13370,7 @@ he:
   new_opportunities_7d349c4d: "הזדמנויות חדשות"
   new_outcome_7fba8c7d: "תוצאת למידה חדשה"
   new_outcome_group_af59f145: "קבוצת השגי למידה חדשה"
+  new_page_84b28714: "דף הבא"
   new_password_1232cbf2: "סיסמה חדשה"
   new_question_9107c469: "שאלה חדשה"
   new_question_group_d9306280: "קבוצת שאלות חדשה"
@@ -19880,6 +19882,7 @@ he:
   true_false_823761a9: "נכון/לא נכון"
   truncated_56b1a661: מקוצץ
   try_again_6ca44338: "יש לנסות שוב"
+  try_again_ad656c3c: "לנסות שנית"
   turned_in_submission_date_e9180b8b: "הוגש בתאריך: %{submission_date}"
   turnitin: 
     error_1007: "הקובץ שהועלה גדול מדי"

@@ -85,16 +85,16 @@ describe('CustomNumberInput', () => {
       const input = container.querySelector('label input[type="text"]')
       fireEvent.change(input, {target: {value: '15'}})
       fireEvent.blur(input)
-      const messageContainer = container.querySelector('label > span > span:last-child')
+      const messageContainer = container.querySelector('label > span:last-child')
       expect(messageContainer.textContent).toEqual('')
     })
 
-    it('shows error messages after parsing', async () => {
+    it('shows error messages after parsing', () => {
       const {container} = subject({parseValueCallback: () => null})
       const input = container.querySelector('label input[type="text"]')
       fireEvent.change(input, {target: {value: 'x'}})
       fireEvent.blur(input)
-      const messageContainer = container.querySelector('label > span > span:last-child')
+      const messageContainer = container.querySelector('label > span:last-child span')
       expect(messageContainer.textContent).toEqual('Invalid entry.')
     })
   })
@@ -153,7 +153,7 @@ describe('CustomNumberInput', () => {
       fireEvent.change(input, {target: {value: 'x'}})
       await waitFor(
         () => {
-          const messageContainer = container.querySelector('label > span > span:last-child')
+          const messageContainer = container.querySelector('label > span:last-child span')
           expect(messageContainer.textContent).toEqual('Invalid entry.')
         },
         {timeout},

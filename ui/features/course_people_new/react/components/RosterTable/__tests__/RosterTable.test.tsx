@@ -21,6 +21,8 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import RosterTable from '../RosterTable'
 import {
+  DEFAULT_SORT_DIRECTION,
+  DEFAULT_SORT_FIELD,
   INACTIVE_ENROLLMENT,
   PENDING_ENROLLMENT
 } from '../../../../util/constants'
@@ -59,9 +61,16 @@ const useCoursePeopleContextMocks = {
   activeGranularEnrollmentPermissions: [],
 }
 
+const defaultProps = {
+  users: mockUsers,
+  handleSort: () => {},
+  sortField: DEFAULT_SORT_FIELD,
+  sortDirection: DEFAULT_SORT_DIRECTION
+}
+
 describe('RosterTable', () => {
   const user = userEvent.setup()
-  const renderComponent = () => render(<RosterTable users={mockUsers} />)
+  const renderComponent = () => render(<RosterTable {...defaultProps} />)
 
   beforeEach(() => {
     (useCoursePeopleQuery as jest.Mock).mockReturnValue({

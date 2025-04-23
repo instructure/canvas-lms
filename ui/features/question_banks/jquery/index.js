@@ -132,10 +132,11 @@ $(document).ready(function () {
         hrefValues: ['id'],
       })
       // if you can convince fillTemplateData to do this, please be my guest
-      $bank.find('.links a').each((_, link) => {
+      $bank.find('.links button').each((_, link) => {
         link.setAttribute('title', link.getAttribute('title').replace('{{ title }}', bank.title))
+        link.setAttribute('href', link.getAttribute('href').replace(encodeURIComponent('{{ id }}'), bank.id))
       })
-      $bank.find('.links a span').each((_, span) => {
+      $bank.find('.links button span').each((_, span) => {
         span.textContent = span.textContent.replace('{{ title }}', bank.title)
       })
       $bank.find('a.title')[0].focus()

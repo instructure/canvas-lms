@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# TODO: after VICE-5047 gets to production, we can remove this mutation
 class Mutations::UpdateDiscussionSortOrder < Mutations::BaseMutation
   graphql_name "UpdateDiscussionSortOrder"
 

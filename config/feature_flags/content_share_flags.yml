@@ -13,6 +13,11 @@ instui_for_course_copy_page:
   description: |-
     If enabled, the course copy page will use InstUI components
   applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 fill_missing_dates_from_source_course:
   state: hidden

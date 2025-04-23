@@ -406,6 +406,40 @@ class Group < ActiveRecord::Base
     end
   end
 
+  def bulk_add_users_to_differentiation_tag(user_ids, options = {})
+    return [] if user_ids.empty?
+
+    old_group_memberships = group_memberships.where(user_id: user_ids).to_a
+    bulk_upsert_group_memberships(user_ids, options)
+    all_group_memberships = group_memberships.where(user_id: user_ids)
+    all_group_memberships - old_group_memberships
+  end
+
+  def bulk_upsert_group_memberships(user_ids, options = {})
+    return if user_ids.empty?
+
+    current_time = Time.zone.now
+    base_options = {
+      group_id: id,
+      workflow_state: "accepted",
+      moderator: false,
+      created_at: current_time,
+      updated_at: current_time,
+      root_account_id:
+    }.merge(options)
+
+    upsert_data = user_ids.map do |user_id|
+      base_options.merge(user_id:, uuid: CanvasSlug.generate_securish_uuid)
+    end
+
+    upsert_data.each_slice(1000) do |batch|
+      GroupMembership.upsert_all(
+        batch,
+        unique_by: [:group_id, :user_id]
+      )
+    end
+  end
+
   def bulk_add_users_to_group(users, options = {})
     return if users.empty?
 

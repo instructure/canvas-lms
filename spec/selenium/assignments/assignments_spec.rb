@@ -296,7 +296,7 @@ describe "assignments" do
           create_text_file(txt_file_1, "This is the content of file1.")
 
           f('input[name="submissions_zip"]').send_keys(txt_file_1)
-          expect(f("#file_type_error_text")).to be_displayed
+          expect(f("[data-testid='error-message-container']")).to be_displayed
         end
       end
     end
@@ -892,6 +892,50 @@ describe "assignments" do
       submit_assignment_form
       # validate allowed extensions max
       expect(f("#allowed_extensions_errors")).to include_text("Must be fewer than 256 characters")
+    end
+
+    context "invalid allowed extensions" do
+      it "ignores invalid extensions if File Uploads is unchecked" do
+        assignment = @course.assignments.create!(
+          name: "Test invalid allowed extensions with file uploads unchecked",
+          submission_types: "online_text_entry,online_upload",
+          assignment_group: @course.assignment_groups.first
+        )
+
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        f("#assignment_restrict_file_extensions").click
+        # invalid file extension
+        f("#assignment_allowed_extensions").send_keys("a" * 256)
+        # unchecking File Uploads clears the error and allow the form to be submitted
+        f("#assignment_online_upload").click
+
+        submit_assignment_form
+
+        expect(assignment.reload.submission_types).to eq "online_text_entry"
+      end
+
+      it "ignores invalid extensions if Restrict Upload File Types is unchecked" do
+        assignment = @course.assignments.create!(
+          name: "Test invalid allowed extensions with restrict upload file types unchecked",
+          submission_types: "online_text_entry,online_upload",
+          assignment_group: @course.assignment_groups.first
+        )
+
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        f("#assignment_restrict_file_extensions").click
+        # invalid extension type
+        f("#assignment_allowed_extensions").send_keys("a" * 256)
+        # unchecking Restrict Upload File Types clears the error and allow the form to be submitted
+        f("#assignment_restrict_file_extensions").click
+
+        submit_assignment_form
+
+        expect(assignment.reload.submission_types).to eq "online_text_entry,online_upload"
+      end
     end
 
     context "validates group assignment" do
@@ -2064,9 +2108,9 @@ describe "assignments" do
       expect(f("[data-testid='assignment-name-input']")).not_to be_disabled
       expect(f("[data-testid='points-input']")).to be_disabled
       # Date
-      expect(f("#Selectable_0")).to be_disabled
+      expect(f("#Selectable___0")).to be_disabled
       # Time
-      expect(f("#Select_0")).to be_disabled
+      expect(f("#Select___0")).to be_disabled
     end
 
     it "displays the correct date input fields in the assign to tray" do

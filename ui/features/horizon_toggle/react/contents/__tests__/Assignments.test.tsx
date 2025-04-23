@@ -59,7 +59,7 @@ describe('Assignments', () => {
         <Assignments />
       </HorizonToggleContext.Provider>,
     )
-    expect(screen.queryByText('Assignments')).not.toBeInTheDocument()
+    expect(screen.queryByText('Assignments')).toBeNull()
   })
 
   it('renders assignment items when errors exist', async () => {

@@ -27,11 +27,26 @@ import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import {reorder} from '../CriterionModal'
 import {WarningModal} from '../WarningModal'
 
-const saveRubricMock = jest.fn()
 jest.mock('../queries/RubricFormQueries', () => ({
   ...jest.requireActual('../queries/RubricFormQueries'),
-  saveRubric: () => saveRubricMock,
+  saveRubric: jest.fn(),
+  generateCriteria: jest.fn(),
 }))
+
+const mockCriteria = [
+  {
+    id: '1',
+    description: 'Generated Criterion 1',
+    points: 20,
+    ratings: [],
+    longDescription: '',
+    outcome: undefined,
+    learningOutcomeId: undefined,
+    ignoreForScoring: false,
+    criterionUseRange: false,
+    masteryPoints: 0,
+  },
+]
 
 const ROOT_OUTCOME_GROUP = {
   id: '1',
@@ -70,7 +85,7 @@ describe('RubricForm Tests', () => {
           onSaveRubric={() => {}}
           accountId="1"
           showAdditionalOptions={true}
-          criteriaViaLlm={false}
+          aiRubricsEnabled={false}
           {...props}
         />
       </MockedQueryProvider>,
@@ -615,6 +630,129 @@ describe('RubricForm Tests', () => {
         const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
         expect(criteriaRowDescriptions[0]).not.toHaveTextContent('Updated Criterion Test')
       })
+    })
+  })
+
+  describe('generate criteria form', () => {
+    it('shows the generate criteria form when aiRubricsEnabled is true and there is an assignmentId', () => {
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      expect(getByTestId('generate-criteria-form')).toBeInTheDocument()
+      expect(getByTestId('criteria-count-input')).toHaveValue('5')
+      expect(getByTestId('rating-count-input')).toHaveValue('4')
+      expect(getByTestId('points-per-criterion-input')).toHaveValue('20')
+    })
+
+    it('does not show the form when aiRubricsEnabled is false', () => {
+      const {queryByTestId} = renderComponent({
+        aiRubricsEnabled: false,
+        assignmentId: '1',
+      })
+
+      expect(queryByTestId('generate-criteria-form')).not.toBeInTheDocument()
+    })
+
+    it('does not show the form when there is no assignmentId', () => {
+      const {queryByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+      })
+
+      expect(queryByTestId('generate-criteria-form')).not.toBeInTheDocument()
+    })
+
+    it('validates points per criterion input', async () => {
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const pointsInput = getByTestId('points-per-criterion-input')
+      fireEvent.change(pointsInput, {target: {value: '-1'}})
+
+      const generateButton = getByTestId('generate-criteria-button')
+      fireEvent.click(generateButton)
+
+      expect(RubricFormQueries.generateCriteria as jest.Mock).not.toHaveBeenCalled()
+      expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
+        'Points per criterion must be a valid number',
+      )
+    })
+
+    it('calls generateCriteria with correct parameters when generate button is clicked', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
+      generateCriteriaMock.mockResolvedValue({
+        rubric: {
+          criteria: mockCriteria,
+        },
+      })
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const generateButton = getByTestId('generate-criteria-button')
+      fireEvent.click(generateButton)
+
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      expect(generateCriteriaMock).toHaveBeenCalledWith('1', '1', {
+        criteriaCount: 5,
+        ratingCount: 4,
+        pointsPerCriterion: '20',
+      })
+      expect(getByTestId('rubric-criteria-container')).toHaveTextContent('Generated Criterion 1')
+    })
+
+    it('renders the ai icon for generated criteria', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
+      generateCriteriaMock.mockResolvedValue({
+        rubric: {
+          criteria: mockCriteria,
+        },
+      })
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const generateButton = getByTestId('generate-criteria-button')
+      fireEvent.click(generateButton)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      const criteriaRows = getByTestId('rubric-criteria-container')
+      expect(
+        criteriaRows.querySelector('[data-testid="rubric-criteria-row-ai-icon"]'),
+      ).toBeInTheDocument()
+    })
+
+    it('shows error when generateCriteria fails', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
+      generateCriteriaMock.mockRejectedValueOnce(new Error('Failed to generate'))
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const generateButton = getByTestId('generate-criteria-button')
+      fireEvent.click(generateButton)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
+        'Failed to generate criteria',
+      )
     })
   })
 

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
-import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
+import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {
   type LtiPlacement,
   supportsDeepLinkingRequest,

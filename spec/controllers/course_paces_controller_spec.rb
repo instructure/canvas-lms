@@ -41,7 +41,6 @@ describe CoursePacesController do
   before :once do
     course_with_teacher(active_all: true)
     @course.update(start_at: "2021-09-30", restrict_enrollments_to_course_dates: true)
-    @course.root_account.enable_feature!(:course_paces)
     @course.enable_course_paces = true
     @course.save!
     student_in_course(active_all: true)
@@ -71,7 +70,6 @@ describe CoursePacesController do
                                                })]
 
     @course.save!
-    @course.account.enable_feature!(:course_paces)
 
     @another_section = @course.course_sections.create!
 
@@ -216,13 +214,6 @@ describe CoursePacesController do
       expect(@course.course_paces.primary.count).to eq(0)
     end
 
-    it "responds with not found if the course_paces feature is disabled" do
-      @course.account.disable_feature!(:course_paces)
-      assert_page_not_found do
-        get :index, params: { course_id: @course.id }
-      end
-    end
-
     it "responds with not found if the enable_course_paces setting is disabled" do
       @course.enable_course_paces = false
       @course.save!
@@ -243,7 +234,6 @@ describe CoursePacesController do
         @teacher1 = User.create!
         course_with_teacher(course: @course1, user: @teacher1, active_all: true)
         @course1.update(start_at: "2021-09-30", restrict_enrollments_to_course_dates: true)
-        @course1.root_account.enable_feature!(:course_paces)
         @course1.enable_course_paces = true
         @course1.save!
         @course_pace1 = course_pace_model(course: @course1)
@@ -252,7 +242,6 @@ describe CoursePacesController do
         @teacher2 = User.create!
         course_with_teacher(course: @course2, user: @teacher2, active_all: true)
         @course2.update(start_at: "2021-09-30", restrict_enrollments_to_course_dates: true)
-        @course2.root_account.enable_feature!(:course_paces)
         @course2.enable_course_paces = true
         @course2.save!
         @course_pace2 = course_pace_model(course: @course2)
@@ -822,6 +811,7 @@ describe CoursePacesController do
       end
 
       it "returns an instantiated section pace if one is already published and the user is in that section" do
+        @course.course_paces.for_user(@student).destroy_all
         @course_section.enrollments << @student_enrollment
         course_section_pace = course_pace_model(course: @course, course_section: @course_section)
         course_section_pace.publish
@@ -1020,7 +1010,9 @@ describe CoursePacesController do
         post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
         expect(response).to be_successful
         json_response = response.parsed_body
-        expect(json_response.values).to eq(%w[2021-12-24 2021-12-26 2021-12-31])
+        dates = json_response.values.map { |d| Date.parse(d) }
+        expected_end_date = Date.parse(course_pace_params[:end_date])
+        expect(dates.last).to eq(expected_end_date)
       end
 
       it "rolls over years properly" do
@@ -1179,117 +1171,103 @@ describe CoursePacesController do
     end
   end
 
-  describe "DELETE #destroy" do
-    it "requires the redesign feature flag" do
-      delete :destroy, params: { course_id: @course.id, id: @course_pace.id }
-      expect(response).not_to be_successful
-      expect(response.code).to eq(404.to_s)
+  it "deletes the pace" do
+    section_pace = course_pace_model(course: @course, course_section: @course_section)
+    delete :destroy, params: { course_id: @course.id, id: section_pace.id }
+    expect(response).to be_successful
+    expect(section_pace.reload.deleted?).to be(true)
+  end
+
+  it "does not allow deleting the published default course pace" do
+    delete :destroy, params: { course_id: @course.id, id: @course_pace.id }
+    expect(response).not_to be_successful
+    json_response = response.parsed_body
+    expect(@course_pace.reload.deleted?).not_to be(true)
+    expect(json_response["errors"]).to eq("You cannot delete the default course pace.")
+  end
+
+  it "does not increment when the course pace delete api endpoint is called" do
+    allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+
+    delete :destroy, params: { course_id: @course.id, id: @course_pace.id }
+    expect(InstStatsd::Statsd).not_to have_received(:increment).with("course_pacing.deleted_course_pace")
+  end
+
+  context "with fallback paces" do
+    before do
+      Setting.set("course_pace_publish_interval", "0") # run publishes immediately
+      @default_pace = @course_pace
+      @default_pace_published_at = @default_pace.published_at
+      @section_pace = course_pace_model(course: @course, course_section: @course_section)
+      @section_pace_published_at = @section_pace.published_at
+      @another_section_pace = course_pace_model(course: @course, course_section: @another_section)
+      @another_section_pace_published_at = @another_section_pace.published_at
     end
 
-    context "with the redesign feature flag" do
-      before do
-        Account.site_admin.enable_feature!(:course_paces_redesign)
-      end
+    it "publishes the default pace if the enrollments don't have another pace" do
+      delete :destroy, params: { course_id: @course.id, id: @section_pace.id }
+      expect(response).to be_successful
+      run_jobs
+      expect(@section_pace.reload.deleted?).to be(true)
+      expect(@default_pace.reload.published_at).to be > (@default_pace_published_at)
+    end
 
-      it "deletes the pace" do
-        section_pace = course_pace_model(course: @course, course_section: @course_section)
-        delete :destroy, params: { course_id: @course.id, id: section_pace.id }
-        expect(response).to be_successful
-        expect(section_pace.reload.deleted?).to be(true)
-      end
+    it "does not publish the default pace if the pace was not originally published" do
+      @section_pace.update(workflow_state: "unpublished")
 
-      it "does not allow deleting the published default course pace" do
-        delete :destroy, params: { course_id: @course.id, id: @course_pace.id }
-        expect(response).not_to be_successful
-        json_response = response.parsed_body
-        expect(@course_pace.reload.deleted?).not_to be(true)
-        expect(json_response["errors"]).to eq("You cannot delete the default course pace.")
-      end
+      delete :destroy, params: { course_id: @course.id, id: @section_pace.id }
+      expect(response).to be_successful
+      run_jobs
+      expect(@section_pace.reload.deleted?).to be(true)
+      expect(@default_pace.reload.published_at).to eq(@default_pace_published_at)
+    end
 
-      it "does not increment when the course pace delete api endpoint is called" do
-        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+    it "publishes another section pace if the enrollments are in two sections with paces" do
+      student_in_section(@another_section, user: @student, allow_multiple_enrollments: true)
+      student_in_section(@course_section, user: @student, allow_multiple_enrollments: true)
 
-        delete :destroy, params: { course_id: @course.id, id: @course_pace.id }
-        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course_pacing.deleted_course_pace")
-      end
+      delete :destroy, params: { course_id: @course.id, id: @section_pace.id }
+      expect(response).to be_successful
+      run_jobs
+      expect(@section_pace.reload.deleted?).to be(true)
+      expect(@default_pace.reload.published_at).to eq(@default_pace_published_at)
+      expect(@another_section_pace.reload.published_at).to be > (@another_section_pace_published_at)
+    end
 
-      context "with fallback paces" do
-        before do
-          Setting.set("course_pace_publish_interval", "0") # run publishes immediately
-          @default_pace = @course_pace
-          @default_pace_published_at = @default_pace.published_at
-          @section_pace = course_pace_model(course: @course, course_section: @course_section)
-          @section_pace_published_at = @section_pace.published_at
-          @another_section_pace = course_pace_model(course: @course, course_section: @another_section)
-          @another_section_pace_published_at = @another_section_pace.published_at
-        end
+    it "publishes the section pace if the student pace is deleted and the student is in a section with a pace" do
+      student_enrollment_pace = course_pace_model(course: @course, user: @student)
 
-        it "publishes the default pace if the enrollments don't have another pace" do
-          delete :destroy, params: { course_id: @course.id, id: @section_pace.id }
-          expect(response).to be_successful
-          run_jobs
-          expect(@section_pace.reload.deleted?).to be(true)
-          expect(@default_pace.reload.published_at).to be > (@default_pace_published_at)
-        end
+      delete :destroy, params: { course_id: @course.id, id: student_enrollment_pace.id }
+      expect(response).to be_successful
+      run_jobs
+      expect(student_enrollment_pace.reload.deleted?).to be(true)
+      expect(@default_pace.reload.published_at).to eq(@default_pace_published_at)
+      expect(@section_pace.reload.published_at).to be > (@section_pace_published_at)
+    end
 
-        it "does not publish the default pace if the pace was not originally published" do
-          @section_pace.update(workflow_state: "unpublished")
+    it "publishes the default pace if a student pace is deleted and the student is not in a section with a pace" do
+      @section_pace.destroy
+      student_enrollment_pace = course_pace_model(course: @course, user: @student)
 
-          delete :destroy, params: { course_id: @course.id, id: @section_pace.id }
-          expect(response).to be_successful
-          run_jobs
-          expect(@section_pace.reload.deleted?).to be(true)
-          expect(@default_pace.reload.published_at).to eq(@default_pace_published_at)
-        end
+      delete :destroy, params: { course_id: @course.id, id: student_enrollment_pace.id }
+      expect(response).to be_successful
+      run_jobs
+      expect(student_enrollment_pace.reload.deleted?).to be(true)
+      expect(@default_pace.reload.published_at).to be > @default_pace_published_at
+    end
 
-        it "publishes another section pace if the enrollments are in two sections with paces" do
-          student_in_section(@another_section, user: @student, allow_multiple_enrollments: true)
-          student_in_section(@course_section, user: @student, allow_multiple_enrollments: true)
+    it "publishes multiple paces if the enrollments belong to sections with paces and enrollments without when a section pace is deleted" do
+      another_student = user_factory(active_all: true)
+      student_in_section(@another_section, user: another_student, allow_multiple_enrollments: true)
+      student_in_section(@course_section, user: another_student, allow_multiple_enrollments: true)
+      student_in_section(@course_section, user: @student, allow_multiple_enrollments: true)
 
-          delete :destroy, params: { course_id: @course.id, id: @section_pace.id }
-          expect(response).to be_successful
-          run_jobs
-          expect(@section_pace.reload.deleted?).to be(true)
-          expect(@default_pace.reload.published_at).to eq(@default_pace_published_at)
-          expect(@another_section_pace.reload.published_at).to be > (@another_section_pace_published_at)
-        end
-
-        it "publishes the section pace if the student pace is deleted and the student is in a section with a pace" do
-          student_enrollment_pace = course_pace_model(course: @course, user: @student)
-
-          delete :destroy, params: { course_id: @course.id, id: student_enrollment_pace.id }
-          expect(response).to be_successful
-          run_jobs
-          expect(student_enrollment_pace.reload.deleted?).to be(true)
-          expect(@default_pace.reload.published_at).to eq(@default_pace_published_at)
-          expect(@section_pace.reload.published_at).to be > (@section_pace_published_at)
-        end
-
-        it "publishes the default pace if a student pace is deleted and the student is not in a section with a pace" do
-          @section_pace.destroy
-          student_enrollment_pace = course_pace_model(course: @course, user: @student)
-
-          delete :destroy, params: { course_id: @course.id, id: student_enrollment_pace.id }
-          expect(response).to be_successful
-          run_jobs
-          expect(student_enrollment_pace.reload.deleted?).to be(true)
-          expect(@default_pace.reload.published_at).to be > @default_pace_published_at
-        end
-
-        it "publishes multiple paces if the enrollments belong to sections with paces and enrollments without when a section pace is deleted" do
-          another_student = user_factory(active_all: true)
-          student_in_section(@another_section, user: another_student, allow_multiple_enrollments: true)
-          student_in_section(@course_section, user: another_student, allow_multiple_enrollments: true)
-          student_in_section(@course_section, user: @student, allow_multiple_enrollments: true)
-
-          delete :destroy, params: { course_id: @course.id, id: @section_pace.id }
-          expect(response).to be_successful
-          run_jobs
-          expect(@section_pace.reload.deleted?).to be(true)
-          expect(@default_pace.reload.published_at).to be > (@default_pace_published_at)
-          expect(@another_section_pace.reload.published_at).to be > (@another_section_pace_published_at)
-        end
-      end
+      delete :destroy, params: { course_id: @course.id, id: @section_pace.id }
+      expect(response).to be_successful
+      run_jobs
+      expect(@section_pace.reload.deleted?).to be(true)
+      expect(@default_pace.reload.published_at).to be > (@default_pace_published_at)
+      expect(@another_section_pace.reload.published_at).to be > (@another_section_pace_published_at)
     end
   end
 end

@@ -73,7 +73,7 @@ describe "admin sub accounts" do
     sub_account_id = sub_account.id
     expect do
       click_account_action_link(sub_account.id, "delete")
-      driver.switch_to.alert.accept
+      f('[data-testid="confirm-delete"]').click
       wait_for_ajaximations
     end.to change(Account.default.sub_accounts, :count).by(-1)
     check_element_has_focus f("[data-testid='link_#{Account.default.id}']")

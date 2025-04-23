@@ -128,6 +128,116 @@ module UserSearch
                                                      context.try(:resolved_root_account_id) || context.root_account_id
                                                    ]))
         users_scope.order(Arel.sql("#{column} #{order}"))
+      when "name"
+        users_scope.select("users.*").order_by_name(direction: (options[:order] == "desc") ? :descending : :ascending)
+      when "login_id"
+        # sort pseudonyms based on SisPseudonym#pick_user_pseudonym
+        # grab only the first pseudonym of each user after sorting based on collation_key
+        users_scope = users_scope.select(User.send(:sanitize_sql, [
+                                                     "users.*,
+                                                    (SELECT unique_id
+                                                      FROM #{Pseudonym.quoted_table_name}
+                                                      WHERE pseudonyms.user_id = users.id
+                                                        #{"AND pseudonyms.workflow_state <> 'deleted'" unless @include_deleted_users}
+                                                        AND pseudonyms.account_id = ?
+                                                      ORDER BY workflow_state,
+                                                              CASE WHEN pseudonyms.sis_user_id IS NOT NULL THEN 0 ELSE 1 END,
+                                                              #{Pseudonym.best_unicode_collation_key("unique_id")},
+                                                              position
+                                                      LIMIT 1) AS login_id",
+                                                     context.try(:resolved_root_account_id) || context.root_account_id
+                                                   ]))
+        users_scope.order(Arel.sql("login_id#{order}"))
+      when "total_activity_time"
+        raise_context_error("total_activity_time") unless context.is_a?(Course)
+
+        # grab the max total_activity_time from all non-deleted user enrollments in the course
+        users_scope = users_scope.select(User.send(:sanitize_sql, [
+                                                     "users.*,
+                                                    (SELECT MAX(enrollments.total_activity_time)
+                                                      FROM #{Enrollment.quoted_table_name}
+                                                      WHERE enrollments.user_id = users.id
+                                                        AND enrollments.workflow_state <> 'deleted'
+                                                        AND enrollments.course_id = ?
+                                                    ) AS total_activity_time",
+                                                     context.id
+                                                   ]))
+        users_scope.order(Arel.sql("total_activity_time#{order}"))
+      when "last_activity_at"
+        raise_context_error("last_activity_at") unless context.is_a?(Course)
+
+        # The order for last_activity_at is intentionally reversed because last activity is
+        # a timestamp and we want the most recent activity to appear first in ascending order
+        # Multiple users with the same last activity are ordered by their id in non-reversed order for consistency with other sorts
+        # Observers are ignored because course roster does not display last activity for them
+        reverse_order = if options[:order] == "desc"
+                          " ASC NULLS LAST, id DESC"
+                        else
+                          " DESC NULLS LAST, id ASC"
+                        end
+        users_scope = users_scope.select(User.send(:sanitize_sql, [
+                                                     "users.*,
+                                                    (SELECT last_activity_at
+                                                      FROM #{Enrollment.quoted_table_name}
+                                                      WHERE enrollments.user_id = users.id
+                                                        AND enrollments.workflow_state <> 'deleted'
+                                                        AND enrollments.type <> 'ObserverEnrollment'
+                                                        AND enrollments.course_id = ?
+                                                      ORDER BY last_activity_at
+                                                      #{(options[:order] == "desc") ? "ASC" : "DESC"}
+                                                      NULLS LAST
+                                                      LIMIT 1) AS last_activity_at",
+                                                     context.id
+                                                   ]))
+        users_scope.order(Arel.sql("last_activity_at#{reverse_order}"))
+      when "section_name"
+        raise_context_error("section_name") unless context.is_a?(Course)
+
+        # ignore observers because course roster does not display section name for them
+        users_scope = users_scope.select(User.send(:sanitize_sql, [
+                                                     "users.*,
+                                                    (SELECT course_sections.name
+                                                      FROM #{Enrollment.quoted_table_name}
+                                                      LEFT JOIN #{CourseSection.quoted_table_name}
+                                                      ON enrollments.course_section_id = course_sections.id
+                                                      WHERE enrollments.user_id = users.id
+                                                        AND enrollments.workflow_state <> 'deleted'
+                                                        AND enrollments.type <> 'ObserverEnrollment'
+                                                        AND enrollments.course_id = ?
+                                                      ORDER BY course_sections.name
+                                                      #{(options[:order] == "desc") ? "DESC" : "ASC"}
+                                                      NULLS LAST
+                                                      LIMIT 1) AS section_name",
+                                                     context.id
+                                                   ]))
+        users_scope.order(Arel.sql("section_name#{order}"))
+      when "role"
+        raise_context_error("role") unless context.is_a?(Course)
+
+        # custom ordering for roles - teacher ranks highest in ascending order
+        users_scope = users_scope.select(User.send(:sanitize_sql, [
+                                                     "users.*,
+                                                    (SELECT
+                                                        CASE
+                                                          WHEN type = 'TeacherEnrollment' THEN 0
+                                                          WHEN type = 'TaEnrollment' THEN 1
+                                                          WHEN type = 'StudentEnrollment' THEN 2
+                                                          WHEN type = 'ObserverEnrollment' THEN 3
+                                                          WHEN type = 'DesignerEnrollment' THEN 4
+                                                        ELSE
+                                                          NULL
+                                                        END as role
+                                                      FROM #{Enrollment.quoted_table_name}
+                                                      WHERE enrollments.user_id = users.id
+                                                        AND enrollments.workflow_state <> 'deleted'
+                                                        AND enrollments.course_id = ?
+                                                      ORDER BY role
+                                                      #{(options[:order] == "desc") ? "DESC" : "ASC"}
+                                                      NULLS LAST
+                                                      LIMIT 1) AS role",
+                                                     context.id
+                                                   ]))
+        users_scope.order(Arel.sql("role#{order}"))
       else
         users_scope.select("users.*").order_by_sortable_name
       end
@@ -305,6 +415,10 @@ module UserSearch
 
     def wildcard_pattern(value, **)
       ActiveRecord::Base.wildcard_pattern(value, **)
+    end
+
+    def raise_context_error(field)
+      raise RequestError.new("Sorting by #{field} is only available within a course context", 400)
     end
   end
 end

@@ -21,36 +21,39 @@ import {Button} from '@instructure/ui-buttons'
 import FilterDropDown from '../FilterDropDown/FilterDropDown'
 import {Text} from '@instructure/ui-text'
 import InsightsSearchBar from '../InsightsSearchBar/InsightsSearchBar'
-import AiIcon from '@canvas/ai-icon'
+import {IconAiLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('discussion_insights')
 
 type InsightsActionBarProps = {
-  handleSearch: (query: string) => void
+  loading: boolean
+  entryCount: number
+  onSearch: (query: string) => void
+  onGenerateInsights: () => void
 }
 
-const InsightsActionBar: React.FC<InsightsActionBarProps> = ({handleSearch}) => {
+const InsightsActionBar: React.FC<InsightsActionBarProps> = ({
+  loading,
+  entryCount,
+  onSearch,
+  onGenerateInsights,
+}) => {
   return (
-    <Flex width="100%" direction="row" wrap="wrap" gap="small">
+    <Flex width="100%" direction="row" wrap="wrap" gap="small" margin="0 0 medium 0">
       <Flex.Item shouldGrow shouldShrink>
-        <InsightsSearchBar onSearch={handleSearch} />
+        <InsightsSearchBar onSearch={onSearch} />
       </Flex.Item>
       <Flex.Item shouldShrink shouldGrow={false} width="fit-content">
-        <FilterDropDown
-          onFilterClick={() => {
-            //TODO: will be implemented in VICE-5147
-          }}
-        />
+        <FilterDropDown />
       </Flex.Item>
       <Flex.Item>
         <Button
           display="inline-block"
           color="primary"
-          renderIcon={<AiIcon />}
-          onClick={() => {
-            //TODO: will be implemented in VICE-5151
-          }}
+          renderIcon={<IconAiLine />}
+          onClick={onGenerateInsights}
+          disabled={loading || entryCount === 0}
           data-testid="discussion-insights-generate-button"
         >
           <Text>{I18n.t('Generate Insights')}</Text>

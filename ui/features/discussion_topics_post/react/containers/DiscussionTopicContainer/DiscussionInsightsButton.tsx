@@ -23,6 +23,7 @@ import {IconAnalyticsLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 interface DiscussionInsightsButtonProps {
+  isMobile: boolean
   onClick: () => void
 }
 
@@ -35,7 +36,9 @@ export const DiscussionInsightsButton: React.FC<DiscussionInsightsButtonProps> =
       <Button
         onClick={props.onClick}
         renderIcon={<IconAnalyticsLine />}
+        id="discussion-insights-button"
         data-testid="discussion-insights-button"
+        display={props.isMobile ? 'block' : 'inline-block'}
       >
         {buttonText}
       </Button>

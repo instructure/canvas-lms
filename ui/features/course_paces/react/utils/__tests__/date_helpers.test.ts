@@ -305,7 +305,6 @@ describe('date_helpers', () => {
 
     it('Student pace and course pace end date is not null', () => {
       window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_for_students = true
 
       const result = getEndDateValue(STUDENT_PACE, plannedEndDate)
       expect(result).toEqual(STUDENT_PACE.end_date)
@@ -313,7 +312,6 @@ describe('date_helpers', () => {
 
     it('Student pace and course pace end date is null', () => {
       window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_for_students = true
 
       const coursePace = {
         ...STUDENT_PACE,
@@ -321,14 +319,6 @@ describe('date_helpers', () => {
       }
 
       const result = getEndDateValue(coursePace, plannedEndDate)
-      expect(result).toEqual(plannedEndDate)
-    })
-
-    it('Student pace and students flag is off', () => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_for_students = false
-
-      const result = getEndDateValue(STUDENT_PACE, plannedEndDate)
       expect(result).toEqual(plannedEndDate)
     })
 

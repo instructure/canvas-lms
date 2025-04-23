@@ -567,7 +567,7 @@ class DiscussionTopicsController < ApplicationController
     return render_unauthorized_action unless @topic.visible_for?(@current_user)
 
     @context.try(:require_assignment_group) unless @topic.is_announcement
-    can_set_group_category = ANONYMOUS_STATES.exclude?(@topic.anonymous_state) && @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage_groups_add) # i.e. not anonymous and not a student
+    can_set_group = @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage_groups_add) # i.e. not a student
     hash = {
       URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
       PERMISSIONS: {
@@ -575,7 +575,7 @@ class DiscussionTopicsController < ApplicationController
         CAN_UPDATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.temp_record.grants_right?(@current_user, session, :update),
         CAN_ATTACH: @topic.grants_right?(@current_user, session, :attach),
         CAN_MODERATE: user_can_moderate,
-        CAN_SET_GROUP: can_set_group_category,
+        CAN_SET_GROUP: can_set_group,
         CAN_EDIT_GRADES: can_do(@context, @current_user, :manage_grades),
         # if not a course content manager, or if topic is graded, do not show add to todo list checkbox
         CAN_MANAGE_CONTENT: @context.grants_right?(@current_user, session, :manage_course_content_add),
@@ -618,7 +618,7 @@ class DiscussionTopicsController < ApplicationController
     handle_assignment_edit_params(hash[:ATTRIBUTES])
 
     categories = []
-    if can_set_group_category
+    if can_set_group && ANONYMOUS_STATES.exclude?(@topic.anonymous_state)
       categories = @context.group_categories.to_a
       # if discussion has entries and is attached to a deleted group category,
       # add that category to the ENV list so it will be shown on the edit page.
@@ -914,7 +914,7 @@ class DiscussionTopicsController < ApplicationController
       edit_url += "?embed=true" if params[:embed] == "true"
 
       assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
-
+      participant = @topic.participant(@current_user)
       js_env({
                course_id: params[:course_id] || @context.course&.id,
                context_type: @topic.context_type,
@@ -936,8 +936,9 @@ class DiscussionTopicsController < ApplicationController
                discussion_translation_languages: Translation.available?(@context, :translation, @domain_root_account.feature_enabled?(:ai_translation_improvements)) ? Translation.languages(@domain_root_account.feature_enabled?(:ai_translation_improvements)) : [],
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                user_can_summarize: @topic.user_can_summarize?(@current_user),
+               user_can_access_insights: @topic.user_can_access_insights?(@current_user),
                user_can_insights: user_can_moderate,
-               discussion_summary_enabled: @topic.summary_enabled,
+               discussion_summary_enabled: participant.nil? ? @topic.summary_enabled : participant.summary_enabled,
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                # although there is a permissions object in DiscussionEntry type, it's only accessible if a discussion entry
                # is being replied to. We need this env var so that replying to the topic can use this
@@ -961,7 +962,6 @@ class DiscussionTopicsController < ApplicationController
                DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
                DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),
                DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
-               DISCUSSION_INSIGHTS_ENABLED: @context.root_account.feature_enabled?(:discussion_insights),
              })
       unless @locked
         InstStatsd::Statsd.increment("discussion_topic.visit.redesign")
@@ -1135,25 +1135,22 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def insights
-    if @context.root_account.feature_enabled?(:discussion_insights)
-      return render_unauthorized_action unless user_can_moderate
+    @topic = @context.all_discussion_topics.find(params[:id])
+    return render_unauthorized_action unless @topic.user_can_access_insights?(@current_user)
 
-      @topic = DiscussionTopic.find(params[:id])
-      add_discussion_or_announcement_crumb
-      add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
-      add_crumb t(:insights_crumb, "Discussion Insights")
-      @page_title = join_title("Discussion Insights", @topic.title)
-      js_bundle :discussion_topic_insights
-      js_env({
-               course_id: params[:course_id] || @context.course&.id,
-               context_type: @topic.context_type,
-               context_id: @context.id,
-               discussion_topic_id: @topic.id,
-               INSIGHTS_URL: context_url(@topic.context, :insights_context_discussion_topic_url, @topic),
-               DISCUSSION_INSIGHTS_ENABLED: @context.root_account.feature_enabled?(:discussion_insights),
-             })
-      render html: "<div id='discussion-insights-container'/>".html_safe, layout: true
-    end
+    add_discussion_or_announcement_crumb
+    add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+    add_crumb t(:insights_crumb, "Discussion Insights")
+    @page_title = join_title("Discussion Insights", @topic.title)
+    js_bundle :discussion_topic_insights
+    js_env({
+             course_id: params[:course_id] || @context.course&.id,
+             context_type: @topic.context_type,
+             context_id: @context.id,
+             discussion_topic_id: @topic.id,
+             INSIGHTS_URL: context_url(@topic.context, :insights_context_discussion_topic_url, @topic),
+           })
+    render html: "<div id='discussion-insights-container'/>".html_safe, layout: true
   end
 
   # @API Create a new discussion topic
@@ -1544,13 +1541,12 @@ class DiscussionTopicsController < ApplicationController
       params[:anonymous_state] = nil
     end
 
-    if is_new && params[:anonymous_state]
+    if params[:anonymous_state]
       # group discussions in a course or discussions simply in a group context cannot be anonymous
       if params[:group_category_id] || @context.is_a?(Group)
-        @errors[:anonymous_state] = t(:error_anonymous_state_groups_create,
-                                      "Group discussions cannot be anonymous.")
+        @errors[:anonymous_state] = t(:error_anonymous_state_groups_create, "Group discussions cannot be anonymous.") unless params.key?("group_category_id") && params[:group_category_id].nil?
       end
-      if params[:assignment]
+      if params[:assignment] && (["false", false, "0"].include?(params.dig(:assignment, :set_assignment)) == false)
         @errors[:anonymous_state] = t(:error_graded_anonymous,
                                       "Anonymous discussions cannot be graded")
       end

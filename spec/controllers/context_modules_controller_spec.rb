@@ -549,7 +549,6 @@ describe ContextModulesController do
         @m2 = @course.context_modules.create!
         time = 1.minute.ago
         ContextModule.where(id: [@m1, @m2]).update_all(updated_at: time)
-        @course.account.enable_feature!(:course_paces)
         @course.enable_course_paces = true
         @course.save!
         @primary_pace = course_pace_model(course: @course)

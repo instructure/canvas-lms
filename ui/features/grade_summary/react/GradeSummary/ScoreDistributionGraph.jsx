@@ -25,7 +25,7 @@ const I18n = createI18nScope('grade_summary')
 const ScoreDistributionGraph = props => {
   const {assignment} = props
   const GRAPH_SCALAR = 150.0
-  const GRAY_COLOR = '#556572'
+  const GRAY_COLOR = '#4A5B68'
   const BLUE_COLOR = '#224488'
   const BLUE_FILL_COLOR = '#aabbdd'
 

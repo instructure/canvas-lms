@@ -309,7 +309,6 @@ class AccountsController < ApplicationController
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
-  before_action :page_has_instui_topnav, only: %i[show users]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
@@ -463,6 +462,7 @@ class AccountsController < ApplicationController
 
     respond_to do |format|
       format.html do
+        page_has_instui_topnav { add_crumb t("Courses") }
         @redirect_on_unauth = true
         return course_user_search
       end
@@ -497,7 +497,8 @@ class AccountsController < ApplicationController
                       microsoft_sync_remote_attribute
                       enable_as_k5_account
                       use_classic_font_in_k5
-                      allow_assign_to_differentiation_tags]
+                      allow_assign_to_differentiation_tags
+                      horizon_account]
     settings_hash = public_attrs.index_with { |key| @account.settings[key] }.compact
 
     if @account.password_complexity_enabled? && !@account.site_admin?
@@ -1015,6 +1016,9 @@ class AccountsController < ApplicationController
             use_classic_font = params.dig(:account, :settings, :use_classic_font_in_k5, :value) || @account.use_classic_font_in_k5?
             K5::EnablementService.new(@account).set_k5_settings(value_to_boolean(enable_k5), value_to_boolean(use_classic_font))
 
+            enable_horizon = params.dig(:account, :settings, :horizon_account, :value)
+            @account.horizon_account = value_to_boolean(enable_horizon) unless enable_horizon.nil?
+
             account_settings[:settings].slice!(*permitted_api_account_settings)
             account_settings[:settings][:password_policy] = policy_settings if policy_settings
             ensure_sis_max_name_length_value!(account_settings)
@@ -1185,6 +1189,9 @@ class AccountsController < ApplicationController
   #
   # @argument account[settings][use_classic_font_in_k5][value] [Boolean]
   #   Whether or not the classic font is used on the dashboard. Only applies if enable_as_k5_account is true.
+  #
+  # @argument account[settings][horizon_account][value] [Boolean]
+  #   Enable or disable Canvas Career for this account
   #
   # @argument override_sis_stickiness [boolean]
   #   Default is true. If false, any fields containing “sticky” changes will not be updated.
@@ -1363,6 +1370,9 @@ class AccountsController < ApplicationController
         enable_k5 = params.dig(:account, :settings, :enable_as_k5_account, :value)
         use_classic_font = params.dig(:account, :settings, :use_classic_font_in_k5, :value)
         K5::EnablementService.new(@account).set_k5_settings(value_to_boolean(enable_k5), value_to_boolean(use_classic_font)) unless enable_k5.nil?
+
+        enable_horizon = params.dig(:account, :settings, :horizon_account, :value)
+        @account.horizon_account = value_to_boolean(enable_horizon) unless enable_horizon.nil?
 
         # validate/normalize default due time parameter
         if (default_due_time = params.dig(:account, :settings, :default_due_time, :value))
@@ -1814,6 +1824,7 @@ class AccountsController < ApplicationController
     get_context
     unless params.key?(:term)
       @account ||= @context
+      page_has_instui_topnav { add_crumb t("People") }
       return course_user_search
     end
     return unless authorized_action(@context, @current_user, :read_roster)
@@ -2123,7 +2134,8 @@ class AccountsController < ApplicationController
                                    :enable_limited_access_for_students,
                                    :enable_as_k5_account,
                                    :use_classic_font_in_k5,
-                                   :show_sections_in_course_tray].freeze
+                                   :show_sections_in_course_tray,
+                                   :horizon_account].freeze
   private_constant :PERMITTED_SETTINGS_FOR_UPDATE
 
   def permitted_account_attributes

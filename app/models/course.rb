@@ -187,6 +187,7 @@ class Course < ActiveRecord::Base
   has_many :announcements, as: :context, inverse_of: :context, class_name: "Announcement", dependent: :destroy
   has_many :active_announcements, -> { where("discussion_topics.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Announcement"
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy, extend: Attachment::FindInContextAssociation
+  has_many :attachment_associations, as: :context, inverse_of: :context
   has_many :active_images, -> { where("attachments.file_state<>? AND attachments.content_type LIKE 'image%'", "deleted").order("attachments.display_name").preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: "Attachment"
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'").order("assignments.title, assignments.position") }, as: :context, inverse_of: :context, class_name: "Assignment"
   has_many :folders, -> { order("folders.name") }, as: :context, inverse_of: :context, dependent: :destroy
@@ -2891,7 +2892,8 @@ class Course < ActiveRecord::Base
        restrict_quantitative_data
        horizon_course
        conditional_release
-       default_due_time]
+       default_due_time
+       content_library]
   end
 
   def student_reporting?
@@ -3408,7 +3410,7 @@ class Course < ActiveRecord::Base
                           })
     end
 
-    if account.feature_enabled?(:course_paces) && enable_course_paces && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    if enable_course_paces && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       default_tabs.insert(default_tabs.index { |t| t[:id] == TAB_MODULES } + 1, {
                             id: TAB_COURSE_PACES,
                             label: t("#tabs.course_paces", "Course Pacing"),
@@ -4524,7 +4526,7 @@ class Course < ActiveRecord::Base
     return unless publishing?
 
     publish_time = ((updated_at - created_at) * 1000).round
-    statsd_bucket = (account.feature_enabled?(:course_paces) && enable_course_paces?) ? "paced" : "unpaced"
+    statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
     InstStatsd::Statsd.timing("course.#{statsd_bucket}.create_to_publish_time", publish_time)
   end
 

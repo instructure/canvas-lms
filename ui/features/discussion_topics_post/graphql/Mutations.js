@@ -262,33 +262,23 @@ export const UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE = gql`
   }
 `
 
-export const UPDATE_DISCUSSION_SORT_ORDER = gql`
-  mutation UpdateDiscussionSortOrder(
+export const UPDATE_DISCUSSION_TOPIC_PARTICIPANT = gql`
+  mutation UpdateDiscussionTopicParticipant(
     $discussionTopicId: ID!
-    $sortOrder: DiscussionSortOrderType!
+    $sortOrder: DiscussionSortOrderType
+    $expanded: Boolean
+    $summaryEnabled: Boolean
   ) {
-    updateDiscussionSortOrder(
-      input: {discussionTopicId: $discussionTopicId, sortOrder: $sortOrder}
+    updateDiscussionTopicParticipant(
+      input: {discussionTopicId: $discussionTopicId, sortOrder: $sortOrder, expanded: $expanded, summaryEnabled: $summaryEnabled}
     ) {
       discussionTopic {
-        _id
         id
         participant {
+          id
           sortOrder
-        }
-      }
-    }
-  }
-`
-
-export const UPDATE_DISCUSSION_EXPANDED = gql`
-  mutation UpdateDiscussionExpanded($discussionTopicId: ID!, $expanded: Boolean!) {
-    updateDiscussionExpanded(input: {discussionTopicId: $discussionTopicId, expanded: $expanded}) {
-      discussionTopic {
-        _id
-        id
-        participant {
           expanded
+          summaryEnabled
         }
       }
     }

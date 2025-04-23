@@ -71,15 +71,6 @@ function gradedOverrides() {
         ],
       },
     },
-    Course: {
-      account: {
-        outcomeProficiency: {
-          proficiencyRatingsConnection: {
-            nodes: [{}],
-          },
-        },
-      },
-    },
   }
 }
 
@@ -101,7 +92,7 @@ describe('SubmissionManager', () => {
         <TextEntry focusOnInit={false} submission={{id: '1', _id: '1', state: 'unsubmitted'}} />,
       )
       await waitFor(() => {
-        expect(tinymce.editors[0]).toBeDefined()
+        expect(tinymce.get('textentry_text')).toBeDefined()
       })
       unmount()
     })
@@ -136,18 +127,16 @@ describe('SubmissionManager', () => {
       // Wait for callbacks to fire and the "editor" to be loaded
       await waitFor(
         () => {
-          expect(tinymce?.editors[0]).toBeDefined()
+          expect(tinymce.get('textentry_text')).toBeDefined()
         },
         {timeout: 4000},
       )
-      fakeEditor = tinymce.editors[0]
+      fakeEditor = tinymce.get('textentry_text')
       return result
     }
 
     beforeEach(async () => {
       jest.useFakeTimers()
-      tinymce.editors = []
-      fakeEditor = undefined
       const alert = document.createElement('div')
       alert.id = 'flash_screenreader_holder'
       alert.setAttribute('role', 'alert')
@@ -165,13 +154,13 @@ describe('SubmissionManager', () => {
 
       await waitFor(
         () => {
-          expect(tinymce?.editors[0]).toBeDefined()
+          expect(tinymce.get('textentry_text')).toBeDefined()
         },
         {timeout: 4000},
       )
 
       act(() => {
-        fakeEditor = tinymce.editors[0]
+        fakeEditor = tinymce.get('textentry_text')
         fakeEditor.setContent('some edited draft text')
         jest.advanceTimersByTime(500)
       })

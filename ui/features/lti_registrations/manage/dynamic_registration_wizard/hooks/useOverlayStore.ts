@@ -18,14 +18,14 @@
 
 import React from 'react'
 import type {
-  RegistrationOverlayActions,
-  RegistrationOverlayState,
-  RegistrationOverlayStore,
-} from '../RegistrationOverlayState'
+  DynamicRegistrationOverlayActions,
+  DynamicRegistrationOverlayState,
+  DynamicRegistrationOverlayStore,
+} from '../DynamicRegistrationOverlayState'
 
 export const useOverlayStore = (
-  overlayStore: RegistrationOverlayStore,
-): [RegistrationOverlayState, RegistrationOverlayActions] => {
+  overlayStore: DynamicRegistrationOverlayStore,
+): [DynamicRegistrationOverlayState, DynamicRegistrationOverlayActions] => {
   const [{state, ...actions}, setState] = React.useState(overlayStore.getState())
 
   React.useEffect(() => overlayStore.subscribe(setState), [overlayStore])

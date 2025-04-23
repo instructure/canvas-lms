@@ -134,12 +134,6 @@ describe "course syllabus" do
         visit_syllabus_page(@course1.id)
         expect(course_pacing_notice).to be_displayed
       end
-
-      it "does not shows the course pacing notice when feature is off on account" do
-        @course1.account.disable_feature!(:course_paces)
-        visit_syllabus_page(@course1.id)
-        expect(element_exists?(course_pacing_notice_selector)).to be_falsey
-      end
     end
   end
 

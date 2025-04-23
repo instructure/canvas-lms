@@ -124,7 +124,7 @@ ready(() => {
   )
 
   $external_content_info_alerts.on('focus', function () {
-    $tool_content_wrapper.find('iframe').css('border', '2px solid #0374B5')
+    $tool_content_wrapper.find('iframe').css('border', '2px solid #2B7ABC')
     $(this).removeClass('screenreader-only-tool')
   })
 

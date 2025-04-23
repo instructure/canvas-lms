@@ -27,31 +27,10 @@ confetti_branding:
   description: Applies account branding to confetti splashes
   applies_to: SiteAdmin
 
-course_paces:
-  state: hidden
-  display_name: 'Course Pacing'
-  description:
-    wrapper: <a href="https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing">\1</a>
-    course_paces_description: |-
-      Course Pacing adds support for rolling enrollments to Canvas;
-      automatically distributing due dates for students with different
-      start dates based on an instructor's defined pace. Learn more and give
-      feedback by joining the *Course Pacing User Group*.
-  applies_to: Account
-  beta: true
-  environments:
-    development:
-      state: allowed_on
-    beta:
-      state: allowed_on
-    ci:
-      state: allowed_on
-
 course_paces_skip_selected_days:
   state: hidden
   display_name: 'Course Pacing Skip Selected Days'
-  description: Course pacing removes support for exclude weekends field and add the
-        ability to select specific days of the week.
+  description: Course pacing removes support for exclude weekends field and add the ability to select specific days of the week.
   applies_to: RootAccount
   beta: true
   environments:
@@ -90,18 +69,6 @@ render_both_to_do_lists:
   description: |-
     Renders both To Do lists on the dashboard sidebar for teachers with student enrollments.
 
-course_paces_for_students:
-  state: hidden
-  display_name: 'Per Student Course Paces'
-  description: Enable unique course paces for students.
-  applies_to: SiteAdmin
-
-course_paces_redesign:
-  state: hidden
-  display_name: 'Course Pacing Redesign'
-  description: Enable the redesigned course pacing user experience.
-  applies_to: SiteAdmin
-
 blueprint_line_item_support:
   state: hidden
   display_name: 'Blueprint Resource ID Support'
@@ -120,6 +87,11 @@ instui_for_import_page:
   description: |-
     If enabled, the course import page will use InstUI components
   applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 differentiated_files:
   state: hidden
@@ -198,3 +170,17 @@ modules_page_rewrite:
   description: |-
     If enabled, the modules page will use the new modules page rewrite.
   applies_to: RootAccount
+
+modules_perf:
+  state: hidden
+  display_name: Modules Performance Improvements
+  description: |-
+    Improves modules page performance on courses with a large number of modules or module items.
+  applies_to: Account
+
+create_wiki_page_mastery_path_overrides:
+  state: hidden
+  display_name: In MasteryPaths Create AssignmentOverrides on WikiPages Instead of Creating a Hidden Assignment
+  description: |-
+    In Mastery Paths create AssignmentOverrides directly onto WikiPages instead of creating a hidden Assignment.
+  applies_to: SiteAdmin

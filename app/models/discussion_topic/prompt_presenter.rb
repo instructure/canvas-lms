@@ -42,21 +42,7 @@ class DiscussionTopic
     #   </entries>
     # </discussion>
     def content_for_summary
-      anonymized_user_ids = {}
-      instructor_count = 0
-      student_count = 0
-
-      @topic.course.enrollments.active.find_each do |enrollment|
-        user_id = enrollment.user_id
-        if @topic.course.user_is_instructor?(enrollment.user)
-          instructor_count += 1
-          anonymized_user_ids[user_id] = "instructor_#{instructor_count}"
-        else
-          student_count += 1
-          anonymized_user_ids[user_id] = "student_#{student_count}"
-        end
-      end
-
+      anonymized_user_ids = get_anonymized_user_ids(with_index: true)
       entries_for_parent_id = @topic.discussion_entries.active.to_a.group_by(&:parent_id)
 
       xml = Builder::XmlMarkup.new(indent: 2)
@@ -69,6 +55,25 @@ class DiscussionTopic
 
         xml.entries do
           xml << parts_for_summary(nil, entries_for_parent_id, anonymized_user_ids, "", 1)
+        end
+      end
+
+      xml.target!
+    end
+
+    def content_for_insight(entries:)
+      xml = Builder::XmlMarkup.new(indent: 2)
+
+      xml.discussion do
+        xml.topic do
+          xml.title { xml.text! @topic.title || "" }
+          xml.message { xml.text! @topic.message || "" }
+        end
+
+        xml.chunk do
+          xml.items do
+            xml << contents_for_insight_entries(entries:).map(&:target!).join
+          end
         end
       end
 
@@ -108,10 +113,71 @@ class DiscussionTopic
       xml.target!
     end
 
+    def get_anonymized_user_ids(with_index:)
+      anonymized_user_ids = {}
+      instructor_count = 0
+      student_count = 0
+
+      enrollments_by_user = {}
+      instructor_types = ["TeacherEnrollment", "TaEnrollment"]
+
+      @topic.course.enrollments.active.select(:user_id, :type).each do |enrollment|
+        enrollments_by_user[enrollment.user_id] ||= []
+        enrollments_by_user[enrollment.user_id] << enrollment.type
+      end
+
+      enrollments_by_user.each do |user_id, types|
+        is_instructor = types.any? { |type| instructor_types.include?(type) }
+
+        if is_instructor
+          instructor_count += 1
+          anonymized_user_ids[user_id] = with_index ? "instructor_#{instructor_count}" : "instructor"
+        else
+          student_count += 1
+          anonymized_user_ids[user_id] = with_index ? "student_#{student_count}" : "student"
+        end
+      end
+
+      anonymized_user_ids
+    end
+
     def anonymize_mentions(content, anonymized_user_ids)
       content.gsub(%r{<span class="mceNonEditable mention" data-mention="(\d+)".*?>.*?</span>}) do
         user_id = $1.to_i
         "@#{anonymized_user_ids[user_id] || "unknown"}"
+      end
+    end
+
+    def contents_for_insight_entries(entries:)
+      anonymized_user_ids = get_anonymized_user_ids(with_index: false)
+
+      entries.map.with_index do |entry, index|
+        anonymized_user_ids[entry.user_id]
+
+        xml = Builder::XmlMarkup.new(indent: 2)
+        xml.item(id: index) do
+          xml.metadata do
+            xml.user_enrollment_type anonymized_user_ids[entry.user_id]
+            xml.word_count entry.message_word_count
+
+            if entry.attachment.present?
+              xml.attachments do
+                # TODO: add attachments from the entry message
+                xml.attachment do
+                  xml.filename entry.attachment.name
+                  xml.content_type entry.attachment.mimetype
+                  if entry.attachment.word_count.present?
+                    xml.word_count entry.attachment.word_count
+                  end
+                end
+              end
+            end
+          end
+          xml.content do
+            xml.text! anonymize_mentions(entry.message || "", anonymized_user_ids)
+          end
+        end
+        xml
       end
     end
   end

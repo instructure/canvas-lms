@@ -120,8 +120,8 @@ describe "new ui" do
       @user.enable_feature!("high_contrast")
       get "/profile/settings"
       menu_link = f(".profile_settings.active")
-      expect(menu_link.css_value("border-left")).to eq("2px solid rgb(45, 59, 69)")
-      expect(menu_link.css_value("color")).to eq("rgba(45, 59, 69, 1)")
+      expect(menu_link.css_value("border-left")).to eq("2px solid rgb(39, 53, 64)")
+      expect(menu_link.css_value("color")).to eq("rgba(39, 53, 64, 1)")
     end
 
     it "does not break tiny mce css", priority: "2" do

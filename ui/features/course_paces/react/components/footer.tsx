@@ -115,10 +115,8 @@ export const Footer = ({
 }: ComponentProps) => {
   const [isRemovePaceModalOpen, setRemovePaceModalOpen] = useState(false)
   const isCoursePace = !sectionPace && !studentPace
-  const useRedesign = window.ENV.FEATURES.course_paces_redesign
   const userIsMasquerading = window.ENV.IS_MASQUERADING
-  const allowStudentPaces = window.ENV.FEATURES.course_paces_for_students
-  const allowDraftPaces = window.ENV.FEATURES.course_pace_draft_state && isCoursePace
+  const allowDraftPaces = window?.ENV?.FEATURES?.course_pace_draft_state && isCoursePace
 
   const handlePublish = useCallback(
     (saveAsDraft: boolean) => {
@@ -129,7 +127,7 @@ export const Footer = ({
 
   const handlePublishClicked = () => {
     handlePublish(false)
-    if (useRedesign && focusOnClose) {
+    if (focusOnClose) {
       focusOnClose()
     }
   }
@@ -138,13 +136,9 @@ export const Footer = ({
     handlePublish(true)
   }
 
-  const cancelDisabled = useRedesign
-    ? anyActiveRequests
-    : autoSaving || isSyncing || showLoadingOverlay || !unpublishedChanges
-  let pubDisabled = useRedesign
-    ? !newPace &&
-      (!unpublishedChanges || autoSaving || isSyncing || showLoadingOverlay || blueprintLocked)
-    : !newPace && (cancelDisabled || blueprintLocked)
+  const cancelDisabled = anyActiveRequests
+  let pubDisabled = !newPace &&
+  (!unpublishedChanges || autoSaving || isSyncing || showLoadingOverlay || blueprintLocked)
   const removeDisabled = autoSaving || isSyncing || showLoadingOverlay || pacePublishing
   const saveDraftEnabled = (isDraftPace || isUnpublishedNewPace) && unpublishedChanges
   // always override publishing to be enabled when a pace is a draft, even if there are no unsaved changes
@@ -152,21 +146,15 @@ export const Footer = ({
 
   // This wrapper div attempts to roughly match the dimensions of the publish button
   let publishLabel = I18n.t('Publish')
-  if (useRedesign) {
-    if (newPace) {
-      publishLabel = I18n.t('Create Pace')
-    } else {
-      publishLabel =
-        allowDraftPaces && isDraftPace ? I18n.t('Publish Pace') : I18n.t('Apply Changes')
-    }
+  if (newPace) {
+    publishLabel = I18n.t('Create Pace')
+  } else {
+    publishLabel =
+      allowDraftPaces && isDraftPace ? I18n.t('Publish Pace') : I18n.t('Apply Changes')
   }
 
   const handleCancelClick = () => {
-    if (useRedesign) {
-      handleCancel()
-    } else {
-      cancelDisabled || onResetPace()
-    }
+    handleCancel()
   }
 
   const handleRemovePaceClicked = () => {
@@ -251,21 +239,18 @@ export const Footer = ({
   }
 
   const removePaceLabel = I18n.t('Remove Pace')
-  const showRemovePaceButton = useRedesign && !isCoursePace && !newPace && !isUnpublishedNewPace
-  const showCondensedView = useRedesign && responsiveSize === 'small'
+  const showRemovePaceButton = !isCoursePace && !newPace && !isUnpublishedNewPace
+  const showCondensedView = responsiveSize === 'small'
   const removePaceButtonProps = {
     onClick: handleRemovePaceClicked,
-    interaction: useRedesign && removeDisabled ? ('disabled' as const) : ('enabled' as const),
+    interaction: removeDisabled ? ('disabled' as const) : ('enabled' as const),
   }
 
   const renderChangesIndicator = () => {
-    if (useRedesign && (!studentPace || (studentPace && allowStudentPaces))) {
-      return <UnpublishedChangesIndicator newPace={newPace} onClick={handleDrawerToggle} />
-    }
+    return <UnpublishedChangesIndicator newPace={newPace} onClick={handleDrawerToggle} />
   }
-  if (studentPace && !isBulkEnrollment && !allowStudentPaces) return null
   return (
-    <View as="div" width="100%" margin={useRedesign && userIsMasquerading ? '0 0 x-large' : '0'}>
+    <View as="div" width="100%" margin={userIsMasquerading ? '0 0 x-large' : '0'}>
       {showCondensedView && (
         <View as="div" textAlign="center" borderWidth="0 0 small 0" padding="xx-small">
           {renderChangesIndicator()}
@@ -283,7 +268,7 @@ export const Footer = ({
           {showRemovePaceButton && (
             <Tooltip
               renderTip={removeDisabled ? removeTip : ''}
-              on={removeDisabled && !useRedesign ? ['hover', 'focus'] : []}
+              on={[]}
             >
               {showCondensedView ? (
                 <IconButton
@@ -307,27 +292,27 @@ export const Footer = ({
           {!showCondensedView && renderChangesIndicator()}
           <Tooltip
             renderTip={cancelDisabled ? cancelTip : ''}
-            on={cancelDisabled && !useRedesign ? ['hover', 'focus'] : []}
+            on={[]}
           >
             <Button
               color="secondary"
               margin="0 small 0"
               onClick={handleCancelClick}
-              interaction={useRedesign && cancelDisabled ? 'disabled' : 'enabled'}
+              interaction={cancelDisabled ? 'disabled' : 'enabled'}
             >
-              {useRedesign ? I18n.t('Close') : I18n.t('Cancel')}
+              {I18n.t('Close')}
             </Button>
           </Tooltip>
           {getSaveDraftButton()}
           <Tooltip
             renderTip={pubDisabled ? pubTip : ''}
-            on={pubDisabled && !useRedesign ? ['hover', 'focus'] : []}
+            on={[]}
           >
             <Button
               data-testid="apply-or-create-pace-button"
               color="primary"
               onClick={() => pubDisabled || handlePublishClicked()}
-              interaction={(useRedesign && pubDisabled) || blueprintLocked ? 'disabled' : 'enabled'}
+              interaction={pubDisabled || blueprintLocked ? 'disabled' : 'enabled'}
             >
               {publishLabel}
             </Button>

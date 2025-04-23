@@ -417,7 +417,7 @@ const ColorPicker = createReactClass({
         }
       }
       if (shouldApplySelectedStyle.call(this, color)) {
-        colorSwatchStyle.borderColor = '#73818C'
+        colorSwatchStyle.borderColor = '#6A7883'
         colorSwatchStyle.borderWidth = '2px'
       }
       const title = color.name + ' (' + color.hexcode + ')'

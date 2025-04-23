@@ -207,331 +207,342 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
 
   return (
     <>
-      <SideNavBar
-        id="instui-sidenav"
-        label="Main navigation"
-        toggleLabel={{
-          expandedLabel: 'Minimize Navigation',
-          minimizedLabel: 'Expand Navigation',
-        }}
-        defaultMinimized={collapseSideNav}
-        onMinimized={e =>
-          e.nativeEvent.type === 'click' && updateCollapseGlobalNav(!collapseSideNav)
-        }
-        themeOverride={{
-          minimizedWidth: '100%',
-          toggleTransition: '200ms',
-        }}
-        data-testid="sidenav-container"
+      <a href="#content" id="skip_navigation_link">
+        {I18n.t('Skip To Content')}
+      </a>
+      <div
+        role="region"
+        className="ic-app-header__main-navigation"
+        aria-label={I18n.t('Global Navigation')}
       >
-        <SideNavBar.Item
-          id="logomark"
-          icon={
-            !logoUrl ? (
-              <IconCanvasLogoSolid
-                data-testid="sidenav-canvas-logo"
-                size={collapseSideNav ? 'small' : 'medium'}
-                // unsure why this is necessary?
-                style={{display: 'none'}}
-              />
-            ) : (
-              <Img
-                display="inline-block"
-                alt="sidenav-brand-logomark"
-                src={logoUrl}
-                data-testid="sidenav-brand-logomark"
-              />
-            )
+        <SideNavBar
+          id="instui-sidenav"
+          label="Main navigation"
+          toggleLabel={{
+            expandedLabel: 'Minimize Navigation',
+            minimizedLabel: 'Expand Navigation',
+          }}
+          defaultMinimized={collapseSideNav}
+          onMinimized={e =>
+            e.nativeEvent.type === 'click' && updateCollapseGlobalNav(!collapseSideNav)
           }
-          label={<ScreenReaderContent>{I18n.t('Home')}</ScreenReaderContent>}
-          href="/"
-          minimized={collapseSideNav}
-          data-testid="sidenav-header-logo"
-        />
-        <SideNavBar.Item
-          id="profile-tray"
-          icon={
-            <Badge
-              count={unreadContentSharesCount}
-              formatOutput={(count: string) =>
-                (unreadContentSharesCount || 0) > 0 ? (
-                  <AccessibleContent
-                    alt={I18n.t(
-                      {
-                        one: 'One unread share.',
-                        other: '%{count} unread shares.',
-                      },
-                      {count},
-                    )}
-                  >
-                    {count}
-                  </AccessibleContent>
-                ) : (
-                  ''
-                )
-              }
-            >
-              <Avatar
-                id="user-avatar"
-                name={window.ENV.current_user.display_name}
-                size={collapseSideNav ? 'x-small' : 'small'}
-                src={window.ENV.current_user.avatar_image_url}
-                data-testid="sidenav-user-avatar"
-                showBorder="always"
-                frameBorder={4}
-                themeOverride={{
-                  background: 'transparent',
-                  borderColor: '#ffffff',
-                  borderWidthSmall: '2px',
-                  borderWidthMedium: '2px',
-                }}
-              />
-            </Badge>
-          }
-          label={I18n.t('Account')}
-          href="/profile/settings"
-          onClick={event => {
-            event.preventDefault()
-            handleActiveTray('profile', true)
-          }}
-          selected={selectedNavItem === 'profile'}
-          data-selected={selectedNavItem === 'profile'}
           themeOverride={{
-            fontWeight: 400,
+            minimizedWidth: '100%',
+            toggleTransition: '200ms',
           }}
-          minimized={collapseSideNav}
-        />
-        <SideNavBar.Item
-          id="accounts-tray"
-          icon={<IconAdminLine />}
-          label={I18n.t('Admin')}
-          href="/accounts"
-          onClick={event => {
-            event.preventDefault()
-            handleActiveTray('accounts', true)
-          }}
-          selected={selectedNavItem === 'accounts'}
-          data-selected={selectedNavItem === 'accounts'}
-          themeOverride={{
-            fontWeight: 400,
-          }}
-          minimized={collapseSideNav}
-        />
-        <SideNavBar.Item
-          id="dashboard-tray"
-          icon={isK5User ? <IconHomeLine data-testid="K5HomeIcon" /> : <IconDashboardLine />}
-          label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
-          href="/"
-          onClick={() => handleActiveTray('dashboard')}
-          selected={selectedNavItem === 'dashboard' || selectedNavItem === ''}
-          data-selected={selectedNavItem === 'dashboard' || selectedNavItem === ''}
-          themeOverride={{
-            fontWeight: 400,
-          }}
-          minimized={collapseSideNav}
-        />
-        <SideNavBar.Item
-          id="courses-tray"
-          icon={<IconCoursesLine />}
-          label={isK5User ? I18n.t('Subjects') : I18n.t('Courses')}
-          href="/courses"
-          onClick={event => {
-            event.preventDefault()
-            handleActiveTray('courses', true)
-          }}
-          selected={selectedNavItem === 'courses'}
-          data-selected={selectedNavItem === 'courses'}
-          themeOverride={{
-            fontWeight: 400,
-          }}
-          minimized={collapseSideNav}
-        />
-        <SideNavBar.Item
-          id="calendar-tray"
-          icon={<IconCalendarMonthLine />}
-          label={I18n.t('Calendar')}
-          href="/calendar"
-          onClick={() => handleActiveTray('calendar')}
-          selected={selectedNavItem === 'calendar'}
-          data-selected={selectedNavItem === 'calendar'}
-          themeOverride={{
-            fontWeight: 400,
-          }}
-          minimized={collapseSideNav}
-        />
-        <SideNavBar.Item
-          id="conversations-tray"
-          icon={
-            <Badge
-              count={unreadConversationsCount}
-              formatOutput={(count: string) =>
-                (unreadConversationsCount || 0) > 0 ? (
-                  <AccessibleContent
-                    alt={I18n.t(
-                      {
-                        one: 'One unread message.',
-                        other: '%{count} unread messages.',
-                      },
-                      {count},
-                    )}
-                  >
-                    {count}
-                  </AccessibleContent>
-                ) : (
-                  ''
-                )
-              }
-            >
-              <IconInboxLine />
-            </Badge>
-          }
-          label={I18n.t('Inbox')}
-          href="/conversations"
-          onClick={() => handleActiveTray('conversations')}
-          selected={selectedNavItem === 'conversations'}
-          data-selected={selectedNavItem === 'conversations'}
-          themeOverride={{
-            fontWeight: 400,
-          }}
-          minimized={collapseSideNav}
-        />
-        <SideNavBar.Item
-          id="history-tray"
-          icon={<IconClockLine />}
-          label={I18n.t('History')}
-          href={window.ENV.page_view_update_url}
-          onClick={event => {
-            event.preventDefault()
-            handleActiveTray('history', true)
-          }}
-          selected={selectedNavItem === 'history'}
-          data-selected={selectedNavItem === 'history'}
-          themeOverride={{
-            fontWeight: 400,
-          }}
-          minimized={collapseSideNav}
-        />
-
-        {processedTools.map(tool => (
+          data-testid="sidenav-container"
+        >
           <SideNavBar.Item
-            key={tool.toolId}
-            id={`${tool.toolId}-external-tool-tray`}
+            id="logomark"
             icon={
-              tool.svgPath ? (
-                <SVGIcon viewBox="0 0 64 64" src={tool.svgPath} title="svg-external-tool" />
-              ) : tool.toolImg ? (
-                <Img width="26px" height="26px" src={tool.toolImg} alt="" />
+              !logoUrl ? (
+                <IconCanvasLogoSolid
+                  data-testid="sidenav-canvas-logo"
+                  size={collapseSideNav ? 'small' : 'medium'}
+                  // unsure why this is necessary?
+                  style={{display: 'none'}}
+                />
               ) : (
-                <IconExternalLinkLine data-testid="IconExternalLinkLine" size="small" />
+                <Img
+                  display="inline-block"
+                  alt="sidenav-brand-logomark"
+                  src={logoUrl}
+                  data-testid="sidenav-brand-logomark"
+                />
               )
             }
-            label={tool.label}
-            href={`${tool.href?.toString() || '#'}&toolId=${tool.toolId}`}
-            onClick={() => handleActiveTray(tool.toolId)}
-            selected={selectedNavItem === tool.toolId}
-            data-selected={selectedNavItem === tool.toolId}
+            label={<ScreenReaderContent>{I18n.t('Home')}</ScreenReaderContent>}
+            href="/"
+            minimized={collapseSideNav}
+            data-testid="sidenav-header-logo"
+          />
+          <SideNavBar.Item
+            id="profile-tray"
+            icon={
+              <Badge
+                count={unreadContentSharesCount}
+                formatOutput={(count: string) =>
+                  (unreadContentSharesCount || 0) > 0 ? (
+                    <AccessibleContent
+                      alt={I18n.t(
+                        {
+                          one: 'One unread share.',
+                          other: '%{count} unread shares.',
+                        },
+                        {count},
+                      )}
+                    >
+                      {count}
+                    </AccessibleContent>
+                  ) : (
+                    ''
+                  )
+                }
+              >
+                <Avatar
+                  id="user-avatar"
+                  name={window.ENV.current_user.display_name}
+                  size={collapseSideNav ? 'x-small' : 'small'}
+                  src={window.ENV.current_user.avatar_image_url}
+                  data-testid="sidenav-user-avatar"
+                  showBorder="always"
+                  frameBorder={4}
+                  themeOverride={{
+                    background: 'transparent',
+                    borderColor: '#ffffff',
+                    borderWidthSmall: '2px',
+                    borderWidthMedium: '2px',
+                  }}
+                />
+              </Badge>
+            }
+            label={I18n.t('Account')}
+            href="/profile/settings"
+            onClick={event => {
+              event.preventDefault()
+              handleActiveTray('profile', true)
+            }}
+            selected={selectedNavItem === 'profile'}
+            data-selected={selectedNavItem === 'profile'}
             themeOverride={{
               fontWeight: 400,
             }}
             minimized={collapseSideNav}
           />
-        ))}
+          <SideNavBar.Item
+            id="accounts-tray"
+            icon={<IconAdminLine />}
+            label={I18n.t('Admin')}
+            href="/accounts"
+            onClick={event => {
+              event.preventDefault()
+              handleActiveTray('accounts', true)
+            }}
+            selected={selectedNavItem === 'accounts'}
+            data-selected={selectedNavItem === 'accounts'}
+            themeOverride={{
+              fontWeight: 400,
+            }}
+            minimized={collapseSideNav}
+          />
+          <SideNavBar.Item
+            id="dashboard-tray"
+            icon={isK5User ? <IconHomeLine data-testid="K5HomeIcon" /> : <IconDashboardLine />}
+            label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
+            href="/"
+            onClick={() => handleActiveTray('dashboard')}
+            selected={selectedNavItem === 'dashboard' || selectedNavItem === ''}
+            data-selected={selectedNavItem === 'dashboard' || selectedNavItem === ''}
+            themeOverride={{
+              fontWeight: 400,
+            }}
+            minimized={collapseSideNav}
+          />
+          <SideNavBar.Item
+            id="courses-tray"
+            icon={<IconCoursesLine />}
+            label={isK5User ? I18n.t('Subjects') : I18n.t('Courses')}
+            href="/courses"
+            onClick={event => {
+              event.preventDefault()
+              handleActiveTray('courses', true)
+            }}
+            selected={selectedNavItem === 'courses'}
+            data-selected={selectedNavItem === 'courses'}
+            themeOverride={{
+              fontWeight: 400,
+            }}
+            minimized={collapseSideNav}
+          />
+          <SideNavBar.Item
+            id="calendar-tray"
+            icon={<IconCalendarMonthLine />}
+            label={I18n.t('Calendar')}
+            href="/calendar"
+            onClick={() => handleActiveTray('calendar')}
+            selected={selectedNavItem === 'calendar'}
+            data-selected={selectedNavItem === 'calendar'}
+            themeOverride={{
+              fontWeight: 400,
+            }}
+            minimized={collapseSideNav}
+          />
+          <SideNavBar.Item
+            id="conversations-tray"
+            icon={
+              <Badge
+                count={unreadConversationsCount}
+                formatOutput={(count: string) =>
+                  (unreadConversationsCount || 0) > 0 ? (
+                    <AccessibleContent
+                      alt={I18n.t(
+                        {
+                          one: 'One unread message.',
+                          other: '%{count} unread messages.',
+                        },
+                        {count},
+                      )}
+                    >
+                      {count}
+                    </AccessibleContent>
+                  ) : (
+                    ''
+                  )
+                }
+              >
+                <IconInboxLine />
+              </Badge>
+            }
+            label={I18n.t('Inbox')}
+            href="/conversations"
+            onClick={() => handleActiveTray('conversations')}
+            selected={selectedNavItem === 'conversations'}
+            data-selected={selectedNavItem === 'conversations'}
+            themeOverride={{
+              fontWeight: 400,
+            }}
+            minimized={collapseSideNav}
+          />
+          <SideNavBar.Item
+            id="history-tray"
+            icon={<IconClockLine />}
+            label={I18n.t('History')}
+            href={window.ENV.page_view_update_url}
+            onClick={event => {
+              event.preventDefault()
+              handleActiveTray('history', true)
+            }}
+            selected={selectedNavItem === 'history'}
+            data-selected={selectedNavItem === 'history'}
+            themeOverride={{
+              fontWeight: 400,
+            }}
+            minimized={collapseSideNav}
+          />
 
-        <SideNavBar.Item
-          id="help-tray"
-          icon={
-            <Badge
-              count={unreadReleaseNotesCount}
-              formatOutput={(count: string) =>
-                (unreadReleaseNotesCount || 0) > 0 ? (
-                  <AccessibleContent
-                    alt={I18n.t(
-                      {
-                        one: 'One unread release note.',
-                        other: '%{count} unread release notes.',
-                      },
-                      {count},
-                    )}
-                  >
-                    {count}
-                  </AccessibleContent>
+          {processedTools.map(tool => (
+            <SideNavBar.Item
+              key={tool.toolId}
+              id={`${tool.toolId}-external-tool-tray`}
+              icon={
+                tool.svgPath ? (
+                  <SVGIcon viewBox="0 0 64 64" src={tool.svgPath} title="svg-external-tool" />
+                ) : tool.toolImg ? (
+                  <Img width="26px" height="26px" src={tool.toolImg} alt="" />
                 ) : (
-                  ''
+                  <IconExternalLinkLine data-testid="IconExternalLinkLine" size="small" />
                 )
               }
-            >
-              {getHelpIcon()}
-            </Badge>
+              label={tool.label}
+              href={`${tool.href?.toString() || '#'}&toolId=${tool.toolId}`}
+              onClick={() => handleActiveTray(tool.toolId)}
+              selected={selectedNavItem === tool.toolId}
+              data-selected={selectedNavItem === tool.toolId}
+              themeOverride={{
+                fontWeight: 400,
+              }}
+              minimized={collapseSideNav}
+            />
+          ))}
+
+          <SideNavBar.Item
+            id="help-tray"
+            icon={
+              <Badge
+                count={unreadReleaseNotesCount}
+                formatOutput={(count: string) =>
+                  (unreadReleaseNotesCount || 0) > 0 ? (
+                    <AccessibleContent
+                      alt={I18n.t(
+                        {
+                          one: 'One unread release note.',
+                          other: '%{count} unread release notes.',
+                        },
+                        {count},
+                      )}
+                    >
+                      {count}
+                    </AccessibleContent>
+                  ) : (
+                    ''
+                  )
+                }
+              >
+                {getHelpIcon()}
+              </Badge>
+            }
+            label={I18n.t('Help')}
+            href="https://help.instructure.com/"
+            onClick={event => {
+              event.preventDefault()
+              handleActiveTray('help', true)
+            }}
+            selected={selectedNavItem === 'help'}
+            data-selected={selectedNavItem === 'help'}
+            themeOverride={{
+              fontWeight: 400,
+            }}
+            minimized={collapseSideNav}
+          />
+        </SideNavBar>
+        <Tray
+          key={activeTray}
+          label={getTrayLabel(activeTray)}
+          size="small"
+          open={isTrayOpen}
+          // We need to override closing trays
+          // so the tour can properly go through them
+          // without them unexpectedly closing.
+          onDismiss={
+            overrideDismiss
+              ? () => {}
+              : () => {
+                  dispatch({type: 'SET_IS_TRAY_OPEN', payload: false})
+                  setTrayShouldContainFocus(false)
+                }
           }
-          label={I18n.t('Help')}
-          href="https://help.instructure.com/"
-          onClick={event => {
-            event.preventDefault()
-            handleActiveTray('help', true)
-          }}
-          selected={selectedNavItem === 'help'}
-          data-selected={selectedNavItem === 'help'}
-          themeOverride={{
-            fontWeight: 400,
-          }}
-          minimized={collapseSideNav}
-        />
-      </SideNavBar>
-      <Tray
-        key={activeTray}
-        label={getTrayLabel(activeTray)}
-        size="small"
-        open={isTrayOpen}
-        // We need to override closing trays
-        // so the tour can properly go through them
-        // without them unexpectedly closing.
-        onDismiss={
-          overrideDismiss
-            ? () => {}
-            : () => {
+          shouldCloseOnDocumentClick={true}
+          shouldContainFocus={trayShouldContainFocus}
+          mountNode={getTrayPortal()}
+          themeOverride={{smallWidth: '28em'}}
+        >
+          <div className={`navigation-tray-container ${activeTray}-tray`}>
+            <CloseButton
+              placement="end"
+              onClick={() => {
                 dispatch({type: 'SET_IS_TRAY_OPEN', payload: false})
                 setTrayShouldContainFocus(false)
-              }
-        }
-        shouldCloseOnDocumentClick={true}
-        shouldContainFocus={trayShouldContainFocus}
-        mountNode={getTrayPortal()}
-        themeOverride={{smallWidth: '28em'}}
-      >
-        <div className={`navigation-tray-container ${activeTray}-tray`}>
-          <CloseButton
-            placement="end"
-            onClick={() => {
-              dispatch({type: 'SET_IS_TRAY_OPEN', payload: false})
-              setTrayShouldContainFocus(false)
-            }}
-            screenReaderLabel={I18n.t('Close')}
-          />
-          <div className="tray-with-space-for-global-nav">
-            <React.Suspense
-              fallback={
-                <View display="block" textAlign="center">
-                  <Spinner
-                    size="large"
-                    delay={200}
-                    margin="large auto"
-                    renderTitle={() => I18n.t('Loading')}
+              }}
+              screenReaderLabel={I18n.t('Close')}
+            />
+            <div className="tray-with-space-for-global-nav">
+              <React.Suspense
+                fallback={
+                  <View display="block" textAlign="center">
+                    <Spinner
+                      size="large"
+                      delay={200}
+                      margin="large auto"
+                      renderTitle={() => I18n.t('Loading')}
+                    />
+                  </View>
+                }
+              >
+                {activeTray === 'accounts' && <AccountsTray />}
+                {activeTray === 'courses' && <CoursesTray />}
+                {activeTray === 'groups' && <GroupsTray />}
+                {activeTray === 'profile' && <ProfileTray />}
+                {activeTray === 'history' && <HistoryTray />}
+                {activeTray === 'help' && (
+                  <HelpTray
+                    closeTray={() => dispatch({type: 'SET_IS_TRAY_OPEN', payload: false})}
                   />
-                </View>
-              }
-            >
-              {activeTray === 'accounts' && <AccountsTray />}
-              {activeTray === 'courses' && <CoursesTray />}
-              {activeTray === 'groups' && <GroupsTray />}
-              {activeTray === 'profile' && <ProfileTray />}
-              {activeTray === 'history' && <HistoryTray />}
-              {activeTray === 'help' && (
-                <HelpTray closeTray={() => dispatch({type: 'SET_IS_TRAY_OPEN', payload: false})} />
-              )}
-            </React.Suspense>
+                )}
+              </React.Suspense>
+            </div>
           </div>
-        </div>
-      </Tray>
+        </Tray>
+      </div>
     </>
   )
 }

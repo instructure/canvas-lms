@@ -350,7 +350,7 @@ describe "reply attachment" do
       expect(attachment_link.attribute("href")).to include("/files/#{entry.attachment.id}")
 
       f("button[data-testid='thread-actions-menu']").click
-      fj("li:contains('Edit')").click
+      fj("[class*=menuItem__label]:contains('Edit')").click
       driver.action.move_to(fj("a:contains('#{entry.attachment.filename}')")).perform # hover
       f("button[data-testid='remove-button']").click
       expect(f("body")).not_to contain_jqcss("a:contains('#{entry.attachment.filename}')")

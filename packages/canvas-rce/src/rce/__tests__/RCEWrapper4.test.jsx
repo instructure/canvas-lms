@@ -32,7 +32,7 @@ let fakeTinyMCE, editor, rce
 
 function createBasicElement(opts) {
   editor = new FakeEditor({id: textareaId})
-  fakeTinyMCE.editors[0] = editor
+  fakeTinyMCE.get = () => editor
 
   const props = {textareaId, tinymce: fakeTinyMCE, ...trayProps(), ...defaultProps(), ...opts}
   rce = new RCEWrapper(props)
@@ -95,10 +95,10 @@ describe('RCEWrapper', () => {
       PluginManager: {
         add: () => {},
       },
+      get: () => editor,
       plugins: {
         AccessibilityChecker: {},
       },
-      editors: [editor],
     }
     global.tinymce = fakeTinyMCE
   })

@@ -8,8 +8,8 @@ exports[`renders desert when completely empty 1`] = `
     font-size: 1rem;
     font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
-    color: #394B58;
-    background: undefined;
+    color: #334451;
+    background: #FFFFFF;
   }
   .PlannerEmptyState-styles__root.PlannerEmptyState-styles__small .PlannerEmptyState-styles__desert, .PlannerEmptyState-styles__root.PlannerEmptyState-styles__small .PlannerEmptyState-styles__balloons {
     max-width: 100%;

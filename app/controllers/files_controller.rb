@@ -1577,8 +1577,6 @@ class FilesController < ApplicationController
   end
 
   def rce_linked_file_instfs_ids
-    return not_found unless Account.site_admin.feature_enabled?(:rce_linked_file_urls)
-
     user = InstAccessToken.find_user_by_uuid_prefer_local(params[:user_uuid])
     return render_unauthorized_action unless user&.grants_right?(@current_user, session, :read_full_profile)
     return render json: { errors: [{ "message" => "No valid file URLs given" }] }, status: :bad_request if params[:file_urls].blank?

@@ -601,6 +601,268 @@ describe DiscussionTopicsApiController do
     end
   end
 
+  context "insight" do
+    before do
+      course_with_teacher(active_course: true)
+      @topic = @course.discussion_topics.create!(title: "discussion")
+      user_session(@teacher)
+    end
+
+    it "returns an error if the user can't access insights" do
+      allow_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(false)
+
+      get "insight", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_forbidden
+    end
+
+    it "returns workflow_state nil, if the insight is not found" do
+      allow_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      get "insight", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(response.parsed_body).to eq({ "workflow_state" => nil })
+    end
+
+    it "returns created insight" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      @topic.insights.create!(user: @teacher, workflow_state: "created")
+
+      get "insight", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(response.parsed_body).to eq({ "workflow_state" => "created" })
+    end
+
+    it "returns in_progress insight" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      @topic.insights.create!(user: @teacher, workflow_state: "in_progress")
+
+      get "insight", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(response.parsed_body).to eq({ "workflow_state" => "in_progress" })
+    end
+
+    it "returns failed insight" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      student = user_factory(active_all: true)
+      @course.enroll_student(student, enrollment_state: "active")
+
+      @topic.insights.create!(user: @teacher, workflow_state: "failed")
+      @topic.discussion_entries.create!(message: "message", user: student)
+
+      get "insight", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(response.parsed_body).to eq({ "workflow_state" => "failed", "needs_processing" => true })
+    end
+
+    it "returns completed insight" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      @topic.insights.create!(user: @teacher, workflow_state: "completed")
+
+      get "insight", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(response.parsed_body).to eq({ "workflow_state" => "completed", "needs_processing" => false })
+    end
+  end
+
+  context "insight_generation" do
+    before do
+      course_with_teacher(active_course: true)
+
+      @topic = @course.discussion_topics.create!(title: "discussion")
+
+      user_session(@teacher)
+    end
+
+    it "returns an error if the user can't access insights" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(false)
+
+      post "insight_generation", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_forbidden
+    end
+
+    it "creates an insight and submits a job" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+      expect_any_instance_of(DiscussionTopicInsight).to receive(:delay).and_return(double("DelayedJob", generate: nil))
+
+      post "insight_generation", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(@topic.insights.count).to eq(1)
+      expect(@topic.insights.first.workflow_state).to eq("created")
+    end
+
+    it "returns an error if submitting the job fails" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+      expect_any_instance_of(DiscussionTopicInsight).to receive(:delay).and_raise("error")
+
+      post "insight_generation", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_unprocessable
+      expect(@topic.insights.count).to eq(0)
+    end
+  end
+
+  context "insight_entries" do
+    before do
+      course_with_teacher(active_course: true)
+
+      @topic = @course.discussion_topics.create!(title: "discussion")
+
+      user_session(@teacher)
+    end
+
+    it "returns an error if the user can't access insights" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(false)
+
+      get "insight_entries", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_forbidden
+    end
+
+    it "returns an empty array if there are no insights" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      get "insight_entries", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(response.parsed_body).to eq([])
+    end
+
+    it "returns the insight entries" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      insight = @topic.insights.create!(user: @teacher, workflow_state: "completed")
+
+      entry_1 = @topic.discussion_entries.create!(message: "message_1", user: @teacher)
+      insight_entry_1 = insight.entries.create!(
+        discussion_topic: @topic,
+        discussion_entry: entry_1,
+        discussion_entry_version: entry_1.discussion_entry_versions.first,
+        locale: "en",
+        dynamic_content_hash: "hash",
+        ai_evaluation: {
+          "relevance_classification" => "relevant",
+          "confidence" => 3,
+          "notes" => "notes"
+        },
+        ai_evaluation_human_feedback_liked: false,
+        ai_evaluation_human_feedback_disliked: false,
+        ai_evaluation_human_feedback_notes: ""
+      )
+
+      entry_2 = @topic.discussion_entries.create!(message: "message_2", user: @teacher)
+      insight_entry_2 = insight.entries.create!(
+        discussion_topic: @topic,
+        discussion_entry: entry_2,
+        discussion_entry_version: entry_2.discussion_entry_versions.first,
+        locale: "en",
+        dynamic_content_hash: "hash_2",
+        ai_evaluation: {
+          "relevance_classification" => "irrelevant",
+          "confidence" => 4,
+          "notes" => "notes_2"
+        },
+        ai_evaluation_human_reviewer: @teacher,
+        ai_evaluation_human_feedback_liked: true,
+        ai_evaluation_human_feedback_disliked: false,
+        ai_evaluation_human_feedback_notes: "notes"
+      )
+
+      get "insight_entries", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(response.parsed_body.count).to eq(2)
+      # TODO: assert better when we finalize the response format
+      expect(response.parsed_body.map { |entry| entry["id"] }).to match_array([insight_entry_1.id, insight_entry_2.id])
+    end
+  end
+
+  context "insight_entry_update" do
+    before do
+      course_with_teacher(active_course: true)
+
+      @topic = @course.discussion_topics.create!(title: "discussion")
+      insight = @topic.insights.create!(user: @teacher, workflow_state: "completed")
+      entry = @topic.discussion_entries.create!(message: "message", user: @teacher)
+      @insight_entry = insight.entries.create!(
+        discussion_topic: @topic,
+        discussion_entry: entry,
+        discussion_entry_version: entry.discussion_entry_versions.first,
+        locale: "en",
+        dynamic_content_hash: "hash",
+        ai_evaluation: {
+          "relevance_classification" => "relevant",
+          "confidence" => 3,
+          "notes" => "notes"
+        },
+        ai_evaluation_human_feedback_liked: false,
+        ai_evaluation_human_feedback_disliked: false,
+        ai_evaluation_human_feedback_notes: ""
+      )
+
+      user_session(@teacher)
+    end
+
+    it "returns an error if the user can't access insights" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(false)
+
+      put "insight_entry_update", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, entry_id: @insight_entry.id, relevance_human_feedback_action: "like", relevance_human_feedback_notes: "notes" }, format: "json"
+
+      expect(response).to be_forbidden
+    end
+
+    it "returns an error if the entry is not found" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      put "insight_entry_update", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, entry_id: 0 }, format: "json"
+
+      expect(response).to be_not_found
+    end
+
+    it "returns an error if the action is invalid" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      put "insight_entry_update", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, entry_id: @insight_entry.id, relevance_human_feedback_action: "invalid" }, format: "json"
+
+      puts response.body
+      puts response.status
+      expect(response).to be_bad_request
+    end
+
+    it "returns an error if the notes are missing" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      put "insight_entry_update", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, entry_id: @insight_entry.id, relevance_human_feedback_action: "like" }, format: "json"
+
+      expect(response).to be_bad_request
+    end
+
+    it "updates the insight entry" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      put "insight_entry_update", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, entry_id: @insight_entry.id, relevance_human_feedback_action: "dislike", relevance_human_feedback_notes: "new notes" }, format: "json"
+
+      expect(response).to be_successful
+
+      @insight_entry.reload
+      expect(@insight_entry.ai_evaluation_human_reviewer).to eq(@teacher)
+      expect(@insight_entry.ai_evaluation_human_feedback_liked).to be_falsey
+      expect(@insight_entry.ai_evaluation_human_feedback_disliked).to be_truthy
+      expect(@insight_entry.ai_evaluation_human_feedback_notes).to eq("new notes")
+    end
+  end
+
   context "mark_all_topic_read" do
     before do
       course_with_teacher(active_course: true)

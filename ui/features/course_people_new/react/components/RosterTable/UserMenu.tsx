@@ -182,7 +182,7 @@ const UserMenu: FC<UserMenuProps> = ({
       )}
       {canRemoveUsers && isInactive && (
         <MenuItem
-          label={I18n.t('Re-activeate User')}
+          label={I18n.t('Re-activate User')}
           onSelectHandler={onReactivateUser}
           testId={`reactivate-user-${uid}`}
         >

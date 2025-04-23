@@ -132,7 +132,7 @@ describe('GradeChangeActivityForm', () => {
     await userEvent.click(submit)
 
     const errorText = await screen.findAllByText('Invalid date and time.')
-    const visualAndScreenReaderErrorMessagesCount = 4
+    const visualAndScreenReaderErrorMessagesCount = 2
     expect(errorText).toHaveLength(visualAndScreenReaderErrorMessagesCount)
     expect(props.onSubmit).not.toHaveBeenCalled()
   })

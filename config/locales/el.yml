@@ -8010,6 +8010,7 @@ el:
   links_14b70841: Σύνδεσμοι
   load_bank: 
     loading_banks: "Φόρτωση τραπεζών θεμάτων"
+  load_in_a_new_tab_829731ab: "Φόρτωση σε νέα καρτέλα"
   load_more_a36f9cf9: "Φόρτωση περισσότερων"
   load_more_results_460f49a9: "Φόρτωση περισσότερων αποτελεσμάτων"
   loading_25990131: Φόρτωση...
@@ -10028,6 +10029,7 @@ el:
   move_dialog_select: 
     move_to_end: "-- Στο κάτω μέρος --"
   move_from_ef79aa53: "Μετακίνηση από"
+  move_item_e94a8103: "Μετακίνηση Στοιχείου"
   move_module_item_77754119: "Μετακίνηση Ενότητας/Στοιχείου"
   move_name_to_a_new_group_acabed4e: "Μετακίνηση του/της %{name} σε νέα ομάδα"
   move_outcome_ce497e6c: "Μετακίνηση Αποτελέσματος"
@@ -10721,6 +10723,7 @@ el:
   page_comments: 
     errors: 
       create_failed: "Αποτυχία δημιουργίας σχολίου"
+  page_name_21defa75: "Όνομα Σελίδας"
   page_not_found_2b0d05f5: "Η Σελίδα δεν βρέθηκε"
   page_title_d1a22bbf: "Τίτλος Σελίδας"
   page_views: 
@@ -15283,6 +15286,7 @@ el:
   true_false_823761a9: Σωστό/Λάθος
   truncated_56b1a661: Ελλιπές
   try_again_6ca44338: "Δοκιμάστε Ξανά"
+  try_again_ad656c3c: "Δοκιμάστε ξανά"
   turned_in_submission_date_e9180b8b: "υποβλήθηκε στις: %{submission_date}"
   turnitin: 
     error_1007: "Το αρχείο που μεταφορτώθηκε είναι πολύ μεγάλο."

@@ -131,6 +131,22 @@ describe PandataEvents do
       it { is_expected.to be_truthy }
     end
 
+    context "when 'true' is set in Consul" do
+      before do
+        allow(DynamicSettings).to receive(:find).with("pandata/events", service: "canvas").and_return({ enabled_for_canvas: "true" })
+      end
+
+      it { is_expected.to be_truthy }
+    end
+
+    context "when 'false' is set in Consul" do
+      before do
+        allow(DynamicSettings).to receive(:find).with("pandata/events", service: "canvas").and_return({ enabled_for_canvas: "false" })
+      end
+
+      it { is_expected.to be_falsy }
+    end
+
     context "when Consul is not configured" do
       before do
         allow(DynamicSettings).to receive(:find).with("pandata/events", service: "canvas").and_return({})

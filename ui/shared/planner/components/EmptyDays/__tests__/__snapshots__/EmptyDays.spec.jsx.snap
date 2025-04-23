@@ -10,17 +10,17 @@ exports[`renders the component 1`] = `
     font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     line-height: 1.25;
-    color: #394B58;
+    color: #334451;
     background: #FFFFFF;
     margin-top: 2.25rem;
     border-bottom-width: 0.0625rem;
     border-bottom-style: solid;
   }
-  
+
   .EmptyDays-styles__nothingPlannedContent {
     padding: 0.75rem 0 0 0;
   }
-  
+
   .EmptyDays-styles__nothingPlannedContainer {
     position: absolute;
     left: 0;
@@ -32,11 +32,11 @@ exports[`renders the component 1`] = `
     justify-content: center;
     align-items: center;
   }
-  
+
   .EmptyDays-styles__nothingPlanned {
     padding-top: 0.75rem;
   }
-  
+
   .EmptyDays-styles__small .EmptyDays-styles__nothingPlannedContent {
     display: flex;
     flex-direction: column-reverse;
@@ -107,17 +107,17 @@ exports[`renders the today className when surrounds Today 1`] = `
     font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
     line-height: 1.25;
-    color: #394B58;
+    color: #334451;
     background: #FFFFFF;
     margin-top: 2.25rem;
     border-bottom-width: 0.0625rem;
     border-bottom-style: solid;
   }
-  
+
   .EmptyDays-styles__nothingPlannedContent {
     padding: 0.75rem 0 0 0;
   }
-  
+
   .EmptyDays-styles__nothingPlannedContainer {
     position: absolute;
     left: 0;
@@ -129,11 +129,11 @@ exports[`renders the today className when surrounds Today 1`] = `
     justify-content: center;
     align-items: center;
   }
-  
+
   .EmptyDays-styles__nothingPlanned {
     padding-top: 0.75rem;
   }
-  
+
   .EmptyDays-styles__small .EmptyDays-styles__nothingPlannedContent {
     display: flex;
     flex-direction: column-reverse;

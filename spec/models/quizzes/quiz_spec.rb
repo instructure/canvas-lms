@@ -268,7 +268,6 @@ describe Quizzes::Quiz do
     context "with course paces" do
       before do
         create_quiz_with_submission(quiz_type: "assignment")
-        @course.root_account.enable_feature!(:course_paces)
         @course.enable_course_paces = true
         @course.save!
         @course_pace = course_pace_model(course: @course)

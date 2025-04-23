@@ -498,7 +498,7 @@ module Importers
             # In some cases the tool ID in the source context does not match the
             # tool ID from the destination context. This check should help find
             # a matching tool correctly.
-            tool = ContextExternalTool.find_external_tool(hash[:external_tool_url], context, tool_id)
+            tool = Lti::ToolFinder.from_url(hash[:external_tool_url], context, preferred_tool_id: tool_id)
 
             # If no match is found in the first search, fall back on using the tool ID
             # provided in the migration hash if a tool with that ID is present

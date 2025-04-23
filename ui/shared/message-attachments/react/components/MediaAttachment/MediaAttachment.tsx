@@ -69,7 +69,7 @@ export function MediaAttachment(props: MediaAttachmentProps) {
           textOverflow: 'ellipsis',
           overflow: 'hidden',
           whiteSpace: 'nowrap',
-          color: colors.ash,
+          color: colors.contrasts.grey4570,
         }}
       >
         {props.file.title}

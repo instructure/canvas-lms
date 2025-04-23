@@ -39,7 +39,8 @@ module LtiAdvantage::Messages
       roles: Array,
       role_scope_mentor: Array,
       lti1p1: LtiAdvantage::Claims::Lti1p1,
-      activity: LtiAdvantage::Claims::Activity
+      activity: LtiAdvantage::Claims::Activity,
+      eulaservice: LtiAdvantage::Claims::Eulaservice,
     }.freeze
 
     attr_accessor(*(REQUIRED_CLAIMS + OPTIONAL_CLAIMS))
@@ -122,6 +123,10 @@ module LtiAdvantage::Messages
 
     def activity
       @activity ||= TYPED_ATTRIBUTES[:activity].new
+    end
+
+    def eulaservice
+      @eulaservice ||= TYPED_ATTRIBUTES[:eulaservice].new
     end
 
     def read_attribute(attribute)

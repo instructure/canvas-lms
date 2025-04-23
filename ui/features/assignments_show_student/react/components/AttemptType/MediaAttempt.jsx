@@ -33,6 +33,7 @@ import StudentViewContext from '../Context'
 import PhotographerPandaSVG from '../../../images/PhotographerPanda.svg'
 import UploadFileSVG from '../../../images/UploadFile.svg'
 import UploadMedia from '@instructure/canvas-media'
+import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import {
   UploadMediaStrings,
   MediaCaptureStrings,
@@ -63,7 +64,7 @@ class MediaAttempt extends React.Component {
     uploadingFiles: bool.isRequired,
     setIframeURL: func.isRequired,
     iframeURL: string,
-    submitButtonRef: object
+    submitButtonRef: object,
   }
 
   state = {
@@ -147,8 +148,21 @@ class MediaAttempt extends React.Component {
     this.setState({
       mediaModalTabs: {record: record, upload: upload},
       mediaModalOpen: true,
-      showErrorMessage: false
+      showErrorMessage: false,
     })
+  }
+
+  renderMediaComponent = (mediaId, mediaTracks, mediaSources, autoCCTrack) => {
+    return ENV.FEATURES?.consolidated_media_player ? (
+      <CanvasStudioPlayer media_id={mediaId} explicitSize={{width: '100%', height: '100%'}} />
+    ) : (
+      <MediaPlayer
+        tracks={mediaTracks}
+        sources={mediaSources}
+        captionPosition="bottom"
+        autoShowCaption={autoCCTrack}
+      />
+    )
   }
 
   renderMediaPlayer = (mediaObject, renderTrashIcon) => {
@@ -159,6 +173,8 @@ class MediaAttempt extends React.Component {
       ...mediaSource,
       label: `${mediaSource.width}x${mediaSource.height}`,
     }))
+
+    const mediaId = mediaObject._id
     const mediaTracks = mediaObject.mediaTracks.map(track => ({
       src: `/media_objects/${mediaObject._id}/media_tracks/${track._id}`,
       label: track.locale,
@@ -167,10 +183,12 @@ class MediaAttempt extends React.Component {
     }))
     const shouldRenderWithIframeURL = mediaObject.mediaSources.length === 0 && this.props.iframeURL
     const autoCCTrack = getAutoTrack(mediaObject.mediaTracks)
+    const {height, width} = mediaObject.mediaSources[0] || {}
+    const ratio = Math.max(height && width ? (height / width) * 100 - 15 : 40, 30)
 
     return (
       <Flex direction="column" alignItems="center">
-        <Flex.Item data-testid="media-recording" width="100%">
+        <Flex.Item data-testid="media-recording" width="100%" height={`${ratio}vw`}>
           {shouldRenderWithIframeURL ? (
             <div
               style={{
@@ -192,12 +210,7 @@ class MediaAttempt extends React.Component {
               />
             </div>
           ) : (
-            <MediaPlayer
-              tracks={mediaTracks}
-              sources={mediaSources}
-              captionPosition="bottom"
-              autoShowCaption={autoCCTrack}
-            />
+            this.renderMediaComponent(mediaId, mediaTracks, mediaSources, autoCCTrack)
           )}
         </Flex.Item>
         <Flex.Item overflowY="visible" margin="medium 0">
@@ -250,121 +263,127 @@ class MediaAttempt extends React.Component {
           uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
           liveRegion={() => document.getElementById('flash_screenreader_holder')}
           userLocale={ENV.LOCALE}
+          useStudioPlayer={ENV.FEATURES?.consolidated_media_player}
         />
         <StudentViewContext.Consumer>
           {context => (
             <>
-            <Flex id='media_upload_container' alignItems="center" justifyItems="center" direction={desktop ? 'row' : 'column'}>
-              <Flex.Item margin="small">
-                <View
-                  as="div"
-                  height="350px"
-                  width="400px"
-                  borderRadius="large"
-                  background="primary"
-                >
+              <Flex
+                id="media_upload_container"
+                alignItems="center"
+                justifyItems="center"
+                direction={desktop ? 'row' : 'column'}
+              >
+                <Flex.Item margin="small">
+                  <View
+                    as="div"
+                    height="350px"
+                    width="400px"
+                    borderRadius="large"
+                    background="primary"
+                  >
+                    <Flex
+                      direction="column"
+                      alignItems="center"
+                      justifyItems="space-around"
+                      height="100%"
+                      shouldShrink={true}
+                    >
+                      <Flex.Item>
+                        <Img
+                          src={PhotographerPandaSVG}
+                          alt={I18n.t('panda taking photograph')}
+                          height="180px"
+                        />
+                      </Flex.Item>
+                      <Flex.Item overflowY="visible">
+                        <Button
+                          data-testid="open-record-media-modal-button"
+                          disabled={!context.allowChangesToSubmission}
+                          renderIcon={IconAttachMediaSolid}
+                          color="primary"
+                          elementRef={el => {
+                            this._mediaUploadRef = el
+                          }}
+                          onClick={() => this.handleMediaClick(true, false)}
+                        >
+                          {I18n.t('Record Media')}
+                        </Button>
+                      </Flex.Item>
+                    </Flex>
+                  </View>
+                </Flex.Item>
+                <Flex.Item margin="medium">
                   <Flex
-                    direction="column"
+                    direction={desktop ? 'column' : 'row'}
+                    justifyItems="space-between"
                     alignItems="center"
-                    justifyItems="space-around"
-                    height="100%"
-                    shouldShrink={true}
                   >
                     <Flex.Item>
-                      <Img
-                        src={PhotographerPandaSVG}
-                        alt={I18n.t('panda taking photograph')}
-                        height="180px"
-                      />
-                    </Flex.Item>
-                    <Flex.Item overflowY="visible">
-                      <Button
-                        data-testid="open-record-media-modal-button"
-                        disabled={!context.allowChangesToSubmission}
-                        renderIcon={IconAttachMediaSolid}
-                        color="primary"
-                        elementRef={el => {
-                          this._mediaUploadRef = el
+                      <div
+                        style={{
+                          backgroundColor: theme.colors.backgroundDark,
+                          height: desktop ? '9em' : '1px',
+                          width: desktop ? '1px' : '9em',
                         }}
-                        onClick={() => this.handleMediaClick(true, false)}
-                      >
-                        {I18n.t('Record Media')}
-                      </Button>
-                    </Flex.Item>
-                  </Flex>
-                </View>
-              </Flex.Item>
-              <Flex.Item margin="medium">
-                <Flex
-                  direction={desktop ? 'column' : 'row'}
-                  justifyItems="space-between"
-                  alignItems="center"
-                >
-                  <Flex.Item>
-                    <div
-                      style={{
-                        backgroundColor: theme.colors.backgroundDark,
-                        height: desktop ? '9em' : '1px',
-                        width: desktop ? '1px' : '9em',
-                      }}
-                    />
-                  </Flex.Item>
-                  <Flex.Item color="darkgrey" margin="small">
-                    {I18n.t('or')}
-                  </Flex.Item>
-                  <Flex.Item>
-                    <div
-                      style={{
-                        backgroundColor: theme.colors.backgroundDark,
-                        height: desktop ? '9em' : '1px',
-                        width: desktop ? '1px' : '9em',
-                      }}
-                    />
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
-              <Flex.Item margin="medium">
-                <View
-                  as="div"
-                  height="350px"
-                  width="400px"
-                  borderRadius="large"
-                  background="primary"
-                >
-                  <Flex
-                    direction="column"
-                    alignItems="center"
-                    justifyItems="space-around"
-                    height="100%"
-                    shouldShrink={true}
-                  >
-                    <Flex.Item>
-                      <Img
-                        src={UploadFileSVG}
-                        alt={I18n.t('rocketship on launchpad')}
-                        height="180px"
                       />
                     </Flex.Item>
-                    <Flex.Item overflowY="visible">
-                      <Button
-                        data-testid="open-upload-media-modal-button"
-                        disabled={!context.allowChangesToSubmission}
-                        renderIcon={IconUploadLine}
-                        color="primary"
-                        onClick={() => this.handleMediaClick(false, true)}
-                      >
-                        {I18n.t('Upload Media')}
-                      </Button>
+                    <Flex.Item color="darkgrey" margin="small">
+                      {I18n.t('or')}
+                    </Flex.Item>
+                    <Flex.Item>
+                      <div
+                        style={{
+                          backgroundColor: theme.colors.backgroundDark,
+                          height: desktop ? '9em' : '1px',
+                          width: desktop ? '1px' : '9em',
+                        }}
+                      />
                     </Flex.Item>
                   </Flex>
+                </Flex.Item>
+                <Flex.Item margin="medium">
+                  <View
+                    as="div"
+                    height="350px"
+                    width="400px"
+                    borderRadius="large"
+                    background="primary"
+                  >
+                    <Flex
+                      direction="column"
+                      alignItems="center"
+                      justifyItems="space-around"
+                      height="100%"
+                      shouldShrink={true}
+                    >
+                      <Flex.Item>
+                        <Img
+                          src={UploadFileSVG}
+                          alt={I18n.t('rocketship on launchpad')}
+                          height="180px"
+                        />
+                      </Flex.Item>
+                      <Flex.Item overflowY="visible">
+                        <Button
+                          data-testid="open-upload-media-modal-button"
+                          disabled={!context.allowChangesToSubmission}
+                          renderIcon={IconUploadLine}
+                          color="primary"
+                          onClick={() => this.handleMediaClick(false, true)}
+                        >
+                          {I18n.t('Upload Media')}
+                        </Button>
+                      </Flex.Item>
+                    </Flex>
+                  </View>
+                </Flex.Item>
+              </Flex>
+              {this.state.showErrorMessage && (
+                <View as="div" padding="small 0 0 0" background="primary">
+                  <FormattedErrorMessage message={MEDIA_ERROR_MESSAGE} />
                 </View>
-              </Flex.Item>
-            </Flex>
-            {this.state.showErrorMessage && (
-              <View as='div' padding='small 0 0 0' background='primary'>
-                <FormattedErrorMessage message={MEDIA_ERROR_MESSAGE} />
-              </View>
-            )}
+              )}
             </>
           )}
         </StudentViewContext.Consumer>

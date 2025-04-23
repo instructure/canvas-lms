@@ -19,7 +19,7 @@
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Responsive} from '@instructure/ui-responsive'
-import {canvas} from '@instructure/ui-theme-tokens'
+import {canvas} from '@instructure/ui-themes'
 import React from 'react'
 import {useNewLoginData} from '../context'
 

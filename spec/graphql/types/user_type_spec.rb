@@ -299,6 +299,170 @@ describe Types::UserType do
                                current_user: @student).map(&:to_i)).to eq [@course2.id, @course1.id]
     end
 
+    context "sort" do
+      before(:once) do
+        @course1 = course_factory
+        course_with_teacher(course: @course1)
+        @section1 = @course1.course_sections.create!(name: "Section A")
+        @section2 = @course1.course_sections.create!(name: "Section B")
+        @section3 = @course1.course_sections.create!(name: "Section C")
+
+        @student1 = user_factory
+        @enrollment1 = @course.enroll_student(@student1, section: @section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        @enrollment2 = @course.enroll_student(@student1, section: @section2, enrollment_state: "active", allow_multiple_enrollments: true)
+        @enrollment3 = @course.enroll_student(@student1, section: @section3, enrollment_state: "active", allow_multiple_enrollments: true)
+      end
+
+      let(:one_day_ago) { 1.day.ago }
+      let(:two_days_ago) { 2.days.ago }
+      let(:three_days_ago) { 3.days.ago }
+
+      let(:user_type1) do
+        GraphQLTypeTester.new(
+          @student1,
+          current_user: @teacher,
+          domain_root_account: @course1.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+      end
+
+      def format_date(date)
+        Time.zone.parse(date.to_s)
+      end
+
+      def resolve_last_activity_at(order = "asc")
+        user_type1.resolve("enrollments(
+          courseId: \"#{@course1.id}\",
+          sort: {
+            field: last_activity_at,
+            direction: #{order}
+          }
+          ) {
+              lastActivityAt
+            }").map { |date_str| format_date(date_str) }
+      end
+
+      def resolve_last_activity_at_with_section_name(order = "asc")
+        user_type1.resolve("enrollments(
+          courseId: \"#{@course1.id}\",
+          sort: {
+            field: last_activity_at,
+            direction: #{order}
+          }
+          ) {
+              section {
+                name
+              }
+            }")
+      end
+
+      def resolve_section_name(order = "asc")
+        user_type1.resolve("enrollments(
+          courseId: \"#{@course1.id}\",
+          sort: {
+            field: section_name,
+            direction: #{order}
+          }
+        ) {
+            section {
+              name
+            }
+          }")
+      end
+
+      def resolve_role(order = "asc")
+        user_type1.resolve("enrollments(
+          courseId: \"#{@course1.id}\",
+          sort: {
+            field: role,
+            direction: #{order}
+          }
+        ) {
+            type
+          }")
+      end
+
+      def resolve_role_with_section_name(order = "asc")
+        user_type1.resolve("enrollments(
+          courseId: \"#{@course1.id}\",
+          sort: {
+            field: role,
+            direction: #{order}
+          }
+        ) {
+            section {
+              name
+            }
+          }")
+      end
+
+      context "last_activity_at" do
+        before(:once) do
+          @enrollment1.update!(last_activity_at: one_day_ago)
+          @enrollment2.update!(last_activity_at: two_days_ago)
+          @enrollment3.update!(last_activity_at: three_days_ago)
+        end
+
+        it "sorts by last_activity_at ascending" do
+          expect(resolve_last_activity_at).to match [format_date(@enrollment1.last_activity_at), format_date(@enrollment2.last_activity_at), format_date(@enrollment3.last_activity_at)]
+        end
+
+        it "sorts by last_activity_at descending" do
+          expect(resolve_last_activity_at("desc")).to match [format_date(@enrollment3.last_activity_at), format_date(@enrollment2.last_activity_at), format_date(@enrollment1.last_activity_at)]
+        end
+
+        it "performs secondary sort by section name ascending" do
+          @enrollment1.update!(last_activity_at: one_day_ago)
+          @enrollment3.update!(last_activity_at: one_day_ago)
+          # enrollment1 - one_day_ago, Section A
+          # enrollment3 - one_day_ago, Section C
+          # enrollment2 - two_days_ago, Section B
+          expect(resolve_last_activity_at_with_section_name).to match ["Section A", "Section C", "Section B"]
+          # enrollment2 - two_days_ago, Section B
+          # enrollment1 - one_day_ago, Section A
+          # enrollment3 - one_day_ago, Section C
+          expect(resolve_last_activity_at_with_section_name("desc")).to match ["Section B", "Section A", "Section C"]
+        end
+      end
+
+      context "section_name" do
+        it "sorts by section_name ascending" do
+          expect(resolve_section_name).to match [@section1.name, @section2.name, @section3.name]
+        end
+
+        it "sorts by section_name descending" do
+          expect(resolve_section_name("desc")).to match [@section3.name, @section2.name, @section1.name]
+        end
+      end
+
+      context "role" do
+        before(:once) do
+          @enrollment2.update!(type: "TeacherEnrollment")
+          @enrollment3.update!(type: "TaEnrollment")
+        end
+
+        it "sorts by role ascending" do
+          expect(resolve_role).to match %w[TeacherEnrollment TaEnrollment StudentEnrollment]
+        end
+
+        it "sorts by role descending" do
+          expect(resolve_role("desc")).to match %w[StudentEnrollment TaEnrollment TeacherEnrollment]
+        end
+
+        it "performs secondary sort by section name ascending" do
+          @enrollment3.update!(type: "StudentEnrollment")
+          # enrollment2 - teacher, Section B
+          # enrollment1 - student, Section A
+          # enrollment3 - student, Section C
+          expect(resolve_role_with_section_name).to match ["Section B", "Section A", "Section C"]
+          # enrollment1 - student, Section A
+          # enrollment3 - student, Section C
+          # enrollment2 - teacher, Section B
+          expect(resolve_role_with_section_name("desc")).to match ["Section A", "Section C", "Section B"]
+        end
+      end
+    end
+
     it "doesn't return enrollments for courses the user doesn't have permission for" do
       expect(
         user_type.resolve(%|enrollments(courseId: "#{@course2.id}") { _id }|)

@@ -151,6 +151,7 @@ export type GradebookOptions = {
   multiselect_gradebook_filters_enabled: boolean
   outcome_gradebook_enabled: boolean
   performance_controls: PerformanceControlValues
+  post_grades_enhanced_modal: boolean
   post_grades_feature: boolean
   post_grades_ltis: Lti[]
   post_manually: boolean

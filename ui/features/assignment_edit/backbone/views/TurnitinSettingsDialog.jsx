@@ -26,9 +26,7 @@ import {View} from '@canvas/backbone'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/util/jquery/fixDialogButtons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Flex} from '@instructure/ui-flex'
-import {IconWarningSolid} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-text'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 
 const I18n = createI18nScope('turnitinSettingsDialog')
 
@@ -170,14 +168,11 @@ TurnitinSettingsDialog.prototype.showErrorMessage = function (message, selectors
   if (errorsContainer) {
     const root = this.errorRoots[selectors.TYPE] ?? createRoot(errorsContainer)
     root.render(
-      <Flex id="error_text" as="div" alignItems="center" justifyItems="start" margin="xx-small 0 small 0">
-        <Flex.Item as="div" margin="0 xx-small xxx-small 0">
-          <IconWarningSolid color="error" />
-        </Flex.Item>
-        <Text size="small" color="danger">
-          {message}
-        </Text>
-      </Flex>
+       <FormattedErrorMessage
+        message={message}
+        margin="xx-small 0 small 0"
+        iconMargin="0 xx-small xxx-small 0"
+      />
     )
 
     Object.assign(this.errorRoots, {

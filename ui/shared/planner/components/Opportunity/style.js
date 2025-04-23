@@ -46,9 +46,9 @@ export default function buildStyle() {
     fontSize: variables.typography.fontSizeMedium,
     fontFamily: variables.typography.fontFamily,
     fontWeight: variables.typography.fontWeightNormal,
-    color: variables.colors.licorice,
-    secondaryColor: variables.colors.slate,
-    background: variables.colors.white,
+    color: variables.colors.contrasts.grey125125,
+    secondaryColor: variables.colors.contrasts.grey4570,
+    background: variables.colors.contrasts.white1010,
     namePaddingTop: variables.spacing.xxSmall,
     nameFontSize: variables.typography.fontSizeSmall,
     statusPadding: variables.spacing.small,
@@ -75,11 +75,11 @@ export default function buildStyle() {
     box-sizing: border-box;
     line-height: ${theme.lineHeight};
   }
-  
+
   .${classNames.oppNameAndTitle} {
     max-width: 16.5rem;
   }
-  
+
   .${classNames.oppName} {
     box-sizing: border-box;
     min-width: 1px;
@@ -91,11 +91,11 @@ export default function buildStyle() {
     font-size: ${theme.nameFontSize};
     margin-right: ${theme.closeButtonIconSize};
   }
-  
+
   .${classNames.title} {
     margin-bottom: ${theme.titleMargin};
   }
-  
+
   .${classNames.close} {
     position: absolute;
     top: 0;
@@ -107,14 +107,14 @@ export default function buildStyle() {
   [dir="rtl"] .${classNames.close} {
     left: 0;
   }
-  
+
   .${classNames.oppName},
   .${classNames.title} {
     overflow-wrap: break-word;
     word-wrap: break-word;
     hyphens: auto;
   }
-  
+
   .${classNames.footer} {
     box-sizing: border-box;
     display: flex;
@@ -122,14 +122,14 @@ export default function buildStyle() {
     justify-content: space-between;
     padding-inline-end: ${theme.footerPadding};
   }
-  
+
   .${classNames.status} {
     box-sizing: border-box;
     min-width: 1px;
     flex-grow: 1;
     padding-inline-end: ${theme.statusPadding};
   }
-  
+
   .${classNames.points} {
     box-sizing: border-box;
     min-width: 1px;
@@ -140,18 +140,18 @@ export default function buildStyle() {
     font-size: ${theme.pointsFontSize};
     line-height: ${theme.pointsLineHeight};
   }
-  
+
   .${classNames.pointsNumber} {
     display: block;
     font-size: ${theme.pointsNumberFontSize};
   }
-  
+
   .${classNames.due} {
     margin-top: ${theme.dueMargin};
     font-size: ${theme.dueFontSize};
     color: ${theme.secondaryColor};
   }
-  
+
   .${classNames.dueText} {
     font-weight: ${theme.dueTextFontWeight};
   }

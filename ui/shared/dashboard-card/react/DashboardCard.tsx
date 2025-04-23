@@ -105,7 +105,7 @@ export type DashboardCardProps = {
 
 export const DashboardCard = ({
   id,
-  backgroundColor = '#394B58',
+  backgroundColor = '#334451',
   shortName,
   originalName,
   courseCode,

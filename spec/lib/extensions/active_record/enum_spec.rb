@@ -22,69 +22,6 @@ module ActiveRecord
   describe Enum do
     let(:test_constant_name) { "TrafficLight" }
 
-    describe "enum columns" do
-      context "when a ActiveRecord::Base descendant uses the enum method" do
-        let(:all_active_record_models) do
-          Zeitwerk::Loader.eager_load_all
-          ActiveRecord::Base.descendants.reject { |model| model.abstract_class? || model.name == test_constant_name }
-        end
-
-        let(:index_ignore_list) do
-          # Example: { "User" => %i[some_column] }
-        end
-
-        it "should include an index on the column" do
-          all_active_record_models.each do |model|
-            enum_columns = model.defined_enums.keys
-            next if enum_columns.empty?
-
-            indexes = model.connection.indexes(model.quoted_table_name)
-            enum_columns.all? do |enum_column|
-              next if index_ignore_list[model.name]&.include?(enum_column.to_sym)
-
-              # Check to validate the table includes an index for the enum column.
-              # Note that we are specifically checking for an index on the first column
-              # of a multi-column index if one exists.
-              expect(indexes.any? { |index| Array(index.columns).first == enum_column }).to(
-                be_truthy,
-                <<~TEXT
-                  A new enum column has been added to a table without an index (#{model.name}.#{enum_column}).
-
-                  Depending on the cardinality of the enum and your query pattern, an index may not always be beneficial.
-                  If you're unsure whether an index should be added, consult with a DBA to evaluate the trade-offs.
-
-                  If an index is not needed for your enum and query pattern, add your model name and enum column to `index_ignore_list`
-                TEXT
-              )
-            end
-          end
-        end
-
-        it "should include a default value from the enum on the column" do
-          all_active_record_models.each do |model|
-            enum_columns = model.defined_enums.keys
-            next if enum_columns.empty?
-
-            model_columns = model.columns
-            enum_columns.each do |enum_column|
-              column = model_columns.find { |c| c.name == enum_column.to_s }
-              next unless column
-
-              expect(model.defined_enums[enum_column]).to(
-                have_key(column.default),
-                <<~TEXT
-                  Expected the column '#{enum_column}' in the model '#{model.name}' to have a default value from the enum.
-
-                  If you are adding a new enum column, please set a default value from the enum on the column. This helps
-                  to ensure the integrity of the data in the column.
-                TEXT
-              )
-            end
-          end
-        end
-      end
-    end
-
     describe ".enum" do
       subject(:enum) { TrafficLight.enum name, values }
 

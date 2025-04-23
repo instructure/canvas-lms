@@ -47,10 +47,7 @@ beforeEach(() => {
     VALID_DATE_RANGE: {
       end_at: {date: '2021-09-30', date_context: 'course'},
       start_at: {date: '2021-09-01', date_context: 'course'},
-    },
-    FEATURES: {
-      course_paces_redesign: false,
-    },
+    }
   })
 })
 
@@ -60,43 +57,20 @@ afterEach(() => {
 })
 
 describe('App', () => {
-  it('starts polling for published status updates on mount', () => {
-    renderConnected(<App {...defaultProps} coursePace={PRIMARY_PACE} />)
-    expect(pollForPublishStatus).toHaveBeenCalled()
-  })
-
-  it('renders one screenreader-only h1', () => {
-    const {getByRole} = renderConnected(<App {...defaultProps} coursePace={PRIMARY_PACE} />)
-    // should only be one h1 in the whole app
-    const heading = getByRole('heading', {level: 1})
-    expect(heading).toBeInTheDocument()
-    expect(heading).toHaveTextContent('Course Pacing')
-  })
-
-  describe('with course paces redesign ON', () => {
-    beforeEach(() => {
-      fakeENV.setup({
-        FEATURES: {
-          course_paces_redesign: true,
-        },
-      })
-    })
-
-    it('renders empty state if supplied shell course pace', () => {
-      const {getByRole} = renderConnected(
-        <App
-          {...defaultProps}
-          coursePace={{
-            ...PRIMARY_PACE,
-            id: undefined,
-            context_type: 'Course',
-            context_id: '1',
-            workflow_state: 'active',
-          }}
-        />,
-      )
-      const getStartedButton = getByRole('button', {name: 'Get Started'})
-      expect(getStartedButton).toBeInTheDocument()
-    })
+  it('renders empty state if supplied shell course pace', () => {
+    const {getByRole} = renderConnected(
+      <App
+        {...defaultProps}
+        coursePace={{
+          ...PRIMARY_PACE,
+          id: undefined,
+          context_type: 'Course',
+          context_id: '1',
+          workflow_state: 'active',
+        }}
+      />,
+    )
+    const getStartedButton = getByRole('button', {name: 'Get Started'})
+    expect(getStartedButton).toBeInTheDocument()
   })
 })

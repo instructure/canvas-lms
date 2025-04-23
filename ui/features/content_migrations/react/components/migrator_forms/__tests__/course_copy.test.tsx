@@ -48,8 +48,8 @@ const defaultEnv = {
   SHOW_SELECT: false,
 }
 
-const searchForACourse = 'Search for a course *'
-const selectACourse = 'Select a course *'
+const searchForACourse = 'Search for a course'
+const selectACourse = 'Select a course'
 const addToImportQueue = 'Add to Import Queue'
 
 describe('CourseCopyImporter', () => {
@@ -394,4 +394,23 @@ describe('CourseCopyImporter', () => {
     })
   })
 
+  describe('URL crafting', () => {
+    it('includes current_course_id in composeManageableCourseURL when ENV.COURSE_ID is set', async () => {
+      fakeENV.setup({
+        ...defaultEnv,
+        COURSE_ID: '123'
+      })
+
+      renderComponent()
+
+      await userEvent.type(screen.getByTestId('course-copy-select-course'), 'coursetest')
+
+
+      await waitFor(() => {
+        expect(doFetchApi).toHaveBeenCalledWith({
+          path: '/users/0/manageable_courses?current_course_id=123&term=coursetest&include=concluded',
+        })
+      })
+    })
+  })
 })

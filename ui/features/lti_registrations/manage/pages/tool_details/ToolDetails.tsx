@@ -16,26 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useAppendBreadcrumb} from '@canvas/breadcrumbs/useAppendBreadcrumb'
+import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
-import {Spinner} from '@instructure/ui-spinner'
-import * as React from 'react'
-import {useApiResult} from '../../../common/lib/apiResult/useApiResult'
-import {useZodParams} from '../../../common/lib/useZodParams/useZodParams'
-import {fetchRegistrationForId} from '../../api/registrations'
-import {AccountId} from '../../model/AccountId'
-import {LtiRegistration} from '../../model/LtiRegistration'
-import {LtiRegistrationId, ZLtiRegistrationId} from '../../model/LtiRegistrationId'
-import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
-import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
+import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import * as React from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {matchApiResultState} from '../../../common/lib/apiResult/matchApiResultState'
-import {useAppendBreadcrumbsToDefaults} from '@canvas/breadcrumbs/useAppendBreadcrumbsToDefaults'
+import {useApiResult} from '../../../common/lib/apiResult/useApiResult'
+import {useZodParams} from '../../../common/lib/useZodParams/useZodParams'
+import {fetchRegistrationWithAllInfoForId} from '../../api/registrations'
+import type {AccountId} from '../../model/AccountId'
+import {LtiRegistration, type LtiRegistrationWithAllInformation} from '../../model/LtiRegistration'
+import {type LtiRegistrationId, ZLtiRegistrationId} from '../../model/LtiRegistrationId'
+import {ltiToolDefaultIconUrl} from '../../model/ltiToolIcons'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -65,7 +66,7 @@ export const ToolDetailsRequest = ({
   ltiRegistrationId: LtiRegistrationId
 }) => {
   const fetchReg = React.useCallback(
-    () => fetchRegistrationForId({accountId, ltiRegistrationId}),
+    () => fetchRegistrationWithAllInfoForId({accountId, ltiRegistrationId}),
     [accountId, ltiRegistrationId],
   )
 
@@ -101,27 +102,18 @@ const useToolDetailsRoute = () => {
 }
 
 export type ToolDetailsOutletContext = {
-  registration: LtiRegistration
+  registration: LtiRegistrationWithAllInformation
 }
 
 const ToolDetailsInner = ({
   registration,
   accountId,
-}: {registration: LtiRegistration; stale: boolean; accountId: AccountId}) => {
+}: {registration: LtiRegistrationWithAllInformation; stale: boolean; accountId: AccountId}) => {
   const navigate = useNavigate()
 
   const route = useToolDetailsRoute()
 
-  useAppendBreadcrumbsToDefaults([
-    {
-      name: I18n.t('Manage'),
-      url: `/accounts/${accountId}/apps/manage`,
-    },
-    {
-      name: registration.name,
-      url: `/accounts/${accountId}/apps/manage/${registration.id}`,
-    },
-  ])
+  useAppendBreadcrumb(registration.name, `/accounts/${accountId}/apps/manage/${registration.id}`)
 
   const onTabClick = React.useCallback(
     (_: any, tab: {id?: string}) => {
@@ -146,9 +138,20 @@ const ToolDetailsInner = ({
       >
         <Flex direction="column">
           <Flex direction="row" margin="0 0 small">
-            {registration.icon_url ? (
-              <img src={registration.icon_url} style={{height: '52px'}} alt={registration.name} />
-            ) : null}
+            <img
+              src={
+                registration.icon_url
+                  ? registration.icon_url
+                  : ltiToolDefaultIconUrl({
+                      base: window.location.origin,
+                      toolName: registration.name,
+                      developerKeyId: registration.developer_key_id || undefined,
+                    })
+              }
+              style={{height: '52px'}}
+              alt={registration.name}
+            />
+
             <Flex direction="column" margin="0 small">
               <Text size="large" weight="bold">
                 {registration.name}
@@ -197,7 +200,7 @@ const ToolDetailsInner = ({
           isSelected={route === 'access'}
           active={route === 'access'}
           id="access"
-          padding="large 0"
+          padding="medium 0"
           href="/"
           renderTitle={
             <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Access')}</Text>
@@ -215,7 +218,7 @@ const ToolDetailsInner = ({
             </Text>
           }
           id="configuration"
-          padding="large x-small"
+          padding="medium 0"
         >
           <Outlet context={{registration}} />
         </Tabs.Panel>
@@ -227,7 +230,7 @@ const ToolDetailsInner = ({
               <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Usage')}</Text>
             }
             id="usage"
-            padding="large x-small"
+            padding="medium 0"
           >
             <Outlet context={{registration}} />
           </Tabs.Panel>
@@ -239,7 +242,7 @@ const ToolDetailsInner = ({
             <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('History')}</Text>
           }
           id="history"
-          padding="large x-small"
+          padding="medium 0"
         >
           <Outlet context={{registration}} />
         </Tabs.Panel>

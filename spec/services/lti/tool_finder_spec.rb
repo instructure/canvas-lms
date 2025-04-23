@@ -936,7 +936,7 @@ describe Lti::ToolFinder do
   describe "associated_1_1_tool" do
     specs_require_cache(:redis_cache_store)
 
-    subject { lti_1_3_tool.associated_1_1_tool(context, requested_url) }
+    subject { Lti::ToolFinder.associated_1_1_tool(lti_1_3_tool, context, requested_url) }
 
     let(:context) { @course }
     let(:domain) { "test.com" }
@@ -948,12 +948,18 @@ describe Lti::ToolFinder do
 
     it { is_expected.to eq lti_1_1_tool }
 
+    context "when tool is nil" do
+      let(:lti_1_3_tool) { nil }
+
+      it { is_expected.to be_nil }
+    end
+
     it "caches the result" do
       expect(subject).to eq lti_1_1_tool
 
-      allow(ContextExternalTool).to receive(:find_external_tool)
-      lti_1_3_tool.associated_1_1_tool(context)
-      expect(ContextExternalTool).not_to have_received(:find_external_tool)
+      allow(Lti::ToolFinder).to receive(:potential_matching_tools)
+      Lti::ToolFinder.associated_1_1_tool(lti_1_3_tool, context, requested_url)
+      expect(Lti::ToolFinder).not_to have_received(:potential_matching_tools)
     end
 
     it "finds deleted 1.1 tools" do

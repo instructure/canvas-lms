@@ -29,7 +29,6 @@ describe CoursePacing::CoursePaceService do
     let(:section) { course.course_sections.create!(name: "Test Section") }
 
     before do
-      @course.root_account.enable_feature!(:course_paces)
       @course.enable_course_paces = true
       @course.save!
 

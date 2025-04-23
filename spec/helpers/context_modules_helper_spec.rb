@@ -298,6 +298,43 @@ describe ContextModulesHelper do
         end
       end
     end
+
+    describe "process_module_items_data" do
+      it "works with module items input" do
+        module_data = process_module_items_data([item], t_module, @student, @session, student: true)
+
+        expect(module_data[:items].length).to eq(1)
+        expect(module_data[:items].first).to eq(item)
+      end
+    end
+
+    describe "load_content_tags" do
+      let(:visible_content_tag_mock) { double("ContentTag1", content: double("Content1", hide_on_modules_view?: false)) }
+      let(:hidden_content_tag_mock) { double("ContentTag2", content: double("Content2", hide_on_modules_view?: true)) }
+
+      before do
+        allow(t_module)
+          .to receive(:content_tags_visible_to)
+          .with(@current_user)
+          .and_return(content_tags_mock)
+      end
+
+      context "when content_tags is NOT empty" do
+        let(:content_tags_mock) { [visible_content_tag_mock, hidden_content_tag_mock] }
+
+        it "returns content tags visible to the current user" do
+          expect(load_content_tags(t_module, @current_user).size).to eq(1)
+        end
+      end
+
+      context "when content_tags is empty" do
+        let(:content_tags_mock) { [] }
+
+        it "returns empty array" do
+          expect(load_content_tags(t_module, @current_user).size).to eq(0)
+        end
+      end
+    end
   end
 
   describe "add_mastery_paths_to_cache_key" do
@@ -403,6 +440,88 @@ describe ContextModulesHelper do
       item = @mod.add_item type: "discussion_topic", id: topic.id
 
       expect(cyoe_able?(item)).to be false
+    end
+  end
+
+  describe "module_performance_improvement_is_enabled?" do
+    subject { module_performance_improvement_is_enabled?(context, current_user) }
+
+    context "when provided context and user are falsey" do
+      let(:context) { nil }
+      let(:current_user) { nil }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context "when provided context is falsey" do
+      let(:context) { nil }
+      let(:current_user) { double }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context "when provided current_user is falsey" do
+      let(:context) { double }
+      let(:current_user) { nil }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context "when provided context and user exist" do
+      let(:current_user) { double("current_user") }
+      let(:visible_items) { double("count_mock", count: items_count) }
+      let(:items_count) { 100 }
+      let(:context) do
+        course = course_model
+        allow(course).to receive(:module_items_visible_to).with(current_user).and_return(visible_items)
+        course
+      end
+
+      context "when modules_perf FF is on" do
+        before { allow(context.account).to receive(:feature_enabled?).with(:modules_perf).and_return(true) }
+
+        it "should call the module_items_visible_to" do
+          expect(context).to receive(:module_items_visible_to).with(current_user)
+
+          subject
+        end
+
+        it "should call the Settings.get with correct key and default value" do
+          expect(Setting).to receive(:get).with("module_perf_threshold", 100)
+
+          subject
+        end
+
+        context "when there is more than 100 modules" do
+          let(:items_count) { 101 }
+
+          it { is_expected.to be_truthy }
+        end
+
+        context "when there is less than 100 modules" do
+          let(:items_count) { 99 }
+
+          it { is_expected.to be_falsey }
+        end
+
+        context "when there are 100 modules" do
+          let(:items_count) { 100 }
+
+          it { is_expected.to be_falsey }
+        end
+      end
+
+      context "when modules_perf FF is off" do
+        before { allow(context.account).to receive(:feature_enabled?).with(:modules_perf).and_return(false) }
+
+        it { is_expected.to be_falsey }
+
+        it "should not call the module_items_visible_to" do
+          expect(context).to_not receive(:module_items_visible_to).with(current_user)
+
+          subject
+        end
+      end
     end
   end
 end

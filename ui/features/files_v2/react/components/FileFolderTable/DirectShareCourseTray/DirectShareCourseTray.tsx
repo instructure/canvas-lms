@@ -30,6 +30,7 @@ import FileFolderTray from '../../shared/TrayWrapper'
 import FileFolderInfo from '../../shared/FileFolderInfo'
 import {type File} from '../../../../interfaces/File'
 import DirectShareCoursePanel, {DirectShareCoursePanelPropsRef} from './DirectShareCoursePanel'
+import {getName} from '../../../../utils/fileFolderUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -91,7 +92,7 @@ const DirectShareCourseTrayBody = ({
         <Spinner
           data-testid="copy-to-spinner"
           renderTitle={I18n.t('Copying %{file}', {
-            file: file.display_name || file.filename,
+            file: getName(file),
           })}
           margin="0 0 0 medium"
           aria-live="polite"

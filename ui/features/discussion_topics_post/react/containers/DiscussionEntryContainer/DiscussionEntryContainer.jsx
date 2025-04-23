@@ -21,7 +21,7 @@ import {AuthorInfo} from '../../components/AuthorInfo/AuthorInfo'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React, {useContext, useEffect, useRef, useCallback} from 'react'
 import {getDisplayName, userNameToShow} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {Attachment} from '../../../graphql/Attachment'
@@ -33,10 +33,70 @@ import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 import theme from '@instructure/canvas-theme'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import useHighlightStore from '../../hooks/useHighlightStore'
 
 const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
   const I18n = useI18nScope('discussion_topics_post')
   const {searchTerm} = useContext(SearchContext)
+
+  const focusableElementRef = useRef(null)
+
+  const addReplyRef = useHighlightStore(state => state.addReplyRef)
+  const removeRef = useHighlightStore(state => state.removeReplyRef)
+  const replyRefs = useHighlightStore(state => state.replyRefs)
+  const clearHighlighted = useHighlightStore(state => state.clearHighlighted)
+  const highlightEl = useHighlightStore(state => state.highlightEl)
+
+  useEffect(() => {
+    // TODO: Check the root entry if this is necessary to keep track of
+    if (props.discussionEntry?._id && focusableElementRef.current) {
+      addReplyRef(props.discussionEntry._id, focusableElementRef.current)
+    }
+
+    return () => {
+      removeRef(props.discussionEntry?._id)
+    }
+  }, [focusableElementRef, props.discussionEntry?._id, addReplyRef, removeRef])
+
+  const handleBlur = useCallback(
+    event => {
+      const nextEl = event.relatedTarget
+
+      const replyRefsArray = Array.from(replyRefs.values())
+
+      if (
+        !nextEl ||
+          (!replyRefsArray.some(ref => ref === nextEl) && !event.target.contains(nextEl))
+      ) {
+        clearHighlighted()
+      }
+    },
+    [replyRefs, clearHighlighted],
+  )
+
+  const handleFocus = useCallback(
+    event => {
+      highlightEl(event.target)
+    },
+    [highlightEl],
+  )
+
+  useEffect(() => {
+    // This component is also used in the main topic view and doesn't have an entry id
+    if (!props.discussionEntry?._id) {
+      return
+    }
+
+    if (focusableElementRef.current) {
+      focusableElementRef.current.addEventListener('blur', handleBlur)
+      focusableElementRef.current.addEventListener('focus', handleFocus)
+
+      return () => {
+        focusableElementRef.current.removeEventListener('blur', handleBlur)
+        focusableElementRef.current.removeEventListener('focus', handleFocus)
+      }
+    }
+  }, [handleBlur, handleFocus, props.discussionEntry?._id])
 
   const getDeletedDisplayName = discussionEntry => {
     const editor = discussionEntry.editor
@@ -63,14 +123,26 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
   }
 
   if (props.deleted) {
+    // Adding a focusable element if the deleted entry has subentries
     return (
-      <DeletedPostMessage
-        deleterName={getDeletedDisplayName(props.discussionEntry)}
-        timingDisplay={props.timingDisplay}
-        deletedTimingDisplay={props.editedTimingDisplay}
+      <div
+        ref={el => {
+          if (el) {
+            focusableElementRef.current = el
+            if (props.discussionEntry.subentriesCount) {
+              el.tabIndex = 0
+            }
+          }
+        }}
       >
-        {props.children}
-      </DeletedPostMessage>
+        <DeletedPostMessage
+          deleterName={getDeletedDisplayName(props.discussionEntry)}
+          timingDisplay={props.timingDisplay}
+          deletedTimingDisplay={props.editedTimingDisplay}
+        >
+          {props.children}
+        </DeletedPostMessage>
+      </div>
     )
   }
 
@@ -78,8 +150,8 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
   const displayedAuthor = props.anonymousAuthor
     ? props.anonymousAuthor.shortName
     : props.author
-    ? props.author.displayName
-    : 'Unknown Author'
+      ? props.author.displayName
+      : 'Unknown Author'
 
   const description = props.isTopic
     ? I18n.t('Post by %{displayedAuthor} from %{date}', {
@@ -125,6 +197,7 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
         elementRef={el => {
           if (el?.parentElement) {
             el.parentElement.tabIndex = 0
+            focusableElementRef.current = el.parentElement
           }
         }}
       >

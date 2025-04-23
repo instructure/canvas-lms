@@ -130,18 +130,48 @@ describe PageViewsController do
         expect(response).to be_successful
       end
 
-      it "returns service_unavailable status when PageView::Pv4Client::Pv4EmptyResponse is raised" do
-        allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4EmptyResponse)
-        get :index, params: { user_id: @user.id }, format: :json
-        expect(response).to have_http_status(:service_unavailable)
-        expect(response.parsed_body["error"]).to eq("Page view data is not available at this time")
-      end
+      context "client errors" do
+        it "returns bad_request status when PageView::Pv4Client::Pv4BadRequest is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4BadRequest)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:bad_request)
+          expect(response.parsed_body["error"]).to eq("Page Views received an invalid or malformed request.")
+        end
 
-      it "returns bad_gateway status when PageView::Pv4Client::Pv4Timeout is raised" do
-        allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4Timeout)
-        get :index, params: { user_id: @user.id }, format: :json
-        expect(response).to have_http_status(:bad_gateway)
-        expect(response.parsed_body["error"]).to eq("Page Views service is temporarily unavailable")
+        it "returns not_found status when PageView::Pv4Client::Pv4NotFound is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4NotFound)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:not_found)
+          expect(response.parsed_body["error"]).to eq("Page Views resource not found.")
+        end
+
+        it "returns not_found status when PageView::Pv4Client::Pv4Unauthorized is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4Unauthorized)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:not_found)
+          expect(response.parsed_body["error"]).to eq("Page Views resource not found.")
+        end
+
+        it "returns too_many_requests status when PageView::Pv4Client::Pv4TooManyRequests is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4TooManyRequests)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:too_many_requests)
+          expect(response.parsed_body["error"]).to eq("Page Views rate limit exceeded. Please wait and try again.")
+        end
+
+        it "returns service_unavailable status when PageView::Pv4Client::Pv4EmptyResponse is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4EmptyResponse)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:service_unavailable)
+          expect(response.parsed_body["error"]).to eq("Page Views data is not available at this time.")
+        end
+
+        it "returns bad_gateway status when PageView::Pv4Client::Pv4Timeout is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4Timeout)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:bad_gateway)
+          expect(response.parsed_body["error"]).to eq("Page Views service is temporarily unavailable.")
+        end
       end
     end
   end

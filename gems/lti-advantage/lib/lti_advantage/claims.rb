@@ -14,4 +14,5 @@ module LtiAdvantage::Claims
   require_relative "claims/asset"
   require_relative "claims/for_user"
   require_relative "claims/submission"
+  require_relative "claims/eulaservice"
 end

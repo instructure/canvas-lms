@@ -192,6 +192,12 @@ export const sharedFormTests = (InputComponent: React.ComponentType<any>) => {
         await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
         expect(screen.getByText(expectedFileMissingError)).toBeInTheDocument()
       })
+
+      it('focuses on input after file error', async () => {
+        renderComponent()
+        await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+        expect(screen.getByTestId('migrationFileUpload')).toHaveFocus()
+      })
     })
   })
 }

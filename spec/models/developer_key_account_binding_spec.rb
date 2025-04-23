@@ -64,6 +64,11 @@ RSpec.describe DeveloperKeyAccountBinding do
         binding = DeveloperKeyAccountBinding.where(developer_key_id: developer_key.id).first
         expect { binding.update!(workflow_state: "allow") }.to raise_error("Please don't turn off the default developer key")
       end
+
+      it "does not allow default key binding to be deleted" do
+        binding = DeveloperKeyAccountBinding.where(developer_key_id: developer_key.id).first
+        expect { binding.update!(workflow_state: "deleted") }.to raise_error("Please don't turn off the default developer key")
+      end
     end
 
     describe "workflow state" do
@@ -191,6 +196,21 @@ RSpec.describe DeveloperKeyAccountBinding do
             dev_key_binding.save!
             expect(dev_key_binding.root_account).to eq account.root_account
           end
+        end
+      end
+    end
+  end
+
+  describe ".skip_dev_key_association_cache" do
+    specs_require_cache
+
+    it "does not cache developer key associations" do
+      DeveloperKeyAccountBinding.transaction do
+        dev_key = DeveloperKey.create!(account:)
+        binding = DeveloperKeyAccountBinding.find_or_initialize_by(account:, developer_key: dev_key)
+        binding.skip_dev_key_association_cache do
+          expect(DeveloperKey).not_to receive(:find_cached)
+          expect { binding.save! }.not_to raise_error
         end
       end
     end

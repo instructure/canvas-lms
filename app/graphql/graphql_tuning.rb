@@ -54,6 +54,10 @@ class GraphQLTuning
     config["max_query_directives"] || 5
   end
 
+  def self.enable_deferred_graphql_tuning?
+    !!config["enable_deferred_graphql_tuning"]
+  end
+
   class << self
     private
 

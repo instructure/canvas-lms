@@ -231,7 +231,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     if (!Number.isNaN(duration)) {
       if (window.ENV.FEATURES.course_pace_time_selection) {
         this.props.setPaceItemDurationTimeToCompleteCalendarDays(this.props.coursePaceItem.module_item_id, duration, this.props.blackoutDates)
-      }else {
+      } else {
         this.props.setPaceItemDuration(this.props.coursePaceItem.module_item_id, duration)
       }
     }
@@ -272,18 +272,6 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   }
 
   renderDurationInput = () => {
-    const contextType = this.props.context_type;
-    if (
-      this.props.isStudentPace &&
-      !window.ENV.FEATURES.course_paces_for_students
-      && contextType !== 'BulkEnrollment'
-    ) {
-      return (
-        <Flex height="2.375rem" alignItems="center" justifyItems="center">
-          {this.state.duration}
-        </Flex>
-      )
-    }
     const disabledByBlueprintLock = this.props.blueprintLocked
     const itemChange = this.props.coursePaceItemChanges.find(
       c => c.newValue.module_item_id === this.props.coursePaceItem.module_item_id,

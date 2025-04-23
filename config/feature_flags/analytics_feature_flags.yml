@@ -12,12 +12,12 @@ analytics_2:
       Community.
   after_state_change_proc: analytics_2_after_state_change_hook
   beta: false
-attendance_on_dap_model:
+analytics_2_attendance_config_v2:
   state: hidden
   applies_to: Account
-  display_name: Attendance on DAP
+  display_name: New Analytics - Attendance Config V2
   description:
-    attendance_on_dap_model_description: Enable attendance on looker_canvas_attendance on DAP data
+    analytics_2_attendance_config_v2_description: Use dynamo for attendance config - course analytics
   root_opt_in: true
   beta: true
   shadow: true
@@ -41,6 +41,17 @@ admin_analytics:
       details on Canvas usage, Canvas course success, and student engagement.
       Learn more in the *Admin Analytics Hub* in the Canvas community.
   after_state_change_proc: analytics_2_after_state_change_hook
+  root_opt_in: true
+  beta: false
+admin_analytics_hide_courses_with_no_enrollments:
+  state: hidden
+  applies_to: Account
+  display_name: Admin Analytics - hide courses with no enrollments
+  description:
+    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
+    admin_analytics_hide_courses_with_no_enrollments_description: When enabled, Admin Analytics + Intelligent Insights
+      will hide courses with no enrollments from all data charts by default. There will be an option in the app
+      to show these courses.
   root_opt_in: true
   beta: false
 admin_analytics_dap_model:

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useRef} from 'react'
 
 import {CommonMigratorControls, noFileSelectedFormMessage} from '@canvas/content-migrations'
 import type {onSubmitMigrationFormCallback} from '../types'
@@ -36,8 +36,9 @@ type D2LImporterProps = {
 }
 
 const D2LImporter = ({onSubmit, onCancel, fileUploadProgress, isSubmitting}: D2LImporterProps) => {
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const {setFile, fileError, questionBankSettings, setQuestionBankSettings, handleSubmit} =
-    useSubmitHandlerWithQuestionBank(onSubmit)
+    useSubmitHandlerWithQuestionBank(onSubmit, fileInputRef)
 
   return (
     <>
@@ -47,6 +48,7 @@ const D2LImporter = ({onSubmit, onCancel, fileUploadProgress, isSubmitting}: D2L
         isSubmitting={isSubmitting}
         externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
         isRequired={true}
+        inputRef={ref => (fileInputRef.current = ref)}
       />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}

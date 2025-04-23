@@ -40,7 +40,7 @@ class NewContentMigrationPage
 
     # Selectors
     def migration_type_dropdown
-      f("#Select_0")
+      f("#Select___0")
     end
 
     def migration_type_option_by_id(id)
@@ -65,10 +65,6 @@ class NewContentMigrationPage
 
     def specific_content_radio
       fxpath('//*[text()="Select specific content"]')
-    end
-
-    def progress_status_label
-      f('[data-testid="migrationStatus"]')
     end
 
     def migration_file_upload_input
@@ -100,7 +96,7 @@ class NewContentMigrationPage
     end
 
     def course_search_result(id)
-      f('#Selectable_1-list > li > [id="' + id + '"]')
+      f('#Selectable___1-list > li > [id="' + id + '"]')
     end
 
     def ui_auto_complete
@@ -112,7 +108,7 @@ class NewContentMigrationPage
     end
 
     def course_search_results
-      ff("Selectable_1-list > li")
+      ff("Selectable___1-list > li")
     end
 
     def course_search_results_visible
@@ -201,6 +197,10 @@ class NewContentMigrationPage
 
     def new_end_date_input
       find_by_test_id("new_end_date")
+    end
+
+    def progress_status_label
+      f("[data-testid='migrationStatus']")
     end
 
     def select_day_substition_range(index, from_weekday, to_weekday)

@@ -28,7 +28,6 @@ describe "Student Enrollment Paces API" do
   let(:student_enrollment) { course.enroll_student(student, enrollment_state: "active") }
 
   before do
-    Account.site_admin.enable_feature!(:course_paces_redesign)
     user_session(teacher)
 
     stub_const("SELECTED_SKIP_DAYS", %w[fri sat])
@@ -291,53 +290,6 @@ describe "Student Enrollment Paces API" do
 
     it "returns a 401 if the user lacks permissions" do
       assert_grant_check { delete api_v1_delete_student_enrollment_pace_path(course, student_enrollment), params: { format: :json } }
-    end
-  end
-
-  context "course_paces_redesign flag is disabled" do
-    before do
-      Account.site_admin.disable_feature!(:course_paces_redesign)
-    end
-
-    describe "show" do
-      before do
-        student_enrollment_pace_model(student_enrollment:)
-      end
-
-      it "returns 404" do
-        get api_v1_student_enrollment_pace_path(course, student_enrollment), params: { format: :json }
-        expect(response).to have_http_status :not_found
-      end
-    end
-
-    describe "create" do
-      it "returns 404" do
-        post api_v1_new_student_enrollment_pace_path(course, student_enrollment), params: { format: :json }
-        expect(response).to have_http_status :not_found
-      end
-    end
-
-    describe "update" do
-      before { student_enrollment_pace_model(student_enrollment:) }
-
-      it "returns 404" do
-        patch api_v1_patch_student_enrollment_pace_path(course, student_enrollment), params: {
-          format: :json,
-          pace: {
-            selected_days_to_skip: SELECTED_SKIP_DAYS
-          }
-        }
-        expect(response).to have_http_status :not_found
-      end
-    end
-
-    describe "delete" do
-      before { student_enrollment_pace_model(student_enrollment:) }
-
-      it "returns 404" do
-        delete api_v1_delete_student_enrollment_pace_path(course, student_enrollment), params: { format: :json }
-        expect(response).to have_http_status :not_found
-      end
     end
   end
 end

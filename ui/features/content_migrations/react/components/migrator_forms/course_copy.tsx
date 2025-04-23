@@ -25,7 +25,7 @@ import {IconSearchLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {canvas} from '@instructure/ui-theme-tokens'
+import {canvas} from '@instructure/ui-themes'
 import {Responsive} from '@instructure/ui-responsive'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {CommonMigratorControls} from '@canvas/content-migrations'
@@ -44,6 +44,8 @@ type CourseOption = {
   term: string
   start_at: string
   end_at: string
+  start_at_locale: string | null
+  end_at_locale: string | null
   blueprint: boolean
 }
 
@@ -77,20 +79,23 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
 
   const composeManageableCourseURL = useCallback(
     (currentSearchParam?: string, includeConcluded?: boolean) => {
-      let url = `/users/${currentUser}/manageable_courses`
+      const params = new URLSearchParams()
 
-      if (currentSearchParam || includeConcluded) {
-        url += '?'
+      if (ENV.COURSE_ID) {
+        params.set('current_course_id', ENV.COURSE_ID)
       }
+
       if (currentSearchParam) {
-        url += `term=${currentSearchParam}`
+        params.set('term', currentSearchParam)
       }
+
       if (includeConcluded) {
-        url += `${currentSearchParam ? '&' : ''}include=concluded`
+        params.set('include', 'concluded')
       }
-      return url
+
+      return `/users/${currentUser}/manageable_courses?${params.toString()}`
     },
-    [currentUser]
+    [currentUser],
   )
 
   useEffect(() => {
@@ -122,7 +127,6 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
       preLoadManageableCourses()
     }
   }, [composeManageableCourseURL, isShowSelect])
-
 
   const throttledCourseFetch = useRef(
     throttle(
@@ -166,7 +170,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
       }
       setPreloadedCourses(newMap)
     },
-    [preloadedCourses]
+    [preloadedCourses],
   )
 
   const selectCourse = useCallback(
@@ -223,13 +227,17 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
   const interaction = isSubmitting || isPreloadedCoursesLoading ? 'disabled' : 'enabled'
   const messages = selectedCourseError
     ? [
-      {
-        text: I18n.t('You must select a course to copy content from'),
-        type: 'newError',
-      },
-    ]
+        {
+          text: I18n.t('You must select a course to copy content from'),
+          type: 'newError',
+        },
+      ]
     : []
   const value = selectedCourse ? selectedCourse.id : ''
+
+  // Prefer locale date, fallback if unavailable
+  const oldStartDate = selectedCourse?.start_at_locale || selectedCourse?.start_at
+  const oldEndDate = selectedCourse?.end_at_locale || selectedCourse?.end_at
 
   return (
     <>
@@ -243,8 +251,11 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
             const dividerTextPadding = selectedCourseError ? 'small 0 small 0' : 'large 0 small 0'
 
             return (
-              <Flex gap="small" direction={matches?.includes('changeToColumnDirection') ? 'row' : 'column'}>
-                {isShowSelect &&
+              <Flex
+                gap="small"
+                direction={matches?.includes('changeToColumnDirection') ? 'row' : 'column'}
+              >
+                {isShowSelect && (
                   <>
                     <Flex.Item shouldGrow={true}>
                       <CanvasSelect
@@ -262,35 +273,38 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
                         scrollToHighlightedOption={true}
                         inputRef={ref => (courseSelectDropdownRef.current = ref)}
                       >
-                        <CanvasSelect.Option
-                          key="emptyOption"
-                          id="emptyOption"
-                          value=""
-                        >
+                        <CanvasSelect.Option key="emptyOption" id="emptyOption" value="">
                           {I18n.t('Select a course')}
                         </CanvasSelect.Option>
-                        {Array.from(preloadedCourses.entries()).map(([term, courseOptions], index) => (
-                          <CanvasSelect.Group label={term} key={`grp-${index}`}>
-                            {courseOptions.map((courseOption) => (
-                              <CanvasSelect.Option
-                                key={courseOption.id}
-                                id={courseOption.id}
-                                value={courseOption.id}
-                              >
-                                {courseOption.label}
-                              </CanvasSelect.Option>
-                            ))}
-                          </CanvasSelect.Group>
-                        ))}
+                        {Array.from(preloadedCourses.entries()).map(
+                          ([term, courseOptions], index) => (
+                            <CanvasSelect.Group label={term} key={`grp-${index}`}>
+                              {courseOptions.map(courseOption => (
+                                <CanvasSelect.Option
+                                  key={courseOption.id}
+                                  id={courseOption.id}
+                                  value={courseOption.id}
+                                >
+                                  {courseOption.label}
+                                </CanvasSelect.Option>
+                              ))}
+                            </CanvasSelect.Group>
+                          ),
+                        )}
                       </CanvasSelect>
                     </Flex.Item>
                     <Flex.Item>
-                      <View as="div" padding={matches?.includes('changeToColumnDirection') ? dividerTextPadding : '0'}>
+                      <View
+                        as="div"
+                        padding={
+                          matches?.includes('changeToColumnDirection') ? dividerTextPadding : '0'
+                        }
+                      >
                         <Text>{I18n.t('or')}</Text>
                       </View>
                     </Flex.Item>
                   </>
-                }
+                )}
                 <Flex.Item shouldGrow={true} overflowY="visible">
                   <CanvasSelect
                     id="course-copy-select-course"
@@ -358,8 +372,8 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
         canImportBPSettings={
           selectedCourse && showBpSettingImport ? selectedCourse.blueprint : false
         }
-        oldStartDate={parseDateToISOString(selectedCourse?.start_at)}
-        oldEndDate={parseDateToISOString(selectedCourse?.end_at)}
+        oldStartDate={parseDateToISOString(oldStartDate)}
+        oldEndDate={parseDateToISOString(oldEndDate)}
         newStartDate={parseDateToISOString(newStartDate)}
         newEndDate={parseDateToISOString(newEndDate)}
         onSubmit={handleSubmit}

@@ -34,11 +34,11 @@ export const ModifiedByLink = ({htmlUrl, displayName, isStacked}: ModifiedByLink
     )
   } else {
     return (
-      <Link isWithinText={false} href={htmlUrl}>
-        <div style={{textOverflow: 'ellipsis', overflow: 'hidden'}}>
+      <div className="modified-by-link">
+        <Link isWithinText={false} href={htmlUrl}>
           <Text>{displayName}</Text>
-        </div>
-      </Link>
+        </Link>
+      </div>
     )
   }
 }
