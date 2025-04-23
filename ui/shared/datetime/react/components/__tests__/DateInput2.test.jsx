@@ -24,7 +24,6 @@ import * as tz from '@instructure/moment-utils'
 import CanvasDateInput2 from '../DateInput2'
 
 const formatDate = date => tz.format(date, 'date.formats.medium')
-const parseDate = timezone => formattedDate => tz.parse(formattedDate, timezone)
 
 function renderInput(overrides = {}) {
   const props = {
@@ -33,7 +32,6 @@ function renderInput(overrides = {}) {
     messages: [],
     timezone: 'UTC',
     formatDate: jest.fn(formatDate),
-    parseDate: jest.fn(parseDate('UTC')),
     onSelectedDateChange: jest.fn(),
     ...overrides,
   }
