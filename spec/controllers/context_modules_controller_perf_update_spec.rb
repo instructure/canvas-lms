@@ -152,7 +152,6 @@ describe ContextModulesController do
 
     before :once do
       course_with_teacher(active_all: true)
-      student_in_course(active_all: true)
     end
 
     let(:page1) { @course.wiki_pages.create! title: "title1" }
@@ -185,6 +184,65 @@ describe ContextModulesController do
             subject
             assert_status(200)
             expect(response.body).to_not be_empty
+          end
+
+          it "has the @module_show_setting with show_student_only_module_id" do
+            ref_id = 111
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: ref_id)
+
+            subject
+            expect(assigns(:module_show_setting)).to eql(ref_id)
+          end
+
+          it "has the @module_show_setting with show_teacher_only_module_id" do
+            ref_id = 222
+            @course.account.enable_feature!(:modules_teacher_module_selection)
+            @course.update!(show_teacher_only_module_id: ref_id)
+
+            subject
+            expect(assigns(:module_show_setting)).to eql(ref_id)
+          end
+
+          it "has the @module variable" do
+            subject
+            expect(assigns(:module)).to eql(context_module)
+          end
+
+          it "has the @modules variable" do
+            subject
+            expect(assigns(:modules).length).to be(1)
+            expect(assigns(:modules).first).to eql(context_module)
+          end
+
+          it "has the @menu_tools variable" do
+            finder_double = double("Lti::ContextToolFinder")
+            tool_double_1 = double("Tool 1", has_placement?: true, cache_key: "key")
+            tool_double_2 = double("Tool 2", has_placement?: false, cache_key: "key")
+
+            allow_any_instance_of(ContextExternalToolsHelper)
+              .to receive(:external_tool_menu_item_tag).and_return("mocked_value")
+            allow(Lti::ContextToolFinder)
+              .to receive(:new)
+              .with(@course, placements: anything, current_user: anything)
+              .and_return(finder_double)
+            allow(finder_double).to receive(:all_tools_sorted_array).and_return([tool_double_1, tool_double_2])
+
+            subject
+
+            expect(assigns(:menu_tools).values).to all(eq([tool_double_1]))
+          end
+
+          describe "rights load" do
+            before { subject }
+
+            it { expect(assigns(:can_view)).to_not be_nil }
+            it { expect(assigns(:can_add)).to_not be_nil }
+            it { expect(assigns(:can_edit)).to_not be_nil }
+            it { expect(assigns(:can_delete)).to_not be_nil }
+            it { expect(assigns(:can_view_grades)).to_not be_nil }
+            it { expect(assigns(:is_student)).to_not be_nil }
+            it { expect(assigns(:can_view_unpublished)).to_not be_nil }
           end
         end
 

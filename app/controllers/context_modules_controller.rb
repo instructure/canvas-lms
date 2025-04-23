@@ -140,25 +140,15 @@ class ContextModulesController < ApplicationController
         hash[:HIDE_BLUEPRINT_LOCK_ICON_FOR_CHILDREN] = true
       end
 
+      load_module_show_setting
+
       @feature_student_module_selection = @context.account.feature_enabled?(:modules_student_module_selection)
       @feature_teacher_module_selection = @context.account.feature_enabled?(:modules_teacher_module_selection)
-      if @feature_student_module_selection || @feature_teacher_module_selection
-        # if the feature is enabled, and you can edit course content, you get the teacher version
-        # everyone else, if the feature is enabled gets the student limited version (so students and unenrolled)
-        # default is show all the things
-        @module_show_setting = if @can_edit && @feature_teacher_module_selection
-                                 @context.show_teacher_only_module_id
-                               elsif @feature_student_module_selection
-                                 @context.show_student_only_module_id
-                               else
-                                 0
-                               end&.to_i
-        @module_show_setting = nil if @module_show_setting&.zero?
-        if @can_edit
-          hash[:MODULE_FEATURES] = {}
-          hash[:MODULE_FEATURES][:STUDENT_MODULE_SELECTION] = true if @feature_student_module_selection
-          hash[:MODULE_FEATURES][:TEACHER_MODULE_SELECTION] = true if @feature_teacher_module_selection
-        end
+
+      if @can_edit && (@feature_student_module_selection || @feature_teacher_module_selection)
+        hash[:MODULE_FEATURES] = {}
+        hash[:MODULE_FEATURES][:STUDENT_MODULE_SELECTION] = true if @feature_student_module_selection
+        hash[:MODULE_FEATURES][:TEACHER_MODULE_SELECTION] = true if @feature_teacher_module_selection
       end
 
       append_default_due_time_js_env(@context, hash)
@@ -203,6 +193,28 @@ class ContextModulesController < ApplicationController
         @menu_tools[p] = tools.select { |t| t.has_placement? p }
       end
       @menu_tools
+    end
+
+    def load_module_show_setting
+      @can_edit = @context.grants_right?(@current_user, session, :manage_course_content_edit)
+      @feature_student_module_selection = @context.account.feature_enabled?(:modules_student_module_selection)
+      @feature_teacher_module_selection = @context.account.feature_enabled?(:modules_teacher_module_selection)
+
+      if @feature_student_module_selection || @feature_teacher_module_selection
+        # if the feature is enabled, and you can edit course content, you get the teacher version
+        # everyone else, if the feature is enabled gets the student limited version (so students and unenrolled)
+        # default is show all the things
+        @module_show_setting = if @can_edit && @feature_teacher_module_selection
+                                 @context.show_teacher_only_module_id
+                               elsif @feature_student_module_selection
+                                 @context.show_student_only_module_id
+                               else
+                                 0
+                               end&.to_i
+        @module_show_setting = nil if @module_show_setting&.zero?
+        @module_show_setting
+      end
+      nil
     end
 
     private
@@ -414,6 +426,11 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       @module = @context.modules_visible_to(@current_user).find_by(id: params[:context_module_id])
       return render status: :not_found, template: "shared/errors/404_message" unless @module
+
+      @modules = [@module]
+      load_module_show_setting
+      load_menu_tools
+      load_permissions
 
       render template: "context_modules/module_html", layout: false
     end
