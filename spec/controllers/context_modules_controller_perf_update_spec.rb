@@ -145,6 +145,72 @@ describe ContextModulesController do
     end
   end
 
+  describe "GET 'module_html'" do
+    subject { get "module_html", params: { course_id: @course.id, context_module_id: context_module.id } }
+
+    render_views
+
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
+    let(:page1) { @course.wiki_pages.create! title: "title1" }
+
+    let(:context_module) do
+      context_module = @course.context_modules.create!
+      context_module.add_item({ type: "wiki_page", id: page1.id }, nil, position: 1)
+      context_module
+    end
+
+    context "when modules_perf enabled" do
+      before do
+        @course.account.enable_feature!(:modules_perf)
+      end
+
+      context "when there is no user session" do
+        it "redirect to login page" do
+          subject
+          assert_unauthorized
+        end
+      end
+
+      context "when there is a user session" do
+        before do
+          user_session(@user)
+        end
+
+        context "when the provided module id exist" do
+          it "renders the template" do
+            subject
+            assert_status(200)
+            expect(response.body).to_not be_empty
+          end
+        end
+
+        context "when the provided module id not exist" do
+          subject { get "module_html", params: { course_id: @course.id, context_module_id: "random_id" } }
+
+          it "renders 404" do
+            subject
+            assert_status(404)
+          end
+        end
+      end
+    end
+
+    context "when modules_perf disabled" do
+      before do
+        @course.account.disable_feature!(:modules_perf)
+      end
+
+      it "renders 404" do
+        subject
+        assert_status(404)
+      end
+    end
+  end
+
   describe "GET 'items_html'" do
     subject { get "items_html", params: { course_id: @course.id, context_module_id: context_module.id } }
 
