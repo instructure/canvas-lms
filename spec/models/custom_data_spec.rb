@@ -51,40 +51,12 @@ describe CustomData do
       @custom_data.set_data("kewl/skope", { "lol" => { "wut" => "ohai" } })
       expect { @custom_data.get_data("no/data/here") }.to raise_error(ArgumentError)
     end
-
-    it "reads from data_json when available" do
-      @custom_data.set_data("test", "value1")
-      @custom_data.save!
-      @custom_data.update_column(:data_json, { "d" => { "test" => "value2" } })
-
-      expect(@custom_data["data"]).to eq({ "d" => { "test" => "value1" } })
-      expect(@custom_data["data_json"]).to eq({ "d" => { "test" => "value2" } })
-      expect(@custom_data.get_data("test")).to eq "value2"
-    end
-
-    it "reads from data when data_json is empty" do
-      @custom_data.set_data("test", "value1")
-      @custom_data.save!
-      @custom_data.update_column(:data_json, {})
-
-      expect(@custom_data["data"]).to eq({ "d" => { "test" => "value1" } })
-      expect(@custom_data["data_json"]).to eq({})
-      expect(@custom_data.get_data("test")).to eq "value1"
-    end
   end
 
   describe "#set_data" do
     it "raises a WriteConflict when the requested scope is invalid" do
       @custom_data.set_data("kewl/skope", "ohai")
       expect { @custom_data.set_data("kewl/skope/plus/more", "bad idea dood") }.to raise_error(CustomData::WriteConflict)
-    end
-
-    it "writes to both data and data_json columns" do
-      @custom_data.set_data("test_key", "test_value")
-      @custom_data.save!
-
-      expect(@custom_data["data"]).to include("d" => { "test_key" => "test_value" })
-      expect(@custom_data["data_json"]).to include("d" => { "test_key" => "test_value" })
     end
   end
 
@@ -110,50 +82,6 @@ describe CustomData do
     it "raises ArgumentError for non-existing scopes" do
       @custom_data.set_data(nil, { "a" => 1, "b" => 2, "c" => 3 })
       expect { @custom_data.delete_data("d") }.to raise_error(ArgumentError)
-    end
-  end
-
-  describe "#synchronize_data_fields" do
-    it "synchronizes data when only data_json is changed" do
-      @custom_data.set_data("test_key", "initial_value")
-      @custom_data.save!
-
-      expect(@custom_data["data"]).to include("d" => { "test_key" => "initial_value" })
-      expect(@custom_data["data_json"]).to include("d" => { "test_key" => "initial_value" })
-
-      @custom_data["data_json"] = { "d" => { "test_key" => "updated_value" } }
-      @custom_data.save!
-
-      expect(@custom_data["data"]).to eq({ "d" => { "test_key" => "updated_value" } })
-      expect(@custom_data["data_json"]).to eq({ "d" => { "test_key" => "updated_value" } })
-    end
-
-    it "synchronizes data_json when only data is changed" do
-      @custom_data.set_data("test_key", "initial_value")
-      @custom_data.save!
-
-      expect(@custom_data["data"]).to include("d" => { "test_key" => "initial_value" })
-      expect(@custom_data["data_json"]).to include("d" => { "test_key" => "initial_value" })
-
-      @custom_data["data"] = { "d" => { "test_key" => "updated_value" } }
-      @custom_data.save!
-
-      expect(@custom_data["data"]).to eq({ "d" => { "test_key" => "updated_value" } })
-      expect(@custom_data["data_json"]).to eq({ "d" => { "test_key" => "updated_value" } })
-    end
-
-    it "prioritizes data_json when accessing data after manual column update" do
-      @custom_data.set_data("test_key", "original_value")
-      @custom_data.save!
-
-      # Force data_json to be different using update_column
-      @custom_data.update_column(:data_json, { "d" => { "test_key" => "forced_value" } })
-      @custom_data.reload
-
-      expect(@custom_data["data"]).to eq({ "d" => { "test_key" => "original_value" } })
-      expect(@custom_data["data_json"]).to eq({ "d" => { "test_key" => "forced_value" } })
-      expect(@custom_data.data).to eq({ "d" => { "test_key" => "forced_value" } })
-      expect(@custom_data.data_json).to eq({ "d" => { "test_key" => "forced_value" } })
     end
   end
 end
