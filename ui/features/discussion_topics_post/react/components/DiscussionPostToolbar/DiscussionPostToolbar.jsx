@@ -290,18 +290,6 @@ export const DiscussionPostToolbar = props => {
                   shouldShrink={responsiveProps.shouldShrink}
                 >
                   <Flex>
-                    {/* Groups */}
-                    {props.childTopics?.length && props.isAdmin && (
-                      <Flex.Item
-                        data-testid="groups-menu-button"
-                        margin={responsiveProps?.groupSelect?.margin}
-                        padding={responsiveProps?.padding}
-                      >
-                        <span className="discussions-post-toolbar-groupsMenu">
-                          <GroupsMenu width="10px" childTopics={props.childTopics} />
-                        </span>
-                      </Flex.Item>
-                    )}
                     {/* Search */}
                     {!hideStudentNames && (
                       <Flex.Item
@@ -404,6 +392,18 @@ export const DiscussionPostToolbar = props => {
                       />
                     </Flex.Item>
                   )}
+                  {/* Groups */}
+                  {props.childTopics?.length >= 0 && props.isAdmin && (
+                    <Flex.Item
+                      data-testid="groups-menu-button"
+                      margin={responsiveProps?.groupSelect?.margin}
+                      padding={responsiveProps?.padding}
+                    >
+                      <span className="discussions-post-toolbar-groupsMenu">
+                        <GroupsMenu width="10px" childTopics={props.childTopics} />
+                      </span>
+                    </Flex.Item>
+                  )}
                   {translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
                     <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                       {renderTranslate()}
@@ -443,22 +443,6 @@ export const DiscussionPostToolbar = props => {
                         {I18n.t('Assign To')}
                       </Button>
                     </Flex.Item>
-                  )}
-                  {window.ENV?.FEATURES?.discussion_default_sort && (
-                    <>
-                      {/* Groups */}
-                      {props.childTopics?.length && props.isAdmin && (
-                        <Flex.Item
-                          data-testid="groups-menu-button"
-                          margin={responsiveProps?.groupSelect?.margin}
-                          padding={responsiveProps?.padding}
-                        >
-                          <span className="discussions-post-toolbar-groupsMenu">
-                            <GroupsMenu width="10px" childTopics={props.childTopics} />
-                          </span>
-                        </Flex.Item>
-                      )}
-                    </>
                   )}
                 </Flex>
               </Flex.Item>

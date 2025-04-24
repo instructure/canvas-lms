@@ -67,22 +67,33 @@ export const GroupsMenu = ({...props}) => {
     </Menu.Item>
   ))
 
+  const groupDiscussionButton = (
+    <span className="discussions-group-discussion-btn">
+      <Button
+        renderIcon={IconGroupLine}
+        data-testid="groups-menu-btn"
+        type="button"
+        display="block"
+        style={{width: '100%'}}
+        disabled={!props.childTopics?.length}
+      >
+        <ScreenReaderContent>{I18n.t('Group discussions')}</ScreenReaderContent>
+        {I18n.t('Group discussion')}
+      </Button>
+    </span>
+  )
+
   return (
     <Menu
       placement="bottom"
       trigger={
-        <span className="discussions-group-discussion-btn">
-          <Button
-            renderIcon={IconGroupLine}
-            data-testid="groups-menu-btn"
-            type="button"
-            display="block"
-            style={{width: '100%'}}
-          >
-            <ScreenReaderContent>{I18n.t('Group discussions')}</ScreenReaderContent>
-            {I18n.t('Group')}
-          </Button>
-        </span>
+        !props.childTopics?.length ? (
+          <Tooltip renderTip={I18n.t('There are no groups in this group set')}>
+            {groupDiscussionButton}
+          </Tooltip>
+        ) : (
+          groupDiscussionButton
+        )
       }
     >
       {menuItems}
