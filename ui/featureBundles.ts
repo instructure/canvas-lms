@@ -170,6 +170,7 @@ const featureBundles: {
   past_global_announcements: () => import('./features/past_global_announcements/index'),
   permissions: () => import('./features/permissions/index'),
   platform_speedgrader: () => import('./features/speed_grader/index'),
+  canvas_career: () => import('./features/canvas_career/index'),
   plugins: () => import('./features/plugins/index'),
   prerequisites_lookup: () => import('./features/prerequisites_lookup/index'),
   profile_show: () => import('./features/profile_show/index'),

@@ -1110,6 +1110,11 @@ CanvasRails::Application.routes.draw do
   get "terms_of_use" => "legal_information#terms_of_use", :as => "terms_of_use_redirect"
   get "privacy_policy" => "legal_information#privacy_policy", :as => "privacy_policy_redirect"
 
+  scope(controller: :career) do
+    get "career", action: :catch_all
+    get "career/*path", action: :catch_all, as: :career_path
+  end
+
   scope(controller: :smart_search) do
     get "courses/:course_id/search", action: :show, as: :course_search
     # TODO: Add back global search once we have a good way to handle it

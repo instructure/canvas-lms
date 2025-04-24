@@ -262,6 +262,7 @@ class ApplicationController < ActionController::Base
           group_information:,
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           DOMAIN_ROOT_ACCOUNT_UUID: @domain_root_account&.uuid,
+          HORIZON_DOMAIN: @domain_root_account&.horizon_domain,
           k12: k12?,
           help_link_name:,
           help_link_icon:,

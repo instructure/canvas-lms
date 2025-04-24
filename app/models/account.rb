@@ -2666,11 +2666,17 @@ class Account < ActiveRecord::Base
     settings[:horizon_domain]
   end
 
-  def horizon_redirect_url(canvas_url, reauthenticate: false, preview: false)
+  def horizon_url(path)
     return nil unless horizon_domain
 
     protocol = horizon_domain.include?("localhost") ? "http" : "https"
-    uri = Addressable::URI.parse("#{protocol}://#{horizon_domain}/redirect")
+    Addressable::URI.parse("#{protocol}://#{horizon_domain}/#{path}")
+  end
+
+  def horizon_redirect_url(canvas_url, reauthenticate: false, preview: false)
+    return nil unless horizon_domain
+
+    uri = horizon_url("redirect")
     uri.query_values = { canvas_url:, reauthenticate:, preview: }
     uri.to_s
   end

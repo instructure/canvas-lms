@@ -6,3 +6,10 @@ horizon_course_setting:
   description: |-
     Enables the Canvas Career tab in the course settings page.
   beta: true
+horizon_learning_provider_app:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Canvas Career Learning Provider App
+  description: |-
+    Enables the Canvas Career Learning Provider App in Classic Canvas.
+  beta: true
