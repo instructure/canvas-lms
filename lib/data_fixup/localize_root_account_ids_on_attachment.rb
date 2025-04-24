@@ -19,18 +19,11 @@
 
 module DataFixup::LocalizeRootAccountIdsOnAttachment
   def self.run
-    Attachment.where(root_account_id: Shard::IDS_PER_SHARD..).in_batches(strategy: :pluck_ids) do |batch|
-      update_me = Hash.new { |h, k| h[k] = Set.new }
-
-      batch.each do |attachment|
-        root_id = attachment.attributes["root_account_id"]
-        local_id, shard = Shard.local_id_for(root_id)
-        update_me[local_id] << attachment.id if shard == Shard.current
-      end
-
-      update_me.each do |local_id, attachment_ids|
-        Attachment.where(id: attachment_ids).update_all("root_account_id=#{local_id}")
-      end
+    upper_bounds = Shard.current.id * Shard::IDS_PER_SHARD
+    lower_bounds = (Shard.current.id + 1) * Shard::IDS_PER_SHARD
+    Attachment.where(root_account_id: upper_bounds...lower_bounds).find_ids_in_batches do |batch|
+      Attachment.where(id: batch).update_all("root_account_id=root_account_id%#{Shard::IDS_PER_SHARD}")
+      sleep Setting.get("localize_data_fixup_sleep_time", "0.1").to_f
     end
   end
 end
