@@ -19,7 +19,7 @@
 
 module UsageMetricsHelper
   def load_usage_metrics?
-    usage_metrics_api_key && @domain_root_account&.feature_enabled?(:send_usage_metrics)
+    js_env&.dig(:FEATURES, :send_usage_metrics) == true && usage_metrics_api_key.present?
   end
 
   def usage_metrics_api_key

@@ -85,7 +85,7 @@ export default function CourseDefaultDueTime({canManage} : CourseDefaultDueTimeP
     <FormFieldGroup
       description={<ScreenReaderContent>{I18n.t('Default Due Time')}</ScreenReaderContent>}
       rowSpacing="small"
-      layout="inline"
+      layout="stacked"
     >
       <TimeSelect
         renderLabel={I18n.t('Choose a time')}

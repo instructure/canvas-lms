@@ -216,6 +216,7 @@ const featureBundles: {
   theme_editor: () => import('./features/theme_editor/index'),
   theme_preview: () => import('./features/theme_preview/index'),
   top_navigation_tools: () => import('./features/top_navigation_tools/index'),
+  usage_metrics: () => import('./features/pendo/index'),
   user_grades: () => import('./features/user_grades/index'),
   user_lists: () => import('./features/user_lists/index'),
   user_logins: () => import('./features/user_logins/index'),
