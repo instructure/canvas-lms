@@ -383,8 +383,10 @@ class UsersController < ApplicationController
   #   This can be a base role type of 'student', 'teacher',
   #   'ta', 'observer', or 'designer'.
   #
-  # @argument sort [String, "username"|"email"|"sis_id"|"integration_id"|"last_login"]
-  #   The column to sort results by.
+  # @argument sort [String, "username"|"email"|"sis_id"|"integration_id"|"last_login"|"id"]
+  #   The column to sort results by. For efficiency, use +id+ if you intend to retrieve
+  #   many pages of results. In the future, other sort options may be rate-limited
+  #   after 50 pages.
   #
   # @argument order [String, "asc"|"desc"]
   #   The order to sort the given column by.
@@ -436,15 +438,18 @@ class UsersController < ApplicationController
                                    })
       users = users.with_last_login if params[:sort] == "last_login"
     end
+    users.preload(:pseudonyms) if includes.include? "deleted_pseudonyms"
 
     page_opts = { total_entries: nil }
     if includes.include?("ui_invoked")
       page_opts = {} # let Folio calculate total entries
       includes.delete("ui_invoked")
+    elsif params[:sort] == "id"
+      # for a more efficient way to retrieve many pages in bulk
+      users = BookmarkedCollection.wrap(UserSearch::Bookmarker.new(order: params[:order]), users)
     end
 
     GuardRail.activate(:secondary) do
-      users.preload(:pseudonyms) if includes.include? "deleted_pseudonyms"
       users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
 
       user_json_preloads(users, includes.include?("email"))
