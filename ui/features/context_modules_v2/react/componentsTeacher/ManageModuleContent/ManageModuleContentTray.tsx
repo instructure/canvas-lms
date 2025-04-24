@@ -82,13 +82,22 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
         moduleAction === 'move_module'),
   )
 
-  // Also fetch module items for the source module when moving module contents
-  // or when moving an individual module item (to get its source module)
   const {data: sourceModuleItemsData} = useModuleItems(
     sourceModuleId,
     !!sourceModuleId &&
       (moduleAction === 'move_module_contents' || moduleAction === 'move_module_item'),
   )
+
+  const modules = useMemo(() => {
+    const allModules = modulesData?.pages?.flatMap(page => page.modules) || []
+
+    if (moduleAction === 'move_module_contents') {
+      return allModules.filter(module => module._id !== sourceModuleId)
+    } else if (moduleAction === 'move_module') {
+      return allModules.filter(module => module._id !== sourceModuleId)
+    }
+    return allModules
+  }, [modulesData?.pages, moduleAction, sourceModuleId])
 
   // Reset selections when tray opens
   useEffect(() => {
@@ -177,41 +186,27 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
     [],
   )
 
-  const modules = useMemo(
-    () => modulesData?.pages?.flatMap(page => page.modules) || [],
-    [modulesData],
-  )
+  const selectedModuleItems = useMemo(() => {
+    return moduleItemsData?.moduleItems || []
+  }, [moduleItemsData])
+
+  const sourceModuleItems = useMemo(() => {
+    return sourceModuleItemsData?.moduleItems || []
+  }, [sourceModuleItemsData])
 
   const moduleItemOrder = useMemo(() => {
-    return moduleItemsData?.moduleItems
-      ? createModuleItemOrder(
-          moduleItemId,
-          moduleItemsData.moduleItems,
-          selectedPosition,
-          selectedItem,
-        )
-      : []
-  }, [moduleItemId, moduleItemsData?.moduleItems, selectedPosition, selectedItem])
+    return createModuleItemOrder(moduleItemId, selectedModuleItems, selectedPosition, selectedItem)
+  }, [moduleItemId, selectedModuleItems, selectedPosition, selectedItem])
 
   const moduleContentsOrder = useMemo(() => {
-    if (!moduleItemsData?.moduleItems) return []
-
-    const sourceItems: string[] = sourceModuleItemsData?.moduleItems
-      ? sourceModuleItemsData.moduleItems.map(item => item._id)
-      : []
-
+    const sourceModuleItemIds = sourceModuleItems.map(item => item._id)
     return createModuleContentsOrder(
-      sourceItems,
-      moduleItemsData.moduleItems,
+      sourceModuleItemIds,
+      selectedModuleItems,
       selectedPosition,
       selectedItem,
     )
-  }, [
-    moduleItemsData?.moduleItems,
-    sourceModuleItemsData?.moduleItems,
-    selectedPosition,
-    selectedItem,
-  ])
+  }, [sourceModuleItems, selectedModuleItems, selectedPosition, selectedItem])
 
   const moduleOrder = useMemo(() => {
     return createModuleOrder(sourceModuleId, modules, selectedPosition, selectedItem)
@@ -314,7 +309,7 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
             selectedItem={selectedItem}
             onItemChange={handleItemChange}
             modules={modules}
-            moduleItems={moduleItemsData?.moduleItems}
+            moduleItems={selectedModuleItems}
             sourceModuleId={sourceModuleId}
             selectedModule={selectedModule}
             sourceModuleItemId={sourceModuleItemId}

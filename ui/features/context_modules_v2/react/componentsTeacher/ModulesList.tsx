@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect, useCallback, memo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -44,6 +44,15 @@ import {
 import {ModuleAction} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
+
+const MemoizedModule = memo(Module, (prevProps, nextProps) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.expanded === nextProps.expanded &&
+    prevProps.published === nextProps.published &&
+    prevProps.name === nextProps.name
+  )
+})
 
 const ModulesList: React.FC = () => {
   const {courseId} = useContextModule()
@@ -108,6 +117,36 @@ const ModulesList: React.FC = () => {
       courseId,
       reorderItemsMutation,
     )
+
+    if (dragModuleId !== hoverModuleId) {
+      const sourceModuleItemsData = queryClient.getQueryData(['moduleItems', dragModuleId]) as any
+
+      if (sourceModuleItemsData?.moduleItems?.length) {
+        const movedItem = sourceModuleItemsData.moduleItems[dragIndex]
+
+        queryClient.setQueryData(['moduleItems', dragModuleId], (oldData: any) => {
+          if (!oldData) return oldData
+          return {
+            ...oldData,
+            moduleItems: oldData.moduleItems.filter((_: any, i: number) => i !== dragIndex),
+          }
+        })
+
+        queryClient.setQueryData(['moduleItems', hoverModuleId], (oldData: any) => {
+          if (!oldData) return oldData
+
+          const newItems = [...oldData.moduleItems]
+          const updatedMovedItem = {...movedItem, moduleId: hoverModuleId}
+
+          newItems.splice(hoverIndex, 0, updatedMovedItem)
+
+          return {
+            ...oldData,
+            moduleItems: newItems,
+          }
+        })
+      }
+    }
   }
 
   const handleDragEnd = (result: DropResult) => {
@@ -186,7 +225,7 @@ const ModulesList: React.FC = () => {
                                 borderRadius: '4px',
                               }}
                             >
-                              <Module
+                              <MemoizedModule
                                 id={module._id}
                                 name={module.name}
                                 published={module.published}
