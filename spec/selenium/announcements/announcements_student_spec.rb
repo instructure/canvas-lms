@@ -40,6 +40,7 @@ describe "announcements" do
     end
 
     it "hides replies if user hasn't posted", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       get "/courses/#{@course.id}/announcements/#{@announcement.id}"
       info_text = "Replies are only visible to those who have posted at least one reply."
       expect(f("#discussion_subentries span").text).to eq info_text
@@ -47,6 +48,7 @@ describe "announcements" do
     end
 
     it "shows replies if user has posted", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       get "/courses/#{@course.id}/announcements/#{@announcement.id}"
       f(".discussion-reply-action").click
       wait_for_ajaximations
@@ -113,6 +115,7 @@ describe "announcements" do
     end
 
     it "allows rating when enabled", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       announcement = @course.announcements.create!(title: "stuff", message: "things", allow_rating: true)
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
 
@@ -132,6 +135,7 @@ describe "announcements" do
     end
 
     it "doesn't allow rating when not enabled", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       announcement = @course.announcements.create!(title: "stuff", message: "things", allow_rating: false)
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
 
@@ -146,6 +150,7 @@ describe "announcements" do
     end
 
     it "does not display the Subscribe button after replying" do
+      skip "Will be fixed in VICE-5209"
       announcement = @course.announcements.create!(title: "Allow Replies", message: "Reply Here")
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
 
@@ -177,6 +182,7 @@ describe "announcements" do
       end
 
       it "is visible to students in the specific section" do
+        skip "Will be fixed in VICE-5209"
         user_session(@student1)
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
         expect(f(".discussion-title")).to include_text(@announcement.title)

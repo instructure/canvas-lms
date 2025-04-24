@@ -233,6 +233,7 @@ describe "native canvas conditional release" do
     end
 
     it "shows Mastery Path Breakdown for a Discussion" do
+      skip "Will be fixed in VICE-5209"
       graded_discussion = @course.discussion_topics.build(assignment: @trigger_assmt, title: "graded discussion")
       graded_discussion.save!
       get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}"

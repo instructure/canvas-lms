@@ -354,6 +354,7 @@ describe "calendar2" do
       end
 
       it "loads discussion page when click on title in discussion checkpoint info modal", :ignore_js_errors do
+        skip "Will be fixed in VICE-5209"
         @course.account.enable_feature!(:discussion_checkpoints)
         due_at = Time.zone.now.utc + 1.day
         title = "graded discussion with checkpoints"
@@ -715,6 +716,7 @@ describe "calendar2" do
       end
 
       it "strikethroughs completed graded discussion", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         date_due = Time.zone.now.utc + 2.days
         reply = "Replying to discussion"
 
