@@ -52,21 +52,25 @@
           <i class="learning_outcome_flag icon-outcomes" aria-hidden="true"></i>
           <span class="screenreader-only"><%= t("This criterion is linked to a Learning Outcome") %></span>
         </span>
-        <span class="description description_title"><%= description %></span>
-        <span class="learning_outcome_id" style="display: none;"><%= learning_outcome_criterion %></span>
-        <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
-        <% if !assessing %>
-          <div class="long_description small_description"><%= (@context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user, include_fake_student: true) && friendly_description.length > 0) ? friendly_description.html_safe : long_description_text.html_safe %></div>
-        <% end %>
+        <span role="text">
+          <span class="description description_title"><%= description %></span>
+          <span class="learning_outcome_id" style="display: none;"><%= learning_outcome_criterion %></span>
+          <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
+          <% if !assessing %>
+            <div class="long_description small_description"><%= (@context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user, include_fake_student: true) && friendly_description.length > 0) ? friendly_description.html_safe : long_description_text.html_safe %></div>
+          <% end %>
+          <div role="text" class="threshold toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>">
+            <%= before_label :threshold, "threshold" %>
+            <%= t :points, "%{points} pts", :points => %{<span class="mastery_points">#{n((criterion.mastery_points rescue 5))}</span>}.html_safe %>
+          </div>
+        </span>
         <div class="hide_when_learning_outcome <%= range_rating_visible ? '' : 'hidden' %>">
           <div class="criterion_use_range_div editing toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
-            <label><%= t 'Range' %>
-              <input type="checkbox" class="criterion_use_range" <%= 'checked' if (criterion.try(:criterion_use_range) && range_rating_enabled) %>/></label>
+            <label>
+              <%= t 'Range' %>
+              <input type="checkbox" class="criterion_use_range" <%= 'checked' if (criterion.try(:criterion_use_range) && range_rating_enabled) %>/>
+            </label>
           </div>
-        </div>
-        <div class="threshold toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>">
-          <%= before_label :threshold, "threshold" %>
-          <%= t :points, "%{points} pts", :points => %{<span class="mastery_points">#{n((criterion.mastery_points rescue 5))}</span>}.html_safe %>
         </div>
       </div>
 
@@ -125,12 +129,14 @@
                   </div>
                   <div class="clear"></div>
                 <% end %>
-                <span class="nobr toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>">
-                  <span class="points"><%= n(round_if_whole(rating.points)) %></span>
-                  <span class="range_rating" style="<%= hidden if !use_range %>"><%= t('to') %> ><span class="min_points"><%= n(rating_min) %></span></span> <%= t('pts') %>
+                <span role="text" class="rating-content-wrapper">
+                  <span class="nobr toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>">
+                    <span class="points"><%= n(round_if_whole(rating.points)) %></span>
+                    <span class="range_rating" style="<%= hidden if !use_range %>"><%= t('to') %> ><span class="min_points"><%= n(rating_min) %></span></span> <%= t('pts') %>
+                  </span>
+                  <span class="description rating_description_value"><%= rating.description %></span>
+                  <span class="rating_long_description small_description"><%= rating.long_description %></span>
                 </span>
-                <div class="description rating_description_value"><%= rating.description %></div>
-                <div class="rating_long_description small_description"><%= rating.long_description %></div>
                 <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
               </div>
               <% if !learning_outcome_criterion && !last_rating %>
@@ -173,7 +179,7 @@
         <% end %>
       </span><br />
     </div>
-    <div class="displaying">
+    <div class="displaying" role="text">
       <span style="white-space: nowrap;">
         <span class="criterion_rating_points_holder" style="<%= hidden unless assessment_rating %>">
           <span class="criterion_rating_points"><%= assessment_rating ? n(round_if_whole(assessment_rating[:points])) : nbsp %></span> /
