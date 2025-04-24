@@ -114,6 +114,14 @@ files_a11y_rewrite:
   description: |-
     Enables the new Files a11y Rewrite page.
 
+disable_iframe_sandbox_file_show:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: Disable Iframe Sandbox at File Show
+  description: |-
+    Disable iframe sandboxing at file show.
+
 media_links_use_attachment_id:
   state: hidden
   display_name: Use Attachment IDs in Media Links
