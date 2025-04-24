@@ -183,9 +183,11 @@ module Canvas::LiveEvents
       name: account.name,
       account_id: account.global_id,
       root_account_id: account.global_root_account_id,
+      root_account_uuid: account.root_account.uuid,
       parent_account_id: account.global_parent_account_id,
       external_status: account.external_status,
       workflow_state: account.workflow_state,
+      domain: account.root_account.environment_specific_domain,
       # TODO: Without read_attribute, this spec "spec/models/assignment_spec.rb:11453" fails
       default_time_zone: account.read_attribute("default_time_zone"),
       default_locale: account.default_locale,

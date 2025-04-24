@@ -72,7 +72,11 @@ module Types
 
     argument :for_attempt, Integer, <<~MD, required: false, default_value: nil
       What submission attempt the rubric assessment should be returned for. If not
-      specified, it will return the rubric assessment for the current submisssion
+      specified, it will return the rubric assessment for the current submission
+      or submission history.
+    MD
+    argument :for_all_attempts, Boolean, <<~MD, required: false, default_value: nil
+      it will return all rubric assessments for the current submission
       or submission history.
     MD
   end
@@ -420,13 +424,18 @@ module Interfaces::SubmissionInterface
   end
   def rubric_assessments_connection(filter:)
     filter = filter.to_h
-    target_attempt = filter[:for_attempt] || object.attempt
+    target_attempt = filter[:for_all_attempts] ? nil : (filter[:for_attempt] || object.attempt)
 
     Promise
       .all([load_association(:assignment), load_association(:rubric_assessments)])
       .then do
-        assessments_needing_versions_loaded =
-          submission.rubric_assessments.reject { |ra| ra.artifact_attempt == target_attempt }
+        # If the target_attempt is nil, we don't need to preload because visible_rubric_assessments_for
+        # will early return and load all rubric assessments for the submission with no version checks
+        assessments_needing_versions_loaded = if target_attempt.nil?
+                                                []
+                                              else
+                                                submission.rubric_assessments.reject { |ra| ra.artifact_attempt == target_attempt }
+                                              end
 
         versionable_loader_promise =
           if assessments_needing_versions_loaded.empty?

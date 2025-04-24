@@ -53,8 +53,8 @@ describe Lti::Concerns::ParentFrame do
     controller.instance_variable_set(:@current_user, current_pseudonym.user)
     controller.instance_variable_set(:@current_pseudonym, current_pseudonym)
     allow(controller).to receive_messages(parent_frame_context: tool.id.to_s, session: nil, request:)
-    allow(ContextExternalTool).to receive(:find_by).and_return(nil)
-    allow(ContextExternalTool).to receive(:find_by).with(id: tool.id.to_s).and_return(tool)
+    allow(Lti::ToolFinder).to receive(:find_by).and_return(nil)
+    allow(Lti::ToolFinder).to receive(:find_by).with(id: tool.id.to_s).and_return(tool)
   end
 
   %w[course account].each do |context_type|

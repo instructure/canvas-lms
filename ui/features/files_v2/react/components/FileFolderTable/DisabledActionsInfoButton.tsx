@@ -36,26 +36,18 @@ const lockedFilesText = I18n.t(
   },
 )
 
-const foldersText = I18n.t("You can't *view* folders.", {
-  wrappers: [`<strong>$1</strong>`],
-})
-
 const lockedFoldersText = I18n.t(
-  "You can't *delete, view, edit permissions, manage usage rights, or move* locked folders.",
+  "You can't *delete, edit permissions, manage usage rights, or move* locked folders.",
   {
     wrappers: [`<strong>$1</strong>`],
   },
 )
 
 export interface DisabledActionsInfoButtonProps {
-  isBlueprintChildCourse: boolean
   size: 'small' | 'medium' | 'large'
 }
 
-export function DisabledActionsInfoButton({
-  isBlueprintChildCourse,
-  size,
-}: DisabledActionsInfoButtonProps) {
+export function DisabledActionsInfoButton({size}: DisabledActionsInfoButtonProps) {
   const [open, setOpen] = useState(false)
   const isDesktop = size === 'large'
 
@@ -117,49 +109,39 @@ export function DisabledActionsInfoButton({
               )}
             </Text>
           </Flex.Item>
-          <Flex.Item>
-            <Heading level="h4" as="h3">
-              {I18n.t('Folders')}
-            </Heading>
-          </Flex.Item>
-          <Flex.Item>
-            <Text dangerouslySetInnerHTML={{__html: foldersText}} />
-          </Flex.Item>
-          {isBlueprintChildCourse && (
-            <>
-              <Flex.Item>
-                <Heading
-                  border="top"
-                  themeOverride={{
-                    borderPadding: '1rem',
-                  }}
-                  level="h4"
-                  as="h3"
-                >
-                  {I18n.t('Locked files')}
-                </Heading>
-              </Flex.Item>
-              <Flex.Item>
-                <Text dangerouslySetInnerHTML={{__html: lockedFilesText}} />
-              </Flex.Item>
+          <>
+            <Flex.Item>
+              <Heading
+                border="top"
+                themeOverride={{
+                  borderPadding: '1rem',
+                }}
+                level="h4"
+                as="h3"
+              >
+                {I18n.t('Locked files')}
+              </Heading>
+            </Flex.Item>
+            <Flex.Item>
+              <Text dangerouslySetInnerHTML={{__html: lockedFilesText}} />
+            </Flex.Item>
 
-              <Flex.Item className="disabled-actions-heading" padding="small 0 0 0">
-                <Heading
-                  border="top"
-                  themeOverride={{
-                    borderPadding: '1rem',
-                  }}
-                  level="h4"
-                  as="h3"
-                >
-                  {I18n.t('Folders containing locked content')}
-                </Heading>
-              </Flex.Item>
-              <Flex.Item>
-                <Text dangerouslySetInnerHTML={{__html: lockedFoldersText}} />
-              </Flex.Item>
-            </>
-          )}
+            <Flex.Item className="disabled-actions-heading" padding="small 0 0 0">
+              <Heading
+                border="top"
+                themeOverride={{
+                  borderPadding: '1rem',
+                }}
+                level="h4"
+                as="h3"
+              >
+                {I18n.t('Folders containing locked content')}
+              </Heading>
+            </Flex.Item>
+            <Flex.Item>
+              <Text dangerouslySetInnerHTML={{__html: lockedFoldersText}} />
+            </Flex.Item>
+          </>
         </Flex>
       </Popover>
     </Flex.Item>

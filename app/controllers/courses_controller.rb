@@ -563,11 +563,11 @@ class CoursesController < ApplicationController
         @past_enrollments << first_enrollment unless first_enrollment.workflow_state == "invited"
       elsif !first_enrollment.hard_inactive?
         if first_enrollment.enrollment_state.pending? || state == :creation_pending ||
-           (first_enrollment.admin? && (
+           (first_enrollment.admin? &&
                first_enrollment.course.restrict_enrollments_to_course_dates &&
                first_enrollment.course.start_at&.>(Time.now.utc) &&
                (first_enrollment.course_section&.start_at&.>(Time.now.utc) || first_enrollment.course_section&.start_at.nil?)
-             )
+
            )
           @future_enrollments << first_enrollment unless first_enrollment.restrict_future_listing?
         elsif state != :inactive
@@ -3403,12 +3403,12 @@ class CoursesController < ApplicationController
 
         # Increment a log if both master course and course pacing are on
         if @old_save_master_course == @new_save_master_course
-          if !changes[:enable_course_paces].nil? && (changes[:enable_course_paces][1] && MasterCourses::MasterTemplate.is_master_course?(@course))
-            InstStatsd::Statsd.increment("course.paced.blueprint_course")
+          if !changes[:enable_course_paces].nil? && changes[:enable_course_paces][1] && MasterCourses::MasterTemplate.is_master_course?(@course)
+            InstStatsd::Statsd.distributed_increment("course.paced.blueprint_course")
           end
         elsif @old_save_master_course == false && @new_save_master_course == true
           if @course.enable_course_paces == true
-            InstStatsd::Statsd.increment("course.paced.blueprint_course")
+            InstStatsd::Statsd.distributed_increment("course.paced.blueprint_course")
           end
         end
 

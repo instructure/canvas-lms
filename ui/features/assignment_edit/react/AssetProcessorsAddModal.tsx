@@ -59,7 +59,6 @@ export function AssetProcessorsAddModal(props: AssetProcessorsAddModalProps) {
     <Modal
       open={true}
       onDismiss={close}
-      size="medium"
       label={I18n.t('Add a document processing app')}
       shouldCloseOnDocumentClick={false}
     >
@@ -129,8 +128,10 @@ function AssetProcessorsAddModalBody(props: AssetProcessorsAddModalProps) {
 function AssetProcessorsAddModalBodyToolList({toolList}: {toolList: LtiLaunchDefinition[]}) {
   const {launchTool} = useAssetProcessorsAddModalState(s => s.actions)
 
+  // Make tool list 800px as that is the default tool size in
+  // launch_definitions (from context_external_tool.rb#extension_default_value)
   return (
-    <Flex direction="column">
+    <Flex direction="column" width={800}>
       <Flex.Item padding="small">
         <Text weight="bold" size="medium">
           {I18n.t('Choose the document processing app that you wish to add to this assignment.')}
@@ -159,6 +160,11 @@ function AssetProcessorsAddModalBodyToolLaunch(
   const {courseId, secureParams, onProcessorResponse, tool} = props
   const {close} = useAssetProcessorsAddModalState(s => s.actions)
 
+  const placement = tool.placements?.ActivityAssetProcessor
+  const toolName = placement?.title || tool.name
+  const width = placement?.selection_width || '800px'
+  const height = placement?.selection_height || '400px'
+
   useEffect(() => handleExternalContentMessages({
     onDeepLinkingResponse: data => {
       tool && onProcessorResponse({tool, data})
@@ -170,9 +176,9 @@ function AssetProcessorsAddModalBodyToolLaunch(
 
   return (
     <>
-      <View padding="small small medium small" as="div">
+      <View padding="small small medium small" as="div"  width={width}>
         <Text weight="bold" size="medium">
-          {I18n.t('Configure settings for %{toolName}.', {toolName: tool.name})}
+          {I18n.t('Configure settings for %{toolName}.', {toolName})}
         </Text>
       </View>
       <div>
@@ -181,7 +187,7 @@ function AssetProcessorsAddModalBodyToolLaunch(
             `/courses/${courseId}/external_tools/${tool.definition_id}/resource_selection` +
             `?display=borderless&launch_type=ActivityAssetProcessor&secure_params=${secureParams}`
           }
-          style={{width: '100%', height: '600px', border: '0', display: 'block'}}
+          style={{width, height, border: '0', display: 'block'}}
           title={I18n.t('Configure new document processing app')}
         />
       </div>

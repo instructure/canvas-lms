@@ -182,7 +182,7 @@ export default class RosterView extends Backbone.View {
     if (
       userDTManager &&
       ENV.permissions.can_manage_differentiation_tags &&
-      ENV.FEATURES.differentiation_tags
+      ENV.permissions.allow_assign_to_differentiation_tags
     ) {
       if (!this.userDTManager) this.userDTManager = createRoot(userDTManager)
       this.userDTManager.render(

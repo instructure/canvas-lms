@@ -65,7 +65,7 @@ export interface ItemAssignToProps {
 export const renderItemAssignToManager = (
   open: boolean,
   returnFocusTo: HTMLElement,
-  itemProps: ItemAssignToProps
+  itemProps: ItemAssignToProps,
 ) => {
   let container = document.getElementById('module-item-assign-to-mount-point')
   if (!container) {
@@ -75,27 +75,26 @@ export const renderItemAssignToManager = (
   }
 
   if ((container as any).reactRoot) {
-    (container as any).reactRoot.unmount()
+    ;(container as any).reactRoot.unmount()
   }
-
-  (container as any).reactRoot = createRoot(container)
+  ;(container as any).reactRoot = createRoot(container)
   ;(container as any).reactRoot.render(
     <ItemAssignToManager
       open={open}
       onClose={() => {
         if ((container as any).reactRoot) {
-          (container as any).reactRoot.unmount()
+          ;(container as any).reactRoot.unmount()
         }
       }}
       onDismiss={() => {
         if ((container as any).reactRoot) {
-          (container as any).reactRoot.unmount()
+          ;(container as any).reactRoot.unmount()
         }
         returnFocusTo.focus()
       }}
       onSave={() => {
         if ((container as any).reactRoot) {
-          (container as any).reactRoot.unmount()
+          ;(container as any).reactRoot.unmount()
         }
         returnFocusTo.focus()
         showFlashSuccess(I18n.t('Assignment settings saved successfully'))
@@ -108,6 +107,6 @@ export const renderItemAssignToManager = (
       pointsPossible={itemProps.pointsPossible}
       locale={ENV.LOCALE || 'en'}
       timezone={ENV.TIMEZONE || 'UTC'}
-    />
+    />,
   )
 }

@@ -1092,6 +1092,18 @@ $wizard-bg-color: $ic-color-dark;
       color: #666;
       .header_title {
         float: direction(left);
+        button {
+          background: none;
+          color: var(--ic-link-color);
+          border: none;
+          padding: 0;
+          font: inherit;
+          text-decoration: none;
+          &:hover {
+            color: var(--ic-link-color);
+            text-decoration: underline;
+          }
+        }
       }
       .header_icon {
         float: direction(left);

@@ -59,6 +59,19 @@ const contentItem = ({
     } else if (expanded) {
       // prevent changes in text input from propagating up to the collection
       e.stopPropagation()
+    } else if (e.key === 'ArrowLeft') {
+      e.stopPropagation()
+      navigateToPrevious(containerRefs[id])
+    }
+  }
+
+  const navigateToPrevious = (thisListElement) => {
+    const parentListElement = thisListElement.parentElement.closest('li')
+    const previousSiblingListElement = Array.from(parentListElement.querySelectorAll('li')).at(-2)
+    if (previousSiblingListElement) {
+      previousSiblingListElement.focus()
+    } else {
+      parentListElement.focus()
     }
   }
 

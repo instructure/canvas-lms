@@ -176,7 +176,7 @@ module InstFS
       # >   file_object: File.open("public/images/a.png")
       # > )
 
-      token = direct_upload_jwt
+      token = direct_upload_jwt(file_object)
       url = "#{app_host}/files?token=#{token}"
 
       data = {}
@@ -436,14 +436,17 @@ module InstFS
       service_jwt(claims, LONG_JWT_EXPIRATION)
     end
 
-    def direct_upload_jwt
-      service_jwt({
-                    iat: Time.now.utc.to_i,
-                    user_id: nil,
-                    host: "canvas",
-                    resource: "/files",
-                  },
-                  LONG_JWT_EXPIRATION)
+    def direct_upload_jwt(file_object)
+      claims = {
+        iat: Time.now.utc.to_i,
+        user_id: nil,
+        host: "canvas",
+        resource: "/files",
+      }
+
+      claims[:filesize] = file_object.size if file_object.respond_to?(:size)
+
+      service_jwt(claims, LONG_JWT_EXPIRATION)
     end
 
     def session_jwt(user, host)

@@ -470,6 +470,7 @@ CanvasRails::Application.routes.draw do
       post "reorder" => "context_modules#reorder_items", :as => :reorder
       post "collapse" => "context_modules#toggle_collapse", :as => :toggle_collapse
       get "items_html" => "context_modules#items_html", :as => :context_modules_items_html
+      get "module_html" => "context_modules#module_html", :as => :context_modules_module_html
       get "prerequisites/:code" => "context_modules#content_tag_prerequisites_needing_finishing", :as => :prerequisites_needing_finishing
       get "items/last" => "context_modules#module_redirect", :as => :last_redirect, :last => 1
       get "items/first" => "context_modules#module_redirect", :as => :first_redirect, :first => 1
@@ -1121,6 +1122,12 @@ CanvasRails::Application.routes.draw do
   scope(controller: "lti/asset_processor_launch") do
     get "asset_processors/:asset_processor_id/launch", action: :launch_settings, as: :asset_processor_settings_launch
     get "asset_processors/:asset_processor_id/reports/:report_id/launch", action: :launch_report, as: :asset_report_launch
+  end
+
+  scope(controller: "lti/eula_launch") do
+    %w[course account].each do |context|
+      get "#{context}s/:#{context}_id/external_tools/:context_external_tool_id/eula_launch", action: :launch_eula, as: "#{context}_tool_eula_launch"
+    end
   end
 
   ### API routes ###
@@ -1973,6 +1980,12 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/lti_registrations/:id/bind", action: :bind
     end
 
+    scope(controller: "lti/deployments") do
+      get "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :list
+      post "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :create
+      delete "accounts/:account_id/lti_registrations/:registration_id/deployments/:id", action: :destroy
+    end
+
     scope(controller: "lti/resource_links") do
       get "courses/:course_id/lti_resource_links", action: :index
       post "courses/:course_id/lti_resource_links", action: :create
@@ -2116,6 +2129,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :module_assignment_overrides) do
       get "courses/:course_id/modules/:context_module_id/assignment_overrides", action: :index, as: "module_assignment_overrides_index"
       put "courses/:course_id/modules/:context_module_id/assignment_overrides", action: :bulk_update
+      put "courses/:course_id/modules/:context_module_id/assignment_overrides/convert_tag_overrides", action: :convert_tag_overrides_to_adhoc_overrides
     end
 
     scope(controller: "quizzes/quiz_assignment_overrides") do

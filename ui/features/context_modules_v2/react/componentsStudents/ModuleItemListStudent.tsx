@@ -22,7 +22,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ModuleItemStudent from './ModuleItemStudent'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {CompletionRequirement,ModuleItem} from '../utils/types'
+import type {CompletionRequirement, ModuleItem} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -40,10 +40,7 @@ const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
   error,
 }) => {
   return (
-    <View
-      as="div"
-      overflowX="hidden"
-    >
+    <View as="div" overflowX="hidden">
       {isLoading ? (
         <View as="div" textAlign="center" padding="medium">
           <Spinner renderTitle={I18n.t('Loading module items')} size="small" />
@@ -51,24 +48,27 @@ const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
       ) : error ? (
         <View as="div" textAlign="center" padding="medium">
           <Text color="danger">{I18n.t('Error loading module items')}</Text>
-              </View>
-            ) : moduleItems.length === 0 ? (
-              <View as="div" textAlign="center" padding="medium">
-                <Text>{I18n.t('No items in this module')}</Text>
-              </View>
-            ) : (
-              moduleItems.map((item, index) => (
-                      <View as="div" borderWidth={`${index === 0 ? '0' : 'small'} 0 0 0`} borderRadius="small" key={item._id}>
-                        <ModuleItemStudent
-                          {...item}
-                          index={index}
-                          completionRequirements={completionRequirements}
-                        />
-                      </View>
-                  )
-              )
-            )
-        }
+        </View>
+      ) : moduleItems.length === 0 ? (
+        <View as="div" textAlign="center" padding="medium">
+          <Text>{I18n.t('No items in this module')}</Text>
+        </View>
+      ) : (
+        moduleItems.map((item, index) => (
+          <View
+            as="div"
+            borderWidth={`${index === 0 ? '0' : 'small'} 0 0 0`}
+            borderRadius="small"
+            key={item._id}
+          >
+            <ModuleItemStudent
+              {...item}
+              index={index}
+              completionRequirements={completionRequirements}
+            />
+          </View>
+        ))
+      )}
     </View>
   )
 }

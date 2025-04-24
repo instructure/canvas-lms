@@ -17,11 +17,9 @@
  */
 
 import React, {useRef, useState, useCallback, type ChangeEvent, useEffect} from 'react'
-import {throttle} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {IconSearchLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -35,28 +33,16 @@ import {parseDateToISOString} from '../utils'
 import {ImportLabel} from './import_label'
 import {ImportInProgressLabel} from './import_in_progress_label'
 import {ImportClearLabel} from './import_clear_label'
+import AsyncCourseSearchSelect from './common_components/async_course_search_select'
+import { CourseOption } from './types'
+import { FormMessage } from '@instructure/ui-form-field'
 
 const I18n = createI18nScope('content_migrations_redesign')
-
-type CourseOption = {
-  id: string
-  label: string
-  term: string
-  start_at: string
-  end_at: string
-  start_at_locale: string | null
-  end_at_locale: string | null
-  blueprint: boolean
-}
 
 type CourseCopyImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
   isSubmitting: boolean
-}
-
-const getCourseOptionDescription = (option: CourseOption): string | null => {
-  return option.term ? I18n.t('Term: %{termName}', {termName: option.term}) : null
 }
 
 export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCopyImporterProps) => {
@@ -67,8 +53,6 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
   const newStartDate = ENV.OLD_START_DATE
   const newEndDate = ENV.OLD_END_DATE
 
-  const [searchParam, setSearchParam] = useState<string>('')
-  const [courseOptions, setCourseOptions] = useState<Array<CourseOption>>([])
   const [preloadedCourses, setPreloadedCourses] = useState<Map<string, CourseOption[]>>(new Map())
   const [isPreloadedCoursesLoading, setIsPreloadedCoursesLoading] = useState<boolean>(false)
   const [selectedCourse, setSelectedCourse] = useState<CourseOption | null>(null)
@@ -128,39 +112,6 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
     }
   }, [composeManageableCourseURL, isShowSelect])
 
-  const throttledCourseFetch = useRef(
-    throttle(
-      (currentSearchParam: string, includeConcluded: boolean) => {
-        if (!currentSearchParam) {
-          setCourseOptions([])
-          return
-        }
-        doFetchApi({
-          path: composeManageableCourseURL(currentSearchParam, includeConcluded),
-        })
-          .then((response: any) => {
-            setCourseOptions(response.json)
-          })
-          .catch(showFlashError(I18n.t("Couldn't load course options")))
-      },
-      500,
-      {
-        leading: false,
-        trailing: true,
-      },
-    ),
-  )
-
-  const getCourseOptions = useCallback(
-    (e: React.SyntheticEvent<Element, Event>) => {
-      const target = e.target as HTMLInputElement
-      setSelectedCourse(null)
-      setSearchParam(target.value)
-      throttledCourseFetch.current(target.value, includeCompletedCourses)
-    },
-    [includeCompletedCourses],
-  )
-
   const addToPreloadedListIfNotExist = useCallback(
     (courseOption: CourseOption) => {
       const newMap = new Map(preloadedCourses)
@@ -171,20 +122,6 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
       setPreloadedCourses(newMap)
     },
     [preloadedCourses],
-  )
-
-  const selectCourse = useCallback(
-    (_e: ChangeEvent<HTMLSelectElement>, courseId: string) => {
-      const courseOption = courseOptions.find((c: CourseOption) => c.id === courseId)
-
-      if (courseOption) {
-        addToPreloadedListIfNotExist(courseOption)
-        setSelectedCourse(courseOption)
-        setSearchParam(courseOption.label)
-        setCourseOptions([])
-      }
-    },
-    [addToPreloadedListIfNotExist, courseOptions],
   )
 
   const selectPreloadedCourse = useCallback(
@@ -198,12 +135,9 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
 
       if (courseOption) {
         setSelectedCourse(courseOption)
-        setSearchParam(courseOption.label)
       } else {
         setSelectedCourse(null)
-        setSearchParam('')
       }
-      setCourseOptions([])
     },
     [preloadedCourses],
   )
@@ -306,45 +240,30 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
                   </>
                 )}
                 <Flex.Item shouldGrow={true} overflowY="visible">
-                  <CanvasSelect
-                    id="course-copy-select-course"
-                    data-testid="course-copy-select-course"
-                    // @ts-expect-error
-                    inputValue={selectedCourse ? selectedCourse.label : searchParam}
+                  <AsyncCourseSearchSelect
+                    selectedCourse={selectedCourse}
                     interaction={interaction}
-                    onChange={selectCourse}
-                    onInputChange={getCourseOptions}
-                    placeholder={I18n.t('Search...')}
-                    isShowingOptions={courseOptions.length > 0}
-                    renderLabel={I18n.t('Search for a course')}
-                    isRequired={true}
-                    renderBeforeInput={<IconSearchLine inline={false} />}
-                    renderAfterInput={<span />}
-                    onBlur={() => {
-                      setCourseOptions([])
-                    }}
-                    messages={messages}
-                    value={value}
-                    scrollToHighlightedOption={true}
-                    inputRef={ref => (courseSelectInputRef.current = ref)}
-                  >
-                    {courseOptions.length > 0 ? (
-                      courseOptions.map((option: CourseOption) => {
-                        return (
-                          <CanvasSelect.Option
-                            id={option.id}
-                            key={option.id}
-                            value={option.id}
-                            description={getCourseOptionDescription(option)}
-                          >
-                            {option.label}
-                          </CanvasSelect.Option>
-                        )
+                    getCourseOptions={async (term: string) => {
+                      return doFetchApi({
+                        path: composeManageableCourseURL(term, includeCompletedCourses),
                       })
-                    ) : (
-                      <CanvasSelect.Option id="empty-option" key="empty-option" value="" />
-                    )}
-                  </CanvasSelect>
+                        .then(res => res.json as CourseOption[])
+                        .catch(() => {
+                          showFlashError(I18n.t("Couldn't load course options"))
+                          return []
+                        })
+                    }}
+                    onSelectCourse={(course: CourseOption | null) => {
+                      if (course) {
+                        addToPreloadedListIfNotExist(course)
+                        setSelectedCourse(course)
+                      } else {
+                        setSelectedCourse(null)
+                      }
+                    }}
+                    messages={messages as FormMessage[]}
+                    inputRef={ref => (courseSelectInputRef.current = ref)}
+                  />
                 </Flex.Item>
               </Flex>
             )

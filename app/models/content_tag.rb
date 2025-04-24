@@ -507,9 +507,9 @@ class ContentTag < ActiveRecord::Base
   end
 
   def clear_discussion_stream_items
-    if content_type == "DiscussionTopic" && (saved_change_to_workflow_state? &&
-         ["active", nil].include?(workflow_state_before_last_save) &&
-         workflow_state == "unpublished")
+    if content_type == "DiscussionTopic" && saved_change_to_workflow_state? &&
+       ["active", nil].include?(workflow_state_before_last_save) &&
+       workflow_state == "unpublished"
       content.clear_stream_items
     end
   end

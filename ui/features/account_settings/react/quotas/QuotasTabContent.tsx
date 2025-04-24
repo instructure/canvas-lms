@@ -23,8 +23,12 @@ import {AccountWithQuotas} from './common'
 import {lazy, Suspense} from 'react'
 import extensions from '@canvas/bundles/extensions'
 
+type Extensions = {
+  [key: string]: any
+}
+
 const SiteAdminQuotas = lazy(async () => {
-  const extension = extensions['ui/features/account_settings/index.jsx']
+  const extension = (extensions as Extensions)['ui/features/account_settings/index.jsx']
   const EmptyComponent = () => <></>
 
   if (extension) {

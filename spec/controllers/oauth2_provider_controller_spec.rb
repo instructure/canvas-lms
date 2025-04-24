@@ -774,7 +774,7 @@ describe OAuth2ProviderController do
       let(:service_user) { user_model }
 
       before do
-        key.update!(service_user:, internal_service: true)
+        key.update!(service_user:, authorized_flows: ["service_user_client_credentials"])
       end
 
       context "with valid parameters" do
@@ -808,7 +808,7 @@ describe OAuth2ProviderController do
         it { is_expected.to be_bad_request }
       end
 
-      context "whent the service user is not active" do
+      context "when the service user is not active" do
         before do
           service_user.destroy!
           post :token, params: base_params

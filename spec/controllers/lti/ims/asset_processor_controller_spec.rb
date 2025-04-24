@@ -219,6 +219,7 @@ describe Lti::IMS::AssetProcessorController do
       expect(controller).to receive(:render_or_redirect_to_stored_file)
       send_request
       expect(response).to have_http_status(:found)
+      expect(response.location).to include("sf_verifier=")
     end
 
     context "when the asset is not found" do

@@ -1080,7 +1080,7 @@ Rails.application.config.to_prepare do
         ],
         true_for: %w[TeacherEnrollment AccountAdmin],
         acts_as_access_token_scope: true,
-        account_allows: ->(a) { a.feature_allowed?(:differentiation_tags) }
+        account_allows: ->(a) { a.allow_assign_to_differentiation_tags_unlocked? },
       },
       manage_tags_manage: {
         label: -> { I18n.t("Manage Differentiation Tags") },
@@ -1096,7 +1096,7 @@ Rails.application.config.to_prepare do
         ],
         true_for: %w[TeacherEnrollment AccountAdmin],
         acts_as_access_token_scope: true,
-        account_allows: ->(a) { a.feature_allowed?(:differentiation_tags) }
+        account_allows: ->(a) { a.allow_assign_to_differentiation_tags_unlocked? },
       },
       manage_tags_delete: {
         label: -> { I18n.t("Delete Differentiation Tags") },
@@ -1112,7 +1112,7 @@ Rails.application.config.to_prepare do
         ],
         true_for: %w[TeacherEnrollment AccountAdmin],
         acts_as_access_token_scope: true,
-        account_allows: ->(a) { a.feature_allowed?(:differentiation_tags) }
+        account_allows: ->(a) { a.allow_assign_to_differentiation_tags_unlocked? },
       },
       manage_interaction_alerts: {
         label: -> { I18n.t("permissions.manage_interaction_alerts", "Manage alerts") },

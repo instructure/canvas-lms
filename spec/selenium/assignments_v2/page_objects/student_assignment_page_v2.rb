@@ -123,6 +123,10 @@ class StudentAssignmentPageV2
       f("span[data-testid='url-submission-text")
     end
 
+    def url_entry
+      f('[data-testid="url-entry"]')
+    end
+
     def start_text_entry_button
       f("button[data-testid='start-text-entry']")
     end
@@ -330,6 +334,10 @@ class StudentAssignmentPageV2
 
     def textarea_div_container
       f("#textarea-emoji-container")
+    end
+
+    def view
+      f('[data-testid="assignments-2-student-view"]')
     end
   end
 end

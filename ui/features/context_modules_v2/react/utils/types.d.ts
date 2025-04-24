@@ -17,34 +17,34 @@
  */
 
 export interface MasteryPathsData {
-    isCyoeAble: boolean
-    isTrigger: boolean
-    isReleased: boolean
-    releasedLabel: string | null
+  isCyoeAble: boolean
+  isTrigger: boolean
+  isReleased: boolean
+  releasedLabel: string | null
 }
 
 // Extend the global ENV object with conditional release properties
 declare global {
-    interface GlobalEnv {
-        CONDITIONAL_RELEASE_SERVICE_ENABLED?: boolean
-        CONDITIONAL_RELEASE_ENV?: {
-            active_rules: Array<{
-                trigger_assignment_id: string
-                trigger_assignment_model: {
-                    points_possible: number
-                }
-                scoring_ranges: Array<{
-                    upper_bound: number
-                    lower_bound: number
-                    assignment_sets: Array<{
-                        assignment_set_associations: Array<{
-                            assignment_id: string
-                        }>
-                    }>
-                }>
-            }>
+  interface GlobalEnv {
+    CONDITIONAL_RELEASE_SERVICE_ENABLED?: boolean
+    CONDITIONAL_RELEASE_ENV?: {
+      active_rules: Array<{
+        trigger_assignment_id: string
+        trigger_assignment_model: {
+          points_possible: number
         }
+        scoring_ranges: Array<{
+          upper_bound: number
+          lower_bound: number
+          assignment_sets: Array<{
+            assignment_set_associations: Array<{
+              assignment_id: string
+            }>
+          }>
+        }>
+      }>
     }
+  }
 }
 
 export type ModuleItemContent = {
@@ -149,3 +149,5 @@ export interface ModuleItem {
   indent: number
   content: ModuleItemContent
 }
+
+export type ModuleAction = 'move_module' | 'move_module_item' | 'move_module_contents'

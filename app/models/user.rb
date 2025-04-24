@@ -1471,7 +1471,7 @@ class User < ActiveRecord::Base
       return true if account.allow_name_pronunciation_edit_for_students? && enrollment_types.include?("StudentEnrollment")
 
       course_admin_roles = %w[TeacherEnrollment TaEnrollment DesignerEnrollment]
-      return true if account.allow_name_pronunciation_edit_for_teachers? && enrollment_types.intersection(course_admin_roles).present?
+      return true if account.allow_name_pronunciation_edit_for_teachers? && enrollment_types.intersect?(course_admin_roles)
 
       account.allow_name_pronunciation_edit_for_admins? && account_users.active.where(account:).exists?
     end

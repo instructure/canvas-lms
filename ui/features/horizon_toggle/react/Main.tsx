@@ -16,12 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {HorizonToggle} from './HorizonToggle'
-import {HorizonEnabled} from './HorizonEnabled'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {Alert} from '@instructure/ui-alerts'
@@ -32,29 +29,19 @@ import {Pill} from '@instructure/ui-pill'
 const I18n = createI18nScope('horizon_toggle_page')
 
 export interface MainProps {
-  isAccountPage: boolean
-  isHorizonCourse: boolean
   isHorizonAccount: boolean
   hasCourses: boolean
-  courseId: string
   accountId: string
   horizonAccountLocked: boolean
 }
 
 export const Main = ({
-  isAccountPage,
-  isHorizonCourse,
   isHorizonAccount,
   hasCourses,
-  courseId,
   accountId,
   horizonAccountLocked,
 }: MainProps) => {
-  const handlePreview = () => {
-    assignLocation(`/courses/${courseId}/student_view?preview=true`)
-  }
-
-  return isAccountPage ? (
+  return (
     <View>
       {hasCourses && !isHorizonAccount && (
         <Alert variant="warning">
@@ -76,14 +63,6 @@ export const Main = ({
           locked={horizonAccountLocked}
         />
       )}
-    </View>
-  ) : (
-    <View as="div">
-      <Flex margin="medium 0 small 0" justifyItems="space-between">
-        <Heading level="h2">{I18n.t('Switch Learner Experience to Canvas Career')}</Heading>
-        <Button onClick={handlePreview}>{I18n.t('Learner Preview')}</Button>
-      </Flex>
-      {isHorizonCourse ? <HorizonEnabled /> : <HorizonToggle />}
     </View>
   )
 }

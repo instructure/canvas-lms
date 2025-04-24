@@ -29,6 +29,10 @@ import Adapter from 'enzyme-adapter-react-16'
 import CoreTranslations from '../public/javascripts/translations/en.json'
 import {up as installNodeDecorations} from '../ui/boot/initializers/installNodeDecorations'
 
+if (process.env.LOG_PLAYGROUND_URL_ON_FAILURE) {
+  process.env.RTL_SKIP_AUTO_CLEANUP = 'true'
+}
+
 loadDevMessages()
 loadErrorMessages()
 registerTranslations('en', CoreTranslations)

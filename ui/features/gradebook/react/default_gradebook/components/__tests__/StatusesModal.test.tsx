@@ -28,12 +28,18 @@ import '@testing-library/jest-dom/extend-expect'
 const originalState = store.getState()
 
 describe('Statuses Modal', () => {
+  let oldEnv: typeof ENV.FEATURES
   beforeEach(() => {
     fetchMock.mock('*', 200)
+    oldEnv = ENV.FEATURES
+    ENV.FEATURES = {
+      extended_submission_state: true,
+    }
   })
   afterEach(() => {
     store.setState(originalState, true)
     fetchMock.restore()
+    ENV.FEATURES = oldEnv
   })
 
   it('renders heading', () => {

@@ -101,7 +101,7 @@ const ComposeModalContainer = props => {
     if (recipientsObserversError) {
       setIncludeObserversMessages({
         text: I18n.t('Observers were not included. Please try again.'),
-        type: 'error',
+        type: 'newError',
       })
       setLoadingObservers(false)
     } else if (recipientsObserversDataLoading) {
@@ -291,7 +291,7 @@ const ComposeModalContainer = props => {
 
     if (!body) {
       const errorMessage = I18n.t('Please insert a message')
-      setBodyMessages([{text: errorMessage, type: 'error'}])
+      setBodyMessages([{text: errorMessage, type: 'newError'}])
       errors.push(errorMessage) // Add error message to the array
       isValid = false
     }
@@ -299,12 +299,12 @@ const ComposeModalContainer = props => {
     if (!isSubmissionCommentsType) {
       if (addressBookInputValue !== '') {
         const errorMessage = I18n.t('No matches found. Please insert a valid recipient.')
-        setAddressBookMessages([{text: errorMessage, type: 'error'}])
+        setAddressBookMessages([{text: errorMessage, type: 'newError'}])
         errors.push(errorMessage) // Add error message to the array
         isValid = false
       } else if (props.selectedIds.length === 0) {
         const errorMessage = I18n.t('Please select a recipient')
-        setAddressBookMessages([{text: errorMessage, type: 'error'}])
+        setAddressBookMessages([{text: errorMessage, type: 'newError'}])
         errors.push(errorMessage) // Add error message to the array
         isValid = false
       }
@@ -316,7 +316,7 @@ const ComposeModalContainer = props => {
         (!selectedContext || !selectedContext?.contextID)
       ) {
         const errorMessage = I18n.t('Please select a course')
-        setCourseMessages([{text: errorMessage, type: 'error'}])
+        setCourseMessages([{text: errorMessage, type: 'newError'}])
         errors.push(errorMessage) // Add error message to the array
         isValid = false
       }

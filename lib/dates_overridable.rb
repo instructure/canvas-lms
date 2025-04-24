@@ -96,7 +96,7 @@ module DatesOverridable
     if is_a?(DiscussionTopic)
       # need to check if is_section_specific for ungraded discussions
       # this column will eventually be deprecated and then this can be removed
-      course_overrides? || ((!only_visible_to_overrides && !is_section_specific) && (module_ids.empty? || (module_ids.any? && modules_without_overrides?)))
+      course_overrides? || (!only_visible_to_overrides && !is_section_specific && (module_ids.empty? || (module_ids.any? && modules_without_overrides?)))
     else
       course_overrides? || (!only_visible_to_overrides && (module_ids.empty? || (module_ids.any? && modules_without_overrides?)))
     end

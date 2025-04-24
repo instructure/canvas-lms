@@ -540,7 +540,20 @@ class Account < ActiveRecord::Base
   end
 
   def allow_assign_to_differentiation_tags?
-    allow_assign_to_differentiation_tags[:value]
+    allow_assign_to_differentiation_tags[:value] && feature_enabled?(:assign_to_differentiation_tags)
+  end
+
+  def allow_assign_to_differentiation_tags_unlocked?
+    # First, the feature flag must be enabled. If not, always false.
+    return false unless feature_enabled?(:assign_to_differentiation_tags)
+
+    dt = allow_assign_to_differentiation_tags
+
+    # If the current value is true, then it's allowed.
+    return true if dt[:value]
+
+    # If the value is false, then allow it if it is not locked.
+    !dt[:locked]
   end
 
   def allow_gradebook_show_first_last_names?
@@ -2531,9 +2544,9 @@ class Account < ActiveRecord::Base
 
     # If an account's RQD setting hasn't been changed before, old_rqd_setting will be nil
     if (old_rqd_setting == false || old_rqd_setting.nil?) && new_rqd_setting == true
-      InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.enabled")
+      InstStatsd::Statsd.distributed_increment("account.settings.restrict_quantitative_data.enabled")
     elsif old_rqd_setting == true && new_rqd_setting == false
-      InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.disabled")
+      InstStatsd::Statsd.distributed_increment("account.settings.restrict_quantitative_data.disabled")
     end
   end
 
@@ -2662,5 +2675,8 @@ class Account < ActiveRecord::Base
       locked: value,
       value:
     }
+    if value == false
+      associated_courses&.not_deleted&.update_all(horizon_course: false)
+    end
   end
 end

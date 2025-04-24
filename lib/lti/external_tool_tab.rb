@@ -61,7 +61,7 @@ module Lti
 
     def self.tool_for_tab(tab)
       tool_id = tool_id_for_tab(tab)
-      tool_id && ContextExternalTool.find_by(id: tool_id)
+      tool_id && Lti::ToolFinder.find_by(id: tool_id)
     end
   end
 end

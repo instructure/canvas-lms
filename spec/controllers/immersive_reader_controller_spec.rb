@@ -100,9 +100,9 @@ describe ImmersiveReaderController do
       end
 
       it "increments the error counter" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
-        expect(InstStatsd::Statsd).to receive(:increment).with(
+        expect(InstStatsd::Statsd).to receive(:distributed_increment).with(
           "immersive_reader.authentication_failure",
           tags: { status: "401" }
         )

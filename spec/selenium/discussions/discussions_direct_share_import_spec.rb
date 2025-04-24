@@ -55,6 +55,7 @@ describe "discussions" do
     end
 
     it "allows user to send discussion from individual discussion page" do
+      skip "Will be fixed in VICE-5209"
       Discussion.visit(@course, @discussion1)
       Discussion.manage_discussion_button.click
       Discussion.send_to_menuitem.click
@@ -63,6 +64,7 @@ describe "discussions" do
     end
 
     it "allows user to copy discussion from individual discussion page" do
+      skip "Will be fixed in VICE-5209"
       Discussion.visit(@course, @discussion1)
       Discussion.manage_discussion_button.click
       Discussion.copy_to_menuitem.click

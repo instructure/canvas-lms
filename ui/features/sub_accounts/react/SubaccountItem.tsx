@@ -19,7 +19,7 @@
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {Link} from '@instructure/ui-link'
 import {
   IconAddLine,
@@ -29,9 +29,9 @@ import {
   IconTrashLine,
 } from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import {AccountWithCounts} from './types'
+import type {AccountWithCounts} from './types'
 import SubaccountNameForm from './SubaccountNameForm'
-import {calculateIndent, useFocusContext} from './util'
+import {calculateIndent} from './util'
 
 const I18n = createI18nScope('sub_accounts')
 
@@ -41,22 +41,29 @@ interface Props {
   onAdd: () => void
   onExpand: () => void
   onCollapse: () => void
-  onEditSaved: () => void
+  onEditSaved: (json: AccountWithCounts) => void
   onDelete: () => void
   isExpanded: boolean
   canDelete: boolean
   show: boolean
+  isFocus: boolean
 }
 
 export default function SubaccountItem(props: Props) {
+  const linkRef = useRef<HTMLElement | null>(null)
   const [isEditing, setIsEditing] = useState(false)
-  const {focusId, setFocusRef} = useFocusContext()
 
   useEffect(() => {
     if (!props.show) {
       setIsEditing(false)
     }
   }, [props.show])
+
+  useEffect(() => {
+    if (props.isFocus && linkRef.current) {
+      linkRef.current.focus()
+    }
+  }, [props.isFocus, linkRef])
 
   const courseCount = I18n.t(
     {
@@ -74,7 +81,7 @@ export default function SubaccountItem(props: Props) {
     {count: props.account.sub_account_count},
   )
 
-  const renderRowContents = () => {
+  const renderRowContents = (id: string) => {
     const collapsedProps = {
       screenReaderLabel: I18n.t('Collapse subaccount list for %{account}', {
         account: props.account.name,
@@ -103,9 +110,7 @@ export default function SubaccountItem(props: Props) {
               data-testid={`link_${props.account.id}`}
               href={`/accounts/${props.account.id}`}
               elementRef={(e: Element | null) => {
-                if (focusId === props.account.id) {
-                  setFocusRef(e as HTMLElement)
-                }
+                linkRef.current = e as HTMLElement
               }}
             >
               <Text size="medium" weight="bold">
@@ -164,9 +169,7 @@ export default function SubaccountItem(props: Props) {
               })}
               renderIcon={<IconTrashLine />}
               disabled={!props.canDelete}
-              onClick={() => {
-                props.onDelete()
-              }}
+              onClick={props.onDelete}
               data-testid={`delete-${props.account.id}`}
             />
           </Flex>
@@ -180,7 +183,7 @@ export default function SubaccountItem(props: Props) {
     return (
       <Flex key={`${props.account.id}_header`}>
         <Flex.Item width={`${indent}%`} />
-        {renderRowContents()}
+        {renderRowContents(props.account.id)}
       </Flex>
     )
   } else if (props.show) {
@@ -189,9 +192,9 @@ export default function SubaccountItem(props: Props) {
         depth={props.depth}
         accountName={props.account.name}
         accountId={props.account.id}
-        onSuccess={() => {
+        onSuccess={(json: AccountWithCounts) => {
           setIsEditing(false)
-          props.onEditSaved()
+          props.onEditSaved(json)
         }}
         onCancel={() => setIsEditing(false)}
       />

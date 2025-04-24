@@ -119,7 +119,6 @@ class ContextExternalTool < ActiveRecord::Base
   QUIZ_LTI = "Quizzes 2"
   ANALYTICS_2 = "fd75124a-140e-470f-944c-114d2d93bb40"
   ADMIN_ANALYTICS = "admin-analytics"
-  TOOL_FEATURE_MAPPING = { ANALYTICS_2 => :analytics_2, ADMIN_ANALYTICS => :admin_analytics }.freeze
   PREFERRED_LTI_VERSION = "1_3"
 
   workflow do
@@ -1024,31 +1023,6 @@ class ContextExternalTool < ActiveRecord::Base
     developer_key_id == Lti::ToolFinder.from_content_tag(content_tag, context)&.developer_key_id
   end
 
-  def self.find_active_external_tool_by_consumer_key(consumer_key, context)
-    active.where(consumer_key:, context: Lti::ContextToolFinder.contexts_to_search(context)).first
-  end
-
-  def self.find_active_external_tool_by_client_id(client_id, context)
-    active.where(developer_key_id: client_id, context: Lti::ContextToolFinder.contexts_to_search(context)).first
-  end
-
-  def self.find_external_tool_by_id(id, context)
-    where(id:, context: Lti::ContextToolFinder.contexts_to_search(context)).first
-  end
-
-  def self.find_external_tool_client_id(id, context)
-    where(id:, context: Lti::ContextToolFinder.contexts_to_search(context)).pluck(:developer_key_id).map { Shard.global_id_for _1 }
-  end
-
-  scope :having_setting, lambda { |setting|
-                           if setting
-                             joins(:context_external_tool_placements)
-                               .where(context_external_tool_placements: { placement_type: setting })
-                           else
-                             all
-                           end
-                         }
-
   scope :placements, lambda { |*placements|
     if placements.present?
       scope = ContextExternalTool.where(
@@ -1100,25 +1074,6 @@ class ContextExternalTool < ActiveRecord::Base
     end
   }
 
-  def self.find_for(id, context, type, raise_error = true)
-    id = id[Api::ID_REGEX] if id.is_a?(String)
-    unless id.present?
-      if raise_error
-        raise ActiveRecord::RecordNotFound
-      else
-        return nil
-      end
-    end
-
-    context = context.context if context.is_a?(Group)
-
-    tool = context.context_external_tools.having_setting(type).active.where(id:).first
-    tool ||= ContextExternalTool.having_setting(type).active.where(context_type: "Account", context_id: context.account_chain_ids, id:).first
-    raise ActiveRecord::RecordNotFound if !tool && raise_error
-
-    tool
-  end
-
   scope :active, lambda {
     where.not(workflow_state: ["deleted", "disabled"])
   }
@@ -1151,6 +1106,18 @@ class ContextExternalTool < ActiveRecord::Base
 
   def opaque_identifier_for(asset, context: nil)
     ContextExternalTool.opaque_identifier_for(asset, shard, context:)
+  end
+
+  # Invalidate the navigation cache for this tool if it has a placement
+  # in the user, course, or account navigation.
+  # This should be called when a tool is updated or deleted.
+  # @param tool [ContextExternalTool] The tool to check for placements
+  # @param domain_root_account [Account] The root account to invalidate the cache for
+  # @return [void]
+  def self.invalidate_nav_tabs_cache(tool, domain_root_account)
+    if tool.has_placement?(:user_navigation) || tool.has_placement?(:course_navigation) || tool.has_placement?(:account_navigation)
+      Lti::NavigationCache.new(domain_root_account).invalidate_cache_key
+    end
   end
 
   def self.opaque_identifier_for(asset, shard, context: nil)
@@ -1203,8 +1170,19 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def feature_flag_enabled?(context = nil)
-    feature = TOOL_FEATURE_MAPPING[tool_id]
-    !feature || (context || self.context).feature_enabled?(feature)
+    context ||= self.context
+
+    if tool_id == ANALYTICS_2
+      context.feature_enabled?(:analytics_2) && !context.feature_enabled?(:analytics_2_lti_13_enabled)
+    elsif tool_id == ADMIN_ANALYTICS
+      if context.is_a?(Course) && context.feature_enabled?(:analytics_2_lti_13_enabled)
+        true
+      else
+        context.feature_enabled?(:admin_analytics)
+      end
+    else
+      true
+    end
   end
 
   # Add new types to this as we finish their migration methods

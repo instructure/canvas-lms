@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {ContextModuleProvider} from '../../hooks/useModuleContext'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemSupplementalInfo from '../ModuleItemSupplementalInfo'
 import type {ModuleItemContent, CompletionRequirement} from '../../utils/types'
 
@@ -38,70 +38,66 @@ const defaultContent: ModuleItemContent = {
 
 const setUp = (
   content: ModuleItemContent = defaultContent,
-  completionRequirement: CompletionRequirement | null = defaultCompletionRequirement
+  completionRequirement: CompletionRequirement | null = defaultCompletionRequirement,
 ) => {
   return render(
     <ContextModuleProvider
-      courseId="1"
-      isMasterCourse={true}
-      isChildCourse={false}
-      permissions={{
-        canEdit: true,
-        canDelete: true,
-        canAdd: true,
-        canDirectShare: true
-      }}
+      {...contextModuleDefaultProps}
     >
       <ModuleItemSupplementalInfo
         content={content}
         completionRequirement={completionRequirement ?? undefined}
         contentTagId="19"
       />
-    </ContextModuleProvider>
+    </ContextModuleProvider>,
   )
 }
 
 describe('ModuleItemSupplementalInfo', () => {
+  it('renders', () => {
+    const container = setUp()
+    expect(container.container).toBeInTheDocument()
+    expect(container.getAllByText('|')).toHaveLength(2)
+  })
+
+  it('does not render', () => {
+    const container = setUp({...defaultContent, dueAt: undefined, pointsPossible: undefined}, null)
+    expect(container.container).toBeInTheDocument()
+    expect(
+      container.queryByText(new Date(currentDate).toLocaleDateString()),
+    ).not.toBeInTheDocument()
+    expect(container.queryAllByText('|')).toHaveLength(0)
+  })
+
+  describe('due at', () => {
     it('renders', () => {
-      const container = setUp()
+      const container = setUp(defaultContent, null)
       expect(container.container).toBeInTheDocument()
-      expect(container.getAllByText('|')).toHaveLength(2)
+      expect(container.getByText(new Date(currentDate).toLocaleDateString())).toBeInTheDocument()
+      expect(container.getAllByText('|')).toHaveLength(1)
     })
 
     it('does not render', () => {
-        const container = setUp({...defaultContent, dueAt: undefined, pointsPossible: undefined}, null)
-        expect(container.container).toBeInTheDocument()
-        expect(container.queryByText(new Date(currentDate).toLocaleDateString())).not.toBeInTheDocument()
-        expect(container.queryAllByText('|')).toHaveLength(0)
-      })
+      const container = setUp({...defaultContent, dueAt: undefined})
+      expect(container.container).toBeInTheDocument()
+      expect(
+        container.queryByText(new Date(currentDate).toLocaleDateString()),
+      ).not.toBeInTheDocument()
+      expect(container.queryAllByText('|')).toHaveLength(1)
+    })
+  })
 
-    describe('due at', () => {
-      it('renders', () => {
-        const container = setUp(defaultContent, null)
-        expect(container.container).toBeInTheDocument()
-        expect(container.getByText(new Date(currentDate).toLocaleDateString())).toBeInTheDocument()
-        expect(container.getAllByText('|')).toHaveLength(1)
-      })
-
-      it('does not render', () => {
-        const container = setUp({...defaultContent, dueAt: undefined})
-        expect(container.container).toBeInTheDocument()
-        expect(container.queryByText(new Date(currentDate).toLocaleDateString())).not.toBeInTheDocument()
-        expect(container.queryAllByText('|')).toHaveLength(1)
-      })
+  describe('points possible', () => {
+    it('renders', () => {
+      const container = setUp()
+      expect(container.container).toBeInTheDocument()
+      expect(container.getByText('100 pts')).toBeInTheDocument()
     })
 
-    describe('points possible', () => {
-      it('renders', () => {
-        const container = setUp()
-        expect(container.container).toBeInTheDocument()
-        expect(container.getByText('100 pts')).toBeInTheDocument()
-      })
-
-      it('does not render', () => {
-        const container = setUp({...defaultContent, pointsPossible: undefined})
-        expect(container.container).toBeInTheDocument()
-        expect(container.queryByText('100 pts')).not.toBeInTheDocument()
-      })
+    it('does not render', () => {
+      const container = setUp({...defaultContent, pointsPossible: undefined})
+      expect(container.container).toBeInTheDocument()
+      expect(container.queryByText('100 pts')).not.toBeInTheDocument()
     })
+  })
 })

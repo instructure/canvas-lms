@@ -62,7 +62,7 @@ const renderTableHead = (
       data-testid="select"
     >
       <Checkbox
-        label={<ScreenReaderContent>{I18n.t('Select all items')}</ScreenReaderContent>}
+        label={<ScreenReaderContent>{I18n.t('Select all files and folders')}</ScreenReaderContent>}
         size={size}
         checked={allRowsSelected}
         indeterminate={someRowsSelected}

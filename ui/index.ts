@@ -86,9 +86,8 @@ up({
   },
   requires: [C.I18n],
 }).catch((e: Error) => {
-  // eslint-disable-next-line no-console
   console.error(
-    `Canvas front-end did not successfully start! Did you add any new bundles to ui/featureBundles.ts? (${e.message})`
+    `Canvas front-end did not successfully start! Did you add any new bundles to ui/featureBundles.ts? (${e.message})`,
   )
   captureException(e)
 })
@@ -117,7 +116,6 @@ const advanceReadiness = (target: string) => {
 }
 
 function afterDocumentReady() {
-  // eslint-disable-next-line promise/catch-or-return
   Promise.all((window.deferredBundles || []).map(loadBundle)).then(() => {
     advanceReadiness('deferredBundles')
   })
@@ -172,7 +170,7 @@ function setupMathML() {
     window.dispatchEvent(
       new CustomEvent(Mathml.processNewMathEventName, {
         detail: {target: document.body, features, config},
-      })
+      }),
     )
   }, 0)
 
@@ -200,7 +198,6 @@ function setupMathML() {
 }
 
 if (ENV.csp) {
-  // eslint-disable-next-line promise/catch-or-return
   import('./boot/initializers/setupCSP').then(({default: setupCSP}) => setupCSP(window.document))
 }
 
@@ -224,11 +221,9 @@ async function openHelpDialog(event: Event): Promise<void> {
     const {renderLoginHelp} = await import('@canvas/help-dialog')
     renderLoginHelp(helpLink)
   } catch (e) {
-    /* eslint-disable no-console */
     console.error('Help dialog could not be displayed')
     console.error(e)
     captureException(e)
-    /* eslint-enable no-console */
   }
 }
 
@@ -246,7 +241,6 @@ async function loadNewUserTutorials() {
     document.getElementsByClassName('TutorialToggleHolder')[0]?.remove() // inherited margin from parent leaves a gap
   }
 }
-
 ;(window.requestIdleCallback || window.setTimeout)(async () => {
   await import('./boot/initializers/runOnEveryPageButDontBlockAnythingElse')
   advanceReadiness('asyncInitializers')
@@ -256,5 +250,7 @@ async function loadNewUserTutorials() {
 // each module with this line. Once we switch pages to using react-router
 // we can remove this, as the setup for HMR is taken care of for us.
 if (typeof module !== 'undefined') {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   module?.hot?.accept()
 }

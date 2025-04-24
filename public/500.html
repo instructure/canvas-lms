@@ -62,9 +62,10 @@
       border: none;
     }
   </style>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
-  <form class="centered-div" id="submit_error_form" action="/errors" method="POST">
+  <form class="centered-div" id="submit_error_form" action="/error_reports" method="POST">
     <h1 class="centered-div-content">Oops! It Looks Like Something Broke</h1>
     <div class="centered-div-content">
       <p>Please let us know how you got here so we can fix it as soon as possible:</p>
@@ -77,6 +78,9 @@
         If you need more assistance, go to our
         <a href="http://help.instructure.com">support website</a> or
         <a href="mailto:support@instructure.com?subject=Feedback from Canvas page error">send us an email</a>.
+      </p>
+      <p>
+        <div class="g-recaptcha" data-sitekey="6LftyLgZAAAAAC10tel8XGucbApMIY8-uFB_yVcN"></div>
       </p>
       <div class="button-container">
         <button type="submit" class="btn">Send Comments</button>

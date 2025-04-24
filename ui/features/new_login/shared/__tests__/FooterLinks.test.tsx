@@ -18,7 +18,6 @@
 
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {FooterLinks} from '..'
 import {
@@ -44,6 +43,17 @@ const mockUseHelpTray = useHelpTray as jest.Mock
 const mockUseNewLogin = useNewLogin as jest.Mock
 
 describe('FooterLinks', () => {
+  const renderFooterLinks = () =>
+    render(
+      <MemoryRouter>
+        <NewLoginProvider>
+          <HelpTrayProvider>
+            <FooterLinks />
+          </HelpTrayProvider>
+        </NewLoginProvider>
+      </MemoryRouter>,
+    )
+
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -55,15 +65,7 @@ describe('FooterLinks', () => {
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
-    render(
-      <MemoryRouter>
-        <NewLoginProvider>
-          <HelpTrayProvider>
-            <FooterLinks />
-          </HelpTrayProvider>
-        </NewLoginProvider>
-      </MemoryRouter>,
-    )
+    renderFooterLinks()
   })
 
   it('renders all links', () => {
@@ -73,15 +75,7 @@ describe('FooterLinks', () => {
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
-    render(
-      <MemoryRouter>
-        <NewLoginProvider>
-          <HelpTrayProvider>
-            <FooterLinks />
-          </HelpTrayProvider>
-        </NewLoginProvider>
-      </MemoryRouter>,
-    )
+    renderFooterLinks()
     expect(screen.getByTestId('help-link')).toBeInTheDocument()
     expect(screen.getByTestId('privacy-link')).toBeInTheDocument()
     expect(screen.getByTestId('cookie-notice-link')).toBeInTheDocument()
@@ -96,15 +90,7 @@ describe('FooterLinks', () => {
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: mockOpenHelpTray})
-    render(
-      <MemoryRouter>
-        <NewLoginProvider>
-          <HelpTrayProvider>
-            <FooterLinks />
-          </HelpTrayProvider>
-        </NewLoginProvider>
-      </MemoryRouter>,
-    )
+    renderFooterLinks()
     const helpLink = screen.getByTestId('help-link')
     await userEvent.click(helpLink)
     expect(mockOpenHelpTray).not.toHaveBeenCalled()
@@ -117,15 +103,7 @@ describe('FooterLinks', () => {
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
-    render(
-      <MemoryRouter>
-        <NewLoginProvider>
-          <HelpTrayProvider>
-            <FooterLinks />
-          </HelpTrayProvider>
-        </NewLoginProvider>
-      </MemoryRouter>,
-    )
+    renderFooterLinks()
     const links = screen.getAllByTestId(/-link$/)
     links.forEach(link => {
       expect(link).not.toHaveAttribute('aria-disabled')
@@ -140,15 +118,7 @@ describe('FooterLinks', () => {
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: mockOpenHelpTray})
-    render(
-      <MemoryRouter>
-        <NewLoginProvider>
-          <HelpTrayProvider>
-            <FooterLinks />
-          </HelpTrayProvider>
-        </NewLoginProvider>
-      </MemoryRouter>,
-    )
+    renderFooterLinks()
     const helpLink = screen.getByTestId('help-link')
     await userEvent.click(helpLink)
     expect(mockOpenHelpTray).toHaveBeenCalled()
@@ -161,15 +131,7 @@ describe('FooterLinks', () => {
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
-    render(
-      <MemoryRouter>
-        <NewLoginProvider>
-          <HelpTrayProvider>
-            <FooterLinks />
-          </HelpTrayProvider>
-        </NewLoginProvider>
-      </MemoryRouter>,
-    )
+    renderFooterLinks()
     const helpLink = screen.getByTestId('help-link')
     expect(helpLink).toHaveAttribute('data-track-category', 'test-category')
     expect(helpLink).toHaveAttribute('data-track-label', 'test-label')
@@ -182,39 +144,23 @@ describe('FooterLinks', () => {
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
-    render(
-      <MemoryRouter>
-        <NewLoginProvider>
-          <HelpTrayProvider>
-            <FooterLinks />
-          </HelpTrayProvider>
-        </NewLoginProvider>
-      </MemoryRouter>,
-    )
+    renderFooterLinks()
     const helpLink = screen.queryByTestId('help-link')
     expect(helpLink).toBeNull()
   })
 
-  it('ensures links are proper anchor elements and do not have role button', () => {
+  it('renders links with correct semantics and no unnecessary roles or hrefs', () => {
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,
       helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
-    render(
-      <MemoryRouter>
-        <NewLoginProvider>
-          <HelpTrayProvider>
-            <FooterLinks />
-          </HelpTrayProvider>
-        </NewLoginProvider>
-      </MemoryRouter>,
-    )
+    renderFooterLinks()
     const helpLink = screen.getByTestId('help-link')
-    expect(helpLink.tagName).toBe('A')
-    expect(helpLink).toHaveAttribute('href', 'https://community.canvaslms.com/')
-    expect(helpLink).not.toHaveAttribute('role', 'button')
+    expect(helpLink.tagName).toBe('BUTTON')
+    expect(helpLink).not.toHaveAttribute('href')
+    expect(helpLink).not.toHaveAttribute('role')
     const privacyLink = screen.getByTestId('privacy-link')
     expect(privacyLink.tagName).toBe('A')
     expect(privacyLink).toHaveAttribute('href', '/privacy_policy')
@@ -230,5 +176,49 @@ describe('FooterLinks', () => {
     expect(aupLink.tagName).toBe('A')
     expect(aupLink).toHaveAttribute('href', '/acceptable_use_policy')
     expect(aupLink).not.toHaveAttribute('role', 'button')
+  })
+
+  it('sets aria-expanded to false when tray is closed', () => {
+    mockUseNewLoginData.mockReturnValue({
+      isPreviewMode: false,
+      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+    })
+    mockUseNewLogin.mockReturnValue({isUiActionPending: false})
+    mockUseHelpTray.mockReturnValue({
+      openHelpTray: jest.fn(),
+      closeHelpTray: jest.fn(),
+      isHelpTrayOpen: false,
+    })
+    renderFooterLinks()
+    expect(screen.getByTestId('help-link')).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('sets aria-expanded to true when tray is open', () => {
+    mockUseNewLoginData.mockReturnValue({
+      isPreviewMode: false,
+      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+    })
+    mockUseNewLogin.mockReturnValue({isUiActionPending: false})
+    mockUseHelpTray.mockReturnValue({
+      openHelpTray: jest.fn(),
+      closeHelpTray: jest.fn(),
+      isHelpTrayOpen: true,
+    })
+    renderFooterLinks()
+    expect(screen.getByTestId('help-link')).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('ensures all links open in the same window (no target="_blank")', () => {
+    mockUseNewLoginData.mockReturnValue({
+      isPreviewMode: false,
+      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+    })
+    mockUseNewLogin.mockReturnValue({isUiActionPending: false})
+    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    renderFooterLinks()
+    const links = screen.getAllByTestId(/-link$/)
+    links.forEach(link => {
+      expect(link).not.toHaveAttribute('target', '_blank')
+    })
   })
 })

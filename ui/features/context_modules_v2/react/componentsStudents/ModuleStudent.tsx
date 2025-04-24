@@ -45,10 +45,10 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
   const [moduleItems, setModuleItems] = useState<ModuleItemProps[]>([])
 
   const toggleExpanded = (moduleId: string) => {
-    const newExpandedState = !isExpanded;
-    setIsExpanded(newExpandedState);
+    const newExpandedState = !isExpanded
+    setIsExpanded(newExpandedState)
     if (onToggleExpand) {
-      onToggleExpand(moduleId);
+      onToggleExpand(moduleId)
     }
   }
 
@@ -58,13 +58,15 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
         ...item,
         moduleId: id,
         index,
-        content: item.content ? {
-          ...item.content,
-          id: item.content.id || item._id,
-          type: item.content.type || 'unknown',
-        } : null
-      }));
-      setModuleItems(transformedItems);
+        content: item.content
+          ? {
+              ...item.content,
+              id: item.content.id || item._id,
+              type: item.content.type || 'unknown',
+            }
+          : null,
+      }))
+      setModuleItems(transformedItems)
     }
   }, [data, id])
 
@@ -91,23 +93,23 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
     >
       <Flex direction="column">
         <Flex.Item>
-        <ModuleHeaderStudent
+          <ModuleHeaderStudent
             id={id}
             name={name}
             expanded={isExpanded}
             onToggleExpand={toggleExpanded}
           />
         </Flex.Item>
-      {isExpanded && (
-        <Flex.Item>
-          <ModuleItemListStudent
-            moduleItems={moduleItems}
-            completionRequirements={completionRequirements}
-            isLoading={isLoading}
-            error={error}
-          />
-        </Flex.Item>
-      )}
+        {isExpanded && (
+          <Flex.Item>
+            <ModuleItemListStudent
+              moduleItems={moduleItems}
+              completionRequirements={completionRequirements}
+              isLoading={isLoading}
+              error={error}
+            />
+          </Flex.Item>
+        )}
       </Flex>
     </View>
   )

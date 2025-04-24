@@ -4,9 +4,19 @@ mastery_path_unreleased_items_block_progression:
   applies_to: RootAccount
   display_name: Mastery Path Unreleased Items block Module Progression
   description: When an ungraded assignment will always release at least one item, all possible unreleased items are considered for module progression logic
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 mastery_path_invalidate_assignment_visibility_cache:
   state: hidden
   applies_to: RootAccount
   display_name: Mastery Path Invalidates Assignment Cache
   description: When mastery path changes assignment visibility, invalidate assignment visibility cache for that user
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on

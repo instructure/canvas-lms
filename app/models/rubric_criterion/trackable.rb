@@ -30,9 +30,9 @@ class RubricCriterion
       # track that critereon aligned with outcome
       if should_track_criterion_aligned_with_outcome?
         if ignore_for_scoring
-          InstStatsd::Statsd.increment("rubrics_management.rubric_criterion.aligned_with_outcome")
+          InstStatsd::Statsd.distributed_increment("rubrics_management.rubric_criterion.aligned_with_outcome")
         else
-          InstStatsd::Statsd.increment("rubrics_management.rubric_criterion.aligned_with_outcome_used_for_scoring")
+          InstStatsd::Statsd.distributed_increment("rubrics_management.rubric_criterion.aligned_with_outcome_used_for_scoring")
         end
       end
     end

@@ -24,6 +24,12 @@ import {queryClient} from '@canvas/query'
 import userEvent from '@testing-library/user-event'
 import {FileManagementProvider} from '../../Contexts'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
+import fetchMock from 'fetch-mock'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashSuccess: jest.fn(() => () => {}),
+}))
 
 const renderComponent = () => {
   return render(
@@ -34,10 +40,19 @@ const renderComponent = () => {
     </FileManagementProvider>,
   )
 }
-
+jest.useFakeTimers()
 describe('CreateFolderButton', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    fetchMock.post(/.*\/folders/, 200)
+  })
+
+  afterEach(() => {
+    fetchMock.restore()
+  })
+
   it('can open and close the create folder modal', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({delay: null})
     renderComponent()
 
     const createFolderButton = await screen.findByRole('button', {name: /Folder/i})
@@ -49,6 +64,7 @@ describe('CreateFolderButton', () => {
     await user.click(closeButton)
     await waitFor(() => {
       expect(modalElement).not.toBeInTheDocument()
+      expect(createFolderButton).toHaveFocus()
     })
   })
 
@@ -56,5 +72,22 @@ describe('CreateFolderButton', () => {
     renderComponent()
     const createFolderButton = screen.getByLabelText(/Add Folder/i)
     expect(createFolderButton).toBeInTheDocument()
+  })
+
+  it('shows alert when folder is created successfully', async () => {
+    const user = userEvent.setup({delay: null})
+    renderComponent()
+
+    const createFolderButton = screen.getByRole('button', {name: /Folder/i})
+    await user.click(createFolderButton)
+    const folderNameInput = screen.getByRole('textbox', {name: /folder name/i})
+    await user.type(folderNameInput, 'New Folder')
+    const createButton = screen.getByRole('button', {name: /Create Folder/i})
+    await user.click(createButton)
+
+    jest.runAllTimers()
+    await waitFor(() =>
+      expect(showFlashSuccess).toHaveBeenCalledWith('Folder created successfully'),
+    )
   })
 })

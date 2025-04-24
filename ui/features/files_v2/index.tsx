@@ -21,12 +21,15 @@ import {createRoot} from 'react-dom/client'
 import {RouterProvider} from 'react-router-dom'
 import {QueryProvider} from '@canvas/query'
 import {router} from './routes/router'
+import {FilesErrorBoundary} from './react/components/FilesErrorBoundary'
 
 const root = createRoot(document.getElementById('content')!)
 root.render(
   <React.StrictMode>
-    <QueryProvider>
-      <RouterProvider router={router} />
-    </QueryProvider>
+    <FilesErrorBoundary>
+      <QueryProvider>
+        <RouterProvider router={router} />
+      </QueryProvider>
+    </FilesErrorBoundary>
   </React.StrictMode>
 )

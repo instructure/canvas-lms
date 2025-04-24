@@ -158,7 +158,7 @@ class PeopleSearch extends React.Component<PeopleSearchProps> {
             />
           ) : null}
         </RadioInputGroup>
-        <fieldset>
+        <div className="peoplesearch_container">
           <TextArea
             label={
               <>
@@ -181,13 +181,14 @@ class PeopleSearch extends React.Component<PeopleSearchProps> {
             messages={this.props.searchInputError ? [this.props.searchInputError] : undefined}
             onChange={this.onChangeNameList}
           />
-        </fieldset>
-        <fieldset className="peoplesearch__selections">
+        </div>
+        <div className="peoplesearch_container">
           <Flex
             wrap="wrap"
             gap="large"
             justifyItems="center"
             data-testid="people-search-role-section-container"
+            className="peoplesearch__role-section-container"
           >
             <Flex.Item>
               <CanvasSelect
@@ -221,17 +222,17 @@ class PeopleSearch extends React.Component<PeopleSearchProps> {
               </CanvasSelect>
             </Flex.Item>
           </Flex>
-          <div style={{marginTop: '1em'}}>
-            <Checkbox
-              key="limit_privileges_to_course_section"
-              id="limit_privileges_to_course_section"
-              label={I18n.t('Can interact with users in their section only')}
-              value={0}
-              checked={this.props.limitPrivilege}
-              onChange={this.onChangePrivilege}
-            />
-          </div>
-        </fieldset>
+        </div>
+        <div className="peoplesearch_container">
+          <Checkbox
+            key="limit_privileges_to_course_section"
+            id="limit_privileges_to_course_section"
+            label={I18n.t('Can interact with users in their section only')}
+            value={0}
+            checked={this.props.limitPrivilege}
+            onChange={this.onChangePrivilege}
+          />
+        </div>
         <div className="peoplesearch__instructions">
           <div className="usericon" aria-hidden={true}>
             <IconUserSolid />

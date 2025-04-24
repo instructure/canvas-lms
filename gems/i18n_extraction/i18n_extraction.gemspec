@@ -15,8 +15,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency "i18nliner", "~> 0.1"
   spec.add_dependency "ruby_parser", "~> 3.7"
   spec.add_dependency "sexp_processor", "~> 4.14", ">= 4.14.1"
-
-  spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "~> 3.12"
 end

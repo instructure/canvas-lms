@@ -45,6 +45,8 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
     setTranslationTargetLanguage,
     translateBody,
     translating: translationLoading,
+    errorMessages,
+    setErrorMessages,
   } = useTranslationContext()
 
   const handleChange = (selectedArray: string[]) => {
@@ -64,24 +66,31 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
 
   const handleSubmit = () => {
     if (!input) {
+      setErrorMessages([{type: 'newError', text: I18n.t('Please select a language')}])
       return
     }
 
     if (!selectedLanguage) {
       const result = languages.current.find(({name}) => name === input)
 
-      if (result) {
-        setSelectedLanguage(result)
-      } else {
-        // TODO: error handling
+      if (!result) {
+        setErrorMessages([
+          {
+            type: 'newError',
+            text: I18n.t('There was an error selecting the language. Please try another language.'),
+          },
+        ])
         return
       }
+
+      setSelectedLanguage(result)
     }
 
     if (asPrimary === null) {
       onSetPrimary(false)
     }
 
+    setErrorMessages([])
     translateBody(asPrimary === null ? false : asPrimary)
   }
 
@@ -93,20 +102,25 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
     return languages.current.filter(({name}) => name.toLowerCase().startsWith(input.toLowerCase()))
   }, [languages, input])
 
-  const isDisabled = !input || translationLoading
-
   return (
     <View>
       <Flex direction="column">
+        <View as="div" margin="xx-small 0 0 xx-small">
+          <label id="langauge-selector-label">
+            <Text weight="bold">{I18n.t('Translate To')}</Text>
+          </label>
+        </View>
         <Flex.Item overflowY="visible" padding="small small 0 small">
-          <Flex margin="0 0 medium 0" gap="mediumSmall" alignItems="end">
+          <Flex margin="0 0 medium 0" gap="mediumSmall" alignItems="start">
             <Flex.Item shouldGrow>
               <CanvasMultiSelect
-                label={I18n.t('Translate To')}
+                label=""
+                aria-labelledby="langauge-selector-label"
                 placeholder={I18n.t('Select a language...')}
                 onChange={handleChange}
                 inputValue={input}
                 onInputChange={e => setInput(e.target.value)}
+                messages={errorMessages}
               >
                 {filteredLanguages.map(({id, name}) => (
                   <CanvasMultiSelect.Option
@@ -125,7 +139,7 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
               <Button
                 renderIcon={() => <IconAiLine />}
                 color="secondary"
-                disabled={isDisabled}
+                disabled={translationLoading}
                 onClick={handleSubmit}
               >
                 {I18n.t('Translate')}

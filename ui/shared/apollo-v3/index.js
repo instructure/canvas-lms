@@ -98,6 +98,17 @@ function createCache() {
       return cacheKey
     },
     possibleTypes: possibleTypes,
+    typePolicies: {
+      Query: {
+        fields: {
+          node: {
+            merge(existing = {}, incoming, { mergeObjects }) {
+              return mergeObjects(existing, incoming);
+            },
+          },
+        },
+      },
+    },
   })
 }
 

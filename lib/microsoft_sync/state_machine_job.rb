@@ -311,7 +311,7 @@ module MicrosoftSync
 
     def statsd_increment(bucket, step, error = nil)
       tags = { category: error&.class&.name&.tr(":", "_"), microsoft_sync_step: step.to_s }.compact
-      InstStatsd::Statsd.increment("#{STATSD_PREFIX}.#{bucket}", tags:)
+      InstStatsd::Statsd.distributed_increment("#{STATSD_PREFIX}.#{bucket}", tags:)
     end
 
     def log(&)

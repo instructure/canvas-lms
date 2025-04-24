@@ -40,9 +40,9 @@ module Types
         unless cmps.size == 1
           # preload user to avoid N+1 queries at cmp.user.nil? below
           ConversationMessageParticipant::Preloader.new(records: cmps, associations: :user).call
-          cmps = cmps.reject { |cmp| cmp.user_id == current_user.id || !cmp.active? || cmp.user.nil? }
+          cmps = cmps.reject { |cmp| cmp.user_id == current_user.id || cmp.user.nil? }
         end
-        Loaders::AssociationLoader.for(ConversationMessageParticipant, :user).load_many(cmps)
+        Loaders::AssociationLoader.for(ConversationMessageParticipant.unscoped, :user).load_many(cmps)
       end
     end
 

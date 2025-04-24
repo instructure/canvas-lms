@@ -21,13 +21,19 @@ import {QueryProvider} from '@canvas/query'
 import AlertManager from '@canvas/alerts/react/AlertManager'
 import {SpeedGraderCheckpointsContainer} from './SpeedGraderCheckpointsContainer'
 
+type SpeedGrader = {
+  setOrUpdateSubmission: (submission: any) => any,
+  updateSelectMenuStatus: (student: any) => any,
+}
+
 type Props = {
+  EG: SpeedGrader
   courseId: string
   assignmentId: string
   studentId: string
 }
 
-export const SpeedGraderCheckpointsWrapper = ({courseId, assignmentId, studentId}: Props) => {
+export const SpeedGraderCheckpointsWrapper = ({EG, courseId, assignmentId, studentId}: Props) => {
   const customGradeStatuses = ENV.custom_grade_statuses || []
   const lateSubmissionInterval = ENV?.late_policy?.late_submission_interval || 'day'
 
@@ -36,6 +42,7 @@ export const SpeedGraderCheckpointsWrapper = ({courseId, assignmentId, studentId
       {/* @ts-expect-error */}
       <AlertManager>
         <SpeedGraderCheckpointsContainer
+          EG={EG}
           courseId={courseId}
           assignmentId={assignmentId}
           studentId={studentId}

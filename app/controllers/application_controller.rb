@@ -229,6 +229,7 @@ class ApplicationController < ActionController::Base
           confetti_branding_enabled: Account.site_admin.feature_enabled?(:confetti_branding),
           url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
           url_for_high_contrast_tinymce_editor_css: editor_hc_css,
+          captcha_site_key:,
           current_user_id: @current_user&.id,
           current_user_global_id: @current_user&.global_id,
           current_user_usage_metrics_id: @current_user&.usage_metrics_id,
@@ -259,7 +260,7 @@ class ApplicationController < ActionController::Base
             can_add_pronouns: @domain_root_account&.can_add_pronouns?,
             show_sections_in_course_tray: @domain_root_account&.show_sections_in_course_tray?
           },
-          RAILS_ENVIRONMENT: Canvas.environment,
+          RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.is_a?(Course)
         unless SentryExtensions::Settings.settings.blank?
@@ -293,6 +294,7 @@ class ApplicationController < ActionController::Base
         @js_env[:FEATURES] = cached_features.merge(
           canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme)
         )
+        @js_env[:PENDO_APP_ID] = usage_metrics_api_key if load_usage_metrics?
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(["user_display_json", @current_user].cache_key, expires_in: 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback, :email]) } : {}
         @js_env[:current_user_is_admin] = @context.account_membership_allows(@current_user) if @context.is_a?(Course)
         @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
@@ -328,8 +330,12 @@ class ApplicationController < ActionController::Base
         @js_env[:top_navigation_tools] = external_tools_display_hashes(:top_navigation) if !!@domain_root_account&.feature_enabled?(:top_navigation_placement)
         @js_env[:horizon_course] = @context.is_a?(Course) && @context.horizon_course?
         @js_env[:has_courses] = @context.associated_courses.not_deleted.any? if @context.is_a?(Account)
-        @js_env[:HORIZON_ACCOUNT] = @context.horizon_account? if @context.is_a?(Account)
         @js_env[:horizon_account_locked] = @context.horizon_account_locked? if @context.is_a?(Account)
+        @js_env[:HORIZON_ACCOUNT] = if @context.is_a?(Account)
+                                      @context.horizon_account?
+                                    elsif @context.is_a?(Course)
+                                      @context.account.horizon_account?
+                                    end
         # partner context data
         if @context&.grants_any_right?(@current_user, session, :read, :read_as_admin)
           @js_env[:current_context] = {
@@ -430,7 +436,8 @@ class ApplicationController < ActionController::Base
     embedded_release_notes
     discussions_speedgrader_revisit
     discussion_checkpoints
-    differentiation_tags
+    assign_to_differentiation_tags
+
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest(
     [
@@ -1602,7 +1609,7 @@ class ApplicationController < ActionController::Base
       end
       if !@context
         @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid."
-      elsif (@context.respond_to?(:is_public) && !@context.is_public) && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
+      elsif @context.respond_to?(:is_public) && !@context.is_public && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
         @problem = case @context_type
                    when "course"
                      t "#application.errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
@@ -3343,4 +3350,14 @@ class ApplicationController < ActionController::Base
     !!@domain_root_account&.feature_enabled?(:discussions_reporting)
   end
   helper_method :react_discussions_post_enabled_for_preferences_use?
+
+  # Similar to Account#recaptcha_key, but does not check the `self_registration_captcha?` setting.
+  def captcha_site_key
+    DynamicSettings.find(tree: :private)["recaptcha_client_key"]
+  end
+  helper_method :captcha_site_key
+
+  def require_feature_enabled(feature)
+    not_found unless context&.root_account&.feature_enabled?(feature)
+  end
 end

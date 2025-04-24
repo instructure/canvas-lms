@@ -160,13 +160,13 @@ describe AuthenticationProvider::LDAP do
                                         account_id: 1,
                                         global_id: 2,
                                         should_send_to_statsd?: true)
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
       end
 
       it "sends to statsd on success" do
         allow(@ldap).to receive(:bind_as).and_return(true)
         @aac.ldap_bind_result("user", "pass")
-        expect(InstStatsd::Statsd).to have_received(:increment).with(
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "#{@aac.send(:statsd_prefix)}.ldap_success",
           short_stat: "ldap_success",
           tags: { account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id }
@@ -176,7 +176,7 @@ describe AuthenticationProvider::LDAP do
       it "sends to statsd on failure" do
         allow(@ldap).to receive(:bind_as).and_return(false)
         @aac.ldap_bind_result("user", "pass")
-        expect(InstStatsd::Statsd).to have_received(:increment).with(
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "#{@aac.send(:statsd_prefix)}.ldap_failure",
           short_stat: "ldap_failure",
           tags: { account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id }
@@ -186,7 +186,7 @@ describe AuthenticationProvider::LDAP do
       it "sends to statsd on timeout" do
         allow(@ldap).to receive(:bind_as).and_raise(Timeout::Error)
         @aac.ldap_bind_result("user", "pass")
-        expect(InstStatsd::Statsd).to have_received(:increment).with(
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "#{@aac.send(:statsd_prefix)}.ldap_timeout",
           short_stat: "ldap_timeout",
           tags: {
@@ -199,7 +199,7 @@ describe AuthenticationProvider::LDAP do
       it "sends to statsd on exception" do
         allow(@ldap).to receive(:bind_as).and_raise(StandardError)
         @aac.ldap_bind_result("user", "pass")
-        expect(InstStatsd::Statsd).to have_received(:increment).with(
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "#{@aac.send(:statsd_prefix)}.ldap_error",
           short_stat: "ldap_error",
           tags: {

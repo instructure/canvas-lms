@@ -41,6 +41,7 @@ class Lti::IMS::Registration < ApplicationRecord
   LAUNCH_WIDTH_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/launch_width".freeze
   LAUNCH_HEIGHT_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/launch_height".freeze
   TOOL_ID_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/tool_id".freeze
+  VENDOR_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/vendor".freeze
 
   validates :redirect_uris,
             :initiate_login_uri,
@@ -252,6 +253,10 @@ class Lti::IMS::Registration < ApplicationRecord
 
   def tool_id
     lti_tool_configuration[TOOL_ID_EXTENSION]
+  end
+
+  def vendor
+    lti_tool_configuration[VENDOR_EXTENSION]
   end
 
   private

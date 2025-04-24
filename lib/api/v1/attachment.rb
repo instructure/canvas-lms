@@ -39,13 +39,19 @@ module Api::V1::Attachment
     if options[:can_view_hidden_files] && options[:context]
       options[:master_course_status] = setup_master_course_restrictions(files, options[:context])
     end
+
+    ActiveRecord::Associations::Preloader.new(records: files, associations: [:root_account]).call
+
     files.map do |f|
       attachment_json(f, user, url_options, options)
     end
   end
 
   def attachment_json(attachment, user, url_options = {}, options = {})
-    hash = attachment.slice("id", "uuid", "folder_id", "display_name", "filename")
+    hash = attachment.slice("id", "folder_id", "display_name", "filename")
+
+    hash["uuid"] = attachment.uuid unless Account.site_admin.feature_enabled?(:deprecate_uuid_in_files_api)
+
     hash["upload_status"] = AttachmentUploadStatus.upload_status(attachment)
 
     if options[:can_view_hidden_files] && options[:context] && options[:include]&.include?("blueprint_course_status") && !options[:master_course_status]
@@ -258,7 +264,7 @@ module Api::V1::Attachment
   end
 
   def validate_on_duplicate(params)
-    if params[:on_duplicate] && !%w[rename overwrite].include?(params[:on_duplicate])
+    if params[:on_duplicate] && !%w[rename overwrite error].include?(params[:on_duplicate])
       render status: :bad_request, json: {
         message: "invalid on_duplicate option"
       }
@@ -336,6 +342,10 @@ module Api::V1::Attachment
                        else
                          current_user
                        end
+
+    if params[:on_duplicate] == "error" && folder.active_file_attachments.where(display_name: infer_upload_filename(params)).exists?
+      return render json: { message: "file already exists; use on_duplicate='overwrite' or 'rename'" }, status: :conflict
+    end
 
     if InstFS.enabled?
       additional_capture_params = {}

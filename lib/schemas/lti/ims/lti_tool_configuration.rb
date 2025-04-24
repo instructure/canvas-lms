@@ -124,6 +124,7 @@ module Schemas::Lti::IMS
         ::Lti::IMS::Registration::PRIVACY_LEVEL_EXTENSION =>
           { type: %w[string null], enum: [nil, *Lti::PrivacyLevelExpander::SUPPORTED_LEVELS] },
         ::Lti::IMS::Registration::TOOL_ID_EXTENSION => { type: %w[string null] },
+        ::Lti::IMS::Registration::VENDOR_EXTENSION => { type: %w[string null] },
       }.freeze
     }.freeze
 

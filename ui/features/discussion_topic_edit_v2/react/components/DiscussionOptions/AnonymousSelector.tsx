@@ -20,9 +20,9 @@ import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import theme from '@instructure/canvas-theme'
+import {Heading} from '@instructure/ui-heading'
 import {IconInfoLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
@@ -60,7 +60,7 @@ export const AnonymousSelector = ({
         description={
           <>
             <View display="inline-block">
-              <Text>{I18n.t('Anonymous Discussion')}</Text>
+              <Heading level="h4">{I18n.t('Anonymous Discussion')}</Heading>
             </View>
             <Tooltip
               renderTip={I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}

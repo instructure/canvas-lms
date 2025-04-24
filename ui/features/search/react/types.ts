@@ -25,9 +25,24 @@ export type Result = {
   html_url: string
   distance: number
   relevance: number
+  // added in follow-up API call
+  modules?: Module[]
 }
 
 export type IndexProgress = {
   progress: number
   status: string
+}
+
+export type ModuleSequence = {
+  modules: Module[]
+}
+
+export type Module = {
+  id: number
+  name: string
+  position: number
+  prerequisite_module_ids: number[]
+  published: boolean
+  items_url: string
 }

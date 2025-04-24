@@ -23,31 +23,41 @@ import {Text} from '@instructure/ui-text'
 import ModuleItem from './ModuleItem'
 import {Droppable, Draggable} from 'react-beautiful-dnd'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {CompletionRequirement} from '../utils/types'
-import {ModuleItem as ModuleItemType} from '../utils/types'
+import type {
+  CompletionRequirement,
+  ModuleItem as ModuleItemType,
+  ModuleAction,
+} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
 export interface ModuleItemListProps {
   moduleId: string
+  moduleTitle?: string
   moduleItems: ModuleItemType[]
   completionRequirements?: CompletionRequirement[]
   isLoading: boolean
   error: any
+  setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
+  setSelectedModuleItem?: (item: {id: string; title: string} | null) => void
+  setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
 }
 
 const ModuleItemList: React.FC<ModuleItemListProps> = ({
   moduleId,
+  moduleTitle = '',
   moduleItems,
   completionRequirements,
   isLoading,
   error,
+  setModuleAction,
+  setSelectedModuleItem,
+  setIsManageModuleContentTrayOpen,
+  setSourceModule,
 }) => {
   return (
-    <View
-      as="div"
-      overflowX="hidden"
-    >
+    <View as="div" overflowX="hidden">
       <Droppable droppableId={moduleId} type="MODULE_ITEM">
         {(provided, snapshot) => (
           <div
@@ -57,7 +67,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
               minHeight: '50px',
               background: snapshot.isDraggingOver ? '#F2F4F4' : 'transparent',
               padding: '0',
-              overflowX: 'hidden'
+              overflowX: 'hidden',
             }}
           >
             {isLoading ? (
@@ -85,21 +95,30 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
                         boxShadow: dragSnapshot.isDragging ? '0 2px 8px rgba(0,0,0,0.15)' : 'none',
                         overflowX: 'hidden',
                         borderWidth: item.content?.published ? '0 0 0 large' : '0',
-                        borderColor: 'success'
+                        borderColor: 'success',
                       }}
                       data-item-id={item._id}
                     >
                       <View as="div" borderWidth={`${index === 0 ? '0' : 'small'} 0 0 0`}>
-                        <View as="div" borderWidth="0 0 0 large" borderColor={item.content?.published ? 'success' : 'transparent'}>
+                        <View
+                          as="div"
+                          borderWidth="0 0 0 large"
+                          borderColor={item.content?.published ? 'success' : 'transparent'}
+                        >
                           <ModuleItem
                             {...item}
                             moduleId={moduleId}
+                            moduleTitle={moduleTitle}
                             index={index}
                             id={item.id}
                             published={item.content?.published ?? false}
                             canUnpublish={item.content?.canUnpublish ?? true}
                             completionRequirements={completionRequirements}
                             dragHandleProps={dragProvided.dragHandleProps}
+                            setModuleAction={setModuleAction}
+                            setSelectedModuleItem={setSelectedModuleItem}
+                            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+                            setSourceModule={setSourceModule}
                           />
                         </View>
                       </View>

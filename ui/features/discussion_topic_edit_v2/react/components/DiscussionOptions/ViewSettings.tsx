@@ -21,11 +21,11 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {Checkbox} from '@instructure/ui-checkbox'
 import {FormFieldGroup} from '@instructure/ui-form-field'
+import {Heading} from '@instructure/ui-heading'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {IconInfoLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
 
@@ -52,12 +52,12 @@ export const ViewSettings = ({
   setSortOrder,
   setSortOrderLocked,
 }: Props) => {
-
   const infoToolTipSortOrder = I18n.t(
-    'This setting defines the initial sort order. Students can set their preference. After they change it, future default updates won\'t alter their settings unless locked.',
+    "This setting defines the initial sort order. Students can set their preference. After they change it, future default updates won't alter their settings unless locked.",
   )
   const infoToolTipExpand = I18n.t(
-    'This setting defines the initial thread state. Students can set their preference. After they change it, future default updates won\'t alter their settings unless locked.'  )
+    "This setting defines the initial thread state. Students can set their preference. After they change it, future default updates won't alter their settings unless locked.",
+  )
 
   return (
     <View display="block" margin="medium 0" data-testid="discussion-view-settings">
@@ -69,8 +69,10 @@ export const ViewSettings = ({
           <RadioInputGroup
             name="expanded"
             description={
-              <View>
-               <Text as="span">{I18n.t('Default Thread State')}</Text>
+              <>
+                <View display="inline-block">
+                  <Heading level="h4">{I18n.t('Default Thread State')}</Heading>
+                </View>
                 <Tooltip renderTip={infoToolTipExpand} on={['hover', 'focus']} color="primary">
                   <IconButton
                     renderIcon={IconInfoLine}
@@ -82,7 +84,7 @@ export const ViewSettings = ({
                     screenReaderLabel={infoToolTipExpand}
                   />
                 </Tooltip>
-              </View>
+              </>
             }
             value={expanded + ''}
             onChange={(_event, value) => {
@@ -128,8 +130,10 @@ export const ViewSettings = ({
           <RadioInputGroup
             name="sortOrder"
             description={
-              <View>
-                <Text as="span">{I18n.t('Default Sort Order')}</Text>
+              <>
+                <View display="inline-block">
+                  <Heading level="h4">{I18n.t('Default Sort Order')}</Heading>
+                </View>
                 <Tooltip renderTip={infoToolTipSortOrder} on={['hover', 'focus']} color="primary">
                   <IconButton
                     renderIcon={IconInfoLine}
@@ -141,7 +145,7 @@ export const ViewSettings = ({
                     screenReaderLabel={infoToolTipSortOrder}
                   />
                 </Tooltip>
-              </View>
+              </>
             }
             value={sortOrder}
             onChange={(_event, value) => {

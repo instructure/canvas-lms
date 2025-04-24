@@ -347,7 +347,7 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
     it "returns unprocessable_entity if the answer param is not provided" do
       json = api_formatted_answer(question)
 
-      expect(json["status"]).to eq "unprocessable_entity"
+      expect(Rack::Utils.status_code(json["status"].to_sym)).to eq 422
     end
 
     it "returns an unchanged string when the given answer param is not a number" do

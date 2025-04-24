@@ -52,7 +52,7 @@ describe('useValidateLaunchSettings', () => {
   it('should return no errors for valid launch settings', () => {
     const launchSettings = createLaunchSettings()
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
     expect(Object.values(result.current)).toEqual([[], [], [], [], [], []])
   })
@@ -62,9 +62,11 @@ describe('useValidateLaunchSettings', () => {
       redirectURIs: `${validUrl}\n${invalidUrl}`,
     })
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
-    expect(result.current.redirectUrisMessages).toEqual([{text: 'Invalid URL', type: 'error'}])
+    expect(result.current.redirectUrisMessages).toEqual([
+      {field: 'redirectURIs', text: 'Invalid URL', type: 'error'},
+    ])
   })
 
   it('should return error for missing target link URI', () => {
@@ -72,9 +74,11 @@ describe('useValidateLaunchSettings', () => {
       targetLinkURI: '',
     })
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
-    expect(result.current.targetLinkURIMessages).toEqual([{text: 'Required', type: 'error'}])
+    expect(result.current.targetLinkURIMessages).toEqual([
+      {field: 'targetLinkURI', text: 'Required', type: 'error'},
+    ])
   })
 
   it('should return error for invalid target link URI', () => {
@@ -82,9 +86,11 @@ describe('useValidateLaunchSettings', () => {
       targetLinkURI: invalidUrl,
     })
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
-    expect(result.current.targetLinkURIMessages).toEqual([{text: 'Invalid URL', type: 'error'}])
+    expect(result.current.targetLinkURIMessages).toEqual([
+      {field: 'targetLinkURI', text: 'Invalid URL', type: 'error'},
+    ])
   })
 
   it('should return error for invalid openID Connect Initiation URL', () => {
@@ -92,10 +98,10 @@ describe('useValidateLaunchSettings', () => {
       openIDConnectInitiationURL: invalidUrl,
     })
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
     expect(result.current.openIDConnectInitiationURLMessages).toEqual([
-      {text: 'Invalid URL', type: 'error'},
+      {field: 'openIDConnectInitiationURL', text: 'Invalid URL', type: 'error'},
     ])
   })
 
@@ -105,9 +111,9 @@ describe('useValidateLaunchSettings', () => {
       Jwk: '',
     })
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
-    expect(result.current.jwkMessages).toEqual([{text: 'Required', type: 'error'}])
+    expect(result.current.jwkMessages).toEqual([{field: 'Jwk', text: 'Required', type: 'error'}])
   })
 
   it('should return error for an invalid JWK', () => {
@@ -116,9 +122,9 @@ describe('useValidateLaunchSettings', () => {
       Jwk: invalidJwk,
     })
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
-    expect(result.current.jwkMessages).toEqual([{text: 'Invalid JWK', type: 'error'}])
+    expect(result.current.jwkMessages).toEqual([{field: 'Jwk', text: 'Invalid JWK', type: 'error'}])
   })
 
   it("shouldn't return an error for a valid JWK", () => {
@@ -127,7 +133,7 @@ describe('useValidateLaunchSettings', () => {
       Jwk: validJwk,
     })
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
     expect(result.current.jwkMessages).toEqual([])
   })
@@ -138,9 +144,9 @@ describe('useValidateLaunchSettings', () => {
       JwkURL: '',
     })
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
-    expect(result.current.jwkMessages).toEqual([{text: 'Required', type: 'error'}])
+    expect(result.current.jwkMessages).toEqual([{field: 'JwkURL', text: 'Required', type: 'error'}])
   })
 
   it('should return error for invalid JWK URL', () => {
@@ -149,9 +155,11 @@ describe('useValidateLaunchSettings', () => {
       JwkURL: invalidUrl,
     })
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
-    expect(result.current.jwkMessages).toEqual([{text: 'Invalid URL', type: 'error'}])
+    expect(result.current.jwkMessages).toEqual([
+      {field: 'JwkURL', text: 'Invalid URL', type: 'error'},
+    ])
   })
 
   it('should return error for invalid domain', () => {
@@ -159,10 +167,11 @@ describe('useValidateLaunchSettings', () => {
       domain: invalidUrl,
     })
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
     expect(result.current.domainMessages).toEqual([
       {
+        field: 'domain',
         text: 'Invalid Domain. Please ensure the domain does not start with http:// or https://.',
         type: 'error',
       },
@@ -174,8 +183,10 @@ describe('useValidateLaunchSettings', () => {
       customFields: 'invalidCustomField',
     })
 
-    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
+    const {result} = renderHook(() => useValidateLaunchSettings(launchSettings))
 
-    expect(result.current.customFieldsMessages).toEqual([{text: 'Invalid Format', type: 'error'}])
+    expect(result.current.customFieldsMessages).toEqual([
+      {field: 'customFields', text: 'Invalid Format', type: 'error'},
+    ])
   })
 })

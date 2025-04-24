@@ -370,7 +370,7 @@ class GradebooksController < ApplicationController
   private :show_enhanced_individual_gradebook
 
   def show_learning_mastery
-    InstStatsd::Statsd.increment("outcomes_page_views", tags: { type: "teacher_lmgb" })
+    InstStatsd::Statsd.distributed_increment("outcomes_page_views", tags: { type: "teacher_lmgb" })
     set_current_grading_period if grading_periods?
     set_tutorial_js_env
 
@@ -988,7 +988,7 @@ class GradebooksController < ApplicationController
           submission_json[:has_sub_assignment_submissions] = assignment.has_sub_assignments
           submission_json[:sub_assignment_submissions] = (assignment.has_sub_assignments &&
             assignment.sub_assignments&.map do |sub_assignment|
-              sub_assignment_submission = sub_assignment.submissions.active.find_by(user_id: submission.user_id)
+              sub_assignment_submission = sub_assignment.find_or_create_submission(submission.user)
               sub_assignnment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, @current_user, @session, @context)
             end) || []
         end
@@ -1059,7 +1059,7 @@ class GradebooksController < ApplicationController
     platform_service_speedgrader_enabled = platform_speedgrader_param_enabled && platform_speedgrader_feature_enabled
 
     if platform_service_speedgrader_enabled
-      InstStatsd::Statsd.increment("speedgrader.platform_service.load")
+      InstStatsd::Statsd.distributed_increment("speedgrader.platform_service.load")
       @page_title = t("SpeedGrader")
       @body_classes << "full-width padless-content"
 
@@ -1091,7 +1091,7 @@ class GradebooksController < ApplicationController
       return
     end
 
-    InstStatsd::Statsd.increment("speedgrader.classic.load")
+    InstStatsd::Statsd.distributed_increment("speedgrader.classic.load")
 
     if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
@@ -1778,17 +1778,17 @@ class GradebooksController < ApplicationController
 
   def track_update_metrics(params, submission)
     if params.dig(:submission, :grade) && params["submission"]["grade"].to_s != submission.grade.to_s && params["originator"] == "speed_grader"
-      InstStatsd::Statsd.increment("speedgrader.submission.posted_grade")
+      InstStatsd::Statsd.distributed_increment("speedgrader.submission.posted_grade")
     end
   end
 
   def track_speedgrader_metrics(param_enabled, feature_enabled)
     if param_enabled && feature_enabled
-      InstStatsd::Statsd.increment("speedgrader.modernized.load")
+      InstStatsd::Statsd.distributed_increment("speedgrader.modernized.load")
     elsif feature_enabled
-      InstStatsd::Statsd.increment("speedgrader.legacy.load.fallback")
+      InstStatsd::Statsd.distributed_increment("speedgrader.legacy.load.fallback")
     else
-      InstStatsd::Statsd.increment("speedgrader.legacy.load")
+      InstStatsd::Statsd.distributed_increment("speedgrader.legacy.load")
     end
   end
 end

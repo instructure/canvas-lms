@@ -146,18 +146,18 @@ describe('IconConfirmationWrapper', () => {
     await userEvent.click(input)
     await userEvent.clear(input)
     await userEvent.paste('invalid-url')
+    await userEvent.tab()
 
     expect(screen.getByText('Invalid URL')).toBeInTheDocument()
   })
 
-  it('disables the next button if any of the URLs are invalid', async () => {
+  it('focuses the invalid input if any of the URLs are invalid', async () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: 'global_navigation', icon_url: 'https://example.com/icon'}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
     const onNextButtonClicked = jest.fn()
     const onPreviousButtonClicked = jest.fn()
-
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
@@ -167,45 +167,18 @@ describe('IconConfirmationWrapper', () => {
         onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
-
     const input = screen.getByLabelText(
       new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation)),
     )
     await userEvent.click(input)
     await userEvent.clear(input)
     await userEvent.paste('invalid-url')
-    jest.runAllTimers()
+    await userEvent.tab()
 
-    expect(screen.getByText('Next').closest('button')).toBeDisabled()
-  })
+    await userEvent.click(screen.getByText('Next').closest('button')!)
 
-  it('enables the next button if all URLs are valid', async () => {
-    const internalConfig = mockInternalConfiguration({
-      placements: [{placement: 'global_navigation', icon_url: 'https://example.com/icon'}],
-    })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
-
-    render(
-      <IconConfirmationWrapper
-        overlayStore={overlayStore}
-        internalConfig={internalConfig}
-        reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
-      />,
-    )
-
-    const input = screen.getByLabelText(
-      new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation)),
-    )
-    await userEvent.click(input)
-    await userEvent.clear(input)
-    await userEvent.paste('https://valid-url.com')
-    jest.runAllTimers()
-
-    expect(screen.getByText('Next').closest('button')).not.toBeDisabled()
+    expect(input).toHaveFocus()
+    expect(onNextButtonClicked).not.toHaveBeenCalled()
   })
 
   it('renders a default icon if no icon is provided for the editor button placement', () => {
@@ -300,16 +273,20 @@ describe('IconConfirmationWrapper', () => {
     await userEvent.clear(input)
     await userEvent.paste('https://new-icon-url.com')
 
+    const img = screen.getByTestId(`img-icon-global_navigation`)
+
     expect(input).toHaveValue('https://new-icon-url.com')
     expect(overlayStore.getState().state.icons.placements[LtiPlacements.GlobalNavigation]).toBe(
-      'https://example.com/icon/first',
+      'https://new-icon-url.com',
     )
+    expect(img).toHaveAttribute('src', 'https://example.com/icon/first')
 
     jest.runAllTimers()
 
     expect(overlayStore.getState().state.icons.placements[LtiPlacements.GlobalNavigation]).toBe(
       'https://new-icon-url.com',
     )
+    expect(img).toHaveAttribute('src', 'https://new-icon-url.com')
   })
 
   it('handles users adding new placements', async () => {

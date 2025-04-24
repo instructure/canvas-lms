@@ -16,13 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getByText, findByText, getAllByText, waitFor} from '@testing-library/dom'
+import {findByText, getAllByText, waitFor} from '@testing-library/dom'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {updateModuleItem} from '../jquery/utils'
 import publishOneModuleHelperModule from '../utils/publishOneModuleHelper'
 import {initBody, makeModuleWithItems} from './testHelpers'
 import type {KeyedModuleItems} from '../react/types'
-import RelockModulesDialog from '@canvas/relock-modules-dialog'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
@@ -68,6 +67,7 @@ const updatePublishMenuDisabledState = jest.fn()
 
 describe('publishOneModuleHelper', () => {
   beforeAll(() => {
+    // @ts-expect-error
     window.modules = {
       updatePublishMenuDisabledState,
       initModuleManagement: () => Promise.resolve(),
@@ -113,7 +113,7 @@ describe('publishOneModuleHelper', () => {
         skipItems,
         'Publishing module and items',
         'Module and items published',
-        onPublishComplete
+        onPublishComplete,
       )
       spy.mockClear()
       skipItems = true
@@ -125,7 +125,7 @@ describe('publishOneModuleHelper', () => {
         skipItems,
         'Publishing module',
         'Module published',
-        onPublishComplete
+        onPublishComplete,
       )
     })
   })
@@ -152,7 +152,7 @@ describe('publishOneModuleHelper', () => {
         skipItems,
         'Unpublishing module and items',
         'Module and items unpublished',
-        onPublishComplete
+        onPublishComplete,
       )
     })
   })

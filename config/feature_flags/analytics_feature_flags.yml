@@ -21,6 +21,15 @@ analytics_2_attendance_config_v2:
   root_opt_in: true
   beta: true
   shadow: true
+analytics_2_lti_13_enabled:
+  state: hidden
+  applies_to: Course
+  display_name: New Analytics - LTI 1.3 Enabled
+  description:
+    analytics_2_lti_1p3_enabled_description: Enables the LTI 1.3 New Analytics implementation.
+  beta: true
+  shadow: true
+  after_state_change_proc: analytics_2_after_state_change_hook
 
 # Admin Analytics - Provided through K20 LTI App
 admin_analytics_view_permission:
@@ -54,26 +63,7 @@ admin_analytics_hide_courses_with_no_enrollments:
       to show these courses.
   root_opt_in: true
   beta: false
-admin_analytics_dap_model:
-  state: hidden
-  applies_to: Account
-  display_name: Admin Analytics DAP
-  description:
-    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
-    admin_analytics_dap_model_description: Enables the use of DAP for Analytics at the account-level.
-  root_opt_in: true
-  beta: true
-  shadow: true
-course_analytics_dap_model:
-  state: hidden
-  applies_to: Account
-  display_name: New/Course Analytics DAP
-  description:
-    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
-    admin_analytics_dap_model_description: Enables the use of DAP for Analytics at the account-level.
-  root_opt_in: true
-  beta: true
-  shadow: true
+
 
 # Intelligent Insights - Provided through K20 LTI App
 k20_course_readiness:

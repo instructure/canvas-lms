@@ -260,6 +260,18 @@ const USER_EVENT_OPTIONS = {
   pointerEventsCheck: PointerEventsCheckLevel.Never,
 }
 
+let oldEnv: typeof window.ENV.FEATURES
+beforeEach(() => {
+  oldEnv = window.ENV.FEATURES
+  window.ENV.FEATURES = {
+    extended_submission_state: true,
+  }
+})
+
+afterEach(() => {
+  window.ENV.FEATURES = oldEnv
+})
+
 describe('FilterNav', () => {
   beforeEach(() => {
     let liveRegion = null

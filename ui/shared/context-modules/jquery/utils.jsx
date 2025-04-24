@@ -229,7 +229,7 @@ export function setExpandAllButton() {
   $('#expand_collapse_all').attr('aria-expanded', someVisible ? 'true' : 'false')
 }
 
-export function setExpandAllButtonHandler() {
+export function setExpandAllButtonHandler(lazy_load_callback) {
   $('#expand_collapse_all').click(function () {
     const shouldExpand = $(this).data('expand')
 
@@ -249,7 +249,7 @@ export function setExpandAllButtonHandler() {
     $(this).data('expand', !shouldExpand)
     $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
 
-    $('.context_module').each(function () {
+    $('.context_module:not(#context_module_blank)').each(function () {
       const $module = $(this)
       if (
         (shouldExpand && $module.find('.content:visible').length === 0) ||
@@ -261,18 +261,22 @@ export function setExpandAllButtonHandler() {
             .css('display', shouldExpand ? 'inline-block' : 'none')
           $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
           $module.find('.footer .manage_module').css('display', '')
-          $module.toggleClass('collapsed_module', shouldExpand)
+          $module.toggleClass('collapsed_module', !shouldExpand)
         }
         $module.find('.content').slideToggle({
           queue: false,
-          done: callback(),
+          done: callback,
         })
       }
     })
 
     const url = $(this).data('url')
     const collapse = shouldExpand ? '0' : '1'
-    $.ajaxJSON(url, 'POST', {collapse})
+    $.ajaxJSON(url, 'POST', {collapse}, _data => {
+      if (shouldExpand) {
+        lazy_load_callback?.()
+      }
+    })
   })
 }
 
@@ -549,7 +553,7 @@ export function openExternalTool(ev) {
 }
 
 let externalToolRoot = null
-const getExternalToolRoot = function() {
+const getExternalToolRoot = function () {
   if (!externalToolRoot) {
     externalToolRoot = createRoot($('#external-tool-mount-point')[0])
   }

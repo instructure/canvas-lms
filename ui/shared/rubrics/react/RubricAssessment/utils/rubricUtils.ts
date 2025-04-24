@@ -19,6 +19,9 @@
 import htmlEscape from '@instructure/html-escape'
 import type {RubricAssessmentData, RubricCriterion, RubricRating} from '../../types/rubric'
 
+import {useScope as createI18nScope} from '@canvas/i18n'
+const I18n = createI18nScope('enhanced-rubrics-assessment')
+
 export const htmlEscapeCriteriaLongDescription = (criteria: RubricCriterion) => {
   const {longDescription} = criteria
 
@@ -87,4 +90,20 @@ export const findCriterionMatchingRatingId = (
 
   return ratings.find(rating => rating.id === id && (criterionUseRange || rating.points === points))
     ?.id
+}
+
+export const rubricSelectedAriaLabel = (isSelected: boolean, isSelfAssessmentSelected: boolean) => {
+  if (isSelected && isSelfAssessmentSelected) {
+    return I18n.t('Selected and Self Assessment')
+  }
+
+  if (isSelected) {
+    return I18n.t('Selected')
+  }
+
+  if (isSelfAssessmentSelected) {
+    return I18n.t('Self Assessment')
+  }
+
+  return ''
 }

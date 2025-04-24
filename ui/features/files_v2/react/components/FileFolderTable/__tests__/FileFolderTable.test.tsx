@@ -58,9 +58,10 @@ describe('FileFolderTable', () => {
   })
 
   it('renders no filedrop when searching', () => {
-    renderComponent({ searchString: 'fileDoesNotExist' })
+    renderComponent({searchString: 'fileDoesNotExist'})
 
-    expect(screen.getByText('No Results')).toBeInTheDocument()
+    const noResultsElements = screen.getAllByText('No results found')
+    expect(noResultsElements.length).toBeGreaterThan(0)
     expect(screen.queryByText('Drop files here to upload')).not.toBeInTheDocument()
   })
 
@@ -128,13 +129,13 @@ describe('FileFolderTable', () => {
   it('has labels for checkboxes', async () => {
     renderComponent({rows: [FAKE_FILES[0], FAKE_FOLDERS[0]]})
 
-    const selectAllCheckbox = screen.getByLabelText('Select all items')
+    const selectAllCheckbox = screen.getByLabelText('Select all files and folders')
     expect(selectAllCheckbox).toBeInTheDocument()
 
-    const fileCheckbox = screen.getByLabelText(FAKE_FILES[0].display_name)
+    const fileCheckbox = screen.getByLabelText(`Audio File ${FAKE_FILES[0].display_name}`)
     expect(fileCheckbox).toBeInTheDocument()
 
-    const folderCheckbox = screen.getByLabelText(FAKE_FOLDERS[0].name)
+    const folderCheckbox = screen.getByLabelText(`Folder ${FAKE_FOLDERS[0].name}`)
     expect(folderCheckbox).toBeInTheDocument()
   })
 

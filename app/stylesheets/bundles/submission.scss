@@ -226,6 +226,26 @@ body.is-inside-submission-frame {
   }
 }
 
+.submission_description {
+  width: 600px;
+  margin: 10px auto;
+  p {
+    button {
+      background: none;
+      color: var(--ic-link-color);
+      border: none;
+      padding: 0;
+      font: inherit;
+      text-decoration: none;
+      &:hover {
+        color: var(--ic-link-color);
+        text-decoration: underline;
+      }
+    }
+  }
+
+}
+
 #add_comment_form {
   label.add_a_comment {
     font-size: 1rem;

@@ -63,7 +63,10 @@ const MODULES_QUERY = gql`
   }
 `
 
-async function getModules({queryKey, pageParam}: {queryKey: any, pageParam?: string}): Promise<ModulesResponse> {
+async function getModules({
+  queryKey,
+  pageParam,
+}: {queryKey: any; pageParam?: string}): Promise<ModulesResponse> {
   const [_key, courseId] = queryKey
   const cursor = pageParam || null
   try {
@@ -105,6 +108,7 @@ export function useModules(courseId: string) {
   return useAllPages<ModulesResponse, Error>({
     queryKey: ['modules', courseId],
     queryFn: getModules,
-    getNextPageParam: (lastPage: ModulesResponse) => lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined,
+    getNextPageParam: (lastPage: ModulesResponse) =>
+      lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined,
   })
 }

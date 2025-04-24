@@ -244,40 +244,71 @@ ready(function () {
     errorRoot = null
   })
 
-  if (submissionForm.attr('id') === 'submit_online_url_form') {
+  const tabList = document.getElementById('submit_assignment_tabs')
+  let submitting_online_url_form = false
+
+  const handleTabSelection = (mutationsList) => {
+    mutationsList.forEach(mutation => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'aria-selected') {
+        const li = mutation.target
+        if (li.getAttribute('aria-selected') === 'true') {
+          if (li.getAttribute('aria-controls') === 'submit_online_url_form') {
+            handleSubmitOnlineUrlForm()
+          } else {
+            submitting_online_url_form = false
+            submissionForm.off('submit')
+            setUpFormSubmissionHandler()
+          }
+        }
+      }
+    })
+  }
+
+  const disableSubmitButton = (form) => {
+    $(form)
+      .find("button[type='submit']")
+      .text(I18n.t('messages.submitting', 'Submitting...'))
+      .prop('disabled', true)
+  }
+
+  const reenableSubmitButton = (form) => {
+    $(form)
+      .find('button[type=submit]')
+      .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
+      .prop('disabled', false)
+  }
+
+  const handleSubmitOnlineUrlForm = () => {
+    submitting_online_url_form = true
     submissionForm.formSubmit({
       formErrors: false,
-      processData(data) {
-        return {...data, should_redirect_to_assignment: true}
-      },
-      beforeSubmit(data) {
+      processData: data => ({ ...data, should_redirect_to_assignment: true }),
+      beforeSubmit: (data) => {
         if (data['submission[url]']) {
           submitting = true
-          $(this)
-            .find("button[type='submit']")
-            .text(I18n.t('messages.submitting', 'Submitting...'))
-            .prop('disabled', true)
+          disableSubmitButton(submissionForm)
         } else {
           handleOnlineUrlSubmissionError()
           return false
         }
       },
-      success(data) {
+      success: (data) => {
         const location = data['redirect_url']
         if (location) {
           window.location.href = location
         }
       },
-      error(_data) {
-        submissionForm
-          .find("button[type='submit']")
-          .text(I18n.t('Submit Assignment'))
-        submissionForm.find('button').prop('disabled', false)
+      error: (_data) => {
+        reenableSubmitButton(submissionForm)
         handleOnlineUrlSubmissionError()
-      }
+      },
     })
-  } else {
+  }
+
+  const setUpFormSubmissionHandler = () => {
     submissionForm.submit(function (event) {
+      if (submitting_online_url_form) return
+
       const self = this
       const parser = new DOMParser()
 
@@ -330,11 +361,7 @@ ready(function () {
       }
 
       RichContentEditor.closeRCE($('#submit_online_text_entry_form textarea:first'))
-
-      $(this)
-        .find("button[type='submit']")
-        .text(I18n.t('messages.submitting', 'Submitting...'))
-        .prop('disabled', true)
+      disableSubmitButton(this)
 
       if ($(this).attr('id') === 'submit_online_upload_form') {
         event.preventDefault() && event.stopPropagation()
@@ -356,13 +383,6 @@ ready(function () {
           })
 
         const uploadedAttachmentIds = $(this).find('#submission_attachment_ids').val()
-
-        const reenableSubmitButton = function () {
-          $(self)
-            .find('button[type=submit]')
-            .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
-            .prop('disabled', false)
-        }
 
         const progressIndicator = function (event) {
           if (event.lengthComputable) {
@@ -393,7 +413,7 @@ ready(function () {
           setShouldShowFileRequiredError(true)
           checkPledgeCheck(uploadPledgeCheckbox, PLEDGE_TYPES.UPLOAD)
           fileDrop?.focus()
-          reenableSubmitButton()
+          reenableSubmitButton(this)
           return false
         }
 
@@ -429,10 +449,9 @@ ready(function () {
         }
 
         if (!checkPledgeCheck(uploadPledgeCheckbox, PLEDGE_TYPES.UPLOAD)) {
-          reenableSubmitButton()
+          reenableSubmitButton(this)
           return false
         }
-
         $.ajaxJSONPreparedFiles.call(this, {
           handle_files(attachments, data) {
             const ids = (data['submission[attachment_ids]'] || '').split(',').filter(id => id !== '')
@@ -469,6 +488,18 @@ ready(function () {
       } else {
         submitting = true
       }
+    })
+  }
+
+  if (tabList) {
+    const observer = new MutationObserver(handleTabSelection)
+    const config = { attributes: true, subtree: true, attributeFilter: ['aria-selected'] }
+
+    const tabItems = tabList.querySelectorAll('li')
+    tabItems.forEach((li) => observer.observe(li, config))
+
+    window.addEventListener('unload', () => {
+      observer.disconnect()
     })
   }
 

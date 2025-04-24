@@ -1046,8 +1046,11 @@ describe "Groups API", type: :request do
     end
 
     it "bulks add users to non collaborative groups" do
-      Account.default.enable_feature!(:differentiation_tags)
       course_with_teacher(active_all: true)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
       category = @course.group_categories.create(name: "category", non_collaborative: true)
       @group = @course.groups.create!(name: "G1", group_category: category, non_collaborative: true)
       user = student_in_course(active_all: true).user
@@ -1062,8 +1065,11 @@ describe "Groups API", type: :request do
 
     describe "POST /api/v1/groups/:group_id/memberships (Differentiation Tag Membership)" do
       before do
-        Account.default.enable_feature!(:differentiation_tags)
         course_with_teacher(active_all: true)
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.account.reload
         category = @course.group_categories.create!(name: "Differentiation", non_collaborative: true)
         @group = @course.groups.create!(name: "Diff Group", group_category: category, non_collaborative: true)
         user_session(@teacher)

@@ -348,7 +348,7 @@ class RubricAssociation < ActiveRecord::Base
       rating[:points] = assessment_points(criterion, data) if has_score
 
       if !has_score && opts[:get_score_from_rating] && !association.hide_points
-        rating[:points] = criterion.ratings.find { |rating| rating.description == data[:description] }&.points
+        rating[:points] = criterion.ratings.find { |r| r.description == data[:description] }&.points
       end
 
       rating[:criterion_id] = criterion.id

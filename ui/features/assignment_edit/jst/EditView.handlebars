@@ -17,12 +17,15 @@
       <input type="hidden" name="name" value="{{name}}"></input>
     {{else}}
       <div>
-        <label for="assignment_name">{{#t}}Assignment Name{{/t}}</label>
+        <label for="assignment_name">{{#t}}Assignment Name{{/t}}
+          <span id="assignment_name_asterisk" aria-hidden="true">*</span>
+        </label>
         <input id="assignment_name"
           name="name"
           placeholder="{{#t "assignment_name"}}Assignment Name{{/t}}"
           value="{{name}}"
           type="text"
+          required
           class="input-block-level"
           {{#if inClosedGradingPeriod}}
             readonly

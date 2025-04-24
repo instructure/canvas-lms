@@ -212,6 +212,11 @@ export const findModalMocks = ({
 
 const parentAccountMock = count => ({
   __typename: 'ParentAccountsConnection',
+  pageInfo: {
+    __typename: 'PageInfo',
+    endCursor: null,
+    hasNextPage: false,
+  },
   nodes: new Array(count).fill(0).map((_v, i) => ({
     __typename: 'Account',
     rootOutcomeGroup: {

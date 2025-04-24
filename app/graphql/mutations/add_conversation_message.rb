@@ -51,14 +51,14 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
       media_comment_id: input[:media_comment_id],
       media_comment_type: input[:media_comment_type]
     )
-    InstStatsd::Statsd.increment("inbox.message.sent.isReply.react")
-    InstStatsd::Statsd.increment("inbox.message.sent.react")
+    InstStatsd::Statsd.distributed_increment("inbox.message.sent.isReply.react")
+    InstStatsd::Statsd.distributed_increment("inbox.message.sent.react")
     InstStatsd::Statsd.count("inbox.message.sent.recipients.react", message[:recipients_count])
     if input[:media_comment_id] || ConversationMessage.where(id: message[:message]&.id).first&.has_media_objects
-      InstStatsd::Statsd.increment("inbox.message.sent.media.react")
+      InstStatsd::Statsd.distributed_increment("inbox.message.sent.media.react")
     end
     if !message[:message].nil? && message[:message][:attachment_ids].present?
-      InstStatsd::Statsd.increment("inbox.message.sent.attachment.react")
+      InstStatsd::Statsd.distributed_increment("inbox.message.sent.attachment.react")
     end
     { conversation_message: message[:message] }
   rescue ActiveRecord::RecordNotFound

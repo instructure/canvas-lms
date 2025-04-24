@@ -17,7 +17,8 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React from 'react'
+import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
+import Badges from './Badges'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
@@ -33,18 +34,21 @@ interface ExternalLinksProps {
 
 const ExternalLinks = (props: ExternalLinksProps) => {
   const {product} = props
+  const {isMobile} = useBreakpoints()
 
   return (
     <div>
       <Flex direction="column" gap="medium">
-        <Flex direction="column">
-          <Flex.Item margin="0 0 small 0">
+        <Flex direction="column" width={isMobile ? '70%' : '90%'}>
+          <Flex.Item margin="0 0 medium 0">
             <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
               {I18n.t('Privacy')}
             </Heading>
           </Flex.Item>
           {product.privacy_policy_url ? (
-            <Flex direction="column">
+            <Flex
+              margin={product.privacy_and_security_badges.length > 0 ? '0 0 large 0' : '0 0 0 0'}
+            >
               <Flex.Item>
                 <Link href={product.privacy_policy_url} isWithinText={false} target="_blank">
                   <Text weight="bold">
@@ -58,6 +62,7 @@ const ExternalLinks = (props: ExternalLinksProps) => {
               {I18n.t('The privacy information for this provider is not currently available.')}
             </Flex.Item>
           )}
+          <Badges badges={product.privacy_and_security_badges[0]} />
         </Flex>
         <Flex direction="column">
           <Flex.Item margin="0 0 small 0">
@@ -76,21 +81,24 @@ const ExternalLinks = (props: ExternalLinksProps) => {
               </Flex.Item>
             </Flex>
           ) : (
-            <Flex.Item>
+            <Flex.Item margin={product.privacy_and_security_badges.length > 0 ? '0 0 large 0' : '0 0 0 0'}>
               {I18n.t(
                 'The terms of service documentation for this provider is not currently available.',
               )}
             </Flex.Item>
           )}
         </Flex>
-        <Flex direction="column">
+        <Flex direction="column" width={isMobile ? '70%' : '90%'}>
           <Flex.Item margin="0 0 small 0">
             <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
               {I18n.t('Accessibility')}
             </Heading>
           </Flex.Item>
           {product.accessibility_url ? (
-            <Flex direction="column">
+            <Flex
+              direction="column"
+              margin={product.accessibility_badges.length > 0 ? '0 0 large 0' : '0 0 0 0'}
+            >
               <Flex.Item>
                 <Link href={product.accessibility_url} isWithinText={false} target="_blank">
                   <Text weight="bold">
@@ -100,12 +108,13 @@ const ExternalLinks = (props: ExternalLinksProps) => {
               </Flex.Item>
             </Flex>
           ) : (
-            <Flex.Item>
+            <Flex.Item margin={product.accessibility_badges.length > 0 ? '0 0 large 0' : '0 0 0 0'}>
               {I18n.t(
                 'The accessibility documentation for this provider is not currently available.',
               )}
             </Flex.Item>
           )}
+          <Badges badges={product.accessibility_badges[0]} />
         </Flex>
       </Flex>
     </div>

@@ -21,29 +21,23 @@ import {render, screen, waitFor} from '@testing-library/react'
 
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import fetchMock from 'fetch-mock'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import FilesUsageBar from '../FilesUsageBar'
 import {FileManagementProvider} from '../Contexts'
 import {createMockFileManagementContext} from '../../__tests__/createMockContext'
-
-const FILES_USAGE_RESULT = {
-  quota_used: 500_000,
-  quota: 1_000_000,
-}
+import {useGetQuota} from '../../hooks/useGetQuota'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: jest.fn().mockReturnValue(jest.fn()),
 }))
 
+jest.mock('../../hooks/useGetQuota', () => ({
+  useGetQuota: jest.fn(),
+}))
+
 describe('FilesUsageBar', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    fetchMock.get(/.*\/files\/quota/, FILES_USAGE_RESULT)
-  })
-
-  afterEach(() => {
-    fetchMock.restore()
   })
 
   const renderComponent = () => {
@@ -71,16 +65,29 @@ describe('FilesUsageBar', () => {
   }
 
   it('renders progress bar with quota data when fetch is successful', async () => {
+    (useGetQuota as jest.Mock).mockImplementation(() => ({
+      data: { quota_used: 500_000, quota: 1_000_000 },
+      error: null,
+      isLoading: false,
+    }))
+
     renderComponent()
     const usageText = await screen.findByText(`500 KB of 1 MB used`)
     expect(usageText).toBeInTheDocument()
 
-    const progressBar = document.querySelector('progress[aria-valuetext="File Storage Quota Used 500 KB of 1 MB used"]');
+    const progressBar = document.querySelector(
+      'progress[aria-valuetext="File Storage Quota Used 500 KB of 1 MB used"]',
+    )
     expect(progressBar).toBeInTheDocument()
   })
 
   it('displays error message if quota fetch fails', async () => {
-    fetchMock.get(/.*\/files\/quota/, 500, {overwriteRoutes: true})
+    (useGetQuota as jest.Mock).mockImplementation(() => ({
+      data: null,
+      error: new Error('Failed to fetch quota'),
+      isLoading: false,
+    }))
+
     renderComponent()
     await waitFor(() => {
       expect(showFlashError).toHaveBeenCalledWith(

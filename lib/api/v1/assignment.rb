@@ -1278,7 +1278,7 @@ module Api::V1::Assignment
     tool = nil
     case assignment_params["configuration_tool_type"]
     when "ContextExternalTool"
-      tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
+      tool = Lti::ToolFinder.from_id(tool_id, context)
     when "Lti::MessageHandler"
       mh = Lti::MessageHandler.find(tool_id)
       mh_context = mh.resource_handler.tool_proxy.context

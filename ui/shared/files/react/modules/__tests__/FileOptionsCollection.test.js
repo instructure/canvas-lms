@@ -65,6 +65,7 @@ describe('FileOptionsCollection', () => {
     FileOptionsCollection.setUploadOptions({
       alwaysRename: false,
       alwaysUploadZips: false,
+      errorOnDuplicate: false,
     })
   })
 
@@ -172,6 +173,36 @@ describe('FileOptionsCollection', () => {
     const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
     expect(resolved).toHaveLength(1)
     expect(collisions).toHaveLength(0)
+    expect(zips).toHaveLength(0)
+  })
+
+  test('segregateOptionBuckets sets dup to error when errorOnDuplicate is true and no dup provided', () => {
+    setupFolderWith(['baz'])
+    FileOptionsCollection.setUploadOptions({errorOnDuplicate: true})
+    const one = createFileOption('foo')
+    const two = createFileOption('bar', 'overwrite')
+    const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one, two])
+    expect(resolved).toHaveLength(2)
+    expect(resolved[0].dup).toBe('error')
+    expect(resolved[1].dup).toBe('overwrite')
+    expect(collisions).toHaveLength(0)
+    expect(zips).toHaveLength(0)
+  })
+
+  test('segregateOptionBuckets catches known duplicates even when errorOnDuplicate is true', () => {
+    setupFolderWith(['foo', 'bar', 'baz'])
+    FileOptionsCollection.setUploadOptions({errorOnDuplicate: true})
+    const one = createFileOption('foo')
+    const two = createFileOption('bar')
+    const three = createFileOption('boop')
+    const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([
+      one,
+      two,
+      three,
+    ])
+    expect(resolved).toHaveLength(1)
+    expect(resolved[0].dup).toBe('error')
+    expect(collisions).toHaveLength(2)
     expect(zips).toHaveLength(0)
   })
 })

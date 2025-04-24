@@ -255,10 +255,10 @@ describe "student groups" do
       end
 
       it "student group leader can manage group", priority: "2" do
-        fln("Manage").click
+        f("[data-testid='open-manage-modal'").click
         wait_for_ajaximations
 
-        expect(f(".ui-dialog-titlebar")).to include_text("Manage Student Group")
+        expect(f("[data-testid='dialog-heading']")).to include_text("Manage Student Group")
       end
 
       it "shows error messages for group name field", :ignore_js_errors do
@@ -268,7 +268,7 @@ describe "student groups" do
 
         get "/courses/#{@course.id}/groups"
 
-        fln("Manage").click
+        f("[data-testid='open-manage-modal'").click
         wait_for_ajaximations
 
         # leave the field empty
@@ -310,14 +310,14 @@ describe "student groups" do
       end
 
       it "populates dialog with current group name", priority: "2" do
-        fln("Manage").click
+        f("[data-testid='open-manage-modal'").click
         wait_for_ajaximations
 
         expect(f("#group_name")).to have_attribute(:value, group_name.to_s)
       end
 
       it "changes group name", priority: "2" do
-        fln("Manage").click
+        f("[data-testid='open-manage-modal'").click
         wait_for_ajaximations
 
         addition = "CRIT"
@@ -340,7 +340,7 @@ describe "student groups" do
         expect(students.length).to eq 2
         expect(students[1]).to include_text("nobody@example.com")
 
-        fln("Manage").click
+        f("[data-testid='open-manage-modal'").click
         wait_for_ajaximations
         students = User.where(name: ["Test Student 1", "Test Student 2"]).pluck(:id)
         students.each do |u|

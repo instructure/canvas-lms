@@ -54,7 +54,7 @@
 </style>
 
 <div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
-  <ul>
+  <ul aria-label="<%= t("Account setting tabs") %>">
     <% if can_do(@context, @current_user, :manage_account_settings) %>
     <li><a href="#tab-settings" id="tab-settings-link"><%= t(:tab_settings, "Settings") %></a></li>
     <% end %>
@@ -92,7 +92,7 @@
     <% end %>
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
-    <div id="tab-settings">
+    <div  tabindex="0" id="tab-settings">
       <h2 class="screenreader-only"><%= t('headings.settings', "Account Settings") %></h2>
       <%= form_for :account, url: account_url(@account), html: {novalidate: true, method: :put, id: "account_settings", class: "account_settings"} do |f| %>
         <fieldset>
@@ -598,7 +598,7 @@
               </div>
             </div>
 
-            <% if !@account.site_admin? && @account.feature_enabled?(:differentiation_tags) && @account.feature_enabled?(:assign_to_differentiation_tags) %>
+            <% if !@account.site_admin? && @account.feature_enabled?(:assign_to_differentiation_tags) %>
               <div>
                 <% diff_tags = @account.allow_assign_to_differentiation_tags %>
                 <% disabled = diff_tags[:locked] && diff_tags[:inherited] %>
@@ -1054,17 +1054,17 @@ acknowledge that you have read and agreed to the
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_storage_quotas) %>
-    <div id="tab-quotas">
+    <div  tabindex="0" id="tab-quotas">
       <h2 class="screenreader-only"><%= t('headings.quotas', "Account Quotas") %></h2>
       <div id="quotas_tab_content_mount_point"></div>
     </div>
   <% end %>
   <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && @account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
-    <div id="tab-integrations">
+    <div  tabindex="0" id="tab-integrations">
     </div>
   <% end %>
   <% if can_do(@context, @current_user, :manage_account_settings) && @account.primary_settings_root_account? && !@account.site_admin? %>
-    <div id="tab-notifications" data-values="<%=
+    <div  tabindex="0" id="tab-notifications" data-values="<%=
       default_name = @account.settings[:outgoing_email_default_name]
       {
         externalWarning: @account.settings[:external_notification_warning],
@@ -1075,7 +1075,7 @@ acknowledge that you have read and agreed to the
     %>"></div>
   <% end %>
 
-  <div id="tab-users">
+  <div tabindex="0" id="tab-users">
     <h2><%= t(:account_admins_title, "Account Admins") %></h2>
     <ul class="admins_list user_list list admins">
       <%= render :partial => 'account_user', :collection => @account_users %>
@@ -1111,7 +1111,7 @@ acknowledge that you have read and agreed to the
     <% end %>
   </div>
 
-  <div id="tab-announcements">
+  <div tabindex="0" id="tab-announcements">
     <h2><%= t(:global_announcements_title, "Global Announcements") %></h2>
         <% if can_do(@account, @current_user, :manage_alerts) %>
       <button id="add_announcement_button" class="Button Button--primary element_toggler add_notification_toggle_focus" title="<%= t('Add New Announcement') %>" aria-label="<%= t('Add New Announcement') %>">
@@ -1412,32 +1412,32 @@ acknowledge that you have read and agreed to the
     </ul>
   </div>
   <% if can_do(@context, @current_user, :read_reports) %>
-    <div id="tab-reports">
+    <div tabindex="0" id="tab-reports">
       <p><%= t("Loading...") %></p>
       <!-- this will be populated by an xhr request to AccountsController::reports_tab -->
     </div>
   <% end %>
   <% if can_do(@context, @current_user, :read_as_admin) %>
-      <div id="tab-tools">
+      <div tabindex="0" id="tab-tools">
         <%= render :partial => 'external_tools/external_tools' %>
       </div>
   <% end %>
   <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
-      <div id="tab-alerts">
+      <div  tabindex="0" id="tab-alerts">
         <div id="alerts_mount_point"></div>
       </div>
   <% end %>
   <% if can_do(@context, @current_user, :view_feature_flags) %>
-    <div id="tab-features"></div>
+    <div tabindex="0" id="tab-features"></div>
   <% end %>
   <% if @account.root_account.feature_enabled?(:javascript_csp) && can_do(@context, @current_user, :manage_account_settings) && !@account.site_admin? %>
-    <div id="tab-security"></div>
+    <div tabindex="0" id="tab-security"></div>
   <% end %>
   <% if @account.site_admin? && can_do(@context, @current_user, :manage_internal_settings) %>
-    <div id="tab-internal-settings"></div>
+    <div  tabindex="0" id="tab-internal-settings"></div>
   <% end %>
   <% if @account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
-    <div id="tab-canvas-career">
+    <div tabindex="0" id="tab-canvas-career">
       <% js_bundle :horizon_toggle %>
     </div>
   <% end %>

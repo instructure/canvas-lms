@@ -80,10 +80,6 @@ const BulkActionButtons = ({
       ),
     [rows, selectedRows],
   )
-  const containsFolders = useMemo(
-    () => Array.from(selectedRows).some(itemId => /^[0-9]+$/.test(itemId)),
-    [selectedRows],
-  )
 
   const selectedText = !isEnabled
     ? I18n.t('0 selected')
@@ -162,10 +158,7 @@ const BulkActionButtons = ({
           <Flex.Item>
             <Text>{selectedText}</Text>
           </Flex.Item>
-          <DisabledActionsInfoButton
-            isBlueprintChildCourse={ENV.BLUEPRINT_COURSES_DATA?.isChildCourse || false}
-            size={size}
-          />
+          {ENV.BLUEPRINT_COURSES_DATA?.isChildCourse && <DisabledActionsInfoButton size={size} />}
         </Flex>
         <Flex gap="small" direction={direction}>
           {renderTooltip(
@@ -201,7 +194,7 @@ const BulkActionButtons = ({
               </Button>,
               !isEnabled || containsLockedBPItems,
             )}
-          {renderTooltip(
+          {userCanEditFilesForContext && renderTooltip(
             <Flex.Item>
               <Menu
                 placement="bottom"
@@ -220,16 +213,6 @@ const BulkActionButtons = ({
                   </Button>
                 }
               >
-                <Menu.Item disabled={containsFolders} data-testid="bulk-actions-view-button">
-                  <Flex alignItems="center" gap="x-small">
-                    <Flex.Item>
-                      <IconEyeLine inline={false} />
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Text>{I18n.t('View')}</Text>
-                    </Flex.Item>
-                  </Flex>
-                </Menu.Item>
                 {userCanRestrictFilesForContext && (
                   <Menu.Item
                     disabled={containsLockedBPItems}

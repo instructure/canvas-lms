@@ -70,6 +70,12 @@ describe "Screenreader Gradebook grading" do
       @dtp.save!
     end
 
+    it "loads discussion when not speedgrader", :ignore_js_errors do
+      # discussions are loaded in many places with many params, this is one way and it shouldn't break.
+      get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}?embed=true&headless=1&student_id=#{@student2.id}"
+      expect(f("body").text).to include("reply to topic i0")
+    end
+
     context "discussions_speedgrader_revisit" do
       before do
         @course.account.enable_feature!(:discussions_speedgrader_revisit)

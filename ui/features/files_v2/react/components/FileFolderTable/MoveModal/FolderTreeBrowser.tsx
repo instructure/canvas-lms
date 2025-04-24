@@ -16,23 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {forwardRef, useCallback, useImperativeHandle, useRef, useState} from 'react'
+import {forwardRef, useCallback, useImperativeHandle, useRef, useState, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import useFetchApi from '@canvas/use-fetch-api-hook'
 import {Alert} from '@instructure/ui-alerts'
-import {Spinner} from '@instructure/ui-spinner'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
 import {FormFieldMessage} from '@instructure/ui-form-field'
 import {Collection, CollectionData} from '@instructure/ui-tree-browser/types/TreeBrowser/props'
 import {View} from '@instructure/ui-view'
+import {useFoldersQuery} from './hooks'
+import {FolderCollection,addNewFoldersToCollection} from './utils'
 import {type Folder} from '../../../../interfaces/File'
-
-type ApiFolderItem = {id: number; name: string}
-
-type FolderCollection = Record<number | string, Collection>
-
-type ApiFoldersResponse = ApiFolderItem[]
 
 export type FolderTreeBrowserRef = {
   validate: () => boolean
@@ -43,26 +36,13 @@ type FolderTreeBrowserProps = {
   onSelectFolder?: (folder: Collection | null) => void
 }
 
-const requestInnerFolders = (folderId: number | string) => {
-  return doFetchApi<ApiFoldersResponse>({
-    path: `/api/v1/folders/${folderId}/folders`,
-  })
-}
-
-const parseFoldersResponse = (response: ApiFoldersResponse) =>
-  response.reduce((result: FolderCollection, item: ApiFolderItem) => {
-    result[item.id] = item
-    return result
-  }, {})
-
 const I18n = createI18nScope('files_v2')
 
 const FolderTreeBrowser = forwardRef<FolderTreeBrowserRef, FolderTreeBrowserProps>(
   ({rootFolder, onSelectFolder}, ref) => {
     const containerRef = useRef<Element | null>(null)
     const hasValidSelection = useRef<boolean>(false)
-    const [loading, setLoading] = useState<boolean>(false)
-    const [fetchError, setFetchError] = useState<Error | null>(null)
+    const [currentFolderId, setCurrentFolderId] = useState<string>(rootFolder.id)
     const [formError, setFormError] = useState<string | null>(null)
     const [folders, setFolders] = useState<FolderCollection>({
       [rootFolder.id]: {id: rootFolder.id, name: rootFolder.name},
@@ -83,26 +63,6 @@ const FolderTreeBrowser = forwardRef<FolderTreeBrowserRef, FolderTreeBrowserProp
       },
     }))
 
-    const updateSubFolders = useCallback(
-      (response: ApiFoldersResponse, folder: Collection) => {
-        const parsedFolders = parseFoldersResponse(response)
-        const collections = Object.keys(parsedFolders).map(key => parsedFolders[key].id)
-        const newFolders = Object.assign({}, folders, {
-          [folder.id]: {...folder, collections},
-          ...parsedFolders,
-        })
-        setFolders(newFolders)
-      },
-      [folders],
-    )
-
-    const updateRootSubFolders = useCallback((response: ApiFoldersResponse) => {
-      const rootCollection = Object.assign({}, folders[rootFolder.id])
-      updateSubFolders(response, rootCollection)
-      // eslint-disable-next-line react-compiler/react-compiler
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
     const handleCollectionToggle = useCallback(
       (collection: CollectionData) => {
         setFormError(null)
@@ -111,15 +71,9 @@ const FolderTreeBrowser = forwardRef<FolderTreeBrowserRef, FolderTreeBrowserProp
         const folder = Object.assign({}, folders[collection.id])
         if (!collection.expanded || folder.collections) return
 
-        requestInnerFolders(folder.id)
-          .then(response => response.json)
-          .then(response => {
-            if (!response) return
-            updateSubFolders(response, folder)
-          })
-          .catch(setFetchError)
+        setCurrentFolderId(collection.id as string)
       },
-      [folders, updateSubFolders],
+      [folders],
     )
 
     const handleCollectionClick = useCallback(
@@ -135,24 +89,17 @@ const FolderTreeBrowser = forwardRef<FolderTreeBrowserRef, FolderTreeBrowserProp
       [folders, onSelectFolder],
     )
 
-    useFetchApi<ApiFoldersResponse, ApiFoldersResponse>({
-      path: `/api/v1/folders/${rootFolder.id}/folders`,
-      success: updateRootSubFolders,
-      error: setFetchError,
-      loading: setLoading,
-    })
+    const {folders : foldersResult, foldersLoading, foldersError} = useFoldersQuery(currentFolderId as string)
 
-    if (loading) {
-      return (
-        <View as="div" textAlign="center">
-          <Spinner size="small" renderTitle={I18n.t('Loading folders...')} />
-        </View>
-      )
-    }
+    useMemo(() => {
+      if (!foldersLoading && !foldersError && foldersResult) {
+        setFolders((originalFolders) => addNewFoldersToCollection(originalFolders, currentFolderId as string, foldersResult))
+      }
+    }, [foldersLoading, foldersError, foldersResult])
 
     return (
       <>
-        {fetchError && (
+        {foldersError && (
           <Alert variant="error" renderCloseButtonLabel={I18n.t('Close error message')}>
             {I18n.t('An error occurred while fetching the folders.')}
           </Alert>

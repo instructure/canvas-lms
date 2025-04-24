@@ -33,5 +33,5 @@
   },
   "biome.enabled": true,
   "prettier.enable": false,
-  "typescript.preferences.importModuleSpecifier": "relative"
+  "typescript.preferences.importModuleSpecifier": "project-relative"
 }

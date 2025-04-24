@@ -1818,7 +1818,7 @@ class DiscussionTopic < ActiveRecord::Base
         end
       end
       # Verify that section limited teachers/ta's are properly restricted
-      if context.is_a?(Course) && (!visible_to_everyone && context.user_is_instructor?(user))
+      if context.is_a?(Course) && !visible_to_everyone && context.user_is_instructor?(user)
 
         section_overrides = assignment_overrides.active.where(set_type: "CourseSection").pluck(:set_id)
         visible_sections_for_user = context.course_section_visibility(user)
@@ -1831,7 +1831,7 @@ class DiscussionTopic < ActiveRecord::Base
       end
       # user is an admin in the context (teacher/ta/designer) OR
       # user is an account admin with appropriate permission
-      next true if context.grants_any_right?(user, :manage, :read_course_content)
+      next true if context.grants_any_right?(user, :manage, :read_as_admin)
 
       # assignment exists and isn't assigned to user (differentiated assignments)
       if for_assignment?

@@ -20,12 +20,9 @@ import React, {useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {IconButton} from '@instructure/ui-buttons'
-import {
-  IconMiniArrowEndSolid,
-  IconMiniArrowDownLine
-} from '@instructure/ui-icons'
+import {IconMiniArrowEndSolid, IconMiniArrowDownLine} from '@instructure/ui-icons'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import { View } from '@instructure/ui-view'
+import {View} from '@instructure/ui-view'
 
 interface ModuleHeaderProps {
   id: string
@@ -34,33 +31,21 @@ interface ModuleHeaderProps {
   onToggleExpand: (id: string) => void
 }
 
-const ModuleHeader: React.FC<ModuleHeaderProps> = ({
-  id,
-  name,
-  expanded,
-  onToggleExpand,
-}) => {
+const ModuleHeader: React.FC<ModuleHeaderProps> = ({id, name, expanded, onToggleExpand}) => {
   const onToggleExpandRef = useCallback(() => {
     onToggleExpand(id)
   }, [onToggleExpand, id])
 
   return (
-    <View as="div"
-      background="secondary"
-      borderWidth="0 0 small 0"
-      borderRadius="small"
-    >
-      <Flex
-        padding="small"
-        justifyItems="space-between"
-      >
+    <View as="div" background="secondary" borderWidth="0 0 small 0" borderRadius="small">
+      <Flex padding="small" justifyItems="space-between">
         <Flex.Item>
           <Flex gap="small" alignItems="center">
             <Flex.Item>
               <IconButton
                 size="small"
                 withBorder={false}
-                screenReaderLabel={expanded ? "Collapse module" : "Expand module"}
+                screenReaderLabel={expanded ? 'Collapse module' : 'Expand module'}
                 renderIcon={expanded ? IconMiniArrowDownLine : IconMiniArrowEndSolid}
                 withBackground={false}
                 onClick={onToggleExpandRef}
@@ -68,9 +53,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             </Flex.Item>
             <Flex.Item>
               <Heading level="h3">
-                <TruncateText maxLines={1}>
-                  {name}
-                </TruncateText>
+                <TruncateText maxLines={1}>{name}</TruncateText>
               </Heading>
             </Flex.Item>
           </Flex>

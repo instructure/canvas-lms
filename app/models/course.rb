@@ -298,6 +298,7 @@ class Course < ActiveRecord::Base
   before_save :update_show_total_grade_as_on_weighting_scheme_change
   before_save :set_self_enrollment_code
   before_save :validate_license
+  before_save :set_horizon_course, if: -> { account_id_changed? || new_record? }
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_enrollment_states_if_necessary
@@ -526,6 +527,10 @@ class Course < ActiveRecord::Base
   def modules_visible_to(user)
     scope = grants_right?(user, :view_unpublished_items) ? context_modules.not_deleted : context_modules.active
     DifferentiableAssignment.scope_filter(scope, user, self)
+  end
+
+  def visible_module_items_by_module(user, context_module)
+    module_items_visible_to(user).where(context_modules: { id: context_module.id })
   end
 
   def module_items_visible_to(user)
@@ -1442,6 +1447,15 @@ class Course < ActiveRecord::Base
     if !license.nil? && !self.class.licenses.key?(license)
       self.license = "private"
     end
+  end
+
+  def set_horizon_course
+    return if dummy?
+
+    new_account = Account.find(account_id)
+    return unless new_account
+
+    self.horizon_course = new_account.horizon_account?
   end
 
   # to ensure permissions on the root folder are updated after hiding or showing the files tab
@@ -2406,6 +2420,142 @@ class Course < ActiveRecord::Base
   def generate_csv(progress, user, options, attachment)
     csv = GradebookExporter.new(self, user, options.merge(progress:)).to_csv
     create_attachment(attachment, csv)
+  end
+
+  def auto_grade_submission_in_background(submission)
+    user = submission.user
+    progress = progresses.create!(tag: "auto_grade_submission", user:)
+    singleton_key = "Course#run_auto_grader:#{submission.global_id}:#{submission.attempt}"
+    max_attempts = 3 # Default max attempts
+
+    progress.process_job(
+      self,
+      :run_auto_grader,
+      {
+        priority: Delayed::HIGH_PRIORITY,
+        n_strand: "Course#run_auto_grader:#{global_root_account_id}",
+        singleton: singleton_key,
+        on_conflict: :use_earliest,
+        preserve_method_args: true,
+        max_attempts:
+      },
+      progress,
+      submission,
+      max_attempts
+    )
+
+    # Find all unlocked jobs with the same singleton key
+    matching_jobs = Delayed::Job.where(singleton: singleton_key, locked_at: nil)
+
+    # Check if any of those jobs already have associated progress
+    existing_progress = Progress.where(delayed_job_id: matching_jobs.pluck(:id))
+                                .where.not(id: progress.id)
+                                .first
+
+    if existing_progress
+      # If progress exists for any similar job, mark current progress as skipped
+      progress.update!(
+        workflow_state: "failed",
+        completion: 0,
+        message: "Skipped: a similar job is already queued or running."
+      )
+      { progress_id: existing_progress.id }
+    else
+      # No existing progress found, continue with current progress
+      { progress_id: progress.id }
+    end
+  end
+
+  def run_auto_grader(progress, submission, max_attempts)
+    assignment = submission.assignment
+    assignment_text = ActionView::Base.full_sanitizer.sanitize(assignment.description || "")
+    essay = ActionView::Base.full_sanitizer.sanitize(submission.body || "")
+    rubric = assignment.rubric_association&.rubric
+
+    auto_grade_result = nil
+
+    begin
+      if submission.blank? || submission.body.blank? || submission.attempt < 1
+        raise "No essay submission found"
+      end
+
+      root_account_uuid = submission.course.account.root_account.uuid
+
+      auto_grade_result = AutoGradeResult.find_or_initialize_by(
+        submission:,
+        attempt: submission.attempt
+      )
+
+      if auto_grade_result.grade_data.blank?
+        grade_data = AutoGradeService.new(
+          assignment: assignment_text,
+          essay:,
+          rubric: rubric.data,
+          root_account_uuid:
+        ).call
+
+        auto_grade_result.update!(
+          root_account_id: submission.course.root_account_id,
+          grade_data:,
+          error_message: nil,
+          grading_attempts: auto_grade_result.grading_attempts + 1
+        )
+      end
+
+      progress&.results = auto_grade_result.grade_data
+      progress&.message = nil
+      progress&.complete!
+    rescue CedarAIGraderError => e
+      error_message = e.message
+
+      begin
+        autograde_error_handling(submission, auto_grade_result, progress, error_message)
+      rescue
+        progress&.results = []
+        progress&.message = "Grading failed. Please try again later or grade manually."
+        progress&.complete!
+        return
+      end
+
+      current_attempts = progress&.delayed_job&.attempts&.+ 1
+      if current_attempts < max_attempts
+        raise Delayed::RetriableError, error_message
+      else
+        progress&.message = "The AI is unavailable. Please try again later or grade manually."
+      end
+
+      progress&.complete!
+    rescue => e
+      error_message = "Grading failed: #{e.message}"
+
+      begin
+        autograde_error_handling(submission, auto_grade_result, progress, error_message)
+      rescue
+        progress&.results = []
+        progress&.message = "Grading failed. Please try again later or grade manually."
+      end
+
+      progress&.complete!
+    end
+  end
+
+  def autograde_error_handling(submission, auto_grade_result, progress, error_message)
+    if auto_grade_result.nil?
+      auto_grade_result = AutoGradeResult.find_or_initialize_by(
+        submission:,
+        attempt: submission.attempt
+      )
+    end
+
+    auto_grade_result&.update!(
+      root_account_id: submission.course.root_account_id,
+      grade_data: {},
+      error_message:,
+      grading_attempts: auto_grade_result.grading_attempts + 1
+    )
+
+    progress&.results = []
+    progress&.message = error_message
   end
 
   def create_attachment(attachment, csv)
@@ -4545,7 +4695,7 @@ class Course < ActiveRecord::Base
   def log_course_pacing_publish_update
     if publishing?
       statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
-      InstStatsd::Statsd.increment("course.#{statsd_bucket}.paced_courses")
+      InstStatsd::Statsd.distributed_increment("course.#{statsd_bucket}.paced_courses")
     end
   end
 
@@ -4553,7 +4703,7 @@ class Course < ActiveRecord::Base
     if publishing?
       statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
       course_format_value = course_format.nil? ? "unset" : course_format
-      InstStatsd::Statsd.increment("course.#{statsd_bucket}.#{course_format_value}")
+      InstStatsd::Statsd.distributed_increment("course.#{statsd_bucket}.#{course_format_value}")
     end
   end
 
@@ -4612,7 +4762,7 @@ class Course < ActiveRecord::Base
 
     statsd_bucket = new_enable_paces_setting ? "paced" : "unpaced"
 
-    InstStatsd::Statsd.increment("course.#{statsd_bucket}.paced_courses")
+    InstStatsd::Statsd.distributed_increment("course.#{statsd_bucket}.paced_courses")
 
     log_course_format_update unless @course_format_change
   end
@@ -4624,7 +4774,7 @@ class Course < ActiveRecord::Base
     new_stats_course_format = setting_changes[1][:course_format].nil? ? "unset" : setting_changes[1][:course_format]
 
     statsd_bucket = new_enable_paces_setting ? "paced" : "unpaced"
-    InstStatsd::Statsd.increment("course.#{statsd_bucket}.#{new_stats_course_format}")
+    InstStatsd::Statsd.distributed_increment("course.#{statsd_bucket}.#{new_stats_course_format}")
   end
 
   def log_rqd_setting_enable_or_disable
@@ -4637,9 +4787,9 @@ class Course < ActiveRecord::Base
     return unless old_rqd_setting != new_rqd_setting # Skip if RQD setting was not changed
 
     if old_rqd_setting == false && new_rqd_setting == true
-      InstStatsd::Statsd.increment("course.settings.restrict_quantitative_data.enabled")
+      InstStatsd::Statsd.distributed_increment("course.settings.restrict_quantitative_data.enabled")
     elsif old_rqd_setting == true && new_rqd_setting == false
-      InstStatsd::Statsd.increment("course.settings.restrict_quantitative_data.disabled")
+      InstStatsd::Statsd.distributed_increment("course.settings.restrict_quantitative_data.disabled")
     end
   end
 end

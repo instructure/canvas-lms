@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useCallback } from 'react'
+import React, {useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
-import { queryClient } from '@canvas/query'
-import { useModules } from '../hooks/queries/useModules'
+import {queryClient} from '@canvas/query'
+import {useModules} from '../hooks/queries/useModules'
 import {Menu} from '@instructure/ui-menu'
 import {
   IconMoreLine,
@@ -31,39 +31,41 @@ import {
   IconTrashLine,
   IconCopySolid,
   IconUserLine,
-  IconDuplicateLine
+  IconDuplicateLine,
 } from '@instructure/ui-icons'
 import {
   handleEdit,
-  handleMoveContents,
-  handleMoveModule,
   handleAssignTo,
   handleDelete,
   handleDuplicate,
   handleSendTo,
-  handleCopyTo
+  handleCopyTo,
 } from '../handlers/moduleActionHandlers'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
-import { useModuleItems } from '../hooks/queries/useModuleItems'
+import {useModuleItems} from '../hooks/queries/useModuleItems'
+import {ModuleAction} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
 export interface ModuleActionMenuProps {
-  expanded?: boolean
+  expanded: boolean
   isMenuOpen: boolean
-  setIsMenuOpen: (isOpen: boolean) => void
+  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>
   id: string
   name: string
-  prerequisites?: {id: string, name: string, type: string}[]
+  prerequisites?: {id: string; name: string; type: string}[]
   handleOpeningModuleUpdateTray?: (
     moduleId?: string,
     moduleName?: string,
-    prerequisites?: {id: string, name: string, type: string}[],
-    openTab?: 'settings' | 'assign-to'
+    prerequisites?: {id: string; name: string; type: string}[],
+    openTab?: 'settings' | 'assign-to',
   ) => void
   setIsDirectShareOpen: React.Dispatch<React.SetStateAction<boolean>>
   setIsDirectShareCourseOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
+  setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
 }
 
 const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
@@ -75,7 +77,10 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
   prerequisites,
   handleOpeningModuleUpdateTray,
   setIsDirectShareOpen,
-  setIsDirectShareCourseOpen
+  setIsDirectShareCourseOpen,
+  setModuleAction,
+  setIsManageModuleContentTrayOpen,
+  setSourceModule,
 }) => {
   const {courseId, permissions} = useContextModule()
   const {data, isLoading, isError} = useModules(courseId)
@@ -87,14 +92,44 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
   }, [id, name, prerequisites, handleOpeningModuleUpdateTray])
 
   const handleMoveContentsRef = useCallback(() => {
-    if (!data) return
-    handleMoveContents(id, name, data, queryClient, courseId)
-  }, [id, name, data, queryClient, courseId])
+    if (!data || !setModuleAction || !setIsManageModuleContentTrayOpen) return
+
+    if (setSourceModule) {
+      setSourceModule({id, title: name})
+    }
+
+    setModuleAction('move_module_contents')
+    setIsManageModuleContentTrayOpen(true)
+    setIsMenuOpen(false)
+  }, [
+    data,
+    id,
+    name,
+    setModuleAction,
+    setIsManageModuleContentTrayOpen,
+    setIsMenuOpen,
+    setSourceModule,
+  ])
 
   const handleMoveModuleRef = useCallback(() => {
-    if (!data || !queryClient) return
-    handleMoveModule(id, name, data, courseId, queryClient)
-  }, [id, name, data, courseId, queryClient])
+    if (!data || !setModuleAction || !setIsManageModuleContentTrayOpen) return
+
+    if (setSourceModule) {
+      setSourceModule({id, title: name})
+    }
+
+    setModuleAction('move_module')
+    setIsManageModuleContentTrayOpen(true)
+    setIsMenuOpen(false)
+  }, [
+    data,
+    id,
+    name,
+    setModuleAction,
+    setIsManageModuleContentTrayOpen,
+    setIsMenuOpen,
+    setSourceModule,
+  ])
 
   const handleAssignToRef = useCallback(() => {
     handleAssignTo(id, name, prerequisites, handleOpeningModuleUpdateTray)
@@ -102,11 +137,11 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
 
   const handleDeleteRef = useCallback(() => {
     handleDelete(id, name, queryClient, courseId, setIsMenuOpen)
-  }, [id, name, queryClient, courseId, setIsMenuOpen])
+  }, [id, name, courseId, setIsMenuOpen])
 
   const handleDuplicateRef = useCallback(() => {
     handleDuplicate(id, name, queryClient, courseId, setIsMenuOpen)
-  }, [id, name, queryClient, courseId, setIsMenuOpen])
+  }, [id, name, courseId, setIsMenuOpen])
 
   const handleSendToRef = useCallback(() => {
     handleSendTo(setIsDirectShareOpen)
@@ -116,15 +151,16 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
     handleCopyTo(setIsDirectShareCourseOpen)
   }, [setIsDirectShareCourseOpen])
 
-  const canDuplicate = moduleItems?.moduleItems.every((item) => item.content?.canDuplicate) && expanded
+  const canDuplicate =
+    moduleItems?.moduleItems.every(item => item.content?.canDuplicate) && expanded
 
   return (
     <Menu
-      onToggle={(isOpen) => setIsMenuOpen(isOpen)}
+      onToggle={isOpen => setIsMenuOpen(isOpen)}
       open={isMenuOpen}
       trigger={
         <IconButton
-          screenReaderLabel={I18n.t("Module Options")}
+          screenReaderLabel={I18n.t('Module Options')}
           renderIcon={IconMoreLine}
           withBackground={false}
           withBorder={false}
@@ -133,54 +169,86 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
         />
       }
     >
-      {permissions?.canEdit && <Menu.Item onClick={handleEditRef}>
-        <Flex>
-          <Flex.Item><IconEditLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Edit')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canEdit && <Menu.Item onClick={handleMoveContentsRef}>
-        <Flex>
-          <Flex.Item><IconMoveDownLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Move Contents...')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canEdit && <Menu.Item onClick={handleMoveModuleRef}>
-        <Flex>
-          <Flex.Item><IconUpdownLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Move Module...')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canEdit && <Menu.Item onClick={handleAssignToRef}>
-        <Flex>
-          <Flex.Item><IconPermissionsSolid /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Assign To...')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canDelete && <Menu.Item onClick={handleDeleteRef}>
-        <Flex>
-          <Flex.Item><IconTrashLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Delete')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canAdd && canDuplicate && <Menu.Item onClick={handleDuplicateRef}>
-        <Flex>
-          <Flex.Item><IconDuplicateLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Duplicate')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canDirectShare && <Menu.Item onClick={handleSendToRef}>
-        <Flex>
-          <Flex.Item><IconUserLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Send To...')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canDirectShare && <Menu.Item onClick={handleCopyToRef}>
-        <Flex>
-          <Flex.Item><IconCopySolid /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Copy To...')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
+      {permissions?.canEdit && (
+        <Menu.Item onClick={handleEditRef}>
+          <Flex>
+            <Flex.Item>
+              <IconEditLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Edit')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canEdit && (
+        <Menu.Item onClick={handleMoveContentsRef}>
+          <Flex>
+            <Flex.Item>
+              <IconMoveDownLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Move Contents...')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canEdit && (
+        <Menu.Item onClick={handleMoveModuleRef}>
+          <Flex>
+            <Flex.Item>
+              <IconUpdownLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Move Module...')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canEdit && (
+        <Menu.Item onClick={handleAssignToRef}>
+          <Flex>
+            <Flex.Item>
+              <IconPermissionsSolid />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Assign To...')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canDelete && (
+        <Menu.Item onClick={handleDeleteRef}>
+          <Flex>
+            <Flex.Item>
+              <IconTrashLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Delete')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canAdd && canDuplicate && (
+        <Menu.Item onClick={handleDuplicateRef}>
+          <Flex>
+            <Flex.Item>
+              <IconDuplicateLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Duplicate')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canDirectShare && (
+        <Menu.Item onClick={handleSendToRef}>
+          <Flex>
+            <Flex.Item>
+              <IconUserLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Send To...')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canDirectShare && (
+        <Menu.Item onClick={handleCopyToRef}>
+          <Flex>
+            <Flex.Item>
+              <IconCopySolid />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Copy To...')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
     </Menu>
   )
 }

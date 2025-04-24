@@ -1483,7 +1483,7 @@ class UsersController < ApplicationController
   def external_tool
     timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     placement = :user_navigation
-    @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, placement)
+    @tool = Lti::ToolFinder.from_id!(params[:id], @domain_root_account, placement:)
     @opaque_id = @tool.opaque_identifier_for(@current_user, context: @domain_root_account)
     @resource_type = "user_navigation"
 
@@ -1947,7 +1947,7 @@ class UsersController < ApplicationController
         format.json do
           if user.set_preference(:custom_colors, colors)
             enrollment_types_tags = user.participating_enrollments.pluck(:type).uniq.map { |type| "enrollment_type:#{type}" }
-            InstStatsd::Statsd.increment("user.set_custom_color", tags: enrollment_types_tags)
+            InstStatsd::Statsd.distributed_increment("user.set_custom_color", tags: enrollment_types_tags)
             render(json: { hexcode: colors[context.asset_string] })
           else
             render(json: user.errors, status: :bad_request)

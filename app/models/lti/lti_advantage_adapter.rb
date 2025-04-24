@@ -178,6 +178,15 @@ module Lti
       login_request(report_review_request.to_cached_hash)
     end
 
+    # Generates a login request pointing to a cached launch (ID token)
+    # for an deployment-level EULA launch (1EdTech Eula Message spec)
+    #
+    # These launches show the EULA of a tool
+    # that can be accessed on deployment level.
+    def generate_post_payload_for_eula
+      login_request(eula_request.to_cached_hash)
+    end
+
     private
 
     def target_link_uri
@@ -287,6 +296,17 @@ module Lti
         expander: @expander,
         return_url: @return_url,
         asset_report: @opts[:asset_report],
+        opts: @opts.merge(option_overrides)
+      )
+    end
+
+    def eula_request
+      @_eula_request ||= Lti::Messages::EulaRequest.new(
+        tool: @tool,
+        context: @context,
+        user: @user,
+        expander: @expander,
+        return_url: @return_url,
         opts: @opts.merge(option_overrides)
       )
     end

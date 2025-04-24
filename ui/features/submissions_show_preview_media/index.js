@@ -36,7 +36,7 @@ $(document).ready(() => {
   $('.play_media_recording_link').click(function (event) {
     event.preventDefault()
     const id = $('.media_comment_id:first').text()
- 
+
     if (isConsolidatedMediaPlayerEnabled()) {
       const type = $('.play_media_recording_link').data('media_comment_type')
       const domId = 'box_content'

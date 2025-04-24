@@ -347,7 +347,7 @@ class ExternalToolsController < ApplicationController
       @lti_launch.link_text =  launch_settings["tool_name"]
       @lti_launch.analytics_id = launch_settings["analytics_id"]
 
-      tool = ContextExternalTool.where(id: launch_settings.dig("metadata", "tool_id")).first ||
+      tool = Lti::ToolFinder.find_by(id: launch_settings.dig("metadata", "tool_id")) ||
              Lti::ToolFinder.from_url(launch_settings["launch_url"], @context)
       if tool
         placement = launch_settings.dig("metadata", "placement")
@@ -593,7 +593,7 @@ class ExternalToolsController < ApplicationController
     return unless selection_type == "editor_button" || verified_user_check
 
     if selection_type.nil? || Lti::ResourcePlacement::PLACEMENTS.include?(selection_type.to_sym)
-      @tool = ContextExternalTool.find_for(id, @context, selection_type, false)
+      @tool = Lti::ToolFinder.from_id(id, @context, placement: selection_type)
     end
 
     unless @tool
@@ -1186,7 +1186,7 @@ class ExternalToolsController < ApplicationController
     @tool.check_for_duplication(params.dig(:external_tool, :verify_uniqueness).present?)
     if @tool.errors.blank? && @tool.save
       @tool.migrate_content_to_1_3_if_needed!
-      invalidate_nav_tabs_cache(@tool)
+      ContextExternalTool.invalidate_nav_tabs_cache(@tool, @domain_root_account)
       if api_request?
         render json: external_tool_json(@tool, @context, @current_user, session)
       else
@@ -1235,7 +1235,7 @@ class ExternalToolsController < ApplicationController
       set_tool_attributes(@tool, external_tool_params)
       respond_to do |format|
         if @tool.save
-          invalidate_nav_tabs_cache(@tool)
+          ContextExternalTool.invalidate_nav_tabs_cache(@tool, @domain_root_account)
           format.json { render json: external_tool_json(@tool, @context, @current_user, session) }
         else
           format.json { render json: @tool.errors, status: :bad_request }
@@ -1265,7 +1265,7 @@ class ExternalToolsController < ApplicationController
       respond_to do |format|
         set_tool_attributes(@tool, external_tool_params)
         if @tool.save
-          invalidate_nav_tabs_cache(@tool)
+          ContextExternalTool.invalidate_nav_tabs_cache(@tool, @domain_root_account)
           if api_request?
             format.json { render json: external_tool_json(@tool, @context, @current_user, session) }
           else
@@ -1317,7 +1317,7 @@ class ExternalToolsController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def add_rce_favorite
     if authorized_action(@context, @current_user, :manage_lti_add)
-      @tool = ContextExternalTool.find_external_tool_by_id(params[:id], @context)
+      @tool = Lti::ToolFinder.from_id(params[:id], @context)
       raise ActiveRecord::RecordNotFound unless @tool
       unless @tool.can_be_rce_favorite?
         return render json: { message: "Tool does not have an editor_button placement" }, status: :bad_request
@@ -1332,7 +1332,7 @@ class ExternalToolsController < ApplicationController
         favorite_ids &= valid_ids # try to clear out any possibly deleted tool references first before causing a fuss
       end
       # On_by_default tools don't count towards the limit
-      client_ids = ContextExternalTool.find_external_tool_client_id(favorite_ids, @context)
+      client_ids = ContextExternalTool.where(id: favorite_ids).select(:developer_key_id).map(&:global_developer_key_id)
       on_by_default_ids = ContextExternalTool.on_by_default_ids
       if (client_ids - on_by_default_ids).length > 2
         render json: { message: "Cannot have more than 2 favorited tools" }, status: :bad_request
@@ -1373,7 +1373,7 @@ class ExternalToolsController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def add_top_nav_favorite
     if authorized_action(@context, @current_user, :manage_lti_add)
-      @tool = ContextExternalTool.find_external_tool_by_id(params[:id], @context)
+      @tool = Lti::ToolFinder.from_id(params[:id], @context)
       raise ActiveRecord::RecordNotFound unless @tool
       unless @tool.can_be_top_nav_favorite?
         return render json: { message: "Tool does not have top_navigation placement" }, status: :bad_request
@@ -1718,12 +1718,6 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  def invalidate_nav_tabs_cache(tool)
-    if tool.has_placement?(:user_navigation) || tool.has_placement?(:course_navigation) || tool.has_placement?(:account_navigation)
-      Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
-    end
-  end
-
   def require_access_to_context
     if @context.is_a?(Account)
       require_user
@@ -1762,7 +1756,7 @@ class ExternalToolsController < ApplicationController
       respond_to do |format|
         if tool.destroy
           if api_request?
-            invalidate_nav_tabs_cache(tool)
+            ContextExternalTool.invalidate_nav_tabs_cache(tool, @domain_root_account)
             format.json { render json: external_tool_json(tool, @context, @current_user, session) }
           else
             format.json { render json: tool.as_json(methods: [:readable_state, :custom_fields_string], include_root: false) }

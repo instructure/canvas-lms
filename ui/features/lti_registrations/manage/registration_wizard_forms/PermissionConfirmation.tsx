@@ -42,37 +42,62 @@ export type PermissionConfirmationProps = {
    * _possible_ to be selected
    * in the permission confirmation.
    */
-  scopesSupported: LtiScope[]
+  scopesSupported: readonly LtiScope[]
   /**
    * Called when a scope is toggled.
    * @param scope
    * @returns
    */
   onScopeToggled: (scope: LtiScope) => void
+  /**
+   * Whether or not to include the 'requesting' text
+   * which state what permissions the app is "requesting"
+   */
+  showAllSettings?: boolean
+  /**
+   * Whether or not we are creating or editing a registration
+   */
+  mode: 'new' | 'edit'
 }
 
-export const PermissionConfirmation = ({
-  appName,
-  scopesSupported,
-  scopesSelected,
-  onScopeToggled,
-}: PermissionConfirmationProps) => {
+export const PermissionConfirmation = React.memo((props: PermissionConfirmationProps) => {
   return (
     <>
       <Heading level="h3" margin="0 0 x-small 0">
         {I18n.t('Permissions')}
       </Heading>
-      {scopesSupported.length === 0 ? (
-        <Text
-          dangerouslySetInnerHTML={{
-            __html: I18n.t("*%{toolName}* hasn't requested any permissions.", {
-              wrapper: '<strong>$1</strong>',
-              toolName: appName,
-            }),
-          }}
-        />
-      ) : (
-        <>
+      {renderBody(props)}
+    </>
+  )
+})
+
+const renderBody = ({
+  appName,
+  scopesSupported,
+  scopesSelected,
+  onScopeToggled,
+  showAllSettings,
+  mode,
+}: PermissionConfirmationProps): React.ReactElement => {
+  const empty = scopesSupported.length === 0
+
+  if (empty && mode === 'new') {
+    return (
+      <Text
+        dangerouslySetInnerHTML={{
+          __html: I18n.t("*%{toolName}* hasn't requested any permissions.", {
+            wrapper: '<strong>$1</strong>',
+            toolName: appName,
+          }),
+        }}
+      />
+    )
+  } else if (empty && mode === 'edit') {
+    return <Text fontStyle="italic">{I18n.t('This app has no permissions configured.')}</Text>
+  } else {
+    return (
+      <>
+        {mode === 'new' ? (
           <Text
             dangerouslySetInnerHTML={{
               __html: I18n.t(
@@ -81,24 +106,41 @@ export const PermissionConfirmation = ({
               ),
             }}
           />
-          <Flex direction="column" alignItems="center" gap="small" margin="medium 0 medium 0">
-            {scopesSupported.map(scope => {
-              return (
-                <Checkbox
-                  data-testid={scope}
-                  key={scope}
-                  variant="toggle"
-                  label={i18nLtiScope(scope)}
-                  checked={scopesSelected.includes(scope)}
-                  onChange={() => {
-                    onScopeToggled(scope)
-                  }}
-                />
-              )
-            })}
-          </Flex>
-        </>
-      )}
-    </>
-  )
+        ) : (
+          <Text
+            dangerouslySetInnerHTML={{
+              __html: showAllSettings
+                ? I18n.t(
+                    'Select the permissions for *%{toolName}*. Services must be supported by the tool in order to work. Check with your app vendor to see what permissions are required.',
+                    {toolName: appName, wrapper: '<strong>$1</strong>'},
+                  )
+                : I18n.t(
+                    "Select the permissions for *%{toolName}*. Please note that altering these defaults might impact the app's performance.",
+                    {
+                      toolName: appName,
+                      wrapper: '<strong>$1</strong>',
+                    },
+                  ),
+            }}
+          />
+        )}
+        <Flex direction="column" alignItems="center" gap="small" margin="medium 0 medium 0">
+          {scopesSupported.map(scope => {
+            return (
+              <Checkbox
+                data-testid={scope}
+                key={scope}
+                variant="toggle"
+                label={i18nLtiScope(scope)}
+                checked={scopesSelected.includes(scope)}
+                onChange={() => {
+                  onScopeToggled(scope)
+                }}
+              />
+            )
+          })}
+        </Flex>
+      </>
+    )
+  }
 }

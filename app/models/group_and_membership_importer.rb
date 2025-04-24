@@ -59,7 +59,9 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     @seen_groups = {}
     @seen_user_ids = Set.new
     @group_members = {}
+    @group_size = 0
     create_groups_and_members(csv_contents)
+    progress.message = progress_message(groups: @group_size, users: @seen_user_ids.size)
     progress.complete
     progress.save!
     self.workflow_state = "completed"
@@ -82,7 +84,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
   def fail_import(error)
     self.workflow_state = "failed"
     save!
-    progress.message = error
+    progress.message = progress_message(error:)
     progress.save!
     progress.fail
   end
@@ -165,6 +167,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
   end
 
   def persist_memberships
+    @group_size += group_members.keys.size
     group_members.each do |group, users|
       group.bulk_add_users_to_group(users)
     end
@@ -175,5 +178,15 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     if index % update_every == 0
       progress.calculate_completion!(index, total_lines)
     end
+  end
+
+  def progress_message(groups: 0, users: 0, error: nil)
+    message = {
+      type: "import_groups",
+      groups:,
+      users:,
+      error:,
+    }
+    message.to_json
   end
 end

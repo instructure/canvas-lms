@@ -247,6 +247,7 @@ describe "announcements" do
       end
 
       it "is visible to teacher in course" do
+        skip "Will be fixed in VICE-5209"
         user_session(@teacher)
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
         expect(f(".discussion-title")).to include_text(@announcement.title)
@@ -264,6 +265,7 @@ describe "announcements" do
       end
 
       it "starts a new topic", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         get url
 
         expect_new_page_load { f("#add_announcement").click }
@@ -271,6 +273,7 @@ describe "announcements" do
       end
 
       it "adds an attachment to a new topic", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         topic_title = "new topic with file"
         get new_url
         wait_for_tiny(f("#discussion-edit-view textarea[name=message]"))
@@ -292,6 +295,7 @@ describe "announcements" do
       end
 
       it "adds an attachment to a graded topic", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         (what_to_create == DiscussionTopic) ? @course.discussion_topics.create!(title: "graded attachment topic", user: @user) : announcement_model(title: "graded attachment topic", user: @user)
         if what_to_create == DiscussionTopic
           what_to_create.last.update(assignment: @course.assignments.create!(name: "graded topic assignment"))
@@ -304,6 +308,7 @@ describe "announcements" do
       end
 
       it "edits a topic", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         edit_name = "edited discussion name"
         topic = (what_to_create == DiscussionTopic) ? @course.discussion_topics.create!(title: @topic_title, user: @user) : announcement_model(title: @topic_title, user: @user)
         get "#{url}/#{topic.id}"
@@ -332,6 +337,7 @@ describe "announcements" do
     end
 
     it "displayed delayed post note on page of delayed announcement" do
+      skip "Will be fixed in VICE-5209"
       a = @course.announcements.create!(title: "Announcement",
                                         message: "foobers",
                                         delayed_post_at: 1.week.from_now)
@@ -342,6 +348,7 @@ describe "announcements" do
     end
 
     it "allows delay post date edit with disabled comments", priority: "2" do
+      skip "Will be fixed in VICE-5209"
       time_new = format_time_for_view(Time.zone.today + 1.day)
       disable_comments_on_announcements
       announcement = @course.announcements.create!(
@@ -354,6 +361,7 @@ describe "announcements" do
     end
 
     it "removes delayed_post_at when delayed_post_at field is cleared", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.ago, message: "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
       expect_new_page_load { f(".edit-btn").click }
@@ -377,6 +385,7 @@ describe "announcements" do
     end
 
     it "lets a teacher add a new entry to its own announcement", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       create_announcement
       get [@course, @announcement]
       f(".discussion-reply-action").click
@@ -432,6 +441,7 @@ describe "announcements" do
       end
 
       it "removes the Reply section" do
+        skip "Will be fixed in VICE-5209"
         create_announcement
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
 

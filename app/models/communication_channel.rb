@@ -118,6 +118,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def broadcast_data
+    @root_account ||= Account.find_by(id: root_account_ids.first) || user.associated_root_accounts.first
     return unless @root_account
 
     { root_account_id: @root_account.global_id, from_host: HostUrl.context_host(@root_account) }
@@ -436,7 +437,7 @@ class CommunicationChannel < ActiveRecord::Base
     # can be used for any root_account, so just set root_account_ids from user.
     self.root_account_ids = user.root_account_ids
     if root_account_ids_changed? && log
-      InstStatsd::Statsd.increment("communication_channel.root_account_ids_set", short_stat: "communication_channel.root_account_ids_set")
+      InstStatsd::Statsd.distributed_increment("communication_channel.root_account_ids_set")
     end
     save! if persist_changes && root_account_ids_changed?
   end

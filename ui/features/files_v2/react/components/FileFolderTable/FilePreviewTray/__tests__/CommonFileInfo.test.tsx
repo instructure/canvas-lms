@@ -44,7 +44,7 @@ describe('CommonFileInfo', () => {
     render(<CommonFileInfo item={mockItem as File} />);
     expect(screen.getByText('File Info')).toBeInTheDocument();
     expect(screen.getByText('Name')).toBeInTheDocument();
-    expect(screen.getByText('Sample File')).toBeInTheDocument();
+    expect(screen.getByTestId('file-display-name')).toBeInTheDocument();
     expect(screen.getByText('Status')).toBeInTheDocument();
     expect(screen.getByText('Published')).toBeInTheDocument();
     expect(screen.getByText('License')).toBeInTheDocument();

@@ -19,14 +19,17 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
 import MoveModal from '../MoveModal'
+import {useFoldersQuery} from '../hooks'
 import {FileManagementProvider} from '../../../Contexts'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 
-jest.mock('@canvas/use-fetch-api-hook')
+jest.mock('../hooks', () => ({
+  useFoldersQuery: jest.fn(),
+}))
+
 jest.mock('@canvas/do-fetch-api-effect')
 
 const defaultProps = {
@@ -50,6 +53,12 @@ describe('MoveModal', () => {
   let flashElements: any
 
   beforeEach(() => {
+    (useFoldersQuery as jest.Mock).mockReturnValue({
+      folders: {[FAKE_FOLDERS[1].id]: FAKE_FOLDERS[1]},
+      foldersLoading: false,
+      foldersSuccessful: true,
+      foldersError: false,
+    })
     flashElements = document.createElement('div')
     flashElements.setAttribute('id', 'flash_screenreader_holder')
     flashElements.setAttribute('role', 'alert')
@@ -119,22 +128,21 @@ describe('MoveModal', () => {
   })
 
   it('shows an error when there is not a selected folder', async () => {
-    ;(useFetchApi as jest.Mock).mockImplementationOnce(({loading, success}) => {
-      loading(false)
-      success([FAKE_FOLDERS[1]])
-    })
     renderComponent()
     await userEvent.click(await screen.findByTestId('move-move-button'))
     expect(await screen.findByText('A target folder should be selected.')).toBeInTheDocument()
   })
 
   it('performs fetch request', async () => {
+    (useFoldersQuery as jest.Mock).mockReturnValue({
+      folders: {[FAKE_FOLDERS[2].id]: FAKE_FOLDERS[2]},
+      foldersLoading: false,
+      foldersSuccessful: true,
+      foldersError: false,
+    })
+    
     const rootFolder = FAKE_FOLDERS[1]
     const childFolder = FAKE_FOLDERS[2]
-    ;(useFetchApi as jest.Mock).mockImplementationOnce(({loading, success}) => {
-      loading(false)
-      success([childFolder])
-    })
     // Fetch inner folders request
     ;(doFetchApi as jest.Mock).mockResolvedValue([])
     // Fetch folder data

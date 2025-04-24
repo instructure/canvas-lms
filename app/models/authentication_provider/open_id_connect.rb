@@ -143,21 +143,21 @@ class AuthenticationProvider
       end_session_endpoint.present?
     end
 
-    def user_logout_redirect(controller, _current_user)
-      return super unless end_session_endpoint.present?
+    def user_logout_redirect(controller, current_user, redirect_options: {})
+      return super(controller, current_user) unless end_session_endpoint.present?
 
       uri = URI.parse(end_session_endpoint)
-      params = post_logout_redirect_params(controller)
+      params = post_logout_redirect_params(controller, redirect_options:)
 
       # anything explicitly set on the end_session_endpoint overrides what Canvas adds
       explicit_params = URI.decode_www_form(uri.query || "").to_h
       uri.query = URI.encode_www_form(explicit_params.reverse_merge(params.stringify_keys))
       uri.to_s
     rescue URI::InvalidURIError
-      super
+      super(controller, current_user)
     end
 
-    def post_logout_redirect_params(controller)
+    def post_logout_redirect_params(controller, redirect_options: {})
       result = { client_id:, post_logout_redirect_uri: self.class.post_logout_redirect_uri(controller) }
       if (id_token = controller.session[:oidc_id_token])
         # theoretically we could use POST, especially since this might be large, but

@@ -744,6 +744,25 @@ describe "Folders API", type: :request do
                { expected_status: 403 })
     end
 
+    it "errors on duplicate file name if on_duplicate set to error" do
+      @context = course_with_teacher
+      @user = @teacher
+      @root_folder = Folder.root_folders(@course).first
+      @root_folder.attachments.create!(filename: "duplicate.txt",
+                                       display_name: "duplicate.txt",
+                                       uploaded_data: StringIO.new("file"),
+                                       folder: @root_folder,
+                                       context: @course,
+                                       user: @user)
+      api_call(:post,
+               "/api/v1/folders/#{@root_folder.id}/files",
+               { controller: "folders", action: "create_file", format: "json", folder_id: @root_folder.id.to_param },
+               { name: "duplicate.txt",
+                 on_duplicate: "error" },
+               {},
+               { expected_status: 409 })
+    end
+
     context "as teacher without manage_files_add permission" do
       before do
         teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: @course.root_account.id)

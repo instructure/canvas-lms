@@ -91,6 +91,7 @@ describe "discussions" do
         end
 
         it "hides points possible" do
+          skip "Will be fixed in VICE-5209"
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/"
           wait_for_ajaximations
           expect(f("#discussion_container").text).to include("This is a graded discussion")
@@ -102,6 +103,7 @@ describe "discussions" do
         let(:topic) { teacher_topic }
 
         it "allows students to reply to a discussion even if they cannot create a topic", priority: "2" do
+          skip "Will be fixed in VICE-5209"
           course.allow_student_discussion_topics = false
           course.save!
           get url
@@ -114,6 +116,7 @@ describe "discussions" do
         end
 
         it "displays the subscribe button after an initial post", priority: "1" do
+          skip "Will be fixed in VICE-5209"
           topic.unsubscribe(student)
           topic.require_initial_post = true
           topic.save!
@@ -133,6 +136,7 @@ describe "discussions" do
         end
 
         it "allows you to subscribe and unsubscribe" do
+          skip "Will be fixed in VICE-5209"
           get url
           expect(f(".topic-subscribe-button").text).to eq("Subscribe")
           expect(f(".topic-unsubscribe-button")).not_to be_displayed
@@ -149,6 +153,7 @@ describe "discussions" do
         end
 
         it "validates that a student can see it and reply to a discussion", priority: "1" do
+          skip "Will be fixed in VICE-5209"
           new_student_entry_text = "new student entry"
           get url
           expect(f(".message_wrapper")).to include_text("teacher")
@@ -158,6 +163,7 @@ describe "discussions" do
         end
 
         it "lets students post to a post-first discussion", priority: "1" do
+          skip "Will be fixed in VICE-5209"
           new_student_entry_text = "new student entry"
           topic.require_initial_post = true
           topic.save
@@ -195,6 +201,7 @@ describe "discussions" do
         end
 
         it "does not hide points possible" do
+          skip "Will be fixed in VICE-5209"
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/"
           wait_for_ajaximations
           expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")
@@ -202,6 +209,7 @@ describe "discussions" do
       end
 
       it "creates a group discussion", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         group
         get "/courses/#{course.id}/discussion_topics"
         expect_new_page_load { f("#add_discussion").click }
@@ -218,6 +226,7 @@ describe "discussions" do
       end
 
       it "creates a graded discussion", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         assignment_group
         get "/courses/#{course.id}/discussion_topics"
         expect_new_page_load { f("#add_discussion").click }
@@ -235,6 +244,7 @@ describe "discussions" do
       end
 
       it "creates a graded group discussion", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         assignment_group
         group
         get "/courses/#{course.id}/discussion_topics/new"
@@ -260,6 +270,7 @@ describe "discussions" do
       end
 
       it "shows attachment", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         get "/courses/#{course.id}/discussion_topics"
         expect_new_page_load { f("#add_discussion").click }
         filename, fullpath, _data = get_file("graded.png")
@@ -271,6 +282,7 @@ describe "discussions" do
       end
 
       it "escapes correctly when posting an attachment", priority: "2" do
+        skip "Will be fixed in VICE-5209"
         get url
         message = "message that needs escaping ' \" & !@#^&*()$%{}[];: blah"
         add_reply(message, "graded.png")

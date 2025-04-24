@@ -74,10 +74,15 @@ class ContextModulesController < ApplicationController
     def load_modules
       @modules = @context.modules_visible_to(@current_user).limit(1000)
       @modules.each(&:check_for_stale_cache_after_unlocking!)
-      @collapsed_modules = ContextModuleProgression.for_user(@current_user)
-                                                   .for_modules(@modules)
-                                                   .pluck(:context_module_id, :collapsed)
-                                                   .select { |_cm_id, collapsed| collapsed }.map(&:first)
+      module_collapsed_base = ContextModuleProgression.for_user(@current_user)
+                                                      .for_modules(@modules)
+                                                      .pluck(:context_module_id, :collapsed)
+      if module_performance_improvement_is_enabled?(@context, @current_user)
+        @collapsed_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed == true }.map(&:first)
+        @expanded_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed == false }.map(&:first)
+      else
+        @collapsed_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed }.map(&:first)
+      end
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 
@@ -135,25 +140,15 @@ class ContextModulesController < ApplicationController
         hash[:HIDE_BLUEPRINT_LOCK_ICON_FOR_CHILDREN] = true
       end
 
+      load_module_show_setting
+
       @feature_student_module_selection = @context.account.feature_enabled?(:modules_student_module_selection)
       @feature_teacher_module_selection = @context.account.feature_enabled?(:modules_teacher_module_selection)
-      if @feature_student_module_selection || @feature_teacher_module_selection
-        # if the feature is enabled, and you can edit course content, you get the teacher version
-        # everyone else, if the feature is enabled gets the student limited version (so students and unenrolled)
-        # default is show all the things
-        @module_show_setting = if @can_edit && @feature_teacher_module_selection
-                                 @context.show_teacher_only_module_id
-                               elsif @feature_student_module_selection
-                                 @context.show_student_only_module_id
-                               else
-                                 0
-                               end&.to_i
-        @module_show_setting = nil if @module_show_setting&.zero?
-        if @can_edit
-          hash[:MODULE_FEATURES] = {}
-          hash[:MODULE_FEATURES][:STUDENT_MODULE_SELECTION] = true if @feature_student_module_selection
-          hash[:MODULE_FEATURES][:TEACHER_MODULE_SELECTION] = true if @feature_teacher_module_selection
-        end
+
+      if @can_edit && (@feature_student_module_selection || @feature_teacher_module_selection)
+        hash[:MODULE_FEATURES] = {}
+        hash[:MODULE_FEATURES][:STUDENT_MODULE_SELECTION] = true if @feature_student_module_selection
+        hash[:MODULE_FEATURES][:TEACHER_MODULE_SELECTION] = true if @feature_teacher_module_selection
       end
 
       append_default_due_time_js_env(@context, hash)
@@ -198,6 +193,28 @@ class ContextModulesController < ApplicationController
         @menu_tools[p] = tools.select { |t| t.has_placement? p }
       end
       @menu_tools
+    end
+
+    def load_module_show_setting
+      @can_edit = @context.grants_right?(@current_user, session, :manage_course_content_edit)
+      @feature_student_module_selection = @context.account.feature_enabled?(:modules_student_module_selection)
+      @feature_teacher_module_selection = @context.account.feature_enabled?(:modules_teacher_module_selection)
+
+      if @feature_student_module_selection || @feature_teacher_module_selection
+        # if the feature is enabled, and you can edit course content, you get the teacher version
+        # everyone else, if the feature is enabled gets the student limited version (so students and unenrolled)
+        # default is show all the things
+        @module_show_setting = if @can_edit && @feature_teacher_module_selection
+                                 @context.show_teacher_only_module_id
+                               elsif @feature_student_module_selection
+                                 @context.show_student_only_module_id
+                               else
+                                 0
+                               end&.to_i
+        @module_show_setting = nil if @module_show_setting&.zero?
+        @module_show_setting
+      end
+      nil
     end
 
     private
@@ -401,6 +418,24 @@ class ContextModulesController < ApplicationController
     end
   end
 
+  def module_html
+    unless @context.account.feature_enabled?(:modules_perf)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    if authorized_action(@context, @current_user, :read)
+      @module = @context.modules_visible_to(@current_user).find_by(id: params[:context_module_id])
+      return render status: :not_found, template: "shared/errors/404_message" unless @module
+
+      @modules = [@module]
+      load_module_show_setting
+      load_menu_tools
+      load_permissions
+
+      render template: "context_modules/module_html", layout: false
+    end
+  end
+
   def item_redirect
     if authorized_action(@context, @current_user, :read)
       @tag = @context.context_module_tags.not_deleted.find(params[:id])
@@ -531,7 +566,16 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       info = {}
 
-      all_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).to_a }
+      all_tags = GuardRail.activate(:secondary) do
+        if context.account.feature_enabled?(:modules_perf) && params[:context_module_id]
+          @module = @context.modules_visible_to(@current_user).find_by(id: params[:context_module_id])
+          return render json: {}, status: :not_found unless @module
+
+          @context.visible_module_items_by_module(@current_user, @module).to_a
+        else
+          @context.module_items_visible_to(@current_user).to_a
+        end
+      end
       user_is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
 
       all_tags.each_slice(1000) do |tags|
@@ -592,7 +636,16 @@ class ContextModulesController < ApplicationController
   def content_tag_estimated_duration_data
     if authorized_action(@context, @current_user, :read)
       info = {}
-      all_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).to_a }
+      all_tags = GuardRail.activate(:secondary) do
+        if context.account.feature_enabled?(:modules_perf) && params[:context_module_id]
+          @module = @context.modules_visible_to(@current_user).find_by(id: params[:context_module_id])
+          return render json: {}, status: :not_found unless @module
+
+          @context.visible_module_items_by_module(@current_user, @module).to_a
+        else
+          @context.module_items_visible_to(@current_user).to_a
+        end
+      end
 
       all_tags.each do |tag|
         info[tag.context_module_id] ||= {}
@@ -610,7 +663,16 @@ class ContextModulesController < ApplicationController
 
       if is_child_course || is_master_course
         tag_ids = GuardRail.activate(:secondary) do
-          tag_scope = @context.module_items_visible_to(@current_user).where(content_type: %w[Assignment Attachment DiscussionTopic Quizzes::Quiz WikiPage])
+          if context.account.feature_enabled?(:modules_perf) && params[:context_module_id]
+            @module = @context.modules_visible_to(@current_user).find_by(id: params[:context_module_id])
+            return render json: { tag_restrictions: {} }, status: :not_found unless @module
+
+            tag_scope = @context.visible_module_items_by_module(@current_user, @module)
+          else
+            tag_scope = @context.module_items_visible_to(@current_user)
+          end
+
+          tag_scope = tag_scope.where(content_type: %w[Assignment Attachment DiscussionTopic Quizzes::Quiz WikiPage])
           tag_scope = tag_scope.where(id: params[:tag_id]) if params[:tag_id]
           tag_scope.pluck(:id)
         end

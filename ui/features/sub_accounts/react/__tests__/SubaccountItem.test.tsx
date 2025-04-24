@@ -34,6 +34,7 @@ const props = {
   isExpanded: true,
   canDelete: true,
   show: true,
+  isFocus: false,
 }
 
 describe('SubaccountItem', () => {

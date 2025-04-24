@@ -20,7 +20,7 @@
 class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   require_relative "discussion_checkpoint_error"
 
-  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible: nil, replies_required: 1)
+  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible: nil, replies_required: 1, saved_by: nil)
     super()
     @discussion_topic = discussion_topic
     @assignment = discussion_topic.assignment
@@ -28,6 +28,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
     @dates = dates
     @points_possible = points_possible
     @replies_required = replies_required
+    @saved_by = saved_by
   end
 
   private
@@ -78,7 +79,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   end
 
   def assignment_attributes
-    { only_visible_to_overrides: only_visible_to_overrides?, has_sub_assignments: true }
+    { only_visible_to_overrides: only_visible_to_overrides?, has_sub_assignments: true, due_at: nil }
   end
 
   def checkpoint_attributes

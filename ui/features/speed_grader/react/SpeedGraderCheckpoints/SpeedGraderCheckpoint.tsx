@@ -90,8 +90,8 @@ export const SpeedGraderCheckpoint = (props: Props) => {
       const secondsLate = props.subAssignmentSubmission.seconds_late
       const timeLate =
         props.lateSubmissionInterval === 'hour'
-          ? (secondsLate / 3600).toString()
-          : (secondsLate / (24 * 3600)).toString()
+          ? Math.ceil(secondsLate / 3600).toString()
+          : Math.ceil(secondsLate / (24 * 3600)).toString()
 
       return timeLate.toString()
     }
@@ -154,7 +154,6 @@ export const SpeedGraderCheckpoint = (props: Props) => {
     const timeLate = parseInt(value, 10)
     const secondsLate =
       props.lateSubmissionInterval === 'hour' ? timeLate * 3600 : timeLate * 24 * 3600
-
     props.updateSubmissionStatus({
       subAssignmentTag: props.subAssignmentSubmission.sub_assignment_tag,
       courseId: props.assignment.course_id,

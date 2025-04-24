@@ -41,6 +41,7 @@ describe LoginController do
       Account.default.auth_discovery_url = "https://google.com/"
       Account.default.save!
 
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       expect(InstStatsd::Statsd).to receive(:distributed_increment)
         .with("auth.new.discovery_redirect.v2", tags: { auth_type: nil, domain: "test.host" })
 

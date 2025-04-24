@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {LtiScope} from '../../../../shared/lti/model/LtiScope'
+import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {LtiMessageType} from '../model/LtiMessageType'
 import type {LtiPlacement, LtiPlacementWithIcon} from '../model/LtiPlacement'
 import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
@@ -63,4 +63,6 @@ export type Lti1p3RegistrationOverlayState = {
   icons: {
     placements: Partial<Record<LtiPlacementWithIcon, IconUrlOverride>>
   }
+  dirty: boolean
+  hasSubmitted: boolean
 }

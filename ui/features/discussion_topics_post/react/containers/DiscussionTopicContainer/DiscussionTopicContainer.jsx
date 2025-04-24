@@ -349,11 +349,6 @@ export const DiscussionTopicContainer = ({
             shouldGrow: true,
             shouldShrink: true,
           },
-          podcastButton: {
-            display: 'block',
-            padding: 'small none none none',
-            textSize: 'small',
-          },
           RCE: {
             paddingClosed: 'none',
             paddingOpen: 'none none small',
@@ -380,11 +375,6 @@ export const DiscussionTopicContainer = ({
           summaryButton: {
             shouldGrow: false,
             shouldShrink: false,
-          },
-          podcastButton: {
-            display: 'inline-block',
-            padding: 'none none none small',
-            textSize: 'medium',
           },
           RCE: {
             paddingClosed: 'none medium none xx-large',
@@ -568,6 +558,7 @@ export const DiscussionTopicContainer = ({
                                   direction={responsiveProps.direction}
                                   wrap="wrap"
                                   gap="small"
+                                  margin="small 0 0 0"
                                 >
                                   <Flex.Item overflowY="visible">
                                     <span className="discussion-topic-reply-button">
@@ -607,19 +598,15 @@ export const DiscussionTopicContainer = ({
                                       />
                                     </Flex.Item>
                                   )}
+                                  {podcast_url?.href && (
+                                    <Flex.Item overflowY="visible">
+                                      <PodcastFeed
+                                        linkUrl={podcast_url.href}
+                                        isMobile={matches.includes('mobile')}
+                                      />
+                                    </Flex.Item>
+                                  )}
                                 </Flex>
-                                {podcast_url?.href && (
-                                  <View
-                                    as="div"
-                                    padding={responsiveProps?.podcastButton?.padding}
-                                    display={responsiveProps?.replyButton?.display}
-                                  >
-                                    <PodcastFeed
-                                      linkUrl={podcast_url.href}
-                                      responsiveProps={responsiveProps.podcastButton}
-                                    />
-                                  </View>
-                                )}
                               </>
                             )}
                           </DiscussionEntryContainer>

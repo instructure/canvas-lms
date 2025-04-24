@@ -53,6 +53,7 @@ export const InstructorApps = () => {
   const {
     data: {tools, meta, description},
     isLoading,
+    error,
   } = useQuery({
     queryKey: ['lti_product_info', queryParams],
     // @ts-expect-error
@@ -62,10 +63,14 @@ export const InstructorApps = () => {
       meta: {total_count: 0, current_page: 1, num_pages: 1, count: 0, per_page: 21},
       description: '',
     },
-    onError: (err: Error) => {
-      showFlashError(I18n.t("Couldn't load apps"))(err)
-    },
   })
+
+  useEffect(() => {
+    if (error) {
+      showFlashError(I18n.t("Couldn't load apps"))(error as Error)
+    }
+  }, [error, I18n])
+
   const screenReaderFilterMessage = useCreateScreenReaderFilterMessage({
     queryParams,
     isFilterApplied,

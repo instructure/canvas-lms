@@ -66,7 +66,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def normalize(value)
     value = 0 if value.is_a?(Float) && value.abs < Float::EPSILON
-    value.to_json.to_s
+    value.to_json
   end
 
   def qs_api_index(raw = false, data = {})

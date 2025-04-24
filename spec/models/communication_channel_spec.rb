@@ -178,6 +178,13 @@ describe CommunicationChannel do
     expect(cc.reload.confirmation_sent_count).to eq conf_count
   end
 
+  it "does not break with missing context" do
+    @u1 = User.create!
+    cc = communication_channel(@u1, { username: "mortgage@tomnook.com" })
+    cc.send_confirmation!(nil)
+    expect(cc.reload.confirmation_sent_count).to eq 1
+  end
+
   it "is able to reset a confirmation code" do
     communication_channel_model
     old_cc = @cc.confirmation_code
@@ -227,7 +234,7 @@ describe CommunicationChannel do
 
   it "provides a confirmation url" do
     expect(HostUrl).to receive(:protocol).and_return("https")
-    expect(HostUrl).to receive(:context_host).and_return("test.canvas.com")
+    expect(HostUrl).to receive(:context_host).and_return("test.canvas.com").at_least(:once)
     expect(CanvasSlug).to receive(:generate).and_return("abc123")
     communication_channel_model
     mock_request = instance_double(ActionDispatch::Request, host_with_port: "test.canvas.com")

@@ -19,7 +19,43 @@
 import {render} from '@testing-library/react'
 import ResultCard from '../ResultCard'
 
+const modules = [
+  {
+    id: 1,
+    name: 'Module 1',
+    position: 0,
+    prerequisite_module_ids: [],
+    published: true,
+    items_url: '',
+  },
+  {
+    id: 2,
+    name: 'Module 2',
+    position: 0,
+    prerequisite_module_ids: [],
+    published: true,
+    items_url: '',
+  },
+  {
+    id: 3,
+    name: 'Module 3',
+    position: 0,
+    prerequisite_module_ids: [],
+    published: true,
+    items_url: '',
+  },
+  {
+    id: 4,
+    name: 'Module 4',
+    position: 0,
+    prerequisite_module_ids: [],
+    published: true,
+    items_url: '',
+  },
+]
+
 const props = {
+  courseId: '1',
   searchTerm: 'writing outlines',
   result: {
     content_id: '3',
@@ -30,6 +66,7 @@ const props = {
     html_url: '/courses/1/pages/syllabus',
     distance: 0.9,
     relevance: 0.8,
+    modules: modules,
   },
 }
 
@@ -41,5 +78,47 @@ describe('ResultCard', () => {
     expect(getByText(/outlines/)).toBeInTheDocument()
     expect(getByText(/writing/)).toBeInTheDocument()
     expect(getByTestId('document_icon')).toBeInTheDocument()
+  })
+
+  it('renders modules', () => {
+    const {getByText, getAllByTestId} = render(<ResultCard {...props} />)
+
+    expect(getAllByTestId('module_icon')).toHaveLength(4)
+    expect(getByText('Module 1')).toBeInTheDocument()
+    expect(getByText('Module 2')).toBeInTheDocument()
+    expect(getByText('Module 3')).toBeInTheDocument()
+    expect(getByText('Module 4')).toBeInTheDocument()
+  })
+
+  it('renders only first 5 modules and shows count of extra modules', () => {
+    const extraModules = [
+      ...modules,
+      {
+        id: 5,
+        name: 'Module 5',
+        position: 0,
+        prerequisite_module_ids: [],
+        published: true,
+        items_url: '',
+      },
+      {
+        id: 6,
+        name: 'Module 6',
+        position: 0,
+        prerequisite_module_ids: [],
+        published: true,
+        items_url: '',
+      },
+    ]
+    const updatedProps = {...props, result: {...props.result, modules: extraModules}}
+    const {getByText, getAllByTestId} = render(<ResultCard {...updatedProps} />)
+
+    expect(getAllByTestId('module_icon')).toHaveLength(5)
+    expect(getByText('Module 1')).toBeInTheDocument()
+    expect(getByText('Module 2')).toBeInTheDocument()
+    expect(getByText('Module 3')).toBeInTheDocument()
+    expect(getByText('Module 4')).toBeInTheDocument()
+    expect(getByText('Module 5')).toBeInTheDocument()
+    expect(getByText('1 other module')).toBeInTheDocument()
   })
 })

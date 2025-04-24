@@ -225,6 +225,18 @@ describe DiscussionTopicsController do
         expect(assigns["topics"]).to include(@inactive_ann1)
         expect(assigns["topics"]).to include(@inactive_ann2)
       end
+
+      it "allows the teacher to see the announcement even if it is locked in a concluded course" do
+        @course.complete!
+        user_session(@teacher)
+
+        get :index, params: { course_id: @course.id, only_announcements: true }, format: :json
+        expect(assigns["topics"].size).to eq(4)
+        expect(assigns["topics"]).to include(@active_ann1)
+        expect(assigns["topics"]).to include(@active_ann2)
+        expect(assigns["topics"]).to include(@inactive_ann1)
+        expect(assigns["topics"]).to include(@inactive_ann2)
+      end
     end
 
     context "cross-sharding" do
@@ -431,14 +443,14 @@ describe DiscussionTopicsController do
 
     describe "Metrics for the index page" do
       before do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:count)
       end
 
       it "count discussion_topic.index.visit" do
         user_session(@teacher)
         get "index", params: { course_id: @course.id }
-        expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.index.visit").at_least(:once)
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.index.visit").at_least(:once)
       end
 
       it "count number of pinned discussions discussion_topic.index.pinned" do
@@ -646,7 +658,6 @@ describe DiscussionTopicsController do
     context "assign to differentiation tags" do
       before :once do
         @course.account.enable_feature! :assign_to_differentiation_tags
-        @course.account.enable_feature! :differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -908,7 +919,6 @@ describe DiscussionTopicsController do
     context "assign to differentiation tags (for discussion redesign only)" do
       before :once do
         @course.account.enable_feature! :assign_to_differentiation_tags
-        @course.account.enable_feature! :differentiation_tags
         @course.enable_feature! :react_discussions_post
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
@@ -1906,8 +1916,10 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION_DEFAULT_SORT_ENABLED]).to be_truthy
     end
 
-    it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of :differentiation_tags ff state" do
-      Account.site_admin.enable_feature!(:differentiation_tags)
+    it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of allow_assign_to_differentiation_tags setting state" do
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
 
       user_session(@teacher)
       @course.group_categories.create!(name: "non_colaborative_category", non_collaborative: true)
@@ -1917,7 +1929,9 @@ describe DiscussionTopicsController do
       get :new, params: { course_id: @course.id }
       expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
 
-      Account.site_admin.disable_feature!(:differentiation_tags)
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+      @course.account.save!
+      @course.account.reload
 
       get :new, params: { course_id: @course.id }
       expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
@@ -2027,8 +2041,10 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
-    it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of :differentiation_tags ff state" do
-      Account.site_admin.enable_feature!(:differentiation_tags)
+    it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of allow_assign_to_differentiation_tags setting state" do
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
 
       user_session(@teacher)
       @course.group_categories.create!(name: "non_colaborative_category", non_collaborative: true)
@@ -2038,7 +2054,9 @@ describe DiscussionTopicsController do
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
 
-      Account.site_admin.disable_feature!(:differentiation_tags)
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+      @course.account.save!
+      @course.account.reload
 
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
@@ -2152,7 +2170,6 @@ describe DiscussionTopicsController do
     context "assign to differentiation tags" do
       before :once do
         @course.account.enable_feature! :assign_to_differentiation_tags
-        @course.account.enable_feature! :differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -3236,7 +3253,7 @@ describe DiscussionTopicsController do
 
   describe "Metrics" do
     before do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       allow(InstStatsd::Statsd).to receive(:count)
     end
 
@@ -3244,14 +3261,14 @@ describe DiscussionTopicsController do
       user_session @teacher
       post "create", params: topic_params(@course), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.created").at_least(:once)
     end
 
     it "does not increment discussion_topic.created when topic is not successfully created" do
       user_session @observer
       post "create", params: topic_params(@course), format: :json
       expect(response).to have_http_status :forbidden
-      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created")
+      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.created")
     end
 
     it "increment discussion_topic.created.partial_anonymity" do
@@ -3259,7 +3276,7 @@ describe DiscussionTopicsController do
       user_session @teacher
       post "create", params: topic_params(@course, { anonymous_state: "partial_anonymity" }), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.partial_anonymity").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.created.partial_anonymity").at_least(:once)
     end
 
     it "does not increment discussion_topic.created.partial_anonymity if topic can not be partially anonymous" do
@@ -3267,7 +3284,7 @@ describe DiscussionTopicsController do
       user_session @teacher
       post "create", params: topic_params(@course, { anonymous_state: "partial_anonymity" }), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.partial_anonymity")
+      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.created.partial_anonymity")
     end
 
     it "increment discussion_topic.created.full_anonymity" do
@@ -3275,7 +3292,7 @@ describe DiscussionTopicsController do
       user_session @teacher
       post "create", params: topic_params(@course, { anonymous_state: "full_anonymity" }), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.full_anonymity").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.created.full_anonymity").at_least(:once)
     end
 
     it "does not increment discussion_topic.created.full_anonymity if topic can not be anonymous" do
@@ -3283,35 +3300,35 @@ describe DiscussionTopicsController do
       user_session @teacher
       post "create", params: topic_params(@course, { anonymous_state: "full_anonymity" }), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.full_anonymity")
+      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.created.full_anonymity")
     end
 
     it "increment discussion_topic.created.podcast_feed_enabled" do
       user_session @teacher
       post "create", params: topic_params(@course, { podcast_enabled: 1 }), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.podcast_feed_enabled").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.created.podcast_feed_enabled").at_least(:once)
     end
 
     it "does not increment discussion_topic.created.podcast_feed_enabled" do
       user_session @teacher
       post "create", params: topic_params(@course, { podcast_enabled: 0 }), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.podcast_feed_enabled")
+      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.created.podcast_feed_enabled")
     end
 
     it "increment discussion_topic.created.allow_liking_enabled" do
       user_session @teacher
       post "create", params: topic_params(@course, { allow_rating: 1 }), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.allow_liking_enabled").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.created.allow_liking_enabled").at_least(:once)
     end
 
     it "does not increment discussion_topic.created.allow_liking_enabled" do
       user_session @teacher
       post "create", params: topic_params(@course, { allow_rating: 0 }), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.allow_liking_enabled")
+      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.created.allow_liking_enabled")
     end
 
     it "increment discussion_topic.created.attachment" do
@@ -3320,48 +3337,48 @@ describe DiscussionTopicsController do
       attachment_model context: @course, uploaded_data: data, folder: Folder.unfiled_folder(@course)
       post "create", params: topic_params(@course, { attachment: data }), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.attachment").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.created.attachment").at_least(:once)
     end
 
     it "does not increment discussion_topic.created.attachment" do
       user_session @teacher
       post "create", params: topic_params(@course, {}), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.attachment")
+      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.created.attachment")
     end
 
     it "increment discussion_topic.created.scheduled when delayed_post_at is not nil" do
       user_session @teacher
       post "create", params: topic_params(@course, { delayed_post_at: "2022-04-21T06:00:00.000Z" }), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.scheduled").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.created.scheduled").at_least(:once)
     end
 
     it "increment discussion_topic.created.scheduled when lock at is not nil" do
       user_session @teacher
       post "create", params: topic_params(@course, { lock_at: "2022-04-21T06:00:00.000Z" }), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.scheduled").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.created.scheduled").at_least(:once)
     end
 
     it "does not increment discussion_topic.created.scheduled without delayed_post_at and lock_at" do
       user_session @teacher
       post "create", params: topic_params(@course), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.scheduled")
+      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.created.scheduled")
     end
 
     it "increment discussion_topic.created.graded" do
       user_session @teacher
       obj_params = topic_params(@course).merge(assignment_params(@course))
       post "create", params: obj_params, format: :json
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.graded").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.created.graded").at_least(:once)
     end
 
     it "does not increment discussion_topic.created.graded for non graded topics" do
       user_session @teacher
       post "create", params: topic_params(@course), format: :json
-      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.graded")
+      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.created.graded")
     end
 
     describe "assignment multiple due dates" do
@@ -3372,7 +3389,7 @@ describe DiscussionTopicsController do
           obj_params[:assignment][:assignment_overrides] = [{ "due_at" => "2022-04-23T05:59:59.000Z", "due_at_overridden" => false, "lock_at" => "2022-04-24T05:59:59.000Z", "lock_at_overridden" => false, "unlock_at" => "2022-04-21T06:00:00.000Z", "unlock_at_overridden" => false, "rowKey" => "0", "course_section_id" => "2", "title" => "Section 1", "all_day" => false, "all_day_date" => nil, "persisted" => false },
                                                             { "due_at" => "2022-04-30T05:59:59.000Z", "due_at_overridden" => false, "lock_at" => "2022-05-01T05:59:59.000Z", "lock_at_overridden" => false, "unlock_at" => "2022-04-28T06:00:00.000Z", "unlock_at_overridden" => false, "rowKey" => "1", "course_section_id" => "3", "title" => "Section 2", "all_day" => false, "all_day_date" => nil, "persisted" => false }]
           post "create", params: obj_params, format: :json
-          expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.multiple_due_dates").at_least(:once)
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.created.multiple_due_dates").at_least(:once)
         end
       end
 
@@ -3380,7 +3397,7 @@ describe DiscussionTopicsController do
         it "discussion_topic.created.multiple_due_dates" do
           user_session @teacher
           post "create", params: topic_params(@course), format: :json
-          expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.multiple_due_dates")
+          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.created.multiple_due_dates")
         end
       end
     end
@@ -3391,7 +3408,7 @@ describe DiscussionTopicsController do
       course_topic
       user_session @teacher
       get "show", params: { course_id: @course.id, id: @topic.id }
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.visit.redesign").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.visit.redesign").at_least(:once)
     end
 
     it "does not increment discussion_topic.visit.redesign with unauthorized visit" do
@@ -3400,7 +3417,7 @@ describe DiscussionTopicsController do
       course_topic
       get "show", params: { course_id: @course.id, id: @topic.id }
       assert_unauthorized
-      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.visit.redesign")
+      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.visit.redesign")
     end
 
     it "count discussion_topic.visit.entries.redesign" do
@@ -3445,7 +3462,7 @@ describe DiscussionTopicsController do
       course_topic
       user_session @teacher
       get "show", params: { course_id: @course.id, id: @topic.id }
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.visit.legacy").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.visit.legacy").at_least(:once)
     end
 
     it "does not increment discussion_topic.visit.legacy with unauthorized visit" do
@@ -3454,7 +3471,7 @@ describe DiscussionTopicsController do
       course_topic
       get "show", params: { course_id: @course.id, id: @topic.id }
       assert_unauthorized
-      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.visit.legacy")
+      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.visit.legacy")
     end
 
     it "increment discussion_topic.created.group" do
@@ -3464,13 +3481,13 @@ describe DiscussionTopicsController do
 
       post "create", params: group_topic_params(@group), format: :json
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.group").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.created.group").at_least(:once)
     end
 
     it "does not increment discussion_topic.created.group when topic is not successfully created" do
       user_session @teacher
       post "create", params: topic_params(@course), format: :json
-      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.group")
+      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("discussion_topic.created.group")
     end
 
     it "count discussion_topic.visit.entries.legacy" do

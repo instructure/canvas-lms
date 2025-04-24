@@ -16,204 +16,35 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState, useRef} from 'react'
+import React, {useCallback, useEffect, useState, useRef, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
-import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {queryClient} from '@canvas/query'
 import {type File, type Folder} from '../../../interfaces/File'
-import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
+import {ModalOrTrayOptions, type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {getUniqueId} from '../../../utils/fileFolderUtils'
 import SubTableContent from './SubTableContent'
-import ActionMenuButton from './ActionMenuButton'
-import NameLink from './NameLink'
-import PublishIconButton from './PublishIconButton'
-import RightsIconButton from './RightsIconButton'
 import renderTableHead from './RenderTableHead'
 import renderTableBody from './RenderTableBody'
 import {useFileManagement} from '../Contexts'
 import {FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
-import BlueprintIconButton from './BlueprintIconButton'
 import {Alert} from '@instructure/ui-alerts'
 import UsageRightsModal from './UsageRightsModal'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import FileTableUpload from './FileTableUpload'
-import {UpdatedAtDate} from './UpdatedAtDate'
-import {ModifiedByLink} from './ModifiedByLink'
 import PermissionsModal from './PermissionsModal'
 import {Sort} from '../../hooks/useGetPaginatedFiles'
 import {createPortal} from 'react-dom'
+import {
+  getColumnHeaders,
+  getSelectionScreenReaderText,
+  setColumnWidths,
+} from './FileFolderTableUtils'
 
 const I18n = createI18nScope('files_v2')
-
 const MIN_HEIGHT = 450
-
-const setColumnWidths = (headers: ColumnHeader[]) => {
-  // Use a temporary div to calculate the width of each column
-  const temp = document.createElement('div')
-  temp.style.position = 'absolute'
-  temp.style.visibility = 'hidden'
-  temp.style.whiteSpace = 'nowrap'
-  temp.style.left = '-9999px'
-  temp.style.fontFamily = getComputedStyle(document.body).fontFamily
-  temp.style.fontSize = getComputedStyle(document.body).fontSize
-  temp.style.fontWeight = 'bold'
-  document.body.appendChild(temp)
-
-  const fontSizeInPx = parseFloat(temp.style.fontSize)
-
-  headers.forEach(header => {
-    if (header.width) return // some headers have fixed widths
-    temp.textContent = header.title
-    const width = temp.getBoundingClientRect().width
-    const widthInEms = width / fontSizeInPx
-    const padding = 1.5
-    header.width = `${Math.round(Math.max(3, widthInEms + padding) * 100) / 100}em`
-  })
-  document.body.removeChild(temp)
-}
-
-const columnHeaders: ColumnHeader[] = [
-  {id: 'name', title: I18n.t('Name'), textAlign: 'start', width: '12.5em'},
-  {
-    id: 'created_at',
-    title: I18n.t('Created'),
-    textAlign: 'start',
-    width: undefined,
-  },
-  {
-    id: 'updated_at',
-    title: I18n.t('Last Modified'),
-    textAlign: 'start',
-    width: undefined,
-  },
-  {
-    id: 'modified_by',
-    title: I18n.t('Modified By'),
-    textAlign: 'start',
-    width: undefined,
-  },
-  {id: 'size', title: I18n.t('Size'), textAlign: 'start', width: ''},
-  {
-    id: 'rights',
-    title: I18n.t('Rights'),
-    textAlign: 'center',
-    width: undefined,
-  },
-  {
-    id: 'blueprint',
-    title: I18n.t('Blueprint'),
-    textAlign: 'center',
-    width: undefined,
-  },
-  {
-    id: 'permissions',
-    title: I18n.t('Status'),
-    textAlign: 'center',
-    width: undefined,
-  },
-  {id: 'actions', title: '', textAlign: 'center', width: '3em'},
-]
-
-setColumnWidths(columnHeaders)
-
-const columnRenderers: {
-  [key: string]: ({
-    row,
-    rows,
-    isStacked,
-    userCanEditFilesForContext,
-    userCanDeleteFilesForContext,
-    userCanRestrictFilesForContext,
-    usageRightsRequiredForContext,
-    size,
-    isSelected,
-    toggleSelect,
-    setModalOrTrayOptions,
-  }: {
-    row: File | Folder
-    rows: (File | Folder)[]
-    isStacked: boolean
-    userCanEditFilesForContext: boolean
-    userCanDeleteFilesForContext: boolean
-    userCanRestrictFilesForContext: boolean
-    usageRightsRequiredForContext: boolean
-    size: 'small' | 'medium' | 'large'
-    isSelected: boolean
-    toggleSelect: () => void
-    setModalOrTrayOptions: (modalOrTray: ModalOrTrayOptions | null) => () => void
-  }) => React.ReactNode
-} = {
-  name: ({row, rows, isStacked}) => <NameLink isStacked={isStacked} item={row} collection={rows} />,
-  created_at: ({row}) => <FriendlyDatetime dateTime={row.created_at} includeScreenReaderContent={false}/>,
-  updated_at: ({row, isStacked}) => (
-    <UpdatedAtDate updatedAt={row.updated_at} isStacked={isStacked} />
-  ),
-  modified_by: ({row, isStacked}) =>
-    'user' in row && row.user?.display_name ? (
-      <ModifiedByLink
-        htmlUrl={row.user.html_url}
-        displayName={row.user.display_name}
-        isStacked={isStacked}
-      />
-    ) : null,
-  size: ({row}) =>
-    'size' in row ? <Text>{friendlyBytes(row.size)}</Text> : <Text>{I18n.t('--')}</Text>,
-  rights: ({
-    row,
-    userCanEditFilesForContext,
-    usageRightsRequiredForContext,
-    setModalOrTrayOptions,
-  }) =>
-    row.folder_id && usageRightsRequiredForContext ? (
-      <RightsIconButton
-        usageRights={row.usage_rights}
-        userCanEditFilesForContext={userCanEditFilesForContext}
-        onClick={setModalOrTrayOptions({id: 'manage-usage-rights', items: [row]})}
-      />
-    ) : null,
-  blueprint: ({row}) => <BlueprintIconButton item={row} />,
-  permissions: ({row, userCanRestrictFilesForContext, setModalOrTrayOptions}) => (
-    <PublishIconButton
-      item={row}
-      userCanRestrictFilesForContext={userCanRestrictFilesForContext}
-      onClick={setModalOrTrayOptions({id: 'permissions', items: [row]})}
-    />
-  ),
-  actions: ({
-    row,
-    size,
-    userCanEditFilesForContext,
-    userCanDeleteFilesForContext,
-    userCanRestrictFilesForContext,
-    usageRightsRequiredForContext,
-  }) => (
-    <ActionMenuButton
-      size={size}
-      userCanEditFilesForContext={userCanEditFilesForContext}
-      userCanDeleteFilesForContext={userCanDeleteFilesForContext}
-      userCanRestrictFilesForContext={userCanRestrictFilesForContext}
-      usageRightsRequiredForContext={usageRightsRequiredForContext}
-      row={row}
-    />
-  ),
-}
-
-const getSelectionScreenReaderText = (selected: number, total: number) => {
-  return I18n.t('%{selected} of %{total} selected', {
-    selected,
-    total,
-  })
-}
-
-export type ModalOrTrayOptions = {
-  id: 'manage-usage-rights' | 'permissions'
-  items: (File | Folder)[]
-}
 
 export interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
@@ -248,6 +79,12 @@ const FileFolderTable = ({
 }: FileFolderTableProps) => {
   const {currentFolder} = useFileManagement()
   const isStacked = size !== 'large'
+  const columnHeaders: ColumnHeader[] = useMemo(() => {
+    const actionsTitle = isStacked ? '' : I18n.t('Actions')
+    const headers = getColumnHeaders(actionsTitle)
+    setColumnWidths(headers)
+    return headers
+  }, [isStacked])
 
   const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>(() => {
     return getSelectionScreenReaderText(selectedRows.size, rows.length)
@@ -261,8 +98,10 @@ const FileFolderTable = ({
 
   useEffect(() => {
     const listener = (event: FilesCollectionEvent) => {
-      if (['add', 'remove', 'refetch'].includes(event))
+      if (['add', 'remove', 'refetch'].includes(event)) {
+        queryClient.refetchQueries({queryKey: ['quota'], type: 'active'})
         queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+      }
     }
     currentFolder?.addListener(listener)
 
@@ -285,7 +124,7 @@ const FileFolderTable = ({
       setSelectedRows(newSet)
       setSelectionAnnouncement(getSelectionScreenReaderText(newSet.size, rows.length))
     },
-    [selectedRows, rows.length],
+    [selectedRows, setSelectedRows, rows.length],
   )
 
   const toggleSelectAll = useCallback(() => {
@@ -296,7 +135,7 @@ const FileFolderTable = ({
       setSelectedRows(new Set(rows.map(row => getUniqueId(row)))) // Select all
       setSelectionAnnouncement(getSelectionScreenReaderText(rows.length, rows.length))
     }
-  }, [rows, selectedRows.size])
+  }, [rows, selectedRows.size, setSelectedRows])
 
   enum SortOrder {
     ASCENDING = 'asc',
@@ -314,7 +153,7 @@ const FileFolderTable = ({
           : SortOrder.ASCENDING
       onSortChange({by: newCol, direction: newDirection})
     },
-    [onSortChange, sort.by, sort.direction],
+    [SortOrder.ASCENDING, SortOrder.DESCENDING, onSortChange, sort.by, sort.direction],
   )
 
   const allRowsSelected = rows.length != 0 && selectedRows.size === rows.length
@@ -333,21 +172,22 @@ const FileFolderTable = ({
   })
 
   const renderModals = useCallback(
-    () => createPortal(
-      <>
-        <UsageRightsModal
-          open={modalOrTrayOptions?.id === 'manage-usage-rights'}
-          items={modalOrTrayOptions?.items || []}
-          onDismiss={setModalOrTrayOptions(null)}
-        />
-        <PermissionsModal
-          open={modalOrTrayOptions?.id === 'permissions'}
-          items={modalOrTrayOptions?.items || []}
-          onDismiss={setModalOrTrayOptions(null)}
-        />
-      </>,
-      document.body,
-    ),
+    () =>
+      createPortal(
+        <>
+          <UsageRightsModal
+            open={modalOrTrayOptions?.id === 'manage-usage-rights'}
+            items={modalOrTrayOptions?.items || []}
+            onDismiss={setModalOrTrayOptions(null)}
+          />
+          <PermissionsModal
+            open={modalOrTrayOptions?.id === 'permissions'}
+            items={modalOrTrayOptions?.items || []}
+            onDismiss={setModalOrTrayOptions(null)}
+          />
+        </>,
+        document.body,
+      ),
     [modalOrTrayOptions?.id, modalOrTrayOptions?.items, setModalOrTrayOptions],
   )
 
@@ -413,7 +253,7 @@ const FileFolderTable = ({
   return (
     <>
       {renderModals()}
-      <Flex direction='column'>
+      <Flex direction="column">
         <div
           data-testid="files-directory"
           ref={filesDirectoryRef}
@@ -453,7 +293,6 @@ const FileFolderTable = ({
                 selectedRows,
                 size,
                 isStacked,
-                columnRenderers,
                 toggleRowSelection,
                 userCanEditFilesForContext,
                 userCanDeleteFilesForContext,

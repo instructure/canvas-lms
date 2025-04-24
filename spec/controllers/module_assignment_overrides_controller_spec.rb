@@ -396,6 +396,7 @@ describe ModuleAssignmentOverridesController do
 
     context "differentiation tags" do
       before do
+        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
       end
@@ -557,6 +558,132 @@ describe ModuleAssignmentOverridesController do
         expect(@module1.assignment_overrides.reload.to_a).to match_array(overrides)
         expect(@module1.assignment_override_students.reload.to_a).to match_array(students)
       end
+    end
+  end
+
+  describe "PUT 'convert_tag_overrides_to_adhoc_overrides" do
+    before do
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @diff_tag_module = @course.context_modules.create!(name: "Differentiation Tag Module")
+      @diff_tag_cat = @course.group_categories.create!(name: "Learning Level", non_collaborative: true)
+      @diff_tag1 = @course.groups.create!(name: "Honors", group_category: @diff_tag_cat, non_collaborative: true)
+      @diff_tag2 = @course.groups.create!(name: "Standard", group_category: @diff_tag_cat, non_collaborative: true)
+
+      # Add student 1 to honors
+      @diff_tag1.add_user(@student1, "accepted")
+
+      @diff_tag2.add_user(@student2, "accepted")
+      @diff_tag2.add_user(@student3, "accepted")
+    end
+
+    def create_diff_tag_override_for_module(context_module, diff_tag)
+      context_module.assignment_overrides.create!(set_type: "Group", set: diff_tag)
+    end
+
+    context "errors" do
+      it "returns 404 if the course doesn't exist" do
+        put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: (@course.id + 1), context_module_id: @diff_tag_module.id }
+        expect(response).to be_not_found
+      end
+
+      it "returns 404 if the module is deleted or nonexistent" do
+        @diff_tag_module.update!(workflow_state: "deleted")
+        put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, context_module_id: @diff_tag_module.id }
+        expect(response).to be_not_found
+      end
+
+      it "returns 404 if the module is in a different course" do
+        course2 = course_with_teacher(active_all: true, user: @teacher).course
+        course2.context_modules.create!
+        put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: course2.id, context_module_id: @diff_tag_module.id }
+        expect(response).to be_not_found
+      end
+
+      it "returns unauthorized if the user doesn't have manage_course_content_edit permission" do
+        student = student_in_course.user
+        user_session(student)
+        put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, context_module_id: @diff_tag_module.id }
+        expect(response).to be_unauthorized
+      end
+
+      it "returns bad request if underlying service contains errors" do
+        allow(DifferentiationTag::OverrideConverterService).to receive(:convert_tags_to_adhoc_overrides_for).and_return(["Something went wrong"])
+
+        put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, context_module_id: @diff_tag_module.id }
+        expect(response).to have_http_status :bad_request
+        json = json_parse(response.body)
+        expect(json["errors"]).to eq ["Something went wrong"]
+      end
+
+      it "concatinates errors if multiple issues occur in underlying service" do
+        allow(DifferentiationTag::OverrideConverterService).to receive(:convert_tags_to_adhoc_overrides_for).and_return(["Invalid course", "Invalid learning object"])
+
+        put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, context_module_id: @diff_tag_module.id }
+        expect(response).to have_http_status :bad_request
+        json = json_parse(response.body)
+        expect(json["errors"]).to eq ["Invalid course", "Invalid learning object"]
+      end
+    end
+
+    it "converts tag overrides to adhoc overrides" do
+      create_diff_tag_override_for_module(@diff_tag_module, @diff_tag1)
+      create_diff_tag_override_for_module(@diff_tag_module, @diff_tag2)
+
+      expect(@diff_tag_module.assignment_overrides.active.count).to eq 2
+      expect(@diff_tag_module.assignment_overrides.active.pluck(:set_type).uniq).to eq ["Group"]
+
+      put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, context_module_id: @diff_tag_module.id }
+
+      expect(response).to have_http_status :no_content
+      expect(@diff_tag_module.assignment_overrides.active.count).to eq 1
+      override = @diff_tag_module.assignment_overrides.active.first
+      expect(override.set_type).to eq "ADHOC"
+      expect(override.assignment_override_students.count).to eq 3
+    end
+
+    it "creates new adhoc override if one already exists" do
+      adhoc_override = @diff_tag_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      create_diff_tag_override_for_module(@diff_tag_module, @diff_tag1)
+      create_diff_tag_override_for_module(@diff_tag_module, @diff_tag2)
+
+      expect(@diff_tag_module.assignment_overrides.active.count).to eq 3
+
+      put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, context_module_id: @diff_tag_module.id }
+
+      expect(response).to have_http_status :no_content
+      adhoc_overrides = @diff_tag_module.assignment_overrides.active.where(set_type: "ADHOC")
+      expect(adhoc_overrides.count).to eq 2
+
+      first_adhoc_override = adhoc_overrides.first
+      expect(first_adhoc_override.assignment_override_students.count).to eq 1
+
+      second_adhoc_override = adhoc_overrides.second
+      expect(second_adhoc_override.assignment_override_students.count).to eq 2
+    end
+
+    it "does not interfere with other types of module overrides" do
+      create_diff_tag_override_for_module(@diff_tag_module, @diff_tag1)
+      create_diff_tag_override_for_module(@diff_tag_module, @diff_tag2)
+      @diff_tag_module.assignment_overrides.create!(set_type: "CourseSection", set_id: @course.course_sections.first)
+
+      expect(@diff_tag_module.assignment_overrides.active.count).to eq 3
+      expect(@diff_tag_module.assignment_overrides.active.pluck(:set_type).uniq).to contain_exactly("Group", "CourseSection")
+
+      put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, context_module_id: @diff_tag_module.id }
+
+      expect(response).to have_http_status :no_content
+      expect(@diff_tag_module.assignment_overrides.active.count).to eq 2
+      expect(@diff_tag_module.assignment_overrides.active.pluck(:set_type).uniq).to contain_exactly("ADHOC", "CourseSection")
+    end
+
+    it "does not return error if no tag overrides exist" do
+      put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, context_module_id: @diff_tag_module.id }
+
+      expect(response).to have_http_status :no_content
+      expect(@diff_tag_module.assignment_overrides.active.count).to eq 0
     end
   end
 end

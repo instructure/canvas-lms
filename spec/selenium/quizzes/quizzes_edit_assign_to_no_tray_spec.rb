@@ -115,7 +115,6 @@ describe "quiz edit page assign to" do
   context "assign to differentiaiton tags" do
     before :once do
       @course.account.enable_feature! :assign_to_differentiation_tags
-      @course.account.enable_feature! :differentiation_tags
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: true }
         a.save!

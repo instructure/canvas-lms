@@ -18,4 +18,5 @@
 
 export {useFetchNewLoginData} from './useFetchNewLoginData'
 export {usePasswordValidator} from './usePasswordValidator'
+export {useSafeBackNavigation} from './useSafeBackNavigation'
 export {useServerErrorsMap} from './useServerErrorsMap'

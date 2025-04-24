@@ -19,11 +19,104 @@
 
 module Lti
   # Centralized tool finding logic for single LTI tools.
-  # Replaces ContextExternalTool#find_external_tool and friends.
+  # Replaces ContextExternalTool#find_external_tool, #find_for, and friends.
+  #
+  # Single place to find tools and confirm that they are available in the
+  # given context, since admins will soon be able to limit availability without
+  # uninstalling tools.
+  #
+  # Finding a single tool is usually done either by ID or URL. This class has a
+  # variety of methods that fall into these two categories to fit most needs.
+  # It's not always possible to directly match a tool by its Canvas ID, like when a
+  # tool is uninstalled and reinstalled from the same 1.3 registration, or when content
+  # items that link to a tool only store a URL. This is the reason that URL matching
+  # is needed, and why it ends up being so complex.
   #
   # For finding all tools available for a given context, use Lti::ContextToolFinder.
   class ToolFinder
     class << self
+      # ----------
+      # Find by ID
+      # ----------
+
+      # Returns the ContextExternalTool with this id, given that
+      # it is available in the given context.
+      # Replaces ContextExternalTool#find_for.
+      #
+      # @param id [Integer] The id of the ContextExternalTool
+      # @param context [Course|Group|Account] Base context for searching
+      # @param placement [String] If provided, will only return tools that use this placement
+      #
+      # @return [ContextExternalTool] The tool that matches the given id and criteria
+      # @raise [ActiveRecord::RecordNotFound] If no tool is found
+      def from_id!(id, context, placement: nil)
+        from_id(id, context, placement:) || raise(ActiveRecord::RecordNotFound)
+      end
+
+      # Returns the ContextExternalTool with this id, given that
+      # it is available in the given context.
+      # Replaces ContextExternalTool#find_for.
+      #
+      # @param id [Integer] The id of the ContextExternalTool
+      # @param context [Course|Group|Account] Base context for searching
+      # @param placement [String] If provided, will only return tools that use this placement
+      #
+      # @return [ContextExternalTool] The tool that matches the given id and criteria, or nil
+      def from_id(id, context, placement: nil)
+        id = id[Api::ID_REGEX] if id.is_a?(String)
+        return nil unless id.present?
+
+        context.shard.activate do
+          scope = ContextExternalTool.active.where(id:, context: Lti::ContextToolFinder.contexts_to_search(context))
+          scope = scope.placements(placement) if placement
+          scope.first
+        end
+      end
+
+      # Returns the first ContextExternalTool present and available in
+      # the given context that matches the given scope.
+      #
+      # @param context [Course|Group|Account] Base context for searching
+      # @param scope [String] A ContextExternalTool query to narrow the search
+      #
+      # @return [ContextExternalTool] The first tool that matches the given scope
+      def from_context(context, scope:)
+        scope.find_by(context: Lti::ContextToolFinder.contexts_to_search(context))
+      end
+
+      # Returns the ContextExternalTool for this id, given that it is
+      # available in the given context.
+      #
+      # Use instead of Rails' find_by to respect admin tool availability decisions.
+      #
+      # @param id [Integer] The id of the ContextExternalTool
+      # @param scope [ActiveRecord::Relation] Optionally, a ContextExternalTool query to narrow the search
+      #
+      # @return [ContextExternalTool] The tool that matches the given id
+      def find_by(id:, scope: nil)
+        scope ||= ContextExternalTool.all
+        scope.find_by(id:)
+      end
+
+      # Returns the ContextExternalTool for this id, given that it is
+      # available in the given context.
+      #
+      # Use instead of Rails' find to respect admin tool availability decisions.
+      #
+      # @param id [Integer] The id of the ContextExternalTool
+      # @param scope [ActiveRecord::Relation] Optionally, a ContextExternalTool query to narrow the search
+      #
+      # @return [ContextExternalTool] The tool that matches the given id
+      # @raise [ActiveRecord::RecordNotFound] If no tool is found
+      def find(id, scope: nil)
+        scope ||= ContextExternalTool.all
+        scope.find(id)
+      end
+
+      # -----------
+      # Find by URL
+      # -----------
+
       # Returns the ContextExternalTool associated with this assignment.
       #
       # Prefers the tool directly linked to the assignment's ContentTag

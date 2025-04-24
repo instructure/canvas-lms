@@ -72,9 +72,10 @@ describe('Card', () => {
       <Card
         href="/test-path"
         icon="/mock.svg"
-        onClick={mockOnClick}
-        text="Test Card"
         label="Test Label"
+        onClick={mockOnClick}
+        testId="card-link"
+        text="Test Card"
       />,
     )
     const link = screen.getByTestId('card-link')
@@ -84,7 +85,14 @@ describe('Card', () => {
 
   it('triggers onClick when clicked', () => {
     render(
-      <Card href="#" icon="/mock.svg" onClick={mockOnClick} text="Test Card" label="Test Label" />,
+      <Card
+        href="#"
+        icon="/mock.svg"
+        label="Test Label"
+        onClick={mockOnClick}
+        testId="card-link"
+        text="Test Card"
+      />,
     )
     const link = screen.getByTestId('card-link')
     fireEvent.click(link)
@@ -96,9 +104,10 @@ describe('Card', () => {
       <Card
         href="#"
         icon="/mock.svg"
-        onClick={mockOnClick}
-        text="Test Card"
         label="Accessible Label"
+        onClick={mockOnClick}
+        testId="card-link"
+        text="Test Card"
       />,
     )
     const link = screen.getByTestId('card-link')

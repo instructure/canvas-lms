@@ -18,10 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe "QTI Generator" do
-  def qti_generator
+  before :once do
     quiz_with_question_group_pointing_to_question_bank
+  end
+
+  def qti_generator(user: nil)
     @rn = Object.new
-    allow(@rn).to receive_messages(user: {}, course: @course, export_dir: {})
+    allow(@rn).to receive_messages(user:, course: @course, export_dir: {})
     allow(@rn).to receive(:export_object?).with(anything).and_return(true)
     @qg = CC::Qti::QtiGenerator.new @rn, nil, nil
   end
@@ -33,6 +36,21 @@ describe "QTI Generator" do
         expect(bank.class.to_s).to eq "AssessmentQuestionBank"
       end
       @result = @qg.generate_banks [@bank.id]
+    end
+
+    context "permissions" do
+      it "includes question banks for teachers" do
+        teacher_in_course
+        qti_generator(user: @teacher)
+        expect(@qg).to receive(:generate_question_bank).at_least(:once)
+        @qg.generate_banks [@bank.id]
+      end
+
+      it "excludes question banks for students" do
+        qti_generator(user: @student)
+        expect(@qg).not_to receive :generate_question_bank
+        @qg.generate_banks [@bank.id]
+      end
     end
   end
 

@@ -16,36 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import { renderHook, act } from '@testing-library/react-hooks'
+import {renderHook, act} from '@testing-library/react-hooks'
 import useTranslationDisplay from '../useTranslationDisplay'
-import { useTranslationContext } from '../useTranslationContext'
-import { translationSeparator } from '../../utils/constants'
+import {useTranslationContext} from '../useTranslationContext'
+import {translationSeparator} from '../../utils/constants'
 import * as translationUtils from '../../utils/inbox_translator'
 
 jest.mock('../useTranslationContext')
 jest.mock('../../utils/inbox_translator')
 
-const mockStripSignature = jest.spyOn(translationUtils, 'stripSignature').mockImplementation(((body: string) => {
-  return body
-}))
+const mockStripSignature = jest
+  .spyOn(translationUtils, 'stripSignature')
+  .mockImplementation((body: string) => {
+    return body
+  })
 
-const mockUseTranslationContext = useTranslationContext as jest.MockedFunction<typeof useTranslationContext>
+const mockUseTranslationContext = useTranslationContext as jest.MockedFunction<
+  typeof useTranslationContext
+>
 
 describe('useTranslationDisplay', () => {
   const setMessagePosition = jest.fn()
   const setBody = jest.fn()
   const mockContext: {
-    setMessagePosition: jest.Mock<any, any>;
-    messagePosition: string | null;
-    body: string;
-    setBody: jest.Mock<(prevBody: string) => void>;
-    translationTargetLanguage: string;
-    setTranslationTargetLanguage: jest.Mock<any, any>;
-    translating: boolean;
-    setTranslating: jest.Mock<any, any>;
-    translateBody: jest.Mock<any, any>;
-    translateBodyWith: jest.Mock<any, any>;
+    setMessagePosition: jest.Mock<any, any>
+    messagePosition: string | null
+    body: string
+    setBody: jest.Mock<(prevBody: string) => void>
+    translationTargetLanguage: string
+    setTranslationTargetLanguage: jest.Mock<any, any>
+    translating: boolean
+    setTranslating: jest.Mock<any, any>
+    translateBody: jest.Mock<any, any>
+    translateBodyWith: jest.Mock<any, any>
+    errorMessages: any[]
+    setErrorMessages: jest.Mock<any, any>
+    textTooLongErrors: any[]
   } = {
     translationTargetLanguage: '',
     setTranslationTargetLanguage: jest.fn(),
@@ -56,7 +62,10 @@ describe('useTranslationDisplay', () => {
     setMessagePosition,
     messagePosition: null,
     body: '',
-    setBody
+    setBody,
+    errorMessages: [],
+    setErrorMessages: jest.fn(),
+    textTooLongErrors: [],
   }
 
   beforeEach(() => {
@@ -70,11 +79,13 @@ describe('useTranslationDisplay', () => {
   })
 
   it('should return primary as null when messagePosition is null', () => {
-    const { result } = renderHook(() => useTranslationDisplay({
-      signature: '',
-      inboxSettingsFeature: false,
-      includeTranslation: true
-    }))
+    const {result} = renderHook(() =>
+      useTranslationDisplay({
+        signature: '',
+        inboxSettingsFeature: false,
+        includeTranslation: true,
+      }),
+    )
 
     expect(result.current.primary).toBeNull()
   })
@@ -85,30 +96,28 @@ describe('useTranslationDisplay', () => {
     const mockReturnValue = {
       ...mockContext,
       messagePosition: 'primary',
-      body
-    };
+      body,
+    }
 
-    mockUseTranslationContext.mockImplementation(() => mockReturnValue);
+    mockUseTranslationContext.mockImplementation(() => mockReturnValue)
 
-    const { result, rerender } = renderHook((props) =>
-      useTranslationDisplay(props), {
+    const {result, rerender} = renderHook(props => useTranslationDisplay(props), {
       initialProps: {
         signature: 'my signature',
         inboxSettingsFeature: true,
-        includeTranslation: true
-      }
-    });
+        includeTranslation: true,
+      },
+    })
 
-    expect(result.current.primary).toBe(true);
+    expect(result.current.primary).toBe(true)
 
     act(() => {
       rerender({
         signature: 'my signature',
         inboxSettingsFeature: true,
-        includeTranslation: false
-      });
-    });
-
+        includeTranslation: false,
+      })
+    })
 
     expect(setMessagePosition).toHaveBeenCalledWith(null)
     expect(setBody).toHaveBeenCalledWith(expect.any(Function))
@@ -120,7 +129,6 @@ describe('useTranslationDisplay', () => {
     expect(capturedFunction(body)).toMatch(/part2.*/)
 
     expect(mockStripSignature).toHaveBeenCalledWith(body)
-
   })
 
   it('should set message position and body correctly when handleIsPrimaryChange is called', () => {
@@ -131,16 +139,18 @@ describe('useTranslationDisplay', () => {
     const mockReturnValue = {
       ...mockContext,
       body,
-      messagePosition: "primary"
+      messagePosition: 'primary',
     }
 
     mockUseTranslationContext.mockImplementation(() => mockReturnValue)
 
-    const { result } = renderHook(() => useTranslationDisplay({
-      signature: '',
-      inboxSettingsFeature: false,
-      includeTranslation: true
-    }))
+    const {result} = renderHook(() =>
+      useTranslationDisplay({
+        signature: '',
+        inboxSettingsFeature: false,
+        includeTranslation: true,
+      }),
+    )
 
     act(() => {
       result.current.handleIsPrimaryChange(false)
@@ -170,7 +180,7 @@ describe('useTranslationDisplay', () => {
   })
 
   it('should return the correct primary value', () => {
-    [true, false, null].forEach((expectedPrimary) => {
+    ;[true, false, null].forEach(expectedPrimary => {
       let messagePosition = null
 
       if (expectedPrimary !== null) {
@@ -184,11 +194,13 @@ describe('useTranslationDisplay', () => {
 
       mockUseTranslationContext.mockImplementation(() => mockReturnValue)
 
-      const { result } = renderHook(() => useTranslationDisplay({
-        signature: '',
-        inboxSettingsFeature: false,
-        includeTranslation: true
-      }))
+      const {result} = renderHook(() =>
+        useTranslationDisplay({
+          signature: '',
+          inboxSettingsFeature: false,
+          includeTranslation: true,
+        }),
+      )
 
       expect(result.current.primary).toBe(expectedPrimary)
     })

@@ -133,7 +133,7 @@ module Submissions
     end
 
     def redirect_to_quiz_history?
-      !redirect_to_quiz? && (@submission.submission_type == "online_quiz" && @submission.quiz_submission_version)
+      !redirect_to_quiz? && @submission.submission_type == "online_quiz" && @submission.quiz_submission_version
     end
   end
 end

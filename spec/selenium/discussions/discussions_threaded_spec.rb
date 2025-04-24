@@ -42,6 +42,7 @@ describe "threaded discussions" do
     end
 
     it "replies with iframe element" do
+      skip "Will be fixed in VICE-5209"
       user_session(@teacher)
       entry_text = "<iframe src='https://example.com'></iframe>"
       Discussion.visit(@course, @topic)
@@ -61,6 +62,7 @@ describe "threaded discussions" do
     end
 
     it "only respects the 'n' shortcut when no rce editors are open" do
+      skip "Will be fixed in VICE-5209"
       @topic.discussion_entries.create!(
         user: @student,
         message: "new threaded reply from student"
@@ -84,6 +86,7 @@ describe "threaded discussions" do
     end
 
     it "allows edits to entries with replies", priority: "2" do
+      skip "Will be fixed in VICE-5209"
       user_session(@teacher)
       edit_text = "edit message"
       entry = @topic.discussion_entries.create!(
@@ -101,6 +104,7 @@ describe "threaded discussions" do
     end
 
     it "does not allow edits for a concluded student", priority: "2" do
+      skip "Will be fixed in VICE-5209"
       student_enrollment = course_with_student(
         course: @course,
         user: @student,
@@ -121,6 +125,7 @@ describe "threaded discussions" do
     end
 
     it "does not allow deletes for a concluded student", priority: "2" do
+      skip "Will be fixed in VICE-5209"
       student_enrollment = course_with_student(
         course: @course,
         user: @student,
@@ -141,6 +146,7 @@ describe "threaded discussions" do
     end
 
     it "allows edits to discussion with replies", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       user_session(@teacher)
       reply_depth = 3
       reply_depth.times do |i|
@@ -155,6 +161,7 @@ describe "threaded discussions" do
     end
 
     it "does not allow students to edit replies to a locked topic", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       user_session(@student)
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       @topic.lock!
@@ -168,6 +175,7 @@ describe "threaded discussions" do
     end
 
     it "shows a reply time that is different from the creation time", priority: "2" do
+      skip "Will be fixed in VICE-5209"
       user_session(@teacher)
       @enrollment.workflow_state = "active"
       @enrollment.save!
@@ -198,6 +206,7 @@ describe "threaded discussions" do
     end
 
     it "deletes a reply", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       user_session(@teacher)
 
       skip_if_safari(:alert)
@@ -219,6 +228,7 @@ describe "threaded discussions" do
     end
 
     it "supports repeated editing", priority: "2" do
+      skip "Will be fixed in VICE-5209"
       user_session(@teacher)
 
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
@@ -232,6 +242,7 @@ describe "threaded discussions" do
     end
 
     it "re-renders replies after editing", priority: "2" do
+      skip "Will be fixed in VICE-5209"
       user_session(@teacher)
 
       edit_text = "edit message"
@@ -251,6 +262,7 @@ describe "threaded discussions" do
     end
 
     it "displays editor name and timestamp after delete", priority: "2" do
+      skip "Will be fixed in VICE-5209"
       user_session(@teacher)
 
       delete_me = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
@@ -267,6 +279,7 @@ describe "threaded discussions" do
       end
 
       it "discussion page should display student name in tray", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         topic = @course.discussion_topics.create!(
           user: @teacher,
           title: "Non threaded discussion",

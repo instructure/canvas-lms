@@ -31,7 +31,7 @@ import FileFolderTable from './FileFolderTable'
 import FilesUsageBar from './FilesUsageBar'
 import SearchBar from './SearchBar'
 import {BBFolderWrapper, FileFolderWrapper} from '../../utils/fileFolderWrappers'
-import {useGetFolders} from '../hooks/useGetFolders'
+import {NotFoundError, UnauthorizedError, useGetFolders} from '../hooks/useGetFolders'
 import {File, Folder} from '../../interfaces/File'
 import {useGetPaginatedFiles} from '../hooks/useGetPaginatedFiles'
 import {FilesLayout} from '../layouts/FilesLayout'
@@ -40,6 +40,7 @@ import Breadcrumbs from './FileFolderTable/Breadcrumbs'
 import BulkActionButtons from './FileFolderTable/BulkActionButtons'
 import CurrentUploads from './FilesHeader/CurrentUploads'
 import CurrentDownloads from './FilesHeader/CurrentDownloads'
+import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
 
 const I18n = createI18nScope('files_v2')
 
@@ -68,7 +69,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
       }
       currentFolderWrapper.current!.files.set(rows.map((row: any) => new FileFolderWrapper(row)))
     },
-    [currentFolder.id],
+    [currentFolder],
   )
 
   const {
@@ -84,7 +85,9 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   })
 
   useEffect(() => {
-    if (error) {
+    if (error instanceof UnauthorizedError) {
+      window.location.href = '/login'
+    } else if (error) {
       showFlashError(I18n.t('Failed to fetch files and folders.'))()
     }
   }, [error])
@@ -140,7 +143,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
           <TopLevelButtons
             size={size}
             isUserContext={isUserContext}
-            shouldHideUploadButtons={!userCanAddFilesForContext  || search.term.length > 0}
+            shouldHideUploadButtons={!userCanAddFilesForContext || search.term.length > 0}
           />
         }
         search={<SearchBar initialValue={search.term} onSearch={search.set} />}
@@ -212,7 +215,19 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
 
 const ResponsiveFilesApp = () => {
   const isUserContext = filesEnv.showingAllContexts
-  const {data: folders} = useGetFolders()
+  const {data: folders, error} = useGetFolders()
+
+  useEffect(() => {
+    if (error instanceof UnauthorizedError) {
+      window.location.href = '/login'
+    }
+  }, [error])
+
+  const isNotFoundError = error instanceof NotFoundError
+  if (isNotFoundError) {
+    return <NotFoundArtwork />
+  }
+
   if (!folders) {
     return null
   }
@@ -222,7 +237,7 @@ const ResponsiveFilesApp = () => {
       match="media"
       query={{
         small: {maxWidth: canvas.breakpoints.small},
-        medium: {maxWidth: canvas.breakpoints.tablet},
+        medium: {maxWidth: '1140px'},
       }}
       render={(_props: any, matches: string[] | undefined) => (
         <FilesApp

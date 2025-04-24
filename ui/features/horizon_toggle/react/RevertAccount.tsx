@@ -49,7 +49,7 @@ export const RevertAccount = ({accountId, isHorizonAccountLocked}: RevertAccount
     } catch (e) {
       showFlashError(I18n.t('Failed to revert sub-account. Please try again.'))
     }
-  }, [])
+  }, [accountId])
 
   return (
     <View as="div">

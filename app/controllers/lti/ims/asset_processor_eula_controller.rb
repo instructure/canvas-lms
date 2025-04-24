@@ -25,26 +25,18 @@ module Lti::IMS
   # 1EdTech Asset Processor services: Eula Service and Eula Acceptance Service.
   #
   class AssetProcessorEulaController < ApplicationController
-    before_action(
-      :validate_tool_id,
-      :require_feature_enabled
-    )
+    before_action :validate_tool_id
+    before_action { require_feature_enabled :lti_asset_processor }
 
     include Concerns::AdvantageServices
 
-    before_action(
-      :verify_tool_belongs_to_developer_key
-    )
+    before_action :verify_tool_belongs_to_developer_key
 
     before_action(
       :validate_user,
       :validate_timestamp,
       only: [:create_acceptance]
     )
-
-    def require_feature_enabled
-      render_error("not found", :not_found) unless context.root_account.feature_enabled?(:lti_asset_processor)
-    end
 
     def validate_tool_id
       render_error("not found", :not_found) unless tool
@@ -160,7 +152,7 @@ module Lti::IMS
     end
 
     def tool
-      @tool ||= ContextExternalTool.active.find_by(id: params.require(:context_external_tool_id))
+      @tool ||= Lti::ToolFinder.find_by(scope: ContextExternalTool.active, id: params.require(:context_external_tool_id))
     end
 
     def scopes_matcher

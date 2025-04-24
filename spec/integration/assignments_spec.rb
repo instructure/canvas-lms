@@ -120,6 +120,37 @@ describe "assignments" do
       expect(doc.css(".assignment_dates").text).not_to include "Everyone"
     end
   end
+
+  describe "read permissions" do
+    describe "admin" do
+      def admin_user_logged_in(permission, enabled)
+        account = @course.root_account
+        role = custom_account_role("CustomAccountUser", account:)
+        RoleOverride.manage_role_override(account, role, permission, override: enabled)
+        admin = account_admin_user(account:, role:, active_all: true)
+        user_session(admin)
+      end
+
+      before do
+        course_with_teacher_logged_in(active_all: true)
+        @assignment = @course.assignments.create!(title: "Test 1", submission_types: "online_text_entry")
+      end
+
+      it "can view assignment with Course Content - view" do
+        admin_user_logged_in("read_course_content", true)
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "cannot view assignment without Course Content - view" do
+        admin_user_logged_in("read_course_content", false)
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
 end
 
 describe "download submissions link" do

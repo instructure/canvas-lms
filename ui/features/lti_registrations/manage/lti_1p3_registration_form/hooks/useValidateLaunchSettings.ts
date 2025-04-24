@@ -23,6 +23,14 @@ import {isValidHttpUrl} from '../../../common/lib/validators/isValidHttpUrl'
 import {isValidDomainName} from '../../../common/lib/validators/isValidDomainName'
 import {ZPublicJwk} from '../../model/internal_lti_configuration/PublicJwk'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
+import {
+  validateCustomFields,
+  validateDomain,
+  validateJwkSettings,
+  validateOpenIDConnectInitiationURL,
+  validateRedirectUris,
+  validateTargetLinkURI,
+} from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -46,110 +54,36 @@ export const useValidateLaunchSettings = (
     domain: string
     customFields: string
   }>,
-  internalConfig: InternalLtiConfiguration,
 ): LaunchSettingsValidationMessages => {
-  const redirectUrisMessages: FormMessage[] = useMemo(() => {
-    const uris = launchSettings.redirectURIs?.trim().split('\n') ?? []
-    if (uris.length < 1) {
-      return [{text: I18n.t('At least one required'), type: 'error'}]
-    } else if (uris.every(isValidHttpUrl)) {
-      return []
-    } else {
-      return [{text: I18n.t('Invalid URL'), type: 'error'}]
-    }
-  }, [launchSettings.redirectURIs])
+  const redirectUrisMessages: FormMessage[] = useMemo(
+    () => validateRedirectUris(launchSettings.redirectURIs),
+    [launchSettings.redirectURIs],
+  )
 
-  const targetLinkURIMessages: FormMessage[] = useMemo(() => {
-    const value = launchSettings.targetLinkURI ?? internalConfig.target_link_uri
-    if (!value) {
-      return [{text: I18n.t('Required'), type: 'error'}]
-    } else if (!isValidHttpUrl(value)) {
-      return [{text: I18n.t('Invalid URL'), type: 'error'}]
-    } else {
-      return []
-    }
-  }, [launchSettings.targetLinkURI, internalConfig.target_link_uri])
+  const targetLinkURIMessages: FormMessage[] = useMemo(
+    () => validateTargetLinkURI(launchSettings.targetLinkURI),
+    [launchSettings.targetLinkURI],
+  )
 
-  const openIDConnectInitiationURLMessages: FormMessage[] = useMemo(() => {
-    if (isValidHttpUrl(launchSettings.openIDConnectInitiationURL || '')) {
-      return []
-    }
-    return [{text: I18n.t('Invalid URL'), type: 'error'}]
-  }, [launchSettings.openIDConnectInitiationURL])
+  const openIDConnectInitiationURLMessages: FormMessage[] = useMemo(
+    () => validateOpenIDConnectInitiationURL(launchSettings.openIDConnectInitiationURL),
+    [launchSettings.openIDConnectInitiationURL],
+  )
 
-  const jwkMessages: FormMessage[] = useMemo(() => {
-    if (launchSettings.JwkMethod === 'public_jwk') {
-      const jwk =
-        launchSettings.Jwk ??
-        (internalConfig.public_jwk ? JSON.stringify(internalConfig.public_jwk, null, 2) : undefined)
-      if (!jwk) {
-        return [{text: I18n.t('Required'), type: 'error'}]
-      } else {
-        try {
-          return ZPublicJwk.parse(JSON.parse(jwk))
-            ? []
-            : [{text: I18n.t('Invalid JWK'), type: 'error'}]
-        } catch {
-          return [{text: I18n.t('Invalid JWK'), type: 'error'}]
-        }
-      }
-    } else if (launchSettings.JwkMethod === 'public_jwk_url') {
-      const jwkUrl = launchSettings.JwkURL ?? internalConfig.public_jwk_url
-      if (!jwkUrl) {
-        return [{text: I18n.t('Required'), type: 'error'}]
-      } else if (!isValidHttpUrl(jwkUrl)) {
-        return [{text: I18n.t('Invalid URL'), type: 'error'}]
-      }
-      return []
-    } else {
-      return []
-    }
-  }, [
-    internalConfig.public_jwk,
-    internalConfig.public_jwk_url,
-    launchSettings.Jwk,
-    launchSettings.JwkMethod,
-    launchSettings.JwkURL,
-  ])
+  const jwkMessages: FormMessage[] = useMemo(
+    () => validateJwkSettings(launchSettings.Jwk, launchSettings.JwkMethod, launchSettings.JwkURL),
+    [launchSettings.Jwk, launchSettings.JwkMethod, launchSettings.JwkURL],
+  )
 
-  const domainMessages: FormMessage[] = useMemo(() => {
-    const value = launchSettings.domain ?? internalConfig.domain
-    if (value && !isValidDomainName(value)) {
-      return [
-        {
-          text: I18n.t(
-            'Invalid Domain. Please ensure the domain does not start with http:// or https://.',
-          ),
-          type: 'error',
-        },
-      ]
-    } else {
-      return []
-    }
-  }, [launchSettings.domain, internalConfig.domain])
+  const domainMessages: FormMessage[] = useMemo(
+    () => validateDomain(launchSettings.domain),
+    [launchSettings.domain],
+  )
 
-  const customFieldsMessages: FormMessage[] = React.useMemo(() => {
-    const customFields =
-      launchSettings.customFields ??
-      (internalConfig.custom_fields
-        ? Object.entries(internalConfig.custom_fields)
-            .map(([k, v]) => `${k}=${v}`)
-            .join('\n')
-        : undefined)
-    if (!customFields || customFields.length === 0) {
-      return []
-    } else if (
-      customFields
-        .split('\n')
-        .map(s => s.trim())
-        .filter(s => s.length > 0)
-        .every(s => s.match(/.+=.+$/))
-    ) {
-      return []
-    } else {
-      return [{text: I18n.t('Invalid Format'), type: 'error'}]
-    }
-  }, [launchSettings.customFields, internalConfig.custom_fields])
+  const customFieldsMessages: FormMessage[] = React.useMemo(
+    () => validateCustomFields(launchSettings.customFields),
+    [launchSettings.customFields],
+  )
 
   return {
     redirectUrisMessages,

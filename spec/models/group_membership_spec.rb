@@ -334,7 +334,10 @@ describe GroupMembership do
     end
 
     it "does not allow ta without permissions to add to a tag" do
-      Account.default.enable_feature!(:differentiation_tags)
+      Account.default.enable_feature! :assign_to_differentiation_tags
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
       teacher_in_course(active_all: true)
       student_in_course(active_all: true)
       ta_in_course(active_all: true)

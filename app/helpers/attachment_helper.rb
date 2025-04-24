@@ -67,6 +67,7 @@ module AttachmentHelper
     # bank, which can be used in multiple contexts, and we need to give access to
     # it in all of them, even if the user doesn't have access to the context the file
     # original comes from.
+    # And also used in Lti Asset Processor Asset service to accept DeveloperKeys::AccessVerifier
     @jwt_resource_match ||= if params[:sf_verifier]
                               jwt_payload = Canvas::Security.decode_jwt(params[:sf_verifier], ignore_expiration: true)
                               jwt_payload["permission"] == "download" && jwt_payload["attachment_id"] == attachment.global_id.to_s

@@ -20,6 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import natcompare from '@canvas/util/natcompare'
 import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('student_groups')
 
@@ -119,16 +120,16 @@ class Group extends React.Component {
       ) : null
 
     const manageLink = isLeader ? (
-      // TODO: use InstUI button
-      // eslint-disable-next-line jsx-a11y/anchor-is-valid
-      <a
-        href="#"
-        className="manage-link"
+      // using Link to keep styling consistent w/ 'Visit' link
+      <Link
+        data-testid="open-manage-modal"
+        isWithinText={false}
+        as="button"
         aria-label={I18n.t('Manage group %{group_name}', {group_name: groupName})}
         onClick={this._onManage}
       >
         {I18n.t('Manage')}
-      </a>
+      </Link>
     ) : null
 
     const showBody = this.state.open && this.props.group.users.length > 0

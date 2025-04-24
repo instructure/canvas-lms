@@ -23,6 +23,9 @@ require "oauth2"
 class OAuthValidationError < RuntimeError
 end
 
+class RetriableOAuthValidationError < OAuthValidationError
+end
+
 class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
   class << self
     def sensitive_params
@@ -54,6 +57,25 @@ class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
 
   def provider_attributes(_token)
     {}
+  end
+
+  # Invoked prior to logging a user in with the found pseudonym.
+  #
+  # The AuthenticationProvider can apply an custom validations and raise
+  # one of the following errors if validation fails:
+  #   - RetriableOAuthValidationError (the user should be redirected to the auth provider's
+  #     validation_error_retry_url for retrying
+  #   - OAuthValidationError (The login should fail without a redirect to the auth provider's
+  #      validation_error_retry_url)
+  def validate_found_pseudonym!(pseudonym:, session:, token:, target_auth_provider:)
+    nil
+  end
+
+  # Used when #validate_found_pseudonym! raises a RetriableOAuthValidationError.
+  #
+  # The authentication provider should return a URL to redirect the user to for retrying
+  def validation_error_retry_url(_error, controller:, target_auth_provider:)
+    nil
   end
 
   protected

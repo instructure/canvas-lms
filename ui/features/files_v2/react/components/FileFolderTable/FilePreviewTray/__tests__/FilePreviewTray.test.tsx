@@ -23,7 +23,6 @@ import {FilePreviewTray, FilePreviewTrayProps} from '../FilePreviewTray'
 import type {File} from '../../../../../interfaces/File.ts'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
-import {FAKE_MEDIA_TRACKS} from './fixtures'
 
 const defaultProps: FilePreviewTrayProps = {
   item: {
@@ -33,9 +32,6 @@ const defaultProps: FilePreviewTrayProps = {
     restricted_by_master_course: false,
   } as unknown as File,
   onDismiss: jest.fn(),
-  mediaTracks: [],
-  isFetchingTracks: false,
-  canAddTracks: false,
 }
 
 const renderComponent = (props?: Partial<FilePreviewTrayProps>) => {
@@ -59,59 +55,5 @@ describe('FilePreviewTray', () => {
   it('renders CommonFileInfo', () => {
     renderComponent()
     expect(screen.getByText('File Info')).toBeInTheDocument()
-  })
-
-  it('renders MediaFileInfo when there are tracks', () => {
-    renderComponent({
-      canAddTracks: true,
-      mediaTracks: FAKE_MEDIA_TRACKS,
-    })
-    expect(screen.getByText('Media Options')).toBeInTheDocument()
-  })
-
-  it('renders loading icon when fetching tracks', () => {
-    renderComponent({
-      isFetchingTracks: true,
-    })
-    expect(screen.getByText('Loading')).toBeInTheDocument()
-  })
-
-  it('does not render MediaFileInfo when there are no tracks', () => {
-    renderComponent()
-    expect(screen.queryByText('Media Options')).not.toBeInTheDocument()
-  })
-
-  it('does not render MediaFileInfo when file is a locked blueprint item in a child course', () => {
-    renderComponent({
-      canAddTracks: true,
-      item: {
-        ...defaultProps.item,
-        restricted_by_master_course: true,
-        is_master_course_child_content: true,
-      },
-      mediaTracks: FAKE_MEDIA_TRACKS,
-    })
-    expect(screen.queryByText('Media Options')).not.toBeInTheDocument()
-  })
-
-  it('does not render MediaFileInfo when user cannot add tracks', () => {
-    renderComponent({
-      canAddTracks: false,
-      mediaTracks: FAKE_MEDIA_TRACKS,
-    })
-    expect(screen.queryByText('Media Options')).not.toBeInTheDocument()
-  })
-
-  it('does render MediaFileInfo when file is a locked blueprint item in a parent course', () => {
-    renderComponent({
-      canAddTracks: true,
-      item: {
-        ...defaultProps.item,
-        restricted_by_master_course: true,
-        is_master_course_child_content: false,
-      },
-      mediaTracks: FAKE_MEDIA_TRACKS,
-    })
-    expect(screen.getByText('Media Options')).toBeInTheDocument()
   })
 })

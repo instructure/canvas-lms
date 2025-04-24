@@ -62,6 +62,7 @@ import {queryClient} from '@canvas/query'
 import {createRoot} from 'react-dom/client'
 import YAML from 'yaml'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
+import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 const I18n = createI18nScope('assignment_editview')
 
@@ -1021,6 +1022,11 @@ EditView.prototype.handleSubmissionTypeChange = function (_ev) {
   const subVal = this.$submissionType.val()
   this.$onlineSubmissionTypes.toggleAccessibly(subVal === 'online')
   this.$externalToolSettings.toggleAccessibly(subVal === 'external_tool')
+  if (subVal === 'external_tool' && this.$peerReviewsBox.prop('checked')) {
+    this.$peerReviewsBox.prop('checked', false)
+    this.togglePeerReviewsAndGroupCategoryEnabled()
+    $('#peer_reviews_details')?.toggleAccessibly(false)
+  }
   const isPlacementTool = subVal.includes('external_tool_placement')
   this.$externalToolPlacementLaunchContainer.toggleAccessibly(isPlacementTool)
 
@@ -1408,6 +1414,10 @@ EditView.prototype.getFormData = function () {
     data.unlock_at = null
   }
 
+  if (data.peer_reviews_assign_at) {
+    data.peer_reviews_assign_at = unfudgeDateForProfileTimezone(data.peer_reviews_assign_at)
+  }
+
   if (ENV.COURSE_PACE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths) {
     data.assignment_overrides = this.masteryPathToggleView.getOverrides()
     data.only_visible_to_overrides = this.masteryPathToggleView.setOnlyVisibleToOverrides()
@@ -1612,6 +1622,10 @@ EditView.prototype.showErrors = function (errors) {
         }
       }
 
+      if (key === ASSIGNMENT_NAME_INPUT_NAME) {
+        document.getElementById('assignment_name_asterisk')?.classList.add('error-text')
+      }
+
       if (key === ONLINE_SUBMISSION_CHECKBOXES_GROUP) {
         document.getElementById('online_entry_options_asterisk')?.classList.add('error-text')
       }
@@ -1681,6 +1695,9 @@ EditView.prototype.hideErrors = function (containerId) {
       const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
       const element = this.getElement(selector)
       element?.classList.remove('error-outline')
+    }
+    if (key === ASSIGNMENT_NAME_INPUT_NAME) {
+      document.getElementById('assignment_name_asterisk')?.classList.remove('error-text')
     }
   }
 }

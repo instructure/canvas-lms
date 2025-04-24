@@ -28,7 +28,7 @@ import {type File, type Folder} from '../../../interfaces/File'
 import {RenameModal} from '../RenameModal'
 import {DeleteModal} from './DeleteModal'
 import {downloadFile, downloadZip} from '../../../utils/downloadUtils'
-import {getName, isFile} from '../../../utils/fileFolderUtils'
+import {getName, isFile, isLockedBlueprintItem} from '../../../utils/fileFolderUtils'
 import {externalToolEnabled} from '../../../utils/fileUtils'
 
 import {
@@ -162,8 +162,7 @@ const ActionMenuButton = ({
     [],
   )
 
-  const blueprint_locked =
-    row.folder_id && row.restricted_by_master_course && row.is_master_course_child_content
+  const blueprint_locked = isLockedBlueprintItem(row)
   const has_usage_rights = userCanEditFilesForContext && usageRightsRequiredForContext
   const send_copy_permissions = contextType === 'course' && userCanEditFilesForContext
   const rename_move_permissions = userCanEditFilesForContext && !blueprint_locked

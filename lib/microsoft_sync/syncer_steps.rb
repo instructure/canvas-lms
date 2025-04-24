@@ -257,8 +257,8 @@ module MicrosoftSync
       n_total = change_result.total_unsuccessful
       Rails.logger.warn("#{self.class.name} (#{group.global_id}): " \
                         "Skipping #{type} for #{n_total}: #{change_result.to_json}")
-      InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}",
-                                   tags: { sync_type: })
+      InstStatsd::Statsd.distributed_increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}",
+                                               tags: { sync_type: })
       InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}",
                                n_total,
                                tags: { sync_type: })
@@ -392,7 +392,7 @@ module MicrosoftSync
       #   there are too many changes to effectively handle here.
       if group.ms_group_id.nil? ||
          (changes = load_partial_sync_changes).length > MAX_PARTIAL_SYNC_CHANGES
-        InstStatsd::Statsd.increment("#{STATSD_NAME}.partial_into_full")
+        InstStatsd::Statsd.distributed_increment("#{STATSD_NAME}.partial_into_full")
         return StateMachineJob::NextStep.new(:step_full_sync_prerequisites)
       end
 
@@ -449,7 +449,7 @@ module MicrosoftSync
       full_sync_after = e.retry_after_seconds || STANDARD_RETRY_DELAY
       Rails.logger.info "MicrosoftSync::SyncerSteps: partial sync throttled, " \
                         "full sync in #{full_sync_after}"
-      InstStatsd::Statsd.increment("#{STATSD_NAME}.partial_into_full_throttled")
+      InstStatsd::Statsd.distributed_increment("#{STATSD_NAME}.partial_into_full_throttled")
       StateMachineJob::DelayedNextStep.new(:step_full_sync_prerequisites, full_sync_after)
     rescue Errors::GroupNotFound
       # If the MS group doesn't exist, it's possible (though unlikely) the API

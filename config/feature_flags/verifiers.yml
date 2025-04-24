@@ -11,12 +11,13 @@ disable_file_verifier_access:
   description: Disable access to the file verifier through UUID
 disable_adding_uuid_verifier_in_api:
   state: hidden
+  shadow: true
   applies_to: RootAccount
   display_name: Disable adding verifiers to file URLs in the API
   description: This will disable self-authorized file URLs in the API.  When this is enabled, file URLs will need to be accessed with authentication.
   environments:
     development:
-      state: allowed_on
+      state: allowed
     ci:
       state: allowed_on
 disable_file_verifiers_in_public_syllabus:
@@ -29,6 +30,16 @@ disable_verified_content_export_links:
   applies_to: SiteAdmin
   display_name: Disable Verified Content Export Links
   description: When turning this on, links on the Content Exports page will not use JWT-verified links.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+enable_file_access_with_api_tokens:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Enable File Access with API Tokens
+  description: Allow file authorization with API tokens.  This will allow API users to download files without a file verifier.
   environments:
     development:
       state: allowed_on

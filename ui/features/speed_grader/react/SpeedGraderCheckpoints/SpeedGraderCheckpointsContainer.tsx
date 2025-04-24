@@ -32,7 +32,13 @@ import {showFlashWarning} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('SpeedGraderCheckpoints')
 
+type SpeedGrader = {
+  setOrUpdateSubmission: (submission: any) => any,
+  updateSelectMenuStatus: (student: any) => any,
+}
+
 type Props = {
+  EG: SpeedGrader,
   courseId: string
   assignmentId: string
   studentId: string
@@ -284,19 +290,31 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
     ])
   }
 
-  const {mutate: updateSubmissionGrade} = useMutation({
-    mutationFn: putSubmissionGrade,
-    onSuccess: () => {
+  const updateSubmissionUI = (data: object) =>{
+    if(props.EG){
+      // all_submissions[0] has submission_history vs data?.json which is a submission, but does not.
+      /* @ts-expect-error */
+      const submissionData = data?.json?.all_submissions[0]
+      if(submissionData){
+        const student = props.EG.setOrUpdateSubmission(submissionData)
+        props.EG.updateSelectMenuStatus(student)
+      }
       invalidateSubmission()
       setShouldAnnounceCurrentGradeChange(true)
+    }
+  }
+
+  const {mutate: updateSubmissionGrade} = useMutation({
+    mutationFn: putSubmissionGrade,
+    onSuccess: (data) => {
+      updateSubmissionUI(data)
     },
   })
 
   const {mutate: updateSubmissionStatus} = useMutation({
     mutationFn: putSubmissionStatus,
-    onSuccess: () => {
-      invalidateSubmission()
-      setShouldAnnounceCurrentGradeChange(true)
+    onSuccess: (data) => {
+      updateSubmissionUI(data)
     },
   })
 

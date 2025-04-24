@@ -163,7 +163,7 @@ def check_document(html, course, attachment, include_verifiers)
   expect(iframe1["src"]).to eq "http://www.example.com/media_objects_iframe/m-some_id?type=video"
   iframe2 = doc.at_css("iframe[data-testid='2']")
   expect(iframe2).to be_present
-  expect(iframe2["src"]).to eq "http://www.example.com/media_attachments_iframe/#{attachment.id}"
+  expect(iframe2["src"]).to eq "http://www.example.com/media_attachments_iframe/#{attachment.id}#{params}"
 end
 
 def check_document_with_disable_adding_uuid_verifier_in_api_ff(html, course, attachment)

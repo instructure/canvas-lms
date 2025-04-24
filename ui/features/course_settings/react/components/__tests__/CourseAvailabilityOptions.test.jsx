@@ -40,7 +40,7 @@ function setupWindowEnv() {
     start_at: '2021-02-10T00:00:00-07:00',
     end_at: '2021-07-10T00:00:00-07:00',
   }
-  window.ENV.TIMEZONE = 'America/Halifax'
+  window.ENV.TIMEZONE = 'Etc/UTC'
   window.ENV.CONTEXT_TIMEZONE = 'America/Denver'
 }
 
@@ -354,11 +354,11 @@ describe('CourseAvailabilityOptions', () => {
       })
       const startDate = getByLabelText('Start')
       const year = moment().year()
-      fireEvent.change(startDate, {target: {value: `Mar 1, ${year} 10:00am`}})
+      fireEvent.change(startDate, {target: {value: `Jun 1, ${year} 10:00am`}})
       pressKey(startDate, {key: 'Enter'})
-      expect(document.getElementById('course_start_at').value).toBe(`${year}-03-01T10:00:00.000Z`)
-      expect(getByText(`Local: Mar 1, ${year} 10:00am`)).toBeInTheDocument()
-      expect(getByText(`Course: Mar 1, ${year} 7:00am`)).toBeInTheDocument()
+      expect(document.getElementById('course_start_at').value).toBe(`${year}-06-01T10:00:00.000Z`)
+      expect(getByText(`Local: Jun 1, ${year}, 10:00 AM`)).toBeInTheDocument()
+      expect(getByText(`Course: Jun 1, ${year}, 4:00 AM`)).toBeInTheDocument()
     })
 
     it('shows local and course time for the end date', () => {
@@ -367,13 +367,13 @@ describe('CourseAvailabilityOptions', () => {
       })
       const endDate = getByLabelText('End')
       const year = moment().year()
-      fireEvent.change(endDate, {target: {value: `Apr 5, ${year} 10:00am`}})
+      fireEvent.change(endDate, {target: {value: `Jul 5, ${year} 10:00am`}})
       pressKey(endDate, {key: 'Enter'})
       expect(document.getElementById('course_conclude_at').value).toBe(
-        `${year}-04-05T10:00:00.000Z`,
+        `${year}-07-05T10:00:00.000Z`,
       )
-      expect(getByText(`Local: Apr 5, ${year} 10:00am`)).toBeInTheDocument()
-      expect(getByText(`Course: Apr 5, ${year} 7:00am`)).toBeInTheDocument()
+      expect(getByText(`Local: Jul 5, ${year}, 10:00 AM`)).toBeInTheDocument()
+      expect(getByText(`Course: Jul 5, ${year}, 4:00 AM`)).toBeInTheDocument()
     })
   })
 })

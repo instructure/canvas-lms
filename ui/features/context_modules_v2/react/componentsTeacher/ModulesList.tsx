@@ -29,7 +29,7 @@ import {
   handleToggleExpand,
   handleOpeningModuleUpdateTray,
 } from '../handlers/modulePageActionHandlers'
-
+import ManageModuleContentTray from './ManageModuleContent/ManageModuleContentTray'
 import {useModules} from '../hooks/queries/useModules'
 import {useReorderModuleItems} from '../hooks/mutations/useReorderModuleItems'
 import {useReorderModules} from '../hooks/mutations/useReorderModules'
@@ -37,7 +37,11 @@ import {useContextModule} from '../hooks/useModuleContext'
 import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import { handleMoveItem as dndHandleMoveItem, handleDragEnd as dndHandleDragEnd } from '../utils/dndUtils'
+import {
+  handleMoveItem as dndHandleMoveItem,
+  handleDragEnd as dndHandleDragEnd,
+} from '../utils/dndUtils'
+import {ModuleAction} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -49,6 +53,14 @@ const ModulesList: React.FC = () => {
 
   // Initialize with an empty Map - all modules will be collapsed by default
   const [expandedModules, setExpandedModules] = useState<Map<string, boolean>>(new Map())
+
+  // State for managing the module content tray
+  const [isManageModuleContentTrayOpen, setIsManageModuleContentTrayOpen] = useState(false)
+  const [moduleAction, setModuleAction] = useState<ModuleAction | null>(null)
+  const [selectedModuleItem, setSelectedModuleItem] = useState<{id: string; title: string} | null>(
+    null,
+  )
+  const [sourceModule, setSourceModule] = useState<{id: string; title: string} | null>(null)
 
   // Set initial expanded state for modules when data is loaded
   useEffect(() => {
@@ -81,7 +93,12 @@ const ModulesList: React.FC = () => {
     }
   }, [data?.pages])
 
-  const handleMoveItem = (dragIndex: number, hoverIndex: number, dragModuleId: string, hoverModuleId: string) => {
+  const handleMoveItem = (
+    dragIndex: number,
+    hoverIndex: number,
+    dragModuleId: string,
+    hoverModuleId: string,
+  ) => {
     dndHandleMoveItem(
       dragIndex,
       hoverIndex,
@@ -89,19 +106,12 @@ const ModulesList: React.FC = () => {
       hoverModuleId,
       data,
       courseId,
-      reorderItemsMutation
+      reorderItemsMutation,
     )
   }
 
   const handleDragEnd = (result: DropResult) => {
-    dndHandleDragEnd(
-      result,
-      data,
-      courseId,
-      queryClient,
-      reorderModulesMutation,
-      handleMoveItem
-    )
+    dndHandleDragEnd(result, data, courseId, queryClient, reorderModulesMutation, handleMoveItem)
   }
 
   const handleCollapseAllRef = useCallback(() => {
@@ -112,28 +122,30 @@ const ModulesList: React.FC = () => {
     handleExpandAll(data, setExpandedModules)
   }, [data, setExpandedModules])
 
-  const handleOpeningModuleUpdateTrayRef = useCallback((moduleId?: string,
-    moduleName?: string,
-    prerequisites?: {id: string, name: string, type: string}[],
-    openTab: 'settings' | 'assign-to' = 'settings') => (
-      handleOpeningModuleUpdateTray(data, courseId, moduleId, moduleName, prerequisites, openTab)
-    ), [handleOpeningModuleUpdateTray, data])
+  const handleOpeningModuleUpdateTrayRef = useCallback(
+    (
+      moduleId?: string,
+      moduleName?: string,
+      prerequisites?: {id: string; name: string; type: string}[],
+      openTab: 'settings' | 'assign-to' = 'settings',
+    ) =>
+      handleOpeningModuleUpdateTray(data, courseId, moduleId, moduleName, prerequisites, openTab),
+    [data, courseId],
+  )
 
-  const handleViewProgressRef = useCallback(() => {
-    window.location.href = `/courses/${courseId}/modules/progressions`
-  }, [])
-
-  const onToggleExpandRef = useCallback((moduleId: string) => {
-    handleToggleExpand(moduleId, setExpandedModules)
-  }, [handleToggleExpand, setExpandedModules])
+  const onToggleExpandRef = useCallback(
+    (moduleId: string) => {
+      handleToggleExpand(moduleId, setExpandedModules)
+    },
+    [setExpandedModules],
+  )
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <View as="div" margin="medium">
+      <View as="div">
         <ModulePageActionHeader
           onCollapseAll={handleCollapseAllRef}
           onExpandAll={handleExpandAllRef}
-          onViewProgress={handleViewProgressRef}
           handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTrayRef}
           anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
         />
@@ -147,53 +159,74 @@ const ModulesList: React.FC = () => {
           </View>
         ) : (
           <Droppable droppableId="modules-list" type="MODULE">
-            {(provided) => (
+            {provided => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                style={{ minHeight: '100px' }}
+                style={{minHeight: '100px'}}
               >
                 <Flex direction="column" gap="small">
-                {data?.pages[0]?.modules.length === 0 ? (
+                  {data?.pages[0]?.modules.length === 0 ? (
                     <View as="div" textAlign="center" padding="large">
                       <Text>{I18n.t('No modules found')}</Text>
                     </View>
                   ) : (
-                  data?.pages.flatMap(page => page.modules).map((module, index) => (
-                    <Draggable key={module._id} draggableId={module._id} index={index}>
-                      {(dragProvided, snapshot) => (
-                        <div
-                          ref={dragProvided.innerRef}
-                          {...dragProvided.draggableProps}
-                          style={{
-                            ...dragProvided.draggableProps.style,
-                            margin: '0 0 8px 0',
-                            background: snapshot.isDragging ? '#F2F4F4' : 'transparent',
-                            borderRadius: '4px'
-                          }}
-                        >
-                          <Module
-                            id={module._id}
-                            name={module.name}
-                            published={module.published}
-                            prerequisites={module.prerequisites}
-                            completionRequirements={module.completionRequirements}
-                            requirementCount={module.requirementCount}
-                            handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTrayRef}
-                            expanded={!!expandedModules.get(module._id)}
-                            onToggleExpand={onToggleExpandRef}
-                            dragHandleProps={dragProvided.dragHandleProps}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  )))}
+                    data?.pages
+                      .flatMap(page => page.modules)
+                      .map((module, index) => (
+                        <Draggable key={module._id} draggableId={module._id} index={index}>
+                          {(dragProvided, snapshot) => (
+                            <div
+                              ref={dragProvided.innerRef}
+                              {...dragProvided.draggableProps}
+                              style={{
+                                ...dragProvided.draggableProps.style,
+                                margin: '0 0 8px 0',
+                                background: snapshot.isDragging ? '#F2F4F4' : 'transparent',
+                                borderRadius: '4px',
+                              }}
+                            >
+                              <Module
+                                id={module._id}
+                                name={module.name}
+                                published={module.published}
+                                prerequisites={module.prerequisites}
+                                completionRequirements={module.completionRequirements}
+                                requirementCount={module.requirementCount}
+                                handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTrayRef}
+                                expanded={!!expandedModules.get(module._id)}
+                                onToggleExpand={onToggleExpandRef}
+                                dragHandleProps={dragProvided.dragHandleProps}
+                                setModuleAction={setModuleAction}
+                                setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+                                setSelectedModuleItem={setSelectedModuleItem}
+                                setSourceModule={setSourceModule}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))
+                  )}
                 </Flex>
                 {provided.placeholder}
               </div>
             )}
           </Droppable>
         )}
+        <ManageModuleContentTray
+          sourceModuleId={sourceModule?.id || ''}
+          sourceModuleTitle={sourceModule?.title || ''}
+          sourceModuleItemId={selectedModuleItem?.id}
+          isOpen={isManageModuleContentTrayOpen}
+          onClose={() => {
+            setIsManageModuleContentTrayOpen(false)
+            setModuleAction(null)
+            setSelectedModuleItem(null)
+          }}
+          moduleAction={moduleAction}
+          moduleItemId={selectedModuleItem?.id}
+          moduleItemTitle={selectedModuleItem?.title}
+        />
       </View>
     </DragDropContext>
   )

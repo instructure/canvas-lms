@@ -47,7 +47,7 @@ module Lti
       tool.check_for_duplication(params[:verify_uniqueness].present?)
 
       if tool.errors.blank? && tool.save
-        invalidate_nav_tabs_cache(tool)
+        ContextExternalTool.invalidate_nav_tabs_cache(tool, @domain_root_account)
         render json: external_tool_json(tool, context, @current_user, session), content_type: MIME_TYPE
       else
         tool.destroy if tool.persisted?
@@ -98,12 +98,6 @@ module Lti
 
     def message_type
       params[:message_type] || "live-event"
-    end
-
-    def invalidate_nav_tabs_cache(tool)
-      if tool.has_placement?(:user_navigation) || tool.has_placement?(:course_navigation) || tool.has_placement?(:account_navigation)
-        Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
-      end
     end
   end
 end
