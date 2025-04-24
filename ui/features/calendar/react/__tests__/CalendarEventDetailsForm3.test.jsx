@@ -38,7 +38,11 @@ const changeValue = (component, testid, value) => {
   expect(child).toBeInTheDocument()
   act(() => child.click())
   fireEvent.change(child, {target: {value}})
-  act(() => child.blur())
+  if (testid == 'edit-calendar-event-form-date') {
+    fireEvent.keyUp(child, {key: 'Enter', code: 'Enter'})
+  } else {
+    act(() => child.blur())
+  }
   return child
 }
 
@@ -72,8 +76,8 @@ const expectFieldsToBeDisabled = (component, fieldNames) => {
 describe('CalendarEventDetailsForm', () => {
   beforeEach(() => {
     defaultProps = eventFormProps()
-    defaultProps.event.object.all_context_codes = "course_2"
-    defaultProps.event.object.context_code = "course_2"
+    defaultProps.event.object.all_context_codes = 'course_2'
+    defaultProps.event.object.context_code = 'course_2'
     fakeENV.setup({
       FEATURES: {
         calendar_series: true,
@@ -329,7 +333,7 @@ describe('CalendarEventDetailsForm', () => {
       const d = moment('2023-08-28') // a monday
       props.event.date = d.toDate()
       props.event.startDate = jest.fn(() => moment(props.event.date))
-      const nextDate = d.clone().add(1, 'day').format('ddd, MMM D, YYYY')
+      const nextDate = d.clone().add(1, 'day').toISOString()
 
       const component = render(<CalendarEventDetailsForm {...props} />)
       component.getByText('Frequency').click()
