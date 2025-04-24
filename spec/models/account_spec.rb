@@ -3014,6 +3014,30 @@ describe Account do
     end
   end
 
+  describe "horizon_url" do
+    before :once do
+      @account = Account.default
+      @account.settings[:horizon_domain] = "test.canvasforcareer.com"
+      @account.save!
+    end
+
+    it "returns the url with the specified path" do
+      expect(@account.horizon_url("api/v1/test").to_s).to eq("https://test.canvasforcareer.com/api/v1/test")
+    end
+
+    it "returns nil if horizon_domain is not set" do
+      @account.settings[:horizon_domain] = nil
+      @account.save!
+      expect(@account.horizon_url("api/v1/test")).to be_nil
+    end
+
+    it "uses http protocol for localhost domains" do
+      @account.settings[:horizon_domain] = "localhost:3002"
+      @account.save!
+      expect(@account.horizon_url("api/v1/test").to_s).to eq("http://localhost:3002/api/v1/test")
+    end
+  end
+
   describe "horizon_redirect_url" do
     before :once do
       @account = Account.default

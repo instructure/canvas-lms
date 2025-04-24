@@ -367,7 +367,7 @@ class CoursesController < ApplicationController
   before_action :check_horizon_redirect, only: [:show]
 
   include HorizonMode
-  before_action :redirect_student_to_horizon, only: [:show, :settings]
+  before_action :load_canvas_career, only: [:show, :settings]
 
   include Api::V1::Course
   include Api::V1::Progress
