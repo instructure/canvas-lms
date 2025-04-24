@@ -26,7 +26,7 @@ import {DateTime} from '@instructure/ui-i18n'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
@@ -152,7 +152,7 @@ export default function DelayedPublishDialog({
           }
         />
         <View as="div" padding="0 0 0 large">
-          <CanvasDateInput
+          <CanvasDateInput2
             timezone={tz}
             selectedDate={selectedDate}
             formatDate={formatDate}

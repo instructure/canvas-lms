@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import moment from 'moment-timezone'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {FormField, FormFieldGroup} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
 import {px} from '@instructure/ui-utils'
@@ -345,7 +345,7 @@ export default function RecurrenceEndPicker({
             onChange={handleModeChange}
           />
         </div>
-        <CanvasDateInput
+        <CanvasDateInput2
           dataTestid="recurrence-ends-on-input"
           interaction={mode === 'ON' ? 'enabled' : 'disabled'}
           locale={locale}
