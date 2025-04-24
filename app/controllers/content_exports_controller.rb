@@ -101,7 +101,10 @@ class ContentExportsController < ApplicationController
 
   def render_export(export)
     json = export.as_json(only: %i[id progress workflow_state], methods: [:error_message])
-    json["content_export"]["download_url"] = verified_file_download_url(export.attachment, export) if export.attachment && !export.expired?
+    if export.attachment && !export.expired?
+      verifier = Account.site_admin.feature_enabled?(:disable_verified_content_export_links) ? nil : export.attachment.uuid
+      json["content_export"]["download_url"] = file_download_url(export.attachment, verifier:)
+    end
     render json:
   end
 end

@@ -24,14 +24,10 @@ describe ContentMigrationsController do
   include K5Common
 
   context "course" do
-    before(:once) do
-      course_factory active_all: true
-    end
-
-    let(:migration) do
-      migration = @course.content_migrations.build(migration_settings: {})
-      migration.save!
-      migration
+    before :once do
+      course_factory(active_all: true)
+      attachment_model(context: @course, uploaded_data: fixture_file_upload("migration/canvas_cc_minimum.zip", "application/zip"))
+      @migration = @course.content_migrations.create(migration_settings: {}, attachment: @attachment)
     end
 
     describe "#index" do
@@ -40,6 +36,21 @@ describe ContentMigrationsController do
         @course.start_at = 3.days.from_now
         @course.conclude_at = 7.days.from_now
         @course.save!
+      end
+
+      context "disable_verified_content_export_links enabled", type: :request do
+        before do
+          Account.site_admin.enable_feature!(:disable_verified_content_export_links)
+
+          # this one also removes the verifier, but we're waiting to turn it on til after the first one
+          Account.site_admin.disable_feature!(:disable_adding_uuid_verifier_in_api)
+        end
+
+        it "does not include verifiers in the content migration attachment URLs in the app" do
+          get "/api/v1/courses/#{@course.id}/content_migrations"
+          expect(response.parsed_body[0].dig("attachment", "url")).to be_present
+          expect(response.parsed_body[0].dig("attachment", "url")).not_to include "verifier="
+        end
       end
 
       it "exports quizzes_next environment" do
@@ -115,7 +126,7 @@ describe ContentMigrationsController do
           user_session(@teacher)
           get :show, params: {
             course_id: @course.id,
-            id: migration.id,
+            id: @migration.id,
             include: ["audit_info"]
           }
           expect(response).to be_successful
@@ -128,7 +139,7 @@ describe ContentMigrationsController do
           user_session(@teacher)
           get :show, params: {
             course_id: @course.id,
-            id: migration.id
+            id: @migration.id
           }
           expect(response).to be_successful
           expect(response.body).not_to include("audit_info")
