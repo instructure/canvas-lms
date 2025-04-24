@@ -64,28 +64,149 @@ describe "Differentiation Tag Management" do
         get "/courses/#{@course.id}/users"
       end
 
-      it "renders the checkbox header" do
-        expect(fj("span:contains('Select User')")).to be_truthy
-      end
+      context "checkbox behavior" do
+        context "master checkbox behavior" do
+          it "checks all checkboxes when the master checkbox is checked and tags all users" do
+            master_checkbox = f("input.select-all-users-checkbox")
+            master_checkbox.click
+            wait_for_ajaximations
 
-      it "Stops displaying differentiation tag UI if the setting is turned off" do
-        expect(f("body")).to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
-        expect(f("body")).to contain_jqcss("button[data-testid='user-diff-tag-manager-tag-as-button']")
-        expect(f("body")).to contain_jqcss("a[aria-label='View user tags']")
-        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
-        @course.account.save!
-        refresh_page
-        expect(f("body")).not_to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
-        expect(f("body")).not_to contain_jqcss("button[data-testid='user-diff-tag-manager-tag-as-button']")
-        expect(f("body")).not_to contain_jqcss("a[aria-label='View user tags']")
-      end
+            # Verify that every checkbox in the user list is now checked.
+            ff("input[type='checkbox'][aria-label^='Select ']").each do |checkbox|
+              expect(checkbox.attribute("checked")).to be_truthy
+            end
 
-      context "checkbox visibility" do
-        it "renders differentiation checkbox only for student rows" do
-          # Ensure the checkbox is displayed for the student
-          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']")).to be_displayed
-          # Ensure the checkbox is not displayed for non-student rows (e.g. teacher)
-          expect(f("body")).not_to contain_jqcss("input[type='checkbox'][aria-label='Select #{@teacher.name}']")
+            # Now, open the tag menu and assign a tag to all selected users.
+            f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+            wait_for_ajaximations
+            force_click("span:contains('#{@single_tag_1.name}')")
+            wait_for_ajaximations
+
+            # Verify that each selected student is now tagged.
+            # Assuming @student and @other_student are the users expected to be tagged.
+            expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include(@single_tag_1.id)
+            expect(@other_student.current_differentiation_tag_memberships.pluck(:group_id)).to include(@single_tag_1.id)
+          end
+
+          it "unchecks all checkboxes when the master checkbox is unchecked and does not tag any users" do
+            master_checkbox = f("input.select-all-users-checkbox")
+            master_checkbox.click
+            wait_for_ajaximations
+            # Uncheck the master checkbox.
+            master_checkbox.click
+            wait_for_ajaximations
+
+            # Verify that every checkbox in the user list is now unchecked.
+            ff("input[type='checkbox'][aria-label^='Select ']").each do |checkbox|
+              expect(checkbox.attribute("checked")).to be_falsey
+            end
+            # Attempt to assign a tag (this should not tag any users since none are selected).
+            f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+            wait_for_ajaximations
+            force_click("span:contains('#{@multiple_tags_1.name}')")
+            wait_for_ajaximations
+            # Verify that no user has been tagged.
+            expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).not_to include(@multiple_tags_1.id)
+            expect(@other_student.current_differentiation_tag_memberships.pluck(:group_id)).not_to include(@multiple_tags_1.id)
+          end
+
+          it "allows you to unselect individual users while master checkbox is checked and only tags the selected ones" do
+            master_checkbox = f("input.select-all-users-checkbox")
+            master_checkbox.click
+            wait_for_ajaximations
+
+            # Unselect a specific student (assuming @student exists).
+            student_checkbox = f("input[type='checkbox'][aria-label='Select #{@student.name}']")
+            student_checkbox.click
+            wait_for_ajaximations
+
+            # That student's checkbox should now be unchecked.
+            expect(student_checkbox.attribute("checked")).to be_falsey
+
+            # All other checkboxes should remain checked.
+            ff("input[type='checkbox'][aria-label^='Select ']").each do |checkbox|
+              next if checkbox == master_checkbox || checkbox == student_checkbox
+
+              expect(checkbox.attribute("checked")).to be_truthy
+            end
+            # Open the tag menu and assign a tag to the selected users.
+            f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+            wait_for_ajaximations
+            force_click("span:contains('#{@multiple_tags_1.name}')")
+            wait_for_ajaximations
+
+            # Verify that the unselected user (@student) does not get tagged.
+            expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).not_to include(@multiple_tags_1.id)
+            # Verify that the remaining selected user(s), for example @other_student, are tagged.
+            expect(@other_student.current_differentiation_tag_memberships.pluck(:group_id)).to include(@multiple_tags_1.id)
+          end
+
+          it "Stops displaying differentiation tag UI if the setting is turned off" do
+            expect(f("body")).to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
+            expect(f("body")).to contain_jqcss("button[data-testid='user-diff-tag-manager-tag-as-button']")
+            expect(f("body")).to contain_jqcss("a[aria-label='View user tags']")
+            @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+            @course.account.save!
+            refresh_page
+            expect(f("body")).not_to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
+            expect(f("body")).not_to contain_jqcss("button[data-testid='user-diff-tag-manager-tag-as-button']")
+            expect(f("body")).not_to contain_jqcss("a[aria-label='View user tags']")
+          end
+
+          it "properly handles paginated users" do
+            students = Array.new(60) do |i|
+              student_in_course(active_all: true, name: "pagination_student_#{i}@example.com").user
+            end
+
+            refresh_page
+            wait_for_ajaximations
+
+            # Select “all”
+            find("input.select-all-users-checkbox").click
+            wait_for_ajaximations
+            expect(find("[data-testid='user-diff-tag-manager-user-count']")).to include_text("#{@course.students.count} Selected")
+
+            # Deselect the first two
+            deselected = students.first(2)
+            deselected.each do |student|
+              find("input[type='checkbox'][aria-label='Select #{student.name}']").click
+              wait_for_ajaximations
+            end
+
+            expect(find("[data-testid='user-diff-tag-manager-user-count']")).to include_text("#{@course.students.count - 2} Selected")
+
+            # Tag the remaining students
+            f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+            wait_for_ajaximations
+            force_click("span:contains('#{@single_tag_1.name}')")
+            wait_for_ajaximations
+
+            # Verify only the still-selected students got tagged
+            selected = students - deselected
+            selected.each do |student|
+              expect(student.current_differentiation_tag_memberships.pluck(:group_id))
+                .to include(@single_tag_1.id)
+            end
+
+            # And the two deselected never got the tag
+            deselected.each do |student|
+              expect(student.current_differentiation_tag_memberships.pluck(:group_id))
+                .not_to include(@single_tag_1.id)
+            end
+          end
+        end
+
+        it "renders the checkbox header" do
+          expect(fj("span:contains('Select All Users')")).to be_truthy
+        end
+
+        context "checkbox visibility" do
+          it "renders differentiation checkbox only for student rows" do
+            # Ensure the checkbox is displayed for the student
+            expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']")).to be_displayed
+            # Ensure the checkbox is not displayed for non-student rows (e.g. teacher)
+            expect(f("body")).not_to contain_jqcss("input[type='checkbox'][aria-label='Select #{@teacher.name}']")
+          end
         end
       end
 
@@ -661,6 +782,51 @@ describe "Differentiation Tag Management" do
           # Verify that both users have been tagged with the multiple tag variant
           expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include(@multiple_tags_1.id)
           expect(@other_student.current_differentiation_tag_memberships.pluck(:group_id)).to include(@multiple_tags_1.id)
+        end
+      end
+
+      it "keeps all users selected when scrolling to load more users" do
+        # Create a bunch of users (enough to trigger pagination)
+        students = []
+        50.times do |i|
+          students << student_in_course(active_all: true, name: "pagination_student_#{i}@example.com").user
+        end
+
+        # Refresh the page to show all the new users
+        refresh_page
+        wait_for_ajaximations
+
+        # Check the master checkbox
+        master_checkbox = f("input.select-all-users-checkbox")
+        master_checkbox.click
+        wait_for_ajaximations
+
+        # Verify the initial set of checkboxes are checked
+        initial_checkboxes = ff("input[type='checkbox'][aria-label^='Select ']")
+        initial_checkboxes.each do |checkbox|
+          expect(checkbox.attribute("checked")).to be_truthy
+        end
+
+        # Scroll to the bottom to trigger loading more users
+        scroll_into_view(ff("tr.rosterUser").last)
+        wait_for_ajaximations
+
+        # Verify that all checkboxes, including newly loaded ones, are checked
+        all_checkboxes = ff("input[type='checkbox'][aria-label^='Select ']")
+        all_checkboxes.each do |checkbox|
+          expect(checkbox.attribute("checked")).to be_truthy
+        end
+
+        # Test tagging functionality with all users selected
+        wait_for_ajaximations
+        force_click("button[data-testid='user-diff-tag-manager-tag-as-button']")
+        wait_for_ajaximations
+        force_click("span:contains('#{@single_tag_1.name}')")
+        wait_for_ajaximations
+
+        # Verify that all users have been tagged
+        students.each do |student|
+          expect(student.current_differentiation_tag_memberships.pluck(:group_id)).to include(@single_tag_1.id)
         end
       end
     end

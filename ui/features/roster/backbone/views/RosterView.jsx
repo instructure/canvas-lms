@@ -30,6 +30,7 @@ import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/T
 import UserDifferentiationTagManager from '@canvas/differentiation-tags/react/UserDifferentiationTagManager/UserDifferentiationTagManager'
 import MessageBus from '@canvas/util/MessageBus'
 import {QueryProvider} from '@canvas/query'
+import {union} from 'lodash'
 
 const I18n = createI18nScope('RosterView')
 
@@ -59,6 +60,9 @@ export default class RosterView extends Backbone.View {
       '#addUsers': '$addUsersButton',
       '#createUsersModalHolder': '$createUsersModalHolder',
     }
+    this.prototype.events = {
+      'change .select-all-users-checkbox': 'handleSelectAllCheckboxChange',
+    }
     const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
       const crumbs = getCrumbs()
       crumbs.push({name: I18n.t('People'), url: ''})
@@ -73,6 +77,78 @@ export default class RosterView extends Backbone.View {
   constructor(options) {
     super(options)
     this.root = null
+  }
+
+  // When the master checkbox changes, either select everything or clear all.
+  // Also resets the deselected list if we uncheck the master.
+  handleSelectAllCheckboxChange(e) {
+    const isChecked = e.currentTarget.checked
+    this.collection.masterSelected = isChecked
+
+    if (isChecked) {
+      // Clear the de-selected list
+      this.collection.deselectedUserIds = []
+
+      // Collect all loaded user IDs that have a checkbox (students)
+      const allUserIds = this.collection
+        .filter(model => model.hasEnrollmentType('StudentEnrollment'))
+        .map(m => m.id)
+
+      this.collection.selectedUserIds = union(this.collection.selectedUserIds, allUserIds)
+    } else {
+      this.collection.selectedUserIds = []
+      this.collection.deselectedUserIds = []
+    }
+
+    this.$('.select-user-checkbox').prop('checked', isChecked)
+    this.updateSelectAllState()
+
+    MessageBus.trigger('userSelectionChanged', {
+      selectedUsers: this.collection.selectedUserIds,
+      deselectedUserIds: this.collection.deselectedUserIds,
+      masterSelected: this.collection.masterSelected,
+    })
+  }
+
+  handleCollectionSync() {
+    // If the user has “select all” turned on, automatically select newly loaded user IDs
+    // except those specifically de-selected.
+    if (this.collection.masterSelected) {
+      let allUserIds = this.collection
+        .filter(model => model.hasEnrollmentType('StudentEnrollment'))
+        .map(m => m.id)
+
+      // Exclude any that the user has specifically de-selected
+      allUserIds = allUserIds.filter(id => !this.collection.deselectedUserIds.includes(id))
+
+      this.collection.selectedUserIds = union(this.collection.selectedUserIds, allUserIds)
+
+      this.$('.select-user-checkbox').prop('checked', true)
+    }
+    this.updateSelectAllState()
+  }
+
+  updateSelectAllState() {
+    const $masterCheckbox = this.$('.select-all-users-checkbox')
+    if (!$masterCheckbox.length) return
+
+    const totalStudentCount = this.collection.filter(m =>
+      m.hasEnrollmentType('StudentEnrollment'),
+    ).length
+
+    const selectedCount = this.collection.selectedUserIds.length
+
+    if (selectedCount === 0) {
+      $masterCheckbox.prop('indeterminate', false)
+      $masterCheckbox.prop('checked', false)
+    } else if (selectedCount === totalStudentCount) {
+      $masterCheckbox.prop('indeterminate', false)
+      $masterCheckbox.prop('checked', true)
+      this.collection.masterSelected = true
+    } else {
+      $masterCheckbox.prop('checked', false)
+      $masterCheckbox.prop('indeterminate', true)
+    }
   }
 
   afterRender() {
@@ -124,19 +200,26 @@ export default class RosterView extends Backbone.View {
     MessageBus.on('reloadUsersTable', this.reloadUsersTable, this)
     return this.collection.on('setParam deleteParam', this.fetch, this)
   }
-  
+
   removeTagIcon(event) {
-    if(event.hasOwnProperty('userId'))
+    if (event.hasOwnProperty('userId')) {
       $(`#tag-icon-id-${event.userId}`).remove()
+    }
   }
-  
+
   reloadUsersTable() {
+    this.collection.masterSelected = false
+    this.collection.deselectedUserIds = []
+    this.collection.selectedUserIds = []
+
     this.collection.fetch()
-    $(".select-user-checkbox").prop('checked', false).trigger('change')
+    $('.select-user-checkbox').prop('checked', false).trigger('change')
   }
 
   fetchOnCreateUsersClose() {
-    if (this.addPeopleApp.usersHaveBeenEnrolled()) return this.collection.fetch()
+    if (this.addPeopleApp.usersHaveBeenEnrolled()) {
+      return this.collection.fetch()
+    }
   }
 
   fetch() {
@@ -177,24 +260,32 @@ export default class RosterView extends Backbone.View {
     return this.addPeopleApp.open()
   }
 
-  mountUserDiffTagManager(users) {
+  mountUserDiffTagManager(users, exceptions, allInCourse) {
     const userDTManager = this.$el.find('#userDiffTagManager')[0]
     if (
       userDTManager &&
       ENV.permissions.can_manage_differentiation_tags &&
       ENV.permissions.allow_assign_to_differentiation_tags
     ) {
-      if (!this.userDTManager) this.userDTManager = createRoot(userDTManager)
+      if (!this.userDTManager) {
+        this.userDTManager = createRoot(userDTManager)
+      }
       this.userDTManager.render(
         <QueryProvider>
-          <UserDifferentiationTagManager courseId={ENV.course.id} users={users} />
+          <UserDifferentiationTagManager
+            courseId={ENV.course.id}
+            users={users}
+            allInCourse={allInCourse}
+            userExceptions={exceptions}
+          />
         </QueryProvider>,
       )
     }
   }
 
   HandleUserSelected(event) {
-    this.mountUserDiffTagManager(event.selectedUsers)
+    this.updateSelectAllState()
+    this.mountUserDiffTagManager(event.selectedUsers, event.deselectedUserIds, event.masterSelected)
   }
 
   remove() {
