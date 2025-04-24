@@ -22,6 +22,7 @@ require "ipaddr"
 require "resolv"
 require "canvas_http/circuit_breaker"
 require "logger"
+require "active_support/core_ext/object/blank"
 
 module CanvasHttp
   OPEN_TIMEOUT = 5
@@ -335,11 +336,11 @@ module CanvasHttp
   # returns a tempfile with a filename based on the uri (same extension, if
   # there was an extension)
   def self.tempfile_for_uri(uri)
-    basename = File.basename(uri.path || "")
-    basename, ext = basename.split(".", 2)
+    ext = File.extname(uri.path || "")
+    basename = File.basename(uri.path || "", ext)
     basename = (basename || "").slice(0, 100)
 
-    tmpfile = if ext
+    tmpfile = if ext.present?
                 Tempfile.new([basename, ext])
               else
                 Tempfile.new(basename)
