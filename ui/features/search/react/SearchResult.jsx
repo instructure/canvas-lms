@@ -33,23 +33,9 @@ import {
 } from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import stopwords from './stopwords'
+import htmlEscape from '@instructure/html-escape'
 
 const I18n = createI18nScope('SmartSearch')
-
-const preview = (body, maxLength = 512) => {
-  const preview = []
-  const words = body.match(/\p{L}+/gu)
-
-  if (words == null) {
-    return ''
-  }
-
-  while (preview.join(' ').length < maxLength) {
-    preview.push(words.shift())
-  }
-
-  return preview.join(' ') + '...'
-}
 
 const icon_class = content_type => {
   switch (content_type) {
@@ -65,7 +51,7 @@ const icon_class = content_type => {
 }
 
 export default function SearchResult({onExplain, onLike, onDislike, result, searchTerm}) {
-  const {body, content_id, content_type, relevance, html_url, readable_type, title} = result
+  const {body, content_id, content_type, html_url, readable_type, title} = result
 
   const getHighlightedSegment = (searchTerm, text, maxTokens) => {
     // Split the searchTerm into tokens
@@ -159,7 +145,7 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
             as="p"
             size="small"
             dangerouslySetInnerHTML={{
-              __html: addSearchHighlighting(searchTerm, body),
+              __html: addSearchHighlighting(searchTerm, htmlEscape(body)),
             }}
           />
         </Flex.Item>
