@@ -2479,6 +2479,8 @@ class Course < ActiveRecord::Base
         raise "No essay submission found"
       end
 
+      root_account_uuid = submission.course.account.root_account.uuid
+
       auto_grade_result = AutoGradeResult.find_or_initialize_by(
         submission:,
         attempt: submission.attempt
@@ -2488,7 +2490,8 @@ class Course < ActiveRecord::Base
         grade_data = AutoGradeService.new(
           assignment: assignment_text,
           essay:,
-          rubric: rubric.data
+          rubric: rubric.data,
+          root_account_uuid:
         ).call
 
         auto_grade_result.update!(
