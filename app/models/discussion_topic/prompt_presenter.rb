@@ -21,6 +21,10 @@ class DiscussionTopic
   class PromptPresenter
     def initialize(topic)
       @topic = topic
+      @cached_entries = nil
+      @cached_entries_by_id = nil
+      @cached_entries_by_parent_id = nil
+      @cached_anonymized_user_ids = nil
     end
 
     # Example output:
@@ -42,9 +46,6 @@ class DiscussionTopic
     #   </entries>
     # </discussion>
     def content_for_summary
-      anonymized_user_ids = get_anonymized_user_ids(with_index: true)
-      entries_for_parent_id = @topic.discussion_entries.active.to_a.group_by(&:parent_id)
-
       xml = Builder::XmlMarkup.new(indent: 2)
 
       xml.discussion do
@@ -54,14 +55,14 @@ class DiscussionTopic
         end
 
         xml.entries do
-          xml << parts_for_summary(nil, entries_for_parent_id, anonymized_user_ids, "", 1)
+          xml << parts_for_summary(nil, entries_by_parent_id, "", 1)
         end
       end
 
       xml.target!
     end
 
-    def content_for_insight(entries:)
+    def content_for_insight(entries:, expanded_context: false)
       xml = Builder::XmlMarkup.new(indent: 2)
 
       xml.discussion do
@@ -70,9 +71,79 @@ class DiscussionTopic
           xml.message { xml.text! @topic.message || "" }
         end
 
-        xml.chunk do
-          xml.items do
-            xml << contents_for_insight_entries(entries:).map(&:target!).join
+        xml.entries do
+          entries.each_with_index do |entry, index|
+            parent_chain = []
+            parent_id = entry.parent_id
+            siblings = []
+
+            if parent_id
+              current_id = parent_id
+              while current_id
+                parent = entries_by_id[current_id]
+                break unless parent
+
+                parent_chain << parent
+                current_id = parent.parent_id
+              end
+
+              siblings = (entries_by_parent_id[parent_id] || []).select { |e| e.created_at < entry.created_at && e.id != entry.id }
+                                                                .sort_by(&:created_at)
+                                                                .last(2).reverse
+            else
+              siblings = (entries_by_parent_id[nil] || []).select { |e| e.created_at < entry.created_at && e.id != entry.id }
+                                                          .sort_by(&:created_at)
+                                                          .last(2).reverse
+            end
+
+            format_insight_entry(
+              xml:,
+              entry:,
+              parent_chain:,
+              siblings:,
+              extra_attributes: { id: index.to_s },
+              should_add_context_availability: !expanded_context
+            )
+
+            next unless expanded_context
+
+            xml.context do
+              if parent_chain.any?
+                xml.thread do
+                  parent_chain.each_with_index do |ancestor, depth|
+                    format_insight_entry(
+                      xml:,
+                      entry: ancestor,
+                      parent_chain: [],
+                      siblings: [],
+                      extra_attributes: {
+                        tag_name: :parent,
+                        depth: depth.to_s,
+                      },
+                      should_add_context_availability: false
+                    )
+                  end
+                end
+              end
+
+              if siblings.any?
+                xml.siblings do
+                  siblings.sort_by(&:created_at).each do |sibling|
+                    format_insight_entry(
+                      xml:,
+                      entry: sibling,
+                      parent_chain: [],
+                      siblings: [],
+                      extra_attributes: {
+                        tag_name: :entry,
+                        created_at: sibling.created_at.to_s,
+                      },
+                      should_add_context_availability: false
+                    )
+                  end
+                end
+              end
+            end
           end
         end
       end
@@ -94,7 +165,79 @@ class DiscussionTopic
 
     private
 
-    def parts_for_summary(parent_id, entries_for_parent_id, anonymized_user_ids, prefix, level)
+    def all_entries
+      @cached_entries ||= @topic.discussion_entries.active.preload(:user, :attachment).to_a
+    end
+
+    def entries_by_id
+      @cached_entries_by_id ||= all_entries.index_by(&:id)
+    end
+
+    def entries_by_parent_id
+      @cached_entries_by_parent_id ||= all_entries.group_by(&:parent_id)
+    end
+
+    def format_insight_entry(xml:, entry:, parent_chain: [], siblings: [], extra_attributes: {}, should_add_context_availability: true)
+      tag_name = extra_attributes.delete(:tag_name) || :item
+      attributes = { id: entry.id.to_s }.merge(extra_attributes)
+
+      xml.tag!(tag_name, attributes) do
+        xml.metadata do
+          xml.anonymized_user_id anonymized_user_ids[entry.user_id]
+          xml.word_count entry.message_word_count.to_s if entry.respond_to?(:message_word_count)
+
+          if should_add_context_availability
+            xml.context_available (parent_chain.any? || siblings.any?).to_s
+          end
+
+          if entry.attachment.present?
+            xml.attachments do
+              xml.attachment do
+                xml.filename entry.attachment.name
+                xml.content_type entry.attachment.mimetype
+                if entry.attachment.word_count.present?
+                  xml.word_count entry.attachment.word_count
+                end
+              end
+            end
+          end
+        end
+        xml.content do
+          xml.text! anonymize_mentions(entry.message || "")
+        end
+      end
+    end
+
+    def anonymized_user_ids
+      return @cached_anonymized_user_ids if @cached_anonymized_user_ids
+
+      user_ids = {}
+      instructor_count = 0
+      student_count = 0
+      instructor_types = ["TeacherEnrollment", "TaEnrollment"]
+
+      enrollments_by_user = {}
+      @topic.course.enrollments.active.select(:user_id, :type).each do |enrollment|
+        enrollments_by_user[enrollment.user_id] ||= []
+        enrollments_by_user[enrollment.user_id] << enrollment.type
+      end
+
+      enrollments_by_user.sort_by { |user_id, _| user_id }.each do |user_id, types|
+        is_instructor = types.any? { |type| instructor_types.include?(type) }
+
+        if is_instructor
+          instructor_count += 1
+          user_ids[user_id] = "instructor_#{instructor_count}"
+        else
+          student_count += 1
+          user_ids[user_id] = "student_#{student_count}"
+        end
+      end
+
+      @cached_anonymized_user_ids = user_ids
+    end
+
+    def parts_for_summary(parent_id, entries_for_parent_id, prefix, level)
       xml = Builder::XmlMarkup.new(indent: 2)
 
       entries_for_parent_id[parent_id]&.each do |entry|
@@ -102,10 +245,10 @@ class DiscussionTopic
         current_level = prefix.empty? ? level.to_s : "#{prefix}.#{level}"
 
         xml.entry(user: user_identifier, index: current_level) do
-          xml.text! anonymize_mentions(entry.message || "", anonymized_user_ids)
+          xml.text! anonymize_mentions(entry.message || "")
         end
 
-        xml << parts_for_summary(entry.id, entries_for_parent_id, anonymized_user_ids, current_level, 1)
+        xml << parts_for_summary(entry.id, entries_for_parent_id, current_level, 1)
 
         level += 1
       end
@@ -113,71 +256,10 @@ class DiscussionTopic
       xml.target!
     end
 
-    def get_anonymized_user_ids(with_index:)
-      anonymized_user_ids = {}
-      instructor_count = 0
-      student_count = 0
-
-      enrollments_by_user = {}
-      instructor_types = ["TeacherEnrollment", "TaEnrollment"]
-
-      @topic.course.enrollments.active.select(:user_id, :type).each do |enrollment|
-        enrollments_by_user[enrollment.user_id] ||= []
-        enrollments_by_user[enrollment.user_id] << enrollment.type
-      end
-
-      enrollments_by_user.each do |user_id, types|
-        is_instructor = types.any? { |type| instructor_types.include?(type) }
-
-        if is_instructor
-          instructor_count += 1
-          anonymized_user_ids[user_id] = with_index ? "instructor_#{instructor_count}" : "instructor"
-        else
-          student_count += 1
-          anonymized_user_ids[user_id] = with_index ? "student_#{student_count}" : "student"
-        end
-      end
-
-      anonymized_user_ids
-    end
-
-    def anonymize_mentions(content, anonymized_user_ids)
+    def anonymize_mentions(content)
       content.gsub(%r{<span class="mceNonEditable mention" data-mention="(\d+)".*?>.*?</span>}) do
         user_id = $1.to_i
         "@#{anonymized_user_ids[user_id] || "unknown"}"
-      end
-    end
-
-    def contents_for_insight_entries(entries:)
-      anonymized_user_ids = get_anonymized_user_ids(with_index: false)
-
-      entries.map.with_index do |entry, index|
-        anonymized_user_ids[entry.user_id]
-
-        xml = Builder::XmlMarkup.new(indent: 2)
-        xml.item(id: index) do
-          xml.metadata do
-            xml.user_enrollment_type anonymized_user_ids[entry.user_id]
-            xml.word_count entry.message_word_count
-
-            if entry.attachment.present?
-              xml.attachments do
-                # TODO: add attachments from the entry message
-                xml.attachment do
-                  xml.filename entry.attachment.name
-                  xml.content_type entry.attachment.mimetype
-                  if entry.attachment.word_count.present?
-                    xml.word_count entry.attachment.word_count
-                  end
-                end
-              end
-            end
-          end
-          xml.content do
-            xml.text! anonymize_mentions(entry.message || "", anonymized_user_ids)
-          end
-        end
-        xml
       end
     end
   end

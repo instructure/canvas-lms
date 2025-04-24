@@ -40,13 +40,12 @@ describe DiscussionTopic::PromptPresenter do
 
     entry_1.update(attachment: attachment_model(uploaded_data: stub_file_data("document.pdf", "This is a document.", "application/pdf"), word_count: 4))
     entry_2.update(attachment: attachment_model(uploaded_data: stub_file_data("image.png", "This is an image.", "image/png")))
-
-    @presenter = described_class.new(@topic)
   end
 
   describe "#initialize" do
     it "initializes with a discussion topic" do
-      expect(@presenter.instance_variable_get(:@topic)).to eq(@topic)
+      presenter = described_class.new(@topic)
+      expect(presenter.instance_variable_get(:@topic)).to eq(@topic)
     end
   end
 
@@ -71,7 +70,7 @@ describe DiscussionTopic::PromptPresenter do
         </discussion>
       TEXT
 
-      expect(@presenter.content_for_summary.strip).to eq(expected_output.strip)
+      expect(described_class.new(@topic).content_for_summary.strip).to eq(expected_output.strip)
     end
 
     describe ".focus_for_summary" do
@@ -109,7 +108,7 @@ describe DiscussionTopic::PromptPresenter do
   end
 
   describe "#content_for_insight" do
-    it "generates correct discussion insight" do
+    it "generates correct discussion insight content" do
       expected_output = <<~TEXT
         <discussion>
           <topic>
@@ -118,51 +117,89 @@ describe DiscussionTopic::PromptPresenter do
             <message>
         Discussion Topic Message    </message>
           </topic>
-          <chunk>
-            <items>
-        <item id="0">
-          <metadata>
-            <user_enrollment_type>student</user_enrollment_type>
-            <word_count>4</word_count>
-            <attachments>
-              <attachment>
-                <filename>document.pdf</filename>
-                <content_type>application/pdf</content_type>
+          <entries>
+            <item id="0">
+              <metadata>
+                <anonymized_user_id>student_1</anonymized_user_id>
                 <word_count>4</word_count>
-              </attachment>
-            </attachments>
-          </metadata>
-          <content>
-        I liked the course.  </content>
-        </item>
-        <item id="1">
-          <metadata>
-            <user_enrollment_type>student</user_enrollment_type>
-            <word_count>22</word_count>
-            <attachments>
-              <attachment>
-                <filename>image.png</filename>
-                <content_type>image/png</content_type>
-              </attachment>
-            </attachments>
-          </metadata>
-          <content>
-        My apologies @instructor, but I felt the course was too hard, not sure how @student was able to keep up.  </content>
-        </item>
-        <item id="2">
-          <metadata>
-            <user_enrollment_type>instructor</user_enrollment_type>
-            <word_count>26</word_count>
-          </metadata>
-          <content>
-        I'm sorry to hear that. Could you please provide more details? Although @unknown has already left the course, he seemed to have encountered similar issues.  </content>
-        </item>
-            </items>
-          </chunk>
+                <context_available>false</context_available>
+                <attachments>
+                  <attachment>
+                    <filename>document.pdf</filename>
+                    <content_type>application/pdf</content_type>
+                    <word_count>4</word_count>
+                  </attachment>
+                </attachments>
+              </metadata>
+              <content>
+        I liked the course.      </content>
+            </item>
+            <item id="1">
+              <metadata>
+                <anonymized_user_id>student_2</anonymized_user_id>
+                <word_count>22</word_count>
+                <context_available>true</context_available>
+                <attachments>
+                  <attachment>
+                    <filename>image.png</filename>
+                    <content_type>image/png</content_type>
+                  </attachment>
+                </attachments>
+              </metadata>
+              <content>
+        My apologies @instructor_1, but I felt the course was too hard, not sure how @student_1 was able to keep up.      </content>
+            </item>
+            <item id="2">
+              <metadata>
+                <anonymized_user_id>instructor_1</anonymized_user_id>
+                <word_count>26</word_count>
+                <context_available>true</context_available>
+              </metadata>
+              <content>
+        I'm sorry to hear that. Could you please provide more details? Although @unknown has already left the course, he seemed to have encountered similar issues.      </content>
+            </item>
+          </entries>
         </discussion>
       TEXT
 
-      expect(@presenter.content_for_insight(entries: @topic.discussion_entries.active)).to eq(expected_output)
+      expect(described_class.new(@topic).content_for_insight(entries: @topic.discussion_entries.active)).to eq(expected_output)
+    end
+
+    it "creates proper expanded context with parents and limited siblings" do
+      grandparent_entry = @topic.discussion_entries.create!(user: @student_1, message: "Grandparent message")
+      parent_entry = @topic.discussion_entries.create!(user: @student_2, message: "Parent message", parent_entry: grandparent_entry)
+
+      older_siblings = []
+      5.times do |i|
+        older_siblings << @topic.discussion_entries.create!(user: @student_1, message: "Older sibling #{i}", parent_entry:)
+      end
+
+      target_entry = @topic.discussion_entries.create!(user: @student_2, message: "Target entry", parent_entry:)
+
+      result = described_class.new(@topic).content_for_insight(entries: [target_entry], expanded_context: true)
+      doc = Nokogiri::XML(result)
+
+      parent_nodes = doc.xpath("//thread/parent")
+      expect(parent_nodes.length).to eq(2)
+
+      parent_messages = parent_nodes.map { |node| node.at_xpath("content").text.strip }
+      expect(parent_messages).to include(parent_entry.message)
+      expect(parent_messages).to include(grandparent_entry.message)
+
+      parent_depths = parent_nodes.map { |node| node["depth"] }
+      expect(parent_depths).to include("0")
+      expect(parent_depths).to include("1")
+
+      sibling_nodes = doc.xpath("//siblings/entry")
+      expect(sibling_nodes.length).to eq(2)
+
+      sibling_messages = sibling_nodes.map { |node| node.at_xpath("content").text.strip }
+      expect(sibling_messages).to include(older_siblings.last.message)
+      expect(sibling_messages).to include(older_siblings[-2].message)
+
+      older_siblings[0..2].each do |old_sibling|
+        expect(sibling_messages).not_to include(old_sibling.message)
+      end
     end
   end
 end

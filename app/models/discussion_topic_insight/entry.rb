@@ -34,7 +34,7 @@ class DiscussionTopicInsight
     validates :dynamic_content_hash, presence: true
     validates :ai_evaluation, presence: true
 
-    INFERENCE_CONFIG_VERSION = "insights-V3_A"
+    INFERENCE_CONFIG_VERSION = LLMConfigs.config_for("discussion_topic_insights").name
 
     def set_root_account
       self.root_account ||= discussion_topic_insight.root_account
