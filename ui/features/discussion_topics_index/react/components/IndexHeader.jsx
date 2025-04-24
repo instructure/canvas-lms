@@ -25,14 +25,12 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import propTypes from '../propTypes'
 import React, {Component} from 'react'
 import select from '@canvas/obj-select'
-
 import {Button} from '@instructure/ui-buttons'
 import DiscussionSettings from './DiscussionSettings'
-import {FormField} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
@@ -239,31 +237,28 @@ export default class IndexHeader extends Component {
         <View margin="0 0 medium" display="block" data-testid="discussions-index-container">
           <Flex wrap="wrap" justifyItems="end" gap="small">
             <Flex.Item size={ddSize} shouldGrow={true} shouldShrink={true}>
-              <FormField
+              <SimpleSelect
+                renderLabel={
+                  <ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>
+                }
                 id="discussion-filter"
-                label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}
+                name="filter-dropdown"
+                onChange={(_e, data) =>
+                  this.setState(
+                    {filter: data.value},
+                    debounce(() => this.props.searchDiscussions(this.state), SEARCH_DELAY, {
+                      leading: false,
+                      trailing: true,
+                    }),
+                  )
+                }
               >
-                <SimpleSelect
-                  renderLabel=""
-                  id="discussion-filter"
-                  name="filter-dropdown"
-                  onChange={(_e, data) =>
-                    this.setState(
-                      {filter: data.value},
-                      debounce(() => this.props.searchDiscussions(this.state), SEARCH_DELAY, {
-                        leading: false,
-                        trailing: true,
-                      }),
-                    )
-                  }
-                >
-                  {Object.keys(getFilters()).map(filter => (
-                    <SimpleSelect.Option key={filter} id={filter} value={filter}>
-                      {getFilters()[filter]}
-                    </SimpleSelect.Option>
-                  ))}
-                </SimpleSelect>
-              </FormField>
+                {Object.entries(getFilters()).map(([filter, label]) => (
+                  <SimpleSelect.Option key={filter} id={filter} value={filter}>
+                    {label}
+                  </SimpleSelect.Option>
+                ))}
+              </SimpleSelect>
             </Flex.Item>
             <Flex.Item size={containerSize} shouldGrow={true} shouldShrink={true} margin="0">
               {this.renderSearchField()}
