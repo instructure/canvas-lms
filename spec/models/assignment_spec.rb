@@ -4891,6 +4891,30 @@ describe Assignment do
         end
       end
 
+      it "links RubricAssociation to AssessmentRequest when done at the same time" do
+        # This test simulates a race condition between associating a rubric and
+        # assigning peer reviews where previously the AssessmentRequests being created
+        # wheren't all linked to the RubricAssociation. This test ensures that is no
+        # longer happening.
+        rubric = Rubric.create!(user: @teacher, context: @course)
+        @a.peer_review_count = 1
+        call_count = 0
+        ra_result = nil
+        original_method = @submissions.first.method(:assign_assessor)
+
+        allow_any_instance_of(Submission).to receive(:assign_assessor) do |_instance, arg|
+          call_count += 1
+          if call_count == 5
+            ra_result = rubric.associate_with(@a, @course, purpose: "grading")
+          end
+
+          original_method.call(arg)
+        end
+
+        @a.assign_peer_reviews
+        expect(ra_result.assessment_requests.count).to eq(10)
+      end
+
       it "does not assign peer reviews to fake students" do
         fake_student = @course.student_view_student
         fake_sub = @a.submit_homework(fake_student, submission_type: "online_url", url: "http://www.google.com")
