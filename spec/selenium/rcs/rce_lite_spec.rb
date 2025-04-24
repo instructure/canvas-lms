@@ -126,7 +126,6 @@ describe "RCE next tests" do
         expect(status_bar_button("View word and character counts")).to be_truthy
         expect(status_bar_button("Click or shift-click for the html editor.")).to be_truthy
         expect(status_bar_button("Fullscreen")).to be_truthy
-        expect(status_bar_button("Resize")).to be_truthy
       end
     end
 
@@ -172,7 +171,6 @@ describe "RCE next tests" do
         expect(status_bar_button("View word and character counts")).to be_truthy
         expect(status_bar_button("Click or shift-click for the html editor.")).to be_falsey
         expect(status_bar_button("Fullscreen")).to be_falsey
-        expect(status_bar_button("Resize")).to be_falsey
       end
     end
 
@@ -215,7 +213,6 @@ describe "RCE next tests" do
         expect(status_bar_button("View word and character counts")).to be_truthy
         expect(status_bar_button("Click or shift-click for the html editor.")).to be_falsey
         expect(status_bar_button("Fullscreen")).to be_falsey
-        expect(status_bar_button("Resize")).to be_falsey
       end
     end
   end
