@@ -121,7 +121,7 @@ describe('DirectShareUserTray', () => {
         body: {
           receiver_ids: ['1'],
           content_type: 'attachment',
-          content_id: '178',
+          content_id: 178,
         },
       })
 
@@ -150,7 +150,7 @@ describe('DirectShareUserTray', () => {
         body: {
           receiver_ids: ['1'],
           content_type: 'attachment',
-          content_id: '178',
+          content_id: 178,
         },
       })
 

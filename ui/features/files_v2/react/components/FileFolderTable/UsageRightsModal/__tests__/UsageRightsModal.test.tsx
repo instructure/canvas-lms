@@ -200,8 +200,8 @@ describe('UsageRightsModal', () => {
         method: 'PUT',
         path: '/api/v1/courses/2/usage_rights',
         params: {
-          folder_ids: FAKE_FOLDERS.map(f => f.id),
-          file_ids: FAKE_FILES.map(f => f.id),
+          folder_ids: FAKE_FOLDERS.map(f => f.id.toString()),
+          file_ids: FAKE_FILES.map(f => f.id.toString()),
           usage_rights: {legal_copyright: 'acme inc', use_justification: 'own_copyright'},
         },
       })
@@ -225,8 +225,8 @@ describe('UsageRightsModal', () => {
         method: 'PUT',
         path: '/api/v1/courses/2/usage_rights',
         params: {
-          folder_ids: FAKE_FOLDERS.map(f => f.id),
-          file_ids: FAKE_FILES.map(f => f.id),
+          folder_ids: FAKE_FOLDERS.map(f => f.id.toString()),
+          file_ids: FAKE_FILES.map(f => f.id.toString()),
           usage_rights: {legal_copyright: 'acme inc', use_justification: 'own_copyright'},
         },
       })

@@ -32,8 +32,7 @@ export interface User {
 }
 
 export interface File {
-  id: string
-  uuid: string
+  id: number
   folder_id: string
   display_name: string
   filename: string
@@ -64,7 +63,7 @@ export interface File {
 }
 
 export interface Folder {
-  id: string
+  id: number
   name: string
   full_name: string
   context_id: string

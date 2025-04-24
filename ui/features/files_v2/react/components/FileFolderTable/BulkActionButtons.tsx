@@ -69,7 +69,6 @@ const BulkActionButtons = ({
 }: BulkActionButtonsProps) => {
   const [modalOrTray, setModalOrTray] = useState<BulkActionModalOrTrayId | null>(null)
   const isEnabled = selectedRows.size >= 1
-
   const containsLockedBPItems = useMemo(
     () =>
       rows.some(
@@ -194,77 +193,78 @@ const BulkActionButtons = ({
               </Button>,
               !isEnabled || containsLockedBPItems,
             )}
-          {userCanEditFilesForContext && renderTooltip(
-            <Flex.Item>
-              <Menu
-                placement="bottom"
-                trigger={
-                  <Button
-                    renderIcon={<IconMoreLine />}
-                    disabled={!isEnabled}
-                    data-testid="bulk-actions-more-button"
-                    display={buttonDisplay}
-                  >
-                    {isSmallScreen ? (
-                      I18n.t('More')
-                    ) : (
-                      <ScreenReaderContent>{I18n.t('Bulk Actions')}</ScreenReaderContent>
-                    )}
-                  </Button>
-                }
-              >
-                {userCanRestrictFilesForContext && (
-                  <Menu.Item
-                    disabled={containsLockedBPItems}
-                    data-testid="bulk-actions-edit-permissions-button"
-                    onClick={createSetModalOrTrayCallback('permissions')}
-                  >
-                    <Flex alignItems="center" gap="x-small">
-                      <Flex.Item>
-                        <IconPermissionsLine inline={false} />
-                      </Flex.Item>
-                      <Flex.Item>
-                        <Text>{I18n.t('Edit Permissions')}</Text>
-                      </Flex.Item>
-                    </Flex>
-                  </Menu.Item>
-                )}
-                {userCanEditFilesForContext && usageRightsRequiredForContext && (
-                  <Menu.Item
-                    disabled={containsLockedBPItems}
-                    data-testid="bulk-actions-manage-usage-rights-button"
-                    onClick={createSetModalOrTrayCallback('manage-usage-rights')}
-                  >
-                    <Flex alignItems="center" gap="x-small">
-                      <Flex.Item>
-                        <IconCloudLockLine inline={false} />
-                      </Flex.Item>
-                      <Flex.Item>
-                        <Text>{I18n.t('Manage Usage Rights')}</Text>
-                      </Flex.Item>
-                    </Flex>
-                  </Menu.Item>
-                )}
-                {userCanEditFilesForContext && (
-                  <Menu.Item
-                    disabled={containsLockedBPItems}
-                    data-testid="bulk-actions-move-button"
-                    onClick={createSetModalOrTrayCallback('move-to')}
-                  >
-                    <Flex alignItems="center" gap="x-small">
-                      <Flex.Item>
-                        <IconExpandItemsLine inline={false} />
-                      </Flex.Item>
-                      <Flex.Item>
-                        <Text>{I18n.t('Move To...')}</Text>
-                      </Flex.Item>
-                    </Flex>
-                  </Menu.Item>
-                )}
-              </Menu>
-            </Flex.Item>,
-            !isEnabled,
-          )}
+          {userCanEditFilesForContext &&
+            renderTooltip(
+              <Flex.Item>
+                <Menu
+                  placement="bottom"
+                  trigger={
+                    <Button
+                      renderIcon={<IconMoreLine />}
+                      disabled={!isEnabled}
+                      data-testid="bulk-actions-more-button"
+                      display={buttonDisplay}
+                    >
+                      {isSmallScreen ? (
+                        I18n.t('More')
+                      ) : (
+                        <ScreenReaderContent>{I18n.t('Bulk Actions')}</ScreenReaderContent>
+                      )}
+                    </Button>
+                  }
+                >
+                  {userCanRestrictFilesForContext && (
+                    <Menu.Item
+                      disabled={containsLockedBPItems}
+                      data-testid="bulk-actions-edit-permissions-button"
+                      onClick={createSetModalOrTrayCallback('permissions')}
+                    >
+                      <Flex alignItems="center" gap="x-small">
+                        <Flex.Item>
+                          <IconPermissionsLine inline={false} />
+                        </Flex.Item>
+                        <Flex.Item>
+                          <Text>{I18n.t('Edit Permissions')}</Text>
+                        </Flex.Item>
+                      </Flex>
+                    </Menu.Item>
+                  )}
+                  {userCanEditFilesForContext && usageRightsRequiredForContext && (
+                    <Menu.Item
+                      disabled={containsLockedBPItems}
+                      data-testid="bulk-actions-manage-usage-rights-button"
+                      onClick={createSetModalOrTrayCallback('manage-usage-rights')}
+                    >
+                      <Flex alignItems="center" gap="x-small">
+                        <Flex.Item>
+                          <IconCloudLockLine inline={false} />
+                        </Flex.Item>
+                        <Flex.Item>
+                          <Text>{I18n.t('Manage Usage Rights')}</Text>
+                        </Flex.Item>
+                      </Flex>
+                    </Menu.Item>
+                  )}
+                  {userCanEditFilesForContext && (
+                    <Menu.Item
+                      disabled={containsLockedBPItems}
+                      data-testid="bulk-actions-move-button"
+                      onClick={createSetModalOrTrayCallback('move-to')}
+                    >
+                      <Flex alignItems="center" gap="x-small">
+                        <Flex.Item>
+                          <IconExpandItemsLine inline={false} />
+                        </Flex.Item>
+                        <Flex.Item>
+                          <Text>{I18n.t('Move To...')}</Text>
+                        </Flex.Item>
+                      </Flex>
+                    </Menu.Item>
+                  )}
+                </Menu>
+              </Flex.Item>,
+              !isEnabled,
+            )}
         </Flex>
       </Flex>
       {buildModals()}

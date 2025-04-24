@@ -59,7 +59,7 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
     searchTerm,
     contextId: folder.context_id,
     contextType: folder.context_type.toLowerCase(),
-    folderId: folder.id,
+    folderId: folder.id.toString(),
     sortBy: sort.by,
     sortDirection: sort.direction,
     pageQueryParam: bookmarkByPage[currentPage],

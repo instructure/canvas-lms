@@ -101,6 +101,14 @@ module FilesPage
     ff("tbody tr")
   end
 
+  def row_checkboxes_selector
+    "[data-testid='row-select-checkbox']"
+  end
+
+  def checked_boxes
+    ff("[name='IconCheckMark']")
+  end
+
   def all_files_table_rows
     driver.find_elements(:css, "tr[data-testid='table-row']")
   end

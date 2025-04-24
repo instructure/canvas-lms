@@ -33,8 +33,14 @@ export const isFile = (item: File | Folder): item is File => {
   return 'display_name' in item
 }
 
+// files and folders can share the same id,
+// and UUIDs have been removed from the API
 export const getUniqueId = (item: File | Folder) => {
-  return isFile(item) ? item.uuid : item.id
+  return isFile(item) ? `file-${item.id}` : `folder-${item.id}`
+}
+
+export const getIdFromUniqueId = (uniqueId: string) => {
+  return uniqueId.split('-')[1]
 }
 
 export const pluralizeContextTypeString = (contextType: string) => `${contextType.toLowerCase()}s`

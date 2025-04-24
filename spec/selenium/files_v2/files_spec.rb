@@ -89,6 +89,13 @@ describe "files index page" do
           expect(content).to include_text("file25.pdf")
         end
 
+        it "Checks just one file" do
+          get "/courses/#{@course.id}/files"
+          # instui table checkboxes have weird DOM structure
+          force_click_native(row_checkboxes_selector)
+          expect(checked_boxes.count).to eq 1
+        end
+
         describe "sorting" do
           it "Can sort by size" do
             get "/courses/#{@course.id}/files"
