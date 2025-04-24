@@ -123,7 +123,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
           </ScreenReaderContent>
         }
         rowSpacing="small"
-        layout="inline"
+        layout="stacked"
       >
         <SimpleSelect
           renderLabel={
