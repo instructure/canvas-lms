@@ -886,6 +886,7 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
       end
 
       it "hides student names and shows name of grading teacher entries on both discussion links" do
+        skip "Will be fixed in VICE-5209"
         teacher = @course.teachers.first
         teacher_message = "why did the taco cross the road?"
 

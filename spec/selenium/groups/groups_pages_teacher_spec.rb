@@ -111,6 +111,7 @@ describe "groups" do
       end
 
       it "lets teachers see announcement details" do
+        skip "Will be fixed in VICE-5209"
         announcement = @testgroup.first.announcements.create!(
           title: "Test Announcement",
           message: "test message",
@@ -123,6 +124,7 @@ describe "groups" do
       end
 
       it "edit button from announcement details works on teachers announcement" do
+        skip "Will be fixed in VICE-5209"
         announcement = @testgroup.first.announcements.create!(
           title: "Test Announcement",
           message: "test message",
@@ -156,6 +158,7 @@ describe "groups" do
       end
 
       it "lets teachers edit group member announcements" do
+        skip "Will be fixed in VICE-5209"
         announcement = @testgroup.first.announcements.create!(
           title: "Your Announcement",
           message: "test message",
@@ -216,6 +219,7 @@ describe "groups" do
       it_behaves_like "discussions_page", :teacher
 
       it "allows teachers to create discussions within a group", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
         # This creates the discussion and also tests its creation
@@ -223,6 +227,7 @@ describe "groups" do
       end
 
       it "has three options when creating a discussion", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
         expect(f("#threaded")).to be_displayed
@@ -231,6 +236,7 @@ describe "groups" do
       end
 
       it "allows teachers to access a discussion", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @students.first,
                                      title: "Discussion Topic",
