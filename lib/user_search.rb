@@ -238,6 +238,8 @@ module UserSearch
                                                      context.id
                                                    ]))
         users_scope.order(Arel.sql("role#{order}"))
+      when "id"
+        users_scope.order(id: (options[:order] == "desc") ? :desc : :asc)
       else
         users_scope.select("users.*").order_by_sortable_name
       end
@@ -419,6 +421,38 @@ module UserSearch
 
     def raise_context_error(field)
       raise RequestError.new("Sorting by #{field} is only available within a course context", 400)
+    end
+  end
+
+  class Bookmarker
+    attr_accessor :order
+
+    def initialize(order: nil)
+      self.order = (order.to_s == "desc") ? :desc : :asc
+    end
+
+    def bookmark_for(user)
+      user.id.to_s
+    end
+
+    def validate(bookmark)
+      bookmark =~ /^\d+$/
+    end
+
+    def restrict_scope(scope, pager)
+      if pager.current_bookmark
+        id = pager.current_bookmark.to_i
+        scope = scope.where("users.id #{comparison(pager.include_bookmark)} ?", id)
+      end
+      scope.order("users.id #{order}")
+    end
+
+    def comparison(include_bookmark)
+      if include_bookmark
+        (order == :desc) ? "<=" : ">="
+      else
+        (order == :desc) ? "<" : ">"
+      end
     end
   end
 end
