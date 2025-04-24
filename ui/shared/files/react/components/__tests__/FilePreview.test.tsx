@@ -187,37 +187,79 @@ describe('File Preview Rendering', () => {
     expect(closePreviewCalled).toBe(true)
   })
 
-  test('the file preview should include sandbox attributes if there is a preview_url', () => {
-    render(
-      <FilePreview
-        isOpen={true}
-        query={{
-          preview: '4',
-        }}
-        currentFolder={currentFolder}
-      />,
-    )
-    const iframe = $('.ef-file-preview-frame')[0]
-    expect(iframe).toBeInTheDocument()
-    expect(iframe.getAttribute('sandbox')).toMatch(/allow-scripts/)
-    expect(iframe.getAttribute('sandbox')).toMatch(/allow-same-origin/)
-    expect(iframe.getAttribute('sandbox')).toMatch(/allow-downloads/)
+  describe('when disable_iframe_sandbox_file_show is false', () => {
+    beforeEach(() => {
+      ENV.FEATURES.disable_iframe_sandbox_file_show = false
+    })
+
+    test('the file preview should include sandbox attributes if there is a preview_url', () => {
+      render(
+        <FilePreview
+          isOpen={true}
+          query={{
+            preview: '4',
+          }}
+          currentFolder={currentFolder}
+        />,
+      )
+      const iframe = $('.ef-file-preview-frame')[0]
+      expect(iframe).toBeInTheDocument()
+      expect(iframe.getAttribute('sandbox')).toMatch(/allow-scripts/)
+      expect(iframe.getAttribute('sandbox')).toMatch(/allow-same-origin/)
+      expect(iframe.getAttribute('sandbox')).toMatch(/allow-downloads/)
+    })
+
+    test('the file preview should not include allow-scripts in sandbox attributes for html files', () => {
+      render(
+        <FilePreview
+          isOpen={true}
+          query={{
+            preview: '5',
+          }}
+          currentFolder={currentFolder}
+        />,
+      )
+      const iframe = $('.ef-file-preview-frame')[0]
+      expect(iframe).toBeInTheDocument()
+      expect(iframe.getAttribute('sandbox')).not.toMatch(/allow-scripts/)
+      expect(iframe.getAttribute('sandbox')).toMatch(/allow-same-origin/)
+      expect(iframe.getAttribute('sandbox')).toMatch(/allow-downloads/)
+    })
   })
 
-  test('the file preview should not include allow-scripts in sandbox attributes for html files', () => {
-    render(
-      <FilePreview
-        isOpen={true}
-        query={{
-          preview: '5',
-        }}
-        currentFolder={currentFolder}
-      />,
-    )
-    const iframe = $('.ef-file-preview-frame')[0]
-    expect(iframe).toBeInTheDocument()
-    expect(iframe.getAttribute('sandbox')).not.toMatch(/allow-scripts/)
-    expect(iframe.getAttribute('sandbox')).toMatch(/allow-same-origin/)
-    expect(iframe.getAttribute('sandbox')).toMatch(/allow-downloads/)
+  describe('when disable_iframe_sandbox_file_show is true', () => {
+    beforeEach(() => {
+      ENV.FEATURES.disable_iframe_sandbox_file_show = true
+    })
+
+    test('the file preview should not include sandbox if there is a preview_url', () => {
+      render(
+        <FilePreview
+          isOpen={true}
+          query={{
+            preview: '4',
+          }}
+          currentFolder={currentFolder}
+        />,
+      )
+      const iframe = $('.ef-file-preview-frame')[0]
+      expect(iframe).toBeInTheDocument()
+      expect(iframe.getAttribute('sandbox')).toBeNull()
+    })
+
+    test('the file preview should not include sandbox for html files', () => {
+      render(
+        <FilePreview
+          isOpen={true}
+          query={{
+            preview: '5',
+          }}
+          currentFolder={currentFolder}
+        />,
+      )
+      const iframe = $('.ef-file-preview-frame')[0]
+      expect(iframe).toBeInTheDocument()
+      expect(iframe.getAttribute('sandbox')).toBeNull()
+    })
   })
 })
