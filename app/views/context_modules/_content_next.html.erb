@@ -212,7 +212,7 @@ context_modules_header_props = {
     aria-label="<%= t('headings.course_modules', %{Course Modules}) %>"
     class="ig-list <%= 'editable' if @can_add || @can_edit %>"
   >
-    <% cache(@modules_cache_key) do %>
+    <% cache_if_no_module_perf_enabled(@modules_cache_key, @context, @current_user) do %>
       <%# This part of code is copied to module_html.html.erb as a temporary solution %>
       <% modules_to_show = @module_show_setting ?  @modules.select { |m| m.id == @module_show_setting } : @modules %>
       <% preload_modules_content(modules_to_show) %>
