@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,18 +18,28 @@
 
 import * as z from 'zod'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
-import {ZLtiDeploymentId} from './LtiDeploymentId'
-import {ZLtiContextControl} from './LtiContextControl'
+import {ZAccountId} from './AccountId'
+import {ZUser} from './User'
 
-export const ZLtiDeployment = z.object({
-  id: ZLtiDeploymentId,
+export type LtiContextControlId = z.infer<typeof ZLtiContextControlId>
+export const ZLtiContextControlId = z.string().brand('LtiContextControlId')
+
+export const ZLtiContextControl = z.object({
+  id: ZLtiContextControlId,
   registration_id: ZLtiRegistrationId,
   deployment_id: z.string(),
-  context_id: z.string(),
-  context_type: z.string(),
+  account_id: ZAccountId.nullable(),
+  course_id: z.string().nullable(),
+  available: z.boolean(),
+  path: z.string(),
+  display_path: z.array(z.string()),
   context_name: z.string(),
+  depth: z.number(),
   workflow_state: z.enum(['active', 'deleted']),
-  context_controls: z.array(ZLtiContextControl),
+  created_at: z.coerce.date(),
+  updated_at: z.coerce.date(),
+  created_by: ZUser.nullable(),
+  updated_by: ZUser.nullable(),
 })
 
-export type LtiDeployment = z.infer<typeof ZLtiDeployment>
+export type LtiContextControl = z.infer<typeof ZLtiContextControl>

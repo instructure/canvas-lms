@@ -1988,6 +1988,10 @@ CanvasRails::Application.routes.draw do
       delete "accounts/:account_id/lti_registrations/:registration_id/deployments/:id", action: :destroy
     end
 
+    scope(controller: "lti/context_controls") do
+      get "lti_registrations/:registration_id/controls", action: :index
+    end
+
     scope(controller: "lti/resource_links") do
       get "courses/:course_id/lti_resource_links", action: :index
       post "courses/:course_id/lti_resource_links", action: :create

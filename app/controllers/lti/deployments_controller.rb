@@ -27,7 +27,7 @@ module Lti
   # @model Lti::Deployment
   #     {
   #       "id": "Lti::Deployment",
-  #       "description": "A registration of an LTI tool in Canvas",
+  #       "description": "A deployment of an LTI tool in Canvas",
   #       "properties": {
   #         "id": {
   #           "description": "the Canvas ID of the Lti::Deployment object",
@@ -55,9 +55,9 @@ module Lti
   #           "type": "string",
   #           "enum": [
   #             "Course",
-  #             "Account",
-  #           ],
-  #         }
+  #             "Account"
+  #           ]
+  #         },
   #         "context_name": {
   #           "description": "The name of the context this deployment is associated with",
   #           "example": "My Course",
@@ -73,16 +73,17 @@ module Lti
   #           ]
   #         },
   #         "context_controls": {
-  #           "description": "The context controls for this deployment",
+  #           "description": "The context controls for this deployment. Only present in the LTI Context Controls - List All Context Controls endpoint.",
+  #           "example": [{ "type": "Lti::ContextControl" }],
   #           "type": "array",
-  #           "items": {
-  #             "type": "Lti::ContextControl",
-  #           }
+  #           "items": { "$ref": "Lti::ContextControl" }
   #         }
   #       }
   #     }
   #
   class DeploymentsController < ApplicationController
+    include Api::V1::Lti::Deployment
+
     before_action :require_account_context
     before_action :require_root_account
     before_action :require_user
@@ -93,8 +94,12 @@ module Lti
     #
     # Create a new deployment for the specified LTI registration in this context.
     #
-    # @param [String] account_id The ID of the account to create the deployment in.
-    # @param [String] registration_id The ID of the LTI registration to create a deployment for.
+    # @returns Lti::Deployment
+    #
+    # @example_request
+    #
+    #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/deployments' \
+    #        -H "Authorization: Bearer <token>"
     def create
       lti_registration = Lti::Registration.find(params[:registration_id])
       if lti_registration.nil?
@@ -106,7 +111,7 @@ module Lti
 
       if deployment.save
         ContextExternalTool.invalidate_nav_tabs_cache(deployment, @domain_root_account)
-        render json: deployment_json(deployment)
+        render json: lti_deployment_json(deployment, @current_user, session, @context)
       else
         deployment.destroy if deployment.persisted?
         render json: deployment.errors, status: :bad_request, content_type: MIME_TYPE
@@ -117,9 +122,12 @@ module Lti
     #
     # Delete the specified deployment for the specified LTI tool in this context.
     #
-    # @param [String] account_id The ID of the account the deployment lives in.
-    # @param [String] registration_id The ID of the LTI tool to delete a deployment for.
-    # @param [String] id The ID of the deployment to delete.
+    # @returns Lti::Deployment
+    #
+    # @example_request
+    #
+    #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/deployments/<deployment_id>' \
+    #        -H "Authorization: Bearer <token>"
     def destroy
       tool = ContextExternalTool.find_by(
         id: params[:id]
@@ -130,7 +138,7 @@ module Lti
       end
       if tool.destroy
         ContextExternalTool.invalidate_nav_tabs_cache(tool, @domain_root_account)
-        render json: { message: "LTI deployment deleted" }, status: :ok
+        render json: lti_deployment_json(tool, @current_user, session, @context)
       else
         render json: { error: "Failed to delete LTI deployment" }, status: :internal_server_error
       end
@@ -140,8 +148,12 @@ module Lti
     #
     # List all deployments available in this context for the specified LTI registration.
     #
-    # @param [String] account_id The ID of the account the registration lives in.
-    # @param [String] registration_id The ID of the LTI Registration to delete a deployment for.
+    # @returns [Lti::Deployment]
+    #
+    # @example_request
+    #
+    #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/deployments' \
+    #        -H "Authorization: Bearer <token>"
     def list
       registration = Lti::Registration.find(params[:registration_id])
       if registration.nil?
@@ -154,7 +166,7 @@ module Lti
         lti_registration_id: params[:registration_id]
       ).active
 
-      render json: tools.map { |tool| deployment_json(tool) }
+      render json: tools.map { |tool| lti_deployment_json(tool, @current_user, session, @context) }
     end
 
     private
@@ -171,20 +183,6 @@ module Lti
       unless @context.root_account.feature_enabled?(:lti_registrations_next)
         render json: { error: "The specified resource does not exist." }, status: :not_found
       end
-    end
-
-    def deployment_json(deployment)
-      {
-        "id" => deployment.id,
-        "registration_id" => deployment.lti_registration_id,
-        "context_id" => deployment.context_id,
-        "context_type" => deployment.context_type,
-        "context_name" => deployment.context.name,
-        "workflow_state" => ["deleted", "disabled"].include?(deployment.workflow_state) ? "deleted" : "active",
-        "deployment_id" => deployment.deployment_id,
-        # TODO: add context_controls when available
-        "context_controls" => []
-      }
     end
   end
 end

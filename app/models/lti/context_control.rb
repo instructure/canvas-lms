@@ -80,6 +80,17 @@ class Lti::ContextControl < ActiveRecord::Base
     "#{prefix}#{context.id}."
   end
 
+  def context_name
+    account&.name || course.name
+  end
+
+  # A human-readable version of this control's path,
+  # meant for UI display.
+  # TODO: Fully implement as part of INTEROP-8992
+  def path_names
+    [context_name]
+  end
+
   private
 
   def set_path
