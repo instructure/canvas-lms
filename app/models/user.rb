@@ -145,6 +145,7 @@ class User < ActiveRecord::Base
   has_many :current_group_memberships, -> { GroupMembership.for_collaborative_groups.where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'") }, class_name: "GroupMembership"
   has_many :groups, -> { where("group_memberships.workflow_state<>'deleted'").merge(Group.collaborative) }, class_name: "Group", through: :group_memberships
   has_many :current_groups, -> { merge(Group.collaborative).where("groups.workflow_state <> 'deleted'") }, class_name: "Group", through: :current_group_memberships, source: :group
+  has_many :current_active_groups, -> { merge(Group.collaborative.active.context_active) }, class_name: "Group", through: :current_group_memberships, source: :group
   has_many :differentiation_tag_memberships, -> { GroupMembership.for_non_collaborative_groups }, class_name: "GroupMembership", dependent: :destroy
   has_many :current_differentiation_tag_memberships, -> { GroupMembership.for_non_collaborative_groups.where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'") }, class_name: "GroupMembership"
   has_many :differentiation_tags, -> { where("group_memberships.workflow_state<>'deleted'").merge(Group.non_collaborative) }, class_name: "Group", through: :differentiation_tag_memberships, source: :group

@@ -825,7 +825,7 @@ class MessageableUser
     def uncached_fully_visible_group_ids
       # ditto for current groups
       course_group_ids = uncached_group_ids_in_courses(recent_fully_visible_courses)
-      own_group_ids = @user.current_groups.shard(Shard.current).pluck(:id)
+      own_group_ids = @user.current_active_groups.shard(Shard.current).pluck(:id)
       (course_group_ids + own_group_ids).uniq
     end
 
