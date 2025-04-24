@@ -50,6 +50,7 @@ export default function loadFullCalendarLocaleData(locale) {
     'lt',
     'lv',
     'nb',
+    'nn',
     'nl',
     'pl',
     'pt',
