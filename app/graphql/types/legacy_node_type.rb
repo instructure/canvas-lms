@@ -30,6 +30,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "DiscussionEntry"
   value "Enrollment"
   value "File"
+  value "Folder"
   value "GradingPeriod"
   value "GradingPeriodGroup"
   value "Group"

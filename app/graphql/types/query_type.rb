@@ -263,6 +263,18 @@ module Types
       GraphQLNodeLoader.load("Rubric", id, context)
     end
 
+    field :folder, Types::FolderType, null: true do
+      description "Folder"
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Folder")
+    end
+    def folder(id:)
+      GraphQLNodeLoader.load("Folder", id, context)
+    end
+
     field :my_inbox_settings, Types::InboxSettingsType, null: true
     def my_inbox_settings
       GraphQLNodeLoader.load("MyInboxSettings", context[:current_user].id.to_s, context) if context[:current_user]

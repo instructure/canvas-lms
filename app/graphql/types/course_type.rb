@@ -83,11 +83,6 @@ module Types
     class CourseUsersFilterInputType < Types::BaseInputObject
       graphql_name "CourseUsersFilter"
 
-      argument :user_ids,
-               [ID],
-               "only include users with the given ids",
-               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
-               required: false
       argument :enrollment_role_ids,
                [ID],
                "Only return users with the specified enrollment role ids",
@@ -116,6 +111,11 @@ module Types
                MD
                required: false,
                prepare: :prepare_search_term
+      argument :user_ids,
+               [ID],
+               "only include users with the given ids",
+               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
+               required: false
 
       def prepare_search_term(term)
         if term.presence && term.length < SearchTermHelper::MIN_SEARCH_TERM_LENGTH
@@ -475,6 +475,15 @@ module Types
     end
     def group_sets(include_non_collaborative: false)
       get_group_sets(course, include_non_collaborative:)
+    end
+
+    field :folders_connection, FolderType.connection_type, null: true do
+      description "Folders for this course."
+    end
+    def folders_connection
+      return nil unless course.grants_right?(current_user, :read)
+
+      course.active_folders
     end
 
     field :external_tools_connection, ExternalToolType.connection_type, null: true do

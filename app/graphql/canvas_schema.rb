@@ -72,6 +72,7 @@ class CanvasSchema < GraphQL::Schema
     when PostPolicy then Types::PostPolicyType
     when WikiPage then Types::PageType
     when Attachment then Types::FileType
+    when Folder then Types::FolderType
     when DiscussionTopic then Types::DiscussionType
     when DiscussionEntry then Types::DiscussionEntryType
     when Quizzes::Quiz then Types::QuizType
