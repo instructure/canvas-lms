@@ -140,8 +140,18 @@ module Plannable
       when Hash
         association_value(object, col)
       else
+        # if we used best_unicode_collation_key, the column name will be
+        # something like "(attachments.display_name COLLATE \"public\".\"und-u-kn-true\")"
+        col = strip_table_and_collation(col) if col.include?(@model.table_name)
         object.attributes[col]
       end
+    end
+
+    # Gets column name from a string like
+    # "(attachments.display_name COLLATE \"public\".\"und-u-kn-true\")"
+    def strip_table_and_collation(col)
+      match = col.match(/#{Regexp.escape(@model.table_name)}\.(\w+)/)
+      match ? match[1] : col
     end
 
     def bookmark_for(object)
@@ -202,7 +212,8 @@ module Plannable
     def column_name(col)
       return associated_table_column_name(col) if col.is_a?(Hash)
 
-      "#{@model.table_name}.#{col}"
+      # if best_unicode_collation_key is used then the table name is already present
+      col.include?(@model.table_name) ? col : "#{@model.table_name}.#{col}"
     end
 
     # Joins the associated table & column together as a string to be used in a SQL query
