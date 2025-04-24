@@ -524,4 +524,74 @@ describe ContextModulesHelper do
       end
     end
   end
+
+  describe "cache_if_no_module_perf_enabled" do
+    let(:context) { double("Context", account: double("Account")) }
+    let(:user) { double("User") }
+    let(:cache_key) { "test_cache_key" }
+
+    before do
+      allow(context.account).to receive(:feature_enabled?).with(:modules_perf).and_return(false)
+    end
+
+    it "yields when module performance improvement is enabled" do
+      allow(helper).to receive(:module_performance_improvement_is_enabled?).with(context, user).and_return(true)
+
+      expect(helper).to_not receive(:cache).with(cache_key, {}).and_yield
+      expect { |b| helper.cache_if_no_module_perf_enabled(cache_key, context, user, &b) }.to yield_control
+    end
+
+    it "caches when module performance improvement is not enabled" do
+      allow(helper).to receive(:module_performance_improvement_is_enabled?).with(context, user).and_return(false)
+
+      expect(helper).to receive(:cache).with(cache_key, {}).and_yield
+      expect { |b| helper.cache_if_no_module_perf_enabled(cache_key, context, user, &b) }.to yield_control
+    end
+  end
+
+  describe "cache_if_module" do
+    subject { helper.cache_if_module(nil, true, true, true, true, true, true, user, context, &proc {}) }
+
+    let(:context_module) { double("ContextModule", cache_key: "context_module_key", id: 1) }
+    let(:user) { double("User", learning_object_visibilities: %w[assignment1 assignment2]) }
+    let(:context) { double("Context") }
+    let(:cache_key) { "test_cache_key" }
+
+    before do
+      allow(helper).to receive_messages(
+        add_menu_tools_to_cache_key: cache_key,
+        add_mastery_paths_to_cache_key: cache_key,
+        cache: proc { |&block| block.call }
+      )
+    end
+
+    context "when context_module is present and module performance improvement is not enabled" do
+      before do
+        allow(helper).to receive(:module_performance_improvement_is_enabled?).with(context, user).and_return(false)
+      end
+
+      it "caches the result with the correct cache key" do
+        expect(helper).to receive(:cache).with(cache_key, {}).and_yield
+        expect { |b| helper.cache_if_module(context_module, true, true, true, true, true, true, user, context, &b) }.to yield_control
+      end
+    end
+
+    context "when context_module is present and module performance improvement is enabled" do
+      before do
+        allow(helper).to receive(:module_performance_improvement_is_enabled?).with(context, user).and_return(true)
+      end
+
+      it "does not cache and directly yields" do
+        expect(helper).not_to receive(:cache)
+        expect { |b| helper.cache_if_module(context_module, true, true, true, true, true, true, user, context, &b) }.to yield_control
+      end
+    end
+
+    context "when context_module is not present" do
+      it "does not cache and directly yields" do
+        expect(helper).not_to receive(:cache)
+        expect { |b| helper.cache_if_module(nil, true, true, true, true, true, true, user, context, &b) }.to yield_control
+      end
+    end
+  end
 end

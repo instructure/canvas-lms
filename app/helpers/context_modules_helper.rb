@@ -23,7 +23,7 @@ module ContextModulesHelper
   include ApplicationHelper
 
   def cache_if_module(context_module, viewable, can_add, can_edit, can_delete, is_student, can_view_unpublished, user, context, &)
-    if context_module
+    if context_module && !module_performance_improvement_is_enabled?(context, user)
       visible_assignments = user ? user.learning_object_visibilities(context) : []
       cache_key_items = ["context_module_render_22_",
                          context_module.cache_key,
@@ -43,6 +43,15 @@ module ContextModulesHelper
       cache(cache_key, {}, &)
     else
       yield
+    end
+  end
+
+  def cache_if_no_module_perf_enabled(cache_key, context, user, &)
+    if module_performance_improvement_is_enabled?(context, user)
+      # No caching
+      yield
+    else
+      cache(cache_key, {}, &)
     end
   end
 
