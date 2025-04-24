@@ -168,13 +168,13 @@ class FoldersController < ApplicationController
     opts = opts.merge(include: params[:include]) if params[:include].present?
 
     folder_column_map = {
-      "name" => "name",
+      "name" => Folder.best_unicode_collation_key("folders.name"),
       "updated_at" => "updated_at",
       "created_at" => "created_at"
     }
 
     file_column_map = {
-      "name" => "display_name",
+      "name" => Attachment.best_unicode_collation_key("attachments.display_name"),
       "updated_at" => "updated_at",
       "created_at" => "created_at",
       "size" => "size",
@@ -199,9 +199,10 @@ class FoldersController < ApplicationController
 
     folder_bookmarker = Plannable::Bookmarker.new(Folder, folder_desc, folder_sort, :id)
     folders_collection = BookmarkedCollection.wrap(folder_bookmarker, folder_scope)
-    file_bookmarker = Plannable::Bookmarker.new(Attachment, file_desc, file_sort, :id)
 
+    file_bookmarker = Plannable::Bookmarker.new(Attachment, file_desc, file_sort, :id)
     files_collection = BookmarkedCollection.wrap(file_bookmarker, file_scope)
+
     collections = [
       ["folders", folders_collection],
       ["files", files_collection]
