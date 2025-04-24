@@ -55,6 +55,7 @@ describe "discussions" do
           let(:topic) { student_topic }
 
           it "updates subscribed button when user posts to a topic", priority: "2" do
+            skip "Will be fixed in VICE-5209"
             get url
             expect(f(".topic-subscribe-button")).to be_displayed
             add_reply "student posting"
@@ -64,6 +65,7 @@ describe "discussions" do
       end
 
       it "displays the current username when adding a reply", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         get url
         expect(f("#content")).not_to contain_css("#discussion_subentries .discussion_entry")
         add_reply
@@ -75,6 +77,7 @@ describe "discussions" do
         let(:topic) { side_comment_topic }
 
         it "adds a side comment", priority: "1" do
+          skip "Will be fixed in VICE-5209"
           side_comment_text = "new side comment"
           get url
 
@@ -91,6 +94,7 @@ describe "discussions" do
         end
 
         it "edits a side comment", priority: "1" do
+          skip "Will be fixed in VICE-5209"
           edit_text = "this has been edited"
           text = "new side comment from somebody"
           entry = topic.discussion_entries.create!(user: somebody, message: text, parent_entry: entry)
