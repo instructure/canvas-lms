@@ -16,55 +16,85 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-import {Billboard} from '@instructure/ui-billboard'
-import {FileDrop} from '@instructure/ui-file-drop'
-import {Flex} from '@instructure/ui-flex'
-import {TextInput} from '@instructure/ui-text-input'
-import {RocketSVG} from '@instructure/canvas-media'
-import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Text} from '@instructure/ui-text'
+import React, {useCallback, useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
+import {TextInput} from '@instructure/ui-text-input'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {FileDrop} from '@instructure/ui-file-drop'
+import {Billboard} from '@instructure/ui-billboard'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
+import {RocketSVG} from '@instructure/canvas-media'
+import {useCourseFolders} from '../../hooks/queries/useCourseFolders'
+import {useContextModule} from '../../hooks/useModuleContext'
+import {useAssignmentGroups} from '../../hooks/queries/useAssignmentGroups'
 
 const I18n = createI18nScope('context_modules_v2')
 
-// Types for props
-interface CreateLearningObjectFormProps {
-  itemType: string
-  onChange: (field: string, value: any) => void
-  assignmentGroups?: {id: string; name: string; _id: string}[]
-  folders?: {id: string; name: string}[]
-}
+const FILE_DROP_HEIGHT = '350px'
 
-const FILE_DROP_HEIGHT = 350
+// Types for props
+export type CreateLearningObjectFormProps = {
+  itemType: 'page' | 'quiz' | 'file' | 'external_url' | string
+  onChange: (field: string, value: any) => void
+}
 
 export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> = ({
   itemType,
   onChange,
-  assignmentGroups = [],
-  folders = [],
 }) => {
   const [name, setName] = useState('')
   const [assignmentGroup, setAssignmentGroup] = useState<string | undefined>(undefined)
   const [folder, setFolder] = useState<string | undefined>(undefined)
   const [file, setFile] = useState<File | null>(null)
 
-  // Handle file drop
-  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setFile(e.dataTransfer.files[0])
-      onChange('file', e.dataTransfer.files[0])
-    }
-  }
+  const {courseId} = useContextModule()
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0])
-      onChange('file', e.target.files[0])
+  const {folders} = useCourseFolders(courseId)
+  const {data: assignmentGroups} = useAssignmentGroups(courseId)
+
+  useEffect(() => {
+    if (folders && folders.length > 0 && folder === undefined) {
+      const defaultFolder = folders[0]._id
+      setFolder(defaultFolder)
+      onChange('folder', defaultFolder)
     }
-  }
+  }, [folders, folder, onChange])
+
+  const handleFileDrop = useCallback(
+    (
+      accepted: ArrayLike<File | DataTransferItem>,
+      _rejected: ArrayLike<File | DataTransferItem>,
+      _event: React.DragEvent<Element>,
+    ) => {
+      if (accepted && accepted.length > 0) {
+        const item = accepted[0]
+        if (item instanceof File) {
+          setFile(item)
+          onChange('file', item)
+        } else if (item.kind === 'file') {
+          const file = item.getAsFile()
+          if (file) {
+            setFile(file)
+            onChange('file', file)
+          }
+        }
+      }
+    },
+    [onChange],
+  )
+
+  const handleFolderChange = useCallback(
+    (_e: React.SyntheticEvent, data: {value?: string | number | undefined}) => {
+      if (data.value === undefined) return
+
+      const selectedFolder = String(data.value)
+      setFolder(selectedFolder)
+      onChange('folder', selectedFolder)
+    },
+    [onChange],
+  )
 
   return (
     <View as="form" padding="small" display="block">
@@ -90,7 +120,7 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
           }}
           placeholder="Select assignment group"
         >
-          {assignmentGroups.map(group => (
+          {assignmentGroups?.assignmentGroups?.map(group => (
             <SimpleSelect.Option id={group._id} key={group._id} value={group._id}>
               {group.name}
             </SimpleSelect.Option>
@@ -101,10 +131,8 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
         <>
           <FileDrop
             height={FILE_DROP_HEIGHT}
-            shouldAllowMultiple={true}
-            // Called when dropping files or when clicking,
-            // after the file dialog window exits successfully
-            onDrop={() => {}}
+            shouldAllowMultiple={false}
+            onDrop={handleFileDrop}
             renderLabel={
               <Flex direction="column" height="100%" alignItems="center" justifyItems="center">
                 <Billboard
@@ -123,16 +151,26 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
             <SimpleSelect
               renderLabel="Folder"
               value={folder}
-              onChange={(_e, {value}) => {}}
+              onChange={handleFolderChange}
               placeholder="Select folder"
             >
-              {folders.map(f => (
-                <SimpleSelect.Option id={f.id} key={f.id} value={f.id}>
+              {folders?.map(f => (
+                <SimpleSelect.Option id={f._id} key={f._id} value={f._id}>
                   {f.name}
                 </SimpleSelect.Option>
               ))}
+              {folders?.length === 0 && (
+                <SimpleSelect.Option id="no-folders" value="">
+                  {I18n.t('No folders available')}
+                </SimpleSelect.Option>
+              )}
             </SimpleSelect>
           </View>
+          {file && (
+            <View as="div" margin="small 0 0 0">
+              <Text weight="bold">{I18n.t('Selected file:')}</Text> {file.name}
+            </View>
+          )}
         </>
       )}
     </View>
