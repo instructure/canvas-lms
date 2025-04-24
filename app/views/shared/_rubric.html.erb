@@ -179,7 +179,7 @@
     <div class="rubric-footer">
       <div class="total_points_holder toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>"
         style="float: <%= direction('right') %>; <%= hidden if rubric_association && rubric_association.hide_score_total %>">
-        <span><%= before_label :total_points, "Total Points" %>
+        <span role="text"><%= before_label :total_points, "Total Points" %>
           <% ot(:out_of, "%{points} *out of %{total}*", :points => capture { %>
             <span class="rubric_total">
               <%=
