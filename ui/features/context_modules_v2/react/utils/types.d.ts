@@ -151,3 +151,11 @@ export interface ModuleItem {
 }
 
 export type ModuleAction = 'move_module' | 'move_module_item' | 'move_module_contents'
+
+export interface Folder {
+  _id: string
+  canUpload: boolean
+  fullName: string
+  id: string
+  name: string
+}

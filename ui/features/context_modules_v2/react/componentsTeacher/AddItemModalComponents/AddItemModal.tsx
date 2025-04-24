@@ -25,7 +25,6 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {useAssignmentGroups} from '../../hooks/queries/useAssignmentGroups'
 import {useModuleItemContent, ModuleItemContentType} from '../../hooks/queries/useModuleItemContent'
 import {useContextModule} from '../../hooks/useModuleContext'
 import {queryClient} from '../../../../../shared/query'
@@ -69,6 +68,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [selectedTabIndex, setSelectedTabIndex] = useState(0)
   const [newItemName, setNewItemName] = useState<string>('')
   const [selectedAssignmentGroup, setSelectedAssignmentGroup] = useState<string>('')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [selectedFolder, setSelectedFolder] = useState<string>('')
 
   const [inputValue, setInputValue] = useState('')
   const [searchText, setSearchText] = useState<string>('')
@@ -88,9 +89,6 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   )
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  const {data: assignmentGroups, isLoading: isLoadingAssignmentGroups} =
-    useAssignmentGroups(courseId)
 
   useEffect(() => {
     if (timeoutRef.current) {
@@ -140,6 +138,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       // For subheaders and external URLs, we can directly submit without creating a new item first
       submitItemData(itemData)
     } else if (selectedTabIndex === 1) {
+      // For file uploads, validate required fields
+      if (itemType === 'file' && !selectedFile) {
+        setIsLoading(false)
+        // Could add an error message here if needed
+        return
+      }
+
       // We need to create a new item
       handleCreateNewItem(itemType).then(newItem => {
         if (newItem) {
@@ -163,6 +168,21 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   }
 
   const handleCreateNewItem = async (type: string) => {
+    // For file types, include the file and folder
+    if (type === 'file') {
+      return await createNewItem(
+        type,
+        courseId,
+        newItemName,
+        selectedAssignmentGroup,
+        NEW_QUIZZES_BY_DEFAULT,
+        DEFAULT_POST_TO_SIS,
+        selectedFile,
+        selectedFolder,
+      )
+    }
+
+    // For other types (quizzes, pages, etc.)
     return await createNewItem(
       type,
       courseId,
@@ -319,11 +339,12 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             >
               <CreateLearningObjectForm
                 itemType={itemType}
-                onChange={(e, value) => {
-                  if (e === 'name') setNewItemName(value)
-                  else if (e === 'assignmentGroup') setSelectedAssignmentGroup(value)
+                onChange={(field, value) => {
+                  if (field === 'name') setNewItemName(value)
+                  else if (field === 'assignmentGroup') setSelectedAssignmentGroup(value)
+                  else if (field === 'file') setSelectedFile(value)
+                  else if (field === 'folder') setSelectedFolder(value)
                 }}
-                assignmentGroups={assignmentGroups?.assignmentGroups || []}
               />
             </Tabs.Panel>
           </Tabs>
