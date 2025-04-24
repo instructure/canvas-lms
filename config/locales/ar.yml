@@ -2695,6 +2695,7 @@ ar:
   admin_analytics_description: "لتمكين التحليلات على مستوى الحساب. توفر لوحات معلومات تحليلات المسؤول تفاصيل حول استخدام Canvas ونجاح مساق Canvas وتفاعل الطلاب. اعرف المزيد في *مركز تحليلات المسؤول* في مجتمع Canvas."
   admin_analytics_eacba735: "تحليلات المسؤول"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "تحليلات المسؤول - إخفاء المساقات الخالية من التسجيلات"
+  admin_analytics_hide_courses_with_no_enrollments_description: "عند التمكين، ستقوم Admin Analytics + Intelligent Insights (تحليلات المسؤول و الرؤى الذكية) بإخفاء المساقات الخالية من التسجيلات من كل مخططات البيانات بشكل افتراضي. سيتوفر خيار في التطبيق لإظهار هذه المساقات."
   admin_analytics_new_filter_ui_aee1ea8e: "تحليلات المسؤول - واجهة مستخدم جديدة لعامل التصفية"
   admin_analytics_new_filter_ui_description: "قم بتمكين واجهة المستخدم الجديدة لعامل تصفية تحليلات المسؤول."
   admin_analytics_view_admin_analytics_permission_cc7d46db: "تحليلات المسؤول - عرض إذن تحليلات المسؤول"
