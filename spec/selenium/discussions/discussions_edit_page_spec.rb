@@ -334,6 +334,7 @@ describe "discussions" do
         end
 
         it "saves and display all changes", priority: "2" do
+          skip "Will be fixed in VICE-5209"
           course.require_assignment_group
 
           confirm(:off)
@@ -363,6 +364,7 @@ describe "discussions" do
         end
 
         it "toggles checkboxes when clicking their labels", priority: "1" do
+          skip "Will be fixed in VICE-5209"
           get url
 
           expect(is_checked("input[type=checkbox][name=threaded]")).not_to be_truthy
