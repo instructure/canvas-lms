@@ -39,7 +39,6 @@ type StatusBarFeature =
   | 'word_count'
   | 'html_view'
   | 'fullscreen'
-  | 'resize_handle'
 
 export const RCEVariantValues = ['full', 'lite', 'text-only', 'text-block'] as const
 
@@ -198,9 +197,9 @@ export function getToolbarForVariant(
   ]
 }
 
-const DESKTOP_FEATURES: StatusBarFeature[] = ['keyboard_shortcuts', 'a11y_checker', 'word_count'];
-const MOBILE_FEATURES: StatusBarFeature[] = ['a11y_checker', 'word_count'];
-const EXTENDED_FEATURES: StatusBarFeature[] = ['html_view', 'fullscreen', 'resize_handle'];
+const DESKTOP_FEATURES: StatusBarFeature[] = ['keyboard_shortcuts', 'a11y_checker', 'word_count']
+const MOBILE_FEATURES: StatusBarFeature[] = ['a11y_checker', 'word_count']
+const EXTENDED_FEATURES: StatusBarFeature[] = ['html_view', 'fullscreen']
 
 export function getStatusBarFeaturesForVariant(
   variant: RCEVariant,
@@ -211,10 +210,10 @@ export function getStatusBarFeaturesForVariant(
     return []
   }
 
-  const platformFeatures = isDesktop ? DESKTOP_FEATURES : MOBILE_FEATURES;
+  const platformFeatures = isDesktop ? DESKTOP_FEATURES : MOBILE_FEATURES
 
   if (variant === 'lite' || variant === 'text-only') {
-    return platformFeatures;
+    return platformFeatures
   }
 
   return [
