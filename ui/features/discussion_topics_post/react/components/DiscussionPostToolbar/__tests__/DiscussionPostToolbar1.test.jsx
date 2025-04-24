@@ -291,12 +291,21 @@ describe('DiscussionPostToolbar', () => {
   })
 
   describe('Groups Menu Button', () => {
-    it('should not render when there are no child topics and the user is an admin', () => {
+    it('should not render when the child topics is undefined', () => {
+      const container = setup({
+        childTopics: undefined,
+        isAdmin: true,
+      })
+      expect(container.queryByTestId('groups-menu-button')).toBeFalsy()
+    })
+
+    it('should render when there are no child topics and the user is an admin', () => {
       const container = setup({
         childTopics: [],
         isAdmin: true,
       })
-      expect(container.queryByTestId('groups-menu-button')).toBeNull()
+
+      expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
     })
 
     it('should render when there are child topics and the user is an admin', () => {
