@@ -518,5 +518,24 @@ describe AddressBook::MessageableUser do
       expect(groups.map(&:id)).to include(group1.id)
       expect(groups.map(&:id)).not_to include(group2.id)
     end
+
+    it "skip not active group" do
+      course = course_factory(active_all: true)
+      student1 = student_in_course(course:, active_all: true).user
+      student2 = student_in_course(course:, active_all: true).user
+      group = group_with_user(user: student1, group_context: course).group
+      group.add_user(student2)
+      group.workflow_state = "deleted"
+      group.save!
+
+      group2 = group_with_user(user: student1, group_context: course).group
+      group2.add_user(student2)
+      course.workflow_state = "concluded"
+      course.save!
+
+      address_book = AddressBook::MessageableUser.new(student1)
+      users_collection = address_book.search_users.paginate(per_page: 10)
+      expect(users_collection).not_to include(student2.id)
+    end
   end
 end
