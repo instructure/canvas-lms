@@ -40,7 +40,7 @@ const renderComponent = (props?: any) =>
     </FileManagementProvider>,
   )
 
-describe('UsageRightsModal', () => {
+describe('PermissionsModal', () => {
   beforeAll(() => {
     filesEnv.contexts = [
       {

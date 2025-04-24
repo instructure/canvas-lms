@@ -37,16 +37,13 @@ describe('BulkActionButtons', () => {
   beforeEach(() => {
     defaultProps = {
       size: 'medium',
-      selectedRows: new Set(['1a', '2a']),
+      selectedRows: new Set(['file-1', 'file-2']),
       totalRows: 10,
       userCanEditFilesForContext: true,
       userCanDeleteFilesForContext: true,
       userCanRestrictFilesForContext: true,
       usageRightsRequiredForContext: true,
-      rows: [
-        {id: '1', uuid: '1a', display_name: 'File 1'} as File,
-        {id: '2', uuid: '2a', display_name: 'File 2'} as File,
-      ],
+      rows: [{id: 1, display_name: 'File 1'} as File, {id: 2, display_name: 'File 2'} as File],
     }
   })
 
@@ -153,8 +150,8 @@ describe('BulkActionButtons', () => {
   it('disables Delete, Manage Usage Rights, Edit Permissions, and Move To when a locked BP is selected', async () => {
     renderComponent({
       rows: [
-        {id: '1', uuid: '1a', display_name: 'File 1', restricted_by_master_course: true} as File,
-        {id: '2', uuid: '2a', display_name: 'File 2'} as File,
+        {id: 1, display_name: 'File 1', restricted_by_master_course: true} as File,
+        {id: 2, display_name: 'File 2'} as File,
       ],
     })
     const moreButton = screen.getByTestId('bulk-actions-more-button')
@@ -179,8 +176,8 @@ describe('BulkActionButtons', () => {
   describe('Folders', () => {
     beforeEach(() => {
       renderComponent({
-        rows: [{id: '1', name: 'Folder 1'} as Folder, {id: '2', name: 'Folder 2'} as Folder],
-        selectedRows: new Set(['1', '2']),
+        rows: [{id: 1, name: 'Folder 1'} as Folder, {id: 2, name: 'Folder 2'} as Folder],
+        selectedRows: new Set(['folder-1', 'folder-2']),
       })
     })
 

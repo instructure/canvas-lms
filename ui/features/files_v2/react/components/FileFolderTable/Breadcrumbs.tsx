@@ -117,7 +117,7 @@ const ResponsiveBreadcrumbs = ({folders, size, search}: ResponsiveBreadcrumbsPro
     name ||= folder.custom_name || folder.name
 
     const url = isRootCrumb && !showingAllContexts ? '/' : generateUrlPath(folder)
-    return {id: folder.id, name, url}
+    return {id: folder.id.toString(), name, url}
   })
 
   if (search) {

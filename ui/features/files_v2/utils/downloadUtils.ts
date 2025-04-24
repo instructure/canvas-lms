@@ -21,6 +21,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {type File, type Folder} from '../interfaces/File'
+import {getIdFromUniqueId} from './fileFolderUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -53,8 +54,10 @@ interface performRequestProps {
 
 const custom_event = 'download_utils_event'
 
-export const addDownloadListener = (f: EventListenerFunction): void => window.addEventListener(custom_event, f);
-export const removeDownloadListener = (f: EventListenerFunction): void => window.removeEventListener(custom_event, f);
+export const addDownloadListener = (f: EventListenerFunction): void =>
+  window.addEventListener(custom_event, f)
+export const removeDownloadListener = (f: EventListenerFunction): void =>
+  window.removeEventListener(custom_event, f)
 
 export const downloadFile = (url: string) => {
   assignLocation(url)
@@ -71,68 +74,65 @@ export const performRequest = ({
   contextId,
   onProgress,
   onComplete,
-}:performRequestProps) => {
+}: performRequestProps) => {
   const url = `/api/v1/${contextType}/${contextId}/content_exports`
-  const selectedItems: { files: string[], folders: string[] } = {
+  const selectedItems: {files: string[]; folders: string[]} = {
     files: [],
     folders: [],
   }
 
-  items.forEach((item) => {
-    // folders are just numbers, files are uuids
-    if (/^[0-9]+$/.test(item)) {
-      selectedItems.folders.push(item)
-    }
-    else {
-      // get file id from uuid
-      const file_id = rows.find((row) => row.uuid == item)?.id
-      if (file_id) {
-        selectedItems.files.push(file_id)
-      } 
+  items.forEach(item => {
+    const id = getIdFromUniqueId(item)
+    if (item.includes('folder-')) {
+      selectedItems.folders.push(id)
+    } else {
+      selectedItems.files.push(id)
     }
   })
 
   if (selectedItems.files.length == 1 && selectedItems.folders.length == 0) {
-    downloadFile(rows.find((row) => row.id == selectedItems.files[0])?.url || '')
+    downloadFile(rows.find(row => row.id.toString() == selectedItems.files[0])?.url || '')
     return false
   }
 
   window.addEventListener('beforeunload', promptBeforeLeaving, true)
-  
+
   doFetchApi<ContentExportResponse>({
     path: `${url}`,
     method: 'POST',
     body: bodyToQueryString(selectedItems),
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-    }
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    },
   })
-  .then((response) => {
-    return poolProgress(response.json?.progress_url || '', onProgress)
-  })
-  .then((response) => {
-    const json = (response as DoFetchApiResults<PoolProgressResponse>).json
-    return doFetchApi<ContentExportResponse>({
-      path: `${url}/${json?.context_id}`
+    .then(response => {
+      return poolProgress(response.json?.progress_url || '', onProgress)
     })
-  })
-  .then((response) => {
-    const json = response.json || {workflow_state: 'failed'}
-    removeBeforeLeaving()
+    .then(response => {
+      const json = (response as DoFetchApiResults<PoolProgressResponse>).json
+      return doFetchApi<ContentExportResponse>({
+        path: `${url}/${json?.context_id}`,
+      })
+    })
+    .then(response => {
+      const json = response.json || {workflow_state: 'failed'}
+      removeBeforeLeaving()
 
-    if (json.workflow_state == 'exported' && json.attachment?.url) {
-      assignLocation(json.attachment.url)
-    } else {
-      throw new Error('Invalid attachment url')
-    }
-  })
-  .catch((error) => {
-    showFlashError(I18n.t('An error occurred trying to prepare download, please try again.'))(error);
-  })
-  .finally(() => {
-    removeBeforeLeaving()
-    onComplete()
-  })
+      if (json.workflow_state == 'exported' && json.attachment?.url) {
+        assignLocation(json.attachment.url)
+      } else {
+        throw new Error('Invalid attachment url')
+      }
+    })
+    .catch(error => {
+      showFlashError(I18n.t('An error occurred trying to prepare download, please try again.'))(
+        error,
+      )
+    })
+    .finally(() => {
+      removeBeforeLeaving()
+      onComplete()
+    })
 
   return true
 }
@@ -141,30 +141,30 @@ const poolProgress = (url: string, onProgress: (progress: number) => void) => {
   return new Promise((resolve, reject) => {
     const poolRequest = () => {
       doFetchApi<PoolProgressResponse>({path: url})
-      .then((response) => {
-        onProgress(response.json?.completion || 0)
-        switch (response.json?.workflow_state || 'failed') {
-          case 'completed':
-            resolve(response)
-            break
-          case 'queued':
-          case 'running':
-            setTimeout(poolRequest, 1000)
-            break
-          case 'failed':
-            reject(new Error(I18n.t('Export failed')))
-            break
-        }
-      })
-      .catch((error) => {
-        reject(error)
-      })
+        .then(response => {
+          onProgress(response.json?.completion || 0)
+          switch (response.json?.workflow_state || 'failed') {
+            case 'completed':
+              resolve(response)
+              break
+            case 'queued':
+            case 'running':
+              setTimeout(poolRequest, 1000)
+              break
+            case 'failed':
+              reject(new Error(I18n.t('Export failed')))
+              break
+          }
+        })
+        .catch(error => {
+          reject(error)
+        })
     }
     poolRequest()
   })
 }
 
-const promptBeforeLeaving = (e:Event) => {
+const promptBeforeLeaving = (e: Event) => {
   e.preventDefault()
   return I18n.t('If you leave, the zip file download currently being prepared will be canceled.')
 }
@@ -178,11 +178,11 @@ const removeBeforeLeaving = () => {
 const bodyToQueryString = (json: Record<string, any>) => {
   const formData = new FormData()
   formData.append('export_type', 'zip')
-  Object.keys(json).forEach(function(k){
-    (json[k] as [string]).forEach((v) => {
+  Object.keys(json).forEach(function (k) {
+    ;(json[k] as [string]).forEach(v => {
       formData.append(`select[${k}][]`, v)
     })
-  });
+  })
   const params = new URLSearchParams(formData as unknown as Record<string, string>)
   return params.toString()
 }
