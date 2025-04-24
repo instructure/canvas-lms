@@ -249,6 +249,12 @@ module GraphQLNodeLoader
 
         record
       end
+    when "Folder"
+      Loaders::IDLoader.for(Folder).load(id).then do |folder|
+        next nil unless folder&.grants_right?(ctx[:current_user], :read)
+
+        folder
+      end
     when "CommentBankItem"
       Loaders::IDLoader.for(CommentBankItem).load(id).then do |record|
         next if !record || record.deleted? || !record.grants_right?(ctx[:current_user], :read)

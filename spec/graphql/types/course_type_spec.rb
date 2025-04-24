@@ -104,6 +104,33 @@ describe Types::CourseType do
   end
 
   context "connection types" do
+    describe "foldersConnection" do
+      before(:once) do
+        @folder1 = folder_model(context: course, name: "Folder 1")
+        @folder2 = folder_model(context: course, name: "Folder 2")
+        @folder3 = folder_model(context: course, name: "Folder 3")
+        @folder3.destroy
+      end
+
+      it "returns course folders" do
+        expect(
+          course_type.resolve("foldersConnection { edges { node { _id } } }", current_user: @teacher)
+        ).to match_array [@folder1.id.to_s, @folder2.id.to_s, Folder.root_folders(course).first.id.to_s]
+      end
+
+      it "doesn't return deleted folders" do
+        expect(
+          course_type.resolve("foldersConnection { edges { node { _id name } } }", current_user: @teacher)
+        ).not_to include("node" => { "_id" => @folder3.id.to_s, "name" => @folder3.name })
+      end
+
+      it "requires read permission" do
+        other_course_student = student_in_course(course: course_factory).user
+        resolver = GraphQLTypeTester.new(course, current_user: other_course_student)
+        expect(resolver.resolve("foldersConnection { edges { node { _id } } }")).to be_nil
+      end
+    end
+
     describe "assignmentsConnection" do
       let_once(:assignment) do
         course.assignments.create! name: "asdf", workflow_state: "unpublished"
