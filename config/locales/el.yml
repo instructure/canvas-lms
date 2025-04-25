@@ -11323,6 +11323,7 @@ el:
   process_as_ui_changes_8e34ed2a: "Επεξεργασία ως αλλαγές UI"
   process_data_2f5f962f: "Επεξεργασία Δεδομένων"
   processing_2fcc9739: "Γίνεται Επεξεργασία"
+  processing_8c569014: "Γίνεται Επεξεργασία..."
   product_name: Canvas
   profile: 
     access_token: 
