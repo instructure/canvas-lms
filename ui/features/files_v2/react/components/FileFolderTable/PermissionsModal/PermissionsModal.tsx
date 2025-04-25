@@ -16,87 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ReactElement, useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {queryClient} from '@canvas/query'
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
-import {DateTimeInput} from '@instructure/ui-date-time-input'
-import {
-  IconCalendarMonthLine,
-  IconOffLine,
-  IconPublishSolid,
-  IconUnpublishedLine,
-} from '@instructure/ui-icons'
-import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-import {Spinner} from '@instructure/ui-spinner'
-import {View} from '@instructure/ui-view'
-import {Alert} from '@instructure/ui-alerts'
-import FileFolderInfo from '../../shared/FileFolderInfo'
 import {type File, type Folder} from '../../../../interfaces/File'
 import {isFile} from '../../../../utils/fileFolderUtils'
 import {useFileManagement} from '../../Contexts'
 import type {FormMessage} from '@instructure/ui-form-field'
-
-type AvailabilityOptionId = 'published' | 'unpublished' | 'link_only' | 'date_range'
-
-type AvailabilityOption = {
-  id: AvailabilityOptionId
-  label: string
-  icon: ReactElement
-}
-
-type VisibilityOption = {
-  id: string
-  label: string
-}
-
-type PermissionsModalHeaderProps = {
-  onDismiss: () => void
-}
-
-type PermissionsModalBodyProps = {
-  isRequestInFlight: boolean
-  items: (File | Folder)[]
-  error: string | null
-  onDismissAlert: () => void
-  availabilityOption: AvailabilityOption
-  onChangeAvailabilityOption: (
-    event: React.SyntheticEvent,
-    data: {
-      id?: string
-    },
-  ) => void
-  enableVisibility: boolean
-  visibilityOption: VisibilityOption
-  visibilityOptions: Record<string, VisibilityOption>
-  onChangeVisibilityOption: (
-    event: React.SyntheticEvent,
-    data: {
-      id?: string
-    },
-  ) => void
-  unlockAt: string | null
-  unlockAtDateInputRef: (el: HTMLInputElement | null) => void
-  unlockAtTimeInputRef: (el: HTMLInputElement | null) => void
-  unlockAtError: FormMessage[] | undefined
-  onChangeUnlockAt: (event: React.SyntheticEvent, isoValue?: string) => void
-  lockAt: string | null
-  lockAtDateInputRef: (el: HTMLInputElement | null) => void
-  lockAtTimeInputRef: (el: HTMLInputElement | null) => void
-  lockAtError: FormMessage[] | undefined
-  onChangeLockAt: (event: React.SyntheticEvent, isoValue?: string) => void
-}
-
-type PermissionsModalFooterProps = {
-  isRequestInFlight: boolean
-  onDismiss: () => void
-  onSave: () => void
-}
+import {PermissionsModalHeader} from './PermissionsModalHeader'
+import {PermissionsModalBody} from './PermissionsModalBody'
+import {PermissionsModalFooter} from './PermissionsModalFooter'
+import {
+  allAreEqual,
+  defaultAvailabilityOption,
+  defaultDate,
+  defaultVisibilityOption,
+  type AvailabilityOptionId,
+  type AvailabilityOption,
+  type VisibilityOption,
+  AVAILABILITY_OPTIONS,
+  VISIBILITY_OPTIONS,
+} from './PermissionsModalUtils'
 
 export type PermissionsModalProps = {
   open: boolean
@@ -105,263 +49,6 @@ export type PermissionsModalProps = {
 }
 
 const I18n = createI18nScope('files_v2')
-
-const AVAILABILITY_OPTIONS: Record<AvailabilityOptionId, AvailabilityOption> = {
-  published: {
-    id: 'published',
-    label: I18n.t('Publish'),
-    icon: <IconPublishSolid color="success" />,
-  },
-  unpublished: {
-    id: 'unpublished',
-    label: I18n.t('Unpublish'),
-    icon: <IconUnpublishedLine />,
-  },
-  link_only: {
-    id: 'link_only',
-    label: I18n.t('Only available with link'),
-    icon: <IconOffLine />,
-  },
-  date_range: {
-    id: 'date_range',
-    label: I18n.t('Schedule availability'),
-    icon: <IconCalendarMonthLine />,
-  },
-}
-
-const VISIBILITY_OPTIONS: Record<string, VisibilityOption> = {
-  inherit: {
-    id: 'inherit',
-    label: I18n.t('Inherit from Course'),
-  },
-  context: {
-    id: 'context',
-    label: I18n.t('Course Members'),
-  },
-  institution: {
-    id: 'institution',
-    label: I18n.t('Institution Members'),
-  },
-  public: {
-    id: 'public',
-    label: I18n.t('Public'),
-  },
-}
-
-const allAreEqual = (items: (File | Folder)[], attributes: string[]) =>
-  items.every(item =>
-    attributes.every(
-      attribute =>
-        items[0][attribute] === item[attribute] || (!items[0][attribute] && !item[attribute]),
-    ),
-  )
-
-const defaultAvailabilityOption = (items: (File | Folder)[]) => {
-  if (items.length === 0) return AVAILABILITY_OPTIONS.published
-
-  if (!allAreEqual(items, ['hidden', 'locked', 'lock_at', 'unlock_at'])) {
-    return AVAILABILITY_OPTIONS.published
-  }
-  const item = items[0]
-  if (item.locked) {
-    return AVAILABILITY_OPTIONS.unpublished
-  } else if (item.lock_at || item.unlock_at) {
-    return AVAILABILITY_OPTIONS.date_range
-  } else if (item.hidden) {
-    return AVAILABILITY_OPTIONS.link_only
-  } else {
-    return AVAILABILITY_OPTIONS.published
-  }
-}
-
-const defaultDate = (items: (File | Folder)[], key: 'unlock_at' | 'lock_at') => {
-  if (items.length === 0) return null
-
-  if (!allAreEqual(items, ['hidden', 'locked', 'lock_at', 'unlock_at'])) {
-    return null
-  }
-  const item = items[0]
-  return item[key]
-}
-
-const defaultVisibilityOption = (
-  items: (File | Folder)[],
-  visibilityOptions: Record<string, VisibilityOption>,
-) => {
-  if (items.length === 0) return visibilityOptions.inherit
-
-  if (visibilityOptions.keep) {
-    return visibilityOptions.keep
-  }
-  const item = items[0]
-  if (isFile(item) && item.visibility_level) return visibilityOptions[item.visibility_level]
-  return visibilityOptions.inherit
-}
-
-const PermissionsModalHeader = ({onDismiss}: PermissionsModalHeaderProps) => (
-  <>
-    <CloseButton
-      placement="end"
-      offset="small"
-      onClick={onDismiss}
-      screenReaderLabel={I18n.t('Close')}
-    />
-    <Heading>{I18n.t('Edit Permissions')}</Heading>
-  </>
-)
-
-const PermissionsModalBody = ({
-  isRequestInFlight,
-  items,
-  error,
-  onDismissAlert,
-  availabilityOption,
-  onChangeAvailabilityOption,
-  enableVisibility,
-  visibilityOption,
-  visibilityOptions,
-  onChangeVisibilityOption,
-  unlockAt,
-  unlockAtDateInputRef,
-  unlockAtTimeInputRef,
-  unlockAtError,
-  onChangeUnlockAt,
-  lockAt,
-  lockAtDateInputRef,
-  lockAtTimeInputRef,
-  lockAtError,
-  onChangeLockAt,
-}: PermissionsModalBodyProps) => {
-  const allFolders = useMemo(() => items.every(item => !isFile(item)), [items])
-
-  if (isRequestInFlight) {
-    return (
-      <View as="div" textAlign="center">
-        <Spinner
-          renderTitle={() => I18n.t('Loading')}
-          aria-live="polite"
-          data-testid="permissions-spinner"
-        />
-      </View>
-    )
-  }
-
-  return (
-    <>
-      <FileFolderInfo items={items} />
-      {error && (
-        <Alert
-          variant="error"
-          renderCloseButtonLabel={I18n.t('Close warning message')}
-          onDismiss={onDismissAlert}
-        >
-          {error}
-        </Alert>
-      )}
-      <View as="div" margin="small none none none">
-        <SimpleSelect
-          data-testid="permissions-availability-selector"
-          renderLabel={I18n.t('Available')}
-          renderBeforeInput={availabilityOption.icon}
-          value={availabilityOption.id}
-          onChange={onChangeAvailabilityOption}
-        >
-          {Object.values(AVAILABILITY_OPTIONS).map(option => (
-            <SimpleSelect.Option
-              key={option.id}
-              id={option.id}
-              value={option.id}
-              renderBeforeLabel={option.icon}
-            >
-              {option.label}
-            </SimpleSelect.Option>
-          ))}
-        </SimpleSelect>
-      </View>
-
-      {availabilityOption.id === 'date_range' && (
-        <>
-          <View as="div" margin="small none none none">
-            <DateTimeInput
-              description={<></>}
-              prevMonthLabel={I18n.t('Previous month')}
-              nextMonthLabel={I18n.t('Next month')}
-              invalidDateTimeMessage={I18n.t('Invalid date')}
-              dateRenderLabel={I18n.t('Available from')}
-              timeRenderLabel={I18n.t('Time')}
-              layout="columns"
-              value={unlockAt || undefined}
-              dateInputRef={unlockAtDateInputRef}
-              timeInputRef={unlockAtTimeInputRef}
-              onChange={onChangeUnlockAt}
-              messages={unlockAtError}
-            />
-          </View>
-
-          <View as="div" margin="small none none none">
-            <DateTimeInput
-              description={<></>}
-              prevMonthLabel={I18n.t('Previous month')}
-              nextMonthLabel={I18n.t('Next month')}
-              invalidDateTimeMessage={I18n.t('Invalid date')}
-              dateRenderLabel={I18n.t('Until')}
-              timeRenderLabel={I18n.t('Time')}
-              layout="columns"
-              value={lockAt || undefined}
-              dateInputRef={lockAtDateInputRef}
-              timeInputRef={lockAtTimeInputRef}
-              onChange={onChangeLockAt}
-              messages={lockAtError}
-            />
-          </View>
-        </>
-      )}
-
-      {enableVisibility && !allFolders && (
-        <View as="div" margin="small none none none">
-          <SimpleSelect
-            data-testid="permissions-visibility-selector"
-            disabled={availabilityOption.id === 'unpublished'}
-            renderLabel={I18n.t('Visibility')}
-            value={visibilityOption.id}
-            onChange={onChangeVisibilityOption}
-          >
-            {Object.values(visibilityOptions).map(option => (
-              <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
-                {option.label}
-              </SimpleSelect.Option>
-            ))}
-          </SimpleSelect>
-        </View>
-      )}
-    </>
-  )
-}
-
-const PermissionsModalFooter = ({
-  isRequestInFlight,
-  onDismiss,
-  onSave,
-}: PermissionsModalFooterProps) => (
-  <>
-    <Button
-      data-testid="permissions-cancel-button"
-      margin="0 x-small 0 0"
-      disabled={isRequestInFlight}
-      onClick={onDismiss}
-    >
-      {I18n.t('Cancel')}
-    </Button>
-    <Button
-      data-testid="permissions-save-button"
-      color="primary"
-      disabled={isRequestInFlight}
-      onClick={onSave}
-    >
-      {I18n.t('Save')}
-    </Button>
-  </>
-)
 
 const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
   const {contextId, contextType} = useFileManagement()
