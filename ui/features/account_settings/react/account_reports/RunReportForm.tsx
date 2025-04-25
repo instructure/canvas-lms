@@ -105,11 +105,11 @@ export default function ConfigureReportForm(props: Props) {
     setIsLoading(true)
     if (formRef.current) {
       const formData = getFormData(formRef.current)
-      if (formData.get('parameters[start_at]')) {
-        formData.append('parameters[start_at]', startAt ?? '')
+      if (formData.has('parameters[start_at]')) {
+        formData.set('parameters[start_at]', startAt ?? '')
       }
-      if (formData.get('parameters[end_at]')) {
-        formData.set('parametes[end_at]', endAt ?? '')
+      if (formData.has('parameters[end_at]')) {
+        formData.set('parameters[end_at]', endAt ?? '')
       }
       try {
         await doFetchApi({
