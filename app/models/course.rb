@@ -2459,10 +2459,10 @@ class Course < ActiveRecord::Base
         completion: 0,
         message: "Skipped: a similar job is already queued or running."
       )
-      { progress_id: existing_progress.id }
+      existing_progress
     else
       # No existing progress found, continue with current progress
-      { progress_id: progress.id }
+      progress
     end
   end
 
