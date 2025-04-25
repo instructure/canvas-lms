@@ -22,7 +22,7 @@ class Mutations::AutoGradeSubmission < Mutations::BaseMutation
   argument :submission_id, ID, required: true
 
   field :error, String, null: true
-  field :progress_id, ID, null: true
+  field :progress, Types::ProgressType, null: true
 
   def resolve(input:)
     submission_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:submission_id], "Submission")
@@ -34,16 +34,16 @@ class Mutations::AutoGradeSubmission < Mutations::BaseMutation
     raise "Course not found" unless course
 
     unless course.feature_enabled?(:project_lhotse)
-      return { error: "Project Lhotse is not enabled for this course" }
+      raise GraphQL::ExecutionError, "Project Lhotse is not enabled for this course"
     end
 
     verify_authorized_action!(course, :manage_grades)
 
-    progress_info = course.auto_grade_submission_in_background(submission)
+    progress = course.auto_grade_submission_in_background(submission)
 
-    { progress_id: progress_info[:progress_id] }
+    { progress: }
   rescue => e
     Rails.logger.error("[AutoGradeSubmission ERROR] #{e.message}")
-    { error: "An unexpected error occurred while grading." }
+    raise GraphQL::ExecutionError, "An unexpected error occurred while grading."
   end
 end
