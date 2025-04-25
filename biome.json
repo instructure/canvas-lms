@@ -18,7 +18,8 @@
       "packages/bundles",
       "packages/jquery*",
       "packages/react-dnd-test-backend/index.js",
-      "packages/slickgrid"
+      "packages/slickgrid",
+      "ui/shared/apollo-v3/possibleTypes.json"
     ]
   },
   "formatter": {
