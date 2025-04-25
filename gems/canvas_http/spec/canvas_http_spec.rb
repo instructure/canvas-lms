@@ -310,6 +310,11 @@ describe "CanvasHttp" do
       CanvasHttp.tempfile_for_uri(URI.parse("1234567890" * 12))
     end
 
+    it "truncates basenames to 100 characters, even if there are intermediate periods" do
+      expect(Tempfile).to receive(:new).with(["1234567890" * 10, ".xyz"])
+      CanvasHttp.tempfile_for_uri(URI.parse("#{"1234567890" * 12}.#{"1234567890" * 12}.xyz"))
+    end
+
     it "doesn't crash when given a URI with no path" do
       res = CanvasHttp.tempfile_for_uri(URI.parse("http://example.com"))
       expect(res).to eq(tempfile)
