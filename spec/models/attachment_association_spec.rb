@@ -86,6 +86,11 @@ describe AttachmentAssociation do
       expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id])
     end
 
+    it "does not allow associations to files the editing user doesn't have update access to" do
+      make_association_update([course_attachment.id, user_attachment.id], nil, student)
+      expect(fetch_list_with_field_name(nil)).to be_empty
+    end
+
     it "works with fields" do
       make_association_update([course_attachment.id, course_attachment2.id], nil)
       make_association_update([course_attachment3.id], "syllabus_body")

@@ -41,7 +41,7 @@ class AttachmentAssociation < ActiveRecord::Base
 
     if to_create.any?
       Attachment.where(id: to_create).find_each do |attachment|
-        next unless attachment.grants_right?(user, session, :download)
+        next unless attachment.grants_right?(user, session, :update)
 
         AttachmentAssociation.create!(context:, attachment:, user:, field_name:)
       end
