@@ -10518,6 +10518,7 @@ ko:
   private_3883d133: 비공개
   process_as_ui_changes_8e34ed2a: "UI 변경으로 처리"
   process_data_2f5f962f: "자료 처리"
+  processing_8c569014: "처리 중..."
   product_name: Canvas
   profile: 
     access_token: 
