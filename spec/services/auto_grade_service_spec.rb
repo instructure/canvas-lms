@@ -294,9 +294,9 @@ RSpec.describe AutoGradeService do
             "criterion" => "Meets requirements"
           },
           {
-            "rubric_category" => "Grammar",
+            "rubric_category" => "Content", # Duplicate
             "reasoning" => "Second reasoning",
-            "criterion" => "Meets requirements" # Duplicate
+            "criterion" => "Meets requirements"
           },
           {
             "rubric_category" => "Style",
