@@ -118,6 +118,12 @@ export const mockRegistration = (
   }
 }
 
+export const mockNonDynamicRegistration = (n: string, i: number) => {
+  const reg = mockRegistrationWithAllInformation({n, i})
+  reg.ims_registration_id = null
+  return reg
+}
+
 export const mockLtiOverlayVersion = ({
   id = '1',
   date = new Date(),

@@ -19,13 +19,7 @@ import {AllLtiScopes} from '@canvas/lti/model/LtiScope'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {render, screen} from '@testing-library/react'
 import {clickOrFail} from '../../../__tests__/interactionHelpers'
-import {
-  createMemoryRouter,
-  RouterProvider,
-  Outlet,
-  Route,
-  Routes
-} from 'react-router-dom'
+import {createMemoryRouter, RouterProvider, Outlet, Route, Routes} from 'react-router-dom'
 import {AllLtiPlacements} from '../../../../model/LtiPlacement'
 import {AllLtiPrivacyLevels} from '../../../../model/LtiPrivacyLevel'
 import {i18nLtiPlacement} from '../../../../model/i18nLtiPlacement'
@@ -34,7 +28,11 @@ import {ZLtiImsRegistrationId} from '../../../../model/lti_ims_registration/LtiI
 import {ZLtiToolConfigurationId} from '../../../../model/lti_tool_configuration/LtiToolConfigurationId'
 import {ToolConfigurationView} from '../ToolConfigurationView'
 import {mockConfiguration, renderApp} from './helpers'
-import {mockRegistrationWithAllInformation, mockSiteAdminRegistration} from '../../../manage/__tests__/helpers'
+import {
+  mockRegistrationWithAllInformation,
+  mockSiteAdminRegistration,
+  mockNonDynamicRegistration,
+} from '../../../manage/__tests__/helpers'
 import fetchMock from 'fetch-mock'
 
 describe('Tool Configuration View Launch Settings', () => {
@@ -355,7 +353,7 @@ describe('Tool Configuration Restore Default Button', () => {
   it('should call the delete endpoint when clicked', async () => {
     fetchMock.put('/api/v1/accounts/1/lti_registrations/1/reset', {
       __type: 'Success',
-      data: {}
+      data: {},
     })
 
     const {getByText} = renderApp({
@@ -386,9 +384,59 @@ describe('Tool Configuration Restore Default Button', () => {
     const responseHeaders = response[1]
     expect(responseUrl).toBe('/api/v1/accounts/1/lti_registrations/1/reset')
     expect(responseHeaders).toMatchObject({
-      method: 'PUT'
+      method: 'PUT',
     })
   })
 })
 
+describe('Tool Configuration Copy JSON Code button', () => {
+  it('renders the button on a non-dynamic-reg tool', () => {
+    const registration = mockNonDynamicRegistration('non-dr reg', 1)
+    const router = createMemoryRouter([
+      {
+        path: '*',
+        element: (
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Outlet
+                  context={{
+                    registration,
+                    refreshRegistration: jest.fn(),
+                  }}
+                />
+              }
+            >
+              <Route index element={<ToolConfigurationView />} />
+            </Route>
+          </Routes>
+        ),
+      },
+    ])
+    const wrapper = render(<RouterProvider router={router} />)
 
+    expect(wrapper.getByText('Copy JSON Code').closest('button')).toBeInTheDocument()
+  })
+
+  it('does not show the Copy JSON Code button for a dynamic reg tool', async () => {
+    const {queryByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({
+          redirect_uris: ['http://example.com/redirect_uri_1'],
+          target_link_uri: 'https://example.com/target_link_uri',
+          oidc_initiation_url: 'http://example.com/oidc_initiation_url',
+          domain: 'domain.com',
+          public_jwk_url: 'http://example.com/public_jwk_url',
+          custom_fields: {
+            foo: 'bar',
+          },
+        }),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(queryByText('Copy JSON Code')).not.toBeInTheDocument()
+  })
+})
