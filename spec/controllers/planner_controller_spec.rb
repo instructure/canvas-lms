@@ -1062,9 +1062,12 @@ describe PlannerController do
         end
 
         it "shows new activity when a new discussion topic has been created" do
-          # the queries behind this be expensive, there is a 1.minute cache on some of them, we'll do our first get
+          # the queries behind this be expensive, there is a 1.week cache on some of them, we'll do our first get
           # in a time longer ago than the cache length
-          Timecop.freeze(2.minutes.ago) do
+          # (note that caching is based on contexts_cache_key --
+          # Context.last_updated_at(...) with second precision -- which can be
+          # depend on spec timing and be flaky)
+          Timecop.freeze(8.days.ago) do
             get :index, params: { start_date: @start_date, end_date: @end_date }
           end
           discussion_topic_model(context: @course, todo_date: 1.day.from_now)
