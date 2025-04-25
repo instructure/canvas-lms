@@ -76,9 +76,9 @@ class AutoGradeService
         feature_slug: "grading-assistance",
         root_account_uuid: @root_account_uuid
       )
-
       body = JSON.parse(response)
       parsed_result = filter_repeating_keys(body)
+
       map_criteria_ids_to_grades(parsed_result, @rubric)
     rescue => e
       raise CedarAIGraderError, "Invalid JSON response: #{e.message}"
@@ -172,7 +172,7 @@ class AutoGradeService
   end
 
   def filter_repeating_keys(json_array)
-    json_array.uniq { |item| item["criterion"] }
+    json_array.uniq { |item| item["rubric_category"] }
   end
 
   def build_prompt
