@@ -305,6 +305,42 @@ describe "root account basic settings" do
       expect(modal_body.find("#parameters_created_by_sis")).to_not be_disabled
       expect(modal_body.find("#parameters_include_deleted")).to_not be_disabled
     end
+
+    it "creates a report with correct parameters" do
+      course_with_admin_logged_in
+
+      get account_settings_url + "#tab-reports"
+
+      f("#configure_students_with_no_submissions_csv").click
+      # change start_at date
+      start_at = modal_body.find('[data-testid="parameters[start_at]"]')
+      start_at.click
+      start_at.clear
+      start_at.send_keys("2023-01-01")
+
+      # change end_at date
+      end_at = modal_body.find('[data-testid="parameters[end_at]"]')
+      end_at.click
+      end_at.clear
+      end_at.send_keys("2023-01-15")
+
+      # change the enrollment state (select)
+      enrollment_state = modal_body.find("select[name='parameters[enrollment_state][]']")
+      enrollment_state.click
+      enrollment_state.find('[value="active"').click
+
+      f("[data-testid='run-report']").click
+
+      report = Account.default.account_reports.last
+      expect(report).to be_present
+      params = report.parameters
+      # unchecked params are excluded from the report
+      expect(params["enrollment_term_id"]).to eq("")
+      expect(params).to have_key("start_at")
+      expect(params).to have_key("end_at")
+      expect(params).not_to have_key("include_enrollment_state")
+      expect(params["enrollment_state"]).to eq(["active"])
+    end
   end
 
   it "changes the default user quota", priority: "1" do
