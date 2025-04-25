@@ -331,6 +331,38 @@ describe SubAssignment do
     end
   end
 
+  describe "callbacks: sync_parent_has_sub_flag" do
+    let(:course)            { course_factory(active_course: true) }
+    let(:parent)            { course.assignments.create!(title: "Parent", has_sub_assignments: false) }
+    let(:attrs) do
+      {
+        context: course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        title: "A Sub"
+      }
+    end
+
+    it "marks parent.has_sub_assignments = true on create" do
+      expect(parent.has_sub_assignments).to be_falsey
+
+      sub = parent.sub_assignments.create!(attrs)
+      sub.send(:sync_parent_has_sub_flag)
+
+      expect(parent.reload.has_sub_assignments).to be_truthy
+    end
+
+    it "marks parent.has_sub_assignments = false on destroy" do
+      sub = parent.sub_assignments.create!(attrs)
+      sub.send(:sync_parent_has_sub_flag)
+      expect(parent.reload.has_sub_assignments).to be_truthy
+
+      expect do
+        sub.destroy!
+        sub.send(:sync_parent_has_sub_flag)
+      end.to change { parent.reload.has_sub_assignments }.from(true).to(false)
+    end
+  end
+
   describe "title_with_id" do
     before(:once) do
       @course = course_factory(active_course: true)
