@@ -653,9 +653,6 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Glissez et déposez ou cliquez pour rechercher sur votre ordinateur"
     },
-    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
-        "message": "Glisser-déposer. Utiliser les flèches vers le haut et vers le bas pour redimensionner"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "À rendre le : Plusieurs dates"
     },
@@ -1972,9 +1969,6 @@
     },
     "reset_95a81614": {
         "message": "Réinitialiser"
-    },
-    "resize_ec83d538": {
-        "message": "Redimensionner"
     },
     "response_copied_to_clipboard_130d66cd": {
         "message": "Réponse copiée sur le presse-papiers"

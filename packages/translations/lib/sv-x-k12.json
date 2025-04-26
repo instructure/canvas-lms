@@ -653,9 +653,6 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Dra och släpp, eller klicka för att söka i din dator"
     },
-    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
-        "message": "Dra handtag. Använd upp- och nedpilarna för att ändra storlek"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Inlämningsdatum: Flera datum"
     },
@@ -1972,9 +1969,6 @@
     },
     "reset_95a81614": {
         "message": "Återställ"
-    },
-    "resize_ec83d538": {
-        "message": "Ändra storlek"
     },
     "response_copied_to_clipboard_130d66cd": {
         "message": "Svar kopierades till Urklipp"

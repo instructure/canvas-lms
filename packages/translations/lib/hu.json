@@ -602,9 +602,6 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Húzza ide a fájlt vagy tallózza ki a számítógépen"
     },
-    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
-        "message": "Húzza a fogantyút. Átméretezéshez használja a fel és le nyilakat."
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Határidő: Több határidő van érvényben"
     },
@@ -1807,9 +1804,6 @@
     },
     "reset_95a81614": {
         "message": "Visszaállítás"
-    },
-    "resize_ec83d538": {
-        "message": "Átméretezés"
     },
     "restore_auto_save_deccd84b": {
         "message": "Visszaállítás automatikus mentésből?"

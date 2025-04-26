@@ -653,9 +653,6 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Tōia me te taka, pāwhiri rānei ki te tirotiro tō rorohiko"
     },
-    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
-        "message": "Tō kakau Whakamahi ngā pere runga raro ki te whakarerekē"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "E tika ana: Rā Maha"
     },
@@ -1972,9 +1969,6 @@
     },
     "reset_95a81614": {
         "message": "Tautuhi anō"
-    },
-    "resize_ec83d538": {
-        "message": "Rahi anō"
     },
     "response_copied_to_clipboard_130d66cd": {
         "message": "Kua tāruahia te whakautu ki te papatopenga"

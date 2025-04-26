@@ -605,9 +605,6 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Dra og slipp, eller klikk for å hente fil frå disk"
     },
-    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
-        "message": "Dragrep. Bruk piltastane opp og ned for å endre storleik"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Frist: Fleire datoar"
     },
@@ -1807,9 +1804,6 @@
     },
     "reset_95a81614": {
         "message": "Tilbakestill"
-    },
-    "resize_ec83d538": {
-        "message": "Endre storleik"
     },
     "restore_auto_save_deccd84b": {
         "message": "Gjenopprette auto-lagring?"

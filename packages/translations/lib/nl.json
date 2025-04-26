@@ -653,9 +653,6 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Slepen en neerzetten of klikken om je computer te doorzoeken"
     },
-    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
-        "message": "Sleep de handgreep. Gebruik de pijltoetsen-omhoog en -omlaag om de grootte te wijzigen"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Inleverdatum: Meerdere datums"
     },
@@ -1972,9 +1969,6 @@
     },
     "reset_95a81614": {
         "message": "Opnieuw instellen"
-    },
-    "resize_ec83d538": {
-        "message": "Grootte wijzigen"
     },
     "response_copied_to_clipboard_130d66cd": {
         "message": "Reactie gekopieerd naar klembord"
