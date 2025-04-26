@@ -653,9 +653,6 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Dra og slipp, eller trykk for å bla i din datamaskin"
     },
-    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
-        "message": "Dra-håndtak. Bruk piltastene for å forandre størrelse"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Frist: Flere datoer"
     },
@@ -1972,9 +1969,6 @@
     },
     "reset_95a81614": {
         "message": "Tilbakestill"
-    },
-    "resize_ec83d538": {
-        "message": "Endre størrelse"
     },
     "response_copied_to_clipboard_130d66cd": {
         "message": "Svar kopiert til utklippstavlen"

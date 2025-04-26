@@ -653,9 +653,6 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Gallwch lusgo a gollwng, neu glicio i bori drwy’ch cyfrifiadur"
     },
-    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
-        "message": "Dolen lusgo. Defnyddiwch y saethau i fyny ac i lawr i newid maint"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Erbyn: Mwy nag un dyddiad"
     },
@@ -1972,9 +1969,6 @@
     },
     "reset_95a81614": {
         "message": "Ailosod"
-    },
-    "resize_ec83d538": {
-        "message": "Ailfeintio"
     },
     "response_copied_to_clipboard_130d66cd": {
         "message": "Ymateb wedi''i gopïo i''r clipfwrdd."

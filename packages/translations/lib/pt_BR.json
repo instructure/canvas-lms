@@ -653,9 +653,6 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Arraste e solte ou clique para navegar no seu computador"
     },
-    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
-        "message": "Arraste a manilha. Use as setas para cima e para baixo para redimensionar"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Vencimento: Várias datas"
     },
@@ -1972,9 +1969,6 @@
     },
     "reset_95a81614": {
         "message": "Redefinir"
-    },
-    "resize_ec83d538": {
-        "message": "Redimensionar"
     },
     "response_copied_to_clipboard_130d66cd": {
         "message": "Resposta copiada para a área de transferência"

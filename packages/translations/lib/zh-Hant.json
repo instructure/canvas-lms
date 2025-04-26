@@ -653,9 +653,6 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "拖放或按一下以瀏覽您的電腦"
     },
-    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
-        "message": "拖曳控點。使用上下箭頭重新調整大小"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "截止日期：多個日期"
     },
@@ -1972,9 +1969,6 @@
     },
     "reset_95a81614": {
         "message": "重設"
-    },
-    "resize_ec83d538": {
-        "message": "調校大小"
     },
     "response_copied_to_clipboard_130d66cd": {
         "message": "回應已複製到剪貼簿"
