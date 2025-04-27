@@ -1,3 +1,13 @@
+<style>
+  .form-horizontal #discussion_form_options label {
+    padding: 4px;
+  }
+
+  .form-horizontal #anonymous_selector label {
+    display: inline-flex !important;
+  }
+</style>
+
 {{#if title}}
 <h1 class="screenreader-only" style="display: inline">{{title}}</h1>
 {{else}}
@@ -102,142 +112,11 @@
       {{/if}}
     </fieldset>
 
-    <fieldset style="display:flex; flex-direction:column">
-
+    <fieldset style="display:flex; flex-direction:column; margin-bottom: 30px;">
       {{#ifAny isTopic contextIsCourse canModerate showAssignment}}
-      <legend class="control-label" style="text-align:start; margin-bottom: 0">{{#t "options"}}Options{{/t}}</legend>
-      <div class="control-group">
-        <div class="controls" style="text-align:start; margin-left:0">
-          {{#if isTopic}}
-          {{#unless react_discussions_post}}
-          <div><label class="checkbox short-label" for="threaded">
-              {{checkbox "threaded"}}
-              {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
-            </label></div>
-          {{/unless}}
-          {{#if react_discussions_post}}
-          {{#if context_is_not_group}}
-          {{#ifAny canModerate allow_student_anonymous_discussion_topics}}
-          <h4 id="anonymous_section_header">{{#t}}Anonymous Discussion{{/t}}</h4>
-          <div style="margin: 0 0 20px 0;">
-            <label class="radio" style="display: block;">
-              <input type="radio" name="anonymous_state" value=null {{checkedIfNullOrUndef anonymousState}} {{#unless 
-                allowAnonymousEdit}}disabled{{/unless}} />
-              {{#t}}Off: student names and profile pictures will be visible to other members of this course{{/t}}
-            </label>
-            <label class="radio" style="display: block;">
-              <input type="radio" name="anonymous_state" value="partial_anonymity" {{checkedIf
-                anonymousState "partial_anonymity" }} {{#unless allowAnonymousEdit}}disabled{{/unless}} />
-              {{#t}}Partial: students can choose to reveal their name and profile picture{{/t}}
-            </label>
-            <label class="radio" style="display: block;">
-              <input type="radio" name="anonymous_state" value="full_anonymity" {{checkedIf
-                anonymousState "full_anonymity" }} {{#unless allowAnonymousEdit}}disabled{{/unless}} />
-              {{#t}}Full: student names and profile pictures will be hidden{{/t}}
-            </label>
-          </div>
-          {{#if is_student}}
-          <div id="sections_anonymous_post_selector" style="display: none"></div>
-          {{/if}}
-          {{/ifAny}}
-          {{/if}}
-          {{/if}}
-          {{/if}}
-          {{#if contextIsCourse}}
-          {{#if isAnnouncement}}
-          {{#unless announcementsLocked}}
-          {{#unless homeroomCourse}}
-          <div><label class="checkbox short-label" for="allow_user_comments">
-              {{#if title}}
-              {{checkbox "allow_user_comments" checked=unlocked}}
-              {{else}}
-              {{checkbox "allow_user_comments" checked=ENV.CREATE_ANNOUNCEMENTS_UNLOCKED}}
-              {{/if}}
-              {{#t}}Allow users to comment{{/t}}
-            </label></div>
-          <div><label class="checkbox short-label" for="require_initial_post" style="margin-left: 2em;">
-              {{checkbox "require_initial_post"}}
-              {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
-            </label></div>
-          {{/unless}}
-          {{/unless}}
-          {{else}}
-          <div><label class="checkbox short-label" for="require_initial_post">
-              {{checkbox "require_initial_post"}}
-              {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
-            </label></div>
-          {{/if}}
-          {{/if}}
-          {{#if canModerate}}
-          {{#unless homeroomCourse}}
-          <div><label class="checkbox short-label" for="podcast_enabled">
-              {{checkbox "podcast_enabled"
-              checked=podcast_url
-              class="element_toggler"
-              aria-expanded=podcast_url
-              aria-controls="podcast_has_student_posts_container"}}
-              {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
-            </label></div>
-
-          {{#if contextIsCourse}}
-          <div><label id="podcast_has_student_posts_container" style="{{hiddenUnless podcast_url}}; margin-left: 20px;"
-              class="checkbox short-label" for="podcast_has_student_posts">
-              {{checkbox "podcast_has_student_posts"}}
-              {{#t "include_replies_in_podcast_feed"}}Include student replies in podcast feed{{/t}}
-            </label></div>
-          {{/if}}
-          {{/unless}}
-          {{/if}}
-          {{#if showAssignment}}
-          <div><label class="checkbox short-label" for="use_for_grading">
-              {{checkbox "assignment.set_assignment"
-              id="use_for_grading"
-              class="element_toggler"
-              aria-controls="assignment_options"
-              checked=set_assignment}}
-              {{#t "use_for_grading"}}Graded{{/t}}
-            </label></div>
-          {{/if}}
-
-          {{#unless homeroomCourse}}
-          <div><label class="checkbox short-label" for="allow_rating">
-              {{checkbox "allow_rating"
-              id="allow_rating"
-              class="element_toggler"
-              checked=allow_rating
-              aria-expanded=allow_rating
-              aria-controls="rating_settings_container"}}
-              {{#t "allow_liking"}}Allow liking{{/t}}
-            </label></div>
-          <div id="rating_settings_container" style="{{hiddenUnless allow_rating}}; margin-left: 20px;">
-            <div><label class="checkbox short-label" for="only_graders_can_rate">
-                {{checkbox "only_graders_can_rate"
-                id="only_graders_can_rate"
-                class="element_toggler"
-                checked=only_graders_can_rate}}
-                {{#t "only_graders_can_like"}}Only graders can like{{/t}}
-              </label></div>
-          </div>
-          {{/unless}}
-
-          {{#if ENV.STUDENT_PLANNER_ENABLED}}
-          {{#if isTopic}}
-          <div id="todo_options" style="{{hiddenIf set_assignment}}">
-            <div><label class="checkbox short-label" for="allow_todo_date">
-                {{checkbox "allow_todo_date"
-                id="allow_todo_date"
-                class="element_toggler"
-                aria-controls="todo_date_input"}}
-                {{#t}}Add to student to-do{{/t}}
-              </label></div>
-            <div id="todo_date_input" style="{{hiddenUnless allow_todo_date}}; margin-left: 20px;"></div>
-          </div>
-          {{/if}}
-          {{/if}}
-        </div>
-      </div>
+      <legend class="control-label" style="text-align:start; margin-bottom: 20px;">{{#t "options"}}Options{{/t}}</legend>
+      <div id="discussion_form_options"></div>
       {{/ifAny}}
-
     </fieldset>
 
     <div id="sections_groups_not_allowed_root" style="display: none"></div>

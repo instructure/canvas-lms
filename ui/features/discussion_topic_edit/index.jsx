@@ -122,7 +122,7 @@ ready(() => {
         courseId: assignment.courseID(),
       }),
       'js-assignment-overrides-mastery-path': new MasteryPathToggle({
-        model: dueDateList
+        model: dueDateList,
       }),
     },
     lockedItems: model.id ? lockedItems : {}, // if no id, creating a new discussion

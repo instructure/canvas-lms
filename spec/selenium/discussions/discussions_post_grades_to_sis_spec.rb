@@ -37,7 +37,7 @@ describe "sync grades to sis" do
     before do
       get "/courses/#{@course.id}/discussion_topics/new"
       f("#discussion-title").send_keys("New Discussion Title")
-      f("#use_for_grading").click
+      f("label[for='use_for_grading']").click
       f("#assignment_post_to_sis").click
       wait_for_ajaximations
       click_option("#assignment_group_id", "Assignment Group")
@@ -55,7 +55,7 @@ describe "sync grades to sis" do
   it "does not display Sync to SIS option when feature not configured", priority: "1" do
     mock_feature_flag(:post_grades, false)
     get "/courses/#{@course.id}/discussion_topics/new"
-    f("#use_for_grading").click
+    f("label[for='use_for_grading']").click
     expect(f("#content")).not_to contain_css("#assignment_post_to_sis")
   end
 

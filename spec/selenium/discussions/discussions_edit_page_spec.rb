@@ -526,8 +526,8 @@ describe "discussions" do
 
             build_assignment_with_type("Discussion", name: "anon disc from assignment", more_options: true)
 
-            f("input[type=radio][value=partial_anonymity]").click
-            f("input#use_for_grading").click
+            f("label[for='anonymous-selector-partial-anonymity']").click
+            f("label[for='use_for_grading']").click
             expect_new_page_load { f("button.save_and_publish").click }
           end
 

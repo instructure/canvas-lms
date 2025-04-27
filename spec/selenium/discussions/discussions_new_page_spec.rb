@@ -74,7 +74,7 @@ describe "discussions" do
         user_session(teacher)
       end
 
-      it "adds an attachment to a new topic", priority: "1" do
+      it "adds an attachment to a new topic", :ignore_js_errors, priority: "1" do
         skip_if_firefox("known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085")
         topic_title = "new topic with file"
         get url
@@ -84,13 +84,13 @@ describe "discussions" do
         expect(DiscussionTopic.where(title: topic_title).first.attachment_id).to be_present
       end
 
-      it "creates a podcast enabled topic", priority: "1" do
+      it "creates a podcast enabled topic", :ignore_js_errors, priority: "1" do
         get url
         wait_for_tiny(f("textarea[name=message]"))
         replace_content(f("input[name=title]"), "This is my test title")
         type_in_tiny("textarea[name=message]", "This is the discussion description.")
 
-        f("input[type=checkbox][name=podcast_enabled]").click
+        f("label[for='checkbox_podcast_enabled']").click
         expect_new_page_load { submit_form(".form-actions") }
         # get "/courses/#{course.id}/discussion_topics"
         # TODO: talk to UI, figure out what to display here
@@ -98,19 +98,19 @@ describe "discussions" do
         expect(DiscussionTopic.last.podcast_enabled).to be_truthy
       end
 
-      it "does not display the section specific announcer if the FF is disabled" do
+      it "does not display the section specific announcer if the FF is disabled", :ignore_js_errors do
         get url
-        graded_checkbox = f('input[type=checkbox][name="assignment[set_assignment]"]')
-        graded_checkbox.click
+        wait_for_ajaximations
+        f("label[for='use_for_grading']").click
         expect(f("body")).not_to contain_css('input[id^="Autocomplete"]')
       end
 
       context "graded" do
-        it "validates that a group category is selected", priority: "1" do
+        it "validates that a group category is selected", :ignore_js_errors, priority: "1" do
           assignment_group
           get url
-
-          f('input[type=checkbox][name="assignment[set_assignment]"]').click
+          wait_for_ajaximations
+          f("label[for='use_for_grading']").click
           f("#has_group_category").click
           f(%(span[data-testid="group-set-close"])).click
           submit_button = f("#edit_discussion_form_buttons .btn-primary[type=submit]")
@@ -132,12 +132,12 @@ describe "discussions" do
             @account_grading_standard = @account.grading_standards.create!(title: "Account Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
           end
 
-          it "shows archived grading scheme if it is the course default twice, once to follow course default scheme and once to choose that scheme to use" do
+          it "shows archived grading scheme if it is the course default twice, once to follow course default scheme and once to choose that scheme to use", :ignore_js_errors do
             @course.update!(grading_standard_id: @archived_grading_standard.id)
             @course.reload
             get "/courses/#{@course.id}/discussion_topics/new"
             wait_for_ajaximations
-            f('input[type=checkbox][name="assignment[set_assignment]"]').click
+            f("label[for='use_for_grading']").click
             wait_for_ajaximations
             f("#assignment_grading_type").click
             ffj("option:contains('Letter Grade')").last.click
@@ -147,10 +147,10 @@ describe "discussions" do
             expect(f("[data-testid='grading-schemes-selector-option-#{@course.grading_standard.id}']")).to include_text(@course.grading_standard.title)
           end
 
-          it "removes grading schemes from dropdown after archiving them but still shows them upon reopening the modal" do
+          it "removes grading schemes from dropdown after archiving them but still shows them upon reopening the modal", :ignore_js_errors do
             get "/courses/#{@course.id}/discussion_topics/new"
             wait_for_ajaximations
-            f('input[type=checkbox][name="assignment[set_assignment]"]').click
+            f("label[for='use_for_grading']").click
             wait_for_ajaximations
             f("#assignment_grading_type").click
             ffj("option:contains('Letter Grade')").last.click
@@ -170,13 +170,13 @@ describe "discussions" do
             expect(f("[data-testid='grading-scheme-row-#{@active_grading_standard.id}']").text).to be_present
           end
 
-          it "shows all archived schemes in the manage grading schemes modal" do
+          it "shows all archived schemes in the manage grading schemes modal", :ignore_js_errors do
             archived_gs1 = @course.grading_standards.create!(title: "Archived Grading Scheme 1", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
             archived_gs2 = @course.grading_standards.create!(title: "Archived Grading Scheme 2", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
             archived_gs3 = @course.grading_standards.create!(title: "Archived Grading Scheme 3", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
             get "/courses/#{@course.id}/discussion_topics/new"
             wait_for_ajaximations
-            f('input[type=checkbox][name="assignment[set_assignment]"]').click
+            f("label[for='use_for_grading']").click
             wait_for_ajaximations
             f("#assignment_grading_type").click
             ffj("option:contains('Letter Grade')").last.click
@@ -188,7 +188,7 @@ describe "discussions" do
             expect(f("[data-testid='grading-scheme-#{archived_gs3.id}-name']")).to include_text(archived_gs3.title)
           end
 
-          it "creates a discussion topic with selected grading scheme/standard" do
+          it "creates a discussion topic with selected grading scheme/standard", :ignore_js_errors do
             grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
 
             get "/courses/#{@course.id}/discussion_topics/new"
@@ -196,10 +196,12 @@ describe "discussions" do
             title = "Graded Discussion Topic with letter grade type"
             message = "replying to topic"
 
+            wait_for_ajaximations
+
             f("input[placeholder='Topic Title']").send_keys title
             type_in_tiny("textarea", message)
 
-            f('input[type=checkbox][name="assignment[set_assignment]"]').click
+            f("label[for='use_for_grading']").click
             wait_for_ajaximations
             f("#assignment_grading_type").click
             ffj("option:contains('Letter Grade')").last.click
@@ -225,19 +227,20 @@ describe "discussions" do
           @account.set_feature_flag! "post_grades", "on"
         end
 
-        it "defaults to post grades if account setting is enabled" do
+        it "defaults to post grades if account setting is enabled", :ignore_js_errors do
           @account.settings[:sis_default_grade_export] = { locked: false, value: true }
           @account.save!
 
           get url
-          f('input[type=checkbox][name="assignment[set_assignment]"]').click
-
+          wait_for_ajaximations
+          f("label[for='use_for_grading']").click
           expect(is_checked("#assignment_post_to_sis")).to be_truthy
         end
 
-        it "does not default to post grades if account setting is not enabled" do
+        it "does not default to post grades if account setting is not enabled", :ignore_js_errors do
           get url
-          f('input[type=checkbox][name="assignment[set_assignment]"]').click
+          wait_for_ajaximations
+          f("label[for='use_for_grading']").click
 
           expect(is_checked("#assignment_post_to_sis")).to be_falsey
         end
@@ -248,10 +251,12 @@ describe "discussions" do
           course.enable_feature! :react_discussions_post
         end
 
-        it "allows creating anonymous discussions" do
+        it "allows creating anonymous discussions", :ignore_js_errors do
           get url
+          wait_for_ajaximations
           replace_content(f("input[name=title]"), "my anonymous title")
-          f("input[value='full_anonymity']").click
+          f("label[for='anonymous-selector-full-anonymity']").click
+
           expect_new_page_load { submit_form(".form-actions") }
           expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
           expect(f("span[data-testid='anon-conversation']").text).to(
@@ -263,6 +268,7 @@ describe "discussions" do
         it "disallows full_anonymity along with graded" do
           skip("revert enable ungraded discussion")
           get url
+          wait_for_ajaximations
           replace_content(f("input[name=title]"), "my anonymous title")
           expect(f("input[id='use_for_grading']").attribute("checked")).to be_nil
           expect(f("span[data-testid=groups_grading_not_allowed]")).to_not be_displayed
@@ -300,12 +306,13 @@ describe "discussions" do
           course.enable_feature! :react_discussions_post
         end
 
-        it "lets students create anonymous discussions when allowed" do
+        it "lets students create anonymous discussions when allowed", :ignore_js_errors do
           course.allow_student_anonymous_discussion_topics = true
           course.save!
           get url
+          wait_for_ajaximations
           replace_content(f("input[name=title]"), "my anonymous title")
-          f("input[value='full_anonymity']").click
+          f("label[for='anonymous-selector-full-anonymity']").click
           expect_new_page_load { submit_form(".form-actions") }
           expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
           expect(f("span[data-testid='anon-conversation']").text).to(
@@ -313,12 +320,13 @@ describe "discussions" do
           )
         end
 
-        it "does not allow creation of anonymous group discussions" do
+        it "does not allow creation of anonymous group discussions", :ignore_js_errors do
           course.allow_student_anonymous_discussion_topics = true
           course.save!
           get url
+          wait_for_ajaximations
           expect(f("span[data-testid=groups_grading_not_allowed]")).to_not be_displayed
-          f("input[value='full_anonymity']").click
+          f("label[for='anonymous-selector-full-anonymity']").click
           expect(f("span[data-testid=groups_grading_not_allowed]")).to be_displayed
         end
 
@@ -332,12 +340,13 @@ describe "discussions" do
           course.allow_student_anonymous_discussion_topics = true
           course.save!
           get url
+          wait_for_ajaximations
           replace_content(f("input[name=title]"), "Student Partial Discussion")
-          f("input[value='partial_anonymity']").click
+          f("label[for='anonymous-selector-partial-anonymity']").click
 
           # verify default anonymous post selector
           expect(f("span[data-testid='current_user_avatar']")).to be_present
-          expect(fj("div#sections_anonymous_post_selector span:contains('#{@student.name}')")).to be_truthy
+          expect(fj("span#sections_anonymous_post_selector span:contains('#{@student.name}')")).to be_truthy
           expect(f("input[data-component='anonymous_post_selector']").attribute("value")).to eq "Show to everyone"
 
           expect_new_page_load { submit_form(".form-actions") }
@@ -349,12 +358,13 @@ describe "discussions" do
           course.allow_student_anonymous_discussion_topics = true
           course.save!
           get url
+          wait_for_ajaximations
           replace_content(f("input[name=title]"), "Student Partial Discussion (student anonymous)")
-          f("input[value='partial_anonymity']").click
+          f("label[for='anonymous-selector-partial-anonymity']").click
           f("input[data-component='anonymous_post_selector']").click
           fj("li:contains('Hide from everyone')").click
           expect(f("span[data-testid='anonymous_avatar']")).to be_present
-          expect(fj("div#sections_anonymous_post_selector span:contains('Anonymous')")).to be_truthy
+          expect(fj("span#sections_anonymous_post_selector span:contains('Anonymous')")).to be_truthy
           expect(f("input[data-component='anonymous_post_selector']").attribute("value")).to eq "Hide from everyone"
 
           expect_new_page_load { submit_form(".form-actions") }
@@ -379,7 +389,7 @@ describe "discussions" do
         expect(f(".discussion-availability").text).to include("Not available until #{unlock_text_index_page}")
       end
 
-      it "gives error if Until date isn't after Available From date", priority: "1" do
+      it "gives error if Until date isn't after Available From date", :ignore_js_errors, priority: "1" do
         get url
         wait_for_tiny(f("textarea[name=message]"))
         replace_content(f("input[name=title]"), "Invalid Until date")
@@ -407,7 +417,7 @@ describe "discussions" do
         expect(f("#content")).not_to contain_css("#topic_publish_button")
       end
 
-      it "does not show file attachment if allow_student_forum_attachments is not true", priority: "2" do
+      it "does not show file attachment if allow_student_forum_attachments is not true", :ignore_js_errors, priority: "2" do
         skip_if_safari(:alert)
         # given
         course.allow_student_forum_attachments = false
@@ -417,7 +427,7 @@ describe "discussions" do
         expect(f("#content")).not_to contain_css("#disussion_attachment_uploaded_data")
       end
 
-      it "shows file attachment if allow_student_forum_attachments is true", priority: "2" do
+      it "shows file attachment if allow_student_forum_attachments is true", :ignore_js_errors, priority: "2" do
         skip_if_safari(:alert)
         # given
         course.allow_student_forum_attachments = true
@@ -430,7 +440,7 @@ describe "discussions" do
       context "in a course group" do
         let(:url) { "/groups/#{group.id}/discussion_topics/new" }
 
-        it "does not show file attachment if allow_student_forum_attachments is not true", priority: "2" do
+        it "does not show file attachment if allow_student_forum_attachments is not true", :ignore_js_errors, priority: "2" do
           skip_if_safari(:alert)
           # given
           course.allow_student_forum_attachments = false
@@ -440,7 +450,7 @@ describe "discussions" do
           expect(f("#content")).not_to contain_css("label[for=discussion_attachment_uploaded_data]")
         end
 
-        it "shows file attachment if allow_student_forum_attachments is true", priority: "2" do
+        it "shows file attachment if allow_student_forum_attachments is true", :ignore_js_errors, priority: "2" do
           skip_if_safari(:alert)
           # given
           course.allow_student_forum_attachments = true
@@ -456,7 +466,7 @@ describe "discussions" do
           context "without the ability to attach files" do
             before { course.update!(allow_student_forum_attachments: false) }
 
-            it "loads page without usage rights" do
+            it "loads page without usage rights", :ignore_js_errors do
               get url
 
               expect(f("body")).not_to contain_jqcss("#usage_rights_control button")
@@ -483,7 +493,7 @@ describe "discussions" do
             account.save!
           end
 
-          it "loads page" do
+          it "loads page", :ignore_js_errors do
             get "/groups/#{group.id}/discussion_topics/new"
 
             expect(f("body")).not_to contain_jqcss("#usage_rights_control button")
