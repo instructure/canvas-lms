@@ -28,7 +28,7 @@ export const ZAssetProcessorWindowSettings = z.object({
 
 /**
  * Data sent by server to show APs already attached to an existing assignment.
- * See Lti::AssetProcessors.processors_info_for_display
+ * See Lti::AssetProcessors.info_for_display
  */
 export const ZExistingAttachedAssetProcessor = z.object({
   id: z.number(),

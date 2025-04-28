@@ -111,9 +111,9 @@ describe Lti::AssetProcessor do
     end
   end
 
-  describe ".processors_info_for_display" do
+  describe ".info_for_display" do
     subject do
-      Lti::AssetProcessor.processors_info_for_display(assignment_id: assignment.id)
+      Lti::AssetProcessor.where(assignment_id: assignment.id).info_for_display
     end
 
     let(:assignment) { assignment_model }

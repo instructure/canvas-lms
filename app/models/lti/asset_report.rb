@@ -116,4 +116,73 @@ class Lti::AssetReport < ApplicationRecord
       errors.add(:extensions, "unrecognized fields #{bad_extensions.to_json} -- extensions property keys must be namespaced (URIs)")
     end
   end
+
+  def info_for_display
+    {
+      id:,
+      title:,
+      comment:,
+      score_given:,
+      score_maximum:,
+      indication_color:,
+      indication_alt:,
+      error_code:,
+      processing_progress:,
+      priority:,
+      launch_url_path:,
+    }.compact
+  end
+
+  def launch_url_path
+    return nil unless processing_progress == PROGRESS_PROCESSED
+
+    Rails.application.routes.url_helpers.asset_report_launch_path(
+      asset_processor_id: lti_asset_processor_id,
+      report_id: id
+    )
+  end
+
+  # Returns all reports for the given asset processor and submission IDs.
+  # Returns hash with:
+  #   asset_processors_ids: array of ids
+  #   reports_by_submission: hash of form
+  #     {
+  #       submission_id => {
+  #         by_attachment: {
+  #           attachment_id => {
+  #             lti_asset_processor_id => [
+  #               { id: report1.id, title: report1.title, ... },
+  #               { id: report2.id, title: report2.title, ... },
+  #             ],
+  # ...
+  def self.info_for_display_by_submission(submission_ids:)
+    asset_processor_ids = Set.new
+    reports_by_submission = {}
+
+    if submission_ids.present?
+      scope =
+        active
+        .joins(:asset)
+        .joins(:asset_processor)
+        .where(lti_asset_processors: { workflow_state: :active })
+        .where(lti_assets: { submission_id: submission_ids })
+        .select("lti_asset_reports.*, lti_assets.submission_id as asset_sub_id, lti_assets.attachment_id as asset_att_id")
+
+      scope.find_each do |report|
+        asset_processor_ids << report.lti_asset_processor_id
+
+        sub_reports = (reports_by_submission[report.asset_sub_id] ||= {})
+
+        if report.asset_att_id
+          by_attachment = (sub_reports[:by_attachment] ||= {})
+          by_processor = (by_attachment[report.asset_att_id] ||= {})
+          report_list = (by_processor[report.lti_asset_processor_id] ||= [])
+          report_list << report.info_for_display
+        end
+        # else if submission version (RCE content) -- TODO
+      end
+    end
+
+    { reports_by_submission:, asset_processor_ids: asset_processor_ids.to_a }
+  end
 end
