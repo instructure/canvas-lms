@@ -1227,7 +1227,7 @@ describe RubricsController do
       allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
     end
 
-    it "generates criteria via LLM when features are enabled" do
+    it "queues job for generation of criteria via LLM when features are enabled" do
       llm_response = {
         criteria: [
           {
@@ -1273,9 +1273,14 @@ describe RubricsController do
 
       expect(response).to be_successful
       json = response.parsed_body
-      expect(json["rubric"]).to be_present
-      expect(json["rubric"]["criteria"]).to be_present
-      expect(json["rubric"]["criteria"].length).to eq 2
+      expect(json).to be_present
+      expect(json["workflow_state"]).to eq "queued"
+
+      run_jobs
+
+      progress = Progress.find(json["id"])
+      expect(progress.results).to be_present
+      expect(progress.results[:criteria].length).to eq 2
     end
 
     it "returns error when features are disabled" do

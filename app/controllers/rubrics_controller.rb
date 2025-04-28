@@ -28,6 +28,7 @@ class RubricsController < ApplicationController
   before_action { |c| c.active_tab = "rubrics" }
 
   include Api::V1::Outcome
+  include Api::V1::Progress
   include K5Mode
 
   def index
@@ -244,29 +245,38 @@ class RubricsController < ApplicationController
     end
   end
 
+  ALLOWED_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion].freeze
   def llm_criteria
-    @association_object = RubricAssociation.get_association_object(params[:rubric_association])
-    generate_options = (params[:generate_options] || {}).permit(:criteria_count, :rating_count, :points_per_criterion)
+    association_object = RubricAssociation.get_association_object(params[:rubric_association])
+    generate_options = (params[:generate_options] || {}).permit(*ALLOWED_GENERATE_PARAMS)
+    generate_options[:use_range] = value_to_boolean(generate_options[:use_range])
     if generate_options[:criteria_count].present? && !(2..8).cover?(generate_options[:criteria_count].to_i)
       return render json: { error: "criteria_count must be between 2 and 8 inclusive" }, status: :bad_request
     end
     if generate_options[:rating_count].present? && !(2..8).cover?(generate_options[:rating_count].to_i)
       return render json: { error: "rating_count must be between 2 and 8 inclusive" }, status: :bad_request
     end
+
     return render_unauthorized_action unless Rubric.ai_rubrics_enabled?(context)
 
-    if can_manage_rubrics_or_association_object?(@association_object)
-      @rubric = @context.rubrics.build
-      @rubric.user = @current_user
+    @rubric = @context.rubrics.build(user: @current_user)
+    if can_manage_rubrics_or_association_object?(association_object) && authorized_action(@rubric, @current_user, :update)
+      progress = Progress.create!(context: association_object, user: @current_user, tag: "llm_rubric_generation")
+      progress.process_job(
+        Rubric,
+        :process_generate_criteria_via_llm,
+        {
+          priority: Delayed::NORMAL_PRIORITY,
+          n_strand: ["Rubric.process_generate_criteria_via_llm", @domain_root_account.global_id],
+          max_attempts: 3,
+        },
+        @context,
+        @current_user,
+        association_object,
+        generate_options.to_h
+      )
 
-      if @rubric.grants_right?(@current_user, session, :update)
-        @rubric.data = @rubric.generate_criteria_via_llm(@association_object, generate_options)
-
-        return render json: { error: true, messages: @association.errors.to_a } if @rubric.data.nil?
-      end
-      json_res = {}
-      json_res[:rubric] = @rubric.as_json(methods: :criteria, include_root: false)
-      render json: json_res
+      render json: progress_json(progress, @current_user, session)
     end
   end
 
