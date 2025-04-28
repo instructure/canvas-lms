@@ -100,14 +100,16 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
         />
       }
     >
-      <Menu.Item onClick={handleEdit}>
-        <Flex>
-          <Flex.Item>
-            <IconEditLine />
-          </Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Edit')}</Flex.Item>
-        </Flex>
-      </Menu.Item>
+      {permissions?.canEdit && (
+        <Menu.Item onClick={handleEdit}>
+          <Flex>
+            <Flex.Item>
+              <IconEditLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Edit')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
       {permissions?.canEdit && !basicContentTypes.includes(itemType) && (
         <Menu.Item onClick={handleSpeedGrader}>
           <Flex>
