@@ -48,3 +48,20 @@ export function makeTimestamp({delayed_post_at, posted_at}, delayedLabel, posted
       }
     : {title: postedOnLabel, date: posted_at}
 }
+
+export function parseDateToMomentWithTimezone(input, timezone) {
+  const local = moment(input)
+  if (!local.isValid()) return null
+
+  return moment.tz(
+    {
+      year: local.year(),
+      month: local.month(),
+      date: local.date(),
+      hour: local.hour(),
+      minute: local.minute(),
+      second: local.second(),
+    },
+    timezone,
+  )
+}

@@ -42,6 +42,7 @@ import type {
   SyntheticEvent,
 } from 'react'
 import type {DateInputProps} from '@instructure/ui-date-input'
+import {parseDateToMomentWithTimezone} from '../date-utils'
 
 type Messages = DateInputProps['messages']
 
@@ -394,6 +395,15 @@ export default function CanvasDateInput({
       handleBlur(e)
     } else if (e.key === 'Escape') {
       setIsShowingCalendar(false)
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      const newDate = parseDateToMomentWithTimezone(inputValue, timezone)
+      if (!isShowingCalendar && newDate) {
+        // If valid, select the date to what the user just typed if they just opened the calendar
+        syncInput(newDate)
+        onSelectedDateChange(newDate.toDate(), 'pick')
+        setInputDetails({method: 'pick', value: newDate.toISOString()})
+      }
+      setIsShowingCalendar(true)
     }
   }
 
@@ -416,11 +426,18 @@ export default function CanvasDateInput({
     const ne: unknown = e.nativeEvent
     if (withRunningValue) {
       if ((ne as InputEvent).constructor.name === 'InputEvent') return
-      if ((ne as KeyboardEvent)?.key === ' ') {
-        setInputValue(v => v + ' ')
+    }
+
+    const isSpaceKey = (ne as KeyboardEvent)?.key === ' ' || (ne as KeyboardEvent)?.code === 'Space'
+    if (inputSourceRef.current === 'keyboard') {
+      if (!isSpaceKey) {
         return
       }
+      // If it's a space key, dont show the calendar but also dont block typing
+      setInputValue(v => v + ' ')
+      return
     }
+
     setIsShowingCalendar(true)
   }
 
@@ -480,6 +497,27 @@ export default function CanvasDateInput({
 
   const allMessages =
     hideMessagesWhenFocused && isInputFocused ? [] : messages.concat(internalMessages)
+
+  const inputSourceRef = useRef<'keyboard' | 'mouse' | null>(null)
+
+  useEffect(() => {
+    const handleMouseDown = () => {
+      inputSourceRef.current = 'mouse'
+    }
+    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (['Tab', 'ArrowDown', 'ArrowUp', 'Enter'].includes(e.key)) {
+        inputSourceRef.current = 'keyboard'
+      }
+    }
+
+    window.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('mousedown', handleMouseDown)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
 
   return (
     // @ts-expect-error
