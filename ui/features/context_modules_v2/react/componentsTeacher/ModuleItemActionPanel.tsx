@@ -44,10 +44,7 @@ import ModuleItemActionMenu from './ModuleItemActionMenu'
 import {MasteryPathsData, ModuleItemContent, ModuleAction} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import {mapContentSelection} from '../utils/utils'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import BlueprintLockIcon from './BlueprintLockIcon'
-
-const ENV = window.ENV as GlobalEnv
 
 const I18n = createI18nScope('context_modules_v2')
 

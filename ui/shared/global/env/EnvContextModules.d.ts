@@ -39,8 +39,19 @@ export interface EnvContextModules {
     usage_rights_required: boolean
     manage_files_edit: boolean
   }
+  MODULES_PERMISSIONS:
+    | {
+        readAsAdmin: boolean
+        canAdd: boolean
+        canEdit: boolean
+        canDelete: boolean
+        canViewUnpublished: boolean
+        canDirectShare: boolean
+      }
+    | undefined
+  NEW_QUIZZES_BY_DEFAULT: boolean | undefined
+  DEFAULT_POST_TO_SIS: boolean | undefined
   MODULE_TOOLS: Record<string, unknown>
-  DEFAULT_POST_TO_SIS: boolean
 
   MASTER_COURSE_SETTINGS?: {
     IS_MASTER_COURSE: boolean

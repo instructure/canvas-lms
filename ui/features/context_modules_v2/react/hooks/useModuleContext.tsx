@@ -53,9 +53,18 @@ export const ContextModuleProvider = ({
   courseId: string
   isMasterCourse: boolean
   isChildCourse: boolean
-  permissions: Record<string, boolean>
-  NEW_QUIZZES_BY_DEFAULT: boolean
-  DEFAULT_POST_TO_SIS: boolean
+  permissions:
+    | {
+        readAsAdmin: boolean
+        canAdd: boolean
+        canEdit: boolean
+        canDelete: boolean
+        canViewUnpublished: boolean
+        canDirectShare: boolean
+      }
+    | undefined
+  NEW_QUIZZES_BY_DEFAULT: boolean | undefined
+  DEFAULT_POST_TO_SIS: boolean | undefined
 }) => {
   const [state, setState] = useState({})
 
@@ -65,9 +74,9 @@ export const ContextModuleProvider = ({
         courseId,
         isMasterCourse,
         isChildCourse,
-        permissions,
-        NEW_QUIZZES_BY_DEFAULT,
-        DEFAULT_POST_TO_SIS,
+        permissions: permissions ?? {},
+        NEW_QUIZZES_BY_DEFAULT: NEW_QUIZZES_BY_DEFAULT ?? false,
+        DEFAULT_POST_TO_SIS: DEFAULT_POST_TO_SIS ?? false,
         state,
         setState,
       }}
@@ -91,6 +100,7 @@ export const contextModuleDefaultProps = {
     canDelete: true,
     canViewUnpublished: true,
     canDirectShare: true,
+    readAsAdmin: true,
   },
   NEW_QUIZZES_BY_DEFAULT: false,
   DEFAULT_POST_TO_SIS: false,
