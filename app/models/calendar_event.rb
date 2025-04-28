@@ -739,6 +739,7 @@ class CalendarEvent < ActiveRecord::Base
     include HtmlTextHelper
 
     def initialize(event)
+      # type: CalendarEvent or AbstractAssignment
       @event = event
     end
 
@@ -814,9 +815,11 @@ class CalendarEvent < ActiveRecord::Base
                           "#{tag_name}_#{@event.id}"
                         end
 
+      event_context = @event.is_a?(CalendarEvent) ? @event.effective_context : @event.context
+
       # This will change when there are other things that have calendars...
       # can't call calendar_url or calendar_url_for here, have to do it manually
-      event.url =         "https://#{HostUrl.context_host(url_context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name_and_id}"
+      event.url =         "https://#{HostUrl.context_host(url_context)}/calendar?include_contexts=#{event_context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name_and_id}"
       event.uid =         "event-#{tag_name.tr("_", "-")}-#{@event.id}"
       event.sequence =    0
 
