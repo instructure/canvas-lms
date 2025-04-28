@@ -119,6 +119,10 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/sub_accounts/react/SubaccountRoute')}
       />
       <Route
+        path="/accounts/:accountId/reports"
+        lazy={() => import('../../features/account_reports/react/AccountReportsRoute')}
+      />
+      <Route
         path="/profile/qr_mobile_login"
         lazy={() => import('../../features/qr_mobile_login/react/QRMobileLoginRoute')}
       />

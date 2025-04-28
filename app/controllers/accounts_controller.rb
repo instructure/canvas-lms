@@ -1432,6 +1432,21 @@ class AccountsController < ApplicationController
     end
   end
 
+  def reports
+    raise ActiveRecord::RecordNotFound unless @account.root_account.feature_enabled?(:new_account_reports_ui)
+
+    if authorized_action(@account, @current_user, :read_reports)
+      add_crumb t("Reports")
+      @page_title = join_title(t("Reports"), @account.name)
+      set_active_tab "account_reports"
+      @current_user.add_to_visited_tabs("account_reports")
+      css_bundle :reports
+      page_has_instui_topnav
+
+      render html: '<div id="reports_mount_point"></div>'.html_safe, layout: true
+    end
+  end
+
   def acceptable_use_policy
     TermsOfService.ensure_terms_for_account(@domain_root_account)
     if request.format.html?

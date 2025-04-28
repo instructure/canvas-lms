@@ -698,6 +698,7 @@ CanvasRails::Application.routes.draw do
         delete :remove_role
       end
     end
+    get :reports
     get "calendar_settings", action: :account_calendar_settings, as: :calendar_settings
 
     scope(controller: :analytics_hub) do

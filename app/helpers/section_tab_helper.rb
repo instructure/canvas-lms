@@ -227,7 +227,7 @@ module SectionTabHelper
 
     # include the css_class of tabs here to show a "new" pill in the nav
     # hide the "new" pill by adding the css_class to the :visited_tabs user preference
-    NEW_TABS = %w[account_calendars].freeze
+    NEW_TABS = %w[account_calendars account_reports].freeze
 
     def indicate_new
       return unless NEW_TABS.include? @tab.css_class

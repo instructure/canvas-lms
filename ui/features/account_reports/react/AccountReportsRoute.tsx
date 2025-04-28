@@ -16,27 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface AccountReport {
-  id: string
-  report: string
-  status: 'created' | 'running' | 'compiling' | 'complete' | 'error' | 'aborted'
-  created_at: string
-  progress: number
-  file_url?: string
-  message?: string
-  parameters?: {
-    extra_text?: string
+import React from 'react'
+import {Portal} from '@instructure/ui-portal'
+import AccountReportView from './components/AccountReportView'
+import {useParams} from 'react-router-dom'
+
+export function Component(): JSX.Element | null {
+  const {accountId} = useParams()
+  const mountPoint = document.getElementById('reports_mount_point')
+  if (mountPoint === null) {
+    console.error('Cannot render AccountReportsRoute, container is missing')
+    return null
   }
-}
 
-export interface AccountReportInfo {
-  report: string
-  title: string
-  description_html: string
-  parameters_html?: string
-  last_run?: AccountReport
-}
-
-export function reportRunning(status: string | undefined) {
-  return status ? status === 'created' || status === 'running' || status === 'compiling' : false
+  return (
+    <Portal open={true} mountNode={mountPoint}>
+      <AccountReportView accountId={accountId!} />
+    </Portal>
+  )
 }
