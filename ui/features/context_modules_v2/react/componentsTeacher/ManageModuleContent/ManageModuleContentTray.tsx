@@ -23,7 +23,7 @@ import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {CloseButton} from '@instructure/ui-buttons'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {ModuleAction, ModulesResponse} from '../../utils/types'
+import {ModuleAction} from '../../utils/types'
 import {queryClient} from '@canvas/query'
 import {useModules} from '../../hooks/queries/useModules'
 import {useModuleItems} from '../../hooks/queries/useModuleItems'
@@ -36,7 +36,6 @@ import {
   getTrayTitle,
   getErrorMessage,
 } from '../../handlers/manageModuleContentsHandlers'
-import {InfiniteData} from '@tanstack/react-query'
 
 import ModuleSelect from './ModuleSelect'
 import PositionSelect from './PositionSelect'

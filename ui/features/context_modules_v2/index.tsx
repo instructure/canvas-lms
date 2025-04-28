@@ -58,14 +58,10 @@ ready(() => {
             courseId={ENV.course_id}
             isMasterCourse={ENV.MASTER_COURSE_SETTINGS?.IS_MASTER_COURSE ?? false}
             isChildCourse={ENV.MASTER_COURSE_SETTINGS?.IS_CHILD_COURSE ?? false}
-            // @ts-expect-error
             permissions={ENV.MODULES_PERMISSIONS}
-            // @ts-expect-error
             NEW_QUIZZES_BY_DEFAULT={ENV.NEW_QUIZZES_BY_DEFAULT}
-            // @ts-expect-error
             DEFAULT_POST_TO_SIS={ENV.DEFAULT_POST_TO_SIS}
           >
-            {/* @ts-expect-error */}
             {ENV.MODULES_PERMISSIONS?.readAsAdmin ? (
               <ModulesContainer />
             ) : (

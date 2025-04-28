@@ -17,12 +17,8 @@
  */
 
 import React, {useCallback} from 'react'
-import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-flex'
-import {IconCollapseLine, IconExpandLine, IconEyeLine, IconPlusLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import ContextModulesPublishMenu from '@canvas/context-modules/react/ContextModulesPublishMenu'
 import {queryClient} from '@canvas/query'
 import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHeader'
 import {useContextModule} from '../hooks/useModuleContext'

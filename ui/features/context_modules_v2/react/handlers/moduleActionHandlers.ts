@@ -17,16 +17,11 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {renderTray} from '@canvas/move-item-tray'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-import type {InfiniteData, QueryClient} from '@tanstack/react-query'
-import type {ModulesResponse} from '../utils/types'
+import type {QueryClient} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('context_modules_v2')
-
-const ENV = window.ENV as GlobalEnv
 
 export const handlePublishComplete = (
   queryClient: QueryClient,
