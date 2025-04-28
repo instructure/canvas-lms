@@ -37,6 +37,7 @@ import {
   IconExitFullScreenLine,
 } from '@instructure/ui-icons'
 import formatMessage from '../format-message'
+import ResizeHandle from './ResizeHandle'
 import {FS_ENABLED} from '../util/fullscreenHelpers'
 import {AIWandSVG} from './plugins/shared/ai_tools'
 
@@ -343,12 +344,13 @@ export default function StatusBar(props) {
     )
   }
 
-  function renderSection3(html_view, fullscreen) {
+  function renderSection3(html_view, fullscreen, resize_handle) {
     return (
       <>
         <div className={css(styles.separator)} />
         {html_view && renderToggleHtml()}
         {fullscreen && renderFullscreen()}
+        {resize_handle && renderResizeHandle()}
       </>
     )
   }
@@ -436,9 +438,24 @@ export default function StatusBar(props) {
     )
   }
 
+  function renderResizeHandle() {
+    if (props.rceIsFullscreen) return null
+    return (
+      <ResizeHandle
+        data-btn-id="rce-resize-handle"
+        onDrag={props.onResize}
+        tabIndex={tabIndexForBtn('rce-resize-handle')}
+        onFocus={() => {
+          setFocusedBtnId('rce-resize-handle')
+        }}
+      />
+    )
+  }
+
   const flexJustify = isHtmlView() ? 'end' : 'start'
   const html_view = isFeature('html_view') && isAvailable('instructure_html_view')
   const fullscreen = isFeature('fullscreen') && isAvailable('instructure_fullscreen')
+  const resize_handle = isFeature('resize_handle')
 
   return (
     <InstUISettingsProvider
@@ -466,7 +483,8 @@ export default function StatusBar(props) {
           {renderIconButtons()}
 
           {isFeature('word_count') && isAvailable('instructure_wordcount') && renderWordCount()}
-          {(html_view || fullscreen) && renderSection3(html_view, fullscreen)}
+          {(html_view || fullscreen || resize_handle) &&
+            renderSection3(html_view, fullscreen, resize_handle)}
         </Flex.Item>
       </Flex>
     </InstUISettingsProvider>

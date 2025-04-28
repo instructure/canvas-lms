@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -39,6 +39,7 @@ type StatusBarFeature =
   | 'word_count'
   | 'html_view'
   | 'fullscreen'
+  | 'resize_handle'
 
 export const RCEVariantValues = ['full', 'lite', 'text-only', 'text-block'] as const
 
@@ -199,7 +200,7 @@ export function getToolbarForVariant(
 
 const DESKTOP_FEATURES: StatusBarFeature[] = ['keyboard_shortcuts', 'a11y_checker', 'word_count']
 const MOBILE_FEATURES: StatusBarFeature[] = ['a11y_checker', 'word_count']
-const EXTENDED_FEATURES: StatusBarFeature[] = ['html_view', 'fullscreen']
+const EXTENDED_FEATURES: StatusBarFeature[] = ['html_view', 'fullscreen', 'resize_handle']
 
 export function getStatusBarFeaturesForVariant(
   variant: RCEVariant,
