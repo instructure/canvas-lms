@@ -28,6 +28,10 @@ class CalendarsController < ApplicationController
   def show
     get_context
     @show_account_calendars = @current_user.all_account_calendars.any?
+    if params[:include_contexts]
+      # We had some bad links in ics calendar feeds that tried to link to a course section calendar
+      params[:include_contexts] = params[:include_contexts].split(",").reject { |c| c.starts_with?("course_section_") }.join(",").presence
+    end
     get_all_pertinent_contexts(include_groups: true, include_accounts: @show_account_calendars, favorites_first: true, cross_shard: true)
     @manage_contexts = @contexts.select do |c|
       c.grants_right?(@current_user, session, :manage_calendar)

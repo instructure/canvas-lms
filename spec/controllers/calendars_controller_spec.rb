@@ -99,6 +99,16 @@ describe CalendarsController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
+    it "ignores trying to include a course section context" do
+      section = @course.course_sections.first
+
+      get "show", params: { include_contexts: section.asset_string }
+      expect(response).to be_successful
+
+      context_info = assigns[:contexts_json].find { |c| c[:asset_string] == section.asset_string }
+      expect(context_info).to be_nil
+    end
+
     it "sets account's auto_subscribe" do
       account = @user.account
       account.account_calendar_visible = true
