@@ -31,7 +31,7 @@ async function initializePendo() {
       id: ENV.DOMAIN_ROOT_ACCOUNT_UUID,
       surveyOptOut: ENV.FEATURES['account_survey_notifications'],
     },
-    globalKey: 'pendo',
+    globalKey: 'canvasUsageMetrics',
     plugins: [Replay, VocPortal],
   })
   return pendo
