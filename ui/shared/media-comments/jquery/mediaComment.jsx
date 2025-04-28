@@ -232,6 +232,20 @@ const mediaCommentActions = {
       const height = Math.round((width / 336) * 240)
       return getSourcesAndTracks(mediaCommentId, attachmentId).done(sourcesAndTracks => {
         if (sourcesAndTracks.sources.length) {
+          if (ENV.FEATURES?.consolidated_media_player) {
+            const root = createRoot(holder[0])
+            root.render(
+              <CanvasStudioPlayer
+                media_id={id}
+                explicitSize={{width: width, height: height}}
+                hideUploadCaptions={!sourcesAndTracks.can_add_captions}
+                type={mediaType === 'audio' ? 'audio' : 'video'}
+              />,
+            )
+            holder.data('reactRoot', root)
+            return
+          }
+
           const mediaPlayerOptions = {
             can_add_captions: sourcesAndTracks.can_add_captions,
             mediaCommentId,
@@ -328,7 +342,7 @@ const mediaCommentActions = {
         if (ENV.FEATURES?.consolidated_media_player) {
           $dialog.css('padding-top', '0')
           height = 280
-        } else if(ENV.FEATURES?.speedgrader_studio_media_capture) { 
+        } else if (ENV.FEATURES?.speedgrader_studio_media_capture) {
           $dialog.css({
             'padding-top': '105px',
             'background-color': 'black',
@@ -342,7 +356,6 @@ const mediaCommentActions = {
           })
         }
       }
-
 
       $dialog.dialog({
         dialogClass: 'play_media_comment',
@@ -406,10 +419,12 @@ const mediaCommentActions = {
                   type={mediaType === 'audio' ? 'audio' : 'video'}
                 />
               ) : (
-                <div style={{
-                  maxHeight: height,
-                  maxWidth: width,
-                }}>
+                <div
+                  style={{
+                    maxHeight: height,
+                    maxWidth: width,
+                  }}
+                >
                   <MediaPlayer
                     tracks={sourcesAndTracks.tracks}
                     sources={sourcesAndTracks.sources}
