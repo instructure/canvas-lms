@@ -592,6 +592,25 @@ class Rubric < ActiveRecord::Base
     criteria
   end
 
+  def self.process_generate_criteria_via_llm(progress, course, user, association_object, generate_options)
+    rubric = course.rubrics.build(user:)
+    if rubric.grants_right?(user, :update)
+      criteria = rubric.generate_criteria_via_llm(association_object, generate_options)
+      progress.set_results({ criteria: })
+      progress.complete!
+    end
+  rescue InstLLM::ServiceQuotaExceededError, InstLLM::ThrottlingError
+    progress.set_results({ error: t("There was an error with generation capacity. Please try again later.") })
+    progress.fail!
+  rescue InstLLMHelper::RateLimitExceededError
+    progress.set_results({ error: t("You have made too many criteria generation requests. Please try again later.") })
+    progress.fail!
+  rescue
+    progress.set_results({ error: t("There was an error with the criteria generation. Please try agian later.") })
+    progress.fail!
+    raise
+  end
+
   def reconstitute_criteria(criteria)
     criteria.map do |criterion|
       ratings = criterion[:ratings].map { |rating| Rating.new(**rating.slice(*Rating.members)) }

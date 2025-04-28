@@ -24,7 +24,7 @@ export interface CanvasProgress {
   workflow_state: 'queued' | 'running' | 'failed' | 'completed'
   message: string | null
   completion: number | null
-  results: any
+  results: any | undefined
 }
 
 function progressAtEndState(progress: CanvasProgress): boolean {
