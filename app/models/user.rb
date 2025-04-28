@@ -2869,6 +2869,10 @@ class User < ActiveRecord::Base
     initialize_default_folder(Folder::CONVERSATION_ATTACHMENTS_FOLDER_NAME)
   end
 
+  def flamegraphs_folder
+    initialize_default_folder(Folder::FLAMEGRAPHS_FOLDER_NAME)
+  end
+
   def initialize_default_folder(name)
     folder = active_folders.where(name:).first
     folder ||= folders.create!(name:,
