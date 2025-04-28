@@ -46,6 +46,8 @@ class ApplicationController < ActionController::Base
   #   (which is common for 401, 404, 500 responses)
   # Around action yields return (in REVERSE order) after all after actions
 
+  around_action :generate_flamegraph, if: :flamegraph_requested_and_permitted?
+
   if Rails.env.development? && !Canvas::Plugin.value_to_boolean(ENV["DISABLE_N_PLUS_ONE_DETECTION"])
     around_action :n_plus_one_detection
 
@@ -128,6 +130,23 @@ class ApplicationController < ActionController::Base
         Delayed::Batch.serial_batch(batch_opts || {}, &action)
       end
     end
+  end
+
+  def flamegraph_requested_and_permitted?
+    return false unless @current_user
+
+    flamegraph_requested = value_to_boolean(params.fetch(:flamegraph, false))
+    flamegraph_requested && Account.site_admin.grants_right?(@current_user, :update)
+  end
+  private :flamegraph_requested_and_permitted?
+
+  def generate_flamegraph(&)
+    Flamegraphs::FlamegraphService.call(
+      user: @current_user,
+      source_name: "#{controller_name}##{action_name}",
+      custom_name: params[:flamename],
+      &
+    )
   end
 
   def supported_timezones
