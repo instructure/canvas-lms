@@ -404,3 +404,46 @@ describe('with hideMessagesWhenFocused set to true', () => {
     expect(queryByText('Invalid date format')).toBeInTheDocument()
   })
 })
+
+describe('when testing keyboard and mouse interactions', () => {
+  it('shows the calendar when clicking on the input with mouse', () => {
+    const date = new Date('2020-05-15')
+    const {getByText, getInput} = renderInput({selectedDate: date})
+    const input = getInput()
+
+    fireEvent.mouseDown(input)
+    fireEvent.click(input)
+
+    // Calendar should open, year label should be visible
+    expect(getByText(date.getFullYear())).toBeInTheDocument()
+  })
+
+  it('does not show the calendar when focusing with keyboard (Tab)', () => {
+    const date = new Date('2020-05-15')
+    const {getInput, queryByText} = renderInput({selectedDate: date})
+    const input = getInput()
+
+    // Keyboard tabbing into input
+    fireEvent.keyDown(window, {key: 'Tab', code: 'Tab', keyCode: 9})
+    fireEvent.focus(input)
+
+    // No calendar visible
+    expect(queryByText(date.getFullYear())).not.toBeInTheDocument()
+  })
+
+  it('shows the calendar if ArrowDown is pressed after keyboard focus', () => {
+    const date = new Date('2020-05-15')
+    const {getInput, getByText} = renderInput({selectedDate: date})
+    const input = getInput()
+
+    // Keyboard tabbing into input
+    fireEvent.keyDown(window, {key: 'Tab', code: 'Tab', keyCode: 9})
+    fireEvent.focus(input)
+
+    fireEvent.keyDown(input, {key: 'ArrowDown', code: 'ArrowDown', keyCode: 40})
+    fireEvent.keyUp(input, {key: 'ArrowDown', code: 'ArrowDown', keyCode: 40})
+
+    // Now calendar should open
+    expect(getByText(date.getFullYear())).toBeInTheDocument()
+  })
+})
