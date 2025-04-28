@@ -69,8 +69,10 @@ class Lti::AssetProcessor < ApplicationRecord
   end
 
   # Result structure should match with ExistingAttachedAssetProcessor in UI
-  def self.processors_info_for_display(assignment_id:)
-    Lti::AssetProcessor.where(assignment_id:).active.preload(:context_external_tool).map do |ap|
+  def self.info_for_display
+    raise ArgumentError, "Must be used with a scope" unless current_scope
+
+    active.preload(:context_external_tool).map do |ap|
       {
         id: ap.id,
         title: ap.title,
