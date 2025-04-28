@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ConfigureExternalToolButton from '../ConfigureExternalToolButton'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 let tool
 let event
@@ -172,4 +173,22 @@ test('opens and closes the modal', async () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
   expect(returnFocus).toHaveBeenCalled()
+})
+
+test('closes the modal when tool sends lti.close message', async () => {
+  renderComponentOpen()
+  monitorLtiMessages()
+
+  fireEvent(
+    window,
+    new MessageEvent('message', {
+      data: {subject: 'lti.close'},
+      origin: 'https://advantage.tool.com',
+      source: window,
+    }),
+  )
+
+  await waitFor(() => {
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
 })

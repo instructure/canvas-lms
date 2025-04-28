@@ -24,6 +24,7 @@ import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import React from 'react'
 import {handleExternalContentMessages} from '../../messages'
 import ToolLaunchIframe from './ToolLaunchIframe'
+import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 const I18n = createI18nScope('external_toolsModalLauncher')
 
@@ -77,6 +78,7 @@ export default class ExternalToolModalLauncher extends React.Component<
   ExternalToolModalLauncherProps | ExternalToolModalLauncherSimplifiedProps
 > {
   removeExternalContentListener?: () => void
+  removeCloseListener?: () => void
   iframe?: HTMLIFrameElement | null
   beforeAlert?: HTMLDivElement | null
   afterAlert?: HTMLDivElement | null
@@ -98,10 +100,14 @@ export default class ExternalToolModalLauncher extends React.Component<
       onDeepLinkingResponse:
         'onDeepLinkingResponse' in this.props ? this.props.onDeepLinkingResponse : undefined,
     })
+
+    const placement = 'tool' in this.props ? this.props.launchType : 'modal'
+    this.removeCloseListener = onLtiClosePostMessage(placement, this.props.onRequestClose)
   }
 
   componentWillUnmount() {
     this.removeExternalContentListener?.()
+    this.removeCloseListener?.()
   }
 
   onExternalToolCompleted = (data: any) => {

@@ -17,14 +17,19 @@
  */
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {render, waitFor} from "@testing-library/react"
-import {AssetProcessorsAddModal} from "../AssetProcessorsAddModal"
-import {QueryClient} from "@tanstack/react-query"
-import {MockedQueryClientProvider} from "@canvas/test-utils/query"
-import {act, renderHook} from "@testing-library/react-hooks"
-import {handleExternalContentMessages} from "@canvas/external-tools/messages"
-import {mockDeepLinkResponse, mockDoFetchApi, mockTools as tools} from './assetProcessorsTestHelpers'
+import {fireEvent, render, waitFor} from '@testing-library/react'
+import {AssetProcessorsAddModal} from '../AssetProcessorsAddModal'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {act, renderHook} from '@testing-library/react-hooks'
+import {handleExternalContentMessages} from '@canvas/external-tools/messages'
+import {
+  mockDeepLinkResponse,
+  mockDoFetchApi,
+  mockTools as tools,
+} from './assetProcessorsTestHelpers'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/external-tools/messages')
@@ -51,10 +56,10 @@ describe('AssetProcessorsAddModal', () => {
       <MockedQueryClientProvider client={queryClient}>
         <AssetProcessorsAddModal
           courseId={123}
-          secureParams={"my-secure-params"}
+          secureParams={'my-secure-params'}
           onProcessorResponse={mockOnProcessorResponse}
         />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
   }
 
@@ -62,26 +67,35 @@ describe('AssetProcessorsAddModal', () => {
     const {queryByText} = renderModal()
     expect(queryByText('Configure settings for t1.')).toBeNull()
     expect(queryByText('Add a document processing app')).toBeNull()
-    expect(queryByText('Choose the document processing app that you wish to add to this assignment.')).toBeNull()
+    expect(
+      queryByText('Choose the document processing app that you wish to add to this assignment.'),
+    ).toBeNull()
   })
 
   it('is opened by calling the showToolList function in the useAssetProcessorsAddModalState hook', () => {
     const {getByText} = renderModal()
     // render hook (zustand store) and get open function:
-    const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current.showToolList
+    const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+      .showToolList
     act(() => open())
     expect(getByText('Add a document processing app')).toBeInTheDocument()
-    expect(getByText('Choose the document processing app that you wish to add to this assignment.')).toBeInTheDocument()
+    expect(
+      getByText('Choose the document processing app that you wish to add to this assignment.'),
+    ).toBeInTheDocument()
   })
 
   it('launches the tool when the AssetProcessorsCard is clicked', () => {
     const {getByText, getByTitle} = renderModal()
-    const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current.showToolList
+    const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+      .showToolList
     act(() => open())
     const t2Card = getByText('t2')
     act(() => t2Card.click())
     const iframe = getByTitle('Configure new document processing app')
-    expect(iframe).toHaveAttribute('src', '/courses/123/external_tools/22/resource_selection?display=borderless&launch_type=ActivityAssetProcessor&secure_params=my-secure-params')
+    expect(iframe).toHaveAttribute(
+      'src',
+      '/courses/123/external_tools/22/resource_selection?display=borderless&launch_type=ActivityAssetProcessor&secure_params=my-secure-params',
+    )
     expect(iframe.style.width).toBe('600px')
     expect(iframe.style.height).toBe('500px')
   })
@@ -94,7 +108,8 @@ describe('AssetProcessorsAddModal', () => {
         onDeepLinkingResponse(mockDeepLinkResponse)
       })
       const {getByText, queryByTitle, queryByText} = renderModal()
-      const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current.showToolList
+      const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+        .showToolList
       open()
       const t2Card = getByText('t2')
       act(() => t2Card.click())
@@ -102,7 +117,36 @@ describe('AssetProcessorsAddModal', () => {
       waitFor(() => expect(queryByText('Configure settings for t2.')).not.toBeNull())
       waitFor(() => expect(queryByTitle('Configure new document processing app')).not.toBeNull())
 
-      expect(mockOnProcessorResponse).toHaveBeenCalledWith({ tool: tools[1], data: mockDeepLinkResponse })
+      expect(mockOnProcessorResponse).toHaveBeenCalledWith({
+        tool: tools[1],
+        data: mockDeepLinkResponse,
+      })
+    })
+  })
+
+  it('closes the modal when tool sends lti.close message', async () => {
+    monitorLtiMessages()
+
+    const {getByText, queryByText} = renderModal()
+    const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+      .showToolList
+    act(() => open())
+    const t2Card = getByText('t2')
+    act(() => t2Card.click())
+
+    await waitFor(() => expect(queryByText('Configure settings for t2.')).not.toBeNull())
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {subject: 'lti.close'},
+        origin: 'http://example.com',
+        source: window,
+      }),
+    )
+
+    await waitFor(() => {
+      expect(queryByText('Configure settings for t2.')).toBeNull()
     })
   })
 })

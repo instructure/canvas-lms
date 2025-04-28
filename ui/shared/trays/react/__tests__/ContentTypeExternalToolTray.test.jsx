@@ -18,8 +18,9 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import ContentTypeExternalToolTray from '../ContentTypeExternalToolTray'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 describe('ContentTypeExternalToolTray', () => {
   let tool
@@ -29,6 +30,7 @@ describe('ContentTypeExternalToolTray', () => {
 
   beforeEach(() => {
     tool = {id: '1', base_url: 'https://one.lti.com/', title: 'First LTI'}
+    jest.resetAllMocks()
   })
 
   function renderTray(props) {
@@ -71,6 +73,15 @@ describe('ContentTypeExternalToolTray', () => {
       renderTray()
       sendPostMessage({subject: 'externalContentReady'})
       expect(onExternalContentReady).toHaveBeenCalledTimes(1)
+    })
+
+    it('calls onDismiss when it receives an lti.close messages from the tool', async () => {
+      monitorLtiMessages()
+      renderTray()
+      sendPostMessage({subject: 'lti.close'})
+      await waitFor(() => {
+        expect(onDismiss).toHaveBeenCalledTimes(1)
+      })
     })
   })
 

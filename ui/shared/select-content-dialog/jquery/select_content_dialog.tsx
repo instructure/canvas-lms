@@ -48,6 +48,7 @@ import type {EnvContextModules} from '@canvas/global/env/EnvContextModules'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import replaceTags from '@canvas/util/replaceTags'
 import {EXTERNAL_CONTENT_READY, EXTERNAL_CONTENT_CANCEL} from '@canvas/external-tools/messages'
+import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
@@ -418,12 +419,14 @@ export const Events = {
         $('body').append($dialog.hide())
         $dialog.on('dialogbeforeclose', dialogCancelHandler)
         const ltiPostMessageHandlerForTool = ltiPostMessageHandler(tool)
+        let removeCloseListener = () => {}
         $dialog
           .dialog({
             autoOpen: false,
             width: 'auto',
             resizable: true,
             close() {
+              removeCloseListener()
               window.removeEventListener('message', ltiPostMessageHandlerForTool)
               $(window).off('beforeunload', beforeUnloadHandler)
               $dialog
@@ -431,6 +434,9 @@ export const Events = {
                 .attr('src', '/images/ajax-loader-medium-444.gif')
             },
             open: () => {
+              removeCloseListener = onLtiClosePostMessage(placement_type, () => {
+                $('#resource_selection_dialog').dialog('close')
+              })
               $dialog.parent().find('.ui-dialog-titlebar-close').focus()
               window.addEventListener('message', ltiPostMessageHandlerForTool)
             },
