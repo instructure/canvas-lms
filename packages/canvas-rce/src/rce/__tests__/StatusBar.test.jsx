@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -83,6 +83,7 @@ describe('RCE StatusBar', () => {
     expect(container.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
     expect(container.querySelector('[data-btn-id="rce-edit-btn"]')).toBeInTheDocument()
     expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).toBeInTheDocument()
   })
 
   it('omits fullscreen button when fullscreen is not enabled', () => {
@@ -93,6 +94,7 @@ describe('RCE StatusBar', () => {
     expect(container.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
     expect(container.querySelector('[data-btn-id="rce-edit-btn"]')).toBeInTheDocument()
     expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).toBeInTheDocument()
   })
 
   it('replaces fullscreen with exit fullscreen if RCE is fullscreen', () => {
@@ -111,7 +113,7 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar()
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('button, *[tabindex]')
-      expect(buttons).toHaveLength(5)
+      expect(buttons).toHaveLength(6)
 
       buttons[0].focus()
       expect(document.activeElement).toBe(buttons[0])
@@ -127,7 +129,7 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar()
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('button, *[tabindex]')
-      expect(buttons).toHaveLength(5)
+      expect(buttons).toHaveLength(6)
 
       buttons[buttons.length - 1].focus()
       expect(document.activeElement).toBe(buttons[buttons.length - 1])
@@ -211,7 +213,7 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar({editorView: RAW_HTML_EDITOR_VIEW})
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('[tabindex]')
-      expect(buttons).toHaveLength(2)
+      expect(buttons).toHaveLength(3)
 
       buttons[0].focus()
       expect(document.activeElement).toBe(buttons[0])
@@ -227,7 +229,7 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar({editorView: RAW_HTML_EDITOR_VIEW})
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('[tabindex]')
-      expect(buttons).toHaveLength(2)
+      expect(buttons).toHaveLength(3)
 
       buttons[buttons.length - 1].focus()
       expect(document.activeElement).toBe(buttons[buttons.length - 1])
@@ -249,7 +251,7 @@ describe('RCE StatusBar', () => {
       })
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('[tabindex]')
-      expect(buttons).toHaveLength(3)
+      expect(buttons).toHaveLength(4)
 
       buttons[0].focus()
       expect(document.activeElement).toBe(buttons[0])
@@ -267,7 +269,7 @@ describe('RCE StatusBar', () => {
       })
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('[tabindex]')
-      expect(buttons).toHaveLength(3)
+      expect(buttons).toHaveLength(4)
 
       buttons[buttons.length - 1].focus()
       expect(document.activeElement).toBe(buttons[buttons.length - 1])
@@ -287,13 +289,15 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar({readOnly: true})
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('button, *[tabindex]')
-      expect(buttons).toHaveLength(2)
+      expect(buttons).toHaveLength(3)
 
       buttons[0].focus()
       expect(document.activeElement).toBe(buttons[0])
       // wraps to the right
-      fireEvent.keyDown(statusbar, {keyCode: keycode.codes.right})
-      fireEvent.keyDown(statusbar, {keyCode: keycode.codes.right})
+      for (let i = 1; i <= buttons.length; ++i) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.right})
+        expect(document.activeElement).toBe(buttons[i % buttons.length])
+      }
       expect(document.activeElement).toBe(buttons[0]) // back to the beginning
     })
 
@@ -301,14 +305,18 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar({readOnly: true})
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('button, *[tabindex]')
-      expect(buttons).toHaveLength(2)
+      expect(buttons).toHaveLength(3)
 
-      buttons[1].focus()
-      expect(document.activeElement).toBe(buttons[1])
+      buttons[buttons.length - 1].focus()
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
       // wraps to the left
-      fireEvent.keyDown(statusbar, {keyCode: keycode.codes.left})
-      fireEvent.keyDown(statusbar, {keyCode: keycode.codes.left})
-      expect(document.activeElement).toBe(buttons[0]) // back to the beginning
+      for (let focusedButton = buttons.length - 1; focusedButton >= 0; --focusedButton) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.left})
+        expect(document.activeElement).toBe(
+          buttons[(focusedButton - 1 + buttons.length) % buttons.length],
+        )
+      }
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
     })
   })
 
@@ -380,6 +388,7 @@ describe('RCE StatusBar', () => {
       expect(container.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
       expect(container.querySelector('[data-btn-id="rce-edit-btn"]')).not.toBeInTheDocument()
       expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]')).not.toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).not.toBeInTheDocument()
     })
   })
 
@@ -392,6 +401,7 @@ describe('RCE StatusBar', () => {
       expect(container.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
       expect(container.querySelector('[data-btn-id="rce-edit-btn"]')).not.toBeInTheDocument()
       expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]')).not.toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).not.toBeInTheDocument()
     })
   })
 
