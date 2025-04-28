@@ -640,7 +640,7 @@ class ContextModule < ActiveRecord::Base
       if tag.content_type == "Assignment"
         target_assignment_ids.include? tag.content_id
       else
-        target_assignment_ids.include? tag.content&.assignment_id
+        target_assignment_ids.include? tag.content&.try(:assignment_id)
       end
     end
 

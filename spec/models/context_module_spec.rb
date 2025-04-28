@@ -1841,6 +1841,27 @@ describe ContextModule do
         expect(@module2.content_tags_for(@student)).to include(@tag_m2_1)
       end
     end
+
+    describe "when a module includes attachments" do
+      def create_attachment(context, opts = {})
+        opts[:uploaded_data] ||= StringIO.new("attachment content")
+        opts[:filename] ||= "content.txt"
+        opts[:display_name] ||= opts[:filename]
+        opts[:folder] ||= Folder.unfiled_folder(context)
+        attachment = context.attachments.build(opts)
+        attachment.save!
+        attachment
+      end
+
+      before :once do
+        attachment = create_attachment(@course)
+        @module1.add_item(type: "attachment", id: attachment.id)
+      end
+
+      it "does not throw" do
+        expect { @module1.content_tags_for(@student) }.not_to raise_error
+      end
+    end
   end
 
   describe "#find_or_create_progression" do
