@@ -843,7 +843,7 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
         wait_for_ajaximations
 
-        expect(f("#assignment_peer_reviews_assign_at").attribute("value")).to eq format_time_for_view(peer_reviews_assign_at, "%b %d, %Y")
+        expect(f("#assignment_peer_reviews_assign_at").attribute("value")).to eq format_time_for_view(peer_reviews_assign_at, "%b %-2d, %Y")
       end
     end
 
