@@ -331,6 +331,7 @@ class ContextModulesController < ApplicationController
           canDelete: @can_delete,
           canViewUnpublished: @can_view_unpublished,
           canDirectShare: can_do(@context, @current_user, :direct_share),
+          readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin)
         }
 
         js_env(MODULES_PERMISSIONS: modules_permissions)

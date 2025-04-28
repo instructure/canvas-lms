@@ -41,9 +41,7 @@ const setUp = (
   completionRequirement: CompletionRequirement | null = defaultCompletionRequirement,
 ) => {
   return render(
-    <ContextModuleProvider
-      {...contextModuleDefaultProps}
-    >
+    <ContextModuleProvider {...contextModuleDefaultProps}>
       <ModuleItemSupplementalInfo
         content={content}
         completionRequirement={completionRequirement ?? undefined}

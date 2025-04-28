@@ -64,7 +64,12 @@ ready(() => {
             // @ts-expect-error
             DEFAULT_POST_TO_SIS={ENV.DEFAULT_POST_TO_SIS}
           >
-            {ENV.current_user_is_student ? <ModulesStudentContainer /> : <ModulesContainer />}
+            {/* @ts-expect-error */}
+            {ENV.MODULES_PERMISSIONS?.readAsAdmin ? (
+              <ModulesContainer />
+            ) : (
+              <ModulesStudentContainer />
+            )}
           </ContextModuleProvider>
         </QueryProvider>
       </ErrorBoundary>,

@@ -23,9 +23,7 @@ import ModuleItemActionMenu from '../ModuleItemActionMenu'
 
 const setUp = (itemType: string = 'Assignment') => {
   return render(
-    <ContextModuleProvider
-      {...contextModuleDefaultProps}
-    >
+    <ContextModuleProvider {...contextModuleDefaultProps}>
       <ModuleItemActionMenu
         itemType={itemType}
         canDuplicate={true}
