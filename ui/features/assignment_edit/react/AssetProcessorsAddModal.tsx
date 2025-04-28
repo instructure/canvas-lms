@@ -35,6 +35,7 @@ import {
 } from './hooks/AssetProcessorsAddModalState'
 import {AssetProcessorsCard} from './AssetProcessorsCards'
 import {useAssetProcessorsToolsList} from './hooks/useAssetProcessorsToolsList'
+import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 const I18n = createI18nScope('asset_processors_selection')
 
@@ -179,6 +180,10 @@ function AssetProcessorsAddModalBodyToolLaunch(
       }),
     [onProcessorResponse, close, tool],
   )
+
+  useEffect(() => {
+    return onLtiClosePostMessage('ActivityAssetProcessor', close)
+  }, [])
 
   return (
     <>

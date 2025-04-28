@@ -31,6 +31,7 @@ jest.mock('@canvas/lti/jquery/messages', () => ({
   ltiState: {
     tray: null,
   },
+  onLtiClosePostMessage: jest.fn(),
 }))
 
 function createFakeStore(initialState) {

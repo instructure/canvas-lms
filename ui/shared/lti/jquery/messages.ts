@@ -92,6 +92,7 @@ const handlers: Record<
   (typeof SUBJECT_ALLOW_LIST)[number],
   () => Promise<{default: LtiMessageHandler<any>}>
 > = {
+  'lti.close': () => import(`./subjects/lti.close`),
   'lti.enableScrollEvents': () => import(`./subjects/lti.enableScrollEvents`),
   'lti.fetchWindowSize': () => import(`./subjects/lti.fetchWindowSize`),
   'lti.frameResize': () => import(`./subjects/lti.frameResize`),
@@ -172,11 +173,18 @@ async function ltiMessageHandler(e: MessageEvent<unknown>) {
     return false
   } else {
     try {
+      const callback = () => {
+        const subject_callbacks = callbacks[subject]
+        if (subject_callbacks) {
+          Object.values(subject_callbacks).forEach(cb => cb())
+        }
+      }
       const handlerModule = await handlers[subject]()
       const hasSentResponse = handlerModule.default({
         message,
         event: e,
         responseMessages,
+        callback,
       })
       if (!hasSentResponse) {
         responseMessages.sendSuccess()
@@ -219,6 +227,11 @@ async function ltiMessageHandler(e: MessageEvent<unknown>) {
 // Prevent duplicate listeners inside the same window
 let hasListener = false
 
+// Let any page define a callback for a given subject and placement
+// Ex: close a modal when `lti.close` is received for a tool launched from `assignment_selection`
+type PlacementCallbacks = Record<string, () => void>
+const callbacks: Partial<Record<(typeof SUBJECT_ALLOW_LIST)[number], PlacementCallbacks>> = {}
+
 function monitorLtiMessages() {
   // This should only be true when canvas is in an iframe (like for postMessage forwarding),
   // to prevent duplicate listeners across canvas windows.
@@ -232,4 +245,59 @@ function monitorLtiMessages() {
   }
 }
 
-export {ltiState, ltiMessageHandler, monitorLtiMessages}
+/**
+ * Hook into a given LTI postMessage handler and run an extra callback.
+ * Example: close an on-page modal when `lti.close` is received.
+ * Will run all callbacks registered for the given subject.
+ *
+ * @param subject An allowed LTI postMessage subject
+ * @param placement A unique identifier for the tool launch placement
+ * @param callback A function to execute when a postMessage with the given subject is received
+ */
+function callbackOnLtiPostMessage(
+  subject: (typeof SUBJECT_ALLOW_LIST)[number],
+  placement: string,
+  callback: () => void,
+) {
+  callbacks[subject] ||= {}
+  callbacks[subject][placement] = callback
+}
+
+/**
+ * Remove an extra callback for a given LTI postMessage subject and placement.
+ * Does not remove the default subject handler.
+ *
+ * @param subject An allowed LTI postMessage subject
+ * @param placement A unique identifier for the tool launch placement
+ */
+function removeLtiPostMessageCallback(
+  subject: (typeof SUBJECT_ALLOW_LIST)[number],
+  placement: string,
+) {
+  if (callbacks[subject] && callbacks[subject][placement]) {
+    delete callbacks[subject][placement]
+  }
+}
+
+/**
+ * Be informed when Canvas receives an `lti.close` postMessage,
+ * and respond (usually by closing the tool launch modal).
+ *
+ * @param placement A unique identifier for the tool launch placement
+ * @param callback A function to execute on `lti.close`
+ * @returns A cleanup function to remove the callback
+ */
+function onLtiClosePostMessage(placement: string, callback: () => void) {
+  callbackOnLtiPostMessage('lti.close', placement, callback)
+
+  return () => removeLtiPostMessageCallback('lti.close', placement)
+}
+
+export {
+  ltiState,
+  ltiMessageHandler,
+  monitorLtiMessages,
+  callbackOnLtiPostMessage,
+  removeLtiPostMessageCallback,
+  onLtiClosePostMessage,
+}

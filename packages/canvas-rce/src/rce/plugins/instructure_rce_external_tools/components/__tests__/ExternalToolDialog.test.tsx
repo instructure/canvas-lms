@@ -521,6 +521,21 @@ describe('ExternalToolDialog', () => {
         '<a href="http://www.tool.com" title="title" target="_blank">title</a>',
       )
     })
+
+    it('closes the modal when tool sends lti.close message', async () => {
+      const instance = await getInstance(container)
+      const closeSpy = jest.spyOn(instance, 'handleClose')
+
+      instance.open(toolHelper(1))
+      instance.handlePostedMessage({
+        origin: 'https://tool.com',
+        data: {
+          subject: 'lti.close',
+        },
+      })
+
+      expect(closeSpy).toHaveBeenCalled()
+    })
   })
 
   describe('alerts', () => {

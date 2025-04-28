@@ -30,6 +30,7 @@ import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunch
 import MutexManager from '@canvas/mutex-manager/MutexManager'
 import type {Tool} from '@canvas/global/env/EnvCommon'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 type Props = {
   tool: Tool | null
@@ -99,6 +100,14 @@ export default function ContentTypeExternalToolDrawer({
     () => handleExternalContentMessages({ready: onExternalContentReady}),
     [onExternalContentReady],
   )
+
+  useEffect(() => {
+    // this drawer is mounted on page load, but listening for tool messages
+    // only needs to happen when the drawer is open
+    if (open) {
+      return onLtiClosePostMessage('top_navigation', onDismiss)
+    }
+  }, [open])
 
   return (
     <View display="block" height={pageContentHeight}>

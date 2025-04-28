@@ -24,10 +24,13 @@ import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
+import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 const I18n = createI18nScope('external_tools')
 
 export default class ConfigureExternalToolButton extends React.Component {
+  removeCloseListener
+
   static propTypes = {
     tool: shape({}).isRequired,
     returnFocus: func.isRequired,
@@ -41,6 +44,14 @@ export default class ConfigureExternalToolButton extends React.Component {
       afterExternalContentAlertClass: 'screenreader-only',
       alertFocused: false,
     }
+  }
+
+  componentDidMount() {
+    this.removeCloseListener = onLtiClosePostMessage('tool_configuration', this.closeModal)
+  }
+
+  componentWillUnmount() {
+    this.removeCloseListener?.()
   }
 
   getLaunchUrl = tool => {

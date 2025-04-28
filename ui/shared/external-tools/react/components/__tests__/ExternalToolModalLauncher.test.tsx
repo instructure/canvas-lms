@@ -19,6 +19,7 @@
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ExternalToolModalLauncher from '../ExternalToolModalLauncher'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 function generateProps(overrides = {}) {
   return {
@@ -34,6 +35,10 @@ function generateProps(overrides = {}) {
 }
 
 describe('ExternalToolModalLauncher', () => {
+  const origin = 'http://example.com'
+  const sendPostMessage = (data: any) =>
+    fireEvent(window, new MessageEvent('message', {data, origin, source: window}))
+
   beforeEach(() => {
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
   })
@@ -65,11 +70,8 @@ describe('ExternalToolModalLauncher', () => {
 
   describe('handling external content events', () => {
     const origEnv = {...window.ENV}
-    const origin = 'http://example.com'
     beforeAll(() => (window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = origin))
     afterAll(() => (window.ENV = origEnv))
-    const sendPostMessage = (data: any) =>
-      fireEvent(window, new MessageEvent('message', {data, origin}))
 
     test('invokes onRequestClose prop when window receives externalContentReady event', async () => {
       const onRequestCloseMock = jest.fn()
@@ -137,6 +139,23 @@ describe('ExternalToolModalLauncher', () => {
       await userEvent.click(backdrop)
 
       expect(onRequestCloseMock).not.toHaveBeenCalled()
+    })
+
+    it('calls onRequestClose when tool sends lti.close event', async () => {
+      monitorLtiMessages()
+
+      const onRequestCloseMock = jest.fn()
+      render(
+        <ExternalToolModalLauncher
+          {...generateProps({onRequestClose: onRequestCloseMock, isOpen: true})}
+        />,
+      )
+
+      sendPostMessage({subject: 'lti.close'})
+
+      await waitFor(() => {
+        expect(onRequestCloseMock).toHaveBeenCalled()
+      })
     })
   })
 

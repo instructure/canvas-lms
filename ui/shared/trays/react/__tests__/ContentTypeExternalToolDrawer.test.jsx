@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import ContentTypeExternalToolDrawer from '../ContentTypeExternalToolDrawer'
 import MutexManager from '@canvas/mutex-manager/MutexManager'
-import { fallbackIframeAllowances } from '../constants'
-
+import {fallbackIframeAllowances} from '../constants'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 describe('ContentTypeExternalToolDrawer', () => {
   const tool = {
@@ -56,6 +56,10 @@ describe('ContentTypeExternalToolDrawer', () => {
       />,
     )
   }
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
 
   it('renders', () => {
     const wrapper = renderTray()
@@ -108,6 +112,15 @@ describe('ContentTypeExternalToolDrawer', () => {
       sendPostMessage({subject: 'externalContentReady'})
       expect(onExternalContentReady).toHaveBeenCalledTimes(1)
     })
+
+    it('calls onDismiss when it receives an lti.close message from the tool', async () => {
+      monitorLtiMessages()
+      renderTray()
+      sendPostMessage({subject: 'lti.close'})
+      await waitFor(() => {
+        expect(onDismiss).toHaveBeenCalledTimes(1)
+      })
+    })
   })
 
   describe('when constructing iframe src url', () => {
@@ -124,7 +137,7 @@ describe('ContentTypeExternalToolDrawer', () => {
       expect(iframe).toBeInTheDocument()
       const src = iframe.src
       expect(src).toContain(`${tool.base_url}?`)
-      expect(iframe.getAttribute("allow")).toContain('clipboard-write')
+      expect(iframe.getAttribute('allow')).toContain('clipboard-write')
     })
   })
 
