@@ -2096,6 +2096,7 @@ class Account < ActiveRecord::Base
   TAB_BRAND_CONFIGS = 20
   TAB_EPORTFOLIO_MODERATION = 21
   TAB_ACCOUNT_CALENDARS = 22
+  TAB_REPORTS = 23
 
   # site admin tabs
   TAB_PLUGINS = 14
@@ -2132,6 +2133,7 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_COURSES, label: t("#account.tab_courses", "Courses"), css_class: "courses", href: :account_path } if user && grants_right?(user, :read_course_list)
       tabs << { id: TAB_USERS, label: t("People"), css_class: "users", href: :account_users_path } if user && grants_right?(user, :read_roster)
       tabs << { id: TAB_STATISTICS, label: t("#account.tab_statistics", "Statistics"), css_class: "statistics", href: :statistics_account_path } if user && grants_right?(user, :view_statistics)
+      tabs << { id: TAB_REPORTS, label: t("Reports"), css_class: "account_reports", href: :account_reports_path } if feature_enabled?(:new_account_reports_ui) && user && grants_right?(user, :read_reports)
       tabs << { id: TAB_PERMISSIONS, label: t("#account.tab_permissions", "Permissions"), css_class: "permissions", href: :account_permissions_path } if user && grants_right?(user, :manage_role_overrides)
       if user && grants_right?(user, :manage_outcomes)
         tabs << { id: TAB_OUTCOMES, label: t("#account.tab_outcomes", "Outcomes"), css_class: "outcomes", href: :account_outcomes_path }
