@@ -16,10 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {QueryFunctionContext} from '@tanstack/react-query'
 import {createContext, type MutableRefObject, useContext, useRef} from 'react'
+import {AccountWithCounts} from './types'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export const calculateIndent = (indent: number) => {
   return indent * 3
+}
+
+export const fetchSubAccounts = async (
+  context: QueryFunctionContext,
+): Promise<{json: AccountWithCounts[]; nextPage: string | null}> => {
+  const accountId = context.queryKey[1] as string
+  const params = {
+    per_page: '100',
+    page: context.pageParam || '1',
+    include: ['course_count', 'sub_account_count'],
+    order: 'name',
+  }
+  const {json, link} = await doFetchApi<AccountWithCounts[]>({
+    path: `/api/v1/accounts/${accountId}/sub_accounts`,
+    method: 'GET',
+    params,
+  })
+  const nextPage = link?.next ? link.next.page : null
+  return {json: json!, nextPage}
 }
 
 interface FocusContextType {
