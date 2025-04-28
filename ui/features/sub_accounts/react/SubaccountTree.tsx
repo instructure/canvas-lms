@@ -25,10 +25,9 @@ import SubaccountItem from './SubaccountItem'
 import type {AccountWithCounts} from './types'
 import {Flex} from '@instructure/ui-flex'
 import SubaccountNameForm from './SubaccountNameForm'
-import {calculateIndent, useFocusContext} from './util'
+import {calculateIndent, fetchSubAccounts, useFocusContext} from './util'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {QueryFunctionContext, useInfiniteQuery} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient, useAllPages} from '@canvas/query'
 import DeleteSubaccountModal from './DeleteSubaccountModal'
 
 const I18n = createI18nScope('sub_accounts')
@@ -54,44 +53,22 @@ export default function SubaccountTree(props: Props) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [displayConfirmation, setDisplayConfirmation] = useState(false)
 
-  const fetchSubAccounts = async (
-    context: QueryFunctionContext,
-  ): Promise<{json: AccountWithCounts[]; nextPage: string | null}> => {
-    const params = {
-      per_page: '100',
-      page: context.pageParam || '1',
-      include: ['course_count', 'sub_account_count'],
-      order: 'name',
-    }
-    const {json, link} = await doFetchApi({
-      path: `/api/v1/accounts/${props.rootAccount.id}/sub_accounts`,
-      method: 'GET',
-      params,
-    })
-    const nextPage = link?.next ? link.next.page : null
-    if (context.pageParam == null || context.pageParam === '1') {
-      setSubaccounts(json as AccountWithCounts[])
-    } else {
-      // switch to a useState
-      setSubaccounts([...subaccounts, ...(json as AccountWithCounts[])])
-    }
-    return {json: json as AccountWithCounts[], nextPage}
-  }
+  const {data, isFetching, isLoading, hasNextPage, isFetchingNextPage, error} = useAllPages({
+    queryKey: ['subAccountList', props.rootAccount.id],
+    queryFn: context => fetchSubAccounts(context),
+    getNextPageParam: lastPage => lastPage.nextPage,
+    enabled: isExpanded && subCount.current > 0,
+  })
 
-  const {isFetching, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage, error} =
-    useInfiniteQuery({
-      queryKey: ['subAccountList', props.rootAccount.id],
-      queryFn: context => fetchSubAccounts(context),
-      getNextPageParam: lastPage => lastPage.nextPage,
-      enabled: isExpanded && subCount.current > 0,
-    })
-
-  // fetch more accounts if available
   useEffect(() => {
-    if (!isFetching && hasNextPage) {
-      fetchNextPage()
+    if (!isFetching && data != null) {
+      const subaccounts =
+        data.pages.reduce((acc, page) => {
+          return acc.concat(page.json)
+        }, [] as AccountWithCounts[]) || []
+      setSubaccounts(subaccounts)
     }
-  }, [isFetchingNextPage, isFetching, fetchNextPage, hasNextPage])
+  }, [data, isFetching])
 
   useEffect(() => {
     setIsExpanded(
