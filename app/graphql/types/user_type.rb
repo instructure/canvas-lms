@@ -144,6 +144,8 @@ module Types
       end
     end
 
+    ALLOWED_ORDER_BY_VALUES = %w[id user_id course_id created_at start_at end_at completed_at courses.id courses.name courses.course_code courses.start_at courses.conclude_at].to_set
+
     field :enrollments, [EnrollmentType], null: false do
       argument :course_id,
                ID,
@@ -165,7 +167,8 @@ module Types
       argument :order_by,
                [String],
                "The fields to order the results by",
-               required: false
+               required: false,
+               validates: { all: { inclusion: { in: ALLOWED_ORDER_BY_VALUES } } }
       argument :sort,
                EnrollmentsSortInputType,
                "The sort field and direction for the results. Secondary sort is by section name",
