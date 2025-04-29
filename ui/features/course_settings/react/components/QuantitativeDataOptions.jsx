@@ -48,7 +48,7 @@ export default function QuantitativeDataOptions({canManage}) {
           <ScreenReaderContent>{I18n.t('Quantitative Data Options')}</ScreenReaderContent>
         }
         rowSpacing="small"
-        layout="inline"
+        layout="stacked"
       >
         <Checkbox
           label={I18n.t('Restrict view of quantitative data')}
