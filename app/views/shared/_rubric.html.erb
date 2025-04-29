@@ -43,9 +43,53 @@
     id="<%= rubric ? "rubric_#{rubric.id}" : "default_rubric" %>"
     style="<%= hidden unless rubric %>"
   >
-    <div class="screenreader-only rubric-screenreader-title"><h2><%= t 'rubric', "Rubric" %></h2></div>
+    <div class="screenreader-only rubric-screenreader-title">
+      <h2>
+        <%= t 'rubric', "Rubric" %>
+      </h2>
+    </div>
     <div class="rubric_title">
-      <div style="<%= hidden unless editable && edit_view %>" class="links displaying pull-right">
+      <div class="editing" style="text-align: <%= direction('left') %>">
+        <label class="rubric-title-label">
+          <%= t('title', "Title:") %>
+          <input id="rubric-title" type="text" class="no-margin-bottom" name="title"
+                value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>"
+                style="width: 200px;" maxlength="255" />
+        </label>
+        <a href="<%= search_rubrics_url(:q => "") %>" style="display: none;" aria-hidden="true">
+          <%= image_tag "find.png", :alt => '' %> <%= t 'links.find_rubric', "Find Rubric" %>
+        </a>
+        <div class="editing">
+          <i class="icon-warning icon-Solid title_error_message"
+            aria-hidden="true"
+            style="color: #AE1B1F; padding: 5px 0 5px 35px; vertical-align: middle; font-weight: normal;
+                    display: none; align-items: center; gap: 5px; font-size: 14px;">
+            <%= t('Please include a title') %>
+          </i>
+        </div>
+        <% if rubric_association && !rubric_association.rubric_assessments.empty? %>
+          <div class="editing" style="font-size: 0.8em;"><%= t 'messages.rubric_in_use',
+                                                              { :one => "Keep in mind that 1 student has already been assessed using this rubric.  Changing it will affect their evaluation.",
+                                                                :other => "Keep in mind that %{count} students have already been assessed using this rubric.  Changing it will affect their evaluations." },
+                                                            :count => rubric_association.rubric_assessments.count %></div>
+        <% end %>
+      </div>
+
+      <div class="editing">
+        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link icon-search"
+          style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>">
+          <%= t 'links.find_a_rubric', "Find a Rubric" %>
+        </a>
+      </div>
+      
+      <div class="displaying">
+        <span class="title" tabindex="-1"><%= rubric.try(:title) || t(:rubric_title, "Title") %></span>
+      </div>
+      <div class="has-assessments-warning" style="<%= hidden unless edit_view && has_assessments %>">
+        <%= t 'messages.rubric_in_use2', "You've already rated students with this rubric.  Any major changes could affect their assessment results." %>
+      </div>
+
+      <div style="<%= hidden unless editable && edit_view %>" class="links displaying pull-right" >
         <% hash = rubric_association ? {:rubric_association_id => rubric_association.id} : {} %>
         <a
           href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}", hash) %>"
@@ -104,7 +148,7 @@
           <% end %>
         </div>
       </div>
-      <div style="float: <%= direction('right') %>; font-size: 0.8em; display: none;" class="links displaying locked">
+      <div style="font-size: 0.8em; display: none"class="links displaying locked">
         <span style="<%= hidden if editable %>"><%= t 'messages.locked', "Can't change a rubric once you've started using it." %></span>
         <% if for_context %>
           <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>" class="delete_rubric_url" style="display: none;">&nbsp;</a>
@@ -112,43 +156,8 @@
           <a href="<%= context_url(context, :context_rubric_association_url, "{{ association_id }}") %>" class="delete_rubric_url" style="display: none;">&nbsp;</a>
         <% end %>
       </div>
-
-      <div class="editing" style="float: <%= direction('right') %>;">
-        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link icon-search"
-          style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>">
-          <%= t 'links.find_a_rubric', "Find a Rubric" %>
-        </a>
-      </div>
-      <div class="editing" style="text-align: <%= direction('left') %>">
-        <label for="rubric-title"><%= t('title', "Title:") %></label>
-        <input id="rubric-title" type="text" class="no-margin-bottom" name="title"
-              value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>"
-              style="width: 200px;" maxlength="255" />
-        <a href="<%= search_rubrics_url(:q => "") %>" style="display: none;">
-          <%= image_tag "find.png", :alt => '' %> <%= t 'links.find_rubric', "Find Rubric" %>
-        </a>
-        <div class="editing">
-          <i class="icon-warning icon-Solid title_error_message"
-            aria-hidden="true"
-            style="color: #AE1B1F; padding: 5px 0 5px 35px; vertical-align: middle; font-weight: normal;
-                    display: none; align-items: center; gap: 5px; font-size: 14px;">
-            <%= t('Please include a title') %>
-          </i>
-        </div>
-        <% if rubric_association && !rubric_association.rubric_assessments.empty? %>
-          <div class="editing" style="font-size: 0.8em;"><%= t 'messages.rubric_in_use',
-                                                              { :one => "Keep in mind that 1 student has already been assessed using this rubric.  Changing it will affect their evaluation.",
-                                                                :other => "Keep in mind that %{count} students have already been assessed using this rubric.  Changing it will affect their evaluations." },
-                                                            :count => rubric_association.rubric_assessments.count %></div>
-        <% end %>
-      </div>
-      <div class="displaying">
-        <span class="title" tabindex="-1"><%= rubric.try(:title) || t(:rubric_title, "Title") %></span>
-      </div>
-      <div class="has-assessments-warning" style="<%= hidden unless edit_view && has_assessments %>">
-        <%= t 'messages.rubric_in_use2', "You've already rated students with this rubric.  Any major changes could affect their assessment results." %>
-      </div>
     </div>
+
     <table class="rubric_table">
       <caption>
         <div class="screenreader-only">
@@ -176,9 +185,14 @@
         <%= render :partial => "shared/rubric_criterion", :object => nil %>
       </tbody>
     </table>
+
     <div class="rubric-footer">
+      <div class="editing pull-left">
+        <span id="add_criterion_holder" class="criterion_link"></span>
+      </div>
+
       <div class="total_points_holder toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>"
-        style="float: <%= direction('right') %>; <%= hidden if rubric_association && rubric_association.hide_score_total %>">
+        style="<%= hidden if rubric_association && rubric_association.hide_score_total %>">
         <span role="text"><%= before_label :total_points, "Total Points" %>
           <% ot(:out_of, "%{points} *out of %{total}*", :points => capture { %>
             <span class="rubric_total">
@@ -193,10 +207,6 @@
             %>
         </span>
       </div>
-      <div class="editing pull-left">
-        <span id="add_criterion_holder" class="criterion_link"></span>
-      </div>
-      <div class="clear"></div>
     </div>
   </div>
   <div id="edit_rubric" style="display: none;">

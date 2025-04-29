@@ -73,7 +73,7 @@ describe "Discussion Topic Show" do
 
       f("button[data-testid='discussion-post-menu-trigger']").click
       fj("span[role='menuitem']:contains('Show Rubric')").click
-      f(".find_rubric_link").click
+      f("div.links.displaying.pull-right a.find_rubric_link").click
 
       expect(fj(".select_rubric_link:contains(#{rubric.title})")).to be_present
       expect(ffj(".rubrics_dialog_rubric:visible").count).to eq 1
