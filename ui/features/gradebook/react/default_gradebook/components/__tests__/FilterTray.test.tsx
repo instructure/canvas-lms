@@ -22,7 +22,7 @@ import fetchMock from 'fetch-mock'
 import store from '../../stores/index'
 import type {FilterTrayProps} from '../FilterTray'
 import type {FilterPreset, Filter} from '../../gradebook.d'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
 
@@ -140,9 +140,12 @@ describe('FilterTray', () => {
     await user.click(getByText('Toggle Create Filter Preset'))
     const startDate = getByTestId('start-date-input')
     await user.click(startDate)
+    // InstUI DateInput2: first tab goes to the calendar button, second tab goes to the next input
+    await user.tab()
     await user.tab()
     const endDate = getByTestId('end-date-input')
     expect(endDate).toHaveFocus()
+    await user.tab()
     await user.tab()
     expect(getByTestId('delete-filter-preset-button')).toHaveFocus()
   })
@@ -153,11 +156,14 @@ describe('FilterTray', () => {
     await user.click(getByText('Toggle Create Filter Preset'))
     const startDate = getByTestId('start-date-input')
     await user.click(startDate)
-    const button = getAllByText('1')[0]
+    await user.tab()
+    await user.keyboard('[Space]')
+    const button = await waitFor(() => getAllByText('01')[0])
     await user.click(button)
     await user.tab()
     const endDate = getByTestId('end-date-input')
     expect(endDate).toHaveFocus()
+    await user.tab()
     await user.tab()
     expect(getByTestId('delete-filter-preset-button')).toHaveFocus()
   })
