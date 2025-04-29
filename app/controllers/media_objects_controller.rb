@@ -155,7 +155,7 @@ class MediaObjectsController < ApplicationController
 
               if root_folder.grants_right?(@current_user, :read_contents)
                 attachment_scope = Attachment.not_deleted.is_media_object.where(context:)
-                attachment_scope = attachment_scope.select { |att| access_allowed(att, @current_user, :download) }
+                attachment_scope = attachment_scope.select { |att| access_allowed(attachment: att, user: @current_user, access_type: :download) }
                 MediaObject.by_media_id(attachment_scope.pluck(:media_entry_id))
               else
                 render_unauthorized_action # not allowed to view files in the context
@@ -296,7 +296,16 @@ class MediaObjectsController < ApplicationController
     @embeddable = true
 
     media_api_json = if @attachment && @media_object
-                       media_attachment_api_json(@attachment, @media_object, @current_user, session, verifier: params[:verifier], access_token: params[:access_token], instfs_id: params[:instfs_id])
+                       media_attachment_api_json(
+                         @attachment,
+                         @media_object,
+                         @current_user,
+                         session,
+                         verifier: params[:verifier],
+                         access_token: params[:access_token],
+                         instfs_id: params[:instfs_id],
+                         location: params[:location]
+                       )
                      elsif @media_object
                        media_object_api_json(@media_object, @current_user, session)
                      end

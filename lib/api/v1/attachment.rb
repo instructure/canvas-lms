@@ -100,11 +100,18 @@ module Api::V1::Attachment
         url = thumbnail_url
       else
         h = { download: "1", download_frd: "1" }
+
         unless attachment.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api)
           h[:verifier] = options[:verifier] if options[:verifier].present?
           h[:verifier] ||= attachment.uuid unless options[:omit_verifier_in_app] && ((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
         end
+
+        if options[:location].present?
+          h[:location] = options[:location]
+        end
+
         h.merge!(options.slice(:access_token, :instfs_id)) if options[:access_token].present? && options[:instfs_id].present?
+
         url = file_download_url(attachment, h.merge(url_options))
       end
       # and svg can stand in as its own thumbnail, but let's be reasonable about their size
@@ -170,8 +177,11 @@ module Api::V1::Attachment
       url_opts = {
         annotate: 0
       }
+      url_opts[:location] = options[:location] if options[:location].present?
+
       url_opts[:verifier] = options[:verifier] if options[:verifier].present?
       url_opts[:verifier] ||= attachment.uuid if downloadable && !options[:omit_verifier_in_app] && !((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
+
       if options[:access_token].present? && options[:instfs_id].present?
         url_opts.merge!(options.slice(:access_token, :instfs_id))
       end
