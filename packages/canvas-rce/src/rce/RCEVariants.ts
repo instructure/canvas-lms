@@ -45,6 +45,12 @@ export const RCEVariantValues = ['full', 'lite', 'text-only', 'text-block'] as c
 
 export type RCEVariant = (typeof RCEVariantValues)[number]
 
+export type StatusBarOptions = {
+  aiTextTools?: boolean
+  isDesktop?: boolean
+  removeResizeButton?: boolean
+}
+
 export function getMenubarForVariant(variant: RCEVariant): MenuBarSpec {
   if (variant === 'full') {
     return 'edit view insert format tools table'
@@ -200,18 +206,21 @@ export function getToolbarForVariant(
 
 const DESKTOP_FEATURES: StatusBarFeature[] = ['keyboard_shortcuts', 'a11y_checker', 'word_count']
 const MOBILE_FEATURES: StatusBarFeature[] = ['a11y_checker', 'word_count']
-const EXTENDED_FEATURES: StatusBarFeature[] = ['html_view', 'fullscreen', 'resize_handle']
+const EXTENDED_FEATURES: StatusBarFeature[] = ['html_view', 'fullscreen']
 
 export function getStatusBarFeaturesForVariant(
   variant: RCEVariant,
-  aiTextTools: boolean = false,
-  isDesktop: boolean = true,
+  options: StatusBarOptions = {
+    aiTextTools: false,
+    isDesktop: true,
+    removeResizeButton: false,
+  },
 ): StatusBarFeature[] {
   if (variant === 'text-block') {
     return []
   }
 
-  const platformFeatures = isDesktop ? DESKTOP_FEATURES : MOBILE_FEATURES
+  const platformFeatures = options.isDesktop ? DESKTOP_FEATURES : MOBILE_FEATURES
 
   if (variant === 'lite' || variant === 'text-only') {
     return platformFeatures
@@ -220,6 +229,7 @@ export function getStatusBarFeaturesForVariant(
   return [
     ...platformFeatures,
     ...EXTENDED_FEATURES,
-    ...(aiTextTools ? ['ai_tools'] : []),
+    ...(options.removeResizeButton ? [] : ['resize_handle']),
+    ...(options.aiTextTools ? ['ai_tools'] : []),
   ] as StatusBarFeature[]
 }
