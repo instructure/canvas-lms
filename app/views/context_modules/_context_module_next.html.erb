@@ -24,6 +24,7 @@
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
   js_bundle :context_modules_publish_icon
+  css_bundle :context_modules
 %>
 
 <% cache_if_module(context_module, @can_view, @can_add, @can_edit, @can_delete, @is_student, @can_view_unpublished, @current_user, @context) do %>

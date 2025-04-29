@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import {Alert} from '@instructure/ui-alerts'
 import {Pagination} from '@instructure/ui-pagination'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -36,8 +37,15 @@ type ModuleItemPagingProps = {
 export const ModuleItemPaging = ({isLoading, paginationOpts}: ModuleItemPagingProps) => {
   if (isLoading) {
     return (
-      <View as="div" textAlign="center" minHeight="3em">
-        <Spinner size="small" renderTitle={I18n.t('Loading')} />
+      <View as="div" textAlign="center" minHeight="3em" className="module-spinner-container">
+        <Alert
+          variant="info"
+          screenReaderOnly={true}
+          liveRegion={() => document.querySelector('#flash_screenreader_holder') as HTMLElement}
+        >
+          {I18n.t('Loading items')}
+        </Alert>
+        <Spinner size="small" renderTitle={I18n.t('Loading items')} />
       </View>
     )
   }

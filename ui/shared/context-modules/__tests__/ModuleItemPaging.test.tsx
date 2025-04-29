@@ -21,9 +21,13 @@ import {render} from '@testing-library/react'
 import {ModuleItemPaging} from '../utils/ModuleItemPaging'
 
 describe('ModuleItemPaging', () => {
+  beforeEach(() => {
+    document.body.innerHTML = ''
+    document.body.innerHTML = '<div id="flash_screenreader_holder" role="alert"></div>'
+  })
   it('renders loading state', () => {
-    const {getByText} = render(<ModuleItemPaging isLoading={true} />)
-    expect(getByText('Loading')).toBeInTheDocument()
+    const {getAllByText} = render(<ModuleItemPaging isLoading={true} />)
+    expect(getAllByText('Loading items')).toHaveLength(2)
   })
 
   it('renders pagination', () => {

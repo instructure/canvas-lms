@@ -409,6 +409,7 @@ class ContextModulesController < ApplicationController
       return render status: :not_found, template: "shared/errors/404_message" unless @module
 
       @items = load_content_tags(@module, @current_user)
+      @items_count = @items.count
       unless params[:no_pagination]
         @items = Api.paginate(@items, self, course_context_module_context_modules_items_html_url)
       end
