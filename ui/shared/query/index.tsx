@@ -47,18 +47,6 @@ export const queryClient = new QueryClient({
   },
 })
 
-window.BroadcastChannel =
-  window.BroadcastChannel ||
-  class BroadcastChannel {
-    close() {}
-
-    postMessage() {}
-
-    addEventListener() {}
-
-    removeEventListener() {}
-  }
-
 /**
  * @deprecated This hook is an anti-pattern and will be removed in a future release.
  * It fetches all pages of data at once, which can lead to performance issues with large datasets.

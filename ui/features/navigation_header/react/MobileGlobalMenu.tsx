@@ -92,6 +92,7 @@ export default function MobileGlobalMenu(props: Props) {
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
+    persister: sessionStoragePersister,
   })
 
   return (
