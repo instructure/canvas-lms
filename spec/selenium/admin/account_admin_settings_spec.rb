@@ -197,7 +197,7 @@ describe "root account basic settings" do
 
         it "lets a user update what settings they want to use" do
           get account_settings_url
-          f("#tab-integrations-link").click
+          f("#tab-integrations").click
 
           tenant_input_area = fxpath('//input[@placeholder="microsoft_tenant_name.onmicrosoft.com"]')
           set_value(tenant_input_area, tenant)
@@ -231,7 +231,7 @@ describe "root account basic settings" do
           account.save!
 
           get account_settings_url
-          f("#tab-integrations-link").click
+          f("#tab-integrations").click
           f("#microsoft_teams_sync_toggle_button").click
           wait_for_ajaximations
 
@@ -267,7 +267,7 @@ describe "root account basic settings" do
     it "has date pickers for reports tab" do
       course_with_admin_logged_in
       get account_settings_url
-      f("#tab-reports-link").click
+      f("#tab-reports").click
       wait_for_ajax_requests
       f("#configure_zero_activity_csv").click
       expect(modal_body.find('[data-testid="parameters[start_at]"]')).to be_present
@@ -348,7 +348,7 @@ describe "root account basic settings" do
     group_model(context: @course)
     get account_settings_url
 
-    f("#tab-quotas-link").click
+    f("#tab-quotas").click
 
     # update the quotas
     user_quota = account.default_user_storage_quota_mb

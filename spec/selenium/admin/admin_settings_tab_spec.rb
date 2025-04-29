@@ -106,7 +106,7 @@ describe "admin settings tab" do
 
   def go_to_feature_options(account_id)
     get "/accounts/#{account_id}/settings"
-    f("#tab-features-link").click
+    f("#tab-features").click
     wait_for_ajaximations
   end
 
@@ -417,8 +417,9 @@ describe "admin settings tab" do
 
       get "/accounts/#{Account.default.id}/settings"
 
-      f("#tab-notifications-link").click
-      f(%(#tab-notifications button[data-testid="update-button")).click
+      f("#tab-notifications").click
+      wait_for_ajax_requests
+      f("#tab-notifications-mount button").click
       wait_for_ajax_requests
 
       expect(Account.default.settings[:custom_help_links]).to eq [
@@ -431,14 +432,15 @@ describe "admin settings tab" do
       Account.default.settings[:custom_help_links] = [help_link]
       Account.default.save!
 
+      wait_for_ajaximations
       default_links = Account.default.help_links_builder.instantiate_links(Account.default.help_links_builder.default_links)
       filtered_links = Account.default.help_links_builder.filtered_links(default_links)
       help_links = Account.default.help_links
+      wait_for_ajaximations
       expect(help_links).to include(help_link.merge(type: "custom"))
       expect(help_links & filtered_links).to eq(filtered_links)
 
       get "/accounts/#{Account.default.id}/settings"
-
       top = f("#custom_help_link_settings .ic-Sortable-item")
       last_button = top.find_elements(:css, "button").last
       scroll_into_view(last_button)
@@ -446,7 +448,6 @@ describe "admin settings tab" do
       wait_for_ajaximations
 
       click_submit
-
       new_help_links = Account.default.help_links
       expect(new_help_links.pluck(:id)).to_not include(Account.default.help_links_builder.filtered_links(default_links).first[:id].to_s)
       expect(new_help_links.pluck(:id)).to include(Account.default.help_links_builder.filtered_links(default_links).last[:id].to_s)
@@ -620,10 +621,11 @@ describe "admin settings tab" do
     course_with_admin_logged_in(account: Account.default, user:)
     provision_quizzes_next(Account.default)
     get "/accounts/#{Account.default.id}/settings"
-    f("#tab-features-link").click
+    wait_for_new_page_load
+    f("#tab-features").click
     wait_for_ajaximations
+    features_text = f("#features-selected").text
 
-    features_text = f("#tab-features").text
     Feature.applicable_features(Account.default).each do |feature|
       next if feature.visible_on && !feature.visible_on.call(Account.default)
 

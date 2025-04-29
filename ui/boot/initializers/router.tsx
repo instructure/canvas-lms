@@ -89,7 +89,7 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/account_admin_tools/react/AccountAdminToolsRoute')}
       />
       <Route
-        path="/accounts/:accountId/settings"
+        path="/accounts/:accountId/settings/*"
         lazy={() => import('../../features/account_settings/react/AccountSettingsRoute')}
       />
       <Route

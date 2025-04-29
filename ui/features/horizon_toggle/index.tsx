@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import ready from '@instructure/ready'
 import {createRoot} from 'react-dom/client'
 import {Main} from './react/Main'
 import {initAccountSelectModal} from './react/HorizonModal/InitHorizonModal'
+import {LoadTab} from '../../shared/tabs/react/LoadTab'
 
-const renderToggle = (ui: any) => {
-  const selectedTab = ui.tab || ui.newTab
-  const tabId = $(selectedTab).find('a').attr('id')
+let careersTabRoot: ReturnType<typeof createRoot> | null = null
+
+function loadCareersTab(targetId: string) {
+  if (targetId !== 'tab-canvas-career-selected') return
 
   const app = (
     <Main
@@ -34,19 +34,17 @@ const renderToggle = (ui: any) => {
       horizonAccountLocked={window.ENV?.horizon_account_locked || false}
     />
   )
-  const element = document.getElementById('tab-canvas-career') as HTMLElement
-  if (tabId === 'tab-canvas-career-link') {
-    const root = createRoot(element)
-    root.render(app)
-  } else {
-    if (element) {
-      const root = createRoot(element)
-      root.unmount()
-    }
+
+  const mountPoint = document.getElementById('tab-canvas-career-mount')
+  if (!mountPoint) return
+
+  if (!careersTabRoot) {
+    careersTabRoot = createRoot(mountPoint)
   }
-}
-ready(() => {
-  $('#account_settings_tabs').on('tabscreate tabsactivate', (_event, ui) => renderToggle(ui))
+
+  careersTabRoot.render(app)
 
   initAccountSelectModal()
-})
+}
+
+LoadTab(loadCareersTab)

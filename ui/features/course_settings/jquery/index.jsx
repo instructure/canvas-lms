@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import ReactDOM from 'react-dom'
-import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {tabIdFromElement} from './course_settings_helper'
@@ -165,35 +164,7 @@ $(document).ready(function () {
   const $add_section_form = $('#add_section_form'),
     $edit_section_form = $('#edit_section_form'),
     $course_form = $('#course_form'),
-    $enrollment_dialog = $('#enrollment_dialog'),
-    $tabBar = $('#course_details_tabs')
-
-  const settingsTabs = $tabBar[0].querySelectorAll('ul>li>a[href*="#tab"]')
-  // find the index of the tab whose href matches the URL's hash
-  const initialTab = Array.from(settingsTabs || []).findIndex(
-    t => `#${t.id}` === `${window.location.hash}-link`,
-  )
-  // Sync the location hash with window.history, this fixes some issues with the browser back
-  // button when going back to or from the details tab
-  if (!window.location.hash) {
-    const defaultTab = settingsTabs[0]?.href
-    window.history.replaceState(null, null, defaultTab)
-  }
-  $tabBar
-    .on('tabsactivate', (event, ui) => {
-      try {
-        const $tabLink = ui.newTab.children('a:first-child')
-        const hash = new URL($tabLink.prop('href')).hash
-        if (window.location.hash !== hash) {
-          window.history.pushState(null, null, hash)
-        }
-        $tabLink.focus()
-      } catch (_ignore) {
-        // if the URL can't be parsed, so be it.
-      }
-    })
-    .tabs({active: initialTab >= 0 ? initialTab : null})
-    .show()
+    $enrollment_dialog = $('#enrollment_dialog')
 
   $add_section_form.formSubmit({
     required: ['course_section[name]'],
@@ -295,7 +266,7 @@ $(document).ready(function () {
           const $prevItem = $(this).prev()
           const $toFocus = $prevItem.length
             ? $prevItem.find('.delete_section_link,.cant_delete_section_link')
-            : $('#sections_tab > a')
+            : $('#tab-sections')
           $(this).slideUp(function () {
             $(this).remove()
             $toFocus.focus()
@@ -343,7 +314,7 @@ $(document).ready(function () {
 
   $(document).fragmentChange((event, hash) => {
     function handleFragmentType(val) {
-      $('#tab-users-link').click()
+      $('#tab-users').click()
       $('.add_users_link:visible').click()
       $("#enroll_users_form select[name='enrollment_type']").val(val)
     }
@@ -681,12 +652,5 @@ $(document).ready(function () {
 
   $('#course_conditional_release').change(function () {
     $('#conditional_release_caution_text').toggleClass('shown', !this.checked)
-  })
-
-  window.addEventListener('popstate', () => {
-    const openTab = window.location.hash
-    if (openTab) {
-      document.querySelector(`[href="${openTab}"]`)?.click()
-    }
   })
 })

@@ -676,8 +676,8 @@ describe "security" do
         expect(response).to be_successful
         html = Nokogiri::HTML5(response.body)
         expect(html.css(".edit_course_link")).to be_empty
-        expect(html.css("#tab-users")).to be_empty
-        expect(html.css("#tab-navigation")).to be_empty
+        expect(html.css("#tab-users-mount")).to be_empty
+        expect(html.css("#tab-navigation-mount")).to be_empty
 
         @course.enroll_teacher(@admin).accept!
         @admin.reload
@@ -689,7 +689,7 @@ describe "security" do
         expect(response).to be_successful
         html = Nokogiri::HTML5(response.body)
         expect(html.css("#course_form")).not_to be_empty
-        expect(html.css("#tab-navigation")).not_to be_empty
+        expect(html.css("#tab-navigation-mount")).not_to be_empty
       end
 
       it "read_roster" do
@@ -706,7 +706,7 @@ describe "security" do
         expect(response).to be_successful
         expect(response.body).not_to match(/People/)
         html = Nokogiri::HTML5(response.body)
-        expect(html.css("#tab-users")).to be_empty
+        expect(html.css("#tab-users-mount")).to be_empty
 
         add_permission :read_roster
 
