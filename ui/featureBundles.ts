@@ -175,7 +175,6 @@ const featureBundles: {
   profile_show: () => import('./features/profile_show/index'),
   profile: () => import('./features/profile/index'),
   progress_pill: () => import('./features/progress_pill/index'),
-  qr_mobile_login: () => import('./features/qr_mobile_login/index'),
   question_bank: () => import('./features/question_bank/index'),
   question_banks: () => import('./features/question_banks/index'),
   quiz_history: () => import('./features/quiz_history/index'),
