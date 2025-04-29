@@ -19,7 +19,7 @@
 import {Portal} from '@instructure/ui-portal'
 import React from 'react'
 import SectionList from './SectionList'
-import {useQuery} from '@tanstack/react-query'
+import {QueryFunctionContext, useQuery} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ePortfolioSection} from './types'
 import {Spinner} from '@instructure/ui-spinner'
@@ -45,12 +45,15 @@ const fetchSections = async (portfolio_id: number): Promise<ePortfolioSection[]>
   return json!
 }
 
+const queryFn = ({queryKey}: QueryFunctionContext<[string, number]>) => {
+  const [, portfolioId] = queryKey
+  return fetchSections(portfolioId)
+}
+
 export default function SectionContainer(props: Props) {
   const {data, isLoading, isError, refetch} = useQuery({
     queryKey: ['portfolioSectionList', props.portfolio.id],
-    queryFn: () => {
-      return fetchSections(props.portfolio.id)
-    },
+    queryFn,
   })
 
   const renderSectionList = () => {

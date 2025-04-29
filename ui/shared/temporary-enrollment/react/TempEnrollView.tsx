@@ -141,7 +141,13 @@ export function TempEnrollView(props: Props) {
 
   const isRecipient = props.enrollmentType === RECIPIENT
   const {isFetching, error, data} = useQuery({
-    queryKey: ['enrollments', props.user.id, isRecipient, currentBookmark],
+    queryKey: [
+      'enrollments',
+      props.user.id,
+      isRecipient,
+      currentBookmark,
+      allBookmarks[currentBookmark].page,
+    ],
     queryFn: () =>
       fetchAndUpdateBookmarks(props.user.id, isRecipient, allBookmarks[currentBookmark].page),
     staleTime: 10_000,

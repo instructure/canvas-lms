@@ -47,10 +47,12 @@ const fetchRootAccount = async (id: string): Promise<AccountWithCounts> => {
   return json as AccountWithCounts
 }
 
+const queryFn = ({queryKey}: {queryKey: string[]}) => fetchRootAccount(queryKey[1])
+
 export default function SubaccountRoute(props: Props) {
   const {data, isLoading, error} = useQuery({
     queryKey: ['account', props.rootAccountId],
-    queryFn: () => fetchRootAccount(props.rootAccountId),
+    queryFn,
   })
 
   const renderTree = () => {

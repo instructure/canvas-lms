@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {type ePortfolio, ePortfolioPage, ePortfolioSection} from './types'
-import {useQuery} from '@tanstack/react-query'
+import {useQuery, type QueryFunction} from '@tanstack/react-query'
 import {Alert} from '@instructure/ui-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PageList from './PageList'
@@ -34,6 +34,8 @@ interface Props {
   readonly onUpdate: (json: ePortfolioPage) => void
 }
 
+type SectionQueryKey = readonly [string, number, number]
+
 const fetchSection = async (portfolioId: number, sectionId: number): Promise<ePortfolioSection> => {
   const section = await doFetchApi<ePortfolioSection>({
     path: `/eportfolios/${portfolioId}/categories/${sectionId}`,
@@ -41,10 +43,20 @@ const fetchSection = async (portfolioId: number, sectionId: number): Promise<ePo
   return section.json!
 }
 
+const queryFn: QueryFunction<ePortfolioSection, SectionQueryKey> = ({queryKey}) => {
+  const [, portfolioId, sectionId] = queryKey
+  return fetchSection(portfolioId, sectionId)
+}
+
 export default function PageContainer(props: Props) {
-  const {data, isError, isLoading} = useQuery<ePortfolioSection>({
+  const {data, isError, isLoading} = useQuery<
+    ePortfolioSection,
+    Error,
+    ePortfolioSection,
+    SectionQueryKey
+  >({
     queryKey: ['portfolioSection', props.portfolio.id, props.sectionId],
-    queryFn: () => fetchSection(props.portfolio.id, props.sectionId),
+    queryFn,
   })
 
   if (isError) {
