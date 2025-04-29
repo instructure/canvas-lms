@@ -19,10 +19,11 @@
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {FileManagementProvider} from '../../../Contexts'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
+import {resetAndGetFilesEnv} from '../../../../../utils/filesEnvUtils'
+import {createFilesContexts} from '../../../../../fixtures/fileContexts'
 import PermissionsModal from '../PermissionsModal'
 
 jest.mock('@canvas/do-fetch-api-effect')
@@ -42,20 +43,8 @@ const renderComponent = (props?: any) =>
 
 describe('PermissionsModal', () => {
   beforeAll(() => {
-    filesEnv.contexts = [
-      {
-        contextType: 'courses',
-        contextId: '2',
-        root_folder_id: '1',
-        asset_string: 'course_2',
-        permissions: {},
-        name: 'Course 2',
-        usage_rights_required: false,
-      },
-    ]
-    filesEnv.contextsDictionary = {
-      courses_2: filesEnv.contexts[0],
-    }
+    const filesContexts = createFilesContexts()
+    resetAndGetFilesEnv(filesContexts)
   })
 
   afterEach(() => {
@@ -348,20 +337,10 @@ describe('PermissionsModal', () => {
   })
 
   it('with alert after trying to save', async () => {
-    filesEnv.contexts = [
-      {
-        contextType: 'courses',
-        contextId: '2',
-        root_folder_id: '1',
-        asset_string: 'course_2',
-        permissions: {},
-        name: 'Course 2',
-        usage_rights_required: true,
-      },
-    ]
-    filesEnv.contextsDictionary = {
-      courses_2: filesEnv.contexts[0],
-    }
+    const usageFilesContexts = createFilesContexts({
+      usageRightsRequired: true,
+    })
+    resetAndGetFilesEnv(usageFilesContexts)
 
     renderComponent()
     await userEvent.click(screen.getByTestId('permissions-save-button'))

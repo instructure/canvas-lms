@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 import {Table} from '@instructure/ui-table'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import FilesHeader from '../FilesHeader/FilesHeader'
@@ -36,7 +36,7 @@ interface AllMyFilesTableProps {
 
 const AllMyFilesTable = ({size}: AllMyFilesTableProps) => {
   const [sortDir, setSortDir] = useState<'ascending' | 'descending' | 'none'>('none')
-  const contexts = filesEnv.contexts
+  const contexts = getFilesEnv().contexts
 
   const handleRequestSort = () => {
     const newSortDir = sortDir === 'ascending' ? 'descending' : 'ascending'

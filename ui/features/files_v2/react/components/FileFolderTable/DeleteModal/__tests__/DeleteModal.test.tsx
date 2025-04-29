@@ -18,12 +18,12 @@
 
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {FileManagementProvider} from '../../../Contexts'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
 import {DeleteModal} from '../DeleteModal'
-import {setupFilesEnv} from '../../../../../fixtures/fakeFilesEnv'
+import {resetAndGetFilesEnv} from '../../../../../utils/filesEnvUtils'
+import {createFilesContexts} from '../../../../../fixtures/fileContexts'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(),
@@ -47,7 +47,8 @@ const renderComponent = (props?: any) =>
 
 describe('DeleteModal', () => {
   beforeAll(() => {
-    setupFilesEnv()
+    const filesContexts = createFilesContexts()
+    resetAndGetFilesEnv(filesContexts)
   })
 
   afterEach(() => {

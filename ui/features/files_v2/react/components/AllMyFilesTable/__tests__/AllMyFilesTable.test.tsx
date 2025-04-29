@@ -19,8 +19,8 @@
 import React from 'react'
 import AllMyFilesTable from '../AllMyFilesTable'
 import {render, screen} from '@testing-library/react'
-import {setupFilesEnv} from '../../../../fixtures/fakeFilesEnv'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {resetAndGetFilesEnv} from '../../../../utils/filesEnvUtils'
+import {createFilesContexts} from '../../../../fixtures/fileContexts'
 import {BrowserRouter} from 'react-router-dom'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
@@ -44,7 +44,10 @@ describe('AllMyFilesTable', () => {
   let flashElements: any
 
   beforeAll(() => {
-    setupFilesEnv(true)
+    const filesContexts = createFilesContexts({
+      isMultipleContexts: true,
+    })
+    resetAndGetFilesEnv(filesContexts)
     window.ENV.context_asset_string = 'courses_1'
   })
 
@@ -62,8 +65,8 @@ describe('AllMyFilesTable', () => {
 
   it('renders each context', () => {
     renderComponent()
-    const firstRow = screen.getByText(filesEnv.contexts[0].name)
-    const secondRow = screen.getByText(filesEnv.contexts[1].name)
+    const firstRow = screen.getByText('My Files')
+    const secondRow = screen.getByText('Course 1')
     expect(firstRow).toBeInTheDocument()
     expect(secondRow).toBeInTheDocument()
   })

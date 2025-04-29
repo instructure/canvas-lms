@@ -27,7 +27,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {getFilesEnv} from '../../../../utils/filesEnvUtils'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import {useFileManagement} from '../../Contexts'
 import FileFolderInfo from '../../shared/FileFolderInfo'
@@ -306,7 +306,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
       )
     }
 
-    const context = filesEnv.contextFor({
+    const context = getFilesEnv().contextFor({
       contextType,
       contextId,
     })

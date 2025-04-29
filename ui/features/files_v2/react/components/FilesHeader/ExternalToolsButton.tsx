@@ -28,7 +28,7 @@ import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useFileManagement} from '../Contexts'
-import {type Tool} from '@canvas/files_v2/react/modules/filesEnv.types'
+import {type Tool} from '@canvas/files_v2/react/modules/filesEnvFactory.types'
 
 const I18n = createI18nScope('files_v2')
 
@@ -49,10 +49,7 @@ const ExternalToolsButton = ({buttonDisplay, size}: ExternalToolsButtonProps) =>
 
   const renderMobileButton = () => {
     return (
-      <Button
-        display={buttonDisplay}
-        data-testid="lti-index-button"
-      >
+      <Button display={buttonDisplay} data-testid="lti-index-button">
         <View as="span" margin="0 x-small 0 0">
           {I18n.t('More')}
         </View>
