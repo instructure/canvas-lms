@@ -33,10 +33,23 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const I18n = createI18nScope('MasteryScale')
 
-const MasteryScale = ({onNotifyPendingChanges}) => {
-  const {contextType, contextId} = useCanvasContext()
+const queryFn = ({pageParam, queryKey}) => {
+  const [_key, contextType, contextId] = queryKey
   const query =
     contextType === 'Course' ? COURSE_OUTCOME_PROFICIENCY_QUERY : ACCOUNT_OUTCOME_PROFICIENCY_QUERY
+  return executeQuery(query, {
+    contextId,
+    proficiencyRatingsCursor: pageParam,
+  })
+}
+
+const getNextPageParam = lastPage => {
+  const pageInfo = lastPage?.context.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
+  return pageInfo?.hasNextPage ? pageInfo.endCursor : null
+}
+
+const MasteryScale = ({onNotifyPendingChanges}) => {
+  const {contextType, contextId} = useCanvasContext()
 
   const {
     data,
@@ -46,21 +59,11 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
   } = useAllPages({
     queryKey: [
       contextType === 'Course' ? 'courseProficiencyRatings' : 'accountProficiencyRatings',
+      contextType,
       contextId,
     ],
-    queryFn: ({pageParam}) => {
-      return executeQuery(query, {
-        contextId,
-        proficiencyRatingsCursor: pageParam,
-      })
-    },
-    getNextPageParam: lastPage => {
-      const pageInfo = lastPage?.context.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
-      return pageInfo?.hasNextPage ? pageInfo.endCursor : null
-    },
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    queryFn,
+    getNextPageParam,
   })
 
   const [updateProficiencyRatingsError, setUpdateProficiencyRatingsError] = useState(null)
