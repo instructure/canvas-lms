@@ -17,7 +17,7 @@
  */
 
 import {type Folder} from '../interfaces/File'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {getFilesEnv} from './filesEnvUtils'
 
 export const generateUrlPath = (folder: Folder) => {
   const EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^/]+\/?/
@@ -32,7 +32,7 @@ export const generateUrlPath = (folder: Folder) => {
   }
 
   let relativePath = getRelativePath(folder.full_name)
-  if (filesEnv.showingAllContexts) {
+  if (getFilesEnv().showingAllContexts) {
     const pluralAssetString = folder.context_type
       ? `${folder.context_type.toLowerCase()}s_${folder.context_id}`
       : ''

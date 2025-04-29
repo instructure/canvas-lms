@@ -29,6 +29,7 @@ import {generateUrlPath} from '../../../utils/folderUtils'
 import {generatePreviewUrlPath} from '../../../utils/fileUtils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {windowPathname} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('files_v2')
 interface NameLinkProps {
@@ -57,7 +58,7 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
       setIsModalOpen(true)
       const searchParams = new URLSearchParams(location.search)
       searchParams.set('preview', item.id.toString())
-      const newPath = `${window.location.pathname}?${searchParams.toString()}`
+      const newPath = `${windowPathname()}?${searchParams.toString()}`
       window.history.pushState(null, '', newPath)
     } else if (item.locked_for_user) {
       e.preventDefault()
@@ -73,7 +74,7 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
     setIsModalOpen(false)
     const searchParams = new URLSearchParams(location.search)
     searchParams.delete('preview')
-    const newPath = `${window.location.pathname}${searchParams.toString() ? '?' : ''}${searchParams.toString()}`
+    const newPath = `${windowPathname()}${searchParams.toString() ? '?' : ''}${searchParams.toString()}`
     window.history.pushState(null, '', newPath)
   }
 

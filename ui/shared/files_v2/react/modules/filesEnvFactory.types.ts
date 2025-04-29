@@ -43,3 +43,14 @@ export interface FileContext {
   file_index_menu_tools?: Tool[]
   file_menu_tools?: Tool[]
 }
+
+export interface FilesEnv {
+  showingAllContexts: boolean
+  contexts: FileContext[]
+  contextsDictionary: Record<string, FileContext>
+  contextType: string
+  contextId: string
+  baseUrl: string
+  contextFor(folder: {contextType: string; contextId: string}): FileContext | undefined
+  userHasPermission(folder: {contextType: string; contextId: string}, action: string): boolean
+}

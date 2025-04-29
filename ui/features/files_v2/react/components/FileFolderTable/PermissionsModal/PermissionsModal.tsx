@@ -21,7 +21,7 @@ import {queryClient} from '@canvas/query'
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {getFilesEnv} from '../../../../utils/filesEnvUtils'
 import {Modal} from '@instructure/ui-modal'
 import {type File, type Folder} from '../../../../interfaces/File'
 import {isFile} from '../../../../utils/fileFolderUtils'
@@ -164,7 +164,7 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
     }
 
     const usageRightsRequiredForContext =
-      filesEnv.contextFor({contextId, contextType})?.usage_rights_required || false
+      getFilesEnv().contextFor({contextId, contextType})?.usage_rights_required || false
     const hasItemsWithoutUsageRights = items.some(item =>
       isFile(item) ? !item.usage_rights : false,
     )

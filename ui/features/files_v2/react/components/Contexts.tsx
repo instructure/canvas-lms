@@ -19,7 +19,7 @@
 import {createContext, useContext} from 'react'
 import {BBFolderWrapper} from 'features/files_v2/utils/fileFolderWrappers'
 import {type Folder} from 'features/files_v2/interfaces/File'
-import {type Tool} from '@canvas/files_v2/react/modules/filesEnv.types'
+import {type Tool} from '@canvas/files_v2/react/modules/filesEnvFactory.types'
 export interface FileManagementContextProps {
   folderId: string
   contextType: string

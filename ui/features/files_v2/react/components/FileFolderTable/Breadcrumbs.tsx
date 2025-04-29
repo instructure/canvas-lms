@@ -21,7 +21,7 @@ import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Folder} from '../../../interfaces/File'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateUrlPath} from '../../../utils/folderUtils'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 import {Link as RouterLink} from 'react-router-dom'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
@@ -108,7 +108,7 @@ const ResponsiveBreadcrumbs = ({folders, size, search}: ResponsiveBreadcrumbsPro
 
     let name
     if (!folder.parent_folder_id) {
-      const context = filesEnv.contextFor({
+      const context = getFilesEnv().contextFor({
         contextType: folderContextType,
         contextId: folderContextId,
       })

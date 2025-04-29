@@ -18,16 +18,23 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import {setupFilesEnv} from '../../../../fixtures/fakeFilesEnv'
+import {resetAndGetFilesEnv} from '../../../../utils/filesEnvUtils'
+import {createFilesContexts} from '../../../../fixtures/fileContexts'
+import {windowPathname} from '@canvas/util/globalUtils'
 import Breadcrumbs from '../Breadcrumbs'
 import {FileManagementProvider, FileManagementContextProps} from '../../Contexts'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  ...jest.requireActual('@canvas/util/globalUtils'),
+  windowPathname: jest.fn(),
+}))
 
 const rootCourseFolder = {
   id: 1,
   name: 'course files',
   full_name: 'course files',
-  context_id: '1',
+  context_id: '2',
   context_type: 'course',
   parent_folder_id: null,
   created_at: '',
@@ -51,7 +58,7 @@ const childCourseFolder = {
   id: 2,
   name: 'Documents',
   full_name: 'course files/Documents',
-  context_id: '1',
+  context_id: '2',
   context_type: 'course',
   parent_folder_id: '1',
   created_at: '',
@@ -75,7 +82,7 @@ const child2CourseFolder = {
   id: 3,
   name: 'PDFs',
   full_name: 'course files/Documents/PDFs',
-  context_id: '1',
+  context_id: '2',
   context_type: 'course',
   parent_folder_id: '2',
   created_at: '',
@@ -103,7 +110,7 @@ const defaultProps = {
 
 const renderComponent = (props = {}, context: Partial<FileManagementContextProps> = {}) => {
   const defaultContext = {
-    contextId: '1',
+    contextId: '2',
   }
 
   return render(
@@ -121,7 +128,13 @@ jest.mock('react-router-dom', () => ({
 
 describe('Breadcrumbs', () => {
   beforeEach(() => {
-    setupFilesEnv(false)
+    ;(windowPathname as jest.Mock).mockReturnValue('/')
+    const filesContexts = createFilesContexts()
+    resetAndGetFilesEnv(filesContexts)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   describe('with small size', () => {
@@ -139,11 +152,15 @@ describe('Breadcrumbs', () => {
     })
 
     it('renders for all contexts', () => {
-      setupFilesEnv(true)
+      ;(windowPathname as jest.Mock).mockReturnValue('/files/')
+      const multipleFilesContexts = createFilesContexts({
+        isMultipleContexts: true,
+      })
+      resetAndGetFilesEnv(multipleFilesContexts)
       renderComponent({}, {showingAllContexts: true})
       expect(screen.getByText('Documents').closest('a')).toHaveAttribute(
         'href',
-        '/folder/courses_1/Documents',
+        '/folder/courses_2/Documents',
       )
     })
   })
@@ -165,16 +182,20 @@ describe('Breadcrumbs', () => {
     })
 
     it('renders for all contexts', () => {
-      setupFilesEnv(true)
+      ;(windowPathname as jest.Mock).mockReturnValue('/files/courses_2/')
+      const multipleFilesContexts = createFilesContexts({
+        isMultipleContexts: true,
+      })
+      resetAndGetFilesEnv(multipleFilesContexts)
       renderComponent({}, {showingAllContexts: true})
       expect(screen.getByText('All My Files').closest('a')).toHaveAttribute('href', '/')
       expect(screen.getByText('Course 1').closest('a')).toHaveAttribute(
         'href',
-        '/folder/courses_1/',
+        '/folder/courses_2/',
       )
       expect(screen.getByText('Documents').closest('a')).toHaveAttribute(
         'href',
-        '/folder/courses_1/Documents',
+        '/folder/courses_2/Documents',
       )
       expect(screen.getByText('PDFs')).toBeInTheDocument()
     })

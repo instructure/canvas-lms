@@ -24,8 +24,7 @@ import {canvas} from '@instructure/ui-themes'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
-
+import {getFilesEnv} from '../../utils/filesEnvUtils'
 import {FileManagementProvider} from './Contexts'
 import FileFolderTable from './FileFolderTable'
 import FilesUsageBar from './FilesUsageBar'
@@ -51,11 +50,11 @@ interface FilesAppProps {
 }
 
 const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
+  const filesEnv = getFilesEnv()
   const showingAllContexts = filesEnv.showingAllContexts
 
   const [paginationAlert, setPaginationAlert] = useState<string>('')
   const currentFolderWrapper = useRef<BBFolderWrapper | null>(null)
-
   const currentFolder = folders[folders.length - 1]
   const folderId = currentFolder.id.toString()
   const contextId = currentFolder.context_id
@@ -214,7 +213,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
 }
 
 const ResponsiveFilesApp = () => {
-  const isUserContext = filesEnv.showingAllContexts
+  const isUserContext = getFilesEnv().showingAllContexts
   const {data: folders, error} = useGetFolders()
 
   useEffect(() => {
