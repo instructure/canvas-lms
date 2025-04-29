@@ -211,7 +211,16 @@ $contentBoxPadding: 8px;
 $ic-line-height: 1.5;
 
 $ic-font-family: "Lato Extended", "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+@if $use_dyslexic_font {
+  $ic-font-family: OpenDyslexic, "Lato Extended", "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 $ic-font-family-monospace: Monaco, Menlo, Consolas, "Courier New", monospace;
+
+@if $use_dyslexic_font {
+  $ic-font-family-monospace: OpenDyslexicMono, Monaco, Menlo, Consolas, "Courier New", monospace;
+}
 
 $ic-font-weight: bold; // we can phase this var out now we're on Lato
 
@@ -236,6 +245,11 @@ $ic-content-background-color: $ic-color-light;
 $ic-content-padding: 15px;
 $ic-header-background: #34444f;
 $ic-header-primary-width: 84px;
+
+@if $use_dyslexic_font {
+  $ic-header-primary-width: 104px;
+}
+
 $ic-header-primary-expanded-width: $ic-sp*15;
 $ic-right-side-width: $ic-sp*24;
 $ic-breadcrumbs-height: 4.5rem;

@@ -1936,6 +1936,10 @@ class User < ActiveRecord::Base
     !!feature_enabled?(:high_contrast)
   end
 
+  def prefers_dyslexic_font?
+    !!feature_enabled?(:use_dyslexic_font)
+  end
+
   def auto_show_cc?
     !!feature_enabled?(:auto_show_cc)
   end

@@ -266,6 +266,7 @@ class ApplicationController < ActionController::Base
           help_link_name:,
           help_link_icon:,
           use_high_contrast: @current_user&.prefers_high_contrast?,
+          use_dyslexic_font: @current_user&.prefers_dyslexic_font?,
           auto_show_cc: @current_user&.auto_show_cc?,
           disable_celebrations: @current_user&.prefers_no_celebrations?,
           disable_keyboard_shortcuts: @current_user&.prefers_no_keyboard_shortcuts?,
