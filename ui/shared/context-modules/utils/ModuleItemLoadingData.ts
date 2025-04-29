@@ -43,7 +43,7 @@ class ModuleItemLoadingData {
   }
 
   getModuleRoot(moduleId: ModuleId): Root | undefined {
-    const moduleData = {...this.getModuleData(moduleId)}
+    const moduleData = this.getModuleData(moduleId)
     if (moduleData.root) {
       return moduleData.root
     }
@@ -53,20 +53,22 @@ class ModuleItemLoadingData {
       return undefined
     }
 
-    const pagingDiv = document.createElement('div')
-    pagingDiv.className = 'item-paging'
-    moduleItemContainer.insertAdjacentElement('beforeend', pagingDiv)
+    let pagingDiv = moduleItemContainer.querySelector(`.item-paging`)
+    if (!pagingDiv) {
+      pagingDiv = document.createElement('div')
+      pagingDiv.id = `context_module_${moduleId}_paging`
+      pagingDiv.className = 'item-paging'
+      moduleItemContainer.insertAdjacentElement('beforeend', pagingDiv)
+    }
     moduleData.root = createRoot(pagingDiv)
-    this.modules[moduleId] = moduleData
     return moduleData.root
   }
 
   unmountModuleRoot(moduleId: ModuleId): void {
-    const moduleData = {...this.getModuleData(moduleId)}
+    const moduleData = this.getModuleData(moduleId)
     if (moduleData.root) {
       moduleData.root.unmount()
       moduleData.root = undefined
-      this.modules[moduleId] = moduleData
     }
   }
 }

@@ -42,6 +42,18 @@ describe('ModuleItemLoadingData', () => {
       expect(root).toBeDefined()
       expect(root).toHaveProperty('render')
     })
+
+    it('should always return the same root when asked', () => {
+      const moduleItemContainer = document.createElement('div')
+      moduleItemContainer.id = `context_module_content_${moduleId}`
+      document.body.appendChild(moduleItemContainer)
+
+      const root = modules.getModuleRoot(moduleId)
+      expect(root).toBeDefined()
+
+      const root2 = modules.getModuleRoot(moduleId)
+      expect(root2).toBe(root)
+    })
   })
 
   describe('unmountModuleRoot', () => {

@@ -82,6 +82,7 @@ import {addModuleElement} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ModuleItemsLazyLoader} from '../utils/ModuleItemsLazyLoader'
+import {addShowAllOrLess} from '../utils/showAllOrLess'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -590,7 +591,7 @@ window.modules = (function () {
       return $item
     },
 
-    lazyLoadItems(moduleIds) {
+    lazyLoadItems(moduleIds, allPages) {
       const itemsCallback = moduleId => {
         initContextModuleItems(moduleId)
         modules.updateAssignmentData(
@@ -603,10 +604,11 @@ window.modules = (function () {
         if (ENV.horizon_course) {
           modules.updateEstimatedDurations(moduleId)
         }
+        addShowAllOrLess(moduleId)
       }
 
       const moduleItemsLazyLoader = new ModuleItemsLazyLoader(ENV.COURSE_ID, itemsCallback)
-      moduleItemsLazyLoader.fetchModuleItems(moduleIds)
+      moduleItemsLazyLoader.fetchModuleItems(moduleIds, allPages)
     },
 
     evaluateItemCyoe($item, data) {
@@ -1810,7 +1812,7 @@ modules.initModuleManagement = async function (duplicate) {
   window.dispatchEvent(new Event('module-publish-models-ready'))
 }
 
-function toggleModuleCollapse(event) {
+function toggleModuleCollapse(event, fetchAllPages) {
   event.preventDefault()
   const expandCallback = null
   const collapse = $(this).hasClass('collapse_module_link') ? '1' : '0'
@@ -1841,6 +1843,9 @@ function toggleModuleCollapse(event) {
       if (expandCallback && $.isFunction(expandCallback)) {
         expandCallback()
       }
+      if (ENV.FEATURE_MODULES_PERF) {
+        addShowAllOrLess($module.data('moduleId'))
+      }
     }
     if (show) {
       $module.find('.content').show()
@@ -1860,7 +1865,7 @@ function toggleModuleCollapse(event) {
     async data => {
       if (reload_entries) {
         if (ENV.FEATURE_MODULES_PERF) {
-          await modules.lazyLoadItems([parseInt($module.data('moduleId'), 10)])
+          await modules.lazyLoadItems([parseInt($module.data('moduleId'), 10)], fetchAllPages)
           $module.loadingImage('remove')
         } else {
           $module.loadingImage('remove')
@@ -2013,6 +2018,10 @@ function initContextModuleItems(moduleId) {
 
     renderTray(moveTrayProps, document.getElementById('not_right_side'))
   })
+
+  if (ENV.FEATURE_MODULES_PERF) {
+    addShowAllOrLess(moduleId)
+  }
 }
 
 // TODO: call this on the current page when getting a new page of items
@@ -2506,20 +2515,19 @@ function initContextModules() {
       })
     })
   }
-
-  initContextModuleItems()
 }
 
 $(() => {
+  const allModules = Array.from(document.querySelectorAll('.context_module'))
+    .map(m => parseInt(m.dataset.moduleId, 10))
+    .filter(mid => !isNaN(mid))
+
   if (ENV.FEATURE_MODULES_PERF) {
     // ENV.COLLAPSED_MODULES are those that have been collapsed by the user
     // ENV.EXPANDED_MODULES are those that have been expanded by the user
     // If the user has not manually changed a module's state, it will not appear in either list
     // This implies that if both arrays are empty, the user has done nothing and we will expand the first module
     // After that, default to collapsed and expand only those in the ENV.EXPANDED_MODULES array
-    const allModules = Array.from(document.querySelectorAll('.context_module'))
-      .map(m => parseInt(m.dataset.moduleId, 10))
-      .filter(mid => !isNaN(mid))
     if (allModules.length > 0) {
       const isInitialState = ENV.EXPANDED_MODULES.length === 0 && ENV.COLLAPSED_MODULES.length === 0
       if (isInitialState) {
@@ -2535,8 +2543,33 @@ $(() => {
       }
       modules.lazyLoadItems(ENV.EXPANDED_MODULES)
     }
+    for (const module of allModules) {
+      addShowAllOrLess(module)
+    }
+    // Handle Show All and Show Less events
+    // I don't bother with removeEventListener because the events are
+    // bound to the document and will be dealt with on page unload
+    document.addEventListener('module-expand-and-load-all', event => {
+      $(`#context_module_${event.detail.moduleId} .expand_module_link`).trigger(
+        'click',
+        event.detail.allPages,
+      )
+    })
+    document.addEventListener('module-load-all', event => {
+      modules.lazyLoadItems([event.detail.moduleId], true)
+    })
+    document.addEventListener('module-load-first-page', event => {
+      // TODO: rather than re-querying, maybe delete all items
+      //       beyond the first page and trigger
+      //       re-render of ModuleItemPaging
+      //       (but this is easier)
+      modules.lazyLoadItems([event.detail.moduleId], false)
+    })
   } else {
     if ($('#context_modules').hasClass('editable')) {
+      for (const moduleId of allModules) {
+        initContextModuleItems(moduleId)
+      }
       modules.loadMasterCourseData()
     }
   }
