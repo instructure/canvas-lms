@@ -19,8 +19,8 @@
 import React, {useState} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
-import type {Moment, MomentInput} from 'moment-timezone'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
+import type {MomentInput} from 'moment-timezone'
 import * as tz from '@instructure/moment-utils'
 import {View} from '@instructure/ui-view'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -95,12 +95,10 @@ export default function FilterNavDateModal({
       </Modal.Header>
       <Modal.Body>
         <View as="div" margin="0 0 medium 0">
-          <CanvasDateInput
+          <CanvasDateInput2
             dataTestid="start-date-input"
-            dateIsDisabled={(date: Moment) =>
-              Boolean(endDateValue && date.toISOString() > endDateValue)
-            }
-            display="block"
+            disabledDates={(isoDate: string) => Boolean(endDateValue && isoDate > endDateValue)}
+            isInline={false}
             // @ts-expect-error
             formatDate={formatDate}
             interaction="enabled"
@@ -132,12 +130,10 @@ export default function FilterNavDateModal({
         </View>
 
         <View as="div">
-          <CanvasDateInput
+          <CanvasDateInput2
             dataTestid="end-date-input"
-            dateIsDisabled={(date: Moment) =>
-              Boolean(startDateValue && date.toISOString() < startDateValue)
-            }
-            display="block"
+            disabledDates={(isoDate: string) => Boolean(startDateValue && isoDate < startDateValue)}
+            isInline={false}
             // @ts-expect-error
             formatDate={formatDate}
             interaction="enabled"
