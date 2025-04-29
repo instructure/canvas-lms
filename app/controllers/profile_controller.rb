@@ -583,8 +583,6 @@ class ProfileController < ApplicationController
     add_crumb(@user.short_name, profile_path)
     add_crumb(t("crumbs.mobile_qr_login", "QR for Mobile Login"))
 
-    js_bundle :qr_mobile_login
-
     page_has_instui_topnav
     render html: "", layout: true
   end
