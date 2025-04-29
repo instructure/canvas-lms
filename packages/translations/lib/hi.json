@@ -653,6 +653,9 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "खींचें और छोड़ें, या अपने कंप्यूटर को ब्राउज़ करने के लिए क्लिक करें"
     },
+    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+        "message": "हैंडल खींचें। आकार बदलने के लिए ऊपर और नीचे तीरों का उपयोग करें"
+    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "नियत: एकाधिक तिथियां"
     },
@@ -1969,6 +1972,9 @@
     },
     "reset_95a81614": {
         "message": "रीसेट करें"
+    },
+    "resize_ec83d538": {
+        "message": "साइज़ बदलें"
     },
     "response_copied_to_clipboard_130d66cd": {
         "message": "प्रतिक्रिया की प्रति क्लिपबोर्ड पर बनाई गई"
