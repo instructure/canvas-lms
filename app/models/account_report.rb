@@ -141,7 +141,30 @@ class AccountReport < ActiveRecord::Base
 
   def self.available_reports
     # check if there is a reports plugin for this account
-    AccountReports.available_reports
+    RequestCache.cache("available_reports", PluginSetting.current_account) do
+      AccountReports.available_reports
+    end
+  end
+
+  def self.last_complete_reports(account: PluginSetting.current_account)
+    account.shard.activate do
+      scope = account.account_reports.active.complete.where("report_type=name").most_recent
+      AccountReport.from("unnest('{#{available_reports.keys.join(",")}}'::text[]) report_types (name),
+                LATERAL (#{scope.to_sql}) account_reports ")
+                   .order("report_types.name")
+                   .preload(:attachment)
+                   .index_by(&:report_type)
+    end
+  end
+
+  def self.last_reports(account: PluginSetting.current_account)
+    account.shard.activate do
+      scope = account.account_reports.active.where("report_type=name").most_recent
+      AccountReport.from("unnest('{#{available_reports.keys.join(",")}}'::text[]) report_types (name),
+                LATERAL (#{scope.to_sql}) account_reports ")
+                   .order("report_types.name")
+                   .index_by(&:report_type)
+    end
   end
 
   def abort_incomplete_runners_if_needed
