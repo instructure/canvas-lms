@@ -179,7 +179,6 @@ describe "teacher k5 course dashboard" do
   context "course color selection" do
     it "allows for available color to be selected", :ignore_js_errors, custom_timeout: 30 do
       get "/courses/#{@subject_course.id}/settings"
-      visit_course_details_tab
 
       click_pink_color_button
 
@@ -192,7 +191,6 @@ describe "teacher k5 course dashboard" do
 
     it "allows for hex color to be input", :ignore_js_errors do
       get "/courses/#{@subject_course.id}/settings"
-      visit_course_details_tab
 
       new_color = "#07AB99"
       input_color_hex_value(new_color)

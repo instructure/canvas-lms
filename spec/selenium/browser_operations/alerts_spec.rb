@@ -30,7 +30,7 @@ describe "Alerts" do
         repetition: 1
       )
       get page_url
-      f("#tab-alerts-link").click
+      f("#tab-alerts").click
 
       alerts = f("[data-testid='alerts']")
       expect(alerts).to include_text("A teacher has not interacted with the student for #{alert.criteria[0].threshold.to_i} days.")
@@ -43,7 +43,7 @@ describe "Alerts" do
 
     it "should be able to create a new alert" do
       get page_url
-      f("#tab-alerts-link").click
+      f("#tab-alerts").click
       f("[aria-label='Create new alert']").click
 
       tray = f("[aria-label='New Alert']")
@@ -72,7 +72,7 @@ describe "Alerts" do
         repetition: 1
       )
       get page_url
-      f("#tab-alerts-link").click
+      f("#tab-alerts").click
 
       alerts = f("[data-testid='alerts']")
       alerts.find_element(:css, "[aria-label='Delete alert button']").click
@@ -87,7 +87,7 @@ describe "Alerts" do
         repetition: 1
       )
       get page_url
-      f("#tab-alerts-link").click
+      f("#tab-alerts").click
 
       alerts = f("[data-testid='alerts']")
       alerts.find_element(:css, "[aria-label='Edit alert button']").click
@@ -112,7 +112,7 @@ describe "Alerts" do
 
     it "should show validation errors if the form invalid" do
       get page_url
-      f("#tab-alerts-link").click
+      f("#tab-alerts").click
       f("[aria-label='Create new alert']").click
 
       tray = f("[aria-label='New Alert']")
@@ -140,7 +140,7 @@ describe "Alerts" do
       custom_role = custom_account_role("Custom role", account: @context)
       alert = @alerts.create!(recipients: [{ role_id: custom_role.id }, :student], criteria: [{ criterion_type: "Interaction", threshold: 7 }])
       get page_url
-      f("#tab-alerts-link").click
+      f("#tab-alerts").click
 
       alerts = f("[data-testid='alerts']")
       expect(alerts).to include_text(custom_role.name)

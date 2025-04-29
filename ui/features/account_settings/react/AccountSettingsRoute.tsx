@@ -35,7 +35,7 @@ type PortalMount = {
 
 // notifications tab
 function notificationsTab(portals: PortalMount[], accountId?: string): void {
-  const mountPoint = document.getElementById('tab-notifications')
+  const mountPoint = document.getElementById('tab-notifications-mount')
   if (!mountPoint) return
   const data = JSON.parse(mountPoint.dataset.values ?? '{}')
   portals.push({
@@ -74,7 +74,7 @@ function quizIPFilters(portals: PortalMount[]): void {
 
 // Feature Flags tab
 function featureFlagsTab(portals: PortalMount[]): void {
-  const mountPoint = document.getElementById('tab-features')
+  const mountPoint = document.getElementById('tab-features-mount')
   if (!mountPoint) return
   portals.push({
     mountPoint,

@@ -535,8 +535,7 @@ describe "accounts/settings" do
         render
         expect(@controller.js_env).to include :ACCOUNT
         expect(@controller.js_env[:ACCOUNT]).to include "default_storage_quota_mb"
-        expect(response).to have_tag "#tab-quotas-link"
-        expect(response).to have_tag "#tab-quotas"
+        expect(response).to have_tag "#tab-quotas-mount"
       end
     end
 
@@ -551,8 +550,8 @@ describe "accounts/settings" do
         render
         expect(@controller.js_env).to include :ACCOUNT
         expect(@controller.js_env[:ACCOUNT]).not_to include "default_storage_quota_mb"
-        expect(response).not_to have_tag "#tab-quotas-link"
-        expect(response).not_to have_tag "#tab-quotas"
+        expect(response).not_to have_tag "#tab-quotas-selected"
+        expect(response).not_to have_tag "#tab-quotas-mount"
       end
     end
   end
@@ -568,22 +567,22 @@ describe "accounts/settings" do
     end
 
     context "with :read_reports" do
-      it "shows reports tab link" do
+      it "shows reports tab content" do
         admin = account_admin_user
         view_context(@account, admin)
         assign(:current_user, admin)
         render
-        expect(response).to have_tag "#tab-reports-link"
+        expect(response).to have_tag "#tab-reports-mount"
       end
     end
 
     context "without :read_reports" do
-      it "does not show reports tab link" do
+      it "does not show reports tab content" do
         admin = account_admin_user_with_role_changes(account: @account, role_changes: { "read_reports" => false })
         view_context(@account, admin)
         assign(:current_user, admin)
         render
-        expect(response).not_to have_tag "#tab-reports-link"
+        expect(response).not_to have_tag "#tab-reports-mount"
       end
     end
   end
@@ -813,7 +812,7 @@ describe "accounts/settings" do
 
       it "does not render" do
         render
-        expect(response).not_to have_tag "#tab-internal-settings"
+        expect(response).not_to have_tag "#tab-internal-settings-mount"
       end
     end
 
@@ -827,7 +826,7 @@ describe "accounts/settings" do
 
       it "renders" do
         render
-        expect(response).to have_tag "#tab-internal-settings"
+        expect(response).to have_tag "#tab-internal-settings-mount"
       end
     end
   end

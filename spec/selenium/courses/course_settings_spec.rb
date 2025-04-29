@@ -96,9 +96,9 @@ describe "course settings" do
 
     it "hides most tabs if set" do
       get "/courses/#{@course.id}/settings"
-      expect(ff("#course_details_tabs > ul li").length).to eq 2
-      expect(f("#course_details_tab")).to be_displayed
-      expect(f("#sections_tab")).to be_displayed
+      expect(ff("[role='tab']").length).to eq 2
+      expect(f("#tab-details-selected")).to be_displayed
+      expect(f("#tab-sections")).to be_displayed
     end
 
     it "shows synced subjects" do
@@ -125,7 +125,7 @@ describe "course settings" do
 
       it "displays the course settings tab" do
         get "/courses/#{course.id}/settings"
-        expect(f("#integrations_tab")).to be_displayed
+        expect(f("#tab-integrations")).to be_displayed
       end
     end
   end
@@ -346,7 +346,7 @@ describe "course settings" do
         expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
         expect(f("#course_hide_final_grades")).to be_present
         # Verify that other parts of the settings are not visilbe when they shouldn't be
-        expect(f("#tab-sections").css_value("display")).to eq "none"
+        expect(f("#sections").attribute("aria-hidden")).to eq "true"
       end
 
       it "is shown when only restrict_quantitative_data account locked setting and feature flags are ON" do
@@ -475,7 +475,10 @@ describe "course settings" do
 
         f("input[title='Term']").click
         fj("li[class*='optionItem']:contains('Course')").click
-        ff("input[id*='TextInput_']")[0].send_keys(Time.zone.now.to_s)
+        start_date = ff("input[id*='TextInput_']")[0]
+        start_date.send_keys(Time.zone.now.to_s)
+        start_date.send_keys(:tab)
+
         fj("button:contains('Update Course Details')").click
         expect(fj("span:contains('Course was successfully updated')")).to be_present
       end
@@ -485,7 +488,10 @@ describe "course settings" do
 
         f("input[title='Term']").click
         fj("li[class*='optionItem']:contains('Course')").click
-        ff("input[id*='TextInput_']")[1].send_keys(Time.zone.now.to_s)
+        end_date = ff("input[id*='TextInput_']")[1]
+        end_date.send_keys(Time.zone.now.to_s)
+        end_date.send_keys(:tab)
+
         fj("button:contains('Update Course Details')").click
         expect(fj("span:contains('Course was successfully updated')")).to be_present
       end
@@ -497,8 +503,11 @@ describe "course settings" do
 
         f("input[title='Term']").click
         fj("li[class*='optionItem']:contains('Course')").click
-        ff("input[id*='TextInput_']")[0].send_keys(current_date.to_s)
-        ff("input[id*='TextInput_']")[1].send_keys(yesterday.to_s)
+        start_date = ff("input[id*='TextInput_']")[0]
+        start_date.send_keys(current_date.to_s)
+        end_date = ff("input[id*='TextInput_']")[1]
+        end_date.send_keys(yesterday.to_s)
+        end_date.send_keys(:tab)
 
         fj("button:contains('Update Course Details')").click
         # Adding expectation for the error shown after the end field
@@ -629,9 +638,9 @@ describe "course settings" do
 
     get "/courses/#{@course.id}/settings"
 
-    ffj("#tab-details input:visible").each do |input|
-      expect(input).to be_disabled
-    end
+    inputs = ffj("#tab-details-mount input:visible")
+    expect(inputs).to all(be_disabled)
+
     expect(f("#content")).not_to contain_css(".course_form button[type='submit']")
   end
 
