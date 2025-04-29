@@ -172,8 +172,5 @@ export function useModuleItems(moduleId: string, enabled: boolean = false) {
     refetchOnReconnect: enabled,
     // Stale time of 5 minutes
     staleTime: 5 * 60 * 1000,
-    meta: {
-      broadcast: true, // Enable broadcasting for module items
-    },
   })
 }

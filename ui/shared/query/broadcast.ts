@@ -16,8 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {hashKey, useQueryClient} from '@tanstack/react-query'
 import {useEffect, useRef} from 'react'
-import {useQueryClient, hashKey} from '@tanstack/react-query'
+
+// window.BroadcastChannel =
+//   window.BroadcastChannel ||
+//   class BroadcastChannel {
+//     close() {}
+
+//     postMessage() {}
+
+//     addEventListener() {}
+
+//     removeEventListener() {}
+//   }
 
 interface UseBroadcastQueryOptions {
   /**
@@ -31,6 +43,19 @@ interface UseBroadcastQueryOptions {
    */
   broadcastChannel?: string
 }
+
+// Keep track of active channels and their subscription counts
+const activeChannels = new Map<
+  string,
+  {
+    channel: BroadcastChannel | null
+    count: number
+  }
+>()
+
+type Message =
+  | {type: 'updated'; queryHash: string; state: unknown}
+  | {type: 'removed'; queryHash: string}
 
 /**
  * Synchronizes TanStack Query cache across browser tabs for a specific query key.
@@ -70,57 +95,89 @@ export function useBroadcastQuery({
 }: UseBroadcastQueryOptions) {
   const queryClient = useQueryClient()
   const transactionRef = useRef(false)
-  const channelRef = useRef<BroadcastChannel>()
+  const lastPostTimeRef = useRef<Record<string, number>>({})
   const queryKeyHash = hashKey(queryKey)
 
   useEffect(() => {
-    const channel = new BroadcastChannel(broadcastChannel)
-    channelRef.current = channel
-
-    const qc = queryClient.getQueryCache()
     const tx = (cb: () => void) => {
       transactionRef.current = true
       cb()
       transactionRef.current = false
     }
 
+    let channelEntry = activeChannels.get(broadcastChannel)
+    if (!channelEntry) {
+      const bc =
+        typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(broadcastChannel) : null
+      channelEntry = {channel: bc, count: 0}
+      activeChannels.set(broadcastChannel, channelEntry)
+    }
+    channelEntry.count++
+    const channel = channelEntry.channel
+    const qc = queryClient.getQueryCache()
+
+    const publish = (type: 'updated' | 'removed', state?: unknown) => {
+      const now = Date.now()
+      const last = lastPostTimeRef.current[queryKeyHash] || 0
+      if (type === 'updated' && now - last < 100) return
+      lastPostTimeRef.current[queryKeyHash] = now
+
+      const msg: Message =
+        type === 'updated' && state !== undefined
+          ? {type: 'updated', queryHash: queryKeyHash, state}
+          : {type: 'removed', queryHash: queryKeyHash}
+
+      if (channel) {
+        channel.postMessage(msg)
+      }
+    }
+
     const unsubscribe = qc.subscribe(event => {
       if (transactionRef.current) return
       const {
-        query: {queryHash, queryKey: eventQueryKey, state},
+        query: {queryHash, state},
       } = event
-
       if (queryHash !== queryKeyHash) return
-
       if (event.type === 'updated' && event.action.type === 'success') {
-        channel.postMessage({type: 'updated', queryHash, queryKey: eventQueryKey, state})
+        publish('updated', structuredClone(state))
       }
       if (event.type === 'removed') {
-        channel.postMessage({type: 'removed', queryHash, queryKey: eventQueryKey})
+        publish('removed')
       }
     })
 
-    channel.onmessage = event => {
-      const action = event.data
-      if (!action?.type) return
+    const onMessage = (e: MessageEvent) => {
+      const action = e.data as Message
       if (action.queryHash !== queryKeyHash) return
-
       tx(() => {
-        const {type, queryHash, state} = action
-        const query = qc.get(queryHash)
+        const query = qc.get(action.queryHash)
         if (!query) return
-
-        if (type === 'updated') {
-          query.setState(state)
-        } else if (type === 'removed') {
+        if (action.type === 'updated') {
+          const newState = action.state as typeof query.state
+          if (newState.dataUpdatedAt > query.state.dataUpdatedAt) {
+            query.setState(newState)
+          }
+        } else if (action.type === 'removed') {
           qc.remove(query)
         }
       })
     }
 
+    if (channel) {
+      channel.addEventListener('message', onMessage)
+    }
+
     return () => {
       unsubscribe()
-      channel.close()
+      if (channel) {
+        channel.removeEventListener('message', onMessage)
+      }
+      const entry = activeChannels.get(broadcastChannel)!
+      entry.count--
+      if (entry.count === 0) {
+        entry.channel?.close()
+        activeChannels.delete(broadcastChannel)
+      }
     }
   }, [queryClient, broadcastChannel, queryKeyHash])
 }

@@ -24,6 +24,7 @@ import {getUnreadCount} from './queries/unreadCountQuery'
 import {getSetting} from '@canvas/settings-query/react/settingsQuery'
 import {useQuery} from '@tanstack/react-query'
 import {sessionStoragePersister} from '@canvas/query'
+import {useBroadcastQuery} from '@canvas/query/broadcast'
 
 const I18n = createI18nScope('Navigation')
 
@@ -58,6 +59,10 @@ export default function NavigationBadges() {
     refetchOnWindowFocus: true,
   })
 
+  useBroadcastQuery({
+    queryKey: ['unread_count', 'content_shares'],
+  })
+
   const {data: unreadConversationsCount, isSuccess: hasUnreadConversationsCount} = useQuery({
     queryKey: ['unread_count', 'conversations'],
     queryFn: getUnreadCount,
@@ -65,6 +70,10 @@ export default function NavigationBadges() {
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
     persister: sessionStoragePersister,
     refetchOnWindowFocus: true,
+  })
+
+  useBroadcastQuery({
+    queryKey: ['unread_count', 'conversations'],
   })
 
   const {data: unreadReleaseNotesCount, isSuccess: hasUnreadReleaseNotesCount} = useQuery({
