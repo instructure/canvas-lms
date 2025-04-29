@@ -66,9 +66,11 @@
         </span>
         <div class="hide_when_learning_outcome <%= range_rating_visible ? '' : 'hidden' %>">
           <div class="criterion_use_range_div editing toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
-            <label>
-              <%= t 'Range' %>
+            <label class="criterion_range_label" aria-label="<%= t 'Range' %>">
               <input type="checkbox" class="criterion_use_range" <%= 'checked' if (criterion.try(:criterion_use_range) && range_rating_enabled) %>/>
+              <span aria-hidden="true">
+                <%= t 'Range' %>
+              </span>
             </label>
           </div>
         </div>
@@ -124,8 +126,12 @@
               <div class="rating-main">
                 <% if !learning_outcome_criterion %>
                   <div class="editing links">
-                    <a href="#" class="edit_rating_link" role="button"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit rating' %></span></a>
-                    <a href="#" class="delete_rating_link"><i class="icon-trash standalone-icon" ></i><span class="screenreader-only"><%= t 'Delete rating' %></span></a>
+                    <a href="#" class="edit_rating_link" role="button" aria-label="<%= t 'Edit rating' %>">
+                      <i class="icon-edit standalone-icon" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" class="delete_rating_link" role="button" aria-label="<%= t 'Delete rating' %>" <%= "aria-hidden=true" if edge%> >
+                      <i class="icon-trash standalone-icon" aria-hidden="true"></i>
+                    </a>
                   </div>
                   <div class="clear"></div>
                 <% end %>
