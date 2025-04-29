@@ -31,6 +31,7 @@ beforeEach(() => {
   ENV.CONTEXT_BASE_URL = 'https://advantage.tool.com'
   tool = {
     name: 'test tool',
+    app_id: '1',
     tool_configuration: {
       url: 'https://advantage.tool.com',
     },
@@ -44,29 +45,17 @@ beforeEach(() => {
 })
 
 function renderComponent(modalIsOpen = false) {
-  return render(
-    <ConfigureExternalToolButton {...{tool, modalIsOpen, returnFocus, ref}} />
-  )
+  return render(<ConfigureExternalToolButton {...{tool, modalIsOpen, returnFocus, ref}} />)
 }
 
 function renderComponentOpen() {
   renderComponent(true)
 }
 
-test('uses the tool configuration "url" when present', () => {
+test('uses the tool id to launch', () => {
   renderComponentOpen()
   expect(screen.getByTitle(/Tool Configuration/i).getAttribute('src')).toContain(
-    'url=https%3A%2F%2Fadvantage.tool.com',
-  )
-})
-
-test('uses the tool configuration "target_link_uri" when "url" is not present', () => {
-  tool.tool_configuration = {
-    target_link_uri: 'https://advantage.tool.com',
-  }
-  renderComponentOpen()
-  expect(screen.getByTitle(/Tool Configuration/i).getAttribute('src')).toContain(
-    'url=https%3A%2F%2Fadvantage.tool.com',
+    '/external_tools/1',
   )
 })
 
@@ -85,8 +74,10 @@ test('shows beginning info alert and adds styles to iframe', () => {
   // so the offsetWidth is 0.
   expect(ref.current.iframeStyle()).toEqual({
     border: '2px solid #2B7ABC',
-    padding: "0px",
-    width: "100%", height: undefined, minHeight: undefined,
+    padding: '0px',
+    width: '100%',
+    height: undefined,
+    minHeight: undefined,
   })
 })
 
@@ -95,8 +86,11 @@ test('adds iframe width/height when it is in the tool configuration', () => {
   tool.tool_configuration.selection_height = 600
   renderComponentOpen()
   expect(ref.current.iframeStyle()).toEqual({
-    border: 'none', padding: "2px",
-    width: 500, height: 600, minHeight: 600,
+    border: 'none',
+    padding: '2px',
+    width: 500,
+    height: 600,
+    minHeight: 600,
   })
 })
 
@@ -107,8 +101,11 @@ test('shows ending info alert and adds styles to iframe', () => {
   // Note: The width here is normally 300px, but because these are older JS files, the CSS isn't included,
   // so the offsetWidth is 0.
   expect(ref.current.iframeStyle()).toEqual({
-    border: '2px solid #2B7ABC', padding: "0px",
-    width: '100%', height: undefined, minHeight: undefined
+    border: '2px solid #2B7ABC',
+    padding: '0px',
+    width: '100%',
+    height: undefined,
+    minHeight: undefined,
   })
 })
 
@@ -118,8 +115,11 @@ test('hides beginning info alert and adds styles to iframe', async () => {
   ref.current.handleAlertBlur({target: {className: 'before'}})
   expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
   expect(ref.current.iframeStyle()).toEqual({
-    border: 'none', padding: "2px",
-    width: '100%', height: undefined, minHeight: undefined,
+    border: 'none',
+    padding: '2px',
+    width: '100%',
+    height: undefined,
+    minHeight: undefined,
   })
 })
 
@@ -129,8 +129,11 @@ test('hides ending info alert and adds styles to iframe', () => {
   ref.current.handleAlertBlur({target: {className: 'after'}})
   expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
   expect(ref.current.iframeStyle()).toEqual({
-    border: 'none', padding: "2px",
-    width: '100%', height: undefined, minHeight: undefined,
+    border: 'none',
+    padding: '2px',
+    width: '100%',
+    height: undefined,
+    minHeight: undefined,
   })
 })
 
