@@ -182,6 +182,21 @@ describe('enhanced_user_content/instructure_helpers', () => {
       )
     })
 
+    it('posts a message with the canvas file location', () => {
+      const link = document.createElement('a')
+      link.href = 'http://localhost/courses/1/files/2?location=xyzzy'
+      const event = makeEvent({target: link})
+      showFilePreviewInOverlay(event, canvasOrigin)
+      expect(window.postMessage).toHaveBeenCalledWith(
+        {
+          subject: 'preview_file',
+          file_id: '2',
+          location: 'xyzzy',
+        },
+        canvasOrigin,
+      )
+    })
+
     it('posts a message with the access token and instfs_id', () => {
       const link = document.createElement('a')
       link.href = 'http://localhost/courses/1/files/2?instfs_id=stuff&access_token=xyzzy'

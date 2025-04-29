@@ -41,29 +41,29 @@ module Api::V1::MediaObject
     end
   end
 
-  def media_attachment_api_json(attachment, media_object, current_user, session, exclude = [], verifier: nil, access_token: nil, instfs_id: nil)
+  def media_attachment_api_json(attachment, media_object, current_user, session, exclude = [], verifier: nil, access_token: nil, instfs_id: nil, location: nil)
     api_json(media_object, current_user, session, API_MEDIA_OBJECT_JSON_OPTS).tap do |json|
       json["title"] = media_object.guaranteed_title
       json["can_add_captions"] = attachment.grants_right?(current_user, session, :update)
-      json["media_sources"] = media_sources_json(media_object, attachment:, verifier:, access_token:, instfs_id:) unless exclude.include?("sources")
+      json["media_sources"] = media_sources_json(media_object, attachment:, verifier:, access_token:, instfs_id:, location:) unless exclude.include?("sources")
       json["embedded_iframe_url"] = media_attachment_iframe_url(attachment.id)
       json["auto_caption_status"] = media_object.auto_caption_status
 
       unless exclude.include?("tracks")
         json["media_tracks"] = attachment.media_tracks_include_originals.map do |track|
           api_json(track, current_user, session, only: %w[kind created_at updated_at id locale inherited]).tap do |json2|
-            json2[:url] = show_media_attachment_tracks_url(attachment.id, track.id, access_token:, instfs_id:)
+            json2[:url] = show_media_attachment_tracks_url(attachment.id, track.id, access_token:, instfs_id:, location:)
           end
         end
       end
     end
   end
 
-  def media_sources_json(media_object, attachment: nil, verifier: nil, access_token: nil, instfs_id: nil)
+  def media_sources_json(media_object, attachment: nil, verifier: nil, access_token: nil, instfs_id: nil, location: nil)
     media_object.media_sources&.map do |mo|
       if Account.site_admin.feature_enabled?(:authenticated_iframe_content)
         mo[:url] = if attachment
-                     media_attachment_redirect_url(attachment.id, bitrate: mo[:bitrate], verifier:, access_token:, instfs_id:)
+                     media_attachment_redirect_url(attachment.id, bitrate: mo[:bitrate], verifier:, access_token:, instfs_id:, location:)
                    else
                      media_object_redirect_url(media_object.media_id, bitrate: mo[:bitrate])
                    end

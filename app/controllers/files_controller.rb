@@ -497,7 +497,6 @@ class FilesController < ApplicationController
   #
   def public_url
     @attachment = Attachment.find(params[:id])
-    verifier_checker = Attachments::Verification.new(@attachment)
 
     # if the attachment is part of a submisison, its 'context' will be the student that submmited the assignment.  so if  @current_user is a
     # teacher authorized_action(@attachment, @current_user, :download) will be false, we need to actually check if they have perms to see the
@@ -506,8 +505,7 @@ class FilesController < ApplicationController
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
 
-    if (@submission && authorized_action(@submission, @current_user, :read)) ||
-       ((params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, @domain_root_account, session)) || authorized_action(@attachment, @current_user, :download))
+    if (@submission && authorized_action(@submission, @current_user, :read)) || access_allowed(attachment: @attachment, user: @current_user, access_type: :download, check_submissions: false)
       render json: { public_url: @attachment.public_url(secure: request.ssl?) }
     end
   end
@@ -564,8 +562,8 @@ class FilesController < ApplicationController
     end
 
     params[:include] = Array(params[:include])
-    if access_allowed(@attachment, @current_user, :read)
-      options = { include: params[:include], verifier: params[:verifier], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) }
+    if access_allowed(attachment: @attachment, user: @current_user, access_type: :read)
+      options = { include: params[:include], location: params[:location], verifier: params[:verifier], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) }
       if params[:access_token].present? && params[:instfs_id].present?
         options[:access_token] = params[:access_token]
         options[:instfs_id] = params[:instfs_id]
@@ -696,15 +694,17 @@ class FilesController < ApplicationController
         return
       end
 
-      if access_allowed(@attachment, @current_user, :read)
+      if access_allowed(attachment: @attachment, user: @current_user, access_type: :read)
         @attachment.ensure_media_object
-        verifier_checker = Attachments::Verification.new(@attachment)
 
         if params[:download]
-          if jwt_resource_match(@attachment) ||
-             (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, @domain_root_account, session)) ||
-             @attachment.grants_right?(@current_user, session, :download) ||
-             access_via_location?(@attachment, @current_user, :download)
+          if access_allowed(
+            attachment: @attachment,
+            user: @current_user,
+            access_type: :download,
+            no_error_on_failure: true,
+            check_submissions: false
+          )
             disable_page_views if params[:preview]
             begin
               send_attachment(@attachment)
@@ -774,10 +774,13 @@ class FilesController < ApplicationController
 
         json[:attachment][:media_entry_id] = attachment.media_entry_id if attachment.media_entry_id
 
-        verifier_checker = Attachments::Verification.new(@attachment)
-        if jwt_resource_match(attachment) ||
-           (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, @domain_root_account, session)) ||
-           attachment.grants_right?(@current_user, session, :download)
+        if access_allowed(
+          attachment: @attachment,
+          user: @current_user,
+          access_type: :download,
+          no_error_on_failure: true,
+          check_submissions: false
+        )
           # Right now we assume if they ask for json data on the attachment
           # then that means they have viewed or are about to view the file in
           # some form.
@@ -1494,7 +1497,7 @@ class FilesController < ApplicationController
     @icon = Attachment.find(params[:id])
     @icon = attachment_or_replacement(@icon.context, params[:id]) if @icon.deleted? && @icon.replacement_attachment_id.present?
     return render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found if @icon.deleted?
-    return unless access_allowed(@icon, @current_user, :download)
+    return unless access_allowed(attachment: @icon, user: @current_user, access_type: :download)
 
     unless @icon.category == Attachment::ICON_MAKER_ICONS
       return render json: { errors: [{ message: "The requested attachment does not support viewing metadata." }] }, status: :bad_request
@@ -1716,28 +1719,6 @@ class FilesController < ApplicationController
     headers["Access-Control-Allow-Origin"] = request.headers["origin"]
     headers["Access-Control-Allow-Credentials"] = "true"
     headers["Access-Control-Allow-Methods"] = "GET, HEAD"
-  end
-
-  def access_allowed(attachment, user, access_type)
-    return true if jwt_resource_match(attachment) || access_via_location?(attachment, user, access_type)
-
-    if params[:verifier]
-      verifier_checker = Attachments::Verification.new(attachment)
-      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], access_type, @domain_root_account, session)
-    end
-
-    submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context).filter_map(&:context)
-    return true if submissions.any? { |submission| submission.grants_right?(user, session, access_type) }
-
-    authorized_action(attachment, user, access_type)
-  end
-
-  def access_via_location?(attachment, user, access_type)
-    if params[:location] && [:read, :download].include?(access_type)
-      return AttachmentAssociation.verify_access(params[:location], attachment.id, user, session)
-    end
-
-    false
   end
 
   def strong_attachment_params
