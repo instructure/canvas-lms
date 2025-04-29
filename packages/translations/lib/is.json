@@ -653,6 +653,9 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Dragðu og slepptu, eða smelltu til að vafra í tölvunni"
     },
+    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+        "message": "Drag handfang. Nota upp og niður örvarnar til að breyta stærð"
+    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Skil: Margar dagsetningar"
     },
@@ -1969,6 +1972,9 @@
     },
     "reset_95a81614": {
         "message": "Endurstilla"
+    },
+    "resize_ec83d538": {
+        "message": "Breyta stærð"
     },
     "response_copied_to_clipboard_130d66cd": {
         "message": "Svar afritað á klemmuspjald"

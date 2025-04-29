@@ -653,6 +653,9 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Przeciągnij i upuść lub kliknij, aby przeglądać komputer"
     },
+    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+        "message": "Przeciągnij uchwyt. Użyj strzałek w dół i w górę, aby zmienić rozmiar"
+    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Termin: Wiele dat"
     },
@@ -1969,6 +1972,9 @@
     },
     "reset_95a81614": {
         "message": "Resetuj"
+    },
+    "resize_ec83d538": {
+        "message": "Zmień rozmiar"
     },
     "response_copied_to_clipboard_130d66cd": {
         "message": "Skopiowano odpowiedź do schowka."
