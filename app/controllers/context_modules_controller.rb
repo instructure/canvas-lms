@@ -999,20 +999,25 @@ class ContextModulesController < ApplicationController
   def progressions
     if authorized_action(@context, @current_user, :read)
       if request.format == :json
+        base_modules_query = @context.context_modules.active
+        if context.account.feature_enabled?(:modules_perf) && params[:context_module_id]
+          base_modules_query = base_modules_query.where(id: params[:context_module_id])
+          return render json: [], status: :not_found if base_modules_query.empty?
+        end
         if @context.grants_right?(@current_user, session, :view_all_grades)
           if params[:user_id] && (@user = @context.students.find(params[:user_id]))
-            @progressions = @context.context_modules.active.map { |m| m.evaluate_for(@user) }
+            @progressions = base_modules_query.map { |m| m.evaluate_for(@user) }
           elsif @context.large_roster
             @progressions = []
           else
-            context_module_ids = @context.context_modules.active.pluck(:id)
+            context_module_ids = base_modules_query.pluck(:id)
             @progressions = ContextModuleProgression.where(context_module_id: context_module_ids).each(&:evaluate)
           end
         elsif @context.grants_right?(@current_user, session, :participate_as_student)
-          @progressions = @context.context_modules.active.order(:id).map { |m| m.evaluate_for(@current_user) }
+          @progressions = base_modules_query.order(:id).map { |m| m.evaluate_for(@current_user) }
         else
           # module progressions don't apply, but unlock_at still does
-          @progressions = @context.context_modules.active.order(:id).map do |m|
+          @progressions = base_modules_query.order(:id).map do |m|
             { context_module_progression: { context_module_id: m.id,
                                             workflow_state: (m.to_be_unlocked ? "locked" : "unlocked"),
                                             requirements_met: [],
