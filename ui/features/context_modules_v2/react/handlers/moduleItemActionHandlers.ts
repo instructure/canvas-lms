@@ -68,15 +68,8 @@ export const handlePublishToggle = async (
   }
 }
 
-export const handleEdit = (
-  itemId: string,
-  courseId: string,
-  setIsMenuOpen?: (isOpen: boolean) => void,
-) => {
-  window.location.href = `/courses/${courseId}/modules/items/${itemId}`
-  if (setIsMenuOpen) {
-    setIsMenuOpen(false)
-  }
+export const handleEdit = (setIsEditItemOpen: (isOpen: boolean) => void) => {
+  setIsEditItemOpen(true)
 }
 
 export const handleSpeedGrader = (

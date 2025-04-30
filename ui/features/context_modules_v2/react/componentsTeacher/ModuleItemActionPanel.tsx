@@ -45,6 +45,7 @@ import {MasteryPathsData, ModuleItemContent, ModuleAction} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import {mapContentSelection} from '../utils/utils'
 import BlueprintLockIcon from './BlueprintLockIcon'
+import EditItemModal from './EditItemModal'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -81,6 +82,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDirectShareOpen, setIsDirectShareOpen] = useState(false)
+  const [isEditItemOpen, setIsEditItemOpen] = useState(false)
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
 
   const {courseId, isMasterCourse, isChildCourse} = useContextModule()
@@ -114,8 +116,8 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }
 
   const handleEditRef = useCallback(() => {
-    handleEdit(itemId, courseId, setIsMenuOpen)
-  }, [itemId, courseId, setIsMenuOpen])
+    handleEdit(setIsEditItemOpen)
+  }, [setIsEditItemOpen])
 
   const handleSpeedGraderRef = useCallback(() => {
     handleSpeedGrader(content, courseId, setIsMenuOpen)
@@ -210,7 +212,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
           />
         </Flex.Item>
         {/* Kebab Menu */}
-        <Flex.Item>
+        <Flex.Item data-testid={`module-item-action-menu_${itemId}`}>
           <ModuleItemActionMenu
             itemType={content?.type || ''}
             canDuplicate={content?.canDuplicate || false}
@@ -260,6 +262,17 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
               setIsDirectShareCourseOpen(false)
             }}
           />
+          {content && (
+            <EditItemModal
+              isOpen={isEditItemOpen}
+              onRequestClose={() => setIsEditItemOpen(false)}
+              itemName={content?.title}
+              itemIndent={indent}
+              itemId={itemId}
+              courseId={courseId}
+              moduleId={moduleId}
+            />
+          )}
         </>
       )}
     </>

@@ -99,6 +99,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           size="small"
         />
       }
+      data-testid="module-item-action-menu"
     >
       {permissions?.canEdit && (
         <Menu.Item onClick={handleEdit}>

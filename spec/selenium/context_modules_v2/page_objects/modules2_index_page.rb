@@ -28,6 +28,26 @@ module Modules2IndexPage
   def teacher_modules_container_selector
     "[data-testid='modules-rewrite-container']"
   end
+
+  def manage_module_item_container_selector(module_item_id)
+    "#context_module_item_#{module_item_id}"
+  end
+
+  def manage_module_item_button_selector(module_item_id)
+    "[data-testid='module-item-action-menu_#{module_item_id}']"
+  end
+
+  def module_item_action_menu_selector
+    "[data-testid='module-item-action-menu']"
+  end
+
+  def module_item_action_menu_link_selector(tool_text)
+    "[role=menuitem]:contains('#{tool_text}')"
+  end
+
+  def edit_item_modal_selector
+    "[data-testid='edit-item-modal']"
+  end
   #------------------------------ Elements ------------------------------
 
   def student_modules_container
@@ -36,6 +56,26 @@ module Modules2IndexPage
 
   def teacher_modules_container
     f(teacher_modules_container_selector)
+  end
+
+  def manage_module_item_button(module_item_id)
+    f(manage_module_item_button_selector(module_item_id))
+  end
+
+  def module_item_action_menu
+    f(module_item_action_menu_selector)
+  end
+
+  def module_item_action_menu_link(tool_text)
+    fj(module_item_action_menu_link_selector(tool_text))
+  end
+
+  def edit_item_modal
+    f(edit_item_modal_selector)
+  end
+
+  def manage_module_item_container(module_item_id)
+    f(manage_module_item_container_selector(module_item_id))
   end
   #------------------------------ Actions -------------------------------
 
