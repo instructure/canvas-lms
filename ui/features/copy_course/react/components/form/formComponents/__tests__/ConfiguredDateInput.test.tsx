@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ConfiguredDateInput} from '../ConfiguredDateInput'
 import moment from 'moment-timezone'
@@ -89,7 +89,7 @@ describe('ConfiguredDateInput', () => {
       advanceTimers: jest.advanceTimersByTime,
     })
     const handleDateChange = jest.fn()
-    const {getByPlaceholderText, getByText} = render(
+    const {getByPlaceholderText} = render(
       <ConfiguredDateInput
         selectedDate={`${currentYear}-01-05T00:00:00.000Z`}
         onSelectedDateChange={handleDateChange}
@@ -101,7 +101,9 @@ describe('ConfiguredDateInput', () => {
 
     const input = getByPlaceholderText(placeholder)
     await user.click(input)
-    const jan15Button = getByText('15').closest('button')
+    await user.tab()
+    await user.keyboard('[Space]') // Open the date picker
+    const jan15Button = screen.getByText('15').closest('button')
     if (!jan15Button) {
       throw new Error('Could not find date button for jan 15')
     }

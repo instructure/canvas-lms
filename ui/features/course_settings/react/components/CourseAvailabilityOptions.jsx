@@ -25,7 +25,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Checkbox} from '@instructure/ui-checkbox'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
 import {IconWarningSolid} from '@instructure/ui-icons'
@@ -171,7 +171,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
           <Flex direction="column" display="inline-flex">
             <Flex.Item padding="xx-small 0">
               <ScreenReaderContent>{I18n.t('Course Start Date')}</ScreenReaderContent>
-              <CanvasDateInput
+              <CanvasDateInput2
                 renderLabel={I18n.t('Start')}
                 formatDate={formatDateLocal}
                 interaction={datesInteraction()}
@@ -201,7 +201,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
             </Flex.Item>
             <Flex.Item padding="xx-small 0">
               <ScreenReaderContent>{I18n.t('Course End Date')}</ScreenReaderContent>
-              <CanvasDateInput
+              <CanvasDateInput2
                 messages={endDateErrors(startDate, endDate)}
                 renderLabel={I18n.t('End')}
                 formatDate={formatDateLocal}

@@ -19,7 +19,7 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {connect} from 'react-redux'
 import {Flex} from '@instructure/ui-flex'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {coursePaceTimezone} from '../../shared/api/backend_serializer'
 import * as tz from '@instructure/moment-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -58,11 +58,12 @@ interface DispatchProps {
 
 interface DateInputWithCaptionProps {
   date: OptionalDate
+  dateColumnWidth: string
   onChangeDate: (date: string) => void
   caption: string
   renderLabel: string
   dataTestId: string
-  dateIsDisabled: (date: moment.Moment) => boolean
+  disabledDates: (isoDateToCheck: string) => boolean
 }
 
 interface NumberInputWithLabelProps {
@@ -71,6 +72,60 @@ interface NumberInputWithLabelProps {
   renderLabel: string
   unit: 'weeks' | 'days'
   dataTestId: string
+}
+
+const formatDate = (date: Date) => {
+  return tz.format(date, 'date.formats.long') || ''
+}
+
+const DateInputContainer = ({
+  children,
+  caption,
+  dateColumnWidth,
+}: {children: React.ReactNode; caption: string; dateColumnWidth: string}) => {
+  return (
+    <Flex.Item width={dateColumnWidth} padding="xxx-small 0 0 0">
+      {children}
+      <View margin="small 0 0 0" display="inline-block">
+        <Text size="small">{caption}</Text>
+      </View>
+    </Flex.Item>
+  )
+}
+
+const DateInputWithCaption = ({
+  date,
+  dateColumnWidth,
+  onChangeDate,
+  caption,
+  renderLabel,
+  dataTestId,
+  disabledDates,
+}: DateInputWithCaptionProps) => {
+  const onChange = (selectedDate: Date | null) => {
+    if (selectedDate === null) return
+    const dateValue = selectedDate.toISOString()
+    if (dateValue === date) return
+    onChangeDate(dateValue)
+  }
+
+  return (
+    <DateInputContainer caption={caption} dateColumnWidth={dateColumnWidth}>
+      <CanvasDateInput2
+        renderLabel={renderLabel}
+        timezone={coursePaceTimezone}
+        formatDate={formatDate}
+        selectedDate={date}
+        onSelectedDateChange={onChange}
+        width={dateColumnWidth}
+        isInline={false}
+        withRunningValue={true}
+        interaction={undefined}
+        dataTestid={dataTestId}
+        disabledDates={disabledDates}
+      />
+    </DateInputContainer>
+  )
 }
 
 type TimeSelectionProps = PassedProps & StoreProps & DispatchProps
@@ -92,9 +147,6 @@ const TimeSelection = (props: TimeSelectionProps) => {
 
   const enrollmentType = coursePace.context_type === 'Enrollment'
   const dateColumnWidth = responsiveSize === 'small' ? '100%' : '15.313rem'
-  const formatDate = (date: Date) => {
-    return tz.format(date, 'date.formats.long') || ''
-  }
 
   const [endDate, setEndDate] = useState<OptionalDate>(null)
   const [weeks, setWeeks] = useState<number>(0)
@@ -155,39 +207,7 @@ const TimeSelection = (props: TimeSelectionProps) => {
   }
 
   const captions = generateDatesCaptions(coursePace, coursePace.start_date, endDate, appliedPace)
-  const DateInputWithCaption = ({
-    date,
-    onChangeDate,
-    caption,
-    renderLabel,
-    dataTestId,
-    dateIsDisabled,
-  }: DateInputWithCaptionProps) => {
-    const onChange = (selectedDate: Date | null) => {
-      if (selectedDate === null) return
-      const dateValue = selectedDate.toISOString()
-      if (dateValue === date) return
-      onChangeDate(dateValue)
-    }
 
-    return (
-      <DateInputContainer caption={caption}>
-        <CanvasDateInput
-          renderLabel={renderLabel}
-          timezone={coursePaceTimezone}
-          formatDate={formatDate}
-          selectedDate={date}
-          onSelectedDateChange={onChange}
-          width={dateColumnWidth}
-          display="block"
-          withRunningValue={true}
-          interaction={undefined}
-          dataTestid={dataTestId}
-          dateIsDisabled={dateIsDisabled}
-        />
-      </DateInputContainer>
-    )
-  }
   const ReadOnlyDateWithCaption = ({
     dateValue,
     caption,
@@ -199,7 +219,7 @@ const TimeSelection = (props: TimeSelectionProps) => {
   }) => {
     return (
       <LabeledComponent label={I18n.t('Start Date')}>
-        <DateInputContainer caption={caption}>
+        <DateInputContainer caption={caption} dateColumnWidth={dateColumnWidth}>
           <View display="inline-block" height="2.406rem" padding="x-small 0 0 x-small">
             <Text data-testid={dataTestId}>
               {formatDate(moment.tz(dateValue, coursePaceTimezone).toDate())}
@@ -224,20 +244,6 @@ const TimeSelection = (props: TimeSelectionProps) => {
           {children}
         </Flex>
       </Flex>
-    )
-  }
-
-  const DateInputContainer = ({
-    children,
-    caption,
-  }: {children: React.ReactNode; caption: string}) => {
-    return (
-      <Flex.Item width={dateColumnWidth} padding="xxx-small 0 0 0">
-        {children}
-        <View margin="small 0 0 0" display="inline-block">
-          <Text size="small">{caption}</Text>
-        </View>
-      </Flex.Item>
     )
   }
 
@@ -306,24 +312,24 @@ const TimeSelection = (props: TimeSelectionProps) => {
           <DateInputWithCaption
             key="start-date"
             date={coursePace.start_date}
+            dateColumnWidth={dateColumnWidth}
             onChangeDate={onChangeStartDate}
             caption={captions.startDate}
             renderLabel={I18n.t('Start Date')}
             dataTestId="start-date-input"
-            dateIsDisabled={(date: moment.Moment) =>
-              Boolean(endDate && date.toISOString() > endDate)
-            }
+            disabledDates={(date: string) => Boolean(endDate && date > endDate)}
           />
         )}
         <DateInputWithCaption
           key="end-date"
           date={endDate}
+          dateColumnWidth={dateColumnWidth}
           onChangeDate={onChangeEndDate}
           caption={captions.endDate}
           renderLabel={I18n.t('End Date')}
           dataTestId="end-date-input"
-          dateIsDisabled={(date: moment.Moment) =>
-            Boolean(coursePace.start_date && date.toISOString() < coursePace.start_date)
+          disabledDates={(date: string) =>
+            Boolean(coursePace.start_date && date < coursePace.start_date)
           }
         />
         <Flex.Item>

@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {canvas} from '@instructure/ui-themes'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -155,7 +155,7 @@ export const DateAdjustments = ({
                     direction={isMobileView ? 'column' : 'row'}
                     alignItems="stretch"
                   >
-                    <CanvasDateInput
+                    <CanvasDateInput2
                       selectedDate={start_from_date}
                       onSelectedDateChange={d => {
                         handleSetDate(d, setOldStartDate, 'old_start_date')
@@ -185,7 +185,7 @@ export const DateAdjustments = ({
                     >
                       <span style={{whiteSpace: 'nowrap'}}>{I18n.t('change to')}</span>
                     </View>
-                    <CanvasDateInput
+                    <CanvasDateInput2
                       selectedDate={start_to_date}
                       onSelectedDateChange={d => {
                         handleSetDate(d, setStartToDate, 'new_start_date')
@@ -212,7 +212,7 @@ export const DateAdjustments = ({
                     direction={isMobileView ? 'column' : 'row'}
                     alignItems="stretch"
                   >
-                    <CanvasDateInput
+                    <CanvasDateInput2
                       selectedDate={end_from_date}
                       onSelectedDateChange={d => {
                         handleSetDate(d, setEndFromDate, 'old_end_date')
@@ -238,7 +238,7 @@ export const DateAdjustments = ({
                     >
                       <span style={{whiteSpace: 'nowrap'}}>{I18n.t('change to')}</span>
                     </View>
-                    <CanvasDateInput
+                    <CanvasDateInput2
                       selectedDate={end_to_date}
                       onSelectedDateChange={d => {
                         handleSetDate(d, setEndToDate, 'new_end_date')

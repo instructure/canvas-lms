@@ -136,16 +136,14 @@ describe('CourseCopyForm', () => {
       const {getByTestId} = renderCopyCourseForm()
 
       const startDateField = getByTestId('course-start-date')
-      const input = within(startDateField).getByRole('combobox')
-      expect(input).toBeInTheDocument()
+      expect(startDateField).toBeInTheDocument()
     })
 
     it('renders the end date', () => {
       const {getByTestId} = renderCopyCourseForm()
 
       const endDateField = getByTestId('course-end-date')
-      const input = within(endDateField).getByRole('combobox')
-      expect(input).toBeInTheDocument()
+      expect(endDateField).toBeInTheDocument()
     })
 
     it('renders the terms', () => {
@@ -199,8 +197,7 @@ describe('CourseCopyForm', () => {
           })
 
           const startDateField = getByTestId('course-start-date')
-          const input = within(startDateField).getByRole('combobox')
-          expect(input).toBeEnabled()
+          expect(startDateField).toBeEnabled()
         })
 
         it('should enable end date input fields', () => {
@@ -209,8 +206,7 @@ describe('CourseCopyForm', () => {
           })
 
           const endDateField = getByTestId('course-end-date')
-          const input = within(endDateField).getByRole('combobox')
-          expect(input).toBeEnabled()
+          expect(endDateField).toBeEnabled()
         })
 
         it('should not render disable state explanation', () => {
@@ -235,8 +231,7 @@ describe('CourseCopyForm', () => {
           })
 
           const startDateField = getByTestId('course-start-date')
-          const input = within(startDateField).getByRole('combobox')
-          expect(input).toBeInTheDocument()
+          expect(startDateField).toBeInTheDocument()
         })
 
         it('should use terms end date', () => {
@@ -245,8 +240,7 @@ describe('CourseCopyForm', () => {
           })
 
           const endDateField = getByTestId('course-end-date')
-          const input = within(endDateField).getByRole('combobox')
-          expect(input).toBeInTheDocument()
+          expect(endDateField).toBeInTheDocument()
         })
       })
 
@@ -257,8 +251,7 @@ describe('CourseCopyForm', () => {
           })
 
           const startDateField = getByTestId('course-start-date')
-          const input = within(startDateField).getByRole('combobox')
-          expect(input).toBeInTheDocument()
+          expect(startDateField).toBeInTheDocument()
         })
 
         it('should use course end date', () => {
@@ -267,8 +260,7 @@ describe('CourseCopyForm', () => {
           })
 
           const endDateField = getByTestId('course-end-date')
-          const input = within(endDateField).getByRole('combobox')
-          expect(input).toBeInTheDocument()
+          expect(endDateField).toBeInTheDocument()
         })
       })
     })
