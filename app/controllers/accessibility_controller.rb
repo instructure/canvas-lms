@@ -20,7 +20,6 @@
 class AccessibilityController < ApplicationController
   before_action :require_context
   before_action :require_user
-  before_action :setup_ruleset
 
   include Api::V1::Course
   include Api::V1::Assignment
@@ -38,10 +37,10 @@ class AccessibilityController < ApplicationController
   def issues
     return unless allowed?
 
-    render json: create_accessibility_issues(@ruleset)
+    render json: create_accessibility_issues
   end
 
-  def create_accessibility_issues(rules = Accessibility::Rule.load_all_rules)
+  def create_accessibility_issues(rules = Accessibility::Rule.registry)
     course_pages = @context.wiki_pages.not_deleted.order(updated_at: :desc)
     course_assignments = @context.assignments.active.order(updated_at: :desc)
 
@@ -53,10 +52,6 @@ class AccessibilityController < ApplicationController
   end
 
   private
-
-  def setup_ruleset
-    @ruleset = Accessibility::Rule.load_all_rules
-  end
 
   def allowed?
     return false unless tab_enabled?(Course::TAB_ACCESSIBILITY) && authorized_action(@context, @current_user, :read)

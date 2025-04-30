@@ -24,7 +24,7 @@ module AccessibilityControllerHelper
     return NO_ACCESSIBILITY_ISSUES.dup if html_content.blank? || !html_content.include?("<")
 
     begin
-      doc = Nokogiri::HTML.fragment(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
+      doc = Nokogiri::HTML5.fragment(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
       extend_nokogiri_with_dom_adapter(doc)
 
       issues = []
@@ -48,14 +48,13 @@ module AccessibilityControllerHelper
               why: rule_class.why,
               path: element_path(element),
               severity: "error",
-              form: rule_class.form.map(&:as_json)
+              issue_url: rule_class.link,
             }
           rescue => e
             Rails.logger.error "Accessibility check problem encountered with rule '#{rule_class.id}'. HTML fragment was '#{element}'. Error is #{e.message}"
             Rails.logger.error e.backtrace.join("\n")
           end
         end
-
         issues.concat(rule_issues)
       end
 
