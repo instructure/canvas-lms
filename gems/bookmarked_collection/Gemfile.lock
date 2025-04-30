@@ -2,6 +2,7 @@ PATH
   remote: ../json_token
   specs:
     json_token (0.0.1)
+      base64
       json
 
 PATH
