@@ -29,7 +29,7 @@ import {
   fetchLtiFilters,
   fetchProductsByOrganization,
 } from '../queries/productsQuery'
-import useDiscoverQueryParams from '../hooks/useDiscoverQueryParams'
+import useDiscoverQueryParams, {DiscoverParams} from '../hooks/useDiscoverQueryParams'
 import {Header} from './apps/Header'
 import type {Product} from '../models/Product'
 import {View} from '@instructure/ui-view'
@@ -38,6 +38,10 @@ import useCreateScreenReaderFilterMessage from '../hooks/useCreateScreenReaderFi
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {useScope as createI18nScope} from '@canvas/i18n'
+
+const queryFn = ({queryKey}: {queryKey: [string, DiscoverParams]}) => {
+  return fetchProductsByOrganization(queryKey[1])
+}
 
 export const InstructorApps = () => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
@@ -56,8 +60,7 @@ export const InstructorApps = () => {
     error,
   } = useQuery({
     queryKey: ['lti_product_info', queryParams],
-    // @ts-expect-error
-    queryFn: () => fetchProductsByOrganization(queryParams, ENV.DOMAIN_ROOT_ACCOUNT_SFID),
+    queryFn,
     initialData: {
       tools: [] as Product[],
       meta: {total_count: 0, current_page: 1, num_pages: 1, count: 0, per_page: 21},

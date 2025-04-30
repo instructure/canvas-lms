@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import {ePortfolioSection, NamedSubmission} from './types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useQuery} from '@tanstack/react-query'
+import {useQuery, QueryFunction} from '@tanstack/react-query'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -38,6 +38,15 @@ interface Props {
   readonly sectionId: number
 }
 
+type SubmissionListQueryKey = readonly ['submissionList', number]
+
+const fetchSubmissionList: QueryFunction<NamedSubmission[], SubmissionListQueryKey> = async ({
+  queryKey,
+}) => {
+  const [, portfolioId] = queryKey
+  return fetchSubmissions(portfolioId)
+}
+
 const fetchSubmissions = async (portfolioId: number): Promise<NamedSubmission[]> => {
   const params = {
     page: 1,
@@ -53,9 +62,14 @@ const fetchSubmissions = async (portfolioId: number): Promise<NamedSubmission[]>
 export default function SubmissionList(props: Props) {
   const [submission, setSubmission] = useState<NamedSubmission | null>(null)
 
-  const {data, isLoading, error} = useQuery<NamedSubmission[]>({
-    queryFn: () => fetchSubmissions(props.portfolioId),
-    queryKey: ['submissionList'],
+  const {data, isLoading, error} = useQuery<
+    NamedSubmission[],
+    Error,
+    NamedSubmission[],
+    SubmissionListQueryKey
+  >({
+    queryKey: ['submissionList', props.portfolioId],
+    queryFn: fetchSubmissionList,
   })
 
   const openModal = (submission: NamedSubmission) => {
