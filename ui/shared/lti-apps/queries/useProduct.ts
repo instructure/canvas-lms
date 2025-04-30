@@ -16,13 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {fetchProductDetails} from './productsQuery'
-import type {UseQueryOptions} from '@tanstack/react-query'
+import type {UseQueryOptions, QueryFunction} from '@tanstack/react-query'
 import type {Product} from '../models/Product'
 import {useQuery} from '@tanstack/react-query'
 
+type ProductQueryKey = readonly [string, string]
+
 export type UseProductProps = {
   productId: string
-  queryOptions?: Partial<UseQueryOptions>
+  queryOptions?: Partial<UseQueryOptions<Product | null, Error, Product | null, ProductQueryKey>>
+}
+
+const queryFn = ({
+  queryKey,
+}: {
+  queryKey: ProductQueryKey
+}) => {
+  const [, productId] = queryKey
+  return fetchProductDetails(productId)
 }
 
 const useProduct = ({productId, queryOptions = {}}: UseProductProps) => {
@@ -30,13 +41,13 @@ const useProduct = ({productId, queryOptions = {}}: UseProductProps) => {
     data: product,
     isLoading,
     isError,
-  } = useQuery({
-    queryKey: ['lti_product_detail'],
-    queryFn: () => fetchProductDetails(productId),
+  } = useQuery<Product | null, Error, Product | null, ProductQueryKey>({
+    queryKey: ['lti_product_detail', productId],
+    queryFn,
     ...queryOptions,
   })
 
-  return {product: product as Product, isLoading, isError}
+  return {product, isLoading, isError}
 }
 
 export default useProduct

@@ -79,7 +79,9 @@ const ProductDetail = (props: ProductDetailProps) => {
   const {product, isLoading, isError} = useProduct({
     productId: currentProductId,
   })
+  // @ts-expect-error
   useAppendBreadcrumb(product?.name, previousPath, !!product?.name)
+  // @ts-expect-error
   const productDescription = stripHtmlTags(product?.description)
 
   const params = () => {
@@ -91,7 +93,9 @@ const ProductDetail = (props: ProductDetailProps) => {
   }
 
   const {otherProductsByCompany} = useSimilarProducts({
+    // @ts-expect-error
     params: params(),
+    // @ts-expect-error
     product,
   })
 
@@ -134,7 +138,8 @@ const ProductDetail = (props: ProductDetailProps) => {
       <Flex margin={buttonMargins}>
         <Flex.Item shouldGrow={true} margin={tabletMargin}>
           {props.renderConfigureButton
-            ? props.renderConfigureButton(buttonWidth, product?.canvas_lti_configurations)
+            ? // @ts-expect-error
+              props.renderConfigureButton(buttonWidth, product?.canvas_lti_configurations)
             : null}
         </Flex.Item>
       </Flex>
@@ -147,6 +152,7 @@ const ProductDetail = (props: ProductDetailProps) => {
         {!isDesktop && (
           <Flex margin="medium 0 0 small">
             <div style={{borderRadius: '8px'}}>
+              {/* @ts-expect-error */}
               <img alt="" src={product.logo_url} width={80} height={80} style={{borderRadius: 8}} />
             </div>
           </Flex>
@@ -157,6 +163,7 @@ const ProductDetail = (props: ProductDetailProps) => {
               <div style={{borderRadius: '8px'}}>
                 <img
                   alt=""
+                  // @ts-expect-error
                   src={product.logo_url}
                   width={80}
                   height={80}
@@ -166,6 +173,7 @@ const ProductDetail = (props: ProductDetailProps) => {
             </Flex.Item>
           )}
           <Flex.Item shouldGrow={true} shouldShrink={true} margin="small 0 0 mediumSmall">
+            {/* @ts-expect-error */}
             <Heading level="h1">{product.name}</Heading>
             <Flex.Item shouldGrow={true} shouldShrink={true}>
               <div style={{marginBottom: '.5rem'}}>
@@ -174,6 +182,7 @@ const ProductDetail = (props: ProductDetailProps) => {
                   horizontalOffset={isDesktop ? -150 : -10}
                   backgroundColor="primary"
                 >
+                  {/* @ts-expect-error */}
                   <Text>{product.tagline}</Text>
                 </TruncateWithTooltip>
               </div>
@@ -190,6 +199,7 @@ const ProductDetail = (props: ProductDetailProps) => {
       <Flex margin={isDesktop ? '0 0 0 large' : '0 0 0 small'}>
         <Flex.Item margin={isDesktop ? '0 0 0 xx-large' : '0'}>
           <Text color="secondary">
+            {/* @ts-expect-error */}
             {I18n.t('by')} {product.company.name}
           </Text>{' '}
           |{' '}
@@ -202,6 +212,7 @@ const ProductDetail = (props: ProductDetailProps) => {
       <Flex direction="column">
         <Flex.Item margin="0 0 0 small">
           <Text color="secondary">
+            {/* @ts-expect-error */}
             {I18n.t('by')} {product.company.name}
           </Text>
         </Flex.Item>
@@ -220,6 +231,7 @@ const ProductDetail = (props: ProductDetailProps) => {
     ))
   }
 
+  // @ts-expect-error
   const hasIntegrationResources = product?.integration_resources.resources?.length > 0
 
   const renderIntegrationResources = () => {
@@ -385,7 +397,10 @@ const ProductDetail = (props: ProductDetailProps) => {
               )}
             </Flex>
             <ExternalLinks product={product} />
-            <LtiConfigurationDetail badges={product.integration_badges} integrationData={relevantIntegration} />
+            <LtiConfigurationDetail
+              badges={product.integration_badges}
+              integrationData={relevantIntegration}
+            />
             <Flex margin="medium 0 0 0">
               <Flex.Item margin="0 0 small 0">
                 <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
@@ -422,6 +437,7 @@ const ProductDetail = (props: ProductDetailProps) => {
         isModalOpen={isImageModalOpen}
         setModalOpen={setImageModalOpen}
         screenshots={imageModalScreenshots}
+        // @ts-expect-error
         productName={product?.name}
       />
     </div>
