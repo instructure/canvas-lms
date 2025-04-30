@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
+
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -25,24 +25,42 @@ import {
   RUBRIC_QUERY,
   COURSE_PROFICIENCY_RATINGS_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
-import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {useQuery} from '@apollo/client'
 import {transformRubricData, transformRubricAssessmentData} from '../helpers/RubricHelpers'
 import useStore from './stores/index'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
-import {bool, func} from 'prop-types'
 import {useAllPages} from '@canvas/query'
 import {executeQuery} from '@canvas/query/graphql'
+import {Assignment, Submission} from './RubricsQuery.types'
 
 const I18n = createI18nScope('assignments_2')
 
-export default function RubricsQuery(props) {
+const queryFn = ({queryKey, pageParam}: {queryKey: string[]; pageParam: unknown}) => {
+  return executeQuery(COURSE_PROFICIENCY_RATINGS_QUERY, {
+    courseID: queryKey[1],
+    cursor: pageParam,
+  })
+}
+
+type Props = {
+  assignment: Assignment
+  submission: Submission
+  rubricExpanded: boolean
+  toggleRubricExpanded: () => void
+}
+
+export default function RubricsQuery({
+  assignment,
+  submission,
+  rubricExpanded,
+  toggleRubricExpanded,
+}: Props) {
   const {loading, error, data} = useQuery(RUBRIC_QUERY, {
     variables: {
-      assignmentLid: props.assignment._id,
-      submissionID: props.submission.id,
-      courseID: props.assignment.env.courseId,
-      submissionAttempt: props.submission.attempt,
+      assignmentLid: assignment._id,
+      submissionID: submission.id,
+      courseID: assignment.env.courseId,
+      submissionAttempt: submission.attempt,
     },
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-first',
@@ -50,6 +68,7 @@ export default function RubricsQuery(props) {
       const allAssessments = data.submission?.rubricAssessmentsConnection?.nodes ?? []
 
       const {parsedAssessments, selfAssessment} = allAssessments.reduce(
+        // @ts-expect-error
         (prev, curr) => {
           if (curr.assessment_type === 'self_assessment') {
             return {...prev, selfAssessment: transformRubricAssessmentData(curr)}
@@ -64,8 +83,9 @@ export default function RubricsQuery(props) {
 
       const parsedRubric = transformRubricData(data.assignment.rubric)
 
-      const assessment = props.assignment.env.peerReviewModeEnabled
-        ? parsedAssessments?.find(assessment => assessment.assessor?._id === ENV.current_user.id)
+      const assessment = assignment.env.peerReviewModeEnabled
+        ? // @ts-expect-error
+          parsedAssessments?.find(assessment => assessment.assessor?._id === ENV.current_user.id)
         : parsedAssessments?.[0]
       const filledAssessment = fillAssessment(parsedRubric, assessment || {})
 
@@ -81,18 +101,15 @@ export default function RubricsQuery(props) {
     isError: ratingsError,
     isLoading: ratingsLoading,
   } = useAllPages({
-    queryKey: ['courseProficiencyRatings', props.assignment.env.courseId],
-    queryFn: ({pageParam}) => {
-      return executeQuery(COURSE_PROFICIENCY_RATINGS_QUERY, {
-        courseID: props.assignment.env.courseId,
-        cursor: pageParam,
-      })
-    },
+    queryKey: ['courseProficiencyRatings', assignment.env.courseId],
+    queryFn,
     getNextPageParam: lastPage => {
       const pageInfo =
+        // @ts-expect-error
         lastPage?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
       return pageInfo?.hasNextPage ? pageInfo.endCursor : null
     },
+    initialPageParam: null,
   })
 
   if (loading || ratingsLoading) {
@@ -112,10 +129,12 @@ export default function RubricsQuery(props) {
 
   return (
     <RubricTab
+      // @ts-expect-error
       assessments={data.submission?.rubricAssessmentsConnection?.nodes?.map(assessment =>
         transformRubricAssessmentData(assessment),
       )}
-      key={props.submission.attempt}
+      key={submission.attempt}
+      // @ts-expect-error
       proficiencyRatings={ratingsData.pages.reduce((acc, page) => {
         const nodes = page?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
         if (nodes) {
@@ -125,16 +144,9 @@ export default function RubricsQuery(props) {
       }, [])}
       rubric={transformRubricData(data.assignment.rubric)}
       rubricAssociation={data.assignment.rubricAssociation}
-      peerReviewModeEnabled={props.assignment.env.peerReviewModeEnabled}
-      rubricExpanded={props.rubricExpanded}
-      toggleRubricExpanded={props.toggleRubricExpanded}
+      peerReviewModeEnabled={assignment.env.peerReviewModeEnabled}
+      rubricExpanded={rubricExpanded}
+      toggleRubricExpanded={toggleRubricExpanded}
     />
   )
-}
-
-RubricsQuery.propTypes = {
-  assignment: Assignment.shape,
-  submission: Submission.shape,
-  rubricExpanded: bool,
-  toggleRubricExpanded: func,
 }
