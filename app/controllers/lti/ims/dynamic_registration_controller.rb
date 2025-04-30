@@ -26,13 +26,13 @@ module Lti
     class DynamicRegistrationController < ApplicationController
       REGISTRATION_TOKEN_EXPIRATION = 1.hour
 
-      before_action :require_user, except: [:create]
-      before_action :require_account, except: [:create]
+      before_action :require_user, except: [:create, :update]
+      before_action :require_account, except: [:create, :update]
 
       # This skip_before_action is required because :load_user will
       # attempt to find the bearer token, which is not stored with
       # the other Canvas tokens.
-      skip_before_action :load_user, only: [:create]
+      skip_before_action :load_user, only: [:create, :update]
 
       include Api::V1::Lti::Registration
 
@@ -250,6 +250,49 @@ module Lti
           end
 
           render_registration(ims_registration, developer_key, deployment) if ims_registration.persisted?
+        end
+      end
+
+      def update
+        registration = Lti::Registration.find(params[:registration_id])
+        unless registration.root_account.feature_enabled?(:lti_dr_registrations_update)
+          respond_to do |format|
+            format.html { render "shared/errors/404_message", status: :not_found }
+            format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
+          end
+        end
+
+        validation_result = Lti::TokenValidationService.verify_developer_key_access_token_and_scopes(
+          request,
+          Lti::ScopeMatchers.all_of(TokenScopes::LTI_REGISTRATION_SCOPE)
+        )
+
+        unless validation_result[:success]
+          return render status: validation_result[:status], json: { errorMessage: validation_result[:error] }
+        end
+
+        # create a registration update request based on the body
+        # of the request and the registration id
+        Schemas::Lti::IMS::OidcRegistration.to_model_attrs(params.to_unsafe_h) =>
+          { errors:, registration_attrs: }
+        return render status: :unprocessable_entity, json: { errors: } if errors.present?
+
+        if registration.present?
+          # Create an LTI RegistrationUpdateRequest
+          # to update the existing registration
+          registration_update_request = Lti::RegistrationUpdateRequest.new(
+            root_account_id: registration.root_account.id,
+            lti_registration_id: registration.id,
+            uuid: nil,
+            lti_ims_registration: registration_attrs,
+            created_by_id: nil,
+            accepted_at: nil,
+            rejected_at: nil
+          )
+
+          root_deployment = ContextExternalTool.find_by(account: registration.root_account, developer_key: registration.developer_key)
+
+          render_registration(registration.ims_registration, registration.developer_key, root_deployment) if registration_update_request.save
         end
       end
 

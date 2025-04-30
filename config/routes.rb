@@ -3093,6 +3093,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/dr_iframe", action: :dr_iframe
       get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create, as: :create_lti_registration
+      put "registrations/:registration_id", action: :update, as: :update_lti_registration
     end
 
     # Public JWK Service

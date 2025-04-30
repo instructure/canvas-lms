@@ -176,6 +176,32 @@ paths:
                       type: array
                     target_link_uri:
                       type: string
+  /api/lti/registrations/:registration_id:
+    put:
+      summary: Updates an existing tool registration.
+      parameters:
+        - in: path
+          name: registration_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "The tool registration was updated."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/registration"
+        '401':
+          description: "The provided token was invalid."
+        '404':
+          description: "The tool registration was not found."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/registration"
   /api/lti/registrations/:registration_id/view:
     get:
       summary: Redirects the user to the tool's configuration view.
