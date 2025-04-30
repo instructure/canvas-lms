@@ -19,7 +19,7 @@
 
 module Accessibility
   class FormField
-    attr_accessor :label, :data_key, :checkbox, :options, :placeholder
+    attr_accessor :label, :data_key, :checkbox, :options, :placeholder, :dom_path, :original_content, :updated_content
     attr_reader :disabled_if_proc
 
     # @param label [String] Human-readable label displayed to the user
@@ -28,13 +28,27 @@ module Accessibility
     # @param options [Array<Array<String, String>>] Optional array of options for select fields [value, label]
     # @param disabled_if [Proc] Optional proc to determine if field should be disabled
     # @param placeholder [String] Optional placeholder text for text fields
-    def initialize(label:, data_key:, checkbox: false, options: nil, disabled_if: nil, placeholder: nil)
+    # @param dom_path [String] Optional DOM path for the element to update
+    # @param original_content [String] Optional original HTML content
+    # @param updated_content [String] Optional updated HTML content
+    def initialize(label:,
+                   data_key:,
+                   checkbox: false,
+                   options: nil,
+                   disabled_if: nil,
+                   placeholder: nil,
+                   dom_path: nil,
+                   original_content: nil,
+                   updated_content: nil)
       @label = label
       @data_key = data_key
       @checkbox = checkbox
       @options = options
       @disabled_if_proc = disabled_if
       @placeholder = placeholder
+      @dom_path = dom_path
+      @original_content = original_content
+      @updated_content = updated_content
     end
 
     # Determines if the field should be disabled based on provided data
@@ -59,6 +73,9 @@ module Accessibility
       hash[:checkbox] = @checkbox if @checkbox
       hash[:options] = @options if @options
       hash[:placeholder] = @placeholder if @placeholder
+      hash[:dom_path] = @dom_path if @dom_path
+      hash[:original_content] = @original_content if @original_content
+      hash[:updated_content] = @updated_content if @updated_content
       hash
     end
   end

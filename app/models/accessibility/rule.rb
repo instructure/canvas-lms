@@ -23,21 +23,21 @@ module Accessibility
       attr_accessor :id, :link
 
       def registry
-        @registry ||= []
-      end
-
-      def inherited(subclass)
-        super&.inherited(subclass)
-        registry << subclass
-      end
-
-      def load_all_rules
-        Dir[File.join(File.dirname(__FILE__), "*_rule.rb")].each do |file|
-          require_dependency file
-        rescue LoadError => e
-          Rails.logger.error("Failed to load accessibility rule: #{e}")
-        end
-        registry
+        [
+          Accessibility::Rules::AdjacentLinksRule,
+          Accessibility::Rules::HeadingsSequenceRule,
+          Accessibility::Rules::HeadingsStartAtH2Rule,
+          Accessibility::Rules::ImgAltFilenameRule,
+          Accessibility::Rules::ImgAltLengthRule,
+          Accessibility::Rules::ImgAltRule,
+          Accessibility::Rules::LargeTextContrastRule,
+          Accessibility::Rules::ListStructureRule,
+          Accessibility::Rules::ParagraphsForHeadingsRule,
+          Accessibility::Rules::SmallTextContrastRule,
+          Accessibility::Rules::TableCaptionRule,
+          Accessibility::Rules::TableHeaderRule,
+          Accessibility::Rules::TableHeaderScopeRule
+        ]
       end
 
       # Tests if an element passes this accessibility rule
@@ -48,7 +48,7 @@ module Accessibility
       end
 
       # Gets data needed for rendering and correcting the issue
-      # @param elem [Nokogiri::XML::Element] The element that failed the test
+      # @param _elem [Nokogiri::XML::Element] The element that failed the test
       # @return [Hash] Data describing the issue
       def data(_elem)
         {}
@@ -61,8 +61,8 @@ module Accessibility
       end
 
       # Updates an element to fix accessibility issues
-      # @param elem [Nokogiri::XML::Element] The element to update
-      # @param data [Hash] Data from the form submission
+      # @param _elem [Nokogiri::XML::Element] The element to update
+      # @param _data [Hash] Data from the form submission
       # @return [Nokogiri::XML::Element] The updated element
       def update(_elem, _data)
         raise NotImplementedError, "#{self} must implement update"

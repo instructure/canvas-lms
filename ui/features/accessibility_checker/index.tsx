@@ -19,9 +19,6 @@
 import ready from '@instructure/ready'
 import {createRoot} from 'react-dom/client'
 import {AccessibilityChecker} from './react'
-import {Heading} from '@instructure/ui-heading'
-import {Alert} from '@instructure/ui-alerts'
-import {Flex} from '@instructure/ui-flex'
 
 ready(() => {
   const container = document.getElementById('accessibility-checker-container')
