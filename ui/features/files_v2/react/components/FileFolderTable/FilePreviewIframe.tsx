@@ -21,10 +21,27 @@ import type {File} from '../../../interfaces/File'
 
 const I18n = createI18nScope('files_v2')
 
+const FLAMEGRAPH_FILENAME_REGEX = /^flamegraph-.+#.+-\d{4}-\d{2}-\d{2}.+$/
+
+const sandboxSettings = (item: File) => {
+  if (item.mime_class !== 'html') {
+    return 'allow-scripts allow-same-origin'
+  }
+
+  if (
+    FLAMEGRAPH_FILENAME_REGEX.test(item.display_name) &&
+    item.filename === `${item.display_name}.html`
+  ) {
+    return 'allow-scripts allow-same-origin'
+  }
+
+  return 'allow-same-origin'
+}
+
 const FilePreviewIframe = ({item}: {item: File}) => (
   <iframe
     key={item.id}
-    sandbox={item.mime_class == 'html' ? 'allow-same-origin' : 'allow-scripts allow-same-origin'}
+    sandbox={sandboxSettings(item)}
     src={item.preview_url}
     style={{
       ...(item.mime_class === 'html' ? {backgroundColor: '#F2F4F4'} : {}),
