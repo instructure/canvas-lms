@@ -27,8 +27,9 @@ import {useEffect} from 'react'
 import {AssetProcessorsAddModal} from './AssetProcessorsAddModal'
 import {AssetProcessorsAttachedProcessorCard} from './AssetProcessorsCards'
 import {useAssetProcessorsAddModalState} from './hooks/AssetProcessorsAddModalState'
-import {ExistingAttachedAssetProcessor, useAssetProcessorsState} from './hooks/AssetProcessorsState'
+import {useAssetProcessorsState} from './hooks/AssetProcessorsState'
 import {useAssetProcessorsToolsList} from './hooks/useAssetProcessorsToolsList'
+import {buildAPDisplayTitle, ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 
 const I18n = createI18nScope('asset_processors_selection')
 
@@ -93,9 +94,9 @@ export function AssetProcessors(props: AssetProcessorsProps) {
                 icon={{
                   toolId: processor.toolId,
                   toolName: processor.toolName || '',
-                  url: processor.iconUrl,
+                  url: processor.iconOrToolIconUrl,
                 }}
-                title={processor.title}
+                title={buildAPDisplayTitle(processor)}
                 description={processor.text}
                 windowSettings={processor.window}
                 iframeSettings={processor.iframe}

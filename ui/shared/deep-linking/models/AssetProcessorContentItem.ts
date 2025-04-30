@@ -15,19 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// Uses stuff from lti/model which is new models with zod stuff. We should try
+// not to import the other way around.
+import {AssetProcessorWindowSettings} from '@canvas/lti/model/AssetProcessor'
 import {ContentItemIframeDimensions} from './helpers'
 
 export type AssetProcessorContentItemReport = {
   url?: string
   custom?: Record<string, string>
-}
-
-// Window configuration for opening asset processor settings in new window/tab
-export type AssetProcessorWindowSettings = {
-  targetName?: string // Name of window to open, allows sharing a target
-  width?: number // Width in pixels of the new window
-  height?: number // Height in pixels of the new window
-  windowFeatures?: string // Comma-separated list of window features for window.open()
 }
 
 export type AssetProcessorContentItem = {

@@ -140,8 +140,9 @@ function AssetProcessorsAddModalBodyToolList({toolList}: {toolList: LtiLaunchDef
         <Flex.Item key={index}>
           <AssetProcessorsCard
             icon={{
-              url: tool.placements?.ActivityAssetProcessor?.icon_url,
-              toolName: tool.name,
+              url: tool.placements.ActivityAssetProcessor!.icon_url,
+              toolName:
+                tool.placements.ActivityAssetProcessor!.tool_name_for_default_icon || tool.name,
               toolId: tool.definition_id,
             }}
             title={tool.placements?.ActivityAssetProcessor?.title || tool.name}

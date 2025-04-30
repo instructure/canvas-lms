@@ -75,6 +75,8 @@ module Lti
         json = api_call(:get, url, params, placements:)
         icon_url = json.first["placements"]["ActivityAssetProcessor"]["icon_url"]
         expect(icon_url).to eq "http://example.com/foo.png"
+        tool_name = json.first["placements"]["ActivityAssetProcessor"]["tool_name_for_default_icon"]
+        expect(tool_name).to eq tool1.name
       end
 
       it "returns authorized for a student but with no results when no placement is specified" do
