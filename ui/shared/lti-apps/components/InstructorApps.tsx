@@ -79,13 +79,12 @@ export const InstructorApps = () => {
 
   const {data: filterData} = useQuery({
     queryKey: ['lti_filters'],
-    queryFn: () => fetchLtiFilters(),
+    queryFn: fetchLtiFilters,
   })
 
   const {data: customFilterData} = useQuery({
     queryKey: ['custom_filters'],
-    // @ts-expect-error
-    queryFn: () => fetchCustomFilters(window.ENV.DOMAIN_ROOT_ACCOUNT_SFID),
+    queryFn: fetchCustomFilters,
   })
 
   return (
