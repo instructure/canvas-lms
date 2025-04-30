@@ -75,7 +75,11 @@ type LtiLaunchPlacement = {
 /**
  * A subset of all the placement types, the ones used
  */
-type SelectContentPlacementType = 'resource_selection' | 'assignment_selection' | 'link_selection' | 'ActivityAssetProcessor'
+type SelectContentPlacementType =
+  | 'resource_selection'
+  | 'assignment_selection'
+  | 'link_selection'
+  | 'ActivityAssetProcessor'
 
 export type LtiLaunchDefinition = {
   definition_type: 'ContextExternalTool' | 'Lti::MessageHandler'
@@ -331,7 +335,7 @@ export const Events = {
         (tool.placements.assignment_selection && 'assignment_selection') ||
         (tool.placements.link_selection && 'link_selection')
       if (!placement_type) {
-        return;
+        return
       }
       const placement = tool.placements[placement_type]!
       const width = placement.selection_width
