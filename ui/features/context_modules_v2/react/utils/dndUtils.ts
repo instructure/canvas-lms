@@ -33,8 +33,14 @@ const getModuleItemsFromDOM = (moduleId: string): any[] => {
     .filter((item, index, self) => index === self.findIndex(t => t._id === item._id))
 }
 
-const uniqueItems = (items: any[]): any[] =>
+export const uniqueItems = (items: any[]): any[] =>
   items.filter((item, index, self) => index === self.findIndex(t => t._id === item._id))
+
+export const updateIndexes = (items: any[]): any[] =>
+  items.map((item: any, idx: number) => ({...item, index: idx}))
+
+export const getItemIds = (items: any[]): string[] =>
+  items.map((item: any) => item._id).filter(Boolean)
 
 export const handleMoveItem = (
   dragIndex: number,
@@ -127,7 +133,6 @@ export const handleDragEnd = (
 
     newModules.splice(destinationIndex, 0, movedModule)
 
-    // FIXME: The drag and drop is a little jumpy, ensure this is working
     queryClient.setQueryData(['modules', courseId], (oldData: any) => ({
       ...oldData,
       pages: oldData.pages.map((page: any) => ({

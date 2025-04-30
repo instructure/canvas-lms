@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {memo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
@@ -30,6 +30,15 @@ import type {
 } from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
+
+const MemoizedModuleItem = memo(ModuleItem, (prevProps, nextProps) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.moduleId === nextProps.moduleId &&
+    prevProps.published === nextProps.published &&
+    prevProps.index === nextProps.index
+  )
+})
 
 export interface ModuleItemListProps {
   moduleId: string
@@ -105,7 +114,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
                           borderWidth="0 0 0 large"
                           borderColor={item.content?.published ? 'success' : 'transparent'}
                         >
-                          <ModuleItem
+                          <MemoizedModuleItem
                             {...item}
                             moduleId={moduleId}
                             moduleTitle={moduleTitle}

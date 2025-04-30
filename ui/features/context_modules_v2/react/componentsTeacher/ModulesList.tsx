@@ -37,11 +37,8 @@ import {useContextModule} from '../hooks/useModuleContext'
 import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {
-  handleMoveItem as dndHandleMoveItem,
-  handleDragEnd as dndHandleDragEnd,
-} from '../utils/dndUtils'
 import {ModuleAction} from '../utils/types'
+import {updateIndexes, getItemIds, handleDragEnd as dndHandleDragEnd} from '../utils/dndUtils'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -108,49 +105,96 @@ const ModulesList: React.FC = () => {
     dragModuleId: string,
     hoverModuleId: string,
   ) => {
-    dndHandleMoveItem(
-      dragIndex,
-      hoverIndex,
-      dragModuleId,
-      hoverModuleId,
-      data,
-      courseId,
-      reorderItemsMutation,
-    )
+    // Get the current data for the source module
+    const sourceModuleData = queryClient.getQueryData(['moduleItems', dragModuleId]) as any
+    if (!sourceModuleData?.moduleItems?.length) return
 
-    if (dragModuleId !== hoverModuleId) {
-      const sourceModuleItemsData = queryClient.getQueryData(['moduleItems', dragModuleId]) as any
+    // Get the item being moved
+    const movedItem = sourceModuleData.moduleItems[dragIndex]
+    if (!movedItem) return
 
-      if (sourceModuleItemsData?.moduleItems?.length) {
-        const movedItem = sourceModuleItemsData.moduleItems[dragIndex]
+    // We're using the shared utility functions from dndUtils.ts
 
-        queryClient.setQueryData(['moduleItems', dragModuleId], (oldData: any) => {
-          if (!oldData) return oldData
-          return {
-            ...oldData,
-            moduleItems: oldData.moduleItems.filter((_: any, i: number) => i !== dragIndex),
-          }
-        })
+    // Helper to update cache and call the mutation
+    const updateAndMutate = (moduleId: string, oldModuleId: string, updatedItems: any[]) => {
+      // Update cache
+      queryClient.setQueryData(['moduleItems', moduleId], {
+        ...(moduleId === dragModuleId
+          ? sourceModuleData
+          : queryClient.getQueryData(['moduleItems', moduleId])),
+        moduleItems: updatedItems,
+      })
 
-        queryClient.setQueryData(['moduleItems', hoverModuleId], (oldData: any) => {
-          if (!oldData) return oldData
-
-          const newItems = [...oldData.moduleItems]
-          const updatedMovedItem = {...movedItem, moduleId: hoverModuleId}
-
-          newItems.splice(hoverIndex, 0, updatedMovedItem)
-
-          return {
-            ...oldData,
-            moduleItems: newItems,
-          }
+      // Get item IDs and call mutation if needed
+      const itemIds = getItemIds(updatedItems)
+      if (itemIds.length > 0) {
+        reorderItemsMutation.mutate({
+          courseId,
+          moduleId,
+          oldModuleId,
+          order: itemIds,
         })
       }
     }
+
+    // ---------- STEP 1: OPTIMISTIC UI UPDATE ----------
+    // For same-module reordering
+    if (dragModuleId === hoverModuleId) {
+      // Clone and update the module items
+      const updatedItems = [...sourceModuleData.moduleItems]
+      updatedItems.splice(dragIndex, 1) // Remove from old position
+      updatedItems.splice(hoverIndex, 0, movedItem) // Insert at new position
+
+      // Update all indexes and update cache
+      updateAndMutate(dragModuleId, dragModuleId, updateIndexes(updatedItems))
+    }
+    // For cross-module movement
+    else {
+      // Get destination module data
+      const destModuleData = queryClient.getQueryData(['moduleItems', hoverModuleId]) as any
+      if (!destModuleData?.moduleItems) return
+
+      // Prepare source module update (remove the item)
+      const updatedSourceItems = updateIndexes(
+        sourceModuleData.moduleItems.filter((_: any, i: number) => i !== dragIndex),
+      )
+
+      // Prepare destination module update (add the item)
+      const updatedItem = {
+        ...movedItem,
+        moduleId: hoverModuleId,
+        index: hoverIndex,
+      }
+      const updatedDestItems = [...destModuleData.moduleItems]
+      updatedDestItems.splice(hoverIndex, 0, updatedItem)
+      const updatedDestWithIndexes = updateIndexes(updatedDestItems)
+
+      // Update both caches and call mutations
+      updateAndMutate(dragModuleId, dragModuleId, updatedSourceItems)
+      updateAndMutate(hoverModuleId, dragModuleId, updatedDestWithIndexes)
+    }
   }
 
+  // Use the utility function from dndUtils.ts, passing our handleMoveItem as a callback
   const handleDragEnd = (result: DropResult) => {
-    dndHandleDragEnd(result, data, courseId, queryClient, reorderModulesMutation, handleMoveItem)
+    // Check for no destination or no movement first
+    if (
+      !result.destination ||
+      (result.source.droppableId === result.destination.droppableId &&
+        result.source.index === result.destination.index)
+    ) {
+      return
+    }
+
+    // Use the shared utility function
+    dndHandleDragEnd(
+      result,
+      data,
+      courseId || '',
+      queryClient,
+      reorderModulesMutation,
+      handleMoveItem,
+    )
   }
 
   const handleCollapseAllRef = useCallback(() => {
@@ -252,20 +296,22 @@ const ModulesList: React.FC = () => {
             )}
           </Droppable>
         )}
-        <ManageModuleContentTray
-          sourceModuleId={sourceModule?.id || ''}
-          sourceModuleTitle={sourceModule?.title || ''}
-          sourceModuleItemId={selectedModuleItem?.id}
-          isOpen={isManageModuleContentTrayOpen}
-          onClose={() => {
-            setIsManageModuleContentTrayOpen(false)
-            setModuleAction(null)
-            setSelectedModuleItem(null)
-          }}
-          moduleAction={moduleAction}
-          moduleItemId={selectedModuleItem?.id}
-          moduleItemTitle={selectedModuleItem?.title}
-        />
+        {isManageModuleContentTrayOpen && (
+          <ManageModuleContentTray
+            sourceModuleId={sourceModule?.id || ''}
+            sourceModuleTitle={sourceModule?.title || ''}
+            sourceModuleItemId={selectedModuleItem?.id}
+            isOpen={isManageModuleContentTrayOpen}
+            onClose={() => {
+              setIsManageModuleContentTrayOpen(false)
+              setModuleAction(null)
+              setSelectedModuleItem(null)
+            }}
+            moduleAction={moduleAction}
+            moduleItemId={selectedModuleItem?.id}
+            moduleItemTitle={selectedModuleItem?.title}
+          />
+        )}
       </View>
     </DragDropContext>
   )

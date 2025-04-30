@@ -45,7 +45,6 @@ export const useReorderModuleItems = () => {
         queryClient.invalidateQueries({queryKey: ['moduleItems', variables?.moduleId || '']})
       if (variables?.moduleId !== variables?.oldModuleId)
         queryClient.invalidateQueries({queryKey: ['moduleItems', variables?.oldModuleId || '']})
-      queryClient.invalidateQueries({queryKey: ['modules', variables?.courseId || '']})
     },
   })
 }
