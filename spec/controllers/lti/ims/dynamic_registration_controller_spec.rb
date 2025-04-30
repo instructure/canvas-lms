@@ -18,8 +18,11 @@
 
 require "yaml"
 require_relative "openapi/openapi_spec_helper"
+require "lib/lti/ims/advantage_access_token_shared_context"
 
 describe Lti::IMS::DynamicRegistrationController do
+  include_context "advantage access token context"
+
   let(:controller_routes) do
     dynamic_registration_routes = []
     CanvasRails::Application.routes.routes.each do |route|
@@ -56,7 +59,6 @@ describe Lti::IMS::DynamicRegistrationController do
         "https://canvas.instructure.com/lti/data_services/scope/create"
       ]
     end
-
     let(:registration_params) do
       {
         "application_type" => "web",
@@ -67,7 +69,6 @@ describe Lti::IMS::DynamicRegistrationController do
         "client_name" => "the client name",
         "jwks_uri" => "https://example.com/api/jwks",
         "token_endpoint_auth_method" => "private_key_jwt",
-
         "logo_uri" => "https://example.com/logo.jpg",
         "https://purl.imsglobal.org/spec/lti-tool-configuration" => {
           "domain" => "example.com",
@@ -163,7 +164,6 @@ describe Lti::IMS::DynamicRegistrationController do
             "token_endpoint_auth_method" => registration_params["token_endpoint_auth_method"],
             "scope" => registration_params["scope"],
           }
-
           expect(parsed_body).to include(expected_response_keys)
           expect(parsed_body["client_id"]).to eq DeveloperKey.last.global_id.to_s
           created_registration = Lti::IMS::Registration.last
@@ -185,7 +185,6 @@ describe Lti::IMS::DynamicRegistrationController do
           to_model_attrs_result = { errors: ["oopsy"], registration_attrs: nil }
           expect(Schemas::Lti::IMS::OidcRegistration).to \
             receive(:to_model_attrs).and_return(to_model_attrs_result)
-
           subject
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.body).to match(/oopsy/)
@@ -512,6 +511,268 @@ describe Lti::IMS::DynamicRegistrationController do
 
         it "returns a 401" do
           subject
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+    end
+  end
+
+  # Additional tests for #update method
+  describe "#update" do
+    let(:account) { Account.default }
+    let(:registration) { lti_ims_registration_model(account:) }
+    let(:developer_key) do
+      registration.developer_key.tap do |dk|
+        dk.update!(scopes: [TokenScopes::LTI_REGISTRATION_SCOPE])
+      end
+    end
+    let(:access_token_scopes) do
+      [TokenScopes::LTI_REGISTRATION_SCOPE]
+    end
+    let(:access_token_exp) do
+      Time.zone.now.to_i + 1.hour.to_i
+    end
+    let(:access_token_jwt_hash) do
+      timestamp = Time.zone.now.to_i
+      {
+        iss: "https://canvas.instructure.com",
+        sub: developer_key.global_id,
+        aud: access_token_aud,
+        iat: timestamp,
+        exp: access_token_exp,
+        nbf: (Time.zone.now.to_i - 30),
+        jti: SecureRandom.uuid,
+        scopes: access_token_scopes.join(" "),
+      }
+    end
+    let(:access_token) do
+      return nil if access_token_jwt_hash.blank?
+
+      JSON::JWT.new(access_token_jwt_hash).sign(access_token_signing_key, :HS256).to_s
+    end
+
+    let(:update_params) do
+      {
+        "application_type" => "web",
+        "grant_types" => ["client_credentials", "implicit"],
+        "response_types" => ["id_token"],
+        "redirect_uris" => ["https://updated.example.com/launch"],
+        "initiate_login_uri" => "https://updated.example.com/login",
+        "client_name" => "updated client name",
+        "jwks_uri" => "https://updated.example.com/api/jwks",
+        "token_endpoint_auth_method" => "private_key_jwt",
+
+        "logo_uri" => "https://updated.example.com/logo.jpg",
+        "https://purl.imsglobal.org/spec/lti-tool-configuration" => {
+          "domain" => "updated.example.com",
+          "messages" => [{
+            "type" => "LtiResourceLinkRequest",
+            "label" => "deep link label",
+            "placements" => ["course_navigation"],
+            "target_link_uri" => "https://updated.example.com/launch",
+            "custom_parameters" => {
+              "foo" => "bar"
+            },
+            "roles" => [
+              "http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper",
+              "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
+            ],
+            "icon_uri" => "https://updated.example.com/icon.jpg"
+          }],
+          "custom_parameters" => {
+            "global_foo" => "global_bar"
+          },
+          "claims" => ["iss", "sub"],
+          "target_link_uri" => "https://updated.example.com/launch",
+          "https://canvas.instructure.com/lti/privacy_level" => "email_only",
+          "https://canvas.instructure.com/lti/vendor" => "Vendor",
+        }
+      }
+    end
+
+    context "with valid access token and scope" do
+      before do
+        developer_key.update!(scopes: [TokenScopes::LTI_REGISTRATION_SCOPE])
+        request.headers["Authorization"] = "Bearer #{access_token}"
+      end
+
+      it "creates a registration update request" do
+        expect do
+          put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+        end.to change { Lti::RegistrationUpdateRequest.count }.by(1)
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "validates using the schema's to_model_attrs" do
+        expect(Schemas::Lti::IMS::OidcRegistration).to receive(:to_model_attrs).and_call_original
+        put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "creates update request with correct attributes" do
+        put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+
+        update_request = Lti::RegistrationUpdateRequest.last
+        expect(update_request.root_account_id).to eq(registration.root_account.id)
+        expect(update_request.lti_registration_id).to eq(registration.lti_registration_id)
+        expect(update_request.lti_ims_registration["client_name"]).to eq("updated client name")
+        expect(update_request.lti_ims_registration["redirect_uris"]).to eq(["https://updated.example.com/launch"])
+        expect(update_request.accepted_at).to be_nil
+        expect(update_request.rejected_at).to be_nil
+      end
+
+      it "renders the registration response" do
+        put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+
+        parsed_body = response.parsed_body
+        expect(parsed_body["client_id"]).to eq(developer_key.global_id.to_s)
+        expect(parsed_body["application_type"]).to eq("web")
+        expect(parsed_body["grant_types"]).to eq(["client_credentials", "implicit"])
+      end
+
+      context "with invalid registration params" do
+        let(:invalid_params) do
+          update_params.merge("grant_types" => ["invalid_grant_type"])
+        end
+
+        it "returns validation errors" do
+          put :update, params: { registration_id: registration.lti_registration_id, **invalid_params }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.parsed_body["errors"]).to be_present
+        end
+
+        it "does not create a registration update request" do
+          expect do
+            put :update, params: { registration_id: registration.lti_registration_id, **invalid_params }
+          end.not_to change { Lti::RegistrationUpdateRequest.count }
+        end
+
+        it "returns the errors if to_model_attrs returns errors" do
+          to_model_attrs_result = { errors: ["update validation failed"], registration_attrs: nil }
+          expect(Schemas::Lti::IMS::OidcRegistration).to \
+            receive(:to_model_attrs).and_return(to_model_attrs_result)
+
+          put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.body).to match(/update validation failed/)
+        end
+      end
+
+      context "with invalid redirect_uris" do
+        let(:invalid_params) do
+          update_params.merge("redirect_uris" => ["not-a-valid-uri"])
+        end
+
+        it "returns validation errors" do
+          put :update, params: { registration_id: registration.lti_registration_id, **invalid_params }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.parsed_body["errors"]).to be_present
+        end
+      end
+
+      context "with missing required fields" do
+        let(:invalid_params) do
+          update_params.except("client_name")
+        end
+
+        it "returns validation errors" do
+          put :update, params: { registration_id: registration.lti_registration_id, **invalid_params }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.parsed_body["errors"]).to be_present
+        end
+      end
+
+      context "with non-existent registration" do
+        it "returns a 404" do
+          put :update, params: { registration_id: 999_999, **update_params }
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+
+    context "with inactive developer key" do
+      before do
+        developer_key.update!(workflow_state: "inactive")
+        request.headers["Authorization"] = "Bearer #{access_token}"
+      end
+
+      it "returns unauthorized when developer key is inactive" do
+        put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body["errorMessage"]).to match(/inactive Developer Key/i)
+      end
+    end
+
+    context "without correct scope" do
+      let(:access_token_scopes) do
+        ["https://canvas.instructure.com/lti/account_lookup/scope/show"]
+      end
+
+      before do
+        request.headers["Authorization"] = "Bearer #{access_token}"
+      end
+
+      it "returns unauthorized when token lacks required scope" do
+        put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body["errorMessage"]).to match(/Insufficient permissions/i)
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "does not create a registration update request" do
+        expect do
+          put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+        end.not_to change { Lti::RegistrationUpdateRequest.count }
+      end
+    end
+
+    context "with malformed authorization header" do
+      it "returns unauthorized with malformed Bearer token" do
+        request.headers["Authorization"] = "Bearer"
+        put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "returns unauthorized with non-Bearer token" do
+        request.headers["Authorization"] = "Basic #{Base64.encode64("user:pass")}"
+        put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "without valid access token" do
+      it "returns unauthorized when no token provided" do
+        put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body["errorMessage"]).to be_present
+      end
+
+      it "returns unauthorized with invalid token" do
+        request.headers["Authorization"] = "Bearer invalid_token"
+        put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body["errorMessage"]).to be_present
+      end
+
+      context "with expired token" do
+        let(:access_token_exp) do
+          Time.zone.now.to_i - 1.hour.to_i
+        end
+
+        it "returns unauthorized with expired token" do
+          request.headers["Authorization"] = "Bearer #{access_token}"
+          put :update, params: { registration_id: registration.lti_registration_id, **update_params }
+
           expect(response).to have_http_status(:unauthorized)
         end
       end
