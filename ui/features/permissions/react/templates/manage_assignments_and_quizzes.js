@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = createI18nScope('permissions_templates_17')
+const I18n = createI18nScope('permissions_templates_manage_assignments_and_quizzes')
 
 export const template = generateActionTemplates(
   [
@@ -244,11 +244,6 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Assignments'),
-      description: I18n.t(
-        'To access the Assignments Index Page, Course Content - view must be enabled.',
-      ),
-    },
-    {
       description: I18n.t(
         'To differentiate assignments to individual students, Users - view list must also be enabled.',
       ),
