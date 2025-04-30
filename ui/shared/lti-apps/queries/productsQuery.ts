@@ -117,8 +117,8 @@ export const fetchCustomFilters = async (): Promise<OrganizationFiltes> => {
 
 export const fetchProductsByOrganization = async (
   params: DiscoverParams,
-  organizationSalesforceId: string,
 ): Promise<OrganizationProductResponse> => {
+  const organizationSalesforceId = ENV.DOMAIN_ROOT_ACCOUNT_SFID
   const {page, search} = params
   const {tags, companies, audience, versions} = params.filters
 

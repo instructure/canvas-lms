@@ -18,16 +18,27 @@
 
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {Alert} from '@instructure/ui-alerts'
-import {useQuery} from '@tanstack/react-query'
+import {useQuery, QueryFunction} from '@tanstack/react-query'
 import {useMemo, useState} from 'react'
 import useCreateScreenReaderFilterMessage from '../hooks/useCreateScreenReaderFilterMessage'
 import useDiscoverQueryParams from '../hooks/useDiscoverQueryParams'
 import {fetchLtiFilters, fetchProducts, fetchToolsByDisplayGroups} from '../queries/productsQuery'
+import type {DiscoverParams} from '../hooks/useDiscoverQueryParams'
+import type {ProductResponse} from '../queries/productsQuery'
 import FilterTags from './apps/FilterTags'
 import LtiFilterTray from './apps/LtiFilterTray'
 import {Products} from './apps/Products'
 import {SearchAndFilter} from './apps/SearchAndFilter'
 import Disclaimer from './common/Disclaimer'
+
+type ProductsQueryKey = readonly ['lti_product_info', DiscoverParams]
+
+const fetchProductsFromQueryKey: QueryFunction<ProductResponse, ProductsQueryKey> = async ({
+  queryKey,
+}) => {
+  const [, params] = queryKey
+  return fetchProducts(params)
+}
 
 export const Discover = () => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
@@ -41,8 +52,8 @@ export const Discover = () => {
     data: {tools = [], meta = {total_count: 0, current_page: 1, num_pages: 1}} = {},
     isLoading,
   } = useQuery({
-    queryKey: ['lti_product_info', queryParams],
-    queryFn: () => fetchProducts(queryParams),
+    queryKey: ['lti_product_info', queryParams] as const,
+    queryFn: fetchProductsFromQueryKey,
     enabled: isFilterApplied,
   })
 
@@ -54,13 +65,13 @@ export const Discover = () => {
 
   const {data: displayGroups, isLoading: isLoadingDisplayGroups} = useQuery({
     queryKey: ['lti_tool_display_groups'],
-    queryFn: () => fetchToolsByDisplayGroups(),
+    queryFn: fetchToolsByDisplayGroups,
     enabled: !isFilterApplied,
   })
 
   const {data: filterData} = useQuery({
     queryKey: ['lti_filters'],
-    queryFn: () => fetchLtiFilters(),
+    queryFn: fetchLtiFilters,
   })
 
   return (

@@ -84,18 +84,12 @@ const ProductDetail = (props: ProductDetailProps) => {
   // @ts-expect-error
   const productDescription = stripHtmlTags(product?.description)
 
-  const params = () => {
-    return {
+  const {otherProductsByCompany} = useSimilarProducts({
+    params: {
       filters: {
         companies: [{id: product?.company.id.toString(), name: product?.company.name}],
       },
-    }
-  }
-
-  const {otherProductsByCompany} = useSimilarProducts({
-    // @ts-expect-error
-    params: params(),
-    // @ts-expect-error
+    },
     product,
   })
 

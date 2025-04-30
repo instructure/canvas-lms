@@ -97,7 +97,7 @@ export interface BlueprintCoursesData {
 
 export interface EnvCommon {
   ASSET_HOST: string
-  DOMAIN_ROOT_ACCOUNT_SFID: number
+  DOMAIN_ROOT_ACCOUNT_SFID: string
   active_brand_config_json_url: string
   active_brand_config: {
     variables: Record<string, string>
