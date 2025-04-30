@@ -169,7 +169,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
 
         <>
           <Flex direction="column" display="inline-flex">
-            <Flex.Item padding="xx-small">
+            <Flex.Item padding="xx-small 0">
               <ScreenReaderContent>{I18n.t('Course Start Date')}</ScreenReaderContent>
               <CanvasDateInput
                 renderLabel={I18n.t('Start')}
@@ -199,7 +199,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
                 </>
               )}
             </Flex.Item>
-            <Flex.Item padding="xx-small">
+            <Flex.Item padding="xx-small 0">
               <ScreenReaderContent>{I18n.t('Course End Date')}</ScreenReaderContent>
               <CanvasDateInput
                 messages={endDateErrors(startDate, endDate)}
