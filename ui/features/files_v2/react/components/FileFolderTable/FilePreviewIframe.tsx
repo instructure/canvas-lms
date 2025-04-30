@@ -28,10 +28,7 @@ const sandboxSettings = (item: File) => {
     return 'allow-scripts allow-same-origin'
   }
 
-  if (
-    FLAMEGRAPH_FILENAME_REGEX.test(item.display_name) &&
-    item.filename === `${item.display_name}.html`
-  ) {
+  if (FLAMEGRAPH_FILENAME_REGEX.test(item.display_name)) {
     return 'allow-scripts allow-same-origin'
   }
 
