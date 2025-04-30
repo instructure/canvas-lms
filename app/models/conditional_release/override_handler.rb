@@ -140,7 +140,7 @@ module ConditionalRelease
           affected_context_modules.each do |context_module|
             progression = context_module.find_or_create_progression(student)
             progression.mark_as_outdated
-            progression.evaluate
+            progression.reload.evaluate
           end
 
           if course.root_account.feature_enabled? :mastery_path_invalidate_assignment_visibility_cache
