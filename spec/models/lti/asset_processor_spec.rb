@@ -111,45 +111,69 @@ describe Lti::AssetProcessor do
     end
   end
 
-  describe ".processors_info_for_assignment_edit_page" do
+  describe ".processors_info_for_display" do
     subject do
-      Lti::AssetProcessor.processors_info_for_assignment_edit_page(assignment_id: assignment.id)
+      Lti::AssetProcessor.processors_info_for_display(assignment_id: assignment.id)
     end
 
     let(:assignment) { assignment_model }
 
-    def make_ap(context_external_tool, num)
-      icon = { url: "https://example.com/icon#{num}.png" }
+    def make_ap(context_external_tool, num, icon: nil)
       title = "title#{num}"
       text = "text#{num}"
       lti_asset_processor_model(context_external_tool:, assignment:, title:, text:, icon:)
     end
 
+    it "doesn't include deleted asset processors" do
+      tool = external_tool_1_3_model
+      ap1 = make_ap(tool, 1)
+      ap2 = make_ap(tool, 2)
+      ap1.destroy!
+      expect(subject.map { |ap| ap[:id] }).to eq([ap2.id])
+    end
+
+    def set_ap_settings(tool, icon_url: nil, text: nil)
+      tool.settings["ActivityAssetProcessor"] = { icon_url:, text: }
+      tool.save!
+    end
+
     it "contains the fields needed for the assignment edit page" do
       tool1 = external_tool_1_3_model(opts: { name: "my tool" })
       tool2 = external_tool_1_3_model(opts: { name: "my other tool" })
-      ap1 = make_ap(tool1, 1)
+
+      # icon from AP (overrides placement icon), text from placement
+      set_ap_settings(tool1, icon_url: "https://example.com/placement.png", text: "placement text")
+      ap1 = make_ap(tool1, 1, icon: { url: "https://example.com/ap.png" })
+
+      # icon from tool, text from tool's name
+      set_ap_settings(tool2, icon_url: "https://example.com/placement-icon.png")
       ap2 = make_ap(tool2, 2)
-      expect(subject).to eq([{
-                              id: ap1.id,
-                              title: "title1",
-                              text: "text1",
-                              icon: ap1.icon,
-                              context_external_tool_name: tool1.name,
-                              context_external_tool_id: tool1.id,
-                              window: ap1.window,
-                              iframe: ap1.iframe,
-                            },
-                             {
-                               id: ap2.id,
-                               title: "title2",
-                               text: "text2",
-                               icon: ap2.icon,
-                               context_external_tool_name: tool2.name,
-                               context_external_tool_id: tool2.id,
-                               window: ap2.window,
-                               iframe: ap2.iframe,
-                             }])
+
+      expected = [
+        {
+          id: ap1.id,
+          title: "title1",
+          text: "text1",
+          tool_name: tool1.name,
+          tool_id: tool1.id,
+          tool_placement_label: "placement text",
+          icon_or_tool_icon_url: "https://example.com/ap.png",
+          window: ap1.window,
+          iframe: ap1.iframe,
+        },
+        {
+          id: ap2.id,
+          title: "title2",
+          text: "text2",
+          tool_name: tool2.name,
+          tool_id: tool2.id,
+          tool_placement_label: "my other tool",
+          icon_or_tool_icon_url: "https://example.com/placement-icon.png",
+          window: ap1.window,
+          iframe: ap1.iframe,
+        }
+      ]
+      expect(subject).to eq(expected)
     end
   end
 end

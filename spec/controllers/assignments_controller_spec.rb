@@ -3047,18 +3047,33 @@ describe AssignmentsController do
       before { user_session(@teacher) }
 
       it "includes the existing asset processors" do
+        icon = "http://example.com/ap.png"
         tool = external_tool_1_3_model(context: @course)
-        ap1 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 1", iframe: { width: 100, height: 200 }, window: nil)
-        ap2 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 2", window: { width: 300, height: 400 }, iframe: nil)
+        ap1 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 1", iframe: { width: 100, height: 200 }, window: nil, icon: { url: icon })
+        ap2 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 2", window: { width: 300, height: 400 }, iframe: nil, icon: { url: icon })
         get :edit, params: { course_id: @course.id, id: @assignment.id }
 
         aps = assigns[:js_env][:ASSET_PROCESSORS].map do |ap|
-          ap.slice(:id, :title, :context_external_tool_id, :iframe, :window).deep_symbolize_keys
+          ap.slice(:id, :title, :tool_id, :tool_name, :icon_or_tool_icon_url, :iframe, :window).deep_symbolize_keys
         end
 
         expected = [
-          { id: ap1.id, title: "ap 1", context_external_tool_id: tool.id, iframe: { width: 100, height: 200 } },
-          { id: ap2.id, title: "ap 2", context_external_tool_id: tool.id, window: { width: 300, height: 400 } }
+          {
+            id: ap1.id,
+            title: "ap 1",
+            tool_id: tool.id,
+            tool_name: tool.name,
+            icon_or_tool_icon_url: icon,
+            iframe: { width: 100, height: 200 },
+          },
+          {
+            id: ap2.id,
+            title: "ap 2",
+            tool_id: tool.id,
+            tool_name: tool.name,
+            icon_or_tool_icon_url: icon,
+            window: { width: 300, height: 400 }
+          }
         ]
 
         expect(aps).to match_array(expected)

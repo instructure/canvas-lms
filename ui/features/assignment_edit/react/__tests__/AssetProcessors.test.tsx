@@ -28,10 +28,8 @@ import {
   AssetProcessorsAddModalProps,
 } from '../AssetProcessorsAddModal'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
-import {
-  ExistingAttachedAssetProcessor,
-  useAssetProcessorsState,
-} from '../hooks/AssetProcessorsState'
+import {useAssetProcessorsState} from '../hooks/AssetProcessorsState'
+import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {mockDeepLinkResponse, mockDoFetchApi, mockTools} from './assetProcessorsTestHelpers'
 
 jest.mock('@canvas/do-fetch-api-effect')
@@ -55,11 +53,12 @@ describe('AssetProcessors', () => {
   const initialAttachedProcessors = (): ExistingAttachedAssetProcessor[] => [
     {
       id: 1,
-      context_external_tool_id: 2,
-      context_external_tool_name: 'tool name',
+      tool_id: 2,
+      tool_name: 'tool name',
+      tool_placement_label: 'tool label',
       title: 'ap title',
       text: 'ap text',
-      icon: {url: 'http://instructure.com/icon.png'},
+      icon_or_tool_icon_url: 'http://instructure.com/icon.png',
       iframe: {
         width: 600,
         height: 500,
@@ -70,11 +69,11 @@ describe('AssetProcessors', () => {
   const processorWithWindowSettings = (): ExistingAttachedAssetProcessor[] => [
     {
       id: 2,
-      context_external_tool_id: 3,
-      context_external_tool_name: 'window tool',
+      tool_id: 3,
+      tool_name: 'window tool',
       title: 'window title',
       text: 'window text',
-      icon: {url: 'http://instructure.com/window-icon.png'},
+      icon_or_tool_icon_url: 'http://instructure.com/icon.png',
       window: {
         width: 800,
         height: 700,
@@ -123,7 +122,7 @@ describe('AssetProcessors', () => {
 
   it('shows the initial attached processors', () => {
     const {getByText} = renderAssetProcessors()
-    expect(getByText('tool name · ap title')).toBeInTheDocument()
+    expect(getByText('tool label · ap title')).toBeInTheDocument()
   })
 
   it('adds attached processors sent by the modal', async () => {
@@ -170,22 +169,22 @@ describe('AssetProcessors', () => {
 
   it('allows removing existing attached processors', async () => {
     const {queryByText, getByText} = renderAssetProcessors()
-    expect(getByText('tool name · ap title')).toBeInTheDocument()
-    getByText('Actions for document processing app: tool name · ap title').click()
+    expect(getByText('tool label · ap title')).toBeInTheDocument()
+    getByText('Actions for document processing app: tool label · ap title').click()
     getByText('Delete').click()
     expect(getByText('Confirm Delete')).toBeInTheDocument()
     getByText('Delete').click()
-    if (queryByText('tool name · ap title')) {
-      await waitForElementToBeRemoved(() => queryByText('tool name · ap title'))
+    if (queryByText('tool label · ap title')) {
+      await waitForElementToBeRemoved(() => queryByText('tool label · ap title'))
     }
   })
 
   it('allows modifying existing attached processors', async () => {
     const {getByText} = renderAssetProcessors()
-    expect(getByText('tool name · ap title')).toBeInTheDocument()
-    getByText('Actions for document processing app: tool name · ap title').click()
+    expect(getByText('tool label · ap title')).toBeInTheDocument()
+    getByText('Actions for document processing app: tool label · ap title').click()
     getByText('Modify').click()
-    expect(getByText('Modify settings for tool name · ap title')).toBeInTheDocument()
+    expect(getByText('Modify settings for tool label · ap title')).toBeInTheDocument()
 
     const iframe = document.querySelector('iframe')
     expect(iframe).toBeInTheDocument()

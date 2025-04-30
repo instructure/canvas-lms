@@ -23,10 +23,15 @@ import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import {
   AssetProcessorContentItem,
   AssetProcessorContentItemDto,
-  AssetProcessorWindowSettings,
   assetProcessorContentItemToDto,
 } from '@canvas/deep-linking/models/AssetProcessorContentItem'
-import {ContentItemIframeDimensions} from '@canvas/deep-linking/models/helpers'
+
+import {
+  AssetProcessorWindowSettings,
+  ExistingAttachedAssetProcessor,
+  safeDigIconUrl,
+} from '@canvas/lti/model/AssetProcessor'
+import {IframeDimensions} from '@canvas/lti/model/common'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
@@ -63,31 +68,17 @@ const jsonStringifyDto: (blob: AttachedAssetProcessorDto) => string = JSON.strin
  */
 export type AttachedAssetProcessor = {
   id?: number
-  toolName?: string
+  toolName: string
+  toolPlacementLabel?: string
   toolId: string
-  iconUrl?: string
+  iconOrToolIconUrl?: string
   title?: string
   text?: string
   window?: AssetProcessorWindowSettings
-  iframe?: ContentItemIframeDimensions
+  iframe?: IframeDimensions
 
   // JSON-serialized Asset Processor (AttachedAssetProcessorDto) to be sent to server
   dtoJson: string
-}
-
-/**
- * Data sent by server to show APs already attached to an existing assignment.
- * See Lti::AssetProcessors.processors_info_for_assignment_edit_page
- */
-export type ExistingAttachedAssetProcessor = {
-  id: number
-  title?: string
-  text?: string
-  icon?: AssetProcessorContentItem['icon']
-  context_external_tool_id: number
-  context_external_tool_name?: string
-  iframe?: ContentItemIframeDimensions
-  window?: AssetProcessorWindowSettings
 }
 
 function newAttachedAssetProcessor({
@@ -95,11 +86,14 @@ function newAttachedAssetProcessor({
   contentItem,
 }: {tool: LtiLaunchDefinition; contentItem: AssetProcessorContentItem}): AttachedAssetProcessor {
   return {
-    iconUrl: safeDigIconUrl(contentItem.icon) || tool.placements?.ActivityAssetProcessor?.icon_url,
+    toolId: tool.definition_id,
+    // tool.name in LtiLaunchDefinitions is not really tool name, it's the placement title
+    toolName: tool.placements.ActivityAssetProcessor!.tool_name_for_default_icon || tool.name,
+    toolPlacementLabel: tool.placements.ActivityAssetProcessor!.title,
+    iconOrToolIconUrl:
+      safeDigIconUrl(contentItem.icon) || tool.placements.ActivityAssetProcessor!.icon_url,
     text: contentItem.text,
     title: contentItem.title,
-    toolId: tool.definition_id,
-    toolName: tool.name,
     iframe: contentItem.iframe,
     window: contentItem.window,
     dtoJson: jsonStringifyDto({
@@ -108,22 +102,15 @@ function newAttachedAssetProcessor({
   }
 }
 
-// TODO: we'll probably want to do real validation on the whole content item,
-// at least on the server. See INTEROP-9255
-function safeDigIconUrl(icon: any): string | undefined {
-  if (typeof icon === 'object' && icon && typeof icon.url === 'string') {
-    return icon.url
-  }
-}
-
 function existingAttachedAssetProcessor(
   processor: ExistingAttachedAssetProcessor,
 ): AttachedAssetProcessor {
   return {
     id: processor.id,
-    toolName: processor.context_external_tool_name,
-    toolId: processor.context_external_tool_id.toString(),
-    iconUrl: processor.icon?.url,
+    toolName: processor.tool_name,
+    toolPlacementLabel: processor.tool_placement_label,
+    toolId: processor.tool_id.toString(),
+    iconOrToolIconUrl: processor.icon_or_tool_icon_url,
     title: processor.title,
     text: processor.text,
     iframe: processor.iframe,

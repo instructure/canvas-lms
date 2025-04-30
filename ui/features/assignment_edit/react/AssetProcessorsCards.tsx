@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssetProcessorWindowSettings} from '@canvas/deep-linking/models/AssetProcessorContentItem'
-import {ContentItemIframeDimensions} from '@canvas/deep-linking/models/helpers'
+import {AssetProcessorWindowSettings} from '@canvas/lti/model/AssetProcessor'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ToolIconOrDefault} from '@canvas/lti-apps/components/common/ToolIconOrDefault'
 import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
+import {IframeDimensions} from '@canvas/lti/model/common'
 import {Spacing} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -47,22 +47,21 @@ type AssetProcessorsCardCommonProps = {
     toolName: string
     toolId: number | string
   }
+  title: string
   description?: string
   margin?: Spacing
   children?: React.ReactNode
 }
 
 type AssetProcessorsCardProps = AssetProcessorsCardCommonProps & {
-  title: string
   extraColumns?: React.ReactNode
   onClick?: () => void
 }
 
 type AssetProcessorsAttachedProcessorCardProps = AssetProcessorsCardCommonProps & {
   assetProcessorId?: number
-  title?: string
   onDelete: () => void
-  iframeSettings?: ContentItemIframeDimensions
+  iframeSettings?: IframeDimensions
   windowSettings?: AssetProcessorWindowSettings
 }
 
@@ -118,12 +117,11 @@ export const AssetProcessorsAttachedProcessorCard = ({
   assetProcessorId,
   iframeSettings,
   onDelete,
-  title,
   windowSettings,
   ...commonProps
 }: AssetProcessorsAttachedProcessorCardProps) => {
   const [settingsLaunchModalVisible, setSettingsLaunchModalVisible] = useState<boolean>(false)
-  const {toolName} = commonProps.icon
+  const {title} = commonProps
   const modifyInNewWindow = !isNil(windowSettings)
 
   function onModify() {
@@ -150,19 +148,12 @@ export const AssetProcessorsAttachedProcessorCard = ({
     setSettingsLaunchModalVisible(true)
   }
 
-  let completeTitle: string
-  if (title && toolName && title !== toolName) {
-    completeTitle = `${toolName} · ${title}`
-  } else {
-    completeTitle = title || toolName
-  }
-
   return (
     <>
       <ExternalToolModalLauncher
         isOpen={settingsLaunchModalVisible}
         title={I18n.t('Modify settings for %{documentProcessingAppName}', {
-          documentProcessingAppName: completeTitle,
+          documentProcessingAppName: title,
         })}
         onRequestClose={() => setSettingsLaunchModalVisible(false)}
         iframeSrc={`/asset_processors/${assetProcessorId}/launch`}
@@ -171,11 +162,10 @@ export const AssetProcessorsAttachedProcessorCard = ({
       />
       <AssetProcessorsCard
         {...commonProps}
-        title={completeTitle}
         extraColumns={
           <div style={{flex: 'none'}}>
             <AttachedAssetProcessorsMenu
-              nameForScreenReader={completeTitle}
+              nameForScreenReader={title}
               onModify={isNil(assetProcessorId) ? undefined : onModify}
               modifyInNewWindow={modifyInNewWindow}
               onDelete={onDelete}

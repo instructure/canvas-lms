@@ -70,6 +70,7 @@ type LtiLaunchPlacement = {
   selection_width: number
   selection_height: number
   icon_url?: string
+  tool_name_for_default_icon?: string
 }
 
 /**
