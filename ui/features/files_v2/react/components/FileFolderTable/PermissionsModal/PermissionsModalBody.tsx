@@ -19,15 +19,15 @@
 import {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {DateTimeInput} from '@instructure/ui-date-time-input'
-import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
 import FileFolderInfo from '../../shared/FileFolderInfo'
 import {isFile} from '../../../../utils/fileFolderUtils'
 import {type File, type Folder} from '../../../../interfaces/File'
-import {AVAILABILITY_OPTIONS} from './PermissionsModalUtils'
+import {AvailabilitySelect, type AvailabilityOptionChangeHandler} from './AvailabilitySelect'
+import {DateRangeSelect} from './DateRangeSelect'
+import {VisibilitySelect, type VisibilityOptionChangeHandler} from './VisibilitySelect'
 import {type AvailabilityOption, type VisibilityOption} from './PermissionsModalUtils'
 
 const I18n = createI18nScope('files_v2')
@@ -38,21 +38,11 @@ type PermissionsModalBodyProps = {
   error: string | null
   onDismissAlert: () => void
   availabilityOption: AvailabilityOption
-  onChangeAvailabilityOption: (
-    event: React.SyntheticEvent,
-    data: {
-      id?: string
-    },
-  ) => void
+  onChangeAvailabilityOption: AvailabilityOptionChangeHandler
   enableVisibility: boolean
   visibilityOption: VisibilityOption
   visibilityOptions: Record<string, VisibilityOption>
-  onChangeVisibilityOption: (
-    event: React.SyntheticEvent,
-    data: {
-      id?: string
-    },
-  ) => void
+  onChangeVisibilityOption: VisibilityOptionChangeHandler
   unlockAt: string | null
   unlockAtDateInputRef: (el: HTMLInputElement | null) => void
   unlockAtTimeInputRef: (el: HTMLInputElement | null) => void
@@ -114,79 +104,35 @@ export const PermissionsModalBody = ({
         </Alert>
       )}
       <View as="div" margin="small none none none">
-        <SimpleSelect
-          data-testid="permissions-availability-selector"
-          renderLabel={I18n.t('Available')}
-          renderBeforeInput={availabilityOption.icon}
-          value={availabilityOption.id}
-          onChange={onChangeAvailabilityOption}
-        >
-          {Object.values(AVAILABILITY_OPTIONS).map(option => (
-            <SimpleSelect.Option
-              key={option.id}
-              id={option.id}
-              value={option.id}
-              renderBeforeLabel={option.icon}
-            >
-              {option.label}
-            </SimpleSelect.Option>
-          ))}
-        </SimpleSelect>
+        <AvailabilitySelect
+          availabilityOption={availabilityOption}
+          onChangeAvailabilityOption={onChangeAvailabilityOption}
+        />
       </View>
 
       {availabilityOption.id === 'date_range' && (
-        <>
-          <View as="div" margin="small none none none">
-            <DateTimeInput
-              description={<></>}
-              prevMonthLabel={I18n.t('Previous month')}
-              nextMonthLabel={I18n.t('Next month')}
-              invalidDateTimeMessage={I18n.t('Invalid date')}
-              dateRenderLabel={I18n.t('Available from')}
-              timeRenderLabel={I18n.t('Time')}
-              layout="columns"
-              value={unlockAt || undefined}
-              dateInputRef={unlockAtDateInputRef}
-              timeInputRef={unlockAtTimeInputRef}
-              onChange={onChangeUnlockAt}
-              messages={unlockAtError}
-            />
-          </View>
-
-          <View as="div" margin="small none none none">
-            <DateTimeInput
-              description={<></>}
-              prevMonthLabel={I18n.t('Previous month')}
-              nextMonthLabel={I18n.t('Next month')}
-              invalidDateTimeMessage={I18n.t('Invalid date')}
-              dateRenderLabel={I18n.t('Until')}
-              timeRenderLabel={I18n.t('Time')}
-              layout="columns"
-              value={lockAt || undefined}
-              dateInputRef={lockAtDateInputRef}
-              timeInputRef={lockAtTimeInputRef}
-              onChange={onChangeLockAt}
-              messages={lockAtError}
-            />
-          </View>
-        </>
+        <DateRangeSelect
+          unlockAt={unlockAt}
+          unlockAtDateInputRef={unlockAtDateInputRef}
+          unlockAtTimeInputRef={unlockAtTimeInputRef}
+          unlockAtError={unlockAtError}
+          onChangeUnlockAt={onChangeUnlockAt}
+          lockAt={lockAt}
+          lockAtDateInputRef={lockAtDateInputRef}
+          lockAtTimeInputRef={lockAtTimeInputRef}
+          lockAtError={lockAtError}
+          onChangeLockAt={onChangeLockAt}
+        />
       )}
 
       {enableVisibility && !allFolders && (
         <View as="div" margin="small none none none">
-          <SimpleSelect
-            data-testid="permissions-visibility-selector"
-            disabled={availabilityOption.id === 'unpublished'}
-            renderLabel={I18n.t('Visibility')}
-            value={visibilityOption.id}
-            onChange={onChangeVisibilityOption}
-          >
-            {Object.values(visibilityOptions).map(option => (
-              <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
-                {option.label}
-              </SimpleSelect.Option>
-            ))}
-          </SimpleSelect>
+          <VisibilitySelect
+            visibilityOption={visibilityOption}
+            visibilityOptions={visibilityOptions}
+            availabilityOption={availabilityOption}
+            onChangeVisibilityOption={onChangeVisibilityOption}
+          />
         </View>
       )}
     </>
