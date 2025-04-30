@@ -18,7 +18,7 @@
 
 import {
   IconDocumentLine,
-  IconAttachMediaLine,
+  IconPaperclipLine,
   IconDiscussionLine,
   IconAssignmentLine,
   IconQuizLine,
@@ -49,7 +49,7 @@ export const getItemIcon = (content: ModuleItemContent) => {
   if (type.includes('discussion'))
     return <IconDiscussionLine color={content.published ? 'success' : 'primary'} />
   if (type.includes('attachment') || type.includes('file'))
-    return <IconAttachMediaLine color={content.published ? 'success' : 'primary'} />
+    return <IconPaperclipLine color={content.published ? 'success' : 'primary'} />
   if (type.includes('external') || type.includes('url'))
     return <IconLinkLine color={content.published ? 'success' : 'primary'} />
   if (type.includes('wiki') || type.includes('page'))
