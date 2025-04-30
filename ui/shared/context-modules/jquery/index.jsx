@@ -164,62 +164,73 @@ window.modules = (function () {
       )
     },
 
-    updateEstimatedDurations() {
+    updateEstimatedDurations(moduleId) {
       if (!ENV.horizon_course) {
         return
       }
-      return $.ajaxJSON(ENV.CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL, 'GET', {}, data => {
-        $(() => {
-          $.each(data, (module_id, durations_by_id) => {
-            let estimatedDurationSum = 0
-            let $context_module_item
+      return $.ajaxJSON(
+        ENV.CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL,
+        'GET',
+        {context_module_id: moduleId},
+        data => {
+          $(() => {
+            $.each(data, (module_id, durations_by_id) => {
+              let estimatedDurationSum = 0
+              let $context_module_item
 
-            $.each(durations_by_id, (id, info) => {
-              $context_module_item = $('#context_module_item_' + id)
-              const data = {
-                estimated_duration_minutes: info.estimated_duration_minutes,
-                can_set_estimated_duration: info.can_set_estimated_duration,
-                estimated_duration_display: '',
-              }
-              if (info.estimated_duration_minutes != null && info.estimated_duration_minutes > 0) {
-                estimatedDurationSum += info.estimated_duration_minutes
-                $context_module_item.find('.ig-row').removeClass('no-estimated-duration')
-                data.estimated_duration_display = I18n.t('%{minutes} Mins', {
-                  minutes: info.estimated_duration_minutes,
+              $.each(durations_by_id, (id, info) => {
+                $context_module_item = $('#context_module_item_' + id)
+                const data = {
+                  estimated_duration_minutes: info.estimated_duration_minutes,
+                  can_set_estimated_duration: info.can_set_estimated_duration,
+                  estimated_duration_display: '',
+                }
+                if (
+                  info.estimated_duration_minutes != null &&
+                  info.estimated_duration_minutes > 0
+                ) {
+                  estimatedDurationSum += info.estimated_duration_minutes
+                  $context_module_item.find('.ig-row').removeClass('no-estimated-duration')
+                  data.estimated_duration_display = I18n.t('%{minutes} Mins', {
+                    minutes: info.estimated_duration_minutes,
+                  })
+                } else {
+                  $context_module_item.find('.ig-row').addClass('no-estimated-duration')
+                }
+                $context_module_item.fillTemplateData({
+                  data,
+                  htmlValues: [
+                    'estimated_duration_display',
+                    'estimated_duration_minutes',
+                    'can_set_estimated_duration',
+                  ],
                 })
-              } else {
-                $context_module_item.find('.ig-row').addClass('no-estimated-duration')
+              })
+
+              const $moduleHeader = $('#context_module_' + module_id).find('.ig-header')
+              const headerData = {
+                estimated_duration_header_title: '',
+                estimated_duration_header_minutes: '',
               }
-              $context_module_item.fillTemplateData({
-                data,
+
+              if (estimatedDurationSum > 0) {
+                headerData.estimated_duration_header_title = I18n.t('Time to Complete:')
+                headerData.estimated_duration_header_minutes = I18n.t('%{minutes} Mins', {
+                  minutes: estimatedDurationSum,
+                })
+              }
+
+              $moduleHeader.fillTemplateData({
+                data: headerData,
                 htmlValues: [
-                  'estimated_duration_display',
-                  'estimated_duration_minutes',
-                  'can_set_estimated_duration',
+                  'estimated_duration_header_title',
+                  'estimated_duration_header_minutes',
                 ],
               })
             })
-
-            const $moduleHeader = $('#context_module_' + module_id).find('.ig-header')
-            const headerData = {
-              estimated_duration_header_title: '',
-              estimated_duration_header_minutes: '',
-            }
-
-            if (estimatedDurationSum > 0) {
-              headerData.estimated_duration_header_title = I18n.t('Time to Complete:')
-              headerData.estimated_duration_header_minutes = I18n.t('%{minutes} Mins', {
-                minutes: estimatedDurationSum,
-              })
-            }
-
-            $moduleHeader.fillTemplateData({
-              data: headerData,
-              htmlValues: ['estimated_duration_header_title', 'estimated_duration_header_minutes'],
-            })
           })
-        })
-      })
+        },
+      )
     },
 
     updateModuleItemPositions(_event, ui) {
@@ -260,7 +271,7 @@ window.modules = (function () {
       })
     },
 
-    updateProgressions(callback) {
+    updateProgressions(callback, moduleId) {
       if (!ENV.IS_STUDENT) {
         if (callback) {
           callback()
@@ -274,7 +285,7 @@ window.modules = (function () {
       $.ajaxJSON(
         url,
         'GET',
-        {},
+        {context_module_id: moduleId},
         function (data) {
           $('.loading_module_progressions_link').remove()
           const $user_progression_list = $('#current_user_progression_list')
@@ -340,11 +351,11 @@ window.modules = (function () {
       )
     },
 
-    updateAssignmentData(callback) {
+    updateAssignmentData(callback, moduleId) {
       return $.ajaxJSON(
         ENV.CONTEXT_MODULE_ASSIGNMENT_INFO_URL,
         'GET',
-        {},
+        {context_module_id: moduleId},
         data => {
           $(() => {
             $.each(data, (id, info) => {
@@ -416,10 +427,11 @@ window.modules = (function () {
       )
     },
 
-    async loadMasterCourseData(tag_id) {
+    async loadMasterCourseData(tag_id, moduleId) {
       if (ENV.MASTER_COURSE_SETTINGS) {
+        const params = {tag_id, context_module_id: moduleId}
         // Grab the stuff for master courses if needed
-        $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id}, data => {
+        $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', params, data => {
           if (data.tag_restrictions) {
             Object.entries(data.tag_restrictions).forEach(([id, restriction]) => {
               const item = document.querySelector(
@@ -580,20 +592,20 @@ window.modules = (function () {
     lazyLoadItems(moduleIds) {
       const itemsCallback = moduleId => {
         initContextModuleItems(moduleId)
+        modules.updateAssignmentData(
+          () => modules.updateProgressions(modules.afterUpdateProgressions, moduleId),
+          moduleId,
+        )
+        if ($('#context_modules').hasClass('editable')) {
+          modules.loadMasterCourseData(undefined, moduleId)
+        }
+        if (ENV.horizon_course) {
+          modules.updateEstimatedDurations(moduleId)
+        }
       }
 
       const moduleItemsLazyLoader = new ModuleItemsLazyLoader(ENV.COURSE_ID, itemsCallback)
-      moduleItemsLazyLoader.fetchModuleItems(moduleIds).then(() => {
-        modules.updateAssignmentData(() => {
-          modules.updateProgressions(modules.afterUpdateProgressions)
-        })
-        if ($('#context_modules').hasClass('editable')) {
-          modules.loadMasterCourseData()
-        }
-        if (ENV.horizon_course) {
-          modules.updateEstimatedDurations()
-        }
-      })
+      moduleItemsLazyLoader.fetchModuleItems(moduleIds)
     },
 
     evaluateItemCyoe($item, data) {
