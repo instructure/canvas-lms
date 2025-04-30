@@ -46,6 +46,7 @@ PATH
   specs:
     i18n_tasks (0.0.1)
       activesupport
+      csv
       i18n (>= 0.7, < 2)
       i18n_extraction
       ruby_parser (~> 3.7)
@@ -156,6 +157,7 @@ PATH
       canvas_http
       canvas_slug
       canvas_sort
+      csv
       legacy_multipart
       nokogiri
     canvas_mimetype_fu (0.0.1)
@@ -193,6 +195,7 @@ PATH
     config_file (0.1.0)
       railties (>= 5.0)
     csv_diff (1.0.0)
+      csv
       sqlite3
     diigo (1.0.0)
       nokogiri
@@ -229,8 +232,10 @@ PATH
       net-smtp
       utf8_cleaner
     json_token (0.0.1)
+      base64
       json
     legacy_multipart (0.0.1)
+      base64
       canvas_slug
       mime-types (~> 3.2)
     live_events (1.0.0)

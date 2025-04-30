@@ -36,6 +36,7 @@ describe EventStream::Logger do
     fake_logger = l_klass.new
     allow(EventStream::Logger).to receive(:logger).and_return(fake_logger)
     EventStream::Logger.info("TEST", "stream_id", "insert", { "foo" => "bar" })
-    expect(fake_logger.msgs.first).to eq("[TEST:INFO] stream_id:insert {\"foo\"=>\"bar\"}")
+    separator = (RUBY_VERSION >= "3.4.0") ? " => " : "=>"
+    expect(fake_logger.msgs.first).to eq("[TEST:INFO] stream_id:insert {\"foo\"#{separator}\"bar\"}")
   end
 end

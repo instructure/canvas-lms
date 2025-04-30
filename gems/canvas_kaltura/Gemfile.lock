@@ -39,6 +39,7 @@ PATH
   remote: ../legacy_multipart
   specs:
     legacy_multipart (0.0.1)
+      base64
       canvas_slug
       mime-types (~> 3.2)
 
@@ -49,6 +50,7 @@ PATH
       canvas_http
       canvas_slug
       canvas_sort
+      csv
       legacy_multipart
       nokogiri
 
@@ -102,6 +104,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
+    csv (3.3.3)
     date (3.4.1)
     diff-lcs (1.6.1)
     digest-murmurhash (1.1.1)
