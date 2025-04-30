@@ -6908,28 +6908,60 @@ describe Course do
   end
 
   describe "visible_module_items_by_module" do
-    before :once do
-      course_with_teacher active_all: true
-      @module1 = @course.context_modules.create!
+    let(:prepare_modules) do
+      @module1 = @course.context_modules.create!(workflow_state: "published")
       @context_module1_item1 = @module1.add_item(type: "sub_header", title: "item 1")
-      @module2 = @course.context_modules.create!
+      @context_module1_item1.publish!
+      @module2 = @course.context_modules.create!(workflow_state: "published")
       @context_module2_item1 = @module2.add_item(type: "sub_header", title: "item 2")
+      @context_module2_item1.publish!
     end
 
-    context "when module exist on the course" do
-      subject { @course.visible_module_items_by_module(@teacher, @module1) }
+    context "when user is teacher" do
+      before do
+        course_with_teacher(active_all: true)
+        prepare_modules
+      end
 
-      it "should return the tags for the given module" do
-        expect(subject.length).to be(1)
-        expect(subject.first).to eql(@context_module1_item1)
+      context "when module exist on the course" do
+        subject { @course.visible_module_items_by_module(@teacher, @module1) }
+
+        it "should return the tags for the given module" do
+          expect(subject.length).to be(1)
+          expect(subject.first).to eql(@context_module1_item1)
+        end
+      end
+
+      context "when module not exist on the course" do
+        subject { @course.visible_module_items_by_module(@teacher, double("mock", id: "noop")) }
+
+        it "should return empty list" do
+          expect(subject.length).to be(0)
+        end
       end
     end
 
-    context "when module not exist on the course" do
-      subject { @course.visible_module_items_by_module(@teacher, double("mock", id: "noop")) }
+    context "when user is student" do
+      before do
+        course_with_student(active_all: true)
+        prepare_modules
+      end
 
-      it "should return empty list" do
-        expect(subject.length).to be(0)
+      context "when module exist on the course" do
+        subject { @course.visible_module_items_by_module(@student, @module1) }
+
+        it "should return the tags for the given module" do
+          expect(subject.length).to be(1)
+          expect(subject.first).to eql(@context_module1_item1)
+        end
+      end
+
+      context "when module not exist on the course" do
+        subject { @course.visible_module_items_by_module(@student, double("mock", id: "noop")) }
+
+        it "should return empty list" do
+          expect(subject.length).to be(0)
+        end
       end
     end
   end

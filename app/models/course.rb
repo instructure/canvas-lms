@@ -538,7 +538,7 @@ class Course < ActiveRecord::Base
   end
 
   def visible_module_items_by_module(user, context_module)
-    module_items_visible_to(user).where(context_modules: { id: context_module.id })
+    module_items_visible_to(user).where(context_module_id: context_module.id)
   end
 
   def module_items_visible_to(user)
