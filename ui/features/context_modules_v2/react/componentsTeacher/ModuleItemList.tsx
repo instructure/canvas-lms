@@ -36,7 +36,9 @@ const MemoizedModuleItem = memo(ModuleItem, (prevProps, nextProps) => {
     prevProps.id === nextProps.id &&
     prevProps.moduleId === nextProps.moduleId &&
     prevProps.published === nextProps.published &&
-    prevProps.index === nextProps.index
+    prevProps.index === nextProps.index &&
+    prevProps.content?.title === nextProps.content?.title &&
+    prevProps.indent === nextProps.indent
   )
 })
 

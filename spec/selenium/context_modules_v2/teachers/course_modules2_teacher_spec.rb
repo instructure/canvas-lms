@@ -39,4 +39,37 @@ describe "context modules", :ignore_js_errors do
     go_to_modules
     expect(teacher_modules_container).to be_displayed
   end
+
+  context "modules edit assignment kebab form" do
+    before do
+      get "/courses/#{@course.id}/modules"
+
+      @item = @module1.content_tags[0]
+
+      manage_module_item_button(@item.id).click
+      module_item_action_menu_link("Edit").click
+    end
+
+    it "edit item form is shown" do
+      expect(edit_item_modal).to be_displayed
+    end
+
+    it "title field has the right value" do
+      item_title = @module1.content_tags[0].title
+      title = edit_item_modal.find_element(:css, "input[type=text]")
+
+      expect(title.attribute("value")).to eq(item_title)
+    end
+
+    it "item is updated" do
+      title = edit_item_modal.find_element(:css, "input[type=text]")
+      replace_content(title, "New Title")
+
+      edit_item_modal.find_element(:css, "button[type='submit']").click
+      assignment_title = manage_module_item_container(@item.id).find_element(:css, "[data-testid='module-item-title-link']")
+      wait_for_animations
+
+      expect(assignment_title.text).to eq("New Title")
+    end
+  end
 end
