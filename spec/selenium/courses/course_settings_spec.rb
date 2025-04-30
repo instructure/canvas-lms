@@ -475,7 +475,7 @@ describe "course settings" do
 
         f("input[title='Term']").click
         fj("li[class*='optionItem']:contains('Course')").click
-        ff("input[id*='Selectable_']").first.send_keys(Time.zone.now.to_s)
+        ff("input[id*='TextInput_']")[0].send_keys(Time.zone.now.to_s)
         fj("button:contains('Update Course Details')").click
         expect(fj("span:contains('Course was successfully updated')")).to be_present
       end
@@ -485,7 +485,7 @@ describe "course settings" do
 
         f("input[title='Term']").click
         fj("li[class*='optionItem']:contains('Course')").click
-        ff("input[id*='Selectable_']").last.send_keys(Time.zone.now.to_s)
+        ff("input[id*='TextInput_']")[1].send_keys(Time.zone.now.to_s)
         fj("button:contains('Update Course Details')").click
         expect(fj("span:contains('Course was successfully updated')")).to be_present
       end
@@ -497,8 +497,8 @@ describe "course settings" do
 
         f("input[title='Term']").click
         fj("li[class*='optionItem']:contains('Course')").click
-        ff("input[id*='Selectable_']").first.send_keys(current_date.to_s)
-        ff("input[id*='Selectable_']").last.send_keys(yesterday.to_s)
+        ff("input[id*='TextInput_']")[0].send_keys(current_date.to_s)
+        ff("input[id*='TextInput_']")[1].send_keys(yesterday.to_s)
 
         fj("button:contains('Update Course Details')").click
         # Adding expectation for the error shown after the end field
