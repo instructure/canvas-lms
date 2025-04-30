@@ -1526,7 +1526,7 @@ class Lti::RegistrationsController < ApplicationController
                region: Canvas.region,
                canvasBaseUrl: request.base_url,
                firstName: @current_user.short_name,
-               locale: @current_user.browser_locale,
+               locale: I18n.locale,
                rootAccountId: @account.root_account.id,
                rootAccountUuid: @account.root_account.uuid,
                isPremiumAccount: @account.root_account.feature_enabled?(:lti_usage_premium)
