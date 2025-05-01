@@ -97,7 +97,7 @@ GEM
     outrigger (3.0.3)
       activerecord (>= 6.0, <= 8.0)
       railties (>= 6.0, <= 8.0)
-    parallel (1.26.3)
+    parallel (1.27.0)
     parser (3.3.7.4)
       ast (~> 2.4.1)
       racc
