@@ -30,6 +30,7 @@ import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import FileFolderInfo from '../../shared/FileFolderInfo'
+import {useRowFocus, SELECT_ALL_FOCUS_STRING} from '../../Contexts'
 
 const I18n = createI18nScope('files_v2')
 
@@ -37,12 +38,14 @@ export interface DeleteModalProps {
   open: boolean
   items: (File | Folder)[]
   onClose: () => void
+  rowIndex?: number
 }
 
-export function DeleteModal({open, items, onClose}: DeleteModalProps) {
+export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const isDeletingOrLoading = isDeleting || items.length === 0
   const isMultiple = items.length > 1
+  const {setRowToFocus} = useRowFocus()
 
   const handleConfirmDelete = useCallback(async () => {
     setIsDeleting(true)
@@ -79,8 +82,9 @@ export function DeleteModal({open, items, onClose}: DeleteModalProps) {
       showFlashError(errorMessage)
     } finally {
       onClose()
+      setRowToFocus(rowIndex ?? SELECT_ALL_FOCUS_STRING)
     }
-  }, [items, isMultiple, onClose])
+  }, [items, isMultiple, onClose, rowIndex, setRowToFocus])
 
   return (
     <Modal

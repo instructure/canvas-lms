@@ -50,3 +50,31 @@ export function FileManagementProvider({
 }) {
   return <FileManagementContext.Provider value={value}>{children}</FileManagementContext.Provider>
 }
+
+export const SELECT_ALL_FOCUS_STRING = 'select_all_focus' as const
+export type SELECT_ALL_FOCUS_STRING = typeof SELECT_ALL_FOCUS_STRING
+
+type RowFocusContextType = {
+  setRowToFocus: (row: number | SELECT_ALL_FOCUS_STRING | null) => void
+  handleActionButtonRef: (ref: HTMLElement | null, i: number) => void
+}
+
+export const RowFocusContext = createContext<RowFocusContextType | undefined>(undefined)
+
+export const useRowFocus = () => {
+  const context = useContext(RowFocusContext)
+  if (!context) {
+    throw new Error('useRowFocus must be used within a RowFocusProvider')
+  }
+  return context
+}
+
+export function RowFocusProvider({
+  children,
+  value,
+}: {
+  children: React.ReactNode
+  value: RowFocusContextType
+}) {
+  return <RowFocusContext.Provider value={value}>{children}</RowFocusContext.Provider>
+}

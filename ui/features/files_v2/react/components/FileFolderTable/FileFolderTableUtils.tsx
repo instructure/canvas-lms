@@ -113,6 +113,7 @@ export const columnRenderers: {
     isSelected,
     toggleSelect,
     setModalOrTrayOptions,
+    rowIndex,
   }: {
     row: File | Folder
     rows: (File | Folder)[]
@@ -125,6 +126,7 @@ export const columnRenderers: {
     isSelected: boolean
     toggleSelect: () => void
     setModalOrTrayOptions: (modalOrTray: ModalOrTrayOptions | null) => () => void
+    rowIndex: number
   }) => React.ReactNode
 } = {
   name: ({row, rows, isStacked}) => <NameLink isStacked={isStacked} item={row} collection={rows} />,
@@ -172,6 +174,7 @@ export const columnRenderers: {
     userCanDeleteFilesForContext,
     userCanRestrictFilesForContext,
     usageRightsRequiredForContext,
+    rowIndex,
   }) => (
     <ActionMenuButton
       size={size}
@@ -180,6 +183,7 @@ export const columnRenderers: {
       userCanRestrictFilesForContext={userCanRestrictFilesForContext}
       usageRightsRequiredForContext={usageRightsRequiredForContext}
       row={row}
+      rowIndex={rowIndex}
     />
   ),
 }

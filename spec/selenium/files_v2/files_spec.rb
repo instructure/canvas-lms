@@ -149,24 +149,31 @@ describe "files index page" do
       end
 
       context "from cog icon" do
+        a_txt_file_name = "a_file.txt"
+        b_txt_file_name = "b_file.txt"
         before do
-          add_file(fixture_file_upload(base_file_name, "application/pdf"),
+          add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
                    @course,
-                   base_file_name)
+                   a_txt_file_name)
+          add_file(fixture_file_upload(b_txt_file_name, "text/plain"),
+                   @course,
+                   b_txt_file_name)
           get "/courses/#{@course.id}/files"
         end
 
         it "edits file name", priority: "1" do
-          expect(base_file_name).to be_present
+          expect(a_txt_file_name).to be_present
           file_rename_to = "Example_edited.pdf"
           edit_name_from_kebab_menu(1, file_rename_to)
           expect(file_rename_to).to be_present
-          expect(content).not_to contain_link(base_file_name)
+          expect(content).not_to contain_link(a_txt_file_name)
         end
 
         it "deletes file", priority: "1" do
           delete_file_from(1, :kebab_menu)
-          expect(content).not_to contain_link(base_file_name)
+          expect(content).not_to contain_link(a_txt_file_name)
+          action_button = get_item_files_table(1, 7).find_element(:css, "button")
+          check_element_has_focus(action_button)
         end
       end
 
@@ -195,10 +202,15 @@ describe "files index page" do
       end
 
       context "from toolbar menu" do
+        a_txt_file_name = "a_file.txt"
+        b_txt_file_name = "b_file.txt"
         before do
-          add_file(fixture_file_upload(base_file_name, "application/pdf"),
+          add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
                    @course,
-                   base_file_name)
+                   a_txt_file_name)
+          add_file(fixture_file_upload(b_txt_file_name, "text/plain"),
+                   @course,
+                   b_txt_file_name)
           get "/courses/#{@course.id}/files"
         end
 
@@ -215,6 +227,12 @@ describe "files index page" do
           select_item_to_edit_permissions_from_kebab_menu(1)
           edit_item_permissions(:available_with_link)
           expect(link_only_status_button).to be_present
+        end
+
+        it "deletes file from toolbar", priority: "1" do
+          delete_file_from(1, :toolbar_menu)
+          expect(content).not_to contain_link(a_txt_file_name)
+          check_element_has_focus(select_all_checkbox)
         end
       end
 
@@ -370,6 +388,8 @@ describe "files index page" do
         it "moves a file using cog icon", priority: "1" do
           move_file_from(2, :kebab_menu)
           expect(alert).to include_text("#{file_to_move} successfully moved to #{folder_name}")
+          action_button = get_item_files_table(2, 7).find_element(:css, "button")
+          check_element_has_focus(action_button)
           get "/courses/#{@course.id}/files/folder/base%20folder"
           expect(get_item_content_files_table(1, 1)).to eq "Text File\n#{file_to_move}"
         end
@@ -385,6 +405,7 @@ describe "files index page" do
           files_to_move = ["a_file.txt", "b_file.txt", "c_file.txt"]
           move_files([2, 3, 4])
           files_to_move.map { |file| expect(alert).to include_text("#{file} successfully moved to #{folder_name}") }
+          check_element_has_focus(select_all_checkbox)
           get "/courses/#{@course.id}/files/folder/base%20folder"
           files_to_move.each_with_index do |file, index|
             expect(get_item_content_files_table(index + 1, 1)).to eq "Text File\n#{file}"

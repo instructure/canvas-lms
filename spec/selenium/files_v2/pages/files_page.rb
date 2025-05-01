@@ -150,6 +150,10 @@ module FilesPage
     f("[data-testid='files-pagination']")
   end
 
+  def select_all_checkbox
+    f("[data-testid='select-all-checkbox']")
+  end
+
   # which button is next/current/previous depends on how many are being rendered
   def pagination_button_by_index(index)
     pagination_container.find_elements(:css, "button")[index]
