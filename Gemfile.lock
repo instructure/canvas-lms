@@ -556,7 +556,7 @@ GEM
       rake
     ffi-icu (0.5.3)
       ffi (~> 1.0, >= 1.0.9)
-    fiber-storage (1.0.0)
+    fiber-storage (1.0.1)
     find_a_port (1.0.1)
     flakey_spec_catcher (0.12.1)
       rspec (~> 3.10)
