@@ -220,6 +220,39 @@ describe Types::CourseType do
         expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student).size).to eq 0
       end
 
+      context "hide_in_gradebook filter" do
+        before(:once) do
+          @regular_assignment = course.assignments.create!(
+            name: "Regular Assignment",
+            points_possible: 10,
+            workflow_state: "published"
+          )
+          @hidden_assignment = course.assignments.create!(
+            name: "Hidden Assignment",
+            points_possible: 0,
+            workflow_state: "published",
+            hide_in_gradebook: true,
+            omit_from_final_grade: true
+          )
+        end
+
+        it "filters out assignments with hide_in_gradebook when feature flag is enabled" do
+          Account.site_admin.enable_feature!(:hide_zero_point_quizzes_option)
+          result = course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student)
+          assignment_ids = result.map(&:to_i)
+          expect(assignment_ids).to include(@regular_assignment.id)
+          expect(assignment_ids).not_to include(@hidden_assignment.id)
+        end
+
+        it "includes all assignments when feature flag is disabled" do
+          Account.site_admin.disable_feature!(:hide_zero_point_quizzes_option)
+          result = course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student)
+          assignment_ids = result.map(&:to_i)
+          expect(assignment_ids).to include(@regular_assignment.id)
+          expect(assignment_ids).to include(@hidden_assignment.id)
+        end
+      end
+
       context "grading periods" do
         before(:once) do
           gpg = GradingPeriodGroup.create! title: "asdf",
