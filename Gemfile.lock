@@ -1174,7 +1174,7 @@ GEM
       rspec (~> 3.8)
     string_pattern (2.3.0)
       regexp_parser (~> 2.5, >= 2.5.0)
-    stringio (3.1.6)
+    stringio (3.1.7)
     swearjar (1.4.0)
     switchman (4.1.0)
       activerecord (>= 7.0, < 7.3)
