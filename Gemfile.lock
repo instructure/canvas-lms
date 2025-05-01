@@ -533,7 +533,7 @@ GEM
       parslet
     factory_bot (6.5.1)
       activesupport (>= 6.1.0)
-    faraday (2.13.0)
+    faraday (2.13.1)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
