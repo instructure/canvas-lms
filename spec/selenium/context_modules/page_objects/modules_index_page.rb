@@ -162,7 +162,20 @@ module ModulesIndexPage
     ".view_assign_link"
   end
 
+  def show_all_or_less_button_selector
+    ".show-all-or-less-button"
+  end
+
+  def show_all_button_selector
+    ".show-all-or-less-button.show-all"
+  end
+
+  def show_less_button_selector
+    ".show-all-or-less-button.show-less"
+  end
+
   #------------------------------ Elements ------------------------------
+
   def expand_collapse_all_button
     f(expand_collapse_all_button_selector)
   end
@@ -341,6 +354,14 @@ module ModulesIndexPage
 
   def all_modules
     ff(all_modules_selector)
+  end
+
+  def show_all_button
+    f(show_all_button_selector)
+  end
+
+  def show_less_button
+    f(show_less_button_selector)
   end
 
   #------------------------------ Actions ------------------------------

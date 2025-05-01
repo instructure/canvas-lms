@@ -33,6 +33,7 @@ require_relative "../../dashboard/pages/k5_dashboard_common_page"
 require_relative "../../../helpers/k5_common"
 require_relative "../shared_examples/context_modules_teacher_shared_examples"
 require_relative "../shared_examples/modules_performance_teacher_shared_examples"
+require_relative "../shared_examples/module_show_all_o_less_shared_examples"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
@@ -139,6 +140,40 @@ describe "context modules" do
         wait_for_ajaximations
 
         expect(copy_to_tray_exists?).to be true
+      end
+    end
+
+    context "show all or less" do
+      before(:once) do
+        @module = @course.context_modules.create!(name: "module 1")
+        11.times do |i|
+          @module.add_item(type: "assignment", id: @course.assignments.create!(title: "assignment #{i}").id)
+        end
+      end
+
+      it_behaves_like "module show all or less"
+
+      context "with modules_teacher_module_selection feature enabled" do
+        before(:once) do
+          @course.context_modules.create!(name: "module 2")
+          @course.account.enable_feature!(:modules_teacher_module_selection)
+          s = @course.settings.dup
+          s[:show_teacher_only_module_id] = @module.id
+          @course.settings = s
+          @course.save!
+        end
+
+        before do
+          user_session(@teacher)
+        end
+
+        it "displays the selecte module with no show all or less button" do
+          go_to_modules
+          mods = all_modules
+          expect(mods).to have_size(1)
+          expect(mods.first.attribute("id")).to eq("context_module_#{@module.id}")
+          expect(mods.first).not_to contain_css(show_all_or_less_button_selector)
+        end
       end
     end
   end
