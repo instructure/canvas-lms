@@ -433,7 +433,7 @@ GEM
     bcrypt (3.1.20)
     benchmark (0.4.0)
     bigdecimal (3.1.9)
-    bindata (2.5.0)
+    bindata (2.5.1)
     bluecloth (2.2.0)
     bootsnap (1.18.4)
       msgpack (~> 1.2)
