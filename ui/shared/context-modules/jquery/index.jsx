@@ -82,7 +82,7 @@ import {addModuleElement} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ModuleItemsLazyLoader} from '../utils/ModuleItemsLazyLoader'
-import {addShowAllOrLess} from '../utils/showAllOrLess'
+import {addShowAllOrLess, isModuleSelectedByTEACHER_MODULE_SELECTION} from '../utils/showAllOrLess'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -2521,6 +2521,7 @@ $(() => {
   const allModules = Array.from(document.querySelectorAll('.context_module'))
     .map(m => parseInt(m.dataset.moduleId, 10))
     .filter(mid => !isNaN(mid))
+  let allPages = false
 
   if (ENV.FEATURE_MODULES_PERF) {
     // ENV.COLLAPSED_MODULES are those that have been collapsed by the user
@@ -2528,7 +2529,18 @@ $(() => {
     // If the user has not manually changed a module's state, it will not appear in either list
     // This implies that if both arrays are empty, the user has done nothing and we will expand the first module
     // After that, default to collapsed and expand only those in the ENV.EXPANDED_MODULES array
+    // Because other places in the code rely on the values in these ENV vars, mutate them here to reflect the current state.
     if (allModules.length > 0) {
+      if (ENV.MODULE_FEATURES?.TEACHER_MODULE_SELECTION) {
+        const moduleId = parseInt(document.getElementById('show_teacher_only_module_id')?.value, 10)
+        if (!isNaN(moduleId)) {
+          if (allModules.includes(moduleId)) {
+            ENV.EXPANDED_MODULES = [moduleId]
+            ENV.COLLAPSED_MODULES = []
+            allPages = true
+          }
+        }
+      }
       const isInitialState = ENV.EXPANDED_MODULES.length === 0 && ENV.COLLAPSED_MODULES.length === 0
       if (isInitialState) {
         ENV.EXPANDED_MODULES.push(allModules.shift())
@@ -2541,7 +2553,8 @@ $(() => {
       } else {
         ENV.COLLAPSED_MODULES = allModules.filter(mid => !ENV.EXPANDED_MODULES.includes(mid))
       }
-      modules.lazyLoadItems(ENV.EXPANDED_MODULES)
+
+      modules.lazyLoadItems(ENV.EXPANDED_MODULES, allPages)
     }
     for (const module of allModules) {
       addShowAllOrLess(module)

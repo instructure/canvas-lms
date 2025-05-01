@@ -26,6 +26,7 @@ require_relative "../../dashboard/pages/k5_dashboard_page"
 require_relative "../../dashboard/pages/k5_dashboard_common_page"
 require_relative "../../../helpers/k5_common"
 require_relative "../shared_examples/modules_performance_student_shared_examples"
+require_relative "../shared_examples/module_show_all_o_less_shared_examples"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
@@ -37,23 +38,45 @@ describe "context modules" do
   include K5DashboardPageObject
   include K5DashboardCommonPageObject
 
-  context "as a student with many module items on the modules page" do
+  context "as a student" do
     before(:once) do
       course_with_student(active_all: true)
 
       @course.account.enable_feature!(:modules_perf)
       Setting.set("module_perf_threshold", -1)
-
-      @module_list = big_course_setup
-      @course.reload
     end
 
     before do
       user_session(@student)
     end
 
-    it_behaves_like "module performance for students", :context_modules
-    it_behaves_like "module performance for students", :course_homepage
+    context "with many module items on the modules page" do
+      before(:once) do
+        @module_list = big_course_setup
+        @course.reload
+      end
+
+      it_behaves_like "module performance for students", :context_modules
+      it_behaves_like "module performance for students", :course_homepage
+    end
+
+    context "show all or less" do
+      before(:once) do
+        course_with_student(active_all: true)
+        @course.account.enable_feature!(:modules_perf)
+        Setting.set("module_perf_threshold", -1)
+        @module = @course.context_modules.create!(name: "module 1")
+        11.times do |i|
+          @module.add_item(type: "assignment", id: @course.assignments.create!(title: "assignment #{i}").id)
+        end
+      end
+
+      before do
+        user_session(@student)
+      end
+
+      it_behaves_like "module show all or less"
+    end
   end
 
   context "as a canvas for elementary teacher with many module items", :ignore_js_errors do

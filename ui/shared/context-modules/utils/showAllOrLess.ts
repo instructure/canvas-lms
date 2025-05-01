@@ -24,6 +24,14 @@ const I18n = createI18nScope('context_modulespublic')
 
 type AllOrLess = 'all' | 'less' | 'none' | 'loading'
 
+declare const ENV: {
+  IS_STUDENT?: boolean
+  MODULE_FEATURES?: {
+    TEACHER_MODULE_SELECTION: boolean
+    STUDENT_MODULE_SELECTION?: boolean
+  }
+}
+
 function isModuleLoading(module: HTMLElement) {
   return !!module.querySelector('.module-spinner-container')
 }
@@ -36,11 +44,26 @@ function isModuleCollapsed(module: HTMLElement) {
   return module.classList.contains('collapsed_module')
 }
 
+function isModuleSelectedByTEACHER_MODULE_SELECTION(module: HTMLElement) {
+  if (ENV.IS_STUDENT) return false
+  if (!ENV.MODULE_FEATURES?.TEACHER_MODULE_SELECTION) return false
+
+  const moduleId = (document.getElementById('show_teacher_only_module_id') as HTMLSelectElement)
+    ?.value
+  if (moduleId && moduleId === module.dataset.moduleId) {
+    return true
+  }
+  return false
+}
+
 function itemCount(module: HTMLElement): number {
   return module.querySelectorAll('.context_module_item').length
 }
 
 function shouldShowAllOrLess(module: HTMLElement): AllOrLess {
+  if (isModuleSelectedByTEACHER_MODULE_SELECTION(module)) {
+    return 'none'
+  }
   if (isModuleCollapsed(module)) {
     return 'none'
   } else {
@@ -166,5 +189,6 @@ export {
   isModuleCollapsed,
   isModulePaginated,
   isModuleLoading,
+  isModuleSelectedByTEACHER_MODULE_SELECTION,
   type AllOrLess,
 }
