@@ -315,6 +315,23 @@ module Types
       scope
     end
 
+    field :users_connection_count, Integer, null: true do
+      argument :filter, CourseUsersFilterInputType, required: false
+      argument :sort, CourseUsersSortInputType, required: false
+      argument :user_ids,
+               [ID],
+               <<~MD,
+                 Only include users with the given ids.
+
+                 **This field is deprecated, use `filter: {userIds}` instead.**
+               MD
+               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
+               required: false
+    end
+    def users_connection_count(user_ids: nil, filter: {}, sort: {})
+      users_connection(user_ids:, filter:, sort:).size
+    end
+
     field :course_nickname, String, null: true
     def course_nickname
       current_user.course_nickname(course)
