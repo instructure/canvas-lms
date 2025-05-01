@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState, useRef, useMemo} from 'react'
+import React, {useCallback, useEffect, useState, useRef, useMemo, Ref} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {queryClient} from '@canvas/query'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {type File, type Folder} from '../../../interfaces/File'
 import {ModalOrTrayOptions, type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {getUniqueId} from '../../../utils/fileFolderUtils'
@@ -60,6 +61,8 @@ export interface FileFolderTableProps {
   searchString?: string
   selectedRows: Set<string>
   setSelectedRows: React.Dispatch<React.SetStateAction<Set<string>>>
+  handleFileDropRef?: (el: HTMLInputElement | null) => void
+  selectAllRef?: Ref<Checkbox>
 }
 
 const FileFolderTable = ({
@@ -76,6 +79,8 @@ const FileFolderTable = ({
   searchString = '',
   selectedRows,
   setSelectedRows,
+  handleFileDropRef,
+  selectAllRef,
 }: FileFolderTableProps) => {
   const {currentFolder} = useFileManagement()
   const isStacked = size !== 'large'
@@ -283,6 +288,7 @@ const FileFolderTable = ({
                   filteredColumns,
                   sort,
                   handleColumnHeaderClick,
+                  selectAllRef,
                 )}
               </Table.Row>
             </Table.Head>
@@ -307,6 +313,7 @@ const FileFolderTable = ({
                       currentFolder={currentFolder!}
                       isDragging={isDragging}
                       handleDrop={handleDrop}
+                      handleFileDropRef={handleFileDropRef}
                     />
                   </Table.Cell>
                 </Table.Row>

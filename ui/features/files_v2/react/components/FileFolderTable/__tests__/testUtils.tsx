@@ -23,7 +23,7 @@ import FileFolderTable, {type FileFolderTableProps} from '..'
 import {BrowserRouter} from 'react-router-dom'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
-import {FileManagementProvider} from '../../Contexts'
+import {FileManagementProvider, RowFocusProvider} from '../../Contexts'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 export const defaultProps: FileFolderTableProps = {
   size: 'large',
@@ -37,11 +37,16 @@ export const defaultProps: FileFolderTableProps = {
   onSortChange: jest.fn(),
   sort: {
     by: 'name',
-    direction: 'asc'
+    direction: 'asc',
   },
   searchString: '',
   selectedRows: new Set<string>(),
   setSelectedRows: jest.fn(),
+}
+
+export const mockRowFocusContext = {
+  setRowToFocus: jest.fn(),
+  handleActionButtonRef: jest.fn(),
 }
 
 export const renderComponent = (props?: Partial<FileFolderTableProps>) => {
@@ -50,7 +55,9 @@ export const renderComponent = (props?: Partial<FileFolderTableProps>) => {
     <BrowserRouter>
       <MockedQueryClientProvider client={queryClient}>
         <FileManagementProvider value={createMockFileManagementContext()}>
-          <FileFolderTable {...defaultProps} {...props} />
+          <RowFocusProvider value={mockRowFocusContext}>
+            <FileFolderTable {...defaultProps} {...props} />
+          </RowFocusProvider>
         </FileManagementProvider>
       </MockedQueryClientProvider>
     </BrowserRouter>,

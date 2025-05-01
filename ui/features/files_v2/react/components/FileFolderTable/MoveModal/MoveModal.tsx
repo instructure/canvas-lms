@@ -29,7 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {getFilesEnv} from '../../../../utils/filesEnvUtils'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
-import {useFileManagement} from '../../Contexts'
+import {useFileManagement, useRowFocus, SELECT_ALL_FOCUS_STRING} from '../../Contexts'
 import FileFolderInfo from '../../shared/FileFolderInfo'
 import {getName, isFile} from '../../../../utils/fileFolderUtils'
 import {type Folder, type File} from '../../../../interfaces/File'
@@ -48,11 +48,12 @@ export type MoveModalProps = {
   open: boolean
   items: (File | Folder)[]
   onDismiss: () => void
+  rowIndex?: number
 }
 
 const I18n = createI18nScope('files_v2')
 
-const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
+const MoveModal = ({open, items, onDismiss, rowIndex}: MoveModalProps) => {
   const {contextType, contextId, rootFolder} = useFileManagement()
   const folderTreeBrowserRef: Ref<FolderTreeBrowserRef> = createRef<FolderTreeBrowserRef>()
   const [selectedFolder, setSelectedFolder] = useState<Collection | null>(null)
@@ -62,6 +63,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
   const [fileOptions, setFileOptions] = useState<FileOptionsResults>(() =>
     FileOptionsCollection.getState(),
   )
+  const {setRowToFocus} = useRowFocus()
 
   const resetState = useCallback(() => {
     setSelectedFolder(null)
@@ -147,6 +149,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
         setFixingNameCollisions(true)
       } else {
         queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+        setRowToFocus(rowIndex ?? SELECT_ALL_FOCUS_STRING)
       }
     })
   }, [selectedFolder])

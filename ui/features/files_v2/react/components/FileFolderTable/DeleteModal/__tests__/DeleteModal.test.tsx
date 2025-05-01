@@ -18,12 +18,13 @@
 
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {FileManagementProvider} from '../../../Contexts'
+import {FileManagementProvider, RowFocusProvider} from '../../../Contexts'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
 import {DeleteModal} from '../DeleteModal'
 import {resetAndGetFilesEnv} from '../../../../../utils/filesEnvUtils'
 import {createFilesContexts} from '../../../../../fixtures/fileContexts'
+import {mockRowFocusContext} from '../../__tests__/testUtils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(),
@@ -41,7 +42,9 @@ const defaultProps = {
 const renderComponent = (props?: any) =>
   render(
     <FileManagementProvider value={createMockFileManagementContext()}>
-      <DeleteModal {...defaultProps} {...props} />
+      <RowFocusProvider value={mockRowFocusContext}>
+        <DeleteModal {...defaultProps} {...props} />
+      </RowFocusProvider>
     </FileManagementProvider>,
   )
 

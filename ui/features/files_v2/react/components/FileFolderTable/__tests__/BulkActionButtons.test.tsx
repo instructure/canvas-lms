@@ -18,8 +18,9 @@
 
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
-import {FileManagementProvider} from '../../Contexts'
+import {FileManagementProvider, RowFocusProvider} from '../../Contexts'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
+import {mockRowFocusContext} from './testUtils'
 import BulkActionButtons from '../BulkActionButtons'
 import {type File, Folder} from '../../../../interfaces/File'
 
@@ -28,7 +29,9 @@ let defaultProps: any
 const renderComponent = (props = {}) => {
   return render(
     <FileManagementProvider value={createMockFileManagementContext()}>
-      <BulkActionButtons {...defaultProps} {...props} />
+      <RowFocusProvider value={mockRowFocusContext}>
+        <BulkActionButtons {...defaultProps} {...props} />
+      </RowFocusProvider>
     </FileManagementProvider>,
   )
 }
