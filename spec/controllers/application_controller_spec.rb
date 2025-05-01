@@ -112,6 +112,21 @@ RSpec.describe ApplicationController do
         end
       end
 
+      context "user_cache_key" do
+        it "sets user_cache_key when user is present" do
+          user_factory
+          @controller.instance_variable_set(:@current_user, @user)
+          allow(@user).to receive(:uuid).and_return("test-uuid")
+          expected_hmac = CanvasSecurity.hmac_sha512("test-uuid")
+          expect(controller.js_env[:user_cache_key]).to eq(expected_hmac)
+        end
+
+        it "does not set user_cache_key when no user is present" do
+          controller.instance_variable_set(:@current_user, nil)
+          expect(controller.js_env[:user_cache_key]).to be_nil
+        end
+      end
+
       describe "user flags" do
         before do
           user_factory
