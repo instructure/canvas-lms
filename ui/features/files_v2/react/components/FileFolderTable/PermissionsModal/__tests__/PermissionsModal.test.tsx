@@ -47,6 +47,11 @@ describe('PermissionsModal', () => {
     resetAndGetFilesEnv(filesContexts)
   })
 
+  beforeEach(() => {
+    // Set up a default mock implementation for doFetchApi to prevent unhandled rejections
+    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+  })
+
   afterEach(() => {
     jest.clearAllMocks()
     jest.resetAllMocks()
@@ -61,19 +66,25 @@ describe('PermissionsModal', () => {
     describe('with preview', () => {
       it('for a files and folders', async () => {
         renderComponent()
-        expect(
-          await screen.findByText(`Selected Items (${FAKE_FOLDERS_AND_FILES.length})`),
-        ).toBeInTheDocument()
+        await waitFor(() => {
+          expect(
+            screen.getByText(`Selected Items (${FAKE_FOLDERS_AND_FILES.length})`),
+          ).toBeInTheDocument()
+        })
       })
 
       it('for a file', async () => {
         renderComponent({items: [FAKE_FILES[0]]})
-        expect(await screen.findByText(FAKE_FILES[0].display_name)).toBeInTheDocument()
+        await waitFor(() => {
+          expect(screen.getByText(FAKE_FILES[0].display_name)).toBeInTheDocument()
+        })
       })
 
       it('for a folder', async () => {
         renderComponent({items: [FAKE_FOLDERS[0]]})
-        expect(await screen.findByText(FAKE_FOLDERS[0].name)).toBeInTheDocument()
+        await waitFor(() => {
+          expect(screen.getByText(FAKE_FOLDERS[0].name)).toBeInTheDocument()
+        })
       })
     })
 
@@ -82,14 +93,14 @@ describe('PermissionsModal', () => {
         renderComponent({
           items: [FAKE_FILES[0]],
         })
-        const input = await screen.getByTestId('permissions-availability-selector')
+        const input = await screen.findByTestId('permissions-availability-selector')
         expect(input).toBeInTheDocument()
         expect(input).toHaveAttribute('value', 'Publish')
       })
 
       it('for multiple files and folders', async () => {
         renderComponent()
-        const input = await screen.getByTestId('permissions-availability-selector')
+        const input = await screen.findByTestId('permissions-availability-selector')
         expect(input).toBeInTheDocument()
         expect(input).toHaveAttribute('value', 'Publish')
       })
@@ -108,8 +119,10 @@ describe('PermissionsModal', () => {
             },
           ],
         })
-        expect(await screen.getByText(/available from/i)).toBeInTheDocument()
-        expect(await screen.getByText(/until/i)).toBeInTheDocument()
+        await waitFor(() => {
+          expect(screen.getByText(/available from/i)).toBeInTheDocument()
+          expect(screen.getByText(/until/i)).toBeInTheDocument()
+        })
       })
 
       it('for multiple files and folders', async () => {
@@ -122,8 +135,10 @@ describe('PermissionsModal', () => {
             lock_at: '2025-04-15T00:00:00Z',
           })),
         })
-        expect(await screen.getByText(/available from/i)).toBeInTheDocument()
-        expect(await screen.getByText(/until/i)).toBeInTheDocument()
+        await waitFor(() => {
+          expect(screen.getByText(/available from/i)).toBeInTheDocument()
+          expect(screen.getByText(/until/i)).toBeInTheDocument()
+        })
       })
 
       // TODO: unskip failing tests (cf. RCX-3333)
@@ -204,7 +219,7 @@ describe('PermissionsModal', () => {
           items: [FAKE_FILES[0]],
         })
 
-        const input = await screen.getByTestId('permissions-visibility-selector')
+        const input = await screen.findByTestId('permissions-visibility-selector')
         expect(input).toBeInTheDocument()
         expect(input).toHaveAttribute('value', 'Inherit from Course')
       })
@@ -212,7 +227,7 @@ describe('PermissionsModal', () => {
       it('for multiple files and folders', async () => {
         renderComponent()
 
-        const input = await screen.getByTestId('permissions-visibility-selector')
+        const input = await screen.findByTestId('permissions-visibility-selector')
         expect(input).toBeInTheDocument()
         expect(input).toHaveAttribute('value', 'Inherit from Course')
       })
@@ -225,7 +240,7 @@ describe('PermissionsModal', () => {
           ],
         })
 
-        const input = await screen.getByTestId('permissions-visibility-selector')
+        const input = await screen.findByTestId('permissions-visibility-selector')
         expect(input).toBeInTheDocument()
         expect(input).toHaveAttribute('value', 'Keep')
       })
@@ -238,26 +253,28 @@ describe('PermissionsModal', () => {
             <PermissionsModal {...defaultProps} />
           </FileManagementProvider>,
         )
-        expect(
-          await screen.queryByTestId('permissions-visibility-selector'),
-        ).not.toBeInTheDocument()
+        await waitFor(() => {
+          expect(screen.queryByTestId('permissions-visibility-selector')).not.toBeInTheDocument()
+        })
       })
 
       it('when items only contain folders', async () => {
         renderComponent({
           items: FAKE_FOLDERS,
         })
-        expect(
-          await screen.queryByTestId('permissions-visibility-selector'),
-        ).not.toBeInTheDocument()
+        await waitFor(() => {
+          expect(screen.queryByTestId('permissions-visibility-selector')).not.toBeInTheDocument()
+        })
       })
     })
   })
 
   it('renders footer', async () => {
     renderComponent()
-    expect(await screen.getByTestId('permissions-cancel-button')).toBeInTheDocument()
-    expect(await screen.getByTestId('permissions-save-button')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByTestId('permissions-cancel-button')).toBeInTheDocument()
+      expect(screen.getByTestId('permissions-save-button')).toBeInTheDocument()
+    })
   })
 
   it.skip('shows an error there are invalid dates', async () => {
