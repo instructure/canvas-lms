@@ -97,3 +97,5 @@ schema.graphql
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+.irb_history
+start-canvas.sh
