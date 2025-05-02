@@ -24,7 +24,7 @@ import {Heading} from '@instructure/ui-heading'
 import FileFolderInfo from './shared/FileFolderInfo'
 import {TextInput} from '@instructure/ui-text-input'
 import type {File, Folder} from '../../interfaces/File'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../utils/apiUtils'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {isFile, getName, getUniqueId} from '../../utils/fileFolderUtils'
@@ -36,7 +36,7 @@ import {useRows} from '../contexts/RowsContext'
 const I18n = createI18nScope('files_v2')
 
 const updateItemName = (item: File | Folder, name: string) => {
-  return doFetchApi({
+  return doFetchApiWithAuthCheck({
     method: 'PUT',
     path: `/api/v1/${isFile(item) ? 'files' : 'folders'}/${item.id}`,
     body: {name: name},
@@ -95,6 +95,10 @@ export const RenameModal = ({
         onClose()
       })
       .catch(err => {
+        if (err instanceof UnauthorizedError) {
+          window.location.href = '/login'
+          return
+        }
         if (err?.response?.status == 409) {
           showFlashError(
             I18n.t('A file named "%{name}" already exists in this folder.', {

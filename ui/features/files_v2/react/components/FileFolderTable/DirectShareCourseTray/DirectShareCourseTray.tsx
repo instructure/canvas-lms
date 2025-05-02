@@ -24,10 +24,10 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import FileFolderTray from '../../shared/TrayWrapper'
 import FileFolderInfo from '../../shared/FileFolderInfo'
+import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../../../utils/apiUtils'
 import {type File} from '../../../../interfaces/File'
 import DirectShareCoursePanel, {DirectShareCoursePanelPropsRef} from './DirectShareCoursePanel'
 import {getName} from '../../../../utils/fileFolderUtils'
@@ -174,7 +174,7 @@ const DirectShareCourseTray = ({open, onDismiss, courseId, file}: DirectShareCou
 
   const startCopyOperation = useCallback(() => {
     const contentSelection = {attachments: [file.id]}
-    return doFetchApi({
+    return doFetchApiWithAuthCheck({
       method: 'POST',
       path: `/api/v1/courses/${selectedCourse?.id}/content_migrations`,
       body: {
@@ -205,7 +205,13 @@ const DirectShareCourseTray = ({open, onDismiss, courseId, file}: DirectShareCou
     setRequestInFlight(true)
     startCopyOperation()
       .then(sendSuccessful)
-      .catch(showFlashError(I18n.t('Copy operation failed.')))
+      .catch(error => {
+        if (error instanceof UnauthorizedError) {
+          window.location.href = '/login'
+          return
+        }
+        showFlashError(I18n.t('Copy operation failed.'))(error)
+      })
       .finally(() => setRequestInFlight(false))
   }, [coursePanelRef, sendSuccessful, startCopyOperation])
 

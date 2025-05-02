@@ -24,7 +24,7 @@ import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
 import {queryClient} from '@canvas/query'
 import {useFileManagement} from '../../contexts/FileManagementContext'
-import {generateFolderPostUrl} from '../../../utils/apiUtils'
+import {generateFolderPostUrl, UnauthorizedError} from '../../../utils/apiUtils'
 import getCookie from '@instructure/get-cookie'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
@@ -61,6 +61,9 @@ const CreateFolderModal = ({isOpen, onRequestClose, onExited}: CreateFolderModal
           'X-CSRF-Token': getCookie('_csrf_token'),
         },
       })
+      if (response.status === 401) {
+        throw new UnauthorizedError()
+      }
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
@@ -70,8 +73,14 @@ const CreateFolderModal = ({isOpen, onRequestClose, onExited}: CreateFolderModal
       onRequestClose()
       await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
     },
-    onError: () => {
-      showFlashError(I18n.t('There was an error creating the folder. Please try again.'))()
+    onError: error => {
+      if (error instanceof UnauthorizedError) {
+        window.location.href = '/login'
+        return
+      }
+      showFlashError(I18n.t('There was an error creating the folder. Please try again.'))(
+        error as Error,
+      )
     },
     onSettled: () => {
       setIsRequestInFlight(false)

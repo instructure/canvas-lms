@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconBlueprintLine, IconBlueprintLockLine} from '@instructure/ui-icons'
 import {type File, type Folder} from '../../../interfaces/File'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../../utils/apiUtils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Tooltip} from '@instructure/ui-tooltip'
 
@@ -53,7 +53,7 @@ const BlueprintIconButton = ({item}: BlueprintIconButtonProps) => {
 
   const handleOnClick = () => {
     setIsUpdating(true)
-    doFetchApi({
+    doFetchApiWithAuthCheck({
       path: `/api/v1/courses/${ENV.COURSE_ID}/blueprint_templates/default/restrict_item`,
       method: 'PUT',
       body: {
@@ -64,6 +64,10 @@ const BlueprintIconButton = ({item}: BlueprintIconButtonProps) => {
     })
       .then(() => setIsLocked(!isLocked))
       .catch(error => {
+        if (error instanceof UnauthorizedError) {
+          window.location.href = '/login'
+          return
+        }
         showFlashError(
           I18n.t('An error occurred changing the lock state for "%{fileName}".', {fileName}),
         )(error)
