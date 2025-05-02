@@ -221,10 +221,10 @@ class GroupCategoriesController < ApplicationController
   #   Name of the group category
   #
   # @argument non_collaborative [Boolean]
-  #  Can only be set by users with the Differentiated Tag Add permission
+  #  Can only be set by users with the Differentiation Tag - Add permission
   #
   #  If set to true, groups in this category will be only be visible to users with the
-  #  Differentiated Tag Manage permission.
+  #  Differentiation Tag - Manage permission.
   #
   # @argument self_signup [String, "enabled"|"restricted"]
   #   Allow students to sign up for a group themselves (Course Only).
