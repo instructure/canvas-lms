@@ -18,17 +18,6 @@
 
 export type CanvasId = string | number
 
-export interface CanvasProgressAPIResult {
-  json: CanvasProgress
-}
-
-export interface CanvasProgress {
-  id: string
-  workflow_state: 'queued' | 'running' | 'failed' | 'completed'
-  message: string | null
-  completion: number | null
-}
-
 export interface ModuleItemAttributes {
   module_item_id: number
 }
