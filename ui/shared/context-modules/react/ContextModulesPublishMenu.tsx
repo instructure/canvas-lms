@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import type {CanvasId, CanvasProgress} from './types'
+import type {CanvasId} from './types'
 import {IconArrowOpenDownLine, IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
@@ -30,11 +30,15 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 import {
   batchUpdateAllModulesApiCall,
-  cancelBatchUpdate,
   fetchAllItemPublishedStates,
-  monitorProgress,
   updateModulePendingPublishedStates,
 } from '../utils/publishAllModulesHelper'
+
+import {
+  monitorProgress,
+  cancelProgressAction,
+  type CanvasProgress,
+} from '@canvas/progress/ProgressHelpers'
 import {disableContextModulesPublishMenu} from '../utils/publishOneModuleHelper'
 import ContextModulesPublishModal from './ContextModulesPublishModal'
 
@@ -50,7 +54,12 @@ interface Props {
 // TODO: remove and replace MenuItem with Menu.Item below when on v8
 const {Item: MenuItem} = Menu as any
 
-const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled, onPublishComplete}: Props) => {
+const ContextModulesPublishMenu = ({
+  courseId,
+  runningProgressId,
+  disabled,
+  onPublishComplete,
+}: Props) => {
   const [isPublishing, setIsPublishing] = useState<boolean>(!!runningProgressId)
   const [isCanceling, setIsCanceling] = useState<boolean>(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -212,7 +221,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled, onPub
   const handleCancel = () => {
     closeModal()
     if (currentProgress) {
-      cancelBatchUpdate(currentProgress, onCancelComplete)
+      cancelProgressAction(currentProgress, onCancelComplete)
     }
     setIsCanceling(true)
     setCurrentProgress(undefined)
