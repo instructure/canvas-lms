@@ -215,16 +215,19 @@ describe "files index page" do
         end
 
         it "unpublishes and publish a file", priority: "1" do
-          select_item_to_edit_permissions_from_kebab_menu(1)
+          select_item_to_edit_from_kebab_menu(1)
+          toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:unpublished)
           expect(unpublished_status_button).to be_present
-          select_item_to_edit_permissions_from_kebab_menu(1)
+          select_item_to_edit_from_kebab_menu(1)
+          toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:published)
           expect(published_status_button).to be_present
         end
 
         it "makes file available to student with link from toolbar", priority: "1" do
-          select_item_to_edit_permissions_from_kebab_menu(1)
+          select_item_to_edit_from_kebab_menu(1)
+          toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:available_with_link)
           expect(link_only_status_button).to be_present
         end
@@ -336,12 +339,104 @@ describe "files index page" do
           user_session @teacher
         end
 
+        context "course files" do
+          it "sets usage rights on a file via the modal by clicking the indicator", priority: "1" do
+            get "/courses/#{@course.id}/files"
+            file_usage_rights_cloud_icon.click
+            set_usage_rights_in_modal(:creative_commons)
+
+            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
+            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
+            # a11y: focus should go back to the element that was clicked.
+            # check_element_has_focus(file_usage_rights_cloud_icon)
+            verify_usage_rights_ui_updates(:creative_commons)
+          end
+
+          it "sets usage rights on a file via the cog menu", priority: "1" do
+            get "/courses/#{@course.id}/files"
+            action_menu_button.click
+            action_menu_item_by_name("Manage Usage Rights").click
+            set_usage_rights_in_modal(:used_by_permission)
+
+            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
+            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
+            # a11y: focus should go back to the element that was clicked.
+            # check_element_has_focus(action_menu_button)
+            verify_usage_rights_ui_updates(:used_by_permission)
+          end
+
+          it "sets usage rights on a file via the toolbar", priority: "1" do
+            get "/courses/#{@course.id}/files"
+            select_item_to_edit_from_kebab_menu(1)
+            toolbox_menu_button("manage-usage-rights-button").click
+            set_usage_rights_in_modal(:public_domain)
+
+            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
+            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
+            # a11y: focus should go back to the element that was clicked.
+            # check_element_has_focus(toolbox_menu_button("more-button"))
+            verify_usage_rights_ui_updates(:public_domain)
+          end
+
+          it "sets usage rights on multiple files via the toolbar", priority: "1" do
+            add_file(fixture_file_upload("b_file.txt", "text/plan"),
+                     @course,
+                     "b_file.txt")
+            get "/courses/#{@course.id}/files"
+            get_row_header_files_table(1).click
+            select_item_to_edit_from_kebab_menu(2)
+            toolbox_menu_button("manage-usage-rights-button").click
+            set_usage_rights_in_modal(:fair_use)
+
+            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
+            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
+            # a11y: focus should go back to the element that was clicked.
+            # check_element_has_focus(toolbox_menu_button("more-button"))
+            verify_usage_rights_ui_updates(:fair_use)
+          end
+
+          it "sets usage rights on a file inside a folder via the toolbar", priority: "1" do
+            folder_model name: "new folder"
+            get "/courses/#{@course.id}/files"
+            move_file_from(2, :toolbar_menu)
+            wait_for_ajaximations
+            action_menu_button.click
+            action_menu_item_by_name("Manage Usage Rights").click
+            expect(usage_rights_manage_modal).to include_text "new folder"
+            set_usage_rights_in_modal(:creative_commons)
+
+            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
+            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
+            # a11y: focus should go back to the element that was clicked.
+            # check_element_has_focus(toolbox_menu_button("more-button"))
+            get_item_files_table(1, 1).click
+            verify_usage_rights_ui_updates(:creative_commons)
+          end
+
+          it "does not show the creative commons selection if creative commons isn't selected", priority: "1" do
+            get "/courses/#{@course.id}/files"
+            file_usage_rights_cloud_icon.click
+            file_usage_rights_justification.click
+            usage_rights_selector_fair_use.click
+            expect(usage_rights_manage_modal).not_to contain_css(usage_rights_license_selector)
+          end
+
+          it "sets focus to the close button when opening the file usage rights dialog", priority: "1" do
+            get "/courses/#{@course.id}/files"
+            file_usage_rights_cloud_icon.click
+            wait_for_ajaximations
+            element = driver.switch_to.active_element
+            should_focus = permissions_dialog_close_button
+            expect(element).to eq(should_focus)
+          end
+        end
+
         context "user files" do
           it "updates course files from user files page", priority: "1" do
             get "/files/folder/courses_#{@course.id}/"
             get_item_files_table(1, 6).click
-            set_usage_rights_in_modal
-            verify_usage_rights_ui_updates
+            set_usage_rights_in_modal(:own_copyright)
+            verify_usage_rights_ui_updates(:own_copyright)
           end
         end
       end
@@ -464,7 +559,7 @@ describe "files index page" do
           expect(item_has_permissions_icon?(1, 6, "published-button")).to be true
         end
 
-        it "sets focus to the close button when opening the dialog", priority: "1" do
+        it "sets focus to the close button when opening the permission edit dialog", priority: "1" do
           published_status_button.click
           wait_for_ajaximations
           element = driver.switch_to.active_element
