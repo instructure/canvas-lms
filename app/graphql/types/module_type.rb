@@ -69,6 +69,8 @@ module Types
     field :prerequisites, [ModulePrerequisiteType], null: true
     delegate :prerequisites, to: :context_module
 
+    field :require_sequential_progress, Boolean, null: true
+
     field :completion_requirements, [ModuleCompletionRequirementType], null: true
     delegate :completion_requirements, to: :context_module
 

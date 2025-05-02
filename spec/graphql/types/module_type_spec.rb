@@ -48,6 +48,10 @@ describe Types::ModuleType do
     expect(module_type.resolve("requirementCount")).to eq mod.requirement_count
   end
 
+  it "has requireSequentialProgress" do
+    expect(module_type.resolve("requireSequentialProgress")).to eq mod.require_sequential_progress
+  end
+
   it "has module items" do
     a1 = assignment_model({ context: course })
     a2 = assignment_model({ context: course })
