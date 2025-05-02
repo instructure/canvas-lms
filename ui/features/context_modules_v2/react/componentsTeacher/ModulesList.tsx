@@ -27,7 +27,6 @@ import {
   handleCollapseAll,
   handleExpandAll,
   handleToggleExpand,
-  handleOpeningModuleUpdateTray,
 } from '../handlers/modulePageActionHandlers'
 import ManageModuleContentTray from './ManageModuleContent/ManageModuleContentTray'
 import {useModules} from '../hooks/queries/useModules'
@@ -205,17 +204,6 @@ const ModulesList: React.FC = () => {
     handleExpandAll(data, setExpandedModules)
   }, [data, setExpandedModules])
 
-  const handleOpeningModuleUpdateTrayRef = useCallback(
-    (
-      moduleId?: string,
-      moduleName?: string,
-      prerequisites?: {id: string; name: string; type: string}[],
-      openTab: 'settings' | 'assign-to' = 'settings',
-    ) =>
-      handleOpeningModuleUpdateTray(data, courseId, moduleId, moduleName, prerequisites, openTab),
-    [data, courseId],
-  )
-
   const onToggleExpandRef = useCallback(
     (moduleId: string) => {
       handleToggleExpand(moduleId, setExpandedModules)
@@ -229,7 +217,6 @@ const ModulesList: React.FC = () => {
         <ModulePageActionHeader
           onCollapseAll={handleCollapseAllRef}
           onExpandAll={handleExpandAllRef}
-          handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTrayRef}
           anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
         />
         {isLoading && !data ? (
@@ -276,7 +263,6 @@ const ModulesList: React.FC = () => {
                                 prerequisites={module.prerequisites}
                                 completionRequirements={module.completionRequirements}
                                 requirementCount={module.requirementCount}
-                                handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTrayRef}
                                 expanded={!!expandedModules.get(module._id)}
                                 onToggleExpand={onToggleExpandRef}
                                 dragHandleProps={dragProvided.dragHandleProps}

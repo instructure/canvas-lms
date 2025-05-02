@@ -73,6 +73,7 @@ export interface Module {
   prerequisites: Prerequisite[]
   completionRequirements: CompletionRequirement[]
   requirementCount: number
+  requireSequentialProgress: boolean
   unlockAt: string | null
   moduleItems: ModuleItem[]
 }

@@ -22,7 +22,7 @@ import {Module as ModuleType} from '@canvas/context-modules/differentiated-modul
 import DifferentiatedModulesTray from '@canvas/context-modules/differentiated-modules/react/DifferentiatedModulesTray'
 import {queryClient} from '@canvas/query'
 import {InfiniteData} from '@tanstack/react-query'
-import type {ModulesResponse} from '../utils/types'
+import type {ModuleItem, ModulesResponse} from '../utils/types'
 
 export const handleCollapseAll = (
   data: InfiniteData<ModulesResponse> | undefined,
@@ -63,6 +63,125 @@ export const handleToggleExpand = (
   })
 }
 
+const getResourceType = (type?: string): string => {
+  if (!type) return 'assignment'
+
+  switch (type) {
+    case 'quiz':
+      return 'quiz'
+    case 'discussion':
+      return 'discussion'
+    case 'attachment':
+      return 'file'
+    case 'wiki_page':
+      return 'page'
+    case 'external_url':
+      return 'externalUrl'
+    case 'context_external_tool':
+      return 'externalTool'
+    default:
+      return 'assignment'
+  }
+}
+
+const requirementTypeMap: Record<string, string> = {
+  must_submit: 'submit',
+  must_view: 'view',
+  must_mark_done: 'mark',
+  must_contribute: 'contribute',
+  min_score: 'score',
+  min_percentage: 'percentage',
+}
+
+const createSyntheticModuleItems = (completionRequirements: any[]): ModuleItem[] => {
+  return completionRequirements.map(
+    (req): ModuleItem => ({
+      id: req.id,
+      _id: req.id,
+      url: '',
+      indent: 0,
+      content: {
+        title: `Item ${req.id}`,
+        type: 'assignment',
+        pointsPossible: undefined,
+      },
+    }),
+  )
+}
+
+const getModuleItemsFromAvailableSources = (
+  providedModuleItems: ModuleItem[],
+  currentModule?: any,
+): any[] => {
+  if (providedModuleItems.length > 0) {
+    return providedModuleItems
+  }
+
+  if (
+    currentModule &&
+    Array.isArray(currentModule.moduleItems) &&
+    currentModule.moduleItems.length > 0
+  ) {
+    return currentModule.moduleItems
+  }
+
+  if (currentModule) {
+    const completionRequirements = currentModule.completionRequirements || []
+    if (completionRequirements.length > 0) {
+      return createSyntheticModuleItems(completionRequirements)
+    }
+  }
+
+  return []
+}
+
+const transformModuleItemsForTray = (rawModuleItems: any[]): any[] => {
+  return rawModuleItems.map((item: any) => ({
+    id: item._id || '',
+    name: item.content?.title || '',
+    resource: getResourceType(item.content?.type),
+    graded: !!item.content?.pointsPossible,
+    pointsPossible: item.content?.pointsPossible ? String(item.content.pointsPossible) : '',
+  }))
+}
+
+const transformRequirementsForTray = (
+  completionRequirements: any[] = [],
+  moduleItems: any[],
+  rawModuleItems: any[],
+): any[] => {
+  return completionRequirements.map(req => {
+    const moduleItem = moduleItems.find((item: {id: string}) => item.id === req.id)
+
+    const rawModuleItem = rawModuleItems.find(
+      (item: {id?: string; _id?: string}) => item.id === req.id || item._id === req.id,
+    )
+
+    const mappedType = requirementTypeMap[req.type] || req.type
+
+    return {
+      id: req.id,
+      name: moduleItem?.name || '',
+      type: mappedType,
+      resource: moduleItem?.resource || 'assignment',
+      graded: !!rawModuleItem?.content?.pointsPossible,
+      pointsPossible:
+        moduleItem?.pointsPossible || String(rawModuleItem?.content?.pointsPossible || 0),
+      minimumScore: req.minScore ? String(req.minScore) : '0',
+    }
+  })
+}
+
+const getDifferentiatedModulesMountPoint = (): HTMLElement => {
+  let mountPoint = document.getElementById('differentiated-modules-mount-point')
+  if (!mountPoint) {
+    mountPoint = document.createElement('div')
+    mountPoint.id = 'differentiated-modules-mount-point'
+    document.body.appendChild(mountPoint)
+  }
+  return mountPoint
+}
+
 export const handleOpeningModuleUpdateTray = (
   data: InfiniteData<ModulesResponse> | undefined,
   courseId: string,
@@ -70,6 +189,7 @@ export const handleOpeningModuleUpdateTray = (
   moduleName?: string,
   prerequisites?: {id: string; name: string; type: string}[],
   openTab: 'settings' | 'assign-to' = 'settings',
+  providedModuleItems: ModuleItem[] = [],
 ) => {
   const moduleElement = document.createElement('div')
   moduleElement.id = moduleId ? `context_module_${moduleId}` : 'context_module_new'
@@ -84,37 +204,49 @@ export const handleOpeningModuleUpdateTray = (
         name: module.name,
       })) || []
 
-  const onComplete = () => {
-    queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
-  }
+  const currentModule = moduleId
+    ? data?.pages.flatMap(page => page.modules).find(module => module._id === moduleId)
+    : undefined
 
-  const container = document.getElementById('differentiated-modules-mount-point')
-  if (!container) {
-    const mountPoint = document.createElement('div')
-    mountPoint.id = 'differentiated-modules-mount-point'
-    document.body.appendChild(mountPoint)
-  }
+  const rawModuleItems = getModuleItemsFromAvailableSources(providedModuleItems, currentModule)
+  const moduleItems = transformModuleItemsForTray(rawModuleItems)
+  const requirementCount = currentModule?.requirementCount === 1 ? 'one' : 'all'
+  const requirements = currentModule?.completionRequirements
+    ? transformRequirementsForTray(
+        currentModule.completionRequirements,
+        moduleItems,
+        rawModuleItems,
+      )
+    : []
 
-  const mountPoint = document.getElementById('differentiated-modules-mount-point')!
+  const mountPoint = getDifferentiatedModulesMountPoint()
   const root = createRoot(mountPoint)
 
-  root.render(
-    <DifferentiatedModulesTray
-      onDismiss={() => {
-        root.unmount()
-        const addButton = document.querySelector('.add-module-button') as HTMLElement
-        addButton?.focus()
-      }}
-      initialTab={openTab}
-      moduleElement={moduleElement}
-      courseId={courseId}
-      moduleList={moduleList}
-      moduleId={moduleId ?? undefined}
-      moduleName={moduleName ?? undefined}
-      prerequisites={prerequisites}
-      onComplete={onComplete}
-    />,
-  )
+  const trayProps = {
+    onDismiss: () => {
+      root.unmount()
+      const addButton = document.querySelector('.add-module-button') as HTMLElement
+      addButton?.focus()
+    },
+    initialTab: openTab,
+    moduleElement,
+    courseId,
+    moduleList,
+    moduleId,
+    moduleName,
+    prerequisites,
+    onComplete: () => queryClient.invalidateQueries({queryKey: ['modules', courseId || '']}),
+
+    // Additional props needed by SettingsPanel
+    moduleItems,
+    requirementCount,
+    requirements,
+    requireSequentialProgress: currentModule?.requireSequentialProgress || false,
+    publishFinalGrade: false,
+    unlockAt: currentModule?.unlockAt,
+  }
+
+  root.render(<DifferentiatedModulesTray {...(trayProps as any)} />)
 }
 
 export const handleAddItem = (
