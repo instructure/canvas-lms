@@ -98,6 +98,10 @@ module ModulesIndexPage
     "[role='dialog'][aria-label='Move Module Item']"
   end
 
+  def module_item_page_button_selector(module_id, button_text)
+    "//*[@id = 'context_module_#{module_id}']//button[.//*[contains(text(), '#{button_text}')]]"
+  end
+
   def new_module_link_selector
     ".add_module_link"
   end
@@ -248,6 +252,10 @@ module ModulesIndexPage
     f(module_item_selector(module_item_id))
   end
 
+  def module_item_page_button(module_id, button_text)
+    fxpath(module_item_page_button_selector(module_id, button_text))
+  end
+
   def module_item_duplicate(module_item_id)
     f(module_item_duplicate_selector(module_item_id))
   end
@@ -258,6 +266,10 @@ module ModulesIndexPage
 
   def module_item_move_tray
     f(module_item_move_tray_selector)
+  end
+
+  def module_item_name_selector(course_id, module_number)
+    "//a[@title='#{course_id}:#{module_number}']"
   end
 
   def module_item_send_to(module_item_id)
@@ -381,20 +393,20 @@ module ModulesIndexPage
 
   def big_course_setup
     course_modules = create_modules(3, true)
-    course_assignments = create_assignments([@course.id], 30)
+    course_assignments = create_assignments([@course.id], 70)
 
-    9.times do |i|
-      course_modules[0].add_item({ type: "Assignment", id: course_assignments[i + 21] }, nil, position: i + 1)
+    51.times do |i|
+      course_modules[0].add_item({ type: "Assignment", id: course_assignments[i] }, nil, position: i + 1)
       course_modules[0].save!
     end
 
     10.times do |i|
-      course_modules[1].add_item({ type: "Assignment", id: course_assignments[i] }, nil, position: i + 1)
+      course_modules[1].add_item({ type: "Assignment", id: course_assignments[i + 51] }, nil, position: i + 1)
       course_modules[1].save!
     end
 
-    11.times do |i|
-      course_modules[2].add_item({ type: "Assignment", id: course_assignments[i + 10] }, nil, position: i + 1)
+    9.times do |i|
+      course_modules[2].add_item({ type: "Assignment", id: course_assignments[i + 61] }, nil, position: i + 1)
       course_modules[2].save!
     end
 
@@ -407,6 +419,10 @@ module ModulesIndexPage
 
   def click_manage_module_item_assign_to(module_item)
     manage_module_item_assign_to(module_item.id).click
+  end
+
+  def click_module_item_page_button(module_id, button_text)
+    module_item_page_button(module_id, button_text).click
   end
 
   def click_module_item_copy_to(module_item)
@@ -447,6 +463,10 @@ module ModulesIndexPage
 
   def module_content_style(module_id)
     element_value_for_attr(module_content(module_id), "style")
+  end
+
+  def module_item_exists?(course_id, module_item_id)
+    element_exists?(module_item_name_selector(course_id, module_item_id), true)
   end
 
   def move_tray_exists?

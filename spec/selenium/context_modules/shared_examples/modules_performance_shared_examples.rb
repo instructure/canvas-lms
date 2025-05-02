@@ -26,7 +26,7 @@ require_relative "../../dashboard/pages/k5_dashboard_page"
 require_relative "../../dashboard/pages/k5_dashboard_common_page"
 require_relative "../../../helpers/k5_common"
 
-shared_examples_for "module performance for teachers" do |context|
+shared_examples_for "module performance with module items" do |context|
   include ContextModulesCommon
   include ModulesIndexPage
   include ModulesSettingsTray
@@ -52,18 +52,60 @@ shared_examples_for "module performance for teachers" do |context|
   it "loads 11 module items with pagination" do
     uncollapse_all_modules(@mod_course, @user)
     get @mod_url
-    expect(pagination_exists?(@module_list[2].id)).to be_truthy
+    expect(pagination_exists?(@module_list[0].id)).to be_truthy
   end
 
   it "loads <10 module items with pagination" do
     uncollapse_all_modules(@mod_course, @user)
     get @mod_url
-    expect(pagination_exists?(@module_list[0].id)).to be_falsey
+    expect(pagination_exists?(@module_list[2].id)).to be_falsey
   end
 
   it "loads 10 module items with pagination" do
     uncollapse_all_modules(@mod_course, @user)
     get @mod_url
     expect(pagination_exists?(@module_list[1].id)).to be_falsey
+  end
+
+  it "navigates to the next page" do
+    get @mod_url
+    scroll_to(module_item_page_button(@module_list[0].id, "Next"))
+    click_module_item_page_button(@module_list[0].id, "Next")
+    wait_for_ajaximations
+
+    keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
+      expect(module_item_exists?(@course.id, 10)).to be_truthy
+    end
+  end
+
+  it "navigates back to the previous page" do
+    get @mod_url
+    scroll_to(module_item_page_button(@module_list[0].id, "Next"))
+    click_module_item_page_button(@module_list[0].id, "Next")
+    wait_for_ajaximations
+
+    keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
+      puts "Previous Trying..."
+      expect(module_item_page_button_selector(@module_list[0].id, "Previous")).to be_truthy
+    end
+
+    scroll_to(module_item_page_button(@module_list[0].id, "Previous"))
+    click_module_item_page_button(@module_list[0].id, "Previous")
+    wait_for_ajaximations
+
+    keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
+      expect(module_item_exists?(@course.id, 0)).to be_truthy
+    end
+  end
+
+  it "navigates to the second page" do
+    get @mod_url
+    scroll_to(module_item_page_button(@module_list[0].id, "2"))
+    click_module_item_page_button(@module_list[0].id, "2")
+    wait_for_ajaximations
+
+    keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
+      expect(module_item_exists?(@course.id, 10)).to be_truthy
+    end
   end
 end
