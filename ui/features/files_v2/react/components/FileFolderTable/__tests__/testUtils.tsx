@@ -23,7 +23,8 @@ import FileFolderTable, {type FileFolderTableProps} from '..'
 import {BrowserRouter} from 'react-router-dom'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
-import {FileManagementProvider, RowFocusProvider} from '../../Contexts'
+import {FileManagementProvider} from '../../../contexts/FileManagementContext'
+import {RowFocusProvider} from '../../../contexts/RowFocusContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 export const defaultProps: FileFolderTableProps = {
   size: 'large',

@@ -23,7 +23,7 @@ import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import FilesUsageBar from '../FilesUsageBar'
-import {FileManagementProvider} from '../Contexts'
+import {FileManagementProvider} from '../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../__tests__/createMockContext'
 import {useGetQuota} from '../../hooks/useGetQuota'
 

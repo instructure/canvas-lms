@@ -18,7 +18,8 @@
 
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {FileManagementProvider, RowFocusProvider} from '../../../Contexts'
+import {FileManagementProvider} from '../../../../contexts/FileManagementContext'
+import {RowFocusProvider} from '../../../../contexts/RowFocusContext'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
 import {DeleteModal} from '../DeleteModal'

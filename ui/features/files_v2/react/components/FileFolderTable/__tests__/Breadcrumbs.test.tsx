@@ -22,7 +22,10 @@ import {resetAndGetFilesEnv} from '../../../../utils/filesEnvUtils'
 import {createFilesContexts} from '../../../../fixtures/fileContexts'
 import {windowPathname} from '@canvas/util/globalUtils'
 import Breadcrumbs from '../Breadcrumbs'
-import {FileManagementProvider, FileManagementContextProps} from '../../Contexts'
+import {
+  FileManagementProvider,
+  FileManagementContextProps,
+} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 
 jest.mock('@canvas/util/globalUtils', () => ({

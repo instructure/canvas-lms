@@ -21,7 +21,11 @@ import {render, screen, waitFor} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import ActionMenuButton from '../ActionMenuButton'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
-import {FileManagementProvider, FileManagementContextProps, RowFocusProvider} from '../../Contexts'
+import {
+  FileManagementProvider,
+  FileManagementContextProps,
+} from '../../../contexts/FileManagementContext'
+import {RowFocusProvider} from '../../../contexts/RowFocusContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {mockRowFocusContext} from './testUtils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'

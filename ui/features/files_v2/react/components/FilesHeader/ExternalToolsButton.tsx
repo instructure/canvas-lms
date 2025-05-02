@@ -27,7 +27,7 @@ import {IconArrowOpenDownLine, IconMoreLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {useFileManagement} from '../Contexts'
+import {useFileManagement} from '../../contexts/FileManagementContext'
 import {type Tool} from '@canvas/files_v2/react/modules/filesEnvFactory.types'
 
 const I18n = createI18nScope('files_v2')

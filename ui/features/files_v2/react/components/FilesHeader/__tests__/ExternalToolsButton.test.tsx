@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import ExternalToolsButton from '../ExternalToolsButton'
-import {FileManagementProvider} from '../../Contexts'
+import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {type ExternalToolsButtonProps} from '../ExternalToolsButton'
 

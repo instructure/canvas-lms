@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useEffect } from 'react'
+import React, {useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import formatMessage from '../../../../../packages/canvas-media/src/format-message'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
-import {useFileManagement} from './Contexts'
+import {useFileManagement} from '../contexts/FileManagementContext'
 import {Flex} from '@instructure/ui-flex'
 import {useGetQuota} from '../hooks/useGetQuota'
 
