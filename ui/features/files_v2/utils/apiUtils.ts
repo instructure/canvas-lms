@@ -18,6 +18,7 @@
 
 import {getFilesEnv} from './filesEnvUtils'
 import {windowPathname} from '@canvas/util/globalUtils'
+import doFetchApi, {type DoFetchApiOpts, type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 
 const SEARCH_AND_ALL_QUERY_PARAMS =
   'per_page=25&include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status'
@@ -108,4 +109,31 @@ const generateSearchUrl = (singularContextType: string, contextId: string, searc
 
 const generateFetchAllUrl = (folderId: string) => {
   return `/api/v1/folders/${folderId}/all?${SEARCH_AND_ALL_QUERY_PARAMS}`
+}
+
+export class UnauthorizedError extends Error {
+  constructor(message: string = 'Unauthorized') {
+    super(message)
+    this.name = 'UnauthorizedError'
+  }
+}
+
+export class NotFoundError extends Error {
+  constructor(message: string = 'Not found') {
+    super(message)
+    this.name = 'NotFoundError'
+  }
+}
+
+export async function doFetchApiWithAuthCheck<T = unknown>(
+  opts: DoFetchApiOpts,
+): Promise<DoFetchApiResults<T>> {
+  try {
+    return await doFetchApi<T>(opts)
+  } catch (err) {
+    if ((err as any).response?.status === 401) {
+      throw new UnauthorizedError()
+    }
+    throw err
+  }
 }

@@ -17,10 +17,13 @@
  */
 
 import {useQuery} from '@tanstack/react-query'
-import {generateFilesQuotaUrl} from '../../utils/apiUtils'
+import {generateFilesQuotaUrl, UnauthorizedError} from '../../utils/apiUtils'
 
 const fetchQuota = async (contextType: string, contextId: string) => {
   const response = await fetch(generateFilesQuotaUrl(contextType, contextId))
+  if (response.status === 401) {
+    throw new UnauthorizedError()
+  }
   if (!response.ok) {
     throw new Error()
   }

@@ -21,22 +21,8 @@ import {useParams} from 'react-router-dom'
 import splitAssetString from '@canvas/util/splitAssetString'
 import {getFilesEnv} from '../../utils/filesEnvUtils'
 import {createStubRootFolder} from '../../utils/folderUtils'
-import {generateFolderByPathUrl} from '../../utils/apiUtils'
+import {generateFolderByPathUrl, NotFoundError, UnauthorizedError} from '../../utils/apiUtils'
 import {Folder} from '../../interfaces/File'
-
-export class UnauthorizedError extends Error {
-  constructor(message: string = 'Unauthorized') {
-    super(message)
-    this.name = 'UnauthorizedError'
-  }
-}
-
-export class NotFoundError extends Error {
-  constructor(message: string = 'Not found') {
-    super(message)
-    this.name = 'NotFoundError'
-  }
-}
 
 function getRootFolder(pluralContextType: string, contextId: string) {
   return createStubRootFolder(getFilesEnv().contextsDictionary[`${pluralContextType}_${contextId}`])
