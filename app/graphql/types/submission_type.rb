@@ -144,5 +144,10 @@ module Types
         audit_events
       end
     end
+
+    field :auto_grade_submission_errors, [String], null: false, description: "Issues related to the submission"
+    def auto_grade_submission_errors
+      GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
+    end
   end
 end
