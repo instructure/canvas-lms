@@ -289,7 +289,7 @@ export const ToolConfigurationView = () => {
           </Flex.Item>
         </Flex>
 
-        <Heading level="h3" margin="small 0">
+        <Heading level="h3" margin="small 0" id="placements">
           {I18n.t('Placement Names')}
         </Heading>
         {enabledPlacements.map((p, i) => (
