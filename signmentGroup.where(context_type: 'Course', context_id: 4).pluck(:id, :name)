@@ -1,0 +1,33 @@
+                                                 Table "public.assignment_groups"
+           Column            |            Type             | Collation | Nullable |                    Default                    
+-----------------------------+-----------------------------+-----------+----------+-----------------------------------------------
+ id                          | bigint                      |           | not null | nextval('assignment_groups_id_seq'::regclass)
+ name                        | character varying(255)      |           |          | 
+ rules                       | text                        |           |          | 
+ default_assignment_name     | character varying(255)      |           |          | 
+ position                    | integer                     |           |          | 
+ assignment_weighting_scheme | character varying(255)      |           |          | 
+ group_weight                | double precision            |           |          | 
+ context_id                  | bigint                      |           | not null | 
+ context_type                | character varying(255)      |           | not null | 
+ workflow_state              | character varying(255)      |           | not null | 
+ created_at                  | timestamp without time zone |           | not null | 
+ updated_at                  | timestamp without time zone |           | not null | 
+ cloned_item_id              | bigint                      |           |          | 
+ context_code                | character varying(255)      |           |          | 
+ migration_id                | character varying(255)      |           |          | 
+ sis_source_id               | character varying(255)      |           |          | 
+ integration_data            | text                        |           |          | 
+ root_account_id             | bigint                      |           |          | 
+Indexes:
+    "assignment_groups_pkey" PRIMARY KEY, btree (id)
+    "index_assignment_groups_on_cloned_item_id" btree (cloned_item_id) WHERE cloned_item_id IS NOT NULL
+    "index_assignment_groups_on_context_id_and_context_type" btree (context_id, context_type)
+    "index_assignment_groups_on_root_account_id" btree (root_account_id)
+Foreign-key constraints:
+    "fk_rails_2d906abe72" FOREIGN KEY (cloned_item_id) REFERENCES cloned_items(id)
+    "fk_rails_9a6cbb6167" FOREIGN KEY (root_account_id) REFERENCES accounts(id)
+Triggers:
+    guard_excessive_deletes AFTER DELETE ON assignment_groups REFERENCING OLD TABLE AS oldtbl FOR EACH STATEMENT EXECUTE FUNCTION guard_excessive_updates()
+    guard_excessive_updates AFTER UPDATE ON assignment_groups REFERENCING OLD TABLE AS oldtbl FOR EACH STATEMENT EXECUTE FUNCTION guard_excessive_updates()
+
