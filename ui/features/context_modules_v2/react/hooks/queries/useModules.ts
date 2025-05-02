@@ -41,6 +41,7 @@ const MODULES_QUERY = gql`
               published
               unlockAt
               requirementCount
+              requireSequentialProgress
               prerequisites {
                 id
                 name

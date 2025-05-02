@@ -27,7 +27,6 @@ import {Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
 export interface ModuleProps {
   id: string
   name: string
-  handleOpeningModuleUpdateTray?: (moduleId?: string, moduleName?: string) => void
   published?: boolean
   prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
@@ -44,7 +43,6 @@ export interface ModuleProps {
 const Module: React.FC<ModuleProps> = ({
   id,
   name,
-  handleOpeningModuleUpdateTray,
   published = false,
   prerequisites,
   completionRequirements,
@@ -101,7 +99,6 @@ const Module: React.FC<ModuleProps> = ({
             completionRequirements={completionRequirements}
             requirementCount={requirementCount || 0}
             dragHandleProps={dragHandleProps}
-            handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
             itemCount={data?.moduleItems?.length || 0}
             setModuleAction={setModuleAction}
             setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}

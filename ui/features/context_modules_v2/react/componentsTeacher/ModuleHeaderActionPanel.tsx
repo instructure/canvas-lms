@@ -43,14 +43,7 @@ interface ModuleHeaderActionPanelProps {
   prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
-  handleOpeningModuleUpdateTray?: (
-    moduleId?: string,
-    moduleName?: string,
-    prerequisites?: {id: string; name: string; type: string}[],
-    openTab?: 'settings' | 'assign-to',
-  ) => void
   itemCount?: number
-  // Add props for managing module content tray
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
   setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
@@ -64,7 +57,6 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   prerequisites,
   completionRequirements,
   requirementCount = null,
-  handleOpeningModuleUpdateTray,
   itemCount,
   setModuleAction,
   setIsManageModuleContentTrayOpen,
@@ -129,7 +121,6 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
             id={id}
             name={name}
             prerequisites={prerequisites}
-            handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
             setIsDirectShareOpen={setIsDirectShareOpen}
             setIsDirectShareCourseOpen={setIsDirectShareCourseOpen}
             setModuleAction={setModuleAction}

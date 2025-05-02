@@ -37,12 +37,6 @@ interface ModuleHeaderProps {
   published: boolean
   prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
-  handleOpeningModuleUpdateTray?: (
-    moduleId?: string,
-    moduleName?: string,
-    prerequisites?: {id: string; name: string; type: string}[],
-    openTab?: 'settings' | 'assign-to',
-  ) => void
   requirementCount: number
   dragHandleProps?: any // For react-beautiful-dnd drag handle
   itemCount: number
@@ -59,7 +53,6 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
   published,
   prerequisites,
   completionRequirements,
-  handleOpeningModuleUpdateTray,
   requirementCount,
   dragHandleProps,
   itemCount,
@@ -105,7 +98,6 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             prerequisites={prerequisites}
             completionRequirements={completionRequirements}
             requirementCount={requirementCount || undefined}
-            handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
             itemCount={itemCount}
             setModuleAction={setModuleAction}
             setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}

@@ -32,34 +32,6 @@ export const handlePublishComplete = (
   queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId || '']})
 }
 
-export const handleEdit = (
-  id: string,
-  name: string,
-  prerequisites?: {id: string; name: string; type: string}[],
-  handleOpeningModuleUpdateTray?: (
-    moduleId?: string,
-    moduleName?: string,
-    prerequisites?: {id: string; name: string; type: string}[],
-    openTab?: 'settings' | 'assign-to',
-  ) => void,
-) => {
-  handleOpeningModuleUpdateTray?.(id, name, prerequisites, 'settings')
-}
-
-export const handleAssignTo = (
-  id: string,
-  name: string,
-  prerequisites?: {id: string; name: string; type: string}[],
-  handleOpeningModuleUpdateTray?: (
-    moduleId?: string,
-    moduleName?: string,
-    prerequisites?: {id: string; name: string; type: string}[],
-    openTab?: 'settings' | 'assign-to',
-  ) => void,
-) => {
-  handleOpeningModuleUpdateTray?.(id, name, prerequisites, 'assign-to')
-}
-
 export const handleDelete = (
   id: string,
   name: string,
