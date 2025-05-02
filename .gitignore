@@ -28,8 +28,11 @@
 /config/RAILS_VERSION
 /coverage/
 /coverage-js/
+
+# Rails schema (ignore schema .rb, but allow structure.sql)
 /db/schema.rb
 /db/*sql
+!/db/structure.sql
 docker-compose.override.yml
 /exports/
 /Gemfile.*.plugins.lock
