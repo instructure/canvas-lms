@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {UnsuccessfulApiResult} from './ApiResult'
+
 export type WithApiResultState<A> =
   | {
       _type: 'not_requested'
@@ -53,5 +55,5 @@ export type WithApiResultState<A> =
        * Indicates that an error occurred while loading data
        */
       _type: 'error'
-      message?: string
+      error: UnsuccessfulApiResult
     }
