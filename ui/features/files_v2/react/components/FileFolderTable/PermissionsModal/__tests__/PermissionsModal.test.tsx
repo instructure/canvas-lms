@@ -19,7 +19,7 @@
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {FileManagementProvider} from '../../../Contexts'
+import {FileManagementProvider} from '../../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
 import {resetAndGetFilesEnv} from '../../../../../utils/filesEnvUtils'

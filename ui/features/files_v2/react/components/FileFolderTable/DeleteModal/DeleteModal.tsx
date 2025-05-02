@@ -30,7 +30,7 @@ import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import FileFolderInfo from '../../shared/FileFolderInfo'
-import {useRowFocus, SELECT_ALL_FOCUS_STRING} from '../../Contexts'
+import {useRowFocus, SELECT_ALL_FOCUS_STRING} from '../../../contexts/RowFocusContext'
 
 const I18n = createI18nScope('files_v2')
 

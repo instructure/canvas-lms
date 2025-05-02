@@ -24,7 +24,7 @@ import {createFilesContexts} from '../../../../fixtures/fileContexts'
 import {BrowserRouter} from 'react-router-dom'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
-import {FileManagementProvider} from '../../Contexts'
+import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import userEvent from '@testing-library/user-event'
 

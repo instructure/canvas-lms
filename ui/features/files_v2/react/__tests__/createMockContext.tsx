@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {FileManagementContextProps} from '../components/Contexts'
+import {FileManagementContextProps} from '../contexts/FileManagementContext'
 
 export function createMockFileManagementContext(
   overrides: Partial<FileManagementContextProps> = {},

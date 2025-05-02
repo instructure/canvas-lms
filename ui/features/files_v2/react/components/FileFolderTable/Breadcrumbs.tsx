@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {IconArrowOpenStartLine} from '@instructure/ui-icons'
-import {useFileManagement} from '../Contexts'
+import {useFileManagement} from '../../contexts/FileManagementContext'
 
 type BreadcrumData = {
   id: string

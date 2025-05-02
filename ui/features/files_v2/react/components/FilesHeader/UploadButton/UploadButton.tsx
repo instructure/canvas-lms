@@ -19,7 +19,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {Button, type ButtonProps} from '@instructure/ui-buttons'
 import UploadForm from '@canvas/files/react/components/UploadForm'
-import {useFileManagement} from '../../Contexts'
+import {useFileManagement} from '../../../contexts/FileManagementContext'
 import UploadQueue from '@canvas/files/react/modules/UploadQueue'
 import FileRenameForm from './FileRenameForm'
 import ZipFileOptionsForm from './ZipFileOptionsForm'

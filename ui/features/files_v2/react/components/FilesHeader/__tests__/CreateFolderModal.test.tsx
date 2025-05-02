@@ -23,7 +23,7 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
-import {FileManagementProvider} from '../../Contexts'
+import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 
 const defaultProps = {

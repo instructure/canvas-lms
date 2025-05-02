@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
-import {FileManagementProvider, RowFocusProvider} from '../../Contexts'
+import {FileManagementProvider} from '../../../contexts/FileManagementContext'
+import {RowFocusProvider} from '../../../contexts/RowFocusContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {mockRowFocusContext} from './testUtils'
 import BulkActionButtons from '../BulkActionButtons'

@@ -18,7 +18,7 @@
 
 import {useCallback, useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useFileManagement} from '../Contexts'
+import {useFileManagement} from '../../contexts/FileManagementContext'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
