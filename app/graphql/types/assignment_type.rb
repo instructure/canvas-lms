@@ -660,5 +660,10 @@ module Types
 
       assignment.anonymous_student_identities.values
     end
+
+    field :auto_grade_assignment_errors, [String], null: false, description: "Issues related to the assignment"
+    def auto_grade_assignment_errors
+      GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
+    end
   end
 end
