@@ -1990,9 +1990,11 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "lti/deployments") do
-      get "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :list
+      get "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :list, as: :list_deployments
       post "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :create
       delete "accounts/:account_id/lti_registrations/:registration_id/deployments/:id", action: :destroy
+      get "accounts/:account_id/lti_registrations/:registration_id/deployments/:id", action: :show
+      get "accounts/:account_id/lti_registrations/:registration_id/deployments/:id/controls", action: :list_controls, as: :list_deployment_controls
     end
 
     scope(controller: "lti/context_controls") do
