@@ -60,6 +60,18 @@ describe Lti::ContextControlsController, type: :request do
     user_session(admin)
   end
 
+  def deployment_for(context)
+    deployment = registration.new_external_tool(context)
+    deployment.save!
+    if context.is_a?(Course)
+      Lti::ContextControl.create!(course: context, registration:, deployment:)
+    elsif context.is_a?(Account)
+      Lti::ContextControl.create!(account: context, registration:, deployment:)
+    end
+
+    deployment
+  end
+
   describe "GET #index" do
     subject { get "/api/v1/lti_registrations/#{registration.id}/controls" }
 
@@ -70,18 +82,6 @@ describe Lti::ContextControlsController, type: :request do
       let(:subaccount) { account_model(parent_account: account) }
       let(:course_deployment) { deployment_for(course) }
       let(:subaccount_deployment) { deployment_for(subaccount) }
-
-      def deployment_for(context)
-        deployment = registration.new_external_tool(context)
-        deployment.save!
-        if context.is_a?(Course)
-          Lti::ContextControl.create!(course: context, registration:, deployment:)
-        elsif context.is_a?(Account)
-          Lti::ContextControl.create!(account: context, registration:, deployment:)
-        end
-
-        deployment
-      end
 
       before do
         deployment
@@ -152,6 +152,68 @@ describe Lti::ContextControlsController, type: :request do
         subject
         expect(response_json).to eq([])
       end
+    end
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      before { user_session(student_in_course(account:).user) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_registrations_next) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+  end
+
+  describe "GET #show" do
+    subject { get "/api/v1/lti_registrations/#{registration.id}/controls/#{control.id}" }
+
+    let(:deployment) { deployment_for(account) }
+    let(:control) { deployment.context_controls.first }
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    it "returns the requested control" do
+      subject
+      expect(response_json).to eq(
+        {
+          account_id: account.id,
+          available: true,
+          context_name: account.name,
+          course_id: nil,
+          created_at: control.created_at.iso8601,
+          created_by: nil,
+          deployment_id: deployment.id,
+          depth: 0,
+          display_path: [account.name],
+          id: control.id,
+          path: control.path,
+          registration_id: registration.id,
+          updated_at: control.updated_at.iso8601,
+          updated_by: nil,
+          workflow_state: "active"
+        }.with_indifferent_access
+      )
     end
 
     context "without user session" do

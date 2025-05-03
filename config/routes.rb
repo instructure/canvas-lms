@@ -1995,6 +1995,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "lti/context_controls") do
       get "lti_registrations/:registration_id/controls", action: :index
+      get "lti_registrations/:registration_id/controls/:id", action: :show
     end
 
     scope(controller: "lti/resource_links") do

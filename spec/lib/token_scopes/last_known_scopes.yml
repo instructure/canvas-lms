@@ -1820,6 +1820,8 @@
 - verb: GET
   path: '/api/v1/lti_registrations/:registration_id/controls'
 - verb: GET
+  path: '/api/v1/lti_registrations/:registration_id/controls/:id'
+- verb: GET
   path: '/api/v1/manageable_accounts'
 - verb: GET
   path: '/api/v1/manually_created_courses_account'
