@@ -83,6 +83,8 @@ import ContextModulesHeader from '../react/ContextModulesHeader'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ModuleItemsLazyLoader} from '../utils/ModuleItemsLazyLoader'
 import {
+  isModuleCollapsed,
+  isModulePaginated,
   addShowAllOrLess,
   maybeExpandAndLoadAll,
   MODULE_EXPAND_AND_LOAD_ALL,
@@ -1987,11 +1989,14 @@ function initContextModuleItems(moduleId) {
 
     const currentItem = $(this).parents('.context_module_item')[0]
     const modules = document.querySelectorAll('#context_modules .context_module')
-    const groups = Array.prototype.map.call(modules, module => {
+    const groups = Array.from(modules).map(module => {
       const id = module.getAttribute('id').substring('context_module_'.length)
       const title = module.querySelector('.header > .collapse_module_link > .name').textContent
+      if (ENV.FEATURE_MODULES_PERF && (isModuleCollapsed(module) || isModulePaginated(module))) {
+        return {id, title, items: false}
+      }
       const moduleItems = module.querySelectorAll('.context_module_item')
-      const items = Array.prototype.map.call(moduleItems, item => ({
+      const items = Array.from(moduleItems).map(item => ({
         id: item.getAttribute('id').substring('context_module_item_'.length),
         title: item.querySelector('.title').textContent.trim(),
       }))
@@ -2012,29 +2017,51 @@ function initContextModuleItems(moduleId) {
       },
       formatSaveUrl: ({groupId}) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
       onMoveSuccess: ({data, itemIds, groupId}) => {
+        const itemId = itemIds[0]
+        const item = document.querySelector(`#context_module_item_${itemId}`)
+        const $container = $(`#context_module_${groupId} .ui-sortable`)
+        if ($container.length) {
+          $container.sortable('disable')
+          $container[0].appendChild(item)
+
+          const order = data.context_module.content_tags.map(item => item.content_tag.id)
+          reorderElements(order, $container[0], id => `#context_module_item_${id}`)
+          $container.sortable('enable').sortable('refresh')
+        } else {
+          item.remove()
+        }
         if (ENV.FEATURE_MODULES_PERF) {
           maybeExpandAndLoadAll(groupId)
         }
-        const itemId = itemIds[0]
-        const $container = $(`#context_module_${groupId} .ui-sortable`)
-        $container.sortable('disable')
-
-        const item = document.querySelector(`#context_module_item_${itemId}`)
-        $container[0].appendChild(item)
-
-        const order = data.context_module.content_tags.map(item => item.content_tag.id)
-        reorderElements(order, $container[0], id => `#context_module_item_${id}`)
-        $container.sortable('enable').sortable('refresh')
       },
       focusOnExit: () => currentItem.querySelector('.al-trigger'),
     }
 
-    renderTray(moveTrayProps, document.getElementById('not_right_side'))
+    fetchModuleItemsAndRenderTray(moveTrayProps, document.getElementById('not_right_side'))
   })
 
   if (ENV.FEATURE_MODULES_PERF) {
     addShowAllOrLess(moduleId)
   }
+}
+
+async function fetchModuleItemsAndRenderTray(moveTrayProps, rootContainer) {
+  const missing_groups = moveTrayProps.moveOptions.groups.filter(group => {
+    return group.items === false
+  })
+
+  const promises = missing_groups.map(async group => {
+    return fetch(
+      `/api/v1/courses/${ENV.COURSE_ID}/modules/${group.id}/items?include[]=title_only&per_page=1000`,
+    )
+      .then(res => res.json())
+      .then(items => {
+        group.items = items.map(item => ({id: String(item.id), title: item.title}))
+      })
+  })
+
+  await Promise.all(promises)
+  renderTray(moveTrayProps, rootContainer)
 }
 
 // TODO: call this on the current page when getting a new page of items
