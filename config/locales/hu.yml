@@ -9726,6 +9726,7 @@ hu:
   edit_history_917c1e08: "Előzmények szerkesztése"
   edit_home_page_ee907de9: "Kezdőlap szerkesztése"
   edit_important_info_for_coursename_bdb3eb6c: "%{courseName}fontos információinak szerkesztése"
+  edit_item_details_1e2b5ba1: "Elem részleteinek szerkesztése"
   edit_item_details_c9a7b9c5: "Elem részleteinek szerkesztése"
   edit_key_developername_2980f240: "%{developerName}kulcs szerkesztése"
   edit_key_name_5c7d2f46: "%{name}kulcs szerkesztése"
@@ -12975,6 +12976,7 @@ hu:
   increase_indent_6d550a4a: "Behúzás növelése"
   incremental_update_successfully_generated_against__db3f3f06: "A növekményes frissítés sikeresen le lett generálva az előző SIS import helyett."
   indent_1_level_e7b18c1e: "Behúzás 1 szinttel"
+  indent_72887794: Behúzás
   indentation_3c6081d5: Behúzás
   indexing_in_progress_6ce56f27: "Indexelés folyamatban"
   india_91_6c290107: "India (+91)"
@@ -23087,6 +23089,7 @@ hu:
   show_key_1fbf0c64: "Kulcs megjelenítése"
   show_less_574a758b: "Kevesebb mutatása"
   show_less_d5bbf728: "kevesebb megjelenítése"
+  show_less_f778dab5: "Kevesebb megjelenítése"
   show_links_to_unpublished_content_30c0450d: "Tartalom visszavonásához tartozó link megjelenítése"
   show_live_events_subscriptions_68b69a03: "Show Live Events előfizetések"
   show_lti_tools_from_federated_parent_accounts_47135c98: "LTI-eszközök megjelenítése összevont szülői fiókokból"
