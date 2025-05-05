@@ -5404,6 +5404,7 @@ ko:
   edit_collaboration_b014c18b: "협업 편집"
   edit_grading_scheme_53091236: "평가 구성표 편집"
   edit_group_c8679dba: "그룹 편집"
+  edit_item_details_1e2b5ba1: "항목 세부 정보 편집"
   edit_module_settings_2bf11f7f: "모듈 설정 편집"
   edit_quiz_ededddd8: "퀴즈 편집"
   edit_rubric: 
@@ -7174,6 +7175,7 @@ ko:
     welcome_to_canvas: "Canvas에 오신 것을 환영합니다!"
   incorrect_username_and_or_password_2de73abb: "유효하지 않은 사용자 이름이나 암호"
   indent_1_level_e7b18c1e: "한 수준 들여쓰기"
+  indent_72887794: 들여쓰기
   indentation_3c6081d5: 들여쓰기
   individual_2033c005: 개별
   info: 
@@ -13265,6 +13267,7 @@ ko:
   show_by_type_c5d61732: "종류별로 정렬"
   show_calendar_events_in_the_month_view_on_multiple_e94c33ae: "달력 월별 보기에서 행사 제목이 한 줄에 들어가지 않는 경우 여러 줄로 나타내기"
   show_concluded_enrollments_6a05544c: "종결된 등록 표시"
+  show_less_f778dab5: "간단히 표시"
   show_more_fae1328: "자세히 표시"
   showing_count_results_below_61ddca33: 
     zero: "결과가 없음"
