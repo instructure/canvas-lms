@@ -32,10 +32,11 @@ class AttachmentAssociation < ActiveRecord::Base
   after_save :set_word_count
 
   def self.update_associations(context, attachment_ids, user, session, field_name = nil)
-    currently_has = AttachmentAssociation.where(context:, field_name:).pluck(:attachment_id)
+    global_ids = attachment_ids.map { |id| Shard.global_id_for(id) }
+    currently_has = AttachmentAssociation.where(context:, field_name:).pluck(:attachment_id).map { |id| Shard.global_id_for(id) }
 
-    to_delete = currently_has - attachment_ids
-    to_create = attachment_ids - currently_has
+    to_delete = currently_has - global_ids
+    to_create = global_ids - currently_has
 
     AttachmentAssociation.where(context:, field_name:, attachment_id: to_delete).destroy_all if to_delete.any?
 
