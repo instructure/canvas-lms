@@ -12357,6 +12357,16 @@ describe Assignment do
       expect(@assignment.submission_types).to eql("online_text_entry")
     end
 
+    it "does not convert valid submission types" do
+      @assignment = assignment_model(submission_types: "online_text_entry,online_upload", course: @course)
+      expect(@assignment.submission_types).to eql("online_text_entry,online_upload")
+    end
+
+    it "converts mixed submission types" do
+      @assignment = assignment_model(submission_types: "online_text_entry,online_upload,on_paper", course: @course)
+      expect(@assignment.submission_types).to eql("online_text_entry")
+    end
+
     it "skips assignment peer reviews" do
       @assignment = assignment_model(peer_reviews: true, course: @course)
       expect(@assignment.peer_reviews).to be false

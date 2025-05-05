@@ -264,7 +264,7 @@ class AbstractAssignment < ActiveRecord::Base
     self.automatic_peer_reviews = false
     self.group_category_id = nil
     self.rubric_association = nil
-    self.submission_types = "online_text_entry" unless HORIZON_SUBMISSION_TYPES.include?(submission_types)
+    self.submission_types = "online_text_entry" unless (submission_types_array - HORIZON_SUBMISSION_TYPES).empty?
     self.workflow_state = "unpublished" if context_module_tags.none? { |t| t.tag_type == "context_module" && t.context_module&.published? }
   end
 
