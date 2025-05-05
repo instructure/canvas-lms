@@ -20,37 +20,36 @@ import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {RowFocusProvider} from '../../../contexts/RowFocusContext'
+import {RowsProvider} from '../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {mockRowFocusContext} from './testUtils'
-import BulkActionButtons from '../BulkActionButtons'
+import BulkActionButtons, {BulkActionButtonsProps} from '../BulkActionButtons'
 import {type File, Folder} from '../../../../interfaces/File'
 
-let defaultProps: any
+const defaultProps: BulkActionButtonsProps = {
+  size: 'medium',
+  selectedRows: new Set(['file-1', 'file-2']),
+  totalRows: 10,
+  userCanEditFilesForContext: true,
+  userCanDeleteFilesForContext: true,
+  userCanRestrictFilesForContext: true,
+  usageRightsRequiredForContext: true,
+  rows: [{id: 1, display_name: 'File 1'} as File, {id: 2, display_name: 'File 2'} as File],
+}
 
-const renderComponent = (props = {}) => {
+const renderComponent = (props: BulkActionButtonsProps = {...defaultProps}) => {
   return render(
     <FileManagementProvider value={createMockFileManagementContext()}>
       <RowFocusProvider value={mockRowFocusContext}>
-        <BulkActionButtons {...defaultProps} {...props} />
+        <RowsProvider value={{setCurrentRows: jest.fn(), currentRows: props.rows}}>
+          <BulkActionButtons {...defaultProps} {...props} />
+        </RowsProvider>
       </RowFocusProvider>
     </FileManagementProvider>,
   )
 }
 
 describe('BulkActionButtons', () => {
-  beforeEach(() => {
-    defaultProps = {
-      size: 'medium',
-      selectedRows: new Set(['file-1', 'file-2']),
-      totalRows: 10,
-      userCanEditFilesForContext: true,
-      userCanDeleteFilesForContext: true,
-      userCanRestrictFilesForContext: true,
-      usageRightsRequiredForContext: true,
-      rows: [{id: 1, display_name: 'File 1'} as File, {id: 2, display_name: 'File 2'} as File],
-    }
-  })
-
   it('renders component with all options enabled', async () => {
     renderComponent()
     expect(screen.getByText('2 of 10 selected')).toBeInTheDocument()
@@ -67,12 +66,16 @@ describe('BulkActionButtons', () => {
   })
 
   it('does not render delete button when userCanDeleteFilesForContext is false', () => {
-    renderComponent({userCanDeleteFilesForContext: false})
+    renderComponent({...defaultProps, userCanDeleteFilesForContext: false})
     expect(screen.queryByTestId('bulk-actions-delete-button')).toBeNull()
   })
 
   it('does not render permissions button when userCanRestrictFilesForContext is false', async () => {
-    renderComponent({userCanEditFilesForContext: true, userCanRestrictFilesForContext: false})
+    renderComponent({
+      ...defaultProps,
+      userCanEditFilesForContext: true,
+      userCanRestrictFilesForContext: false,
+    })
     const moreButton = screen.getByTestId('bulk-actions-more-button')
     fireEvent.click(moreButton)
     await waitFor(() => {
@@ -81,12 +84,16 @@ describe('BulkActionButtons', () => {
   })
 
   it('does not render more actions when userCanEditFilesForContext is false', async () => {
-    renderComponent({userCanEditFilesForContext: false, userCanRestrictFilesForContext: false})
+    renderComponent({
+      ...defaultProps,
+      userCanEditFilesForContext: false,
+      userCanRestrictFilesForContext: false,
+    })
     expect(screen.queryByTestId('bulk-actions-more-button')).toBeNull()
   })
 
   it('does not render manage access when usageRightsRequiredForContext is false', async () => {
-    renderComponent({usageRightsRequiredForContext: false})
+    renderComponent({...defaultProps, usageRightsRequiredForContext: false})
     const moreButton = screen.getByTestId('bulk-actions-more-button')
     fireEvent.click(moreButton)
     await waitFor(() => {
@@ -95,7 +102,7 @@ describe('BulkActionButtons', () => {
   })
 
   it('renders disabled buttons when no selection', async () => {
-    renderComponent({selectedRows: new Set()})
+    renderComponent({...defaultProps, selectedRows: new Set()})
     expect(screen.getByText('0 selected')).toBeInTheDocument()
 
     const button = screen.getByTestId('bulk-actions-more-button')
@@ -103,7 +110,7 @@ describe('BulkActionButtons', () => {
   })
 
   it('renders the delete button as disabled when no rows are selected', () => {
-    renderComponent({selectedRows: new Set()})
+    renderComponent({...defaultProps, selectedRows: new Set()})
     const deleteButton = screen.getByTestId('bulk-actions-delete-button')
     expect(deleteButton.closest('button')).toHaveAttribute('disabled')
   })
@@ -122,7 +129,7 @@ describe('BulkActionButtons', () => {
   })
 
   it('renders the more button as disabled when no rows are selected', () => {
-    renderComponent({selectedRows: new Set()})
+    renderComponent({...defaultProps, selectedRows: new Set()})
     const moreButton = screen.getByTestId('bulk-actions-more-button')
     expect(moreButton.closest('button')).toHaveAttribute('disabled')
   })
@@ -153,6 +160,7 @@ describe('BulkActionButtons', () => {
 
   it('disables Delete, Manage Usage Rights, Edit Permissions, and Move To when a locked BP is selected', async () => {
     renderComponent({
+      ...defaultProps,
       rows: [
         {id: 1, display_name: 'File 1', restricted_by_master_course: true} as File,
         {id: 2, display_name: 'File 2'} as File,
@@ -180,6 +188,7 @@ describe('BulkActionButtons', () => {
   describe('Folders', () => {
     beforeEach(() => {
       renderComponent({
+        ...defaultProps,
         rows: [{id: 1, name: 'Folder 1'} as Folder, {id: 2, name: 'Folder 2'} as Folder],
         selectedRows: new Set(['folder-1', 'folder-2']),
       })

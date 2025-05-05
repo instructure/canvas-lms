@@ -52,7 +52,7 @@ import PermissionsModal from './PermissionsModal'
 
 const I18n = createI18nScope('files_v2')
 
-interface ActionMenuButtonProps {
+export interface ActionMenuButtonProps {
   size: 'small' | 'medium' | 'large'
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean

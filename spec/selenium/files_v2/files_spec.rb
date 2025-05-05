@@ -219,7 +219,7 @@ describe "files index page" do
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:unpublished)
           expect(unpublished_status_button).to be_present
-          select_item_to_edit_from_kebab_menu(1)
+          toolbox_menu_button("more-button").click
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:published)
           expect(published_status_button).to be_present
