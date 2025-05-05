@@ -38,15 +38,7 @@
 %>
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if learning_outcome_criterion %>" style="<%= hidden unless criterion %>">
   <td class="criterion_description hover-container pad-box-micro">
-    <div class="container">
-      <div class="links editing">
-        <% if !learning_outcome_criterion %>
-          <a href="#" class="edit_criterion_link" role="button"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit criterion description' %></span></a>
-        <% end %>
-        <% if should_show_delete || rubric == nil %>
-          <a href="#" class="delete_criterion_link" role="button"><i class="icon-trash standalone-icon"></i><span class="screenreader-only"><%= t 'Delete criterion row' %></span></a>
-        <% end %>
-      </div>
+    <div class="criterion_description_container">
       <div class="description_content">
         <span class="outcome_sr_content" aria-hidden="<%= learning_outcome_criterion.nil? %>">
           <i class="learning_outcome_flag icon-outcomes" aria-hidden="true"></i>
@@ -76,6 +68,14 @@
         </div>
       </div>
 
+      <div class="links editing">
+        <% if !learning_outcome_criterion %>
+          <a href="#" class="edit_criterion_link" role="button"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit criterion description' %></span></a>
+        <% end %>
+        <% if should_show_delete || rubric == nil %>
+          <a href="#" class="delete_criterion_link" role="button"><i class="icon-trash standalone-icon"></i><span class="screenreader-only"><%= t 'Delete criterion row' %></span></a>
+        <% end %>
+      </div>
     </div>
     <% if rubric && !rubric.free_form_criterion_comments && assessment_rating && assessment_rating[:comments] %>
       <div class="assessment-comments">
@@ -124,17 +124,6 @@
           >
             <div class="container">
               <div class="rating-main">
-                <% if !learning_outcome_criterion %>
-                  <div class="editing links">
-                    <a href="#" class="edit_rating_link" role="button" aria-label="<%= t 'Edit rating' %>">
-                      <i class="icon-edit standalone-icon" aria-hidden="true"></i>
-                    </a>
-                    <a href="#" class="delete_rating_link" role="button" aria-label="<%= t 'Delete rating' %>" <%= "aria-hidden=true" if edge%> >
-                      <i class="icon-trash standalone-icon" aria-hidden="true"></i>
-                    </a>
-                  </div>
-                  <div class="clear"></div>
-                <% end %>
                 <span role="text" class="rating-content-wrapper">
                   <span class="nobr toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>">
                     <span class="points"><%= n(round_if_whole(rating.points)) %></span>
@@ -144,6 +133,16 @@
                   <span class="rating_long_description small_description"><%= rating.long_description %></span>
                 </span>
                 <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
+                <% if !learning_outcome_criterion %>
+                  <div class="editing links">
+                    <a href="#" class="edit_rating_link" role="button" aria-label="<%= t 'Edit rating' %>">
+                      <i class="icon-edit standalone-icon" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" class="delete_rating_link" role="button" aria-label="<%= t 'Delete rating' %>" <%= "aria-hidden=true" if edge%> >
+                      <i class="icon-trash standalone-icon" aria-hidden="true"></i>
+                    </a>
+                  </div>
+                <% end %>
               </div>
               <% if !learning_outcome_criterion && !last_rating %>
                 <div class="editing links add_rating_link">
