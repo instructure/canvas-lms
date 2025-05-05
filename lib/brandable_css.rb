@@ -213,7 +213,7 @@ module BrandableCSS
     def high_contrast_overrides
       Class.new do
         def get_value(variable_name)
-          { "ic-brand-primary" => "#0A5A9E", "ic-link-color" => "#2B7ABC" }[variable_name]
+          { "ic-brand-primary" => "#0A5A9E", "ic-link-color" => "#09508C" }[variable_name]
         end
       end.new
     end
