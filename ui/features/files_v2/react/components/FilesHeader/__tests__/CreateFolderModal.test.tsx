@@ -18,7 +18,7 @@
 
 import React from 'react'
 import CreateFolderModal from '../CreateFolderModal'
-import {render, screen, within} from '@testing-library/react'
+import {fireEvent, render, screen, within} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
@@ -102,5 +102,29 @@ describe('CreateFolderModal', () => {
     const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
     await user.click(createFolderButton)
     expect(defaultProps.onRequestClose).not.toHaveBeenCalled()
+  })
+
+  it('shows validation error when folder name is greater than 255 characters', async () => {
+    const user = userEvent.setup()
+    renderComponent()
+    const input = screen.getByRole('textbox', {name: /Folder Name/i})
+    const name = 'a'.repeat(256)
+    // userEvent.type is flaky with long strings
+    fireEvent.change(input, {target: {value: name}})
+    const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
+    await user.click(createFolderButton)
+    expect(await screen.findByText(/Folder name cannot exceed 255 characters/i)).toBeInTheDocument()
+  })
+
+  it('submits with folder name of 255 characters', async () => {
+    const user = userEvent.setup()
+    renderComponent()
+    const input = screen.getByRole('textbox', {name: /Folder Name/i})
+    const name = 'a'.repeat(255)
+    // userEvent.type is flaky with long strings
+    fireEvent.change(input, {target: {value: name}})
+    const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
+    await user.click(createFolderButton)
+    expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
   })
 })
