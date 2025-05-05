@@ -24,6 +24,7 @@ import {FAKE_FILES, FAKE_FOLDERS} from '../../../fixtures/fakeData'
 import {userEvent} from '@testing-library/user-event'
 import {Folder, File} from '../../../interfaces/File'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {RowsProvider} from '../../contexts/RowsContext'
 
 const defaultProps: {
   isOpen: boolean
@@ -36,7 +37,11 @@ const defaultProps: {
 }
 
 const renderComponent = (props = {}) => {
-  return render(<RenameModal {...defaultProps} {...props} />)
+  return render(
+    <RowsProvider value={{setCurrentRows: jest.fn(), currentRows: [defaultProps.renamingItem]}}>
+      <RenameModal {...defaultProps} {...props} />
+    </RowsProvider>,
+  )
 }
 
 describe('RenameModal', () => {
@@ -139,7 +144,7 @@ describe('RenameModal', () => {
       renderComponent()
       const input = screen.getByRole('textbox', {name: 'File Name'})
       await user.clear(input)
-      await user.type(input, 'validfilename')
+      await user.type(input, 'anothervalidfilename')
       await user.type(input, '{enter}')
       await waitFor(() => {
         expect(fetchMock.calls()[0][0]).toBe(`/api/v1/files/${defaultProps.renamingItem.id}`)
