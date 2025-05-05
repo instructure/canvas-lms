@@ -74,7 +74,8 @@ if (window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) {
 }
 
 ready(() => {
-  if (window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) {
+  const showInstUiNavbar = window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev
+  if (showInstUiNavbar) {
     const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
     if (mobileContextNavContainer) {
       const sideNavRoot = createRoot(mobileContextNavContainer)
@@ -117,6 +118,18 @@ ready(() => {
       }
     }
   }
+
+  // Each element in the side bar menu can be triggered by enter and space.
+  const navLinksSelector = showInstUiNavbar ? '#instui-sidenav > ul > li > a' : '#menu > li > a'
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>(navLinksSelector)
+  navLinks.forEach(link => {
+    link.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        link.click()
+      }
+    })
+  })
 
   const newTabContainers = document.getElementsByClassName('new-tab-indicator')
   Array.from(newTabContainers).forEach(newTabContainer => {
