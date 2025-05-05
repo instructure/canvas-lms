@@ -10559,6 +10559,7 @@ nn:
   edit_history_917c1e08: Endringshistorikk
   edit_home_page_ee907de9: "Rediger nettside"
   edit_important_info_for_coursename_bdb3eb6c: "Rediger viktig informasjon for %{courseName}"
+  edit_item_details_1e2b5ba1: "Rediger elementdetaljar"
   edit_item_details_c9a7b9c5: "Rediger elementdetaljar"
   edit_key_developername_2980f240: "Endre nøkkel %{developerName}"
   edit_key_name_5c7d2f46: "Rediger nøkkel %{name}"
@@ -14257,6 +14258,7 @@ nn:
   increase_indent_6d550a4a: "Auk innrykk"
   incremental_update_successfully_generated_against__db3f3f06: "Trinnvis oppdatering er generert mot ein tidlegare SIS-import."
   indent_1_level_e7b18c1e: "Innrykk 1 nivå"
+  indent_72887794: Innrykk
   indentation_3c6081d5: Innrykk
   indexing_in_progress_6ce56f27: "Indeksering i gang"
   india_91_6c290107: "India (+91)"
@@ -24720,6 +24722,7 @@ nn:
   show_key_1fbf0c64: "Vis nøkkel"
   show_less_574a758b: "Vis mindre"
   show_less_d5bbf728: "Vis mindre"
+  show_less_f778dab5: "Vis mindre"
   show_links_to_unpublished_content_30c0450d: "Vis lenker til upublisert innhald"
   show_live_events_subscriptions_68b69a03: "Vis abonnement på direktesendingar"
   show_lti_tools_from_federated_parent_accounts_47135c98: "Vis LTI-verktøy frå overordna kontoar"
