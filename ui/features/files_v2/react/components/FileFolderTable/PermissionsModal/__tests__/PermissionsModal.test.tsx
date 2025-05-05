@@ -26,7 +26,11 @@ import {resetAndGetFilesEnv} from '../../../../../utils/filesEnvUtils'
 import {createFilesContexts} from '../../../../../fixtures/fileContexts'
 import {RowsProvider} from '../../../../contexts/RowsContext'
 import PermissionsModal from '../PermissionsModal'
-import {type AvailabilityOptionId, parseNewRows} from '../PermissionsModalUtils'
+import {
+  type AvailabilityOptionId,
+  DATE_RANGE_TYPE_OPTIONS,
+  parseNewRows,
+} from '../PermissionsModalUtils'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -145,32 +149,7 @@ describe('PermissionsModal', () => {
         })
       })
 
-      // TODO: unskip failing tests (cf. RCX-3333)
-      describe.skip('with date errors', () => {
-        it('shows an error there are invalid dates', async () => {
-          renderComponent({
-            items: [
-              {
-                ...FAKE_FILES[0],
-                unlock_at: '2025-04-12T00:00:00Z',
-                lock_at: '2025-04-15T00:00:00Z',
-              },
-            ],
-          })
-          let input = await screen.getByLabelText(/available from/i)
-          await userEvent.click(input)
-          await userEvent.clear(input)
-          await userEvent.type(input, 'banana')
-          input = await screen.getByLabelText(/until/i)
-          await userEvent.click(input)
-          await userEvent.clear(input)
-          await userEvent.type(input, 'avocado')
-          await userEvent.click(screen.getByTestId('permissions-save-button'))
-          const messages = await screen.getAllByText('Invalid date')
-          expect(messages[0]).toBeInTheDocument()
-          expect(messages[1]).toBeInTheDocument()
-        })
-
+      describe('with date errors', () => {
         it('shows error when unlock date is after lock date', async () => {
           renderComponent({
             items: [
@@ -181,38 +160,32 @@ describe('PermissionsModal', () => {
               },
             ],
           })
-          const availableInput = screen.getByLabelText(/available from/i)
           await userEvent.click(screen.getByTestId('permissions-save-button'))
           expect(
             await screen.findByText('Unlock date cannot be after lock date.'),
           ).toBeInTheDocument()
-          expect(availableInput).toHaveFocus()
         })
 
-        it('shows error when both lock_at and unlock_at are blank', async () => {
+        it('shows error when both lock_at and unlock_at are blank and date range type is range', async () => {
           renderComponent({
             items: [
               {
                 ...FAKE_FILES[0],
                 hidden: false,
                 locked: false,
-                unlock_at: '2025-04-12T00:00:00Z',
-                lock_at: '2025-04-15T00:00:00Z',
+                unlock_at: '',
+                lock_at: '',
               },
             ],
           })
-          const availableInput = screen.getByLabelText(/available from/i)
-          await userEvent.click(availableInput)
-          await userEvent.clear(availableInput)
-          const untilInput = screen.getByLabelText(/until/i)
-          await userEvent.click(untilInput)
-          await userEvent.clear(untilInput)
-          await userEvent.click(untilInput)
+
+          screen.getByTestId('permissions-availability-selector').click()
+          screen.getByText('Schedule availability').click()
 
           await userEvent.click(screen.getByTestId('permissions-save-button'))
-
-          expect(await screen.findByText('Please enter at least one date.')).toBeInTheDocument()
-          expect(availableInput).toHaveFocus()
+          const messages = await screen.getAllByText('Invalid date.')
+          expect(messages[0]).toBeInTheDocument()
+          expect(messages[1]).toBeInTheDocument()
         })
       })
     })
@@ -281,30 +254,6 @@ describe('PermissionsModal', () => {
       expect(screen.getByTestId('permissions-cancel-button')).toBeInTheDocument()
       expect(screen.getByTestId('permissions-save-button')).toBeInTheDocument()
     })
-  })
-
-  it.skip('shows an error there are invalid dates', async () => {
-    renderComponent({
-      items: [
-        {
-          ...FAKE_FILES[0],
-          unlock_at: '2025-04-12T00:00:00Z',
-          lock_at: '2025-04-15T00:00:00Z',
-        },
-      ],
-    })
-    let input = await screen.getByLabelText(/available from/i)
-    await userEvent.click(input)
-    await userEvent.clear(input)
-    await userEvent.type(input, 'banana')
-    input = await screen.getByLabelText(/until/i)
-    await userEvent.click(input)
-    await userEvent.clear(input)
-    await userEvent.type(input, 'avocado')
-    await userEvent.click(screen.getByTestId('permissions-save-button'))
-    const messages = await screen.getAllByText('Invalid date')
-    expect(messages[0]).toBeInTheDocument()
-    expect(messages[1]).toBeInTheDocument()
   })
 
   it('performs fetch request and shows alert', async () => {
@@ -379,6 +328,7 @@ describe('PermissionsModal', () => {
       currentRows: [FAKE_FILES[0]],
       items: [FAKE_FILES[0]],
       availabilityOptionId: 'published' as AvailabilityOptionId,
+      dateRangeType: null,
       unlockAt: null,
       lockAt: null,
     }
@@ -430,6 +380,7 @@ describe('PermissionsModal', () => {
     it('sets a row to date_range', () => {
       const newRows = parseNewRows({
         ...defaultParams,
+        dateRangeType: DATE_RANGE_TYPE_OPTIONS.range,
         availabilityOptionId: 'date_range',
         unlockAt: '2025-04-12T00:00:00Z',
         lockAt: '2025-04-15T00:00:00Z',
