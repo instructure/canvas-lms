@@ -9500,6 +9500,7 @@ fa:
   edit_group_c8679dba: "ویرایش گروه"
   edit_home_page_ee907de9: "ویرایش صفحه اصلی"
   edit_important_info_for_coursename_bdb3eb6c: "ویرایش اطلاعات مهم برای %{courseName}"
+  edit_item_details_1e2b5ba1: "ویرایش اطلاعات مورد"
   edit_item_details_c9a7b9c5: "ویرایش جزئیات مورد"
   edit_key_developername_2980f240: "ویرایش کلید %{developerName}"
   edit_key_name_5c7d2f46: "ویرایش کلید %{name}"
@@ -12839,6 +12840,7 @@ fa:
   increase_indent_6d550a4a: "افزایش تورفتگی"
   incremental_update_successfully_generated_against__db3f3f06: "بهنگام سازی صعودی با موفقیت در برابر ورود قبلی در سامانه اطلاعات دانشجو ایجاد شد."
   indent_1_level_e7b18c1e: "تورفتگی به میزان 1 سطح"
+  indent_72887794: تورفتگی
   indentation_3c6081d5: "افزایش تورفتگی"
   india_91_6c290107: "هند (+91)"
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "تصویر را فقط برای اهداف تزیینی نشان می دهد و نباید توسط صفحه خوان ها خوانده شود"
@@ -22422,6 +22424,7 @@ fa:
   show_inactive_enrollments_8f4c4824: "نمایش ثبت نام های غیر فعال"
   show_key_1fbf0c64: "نمایش کلید"
   show_less_d5bbf728: "نمایش کمتر"
+  show_less_f778dab5: "نمایش کمتر"
   show_links_to_unpublished_content_30c0450d: "نمایش پیوندهای مربوط به محتوای منتشر نشده"
   show_more_8d5f918b: "نمایش بیشتر"
   show_more_af9cbc16: "نمایش بیشتر"
