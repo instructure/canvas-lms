@@ -82,7 +82,13 @@ import {addModuleElement} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ModuleItemsLazyLoader} from '../utils/ModuleItemsLazyLoader'
-import {addShowAllOrLess, isModuleSelectedByTEACHER_MODULE_SELECTION} from '../utils/showAllOrLess'
+import {
+  addShowAllOrLess,
+  maybeExpandAndLoadAll,
+  MODULE_EXPAND_AND_LOAD_ALL,
+  MODULE_LOAD_ALL,
+  MODULE_LOAD_FIRST_PAGE,
+} from '../utils/showAllOrLess'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -586,6 +592,9 @@ window.modules = (function () {
         $module.find('.context_module_items').append($item.show())
       } else {
         $before.before($item.show())
+      }
+      if (ENV.FEATURE_MODULES_PERF && $module[0]?.dataset.moduleId) {
+        maybeExpandAndLoadAll($module[0].dataset.moduleId)
       }
       refreshDuplicateLinkStatus($module)
       return $item
@@ -1817,7 +1826,8 @@ function toggleModuleCollapse(event, fetchAllPages) {
   const expandCallback = null
   const collapse = $(this).hasClass('collapse_module_link') ? '1' : '0'
   const $module = $(this).parents('.context_module')
-  const reload_entries = $module.find('.content .context_module_items').children().length === 0
+  const reload_entries =
+    fetchAllPages || $module.find('.content .context_module_items').children().length === 0
   const toggle = function (show) {
     const callback = function () {
       $module
@@ -2002,6 +2012,9 @@ function initContextModuleItems(moduleId) {
       },
       formatSaveUrl: ({groupId}) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
       onMoveSuccess: ({data, itemIds, groupId}) => {
+        if (ENV.FEATURE_MODULES_PERF) {
+          maybeExpandAndLoadAll(groupId)
+        }
         const itemId = itemIds[0]
         const $container = $(`#context_module_${groupId} .ui-sortable`)
         $container.sortable('disable')
@@ -2562,16 +2575,16 @@ $(() => {
     // Handle Show All and Show Less events
     // I don't bother with removeEventListener because the events are
     // bound to the document and will be dealt with on page unload
-    document.addEventListener('module-expand-and-load-all', event => {
+    document.addEventListener(MODULE_EXPAND_AND_LOAD_ALL, event => {
       $(`#context_module_${event.detail.moduleId} .expand_module_link`).trigger(
         'click',
         event.detail.allPages,
       )
     })
-    document.addEventListener('module-load-all', event => {
+    document.addEventListener(MODULE_LOAD_ALL, event => {
       modules.lazyLoadItems([event.detail.moduleId], true)
     })
-    document.addEventListener('module-load-first-page', event => {
+    document.addEventListener(MODULE_LOAD_FIRST_PAGE, event => {
       // TODO: rather than re-querying, maybe delete all items
       //       beyond the first page and trigger
       //       re-render of ModuleItemPaging

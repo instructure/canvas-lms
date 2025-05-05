@@ -18,7 +18,6 @@
 
 import {waitFor} from '@testing-library/dom'
 import {DEFAULT_PAGE_SIZE} from '../ModuleItemsLazyLoader'
-
 import {
   addShowAllOrLess,
   shouldShowAllOrLess,
@@ -27,6 +26,13 @@ import {
   isModulePaginated,
   isModuleLoading,
   isModuleSelectedByTEACHER_MODULE_SELECTION,
+  expandModuleAndLoadAll,
+  loadAll,
+  loadFirstPage,
+  maybeExpandAndLoadAll,
+  MODULE_EXPAND_AND_LOAD_ALL,
+  MODULE_LOAD_ALL,
+  MODULE_LOAD_FIRST_PAGE,
 } from '../showAllOrLess'
 
 declare const ENV: {
@@ -180,6 +186,73 @@ describe('showAllOrLess', () => {
       const module = document.createElement('div')
       addItemsToModule(module, DEFAULT_PAGE_SIZE)
       expect(shouldShowAllOrLess(module)).toBe('none')
+    })
+  })
+
+  describe('expandModuleAndLoadAll', () => {
+    it('should fire the event', (done: jest.DoneCallback) => {
+      document.addEventListener(MODULE_EXPAND_AND_LOAD_ALL, ((event: Event) => {
+        const customEvent = event as CustomEvent<{moduleId: string; allPages: boolean}>
+        expect(customEvent.detail.moduleId).toBe('1')
+        expect(customEvent.detail.allPages).toBe(true)
+        done()
+      }) as EventListener)
+      expandModuleAndLoadAll('1')
+    })
+  })
+
+  describe('loadAll', () => {
+    it('should fire the event', (done: jest.DoneCallback) => {
+      document.addEventListener(MODULE_LOAD_ALL, ((event: Event) => {
+        const customEvent = event as CustomEvent<{moduleId: string}>
+        expect(customEvent.detail.moduleId).toBe('1')
+        done()
+      }) as EventListener)
+      loadAll('1')
+    })
+  })
+
+  describe('loadFirstPage', () => {
+    it('should fire the event', (done: jest.DoneCallback) => {
+      document.addEventListener(MODULE_LOAD_FIRST_PAGE, ((event: Event) => {
+        const customEvent = event as CustomEvent<{moduleId: string}>
+        expect(customEvent.detail.moduleId).toBe('1')
+        done()
+      }) as EventListener)
+      loadFirstPage('1')
+    })
+  })
+
+  describe('maybeExpandAndLoadAll', () => {
+    it('should call expandModuleAndLoadAll when module is collapsed', (done: jest.DoneCallback) => {
+      const module = document.createElement('div')
+      module.id = 'context_module_1'
+      module.setAttribute('data-module-id', '1')
+      module.classList.add('collapsed_module')
+      document.body.appendChild(module)
+      document.addEventListener(MODULE_EXPAND_AND_LOAD_ALL, ((event: Event) => {
+        const customEvent = event as CustomEvent<{moduleId: string; allPages: boolean}>
+        expect(customEvent.detail.moduleId).toBe('1')
+        expect(customEvent.detail.allPages).toBe(true)
+        done()
+      }) as EventListener)
+      maybeExpandAndLoadAll('1')
+    })
+
+    it('should call loadAll when module is paginated', (done: jest.DoneCallback) => {
+      const module = document.createElement('div')
+      module.id = 'context_module_1'
+      module.setAttribute('data-module-id', '1')
+      const pager = document.createElement('div')
+      pager.setAttribute('data-testid', 'module-1-pagination')
+      module.appendChild(pager)
+      document.body.appendChild(module)
+      document.addEventListener(MODULE_LOAD_ALL, ((event: Event) => {
+        const customEvent = event as CustomEvent<{moduleId: string}>
+        expect(customEvent.detail.moduleId).toBe('1')
+        done()
+      }) as EventListener)
+      maybeExpandAndLoadAll('1')
     })
   })
 
