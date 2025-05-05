@@ -25,7 +25,7 @@ require_relative "../../helpers/items_assign_to_tray"
 require_relative "../../dashboard/pages/k5_dashboard_page"
 require_relative "../../dashboard/pages/k5_dashboard_common_page"
 require_relative "../../../helpers/k5_common"
-require_relative "../shared_examples/module_show_all_o_less_shared_examples"
+# require_relative "../shared_examples/module_show_all_o_less_shared_examples"
 require_relative "../shared_examples/modules_performance_shared_examples"
 
 describe "context modules" do
@@ -75,7 +75,8 @@ describe "context modules" do
         user_session(@student)
       end
 
-      it_behaves_like "module show all or less"
+      it_behaves_like "module show all or less", :context_modules
+      it_behaves_like "module show all or less", :course_homepage
     end
   end
 
@@ -94,5 +95,25 @@ describe "context modules" do
     end
 
     it_behaves_like "module performance with module items", :canvas_for_elementary
+  end
+
+  context "as a canvas for elementary student with module items to show", :ignore_js_errors do
+    before(:once) do
+      student_setup
+      @subject_course.account.enable_feature!(:modules_perf)
+      Setting.set("module_perf_threshold", -1)
+      @course = @subject_course
+      @module = @course.context_modules.create!(name: "module 1")
+      11.times do |i|
+        @module.add_item(type: "assignment", id: @course.assignments.create!(title: "assignment #{i}").id)
+      end
+      @subject_course.reload
+    end
+
+    before do
+      user_session(@student)
+    end
+
+    it_behaves_like "module show all or less", :canvas_for_elementary
   end
 end
