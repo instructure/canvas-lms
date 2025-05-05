@@ -151,6 +151,12 @@ import './resizable'
           event.preventDefault();
           that.close( event );
         })
+        .on("keydown", function(event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            $(this).click(); // Trigger the same click handler
+          }
+        })
         .appendTo( uiDialogTitlebar );
 
       ( this.uiDialogTitlebarCloseText = $( "<span>" ) )
