@@ -24,7 +24,6 @@ import {
   IconMoreLine,
   IconDownloadLine,
   IconTrashLine,
-  IconEyeLine,
   IconCloudLockLine,
   IconExpandItemsLine,
   IconPermissionsLine,
@@ -44,7 +43,7 @@ import {DisabledActionsInfoButton} from './DisabledActionsInfoButton'
 
 const I18n = createI18nScope('files_v2')
 
-interface BulkActionButtonsProps {
+export interface BulkActionButtonsProps {
   size: 'small' | 'medium' | 'large'
   selectedRows: Set<string>
   totalRows: number

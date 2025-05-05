@@ -25,6 +25,7 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
 import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {RowFocusProvider} from '../../../contexts/RowFocusContext'
+import {RowsProvider} from '../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 export const defaultProps: FileFolderTableProps = {
   size: 'large',
@@ -57,7 +58,9 @@ export const renderComponent = (props?: Partial<FileFolderTableProps>) => {
       <MockedQueryClientProvider client={queryClient}>
         <FileManagementProvider value={createMockFileManagementContext()}>
           <RowFocusProvider value={mockRowFocusContext}>
-            <FileFolderTable {...defaultProps} {...props} />
+            <RowsProvider value={{currentRows: props?.rows ?? [], setCurrentRows: jest.fn()}}>
+              <FileFolderTable {...defaultProps} {...props} />
+            </RowsProvider>
           </RowFocusProvider>
         </FileManagementProvider>
       </MockedQueryClientProvider>

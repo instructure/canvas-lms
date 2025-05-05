@@ -24,7 +24,9 @@ import {createMockFileManagementContext} from '../../../../__tests__/createMockC
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
 import {resetAndGetFilesEnv} from '../../../../../utils/filesEnvUtils'
 import {createFilesContexts} from '../../../../../fixtures/fileContexts'
+import {RowsProvider} from '../../../../contexts/RowsContext'
 import PermissionsModal from '../PermissionsModal'
+import {type AvailabilityOptionId, parseNewRows} from '../PermissionsModalUtils'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -37,7 +39,9 @@ const defaultProps = {
 const renderComponent = (props?: any) =>
   render(
     <FileManagementProvider value={createMockFileManagementContext()}>
-      <PermissionsModal {...defaultProps} {...props} />
+      <RowsProvider value={{currentRows: FAKE_FOLDERS_AND_FILES, setCurrentRows: jest.fn()}}>
+        <PermissionsModal {...defaultProps} {...props} />
+      </RowsProvider>
     </FileManagementProvider>,
   )
 
@@ -250,7 +254,9 @@ describe('PermissionsModal', () => {
       it('when is not a course context', async () => {
         render(
           <FileManagementProvider value={createMockFileManagementContext({contextType: 'user'})}>
-            <PermissionsModal {...defaultProps} />
+            <RowsProvider value={{currentRows: FAKE_FOLDERS_AND_FILES, setCurrentRows: jest.fn()}}>
+              <PermissionsModal {...defaultProps} />
+            </RowsProvider>
           </FileManagementProvider>,
         )
         await waitFor(() => {
@@ -366,5 +372,95 @@ describe('PermissionsModal', () => {
         'Selected items must have usage rights assigned before they can be published.',
       ),
     ).toBeInTheDocument()
+  })
+
+  describe('parseNewRows', () => {
+    const defaultParams = {
+      currentRows: [FAKE_FILES[0]],
+      items: [FAKE_FILES[0]],
+      availabilityOptionId: 'published' as AvailabilityOptionId,
+      unlockAt: null,
+      lockAt: null,
+    }
+
+    it('sets a row to published', () => {
+      const newRows = parseNewRows(defaultParams)
+      expect(newRows).toEqual([
+        {
+          ...FAKE_FILES[0],
+          hidden: false,
+          lock_at: null,
+          locked: false,
+          unlock_at: null,
+        },
+      ])
+    })
+
+    it('sets a row to unpublished', () => {
+      const newRows = parseNewRows({
+        ...defaultParams,
+        availabilityOptionId: 'unpublished',
+      })
+      expect(newRows).toEqual([
+        {
+          ...FAKE_FILES[0],
+          hidden: false,
+          lock_at: null,
+          locked: true,
+          unlock_at: null,
+        },
+      ])
+    })
+    it('sets a row to link_only', () => {
+      const newRows = parseNewRows({
+        ...defaultParams,
+        availabilityOptionId: 'link_only',
+      })
+      expect(newRows).toEqual([
+        {
+          ...FAKE_FILES[0],
+          hidden: true,
+          lock_at: null,
+          locked: false,
+          unlock_at: null,
+        },
+      ])
+    })
+
+    it('sets a row to date_range', () => {
+      const newRows = parseNewRows({
+        ...defaultParams,
+        availabilityOptionId: 'date_range',
+        unlockAt: '2025-04-12T00:00:00Z',
+        lockAt: '2025-04-15T00:00:00Z',
+      })
+      expect(newRows).toEqual([
+        {
+          ...FAKE_FILES[0],
+          hidden: false,
+          lock_at: '2025-04-15T00:00:00Z',
+          locked: false,
+          unlock_at: '2025-04-12T00:00:00Z',
+        },
+      ])
+    })
+
+    it('sets multiple rows', () => {
+      const newRows = parseNewRows({
+        ...defaultParams,
+        currentRows: FAKE_FOLDERS_AND_FILES,
+        items: FAKE_FOLDERS_AND_FILES,
+        availabilityOptionId: 'unpublished',
+      })
+      expect(newRows).toEqual(
+        FAKE_FOLDERS_AND_FILES.map(item => ({
+          ...item,
+          hidden: false,
+          lock_at: null,
+          locked: true,
+          unlock_at: null,
+        })),
+      )
+    })
   })
 })

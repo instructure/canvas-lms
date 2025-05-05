@@ -17,7 +17,6 @@
  */
 
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import {queryClient} from '@canvas/query'
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -26,6 +25,7 @@ import {Modal} from '@instructure/ui-modal'
 import {type File, type Folder} from '../../../../interfaces/File'
 import {isFile} from '../../../../utils/fileFolderUtils'
 import {useFileManagement} from '../../../contexts/FileManagementContext'
+import {useRows} from '../../../contexts/RowsContext'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {PermissionsModalHeader} from './PermissionsModalHeader'
 import {PermissionsModalBody} from './PermissionsModalBody'
@@ -35,6 +35,7 @@ import {
   defaultAvailabilityOption,
   defaultDate,
   defaultVisibilityOption,
+  parseNewRows,
   type AvailabilityOptionId,
   type AvailabilityOption,
   type VisibilityOption,
@@ -79,6 +80,8 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
     defaultVisibilityOption(items, visibilityOptions),
   )
   const [error, setError] = useState<string | null>()
+
+  const {currentRows, setCurrentRows} = useRows()
 
   const resetState = useCallback(() => {
     setIsRequestInFlight(false)
@@ -186,7 +189,14 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
       .then(() => {
         onDismiss()
         showFlashSuccess(I18n.t('Permissions have been successfully set.'))()
-        queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+        const newRows = parseNewRows({
+          items,
+          availabilityOptionId: availabilityOption.id,
+          currentRows,
+          unlockAt,
+          lockAt,
+        })
+        setCurrentRows(newRows)
       })
       .catch(() => {
         showFlashError(I18n.t('An error occurred while setting permissions. Please try again.'))()
@@ -201,6 +211,8 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
     onDismiss,
     startUpdateOperation,
     unlockAt,
+    currentRows,
+    setCurrentRows,
   ])
 
   const handleChangeAvailabilityOption = useCallback(
