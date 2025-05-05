@@ -248,7 +248,10 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
             open={isDirectShareOpen}
             sourceCourseId={courseId}
             courseId={courseId}
-            contentShare={{content_type: content?.type?.toLowerCase() || '', content_id: itemId}}
+            contentShare={{
+              content_type: content?.type?.toLowerCase() || '',
+              content_id: content?._id,
+            }}
             onDismiss={() => {
               setIsDirectShareOpen(false)
             }}

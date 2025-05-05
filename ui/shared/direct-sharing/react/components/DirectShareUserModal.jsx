@@ -144,7 +144,13 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
 
   // TODO: should show the title of item being shared
   return (
-    <CanvasModal label={I18n.t('Send To...')} size="medium" {...modalProps} footer={<Footer />}>
+    <CanvasModal
+      label={I18n.t('Send To...')}
+      size="medium"
+      footer={<Footer />}
+      data-testid="send-to-item-modal"
+      {...modalProps}
+    >
       <Suspense fallback={suspenseFallback}>
         {alert}
         <DirectShareUserPanel

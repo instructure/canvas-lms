@@ -48,6 +48,14 @@ module Modules2IndexPage
   def edit_item_modal_selector
     "[data-testid='edit-item-modal']"
   end
+
+  def send_to_modal_modal_selector
+    "[data-testid='send-to-item-modal']"
+  end
+
+  def send_to_modal_input_selector
+    "#content-share-user-search"
+  end
   #------------------------------ Elements ------------------------------
 
   def student_modules_container
@@ -76,6 +84,22 @@ module Modules2IndexPage
 
   def manage_module_item_container(module_item_id)
     f(manage_module_item_container_selector(module_item_id))
+  end
+
+  def send_to_modal
+    f(send_to_modal_modal_selector)
+  end
+
+  def send_to_modal_input
+    f(send_to_modal_input_selector)
+  end
+
+  def send_to_modal_input_container
+    fxpath("../..", send_to_modal_input)
+  end
+
+  def send_to_form_selected_elements
+    ff("button[type='button']", send_to_modal_input_container)
   end
   #------------------------------ Actions -------------------------------
 

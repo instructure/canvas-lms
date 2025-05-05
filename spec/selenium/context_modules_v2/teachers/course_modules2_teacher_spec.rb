@@ -40,36 +40,81 @@ describe "context modules", :ignore_js_errors do
     expect(teacher_modules_container).to be_displayed
   end
 
-  context "modules edit assignment kebab form" do
+  context "modules action menu" do
     before do
-      get "/courses/#{@course.id}/modules"
-
       @item = @module1.content_tags[0]
-
-      manage_module_item_button(@item.id).click
-      module_item_action_menu_link("Edit").click
     end
 
-    it "edit item form is shown" do
-      expect(edit_item_modal).to be_displayed
+    context "edit assignment kebab form" do
+      it "edit item form is shown" do
+        go_to_modules
+        manage_module_item_button(@item.id).click
+        module_item_action_menu_link("Edit").click
+
+        expect(edit_item_modal).to be_displayed
+      end
+
+      it "title field has the right value" do
+        go_to_modules
+        manage_module_item_button(@item.id).click
+        module_item_action_menu_link("Edit").click
+
+        item_title = @module1.content_tags[0].title
+        title = edit_item_modal.find_element(:css, "input[type=text]")
+
+        expect(title.attribute("value")).to eq(item_title)
+      end
+
+      it "item is updated" do
+        go_to_modules
+        manage_module_item_button(@item.id).click
+        module_item_action_menu_link("Edit").click
+
+        title = edit_item_modal.find_element(:css, "input[type=text]")
+        replace_content(title, "New Title")
+
+        edit_item_modal.find_element(:css, "button[type='submit']").click
+        assignment_title = manage_module_item_container(@item.id).find_element(:css, "[data-testid='module-item-title-link']")
+        wait_for_animations
+
+        expect(assignment_title.text).to eq("New Title")
+      end
     end
 
-    it "title field has the right value" do
-      item_title = @module1.content_tags[0].title
-      title = edit_item_modal.find_element(:css, "input[type=text]")
+    context "send to kebab form" do
+      before do
+        student_in_course
+        @first_user = @course.students.first
+      end
 
-      expect(title.attribute("value")).to eq(item_title)
-    end
+      it "edit item form is shown" do
+        go_to_modules
+        manage_module_item_button(@item.id).click
+        module_item_action_menu_link("Send To...").click
 
-    it "item is updated" do
-      title = edit_item_modal.find_element(:css, "input[type=text]")
-      replace_content(title, "New Title")
+        expect(send_to_modal).to be_displayed
+      end
 
-      edit_item_modal.find_element(:css, "button[type='submit']").click
-      assignment_title = manage_module_item_container(@item.id).find_element(:css, "[data-testid='module-item-title-link']")
-      wait_for_animations
+      it "module item is correctly sent" do
+        go_to_modules
+        manage_module_item_button(@item.id).click
+        module_item_action_menu_link("Send To...").click
 
-      expect(assignment_title.text).to eq("New Title")
+        set_value(send_to_modal_input, "User")
+        option_list_id = send_to_modal_input.attribute("aria-controls")
+
+        expect(ff("##{option_list_id} [role='option']").count).to eq 1
+
+        fj("##{option_list_id} [role='option']:contains(#{@first_user.first_name})").click
+        selected_element = send_to_form_selected_elements.first
+
+        expect(selected_element.text).to eq("User")
+
+        fj("button:contains('Send')").click
+
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_css(send_to_modal_modal_selector)
+      end
     end
   end
 end
