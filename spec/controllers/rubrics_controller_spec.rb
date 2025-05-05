@@ -1267,7 +1267,7 @@ describe RubricsController do
            params: {
              course_id: @course.id,
              rubric_association: { association_type: "Assignment", association_id: @assignment.id },
-             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5 }
+             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5, use_range: true }
            },
            format: :json
 
@@ -1281,6 +1281,7 @@ describe RubricsController do
       progress = Progress.find(json["id"])
       expect(progress.results).to be_present
       expect(progress.results[:criteria].length).to eq 2
+      expect(progress.results[:criteria][0][:criterion_use_range]).to be_truthy
     end
 
     it "returns error when features are disabled" do

@@ -514,7 +514,8 @@ class Rubric < ActiveRecord::Base
   DEFAULT_GENERATE_OPTIONS = {
     criteria_count: 5,
     rating_count: 4,
-    points_per_criterion: 20
+    points_per_criterion: 20,
+    use_range: false,
   }.freeze
   def generate_criteria_via_llm(association_object, generate_options = {})
     unless association_object.is_a?(AbstractAssignment)
@@ -586,6 +587,7 @@ class Rubric < ActiveRecord::Base
       end
       criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
       criterion[:points] = criterion[:ratings].pluck(:points).max || 0
+      criterion[:criterion_use_range] = !!generate_options[:use_range]
 
       criteria.push(criterion)
     end

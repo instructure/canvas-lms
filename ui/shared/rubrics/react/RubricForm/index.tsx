@@ -84,6 +84,7 @@ export const defaultGenerateCriteriaForm: GenerateCriteriaFormProps = {
   criteriaCount: 5,
   ratingCount: 4,
   pointsPerCriterion: '20',
+  useRange: false,
 }
 
 type RubricFormValidationProps = {
@@ -677,6 +678,22 @@ export const RubricForm = ({
                     type="text"
                   />
                 </Flex.Item>
+                {criterionUseRangeEnabled && (
+                  <Flex.Item padding="0 0 x-small 0">
+                    <Checkbox
+                      data-testid="use-range-input"
+                      label={I18n.t('Enable Range')}
+                      checked={generateCriteriaForm.useRange}
+                      onChange={_event =>
+                        setGenerateCriteriaForm({
+                          ...generateCriteriaForm,
+                          useRange: !generateCriteriaForm.useRange,
+                        })
+                      }
+                    />
+                  </Flex.Item>
+                )}
+                <Flex.Item shouldGrow={true}></Flex.Item>
                 <Flex.Item>
                   <span className="instui-button-ignite-ai-gradient">
                     <Button
