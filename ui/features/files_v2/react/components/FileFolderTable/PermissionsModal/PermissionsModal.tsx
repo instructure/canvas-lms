@@ -34,13 +34,19 @@ import {
   allAreEqual,
   defaultAvailabilityOption,
   defaultDate,
+  defaultDateRangeType,
   defaultVisibilityOption,
   parseNewRows,
   type AvailabilityOptionId,
   type AvailabilityOption,
+  type DateRangeTypeId,
+  type DateRangeTypeOption,
   type VisibilityOption,
   AVAILABILITY_OPTIONS,
+  DATE_RANGE_TYPE_OPTIONS,
   VISIBILITY_OPTIONS,
+  isStartDateRequired,
+  isEndDateRequired,
 } from './PermissionsModalUtils'
 
 export type PermissionsModalProps = {
@@ -76,6 +82,9 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
   const [unlockAtError, setUnlockAtError] = useState<FormMessage[]>()
   const [lockAt, setLockAt] = useState<string | null>(() => defaultDate(items, 'lock_at'))
   const [lockAtError, setLockAtError] = useState<FormMessage[]>()
+  const [dateRangeType, setDateRangeType] = useState<DateRangeTypeOption | null>(() =>
+    defaultDateRangeType(items),
+  )
   const [visibilityOption, setVisibilityOption] = useState(() =>
     defaultVisibilityOption(items, visibilityOptions),
   )
@@ -88,6 +97,7 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
     setAvailabilityOption(defaultAvailabilityOption(items))
     setUnlockAt(defaultDate(items, 'unlock_at'))
     setLockAt(defaultDate(items, 'lock_at'))
+    setDateRangeType(defaultDateRangeType(items))
     setVisibilityOption(defaultVisibilityOption(items, visibilityOptions))
     setError(null)
   }, [items, visibilityOptions])
@@ -105,8 +115,8 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
     let lock_at = null
 
     if (availabilityOption.id === 'date_range') {
-      unlock_at = unlockAt
-      lock_at = lockAt
+      unlock_at = isStartDateRequired(dateRangeType) ? unlockAt : null
+      lock_at = isEndDateRequired(dateRangeType) ? lockAt : null
     }
 
     const opts: Record<string, string | boolean> = {
@@ -129,39 +139,69 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
         }),
       ),
     )
-  }, [availabilityOption.id, enableVisibility, items, lockAt, unlockAt, visibilityOption])
+  }, [
+    availabilityOption.id,
+    dateRangeType,
+    enableVisibility,
+    items,
+    lockAt,
+    unlockAt,
+    visibilityOption,
+  ])
 
-  const handleSaveClick = useCallback(() => {
-    if (availabilityOption.id === 'date_range') {
-      const errors = {
-        noInput: !unlockAt && !lockAt,
-        unlockAtTime: !!(!unlockAt && unlockAtTimeInputRef.current?.value),
-        lockAtTime: !!(!lockAt && lockAtTimeInputRef.current?.value),
-        unlockAfterLock: !!(unlockAt && lockAt && unlockAt > lockAt),
-      }
-      if (errors.noInput) {
-        setError(I18n.t('Please enter at least one date.'))
+  const isValidByDateRange = useCallback(() => {
+    const errorMsg = I18n.t('Invalid date.')
+    if (dateRangeType?.id === 'start') {
+      if (!unlockAt) {
+        setUnlockAtError([{text: errorMsg, type: 'newError'}])
         unlockAtDateInputRef.current?.focus()
-        return
+        return false
       }
+    }
 
-      if (errors.unlockAtTime) {
-        setUnlockAtError([{text: I18n.t('Invalid date.'), type: 'newError'}])
-        unlockAtDateInputRef.current?.focus()
-        return
-      }
-
-      if (errors.lockAtTime) {
-        setLockAtError([{text: I18n.t('Invalid date.'), type: 'newError'}])
+    if (dateRangeType?.id === 'end') {
+      if (!lockAt) {
+        setLockAtError([{text: errorMsg, type: 'newError'}])
         lockAtDateInputRef.current?.focus()
-        return
+        return false
+      }
+    }
+
+    if (dateRangeType?.id === 'range') {
+      if (!unlockAt && !lockAt) {
+        setUnlockAtError([{text: errorMsg, type: 'newError'}])
+        setLockAtError([{text: errorMsg, type: 'newError'}])
+        unlockAtDateInputRef.current?.focus()
+        return false
       }
 
-      if (errors.unlockAfterLock) {
+      if (!unlockAt) {
+        setUnlockAtError([{text: errorMsg, type: 'newError'}])
+        unlockAtDateInputRef.current?.focus()
+        return false
+      }
+
+      if (!lockAt) {
+        setLockAtError([{text: errorMsg, type: 'newError'}])
+        lockAtDateInputRef.current?.focus()
+        return false
+      }
+
+      if (unlockAt && lockAt && unlockAt > lockAt) {
         setUnlockAtError([
           {text: I18n.t('Unlock date cannot be after lock date.'), type: 'newError'},
         ])
         unlockAtDateInputRef.current?.focus()
+        return false
+      }
+    }
+
+    return true
+  }, [dateRangeType, lockAt, unlockAt])
+
+  const handleSaveClick = useCallback(() => {
+    if (availabilityOption.id === 'date_range') {
+      if (!isValidByDateRange()) {
         return
       }
     }
@@ -192,6 +232,7 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
         const newRows = parseNewRows({
           items,
           availabilityOptionId: availabilityOption.id,
+          dateRangeType: dateRangeType,
           currentRows,
           unlockAt,
           lockAt,
@@ -204,15 +245,17 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
       .finally(() => setIsRequestInFlight(false))
   }, [
     availabilityOption.id,
+    dateRangeType,
     contextId,
     contextType,
     items,
-    lockAt,
     onDismiss,
     startUpdateOperation,
     unlockAt,
+    lockAt,
     currentRows,
     setCurrentRows,
+    isValidByDateRange,
   ])
 
   const handleChangeAvailabilityOption = useCallback(
@@ -221,6 +264,9 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
         setAvailabilityOption(
           AVAILABILITY_OPTIONS[data.id as AvailabilityOptionId] as AvailabilityOption,
         )
+        if (data.id === 'date_range') {
+          setDateRangeType(DATE_RANGE_TYPE_OPTIONS.range)
+        }
       }
     },
     [],
@@ -234,6 +280,14 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
     },
     [visibilityOptions],
   )
+
+  const handleChangeDateRangeType = useCallback((_: React.SyntheticEvent, data: {id?: string}) => {
+    if (data.id) {
+      setDateRangeType(
+        (DATE_RANGE_TYPE_OPTIONS[data.id as DateRangeTypeId] as DateRangeTypeOption) || null,
+      )
+    }
+  }, [])
 
   const setUnlockAtInputRef = useCallback((el: HTMLInputElement | null) => {
     unlockAtDateInputRef.current = el
@@ -284,6 +338,8 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
             visibilityOption={visibilityOption}
             visibilityOptions={visibilityOptions}
             onChangeVisibilityOption={handleChangeVisibilityOption}
+            dateRangeType={dateRangeType}
+            onChangeDateRangeType={handleChangeDateRangeType}
             unlockAt={unlockAt}
             unlockAtDateInputRef={setUnlockAtInputRef}
             unlockAtTimeInputRef={setUnlockAtTimeInputRef}

@@ -28,7 +28,11 @@ import {type File, type Folder} from '../../../../interfaces/File'
 import {AvailabilitySelect, type AvailabilityOptionChangeHandler} from './AvailabilitySelect'
 import {DateRangeSelect} from './DateRangeSelect'
 import {VisibilitySelect, type VisibilityOptionChangeHandler} from './VisibilitySelect'
-import {type AvailabilityOption, type VisibilityOption} from './PermissionsModalUtils'
+import {
+  type DateRangeTypeOption,
+  type AvailabilityOption,
+  type VisibilityOption,
+} from './PermissionsModalUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -43,7 +47,9 @@ type PermissionsModalBodyProps = {
   visibilityOption: VisibilityOption
   visibilityOptions: Record<string, VisibilityOption>
   onChangeVisibilityOption: VisibilityOptionChangeHandler
+  dateRangeType: DateRangeTypeOption | null
   unlockAt: string | null
+  onChangeDateRangeType: (event: React.SyntheticEvent, data: {id?: string}) => void
   unlockAtDateInputRef: (el: HTMLInputElement | null) => void
   unlockAtTimeInputRef: (el: HTMLInputElement | null) => void
   unlockAtError: FormMessage[] | undefined
@@ -66,6 +72,8 @@ export const PermissionsModalBody = ({
   visibilityOption,
   visibilityOptions,
   onChangeVisibilityOption,
+  dateRangeType,
+  onChangeDateRangeType,
   unlockAt,
   unlockAtDateInputRef,
   unlockAtTimeInputRef,
@@ -112,6 +120,8 @@ export const PermissionsModalBody = ({
 
       {availabilityOption.id === 'date_range' && (
         <DateRangeSelect
+          dateRangeType={dateRangeType}
+          onChangeDateRangeType={onChangeDateRangeType}
           unlockAt={unlockAt}
           unlockAtDateInputRef={unlockAtDateInputRef}
           unlockAtTimeInputRef={unlockAtTimeInputRef}

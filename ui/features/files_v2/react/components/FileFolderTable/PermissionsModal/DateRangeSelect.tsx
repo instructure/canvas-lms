@@ -19,11 +19,20 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import type {FormMessage} from '@instructure/ui-form-field'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
+import {
+  DATE_RANGE_TYPE_OPTIONS,
+  isStartDateRequired,
+  isEndDateRequired,
+  type DateRangeTypeOption,
+} from './PermissionsModalUtils'
 
 const I18n = createI18nScope('files_v2')
 
 export type DateRangeSelectProps = {
+  dateRangeType: DateRangeTypeOption | null
+  onChangeDateRangeType: (event: React.SyntheticEvent, data: {id?: string}) => void
   unlockAt: string | null
   unlockAtDateInputRef: (el: HTMLInputElement | null) => void
   unlockAtTimeInputRef: (el: HTMLInputElement | null) => void
@@ -37,6 +46,8 @@ export type DateRangeSelectProps = {
 }
 
 export const DateRangeSelect = ({
+  dateRangeType,
+  onChangeDateRangeType,
   unlockAt,
   unlockAtDateInputRef,
   unlockAtTimeInputRef,
@@ -51,38 +62,60 @@ export const DateRangeSelect = ({
   return (
     <>
       <View as="div" margin="small none none none">
-        <DateTimeInput
-          description={<></>}
-          prevMonthLabel={I18n.t('Previous month')}
-          nextMonthLabel={I18n.t('Next month')}
-          invalidDateTimeMessage={I18n.t('Invalid date')}
-          dateRenderLabel={I18n.t('Available from')}
-          timeRenderLabel={I18n.t('Time')}
-          layout="columns"
-          value={unlockAt || undefined}
-          dateInputRef={unlockAtDateInputRef}
-          timeInputRef={unlockAtTimeInputRef}
-          onChange={onChangeUnlockAt}
-          messages={unlockAtError}
-        />
+        <SimpleSelect
+          data-testid="permissions-date-range-selector"
+          renderLabel={I18n.t('Set availability by')}
+          value={dateRangeType?.id}
+          onChange={onChangeDateRangeType}
+        >
+          {Object.values(DATE_RANGE_TYPE_OPTIONS).map(option => (
+            <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
+              {option.label}
+            </SimpleSelect.Option>
+          ))}
+        </SimpleSelect>
       </View>
+      {isStartDateRequired(dateRangeType) && (
+        <View data-testid="permissions-unlock-at" as="div" margin="small none none none">
+          <DateTimeInput
+            description={<></>}
+            prevMonthLabel={I18n.t('Previous month')}
+            nextMonthLabel={I18n.t('Next month')}
+            invalidDateTimeMessage={I18n.t('Invalid date')}
+            dateRenderLabel={I18n.t('Available from')}
+            timeRenderLabel={I18n.t('Time')}
+            layout="columns"
+            value={unlockAt || undefined}
+            dateInputRef={unlockAtDateInputRef}
+            timeInputRef={unlockAtTimeInputRef}
+            onChange={onChangeUnlockAt}
+            messages={unlockAtError}
+            isRequired={true}
+            showMessages={false}
+          />
+        </View>
+      )}
 
-      <View as="div" margin="small none none none">
-        <DateTimeInput
-          description={<></>}
-          prevMonthLabel={I18n.t('Previous month')}
-          nextMonthLabel={I18n.t('Next month')}
-          invalidDateTimeMessage={I18n.t('Invalid date')}
-          dateRenderLabel={I18n.t('Until')}
-          timeRenderLabel={I18n.t('Time')}
-          layout="columns"
-          value={lockAt || undefined}
-          dateInputRef={lockAtDateInputRef}
-          timeInputRef={lockAtTimeInputRef}
-          onChange={onChangeLockAt}
-          messages={lockAtError}
-        />
-      </View>
+      {isEndDateRequired(dateRangeType) && (
+        <View data-testid="permissions-lock-at" as="div" margin="small none none none">
+          <DateTimeInput
+            description={<></>}
+            prevMonthLabel={I18n.t('Previous month')}
+            nextMonthLabel={I18n.t('Next month')}
+            invalidDateTimeMessage={I18n.t('Invalid date')}
+            dateRenderLabel={I18n.t('Until')}
+            timeRenderLabel={I18n.t('Time')}
+            layout="columns"
+            value={lockAt || undefined}
+            dateInputRef={lockAtDateInputRef}
+            timeInputRef={lockAtTimeInputRef}
+            onChange={onChangeLockAt}
+            messages={lockAtError}
+            isRequired={true}
+            showMessages={false}
+          />
+        </View>
+      )}
     </>
   )
 }
