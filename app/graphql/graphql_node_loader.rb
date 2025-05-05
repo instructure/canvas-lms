@@ -267,6 +267,19 @@ module GraphQLNodeLoader
 
         record
       end
+    when "ModuleProgression"
+      Loaders::IDLoader.for(ContextModuleProgression).load(id).then do |progression|
+        next unless progression
+
+        Loaders::AssociationLoader.for(ContextModuleProgression, :context_module).load(progression).then do |mod|
+          Loaders::AssociationLoader.for(ContextModule, :context).load(mod).then do
+            next nil unless mod.context.grants_right?(ctx[:current_user], :read)
+            next nil unless progression.user_id == ctx[:current_user].id || mod.context.grants_right?(ctx[:current_user], :view_all_grades)
+
+            progression
+          end
+        end
+      end
     when "UsageRights"
       Loaders::IDLoader.for(UsageRights).load(id).then do |usage_rights|
         next unless usage_rights.context.grants_right?(ctx[:current_user], :read)
