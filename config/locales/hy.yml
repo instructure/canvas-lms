@@ -6405,6 +6405,7 @@ hy:
   edit_course_role_3b992fc2: "Խմբագրել դասընթացի դերը"
   edit_grading_scheme_53091236: "Խմբագրել գնահատման սխեման"
   edit_group_c8679dba: "Խմբագրել խումբը"
+  edit_item_details_1e2b5ba1: "Խմբագրել տարրի մանրամասները"
   edit_module_item_83258f6d: "Խմբագրել մոդուլը/տարրը"
   edit_module_settings_2bf11f7f: "Խմբագրել մոդուլի կարգաբերումները"
   edit_permissions_for_count_items_d65e3855: 
@@ -8580,6 +8581,7 @@ hy:
   increase_indent_6af90f7c: "Մեծացնել ներսի տողագլուխը"
   incremental_update_successfully_generated_against__db3f3f06: "Նախկինում SIS ներմուծման հիման վրա հաջողությամբ իրականացվել է լրացուցիչ թարմացում: "
   indent_1_level_e7b18c1e: "Ներսի տողագլուխ 1 մակարդակ"
+  indent_72887794: "Ներսի տողագլուխ"
   indentation_3c6081d5: "Ներսի տողագլուխ թողնել"
   indigo_2035fc55: Indigo
   individual_2033c005: Անհատ
@@ -15992,6 +15994,7 @@ hy:
   show_correct_answers_at_a5475aa3: "Ցույց տալ ճիշտ պատասխանները"
   show_current_grade_5bf4e0d9: "Ցույց տալ ընթացիկ գնահատականը"
   show_final_grade_a95e14dc: "Ցույց տալ վերջնական գնահատականը"
+  show_less_f778dab5: "Ավելի քիչ ցուցադրել "
   show_links_to_unpublished_content_30c0450d: "Ցույց տալ չհրապարակված բովանդակության հղումները"
   show_lti_2_configuration_ui_94ce35a9: "Ցույց տալ LTI 2 կարգաբերման օգտագործողի ինտերֆեյսը"
   show_me_76823679: "Ցույց տալ"
