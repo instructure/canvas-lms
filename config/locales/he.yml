@@ -7613,6 +7613,7 @@ he:
   edit_grading_period_set_c548f4df: "עריכת אוגדן תקופות הערכה"
   edit_grading_scheme_53091236: "עריכת סכימת הערכה"
   edit_group_c8679dba: "עריכת קבוצה"
+  edit_item_details_1e2b5ba1: "עריכת פרטי פריט"
   edit_item_details_c9a7b9c5: "עריכת פרטי פריט"
   edit_key_name_5c7d2f46: "עריכת מפתח %{name}"
   edit_mastery_paths_for_name_c9fc59f9: "עריכת מסלול התמחות עבור %{name}"
@@ -10324,6 +10325,7 @@ he:
   increase_indent_6d550a4a: "הרחבת עימוד"
   incremental_update_successfully_generated_against__db3f3f06: "תהליך העדכון במנות נסתיים בהצלחה אל מול היבוא הקודם מהמערכת הבית ספרית"
   indent_1_level_e7b18c1e: "עימוד רמה 1"
+  indent_72887794: עימוד
   indentation_3c6081d5: עימוד
   india_91_6c290107: "הודו (+91)"
   indigo_2035fc55: אינדיגו
@@ -18493,6 +18495,7 @@ he:
   show_final_grade_a95e14dc: "הצגת ציון סופי"
   show_groups_navigation_menu_1521d38d: "הצגת תפריט ניווט קבוצות"
   show_inactive_enrollments_8f4c4824: "הצגת הרשמות לא פעילות"
+  show_less_f778dab5: "הצג פחות"
   show_links_to_unpublished_content_30c0450d: "הצגת קישורים לתוכן שלא פורסם"
   show_me_76823679: "הראה לי"
   show_more_af9cbc16: "הצג עוד"
