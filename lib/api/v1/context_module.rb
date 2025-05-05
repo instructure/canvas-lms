@@ -179,6 +179,9 @@ module Api::V1::ContextModule
     if includes.include?("mastery_paths")
       hash["mastery_paths"] = conditional_release_json(content_tag, current_user, opts)
     end
+    if includes.include?("title_only")
+      hash = hash.slice(:id, :title)
+    end
 
     hash
   end
