@@ -72,12 +72,15 @@ const getResourceType = (type?: string): string => {
     case 'discussion':
       return 'discussion'
     case 'attachment':
+    case 'file':
       return 'file'
     case 'wiki_page':
+    case 'page':
       return 'page'
-    case 'external_url':
+    case 'externalurl':
       return 'externalUrl'
     case 'context_external_tool':
+    case 'moduleexternaltool':
       return 'externalTool'
     default:
       return 'assignment'
@@ -136,13 +139,16 @@ const getModuleItemsFromAvailableSources = (
 }
 
 const transformModuleItemsForTray = (rawModuleItems: any[]): any[] => {
-  return rawModuleItems.map((item: any) => ({
-    id: item._id || '',
-    name: item.content?.title || '',
-    resource: getResourceType(item.content?.type),
-    graded: !!item.content?.pointsPossible,
-    pointsPossible: item.content?.pointsPossible ? String(item.content.pointsPossible) : '',
-  }))
+  // Filter out SubHeader items as they shouldn't be selectable in the requirements selector
+  return rawModuleItems
+    .filter((item: any) => item.content?.type !== 'SubHeader')
+    .map((item: any) => ({
+      id: item._id || '',
+      name: item.content?.title || '',
+      resource: getResourceType(item.content?.type.toLowerCase()),
+      graded: !!item.content?.pointsPossible,
+      pointsPossible: item.content?.pointsPossible ? String(item.content.pointsPossible) : '',
+    }))
 }
 
 const transformRequirementsForTray = (
