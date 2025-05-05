@@ -19,6 +19,8 @@
 import {type Folder} from '../interfaces/File'
 import {getFilesEnv} from './filesEnvUtils'
 
+export const MAX_FOLDER_NAME_LENGTH = 255
+
 export const generateUrlPath = (folder: Folder) => {
   const EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^/]+\/?/
 

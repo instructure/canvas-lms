@@ -31,6 +31,7 @@ import type {FormMessage} from '@instructure/ui-form-field'
 import {isFile, getName} from '../../utils/fileFolderUtils'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
+import {MAX_FOLDER_NAME_LENGTH} from '../../utils/folderUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -66,20 +67,9 @@ export const RenameModal = ({
       return
     }
 
-    if (trimmedNewItemName == '' || trimmedNewItemName?.indexOf('/') !== -1) {
-      if (isFile(renamingItem)) {
-        setErrorMessages(
-          !trimmedNewItemName
-            ? [{text: I18n.t('File name cannot be blank'), type: 'newError'}]
-            : [{text: I18n.t('File name cannot contain /'), type: 'newError'}],
-        )
-      } else {
-        setErrorMessages(
-          !trimmedNewItemName
-            ? [{text: I18n.t('Folder name cannot be blank'), type: 'newError'}]
-            : [{text: I18n.t('Folder name cannot contain /'), type: 'newError'}],
-        )
-      }
+    const errors = validateNewItemName(isFile(renamingItem), trimmedNewItemName)
+    if (errors.length > 0) {
+      setErrorMessages(errors)
       inputRef.current?.focus()
       return
     }
@@ -117,6 +107,29 @@ export const RenameModal = ({
     setNewItemName(getName(renamingItem))
     setErrorMessages([])
     setIsRequestInFlight(false)
+  }
+
+  const validateNewItemName = (isFile: boolean, trimmedName: string): FormMessage[] => {
+    const errorMessages: FormMessage[] = []
+    if (trimmedName === '') {
+      errorMessages.push({
+        text: isFile ? I18n.t('File name cannot be blank') : I18n.t('Folder name cannot be blank'),
+        type: 'newError',
+      })
+    } else if (trimmedName.indexOf('/') !== -1) {
+      errorMessages.push({
+        text: isFile
+          ? I18n.t('File name cannot contain /')
+          : I18n.t('Folder name cannot contain /'),
+        type: 'newError',
+      })
+    } else if (!isFile && trimmedName.length > MAX_FOLDER_NAME_LENGTH) {
+      errorMessages.push({
+        text: I18n.t('Folder name cannot exceed 255 characters'),
+        type: 'newError',
+      })
+    }
+    return errorMessages
   }
 
   return (

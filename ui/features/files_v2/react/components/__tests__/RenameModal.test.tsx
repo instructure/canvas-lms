@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {RenameModal} from '../RenameModal'
 import fetchMock from 'fetch-mock'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../fixtures/fakeData'
@@ -145,6 +145,17 @@ describe('RenameModal', () => {
         expect(fetchMock.calls()[0][0]).toBe(`/api/v1/files/${defaultProps.renamingItem.id}`)
       })
     })
+
+    it('allows a file name longer than 255 characters', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+      const input = screen.getByLabelText('File Name *')
+      const name = 'a'.repeat(256)
+      // userEvent.type is flaky with long strings
+      fireEvent.change(input, {target: {value: name}})
+      await user.click(screen.getByRole('button', {name: 'Save'}))
+      expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
+    })
   })
 
   describe('when renaming a folder', () => {
@@ -203,6 +214,30 @@ describe('RenameModal', () => {
       await waitFor(() => {
         expect(fetchMock.calls()[0][0]).toBe(`/api/v1/folders/${defaultProps.renamingItem.id}`)
       })
+    })
+
+    it('does not allow a folder name longer than 255 characters', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+      const input = screen.getByLabelText('Folder Name *')
+      const name = 'a'.repeat(256)
+      // userEvent.type is flaky with long strings
+      fireEvent.change(input, {target: {value: name}})
+      await user.click(screen.getByRole('button', {name: 'Save'}))
+      expect(
+        await screen.findByText(/Folder name cannot exceed 255 characters/i),
+      ).toBeInTheDocument()
+    })
+
+    it('does allow a folder name of 255 characters', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+      const input = screen.getByLabelText('Folder Name *')
+      const name = 'a'.repeat(255)
+      // userEvent.type is flaky with long strings
+      fireEvent.change(input, {target: {value: name}})
+      await user.click(screen.getByRole('button', {name: 'Save'}))
+      expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
     })
   })
 })
