@@ -84,6 +84,8 @@ class ContextExternalTool < ActiveRecord::Base
 
   scope :disabled, -> { where(workflow_state: DISABLED_STATE) }
   scope :quiz_lti, -> { where(tool_id: QUIZ_LTI) }
+  scope :lti_1_3, -> { where(lti_version: "1.3") }
+  scope :lti_1_1, -> { where(lti_version: "1.1") }
 
   STANDARD_EXTENSION_KEYS = [
     :canvas_icon_class,
