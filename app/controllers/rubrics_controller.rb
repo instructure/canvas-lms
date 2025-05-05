@@ -245,7 +245,7 @@ class RubricsController < ApplicationController
     end
   end
 
-  ALLOWED_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion].freeze
+  ALLOWED_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion use_range].freeze
   def llm_criteria
     association_object = RubricAssociation.get_association_object(params[:rubric_association])
     generate_options = (params[:generate_options] || {}).permit(*ALLOWED_GENERATE_PARAMS)

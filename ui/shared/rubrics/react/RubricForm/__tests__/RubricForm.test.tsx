@@ -727,6 +727,7 @@ describe('RubricForm Tests', () => {
         criteriaCount: 5,
         ratingCount: 4,
         pointsPerCriterion: '20',
+        useRange: false,
       })
       expect(getByTestId('rubric-criteria-container')).toHaveTextContent('Generated Criterion 1')
     })

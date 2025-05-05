@@ -245,6 +245,7 @@ export const generateCriteria = async (
         criteria_count: generateCriteriaProps.criteriaCount,
         rating_count: generateCriteriaProps.ratingCount,
         points_per_criterion: generateCriteriaProps.pointsPerCriterion,
+        use_range: generateCriteriaProps.useRange,
       },
     }),
   })
