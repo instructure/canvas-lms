@@ -324,7 +324,8 @@ class AccountNotification < ActiveRecord::Base
   def should_send_message?
     send_message? && !messages_sent_at &&
       (start_at.nil? || (start_at < Time.now.utc)) &&
-      (end_at.nil? || (end_at > Time.now.utc))
+      (end_at.nil? || (end_at > Time.now.utc)) &&
+      workflow_state != "deleted"
   end
 
   def queue_message_broadcast
