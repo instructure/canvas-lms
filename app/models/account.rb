@@ -81,6 +81,7 @@ class Account < ActiveRecord::Base
   has_many :child_courses, -> { where(course_account_associations: { depth: 0 }) }, through: :course_account_associations, source: :course
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Assignment"
+  has_many :attachment_associations, inverse_of: :root_account
   has_many :folders, -> { order("folders.name") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_folders, -> { where("folder.workflow_state<>'deleted'").order("folders.name") }, class_name: "Folder", as: :context, inverse_of: :context
   has_many :developer_keys
