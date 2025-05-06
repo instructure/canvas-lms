@@ -113,12 +113,18 @@ describe('ViewRubrics Tests', () => {
       expect(Router.useNavigate).toHaveReturnedWith(expect.any(Function))
     })
 
-    it('renders a popover menu without access to the share course tray', () => {
+    it('renders a popover menu without access to the share course tray', async () => {
       const mockNavigate = jest.fn()
       jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
+      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
 
-      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId, queryByTestId} = renderComponent()
+
+      await waitFor(() => {
+        expect(getByTestId('rubric-options-1-button')).toBeInTheDocument()
+      })
+
       const popover = getByTestId('rubric-options-1-button')
       popover.click()
 

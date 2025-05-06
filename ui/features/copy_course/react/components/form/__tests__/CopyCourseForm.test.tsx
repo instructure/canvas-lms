@@ -196,12 +196,12 @@ describe('CourseCopyForm', () => {
   })
 
   it('renders all the fields as disabled on submit', () => {
-    const {getByRole, getByDisplayValue} = renderCopyCourseForm({isSubmitting: true})
+    const {getByRole, getByDisplayValue, getByTestId} = renderCopyCourseForm({isSubmitting: true})
 
     expect(getByDisplayValue(courseName)).toBeDisabled()
     expect(getByDisplayValue(courseCode)).toBeDisabled()
-    expect(getByDisplayValue('Jan 1 at 12am')).toBeDisabled()
-    expect(getByDisplayValue('Jan 2 at 12am')).toBeInTheDocument()
+    expect(getByTestId('course-start-date').querySelector('input')).toBeDisabled()
+    expect(getByTestId('course-end-date').querySelector('input')).toBeDisabled()
     expect(getByRole('button', {name: /Creating/})).toBeDisabled()
   })
 

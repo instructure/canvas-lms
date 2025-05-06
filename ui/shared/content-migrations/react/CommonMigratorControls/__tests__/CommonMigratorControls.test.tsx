@@ -54,7 +54,12 @@ describe('CommonMigratorControls', () => {
   afterEach(() => jest.clearAllMocks())
 
   const expectNqCheckbox = (getByRole: (role: string, options?: object) => HTMLElement) => {
-    return getByRole('checkbox', {name: /Import existing quizzes as New Quizzes/})
+    // Look for either of the possible checkbox labels based on feature flag
+    return getByRole('checkbox', {
+      name: (name: string) =>
+        name.includes('Convert content to New Quizzes') ||
+        name.includes('Import existing quizzes as New Quizzes'),
+    })
   }
   it('calls onSubmit with import_quizzes_next', async () => {
     const {getByRole} = renderComponent({canImportAsNewQuizzes: true})
