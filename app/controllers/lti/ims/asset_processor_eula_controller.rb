@@ -47,7 +47,7 @@ module Lti::IMS
     end
 
     def validate_user
-      render_error("not found", :not_found) unless user&.root_account_ids&.include?(context.root_account.id)
+      render_error("not found", :not_found) unless user&.root_account_ids&.map { |id| Shard.global_id_for(id, user.shard) }&.include?(context.root_account.global_id)
     end
 
     def validate_timestamp
