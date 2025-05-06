@@ -115,8 +115,15 @@ module Types
     def author(course_id: nil, role_types: nil, built_in_only: false)
       load_association(:discussion_topic).then do |topic|
         course_id = topic&.course&.id if course_id.nil?
-        # Set the graphql context so it can be used downstream
-        context[:course_id] = course_id
+
+        if topic&.course.is_a?(Account) && !topic&.group&.id.nil?
+          # If the discussion entry is in an admin group there is no course
+          context[:group_id] = topic&.group&.id
+        else
+          # Set the graphql context so it can be used downstream
+          context[:course_id] = course_id
+        end
+
         if topic.anonymous? && object.is_anonymous_author
           nil
         else
