@@ -4279,6 +4279,32 @@ describe CoursesController do
       expect(test_student.learning_outcome_results.active.size).to be_zero
       expect(@outcome.assessed?).to be_falsey
     end
+
+    it "removes auto grade results for the test student" do
+      user_session(@teacher)
+      post "student_view", params: { course_id: @course.id }
+      test_student = @course.student_view_student
+
+      assignment = @course.assignments.create!(workflow_state: "published")
+
+      submission = assignment.submissions.find_by(user: test_student) ||
+                   assignment.submissions.build(user: test_student)
+      submission.save! unless submission.persisted?
+
+      AutoGradeResult.create!(
+        submission:,
+        attempt: 1,
+        grade_data: { score: 4.0 },
+        grading_attempts: 1,
+        root_account_id: @course.account.root_account.id
+      )
+
+      expect(AutoGradeResult.where(submission_id: submission.id).count).to eq(1)
+
+      delete "reset_test_student", params: { course_id: @course.id }
+
+      expect(AutoGradeResult.where(submission_id: submission.id)).to be_empty
+    end
   end
 
   describe "GET #permissions" do
