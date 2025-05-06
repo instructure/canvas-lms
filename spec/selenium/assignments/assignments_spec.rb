@@ -760,6 +760,7 @@ describe "assignments" do
       build_assignment_with_type("Assignment", assignment_group_id: group.id, name: assignment_name, points: "10", submit: true)
       wait_for_ajaximations
       assignment = @course.assignments.where(title: assignment_name).last
+      expect(f("#assignment_#{@course.assignments.last.id}_settings_delete_item").attribute(:class)).not_to include("disabled")
       expect(assignment).not_to be_nil
       expect(assignment).to be_post_to_sis
     end
