@@ -25,6 +25,7 @@ module DataFixup::Lti::AddUserUuidCustomVariableToInternalTools
   def self.run
     [
       { target_link_id: "sistemic.", custom_field: "UserUUID" },
+      { target_link_id: "sistemic-", custom_field: "UserUUID" },
       { target_link_id: ".eesysoft.com", custom_field: "canvas_user_uuid" }
     ].each { |tool| update_tool_config(tool[:target_link_id], tool[:custom_field]) }
   end
