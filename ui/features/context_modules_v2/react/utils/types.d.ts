@@ -47,6 +47,8 @@ export type ModuleItemContent = {
   thumbnailUrl?: string
   externalUrl?: string
   newTab?: boolean
+  fileState?: string
+  locked?: boolean
 } | null
 
 export interface CompletionRequirement {

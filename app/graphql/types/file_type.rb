@@ -47,6 +47,14 @@ module Types
 
     field :word_count, Integer, null: true
 
+    field :file_state, String, null: true
+
+    field :locked, Boolean
+
+    field :lock_at, Types::DateTimeType, null: true
+
+    field :unlock_at, Types::DateTimeType, null: true
+
     field :size, String, null: true
     def size
       ActiveSupport::NumberHelper.number_to_human_size(object.size)
