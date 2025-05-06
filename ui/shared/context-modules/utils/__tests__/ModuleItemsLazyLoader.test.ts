@@ -23,13 +23,17 @@ import {
   ModuleItemsLazyLoader,
   type ModuleId,
   type ModuleItemsCallback,
+  DEFAULT_PAGE,
 } from '../ModuleItemsLazyLoader'
+import {ModuleItemsStore} from '@canvas/context-modules/utils/ModuleItemsStore'
 
 // @ts-expect-error
 global.IS_REACT_ACT_ENVIRONMENT = true
 
 const courseId = '23'
 const pageSize = 2
+const accountId = '3'
+const userId = '4'
 
 const modules: Record<ModuleId, {items: string; api: string; link: string}> = {
   '1083': {
@@ -56,6 +60,7 @@ Object.keys(modules).forEach((moduleId: string) => {
       link: modules[moduleId].link,
     },
   })
+  fetchMock.mock(`/courses/${courseId}/modules/${moduleId}/items_html?no_pagination=1`, 200)
 })
 
 const createMockContainer = (moduleId: string) => {
@@ -78,11 +83,12 @@ createMockContainer(badModule.moduleId)
 
 let moduleItemsLazyLoader: ModuleItemsLazyLoader
 let itemsCallback: ModuleItemsCallback
+const mockStore = new ModuleItemsStore(courseId, accountId, userId)
 
 describe('fetchModuleItems utility', () => {
   beforeEach(() => {
     itemsCallback = jest.fn()
-    moduleItemsLazyLoader = new ModuleItemsLazyLoader(courseId, itemsCallback, pageSize)
+    moduleItemsLazyLoader = new ModuleItemsLazyLoader(courseId, itemsCallback, mockStore, pageSize)
 
     document.body.innerHTML = ''
     Object.keys(modules).forEach((moduleId: string) => {
@@ -99,6 +105,7 @@ describe('fetchModuleItems utility', () => {
         container.innerHTML = ''
       }
     })
+    jest.restoreAllMocks()
   })
 
   describe('fetchModuleItems', () => {
@@ -180,7 +187,12 @@ describe('fetchModuleItems utility', () => {
             document.querySelector(`#context_module_content_${badModuleId}`)?.outerHTML,
           ).toContain('Items failed to load')
         }
-        const moduleItemsLazyLoader = new ModuleItemsLazyLoader(courseId, callback, pageSize)
+        const moduleItemsLazyLoader = new ModuleItemsLazyLoader(
+          courseId,
+          callback,
+          mockStore,
+          pageSize,
+        )
         await moduleItemsLazyLoader.fetchModuleItems([badModuleId, goodModuleId])
       })
 
@@ -218,6 +230,83 @@ describe('fetchModuleItems utility', () => {
       expect(fetchMock.calls()).toHaveLength(1)
     })
 
+    describe('pageNumber storing', () => {
+      describe('get', () => {
+        let getPageNumberSpy: jest.SpyInstance
+
+        beforeEach(() => {
+          getPageNumberSpy = jest.spyOn(mockStore, 'getPageNumber')
+        })
+
+        describe('when pageParam is provided', () => {
+          const pageParam = 2
+
+          it('should not call the getPageNumber', async () => {
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, pageParam)
+            expect(getPageNumberSpy).not.toHaveBeenCalled()
+          })
+        })
+
+        describe('when pageParam is not provided', () => {
+          it('should call the getPageNumber', async () => {
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId)
+            expect(getPageNumberSpy).toHaveBeenCalledWith(moduleId)
+          })
+        })
+      })
+
+      describe('set', () => {
+        let setPageNumberSpy: jest.SpyInstance
+        let removePageNumberSpy: jest.SpyInstance
+
+        beforeEach(() => {
+          setPageNumberSpy = jest.spyOn(mockStore, 'setPageNumber')
+          removePageNumberSpy = jest.spyOn(mockStore, 'removePageNumber')
+        })
+
+        describe('when pageParam is provided and allPage is false', () => {
+          const pageParam = 2
+          const allPages = false
+
+          it('should call the setPageNumber', async () => {
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, pageParam, allPages)
+            expect(setPageNumberSpy).toHaveBeenCalledWith(moduleId, pageParam)
+          })
+        })
+
+        describe('when pageParam is not provided and allPage is false', () => {
+          const pageParam = undefined
+          const allPages = false
+
+          it('should call the setPageNumber', async () => {
+            jest.spyOn(mockStore, 'getPageNumber').mockImplementation(() => '')
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, pageParam, allPages)
+            expect(setPageNumberSpy).toHaveBeenCalledWith(moduleId, DEFAULT_PAGE)
+          })
+        })
+
+        describe('when allPage is true', () => {
+          const pageParam = 2
+          const allPages = true
+
+          it('should call removePageNumber', async () => {
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, pageParam, allPages)
+            expect(removePageNumberSpy).toHaveBeenCalledWith(moduleId)
+          })
+        })
+
+        describe('when allPage is false', () => {
+          const pageParam = 2
+          const allPages = false
+
+          it('should call removePageNumber', async () => {
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, pageParam, allPages)
+            expect(removePageNumberSpy).not.toHaveBeenCalled()
+          })
+        })
+      })
+    })
+
     describe('success response', () => {
       it('set the htmls in the container with the result', async () => {
         await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, 1)
@@ -241,7 +330,12 @@ describe('fetchModuleItems utility', () => {
             document.querySelector(`#context_module_content_${badModuleId}`)?.outerHTML,
           ).toContain('Items failed to load')
         }
-        const moduleItemsLazyLoader = new ModuleItemsLazyLoader(courseId, callback, pageSize)
+        const moduleItemsLazyLoader = new ModuleItemsLazyLoader(
+          courseId,
+          callback,
+          mockStore,
+          pageSize,
+        )
         await moduleItemsLazyLoader.fetchModuleItemsHtml(badModuleId, 1)
       })
 
@@ -273,7 +367,12 @@ describe('fetchModuleItems utility', () => {
         const callback = () => {
           expect(screen.getByTestId('module-1083-pagination')).toBeInTheDocument()
         }
-        const moduleItemsLazyLoader = new ModuleItemsLazyLoader(courseId, callback, pageSize)
+        const moduleItemsLazyLoader = new ModuleItemsLazyLoader(
+          courseId,
+          callback,
+          mockStore,
+          pageSize,
+        )
         await moduleItemsLazyLoader.fetchModuleItemsHtml('1083', 1)
       })
 
