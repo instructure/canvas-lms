@@ -18,9 +18,9 @@
 
 import React from 'react'
 import useStore from '@canvas/rubrics/stores'
-import {RubricSelfAssessmentSettings} from '@canvas/rubrics/react/RubricAssignment'
 import {queryClient} from '@canvas/query'
 import {QueryClientProvider} from '@tanstack/react-query'
+import {RubricSelfAssessmentSettings} from './RubricSelfAssessmentSettings'
 
 type RubricSelfAssessmentSettingsWrapperProps = {
   assignmentId: string
