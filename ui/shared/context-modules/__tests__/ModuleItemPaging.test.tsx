@@ -45,6 +45,22 @@ describe('ModuleItemPaging', () => {
     expect(getByTestId('module-1083-pagination')).toBeInTheDocument()
   })
 
+  it('renders loading and pagination', () => {
+    const {getByTestId, getAllByText} = render(
+      <ModuleItemPaging
+        isLoading={true}
+        paginationOpts={{
+          moduleId: '1083',
+          currentPage: 1,
+          totalPages: 2,
+          onPageChange: () => {},
+        }}
+      />,
+    )
+    expect(getByTestId('module-1083-pagination')).toBeInTheDocument()
+    expect(getAllByText('Loading items')).toHaveLength(2)
+  })
+
   it('renders nothing when no pagination options are provided', () => {
     const {container} = render(<ModuleItemPaging isLoading={false} />)
     expect(container).toBeEmptyDOMElement()

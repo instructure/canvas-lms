@@ -19,8 +19,9 @@
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {type Links} from '@canvas/parse-link-header'
 import {FetchError} from '@canvas/context-modules/utils/FetchError'
-import {ModuleItemPaging} from '@canvas/context-modules/utils/ModuleItemPaging'
+import {ModuleItemPaging, type PaginationOpts} from '@canvas/context-modules/utils/ModuleItemPaging'
 import {ModuleItemLoadingData, type ModuleId} from './ModuleItemLoadingData'
+import {addShowAllOrLess} from './showAllOrLess'
 
 const DEFAULT_PAGE_SIZE = 10
 const BATCH_SIZE = 6
@@ -34,6 +35,12 @@ class ModuleItemsLazyLoader {
   private courseId: string = ''
   private callback: ModuleItemsCallback = () => {}
   private perPage: number = DEFAULT_PAGE_SIZE
+  private paginationOpts: PaginationOpts = {
+    moduleId: '',
+    currentPage: 1,
+    totalPages: 1,
+    onPageChange: () => {},
+  }
 
   constructor(
     courseId: string,
@@ -43,6 +50,7 @@ class ModuleItemsLazyLoader {
     this.courseId = courseId
     this.callback = callback
     this.perPage = perPage
+    this.paginationOpts.onPageChange = this.onPageChange.bind(this)
   }
 
   emptyModuleOfItems(moduleItemContainer: Element) {
@@ -55,26 +63,17 @@ class ModuleItemsLazyLoader {
   renderResult(moduleId: ModuleId, moduleItemContainer: Element, text: string, links?: Links) {
     this.emptyModuleOfItems(moduleItemContainer)
     moduleItemContainer.insertAdjacentHTML('afterbegin', text)
+    this.paginationOpts.moduleId = moduleId
 
     if (links?.current && links?.first && links?.last) {
       const firstPage = parseInt(links.first.page, 10) || DEFAULT_PAGE
-      const currentPage = parseInt(links.current.page, 10) || DEFAULT_PAGE
-      const lastPage = parseInt(links.last.page, 10) || DEFAULT_PAGE
-      if (lastPage > firstPage) {
+      this.paginationOpts.currentPage = parseInt(links.current.page, 10) || DEFAULT_PAGE
+      this.paginationOpts.totalPages = parseInt(links.last.page, 10) || DEFAULT_PAGE
+      if (this.paginationOpts.totalPages > firstPage) {
         const root = ModuleItemsLazyLoader.loadingData.getModuleRoot(moduleId)
         if (!root) return
 
-        root.render(
-          <ModuleItemPaging
-            isLoading={false}
-            paginationOpts={{
-              moduleId,
-              currentPage,
-              totalPages: lastPage,
-              onPageChange: (page: number) => this.onPageChange(page, moduleId),
-            }}
-          />,
-        )
+        root.render(<ModuleItemPaging isLoading={false} paginationOpts={this.paginationOpts} />)
       } else {
         ModuleItemsLazyLoader.loadingData.unmountModuleRoot(moduleId)
       }
@@ -108,9 +107,11 @@ class ModuleItemsLazyLoader {
     if (!moduleItemContainer) return
 
     try {
+      this.paginationOpts.moduleId = moduleId
+      this.paginationOpts.currentPage = page
       const root = ModuleItemsLazyLoader.loadingData.getModuleRoot(moduleId)
       if (root) {
-        root.render(<ModuleItemPaging isLoading={true} />)
+        root.render(<ModuleItemPaging isLoading={true} paginationOpts={this.paginationOpts} />)
       }
 
       const result = await doFetchApi<ModuleItems>({

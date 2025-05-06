@@ -25,6 +25,7 @@ describe('ModuleItemLoadingData', () => {
 
   beforeEach(() => {
     modules = new ModuleItemLoadingData()
+    document.body.innerHTML = ''
   })
 
   describe('getModuleRoot', () => {
