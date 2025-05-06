@@ -345,8 +345,14 @@ $icon-size: 1.4rem;
   }
 
   #rubric_assessments_list_and_edit_button_holder {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+
     .button-container {
       display: inline-block;
+      margin-top: 1.375rem
     }
   }
   div.comment {

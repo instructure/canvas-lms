@@ -160,7 +160,6 @@ import {isPreviewable} from '@instructure/canvas-rce/es/rce/plugins/shared/Previ
 import {createRoot} from 'react-dom/client'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
-import {SpeedGraderDiscussionsNavigation} from '../react/SpeedGraderDiscussionsNavigation'
 import {SpeedGraderDiscussionsNavigation2} from '../react/SpeedGraderDiscussionsNavigation2'
 
 declare global {
@@ -3295,6 +3294,13 @@ EG = {
       const assessmentsByMe = EG.currentStudent.rubric_assessments.filter(assessment =>
         assessmentBelongsToCurrentUser(assessment),
       )
+      const hasPeerReviewAssessments = EG.currentStudent.rubric_assessments.some(
+        assessment => assessment.assessment_type === 'peer_review',
+      )
+      const hasGradedAssessments = EG.currentStudent.rubric_assessments.some(
+        assessment => assessment.assessment_type === 'grading',
+      )
+
       if (assessmentsByMe.length > 0) {
         assessmentsByMe.forEach(assessment => {
           const displayName = isModerator ? customProvisionalGraderLabel : assessment.assessor_name
@@ -3303,6 +3309,8 @@ EG = {
       } else if (isModerator) {
         // Moderators can create a custom assessment if they don't have one
         selectMenuOptions.push({id: '', name: customProvisionalGraderLabel})
+      } else if (hasPeerReviewAssessments && !hasGradedAssessments) {
+        selectMenuOptions.unshift({id: '', name: I18n.t('Add your assessment')})
       }
 
       const {assessmentsByOthers, selfAssessment} = EG.currentStudent.rubric_assessments.reduce(
