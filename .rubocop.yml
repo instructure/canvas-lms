@@ -404,8 +404,6 @@ Style/CommentedKeyword:
   AutoCorrect: false
 Style/DocumentDynamicEvalDefinition:
   Severity: convention
-Style/ExponentialNotation:
-  Severity: convention
 Style/FormatString:
   Severity: convention
   AutoCorrect: false

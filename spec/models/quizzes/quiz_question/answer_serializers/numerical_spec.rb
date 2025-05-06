@@ -22,13 +22,13 @@ require_relative "support/answer_serializers_specs"
 describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
   context "English" do
     let :inputs do
-      [25.3, 25e-6, "0.12", "3", "17,000", "6,200,000.13"]
+      [25.3, 2.5e-5, "0.12", "3", "17,000", "6,200,000.13"]
     end
 
     let :outputs do
       [
-        { question_5: 0.253e2 }.with_indifferent_access,
-        { question_5: 25e-6 }.with_indifferent_access,
+        { question_5: 2.53e1 }.with_indifferent_access,
+        { question_5: 2.5e-5 }.with_indifferent_access,
         { question_5: 0.12 }.with_indifferent_access,
         { question_5: 3.0 }.with_indifferent_access,
         { question_5: 17_000.0 }.with_indifferent_access,
@@ -61,7 +61,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
     end
 
     let :inputs do
-      [25.3, 25e-6, "0,12", "3", "17.000", "6.200.000,13"]
+      [25.3, 2.5e-5, "0,12", "3", "17.000", "6.200.000,13"]
     end
 
     let :outputs do
@@ -84,7 +84,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
     end
 
     let :inputs do
-      [25.3, 25e-6, "0,12", "3", "17 000", "6 200 000,13"]
+      [25.3, 2.5e-5, "0,12", "3", "17 000", "6 200 000,13"]
     end
 
     let :outputs do
