@@ -26,6 +26,7 @@ class Quizzes::QuizzesController < ApplicationController
   include ::Filters::Quizzes
   include SubmittablesGradingPeriodProtection
   include QuizMathDataFixup
+  include Api::V1::Rubric
 
   # If Quiz#one_time_results is on, this flag must be set whenever we've
   # rendered the submission results to the student so that the results can be
@@ -279,11 +280,13 @@ class Quizzes::QuizzesController < ApplicationController
         VALID_DATE_RANGE: CourseDateRange.new(@context),
         HAS_GRADING_PERIODS: @context.grading_periods?,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
+        PERMISSIONS: { manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics) },
       }
       set_section_list_js_env
       append_sis_data(hash)
       js_env(hash)
       conditional_release_js_env(@quiz.assignment, includes: [:rule])
+      enhanced_rubrics_assignments_js_env(@assignment) if Rubric.enhanced_rubrics_assignments_enabled?(@context)
 
       set_master_course_js_env_data(@quiz, @context)
       @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
