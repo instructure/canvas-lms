@@ -77,7 +77,7 @@ export default function GradingResults({
   dropped,
 }: GradingResultsComponentProps) {
   const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
-  const [gradeInput, setGradeInput] = useState<string>('')
+  const [gradeInput, setGradeInput] = useState<string>(submission?.enteredGrade ?? '')
   const [replyToTopicGradeInput, setReplyToTopicGradeInput] = useState<string>('')
   const [replyToEntryGradeInput, setReplyToEntryGradeInput] = useState<string>('')
   const [excusedChecked, setExcusedChecked] = useState<boolean>(false)
