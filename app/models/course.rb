@@ -2426,14 +2426,15 @@ class Course < ActiveRecord::Base
     user = submission.user
     progress = progresses.create!(tag: "auto_grade_submission", user:)
     singleton_key = "Course#run_auto_grader:#{submission.global_id}:#{submission.attempt}"
-    max_attempts = 3 # Default max attempts
+    n_strand_key = ["Course#run_auto_grader", global_root_account_id]
+    max_attempts = 3
 
     progress.process_job(
       self,
       :run_auto_grader,
       {
         priority: Delayed::HIGH_PRIORITY,
-        n_strand: "Course#run_auto_grader:#{global_root_account_id}",
+        n_strand: n_strand_key,
         singleton: singleton_key,
         on_conflict: :use_earliest,
         preserve_method_args: true,
@@ -2511,19 +2512,16 @@ class Course < ActiveRecord::Base
       begin
         autograde_error_handling(submission, auto_grade_result, progress, error_message)
       rescue
-        progress&.results = []
-        progress&.message = "Grading failed. Please try again later or grade manually."
-        progress&.complete!
-        return
+        # log error_message
       end
 
       current_attempts = progress&.delayed_job&.attempts&.+ 1
       if current_attempts < max_attempts
         raise Delayed::RetriableError, error_message
-      else
-        progress&.message = "The AI is unavailable. Please try again later or grade manually."
       end
 
+      progress&.results = []
+      progress&.message = I18n.t("Grading failed. Please try again later or grade manually.")
       progress&.complete!
     rescue => e
       error_message = "Grading failed: #{e.message}"
@@ -2531,10 +2529,11 @@ class Course < ActiveRecord::Base
       begin
         autograde_error_handling(submission, auto_grade_result, progress, error_message)
       rescue
-        progress&.results = []
-        progress&.message = "Grading failed. Please try again later or grade manually."
+        # log error_message
       end
 
+      progress&.results = []
+      progress&.message = I18n.t("Grading failed. Please try again later or grade manually.")
       progress&.complete!
     end
   end
