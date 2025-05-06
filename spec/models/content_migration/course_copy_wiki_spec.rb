@@ -204,8 +204,8 @@ describe ContentMigration do
     end
 
     it "keeps assignment relationship" do
-      @copy_to.conditional_release = true
-      @copy_to.save!
+      @copy_from.conditional_release = true
+      @copy_from.save!
       vanilla_page_from = @copy_from.wiki_pages.create!(title: "Everyone Sees This Page")
       title = "conditional page"
       wiki_page_assignment_model(course: @copy_from, title:)

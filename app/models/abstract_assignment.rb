@@ -1186,11 +1186,18 @@ class AbstractAssignment < ActiveRecord::Base
   def ensure_assignment_group(do_save = true)
     return if assignment_group_id
 
+    return if skip_assignment_group_for_wiki_page?
+
     context.require_assignment_group
     self.assignment_group = context.assignment_groups.active.first
     if do_save
       GuardRail.activate(:primary) { save! }
     end
+  end
+
+  def skip_assignment_group_for_wiki_page?
+    Account.site_admin.feature_enabled?(:wiki_page_mastery_path_no_assignment_group) &&
+      submission_types == "wiki_page" && context.conditional_release?
   end
 
   def attendance?

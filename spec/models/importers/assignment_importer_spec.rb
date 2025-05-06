@@ -1673,4 +1673,25 @@ describe "Importing assignments" do
       end
     end
   end
+
+  describe "default assignment group" do
+    let(:course) { Course.create! }
+    let(:migration) { course.content_migrations.create! }
+    let(:assignment_hash) do
+      {
+        migration_id:,
+        title: "wiki page assignment",
+        submission_types: "wiki_page",
+        assignment_group_migration_id: nil,
+        wiki_page_migration_id: "mig"
+      }
+    end
+
+    it "hidden assignment for wiki page has default assignment group" do
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+
+      assignment = course.assignments.where(migration_id:).first
+      expect(assignment.assignment_group.name).to eq("Imported Assignments")
+    end
+  end
 end

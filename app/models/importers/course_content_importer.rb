@@ -116,6 +116,9 @@ module Importers
               end
             end
           end
+          if data[:course] && data[:course][:conditional_release]
+            migration.context.conditional_release = data[:course][:conditional_release]
+          end
 
           migration.update_import_progress(30)
           Importers::MediaTrackImporter.process_migration(data[:media_tracks], migration)
