@@ -1962,8 +1962,8 @@ zh-Hans:
       pending_batches_title: 待处理批次
       process_data_button: 处理数据
       select_file_instructions: |-
-          选择要导入的压缩文件。  
-          有关如何生成这些压缩文件的说明，[请参阅本文档](%{url})。
+          选择需要导入的 CSV 或压缩文件。
+          有关如何生成这些文件的描述，[请参阅此文档](%{url})。
       sis_import_crumb: "SIS 导入"
       started_at_message: "开始时间: %{started_at}"
       title: "SIS 导入"
