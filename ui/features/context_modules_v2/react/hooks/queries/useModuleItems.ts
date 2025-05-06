@@ -48,6 +48,33 @@ const MODULE_ITEMS_QUERY = gql`
               canUnpublish
               isLockedByMasterCourse
               canDuplicate
+              assignmentOverrides(first: 100) {
+                edges {
+                  cursor
+                  node {
+                    _id
+                    dueAt
+                    lockAt
+                    unlockAt
+                    set {
+                      ... on AdhocStudents {
+                        students {
+                          id
+                        }
+                      }
+                      ... on Course {
+                        courseId: id
+                      }
+                      ... on Group {
+                        groupId: id
+                      }
+                      ... on Section {
+                        sectionId: id
+                      }
+                    }
+                  }
+                }
+              }
             }
             ... on Discussion {
               _id
