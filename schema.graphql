@@ -3895,6 +3895,10 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   url: URL
   usageRights: UsageRights
   wordCount: Int
+  fileState: String
+  locked: Boolean
+  lockAt: DateTime
+  unlockAt: DateTime
 }
 
 """

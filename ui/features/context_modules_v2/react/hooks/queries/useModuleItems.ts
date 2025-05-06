@@ -75,6 +75,10 @@ const MODULE_ITEMS_QUERY = gql`
               canUnpublish
               isLockedByMasterCourse
               canDuplicate
+              fileState
+              locked
+              lockAt
+              unlockAt
             }
             ... on Page {
               _id
