@@ -92,6 +92,7 @@ import {
   MODULE_LOAD_ALL,
   MODULE_LOAD_FIRST_PAGE,
 } from '../utils/showAllOrLess'
+import {ModuleItemsStore} from '../utils/ModuleItemsStore'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -619,7 +620,11 @@ window.modules = (function () {
         addShowAllOrLess(moduleId)
       }
 
-      const moduleItemsLazyLoader = new ModuleItemsLazyLoader(ENV.COURSE_ID, itemsCallback)
+      const moduleItemsLazyLoader = new ModuleItemsLazyLoader(
+        ENV.COURSE_ID,
+        itemsCallback,
+        new ModuleItemsStore(ENV.COURSE_ID, ENV.current_user_id, ENV.ACCOUNT_ID),
+      )
       moduleItemsLazyLoader.fetchModuleItems(moduleIds, allPages)
     },
 
