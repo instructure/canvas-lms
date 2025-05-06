@@ -140,6 +140,7 @@ export const DiscussionPostToolbar = props => {
       <Button
         onClick={toggleTranslateText}
         data-testid="translate-button"
+        data-action-state={showTranslationControl ? 'disableTranslation' : 'enableTranslation'}
         renderIcon={<IconAiLine />}
       >
         {ENV.ai_translation_improvements ? improvedText : text}
@@ -483,6 +484,7 @@ export const DiscussionPostToolbar = props => {
                     >
                       <span data-testid="toggle-filter-menu">
                         <SimpleSelect
+                          id="viewSelect"
                           renderLabel={
                             <ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>
                           }

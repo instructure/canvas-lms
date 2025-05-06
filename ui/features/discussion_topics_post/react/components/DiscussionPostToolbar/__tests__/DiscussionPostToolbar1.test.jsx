@@ -108,40 +108,90 @@ describe('DiscussionPostToolbar', () => {
       const {queryByTestId} = setup()
       expect(queryByTestId('clear-search-button')).toBeNull()
     })
+    describe('when the threads are inline', () => {
+      describe('when threads are expanded', () => {
+        it('should add pendo action id properly', () => {
+          const {getByTestId} = setup(
+            {
+              setUserSplitScreenPreference: jest.fn(),
+              userSplitScreenPreference: false,
+              isExpanded: true,
+            },
+            updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true}),
+          )
+
+          const collapseButton = getByTestId('ExpandCollapseThreads-button')
+          expect(collapseButton).toHaveAttribute('data-action-state', 'collapseButton')
+        })
+      })
+
+      describe('when the threads are collapsed', () => {
+        it('should add pendo action id properly', () => {
+          const {getByTestId} = setup(
+            {
+              setUserSplitScreenPreference: jest.fn(),
+              userSplitScreenPreference: false,
+              isExpanded: false,
+            },
+            updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true}),
+          )
+
+          const collapseButton = getByTestId('ExpandCollapseThreads-button')
+          expect(collapseButton).toHaveAttribute('data-action-state', 'expandButton')
+        })
+      })
+    })
   })
 
   describe('Splitscreen Button', () => {
-    it('should call updateUserDiscussionsSplitscreenView mutation when clicked', async () => {
-      // Reset mocks to ensure clean state
-      jest.clearAllMocks()
+    describe('when user preference is to be split screen', () => {
+      it('should render the button with the proper pendo attribute for further event tracking', async () => {
+        const {getByTestId} = setup(
+          {
+            setUserSplitScreenPreference: jest.fn(),
+            userSplitScreenPreference: true,
+            closeView: jest.fn(),
+          },
+          updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true}),
+        )
 
-      // Mock functions
-      const setUserSplitScreenPreference = jest.fn()
-      const closeView = jest.fn()
+        const splitscreenButton = getByTestId('splitscreenButton')
+        expect(splitscreenButton).toHaveAttribute('data-action-state', 'splitscreenButtonToInline')
+      })
+    })
 
-      const {getByTestId} = setup(
-        {
-          setUserSplitScreenPreference,
-          userSplitScreenPreference: false,
-          closeView,
-        },
-        updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true}),
-      )
+    describe('when user preference is to be inline', () => {
+      it('should render the button with the proper pendo attribute for further event tracking', async () => {
+        const {getByTestId} = setup(
+          {
+            setUserSplitScreenPreference: jest.fn(),
+            userSplitScreenPreference: false,
+            closeView: jest.fn(),
+          },
+          updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true}),
+        )
 
-      // Get and click the button
-      const splitscreenButton = getByTestId('splitscreenButton')
-      fireEvent.click(splitscreenButton)
+        const splitscreenButton = getByTestId('splitscreenButton')
+        expect(splitscreenButton).toHaveAttribute('data-action-state', 'splitscreenButtonToSplit')
+      })
 
-      // Wait for the success callback to be called
-      await waitFor(
-        () => {
-          expect(onSuccessStub).toHaveBeenCalled()
-        },
-        {timeout: 2000},
-      )
+      it('should call updateUserDiscussionsSplitscreenView mutation when clicked', async () => {
+        const {getByTestId} = setup(
+          {
+            setUserSplitScreenPreference: jest.fn(),
+            userSplitScreenPreference: false,
+            closeView: jest.fn(),
+          },
+          updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true}),
+        )
 
-      // Verify the preference was updated
-      expect(setUserSplitScreenPreference).toHaveBeenCalled()
+        const splitscreenButton = getByTestId('splitscreenButton')
+        fireEvent.click(splitscreenButton)
+
+        await waitFor(() => {
+          expect(onSuccessStub.mock.calls).toHaveLength(1)
+        })
+      })
     })
   })
 

@@ -247,12 +247,16 @@ describe('DiscussionPostToolbar', () => {
       })
 
       it('does render the translate button with improved text when the translation controls are on', () => {
-        const {getByText} = setup(null, null, {
+        const {getByText, getByTestId} = setup(null, null, {
           translationLanguages: {current: ['en', 'es']},
           showTranslationControl: true,
         })
 
         expect(getByText('Turn off Translation')).toBeTruthy()
+        expect(getByTestId('translate-button')).toHaveAttribute(
+          'data-action-state',
+          'disableTranslation',
+        )
       })
     })
 
@@ -262,6 +266,10 @@ describe('DiscussionPostToolbar', () => {
       })
 
       expect(getByTestId('translate-button')).toBeTruthy()
+      expect(getByTestId('translate-button')).toHaveAttribute(
+        'data-action-state',
+        'enableTranslation',
+      )
     })
 
     it('does call setShowTranslationControl when clicked', () => {

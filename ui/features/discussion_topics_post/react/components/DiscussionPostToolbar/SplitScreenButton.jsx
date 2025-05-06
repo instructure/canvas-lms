@@ -89,6 +89,9 @@ export const SplitScreenButton = ({
     <Button
       onClick={onSplitScreenClick}
       data-testid="splitscreenButton"
+      data-action-state={
+        userSplitScreenPreference ? 'splitscreenButtonToInline' : 'splitscreenButtonToSplit'
+      }
       renderIcon={getRenderIcon()}
       display={display}
     >
