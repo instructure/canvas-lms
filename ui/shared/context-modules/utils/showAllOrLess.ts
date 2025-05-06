@@ -123,6 +123,8 @@ function addOrRemoveButton(module: HTMLElement) {
   }
 }
 
+// TODO: should probably be caching the requestAnimationFrame timestamp
+//       and throttling calls back here, but it's not too bad as is.
 function maybeShowAllOrLess(moduleId: ModuleId) {
   const module = moduleFromId(moduleId)
   if (!module) return
@@ -133,8 +135,9 @@ function maybeShowAllOrLess(moduleId: ModuleId) {
       maybeShowAllOrLess(moduleId)
     })
     return
+  } else {
+    addOrRemoveButton(module)
   }
-  addOrRemoveButton(module)
 }
 
 function addShowAllOrLess(moduleId: ModuleId) {
