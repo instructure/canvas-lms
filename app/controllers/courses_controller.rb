@@ -3829,7 +3829,7 @@ class CoursesController < ApplicationController
       # destroy the exising student
       @fake_student = @context.student_view_student
       # but first, remove all existing quiz submissions / submissions
-
+      AutoGradeResult.where(submission_id: @fake_student.all_submissions).delete_all
       AssessmentRequest.for_assessee(@fake_student).destroy_all
 
       @fake_student.destroy
