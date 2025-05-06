@@ -21,36 +21,41 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import '@canvas/util/templateData'
 import 'jquery-pageless'
+import ready from '@instructure/ready'
+import MutexManager from '@canvas/mutex-manager/MutexManager'
 
 const I18n = createI18nScope('context.roster_user_usage')
 
-$(() => {
+ready(() => {
   const url = ENV.context_url
-  $('#usage_report').pageless({
-    totalPages: ENV.accesses_total_pages,
-    url,
-    loaderMsg: I18n.t('loading_more_results', 'Loading more results'),
-    container: $('#drawer-layout-content'),
-    scrape(data) {
-      if (typeof data === 'string') {
-        try {
-          data = JSON.parse(data)
-        } catch (e) {
-          data = []
+  const drawerLayoutMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
+  MutexManager.awaitMutex(drawerLayoutMutex, () => {
+    $('#usage_report').pageless({
+      totalPages: ENV.accesses_total_pages,
+      url,
+      loaderMsg: I18n.t('loading_more_results', 'Loading more results'),
+      container: $('#drawer-layout-content'),
+      scrape(data) {
+        if (typeof data === 'string') {
+          try {
+            data = JSON.parse(data)
+          } catch (e) {
+            data = []
+          }
         }
-      }
-      for (const idx in data) {
-        const $access = $('#usage_report .access.blank:first').clone(true).removeClass('blank')
-        const access = data[idx].asset_user_access
-        $access.addClass(access.asset_class_name)
-        $access.find('.icon').addClass(access.icon)
-        delete access.icon
-        access.readable_name = access.readable_name || access.display_name || access.asset_code
-        access.last_viewed = datetimeString(access.last_access)
-        $access.fillTemplateData({data: access})
-        $('#usage_report table tbody').append($access.show())
-      }
-      return ''
-    },
+        for (const idx in data) {
+          const $access = $('#usage_report .access.blank:first').clone(true).removeClass('blank')
+          const access = data[idx].asset_user_access
+          $access.addClass(access.asset_class_name)
+          $access.find('.icon').addClass(access.icon)
+          delete access.icon
+          access.readable_name = access.readable_name || access.display_name || access.asset_code
+          access.last_viewed = datetimeString(access.last_access)
+          $access.fillTemplateData({data: access})
+          $('#usage_report table tbody').append($access.show())
+        }
+        return ''
+      },
+    })
   })
 })

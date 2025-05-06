@@ -22,9 +22,8 @@ import MutexManager from '@canvas/mutex-manager/MutexManager'
  * DrawerLayout has finished reparenting the application body.
  */
 const drawerLayoutMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
-const topNavigationTools = document.getElementById('top-nav-tools-mount-point')
 const drawerLayout = document.getElementById('drawer-layout-mount-point')
 
-if (drawerLayoutMutex && topNavigationTools && drawerLayout) {
+if (drawerLayoutMutex && drawerLayout) {
   MutexManager.createMutex(drawerLayoutMutex)
 }
