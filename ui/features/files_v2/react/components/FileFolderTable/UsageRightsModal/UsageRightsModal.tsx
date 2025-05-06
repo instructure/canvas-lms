@@ -19,7 +19,6 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
-import {queryClient} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {Alert} from '@instructure/ui-alerts'
@@ -32,9 +31,17 @@ import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {useFileManagement} from '../../../contexts/FileManagementContext'
+import {useRows} from '../../../contexts/RowsContext'
 import FileFolderInfo from '../../shared/FileFolderInfo'
 import {isFile, pluralizeContextTypeString} from '../../../../utils/fileFolderUtils'
 import {type File, type Folder} from '../../../../interfaces/File'
+import {
+  CONTENT_OPTIONS,
+  defaultCopyright,
+  defaultCCValue,
+  defaultSelectedRight,
+  parseNewRows,
+} from './UsageRightsModalUtils'
 
 export type UsageRightsModalProps = {
   open: boolean
@@ -50,78 +57,6 @@ type LicenseOption = {
 
 const I18n = createI18nScope('files_v2')
 
-const CONTENT_OPTIONS = [
-  {
-    display: I18n.t('Choose usage rights...'),
-    value: 'choose',
-  },
-  {
-    display: I18n.t('I hold the copyright'),
-    value: 'own_copyright',
-  },
-  {
-    display: I18n.t('I have permission to use this file'),
-    value: 'used_by_permission',
-  },
-  {
-    display: I18n.t('The material is in the public domain'),
-    value: 'public_domain',
-  },
-  {
-    display: I18n.t(
-      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws',
-    ),
-    value: 'fair_use',
-  },
-  {
-    display: I18n.t('Creative Commons License'),
-    value: 'creative_commons',
-  },
-]
-
-function defaultSelectedRight(items: (File | Folder)[]) {
-  if (items.length === 0) return 'choose'
-
-  const useJustification = items[0].usage_rights && items[0].usage_rights.use_justification
-  if (
-    useJustification &&
-    items.every(
-      item => (item.usage_rights && item.usage_rights.use_justification) === useJustification,
-    )
-  ) {
-    return useJustification
-  } else {
-    return 'choose'
-  }
-}
-
-function defaultCopyright(items: (File | Folder)[]) {
-  if (items.length === 0) return null
-
-  const copyright = (items[0].usage_rights && items[0].usage_rights.legal_copyright) || ''
-  if (
-    items.every(
-      item =>
-        (item.usage_rights && item.usage_rights.legal_copyright) === copyright ||
-        (item.usage_rights && item.usage_rights.license) === copyright,
-    )
-  ) {
-    return copyright
-  } else {
-    return null
-  }
-}
-
-function defaultCCValue(usageRight: string | null, items: (File | Folder)[]) {
-  if (items.length === 0) return null
-
-  if (usageRight === 'creative_commons') {
-    return items[0].usage_rights && items[0].usage_rights.license
-  } else {
-    return null
-  }
-}
-
 const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
   const {contextId, contextType} = useFileManagement()
   const usageRightRef = useRef<HTMLInputElement | null>(null)
@@ -136,6 +71,8 @@ const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
   const [ccLicenseOption, setCcLicenseOption] = useState<string | null>(() =>
     defaultCCValue(usageRight, items),
   )
+
+  const {currentRows, setCurrentRows} = useRows()
 
   const showCreativeCommonsOptions = useMemo(() => usageRight === 'creative_commons', [usageRight])
   const showDifferentRightsMessage = useMemo(
@@ -192,11 +129,27 @@ const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
       .then(() => {
         onDismiss()
         showFlashSuccess(I18n.t('Usage rights have been set.'))()
-        queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+        const newRows = parseNewRows({
+          items,
+          currentRows,
+          usageRight,
+          ccLicenseOption,
+          copyrightHolder,
+        })
+        setCurrentRows(newRows)
       })
       .catch(showFlashError(I18n.t('There was an error setting usage rights.')))
       .finally(() => setIsRequestInFlight(false))
-  }, [onDismiss, startUpdateOperation, usageRight])
+  }, [
+    onDismiss,
+    startUpdateOperation,
+    usageRight,
+    items,
+    ccLicenseOption,
+    copyrightHolder,
+    currentRows,
+    setCurrentRows,
+  ])
 
   const renderHeader = useCallback(
     () => (
