@@ -27,6 +27,8 @@ class Pseudonym < ActiveRecord::Base
   # before persisting the change.
   attr_writer :current_user
 
+  after_commit :expire_pseudonym_session_cache_if_password_changed
+
   include Workflow
   include SearchTermHelper
 
@@ -889,5 +891,26 @@ class Pseudonym < ActiveRecord::Base
 
   def self.expire_oidc_session(logout_token, _request)
     Canvas.redis.set(oidc_session_key(logout_token["iss"], logout_token["sub"], logout_token["sid"]), true, ex: CAS_TICKET_TTL)
+  end
+
+  def self.expire_cache(pseudonym_global_id)
+    Shard.shard_for(pseudonym_global_id).activate do
+      Rails.cache.delete(cache_key_for(pseudonym_global_id))
+    end
+  end
+
+  def self.cache_key_for(pseudonym_global_id)
+    ["pseudonym_session", pseudonym_global_id].cache_key
+  end
+
+  private
+
+  # invalidate session cache immediately when password changes to prevent
+  # login redirects; without this, stale cache persists for ~5 seconds,
+  # potentially causing authentication failures during that time
+  def expire_pseudonym_session_cache_if_password_changed
+    return unless saved_change_to_crypted_password?
+
+    self.class.expire_cache(global_id)
   end
 end

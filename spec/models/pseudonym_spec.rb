@@ -584,6 +584,72 @@ describe Pseudonym do
     end
   end
 
+  describe "session cache expiration" do
+    specs_require_sharding
+
+    let(:user) { User.create! }
+
+    it "expires session cache when password changes" do
+      pseudonym = Pseudonym.create!(
+        password: "abcdefgh",
+        password_confirmation: "abcdefgh",
+        unique_id: "bob@instructure.com",
+        user:
+      )
+      allow(Rails.cache).to receive(:delete)
+      pseudonym.update!(password: "12345678", password_confirmation: "12345678")
+      expect(Rails.cache).to have_received(:delete).with(Pseudonym.cache_key_for(pseudonym.global_id))
+    end
+
+    it "does not expire session cache when password stays the same" do
+      pseudonym = Pseudonym.create!(
+        password: "abcdefgh",
+        password_confirmation: "abcdefgh",
+        unique_id: "bob@instructure.com",
+        user:
+      )
+      allow(Rails.cache).to receive(:delete)
+      pseudonym.update!(unique_id: "billy@instructure.com")
+      expect(Rails.cache).not_to have_received(:delete)
+    end
+
+    it "expires session cache when password is re-set to the same value" do
+      pseudonym = Pseudonym.create!(
+        password: "abcdefgh",
+        password_confirmation: "abcdefgh",
+        unique_id: "bob@instructure.com",
+        user:
+      )
+      original_crypted_password = pseudonym.crypted_password
+      allow(Rails.cache).to receive(:delete)
+      pseudonym.update!(password: "abcdefgh", password_confirmation: "abcdefgh")
+      # even though the password string is the same
+      # the crypted_password changes due to rehashing
+      expect(pseudonym.crypted_password).not_to eq(original_crypted_password)
+      expect(Rails.cache).to have_received(:delete)
+    end
+
+    it "expires cache only for the updated pseudonym" do
+      Pseudonym.create!(
+        password: "primarypass",
+        password_confirmation: "primarypass",
+        unique_id: "primary@example.com",
+        user:
+      )
+      secondary = Pseudonym.create!(
+        password: "secondarypass",
+        password_confirmation: "secondarypass",
+        unique_id: "secondary@example.com",
+        user:
+      )
+      allow(Rails.cache).to receive(:delete)
+      # trigger a password update for the secondary pseudonym
+      secondary.update!(password: "secondarynewpass", password_confirmation: "secondarynewpass")
+      # only the secondary pseudonym’s cache should be cleared
+      expect(Rails.cache).to have_received(:delete).with(Pseudonym.cache_key_for(secondary.global_id)).once
+    end
+  end
+
   context "cas" do
     let!(:cas_ticket) { CanvasUuid::Uuid.generate_securish_uuid }
     let!(:redis_key) { "cas_session_slo:#{cas_ticket}" }
