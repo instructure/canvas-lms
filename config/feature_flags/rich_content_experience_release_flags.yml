@@ -77,6 +77,26 @@ default_copyright_on_attachments:
     development:
       state: allowed_on
 
+deprecate_uuid_in_files_api:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Remove UUID from the response of the files API
+  description: This will remove the UUID from the response of the files API. This is an internal only field, and not sending it over the wire will be a network optimization.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
+disable_iframe_sandbox_file_show:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: Disable Iframe Sandbox at File Show
+  description: |-
+    Disable iframe sandboxing at file show.
+
 docviewer_enable_iwork_files:
   state: hidden
   applies_to: RootAccount
@@ -114,13 +134,22 @@ files_a11y_rewrite:
   description: |-
     Enables the new Files a11y Rewrite page.
 
-disable_iframe_sandbox_file_show:
-  applies_to: RootAccount
+files_a11y_rewrite_toogle:
+  applies_to: SiteAdmin
   state: hidden
-  shadow: true
-  display_name: Disable Iframe Sandbox at File Show
+  display_name: Files a11y Rewrite Toggle
   description: |-
-    Disable iframe sandboxing at file show.
+    Controls whether users can see the "Switch to Old UI" toggle in the Files component.
+  environments:
+    development:
+      state: allowed_on
+
+hidden_attachments_replacement_chain:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Hidden Attachments Replacement Chain
+  description: |-
+    Enables that hidden attachments will be included into the replacement chain.
 
 media_links_use_attachment_id:
   state: hidden
@@ -182,13 +211,6 @@ rce_transform_loaded_content:
     ci:
       state: allowed_on
 
-hidden_attachments_replacement_chain:
-  applies_to: SiteAdmin
-  state: hidden
-  display_name: Hidden Attachments Replacement Chain
-  description: |-
-    Enables that hidden attachments will be included into the replacement chain.
-
 remove_rce_resize_button:
   applies_to: SiteAdmin
   state: hidden
@@ -214,16 +236,4 @@ visibility_performance_improvements:
     ci:
       state: allowed_on
     development:
-      state: allowed_on
-
-deprecate_uuid_in_files_api:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Remove UUID from the response of the files API
-  description: This will remove the UUID from the response of the files API. This is an internal only field, and not sending it over the wire will be a network optimization.
-  environments:
-    development:
-      state: allowed_on
-    ci:
       state: allowed_on
