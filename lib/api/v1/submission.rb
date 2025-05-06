@@ -151,7 +151,7 @@ module Api::V1::Submission
             anonymous_id: submission.anonymous_id
           )
         else
-          course_assignment_submission_url(submission.context.id, assignment.id, submission.user.id)
+          course_assignment_submission_url(submission.context.id, assignment.id, submission.user.global_id)
         end
     end
 
@@ -272,7 +272,7 @@ module Api::V1::Submission
       preview_args["version"] =
         quiz_submission_version || attempt.quiz_submission_version || attempt.version_number
       hash["preview_url"] =
-        course_assignment_submission_url(context, assignment, attempt[:user_id], preview_args)
+        course_assignment_submission_url(context, assignment, attempt&.user&.global_id, preview_args)
     end
 
     unless attempt.media_comment_id.blank?
@@ -602,7 +602,7 @@ module Api::V1::Submission
   def speed_grader_url(submission:, assignment:, current_user:)
     student_or_anonymous_id =
       if assignment.can_view_student_names?(current_user)
-        { student_id: submission.user_id }
+        { student_id: submission.user.global_id }
       else
         { anonymous_id: submission.anonymous_id }
       end
