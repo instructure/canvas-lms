@@ -147,6 +147,9 @@
         <%= assignment_submission_button(@assignment, @current_user, @current_user_submission, @first_annotation_submission) %>
       </div>
     </div>
+    <% if @domain_root_account&.feature_enabled?(:lti_asset_processor) %>
+      <div id="assignment_asset_processor_eula"></div>
+    <% end %>
     <%= render "student_assignment_overview" %>
   <% end %>
 
