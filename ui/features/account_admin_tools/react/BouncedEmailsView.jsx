@@ -22,13 +22,14 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
 import {string} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import * as tz from '@instructure/moment-utils'
 import {encodeQueryString} from '@instructure/query-string-encoding'
@@ -179,19 +180,19 @@ export default function BouncedEmailsView({accountId}) {
           }}
         />
       </View>
-      <View as="div" margin="0 0 small 0">
-        <CanvasDateInput
+      <Flex margin="0 0 small 0">
+        <CanvasDateInput2
           renderLabel={I18n.t('Last bounced after')}
           formatDate={formatDate}
           onSelectedDateChange={setAfter}
         />
         &emsp;
-        <CanvasDateInput
+        <CanvasDateInput2
           renderLabel={I18n.t('Last bounced before')}
           formatDate={formatDate}
           onSelectedDateChange={setBefore}
         />
-      </View>
+      </Flex>
       <View as="div" margin="0 0 small 0">
         <Button color="primary" margin="small 0 0 0" onClick={performSearch}>
           {I18n.t('Search')}

@@ -26,7 +26,7 @@ import * as tz from '@instructure/moment-utils'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('last_attended')
@@ -117,9 +117,9 @@ export default class StudentLastAttended extends React.Component {
       )
     }
     return (
-      <View display="block" margin="small x-small">
+      <View display="block" margin="small x-small" width="222px">
         {this.renderTitle()}
-        <CanvasDateInput
+        <CanvasDateInput2
           renderLabel={I18n.t('Set Last Attended Date')}
           onSelectedDateChange={this.onDateSubmit}
           formatDate={formatDate}

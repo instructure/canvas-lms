@@ -22,7 +22,7 @@ import * as tz from '@instructure/moment-utils'
 import * as z from 'zod'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {Heading} from '@instructure/ui-heading'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -123,7 +123,7 @@ const AuditLogForm = ({onSubmit}: AuditLogFormProps) => {
                 name="startDate"
                 control={control}
                 render={({field: {ref, ...restField}}) => (
-                  <CanvasDateInput
+                  <CanvasDateInput2
                     {...restField}
                     renderLabel={I18n.t('Start Date')}
                     onSelectedDateChange={startDate => {
@@ -135,7 +135,6 @@ const AuditLogForm = ({onSubmit}: AuditLogFormProps) => {
                     }}
                     formatDate={formatDate}
                     selectedDate={restField.value}
-                    placement="top center"
                     withRunningValue={true}
                     interaction={undefined}
                   />
@@ -147,7 +146,7 @@ const AuditLogForm = ({onSubmit}: AuditLogFormProps) => {
                 name="endDate"
                 control={control}
                 render={({field: {ref, ...restField}}) => (
-                  <CanvasDateInput
+                  <CanvasDateInput2
                     {...restField}
                     renderLabel={I18n.t('End Date')}
                     onSelectedDateChange={endDate => {
@@ -159,7 +158,6 @@ const AuditLogForm = ({onSubmit}: AuditLogFormProps) => {
                     }}
                     formatDate={formatDate}
                     selectedDate={restField.value}
-                    placement="top center"
                     withRunningValue={true}
                     interaction={undefined}
                   />
