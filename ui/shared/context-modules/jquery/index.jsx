@@ -2570,7 +2570,7 @@ $(() => {
   const allModules = Array.from(document.querySelectorAll('.context_module'))
     .map(m => parseInt(m.dataset.moduleId, 10))
     .filter(mid => !isNaN(mid))
-  let allPages = false
+  const allPages = false
 
   if (ENV.FEATURE_MODULES_PERF) {
     // ENV.COLLAPSED_MODULES are those that have been collapsed by the user
@@ -2586,7 +2586,6 @@ $(() => {
           if (allModules.includes(moduleId)) {
             ENV.EXPANDED_MODULES = [moduleId]
             ENV.COLLAPSED_MODULES = []
-            allPages = true
           }
         }
       }

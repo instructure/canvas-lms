@@ -26,7 +26,6 @@ import {
   isModuleCollapsed,
   isModulePaginated,
   isModuleLoading,
-  isModuleSelectedByTEACHER_MODULE_SELECTION,
   expandModuleAndLoadAll,
   loadAll,
   loadFirstPage,
@@ -67,46 +66,6 @@ describe('showAllOrLess', () => {
       module.setAttribute('data-module-id', '1')
       addItemsToModule(module, 1)
       expect(isModuleCurrentPageEmpty(module)).toBe(false)
-    })
-  })
-
-  describe('isModuleSelectedByTEACHER_MODULE_SELECTION', () => {
-    beforeEach(() => {
-      ENV.MODULE_FEATURES = {TEACHER_MODULE_SELECTION: true}
-    })
-
-    it('should return false if the feature is off', () => {
-      ENV.MODULE_FEATURES = {TEACHER_MODULE_SELECTION: false}
-      const module = document.createElement('div')
-      module.setAttribute('data-module-id', '1')
-      expect(isModuleSelectedByTEACHER_MODULE_SELECTION(module)).toBe(false)
-    })
-
-    it('should return false if the user is a student', () => {
-      ENV.IS_STUDENT = true
-      const module = document.createElement('div')
-      module.setAttribute('data-module-id', '1')
-      expect(isModuleSelectedByTEACHER_MODULE_SELECTION(module)).toBe(false)
-    })
-
-    it('should return false if the module is not selected', () => {
-      const module = document.createElement('div')
-      module.setAttribute('data-module-id', '1')
-      const select = document.createElement('input')
-      select.id = 'show_teacher_only_module_id'
-      select.value = '2'
-      document.body.appendChild(select)
-      expect(isModuleSelectedByTEACHER_MODULE_SELECTION(module)).toBe(false)
-    })
-
-    it('should return true if the module is selected', () => {
-      const module = document.createElement('div')
-      module.setAttribute('data-module-id', '1')
-      const select = document.createElement('input')
-      select.id = 'show_teacher_only_module_id'
-      select.value = '1'
-      document.body.appendChild(select)
-      expect(isModuleSelectedByTEACHER_MODULE_SELECTION(module)).toBe(true)
     })
   })
 
