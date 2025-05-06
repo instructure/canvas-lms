@@ -1632,7 +1632,9 @@ class AbstractAssignment < ActiveRecord::Base
     scope ||= context.all_students.where("enrollments.workflow_state NOT IN ('inactive', 'rejected')")
     return scope unless differentiated_assignments_applies?
 
-    scope.able_to_see_assignment_in_course_with_da(id, context.id, user_ids)
+    context.shard.activate do
+      scope.able_to_see_assignment_in_course_with_da(id, context.id, user_ids)
+    end
   end
 
   def process_if_quiz

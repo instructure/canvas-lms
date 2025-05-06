@@ -27,6 +27,40 @@ describe Assignment do
     end
   end
 
+  describe "cross-shard" do
+    specs_require_sharding
+    before(:once) do
+      @shard1.activate do
+        @cross_shard_student = User.create!
+      end
+
+      @shard2.activate do
+        account = @account = Account.create!
+        @course2 = Course.create!(account:, workflow_state: "available")
+        @teacher = course_with_teacher(active_all: true, course: @course2).user
+        @student1 = student_in_course(active_all: true).user
+        @student2 = student_in_course(active_all: true).user
+        @student3 = student_in_course(active_all: true).user
+        @course2.enroll_student(@cross_shard_student, enrollment_state: "active")
+
+        @assignment = @course2.assignments.create(points_possible: 100)
+        @assignment.submit_homework @student1, body: "EHLO"
+        @assignment.submit_homework @student2, body: "EHLO"
+        @assignment.submit_homework @cross_shard_student, body: "EHLO_cross"
+        @assignment.grade_student @student1, score: 99, grader: @teacher
+        @assignment.grade_student(@cross_shard_student, grade: 9, grader: @teacher)
+      end
+    end
+
+    it "returns all representatives with assignment overrides" do
+      # we could spec some examples, but this way it works for any overrides.
+      allow_any_instance_of(AbstractAssignment).to receive(:differentiated_assignments_applies?).and_return(true)
+      @shard1.activate do
+        expect(Assignment.find(@assignment.global_id).representatives(user: @teacher).map(&:id).sort).to match([@cross_shard_student.id, @student1.global_id, @student2.global_id, @student3.global_id].sort)
+      end
+    end
+  end
+
   describe "serialization" do
     before do
       course = Course.create!
