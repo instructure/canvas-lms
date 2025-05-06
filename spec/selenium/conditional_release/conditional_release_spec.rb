@@ -20,6 +20,8 @@
 require_relative "../common"
 require_relative "../../conditional_release_spec_helper"
 require_relative "../assignments/page_objects/assignments_index_page"
+require_relative "../content_migrations/page_objects/new_course_copy_page"
+require_relative "../content_migrations/page_objects/new_content_migration_page"
 require_relative "page_objects/conditional_release_objects"
 
 describe "native canvas conditional release" do
@@ -34,6 +36,14 @@ describe "native canvas conditional release" do
 
   before do
     course_with_teacher_logged_in
+    @course.conditional_release = true
+    @course.save!
+  end
+
+  def wait_for_migration_to_complete
+    keep_trying_for_attempt_times(attempts: 10, sleep_interval: 1) do
+      wait_for_ajaximations
+    end
   end
 
   context "Pages as part of Mastery Paths" do
@@ -244,6 +254,73 @@ describe "native canvas conditional release" do
       get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}"
 
       expect(ConditionalReleaseObjects.breakdown_graph_exists?).to be(true)
+    end
+  end
+
+  context "Copying a course with a mastery path" do
+    it "copies a mastery path course with wiki pages correctly" do
+      course_with_admin_logged_in
+
+      Account.site_admin.enable_feature!(:wiki_page_mastery_path_no_assignment_group)
+
+      page_title = "MP Page to Verify"
+      @new_page = @course.wiki_pages.create!(title: page_title)
+      page_assignment = @new_page.course.assignments.create!(
+        wiki_page: @new_page,
+        submission_types: "wiki_page",
+        title: @new_page.title
+      )
+
+      @trigger_assignment = @course.assignments.create!(
+        title: "Trigger Assignment",
+        grading_type: "points",
+        points_possible: 100,
+        submission_types: "online_text_entry"
+      )
+
+      page_assignment.assignment_overrides.create!(
+        set_type: "Noop",
+        set_id: 1,
+        all_day: false,
+        title: "Mastery Paths",
+        unlock_at_overridden: true,
+        lock_at_overridden: true,
+        due_at_overridden: true
+      )
+
+      course_module = @course.context_modules.create!(name: "Mastery Path Module")
+      course_module.add_item(id: @trigger_assignment.id, type: "assignment")
+      course_module.add_item(id: @new_page.id, type: "wiki_page")
+
+      ranges = [
+        ConditionalRelease::ScoringRange.new(
+          lower_bound: 0,
+          upper_bound: 0.4,
+          assignment_sets: [
+            ConditionalRelease::AssignmentSet.new(
+              assignment_set_associations: [
+                ConditionalRelease::AssignmentSetAssociation.new(
+                  assignment_id: page_assignment.id
+                )
+              ]
+            )
+          ]
+        )
+      ]
+      @rule = @course.conditional_release_rules.create!(trigger_assignment: @trigger_assignment, scoring_ranges: ranges)
+      get "/courses/#{@course.id}/modules"
+      get "/courses/#{@course.id}/copy"
+
+      expect_new_page_load { NewCourseCopyPage.create_course_button.click }
+
+      run_jobs
+      wait_for_ajaximations
+      wait_for_migration_to_complete
+
+      @new_course = Course.last
+
+      expect(@new_course.conditional_release).to be(true)
+      expect(@new_course.assignments.count).to eq(2)
     end
   end
 end
