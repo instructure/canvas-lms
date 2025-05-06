@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -500,10 +499,11 @@ describe('Grading Results Tests', () => {
         studentSubmissions: [modifiedDefaultStudentSubmissions],
         assignment: modifiedDefaultAssignments,
       }
-      const {getByTestId, getByText} = renderGradingResults(props)
+      const {getByTestId, getByRole} = renderGradingResults(props)
       const gradeSelector = getByTestId('student_and_assignment_grade_select')
       await userEvent.click(gradeSelector)
-      await userEvent.click(getByText('Complete'))
+      const completeOption = getByRole('option', {name: 'Complete'})
+      await userEvent.click(completeOption)
       await userEvent.tab()
       expect(executeApiRequest).toHaveBeenCalledWith({
         body: {
@@ -522,10 +522,13 @@ describe('Grading Results Tests', () => {
         studentSubmissions: [modifiedDefaultStudentSubmissions],
         assignment: modifiedDefaultAssignments,
       }
-      const {getByTestId, getByText} = renderGradingResults(props)
+      const {getByTestId} = renderGradingResults(props)
       await userEvent.click(getByTestId('submission-details-button'))
       await userEvent.click(getByTestId('submission_details_grade_select'))
-      await userEvent.click(getByText('Complete'))
+      // First click opens the combobox dropdown
+      await userEvent.keyboard('{ArrowDown}') // Move to first option
+      await userEvent.keyboard('{ArrowDown}') // Move to "Complete" option
+      await userEvent.keyboard('{Enter}') // Select "Complete"
       await userEvent.click(getByTestId('submission-details-submit-button'))
       expect(executeApiRequest).toHaveBeenCalledWith({
         body: {

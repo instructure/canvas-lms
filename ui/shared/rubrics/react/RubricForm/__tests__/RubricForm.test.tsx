@@ -27,6 +27,7 @@ import * as ProgressHelpers from '@canvas/progress/ProgressHelpers'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import {reorder} from '../CriterionModal'
 import {WarningModal} from '../WarningModal'
+import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('../queries/RubricFormQueries', () => ({
   ...jest.requireActual('../queries/RubricFormQueries'),
@@ -77,6 +78,7 @@ describe('RubricForm Tests', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+    destroyFlashAlertContainer()
   })
 
   const renderComponent = (props?: Partial<RubricFormComponentProp>) => {
