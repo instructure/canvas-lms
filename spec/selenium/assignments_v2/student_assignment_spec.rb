@@ -1322,6 +1322,7 @@ describe "as a student" do
 
       it "does not allow student to submit for assignment assigned to concluded section" do
         create_section_override_for_assignment(@assignment, course_section: @sec2)
+        @assignment.update!(only_visible_to_overrides: true)
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
         wait_for_ajaximations
