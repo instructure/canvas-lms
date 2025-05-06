@@ -8534,6 +8534,7 @@ describe Assignment do
 
     it "returns true if the assignment has an ADHOC override that applies to the student" do
       create_adhoc_override_for_assignment(@assignment, @student)
+      @assignment.update!(only_visible_to_overrides: true)
       expect(@assignment.enrollment_active_for_assignment?(@student)).to be_truthy
     end
 
@@ -8543,18 +8544,42 @@ describe Assignment do
       group = @group_category.groups.create!(context: @course)
       group.add_user(@student, "accepted")
       create_group_override_for_assignment(group_assignment, { user: @student, group: })
+      @assignment.update!(only_visible_to_overrides: true)
       expect(@assignment.enrollment_active_for_assignment?(@student)).to be_truthy
     end
 
     it "returns true if the assignment has a CourseSection override for a section the student has an active enrollment in" do
       create_section_override_for_assignment(@assignment, course_section: @sec1)
       create_section_override_for_assignment(@assignment, course_section: @sec2)
+      @assignment.update!(only_visible_to_overrides: true)
       expect(@assignment.enrollment_active_for_assignment?(@student)).to be_truthy
     end
 
     it "returns false if the assignment is assigned to a CourseSection the student is concluded in" do
       create_section_override_for_assignment(@assignment, course_section: @sec2)
+      @assignment.update!(only_visible_to_overrides: true)
       expect(@assignment.enrollment_active_for_assignment?(@student)).to be_falsey
+    end
+
+    it "does not evaluate deleted overrides" do
+      student1 = @student
+      student2 = student_in_course(course: @course, active_all: true, user_name: "student 2").user
+      override = create_adhoc_override_for_assignment(@assignment, student2)
+      @assignment.update!(only_visible_to_overrides: true)
+      # Assignment is not assigned to student1 because of active ADHOC override for student2
+      expect(@assignment.enrollment_active_for_assignment?(student1)).to be_falsey
+      override.destroy!
+      # Assignment is assigned to student1 because the override was deleted
+      expect(@assignment.enrollment_active_for_assignment?(student1)).to be_truthy
+    end
+
+    it "returns true if there is an ADHOC and Everyone Else assignment override" do
+      student1 = @student
+      student2 = student_in_course(course: @course, active_all: true, user_name: "student 2").user
+      create_adhoc_override_for_assignment(@assignment, student2)
+      # Include everyone else
+      @assignment.update!(only_visible_to_overrides: false)
+      expect(@assignment.enrollment_active_for_assignment?(student1)).to be_truthy
     end
   end
 

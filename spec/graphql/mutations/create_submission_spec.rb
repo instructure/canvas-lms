@@ -117,6 +117,7 @@ RSpec.describe Mutations::CreateSubmission do
       concluded_enrollment = @course.enroll_student(@student, enrollment_state: "active", section: sec2, allow_multiple_enrollments: true)
       concluded_enrollment.conclude
       create_section_override_for_assignment(@assignment, course_section: sec2)
+      @assignment.update!(only_visible_to_overrides: true)
       result = run_mutation
       expect(result.dig(:errors, 0, :message)).to eq "not found"
     end
