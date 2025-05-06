@@ -3815,11 +3815,12 @@ class AbstractAssignment < ActiveRecord::Base
     return false if user_active_enrollments.empty?
 
     # Collect both module and assignment overrides
-    all_overrides = (context_modules.flat_map(&:assignment_overrides) + assignment_overrides)
+    all_overrides = (context_modules.flat_map { |cm| cm.assignment_overrides.active } + assignment_overrides.active)
     return true if all_overrides.empty?
 
-    # If there's a "Course" override, meaning we are using "Everyone Else" with a module override, return true
-    return true if all_overrides.any? { |o| o.set_type == "Course" }
+    # If there's a "Course" override, meaning we are using "Everyone Else" with a module override, or
+    # only_visible_to_overrides is false, meaning we are using "Everyone Else" with an assignment override, we return true
+    return true if all_overrides.any? { |o| o.set_type == "Course" } || !only_visible_to_overrides?
 
     override_priority_order = %w[ADHOC Group CourseSection]
     # Sort overrides based on priority
