@@ -87,6 +87,8 @@ import {
   isModulePaginated,
   addShowAllOrLess,
   maybeExpandAndLoadAll,
+  loadFirstPage,
+  isModuleCurrentPageEmpty,
   MODULE_EXPAND_AND_LOAD_ALL,
   MODULE_LOAD_ALL,
   MODULE_LOAD_FIRST_PAGE,
@@ -1404,6 +1406,13 @@ modules.initModuleManagement = async function (duplicate) {
             modules.updateEstimatedDurations()
             $placeToFocus.focus()
             refreshDuplicateLinkStatus($currentModule)
+            if (
+              ENV.FEATURE_MODULES_PERF &&
+              isModulePaginated($currentModule[0]) &&
+              isModuleCurrentPageEmpty($currentModule[0])
+            ) {
+              loadFirstPage($currentModule[0]?.dataset.moduleId)
+            }
           })
           $.flashMessage(
             I18n.t('Module item %{module_item_name} was successfully removed.', {

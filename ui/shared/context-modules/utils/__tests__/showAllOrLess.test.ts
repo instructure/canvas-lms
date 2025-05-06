@@ -22,6 +22,7 @@ import {
   addShowAllOrLess,
   shouldShowAllOrLess,
   itemCount,
+  isModuleCurrentPageEmpty,
   isModuleCollapsed,
   isModulePaginated,
   isModuleLoading,
@@ -37,10 +38,6 @@ import {
 
 declare const ENV: {
   IS_STUDENT?: boolean
-  MODULE_FEATURES?: {
-    TEACHER_MODULE_SELECTION: boolean
-    STUDENT_MODULE_SELECTION?: boolean
-  }
 }
 
 const addItemsToModule = (module: HTMLElement, count: number) => {
@@ -56,7 +53,21 @@ describe('showAllOrLess', () => {
     document.body.innerHTML = ''
 
     ENV.IS_STUDENT = false
-    ENV.MODULE_FEATURES = undefined
+  })
+
+  describe('isModuleCurrentPageEmpty', () => {
+    it('should return true if the module is empty', () => {
+      const module = document.createElement('div')
+      module.setAttribute('data-module-id', '1')
+      expect(isModuleCurrentPageEmpty(module)).toBe(true)
+    })
+
+    it('should return false if the module is not empty', () => {
+      const module = document.createElement('div')
+      module.setAttribute('data-module-id', '1')
+      addItemsToModule(module, 1)
+      expect(isModuleCurrentPageEmpty(module)).toBe(false)
+    })
   })
 
   describe('isModuleSelectedByTEACHER_MODULE_SELECTION', () => {
