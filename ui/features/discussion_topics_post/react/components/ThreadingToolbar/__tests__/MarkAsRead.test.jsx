@@ -49,13 +49,21 @@ const setup = props => {
 
 describe('MarkAsRead', () => {
   it('renders text for desktop view', () => {
-    const {getAllByText} = setup()
+    const {getAllByText, queryByTestId} = setup()
     expect(getAllByText('Mark as Read')).toBeTruthy()
+    expect(queryByTestId('threading-toolbar-mark-as-read')).toHaveAttribute(
+      'data-action-state',
+      'readButton',
+    )
   })
 
   it('renders unread text for desktop view', () => {
-    const {getAllByText} = setup({isRead: true})
+    const {getAllByText, queryByTestId} = setup({isRead: true})
     expect(getAllByText('Mark as Unread')).toBeTruthy()
+    expect(queryByTestId('threading-toolbar-mark-as-read')).toHaveAttribute(
+      'data-action-state',
+      'unreadButton',
+    )
   })
 
   it('does not render text for split screen view', () => {

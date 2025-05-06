@@ -83,6 +83,7 @@ describe('Like', () => {
     expect(queryByTestId('liked-icon')).toBeFalsy()
     expect(queryByText('Like post from Xerxes')).toBeTruthy()
     expect(queryByText('Unlike post from Xerxes')).toBeFalsy()
+    expect(queryByTestId('like-button')).toHaveAttribute('data-action-state', 'likeButton')
 
     rerender(
       <Like
@@ -98,5 +99,6 @@ describe('Like', () => {
     expect(queryByTestId('liked-icon')).toBeTruthy()
     expect(queryByText('Like post from Xerxes')).toBeFalsy()
     expect(queryByText('Unlike post from Xerxes')).toBeTruthy()
+    expect(queryByTestId('like-button')).toHaveAttribute('data-action-state', 'unlikeButton')
   })
 })
