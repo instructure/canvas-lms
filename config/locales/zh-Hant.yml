@@ -1963,8 +1963,8 @@ zh-Hant:
       pending_batches_title: 擱置批次
       process_data_button: 處理資料
       select_file_instructions: |-
-          選擇您希望導入的 zip文檔。  
-          有關如何生成這些 zip 文檔的說明，[請參閱此文件](%{url})。
+          選取要匯入的 CSV 或 zip 檔案。
+          如需有關如何產生這些檔案的說明，[請參閱此文件](%{url})。
       sis_import_crumb: "SIS 導入"
       started_at_message: "開始時間：%{started_at}"
       title: "SIS 導入"
