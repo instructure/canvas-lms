@@ -1967,6 +1967,32 @@ describe AssignmentsController do
           expect(assigns[:js_env][:rubric_association][:id]).to eq @assignment.rubric_association.id
         end
       end
+
+      it "sets ASSET_PROCESSOR_EULA_LAUNCH_URLS if the user is a student" do
+        user_session @student
+        urls = [
+          { url: "https://example.com", name: "Example" },
+          { url: "https://example2.com", name: "Example2" }
+        ]
+        allow(Lti::EulaUiService).to receive(:eula_launch_urls).and_return(urls)
+
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to eq urls
+      end
+
+      it "does not set ASSET_PROCESSOR_EULA_LAUNCH_URLS if the user is not student" do
+        user_session @teacher
+        urls = [
+          { url: "https://example.com", name: "Example" },
+          { url: "https://example2.com", name: "Example2" }
+        ]
+        allow(Lti::EulaUiService).to receive(:eula_launch_urls).and_return(urls)
+
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to be_nil
+      end
     end
 
     context "assign to differentiation tags" do

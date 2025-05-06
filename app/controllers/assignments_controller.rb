@@ -323,6 +323,7 @@ class AssignmentsController < ApplicationController
         end
 
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
+        asset_processor_eula_js_env
 
         if render_a2_student_view? && params[:display] != "borderless"
           js_env({ OBSERVER_OPTIONS: {
@@ -950,7 +951,7 @@ class AssignmentsController < ApplicationController
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
       hash[:NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED] = Account.site_admin.feature_enabled?(:anonymous_grading_with_new_quizzes)
-      hash[:ASSET_PROCESSORS] = Lti::AssetProcessor.where(assignment_id: @assignment.id).info_for_display
+      hash[:ASSET_PROCESSORS] = Lti::AssetProcessor.for_assignment_id(@assignment.id).info_for_display
       hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(
         :submission_type_selection,
         @context,
@@ -1116,6 +1117,7 @@ class AssignmentsController < ApplicationController
     }
   end
 
+  # LTI 2.0 EULA URL
   def tool_eula_url
     @assignment.tool_settings_tool.try(:tool_proxy)&.find_service(Assignment::LTI_EULA_SERVICE, "GET")&.endpoint
   end
@@ -1255,5 +1257,13 @@ class AssignmentsController < ApplicationController
         override_course_and_term_dates: section.restrict_enrollments_to_section_dates
       }
     }
+  end
+
+  # LTI 1.3 Asset Processor Eula Service
+  def asset_processor_eula_js_env
+    return unless @current_user
+    return unless @context_enrollment&.student?
+
+    js_env ASSET_PROCESSOR_EULA_LAUNCH_URLS: Lti::EulaUiService.eula_launch_urls(user: @current_user, assignment: @assignment)
   end
 end

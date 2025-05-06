@@ -68,6 +68,13 @@ class Lti::AssetProcessor < ApplicationRecord
     end
   end
 
+  def self.for_assignment_id(assignment_id)
+    Lti::AssetProcessor.active
+                       .where(assignment_id:)
+                       .joins(:context_external_tool)
+                       .merge(ContextExternalTool.active)
+  end
+
   # Result structure should match with ExistingAttachedAssetProcessor in UI
   def self.info_for_display
     raise ArgumentError, "Must be used with a scope" unless current_scope

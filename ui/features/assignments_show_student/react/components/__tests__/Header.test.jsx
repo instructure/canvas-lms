@@ -360,7 +360,7 @@ describe('Peer reviews counter', () => {
       }
     })
 
-    it('sets 1 as "current-counter" when anonymousId matches the first assigned assessment"', async () => {
+    it('sets 1 as "current-counter" when anonymousId matches the first assigned assessment', async () => {
       window.ENV.FEATURES.instui_nav = false
       props.assignment.env.anonymousAssetId =
         props.reviewerSubmission.assignedAssessments[0].anonymousId
@@ -368,7 +368,7 @@ describe('Peer reviews counter', () => {
       expect(queryByTestId('current-counter')).toHaveTextContent('1')
     })
 
-    it('sets assigned assessments count as "current-counter" when anonymousId matches the last assigned assessment"', async () => {
+    it('sets assigned assessments count as "current-counter" when anonymousId matches the last assigned assessment', async () => {
       window.ENV.FEATURES.instui_nav = false
       props.assignment.env.anonymousAssetId =
         props.reviewerSubmission.assignedAssessments[2].anonymousId
@@ -376,7 +376,7 @@ describe('Peer reviews counter', () => {
       expect(queryByTestId('current-counter')).toHaveTextContent('3')
     })
 
-    it('sets 0 as "current-counter when there are no matches for the anonymousId"', async () => {
+    it('sets 0 as "current-counter when there are no matches for the anonymousId', async () => {
       window.ENV.FEATURES.instui_nav = false
       props.assignment.env.anonymousAssetId = '0baCxm'
       const {queryByTestId} = render(<Header {...props} />)
@@ -417,7 +417,7 @@ describe('Peer reviews counter', () => {
       }
     })
 
-    it('sets 1 as "current-counter" when reviewerId matches the first assigned assessment"', async () => {
+    it('sets 1 as "current-counter" when reviewerId matches the first assigned assessment', async () => {
       window.ENV.FEATURES.instui_nav = false
       props.assignment.env.revieweeId =
         props.reviewerSubmission.assignedAssessments[0].anonymizedUser._id
@@ -425,7 +425,7 @@ describe('Peer reviews counter', () => {
       expect(queryByTestId('current-counter')).toHaveTextContent('1')
     })
 
-    it('sets assigned assessments count as "current-counter" when reviewerId matches the last assigned assessment"', async () => {
+    it('sets assigned assessments count as "current-counter" when reviewerId matches the last assigned assessment', async () => {
       window.ENV.FEATURES.instui_nav = false
       props.assignment.env.revieweeId =
         props.reviewerSubmission.assignedAssessments[2].anonymizedUser._id
@@ -433,7 +433,7 @@ describe('Peer reviews counter', () => {
       expect(queryByTestId('current-counter')).toHaveTextContent('3')
     })
 
-    it('sets 0 as "current-counter when there are no matches for the reviewerId"', async () => {
+    it('sets 0 as "current-counter when there are no matches for the reviewerId', async () => {
       window.ENV.FEATURES.instui_nav = false
       props.assignment.env.revieweeId = '4'
       const {queryByTestId} = render(<Header {...props} />)
@@ -635,5 +635,36 @@ describe('Peer reviews counter', () => {
         2,
       )
     })
+  })
+})
+
+describe('AssignmentAssetProcessorEula', () => {
+  beforeEach(() => {
+    window.ENV.FEATURES = {
+      lti_asset_processor: true,
+    }
+    window.ENV.ASSET_PROCESSOR_EULA_LAUNCH_URLS = [
+      {url: 'https://example.com/eula/1', name: 'Tool 1'},
+      {url: 'https://example.com/eula/2', name: 'Tool 2'},
+    ]
+  })
+
+  afterEach(() => {
+    delete window.ENV.FEATURES.lti_asset_processor
+    delete window.ENV.ASSET_PROCESSOR_EULA_LAUNCH_URLS
+  })
+
+  it('renders AssignmentAssetProcessorEula when lti_asset_processor feature flag is enabled', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByText} = render(<Header {...props} />)
+    expect(getByText('EULA of Tool 1')).toBeInTheDocument()
+  })
+
+  it('does not render AssignmentAssetProcessorEula when feature flag is disabled', async () => {
+    window.ENV.FEATURES.lti_asset_processor = false
+    const props = await mockAssignmentAndSubmission()
+    const {queryByText} = render(<Header {...props} />)
+    const elem = queryByText('EULA of Tool 1')
+    expect(elem).not.toBeInTheDocument()
   })
 })

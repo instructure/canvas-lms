@@ -26,10 +26,7 @@ module Lti
       return unless submission.submission_type == "online_upload"
       return unless submission.root_account.feature_enabled?(:lti_asset_processor)
 
-      asset_processors = Lti::AssetProcessor.active
-                                            .where(assignment: submission.assignment)
-                                            .joins(:context_external_tool)
-                                            .merge(ContextExternalTool.active)
+      asset_processors = Lti::AssetProcessor.for_assignment_id(submission.assignment.id)
       return if asset_processors.empty?
 
       lti_assets = submission.attachments.map do |attachment|
