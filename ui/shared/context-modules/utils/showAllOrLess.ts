@@ -24,14 +24,6 @@ const I18n = createI18nScope('context_modulespublic')
 
 type AllOrLess = 'all' | 'less' | 'none' | 'loading'
 
-declare const ENV: {
-  IS_STUDENT?: boolean
-  MODULE_FEATURES?: {
-    TEACHER_MODULE_SELECTION: boolean
-    STUDENT_MODULE_SELECTION?: boolean
-  }
-}
-
 const MODULE_EXPAND_AND_LOAD_ALL = 'module-expand-and-load-all'
 const MODULE_LOAD_ALL = 'module-load-all'
 const MODULE_LOAD_FIRST_PAGE = 'module-load-first-page'
@@ -44,6 +36,9 @@ function isModuleLoading(module: HTMLElement) {
   return !!module.querySelector('.module-spinner-container')
 }
 
+function isModuleCurrentPageEmpty(module: HTMLElement) {
+  return module.querySelectorAll('.context_module_item').length === 0
+}
 function isModulePaginated(module: HTMLElement) {
   return !!module.querySelector(`[data-testid="module-${module.dataset.moduleId}-pagination"]`)
 }
@@ -208,6 +203,7 @@ export {
   addShowAllOrLess,
   shouldShowAllOrLess,
   itemCount,
+  isModuleCurrentPageEmpty,
   isModuleCollapsed,
   isModulePaginated,
   isModuleLoading,
