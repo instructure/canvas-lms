@@ -138,6 +138,15 @@ describe Lti::IMS::AssetProcessorEulaController do
       end
     end
 
+    context "when the user is from cross shard" do
+      let(:user) { user_model(root_account_ids: [context.root_account.global_id]) }
+
+      it "creates a new EULA acceptance and returns 201 created" do
+        send_request
+        expect(response).to have_http_status(:created)
+      end
+    end
+
     context "when the timestamp is invalid" do
       let(:timestamp) { "invalid_timestamp" }
 
