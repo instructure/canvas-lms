@@ -41,6 +41,7 @@ describe SubmissionsController do
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
       create_section_override_for_assignment(@assignment, course_section: sec2)
+      @assignment.update!(only_visible_to_overrides: true)
       post "create", params: { course_id: @course.id, assignment_id: @assignment.id, submission: { submission_type: "online_url", url: "url" } }
       assert_unauthorized
     end
