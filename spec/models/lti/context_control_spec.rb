@@ -63,11 +63,11 @@ describe Lti::ContextControl do
         expect { create! }.not_to raise_error
       end
 
-      context "when registration is not unique" do
+      context "when deployment is not unique" do
         before { create! }
 
         it "is invalid" do
-          expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /Registration has already been taken/)
+          expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /Deployment has already been taken/)
         end
       end
 
@@ -102,11 +102,11 @@ describe Lti::ContextControl do
       end
     end
 
-    context "when registration is not unique" do
+    context "when deployment is not unique" do
       before { create! }
 
       it "is invalid" do
-        expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /Registration has already been taken/)
+        expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /Deployment has already been taken/)
       end
     end
 

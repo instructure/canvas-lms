@@ -34,7 +34,7 @@ class Lti::ContextControl < ActiveRecord::Base
   validates :course, presence: true, if: -> { account.blank? }
   validates :account, presence: true, if: -> { course.blank? }
 
-  validates :registration_id, uniqueness: { scope: %i[account_id course_id] }
+  validates :deployment_id, uniqueness: { scope: %i[account_id course_id] }
 
   validates :path, on: :update, if: -> { path.present? }, comparison: { equal_to: :path_was, message: t("cannot be changed") }
   validates :course_id, on: :update, if: -> { course_id.present? }, comparison: { equal_to: :course_id_was, message: t("cannot be changed") }
