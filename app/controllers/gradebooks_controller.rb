@@ -875,7 +875,7 @@ class GradebooksController < ApplicationController
                                        :media_comment_type,
                                        :group_comment,
                                        :late_policy_status).to_unsafe_h
-        is_default_grade_for_missing = value_to_boolean(submission.delete(:set_by_default_grade)) && submission_record.missing? && submission_record.late_policy_status.nil?
+        is_default_grade_for_missing = value_to_boolean(submission.delete(:set_by_default_grade)) && submission_record && submission_record.missing? && submission_record.late_policy_status.nil?
 
         submission[:grader] = @current_user unless is_default_grade_for_missing
         submission.delete(:provisional) unless @assignment.moderated_grading?
