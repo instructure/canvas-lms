@@ -2400,10 +2400,10 @@
   dependencies:
     prop-types "^15.8.1"
 
-"@instructure/studio-player@1.1.7":
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.1.7.tgz#e7f348aeb9017420bcb954501d1b336086fad90f"
-  integrity sha512-c2D5GxEKIt18VpCBDJlUNXDagylE54V8Soh7QoLAqxIWJ5LtZ5v4I01H9RObjCU3aADzTbdn/bPaLFaejSzzNg==
+"@instructure/studio-player@1.1.11":
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.1.11.tgz#e508dce798bd2b5f66dc9ad140f80ae1697ee6c7"
+  integrity sha512-QwrxAuSe2keU7UaIidxY4CFN4YQfehddOtKj2ng3dhJ+d21WqJN3R2DxGf4J2qPBd6l/BWhdMJZgMoYqL7UIxA==
   dependencies:
     "@floating-ui/react" "^0.27.3"
     clsx "^2.1.1"
@@ -19021,6 +19021,7 @@ pumpify@^1.3.3, pumpify@^1.3.5:
     pump "^2.0.0"
 
 punycode2@1.0.1, punycode@1.3.2, punycode@1.4.1, punycode@^1.2.4, punycode@^1.4.1, punycode@^2.1.0, punycode@^2.1.1, punycode@^2.3.1, "punycode@npm:punycode2@1.0.1":
+  name punycode
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/punycode2/-/punycode2-1.0.1.tgz#7190290a2f672a97c18bda38ad9f402787b4eded"
   integrity sha512-+TXpd9YRW4YUZZPoRHJ3DILtWwootGc2DsgvfHmklQ8It1skINAuqSdqizt5nlTaBmwrYACHkHApCXjc9gHk2Q==
