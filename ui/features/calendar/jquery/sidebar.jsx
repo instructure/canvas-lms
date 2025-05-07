@@ -188,6 +188,22 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
             'aria-labelledby',
             e.target.parentElement.querySelector('.ui-dialog-title').id,
           )
+          // Replace the close button with a proper button element
+          const $closeButton = $(e.target.parentElement).find('.ui-dialog-titlebar-close')
+          const $newCloseButton = $('<button>')
+            .addClass('ui-dialog-titlebar-close ui-corner-all')
+            .attr('type', 'button')
+            .attr('aria-label', I18n.t('Close'))
+            .html('<span class="ui-icon ui-icon-closethick"></span>')
+            .on('click', event => {
+              event.preventDefault()
+              $calendarFeedModalContent.dialog('close')
+            })
+          $closeButton.replaceWith($newCloseButton)
+        },
+        close: () => {
+          forceScreenreaderToReparse($('#application')[0])
+          $('#calendar-feed .dialog_opener').focus()
         },
       },
       $calendarFeedModalOpener.data('dialogOpts'),
@@ -195,12 +211,7 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
   )
 
   $calendarFeedModalOpener.on('click', () => {
-    $calendarFeedModalContent.dialog('open');
-  })
-
-  $calendarFeedModalContent.on('dialogclose', () => {
-    forceScreenreaderToReparse($('#application')[0])
-    $('#calendar-feed .dialog_opener').focus()
+    $calendarFeedModalContent.dialog('open')
   })
 }
 
