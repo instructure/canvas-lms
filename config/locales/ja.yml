@@ -1963,8 +1963,8 @@ ja:
       pending_batches_title: 保留中のバッチ
       process_data_button: データの処理
       select_file_instructions: |-
-          インポートする zip ファイルを選択します。  
-          これらの zip ファイルの生成方法については、[このドキュメントを参照してください](%{url})。
+          インポートしたいCSVまたはZIPファイルを選択してください。
+          これらのファイルの生成方法については、[このドキュメント](%{url})を確認してください。
       sis_import_crumb: "SIS インポート"
       started_at_message: "開始日時: %{started_at}"
       title: "SIS インポート"

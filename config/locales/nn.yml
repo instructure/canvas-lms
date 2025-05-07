@@ -13542,6 +13542,7 @@ nn:
   haven_t_submitted_yet_e63834db: "Ikkje har levert"
   he_him_99aea1a8: Han
   header_f28f73db: Topptekst
+  headings_should_not_contain_more_than_120_characte_3c0e0cb3: "Overskrifter bør ikkje innehalde meir enn 120 karakterer."
   heads_up_a_valid_salesforce_account_id_should_be_a_999cbf7d: "Obs! Ein gyldig Salesforce konto-ID er mellom 15 og 18 alfanumeriske teikn lang."
   hebrew_88fbf778: Hebraisk
   height_69b03e15: Høgde
@@ -14111,6 +14112,7 @@ nn:
     invalid_file_type: "Ugyldig filtype %{type}. Tillatne typar omfattar: %{type_list}"
     not_an_image: "Vald fil er ikkje eit bilde"
   images_documents_and_more_dccb362f: "Bilde, dokument, med meir"
+  images_should_include_an_alt_attribute_describing__b86d6a86: "Bilder bør innehlade ein alt-attributt som beskriv bildeinnhaldet."
   immediately_c128ede6: "Med ein gong"
   immersive_reader_7b87538: "Engasjerande lesar."
   immersive_reader_failed_to_load_bc8d4dd4: "Engasjerande lesar mislukka å laste"
@@ -14902,7 +14904,10 @@ nn:
   learn_more_about_collaborations_2978f66d: "Lær meir om samarbeid"
   learn_more_about_quiz_statistics_315a378: "Lær meir om quiz-statistikk"
   learn_more_about_the_differences_a1217479: "Lær meir om skilnadene."
+  learn_more_about_using_alt_text_for_images_5698df9a: "Lær meir om bruk av alternativ tekst til bilder"
+  learn_more_about_using_captions_with_tables_36fe496f: "Lær meir om bruk av tabelltitlar"
   learn_more_about_using_commons_and_blueprints_3df953f6: "Lær meir om Commons og Blueprintemne."
+  learn_more_about_using_lists_4e6eb860: "Lær meir om bruk av lister"
   learn_more_about_video_conferencing_5f0e76e4: "Lær meir om videomøter"
   learn_more_in_the_canvas_community_3bba7b11: "Lær meir på \"Canvas Community\""
   learner_passport_prototype_1c3446b3: "Prototype for lærarpass"
@@ -15132,6 +15137,7 @@ nn:
   list_of_students_and_observers_f7f1a58a: "Liste over studentar og observatørar"
   list_of_the_currently_attainable_trophies_959b2518: "Liste over tilgjengelege trofé"
   list_view_430aecce: Listevising
+  lists_should_be_formatted_as_lists_f862de8d: "Lister burde formaterast som lister."
   lithuanian_5adcbe24: Litauisk
   little_lost_try_here_first_9e24e575: "Gått deg bort? Forsøk her først! "
   live_event_subscription_webhooks_1dae83bb: "Abbonement på Direktehendingar Webhook"
@@ -23186,6 +23192,8 @@ nn:
   scored_more_than_d1646bd5: "Skåra høgare enn"
   scored_more_than_score_on_assignmenttitle_2afa1d32: "Skåra høgare enn %{score} på %{assignmentTitle}"
   scoring_range_upperbound_to_lowerbound_c017669b: "Vurderingsintervall %{upperBound} til %{lowerBound}"
+  screen_readers_cannot_determine_what_is_displayed__a57e6723: "Skjermlesarar kan ikkje vite kva som visast i eit bilde utan ein alternativ tekst, som skildrar innhaldet og tydinga av bildet."
+  screen_readers_cannot_interpret_tables_without_the_e62912d5: "Skjermlesarar kan ikkje tolke tabellar utan riktig tabellstruktur. Tabellskildringar skildrar konteksten og korleis ein skal tyda tabellen."
   screenreader_gradebook: 
     assignment_information: 
       actions: 

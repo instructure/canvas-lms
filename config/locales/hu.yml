@@ -12299,6 +12299,7 @@ hu:
   haven_t_submitted_yet_e63834db: "Még nem adott be"
   he_him_99aea1a8: Ő
   header_f28f73db: Fejléc
+  headings_should_not_contain_more_than_120_characte_3c0e0cb3: "A címsorok nem tartalmazhatnak 120 karakternél többet."
   heads_up_a_valid_salesforce_account_id_should_be_a_999cbf7d: "Fel a fejjel! Az érvényes Salesforce-fiókazonosítónak 15–18 alfanumerikus karakterből álló sorozatnak kell lennie."
   hebrew_88fbf778: Héber
   height_69b03e15: Magasság
@@ -12827,6 +12828,7 @@ hu:
   image_search_b0944fc2: Képkeresés
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url és  image_id nem állítható be egyszerre."
   image_url_is_not_a_valid_url_4e31c8b0: "image_url nem érvényes URL"
+  images_should_include_an_alt_attribute_describing__b86d6a86: "A képeknek tartalmazniuk kell egy alt attribútumot, amely leírja a kép tartalmát."
   immediately_c128ede6: Azonnal
   immersive_reader_7b87538: "Imerzív olvasó"
   immersive_reader_failed_to_load_bc8d4dd4: "Az Immersive Reader nem tudott betölteni"
@@ -13649,7 +13651,10 @@ hu:
   learn_more_about_quiz_statistics_315a378: "Tudjon meg többet a kvízstatisztikákról."
   learn_more_about_the_differences_a1217479: "Tudjon meg többet a különbségekről."
   learn_more_about_this_feature_in_the_course_pacing_687ceb39: "Tudjon meg többet erről a funkcióról a *kurzus ütemezés felhasználói csoportban*."
+  learn_more_about_using_alt_text_for_images_5698df9a: "További információ az alternatív szövegek képekhez való használatáról"
+  learn_more_about_using_captions_with_tables_36fe496f: "További információ a feliratok táblázatokkal való használatáról"
   learn_more_about_using_commons_and_blueprints_3df953f6: "Tudjon meg többet a Commons és a Blueprints használatáról."
+  learn_more_about_using_lists_4e6eb860: "További információ a listák használatáról"
   learn_more_about_video_conferencing_5f0e76e4: "Tudjon meg többet a videokonferenciáról"
   learn_more_in_the_canvas_community_3bba7b11: "További információk a Canvas közösségi oldalon"
   learner_passport_prototype_1c3446b3: "Hallgatói útlevél prototípus"
@@ -13892,6 +13897,7 @@ hu:
   list_of_pseudonyms_to_get_report_for_af38e1c6: "A jelentéshez szükséges álnevek listája"
   list_of_students_and_observers_f7f1a58a: "A hallgatók és megfigyelők listája"
   list_view_430aecce: Listanézet
+  lists_should_be_formatted_as_lists_f862de8d: "A listákat listákként kell formázni."
   lithuanian_5adcbe24: Litván
   little_lost_try_here_first_9e24e575: "Elveszve érzi magát? Próbálkozzon először itt!"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Az élő eseményekre való feliratkozás nincs konfigurálva"
@@ -21731,6 +21737,8 @@ hu:
   scored_more_than_d1646bd5: "Több pontot szerzett, mint"
   scored_more_than_score_on_assignmenttitle_2afa1d32: "Több pontot ért el, mint %{score}, ezen a feladaton: %{assignmentTitle}"
   scoring_range_upperbound_to_lowerbound_c017669b: "Pontszámtartomány %{upperBound} és %{lowerBound} között"
+  screen_readers_cannot_determine_what_is_displayed__a57e6723: "A képernyőolvasók nem tudják meghatározni, hogy mi jelenik meg a képen az alternatív szöveg nélkül, amely leírja a kép tartalmát és jelentését."
+  screen_readers_cannot_interpret_tables_without_the_e62912d5: "A képernyőolvasók nem tudják értelmezni a táblázatokat megfelelő szerkezet nélkül. A táblázat feliratai leírják a táblázat kontextusát és általános értelmezését."
   screen_recording_is_in_progress_6e3993ac: "A képernyőfelvétel folyamatban van "
   screenreader_gradebook: 
     assignment_information: 
@@ -23145,6 +23153,7 @@ hu:
   showing_search_results_below_4c9a63d9: "Az alábbi keresési eredmények megjelenítése"
   shrink_permission_74b01aed: "Csökkentés %{permission}"
   shuffle_answers_edb602b7: "Válaszok összekeverése"
+  sighted_users_browse_web_pages_quickly_looking_for_ade806f5: "A látó felhasználók gyorsan böngésznek a weboldalakon, nagy vagy félkövér fejléceket keresve. A képernyőolvasó felhasználói a fejlécekre hagyatkoznak a kontextus megértéséhez. A fejléceknek tömörnek kell lenniük a megfelelő szerkezeten belül."
   sign_in_c6858e26: Bejelentkezés
   sign_up_dafdee18: Feliratkozás
   signature_8d0141c8: Aláírás
@@ -24208,6 +24217,7 @@ hu:
     type: Típus
   table_of_contents_544d9471: Tartalomjegyzék
   table_of_contents_d2d11ba6: Tartalomjegyzék
+  tables_should_include_a_caption_describing_the_con_e91e78fc: "A táblázatoknak tartalmazniuk kell egy feliratot, amely leírja a táblázat tartalmát."
   tabs: 
     announcements: Hirdetmények
     assignments: Feladatok
@@ -27262,6 +27272,7 @@ hu:
                                     új lapon.
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: " Az anonim feladatok osztályzatainak elrejtésekor az osztályzatokat mindenki számára\n\
       \x20                             elrejti a kurzusban. "
+  when_markup_is_used_that_visually_formats_items_as_f941fc1b: "Ha olyan jelölést használnak, amely vizuálisan formázza az elemeket listaként, de nem jelzi a lista kapcsolatát, akkor a felhasználók nehézségekbe ütközhetnek az információk közötti navigáció során."
   when_masquerading_as_course_admin_roles_teacher_ta_e3e3c0a9: |-
       A kurzus adminisztrátori szerepkörnek (tanár/segédoktató/tervező alapszerepkör) álcázásakor a
        Canvas biztosítja, hogy az álcázó felhasználó minden olyan (vagy több) jogosultsággal
