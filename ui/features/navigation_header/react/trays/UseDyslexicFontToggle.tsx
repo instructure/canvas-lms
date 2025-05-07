@@ -32,35 +32,17 @@ import {IconInfoLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('ProfileTray')
 
-// The checkbox toggle is the only thing we have to worry about here,
-// as all the other page elements are just primary-color text, which is
-// the same in both the normal Canvas theme and the Canvas High Contrast
-// theme.
-const hcmColors = canvasHighContrast?.colors
-
-const checkboxThemeOverrides = {
-  color: hcmColors?.contrasts?.grey1111,
-  toggleBackground: hcmColors?.contrasts?.grey1111,
-  labelColor: hcmColors?.contrasts?.grey125125,
-  background: hcmColors?.contrasts?.grey125125,
-  borderColor: hcmColors?.contrasts?.grey125125,
-  uncheckedIconColor: hcmColors?.contrasts?.grey125125,
-  checkedBackground: hcmColors?.contrasts?.green4570,
-  checkedIconColor: hcmColors?.contrasts?.green4570,
-  focusOutlineColor: hcmColors?.contrasts?.blue4570,
-}
-
-type HighContrastLabelProps = {
+type DyslexicFontLabelProps = {
   loading: boolean
   isMobile: boolean
 }
 
 type TipTrigger = 'click' | 'hover' | 'focus'
 
-const HighContrastLabel = ({loading, isMobile}: HighContrastLabelProps) => {
-  const labelText = isMobile ? I18n.t('Hi-contrast') : I18n.t('Use High Contrast UI')
-  const mobileTipText = I18n.t('Enhance color contrast of content')
-  const dekstopTipText = I18n.t('Enhances the color contrast of text, buttons, etc.')
+const DyslexicFontLabel = ({loading, isMobile}: DyslexicFontLabelProps) => {
+  const labelText = isMobile ? I18n.t('Dyslexic font') : I18n.t('Use Dyslexic Friendly Font')
+  const mobileTipText = I18n.t('Use OpenDyslexia font')
+  const dekstopTipText = I18n.t('Enhances the readability of text for users with dyslexia')
   const tipText = isMobile ? mobileTipText : dekstopTipText
   const tipTriggers: TipTrigger[] = ['click']
 
@@ -120,44 +102,44 @@ const HighContrastLabel = ({loading, isMobile}: HighContrastLabelProps) => {
   )
 }
 
-HighContrastLabel.propTypes = {
+DyslexicFontLabel.propTypes = {
   loading: bool.isRequired,
   isMobile: bool.isRequired,
 }
 
-type HighContrastModeToggleProps = {
+type DyslexicFontToggleProps = {
   isMobile: boolean
 }
 
-export default function HighContrastModeToggle({isMobile}: HighContrastModeToggleProps) {
-  const originalSetting = useRef(ENV.use_high_contrast)
-  const [enabled, setEnabled] = useState(ENV.use_high_contrast)
+export default function DyslexicFontToggle({isMobile}: DyslexicFontToggleProps) {
+  const originalSetting = useRef(ENV.use_dyslexic_font)
+  const [enabled, setEnabled] = useState(ENV.use_dyslexic_font)
   const [loading, setLoading] = useState(false)
-  const path = `/api/v1/users/${ENV.current_user_id}/features/flags/high_contrast`
+  const path = `/api/v1/users/${ENV.current_user_id}/features/flags/use_dyslexic_font`
   const changed = originalSetting.current !== enabled
   const margins = isMobile ? 'none none none small' : 'none'
 
-  // Toggles the high_contrast feature flag to the opposite state from where it
+  // Toggles the use_dyslexic_font feature flag to the opposite state from where it
   // is currently at. Note that this only updates the back-end and the current page
   // will remain on the old setting until a new Canvas page load happens (or this
   // page is manually reloaded by the user), so the currently loaded CSS and thus
   // the HCM state of the browser screen will be out of sync with the persistence
   // layer until that happens.
-  async function toggleHiContrast() {
+  async function toggleDyslexicFont() {
     const newState = enabled ? 'off' : 'on'
     setLoading(true)
     try {
       const {json} = await doFetchApi({
         path,
         method: 'PUT',
-        body: {feature: 'high_contrast', state: newState},
+        body: {feature: 'use_dyslexic_font', state: newState},
       })
       // @ts-expect-error
-      if (json.feature !== 'high_contrast') throw new Error('Unexpected response from API call')
+      if (json.feature !== 'use_dyslexic_font') throw new Error('Unexpected response from API call')
       // @ts-expect-error
       setEnabled(json.state === 'on')
       // @ts-expect-error
-      ENV.use_high_contrast = json.state === 'on'
+      ENV.use_dyslexic_font = json.state === 'on'
     } catch (err) {
       if (err instanceof Error) {
         showFlashAlert({
@@ -173,15 +155,14 @@ export default function HighContrastModeToggle({isMobile}: HighContrastModeToggl
   // By definition this control for turning on HCM has to be in HCM all the time,
   // regardless of the global theme, so we have to apply some overrides.
   return (
-    <View as="div" margin={margins} data-testid="high-contrast-toggle">
+    <View as="div" margin={margins} data-testid="dyslexic-font-toggle">
       <Checkbox
-        themeOverride={checkboxThemeOverrides}
         variant="toggle"
         size="small"
-        label={<HighContrastLabel loading={loading} isMobile={isMobile} />}
+        label={<DyslexicFontLabel loading={loading} isMobile={isMobile} />}
         checked={enabled}
         readOnly={loading}
-        onChange={toggleHiContrast}
+        onChange={toggleDyslexicFont}
       />
       {changed && (
         <Text size="small">
@@ -192,6 +173,6 @@ export default function HighContrastModeToggle({isMobile}: HighContrastModeToggl
   )
 }
 
-HighContrastModeToggle.defaultProps = {
+DyslexicFontToggle.defaultProps = {
   isMobile: false,
 }
