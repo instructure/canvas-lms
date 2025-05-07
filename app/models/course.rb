@@ -2515,6 +2515,25 @@ class Course < ActiveRecord::Base
         )
       end
 
+      grade_data = auto_grade_result.grade_data
+      all_missing_comments = grade_data.all? { |item| !item.key?("comments") }
+
+      if all_missing_comments
+
+        grade_data_with_comments = AutoGradeCommentsService.new(
+          assignment: assignment_text,
+          grade_data:,
+          root_account_uuid:
+        ).call
+
+        auto_grade_result.update!(
+          root_account_id: submission.course.root_account_id,
+          grade_data: grade_data_with_comments,
+          error_message: nil,
+          grading_attempts: auto_grade_result.grading_attempts + 1
+        )
+      end
+
       progress&.results = auto_grade_result.grade_data
       progress&.message = nil
       progress&.complete!
