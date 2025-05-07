@@ -17,7 +17,11 @@
   },
   "[json]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "vscode.json-language-features"
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "[ruby]": {
     "editor.defaultFormatter": "Shopify.ruby-lsp",
@@ -25,9 +29,7 @@
     "editor.insertSpaces": true,
     "editor.semanticHighlighting.enabled": true
   },
-  "cSpell.words": [
-    "urlsafe"
-  ],
+  "cSpell.words": ["urlsafe"],
   "search.exclude": {
     ".bundle": true,
     ".git": true,
