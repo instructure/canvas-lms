@@ -143,6 +143,8 @@ class WikiPagesController < ApplicationController
       flash[:warning] = t("notices.cannot_edit", 'You are not allowed to edit the page "%{title}".', title: @page.title)
       redirect_to polymorphic_url([@context, @page])
     end
+
+    css_bundle :wiki_page
   end
 
   def revisions
