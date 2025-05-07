@@ -87,14 +87,22 @@ const CommonFileInfo = ({item}: {item: File}) => {
         <Flex.Item>
           <Text weight="bold">{I18n.t('Date Created')}</Text>
           <br />
-          <Text>{new Date(item.created_at).toLocaleString()}</Text>
+          <Text>
+            {new Date(item.created_at).toLocaleString(ENV.LOCALE, {
+              timeZone: ENV.TIMEZONE,
+            })}
+          </Text>
         </Flex.Item>
       )}
       {'updated_at' in item && (
         <Flex.Item>
           <Text weight="bold">{I18n.t('Date Modified')}</Text>
           <br />
-          <Text>{new Date(item.updated_at).toLocaleString()}</Text>
+          <Text>
+            {new Date(item.updated_at).toLocaleString(ENV.LOCALE, {
+              timeZone: ENV.TIMEZONE,
+            })}
+          </Text>
         </Flex.Item>
       )}
     </Flex>

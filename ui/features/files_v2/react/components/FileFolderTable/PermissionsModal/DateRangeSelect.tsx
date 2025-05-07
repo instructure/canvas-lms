@@ -92,6 +92,7 @@ export const DateRangeSelect = ({
             messages={unlockAtError}
             isRequired={true}
             showMessages={false}
+            timezone={ENV.TIMEZONE}
           />
         </View>
       )}
@@ -113,6 +114,7 @@ export const DateRangeSelect = ({
             messages={lockAtError}
             isRequired={true}
             showMessages={false}
+            timezone={ENV.TIMEZONE}
           />
         </View>
       )}
