@@ -99,8 +99,8 @@ export const ZLtiAssetReport = z.object({
 
   title: z.string().optional(),
   comment: z.string().optional(),
-  score_given: z.number().optional(),
-  score_maximum: z.number().optional(),
+  result: z.string().optional(),
+  result_truncated: z.string().optional(),
   indication_color: z.string().optional(),
   indication_alt: z.string().optional(),
   error_code: z.string().optional(),

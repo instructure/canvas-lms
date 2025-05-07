@@ -22,6 +22,7 @@
 class Lti::AssetReport < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
+  self.ignored_columns += %i[score_given score_maximum]
 
   resolves_root_account through: :asset_processor
 
@@ -78,12 +79,8 @@ class Lti::AssetReport < ApplicationRecord
             },
             if: -> { !deleted? }
   validates :title, length: { minimum: 1, maximum: 1.kilobyte }, allow_nil: true
+  validates :result, length: { maximum: 255 }, allow_nil: true
   validates :comment, length: { minimum: 1, maximum: 64.kilobytes }, allow_nil: true
-  validates :score_given, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :score_maximum, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :score_maximum,
-            presence: { message: I18n.t("must be present if score_given is present") },
-            if: -> { score_given.present? }
   # For now, spec implies must be a hex code if present
   validates :indication_color,
             format: { with: /\A#[0-9a-fA-F]{6}\z/, message: I18n.t("Indication color must be a valid hex code") },
@@ -122,8 +119,8 @@ class Lti::AssetReport < ApplicationRecord
       id:,
       title:,
       comment:,
-      score_given:,
-      score_maximum:,
+      result:,
+      result_truncated:,
       indication_color:,
       indication_alt:,
       error_code:,
@@ -155,6 +152,13 @@ class Lti::AssetReport < ApplicationRecord
   def resubmit_available?
     processing_progress == PROGRESS_PENDING_MANUAL ||
       (processing_progress == PROGRESS_FAILED && [ERROR_CODE_EULA_NOT_ACCEPTED, ERROR_CODE_DOWNLOAD_FAILED].include?(error_code))
+  end
+
+  def result_truncated
+    return nil unless result.is_a?(String) && result.present?
+    return nil if result.length <= 16
+
+    "#{result.first(15)}…"
   end
 
   # Returns all reports for the given asset processor and submission IDs.

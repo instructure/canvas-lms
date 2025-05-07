@@ -46,15 +46,6 @@ RSpec.describe Lti::AssetReport do
         end
       end
 
-      it "is invalid if score_given is provided without score_maximum" do
-        expect do
-          lti_asset_report_model(score_given: 1, score_maximum: nil)
-        end.to raise_error(ActiveRecord::RecordInvalid, /Score maximum must be present if score_given is present/)
-        expect(lti_asset_report_model(score_given: nil, score_maximum: 1)).to be_valid
-        expect(lti_asset_report_model(score_given: nil, score_maximum: nil)).to be_valid
-        expect(lti_asset_report_model(score_given: 1, score_maximum: 1)).to be_valid
-      end
-
       it "requires indication_color to be a hex code" do
         expect(lti_asset_report_model(indication_color: "#123456")).to be_valid
         %w[#1234567 123456 #12345 white].each do |color|
@@ -249,8 +240,7 @@ RSpec.describe Lti::AssetReport do
         comment: "What a great report",
         indication_color: "#008800",
         indication_alt: "WOW",
-        score_given: 8,
-        score_maximum: 10,
+        result: "8/10",
         error_code: "MYERRORCODE",
         processing_progress: "Processed"
       )
@@ -260,12 +250,18 @@ RSpec.describe Lti::AssetReport do
       expect(subject[:id]).to eq(report.id)
       expect(subject[:title]).to eq("My cool report")
       expect(subject[:comment]).to eq("What a great report")
-      expect(subject[:score_given]).to eq(8)
-      expect(subject[:score_maximum]).to eq(10)
+      expect(subject[:result]).to eq("8/10")
+      expect(subject).to_not have_key(:result_truncated)
       expect(subject[:indication_color]).to eq("#008800")
       expect(subject[:indication_alt]).to eq("WOW")
       expect(subject[:error_code]).to eq("MYERRORCODE")
       expect(subject[:processing_progress]).to eq("Processed")
+    end
+
+    it "truncates result_truncated to 16 characters" do
+      report.update!(result: "12345678901234567890")
+      expect(subject[:result_truncated]).to eq("123456789012345…")
+      expect(subject[:result]).to eq("12345678901234567890")
     end
 
     it "includes launch_url_path for processed reports" do
