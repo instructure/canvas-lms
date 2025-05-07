@@ -96,7 +96,7 @@ describe('ActionButtons', () => {
       },
     })
 
-    expect(container.querySelector('#edit-developer-key-button')).toBeInTheDocument()
+    expect(container.querySelector('#edit-developer-key-button-1')).toBeInTheDocument()
   })
 
   it('warns the user when deleting a LTI key', () => {
