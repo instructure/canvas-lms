@@ -72,7 +72,11 @@ export default function BestResults(props: Props) {
       <Flex direction="column" gap="small">
         {props.results.map(result => {
           return (
-            <ResultCard key={result.content_id} result={result} searchTerm={props.searchTerm} />
+            <ResultCard
+              key={`${result.content_id}-${result.content_type}`}
+              result={result}
+              searchTerm={props.searchTerm}
+            />
           )
         })}
       </Flex>

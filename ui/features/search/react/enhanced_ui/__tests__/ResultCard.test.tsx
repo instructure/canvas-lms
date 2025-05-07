@@ -67,6 +67,8 @@ const props = {
     distance: 0.9,
     relevance: 0.8,
     modules: modules,
+    due_date: null,
+    published: true,
   },
 }
 
@@ -120,5 +122,22 @@ describe('ResultCard', () => {
     expect(getByText('Module 4')).toBeInTheDocument()
     expect(getByText('Module 5')).toBeInTheDocument()
     expect(getByText('1 other module')).toBeInTheDocument()
+  })
+
+  it('does not render pills if due_date is null and published is true', () => {
+    const {queryByTestId} = render(<ResultCard {...props} />)
+
+    expect(queryByTestId('3-Page-due')).toBeNull()
+    expect(queryByTestId('3-Page-publish')).toBeNull()
+  })
+
+  it('renders due date and unpublished pills', () => {
+    const date = new Date('May 7, 2025 11:00:00').toString()
+    const {getByText} = render(
+      <ResultCard {...{...props, result: {...props.result, published: false, due_date: date}}} />,
+    )
+
+    expect(getByText('Due May 7')).toBeInTheDocument()
+    expect(getByText('Unpublished')).toBeInTheDocument()
   })
 })

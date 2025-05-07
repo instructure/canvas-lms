@@ -28,6 +28,8 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('SmartSearch')
 
+const MAX_NUMBER_OF_RESULTS = 25
+
 interface Props {
   courseId: string
   isLoading: boolean
@@ -60,8 +62,14 @@ export default function SmartSearchHeader(props: Props) {
     }
 
     try {
+      const params = {
+        q: searchTerm,
+        per_page: MAX_NUMBER_OF_RESULTS,
+        include: ['modules', 'status'],
+      }
       const {json} = await doFetchApi<{results: Result[]}>({
-        path: `/api/v1/courses/${props.courseId}/smartsearch?q=${searchTerm}&per_page=25`,
+        path: `/api/v1/courses/${props.courseId}/smartsearch`,
+        params,
       })
       props.onSuccess(json!.results)
     } catch (error) {

@@ -26,7 +26,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import IndexingProgress from '../IndexingProgress'
 import {Alert} from '@instructure/ui-alerts'
-import {fetchAllModules} from '../utils'
 
 const RELEVANCE_THRESHOLD = 0.5
 const MAX_NUMBER_OF_RESULTS = 25
@@ -43,26 +42,6 @@ export default function EnhancedSmartSearch(props: Props) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [indexingProgress, setIndexingProgress] = useState<IndexProgress | null>(null)
-
-  const setModules = (results: Result[]) => {
-    fetchAllModules(props.courseId, results)
-      .then(response => {
-        // add correct modules to each result
-        const updatedResults = results.map(result => {
-          const matchingResponse = response.find(res => res.assetId === result.content_id)
-          const modules = matchingResponse ? matchingResponse.modules : []
-          return {
-            ...result,
-            modules: modules,
-          }
-        })
-        setSearchResults(updatedResults)
-      })
-      .catch(error => {
-        // just don't update modules if we fail; let users still select results w/o modules
-        console.log('Error fetching modules:', error)
-      })
-  }
 
   const renderResults = () => {
     if (error) {
@@ -109,7 +88,7 @@ export default function EnhancedSmartSearch(props: Props) {
           setIsLoading(true)
         }}
         onSuccess={results => {
-          setModules(results)
+          setSearchResults(results)
           setIsLoading(false)
         }}
         onError={error => {

@@ -62,6 +62,7 @@
 #
 class SmartSearchController < ApplicationController
   include Api::V1::SearchResult
+  include Api::V1::ContextModule
 
   before_action :require_context
   before_action :require_user
@@ -78,6 +79,11 @@ class SmartSearchController < ApplicationController
   # @argument filter[] [String, optional]
   #   Types of objects to search. By default, all supported types are searched. Supported types
   #   include +pages+, +assignments+, +announcements+, and +discussion_topics+.
+  #
+  # @argument include[] [String, "status"|"modules"]
+  #   Optional information to include with each search result:
+  #   modules:: An array of module objects that the search result belongs to.
+  #   status:: The published status for all results and the due_date for all assignments.
   #
   # @returns [SearchResult]
   def search
@@ -98,7 +104,9 @@ class SmartSearchController < ApplicationController
     if params[:q].present?
       scope = SmartSearch.perform_search(@context, @current_user, params[:q], Array(params[:filter]))
       items = Api.paginate(scope, self, api_v1_course_smart_search_query_url(@context))
-      response[:results].concat(search_results_json(filter_for_current_user(items)))
+      filtered_items = filter_for_current_user(items)
+      includes = Array(params[:include])
+      response[:results].concat(search_results_json(filtered_items, @current_user, includes || []))
     end
 
     render json: response
