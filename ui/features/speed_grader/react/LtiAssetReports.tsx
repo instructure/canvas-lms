@@ -33,6 +33,7 @@ import {ToolIconOrDefault} from '@canvas/lti-apps/components/common/ToolIconOrDe
 import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {
   buildAPDisplayTitle,
   ExistingAttachedAssetProcessor,
@@ -119,6 +120,24 @@ function defaultInfoText(progress: LtiAssetReport['processing_progress']) {
   }
 }
 
+function TooltipIfTruncated({full, truncated}: {full: string; truncated: string | undefined}) {
+  if (truncated && full !== truncated) {
+    return (
+      <Tooltip renderTip={full}>
+        <Text as="div" size="small" style={{verticalAlign: 'middle'}}>
+          {truncated}
+        </Text>
+      </Tooltip>
+    )
+  } else {
+    return (
+      <Text as="div" size="small" style={{verticalAlign: 'middle'}}>
+        {full}
+      </Text>
+    )
+  }
+}
+
 const resubmit = async function (url: string) {
   return await doFetchApi({
     path: url,
@@ -154,13 +173,13 @@ function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
         {comment && (
           <Flex.Item>
             <Text size="small">
-              <TruncateText maxLines={4} ignore={[' ', '.', ',']} ellipsis=" ...">
+              <TruncateText maxLines={4} ignore={[' ', '.', ',']}>
                 {comment}
               </TruncateText>
             </Text>
           </Flex.Item>
         )}
-        {report.indication_alt != null || report.score_given != null ? (
+        {report.indication_alt != null || report.result != null ? (
           <Flex.Item>
             <Flex direction="row" gap="x-small">
               {report.indication_color != null ? (
@@ -176,14 +195,9 @@ function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
                   }}
                 />
               ) : undefined}
-              {report.score_given != null ? (
-                <Text as="div" size="small" style={{verticalAlign: 'middle'}}>
-                  {I18n.t('%{scoreGiven} / %{scoreMaximum}', {
-                    scoreGiven: report.score_given,
-                    scoreMaximum: report.score_maximum || I18n.t('n/a'),
-                  })}
-                </Text>
-              ) : undefined}
+              {report.result ? (
+                <TooltipIfTruncated full={report.result} truncated={report.result_truncated} />
+              ) : null}
             </Flex>
           </Flex.Item>
         ) : undefined}
@@ -202,7 +216,7 @@ function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
         {infoText && (
           <Flex.Item>
             <Text as="div" size="small">
-              <TruncateText maxLines={4} ignore={[' ', '.', ',']} ellipsis=" ...">
+              <TruncateText maxLines={4} ignore={[' ', '.', ',']}>
                 <IconInfoSolid inline={true} style={{paddingRight: '0.3em'}} />
                 {infoText}
               </TruncateText>

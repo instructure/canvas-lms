@@ -64,8 +64,7 @@ module Factories
   def processed_lti_asset_report_model(overrides = {})
     new_overrides = {
       comment: "Uh-oh",
-      score_given: 83,
-      score_maximum: 100,
+      result: "83/100",
       indication_color: "#EC0000",
       indication_alt: "High percentage of matched text.",
       priority: 5,
