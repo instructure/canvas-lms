@@ -33,7 +33,7 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
     submission = Submission.find_by(id: input[:submission_id], root_account:)
     raise GraphQL::ExecutionError, "Submission not found" if submission.nil?
 
-    association = submission.course.rubric_associations.find(input[:rubric_association_id])
+    association = RubricAssociation.find(input[:rubric_association_id])
     association_object = association.association_object
 
     assessment = association.rubric_assessments.find(input[:rubric_assessment_id]) if input[:rubric_assessment_id].present?
