@@ -2996,6 +2996,33 @@ describe User do
       expect(user).not_to receive(:pseudonyms)
       expect(user.mfa_settings(pseudonym_hint: p)).to eq :required
     end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      before :once do
+        account = Account.create!(settings: { mfa_settings: :disabled })
+        @p = user.pseudonyms.create!(account:, unique_id: "user")
+        @shard1.activate do
+          account = Account.create!(settings: { mfa_settings: :required })
+          course = course_model(account:)
+          course.enroll_student(user)
+          @p2 = user.pseudonyms.create!(account:, unique_id: "user")
+        end
+      end
+
+      it "does not include deleted pseudonyms when checking associated accounts" do
+        @p2.destroy
+
+        expect(user.mfa_settings).to eq :disabled
+        expect(user.mfa_settings(pseudonym_hint: @p)).to eq :disabled
+      end
+
+      it "includes all active user pseudonyms and returns most restrictive when checking associated accounts" do
+        expect(user.mfa_settings).to eq :required
+        expect(user.mfa_settings(pseudonym_hint: @p)).to eq :required
+      end
+    end
   end
 
   context "crocodoc attributes" do

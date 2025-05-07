@@ -3212,10 +3212,11 @@ class User < ActiveRecord::Base
     end
     return :required if pseudonym_hint&.authentication_provider&.mfa_required?
 
-    pseudonyms = self.pseudonyms.shard(self).preload(:account, authentication_provider: :account)
+    pseudonyms = self.pseudonyms.active.shard(self).preload(:account, authentication_provider: :account)
     return :required if pseudonyms.any? { |p| p.authentication_provider&.mfa_required? }
 
-    result = pseudonyms.map(&:account).uniq.map do |account|
+    associated_pseudonym_account_ids = pseudonyms.unscope(:order).distinct.pluck(:account_id)
+    result = Account.root_accounts.active.where(id: associated_pseudonym_account_ids).map do |account|
       case account.mfa_settings
       when :disabled
         0
