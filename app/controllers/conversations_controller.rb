@@ -315,7 +315,8 @@ class ConversationsController < ApplicationController
                  conversation_cache_key: Base64.encode64("#{@current_user.uuid}jamDN74lLSmfnmo74Hb6snyBnmc6q"),
                  react_inbox_labels: Account.site_admin.feature_enabled?(:react_inbox_labels),
                  inbox_translation_languages: @domain_root_account.feature_enabled?(:translate_inbox_messages) ? Translation.languages(@domain_root_account.feature_enabled?(:ai_translation_improvements)) : [],
-                 inbox_translation_enabled: @domain_root_account.feature_enabled?(:translate_inbox_messages)
+                 inbox_translation_enabled: @domain_root_account.feature_enabled?(:translate_inbox_messages),
+                 inbox_new_player: @domain_root_account.feature_enabled?(:inbox_new_player)
                })
         @page_title = t("Inbox")
         InstStatsd::Statsd.distributed_increment("inbox.visit.react")
