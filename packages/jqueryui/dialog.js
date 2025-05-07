@@ -144,9 +144,9 @@ import './resizable'
         })
         .prependTo( uiDialog );
 
-      uiDialogTitlebarClose = $( "<a href='#'></a>" )
-        .addClass( "ui-dialog-titlebar-close  ui-corner-all" )
-        .attr( "role", "button" )
+      uiDialogTitlebarClose = $( "<button type='button'></button>" )
+        .addClass( "ui-dialog-titlebar-close ui-corner-all" )
+        .attr( "aria-label", options.closeText )
         .click(function( event ) {
           event.preventDefault();
           that.close( event );
