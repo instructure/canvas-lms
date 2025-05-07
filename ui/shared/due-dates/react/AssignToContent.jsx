@@ -100,6 +100,13 @@ const AssignToContent = ({
   )
 
   useEffect(() => {
+    const newGroupCategoryId = getGroupCategoryId?.()
+    if (newGroupCategoryId !== undefined && newGroupCategoryId !== groupCategoryId) {
+      setGroupCategoryId(newGroupCategoryId)
+    }
+  }, [getGroupCategoryId, groupCategoryId])
+
+  useEffect(() => {
     if (getGroupCategoryId === undefined) return
     const handleGroupChange = () => setGroupCategoryId(getGroupCategoryId?.())
     document.addEventListener('group_category_changed', handleGroupChange)
@@ -161,7 +168,7 @@ const AssignToContent = ({
           if (moduleOverride.student_ids) {
             return moduleOverride.student_ids.map(id => `student-${id}`)
           }
-          if(moduleOverride.group_id && moduleOverride.non_collaborative === true) {
+          if (moduleOverride.group_id && moduleOverride.non_collaborative === true) {
             return `tag-${moduleOverride.group_id}`
           }
           return []

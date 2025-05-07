@@ -109,13 +109,13 @@ describe('handlebars_helpers', () => {
     it('default truncates 30 characters', () => {
       const text = 'asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf'
       const truncText = helpers.truncate(text)
-      expect(truncText.length).toBe(30)
+      expect(truncText).toHaveLength(30)
     })
 
     it('expects options for max length', () => {
       const text = 'asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf'
       const truncText = helpers.truncate(text, 10)
-      expect(truncText.length).toBe(10)
+      expect(truncText).toHaveLength(10)
     })
 
     it('supports truncation left', () => {
@@ -238,6 +238,23 @@ describe('handlebars_helpers', () => {
       const format = 'outcomeScore'
       const result = helpers.nf(num, {hash: {format}})
       expect(result).toBeDefined()
+    })
+  })
+
+  describe('selectedIfNumber helper', () => {
+    it('returns selected if the number is equal to the value', () => {
+      const result = helpers.selectedIfNumber(1, 1)
+      expect(result).toBe('selected')
+    })
+
+    it('returns empty string if the number is not equal to the value', () => {
+      const result = helpers.selectedIfNumber(1, 2)
+      expect(result).toBe('')
+    })
+
+    it('returns selected if one of the params is a string number', () => {
+      const result = helpers.selectedIfNumber('1', 1)
+      expect(result).toBe('selected')
     })
   })
 })

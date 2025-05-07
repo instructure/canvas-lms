@@ -760,6 +760,12 @@ const object = {
     }
   },
 
+  selectedIfNumber(thing, thingToCompare) {
+    const thingNumber = Number(thing)
+    const thingToCompareNumber = Number(thingToCompare)
+    return thingNumber === thingToCompareNumber ? 'selected' : ''
+  },
+
   disabledIf(thing, _hash) {
     if (thing) {
       return 'disabled'
