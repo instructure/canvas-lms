@@ -437,7 +437,8 @@
     "@instructure/ui-truncate-text": "10.15.2",
     "@instructure/ui-view": "10.15.2",
     "@instructure/uid": "10.15.2",
-    "jsdom": "25.0.1"
+    "jsdom": "25.0.1",
+    "webpack-dev-server/webpack-dev-middleware": "5.3.4"
   },
   "packageManager": "yarn@1.19.1+sha512.8019df6cbf6b618d391add1c8c986cfec8aa4171d89596a54e32b79d79f640edb4c5b90814fa1bf8b947e3830be3b19c478554f7fd9d61c93505614cd096afc7"
 }
