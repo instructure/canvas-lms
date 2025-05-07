@@ -2213,8 +2213,7 @@ describe ExternalToolsController do
         let_once(:developer_key) { lti_developer_key_model(account: @course.account) }
 
         before do
-          tool = developer_key.lti_registration.new_external_tool(@course)
-          tool.save!
+          developer_key.lti_registration.new_external_tool(@course)
           enable_developer_key_account_binding!(developer_key)
         end
 
@@ -3001,9 +3000,7 @@ describe ExternalToolsController do
         end
       end
       let(:tool) do
-        t = developer_key.lti_registration.new_external_tool(@course)
-        t.save!
-        t
+        developer_key.lti_registration.new_external_tool(@course)
       end
       let(:rl) do
         Lti::ResourceLink.create!(
@@ -3096,9 +3093,7 @@ describe ExternalToolsController do
         specs_require_sharding
 
         let!(:tool) do
-          t = developer_key.lti_registration.new_external_tool(course)
-          t.save!
-          t
+          developer_key.lti_registration.new_external_tool(course)
         end
 
         let(:course) do
@@ -3145,9 +3140,7 @@ describe ExternalToolsController do
 
         context "when the context is not a course" do
           let!(:tool) do
-            t = developer_key.lti_registration.new_external_tool(course.account)
-            t.save!
-            t
+            developer_key.lti_registration.new_external_tool(course.account)
           end
 
           let(:params) { { account_id: course.account.global_id, id: tool.global_id, redirect: true } }

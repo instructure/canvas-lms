@@ -596,7 +596,7 @@ class DeveloperKey < ActiveRecord::Base
         lti_registration.new_external_tool(
           tool.context,
           existing_tool: tool
-        ).save
+        )
       end
     end
   end

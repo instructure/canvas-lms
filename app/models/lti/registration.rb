@@ -109,7 +109,16 @@ class Lti::Registration < ActiveRecord::Base
     Lti::Overlay.find_in_site_admin(self)
   end
 
-  def new_external_tool(context, existing_tool: nil)
+  # Returns a new ContextExternalTool for this Registration and the given context.
+  # If an existing tool is provided, it will be updated with the new configuration.
+  # If errors occur during the update, a ContextExternalToolErrors exception will be raised,
+  # containing the errors from the update.
+  #
+  # @param context [Account | Course] The context for which to create the tool.
+  # @param existing_tool [ContextExternalTool | nil] An existing tool to update.
+  # @param verify_uniqueness [Boolean] Whether or not to check for uniqueness.
+  # @return [ContextExternalTool] A new ContextExternalTool for this Registration and the given context.
+  def new_external_tool(context, existing_tool: nil, verify_uniqueness: false)
     # disabled tools should stay disabled while getting updated
     # deleted tools are never updated during a dev key update so can be safely ignored
     tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
@@ -125,6 +134,15 @@ class Lti::Registration < ActiveRecord::Base
     tool.lti_registration = self
     tool.developer_key = developer_key
     tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || privacy_level
+
+    if verify_uniqueness
+      tool.check_for_duplication
+    end
+
+    if tool.errors.any? || !tool.save
+      raise Lti::ContextExternalToolErrors, tool.errors
+    end
+
     tool
   end
 

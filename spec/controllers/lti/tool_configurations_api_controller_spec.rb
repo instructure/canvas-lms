@@ -545,9 +545,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         subject { installed_tool.reload.workflow_state }
 
         let(:installed_tool) do
-          t = tool_configuration.lti_registration.new_external_tool(context)
-          t.save!
-          t
+          tool_configuration.lti_registration.new_external_tool(context)
         end
         let(:context) { raise "set in examples" }
         let(:privacy_level) { "anonymous" }

@@ -1015,14 +1015,10 @@ describe DeveloperKey do
           let(:shard_1_account) { @shard1.activate { account_model } }
           let(:shard_2_account) { @shard2.activate { account_model } }
           let(:shard_1_tool) do
-            t = @shard1.activate { key.lti_registration.new_external_tool(shard_1_account) }
-            t.save!
-            t
+            @shard1.activate { key.lti_registration.new_external_tool(shard_1_account) }
           end
           let(:shard_2_tool) do
-            t = @shard2.activate { key.lti_registration.new_external_tool(shard_2_account) }
-            t.save!
-            t
+            @shard2.activate { key.lti_registration.new_external_tool(shard_2_account) }
           end
 
           before do
@@ -1040,9 +1036,7 @@ describe DeveloperKey do
           context "when tools are installed at the course level" do
             let(:shard_1_course) { shard_1_account.shard.activate { course_model(account: shard_1_account) } }
             let(:shard_1_course_tool) do
-              t = @shard1.activate { key.lti_registration.new_external_tool(shard_1_course) }
-              t.save!
-              t
+              @shard1.activate { key.lti_registration.new_external_tool(shard_1_course) }
             end
 
             before do
@@ -1074,9 +1068,7 @@ describe DeveloperKey do
         let(:developer_key) { lti_developer_key_model(account:) }
         let(:tool_configuration) { lti_tool_configuration_model(developer_key:) }
         let(:tool) do
-          t = developer_key.lti_registration.new_external_tool(account)
-          t.save!
-          t
+          developer_key.lti_registration.new_external_tool(account)
         end
 
         before do
@@ -1094,9 +1086,7 @@ describe DeveloperKey do
           context "when tools are installed at the course level" do
             let(:course) { course_model(account:) }
             let(:course_tool) do
-              t = developer_key.lti_registration.new_external_tool(course)
-              t.save!
-              t
+              developer_key.lti_registration.new_external_tool(course)
             end
 
             before { course_tool }

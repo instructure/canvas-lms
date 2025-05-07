@@ -68,8 +68,7 @@ RSpec.describe Lti::DeploymentsController do
     context "correctness verifications" do
       before do
         3.times do
-          deployment = registration.new_external_tool(account)
-          deployment.save!
+          registration.new_external_tool(account)
         end
       end
 
@@ -364,7 +363,8 @@ RSpec.describe Lti::DeploymentsController do
     let(:admin) { account_admin_user(account:) }
 
     before do
-      deployment.save!
+      # creates the deployment
+      deployment
     end
 
     it "soft-deletes the deployment" do

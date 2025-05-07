@@ -119,13 +119,10 @@ module Lti
       lti_registration = Lti::Registration.find(params[:registration_id])
       deployment = lti_registration.new_external_tool(@context)
 
-      if deployment.save
-        ContextExternalTool.invalidate_nav_tabs_cache(deployment, @domain_root_account)
-        render json: lti_deployment_json(deployment, @current_user, session, @context)
-      else
-        deployment.destroy if deployment.persisted?
-        render json: deployment.errors, status: :bad_request, content_type: MIME_TYPE
-      end
+      ContextExternalTool.invalidate_nav_tabs_cache(deployment, @domain_root_account)
+      render json: lti_deployment_json(deployment, @current_user, session, @context)
+    rescue Lti::ContextExternalToolErrors => e
+      render json: e.errors, status: :bad_request, content_type: MIME_TYPE
     end
 
     # @API Delete LTI Deployment
