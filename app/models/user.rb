@@ -1940,6 +1940,21 @@ class User < ActiveRecord::Base
     !!feature_enabled?(:use_dyslexic_font)
   end
 
+  # the logic here is copied from feature_flags_controller#index
+  # we don't want to add use_dyslexic_font to ENV if
+  # (a) the flag is shadowed or (b) the flag is off/locked at site admin
+  def can_see_dyslexic_font_feature_flag?(session)
+    can_read_site_admin = Account.site_admin.grants_right?(@current_user, session, :read)
+
+    !!lookup_feature_flag(
+      "use_dyslexic_font",
+      override_hidden: can_read_site_admin,
+      include_shadowed: can_read_site_admin,
+      skip_cache: false,
+      hide_inherited_enabled: true
+    )
+  end
+
   def auto_show_cc?
     !!feature_enabled?(:auto_show_cc)
   end

@@ -143,6 +143,7 @@ export interface EnvCommon {
   help_link_name: string
   help_link_icon: string
   use_high_contrast: boolean
+  use_dyslexic_font?: boolean
   auto_show_cc: boolean
   disable_celebrations: boolean
   disable_keyboard_shortcuts: boolean

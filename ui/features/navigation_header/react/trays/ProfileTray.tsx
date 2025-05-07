@@ -28,6 +28,7 @@ import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import LogoutButton from '../LogoutButton'
 import HighContrastModeToggle from './HighContrastModeToggle'
+import DyslexicFontToggle from './UseDyslexicFontToggle'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import profileQuery from '../queries/profileQuery'
 import {getUnreadCount} from '../queries/unreadCountQuery'
@@ -146,6 +147,7 @@ export default function ProfileTray() {
       </List>
       <hr role="presentation" />
       <HighContrastModeToggle />
+      {'use_dyslexic_font' in window.ENV && <DyslexicFontToggle />}
     </View>
   )
 }
