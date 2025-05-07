@@ -1,0 +1,69 @@
+# to use this add inst-cli/docker-compose/s3.override.yml
+# to your COMPOSE_FILE var in .env
+#
+# Setup steps:
+# Create a config/file_store.yml with the following content:
+#
+# development:
+#   storage: s3
+#
+# Create a config/amazon_s3.yml with the following content:
+#
+# development:
+#   bucket_name: development-bucket
+#   access_key_id: admin@fake.com
+#   secret_access_key: fakepassword
+#   region: us-east-1
+#   endpoint: http://canvas-s3.inst.test:9000
+#   force_path_style: true
+#
+# Tips:
+# Buckets and files can be inspected/managed on http://canvas-s3.inst.test:9001.
+
+services:
+  web:
+    depends_on:
+      - s3
+
+  s3:
+    image: minio/minio:latest
+    container_name: canvas-s3
+    ports:
+      - "9000:9000"  # MinIO API
+      - "9001:9001"  # MinIO Console
+    environment:
+      MINIO_ROOT_USER: admin@fake.com
+      MINIO_ROOT_PASSWORD: fakepassword
+    volumes:
+      - minio_data:/data
+    command: server --console-address ":9001" /data
+    labels:
+      - traefik.enable=true
+    networks:
+      default:
+        aliases:
+          - canvas-s3.$INST_DOMAIN
+
+  createbuckets:
+    image: minio/mc:latest
+    container_name: canvas-createbuckets
+    depends_on:
+      - s3
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      mc alias set myminio http://s3:9000 admin@fake.com fakepassword;
+      mc mb --ignore-existing myminio/development-bucket;
+      mc anonymous set public myminio/development-bucket;
+      exit 0;
+      "
+    labels:
+      - traefik.enable=true
+
+volumes:
+  minio_data:
+
+networks:
+  default:
+    external: true
+    name: "inst_shared"
