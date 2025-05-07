@@ -134,6 +134,16 @@ describe "calendar2" do
           expect(f("#calendar_feed_box")).to be_displayed
         end
 
+        it "uses a proper button element for the calendar feed modal close button" do
+          get "/calendar2"
+
+          f("#calendar-feed button").click
+          close_button = fj(".ui-dialog-titlebar-close:visible")
+          expect(close_button.tag_name).to eq("button")
+          expect(close_button.attribute("type")).to eq("button")
+          expect(close_button.attribute("aria-label")).to eq("Close")
+        end
+
         it "removes calendar item if calendar is unselected", priority: "1" do
           title = "blarg"
           make_event(context: @course, start: Time.zone.now, title:)
