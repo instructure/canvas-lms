@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState, useCallback} from 'react'
 import Focus from '@canvas/outcomes/react/Focus'
 import PropTypes, {arrayOf} from 'prop-types'
 import UploadFileSVG from '../images/UploadFile.svg'
@@ -41,7 +41,7 @@ const Attachment = ({
   setBlob,
   validFileTypes,
   getShouldShowFileRequiredError,
-  setShouldShowFileRequiredError
+  setShouldShowFileRequiredError,
 }) => {
   const [openWebcamModal, setOpenWebcamModal] = useState(false)
   const [dataURL, setDataURL] = useState(null)
@@ -52,8 +52,10 @@ const Attachment = ({
   const fileInputPlaceholderRef = useRef(null)
 
   const fileTypeError = () => {
-    const fileTypes = validFileTypes.join(", ")
-    return I18n.t('This file type is not allowed. Accepted file types are: %{fileTypes}.', {fileTypes})
+    const fileTypes = validFileTypes.join(', ')
+    return I18n.t('This file type is not allowed. Accepted file types are: %{fileTypes}.', {
+      fileTypes,
+    })
   }
 
   // TODO: When we upgrade to InstUI 10, the inputRef prop will be available to use.
@@ -64,7 +66,7 @@ const Attachment = ({
     const handleFocus = () => {
       if (getShouldShowFileRequiredError()) {
         const errorText = I18n.t('A file is required to make a submission.')
-        setErrorMessages([{ text: errorText, type: 'newError' }])
+        setErrorMessages([{text: errorText, type: 'newError'}])
         // reset the value
         setShouldShowFileRequiredError(false)
       }
@@ -72,13 +74,14 @@ const Attachment = ({
     // There is a case where the user drags and drops a file while the native file browser
     // is open. When this is the case, we can't rely on handleAcceptFile to update the
     // state and need to observe changes on the input.
-    const handleChange = (e) => {
+    const handleChange = e => {
       const files = e.target.files
       const fileDropInput = getFileDropInput()
       if (file && files.length === 0 && fileDropInput) {
         // If the user clicks "Cancel", the input will be cleared and we should update the UI to reflect that.
         clearInputFile()
       } else if (files.length > 0 && fileDropInput) {
+        persistFileInput(fileDropInput)
         // If the user clicks "Open", the input will be updated and we should update the UI to reflect that.
         const newFile = files[0]
         if (newFile !== file && isValidFileType(newFile) && isValidFileSize(newFile)) {
@@ -91,16 +94,16 @@ const Attachment = ({
       // set these values from the legacy input on the FileDrop's input
       fileDropInput.name = `attachments[${index}][uploaded_data]`
       fileDropInput.className = `${fileDropInput.className} input-file`
-      fileDropInput.setAttribute("data-testid", `file-upload-${index}`)
+      fileDropInput.setAttribute('data-testid', `file-upload-${index}`)
       // set up focus listener
-      fileDropInput.addEventListener("focus", handleFocus)
-      fileDropInput.addEventListener("change", handleChange)
+      fileDropInput.addEventListener('focus', handleFocus)
+      fileDropInput.addEventListener('change', handleChange)
     }
 
     return () => {
       if (fileDropInput) {
-        fileDropInput.removeEventListener("focus", handleFocus)
-        fileDropInput.removeEventListener("change", handleChange)
+        fileDropInput.removeEventListener('focus', handleFocus)
+        fileDropInput.removeEventListener('change', handleChange)
       }
     }
   }, [file])
@@ -110,6 +113,10 @@ const Attachment = ({
       setBlob(null)
     }
   }, [setBlob])
+
+  const persistFileInput = useCallback(fileDropInput => {
+    fileInputPlaceholderRef.current?.appendChild(fileDropInput)
+  }, [])
 
   const clearErrors = () => {
     setShouldShowFileRequiredError(false)
@@ -122,25 +129,25 @@ const Attachment = ({
     setFile(null)
   }
 
-  const getFileExtension = (file) => {
+  const getFileExtension = file => {
     const name = file.name
     const match = name.match(/\.([^.]+)$/)
     return match ? match[1] : ''
   }
 
-  const isValidFileType = (file) => {
+  const isValidFileType = file => {
     const type = getFileExtension(file)
     if (!validFileTypes.includes(type)) {
-      setErrorMessages([{ text: fileTypeError(), type: 'newError' }])
+      setErrorMessages([{text: fileTypeError(), type: 'newError'}])
       return false
     }
     return true
   }
 
-  const isValidFileSize = (file) => {
+  const isValidFileSize = file => {
     if (file.size === 0) {
       const errorText = I18n.t('Attached files must be greater than 0 bytes.')
-      setErrorMessages([{ text: errorText, type: 'newError' }])
+      setErrorMessages([{text: errorText, type: 'newError'}])
       // Clear the file from the input since we are not accepting it
       clearInputFile()
       return false
@@ -157,15 +164,15 @@ const Attachment = ({
       if (!fileDropInput.value) {
         fileDropInput.files = e.dataTransfer?.files
       }
-      if (fileDropInput && fileInputPlaceholderRef.current) {
-        fileInputPlaceholderRef.current.appendChild(fileDropInput)
+      if (fileDropInput) {
+        persistFileInput(fileDropInput)
       }
       setFile(file)
     }
   }
 
-  const handleRejectedFile = (_file) => {
-    setErrorMessages([{ text: fileTypeError(), type: 'newError' }])
+  const handleRejectedFile = _file => {
+    setErrorMessages([{text: fileTypeError(), type: 'newError'}])
   }
 
   const useWebcamButton = (
@@ -180,12 +187,12 @@ const Attachment = ({
     </Button>
   )
 
-  const legacyFileUpload = (index) => {
+  const legacyFileUpload = index => {
     return (
       <>
         {!file && (
-          <Flex direction='column'>
-            <Flex width='100%'>
+          <Flex direction="column">
+            <Flex width="100%">
               <FileDrop
                 id={`submission_file_drop_${index}`}
                 accept={validFileTypes.length > 0 ? validFileTypes : undefined}
@@ -203,7 +210,7 @@ const Attachment = ({
                     background="primary"
                   >
                     <View as="div" margin="x-large">
-                      <Img src={UploadFileSVG} height='172px' />
+                      <Img src={UploadFileSVG} height="172px" />
                     </View>
                     <View as="div">
                       <Text size="large" lineHeight="double">
@@ -217,17 +224,19 @@ const Attachment = ({
                     </View>
                   </View>
                 }
-                display='inline-block'
-                width='25rem'
-                margin='x-small'
+                display="inline-block"
+                width="25rem"
+                margin="x-small"
                 data-testid={`submission_file_drop_${index}`}
               />
             </Flex>
-            {(hasMediaFeature() && (validFileTypes.length === 0 || validFileTypes.includes('png')) && !dataURL) && (
-              <Flex width='100%' margin='small 0'>
-                {useWebcamButton}
-              </Flex>
-            )}
+            {hasMediaFeature() &&
+              (validFileTypes.length === 0 || validFileTypes.includes('png')) &&
+              !dataURL && (
+                <Flex width="100%" margin="small 0">
+                  {useWebcamButton}
+                </Flex>
+              )}
           </Flex>
         )}
         <div ref={fileInputPlaceholderRef}></div>
@@ -287,7 +296,9 @@ const Attachment = ({
             </Focus>
           </span>
         </div>
-      ) : (legacyFileUpload(index))}
+      ) : (
+        legacyFileUpload(index)
+      )}
 
       <WebcamModal
         open={openWebcamModal}
@@ -308,13 +319,13 @@ Attachment.propTypes = {
   setBlob: PropTypes.func.isRequired,
   validFileTypes: arrayOf(PropTypes.string),
   getShouldShowFileRequiredError: PropTypes.func,
-  setShouldShowFileRequiredError: PropTypes.func
+  setShouldShowFileRequiredError: PropTypes.func,
 }
 
 Attachment.defaultProps = {
   validFileTypes: [],
   getShouldShowFileRequiredError: () => {},
-  setShouldShowFileRequiredError: () => {}
+  setShouldShowFileRequiredError: () => {},
 }
 
 export default Attachment

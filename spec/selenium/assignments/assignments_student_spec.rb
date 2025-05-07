@@ -289,6 +289,19 @@ describe "assignments" do
       end
     end
 
+    it "allows student to submit valid file upload" do
+      _filename_txt, fullpath_txt, _data_txt, _tempfile_txt = get_file("testfile4.txt")
+      @assignment.update(submission_types: "online_upload", allowed_extensions: ".txt")
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f(".submit_assignment_link").click
+      submission_input = f(".submission_attachment input")
+      submission_input.send_keys(fullpath_txt)
+      assignment_form = f("#submit_online_upload_form")
+      submit_form(assignment_form)
+      wait_for_ajax_requests
+      expect(f("#right-side-wrapper")).to include_text("Submitted!")
+    end
+
     # EVAL-3711 Remove this test when instui_nav feature flag is removed
     it "lists the assignments" do
       ag = @course.assignment_groups.first
