@@ -31,10 +31,14 @@ import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {ConversationContext} from '../../../util/constants'
+import CanvasMediaPlayer from '@canvas/canvas-media-player'
+import CanvasStudioPlayer from '@canvas/canvas-studio-player'
+import {MediaPlayer} from '@instructure/ui-media-player'
 import {MediaAttachment} from '@canvas/message-attachments'
 import {formatMessage, containsHtmlTags} from '@canvas/util/TextHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
+import {StudioPlayer} from '@instructure/studio-player'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -48,8 +52,8 @@ export const MessageDetailItem = ({...props}) => {
   const isMessageHtml = containsHtmlTags(props.conversationMessage?.htmlBody)
 
   const messageBody = isMessageHtml
-      ? sanitizeHtml(props.conversationMessage?.htmlBody)
-      : formatMessage(props.conversationMessage?.body)
+    ? sanitizeHtml(props.conversationMessage?.htmlBody)
+    : formatMessage(props.conversationMessage?.body)
   return (
     <Responsive
       match="media"
@@ -149,16 +153,22 @@ export const MessageDetailItem = ({...props}) => {
               })}
             </List>
           )}
-          {mediaComment && (
-            <MediaAttachment
-              file={{
-                mediaID: mediaComment._id,
-                title: mediaComment.title,
-                mediaTracks: mediaComment.media_tracks,
-                mediaSources: mediaComment.mediaSources,
-              }}
-            />
-          )}
+          {mediaComment &&
+            (ENV.inbox_new_player ? (
+              <CanvasStudioPlayer
+                media_id={mediaComment._id}
+                explicitSize={{width: 550, height: 400}}
+              />
+            ) : (
+              <MediaAttachment
+                file={{
+                  mediaID: mediaComment._id,
+                  title: mediaComment.title,
+                  mediaTracks: mediaComment.media_tracks,
+                  mediaSources: mediaComment.mediaSources,
+                }}
+              />
+            ))}
         </>
       )}
     />
