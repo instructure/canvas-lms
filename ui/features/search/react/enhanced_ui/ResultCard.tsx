@@ -28,10 +28,14 @@ import {
   IconAnnouncementLine,
   IconDiscussionLine,
   IconModuleLine,
+  IconCalendarMonthLine,
+  IconUnpublishLine,
 } from '@instructure/ui-icons'
 import stopwords from '../stopwords'
 import type {Module, Result} from '../types'
 import {htmlEscape} from '@instructure/html-escape'
+import {Pill} from '@instructure/ui-pill'
+import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 
 const I18n = createI18nScope('SmartSearch')
 
@@ -152,6 +156,34 @@ export default function ResultCard(props: Props) {
     )
   }
 
+  const renderPills = (id: string, dueDate: string | null, published: boolean | null) => {
+    let datePill,
+      publishPill = null
+    if (dueDate != null) {
+      const fudgedDate = fudgeDateForProfileTimezone(new Date(dueDate))
+      datePill = (
+        <Pill data-testid={`${id}-due`} renderIcon={<IconCalendarMonthLine />}>
+          {I18n.t('Due %{date}', {
+            date: fudgedDate!.toLocaleDateString(undefined, {month: 'short', day: 'numeric'}),
+          })}
+        </Pill>
+      )
+    }
+    if (published === false) {
+      publishPill = (
+        <Pill data-testid={`${id}-publish`} renderIcon={<IconUnpublishLine />}>
+          {I18n.t('Unpublished')}
+        </Pill>
+      )
+    }
+    return (
+      <Flex gap="x-small">
+        {datePill}
+        {publishPill}
+      </Flex>
+    )
+  }
+
   return (
     <Flex
       alignItems="start"
@@ -171,6 +203,11 @@ export default function ResultCard(props: Props) {
       >
         {readable_type}
       </Link>
+      {renderPills(
+        `${props.result.content_id}-${props.result.content_type}`,
+        props.result.due_date ?? null,
+        props.result.published ?? null,
+      )}
       <Text
         as="p"
         dangerouslySetInnerHTML={{

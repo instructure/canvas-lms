@@ -54,4 +54,77 @@ describe SmartSearchController do
       end
     end
   end
+
+  describe "search" do
+    before :once do
+      @user = user_factory
+      @course = course_factory
+      @course.enable_feature!(:smart_search)
+
+      @page = @course.wiki_pages.create! title: "panda pages", body: "foo " * 400
+
+      @module = @course.context_modules.create!(name: "module1")
+      @assignment = @course.assignments.create! name: "panda assignment", description: "...", due_at: 1.day.from_now
+      @module.add_item(id: @assignment.id, type: "assignment")
+
+      @topic = @course.discussion_topics.create! title: "panda topic", message: "...", assignment: @assignment, workflow_state: "unpublished"
+    end
+
+    before do
+      skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
+
+      allow(SmartSearch).to receive(:bedrock_client).and_return(double)
+      allow(SmartSearch).to receive(:generate_embedding) { |input| input.chars.map(&:ord).fill(0, input.size...1024).slice(0...1024) }
+    end
+
+    # mock the distance method + perform_search
+    # both require embeddings to be generated, but we want to test include params
+    it "returns search results" do
+      allow(@page).to receive(:distance).and_return(0.123)
+      allow(SmartSearch).to receive(:perform_search)
+        .with(@course, @user, "panda", [])
+        .and_return([@page])
+      course_with_teacher_logged_in(course: @course, user: @user, active_all: true)
+
+      get "search", params: { course_id: @course.id, q: "panda" }
+      expect(response).to be_successful
+      json = response.parsed_body
+      result = json["results"][0]
+      expect(result["modules"]).to be_nil
+      expect(result["published"]).to be_nil
+      expect(result["due_date"]).to be_nil
+    end
+
+    it "returns search result with modules" do
+      allow(@assignment).to receive(:distance).and_return(0.123)
+      allow(SmartSearch).to receive(:perform_search)
+        .with(@course, @user, "panda", [])
+        .and_return([@assignment])
+      course_with_teacher_logged_in(course: @course, user: @user, active_all: true)
+
+      get "search", params: { course_id: @course.id, q: "panda", include: ["modules"] }
+      expect(response).to be_successful
+      json = response.parsed_body
+      result = json["results"][0]
+      expect(result["modules"].first["id"]).to eq(@module.id)
+      expect(result["published"]).to be_nil
+      expect(result["due_date"]).to be_nil
+    end
+
+    it "returns search results with status" do
+      allow(@topic).to receive(:distance).and_return(0.123)
+      allow(SmartSearch).to receive(:perform_search)
+        .with(@course, @user, "panda", [])
+        .and_return([@topic])
+      course_with_teacher_logged_in(course: @course, user: @user, active_all: true)
+
+      get "search", params: { course_id: @course.id, q: "panda", include: ["status"] }
+      expect(response).to be_successful
+      json = response.parsed_body
+      result = json["results"][0]
+      expect(result["modules"]).to be_nil
+      expect(result["published"]).to be false
+      expect(result["due_date"]).to eq(@assignment.due_at.iso8601)
+    end
+  end
 end
