@@ -195,6 +195,7 @@ module SectionTabHelper
       {
         href: @tab.path,
         title: a_title,
+        id: "#{@tab.label.downcase.tr(" ", "-")}-link",
         "aria-label": a_aria_label,
         "aria-current": a_aria_current_page,
         class: a_classes

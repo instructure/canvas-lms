@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ReactElement, useCallback, useMemo, useRef, useState} from 'react'
+import {ReactElement, useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {queryClient} from '@canvas/query'
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
@@ -40,6 +40,7 @@ import FileFolderInfo from '../../shared/FileFolderInfo'
 import {type File, type Folder} from '../../../../interfaces/File'
 import {isFile} from '../../../../utils/fileFolderUtils'
 import {useFileManagement} from '../../Contexts'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 type AvailabilityOptionId = 'published' | 'unpublished' | 'link_only' | 'date_range'
 
@@ -80,10 +81,14 @@ type PermissionsModalBodyProps = {
     },
   ) => void
   unlockAt: string | null
-  unlockAtInputRef: (el: HTMLInputElement | null) => void
+  unlockAtDateInputRef: (el: HTMLInputElement | null) => void
+  unlockAtTimeInputRef: (el: HTMLInputElement | null) => void
+  unlockAtError: FormMessage[] | undefined
   onChangeUnlockAt: (event: React.SyntheticEvent, isoValue?: string) => void
   lockAt: string | null
-  lockAtInputRef: (el: HTMLInputElement | null) => void
+  lockAtDateInputRef: (el: HTMLInputElement | null) => void
+  lockAtTimeInputRef: (el: HTMLInputElement | null) => void
+  lockAtError: FormMessage[] | undefined
   onChangeLockAt: (event: React.SyntheticEvent, isoValue?: string) => void
 }
 
@@ -217,10 +222,14 @@ const PermissionsModalBody = ({
   visibilityOptions,
   onChangeVisibilityOption,
   unlockAt,
-  unlockAtInputRef,
+  unlockAtDateInputRef,
+  unlockAtTimeInputRef,
+  unlockAtError,
   onChangeUnlockAt,
   lockAt,
-  lockAtInputRef,
+  lockAtDateInputRef,
+  lockAtTimeInputRef,
+  lockAtError,
   onChangeLockAt,
 }: PermissionsModalBodyProps) => {
   const allFolders = useMemo(() => items.every(item => !isFile(item)), [items])
@@ -282,8 +291,10 @@ const PermissionsModalBody = ({
               timeRenderLabel={I18n.t('Time')}
               layout="columns"
               value={unlockAt || undefined}
-              dateInputRef={unlockAtInputRef}
+              dateInputRef={unlockAtDateInputRef}
+              timeInputRef={unlockAtTimeInputRef}
               onChange={onChangeUnlockAt}
+              messages={unlockAtError}
             />
           </View>
 
@@ -297,8 +308,10 @@ const PermissionsModalBody = ({
               timeRenderLabel={I18n.t('Time')}
               layout="columns"
               value={lockAt || undefined}
-              dateInputRef={lockAtInputRef}
+              dateInputRef={lockAtDateInputRef}
+              timeInputRef={lockAtTimeInputRef}
               onChange={onChangeLockAt}
+              messages={lockAtError}
             />
           </View>
         </>
@@ -363,14 +376,18 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
       : {keep: {id: 'keep', label: I18n.t('Keep')}, ...VISIBILITY_OPTIONS}
   }, [items])
 
-  const unlockAtInputRef = useRef<HTMLInputElement | null>(null)
-  const lockAtInputRef = useRef<HTMLInputElement | null>(null)
+  const unlockAtDateInputRef = useRef<HTMLInputElement | null>(null)
+  const unlockAtTimeInputRef = useRef<HTMLInputElement | null>(null)
+  const lockAtDateInputRef = useRef<HTMLInputElement | null>(null)
+  const lockAtTimeInputRef = useRef<HTMLInputElement | null>(null)
   const [isRequestInFlight, setIsRequestInFlight] = useState<boolean>(false)
   const [availabilityOption, setAvailabilityOption] = useState<AvailabilityOption>(() =>
     defaultAvailabilityOption(items),
   )
   const [unlockAt, setUnlockAt] = useState<string | null>(() => defaultDate(items, 'unlock_at'))
+  const [unlockAtError, setUnlockAtError] = useState<FormMessage[]>()
   const [lockAt, setLockAt] = useState<string | null>(() => defaultDate(items, 'lock_at'))
+  const [lockAtError, setLockAtError] = useState<FormMessage[]>()
   const [visibilityOption, setVisibilityOption] = useState(() =>
     defaultVisibilityOption(items, visibilityOptions),
   )
@@ -386,6 +403,12 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
   }, [items, visibilityOptions])
 
   const resetError = useCallback(() => setError(null), [])
+
+  useEffect(() => {
+    setError(null)
+    setLockAtError([])
+    setUnlockAtError([])
+  }, [availabilityOption.id, unlockAt, lockAt])
 
   const startUpdateOperation = useCallback(() => {
     let unlock_at = null
@@ -419,21 +442,38 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
   }, [availabilityOption.id, enableVisibility, items, lockAt, unlockAt, visibilityOption])
 
   const handleSaveClick = useCallback(() => {
-    const unlockAtHasError =
-      availabilityOption.id === 'date_range' &&
-      !unlockAt &&
-      unlockAtInputRef.current?.value.trim() !== ''
-    if (unlockAtHasError) {
-      unlockAtInputRef.current?.focus()
-      return
-    }
-    const lockAtHasError =
-      availabilityOption.id === 'date_range' &&
-      !lockAt &&
-      lockAtInputRef.current?.value.trim() !== ''
-    if (lockAtHasError) {
-      lockAtInputRef.current?.focus()
-      return
+    if (availabilityOption.id === 'date_range') {
+      const errors = {
+        noInput: !unlockAt && !lockAt,
+        unlockAtTime: !!(!unlockAt && unlockAtTimeInputRef.current?.value),
+        lockAtTime: !!(!lockAt && lockAtTimeInputRef.current?.value),
+        unlockAfterLock: !!(unlockAt && lockAt && unlockAt > lockAt),
+      }
+      if (errors.noInput) {
+        setError(I18n.t('Please enter at least one date.'))
+        unlockAtDateInputRef.current?.focus()
+        return
+      }
+
+      if (errors.unlockAtTime) {
+        setUnlockAtError([{text: I18n.t('Invalid date.'), type: 'newError'}])
+        unlockAtDateInputRef.current?.focus()
+        return
+      }
+
+      if (errors.lockAtTime) {
+        setLockAtError([{text: I18n.t('Invalid date.'), type: 'newError'}])
+        lockAtDateInputRef.current?.focus()
+        return
+      }
+
+      if (errors.unlockAfterLock) {
+        setUnlockAtError([
+          {text: I18n.t('Unlock date cannot be after lock date.'), type: 'newError'},
+        ])
+        unlockAtDateInputRef.current?.focus()
+        return
+      }
     }
 
     const usageRightsRequiredForContext =
@@ -442,7 +482,11 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
       isFile(item) ? !item.usage_rights : false,
     )
 
-    if (usageRightsRequiredForContext && hasItemsWithoutUsageRights) {
+    if (
+      usageRightsRequiredForContext &&
+      hasItemsWithoutUsageRights &&
+      availabilityOption.id !== 'unpublished'
+    ) {
       setError(
         I18n.t('Selected items must have usage rights assigned before they can be published.'),
       )
@@ -493,22 +537,28 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
   )
 
   const setUnlockAtInputRef = useCallback((el: HTMLInputElement | null) => {
-    unlockAtInputRef.current = el
+    unlockAtDateInputRef.current = el
   }, [])
 
-  const handleChangeUnlockAt = useCallback(
-    (_: React.SyntheticEvent, isoValue?: string) => setUnlockAt(isoValue || null),
-    [],
-  )
+  const setUnlockAtTimeInputRef = useCallback((el: HTMLInputElement | null) => {
+    unlockAtTimeInputRef.current = el
+  }, [])
+
+  const handleChangeUnlockAt = useCallback((_: React.SyntheticEvent, isoValue?: string) => {
+    setUnlockAt(isoValue || null)
+  }, [])
 
   const setLockAtInputRef = useCallback((el: HTMLInputElement | null) => {
-    unlockAtInputRef.current = el
+    lockAtDateInputRef.current = el
   }, [])
 
-  const handleChangeLockAt = useCallback(
-    (_: React.SyntheticEvent, isoValue?: string) => setLockAt(isoValue || null),
-    [],
-  )
+  const setLockAtTimeInputRef = useCallback((el: HTMLInputElement | null) => {
+    lockAtTimeInputRef.current = el
+  }, [])
+
+  const handleChangeLockAt = useCallback((_: React.SyntheticEvent, isoValue?: string) => {
+    setLockAt(isoValue || null)
+  }, [])
 
   return (
     <>
@@ -536,10 +586,14 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
             visibilityOptions={visibilityOptions}
             onChangeVisibilityOption={handleChangeVisibilityOption}
             unlockAt={unlockAt}
-            unlockAtInputRef={setUnlockAtInputRef}
+            unlockAtDateInputRef={setUnlockAtInputRef}
+            unlockAtTimeInputRef={setUnlockAtTimeInputRef}
+            unlockAtError={unlockAtError}
             onChangeUnlockAt={handleChangeUnlockAt}
             lockAt={lockAt}
-            lockAtInputRef={setLockAtInputRef}
+            lockAtDateInputRef={setLockAtInputRef}
+            lockAtTimeInputRef={setLockAtTimeInputRef}
+            lockAtError={lockAtError}
             onChangeLockAt={handleChangeLockAt}
           />
         </Modal.Body>

@@ -47,7 +47,7 @@ export type PlacementsConfirmationProps = {
    * _possible_ to be toggled
    * in the placements confirmation screen.
    */
-  availablePlacements: LtiPlacement[]
+  availablePlacements: readonly LtiPlacement[]
 
   /**
    * A boolean that determines if the course navigation placement is hidden by default.
@@ -75,58 +75,60 @@ export const UNDOCUMENTED_PLACEMENTS = [
   LtiPlacements.SimilarityDetection, // Only really relevant for LTI 2
 ]
 
-export const PlacementsConfirmation = ({
-  appName,
-  enabledPlacements,
-  courseNavigationDefaultHidden,
-  availablePlacements,
-  onTogglePlacement,
-  onToggleDefaultDisabled,
-}: PlacementsConfirmationProps) => {
-  return (
-    <>
-      <Heading level="h3" margin="0 0 x-small 0">
-        {I18n.t('Placements')}
-      </Heading>
-      <Text
-        dangerouslySetInnerHTML={{
-          __html: I18n.t(
-            'Choose where *%{appName}* may be accessed from. Find more details in the **placements documentation.**',
-            {
-              appName,
-              wrappers: [
-                '<strong>$1</strong>',
-                "<a href='https://canvas.instructure.com/doc/api/file.placements_overview.html' style='text-decoration: underline' target='_blank'>$1</a>",
-              ],
-            },
-          ),
-        }}
-      />
-      {availablePlacements.length === 0 ? (
-        <Text>
-          {I18n.t(
-            "This tool has not requested access to any placements. If installed, it will have access to the LTI APIs but won't be visible for users to launch. The app can be managed via the Manage Apps page.",
-          )}
-        </Text>
-      ) : (
-        <Flex gap="medium" direction="column" margin="medium 0 medium 0">
-          {availablePlacements.map(p => {
-            return (
-              <PlacementCheckbox
-                key={p}
-                placement={p}
-                enabled={enabledPlacements.includes(p)}
-                onTogglePlacement={onTogglePlacement}
-                courseNavigationDefaultHidden={courseNavigationDefaultHidden}
-                onToggleDefaultDisabled={onToggleDefaultDisabled}
-              />
-            )
-          })}
-        </Flex>
-      )}
-    </>
-  )
-}
+export const PlacementsConfirmation = React.memo(
+  ({
+    appName,
+    enabledPlacements,
+    courseNavigationDefaultHidden,
+    availablePlacements,
+    onTogglePlacement,
+    onToggleDefaultDisabled,
+  }: PlacementsConfirmationProps) => {
+    return (
+      <>
+        <Heading level="h3" margin="0 0 x-small 0">
+          {I18n.t('Placements')}
+        </Heading>
+        <Text
+          dangerouslySetInnerHTML={{
+            __html: I18n.t(
+              'Choose where *%{appName}* may be accessed from. Find more details in the **placements documentation.**',
+              {
+                appName,
+                wrappers: [
+                  '<strong>$1</strong>',
+                  "<a href='https://canvas.instructure.com/doc/api/file.placements_overview.html' style='text-decoration: underline' target='_blank'>$1</a>",
+                ],
+              },
+            ),
+          }}
+        />
+        {availablePlacements.length === 0 ? (
+          <Text>
+            {I18n.t(
+              "This tool has not requested access to any placements. If installed, it will have access to the LTI APIs but won't be visible for users to launch. The app can be managed via the Manage Apps page.",
+            )}
+          </Text>
+        ) : (
+          <Flex gap="medium" direction="column" margin="medium 0 medium 0">
+            {availablePlacements.toSorted().map(p => {
+              return (
+                <PlacementCheckbox
+                  key={p}
+                  placement={p}
+                  enabled={enabledPlacements.includes(p)}
+                  onTogglePlacement={onTogglePlacement}
+                  courseNavigationDefaultHidden={courseNavigationDefaultHidden}
+                  onToggleDefaultDisabled={onToggleDefaultDisabled}
+                />
+              )
+            })}
+          </Flex>
+        )}
+      </>
+    )
+  },
+)
 
 type PlacementCheckboxProps = {
   placement: LtiPlacement
@@ -148,6 +150,7 @@ const PlacementCheckbox = React.memo(
       <Flex direction="row" gap="x-small" justifyItems="start" alignItems="center" key={placement}>
         <Flex.Item>
           <Checkbox
+            data-testid={`placement-checkbox-${placement}`}
             labelPlacement="end"
             label={<Text>{i18nLtiPlacement(placement)}</Text>}
             checked={enabled}

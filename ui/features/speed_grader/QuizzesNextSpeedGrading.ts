@@ -125,6 +125,14 @@ function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindo
         EG.renderDiscussionsNavigation('discussion_view_with_context')
         return
       /* falls through */
+      case 'SG.commentKeyPress':
+        EG.addCommentTextAreaFocus()
+        return
+      /* falls through */
+      case 'SG.gradeKeyPress':
+        EG.gradeFocus()
+        return
+      /* falls through */
     }
   }
 

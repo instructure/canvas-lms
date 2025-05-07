@@ -113,5 +113,4 @@ export const AssignmentProgress = ({url, onCompletion, apiCall}) => {
 AssignmentProgress.propTypes = {
   url: string.isRequired,
   onCompletion: func.isRequired,
-  apiCall: func, // Used to override doFetchApi for storybook purposes
 }

@@ -151,7 +151,7 @@ describe Mutations::UpdateConversationParticipants do
 
       it "marks each conversation as unread" do
         allow(InstStatsd::Statsd).to receive(:count)
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         query = <<~GQL
           conversationIds: [#{conv.id}, #{conv2.id}],
           workflowState: "unread"
@@ -163,7 +163,7 @@ describe Mutations::UpdateConversationParticipants do
 
         expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.unread.react", 2)
         expect(InstStatsd::Statsd).not_to have_received(:count).with("inbox.conversation.unread.legacy", 2)
-        expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.unarchived.react")
+        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("inbox.conversation.unarchived.react")
 
         updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
         expect(updated_attrs.pluck("workflowState")).to match_array %w[unread unread]
@@ -172,7 +172,7 @@ describe Mutations::UpdateConversationParticipants do
       it "archives and unsubscribes from two public conversations" do
         conv3 = conversation(sender, user_model, user_model).conversation
         allow(InstStatsd::Statsd).to receive(:count)
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         query = <<~GQL
           conversationIds: [#{conv.id}, #{conv3.id}],
           subscribed: false
@@ -193,7 +193,7 @@ describe Mutations::UpdateConversationParticipants do
 
       it "archives each conversation" do
         allow(InstStatsd::Statsd).to receive(:count)
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         query = <<~GQL
           conversationIds: [#{conv.id}, #{conv2.id}],
           subscribed: false
@@ -214,7 +214,7 @@ describe Mutations::UpdateConversationParticipants do
 
       it "unarchives each conversation" do
         allow(InstStatsd::Statsd).to receive(:count)
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         sender.all_conversations.find_by(conversation: conv).update(workflow_state: "archived", subscribed: false)
         sender.all_conversations.find_by(conversation: conv2).update(workflow_state: "archived", subscribed: false)
         query = <<~GQL
@@ -227,15 +227,15 @@ describe Mutations::UpdateConversationParticipants do
         expect(result["errors"]).to be_nil
         expect(result.dig("data", "updateConversationParticipants", "errors")).to be_nil
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unarchived.react").twice
-        expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.unarchived.legacy")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.unarchived.react").twice
+        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("inbox.conversation.unarchived.legacy")
         updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
         expect(updated_attrs.pluck("workflowState")).to match_array %w[read read]
         expect(updated_attrs.pluck("subscribed")).to match_array [true, true]
       end
 
       it "unarchives each conversation by marking as read" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         sender.all_conversations.find_by(conversation: conv).update(workflow_state: "archived")
         sender.all_conversations.find_by(conversation: conv2).update(workflow_state: "archived")
         query = <<~GQL
@@ -247,15 +247,15 @@ describe Mutations::UpdateConversationParticipants do
         expect(result["errors"]).to be_nil
         expect(result.dig("data", "updateConversationParticipants", "errors")).to be_nil
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unarchived.react").twice
-        expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.unarchived.legacy")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.unarchived.react").twice
+        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("inbox.conversation.unarchived.legacy")
 
         updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
         expect(updated_attrs.pluck("workflowState")).to match_array %w[read read]
       end
 
       it "unarchives each conversation by marking as unread" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         sender.all_conversations.find_by(conversation: conv).update(workflow_state: "archived")
         sender.all_conversations.find_by(conversation: conv2).update(workflow_state: "archived")
         query = <<~GQL
@@ -267,8 +267,8 @@ describe Mutations::UpdateConversationParticipants do
         expect(result["errors"]).to be_nil
         expect(result.dig("data", "updateConversationParticipants", "errors")).to be_nil
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unarchived.react").twice
-        expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.unarchived.legacy")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.unarchived.react").twice
+        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("inbox.conversation.unarchived.legacy")
 
         updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
         expect(updated_attrs.pluck("workflowState")).to match_array %w[unread unread]

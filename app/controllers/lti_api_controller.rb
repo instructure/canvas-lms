@@ -163,7 +163,7 @@ class LtiApiController < ApplicationController
 
   def verify_oauth(tool = nil)
     # load the external tool to grab the key and secret
-    @tool = tool || ContextExternalTool.find(params[:tool_id])
+    @tool = tool || Lti::ToolFinder.find(params[:tool_id])
 
     # verify the request oauth signature, timestamp and nonce
     begin

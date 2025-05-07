@@ -119,7 +119,7 @@ export default class RosterUserView extends View {
     json.canViewLoginIdColumn = ENV.permissions.view_user_logins
     json.canViewSisIdColumn = ENV.permissions.read_sis
     json.canManageDifferentiationTags =
-      ENV.permissions.can_manage_differentiation_tags && ENV.FEATURES.differentiation_tags
+      ENV.permissions.can_manage_differentiation_tags && ENV.permissions.allow_assign_to_differentiation_tags
 
     const candoAdminActions = ENV.permissions.can_allow_course_admin_actions
 

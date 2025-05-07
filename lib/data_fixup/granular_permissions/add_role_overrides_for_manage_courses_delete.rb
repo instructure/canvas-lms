@@ -54,7 +54,7 @@ module DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
            )
           check_locked_state_and_create_ro(manage_courses_ro, change_course_state_ro)
         elsif base_role_type == "AccountMembership" &&
-              (manage_courses_ro&.enabled && change_course_state_ro&.enabled)
+              manage_courses_ro&.enabled && change_course_state_ro&.enabled
           check_locked_state_and_create_ro(manage_courses_ro, change_course_state_ro, enabled: true)
         else
           next

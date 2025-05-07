@@ -19,6 +19,7 @@
 import React, {useCallback} from 'react'
 import {bool, func, oneOf, string, arrayOf, shape} from 'prop-types'
 import moment from 'moment-timezone'
+import {View} from '@instructure/ui-view'
 import {DateTime} from '@instructure/ui-i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
@@ -115,17 +116,20 @@ function BulkDateInput({
   const renderLabel = useCallback(() => <ScreenReaderContent>{label}</ScreenReaderContent>, [label])
 
   return (
-    <CanvasDateInput
-      renderLabel={renderLabel}
-      selectedDate={selectedDateString}
-      formatDate={formatDate}
-      onSelectedDateChange={handleSelectedDateChange}
-      timezone={timezone}
-      interaction={interaction}
-      messages={messages}
-      width={width}
-      withRunningValue={true}
-    />
+    <View as="div" minWidth={width} margin="x-small 0">
+      <CanvasDateInput
+        renderLabel={renderLabel}
+        selectedDate={selectedDateString}
+        formatDate={formatDate}
+        onSelectedDateChange={handleSelectedDateChange}
+        timezone={timezone}
+        interaction={interaction}
+        messages={messages}
+        width={width}
+        size="small"
+        withRunningValue={true}
+      />
+    </View>
   )
 }
 

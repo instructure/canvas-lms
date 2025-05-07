@@ -465,7 +465,7 @@ $(document).ready(function () {
         'confirms.remove_account_admin',
         'Are you sure you want to remove this account admin?',
       ),
-      url: $(this).attr('href'),
+      url: $(this).data('href'),
       success() {
         $item.slideUp(function () {
           $(this).remove()

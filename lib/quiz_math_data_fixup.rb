@@ -33,7 +33,7 @@ module QuizMathDataFixup
       quiz_question["question_data"] = new_data if new_data != old_data
       if quiz_question.changed?
         stat = question_bank ? "updated_math_qb_question" : "updated_math_question"
-        InstStatsd::Statsd.increment(stat)
+        InstStatsd::Statsd.distributed_increment(stat)
         changed = true
         quiz_question.save!
       end
@@ -41,7 +41,7 @@ module QuizMathDataFixup
       Canvas::Errors.capture(e)
     end
     qstat = question_bank ? "updated_math_question_bank" : "updated_math_quiz"
-    InstStatsd::Statsd.increment(qstat) if changed
+    InstStatsd::Statsd.distributed_increment(qstat) if changed
     quiz_or_bank
   end
 

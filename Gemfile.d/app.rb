@@ -22,14 +22,15 @@
 gem "bootsnap", "~> 1.16", require: false
 if $canvas_rails == "7.1"
   gem "rails", "~> 7.1.3"
+  # if rack is updated, please remove gems/autoextend/lib/rack/
+  gem "rack", "~> 3.0.11"
+  gem "sqlite3", "~> 1.7"
 else
   gem "rails", "~> 7.2.0"
+  gem "rack", "~> 3.1"
+  gem "sqlite3", "~> 2.6"
 end
-  # can't upgrade to 3.1 until Rails 7.2
-  # if rack is updated, please remove gems/autoextend/lib/rack/
-  gem "rack", "~> 3.0.11" if $canvas_rails == "7.1"
-  # can't upgrade to 2.0 until Rails 7.2
-  gem "sqlite3", "~> 1.7"
+
 gem "switchman", "~> 4.0"
 gem "guardrail", "~> 3.0"
 gem "switchman-inst-jobs", "~> 4.0"
@@ -100,10 +101,9 @@ gem "parallel", "~> 1.23", require: false
 gem "pdf-reader", "~> 2.11"
 gem "pg_query", "~> 6.0", require: false
 gem "pragmatic_segmenter", "~> 0.3"
-gem "prawn-emoji", "~> 5.3", require: false
+gem "prawn-emoji", "~> 6.0", require: false
 gem "prawn-rails", "~> 1.4"
-  gem "matrix", "0.4.2" # Used to be a default gem but is no more, but prawn depends on it implicitly
-gem "prosopite", "~> 1.3"
+gem "prosopite", "~> 2.1"
 gem "puma", "~> 6.3", require: false
 gem "rack3-brotli", "~> 1.0", require: "rack/brotli"
 gem "rails-observers", "0.1.5"
@@ -118,7 +118,7 @@ gem "rubycas-client", "2.3.9", require: false
 gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "~> 2.3", require: "zip"
 gem "saml2", "~> 3.1"
-gem "sanitize", "~> 6.0", require: false
+gem "sanitize", "~> 7.0", require: false
 gem "stackprof", "~> 0.2" # must be loaded before Sentry
 gem "sentry-rails", "~> 5.10"
 gem "sentry-inst_jobs", "~> 5.10"

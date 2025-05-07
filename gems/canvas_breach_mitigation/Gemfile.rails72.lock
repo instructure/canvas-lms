@@ -24,18 +24,18 @@ GEM
     bigdecimal (3.1.9)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.0)
-    diff-lcs (1.6.0)
+    diff-lcs (1.6.1)
     docile (1.4.1)
     drb (2.2.1)
-    i18n (1.14.6)
+    i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    logger (1.6.6)
-    minitest (5.25.4)
+    logger (1.7.0)
+    minitest (5.25.5)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
       rspec-mocks (~> 3.13.0)
-    rspec-core (3.13.2)
+    rspec-core (3.13.3)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.3)
       diff-lcs (>= 1.2.0, < 2.0)
@@ -62,7 +62,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   canvas_breach_mitigation!
   rspec (~> 3.12)
   simplecov (~> 0.22)

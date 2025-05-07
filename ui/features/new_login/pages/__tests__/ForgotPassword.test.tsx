@@ -19,7 +19,7 @@
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import {MemoryRouter, useNavigate} from 'react-router-dom'
+import {MemoryRouter, useLocation, useNavigate, useNavigationType} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../context'
 import {forgotPassword} from '../../services'
 import ForgotPassword from '../ForgotPassword'
@@ -27,6 +27,8 @@ import ForgotPassword from '../ForgotPassword'
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
+  useNavigationType: jest.fn(),
+  useLocation: jest.fn(),
 }))
 
 jest.mock('../../context', () => {
@@ -57,6 +59,8 @@ describe('ForgotPassword', () => {
   }
 
   const mockNavigate = jest.fn()
+  const mockNavigationType = useNavigationType as jest.Mock
+  const mockLocation = useLocation as jest.Mock
   beforeAll(() => {
     ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
   })
@@ -68,7 +72,6 @@ describe('ForgotPassword', () => {
     ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
       loginHandleName: 'Email',
     }))
-    setup()
   })
 
   afterEach(() => {
@@ -78,6 +81,7 @@ describe('ForgotPassword', () => {
   describe('form validation', () => {
     describe('when required fields are empty', () => {
       it('does not allow the form to submit', async () => {
+        setup()
         const submitButton = screen.getByTestId('submit-button')
         await userEvent.click(submitButton)
         const emailInput = await screen.findByTestId('email-input')
@@ -85,6 +89,7 @@ describe('ForgotPassword', () => {
       })
 
       it('displays a required validation message', async () => {
+        setup()
         const submitButton = screen.getByTestId('submit-button')
         await userEvent.click(submitButton)
         const errorMessage = await screen.findByText('Please enter a valid email.')
@@ -92,6 +97,7 @@ describe('ForgotPassword', () => {
       })
 
       it('renders an asterisk for required fields', async () => {
+        setup()
         const submitButton = screen.getByTestId('submit-button')
         await userEvent.click(submitButton)
         const requiredLabels = screen.getAllByText(/\*$/)
@@ -99,6 +105,7 @@ describe('ForgotPassword', () => {
       })
 
       it('displays the asterisk in red color', async () => {
+        setup()
         const submitButton = screen.getByTestId('submit-button')
         await userEvent.click(submitButton)
         const requiredLabels = screen.getAllByText(/\*$/)
@@ -109,6 +116,7 @@ describe('ForgotPassword', () => {
       })
 
       it('shows validation error for invalid email format', async () => {
+        setup()
         const emailInput = screen.getByTestId('email-input')
         const submitButton = screen.getByTestId('submit-button')
         await userEvent.type(emailInput, 'invalid-email')
@@ -119,6 +127,7 @@ describe('ForgotPassword', () => {
     })
 
     it('moves focus to the email input when validation fails', async () => {
+      setup()
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.click(submitButton)
       const emailInput = screen.getByTestId('email-input')
@@ -128,12 +137,14 @@ describe('ForgotPassword', () => {
 
   describe('user input', () => {
     it('allows user to enter an email', async () => {
+      setup()
       const emailInput = screen.getByTestId('email-input')
       await userEvent.type(emailInput, 'test@example.com')
       expect(emailInput).toHaveValue('test@example.com')
     })
 
     it('trims whitespace from the email input', async () => {
+      setup()
       const emailInput = screen.getByTestId('email-input')
       await userEvent.type(emailInput, '  test@example.com  ')
       expect(emailInput).toHaveValue('test@example.com')
@@ -142,27 +153,33 @@ describe('ForgotPassword', () => {
 
   describe('navigation behavior', () => {
     describe('when the cancel button is clicked', () => {
-      it('navigates back to the login page', async () => {
-        const cancelButton = screen.getByTestId('cancel-button')
-        await userEvent.click(cancelButton)
+      it('navigates back to login when there is no previous history', async () => {
+        setup()
+        const backButton = screen.getByTestId('cancel-button')
+        await userEvent.click(backButton)
         expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
         expect(mockNavigate).toHaveBeenCalledTimes(1)
       })
 
       it('navigates back to the previous page when history exists', async () => {
-        const originalHistoryLength = window.history.length
-        Object.defineProperty(window, 'history', {
-          value: {length: 2},
-          writable: true,
-        })
-        const cancelButton = screen.getByTestId('cancel-button')
-        await userEvent.click(cancelButton)
+        mockNavigationType.mockReturnValue('PUSH')
+        mockLocation.mockReturnValue({key: 'abc123'}) // non-default key
+        ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
+        setup()
+        const backButton = screen.getByTestId('cancel-button')
+        await userEvent.click(backButton)
         expect(mockNavigate).toHaveBeenCalledWith(-1)
         expect(mockNavigate).toHaveBeenCalledTimes(1)
-        Object.defineProperty(window, 'history', {
-          value: {length: originalHistoryLength},
-          writable: true,
-        })
+      })
+
+      it('navigates to fallback when navigationType is POP or key is default', async () => {
+        mockNavigationType.mockReturnValue('POP')
+        mockLocation.mockReturnValue({key: 'default'})
+        ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
+        setup()
+        const backButton = screen.getByTestId('cancel-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
       })
     })
 
@@ -171,6 +188,7 @@ describe('ForgotPassword', () => {
         status: 200,
         data: {requested: true},
       })
+      setup()
       const emailInput = screen.getByTestId('email-input')
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.type(emailInput, 'test@example.com')
@@ -185,6 +203,7 @@ describe('ForgotPassword', () => {
 
   describe('ui behavior', () => {
     it('displays the correct login handle label', () => {
+      setup()
       // this label is customizable by the end-user
       expect(screen.getByLabelText(/Email/i)).toBeInTheDocument()
     })
@@ -194,6 +213,7 @@ describe('ForgotPassword', () => {
         status: 200,
         data: {requested: true},
       })
+      setup()
       const emailInput = screen.getByTestId('email-input')
       const submitButton = screen.getByTestId('submit-button')
       const cancelButton = screen.getByTestId('cancel-button')
@@ -216,6 +236,7 @@ describe('ForgotPassword', () => {
         status: 200,
         data: {requested: true},
       })
+      setup()
       const emailInput = screen.getByTestId('email-input')
       await userEvent.type(emailInput, 'test@example.com')
       const submitButton = screen.getByTestId('submit-button')
@@ -233,6 +254,7 @@ describe('ForgotPassword', () => {
         status: 200,
         data: {requested: true},
       })
+      setup()
       const emailInput = screen.getByTestId('email-input')
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.type(emailInput, 'test@example.com')
@@ -246,6 +268,7 @@ describe('ForgotPassword', () => {
 
   describe('api interactions', () => {
     it('calls forgotPassword API with the entered email', async () => {
+      setup()
       const emailInput = screen.getByTestId('email-input')
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.type(emailInput, 'test@example.com')

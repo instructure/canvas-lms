@@ -90,6 +90,7 @@ describe Lti::IMS::DynamicRegistrationController do
           "claims" => ["iss", "sub"],
           "target_link_uri" => "https://example.com/launch",
           "https://canvas.instructure.com/lti/privacy_level" => "email_only",
+          "https://canvas.instructure.com/lti/vendor" => "Vendor",
         },
       }.merge(
         scopes ? { "scope" => scopes.join(" ") } : {}
@@ -156,6 +157,7 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(created_registration.canvas_configuration["custom_fields"]).to eq({ "global_foo" => "global_bar" })
           expect(created_registration.unified_tool_id).to eq("asdf")
           expect(created_registration.registration_url).to eq("https://example.com/registration")
+          expect(created_registration.lti_registration.vendor).to eq("Vendor")
         end
 
         it "validates using the schema's to_model_attrs" do

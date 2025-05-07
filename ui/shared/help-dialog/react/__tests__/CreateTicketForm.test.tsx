@@ -336,4 +336,28 @@ describe('CreateTicketForm', () => {
       expect(getByTestId('subject-input')).toHaveValue('')
     })
   })
+
+  describe('Captcha', () => {
+    it('loads script when user is not logged in', () => {
+      mockEnv({ current_user_id: null })
+      render(<CreateTicketForm {...props} />)
+      const script = document.querySelector('head script[src="https://www.google.com/recaptcha/api.js"]')
+      expect(script).toBeInTheDocument()
+    })
+
+    it('removes script on unmount when user is not logged in', () => {
+      mockEnv({ current_user_id: null })
+      const { unmount } = render(<CreateTicketForm {...props} />)
+      unmount()
+      const script = document.querySelector('head script[src="https://www.google.com/recaptcha/api.js"]')
+      expect(script).toBeNull()
+    })
+
+    it('does not load script when user is logged in', () => {
+      mockEnv({ current_user_id: '64' })
+      render(<CreateTicketForm {...props} />)
+      const script = document.querySelector('head script[src="https://www.google.com/recaptcha/api.js"]')
+      expect(script).toBeNull()
+    })
+  })
 })

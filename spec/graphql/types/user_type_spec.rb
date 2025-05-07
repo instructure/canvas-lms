@@ -78,6 +78,13 @@ describe Types::UserType do
     end
   end
 
+  context "name" do
+    it "encodes html entities" do
+      @student.update! name: "<script>alert(1)</script>"
+      expect(user_type.resolve("name")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
+    end
+  end
+
   context "shortName" do
     before(:once) do
       @student.update! short_name: "new display name"
@@ -90,6 +97,18 @@ describe Types::UserType do
     it "returns full name if shortname is not set" do
       @student.update! short_name: nil
       expect(user_type.resolve("shortName")).to eq @student.name
+    end
+
+    it "encodes html entities" do
+      @student.update! short_name: "<script>alert(1)</script>"
+      expect(user_type.resolve("shortName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
+    end
+  end
+
+  context "sortableName" do
+    it "encodes html entities" do
+      @student.update! sortable_name: "<script>alert(1)</script>"
+      expect(user_type.resolve("sortableName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
     end
   end
 
@@ -857,7 +876,7 @@ describe Types::UserType do
     end
 
     it "scopes the conversations" do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       conversation(@student, @teacher, { body: "You get that thing I sent ya?" })
       conversation(@teacher, @student, { body: "oh yea =)" })
       conversation(@student, @random_person, { body: "Whats up?", starred: true })
@@ -870,21 +889,21 @@ describe Types::UserType do
       )
       expect(result.flatten.count).to eq 3
       expect(result.flatten).to match_array ["You get that thing I sent ya?", "oh yea =)", "Whats up?"]
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.inbox.pages_loaded.react")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.scope.inbox.pages_loaded.react")
 
       result = type.resolve(
         "conversationsConnection(scope: \"starred\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
       )
       expect(result.count).to eq 1
       expect(result[0][0]).to eq "Whats up?"
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.starred.pages_loaded.react")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.scope.starred.pages_loaded.react")
 
       type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
       result = type.resolve(
         "conversationsConnection(scope: \"unread\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
       )
       expect(result.flatten.count).to eq 2
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.unread.pages_loaded.react")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.scope.unread.pages_loaded.react")
 
       type = GraphQLTypeTester.new(
         @random_person,
@@ -894,7 +913,7 @@ describe Types::UserType do
       )
       result = type.resolve("conversationsConnection(scope: \"sent\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
       expect(result[0][0]).to eq "Help! Please make me non-random!"
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.sent.pages_loaded.react")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.scope.sent.pages_loaded.react")
 
       @conversation.update!(workflow_state: "archived")
       type = GraphQLTypeTester.new(
@@ -905,7 +924,7 @@ describe Types::UserType do
       )
       result = type.resolve("conversationsConnection(scope: \"archived\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
       expect(result[0][0]).to eq "Help! Please make me non-random!"
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.archived.pages_loaded.react")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.scope.archived.pages_loaded.react")
       @conversation.update!(workflow_state: "read")
     end
   end
@@ -998,7 +1017,10 @@ describe Types::UserType do
 
     context "differentiation tags" do
       before do
-        Account.default.enable_feature!(:differentiation_tags)
+        Account.default.enable_feature! :assign_to_differentiation_tags
+        Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        Account.default.save!
+        Account.default.reload
         @collaborative_category = @course.group_categories.create!(name: "Collaborative Category", non_collaborative: false)
         @collaborative_group = @course.groups.create!(name: "Collaborative group", group_category: @collaborative_category)
         @collaborative_group.add_user(@student)
@@ -1030,7 +1052,10 @@ describe Types::UserType do
         end
 
         it "does not return differentiation tags when flag is off" do
-          Account.default.disable_feature!(:differentiation_tags)
+          Account.default.disable_feature! :assign_to_differentiation_tags
+          Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false }
+          Account.default.save!
+          Account.default.reload
 
           result = teacher_type.resolve("recipients(context: \"course_#{@course.id}\") { contextsConnection { nodes { name } } }")
           expect(result).not_to include("Differentiation Tags")
@@ -1368,7 +1393,9 @@ describe Types::UserType do
     end
 
     it "includes non_collaborative group when asked for by someone with permissions" do
-      Account.default.enable_feature!(:differentiation_tags)
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
       allow_any_instance_of(Course).to receive(:grants_any_right?).with(@student, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(true)
 
       @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Groups", non_collaborative: true)
@@ -1386,7 +1413,9 @@ describe Types::UserType do
     end
 
     it "excludes non_collaborative groups when asked for by someone without permissions" do
-      Account.default.enable_feature!(:differentiation_tags)
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
       @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Groups", non_collaborative: true)
       group_with_user(user: @student, active_all: true)
       favorite_group = @group
@@ -1401,7 +1430,9 @@ describe Types::UserType do
     end
 
     it "excludes non_collaborative groups when asked for by someone without permissions and no favorite groups" do
-      Account.default.enable_feature!(:differentiation_tags)
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
       @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Groups", non_collaborative: true)
 
       hidden_group_membership = group_with_user(user: @student, active_all: true, group_category: @non_collaborative_category, context: @course)
@@ -1735,11 +1766,11 @@ describe Types::UserType do
       end
 
       it "can retrieve submission comments" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { commentsConnection { nodes { comment }} }  }")
         expect(query_result[0].count).to eq 3
         expect(query_result[0]).to match_array ["First comment", "Second comment", "Third comment"]
-        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.submission_comments.pages_loaded.react")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.scope.submission_comments.pages_loaded.react")
       end
 
       it "can get createdAt" do

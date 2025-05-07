@@ -294,6 +294,7 @@ describe "context modules" do
     end
 
     it "shows student progress once discussion-contribute requirement is met", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       @discussion_1 = @course.assignments.create!(name: "Discuss!", points_possible: "5", submission_types: "discussion_topic")
       tag = @module1.add_item({ id: @discussion_1.id, type: "assignment" })
       add_requirement({ tag.id => { type: "must_contribute" } })

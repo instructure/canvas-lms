@@ -23,7 +23,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Text} from '@instructure/ui-text'
-import {statuses} from '../constants/statuses'
+import {getStatuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
 import type {StatusColors} from '../constants/colors'
 
@@ -58,6 +58,7 @@ class StatusesModal extends React.Component<Props, State> {
   doneButton: InstanceType<typeof Button> | null = null
 
   modalContentRef: HTMLDivElement | null = null
+  statuses: string[]
 
   constructor(props: Props) {
     super(props)
@@ -65,6 +66,7 @@ class StatusesModal extends React.Component<Props, State> {
     this.colorPickerButtons = {}
     this.colorPickerContents = {}
     this.state = {colors: props.colors, openPopover: null}
+    this.statuses = getStatuses()
   }
 
   updateStatusColorsFn =
@@ -126,7 +128,7 @@ class StatusesModal extends React.Component<Props, State> {
   }
 
   renderListItems() {
-    return statuses.map(status => (
+    return this.statuses.map(status => (
       <StatusColorListItem
         key={status}
         status={status}

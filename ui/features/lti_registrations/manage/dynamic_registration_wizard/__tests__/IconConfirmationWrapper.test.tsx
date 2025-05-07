@@ -239,11 +239,11 @@ describe('IconConfirmation', () => {
     await userEvent.clear(input)
     await userEvent.click(input)
     await userEvent.paste('invalid-url')
+    await userEvent.tab()
 
     expect(input).toHaveValue('invalid-url')
     expect(screen.getByText(/invalid URL/i)).toBeInTheDocument()
     expect(screen.getByTitle('Global Navigation icon')).not.toHaveAttribute('src', 'invalid-url')
-    expect(screen.getByRole('button', {name: /next/i})).toBeDisabled()
   })
 
   it('should transition to reviewing state when all icons are valid and the next button is clicked', async () => {

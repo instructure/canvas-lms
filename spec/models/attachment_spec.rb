@@ -1085,6 +1085,18 @@ describe Attachment do
           expect(attachment.instfs_uuid).to eq "more_uuid"
         end
       end
+
+      it "handles a duplication error and attempts to re-upload instead" do
+        expect(InstFS).to receive(:duplicate_file).with("instfs_uuid").and_raise(InstFS::DuplicationError)
+        expect(@attachment).to receive(:open).and_return(StringIO.new("fake content"))
+        expect(InstFS).to receive(:direct_upload) { |args| args[:file_object].read == "fake content" }
+        @shard1.activate do
+          account_model
+          course_model(account: @account)
+          attachment = @attachment.clone_for(@course, nil, { force_copy: true })
+          attachment.save!
+        end
+      end
     end
 
     it "clones to another context" do
@@ -2149,6 +2161,24 @@ describe Attachment do
       expect(@root.reload.children).to eq []
       expect(@child.reload.root_attachment_id).to be_nil
       expect(@child["filename"]).to eq @root.filename
+    end
+  end
+
+  describe "make_rootless" do
+    before do
+      local_storage!
+    end
+
+    before :once do
+      @root = attachment_model(uploaded_data: default_uploaded_data)
+      @child = attachment_model(root_attachment: @root)
+    end
+
+    it "makes independent copy from root attachment" do
+      @child.make_rootless
+      expect(@child.reload.root_attachment_id).to be_nil
+      expect(@child.filename).not_to eq @root.filename
+      expect(@child.open.read).to eq @root.open.read
     end
   end
 

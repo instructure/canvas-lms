@@ -311,6 +311,7 @@ export const MessageDetailContainer = props => {
     <View
       as="div"
       borderWidth="small none none none"
+      borderColor="secondary"
       padding="small"
       key={message.id}
       elementRef={el => {

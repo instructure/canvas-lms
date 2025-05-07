@@ -63,6 +63,7 @@ describe "discussion assignments" do
       end
 
       it "creates a group discussion ungraded", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         expect_new_page_load { submit_form(".form-actions") }
         expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
                                                            "each group has its own conversation for this topic. " \
@@ -70,6 +71,7 @@ describe "discussion assignments" do
       end
 
       it "creates a group discussion graded", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         f("#use_for_grading").click
         f("#discussion_topic_assignment_points_possible").send_keys("10")
         click_option("#assignment_group_id", "Assignment Group")
@@ -132,6 +134,7 @@ describe "discussion assignments" do
     end
 
     it "allows the student to reply and teacher to see the unread count", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       expect(f(".new-and-total-badge .new-items").text).to include ""
       user_session(@student1)

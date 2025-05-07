@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState, useCallback } from 'react'
+import React, {useState, useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
@@ -25,13 +25,11 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import ContextModulesPublishIcon from '@canvas/context-modules/react/ContextModulesPublishIcon'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
-import { queryClient } from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import ModuleActionMenu from '../componentsTeacher/ModuleActionMenu'
-import {
-  handlePublishComplete,
-} from '../handlers/moduleActionHandlers'
-import { Pill } from '@instructure/ui-pill'
-import {Prerequisite, CompletionRequirement} from '../utils/types'
+import {handlePublishComplete} from '../handlers/moduleActionHandlers'
+import {Pill} from '@instructure/ui-pill'
+import {Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import AddItemModal from './AddItemModalComponents/AddItemModal'
 
@@ -45,8 +43,17 @@ interface ModuleHeaderActionPanelProps {
   prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
-  handleOpeningModuleUpdateTray?: (moduleId?: string, moduleName?: string, prerequisites?: {id: string, name: string, type: string}[], openTab?: 'settings' | 'assign-to') => void
+  handleOpeningModuleUpdateTray?: (
+    moduleId?: string,
+    moduleName?: string,
+    prerequisites?: {id: string; name: string; type: string}[],
+    openTab?: 'settings' | 'assign-to',
+  ) => void
   itemCount?: number
+  // Add props for managing module content tray
+  setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
+  setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
 }
 
 const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
@@ -58,7 +65,10 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   completionRequirements,
   requirementCount = null,
   handleOpeningModuleUpdateTray,
-  itemCount
+  itemCount,
+  setModuleAction,
+  setIsManageModuleContentTrayOpen,
+  setSourceModule,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDirectShareOpen, setIsDirectShareOpen] = useState(false)
@@ -68,23 +78,29 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
 
   const onPublishCompleteRef = useCallback(() => {
     handlePublishComplete(queryClient, id, courseId)
-  }, [queryClient, id, courseId])
+  }, [id, courseId])
 
   return (
     <>
-      <Flex gap="small" alignItems="center" justifyItems="end" wrap='wrap'>
-        {prerequisites?.length && <Flex.Item>
-          <Text size="small" color="secondary">
-            {I18n.t('Prerequisites: %{prerequisiteModuleName}', { prerequisiteModuleName: prerequisites?.map?.(p => p.name).join(', ') || '' })}
-          </Text>
-        </Flex.Item>}
-        {completionRequirements?.length && <Flex.Item>
-          <Pill>
-            <Text size="medium" weight='bold'>
-              {requirementCount ? I18n.t('Complete One Item') : I18n.t('Complete All Items')}
+      <Flex gap="small" alignItems="center" justifyItems="end" wrap="wrap">
+        {prerequisites?.length && (
+          <Flex.Item>
+            <Text size="small" color="secondary">
+              {I18n.t('Prerequisites: %{prerequisiteModuleName}', {
+                prerequisiteModuleName: prerequisites?.map?.(p => p.name).join(', ') || '',
+              })}
             </Text>
-          </Pill>
-        </Flex.Item>}
+          </Flex.Item>
+        )}
+        {completionRequirements?.length && (
+          <Flex.Item>
+            <Pill>
+              <Text size="medium" weight="bold">
+                {requirementCount ? I18n.t('Complete One Item') : I18n.t('Complete All Items')}
+              </Text>
+            </Pill>
+          </Flex.Item>
+        )}
         <Flex.Item>
           <ContextModulesPublishIcon
             courseId={courseId}
@@ -98,7 +114,7 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
         <Flex.Item>
           <IconButton
             size="small"
-            screenReaderLabel={I18n.t("Add Item")}
+            screenReaderLabel={I18n.t('Add Item')}
             renderIcon={IconPlusLine}
             withBorder={false}
             withBackground={true}
@@ -116,6 +132,9 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
             handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
             setIsDirectShareOpen={setIsDirectShareOpen}
             setIsDirectShareCourseOpen={setIsDirectShareCourseOpen}
+            setModuleAction={setModuleAction}
+            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+            setSourceModule={setSourceModule}
           />
         </Flex.Item>
       </Flex>

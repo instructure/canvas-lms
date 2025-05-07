@@ -33,6 +33,7 @@ class DeveloperKey < ActiveRecord::Base
 
   CONFIDENTIAL_CLIENT_TYPE = "confidential"
   PUBLIC_CLIENT_TYPE = "public"
+  ALLOWED_AUTHORIZED_FLOWS = ["service_user_client_credentials"].freeze
 
   include CustomValidations
   include Workflow
@@ -76,6 +77,7 @@ class DeveloperKey < ActiveRecord::Base
   validate :validate_public_jwk
   validate :validate_lti_fields
   validate :validate_flag_combinations
+  validate :validate_authorized_flows
 
   attr_reader :private_jwk
   attr_accessor :skip_lti_sync, :current_user
@@ -414,10 +416,10 @@ class DeveloperKey < ActiveRecord::Base
   # If true, this key can be used for "service authentication" (a token request
   # using a client_credentials grant type and a pre-determined service user).
   #
-  # For now we will only allow this pattern for internal services in the
-  # site admin account.
+  # This pattern is only supported for site admin keys with
+  # "service_user_client_credentials" in authorized_flows.
   def site_admin_service_auth?
-    internal_service? && site_admin? && service_user.present?
+    authorized_flows.include?("service_user_client_credentials") && site_admin? && service_user.present?
   end
 
   def tool_configuration
@@ -518,7 +520,7 @@ class DeveloperKey < ActiveRecord::Base
     tags = { method: }
     latency = (Time.zone.now.to_i - start_time) * 1000 # ms for DD
 
-    InstStatsd::Statsd.increment("#{stat_prefix}.count", tags:)
+    InstStatsd::Statsd.distributed_increment("#{stat_prefix}.count", tags:)
     InstStatsd::Statsd.timing("#{stat_prefix}.latency", latency, tags:)
 
     if exception
@@ -673,5 +675,13 @@ class DeveloperKey < ActiveRecord::Base
 
   def site_admin?
     account_id.nil?
+  end
+
+  def validate_authorized_flows
+    return if authorized_flows.blank?
+
+    invalid_flows = authorized_flows.reject { |af| ALLOWED_AUTHORIZED_FLOWS.include?(af) }
+    errors.add(:authorized_flows, "contains invalid values: #{invalid_flows.join(", ")}") if invalid_flows.present?
+    errors.add(:authorized_flows, "contains duplicate values") if authorized_flows.uniq.length != authorized_flows.length
   end
 end

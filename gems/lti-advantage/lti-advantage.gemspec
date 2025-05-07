@@ -28,9 +28,4 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activemodel", ">= 5.1"
   spec.add_dependency "json-jwt", "~> 1.5"
-
-  spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "redcarpet"
-  spec.add_development_dependency "rspec", "~> 3.0"
 end

@@ -77,9 +77,6 @@
       <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
         <li id="integrations_tab"><a href="#tab-integrations" id="tab-integrations-link"><%= t('Integrations') %></a></li>
       <% end %>
-      <% if @context.account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
-        <li id="canvas_career_tab"><a href="#tab-canvas-career" id="tab-canvas-career-link"><%= t('Canvas Career Beta') %></a></li>
-      <% end %>
     <% end %>
   </ul>
   <div id="tab-details">
@@ -254,7 +251,7 @@
                 <% if account.root_account? && account.all_accounts.active.count > Setting.get('course_settings_sub_account_dropdown_limit', '500').to_i %>
                   <a href="<%= context_url(account, :context_sub_accounts_url, :format => :json, :include_self => "1") %>" id="course_account_id_url" style="display: none;">&nbsp;</a>
                   <input type="hidden" name="course[account_id]" id="course_account_id" value="<%= @context.account_id %>"/>
-                  <input type="text" name="account[name]" id="course_account_id_lookup" value="<%= @context.account.name %>" style="width: 150px;"/>
+                  <input type="text" name="account[name]" id="course_account_id_lookup" value="<%= @context.account.name %>" style="width: 150px;" data-is-horizon="<%= account.horizon_account? %>"/>
                 <% else %>
                   <select name="course[account_id]" id="course_account_id">
                     <%= render :partial => "shared/account_options", :locals => {:account => account} %>
@@ -353,8 +350,12 @@
         <div class="form-label"><%= f.blabel :default_due_time, en: "Default due time" %></div>
         <div class="tall-row">
           <% if Account.site_admin.feature_enabled?(:customizable_default_due_time) %>
-            <div id="default_due_time_container" style="width: 350px"></div>
-            <%= f.hidden_field :default_due_time %>
+            <div
+              id="default_due_time_container"
+              data-default-due-time=<%= @context.default_due_time || inherited_default_due_time(@context) %>
+              style="width: 350px"
+            >
+            </div>
           <% else %>
             <%= f.select :default_due_time, options_for_select(default_due_time_options(@context), default_due_time_key(@context)), {}, {'aria-describedby' => 'due-time-description', :disabled => !can_manage} %>
           <% end %>
@@ -1002,9 +1003,7 @@
   <% end %>
 
   <% if @context.account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
-      <div id="tab-canvas-career">
-        <% js_bundle :horizon_toggle %>
-      </div>
+    <% js_bundle :horizon_toggle %>
   <% end %>
 </div><!-- end course details tab -->
 

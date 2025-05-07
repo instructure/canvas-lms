@@ -26,17 +26,21 @@ import {RegistrationModalBody} from '../../registration_wizard/RegistrationModal
 export type PermissionConfirmationWrapperProps = {
   internalConfig: InternalLtiConfiguration
   overlayStore: Lti1p3RegistrationOverlayStore
+  showAllSettings: boolean
 }
 
 export const PermissionConfirmationWrapper = ({
   overlayStore,
   internalConfig,
+  showAllSettings,
 }: PermissionConfirmationWrapperProps) => {
   const {state, ...actions} = overlayStore()
 
   return (
     <RegistrationModalBody>
       <PermissionConfirmation
+        showAllSettings={showAllSettings}
+        mode="new"
         appName={internalConfig.title}
         scopesSelected={state.permissions.scopes ?? []}
         scopesSupported={[...Object.values(LtiScopes)]}

@@ -141,6 +141,25 @@ module Factories
     @override
   end
 
+  def create_course_override_for_assignment(assignment_or_quiz, opts = {})
+    if assignment_or_quiz.is_a?(SubAssignment) && assignment_or_quiz.context.discussion_checkpoints_enabled?
+      override_params = {
+        student_ids: Array.wrap(users).map(&:id),
+        due_at: opts[:due_at]
+      }
+      service = Checkpoints::CourseOverrideCreatorService.new(checkpoint: assignment_or_quiz, override: override_params)
+      @override = service.call
+    else
+      @override = assignment_override_model(opts.merge(assignment: assignment_or_quiz))
+      @override.set = assignment_or_quiz.context
+      @override.set_type = "Course"
+      @override.due_at = opts[:due_at]
+      @override.save!
+    end
+
+    @override
+  end
+
   def create_mastery_paths_override_for_assignment(assignment_or_quiz, opts = {})
     mastery_paths_opts = {
       assignment: assignment_or_quiz,

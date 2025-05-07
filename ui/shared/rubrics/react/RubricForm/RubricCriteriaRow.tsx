@@ -35,8 +35,8 @@ import {
   IconOutcomesLine,
   IconTrashLine,
   IconLockLine,
-  IconAiSolid,
 } from '@instructure/ui-icons'
+import {IgniteAiIcon} from '@canvas/ignite-ai-icon/react/IgniteAiIcon'
 import {Draggable} from 'react-beautiful-dnd'
 import './drag-and-drop/styles.css'
 
@@ -152,7 +152,9 @@ export const RubricCriteriaRow = ({
                     >
                       <Flex alignItems="center" gap="x-small">
                         {isGenerated && (
-                          <IconAiSolid data-testid="rubric-criteria-row-ai-icon" color="brand" />
+                          <span data-testid="rubric-criteria-row-ai-icon">
+                            <IgniteAiIcon />
+                          </span>
                         )}
                         <Text weight="bold">{description}</Text>
                       </Flex>

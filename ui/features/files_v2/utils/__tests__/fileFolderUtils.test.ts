@@ -16,7 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isFile, getUniqueId, pluralizeContextTypeString, getName} from '../fileFolderUtils'
+import {
+  isFile,
+  getUniqueId,
+  pluralizeContextTypeString,
+  getName,
+  getCheckboxLabel,
+  isLockedBlueprintItem,
+} from '../fileFolderUtils'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../fixtures/fakeData'
 
 describe('isFile', () => {
@@ -64,5 +71,73 @@ describe('getName', () => {
       display_name: '',
     }
     expect(getName(file)).toBe(file.filename)
+  })
+})
+
+describe('getCheckboxLabel', () => {
+  it('returns the correct label for a file with a known mimetype', () => {
+    const file = FAKE_FILES[0]
+    file.mime_class = 'pdf'
+    const expectedLabel = `PDF File ${file.display_name}`
+    expect(getCheckboxLabel(file)).toBe(expectedLabel)
+  })
+
+  it('returns the correct label for a file with blank mimetype', () => {
+    const file = FAKE_FILES[0]
+    file.mime_class = ''
+    const expectedLabel = `File ${file.display_name}`
+    expect(getCheckboxLabel(file)).toBe(expectedLabel)
+  })
+
+  it('returns the correct label for an unlocked folder', () => {
+    const folder = FAKE_FOLDERS[0]
+    folder.for_submissions = false
+    const expectedLabel = `Folder ${folder.name}`
+    expect(getCheckboxLabel(folder)).toBe(expectedLabel)
+  })
+
+  it('returns the correct label for a locked folder', () => {
+    const folder = FAKE_FOLDERS[0]
+    folder.for_submissions = true
+    const expectedLabel = `Folder Locked ${folder.name}`
+    expect(getCheckboxLabel(folder)).toBe(expectedLabel)
+  })
+})
+
+describe('isLockedBlueprintItem', () => {
+  it('returns false for folders', () => {
+    expect(isLockedBlueprintItem(FAKE_FOLDERS[0])).toBe(false)
+  })
+
+  it('returns true for locked files', () => {
+    const file = FAKE_FILES[0]
+    file.folder_id = '1'
+    file.restricted_by_master_course = true
+    file.is_master_course_child_content = true
+    expect(isLockedBlueprintItem(file)).toBe(true)
+  })
+
+  it('returns false when file is blueprint content but not locked', () => {
+    const file = FAKE_FILES[0]
+    file.folder_id = '1'
+    file.restricted_by_master_course = false
+    file.is_master_course_child_content = true
+    expect(isLockedBlueprintItem(file)).toBe(false)
+  })
+
+  it('returns false when locked but file fetched from blueprint parent course', () => {
+    const file = FAKE_FILES[0]
+    file.folder_id = '1'
+    file.restricted_by_master_course = true
+    file.is_master_course_child_content = false
+    expect(isLockedBlueprintItem(file)).toBe(false)
+  })
+
+  it('returns false if no folder_id', () => {
+    const file = FAKE_FILES[0]
+    file.folder_id = ''
+    file.restricted_by_master_course = true
+    file.is_master_course_child_content = true
+    expect(isLockedBlueprintItem(file)).toBe(false)
   })
 })

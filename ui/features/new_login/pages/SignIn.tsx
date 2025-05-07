@@ -148,7 +148,7 @@ const SignIn = () => {
         </Heading>
 
         {selfRegistrationType && (
-          <Flex.Item overflowX="visible" overflowY="visible">
+          <Flex.Item data-testid="self-registration-prompt" overflowX="visible" overflowY="visible">
             <ActionPrompt
               variant={
                 selfRegistrationType === SelfRegistrationType.ALL

@@ -45,12 +45,12 @@ shared_examples "profile_user_about_page" do
     enable_avatars(false)
     get "/about/#{@user.id}"
 
-    driver.action.move_to(f(".avatar.profile-link")).perform
+    driver.action.move_to(f(".profile-link")).perform
     wait_for_ajaximations
 
     # We are checking the title in this tooltip like we do in the one above,
     # given the same limitation.
-    expect(f(".avatar.profile-link i")).to be_displayed
+    expect(f(".btn.btn-small.profile-link")).to be_displayed
   end
 end
 

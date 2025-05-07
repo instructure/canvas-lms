@@ -177,18 +177,21 @@ const RubricContextSelect = ({
     meta: {
       fetchAtLeastOnce: true,
     },
-    onSuccess: successResponse => {
-      const matchingCourseContext = successResponse.find(
+  })
+
+  useEffect(() => {
+    if (rubricContexts.length > 0) {
+      const matchingCourseContext = rubricContexts.find(
         x => x.context_code === `course_${courseId}`,
       )
 
       if (matchingCourseContext) {
         setSelectedContext(matchingCourseContext.context_code)
       } else {
-        setSelectedContext(successResponse[0]?.context_code)
+        setSelectedContext(rubricContexts[0]?.context_code)
       }
-    },
-  })
+    }
+  }, [rubricContexts, courseId, setSelectedContext])
 
   const contextPrefix = (contextCode: string) => {
     if (contextCode.startsWith('account_')) {

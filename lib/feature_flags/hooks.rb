@@ -156,7 +156,7 @@ module FeatureFlags
                 "disabled"
               end
       cxt = context.is_a?(Course) ? "course" : "account"
-      InstStatsd::Statsd.increment("speedgrader.modernized.flag.#{state}.#{cxt}")
+      InstStatsd::Statsd.distributed_increment("speedgrader.modernized.flag.#{state}.#{cxt}")
     end
   end
 end

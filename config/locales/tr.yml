@@ -266,6 +266,7 @@ tr:
   access_token_details_495d989: "Token Erişim Ayrıntıları"
   access_token_is_valid_until_d2f048cf: "Erişim dizgesi şu tarihe kadar geçerli"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Erişim Anahtarları diğer uygulamaların sizin adınıza API iletişimi kurmalarına izin vermek için kullanılır. Kendi entegrasyonlarınız için erişim anahtarları üretip *Canvas Açık API'yi de kullanabilirsiniz.*"
+  accessibility_checker_b3af1f6c: "Erişilebilirlik Kontrolü"
   accessible_sidebar_menu_b30baf97: "Erişilebilir Kenar Çubuğu Menüsü"
   accordion_section_1_7888782d: "Akordiyon Bölüm 1"
   accordion_section_2_e1812997: "Akordiyon Bölüm 2"
@@ -7895,6 +7896,7 @@ tr:
   edit_discussion_settings_1bbb03d: "Tartışma Ayarlarını Düzenle"
   edit_grading_scheme_53091236: "Notlandırma Şemasını Düzenle"
   edit_group_c8679dba: "Grubu Düzenle"
+  edit_item_details_1e2b5ba1: "Öğe ayrıntılarını düzenle"
   edit_item_details_c9a7b9c5: "Öğe ayrıntılarını düzenle"
   edit_key_name_5c7d2f46: "Anahtarı düzenle %{name}"
   edit_mastery_paths_for_name_c9fc59f9: "%{name} için Yeterlilik Süreçlerini Düzenleyin"
@@ -10436,6 +10438,7 @@ tr:
   increase_indent_6d550a4a: "İçerden başlat"
   incremental_update_successfully_generated_against__db3f3f06: "Önceki ÖBS içeri aktarımına karşın artış içeren güncelleme başarıyla oluşturuldu."
   indent_1_level_e7b18c1e: "1 Seviye İçeriden başlat"
+  indent_72887794: "İçeriden başlat"
   indentation_3c6081d5: "İçeriden Başlat"
   india_91_6c290107: "Hindistan (+91)"
   indigo_2035fc55: Indigo
@@ -14946,6 +14949,7 @@ tr:
   private_3883d133: Özel
   process_as_ui_changes_8e34ed2a: "Arayüz Değişim Süreçleri "
   process_data_2f5f962f: "Veriyi İşle"
+  processing_8c569014: İşleniyor...
   product_name: Canvas
   profile: 
     access_token: 
@@ -18459,6 +18463,7 @@ tr:
   show_courses_from_8a087f63: "Dönem Derslerini Göster"
   show_deleted_replies_a2e0a36f: "Silinmiş yanıtları göster"
   show_inactive_enrollments_8f4c4824: "Etkin Olmayan Ders Kayıtlarını Göster"
+  show_less_f778dab5: "Daha Az Göster"
   show_lti_2_configuration_ui_94ce35a9: "LTI 2 Yapılandırma UI sini Göster"
   show_me_76823679: "Bana Göster"
   show_more_af9cbc16: "Daha Fazla Göster"

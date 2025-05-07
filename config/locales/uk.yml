@@ -196,6 +196,7 @@ uk:
   access_token_3be22221: "Маркер доступу"
   access_token_count_access_token_count_dfb5463c: "Кількість маркерів доступу: %{access_token_count}"
   access_token_details_495d989: "Деталі маркерів доступу"
+  accessibility_checker_b3af1f6c: "Перевірка доступності"
   accordion_section_1_7888782d: "Координаційний розділ 1"
   accordion_section_2_e1812997: "Координаційний розділ 2"
   accordion_section_3_96861901: "Координаційний розділ 3"
@@ -6958,6 +6959,7 @@ uk:
   edit_current_message_da650d4c: "Редагувати поточне повідомлення"
   edit_grading_scheme_53091236: "Редагувати схему оцінювання"
   edit_group_c8679dba: "Редагувати групу"
+  edit_item_details_1e2b5ba1: "Редагувати детальну інформацію елемента"
   edit_item_details_c9a7b9c5: "Редагувати деталі елемента"
   edit_key_name_5c7d2f46: "Редагувати ключ %{name}"
   edit_mastery_paths_for_name_c9fc59f9: "Редагувати шляхи майстерності для  %{name}"
@@ -8998,6 +9000,7 @@ uk:
   increase_indent_6d550a4a: "Збільшити відступ"
   incremental_update_successfully_generated_against__db3f3f06: "Інкрементне оновлення успішно згенероване за попереднім імпортом SIS."
   indent_1_level_e7b18c1e: "Абзац 1 рівня"
+  indent_72887794: Абзац
   indentation_3c6081d5: Відступ
   india_91_6c290107: "Індія (+91)"
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Вказує, що зображення призначене лише для декоративних цілей і не має зчитуватися шпигунами екранів."
@@ -13355,6 +13358,7 @@ uk:
   process_as_ui_changes_8e34ed2a: "Обробка змін графічного інтерфейсу користувача"
   process_data_2f5f962f: "Обробка даних"
   processing_2fcc9739: Обробка
+  processing_8c569014: Обробка...
   product_name: Canvas
   profile: 
     access_token: 
@@ -16636,6 +16640,7 @@ uk:
   show_exceptions_270ea1c5: "Показати винятки"
   show_groups_navigation_menu_1521d38d: "Показувати меню навігації груп"
   show_inactive_enrollments_8f4c4824: "Показати неактивні реєстрації"
+  show_less_f778dab5: "Показати менше"
   show_links_to_unpublished_content_30c0450d: "Показати посилання на неопублікований вміст"
   show_more_af9cbc16: "Показати більше"
   show_more_fae1328: "Показати більше"

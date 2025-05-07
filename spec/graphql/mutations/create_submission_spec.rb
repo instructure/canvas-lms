@@ -109,6 +109,18 @@ RSpec.describe Mutations::CreateSubmission do
       result = run_mutation
       expect(result.dig(:errors, 0, :message)).to eq "not found"
     end
+
+    it "does not allow a student to submit an assignment that is assigned to a section they are concluded in" do
+      sec1 = @course.course_sections.create!(name: "section 1")
+      sec2 = @course.course_sections.create!(name: "section 2")
+      @course.enroll_student(@student, enrollment_state: "active", section: sec1, allow_multiple_enrollments: true)
+      concluded_enrollment = @course.enroll_student(@student, enrollment_state: "active", section: sec2, allow_multiple_enrollments: true)
+      concluded_enrollment.conclude
+      create_section_override_for_assignment(@assignment, course_section: sec2)
+      @assignment.update!(only_visible_to_overrides: true)
+      result = run_mutation
+      expect(result.dig(:errors, 0, :message)).to eq "not found"
+    end
   end
 
   context "when the submission_type is student_annotation" do

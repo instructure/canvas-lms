@@ -132,57 +132,11 @@
       </h1>
       <div class="submission-details-header__grade-summary">
         <% if @submission.user_can_read_grade?(@current_user, session) %>
-        <table class="grade-values">
-          <tbody>
-            <% if @assignment.checkpoints_parent? %>
-              <div id="checkpoints-grade-inputs-mount-point">
-            <% else %>
-              <tr>
-                <th><label for="student_grading_<%= @assignment.id %>"><%= I18n.t('Grade:') %></label></th>
-                <td class="bold">
-                  <% if can_do(@assignment, @current_user, :grade) %>
-                    <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
-                  <% else %>
-                    <span class="entered_grade">
-                      <% if @submission.excused? %>
-                        <%= t "Excused" %>
-                      <% else %>
-                        <%= i18n_grade(round_if_whole(presenter.entered_grade), @submission.grading_type) %>
-                      <% end %>
-                    </span>
-                  <% end %>
-                  <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible && !@assignment.restrict_quantitative_data?(@current_user) %>
-                    <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-            <% if can_do(@assignment, @current_user, :grade) || @submission.user_can_read_grade?(@current_user, session)
-                points_deducted = I18n.n(-@submission.points_deducted) if @submission.points_deducted&.> 0
-                points_possible = I18n.n(round_if_whole(@assignment.points_possible))
-                grade_breakdown_style = hidden unless points_deducted && !@submission.excused?
-            %>
-              <tr class="error late-penalty-display" style="<%= grade_breakdown_style %>">
-                <th><%= I18n.t('Late penalty:') %></th>
-                <td class="late_penalty bold"><%= points_deducted %></td>
-              </tr>
-              <tr class="late-penalty-display" style="<%= grade_breakdown_style %>">
-                <th><%= I18n.t('Final grade:') %></th>
-                <td class="bold">
-                  <% if can_do(@assignment, @current_user, :grade) %>
-                    <span class="published_grade"><%= i18n_grade(round_if_whole(@submission.grade), @submission.grading_type) %></span>
-                  <% elsif @submission.user_can_read_grade?(@current_user, session) %>
-                    <span class="grade"><%= i18n_grade(round_if_whole(@submission.published_grade), @submission.grading_type) %></span>
-                  <% end %>
-
-                  <% if @assignment.grading_type == 'points' %>
-                    / <%= points_possible %>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+          <% if can_do(@assignment, @current_user, :grade) %>
+            <%= render partial: "grade_values_can_grade" %>
+          <% else %>
+            <%= render partial: "grade_values_can_read", locals: { presenter: } %>
+          <% end %>
         <% if can_do(@submission, @current_user, :view_turnitin_report) %>
           <% if (turnitin_score = @submission.turnitin_data[@submission.asset_string]) &&
             @submission.turnitin_data[:provider] == nil && turnitin_score[:similarity_score] %>

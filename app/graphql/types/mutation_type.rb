@@ -132,5 +132,6 @@ class Types::MutationType < Types::ApplicationObjectType
     IN ACTIVE DEVELOPMENT, USE AT YOUR OWN RISK: Submit homework on an assignment.
   MD
 
+  field :auto_grade_submission, mutation: Mutations::AutoGradeSubmission
   field :update_rubric_archived_state, mutation: Mutations::UpdateRubricArchivedState
 end

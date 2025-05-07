@@ -20,7 +20,7 @@ import React from 'react'
 import {createRoot} from 'react-dom/client'
 
 import {renderGameIntoDom} from './react/gameEntry'
-import NotFoundArtwork from './react/NotFoundArtwork'
+import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
 
 export const renderNotFoundApp = domElementId => {
   const AppRootElement = document.getElementById(domElementId)

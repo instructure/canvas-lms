@@ -300,10 +300,12 @@ describe('CourseCopyImporter', () => {
 
         it('should throw invalid message on empty selected course', async () => {
           const component = await populateSearchField()
-          await userEvent.type(component.getByRole('combobox', {name: searchForACourse}), 'invalid')
+          await userEvent.clear(component.getByTestId('course-copy-select-course'))
           await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
 
-          expect(component.queryAllByText(/You must select a course to copy content from/)).toHaveLength(2)
+          await waitFor(() => {
+            expect(component.queryAllByText(/You must select a course to copy content from/)).toHaveLength(2)
+          })
           expect(onSubmit).not.toHaveBeenCalled()
         })
 
@@ -381,9 +383,12 @@ describe('CourseCopyImporter', () => {
 
   describe('course input error focus', () => {
     it('when SHOW_SELECT is false it focuses on input', async () => {
+      fakeENV.setup({...defaultEnv, SHOW_SELECT: false})
       renderComponent()
       await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
-      expect(screen.getByTestId('course-copy-select-course')).toHaveFocus()
+      await waitFor(() => {
+        expect(screen.getByTestId('course-copy-select-course')).toHaveFocus()
+      })
     })
 
     it('when SHOW_SELECT is true it focuses on dropdown', async () => {

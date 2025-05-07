@@ -16,46 +16,84 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createContext, useContext, useState } from "react";
+import {createContext, useContext, useState} from 'react'
 
 const ContextModule = createContext<{
   courseId: string
   isMasterCourse: boolean
   isChildCourse: boolean
   permissions: Record<string, boolean>
+  NEW_QUIZZES_BY_DEFAULT: boolean
+  DEFAULT_POST_TO_SIS: boolean
   state: Record<string, any>
   setState: (state: Record<string, any>) => void
-}>({} as {
-  courseId: string
-  isMasterCourse: boolean
-  isChildCourse: boolean
-  permissions: Record<string, boolean>
-  state: Record<string, any>
-  setState: (state: Record<string, any>) => void
-})
+}>(
+  {} as {
+    courseId: string
+    isMasterCourse: boolean
+    isChildCourse: boolean
+    permissions: Record<string, boolean>
+    NEW_QUIZZES_BY_DEFAULT: boolean
+    DEFAULT_POST_TO_SIS: boolean
+    state: Record<string, any>
+    setState: (state: Record<string, any>) => void
+  },
+)
 
 export const ContextModuleProvider = ({
   children,
   courseId,
   isMasterCourse,
   isChildCourse,
-  permissions
+  permissions,
+  NEW_QUIZZES_BY_DEFAULT,
+  DEFAULT_POST_TO_SIS,
 }: {
   children: React.ReactNode
   courseId: string
   isMasterCourse: boolean
   isChildCourse: boolean
   permissions: Record<string, boolean>
+  NEW_QUIZZES_BY_DEFAULT: boolean
+  DEFAULT_POST_TO_SIS: boolean
 }) => {
   const [state, setState] = useState({})
 
   return (
-    <ContextModule.Provider value={{ courseId, isMasterCourse, isChildCourse, permissions, state, setState }}>
+    <ContextModule.Provider
+      value={{
+        courseId,
+        isMasterCourse,
+        isChildCourse,
+        permissions,
+        NEW_QUIZZES_BY_DEFAULT,
+        DEFAULT_POST_TO_SIS,
+        state,
+        setState,
+      }}
+    >
       {children}
     </ContextModule.Provider>
-  );
+  )
 }
 
 export function useContextModule() {
-  return useContext(ContextModule);
+  return useContext(ContextModule)
+}
+
+export const contextModuleDefaultProps = {
+  courseId: '',
+  isMasterCourse: false,
+  isChildCourse: false,
+  permissions: {
+    canAdd: true,
+    canEdit: true,
+    canDelete: true,
+    canViewUnpublished: true,
+    canDirectShare: true
+  },
+  NEW_QUIZZES_BY_DEFAULT: false,
+  DEFAULT_POST_TO_SIS: false,
+  state: {},
+  setState: () => {},
 }

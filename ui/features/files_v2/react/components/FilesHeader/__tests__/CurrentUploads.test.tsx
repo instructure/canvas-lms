@@ -22,8 +22,10 @@ import CurrentUploads from '../CurrentUploads'
 import FileUploader from '@canvas/files/react/modules/FileUploader'
 import UploadQueue from '@canvas/files/react/modules/UploadQueue'
 
-function makeUploader(name: string) {
-  return new FileUploader({file: new File(['foo'], name, {type: 'text/plain'})})
+function makeUploader(name: string, error?: object) {
+  const uploader = new FileUploader({file: new File(['foo'], name, {type: 'text/plain'})})
+  uploader.error = error
+  return uploader
 }
 
 jest.mock('@canvas/files/react/modules/UploadQueue', () => ({
@@ -42,5 +44,17 @@ describe('CurrentUploads', () => {
     UploadQueue.getAllUploaders = jest.fn().mockImplementation(() => [])
     render(<CurrentUploads />)
     expect(screen.queryByTestId('current-uploads')).not.toBeInTheDocument()
+  })
+
+  it('catches file conflicts and shows rename form', () => {
+    const error = {response: {status: 409}}
+    UploadQueue.getAllUploaders = jest
+      .fn()
+      .mockImplementation(() => [makeUploader('foo.txt', error)])
+    render(<CurrentUploads />)
+    expect(screen.getByText('File failed to upload. Please try again.')).toBeInTheDocument()
+    expect(screen.getByTestId('rename-replace-button')).toBeInTheDocument()
+    expect(screen.getByTestId('rename-skip-button')).toBeInTheDocument()
+    expect(screen.getByTestId('rename-change-button')).toBeInTheDocument()
   })
 })

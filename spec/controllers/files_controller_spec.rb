@@ -354,6 +354,53 @@ describe FilesController do
       end
     end
 
+    describe "with an OAuth access token" do
+      before do
+        user_with_pseudonym
+        pseudonym(@teacher)
+        @access_token = AccessToken.create!(user: @teacher)
+        @invalid_token = AccessToken.create!(user: @teacher, permanent_expires_at: 1.day.ago)
+        @unauthorized_token = AccessToken.create!(user: @user)
+      end
+
+      context "with enable_file_access_with_api_tokens disabled" do
+        before do
+          Account.site_admin.disable_feature!(:enable_file_access_with_api_tokens)
+        end
+
+        it "does not allow access with a valid token" do
+          request.headers["Authorization"] = "Bearer #{@access_token.full_token}"
+          get "show", params: { course_id: @course.id, id: @file.id }
+          expect(response).not_to be_successful
+        end
+      end
+
+      it "allows access with a valid token" do
+        request.headers["Authorization"] = "Bearer #{@access_token.full_token}"
+        get "show", params: { course_id: @course.id, id: @file.id }, format: "json"
+        expect(response).to be_successful
+      end
+
+      it "allows download with a valid token" do
+        request.headers["Authorization"] = "Bearer #{@access_token.full_token}"
+        get "show", params: { course_id: @course.id, id: @file.id, download: "1" }
+        expect(response).to be_redirect
+        expect(response.location).to include "/courses/#{@course.id}/files/#{@file.id}/course%20files"
+      end
+
+      it "denies access with an invalid token" do
+        request.headers["Authorization"] = "Bearer #{@invalid_token.full_token}"
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(response.status.to_i).to be > 399
+      end
+
+      it "denies access with a valid token for a user who does not have access" do
+        request.headers["Authorization"] = "Bearer #{@unauthorized_token.full_token}"
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(response.status.to_i).to be > 399
+      end
+    end
+
     describe "with JWT access token" do
       include_context "InstAccess setup"
 

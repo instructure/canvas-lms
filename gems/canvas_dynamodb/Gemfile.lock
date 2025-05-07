@@ -9,9 +9,9 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    aws-eventstream (1.3.1)
-    aws-partitions (1.1050.0)
-    aws-sdk-applicationautoscaling (1.101.0)
+    aws-eventstream (1.3.2)
+    aws-partitions (1.1084.0)
+    aws-sdk-applicationautoscaling (1.102.0)
       aws-sdk-core (~> 3, >= 3.216.0)
       aws-sigv4 (~> 1.5)
     aws-sdk-core (3.218.1)
@@ -20,14 +20,14 @@ GEM
       aws-sigv4 (~> 1.9)
       base64
       jmespath (~> 1, >= 1.6.1)
-    aws-sdk-dynamodb (1.136.0)
+    aws-sdk-dynamodb (1.139.0)
       aws-sdk-core (~> 3, >= 3.216.0)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.11.0)
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.2.0)
     benchmark (0.4.0)
-    diff-lcs (1.6.0)
+    diff-lcs (1.6.1)
     docile (1.4.1)
     jmespath (1.6.2)
     rake (13.2.1)
@@ -35,7 +35,7 @@ GEM
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
       rspec-mocks (~> 3.13.0)
-    rspec-core (3.13.2)
+    rspec-core (3.13.3)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.3)
       diff-lcs (>= 1.2.0, < 2.0)
@@ -59,7 +59,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   canvas_dynamodb!
   rake
   rspec (~> 3.12)

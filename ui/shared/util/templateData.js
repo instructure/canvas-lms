@@ -91,7 +91,7 @@ $.fn.fillTemplateData = function (options) {
       }
     }
     if (options.hrefValues && options.data) {
-      this.find('a,span[rel]').each(function () {
+      this.find('a,span[rel],[data-href]').each(function () {
         let oldHref, oldRel, oldName
         const $obj = $(this)
         for (const i in options.hrefValues) {
@@ -99,11 +99,17 @@ $.fn.fillTemplateData = function (options) {
             continue
           }
           const name = options.hrefValues[i]
-          if ((oldHref = $obj.attr('href'))) {
+          const dataHref = $obj.data('href')
+          const attrHref = $obj.attr('href')
+          if ((oldHref = dataHref || attrHref)) {
             const newHref = replaceTags(oldHref, name, encodeURIComponent(options.data[name]))
             const orig = $obj.text() === $obj.html() ? $obj.text() : null
             if (oldHref !== newHref) {
-              $obj.attr('href', newHref)
+              if (dataHref) {
+                $obj.data('href', newHref)
+              } else {
+                $obj.attr('href', newHref)
+              }
               if (orig) {
                 $obj.text(orig)
               }

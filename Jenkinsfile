@@ -624,6 +624,7 @@ pipeline {
                       callableWithDelegate(lintersStage.gergichLintersStage(nestedStages))()
                       callableWithDelegate(lintersStage.miscJsChecksStage(nestedStages))()
                       callableWithDelegate(lintersStage.eslintStage(nestedStages))()
+                      callableWithDelegate(lintersStage.biomeStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.typescriptStage(nestedStages))()
                       callableWithDelegate(lintersStage.masterBouncerStage(nestedStages))()
                       callableWithDelegate(lintersStage.yarnStage(nestedStages, buildConfig))()

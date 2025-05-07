@@ -21,7 +21,7 @@
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {defaultColors, statusColors} from '../../constants/colors'
-import {statuses, statusesTitleMap} from '../../constants/statuses'
+import {getStatuses, statusesTitleMap} from '../../constants/statuses'
 import StatusColorPanel from '../StatusColorPanel'
 
 describe('StatusColorPanel', () => {
@@ -39,8 +39,8 @@ describe('StatusColorPanel', () => {
     )
 
     const colorListItems = getAllByRole('listitem')
-    expect(colorListItems).toHaveLength(statuses.length)
-    statuses.forEach((status, idx) => {
+    expect(colorListItems).toHaveLength(getStatuses().length)
+    getStatuses().forEach((status, idx) => {
       expect(colorListItems[idx]).toHaveStyle({backgroundColor: statusColors[status]})
       expect(colorListItems[idx]).toHaveTextContent(statusesTitleMap[status])
     })

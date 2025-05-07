@@ -45,6 +45,7 @@ export default class AvatarWidget {
     }
     if (!this.avatarDialog) {
       this.avatarDialog = new AvatarDialogView()
+      this.avatarDialog.triggerElement = this.$el
     }
     return this.avatarDialog.show()
   }

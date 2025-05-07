@@ -87,9 +87,8 @@ const convertMediaTracksIfNeeded = (
 const DEFAULT_MAX_RETRY_ATTEMPTS = 11
 const DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS = 3
 
-interface CanvasStudioPlayerProps {
-  media_id: string
-  // TODO: we've asked studio to export definitions for PlayerSrc and CaptionMetaData
+interface BaseCanvasStudioPlayerProps {
+  // TODO: we've asked studio to export definitions for PlayerSrc
   media_sources?: string | any[]
   media_tracks?: MediaTrack[] | CaptionMetaData[]
   type?: 'audio' | 'video'
@@ -97,13 +96,18 @@ interface CanvasStudioPlayerProps {
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS?: number
   aria_label?: string
   is_attachment?: boolean
-  attachment_id?: string
   show_loader?: boolean
   maxHeight?: null | string
   mediaFetchCallback?: (mediaInfo: MediaInfo) => void
   explicitSize?: {width: number | string; height: number | string}
   hideUploadCaptions?: boolean
+  isInverseVariant?: boolean
 }
+
+type CanvasStudioPropsWithMediaIdOrAttachmentId =
+  | (BaseCanvasStudioPlayerProps & {media_id: string; attachment_id?: undefined})
+  | (BaseCanvasStudioPlayerProps & {media_id?: undefined; attachment_id: string})
+  | (BaseCanvasStudioPlayerProps & {media_id: string; attachment_id: string})
 
 // The main difference between CanvasMediaPlayer and CanvasStudioPlayer
 // besides the media package we use
@@ -121,7 +125,9 @@ export default function CanvasStudioPlayer({
   show_loader = false,
   explicitSize,
   hideUploadCaptions = false,
-}: CanvasStudioPlayerProps) {
+  isInverseVariant = false,
+}: CanvasStudioPropsWithMediaIdOrAttachmentId) {
+  const [mediaId, setMediaId] = useState(media_id)
   const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
     ? convertMediaTracksIfNeeded(media_captions)
     : undefined
@@ -197,7 +203,7 @@ export default function CanvasStudioPlayer({
     async function () {
       const url = attachment_id
         ? `/media_attachments/${attachment_id}/info`
-        : `/media_objects/${media_id}/info`
+        : `/media_objects/${mediaId}/info`
       let resp
       try {
         setIsLoading(true)
@@ -208,6 +214,9 @@ export default function CanvasStudioPlayer({
         setMediaObjNetworkErr(e)
         setIsLoading(false)
         return
+      }
+      if (resp?.media_id && !mediaId) {
+        setMediaId(resp.media_id)
       }
       if (typeof resp?.can_add_captions === 'boolean') {
         setCanAddCaptions(resp.can_add_captions)
@@ -222,7 +231,7 @@ export default function CanvasStudioPlayer({
         setRetryAttempt(retryAttempt + 1)
       }
     },
-    [attachment_id, media_id, retryAttempt, media_captions],
+    [attachment_id, mediaId, retryAttempt, media_captions],
   )
 
   const deleteCaption = useCallback(async (caption: CaptionMetaData) => {
@@ -358,6 +367,9 @@ export default function CanvasStudioPlayer({
   const containerStyle: Partial<CSSProperties> = {
     height: containerHeight,
     width: containerWidth,
+    // in a modal of variant "inverse" some menu labels get white text
+    // which makes them invisible
+    color: isInverseVariant ? '#000000' : undefined,
   }
 
   const hideCaptionButtons = hideUploadCaptions || !canAddCaptions
@@ -395,7 +407,7 @@ export default function CanvasStudioPlayer({
                           import('../../mediaelement/UploadMediaTrackForm').then(
                             ({default: UploadMediaTrackForm}) => {
                               new UploadMediaTrackForm(
-                                media_id,
+                                mediaId,
                                 src,
                                 attachment_id as any,
                                 false,

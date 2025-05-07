@@ -174,6 +174,38 @@ const DEFAULT_CHECKPOINT_STATES = [
   {label: REPLY_TO_ENTRY, status: NONE, timeLate: '0', secondsLate: 0, customGradeStatusId: null},
 ]
 
+// @ts-expect-error
+export const calculateCheckpointStates = (submission, latePolicy) => {
+  // @ts-expect-error
+  return submission.subAssignmentSubmissions.map((subSubmission) => {
+    let status = NONE
+    let timeLate = '0'
+    const secondsLate = subSubmission.seconds_late || 0
+    const customGradeStatusId = subSubmission.custom_grade_status_id || null
+
+    if (subSubmission.late_policy_status === 'extended') {
+      status = EXTENDED
+    } else if (subSubmission.late) {
+      status = LATE
+      timeLate =
+        latePolicy.lateSubmissionInterval === 'hour'
+          ? Math.ceil(secondsLate / 3600).toString()
+          : Math.ceil(secondsLate / (24 * 3600)).toString()
+    } else if (subSubmission.missing) {
+      status = MISSING
+    } else if (subSubmission.excused) {
+      status = EXCUSED
+    }
+    return {
+      label: subSubmission.sub_assignment_tag,
+      status,
+      timeLate,
+      secondsLate,
+      customGradeStatusId,
+    }
+  })
+}
+
 export default class SubmissionTray extends React.Component<
   SubmissionTrayProps,
   SubmissionTrayState
@@ -207,36 +239,7 @@ export default class SubmissionTray extends React.Component<
 
     // @ts-expect-error
     if (submission.hasSubAssignmentSubmissions && submission.subAssignmentSubmissions.length > 0) {
-      // @ts-expect-error
-      const checkpointStates = submission.subAssignmentSubmissions.map(subSubmission => {
-        let status = NONE
-        let timeLate = '0'
-        const secondsLate = subSubmission.seconds_late || 0
-        const customGradeStatusId = subSubmission.custom_grade_status_id || null
-
-        if (subSubmission.late_policy_status === 'extended') {
-          status = EXTENDED
-        } else if (subSubmission.late) {
-          status = LATE
-          timeLate =
-            // @ts-expect-error
-            latePolicy.lateSubmissionInterval === 'hour'
-              ? (secondsLate / 3600).toString()
-              : (secondsLate / (24 * 3600)).toString()
-        } else if (subSubmission.missing) {
-          status = MISSING
-        } else if (subSubmission.excused) {
-          status = EXCUSED
-        }
-        return {
-          label: subSubmission.sub_assignment_tag,
-          status,
-          timeLate,
-          secondsLate,
-          customGradeStatusId,
-        }
-      })
-
+      const checkpointStates = calculateCheckpointStates(submission, latePolicy)
       this.setState({checkpointStates})
     } else {
       // @ts-expect-error

@@ -64,6 +64,7 @@ import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
 import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKeyboardShortcut'
 import useHighlightStore from '../../hooks/useHighlightStore'
+import useSpeedGrader from '../../hooks/useSpeedGrader'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -83,6 +84,8 @@ export const DiscussionThreadContainer = props => {
   const replyButtonRef = useRef()
   const expansionButtonRef = useRef()
   const moreOptionsButtonRef = useRef()
+
+  const {isInSpeedGrader, handleCommentKeyPress, handleGradeKeyPress} = useSpeedGrader()
 
   const {searchTerm, filter, allThreadsStatus, expandedThreads, setExpandedThreads} =
     useContext(SearchContext)
@@ -385,6 +388,40 @@ export const DiscussionThreadContainer = props => {
   }
 
   useEventHandler(KeyboardShortcuts.ON_EDIT_KEYBOARD, onEditKeyboard)
+
+  const onSpeedGraderCommentKeyboard = e => {
+    // When full context view is on in speedgrader, the full Discussion view
+    // is shown, an entry is also immediately highlighted.
+    // because of this highlight, speedgrader's listeners no longer work,
+    // so we need to listen for them here instead.
+    //
+    // NOTE: Splitscreen view is disabled in speedgrader, so we only need to
+    // listen here, in threaded view
+    //
+    // we are checking entry id so that we don't call handleCommentKeyPress for every
+    // entry, instead, we call it for just one
+    if (isInSpeedGrader && e.detail.entryId === props.discussionEntry._id) {
+      handleCommentKeyPress()
+    }
+  }
+  useEventHandler(KeyboardShortcuts.ON_SPEEDGRADER_COMMENT, onSpeedGraderCommentKeyboard)
+
+  const onSpeedGraderGradeKeyboard = e => {
+    // When full context view is on in speedgrader, the full Discussion view
+    // is shown, an entry is also immediately highlighted.
+    // because of this highlight, speedgrader's listeners no longer work,
+    // so we need to listen for them here instead.
+    //
+    // NOTE: Splitscreen view is disabled in speedgrader, so we only need to
+    // listen here, in threaded view
+    //
+    // we are checking entry id so that we don't call handleGradetKeyPress for every
+    // entry, instead, we call it for just one
+    if (isInSpeedGrader && e.detail.entryId === props.discussionEntry._id) {
+      handleGradeKeyPress()
+    }
+  }
+  useEventHandler(KeyboardShortcuts.ON_SPEEDGRADER_GRADE, onSpeedGraderGradeKeyboard)
 
   const onUpdate = (message, quotedEntryId, file) => {
     updateDiscussionEntry({

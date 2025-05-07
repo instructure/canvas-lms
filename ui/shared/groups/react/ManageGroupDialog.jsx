@@ -18,7 +18,6 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {without} from 'lodash'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import BackboneState from './mixins/BackboneState'
@@ -27,8 +26,10 @@ import InfiniteScroll from './mixins/InfiniteScroll'
 import '@canvas/jquery/jquery.instructure_forms'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
+import {Modal} from '@instructure/ui-modal'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
+import {Heading} from '@instructure/ui-heading'
 
 const I18n = createI18nScope('student_groups')
 
@@ -54,23 +55,19 @@ const ManageGroupDialog = createReactClass({
     e.preventDefault()
     let errors = false
     if (this.props.maxMembership && this.state.checked.length > this.props.maxMembership) {
-      this.setState({checkboxErrorMessage: [
-        {type: 'newError', text: I18n.t('Too many members')},
-      ]})
-      $(this.userListRef).attr("tabindex",-1).focus()
+      this.setState({checkboxErrorMessage: [{type: 'newError', text: I18n.t('Too many members')}]})
+      $(this.userListRef).attr('tabindex', -1).focus()
       errors = true
     }
     if (this.state.name.trim().length === 0) {
-      this.setState({errorMessages: [
-        {type: 'newError', text: I18n.t('Group name is required')},
-      ]})
+      this.setState({errorMessages: [{type: 'newError', text: I18n.t('Group name is required')}]})
       this.nameInputRef?.focus()
       errors = true
     }
     if (this.state.name.trim().length > 200) {
-      this.setState({errorMessages: [
-        {type: 'newError', text: I18n.t('Enter a shorter group name')},
-      ]})
+      this.setState({
+        errorMessages: [{type: 'newError', text: I18n.t('Enter a shorter group name')}],
+      })
       this.nameInputRef?.focus()
       errors = true
     }
@@ -108,10 +105,19 @@ const ManageGroupDialog = createReactClass({
     }
 
     return (
-      <Flex id="manage_group_form" as="div" alignItems="center" justifyItems="start" gap="none" direction="row" width="100%">
-        <form className="form-dialog" onSubmit={this.handleFormSubmit}>
-          <div ref={c => (this.scrollElementRef = c)} className="form-dialog-content">
-            <Flex.Item margin="xx-small">
+      <Modal
+        as="form"
+        onSubmit={e => this.handleFormSubmit(e)}
+        open={true}
+        size="small"
+        label={I18n.t('Manage student ${group_name}', {group_name: this.props.name})}
+      >
+        <Modal.Header>
+          <Heading data-testid="dialog-heading">{I18n.t('Manage Student Group')}</Heading>
+        </Modal.Header>
+        <Modal.Body elementRef={c => (this.scrollElementRef = c)} className="form-dialog-content">
+          <Flex direction="column" margin="xx-small" height="400px">
+            <Flex.Item padding="xx-small">
               <TextInput
                 inputRef={c => (this.nameInputRef = c)}
                 id="group_name"
@@ -125,11 +131,7 @@ const ManageGroupDialog = createReactClass({
                 onChange={event => this.setState({name: event.target.value, errorMessages: []})}
               />
             </Flex.Item>
-            <Flex.Item
-              margin="xx-small"
-              tabindex="-1"
-              elementRef={c => (this.userListRef = c)}
-            >
+            <Flex.Item padding="xx-small" tabindex="-1" elementRef={c => (this.userListRef = c)}>
               <PaginatedUserCheckList
                 checked={this.state.checked}
                 permanentUsers={[ENV.current_user]}
@@ -143,12 +145,13 @@ const ManageGroupDialog = createReactClass({
                 }
               />
             </Flex.Item>
-          </div>
-          <div className="form-controls">
+          </Flex>
+        </Modal.Body>
+        <Modal.Footer>
+          <Flex className="form-controls" gap="x-small">
             <Button
               data-testid="manage-group-modal-cancel-button"
               color="secondary"
-              margin="xxx-small"
               onClick={this.props.closeDialog}
             >
               {I18n.t('Cancel')}
@@ -156,15 +159,14 @@ const ManageGroupDialog = createReactClass({
             <Button
               data-testid="manage-group-modal-submit-button"
               color="primary"
-              margin="xxx-small"
               type="submit"
               formNoValidate
             >
               {I18n.t('Submit')}
             </Button>
-          </div>
-        </form>
-      </Flex>
+          </Flex>
+        </Modal.Footer>
+      </Modal>
     )
   },
 })

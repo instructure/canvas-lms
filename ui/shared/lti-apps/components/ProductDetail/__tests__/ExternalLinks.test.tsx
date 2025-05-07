@@ -21,8 +21,23 @@ import {render} from '@testing-library/react'
 import ExternalLinks from '../ExternalLinks'
 import {product} from '../../common/__tests__/data'
 
-describe('ExternalLinks renders as expected', () => {
-  it('ExternalLinks renders as expected', () => {
+// Mock matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+})
+
+describe('ExternalLinks', () => {
+  it('renders as expected', () => {
     const {getByText} = render(<ExternalLinks product={product[0]} />)
     expect(getByText('Partner Privacy Policy')).toBeInTheDocument()
     expect(getByText('Accessibility Documentation')).toBeInTheDocument()

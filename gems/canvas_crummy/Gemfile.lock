@@ -23,7 +23,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   canvas_crummy!
   rake
   simplecov (~> 0.22)

@@ -12,9 +12,4 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "activesupport", "< 8.0"
-
-  spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "~> 3.12"
-  spec.add_development_dependency "simplecov", "~> 0.22"
 end

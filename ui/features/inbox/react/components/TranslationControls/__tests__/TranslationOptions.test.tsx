@@ -16,31 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 import TranslationOptions from '../TranslationOptions'
-import { useTranslationContext } from '../../../hooks/useTranslationContext'
+import {useTranslationContext} from '../../../hooks/useTranslationContext'
 
 jest.mock('../../../hooks/useTranslationContext')
 
-const mockUseTranslationContext = useTranslationContext as jest.MockedFunction<typeof useTranslationContext>
+const mockUseTranslationContext = useTranslationContext as jest.MockedFunction<
+  typeof useTranslationContext
+>
 
 const translateBody = jest.fn()
 
 describe('TranslationOptions', () => {
-
   beforeAll(() => {
     // @ts-expect-error
     global.ENV = {
       inbox_translation_languages: [
-        { id: 'en', name: 'English' },
-        { id: 'es', name: 'Spanish' },
-        { id: 'fr', name: 'French' },
-        { id: 'de', name: 'German' },
-        { id: 'it', name: 'Italian' }
-      ]
-    };
+        {id: 'en', name: 'English'},
+        {id: 'es', name: 'Spanish'},
+        {id: 'fr', name: 'French'},
+        {id: 'de', name: 'German'},
+        {id: 'it', name: 'Italian'},
+      ],
+    }
   })
 
   beforeEach(() => {
@@ -50,6 +50,7 @@ describe('TranslationOptions', () => {
       setTranslationTargetLanguage: jest.fn(),
       translateBody,
       translating: false,
+      setErrorMessages: jest.fn(),
     })
   })
 
@@ -61,16 +62,16 @@ describe('TranslationOptions', () => {
   it('initial state is correct', () => {
     render(<TranslationOptions asPrimary={null} onSetPrimary={jest.fn()} />)
     expect(screen.getByPlaceholderText(/Select a language.../i)).toHaveValue('')
-    expect(screen.getByText(/^Translate$/i).closest("button")).toBeDisabled()
+    expect(screen.getByText(/^Translate$/i).closest('button')).toBeEnabled()
   })
 
   it('calls translateBody on clicking on translate button', () => {
-    const { translateBody } = mockUseTranslationContext()
+    const {translateBody} = mockUseTranslationContext()
     const setPrimaryMock = jest.fn()
     render(
       <div id="flash_screenreader_holder" role="alert">
         <TranslationOptions asPrimary={null} onSetPrimary={setPrimaryMock} />
-      </div>
+      </div>,
     )
 
     const input = screen.getByPlaceholderText(/Select a language.../i)
@@ -78,7 +79,7 @@ describe('TranslationOptions', () => {
     const option = screen.getByText(/Spanish/i)
     option.click()
 
-    const translateButton = screen.getByText(/^Translate$/i).closest("button")
+    const translateButton = screen.getByText(/^Translate$/i).closest('button')
     fireEvent.click(translateButton!)
     expect(translateBody).toHaveBeenCalledWith(false)
     expect(setPrimaryMock).toHaveBeenCalledWith(false)
@@ -90,17 +91,17 @@ describe('TranslationOptions', () => {
     const valuesArr = [true, false]
 
     const setPrimaryMock = jest.fn()
-    const { rerender } = render(<TranslationOptions asPrimary={null} onSetPrimary={setPrimaryMock} />)
+    const {rerender} = render(<TranslationOptions asPrimary={null} onSetPrimary={setPrimaryMock} />)
 
-    valuesArr.forEach((asPrimary) => {
+    valuesArr.forEach(asPrimary => {
       translateBody.mockClear()
       setPrimaryMock.mockClear()
 
       rerender(<TranslationOptions asPrimary={asPrimary} onSetPrimary={setPrimaryMock} />)
 
       const input = screen.getByPlaceholderText(/Select a language.../i)
-      fireEvent.change(input, { target: { value: 'Spanish' } })
-      const translateButton = screen.getByText(/^Translate$/i).closest("button")
+      fireEvent.change(input, {target: {value: 'Spanish'}})
+      const translateButton = screen.getByText(/^Translate$/i).closest('button')
       fireEvent.click(translateButton!)
 
       expect(translateBody).toHaveBeenCalledWith(asPrimary)
@@ -113,11 +114,11 @@ describe('TranslationOptions', () => {
     mockUseTranslationContext.mockReturnValueOnce({
       setTranslationTargetLanguage: jest.fn(),
       translateBody: jest.fn(),
-      body: "Hello",
-      translating: true
+      body: 'Hello',
+      translating: true,
     })
     render(<TranslationOptions asPrimary={null} onSetPrimary={jest.fn()} />)
-    expect(screen.getByText(/^Translate$/i).closest("button")).toBeDisabled()
+    expect(screen.getByText(/^Translate$/i).closest('button')).toBeDisabled()
   })
 
   it('updates asPrimary state on radio input change', () => {
@@ -128,11 +129,11 @@ describe('TranslationOptions', () => {
   })
 
   it('calls setTranslationTargetLanguage on selecting multiple languages', () => {
-    const { setTranslationTargetLanguage } = mockUseTranslationContext()
+    const {setTranslationTargetLanguage} = mockUseTranslationContext()
     render(
       <div id="flash_screenreader_holder" role="alert">
         <TranslationOptions asPrimary={null} onSetPrimary={jest.fn()} />
-      </div>
+      </div>,
     )
 
     const input = screen.getByPlaceholderText(/Select a language.../i)
@@ -142,7 +143,7 @@ describe('TranslationOptions', () => {
 
     expect(setTranslationTargetLanguage).toHaveBeenCalledWith('es')
 
-    fireEvent.change(input, { target: { value: '' } })
+    fireEvent.change(input, {target: {value: ''}})
     fireEvent.click(input)
     const option2 = screen.getByText(/French/i)
     option2.click()

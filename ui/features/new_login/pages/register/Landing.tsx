@@ -65,6 +65,7 @@ const Landing = () => {
                   icon={iconTeacher}
                   label={I18n.t('Create Teacher Account')}
                   onClick={handleNavigate(ROUTES.REGISTER_TEACHER)}
+                  testId="teacher-card-link"
                   text={I18n.t('Teacher')}
                 />
               </Flex.Item>
@@ -76,6 +77,7 @@ const Landing = () => {
                   icon={iconStudent}
                   label={I18n.t('Create Student Account')}
                   onClick={handleNavigate(ROUTES.REGISTER_STUDENT)}
+                  testId="student-card-link"
                   text={I18n.t('Student')}
                 />
               </Flex.Item>
@@ -87,6 +89,7 @@ const Landing = () => {
                   icon={iconParent}
                   label={I18n.t('Create Parent Account')}
                   onClick={handleNavigate(ROUTES.REGISTER_PARENT)}
+                  testId="parent-card-link"
                   text={I18n.t('Parent')}
                 />
               </Flex.Item>

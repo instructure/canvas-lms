@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from 'sinon'
+const sinon = require('sinon/pkg/sinon.js')
 
 import {buildText, buildTextBackground, getContainerWidth, getContainerHeight} from '../text'
 import {BASE_SIZE, DEFAULT_SETTINGS} from '../constants'

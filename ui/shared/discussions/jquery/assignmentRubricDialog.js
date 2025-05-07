@@ -31,7 +31,7 @@ const assignmentRubricDialog = {
     const $trigger = $('.rubric_dialog_trigger')
     if ($trigger) {
       this.noRubricExists = $trigger.data('noRubricExists')
-      const selector = $trigger.data('focusReturnsTo')
+      const selector = $trigger.data('focusReturnsTo') ?? '[data-testid="discussion-post-menu-trigger"]'
       try {
         this.$focusReturnsTo = $(document.querySelector(selector))
       } catch (err) {
@@ -54,7 +54,15 @@ const assignmentRubricDialog = {
       modal: false,
       resizable: true,
       autoOpen: false,
-      close: () => this.$focusReturnsTo.focus(),
+      close: () => {
+        this.$focusReturnsTo?.focus()
+      },
+      open: () => {
+        const $container = this.$dialog.dialog('widget')
+        $container.attr('aria-modal', 'true')
+        $container.find('.ui-dialog-titlebar-close').attr('tabindex', '0')
+        $container.find('.add_rubric_link').attr('tabindex', '0')
+      },
       zIndex: 1000,
     })
 
@@ -63,7 +71,7 @@ const assignmentRubricDialog = {
       // since that is the point of why they clicked the link.
       if (assignmentRubricDialog.noRubricExists) {
         $.subscribe('edit_rubric/initted', () =>
-          assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click(),
+            assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click(),
         )
       }
 
@@ -76,7 +84,7 @@ const assignmentRubricDialog = {
   openDialog() {
     if (!this.dialogInited) this.initDialog()
     this.$dialog.dialog('open')
-  },
+  }
 }
 
 export default assignmentRubricDialog

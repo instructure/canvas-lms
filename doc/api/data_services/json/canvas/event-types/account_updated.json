@@ -6,9 +6,11 @@
     "name": "The name of the account.",
     "account_id": "The Canvas id of the account.",
     "root_account_id": "The id of the Canvas root account the created account belongs to.",
+    "root_account_uuid": "The uuid of the Canvas root account the created account belongs to.",
     "parent_account_id": "The id of the Canvas parent account of the created account.",
     "external_status": "The external status of the account.",
     "workflow_state": "The workflow state of the account.",
+    "domain": "The Canvas domain of the root account of the account.",
     "default_time_zone": "The default time zone of the account.",
     "default_locale": "The default locale of the account."
   },
@@ -40,9 +42,11 @@
           "name": "Account Name",
           "account_id": 3,
           "root_account_id": 1,
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
           "parent_account_id": 2,
           "external_status": "paid",
           "workflow_state": "active",
+          "domain": "example.instructure.com",
           "default_time_zone": "America/Chicago",
           "default_locale": "en"
         }

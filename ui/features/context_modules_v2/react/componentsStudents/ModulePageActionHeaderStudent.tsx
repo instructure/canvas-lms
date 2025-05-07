@@ -16,14 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useCallback } from 'react'
-import { View } from '@instructure/ui-view'
-import { Button } from '@instructure/ui-buttons'
-import { Flex } from '@instructure/ui-flex'
-import {
-  IconCollapseLine,
-  IconExpandLine,
-} from '@instructure/ui-icons'
+import React, {useCallback} from 'react'
+import {View} from '@instructure/ui-view'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {IconCollapseLine, IconExpandLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_v2')
@@ -51,10 +48,7 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
     <View as="div" padding="small">
       <Flex justifyItems="space-between" gap="small">
         <Flex.Item>
-          <Button
-            renderIcon={anyModuleExpanded ? <IconCollapseLine /> : <IconExpandLine />}
-            onClick={handleCollapseExpandClick}
-          >
+          <Button onClick={handleCollapseExpandClick}>
             {anyModuleExpanded ? I18n.t('Collapse All') : I18n.t('Expand All')}
           </Button>
         </Flex.Item>

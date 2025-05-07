@@ -54,7 +54,7 @@ class ImmersiveReaderController < ApplicationController
   private
 
   def increment_error_count(response)
-    InstStatsd::Statsd.increment(
+    InstStatsd::Statsd.distributed_increment(
       "immersive_reader.authentication_failure",
       tags: { status: response.code }
     )

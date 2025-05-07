@@ -25,18 +25,19 @@ import React from 'react'
 
 type Props = {
   compact?: boolean
-  icon: string
   href: string
-  onClick: (event: React.MouseEvent<ViewOwnProps>) => void
-  text: string
+  icon: string
   label: string
+  onClick: (event: React.MouseEvent<ViewOwnProps>) => void
+  testId?: string
+  text: string
 }
 
-const Card = ({compact = false, href, icon, onClick, text, label}: Props) => {
+const Card = ({compact = false, href, icon, label, onClick, testId, text}: Props) => {
   return (
     <Link
       aria-label={label}
-      data-testid="card-link"
+      data-testid={testId}
       display="block"
       href={href}
       isWithinText={false}

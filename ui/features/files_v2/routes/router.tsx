@@ -18,9 +18,9 @@
 
 import {createBrowserRouter, Outlet, RouteObject} from 'react-router-dom'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
-import {FilesGenericErrorPage} from '../react/components/FilesGenericErrorPage'
 import AllMyFilesTable from '../react/components/AllMyFilesTable'
 import FilesApp from '../react/components/FilesApp'
+import {ReThrowRouteError} from './ReThrowRouteError'
 
 const ROUTES = {
   ALL_FOLDER: 'folder/:context/*',
@@ -52,7 +52,9 @@ const filesRoutes: RouteObject[] = [
 const routes: RouteObject[] = [
   {
     path: '/',
-    errorElement: <FilesGenericErrorPage />,
+    // react-router does not support skipping its own error handling
+    // ref: https://github.com/remix-run/react-router/discussions/10166
+    errorElement: <ReThrowRouteError />,
     Component: Outlet,
     children: filesEnv.showingAllContexts
       ? allMyFilesRoutes

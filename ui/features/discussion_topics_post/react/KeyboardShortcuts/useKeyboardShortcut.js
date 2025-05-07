@@ -27,6 +27,8 @@ export const KeyboardShortcuts = {
   ON_OPEN_TOPIC_REPLY: 'onOpenTopicReply',
   ON_NEXT_REPLY: 'onNextReply',
   ON_PREV_REPLY: 'onPrevReply',
+  ON_SPEEDGRADER_COMMENT: 'onSpeedGraderComment',
+  ON_SPEEDGRADER_GRADE: 'onSpeedGraderGrade',
 }
 
 export function useEventHandler(eventName, callback) {
@@ -49,7 +51,7 @@ export function useKeyboardShortcuts() {
           detail: {
             entryId,
           },
-        })
+        }),
       )
     }
 
@@ -70,6 +72,8 @@ export function useKeyboardShortcuts() {
         x: () => dispatchCustomEvent(KeyboardShortcuts.ON_SHOW_REPLIES_KEYBOARD, entryId),
         k: () => dispatchCustomEvent(KeyboardShortcuts.ON_PREV_REPLY, entryId),
         j: () => dispatchCustomEvent(KeyboardShortcuts.ON_NEXT_REPLY, entryId),
+        c: () => dispatchCustomEvent(KeyboardShortcuts.ON_SPEEDGRADER_COMMENT, entryId),
+        g: () => dispatchCustomEvent(KeyboardShortcuts.ON_SPEEDGRADER_GRADE, entryId),
       }
 
       if (keyEventMap[e.key]) {

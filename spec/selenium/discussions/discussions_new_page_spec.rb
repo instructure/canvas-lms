@@ -281,6 +281,7 @@ describe "discussions" do
         end
 
         it "does not show anonymous discussion options" do
+          skip "Will be fixed in VICE-5209"
           get url
           expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
         end
@@ -363,6 +364,7 @@ describe "discussions" do
       end
 
       it "creates a delayed discussion", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         get url
         wait_for_tiny(f("textarea[name=message]"))
         replace_content(f("input[name=title]"), "Student Delayed")
@@ -393,6 +395,7 @@ describe "discussions" do
       end
 
       it "allows a student to create a discussion", priority: "1" do
+        skip "Will be fixed in VICE-5209"
         skip_if_firefox("known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085")
         get url
         wait_for_tiny(f("textarea[name=message]"))

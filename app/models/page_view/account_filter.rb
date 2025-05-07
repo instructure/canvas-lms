@@ -21,7 +21,7 @@
 class PageView
   class AccountFilter
     def self.filter(collection, viewer)
-      BookmarkedCollection.filter(collection, &new(viewer).method(:filter))
+      BookmarkedCollection.filter(collection, sync: true, &new(viewer).method(:filter))
     end
 
     def initialize(viewer)

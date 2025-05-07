@@ -22,6 +22,7 @@ import type {FallbackRender} from '@sentry/react/types/errorboundary.d'
 
 export type ErrorBoundaryProps = PropsWithChildren<{
   errorComponent: FallbackRender | ReactElement
+  beforeCapture?: Sentry.ErrorBoundaryProps['beforeCapture']
 }>
 
 type ErrorBoundaryState = {
@@ -35,7 +36,6 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
 
   // @ts-expect-error
   componentDidCatch(error, errorInfo) {
-    // eslint-disable-next-line no-console
     console.error(error, errorInfo)
   }
 
@@ -60,7 +60,10 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
     }
 
     return (
-      <Sentry.ErrorBoundary fallback={this.props.errorComponent}>
+      <Sentry.ErrorBoundary
+        fallback={this.props.errorComponent}
+        beforeCapture={this.props.beforeCapture}
+      >
         {this.props.children}
       </Sentry.ErrorBoundary>
     )

@@ -565,6 +565,17 @@ describe AccountNotification do
         expect(job.run_at.to_i).to eq an.start_at.to_i
       end
 
+      it "cannot send_message when workflow is deleted" do
+        an = account_notification(account: Account.default,
+                                  send_message: true,
+                                  start_at: 1.day.ago,
+
+                                  end_at: 2.days.from_now)
+        expect(an.should_send_message?).to be true
+        an.workflow_state = "deleted"
+        expect(an.should_send_message?).to be false
+      end
+
       it "does not queue a job when saving an announcement that already had messages sent" do
         an = account_notification(account: Account.default)
         an.messages_sent_at = 1.day.ago

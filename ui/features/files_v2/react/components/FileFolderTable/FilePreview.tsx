@@ -16,69 +16,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Suspense} from 'react'
 import {Flex} from '@instructure/ui-flex'
-
 import StudioMediaPlayer from '@canvas/canvas-studio-player'
-import {MediaTrack} from '@canvas/canvas-studio-player/react/types'
-
 import {type File} from '../../../interfaces/File'
+import {isLockedBlueprintItem} from '../../../utils/fileFolderUtils'
 import NoFilePreviewAvailable from './NoFilePreviewAvailable'
 import FilePreviewIframe from './FilePreviewIframe'
-import LoadingIndicator from '@canvas/loading-indicator/react'
+
+const previewableTypes = ['image', 'pdf', 'html', 'doc', 'text']
+const mediaTypes = ['video', 'audio']
 
 export interface FilePreviewProps {
   item: File
-  isFilePreview: boolean
-  isMediaPreview: boolean
-  mediaId: string
-  mediaSources: any[]
-  mediaTracks: MediaTrack[]
-  isFetchingMedia: boolean
 }
 
-export const mediaTypes = ['video', 'audio']
+export const FilePreview = ({item}: FilePreviewProps) => {
+  const isFilePreview = !!(item.preview_url && previewableTypes.includes(item.mime_class))
+  const isMediaPreview = !isFilePreview && mediaTypes.includes(item.mime_class)
 
-export const FilePreview = ({
-  item,
-  isFilePreview,
-  isMediaPreview,
-  mediaId,
-  mediaSources,
-  mediaTracks,
-  isFetchingMedia,
-}: FilePreviewProps) => {
   if (isFilePreview) {
     return <FilePreviewIframe item={item} />
   } else if (isMediaPreview) {
     return (
       <Flex as="div" alignItems="center" height="100%" justifyItems="center">
-        {isFetchingMedia ? (
-          <Flex.Item>
-            <LoadingIndicator />
-          </Flex.Item>
-        ) : (
-          <Suspense>
-            <StudioMediaPlayer
-              media_id={mediaId}
-              type={
-                mediaTypes.includes(item.mime_class)
-                  ? (item.mime_class as 'video' | 'audio')
-                  : undefined
-              }
-              media_sources={mediaSources}
-              media_tracks={mediaTracks}
-              is_attachment={true}
-              attachment_id={item.id}
-              show_loader={!mediaSources?.length}
-              hideUploadCaptions={true}
-              explicitSize={{
-                width: '100%',
-                height: '100%',
-              }}
-            />
-          </Suspense>
-        )}
+        <StudioMediaPlayer
+          is_attachment={true}
+          attachment_id={item.id}
+          show_loader={true}
+          isInverseVariant={true}
+          hideUploadCaptions={isLockedBlueprintItem(item)}
+          explicitSize={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
       </Flex>
     )
   } else {

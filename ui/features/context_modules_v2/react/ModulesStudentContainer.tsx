@@ -18,12 +18,11 @@
 
 import React from 'react'
 import {View} from '@instructure/ui-view'
-import {QueryProvider} from '@canvas/query'
 import ModulesListStudent from './componentsStudents/ModuleListStudent'
 
 const ModulesStudentContainer: React.FC = () => {
   return (
-    <View as="div" margin="large" data-testid="modules-rewrite-student-container">
+    <View as="div" data-testid="modules-rewrite-student-container">
       <ModulesListStudent />
       <div id="differentiated-modules-mount-point" />
     </View>

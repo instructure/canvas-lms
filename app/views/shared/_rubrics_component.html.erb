@@ -19,13 +19,15 @@
   <% js_bundle :edit_rubric %>
   <% css_bundle :learning_outcomes %>
 
+  <% is_a2_student_view = false if is_a2_student_view.nil? %>
+
   <% if can_do(@assignment, @current_user, :update) %>
     <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
     <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
   <% end %>
 
   <div id="rubrics" class="mathjax_ignore" style="margin-bottom: 10px;">
-    <% if @assignment.active_rubric_association? && @assignment.rubric_association.rubric %>
+    <% if @assignment.active_rubric_association? && @assignment.rubric_association.rubric && !is_a2_student_view %>
       <%= render :partial => "shared/rubric", :object => @assignment.rubric_association.rubric, :locals => {:association => @assignment, :rubric_association => @assignment.rubric_association, :editable => can_do(@assignment, @current_user, :update), :has_assessments => !@assignment.rubric_association.rubric_assessments.empty?, :edit_view => can_do(@assignment.rubric_association, @current_user, :update) } %>
     <% end %>
     <div style="display: none;" id="rubric_parameters">
@@ -49,4 +51,4 @@
       <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link rubric" style="<%= hidden if @assignment.active_rubric_association? %>"><%= t 'links.assign_rubric', 'Assign Rubric' %></a>
     </div>
   <% end %>
-  <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? %>
+  <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? && !is_a2_student_view %>

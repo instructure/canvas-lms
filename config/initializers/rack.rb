@@ -28,4 +28,4 @@ module EnableRackChunking
     false
   end
 end
-Rack::Chunked.prepend(EnableRackChunking)
+Rack::Chunked.prepend(EnableRackChunking) if $canvas_rails == "7.1"

@@ -17,21 +17,30 @@
  */
 
 import React, {useState, useEffect, useMemo, useRef} from 'react'
-import {Modal} from '@instructure/ui-modal'
+import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-heading'
+import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {FormFieldGroup} from '@instructure/ui-form-field'
+import {useAssignmentGroups} from '../../hooks/queries/useAssignmentGroups'
 import {useModuleItemContent, ModuleItemContentType} from '../../hooks/queries/useModuleItemContent'
 import {useContextModule} from '../../hooks/useModuleContext'
-import doFetchApi from '../../../../../shared/do-fetch-api-effect'
-import { queryClient } from '../../../../../shared/query'
+import {queryClient} from '../../../../../shared/query'
 import AddItemTypeSelector from './AddItemTypeSelector'
-import { ScreenReaderContent } from '@instructure/ui-a11y-content'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import IndentSelector from './IndentSelector'
+import {Tabs} from '@instructure/ui-tabs'
+import CreateLearningObjectForm from './CreateLearningObjectForm'
+import ExternalItemForm from './ExternalItemForm'
+import {Spinner} from '@instructure/ui-spinner'
+import {
+  createNewItem,
+  prepareModuleItemData,
+  submitModuleItem,
+} from '../../handlers/addItemHandlers'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -48,7 +57,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   onRequestClose,
   moduleName,
   moduleId,
-  itemCount
+  itemCount,
 }) => {
   const [itemType, setItemType] = useState<ModuleItemContentType>('assignment')
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -56,21 +65,32 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [textHeaderValue, setTextHeaderValue] = useState<string>('')
   const [externalUrlValue, setExternalUrlValue] = useState<string>('')
   const [externalUrlName, setExternalUrlName] = useState<string>('')
+  const [externalUrlNewTab, setExternalUrlNewTab] = useState<boolean>(false)
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0)
+  const [newItemName, setNewItemName] = useState<string>('')
+  const [selectedAssignmentGroup, setSelectedAssignmentGroup] = useState<string>('')
 
   const [inputValue, setInputValue] = useState('')
   const [searchText, setSearchText] = useState<string>('')
   const [debouncedSearchText, setDebouncedSearchText] = useState<string>('')
 
-  const { courseId } = useContextModule()
+  const {courseId, NEW_QUIZZES_BY_DEFAULT, DEFAULT_POST_TO_SIS} = useContextModule()
 
-  const { data, isLoading: isLoadingContent, isError } = useModuleItemContent(
+  const {
+    data,
+    isLoading: isLoadingContent,
+    isError,
+  } = useModuleItemContent(
     itemType,
     courseId,
     debouncedSearchText,
-    isOpen && itemType !== 'context_module_sub_header' && itemType !== 'external_url'
+    isOpen && itemType !== 'context_module_sub_header' && itemType !== 'external_url',
   )
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const {data: assignmentGroups, isLoading: isLoadingAssignmentGroups} =
+    useAssignmentGroups(courseId)
 
   useEffect(() => {
     if (timeoutRef.current) {
@@ -88,106 +108,86 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     }
   }, [searchText])
 
+  useEffect(() => {
+    setInputValue(data?.items?.[0]?.id || '')
+  }, [data?.items])
+
   const handleSubmit = () => {
-    /* sample itemData, submitted as form data:
-      Sample 1:
-
-      item[type]: assignment
-      item[id]: 110991
-      item[title]: Module 1 - Assignment - Alpha
-      item[indent]: 0
-      quiz_lti: false
-      content_details[]: items
-      item[position]: 1
-      id: new
-      type: assignment
-      title: Module 1 - Assignment - Alpha
-      new_tab: 0
-      graded: 0
-      _method: POST
-
-      Sample 2:
-      item[type]: context_module_sub_header
-      item[indent]: 0
-      item[title]: OLDER QUIZZES
-      content_details[]: items
-      item[position]: 2
-      id: new
-      type: context_module_sub_header
-      title: OLDER QUIZZES
-      new_tab: 0
-      graded: 0
-      _method: POST
-    */
     setIsLoading(true)
 
-    const itemData: Record<string, string | number | string[] | undefined | boolean> = {
-      'item[type]': itemType,
-      'item[position]': itemCount + 1,
-      'item[indent]': indentation,
-      'quiz_lti': false,
-      'content_details[]': 'items',
-      'id': 'new',
-      'type': itemType,
-      'new_tab': 0,
-      'graded': 0,
-      '_method': 'POST'
-    }
-
-    if (itemType === 'context_module_sub_header') {
-      itemData['item[title]'] = textHeaderValue
-      itemData['title'] = textHeaderValue
-    } else if (itemType === 'external_url') {
-      itemData['item[title]'] = externalUrlName
-      itemData['title'] = externalUrlName
-      itemData['url'] = externalUrlValue
-
-      if (!externalUrlValue) {
-        setIsLoading(false)
-        return
-      } else if (!externalUrlName) {
+    if (itemType === 'external_url') {
+      if (!externalUrlValue || !externalUrlName) {
         setIsLoading(false)
         return
       }
+    }
+
+    const selectedItem = contentItems.find(item => item.id === inputValue)
+
+    const itemData = prepareModuleItemData(moduleId, {
+      type: itemType,
+      itemCount,
+      indentation,
+      selectedTabIndex,
+      textHeaderValue,
+      externalUrlName,
+      externalUrlValue,
+      externalUrlNewTab,
+      selectedItem: selectedItem || null,
+    })
+
+    if (itemType === 'context_module_sub_header' || itemType === 'external_url') {
+      // For subheaders and external URLs, we can directly submit without creating a new item first
+      submitItemData(itemData)
+    } else if (selectedTabIndex === 1) {
+      // We need to create a new item
+      handleCreateNewItem(itemType).then(newItem => {
+        if (newItem) {
+          // Update the itemData with the newly created item's ID
+          itemData['item[id]'] = newItem.id || newItem.page_id
+          itemData['id'] = 'new'
+          itemData['item[title]'] = newItem.title || newItem.display_name || ''
+          itemData['title'] = newItem.title || newItem.display_name || ''
+          submitItemData(itemData)
+        } else {
+          setIsLoading(false)
+          console.error('Failed to create new item')
+        }
+      })
+    } else if (selectedItem) {
+      // Using an existing item
+      submitItemData(itemData)
     } else {
-      const selectedItem = contentItems.find(item => item.id === inputValue)
-
-      if (selectedItem) {
-        itemData['item[id]'] = selectedItem.id
-        itemData['item[title]'] = selectedItem.name
-        itemData['title'] = selectedItem.name
-      } else {
-        itemData['item[id]'] = ''
-        itemData['item[title]'] = ''
-        itemData['title'] = ''
-      }
+      setIsLoading(false)
     }
-
-    submitItemData(itemData)
   }
 
-  const submitItemData = (_itemData: Record<string, string | number | string[] | undefined | boolean>) => {
-    const body = new FormData()
-    Object.entries(_itemData).forEach(([key, value]) => {
-      body.append(key, String(value))
-    })
-    doFetchApi({
-      path: `/courses/${courseId}/modules/${moduleId}/items`,
-      method: 'POST',
-      body,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(() => {
+  const handleCreateNewItem = async (type: string) => {
+    return await createNewItem(
+      type,
+      courseId,
+      newItemName,
+      selectedAssignmentGroup,
+      NEW_QUIZZES_BY_DEFAULT,
+      DEFAULT_POST_TO_SIS,
+    )
+  }
+
+  const submitItemData = (
+    itemData: Record<string, string | number | string[] | undefined | boolean>,
+  ) => {
+    submitModuleItem(courseId, moduleId, itemData)
+      .then(response => {
+        if (response) {
+          queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId], exact: false})
+
+          onRequestClose()
+        }
+
         setIsLoading(false)
-        queryClient.invalidateQueries({
-          queryKey: ['moduleItems', moduleId],
-          exact: false
-        })
-        onRequestClose()
       })
-      .catch(() => {
+      .catch(error => {
+        console.error('Error adding item to module:', error)
         setIsLoading(false)
       })
   }
@@ -199,6 +199,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     setTextHeaderValue('')
     setExternalUrlValue('')
     setExternalUrlName('')
+    setExternalUrlNewTab(false)
     setIsLoading(false)
 
     setInputValue('')
@@ -229,41 +230,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
   const contentItems = useMemo(() => {
     if (itemType === 'context_module_sub_header') {
-      return [{ id: 'new_header', name: I18n.t('Create a new header') }]
+      return [{id: 'new_header', name: I18n.t('Create a new header')}]
     } else if (itemType === 'external_url') {
-      return [{ id: 'new_url', name: I18n.t('Create a new URL') }]
+      return [{id: 'new_url', name: I18n.t('Create a new URL')}]
     } else {
       return [...(data?.items || [])]
     }
   }, [itemType, data?.items])
-
-  const renderedOptions = useMemo(() => {
-    if (isLoadingContent) {
-      return (
-        <SimpleSelect.Option
-          id="loading-option"
-          key="loading-option"
-          value="loading-option"
-        >
-          {I18n.t('Loading...')}
-        </SimpleSelect.Option>
-      )
-    }
-
-    if (contentItems.length > 0) {
-      return contentItems.map(option => (
-        <SimpleSelect.Option
-          id={option.id}
-          key={option.id}
-          value={option.id}
-        >
-          {option.name}
-        </SimpleSelect.Option>
-      ))
-    }
-
-    return <SimpleSelect.Option id="empty-option" key="empty-option" value="">---</SimpleSelect.Option>
-  }, [contentItems, isLoadingContent])
 
   const renderContentItems = () => {
     if (isError) {
@@ -276,70 +249,31 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
     return (
       <SimpleSelect
-        renderLabel={I18n.t('Select %{itemType}', { itemType: itemTypeLabel })}
-        assistiveText={I18n.t('Type or use arrow keys to navigate options. Multiple selections allowed.')}
+        renderLabel={I18n.t('Select %{itemType}', {itemType: itemTypeLabel})}
+        assistiveText={I18n.t('Type or use arrow keys to navigate options.')}
         value={inputValue}
         onChange={(_e, {value}) => setInputValue(value as string)}
+        renderAfterInput={
+          isLoadingContent && <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
+        }
       >
-        {renderedOptions}
+        {contentItems
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(option => (
+            <SimpleSelect.Option id={option.id} key={option.id} value={option.id}>
+              {option.name}
+            </SimpleSelect.Option>
+          ))}
       </SimpleSelect>
     )
   }
 
-  const renderTextHeaderInputs = () => {
-    return (
-      <View as="div" margin="medium 0">
-        <TextInput
-          renderLabel={I18n.t('Header text')}
-          placeholder={I18n.t('Enter header text')}
-          value={textHeaderValue}
-          onChange={(_e, value) => setTextHeaderValue(value)}
-        />
-      </View>
-    )
-  }
-
-  const renderExternalUrlInputs = () => {
-    return (
-      <View as="div" margin="medium 0">
-        <TextInput
-          renderLabel={I18n.t('URL')}
-          placeholder="https://example.com"
-          value={externalUrlValue}
-          onChange={(_e, value) => setExternalUrlValue(value)}
-        />
-        <View as="div" margin="small 0 0 0">
-          <TextInput
-            renderLabel={I18n.t('Page name')}
-            placeholder={I18n.t('Enter page name')}
-            value={externalUrlName}
-            onChange={(_e, value) => setExternalUrlName(value)}
-          />
-        </View>
-      </View>
-    )
-  }
-
-  const renderItemSelectForm = () => {
-    return renderContentItems()
-  }
-
-  const renderItemForm = () => {
-    if (itemType === 'context_module_sub_header') {
-      return renderTextHeaderInputs()
-    } else if (itemType === 'external_url') {
-      return renderExternalUrlInputs()
-    } else {
-      return renderItemSelectForm()
-    }
-  }
-
   return (
-    <Modal
+    <CanvasModal
       as="form"
       open={isOpen}
       onDismiss={onRequestClose}
-      onSubmit={(e) => {
+      onSubmit={(e: React.FormEvent) => {
         e.preventDefault()
         handleSubmit()
       }}
@@ -347,62 +281,78 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       label={I18n.t('Add Item to Module')}
       shouldCloseOnDocumentClick
       size="medium"
+      title={I18n.t('Add an item to %{module}', {module: moduleName})}
+      footer={
+        <>
+          <Button onClick={onRequestClose} disabled={isLoading} margin="0 x-small 0 0">
+            {I18n.t('Cancel')}
+          </Button>
+          <Button color="primary" type="submit" disabled={isLoading}>
+            {I18n.t('Add Item')}
+          </Button>
+        </>
+      }
     >
-      <Modal.Header>
-        <CloseButton
-          placement="end"
-          offset="small"
-          onClick={onRequestClose}
-          screenReaderLabel={I18n.t('Close')}
-        />
-        <Heading level="h2">
-          {I18n.t('Add an item to %{module}', { module: moduleName })}
-        </Heading>
-      </Modal.Header>
-      <Modal.Body>
-        <View as="div" margin="0 0 medium 0">
-          <AddItemTypeSelector
-            itemType={itemType}
-            onChange={(value) => setItemType(value)}
+      <View as="div" margin="0 0 medium 0">
+        <AddItemTypeSelector itemType={itemType} onChange={value => setItemType(value)} />
+      </View>
+      <FormFieldGroup
+        description={
+          <ScreenReaderContent>
+            {I18n.t('Add an item to %{module}', {module: moduleName})}
+          </ScreenReaderContent>
+        }
+      >
+        {['assignment', 'quiz', 'file', 'page', 'discussion'].includes(itemType) && (
+          <Tabs onRequestTabChange={(_event, tabData) => setSelectedTabIndex(tabData.index)}>
+            <Tabs.Panel
+              id="add-item-form"
+              renderTitle={I18n.t('Add Item')}
+              isSelected={selectedTabIndex === 0}
+            >
+              {renderContentItems()}
+            </Tabs.Panel>
+            <Tabs.Panel
+              id="create-item-form"
+              renderTitle={I18n.t('Create Item')}
+              isSelected={selectedTabIndex === 1}
+            >
+              <CreateLearningObjectForm
+                itemType={itemType}
+                onChange={(e, value) => {
+                  if (e === 'name') setNewItemName(value)
+                  else if (e === 'assignmentGroup') setSelectedAssignmentGroup(value)
+                }}
+                assignmentGroups={assignmentGroups?.assignmentGroups || []}
+              />
+            </Tabs.Panel>
+          </Tabs>
+        )}
+        {itemType === 'context_module_sub_header' && (
+          <View as="div" margin="medium 0">
+            <TextInput
+              renderLabel={I18n.t('Header text')}
+              placeholder={I18n.t('Enter header text')}
+              value={textHeaderValue}
+              onChange={(_e, value) => setTextHeaderValue(value)}
+            />
+          </View>
+        )}
+        {['external_url', 'external_tool'].includes(itemType) && (
+          <ExternalItemForm
+            onChange={(field, value) => {
+              if (field === 'url') setExternalUrlValue(value)
+              if (field === 'name') setExternalUrlName(value)
+              if (field === 'newTab') setExternalUrlNewTab(value)
+            }}
+            externalUrlValue={externalUrlValue}
+            externalUrlName={externalUrlName}
+            newTab={externalUrlNewTab}
           />
-        </View>
-        <FormFieldGroup
-          description={<ScreenReaderContent>{I18n.t('Add an item to %{module}', { module: moduleName })}</ScreenReaderContent>}
-        >
-          {renderItemForm()}
-          <SimpleSelect
-            renderLabel={I18n.t('Indentation')}
-            value={indentation}
-            onChange={(_e, {value}) => setIndentation(value as number)}
-          >
-            <SimpleSelect.Option id="0" value={0}>
-              {I18n.t('Don\'t indent')}
-            </SimpleSelect.Option>
-            <SimpleSelect.Option id="1" value={1}>
-              {I18n.t('Indent 1 level')}
-            </SimpleSelect.Option>
-            <SimpleSelect.Option id="2" value={2}>
-              {I18n.t('Indent 2 levels')}
-            </SimpleSelect.Option>
-            <SimpleSelect.Option id="3" value={3}>
-              {I18n.t('Indent 3 levels')}
-            </SimpleSelect.Option>
-          </SimpleSelect>
-        </FormFieldGroup>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={onRequestClose} disabled={isLoading} margin="0 x-small 0 0">
-          {I18n.t('Cancel')}
-        </Button>
-        <Button
-          color="primary"
-          type="submit"
-          disabled={isLoading}
-        >
-          {I18n.t('Add Item')}
-        </Button>
-      </Modal.Footer>
-    </Modal>
+        )}
+        <IndentSelector value={indentation} onChange={setIndentation} />
+      </FormFieldGroup>
+    </CanvasModal>
   )
 }
 

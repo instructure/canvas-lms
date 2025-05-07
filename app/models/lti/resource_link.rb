@@ -83,8 +83,12 @@ class Lti::ResourceLink < ApplicationRecord
   end
 
   def self.find_or_initialize_for_context_and_lookup_uuid(
-    context:, lookup_uuid:, custom: nil, url: nil,
-    context_external_tool: nil, context_external_tool_launch_url: nil
+    context:,
+    lookup_uuid:,
+    custom: nil,
+    url: nil,
+    context_external_tool: nil,
+    context_external_tool_launch_url: nil
   )
     result = lookup_uuid.present? && context&.lti_resource_links&.find_by(lookup_uuid:)
     result || context&.shard&.activate do

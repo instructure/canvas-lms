@@ -21,7 +21,7 @@ import {
   getLabelForFilter,
   formatGradingPeriodTitleForDisplay,
 } from '../Gradebook.utils'
-import type {Filter} from '../gradebook.d'
+import type {Filter, EnrollmentFilter} from '../gradebook.d'
 import type {Student, Enrollment} from '../../../../../api.d'
 import {enrollment, student, enrollmentFilter, appliedFilters, student2} from './fixtures'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading'
@@ -29,9 +29,12 @@ import type {CamelizedGradingPeriod} from '@canvas/grading/grading'
 describe('filterStudentBySectionFn', () => {
   describe('section filtering', () => {
     let modifiedStudents: Student[]
-    const enrollmentFilterTest = {...enrollmentFilter}
-    const appliedFilterTest = [...appliedFilters]
+    let enrollmentFilterTest: EnrollmentFilter
+    let appliedFilterTest: Filter[]
     beforeEach(() => {
+      enrollmentFilterTest = {...enrollmentFilter}
+      appliedFilterTest = [...appliedFilters]
+
       const enrollment1: Enrollment = {
         ...enrollment,
         course_section_id: 'section1',
@@ -71,9 +74,12 @@ describe('filterStudentBySectionFn', () => {
 
   describe('enrollment filters', () => {
     let modifiedStudents: Student[]
-    const enrollmentFilterTest = {...enrollmentFilter}
-    const appliedFilterTest = [...appliedFilters]
+    let enrollmentFilterTest: EnrollmentFilter
+    let appliedFilterTest: Filter[]
     beforeEach(() => {
+      enrollmentFilterTest = {...enrollmentFilter}
+      appliedFilterTest = [...appliedFilters]
+
       const enrollment1: Enrollment = {
         ...enrollment,
         course_section_id: 'section1',
@@ -89,6 +95,7 @@ describe('filterStudentBySectionFn', () => {
       modifiedStudents = [modifiedStudent1, modifiedStudent2]
     })
     it('student appears in section 1 with a completed enrollment when the concluded enrollment filter is on ', () => {
+      enrollmentFilterTest.inactive = false
       enrollmentFilterTest.concluded = true
       appliedFilterTest[0].value = 'section1'
       const filteredStudentsSection1 = modifiedStudents.filter(
@@ -119,8 +126,8 @@ describe('filterStudentBySectionFn', () => {
   })
 
   describe('dual enrollment', () => {
-    const enrollmentFilterTest = {...enrollmentFilter}
-    const appliedFilterTest = [...appliedFilters]
+    let enrollmentFilterTest: EnrollmentFilter
+    let appliedFilterTest: Filter[]
     let modifiedStudents: Student[]
     const enrollment3: Enrollment = {
       ...enrollment,
@@ -129,6 +136,9 @@ describe('filterStudentBySectionFn', () => {
     }
     const modifiedStudent2: Student = {...student2, enrollments: [enrollment3]}
     beforeEach(() => {
+      enrollmentFilterTest = {...enrollmentFilter}
+      appliedFilterTest = [...appliedFilters]
+
       const enrollment1: Enrollment = {
         ...enrollment,
         course_section_id: 'section1',

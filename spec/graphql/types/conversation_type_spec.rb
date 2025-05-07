@@ -164,6 +164,17 @@ describe Types::ConversationType do
       result = conversation_type.resolve("conversationMessagesConnection { nodes { body } }")
       expect(result).to match_array(@conversation.conversation.conversation_messages.pluck(:body))
     end
+
+    it "returns the recipients of the message" do
+      result = conversation_type.resolve("conversationMessagesConnection { nodes { recipients { name } } }")
+      expect(result[0]).to include(@student.name)
+    end
+
+    it "returns the recipients even if they delete the conversation" do
+      @conversation.conversation.conversation_messages[0].conversation_message_participants.where(user_id: @student.id).first.update!(workflow_state: "deleted")
+      result = conversation_type.resolve("conversationMessagesConnection { nodes { recipients { name } } }")
+      expect(result[0]).to include(@student.name)
+    end
   end
 
   context "conversationParticipants" do

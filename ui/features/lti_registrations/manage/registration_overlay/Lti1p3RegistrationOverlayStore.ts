@@ -31,6 +31,8 @@ export type PlacementLabelOverride = string
 export type IconUrlOverride = string
 
 export interface Lti1p3RegistrationOverlayActions {
+  setDirty: (dirty: boolean) => void
+  setHasSubmitted: (hasSubmitted: boolean) => void
   setRedirectURIs: (redirectURIs: string) => void
   setDefaultTargetLinkURI: (targetLinkURI: string) => void
   setOIDCInitiationURI: (oidcInitiationURI: string) => void
@@ -56,7 +58,10 @@ export interface Lti1p3RegistrationOverlayActions {
 const updateState =
   (f: (state: Lti1p3RegistrationOverlayState) => Lti1p3RegistrationOverlayState) =>
   (fullState: {state: Lti1p3RegistrationOverlayState}): {state: Lti1p3RegistrationOverlayState} =>
-    stateFor(f(fullState.state))
+    stateFor({
+      ...f(fullState.state),
+      dirty: true,
+    })
 
 const stateFor = (state: Lti1p3RegistrationOverlayState) => ({state})
 
@@ -115,6 +120,8 @@ export const createLti1p3RegistrationOverlayStore = (
 ) =>
   create<{state: Lti1p3RegistrationOverlayState} & Lti1p3RegistrationOverlayActions>(set => ({
     state: initialOverlayStateFromInternalConfig(internalConfig, adminNickname, existingOverlay),
+    setDirty: dirty => set(s => ({...set, state: {...s.state, dirty}})),
+    setHasSubmitted: hasSubmitted => set(s => ({...set, state: {...s.state, hasSubmitted}})),
     setRedirectURIs: redirectURIs =>
       set(updateLaunchSetting('redirectURIs', filterEmptyString(redirectURIs))),
     setDefaultTargetLinkURI: targetLinkURI =>

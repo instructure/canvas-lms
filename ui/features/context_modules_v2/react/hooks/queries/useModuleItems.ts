@@ -129,11 +129,13 @@ const transformItems = (items: ModuleItem[], moduleId: string) => {
     ...item,
     moduleId,
     index,
-    content: item.content ? {
-      ...item.content,
-      id: item.content.id || item._id,
-      type: item.content.type || 'unknown',
-    } : null
+    content: item.content
+      ? {
+          ...item.content,
+          id: item.content.id || item._id,
+          type: item.content.type || 'unknown',
+        }
+      : null,
   }))
 }
 

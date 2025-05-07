@@ -877,6 +877,7 @@ function renderCheckpoints(submission: Submission) {
   if (mountPoint) {
     ReactDOM.render(
       <SpeedGraderCheckpointsWrapper
+        EG={EG}
         courseId={ENV.course_id}
         // @ts-expect-error
         assignmentId={submission.assignment_id}
@@ -1204,9 +1205,9 @@ function initKeyCodes() {
     } else if (keyString === 'j' || keyString === 'n') {
       EG.next() // goto Next Student
     } else if (keyString === 'c') {
-      $add_a_comment_textarea.focus() // add comment
+      EG.addCommentTextAreaFocus() // add comment
     } else if (keyString === 'g') {
-      $grade.focus() // focus on grade
+      EG.gradeFocus() // focus on grade
     } else if (keyString === 'r') {
       EG.toggleFullRubric() // focus rubric
     }
@@ -1663,6 +1664,14 @@ EG = {
 
     const submissionStatus = SpeedgraderHelpers.classNameBasedOnStudent(student)
     return `${studentName} - ${submissionStatus.formatted}`
+  },
+
+  addCommentTextAreaFocus() {
+    $add_a_comment_textarea.focus()
+  },
+
+  gradeFocus() {
+    $grade.first().focus()
   },
 
   toggleFullRubric(force) {

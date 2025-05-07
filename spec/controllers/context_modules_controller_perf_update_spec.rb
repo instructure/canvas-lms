@@ -25,32 +25,246 @@ describe ContextModulesController do
 
     before do
       course_with_teacher_logged_in(active_all: true)
-      @course.context_modules.create!(name: "Test Module")
     end
 
-    context "when modules_perf enabled" do
+    context "when module_performance_improvement_is_enabled? enabled" do
       before do
         allow_any_instance_of(ContextModulesHelper)
           .to receive(:module_performance_improvement_is_enabled?)
           .and_return(true)
       end
 
-      it "exports proper environment variable with the flag ON" do
-        subject
-        expect(assigns[:js_env][:FEATURE_MODULES_PERF]).to be_truthy
+      describe "FEATURE_MODULES_PERF" do
+        it "exports proper environment variable with the flag ON" do
+          subject
+          expect(assigns[:js_env][:FEATURE_MODULES_PERF]).to be_truthy
+        end
+      end
+
+      describe "EXPANDED_MODULES and COLLAPSED_MODULES" do
+        context "when we don't have context module progression" do
+          it "should assign empty array to @expanded_modules and @collapsed_modules" do
+            subject
+            expect(assigns(:expanded_modules)).to be_empty
+            expect(assigns(:collapsed_modules)).to be_empty
+          end
+
+          it "should assign empty array to EXPANDED_MODULES and COLLAPSED_MODULES js env" do
+            subject
+            expect(assigns[:js_env][:EXPANDED_MODULES]).to be_empty
+            expect(assigns[:js_env][:COLLAPSED_MODULES]).to be_empty
+          end
+        end
+
+        context "when we have context module progression" do
+          let(:context_module) { @course.context_modules.create! }
+          let(:progression) { @user.context_module_progressions.create!(context_module:) }
+
+          context "when progression is collapsed" do
+            before do
+              progression.update!(collapsed: true)
+            end
+
+            it "should assign empty array to @expanded_modules" do
+              subject
+              expect(assigns(:expanded_modules)).to be_empty
+              expect(assigns(:collapsed_modules)).to eql([context_module.id])
+            end
+
+            it "should assign empty array to EXPANDED_MODULES js env" do
+              subject
+              expect(assigns[:js_env][:EXPANDED_MODULES]).to be_empty
+              expect(assigns[:js_env][:COLLAPSED_MODULES]).to eql([context_module.id])
+            end
+          end
+
+          context "when progression is expanded" do
+            before do
+              progression.update!(collapsed: false)
+            end
+
+            it "should assign empty array to @expanded_modules" do
+              subject
+              expect(assigns(:expanded_modules)).to eql([context_module.id])
+              expect(assigns(:collapsed_modules)).to be_empty
+            end
+
+            it "should assign empty array to EXPANDED_MODULES and COLLAPSED_MODULES js env" do
+              subject
+              expect(assigns[:js_env][:EXPANDED_MODULES]).to eql([context_module.id])
+              expect(assigns[:js_env][:COLLAPSED_MODULES]).to be_empty
+            end
+          end
+
+          context "when progression is nil" do
+            before do
+              progression.update!(collapsed: nil)
+            end
+
+            it "should assign empty array to @expanded_modules and @collapsed_modules" do
+              subject
+              expect(assigns(:expanded_modules)).to be_empty
+              expect(assigns(:collapsed_modules)).to be_empty
+            end
+
+            it "should assign empty array to EXPANDED_MODULES and COLLAPSED_MODULES js env" do
+              subject
+              expect(assigns[:js_env][:EXPANDED_MODULES]).to be_empty
+              expect(assigns[:js_env][:COLLAPSED_MODULES]).to be_empty
+            end
+          end
+        end
       end
     end
 
-    context "when modules_perf disabled" do
+    context "when module_performance_improvement_is_enabled? disabled" do
       before do
         allow_any_instance_of(ContextModulesHelper)
           .to receive(:module_performance_improvement_is_enabled?)
           .and_return(false)
       end
 
-      it "exports proper environment variable with the flag OFF" do
+      describe "FEATURE_MODULES_PERF" do
+        it "exports proper environment variable with the flag OFF" do
+          subject
+          expect(assigns[:js_env][:FEATURE_MODULES_PERF]).to be_falsey
+        end
+      end
+
+      describe "EXPANDED_MODULES" do
+        it "should not assign the @expanded_modules" do
+          subject
+          expect(assigns(:expanded_modules)).to be_nil
+        end
+
+        it "should have empty EXPANDED_MODULES js env" do
+          subject
+          expect(assigns[:js_env][:EXPANDED_MODULES]).to be_empty
+        end
+      end
+    end
+  end
+
+  describe "GET 'module_html'" do
+    subject { get "module_html", params: { course_id: @course.id, context_module_id: context_module.id } }
+
+    render_views
+
+    before :once do
+      course_with_teacher(active_all: true)
+    end
+
+    let(:page1) { @course.wiki_pages.create! title: "title1" }
+
+    let(:context_module) do
+      context_module = @course.context_modules.create!
+      context_module.add_item({ type: "wiki_page", id: page1.id }, nil, position: 1)
+      context_module
+    end
+
+    context "when modules_perf enabled" do
+      before do
+        @course.account.enable_feature!(:modules_perf)
+      end
+
+      context "when there is no user session" do
+        it "redirect to login page" do
+          subject
+          assert_unauthorized
+        end
+      end
+
+      context "when there is a user session" do
+        before do
+          user_session(@user)
+        end
+
+        context "when the provided module id exist" do
+          it "renders the template" do
+            subject
+            assert_status(200)
+            expect(response.body).to_not be_empty
+          end
+
+          it "has the @module_show_setting with show_student_only_module_id" do
+            ref_id = 111
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: ref_id)
+
+            subject
+            expect(assigns(:module_show_setting)).to eql(ref_id)
+          end
+
+          it "has the @module_show_setting with show_teacher_only_module_id" do
+            ref_id = 222
+            @course.account.enable_feature!(:modules_teacher_module_selection)
+            @course.update!(show_teacher_only_module_id: ref_id)
+
+            subject
+            expect(assigns(:module_show_setting)).to eql(ref_id)
+          end
+
+          it "has the @module variable" do
+            subject
+            expect(assigns(:module)).to eql(context_module)
+          end
+
+          it "has the @modules variable" do
+            subject
+            expect(assigns(:modules).length).to be(1)
+            expect(assigns(:modules).first).to eql(context_module)
+          end
+
+          it "has the @menu_tools variable" do
+            finder_double = double("Lti::ContextToolFinder")
+            tool_double_1 = double("Tool 1", has_placement?: true, cache_key: "key")
+            tool_double_2 = double("Tool 2", has_placement?: false, cache_key: "key")
+
+            allow_any_instance_of(ContextExternalToolsHelper)
+              .to receive(:external_tool_menu_item_tag).and_return("mocked_value")
+            allow(Lti::ContextToolFinder)
+              .to receive(:new)
+              .with(@course, placements: anything, current_user: anything)
+              .and_return(finder_double)
+            allow(finder_double).to receive(:all_tools_sorted_array).and_return([tool_double_1, tool_double_2])
+
+            subject
+
+            expect(assigns(:menu_tools).values).to all(eq([tool_double_1]))
+          end
+
+          describe "rights load" do
+            before { subject }
+
+            it { expect(assigns(:can_view)).to_not be_nil }
+            it { expect(assigns(:can_add)).to_not be_nil }
+            it { expect(assigns(:can_edit)).to_not be_nil }
+            it { expect(assigns(:can_delete)).to_not be_nil }
+            it { expect(assigns(:can_view_grades)).to_not be_nil }
+            it { expect(assigns(:is_student)).to_not be_nil }
+            it { expect(assigns(:can_view_unpublished)).to_not be_nil }
+          end
+        end
+
+        context "when the provided module id not exist" do
+          subject { get "module_html", params: { course_id: @course.id, context_module_id: "random_id" } }
+
+          it "renders 404" do
+            subject
+            assert_status(404)
+          end
+        end
+      end
+    end
+
+    context "when modules_perf disabled" do
+      before do
+        @course.account.disable_feature!(:modules_perf)
+      end
+
+      it "renders 404" do
         subject
-        expect(assigns[:js_env][:FEATURE_MODULES_PERF]).to be_falsey
+        assert_status(404)
       end
     end
   end
@@ -255,6 +469,125 @@ describe ContextModulesController do
         subject
         assert_status(404)
       end
+    end
+  end
+
+  RSpec.shared_examples "rendering when context_module_id is provided" do
+    context "when context_module_id is provided" do
+      subject do
+        get action, params: { course_id: @course.id, context_module_id: module_id }, format: "json"
+        parsed_json
+      end
+
+      context "when FF is off" do
+        before do
+          @course.account.disable_feature!(:modules_perf)
+        end
+
+        it "should render unfiltered result" do
+          expect(subject.keys).to match_array([@context_module1_item1.id.to_s, @context_module2_item1.id.to_s])
+        end
+      end
+
+      context "when FF is on" do
+        before do
+          @course.account.enable_feature!(:modules_perf)
+        end
+
+        context "when provided module id is exist" do
+          it "should render filtered result" do
+            expect(subject.keys).to match_array([@context_module1_item1.id.to_s])
+          end
+        end
+
+        context "when provided module is is not exist" do
+          let(:module_id) { "noop" }
+
+          it "should render 404" do
+            expect(subject).to be_empty
+            assert_status(404)
+          end
+        end
+      end
+    end
+  end
+
+  RSpec.shared_examples "rendering when context_module_id is not provided" do
+    context "when context_module_id is not provided" do
+      subject do
+        get action, params: { course_id: @course.id }, format: "json"
+        parsed_json
+      end
+
+      context "when FF is off" do
+        before do
+          @course.account.disable_feature!(:modules_perf)
+        end
+
+        it "should render unfiltered result" do
+          subject
+
+          expect(subject.keys).to match_array([@context_module1_item1.id.to_s, @context_module2_item1.id.to_s])
+        end
+      end
+
+      context "when FF is on" do
+        before do
+          @course.account.enable_feature!(:modules_perf)
+        end
+
+        it "should render unfiltered result" do
+          subject
+
+          expect(subject.keys).to match_array([@context_module1_item1.id.to_s, @context_module2_item1.id.to_s])
+        end
+      end
+    end
+  end
+
+  describe "filter for module id" do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @assignment = @course.assignments.create!(title: "some assignment", points_possible: 12)
+      @module1 = @course.context_modules.create!
+      @context_module1_item1 = @module1.add_item({ id: @assignment.id, type: "assignment" })
+      @module2 = @course.context_modules.create!
+      @context_module2_item1 = @module2.add_item({ id: @assignment.id, type: "assignment" })
+    end
+
+    describe "GET assignment_info" do
+      let(:action) { "content_tag_assignment_data" }
+      let(:module_id) { @module1.id }
+      let(:parsed_json) { json_parse(response.body) }
+
+      it_behaves_like "rendering when context_module_id is provided"
+
+      it_behaves_like "rendering when context_module_id is not provided"
+    end
+
+    describe "GET master_course_info" do
+      before do
+        @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+        MasterCourses::MasterContentTag.create!(master_template: @template, content: @assignment)
+      end
+
+      let(:action) { "content_tag_master_course_data" }
+      let(:module_id) { @module1.id }
+      let(:parsed_json) { json_parse(response.body)["tag_restrictions"] }
+
+      it_behaves_like "rendering when context_module_id is provided"
+
+      it_behaves_like "rendering when context_module_id is not provided"
+    end
+
+    describe "GET content_tag_estimated_duration_data" do
+      let(:action) { "content_tag_estimated_duration_data" }
+      let(:module_id) { @module1.id }
+      let(:parsed_json) { json_parse(response.body).values.each_with_object({}) { |item, hash| hash.merge!(item) } }
+
+      it_behaves_like "rendering when context_module_id is provided"
+
+      it_behaves_like "rendering when context_module_id is not provided"
     end
   end
 end

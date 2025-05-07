@@ -17,53 +17,69 @@
  */
 
 import {
-    IconDocumentLine,
-    IconAttachMediaLine,
-    IconDiscussionLine,
-    IconAssignmentLine,
-    IconQuizLine,
-    IconLinkLine,
-  } from '@instructure/ui-icons'
-import { ModuleItemContent } from './types'
+  IconDocumentLine,
+  IconAttachMediaLine,
+  IconDiscussionLine,
+  IconAssignmentLine,
+  IconQuizLine,
+  IconLinkLine,
+} from '@instructure/ui-icons'
+import {ModuleItemContent} from './types'
 
 const pixelOffset = 20
 
 export const INDENT_LOOKUP: Record<number, string> = {
-    0: `${pixelOffset * 0}px`,
-    1: `${pixelOffset * 1}px`,
-    2: `${pixelOffset * 2}px`,
-    3: `${pixelOffset * 3}px`,
-    4: `${pixelOffset * 4}px`,
-    5: `${pixelOffset * 5}px`,
+  0: `${pixelOffset * 0}px`,
+  1: `${pixelOffset * 1}px`,
+  2: `${pixelOffset * 2}px`,
+  3: `${pixelOffset * 3}px`,
+  4: `${pixelOffset * 4}px`,
+  5: `${pixelOffset * 5}px`,
 }
 
 export const getItemIcon = (content: ModuleItemContent) => {
-    if (!content?.type) return <IconDocumentLine />
+  if (!content?.type) return <IconDocumentLine />
 
-    const type = content.type.toLowerCase()
+  const type = content.type.toLowerCase()
 
-    if (type.includes('assignment')) return <IconAssignmentLine color={content.published ? 'success' : 'primary'} />
-    if (type.includes('quiz')) return <IconQuizLine color={content.published ? 'success' : 'primary'} />
-    if (type.includes('discussion')) return <IconDiscussionLine color={content.published ? 'success' : 'primary'} />
-    if (type.includes('attachment') || type.includes('file')) return <IconAttachMediaLine color={content.published ? 'success' : 'primary'} />
-    if (type.includes('external') || type.includes('url')) return <IconLinkLine color={content.published ? 'success' : 'primary'} />
-    if (type.includes('wiki') || type.includes('page')) return <IconDocumentLine color={content.published ? 'success' : 'primary'} />
-    if (type.includes('link')) return <IconLinkLine color={content.published ? 'success' : 'primary'} />
+  if (type.includes('assignment'))
+    return <IconAssignmentLine color={content.published ? 'success' : 'primary'} />
+  if (type.includes('quiz'))
+    return <IconQuizLine color={content.published ? 'success' : 'primary'} />
+  if (type.includes('discussion'))
+    return <IconDiscussionLine color={content.published ? 'success' : 'primary'} />
+  if (type.includes('attachment') || type.includes('file'))
+    return <IconAttachMediaLine color={content.published ? 'success' : 'primary'} />
+  if (type.includes('external') || type.includes('url'))
+    return <IconLinkLine color={content.published ? 'success' : 'primary'} />
+  if (type.includes('wiki') || type.includes('page'))
+    return <IconDocumentLine color={content.published ? 'success' : 'primary'} />
+  if (type.includes('link'))
+    return <IconLinkLine color={content.published ? 'success' : 'primary'} />
 
-    return null
-  }
+  return null
+}
 
 export const mapContentSelection = (id: string, contentType: string) => {
-    // Cast the string to our supported content types
-    const type = contentType as 'assignment' | 'quiz' | 'discussion' | 'attachment' | 'file' | 'external' | 'url' | 'page' | 'link'
+  // Cast the string to our supported content types
+  const type = contentType as
+    | 'assignment'
+    | 'quiz'
+    | 'discussion'
+    | 'attachment'
+    | 'file'
+    | 'external'
+    | 'url'
+    | 'page'
+    | 'link'
 
-    if (type === 'assignment') return {assignments: [id]}
-    if (type === 'quiz') return {quizzes: [id]}
-    if (type === 'discussion') return {discussions: [id]}
-    if (type === 'attachment' || type === 'file') return {files: [id]}
-    if (type === 'external' || type === 'url') return {urls: [id]}
-    if (type === 'page') return {pages: [id]}
-    if (type === 'link') return {links: [id]}
+  if (type === 'assignment') return {assignments: [id]}
+  if (type === 'quiz') return {quizzes: [id]}
+  if (type === 'discussion') return {discussions: [id]}
+  if (type === 'attachment' || type === 'file') return {files: [id]}
+  if (type === 'external' || type === 'url') return {urls: [id]}
+  if (type === 'page') return {pages: [id]}
+  if (type === 'link') return {links: [id]}
 
-    return {modules: [id]}
+  return {modules: [id]}
 }

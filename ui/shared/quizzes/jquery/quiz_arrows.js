@@ -46,7 +46,7 @@ export default class QuizArrowApplicator {
       .find(
         '.short_answer_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .numerical_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .equation_combinations_holder_holder.calculated_question_answers',
       )
-    this.unansweredQ = $('.question.unanswered .header .question_name')
+    this.unansweredQ = $('.question.unanswered')
     this.creditPartial = $(
       '#questions.suppress_correct_answers:not(.survey_results) .question.partial_credit .header .question_name',
     )
@@ -61,7 +61,7 @@ export default class QuizArrowApplicator {
     this.wrongTpl = $('<span />', {class: 'answer_arrow incorrect'})
     this.correctTpl = $('<span />', {class: 'answer_arrow info'})
     this.shortTpl = $('<span />', {class: 'answer_arrow info'})
-    this.unansweredTpl = $('<span />', {class: 'answer_arrow incorrect'})
+    this.unansweredTpl = $('<span />', {class: 'answer_indicator incorrect'})
     this.creditFullTpl = $('<span />', {class: 'answer_arrow correct'})
     this.creditPartialTpl = $('<span />', {class: 'answer_arrow incorrect'})
     this.creditNoneTpl = $('<span />', {class: 'answer_arrow incorrect'})
@@ -76,7 +76,7 @@ export default class QuizArrowApplicator {
       },
     )
     $.each(
-      [this.unansweredTpl, this.creditFullTpl, this.creditNoneTpl, this.creditPartialTpl],
+      [this.creditFullTpl, this.creditNoneTpl, this.creditPartialTpl],
       function () {
         this.css({[direction('left')]: -108, top: 9})
       },

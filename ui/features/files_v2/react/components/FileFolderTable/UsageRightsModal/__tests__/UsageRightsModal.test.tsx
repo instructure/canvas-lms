@@ -146,10 +146,12 @@ describe('UsageRightsModal', () => {
       it('for CC license', async () => {
         const file = {...FAKE_FILES[0], usage_rights: {use_justification: 'creative_commons'}}
         renderComponent({items: [file]})
-        const selector = await screen.findByTestId('usage-rights-license-selector')
+        const selector = await screen.findByTestId('usage-rights-justification-selector')
         expect(selector).toBeInTheDocument()
 
+        await userEvent.click(await screen.findByText('Creative Commons License'))
         await userEvent.click(selector)
+        await userEvent.click(await screen.findByTestId('usage-rights-license-selector'))
         expect(await screen.findByText('CC Attribution')).toBeInTheDocument()
         expect(await screen.findByText('CC Attribution Share Alike')).toBeInTheDocument()
         expect(await screen.findByText('CC Attribution Non-Commercial')).toBeInTheDocument()

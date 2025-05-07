@@ -1965,6 +1965,22 @@ ul#quiz_versions {
   }
 }
 
+.answer_indicator.incorrect {
+  background-color: #E62429;
+  color: white;
+  padding: 4px 8px;
+  border-top-left-radius: 0.225rem;
+  border-top-right-radius: 0.225rem;
+  position: absolute;
+  margin-top: -33px;
+  margin-left: -1px;
+}
+
+.question.unanswered {
+  border-color: #E62429;
+  margin-top: 30px !important;
+}
+
 // styles for teacher comments on quiz answers (comment bubbles).
 @mixin comment-arrow {
   border: 10px solid transparent;

@@ -16,9 +16,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency "aws-sdk-applicationautoscaling", "~> 1.26"
   spec.add_dependency "aws-sdk-dynamodb", "~> 1.32"
   spec.add_dependency "benchmark", "~> 0.4"
-
-  spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "~> 3.12"
-  spec.add_development_dependency "simplecov", "~> 0.22"
 end

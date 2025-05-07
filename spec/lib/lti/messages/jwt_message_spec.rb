@@ -1164,14 +1164,14 @@ describe Lti::Messages::JwtMessage do
     end
   end
 
-  describe "#include_asset_processor_eula_claims?" do
+  describe "#include_eulaservice_claims?" do
     context "when the feature is enabled" do
       before do
         tool.context.root_account.enable_feature!(:lti_asset_processor)
       end
 
       it "returns true" do
-        expect(jwt_message.send(:include_asset_processor_eula_claims?)).to be true
+        expect(jwt_message.send(:include_eulaservice_claims?)).to be true
       end
     end
 
@@ -1181,12 +1181,12 @@ describe Lti::Messages::JwtMessage do
       end
 
       it "returns false" do
-        expect(jwt_message.send(:include_asset_processor_eula_claims?)).to be false
+        expect(jwt_message.send(:include_eulaservice_claims?)).to be false
       end
     end
   end
 
-  describe "#add_asset_processor_eula_claims!" do
+  describe "#add_eulaservice_claims!" do
     subject { decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/eulaservice"] }
 
     it "adds the EULA service claims to the message" do

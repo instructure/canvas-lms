@@ -21,6 +21,9 @@ import UploadQueue from '@canvas/files/react/modules/UploadQueue'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import UploadProgress, {Uploader} from './UploadProgress'
+import FileRenameForm from '../FilesHeader/UploadButton/FileRenameForm'
+import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
+import {type ResolvedName} from '../FilesHeader/UploadButton/FileOptions'
 
 type CurrentUploadsProps = {
   onUploadChange?: (uploadsCount: number) => void
@@ -28,11 +31,24 @@ type CurrentUploadsProps = {
 
 const CurrentUploads = ({onUploadChange}: CurrentUploadsProps) => {
   const [currentUploads, setCurrentUploads] = useState<Uploader[]>([])
+  const [conflictedUploads, setConflictedUploads] = useState<Uploader[]>([])
 
-  const handleUploadQueueChange = useCallback(
-    () => setCurrentUploads(UploadQueue.getAllUploaders()),
-    [],
-  )
+  const handleUploadQueueChange = useCallback(() => {
+    const allUploaders = UploadQueue.getAllUploaders()
+    const conflicted = allUploaders.filter(uploader => uploader.error?.response.status === 409)
+    setCurrentUploads(allUploaders)
+    setConflictedUploads(conflicted)
+  }, [])
+
+  const onNameConflictResolved = (fileNameOptions: ResolvedName): void => {
+    FileOptionsCollection.resetState()
+    FileOptionsCollection.onNameConflictResolved(fileNameOptions)
+    FileOptionsCollection.setState({
+      newOptions: true,
+    })
+    FileOptionsCollection.onChange()
+    conflictedUploads[0].cancel?.()
+  }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => onUploadChange?.(currentUploads.length), [currentUploads])
@@ -45,17 +61,31 @@ const CurrentUploads = ({onUploadChange}: CurrentUploadsProps) => {
 
   if (currentUploads.length) {
     return (
-      <View as="div" data-testid="current-uploads" className="current_uploads" padding="medium">
-        <Flex direction="column" gap="medium">
-          {currentUploads.map(uploader => {
-            return (
-              <Flex.Item key={uploader.getFileName()}>
-                <UploadProgress uploader={uploader} />
-              </Flex.Item>
-            )
-          })}
-        </Flex>
-      </View>
+      <>
+        <View as="div" data-testid="current-uploads" className="current_uploads" padding="medium">
+          <Flex direction="column" gap="medium">
+            {currentUploads.map(uploader => {
+              return (
+                <Flex.Item key={uploader.getFileName()}>
+                  <UploadProgress uploader={uploader} />
+                </Flex.Item>
+              )
+            })}
+          </Flex>
+        </View>
+        {conflictedUploads.length > 0 && (
+          <FileRenameForm
+            open={conflictedUploads.length > 0}
+            onClose={() => {
+              conflictedUploads[0].cancel?.()
+            }}
+            fileOptions={conflictedUploads[0].options}
+            onNameConflictResolved={fileNameOptions => {
+              onNameConflictResolved(fileNameOptions)
+            }}
+          />
+        )}
+      </>
     )
   } else {
     return null

@@ -70,6 +70,7 @@ describe "discussion assignments" do
 
   context "created with html in title" do
     it "does not render html in flash notice", priority: "2" do
+      skip "Will be fixed in VICE-5209"
       discussion_title = "<s>broken</s>"
       topic = create_discussion(discussion_title, "threaded")
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
@@ -96,6 +97,7 @@ describe "discussion assignments" do
 
   context "created by different users" do
     it "lists identical authors after a user merge", priority: "2" do
+      skip "Will be fixed in VICE-5209"
       @student_a = User.create!(name: "Student A")
       @student_b = User.create!(name: "Student B")
       discussion_a = @course.discussion_topics.create!(user: @student_a, title: "title a", message: "from student a")

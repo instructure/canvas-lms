@@ -161,7 +161,7 @@ module CC
         banks = AssessmentQuestionBank.where(id: bank_ids)
 
         banks.each do |bank|
-          next unless export_object?(bank)
+          next unless export_object?(bank) && (@user.nil? || bank.grants_right?(@user, :read))
 
           begin
             generate_question_bank(bank)

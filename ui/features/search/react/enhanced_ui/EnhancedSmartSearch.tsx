@@ -18,7 +18,7 @@
 
 import {useRef, useState} from 'react'
 import SmartSearchHeader from './SmartSearchHeader'
-import {IndexProgress, Result} from '../types'
+import type {IndexProgress, Result} from '../types'
 import BestResults from './BestResults'
 import SimilarResults from './SimilarResults'
 import {Flex} from '@instructure/ui-flex'
@@ -26,6 +26,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import IndexingProgress from '../IndexingProgress'
 import {Alert} from '@instructure/ui-alerts'
+import {fetchAllModules} from '../utils'
 
 const RELEVANCE_THRESHOLD = 0.5
 const MAX_NUMBER_OF_RESULTS = 25
@@ -43,6 +44,26 @@ export default function EnhancedSmartSearch(props: Props) {
   const [error, setError] = useState('')
   const [indexingProgress, setIndexingProgress] = useState<IndexProgress | null>(null)
 
+  const setModules = (results: Result[]) => {
+    fetchAllModules(props.courseId, results)
+      .then(response => {
+        // add correct modules to each result
+        const updatedResults = results.map(result => {
+          const matchingResponse = response.find(res => res.assetId === result.content_id)
+          const modules = matchingResponse ? matchingResponse.modules : []
+          return {
+            ...result,
+            modules: modules,
+          }
+        })
+        setSearchResults(updatedResults)
+      })
+      .catch(error => {
+        // just don't update modules if we fail; let users still select results w/o modules
+        console.log('Error fetching modules:', error)
+      })
+  }
+
   const renderResults = () => {
     if (error) {
       return <Alert variant="error">{error}</Alert>
@@ -56,7 +77,8 @@ export default function EnhancedSmartSearch(props: Props) {
       return <Alert variant="error">{I18n.t('Failed to execute search')}</Alert>
     } else if (indexingProgress !== null) {
       return <IndexingProgress progress={indexingProgress?.progress} />
-    } else if (searchResults.length === 0) {
+    } else if (previousSearch.current === '' && searchResults.length === 0) {
+      // no search has been performed yet
       return null
     } else {
       // only grab the first 25 results, then split into best and similar
@@ -68,7 +90,11 @@ export default function EnhancedSmartSearch(props: Props) {
       const similarResults = results.filter(result => result.relevance < RELEVANCE_THRESHOLD)
       return (
         <>
-          <BestResults searchTerm={previousSearch.current} results={bestResults} />
+          <BestResults
+            searchTerm={previousSearch.current}
+            results={bestResults}
+            courseId={props.courseId}
+          />
           <SimilarResults searchTerm={previousSearch.current} results={similarResults} />
         </>
       )
@@ -83,7 +109,7 @@ export default function EnhancedSmartSearch(props: Props) {
           setIsLoading(true)
         }}
         onSuccess={results => {
-          setSearchResults(results)
+          setModules(results)
           setIsLoading(false)
         }}
         onError={error => {

@@ -28,4 +28,11 @@ describe "shared/errors/_error_form" do
     expect(response).not_to be_nil
     expect(response).to include("error[user_roles]")
   end
+
+  it "renders captcha when user is not logged in" do
+    view_context(current_user: nil)
+    allow_any_instance_of(ApplicationController).to receive(:captcha_site_key).and_return("test_key")
+    render partial: "shared/errors/error_form"
+    expect(response).to include("g-recaptcha")
+  end
 end

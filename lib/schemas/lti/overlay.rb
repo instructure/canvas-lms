@@ -66,5 +66,9 @@ module Schemas::Lti
     def self.schema
       SCHEMA
     end
+
+    def self.allowed_base_properties
+      schema[:properties].keys
+    end
   end
 end

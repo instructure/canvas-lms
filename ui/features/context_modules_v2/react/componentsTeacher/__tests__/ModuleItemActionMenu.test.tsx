@@ -18,16 +18,13 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import {ContextModuleProvider} from '../../hooks/useModuleContext'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemActionMenu from '../ModuleItemActionMenu'
 
 const setUp = (itemType: string = 'Assignment') => {
   return render(
     <ContextModuleProvider
-      courseId="1"
-      isMasterCourse={true}
-      isChildCourse={false}
-      permissions={{canEdit: true, canDelete: true, canAdd: true, canDirectShare: true}}
+      {...contextModuleDefaultProps}
     >
       <ModuleItemActionMenu
         itemType={itemType}
@@ -45,10 +42,15 @@ const setUp = (itemType: string = 'Assignment') => {
         handleSendTo={() => {}}
         handleCopyTo={() => {}}
         handleRemove={() => {}}
-        masteryPathsData={{isCyoeAble: false, isTrigger: false, isReleased: false, releasedLabel: null}}
+        masteryPathsData={{
+          isCyoeAble: false,
+          isTrigger: false,
+          isReleased: false,
+          releasedLabel: null,
+        }}
         handleMasteryPaths={() => {}}
       />
-    </ContextModuleProvider>
+    </ContextModuleProvider>,
   )
 }
 
@@ -61,7 +63,7 @@ describe('ModuleItemActionMenu', () => {
   it('renders menu with correct props', () => {
     const container = setUp()
     // Check that the Menu button is rendered
-    const menuButton = container.getByRole('button', { name: 'Module Item Options' })
+    const menuButton = container.getByRole('button', {name: 'Module Item Options'})
     expect(menuButton).toBeInTheDocument()
     fireEvent.click(menuButton)
 
@@ -81,7 +83,7 @@ describe('ModuleItemActionMenu', () => {
     const container = setUp('SubHeader')
 
     // Check that the Menu button is rendered
-    const menuButton = container.getByRole('button', { name: 'Module Item Options' })
+    const menuButton = container.getByRole('button', {name: 'Module Item Options'})
     expect(menuButton).toBeInTheDocument()
     fireEvent.click(menuButton)
 

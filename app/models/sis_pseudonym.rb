@@ -123,29 +123,32 @@ class SisPseudonym
       return pick_user_pseudonym(user.all_active_pseudonyms, (type == :trusted) ? root_account.trusted_account_ids : nil)
     end
 
-    trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) } if type == :trusted
+    if type == :trusted
+      trusted_local_account_ids_by_shard = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) }
+                                                       .transform_values { |ids| ids.map { |id| Shard.local_id_for(id).first } }
+    end
 
     # try the user's home shard first if it's fast
     # the default shard has a replica in every region, so is always fast
     user_shard_is_in_region = user.shard.in_current_region? || user.shard.default?
-    if user_shard_is_in_region && (type != :trusted || (account_ids = trusted_account_ids[user.shard]))
+    if user_shard_is_in_region && (type != :trusted || (trusted_local_account_ids = trusted_local_account_ids_by_shard[user.shard]))
       user.shard.activate do
-        result = find_in_trusted_accounts(account_ids)
+        result = find_in_trusted_accounts(trusted_local_account_ids)
         return result if result
       end
     end
 
     shards = @in_region ? user.in_region_associated_shards : user.associated_shards
     # only search the shards with trusted accounts
-    shards &= trusted_account_ids.keys if type == :trusted
+    shards &= trusted_local_account_ids_by_shard.keys if type == :trusted
 
     return nil if shards.empty?
 
     Shard.with_each_shard(shards.sort) do
       next if Shard.current == user.shard && user_shard_is_in_region
 
-      account_ids = trusted_account_ids[Shard.current] if type == :trusted
-      result = find_in_trusted_accounts(account_ids)
+      trusted_local_account_ids = trusted_local_account_ids_by_shard[Shard.current] if type == :trusted
+      result = find_in_trusted_accounts(trusted_local_account_ids)
       return result if result
     end
 

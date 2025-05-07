@@ -23,6 +23,7 @@ import {createGradebook} from './GradebookSpecHelper'
 import GradebookApi from '../apis/GradebookApi'
 import ReactDOM from 'react-dom'
 import moxios from 'moxios'
+import {calculateCheckpointStates} from '../components/SubmissionTray.tsx'
 
 // Mock global $ for flashError usage
 global.$ = $
@@ -1229,5 +1230,45 @@ describe('Gradebook#renderSubmissionTray', () => {
       gradebook.renderSubmissionTray(gradebook.student('1101'))
       expect(loadSubmissionCommentsStub).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe('calculateCheckpointStates', () => {
+  it('rounds up late hours', () => {
+    const SECONDS_IN_HOUR = 3600
+    const result = calculateCheckpointStates(
+      {
+        subAssignmentSubmissions: [
+          {
+            seconds_late: SECONDS_IN_HOUR * 5 + 1,
+            late: true
+          }
+        ]
+      },
+      {
+        lateSubmissionInterval: 'hour',
+      }
+    )
+
+    expect(result[0].timeLate).toEqual("6")
+  })
+
+  it('rounds up late days', () => {
+    const SECONDS_IN_DAY = 24 * 3600
+    const result = calculateCheckpointStates(
+      {
+        subAssignmentSubmissions: [
+          {
+            seconds_late: SECONDS_IN_DAY * 5 + 1,
+            late: true
+          }
+        ]
+      },
+      {
+        lateSubmissionInterval: 'day',
+      }
+    )
+
+    expect(result[0].timeLate).toEqual("6")
   })
 })

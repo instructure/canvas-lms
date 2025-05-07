@@ -93,10 +93,6 @@ class GraphQLController < ApplicationController
       return !::Account.site_admin.feature_enabled?(:disable_graphql_authentication)
     end
 
-    if !Rails.env.production? && action_name == "subgraph_execute" && sdl_query?
-      return false
-    end
-
     true
   end
 

@@ -283,8 +283,17 @@ describe('DiscussionPostToolbar', () => {
 
   describe('Translate Button', () => {
     describe('when translationLanguages is empty', () => {
-      it('does not render the translate button if translationLanguages is empty', () => {
+      it('does not render the translate button', () => {
         const {queryByTestId} = setup()
+        expect(queryByTestId('translate-button')).toBeNull()
+      })
+    })
+
+    describe('when the discussion topic is an announcement', () => {
+      it('does not render the translate button', () => {
+        const {queryByTestId} = setup({isAnnouncement: true}, null, {
+          translationLanguages: {current: ['en', 'es']}
+        })
         expect(queryByTestId('translate-button')).toBeNull()
       })
     })

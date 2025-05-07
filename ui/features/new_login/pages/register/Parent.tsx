@@ -25,13 +25,12 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import React, {useRef, useState} from 'react'
-import {useNavigate} from 'react-router-dom'
 import {useNewLogin, useNewLoginData} from '../../context'
-import {usePasswordValidator, useServerErrorsMap} from '../../hooks'
+import {usePasswordValidator, useSafeBackNavigation, useServerErrorsMap} from '../../hooks'
 import {ROUTES} from '../../routes/routes'
 import {createParentAccount} from '../../services'
 import {ActionPrompt, TermsAndPolicyCheckbox} from '../../shared'
-import {EMAIL_REGEX, createErrorMessage, handleRegistrationRedirect} from '../../shared/helpers'
+import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
 import {ReCaptchaSection, ReCaptchaSectionRef} from '../../shared/recaptcha'
 
 const I18n = createI18nScope('new_login')
@@ -51,7 +50,6 @@ const Parent = () => {
     useNewLoginData()
   const validatePassword = usePasswordValidator(passwordPolicy)
   const serverErrorsMap = useServerErrorsMap()
-  const navigate = useNavigate()
 
   const [confirmPassword, setConfirmPassword] = useState('')
   const [confirmPasswordError, setConfirmPasswordError] = useState('')
@@ -305,13 +303,7 @@ const Parent = () => {
     setTermsAccepted(checked)
   }
 
-  const handleCancel = () => {
-    if (window.history.length > 1) {
-      navigate(-1)
-    } else {
-      navigate(ROUTES.SIGN_IN)
-    }
-  }
+  const handleCancel = useSafeBackNavigation(ROUTES.SIGN_IN)
 
   const handleReCaptchaVerify = (token: string | null) => {
     if (!token) console.error('Failed to get a valid reCAPTCHA token')

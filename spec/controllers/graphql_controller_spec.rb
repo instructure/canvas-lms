@@ -318,9 +318,7 @@ describe GraphQLController do
   context "with feature flag disable_graphql_authentication enabled" do
     context "graphql, without a session" do
       it "works" do
-        expect(Account.site_admin).to(
-          receive(:feature_enabled?).with(:disable_graphql_authentication).and_return(true)
-        )
+        Account.site_admin.enable_feature!(:disable_graphql_authentication)
         post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
         expect(response.parsed_body["errors"]).to be_blank
         expect(response.parsed_body["data"]).not_to be_blank

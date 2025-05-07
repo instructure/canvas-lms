@@ -18,13 +18,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module DefaultDueTimeHelper
-  def default_due_time_options(context)
+  FANCY_MIDNIGHT = "23:59:59"
+
+  # Returns the default due time for a course or account.
+  def inherited_default_due_time(context)
     inherited_value = if context.is_a?(Course)
                         context.account.default_due_time&.dig(:value)
                       elsif !context.root_account?
                         context.parent_account.default_due_time&.dig(:value)
                       end
-    inherited_value ||= "23:59"
+    inherited_value || FANCY_MIDNIGHT
+  end
+
+  def default_due_time_options(context)
+    inherited_value = inherited_default_due_time(context)
 
     format_time = ->(ts) { I18n.l(Time.zone.parse(ts), format: :tiny) }
     time_option = ->(ts) { [format_time.call(ts), ts] } # [human-readable text, option value] pair

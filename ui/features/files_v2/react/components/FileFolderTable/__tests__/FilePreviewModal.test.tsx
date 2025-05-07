@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {fireEvent, render, screen} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
@@ -25,6 +25,7 @@ import {FilePreviewModal, FilePreviewModalProps} from '../FilePreviewModal'
 import {FAKE_FILES} from '../../../../fixtures/fakeData'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
+import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/canvas-studio-player', () => {
   const mockDefault = jest.fn(() => <div data-testid="media-player">Media Player</div>)
@@ -64,11 +65,12 @@ describe('FilePreviewModal', () => {
   afterEach(() => {
     fetchMock.reset()
     jest.restoreAllMocks()
+    destroyContainer()
   })
 
   it('renders the modal when open', () => {
     renderComponent()
-    expect(screen.getAllByText(defaultProps.item.display_name)).toHaveLength(2)
+    expect(screen.getAllByText(defaultProps.item.display_name)).toHaveLength(4)
   })
 
   it('calls onClose when close button is clicked', async () => {
@@ -109,7 +111,7 @@ describe('FilePreviewModal', () => {
   it('navigates to next file when next button is clicked', async () => {
     renderComponent()
     await userEvent.click(screen.getByRole('button', {name: /next/i}))
-    const header = screen.getByText(FAKE_FILES[1].display_name)
+    const header = screen.getAllByText(FAKE_FILES[1].display_name)[0]
     expect(header).toBeInTheDocument()
     expect(window.history.replaceState).toHaveBeenCalled()
   })
@@ -117,8 +119,51 @@ describe('FilePreviewModal', () => {
   it('navigates to previous file when previous button is clicked', async () => {
     renderComponent()
     await userEvent.click(screen.getByRole('button', {name: /previous/i}))
-    const header = screen.getByText(FAKE_FILES[FAKE_FILES.length - 1].display_name)
+    const header = screen.getAllByText(FAKE_FILES[FAKE_FILES.length - 1].display_name)[0]
     expect(header).toBeInTheDocument()
     expect(window.history.replaceState).toHaveBeenCalled()
+  })
+
+  // userEvent.type is flaky
+  it('navigates to next file when right arrow key is pressed', async () => {
+    renderComponent()
+    const modal = screen.getByRole('dialog')
+    fireEvent.keyDown(modal, {key: 'ArrowRight'})
+    const header = screen.getAllByText(FAKE_FILES[1].display_name)[0]
+    expect(header).toBeInTheDocument()
+    expect(window.history.replaceState).toHaveBeenCalled()
+  })
+
+  it('navigates to previous file when left arrow key is pressed', async () => {
+    renderComponent()
+    const modal = screen.getByRole('dialog')
+    fireEvent.keyDown(modal, {key: 'ArrowLeft'})
+    const header = screen.getAllByText(FAKE_FILES[FAKE_FILES.length - 1].display_name)[0]
+    expect(header).toBeInTheDocument()
+    expect(window.history.replaceState).toHaveBeenCalled()
+  })
+
+  describe('with keyboard shortcuts disabled', () => {
+    beforeAll(() => {
+      ENV.disable_keyboard_shortcuts = true
+    })
+
+    afterAll(() => {
+      ENV.disable_keyboard_shortcuts = false
+    })
+
+    it('does not navigate to next file when right arrow key is pressed', async () => {
+      renderComponent()
+      const modal = screen.getByRole('dialog')
+      fireEvent.keyDown(modal, {key: 'ArrowRight'})
+      expect(screen.getByRole('heading', {name: FAKE_FILES[0].display_name})).toBeInTheDocument()
+    })
+
+    it('does not navigate to previous file when left arrow key is pressed', async () => {
+      renderComponent()
+      const modal = screen.getByRole('dialog')
+      fireEvent.keyDown(modal, {key: 'ArrowLeft'})
+      expect(screen.getByRole('heading', {name: FAKE_FILES[0].display_name})).toBeInTheDocument()
+    })
   })
 })

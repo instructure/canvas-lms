@@ -23,6 +23,8 @@ import ConfigureExternalToolButton from '../ConfigureExternalToolButton'
 
 let tool
 let event
+let ref
+let returnFocus
 
 beforeEach(() => {
   ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
@@ -36,11 +38,23 @@ beforeEach(() => {
   event = {
     preventDefault() {},
   }
+  ref = React.createRef()
+  returnFocus = jest.fn()
   userEvent.setup()
 })
 
+function renderComponent(modalIsOpen = false) {
+  return render(
+    <ConfigureExternalToolButton {...{tool, modalIsOpen, returnFocus, ref}} />
+  )
+}
+
+function renderComponentOpen() {
+  renderComponent(true)
+}
+
 test('uses the tool configuration "url" when present', () => {
-  render(<ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} />)
+  renderComponentOpen()
   expect(screen.getByTitle(/Tool Configuration/i).getAttribute('src')).toContain(
     'url=https%3A%2F%2Fadvantage.tool.com',
   )
@@ -50,76 +64,78 @@ test('uses the tool configuration "target_link_uri" when "url" is not present', 
   tool.tool_configuration = {
     target_link_uri: 'https://advantage.tool.com',
   }
-  render(<ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} />)
+  renderComponentOpen()
   expect(screen.getByTitle(/Tool Configuration/i).getAttribute('src')).toContain(
     'url=https%3A%2F%2Fadvantage.tool.com',
   )
 })
 
 test('includes the tool_configuration placement', () => {
-  render(<ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} />)
+  renderComponentOpen()
   expect(screen.getByTitle(/Tool Configuration/i).getAttribute('src')).toContain(
     'placement=tool_configuration',
   )
 })
 
 test('shows beginning info alert and adds styles to iframe', () => {
-  const ref = React.createRef()
-  render(
-    <ConfigureExternalToolButton
-      tool={tool}
-      modalIsOpen={true}
-      returnFocus={jest.fn()}
-      ref={ref}
-    />,
-  )
+  renderComponentOpen()
   ref.current.handleAlertFocus({target: {className: 'before'}})
   expect(ref.current.state.beforeExternalContentAlertClass).toEqual('')
   // Note: The width here is normally 300px, but because these are older JS files, the CSS isn't included,
   // so the offsetWidth is 0.
-  expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
+  expect(ref.current.iframeStyle()).toEqual({
+    border: '2px solid #2B7ABC',
+    padding: "0px",
+    width: "100%", height: undefined, minHeight: undefined,
+  })
+})
+
+test('adds iframe width/height when it is in the tool configuration', () => {
+  tool.tool_configuration.selection_width = 500
+  tool.tool_configuration.selection_height = 600
+  renderComponentOpen()
+  expect(ref.current.iframeStyle()).toEqual({
+    border: 'none', padding: "2px",
+    width: 500, height: 600, minHeight: 600,
+  })
 })
 
 test('shows ending info alert and adds styles to iframe', () => {
-  const ref = React.createRef()
-  render(
-    <ConfigureExternalToolButton
-      tool={tool}
-      modalIsOpen={true}
-      returnFocus={jest.fn()}
-      ref={ref}
-    />,
-  )
-
+  renderComponentOpen()
   ref.current.handleAlertFocus({target: {className: 'after'}})
   expect(ref.current.state.afterExternalContentAlertClass).toEqual('')
   // Note: The width here is normally 300px, but because these are older JS files, the CSS isn't included,
   // so the offsetWidth is 0.
-  expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
+  expect(ref.current.iframeStyle()).toEqual({
+    border: '2px solid #2B7ABC', padding: "0px",
+    width: '100%', height: undefined, minHeight: undefined
+  })
 })
 
 test('hides beginning info alert and adds styles to iframe', async () => {
-  const ref = React.createRef()
-  render(<ConfigureExternalToolButton tool={tool} returnFocus={jest.fn()} ref={ref} />)
+  renderComponent()
   ref.current.openModal(event)
   ref.current.handleAlertBlur({target: {className: 'before'}})
   expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-  expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
+  expect(ref.current.iframeStyle()).toEqual({
+    border: 'none', padding: "2px",
+    width: '100%', height: undefined, minHeight: undefined,
+  })
 })
 
 test('hides ending info alert and adds styles to iframe', () => {
-  const ref = React.createRef()
-  render(<ConfigureExternalToolButton tool={tool} returnFocus={jest.fn()} ref={ref} />)
+  renderComponent()
   ref.current.openModal(event)
-
   ref.current.handleAlertBlur({target: {className: 'after'}})
   expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-  expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
+  expect(ref.current.iframeStyle()).toEqual({
+    border: 'none', padding: "2px",
+    width: '100%', height: undefined, minHeight: undefined,
+  })
 })
 
 test("doesn't show alerts or add border to iframe by default", () => {
-  const ref = React.createRef()
-  render(<ConfigureExternalToolButton tool={tool} returnFocus={jest.fn()} ref={ref} />)
+  renderComponent()
   ref.current.openModal(event)
   const iframe = screen.getByTitle(/Tool Configuration/i)
   expect(iframe).toHaveClass('tool_launch')
@@ -127,29 +143,20 @@ test("doesn't show alerts or add border to iframe by default", () => {
 })
 
 test('sets the iframe allowances', () => {
-  const ref = React.createRef()
-  render(
-    <ConfigureExternalToolButton
-      tool={tool}
-      modalIsOpen={true}
-      returnFocus={jest.fn()}
-      ref={ref}
-    />,
-  )
+  renderComponentOpen()
   ref.current.handleAlertFocus({target: {className: 'before'}})
   const iframe = screen.getByTitle(/Tool Configuration/i)
   expect(iframe).toHaveAttribute('allow', 'midi; media')
 })
 
 test("sets the 'data-lti-launch' attribute on the iframe", () => {
-  render(<ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} />)
+  renderComponentOpen()
   const iframe = screen.getByTitle(/Tool Configuration/i)
   expect(iframe).toHaveAttribute('data-lti-launch', 'true')
 })
 
 test('opens and closes the modal', async () => {
-  const returnFocus = jest.fn()
-  render(<ConfigureExternalToolButton tool={tool} returnFocus={returnFocus} />)
+  renderComponent()
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 
   await userEvent.click(screen.getByText(/configure/i))

@@ -62,8 +62,8 @@ class TranslationController < ApplicationController
   end
 
   def handle_same_language_error
-    InstStatsd::Statsd.increment("translation.errors", tags: ["error:same_language"])
-    render json: { translationError: { type: "info", message: I18n.t("Translation is identical to source language.") } }, status: :unprocessable_entity
+    InstStatsd::Statsd.distributed_increment("translation.errors", tags: ["error:same_language"])
+    render json: { translationError: { type: "info", message: I18n.t("Looks like you're trying to translate into the same language.") } }, status: :unprocessable_entity
   end
 
   def handle_generic_error(exception)
@@ -84,8 +84,7 @@ class TranslationController < ApplicationController
       message = I18n.t("Couldn’t identify source language.")
       status = :unprocessable_entity
     when Aws::Translate::Errors::TextSizeLimitExceededException
-      character_count = required_params[:text].length
-      tags = ["error:text_size_limit", "character_count:#{character_count}"]
+      tags = ["error:text_size_limit"]
       message = I18n.t("Couldn’t translate because the text is too long.")
       status = :unprocessable_entity
     else
@@ -95,7 +94,10 @@ class TranslationController < ApplicationController
       status = :internal_server_error
     end
 
-    InstStatsd::Statsd.increment("translation.errors", tags:)
+    InstStatsd::Statsd.distributed_increment("translation.errors", tags:)
+
+    render(json: { translationErrorTextTooLong: { type: "error", message: } }, status:) and return if action_name == "translate_paragraph" && tags == ["error:text_size_limit"]
+
     render json: { translationError: { type: "error", message: } }, status:
   end
 

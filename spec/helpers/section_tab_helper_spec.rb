@@ -376,6 +376,10 @@ describe SectionTabHelper do
           icon = html.xpath("i")
           expect(icon).to be_empty
         end
+
+        it "has an id with the label" do
+          expect(html.attributes["id"].value).to eq "#{tab_assignments[:label].downcase}-link"
+        end
       end
 
       context "when tab is unused" do

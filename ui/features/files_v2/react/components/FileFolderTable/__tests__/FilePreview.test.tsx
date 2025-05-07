@@ -30,12 +30,6 @@ jest.mock('@canvas/canvas-studio-player', () => {
 
 const defaultProps: FilePreviewProps = {
   item: FAKE_FILES[0],
-  isFilePreview: true,
-  isMediaPreview: false,
-  mediaId: '',
-  mediaSources: [],
-  mediaTracks: [],
-  isFetchingMedia: false,
 }
 
 const renderComponent = (props?: Partial<FilePreviewProps>) => {
@@ -44,35 +38,34 @@ const renderComponent = (props?: Partial<FilePreviewProps>) => {
 
 describe('File Preview', () => {
   it('renders preview for non-media files', () => {
-    renderComponent()
-    const iframe = screen.getByTitle(`Preview for file: ${FAKE_FILES[0].display_name}`)
+    const item = FAKE_FILES[2]
+    renderComponent({item})
+    const iframe = screen.getByTitle(`Preview for file: ${item.display_name}`)
     expect(iframe).toBeInTheDocument()
   })
 
-  it('renders no preview for non-previewable files', () => {
-    renderComponent({isFilePreview: false})
+  it('renders no preview for non-previewable mime types', () => {
+    const nonPreviewableFile = {
+      ...FAKE_FILES[2],
+      mime_class: 'application/zip',
+    }
+    renderComponent({item: nonPreviewableFile})
     const noPreview = screen.getByText('No Preview Available')
     expect(noPreview).toBeInTheDocument()
   })
 
-  it('renders loading icon when loading media preview', () => {
-    renderComponent({
-      isFilePreview: false,
-      isMediaPreview: true,
-      mediaId: '123',
-      isFetchingMedia: true,
-    })
-    const loadingIcon = screen.getByText('Loading')
-    expect(loadingIcon).toBeInTheDocument()
+  it('renders no preview when no preview_url', () => {
+    const nonPreviewableFile = {
+      ...FAKE_FILES[2],
+      preview_url: '',
+    }
+    renderComponent({item: nonPreviewableFile})
+    const noPreview = screen.getByText('No Preview Available')
+    expect(noPreview).toBeInTheDocument()
   })
 
   it('renders media player for media files', () => {
-    renderComponent({
-      isFilePreview: false,
-      isMediaPreview: true,
-      mediaId: '123',
-      isFetchingMedia: false,
-    })
+    renderComponent()
     const mediaPlayer = screen.getByTestId('media-player')
     expect(mediaPlayer).toBeInTheDocument()
   })

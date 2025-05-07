@@ -241,16 +241,6 @@ inst canvas setup
 docker compose restart web
 ```
 
-## Storybook
-
-Edit `.env`
-
-```
-COMPOSE_FILE=<CURRENT_VALUE>:inst-cli/docker-compose/storybook.override.yml
-```
-
-`inst proxy up` if you haven't already, then `docker compose up storybook` and open <http://canvas-storybook.inseng.test> in your browser.
-
 ## Tips
 
 It will likely be helpful to alias the various docker compose commands like `docker compose run --rm web` because that can get tiring to type over and over. Here are some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.

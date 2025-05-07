@@ -48,55 +48,51 @@ export type PrivacyConfirmationProps = {
   privacyLevelOnChange: (privacyLevel: LtiPrivacyLevel) => void
 }
 
-export const PrivacyConfirmation = ({
-  appName,
-  selectedPrivacyLevel,
-  privacyLevelOnChange,
-}: PrivacyConfirmationProps) => {
-  const messages = isLtiPrivacyLevel(selectedPrivacyLevel)
-    ? [
-        {
-          text: (
-            <Text size="small" weight="light">
-              {i18nLtiPrivacyLevelDescription(selectedPrivacyLevel)}
-            </Text>
-          ),
-          type: 'hint' as const,
-        },
-      ]
-    : []
+export const PrivacyConfirmation = React.memo(
+  ({appName, selectedPrivacyLevel, privacyLevelOnChange}: PrivacyConfirmationProps) => {
+    const messages = [
+      {
+        text: (
+          <Text size="small" weight="light">
+            {i18nLtiPrivacyLevelDescription(selectedPrivacyLevel)}
+          </Text>
+        ),
+        type: 'hint' as const,
+      },
+    ]
 
-  return (
-    <>
-      <Heading level="h3" margin="0 0 x-small 0">
-        {I18n.t('Data Sharing')}
-      </Heading>
-      <Text
-        dangerouslySetInnerHTML={{
-          __html: I18n.t('Select what data *%{toolName}* has access to.', {
-            toolName: appName,
-            wrapper: ['<strong>$1</strong>'],
-          }),
-        }}
-      />
-      <View margin="medium 0 medium 0" as="div">
-        <SimpleSelect
-          messages={messages}
-          renderLabel={I18n.t('User Data Shared With This App')}
-          value={selectedPrivacyLevel}
-          onChange={(_, {value}) => {
-            if (isLtiPrivacyLevel(value)) {
-              privacyLevelOnChange(value)
-            }
+    return (
+      <>
+        <Heading level="h3" margin="0 0 x-small 0">
+          {I18n.t('Data Sharing')}
+        </Heading>
+        <Text
+          dangerouslySetInnerHTML={{
+            __html: I18n.t('Select what data *%{toolName}* has access to.', {
+              toolName: appName,
+              wrapper: ['<strong>$1</strong>'],
+            }),
           }}
-        >
-          {AllLtiPrivacyLevels.map(level => (
-            <SimpleSelect.Option key={level} value={level} id={level}>
-              {i18nLtiPrivacyLevel(level)}
-            </SimpleSelect.Option>
-          ))}
-        </SimpleSelect>
-      </View>
-    </>
-  )
-}
+        />
+        <View margin="medium 0 medium 0" as="div">
+          <SimpleSelect
+            messages={messages}
+            renderLabel={I18n.t('User Data Shared With This App')}
+            value={selectedPrivacyLevel}
+            onChange={(_, {value}) => {
+              if (isLtiPrivacyLevel(value)) {
+                privacyLevelOnChange(value)
+              }
+            }}
+          >
+            {AllLtiPrivacyLevels.map(level => (
+              <SimpleSelect.Option key={level} value={level} id={level}>
+                {i18nLtiPrivacyLevel(level)}
+              </SimpleSelect.Option>
+            ))}
+          </SimpleSelect>
+        </View>
+      </>
+    )
+  },
+)

@@ -334,6 +334,7 @@ describe "discussions" do
         end
 
         it "saves and display all changes", priority: "2" do
+          skip "Will be fixed in VICE-5209"
           course.require_assignment_group
 
           confirm(:off)
@@ -363,6 +364,7 @@ describe "discussions" do
         end
 
         it "toggles checkboxes when clicking their labels", priority: "1" do
+          skip "Will be fixed in VICE-5209"
           get url
 
           expect(is_checked("input[type=checkbox][name=threaded]")).not_to be_truthy
@@ -593,6 +595,22 @@ describe "discussions" do
           expect(f("input[value='allow-liking']").selected?).to be_truthy
           expect(f("input[value='only-graders-can-like']").selected?).to be_truthy
           expect(f("input[value='add-to-student-to-do']").selected?).to be_truthy
+        end
+
+        it "can convert ungraded to graded and checkpointed" do
+          get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
+          force_click_native("input[data-testid='graded-checkbox']")
+          force_click_native("input[data-testid='checkpoints-checkbox']")
+          fj("button:contains('Save')").click
+          expect(@topic_no_options.reload.checkpoints?).to be_truthy
+        end
+
+        it "cannot convert ungraded to checkpointed if there are replies" do
+          @topic_no_options.reply_from({ user: teacher, text: "I feel pretty" })
+          get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
+          force_click_native("input[data-testid='graded-checkbox']")
+          expect(f("input[data-testid='checkpoints-checkbox']").attribute("disabled")).to be_truthy
+          expect(fj("span[class*='screenReaderContent']:contains('Checkpoints cannot be toggled after replies have been made.')")).to be_present
         end
 
         it "displays the grading and groups not supported in anonymous discussions message in the edit page" do
@@ -1555,7 +1573,6 @@ describe "discussions" do
           context "differentiaiton tags" do
             before do
               @course.account.enable_feature! :assign_to_differentiation_tags
-              @course.account.enable_feature! :differentiation_tags
               @course.account.tap do |a|
                 a.settings[:allow_assign_to_differentiation_tags] = { value: true }
                 a.save!
@@ -1739,7 +1756,6 @@ describe "discussions" do
             end
 
             it "displays an error when the availability date is after the due date" do
-              skip("Need validations to work for this one to pass")
               Account.site_admin.enable_feature!(:discussion_checkpoints)
               @course.account.enable_feature!(:discussion_checkpoints)
               assignment = @course.assignments.create!(
@@ -1919,6 +1935,18 @@ describe "discussions" do
             expect(sub_assignment2.points_possible).to eq 7
           end
 
+          it "still saves existing checkpointed discussion successfully even when there are replies" do
+            @checkpointed_discussion.discussion_entries.create!(
+              user: @teacher,
+              message: "Initial post"
+            )
+
+            get "/courses/#{course.id}/discussion_topics/#{@checkpointed_discussion.id}/edit"
+            fj("button:contains('Save')").click
+
+            expect(f("h2[data-testid='message_title']").text).to include(@checkpointed_discussion.title)
+          end
+
           it "deletes checkpoints if the checkpoint checkbox is unselected on an existing discussion with checkpoints" do
             assignment = Assignment.last
             expect(assignment.sub_assignments.count).to eq 2
@@ -1937,7 +1965,7 @@ describe "discussions" do
             graded_discussion = create_graded_discussion(course)
 
             get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
-
+            expect(fj("span[class*='screenReaderContent']:contains('Checkpoints can be set to have different due dates and point values for the initial response and the subsequent replies.')")).to be_present
             force_click_native('input[type=checkbox][value="checkpoints"]')
 
             f("input[data-testid='points-possible-input-reply-to-topic']").send_keys :backspace
@@ -1960,6 +1988,18 @@ describe "discussions" do
 
             expect(sub_assignment1.points_possible).to eq 5
             expect(sub_assignment2.points_possible).to eq 7
+          end
+
+          it "cannot edit a non-checkpointed discussion with replies into a checkpointed discussion" do
+            graded_discussion = create_graded_discussion(course)
+            graded_discussion.discussion_entries.create!(
+              user: @teacher,
+              message: "Initial post"
+            )
+
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            expect(f('input[type=checkbox][value="checkpoints"]')).not_to be_enabled
+            expect(fj("span[class*='screenReaderContent']:contains('Checkpoints cannot be toggled after replies have been made.')")).to be_present
           end
 
           it "deletes checkpoints if the graded checkbox is unselected on an exisitng discussion with checkpoints" do

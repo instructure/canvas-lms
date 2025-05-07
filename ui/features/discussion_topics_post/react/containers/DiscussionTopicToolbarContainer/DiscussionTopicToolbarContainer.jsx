@@ -295,6 +295,7 @@ const DiscussionTopicToolbarContainer = props => {
             isExpandedLocked={props.discussionTopic.expandedLocked}
             discDefaultSortEnabled={discDefaultSortEnabled()}
             discDefaultExpandEnabled={discDefaultExpandEnabled()}
+            isAnnouncement={props.discussionTopic.isAnnouncement}
             showAssignTo={
               !props.discussionTopic.isAnnouncement &&
               props.discussionTopic.contextType === 'Course' &&

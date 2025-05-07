@@ -8,3 +8,6 @@ gemspec
 gem "canvas_text_helper", path: "../canvas_text_helper"
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "rspec", "~> 3.12"
+gem "simplecov", "~> 0.22"

@@ -146,10 +146,6 @@
   <div id="assignment_group_{{id}}_assignments" class="assignment-list" >
     <ul class="collectionViewItems ig-list draggable"></ul>
   </div>
-
-  {{#if ENV.PERMISSIONS.manage_assignments_add}}
-    <form data-view="createAssignment" class="form-dialog"></form>
-  {{/if}}
   {{#if ENV.PERMISSIONS.manage}}
     <form data-view="editAssignmentGroup" class="form-dialog"></form>
   {{/if}}

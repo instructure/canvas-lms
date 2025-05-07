@@ -5932,6 +5932,7 @@ el:
   edit_current_message_da650d4c: "Επεξεργασία Τρέχοντος Μηνύματος"
   edit_grading_scheme_53091236: "Τροποποίηση Κανονισμού Βαθμολόγισης"
   edit_group_c8679dba: "Επεξεργασία Ομάδας"
+  edit_item_details_1e2b5ba1: "Επεξεργασία Λεπτομερειών Αντικειμένου"
   edit_item_details_c9a7b9c5: "Επεξεργασία λεπτομερειών αντικειμένου"
   edit_module_item_83258f6d: "Πρόσθεση Ενότητας/Στοιχείου"
   edit_module_settings_2bf11f7f: "Τροποποίηση Ρυθμίσεων Ενότητας"
@@ -7577,6 +7578,7 @@ el:
   increase_indent_6d550a4a: "Αύξηση Εσοχής Κειμένου"
   incremental_update_successfully_generated_against__db3f3f06: "Η αυξητική ενημέρωση ολοκληρώθηκε επιτυχώς σε αντιπαραβολή με προηγούμενη Εισαγωγή προς το SIS."
   indent_1_level_e7b18c1e: "Εσοχή Κειμένου Επίπεδο 1"
+  indent_72887794: "Δημιουργία Εσοχής Κειμένου"
   indentation_3c6081d5: "Προσθήκη εσοχής κειμένου"
   india_91_6c290107: "Ινδία (+91)"
   indigo_2035fc55: Λουλακί
@@ -11323,6 +11325,7 @@ el:
   process_as_ui_changes_8e34ed2a: "Επεξεργασία ως αλλαγές UI"
   process_data_2f5f962f: "Επεξεργασία Δεδομένων"
   processing_2fcc9739: "Γίνεται Επεξεργασία"
+  processing_8c569014: "Γίνεται Επεξεργασία..."
   product_name: Canvas
   profile: 
     access_token: 
@@ -14263,6 +14266,7 @@ el:
   show_by_type_c5d61732: "Εμφάνιση βάσει Τύπου"
   show_concluded_enrollments_6a05544c: "Εμφάνιση Ολοκληρωμένων Εγγραφών"
   show_correct_answers_at_a5475aa3: "Εμφάνιση Σωστών Απαντήσεων Σε"
+  show_less_f778dab5: "Εμφάνιση Λιγότερων Πληροφοριών"
   show_links_to_unpublished_content_30c0450d: "Προβολή συνδέσμων σε μη δημοσιευμένο περιεχόμενο"
   show_more_af9cbc16: "Εμφάνιση Περισσότερων Πληροφοριών"
   show_more_fae1328: "Εμφάνιση περισσότερων πληροφοριών"

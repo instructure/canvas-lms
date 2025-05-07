@@ -231,7 +231,10 @@ describe Mutations::CreateGroupSet do
 
   context "non-collaborative groups" do
     before do
-      Account.default.enable_feature!(:differentiation_tags)
+      Account.default.enable_feature! :assign_to_differentiation_tags
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
     end
 
     it "does not allow users to create non-collaborative groups if they do not have permission" do

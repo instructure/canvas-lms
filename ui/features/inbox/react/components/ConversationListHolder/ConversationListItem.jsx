@@ -108,6 +108,7 @@ export const ConversationListItem = ({...props}) => {
             data-testid="conversation"
             as="div"
             borderWidth="none none small none"
+            borderColor="secondary"
             padding="small medium small x-small"
           >
             <Grid
@@ -263,7 +264,7 @@ export const ConversationListItem = ({...props}) => {
                   )}
                 </Grid.Col>
               </Grid.Row>
-              <Grid.Row>
+              <Grid.Row role='button'>
                 <Grid.Col>
                   <Focusable>
                     {({focused}) => {

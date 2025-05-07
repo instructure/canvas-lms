@@ -399,7 +399,8 @@ class PseudonymsController < ApplicationController
   #   them, or unassociated logins. New providers will only search for logins
   #   explicitly associated with them. This can be the integer ID of the
   #   provider, or the type of the provider (in which case, it will find the
-  #   first matching provider).
+  #   first matching provider). To unassociate from a known provider, specify
+  #   null or an empty string.
   #
   # @argument login[workflow_state] [String, "active"|"suspended"]
   #   Used to suspend or re-activate a login.
@@ -538,7 +539,7 @@ class PseudonymsController < ApplicationController
   end
 
   def find_authentication_provider
-    return true unless params[:pseudonym][:authentication_provider_id]
+    return true unless params[:pseudonym][:authentication_provider_id].present?
 
     params[:pseudonym][:authentication_provider] = @domain_root_account
                                                    .authentication_providers.active
@@ -567,30 +568,30 @@ class PseudonymsController < ApplicationController
 
     @override_sis_stickiness = !params[:override_sis_stickiness] || value_to_boolean(params[:override_sis_stickiness]) || params[:action] != "update"
 
-    has_right_if_requests_change(:unique_id, :update) do
+    authorized_if_requested_change?(:unique_id, :update) do
       if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :unique_id)
         @pseudonym.unique_id = params[:pseudonym][:unique_id]
       end
     end or return false
 
-    has_right_if_requests_change(:authentication_provider, :update) do
+    authorized_if_requested_change?(:authentication_provider, :update) do
       if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :authentication_provider)
         @pseudonym.authentication_provider = params[:pseudonym][:authentication_provider]
       end
     end or return false
 
-    has_right_if_requests_change(:declared_user_type, :update) do
+    authorized_if_requested_change?(:declared_user_type, :update) do
       if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :declared_user_type)
         @pseudonym.declared_user_type = params[:pseudonym][:declared_user_type]
       end
     end or return false
 
-    has_right_if_requests_change(:sis_user_id, :manage_sis) do
+    authorized_if_requested_change?(:sis_user_id, :manage_sis) do
       # convert "" -> nil for sis_user_id
       @pseudonym.sis_user_id = params[:pseudonym][:sis_user_id].presence
     end or return false
 
-    has_right_if_requests_change(:integration_id, :manage_sis) do
+    authorized_if_requested_change?(:integration_id, :manage_sis) do
       # convert "" -> nil for integration_id
       @pseudonym.integration_id = params[:pseudonym][:integration_id].presence
     end or return false
@@ -605,7 +606,7 @@ class PseudonymsController < ApplicationController
       return false
     end
 
-    has_right_if_requests_change(:password, :change_password) do
+    authorized_if_requested_change?(:password, :change_password) do
       if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :password)
         @pseudonym.password = params[:pseudonym][:password]
         @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
@@ -622,16 +623,22 @@ class PseudonymsController < ApplicationController
       return false
     end
 
-    has_right_if_requests_change(:workflow_state, :delete) do
+    authorized_if_requested_change?(:workflow_state, :delete) do
       if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :workflow_state)
         @pseudonym.workflow_state = params[:pseudonym][:workflow_state]
+      end
+    end or return false
+
+    authorized_if_requested_change?(:authentication_provider_id, :update) do
+      if @pseudonym.authentication_provider_id.present? && params[:pseudonym][:authentication_provider_id].blank?
+        @pseudonym.authentication_provider_id = nil
       end
     end or return false
   end
 
   private
 
-  def has_right_if_requests_change(key, right)
+  def authorized_if_requested_change?(key, right)
     return true unless params[:pseudonym].key?(key.to_sym)
 
     if @pseudonym.grants_right?(@current_user, right.to_sym)

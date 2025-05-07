@@ -90,6 +90,7 @@ export default class GenericErrorPage extends React.Component {
         comments: this.state.textAreaComment,
         email: this.state.email,
         backtrace: this.props.stack,
+        user_roles: window.ENV.current_user_roles?.join(','),
       },
     }
     this.setState({submitLoading: true, showingCommentBox: false})

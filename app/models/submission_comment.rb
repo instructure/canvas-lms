@@ -242,7 +242,7 @@ class SubmissionComment < ActiveRecord::Base
     p.whenever do |record|
       # allows broadcasting when this record is initially saved (assuming draft == false) and also when it gets updated
       # from draft to final
-      (!record.draft? && (record.just_created || record.saved_change_to_draft?)) &&
+      !record.draft? && (record.just_created || record.saved_change_to_draft?) &&
         record.provisional_grade_id.nil? &&
         record.submission.assignment &&
         record.submission.assignment.context.available? &&
@@ -255,7 +255,7 @@ class SubmissionComment < ActiveRecord::Base
     p.dispatch :submission_comment_for_teacher
     p.to { submission.assignment.context.instructors_in_charge_of(author_id) - [author] }
     p.whenever do |record|
-      (!record.draft? && (record.just_created || record.saved_change_to_draft?)) &&
+      !record.draft? && (record.just_created || record.saved_change_to_draft?) &&
         record.provisional_grade_id.nil? &&
         record.submission.user_id == record.author_id
     end

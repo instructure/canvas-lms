@@ -281,6 +281,17 @@ describe WikiPagesApiController, type: :request do
       json = get_wiki_page(user, 403)
       expect(json["url"]).to be_nil
     end
+
+    it "with file_association_access ff it will add location to file tags" do
+      attachment = attachment_model(context: @course)
+      @course.root_account.enable_feature!(:file_association_access)
+      wiki_body = <<~HTML
+        <img src="/courses/#{@course.id}/files/#{attachment.id}/preview">
+      HTML
+      @page.update(body: wiki_body)
+      json = get_wiki_page(@student)
+      expect(json["body"]).to include("location=#{@page.asset_string}")
+    end
   end
 
   describe "POST 'duplicate'" do

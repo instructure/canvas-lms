@@ -183,7 +183,10 @@ const FindOutcomesModal = ({
     }
   }, [importOutcomesStatus]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onAddAllHandler = () => {
+  const onAddAllHandler = evt => {
+    evt.preventDefault()
+    evt.stopPropagation()
+
     const callImportApiToGroup = () => {
       importOutcomes({
         targetGroupId: targetGroup?._id,

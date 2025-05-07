@@ -66,9 +66,14 @@ export const useDeleteDifferentiationTagCategory = () => {
 
     onSuccess: async () => {
       // Invalidate queries related to differentiation tag categories so the UI can refresh
-      await queryClient.invalidateQueries(['differentiationTagCategories'], undefined, {
-        cancelRefetch: true,
-      })
+      await queryClient.invalidateQueries(
+        {
+          queryKey: ['differentiationTagCategories'],
+        },
+        {
+          cancelRefetch: true,
+        },
+      )
     },
 
     onError: error => {

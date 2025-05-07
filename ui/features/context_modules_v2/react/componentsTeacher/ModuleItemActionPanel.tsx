@@ -16,14 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState, useCallback } from 'react'
+import React, {useState, useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
-import {
-  IconPublishSolid,
-  IconUnpublishedLine,
-  IconMasteryPathsLine
-} from '@instructure/ui-icons'
+import {IconPublishSolid, IconUnpublishedLine, IconMasteryPathsLine} from '@instructure/ui-icons'
 import {
   handlePublishToggle,
   handleEdit,
@@ -36,16 +32,16 @@ import {
   handleSendTo,
   handleCopyTo,
   handleRemove,
-  handleMasteryPaths
+  handleMasteryPaths,
 } from '../handlers/moduleItemActionHandlers'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
-import { queryClient } from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import {Pill} from '@instructure/ui-pill'
 import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleItemActionMenu from './ModuleItemActionMenu'
-import {MasteryPathsData, ModuleItemContent} from '../utils/types'
+import {MasteryPathsData, ModuleItemContent, ModuleAction} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import {mapContentSelection} from '../utils/utils'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
@@ -64,17 +60,27 @@ interface ModuleItemActionPanelProps {
   published: boolean
   canBeUnpublished: boolean
   masteryPathsData: MasteryPathsData | null
+  setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
+  setSelectedModuleItem?: (item: {id: string; title: string} | null) => void
+  setIsManageModuleContentTrayOpen?: (isOpen: boolean) => void
+  setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
+  moduleTitle?: string
 }
 
 const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   moduleId,
   itemId,
-  id,
+  id: _id,
   indent,
   content,
   published,
   canBeUnpublished,
   masteryPathsData,
+  setModuleAction,
+  setSelectedModuleItem,
+  setIsManageModuleContentTrayOpen,
+  setSourceModule,
+  moduleTitle = '',
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDirectShareOpen, setIsDirectShareOpen] = useState(false)
@@ -91,7 +97,10 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       <Flex gap="small" data-testid={`mastery-paths-data-${itemId}`}>
         {masteryPathsData.isTrigger && itemId && (
           <Flex.Item>
-            <Link isWithinText={false} href={`${ENV.CONTEXT_URL_ROOT}/modules/items/${itemId}/edit_mastery_paths`}>
+            <Link
+              isWithinText={false}
+              href={`${ENV.CONTEXT_URL_ROOT}/modules/items/${itemId}/edit_mastery_paths`}
+            >
               {I18n.t('Mastery Paths')}
             </Link>
           </Flex.Item>
@@ -99,9 +108,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         {masteryPathsData.releasedLabel && (
           <Flex.Item>
             <Pill data-testid={`${masteryPathsData.releasedLabel}-${itemId}`}>
-              <IconMasteryPathsLine size="x-small" />
-              {' '}
-              {masteryPathsData.releasedLabel}
+              <IconMasteryPathsLine size="x-small" /> {masteryPathsData.releasedLabel}
             </Pill>
           </Flex.Item>
         )}
@@ -111,118 +118,153 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
 
   const handleEditRef = useCallback(() => {
     handleEdit(itemId, courseId, setIsMenuOpen)
-  }, [handleEdit, itemId, courseId, setIsMenuOpen])
+  }, [itemId, courseId, setIsMenuOpen])
 
   const handleSpeedGraderRef = useCallback(() => {
     handleSpeedGrader(content, courseId, setIsMenuOpen)
-  }, [handleSpeedGrader, content, courseId, setIsMenuOpen])
+  }, [content, courseId, setIsMenuOpen])
 
   const handleAssignToRef = useCallback(() => {
     handleAssignTo(content, courseId, setIsMenuOpen)
-  }, [handleAssignTo, content, courseId, setIsMenuOpen])
+  }, [content, courseId, setIsMenuOpen])
 
   const handleDuplicateRef = useCallback(() => {
     handleDuplicate(moduleId, itemId, queryClient, courseId, setIsMenuOpen)
-  }, [handleDuplicate, moduleId, itemId, queryClient, courseId, setIsMenuOpen])
+  }, [moduleId, itemId, courseId, setIsMenuOpen])
 
   const handleMoveToRef = useCallback(() => {
-    handleMoveTo(setIsMenuOpen)
-  }, [handleMoveTo, setIsMenuOpen])
+    if (!setModuleAction || !setSelectedModuleItem || !setIsManageModuleContentTrayOpen) return
+
+    handleMoveTo(
+      moduleId,
+      moduleTitle,
+      itemId,
+      content,
+      setModuleAction,
+      setSelectedModuleItem,
+      setIsManageModuleContentTrayOpen,
+      setIsMenuOpen,
+      setSourceModule,
+    )
+  }, [
+    moduleId,
+    moduleTitle,
+    itemId,
+    content,
+    setModuleAction,
+    setSelectedModuleItem,
+    setIsManageModuleContentTrayOpen,
+    setIsMenuOpen,
+    setSourceModule,
+  ])
 
   const handleDecreaseIndentRef = useCallback(() => {
     handleDecreaseIndent(itemId, moduleId, indent, courseId, queryClient, setIsMenuOpen)
-  }, [handleDecreaseIndent, itemId, moduleId, indent, courseId, queryClient, setIsMenuOpen])
+  }, [itemId, moduleId, indent, courseId, setIsMenuOpen])
 
   const handleIncreaseIndentRef = useCallback(() => {
     handleIncreaseIndent(itemId, moduleId, indent, courseId, queryClient, setIsMenuOpen)
-  }, [handleIncreaseIndent, itemId, moduleId, indent, courseId,queryClient, setIsMenuOpen])
+  }, [itemId, moduleId, indent, courseId, setIsMenuOpen])
 
   const handleSendToRef = useCallback(() => {
     handleSendTo(setIsDirectShareOpen, setIsMenuOpen)
-  }, [handleSendTo, setIsDirectShareOpen, setIsMenuOpen])
+  }, [setIsDirectShareOpen, setIsMenuOpen])
 
   const handleCopyToRef = useCallback(() => {
     handleCopyTo(setIsDirectShareCourseOpen, setIsMenuOpen)
-  }, [handleCopyTo, setIsDirectShareCourseOpen, setIsMenuOpen])
+  }, [setIsDirectShareCourseOpen, setIsMenuOpen])
 
   const handleRemoveRef = useCallback(() => {
     handleRemove(moduleId, itemId, content, queryClient, courseId, setIsMenuOpen)
-  }, [handleRemove, moduleId, itemId, content, queryClient, courseId, setIsMenuOpen])
+  }, [moduleId, itemId, content, courseId, setIsMenuOpen])
 
   const handleMasteryPathsRef = useCallback(() => {
     handleMasteryPaths(masteryPathsData, itemId, setIsMenuOpen)
-  }, [handleMasteryPaths, masteryPathsData, itemId, setIsMenuOpen])
+  }, [masteryPathsData, itemId, setIsMenuOpen])
 
   const publishIconOnClickRef = useCallback(() => {
     handlePublishToggle(moduleId, itemId, content, canBeUnpublished, queryClient, courseId)
-  }, [handlePublishToggle, moduleId, itemId, content, canBeUnpublished, queryClient, courseId])
+  }, [moduleId, itemId, content, canBeUnpublished, courseId])
 
   return (
     <>
-    <Flex alignItems="center" gap="small" wrap="no-wrap" justifyItems="end">
-      {/* Mastery Path Info */}
-      {renderMasteryPathsInfo()}
-      {/* BlueprintLockIcon */}
-      {(isMasterCourse || isChildCourse) && <BlueprintLockIcon
-        isChildCourse={isChildCourse}
-        initialLockState={content?.isLockedByMasterCourse || false}
-        contentId={content?._id}
-        contentType={content?.type?.toLowerCase() || ''}
-      />}
-      {/* Publish Icon */}
-      <Flex.Item>
-        <IconButton
-          screenReaderLabel={published ? "Published" : "Unpublished"}
-          renderIcon={published ? IconPublishSolid : IconUnpublishedLine}
-          withBackground={false}
-          withBorder={false}
-          color={published ? "success" : "secondary"}
-          size="small"
-          interaction={canBeUnpublished ? "enabled" : "disabled"}
-          onClick={publishIconOnClickRef}
-        />
-      </Flex.Item>
-      {/* Kebab Menu */}
-      <Flex.Item>
-        <ModuleItemActionMenu
-          itemType={content?.type || ''}
-          canDuplicate={content?.canDuplicate || false}
-          isMenuOpen={isMenuOpen}
-          setIsMenuOpen={setIsMenuOpen}
-          indent={indent}
-          handleEdit={handleEditRef}
-          handleSpeedGrader={handleSpeedGraderRef}
-          handleAssignTo={handleAssignToRef}
-          handleDuplicate={handleDuplicateRef}
-          handleMoveTo={handleMoveToRef}
-          handleDecreaseIndent={handleDecreaseIndentRef}
-          handleIncreaseIndent={handleIncreaseIndentRef}
-          handleSendTo={handleSendToRef}
-          handleCopyTo={handleCopyToRef}
-          handleRemove={handleRemoveRef}
-          masteryPathsData={masteryPathsData}
-          handleMasteryPaths={handleMasteryPathsRef}
-        />
-      </Flex.Item>
-    </Flex>
-    {["assignment","attachment","discussion_topic","page","quiz","module","module_item"].includes(content?.type?.toLowerCase() || '') && <>
-      <DirectShareUserModal
-        open={isDirectShareOpen}
-        sourceCourseId={courseId}
-        courseId={courseId}
-        contentShare={{ content_type: content?.type?.toLowerCase() || '', content_id: itemId }}
-        onDismiss={() => {
-          setIsDirectShareOpen(false)
-        } } />
-      <DirectShareCourseTray
-        open={isDirectShareCourseOpen}
-        sourceCourseId={courseId}
-        courseId={courseId}
-        contentSelection={mapContentSelection(itemId, content?.type?.toLowerCase() || '') || {}}
-        onDismiss={() => {
-          setIsDirectShareCourseOpen(false)
-        } } />
-      </>}
+      <Flex alignItems="center" gap="small" wrap="no-wrap" justifyItems="end">
+        {/* Mastery Path Info */}
+        {renderMasteryPathsInfo()}
+        {/* BlueprintLockIcon */}
+        {(isMasterCourse || isChildCourse) && (
+          <BlueprintLockIcon
+            initialLockState={content?.isLockedByMasterCourse || false}
+            contentId={content?._id}
+            contentType={content?.type?.toLowerCase() || ''}
+          />
+        )}
+        {/* Publish Icon */}
+        <Flex.Item>
+          <IconButton
+            screenReaderLabel={published ? 'Published' : 'Unpublished'}
+            renderIcon={published ? IconPublishSolid : IconUnpublishedLine}
+            withBackground={false}
+            withBorder={false}
+            color={published ? 'success' : 'secondary'}
+            size="small"
+            interaction={canBeUnpublished ? 'enabled' : 'disabled'}
+            onClick={publishIconOnClickRef}
+          />
+        </Flex.Item>
+        {/* Kebab Menu */}
+        <Flex.Item>
+          <ModuleItemActionMenu
+            itemType={content?.type || ''}
+            canDuplicate={content?.canDuplicate || false}
+            isMenuOpen={isMenuOpen}
+            setIsMenuOpen={setIsMenuOpen}
+            indent={indent}
+            handleEdit={handleEditRef}
+            handleSpeedGrader={handleSpeedGraderRef}
+            handleAssignTo={handleAssignToRef}
+            handleDuplicate={handleDuplicateRef}
+            handleMoveTo={handleMoveToRef}
+            handleDecreaseIndent={handleDecreaseIndentRef}
+            handleIncreaseIndent={handleIncreaseIndentRef}
+            handleSendTo={handleSendToRef}
+            handleCopyTo={handleCopyToRef}
+            handleRemove={handleRemoveRef}
+            masteryPathsData={masteryPathsData}
+            handleMasteryPaths={handleMasteryPathsRef}
+          />
+        </Flex.Item>
+      </Flex>
+      {[
+        'assignment',
+        'attachment',
+        'discussion_topic',
+        'page',
+        'quiz',
+        'module',
+        'module_item',
+      ].includes(content?.type?.toLowerCase() || '') && (
+        <>
+          <DirectShareUserModal
+            open={isDirectShareOpen}
+            sourceCourseId={courseId}
+            courseId={courseId}
+            contentShare={{content_type: content?.type?.toLowerCase() || '', content_id: itemId}}
+            onDismiss={() => {
+              setIsDirectShareOpen(false)
+            }}
+          />
+          <DirectShareCourseTray
+            open={isDirectShareCourseOpen}
+            sourceCourseId={courseId}
+            courseId={courseId}
+            contentSelection={mapContentSelection(itemId, content?.type?.toLowerCase() || '') || {}}
+            onDismiss={() => {
+              setIsDirectShareCourseOpen(false)
+            }}
+          />
+        </>
+      )}
     </>
   )
 }

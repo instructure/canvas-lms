@@ -22,6 +22,7 @@ import {HelpTrayProvider, NewLoginDataProvider, NewLoginProvider} from '../conte
 import {LoginLayout} from '../layouts/LoginLayout'
 import {HelpTray} from '../shared'
 import RegistrationRoutesMiddleware from './RegistrationRoutesMiddleware'
+import RenderGuard from './RenderGuard'
 
 const SignIn = lazy(() => import('../pages/SignIn'))
 const ForgotPassword = lazy(() => import('../pages/ForgotPassword'))
@@ -34,14 +35,16 @@ export const NewLoginRoutes = (
   <Route
     path="login"
     element={
-      <NewLoginProvider>
-        <NewLoginDataProvider>
-          <HelpTrayProvider>
-            <LoginLayout />
-            <HelpTray />
-          </HelpTrayProvider>
-        </NewLoginDataProvider>
-      </NewLoginProvider>
+      <RenderGuard>
+        <NewLoginProvider>
+          <NewLoginDataProvider>
+            <HelpTrayProvider>
+              <LoginLayout />
+              <HelpTray />
+            </HelpTrayProvider>
+          </NewLoginDataProvider>
+        </NewLoginProvider>
+      </RenderGuard>
     }
   >
     {/* standalone LDAP login route */}

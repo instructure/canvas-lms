@@ -64,9 +64,12 @@
 #   }
 #
 class ErrorsController < ApplicationController
+  include CaptchaValidation
+
   PER_PAGE = 20
 
   before_action :require_view_error_reports, except: [:create]
+  before_action :validate_captcha!, only: [:create]
   skip_before_action :verify_authenticity_token, only: [:create]
 
   def require_view_error_reports
@@ -164,6 +167,9 @@ class ErrorsController < ApplicationController
       report.http_env ||= Canvas::Errors::Info.useful_http_env_stuff_from_request(request)
       report.request_context_id = RequestContext::Generator.request_id
       report.assign_data(error)
+      if reporter && !report.data.key?("user_roles")
+        report.data["user_roles"] = reporter.roles(@domain_root_account).join(",")
+      end
       report.save
       report.delay.send_to_external
     rescue => e

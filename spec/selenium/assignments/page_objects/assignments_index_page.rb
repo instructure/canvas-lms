@@ -115,7 +115,7 @@ module AssignmentsIndexPage
   end
 
   def bulk_edit_tr_rows
-    ff("#bulkEditRoot [role='table'] [role='row']")
+    ff("[data-testid='bulk-edit-table-row']")
   end
 
   def bulk_edit_loading_spinner

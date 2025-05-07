@@ -412,6 +412,8 @@ module AttachmentFu # :nodoc:
     end
 
     def find_existing_attachment_for_md5
+      return nil if avoid_linking_to_root_attachment
+
       shard.activate do
         GuardRail.activate(:secondary) do
           if md5.present? && (ns = infer_namespace)

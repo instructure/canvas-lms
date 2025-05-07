@@ -25,18 +25,17 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import React, {useEffect, useRef, useState} from 'react'
-import {useNavigate} from 'react-router-dom'
 import {useNewLogin, useNewLoginData} from '../context'
+import {useSafeBackNavigation} from '../hooks'
 import {ROUTES} from '../routes/routes'
 import {forgotPassword} from '../services'
-import {EMAIL_REGEX, createErrorMessage} from '../shared/helpers'
+import {createErrorMessage, EMAIL_REGEX} from '../shared/helpers'
 
 const I18n = createI18nScope('new_login')
 
 const ForgotPassword = () => {
   const {isUiActionPending, setIsUiActionPending} = useNewLogin()
   const {loginHandleName} = useNewLoginData()
-  const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
@@ -97,13 +96,7 @@ const ForgotPassword = () => {
     setEmail(value.trim())
   }
 
-  const handleCancel = () => {
-    if (window.history.length > 1) {
-      navigate(-1)
-    } else {
-      navigate(ROUTES.SIGN_IN)
-    }
-  }
+  const handleCancel = useSafeBackNavigation(ROUTES.SIGN_IN)
 
   const passwordRecoveryForm = (
     <>

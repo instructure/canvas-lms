@@ -1421,7 +1421,10 @@ describe GradebooksController do
 
         context ":differentiation_tags" do
           before :once do
-            Account.site_admin.enable_feature!(:differentiation_tags)
+            @course.account.enable_feature! :assign_to_differentiation_tags
+            @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+            @course.account.save!
+            @course.account.reload
           end
 
           before do
@@ -1791,10 +1794,10 @@ describe GradebooksController do
           # The initial show view will redirect to show without the view query param the first time,
           #  and because RSpec doesn't follow redirects well, we stub out a few things to simulate
           #  the redirects
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
           allow_any_instance_of(GradebooksController).to receive(:preferred_gradebook_view).and_return("learning_mastery")
           get "show", params: { course_id: @course.id, view: "" }
-          expect(InstStatsd::Statsd).to have_received(:increment).with(
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "outcomes_page_views",
             tags: { type: "teacher_lmgb" }
           )

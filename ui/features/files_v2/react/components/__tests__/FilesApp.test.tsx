@@ -26,6 +26,16 @@ import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {setupFilesEnv} from '../../../fixtures/fakeFilesEnv'
 import {createMemoryRouter, RouterProvider} from 'react-router-dom'
 import {FAKE_FOLDERS} from '../../../fixtures/fakeData'
+import {NotFoundError} from '../../hooks/useGetFolders'
+
+// Mock the useGetFolders module, but provide the real implementation by default
+jest.mock('../../hooks/useGetFolders', () => {
+  const originalModule = jest.requireActual('../../hooks/useGetFolders')
+  return {
+    ...originalModule,
+    useGetFolders: originalModule.useGetFolders,
+  }
+})
 
 describe('FilesApp', () => {
   let flashElements: any
@@ -106,8 +116,8 @@ describe('FilesApp', () => {
     renderComponent()
     // necessary to make sure table has finished loading
     // otherwise test is false positive because button would never be rendered
-    const folderName = await screen.findAllByText(FAKE_FOLDERS[1].name)
-    expect(folderName).toHaveLength(2)
+    const folderName = await screen.findByText(FAKE_FOLDERS[1].name)
+    expect(folderName).toBeInTheDocument()
     const nextPageButton = screen.queryByRole('button', {name: '1'})
     expect(nextPageButton).not.toBeInTheDocument()
   })
@@ -140,5 +150,52 @@ describe('FilesApp', () => {
     expect(allMyFilesButton).toBeInTheDocument()
     expect(uploadButton).not.toBeInTheDocument()
     expect(createFolderButton).not.toBeInTheDocument()
+  })
+
+  describe('404 error handling', () => {
+    const hooksModule = require('../../hooks/useGetFolders')
+    const originalUseGetFolders = hooksModule.useGetFolders
+
+    afterEach(() => {
+      hooksModule.useGetFolders = originalUseGetFolders
+    })
+
+    it('renders NotFoundArtwork component when a 404 error occurs', async () => {
+      const mockError = new NotFoundError('Not found')
+      hooksModule.useGetFolders = jest.fn().mockReturnValue({
+        data: null,
+        error: mockError,
+        isLoading: false,
+      })
+      renderComponent()
+      await waitFor(() => {
+        expect(screen.getByText(/whoops... looks like nothing is here/i)).toBeInTheDocument()
+        expect(screen.getByText(/we couldn't find that page/i)).toBeInTheDocument()
+      })
+    })
+
+    it('does not render NotFoundArtwork component when no error occurs', async () => {
+      hooksModule.useGetFolders = jest.fn().mockReturnValue({
+        data: [{id: '1', name: 'Test Folder'}],
+        error: null,
+        isLoading: false,
+      })
+      renderComponent()
+      await waitFor(() => {
+        const notFoundContainer = document.querySelector('.not_found_page_artwork')
+        expect(notFoundContainer).not.toBeInTheDocument()
+      })
+    })
+
+    it('does not show flash error message for 404 errors', async () => {
+      const mockError = new NotFoundError('Not found')
+      hooksModule.useGetFolders = jest.fn().mockReturnValue({
+        data: null,
+        error: mockError,
+        isLoading: false,
+      })
+      renderComponent()
+      expect(flashElements.textContent).not.toContain('Failed to fetch files and folders')
+    })
   })
 })

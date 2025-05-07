@@ -77,7 +77,7 @@ const FileRenameForm = ({
     () =>
       onNameConflictResolved({
         file: fileOptions.file,
-        dup: 'rename',
+        dup: 'error', // throw an error if the new name also already exists
         name: renameFileInput,
         expandZip: fileOptions.expandZip,
       }),
@@ -131,11 +131,7 @@ const FileRenameForm = ({
   const renderFooter = useCallback(() => {
     if (fileOptions.cannotOverwrite) {
       return (
-        <Button
-          data-testid="rename-change-button"
-          color="primary"
-          onClick={handleChangeClick}
-        >
+        <Button data-testid="rename-change-button" color="primary" onClick={handleChangeClick}>
           {I18n.t('Change')}
         </Button>
       )
@@ -152,11 +148,7 @@ const FileRenameForm = ({
           >
             {I18n.t('Change Name')}
           </Button>
-          <Button
-            data-testid="rename-replace-button"
-            color="primary"
-            onClick={handleReplaceClick}
-          >
+          <Button data-testid="rename-replace-button" color="primary" onClick={handleReplaceClick}>
             {I18n.t('Replace')}
           </Button>
         </>
@@ -167,11 +159,7 @@ const FileRenameForm = ({
           <Button data-testid="rename-back-button" margin="0 x-small 0 0" onClick={handleBackClick}>
             {I18n.t('Back')}
           </Button>
-          <Button
-            data-testid="rename-change-button"
-            color="primary"
-            onClick={handleChangeClick}
-          >
+          <Button data-testid="rename-change-button" color="primary" onClick={handleChangeClick}>
             {I18n.t('Change')}
           </Button>
         </>

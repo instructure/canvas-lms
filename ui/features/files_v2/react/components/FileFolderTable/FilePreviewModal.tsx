@@ -16,27 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {IconButton, Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {FilePreviewTray} from './FilePreviewTray'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {IconButton, Button} from '@instructure/ui-buttons'
-import {
-  IconImageSolid,
-  IconInfoSolid,
-  IconDownloadSolid,
-  IconPrinterSolid,
-  IconXSolid,
-} from '@instructure/ui-icons'
+import {IconImageSolid, IconInfoSolid, IconDownloadSolid, IconXSolid} from '@instructure/ui-icons'
 import {type File} from '../../../interfaces/File'
 import {generatePreviewUrlPath} from '../../../utils/fileUtils'
-import {FilePreview, mediaTypes} from './FilePreview'
+import {FilePreview} from './FilePreview'
 import {FilePreviewNavigationButtons} from './FilePreviewNavigationButtons'
-import {useFetchMedia} from './useFetchMedia'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('files_v2')
 
@@ -47,19 +42,12 @@ export interface FilePreviewModalProps {
   collection: File[]
 }
 
-const previewableTypes = ['image', 'pdf', 'html', 'doc', 'text']
-
 export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePreviewModalProps) => {
+  const closeButton = useRef<HTMLElement | null>(null)
   const [currentItem, setCurrentItem] = useState<File>(item)
   const [currentIndex, setCurrentIndex] = useState<number>(collection.indexOf(item))
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const name = currentItem.display_name
-  const isFilePreview = !!(
-    currentItem.preview_url && previewableTypes.includes(currentItem.mime_class)
-  )
-  const isMediaPreview = !isFilePreview && mediaTypes.includes(currentItem.mime_class)
-  const isQueryEnabled = isMediaPreview && isOpen
-  const {data, isFetching} = useFetchMedia({attachmentId: currentItem.id, enabled: isQueryEnabled})
 
   // Reset state when the modal is opened or item changes
   useEffect(() => {
@@ -72,6 +60,21 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
   const handleOverlayTrayChange = (isTrayOpen: boolean) => {
     setIsTrayOpen(isTrayOpen)
   }
+
+  useEffect(() => {
+    const timeoutID = isOpen ? setTimeout(() => closeButton.current?.focus(), 50) : undefined
+    return timeoutID ? () => clearTimeout(timeoutID) : undefined
+  }, [isOpen])
+
+  useEffect(() => {
+    if (isOpen) {
+      showFlashAlert({
+        message: I18n.t('Previewing file %{name}', {name}),
+        srOnly: true,
+        politeness: 'assertive',
+      })
+    }
+  }, [isOpen, name])
 
   useEffect(() => {
     const handlePopState = () => {
@@ -117,6 +120,17 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
     window.history.replaceState(null, '', generatePreviewUrlPath(collection[previousIndex] as File))
   }
 
+  const handleKeyboardNavigation = (event: React.KeyboardEvent) => {
+    if (ENV.disable_keyboard_shortcuts) return
+
+    const {key} = event
+    if (key === 'ArrowRight') {
+      handleNext()
+    } else if (key === 'ArrowLeft') {
+      handlePrevious()
+    }
+  }
+
   return (
     <Modal
       open={isOpen}
@@ -126,7 +140,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
       shouldCloseOnDocumentClick={false}
       variant="inverse"
       overflow="fit"
-      defaultFocusElement={() => document.getElementById('download-button')}
+      onKeyDown={handleKeyboardNavigation}
     >
       <Modal.Header>
         <Flex>
@@ -136,9 +150,11 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
                 <IconImageSolid size="x-small" />
               </Flex.Item>
               <Flex.Item shouldGrow shouldShrink>
-                <Heading level="h2" data-testid="file-header">
-                  <TruncateText>{name}</TruncateText>
-                </Heading>
+                <Tooltip renderTip={name}>
+                  <Heading level="h2" data-testid="file-header" width='30%'>
+                    <TruncateText>{name}</TruncateText>
+                  </Heading>
+                </Tooltip>
               </Flex.Item>
             </Flex>
           </Flex.Item>
@@ -152,16 +168,6 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
               margin="0 x-small 0 0"
               id="file-info-button"
               onClick={() => handleOverlayTrayChange(true)}
-            />
-            <IconButton
-              color="primary-inverse"
-              withBackground={false}
-              withBorder={false}
-              renderIcon={IconPrinterSolid}
-              screenReaderLabel={I18n.t('Print')}
-              margin="0 x-small 0 0"
-              onClick={() => window.print()}
-              id="print-button"
             />
             <IconButton
               color="primary-inverse"
@@ -181,6 +187,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
               screenReaderLabel={I18n.t('Close')}
               onClick={onClose}
               id="close-button"
+              ref={e => (closeButton.current = e as HTMLElement | null)}
               data-testid="close-button"
             />
           </Flex.Item>
@@ -192,15 +199,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
             id="file-preview-modal-drawer-layout"
             label={I18n.t('File Preview')}
           >
-            <FilePreview
-              item={currentItem}
-              mediaId={data?.media_id ?? ''}
-              mediaSources={data?.media_sources ?? []}
-              mediaTracks={data?.media_tracks ?? []}
-              isFilePreview={isFilePreview}
-              isMediaPreview={isMediaPreview}
-              isFetchingMedia={isFetching}
-            />
+            <FilePreview item={currentItem} />
           </DrawerLayout.Content>
           <DrawerLayout.Tray
             open={isTrayOpen}
@@ -208,13 +207,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
             placement="end"
             label={I18n.t('File Information')}
           >
-            <FilePreviewTray
-              onDismiss={() => setIsTrayOpen(false)}
-              item={currentItem}
-              mediaTracks={data?.media_tracks ?? []}
-              canAddTracks={data?.can_add_captions ?? false}
-              isFetchingTracks={isFetching}
-            />
+            <FilePreviewTray onDismiss={() => setIsTrayOpen(false)} item={currentItem} />
           </DrawerLayout.Tray>
         </DrawerLayout>
       </Modal.Body>

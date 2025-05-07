@@ -32,6 +32,10 @@
     <% end %>
     <%= text_field :error, :email, :value => (@current_user.email rescue ""), :style => "border: 1px solid #888;" %>
   </div>
+  <% if captcha_site_key && !@current_user %>
+    <div class="g-recaptcha" data-sitekey="<%= captcha_site_key %>"></div>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <% end %>
   <div class="button-container">
     <button type="submit" class="btn"><%= t('buttons.submit', %{Send Comments}) %></button>
   </div>

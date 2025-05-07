@@ -8,3 +8,8 @@ gem "json_token", path: "../json_token"
 gem "paginated_collection", path: "../paginated_collection"
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "debug"
+gem "rake"
+gem "rspec", "~> 3.12"
+gem "sqlite3"

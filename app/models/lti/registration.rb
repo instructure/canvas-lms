@@ -121,6 +121,7 @@ class Lti::Registration < ActiveRecord::Base
       tool,
       false
     )
+    tool.lti_registration = self
     tool.developer_key = developer_key
     tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || privacy_level
     tool

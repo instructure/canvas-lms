@@ -48,6 +48,12 @@ class Login::OAuthBaseController < ApplicationController
       yield
       true
     end
+  rescue RetriableOAuthValidationError => e
+    redirect_to aac.try(:validation_error_retry_url, e, controller: self, target_auth_provider: try(:target_auth_provider)) || login_url
+
+    increment_statsd(:failure, reason: :retriable_oauth_validation_error)
+
+    false
   rescue => e
     Canvas::Errors.capture(e,
                            type: :oauth_consumer,
@@ -82,6 +88,11 @@ class Login::OAuthBaseController < ApplicationController
     elsif @aac.jit_provisioning?
       pseudonym = @aac.provision_user(unique_ids, provider_attributes)
     end
+
+    # Apply any authentication-provider-specific validations on the found pseudonym.
+    #
+    # See AuthenticationProvider::OAuth2#validate_found_pseudonym!
+    @aac.try(:validate_found_pseudonym!, pseudonym:, session:, token:, target_auth_provider: try(:target_auth_provider))
 
     if pseudonym && (user = pseudonym.login_assertions_for_user)
       # Successful login and we have a user

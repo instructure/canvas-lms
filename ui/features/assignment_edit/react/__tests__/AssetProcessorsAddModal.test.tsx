@@ -82,6 +82,8 @@ describe('AssetProcessorsAddModal', () => {
     act(() => t2Card.click())
     const iframe = getByTitle('Configure new document processing app')
     expect(iframe).toHaveAttribute('src', '/courses/123/external_tools/22/resource_selection?display=borderless&launch_type=ActivityAssetProcessor&secure_params=my-secure-params')
+    expect(iframe.style.width).toBe('600px')
+    expect(iframe.style.height).toBe('500px')
   })
 
   describe('when a deep linking response is received from the launch', () => {

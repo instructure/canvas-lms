@@ -982,7 +982,7 @@ describe Course do
     subject { Importers::CourseContentImporter.import_content(@course, {}, {}, migration) }
 
     before do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       allow(InstStatsd::Statsd).to receive(:timing)
     end
 
@@ -994,7 +994,7 @@ describe Course do
 
     it "logs import successes" do
       subject
-      expect(InstStatsd::Statsd).to have_received(:increment).with("content_migrations.import_success").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("content_migrations.import_success").once
     end
 
     it "logs import duration" do
@@ -1007,7 +1007,7 @@ describe Course do
     it "logs import failures" do
       allow(Auditors::Course).to receive(:record_copied).and_raise("Something went wrong at the last minute")
       expect { subject }.to raise_error("Something went wrong at the last minute")
-      expect(InstStatsd::Statsd).to have_received(:increment).with("content_migrations.import_failure").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("content_migrations.import_failure").once
     end
 
     it "Does not log duration on failures" do

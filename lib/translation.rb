@@ -252,7 +252,7 @@ module Translation
 
       check_same_language(result)
       tags = ["type:inbox", "source_language:#{result.source_language_code}", "dest_language:#{result.target_language_code}"]
-      InstStatsd::Statsd.increment("translation.invocations", tags:)
+      InstStatsd::Statsd.distributed_increment("translation.invocations", tags:)
       result.translated_text
     end
 
@@ -271,7 +271,7 @@ module Translation
 
       check_same_language(result)
       tags = ["type:discussion", "source_language:#{result.source_language_code}", "dest_language:#{result.target_language_code}"]
-      InstStatsd::Statsd.increment("translation.invocations", tags:)
+      InstStatsd::Statsd.distributed_increment("translation.invocations", tags:)
       result.translated_document.content
     end
 
@@ -338,7 +338,7 @@ module Translation
       if tgt_lang.nil?
         tgt_lang = trim_locale(user.locale)
       end
-      InstStatsd::Statsd.increment("translation.create.#{src_lang}.#{tgt_lang}")
+      InstStatsd::Statsd.distributed_increment("translation.create.#{src_lang}.#{tgt_lang}")
       # TODO: Error handling of invoke endpoint.
       response = sagemaker_client.invoke_endpoint(
         endpoint_name: @endpoint,

@@ -371,9 +371,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
     return (
     <span>
       <Modal
-        as="form"
         noValidate={true}
-        onSubmit={preventDefault(this.onSubmit)}
         open={this.state.open}
         onDismiss={this.close}
         size="medium"
@@ -383,18 +381,20 @@ export default class CreateOrUpdateUserModal extends React.Component {
             : I18n.t('Edit User Details')
         }
       >
-        <Modal.Body>
-          <Flex gap='small' direction='column'>
-            {this.renderNameFields()}
-            {this.props.createOrUpdate === 'create' ? this.renderCreateFields() : this.renderUpdateFields()}
-          </Flex>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={this.close}>{I18n.t('Cancel')}</Button> &nbsp;
-          <Button type="submit" color="primary">
-            {this.props.createOrUpdate === 'create' ? I18n.t('Add User') : I18n.t('Save')}
-          </Button>
-        </Modal.Footer>
+        <form style={{margin: '0px'}} onSubmit={preventDefault(this.onSubmit)}>
+          <Modal.Body>
+            <Flex gap='small' direction='column'>
+              {this.renderNameFields()}
+              {this.props.createOrUpdate === 'create' ? this.renderCreateFields() : this.renderUpdateFields()}
+            </Flex>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={this.close}>{I18n.t('Cancel')}</Button> &nbsp;
+            <Button type="submit" color="primary">
+              {this.props.createOrUpdate === 'create' ? I18n.t('Add User') : I18n.t('Save')}
+            </Button>
+          </Modal.Footer>
+        </form>
       </Modal>
       {React.Children.map(this.props.children, child =>
         // when you click whatever is the child element to this, open the modal

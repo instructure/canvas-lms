@@ -201,7 +201,8 @@ module Api
     (flattened_array_of_columns - not_scoped_to_account_columns).empty?
   end
 
-  def self.sis_parse_id(id, _current_user = nil,
+  def self.sis_parse_id(id,
+                        _current_user = nil,
                         root_account: nil)
     # returns sis_column_name, column_value
     return "id", id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
@@ -618,7 +619,8 @@ module Api
                        user = @current_user,
                        preloaded_attachments = {},
                        options = {},
-                       is_public = false)
+                       is_public = false,
+                       location: nil)
     return html if html.blank?
 
     # use the host of the request if available;
@@ -637,7 +639,7 @@ module Api
     no_verifiers = @domain_root_account&.feature_enabled?(:disable_adding_uuid_verifier_in_api) || (params[:no_verifiers] if defined?(params))
     html = context.shard.activate do
       rewriter = UserContent::HtmlRewriter.new(context, user)
-      rewriter.set_handler("files") do |match|
+      file_handler = proc do |match|
         UserContent::FilesHandler.new(
           match:,
           context:,
@@ -645,9 +647,13 @@ module Api
           preloaded_attachments:,
           is_public:,
           in_app: respond_to?(:in_app?, true) && in_app?,
-          no_verifiers:
+          no_verifiers:,
+          location: (location.asset_string if @domain_root_account&.feature_enabled?(:file_association_access))
         ).processed_url
       end
+      rewriter.set_handler("files", &file_handler)
+      rewriter.set_handler("media_attachments_iframe", &file_handler)
+
       rewriter.translate_content(html)
     end
 

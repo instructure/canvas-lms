@@ -44,13 +44,14 @@ import type {Lti1p3RegistrationWizardService} from './manage/lti_1p3_registratio
 import {type AccountId, ZAccountId} from './manage/model/AccountId'
 import {ToolDetails} from './manage/pages/tool_details/ToolDetails'
 import {ToolAccess} from './manage/pages/tool_details/access/ToolAccess'
-import {ToolConfiguration} from './manage/pages/tool_details/configuration/ToolConfigurationView'
+import {ToolConfigurationView} from './manage/pages/tool_details/configuration/ToolConfigurationView'
 import {ToolHistory} from './manage/pages/tool_details/history/ToolHistory'
 import {ToolUsage} from './manage/pages/tool_details/usage/ToolUsage'
 import type {JsonUrlWizardService} from './manage/registration_wizard/JsonUrlWizardService'
 import {RegistrationWizardModal} from './manage/registration_wizard/RegistrationWizardModal'
 import {route as MonitorRoute} from './monitor/route'
 import {isLtiRegistrationsUsageEnabled} from './monitor/utils'
+import {ToolConfigurationEdit} from './manage/pages/tool_details/configuration/ToolConfigurationEdit'
 
 const accountId = ZAccountId.parse(window.ENV.ACCOUNT_ID)
 
@@ -110,7 +111,11 @@ const router = createBrowserRouter(
             },
             {
               path: 'configuration',
-              element: <ToolConfiguration />,
+              element: <ToolConfigurationView />,
+            },
+            {
+              path: 'configuration/edit',
+              element: <ToolConfigurationEdit updateLtiRegistration={updateRegistration} />,
             },
             ...(isLtiRegistrationsUsageEnabled()
               ? [

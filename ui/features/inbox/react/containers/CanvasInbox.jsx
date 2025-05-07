@@ -55,6 +55,8 @@ import InboxSettingsModalContainer, {
   LOAD_SETTINGS_FAIL,
 } from './InboxSettingsModalContainer/InboxSettingsModalContainer'
 import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
+import { InstUISettingsProvider } from '@instructure/emotion'
+import canvas from '@instructure/ui-themes'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -757,168 +759,176 @@ const CanvasInbox = ({breakpoints}) => {
             <ScreenReaderContent>{I18n.t('Inbox')}</ScreenReaderContent>
           </Heading>
         )}
-        <Flex as="div" height="100vh" direction="column">
-          {inboxSettingsFeature && (
-            <Flex.Item>
-              <Flex
-                data-testid="inbox-settings-in-header"
-                as="div"
-                direction="row"
-                justifyItems="space-between"
-                wrap="wrap"
-                overflowX="hidden"
-                overflowY="hidden"
-                margin="small medium medium medium"
+        <InstUISettingsProvider
+          theme={{
+            componentOverrides: {
+              View: { borderColorSecondary: canvas.colors.contrasts.grey3045 }
+            }
+          }}
+        >
+          <Flex as="div" height="100vh" direction="column">
+            {inboxSettingsFeature && (
+              <Flex.Item>
+                <Flex
+                  data-testid="inbox-settings-in-header"
+                  as="div"
+                  direction="row"
+                  justifyItems="space-between"
+                  wrap="wrap"
+                  overflowX="hidden"
+                  overflowY="hidden"
+                  margin="small medium medium medium"
+                >
+                  <Flex.Item width={getResponsiveStyles().containerWidth} shouldShrink={true}>
+                    <Heading margin={getResponsiveStyles().headerMargin} level="h1">
+                      {I18n.t('Inbox')}
+                    </Heading>
+                  </Flex.Item>
+                  <Flex.Item width={getResponsiveStyles().buttonsWidth}>
+                    <Flex
+                      wrap="no-wrap"
+                      direction={getResponsiveStyles().buttonsDirection}
+                      gap="small"
+                      justifyItems="end"
+                      overflowX="hidden"
+                      overflowY="hidden"
+                      width="100%"
+                      height="100%"
+                    >
+                      {renderActionButtons()}
+                    </Flex>
+                  </Flex.Item>
+                </Flex>
+              </Flex.Item>
+            )}
+            {(breakpoints.desktopOnly ||
+              (breakpoints.mobileOnly && !selectedConversations.length) ||
+              multiselect) && (
+              <Flex.Item
+                data-testid={
+                  breakpoints.mobileOnly
+                    ? 'mobile-message-action-header'
+                    : 'desktop-message-action-header'
+                }
               >
-                <Flex.Item width={getResponsiveStyles().containerWidth} shouldShrink={true}>
-                  <Heading margin={getResponsiveStyles().headerMargin} level="h1">
-                    {I18n.t('Inbox')}
-                  </Heading>
-                </Flex.Item>
-                <Flex.Item width={getResponsiveStyles().buttonsWidth}>
-                  <Flex
-                    wrap="no-wrap"
-                    direction={getResponsiveStyles().buttonsDirection}
-                    gap="small"
-                    justifyItems="end"
-                    overflowX="hidden"
-                    overflowY="hidden"
-                    width="100%"
+                <MessageListActionContainer
+                  activeMailbox={scope}
+                  activeCourseFilterID={courseFilter}
+                  onSelectMailbox={newScope => {
+                    setSelectedConversations([])
+                    setScope(newScope)
+                  }}
+                  onCourseFilterSelect={course => {
+                    setSelectedConversations([])
+                    setCourseFilter(course)
+                  }}
+                  onUserFilterSelect={userIDFilter => {
+                    setUserFilter(userIDFilter)
+                  }}
+                  selectedConversations={selectedConversations}
+                  onCompose={() => setComposeModal(true)}
+                  onManageLabels={() => (userInboxLabelsQuery.loading ? null : setManageLabels(true))}
+                  onReply={() => onReply()}
+                  onReplyAll={() => onReply({replyAll: true})}
+                  onForward={() => onForward()}
+                  onArchive={displayUnarchiveButton ? undefined : handleArchive}
+                  onUnarchive={displayUnarchiveButton ? handleUnarchive : undefined}
+                  deleteDisabled={deleteDisabled}
+                  deleteToggler={setDeleteDisabled}
+                  archiveDisabled={archiveDisabled}
+                  archiveToggler={setArchiveDisabled}
+                  onConversationRemove={removeFromSelectedConversations}
+                  displayUnarchiveButton={displayUnarchiveButton}
+                  conversationsQueryOptions={conversationsQueryOption}
+                  onStar={handleStar}
+                  firstConversationIsStarred={firstConversationIsStarred}
+                  onDelete={handleDelete}
+                  onReadStateChange={handleReadState}
+                  canReply={canReply}
+                  showComposeButton={!inboxSettingsFeature} // TODO: after feature flag is removed, this should always be false
+                />
+              </Flex.Item>
+            )}
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
+              <Flex height="100%" as="div" align="center" justifyItems="center">
+                {(breakpoints.desktopOnly ||
+                  (breakpoints.mobileOnly && !selectedConversations.length) ||
+                  multiselect) && (
+                  <Flex.Item
+                    width={
+                      conversationLength || submissionCommentLength
+                        ? getResponsiveStyles().conversationListWidth
+                        : '100%'
+                    }
                     height="100%"
                   >
-                    {renderActionButtons()}
-                  </Flex>
-                </Flex.Item>
+                    <ConversationListContainer
+                      course={courseFilter}
+                      userFilter={userFilter}
+                      scope={scope}
+                      onSelectConversation={updateSelectedConversations}
+                      onStarStateChange={handleStar}
+                      onReadStateChange={handleReadState}
+                      commonQueryVariables={commonQueryVariables}
+                      conversationsQuery={conversationsQuery}
+                      submissionCommentsQuery={submissionCommentsQuery}
+                      setConversationIdToGoBackTo={setConversationIdToGoBackTo}
+                    />
+                  </Flex.Item>
+                )}
+                {(breakpoints.desktopOnly ||
+                  (breakpoints.mobileOnly && selectedConversations.length > 0 && !multiselect)) && (
+                  <Flex.Item
+                    shouldGrow={true}
+                    shouldShrink={true}
+                    height="100%"
+                    overflowY="auto"
+                    margin={getResponsiveStyles().messageDetailMargin}
+                  >
+                    {!conversationsQuery.loading &&
+                    !submissionCommentsQuery.loading &&
+                    selectedConversations.length > 0 ? (
+                      <MessageDetailContainer
+                        setCanReply={setCanReply}
+                        conversation={selectedConversations[0]}
+                        onReply={conversationMessage => onReply({conversationMessage})}
+                        onReplyAll={conversationMessage =>
+                          onReply({conversationMessage, replyAll: true})
+                        }
+                        onArchive={displayUnarchiveButton ? undefined : handleArchive}
+                        onUnarchive={displayUnarchiveButton ? handleUnarchive : undefined}
+                        onDelete={handleDelete}
+                        onBack={handleBack}
+                        onForward={conversationMessage => onForward({conversationMessage})}
+                        onStar={
+                          !firstConversationIsStarred
+                            ? () => {
+                                handleStar(true)
+                              }
+                            : null
+                        }
+                        onUnstar={
+                          firstConversationIsStarred
+                            ? () => {
+                                handleStar(false)
+                              }
+                            : null
+                        }
+                        onReadStateChange={handleReadState}
+                        scope={scope}
+                        conversationsQueryOption={conversationsQueryOption}
+                      />
+                    ) : (
+                      <View padding="small">
+                        <NoSelectedConversation />
+                      </View>
+                    )}
+                  </Flex.Item>
+                )}
               </Flex>
             </Flex.Item>
-          )}
-          {(breakpoints.desktopOnly ||
-            (breakpoints.mobileOnly && !selectedConversations.length) ||
-            multiselect) && (
-            <Flex.Item
-              data-testid={
-                breakpoints.mobileOnly
-                  ? 'mobile-message-action-header'
-                  : 'desktop-message-action-header'
-              }
-            >
-              <MessageListActionContainer
-                activeMailbox={scope}
-                activeCourseFilterID={courseFilter}
-                onSelectMailbox={newScope => {
-                  setSelectedConversations([])
-                  setScope(newScope)
-                }}
-                onCourseFilterSelect={course => {
-                  setSelectedConversations([])
-                  setCourseFilter(course)
-                }}
-                onUserFilterSelect={userIDFilter => {
-                  setUserFilter(userIDFilter)
-                }}
-                selectedConversations={selectedConversations}
-                onCompose={() => setComposeModal(true)}
-                onManageLabels={() => (userInboxLabelsQuery.loading ? null : setManageLabels(true))}
-                onReply={() => onReply()}
-                onReplyAll={() => onReply({replyAll: true})}
-                onForward={() => onForward()}
-                onArchive={displayUnarchiveButton ? undefined : handleArchive}
-                onUnarchive={displayUnarchiveButton ? handleUnarchive : undefined}
-                deleteDisabled={deleteDisabled}
-                deleteToggler={setDeleteDisabled}
-                archiveDisabled={archiveDisabled}
-                archiveToggler={setArchiveDisabled}
-                onConversationRemove={removeFromSelectedConversations}
-                displayUnarchiveButton={displayUnarchiveButton}
-                conversationsQueryOptions={conversationsQueryOption}
-                onStar={handleStar}
-                firstConversationIsStarred={firstConversationIsStarred}
-                onDelete={handleDelete}
-                onReadStateChange={handleReadState}
-                canReply={canReply}
-                showComposeButton={!inboxSettingsFeature} // TODO: after feature flag is removed, this should always be false
-              />
-            </Flex.Item>
-          )}
-          <Flex.Item shouldGrow={true} shouldShrink={true}>
-            <Flex height="100%" as="div" align="center" justifyItems="center">
-              {(breakpoints.desktopOnly ||
-                (breakpoints.mobileOnly && !selectedConversations.length) ||
-                multiselect) && (
-                <Flex.Item
-                  width={
-                    conversationLength || submissionCommentLength
-                      ? getResponsiveStyles().conversationListWidth
-                      : '100%'
-                  }
-                  height="100%"
-                >
-                  <ConversationListContainer
-                    course={courseFilter}
-                    userFilter={userFilter}
-                    scope={scope}
-                    onSelectConversation={updateSelectedConversations}
-                    onStarStateChange={handleStar}
-                    onReadStateChange={handleReadState}
-                    commonQueryVariables={commonQueryVariables}
-                    conversationsQuery={conversationsQuery}
-                    submissionCommentsQuery={submissionCommentsQuery}
-                    setConversationIdToGoBackTo={setConversationIdToGoBackTo}
-                  />
-                </Flex.Item>
-              )}
-              {(breakpoints.desktopOnly ||
-                (breakpoints.mobileOnly && selectedConversations.length > 0 && !multiselect)) && (
-                <Flex.Item
-                  shouldGrow={true}
-                  shouldShrink={true}
-                  height="100%"
-                  overflowY="auto"
-                  margin={getResponsiveStyles().messageDetailMargin}
-                >
-                  {!conversationsQuery.loading &&
-                  !submissionCommentsQuery.loading &&
-                  selectedConversations.length > 0 ? (
-                    <MessageDetailContainer
-                      setCanReply={setCanReply}
-                      conversation={selectedConversations[0]}
-                      onReply={conversationMessage => onReply({conversationMessage})}
-                      onReplyAll={conversationMessage =>
-                        onReply({conversationMessage, replyAll: true})
-                      }
-                      onArchive={displayUnarchiveButton ? undefined : handleArchive}
-                      onUnarchive={displayUnarchiveButton ? handleUnarchive : undefined}
-                      onDelete={handleDelete}
-                      onBack={handleBack}
-                      onForward={conversationMessage => onForward({conversationMessage})}
-                      onStar={
-                        !firstConversationIsStarred
-                          ? () => {
-                              handleStar(true)
-                            }
-                          : null
-                      }
-                      onUnstar={
-                        firstConversationIsStarred
-                          ? () => {
-                              handleStar(false)
-                            }
-                          : null
-                      }
-                      onReadStateChange={handleReadState}
-                      scope={scope}
-                      conversationsQueryOption={conversationsQueryOption}
-                    />
-                  ) : (
-                    <View padding="small">
-                      <NoSelectedConversation />
-                    </View>
-                  )}
-                </Flex.Item>
-              )}
-            </Flex>
-          </Flex.Item>
-        </Flex>
+          </Flex>
+        </InstUISettingsProvider>
         {inboxSettingsFeature && inboxSettingsModal && (
           <InboxSettingsModalContainer
             onDismissWithAlert={handleDismissWithAlert}

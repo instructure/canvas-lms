@@ -16,42 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {useQuery} from '@canvas/query'
+import React, { useEffect } from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import formatMessage from '../../../../../packages/canvas-media/src/format-message'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
-import {generateFilesQuotaUrl} from '../../utils/apiUtils'
 import {useFileManagement} from './Contexts'
-import { Flex } from '@instructure/ui-flex'
+import {Flex} from '@instructure/ui-flex'
+import {useGetQuota} from '../hooks/useGetQuota'
 
 const I18n = createI18nScope('files_v2')
 
-const fetchQuota = async (contextType: string, contextId: string) => {
-  const response = await fetch(generateFilesQuotaUrl(contextType, contextId))
-  if (!response.ok) {
-    throw new Error('Failed to fetch quota data')
-  }
-  return response.json()
-}
-
 const FilesUsageBar = () => {
   const {contextType, contextId} = useFileManagement()
-  const {data, error, isLoading} = useQuery({
-    queryKey: ['quota'],
-    queryFn: () => fetchQuota(contextType, contextId),
-    staleTime: 0,
-  })
+  const {data, error, isLoading} = useGetQuota(contextType, contextId)
 
-  if (error) {
-    showFlashError(I18n.t('An error occurred while loading files usage data.'))(error as Error)
-    return null
-  }
+  useEffect(() => {
+    if (error) {
+      showFlashError(I18n.t('An error occurred while loading files usage data.'))()
+    }
+  }, [error])
 
-  if (isLoading) {
+  if (isLoading || error) {
     return null
   }
 
@@ -62,10 +50,7 @@ const FilesUsageBar = () => {
   })
 
   return (
-    <Flex
-      direction='column'
-      gap='x-small'
-    >
+    <Flex direction="column" gap="x-small">
       <ProgressBar
         meterColor="brand"
         screenReaderLabel={formatMessage('File Storage Quota Used')}

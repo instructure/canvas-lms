@@ -111,8 +111,17 @@ module CanvasHttp
   # parameter, which is the redirect response.
   #
   # Eventually it may be expanded to optionally do cert verification as well.
-  def self.request(request_class, url_str, other_headers = {}, redirect_limit: 3, form_data: nil, multipart: false,
-                   streaming: false, body: nil, content_type: nil, redirect_spy: nil, max_response_body_length: nil)
+  def self.request(request_class,
+                   url_str,
+                   other_headers = {},
+                   redirect_limit: 3,
+                   form_data: nil,
+                   multipart: false,
+                   streaming: false,
+                   body: nil,
+                   content_type: nil,
+                   redirect_spy: nil,
+                   max_response_body_length: nil)
     last_scheme = nil
     last_host = nil
     current_host = nil

@@ -69,55 +69,59 @@ const ModulesListStudent: React.FC = () => {
     }
   }, [data?.pages])
 
-  const handleToggleExpandRef = useCallback((moduleId: string) => {
-    handleToggleExpand(moduleId, setExpandedModules)
-  }, [setExpandedModules])
+  const handleToggleExpandRef = useCallback(
+    (moduleId: string) => {
+      handleToggleExpand(moduleId, setExpandedModules)
+    },
+    [setExpandedModules],
+  )
 
   return (
-      <View as="div" margin="medium">
-        <ModulePageActionHeaderStudent
-          onCollapseAll={() => handleCollapseAll(data, setExpandedModules)}
-          onExpandAll={() => handleExpandAll(data, setExpandedModules)}
-          anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
-        />
-        {isLoading && !data ? (
-          <View as="div" textAlign="center" padding="large">
-            <Spinner renderTitle={I18n.t('Loading modules')} size="large" />
-          </View>
-        ) : error ? (
-          <View as="div" textAlign="center" padding="large">
-            <Text color="danger">{I18n.t('Error loading modules')}</Text>
-          </View>
-        ) : (
-            <Flex direction="column" gap="small">
-            {data?.pages[0]?.modules.length === 0 ? (
-                <View as="div" textAlign="center" padding="large">
-                  <Text>{I18n.t('No modules found')}</Text>
-                </View>
-              ) : (
-                data?.pages.flatMap(page => page.modules).map((module) => (
-                      <ModuleStudent
-                        key={module._id}
-                        id={module._id}
-                        name={module.name}
-                        completionRequirements={module.completionRequirements}
-                        expanded={!!expandedModules.get(module._id)}
-                        onToggleExpand={handleToggleExpandRef}
-                      />
-                  )))}
-            </Flex>
-          )
-        }
-        {hasNextPage && (
-          <View as="div" padding="medium" textAlign="center">
-            {isFetchingNextPage && (
-              <Spinner renderTitle={I18n.t('Loading more modules')} size="small" margin="small" />
-            )}
-          </View>
-        )}
-      </View>
-    )
-  }
-
+    <View as="div" margin="medium">
+      <ModulePageActionHeaderStudent
+        onCollapseAll={() => handleCollapseAll(data, setExpandedModules)}
+        onExpandAll={() => handleExpandAll(data, setExpandedModules)}
+        anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
+      />
+      {isLoading && !data ? (
+        <View as="div" textAlign="center" padding="large">
+          <Spinner renderTitle={I18n.t('Loading modules')} size="large" />
+        </View>
+      ) : error ? (
+        <View as="div" textAlign="center" padding="large">
+          <Text color="danger">{I18n.t('Error loading modules')}</Text>
+        </View>
+      ) : (
+        <Flex direction="column" gap="small">
+          {data?.pages[0]?.modules.length === 0 ? (
+            <View as="div" textAlign="center" padding="large">
+              <Text>{I18n.t('No modules found')}</Text>
+            </View>
+          ) : (
+            data?.pages
+              .flatMap(page => page.modules)
+              .map(module => (
+                <ModuleStudent
+                  key={module._id}
+                  id={module._id}
+                  name={module.name}
+                  completionRequirements={module.completionRequirements}
+                  expanded={!!expandedModules.get(module._id)}
+                  onToggleExpand={handleToggleExpandRef}
+                />
+              ))
+          )}
+        </Flex>
+      )}
+      {hasNextPage && (
+        <View as="div" padding="medium" textAlign="center">
+          {isFetchingNextPage && (
+            <Spinner renderTitle={I18n.t('Loading more modules')} size="small" margin="small" />
+          )}
+        </View>
+      )}
+    </View>
+  )
+}
 
 export default ModulesListStudent

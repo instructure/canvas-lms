@@ -55,6 +55,7 @@ describe('Assignment Student Content View', () => {
 
     beforeEach(() => {
       oldEnv = window.ENV
+      window.ENV.can_submit_assignment_from_section = true
       window.ENV = {...window.ENV}
     })
 
@@ -65,6 +66,18 @@ describe('Assignment Student Content View', () => {
     it('renders when the current enrollment is concluded', async () => {
       window.ENV.enrollment_state = 'completed'
 
+      const props = await mockAssignmentAndSubmission()
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>,
+      )
+
+      expect(getByText(concludedMatch)).toBeInTheDocument()
+    })
+
+    it('renders when the enrollment for the section the assignment is assigned to is concluded', async () => {
+      window.ENV.can_submit_assignment_from_section = false
       const props = await mockAssignmentAndSubmission()
       const {getByText} = render(
         <MockedProvider>

@@ -420,8 +420,8 @@ ai_rubrics:
   applies_to: Course
   root_opt_in: true
   beta: true
-  display_name: AI Genreated Rubrics
-  description: Give rubric creators the options to generate rubric criteria automatically based on an assignment description via a large language model (LLM).
+  display_name: AI Generated Rubrics
+  description: Give rubric creators the option to generate rubric criteria automatically based on an assignment description via a large language model (LLM).
 use_body_word_count:
   state: allowed_on # this is intentional. we want to enable this upon deploy so we start populating word count.
   applies_to: SiteAdmin
@@ -457,6 +457,6 @@ post_grades_enhanced_modal:
 project_lhotse:
   state: hidden
   applies_to: Course
-  display_name: Project Lhotse
-  description: Enables the new AI-assisted grading tool, codename Project Lhotse, for assignments in this course.
-  shadow: true
+  display_name: Grading Assistance
+  description: Enables the new AI-assisted grading tool inside of the Modernized Speedgrader for assignments in this course.
+  hidden: true

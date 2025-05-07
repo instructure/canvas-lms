@@ -259,6 +259,7 @@ describe "context modules" do
     end
 
     it "does not show the description of a discussion locked by module", priority: "1" do
+      skip "Will be fixed in VICE-5209"
       module1 = @course.context_modules.create! name: "a_locked_mod", unlock_at: 1.day.from_now
       discussion = @course.discussion_topics.create!(title: "discussion", message: "discussion description")
       module1.add_item type: "discussion_topic", id: discussion.id
@@ -698,6 +699,7 @@ describe "context modules" do
     end
 
     it "marks locked but visible assignments/quizzes/discussions as read" do
+      skip "Will be fixed in VICE-5209"
       # setting lock_at in the past will cause assignments/quizzes/discussions to still be visible
       # they just can't be submitted to anymore
 

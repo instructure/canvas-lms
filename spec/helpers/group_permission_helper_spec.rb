@@ -26,7 +26,9 @@ describe GroupPermissionHelper do
 
   before do
     context.enroll_teacher(teacher)
-    Account.default.enable_feature!(:differentiation_tags)
+    Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+    Account.default.save!
+    Account.default.reload
   end
 
   describe "#check_group_authorization" do
@@ -76,7 +78,9 @@ describe GroupPermissionHelper do
 
     describe "when feature flag is off is nil" do
       before do
-        Account.default.disable_feature!(:differentiation_tags)
+        Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        Account.default.save!
+        Account.default.reload
       end
 
       it "checks collaborative group add permissions" do

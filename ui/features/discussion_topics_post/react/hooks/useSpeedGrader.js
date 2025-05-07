@@ -62,11 +62,23 @@ export default function useSpeedGrader() {
     sendPostMessage(message)
   }
 
+  const handleCommentKeyPress = () => {
+    const message = {subject: 'SG.commentKeyPress'}
+    sendPostMessage(message)
+  }
+
+  const handleGradeKeyPress = () => {
+    const message = {subject: 'SG.gradeKeyPress'}
+    sendPostMessage(message)
+  }
+
   return {
     isInSpeedGrader,
     handlePreviousStudentReply,
     handleNextStudentReply,
     handleJumpFocusToSpeedGrader,
     handleSwitchClick,
+    handleCommentKeyPress,
+    handleGradeKeyPress,
   }
 }

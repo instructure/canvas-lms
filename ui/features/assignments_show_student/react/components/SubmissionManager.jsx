@@ -216,6 +216,7 @@ const SubmissionManager = ({
 
   const similarityPledgeCheckboxRef = useRef(null)
   const submitButtonRef = useRef(null)
+  const newAttemptButtonRef = useRef(null)
 
   const updateSubmissionDraftCache = (cache, result) => {
     if (!result.data.createSubmissionDraft.errors) {
@@ -762,6 +763,7 @@ const SubmissionManager = ({
           updateUploadingFiles={updateUploadingFiles}
           uploadingFiles={uploadingFiles}
           submitButtonRef={submitButtonRef}
+          newAttemptButtonRef={newAttemptButtonRef}
         />
       </View>
     )
@@ -841,6 +843,7 @@ const SubmissionManager = ({
               data-testid="new-attempt-button"
               color="primary"
               onClick={startNewAttemptAction}
+              elementRef={(element) => newAttemptButtonRef.current = element}
             >
               {I18n.t('New Attempt')}
             </Button>

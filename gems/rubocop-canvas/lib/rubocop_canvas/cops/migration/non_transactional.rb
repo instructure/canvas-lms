@@ -53,7 +53,7 @@ module RuboCop
 
           block_arg = node.parent.arguments.first
           node.parent.body.each_child_node do |child|
-            next unless child.send_type? && child.receiver.children.first == block_arg.name
+            next unless child.send_type? && child.receiver && child.receiver.children.first == block_arg.name
 
             case child.method_name
             when :references

@@ -32,7 +32,7 @@ import {
   IconUserLine,
   IconDuplicateSolid,
   IconTrashLine,
-  IconMasteryPathsLine
+  IconMasteryPathsLine,
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
@@ -83,12 +83,12 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   handleCopyTo,
   handleRemove,
   masteryPathsData,
-  handleMasteryPaths = () => {}
+  handleMasteryPaths = () => {},
 }) => {
-  const { permissions } = useContextModule()
+  const {permissions} = useContextModule()
   return (
     <Menu
-      onToggle={(isOpen) => setIsMenuOpen(isOpen)}
+      onToggle={isOpen => setIsMenuOpen(isOpen)}
       open={isMenuOpen}
       trigger={
         <IconButton
@@ -102,62 +102,98 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
     >
       <Menu.Item onClick={handleEdit}>
         <Flex>
-          <Flex.Item><IconEditLine /></Flex.Item>
+          <Flex.Item>
+            <IconEditLine />
+          </Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{I18n.t('Edit')}</Flex.Item>
         </Flex>
       </Menu.Item>
-      {permissions?.canEdit && !basicContentTypes.includes(itemType) && <Menu.Item onClick={handleSpeedGrader}>
-        <Flex>
-          <Flex.Item><IconSpeedGraderLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('SpeedGrader')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canEdit && !basicContentTypes.includes(itemType) && <Menu.Item onClick={handleAssignTo}>
-        <Flex>
-          <Flex.Item><IconPermissionsSolid /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Assign To...')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canAdd && canDuplicate && !basicContentTypes.includes(itemType) && <Menu.Item onClick={handleDuplicate}>
-        <Flex>
-          <Flex.Item><IconDuplicateLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Duplicate')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canEdit && <Menu.Item onClick={handleMoveTo}>
-        <Flex>
-          <Flex.Item><IconUpdownLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Move to...')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canEdit && indent > 0 && <Menu.Item onClick={handleDecreaseIndent}>
-        <Flex>
-          <Flex.Item><IconArrowStartLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Decrease indent')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canEdit && indent < 5 && <Menu.Item onClick={handleIncreaseIndent}>
-        <Flex>
-          <Flex.Item><IconArrowEndLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Increase indent')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && <Menu.Item onClick={handleSendTo}>
-        <Flex>
-          <Flex.Item><IconUserLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Send To...')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
-      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && <Menu.Item onClick={handleCopyTo}>
-        <Flex>
-          <Flex.Item><IconDuplicateSolid /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Copy To...')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
+      {permissions?.canEdit && !basicContentTypes.includes(itemType) && (
+        <Menu.Item onClick={handleSpeedGrader}>
+          <Flex>
+            <Flex.Item>
+              <IconSpeedGraderLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('SpeedGrader')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canEdit && !basicContentTypes.includes(itemType) && (
+        <Menu.Item onClick={handleAssignTo}>
+          <Flex>
+            <Flex.Item>
+              <IconPermissionsSolid />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Assign To...')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canAdd && canDuplicate && !basicContentTypes.includes(itemType) && (
+        <Menu.Item onClick={handleDuplicate}>
+          <Flex>
+            <Flex.Item>
+              <IconDuplicateLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Duplicate')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canEdit && (
+        <Menu.Item onClick={handleMoveTo}>
+          <Flex>
+            <Flex.Item>
+              <IconUpdownLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Move to...')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canEdit && indent > 0 && (
+        <Menu.Item onClick={handleDecreaseIndent}>
+          <Flex>
+            <Flex.Item>
+              <IconArrowStartLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Decrease indent')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canEdit && indent < 5 && (
+        <Menu.Item onClick={handleIncreaseIndent}>
+          <Flex>
+            <Flex.Item>
+              <IconArrowEndLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Increase indent')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && (
+        <Menu.Item onClick={handleSendTo}>
+          <Flex>
+            <Flex.Item>
+              <IconUserLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Send To...')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
+      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && (
+        <Menu.Item onClick={handleCopyTo}>
+          <Flex>
+            <Flex.Item>
+              <IconDuplicateSolid />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Copy To...')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
       {!basicContentTypes.includes(itemType) && masteryPathsData?.isCyoeAble && (
         <Menu.Item onClick={handleMasteryPaths}>
           <Flex>
-            <Flex.Item><IconMasteryPathsLine /></Flex.Item>
+            <Flex.Item>
+              <IconMasteryPathsLine />
+            </Flex.Item>
             <Flex.Item margin="0 0 0 x-small">
               {masteryPathsData.isTrigger
                 ? I18n.t('Edit Mastery Paths')
@@ -166,12 +202,16 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           </Flex>
         </Menu.Item>
       )}
-      {permissions?.canEdit && <Menu.Item onClick={handleRemove}>
-        <Flex>
-          <Flex.Item><IconTrashLine /></Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">{I18n.t('Remove')}</Flex.Item>
-        </Flex>
-      </Menu.Item>}
+      {permissions?.canEdit && (
+        <Menu.Item onClick={handleRemove}>
+          <Flex>
+            <Flex.Item>
+              <IconTrashLine />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{I18n.t('Remove')}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )}
     </Menu>
   )
 }

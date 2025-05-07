@@ -3,7 +3,7 @@
   <table class="roster ic-Table ic-Table--hover-row ic-Table--condensed ic-Table--striped">
     <thead>
       <tr>
-        {{#ifAll ENV.permissions.can_manage_differentiation_tags ENV.FEATURES.differentiation_tags}}
+        {{#ifAll ENV.permissions.can_manage_differentiation_tags ENV.permissions.allow_assign_to_differentiation_tags}}
           <th scope="col"><span class="screenreader-only">{{#t}}Select User{{/t}}</span></th>
         {{/ifAll}}
         <th scope="col"><span class="screenreader-only">{{#t}}Profile Picture{{/t}}</span></th>

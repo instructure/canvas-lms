@@ -653,7 +653,7 @@ describe CanvasOutcomesHelper do
           ]
 
           stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&artifact_type=quizzes.quiz&user_uuid_list=#{one_user_uuid}&per_page=200&page=1")
-            .to_return(status: 200, body: mocked_result.to_json.to_s, headers: { "Per-Page" => 200, "Total" => 2 })
+            .to_return(status: 200, body: mocked_result.to_json, headers: { "Per-Page" => 200, "Total" => 2 })
 
           expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq expected_results
         end

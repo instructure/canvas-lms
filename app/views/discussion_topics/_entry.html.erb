@@ -55,9 +55,9 @@
           <span style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;">from
             <% if assignment_visible_to_user %>
               <% if discussions_speedgrader_revisit_enabled && use_discussion_toggle_link %>
-                <a id="discussion_speedgrader_revisit_link_entryId=<%= entry_id %>" href="#"><%= entry.discussion_topic.title %></a>
+                <button id="discussion_speedgrader_revisit_link_entryId=<%= entry_id %>"><%= entry.discussion_topic.title %></button>
               <% else %>
-                <a href="<%= context_url(entry_context, :context_discussion_topic_url, (entry ? entry.discussion_topic_id : '{{ topic_id }}'), headless_param) %>" style="font-size: 1.2em; font-weight: bold;"><%= entry.discussion_topic.title %></a>
+                <a role="button" href="<%= context_url(entry_context, :context_discussion_topic_url, (entry ? entry.discussion_topic_id : '{{ topic_id }}'), headless_param) %>" style="font-size: 1.2em; font-weight: bold;"><%= entry.discussion_topic.title %></a>
               <% end %>
             <% else %>
               <b> <%= entry.discussion_topic.title %> </b>
@@ -65,9 +65,15 @@
           </span>
         <% else %>
           <% if @topic_agglomerated && entry %>
-            <a href="<%= context_url(entry_context, :context_discussion_topic_url, entry ? entry.discussion_topic_id : '{{ topic_id }}') %>" style="font-weight: bold;"><%= entry.context.name %></a>
+            <button
+              type="button"
+              style="font-weight: bold;"
+              onclick="window.location.href='<%= context_url(entry_context, :context_discussion_topic_url, entry ? entry.discussion_topic_id : '{{ topic_id }}') %>'"
+            >
+              <%= entry.context.name %>
+            </button>
           <% end %>
-          <a title="<%= t :authors_name, "Author's name" %>" href="<%= context_url(entry_context, :context_user_url, user_id) %>" class="user_name"><%= context_user_name(@context, entry && entry.user_id) %></a>
+          <a role="button" title="<%= t :authors_name, "Author's name" %>" href="<%= context_url(entry_context, :context_user_url, user_id) %>" class="user_name"><%= context_user_name(@context, entry && entry.user_id) %></a>
         <% end %>
       </div>
       <div class="teaser_message"></div>
