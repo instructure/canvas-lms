@@ -978,8 +978,8 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def check_for_duplication(verify_uniqueness)
-    if duplicated_in_context? && verify_uniqueness
+  def check_for_duplication
+    if duplicated_in_context?
       errors.add(:tool_currently_installed, "The tool is already installed in this context.")
     end
   end

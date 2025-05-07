@@ -1173,7 +1173,7 @@ class ExternalToolsController < ApplicationController
     if params.key?(:client_id)
       raise ActiveRecord::RecordInvalid unless developer_key.usable_in_context?(@context)
 
-      @tool = developer_key.lti_registration.new_external_tool(@context)
+      @tool = developer_key.lti_registration.new_external_tool(@context, verify_uniqueness: params.dig(:external_tool, :verify_uniqueness).present?)
     else
       external_tool_params = (params[:external_tool] || params).to_unsafe_h
       @tool = @context.context_external_tools.new
@@ -1182,20 +1182,20 @@ class ExternalToolsController < ApplicationController
         external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
       end
       set_tool_attributes(@tool, external_tool_params)
-    end
-    @tool.check_for_duplication(params.dig(:external_tool, :verify_uniqueness).present?)
-    if @tool.errors.blank? && @tool.save
-      @tool.migrate_content_to_1_3_if_needed!
-      ContextExternalTool.invalidate_nav_tabs_cache(@tool, @domain_root_account)
-      if api_request?
-        render json: external_tool_json(@tool, @context, @current_user, session)
-      else
-        render json: @tool.as_json(methods: %i[readable_state custom_fields_string], include_root: false)
+      @tool.check_for_duplication if params.dig(:external_tool, :verify_uniqueness).present?
+      unless @tool.errors.blank? && @tool.save
+        raise Lti::ContextExternalToolErrors, @tool.errors
       end
-    else
-      render json: @tool.errors, status: :bad_request
-      @tool.destroy if @tool.persisted?
     end
+    @tool.migrate_content_to_1_3_if_needed!
+    ContextExternalTool.invalidate_nav_tabs_cache(@tool, @domain_root_account)
+    if api_request?
+      render json: external_tool_json(@tool, @context, @current_user, session)
+    else
+      render json: @tool.as_json(methods: %i[readable_state custom_fields_string], include_root: false)
+    end
+  rescue Lti::ContextExternalToolErrors => e
+    render json: e.errors, status: :bad_request
   end
 
   # Add an external tool and verify the provided
