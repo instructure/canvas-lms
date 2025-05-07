@@ -192,10 +192,3 @@ discussion_insights:
   display_name: Discussion Insights
   description: |-
     Allow access to discussion insights
-
-inbox_new_player:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Inbox New Player
-  description: |-
-    This is for the new CanvasStudioPlayer
