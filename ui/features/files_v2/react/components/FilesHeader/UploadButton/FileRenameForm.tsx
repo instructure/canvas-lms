@@ -41,10 +41,14 @@ const FileRenameForm = ({
   fileOptions,
   onNameConflictResolved,
 }: FileRenameFormProps) => {
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null)
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const [renameFileInput, setRenameFileInput] = useState<string>('')
 
-  const handleRenameClick = useCallback(() => setIsEditing(true), [])
+  const handleRenameClick = useCallback(() => {
+    setIsEditing(true)
+    closeButtonRef.current?.focus()
+  }, [closeButtonRef])
   const handleBackClick = useCallback(() => setIsEditing(false), [])
 
   const handleSkipClick = useCallback(
@@ -88,6 +92,7 @@ const FileRenameForm = ({
     () => (
       <>
         <CloseButton
+          elementRef={el => (closeButtonRef.current = el as HTMLButtonElement)}
           placement="end"
           offset="small"
           onClick={onClose}
