@@ -5303,6 +5303,7 @@ fa:
   cc_attribution_non_commercial_39e0d30d: "ارجاع کریتیو کامنز، غیر تجاری"
   cc_attribution_non_commercial_no_derivatives_9fe74c00: "ارجاع کریتیو کامنز، غیر تجاری، بدون آثار اشتقاقی"
   cc_attribution_non_commercial_share_alike_c7edb1e5: "ارجاع کریتیو کامنز، غیر تجاری، اشتراک سازی یکسان"
+  cc_attribution_share_alike_669e7f16: "ارجاع کریتیو کامنز، اشتراک سازی یکسان"
   cc_subtitles_a0d16ff6: "کریتیو کامنز/زیرنویس"
   ccp_zero_activity_73d094c3: "فعالیت صفر CCP"
   cell_number_69a7c309: "شماره تلفن همراه"
@@ -18313,6 +18314,7 @@ fa:
   privacy_level_f0ec09a3: "سطح حریم خصوصی"
   privacy_policy_c68f482a: "سیاست حریم خصوصی"
   private_3883d133: خصوصی
+  private_copyrighted_3cac9686: "خصوصی (دارای حق تکثیر)"
   proceed_f3d33864: "ادامه دادن"
   process_as_ui_changes_8e34ed2a: "پردازش به عنوان تغییرات واسط کاربر"
   process_data_2f5f962f: "پردازش داده ها"
@@ -20670,6 +20672,7 @@ fa:
   restrict_students_from_viewing_course_before_term__3c4924f0: "دانشجویان را از دیدن دوره قبل از تاریخ شروع ترم محدود کنید"
   restrict_students_from_viewing_future_courses_in_e_67486caf: "محدود کردن دانشجویان برای مشاهده درس های آتی در فهرست ثبت نام ها"
   restricted_access_d3e99a39: "دسترسی محدود"
+  resubmit_63cf65ef: "ارسال دوباره"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "به ابزار مربوط برای تحلیل سرقت ادبی دوباره ارسال کنید."
   resubmit_to_tool_name_1cf02a31: "ارسال دوباره به %{tool_name}"
   resubmitted_2080646f: "دوباره ارسال شده است."
