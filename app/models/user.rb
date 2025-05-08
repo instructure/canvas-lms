@@ -2030,6 +2030,10 @@ class User < ActiveRecord::Base
     preferences[:text_editor_preference]
   end
 
+  def files_ui_version
+    get_preference(:files_ui_version) || "v2"
+  end
+
   # ***** OHI If you're going to add a lot of data into `preferences` here maybe take a look at app/models/user_preference_value.rb instead ***
   # it will store the data in a separate table on the db and lighten the load on poor `users`
 

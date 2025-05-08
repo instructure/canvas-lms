@@ -1982,6 +1982,41 @@ class UsersController < ApplicationController
     end
   end
 
+  # @API Update files UI version preference
+  # Updates a user's default choice for files UI version. This allows
+  # the files UI to preload the user's preference.
+  #
+  # @argument files_ui_version [String, "v1"|"v2"]
+  #   The identifier for the files UI version.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/files_ui_version_preference \
+  #     -X PUT \
+  #     -F 'files_ui_version=v2'
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "files_ui_version": "v2"
+  #   }
+
+  def set_files_ui_version_preference
+    user = api_find(User, params[:id])
+
+    return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
+
+    if %w[v1 v2].exclude?(params[:files_ui_version])
+      return render(json: { message: "Invalid files_ui_version provided" }, status: :bad_request)
+    end
+
+    if user.set_preference(:files_ui_version, params[:files_ui_version])
+      render(json: { files_ui_version: user.reload.get_preference(:files_ui_version) })
+    else
+      render(json: user.errors, status: :bad_request)
+    end
+  end
+
   # @API Get dashboard positions
   #
   # Returns all dashboard positions that have been saved for a user.
