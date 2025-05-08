@@ -537,35 +537,4 @@ describe('ExternalToolDialog', () => {
       expect(closeSpy).toHaveBeenCalled()
     })
   })
-
-  describe('alerts', () => {
-    it('has screenreader-only for both by default', async () => {
-      const instance = await getInstance(container)
-      instance.open(toolHelper(1))
-      expect(instance.beforeInfoAlertRef.current?.className).toContain('screenreader-only')
-      expect(instance.afterInfoAlertRef.current?.className).toContain('screenreader-only')
-    })
-
-    it('removes screenreader-only from before alert on focus', async () => {
-      const instance = await getInstance(container)
-      instance.open(toolHelper(1))
-      const ev = {target: instance.beforeInfoAlertRef.current!}
-      instance.handleInfoAlertFocus(ev)
-      expect(instance.beforeInfoAlertRef.current?.className).not.toContain('screenreader-only')
-      expect(instance.afterInfoAlertRef.current?.className).toContain('screenreader-only')
-      instance.handleInfoAlertBlur()
-      expect(instance.beforeInfoAlertRef.current?.className).toContain('screenreader-only')
-    })
-
-    it('removes screenreader-only from after alert on focus', async () => {
-      const instance = await getInstance(container)
-      instance.open(toolHelper(1))
-      const ev = {target: instance.afterInfoAlertRef.current!}
-      instance.handleInfoAlertFocus(ev)
-      expect(instance.beforeInfoAlertRef.current?.className).toContain('screenreader-only')
-      expect(instance.afterInfoAlertRef.current?.className).not.toContain('screenreader-only')
-      instance.handleInfoAlertBlur()
-      expect(instance.afterInfoAlertRef.current?.className).toContain('screenreader-only')
-    })
-  })
 })

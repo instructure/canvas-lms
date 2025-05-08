@@ -28,9 +28,11 @@ const I18n = createI18nScope('external_toolsModalLauncher')
  *
  * TODO: include more common usages in this instead of in callers, including:
  * - allow: iframeAllowances
- * - "the following content is partner provided" - both visible and SR-only types
  */
-const ToolLaunchIframe = React.forwardRef<HTMLIFrameElement, IframeHTMLAttributes<HTMLIFrameElement>>((props, ref) => {
+const ToolLaunchIframe = React.forwardRef<
+  HTMLIFrameElement,
+  IframeHTMLAttributes<HTMLIFrameElement>
+>((props, ref) => {
   return (
     <iframe
       title={I18n.t('External tool frame')}

@@ -24,9 +24,6 @@ import CollaborationView from '../CollaborationView'
 describe('CollaborationsView screenreader only content', () => {
   let fixtures
   let view
-  let el
-  let iframe
-  let info
 
   beforeEach(() => {
     fixtures = document.createElement('div')
@@ -36,29 +33,11 @@ describe('CollaborationsView screenreader only content', () => {
     fixtures.innerHTML = `
       <div class="container" data-id="15" data-testid="collaboration-container">
         <a class="edit_collaboration_link" href=""></a>
-        <div class="before_external_content_info_alert screenreader-only" tabindex="0" data-testid="before-info-alert">
-          <div class="ic-flash-info">
-            <div class="ic-flash__icon" aria-hidden="true">
-              <i class="icon-info"></i>
-            </div>
-            The following content is partner provided
-          </div>
-        </div>
         <iframe data-testid="collaboration-iframe"></iframe>
-        <div class="after_external_content_info_alert screenreader-only" tabindex="0" data-testid="after-info-alert">
-          <div class="ic-flash-info">
-            <div class="ic-flash__icon" aria-hidden="true">
-              <i class="icon-info"></i>
-            </div>
-            The preceding content is partner provided
-          </div>
-        </div>
       </div>
     `
     view = new CollaborationView({el: fixtures.querySelector('.container')})
     view.render()
-    el = view.$el
-    iframe = el.find('iframe')
     fakeENV.setup({LTI_LAUNCH_FRAME_ALLOWANCES: ['midi', 'media']})
   })
 
@@ -67,47 +46,8 @@ describe('CollaborationsView screenreader only content', () => {
     fixtures.remove()
   })
 
-  it('shows beginning info alert and adds class to iframe', () => {
-    info = el.find('.before_external_content_info_alert')
-    info.focus()
-    expect(info.hasClass('screenreader-only')).toBeFalsy()
-    expect(iframe.hasClass('info_alert_outline')).toBeTruthy()
-  })
-
-  it('shows ending info alert and adds class to iframe', () => {
-    info = el.find('.after_external_content_info_alert')
-    info.focus()
-    expect(info.hasClass('screenreader-only')).toBeFalsy()
-    expect(iframe.hasClass('info_alert_outline')).toBeTruthy()
-  })
-
-  it('hides beginning info alert and removes class from iframe', () => {
-    info = el.find('.before_external_content_info_alert')
-    info.focus()
-    info.blur()
-    expect(info.hasClass('screenreader-only')).toBeTruthy()
-    expect(iframe.hasClass('info_alert_outline')).toBeFalsy()
-  })
-
-  it('hides ending info alert and removes class from iframe', () => {
-    info = el.find('.after_external_content_info_alert')
-    info.focus()
-    info.blur()
-    expect(info.hasClass('screenreader-only')).toBeTruthy()
-    expect(iframe.hasClass('info_alert_outline')).toBeFalsy()
-  })
-
-  it("doesn't show infos or add border to iframe by default", () => {
-    expect(
-      el.find(
-        '.before_external_content_info_alert.screenreader-only, .after_external_content_info_alert.screenreader-only',
-      ),
-    ).toHaveLength(2)
-    expect(iframe.hasClass('info_alert_outline')).toBeFalsy()
-  })
-
-  it('testing stuff', () => {
+  it('set iframe allowances', () => {
     const iframeTemplate = view.iframeTemplate('about:blank')
-    expect($(iframeTemplate[2]).attr('allow')).toBe(ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
+    expect($(iframeTemplate[0]).attr('allow')).toBe(ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
   })
 })

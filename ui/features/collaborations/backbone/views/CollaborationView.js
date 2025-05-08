@@ -31,7 +31,6 @@ extend(CollaborationView, View)
 
 function CollaborationView() {
   this.delete = this.delete.bind(this)
-  this.handleAlertBlur = this.handleAlertBlur.bind(this)
   return CollaborationView.__super__.constructor.apply(this, arguments)
 }
 
@@ -41,25 +40,11 @@ CollaborationView.prototype.events = {
   'click .delete_collaboration_link': 'onDelete',
   'keyclick .delete_collaboration_link': 'onDelete',
   'click .cancel_button': 'onCloseForm',
-  'focus .before_external_content_info_alert': 'handleAlertFocus',
-  'focus .after_external_content_info_alert': 'handleAlertFocus',
-  'blur .before_external_content_info_alert': 'handleAlertBlur',
-  'blur .after_external_content_info_alert': 'handleAlertBlur',
 }
 
 CollaborationView.prototype.initialize = function () {
   CollaborationView.__super__.initialize.apply(this, arguments)
   return (this.id = this.$el.data('id'))
-}
-
-CollaborationView.prototype.handleAlertFocus = function (e) {
-  $(e.target).removeClass('screenreader-only')
-  return this.$el.find('iframe').addClass('info_alert_outline')
-}
-
-CollaborationView.prototype.handleAlertBlur = function (e) {
-  $(e.target).addClass('screenreader-only')
-  return this.$el.find('iframe').removeClass('info_alert_outline')
 }
 
 // Internal: Create collaboration edit form HTML.
@@ -84,17 +69,16 @@ CollaborationView.prototype.formTemplate = function (arg) {
   )
 
   const view = this
-  return $form.on(
-    'keydown',
-    function(e) {
+  return $form
+    .on('keydown', function (e) {
       if (e.which === 27) {
         e.preventDefault()
         return view.onCloseForm(e)
       }
-    }
-  ).on('submit', function (e) {
-    view.trigger('validate', e, $form, collaborationId)
-  })
+    })
+    .on('submit', function (e) {
+      view.trigger('validate', e, $form, collaborationId)
+    })
 }
 
 CollaborationView.prototype.iframeTemplate = function (arg) {

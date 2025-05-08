@@ -37,63 +37,10 @@ describe('CollaborationsToolLaunch screenreader functionality', () => {
     fakeENV.teardown()
   })
 
-  test('shows beginning info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    const wrapper = render(<CollaborationsToolLaunch ref={ref} />)
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    const alert = wrapper.container.querySelector('.before_external_content_info_alert')
-    alert.focus()
-    expect(ref.current.state.beforeExternalContentAlertClass).toEqual('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
-  })
-
-  test('shows ending info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    const wrapper = render(<CollaborationsToolLaunch ref={ref} />)
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    const alert = wrapper.container.querySelector('.after_external_content_info_alert')
-    alert.focus()
-    expect(ref.current.state.afterExternalContentAlertClass).toEqual('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
-  })
-
-  test('hides beginning info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    const wrapper = render(<CollaborationsToolLaunch ref={ref} />)
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    const alert = wrapper.container.querySelector('.before_external_content_info_alert')
-    alert.focus()
-    alert.blur()
-    expect(ref.current.state.beforeExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-  })
-
-  test('hides ending info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    const wrapper = render(<CollaborationsToolLaunch ref={ref} />)
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    const alert = wrapper.container.querySelector('.after_external_content_info_alert')
-    alert.focus()
-    alert.blur()
-    expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-  })
-
-  test("doesn't show alerts or add border to iframe by default", () => {
-    const ref = React.createRef()
-    render(<CollaborationsToolLaunch ref={ref} />)
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    expect(ref.current.state.beforeExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({})
-  })
-
   test('sets the iframe allowances', () => {
     const ref = React.createRef()
     const wrapper = render(<CollaborationsToolLaunch ref={ref} />)
     ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    expect(ref.current.state.beforeExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
     expect(wrapper.container.querySelector('.tool_launch').getAttribute('allow')).toEqual(
       ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '),
     )

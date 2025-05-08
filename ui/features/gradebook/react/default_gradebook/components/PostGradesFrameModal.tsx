@@ -23,7 +23,6 @@ import {Modal} from '@instructure/ui-modal'
 import {Lti} from '../gradebook.d'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 const I18n = createI18nScope('gradebook')
@@ -64,9 +63,6 @@ function PostGradesFrameModal({postGradesLtis, selectedLtiId, onClose}: PostGrad
         />
       </Modal.Header>
       <Modal.Body padding="none">
-        <ScreenReaderContent>
-          {I18n.t('The following content is partner provided')}
-        </ScreenReaderContent>
         {baseUrl ? (
           <iframe
             src={baseUrl}
@@ -77,9 +73,6 @@ function PostGradesFrameModal({postGradesLtis, selectedLtiId, onClose}: PostGrad
             data-lti-launch="true"
           />
         ) : null}
-        <ScreenReaderContent>
-          {I18n.t('The preceding content is partner provided')}
-        </ScreenReaderContent>
       </Modal.Body>
     </Modal>
   )

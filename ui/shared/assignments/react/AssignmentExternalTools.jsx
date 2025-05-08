@@ -33,9 +33,6 @@ class AssignmentExternalTools extends React.Component {
     super(props)
     this.state = {
       tools: [],
-      beforeExternalContentAlertClass: 'screenreader-only',
-      afterExternalContentAlertClass: 'screenreader-only',
-      iframeStyle: {},
     }
   }
 
@@ -94,33 +91,8 @@ class AssignmentExternalTools extends React.Component {
     return endpoint + query
   }
 
-  handleAlertFocus = event => {
-    const newState = {
-      iframeStyle: {border: '2px solid #2B7ABC', width: `${this.getMaxIFrameWidth() - 4}px`},
-    }
-    if (event.target.className.search('before') > -1) {
-      newState.beforeExternalContentAlertClass = ''
-    } else if (event.target.className.search('after') > -1) {
-      newState.afterExternalContentAlertClass = ''
-    }
-    this.setState(newState)
-  }
-
-  handleAlertBlur = event => {
-    const newState = {
-      iframeStyle: {border: 'none', width: '100%'},
-    }
-    if (event.target.className.search('before') > -1) {
-      newState.beforeExternalContentAlertClass = 'screenreader-only'
-    } else if (event.target.className.search('after') > -1) {
-      newState.afterExternalContentAlertClass = 'screenreader-only'
-    }
-    this.setState(newState)
-  }
-
   renderTool(tool) {
     const styles = {}
-    $.extend(styles, this.state.iframeStyle)
     if (tool.placements[this.props.placement].launch_height) {
       styles.height = tool.placements[this.props.placement].launch_height
       styles.minHeight = 'unset'
@@ -142,41 +114,9 @@ class AssignmentExternalTools extends React.Component {
   }
 
   renderToolsContainer() {
-    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
-    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
-
     return (
       <div style={{display: this.state.toolLaunchUrl === 'about:blank' ? 'none' : 'block'}}>
-        <div
-          onFocus={this.handleAlertFocus}
-          onBlur={this.handleAlertBlur}
-          className={beforeAlertStyles}
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex="0"
-        >
-          <div className="ic-flash-info" style={{width: 'auto', margin: '20px'}}>
-            <div className="ic-flash__icon" aria-hidden="true">
-              <i className="icon-info" />
-            </div>
-            {I18n.t('The following content is partner provided')}
-          </div>
-        </div>
         {this.state.tools.map(tool => this.renderTool(tool))}
-
-        <div
-          onFocus={this.handleAlertFocus}
-          onBlur={this.handleAlertBlur}
-          className={afterAlertStyles}
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex="0"
-        >
-          <div className="ic-flash-info" style={{width: 'auto', margin: '20px'}}>
-            <div className="ic-flash__icon" aria-hidden="true">
-              <i className="icon-info" />
-            </div>
-            {I18n.t('The preceding content is partner provided')}
-          </div>
-        </div>
       </div>
     )
   }

@@ -265,82 +265,6 @@ describe('AssignmentConfigurationsTools', () => {
     expect(selectBox.value).toBe('ContextExternalTool_5')
   })
 
-  test('shows beginning info alert and adds styles to iframe', async () => {
-    const ref = React.createRef()
-    const wrapper = render(
-      <AssignmentConfigurationTools.configTools
-        courseId={1}
-        secureParams={secureParams}
-        ref={ref}
-      />,
-    )
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    wrapper.container.querySelector('.before_external_content_info_alert').focus()
-    expect(ref.current.state.beforeExternalContentAlertClass).toBe('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
-  })
-
-  test('shows ending info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    const wrapper = render(
-      <AssignmentConfigurationTools.configTools
-        courseId={1}
-        secureParams={secureParams}
-        ref={ref}
-      />,
-    )
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    wrapper.container.querySelector('.after_external_content_info_alert').focus()
-    expect(ref.current.state.afterExternalContentAlertClass).toBe('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
-  })
-
-  test('hides beginning info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    const wrapper = render(
-      <AssignmentConfigurationTools.configTools
-        courseId={1}
-        secureParams={secureParams}
-        ref={ref}
-      />,
-    )
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    wrapper.container.querySelector('.before_external_content_info_alert').focus()
-    wrapper.container.querySelector('.before_external_content_info_alert').blur()
-    expect(ref.current.state.beforeExternalContentAlertClass).toBe('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-  })
-
-  test('hides ending info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    const wrapper = render(
-      <AssignmentConfigurationTools.configTools
-        courseId={1}
-        secureParams={secureParams}
-        ref={ref}
-      />,
-    )
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    wrapper.container.querySelector('.after_external_content_info_alert').focus()
-    wrapper.container.querySelector('.after_external_content_info_alert').blur()
-    expect(ref.current.state.afterExternalContentAlertClass).toBe('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-  })
-
-  test("doesn't show alerts or add border to iframe by default", () => {
-    const ref = React.createRef()
-    render(
-      <AssignmentConfigurationTools.configTools
-        courseId={1}
-        secureParams={secureParams}
-        ref={ref}
-      />,
-    )
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    expect(ref.current.state.beforeExternalContentAlertClass).toBe('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({})
-  })
-
   test('renders visibility options', () => {
     const ref = React.createRef()
     const wrapper = render(
@@ -372,7 +296,6 @@ describe('AssignmentConfigurationsTools', () => {
   })
 
   test('sets the iframe allowances', () => {
-    const ref = React.createRef()
     const wrapper = render(
       <AssignmentConfigurationTools.configTools
         courseId={1}
