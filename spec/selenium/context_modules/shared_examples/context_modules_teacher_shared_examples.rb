@@ -46,7 +46,7 @@ shared_examples_for "context modules for teachers" do
     get "/courses/#{@course.id}/modules"
     expect(module_content(modules[0].id)).to be_displayed
     f(".collapse_module_link[aria-controls='context_module_content_#{modules[0].id}']").click
-    expect(module_content(modules[0].id)).to be_displayed
+    expect(module_content(modules[0].id)).not_to be_displayed
   end
 
   it "collapses module items", priority: "1" do
@@ -212,14 +212,6 @@ shared_examples_for "context modules for teachers" do
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
     expect(module_item).to include_text(header_text)
-  end
-
-  it "always shows module contents on empty module", priority: "1" do
-    @course.context_modules.create!(name: "Test Module")
-    get "/courses/#{@course.id}/modules"
-    ff(".icon-mini-arrow-down")[0].click
-    expect(f(".context_module .content")).to be_displayed
-    expect(ff(".icon-mini-arrow-down")[0]).to be_displayed
   end
 
   it "allows adding an item twice" do

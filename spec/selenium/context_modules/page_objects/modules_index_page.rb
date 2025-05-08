@@ -178,6 +178,10 @@ module ModulesIndexPage
     ".show-all-or-less-button.show-less"
   end
 
+  def module_file_drop_selector
+    "[data-testid='module-file-drop']"
+  end
+
   #------------------------------ Elements ------------------------------
 
   def expand_collapse_all_button
@@ -537,5 +541,11 @@ module ModulesIndexPage
     form = f("#edit_item_form")
     form.submit
     wait_for_ajaximations
+  end
+
+  def duplicate_module(context_module)
+    manage_module_button(context_module).click
+    duplicate_module_button(context_module).click
+    wait_for_ajax_requests
   end
 end
