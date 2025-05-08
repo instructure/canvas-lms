@@ -5451,6 +5451,7 @@ hu:
   cc_attribution_non_commercial_39e0d30d: "CC Nevezd meg!-Ne add el!"
   cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC Nevezd meg!-Ne add el!-Ne változtasd!"
   cc_attribution_non_commercial_share_alike_c7edb1e5: "CC Nevezd meg!-Ne add el!-Így add tovább!"
+  cc_attribution_share_alike_669e7f16: "CC Nevezd meg!-Így add tovább!"
   cc_subtitles_a0d16ff6: CC/Feliratok
   ccp_zero_activity_73d094c3: "CCP nulla aktivitás"
   cell_number_69a7c309: Mobilszám
@@ -19031,6 +19032,7 @@ hu:
   privacy_level_f0ec09a3: "Adatvédelmi szint"
   privacy_policy_c68f482a: "Adatvédelmi irányelvek"
   private_3883d133: Privát
+  private_copyrighted_3cac9686: "Magán (jogvédett)"
   private_key_is_present_in_certificate_file_1a1b7b42: "A magánkulcs jelen van a tanúsítványfájlban"
   pro_tip_30e41fa3: "PRO TIPP!"
   proceed_f3d33864: Folytatás
@@ -21302,6 +21304,7 @@ hu:
   restrict_view_of_quantitative_data_b6089ee9: "A mennyiségi adatok korlátozott megtekintése"
   restricted_access_d3e99a39: "Korlátozott hozzáférés"
   restricted_view_for_teachers_in_lmgb_52c78a62: "Korlátozott nézet az oktatók számára az LMGB-ben"
+  resubmit_63cf65ef: Újraküldés
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Újra elküldés a hozzárendelt eszköznek plágium analizálásra."
   resubmit_to_tool_name_1cf02a31: "Újraküldés ennek: %{tool_name}"
   resubmitted_2080646f: Újraküldve

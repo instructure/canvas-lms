@@ -3490,6 +3490,7 @@ hy:
   cc_attribution_non_commercial_39e0d30d: "CC-ին պատկանելություն, ոչ կոմերցիոն"
   cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC-ին պատկանելություն, ոչ կոմերցիոն, առանց ածանցյալների"
   cc_attribution_non_commercial_share_alike_c7edb1e5: "CC-ին պատկանելություն, ոչ կոմերցիոն, հավասար բաժիններով"
+  cc_attribution_share_alike_669e7f16: "CC-ին պատկանելություն, հավասարապես"
   cell_number_69a7c309: "Բջջային հեռախոսի համարը"
   cell_number_is_invalid_bd6faee0: "Հեռախոսահամարը սխալ է"
   cell_number_is_required_2edcee60: "Անհրաժեշտ է հեռախոսահամար"
@@ -12595,6 +12596,7 @@ hy:
   priority_dd4381ee: Առաջնահերթություն
   privacy_290109ea: Գաղտնիություն
   privacy_policy_c68f482a: "Գաղտնիության պահպանման քաղաքականություն"
+  private_copyrighted_3cac9686: "Մասնավոր (պաշտպանված է հեղինակային իրավունքով)"
   process_as_ui_changes_8e34ed2a: "Մշակվում են  որպես UI փոփոխություններ "
   process_data_2f5f962f: "Մշակել տվյալները"
   processing_8c569014: "Մշակվում է..."
