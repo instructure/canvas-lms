@@ -1695,11 +1695,7 @@ type CommentBankItemConnection {
   A list of nodes.
   """
   nodes: [CommentBankItem]
-
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
+  pageInfo: TotalCountPageInfo!
 }
 
 """
@@ -9567,11 +9563,7 @@ type SubmissionCommentConnection {
   A list of nodes.
   """
   nodes: [SubmissionComment]
-
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
+  pageInfo: TotalCountPageInfo!
 }
 
 """
@@ -9627,11 +9619,7 @@ type SubmissionConnection {
   A list of nodes.
   """
   nodes: [Submission]
-
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
+  pageInfo: TotalCountPageInfo!
 }
 
 type SubmissionDraft implements LegacyIDInterface {
@@ -10316,6 +10304,36 @@ Contains timestamp metadata
 interface Timestamped {
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+"""
+Information about pagination in a connection.
+"""
+type TotalCountPageInfo {
+  """
+  When paginating forwards, the cursor to continue.
+  """
+  endCursor: String
+
+  """
+  When paginating forwards, are there more items?
+  """
+  hasNextPage: Boolean!
+
+  """
+  When paginating backwards, are there more items?
+  """
+  hasPreviousPage: Boolean!
+
+  """
+  When paginating backwards, the cursor to continue.
+  """
+  startCursor: String
+
+  """
+  Total number of items in the connection, ignoring pagination.
+  """
+  totalCount: Int
 }
 
 union TurnitinContext = File | Submission
