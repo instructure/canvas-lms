@@ -62,7 +62,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
           ? {
               ...item.content,
               id: item.content.id || item._id,
-              type: item.content.type || 'unknown',
+              type: item?.content?.type,
             }
           : null,
       }))
