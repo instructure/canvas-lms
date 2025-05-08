@@ -3161,6 +3161,64 @@ describe "Users API", type: :request do
     end
   end
 
+  describe "files ui version preference" do
+    before do
+      @a = Account.default
+      @user = user_factory(active_all: true)
+      @a.account_users.create!(user: @user)
+    end
+
+    it "defaults to v2 if no preference has been set" do
+      expect(@user.files_ui_version).to eq "v2"
+    end
+
+    it "updates the files ui version for a user" do
+      json = api_call(
+        :put,
+        "/api/v1/users/#{@user.id}/files_ui_version_preference",
+        { controller: "users",
+          action: "set_files_ui_version_preference",
+          format: "json",
+          id: @user.to_param },
+        { files_ui_version: "v1" },
+        {},
+        { expected_status: 200 }
+      )
+      expect(json["files_ui_version"]).to eq "v1"
+      expect(@user.reload.files_ui_version).to eq "v1"
+    end
+
+    it "returns a 400 if the files ui version is invalid" do
+      json = api_call(
+        :put,
+        "/api/v1/users/#{@user.id}/files_ui_version_preference",
+        { controller: "users",
+          action: "set_files_ui_version_preference",
+          format: "json",
+          id: @user.to_param },
+        { files_ui_version: "v3" },
+        {},
+        { expected_status: 400 }
+      )
+      expect(json["message"]).to eq "Invalid files_ui_version provided"
+    end
+
+    it "returns a 400 if the files ui version is not provided" do
+      json = api_call(
+        :put,
+        "/api/v1/users/#{@user.id}/files_ui_version_preference",
+        { controller: "users",
+          action: "set_files_ui_version_preference",
+          format: "json",
+          id: @user.to_param },
+        {},
+        {},
+        { expected_status: 400 }
+      )
+      expect(json["message"]).to eq "Invalid files_ui_version provided"
+    end
+  end
+
   describe "dashboard positions" do
     before do
       @a = Account.default
