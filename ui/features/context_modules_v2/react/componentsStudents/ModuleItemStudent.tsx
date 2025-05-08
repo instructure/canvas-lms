@@ -17,14 +17,15 @@
  */
 
 import React, {useMemo} from 'react'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
-import {INDENT_LOOKUP, getItemIcon} from '../utils/utils'
-
-import ModuleItemSupplementalInfo from '../components/ModuleItemSupplementalInfo'
-import {CompletionRequirement, ModuleItemContent} from '../utils/types'
+import {getItemIcon, INDENT_LOOKUP} from '../utils/utils'
+import {CompletionRequirement, ModuleItemContent, ModuleProgression} from '../utils/types'
+import ModuleItemSupplementalInfoStudent from './ModuleItemSupplementalInfoStudent'
+import ModuleItemStatusIcon from './ModuleItemStatusIcon'
+import {IconLockLine} from '@instructure/ui-icons'
 
 export interface ModuleItemStudentProps {
   _id: string
@@ -34,6 +35,7 @@ export interface ModuleItemStudentProps {
   content: ModuleItemContent
   onClick?: () => void
   completionRequirements?: CompletionRequirement[]
+  progression?: ModuleProgression
 }
 
 const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
@@ -43,8 +45,9 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   content,
   onClick,
   completionRequirements,
+  progression,
 }) => {
-  const itemIcon = useMemo(() => getItemIcon(content), [content])
+  const itemIcon = useMemo(() => getItemIcon(content, true), [content])
   const itemLeftMargin = useMemo(() => INDENT_LOOKUP[indent ?? 0], [indent])
 
   return (
@@ -58,35 +61,61 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
       data-item-id={_id}
     >
       <Flex>
-        {/* Item Type Icon */}
-        {itemIcon && (
-          <Flex.Item margin="0 small 0 0">
-            <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>{itemIcon}</div>
-          </Flex.Item>
-        )}
-        <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`}>
-          <div style={itemIcon ? {} : {padding: `0 0 0 ${itemLeftMargin}`}}>
+        <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`} shouldGrow>
+          <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>
             <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
               {/* Item Title */}
               <Flex.Item>
                 <Flex.Item shouldGrow={true}>
-                  <Link href={url} isWithinText={false} onClick={onClick}>
-                    <Text weight="bold" color="primary">
-                      {content?.title || 'Untitled Item'}
-                    </Text>
-                  </Link>
+                  {progression?.locked ? (
+                    <Flex alignItems="center">
+                      <Text weight="bold" color="secondary">
+                        {content?.title || 'Untitled Item'}
+                      </Text>
+                      <IconLockLine size="x-small" />
+                    </Flex>
+                  ) : (
+                    <Link href={url} isWithinText={false} onClick={onClick}>
+                      <Text weight="bold" color="primary">
+                        {content?.title || 'Untitled Item'}
+                      </Text>
+                    </Link>
+                  )}
                 </Flex.Item>
               </Flex.Item>
               {/* Due Date and Points Possible */}
               <Flex.Item>
-                <ModuleItemSupplementalInfo
-                  contentTagId={_id}
-                  content={content}
-                  completionRequirement={completionRequirements?.find(req => req.id === _id)}
-                />
+                <Flex>
+                  {/* Item Type Icon */}
+                  {itemIcon && (
+                    <>
+                      <Flex.Item margin="0 small 0 0">
+                        <View as="div">{itemIcon}</View>
+                      </Flex.Item>
+                      <Flex.Item margin="0 small 0 0">
+                        <Text size="x-small">{content?.type}</Text>
+                      </Flex.Item>
+                    </>
+                  )}
+                  <Flex.Item>
+                    <ModuleItemSupplementalInfoStudent
+                      contentTagId={_id}
+                      content={content}
+                      completionRequirement={completionRequirements?.find(req => req.id === _id)}
+                    />
+                  </Flex.Item>
+                </Flex>
               </Flex.Item>
             </Flex>
           </div>
+        </Flex.Item>
+        <Flex.Item>
+          <ModuleItemStatusIcon
+            itemId={_id || ''}
+            completionRequirement={completionRequirements?.find(req => req.id === _id)}
+            requirementsMet={progression?.requirementsMet || []}
+            content={content}
+          />
         </Flex.Item>
       </Flex>
     </View>
