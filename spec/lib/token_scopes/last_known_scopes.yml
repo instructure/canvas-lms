@@ -2087,6 +2087,8 @@
   path: '/api/v1/users/:id/dashboard_positions'
 - verb: PUT
   path: '/api/v1/users/:id/dashboard_positions'
+- verb: PUT
+  path: '/api/v1/users/:id/files_ui_version_preference'
 - verb: GET
   path: '/api/v1/users/:id/graded_submissions'
 - verb: PUT

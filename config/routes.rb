@@ -1683,6 +1683,8 @@ CanvasRails::Application.routes.draw do
 
       put "users/:id/text_editor_preference", controller: "users", action: "set_text_editor_preference"
 
+      put "users/:id/files_ui_version_preference", controller: "users", action: "set_files_ui_version_preference"
+
       get "users/:id/new_user_tutorial_statuses", action: "get_new_user_tutorial_statuses"
       put "users/:id/new_user_tutorial_statuses/:page_name", action: "set_new_user_tutorial_status"
 
