@@ -213,14 +213,14 @@
     <form id="edit_rubric_form" class="edit-rubric-form no-margin-bottom">
       <div class="rubric_custom_ratings" style="<%= hidden unless @assignment %>">
         <label>
-          <input type="checkbox" id="rubric_custom_rating" class="rubric-custom-rating" <%= 'checked' if rubric && rubric.free_form_criterion_comments %>/>
+          <input type="checkbox" id="rubric_custom_rating" class="rubric_custom_rating" <%= 'checked' if rubric && rubric.free_form_criterion_comments %>/>
           <%= t "I'll write free-form comments when assessing students" %>
         </label>
       </div>
       <% if @domain_root_account.feature_enabled?(:non_scoring_rubrics) %>
         <div class="hide_points" style="<%= hidden unless @assignment %>">
           <label>
-            <input type="checkbox" id="hide_points" name="hide_points" class="hide-points-checkbox" <%= 'checked' if rubric_association&.hide_points %>/>
+            <input type="checkbox" id="hide_points" name="hide_points" class="hide_points_checkbox" <%= 'checked' if rubric_association&.hide_points %>/>
             <%= t "Remove points from rubric" %>
           </label>
         </div>
