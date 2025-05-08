@@ -35,6 +35,7 @@ import {MediaAttachment} from '@canvas/message-attachments'
 import {formatMessage, containsHtmlTags} from '@canvas/util/TextHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
+import MediaPlayer from './MediaPlayer'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -48,8 +49,12 @@ export const MessageDetailItem = ({...props}) => {
   const isMessageHtml = containsHtmlTags(props.conversationMessage?.htmlBody)
 
   const messageBody = isMessageHtml
-      ? sanitizeHtml(props.conversationMessage?.htmlBody)
-      : formatMessage(props.conversationMessage?.body)
+    ? sanitizeHtml(props.conversationMessage?.htmlBody)
+    : formatMessage(props.conversationMessage?.body)
+
+  const elementId = mediaComment?._id
+    ? `media-player-${props.conversationMessage?._id}-${mediaComment._id}`
+    : ''
   return (
     <Responsive
       match="media"
@@ -149,16 +154,22 @@ export const MessageDetailItem = ({...props}) => {
               })}
             </List>
           )}
-          {mediaComment && (
-            <MediaAttachment
-              file={{
-                mediaID: mediaComment._id,
-                title: mediaComment.title,
-                mediaTracks: mediaComment.media_tracks,
-                mediaSources: mediaComment.mediaSources,
-              }}
-            />
-          )}
+          {mediaComment &&
+            (ENV.FEATURES?.consolidated_media_player ? (
+              <>
+                <div id={elementId} />
+                <MediaPlayer elementId={elementId} mediaId={mediaComment._id} />
+              </>
+            ) : (
+              <MediaAttachment
+                file={{
+                  mediaID: mediaComment._id,
+                  title: mediaComment.title,
+                  mediaTracks: mediaComment.media_tracks,
+                  mediaSources: mediaComment.mediaSources,
+                }}
+              />
+            ))}
         </>
       )}
     />
