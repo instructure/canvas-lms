@@ -4420,6 +4420,7 @@ tr:
   cc_attribution_non_commercial_39e0d30d: "CC Özelliği Ticari Olmayan"
   cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC Özelliği Ticari kullanılamayacak Özgün hali korunacak"
   cc_attribution_non_commercial_share_alike_c7edb1e5: "CC Özelliği Ticari kullanılamayacak İlk lisans modeli korunacak"
+  cc_attribution_share_alike_669e7f16: "CC Özelliği İlk lisans modeli korunacak"
   cc_subtitles_a0d16ff6: Altyazılar
   ccp_zero_activity_73d094c3: "CCP Zero Aktivitesi"
   cell_number_69a7c309: "Telefon Numarası"
@@ -14947,6 +14948,7 @@ tr:
   privacy_290109ea: Gizlilik
   privacy_policy_c68f482a: "Gizlilik Sözleşmesi"
   private_3883d133: Özel
+  private_copyrighted_3cac9686: "Özel (Telif Hakkı Saklı)"
   process_as_ui_changes_8e34ed2a: "Arayüz Değişim Süreçleri "
   process_data_2f5f962f: "Veriyi İşle"
   processing_8c569014: İşleniyor...
