@@ -3853,6 +3853,7 @@ uk:
   cc_attribution_no_derivatives_b006744f: "CC атрибуція непохідна"
   cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC атрибуція некомерційна і непохідна"
   cc_attribution_non_commercial_share_alike_c7edb1e5: "CC атрибуція некомерційна розповсюджена таким чином"
+  cc_attribution_share_alike_669e7f16: "CC атрибуція розповсюджена таким чином"
   cell_number_69a7c309: "Номер мобільного"
   cell_number_is_invalid_bd6faee0: "Номер мобільного телефона недійсний!"
   cell_number_is_required_2edcee60: "Номер мобільного телефона обов'язковий"
@@ -13354,6 +13355,7 @@ uk:
   priority_dd4381ee: Пріоритет
   privacy_290109ea: Приватність
   privacy_policy_c68f482a: "Політика конфіденційності"
+  private_copyrighted_3cac9686: "Приватний (Захищено авторським правом)"
   proceed_f3d33864: Продовжувати
   process_as_ui_changes_8e34ed2a: "Обробка змін графічного інтерфейсу користувача"
   process_data_2f5f962f: "Обробка даних"
@@ -15316,6 +15318,7 @@ uk:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Обмежити студентам доступ до курсів до початкової дати"
   restrict_students_from_viewing_future_courses_in_e_67486caf: "Обмежити студентів від перегляду майбутніх курсів в списку реєстрацій"
   restricted_access_d3e99a39: "Обмежений доступ"
+  resubmit_63cf65ef: "Повторити відправку"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Повторно подати до відповідної служби для перевірки на плагіат"
   resubmit_to_tool_name_1cf02a31: "Повторно подати до %{tool_name}"
   resubmitted_2080646f: "Повторно поданий"
