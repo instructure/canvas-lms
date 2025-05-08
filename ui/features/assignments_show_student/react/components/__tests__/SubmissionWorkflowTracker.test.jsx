@@ -82,6 +82,13 @@ it('renders as "Submitted" when the student has submitted', async () => {
   expect(getByTestId('submission-workflow-tracker-title')).toHaveTextContent(/Submitted/i)
 })
 
+it('renders as "Submitted" when submission state is pending_review', async () => {
+  const submission = await mockSubmission({Submission: {...SubmissionMocks.pendingReview}})
+
+  const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
+  expect(getByTestId('submission-workflow-tracker-title')).toHaveTextContent(/Submitted/i)
+})
+
 it('renders the time submitted when the student has submitted', async () => {
   const submission = await mockSubmission({Submission: {...SubmissionMocks.submitted}})
   submission.submittedAt = tz.parse('2021-06-01T19:27:54Z')
