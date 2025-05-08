@@ -2006,6 +2006,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: "lti/context_controls") do
       get "lti_registrations/:registration_id/controls", action: :index
       post "lti_registrations/:registration_id/controls", action: :create
+      post "lti_registrations/:registration_id/controls/bulk", action: :create_many
       get "lti_registrations/:registration_id/controls/:id", action: :show
       put "lti_registrations/:registration_id/controls/:id", action: :update
       delete "lti_registrations/:registration_id/controls/:id", action: :delete
