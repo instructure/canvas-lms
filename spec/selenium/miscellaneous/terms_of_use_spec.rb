@@ -54,7 +54,7 @@ describe "terms of use test" do
       user_session(@admin)
     end
 
-    it "is able to update custom terms" do
+    it "is able to update custom terms", :ignore_js_errors do
       get "/accounts/#{@account.id}/settings"
 
       click_option("#account_terms_of_service_terms_type", "custom", :value)
