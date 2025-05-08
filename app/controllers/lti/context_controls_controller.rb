@@ -192,6 +192,62 @@ module Lti
       raise e
     end
 
+    # @API Create LTI Context Control
+    #
+    # Create a new LTI ContextControl for the specified LTI registration in this context.
+    # @argument account_id [integer] The Canvas ID of the Account that owns this. One of account_id or course_id must be present. Can also be a string.
+    # @argument course_id [integer] The Canvas ID of the Course that owns this. One of account_id or course_id must be present. Can also be a string.
+    # @argument deployment_id [integer] The Canvas ID of the ContextExternalTool that owns this, representing an LTI deployment.
+    #   If absent, this ContextControl will be associated with the Deployment of this Registration at the Root Account level.
+    #   If that is not present, this request will fail.
+    # @argument available [boolean] The state of this tool in this context. `true` shows the tool in this context and all contexts
+    #   below it. `false` disables the tool for this context and all contexts below it. Defaults to true.
+    #
+    # @returns Lti::ContextControl
+    #
+    # @example_request
+    #
+    #   curl -X POST 'https://<canvas>/api/v1/lti_registrations/<registration_id>/controls' \
+    #        -H "Authorization: Bearer <token>" \
+    #        -d '{
+    #               "account_id": 1,
+    #               "deployment_id": 1,
+    #               "available": true
+    #            }'
+    #
+    def create
+      control_params = params_for_control(params)
+
+      if control_params[:deployment_id].blank?
+        return render_errors("No active deployment found for the root account.")
+      end
+
+      if control_params[:account_id].blank? && control_params[:course_id].blank?
+        return render_errors("Either account_id or course_id must be present.")
+      end
+
+      unique_checks = control_params.slice(:account_id, :course_id, :deployment_id, :registration_id).compact
+      if registration.context_controls.active.exists?(unique_checks)
+        return render_errors("A context control for this deployment and context already exists.")
+      end
+
+      control = registration.context_controls.find_or_initialize_by(unique_checks)
+      if control.new_record?
+        control.assign_attributes(control_params)
+      else
+        restore_deleted_control(control, control_params)
+      end
+
+      if control.save
+        render json: lti_context_control_json(control, @current_user, session, context, include_users: true), status: :created
+      else
+        render_errors(control.errors.full_messages)
+      end
+    rescue => e
+      report_error(e)
+      raise e
+    end
+
     # @API Modify a Context Control
     #
     # Changes the availability of a context control. This endpoint can only be used
@@ -242,6 +298,30 @@ module Lti
     end
 
     private
+
+    def restore_deleted_control(control, control_params)
+      restore_params = control_params.slice(:available, :updated_by, :workflow_state)
+      control.assign_attributes(restore_params)
+    end
+
+    def render_errors(errors, status: :unprocessable_entity)
+      errors = [errors] unless errors.is_a?(Array)
+      render json: { errors: }, status:
+    end
+
+    def params_for_control(params)
+      params.permit(:account_id, :course_id, :deployment_id, :available).to_h.tap do |p|
+        p[:deployment_id] ||= root_account_deployment&.id
+        p[:available] = true unless p.key?(:available)
+        p[:workflow_state] = :active
+        p[:created_by] = @current_user
+        p[:updated_by] = @current_user
+      end
+    end
+
+    def root_account_deployment
+      @root_account_deployment ||= registration.deployments.active.find_by(context: registration.root_account)
+    end
 
     def control
       @control ||= Lti::ContextControl.active.find_by(id: params[:id], registration:)

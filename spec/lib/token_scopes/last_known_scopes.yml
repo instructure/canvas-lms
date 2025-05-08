@@ -1831,6 +1831,8 @@
   path: '/api/v1/login/session_token'
 - verb: GET
   path: '/api/v1/lti_registrations/:registration_id/controls'
+- verb: POST
+  path: '/api/v1/lti_registrations/:registration_id/controls'
 - verb: DELETE
   path: '/api/v1/lti_registrations/:registration_id/controls/:id'
 - verb: GET
