@@ -20,6 +20,13 @@ import fetchMock from 'fetch-mock'
 import stubEnv from '@canvas/stub-env'
 import GroupCategoryMessageAllUnassignedModal from '../GroupCategoryMessageAllUnassignedModal'
 import {userEvent} from '@testing-library/user-event'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+
+// Mock the flash alert module
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashSuccess: jest.fn(() => jest.fn()),
+  showFlashError: jest.fn(() => jest.fn()),
+}))
 
 describe('GroupCategoryMessageAllUnassignedModal', () => {
   const onDismiss = jest.fn()
@@ -140,7 +147,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
     })
     expect(getAllByText(/Sending Message/i)).toBeTruthy()
     await fetchMock.flush(true)
-    expect(getAllByText(/Message Sent/i)).toBeTruthy()
+    expect(showFlashSuccess).toHaveBeenCalledWith('Message Sent!')
     expect(onDismiss).toHaveBeenCalled()
   })
 
@@ -205,7 +212,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
       errorMessages = await screen.queryAllByText(/Message text is required/i)
       expect(errorMessages.length).toBeGreaterThan(0)
 
-      const textarea = screen.getByTestId('message_all_unassigned_textarea');
+      const textarea = screen.getByTestId('message_all_unassigned_textarea')
       await userEvent.type(textarea, 'Hello')
 
       expect(textarea.value).toBe('Hello')
@@ -217,7 +224,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
       expect(screen.queryAllByText(/Sending Message/i)).toBeTruthy()
 
       await fetchMock.flush(true)
-      expect(screen.getAllByText(/Message Sent/i)).toBeTruthy()
+      expect(showFlashSuccess).toHaveBeenCalledWith('Message Sent!')
       expect(onDismiss).toHaveBeenCalled()
     })
   })

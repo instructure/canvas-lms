@@ -237,7 +237,7 @@ describe('AddEditPseudonym', () => {
       })
 
       it('should allow password fields to be empty', async () => {
-        fetchMock.put(CREATE_LOGIN_URL, 200, {overwriteRoutes: true})
+        fetchMock.post(CREATE_LOGIN_URL, 200, {overwriteRoutes: true})
         render(<AddEditPseudonym {...addProps} />)
         const uniqueIdValue = 'unique id'
         const uniqueId = screen.getByLabelText('Login *')
