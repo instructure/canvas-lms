@@ -17,7 +17,12 @@
  */
 
 import {render} from '@testing-library/react'
-import {getItemIcon, getIconColor} from '../utils'
+import {
+  getItemIcon,
+  validateModuleStudentRenderRequirements,
+  validateModuleItemStudentRenderRequirements,
+  getIconColor,
+} from '../utils'
 
 describe('utils', () => {
   describe('getIconColor', () => {
@@ -81,6 +86,154 @@ describe('utils', () => {
       const container = render(getItemIcon({type: 'unknown' as any, title: 'Unknown'}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('document-icon')).toBeInTheDocument()
+    })
+  })
+
+  describe('validateModuleStudentRenderRequirements', () => {
+    const defaultProps = {
+      id: '1',
+      url: 'https://example.com',
+      indent: 0,
+      index: 0,
+      content: {
+        id: '1',
+        type: 'Assignment',
+        title: 'Assignment',
+      },
+    }
+    it('should return true when the props are the same', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+      }
+      expect(validateModuleStudentRenderRequirements(prevProps, nextProps)).toBe(true)
+    })
+
+    it('should return false when the props are different - id', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        id: '2',
+      }
+      expect(validateModuleStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - expanded', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        expanded: false,
+      }
+      expect(validateModuleStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - name', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        name: 'Module 2',
+      }
+      expect(validateModuleStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - completionRequirements', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements: [],
+      }
+      expect(validateModuleStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+  })
+
+  describe('validateModuleItemStudentRenderRequirements', () => {
+    const defaultProps = {
+      id: '1',
+      url: 'https://example.com',
+      indent: 0,
+      index: 0,
+      content: {
+        id: '1',
+        type: 'Assignment',
+        title: 'Assignment',
+      },
+    }
+    it('should return true when the props are the same', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+      }
+      expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(true)
+    })
+
+    it('should return false when the props are different - id', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        id: '2',
+      }
+      expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - url', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        url: 'https://example.com/2',
+      }
+      expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - indent', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        indent: 1,
+      }
+      expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - index', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        index: 1,
+      }
+      expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - content', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        content: {
+          ...defaultProps.content,
+          id: '2',
+        },
+      }
+      expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
     })
   })
 })
