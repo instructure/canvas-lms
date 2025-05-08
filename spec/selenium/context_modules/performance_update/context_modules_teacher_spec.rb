@@ -70,6 +70,33 @@ describe "context modules" do
 
     it_behaves_like "context modules for teachers"
 
+    context "when the module is empty" do
+      before(:once) do
+        @empty_module = @course.context_modules.create!(name: "empty module")
+      end
+
+      it "displays an empty module" do
+        get "/courses/#{@course.id}/modules"
+        expect(context_module(@empty_module.id)).to contain_css(module_file_drop_selector)
+      end
+
+      it "collapses and expands" do
+        get "/courses/#{@course.id}/modules"
+        collapse_module_link(@empty_module.id).click
+        expect(f(module_file_drop_selector)).not_to be_displayed
+        expand_module_link(@empty_module.id).click
+        expect(f(module_file_drop_selector)).to be_displayed
+      end
+
+      it "collapses after duplication" do
+        get "/courses/#{@course.id}/modules"
+        duplicate_module(@empty_module)
+        expect(f(module_file_drop_selector)).to be_displayed
+        collapse_module_link(@empty_module.id).click
+        expect(f(module_file_drop_selector)).not_to be_displayed
+      end
+    end
+
     context "when lazy loading fails" do
       it "displays an error message" do
         allow_any_instance_of(ContextModulesController).to receive(:items_html).and_raise(404)

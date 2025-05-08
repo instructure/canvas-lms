@@ -1194,7 +1194,7 @@ modules.initModuleManagement = async function (duplicate) {
             $(document).off('click', '.add_module_link')
           }
           $('#context_modules').off('addFileToModule')
-          $('.context_module')
+          $newModule
             .find('.expand_module_link,.collapse_module_link')
             .bind('click keyclick', toggleModuleCollapse)
           modules.initModuleManagement($newModule)
@@ -1858,7 +1858,9 @@ function toggleModuleCollapse(event, fetchAllPages) {
   const collapse = $(this).hasClass('collapse_module_link') ? '1' : '0'
   const $module = $(this).parents('.context_module')
   const reload_entries =
-    fetchAllPages || $module.find('.content .context_module_items').children().length === 0
+    fetchAllPages ||
+    ($module.find('.content .context_module_items').children().length === 0 &&
+      $module.find('.module_dnd').length === 0)
   const toggle = function (show) {
     const callback = function () {
       $module
