@@ -25,8 +25,8 @@ import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('context_modules_v2')
 
-const MODULE_ITEMS_QUERY = gql`
-  query GetModuleItemsQuery($moduleId: ID!) {
+const MODULE_ITEMS_STUDENT_QUERY = gql`
+  query GetModuleItemsStudentQuery($moduleId: ID!) {
     legacyNode(_id: $moduleId, type: Module) {
       ... on Module {
         moduleItems {
@@ -41,38 +41,11 @@ const MODULE_ITEMS_QUERY = gql`
               title
               type: __typename
               pointsPossible
-              dueAt
-              lockAt
-              unlockAt
               published
-              canUnpublish
-              isLockedByMasterCourse
-              canDuplicate
-              assignmentOverrides(first: 100) {
-                edges {
-                  cursor
-                  node {
-                    _id
-                    dueAt
-                    lockAt
-                    unlockAt
-                    set {
-                      ... on AdhocStudents {
-                        students {
-                          id
-                        }
-                      }
-                      ... on Course {
-                        courseId: id
-                      }
-                      ... on Group {
-                        groupId: id
-                      }
-                      ... on Section {
-                        sectionId: id
-                      }
-                    }
-                  }
+              submissionsConnection(filter: {includeUnsubmitted: true}) {
+                nodes {
+                  _id
+                  cachedDueDate
                 }
               }
             }
@@ -85,9 +58,6 @@ const MODULE_ITEMS_QUERY = gql`
               todoDate
               discussionType
               published
-              canUnpublish
-              isLockedByMasterCourse
-              canDuplicate
             }
             ... on File {
               _id
@@ -99,23 +69,13 @@ const MODULE_ITEMS_QUERY = gql`
               thumbnailUrl
               url
               published
-              canUnpublish
-              isLockedByMasterCourse
-              canDuplicate
-              fileState
-              locked
-              lockAt
-              unlockAt
             }
             ... on Page {
               _id
               id
               title
               published
-              canUnpublish
               type: __typename
-              isLockedByMasterCourse
-              canDuplicate
             }
             ... on Quiz {
               _id
@@ -124,16 +84,12 @@ const MODULE_ITEMS_QUERY = gql`
               type: __typename
               pointsPossible
               published
-              canUnpublish
-              isLockedByMasterCourse
-              canDuplicate
             }
             ... on ExternalUrl {
               title
               type: __typename
               url
               published
-              canUnpublish
               newTab
             }
             ... on ModuleExternalTool {
@@ -141,7 +97,6 @@ const MODULE_ITEMS_QUERY = gql`
               type: __typename
               url
               published
-              canUnpublish
             }
             ... on SubHeader {
               title
@@ -163,10 +118,10 @@ const transformItems = (items: ModuleItem[], moduleId: string) => {
   }))
 }
 
-async function getModuleItems({queryKey}: {queryKey: any}): Promise<ModuleItemsResponse> {
+async function getModuleItemsStudent({queryKey}: {queryKey: any}): Promise<ModuleItemsResponse> {
   const [_key, moduleId] = queryKey
   try {
-    const result = await executeQuery<ModuleItemsGraphQLResult>(MODULE_ITEMS_QUERY, {
+    const result = await executeQuery<ModuleItemsGraphQLResult>(MODULE_ITEMS_STUDENT_QUERY, {
       moduleId,
     })
 
@@ -186,15 +141,12 @@ async function getModuleItems({queryKey}: {queryKey: any}): Promise<ModuleItemsR
   }
 }
 
-export function useModuleItems(moduleId: string, enabled: boolean = false) {
+export function useModuleItemsStudent(moduleId: string, enabled: boolean = false) {
   return useQuery<ModuleItemsResponse, Error>({
-    queryKey: ['moduleItems', moduleId],
-    queryFn: getModuleItems,
+    queryKey: ['moduleItemsStudent', moduleId],
+    queryFn: getModuleItemsStudent,
     enabled,
-    // Don't refetch on window focus or reconnect if not enabled
     refetchOnWindowFocus: enabled,
     refetchOnReconnect: enabled,
-    // Stale time of 5 minutes
-    staleTime: 5 * 60 * 1000,
   })
 }

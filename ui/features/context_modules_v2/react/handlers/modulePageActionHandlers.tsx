@@ -96,22 +96,6 @@ const requirementTypeMap: Record<string, string> = {
   min_percentage: 'percentage',
 }
 
-const createSyntheticModuleItems = (completionRequirements: any[]): ModuleItem[] => {
-  return completionRequirements.map(
-    (req): ModuleItem => ({
-      id: req.id,
-      _id: req.id,
-      url: '',
-      indent: 0,
-      content: {
-        title: `Item ${req.id}`,
-        type: 'assignment',
-        pointsPossible: undefined,
-      },
-    }),
-  )
-}
-
 const getModuleItemsFromAvailableSources = (
   providedModuleItems: ModuleItem[],
   currentModule?: any,
@@ -126,13 +110,6 @@ const getModuleItemsFromAvailableSources = (
     currentModule.moduleItems.length > 0
   ) {
     return currentModule.moduleItems
-  }
-
-  if (currentModule) {
-    const completionRequirements = currentModule.completionRequirements || []
-    if (completionRequirements.length > 0) {
-      return createSyntheticModuleItems(completionRequirements)
-    }
   }
 
   return []
