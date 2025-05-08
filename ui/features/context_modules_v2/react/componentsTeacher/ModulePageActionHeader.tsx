@@ -17,32 +17,29 @@
  */
 
 import React, {useCallback} from 'react'
-import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-flex'
-import {IconCollapseLine, IconExpandLine, IconEyeLine, IconPlusLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import ContextModulesPublishMenu from '@canvas/context-modules/react/ContextModulesPublishMenu'
 import {queryClient} from '@canvas/query'
+import {handleOpeningModuleUpdateTray} from '../handlers/modulePageActionHandlers'
 import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHeader'
 import {useContextModule} from '../hooks/useModuleContext'
+import {useModules} from '../hooks/queries/useModules'
 
 const I18n = createI18nScope('context_modules_v2')
 
 interface ModulePageActionHeaderProps {
   onCollapseAll: () => void
   onExpandAll: () => void
-  handleOpeningModuleUpdateTray?: (moduleId: string | undefined) => void
   anyModuleExpanded?: boolean
 }
 
 const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   onCollapseAll,
   onExpandAll,
-  handleOpeningModuleUpdateTray,
   anyModuleExpanded = true,
 }) => {
   const {courseId} = useContextModule()
+  const {data} = useModules(courseId)
 
   const handleCollapseExpandClick = useCallback(() => {
     if (anyModuleExpanded) {
@@ -59,8 +56,8 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   }, [courseId])
 
   const handleAddModule = useCallback(() => {
-    handleOpeningModuleUpdateTray?.(undefined)
-  }, [handleOpeningModuleUpdateTray])
+    handleOpeningModuleUpdateTray(data, courseId, undefined)
+  }, [data, courseId])
 
   const renderExpandCollapseAll = useCallback(
     (displayOptions?: {

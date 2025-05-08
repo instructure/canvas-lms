@@ -20,10 +20,11 @@ import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
-import {useMutation, useQuery, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import {getRubricSelfAssessmentSettings, setRubricSelfAssessment} from '../queries'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {useMutation, useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('enhanced-rubrics-self-assessments')
 
@@ -38,7 +39,7 @@ export const RubricSelfAssessmentSettings = ({
   const queryKey = ['assignment-self-assessment-settings', assignmentId, rubricId ?? '']
   const [showTooltip, setShowTooltip] = React.useState(false)
 
-  const {isLoading: mutationLoading, mutateAsync} = useMutation({
+  const {isPending: mutationLoading, mutateAsync} = useMutation({
     mutationFn: setRubricSelfAssessment,
     mutationKey: ['set-rubric-self-assessment', assignmentId, rubricId],
     onError: _error => {
@@ -49,7 +50,7 @@ export const RubricSelfAssessmentSettings = ({
   const {data: selfAssessmentSettings} = useQuery({
     queryKey,
     queryFn: getRubricSelfAssessmentSettings,
-    enabled: !!rubricId
+    enabled: !!rubricId,
   })
 
   const handleSettingChange = async (enabled: boolean) => {
@@ -58,25 +59,24 @@ export const RubricSelfAssessmentSettings = ({
       enabled,
     })
 
-    queryClient.invalidateQueries(queryKey)
+    queryClient.invalidateQueries({queryKey})
   }
 
   if (!rubricId || !selfAssessmentSettings) {
     return null
   }
 
-
-  const { canUpdateRubricSelfAssessment, rubricSelfAssessmentEnabled } = selfAssessmentSettings
+  const {canUpdateRubricSelfAssessment, rubricSelfAssessmentEnabled} = selfAssessmentSettings
 
   return (
     <View as="div">
       <View as="div" margin="small 0">
         <Tooltip
           renderTip={
-            <View width='336px' as='div'>
-              {
-                I18n.t('This toggle will be disabled if the due date has passed OR there have already been self-assessments made on this assignment OR if the assignment is a group assignment.')
-              }
+            <View width="336px" as="div">
+              {I18n.t(
+                'This toggle will be disabled if the due date has passed OR there have already been self-assessments made on this assignment OR if the assignment is a group assignment.',
+              )}
             </View>
           }
           isShowingContent={!canUpdateRubricSelfAssessment && showTooltip}

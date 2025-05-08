@@ -203,6 +203,7 @@
               <% end %>
               <div class="turnitin_info_container"></div>
             </div>
+            <div id="speed_grader_lti_asset_reports_mount_point"></div>
           </div>
 
           <div class="content_box">
@@ -511,7 +512,7 @@
       </p>
     <% end %>
 
-    <% if @context.account.feature_enabled?(:discussions_speedgrader_revisit) %>
+    <% if @context.discussion_checkpoints_enabled? %>
       <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
         <legend class="ic-Legend"><%= t("Default Discussion View Options") %></legend>
           <div class="ic-Form-control ic-Form-control--radio">

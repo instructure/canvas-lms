@@ -17,7 +17,9 @@
  */
 
 import {type Folder} from '../interfaces/File'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {getFilesEnv} from './filesEnvUtils'
+
+export const MAX_FOLDER_NAME_LENGTH = 255
 
 export const generateUrlPath = (folder: Folder) => {
   const EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^/]+\/?/
@@ -32,7 +34,7 @@ export const generateUrlPath = (folder: Folder) => {
   }
 
   let relativePath = getRelativePath(folder.full_name)
-  if (filesEnv.showingAllContexts) {
+  if (getFilesEnv().showingAllContexts) {
     const pluralAssetString = folder.context_type
       ? `${folder.context_type.toLowerCase()}s_${folder.context_id}`
       : ''
@@ -49,7 +51,7 @@ export const createStubRootFolder = (context: {
   root_folder_id: string
 }): Folder => {
   return {
-    id: context.root_folder_id,
+    id: parseInt(context.root_folder_id),
     name: '',
     parent_folder_id: null,
     context_id: context.contextId,

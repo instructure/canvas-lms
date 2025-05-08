@@ -76,7 +76,7 @@ export default function SisImportForm(props: Props) {
   }: QueryFunctionContext): Promise<{json: EnrollmentTerms; nextPage: string | null}> => {
     const params = {
       per_page: 50,
-      page: pageParam,
+      page: String(pageParam),
     }
     const {json, link} = await doFetchApi<EnrollmentTerms>({
       path: `/api/v1/accounts/${accountId}/terms`,
@@ -86,10 +86,11 @@ export default function SisImportForm(props: Props) {
     return {json: json || {enrollment_terms: []}, nextPage: nextPage}
   }
 
-  const {data, fetchNextPage, isFetching, hasNextPage, isSuccess, error} = useInfiniteQuery({
+  const {data, fetchNextPage, isFetching, hasNextPage, error} = useInfiniteQuery({
     queryKey: ['terms_list', accountId],
     queryFn: fetchTerms,
     getNextPageParam: lastPage => lastPage.nextPage,
+    initialPageParam: '1',
   })
 
   useEffect(() => {

@@ -22,7 +22,6 @@
 <div class="answer">
   <% if question_type.entry_type == "radio" || question_type.entry_type == "select" || question_type.entry_type == "checkbox" %>
     <% answer_text = (hash_get(answer, :html).present? ? user_content(hash_get(answer, :html)) : hash_get(answer, :text)) || '' %>
-    <% answer_label = html_to_text(answer_text + ' ' + (hash_get(question, 'question_text') || '')) %>
     <% answer_label_id = "question_" + hash_get(question, :id).to_s + "_answer_" + hash_get(answer, :id).to_s + "_label" %>
     <label class="answer_row user_content">
       <span class="answer_input">
@@ -44,10 +43,9 @@
     <% html_answer = hash_get(answer, :left_html) || hash_get(answer, :html) %>
     <% text_answer = hash_get(answer, :left) || hash_get(answer, :text) || '' %>
     <% answer_text = html_answer.present? ? user_content(html_answer) : text_answer %>
-    <% answer_label = html_to_text(answer_text + ' ' + (hash_get(question, 'question_text') || '')) %>
     <div class="pull-left" style="width: 40%; margin-top: 10px;">
       <% if answer %>
-        <label for="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" aria-label="<%= answer_label %>"><%= answer_text %></label>
+        <label for="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>"><%= answer_text %></label>
         <% if !user_answer %>
           <br/>
           <div style="margin-<%= direction('left') %>: 20px;">
@@ -66,7 +64,7 @@
           It was really: <%= (hash_get(answer, :right) || (hash_get(question, :matches, []).find{|a| hash_get(a, :match_id).to_i == hash_get(answer, :match_id).to_i}[:text] rescue '')) %>
         <% end %>
       <% else %>
-        <select name="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" id="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" class="question_input mathjax_ignore" style="max-width: 90%;" aria-label="<%= answer_label %>">
+        <select name="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" id="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" class="question_input mathjax_ignore" style="max-width: 90%;">
           <option value="" <%= "selected" unless @stored_params["question_#{hash_get(question, :id)}_answer_#{hash_get(answer, :id)}"] %>>[ <%= t :choose_answer, "Choose" %> ]</option>
           <% right_answers.uniq{|a| hash_get(a, :right) || (hash_get(question, :matches, []).find{|aa| hash_get(aa, :match_id).to_i == hash_get(a, :match_id).to_i}[:text] rescue '') }.each do |a| %>
             <option value="<%= hash_get(a, :match_id) %>" <%= "selected" if @stored_params["question_#{hash_get(question, :id)}_answer_#{hash_get(answer, :id)}"].to_s == hash_get(a, :match_id).to_s %>><%= (hash_get(a, :right) || (hash_get(question, :matches).find{|aa| hash_get(aa, :match_id).to_i == hash_get(a, :match_id).to_i}[:text] rescue '')) %></option>

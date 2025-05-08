@@ -97,6 +97,7 @@ export interface BlueprintCoursesData {
 
 export interface EnvCommon {
   ASSET_HOST: string
+  DOMAIN_ROOT_ACCOUNT_SFID: string
   active_brand_config_json_url: string
   active_brand_config: {
     variables: Record<string, string>
@@ -142,6 +143,7 @@ export interface EnvCommon {
   help_link_name: string
   help_link_icon: string
   use_high_contrast: boolean
+  use_dyslexic_font?: boolean
   auto_show_cc: boolean
   disable_celebrations: boolean
   disable_keyboard_shortcuts: boolean
@@ -298,7 +300,7 @@ export type SiteAdminFeatureId =
   | 'validate_call_to_action'
   | 'new_quizzes_navigation_updates'
   | 'create_wiki_page_mastery_path_overrides'
-
+  | 'create_external_apps_side_tray_overrides'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
@@ -344,7 +346,6 @@ export type RootAccountServiceId = 'account_survey_notifications'
 export type BrandAccountFeatureId =
   | 'embedded_release_notes'
   | 'consolidated_media_player'
-  | 'discussions_speedgrader_revisit'
   | 'discussion_checkpoints'
 
 /**

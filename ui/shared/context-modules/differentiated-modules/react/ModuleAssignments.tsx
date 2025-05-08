@@ -20,7 +20,8 @@ import React, {useCallback, useEffect, useState} from 'react'
 import AssigneeSelector from './AssigneeSelector'
 import type {FormMessage} from '@instructure/ui-form-field'
 import type {AssigneeOption} from './Item/types'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 export interface ModuleAssignmentsProps {
   courseId: string
@@ -58,7 +59,7 @@ export default function ModuleAssignments({
   }, [defaultValues, handleSelect])
 
   return (
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <AssigneeSelector
         courseId={courseId}
         onSelect={handleSelect}
@@ -70,6 +71,6 @@ export default function ModuleAssignments({
         onBlur={onBlur}
         messages={messages}
       />
-    </QueryProvider>
+    </QueryClientProvider>
   )
 }

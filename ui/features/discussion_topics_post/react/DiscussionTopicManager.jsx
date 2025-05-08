@@ -16,48 +16,48 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DISCUSSION_QUERY} from '../graphql/Queries'
-import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepliesContainer/DiscussionTopicRepliesContainer'
-import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
-import {getOptimisticResponse, responsiveQuerySizes, getCheckpointSubmission} from './utils'
-import {
-  HIGHLIGHT_TIMEOUT,
-  SearchContext,
-  DiscussionManagerUtilityContext,
-  AllThreadsState,
-  REPLY_TO_TOPIC,
-  REPLY_TO_ENTRY,
-  isSpeedGraderInTopUrl,
-} from './utils/constants'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
-import PropTypes from 'prop-types'
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
 import {useQuery} from '@apollo/client'
-import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import GenericErrorPage from '@canvas/generic-error-page'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {Mask} from '@instructure/ui-overlays'
 import {Responsive} from '@instructure/ui-responsive'
 import {View} from '@instructure/ui-view'
-import useCreateDiscussionEntry from './hooks/useCreateDiscussionEntry'
-import {flushSync} from 'react-dom'
 import {captureException} from '@sentry/react'
-import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
-import useNavigateEntries from './hooks/useNavigateEntries'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
-import DiscussionTopicToolbarContainer from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
-import StickyToolbarWrapper from './containers/StickyToolbarWrapper/StickyToolbarWrapper'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {DiscussionTranslationModuleContainer} from './containers/DiscussionTranslationModuleContainer/DiscussionTranslationModuleContainer'
-import {TranslationControls} from './components/TranslationControls/TranslationControls'
-import useHighlightStore from './hooks/useHighlightStore'
+import PropTypes from 'prop-types'
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
+import {flushSync} from 'react-dom'
+import {DISCUSSION_QUERY} from '../graphql/Queries'
 import {
   KeyboardShortcuts,
   useEventHandler,
   useKeyboardShortcuts,
 } from './KeyboardShortcuts/useKeyboardShortcut'
+import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
+import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
+import {TranslationControls} from './components/TranslationControls/TranslationControls'
+import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
+import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepliesContainer/DiscussionTopicRepliesContainer'
+import DiscussionTopicToolbarContainer from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
+import {DiscussionTranslationModuleContainer} from './containers/DiscussionTranslationModuleContainer/DiscussionTranslationModuleContainer'
+import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
+import StickyToolbarWrapper from './containers/StickyToolbarWrapper/StickyToolbarWrapper'
+import useCreateDiscussionEntry from './hooks/useCreateDiscussionEntry'
+import useHighlightStore from './hooks/useHighlightStore'
+import useNavigateEntries from './hooks/useNavigateEntries'
+import {getCheckpointSubmission, getOptimisticResponse, responsiveQuerySizes} from './utils'
+import {
+  AllThreadsState,
+  DiscussionManagerUtilityContext,
+  HIGHLIGHT_TIMEOUT,
+  REPLY_TO_ENTRY,
+  REPLY_TO_TOPIC,
+  SearchContext,
+  isSpeedGraderInTopUrl,
+} from './utils/constants'
 
 const I18n = createI18nScope('discussion_topics_post')
 const SEARCH_INPUT_SELECTOR = '#discussion-drawer-layout input[data-testid="search-filter"]'
@@ -501,7 +501,7 @@ const DiscussionTopicManager = props => {
                     overflowY="auto"
                     id="module_sequence_footer_container"
                   >
-                    {ENV?.FEATURES?.discussions_speedgrader_revisit && isSpeedGraderInTopUrl ? (
+                    {ENV?.FEATURES?.discussion_checkpoints && isSpeedGraderInTopUrl ? (
                       <StickyToolbarWrapper>
                         <DiscussionTopicToolbarContainer
                           discussionTopic={discussionTopicQuery.data.legacyNode}

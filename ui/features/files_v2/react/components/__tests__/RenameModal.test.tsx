@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {RenameModal} from '../RenameModal'
 import fetchMock from 'fetch-mock'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../fixtures/fakeData'
 import {userEvent} from '@testing-library/user-event'
 import {Folder, File} from '../../../interfaces/File'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {RowsProvider} from '../../contexts/RowsContext'
 
 const defaultProps: {
   isOpen: boolean
@@ -36,7 +37,11 @@ const defaultProps: {
 }
 
 const renderComponent = (props = {}) => {
-  return render(<RenameModal {...defaultProps} {...props} />)
+  return render(
+    <RowsProvider value={{setCurrentRows: jest.fn(), currentRows: [defaultProps.renamingItem]}}>
+      <RenameModal {...defaultProps} {...props} />
+    </RowsProvider>,
+  )
 }
 
 describe('RenameModal', () => {
@@ -139,11 +144,22 @@ describe('RenameModal', () => {
       renderComponent()
       const input = screen.getByRole('textbox', {name: 'File Name'})
       await user.clear(input)
-      await user.type(input, 'validfilename')
+      await user.type(input, 'anothervalidfilename')
       await user.type(input, '{enter}')
       await waitFor(() => {
         expect(fetchMock.calls()[0][0]).toBe(`/api/v1/files/${defaultProps.renamingItem.id}`)
       })
+    })
+
+    it('allows a file name longer than 255 characters', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+      const input = screen.getByLabelText('File Name *')
+      const name = 'a'.repeat(256)
+      // userEvent.type is flaky with long strings
+      fireEvent.change(input, {target: {value: name}})
+      await user.click(screen.getByRole('button', {name: 'Save'}))
+      expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
     })
   })
 
@@ -203,6 +219,30 @@ describe('RenameModal', () => {
       await waitFor(() => {
         expect(fetchMock.calls()[0][0]).toBe(`/api/v1/folders/${defaultProps.renamingItem.id}`)
       })
+    })
+
+    it('does not allow a folder name longer than 255 characters', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+      const input = screen.getByLabelText('Folder Name *')
+      const name = 'a'.repeat(256)
+      // userEvent.type is flaky with long strings
+      fireEvent.change(input, {target: {value: name}})
+      await user.click(screen.getByRole('button', {name: 'Save'}))
+      expect(
+        await screen.findByText(/Folder name cannot exceed 255 characters/i),
+      ).toBeInTheDocument()
+    })
+
+    it('does allow a folder name of 255 characters', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+      const input = screen.getByLabelText('Folder Name *')
+      const name = 'a'.repeat(255)
+      // userEvent.type is flaky with long strings
+      fireEvent.change(input, {target: {value: name}})
+      await user.click(screen.getByRole('button', {name: 'Save'}))
+      expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
     })
   })
 })

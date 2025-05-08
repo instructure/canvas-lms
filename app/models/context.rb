@@ -172,6 +172,8 @@ module Context
   def find_asset(asset_string, allowed_types = nil)
     return nil unless asset_string
 
+    asset_string = Context.normalize_asset_string(asset_string)
+
     res = Context.find_asset_by_asset_string(asset_string, self, allowed_types)
     res = nil if res.respond_to?(:deleted?) && res.deleted?
     res
@@ -204,7 +206,16 @@ module Context
     end
   end
 
+  def self.normalize_asset_string(asset_string)
+    if asset_string.start_with?("course_syllabus_")
+      return asset_string.gsub("course_syllabus", "course")
+    end
+
+    asset_string
+  end
+
   def self.find_by_asset_string(string)
+    string = normalize_asset_string(string)
     ActiveRecord::Base.find_by_asset_string(string, CONTEXT_TYPES.map(&:to_s))
   end
 

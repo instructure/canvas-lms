@@ -101,6 +101,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
 
   return (
     <View
+      id={`context_module_item_${_id}`}
       as="div"
       padding="small medium small xxx-small"
       background="transparent"

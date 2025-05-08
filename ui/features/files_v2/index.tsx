@@ -19,17 +19,18 @@
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import {RouterProvider} from 'react-router-dom'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 import {router} from './routes/router'
 import {FilesErrorBoundary} from './react/components/FilesErrorBoundary'
+import {queryClient} from '@canvas/query'
 
 const root = createRoot(document.getElementById('content')!)
 root.render(
   <React.StrictMode>
     <FilesErrorBoundary>
-      <QueryProvider>
+      <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
-      </QueryProvider>
+      </QueryClientProvider>
     </FilesErrorBoundary>
-  </React.StrictMode>
+  </React.StrictMode>,
 )

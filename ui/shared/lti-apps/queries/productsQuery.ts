@@ -101,7 +101,8 @@ export const fetchLtiFilters = async (): Promise<LtiFilters> => {
   return filters || {}
 }
 
-export const fetchCustomFilters = async (salesforceId: number): Promise<OrganizationFiltes> => {
+export const fetchCustomFilters = async (): Promise<OrganizationFiltes> => {
+  const salesforceId = ENV.DOMAIN_ROOT_ACCOUNT_SFID
   const url = `/api/v1/accounts/${accountId}/learn_platform/custom_filters?${stringify(
     {salesforce_id: salesforceId},
     {
@@ -116,8 +117,8 @@ export const fetchCustomFilters = async (salesforceId: number): Promise<Organiza
 
 export const fetchProductsByOrganization = async (
   params: DiscoverParams,
-  organizationSalesforceId: string,
 ): Promise<OrganizationProductResponse> => {
+  const organizationSalesforceId = ENV.DOMAIN_ROOT_ACCOUNT_SFID
   const {page, search} = params
   const {tags, companies, audience, versions} = params.filters
 

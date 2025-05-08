@@ -46,7 +46,7 @@ describe "Student reports" do
     @course1.enroll_teacher(@teacher)
     @course2.enroll_teacher(@teacher)
     @course3.enroll_teacher(@teacher)
-
+    @course.account.enable_feature!(:discussion_checkpoints)
     @assignment1 = @course1.assignments.create!(title: "My Assignment")
     @assignment1.sub_assignments.create!(title: "sub assignment", context: @assignment1.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
     @assignment2 = @course2.assignments.create!(title: "My Assignment")
@@ -54,6 +54,12 @@ describe "Student reports" do
     @assignment3 = @course3.assignments.create!(title: "My Assignment")
     @assignment3.sub_assignments.create!(title: "sub assignment", context: @assignment3.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
     @assignment4 = @course3.assignments.create!(title: "My Assignment")
+
+    @assignment1.reload
+    @assignment2.reload
+    @assignment3.reload
+    @assignment4.reload
+
     @user1 = user_with_managed_pseudonym(
       active_all: true,
       account: @account,
@@ -93,20 +99,17 @@ describe "Student reports" do
       @start_at = 2.months.ago
       @start_at2 = 10.days.ago
       @end_at = 1.day.ago
-
       @submission_time = 1.month.ago
-      @assignment1.grade_student(@user1, grade: "4", grader: @teacher)
+      @assignment1.grade_student(@user1, grade: "4", grader: @teacher, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
       s = Submission.where(assignment_id: @assignment1, user_id: @user1).first
       s.submitted_at = @submission_time
       s.save!
-
       @submission_time2 = 40.days.ago
-      @assignment1.grade_student(@user2, grade: "5", grader: @teacher)
+      @assignment1.grade_student(@user2, grade: "5", grader: @teacher, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
       s = Submission.where(assignment_id: @assignment1, user_id: @user2).first
       s.submitted_at = @submission_time2
       s.save!
-
-      @assignment2.grade_student(@user1, grade: "9", grader: @teacher)
+      @assignment2.grade_student(@user1, grade: "9", grader: @teacher, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
       s = Submission.where(assignment_id: @assignment2, user_id: @user1).first
       s.submitted_at = @submission_time2
       s.save!

@@ -272,7 +272,7 @@ class DiscussionTopicsController < ApplicationController
   before_action :require_context_and_read_access, except: :public_feed
 
   include HorizonMode
-  before_action :redirect_student_to_horizon, only: [:index, :show]
+  before_action :load_canvas_career, only: [:index, :show]
 
   before_action :rce_js_env
 
@@ -680,6 +680,7 @@ class DiscussionTopicsController < ApplicationController
       GRADING_SCHEME_UPDATES_ENABLED: Account.site_admin.feature_enabled?(:grading_scheme_updates),
       ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
       DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
+      CHECKPOINTS_GROUP_DISCUSSIONS_ENABLED: @context.checkpoints_group_discussions_enabled?,
       ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: Account.site_admin.feature_enabled?(:assignment_edit_placement_not_on_announcements),
       ANNOUNCEMENTS_COMMENTS_DISABLED: Announcement.new(context: @context).comments_disabled?,
       DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),

@@ -44,7 +44,11 @@ import {getResponsiveSize} from '../reducers/ui'
 import {getIsDraftPace} from '../reducers/course_paces'
 import Search from './search'
 import {API_CONTEXT_TYPE_MAP} from '../utils/utils'
-import { show as showCourseReport, getLast as getLastCourseReport, create as createCourseReport } from '../api/course_reports_api'
+import {
+  show as showCourseReport,
+  getLast as getLastCourseReport,
+  create as createCourseReport,
+} from '../api/course_reports_api'
 import BulkEditStudentPaces from './bulk_edit_students'
 
 const I18n = createI18nScope('course_paces_app')
@@ -135,8 +139,8 @@ export const PaceContent = ({
   const handleContextSelect = (paceContext: PaceContext, bulkEdit: boolean = false) => {
     setSelectedContext(paceContext)
 
-    if(!bulkEdit)
-    setSelectedModalContext(API_CONTEXT_TYPE_MAP[selectedContextType], paceContext.item_id)
+    if (!bulkEdit)
+      setSelectedModalContext(API_CONTEXT_TYPE_MAP[selectedContextType], paceContext.item_id)
   }
 
   if (isDraftPace) {
@@ -206,7 +210,6 @@ export const PaceContent = ({
             contextsPublishing={contextsPublishing}
             course={course}
             createCourseReport={createCourseReport}
-            getLastCourseReport={getLastCourseReport}
             showCourseReport={showCourseReport}
           />
         </TabPanel>
@@ -217,10 +220,9 @@ export const PaceContent = ({
           isSelected={selectedTab === 'tab-student_enrollment'}
           padding="none"
         >
-          {
-            window.ENV.FEATURES.course_pace_allow_bulk_pace_assign &&
+          {window.ENV.FEATURES.course_pace_allow_bulk_pace_assign && (
             <BulkEditStudentPaces handleContextSelect={handleContextSelect} />
-          }
+          )}
           <View
             as="div"
             padding="small"
@@ -245,7 +247,6 @@ export const PaceContent = ({
             contextsPublishing={contextsPublishing}
             course={course}
             createCourseReport={createCourseReport}
-            getLastCourseReport={getLastCourseReport}
             showCourseReport={showCourseReport}
           />
         </TabPanel>

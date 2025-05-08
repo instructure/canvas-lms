@@ -19,7 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 import ready from '@instructure/ready'
 
@@ -50,9 +51,9 @@ ready(() => {
 
     if (dashcard_query_enabled) {
       ReactDOM.render(
-        <QueryProvider>
+        <QueryClientProvider client={queryClient}>
           <DashboardWrapper {...dashboardProps} />
-        </QueryProvider>,
+        </QueryClientProvider>,
         dashboardHeaderContainer,
       )
     } else {

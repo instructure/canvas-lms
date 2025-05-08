@@ -33,7 +33,8 @@ import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {captureException} from '@sentry/react'
 import StudentMultiSelect from './components/StudentMultiSelect'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('student_groups')
 
@@ -148,7 +149,7 @@ export default function NewStudentGroupModal({onSave, ...modalProps}) {
   }
 
   return (
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <CanvasModal
         label={I18n.t('New Student Group')}
         size="medium"
@@ -208,7 +209,7 @@ export default function NewStudentGroupModal({onSave, ...modalProps}) {
         </FormFieldGroup>
         {alert}
       </CanvasModal>
-    </QueryProvider>
+    </QueryClientProvider>
   )
 }
 

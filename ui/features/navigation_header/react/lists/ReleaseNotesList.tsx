@@ -27,12 +27,12 @@ import {List} from '@instructure/ui-list'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {useQuery} from '@canvas/query'
-import {useMutation, useQueryClient} from '@tanstack/react-query'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import releaseNotesQuery from '../queries/releaseNotesQuery'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {getSetting, setSetting} from '@canvas/settings-query/react/settingsQuery'
+import {sessionStoragePersister} from '@canvas/query'
 
 const I18n = createI18nScope('Navigation')
 
@@ -48,9 +48,7 @@ export default function ReleaseNotesList() {
     queryKey: ['settings', 'release_notes_badge_disabled'],
     queryFn: getSetting,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    persister: sessionStoragePersister,
   })
 
   const mutation = useMutation({
@@ -72,9 +70,7 @@ export default function ReleaseNotesList() {
     queryKey: ['releaseNotes'],
     queryFn: releaseNotesQuery,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    persister: sessionStoragePersister,
   })
 
   const [wasFetchingReleaseNotes, setWasFetchingReleaseNotes] = useState(isFetching)

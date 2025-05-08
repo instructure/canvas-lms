@@ -21,7 +21,6 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {clearObservedId, savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
-import {useMutation, useQuery} from '@canvas/query'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {Alert} from '@instructure/ui-alerts'
@@ -34,6 +33,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
+import {useMutation, useQuery} from '@tanstack/react-query'
 import React from 'react'
 import {Controller, type SubmitHandler, useForm} from 'react-hook-form'
 import * as z from 'zod'
@@ -136,7 +136,7 @@ function UserObservees({userId}: UserObserveesProps) {
     },
     onError: () => showFlashError(I18n.t('Failed to remove student.'))(),
   })
-  const isOverlayOpen = removeObserveeMutationState.isLoading || addObserveeMutationState.isLoading
+  const isOverlayOpen = removeObserveeMutationState.isPending || addObserveeMutationState.isPending
   const buttonText = I18n.t('Student')
 
   const handleRemoveObservee = ({observeeId, name}: {observeeId: string; name: string}) => {

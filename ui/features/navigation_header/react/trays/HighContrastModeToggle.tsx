@@ -173,7 +173,7 @@ export default function HighContrastModeToggle({isMobile}: HighContrastModeToggl
   // By definition this control for turning on HCM has to be in HCM all the time,
   // regardless of the global theme, so we have to apply some overrides.
   return (
-    <View as="div" margin={margins}>
+    <View as="div" margin={margins} data-testid="high-contrast-toggle">
       <Checkbox
         themeOverride={checkboxThemeOverrides}
         variant="toggle"

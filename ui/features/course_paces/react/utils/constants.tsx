@@ -15,4 +15,4 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export const POLL_DOCX_DELAY = 10000
+export const POLL_DOCX_DELAY = 500

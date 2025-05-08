@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -44,6 +44,12 @@ type StatusBarFeature =
 export const RCEVariantValues = ['full', 'lite', 'text-only', 'text-block'] as const
 
 export type RCEVariant = (typeof RCEVariantValues)[number]
+
+export type StatusBarOptions = {
+  aiTextTools?: boolean
+  isDesktop?: boolean
+  removeResizeButton?: boolean
+}
 
 export function getMenubarForVariant(variant: RCEVariant): MenuBarSpec {
   if (variant === 'full') {
@@ -198,28 +204,32 @@ export function getToolbarForVariant(
   ]
 }
 
-const DESKTOP_FEATURES: StatusBarFeature[] = ['keyboard_shortcuts', 'a11y_checker', 'word_count'];
-const MOBILE_FEATURES: StatusBarFeature[] = ['a11y_checker', 'word_count'];
-const EXTENDED_FEATURES: StatusBarFeature[] = ['html_view', 'fullscreen', 'resize_handle'];
+const DESKTOP_FEATURES: StatusBarFeature[] = ['keyboard_shortcuts', 'a11y_checker', 'word_count']
+const MOBILE_FEATURES: StatusBarFeature[] = ['a11y_checker', 'word_count']
+const EXTENDED_FEATURES: StatusBarFeature[] = ['html_view', 'fullscreen']
 
 export function getStatusBarFeaturesForVariant(
   variant: RCEVariant,
-  aiTextTools: boolean = false,
-  isDesktop: boolean = true,
+  options: StatusBarOptions = {
+    aiTextTools: false,
+    isDesktop: true,
+    removeResizeButton: false,
+  },
 ): StatusBarFeature[] {
   if (variant === 'text-block') {
     return []
   }
 
-  const platformFeatures = isDesktop ? DESKTOP_FEATURES : MOBILE_FEATURES;
+  const platformFeatures = options.isDesktop ? DESKTOP_FEATURES : MOBILE_FEATURES
 
   if (variant === 'lite' || variant === 'text-only') {
-    return platformFeatures;
+    return platformFeatures
   }
 
   return [
     ...platformFeatures,
     ...EXTENDED_FEATURES,
-    ...(aiTextTools ? ['ai_tools'] : []),
+    ...(options.removeResizeButton ? [] : ['resize_handle']),
+    ...(options.aiTextTools ? ['ai_tools'] : []),
   ] as StatusBarFeature[]
 }

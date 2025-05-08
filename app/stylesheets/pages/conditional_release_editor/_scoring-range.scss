@@ -30,7 +30,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: 60px;
+    width: 104px;
     padding: 10px;
     flex-shrink: 0;
   }
@@ -54,12 +54,8 @@
     margin: auto;
     background: transparent;
     color: var(--ic-brand-font-color-dark);
-    width: 60px;
+    width: 104px;
     height: 130px;
-  }
-
-  .cr-scoring-range__upper-bound, .cr-scoring-range__lower-bound{
-    align-self: center;
   }
 
   .cr-scoring-range__center{

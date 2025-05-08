@@ -51,8 +51,7 @@ import type {ViewProps} from '@instructure/ui-view'
 import type {TableColHeaderProps} from '@instructure/ui-table'
 import NoResults from './no_results'
 import type {Course} from '../shared/types'
-import {POLL_DOCX_DELAY} from '../utils/constants'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import PaceDownloadModal from './pace_download_modal'
 
 type SortingProps = {
   onRequestSort: () => void
@@ -75,10 +74,9 @@ export interface PaceContextsTableProps {
   setOrderType: typeof paceContextsActions.setOrderType
   handleContextSelect: (paceContext: PaceContext) => void
   contextsPublishing: PaceContextProgress[]
-  course: Course,
-  createCourseReport: (courseReport: CourseReport) => Promise<CourseReport | undefined>,
-  showCourseReport: (courseReport: CourseReport) => Promise<CourseReport | undefined>,
-  getLastCourseReport: (courseId: string, reportType: string) => Promise<CourseReport | undefined>
+  course: Course
+  createCourseReport: (courseReport: CourseReport) => Promise<CourseReport | undefined>
+  showCourseReport: (courseReport: CourseReport) => Promise<CourseReport | undefined>
 }
 
 interface Header {
@@ -122,7 +120,6 @@ const PaceContextsTable = ({
   course,
   createCourseReport,
   showCourseReport,
-  getLastCourseReport
 }: PaceContextsTableProps) => {
   const [headers, setHeaders] = useState<Header[]>([])
   const [newOrderType, setNewOrderType] = useState(currentOrderType)
@@ -179,54 +176,6 @@ const PaceContextsTable = ({
   }, [newOrderType])
 
   useEffect(() => {
-    (async () => {
-      if (!window.ENV.FEATURES.course_pace_download_document) {
-        return
-      }
-
-      const lastReport = await getLastCourseReport(course.id, "course_pace_docx")
-      if (lastReport?.status == "running") {
-        setReport(lastReport)
-      }
-    })()
-  }, [])
-
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      if (report?.id && !report?.file_url) {
-        const updatedReport = await showCourseReport(report)
-        setReport(updatedReport)
-      }
-    }, POLL_DOCX_DELAY)
-
-    return () => clearInterval(interval)
-  }, [report, course])
-
-  useEffect(() => {
-    if (report?.file_url) {
-      window.location.href = report.file_url
-
-      showFlashAlert({
-        message: I18n.t('The Course Pace download is complete.'),
-        type: 'success',
-      })
-      setReport(undefined)
-    } else if (report) {
-      if (report.status == "running") {
-        showFlashAlert({
-          message: I18n.t('A Course Pace download is in progress.'),
-        })
-      } else if (report.status == "error") {
-        showFlashAlert({
-          message: I18n.t('The course pace download encountered an error.'),
-          type: 'error',
-        })
-        setReport(undefined);
-      }
-    }
-  }, [report, report?.status, report?.file_url])
-
-  useEffect(() => {
     setSelectedPaceContexts(new Set<PaceContext>())
   }, [currentPage])
 
@@ -272,16 +221,16 @@ const PaceContextsTable = ({
             width: '30%',
             sortable: true,
           },
-          ...(
-            window.ENV.FEATURES.course_pace_pacing_status_labels
-              ? [{
+          ...(window.ENV.FEATURES.course_pace_pacing_status_labels
+            ? [
+                {
                   key: 'paceStatus',
                   label: I18n.t('Pace Status'),
                   content: I18n.t('Pace Status'),
-                  width: '20%'
-                }]
-              : []
-          ),
+                  width: '20%',
+                },
+              ]
+            : []),
           {
             key: 'pace',
             label: I18n.t('Assigned Pace'),
@@ -353,16 +302,18 @@ const PaceContextsTable = ({
         break
       }
       case 'student_enrollment': {
-        const studentOnPace = paceContext.on_pace ?
-          <Text color="success"><IconCheckLine size="x-small" /> {I18n.t("On Pace")}</Text> :
-          <Text color="danger"><IconWarningLine size="x-small" /> {I18n.t("Off Pace")}</Text>
+        const studentOnPace = paceContext.on_pace ? (
+          <Text color="success">
+            <IconCheckLine size="x-small" /> {I18n.t('On Pace')}
+          </Text>
+        ) : (
+          <Text color="danger">
+            <IconWarningLine size="x-small" /> {I18n.t('Off Pace')}
+          </Text>
+        )
         values = [
           renderContextLink(paceContext),
-          ...(
-            window.ENV.FEATURES.course_pace_pacing_status_labels
-              ? [studentOnPace]
-              : []
-          ),
+          ...(window.ENV.FEATURES.course_pace_pacing_status_labels ? [studentOnPace] : []),
           appliedPace?.name,
           PACE_TYPES[appliedPaceType] || appliedPaceType,
           renderLastModified(paceContext.type, paceContext?.item_id, appliedPace?.last_modified),
@@ -454,14 +405,19 @@ const PaceContextsTable = ({
       const parameters = {
         enrollment_ids: Array<string>(),
         section_ids: Array<string>(),
-        report_type: 'course_pace_docx'
+        report_type: 'course_pace_docx',
       }
       if (paceContext.type == 'StudentEnrollment') {
         parameters.enrollment_ids = [paceContext.item_id]
       } else {
         parameters.section_ids = [paceContext.item_id]
       }
-      const value = await createCourseReport({ course_id: course.id, report_type: 'course_pace_docx', parameters })
+      const value = await createCourseReport({
+        course_id: course.id,
+        report_type: 'course_pace_docx',
+        progress: 0,
+        parameters,
+      })
       setReport(value)
     }
   }
@@ -469,17 +425,22 @@ const PaceContextsTable = ({
   const onDownloadPaces = async () => {
     const parameters = {
       enrollment_ids: Array<string>(),
-      section_ids: Array<string>()
+      section_ids: Array<string>(),
     }
 
-    selectedPaceContexts.forEach((paceContext) => {
+    selectedPaceContexts.forEach(paceContext => {
       if (paceContext.type == 'StudentEnrollment') {
         parameters.enrollment_ids.push(paceContext.item_id)
       } else {
         parameters.section_ids.push(paceContext.item_id)
       }
     })
-    const value = await createCourseReport({ course_id: course.id, report_type: 'course_pace_docx', parameters })
+    const value = await createCourseReport({
+      course_id: course.id,
+      report_type: 'course_pace_docx',
+      progress: 0,
+      parameters,
+    })
     setReport(value)
   }
 
@@ -682,6 +643,12 @@ const PaceContextsTable = ({
               pageCount={pageCount}
             />
           )}
+
+      <PaceDownloadModal
+        courseReport={report}
+        showCourseReport={showCourseReport}
+        setCourseReport={setReport}
+      />
     </>
   )
 }

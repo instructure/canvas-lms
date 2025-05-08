@@ -38,7 +38,7 @@ class AssignmentsController < ApplicationController
   before_action :require_context
 
   include HorizonMode
-  before_action :redirect_student_to_horizon, only: %i[index show syllabus]
+  before_action :load_canvas_career, only: %i[index show syllabus]
 
   include K5Mode
   add_crumb(
@@ -296,7 +296,7 @@ class AssignmentsController < ApplicationController
         if @assignment.external_tool? && Account.site_admin.feature_enabled?(:external_tools_for_a2) && @unlocked
           @tool = Lti::ToolFinder.from_assignment(@assignment)
 
-          js_env({ LTI_TOOL: "true" })
+          js_env({ LTI_TOOL: "true", LTI_TOOL_ID: @tool&.id })
         end
 
         if @assignment.external_tool?
@@ -397,18 +397,6 @@ class AssignmentsController < ApplicationController
           env[:speed_grader_url] = context_url(@context, :speed_grader_context_gradebook_url, assignment_id: @assignment.id)
         end
 
-        rubric_association = nil
-        assigned_rubric = nil
-        if @assignment.active_rubric_association? && Rubric.enhanced_rubrics_assignments_enabled?(@context)
-          rubric_association = @assignment.rubric_association
-          can_update_rubric = can_do(rubric_association.rubric, @current_user, :update)
-          assigned_rubric = rubric_json(rubric_association.rubric, @current_user, session, style: "full")
-          assigned_rubric[:unassessed] = Rubric.active.unassessed.where(id: rubric_association.rubric.id).exists?
-          assigned_rubric[:can_update] = can_update_rubric
-          assigned_rubric[:association_count] = RubricAssociation.active.where(rubric_id: rubric_association.rubric.id, association_type: "Assignment").count
-          rubric_association = rubric_association_json(rubric_association, @current_user, session)
-        end
-
         if @assignment.quiz?
           return redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id)
         elsif @assignment.discussion_topic? &&
@@ -422,18 +410,10 @@ class AssignmentsController < ApplicationController
             manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
           }
           hash = {
-            ACCOUNT_LEVEL_MASTERY_SCALES: @context.root_account.feature_enabled?(:account_level_mastery_scales),
-            ASSIGNMENT_ID: @assignment.id,
-            COURSE_ID: @context.id,
             PERMISSIONS: permissions,
-            ai_rubrics_enabled: Rubric.ai_rubrics_enabled?(@context),
-            assigned_rubric:,
-            rubric_association:,
-            rubric_self_assessment_ff_enabled: Rubric.rubric_self_assessment_enabled?(@context),
-            rubric_self_assessment_enabled: @assignment.rubric_self_assessment_enabled?,
-            can_update_rubric_self_assessment: @assignment.can_update_rubric_self_assessment?,
           }
           js_env(hash)
+          enhanced_rubrics_assignments_js_env(@assignment) if Rubric.enhanced_rubrics_assignments_enabled?(@context)
           tag_type = params[:module_item_id].present? ? :modules : :assignments
           return content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type)
         end
@@ -506,16 +486,11 @@ class AssignmentsController < ApplicationController
           EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
           USER_ASSET_STRING: @current_user&.asset_string,
           OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
-          assigned_rubric:,
-          rubric_association:,
-          ai_rubrics_enabled: Rubric.ai_rubrics_enabled?(@context),
-          rubric_self_assessment_ff_enabled: Rubric.rubric_self_assessment_enabled?(@context),
-          rubric_self_assessment_enabled: @assignment.rubric_self_assessment_enabled?,
-          can_update_rubric_self_assessment: @assignment.can_update_rubric_self_assessment?,
         }
 
         append_default_due_time_js_env(@context, hash)
         js_env(hash)
+        enhanced_rubrics_assignments_js_env(@assignment) if Rubric.enhanced_rubrics_assignments_enabled?(@context)
 
         set_master_course_js_env_data(@assignment, @context)
         conditional_release_js_env(@assignment, includes: :rule)
@@ -975,7 +950,7 @@ class AssignmentsController < ApplicationController
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
       hash[:NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED] = Account.site_admin.feature_enabled?(:anonymous_grading_with_new_quizzes)
-      hash[:ASSET_PROCESSORS] = Lti::AssetProcessor.processors_info_for_assignment_edit_page(assignment_id: @assignment.id)
+      hash[:ASSET_PROCESSORS] = Lti::AssetProcessor.where(assignment_id: @assignment.id).info_for_display
       hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(
         :submission_type_selection,
         @context,

@@ -40,12 +40,10 @@ import {View} from '@instructure/ui-view'
 import UnpublishedModule from '../UnpublishedModule'
 import UnavailablePeerReview from '../UnavailablePeerReview'
 import VisualOnFocusMessage from './VisualOnFocusMessage'
-import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Flex} from '@instructure/ui-flex'
 import {arrayOf, func, bool} from 'prop-types'
-import {Link} from '@instructure/ui-link'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {LtiToolIframe} from './LtiToolIframe'
 
 const I18n = createI18nScope('assignments_2_student_content')
 
@@ -72,8 +70,12 @@ function EnrollmentConcludedNotice({hasActiveEnrollment}) {
     <View as="div" textAlign="center" margin="auto" padding="small">
       <Text fontStyle="italic" size="large">
         {hasActiveEnrollment
-          ? I18n.t('You are unable to submit to this assignment as your enrollment in this section has been concluded.')
-          : I18n.t('You are unable to submit to this assignment as your enrollment in this course has been concluded.')}
+          ? I18n.t(
+              'You are unable to submit to this assignment as your enrollment in this section has been concluded.',
+            )
+          : I18n.t(
+              'You are unable to submit to this assignment as your enrollment in this course has been concluded.',
+            )}
       </Text>
     </View>
   )
@@ -128,43 +130,6 @@ function renderAttemptsAndAvailability(assignment) {
         </View>
       )}
     </StudentViewContext.Consumer>
-  )
-}
-
-function renderLTIToolIframe(assignment, submission) {
-  const showTool = ENV.LTI_TOOL === 'true'
-  const showSubmissionDetailsLink =
-    submission.state === 'graded' && assignment.submissionTypes?.includes('external_tool')
-
-  // render nothing new if neither is true
-  if (!showTool && !showSubmissionDetailsLink) {
-    return null
-  }
-
-  const launchURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/tool_launch`
-  const submissionDetailsURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/submissions/${ENV.current_user_id}`
-
-  return (
-    <>
-      {showSubmissionDetailsLink && (
-        <View margin="0 0 small 0" as="div">
-          <Link data-testid="view-submission-link" href={submissionDetailsURL}>
-            {I18n.t('View Submission')}
-          </Link>
-        </View>
-      )}
-      {showTool && (
-        <ToolLaunchIframe
-          allow={iframeAllowances()}
-          src={launchURL}
-          data-testid="lti-external-tool"
-          title={I18n.t('Tool content')}
-          allowFullScreen="true"
-          webkitallowfullscreen="true"
-          mozallowfullscreen="true"
-        />
-      )}
-    </>
   )
 }
 
@@ -255,8 +220,10 @@ function renderContentBaseOnAvailability(
         ) : (
           <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
         )}
-        {renderLTIToolIframe(assignment, submission)}
-        {(ENV.enrollment_state === 'completed' || !ENV.can_submit_assignment_from_section) && <EnrollmentConcludedNotice hasActiveEnrollment={ENV.enrollment_state === 'active'} />}
+        <LtiToolIframe assignment={assignment} submission={submission} />
+        {(ENV.enrollment_state === 'completed' || !ENV.can_submit_assignment_from_section) && (
+          <EnrollmentConcludedNotice hasActiveEnrollment={ENV.enrollment_state === 'active'} />
+        )}
       </>
     )
   }

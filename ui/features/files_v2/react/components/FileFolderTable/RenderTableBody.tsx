@@ -38,7 +38,7 @@ const renderTableBody = (
   usageRightsRequiredForContext: boolean,
   setModalOrTrayOptions: (modalOrTray: ModalOrTrayOptions | null) => () => void,
 ) => {
-  return rows.map(row => {
+  return rows.map((row, index) => {
     const isSelected = selectedRows.has(getUniqueId(row))
     const rowHead = [
       <Table.RowHeader key="select">
@@ -65,6 +65,7 @@ const renderTableBody = (
             isSelected: isSelected,
             toggleSelect: () => toggleRowSelection(getUniqueId(row)),
             setModalOrTrayOptions,
+            rowIndex: index,
           })}
         </Table.Cell>
       )),

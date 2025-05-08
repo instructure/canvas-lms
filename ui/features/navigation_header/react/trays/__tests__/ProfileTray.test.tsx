@@ -90,4 +90,36 @@ describe('ProfileTray', () => {
     const elt = container.firstChild.querySelector('a[href="/shared"]')
     domGetByText(elt, '12 unread.')
   })
+
+  it('renders the high contrast toggle', () => {
+    const {getByTestId} = render(<ProfileTray />)
+    const toggle = getByTestId('high-contrast-toggle')
+    expect(toggle).toBeInTheDocument()
+  })
+
+  describe('use dyslexic friendly font toggle', () => {
+    describe('when the use_dyslexic_font feature is shadowed', () => {
+      beforeEach(() => {
+        delete window.ENV.use_dyslexic_font
+      })
+
+      it('does not render the dyslexic font toggle', () => {
+        const {queryByTestId} = render(<ProfileTray />)
+        const toggle = queryByTestId('dyslexic-font-toggle')
+        expect(toggle).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when the use_dyslexic_font feature is not shadowed', () => {
+      beforeEach(() => {
+        window.ENV.use_dyslexic_font = false
+      })
+
+      it('renders the dyslexic font toggle', () => {
+        const {getByTestId} = render(<ProfileTray />)
+        const toggle = getByTestId('dyslexic-font-toggle')
+        expect(toggle).toBeInTheDocument()
+      })
+    })
+  })
 })

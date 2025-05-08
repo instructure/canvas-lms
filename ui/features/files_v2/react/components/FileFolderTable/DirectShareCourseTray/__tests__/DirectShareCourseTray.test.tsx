@@ -99,7 +99,7 @@ describe('DirectShareCourseTray', () => {
       path: `/api/v1/courses/1/content_migrations`,
       body: {
         migration_type: 'course_copy_importer',
-        select: {attachments: ['178']},
+        select: {attachments: [178]},
         settings: {
           source_course_id: '1',
           insert_into_module_id: null,
@@ -174,7 +174,7 @@ describe('DirectShareCourseTray', () => {
         path: `/api/v1/courses/1/content_migrations`,
         body: {
           migration_type: 'course_copy_importer',
-          select: {attachments: ['178']},
+          select: {attachments: [178]},
           settings: {
             source_course_id: '1',
             insert_into_module_id: null,

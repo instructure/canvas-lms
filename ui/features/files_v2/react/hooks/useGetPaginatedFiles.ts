@@ -17,7 +17,7 @@
  */
 
 import {useRef, useState} from 'react'
-import {useQuery} from '@canvas/query'
+import {keepPreviousData, useQuery} from '@tanstack/react-query'
 import {File, Folder} from '../../interfaces/File'
 import {generateTableUrl, parseBookmarkFromUrl, parseLinkHeader} from '../../utils/apiUtils'
 import {useSearchTerm} from './useSearchTerm'
@@ -59,7 +59,7 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
     searchTerm,
     contextId: folder.context_id,
     contextType: folder.context_type.toLowerCase(),
-    folderId: folder.id,
+    folderId: folder.id.toString(),
     sortBy: sort.by,
     sortDirection: sort.direction,
     pageQueryParam: bookmarkByPage[currentPage],
@@ -67,7 +67,7 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
 
   const query = useQuery({
     staleTime: 0,
-    keepPreviousData: false,
+    placeholderData: keepPreviousData,
     queryKey: [
       'files',
       {url, folderId: folder.id, searchTerm, sort, bookmarkByPage, currentPage},

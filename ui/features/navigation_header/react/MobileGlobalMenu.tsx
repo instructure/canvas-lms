@@ -48,11 +48,12 @@ import GroupsList from './lists/GroupsList'
 import AccountsList from './lists/AccountsList'
 import ProfileTabsList from './lists/ProfileTabsList'
 import HistoryList from './lists/HistoryList'
-import {useQuery} from '@canvas/query'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {filterAndProcessTools, getExternalApps, type ProcessedTool} from './utils'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import {Img} from '@instructure/ui-img'
+import {useQuery} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
 
 const I18n = createI18nScope('MobileGlobalMenu')
 
@@ -79,6 +80,7 @@ export default function MobileGlobalMenu(props: Props) {
     queryFn: getExternalApps,
     staleTime: 2 * 60 * 1000, // two minutes,
     enabled: true,
+    persister: sessionStoragePersister,
   })
   const processedTools = useMemo(
     () => filterAndProcessTools(externalToolsData || []),
@@ -90,6 +92,7 @@ export default function MobileGlobalMenu(props: Props) {
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
+    persister: sessionStoragePersister,
   })
 
   return (

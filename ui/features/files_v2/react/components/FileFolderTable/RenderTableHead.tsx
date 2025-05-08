@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {Ref} from 'react'
 import {Table} from '@instructure/ui-table'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
@@ -51,6 +51,7 @@ const renderTableHead = (
   columnHeaders: ColumnHeader[],
   sort: Sort,
   handleSortChange: (column: string) => void,
+  selectAllRef?: Ref<Checkbox>,
 ) => {
   return [
     <Table.ColHeader
@@ -68,6 +69,7 @@ const renderTableHead = (
         indeterminate={someRowsSelected}
         onChange={toggleSelectAll}
         data-testid="select-all-checkbox"
+        ref={selectAllRef}
       />
     </Table.ColHeader>,
     ...columnHeaders.map(columnHeader => (

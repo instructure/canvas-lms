@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React, {useEffect, useCallback, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
 import {Flex} from '@instructure/ui-flex'
@@ -27,25 +27,25 @@ import {formatTimeAgoDate, formatTimeAgoTitle} from '@canvas/enhanced-user-conte
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
 import {useInfiniteQuery} from '@tanstack/react-query'
+import type {QueryFunctionContext} from '@tanstack/react-query'
 
 const I18n = createI18nScope('new_nav')
+
+const fetchHistory = async (context: QueryFunctionContext<string[], string>) => {
+  const {pageParam = '/api/v1/users/self/history'} = context
+  const {json, link} = await doFetchApi({path: pageParam})
+  const nextPage = link?.next ? link.next.url : null
+  return {json, nextPage}
+}
 
 export default function HistoryList() {
   const [lastItem, setLastItem] = useState<Element | null>(null)
 
-  const fetchHistory = useCallback(async ({pageParam = '/api/v1/users/self/history'}) => {
-    const {json, link} = await doFetchApi({path: pageParam})
-    const nextPage = link?.next ? link.next.url : null
-    return {json, nextPage}
-  }, [])
-
   const {data, fetchNextPage, isLoading, hasNextPage, error} = useInfiniteQuery({
     queryKey: ['history'],
     queryFn: fetchHistory,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
-    getNextPageParam: lastPage => lastPage.nextPage,
+    getNextPageParam: lastPage => lastPage.nextPage || undefined,
+    initialPageParam: '/api/v1/users/self/history',
   })
 
   // @ts-expect-error

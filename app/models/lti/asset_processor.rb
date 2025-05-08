@@ -62,20 +62,30 @@ class Lti::AssetProcessor < ApplicationRecord
     )
   end
 
-  PROCESSORS_INFO_FOR_ASSIGNMENT_EDIT_PAGE_FIELDS = {
-    id: "lti_asset_processors.id",
-    title: "lti_asset_processors.title",
-    text: "lti_asset_processors.text",
-    icon: "lti_asset_processors.icon",
-    context_external_tool_name: "context_external_tools.name",
-    context_external_tool_id: "context_external_tools.id",
-  }.freeze
+  def icon_url
+    if icon.is_a?(Hash) && icon["url"].is_a?(String)
+      icon["url"].presence
+    end
+  end
 
-  # should match with ExistingAttachedAssetProcessor in UI
-  def self.processors_info_for_assignment_edit_page(assignment_id:)
-    scope = active.where(assignment_id:).joins(:context_external_tool)
-    scope.pluck(PROCESSORS_INFO_FOR_ASSIGNMENT_EDIT_PAGE_FIELDS.values).map do |row|
-      PROCESSORS_INFO_FOR_ASSIGNMENT_EDIT_PAGE_FIELDS.keys.zip(row).to_h.compact
+  # Result structure should match with ExistingAttachedAssetProcessor in UI
+  def self.info_for_display
+    raise ArgumentError, "Must be used with a scope" unless current_scope
+
+    active.preload(:context_external_tool).map do |ap|
+      {
+        id: ap.id,
+        title: ap.title,
+        text: ap.text,
+        tool_id: ap.context_external_tool_id,
+        tool_name: ap.context_external_tool.name,
+        tool_placement_label: ap.context_external_tool.label_for(:ActivityAssetProcessor, I18n.locale),
+        icon_or_tool_icon_url:
+          ap.icon_url ||
+            ap.context_external_tool.extension_setting(:ActivityAssetProcessor, :icon_url),
+        iframe: ap.iframe,
+        window: ap.window,
+      }.compact
     end
   end
 end

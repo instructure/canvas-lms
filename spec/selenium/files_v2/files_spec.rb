@@ -89,6 +89,13 @@ describe "files index page" do
           expect(content).to include_text("file25.pdf")
         end
 
+        it "Checks just one file" do
+          get "/courses/#{@course.id}/files"
+          # instui table checkboxes have weird DOM structure
+          force_click_native(row_checkboxes_selector)
+          expect(checked_boxes.count).to eq 1
+        end
+
         describe "sorting" do
           it "Can sort by size" do
             get "/courses/#{@course.id}/files"
@@ -142,6 +149,37 @@ describe "files index page" do
       end
 
       context "from cog icon" do
+        a_txt_file_name = "a_file.txt"
+        b_txt_file_name = "b_file.txt"
+        before do
+          add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
+                   @course,
+                   a_txt_file_name)
+          add_file(fixture_file_upload(b_txt_file_name, "text/plain"),
+                   @course,
+                   b_txt_file_name)
+          get "/courses/#{@course.id}/files"
+        end
+
+        it "edits file name", priority: "1" do
+          expect(a_txt_file_name).to be_present
+          file_rename_to = "Example_edited.pdf"
+          edit_name_from_kebab_menu(1, file_rename_to)
+          expect(file_rename_to).to be_present
+          expect(content).not_to contain_link(a_txt_file_name)
+          action_button = get_item_files_table(1, 7).find_element(:css, "button")
+          check_element_has_focus(action_button)
+        end
+
+        it "deletes file", priority: "1" do
+          delete_file_from(1, :kebab_menu)
+          expect(content).not_to contain_link(a_txt_file_name)
+          action_button = get_item_files_table(1, 7).find_element(:css, "button")
+          check_element_has_focus(action_button)
+        end
+      end
+
+      context "from cloud icon" do
         before do
           add_file(fixture_file_upload(base_file_name, "application/pdf"),
                    @course,
@@ -149,17 +187,57 @@ describe "files index page" do
           get "/courses/#{@course.id}/files"
         end
 
-        it "edits file name", priority: "1" do
-          expect(base_file_name).to be_present
-          file_rename_to = "Example_edited.pdf"
-          edit_name_from_kebab_menu(1, file_rename_to)
-          expect(file_rename_to).to be_present
-          expect(content).not_to contain_link(base_file_name)
+        it "unpublishes and publish a file", priority: "1" do
+          published_status_button.click
+          edit_item_permissions(:unpublished)
+          expect(unpublished_status_button).to be_present
+          unpublished_status_button.click
+          edit_item_permissions(:published)
+          expect(published_status_button).to be_present
         end
 
-        it "deletes file", priority: "1" do
-          delete_file_from(1, :kebab_menu)
-          expect(content).not_to contain_link(base_file_name)
+        it "makes file available to student with link", priority: "1" do
+          published_status_button.click
+          edit_item_permissions(:available_with_link)
+          expect(link_only_status_button).to be_present
+        end
+      end
+
+      context "from toolbar menu" do
+        a_txt_file_name = "a_file.txt"
+        b_txt_file_name = "b_file.txt"
+        before do
+          add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
+                   @course,
+                   a_txt_file_name)
+          add_file(fixture_file_upload(b_txt_file_name, "text/plain"),
+                   @course,
+                   b_txt_file_name)
+          get "/courses/#{@course.id}/files"
+        end
+
+        it "unpublishes and publish a file", priority: "1" do
+          select_item_to_edit_from_kebab_menu(1)
+          toolbox_menu_button("edit-permissions-button").click
+          edit_item_permissions(:unpublished)
+          expect(unpublished_status_button).to be_present
+          toolbox_menu_button("more-button").click
+          toolbox_menu_button("edit-permissions-button").click
+          edit_item_permissions(:published)
+          expect(published_status_button).to be_present
+        end
+
+        it "makes file available to student with link from toolbar", priority: "1" do
+          select_item_to_edit_from_kebab_menu(1)
+          toolbox_menu_button("edit-permissions-button").click
+          edit_item_permissions(:available_with_link)
+          expect(link_only_status_button).to be_present
+        end
+
+        it "deletes file from toolbar", priority: "1" do
+          delete_file_from(1, :toolbar_menu)
+          expect(content).not_to contain_link(a_txt_file_name)
+          check_element_has_focus(select_all_checkbox)
         end
       end
 
@@ -263,12 +341,104 @@ describe "files index page" do
           user_session @teacher
         end
 
+        context "course files" do
+          it "sets usage rights on a file via the modal by clicking the indicator", priority: "1" do
+            get "/courses/#{@course.id}/files"
+            file_usage_rights_cloud_icon.click
+            set_usage_rights_in_modal(:creative_commons)
+
+            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
+            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
+            # a11y: focus should go back to the element that was clicked.
+            # check_element_has_focus(file_usage_rights_cloud_icon)
+            verify_usage_rights_ui_updates(:creative_commons)
+          end
+
+          it "sets usage rights on a file via the cog menu", priority: "1" do
+            get "/courses/#{@course.id}/files"
+            action_menu_button.click
+            action_menu_item_by_name("Manage Usage Rights").click
+            set_usage_rights_in_modal(:used_by_permission)
+
+            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
+            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
+            # a11y: focus should go back to the element that was clicked.
+            # check_element_has_focus(action_menu_button)
+            verify_usage_rights_ui_updates(:used_by_permission)
+          end
+
+          it "sets usage rights on a file via the toolbar", priority: "1" do
+            get "/courses/#{@course.id}/files"
+            select_item_to_edit_from_kebab_menu(1)
+            toolbox_menu_button("manage-usage-rights-button").click
+            set_usage_rights_in_modal(:public_domain)
+
+            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
+            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
+            # a11y: focus should go back to the element that was clicked.
+            # check_element_has_focus(toolbox_menu_button("more-button"))
+            verify_usage_rights_ui_updates(:public_domain)
+          end
+
+          it "sets usage rights on multiple files via the toolbar", priority: "1" do
+            add_file(fixture_file_upload("b_file.txt", "text/plan"),
+                     @course,
+                     "b_file.txt")
+            get "/courses/#{@course.id}/files"
+            get_row_header_files_table(1).click
+            select_item_to_edit_from_kebab_menu(2)
+            toolbox_menu_button("manage-usage-rights-button").click
+            set_usage_rights_in_modal(:fair_use)
+
+            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
+            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
+            # a11y: focus should go back to the element that was clicked.
+            # check_element_has_focus(toolbox_menu_button("more-button"))
+            verify_usage_rights_ui_updates(:fair_use)
+          end
+
+          it "sets usage rights on a file inside a folder via the toolbar", priority: "1" do
+            folder_model name: "new folder"
+            get "/courses/#{@course.id}/files"
+            move_file_from(2, :toolbar_menu)
+            wait_for_ajaximations
+            action_menu_button.click
+            action_menu_item_by_name("Manage Usage Rights").click
+            expect(usage_rights_manage_modal).to include_text "new folder"
+            set_usage_rights_in_modal(:creative_commons)
+
+            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
+            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
+            # a11y: focus should go back to the element that was clicked.
+            # check_element_has_focus(toolbox_menu_button("more-button"))
+            get_item_files_table(1, 1).click
+            verify_usage_rights_ui_updates(:creative_commons)
+          end
+
+          it "does not show the creative commons selection if creative commons isn't selected", priority: "1" do
+            get "/courses/#{@course.id}/files"
+            file_usage_rights_cloud_icon.click
+            file_usage_rights_justification.click
+            usage_rights_selector_fair_use.click
+            expect(usage_rights_manage_modal).not_to contain_css(usage_rights_license_selector)
+          end
+
+          it "sets focus to the close button when opening the file usage rights dialog", priority: "1" do
+            get "/courses/#{@course.id}/files"
+            file_usage_rights_cloud_icon.click
+            wait_for_ajaximations
+            element = driver.switch_to.active_element
+            should_focus = permissions_dialog_close_button
+            expect(element).to eq(should_focus)
+          end
+        end
+
         context "user files" do
           it "updates course files from user files page", priority: "1" do
             get "/files/folder/courses_#{@course.id}/"
             get_item_files_table(1, 6).click
-            set_usage_rights_in_modal
-            verify_usage_rights_ui_updates
+            set_usage_rights_in_modal(:own_copyright)
+            verify_usage_rights_ui_updates(:own_copyright)
           end
         end
       end
@@ -305,7 +475,7 @@ describe "files index page" do
         file_to_move = "a_file.txt"
         txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
         before do
-          Folder.create!(name: folder_name, context: @course)
+          @base_folder = Folder.create!(name: folder_name, context: @course)
           txt_files.map do |text_file|
             add_file(fixture_file_upload(text_file.to_s, "text/plain"), @course, text_file)
           end
@@ -315,6 +485,8 @@ describe "files index page" do
         it "moves a file using cog icon", priority: "1" do
           move_file_from(2, :kebab_menu)
           expect(alert).to include_text("#{file_to_move} successfully moved to #{folder_name}")
+          action_button = get_item_files_table(2, 7).find_element(:css, "button")
+          check_element_has_focus(action_button)
           get "/courses/#{@course.id}/files/folder/base%20folder"
           expect(get_item_content_files_table(1, 1)).to eq "Text File\n#{file_to_move}"
         end
@@ -330,10 +502,33 @@ describe "files index page" do
           files_to_move = ["a_file.txt", "b_file.txt", "c_file.txt"]
           move_files([2, 3, 4])
           files_to_move.map { |file| expect(alert).to include_text("#{file} successfully moved to #{folder_name}") }
+          check_element_has_focus(select_all_checkbox)
           get "/courses/#{@course.id}/files/folder/base%20folder"
           files_to_move.each_with_index do |file, index|
             expect(get_item_content_files_table(index + 1, 1)).to eq "Text File\n#{file}"
           end
+        end
+
+        it "catches a collision error", priority: "1" do
+          add_file(fixture_file_upload("a_file.txt", "text/plain"),
+                   @course,
+                   "a_file.txt",
+                   @base_folder)
+          move_file_from(2, :kebab_menu)
+          expect(rename_change_button).to be_displayed
+        end
+
+        it "catches a collision error for multiple files", priority: "1" do
+          add_file(fixture_file_upload("a_file.txt", "text/plain"),
+                   @course,
+                   "a_file.txt",
+                   @base_folder)
+          add_file(fixture_file_upload("b_file.txt", "text/plain"),
+                   @course,
+                   "b_file.txt",
+                   @base_folder)
+          move_files([2, 3, 4])
+          expect(rename_change_button).to be_displayed
         end
 
         context "Search Results" do
@@ -364,6 +559,14 @@ describe "files index page" do
 
         it "validates that file is published by default", priority: "1" do
           expect(item_has_permissions_icon?(1, 6, "published-button")).to be true
+        end
+
+        it "sets focus to the close button when opening the permission edit dialog", priority: "1" do
+          published_status_button.click
+          wait_for_ajaximations
+          element = driver.switch_to.active_element
+          should_focus = permissions_dialog_close_button
+          expect(element).to eq(should_focus)
         end
       end
 

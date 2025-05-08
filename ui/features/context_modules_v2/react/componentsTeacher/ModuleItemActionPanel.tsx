@@ -44,10 +44,10 @@ import ModuleItemActionMenu from './ModuleItemActionMenu'
 import {MasteryPathsData, ModuleItemContent, ModuleAction} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import {mapContentSelection} from '../utils/utils'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import BlueprintLockIcon from './BlueprintLockIcon'
-
-const ENV = window.ENV as GlobalEnv
+import EditItemModal from './EditItemModal'
+import PublishCloud from '@canvas/files/react/components/PublishCloud'
+import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -84,6 +84,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDirectShareOpen, setIsDirectShareOpen] = useState(false)
+  const [isEditItemOpen, setIsEditItemOpen] = useState(false)
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
 
   const {courseId, isMasterCourse, isChildCourse} = useContextModule()
@@ -117,8 +118,8 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }
 
   const handleEditRef = useCallback(() => {
-    handleEdit(itemId, courseId, setIsMenuOpen)
-  }, [itemId, courseId, setIsMenuOpen])
+    handleEdit(setIsEditItemOpen)
+  }, [setIsEditItemOpen])
 
   const handleSpeedGraderRef = useCallback(() => {
     handleSpeedGrader(content, courseId, setIsMenuOpen)
@@ -186,6 +187,52 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
     handlePublishToggle(moduleId, itemId, content, canBeUnpublished, queryClient, courseId)
   }, [moduleId, itemId, content, canBeUnpublished, courseId])
 
+  const renderFilePublishButton = () => {
+    const file = new ModuleFile({
+      type: 'file',
+      id: content?._id,
+      locked: content?.locked,
+      hidden: content?.fileState === 'hidden',
+      unlock_at: content?.unlockAt,
+      lock_at: content?.lockAt,
+      display_name: content?.title,
+      thumbnail_url: content?.thumbnailUrl,
+      module_item_id: parseInt(itemId),
+      published: content?.published,
+    })
+
+    const props = {
+      userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS?.manage_files_edit,
+      usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS?.usage_rights_required,
+      fileName: content?.displayName,
+    }
+
+    return <PublishCloud {...props} model={file} disabled={false} />
+  }
+
+  const renderItemPublishButton = () => {
+    return (
+      <IconButton
+        screenReaderLabel={published ? 'Published' : 'Unpublished'}
+        renderIcon={published ? IconPublishSolid : IconUnpublishedLine}
+        withBackground={false}
+        withBorder={false}
+        color={published ? 'success' : 'secondary'}
+        size="small"
+        interaction={canBeUnpublished ? 'enabled' : 'disabled'}
+        onClick={publishIconOnClickRef}
+      />
+    )
+  }
+
+  const renderPublishButton = (contentType?: string) => {
+    if (contentType === 'File') {
+      return renderFilePublishButton()
+    }
+
+    return renderItemPublishButton()
+  }
+
   return (
     <>
       <Flex alignItems="center" gap="small" wrap="no-wrap" justifyItems="end">
@@ -200,20 +247,9 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
           />
         )}
         {/* Publish Icon */}
-        <Flex.Item>
-          <IconButton
-            screenReaderLabel={published ? 'Published' : 'Unpublished'}
-            renderIcon={published ? IconPublishSolid : IconUnpublishedLine}
-            withBackground={false}
-            withBorder={false}
-            color={published ? 'success' : 'secondary'}
-            size="small"
-            interaction={canBeUnpublished ? 'enabled' : 'disabled'}
-            onClick={publishIconOnClickRef}
-          />
-        </Flex.Item>
+        <Flex.Item>{renderPublishButton(content?.type)}</Flex.Item>
         {/* Kebab Menu */}
-        <Flex.Item>
+        <Flex.Item data-testid={`module-item-action-menu_${itemId}`}>
           <ModuleItemActionMenu
             itemType={content?.type || ''}
             canDuplicate={content?.canDuplicate || false}
@@ -249,7 +285,10 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
             open={isDirectShareOpen}
             sourceCourseId={courseId}
             courseId={courseId}
-            contentShare={{content_type: content?.type?.toLowerCase() || '', content_id: itemId}}
+            contentShare={{
+              content_type: content?.type?.toLowerCase() || '',
+              content_id: content?._id,
+            }}
             onDismiss={() => {
               setIsDirectShareOpen(false)
             }}
@@ -263,6 +302,17 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
               setIsDirectShareCourseOpen(false)
             }}
           />
+          {content && (
+            <EditItemModal
+              isOpen={isEditItemOpen}
+              onRequestClose={() => setIsEditItemOpen(false)}
+              itemName={content?.title}
+              itemIndent={indent}
+              itemId={itemId}
+              courseId={courseId}
+              moduleId={moduleId}
+            />
+          )}
         </>
       )}
     </>

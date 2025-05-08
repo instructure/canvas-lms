@@ -174,6 +174,7 @@ export default class ExternalToolDialog extends React.Component<
   }
 
   handlePostedMessage = (ev: Pick<MessageEvent, 'origin' | 'data'>) => {
+    // messages from Canvas in the tool launch frame
     if (ev.origin === this.resourceSelectionOrigin) {
       const data = ev.data as Record<string, unknown> | null | undefined
 
@@ -184,6 +185,13 @@ export default class ExternalToolDialog extends React.Component<
         // ui/shared/external-tools/externalContentEvents.ts
         // where events are also described/used
         this.handleExternalContentReady(ev.data)
+      }
+    } else {
+      // messages from the tool
+      const data = ev.data as Record<string, unknown> | null | undefined
+
+      if (data?.subject === 'lti.close') {
+        this.handleClose()
       }
     }
   }

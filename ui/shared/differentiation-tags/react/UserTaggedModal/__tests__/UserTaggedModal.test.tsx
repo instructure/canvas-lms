@@ -48,7 +48,13 @@ describe('UserTaggedModal', () => {
       isLoading: false,
       error: null,
     }
-    const defaultMutationMock = { mutate: mutateMock, isLoading: false, isSuccess: true, isError: false, error: null}
+    const defaultMutationMock = {
+      mutate: mutateMock,
+      isLoading: false,
+      isSuccess: true,
+      isError: false,
+      error: null,
+    }
     mockuseUserTags.mockReturnValue({...defaultMock, ...mockReturn})
     mockuseDeleteTagMembership.mockReturnValue({...defaultMutationMock, ...mutationMockReturn})
     render(<UserTaggedModal {...defaultProps} {...props} />)
@@ -66,11 +72,6 @@ describe('UserTaggedModal', () => {
   it('does not show the modal when isOpen is false', () => {
     renderComponent({}, {isOpen: false})
     expect(screen.queryByTestId('user-tag-modal')).not.toBeInTheDocument()
-  })
-
-  it('shows loading spinner when isLoading is true', () => {
-    renderComponent({isLoading: true})
-    expect(screen.getByTitle('Loading...')).toBeInTheDocument()
   })
 
   it('shows error message when there is an error', () => {
@@ -124,17 +125,16 @@ describe('UserTaggedModal', () => {
     ).toBeInTheDocument()
   })
 
-  it('calls mutate when removing a tag from the user', async () =>{
+  it('calls mutate when removing a tag from the user', async () => {
     const mockData = [
       {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
       {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
     ]
-    renderComponent({data:mockData})
+    renderComponent({data: mockData})
     expect(screen.getByText('Reading Groups | Macroeconomics')).toBeInTheDocument()
     expect(screen.getByText('Reading Groups | Microeconomics')).toBeInTheDocument()
     const tagBtn = screen.queryByTestId('user-tag-1')
-    if(tagBtn)
-        await userEvent.click(tagBtn)
+    if (tagBtn) await userEvent.click(tagBtn)
     expect(
       screen.getByText(/Removing the tag from a student preserves past assignments/i),
     ).toBeInTheDocument()
@@ -144,19 +144,18 @@ describe('UserTaggedModal', () => {
     expect(screen.getByText(/Tag removed successfully/)).toBeInTheDocument()
   })
 
-  it('shows an Alert with error description when mutation fails', async () =>{
+  it('shows an Alert with error description when mutation fails', async () => {
     const mockData = [
       {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
       {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
     ]
     const error = new Error('Forbidden, user does not have permission')
 
-    renderComponent({data:mockData},{},{isSuccess: false, isError: true, error: error})
+    renderComponent({data: mockData}, {}, {isSuccess: false, isError: true, error: error})
     expect(screen.getByText('Reading Groups | Macroeconomics')).toBeInTheDocument()
     expect(screen.getByText('Reading Groups | Microeconomics')).toBeInTheDocument()
     const tagBtn = screen.queryByTestId('user-tag-1')
-    if(tagBtn)
-        await userEvent.click(tagBtn)
+    if (tagBtn) await userEvent.click(tagBtn)
     expect(
       screen.getByText(/Removing the tag from a student preserves past assignments/i),
     ).toBeInTheDocument()
@@ -166,9 +165,8 @@ describe('UserTaggedModal', () => {
     expect(screen.getByText(/Error: Forbidden, user does not have permission/)).toBeInTheDocument()
   })
 
-  it('it sends a message to RoosterView to remove user tag icon when all tags are removed', async () =>{
-    renderComponent({data:[]})
-    expect(MessageBus.trigger).toHaveBeenCalledWith('removeUserTagIcon', { userId: 2 });
-    
+  it('it sends a message to RoosterView to remove user tag icon when all tags are removed', async () => {
+    renderComponent({data: []})
+    expect(MessageBus.trigger).toHaveBeenCalledWith('removeUserTagIcon', {userId: 2})
   })
 })

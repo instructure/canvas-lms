@@ -215,22 +215,28 @@ describe ContextModulesController do
             expect(assigns(:modules).first).to eql(context_module)
           end
 
-          it "has the @menu_tools variable" do
-            finder_double = double("Lti::ContextToolFinder")
-            tool_double_1 = double("Tool 1", has_placement?: true, cache_key: "key")
-            tool_double_2 = double("Tool 2", has_placement?: false, cache_key: "key")
+          context "when create_external_apps_side_tray_overrides FF is disabled" do
+            before(:once) do
+              Account.site_admin.disable_feature!(:create_external_apps_side_tray_overrides)
+            end
 
-            allow_any_instance_of(ContextExternalToolsHelper)
-              .to receive(:external_tool_menu_item_tag).and_return("mocked_value")
-            allow(Lti::ContextToolFinder)
-              .to receive(:new)
-              .with(@course, placements: anything, current_user: anything)
-              .and_return(finder_double)
-            allow(finder_double).to receive(:all_tools_sorted_array).and_return([tool_double_1, tool_double_2])
+            it "has the @menu_tools variable" do
+              finder_double = double("Lti::ContextToolFinder")
+              tool_double_1 = double("Tool 1", has_placement?: true, cache_key: "key")
+              tool_double_2 = double("Tool 2", has_placement?: false, cache_key: "key")
 
-            subject
+              allow_any_instance_of(ContextExternalToolsHelper)
+                .to receive(:external_tool_menu_item_tag).and_return("mocked_value")
+              allow(Lti::ContextToolFinder)
+                .to receive(:new)
+                .with(@course, placements: anything, current_user: anything)
+                .and_return(finder_double)
+              allow(finder_double).to receive(:all_tools_sorted_array).and_return([tool_double_1, tool_double_2])
 
-            expect(assigns(:menu_tools).values).to all(eq([tool_double_1]))
+              subject
+
+              expect(assigns(:menu_tools).values).to all(eq([tool_double_1]))
+            end
           end
 
           describe "rights load" do
@@ -485,7 +491,7 @@ describe ContextModulesController do
         end
 
         it "should render unfiltered result" do
-          expect(subject.keys).to match_array([@context_module1_item1.id.to_s, @context_module2_item1.id.to_s])
+          expect(subject).to match_array(expected_full_list)
         end
       end
 
@@ -496,7 +502,7 @@ describe ContextModulesController do
 
         context "when provided module id is exist" do
           it "should render filtered result" do
-            expect(subject.keys).to match_array([@context_module1_item1.id.to_s])
+            expect(subject).to match_array(expected_queried_element)
           end
         end
 
@@ -527,7 +533,7 @@ describe ContextModulesController do
         it "should render unfiltered result" do
           subject
 
-          expect(subject.keys).to match_array([@context_module1_item1.id.to_s, @context_module2_item1.id.to_s])
+          expect(subject).to match_array(expected_full_list)
         end
       end
 
@@ -539,13 +545,15 @@ describe ContextModulesController do
         it "should render unfiltered result" do
           subject
 
-          expect(subject.keys).to match_array([@context_module1_item1.id.to_s, @context_module2_item1.id.to_s])
+          expect(subject).to match_array(expected_full_list)
         end
       end
     end
   end
 
   describe "filter for module id" do
+    let(:module_id) { @module1.id }
+
     before do
       course_with_teacher_logged_in(active_all: true)
       @assignment = @course.assignments.create!(title: "some assignment", points_possible: 12)
@@ -557,8 +565,9 @@ describe ContextModulesController do
 
     describe "GET assignment_info" do
       let(:action) { "content_tag_assignment_data" }
-      let(:module_id) { @module1.id }
-      let(:parsed_json) { json_parse(response.body) }
+      let(:parsed_json) { json_parse(response.body).keys }
+      let(:expected_full_list) { [@context_module1_item1.id.to_s, @context_module2_item1.id.to_s] }
+      let(:expected_queried_element) { [@context_module1_item1.id.to_s] }
 
       it_behaves_like "rendering when context_module_id is provided"
 
@@ -572,8 +581,9 @@ describe ContextModulesController do
       end
 
       let(:action) { "content_tag_master_course_data" }
-      let(:module_id) { @module1.id }
-      let(:parsed_json) { json_parse(response.body)["tag_restrictions"] }
+      let(:parsed_json) { json_parse(response.body)["tag_restrictions"].keys }
+      let(:expected_full_list) { [@context_module1_item1.id.to_s, @context_module2_item1.id.to_s] }
+      let(:expected_queried_element) { [@context_module1_item1.id.to_s] }
 
       it_behaves_like "rendering when context_module_id is provided"
 
@@ -582,8 +592,27 @@ describe ContextModulesController do
 
     describe "GET content_tag_estimated_duration_data" do
       let(:action) { "content_tag_estimated_duration_data" }
-      let(:module_id) { @module1.id }
-      let(:parsed_json) { json_parse(response.body).values.each_with_object({}) { |item, hash| hash.merge!(item) } }
+      let(:parsed_json) { json_parse(response.body).values.flat_map(&:keys) }
+      let(:expected_full_list) { [@context_module1_item1.id.to_s, @context_module2_item1.id.to_s] }
+      let(:expected_queried_element) { [@context_module1_item1.id.to_s] }
+
+      it_behaves_like "rendering when context_module_id is provided"
+
+      it_behaves_like "rendering when context_module_id is not provided"
+    end
+
+    describe "GET progressions" do
+      let(:action) { "progressions" }
+      let(:parsed_json) do
+        json_parse(response.body).flat_map { |hash| hash["context_module_progression"]["context_module_id"] }
+      end
+      let(:expected_full_list) { [@module1.id, @module2.id] }
+      let(:expected_queried_element) { [@module1.id] }
+
+      before do
+        @module1.evaluate_for(@teacher)
+        @module2.evaluate_for(@teacher)
+      end
 
       it_behaves_like "rendering when context_module_id is provided"
 

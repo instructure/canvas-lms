@@ -21,20 +21,20 @@ import {fetchFolders} from '../folders'
 
 jest.mock('@canvas/do-fetch-api-effect', () => {
   return jest.fn(() => ({
-    json: [{ id: '123', name: 'Test Folder' }],
-    link: { next: { page: '2' } },
+    json: [{id: '123', name: 'Test Folder'}],
+    link: {next: {page: '2'}},
   }))
 })
 
 describe('folders', () => {
   describe('fetchFolders', () => {
-    const folderId = '235';
-    const expectedFolderPerPage = '25';
-    const expectedPath = `/api/v1/folders/${folderId}/folders`;
-    const expectedHttpMethod = 'GET';
+    const folderId = '235'
+    const expectedFolderPerPage = '25'
+    const expectedPath = `/api/v1/folders/${folderId}/folders`
+    const expectedHttpMethod = 'GET'
 
     beforeEach(() => {
-      (doFetchApi as jest.Mock).mockClear()
+      ;(doFetchApi as jest.Mock).mockClear()
     })
 
     it('should call the doFetchApi with page 1 when no page param is provided', async () => {
@@ -42,7 +42,7 @@ describe('folders', () => {
       expect(doFetchApi).toHaveBeenCalledWith({
         path: expectedPath,
         method: expectedHttpMethod,
-        params: { per_page: expectedFolderPerPage, page: '1' },
+        params: {per_page: expectedFolderPerPage, page: '1'},
       })
     })
 
@@ -51,14 +51,14 @@ describe('folders', () => {
       expect(doFetchApi).toHaveBeenCalledWith({
         path: expectedPath,
         method: expectedHttpMethod,
-        params: { per_page: expectedFolderPerPage, page: '2' },
+        params: {per_page: expectedFolderPerPage, page: '2'},
       })
     })
 
     it('should return the transformed response from doFetchApi response', async () => {
       const result = await fetchFolders(folderId, null)
       expect(result).toEqual({
-        json: [{ id: '123', name: 'Test Folder' }],
+        json: [{id: '123', name: 'Test Folder'}],
         nextPage: '2',
       })
     })

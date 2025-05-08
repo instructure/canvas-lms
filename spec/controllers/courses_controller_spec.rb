@@ -53,7 +53,7 @@ describe CoursesController do
       expect(assigns[:past_enrollments]).not_to be_nil
       expect(assigns[:future_enrollments]).not_to be_nil
       expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be_nil
-      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_truthy
     end
 
     it "does not duplicate enrollments in variables" do
@@ -1364,6 +1364,16 @@ describe CoursesController do
 
       get "show", params: { id: @course.id }
       expect(response).to redirect_to("#{course_url(@course)}/modules")
+    end
+
+    it "does not redirect to modules page for horizon courses when invitation param is present" do
+      user_session(@teacher)
+      @course.account.enable_feature!(:horizon_course_setting)
+      @course.update!(horizon_course: true)
+
+      get "show", params: { id: @course.id, invitation: "some_invitation_code" }
+      expect(response).to be_successful
+      expect(response).not_to be_redirect
     end
 
     it "allows student view student to view unpublished courses" do
@@ -4268,6 +4278,32 @@ describe CoursesController do
       test_student.reload
       expect(test_student.learning_outcome_results.active.size).to be_zero
       expect(@outcome.assessed?).to be_falsey
+    end
+
+    it "removes auto grade results for the test student" do
+      user_session(@teacher)
+      post "student_view", params: { course_id: @course.id }
+      test_student = @course.student_view_student
+
+      assignment = @course.assignments.create!(workflow_state: "published")
+
+      submission = assignment.submissions.find_by(user: test_student) ||
+                   assignment.submissions.build(user: test_student)
+      submission.save! unless submission.persisted?
+
+      AutoGradeResult.create!(
+        submission:,
+        attempt: 1,
+        grade_data: { score: 4.0 },
+        grading_attempts: 1,
+        root_account_id: @course.account.root_account.id
+      )
+
+      expect(AutoGradeResult.where(submission_id: submission.id).count).to eq(1)
+
+      delete "reset_test_student", params: { course_id: @course.id }
+
+      expect(AutoGradeResult.where(submission_id: submission.id)).to be_empty
     end
   end
 

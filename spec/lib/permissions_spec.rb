@@ -19,6 +19,14 @@
 #
 
 describe Permissions, type: :module do
+  before :all do
+    @original_permission = Permissions.instance_variable_get(:@permissions)
+  end
+
+  after do
+    Permissions.instance_variable_set(:@permissions, @original_permission)
+  end
+
   before do
     Permissions.instance_variable_set(:@permissions, nil)
   end

@@ -18,7 +18,6 @@
 
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useQuery} from '@canvas/query'
 import {Heading} from '@instructure/ui-heading'
 import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
@@ -29,6 +28,8 @@ import React from 'react'
 import type {Course} from '../../../../api.d'
 import {CourseListItemContent, SplitCoursesList} from '../lists/SplitCoursesList'
 import coursesQuery, {hideHomeroomCourseIfK5Student} from '../queries/coursesQuery'
+import {useQuery} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
 
 declare const window: Window & {ENV: GlobalEnv}
 
@@ -39,9 +40,7 @@ export default function CoursesTray() {
   const {data, isLoading, isSuccess} = useQuery<Course[], Error>({
     queryKey: ['courses'],
     queryFn: coursesQuery,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    persister: sessionStoragePersister,
     refetchOnMount: false,
     select: courses => courses.filter(hideHomeroomCourseIfK5Student),
   })

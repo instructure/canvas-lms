@@ -21,6 +21,7 @@ import userEvent, {UserEvent} from '@testing-library/user-event'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
 import {renderComponent} from './testUtils'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {getUniqueId} from '../../../../utils/fileFolderUtils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(),
@@ -217,14 +218,14 @@ describe('FileFolderTable', () => {
       it('calls setSelectedRows with the correct value when a row is selected', async () => {
         const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
         await user.click(rowCheckboxes[0])
-        expect(setSelectedRows).toHaveBeenCalledWith(new Set([FAKE_FILES[0].uuid]))
+        expect(setSelectedRows).toHaveBeenCalledWith(new Set([getUniqueId(FAKE_FILES[0])]))
       })
 
       it('calls setSelectedRows with all values when "Select All" is clicked', async () => {
         const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
         await user.click(selectAllCheckbox)
         expect(setSelectedRows).toHaveBeenCalledWith(
-          new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]),
+          new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
         )
       })
     })
@@ -233,7 +234,7 @@ describe('FileFolderTable', () => {
       beforeEach(() => {
         renderComponent({
           rows: [FAKE_FILES[0], FAKE_FILES[1]],
-          selectedRows: new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]),
+          selectedRows: new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
           setSelectedRows,
         })
       })
@@ -252,7 +253,7 @@ describe('FileFolderTable', () => {
       it('calls setSelectedRows with the correct value when a row is unselected', async () => {
         const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
         await user.click(rowCheckboxes[0])
-        expect(setSelectedRows).toHaveBeenCalledWith(new Set([FAKE_FILES[1].uuid]))
+        expect(setSelectedRows).toHaveBeenCalledWith(new Set([getUniqueId(FAKE_FILES[1])]))
       })
 
       it('calls setSelectedRows with empty when "Select All" is clicked', async () => {
@@ -266,7 +267,7 @@ describe('FileFolderTable', () => {
       beforeEach(() => {
         renderComponent({
           rows: [FAKE_FILES[0], FAKE_FILES[1]],
-          selectedRows: new Set([FAKE_FILES[0].uuid]),
+          selectedRows: new Set([getUniqueId(FAKE_FILES[0])]),
           setSelectedRows,
         })
       })
@@ -281,7 +282,7 @@ describe('FileFolderTable', () => {
         const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
         await user.click(selectAllCheckbox)
         expect(setSelectedRows).toHaveBeenCalledWith(
-          new Set([FAKE_FILES[0].uuid, FAKE_FILES[1].uuid]),
+          new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
         )
       })
 

@@ -17,7 +17,7 @@
  */
 
 import {createBrowserRouter, Outlet, RouteObject} from 'react-router-dom'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {getFilesEnv} from '../utils/filesEnvUtils'
 import AllMyFilesTable from '../react/components/AllMyFilesTable'
 import FilesApp from '../react/components/FilesApp'
 import {ReThrowRouteError} from './ReThrowRouteError'
@@ -56,12 +56,10 @@ const routes: RouteObject[] = [
     // ref: https://github.com/remix-run/react-router/discussions/10166
     errorElement: <ReThrowRouteError />,
     Component: Outlet,
-    children: filesEnv.showingAllContexts
-      ? allMyFilesRoutes
-      : filesRoutes
-  }
+    children: getFilesEnv().showingAllContexts ? allMyFilesRoutes : filesRoutes,
+  },
 ]
 
 export const router = createBrowserRouter(routes, {
-  basename: filesEnv.baseUrl,
+  basename: getFilesEnv().baseUrl,
 })

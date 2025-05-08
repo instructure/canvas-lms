@@ -359,6 +359,39 @@ describe AssignmentGroupsController do
           expect(response).to be_successful
         end
       end
+
+      describe "with inactive student enrollment", type: :request do
+        before do
+          @assignment = @course.assignments.create!(
+            title: "assignment",
+            assignment_group: @course.assignment_groups.first,
+            workflow_state: "published"
+          )
+          override = @assignment.assignment_overrides.create!(set_type: "ADHOC")
+          override.assignment_override_students.create!(user: @student)
+          @student.enrollments.first.deactivate
+        end
+
+        it "excludes overrides for that student" do
+          json = api_call_as_user(@teacher,
+                                  :get,
+                                  "/api/v1/courses/#{@course.id}/assignment_groups",
+                                  {
+                                    controller: "assignment_groups",
+                                    action: "index",
+                                    format: "json",
+                                    course_id: @course.id,
+                                    include: ["assignments", "all_dates"]
+                                  })
+
+          expect(json[0]["assignments"][0]["all_dates"]).to eq([{
+                                                                 "due_at" => nil,
+                                                                 "unlock_at" => nil,
+                                                                 "lock_at" => nil,
+                                                                 "base" => true
+                                                               }])
+        end
+      end
     end
 
     describe "passing include_param submission", type: :request do

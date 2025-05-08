@@ -17,8 +17,8 @@
  */
 
 export type FilterItem = {
-  id: string
-  name: string
+  id?: string
+  name?: string
 }
 
 export type LtiFilters = {

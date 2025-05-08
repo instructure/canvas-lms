@@ -504,7 +504,7 @@ const InboxSettingsModalContainer = ({
                       )}
                       <View as="div" padding="small 0 x-small 0">
                         <TextInput
-                          renderLabel={I18n.t('Subject*')}
+                          renderLabel={I18n.t('Subject')}
                           placeholder={I18n.t('Enter Subject')}
                           interaction={formState.useOutOfOffice ? 'enabled' : 'disabled'}
                           value={formState.outOfOfficeSubject || ''}
@@ -560,7 +560,7 @@ const InboxSettingsModalContainer = ({
                     </View>
                     <View as="div" padding="small 0 x-small 0">
                       <TextArea
-                        label={I18n.t('Signature*')}
+                        label={I18n.t('Signature')}
                         height="8rem"
                         maxHeight="10rem"
                         placeholder={I18n.t('Add Signature')}

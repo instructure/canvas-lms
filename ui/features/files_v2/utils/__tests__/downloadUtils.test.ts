@@ -59,13 +59,13 @@ describe('downloadZip', () => {
     const mockListener = jest.fn()
     addDownloadListener(mockListener)
     downloadZip(items)
-    expect(mockListener).toHaveBeenCalledWith(expect.objectContaining({ detail: { items } }))
+    expect(mockListener).toHaveBeenCalledWith(expect.objectContaining({detail: {items}}))
     removeDownloadListener(mockListener)
   })
 })
 
 describe('performRequest', () => {
-  const mockItems = new Set(['tY3ZZIQyKxgAaxoIMGQai8J1gZ0IZWA5lmBVHYNb', '46'])
+  const mockItems = new Set(['folder-46', 'file-178'])
   const mockContextType = 'courses'
   const mockContextId = '1'
   const mockOnProgress = jest.fn()
@@ -80,7 +80,7 @@ describe('performRequest', () => {
       json: {
         workflow_state: 'exported',
         progress_url: '/progress',
-        attachment: { url: 'http://example.com/file.zip' },
+        attachment: {url: 'http://example.com/file.zip'},
       },
     }
     const mockPoolResponse = {
@@ -88,10 +88,8 @@ describe('performRequest', () => {
         workflow_state: 'completed',
         completion: 100,
         context_id: '1',
-      }
+      },
     }
-    
-
     ;(doFetchApi as jest.Mock).mockResolvedValueOnce(mockResponse)
     ;(doFetchApi as jest.Mock).mockResolvedValueOnce(mockPoolResponse)
     ;(doFetchApi as jest.Mock).mockResolvedValueOnce(mockResponse)
@@ -105,14 +103,20 @@ describe('performRequest', () => {
       onComplete: mockOnComplete,
     })
 
-    expect(doFetchApi).toHaveBeenNthCalledWith(1, expect.objectContaining({
-      path: `/api/v1/${mockContextType}/${mockContextId}/content_exports`,
-      method: 'POST',
-      body: "export_type=zip&select%5Bfiles%5D%5B%5D=178&select%5Bfolders%5D%5B%5D=46",
-    }))
+    expect(doFetchApi).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        path: `/api/v1/${mockContextType}/${mockContextId}/content_exports`,
+        method: 'POST',
+        body: 'export_type=zip&select%5Bfiles%5D%5B%5D=178&select%5Bfolders%5D%5B%5D=46',
+      }),
+    )
 
-    expect(doFetchApi).toHaveBeenNthCalledWith(2, expect.objectContaining({
-      path: mockResponse.json.progress_url,
-    }))
+    expect(doFetchApi).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        path: mockResponse.json.progress_url,
+      }),
+    )
   })
 })

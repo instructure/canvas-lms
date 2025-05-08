@@ -281,6 +281,7 @@ module SeleniumDriverSetup
         options.args << "start-maximized"
         options.args << "--enable-automation"
         options.args << "--disable-dev-shm-usage"
+        options.add_preference("profile.password_manager_leak_detection", false)
         if ENV["DISABLE_CORS"]
           options.args << "disable-web-security"
         end

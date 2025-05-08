@@ -81,6 +81,10 @@ module FilesPage
     f("[data-testid='move-move-button']")
   end
 
+  def rename_change_button
+    f("[data-testid='rename-change-button']")
+  end
+
   def toolbox_menu_button(name)
     f("[data-testid='bulk-actions-#{name}']")
   end
@@ -99,6 +103,14 @@ module FilesPage
 
   def table_rows
     ff("tbody tr")
+  end
+
+  def row_checkboxes_selector
+    "[data-testid='row-select-checkbox']"
+  end
+
+  def checked_boxes
+    ff("[name='IconCheckMark']")
   end
 
   def all_files_table_rows
@@ -138,6 +150,10 @@ module FilesPage
     f("[data-testid='files-pagination']")
   end
 
+  def select_all_checkbox
+    f("[data-testid='select-all-checkbox']")
+  end
+
   # which button is next/current/previous depends on how many are being rendered
   def pagination_button_by_index(index)
     pagination_container.find_elements(:css, "button")[index]
@@ -173,6 +189,64 @@ module FilesPage
 
   def bulk_actions_by_name(name)
     f(bulk_actions_by_name_selector(name))
+  end
+
+  def published_status_button
+    f("[data-testid='published-button-icon']")
+  end
+
+  def unpublished_status_button
+    f("[data-testid='unpublished-button-icon']")
+  end
+
+  def link_only_status_button
+    f("[data-testid='link-only-button-icon']")
+  end
+
+  def restricted_status_button
+    f("button[data-testid='restricted-button-icon']")
+  end
+
+  def permission_availablability_selector_listbox
+    f("input[role='combobox']:nth-of-type(1)")
+  end
+
+  def permission_selector_publish
+    f("#published")
+  end
+
+  def permission_selector_unpublish
+    f("#unpublished")
+  end
+
+  def permission_selector_only_with_link
+    f("#link_only")
+  end
+
+  def permission_save_button
+    fxpath("//button[.//span[contains(text(), 'Save')]]")
+  end
+
+  def permissions_dialog_close_button
+    fxpath("//button[.//span[text()='Close']]")
+  end
+
+  def edit_item_permissions(availability)
+    permission_availablability_selector_listbox.click
+    case availability
+    when :published
+      permission_selector_publish.click
+    when :unpublished
+      permission_selector_unpublish.click
+    when :available_with_link
+      permission_selector_only_with_link.click
+    end
+    permission_save_button.click
+  end
+
+  def select_item_to_edit_from_kebab_menu(item)
+    get_row_header_files_table(item).click
+    toolbox_menu_button("more-button").click
   end
 
   def body
@@ -271,6 +345,42 @@ module FilesPage
     f("#file-preview-modal-alert")
   end
 
+  def usage_rights_manage_modal
+    f("[aria-label='Manage Usage Rights']")
+  end
+
+  def file_usage_rights_cloud_icon
+    f('[aria-label="Set usage rights"]')
+  end
+
+  def usage_rights_selector_own_copyright
+    fxpath("//li[.//span[contains(text(), 'I hold the copyright')]]")
+  end
+
+  def usage_rights_selector_used_by_permission
+    f("#used_by_permission")
+  end
+
+  def usage_rights_selector_creative_commons
+    fxpath("//li[.//span[contains(text(), 'Creative Commons License')]]")
+  end
+
+  def usage_rights_license_selector
+    "[data-testid='usage-rights-license-selector']"
+  end
+
+  def usage_rights_selector_public_domain
+    f("#public_domain")
+  end
+
+  def usage_rights_selector_fair_use
+    f("#fair_use")
+  end
+
+  def usage_rights_holder_input
+    f("[data-testid='usage-rights-holder-input']")
+  end
+
   def file_usage_rights_justification_selector
     '[data-testid="usage-rights-justification-selector"]'
   end
@@ -283,15 +393,38 @@ module FilesPage
     f('[data-testid="usage-rights-save-button"]')
   end
 
-  def set_usage_rights_in_modal
+  def set_usage_rights_in_modal(usage_rights = :own_copyright)
     file_usage_rights_justification.click
-    file_usage_rights_justification.send_keys(:arrow_down, :return)
+    case usage_rights
+    when :own_copyright
+      usage_rights_selector_own_copyright.click
+    when :used_by_permission
+      usage_rights_selector_used_by_permission.click
+    when :public_domain
+      usage_rights_selector_public_domain.click
+    when :fair_use
+      usage_rights_selector_fair_use.click
+    when :creative_commons
+      usage_rights_selector_creative_commons.click
+      usage_rights_holder_input.send_keys("Test User")
+    end
     file_usage_rights_save_button.click
     expect(body).not_to contain_css(file_usage_rights_justification_selector)
   end
 
-  def verify_usage_rights_ui_updates(type = "Own Copyright")
-    expect(get_item_content_files_table(1, 6)).to eq type
+  def verify_usage_rights_ui_updates(rights_type = :own_copyright)
+    case rights_type
+    when :own_copyright
+      expect(get_item_content_files_table(1, 6)).to eq "Own Copyright"
+    when :used_by_permission
+      expect(get_item_content_files_table(1, 6)).to eq "Used by Permission"
+    when :public_domain
+      expect(get_item_content_files_table(1, 6)).to eq "Public Domain"
+    when :fair_use
+      expect(get_item_content_files_table(1, 6)).to eq "Fair Use"
+    when :creative_commons
+      expect(get_item_content_files_table(1, 6)).to eq "Creative Commons"
+    end
   end
 
   def verify_hidden_item_not_searchable_as_student(search_text)

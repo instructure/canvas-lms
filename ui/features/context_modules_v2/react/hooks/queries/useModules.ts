@@ -22,6 +22,7 @@ import {executeQuery} from '@canvas/query/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ModulesResponse, GraphQLResult} from '../../utils/types.d'
+import {InfiniteData} from '@tanstack/react-query'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -40,6 +41,7 @@ const MODULES_QUERY = gql`
               published
               unlockAt
               requirementCount
+              requireSequentialProgress
               prerequisites {
                 id
                 name
@@ -66,9 +68,9 @@ const MODULES_QUERY = gql`
 async function getModules({
   queryKey,
   pageParam,
-}: {queryKey: any; pageParam?: string}): Promise<ModulesResponse> {
+}: {queryKey: any; pageParam?: unknown}): Promise<ModulesResponse> {
   const [_key, courseId] = queryKey
-  const cursor = pageParam || null
+  const cursor = pageParam ? String(pageParam) : null
   try {
     const result = await executeQuery<GraphQLResult>(MODULES_QUERY, {
       courseId,
@@ -105,9 +107,10 @@ async function getModules({
 }
 
 export function useModules(courseId: string) {
-  return useAllPages<ModulesResponse, Error>({
+  return useAllPages<ModulesResponse, Error, InfiniteData<ModulesResponse>, [string, string]>({
     queryKey: ['modules', courseId],
     queryFn: getModules,
+    initialPageParam: undefined,
     getNextPageParam: (lastPage: ModulesResponse) =>
       lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined,
   })

@@ -95,10 +95,10 @@ describe('EditView', () => {
     expect(view.$el.find('#discussion_point_change_warning')).toBeTruthy()
     view.$el.find('#discussion_topic_assignment_points_possible').val(1)
     view.$el.find('#discussion_topic_assignment_points_possible').trigger('change')
-    expect(view.$el.find('#discussion_point_change_warning').attr('aria-expanded')).toBe('true')
+    expect(view.$el.find('#discussion_point_change_warning').attr('style')).not.toBeDefined()
     view.$el.find('#discussion_topic_assignment_points_possible').val(0)
     view.$el.find('#discussion_topic_assignment_points_possible').trigger('change')
-    expect(view.$el.find('#discussion_point_change_warning').attr('aria-expanded')).toBe('false')
+    expect(view.$el.find('#discussion_point_change_warning').attr('style')).toBe('display: none;')
   })
 
   it('hides the published icon for announcements', () => {

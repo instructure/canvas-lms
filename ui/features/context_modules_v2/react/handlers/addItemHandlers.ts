@@ -17,7 +17,8 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import doFetchApi from '../../../../shared/do-fetch-api-effect'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import BaseUploader from '@canvas/files/react/modules/BaseUploader'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -70,12 +71,12 @@ export const prepareModuleItemData = (
 
   // Base item data that applies to all types
   const result: Record<string, string | number | string[] | undefined | boolean> = {
-    'item[type]': type,
+    'item[type]': type === 'file' ? 'attachment' : type,
     'item[position]': itemCount + 1,
     'item[indent]': indentation,
     quiz_lti: false,
     'content_details[]': 'items',
-    type: type,
+    type: type === 'file' ? 'attachment' : type,
     new_tab: 0,
     graded: 0,
     _method: 'POST',
@@ -141,6 +142,7 @@ export const createNewItemApiPath = (
   type: string,
   courseId: string,
   NEW_QUIZZES_BY_DEFAULT: boolean,
+  folderId?: string,
 ) => {
   switch (type) {
     case 'assignment':
@@ -153,9 +155,56 @@ export const createNewItemApiPath = (
       return `/api/v1/courses/${courseId}/discussion_topics`
     case 'page':
       return `/api/v1/courses/${courseId}/pages`
+    case 'file':
+      return folderId ? `/api/v1/folders/${folderId}/files` : `/api/v1/courses/${courseId}/files`
     default:
       console.error('Unsupported item type for creation:', type)
       return ''
+  }
+}
+
+export const uploadFile = async (file: File, folderId?: string): Promise<NewItemType | null> => {
+  if (!folderId) {
+    console.error('No folder selected for file upload')
+    return null
+  }
+
+  const folder = {id: parseInt(folderId, 10)}
+
+  const fileOptions = {
+    file,
+    name: file.name,
+    dup: 'rename',
+  }
+
+  const uploader = new BaseUploader(fileOptions, folder)
+
+  let attachmentData: any = null
+  uploader.onUploadPosted = (attachment: any) => {
+    attachmentData = attachment
+    return attachment
+  }
+
+  try {
+    await uploader.upload()
+
+    if (!attachmentData) {
+      throw new Error('File upload completed but no attachment data was returned')
+    }
+
+    return {
+      id: attachmentData.id,
+      title: attachmentData.display_name || file.name,
+      display_name: attachmentData.display_name || file.name,
+      type: 'attachment',
+    }
+  } catch (err) {
+    if (err === 'user_aborted_upload') {
+      console.warn('File upload was aborted by the user')
+    } else {
+      console.error('Error uploading file:', err)
+    }
+    return null
   }
 }
 
@@ -166,9 +215,16 @@ export const createNewItem = async (
   selectedAssignmentGroup: string,
   NEW_QUIZZES_BY_DEFAULT: boolean,
   DEFAULT_POST_TO_SIS: boolean,
+  selectedFile?: File | null,
+  selectedFolder?: string,
 ): Promise<NewItemType | null> => {
   try {
-    // Create the item
+    // Handle file uploads separately using BaseUploader
+    if (type === 'file' && selectedFile) {
+      return uploadFile(selectedFile, selectedFolder)
+    }
+
+    // For other types (non-file items)
     const response = await doFetchApi({
       path: createNewItemApiPath(type, courseId, NEW_QUIZZES_BY_DEFAULT),
       method: 'POST',
@@ -193,6 +249,8 @@ export const createNewItem = async (
       return responseData as NewItemType
     } else if (type === 'page') {
       return responseData as NewItemType
+    } else if (type === 'file') {
+      return responseData as NewItemType
     }
 
     return responseData as NewItemType
@@ -208,17 +266,14 @@ export const submitModuleItem = async (
   itemData: Record<string, string | number | string[] | undefined | boolean>,
 ): Promise<Record<string, any> | null> => {
   try {
-    // Convert the itemData object to FormData
     const formData = new FormData()
 
-    // Add each key-value pair to the FormData object
     Object.entries(itemData).forEach(([key, value]) => {
       if (value !== undefined) {
         formData.append(key, String(value))
       }
     })
 
-    // Make the API call to add the item to the module
     const response = await doFetchApi({
       path: `/courses/${courseId}/modules/${moduleId}/items`,
       method: 'POST',

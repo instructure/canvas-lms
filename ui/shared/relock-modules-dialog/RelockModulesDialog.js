@@ -59,7 +59,7 @@ export default class RelockModulesDialog extends DialogBaseView {
   }
 
   relock() {
-    const url = `/api/v1/courses/${ENV.COURSE_ID}/modules/${this.module_id}/relock`
+    const url = `/api/v1/courses/${ENV.COURSE_ID || ENV.course_id}/modules/${this.module_id}/relock`
     return this.dialog.disableWhileLoading($.ajaxJSON(url, 'PUT', {}, () => this.close()))
   }
 }

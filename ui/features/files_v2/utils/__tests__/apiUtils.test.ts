@@ -25,10 +25,12 @@ import {
   generateTableUrl,
   generateSearchNavigationUrl,
 } from '../apiUtils'
-import {setupFilesEnv} from '../../fixtures/fakeFilesEnv'
+import {resetAndGetFilesEnv} from '../filesEnvUtils'
+import {createFilesContexts} from '../../fixtures/fileContexts'
+import {windowPathname} from '@canvas/util/globalUtils'
 
 jest.mock('@canvas/util/globalUtils', () => ({
-  windowPathname: () => '/files/folder/users_1',
+  windowPathname: jest.fn(),
 }))
 
 describe('generateFolderByPathUrl', () => {
@@ -44,14 +46,18 @@ describe('generateFolderByPathUrl', () => {
     const path = 'afolder/asubfolder'
     const expectedPath = 'afolder/asubfolder'
     const url = generateFolderByPathUrl(expectedPluralContextType, expectedContextId, path)
-    expect(url).toBe(`/api/v1/${expectedPluralContextType}/${expectedContextId}/folders/by_path/${expectedPath}`)
+    expect(url).toBe(
+      `/api/v1/${expectedPluralContextType}/${expectedContextId}/folders/by_path/${expectedPath}`,
+    )
   })
 
   it('returns the correct url when path has uri characters', () => {
     const path = 'some folder/this#could+be bad?maybe'
     const expectedPath = 'some%20folder/this%23could%2Bbe%20bad%3Fmaybe'
     const url = generateFolderByPathUrl(expectedPluralContextType, expectedContextId, path)
-    expect(url).toBe(`/api/v1/${expectedPluralContextType}/${expectedContextId}/folders/by_path/${expectedPath}`)
+    expect(url).toBe(
+      `/api/v1/${expectedPluralContextType}/${expectedContextId}/folders/by_path/${expectedPath}`,
+    )
   })
 })
 
@@ -180,13 +186,21 @@ describe('generateTableUrl', () => {
 
 describe('generateSearchNavigationUrl', () => {
   it('returns correct url when showing all contexts', () => {
-    setupFilesEnv(true)
+    const filesContexts = createFilesContexts({
+      isMultipleContexts: true,
+    })
+    ;(windowPathname as jest.Mock).mockReturnValue('/files/folder/users_1')
+    resetAndGetFilesEnv(filesContexts)
+
     const url = generateSearchNavigationUrl('foo')
     expect(url).toBe('/folder/users_1?search_term=foo')
   })
 
   it('returns correct url when showing only course context', () => {
-    setupFilesEnv(false)
+    const filesContexts = createFilesContexts()
+    ;(windowPathname as jest.Mock).mockReturnValue('/')
+    resetAndGetFilesEnv(filesContexts)
+
     const url = generateSearchNavigationUrl('foo')
     expect(url).toBe('/?search_term=foo')
   })

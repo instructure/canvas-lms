@@ -46,6 +46,8 @@ class ApplicationController < ActionController::Base
   #   (which is common for 401, 404, 500 responses)
   # Around action yields return (in REVERSE order) after all after actions
 
+  around_action :generate_flamegraph, if: :flamegraph_requested_and_permitted?
+
   if Rails.env.development? && !Canvas::Plugin.value_to_boolean(ENV["DISABLE_N_PLUS_ONE_DETECTION"])
     around_action :n_plus_one_detection
 
@@ -128,6 +130,23 @@ class ApplicationController < ActionController::Base
         Delayed::Batch.serial_batch(batch_opts || {}, &action)
       end
     end
+  end
+
+  def flamegraph_requested_and_permitted?
+    return false unless @current_user
+
+    flamegraph_requested = value_to_boolean(params.fetch(:flamegraph, false))
+    flamegraph_requested && Account.site_admin.grants_right?(@current_user, :update)
+  end
+  private :flamegraph_requested_and_permitted?
+
+  def generate_flamegraph(&)
+    Flamegraphs::FlamegraphService.call(
+      user: @current_user,
+      source_name: "#{controller_name}##{action_name}",
+      custom_name: params[:flamename],
+      &
+    )
   end
 
   def supported_timezones
@@ -243,6 +262,7 @@ class ApplicationController < ActionController::Base
           group_information:,
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           DOMAIN_ROOT_ACCOUNT_UUID: @domain_root_account&.uuid,
+          HORIZON_DOMAIN: @domain_root_account&.horizon_domain,
           k12: k12?,
           help_link_name:,
           help_link_icon:,
@@ -262,6 +282,7 @@ class ApplicationController < ActionController::Base
           },
           RAILS_ENVIRONMENT: Canvas.environment
         }
+        @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session)
         @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.is_a?(Course)
         unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {
@@ -326,7 +347,7 @@ class ApplicationController < ActionController::Base
         @js_env[:K5_SUBJECT_COURSE] = @context.is_a?(Course) && @context.elementary_subject_course?
         @js_env[:LOCALE_TRANSLATION_FILE] = ::Canvas::Cdn.registry.url_for("javascripts/translations/#{@js_env[:LOCALES].first}.json")
         @js_env[:ACCOUNT_ID] = effective_account_id(@context)
-        @js_env[:user_cache_key] = Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg") if @current_user&.workflow_state
+        @js_env[:user_cache_key] = CanvasSecurity.hmac_sha512(@current_user.uuid) if @current_user.present?
         @js_env[:top_navigation_tools] = external_tools_display_hashes(:top_navigation) if !!@domain_root_account&.feature_enabled?(:top_navigation_placement)
         @js_env[:horizon_course] = @context.is_a?(Course) && @context.horizon_course?
         @js_env[:has_courses] = @context.associated_courses.not_deleted.any? if @context.is_a?(Account)
@@ -393,6 +414,8 @@ class ApplicationController < ActionController::Base
     validate_call_to_action
     new_quizzes_navigation_updates
     create_wiki_page_mastery_path_overrides
+    remove_rce_resize_button
+    create_external_apps_side_tray_overrides
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -434,10 +457,8 @@ class ApplicationController < ActionController::Base
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
     embedded_release_notes
-    discussions_speedgrader_revisit
     discussion_checkpoints
     assign_to_differentiation_tags
-
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest(
     [

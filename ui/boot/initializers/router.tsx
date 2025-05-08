@@ -29,8 +29,9 @@ import accountGradingSettingsRoutes from '../../features/account_grading_setting
 import {RubricRoutes} from '../../features/rubrics/routes/rubricRoutes'
 import {NewLoginRoutes} from '../../features/new_login/routes/NewLoginRoutes'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {QueryProvider} from '@canvas/query'
 import {AUPRoutes} from '../../features/acceptable_use_policy/routes/AUPRoutes'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -79,6 +80,10 @@ const portalRouter = createBrowserRouter(
         path="/accounts/:accountId/sub_accounts"
         lazy={() => import('../../features/sub_accounts/react/SubaccountRoute')}
       />
+      <Route
+        path="/profile/qr_mobile_login"
+        lazy={() => import('../../features/qr_mobile_login/react/QRMobileLoginRoute')}
+      />
 
       {accountGradingSettingsRoutes}
 
@@ -113,9 +118,9 @@ export function loadReactRouter() {
   if (mountNode) {
     const root = ReactDOM.createRoot(mountNode)
     root.render(
-      <QueryProvider>
+      <QueryClientProvider client={queryClient}>
         <RouterProvider router={portalRouter} fallbackElement={<FallbackSpinner />} />
-      </QueryProvider>,
+      </QueryClientProvider>,
     )
   }
 }

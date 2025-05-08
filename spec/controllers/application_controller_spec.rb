@@ -112,6 +112,21 @@ RSpec.describe ApplicationController do
         end
       end
 
+      context "user_cache_key" do
+        it "sets user_cache_key when user is present" do
+          user_factory
+          @controller.instance_variable_set(:@current_user, @user)
+          allow(@user).to receive(:uuid).and_return("test-uuid")
+          expected_hmac = CanvasSecurity.hmac_sha512("test-uuid")
+          expect(controller.js_env[:user_cache_key]).to eq(expected_hmac)
+        end
+
+        it "does not set user_cache_key when no user is present" do
+          controller.instance_variable_set(:@current_user, nil)
+          expect(controller.js_env[:user_cache_key]).to be_nil
+        end
+      end
+
       describe "user flags" do
         before do
           user_factory
@@ -348,7 +363,8 @@ RSpec.describe ApplicationController do
                               settings: {},
                               cache_key: "key",
                               uuid: "bleh",
-                              salesforce_id: "blah")
+                              salesforce_id: "blah",
+                              horizon_domain: nil)
         allow(root_account).to receive(:kill_joy?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
@@ -369,7 +385,8 @@ RSpec.describe ApplicationController do
                               settings: {},
                               cache_key: "key",
                               uuid: "blah",
-                              salesforce_id: "bleh")
+                              salesforce_id: "bleh",
+                              horizon_domain: nil)
         allow(root_account).to receive(:kill_joy?).and_return(true)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
@@ -2259,7 +2276,8 @@ RSpec.describe ApplicationController do
           uuid: "account_uuid1",
           global_id: "account_global1",
           lti_guid: "lti1",
-          feature_enabled?: false
+          feature_enabled?: false,
+          horizon_domain: nil
         }
       end
 

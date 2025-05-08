@@ -17,7 +17,13 @@
  */
 
 import $ from '@canvas/rails-flash-notifications'
-import {ltiMessageHandler, ltiState} from '../messages'
+import {
+  callbackOnLtiPostMessage,
+  ltiMessageHandler,
+  ltiState,
+  onLtiClosePostMessage,
+  removeLtiPostMessageCallback,
+} from '../messages'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -130,6 +136,92 @@ describe('ltiMessageHander', () => {
           }),
           undefined,
         )
+      })
+    })
+
+    describe('with callbacks', () => {
+      const subject = 'lti.close'
+      const placement = 'placement'
+
+      it('calls callback when added', async () => {
+        const callback = jest.fn()
+
+        callbackOnLtiPostMessage(subject, placement, callback)
+
+        const event = postMessageEvent({subject})
+        await ltiMessageHandler(event)
+        expect(callback).toHaveBeenCalled()
+      })
+
+      it('does not call callback once removed', async () => {
+        const callback = jest.fn()
+
+        callbackOnLtiPostMessage(subject, placement, callback)
+        removeLtiPostMessageCallback(subject, placement)
+
+        const event = postMessageEvent({subject})
+        await ltiMessageHandler(event)
+        expect(callback).not.toHaveBeenCalled()
+      })
+
+      it('calls callback when added with hook', async () => {
+        const callback = jest.fn()
+
+        onLtiClosePostMessage(placement, callback)
+
+        const event = postMessageEvent({subject})
+        await ltiMessageHandler(event)
+        expect(callback).toHaveBeenCalled()
+      })
+
+      it('does not call callback when hook is cleaned up', async () => {
+        const callback = jest.fn()
+
+        const cleanup = onLtiClosePostMessage(placement, callback)
+        cleanup()
+
+        const event = postMessageEvent({subject})
+        await ltiMessageHandler(event)
+        expect(callback).not.toHaveBeenCalled()
+      })
+
+      it('calls all callbacks for subject', async () => {
+        const callback1 = jest.fn()
+        const callback2 = jest.fn()
+
+        callbackOnLtiPostMessage(subject, placement, callback1)
+        callbackOnLtiPostMessage(subject, 'placement2', callback2)
+
+        const event = postMessageEvent({subject})
+        await ltiMessageHandler(event)
+        expect(callback1).toHaveBeenCalled()
+        expect(callback2).toHaveBeenCalled()
+      })
+
+      it('only calls callbacks for subject', async () => {
+        const callback1 = jest.fn()
+        const callback2 = jest.fn()
+
+        callbackOnLtiPostMessage(subject, placement, callback1)
+        callbackOnLtiPostMessage('lti.frameResize', placement, callback2)
+
+        const event = postMessageEvent({subject})
+        await ltiMessageHandler(event)
+        expect(callback1).toHaveBeenCalled()
+        expect(callback2).not.toHaveBeenCalled()
+      })
+
+      it('replaces callbacks when added twice', async () => {
+        const callback1 = jest.fn()
+        const callback2 = jest.fn()
+
+        callbackOnLtiPostMessage(subject, placement, callback1)
+        callbackOnLtiPostMessage(subject, placement, callback2)
+
+        const event = postMessageEvent({subject})
+        await ltiMessageHandler(event)
+        expect(callback1).not.toHaveBeenCalled()
+        expect(callback2).toHaveBeenCalled()
       })
     })
   })

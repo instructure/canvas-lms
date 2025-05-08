@@ -17,7 +17,6 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useQuery} from '@canvas/query'
 import tourPubSub from '@canvas/tour-pubsub'
 import {replaceLocation} from '@canvas/util/globalUtils'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -32,6 +31,8 @@ import React from 'react'
 import type {HelpLink} from '../../../api.d'
 import helpLinksQuery from '../queries/helpLinksQuery'
 import FeaturedHelpLink from './FeaturedHelpLink'
+import {useQuery} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
 
 const I18n = createI18nScope('HelpLinks')
 
@@ -43,9 +44,9 @@ export default function HelpLinks({onClick}: Props) {
   const {data, isLoading, isSuccess} = useQuery<HelpLink[]>({
     queryKey: ['helpLinks'],
     queryFn: helpLinksQuery,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    persister: sessionStoragePersister,
+    // 1 hour
+    staleTime: 60 * 60 * 1000,
   })
 
   const links = data || []

@@ -16,20 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMemo, useState} from 'react'
+import {useMemo} from 'react'
 import {fetchOutcomes, getNextOutcomesPage} from '../../queries/Queries'
 import {useAllPages} from '@canvas/query'
+import type {InfiniteData} from '@tanstack/react-query'
+import type {FetchOutcomesResponse} from '../../queries/Queries'
 
 export const useOutcomesQuery = (courseId: string) => {
-  const [queryKey] = useState(['individual-gradebook-outcomes', courseId])
+  const queryKey: [string, string] = ['individual-gradebook-outcomes', courseId]
 
-  const {data, hasNextPage, isError, isLoading} = useAllPages({
+  const {data, hasNextPage, isError, isLoading} = useAllPages<
+    FetchOutcomesResponse,
+    Error,
+    InfiniteData<FetchOutcomesResponse>,
+    [string, string]
+  >({
     queryKey,
     queryFn: fetchOutcomes,
     getNextPageParam: getNextOutcomesPage,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    initialPageParam: null,
   })
 
   const outcomes = useMemo(

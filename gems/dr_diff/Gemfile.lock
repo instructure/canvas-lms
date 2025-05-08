@@ -8,7 +8,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     bigdecimal (3.1.9)
-    csv (3.3.3)
+    csv (3.3.4)
     date (3.4.1)
     debug (1.10.0)
       irb (~> 1.10)
@@ -27,8 +27,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.8)
-    multi_xml (0.7.1)
+    multi_xml (0.7.2)
       bigdecimal (~> 3.1)
     pp (0.6.2)
       prettyprint
@@ -53,13 +52,11 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.2)
-    sqlite3 (1.7.3)
-      mini_portile2 (~> 2.8.0)
-    sqlite3 (1.7.3-aarch64-linux)
-    sqlite3 (1.7.3-arm64-darwin)
-    sqlite3 (1.7.3-x86_64-darwin)
-    sqlite3 (1.7.3-x86_64-linux)
-    stringio (3.1.6)
+    sqlite3 (2.6.0-aarch64-linux-gnu)
+    sqlite3 (2.6.0-arm64-darwin)
+    sqlite3 (2.6.0-x86_64-darwin)
+    sqlite3 (2.6.0-x86_64-linux-gnu)
+    stringio (3.1.7)
 
 PLATFORMS
   aarch64-linux

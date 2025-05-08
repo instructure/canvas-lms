@@ -171,9 +171,13 @@ module Lti
       end
 
       def asset_processor_info(tool)
-        %i[icon_url icon_svg_path_64].index_with do |key|
-          tool.extension_setting(Lti::ResourcePlacement::ASSET_PROCESSOR, key)
-        end.compact
+        {
+          icon_url:
+            tool.extension_setting(Lti::ResourcePlacement::ASSET_PROCESSOR, :icon_url),
+
+          # TODO: use this for global nav too, for consistent default icons
+          tool_name_for_default_icon: tool.name,
+        }
       end
 
       def global_nav_info(tool)

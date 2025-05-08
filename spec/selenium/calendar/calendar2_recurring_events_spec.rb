@@ -70,6 +70,8 @@ describe "recurring events" do
       create_new_calendar_event
       enter_event_title("Test event")
       newdate = "July 20, 2023"
+
+      handle_event_date_input_arrow_down
       enter_new_event_date(newdate)
 
       select_frequency_option("Monthly on the third Thursday")
@@ -84,6 +86,8 @@ describe "recurring events" do
       create_new_calendar_event
       enter_event_title("Test event")
       newdate = "July 20, 2023"
+
+      handle_event_date_input_arrow_down
       enter_new_event_date(newdate)
 
       select_frequency_option("Annually on July 20")
@@ -99,6 +103,8 @@ describe "recurring events" do
       create_new_calendar_event
       enter_event_title("Test event")
       newdate = "July 20, 2023"
+
+      handle_event_date_input_arrow_down
       enter_new_event_date(newdate)
 
       select_frequency_option("Weekly on Thursday")

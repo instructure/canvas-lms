@@ -88,8 +88,8 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
       }
 
       // Only update state if we have a different preview ID
-      if (previewId !== currentItem.id && collection) {
-        const newItem = collection.find(item => item.id === previewId)
+      if (previewId !== currentItem.id.toString() && collection) {
+        const newItem = collection.find(item => item.id.toString() === previewId)
         if (newItem) {
           setCurrentItem(newItem as File)
           setCurrentIndex(collection.indexOf(newItem))
@@ -151,7 +151,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
               </Flex.Item>
               <Flex.Item shouldGrow shouldShrink>
                 <Tooltip renderTip={name}>
-                  <Heading level="h2" data-testid="file-header" width='30%'>
+                  <Heading level="h2" data-testid="file-header" width="30%">
                     <TruncateText>{name}</TruncateText>
                   </Heading>
                 </Tooltip>

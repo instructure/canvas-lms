@@ -35,6 +35,7 @@ import FilesystemObject from '../../backbone/models/FilesystemObject'
 import '@canvas/rails-flash-notifications'
 
 const I18n = createI18nScope('file_preview')
+const FLAMEGRAPH_FOLDER_REGEX = /^users_.+\/flamegraphs$/
 
 export default class FilePreview extends React.PureComponent {
   static propTypes = {
@@ -258,7 +259,9 @@ export default class FilePreview extends React.PureComponent {
       'attachment-html-iframe': html,
     })
     const disableSandboxing = ENV.FEATURES?.disable_iframe_sandbox_file_show
-    const sandbox = classnames('allow-same-origin', 'allow-downloads', {'allow-scripts': !html})
+    const sandbox = classnames('allow-same-origin', 'allow-downloads', {
+      'allow-scripts': !html || FLAMEGRAPH_FOLDER_REGEX.test(this.props.splat),
+    })
     return (
       <iframe
         allowFullScreen={true}

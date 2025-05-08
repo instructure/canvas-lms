@@ -20,37 +20,46 @@
 import React from 'react'
 import {act, render, waitFor, fireEvent} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {updateModulePendingPublishedStates, monitorProgress, batchUpdateAllModulesApiCall, cancelBatchUpdate, fetchAllItemPublishedStates} from '../../utils/publishAllModulesHelper'
+import {
+  updateModulePendingPublishedStates,
+  batchUpdateAllModulesApiCall,
+  fetchAllItemPublishedStates,
+} from '../../utils/publishAllModulesHelper'
+import {monitorProgress, cancelProgressAction} from '@canvas/progress/ProgressHelpers'
 
 import ContextModulesPublishMenu from '../ContextModulesPublishMenu'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
-  default: jest.fn(() => 
+  default: jest.fn(() =>
     Promise.resolve({
       response: new Response('', {status: 200}),
       json: {
         workflow_state: 'completed',
-        completion: 100
+        completion: 100,
       },
       text: '',
-    })
-  )
+    }),
+  ),
+}))
+
+jest.mock('@canvas/progress/ProgressHelpers', () => ({
+  _esModule: true,
+  monitorProgress: jest.fn(),
+  cancelProgressAction: jest.fn(),
 }))
 
 jest.mock('../../utils/publishAllModulesHelper', () => ({
   __esModule: true,
   updateModulePendingPublishedStates: jest.fn(),
-  monitorProgress: jest.fn(),
   batchUpdateAllModulesApiCall: jest.fn(),
-  cancelBatchUpdate: jest.fn(),
-  fetchAllItemPublishedStates: jest.fn()
+  fetchAllItemPublishedStates: jest.fn(),
 }))
 
 const mockUpdateModulePendingPublishedStates = updateModulePendingPublishedStates as jest.Mock
 const mockMonitorProgress = monitorProgress as jest.Mock
 const mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as jest.Mock
-const mockCancelBatchUpdate = cancelBatchUpdate as jest.Mock
+const mockCancelProgressAction = cancelProgressAction as jest.Mock
 const mockFetchAllItemPublishedStates = fetchAllItemPublishedStates as jest.Mock
 
 const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
@@ -67,22 +76,22 @@ describe('ContextModulesPublishMenu', () => {
     mockUpdateModulePendingPublishedStates.mockReset()
     mockMonitorProgress.mockReset()
     mockBatchUpdateAllModulesApiCall.mockReset()
-    mockCancelBatchUpdate.mockReset()
+    mockCancelProgressAction.mockReset()
     mockFetchAllItemPublishedStates.mockReset()
-    mockDoFetchApi.mockImplementation(() => 
+    mockDoFetchApi.mockImplementation(() =>
       Promise.resolve({
         response: new Response('', {status: 200}),
         json: {
           workflow_state: 'completed',
-          completion: 100
+          completion: 100,
         },
         text: '',
-      })
+      }),
     )
     mockUpdateModulePendingPublishedStates.mockImplementation(() => {})
     mockMonitorProgress.mockImplementation(() => {})
     mockBatchUpdateAllModulesApiCall.mockImplementation(() => {})
-    mockCancelBatchUpdate.mockImplementation(() => {})
+    mockCancelProgressAction.mockImplementation(() => {})
     mockFetchAllItemPublishedStates.mockImplementation(() => {})
   })
 
@@ -91,7 +100,7 @@ describe('ContextModulesPublishMenu', () => {
     mockUpdateModulePendingPublishedStates.mockReset()
     mockMonitorProgress.mockReset()
     mockBatchUpdateAllModulesApiCall.mockReset()
-    mockCancelBatchUpdate.mockReset()
+    mockCancelProgressAction.mockReset()
     mockFetchAllItemPublishedStates.mockReset()
     document.body.innerHTML = ''
   })
@@ -111,16 +120,16 @@ describe('ContextModulesPublishMenu', () => {
 
     it('renders a spinner when publish is in-flight', () => {
       // Mock the progress API call
-      (doFetchApi as jest.Mock).mockImplementation(() =>
+      ;(doFetchApi as jest.Mock).mockImplementation(() =>
         Promise.resolve({
           response: new Response('', {status: 200}),
           json: {
             id: '17',
             workflow_state: 'running',
-            completion: 50
+            completion: 50,
           },
-          text: ''
-        })
+          text: '',
+        }),
       )
 
       const {getByText} = render(
@@ -131,16 +140,16 @@ describe('ContextModulesPublishMenu', () => {
 
     it('updates all the modules when ready', async () => {
       // Mock the progress API call
-      (doFetchApi as jest.Mock).mockImplementation(() =>
+      ;(doFetchApi as jest.Mock).mockImplementation(() =>
         Promise.resolve({
           response: new Response('', {status: 200}),
           json: {
             id: '17',
             workflow_state: 'completed',
-            completion: 100
+            completion: 100,
           },
-          text: ''
-        })
+          text: '',
+        }),
       )
 
       render(<ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />)
@@ -158,25 +167,23 @@ describe('ContextModulesPublishMenu', () => {
       beforeEach(() => {
         mockMonitorProgress = monitorProgress as jest.Mock
         mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as jest.Mock
-        mockBatchUpdateAllModulesApiCall.mockImplementation(() => 
+        mockBatchUpdateAllModulesApiCall.mockImplementation(() =>
           Promise.resolve({
             json: {
               progress: {
                 progress: {
                   id: '17',
                   workflow_state: 'running',
-                  completion: 0
-                }
-              }
-            }
-          })
+                  completion: 0,
+                },
+              },
+            },
+          }),
         )
       })
 
       it('renders a screenreader message with progress starts', async () => {
-        const {getByRole, getByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} />
-        )
+        const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
 
         // Open menu
         const menuButton = getByRole('button')
@@ -199,20 +206,20 @@ describe('ContextModulesPublishMenu', () => {
         mockMonitorProgress.mockImplementation((id, callback) => {
           callback({
             workflow_state: 'running',
-            completion: 0
+            completion: 0,
           })
         })
 
         // Wait for the alert to be added to the DOM
         await waitFor(() => {
-          expect(document.querySelector('[role="alert"]')).toHaveTextContent('Publishing modules has started.')
+          expect(document.querySelector('[role="alert"]')).toHaveTextContent(
+            'Publishing modules has started.',
+          )
         })
       })
 
       it('renders a screenreader message with progress updates', async () => {
-        const {getByRole, getByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} />
-        )
+        const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
 
         // Open menu
         const menuButton = getByRole('button')
@@ -235,20 +242,20 @@ describe('ContextModulesPublishMenu', () => {
         mockMonitorProgress.mockImplementation((id, callback) => {
           callback({
             workflow_state: 'running',
-            completion: 50
+            completion: 50,
           })
         })
 
         // Wait for the alert to be added to the DOM
         await waitFor(() => {
-          expect(document.querySelector('[role="alert"]')).toHaveTextContent('Publishing progress is 50 percent complete')
+          expect(document.querySelector('[role="alert"]')).toHaveTextContent(
+            'Publishing progress is 50 percent complete',
+          )
         })
       })
 
       it('renders a screenreader message when progress completes', async () => {
-        const {getByRole, getByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} />
-        )
+        const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
 
         // Open menu
         const menuButton = getByRole('button')
@@ -271,20 +278,20 @@ describe('ContextModulesPublishMenu', () => {
         mockMonitorProgress.mockImplementation((id, callback) => {
           callback({
             workflow_state: 'completed',
-            completion: 100
+            completion: 100,
           })
         })
 
         // Wait for the alert to be added to the DOM
         await waitFor(() => {
-          expect(document.querySelector('[role="alert"]')).toHaveTextContent('Publishing progress is complete. Refreshing item status.')
+          expect(document.querySelector('[role="alert"]')).toHaveTextContent(
+            'Publishing progress is complete. Refreshing item status.',
+          )
         })
       })
 
       it('renders message when publishing was canceled', async () => {
-        const {getByRole, getByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} />
-        )
+        const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
 
         // Open menu
         const menuButton = getByRole('button')
@@ -308,13 +315,15 @@ describe('ContextModulesPublishMenu', () => {
           callback({
             workflow_state: 'failed',
             message: 'canceled',
-            completion: 0
+            completion: 0,
           })
         })
 
         // Wait for the alert to be added to the DOM
         await waitFor(() => {
-          expect(document.querySelector('[role="alert"]')).toHaveTextContent('Your publishing job was canceled before it completed.')
+          expect(document.querySelector('[role="alert"]')).toHaveTextContent(
+            'Your publishing job was canceled before it completed.',
+          )
         })
       })
     })
@@ -373,30 +382,28 @@ describe('ContextModulesPublishMenu', () => {
 
     describe('Modal actions', () => {
       it('closes the modal when stopping an action', async () => {
-        mockBatchUpdateAllModulesApiCall.mockImplementation(() => 
+        mockBatchUpdateAllModulesApiCall.mockImplementation(() =>
           Promise.resolve({
             json: {
               progress: {
                 progress: {
                   id: '17',
                   workflow_state: 'running',
-                  completion: 0
-                }
-              }
-            }
-          })
+                  completion: 0,
+                },
+              },
+            },
+          }),
         )
         mockMonitorProgress.mockImplementation((id, callback) => {
           callback({
             workflow_state: 'running',
-            completion: 50
+            completion: 50,
           })
         })
         mockFetchAllItemPublishedStates.mockImplementation(() => Promise.resolve())
 
-        const {getByRole, getByTestId} = render(
-          <ContextModulesPublishMenu {...defaultProps} />
-        )
+        const {getByRole, getByTestId} = render(<ContextModulesPublishMenu {...defaultProps} />)
 
         // Open menu
         const menuButton = getByRole('button')
@@ -431,30 +438,28 @@ describe('ContextModulesPublishMenu', () => {
 
     describe('error handling', () => {
       it('shows alert on successful publish', async () => {
-        mockBatchUpdateAllModulesApiCall.mockImplementation(() => 
+        mockBatchUpdateAllModulesApiCall.mockImplementation(() =>
           Promise.resolve({
             json: {
               progress: {
                 progress: {
                   id: '17',
                   workflow_state: 'completed',
-                  completion: 100
-                }
-              }
-            }
-          })
+                  completion: 100,
+                },
+              },
+            },
+          }),
         )
         mockMonitorProgress.mockImplementation((id, callback) => {
           callback({
             workflow_state: 'completed',
-            completion: 100
+            completion: 100,
           })
         })
         mockFetchAllItemPublishedStates.mockImplementation(() => Promise.resolve())
 
-        const {getByRole} = render(
-          <ContextModulesPublishMenu {...defaultProps} />
-        )
+        const {getByRole} = render(<ContextModulesPublishMenu {...defaultProps} />)
 
         // Open menu
         const menuButton = getByRole('button')
@@ -485,9 +490,7 @@ describe('ContextModulesPublishMenu', () => {
         mockBatchUpdateAllModulesApiCall.mockRejectedValue(new Error('Failed to publish'))
         mockFetchAllItemPublishedStates.mockImplementation(() => Promise.resolve())
 
-        const {getByRole} = render(
-          <ContextModulesPublishMenu {...defaultProps} />
-        )
+        const {getByRole} = render(<ContextModulesPublishMenu {...defaultProps} />)
 
         // Open menu
         const menuButton = getByRole('button')
@@ -513,30 +516,28 @@ describe('ContextModulesPublishMenu', () => {
       })
 
       it('shows alert on failed poll for progress', async () => {
-        mockBatchUpdateAllModulesApiCall.mockImplementation(() => 
+        mockBatchUpdateAllModulesApiCall.mockImplementation(() =>
           Promise.resolve({
             json: {
               progress: {
                 progress: {
                   id: '17',
                   workflow_state: 'running',
-                  completion: 0
-                }
-              }
-            }
-          })
+                  completion: 0,
+                },
+              },
+            },
+          }),
         )
         mockMonitorProgress.mockImplementation((id, callback) => {
           callback({
             workflow_state: 'failed',
-            completion: 0
+            completion: 0,
           })
         })
         mockFetchAllItemPublishedStates.mockImplementation(() => Promise.resolve())
 
-        const {getByRole} = render(
-          <ContextModulesPublishMenu {...defaultProps} />
-        )
+        const {getByRole} = render(<ContextModulesPublishMenu {...defaultProps} />)
 
         // Open menu
         const menuButton = getByRole('button')
@@ -563,30 +564,28 @@ describe('ContextModulesPublishMenu', () => {
       })
 
       it('shows alert when failing to update results', async () => {
-        mockBatchUpdateAllModulesApiCall.mockImplementation(() => 
+        mockBatchUpdateAllModulesApiCall.mockImplementation(() =>
           Promise.resolve({
             json: {
               progress: {
                 progress: {
                   id: '17',
                   workflow_state: 'running',
-                  completion: 0
-                }
-              }
-            }
-          })
+                  completion: 0,
+                },
+              },
+            },
+          }),
         )
         mockMonitorProgress.mockImplementation((id, callback) => {
           callback({
             workflow_state: 'completed',
-            completion: 100
+            completion: 100,
           })
         })
         mockFetchAllItemPublishedStates.mockRejectedValue(new Error('Failed to fetch states'))
 
-        const {getByRole} = render(
-          <ContextModulesPublishMenu {...defaultProps} />
-        )
+        const {getByRole} = render(<ContextModulesPublishMenu {...defaultProps} />)
 
         // Open menu
         const menuButton = getByRole('button')

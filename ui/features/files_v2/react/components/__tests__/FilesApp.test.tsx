@@ -22,11 +22,11 @@ import FilesApp from '../FilesApp'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
-import {setupFilesEnv} from '../../../fixtures/fakeFilesEnv'
 import {createMemoryRouter, RouterProvider} from 'react-router-dom'
 import {FAKE_FOLDERS} from '../../../fixtures/fakeData'
 import {NotFoundError} from '../../hooks/useGetFolders'
+import {resetAndGetFilesEnv} from '../../../utils/filesEnvUtils'
+import {createFilesContexts} from '../../../fixtures/fileContexts'
 
 // Mock the useGetFolders module, but provide the real implementation by default
 jest.mock('../../hooks/useGetFolders', () => {
@@ -41,15 +41,21 @@ describe('FilesApp', () => {
   let flashElements: any
 
   beforeEach(() => {
-    setupFilesEnv()
+    const filesContexts = createFilesContexts({
+      permissions: {
+        manage_files_add: true,
+        manage_files_delete: true,
+        manage_files_edit: true,
+      },
+    })
+    resetAndGetFilesEnv(filesContexts)
+
     fetchMock.get(/.*\/by_path/, [FAKE_FOLDERS[0]], {overwriteRoutes: true})
     fetchMock.get(/.*\/all.*/, [FAKE_FOLDERS[1]], {
       overwriteRoutes: true,
     })
     fetchMock.get(/.*\/files\/quota/, {quota_used: 500, quota: 1000}, {overwriteRoutes: true})
     fetchMock.get(/.*\/files\?search_term.*/, [], {overwriteRoutes: true})
-    filesEnv.userHasPermission = jest.fn().mockReturnValue(true)
-    filesEnv.showingAllContexts = false
 
     flashElements = document.createElement('div')
     flashElements.setAttribute('id', 'flash_screenreader_holder')
@@ -82,13 +88,36 @@ describe('FilesApp', () => {
     )
   }
 
-  it('does not render progress bar without permission', async () => {
-    filesEnv.userHasPermission = jest.fn().mockReturnValue(false)
-    renderComponent()
+  describe('without permissions', () => {
+    beforeEach(() => {
+      const filesContexts = createFilesContexts({
+        permissions: {
+          manage_files_add: false,
+          manage_files_delete: false,
+          manage_files_edit: false,
+        },
+      })
+      resetAndGetFilesEnv(filesContexts)
+    })
 
-    await waitFor(() => {
-      expect(fetchMock.calls()).toHaveLength(1)
-      expect(fetchMock.calls()[0][0]).not.toContain('/files/quota')
+    it('does not render progress bar without permission', async () => {
+      renderComponent()
+
+      await waitFor(() => {
+        expect(fetchMock.calls()).toHaveLength(1)
+        expect(fetchMock.calls()[0][0]).not.toContain('/files/quota')
+      })
+    })
+
+    it('does not render Upload File or Create Folder buttons when user does not have permission', async () => {
+      renderComponent()
+      // necessary to prevent false positives
+      const allMyFilesButton = await screen.findByRole('button', {name: /all my files/i})
+      const uploadButton = screen.queryByRole('button', {name: 'Upload'})
+      const createFolderButton = screen.queryByRole('button', {name: 'Folder'})
+      expect(allMyFilesButton).toBeInTheDocument()
+      expect(uploadButton).not.toBeInTheDocument()
+      expect(createFolderButton).not.toBeInTheDocument()
     })
   })
 
@@ -130,18 +159,6 @@ describe('FilesApp', () => {
     expect(createFolderButton).toBeInTheDocument()
   })
 
-  it('does not render Upload File or Create Folder buttons when user does not have permission', async () => {
-    filesEnv.userHasPermission = jest.fn().mockReturnValue(false)
-    renderComponent()
-    // necessary to prevent false positives
-    const allMyFilesButton = await screen.findByRole('button', {name: /all my files/i})
-    const uploadButton = screen.queryByRole('button', {name: 'Upload'})
-    const createFolderButton = screen.queryByRole('button', {name: 'Folder'})
-    expect(allMyFilesButton).toBeInTheDocument()
-    expect(uploadButton).not.toBeInTheDocument()
-    expect(createFolderButton).not.toBeInTheDocument()
-  })
-
   it('does not render Upload File or Create Folder buttons when searching', async () => {
     renderComponent(['?search_term=foo'])
     const allMyFilesButton = await screen.findByRole('button', {name: /all my files/i})
@@ -176,7 +193,7 @@ describe('FilesApp', () => {
 
     it('does not render NotFoundArtwork component when no error occurs', async () => {
       hooksModule.useGetFolders = jest.fn().mockReturnValue({
-        data: [{id: '1', name: 'Test Folder'}],
+        data: [{id: '1', name: 'Test Folder', context_id: '123', context_type: 'course'}],
         error: null,
         isLoading: false,
       })

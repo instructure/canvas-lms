@@ -21,7 +21,10 @@ import FilesHeader from '../FilesHeader'
 import {render, screen} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
-import {FileManagementProvider, FileManagementContextProps} from '../../Contexts'
+import {
+  FileManagementProvider,
+  FileManagementContextProps,
+} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 
 const defaultProps = {

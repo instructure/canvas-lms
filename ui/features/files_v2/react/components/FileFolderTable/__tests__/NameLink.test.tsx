@@ -17,12 +17,18 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import NameLink from '../NameLink'
 import {BrowserRouter} from 'react-router-dom'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
+import userEvent from '@testing-library/user-event'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: jest.fn(() => jest.fn()),
+}))
 
 const defaultProps = {
   isStacked: false,
@@ -81,5 +87,19 @@ describe('NameLink', () => {
       'href',
       `/folder/${encodeURIComponent(folder.name)}`,
     )
+  })
+
+  it('Does not allow user to navigate to locked folder', async () => {
+    const user = userEvent.setup()
+    const folder = {...FAKE_FOLDERS[0], locked_for_user: true}
+    renderComponent({item: folder})
+
+    expect(screen.getByText(folder.name)).toBeInTheDocument()
+    user.click(screen.getByText(folder.name))
+    await waitFor(() => {
+      expect(showFlashError).toHaveBeenCalledWith(
+        `${folder.name} is currently locked and unavailable to view.`,
+      )
+    })
   })
 })

@@ -18,20 +18,12 @@
 
 import $ from 'jquery'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import type {
-  CanvasId,
-  CanvasProgress,
-  CanvasProgressAPIResult,
-  DoFetchModuleWithItemsResponse,
-  FetchedModuleWithItems,
-} from '../react/types'
+import type {CanvasId, FetchedModuleWithItems} from '../react/types'
 import {
   renderContextModulesPublishIcon,
   updateModuleItemPublishedState,
   updateModuleItemsPublishedStates,
 } from './publishOneModuleHelper'
-
-const PUBLISH_STATUS_POLLING_MS = 1000
 
 // calls the batch update api which creates a delayed job and returns
 // progress of the work and when it completes is monitored by the
@@ -56,61 +48,6 @@ export function batchUpdateAllModulesApiCall(
       async,
     },
   })
-}
-
-export function monitorProgress(
-  progressId: string,
-  setCurrentProgress: (progress: CanvasProgress) => void,
-  onProgressFail: (error: Error) => void,
-) {
-  let progress: CanvasProgress
-
-  const pollBatchApiProgress = () => {
-    if (!progressId) return
-    if (
-      progress &&
-      (progress.workflow_state === 'completed' || progress.workflow_state === 'failed')
-    )
-      return
-
-    const pollingLoop = () => {
-      doFetchApi<CanvasProgress>({
-        path: `/api/v1/progress/${progressId}`,
-      })
-        .then(result => {
-          progress = result.json!
-          if (!['completed', 'failed'].includes(progress.workflow_state)) {
-            window.setTimeout(pollingLoop, PUBLISH_STATUS_POLLING_MS)
-          }
-          setCurrentProgress(progress)
-        })
-        .catch((error: Error) => {
-          onProgressFail(error)
-        })
-    }
-    pollingLoop()
-  }
-  pollBatchApiProgress()
-}
-
-export function cancelBatchUpdate(
-  progress: CanvasProgress | undefined,
-  onCancelComplete: (error?: Error) => void,
-) {
-  if (!progress) return
-  if (progress.workflow_state === 'completed' || progress.workflow_state === 'failed') return
-
-  doFetchApi<CanvasProgress>({
-    path: `/api/v1/progress/${progress.id}/cancel`,
-    method: 'POST',
-    body: {message: 'canceled'},
-  })
-    .then(_result => {
-      onCancelComplete()
-    })
-    .catch((error: Error) => {
-      onCancelComplete(error)
-    })
 }
 
 export function fetchAllItemPublishedStates(courseId: string | number, nextLink?: string) {
@@ -179,8 +116,6 @@ export function moduleIds(): Array<number> {
 // calling each other from w/in this module.
 const exportFuncs = {
   batchUpdateAllModulesApiCall,
-  monitorProgress,
-  cancelBatchUpdate,
   fetchAllItemPublishedStates,
   updateModulePendingPublishedStates,
   updateModulePublishedState,

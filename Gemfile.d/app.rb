@@ -20,16 +20,9 @@
 # NOTE: Indented gems are meant to indicate optional dependencies of parent gems
 
 gem "bootsnap", "~> 1.16", require: false
-if $canvas_rails == "7.1"
-  gem "rails", "~> 7.1.3"
-  # if rack is updated, please remove gems/autoextend/lib/rack/
-  gem "rack", "~> 3.0.11"
-  gem "sqlite3", "~> 1.7"
-else
-  gem "rails", "~> 7.2.0"
-  gem "rack", "~> 3.1"
-  gem "sqlite3", "~> 2.6"
-end
+gem "rails", "~> 7.2.0"
+gem "rack", "~> 3.1"
+gem "sqlite3", "~> 2.6"
 
 gem "switchman", "~> 4.0"
 gem "guardrail", "~> 3.0"
@@ -48,7 +41,7 @@ gem "aws-sdk-sns", "~> 1.60", require: false
 gem "aws-sdk-sqs", "~> 1.53", require: false
 gem "aws-sdk-sagemakerruntime", "~> 1.61", require: false
 gem "aws-sdk-translate", "~> 1.77", require: false
-gem "rqrcode", "~> 2.2", require: false
+gem "rqrcode", "~> 3.0", require: false
 gem "bcrypt", "~> 3.1"
 gem "benchmark", "~> 0.4", require: false
 gem "bigdecimal", "~> 3.1"

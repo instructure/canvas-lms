@@ -18,10 +18,20 @@
 
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import SubmissionModal from '../SubmissionModal'
 import fetchMock from 'fetch-mock'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
+import {generatePageListKey} from '../utils'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  ...jest.requireActual('@canvas/util/globalUtils'),
+  assignLocation: jest.fn(),
+}))
+
+// Import the mocked module
+import * as globalUtils from '@canvas/util/globalUtils'
 
 describe('SubmissionModal', () => {
   const submission = {
@@ -59,12 +69,24 @@ describe('SubmissionModal', () => {
   const SECOND_SECTION_URI = `/eportfolios/1/categories/${sections[1].id}/pages?page=1&per_page=10`
   const CREATE_URI = `/eportfolios/${defaultProps.portfolioId}/entries`
 
-  afterEach(() => {
+  beforeEach(() => {
+    queryClient.clear()
     fetchMock.restore()
+    jest.clearAllMocks()
+
+    queryClient.setQueryData(generatePageListKey(sections[0].id, defaultProps.portfolioId), {
+      pages: [{json: firstPages, nextPage: null}],
+      pageParams: [null],
+    })
+
+    fetchMock.get(FIRST_SECTION_URI, firstPages)
+    fetchMock.get(SECOND_SECTION_URI, secondPages)
   })
 
-  beforeEach(() => {
-    fetchMock.get(FIRST_SECTION_URI, firstPages)
+  afterEach(() => {
+    queryClient.clear()
+    fetchMock.restore()
+    jest.clearAllMocks()
   })
 
   it('renders a modal', async () => {
@@ -80,54 +102,58 @@ describe('SubmissionModal', () => {
     })
   })
 
-  it('fetches pages based on selected section', async () => {
-    const {getByText, getByTestId} = render(
+  it('shows correct pages for each section', async () => {
+    const {getByText, unmount} = render(
       <MockedQueryClientProvider client={queryClient}>
         <SubmissionModal {...defaultProps} />
       </MockedQueryClientProvider>,
     )
 
-    fetchMock.get(SECOND_SECTION_URI, secondPages)
     await waitFor(() => {
       expect(getByText('Page 1')).toBeInTheDocument()
       expect(getByText('Page 2')).toBeInTheDocument()
     })
-    getByTestId('section-select').click()
-    getByTestId('option-12').click()
+
+    unmount()
+
+    queryClient.setQueryData(generatePageListKey(sections[1].id, defaultProps.portfolioId), {
+      pages: [{json: secondPages, nextPage: null}],
+      pageParams: [null],
+    })
+
+    const {getByText: getByTextSecond} = render(
+      <MockedQueryClientProvider client={queryClient}>
+        <SubmissionModal {...defaultProps} sectionId={sections[1].id} />
+      </MockedQueryClientProvider>,
+    )
+
     await waitFor(() => {
-      expect(getByText('Page 3')).toBeInTheDocument()
-      expect(getByText('Page 4')).toBeInTheDocument()
+      expect(getByTextSecond('Page 3')).toBeInTheDocument()
+      expect(getByTextSecond('Page 4')).toBeInTheDocument()
     })
   })
 
   it('creates a new page with the selected submission', async () => {
-    const {getByText} = render(
+    const user = userEvent.setup()
+    const {getByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
         <SubmissionModal {...defaultProps} />
       </MockedQueryClientProvider>,
     )
 
-    const body = {
-      section_1: {
-        section_type: 'rich_text',
-        content: `This is my ${submission.assignment_name} submission for ${submission.course_name}`,
-      },
-      section_2: {
-        section_type: 'submission',
-        submission_id: submission.id,
-      },
-      eportfolio_entry: {
-        name: submission.assignment_name,
-        eportfolio_category_id: sections[0].id,
-      },
-      section_count: 2,
-    }
     fetchMock.post(CREATE_URI, {
-      json: {entry_url: 'path/to/new_entry'},
+      entry_url: 'path/to/new_entry',
     })
-    getByText('Create Page').click()
+
     await waitFor(() => {
-      expect(fetchMock.called(CREATE_URI, {method: 'POST', body})).toBe(true)
+      expect(getByTestId('create-page-button')).toBeInTheDocument()
+    })
+
+    await user.click(getByTestId('create-page-button'))
+
+    await waitFor(() => {
+      expect(fetchMock.called(CREATE_URI)).toBe(true)
+      expect(globalUtils.assignLocation).toHaveBeenCalledWith('path/to/new_entry')
     })
   })
 })

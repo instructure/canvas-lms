@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useMutation} from '@canvas/query'
+import {useMutation} from '@tanstack/react-query'
 import {ImportRubricTray} from './ImportRubricTray'
 import {ImportFailuresModal} from './ImportFailuresModal'
 // @ts-expect-error

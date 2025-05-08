@@ -26,7 +26,7 @@ RSpec.describe DataFixup::Lti::AddUserUuidCustomVariableToInternalTools do
   end
 
   describe ".run" do
-    context "sistemic" do
+    context "sistemic test" do
       before do
         tool_configuration.update!(target_link_uri: "https://sistemic.example.com")
       end
@@ -39,6 +39,24 @@ RSpec.describe DataFixup::Lti::AddUserUuidCustomVariableToInternalTools do
 
       it "does not update tool configurations that do not match the target link uri" do
         tool_configuration.update!(target_link_uri: "https://sistemicc.example.com")
+        described_class.run
+        expect(tool_configuration.reload.custom_fields["UserUUID"]).to be_nil
+      end
+    end
+
+    context "sistemic production" do
+      before do
+        tool_configuration.update!(target_link_uri: "https://sistemic-iad-prod.example.com")
+      end
+
+      it "adds the custom field to matching tool configurations using the target link uri" do
+        described_class.run
+        tool_configuration.reload
+        expect(tool_configuration.custom_fields["UserUUID"]).to eq("$vnd.instructure.User.uuid")
+      end
+
+      it "does not update tool configurations that do not match the target link uri" do
+        tool_configuration.update!(target_link_uri: "https://sistemicc-iad-prod.example.com")
         described_class.run
         expect(tool_configuration.reload.custom_fields["UserUUID"]).to be_nil
       end

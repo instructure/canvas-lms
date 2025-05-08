@@ -60,17 +60,19 @@ export const useUpdateEntry = () => {
   const contextId = useInsightStore(state => state.contextId)
   const discussionId = useInsightStore(state => state.discussionId)
 
-  const {isLoading, isError, mutateAsync} = useMutation({
+  const {isPending, isError, mutateAsync} = useMutation({
     mutationFn: ({entryId, entryFeedback}: {entryId: number; entryFeedback: EntryFeedback}) =>
       updateEntry(context, contextId, discussionId, entryId, entryFeedback),
     onSuccess: () => {
-      queryClient.invalidateQueries(['insightEntries', context, contextId, discussionId])
+      queryClient.invalidateQueries({
+        queryKey: ['insightEntries', context, contextId, discussionId],
+      })
     },
   })
 
   return {
     isError,
-    loading: isLoading,
+    loading: isPending,
     updateEntry: mutateAsync,
   }
 }

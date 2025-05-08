@@ -16,15 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ErrorShip from '@canvas/images/ErrorShip.svg'
-import {useMutation, useQuery} from '@canvas/query'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
-import React from 'react'
 import {createCourseCopyMutation} from '../mutations/createCourseCopyMutation'
 import {coursesQuery} from '../queries/courseQuery'
 import {useTermsQuery} from '../queries/termsQuery'
@@ -35,6 +34,7 @@ import {
   createCourseAndMigrationKey,
 } from '../types'
 import {CopyCourseForm} from './form/CopyCourseForm'
+import {useMutation, useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('content_copy_redesign')
 
@@ -66,7 +66,6 @@ export const CourseCopy = ({
   const courseQueryResult = useQuery({
     queryKey: [courseCopyRootKey, courseFetchKey, courseId],
     queryFn: coursesQuery,
-    meta: {fetchAtLeastOnce: true},
   })
 
   const termsQueryResult = useTermsQuery(rootAccountId)
@@ -123,7 +122,7 @@ export const CourseCopy = ({
       terms={termsQueryResult.data}
       userTimeZone={userTimeZone}
       courseTimeZone={courseTimeZone}
-      isSubmitting={mutation.isLoading || mutation.isSuccess}
+      isSubmitting={mutation.isPending || mutation.isSuccess}
       onCancel={handleCancel}
       onSubmit={handleSubmit}
     />

@@ -19,7 +19,10 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import TopLevelButtons from '../TopLevelButtons'
-import {FileManagementProvider, FileManagementContextProps} from '../../Contexts'
+import {
+  FileManagementProvider,
+  FileManagementContextProps,
+} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'

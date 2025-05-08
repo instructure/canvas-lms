@@ -265,6 +265,19 @@ describe DiscussionEntry do
       expect(BroadcastPolicy.notifier).to receive(:send_notification).once
       entry.broadcast_report_notification("hello I have been reported")
     end
+
+    it "sends notification to teacher when a reply is reported in a group discussion" do
+      @course.root_account.enable_feature!(:discussions_reporting)
+      group(group_context: @course)
+      @group.participating_users << @student
+      @group.save!
+
+      topic = @group.discussion_topics.create!(user: @teacher, message: "This is an important announcement")
+      topic.subscribe(@student)
+      entry = topic.discussion_entries.create!(user: @teacher, message: "Oh, and another thing...")
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).once
+      entry.broadcast_report_notification("hello I have been reported")
+    end
   end
 
   context "sub-topics" do

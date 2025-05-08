@@ -324,7 +324,7 @@ class AssignmentGroupsController < ApplicationController
     includes += [:rubric_association] if !assignment_excludes.include?("rubric") || include_params.include?("has_rubric")
     includes += [:rubric] unless assignment_excludes.include?("rubric")
     includes << :discussion_topic if include_params.include?("discussion_topic")
-    includes << :assignment_overrides if include_overrides?
+    includes << :active_assignment_overrides if include_overrides?
     includes
   end
 

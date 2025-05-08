@@ -1936,6 +1936,25 @@ class User < ActiveRecord::Base
     !!feature_enabled?(:high_contrast)
   end
 
+  def prefers_dyslexic_font?
+    !!feature_enabled?(:use_dyslexic_font)
+  end
+
+  # the logic here is copied from feature_flags_controller#index
+  # we don't want to add use_dyslexic_font to ENV if
+  # (a) the flag is shadowed or (b) the flag is off/locked at site admin
+  def can_see_dyslexic_font_feature_flag?(session)
+    can_read_site_admin = Account.site_admin.grants_right?(@current_user, session, :read)
+
+    !!lookup_feature_flag(
+      "use_dyslexic_font",
+      override_hidden: can_read_site_admin,
+      include_shadowed: can_read_site_admin,
+      skip_cache: false,
+      hide_inherited_enabled: true
+    )
+  end
+
   def auto_show_cc?
     !!feature_enabled?(:auto_show_cc)
   end
@@ -2869,6 +2888,10 @@ class User < ActiveRecord::Base
     initialize_default_folder(Folder::CONVERSATION_ATTACHMENTS_FOLDER_NAME)
   end
 
+  def flamegraphs_folder
+    initialize_default_folder(Folder::FLAMEGRAPHS_FOLDER_NAME)
+  end
+
   def initialize_default_folder(name)
     folder = active_folders.where(name:).first
     folder ||= folders.create!(name:,
@@ -3204,10 +3227,11 @@ class User < ActiveRecord::Base
     end
     return :required if pseudonym_hint&.authentication_provider&.mfa_required?
 
-    pseudonyms = self.pseudonyms.shard(self).preload(:account, authentication_provider: :account)
+    pseudonyms = self.pseudonyms.active.shard(self).preload(:account, authentication_provider: :account)
     return :required if pseudonyms.any? { |p| p.authentication_provider&.mfa_required? }
 
-    result = pseudonyms.map(&:account).uniq.map do |account|
+    associated_pseudonym_account_ids = pseudonyms.unscope(:order).distinct.pluck(:account_id)
+    result = Account.root_accounts.active.where(id: associated_pseudonym_account_ids).map do |account|
       case account.mfa_settings
       when :disabled
         0
@@ -3557,6 +3581,23 @@ class User < ActiveRecord::Base
     return :no_enrollments if account.root_account.no_enrollments_can_create_courses? && !scope.exists? && account == mcc
 
     nil
+  end
+
+  def create_courses_permissions(root_account)
+    # things needed on both k5 and classic dashboards
+    create_permission_root_account = create_courses_right(root_account, check_subaccounts: true)
+    create_permission_mcc_account = create_courses_right(root_account.manually_created_courses_account)
+    # alternate account already checks if the user is an admin + can create courses in the account
+    create_permission_alternate_account = :admin if alternate_account_for_course_creation
+
+    mcc_only = if create_permission_alternate_account
+                 # admin can always create courses in other accounts/subaccounts
+                 false
+               else
+                 !(create_permission_root_account && root_account.feature_enabled?(:create_course_subaccount_picker))
+               end
+    can_create = create_permission_root_account || create_permission_alternate_account || create_permission_mcc_account
+    { can_create:, restrict_to_mcc: mcc_only }
   end
 
   def all_account_calendars

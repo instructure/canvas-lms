@@ -16,53 +16,69 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 // TODO: if editing this file, please consider removing/resolving some of the "any" references
 
-import React from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
-import ToolLaunchIframe from './ToolLaunchIframe'
+import React from 'react'
 import {handleExternalContentMessages} from '../../messages'
+import ToolLaunchIframe from './ToolLaunchIframe'
+import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 const I18n = createI18nScope('external_toolsModalLauncher')
 
 type ExternalToolModalLauncherState = {
   modalLaunchStyle: {
-    border: string,
-    width?: number,
-    height?: number,
-  },
-  beforeExternalContentAlertClass?: string,
-  afterExternalContentAlertClass?: string,
+    border: string
+    width?: number
+    height?: number
+  }
+  beforeExternalContentAlertClass?: string
+  afterExternalContentAlertClass?: string
 }
 
 export type ExternalToolModalLauncherProps = {
-  appElement: Element,
-  title: string,
+  appElement: Element
+  title: string
   tool: {
-    definition_id: string,
-    placements?: Record<string, {
-      selection_width?: number,
-      selection_height?: number,
-      launch_width?: number,
-      launch_height?: number,
-    }>
-  },
-  isOpen: boolean,
-  onRequestClose: () => void,
-  contextType: string,
-  contextId: number | string,
-  launchType: string,
-  contextModuleId?: string,
-  onExternalContentReady?: (data: any) => void,
-  onDeepLinkingResponse?: (data: any) => void,
-  resourceSelection?: boolean,
+    definition_id: string
+    placements?: Record<
+      string,
+      {
+        selection_width?: number
+        selection_height?: number
+        launch_width?: number
+        launch_height?: number
+      }
+    >
+  }
+  isOpen: boolean
+  onRequestClose: () => void
+  contextType: string
+  contextId: number | string
+  launchType: string
+  contextModuleId?: string
+  onExternalContentReady?: (data: any) => void
+  onDeepLinkingResponse?: (data: any) => void
+  resourceSelection?: boolean
 }
 
-export default class ExternalToolModalLauncher extends React.Component<ExternalToolModalLauncherProps> {
+export type ExternalToolModalLauncherSimplifiedProps = {
+  appElement: Element
+  isOpen: boolean
+  onRequestClose: () => void
+  iframeSrc: string
+  title: string
+  width?: number
+  height?: number
+}
+
+export default class ExternalToolModalLauncher extends React.Component<
+  ExternalToolModalLauncherProps | ExternalToolModalLauncherSimplifiedProps
+> {
   removeExternalContentListener?: () => void
+  removeCloseListener?: () => void
   iframe?: HTMLIFrameElement | null
   beforeAlert?: HTMLDivElement | null
   afterAlert?: HTMLDivElement | null
@@ -81,23 +97,31 @@ export default class ExternalToolModalLauncher extends React.Component<ExternalT
     this.removeExternalContentListener = handleExternalContentMessages({
       ready: this.onExternalToolCompleted,
       cancel: () => this.onExternalToolCompleted({}),
-      onDeepLinkingResponse: this.props.onDeepLinkingResponse,
+      onDeepLinkingResponse:
+        'onDeepLinkingResponse' in this.props ? this.props.onDeepLinkingResponse : undefined,
     })
+
+    const placement = 'tool' in this.props ? this.props.launchType : 'modal'
+    this.removeCloseListener = onLtiClosePostMessage(placement, this.props.onRequestClose)
   }
 
   componentWillUnmount() {
     this.removeExternalContentListener?.()
+    this.removeCloseListener?.()
   }
 
   onExternalToolCompleted = (data: any) => {
-    if (this.props.onExternalContentReady) {
-      this.props.onExternalContentReady(data)
+    if ('onExternalContentReady' in this.props) {
+      this.props.onExternalContentReady?.(data)
     }
     this.props.onRequestClose()
   }
 
   getIframeSrc = () => {
-    if (this.props.isOpen && this.props.tool) {
+    if ('iframeSrc' in this.props) {
+      return this.props.iframeSrc
+    }
+    if (this.props.isOpen && 'tool' in this.props) {
       return [
         '/',
         this.props.contextType,
@@ -120,9 +144,11 @@ export default class ExternalToolModalLauncher extends React.Component<ExternalT
       height: 700,
     }
 
-    if (
-      this.props.isOpen &&
-      this.props.tool &&
+    if ('width' in this.props && 'height' in this.props) {
+      dimensions.width = this.props.width || dimensions.width
+      dimensions.height = this.props.height || dimensions.height
+    } else if (
+      'tool' in this.props &&
       this.props.launchType &&
       this.props.tool.placements &&
       this.props.tool.placements[this.props.launchType]
@@ -168,6 +194,28 @@ export default class ExternalToolModalLauncher extends React.Component<ExternalT
     if (this.iframe) {
       this.iframe.setAttribute('allow', iframeAllowances())
     }
+
+    const observer = new MutationObserver(() => {
+      const closeButton = document.querySelector(
+        '[role="dialog"] button[data-cid="BaseButton"]',
+      ) as HTMLButtonElement | null
+
+      if (closeButton) {
+        observer.disconnect()
+
+        setTimeout(() => {
+          requestAnimationFrame(() => {
+            closeButton.setAttribute('tabindex', '-1')
+            closeButton.focus()
+          })
+        }, 100)
+      }
+    })
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    })
   }
 
   render() {
@@ -176,12 +224,14 @@ export default class ExternalToolModalLauncher extends React.Component<ExternalT
 
     const modalLaunchStyle = {
       ...this.getLaunchDimensions(),
-      ...this.state.modalLaunchStyle
+      ...this.state.modalLaunchStyle,
     }
 
     return (
       <CanvasModal
-        label={I18n.t('%{externalToolText}', {externalToolText: this.props.title || 'Launch External Tool'})}
+        label={I18n.t('%{externalToolText}', {
+          externalToolText: this.props.title || 'Launch External Tool',
+        })}
         open={this.props.isOpen}
         onDismiss={this.props.onRequestClose}
         onOpen={this.onAfterOpen}

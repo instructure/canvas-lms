@@ -25,8 +25,10 @@ import Navigation from './react/OldSideNav'
 import MobileNavigation from './react/MobileNavigation'
 import ready from '@instructure/ready'
 import NewTabIndicator from './react/NewTabIndicator'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 import {getExternalTools} from './react/utils'
+import AlertManager from '@canvas/alerts/react/AlertManager'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('common')
 
@@ -77,17 +79,19 @@ ready(() => {
     if (mobileContextNavContainer) {
       const sideNavRoot = createRoot(mobileContextNavContainer)
       sideNavRoot.render(
-        <QueryProvider>
+        <QueryClientProvider client={queryClient}>
           <SideNav externalTools={getExternalTools()} />
-        </QueryProvider>,
+        </QueryClientProvider>,
       )
 
       // Render MobileNavigation after SideNav
       const mobileNavRoot = createRoot(mobileContextNavContainer)
       mobileNavRoot.render(
-        <QueryProvider>
-          <MobileNavigation navIsOpen={globalNavIsOpen} />
-        </QueryProvider>,
+        <QueryClientProvider client={queryClient}>
+          <AlertManager breakpoints={{}}>
+            <MobileNavigation navIsOpen={globalNavIsOpen} />
+          </AlertManager>
+        </QueryClientProvider>,
       )
     }
   } else {
@@ -95,18 +99,20 @@ ready(() => {
     if (globalNavTrayContainer) {
       const navigationRoot = createRoot(globalNavTrayContainer)
       navigationRoot.render(
-        <QueryProvider>
+        <QueryClientProvider client={queryClient}>
           <Navigation />
-        </QueryProvider>,
+        </QueryClientProvider>,
       )
 
       const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
       if (mobileContextNavContainer) {
         const mobileNavRoot = createRoot(mobileContextNavContainer)
         mobileNavRoot.render(
-          <QueryProvider>
-            <MobileNavigation />
-          </QueryProvider>,
+          <QueryClientProvider client={queryClient}>
+            <AlertManager breakpoints={{}}>
+              <MobileNavigation />
+            </AlertManager>
+          </QueryClientProvider>,
         )
       }
     }

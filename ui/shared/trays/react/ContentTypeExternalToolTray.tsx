@@ -20,6 +20,7 @@ import CanvasTray from './Tray'
 import $ from 'jquery'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
+import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 type Tool = {
   id: string
@@ -89,6 +90,10 @@ export default function ContentTypeExternalToolTray({
     () => handleExternalContentMessages({ready: onExternalContentReady}),
     [onExternalContentReady],
   )
+
+  useEffect(() => {
+    return onLtiClosePostMessage(placement, onDismiss)
+  }, [])
 
   return (
     <CanvasTray

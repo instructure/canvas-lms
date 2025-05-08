@@ -59,6 +59,38 @@ describe Checkpoints::SubmissionAggregatorService do
     end
 
     describe "score" do
+      it "creates a parent submission when none exists and correctly aggregates a single checkpoint score" do
+        @course2 = course_model
+        assignment_without_submissions = @course2.assignments.create!(title: "My Assignment")
+        assignment_without_submissions.sub_assignments.create!(title: "sub assignment", context: assignment_without_submissions.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+        assignment_without_submissions.reload
+        enrollment_params = { enrollment_state: "active", type: "StudentEnrollment", return_type: :record }
+        create_enrollments(@course2, [@student], enrollment_params)
+
+        expect(assignment_without_submissions.submissions.find_by(user: @student)).to be_nil
+        # grade only the REPLY_TO_TOPIC checkpoint
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          assignment_without_submissions.grade_student(
+            @student,
+            grader: @teacher,
+            score: 5,
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC
+          )
+        end
+        result = nil
+        expect do
+          result = service.call(assignment: assignment_without_submissions, student: @student)
+        end.to change { assignment_without_submissions.submissions.count }.from(0).to(1)
+        expect(result).to be true
+
+        # verify both child and parent scores
+        child  = assignment_without_submissions.sub_assignments.first.submissions.first
+        parent = assignment_without_submissions.submissions.first
+
+        expect(child.score).to eq 5
+        expect(parent.score).to eq 5
+      end
+
       it "saves the sum of checkpoint scores on the parent submission" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
           @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)

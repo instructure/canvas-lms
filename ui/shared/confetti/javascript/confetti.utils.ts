@@ -37,7 +37,6 @@ const confettiFlavors = [
   'magic_mystery_thumbs_up',
   'medal',
   'moon',
-  'ninja',
   'panama_rocket',
   'panda',
   'panda_unicycle',
@@ -140,7 +139,6 @@ export function getRandomConfettiFlavor() {
     return generateConfettiObject(flavor)
   } catch (e) {
     if (e instanceof Error) {
-       
       console.error(e.stack)
     }
     return null

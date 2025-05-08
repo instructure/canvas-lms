@@ -35,6 +35,11 @@ import {
 } from '@canvas/outcomes/react/OutcomesImporter'
 import {courseMocks, groupDetailMocks, groupMocks} from '@canvas/outcomes/mocks/Management'
 import {windowConfirm} from '@canvas/util/globalUtils'
+import {useAllPages} from '@canvas/query'
+
+jest.mock('@canvas/query', () => ({
+  useAllPages: jest.fn(),
+}))
 
 jest.mock('@canvas/outcomes/react/OutcomesImporter', () => ({
   showOutcomesImporter: jest.fn(() => jest.fn(() => {})),
@@ -267,6 +272,11 @@ describe('OutcomeManagement', () => {
       })
 
       it("Doesn't ask to confirm tab change when there is not change", () => {
+        useAllPages.mockReturnValue({
+          data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+          isError: false,
+          isLoading: false,
+        })
         const {getByText} = render(
           <MockedProvider
             cache={cache}
@@ -283,6 +293,11 @@ describe('OutcomeManagement', () => {
       })
 
       it('Asks to confirm tab change when there is changes', async () => {
+        useAllPages.mockReturnValue({
+          data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+          isError: false,
+          isLoading: false,
+        })
         const {getByText, getByLabelText, getByTestId} = render(
           <MockedProvider
             cache={cache}

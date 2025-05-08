@@ -20,43 +20,57 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
-import {useQuery} from '@canvas/query'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import StudentMultiSelect from '../StudentMultiSelect'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 injectGlobalAlertContainers()
 
-jest.mock('@canvas/query')
-
-const renderComponent = (props = {}) => {
-  const defaultProps = {
-    selectedOptionIds: [],
-    onSelect: jest.fn(),
-  }
-
-  return render(<StudentMultiSelect {...defaultProps} {...props} />)
-}
+const mockStudents = [
+  {id: '1', name: 'Student One'},
+  {id: '2', name: 'Student Two'},
+  {id: '3', name: 'Student Three'},
+]
 
 describe('StudentMultiSelect', () => {
-  const mockStudents = [
-    {id: '1', name: 'Student One'},
-    {id: '2', name: 'Student Two'},
-    {id: '3', name: 'Student Three'},
-  ]
-
-  const mockUseQuery = useQuery as jest.Mock
+  let queryClient: QueryClient
 
   beforeEach(() => {
-    mockUseQuery.mockReturnValue({
-      data: mockStudents,
-      isLoading: false,
-      refetch: jest.fn(),
+    fakeENV.setup({
+      course_id: '123',
+      current_user_id: '999',
     })
+
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
+
+    // Pre-populate the query cache with our mock data
+    queryClient.setQueryData(['courses', {courseId: '123', searchText: 'Student'}], mockStudents)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    queryClient.clear()
+    fakeENV.teardown()
   })
+
+  const renderComponent = (props = {}) => {
+    const defaultProps = {
+      selectedOptionIds: [],
+      onSelect: jest.fn(),
+    }
+
+    return render(
+      <QueryClientProvider client={queryClient}>
+        <StudentMultiSelect {...defaultProps} {...props} />
+      </QueryClientProvider>,
+    )
+  }
 
   it('renders the component', async () => {
     renderComponent()
@@ -64,22 +78,27 @@ describe('StudentMultiSelect', () => {
   })
 
   it('displays students when typing in the search input', async () => {
+    const user = userEvent.setup()
     renderComponent()
     const input = screen.getByPlaceholderText('Search')
-    await userEvent.type(input, 'Student')
+    await user.type(input, 'Student')
 
-    expect(screen.getByText('Student One')).toBeInTheDocument()
+    // Wait for the students to appear
+    expect(await screen.findByText('Student One')).toBeInTheDocument()
     expect(screen.getByText('Student Two')).toBeInTheDocument()
     expect(screen.getByText('Student Three')).toBeInTheDocument()
   })
 
   it('calls onSelect when a student is selected', async () => {
+    const user = userEvent.setup()
     const onSelectMock = jest.fn()
     renderComponent({onSelect: onSelectMock})
     const input = screen.getByPlaceholderText('Search')
-    await userEvent.type(input, 'Student')
+    await user.type(input, 'Student')
 
-    await userEvent.click(screen.getByText('Student Two'))
+    // Wait for the students to appear
+    await screen.findByText('Student Two')
+    await user.click(screen.getByText('Student Two'))
 
     expect(onSelectMock).toHaveBeenCalledWith(['2'])
   })

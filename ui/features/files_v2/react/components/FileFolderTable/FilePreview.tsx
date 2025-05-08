@@ -41,7 +41,7 @@ export const FilePreview = ({item}: FilePreviewProps) => {
       <Flex as="div" alignItems="center" height="100%" justifyItems="center">
         <StudioMediaPlayer
           is_attachment={true}
-          attachment_id={item.id}
+          attachment_id={item.id.toString()}
           show_loader={true}
           isInverseVariant={true}
           hideUploadCaptions={isLockedBlueprintItem(item)}

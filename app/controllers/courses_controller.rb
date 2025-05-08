@@ -367,7 +367,7 @@ class CoursesController < ApplicationController
   before_action :check_horizon_redirect, only: [:show]
 
   include HorizonMode
-  before_action :redirect_student_to_horizon, only: [:show, :settings]
+  before_action :load_canvas_career, only: [:show, :settings]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -512,13 +512,11 @@ class CoursesController < ApplicationController
           css_bundle :context_list, :course_list
           js_bundle :course_list
 
-          create_permission_root_account = @current_user.create_courses_right(@domain_root_account)
-          create_permission_mcc_account = @current_user.create_courses_right(@domain_root_account.manually_created_courses_account)
-
+          course_permissions = @current_user.create_courses_permissions(@domain_root_account)
           js_env({
                    CREATE_COURSES_PERMISSIONS: {
-                     PERMISSION: create_permission_root_account || create_permission_mcc_account,
-                     RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
+                     PERMISSION: course_permissions[:can_create],
+                     RESTRICT_TO_MCC_ACCOUNT: course_permissions[:restrict_to_mcc]
                    }
                  })
 
@@ -2237,7 +2235,7 @@ class CoursesController < ApplicationController
 
       @context ||= api_find(Course.active, params[:id])
 
-      if @context.horizon_course? && !request.path.include?("/modules")
+      if @context.horizon_course? && !request.path.include?("/modules") && params[:invitation].blank?
         redirect_to course_context_modules_path(@context.id)
         return
       end
@@ -3831,7 +3829,7 @@ class CoursesController < ApplicationController
       # destroy the exising student
       @fake_student = @context.student_view_student
       # but first, remove all existing quiz submissions / submissions
-
+      AutoGradeResult.where(submission_id: @fake_student.all_submissions).delete_all
       AssessmentRequest.for_assessee(@fake_student).destroy_all
 
       @fake_student.destroy

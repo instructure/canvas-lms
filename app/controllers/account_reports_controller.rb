@@ -230,10 +230,10 @@ class AccountReportsController < ApplicationController
       available_reports = AccountReport.available_reports
 
       results = []
+      last_runs = AccountReport.last_reports(account: @account)
 
       available_reports.each do |key, value|
-        last_run = @account.account_reports.active.where(report_type: key).most_recent.take
-        last_run = account_report_json(last_run, @current_user) if last_run
+        last_run = account_report_json(last_runs[key], @current_user) if last_runs.key?(key)
         report = {
           title: value.title,
           parameters: nil,

@@ -215,6 +215,8 @@ class SubmissionLifecycleManager
     # in a transaction on the correct shard:
     @course.shard.activate do
       values = []
+      # values must be unique by assignment_id and student_id
+      processed_pairs = Set.new
 
       assignments_by_id = AbstractAssignment.find(@assignment_ids).index_by(&:id)
 
@@ -226,6 +228,9 @@ class SubmissionLifecycleManager
         quiz_lti = quiz_lti_assignments.include?(assignment_id)
 
         student_due_dates.each_key do |student_id|
+          key = [assignment_id, student_id]
+          next unless processed_pairs.add?(key)
+
           submission_info = student_due_dates[student_id]
           due_date = submission_info[:due_at] ? "'#{ActiveRecord::Base.connection.quoted_date(submission_info[:due_at].change(usec: 0))}'::timestamptz" : "NULL"
           grading_period_id = submission_info[:grading_period_id] || "NULL"
@@ -238,6 +243,9 @@ class SubmissionLifecycleManager
 
           if @create_sub_assignment_submissions && assignment.checkpoints_parent? && assignment.sub_assignment_submissions.find_by(user_id: student_id).nil?
             assignment.sub_assignments.each do |sub_assignment|
+              sub_assignment_key = [sub_assignment.id, student_id]
+              next unless processed_pairs.add?(sub_assignment_key)
+
               values << [sub_assignment.id, student_id, "NULL", grading_period_id, sql_ready_anonymous_id, quiz_lti, @course.root_account_id]
             end
           end

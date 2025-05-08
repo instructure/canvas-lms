@@ -514,7 +514,8 @@ class Rubric < ActiveRecord::Base
   DEFAULT_GENERATE_OPTIONS = {
     criteria_count: 5,
     rating_count: 4,
-    points_per_criterion: 20
+    points_per_criterion: 20,
+    use_range: false,
   }.freeze
   def generate_criteria_via_llm(association_object, generate_options = {})
     unless association_object.is_a?(AbstractAssignment)
@@ -586,10 +587,30 @@ class Rubric < ActiveRecord::Base
       end
       criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
       criterion[:points] = criterion[:ratings].pluck(:points).max || 0
+      criterion[:criterion_use_range] = !!generate_options[:use_range]
 
       criteria.push(criterion)
     end
     criteria
+  end
+
+  def self.process_generate_criteria_via_llm(progress, course, user, association_object, generate_options)
+    rubric = course.rubrics.build(user:)
+    if rubric.grants_right?(user, :update)
+      criteria = rubric.generate_criteria_via_llm(association_object, generate_options)
+      progress.set_results({ criteria: })
+      progress.complete!
+    end
+  rescue InstLLM::ServiceQuotaExceededError, InstLLM::ThrottlingError
+    progress.set_results({ error: t("There was an error with generation capacity. Please try again later.") })
+    progress.fail!
+  rescue InstLLMHelper::RateLimitExceededError
+    progress.set_results({ error: t("You have made too many criteria generation requests. Please try again later.") })
+    progress.fail!
+  rescue
+    progress.set_results({ error: t("There was an error with the criteria generation. Please try agian later.") })
+    progress.fail!
+    raise
   end
 
   def reconstitute_criteria(criteria)

@@ -20,12 +20,11 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useQuery} from '@tanstack/react-query'
 import {UserTags} from '../types'
 
-export const useUserTags = (
-  courseId: number,
-  userId: number,
-) => {
-  const fetchUserTags= async () => {
-    const response = await doFetchApi<Array<{id: number; name: string; group_category_name: string; is_single_tag: boolean;}>>({
+export const useUserTags = (courseId: number, userId: number) => {
+  const fetchUserTags = async () => {
+    const response = await doFetchApi<
+      Array<{id: number; name: string; group_category_name: string; is_single_tag: boolean}>
+    >({
       path: `/api/v1/courses/${courseId}/groups`,
       headers: {
         Accept: 'application/json',
@@ -56,6 +55,5 @@ export const useUserTags = (
     queryFn: fetchUserTags,
     enabled: !!courseId && !!userId,
     refetchOnMount: 'always',
-
   })
 }

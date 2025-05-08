@@ -79,8 +79,13 @@ export default class RosterUserView extends View {
     this.permissionsJSON(json)
     this.observerJSON(json)
     this.contextCardJSON(json)
-    // Set flag based on whether the user is selected in the collection
-    json.isSelected = this.model.collection?.selectedUserIds?.includes(this.model.id) ?? false
+    const collection = this.model.collection
+    if (collection && collection.masterSelected) {
+      // If masterSelected is true, mark as selected unless explicitly de-selected.
+      json.isSelected = !collection.deselectedUserIds.includes(this.model.id)
+    } else {
+      json.isSelected = collection?.selectedUserIds?.includes(this.model.id) ?? false
+    }
     return json
   }
 
@@ -119,7 +124,8 @@ export default class RosterUserView extends View {
     json.canViewLoginIdColumn = ENV.permissions.view_user_logins
     json.canViewSisIdColumn = ENV.permissions.read_sis
     json.canManageDifferentiationTags =
-      ENV.permissions.can_manage_differentiation_tags && ENV.permissions.allow_assign_to_differentiation_tags
+      ENV.permissions.can_manage_differentiation_tags &&
+      ENV.permissions.allow_assign_to_differentiation_tags
 
     const candoAdminActions = ENV.permissions.can_allow_course_admin_actions
 
@@ -320,14 +326,7 @@ export default class RosterUserView extends View {
         console.error('Error invalidating query, error:', error)
       }
 
-      const $focusElement = $previousRow.length
-        ? $previousRow.find('.al-trigger')
-        : // For some reason, VO + Safari sends the virtual cursor to the window
-          // instead of to this element, this has the side effect of making the
-          // flash message not read either in this case :(
-          // Looking at the Tech Preview version of Safari, this isn't an issue
-          // so it should start working once new Safari is released.
-          $('#addUsers')
+      const $focusElement = $previousRow.length ? $previousRow.find('.al-trigger') : $('#addUsers')
       return $focusElement.focus()
     }
 
@@ -350,23 +349,35 @@ export default class RosterUserView extends View {
     return this[method].call(this, e)
   }
 
+  // If unchecking a user while master is on, add them to the "deselected" list
   handleCheckboxChange(e) {
     const isChecked = $(e.currentTarget).is(':checked')
     const userId = this.model.id
-    const selectedUserIds = this.model.collection.selectedUserIds
+    const {selectedUserIds, masterSelected, deselectedUserIds} = this.model.collection
 
     if (isChecked) {
+      // Add user to selected list if not already
       if (!selectedUserIds.includes(userId)) {
         selectedUserIds.push(userId)
       }
+      // Also remove from the deselected list if present
+      this.model.collection.deselectedUserIds = deselectedUserIds.filter(id => id !== userId)
     } else {
+      // Remove from selected
       this.model.collection.selectedUserIds = selectedUserIds.filter(id => id !== userId)
+
+      // If master is set, remember that this user was explicitly unchecked
+      if (masterSelected && !deselectedUserIds.includes(userId)) {
+        this.model.collection.deselectedUserIds.push(userId)
+      }
     }
 
     MessageBus.trigger('userSelectionChanged', {
       model: this.model,
       selected: isChecked,
       selectedUsers: this.model.collection.selectedUserIds,
+      deselectedUserIds: this.model.collection.deselectedUserIds,
+      masterSelected: this.model.collection.masterSelected,
     })
   }
 

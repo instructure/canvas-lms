@@ -171,7 +171,8 @@ describe ContentExportsController do
         course_factory active_all: true
         course_with_ta(course: @course, active_all: true)
         student_in_course(course: @course, active_all: true)
-        @acx = @course.content_exports.create!(user: @ta, export_type: "common_cartridge")
+        attachment_model(context: @course, uploaded_data: fixture_file_upload("migration/canvas_cc_minimum.zip", "application/zip"))
+        @acx = @course.content_exports.create!(user: @ta, export_type: "common_cartridge", attachment: @attachment)
         @tcx = @course.content_exports.create!(user: @teacher, export_type: "common_cartridge")
         @tzx = @course.content_exports.create!(user: @teacher, export_type: "zip")
         @szx = @course.content_exports.create!(user: @student, export_type: "zip")
@@ -203,6 +204,19 @@ describe ContentExportsController do
           user_session(@teacher)
           get :show, params: { course_id: @course.id, id: @szx.id }
           assert_status(404)
+        end
+
+        context "disable_verified_content_export_links enabled" do
+          before do
+            Account.site_admin.enable_feature!(:disable_verified_content_export_links)
+          end
+
+          it "does not send verifiers in the attachment link" do
+            user_session(@teacher)
+            get :show, params: { course_id: @course.id, id: @acx.id }
+            expect(response.parsed_body.dig("content_export", "download_url")).to be_present
+            expect(response.parsed_body.dig("content_export", "download_url")).not_to include "verifier="
+          end
         end
       end
     end

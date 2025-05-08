@@ -1374,6 +1374,12 @@ describe AssignmentsController do
     end
 
     it "sets 'ROOT_OUTCOME_GROUP' for external tool assignments in the teacher view" do
+      @course.context_external_tools.create!(
+        shared_secret: "test_secret",
+        consumer_key: "test_key",
+        name: "test tool",
+        domain: "example.com"
+      )
       user_session(@teacher)
       @assignment.submission_types = "external_tool"
       @assignment.build_external_tool_tag(url: "http://example.com/test")
@@ -1381,6 +1387,7 @@ describe AssignmentsController do
 
       get "show", params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).not_to be_nil
+      expect(assigns[:js_env][:LTI_TOOL_ID]).not_to be_nil
     end
 
     it "sets first_annotation_submission to true if it's the first submission and the assignment is annotatable" do
@@ -1497,7 +1504,16 @@ describe AssignmentsController do
             end
 
             it "is included when assignment is an external tool type" do
-              @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+              @course.context_external_tools.create!(
+                shared_secret: "test_secret",
+                consumer_key: "test_key",
+                name: "test tool",
+                domain: "example.com"
+              )
+              @assignment.submission_types = "external_tool"
+              @assignment.build_external_tool_tag(url: "http://example.com/test")
+              @assignment.save!
+
               get :show, params: { course_id: @course.id, id: @assignment.id }
               expect(assigns[:js_env][:SETTINGS]).to have_key(:filter_speed_grader_by_student_group)
             end
@@ -1577,13 +1593,29 @@ describe AssignmentsController do
           end
 
           it "includes group_categories when assignment is an external tool type" do
-            @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+            @course.context_external_tools.create!(
+              shared_secret: "test_secret",
+              consumer_key: "test_key",
+              name: "test tool",
+              domain: "example.com"
+            )
+            @assignment.submission_types = "external_tool"
+            @assignment.build_external_tool_tag(url: "http://example.com/test")
+            @assignment.save!
             get :show, params: { course_id: @course.id, id: @assignment.id }
             expect(assigns[:js_env]).to have_key(:group_categories)
           end
 
           it "includes selected_student_group_id when assignment is an external tool type" do
-            @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+            @course.context_external_tools.create!(
+              shared_secret: "test_secret",
+              consumer_key: "test_key",
+              name: "test tool",
+              domain: "example.com"
+            )
+            @assignment.submission_types = "external_tool"
+            @assignment.build_external_tool_tag(url: "http://example.com/test")
+            @assignment.save!
             first_group_id = @course.groups.first.id.to_s
             @teacher.preferences[:gradebook_settings] = {
               @course.global_id => {
@@ -1670,7 +1702,15 @@ describe AssignmentsController do
         end
 
         it "includes speed_grader_url when assignment is an external tool type" do
-          @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+          @course.context_external_tools.create!(
+            shared_secret: "test_secret",
+            consumer_key: "test_key",
+            name: "test tool",
+            domain: "example.com"
+          )
+          @assignment.submission_types = "external_tool"
+          @assignment.build_external_tool_tag(url: "http://example.com/test")
+          @assignment.save!
           get :show, params: { course_id: @course.id, id: @assignment.id }
           expect(assigns[:js_env]).to have_key(:speed_grader_url)
         end
@@ -1905,7 +1945,15 @@ describe AssignmentsController do
         end
 
         it "sets assigned_rubric and rubric_association for external_tool assignments" do
-          @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+          @course.context_external_tools.create!(
+            shared_secret: "test_secret",
+            consumer_key: "test_key",
+            name: "test tool",
+            domain: "example.com"
+          )
+          @assignment.submission_types = "external_tool"
+          @assignment.build_external_tool_tag(url: "http://example.com/test")
+          @assignment.save!
           get :show, params: { course_id: @course.id, id: @assignment.id }
           expect(assigns[:js_env][:assigned_rubric][:id]).to eq @assignment.rubric_association.rubric_id
           expect(assigns[:js_env][:assigned_rubric][:title]).to eq "Unnamed Course Rubric"
@@ -2999,18 +3047,33 @@ describe AssignmentsController do
       before { user_session(@teacher) }
 
       it "includes the existing asset processors" do
+        icon = "http://example.com/ap.png"
         tool = external_tool_1_3_model(context: @course)
-        ap1 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 1")
-        ap2 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 2")
+        ap1 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 1", iframe: { width: 100, height: 200 }, window: nil, icon: { url: icon })
+        ap2 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 2", window: { width: 300, height: 400 }, iframe: nil, icon: { url: icon })
         get :edit, params: { course_id: @course.id, id: @assignment.id }
 
         aps = assigns[:js_env][:ASSET_PROCESSORS].map do |ap|
-          ap.slice(:id, :title, :context_external_tool_id)
+          ap.slice(:id, :title, :tool_id, :tool_name, :icon_or_tool_icon_url, :iframe, :window).deep_symbolize_keys
         end
 
         expected = [
-          { id: ap1.id, title: "ap 1", context_external_tool_id: tool.id },
-          { id: ap2.id, title: "ap 2", context_external_tool_id: tool.id }
+          {
+            id: ap1.id,
+            title: "ap 1",
+            tool_id: tool.id,
+            tool_name: tool.name,
+            icon_or_tool_icon_url: icon,
+            iframe: { width: 100, height: 200 },
+          },
+          {
+            id: ap2.id,
+            title: "ap 2",
+            tool_id: tool.id,
+            tool_name: tool.name,
+            icon_or_tool_icon_url: icon,
+            window: { width: 300, height: 400 }
+          }
         ]
 
         expect(aps).to match_array(expected)

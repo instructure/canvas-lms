@@ -163,7 +163,6 @@ module CanvasRails
                                 Rails.root.join("app/stylesheets"),
                                 Rails.root.join("ui")]
 
-    config.middleware.insert_before Rack::ETag, Rack::Chunked if $canvas_rails == "7.1"
     config.middleware.insert_before Rack::ETag, Rack::Deflater, if: lambda { |*|
       ::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
     }
@@ -364,13 +363,6 @@ module CanvasRails
         %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
     end
 
-    # for Rails 7.1
-    def validate_secret_key_base(_)
-      # we don't use Rails' CookieStore session middleware, so we
-      # don't care about secret_key_base
-    end
-
-    # for Rails 7.2
     def secret_key_base
       # we don't use Rails' CookieStore session middleware, so we
       # don't care about secret_key_base
@@ -417,22 +409,9 @@ module CanvasRails
       end
     end
 
-    if $canvas_rails < "7.2"
-      # This should run after all initializers are complete, as yjit optimizing initialization code is unhelpful
-      # (modeled after version of yjit enabling in rails main)
-      initializer :enable_yjit do
-        config.after_initialize do
-          yjit_enabled = ActiveModel::Type::Boolean.new.cast(::DynamicSettings.find(tree: :private)["enable_yjit", failsafe: "false"])
-          if yjit_enabled && defined?(RubyVM::YJIT.enable)
-            RubyVM::YJIT.enable
-          end
-        end
-      end
-    else
-      # ensure configure after dynamic settings is configured before yjit is managed
-      initializer :enable_yjit_check, before: "enable_yjit" do
-        config.yjit = ActiveModel::Type::Boolean.new.cast(::DynamicSettings.find(tree: :private)["enable_yjit", failsafe: "false"])
-      end
+    # ensure configure after dynamic settings is configured before yjit is managed
+    initializer :enable_yjit_check, before: "enable_yjit" do
+      config.yjit = ActiveModel::Type::Boolean.new.cast(::DynamicSettings.find(tree: :private)["enable_yjit", failsafe: "false"])
     end
 
     initializer "canvas.extend_shard", before: "active_record.initialize_database" do

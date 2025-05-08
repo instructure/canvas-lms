@@ -24,7 +24,7 @@ import {FormFieldMessage} from '@instructure/ui-form-field'
 import {Collection, CollectionData} from '@instructure/ui-tree-browser/types/TreeBrowser/props'
 import {View} from '@instructure/ui-view'
 import {useFoldersQuery} from './hooks'
-import {FolderCollection,addNewFoldersToCollection} from './utils'
+import {FolderCollection, addNewFoldersToCollection} from './utils'
 import {type Folder} from '../../../../interfaces/File'
 
 export type FolderTreeBrowserRef = {
@@ -42,7 +42,7 @@ const FolderTreeBrowser = forwardRef<FolderTreeBrowserRef, FolderTreeBrowserProp
   ({rootFolder, onSelectFolder}, ref) => {
     const containerRef = useRef<Element | null>(null)
     const hasValidSelection = useRef<boolean>(false)
-    const [currentFolderId, setCurrentFolderId] = useState<string>(rootFolder.id)
+    const [currentFolderId, setCurrentFolderId] = useState<string>(rootFolder.id.toString())
     const [formError, setFormError] = useState<string | null>(null)
     const [folders, setFolders] = useState<FolderCollection>({
       [rootFolder.id]: {id: rootFolder.id, name: rootFolder.name},
@@ -89,11 +89,17 @@ const FolderTreeBrowser = forwardRef<FolderTreeBrowserRef, FolderTreeBrowserProp
       [folders, onSelectFolder],
     )
 
-    const {folders : foldersResult, foldersLoading, foldersError} = useFoldersQuery(currentFolderId as string)
+    const {
+      folders: foldersResult,
+      foldersLoading,
+      foldersError,
+    } = useFoldersQuery(currentFolderId as string)
 
     useMemo(() => {
       if (!foldersLoading && !foldersError && foldersResult) {
-        setFolders((originalFolders) => addNewFoldersToCollection(originalFolders, currentFolderId as string, foldersResult))
+        setFolders(originalFolders =>
+          addNewFoldersToCollection(originalFolders, currentFolderId as string, foldersResult),
+        )
       }
     }, [foldersLoading, foldersError, foldersResult])
 

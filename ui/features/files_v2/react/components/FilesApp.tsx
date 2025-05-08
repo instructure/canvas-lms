@@ -24,9 +24,11 @@ import {canvas} from '@instructure/ui-themes'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
-
-import {FileManagementProvider} from './Contexts'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {getFilesEnv} from '../../utils/filesEnvUtils'
+import {FileManagementProvider} from '../contexts/FileManagementContext'
+import {RowFocusProvider, SELECT_ALL_FOCUS_STRING} from '../contexts/RowFocusContext'
+import {RowsProvider} from '../contexts/RowsContext'
 import FileFolderTable from './FileFolderTable'
 import FilesUsageBar from './FilesUsageBar'
 import SearchBar from './SearchBar'
@@ -51,13 +53,26 @@ interface FilesAppProps {
 }
 
 const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
+  const filesEnv = getFilesEnv()
   const showingAllContexts = filesEnv.showingAllContexts
 
+  const [currentRows, setCurrentRows] = useState<(File | Folder)[]>([])
   const [paginationAlert, setPaginationAlert] = useState<string>('')
+  const [rowToFocus, setRowToFocus] = useState<number | SELECT_ALL_FOCUS_STRING | null>(null)
   const currentFolderWrapper = useRef<BBFolderWrapper | null>(null)
+  const fileDropRef = useRef<HTMLInputElement | null>(null)
+  const selectAllRef = useRef<Checkbox | null>(null)
+  const actionButtonRefArray = useRef<React.RefObject<HTMLElement>[]>([])
+
+  const handleFileDropRef = (el: HTMLInputElement | null) => {
+    fileDropRef.current = el
+  }
+  const handleActionButtonRef = (el: HTMLElement | null, i: number) => {
+    actionButtonRefArray.current[i] = {current: el}
+  }
 
   const currentFolder = folders[folders.length - 1]
-  const folderId = currentFolder.id
+  const folderId = currentFolder.id.toString()
   const contextId = currentFolder.context_id
   const contextType = currentFolder.context_type.toLowerCase()
 
@@ -68,6 +83,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
         currentFolderWrapper.current = new BBFolderWrapper(currentFolder)
       }
       currentFolderWrapper.current!.files.set(rows.map((row: any) => new FileFolderWrapper(row)))
+      setCurrentRows(rows)
     },
     [currentFolder],
   )
@@ -83,6 +99,26 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
     folder: currentFolder,
     onSettled,
   })
+
+  // used to set focus after a move or delete action
+  useEffect(() => {
+    if (rowToFocus != null && !isLoading) {
+      if (currentRows?.length === 0) {
+        // empty table, focus on file drop
+        fileDropRef.current?.focus()
+      } else if (rowToFocus === SELECT_ALL_FOCUS_STRING) {
+        selectAllRef.current?.focus()
+      } else if (currentRows?.length) {
+        // focus on the next row from the row just moved or deleted
+        const rowToFocusIndex =
+          rowToFocus >= currentRows.length ? currentRows.length - 1 : rowToFocus
+        const menu = actionButtonRefArray.current[rowToFocusIndex]?.current
+        const focusable = menu?.querySelector('button')
+        ;(focusable as HTMLElement)?.focus()
+      }
+      setRowToFocus(null)
+    }
+  }, [rowToFocus, isLoading, currentRows?.length])
 
   useEffect(() => {
     if (error instanceof UnauthorizedError) {
@@ -136,85 +172,91 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
         fileMenuTools,
       }}
     >
-      <FilesLayout
-        size={size}
-        title={I18n.t('Files')}
-        headerActions={
-          <TopLevelButtons
+      <RowFocusProvider value={{setRowToFocus, handleActionButtonRef}}>
+        <RowsProvider value={{setCurrentRows, currentRows}}>
+          <FilesLayout
             size={size}
-            isUserContext={isUserContext}
-            shouldHideUploadButtons={!userCanAddFilesForContext || search.term.length > 0}
-          />
-        }
-        search={<SearchBar initialValue={search.term} onSearch={search.set} />}
-        breadcrumbs={<Breadcrumbs folders={folders} size={size} search={search.term} />}
-        bulkActions={
-          <BulkActionButtons
-            size={size}
-            selectedRows={selectedRows}
-            rows={rows ?? []}
-            totalRows={rows?.length ?? 0}
-            userCanEditFilesForContext={userCanEditFilesForContext}
-            userCanDeleteFilesForContext={userCanDeleteFilesForContext}
-            userCanRestrictFilesForContext={userCanRestrictFilesForContext}
-            usageRightsRequiredForContext={usageRightsRequiredForContext}
-          />
-        }
-        progress={
-          <>
-            <CurrentUploads />
-            <CurrentDownloads rows={rows ?? []} />
-          </>
-        }
-        table={
-          <FileFolderTable
-            size={size}
-            rows={isLoading ? [] : rows!}
-            isLoading={isLoading}
-            contextType={contextType}
-            userCanEditFilesForContext={userCanEditFilesForContext}
-            userCanDeleteFilesForContext={userCanDeleteFilesForContext}
-            userCanRestrictFilesForContext={userCanRestrictFilesForContext}
-            usageRightsRequiredForContext={usageRightsRequiredForContext}
-            onSortChange={sort.set}
-            sort={sort}
-            searchString={search.term}
-            selectedRows={selectedRows}
-            setSelectedRows={setSelectedRows}
-          />
-        }
-        usageBar={userCanManageFilesForContext && <FilesUsageBar />}
-        pagination={
-          <>
-            <Alert
-              liveRegion={() => document.getElementById('flash_screenreader_holder')!}
-              liveRegionPoliteness="polite"
-              screenReaderOnly
-              data-testid="pagination-announcement"
-            >
-              {paginationAlert}
-            </Alert>
-            {!isLoading && page.total > 1 && (
-              <Pagination
-                as="nav"
-                labelNext={I18n.t('Next page')}
-                labelPrev={I18n.t('Previous page')}
-                variant="compact"
-                currentPage={page.current}
-                totalPageNumber={page.total}
-                onPageChange={page.set}
-                data-testid="files-pagination"
+            title={I18n.t('Files')}
+            headerActions={
+              <TopLevelButtons
+                size={size}
+                isUserContext={isUserContext}
+                shouldHideUploadButtons={!userCanAddFilesForContext || search.term.length > 0}
               />
-            )}
-          </>
-        }
-      />
+            }
+            search={<SearchBar initialValue={search.term} onSearch={search.set} />}
+            breadcrumbs={<Breadcrumbs folders={folders} size={size} search={search.term} />}
+            bulkActions={
+              <BulkActionButtons
+                size={size}
+                selectedRows={selectedRows}
+                rows={currentRows ?? []}
+                totalRows={currentRows?.length ?? 0}
+                userCanEditFilesForContext={userCanEditFilesForContext}
+                userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+                userCanRestrictFilesForContext={userCanRestrictFilesForContext}
+                usageRightsRequiredForContext={usageRightsRequiredForContext}
+              />
+            }
+            progress={
+              <>
+                <CurrentUploads />
+                <CurrentDownloads rows={currentRows ?? []} />
+              </>
+            }
+            table={
+              <FileFolderTable
+                size={size}
+                rows={isLoading ? [] : currentRows!}
+                isLoading={isLoading}
+                contextType={contextType}
+                userCanEditFilesForContext={userCanEditFilesForContext}
+                userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+                userCanRestrictFilesForContext={userCanRestrictFilesForContext}
+                usageRightsRequiredForContext={usageRightsRequiredForContext}
+                onSortChange={sort.set}
+                sort={sort}
+                searchString={search.term}
+                selectedRows={selectedRows}
+                setSelectedRows={setSelectedRows}
+                handleFileDropRef={handleFileDropRef}
+                selectAllRef={selectAllRef}
+              />
+            }
+            usageBar={userCanManageFilesForContext && <FilesUsageBar />}
+            pagination={
+              <>
+                <Alert
+                  liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+                  liveRegionPoliteness="polite"
+                  screenReaderOnly
+                  data-testid="pagination-announcement"
+                >
+                  {paginationAlert}
+                </Alert>
+                {!isLoading && page.total > 1 && (
+                  <Pagination
+                    as="nav"
+                    labelNext={I18n.t('Next page')}
+                    labelPrev={I18n.t('Previous page')}
+                    variant="compact"
+                    currentPage={page.current}
+                    totalPageNumber={page.total}
+                    onPageChange={page.set}
+                    data-testid="files-pagination"
+                  />
+                )}
+              </>
+            }
+          />
+        </RowsProvider>
+      </RowFocusProvider>
     </FileManagementProvider>
   )
 }
 
 const ResponsiveFilesApp = () => {
-  const isUserContext = filesEnv.showingAllContexts
+  const isUserContext = getFilesEnv().showingAllContexts
   const {data: folders, error} = useGetFolders()
 
   useEffect(() => {

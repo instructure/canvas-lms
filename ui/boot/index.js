@@ -92,6 +92,10 @@ const typography = {
   fontFamily: 'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif',
 }
 
+if (ENV.use_dyslexic_font) {
+  typography.fontFamily = `OpenDyslexic, ${typography.fontFamily}`
+}
+
 // Check for high contrast mode from either ENV variable or URL query parameter
 const urlParams = new URLSearchParams(window.location.search)
 const hasHighContrastQueryParam = urlParams.get('instui_theme') === 'canvas_high_contrast'

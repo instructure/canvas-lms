@@ -153,7 +153,8 @@ module Api::V1::Assignment
     description = api_user_content(hash["description"],
                                    @context || assignment.context,
                                    user,
-                                   opts[:preloaded_user_content_attachments] || {})
+                                   opts[:preloaded_user_content_attachments] || {},
+                                   location: assignment.asset_string)
 
     hash["secure_params"] = assignment.secure_params(include_description: description.present?) if assignment.has_attribute?(:lti_context_id)
     hash["lti_context_id"] = assignment.lti_context_id if assignment.has_attribute?(:lti_context_id)

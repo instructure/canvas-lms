@@ -23,7 +23,7 @@ import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import {fetchStudentSubmissionComments} from '../../queries/Queries'
 import {ApiCallStatus, type CommentConnection} from '../../types'
 import type {Submission} from '../../../../api.d'
-import {useQuery} from '@canvas/query'
+import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('enhanced_individual_gradebook_submit_score')
 

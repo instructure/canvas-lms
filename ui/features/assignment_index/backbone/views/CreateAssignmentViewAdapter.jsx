@@ -84,6 +84,11 @@ const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}
     try {
       const saveOpts = {wait: true}
       await assignmentModel.save(mappedData, saveOpts)
+      ENV.PERMISSIONS.by_assignment_id &&
+        (ENV.PERMISSIONS.by_assignment_id[assignmentModel.get('id')] = {
+          update: ENV.PERMISSIONS.manage_assignments_edit,
+          delete: ENV.PERMISSIONS.manage_assignments_delete,
+        })
       assignmentGroup?.get('assignments').add(assignmentModel)
     } catch (e) {
       showFlashAlert({
@@ -200,7 +205,7 @@ const launchDiscussionTopicEdit = (assignment, assignmentGroup, data, isNewAssig
   }
 }
 
-const getSubmissionType = (formData) => {
+const getSubmissionType = formData => {
   if (['discussion_topic', 'external_tool', 'not_graded'].includes(formData.type)) {
     return [formData.type]
   } else if (formData.type === 'online_quiz') {

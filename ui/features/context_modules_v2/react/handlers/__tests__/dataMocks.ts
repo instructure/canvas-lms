@@ -103,6 +103,7 @@ export const defaultModules: Module[] = [
     requirementCount: 0,
     unlockAt: null,
     moduleItems: [],
+    requireSequentialProgress: false,
   },
   {
     id: '1',
@@ -115,6 +116,7 @@ export const defaultModules: Module[] = [
     requirementCount: 0,
     unlockAt: null,
     moduleItems: [],
+    requireSequentialProgress: false,
   },
   {
     id: '2',
@@ -127,6 +129,7 @@ export const defaultModules: Module[] = [
     requirementCount: 0,
     unlockAt: null,
     moduleItems: [],
+    requireSequentialProgress: false,
   },
   {
     id: '3',
@@ -139,6 +142,7 @@ export const defaultModules: Module[] = [
     requirementCount: 0,
     unlockAt: null,
     moduleItems: [],
+    requireSequentialProgress: false,
   },
   {
     id: '4',
@@ -151,5 +155,6 @@ export const defaultModules: Module[] = [
     requirementCount: 0,
     unlockAt: null,
     moduleItems: [],
+    requireSequentialProgress: false,
   },
 ]

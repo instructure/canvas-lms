@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {type File, type Folder} from '../interfaces/File'
-import {Tool} from '@canvas/files_v2/react/modules/filesEnv.types'
+import {Tool} from '@canvas/files_v2/react/modules/filesEnvFactory.types'
 
 const I18n = createI18nScope('files_v2')
 

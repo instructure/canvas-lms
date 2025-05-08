@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-import {useMutation, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {Alert} from '@instructure/ui-alerts'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
@@ -29,6 +29,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {duplicateRubric} from '../../queries/ViewRubricQueries'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import {useMutation} from '@tanstack/react-query'
 
 const I18n = createI18nScope('rubrics-duplicate-modal')
 
@@ -63,7 +64,7 @@ export const DuplicateRubricModal = ({
   setPopoverIsOpen,
 }: DuplicateRubricModalProps) => {
   const {
-    isLoading: duplicateLoading,
+    isPending: duplicateLoading,
     isError: duplicateError,
     mutate,
   } = useMutation({
@@ -84,8 +85,18 @@ export const DuplicateRubricModal = ({
     onSuccess: async () => {
       showFlashSuccess(I18n.t('Rubric duplicated successfully'))()
       const queryKey = accountId ? `accountRubrics-${accountId}` : `courseRubrics-${courseId}`
-      await queryClient.invalidateQueries([`fetch-rubric-${id}`], {}, {cancelRefetch: true})
-      await queryClient.invalidateQueries([queryKey], undefined, {cancelRefetch: true})
+      await queryClient.invalidateQueries(
+        {
+          queryKey: [`fetch-rubric-${id}`],
+        },
+        {cancelRefetch: true},
+      )
+      await queryClient.invalidateQueries(
+        {
+          queryKey: [queryKey],
+        },
+        {cancelRefetch: true},
+      )
       onDismiss()
       setPopoverIsOpen(false)
     },

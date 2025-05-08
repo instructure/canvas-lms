@@ -84,6 +84,7 @@ import {
   getToolbarForVariant,
   getStatusBarFeaturesForVariant,
   RCEVariant,
+  type StatusBarOptions,
 } from './RCEVariants'
 
 import {
@@ -2034,7 +2035,12 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         />
       )
     }
-    const statusBarFeatures = getStatusBarFeaturesForVariant(this.variant, this.props.ai_text_tools, tinymce.Env.deviceType.isDesktop())
+    const statusBarOptions: StatusBarOptions = {
+      aiTextTools: this.props.ai_text_tools,
+      isDesktop: tinymce.Env.deviceType.isDesktop(),
+      removeResizeButton: !!this.props.features?.remove_rce_resize_button,
+    }
+    const statusBarFeatures = getStatusBarFeaturesForVariant(this.variant, statusBarOptions)
     return (
       <>
         <style>{this.style.css}</style>

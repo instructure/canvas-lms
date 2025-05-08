@@ -19,6 +19,7 @@
 import * as z from 'zod'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZLtiDeploymentId} from './LtiDeploymentId'
+import {ZLtiContextControl} from './LtiContextControl'
 
 export const ZLtiDeployment = z.object({
   id: ZLtiDeploymentId,
@@ -28,7 +29,7 @@ export const ZLtiDeployment = z.object({
   context_type: z.string(),
   context_name: z.string(),
   workflow_state: z.enum(['active', 'deleted']),
-  context_controls: z.array(z.unknown()),
+  context_controls: z.array(ZLtiContextControl),
 })
 
 export type LtiDeployment = z.infer<typeof ZLtiDeployment>

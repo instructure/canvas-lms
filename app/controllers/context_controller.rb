@@ -25,7 +25,7 @@ class ContextController < ApplicationController
   before_action :require_context, except: [:inbox, :object_snippet]
 
   include HorizonMode
-  before_action :redirect_student_to_horizon, only: [:roster]
+  before_action :load_canvas_career, only: [:roster]
 
   before_action :require_user, only: [:inbox, :report_avatar_image]
   before_action :reject_student_view_student, only: [:inbox]
@@ -129,7 +129,8 @@ class ContextController < ApplicationController
                  prior_enrollments_url: course_prior_users_path(@context),
                  interactions_report_url: user_course_teacher_activity_url(@current_user, @context),
                  user_services_url: context_url(@context, :context_user_services_url),
-                 observer_pairing_codes_url: course_observer_pairing_codes_url(@context)
+                 observer_pairing_codes_url: course_observer_pairing_codes_url(@context),
+                 course_student_count: allow_assign_to_differentiation_tags ? @context.student_enrollments.count : nil,
                }
              })
       set_tutorial_js_env

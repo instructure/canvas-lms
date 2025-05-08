@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect, useCallback, memo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -27,7 +27,6 @@ import {
   handleCollapseAll,
   handleExpandAll,
   handleToggleExpand,
-  handleOpeningModuleUpdateTray,
 } from '../handlers/modulePageActionHandlers'
 import ManageModuleContentTray from './ManageModuleContent/ManageModuleContentTray'
 import {useModules} from '../hooks/queries/useModules'
@@ -37,13 +36,19 @@ import {useContextModule} from '../hooks/useModuleContext'
 import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {
-  handleMoveItem as dndHandleMoveItem,
-  handleDragEnd as dndHandleDragEnd,
-} from '../utils/dndUtils'
 import {ModuleAction} from '../utils/types'
+import {updateIndexes, getItemIds, handleDragEnd as dndHandleDragEnd} from '../utils/dndUtils'
 
 const I18n = createI18nScope('context_modules_v2')
+
+const MemoizedModule = memo(Module, (prevProps, nextProps) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.expanded === nextProps.expanded &&
+    prevProps.published === nextProps.published &&
+    prevProps.name === nextProps.name
+  )
+})
 
 const ModulesList: React.FC = () => {
   const {courseId} = useContextModule()
@@ -64,8 +69,8 @@ const ModulesList: React.FC = () => {
 
   // Set initial expanded state for modules when data is loaded
   useEffect(() => {
-    if (data?.pages) {
-      const allModules = data.pages.flatMap(page => page.modules)
+    if (data) {
+      const allModules = data.pages?.flatMap(page => page.modules) || []
 
       // Create a Map with all modules collapsed by default
       const initialExpandedState = new Map<string, boolean>()
@@ -91,7 +96,7 @@ const ModulesList: React.FC = () => {
         return initialExpandedState
       })
     }
-  }, [data?.pages])
+  }, [data])
 
   const handleMoveItem = (
     dragIndex: number,
@@ -99,19 +104,96 @@ const ModulesList: React.FC = () => {
     dragModuleId: string,
     hoverModuleId: string,
   ) => {
-    dndHandleMoveItem(
-      dragIndex,
-      hoverIndex,
-      dragModuleId,
-      hoverModuleId,
-      data,
-      courseId,
-      reorderItemsMutation,
-    )
+    // Get the current data for the source module
+    const sourceModuleData = queryClient.getQueryData(['moduleItems', dragModuleId]) as any
+    if (!sourceModuleData?.moduleItems?.length) return
+
+    // Get the item being moved
+    const movedItem = sourceModuleData.moduleItems[dragIndex]
+    if (!movedItem) return
+
+    // We're using the shared utility functions from dndUtils.ts
+
+    // Helper to update cache and call the mutation
+    const updateAndMutate = (moduleId: string, oldModuleId: string, updatedItems: any[]) => {
+      // Update cache
+      queryClient.setQueryData(['moduleItems', moduleId], {
+        ...(moduleId === dragModuleId
+          ? sourceModuleData
+          : queryClient.getQueryData(['moduleItems', moduleId])),
+        moduleItems: updatedItems,
+      })
+
+      // Get item IDs and call mutation if needed
+      const itemIds = getItemIds(updatedItems)
+      if (itemIds.length > 0) {
+        reorderItemsMutation.mutate({
+          courseId,
+          moduleId,
+          oldModuleId,
+          order: itemIds,
+        })
+      }
+    }
+
+    // ---------- STEP 1: OPTIMISTIC UI UPDATE ----------
+    // For same-module reordering
+    if (dragModuleId === hoverModuleId) {
+      // Clone and update the module items
+      const updatedItems = [...sourceModuleData.moduleItems]
+      updatedItems.splice(dragIndex, 1) // Remove from old position
+      updatedItems.splice(hoverIndex, 0, movedItem) // Insert at new position
+
+      // Update all indexes and update cache
+      updateAndMutate(dragModuleId, dragModuleId, updateIndexes(updatedItems))
+    }
+    // For cross-module movement
+    else {
+      // Get destination module data
+      const destModuleData = queryClient.getQueryData(['moduleItems', hoverModuleId]) as any
+      if (!destModuleData?.moduleItems) return
+
+      // Prepare source module update (remove the item)
+      const updatedSourceItems = updateIndexes(
+        sourceModuleData.moduleItems.filter((_: any, i: number) => i !== dragIndex),
+      )
+
+      // Prepare destination module update (add the item)
+      const updatedItem = {
+        ...movedItem,
+        moduleId: hoverModuleId,
+        index: hoverIndex,
+      }
+      const updatedDestItems = [...destModuleData.moduleItems]
+      updatedDestItems.splice(hoverIndex, 0, updatedItem)
+      const updatedDestWithIndexes = updateIndexes(updatedDestItems)
+
+      // Update both caches and call mutations
+      updateAndMutate(dragModuleId, dragModuleId, updatedSourceItems)
+      updateAndMutate(hoverModuleId, dragModuleId, updatedDestWithIndexes)
+    }
   }
 
+  // Use the utility function from dndUtils.ts, passing our handleMoveItem as a callback
   const handleDragEnd = (result: DropResult) => {
-    dndHandleDragEnd(result, data, courseId, queryClient, reorderModulesMutation, handleMoveItem)
+    // Check for no destination or no movement first
+    if (
+      !result.destination ||
+      (result.source.droppableId === result.destination.droppableId &&
+        result.source.index === result.destination.index)
+    ) {
+      return
+    }
+
+    // Use the shared utility function
+    dndHandleDragEnd(
+      result,
+      data,
+      courseId || '',
+      queryClient,
+      reorderModulesMutation,
+      handleMoveItem,
+    )
   }
 
   const handleCollapseAllRef = useCallback(() => {
@@ -121,17 +203,6 @@ const ModulesList: React.FC = () => {
   const handleExpandAllRef = useCallback(() => {
     handleExpandAll(data, setExpandedModules)
   }, [data, setExpandedModules])
-
-  const handleOpeningModuleUpdateTrayRef = useCallback(
-    (
-      moduleId?: string,
-      moduleName?: string,
-      prerequisites?: {id: string; name: string; type: string}[],
-      openTab: 'settings' | 'assign-to' = 'settings',
-    ) =>
-      handleOpeningModuleUpdateTray(data, courseId, moduleId, moduleName, prerequisites, openTab),
-    [data, courseId],
-  )
 
   const onToggleExpandRef = useCallback(
     (moduleId: string) => {
@@ -146,7 +217,6 @@ const ModulesList: React.FC = () => {
         <ModulePageActionHeader
           onCollapseAll={handleCollapseAllRef}
           onExpandAll={handleExpandAllRef}
-          handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTrayRef}
           anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
         />
         {isLoading && !data ? (
@@ -186,14 +256,13 @@ const ModulesList: React.FC = () => {
                                 borderRadius: '4px',
                               }}
                             >
-                              <Module
+                              <MemoizedModule
                                 id={module._id}
                                 name={module.name}
                                 published={module.published}
                                 prerequisites={module.prerequisites}
                                 completionRequirements={module.completionRequirements}
                                 requirementCount={module.requirementCount}
-                                handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTrayRef}
                                 expanded={!!expandedModules.get(module._id)}
                                 onToggleExpand={onToggleExpandRef}
                                 dragHandleProps={dragProvided.dragHandleProps}
@@ -213,20 +282,22 @@ const ModulesList: React.FC = () => {
             )}
           </Droppable>
         )}
-        <ManageModuleContentTray
-          sourceModuleId={sourceModule?.id || ''}
-          sourceModuleTitle={sourceModule?.title || ''}
-          sourceModuleItemId={selectedModuleItem?.id}
-          isOpen={isManageModuleContentTrayOpen}
-          onClose={() => {
-            setIsManageModuleContentTrayOpen(false)
-            setModuleAction(null)
-            setSelectedModuleItem(null)
-          }}
-          moduleAction={moduleAction}
-          moduleItemId={selectedModuleItem?.id}
-          moduleItemTitle={selectedModuleItem?.title}
-        />
+        {isManageModuleContentTrayOpen && (
+          <ManageModuleContentTray
+            sourceModuleId={sourceModule?.id || ''}
+            sourceModuleTitle={sourceModule?.title || ''}
+            sourceModuleItemId={selectedModuleItem?.id}
+            isOpen={isManageModuleContentTrayOpen}
+            onClose={() => {
+              setIsManageModuleContentTrayOpen(false)
+              setModuleAction(null)
+              setSelectedModuleItem(null)
+            }}
+            moduleAction={moduleAction}
+            moduleItemId={selectedModuleItem?.id}
+            moduleItemTitle={selectedModuleItem?.title}
+          />
+        )}
       </View>
     </DragDropContext>
   )

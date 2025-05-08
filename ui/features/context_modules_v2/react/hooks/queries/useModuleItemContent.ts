@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useQuery} from '@canvas/query'
-import gql from 'graphql-tag'
+import {useQuery} from '@tanstack/react-query'
+import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/query/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
