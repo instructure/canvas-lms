@@ -4203,6 +4203,7 @@ he:
   cc_attribution_non_commercial_39e0d30d: "הרשאת שימוש שאינה מסחרית עם קרדיט למחבר"
   cc_attribution_non_commercial_no_derivatives_9fe74c00: "הרשאה שימוש שאינה מסחרית וללא שינויים עם קרדיט למחבר"
   cc_attribution_non_commercial_share_alike_c7edb1e5: "הרשאה שימוש שאינה מסחרית וניתנת להפצה הלאה באותם תנאי שימוש ועם קרדיט למחבר"
+  cc_attribution_share_alike_669e7f16: "הרשאה שימוש שניתנת להפצה הלאה באותם תנאי שימוש ועם קרדיט למחבר"
   cell_number_69a7c309: "מספר סלולרי"
   cell_number_is_invalid_bd6faee0: "מספר טלפון לא חוקי!"
   cell_number_is_required_2edcee60: "נדרש מספר טלפון"
@@ -14858,6 +14859,7 @@ he:
   priority_dd4381ee: עדיפות
   privacy_290109ea: פרטיות
   privacy_policy_c68f482a: "מדיניות פרטיות"
+  private_copyrighted_3cac9686: "פרטי (מוגן בזכויות יוצרים)"
   process_as_ui_changes_8e34ed2a: "עבד כשינויי UI"
   process_data_2f5f962f: "עיבוד מידע"
   processing_2fcc9739: מעבד
