@@ -192,6 +192,35 @@ module Lti
       raise e
     end
 
+    # @API Modify a Context Control
+    #
+    # Changes the availability of a context control. This endpoint can only be used
+    # to change the availability of a context control; no other attributes about the
+    # control (such as which course or account it belongs to) can be changed here.
+    # To change those values, the control should be deleted and a new one created
+    # instead.
+    #
+    # Returns the context control with its new availability value applied.
+    #
+    # @argument available [Required, boolean] the new value for this control's availability
+    # @returns Lti::ContextControl
+    #
+    # @example_request
+    #
+    #   curl "https://<canvas>/api/v1/lti_registrations/<registration_id>/controls/<id>" \
+    #        -X PUT \
+    #        -F "available=true" \
+    #        -H "Authorization: Bearer <token>"
+    def update
+      available = value_to_boolean(params.require(:available))
+      control.update!(available:)
+
+      render json: lti_context_control_json(control, @current_user, session, context, include_users: true)
+    rescue => e
+      report_error(e)
+      raise e
+    end
+
     private
 
     def control
