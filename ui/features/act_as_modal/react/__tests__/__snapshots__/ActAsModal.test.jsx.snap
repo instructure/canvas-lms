@@ -111,7 +111,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
               textAlign="center"
               withVisualDebug={false}
             >
-              <Avatar
+              <ForwardRef
                 data-fs-exclude={true}
                 margin="medium 0 x-small 0"
                 name="foo"

@@ -80,9 +80,9 @@ describe('Settings', () => {
     act(() => settingsButton.click())
 
     const skipSelectedDays = screen.getByTestId('skip-selected-days')
-    expect(skipSelectedDays).toHaveClass('css-1pj8lp9-menuItem')
+    expect(skipSelectedDays).toHaveClass('css-1ekjxd2-menuItem')
     const blackoutDatesBtn = screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})
-    expect(blackoutDatesBtn).toHaveClass('css-1mh06e9-menuItem')
+    expect(blackoutDatesBtn).toHaveClass('css-rldcki-menuItem')
   })
 
   it('shows and hides the blackout dates modal correctly', () => {
@@ -188,7 +188,9 @@ describe('Settings', () => {
       const skipSelectedDaysOption = screen.getByRole('menuitem', {name: /Skip Selected Days/i})
       act(() => skipSelectedDaysOption.click())
 
-      expect(screen.getByRole('menuitemcheckbox', {name: 'Weekends'}).getAttribute('aria-disabled')).toBe('true')
+      expect(
+        screen.getByRole('menuitemcheckbox', {name: 'Weekends'}).getAttribute('aria-disabled'),
+      ).toBe('true')
     })
   })
 
