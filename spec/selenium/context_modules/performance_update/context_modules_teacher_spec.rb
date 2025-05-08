@@ -206,6 +206,34 @@ describe "context modules" do
     it_behaves_like "module performance with module items", :canvas_for_elementary
   end
 
+  context "as teacher with module items to add, update, show", :ignore_js_errors do
+    before(:once) do
+      course_with_teacher(active_all: true)
+
+      @course.account.enable_feature!(:modules_perf)
+      Setting.set("module_perf_threshold", -1)
+
+      @module = @course.context_modules.create!(name: "module 1")
+      11.times do |i|
+        @module.add_item(type: "assignment", id: @course.assignments.create!(title: "assignment #{i}").id)
+      end
+      @course.reload
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it_behaves_like "module show all or less", :context_modules
+    it_behaves_like "module show all or less", :course_homepage
+
+    it_behaves_like "add module items to list", :context_modules
+    it_behaves_like "add module items to list", :course_homepage
+
+    it_behaves_like "module moving items", :context_modules
+    it_behaves_like "module moving items", :course_homepage
+  end
+
   context "as a canvas for elementary teacher with module items to show", :ignore_js_errors do
     before(:once) do
       teacher_setup
@@ -224,5 +252,10 @@ describe "context modules" do
     end
 
     it_behaves_like "module show all or less", :canvas_for_elementary
+    it_behaves_like "add module items to list", :canvas_for_elementary
+
+    # C4E is very challenging with the modules page and scrolling to items
+    # is proving to be very flakey, so leaving this out for now.
+    # it_behaves_like "module moving items",:canvas_for_elementary
   end
 end
