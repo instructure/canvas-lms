@@ -6014,6 +6014,7 @@ nn:
   cc_attribution_non_commercial_39e0d30d: "CC Namngjeving - Ingen behandling BY-ND"
   cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC Namngjeving – Ikkje-kommersiell - Ingen behandling BY-NC-ND "
   cc_attribution_non_commercial_share_alike_c7edb1e5: "CC Namngjeving – Ikkje-kommersiell BY-NC"
+  cc_attribution_share_alike_669e7f16: "CC Namngjeving - Del på same vilkår BY-SA"
   cc_subtitles_a0d16ff6: Undertekstar
   ccp_zero_activity_73d094c3: "CCP null aktivitet"
   cell_number_69a7c309: Mobiltelefonnummer
@@ -20392,6 +20393,7 @@ nn:
   privacy_level_f0ec09a3: Personvernnivå
   privacy_policy_c68f482a: "Retningslinjer for personvern"
   private_3883d133: Privat
+  private_copyrighted_3cac9686: "Privat (med opphavsrett)"
   pro_tip_30e41fa3: PROFFTIPS!
   proceed_f3d33864: Fortsett
   process_as_ui_changes_8e34ed2a: "Behandle som endringar i brukargrensesnittet"
@@ -22753,6 +22755,7 @@ nn:
   restrict_students_from_viewing_future_courses_in_e_67486caf: "Studentar skal ikkje kunne sjå framtidige emne blant eigne påmeldingar"
   restricted_access_d3e99a39: "Avgrensa tilgang"
   restricted_view_for_teachers_in_lmgb_52c78a62: "Avgrensa visning for lærarar i LMGB"
+  resubmit_63cf65ef: "Send på nytt"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Send på nytt til tilknytta verktøy for plagieringskontroll"
   resubmit_to_tool_name_1cf02a31: "Lever på nytt til %{tool_name}"
   resubmitted_2080646f: "Sendt på nytt"
