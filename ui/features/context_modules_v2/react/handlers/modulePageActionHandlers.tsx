@@ -123,7 +123,7 @@ const transformModuleItemsForTray = (rawModuleItems: any[]): any[] => {
       id: item._id || '',
       name: item.content?.title || '',
       resource: getResourceType(item.content?.type.toLowerCase()),
-      graded: !!item.content?.pointsPossible,
+      graded: item.content?.graded,
       pointsPossible: item.content?.pointsPossible ? String(item.content.pointsPossible) : '',
     }))
 }
@@ -147,7 +147,7 @@ const transformRequirementsForTray = (
       name: moduleItem?.name || '',
       type: mappedType,
       resource: moduleItem?.resource || 'assignment',
-      graded: !!rawModuleItem?.content?.pointsPossible,
+      graded: rawModuleItem?.content?.graded,
       pointsPossible:
         moduleItem?.pointsPossible || String(rawModuleItem?.content?.pointsPossible || 0),
       minimumScore: req.minScore ? String(req.minScore) : '0',
@@ -205,6 +205,8 @@ export const handleOpeningModuleUpdateTray = (
   const mountPoint = getDifferentiatedModulesMountPoint()
   const root = createRoot(mountPoint)
 
+  const onCompleteFunction = () =>
+    queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
   const trayProps = {
     onDismiss: () => {
       root.unmount()
@@ -218,8 +220,8 @@ export const handleOpeningModuleUpdateTray = (
     moduleId,
     moduleName,
     prerequisites,
-    onComplete: () => queryClient.invalidateQueries({queryKey: ['modules', courseId || '']}),
-
+    onComplete: onCompleteFunction,
+    onChangeAssignedTo: onCompleteFunction,
     // Additional props needed by SettingsPanel
     moduleItems,
     requirementCount,

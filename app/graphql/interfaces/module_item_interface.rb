@@ -108,4 +108,14 @@ module Interfaces::ModuleItemInterface
   def can_unpublish
     object.respond_to?(:can_unpublish?) ? object.can_unpublish? : true
   end
+
+  field :graded, Boolean, null: true
+
+  def graded
+    if @object.respond_to?(:graded?)
+      @object.graded?
+    else
+      false
+    end
+  end
 end

@@ -32,6 +32,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import AddItemModal from './AddItemModalComponents/AddItemModal'
+import ViewAssignTo from './ViewAssignToTrayComponents/ViewAssignTo'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -44,6 +45,7 @@ interface ModuleHeaderActionPanelProps {
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
   itemCount?: number
+  hasActiveOverrides: boolean
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
   setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
@@ -58,6 +60,7 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   completionRequirements,
   requirementCount = null,
   itemCount,
+  hasActiveOverrides,
   setModuleAction,
   setIsManageModuleContentTrayOpen,
   setSourceModule,
@@ -154,6 +157,15 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
         moduleId={id}
         itemCount={itemCount || 0}
       />
+      {hasActiveOverrides ? (
+        <ViewAssignTo
+          expanded={expanded}
+          isMenuOpen={isMenuOpen}
+          moduleId={id}
+          moduleName={name}
+          prerequisites={prerequisites}
+        />
+      ) : null}
     </>
   )
 }

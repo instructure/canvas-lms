@@ -26,8 +26,11 @@ import {
   IconMiniArrowDownLine,
 } from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleHeaderActionPanel from './ModuleHeaderActionPanel'
 import {CompletionRequirement, Prerequisite, ModuleAction} from '../utils/types'
+
+const I18n = createI18nScope('context_modules_v2')
 
 interface ModuleHeaderProps {
   id: string
@@ -39,6 +42,7 @@ interface ModuleHeaderProps {
   completionRequirements?: CompletionRequirement[]
   requirementCount: number
   dragHandleProps?: any // For react-beautiful-dnd drag handle
+  hasActiveOverrides: boolean
   itemCount: number
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
@@ -56,6 +60,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
   requirementCount,
   dragHandleProps,
   itemCount,
+  hasActiveOverrides,
   setModuleAction,
   setIsManageModuleContentTrayOpen,
   setSourceModule,
@@ -78,7 +83,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
               <IconButton
                 size="small"
                 withBorder={false}
-                screenReaderLabel={expanded ? 'Collapse module' : 'Expand module'}
+                screenReaderLabel={expanded ? I18n.t('Collapse module') : I18n.t('Expand module')}
                 renderIcon={expanded ? IconMiniArrowDownLine : IconMiniArrowEndSolid}
                 withBackground={false}
                 onClick={onToggleExpandRef}
@@ -99,6 +104,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             completionRequirements={completionRequirements}
             requirementCount={requirementCount || undefined}
             itemCount={itemCount}
+            hasActiveOverrides={hasActiveOverrides}
             setModuleAction={setModuleAction}
             setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
             setSourceModule={setSourceModule}

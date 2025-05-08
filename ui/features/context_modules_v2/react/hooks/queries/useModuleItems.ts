@@ -41,6 +41,7 @@ const MODULE_ITEMS_QUERY = gql`
               title
               type: __typename
               pointsPossible
+              graded
               dueAt
               lockAt
               unlockAt
@@ -88,6 +89,7 @@ const MODULE_ITEMS_QUERY = gql`
               canUnpublish
               isLockedByMasterCourse
               canDuplicate
+              graded
             }
             ... on File {
               _id
@@ -106,6 +108,7 @@ const MODULE_ITEMS_QUERY = gql`
               locked
               lockAt
               unlockAt
+              graded
             }
             ... on Page {
               _id
@@ -116,6 +119,7 @@ const MODULE_ITEMS_QUERY = gql`
               type: __typename
               isLockedByMasterCourse
               canDuplicate
+              graded
             }
             ... on Quiz {
               _id
@@ -127,6 +131,7 @@ const MODULE_ITEMS_QUERY = gql`
               canUnpublish
               isLockedByMasterCourse
               canDuplicate
+              graded
             }
             ... on ExternalUrl {
               title
@@ -135,6 +140,7 @@ const MODULE_ITEMS_QUERY = gql`
               published
               canUnpublish
               newTab
+              graded
             }
             ... on ModuleExternalTool {
               title
@@ -142,6 +148,7 @@ const MODULE_ITEMS_QUERY = gql`
               url
               published
               canUnpublish
+              graded
             }
             ... on SubHeader {
               title

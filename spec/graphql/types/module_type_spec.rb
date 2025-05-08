@@ -146,4 +146,24 @@ describe Types::ModuleType do
       end
     end
   end
+
+  it "returns false when there are no overrides" do
+    expect(module_type.resolve("hasActiveOverrides")).to be false
+  end
+
+  it "returns false when overrides are not active" do
+    AssignmentOverride.create!(
+      context_module_id: mod.id,
+      workflow_state: "deleted"
+    )
+    expect(module_type.resolve("hasActiveOverrides")).to be false
+  end
+
+  it "returns true when there is at least one active override" do
+    AssignmentOverride.create!(
+      context_module_id: mod.id,
+      workflow_state: "active"
+    )
+    expect(module_type.resolve("hasActiveOverrides")).to be true
+  end
 end

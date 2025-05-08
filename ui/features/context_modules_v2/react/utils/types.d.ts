@@ -64,6 +64,7 @@ export type ModuleItemContent = {
   newTab?: boolean
   fileState?: string
   locked?: boolean
+  graded?: boolean
   assignmentOverrides?: AssignmentOverrideGraphQLResult
 } | null
 
@@ -149,6 +150,7 @@ export interface Module {
   unlockAt: string | null
   moduleItems: ModuleItem[]
   progression?: ModuleProgression
+  hasActiveOverrides: boolean
 }
 
 export interface ModulesResponse {
