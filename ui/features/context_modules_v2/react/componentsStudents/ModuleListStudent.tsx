@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect, useCallback, memo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -27,13 +27,15 @@ import {
   handleExpandAll,
   handleToggleExpand,
 } from '../handlers/modulePageActionHandlers'
-
+import {validateModuleStudentRenderRequirements} from '../utils/utils'
 import {useModules} from '../hooks/queries/useModules'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
 
 const I18n = createI18nScope('context_modules_v2')
+
+const MemoizedModuleStudent = memo(ModuleStudent, validateModuleStudentRenderRequirements)
 
 const ModulesListStudent: React.FC = () => {
   const {courseId} = useContextModule()
@@ -101,7 +103,7 @@ const ModulesListStudent: React.FC = () => {
             data?.pages
               .flatMap(page => page.modules)
               .map(module => (
-                <ModuleStudent
+                <MemoizedModuleStudent
                   key={module._id}
                   id={module._id}
                   name={module.name}

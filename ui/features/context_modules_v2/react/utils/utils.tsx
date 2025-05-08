@@ -89,3 +89,22 @@ export const mapContentSelection = (id: string, contentType: string) => {
 
   return {modules: [id]}
 }
+
+export const validateModuleStudentRenderRequirements = (prevProps: any, nextProps: any) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.expanded === nextProps.expanded &&
+    prevProps.name === nextProps.name &&
+    prevProps.completionRequirements === nextProps.completionRequirements
+  )
+}
+
+export const validateModuleItemStudentRenderRequirements = (prevProps: any, nextProps: any) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.url === nextProps.url &&
+    prevProps.indent === nextProps.indent &&
+    prevProps.index === nextProps.index &&
+    prevProps.content === nextProps.content
+  )
+}
