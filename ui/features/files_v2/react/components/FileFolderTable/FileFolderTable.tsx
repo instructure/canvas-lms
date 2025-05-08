@@ -306,7 +306,9 @@ const FileFolderTable = ({
                 usageRightsRequiredForContext,
                 setModalOrTrayOptions,
               )}
-              {userCanEditFilesForContext && showDrop && (
+              {/* Only render the upload row when needed, else screenreaders count an extra row 
+                  and the upload has to be in a <tr> else browsers will complain */}
+              {userCanEditFilesForContext && showDrop && (isDragging || rows.length === 0) && (
                 <Table.Row data-upload>
                   <Table.Cell>
                     <FileTableUpload

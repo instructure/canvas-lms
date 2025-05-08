@@ -140,6 +140,13 @@ describe('FileFolderTable', () => {
     expect(folderCheckbox).toBeInTheDocument()
   })
 
+  it('does not render an extra row for the filedrop', async () => {
+    renderComponent({rows: [FAKE_FOLDERS_AND_FILES[0]]})
+    const rows = document.querySelectorAll('tr')
+    // the header row counts as a row
+    expect(rows).toHaveLength(2)
+  })
+
   it('renders screen reader labels for headers', async () => {
     renderComponent({rows: FAKE_FOLDERS_AND_FILES})
 
