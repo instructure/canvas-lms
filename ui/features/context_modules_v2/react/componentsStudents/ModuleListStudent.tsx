@@ -27,8 +27,9 @@ import {
   handleExpandAll,
   handleToggleExpand,
 } from '../handlers/modulePageActionHandlers'
+
 import {validateModuleStudentRenderRequirements} from '../utils/utils'
-import {useModules} from '../hooks/queries/useModules'
+import {useModulesStudent} from '../hooks/queriesStudent/useModulesStudent'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
@@ -39,7 +40,7 @@ const MemoizedModuleStudent = memo(ModuleStudent, validateModuleStudentRenderReq
 
 const ModulesListStudent: React.FC = () => {
   const {courseId} = useContextModule()
-  const {data, isLoading, error, isFetchingNextPage, hasNextPage} = useModules(courseId)
+  const {data, isLoading, error, isFetchingNextPage, hasNextPage} = useModulesStudent(courseId)
 
   // Initialize with an empty Map - all modules will be collapsed by default
   const [expandedModules, setExpandedModules] = useState<Map<string, boolean>>(new Map())
@@ -108,6 +109,7 @@ const ModulesListStudent: React.FC = () => {
                   id={module._id}
                   name={module.name}
                   completionRequirements={module.completionRequirements}
+                  progression={module.progression}
                   expanded={!!expandedModules.get(module._id)}
                   onToggleExpand={handleToggleExpandRef}
                 />
