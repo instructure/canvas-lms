@@ -244,6 +244,188 @@ describe Lti::ContextControlsController, type: :request do
     end
   end
 
+  describe "POST #create" do
+    subject do
+      post "/api/v1/lti_registrations/#{registration.id}/controls",
+           params:,
+           as: :json
+    end
+
+    let(:params) { { account_id: account.id } }
+    let(:root_deployment) { registration.new_external_tool(account).tap(&:save!) }
+
+    before { root_deployment }
+
+    it "creates a new control" do
+      expect { subject }.to change { Lti::ContextControl.count }.by(1)
+      expect(response).to be_successful
+      expect(response_json).to include(
+        {
+          account_id: account.id,
+          available: true,
+          context_name: account.name,
+          course_id: nil,
+          created_at: an_instance_of(String),
+          created_by: hash_including(id: admin.id),
+          deployment_id: root_deployment.id,
+          depth: 0,
+          display_path: [account.name],
+          id: an_instance_of(Integer),
+          path: an_instance_of(String),
+          registration_id: registration.id,
+          updated_at: an_instance_of(String),
+          updated_by: hash_including(id: admin.id),
+          workflow_state: "active"
+        }.with_indifferent_access
+      )
+    end
+
+    context "with course_id" do
+      let(:course) { course_model(account:) }
+      let(:params) { { course_id: course.id } }
+
+      it "creates a new control with the specified course" do
+        subject
+        expect(Lti::ContextControl.last.course_id).to eq(course.id)
+        expect(response_json["course_id"]).to eq(course.id)
+        expect(response_json["account_id"]).to be_nil
+      end
+    end
+
+    context "with both course_id and account_id" do
+      let(:course) { course_model(account:) }
+      let(:params) { { account_id: account.id, course_id: course.id } }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response_json.dig("errors", 0)).to eq("Context must have either an account or a course, not both")
+      end
+    end
+
+    context "with neither course_id nor account_id" do
+      let(:params) { {} }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response_json.dig("errors", 0)).to eq("Either account_id or course_id must be present.")
+      end
+
+      context "with existing control" do
+        before do
+          Lti::ContextControl.create!(account:, registration:, deployment: root_deployment)
+        end
+
+        it "returns 422" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response_json["errors"]).to include(
+            "Either account_id or course_id must be present."
+          )
+        end
+      end
+    end
+
+    context "with deployment_id" do
+      let(:subaccount) { account_model(parent_account: account) }
+      let(:deployment) { registration.new_external_tool(subaccount).tap(&:save!) }
+      let(:params) { { account_id: account.id, deployment_id: deployment.id } }
+
+      it "creates a new control with the specified deployment" do
+        subject
+        expect(Lti::ContextControl.last.deployment_id).to eq(deployment.id)
+        expect(response_json["deployment_id"]).to eq(deployment.id)
+      end
+    end
+
+    context "with available: false" do
+      let(:params) { { account_id: account.id, available: false } }
+
+      it "creates a new control with available set to false" do
+        subject
+        expect(Lti::ContextControl.last.available).to be false
+        expect(response_json["available"]).to be false
+      end
+    end
+
+    context "without root deployment" do
+      let(:params) { { account_id: account.id } }
+
+      before { root_deployment.destroy }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response_json["errors"]).to include(
+          "No active deployment found for the root account."
+        )
+      end
+    end
+
+    context "with existing control" do
+      let(:params) { { account_id: account.id } }
+
+      before do
+        Lti::ContextControl.create!(account:, registration:, deployment: root_deployment)
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response_json["errors"]).to include(
+          "A context control for this deployment and context already exists."
+        )
+      end
+    end
+
+    context "with existing deleted control" do
+      let(:params) { { account_id: account.id, available: true } }
+      let(:control) { Lti::ContextControl.create!(account:, registration:, deployment: root_deployment, workflow_state: "deleted", available: false) }
+
+      before { control }
+
+      it "restores control and updates params" do
+        expect { subject }.not_to change { Lti::ContextControl.count }
+        expect(response).to be_created
+        expect(response_json).to include(
+          {
+            available: true,
+            id: control.id,
+            workflow_state: "active"
+          }.with_indifferent_access
+        )
+      end
+    end
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      before { user_session(student_in_course(account:).user) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_registrations_next) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+  end
+
   describe "PUT #update" do
     subject do
       put "/api/v1/lti_registrations/#{registration_id}/controls/#{control_id}",
