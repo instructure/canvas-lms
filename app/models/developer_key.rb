@@ -423,10 +423,10 @@ class DeveloperKey < ActiveRecord::Base
   # If true, this key can be used for "service authentication" (a token request
   # using a client_credentials grant type and a pre-determined service user).
   #
-  # This pattern is only supported for site admin keys with
+  # This pattern is only supported for keys with
   # "service_user_client_credentials" in authorized_flows.
   def site_admin_service_auth?
-    authorized_flows.include?("service_user_client_credentials") && site_admin? && service_user.present?
+    authorized_flows.include?("service_user_client_credentials") && service_user.present?
   end
 
   def tool_configuration

@@ -198,6 +198,12 @@ describe DeveloperKey do
         let(:key_attributes) { super().merge(account: root_account) }
 
         it { is_expected.to be false }
+
+        context "and the key allows service user client credentials" do
+          let(:key_attributes) { super().merge(authorized_flows: ["service_user_client_credentials"]) }
+
+          it { is_expected.to be true }
+        end
       end
     end
   end
