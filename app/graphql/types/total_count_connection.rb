@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2021 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,21 +19,8 @@
 #
 
 module Types
-  class CommentBankItemType < ApplicationObjectType
-    description "Comment bank items"
-
-    implements GraphQL::Types::Relay::Node
-    implements Interfaces::LegacyIDInterface
-    implements Interfaces::TimestampInterface
-
-    connection_type_class TotalCountConnection
-
-    global_id_field :id
-
-    field :assignment_id, ID, null: true
-    field :course_id, ID, null: false
-    field :user_id, ID, null: false
-
-    field :comment, String, null: false
+  # Connection with totalCount support
+  class TotalCountConnection < GraphQL::Types::Relay::BaseConnection
+    field :page_info, TotalCountPageInfo, null: false
   end
 end

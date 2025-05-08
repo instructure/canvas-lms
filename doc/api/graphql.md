@@ -178,3 +178,33 @@ being limited.
   }
 }
 ```
+
+#### Total Count in Connections
+
+Some connection types support a `totalCount` field in `pageInfo` that provides
+the total number of items in the connection, regardless of pagination limits.
+This is useful for displaying "Page X of Y" pagination interfaces.
+
+```graphql
+{
+  assignment(id: "1") {
+    submissionsConnection(first: 10) {
+      nodes {
+        id
+        state
+      }
+      pageInfo {
+        hasNextPage
+        totalCount    # total number of submissions (ignoring pagination)
+      }
+    }
+  }
+}
+```
+
+For details on which connections support `totalCount` and how to add it to new connections,
+see [app/graphql/types/HOWTO Connections.md](../../app/graphql/types/HOWTO%20Connections.md)
+
+**Note:** `totalCount` is only available on connections that have been explicitly
+configured for it. See `app/graphql/types/HOWTO Connections.md` for implementation
+details and performance considerations.

@@ -24,6 +24,7 @@ import {Course} from './Course'
 import {Group} from './Group'
 import {SubmissionComment} from './SubmissionComment'
 import {PageInfo} from './PageInfo'
+import {TotalCountPageInfo} from './TotalCountPageInfo'
 
 export const ADDRESS_BOOK_RECIPIENTS = gql`
   query GetAddressBookRecipients(
@@ -330,14 +331,14 @@ export const VIEWABLE_SUBMISSIONS_QUERY = gql`
             }
           }
           pageInfo {
-            ...PageInfo
+            ...TotalCountPageInfo
           }
         }
       }
     }
   }
   ${SubmissionComment.fragment}
-  ${PageInfo.fragment}
+  ${TotalCountPageInfo.fragment}
 `
 
 export const SUBMISSION_COMMENTS_QUERY = gql`
@@ -361,7 +362,7 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
             ...SubmissionComment
           }
           pageInfo {
-            ...PageInfo
+            ...TotalCountPageInfo
           }
         }
         user {
@@ -371,7 +372,7 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
     }
   }
   ${SubmissionComment.fragment}
-  ${PageInfo.fragment}
+  ${TotalCountPageInfo.fragment}
 `
 
 export const RECIPIENTS_OBSERVERS_QUERY = gql`
