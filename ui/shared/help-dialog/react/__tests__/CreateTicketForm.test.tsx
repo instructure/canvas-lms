@@ -98,13 +98,30 @@ describe('CreateTicketForm', () => {
   })
 
   describe('validation', () => {
-    it('prevents submission if required fields are empty', async () => {
-      const {getByText, queryByText} = render(<CreateTicketForm {...props} />)
-      fireEvent.click(getByText('Submit Ticket'))
-      await waitFor(() => {
-        expect(queryByText('Ticket successfully submitted.')).not.toBeInTheDocument()
+    beforeEach(() => {
+      // Reset all mocks before each test
+      jest.clearAllMocks()
+
+      // Mock doFetchApi to prevent actual API calls
+      ;(doFetchApi as jest.Mock).mockImplementation(() => {
+        return Promise.resolve({
+          response: {status: 200},
+          json: {message: 'Success'},
+        })
       })
-      expect(onSubmit).not.toHaveBeenCalled()
+    })
+
+    it('prevents submission if required fields are empty', async () => {
+      const {getByText, findByText} = render(<CreateTicketForm {...props} />)
+
+      // Click submit with empty fields
+      fireEvent.click(getByText('Submit Ticket'))
+
+      // Verify that validation errors appear for required fields
+      expect(await findByText('Subject is required.')).toBeInTheDocument()
+
+      // Since validation fails, the form submission API should not be called
+      expect(doFetchApi).not.toHaveBeenCalled()
     })
 
     it('validates fields progressively when submitting the form', async () => {
@@ -339,24 +356,30 @@ describe('CreateTicketForm', () => {
 
   describe('Captcha', () => {
     it('loads script when user is not logged in', () => {
-      mockEnv({ current_user_id: null })
+      mockEnv({current_user_id: null})
       render(<CreateTicketForm {...props} />)
-      const script = document.querySelector('head script[src="https://www.google.com/recaptcha/api.js"]')
+      const script = document.querySelector(
+        'head script[src="https://www.google.com/recaptcha/api.js"]',
+      )
       expect(script).toBeInTheDocument()
     })
 
     it('removes script on unmount when user is not logged in', () => {
-      mockEnv({ current_user_id: null })
-      const { unmount } = render(<CreateTicketForm {...props} />)
+      mockEnv({current_user_id: null})
+      const {unmount} = render(<CreateTicketForm {...props} />)
       unmount()
-      const script = document.querySelector('head script[src="https://www.google.com/recaptcha/api.js"]')
+      const script = document.querySelector(
+        'head script[src="https://www.google.com/recaptcha/api.js"]',
+      )
       expect(script).toBeNull()
     })
 
     it('does not load script when user is logged in', () => {
-      mockEnv({ current_user_id: '64' })
+      mockEnv({current_user_id: '64'})
       render(<CreateTicketForm {...props} />)
-      const script = document.querySelector('head script[src="https://www.google.com/recaptcha/api.js"]')
+      const script = document.querySelector(
+        'head script[src="https://www.google.com/recaptcha/api.js"]',
+      )
       expect(script).toBeNull()
     })
   })
