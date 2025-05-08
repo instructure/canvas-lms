@@ -94,8 +94,13 @@ describe('UserTaggedModal', () => {
     ]
     renderComponent({data: mockData})
 
+    expect(screen.getByText('Remove Reading Groups | Macroeconomics')).toBeInTheDocument()
     expect(screen.getByText('Reading Groups | Macroeconomics')).toBeInTheDocument()
+
+    expect(screen.getByText('Remove Reading Groups | Microeconomics')).toBeInTheDocument()
     expect(screen.getByText('Reading Groups | Microeconomics')).toBeInTheDocument()
+
+    expect(screen.getByText('Remove Single Tag')).toBeInTheDocument()
     expect(screen.getByText('Single Tag')).toBeInTheDocument()
   })
 

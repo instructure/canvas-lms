@@ -155,7 +155,13 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
                     ref={el => el && (tagRefs.current[tag.id] = el)}
                     data-testid={`user-tag-${tag.id}`}
                     text={
-                      <AccessibleContent alt="Remove dismissible tag">
+                      <AccessibleContent
+                        alt={I18n.t('Remove %{tag}', {
+                          tag: tag.isSingleTag
+                            ? tag.groupCategoryName
+                            : `${tag.groupCategoryName} | ${tag.name}`,
+                        })}
+                      >
                         {tag.isSingleTag
                           ? tag.groupCategoryName
                           : `${tag.groupCategoryName} | ${tag.name}`}

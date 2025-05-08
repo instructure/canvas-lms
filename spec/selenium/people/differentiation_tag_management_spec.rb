@@ -449,6 +449,16 @@ describe "Differentiation Tag Management" do
           expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_1.name}')").text).to include("0 students")
           expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_2.name}')").text).to include("0 students")
         end
+
+        it "shows accessibility information for tag pills in users tag modal" do
+          @multiple_tags_2.add_user(@third_student)
+          refresh_page
+          wait_for_ajaximations
+          f("#tag-icon-id-#{@third_student.id}").click
+          wait_for_ajaximations
+          expect(f("body")).to contain_jqcss("span:contains('Remove #{@multiple_tags.name} | #{@multiple_tags_2.name}')")
+          expect(f("body")).to contain_jqcss("span:contains('Remove #{@single_tag_1.name}')")
+        end
       end
 
       context "create/edit modal" do
