@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import ModuleDuplicationSpinner from '../react/ModuleDuplicationSpinner'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {createRoot} from 'react-dom/client'
 import {reorderElements, renderTray} from '@canvas/move-item-tray'
 import LockIconView from '@canvas/lock-icon'
@@ -959,13 +958,15 @@ const updatePublishMenuDisabledState = function (disabled) {
       const $publishMenu = $(publishMenu)
       $publishMenu.data('disabled', disabled)
 
-      ReactDOM.render(
+      if (!publishMenu.reactRoot) {
+        publishMenu.reactRoot = createRoot(publishMenu)
+      }
+      publishMenu.reactRoot.render(
         <ContextModulesPublishMenu
           courseId={$publishMenu.data('courseId')}
           runningProgressId={$publishMenu.data('progressId')}
           disabled={disabled}
         />,
-        publishMenu,
       )
     }
   }
@@ -1125,7 +1126,14 @@ modules.initModuleManagement = async function (duplicate) {
     const $tempElement = $('<div id="temporary-spinner" class="item-group-condensed"></div>')
     $tempElement.insertAfter(duplicatedModuleElement)
 
-    ReactDOM.render(spinner, $('#temporary-spinner')[0])
+    const spinnerContainer = $('#temporary-spinner')[0]
+    if (spinnerContainer) {
+      if (!spinnerContainer.reactRoot) {
+        spinnerContainer.reactRoot = createRoot(spinnerContainer)
+      }
+      spinnerContainer.reactRoot.render(spinner)
+    }
+
     $.screenReaderFlashMessage(I18n.t('Duplicating Module, this may take some time'))
     const renderDuplicatedModule = function (response) {
       response.data.ENV_UPDATE.forEach(newAttachmentItem => {
@@ -1144,20 +1152,23 @@ modules.initModuleManagement = async function (duplicate) {
           const $newModule = ENV.FEATURE_MODULES_PERF
             ? $(getResponse.data)
             : $(getResponse.data).find(`#context_module_${newModuleId}`)
+          spinnerContainer?.reactRoot?.unmount()
           $tempElement.remove()
           $newModule.insertAfter(duplicatedModuleElement)
           const module_dnd = $newModule.find('.module_dnd')[0]
           if (module_dnd) {
             const contextModules = document.getElementById('context_modules')
+            if (!module_dnd.reactRoot) {
+              module_dnd.reactRoot = createRoot(module_dnd)
+            }
 
-            ReactDOM.render(
+            module_dnd.reactRoot.render(
               <ModuleFileDrop
                 courseId={ENV.course_id}
                 moduleId={newModuleId}
                 contextModules={contextModules}
                 moduleName={moduleName}
               />,
-              module_dnd,
             )
           }
           $newModule.find('.collapse_module_link').focus()
@@ -1220,7 +1231,11 @@ modules.initModuleManagement = async function (duplicate) {
             : $addModuleButton
           const module_dnd = $(this).find('.module_dnd')[0]
           if (module_dnd) {
-            ReactDOM.unmountComponentAtNode(module_dnd)
+            const module_dnd_root = module_dnd.reactRoot
+            if (module_dnd_root) {
+              module_dnd_root.unmount()
+              module_dnd.reactRoot = undefined
+            }
           }
           $(this).slideUp(function () {
             $(this).remove()
@@ -2135,7 +2150,12 @@ function renderItemAssignToTray(open, returnFocusTo, itemProps) {
 }
 
 function renderCopyToTray(open, contentSelection, returnFocusTo) {
-  ReactDOM.render(
+  const mountPoint = document.getElementById('direct-share-mount-point')
+  if (!mountPoint) return
+  if (!mountPoint.reactRoot) {
+    mountPoint.reactRoot = createRoot(mountPoint)
+  }
+  mountPoint.reactRoot.render(
     <DirectShareCourseTray
       open={open}
       sourceCourseId={ENV.COURSE_ID}
@@ -2145,12 +2165,16 @@ function renderCopyToTray(open, contentSelection, returnFocusTo) {
         returnFocusTo.focus()
       }}
     />,
-    document.getElementById('direct-share-mount-point'),
   )
 }
 
 function renderSendToTray(open, contentSelection, returnFocusTo) {
-  ReactDOM.render(
+  const mountPoint = document.getElementById('direct-share-mount-point')
+  if (!mountPoint) return
+  if (!mountPoint.reactRoot) {
+    mountPoint.reactRoot = createRoot(mountPoint)
+  }
+  mountPoint.reactRoot.render(
     <DirectShareUserModal
       open={open}
       sourceCourseId={ENV.COURSE_ID}
@@ -2160,12 +2184,16 @@ function renderSendToTray(open, contentSelection, returnFocusTo) {
         returnFocusTo.focus()
       }}
     />,
-    document.getElementById('direct-share-mount-point'),
   )
 }
 
 function renderExternalAppsTray(open, contentSelection, moduleId, returnFocusTo) {
-  ReactDOM.render(
+  const mountPoint = document.getElementById('direct-share-mount-point')
+  if (!mountPoint) return
+  if (!mountPoint.reactRoot) {
+    mountPoint.reactRoot = createRoot(mountPoint)
+  }
+  mountPoint.reactRoot.render(
     <ExternalAppsMenuTray
       open={open}
       sourceCourseId={ENV.COURSE_ID}
@@ -2176,7 +2204,6 @@ function renderExternalAppsTray(open, contentSelection, moduleId, returnFocusTo)
         returnFocusTo.focus()
       }}
     />,
-    document.getElementById('direct-share-mount-point'),
   )
 }
 
@@ -2442,9 +2469,12 @@ function initContextModules() {
 
   function renderHeaderComponent() {
     const root = $('#context-modules-header-root')
-    if (root[0]) {
-      ReactDOM.render(<ContextModulesHeader {...root.data('props')} />, root[0])
+    if (!root.length) return
+    const mountPoint = root[0]
+    if (!mountPoint.reactRoot) {
+      mountPoint.reactRoot = createRoot(mountPoint)
     }
+    mountPoint.reactRoot.render(<ContextModulesHeader {...root.data('props')} />)
   }
 
   $(document).on('click', '.module_copy_to', event => {
