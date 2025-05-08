@@ -2955,6 +2955,7 @@ ko:
   cc_attribution_non_commercial_39e0d30d: "CC 유형 비영리"
   cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC 유형 비영리 변경금지"
   cc_attribution_non_commercial_share_alike_c7edb1e5: "CC 유형 비영리 동일조건변경허락 "
+  cc_attribution_share_alike_669e7f16: "CC 유형 동일조건변경허락"
   cell_number_69a7c309: "휴대 전화 번호"
   change_beginning_date_to_39dbd06e: "시작 날짜를 다음으로 변경"
   change_ending_date_to_d2cebd54: "끝 날짜를 다음으로 변경"
@@ -10518,6 +10519,7 @@ ko:
   privacy_level_f0ec09a3: "개인 정보 보호 수준"
   privacy_policy_c68f482a: "개인 정보 보호 정책"
   private_3883d133: 비공개
+  private_copyrighted_3cac9686: "비공개 (저작권 있음)"
   process_as_ui_changes_8e34ed2a: "UI 변경으로 처리"
   process_data_2f5f962f: "자료 처리"
   processing_8c569014: "처리 중..."
