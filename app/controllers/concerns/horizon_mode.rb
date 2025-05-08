@@ -54,6 +54,8 @@ module HorizonMode
   # Use this function after @context is set
   # Combines both student and provider career loading in one method
   def load_canvas_career
+    return if Canvas::Plugin.value_to_boolean(params[:force_classic])
+
     # First try student path
     load_canvas_career_for_student
     # If no redirect happened, try provider path
