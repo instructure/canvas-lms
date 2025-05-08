@@ -112,6 +112,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
             <ModuleItemListStudent
               moduleItems={moduleItems}
               completionRequirements={completionRequirements}
+              progression={progression}
               isLoading={isLoading}
               error={error}
             />
