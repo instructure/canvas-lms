@@ -16,18 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {type File, type Folder} from './File'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 
-export interface ColumnHeader {
-  id: string
-  title: string
-  textAlign: 'start' | 'center' | 'end'
-  width?: string
-  isSortable: boolean
-  screenReaderLabel?: string
+export interface ColumnHeaderTextProps {
+  columnHeader: ColumnHeader
+  isStacked: boolean
 }
 
-export type ModalOrTrayOptions = {
-  id: 'manage-usage-rights' | 'permissions'
-  items: (File | Folder)[]
+export const ColumnHeaderText = ({columnHeader, isStacked}: ColumnHeaderTextProps) => {
+  const shouldShowScreenReaderLabel = !!(columnHeader.screenReaderLabel && !isStacked)
+
+  return (
+    <>
+      {shouldShowScreenReaderLabel && (
+        <ScreenReaderContent>{columnHeader.screenReaderLabel}</ScreenReaderContent>
+      )}
+      <span aria-hidden={shouldShowScreenReaderLabel}>{columnHeader.title}</span>
+    </>
+  )
 }
