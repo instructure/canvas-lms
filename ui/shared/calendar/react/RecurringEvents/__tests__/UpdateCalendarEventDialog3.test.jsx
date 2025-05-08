@@ -78,7 +78,7 @@ describe('UpdateCalendarEventDialog', () => {
     })
 
     // Find the confirm button in the footer
-    const confirmButton = dialog.querySelector('.css-1a66jsg-modalFooter button:last-child')
+    const confirmButton = dialog.querySelector('.css-1q7wie3-modalFooter button:last-child')
     expect(confirmButton).not.toBeNull()
 
     // Click the confirm button
