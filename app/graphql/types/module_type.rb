@@ -124,5 +124,14 @@ module Types
     def progression
       ModuleProgressionLoader.for(current_user).load(context_module)
     end
+
+    field :has_active_overrides, Boolean, null: false
+
+    def has_active_overrides
+      AssignmentOverride.where(
+        context_module_id: object.id,
+        workflow_state: "active"
+      ).exists?
+    end
   end
 end

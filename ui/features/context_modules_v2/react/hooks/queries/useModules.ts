@@ -42,6 +42,7 @@ const MODULES_QUERY = gql`
               unlockAt
               requirementCount
               requireSequentialProgress
+              hasActiveOverrides
               prerequisites {
                 id
                 name
