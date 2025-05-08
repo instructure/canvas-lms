@@ -1009,6 +1009,11 @@ describe AssignmentsController do
           expect(response).not_to render_template("assignments/show")
         end
 
+        it "renders the old layout in borderless mode" do
+          get :show, params: { course_id: @course.id, id: @assignment.id, display: "borderless" }
+          expect(response).to render_template("assignments/show")
+        end
+
         it "sets unlock date as a prerequisite for date locked assignment" do
           @assignment.unlock_at = 1.week.from_now
           @assignment.lock_at = 2.weeks.from_now
