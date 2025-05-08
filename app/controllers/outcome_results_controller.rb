@@ -513,12 +513,15 @@ class OutcomeResultsController < ApplicationController
     # NOTE: If viewing all sections and a user is concluded or inactive in one section and not another,
     # the student should always be visible
 
-    join_query = "LEFT JOIN #{Enrollment.quoted_table_name} ON enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND enrollments.user_id = users.id"
-    if params[:section_id]
-      join_query += " AND enrollments.course_section_id = #{params[:section_id]}"
+    user_query = User.joins(:enrollments)
+                     .where(enrollments: { type: ["StudentEnrollment", "StudentViewEnrollment"], course_id: @context.id })
+                     .where.not(enrollments: { workflow_state: filters })
+
+    if params[:section_id]&.to_i&.positive?
+      user_query = user_query.where(enrollments: { course_section_id: params[:section_id].to_i })
     end
 
-    @users = User.joins(join_query).where("#{Enrollment.quoted_table_name}.course_id = #{@context.id} AND enrollments.workflow_state NOT IN (?)", filters).distinct
+    @users = user_query.distinct
   end
 
   # used in LMGB
