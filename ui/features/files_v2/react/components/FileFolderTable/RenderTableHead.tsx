@@ -23,13 +23,9 @@ import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {Sort} from '../../hooks/useGetPaginatedFiles'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ColumnHeaderText} from './ColumnHeaderText'
 
 const I18n = createI18nScope('files_v2')
-
-// TODO: when we know how to sort by modified_at and published, add them here.
-const SORTABLE_COLUMNS = ['name', 'created_at', 'updated_at', 'size', 'modified_by', 'rights']
-
-const isSortable = (column: string) => SORTABLE_COLUMNS.includes(column)
 
 const mapSortDirection = (sortDirection: Sort['direction']) => {
   switch (sortDirection) {
@@ -81,12 +77,15 @@ const renderTableHead = (
         width={columnHeader.width}
         data-testid={columnHeader.id}
         onRequestSort={
-          isSortable(columnHeader.id) ? () => handleSortChange(columnHeader.id) : undefined
+          columnHeader.isSortable ? () => handleSortChange(columnHeader.id) : undefined
         }
         sortDirection={sort.by === columnHeader.id ? mapSortDirection(sort.direction) : 'none'}
         stackedSortByLabel={columnHeader.title}
       >
-        {columnHeader.title}
+        {/* If we render null in ColumnHeaderText, we get ":" as the header for Actions in stacked view */}
+        {columnHeader.title && (
+          <ColumnHeaderText columnHeader={columnHeader} isStacked={isStacked} />
+        )}
       </Table.ColHeader>
     )),
   ]

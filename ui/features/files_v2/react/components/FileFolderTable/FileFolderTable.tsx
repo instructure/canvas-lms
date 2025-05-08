@@ -86,10 +86,10 @@ const FileFolderTable = ({
   const isStacked = size !== 'large'
   const columnHeaders: ColumnHeader[] = useMemo(() => {
     const actionsTitle = isStacked ? '' : I18n.t('Actions')
-    const headers = getColumnHeaders(actionsTitle)
+    const headers = getColumnHeaders(actionsTitle, sort.by)
     setColumnWidths(headers)
     return headers
-  }, [isStacked])
+  }, [isStacked, sort.by])
 
   const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>(() => {
     return getSelectionScreenReaderText(selectedRows.size, rows.length)
