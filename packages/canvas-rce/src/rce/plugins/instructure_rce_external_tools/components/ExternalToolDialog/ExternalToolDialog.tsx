@@ -20,7 +20,6 @@
 
 import {replaceTags} from '../../helpers/tags'
 import React, {createRef} from 'react'
-import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import ToolLaunchIframe from '../util/ToolLaunchIframe'
@@ -37,9 +36,7 @@ import {parseUrlOrNull} from '../../../../../util/url-util'
 
 export interface ExternalToolDialogProps {
   env: ExternalToolsEnv
-
   iframeAllowances: string
-
   resourceSelectionUrlOverride?: string | null
 }
 
@@ -54,17 +51,11 @@ export default class ExternalToolDialog extends React.Component<
   state: ExternalToolDialogState = {
     open: false,
     button: null,
-    infoAlert: null,
     form: EMPTY_FORM,
     iframeLoaded: false,
   }
 
   formRef = createRef<HTMLFormElement>()
-
-  beforeInfoAlertRef = createRef<HTMLDivElement>()
-
-  afterInfoAlertRef = createRef<HTMLDivElement>()
-
   iframeRef = createRef<HTMLIFrameElement>()
 
   open(button: RceToolWrapper): void {
@@ -216,10 +207,6 @@ export default class ExternalToolDialog extends React.Component<
     window.dispatchEvent(new Event('resize'))
   }
 
-  handleInfoAlertFocus = (ev: {target: Element}) => this.setState({infoAlert: ev.target})
-
-  handleInfoAlertBlur = () => this.setState({infoAlert: null})
-
   calcIFrameHeight = () => {
     if (this.state.button?.use_tray) {
       return '100%'
@@ -283,22 +270,6 @@ export default class ExternalToolDialog extends React.Component<
           onCloseButton={this.handleClose}
           name={state.button?.title ?? ' '}
         >
-          <div
-            ref={this.beforeInfoAlertRef}
-            tabIndex={0} // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
-            onFocus={this.handleInfoAlertFocus}
-            onBlur={this.handleInfoAlertBlur}
-            className={
-              this.beforeInfoAlertRef.current != null &&
-              state.infoAlert === this.beforeInfoAlertRef.current
-                ? ''
-                : 'screenreader-only'
-            }
-          >
-            <Alert margin="small">
-              {formatMessage('The following content is partner provided')}
-            </Alert>
-          </div>
           {!state.iframeLoaded && (
             <Flex alignItems="center" justifyItems="center">
               <Flex.Item>
@@ -310,7 +281,6 @@ export default class ExternalToolDialog extends React.Component<
               </Flex.Item>
             </Flex>
           )}
-
           <ToolLaunchIframe
             title={label}
             ref={this.iframeRef}
@@ -327,28 +297,6 @@ export default class ExternalToolDialog extends React.Component<
             allow={props.iframeAllowances}
             onLoad={() => this.setState({iframeLoaded: true})}
           />
-          <div
-            ref={this.afterInfoAlertRef}
-            tabIndex={0} // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
-            onFocus={this.handleInfoAlertFocus}
-            onBlur={this.handleInfoAlertBlur}
-            style={
-              this.afterInfoAlertRef.current != null &&
-              state.infoAlert === this.afterInfoAlertRef.current
-                ? {}
-                : {bottom: '0'}
-            }
-            className={
-              this.afterInfoAlertRef.current != null &&
-              state.infoAlert === this.afterInfoAlertRef.current
-                ? ''
-                : 'screenreader-only'
-            }
-          >
-            <Alert margin="small">
-              {formatMessage('The preceding content is partner provided')}
-            </Alert>
-          </div>
         </Overlay>
       </>
     )
@@ -358,7 +306,6 @@ export default class ExternalToolDialog extends React.Component<
 interface ExternalToolDialogState {
   open: boolean
   button: RceToolWrapper | null
-  infoAlert: Element | null
   form: ExternalToolDialogForm
   iframeLoaded: boolean
 }

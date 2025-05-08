@@ -40,9 +40,6 @@ export default class ConfigureExternalToolButton extends React.Component {
     super(props)
     this.state = {
       modalIsOpen: props.modalIsOpen,
-      beforeExternalContentAlertClass: 'screenreader-only',
-      afterExternalContentAlertClass: 'screenreader-only',
-      alertFocused: false,
     }
   }
 
@@ -72,57 +69,19 @@ export default class ConfigureExternalToolButton extends React.Component {
     this.props.returnFocus()
   }
 
-  handleAlertFocus = event => {
-    const newState = {alertFocused: true}
-    if (event.target.className.search('before') > -1) {
-      newState.beforeExternalContentAlertClass = ''
-    } else if (event.target.className.search('after') > -1) {
-      newState.afterExternalContentAlertClass = ''
-    }
-    this.setState(newState)
-  }
-
   iframeStyle = () => {
-    const alertFocused = this.state?.alertFocused
     return {
       width: this.iframeWidth() || '100%',
       height: this.iframeHeight(),
       minHeight: this.iframeHeight(),
-      border: alertFocused ? '2px solid #2B7ABC' : 'none',
-      padding: alertFocused ? '0px' : '2px',
+      border: 'none',
+      padding: '2px',
     }
-  }
-
-  handleAlertBlur = event => {
-    const newState = {alertFocused: false}
-    if (event.target.className.search('before') > -1) {
-      newState.beforeExternalContentAlertClass = 'screenreader-only'
-    } else if (event.target.className.search('after') > -1) {
-      newState.afterExternalContentAlertClass = 'screenreader-only'
-    }
-    this.setState(newState)
   }
 
   renderIframe = () => {
-    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
-    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
-
     return (
       <div>
-        <div
-          onFocus={this.handleAlertFocus}
-          onBlur={this.handleAlertBlur}
-          className={beforeAlertStyles}
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex="0"
-        >
-          <div className="ic-flash-info" style={{maxWidth: this.headingWidth()}}>
-            <div className="ic-flash__icon" aria-hidden="true">
-              <i className="icon-info" />
-            </div>
-            {I18n.t('The following content is partner provided')}
-          </div>
-        </div>
         <ToolLaunchIframe
           src={this.getLaunchUrl(this.props.tool)}
           title={I18n.t('Tool Configuration')}
@@ -131,20 +90,6 @@ export default class ConfigureExternalToolButton extends React.Component {
             this.iframe = e
           }}
         />
-        <div
-          onFocus={this.handleAlertFocus}
-          onBlur={this.handleAlertBlur}
-          className={afterAlertStyles}
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex="0"
-        >
-          <div className="ic-flash-info">
-            <div className="ic-flash__icon" aria-hidden="true">
-              <i className="icon-info" />
-            </div>
-            {I18n.t('The preceding content is partner provided')}
-          </div>
-        </div>
       </div>
     )
   }

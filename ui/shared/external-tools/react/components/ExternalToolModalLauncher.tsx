@@ -28,16 +28,6 @@ import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 const I18n = createI18nScope('external_toolsModalLauncher')
 
-type ExternalToolModalLauncherState = {
-  modalLaunchStyle: {
-    border: string
-    width?: number
-    height?: number
-  }
-  beforeExternalContentAlertClass?: string
-  afterExternalContentAlertClass?: string
-}
-
 export type ExternalToolModalLauncherProps = {
   appElement: Element
   title: string
@@ -80,17 +70,9 @@ export default class ExternalToolModalLauncher extends React.Component<
   removeExternalContentListener?: () => void
   removeCloseListener?: () => void
   iframe?: HTMLIFrameElement | null
-  beforeAlert?: HTMLDivElement | null
-  afterAlert?: HTMLDivElement | null
 
   static defaultProps = {
     appElement: document.getElementById('application'),
-  }
-
-  state: ExternalToolModalLauncherState = {
-    beforeExternalContentAlertClass: 'screenreader-only',
-    afterExternalContentAlertClass: 'screenreader-only',
-    modalLaunchStyle: {border: 'none'},
   }
 
   componentDidMount() {
@@ -161,35 +143,6 @@ export default class ExternalToolModalLauncher extends React.Component<
     return dimensions
   }
 
-  handleAlertBlur = (event: React.FocusEvent<HTMLDivElement>) => {
-    const newState: ExternalToolModalLauncherState = {
-      modalLaunchStyle: {
-        border: 'none',
-      },
-    }
-    if (event.target.className.search('before') > -1) {
-      newState.beforeExternalContentAlertClass = 'screenreader-only'
-    } else if (event.target.className.search('after') > -1) {
-      newState.afterExternalContentAlertClass = 'screenreader-only'
-    }
-    this.setState(newState)
-  }
-
-  handleAlertFocus = (event: React.FocusEvent<HTMLDivElement>) => {
-    const newState: ExternalToolModalLauncherState = {
-      modalLaunchStyle: {
-        width: this.iframe!.offsetWidth - 4,
-        border: '2px solid #2B7ABC',
-      },
-    }
-    if (event.target.className.search('before') > -1) {
-      newState.beforeExternalContentAlertClass = ''
-    } else if (event.target.className.search('after') > -1) {
-      newState.afterExternalContentAlertClass = ''
-    }
-    this.setState(newState)
-  }
-
   onAfterOpen = () => {
     if (this.iframe) {
       this.iframe.setAttribute('allow', iframeAllowances())
@@ -219,12 +172,9 @@ export default class ExternalToolModalLauncher extends React.Component<
   }
 
   render() {
-    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
-    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
-
     const modalLaunchStyle = {
       ...this.getLaunchDimensions(),
-      ...this.state.modalLaunchStyle,
+      border: 'none',
     }
 
     return (
@@ -240,21 +190,6 @@ export default class ExternalToolModalLauncher extends React.Component<
         shouldCloseOnDocumentClick={false}
         footer={null}
       >
-        <div
-          onFocus={this.handleAlertFocus}
-          onBlur={this.handleAlertBlur}
-          className={beforeAlertStyles}
-          ref={e => {
-            this.beforeAlert = e
-          }}
-        >
-          <div className="ic-flash-info">
-            <div className="ic-flash__icon" aria-hidden="true">
-              <i className="icon-info" />
-            </div>
-            {I18n.t('The following content is partner provided')}
-          </div>
-        </div>
         <ToolLaunchIframe
           src={this.getIframeSrc()}
           style={modalLaunchStyle}
@@ -263,21 +198,6 @@ export default class ExternalToolModalLauncher extends React.Component<
             this.iframe = e
           }}
         />
-        <div
-          onFocus={this.handleAlertFocus}
-          onBlur={this.handleAlertBlur}
-          className={afterAlertStyles}
-          ref={e => {
-            this.afterAlert = e
-          }}
-        >
-          <div className="ic-flash-info">
-            <div className="ic-flash__icon" aria-hidden="true">
-              <i className="icon-info" />
-            </div>
-            {I18n.t('The preceding content is partner provided')}
-          </div>
-        </div>
       </CanvasModal>
     )
   }
