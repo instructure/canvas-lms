@@ -411,6 +411,7 @@ class FilesController < ApplicationController
     if authorized_action(@context, @current_user, [:read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]) &&
        tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
+      files_version_2 = Account.site_admin.feature_enabled?(:files_a11y_rewrite) && (!Account.site_admin.feature_enabled?(:files_a11y_rewrite_toggle) || @current_user.files_ui_version != "v1")
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
         tool_context = case context
@@ -430,7 +431,7 @@ class FilesController < ApplicationController
                                 else
                                   []
                                 end
-        root_folder_id = Folder.root_folders(context)&.first&.id if Account.site_admin.feature_enabled?(:files_a11y_rewrite)
+        root_folder_id = Folder.root_folders(context)&.first&.id if files_version_2
         {
           asset_string: context.asset_string,
           name: (context == @current_user) ? t("my_files", "My Files") : context.name,
@@ -448,7 +449,7 @@ class FilesController < ApplicationController
 
       @page_title = t("files_page_title", "Files")
       @body_classes << "full-width padless-content"
-      if Account.site_admin.feature_enabled?(:files_a11y_rewrite)
+      if files_version_2
         js_bundle :files_v2
       else
         js_bundle :files
