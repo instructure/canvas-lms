@@ -213,11 +213,19 @@ describe('DiscussionPostToolbar', () => {
     })
 
     describe('when the discussion topic is an announcement', () => {
-      it('does not render the translate button', () => {
+      it('does render the translate button', () => {
         const {queryByTestId} = setup({isAnnouncement: true}, null, {
           translationLanguages: {current: ['en', 'es']},
         })
-        expect(queryByTestId('translate-button')).toBeNull()
+        expect(queryByTestId('translate-button')).toBeTruthy()
+      })
+
+      it('does render the new button label if the flag is on', () => {
+        ENV.ai_translation_improvements = true
+        const {getByText} = setup({isAnnouncement: true}, null, {
+          translationLanguages: {current: ['en', 'es']},
+        })
+        expect(getByText('Translate Announcement')).toBeTruthy()
       })
     })
 

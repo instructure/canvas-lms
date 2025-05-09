@@ -211,6 +211,7 @@ const DiscussionTopicToolbarContainer = props => {
                   (props.discussionTopic.assignment !== null ||
                     !props.discussionTopic.groupSet !== null)
                 }
+                isAnnouncement={props.discussionTopic.isAnnouncement}
               />
             </Flex.Item>
           </Flex>
