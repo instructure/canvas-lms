@@ -86,4 +86,10 @@ describe DataFixup::CopyCustomDataToJsonb do
     expect(custom_data2["data"]).to eq(nested_data)
     expect(custom_data2["data_json"]).to eq(nested_data)
   end
+
+  it "skips validations" do
+    @custom_data.user.delete
+
+    expect { DataFixup::CopyCustomDataToJsonb.run }.not_to raise_error
+  end
 end
