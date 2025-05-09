@@ -7774,6 +7774,9 @@ nn:
     one: "1 Filter"
     other: "{{count}} Filter"
     zero: "Ingen filter"
+  count_groups_90e215b1: 
+    one: "1 gruppe"
+    other: "%{count} grupper"
   count_hidden_e8d2c57c: "%{count} skjult"
   count_hours_1bd03883: 
     one: "1 time"
@@ -7899,6 +7902,9 @@ nn:
   count_rows_removed_c6ff7bc: "%{count} rader fjerna"
   count_sections_466dcd5c: 
     one: "1 seksjon"
+    other: "%{count} seksjonar"
+  count_sections_bf1baf0a: 
+    one: "1 klasse"
     other: "%{count} seksjonar"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "Fann 1 sett med karaktersetjingsperiodar"
@@ -28271,6 +28277,7 @@ nn:
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Panelet kan brukast for å luke ut dupliserte resultat eller personar som du ikkje fann gjennom søk."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Panelet kan brukast til å søke etter brukarar du vil legge til emnet. "
   use_this_photo_3a594830: "Bruk dette bildet"
+  use_this_rubric_for_assignment_grading_a02fd079: "Bruk vurderingsskjemaet for karaktersetjing av oppgåver"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Bruk same vurdering for den nye innleveringa"
   use_webcam_1ed0bf6b: "Bruk Webkamera"
   used_by_permission_314a78dd: "Med løyve"

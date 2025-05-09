@@ -7178,6 +7178,9 @@ hu:
     one: "1 szűrő"
     other: "{{count}} Szűrők"
     zero: "Nincsenek szűrők"
+  count_groups_90e215b1: 
+    one: "1 csoport"
+    other: "%{count} csoport"
   count_hidden_e8d2c57c: "%{count} elrejtve"
   count_hours_1bd03883: 
     one: "1 óra"
@@ -7300,6 +7303,9 @@ hu:
   count_rows_added_dacc9daf: "%{count} sor hozzáadva"
   count_rows_removed_c6ff7bc: "%{count} sor eltávolítva"
   count_sections_466dcd5c: 
+    one: "1 szekció"
+    other: "%{count} szekció"
+  count_sections_bf1baf0a: 
     one: "1 szekció"
     other: "%{count} szekció"
   count_sets_of_grading_periods_found_c8857ae9: 
@@ -26423,6 +26429,7 @@ hu:
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Használja ezt a panelt a duplikált találatok vagy a kereséssel nem talált személyek feloldására."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Ezen a panelen kereshet olyan személyeket, akiket hozzá szeretne adni ehhez a kurzushoz.                        "
   use_this_photo_3a594830: "Használja ezt a fotót"
+  use_this_rubric_for_assignment_grading_a02fd079: "Értékelőtábla használata a feladat értékeléséhez"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Az újraküldött megoldásnál is legyen ugyanez az osztályzat"
   use_webcam_1ed0bf6b: "Webkamera használata"
   use_window_parent_in_deep_linking_response_8fe5f845: "A window.parent használata a Deep Linking válaszban"

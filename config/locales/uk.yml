@@ -5104,6 +5104,11 @@ uk:
     many: "%{count} файлів оновлено"
     one: "1 файл оновлено"
     other: "%{count} файлів оновлено"
+  count_groups_90e215b1: 
+    few: "%{count}групи"
+    many: "%{count}груп"
+    one: "1 група"
+    other: "%{count}груп"
   count_hours_1bd03883: 
     few: "%{count} годин"
     many: "%{count} годин"
@@ -5180,6 +5185,11 @@ uk:
     many: "%{count} результатів показано"
     one: "один результат показано"
     other: "%{count} результатів показано"
+  count_sections_bf1baf0a: 
+    few: "%{count}розділи"
+    many: "%{count}розділів"
+    one: "1 розділ"
+    other: "%{count}розділів"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "1 налаштування періоду оцінювання знайдено."
     other: "%{count} налаштувань періодів оцінювання знайдено."
@@ -18246,6 +18256,7 @@ uk:
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Використовуйте цей список для видалення призначених студентів. Додайте нових студентів з вікна під списком."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Використовуйте цю панель для вирішення проблеми дублювання результатів або людей, не знайдені у вашому пошуку."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Використовуйте цю панель, щоб шукати людей, яких ви хочете додати до цього курсу."
+  use_this_rubric_for_assignment_grading_a02fd079: "Використовуйте цю рубрику для оцінювання завдання"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Використати саме цю оцінку для цього  повторного завдання"
   used_by_permission_314a78dd: "Використовується дозволом"
   user: 
