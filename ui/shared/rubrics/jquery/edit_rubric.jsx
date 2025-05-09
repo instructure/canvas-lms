@@ -188,8 +188,9 @@ const rubricEditing = {
     }
 
     // multiple rubrics can be open for editing but only the active one will have Find Outcome link
-    // const $rubric = $('#add_learning_outcome_link').closest('.rubric table.rubric_table:visible')
-    const $rubric = $('#add_learning_outcome_link').closest('.rubric').find('table.rubric_table:visible')
+    const $rubric = $('#add_learning_outcome_link')
+      .closest('.rubric')
+      .find('table.rubric_table:visible')
     $rubric
       .find('.criterion.learning_outcome_' + outcome.id)
       .find('.delete_criterion_link')

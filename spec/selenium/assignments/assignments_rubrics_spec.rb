@@ -417,7 +417,7 @@ describe "assignment rubrics" do
         wait_for_ajaximations
 
         expect(ffj(".criterion_use_range:visible").count).to eq 1
-        f(".rubric-custom-rating").click
+        f(".rubric_custom_rating").click
         wait_for_ajaximations
 
         expect(f(".rubric_container")).not_to contain_jqcss(".criterion_use_range:visible")
