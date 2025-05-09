@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ModuleId} from './ModuleItemLoadingData'
+import {ModuleId} from './types'
 
 // Shorten the names for memory cost reason
 // p => page, s => showAll

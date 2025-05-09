@@ -19,13 +19,10 @@
 import {waitFor} from '@testing-library/react'
 import {screen} from '@testing-library/dom'
 import fetchMock from 'fetch-mock'
-import {
-  ModuleItemsLazyLoader,
-  type ModuleId,
-  type ModuleItemsCallback,
-  DEFAULT_PAGE,
-} from '../ModuleItemsLazyLoader'
-import {ModuleItemsStore} from '@canvas/context-modules/utils/ModuleItemsStore'
+import {ModuleItemsLazyLoader, type ModuleItemsCallback} from '../ModuleItemsLazyLoader'
+import {ModuleItemsStore} from '../ModuleItemsStore'
+import {moduleFromId} from '../moduleHelpers'
+import {type ModuleId} from '../types'
 
 // @ts-expect-error
 global.IS_REACT_ACT_ENVIRONMENT = true
@@ -63,23 +60,33 @@ Object.keys(modules).forEach((moduleId: string) => {
   fetchMock.mock(`/courses/${courseId}/modules/${moduleId}/items_html?no_pagination=1`, 200)
 })
 
-const createMockContainer = (moduleId: string) => {
-  const div = document.createElement('div')
-  div.id = `context_module_content_${moduleId}`
+const createMockModule = (moduleId: string) => {
+  const module = document.createElement('div')
+  module.id = `context_module_${moduleId}`
+  const content = document.createElement('div')
+  content.id = `context_module_content_${moduleId}`
   const footer = document.createElement('footer')
   footer.className = 'footer'
-  div.appendChild(footer)
-  document.body.appendChild(div)
+  content.appendChild(footer)
+  module.appendChild(content)
+  document.body.appendChild(module)
 }
 const badModule = {
   moduleId: '1086',
   api: '/courses/23/modules/1086/items_html?page=1&per_page=2',
   response: new Response('', {status: 500}),
 }
-
 fetchMock.mock(badModule.api, badModule.response)
+createMockModule(badModule.moduleId)
 
-createMockContainer(badModule.moduleId)
+const singlePageModules = {
+  moduleId: '1087',
+  items: '<ul><li id="21"></li><li id="22"></li></ul>',
+  api: '/courses/23/modules/1087/items_html?page=1&per_page=2',
+}
+fetchMock.mock(singlePageModules.api, {
+  body: singlePageModules.items,
+})
 
 let moduleItemsLazyLoader: ModuleItemsLazyLoader
 let itemsCallback: ModuleItemsCallback
@@ -92,9 +99,9 @@ describe('fetchModuleItems utility', () => {
 
     document.body.innerHTML = ''
     Object.keys(modules).forEach((moduleId: string) => {
-      createMockContainer(moduleId)
+      createMockModule(moduleId)
     })
-    createMockContainer(badModule.moduleId)
+    createMockModule(badModule.moduleId)
   })
 
   afterEach(() => {
@@ -106,6 +113,126 @@ describe('fetchModuleItems utility', () => {
       }
     })
     jest.restoreAllMocks()
+  })
+
+  describe('fetchModuleItems', () => {
+    it('does nothing if no modules are provided', async () => {
+      await moduleItemsLazyLoader.fetchModuleItems([])
+      expect(itemsCallback).not.toHaveBeenCalled()
+    })
+
+    it('does nothing if the provided moduleIds not exist in the dom', async () => {
+      await moduleItemsLazyLoader.fetchModuleItems(['noop'])
+      expect(fetchMock.calls()).toHaveLength(0)
+    })
+
+    it('construct the api urls correctly', async () => {
+      await moduleItemsLazyLoader.fetchModuleItems(Object.keys(modules))
+      const calls = fetchMock.calls()
+      expect(calls[0][0]).toBe(
+        `/courses/${courseId}/modules/1083/items_html?page=1&per_page=${pageSize}`,
+      )
+      expect(calls[1][0]).toBe(
+        `/courses/${courseId}/modules/1084/items_html?page=1&per_page=${pageSize}`,
+      )
+      expect(calls[2][0]).toBe(
+        `/courses/${courseId}/modules/1085/items_html?page=1&per_page=${pageSize}`,
+      )
+    })
+
+    it('fetches the items', async () => {
+      await moduleItemsLazyLoader.fetchModuleItems(Object.keys(modules))
+      expect(fetchMock.calls()).toHaveLength(3)
+    })
+
+    describe('success responses', () => {
+      it('set the html in the containers with the results', async () => {
+        await moduleItemsLazyLoader.fetchModuleItems(Object.keys(modules))
+        Object.keys(modules).forEach(moduleId => {
+          expect(
+            document.querySelector(`#context_module_content_${moduleId} ul`)?.outerHTML,
+          ).toEqual(modules[moduleId].items)
+        })
+      })
+
+      it("calls the callback for each module's items", async () => {
+        await moduleItemsLazyLoader.fetchModuleItems(Object.keys(modules))
+        Object.keys(modules).forEach(moduleId =>
+          expect(itemsCallback).toHaveBeenCalledWith(moduleId),
+        )
+      })
+
+      it("sets the loadstate to 'paginated' when there are multiple pages", async () => {
+        await moduleItemsLazyLoader.fetchModuleItems(['1083'])
+        const module = moduleFromId('1083')
+        expect(module?.dataset.loadstate).toBe('paginated')
+      })
+
+      it("sets the loadstate to 'loaded' when there is only one page", async () => {
+        createMockModule(singlePageModules.moduleId)
+        await moduleItemsLazyLoader.fetchModuleItems([singlePageModules.moduleId])
+        const module = moduleFromId(singlePageModules.moduleId)
+        expect(module?.dataset.loadstate).toBe('loaded')
+      })
+
+      it('sets the loadstate to "error" when the fetch fails', async () => {
+        await moduleItemsLazyLoader.fetchModuleItems([badModule.moduleId])
+        const module = moduleFromId(badModule.moduleId)
+        expect(module?.dataset.loadstate).toBe('error')
+      })
+    })
+
+    describe('failed responses', () => {
+      const badModuleId = badModule.moduleId
+
+      it('handles the error appropriately', async () => {
+        // We know the module will fail to load because we've mocked the fetch to fail
+        await moduleItemsLazyLoader.fetchModuleItems([badModuleId])
+
+        // The error is handled by the renderError method which calls ModuleItemsLazyLoader.loadingData.getModuleRoot
+        // We can verify the error handling by checking that the callback wasn't called
+        expect(itemsCallback).not.toHaveBeenCalled()
+
+        // Also verify the module content still exists but wasn't modified
+        const moduleContent = document.querySelector(`#context_module_content_${badModuleId}`)
+        expect(moduleContent).toBeTruthy()
+        expect(moduleContent?.innerHTML).toContain('<footer class="footer"></footer>')
+      })
+
+      it('does not call the callback', async () => {
+        await moduleItemsLazyLoader.fetchModuleItems([badModuleId])
+        expect(itemsCallback).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('mixed responses', () => {
+      const badModuleId = badModule.moduleId
+      const goodModuleId = '1083'
+
+      it('does set the html for successful responses', async () => {
+        const callback = () => {
+          expect(
+            document.querySelector(`#context_module_content_${goodModuleId} ul`)?.outerHTML,
+          ).toEqual(modules[goodModuleId].items)
+          expect(
+            document.querySelector(`#context_module_content_${badModuleId}`)?.outerHTML,
+          ).toContain('Items failed to load')
+        }
+        const moduleItemsLazyLoader = new ModuleItemsLazyLoader(
+          courseId,
+          callback,
+          mockStore,
+          pageSize,
+        )
+        await moduleItemsLazyLoader.fetchModuleItems([badModuleId, goodModuleId])
+      })
+
+      it('does call the callback for successful responses', async () => {
+        await moduleItemsLazyLoader.fetchModuleItems([badModuleId, goodModuleId])
+        expect(itemsCallback).toHaveBeenCalledWith(goodModuleId)
+        expect(itemsCallback).not.toHaveBeenCalledWith(badModuleId)
+      })
+    })
   })
 
   describe('fetchModuleItemsHtml', () => {
@@ -198,7 +325,7 @@ describe('fetchModuleItems utility', () => {
           it('should call the setPageNumber', async () => {
             jest.spyOn(mockStore, 'getPageNumber').mockImplementation(() => '')
             await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, pageParam, allPages)
-            expect(setPageNumberSpy).toHaveBeenCalledWith(moduleId, DEFAULT_PAGE)
+            expect(setPageNumberSpy).toHaveBeenCalledWith(moduleId, 1)
           })
         })
 

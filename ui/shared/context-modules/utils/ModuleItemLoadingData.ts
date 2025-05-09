@@ -17,11 +17,11 @@
  */
 
 import {createRoot, type Root} from 'react-dom/client'
-
-type ModuleId = number | string
+import {type ModuleId, type PaginationData} from './types'
 
 type ModuleData = {
   moduleId: ModuleId
+  paginationData: PaginationData
   root?: Root
 }
 
@@ -38,8 +38,19 @@ class ModuleItemLoadingData {
   private addModule(moduleId: ModuleId): ModuleData {
     this.modules[moduleId] = {
       moduleId,
+      paginationData: {currentPage: 1, totalPages: 1},
     }
     return this.modules[moduleId]
+  }
+
+  getPaginationData(moduleId: ModuleId): PaginationData {
+    const moduleData = this.getModuleData(moduleId)
+    return {...moduleData.paginationData}
+  }
+
+  setPaginationData(moduleId: ModuleId, paginationData: PaginationData): void {
+    const moduleData = this.getModuleData(moduleId)
+    moduleData.paginationData = {...paginationData}
   }
 
   getModuleRoot(moduleId: ModuleId): Root | undefined {
@@ -73,4 +84,4 @@ class ModuleItemLoadingData {
   }
 }
 
-export {ModuleItemLoadingData, type ModuleId, type ModuleData}
+export {ModuleItemLoadingData, type ModuleData}
