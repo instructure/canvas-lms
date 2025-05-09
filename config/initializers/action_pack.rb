@@ -68,3 +68,17 @@ end
 ActionDispatch::Request::Session.include(FileAccessUserOnSession)
 
 Autoextend.hook(:"ActionController::TestSession", FileAccessUserOnSession)
+
+module ValidateCallbackArgs
+  module ClassMethods
+    private
+
+    def _insert_callbacks(callbacks, block = nil)
+      options = callbacks.extract_options!
+      options.assert_valid_keys(:if, :unless, :prepend, :only, :except, :raise, :with)
+      callbacks << options
+      super
+    end
+  end
+end
+ActionController::Base.singleton_class.include(ValidateCallbackArgs::ClassMethods)

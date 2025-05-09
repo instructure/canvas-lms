@@ -32,9 +32,11 @@ module CanvasCrummy
         # I wanted this next line to look more like:
         # html_options = options.pluck { |k,v| %w{class id}.include? k.to_s  }
         # but couldn't figure out how
-        html_options = options[:class] ? { class: options[:class] } : {}
-        html_options[:id] = options[:id] if options[:id]
-        raise ArgumentError, "Need more arguments" unless name || options[:record] || block_given?
+        html_options = (klass = options.delete(:class)) ? { class: klass } : {}
+        if (id = options.delete(:id))
+          html_options[:id] = id
+        end
+        raise ArgumentError, "Need more arguments" unless name || block_given?
         raise ArgumentError, "Cannot pass url and use block" if url && block_given?
 
         before_action(options) do |instance|
