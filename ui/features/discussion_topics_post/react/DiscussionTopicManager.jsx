@@ -521,7 +521,9 @@ const DiscussionTopicManager = props => {
                       />
                     )}
                     {showTranslationControl && ENV.ai_translation_improvements && (
-                      <DiscussionTranslationModuleContainer />
+                      <DiscussionTranslationModuleContainer
+                        isAnnouncement={discussionTopicQuery.data.legacyNode?.isAnnouncement}
+                      />
                     )}
                     {showTranslationControl && !ENV.ai_translation_improvements && (
                       <TranslationControls />
