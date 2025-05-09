@@ -130,6 +130,7 @@ class Lti::AssetReport < ApplicationRecord
       processing_progress:,
       priority:,
       launch_url_path:,
+      resubmit_url_path:
     }.compact
   end
 
@@ -140,6 +141,20 @@ class Lti::AssetReport < ApplicationRecord
       asset_processor_id: lti_asset_processor_id,
       report_id: id
     )
+  end
+
+  def resubmit_url_path
+    return nil unless resubmit_available?
+
+    Rails.application.routes.url_helpers.lti_asset_processor_notice_resubmit_path(
+      asset_processor_id: lti_asset_processor_id,
+      student_id: asset.submission.user_id
+    )
+  end
+
+  def resubmit_available?
+    processing_progress == PROGRESS_PENDING_MANUAL ||
+      (processing_progress == PROGRESS_FAILED && [ERROR_CODE_EULA_NOT_ACCEPTED, ERROR_CODE_DOWNLOAD_FAILED].include?(error_code))
   end
 
   # Returns all reports for the given asset processor and submission IDs.

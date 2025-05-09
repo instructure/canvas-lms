@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -38,8 +38,10 @@ import {
   ExistingAttachedAssetProcessor,
   LtiAssetReport,
 } from '@canvas/lti/model/AssetProcessor'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import React from 'react'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useMutation, QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('speed_grader')
 
@@ -117,8 +119,21 @@ function defaultInfoText(progress: LtiAssetReport['processing_progress']) {
   }
 }
 
+const resubmit = async function (url: string) {
+  return await doFetchApi({
+    path: url,
+    method: 'POST',
+  })
+}
+
 function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
   const {comment, infoText} = reportCommentAndInfoText(report)
+
+  const resubmitMutation = useMutation({
+    mutationFn: resubmit,
+    onSuccess: () => showFlashSuccess(I18n.t('Resubmitted to Document Processing App'))(),
+    onError: () => showFlashError(I18n.t('Resubmission failed'))(),
+  })
 
   return (
     <View
@@ -204,15 +219,12 @@ function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
             </Flex.Item>
           )
         }
-        {report.resubmit_url_path && (
+        {report.resubmit_url_path && !resubmitMutation.isSuccess && (
           <Flex.Item overflowY="visible">
             <Button
+              data-pendo="asset-processor-resubmit-notice"
               size="small"
-              onClick={() =>
-                showFlashAlert(
-                  I18n.t('We are working on Resubmit functionality, please check back soon!'),
-                )
-              }
+              onClick={() => resubmitMutation.mutate(report.resubmit_url_path!)}
             >
               {I18n.t('Resubmit')}
             </Button>
@@ -276,35 +288,37 @@ function LtiAssetReportsCardGroup({
 export function LtiAssetReports({attachmentsAndReports, assetProcessors}: LtiAssetReportsProps) {
   const assetProcessorsById = Object.fromEntries(assetProcessors.map(ap => [ap.id, ap]))
   return (
-    <View as="div" borderColor="primary" borderWidth="none none small none">
-      <Flex direction="column" gap="xxx-small">
-        {attachmentsAndReports.map(
-          ({attachmentName, reportsByProcessor: reportsByProcessor}, index) => (
-            <View
-              as="div"
-              margin="xxx-small none none none"
-              padding="small none"
-              borderColor="primary"
-              borderWidth="small none none none"
-              key={`a-${index}`}
-            >
-              <Flex direction="column" gap="medium" margin="xxx-small none">
-                <Heading level="h4">{attachmentName}</Heading>
-                {Object.keys(reportsByProcessor)
-                  .sort()
-                  .map((processorId, index) => (
-                    <LtiAssetReportsCardGroup
-                      key={index}
-                      reportsArray={reportsByProcessor[processorId]}
-                      assetProcessor={assetProcessorsById[processorId]}
-                    />
-                  ))}
-              </Flex>
-            </View>
-          ),
-        )}
-      </Flex>
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <View as="div" borderColor="primary" borderWidth="none none small none">
+        <Flex direction="column" gap="xxx-small">
+          {attachmentsAndReports.map(
+            ({attachmentName, reportsByProcessor: reportsByProcessor}, index) => (
+              <View
+                as="div"
+                margin="xxx-small none none none"
+                padding="small none"
+                borderColor="primary"
+                borderWidth="small none none none"
+                key={`a-${index}`}
+              >
+                <Flex direction="column" gap="medium" margin="xxx-small none">
+                  <Heading level="h4">{attachmentName}</Heading>
+                  {Object.keys(reportsByProcessor)
+                    .sort()
+                    .map((processorId, index) => (
+                      <LtiAssetReportsCardGroup
+                        key={index}
+                        reportsArray={reportsByProcessor[processorId]}
+                        assetProcessor={assetProcessorsById[processorId]}
+                      />
+                    ))}
+                </Flex>
+              </View>
+            ),
+          )}
+        </Flex>
+      </View>
+    </QueryClientProvider>
   )
 }
 

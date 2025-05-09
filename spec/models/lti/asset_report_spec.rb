@@ -273,4 +273,48 @@ RSpec.describe Lti::AssetReport do
         eq "/asset_processors/#{report.lti_asset_processor_id}/reports/#{report.id}/launch"
     end
   end
+
+  describe "#resubmit_url_path" do
+    let(:processing_progress) { "Failed" }
+    let(:error_code) { "MYERRORCODE" }
+    let(:standard_report) { lti_asset_report_model(processing_progress:, error_code:) }
+
+    context "when processing_progress is Failed" do
+      ["EULA_NOT_ACCEPTED", "DOWNLOAD_FAILED"].each do |error_code|
+        context "when error_code is #{error_code}" do
+          let(:error_code) { error_code }
+
+          it "returns a resubmit URL path" do
+            expect(standard_report.resubmit_url_path).to eq(
+              "/api/lti/asset_processors/#{standard_report.lti_asset_processor_id}/notices/#{standard_report.asset.submission.user_id}"
+            )
+          end
+        end
+      end
+
+      context "when error_code does not need action" do
+        it "resubmit_url_path is nil" do
+          expect(standard_report.resubmit_url_path).to be_nil
+        end
+      end
+    end
+
+    context "when processing_progress is PendingManual" do
+      let(:processing_progress) { "PendingManual" }
+
+      it "returns a resubmit URL path" do
+        expect(standard_report.resubmit_url_path).to eq(
+          "/api/lti/asset_processors/#{standard_report.lti_asset_processor_id}/notices/#{standard_report.asset.submission.user_id}"
+        )
+      end
+    end
+
+    context "when processing_progress is not Failed or PendingManual" do
+      let(:processing_progress) { "Processed" }
+
+      it "returns nil" do
+        expect(standard_report.resubmit_url_path).to be_nil
+      end
+    end
+  end
 end
