@@ -229,23 +229,16 @@ module Lti
         return render_errors("Either account_id or course_id must be present.")
       end
 
-      unique_checks = control_params.slice(:account_id, :course_id, :deployment_id, :registration_id).compact
+      unique_checks = control_params.slice(*Lti::ContextControlService.unique_check_attrs).compact
       if registration.context_controls.active.exists?(unique_checks)
         return render_errors("A context control for this deployment and context already exists.")
       end
 
-      control = registration.context_controls.find_or_initialize_by(unique_checks)
-      if control.new_record?
-        control.assign_attributes(control_params)
-      else
-        restore_deleted_control(control, control_params)
-      end
+      control = Lti::ContextControlService.create_or_update(control_params)
 
-      if control.save
-        render json: lti_context_control_json(control, @current_user, session, context, include_users: true), status: :created
-      else
-        render_errors(control.errors.full_messages)
-      end
+      render json: lti_context_control_json(control, @current_user, session, context, include_users: true), status: :created
+    rescue Lti::ContextControlErrors => e
+      render_errors(e.errors.full_messages)
     rescue => e
       report_error(e)
       raise e
@@ -392,11 +385,6 @@ module Lti
 
     private
 
-    def restore_deleted_control(control, control_params)
-      restore_params = control_params.slice(:available, :updated_by, :workflow_state)
-      control.assign_attributes(restore_params)
-    end
-
     def render_errors(errors, status: :unprocessable_entity)
       errors = [errors] unless errors.is_a?(Array)
       render json: { errors: }, status:
@@ -413,6 +401,7 @@ module Lti
         p[:workflow_state] = :active
         p[:created_by] = @current_user
         p[:updated_by] = @current_user
+        p[:registration_id] = registration.id
       end
     end
 

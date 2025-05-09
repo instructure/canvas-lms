@@ -21,6 +21,6 @@ class Lti::ContextExternalToolErrors < StandardError
 
   def initialize(errors)
     @errors = errors
-    super("Error creating ContextExternalTool: #{errors}")
+    super("Error creating ContextExternalTool: #{errors.full_messages.join(", ")}")
   end
 end

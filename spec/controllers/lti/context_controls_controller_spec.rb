@@ -61,15 +61,7 @@ describe Lti::ContextControlsController, type: :request do
   end
 
   def deployment_for(context)
-    deployment = registration.new_external_tool(context)
-    deployment.save!
-    if context.is_a?(Course)
-      Lti::ContextControl.create!(course: context, registration:, deployment:)
-    elsif context.is_a?(Account)
-      Lti::ContextControl.create!(account: context, registration:, deployment:)
-    end
-
-    deployment
+    registration.new_external_tool(context)
   end
 
   describe "GET #index" do
@@ -251,7 +243,8 @@ describe Lti::ContextControlsController, type: :request do
            as: :json
     end
 
-    let(:params) { { account_id: account.id } }
+    let(:params) { { course_id: course.id } }
+    let(:course) { course_model(account:) }
     let(:root_deployment) { registration.new_external_tool(account).tap(&:save!) }
 
     before { root_deployment }
@@ -261,15 +254,15 @@ describe Lti::ContextControlsController, type: :request do
       expect(response).to be_successful
       expect(response_json).to include(
         {
-          account_id: account.id,
+          account_id: nil,
           available: true,
-          context_name: account.name,
-          course_id: nil,
+          context_name: course.name,
+          course_id: course.id,
           created_at: an_instance_of(String),
           created_by: hash_including(id: admin.id),
           deployment_id: root_deployment.id,
           depth: 0,
-          display_path: [account.name],
+          display_path: [course.name],
           id: an_instance_of(Integer),
           path: an_instance_of(String),
           registration_id: registration.id,
@@ -313,10 +306,6 @@ describe Lti::ContextControlsController, type: :request do
       end
 
       context "with existing control" do
-        before do
-          Lti::ContextControl.create!(account:, registration:, deployment: root_deployment)
-        end
-
         it "returns 422" do
           subject
           expect(response).to have_http_status(:unprocessable_entity)
@@ -340,7 +329,7 @@ describe Lti::ContextControlsController, type: :request do
     end
 
     context "with available: false" do
-      let(:params) { { account_id: account.id, available: false } }
+      let(:params) { { course_id: course.id, available: false } }
 
       it "creates a new control with available set to false" do
         subject
@@ -367,7 +356,7 @@ describe Lti::ContextControlsController, type: :request do
       let(:params) { { account_id: account.id } }
 
       before do
-        Lti::ContextControl.create!(account:, registration:, deployment: root_deployment)
+        root_deployment
       end
 
       it "returns 422" do
@@ -381,7 +370,11 @@ describe Lti::ContextControlsController, type: :request do
 
     context "with existing deleted control" do
       let(:params) { { account_id: account.id, available: true } }
-      let(:control) { Lti::ContextControl.create!(account:, registration:, deployment: root_deployment, workflow_state: "deleted", available: false) }
+      let(:control) do
+        root_deployment
+        Lti::ContextControl.last.update!(account:, registration:, deployment: root_deployment, workflow_state: "deleted", available: false)
+        Lti::ContextControl.last
+      end
 
       before { control }
 

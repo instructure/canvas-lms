@@ -117,7 +117,7 @@ module Lti
     #        -H "Authorization: Bearer <token>"
     def create
       lti_registration = Lti::Registration.find(params[:registration_id])
-      deployment = lti_registration.new_external_tool(@context)
+      deployment = lti_registration.new_external_tool(@context, current_user: @current_user)
 
       ContextExternalTool.invalidate_nav_tabs_cache(deployment, @domain_root_account)
       render json: lti_deployment_json(deployment, @current_user, session, @context)

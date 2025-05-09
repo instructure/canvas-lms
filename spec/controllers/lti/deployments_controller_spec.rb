@@ -114,7 +114,13 @@ RSpec.describe Lti::DeploymentsController do
         subject
 
         expect(response_json.first)
-          .to include({ id: an_instance_of(Integer), context_name: an_instance_of(String), deployment_id: an_instance_of(String) })
+          .to include(
+            {
+              id: an_instance_of(Integer),
+              context_name: an_instance_of(String),
+              deployment_id: an_instance_of(String)
+            }
+          )
       end
 
       context "without user session" do
@@ -156,7 +162,6 @@ RSpec.describe Lti::DeploymentsController do
     let(:deployment) { registration.new_external_tool(account) }
 
     before do
-      deployment.save!
       3.times do
         course = course_model(account:)
         Lti::ContextControl.create!(course:, registration:, deployment:)
@@ -196,17 +201,17 @@ RSpec.describe Lti::DeploymentsController do
 
     it "returns a list of context controls" do
       subject
-      expect(response_json.length).to eq(3)
+      expect(response_json.length).to eq(4)
     end
 
     it "has the expected fields in the results" do
       subject
       expect(response_json.first).to include(
         {
-          account_id: nil,
+          account_id: account.id,
           available: true,
           context_name: an_instance_of(String),
-          course_id: an_instance_of(Integer),
+          course_id: nil,
           created_at: an_instance_of(String),
           created_by: nil,
           deployment_id: deployment.id,
@@ -347,6 +352,14 @@ RSpec.describe Lti::DeploymentsController do
       expect(response).to be_successful
       expect(response_json[:registration_id]).to eq(registration.id)
       expect(response_json[:context_id]).to eq(account.id)
+    end
+
+    it "creates a context control for the deployment" do
+      expect { subject }.to change { Lti::ContextControl.count }.by(1)
+      expect(Lti::ContextControl.last.deployment.id).to eql(
+        ContextExternalTool.last.id
+      )
+      expect(Lti::ContextControl.last.created_by).to eql(admin)
     end
   end
 
