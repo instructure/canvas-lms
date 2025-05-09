@@ -22,11 +22,16 @@ module Lti
   module AssetProcessorNotifier
     module_function
 
-    def notify_asset_processors(submission)
+    def notify_asset_processors(submission, asset_processor = nil)
       return unless submission.submission_type == "online_upload"
       return unless submission.root_account.feature_enabled?(:lti_asset_processor)
 
       asset_processors = Lti::AssetProcessor.for_assignment_id(submission.assignment.id)
+
+      if asset_processor.present?
+        asset_processors = asset_processors.where(id: asset_processor.id)
+      end
+
       return if asset_processors.empty?
 
       lti_assets = submission.attachments.map do |attachment|

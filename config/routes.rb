@@ -2988,6 +2988,11 @@ CanvasRails::Application.routes.draw do
       post "asset_processor_eulas/:context_external_tool_id/user", action: :create_acceptance, as: :create_user_eula_acceptance
     end
 
+    # Asset Processor internal endpoints
+    scope(controller: "lti/asset_processor") do
+      post "asset_processors/:asset_processor_id/notices/:student_id", action: :resubmit_notice, as: :lti_asset_processor_notice_resubmit
+    end
+
     # Dynamic Registration Service
     scope(controller: "lti/ims/dynamic_registration") do
       get "accounts/:account_id/registration_token", action: :registration_token
