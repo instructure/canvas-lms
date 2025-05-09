@@ -4416,6 +4416,9 @@ el:
   count_files_updated_4570a8a: 
     one: "1 αρχείο ενημερώθηκε"
     other: "%{count} αρχεία ενημερώθηκαν"
+  count_groups_90e215b1: 
+    one: "1 ομάδα"
+    other: "%{count} ομάδες"
   count_hours_1bd03883: 
     one: "1 ώρα"
     other: "%{count} ώρες"
@@ -11323,6 +11326,7 @@ el:
   priority_dd4381ee: Προτεραιότητα
   privacy_290109ea: Απόρρητο
   privacy_policy_c68f482a: "Πολιτική Απορρήτου"
+  private_copyrighted_3cac9686: "Ιδιωτική (Προστατευόμενη)"
   process_as_ui_changes_8e34ed2a: "Επεξεργασία ως αλλαγές UI"
   process_data_2f5f962f: "Επεξεργασία Δεδομένων"
   processing_2fcc9739: "Γίνεται Επεξεργασία"
@@ -15415,6 +15419,7 @@ el:
   use_new_folder_tree_in_files_bc0ea09f: "Χρήση Νέας Δομής Φακέλων στα Αρχεία"
   use_remote_service_for_notifications_9fe667c6: "Χρήση της απομακρυσμένης υπηρεσίας για τις ειδοποιήσεις"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Χρησιμοποιήστε εργαλείο LTI του νέου κουίζ αντί για τα συνηθισμένα κουίζ του Canvas"
+  use_this_rubric_for_assignment_grading_a02fd079: "Χρήση αυτής της ρουμπρίκας για τη βαθμολόγηση του μαθήματος"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Χρήση του ίδιου βαθμού για την επανυποβολή"
   used_by_permission_314a78dd: "Χρησιμοποιήθηκε κατόπιν Άδειας"
   user: 
