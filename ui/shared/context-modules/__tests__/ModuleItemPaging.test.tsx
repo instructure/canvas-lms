@@ -20,26 +20,28 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {ModuleItemPaging} from '../utils/ModuleItemPaging'
 
+const moduleId = '1083'
+
 describe('ModuleItemPaging', () => {
   beforeEach(() => {
     document.body.innerHTML = ''
     document.body.innerHTML = '<div id="flash_screenreader_holder" role="alert"></div>'
   })
   it('renders loading state', () => {
-    const {getAllByText} = render(<ModuleItemPaging isLoading={true} />)
+    const {getAllByText} = render(<ModuleItemPaging moduleId={moduleId} isLoading={true} />)
     expect(getAllByText('Loading items')).toHaveLength(2)
   })
 
   it('renders pagination', () => {
     const {getByTestId} = render(
       <ModuleItemPaging
+        moduleId={moduleId}
         isLoading={false}
-        paginationOpts={{
-          moduleId: '1083',
+        paginationData={{
           currentPage: 1,
           totalPages: 2,
-          onPageChange: () => {},
         }}
+        onPageChange={() => {}}
       />,
     )
     expect(getByTestId('module-1083-pagination')).toBeInTheDocument()
@@ -48,21 +50,37 @@ describe('ModuleItemPaging', () => {
   it('renders loading and pagination', () => {
     const {getByTestId, getAllByText} = render(
       <ModuleItemPaging
+        moduleId={moduleId}
         isLoading={true}
-        paginationOpts={{
-          moduleId: '1083',
+        paginationData={{
           currentPage: 1,
           totalPages: 2,
-          onPageChange: () => {},
         }}
+        onPageChange={() => {}}
       />,
     )
     expect(getByTestId('module-1083-pagination')).toBeInTheDocument()
     expect(getAllByText('Loading items')).toHaveLength(2)
   })
 
-  it('renders nothing when no pagination options are provided', () => {
-    const {container} = render(<ModuleItemPaging isLoading={false} />)
+  it('does not render pagination if there is no onPageChange callback', () => {
+    const {queryByTestId} = render(
+      <ModuleItemPaging
+        moduleId={moduleId}
+        isLoading={false}
+        paginationData={{
+          currentPage: 1,
+          totalPages: 2,
+        }}
+      />,
+    )
+    expect(queryByTestId('module-1083-pagination')).toBeNull()
+  })
+
+  it('renders nothing when no pagination data is provided', () => {
+    const {container} = render(
+      <ModuleItemPaging moduleId={moduleId} isLoading={false} onPageChange={() => {}} />,
+    )
     expect(container).toBeEmptyDOMElement()
   })
 })

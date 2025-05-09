@@ -17,7 +17,8 @@
  */
 
 import {DEFAULT_PAGE_SIZE} from './ModuleItemsLazyLoader'
-import {type ModuleId} from './ModuleItemLoadingData'
+import {type ModuleId} from './types'
+import {moduleFromId} from './moduleHelpers'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modulespublic')
@@ -27,20 +28,15 @@ type AllOrLess = 'all' | 'less' | 'none' | 'loading'
 const MODULE_EXPAND_AND_LOAD_ALL = 'module-expand-and-load-all'
 const MODULE_LOAD_ALL = 'module-load-all'
 const MODULE_LOAD_FIRST_PAGE = 'module-load-first-page'
-
-function moduleFromId(moduleId: ModuleId): HTMLElement {
-  return document.querySelector(`#context_module_${moduleId}`) as HTMLElement
-}
-
 function isModuleLoading(module: HTMLElement) {
-  return !!module.querySelector('.module-spinner-container')
+  return module.dataset.loadstate === 'loading'
 }
 
 function isModuleCurrentPageEmpty(module: HTMLElement) {
   return module.querySelectorAll('.context_module_item').length === 0
 }
 function isModulePaginated(module: HTMLElement) {
-  return !!module.querySelector(`[data-testid="module-${module.dataset.moduleId}-pagination"]`)
+  return module.dataset.loadstate === 'paginated'
 }
 
 function isModuleCollapsed(module: HTMLElement) {
@@ -74,7 +70,7 @@ function addOrRemoveButton(module: HTMLElement) {
   let button = module.querySelector('.show-all-or-less-button.ui-button') as HTMLElement
   const totalItems = (module.querySelector('.content ul') as HTMLElement)?.dataset?.totalItems || ''
 
-  if (shouldShow === 'none') {
+  if (shouldShow === 'none' || shouldShow === 'loading') {
     if (button) {
       button.removeEventListener('click', handleShowAllOrLessClick)
       button.removeEventListener('keydown', buttonKeyDown)
@@ -108,28 +104,10 @@ function addOrRemoveButton(module: HTMLElement) {
   }
 }
 
-// TODO: should probably be caching the requestAnimationFrame timestamp
-//       and throttling calls back here, but it's not too bad as is.
-function maybeShowAllOrLess(moduleId: ModuleId) {
-  const module = moduleFromId(moduleId)
-  if (!module) return
-
-  const shouldShow = shouldShowAllOrLess(module)
-  if (shouldShow === 'loading') {
-    requestAnimationFrame(() => {
-      maybeShowAllOrLess(moduleId)
-    })
-    return
-  } else {
-    addOrRemoveButton(module)
-  }
-}
-
 function addShowAllOrLess(moduleId: ModuleId) {
   const module = moduleFromId(moduleId)
   if (!module) return
-
-  maybeShowAllOrLess(moduleId)
+  addOrRemoveButton(module)
 }
 
 function handleShowAllOrLessClick(event: Event) {

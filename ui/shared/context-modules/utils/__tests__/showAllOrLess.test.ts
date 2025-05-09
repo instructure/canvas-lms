@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {waitFor} from '@testing-library/dom'
 import {DEFAULT_PAGE_SIZE} from '../ModuleItemsLazyLoader'
 import {
   addShowAllOrLess,
@@ -49,9 +48,10 @@ const addItemsToModule = (module: HTMLElement, count: number) => {
 
 describe('showAllOrLess', () => {
   beforeEach(() => {
-    document.body.innerHTML = ''
-
     ENV.IS_STUDENT = false
+  })
+  afterEach(() => {
+    document.body.innerHTML = ''
   })
 
   describe('isModuleCurrentPageEmpty', () => {
@@ -73,9 +73,7 @@ describe('showAllOrLess', () => {
     it('should return true if the module is loading', () => {
       const module = document.createElement('div')
       module.setAttribute('data-module-id', '1')
-      const spinner = document.createElement('div')
-      spinner.classList.add('module-spinner-container')
-      module.appendChild(spinner)
+      module.dataset.loadstate = 'loading'
       expect(isModuleLoading(module)).toBe(true)
     })
 
@@ -90,9 +88,7 @@ describe('showAllOrLess', () => {
     it('should return true if the module is paginated', () => {
       const module = document.createElement('div')
       module.setAttribute('data-module-id', '1')
-      const pager = document.createElement('div')
-      pager.setAttribute('data-testid', 'module-1-pagination')
-      module.appendChild(pager)
+      module.dataset.loadstate = 'paginated'
       expect(isModulePaginated(module)).toBe(true)
     })
 
@@ -134,9 +130,7 @@ describe('showAllOrLess', () => {
     it('should return "all" if the module is paginated', () => {
       const module = document.createElement('div')
       module.setAttribute('data-module-id', '1')
-      const pager = document.createElement('div')
-      pager.setAttribute('data-testid', 'module-1-pagination')
-      module.appendChild(pager)
+      module.dataset.loadstate = 'paginated'
       expect(shouldShowAllOrLess(module)).toBe('all')
     })
 
@@ -213,9 +207,7 @@ describe('showAllOrLess', () => {
       const module = document.createElement('div')
       module.id = 'context_module_1'
       module.setAttribute('data-module-id', '1')
-      const pager = document.createElement('div')
-      pager.setAttribute('data-testid', 'module-1-pagination')
-      module.appendChild(pager)
+      module.dataset.loadstate = 'paginated'
       document.body.appendChild(module)
       document.addEventListener(MODULE_LOAD_ALL, ((event: Event) => {
         const customEvent = event as CustomEvent<{moduleId: string}>
@@ -244,26 +236,27 @@ describe('showAllOrLess', () => {
       return module
     }
 
-    it('should add the show all button to the module', async () => {
+    it('should add the show all button to the module', () => {
       const module = makeModule()
-      const pager = document.createElement('div')
-      pager.setAttribute('data-testid', 'module-1-pagination')
-      module.appendChild(pager)
+      module.dataset.loadstate = 'paginated'
       addShowAllOrLess('1')
-      await waitFor(() => {
-        expect(document.querySelector('.show-all-or-less-button')).toBeInTheDocument()
-      })
-      expect(document.querySelector('.show-all')).toBeInTheDocument()
+      expect(module.querySelector('.show-all-or-less-button')).toBeInTheDocument()
+      expect(module.querySelector('.show-all')).toBeInTheDocument()
     })
 
-    it('should add the show less button to the module', async () => {
+    it('should add the show less button to the module', () => {
       const module = makeModule()
       addItemsToModule(module, DEFAULT_PAGE_SIZE + 1)
       addShowAllOrLess('1')
-      await waitFor(() => {
-        expect(document.querySelector('.show-all-or-less-button')).toBeInTheDocument()
-      })
-      expect(document.querySelector('.show-less')).toBeInTheDocument()
+      expect(module.querySelector('.show-all-or-less-button')).toBeInTheDocument()
+      expect(module.querySelector('.show-less')).toBeInTheDocument()
+    })
+
+    it('should not add either button while the module is loading', () => {
+      const module = makeModule()
+      module.dataset.loadstate = 'loading'
+      addShowAllOrLess('1')
+      expect(module.querySelector('.show-all-or-less-button')).not.toBeInTheDocument()
     })
   })
 })

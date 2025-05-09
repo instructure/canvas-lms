@@ -28,6 +28,27 @@ describe('ModuleItemLoadingData', () => {
     document.body.innerHTML = ''
   })
 
+  describe('PaginationData', () => {
+    it('get returns the default pagination data for a module', () => {
+      const paginationData = modules.getPaginationData(moduleId)
+      expect(paginationData).toEqual({currentPage: 1, totalPages: 1})
+    })
+
+    it('set sets the pagination data for a module', () => {
+      modules.setPaginationData(moduleId, {currentPage: 2, totalPages: 3})
+      const paginationData = modules.getPaginationData(moduleId)
+      expect(paginationData).toEqual({currentPage: 2, totalPages: 3})
+    })
+
+    it('treats pagination data as immutable', () => {
+      const paginationData = modules.getPaginationData(moduleId)
+      paginationData.currentPage = 2
+      paginationData.totalPages = 3
+      const paginationData2 = modules.getPaginationData(moduleId)
+      expect(paginationData2).toEqual({currentPage: 1, totalPages: 1})
+    })
+  })
+
   describe('getModuleRoot', () => {
     it('should return undefined if the item container does not exist', () => {
       const root = modules.getModuleRoot(moduleId)

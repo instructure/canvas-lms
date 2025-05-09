@@ -21,21 +21,22 @@ import {Flex} from '@instructure/ui-flex'
 import {Pagination} from '@instructure/ui-pagination'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
+import {type PaginationData, type ModuleId} from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('context_modulespublic')
 
-type ModuleId = number | string
-type PaginationOpts = {
-  moduleId: ModuleId
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number, moduleId: ModuleId) => void
-}
 type ModuleItemPagingProps = {
+  moduleId: ModuleId
   isLoading: boolean
-  paginationOpts?: PaginationOpts
+  paginationData?: PaginationData
+  onPageChange?: (page: number, moduleId: ModuleId) => void
 }
-export const ModuleItemPaging = ({isLoading, paginationOpts}: ModuleItemPagingProps) => {
+export const ModuleItemPaging = ({
+  moduleId,
+  isLoading,
+  paginationData,
+  onPageChange,
+}: ModuleItemPagingProps) => {
   const renderLoading = () => {
     if (!isLoading) return null
     return (
@@ -59,8 +60,8 @@ export const ModuleItemPaging = ({isLoading, paginationOpts}: ModuleItemPagingPr
   }
 
   const renderPagination = () => {
-    if (paginationOpts && paginationOpts.totalPages > 1) {
-      const {moduleId, currentPage, totalPages, onPageChange} = {...paginationOpts}
+    if (paginationData && paginationData.totalPages > 1 && onPageChange) {
+      const {currentPage, totalPages} = {...paginationData}
       return (
         <View as="div">
           <Pagination
@@ -81,7 +82,7 @@ export const ModuleItemPaging = ({isLoading, paginationOpts}: ModuleItemPagingPr
     }
   }
 
-  if (!isLoading && (!paginationOpts || paginationOpts.totalPages < 2)) return null
+  if (!isLoading && (!paginationData || paginationData.totalPages < 2)) return null
 
   return (
     <Flex as="div" justifyItems="center" alignItems="center">
@@ -97,4 +98,4 @@ export const ModuleItemPaging = ({isLoading, paginationOpts}: ModuleItemPagingPr
   )
 }
 
-export {type PaginationOpts}
+export {type PaginationData}
