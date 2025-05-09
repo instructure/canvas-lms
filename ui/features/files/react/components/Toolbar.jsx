@@ -36,6 +36,9 @@ import RestrictedDialogForm from '@canvas/files/react/components/RestrictedDialo
 import '@canvas/rails-flash-notifications'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {reloadWindow} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('react_files')
 
@@ -59,6 +62,20 @@ export default class Toolbar extends React.Component {
 
   addFolder() {
     return this.props.currentFolder.folders.add({})
+  }
+
+  handleSwitchToNewFiles = async () => {
+    doFetchApi({
+      method: 'PUT',
+      path: `/api/v1/users/self/files_ui_version_preference`,
+      body: {files_ui_version: 'v2'},
+    })
+      .then(() => {
+        reloadWindow()
+      })
+      .catch(_ => {
+        showFlashError(I18n.t('Error switching to New Files Page.'))()
+      })
   }
 
   getItemsToDownload() {
@@ -222,6 +239,16 @@ export default class Toolbar extends React.Component {
     if (canManage) {
       return (
         <div className="ef-actions">
+          {ENV.FEATURES?.files_a11y_rewrite_toggle && ENV.FEATURES?.files_a11y_rewrite && (
+            <button
+              type="button"
+              className="btn btn-switch-to-new-files-page"
+              aria-label={I18n.t('Switch to New Files Page')}
+              onClick={() => this.handleSwitchToNewFiles()}
+            >
+              <span className={phoneHiddenSet}>{I18n.t('Switch to New Files Page')}</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => this.addFolder()}
