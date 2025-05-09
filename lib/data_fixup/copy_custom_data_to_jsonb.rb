@@ -20,12 +20,9 @@
 
 module DataFixup::CopyCustomDataToJsonb
   def self.run
-    CustomData.find_each(strategy: :id) do |custom_data|
-      # Skip if data is empty or data_json has already been modified before this fixup runs
-      next if custom_data["data"].blank? || custom_data["data_json"].present?
-
-      custom_data["data_json"] = custom_data["data"]
-      custom_data.save!
+    # Skip if data is empty or data_json has already been modified before this fixup runs
+    CustomData.where.not(data: [nil, {}]).where(data_json: {}).find_each(strategy: :id) do |custom_data|
+      custom_data.update_column(:data_json, custom_data["data"])
     end
   end
 end
