@@ -70,8 +70,18 @@ pipeline {
 
           extendedStage('Runner').hooks(postRunnerHandler).obeysAllowStages(false).execute {
             def runnerStages = [:]
+            def maxRandomizedJestShards = 1 // increased as tests become more stable
 
-            for (int i = 0; i < jsStage.JEST_NODE_COUNT; i++) {
+            for (int i = 0; i < maxRandomizedJestShards; i++) {
+              String index = i
+              extendedStage("Runner - Jest (randomized) ${i}").hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.jestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+                def tests = [:]
+                callableWithDelegate(jsStage.queueRandomizedJestDistribution(index))(tests)
+                parallel(tests)
+              }
+            }
+
+            for (int i = maxRandomizedJestShards; i < jsStage.JEST_NODE_COUNT; i++) {
               String index = i
               extendedStage("Runner - Jest ${i}").hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.jestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
                 def tests = [:]
