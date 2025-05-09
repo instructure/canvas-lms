@@ -117,8 +117,9 @@ class Lti::Registration < ActiveRecord::Base
   # @param context [Account | Course] The context for which to create the tool.
   # @param existing_tool [ContextExternalTool | nil] An existing tool to update.
   # @param verify_uniqueness [Boolean] Whether or not to check for uniqueness.
+  # @param current_user [User] The user who is creating the tool.
   # @return [ContextExternalTool] A new ContextExternalTool for this Registration and the given context.
-  def new_external_tool(context, existing_tool: nil, verify_uniqueness: false)
+  def new_external_tool(context, existing_tool: nil, verify_uniqueness: false, current_user: nil)
     # disabled tools should stay disabled while getting updated
     # deleted tools are never updated during a dev key update so can be safely ignored
     tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
@@ -142,6 +143,17 @@ class Lti::Registration < ActiveRecord::Base
     if tool.errors.any? || !tool.save
       raise Lti::ContextExternalToolErrors, tool.errors
     end
+
+    Lti::ContextControlService.create_or_update(
+      {
+        course_id: context.is_a?(Course) ? context.id : nil,
+        account_id: context.is_a?(Account) ? context.id : nil,
+        registration_id: id,
+        deployment_id: tool.id,
+        created_by_id: current_user&.id,
+        updated_by_id: current_user&.id
+      }.compact
+    )
 
     tool
   end

@@ -43,7 +43,7 @@ module Lti
     }.freeze.with_indifferent_access
 
     def create
-      tool = target_developer_key.lti_registration.new_external_tool(context, verify_uniqueness: params[:verify_uniqueness].present?)
+      tool = target_developer_key.lti_registration.new_external_tool(context, verify_uniqueness: params[:verify_uniqueness].present?, current_user: @current_user)
 
       ContextExternalTool.invalidate_nav_tabs_cache(tool, @domain_root_account)
       render json: external_tool_json(tool, context, @current_user, session), content_type: MIME_TYPE
