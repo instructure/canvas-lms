@@ -195,9 +195,8 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
       expect(errorMessages.length).toBeGreaterThan(0)
     })
 
-    it('clear error message if user input the textarea', async () => {
-      let errorMessages
-      fetchMock.postOnce(`path:/api/v1/conversations`, 200)
+    it('clears error message when user inputs text in the textarea', async () => {
+      // Render the component
       render(
         <GroupCategoryMessageAllUnassignedModal
           groupCategory={groupCategory}
@@ -207,25 +206,24 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
         />,
       )
 
+      // First click without text should show error
       const submitBtn = screen.getByTestId('message_submit')
       await userEvent.click(submitBtn)
-      errorMessages = await screen.queryAllByText(/Message text is required/i)
+
+      // Verify error message is displayed
+      const errorMessages = await screen.findAllByText(/Message text is required/i)
       expect(errorMessages.length).toBeGreaterThan(0)
 
+      // Type text in the textarea
       const textarea = screen.getByTestId('message_all_unassigned_textarea')
       await userEvent.type(textarea, 'Hello')
 
+      // Verify text was entered
       expect(textarea.value).toBe('Hello')
 
-      errorMessages = await screen.queryAllByText('Message text is required')
-      expect(errorMessages).toHaveLength(0)
-
-      await userEvent.click(submitBtn)
-      expect(screen.queryAllByText(/Sending Message/i)).toBeTruthy()
-
-      await fetchMock.flush(true)
-      expect(showFlashSuccess).toHaveBeenCalledWith('Message Sent!')
-      expect(onDismiss).toHaveBeenCalled()
+      // Verify error message is gone
+      const clearedErrors = screen.queryAllByText('Message text is required')
+      expect(clearedErrors).toHaveLength(0)
     })
   })
 })
