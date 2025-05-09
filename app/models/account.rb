@@ -1132,6 +1132,53 @@ class Account < ActiveRecord::Base
     key ? Rails.cache.fetch(["account_chain_ids", key], &block) : block.call
   end
 
+  # Returns a hash of account ids to an array of their account chain ids. Basically,
+  # it's like Account.account_chain_ids, but for multiple accounts at once.
+  # The array is sorted from bottom of the chain to the top, so the first element
+  # is the account itself. The last element is a root account.
+  # There are a few limitations with this method:
+  # 1. It only works for accounts that are in the same shard. This method assumes that
+  #    all of the provided account_ids are on the *current* shard, so you are responsible
+  #    for activating the correct shard when running this.
+  # 2. It does not include site admin or consortia parent ids in the chain. If you need
+  #   those, you should use Account.account_chain_ids instead, or figure out how to make
+  #   this method include them.
+  # Finally, note that this method uses a recursive CTE, so, if the account chain ends
+  # up being very long, it may suffer from poor performance. It will also suffer from
+  # poor performance if you pass in a large number of account ids, so be careful!
+  #
+  # @param account_ids [Array] The ids of the accounts to get the chain ids for.
+  # @return [Hash] A hash of account ids to an array of their account chain ids.
+  # @example
+  #   Account.account_chain_ids_for_accounts([1, 2, 3])
+  #   # => {1 => [1, 2], 2 => [2], 3 => [3]}
+  def self.account_chain_ids_for_multiple_accounts(account_ids)
+    results = GuardRail.activate(:secondary) do
+      Account.connection.select_rows(<<~SQL.squish)
+            with recursive account_chain_ids as (
+              select id,
+                parent_account_id,
+                id as original_account_id,
+                0 as level
+              from #{Account.quoted_table_name} a
+              where id in (#{Account.sanitize_sql(account_ids.join(", "))})
+              union
+              SELECT a.id,
+                a.parent_account_id,
+                aci.original_account_id,
+                aci.level + 1
+              FROM #{Account.quoted_table_name} a
+                INNER JOIN account_chain_ids aci ON a.id = aci.parent_account_id
+        )
+        select * from account_chain_ids order by original_account_id, level;
+      SQL
+    end
+
+    results.group_by { |row| row[2] }.transform_values do |rows|
+      rows.map { |row| row[0] }
+    end
+  end
+
   def self.multi_account_chain_ids(starting_account_ids)
     original_shard = Shard.current
     Shard.partition_by_shard(starting_account_ids) do |sliced_acc_ids|
