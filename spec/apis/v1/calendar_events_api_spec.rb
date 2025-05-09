@@ -5203,14 +5203,14 @@ describe CalendarEventsApiController, type: :request do
 
   context "calendar feed" do
     before :once do
-      time = Time.utc(Time.now.year, Time.now.month, Time.now.day, 4, 20)
+      @time = Time.utc(Time.now.year, Time.now.month, Time.now.day, 4, 20)
       @student = user_factory(active_all: true, active_state: "active")
       @course.enroll_student(@student, enrollment_state: "active")
       @student2 = user_factory(active_all: true, active_state: "active")
       @course.enroll_student(@student2, enrollment_state: "active")
 
-      @event = @course.calendar_events.create(title: "course event", start_at: time + 1.day)
-      @assignment = @course.assignments.create(title: "original assignment", due_at: time + 2.days)
+      @event = @course.calendar_events.create(title: "course event", start_at: @time + 1.day)
+      @assignment = @course.assignments.create(title: "original assignment", due_at: @time + 2.days)
       @override = assignment_override_model(
         assignment: @assignment, due_at: @assignment.due_at + 3.days, set: @course.default_section
       )
@@ -5219,9 +5219,9 @@ describe CalendarEventsApiController, type: :request do
         title: "appointment group",
         participants_per_appointment: 4,
         new_appointments: [
-          [time + 3.days, time + 3.days + 1.hour],
-          [time + 3.days + 1.hour, time + 3.days + 2.hours],
-          [time + 3.days + 2.hours, time + 3.days + 3.hours]
+          [@time + 3.days, @time + 3.days + 1.hour],
+          [@time + 3.days + 1.hour, @time + 3.days + 2.hours],
+          [@time + 3.days + 2.hours, @time + 3.days + 3.hours]
         ],
         contexts: [@course]
       )
@@ -5260,6 +5260,26 @@ describe CalendarEventsApiController, type: :request do
       # make sure the assignment actually has the override date
       expected_override_date_output = @override.due_at.utc.iso8601.gsub(/[-:]/, "").gsub(/\d\dZ$/, "00Z")
       expect(response.body.match(/DTSTART:\s*#{expected_override_date_output}/)).not_to be_nil
+    end
+
+    it "doesn't crash on section events with file links" do
+      image = attachment_model(context: @course, display_name: "cn_image.jpg", uploaded_data: fixture_file_upload("cn_image.jpg"))
+      media = attachment_model(context: @course, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"))
+      description = <<~HTML
+        <p><img src="/courses/#{@course.id}/files/#{image.id}/preview"></p>
+        <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" data-media-id="#{media.media_entry_id}"></iframe></p>
+      HTML
+      @event.update(description:)
+      @s_event = @event.child_events.create!(
+        title: "course event section 1",
+        start_at: @time + 1.day,
+        context: @course.course_sections.take
+      )
+
+      raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.ics", {
+                     controller: "calendar_events_api", action: "public_feed", format: "ics", feed_code: @student.feed_code
+                   })
+      expect(response).to be_successful
     end
 
     it "has events for a merged student" do
