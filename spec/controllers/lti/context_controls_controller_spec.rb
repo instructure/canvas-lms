@@ -308,4 +308,54 @@ describe Lti::ContextControlsController, type: :request do
       end
     end
   end
+
+  describe "DELETE #delete" do
+    subject { delete "/api/v1/lti_registrations/#{registration_id}/controls/#{control_id}" }
+
+    let(:deployment) { deployment_for(account) }
+    let(:control) { deployment.context_controls.first }
+    let(:registration_id) { registration.id }
+    let(:control_id) { control.id }
+
+    context "with the lti_registrations_next feature flag enabled" do
+      it "deletes and returns the context control" do
+        subject
+        expect(control.reload).to be_deleted
+        expect(response).to be_successful
+      end
+
+      context "with a non-existent control" do
+        let(:control_id) { (Lti::ContextControl.last&.id || 1) + 1 }
+
+        it "returns a 404" do
+          subject
+          expect(response).to be_not_found
+        end
+      end
+
+      context "with a non-existent registration" do
+        let(:registration_id) { (Lti::Registration.last&.id || 1) + 1 }
+
+        it "returns a 404" do
+          subject
+          expect(response).to be_not_found
+        end
+      end
+
+      it "returns a 403 if the user is not an admin" do
+        user_session(user_model)
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with the lti_registration_next flag disabled" do
+      before { account.disable_feature!(:lti_registrations_next) }
+
+      it "returns a 404 if the lti_registrations_next feature flag is disabled" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+  end
 end

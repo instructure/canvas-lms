@@ -2007,6 +2007,7 @@ CanvasRails::Application.routes.draw do
       get "lti_registrations/:registration_id/controls", action: :index
       get "lti_registrations/:registration_id/controls/:id", action: :show
       put "lti_registrations/:registration_id/controls/:id", action: :update
+      delete "lti_registrations/:registration_id/controls/:id", action: :delete
     end
 
     scope(controller: "lti/resource_links") do

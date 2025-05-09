@@ -221,6 +221,26 @@ module Lti
       raise e
     end
 
+    # @API Delete a Context Control
+    #
+    # Deletes a context control. Returns the control that is now deleted.
+    #
+    # @returns Lti::ContextControl
+    #
+    # @example_request
+    #
+    #   curl "https://<canvas>/api/v1/lti_registrations/<registration_id>/controls/<id>" \
+    #        -X DELETE \
+    #        -H "Authorization: Bearer <token>"
+    def delete
+      control.destroy
+
+      render json: lti_context_control_json(control, @current_user, session, context, include_users: true)
+    rescue => e
+      report_error(e)
+      raise e
+    end
+
     private
 
     def control
