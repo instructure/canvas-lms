@@ -7004,6 +7004,9 @@ fa:
   count_files_updated_4570a8a: 
     one: "%{count} فایل بهنگام سازی شد"
     other: "%{count} فایل بهنگام سازی شد"
+  count_groups_90e215b1: 
+    one: "%{count} گروه"
+    other: "%{count} گروه"
   count_hidden_e8d2c57c: "%{count} مخفی"
   count_hours_1bd03883: 
     one: "%{count} ساعت"
@@ -7083,6 +7086,9 @@ fa:
   count_sections_466dcd5c: 
     one: "1 بخش"
     other: "%{count} بخش ها"
+  count_sections_bf1baf0a: 
+    one: "%{count} بخش"
+    other: "%{count} بخش"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "1 مجموعه برای دوره های نمره گذاری موجود است."
     other: "%{count} مجموعه دوره های نمره گذاری موجود است."
@@ -24985,6 +24991,7 @@ fa:
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "از این پنل برای حل و فصل نتایج تکراری یا افرادی که در جستجوی شما نیستند استفاده کنید. "
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "از این پنل برای جستجوی افرادی که می‌خواهید به این درس اضافه شوند استفاده کنید."
   use_this_photo_3a594830: "از این عکس استفاده کنید"
+  use_this_rubric_for_assignment_grading_a02fd079: "استفاده از این دستورالعمل ارزیابی برای نمره گذاری تکلیف"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "استفاده از همان نمره برای مورد دوباره ارسال شده"
   use_webcam_1ed0bf6b: "از وب کم استفاده کنید"
   used_by_permission_314a78dd: "استفاده شده از طریق مجوز"
