@@ -565,7 +565,7 @@ module Api
   end
 
   def self.api_bulk_load_user_content_attachments(htmls, context = nil)
-    regex = context ? %r{/#{context.class.name.tableize}/#{context.id}/files/(\d+)} : %r{/files/(\d+)}
+    regex = context ? %r{/#{context.class.name.tableize}/#{context.id}/files/(\d+)} : %r{/(?:files|media_attachments_iframe)/(\d+)}
 
     attachment_ids = []
     htmls.compact.each do |html|
