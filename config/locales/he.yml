@@ -5562,6 +5562,10 @@ he:
     one: "קובץ אחד הועלה"
     other: "%{count} קבצים הועלו"
     two: "%{count} קבצים הועלו"
+  count_groups_90e215b1: 
+    one: "קבוצה אחת"
+    other: "%{count} קבוצות"
+    two: "%{count} קבוצות"
   count_hours_1bd03883: 
     many: "%{count} שעות"
     one: "שעה אחת"
@@ -5638,6 +5642,10 @@ he:
     one: "תוצאה אחת הוצגה"
     other: "%{count} תוצאות הוצגו"
     two: "%{count} תוצאות הוצגו"
+  count_sections_bf1baf0a: 
+    one: "סעיף אחד"
+    other: "%{count} הקבצות"
+    two: "%{count} הקבצות"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "נמצא אוגדן אחד של תקופות הערכה"
     other: "%{count} אודנים של תקופות הערכה נמצאו ."
@@ -20078,6 +20086,7 @@ he:
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "השתמש/י ברשימה זו כדי להסיר תלמידים רשומים. הוספת תלמידים נעשית בתיבת קומבו בהמשך הרשימה."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "השתמש/י בפאנל זה לפתור כפילויות או אנשים שלא אותרו בחיפוש"
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "השתמש/י בפאנל זה לחיפוש אנשים שברצונך להוסיף לקורס"
+  use_this_rubric_for_assignment_grading_a02fd079: "יש להשתמש ברובריקה זו להערכת המשימה"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "השתמש/י באותה הערכה לשיגור מחדש"
   used_by_permission_314a78dd: "שומש ברשות"
   user: 
