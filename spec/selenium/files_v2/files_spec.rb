@@ -346,11 +346,8 @@ describe "files index page" do
             get "/courses/#{@course.id}/files"
             file_usage_rights_cloud_icon.click
             set_usage_rights_in_modal(:creative_commons)
-
-            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
-            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
             # a11y: focus should go back to the element that was clicked.
-            # check_element_has_focus(file_usage_rights_cloud_icon)
+            check_element_has_focus(file_usage_rights_cloud_icon)
             verify_usage_rights_ui_updates(:creative_commons)
           end
 
@@ -359,11 +356,8 @@ describe "files index page" do
             action_menu_button.click
             action_menu_item_by_name("Manage Usage Rights").click
             set_usage_rights_in_modal(:used_by_permission)
-
-            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
-            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
             # a11y: focus should go back to the element that was clicked.
-            # check_element_has_focus(action_menu_button)
+            check_element_has_focus(action_menu_button)
             verify_usage_rights_ui_updates(:used_by_permission)
           end
 
@@ -372,11 +366,8 @@ describe "files index page" do
             select_item_to_edit_from_kebab_menu(1)
             toolbox_menu_button("manage-usage-rights-button").click
             set_usage_rights_in_modal(:public_domain)
-
-            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
-            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
             # a11y: focus should go back to the element that was clicked.
-            # check_element_has_focus(toolbox_menu_button("more-button"))
+            check_element_has_focus(toolbox_menu_button("more-button"))
             verify_usage_rights_ui_updates(:public_domain)
           end
 
@@ -389,11 +380,8 @@ describe "files index page" do
             select_item_to_edit_from_kebab_menu(2)
             toolbox_menu_button("manage-usage-rights-button").click
             set_usage_rights_in_modal(:fair_use)
-
-            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
-            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
             # a11y: focus should go back to the element that was clicked.
-            # check_element_has_focus(toolbox_menu_button("more-button"))
+            check_element_has_focus(toolbox_menu_button("more-button"))
             verify_usage_rights_ui_updates(:fair_use)
           end
 
@@ -406,11 +394,8 @@ describe "files index page" do
             action_menu_item_by_name("Manage Usage Rights").click
             expect(usage_rights_manage_modal).to include_text "new folder"
             set_usage_rights_in_modal(:creative_commons)
-
-            # TODO: Uncomment this a11y assertion after RCX-3358 is done.
-            # This is a11y test, but currently, the focus is not going back to the element that was clicked.
             # a11y: focus should go back to the element that was clicked.
-            # check_element_has_focus(toolbox_menu_button("more-button"))
+            check_element_has_focus(action_menu_button)
             get_item_files_table(1, 1).click
             verify_usage_rights_ui_updates(:creative_commons)
           end
