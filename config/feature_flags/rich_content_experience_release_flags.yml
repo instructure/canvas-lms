@@ -139,7 +139,7 @@ files_a11y_rewrite_toggle:
   state: hidden
   display_name: Files a11y Rewrite Toggle
   description: |-
-    Controls whether users can see the "Switch to Old UI" toggle in the Files component.
+    Allows users to switch to the old files ui when the Files A11y Rewrite flag is enabled.
   environments:
     development:
       state: allowed_on
