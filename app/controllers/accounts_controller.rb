@@ -892,6 +892,10 @@ class AccountsController < ApplicationController
       end
     end
 
+    if params[:copied_asset] && @account.horizon_account?
+      @courses = @courses.copied_asset(params[:copied_asset])
+    end
+
     includes = Set.new(Array(params[:include]))
     # We only want to return the permissions for single courses and not lists of courses.
     # sections, needs_grading_count, and total_score not valid as enrollments are needed
