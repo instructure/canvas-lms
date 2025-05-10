@@ -26,6 +26,21 @@ jest.useFakeTimers()
 jest.mock('jquery')
 
 describe('LinkValidator', () => {
+  beforeEach(() => {
+    // Mock jQuery selector and show/hide methods
+    const mockShow = jest.fn()
+    const mockHide = jest.fn()
+    const mockJQuery = jest.fn(() => ({
+      show: mockShow,
+      hide: mockHide,
+    }))
+    $.mockImplementation(selector => mockJQuery(selector))
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   describe('confetti', () => {
     describe('with no invalid links', () => {
       beforeEach(() => {
@@ -33,14 +48,6 @@ describe('LinkValidator', () => {
           validation_api_url: '/foo/bar',
           VALIDATION_CONFETTI_ENABLED: true,
         })
-
-        // Mock jQuery selector and show/hide methods
-        const mockShow = jest.fn()
-        const mockHide = jest.fn()
-        $.mockImplementation(() => ({
-          show: mockShow,
-          hide: mockHide,
-        }))
 
         $.ajax.mockImplementation(params =>
           params.success({

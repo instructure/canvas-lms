@@ -21,11 +21,14 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ConfiguredDateInput} from '../ConfiguredDateInput'
 import moment from 'moment-timezone'
-import tzInTest from '@instructure/moment-utils/specHelpers'
+import {configureAndRestoreLater} from '@instructure/moment-utils/specHelpers'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 import tz from 'timezone'
 import chicago from 'timezone/America/Chicago'
 import detroit from 'timezone/America/Detroit'
+// @ts-expect-error
+import denver from 'timezone/America/Denver'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('ConfiguredDateInput', () => {
   const placeholder = 'Select a date (optional)'
@@ -34,29 +37,41 @@ describe('ConfiguredDateInput', () => {
   const currentYear = new Date().getFullYear()
 
   beforeEach(() => {
-    // Set timezone for both moment and ENV
     const timezone = 'America/Denver'
     moment.tz.setDefault(timezone)
-    window.ENV = window.ENV || {}
-    window.ENV.TIMEZONE = timezone
+    fakeENV.setup({
+      TIMEZONE: timezone,
+    })
+
+    configureAndRestoreLater({
+      tz: tz(detroit, 'America/Detroit', chicago, 'America/Chicago', denver, 'America/Denver'),
+      tzData: {
+        'America/Detroit': detroit,
+        'America/Chicago': chicago,
+        'America/Denver': denver,
+      },
+      formats: getI18nFormats(),
+    })
 
     // Mock the current date to be January 1st of the current year at noon
     jest.useFakeTimers()
-    jest.setSystemTime(new Date(`${currentYear}-01-01T12:00:00.000Z`))
+    jest.setSystemTime(new Date(`${currentYear}-01-01T07:00:00.000Z`)) // 12am Denver time
   })
 
   afterEach(() => {
     jest.useRealTimers()
+    fakeENV.teardown()
   })
 
   it('renders correctly with initial date', () => {
     const {getByPlaceholderText, getByText} = render(
       <ConfiguredDateInput
-        selectedDate={`${currentYear}-01-01T00:00:00.000Z`}
+        selectedDate={`${currentYear}-01-01T07:00:00.000Z`} // 12am Denver time
         onSelectedDateChange={() => {}}
         placeholder={placeholder}
         renderLabelText={renderLabelText}
         renderScreenReaderLabelText={renderScreenReaderLabelText}
+        userTimeZone="America/Denver"
       />,
     )
     const input = getByPlaceholderText(placeholder)
@@ -98,21 +113,23 @@ describe('ConfiguredDateInput', () => {
   })
 
   it('renders with disabled', () => {
-    const {getByDisplayValue} = render(
+    const {getByPlaceholderText} = render(
       <ConfiguredDateInput
-        selectedDate={`${currentYear}-01-01T00:00:00.000Z`}
+        selectedDate={`${currentYear}-01-01T07:00:00.000Z`} // 12am Denver time
         onSelectedDateChange={() => {}}
         placeholder={placeholder}
         renderLabelText={renderLabelText}
         renderScreenReaderLabelText={renderScreenReaderLabelText}
+        userTimeZone="America/Denver"
         disabled={true}
       />,
     )
-    const input = getByDisplayValue('Jan 1 at 12am')
+    const input = getByPlaceholderText(placeholder)
     if (!(input instanceof HTMLInputElement)) {
       throw new Error('Expected input to be an HTMLInputElement')
     }
     expect(input).toBeDisabled()
+    expect(input.value).toBe('Jan 1 at 12am')
   })
 
   it('renders error message', () => {
@@ -151,10 +168,11 @@ describe('ConfiguredDateInput', () => {
     beforeEach(() => {
       const timezone = 'America/Denver'
       moment.tz.setDefault(timezone)
-      window.ENV = window.ENV || {}
-      window.ENV.TIMEZONE = timezone
+      fakeENV.setup({
+        TIMEZONE: timezone,
+      })
 
-      tzInTest.configureAndRestoreLater({
+      configureAndRestoreLater({
         tz: tz(detroit, 'America/Detroit', chicago, 'America/Chicago'),
         tzData: {
           'America/Detroit': detroit,

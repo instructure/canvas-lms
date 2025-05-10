@@ -16,15 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ApolloProvider} from '@apollo/client'
+import {render, fireEvent, waitFor, within} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {fireEvent, render} from '@testing-library/react'
-import React from 'react'
+import {ApolloProvider} from '@apollo/client'
+
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
 import {handlers, inboxSettingsHandlers} from '../../../graphql/mswHandlers'
 import {responsiveQuerySizes} from '../../../util/utils'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
+import React from 'react'
 import CanvasInbox from '../CanvasInbox'
 
 jest.mock('../../../util/utils', () => ({
@@ -133,11 +135,12 @@ describe('CanvasInbox App Container', () => {
         expect(window.location.hash).toBe('#filter=type=inbox')
 
         const mailboxDropdown = await container.findByLabelText('Mailbox Selection')
-        fireEvent.click(mailboxDropdown)
+        await userEvent.click(mailboxDropdown)
         await waitForApolloLoading()
 
-        const option = await container.findByText('Sent')
-        fireEvent.click(option)
+        const listbox = await container.findByRole('listbox')
+        const option = within(listbox).getByRole('option', {name: 'Sent'})
+        await userEvent.click(option)
         await waitForApolloLoading()
 
         expect(window.location.hash).toBe('#filter=type=sent')
@@ -187,12 +190,14 @@ describe('CanvasInbox App Container', () => {
 
         expect(window.location.hash).toBe('#filter=type=inbox')
 
-        const courseDropdown = await container.findByTestId('course-select')
-        fireEvent.click(courseDropdown)
+        const courseDropdown = container.getByTestId('course-select')
+        await userEvent.click(courseDropdown)
         await waitForApolloLoading()
 
-        const option = await container.findByText('Ipsum')
-        fireEvent.click(option)
+        const listbox = await container.findByRole('listbox')
+        await waitFor(() => within(listbox).getByRole('option', {name: /Ipsum/}))
+        const option = within(listbox).getByRole('option', {name: /Ipsum/})
+        await userEvent.click(option)
         await waitForApolloLoading()
 
         expect(window.location.hash).toBe('#filter=type=inbox&course=course_195')

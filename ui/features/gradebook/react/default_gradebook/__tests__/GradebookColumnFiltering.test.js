@@ -98,7 +98,7 @@ jest.mock('../Gradebook', () => {
       module_ids: ['2601'],
       module_positions: [2],
       assignment_group_id: '2201',
-      published: true,
+      published: false,
       submission_types: ['attendance'],
     },
     2304: {
@@ -107,7 +107,7 @@ jest.mock('../Gradebook', () => {
       module_ids: ['2603'],
       module_positions: [1],
       assignment_group_id: '2202',
-      published: true,
+      published: false,
       submission_types: ['online_quiz'],
     },
   }

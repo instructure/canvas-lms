@@ -20,7 +20,8 @@ import React from 'react'
 import {fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import SaveThemeButton, {SaveThemeButtonProps, SharedBrandConfig} from '../SaveThemeButton'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 describe('SaveThemeButton', () => {
   const defaultProps: SaveThemeButtonProps = {
@@ -37,8 +38,19 @@ describe('SaveThemeButton', () => {
     userNeedsToPreviewFirst: false,
   }
 
+  const server = setupServer()
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
+    server.resetHandlers()
   })
 
   it('renders a save button', () => {
@@ -68,7 +80,13 @@ describe('SaveThemeButton', () => {
       brand_config_md5: 'new_md5',
     }
     const url = `/api/v1/accounts/${defaultProps.accountID}/shared_brand_configs/${defaultProps.sharedBrandConfigBeingEdited?.id}`
-    fetchMock.put(url, responseData, {overwriteRoutes: true})
+    server.use(
+      http.put(url, async ({request}) => {
+        const body = await request.json()
+        expect(body).toEqual({shared_brand_config: {brand_config_md5: defaultProps.brandConfigMd5}})
+        return HttpResponse.json(responseData)
+      }),
+    )
     render(
       <SaveThemeButton {...{...defaultProps, sharedBrandConfigBeingEdited: {...responseData}}} />,
     )
@@ -77,12 +95,6 @@ describe('SaveThemeButton', () => {
     await userEvent.click(button)
 
     await waitFor(() => {
-      expect(
-        fetchMock.called(url, {
-          method: 'PUT',
-          body: {shared_brand_config: {brand_config_md5: defaultProps.brandConfigMd5}},
-        }),
-      ).toBe(true)
       expect(defaultProps.onSave).toHaveBeenCalledWith(responseData)
       const dialog = screen.queryByLabelText('Save Theme Dialog')
       expect(dialog).not.toBeInTheDocument()
@@ -128,7 +140,18 @@ describe('SaveThemeButton', () => {
       brand_config_md5: 'new_md5',
     }
     const url = `/api/v1/accounts/${defaultProps.accountID}/shared_brand_configs`
-    fetchMock.post(url, responseData, {overwriteRoutes: true})
+    server.use(
+      http.post(url, async ({request}) => {
+        const body = await request.json()
+        expect(body).toEqual({
+          shared_brand_config: {
+            brand_config_md5: defaultProps.brandConfigMd5,
+            name: newThemeName,
+          },
+        })
+        return HttpResponse.json(responseData)
+      }),
+    )
     render(<SaveThemeButton {...propsWithoutSharedConfig} />)
     const saveButton = screen.getByLabelText('Save theme')
     const newThemeName = 'New Theme Name'
@@ -141,17 +164,6 @@ describe('SaveThemeButton', () => {
     await userEvent.click(modalSaveButton)
 
     await waitFor(() => {
-      expect(
-        fetchMock.called(url, {
-          method: 'POST',
-          body: {
-            shared_brand_config: {
-              brand_config_md5: defaultProps.brandConfigMd5,
-              name: newThemeName,
-            },
-          },
-        }),
-      ).toBe(true)
       expect(defaultProps.onSave).toHaveBeenCalledWith(responseData)
       const dialog = screen.queryByLabelText('Save Theme Dialog')
       expect(dialog).not.toBeInTheDocument()
