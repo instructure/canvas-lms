@@ -151,11 +151,14 @@ describe('QRMobileLogin', () => {
     it('cancels the modal and displays no code when header close button is clicked', async () => {
       fetchMock.post(route, loginImageJsons[0], {overwriteRoutes: true})
       const {getByTestId, findByText, queryByTestId} = render(<QRMobileLogin withWarning={true} />)
-      const cancelButton = getByTestId('qr-header-close-button').querySelector(
-        'button',
-      ) as HTMLButtonElement
-      fireEvent.click(cancelButton)
-      await findByText(/qr code display was canceled/i)
+      const cancelButton = getByTestId('qr-header-close-button')
+      const closeButton = cancelButton.querySelector('button')
+      expect(closeButton).not.toBeNull()
+      await act(async () => {
+        fireEvent.click(closeButton!)
+      })
+      const text = await findByText(/qr code display was canceled/i)
+      expect(text).toBeInTheDocument()
       expect(queryByTestId('qr-code-image')).toBeNull()
     })
   })

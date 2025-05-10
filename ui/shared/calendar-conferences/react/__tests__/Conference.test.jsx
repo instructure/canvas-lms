@@ -150,8 +150,20 @@ describe('Conference', () => {
     }
 
     it('shows lti html conferences as html', () => {
+      // Create a fresh copy of the conference object to avoid test interference
+      const freshConference = {
+        id: 1,
+        title: 'HTML Conference',
+        conference_type: 'LtiConference',
+        url: 'invalid://foo',
+        lti_settings: {
+          type: 'html',
+          html: '<div><a href="invalid://foo">This is some text</a></div>',
+        },
+      }
+
       const {getByRole} = render(
-        <Conference conference={htmlConference} conferenceType={msTeamsConferenceType} />,
+        <Conference conference={freshConference} conferenceType={msTeamsConferenceType} />,
       )
       const link = getByRole('link', {name: 'This is some text'})
       expect(link.href).toBe('invalid://foo')

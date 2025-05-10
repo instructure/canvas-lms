@@ -331,6 +331,8 @@ describe('Parent', () => {
   describe('navigation behavior', () => {
     describe('when the cancel button is clicked', () => {
       it('navigates back to login when there is no previous history', async () => {
+        mockNavigationType.mockReturnValue('POP')
+        mockLocation.mockReturnValue({key: 'default'})
         setup()
         const backButton = screen.getByTestId('back-button')
         await userEvent.click(backButton)

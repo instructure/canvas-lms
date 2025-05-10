@@ -16,17 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  render,
-  within,
-  cleanup,
-  getByText,
-  queryAllByText,
-  screen,
-  findByTestId,
-  findAllByTestId,
-  findByText,
-} from '@testing-library/react'
+import {render, within, cleanup, getByText, queryAllByText} from '@testing-library/react'
 import React from 'react'
 import RosterTable from '../RosterTable'
 import {mockUser, getRosterQueryMock} from '../../../../graphql/Mocks'
@@ -230,7 +220,9 @@ describe('RosterTable', () => {
     const rows = await findAllByTestId('roster-table-data-row')
     const loginIdByUser = mockUsers.map(user => user.enrollments[0].loginId)
     rows.forEach((row, index) => {
-      loginIdByUser[index] && expect(queryAllByText(row, loginIdByUser[index])).toHaveLength(0)
+      if (loginIdByUser[index]) {
+        expect(queryAllByText(row, loginIdByUser[index])).toHaveLength(0)
+      }
     })
   })
 
@@ -251,7 +243,9 @@ describe('RosterTable', () => {
 
     // Check there is no SIS ID data
     rows.forEach((row, index) => {
-      sisIdByUser[index] && expect(queryAllByText(row, sisIdByUser[index])).toHaveLength(0)
+      if (sisIdByUser[index]) {
+        expect(queryAllByText(row, sisIdByUser[index])).toHaveLength(0)
+      }
     })
   })
 
@@ -275,7 +269,9 @@ describe('RosterTable', () => {
 
     // Check section name exists in row
     rows.forEach((row, index) => {
-      sectionByUser[index] && expect(getByText(row, sectionByUser[index])).toBeInTheDocument()
+      if (sectionByUser[index]) {
+        expect(getByText(row, sectionByUser[index])).toBeInTheDocument()
+      }
     })
   })
 
@@ -296,17 +292,24 @@ describe('RosterTable', () => {
 
     // Check section name doesn't exist in row
     rows.forEach((row, index) => {
-      sectionByUser[index] && expect(queryAllByText(row, sectionByUser[index])).toHaveLength(0)
+      if (sectionByUser[index]) {
+        expect(queryAllByText(row, sectionByUser[index])).toHaveLength(0)
+      }
     })
   })
 
   describe('Administrative Links', () => {
-    const checkContainerForButtons = async (container, users) => {
-      await container.findAllByTestId('roster-table-data-row') // Ensure rows are rendered before querying
-      const buttonTextList = users.map(user => `Manage ${user.name}`)
-      buttonTextList.forEach(async buttonText => {
-        expect(await screen.findByRole('button', {name: buttonText})).toBeInTheDocument()
-      })
+    const checkContainerForButtons = async ({findAllByTestId, findByRole}, users) => {
+      // Wait for rows to render
+      const rows = await findAllByTestId('roster-table-data-row')
+      expect(rows).toHaveLength(users.length)
+
+      // Check each user has a manage button
+      for (const user of users) {
+        const buttonText = `Manage ${user.name}`
+        const button = await findByRole('button', {name: buttonText})
+        expect(button).toBeInTheDocument()
+      }
     }
 
     beforeEach(() => {
@@ -325,9 +328,9 @@ describe('RosterTable', () => {
       expect(await findByTestId('colheader-administrative-links')).toBeInTheDocument()
     })
 
-    it('should show the Administrative Link button if the user can be removed', () => {
-      const container = setup() // Mock Users can be removed by default
-      checkContainerForButtons(container, mockUsers)
+    it('should show the Administrative Link button if the user can be removed', async () => {
+      const renderResult = setup() // Mock Users can be removed by default
+      await checkContainerForButtons(renderResult, mockUsers)
     })
 
     describe('All enrollments have canBeRemoved=false', () => {
@@ -341,7 +344,7 @@ describe('RosterTable', () => {
         mockUsers.forEach(user => (user.enrollments[0].canBeRemoved = true))
       })
 
-      it('should show the Administrative Link button for students if the user has the manage_students permission', () => {
+      it('should show the Administrative Link button for students if the user has the manage_students permission', async () => {
         fakeENV.setup({
           ...SITE_ADMIN_ENV,
           permissions: {
@@ -349,11 +352,11 @@ describe('RosterTable', () => {
             manage_students: true,
           },
         })
-        const container = setup(mockSettingsToProps({mockUsers: mockStudents}))
-        checkContainerForButtons(container, mockStudents)
+        const renderResult = setup(mockSettingsToProps({mockUsers: mockStudents}))
+        await checkContainerForButtons(renderResult, mockStudents)
       })
 
-      it('should show the Administrative Link button for admin roles if the user has the can_allow_admin_actions permission', () => {
+      it('should show the Administrative Link button for admin roles if the user has the can_allow_admin_actions permission', async () => {
         fakeENV.setup({
           ...SITE_ADMIN_ENV,
           permissions: {
@@ -361,8 +364,8 @@ describe('RosterTable', () => {
             can_allow_admin_actions: true,
           },
         })
-        const container = setup(mockSettingsToProps({mockUsers: mockAdmin}))
-        checkContainerForButtons(container, mockAdmin)
+        const renderResult = setup(mockSettingsToProps({mockUsers: mockAdmin}))
+        await checkContainerForButtons(renderResult, mockAdmin)
       })
     })
   })
