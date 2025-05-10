@@ -40,6 +40,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
   end
 
   delegate :context, to: :@migration
+  delegate :user, to: :@migration
 
   delegate :context_path, to: :@migration_id_converter
 
@@ -122,6 +123,14 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     end
   end
 
+  def disable_file_verifiers_in_public_syllabus_enabled?
+    if defined?(@disable_file_verifiers_in_public_syllabus_enabled)
+      @disable_file_verifiers_in_public_syllabus_enabled
+    else
+      @disable_file_verifiers_in_public_syllabus_enabled = context.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+    end
+  end
+
   def replace_item_placeholders!(item_key, field_links, skip_associations = false)
     item_type = item_key[:type]
     item_type = field_links.keys.first if [:block_editor, :block_editor_text].include? field_links.keys.first
@@ -133,6 +142,9 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
       syllabus = context.syllabus_body
       if LinkReplacer.sub_placeholders!(syllabus, field_links.values.flatten)
         context.class.where(id: context.id).update_all(syllabus_body: syllabus)
+      end
+      if disable_file_verifiers_in_public_syllabus_enabled?
+        UserContent.associate_attachments_to_rce_object(syllabus, context, "syllabus_body", user)
       end
     when :assessment_question
       process_assessment_question!(item_key[:item], field_links.values.flatten)

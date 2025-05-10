@@ -37,6 +37,7 @@ describe "Canvas Cartridge importing" do
     @resource = CC::Resource.new(manifest, nil)
     @migration = ContentMigration.new
     @migration.context = @copy_to
+    @migration.user = @user
     @migration.save
   end
 
@@ -700,6 +701,36 @@ describe "Canvas Cartridge importing" do
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
     expect(page_2.body).to eq body_with_link % ([@copy_to.id, attachment_import.id] * 4)
+  end
+
+  it "creates attachment_associations for syllabus attachment links on import" do
+    @copy_from.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+
+    image = attachment_model(context: @copy_from, display_name: "cn_image.jpg", uploaded_data: fixture_file_upload("cn_image.jpg"))
+    media = attachment_model(context: @copy_from, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"))
+    image_to = attachment_model(context: @copy_to, display_name: "cn_image.jpg", uploaded_data: fixture_file_upload("cn_image.jpg"), migration_id: "image")
+    media_to = attachment_model(context: @copy_to, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"), migration_id: "media")
+    body = <<~HTML
+      <p><img src="/courses/#{@copy_from.id}/files/#{image.id}/preview"></p>
+      <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" data-media-id="#{media.media_entry_id}"></iframe></p>
+    HTML
+    @copy_from.update!(syllabus_body: body)
+
+    # export to html file
+    exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(@copy_from.syllabus_body, "Syllabus")
+    # convert to json
+    doc = Nokogiri::XML(exported_html)
+    syllabus_body = @converter.convert_syllabus(doc)
+    # import into new course
+    @migration.attachment_path_id_lookup = {
+      "cn_image.jpg" => image_to.migration_id,
+      "292.mp3" => media_to.migration_id
+    }
+    Importers::CourseContentImporter.import_syllabus_from_migration(@copy_to, syllabus_body, @migration)
+    @migration.resolve_content_links!
+
+    syllabus_attachment_associations = @copy_to.attachment_associations.where(field_name: "syllabus_body")
+    expect(syllabus_attachment_associations.pluck(:attachment_id)).to match_array([image_to.id, media_to.id])
   end
 
   it "translates media file links on import" do
