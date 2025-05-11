@@ -149,14 +149,16 @@ describe('Address Book Component', () => {
 
         it('Show up pronouns if pronouns is not null', async () => {
           const mockSetIsMenuOpen = jest.fn()
-          const {getByText} = setup({
+          setup({
             ...defaultProps,
             isMenuOpen: true,
             isSubMenu: true,
             setIsMenuOpen: mockSetIsMenuOpen,
           })
           await screen.findByTestId('address-book-popover')
-          expect(getByText('he/him')).toBeInTheDocument()
+          const items = await screen.findAllByTestId('address-book-item')
+          const userItem = items.find(item => item.textContent.includes('Rob Orton'))
+          expect(userItem).toHaveTextContent('he/him')
         })
 
         it('Do not show up pronouns if pronouns is null', async () => {

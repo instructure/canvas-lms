@@ -50,12 +50,10 @@ const renderComponent = (props?: any) =>
   )
 
 describe('PermissionsModal', () => {
-  beforeAll(() => {
+  beforeEach(() => {
+    // Reset the environment before each test
     const filesContexts = createFilesContexts()
     resetAndGetFilesEnv(filesContexts)
-  })
-
-  beforeEach(() => {
     // Set up a default mock implementation for doFetchApi to prevent unhandled rejections
     ;(doFetchApi as jest.Mock).mockResolvedValue({})
   })
@@ -63,6 +61,9 @@ describe('PermissionsModal', () => {
   afterEach(() => {
     jest.clearAllMocks()
     jest.resetAllMocks()
+    // Reset the environment after each test to ensure clean state
+    const filesContexts = createFilesContexts()
+    resetAndGetFilesEnv(filesContexts)
   })
 
   it('performs fetch request and shows alert', async () => {
@@ -123,12 +124,16 @@ describe('PermissionsModal', () => {
     })
     resetAndGetFilesEnv(usageFilesContexts)
 
-    renderComponent()
-    await userEvent.click(screen.getByTestId('permissions-save-button'))
-    expect(
-      await screen.findByText(
+    const {getByTestId} = renderComponent()
+
+    await userEvent.click(getByTestId('permissions-save-button'))
+
+    // Wait for any state updates and re-renders
+    await waitFor(async () => {
+      const alert = await screen.findByText(
         'Selected items must have usage rights assigned before they can be published.',
-      ),
-    ).toBeInTheDocument()
+      )
+      expect(alert).toBeInTheDocument()
+    })
   })
 })
