@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {render, screen, waitFor, fireEvent} from '@testing-library/react'
+import {render, waitFor, fireEvent, screen as testScreen} from '@testing-library/react'
 import EditPage from '../EditPage'
 import axios from '@canvas/axios'
 import MessageParticipantsDialog from '@canvas/calendar/jquery/MessageParticipantsDialog'
@@ -32,9 +32,7 @@ $.fn.errorBox = jest.fn()
 $.fn.getClientRects = () => [{top: 0, left: 0}]
 $.fn.offset = () => ({top: 0, left: 0})
 $.fn.position = () => ({top: 0, left: 0})
-$.fn.val = function () {
-  return this.value || ''
-}
+$.fn.val = jest.fn().mockReturnValue('')
 $.flashError = jest.fn()
 
 const defaultProps = {
@@ -95,7 +93,7 @@ describe('AppointmentGroup EditPage', () => {
   it('renders the EditPage component', async () => {
     render(<EditPage {...defaultProps} />)
     await waitFor(() => {
-      expect(screen.getByTestId('edit-page')).toBeInTheDocument()
+      expect(testScreen.getByTestId('edit-page')).toBeInTheDocument()
     })
   })
 
@@ -121,14 +119,14 @@ describe('AppointmentGroup EditPage', () => {
     it('renders message users button', async () => {
       render(<EditPage {...defaultProps} />)
       await waitFor(() => {
-        expect(screen.getByText('Message Students')).toBeInTheDocument()
+        expect(testScreen.getByText('Message Students')).toBeInTheDocument()
       })
     })
 
     it('opens message students modal when clicking button', async () => {
       render(<EditPage {...defaultProps} />)
       await waitFor(() => {
-        const messageButton = screen.getByText('Message Students')
+        const messageButton = testScreen.getByText('Message Students')
         fireEvent.click(messageButton)
         expect(MessageParticipantsDialog).toHaveBeenCalledWith({
           group: expect.any(Object),
@@ -142,7 +140,7 @@ describe('AppointmentGroup EditPage', () => {
     it('sends delete request with correct id', async () => {
       axios.delete.mockResolvedValueOnce({})
       render(<EditPage {...defaultProps} />)
-      const deleteButton = await screen.findByText('Delete Group')
+      const deleteButton = await testScreen.findByText('Delete Group')
       fireEvent.click(deleteButton)
       await waitFor(() => {
         expect(axios.delete).toHaveBeenCalledWith('/api/v1/appointment_groups/1')
@@ -152,7 +150,7 @@ describe('AppointmentGroup EditPage', () => {
     it('shows error message on failed delete', async () => {
       axios.delete.mockRejectedValueOnce(new Error('Failed to delete'))
       render(<EditPage {...defaultProps} />)
-      const deleteButton = await screen.findByText('Delete Group')
+      const deleteButton = await testScreen.findByText('Delete Group')
       fireEvent.click(deleteButton)
       await waitFor(() => {
         expect($.flashError).toHaveBeenCalledWith(
@@ -165,14 +163,14 @@ describe('AppointmentGroup EditPage', () => {
   describe('Form Interactions', () => {
     it('updates form values on input change', async () => {
       render(<EditPage {...defaultProps} />)
-      const titleInput = await screen.findByRole('textbox', {name: 'Title'})
+      const titleInput = await testScreen.findByRole('textbox', {name: 'Title'})
       fireEvent.change(titleInput, {target: {value: 'New Title', name: 'title'}})
       expect(titleInput.value).toBe('New Title')
     })
 
     it('updates checkbox values correctly', async () => {
       render(<EditPage {...defaultProps} />)
-      const checkbox = await screen.findByRole('checkbox', {
+      const checkbox = await testScreen.findByRole('checkbox', {
         name: 'Allow students to see who was signed up for time slots that are still available',
       })
       fireEvent.click(checkbox)
@@ -187,10 +185,18 @@ describe('AppointmentGroup EditPage', () => {
 
     it('shows error for empty limit users per slot', async () => {
       const {container} = render(<EditPage {...defaultProps} />)
+
+      // Click the checkbox to enable the input
       const checkbox = container.querySelector('#limit_users_per_slot')
       fireEvent.click(checkbox)
-      const saveButton = screen.getByText('Save')
+
+      // Mock the jQuery val() call to return an empty string
+      $.fn.val.mockReturnValue('')
+
+      // Click save to trigger validation
+      const saveButton = testScreen.getByText('Save')
       fireEvent.click(saveButton)
+
       await waitFor(() => {
         expect($.fn.errorBox).toHaveBeenCalledWith(
           'You must provide a value or unselect the option.',
@@ -213,7 +219,7 @@ describe('AppointmentGroup EditPage', () => {
       // Mock the jQuery val() call to return 0
       $.fn.val = jest.fn().mockReturnValue('0')
 
-      const saveButton = screen.getByText('Save')
+      const saveButton = testScreen.getByText('Save')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -242,7 +248,7 @@ describe('AppointmentGroup EditPage', () => {
       // Mock the jQuery val() call to return 1
       $.fn.val = jest.fn().mockReturnValue('1')
 
-      const saveButton = screen.getByText('Save')
+      const saveButton = testScreen.getByText('Save')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -261,7 +267,7 @@ describe('AppointmentGroup EditPage', () => {
     it('shows error on failed save', async () => {
       axios.put.mockRejectedValueOnce(new Error('Failed to save'))
       render(<EditPage {...defaultProps} />)
-      const saveButton = screen.getByText('Save')
+      const saveButton = testScreen.getByText('Save')
       fireEvent.click(saveButton)
       await waitFor(() => {
         expect($.flashError).toHaveBeenCalledWith(

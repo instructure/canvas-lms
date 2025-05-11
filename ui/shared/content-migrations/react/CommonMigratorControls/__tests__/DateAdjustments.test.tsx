@@ -23,12 +23,14 @@ import {timeZonedFormMessages} from '../timeZonedFormMessages'
 import type {DateAdjustmentConfig, DateShifts} from '../types'
 import userEvent from '@testing-library/user-event'
 import moment from 'moment-timezone'
-import tzInTest from '@instructure/moment-utils/specHelpers'
+import {configureAndRestoreLater} from '@instructure/moment-utils/specHelpers'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import tz from 'timezone'
+
 import chicago from 'timezone/America/Chicago'
 import detroit from 'timezone/America/Detroit'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 declare module 'timezone' {
   interface Timezone {
@@ -92,8 +94,32 @@ describe('DateAdjustment', () => {
   })
 
   describe('Date fill in on initial data', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        TIMEZONE: 'America/Detroit',
+        CONTEXT_TIMEZONE: 'America/Detroit',
+        LOCALE: 'en',
+        FEATURES: {},
+        MOMENT_LOCALE: 'en',
+      })
+      moment.tz.setDefault('UTC')
+      configureAndRestoreLater({
+        tz: tz(detroit, 'America/Detroit', chicago, 'America/Chicago'),
+        tzData: {
+          'America/Detroit': detroit,
+          'America/Chicago': chicago,
+        },
+        formats: getI18nFormats(),
+        momentLocale: 'en',
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
     const dateObject = '2024-08-08T08:00:00+00:00'
-    const expectedDate = 'Aug 8, 2024 at 8am'
+    const expectedDate = 'Aug 8, 2024 at 4am'
     const getComponent = (dateShiftOptionVariant: Partial<DateShifts>) => {
       return (
         <DateAdjustments
@@ -186,7 +212,7 @@ describe('DateAdjustment', () => {
     it('returns the correct localised date messages', () => {
       moment.tz.setDefault('America/Denver')
 
-      tzInTest.configureAndRestoreLater({
+      configureAndRestoreLater({
         tz: tz(detroit, 'America/Detroit', chicago, 'America/Chicago'),
         tzData: {
           'America/Chicago': chicago,
