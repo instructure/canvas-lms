@@ -73,7 +73,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   margin-top: $ic-sp*2;
 }
 .ic-Login__content {
-  width: 400px;
+  max-width: 400px;
   margin: 0 auto;
   background: var(--ic-brand-Login-Content-bgd-color);
   border: 5px solid var(--ic-brand-Login-Content-border-color);
