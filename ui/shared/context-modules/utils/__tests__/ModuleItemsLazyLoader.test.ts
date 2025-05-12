@@ -21,7 +21,7 @@ import {screen} from '@testing-library/dom'
 import fetchMock from 'fetch-mock'
 import {ModuleItemsLazyLoader, type ModuleItemsCallback} from '../ModuleItemsLazyLoader'
 import {ModuleItemsStore} from '../ModuleItemsStore'
-import {moduleFromId} from '../moduleHelpers'
+import {moduleFromId} from '../showAllOrLess'
 import {type ModuleId} from '../types'
 
 // @ts-expect-error

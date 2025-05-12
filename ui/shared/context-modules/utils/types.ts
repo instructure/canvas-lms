@@ -23,4 +23,7 @@ type PaginationData = {
   totalPages: number
 }
 
+const DEFAULT_PAGE_SIZE = 10
+
+export {DEFAULT_PAGE_SIZE}
 export type {ModuleId, PaginationData}

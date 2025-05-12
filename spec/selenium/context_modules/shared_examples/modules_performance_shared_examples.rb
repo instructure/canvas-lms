@@ -163,6 +163,13 @@ shared_examples_for "module show all or less" do |context|
       expect(show_all_button.text).to include("(11)")
     end
 
+    it "is removed on clicking Collapse All" do
+      get @mod_url
+      wait_for_dom_ready
+      expand_collapse_all_button.click
+      expect(context_module(@module.id)).not_to contain_css(show_all_or_less_button_selector)
+    end
+
     context "with one less item" do
       before do
         @module.content_tags.last.destroy

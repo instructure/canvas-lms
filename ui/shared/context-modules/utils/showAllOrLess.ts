@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DEFAULT_PAGE_SIZE} from './ModuleItemsLazyLoader'
-import {type ModuleId} from './types'
-import {moduleFromId} from './moduleHelpers'
+import {DEFAULT_PAGE_SIZE, type ModuleId} from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modulespublic')
@@ -28,6 +26,11 @@ type AllOrLess = 'all' | 'less' | 'none' | 'loading'
 const MODULE_EXPAND_AND_LOAD_ALL = 'module-expand-and-load-all'
 const MODULE_LOAD_ALL = 'module-load-all'
 const MODULE_LOAD_FIRST_PAGE = 'module-load-first-page'
+
+function moduleFromId(moduleId: string | number): HTMLElement {
+  return document.querySelector(`#context_module_${moduleId}`) as HTMLElement
+}
+
 function isModuleLoading(module: HTMLElement) {
   return module.dataset.loadstate === 'loading'
 }
@@ -166,6 +169,7 @@ function buttonKeyDown(event: KeyboardEvent) {
 }
 
 export {
+  moduleFromId,
   addShowAllOrLess,
   shouldShowAllOrLess,
   itemCount,
