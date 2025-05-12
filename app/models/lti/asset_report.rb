@@ -93,6 +93,16 @@ class Lti::AssetReport < ApplicationRecord
   validate :validate_extensions
   validate :validate_asset_compatible_with_processor
 
+  scope :for_active_processors, lambda {
+    joins(:asset_processor)
+      .where(lti_asset_processors: { workflow_state: :active })
+  }
+
+  scope :for_submissions, lambda { |submission_ids|
+    joins(:asset)
+      .where(lti_assets: { submission_id: submission_ids })
+  }
+
   def validate_asset_compatible_with_processor
     unless asset&.compatible_with_processor?(asset_processor)
       errors.add(:asset, "internal error, asset (e.g. asset's submission) not compatible with processor")
@@ -115,6 +125,8 @@ class Lti::AssetReport < ApplicationRecord
     end
   end
 
+  # See also fields in graphql/types/lti_asset_report_type.rb (used
+  # in New Speedgrader)
   def info_for_display
     {
       id:,
@@ -169,10 +181,8 @@ class Lti::AssetReport < ApplicationRecord
     if submission_ids.present?
       scope =
         active
-        .joins(:asset)
-        .joins(:asset_processor)
-        .where(lti_asset_processors: { workflow_state: :active })
-        .where(lti_assets: { submission_id: submission_ids })
+        .for_active_processors
+        .for_submissions(submission_ids)
         .select("lti_asset_reports.*, lti_assets.submission_id as asset_sub_id, lti_assets.attachment_id as asset_att_id")
 
       scope.find_each do |report|

@@ -267,6 +267,22 @@ RSpec.describe Lti::AssetReport do
     end
   end
 
+  describe "#result_truncated" do
+    context "when result is < 16 chars" do
+      it "is nil" do
+        report = lti_asset_report_model(result: "123456789012345")
+        expect(report.result_truncated).to be_nil
+      end
+    end
+
+    context "when result is > 16 chars" do
+      it "is truncated to 15 chars with ellipsis" do
+        report = lti_asset_report_model(result: "12345678901234567890")
+        expect(report.result_truncated).to eq("123456789012345…")
+      end
+    end
+  end
+
   describe "#resubmit_available?" do
     subject { standard_report.resubmit_available? }
 

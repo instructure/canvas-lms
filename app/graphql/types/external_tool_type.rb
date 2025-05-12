@@ -28,13 +28,12 @@ module Types
     value "public"
   end
 
-  # We can add additional placements to this filter as they are needed. Currently we
-  # only need to filter to `homework_submission` as that is the only place that this
-  # graphql type is being queried and used in.
+  # We can add additional placements as they are needed.
   class ExternalToolPlacementType < Types::BaseEnum
     graphql_name "ExternalToolPlacement"
     description "Placements that an External Tool can have"
     value "homework_submission"
+    value "ActivityAssetProcessor"
   end
 
   class ExternalToolFilterInputType < Types::BaseInputObject
@@ -69,6 +68,13 @@ module Types
     field :settings, ExternalToolSettingsType, null: true
 
     field :state, ExternalToolStateType, method: :workflow_state, null: true
+
+    field :label_for, String, null: true do
+      argument :placement, ExternalToolPlacementType, required: true
+    end
+    def label_for(placement:)
+      object.label_for(placement.to_sym, I18n.locale)
+    end
 
     # TODO: This is currently just a placeholder so that it can be used in
     #       ModuleItemType. Once we start exporting actual fields for this,
