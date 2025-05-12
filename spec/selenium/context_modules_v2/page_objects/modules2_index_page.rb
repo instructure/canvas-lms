@@ -33,6 +33,10 @@ module Modules2IndexPage
     "#context_module_item_#{module_item_id}"
   end
 
+  def module_action_menu_selector(module_id)
+    "[data-testid='module-action-menu_#{module_id}']"
+  end
+
   def manage_module_item_button_selector(module_item_id)
     "[data-testid='module-item-action-menu_#{module_item_id}']"
   end
@@ -64,6 +68,10 @@ module Modules2IndexPage
 
   def teacher_modules_container
     f(teacher_modules_container_selector)
+  end
+
+  def module_action_menu(module_id)
+    f(module_action_menu_selector(module_id))
   end
 
   def manage_module_item_button(module_item_id)
