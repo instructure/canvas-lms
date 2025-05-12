@@ -119,9 +119,32 @@ describe('DiscussionRow', () => {
     expect(screen.queryByTestId('ic-blue-unread-badge')).not.toBeInTheDocument()
   })
 
-  it('renders the subscription ToggleIcon', () => {
-    render(<DiscussionRow {...makeProps()} />)
-    expect(screen.getByText('Subscribe to Hello World')).toBeInTheDocument()
+  describe('subscription ToggleIcon', () => {
+    it('should render', () => {
+      render(<DiscussionRow {...makeProps()} />)
+      expect(screen.getByText('Subscribe to Hello World')).toBeInTheDocument()
+    })
+
+    it('should add trackable attribute correctly', () => {
+      const {getByTestId} = render(<DiscussionRow {...makeProps()} />)
+      const toggle = getByTestId('discussion-subscribe')
+      expect(toggle).toHaveAttribute('data-action-state', 'subscribeButton')
+    })
+
+    describe('when subscribed', () => {
+      it('should render the unsubscribe icon', () => {
+        const discussion = {subscribed: true}
+        render(<DiscussionRow {...makeProps({discussion})} />)
+        expect(screen.getByText('Unsubscribe from Hello World')).toBeInTheDocument()
+      })
+
+      it('should add trackable attribute correctly', () => {
+        const discussion = {subscribed: true}
+        const {getByTestId} = render(<DiscussionRow {...makeProps({discussion})} />)
+        const toggle = getByTestId('discussion-subscribe')
+        expect(toggle).toHaveAttribute('data-action-state', 'unsubscribeButton')
+      })
+    })
   })
 
   it('disables publish button when can_unpublish is false', () => {
@@ -138,10 +161,36 @@ describe('DiscussionRow', () => {
     expect(button.hasAttribute('disabled')).toBe(false)
   })
 
-  it('renders the publish ToggleIcon', () => {
-    const discussion = {published: false}
-    render(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
-    expect(screen.getAllByText('Publish Hello World', {exact: false})).toHaveLength(2)
+  describe('publish ToggleIcon', () => {
+    it('should render', () => {
+      const discussion = {published: false}
+      render(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
+      expect(screen.getAllByText('Publish Hello World', {exact: false})).toHaveLength(2)
+    })
+
+    it('should add trackable attribute correctly', () => {
+      const discussion = {published: false}
+      const {getByTestId} = render(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
+      const toggle = getByTestId('discussion-publish')
+      expect(toggle).toHaveAttribute('data-action-state', 'publishButton')
+    })
+
+    describe('when published', () => {
+      it('should render the unpublish icon', () => {
+        const discussion = {published: true}
+        render(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
+        expect(screen.getAllByText('Unpublish Hello World', {exact: false})).toHaveLength(2)
+      })
+
+      it('should add trackable attribute correctly', () => {
+        const discussion = {published: true}
+        const {getByTestId} = render(
+          <DiscussionRow {...makeProps({canPublish: true, discussion})} />,
+        )
+        const toggle = getByTestId('discussion-publish')
+        expect(toggle).toHaveAttribute('data-action-state', 'unpublishButton')
+      })
+    })
   })
 
   it('when feature flag is off, renders anonymous discussion lock explanation for read_as_admin', () => {
