@@ -417,23 +417,37 @@ describe('useOutcomesImport', () => {
     })
 
     it('changes import outcome status from pending to failed if progress tracker throws error', async () => {
-      resolveProgress.mockImplementationOnce(() => Promise.reject(new Error()))
+      // Save the original implementation to restore later
+      const originalImplementation = resolveProgress.mockImplementation
+
+      // Clear all previous mock implementations and set a new one that rejects
+      resolveProgress.mockReset()
+      resolveProgress.mockImplementation(() => Promise.reject(new Error()))
+
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
           mocks: importOutcomeMocks(),
         },
       })
+
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
       })
+
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_PENDING})
+
       await act(async () => jest.runAllTimers())
+
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing this outcome.',
         type: 'error',
       })
+
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_FAILED})
+
+      // Restore the original mock implementation for subsequent tests
+      resolveProgress.mockImplementation(originalImplementation)
     })
 
     it('displays flash error message with details if cannot import outcome', async () => {

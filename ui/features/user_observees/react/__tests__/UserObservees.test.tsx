@@ -77,10 +77,15 @@ describe('UserObservees', () => {
 
   describe('when no students are being observed', () => {
     it('should show the placeholder message', async () => {
+      // Clear any mocks that might affect the test
+      fetchMock.restore()
+      fetchMock.get(GET_OBSERVEES_URI, [])
+
       renderComponent()
 
+      // Use a more flexible approach to find the text
       const noStudentsMessage = await screen.findByText(content => {
-        return content.includes('No students being observed')
+        return content.trim() === 'No students being observed.'
       })
       expect(noStudentsMessage).toBeInTheDocument()
     })
@@ -102,7 +107,9 @@ describe('UserObservees', () => {
 
   describe('when observees are fetched successfully', () => {
     it('should show the list of observees', async () => {
-      fetchMock.get(GET_OBSERVEES_URI, observees)
+      // Clear any existing mocks first
+      fetchMock.restore()
+      fetchMock.get(GET_OBSERVEES_URI, observees, {overwriteRoutes: true})
       renderComponent()
 
       const expectations = observees.map(async observee => {

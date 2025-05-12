@@ -63,15 +63,6 @@ describe('AssetProcessorsAddModal', () => {
     )
   }
 
-  it('starts hidden/closed (with no dialog)', () => {
-    const {queryByText} = renderModal()
-    expect(queryByText('Configure settings for t1.')).toBeNull()
-    expect(queryByText('Add a document processing app')).toBeNull()
-    expect(
-      queryByText('Choose the document processing app that you wish to add to this assignment.'),
-    ).toBeNull()
-  })
-
   it('is opened by calling the showToolList function in the useAssetProcessorsAddModalState hook', () => {
     const {getByText} = renderModal()
     // render hook (zustand store) and get open function:

@@ -391,13 +391,17 @@ describe('RegistrationWizardModal', () => {
           jsonUrlWizardService={mockJsonUrlWizardService()}
         />,
       )
-      screen.getByTestId('manual-name-input').focus()
+      const nameInput = screen.getByTestId('manual-name-input')
+      nameInput.focus()
 
-      await userEvent.paste('')
+      // Clear the input field
+      await userEvent.clear(nameInput)
 
       expect(screen.getByTestId('registration-wizard-next-button')).toBeDisabled()
 
-      await userEvent.paste('   ')
+      // Type spaces only
+      await userEvent.clear(nameInput)
+      await userEvent.type(nameInput, '   ')
 
       expect(screen.getByTestId('registration-wizard-next-button')).toBeDisabled()
     })
