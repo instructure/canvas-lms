@@ -4445,6 +4445,9 @@ el:
   count_points_4735a2e8: 
     one: "1 μόριο"
     other: "%{count} μόρια"
+  count_sections_bf1baf0a: 
+    one: "1 τομέας"
+    other: "%{count} τομείς"
   count_students_30e46120: 
     one: "1 μαθητής"
     other: "%{count} μαθητές"
