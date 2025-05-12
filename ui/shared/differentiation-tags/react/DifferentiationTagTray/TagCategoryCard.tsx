@@ -35,9 +35,15 @@ export interface TagCategoryCardProps {
   category: DifferentiationTagCategory
   onEditCategory: (id: number) => void
   onDeleteFocusFallback?: () => void
+  focusElRef?: React.MutableRefObject<(HTMLElement | null)[]>
 }
 
-function TagCategoryCard({category, onEditCategory, onDeleteFocusFallback}: TagCategoryCardProps) {
+function TagCategoryCard({
+  category,
+  onEditCategory,
+  onDeleteFocusFallback,
+  focusElRef,
+}: TagCategoryCardProps) {
   const {name, groups = []} = category
 
   const deleteMutation = useDeleteDifferentiationTagCategory()
@@ -141,6 +147,11 @@ function TagCategoryCard({category, onEditCategory, onDeleteFocusFallback}: TagC
               </Flex.Item>
               <Flex.Item>
                 <IconButton
+                  elementRef={el => {
+                    if (focusElRef?.current && el instanceof HTMLElement) {
+                      focusElRef.current[category.id] = el
+                    }
+                  }}
                   color="primary"
                   size="small"
                   withBackground={false}
