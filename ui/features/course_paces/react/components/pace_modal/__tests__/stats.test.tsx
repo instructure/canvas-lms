@@ -50,7 +50,11 @@ describe('pace modal stats', () => {
     const {getByText, getByTestId} = render(<PaceModalStats {...defaultProps} />)
 
     expect(getByText('Start Date')).toBeInTheDocument()
-    expect(getByText('Determined by course start date')).toBeInTheDocument()
+    expect(
+      getByText(
+        'Determined by course start date. Changing this date will not save, but you can view the effects of a new start date by changing the date here.',
+      ),
+    ).toBeInTheDocument()
     expect(getByText('End Date')).toBeInTheDocument()
     expect(getByText('Determined by course end date')).toBeInTheDocument()
 
@@ -71,7 +75,11 @@ describe('pace modal stats', () => {
     const {getByText, getByTestId} = render(<PaceModalStats {...defaultProps} coursePace={cpace} />)
 
     expect(getByText('Start Date')).toBeInTheDocument()
-    expect(getByText('Determined by course start date')).toBeInTheDocument()
+    expect(
+      getByText(
+        'Determined by course start date. Changing this date will not save, but you can view the effects of a new start date by changing the date here.',
+      ),
+    ).toBeInTheDocument()
     expect(getByText('End Date')).toBeInTheDocument()
     expect(getByText('Determined by course end date')).toBeInTheDocument()
 
@@ -149,9 +157,7 @@ describe('pace modal stats', () => {
 
   it("shows course end date for student if start date is all that's given", () => {
     const cpace = {...STUDENT_PACE, end_date: null}
-    const {getByTestId, getByText} = render(
-      <PaceModalStats {...defaultProps} coursePace={cpace} />,
-    )
+    const {getByTestId, getByText} = render(<PaceModalStats {...defaultProps} coursePace={cpace} />)
 
     expect(getByText('Start Date')).toBeInTheDocument()
     expect(getByText('End Date')).toBeInTheDocument()

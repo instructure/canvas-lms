@@ -36,7 +36,7 @@ import {
 } from '../../shared/api/backend_serializer'
 import type {CoursePace, OptionalDate, Pace, PaceDuration, ResponsiveSizes} from '../../types'
 import {coursePaceActions} from '../../actions/course_paces'
-import { generateDatesCaptions, getEndDateValue } from '../../utils/date_stuff/date_helpers'
+import {generateDatesCaptions, getEndDateValue} from '../../utils/date_stuff/date_helpers'
 
 const I18n = createI18nScope('course_paces_projected_dates')
 
@@ -69,7 +69,6 @@ export const PaceModalStats = ({
   const [shrink, setShrink] = useState(responsiveSize !== 'large')
   const startDateValue = coursePace.start_date
   const endDateValue = getEndDateValue(coursePace, plannedEndDate)
-
 
   useEffect(() => {
     const isSmallScreen = responsiveSize !== 'large'
@@ -114,8 +113,8 @@ export const PaceModalStats = ({
               })}
         </View>
         {!shrink && (
-          <div style={{whiteSpace: 'nowrap'}}>
-            {getColoredText('#5C1C78', <span style={{whiteSpace: 'nowrap'}}>{helpText}</span>, {
+          <div>
+            {getColoredText('#5C1C78', <span>{helpText}</span>, {
               fontStyle: 'italic',
               size: 'small',
             })}
@@ -125,18 +124,70 @@ export const PaceModalStats = ({
     )
   }
 
-  const renderDates = () => {
+  const renderDates = (shrink: boolean) => {
     const captions = generateDatesCaptions(coursePace, startDateValue, endDateValue, appliedPace)
-    return (
-      <View
-        as="div"
-        background="alert"
-        themeOverride={{backgroundAlert: '#F9F0FF'}}
-        padding="small medium"
-        borderRadius="medium"
-        height="100%"
-      >
-        <Flex.Item margin="0 medium medium 0">
+
+    if (shrink) {
+      return (
+        <View
+          as="div"
+          background="alert"
+          themeOverride={{backgroundAlert: '#F9F0FF'}}
+          padding="small medium"
+          borderRadius="medium"
+          height="100%"
+        >
+          <Flex.Item margin="0 medium medium 0">
+            <View
+              display="inline-block"
+              background="alert"
+              themeOverride={{backgroundAlert: '#EAD7F8'}}
+              padding="small"
+              width="3.3rem"
+              height="3.3rem"
+              margin="none small none none"
+              borderRadius="circle"
+            >
+              <IconCalendarClockLine
+                color="alert"
+                size="small"
+                themeOverride={{alertColor: '#5C1C78'}}
+              />
+            </View>
+            {renderColoredDate(
+              I18n.t('Start Date'),
+              startDateValue,
+              captions.startDate,
+              'coursepace-start-date',
+            )}
+          </Flex.Item>
+          <Flex.Item margin="0 medium medium 0" shouldGrow={true}>
+            <View margin="none small none none">
+              <IconArrowEndLine
+                color="alert"
+                size="x-small"
+                themeOverride={{alertColor: '#5C1C78'}}
+              />
+            </View>
+            {renderColoredDate(
+              I18n.t('End Date'),
+              endDateValue,
+              captions.endDate,
+              'coursepace-end-date',
+            )}
+          </Flex.Item>
+        </View>
+      )
+    } else {
+      return (
+        <View
+          as="div"
+          background="alert"
+          themeOverride={{backgroundAlert: '#F9F0FF'}}
+          padding="small medium"
+          borderRadius="medium"
+          height="100%"
+        >
           <View
             display="inline-block"
             background="alert"
@@ -153,30 +204,34 @@ export const PaceModalStats = ({
               themeOverride={{alertColor: '#5C1C78'}}
             />
           </View>
-          {renderColoredDate(
-            I18n.t('Start Date'),
-            startDateValue,
-            captions.startDate,
-            'coursepace-start-date',
-          )}
-        </Flex.Item>
-        <Flex.Item margin="0 medium medium 0" shouldGrow={true}>
-          <View margin="none small none none">
-            <IconArrowEndLine
-              color="alert"
-              size="x-small"
-              themeOverride={{alertColor: '#5C1C78'}}
-            />
-          </View>
-          {renderColoredDate(
-            I18n.t('End Date'),
-            endDateValue,
-            captions.endDate,
-            'coursepace-end-date',
-          )}
-        </Flex.Item>
-      </View>
-    )
+          <Flex direction="row">
+            <Flex.Item margin="0 medium medium 0" shouldShrink>
+              {renderColoredDate(
+                I18n.t('Start Date'),
+                startDateValue,
+                captions.startDate,
+                'coursepace-start-date',
+              )}
+            </Flex.Item>
+            <Flex.Item margin="none small none none">
+              <IconArrowEndLine
+                color="alert"
+                size="x-small"
+                themeOverride={{alertColor: '#5C1C78'}}
+              />
+            </Flex.Item>
+            <Flex.Item margin="0 medium medium 0" shouldGrow shouldShrink>
+              {renderColoredDate(
+                I18n.t('End Date'),
+                endDateValue,
+                captions.endDate,
+                'coursepace-end-date',
+              )}
+            </Flex.Item>
+          </Flex>
+        </View>
+      )
+    }
   }
 
   const renderAssignmentsSection = () => {
@@ -273,9 +328,9 @@ export const PaceModalStats = ({
       margin="none none small none"
       alignItems="stretch"
     >
-      {hasAtLeastOneDate() && <Flex.Item>{renderDates()}</Flex.Item>}
-      <Flex.Item>{renderAssignmentsSection()}</Flex.Item>
-      <Flex.Item>{renderDurationSection()}</Flex.Item>
+      {hasAtLeastOneDate() && <Flex.Item shouldShrink>{renderDates(shrink)}</Flex.Item>}
+      <Flex.Item shouldShrink>{renderAssignmentsSection()}</Flex.Item>
+      <Flex.Item shouldShrink>{renderDurationSection()}</Flex.Item>
     </Flex>
   )
 }

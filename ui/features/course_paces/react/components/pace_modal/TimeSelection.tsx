@@ -16,24 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useEffect, useRef, useState } from 'react'
-import { connect } from 'react-redux'
-import { Flex } from '@instructure/ui-flex'
+import React, {useEffect, useRef, useState} from 'react'
+import {connect} from 'react-redux'
+import {Flex} from '@instructure/ui-flex'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
-import { coursePaceTimezone } from '../../shared/api/backend_serializer'
+import {coursePaceTimezone} from '../../shared/api/backend_serializer'
 import * as tz from '@instructure/moment-utils'
-import { useScope as createI18nScope } from '@canvas/i18n'
-import { Text } from '@instructure/ui-text'
-import { NumberInput } from '@instructure/ui-number-input'
-import { View } from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Text} from '@instructure/ui-text'
+import {NumberInput} from '@instructure/ui-number-input'
+import {View} from '@instructure/ui-view'
 import moment from 'moment-timezone'
 import _ from 'lodash'
-import type { CoursePace, OptionalDate, Pace, ResponsiveSizes, StoreState } from '../../types'
-import { generateDatesCaptions, rawDaysBetweenInclusive } from '../../utils/date_stuff/date_helpers'
-import { coursePaceActions } from '../../actions/course_paces'
-import { calendarDaysToPaceDuration } from '../../utils/utils'
-import { getBlackoutDates } from '../../shared/reducers/blackout_dates'
-import { BlackoutDate } from '../../shared/types'
+import type {CoursePace, OptionalDate, Pace, ResponsiveSizes, StoreState} from '../../types'
+import {generateDatesCaptions, rawDaysBetweenInclusive} from '../../utils/date_stuff/date_helpers'
+import {coursePaceActions} from '../../actions/course_paces'
+import {calendarDaysToPaceDuration} from '../../utils/utils'
+import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
+import {BlackoutDate} from '../../shared/types'
 
 const I18n = createI18nScope('acceptable_use_policy')
 
@@ -91,7 +91,7 @@ const TimeSelection = (props: TimeSelectionProps) => {
   const originalBlackoutDates = useRef(blackoutDates)
 
   const enrollmentType = coursePace.context_type === 'Enrollment'
-  const dateColumnWidth = responsiveSize === "small" ? "100%" : "15.313rem"
+  const dateColumnWidth = responsiveSize === 'small' ? '100%' : '15.313rem'
   const formatDate = (date: Date) => {
     return tz.format(date, 'date.formats.long') || ''
   }
@@ -102,7 +102,7 @@ const TimeSelection = (props: TimeSelectionProps) => {
 
   useEffect(() => {
     if (
-      !_.isEqual(coursePace.selected_days_to_skip, originalSelectedDaysToSkip.current) || 
+      !_.isEqual(coursePace.selected_days_to_skip, originalSelectedDaysToSkip.current) ||
       !_.isEqual(blackoutDates, originalBlackoutDates.current)
     ) {
       setTimeToCompleteCalendarDaysFromItems(blackoutDates)
@@ -113,16 +113,16 @@ const TimeSelection = (props: TimeSelectionProps) => {
 
   useEffect(() => {
     const startDateMoment = moment(coursePace.start_date).startOf('day')
-    const calendarDays = coursePace.time_to_complete_calendar_days === 0 
-      ? 0 
-      : coursePace.time_to_complete_calendar_days
-    const endDateValue = startDateMoment
-      .add(calendarDays, 'days')
-      .startOf('day')
-      .toISOString()
+    const calendarDays =
+      coursePace.time_to_complete_calendar_days === 0
+        ? 0
+        : coursePace.time_to_complete_calendar_days
+    const endDateValue = startDateMoment.add(calendarDays, 'days').startOf('day').toISOString()
     setEndDate(endDateValue)
 
-    const originalPaceDuration = calendarDaysToPaceDuration(coursePace.time_to_complete_calendar_days)
+    const originalPaceDuration = calendarDaysToPaceDuration(
+      coursePace.time_to_complete_calendar_days,
+    )
     setWeeks(originalPaceDuration.weeks)
     setDays(originalPaceDuration.days)
   }, [coursePace.time_to_complete_calendar_days, coursePace.start_date])
@@ -161,9 +161,8 @@ const TimeSelection = (props: TimeSelectionProps) => {
     caption,
     renderLabel,
     dataTestId,
-    dateIsDisabled
+    dateIsDisabled,
   }: DateInputWithCaptionProps) => {
-
     const onChange = (selectedDate: Date | null) => {
       if (selectedDate === null) return
       const dateValue = selectedDate.toISOString()
@@ -184,63 +183,76 @@ const TimeSelection = (props: TimeSelectionProps) => {
           withRunningValue={true}
           interaction={undefined}
           dataTestid={dataTestId}
-          dateIsDisabled={dateIsDisabled} />
+          dateIsDisabled={dateIsDisabled}
+        />
       </DateInputContainer>
     )
   }
   const ReadOnlyDateWithCaption = ({
     dateValue,
     caption,
-    dataTestId
+    dataTestId,
   }: {
-    dateValue: OptionalDate,
-    caption: string,
+    dateValue: OptionalDate
+    caption: string
     dataTestId: string
   }) => {
     return (
       <LabeledComponent label={I18n.t('Start Date')}>
         <DateInputContainer caption={caption}>
-          <View display='inline-block' height='2.406rem' padding="x-small 0 0 x-small">
-            <Text data-testid={dataTestId}>{formatDate(moment.tz(dateValue, coursePaceTimezone).toDate())}</Text>
+          <View display="inline-block" height="2.406rem" padding="x-small 0 0 x-small">
+            <Text data-testid={dataTestId}>
+              {formatDate(moment.tz(dateValue, coursePaceTimezone).toDate())}
+            </Text>
           </View>
         </DateInputContainer>
       </LabeledComponent>
     )
   }
 
-  const LabeledComponent = ({ label, children }: { label: string, children: React.ReactNode }) => {
+  const LabeledComponent = ({label, children}: {label: string; children: React.ReactNode}) => {
     return (
       <Flex direction="column">
         <Flex.Item>
           <Text weight="bold">{label}</Text>
         </Flex.Item>
-        <Flex gap="small" direction={responsiveSize === "small" ? "column" : "row"} padding="x-small 0 0 0">
+        <Flex
+          gap="small"
+          direction={responsiveSize === 'small' ? 'column' : 'row'}
+          padding="x-small 0 0 0"
+        >
           {children}
         </Flex>
       </Flex>
     )
   }
 
-  const DateInputContainer = ({ children, caption }: { children: React.ReactNode, caption: string }) => {
+  const DateInputContainer = ({
+    children,
+    caption,
+  }: {children: React.ReactNode; caption: string}) => {
     return (
       <Flex.Item width={dateColumnWidth} padding="xxx-small 0 0 0">
         {children}
         <View margin="small 0 0 0" display="inline-block">
-          <div style={{ whiteSpace: 'nowrap' }}>
-            <Text size='small'>{caption}</Text>
-          </div>
+          <Text size="small">{caption}</Text>
         </View>
       </Flex.Item>
     )
   }
 
-  const NumberInputWithLabel = ({ value, label, renderLabel, unit, dataTestId }: NumberInputWithLabelProps) => {
+  const NumberInputWithLabel = ({
+    value,
+    label,
+    renderLabel,
+    unit,
+    dataTestId,
+  }: NumberInputWithLabelProps) => {
     const updateEndDate = (operation: 'add' | 'subtract') => {
-      if (!Number.isInteger(value) || value <= 0 && operation === 'subtract') return
+      if (!Number.isInteger(value) || (value <= 0 && operation === 'subtract')) return
 
-      const newEndDate = (operation === 'add')
-        ? moment(endDate).add(1, unit)
-        : moment(endDate).subtract(1, unit)
+      const newEndDate =
+        operation === 'add' ? moment(endDate).add(1, unit) : moment(endDate).subtract(1, unit)
 
       setEndDate(newEndDate.toISOString(true))
       setTimeToComplete(coursePace.start_date, newEndDate.toISOString(true))
@@ -259,7 +271,7 @@ const TimeSelection = (props: TimeSelectionProps) => {
         <NumberInput
           renderLabel={renderLabel}
           display={'inline-block'}
-          width={responsiveSize === "small" ? "14.313rem" : "5.313rem"}
+          width={responsiveSize === 'small' ? '14.313rem' : '5.313rem'}
           onIncrement={onIncrement}
           onDecrement={onDecrement}
           placeholder={label}
@@ -279,16 +291,16 @@ const TimeSelection = (props: TimeSelectionProps) => {
       <Flex
         data-testid="time-selection-section"
         gap={GAP_WIDTH}
-        direction={responsiveSize === "small" ? "column" : "row"}
+        direction={responsiveSize === 'small' ? 'column' : 'row'}
         margin="0 0 medium"
         padding="x-small 0 0 xx-small"
-        alignItems="start">
-
+        alignItems="start"
+      >
         {enrollmentType ? (
           <ReadOnlyDateWithCaption
             dateValue={coursePace.start_date}
             caption={captions.startDate}
-            dataTestId='start-date-readonly'
+            dataTestId="start-date-readonly"
           />
         ) : (
           <DateInputWithCaption
@@ -297,7 +309,7 @@ const TimeSelection = (props: TimeSelectionProps) => {
             onChangeDate={onChangeStartDate}
             caption={captions.startDate}
             renderLabel={I18n.t('Start Date')}
-            dataTestId='start-date-input'
+            dataTestId="start-date-input"
             dateIsDisabled={(date: moment.Moment) =>
               Boolean(endDate && date.toISOString() > endDate)
             }
@@ -319,15 +331,17 @@ const TimeSelection = (props: TimeSelectionProps) => {
             <NumberInputWithLabel
               value={weeks}
               label="Weeks"
-              renderLabel=''
-              unit='weeks'
-              dataTestId='weeks-number-input' />
+              renderLabel=""
+              unit="weeks"
+              dataTestId="weeks-number-input"
+            />
             <NumberInputWithLabel
               value={days}
               label="Days"
-              renderLabel=''
-              unit='days'
-              dataTestId='days-number-input' />
+              renderLabel=""
+              unit="days"
+              dataTestId="days-number-input"
+            />
           </LabeledComponent>
         </Flex.Item>
       </Flex>
