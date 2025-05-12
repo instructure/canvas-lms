@@ -69,7 +69,6 @@ class DeveloperKey < ActiveRecord::Base
   after_save :clear_cache
   after_update :invalidate_access_tokens_if_scopes_removed!
   after_update :destroy_external_tools!, if: :destroy_external_tools?
-  before_destroy :destroy_registration!
 
   validates :client_type, inclusion: { in: [PUBLIC_CLIENT_TYPE, CONFIDENTIAL_CLIENT_TYPE] }
   validates_as_url :redirect_uri, :oidc_initiation_url, :public_jwk_url, allowed_schemes: nil
@@ -117,8 +116,20 @@ class DeveloperKey < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
+    return true if deleted?
+
     self.workflow_state = "deleted"
-    run_callbacks(:destroy) { save }
+    # You might wonder why we aren't using lifecycle callbacks here.
+    # The answer is that if we do, Rails will also try to destroy the IMS Registration.
+    # However, Lti::IMS::Registration includes Canvas::SoftDeletable,
+    # which means that `destroy` only sets the workflow_state to deleted. Rails will then
+    # go "Hey, I called destroy but you didn't get actually get deleted from the database! Abort!"
+    # and then we'll be left in a weird state where the developer key doesn't get "destroyed",
+    # but the IMS Registration does.
+    # Thus, we must do it manually.
+    destroy_registration!
+    developer_key_account_bindings.each(&:destroy)
+    save!
   end
 
   def confidential_client?
