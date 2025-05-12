@@ -144,13 +144,13 @@ describe "Differentiation Tag Management" do
           it "Stops displaying differentiation tag UI if the setting is turned off" do
             expect(f("body")).to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
             expect(f("body")).to contain_jqcss("button[data-testid='user-diff-tag-manager-tag-as-button']")
-            expect(f("body")).to contain_jqcss("a[aria-label='View user tags']")
+            expect(f("body")).to contain_jqcss("a[aria-label^='View '][aria-label$=' user tags']")
             @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
             @course.account.save!
             refresh_page
             expect(f("body")).not_to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
             expect(f("body")).not_to contain_jqcss("button[data-testid='user-diff-tag-manager-tag-as-button']")
-            expect(f("body")).not_to contain_jqcss("a[aria-label='View user tags']")
+            expect(f("body")).not_to contain_jqcss("a[aria-label^='View '][aria-label$=' user tags']")
           end
 
           it "properly handles paginated users" do
@@ -437,7 +437,7 @@ describe "Differentiation Tag Management" do
           expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_2.name}')").text).to include("0 students")
 
           # remove the user from the tag
-          f("a[aria-label='View user tags']").click
+          f("a[aria-label='View #{@student.name} user tags']").click
           wait_for_ajaximations
           f("button[data-testid='user-tag-#{@multiple_tags_1.id}']").click
           wait_for_ajaximations
