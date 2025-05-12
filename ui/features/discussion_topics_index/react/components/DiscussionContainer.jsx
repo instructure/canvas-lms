@@ -208,8 +208,18 @@ export class DiscussionsContainer extends Component {
   }
 
   render() {
+    const titleKebab = this.props.title.toLowerCase().replace(/\s+/g, '-')
+
     return this.props.connectDropTarget(
-      <div className="discussions-container__wrapper">
+      <div
+        className="discussions-container__wrapper"
+        data-testid={`discussions-container-${titleKebab}`}
+        data-action-state={
+          this.state.expanded
+            ? `discussions-container-${titleKebab}-expanded`
+            : `discussions-container-${titleKebab}-collapsed`
+        }
+      >
         <span ref={this.wrapperToggleRef}>
           <ScreenReaderContent>
             <Heading level="h2">{this.props.title}</Heading>

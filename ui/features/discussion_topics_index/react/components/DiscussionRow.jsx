@@ -418,7 +418,14 @@ class DiscussionRow extends Component {
 
   subscribeButton = () =>
     !this.isInaccessibleDueToAnonymity() && (
-      <span className="subscribe-button" key={`Subscribe_${this.props.discussion.id}`}>
+      <span
+        className="subscribe-button"
+        key={`Subscribe_${this.props.discussion.id}`}
+        data-testid="discussion-subscribe"
+        data-action-state={
+          this.props.discussion.subscribed ? 'unsubscribeButton' : 'subscribeButton'
+        }
+      >
         <ToggleButton
           size="small"
           status={this.props.discussion.subscribed ? 'pressed' : 'unpressed'}
@@ -452,7 +459,12 @@ class DiscussionRow extends Component {
 
   publishButton = () =>
     this.props.canPublish && !this.isInaccessibleDueToAnonymity() ? (
-      <span className="publish-button" key={`Publish_${this.props.discussion.id}`}>
+      <span
+        className="publish-button"
+        key={`Publish_${this.props.discussion.id}`}
+        data-testid="discussion-publish"
+        data-action-state={this.props.discussion.published ? 'unpublishButton' : 'publishButton'}
+      >
         <ToggleButton
           size="small"
           status={this.props.discussion.published ? 'pressed' : 'unpressed'}
@@ -517,11 +529,12 @@ class DiscussionRow extends Component {
     }
   }
 
-  createMenuItem = (itemKey, visibleItemLabel, screenReaderContent) => (
+  createMenuItem = (itemKey, visibleItemLabel, screenReaderContent, dataActionState) => (
     <Menu.Item
       key={itemKey}
       value={{action: itemKey, id: this.props.discussion.id}}
       id={`${itemKey}-discussion-menu-option`}
+      data-action-state={dataActionState}
     >
       {visibleItemLabel}
       <ScreenReaderContent>{screenReaderContent}</ScreenReaderContent>
@@ -586,6 +599,7 @@ class DiscussionRow extends Component {
             {icon}&nbsp;&nbsp;{menuLabel}{' '}
           </span>,
           screenReaderContent,
+          this.props.discussion.locked ? 'unlockButton' : 'lockButton',
         ),
       )
     }
@@ -611,7 +625,12 @@ class DiscussionRow extends Component {
         ? I18n.t('Unpin discussion %{title}', {title: discussionTitle})
         : I18n.t('Pin discussion %{title}', {title: discussionTitle})
       menuList.push(
-        this.createMenuItem('togglepinned', this.pinMenuItemDisplay(), screenReaderContent),
+        this.createMenuItem(
+          'togglepinned',
+          this.pinMenuItemDisplay(),
+          screenReaderContent,
+          this.props.discussion.pinned ? 'unpinButton' : 'pinButton',
+        ),
       )
     }
 
