@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DEFAULT_PAGE_SIZE} from '../ModuleItemsLazyLoader'
+import {DEFAULT_PAGE_SIZE} from '../types'
 import {
   addShowAllOrLess,
   shouldShowAllOrLess,

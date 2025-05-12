@@ -32,10 +32,6 @@ import {
 } from '../jquery/utils'
 import RelockModulesDialog from '@canvas/relock-modules-dialog'
 
-export function moduleFromId(moduleId: string | number): HTMLElement {
-  return document.querySelector(`#context_module_${moduleId}`) as HTMLElement
-}
-
 export function addModuleElement(
   data: Record<string, any>,
   $module: JQuery,

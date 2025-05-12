@@ -22,10 +22,9 @@ import {FetchError} from './FetchError'
 import {ModuleItemPaging, type PaginationData} from './ModuleItemPaging'
 import {ModuleItemLoadingData} from './ModuleItemLoadingData'
 import {ModuleItemsStore} from './ModuleItemsStore'
-import {moduleFromId} from './moduleHelpers'
-import {type ModuleId} from './types'
+import {moduleFromId} from './showAllOrLess'
+import {DEFAULT_PAGE_SIZE, type ModuleId} from './types'
 
-const DEFAULT_PAGE_SIZE = 10
 const BATCH_SIZE = 6
 
 type ModuleItems = string
