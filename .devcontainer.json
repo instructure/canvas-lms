@@ -11,7 +11,8 @@
         "koichisasada.vscode-rdbg",
         "ms-azuretools.vscode-docker",
         "redhat.vscode-yaml",
-        "Shopify.ruby-lsp"
+        "Shopify.ruby-lsp",
+        "eamodio.gitlens"
       ]
     }
   }
