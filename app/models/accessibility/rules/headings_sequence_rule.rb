@@ -120,6 +120,14 @@ module Accessibility
         true
       end
 
+      def self.form(_elem)
+        Accessibility::Forms::DropdownField.new(
+          label: "Merge links",
+          value: "Leave as is",
+          options: ["Leave as is", "Fix heading hierarchy", "Remove heading style"]
+        )
+      end
+
       def self.message
         "Headings should not skip levels."
       end

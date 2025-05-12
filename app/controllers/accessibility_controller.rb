@@ -40,6 +40,55 @@ class AccessibilityController < ApplicationController
     render json: create_accessibility_issues
   end
 
+  def update
+    return unless allowed?
+
+    content = request.body.read
+    content_data = JSON.parse(content)
+
+    unless Accessibility::Rule.registry.key?(content_data["rule"])
+      render json: {
+               error: "Invalid rule identifier '#{content_data["rule"]}', should be one of #{Accessibility::Rule.registry.keys}"
+             },
+             status: :bad_request and return
+    end
+
+    rule = Accessibility::Rule.registry[content_data["rule"]]
+
+    case content_data["content_type"]
+    when "Page"
+      wiki_page = @context.wiki_pages.find_by(id: content_data["content_id"])
+      unless wiki_page
+        render json: {
+                 error: "Wiki page #{content_data["content_id"]} not found"
+               },
+               status: :not_found and return
+      end
+
+      wiki_page.body = AccessibilityControllerHelper.fix_content(
+        wiki_page.body, rule, content_data["path"], content_data["value"]
+      )
+      wiki_page.save!
+    when "Assignment"
+      assignment = @context.assignments.find_by(id: content_data["content_id"])
+      unless assignment
+        render json: {
+                 error: "Assignment #{content_data["content_id"]} not found"
+               },
+               status: :not_found and return
+      end
+
+      assignment.description = AccessibilityControllerHelper.fix_content(
+        assignment.body, rule, content_data["path"], content_data["value"]
+      )
+      assignment.save!
+    else
+      render json: { error: "Invalid content type" }, status: :unprocessable_entity and return
+    end
+
+    render json: { success: true }
+  end
+
   def create_accessibility_issues(rules = Accessibility::Rule.registry)
     course_pages = @context.wiki_pages.not_deleted.order(updated_at: :desc)
     course_assignments = @context.assignments.active.order(updated_at: :desc)

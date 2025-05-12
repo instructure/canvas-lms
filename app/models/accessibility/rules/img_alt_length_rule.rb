@@ -47,6 +47,13 @@ module Accessibility
       def self.link_text
         "Learn more about writing effective alt text for images"
       end
+
+      def self.form(elem)
+        Accessibility::Forms::TextInputField.new(
+          label: "Change alt text",
+          value: elem.get_attribute("alt") || ""
+        )
+      end
     end
   end
 end

@@ -531,6 +531,7 @@ CanvasRails::Application.routes.draw do
     post "canvas_career_reversion" => "horizon#revert_course"
     get "accessibility", controller: :accessibility, action: :show
     get "accessibility/issues", controller: :accessibility, action: :issues
+    post "accessibility/update", controller: :accessibility, action: :update
   end
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
 
