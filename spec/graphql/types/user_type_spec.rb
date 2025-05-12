@@ -327,7 +327,9 @@ describe Types::UserType do
           }
         }')
       end
-      expect(error.message).to eq('[{"message"=>"orderBy is not included in the list", "locations"=>[{"line"=>4, "column"=>7}], "path"=>["node", "enrollments"]}]')
+
+      separator = (RUBY_VERSION >= "3.4.0") ? " => " : "=>"
+      expect(error.message).to eq(%([{"message"#{separator}"orderBy is not included in the list", "locations"#{separator}[{"line"#{separator}4, "column"#{separator}7}], "path"#{separator}["node", "enrollments"]}]))
     end
 
     context "sort" do
