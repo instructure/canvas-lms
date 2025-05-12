@@ -169,6 +169,7 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
       trigger={
         <IconButton
           screenReaderLabel={I18n.t('Module Options')}
+          data-testid={`module-action-menu_${id}`}
           renderIcon={IconMoreLine}
           withBackground={false}
           withBorder={false}
