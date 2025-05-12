@@ -26,16 +26,24 @@ module Factories
     shared_secret: "secret"
   }.freeze
 
-  def external_tool_model(context: nil, opts: {})
+  def external_tool_model(context: nil, opts: {}, placements: nil)
     context ||= course_model
-    context.context_external_tools.create(
+
+    tool = context.context_external_tools.create(
       BASE_ATTRS.merge(opts)
     )
+
+    if placements.present?
+      placements.each { |plac| tool.settings[plac] = { "enabled" => true } }
+      tool.save!
+    end
+
+    tool
   end
 
-  def external_tool_1_3_model(context: nil, opts: {}, developer_key: nil)
+  def external_tool_1_3_model(context: nil, opts: {}, developer_key: nil, placements: nil)
     developer_key ||= DeveloperKey.create!
     opts = { developer_key_id: developer_key.id, lti_version: "1.3", url: "https://example.com/1_3/launch", domain: "example.com" }.merge(opts)
-    external_tool_model(context:, opts:)
+    external_tool_model(context:, opts:, placements:)
   end
 end

@@ -1281,7 +1281,7 @@ module Api::V1::Assignment
       add_or_remove_asset_processors(assignment, assignment_params)
     elsif asset_processor_capable?(submission_types: assignment.submission_types_array)
       # Remove APs if the assignment is no longer capable.
-      assignment.lti_asset_processors.active.destroy_all
+      assignment.lti_asset_processors.destroy_all
     end
   end
 
@@ -1290,7 +1290,7 @@ module Api::V1::Assignment
     existing_ids_to_keep = asset_processors.filter_map { |ap| ap["existing_id"] }
     content_items_to_create = asset_processors.filter_map { |ap| ap["new_content_item"] }
 
-    assignment.lti_asset_processors.active.where.not(id: existing_ids_to_keep).destroy_all
+    assignment.lti_asset_processors.where.not(id: existing_ids_to_keep).destroy_all
     assignment.lti_asset_processors += content_items_to_create.filter_map do |content_item|
       Lti::AssetProcessor.build_for_assignment(content_item:, context: assignment.context)
     end

@@ -30,7 +30,7 @@ module Factories
       report: { released: false, indicator: true, url: "https://example.com/my_special_target_uri", custom: {} },
     }.with_indifferent_access.merge(overrides)
     props[:context_external_tool] ||=
-      props.delete(:tool) || external_tool_1_3_model(context: external_tool_context)
+      props.delete(:tool) || external_tool_1_3_model(context: external_tool_context, placements: ["ActivityAssetProcessor"])
     props[:assignment] ||= assignment_model(assingment_opts)
     props[:url] ||= props[:context_external_tool].url
     Lti::AssetProcessor.create!(**props)
@@ -52,7 +52,7 @@ module Factories
     props[:asset] ||=
       props.delete(:lti_asset_id)&.then { Lti::Asset.find(_1) } ||
       lti_asset_model(
-        submission: submission_model(
+        submission: props.delete(:submission) || submission_model(
           user: props[:user],
           assignment: props[:asset_processor].assignment
         )
