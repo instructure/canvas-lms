@@ -70,7 +70,7 @@ pipeline {
 
           extendedStage('Runner').hooks(postRunnerHandler).obeysAllowStages(false).execute {
             def runnerStages = [:]
-            def maxRandomizedJestShards = 5 // increased as tests become more stable
+            def maxRandomizedJestShards = 8 // increased as tests become more stable
 
             for (int i = 0; i < maxRandomizedJestShards; i++) {
               String index = i
