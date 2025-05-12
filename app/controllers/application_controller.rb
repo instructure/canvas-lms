@@ -280,7 +280,6 @@ class ApplicationController < ActionController::Base
             can_add_pronouns: @domain_root_account&.can_add_pronouns?,
             show_sections_in_course_tray: @domain_root_account&.show_sections_in_course_tray?
           },
-          INIT_DRAWER_LAYOUT_MUTEX: "init-drawer-layout",
           RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session)
