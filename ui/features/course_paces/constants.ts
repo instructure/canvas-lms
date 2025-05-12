@@ -35,9 +35,15 @@ export const WEEK_DAYS_VALUES = WORK_WEEK_DAYS_MENU_OPTIONS.slice(0, 5).map(({va
 export const START_DATE_CAPTIONS = {
   enrollment: I18n.t('Student enrollment date'),
   enrollment_time_selection: I18n.t('Determined by student enrollment date'),
-  course: I18n.t('Determined by course start date'),
-  section: I18n.t('Determined by section start date'),
-  empty: I18n.t("Determined by today's date"),
+  course: I18n.t(
+    'Determined by course start date. Changing this date will not save, but you can view the effects of a new start date by changing the date here.',
+  ),
+  section: I18n.t(
+    'Determined by section start date. Changing this date will not save, but you can view the effects of a new start date by changing the date here.',
+  ),
+  empty: I18n.t(
+    "Determined by today's date. Changing this date will not save, but you can view the effects of a new start date by changing the date here.",
+  ),
 }
 
 export const END_DATE_CAPTIONS = {
