@@ -207,15 +207,54 @@ describe('ContentTabs', () => {
 
     it('renders the file preview tab when the submission is submitted', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_upload']},
+        Assignment: {
+          submissionTypes: ['online_upload'],
+          courseId: '1',
+        },
         Submission: {
           ...SubmissionMocks.submitted,
-          attachments: [{}],
+          attachments: [
+            {
+              displayName: 'test.jpg',
+              submissionPreviewUrl: 'http://example.com/preview',
+              mimeClass: 'image',
+              _id: '1',
+              id: '1',
+            },
+          ],
         },
       })
       props.submitButtonRef = createSubmitButtonRef()
 
-      const {findByTestId} = render(<AttemptTab {...props} focusAttemptOnInit={false} />)
+      const mocks = [
+        {
+          request: {
+            query: EXTERNAL_TOOLS_QUERY,
+            variables: {courseID: '1'},
+          },
+          result: {
+            data: {
+              course: {
+                externalToolsConnection: {
+                  nodes: [],
+                },
+              },
+            },
+          },
+        },
+      ]
+
+      const {findByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <AttemptTab {...props} focusAttemptOnInit={false} />
+        </MockedProvider>,
+      )
+
+      // First wait for the loading spinner to appear
+      const spinner = await findByTestId('attempt-tab')
+      expect(spinner).toBeInTheDocument()
+
+      // Then wait for the preview to appear
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
     })
 
@@ -276,7 +315,11 @@ describe('ContentTabs', () => {
       // This gets the lazy loaded components loaded before our specs.
       // otherwise, the first one (at least) will fail.
       const {unmount} = render(
-        <TextEntry focusOnInit={false} submission={{id: '1', _id: '1', state: 'unsubmitted'}} submitButtonRef={submitButtonRef} />,
+        <TextEntry
+          focusOnInit={false}
+          submission={{id: '1', _id: '1', state: 'unsubmitted'}}
+          submitButtonRef={submitButtonRef}
+        />,
       )
       await waitFor(() => {
         expect(tinymce.get('textentry_text')).toBeDefined()

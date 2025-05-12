@@ -95,6 +95,10 @@ const mockStore = new ModuleItemsStore(courseId, accountId, userId)
 describe('fetchModuleItems utility', () => {
   beforeEach(() => {
     itemsCallback = jest.fn()
+    // Reset the store to ensure page numbers are cleared before each test
+    Object.keys(modules).forEach((moduleId: string) => {
+      mockStore.removePageNumber(moduleId)
+    })
     moduleItemsLazyLoader = new ModuleItemsLazyLoader(courseId, itemsCallback, mockStore, pageSize)
 
     document.body.innerHTML = ''

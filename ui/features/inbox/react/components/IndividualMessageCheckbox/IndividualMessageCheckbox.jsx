@@ -33,16 +33,16 @@ export const IndividualMessageCheckbox = ({checked, checkedAndDisabled, ...props
       props={{
         mobile: {
           variant: 'toggle',
-          dataTestId: 'individual-message-checkbox-mobile',
+          'data-testid': 'individual-message-checkbox-mobile',
         },
         desktop: {
           variant: 'simple',
-          dataTestId: 'individual-message-checkbox',
+          'data-testid': 'individual-message-checkbox',
         },
       }}
       render={responsiveProps => (
         <Checkbox
-          data-testid={responsiveProps.dataTestId}
+          data-testid={responsiveProps['data-testid']}
           label={I18n.t('Send an individual message to each recipient')}
           variant={responsiveProps.variant}
           {...props}

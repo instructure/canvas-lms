@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import stubEnv from '@canvas/stub-env'
 import User from '@canvas/users/backbone/models/User'
@@ -126,6 +126,11 @@ describe('NewStudentGroupModal', () => {
       target: {value: 'name'},
     })
     fireEvent.click(getByRole('combobox', {name: 'Invite Students'}))
+    // Wait for loading state to finish
+    await waitFor(() => {
+      expect(screen.queryByRole('option', {name: 'Loading'})).not.toBeInTheDocument()
+    })
+    // Now click the student option
     fireEvent.click(getByRole('option', {name: 'Student'}))
     fireEvent.click(getByText('Submit'))
     const [, fetchOptions] = fetchMock.lastCall()

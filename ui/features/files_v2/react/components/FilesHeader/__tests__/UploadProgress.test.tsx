@@ -27,9 +27,13 @@ function makeUploader(name: string) {
   return uploader
 }
 
-const defaultProps = {
-  uploader: makeUploader('foo.txt'),
-}
+let defaultProps: {uploader: ReturnType<typeof makeUploader>}
+
+beforeEach(() => {
+  defaultProps = {
+    uploader: makeUploader('foo.txt'),
+  }
+})
 
 const renderComponent = (props = {}) => {
   return render(<UploadProgress {...defaultProps} {...props} />)
@@ -41,7 +45,10 @@ describe('UploadProgress', () => {
       renderComponent()
       const progressBar = document.body.querySelector('progress')
       expect(progressBar).toHaveAttribute('value', '50')
-      expect(progressBar).toHaveAttribute('aria-valuetext', 'foo.txt - 50 percent uploaded 50 / 100')
+      expect(progressBar).toHaveAttribute(
+        'aria-valuetext',
+        'foo.txt - 50 percent uploaded 50 / 100',
+      )
     })
 
     it('with success message', () => {
@@ -49,7 +56,10 @@ describe('UploadProgress', () => {
       renderComponent()
       const progressBar = document.body.querySelector('progress')
       expect(progressBar).toHaveAttribute('value', '100')
-      expect(progressBar).toHaveAttribute('aria-valuetext', 'foo.txt uploaded successfully! 100 / 100')
+      expect(progressBar).toHaveAttribute(
+        'aria-valuetext',
+        'foo.txt uploaded successfully! 100 / 100',
+      )
     })
 
     it('with error message', () => {

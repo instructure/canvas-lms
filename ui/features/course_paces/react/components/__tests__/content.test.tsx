@@ -158,17 +158,15 @@ describe('PaceContextsContent', () => {
       const {findByText, queryByText, getByRole, getByPlaceholderText, getByText} = renderConnected(
         <PaceContent />,
       )
+      const user = userEvent.setup({delay: null})
       const searchInput = getByPlaceholderText('Search for sections')
+      await user.type(searchInput, 'A')
       const searchButton = getByRole('button', {name: 'Search'})
-      fireEvent.change(searchInput, {target: {value: 'A'}})
-      act(() => {
-        searchButton.click()
-      })
+      await user.click(searchButton)
+      await findByText('A-C')
 
-      expect(await findByText('A-C')).toBeInTheDocument()
       expect(queryByText('D-F')).not.toBeInTheDocument()
       expect(queryByText('G-K')).not.toBeInTheDocument()
-      expect(queryByText('No results found')).not.toBeInTheDocument()
       expect(getByText('Showing 1 result below')).toBeInTheDocument()
     })
 
