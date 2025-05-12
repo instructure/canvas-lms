@@ -18,12 +18,15 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Button} from '@instructure/ui-buttons'
 import {IconUploadLine} from '@instructure/ui-icons'
 import CreateFolderButton from './CreateFolderButton'
 import ExternalToolsButton from './ExternalToolsButton'
 import UploadButton from './UploadButton'
-import { Flex } from '@instructure/ui-flex'
+import {Flex} from '@instructure/ui-flex'
+import {reloadWindow} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('files_v2')
 interface TopLevelButtonsProps {
@@ -55,11 +58,7 @@ const TopLevelButtons = ({
     if (shouldHideUploadButtons) return null
 
     return (
-      <UploadButton
-        color="primary"
-        renderIcon={<IconUploadLine />}
-        display={buttonDisplay}
-      >
+      <UploadButton color="primary" renderIcon={<IconUploadLine />} display={buttonDisplay}>
         {I18n.t('Upload')}
       </UploadButton>
     )
@@ -76,19 +75,44 @@ const TopLevelButtons = ({
     )
   }
 
+  const handleSwitchToOldFiles = async () => {
+    doFetchApi({
+      method: 'PUT',
+      path: `/api/v1/users/self/files_ui_version_preference`,
+      body: {files_ui_version: 'v1'},
+    })
+      .then(() => {
+        reloadWindow()
+      })
+      .catch(_ => {
+        showFlashError(I18n.t('Error switching to Old Files Page.'))()
+      })
+  }
+
+  const switchUIButton = () => {
+    if (!ENV.FEATURES?.files_a11y_rewrite_toggle) return null
+    return (
+      <Button color="secondary" display={buttonDisplay} onClick={handleSwitchToOldFiles}>
+        {I18n.t('Switch to Old Files Page')}
+      </Button>
+    )
+  }
+
   if (size === 'small') {
     return (
-      <Flex as='div' gap='small' direction='column'>
+      <Flex as="div" gap="small" direction="column">
         {uploadButton()}
         {createFolderButton()}
         {allMyFilesButton()}
         {externalToolsButton()}
+        {switchUIButton()}
       </Flex>
     )
   }
 
   return (
-    <Flex as='div' gap='small'>
+    <Flex as="div" gap="small">
+      {switchUIButton()}
       {externalToolsButton()}
       {allMyFilesButton()}
       {createFolderButton()}
