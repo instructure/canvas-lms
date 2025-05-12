@@ -95,7 +95,21 @@ module.exports = {
     '^.+\\.(j|t)sx?$': [
       '@swc/jest',
       {
-        jsc: swc[1].use.options.jsc,
+        jsc: {
+          ...swc[1].use.options.jsc,
+          transform: {
+            ...swc[1].use.options.jsc.transform,
+            react: {
+              ...swc[1].use.options.jsc.transform.react,
+              runtime: 'automatic',
+              // These are `process.env.NODE_ENV === 'development'` in the webpack config
+              // but Jest doesn't set that env var until after this file is loaded, so
+              // we need to set it manually here.
+              development: false,
+              refresh: false,
+            },
+          },
+        },
       },
     ],
   },
