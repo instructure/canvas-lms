@@ -40,6 +40,18 @@ interface Props {
   onRender: () => void
 }
 
+const getParameterName = (name: string) => {
+  const match = name.match(/parameters\[(.*)\]/)
+  if (match) {
+    return match[1]
+  }
+  return name
+}
+
+const wrapParameterName = (name: string) => {
+  return `parameters[${name}]`
+}
+
 const getElementValue = (element: Element) => {
   let value
   const type = element.getAttribute('type')
@@ -77,39 +89,43 @@ const getFormData = (form: HTMLDivElement) => {
 export default function ConfigureReportForm(props: Props) {
   const formRef = useRef<HTMLDivElement | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [startRef, setStartRef] = useState<HTMLElement | null>(null)
-  const [endRef, setEndRef] = useState<HTMLElement | null>(null)
-  const [startAt, setStartAt] = useState<string>()
-  const [endAt, setEndAt] = useState<string>()
+  const [dateRefs, setDateRefs] = useState<Record<string, [string, HTMLElement]>>({})
+  const [dateValues, setDateValues] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    props.onRender()
-    // testing purposes only; don't swap date pickers if in jest
+    // $ is undefined if in jest; skip block when testing
     if (formRef.current && typeof $ !== 'undefined') {
+      props.onRender()
       const $form = $(formRef.current)
+      const record = dateRefs
 
       // Find all datetime inputs and remove the closest <tr>
       $form.find('input.datetime_field').each(function () {
         const closestTd = $(this).closest('td')[0]
+        // delete html content but store label
+        const inputLabel = closestTd.innerText
         closestTd.innerHTML = ''
-        if ($(this).attr('name') === 'parameters[start_at]') {
-          setStartRef(closestTd)
-        } else {
-          setEndRef(closestTd)
-        }
+
+        const name = getParameterName($(this).attr('name') ?? '')
+        record[name] = [inputLabel, closestTd]
       })
+      setDateRefs({...record})
     }
-  }, [])
+    // don't run this effect when dateRefs change; causes looping
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props])
 
   const onSubmit = async () => {
     setIsLoading(true)
     if (formRef.current) {
       const formData = getFormData(formRef.current)
-      if (formData.has('parameters[start_at]')) {
-        formData.set('parameters[start_at]', startAt ?? '')
-      }
-      if (formData.has('parameters[end_at]')) {
-        formData.set('parameters[end_at]', endAt ?? '')
+      if (dateRefs != null) {
+        Object.entries(dateRefs).forEach(pair => {
+          const dateKey = wrapParameterName(pair[0])
+          if (pair[0]) {
+            formData.set(dateKey, dateValues[pair[0]] ?? '')
+          }
+        })
       }
       try {
         await doFetchApi({
@@ -142,38 +158,36 @@ export default function ConfigureReportForm(props: Props) {
           ref={formRef}
           dangerouslySetInnerHTML={{__html: props.formHTML}}
         ></div>
-        <Portal open mountNode={startRef}>
-          <DateTimeInput
-            layout="columns"
-            dateInputRef={dateInputRef => {
-              dateInputRef?.setAttribute('data-testid', 'parameters[start_at]')
-            }}
-            onChange={(_, isoValue) => setStartAt(isoValue)}
-            description={<ScreenReaderContent>{I18n.t('Start at')}</ScreenReaderContent>}
-            dateRenderLabel={I18n.t('Start Date')}
-            prevMonthLabel={I18n.t('Previous month')}
-            nextMonthLabel={I18n.t('Next month')}
-            timeRenderLabel={I18n.t('Time')}
-            invalidDateTimeMessage={I18n.t('Invalid date and time.')}
-          />
-          <br />
-        </Portal>
-        <Portal open mountNode={endRef}>
-          <DateTimeInput
-            layout="columns"
-            dateInputRef={dateInputRef => {
-              dateInputRef?.setAttribute('data-testid', 'parameters[end_at]')
-            }}
-            onChange={(_, isoValue) => setEndAt(isoValue)}
-            description={<ScreenReaderContent>{I18n.t('End at')}</ScreenReaderContent>}
-            dateRenderLabel={I18n.t('End Date')}
-            prevMonthLabel={I18n.t('Previous month')}
-            nextMonthLabel={I18n.t('Next month')}
-            timeRenderLabel={I18n.t('Time')}
-            invalidDateTimeMessage={I18n.t('Invalid date and time.')}
-          />
-          <br />
-        </Portal>
+
+        {Object.entries(dateRefs).map(pair => {
+          const dateKey = pair[0]
+          const dateLabel = pair[1][0]
+          const dateNode = pair[1][1]
+          return (
+            <Portal open mountNode={dateNode} key={dateKey}>
+              <DateTimeInput
+                layout="columns"
+                dateInputRef={dateInputRef => {
+                  dateInputRef?.setAttribute('data-testid', wrapParameterName(dateKey))
+                }}
+                onChange={(_, isoValue) => {
+                  const record = dateValues
+                  if (isoValue) {
+                    record[dateKey] = isoValue
+                    setDateValues({...record})
+                  }
+                }}
+                description={<ScreenReaderContent>{dateLabel}</ScreenReaderContent>}
+                dateRenderLabel={dateLabel}
+                prevMonthLabel={I18n.t('Previous month')}
+                nextMonthLabel={I18n.t('Next month')}
+                timeRenderLabel={I18n.t('Time')}
+                invalidDateTimeMessage={I18n.t('Invalid date and time.')}
+              />
+              <br />
+            </Portal>
+          )
+        })}
       </Modal.Body>
     )
   }
