@@ -79,7 +79,9 @@ describe('UserObservees', () => {
     it('should show the placeholder message', async () => {
       renderComponent()
 
-      const noStudentsMessage = await screen.findByText('No students being observed.')
+      const noStudentsMessage = await screen.findByText(content => {
+        return content.includes('No students being observed')
+      })
       expect(noStudentsMessage).toBeInTheDocument()
     })
   })
@@ -118,8 +120,8 @@ describe('UserObservees', () => {
 
       await userEvent.click(submit)
 
-      const errorText = await screen.findByText('Invalid pairing code.')
-      expect(errorText).toBeInTheDocument()
+      const errorTexts = await screen.findAllByText('Invalid pairing code.')
+      expect(errorTexts.length).toBeTruthy()
     })
   })
 

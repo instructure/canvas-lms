@@ -16,14 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {IndividualMessageCheckbox} from '../IndividualMessageCheckbox'
 import {responsiveQuerySizes} from '../../../../util/utils'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
+  responsiveQuerySizes: jest.fn(() => ({
+    mobile: {maxWidth: '67px'},
+    desktop: {minWidth: '768px'},
+  })),
 }))
 
 const setup = props => {
@@ -35,19 +38,18 @@ const setup = props => {
 describe('Button', () => {
   beforeAll(() => {
     // Add appropriate mocks for responsive
-    window.matchMedia = jest.fn().mockImplementation(() => {
-      return {
-        matches: true,
-        media: '',
-        onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-      }
-    })
+    window.matchMedia = jest.fn().mockImplementation(query => ({
+      matches: query.includes('max-width'),
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+    }))
 
     // Repsonsive Query Mock Default
     responsiveQuerySizes.mockImplementation(() => ({
-      mobile: {maxWidth: '750px'},
+      mobile: {maxWidth: '67px'},
+      desktop: {minWidth: '768px'},
     }))
   })
 
@@ -85,9 +87,9 @@ describe('Button', () => {
         title: 'Test Item',
       }
 
-      render(<IndividualMessageCheckbox {...props} />)
+      const {getByTestId} = render(<IndividualMessageCheckbox {...props} />)
 
-      const checkbox = screen.getByTestId('individual-message-checkbox-mobile')
+      const checkbox = getByTestId('individual-message-checkbox-mobile')
       expect(checkbox).toBeChecked()
       expect(checkbox).toBeDisabled()
     })
@@ -99,9 +101,9 @@ describe('Button', () => {
         title: 'Test Item',
       }
 
-      render(<IndividualMessageCheckbox {...props} />)
+      const {getByTestId} = render(<IndividualMessageCheckbox {...props} />)
 
-      const checkbox = screen.getByTestId('individual-message-checkbox-mobile')
+      const checkbox = getByTestId('individual-message-checkbox-mobile')
       expect(checkbox).not.toBeChecked()
       expect(checkbox).not.toBeDisabled()
     })

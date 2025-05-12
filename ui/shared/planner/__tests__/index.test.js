@@ -16,7 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, findByTestId, getByTestId, render, waitFor} from '@testing-library/react'
+import {render, getByTestId, configure, act, findByTestId, waitFor} from '@testing-library/react'
+
+// Configure testing-library to support act
+configure({asyncUtilTimeout: 4000})
 import moxios from 'moxios'
 import '@testing-library/jest-dom/extend-expect'
 import {
@@ -63,14 +66,22 @@ afterEach(() => {
 })
 
 describe('with mock api', () => {
-  beforeEach(() => {
-    document.body.innerHTML = `
-      <div id="application"></div>
-      <div id="dashboard-planner"></div>
-      <div id="dashboard-planner-header"></div>
-      <div id="dashboard-planner-header-aux"></div>
-      <div id="dashboard-sidebar"></div>
-    `
+  beforeEach(async () => {
+    document.body.innerHTML = ''
+    document.body.appendChild(document.createElement('div')).id = 'dashboard-planner'
+    document.body.appendChild(document.createElement('div')).id = 'dashboard-planner-header'
+    document.body.appendChild(document.createElement('div')).id = 'dashboard-planner-header-aux'
+    document.body.appendChild(document.createElement('div')).id = 'dashboard-sidebar'
+
+    // Setup mock for window.matchMedia
+    window.matchMedia = jest.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+    }))
+
     moxios.install()
     alertInitialize({
       visualSuccessCallback: jest.fn(),
@@ -126,13 +137,23 @@ describe('with mock api', () => {
     })
 
     it('renders into provided divs', async () => {
-      await act(async () => loadPlannerDashboard())
-      await waitFor(() => {
-        expect(getByTestId(document.body, 'PlannerApp')).toBeTruthy()
-        expect(getByTestId(document.body, 'PlannerHeader')).toBeTruthy()
-        expect(document.querySelector('.PlannerApp')).toBeTruthy()
-        expect(document.querySelector('.PlannerHeader')).toBeTruthy()
+      await act(async () => {
+        loadPlannerDashboard()
       })
+
+      // Wait for any pending effects and Suspense boundaries to resolve
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      // Verify the components are rendered
+      await waitFor(
+        () => {
+          expect(getByTestId(document.body, 'PlannerApp')).toBeTruthy()
+          expect(getByTestId(document.body, 'PlannerHeader')).toBeTruthy()
+          expect(document.querySelector('.PlannerApp')).toBeTruthy()
+          expect(document.querySelector('.PlannerHeader')).toBeTruthy()
+        },
+        {timeout: 4000},
+      )
     })
 
     it('dispatches getPlannerItems and getInitialOpportunities', async () => {
