@@ -54,10 +54,12 @@ export const AccessibilityCheckerApp: React.FC = () => {
           ]),
         )
       }
-      return input ? input : {}
+      return input !== null && input !== undefined ? input : {}
     }
     doFetchApi({path: window.location.href + '/issues', method: 'GET'})
-      .then(data => setAccessibilityIssues(convertKeysToCamelCase(data.json) as AccessibilityData))
+      .then(data => {
+        setAccessibilityIssues(convertKeysToCamelCase(data.json) as AccessibilityData)
+      })
       .catch(err => {
         setError('Error loading accessibility issues. Error is:' + err.message)
         setAccessibilityIssues(null)
@@ -78,10 +80,9 @@ export const AccessibilityCheckerApp: React.FC = () => {
         Object.entries(accessibilityIssues.pages).forEach(([id, pageData]) => {
           if (pageData) {
             flatData.push({
-              id,
-              type: ContentItemType.Page,
+              id: Number(id),
+              type: ContentItemType.WikiPage,
               title: pageData.title || 'Untitled Page',
-              contentType: 'Page',
               published: pageData.published || false,
               updatedAt: pageData.updatedAt || '',
               count: pageData.count || 0,
@@ -96,10 +97,9 @@ export const AccessibilityCheckerApp: React.FC = () => {
         Object.entries(accessibilityIssues.assignments).forEach(([id, assignmentData]) => {
           if (assignmentData) {
             flatData.push({
-              id,
+              id: Number(id),
               type: ContentItemType.Assignment,
               title: assignmentData.title || 'Untitled Assignment',
-              contentType: 'Assignment',
               published: assignmentData.published || false,
               updatedAt: assignmentData.updatedAt || '',
               count: assignmentData.count || 0,
@@ -117,14 +117,13 @@ export const AccessibilityCheckerApp: React.FC = () => {
   }, [accessibilityIssues])
 
   const handleRowClick = (item: ContentItem) => {
-    const typeKey = item.type === ContentItemType.Page ? 'pages' : 'assignments'
-    const iss = accessibilityIssues?.[typeKey]?.[item.id]
+    const typeKey = item.type === ContentItemType.WikiPage ? 'pages' : 'assignments'
+    const contentItem = accessibilityIssues?.[typeKey]?.[item.id]
       ? structuredClone(accessibilityIssues[typeKey]?.[item.id])
       : undefined
-    console.dir(iss)
     setSelectedItem({
       ...item,
-      issues: iss?.issues || [],
+      issues: contentItem?.issues || [],
     })
     setShowModal(true)
   }
@@ -135,6 +134,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
 
   const closeModal = () => {
     setShowModal(false)
+    window.location.reload()
   }
 
   if (loading)
@@ -239,7 +239,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
                         <Text color="secondary">No issues</Text>
                       )}
                     </Table.Cell>
-                    <Table.Cell>{item.contentType}</Table.Cell>
+                    <Table.Cell>{item.type}</Table.Cell>
                     <Table.Cell>
                       <Flex alignItems="center">
                         {item.published ? (

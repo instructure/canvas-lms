@@ -41,6 +41,14 @@ module Accessibility
       def self.link_text
         "Learn more about table headers"
       end
+
+      def self.form(_elem)
+        Accessibility::Forms::DropdownField.new(
+          label: "Set table header",
+          value: "No headers",
+          options: ["None", "Header row", "Header column", "Header row and column"]
+        )
+      end
     end
   end
 end

@@ -18,27 +18,28 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Accessibility
-  class FormField
-    attr_accessor :label
+  module Forms
+    class CheckboxField < FormField
+      # @param label [String] Human-readable label displayed to the user
+      # @param dom_path [String] Optional DOM path for the element to update
+      # @param value [String] Optional default state for the checkbox
+      # @param original_content [String] Optional original HTML content
+      # @param updated_content [String] Optional updated HTML content
+      def initialize(label:,
+                     value:)
+        super(
+          label:
+        )
+        @value = value
+      end
 
-    # @param label [String] Human-readable label displayed to the user
-    def initialize(label:)
-      @label = label
-    end
+      def field_type
+        "checkbox"
+      end
 
-    def to_json(*options)
-      to_h.to_json(*options)
-    end
-
-    def to_h
-      {
-        type: field_type,
-        label: @label
-      }.compact
-    end
-
-    def field_type
-      raise NotImplementedError, "Subclasses must implement field_type"
+      def to_h
+        super.merge({ value: @value }.compact)
+      end
     end
   end
 end

@@ -80,6 +80,13 @@ module Accessibility
         end
         "#000000"
       end
+
+      def self.form(_elem)
+        Accessibility::Forms::ColorPickerField.new(
+          label: "Change color",
+          value: ""
+        )
+      end
     end
   end
 end

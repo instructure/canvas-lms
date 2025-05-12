@@ -49,6 +49,13 @@ module Accessibility
       def self.link_text
         "Learn more about providing meaningful alt text"
       end
+
+      def self.form(elem)
+        Accessibility::Forms::TextInputField.new(
+          label: "Change alt text",
+          value: elem.get_attribute("alt") || ""
+        )
+      end
     end
   end
 end

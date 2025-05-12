@@ -49,6 +49,13 @@ module Accessibility
           parent.append_child(child)
         end
       end
+
+      def self.form(_elem)
+        Accessibility::Forms::TextInputField.new(
+          label: "Change table caption",
+          value: ""
+        )
+      end
     end
   end
 end

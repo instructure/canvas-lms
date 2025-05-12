@@ -51,6 +51,13 @@ module Accessibility
       def self.link_text
         ""
       end
+
+      def self.form(_elem)
+        Accessibility::Forms::CheckboxField.new(
+          label: "Change heading tag to paragraph",
+          value: "false"
+        )
+      end
     end
   end
 end
