@@ -475,7 +475,7 @@ function DiscussionTopicForm({
   }, [gradingSchemeId, displayGradeAs, pointsPossible, isGraded])
 
   useEffect(() => {
-    if (isCheckpoints) {
+    if (isCheckpoints && !ENV.CHECKPOINTS_GROUP_DISCUSSIONS_ENABLED) {
       setIsGroupDiscussion(false)
       setGroupCategoryId(null)
     }
