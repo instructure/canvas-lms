@@ -308,6 +308,12 @@ describe "Outcome Reports" do
       end
     end
 
+    it "does not include deleted assignment" do
+      @assignment.destroy!
+      expect(report.length).to eq 1
+      expect(report[0][0]).to eq "No outcomes found"
+    end
+
     it "does not include scores when hidden on learning outcome results" do
       lor = user1_values[:outcome_result]
       lor.update!(hide_points: true)
