@@ -28,11 +28,33 @@ function makeUploader(name: string, error?: object) {
   return uploader
 }
 
-jest.mock('@canvas/files/react/modules/UploadQueue', () => ({
-  addChangeListener: jest.fn().mockImplementation(callback => callback()),
-  removeChangeListener: jest.fn(),
-  getAllUploaders: jest.fn().mockImplementation(() => [makeUploader('foo.txt')]),
-}))
+// Mock the UploadQueue module
+jest.mock('@canvas/files/react/modules/UploadQueue')
+
+// Define mock implementation types
+const mockAddChangeListener = jest.fn()
+const mockRemoveChangeListener = jest.fn()
+const mockGetAllUploaders = jest.fn()
+
+// Setup mock implementations
+beforeEach(() => {
+  // Reset all mocks
+  jest.resetAllMocks()
+
+  // Setup default mock implementations
+  mockAddChangeListener.mockImplementation((callback: () => void) => {
+    // Call the callback immediately to trigger state update
+    callback()
+  })
+
+  // Assign mocks to the module
+  UploadQueue.addChangeListener = mockAddChangeListener
+  UploadQueue.removeChangeListener = mockRemoveChangeListener
+  UploadQueue.getAllUploaders = mockGetAllUploaders
+
+  // Default to returning one uploader
+  mockGetAllUploaders.mockReturnValue([makeUploader('foo.txt')])
+})
 
 describe('CurrentUploads', () => {
   it('renders', () => {
@@ -41,16 +63,16 @@ describe('CurrentUploads', () => {
   })
 
   it("doesn't render", () => {
-    UploadQueue.getAllUploaders = jest.fn().mockImplementation(() => [])
+    // Return empty array for this test
+    mockGetAllUploaders.mockReturnValue([])
     render(<CurrentUploads />)
     expect(screen.queryByTestId('current-uploads')).not.toBeInTheDocument()
   })
 
   it('catches file conflicts and shows rename form', () => {
     const error = {response: {status: 409}}
-    UploadQueue.getAllUploaders = jest
-      .fn()
-      .mockImplementation(() => [makeUploader('foo.txt', error)])
+    // Return uploader with error for this test
+    mockGetAllUploaders.mockReturnValue([makeUploader('foo.txt', error)])
     render(<CurrentUploads />)
     expect(screen.getByText('File failed to upload. Please try again.')).toBeInTheDocument()
     expect(screen.getByTestId('rename-replace-button')).toBeInTheDocument()

@@ -46,9 +46,9 @@ describe('Button', () => {
       removeListener: jest.fn(),
     }))
 
-    // Repsonsive Query Mock Default
+    // Responsive Query Mock Default
     responsiveQuerySizes.mockImplementation(() => ({
-      mobile: {maxWidth: '67px'},
+      mobile: {maxWidth: '767px'},
       desktop: {minWidth: '768px'},
     }))
   })
@@ -80,6 +80,22 @@ describe('Button', () => {
   })
 
   describe('checkedAndDisabled prop', () => {
+    beforeEach(() => {
+      // Ensure mobile view for these tests
+      window.matchMedia = jest.fn().mockImplementation(query => ({
+        matches: query.includes('max-width'),
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+      }))
+
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {maxWidth: '767px'},
+        desktop: {minWidth: '768px'},
+      }))
+    })
+
     it('should render checked and disabled checkbox when true', () => {
       const props = {
         checkedAndDisabled: true,
@@ -113,7 +129,7 @@ describe('Button', () => {
     describe('Mobile', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          mobile: {maxWidth: '67'},
+          mobile: {maxWidth: '767px'},
         }))
       })
 
@@ -127,7 +143,7 @@ describe('Button', () => {
     describe('Desktop', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          desktop: {minWidth: '768'},
+          desktop: {minWidth: '768px'},
         }))
       })
 
