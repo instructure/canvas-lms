@@ -5213,10 +5213,10 @@
     tslib "^2.4.1"
     tsyringe "^4.7.0"
 
-"@pendo/agent@^2.274.0":
-  version "2.274.0"
-  resolved "https://registry.yarnpkg.com/@pendo/agent/-/agent-2.274.0.tgz#5fa7039142ba774c42bf127d7a8ee7d30d2c4a5b"
-  integrity sha512-qI5sqSupB8SphGoQ2OQa2N4QD4I+WhvSj1yI41iKx62FVI65Jzt3CLa82iUMMGON/qsSBNUZ8EYqNbP01UUj7A==
+"@pendo/agent@^2.275.1":
+  version "2.275.1"
+  resolved "https://registry.yarnpkg.com/@pendo/agent/-/agent-2.275.1.tgz#4236b518e18230a06dde29d76f8c97c15f621c05"
+  integrity sha512-khgXX65qyeykhL0B+NosZ8wfPZIEdipEKH7m4xJNadrk3aOliiRyS5yjW9y5RH/BMjXgGAGKuMEr9k2dRYKhDA==
   dependencies:
     minimist "^1.2.8"
 
