@@ -22,6 +22,10 @@ module HorizonMode
     @context.is_a?(Course) && @context.horizon_course?
   end
 
+  def horizon_account?
+    @context.is_a?(Account) && @context.horizon_account?
+  end
+
   def horizon_student?
     !(@context.user_is_admin?(@current_user) || @context.cached_account_users_for(@current_user).any?)
   end
@@ -46,9 +50,15 @@ module HorizonMode
   def load_canvas_career_for_provider
     return unless canvas_career_learning_provider_app_enabled?
 
-    session[:career_course_id] = @context.id
+    return if request.path.include?("/career")
 
-    redirect_to "/career"
+    if @context.is_a?(Course)
+      redirect_to course_career_path(course_id: @context.id)
+    elsif @context.is_a?(Account)
+      redirect_to account_career_path(account_id: @context.id)
+    else
+      redirect_to root_path
+    end
   end
 
   # Use this function after @context is set
@@ -68,7 +78,7 @@ module HorizonMode
   end
 
   def canvas_career_learning_provider_app_enabled?
-    return false unless horizon_course?
+    return false unless horizon_course? || horizon_account?
     return false unless horizon_admin?
     return false if canvas_career_learning_provider_app_launch_url.blank?
     return false unless Account.site_admin.feature_enabled?(:horizon_learning_provider_app)
@@ -77,8 +87,6 @@ module HorizonMode
   end
 
   def load_canvas_career_learning_provider_app
-    return unless canvas_career_learning_provider_app_enabled?
-
     remote_env(canvascareer: canvas_career_learning_provider_app_launch_url)
     deferred_js_bundle :canvas_career
   end

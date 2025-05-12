@@ -1111,8 +1111,10 @@ CanvasRails::Application.routes.draw do
   get "privacy_policy" => "legal_information#privacy_policy", :as => "privacy_policy_redirect"
 
   scope(controller: :career) do
-    get "career", action: :catch_all
-    get "career/*path", action: :catch_all, as: :career_path
+    get "courses/:course_id/career", action: :catch_all, as: :course_career
+    get "courses/:course_id/career/*path", action: :catch_all, as: :course_career_path
+    get "accounts/:account_id/career", action: :catch_all, as: :account_career
+    get "accounts/:account_id/career/*path", action: :catch_all, as: :account_career_path
   end
 
   scope(controller: :smart_search) do
