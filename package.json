@@ -166,7 +166,7 @@
     "page": "^1.11",
     "parse-decimal-number": "1.0.0",
     "prop-types": "^15",
-    "punycode": "2.3.1",
+    "punycode2": "1.0.1",
     "qs": "^6.6.0",
     "re-resizable": "6.9.16",
     "react": "^18",
@@ -417,6 +417,7 @@
     "clean": "wsrun --serial --exclude-missing -c clean"
   },
   "resolutions": {
+    "punycode": "npm:punycode2@1.0.1",
     "graphael": "https://github.com/instructure/graphael.git",
     "@instructure/emotion": "10.15.2",
     "@instructure/ui-a11y-content": "10.15.2",

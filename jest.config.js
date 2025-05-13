@@ -60,7 +60,12 @@ module.exports = {
     ],
   ],
   snapshotSerializers: ['enzyme-to-json/serializer'],
-  setupFiles: ['jest-localstorage-mock', 'jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
+  setupFiles: [
+    'jest-localstorage-mock',
+    'jest-canvas-mock',
+    '<rootDir>/jest/jest-setup.js',
+    '<rootDir>/jest/punycodeWarningFilter.js',
+  ],
   setupFilesAfterEnv: setupFilesAfterEnv,
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
 
