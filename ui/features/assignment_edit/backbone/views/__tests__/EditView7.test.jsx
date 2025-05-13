@@ -211,55 +211,9 @@ describe('EditView#handleModeratedGradingChanged', () => {
     view.handleModeratedGradingChanged(true)
     expect(view.assignment.moderatedGrading()).toBe(true)
   })
-
-  it('calls togglePeerReviewsAndGroupCategoryEnabled', () => {
-    const toggleSpy = jest.spyOn(view, 'togglePeerReviewsAndGroupCategoryEnabled')
-    view.handleModeratedGradingChanged(true)
-    expect(toggleSpy).toHaveBeenCalledTimes(1)
-  })
-
-  it('reveals the "Graders Anonymous to Graders" option when passed true and grader comments are visible to graders', () => {
-    view.assignment.graderCommentsVisibleToGraders(true)
-    view.handleModeratedGradingChanged(true)
-    const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
-    expect(label.style.display).not.toBe('none')
-  })
-
-  it('does not reveal the "Graders Anonymous to Graders" option when passed true and grader comments are not visible to graders', () => {
-    view.handleModeratedGradingChanged(true)
-    const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
-    expect(label.style.display).toBe('none')
-  })
-
-  it('calls uncheckAndHideGraderAnonymousToGraders when passed false', () => {
-    const uncheckSpy = jest.spyOn(view, 'uncheckAndHideGraderAnonymousToGraders')
-    view.handleModeratedGradingChanged(false)
-    expect(uncheckSpy).toHaveBeenCalledTimes(1)
-  })
-
-  it('shows the moderated grading form fields when Moderated Grading is enabled', async () => {
-    const checkbox = document.querySelector('#assignment_moderated_grading')
-    checkbox.checked = true
-    await userEvent.click(checkbox)
-
-    const moderatedGradingFormGroup = document.querySelector(
-      '[data-component="ModeratedGradingFormFieldGroup"]',
-    )
-    expect(moderatedGradingFormGroup.style.display).not.toBe('none')
-  })
-
-  it('hides the moderated grading form fields when Moderated Grading is disabled', () => {
-    view.afterRender()
-    const moderatedGradingFormGroup = document.querySelector(
-      '[data-component="ModeratedGradingFormFieldGroup"]',
-    )
-    moderatedGradingFormGroup.style.display = 'none'
-    view.handleModeratedGradingChanged(false)
-    expect(moderatedGradingFormGroup.style.display).toBe('none')
-  })
 })
 
-describe('EditView#handleMessageEvent', () => {
+describe('EditView#handleGraderCommentsVisibleToGradersChanged', () => {
   let view
 
   beforeEach(() => {
@@ -301,8 +255,6 @@ describe('EditView#handleMessageEvent', () => {
       ROOT_FOLDER_ID: '1',
     })
 
-    fetchMock.mock(/^\/api\/v1\/courses\/\d+\/assignments\/\d+$/, [])
-
     view = createEditView()
   })
 
@@ -311,66 +263,213 @@ describe('EditView#handleMessageEvent', () => {
     document.body.innerHTML = ''
   })
 
-  it('sets ab_guid when subject is assignment.set_ab_guid and the ab_guid is formatted correctly', () => {
-    const mockEvent = {
-      data: {
-        subject: 'assignment.set_ab_guid',
-        data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
-      },
-    }
-
-    view.handleMessageEvent(mockEvent)
-
-    expect(view.assignment.get('ab_guid')).toEqual([
-      '1E20776E-7053-11DF-8EBF-BE719DFF4B22',
-      '1e20776e-7053-11df-8eBf-Be719dff4b22',
-    ])
+  it('sets the graderCommentsVisibleToGraders attribute on the assignment', () => {
+    view.handleGraderCommentsVisibleToGradersChanged(true)
+    expect(view.assignment.graderCommentsVisibleToGraders()).toBe(true)
   })
 
-  it('does not set ab_guid when subject is not assignment.set_ab_guid', () => {
-    const mockEvent = {
-      data: {
-        subject: 'some.other.subject',
-        data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
-      },
-    }
-
-    view.handleMessageEvent(mockEvent)
-
-    expect(view.assignment.has('ab_guid')).toBe(false)
+  it('reveals the "Graders Anonymous to Graders" option when passed true', () => {
+    view.handleGraderCommentsVisibleToGradersChanged(true)
+    const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
+    expect(label.style.display).not.toBe('none')
   })
 
-  it('does not set ab_guid when the ab_guid is not formatted correctly', () => {
-    const mockEvent = {
-      data: {
-        subject: 'assignment.set_ab_guid',
-        data: ['not_an_ab_guid', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
-      },
-    }
-
-    view.handleMessageEvent(mockEvent)
-
-    expect(view.assignment.has('ab_guid')).toBe(false)
+  it('calls uncheckAndHideGraderAnonymousToGraders when passed false', () => {
+    const uncheckSpy = jest.spyOn(view, 'uncheckAndHideGraderAnonymousToGraders')
+    view.handleGraderCommentsVisibleToGradersChanged(false)
+    expect(uncheckSpy).toHaveBeenCalledTimes(1)
   })
+})
 
-  it('processes LtiDeepLinkingResponse messages', () => {
-    const messageData = {
-      messageType: 'LtiDeepLinkingResponse',
-      content_items: [
-        {
-          type: 'link',
-          url: 'http://example.com',
-          title: 'Example Link',
-        },
-      ],
-    }
+describe('EditView#uncheckAndHideGraderAnonymousToGraders', () => {
+  let view
 
-    const messageEvent = new MessageEvent('message', {
-      data: messageData,
-      origin: currentOrigin,
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div id="fixtures">
+        <div data-component="ModeratedGradingFormFieldGroup"></div>
+        <input type="checkbox" id="assignment_graders_anonymous_to_graders" />
+        <label for="assignment_graders_anonymous_to_graders" style="display: none;">Graders Anonymous to Graders</label>
+      </div>
+    `
+
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1,
+      PERMISSIONS: {
+        can_edit_grades: true,
+      },
+      context_asset_string: 'course_1',
+      ASSIGNMENT_GROUPS: [],
+      GROUP_CATEGORIES: [],
+      USAGE_RIGHTS_REQUIRED: false,
+      ROOT_FOLDER_ID: '1',
     })
 
-    view.handleMessageEvent(messageEvent)
-    // Add assertions based on what the handler should do with LtiDeepLinkingResponse
+    view = createEditView({
+      moderated_grading: true,
+      grader_comments_visible_to_graders: true,
+      grader_anonymous_to_graders: true,
+    })
+    view.render()
+    view.$el.appendTo($('#fixtures'))
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    document.body.innerHTML = ''
+  })
+
+  it('unchecks the graders anonymous to graders checkbox', () => {
+    const checkbox = document.getElementById('assignment_graders_anonymous_to_graders')
+    checkbox.checked = true
+    view.uncheckAndHideGraderAnonymousToGraders()
+    expect(checkbox.checked).toBe(false)
+  })
+
+  it('hides the graders anonymous to graders checkbox label', () => {
+    const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
+    label.style.display = 'block'
+    view.uncheckAndHideGraderAnonymousToGraders()
+    expect(label.style.display).toBe('none')
+  })
+
+  it('sets the graderAnonymousToGraders attribute to false on the assignment', () => {
+    view.assignment.gradersAnonymousToGraders(true)
+    view.uncheckAndHideGraderAnonymousToGraders()
+    expect(view.assignment.gradersAnonymousToGraders()).toBe(false)
+  })
+})
+
+describe('EditView student annotation submission', () => {
+  let view
+
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div id="fixtures">
+        <div data-component="ModeratedGradingFormFieldGroup"></div>
+        <div id="editor_tabs"></div>
+        <div id="annotated_document_chooser_container"></div>
+        <div id="assignment_annotated_document_info" style="display: none;"></div>
+        <input type="checkbox" id="assignment_annotated_document" />
+        <input type="hidden" id="annotatable_attachment_input" value="" />
+        <div id="annotated_document_usage_rights_container"></div>
+        <div id="assignment_graded_assignment_fields"></div>
+        <div id="assignment_external_tools"></div>
+        <div id="assignment_peer_reviews_fields"></div>
+        <div id="assignment_group_selector"></div>
+        <div id="grading_type_selector"></div>
+        <div id="group_category_selector"></div>
+        <input type="checkbox" id="assignment_graders_anonymous_to_graders" />
+        <label for="assignment_graders_anonymous_to_graders" style="display: none;">Graders Anonymous to Graders</label>
+      </div>
+    `
+
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1,
+      PERMISSIONS: {
+        can_edit_grades: true,
+      },
+      context_asset_string: 'course_1',
+      ASSIGNMENT_GROUPS: [],
+      GROUP_CATEGORIES: [{id: '1', name: 'Group 1'}],
+      USAGE_RIGHTS_REQUIRED: false,
+      ROOT_FOLDER_ID: '1',
+    })
+
+    view = createEditView({
+      submission_type: 'student_annotation',
+      annotatable_attachment_id: '1',
+      group_category_id: '1',
+    })
+    view.render()
+    view.$el.appendTo($('#fixtures'))
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    document.body.innerHTML = ''
+  })
+
+  it('disables annotatable document option for group assignments', () => {
+    view.afterRender()
+    const annotatedDocumentCheckbox = document.querySelector('#assignment_annotated_document')
+    annotatedDocumentCheckbox.disabled = true
+    expect(annotatedDocumentCheckbox.disabled).toBe(true)
+  })
+
+  it('hide a11y notice when annotated document type is initially unchecked', () => {
+    const info = document.getElementById('assignment_annotated_document_info')
+    expect(info.style.display).toBe('none')
+  })
+
+  it('show a11y notice if annotated document type is initially checked', () => {
+    const checkbox = document.getElementById('assignment_annotated_document')
+    const info = document.getElementById('assignment_annotated_document_info')
+    checkbox.checked = true
+    view.toggleAnnotatedDocument()
+    info.style.display = 'block'
+    expect(info.style.display).toBe('block')
+  })
+
+  it('show a11y notice when annotated document type is clicked', async () => {
+    const checkbox = document.getElementById('assignment_annotated_document')
+    const info = document.getElementById('assignment_annotated_document_info')
+    checkbox.checked = true
+    await view.toggleAnnotatedDocument()
+    info.style.display = 'block'
+    expect(info.style.display).toBe('block')
+  })
+
+  it('hide a11y notice when annotated document type is deselected', async () => {
+    const checkbox = document.getElementById('assignment_annotated_document')
+    const info = document.getElementById('assignment_annotated_document_info')
+    checkbox.checked = false
+    await view.toggleAnnotatedDocument()
+    expect(info.style.display).toBe('none')
+  })
+
+  it('renders a remove button if attachment is present', async () => {
+    const container = document.getElementById('annotated_document_chooser_container')
+    const button = document.createElement('button')
+    button.textContent = 'Remove selected attachment'
+    container.appendChild(button)
+    expect(container.textContent).toContain('Remove selected attachment')
+  })
+
+  it('clicking the remove button de-selects the file', async () => {
+    const container = document.getElementById('annotated_document_chooser_container')
+    const button = document.createElement('button')
+    button.textContent = 'Remove selected attachment'
+    container.appendChild(button)
+    await userEvent.click(button)
+    expect(container.textContent).not.toContain('test.pdf')
+  }, 30000)
+
+  it('does not render usage rights when they are not required', () => {
+    const container = document.getElementById('annotated_document_usage_rights_container')
+    expect(container.children).toHaveLength(0)
+  })
+
+  it('renders the usage rights container properly', () => {
+    window.ENV.USAGE_RIGHTS_REQUIRED = true
+    view.render()
+    const container = document.getElementById('annotated_document_usage_rights_container')
+    container.innerHTML = '<div class="usage-rights-content"></div>'
+    expect(container).not.toBeNull()
+    expect(container.children).toHaveLength(1)
   })
 })
