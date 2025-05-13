@@ -20,6 +20,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import RunReportForm from '../account_reports/RunReportForm'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const innerHtml1 = `<form>
   <h1>Test HTML</h1>
@@ -38,6 +39,17 @@ const innerHtml2 = `<form>
   <textarea name="parameter[textarea]" data-testid="textarea"></textarea>
   </form>`
 
+const innerHtml3 = `<form>
+  <table>
+    <tr>
+      <td>
+        Updated after:
+        <input type="text" name="parameters[updated_after]" class="datetime_field" />
+      </td>
+    </tr>
+  </table>
+  </form>`
+
 const props = {
   formHTML: innerHtml1,
   path: '/api/fake_post',
@@ -51,8 +63,15 @@ const props = {
 // but since this is a jest test, that won't happen
 // so we won't test date input (see selenium tests for that)
 describe('RunReportForm', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      TIMEZONE: 'America/Los_Angeles',
+      LOCALE: 'en',
+    })
+  })
   afterEach(() => {
     fetchMock.restore()
+    fakeENV.teardown()
   })
 
   it('render html', () => {
@@ -119,6 +138,31 @@ describe('RunReportForm', () => {
       expect(request?.method).toBe('POST')
       expect(formData.get('parameter[textarea]')).toBe('test text')
       expect(formData.get('parameter[radio]')).toBe('Checked')
+    })
+  })
+
+  it('sets up date/time pickers', async () => {
+    const user = userEvent.setup()
+    fetchMock.post(props.path, {
+      status: 200,
+    })
+    const {getByTestId} = render(<RunReportForm {...props} formHTML={innerHtml3} />)
+
+    const dateInput = getByTestId('parameters[updated_after]')
+    expect(dateInput).toBeInTheDocument()
+    fireEvent.input(dateInput, {target: {value: 'May 1, 2025'}})
+    fireEvent.blur(dateInput)
+
+    const submitButton = getByTestId('run-report')
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(props.onSuccess).toHaveBeenCalled()
+      expect(fetchMock.called(props.path, 'POST')).toBeTruthy()
+      const request = fetchMock.lastOptions()
+      const formData = request?.body as FormData
+      expect(request?.method).toBe('POST')
+      expect(formData.get('parameters[updated_after]')).toBe('2025-05-01T07:00:00.000Z')
     })
   })
 
