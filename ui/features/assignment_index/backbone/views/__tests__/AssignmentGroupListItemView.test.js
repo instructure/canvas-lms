@@ -107,6 +107,7 @@ const createView = (model, options = {}) => {
     manage_assignments_add: options.canAdd ?? options.canManage,
     manage_assignments_delete: options.canDelete ?? options.canManage,
   }
+  ENV.SETTINGS = {}
 
   const view = new AssignmentGroupListItemView({
     model,

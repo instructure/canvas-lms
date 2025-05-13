@@ -625,6 +625,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   ): SubmissionConnection
   submissionsDownloads: Int
   supportsGradeByQuestion: Boolean!
+  suppressAssignment: Boolean
   timeZoneEdited: String
   title: String
   totalGradedSubmissions: Int

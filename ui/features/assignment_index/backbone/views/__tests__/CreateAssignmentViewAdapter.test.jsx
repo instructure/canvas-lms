@@ -85,6 +85,7 @@ describe('CreateAssignmentViewAdapter', () => {
   beforeEach(() => {
     window.ENV.FLAGS = {new_quizzes_by_default: false}
     window.ENV.PERMISSIONS = {manage_assignments_edit: true, manage_assignments_delete: true}
+    window.ENV.SETTINGS = {suppress_assignments: false}
     closeHandlerMock = jest.fn()
     jest.clearAllMocks()
   })

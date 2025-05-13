@@ -2514,6 +2514,33 @@ describe Submission do
       stream_item_instances.each { |sii| expect(sii).not_to be_hidden }
     end
 
+    context "stream item comments" do
+      before :once do
+        course_with_student(active_all: true)
+        @a1 = assignment_model(course: @course, group_category: "Study Groups", due_at: Time.zone.now - 1000, submission_types: ["online_text_entry"], suppress_assignment: true)
+      end
+
+      it "does not show stream item comments when suppress_assignment is true" do
+        @a1.suppress_assignment = true
+        @a1.save!
+        @submission = @a1.submit_homework(@student, body: "some message")
+        @submission.add_comment(author: @teacher, comment: "a")
+        stream_item_ids       = StreamItem.where(asset_type: "Submission", asset_id: @a1.submissions.all).pluck(:id)
+        stream_item_instances = StreamItemInstance.where(stream_item_id: stream_item_ids)
+        expect(stream_item_instances).to all be_hidden
+      end
+
+      it "shows stream item comments when suppress_assignment is false" do
+        @a1.suppress_assignment = false
+        @a1.save!
+        @submission = @a1.submit_homework(@student, body: "some message")
+        @submission.add_comment(author: @teacher, comment: "a")
+        stream_item_ids       = StreamItem.where(asset_type: "Submission", asset_id: @a1.submissions.all).pluck(:id)
+        stream_item_instances = StreamItemInstance.where(stream_item_id: stream_item_ids)
+        stream_item_instances.each { |sii| expect(sii).not_to be_hidden }
+      end
+    end
+
     context "Submission Grade Changed" do
       before :once do
         Auditors::ActiveRecord::Partitioner.process

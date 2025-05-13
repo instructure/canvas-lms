@@ -177,6 +177,19 @@ describe('GradeSummary', () => {
       expect(messageText).toContain('the new total is now')
     })
 
+    // suppressed assignments are meant to be hidden from the gradebook, but still counted towards the final grade
+    it('displays the correct grade when there are suppressed assignments', () => {
+      ENV = {
+        ...ENV,
+        SETTINGS: {suppress_assignments: true},
+      }
+      ENV.assignment_groups = createAssignmentGroups()
+      ENV.assignment_groups[0].assignments[0].suppress_assignment = true
+      GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
+      const $grade = $($fixtures).find('.final_grade .grade')
+      expect($grade.text()).toBe('23%')
+    })
+
     it('does not display a screenreader-only alert when grades have not been changed', () => {
       GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
       expect(screenReaderFlashMock).not.toHaveBeenCalled()

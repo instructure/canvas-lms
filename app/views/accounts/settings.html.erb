@@ -821,6 +821,10 @@
                 <%= settings.check_box :enable_turnitin, :checked => @account.settings[:enable_turnitin] %>
                 <%= settings.label :enable_turnitin, :en => "Turnitin" %>
               </div>
+              <div>
+                <%= settings.check_box :suppress_assignments, :checked => @account.settings[:suppress_assignments] %>
+                <%= settings.label :suppress_assignments, :en => "Allow assignments to be suppressed" %>
+              </div>
             <% end %>
           <% end %>
 

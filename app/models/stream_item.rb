@@ -292,7 +292,7 @@ class StreamItem < ActiveRecord::Base
           }
         end
         # set the hidden flag if this submission is not posted
-        if object.is_a?(Submission) && !object.posted? && (owner_insert = inserts.detect { |i| i[:user_id] == object.user_id })
+        if object.is_a?(Submission) && (!object.posted? || object.assignment.suppress_assignment?) && (owner_insert = inserts.detect { |i| i[:user_id] == object.user_id })
           owner_insert[:hidden] = true
         end
 

@@ -278,7 +278,8 @@ class ApplicationController < ActionController::Base
             collapse_global_nav: @current_user&.collapse_global_nav?,
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
             can_add_pronouns: @domain_root_account&.can_add_pronouns?,
-            show_sections_in_course_tray: @domain_root_account&.show_sections_in_course_tray?
+            show_sections_in_course_tray: @domain_root_account&.show_sections_in_course_tray?,
+            suppress_assignments: @domain_root_account&.suppress_assignments?
           },
           RAILS_ENVIRONMENT: Canvas.environment
         }

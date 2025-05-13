@@ -26,6 +26,36 @@ describe UsersController do
 
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
 
+  describe "activity_stream" do
+    before do
+      course_with_teacher(active_all: true)
+      course_with_student(active_all: true, course: @course)
+      user_session(@student)
+    end
+
+    context "with a suppressed assignment" do
+      it "skips submission stream items for that assignment" do
+        assignment = @course.assignments.create!(title: "some assignment", submission_types: ["online_text_entry"], suppress_assignment: true)
+        sub = assignment.submit_homework @student, body: "submission"
+        sub.add_comment author: @teacher, comment: "lol"
+        get :activity_stream, params: { user_id: @student.id, only_active_courses: true }
+        json = response.parsed_body
+        expect(json.length).to eq 0
+      end
+    end
+
+    context "with a non-suppressed assignment" do
+      it "includes submission stream items for that assignment" do
+        assignment = @course.assignments.create!(title: "some assignment", submission_types: ["online_text_entry"], suppress_assignment: false)
+        sub = assignment.submit_homework @student, body: "submission"
+        sub.add_comment author: @teacher, comment: "lol"
+        get :activity_stream, params: { user_id: @student.id, only_active_courses: true }
+        json = response.parsed_body
+        expect(json.length).to eq 1
+      end
+    end
+  end
+
   describe "external_tool" do
     let(:account) { Account.default }
 

@@ -1322,6 +1322,7 @@ class AccountsController < ApplicationController
              enable_eportfolios
              enable_profiles
              enable_turnitin
+             suppress_assignments
              include_integration_ids_in_gradebook_exports
              show_scheduler
              global_includes
@@ -2103,6 +2104,7 @@ class AccountsController < ApplicationController
                                    :students_can_create_courses,
                                    :allow_name_pronunciation_edit_for_students,
                                    :sub_account_includes,
+                                   :suppress_assignments,
                                    :teachers_can_create_courses,
                                    :allow_name_pronunciation_edit_for_teachers,
                                    :trusted_referers,

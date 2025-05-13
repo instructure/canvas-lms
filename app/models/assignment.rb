@@ -31,6 +31,7 @@ class Assignment < AbstractAssignment
 
   SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[workflow_state grading_type].freeze
   after_save :sync_sub_assignments, if: :sync_attributes_changed?
+  after_save :sync_stream_items_hidden, if: :saved_change_to_suppress_assignment?
   after_commit :sync_sub_assignments_after_commit, if: :sync_attributes_changed_after_commit?
 
   set_broadcast_policy do |p|
@@ -200,6 +201,20 @@ class Assignment < AbstractAssignment
 
   def sync_attributes_changed_after_commit?
     previous_changes.keys.intersect?(SubAssignment::SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
+  end
+
+  def sync_stream_items_hidden
+    submission_ids = submissions.active.pluck(:id)
+    stream_items = StreamItem.select(%i[id context_type context_id])
+                             .where(asset_type: "Submission", asset_id: submission_ids)
+                             .preload(:context).to_a
+    stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
+    user_ids = submissions.map(&:user_id).uniq
+
+    Shard.partition_by_shard(user_ids) do |user_ids_subset|
+      StreamItemInstance.where(stream_item_id: stream_items, user_id: user_ids_subset)
+                        .update_all_with_invalidation(stream_item_contexts, hidden: suppress_assignment?)
+    end
   end
 
   def unpublish_ok?

@@ -88,6 +88,9 @@ const setupFakeEnv = (envOptions = {}) => {
     GROUP_CATEGORIES: [{id: '1', name: 'Group Category #1'}],
     ANONYMOUS_GRADING_ENABLED: false,
     NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED: true,
+    SETTINGS: {
+      suppress_assignments: false,
+    },
   }
   fakeENV.setup({...defaultEnvOptions, ...envOptions})
 }
