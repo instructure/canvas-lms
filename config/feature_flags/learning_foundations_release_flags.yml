@@ -178,6 +178,13 @@ modules_perf:
     Improves modules page performance on courses with a large number of modules or module items.
   applies_to: Account
 
+modules_page_rewrite_student_view:
+  state: hidden
+  display_name: Modules Page Rewrite Student View
+  description: |-
+    If enabled, the modules page will use the new modules page rewrite on student view.
+  applies_to: Course
+
 create_wiki_page_mastery_path_overrides:
   state: hidden
   display_name: In MasteryPaths Create AssignmentOverrides on WikiPages Instead of Creating a Hidden Assignment
