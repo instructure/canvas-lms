@@ -660,6 +660,22 @@ describe AppointmentGroup do
       expect(@ag.possible_participants(registration_status: "registered")).to eql [@group1]
       expect(@ag.possible_participants(registration_status: "unregistered")).to eql [@group2]
     end
+
+    it "returns only the active courses users" do
+      course_with_student(active_all: true)
+      course1 = @course
+      course_with_student(active_all: true)
+      course2 = @course
+
+      ag = AppointmentGroup.create!(title: "test", contexts: [course1, course2], participants_per_appointment: 2, new_appointments: [["#{Time.zone.now.year + 1}-01-01 12:00:00", "#{Time.zone.now.year + 1}-01-01 13:00:00"], ["#{Time.zone.now.year + 1}-01-01 13:00:00", "#{Time.zone.now.year + 1}-01-01 14:00:00"]])
+
+      expect(ag.possible_participants.size).to be 2
+
+      course2.workflow_state = "unpublished"
+      course2.save!
+
+      expect(ag.possible_participants.size).to be 1
+    end
   end
 
   it "restricts instructors by section" do
