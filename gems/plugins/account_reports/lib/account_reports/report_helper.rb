@@ -21,6 +21,8 @@
 module AccountReports::ReportHelper
   include ::Api
 
+  class ReportStopped < StandardError; end
+
   def self.included(base)
     base.singleton_class.delegate :value_to_boolean, to: :"Canvas::Plugin"
   end
@@ -512,6 +514,13 @@ module AccountReports::ReportHelper
   end
 
   def fail_with_error(error)
+    # ReportStopped is a special kind of exception: it is raised
+    # when the Account Report is deleted or aborted during execution.
+    #
+    # As such, it is only used to cancel the execution of a running job,
+    # but it does not need to be captured in Canvas::Errors, nor need to change the workflow_state
+    return if error.is_a? ReportStopped
+
     GuardRail.activate(:primary) do
       Canvas::Errors.capture_exception(:account_report, error)
       @account_report.workflow_state = "error"
@@ -571,11 +580,8 @@ module AccountReports::ReportHelper
           updates[:current_line] = lineno
           updates[:progress] = (lineno.to_f / (report.total_lines + 1) * 100).to_i if report.total_lines
           report.update(updates)
-          if report.workflow_state == "deleted"
-            report.workflow_state = "aborted"
-            report.save!
-            raise "aborted"
-          end
+
+          raise ReportStopped if report.stopped?
         end
       end
       super

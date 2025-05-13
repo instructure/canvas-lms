@@ -113,14 +113,15 @@ module AccountReports
       I18n.with_locale(account_report.parameters["locale"]) do
         REPORTS[account_report.report_type].proc.call(account_report)
       end
+    rescue ReportHelper::ReportStopped
+      finalize_report(account_report, "Generating the report, #{account_report.title}, stopped.")
     rescue => e
       if retry_exception?(e) && attempt < Setting.get("account_report_attempts", "3").to_i
         account_report.run_report(attempt: attempt + 1) # this will queue a new job
         return
       end
       error_report_id = report_on_exception(e, { user: account_report.user })
-      title = account_report.report_type.to_s.titleize
-      error_message = "Generating the report, #{title}, failed."
+      error_message = "Generating the report, #{account_report.title}, failed."
       error_message += if error_report_id
                          " Please report the following error code to your system administrator: ErrorReport:#{error_report_id}"
                        else
@@ -245,14 +246,18 @@ module AccountReports
 
   def self.finalize_report(account_report, message, csv = nil, exception: nil)
     account_report.reload
-    report_attachment(account_report, csv)
     account_report.message = message
-    failed_report(account_report, exception:) unless csv
-    if account_report.workflow_state == "aborted"
+
+    if account_report.stopped?
       account_report.parameters["extra_text"] = I18n.t("Report has been aborted")
+    elsif csv
+      report_attachment(account_report, csv)
+      account_report.workflow_state = "complete"
     else
-      account_report.workflow_state = csv ? "complete" : "error"
+      failed_report(account_report, exception:)
+      account_report.workflow_state = "error"
     end
+
     account_report.update_attribute(:progress, 100)
     account_report.end_at ||= Time.zone.now
     account_report.save!

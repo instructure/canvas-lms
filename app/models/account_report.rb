@@ -98,10 +98,18 @@ class AccountReport < ActiveRecord::Base
     account
   end
 
+  def title
+    report_type.to_s.titleize
+  end
+
   delegate :root_account, to: :account
 
   def in_progress?
     created? || running?
+  end
+
+  def stopped?
+    aborted? || deleted?
   end
 
   def run_report(type = nil, attempt: 1)
