@@ -83,4 +83,31 @@ describe('ModuleItemPaging', () => {
     )
     expect(container).toBeEmptyDOMElement()
   })
+
+  it('should add positioning style to spinner container on paginationData exist', () => {
+    const {queryByTestId} = render(
+      <ModuleItemPaging
+        moduleId={moduleId}
+        isLoading={true}
+        paginationData={{
+          currentPage: 1,
+          totalPages: 2,
+        }}
+      />,
+    )
+    const spinnerContainer = queryByTestId('spinner_container_1083')
+    const styles = getComputedStyle(spinnerContainer!)
+    expect(styles.position).toBe('absolute')
+    expect(styles.insetInlineStart).toBe('-3.5em')
+    expect(styles.top).toBe('-.25rem')
+  })
+
+  it('should not add positioning style to spinner container on paginationData missing', () => {
+    const {queryByTestId} = render(<ModuleItemPaging moduleId={moduleId} isLoading={true} />)
+    const spinnerContainer = queryByTestId('spinner_container_1083')
+    const styles = getComputedStyle(spinnerContainer!)
+    expect(styles.position).not.toBe('absolute')
+    expect(styles.insetInlineStart).not.toBe('-3.5em')
+    expect(styles.top).not.toBe('-.25rem')
+  })
 })

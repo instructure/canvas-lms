@@ -70,7 +70,7 @@ function shouldShowAllOrLess(module: HTMLElement): AllOrLess {
 function addOrRemoveButton(module: HTMLElement) {
   const shouldShow = shouldShowAllOrLess(module)
 
-  let button = module.querySelector('.show-all-or-less-button.ui-button') as HTMLElement
+  let button = module.querySelector('.show-all-or-less-button.ui-button') as HTMLButtonElement
   const totalItems = (module.querySelector('.content ul') as HTMLElement)?.dataset?.totalItems || ''
 
   if (shouldShow === 'none' || shouldShow === 'loading') {
@@ -92,6 +92,7 @@ function addOrRemoveButton(module: HTMLElement) {
     reqMsg?.after(button)
   }
 
+  button.dataset.isLoading = 'false'
   if (shouldShow === 'all') {
     button.classList.add('show-all')
     button.classList.remove('show-less')
@@ -120,8 +121,11 @@ function handleShowAllOrLessClick(event: Event) {
   const module = moduleFromId(moduleId)
   if (!module) return
 
-  const button = module.querySelector('.show-all-or-less-button') as HTMLElement
+  const button = module.querySelector('.show-all-or-less-button') as HTMLButtonElement
   if (!button) return
+
+  if (button.dataset.isLoading === 'true') return
+  button.dataset.isLoading = 'true'
 
   if (button.classList.contains('show-all')) {
     if (isModuleCollapsed(module)) {
