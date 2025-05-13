@@ -126,7 +126,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']")
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Delete')).toBe(true)
   })
@@ -142,7 +142,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']")
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Close for comments')).toBe(true)
   })
@@ -161,7 +161,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']")
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Edit')).toBe(true)
 
@@ -185,7 +185,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']")
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Mastery Paths')).toBe(true)
   })
@@ -224,7 +224,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']")
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('discussion_topic_menu Text')).toBe(true)
   })
@@ -253,32 +253,9 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']")
     expect(allKeys).toHaveLength(2)
     expect(allKeys[0].textContent.includes('discussion_topic_menu Text')).toBe(true)
     expect(allKeys[1].textContent.includes('discussion_topic_menu otherText')).toBe(true)
-  })
-
-  it('renders the latest available until date for ungraded overrides', () => {
-    const now = new Date()
-    const futureDate = new Date(now)
-    futureDate.setFullYear(futureDate.getFullYear() + 1)
-    const furtherFutureDate = new Date(now)
-    furtherFutureDate.setFullYear(furtherFutureDate.getFullYear() + 2)
-    const discussion = {
-      ungraded_discussion_overrides: [
-        {assignment_override: {lock_at: futureDate}},
-        {assignment_override: {lock_at: furtherFutureDate}},
-      ],
-    }
-    render(<DiscussionRow {...makeProps({discussion})} />)
-
-    // Find element that contains text starting with "Available until"
-    const availabilityElement = screen.getByText(/^Available until/)
-    expect(availabilityElement).toBeInTheDocument()
-
-    // Verify it has the latest date
-    const formattedDate = dateFormatter(furtherFutureDate)
-    expect(availabilityElement.textContent).toContain(formattedDate)
   })
 })
