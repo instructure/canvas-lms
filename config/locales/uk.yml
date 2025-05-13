@@ -2002,6 +2002,7 @@ uk:
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Дозволити студентам бачити, хто підписався на часові інтервали."
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Дозволити можливість відправки повідомлень через нашу чергу відправки"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Дозволити засобу доспуп до системи забезпечення імен і ролей IMS"
+  allow_threaded_replies_43b2311e: "Дозволити зв'язані відповіді"
   allow_users_to_comment_45b8f753: "Дозволити користувачам коментувати"
   allowed_attempts_4e229caa: "Дозволені спроби"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Дозволяє створення оголошень для конкретного розділу"
@@ -18686,6 +18687,7 @@ uk:
       welcome_to_happiness: "Ласкаво просимо до Canvas!"
   users_d1b60cb0: Користувачі
   users_matching_search_term_c604db9e: "Відповідність користувачів \"%{search_term}\""
+  users_must_post_before_seeing_replies_d1761968: "Користувачі повинні опублікувати, перш ніж побачать відповіді"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Користувачам електронних книжок, можливо, доведеться вимкнути віртуальний курсор для використання цих комбінацій клавіш"
   users_with_no_enrollments_5dddce33: "Користувачі без реєстрацій"
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Використовує новий планувальник та його функціональність"
