@@ -88,7 +88,14 @@ function TagCategoryCard({category, onEditCategory, onDeleteFocusFallback}: TagC
 
   return (
     <>
-      <View padding="small medium" margin="small 0" display="block" borderWidth="small">
+      <View
+        padding="small medium"
+        margin="small 0"
+        display="block"
+        borderWidth="small"
+        role="group"
+        aria-label={name}
+      >
         <Flex justifyItems="space-between" width="100%">
           <Flex.Item shouldGrow shouldShrink>
             <Flex direction="column">
