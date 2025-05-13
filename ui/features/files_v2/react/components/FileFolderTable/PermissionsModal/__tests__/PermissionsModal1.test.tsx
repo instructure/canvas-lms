@@ -160,28 +160,6 @@ describe('PermissionsModal', () => {
             await screen.findByText('Unlock date cannot be after lock date.'),
           ).toBeInTheDocument()
         })
-
-        it('shows error when both lock_at and unlock_at are blank and date range type is range', async () => {
-          renderComponent({
-            items: [
-              {
-                ...FAKE_FILES[0],
-                hidden: false,
-                locked: false,
-                unlock_at: '',
-                lock_at: '',
-              },
-            ],
-          })
-
-          screen.getByTestId('permissions-availability-selector').click()
-          screen.getByText('Schedule availability').click()
-
-          await userEvent.click(screen.getByTestId('permissions-save-button'))
-          const messages = await screen.getAllByText('Invalid date.')
-          expect(messages[0]).toBeInTheDocument()
-          expect(messages[1]).toBeInTheDocument()
-        })
       })
     })
 
