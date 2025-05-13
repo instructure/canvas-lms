@@ -211,6 +211,7 @@ describe('#renderGradebookSettingsModal', () => {
     }
 
     test('is passed as true if the course has at least one anonymous assignment', () => {
+      window.ENV.SETTINGS = {}
       gradebook = createGradebook()
       gradebook.gotAllAssignmentGroups([anonymousAssignmentGroup, nonAnonymousAssignmentGroup])
       gradebook.renderGradebookSettingsModal()
@@ -219,6 +220,7 @@ describe('#renderGradebookSettingsModal', () => {
     })
 
     test('is passed as false if the course has no anonymous assignments', () => {
+      window.ENV.SETTINGS = {}
       gradebook = createGradebook()
       gradebook.gotAllAssignmentGroups([nonAnonymousAssignmentGroup])
       gradebook.renderGradebookSettingsModal()

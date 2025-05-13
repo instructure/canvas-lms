@@ -2707,6 +2707,22 @@ describe AssignmentsController do
       expect(assigns[:js_env][:MODERATED_GRADING_MAX_GRADER_COUNT]).to eq @assignment.moderated_grading_max_grader_count
     end
 
+    context "when the account has suppress_assignments setting on" do
+      before do
+        account = @course.root_account
+        account.settings[:suppress_assignments] = true
+        account.save
+      end
+
+      it "reflects assignment.suppress_assignment when given query parameter suppress_assignment" do
+        user_session(@teacher)
+        expect(@assignment.suppress_assignment).to be(false) # default
+        get "edit", params: { course_id: @course.id, id: @assignment.id, suppress_assignment: true }
+        expect(assigns[:assignment]).to eql(@assignment)
+        expect(assigns[:assignment].suppress_assignment).to be(true)
+      end
+    end
+
     context "when the root account does not have a default tool url set" do
       subject { get :edit, params: { course_id: course.id, id: @assignment.id } }
 

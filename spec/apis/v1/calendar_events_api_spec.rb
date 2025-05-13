@@ -3653,6 +3653,45 @@ describe CalendarEventsApiController, type: :request do
             expect(json.size).to eq 0 # nothing returned
           end
 
+          context "with supress_assignment account setting" do
+            before(:once) do
+              account = @course.root_account
+              account.settings[:suppress_assignments] = true
+              account.save
+            end
+
+            it "does not return todo items for suppressed assignments" do
+              @course.assignments.create(title: "suppressed", due_at: "2012-01-08 12:00:00", suppress_assignment: true)
+              json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                                controller: "calendar_events_api",
+                                action: "index",
+                                format: "json",
+                                type: "assignment",
+                                context_codes: ["course_#{@course.id}"],
+                                start_date: "2012-01-07",
+                                end_date: "2012-01-16",
+                                per_page: "25"
+                              })
+              expect(json.count).to be 1
+            end
+
+            it "does return todo items for unsuppressed assignments" do
+              new_assignment = @course.assignments.create(title: "suppressed", due_at: "2012-01-08 12:00:00", suppress_assignment: false)
+              json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                                controller: "calendar_events_api",
+                                action: "index",
+                                format: "json",
+                                type: "assignment",
+                                context_codes: ["course_#{@course.id}"],
+                                start_date: "2012-01-07",
+                                end_date: "2012-01-16",
+                                per_page: "25"
+                              })
+              expect(json.first["assignment"]["id"]).to eq(new_assignment.id)
+              expect(json.count).to be 2
+            end
+          end
+
           it "returns user specific override" do
             override = assignment_override_model(assignment: @default_assignment,
                                                  due_at: Time.zone.parse("2012-01-12 12:00:00"))

@@ -68,6 +68,7 @@ describe('EditView', () => {
       ENV.USAGE_RIGHTS_REQUIRED = true
       ENV.PERMISSIONS = {manage_files: true}
       ENV.context_asset_string = 'course_1'
+      ENV.SETTINGS = {suppress_assignments: false}
 
       // Mock API endpoints
       fetchMock

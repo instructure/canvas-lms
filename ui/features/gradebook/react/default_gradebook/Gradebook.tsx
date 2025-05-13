@@ -488,6 +488,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   returnFocusTo: HTMLButtonElement | null
 
+  has_suppressed_assignments: boolean = false
+
   constructor(props: GradebookProps) {
     super(props)
     this.options = {...(props.gradebookEnv || {}), ...props}
@@ -789,7 +791,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         group = assignmentGroup
         this.assignmentGroups[group.id] = group
       }
-
       // @ts-expect-error
       group.assignments = group.assignments || [] // perhaps unnecessary
       assignmentGroup.assignments.forEach(assignment => {
@@ -797,7 +798,18 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         // @ts-expect-error
         assignment.due_at = tz.parse(assignment.due_at)
         this.updateAssignmentEffectiveDueDates(assignment)
-        this.addAssignmentColumnDefinition(assignment)
+
+        if (window.ENV.SETTINGS.suppress_assignments) {
+          if (assignment.suppress_assignment) {
+            // If suppressed, then has_suppressed_assignments is true
+            this.has_suppressed_assignments = true
+          } else {
+            // If not suppressed, then add the column for the assignment
+            this.addAssignmentColumnDefinition(assignment)
+          }
+        } else {
+          this.addAssignmentColumnDefinition(assignment)
+        }
         this.assignments[assignment.id] = assignment
         if (!group.assignments.some(a => a.id === assignment.id)) {
           group.assignments.push(assignment)
@@ -5397,6 +5409,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
               />
             )}
         </div>
+
+        {window.ENV.SETTINGS.suppress_assignments && this.has_suppressed_assignments && (
+          <div>
+            <p>{I18n.t('* Some items are hidden from gradebook view.')}</p>
+          </div>
+        )}
         {this.state.isGridLoaded &&
           !this.props.isSubmissionDataLoaded &&
           Object.keys(this.props.assignmentMap).length * this.props.totalStudentsToLoad > 200 && (

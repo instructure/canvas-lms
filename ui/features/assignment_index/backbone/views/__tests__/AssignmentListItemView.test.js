@@ -141,6 +141,7 @@ const createView = (model, options = {}) => {
     newquizzes_on_quiz_page: options.newquizzes_on_quiz_page,
   }
   ENV.SHOW_SPEED_GRADER_LINK = options.show_additional_speed_grader_link
+  ENV.SETTINGS = {}
 
   const view = new AssignmentListItemView({
     model,
@@ -165,6 +166,7 @@ const genSetup = (model = assignment1()) => {
     current_user_is_admin: false,
     PERMISSIONS: {manage: false},
     URLS: {assignment_sort_base_url: 'test'},
+    SETTINGS: {},
   })
   const submission = new Submission()
   const view = createView(model, {canManage: false})

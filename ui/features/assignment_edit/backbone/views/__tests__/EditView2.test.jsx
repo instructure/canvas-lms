@@ -138,6 +138,7 @@ describe('EditView', () => {
       use_rce_enhancements: true,
       COURSE_ID: 1,
       USAGE_RIGHTS_REQUIRED: true,
+      SETTINGS: {},
     })
 
     fetchMock.get('/api/v1/courses/1/settings', {})

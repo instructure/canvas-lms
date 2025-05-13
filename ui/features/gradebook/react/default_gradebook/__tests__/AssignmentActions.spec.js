@@ -22,6 +22,8 @@ describe('Gradebook Assignment Actions', () => {
   let gradebook
   let assignments
 
+  window.ENV.SETTINGS = {}
+
   beforeEach(() => {
     gradebook = createGradebook({
       download_assignment_submissions_url: 'http://example.com/submissions',

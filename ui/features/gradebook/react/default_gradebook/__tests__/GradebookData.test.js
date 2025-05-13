@@ -18,6 +18,8 @@
 
 import {createGradebook} from './GradebookSpecHelper'
 
+window.ENV.SETTINGS = {}
+
 describe('Gradebook#setAssignmentsLoaded', () => {
   let gradebook
 
