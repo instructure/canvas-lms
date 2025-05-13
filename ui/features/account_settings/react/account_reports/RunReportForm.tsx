@@ -28,6 +28,7 @@ import {Portal} from '@instructure/ui-portal'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
+import $ from 'jquery'
 
 const I18n = createI18nScope('account_reports')
 
@@ -93,8 +94,7 @@ export default function ConfigureReportForm(props: Props) {
   const [dateValues, setDateValues] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    // $ is undefined if in jest; skip block when testing
-    if (formRef.current && typeof $ !== 'undefined') {
+    if (formRef.current) {
       props.onRender()
       const $form = $(formRef.current)
       const record = dateRefs
@@ -183,6 +183,8 @@ export default function ConfigureReportForm(props: Props) {
                 nextMonthLabel={I18n.t('Next month')}
                 timeRenderLabel={I18n.t('Time')}
                 invalidDateTimeMessage={I18n.t('Invalid date and time.')}
+                timezone={ENV.TIMEZONE}
+                locale={ENV.LOCALE}
               />
               <br />
             </Portal>
