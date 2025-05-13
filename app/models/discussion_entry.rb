@@ -276,7 +276,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def update_topic_submission
-    if discussion_topic&.assignment&.checkpoints_parent?
+    if discussion_topic&.assignment&.checkpoints_parent? && discussion_topic&.assignment&.sub_assignments&.length == 2
       entry_checkpoint_type = parent_id ? CheckpointLabels::REPLY_TO_ENTRY : CheckpointLabels::REPLY_TO_TOPIC
       submission = if entry_checkpoint_type == CheckpointLabels::REPLY_TO_TOPIC
                      discussion_topic.reply_to_topic_checkpoint.submissions.find_by(user_id:)
