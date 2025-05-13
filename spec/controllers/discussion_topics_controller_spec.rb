@@ -2259,6 +2259,58 @@ describe DiscussionTopicsController do
     end
   end
 
+  describe "ignore malicious message on create or update" do
+    before(:once) do
+      @topic = DiscussionTopic.create!(context: @course, title: "Test Topic", message: "Original Message")
+    end
+
+    it "sanitizes HTML content in the message field during create" do
+      user_session(@teacher)
+      malicious_message = "<script>alert('XSS')</script><b>Bold Text</b>"
+      sanitized_message = "<b>Bold Text</b>"
+
+      post "create", params: { course_id: @course.id, title: "Test Topic", message: malicious_message }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      topic = DiscussionTopic.last
+      expect(topic.message).to eq sanitized_message
+    end
+
+    it "removes unsanitized HTML during create" do
+      user_session(@teacher)
+      malicious_message = "<img src='x' onerror='alert(1)'>"
+      sanitized_message = "<img src=\"x\">"
+
+      post "create", params: { course_id: @course.id, title: "Test Topic", message: malicious_message }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      topic = DiscussionTopic.last
+      expect(topic.message).to eq sanitized_message
+    end
+
+    it "sanitizes HTML content in the message field during update" do
+      user_session(@teacher)
+      malicious_message = "<script>alert('XSS')</script><b>Bold Text</b>"
+      sanitized_message = "<b>Bold Text</b>"
+
+      put "update", params: { course_id: @course.id, topic_id: @topic.id, message: malicious_message }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(@topic.reload.message).to eq sanitized_message
+    end
+
+    it "removes unsanitized HTML during update" do
+      user_session(@teacher)
+      malicious_message = "<img src='x' onerror='alert(1)'>"
+      sanitized_message = "<img src=\"x\">"
+
+      put "update", params: { course_id: @course.id, topic_id: @topic.id, message: malicious_message }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(@topic.reload.message).to eq sanitized_message
+    end
+  end
+
   context "student planner" do
     before do
       course_topic
