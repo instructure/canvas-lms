@@ -250,12 +250,11 @@ describe('EditView#handleModeratedGradingChanged', () => {
 
   it('hides the moderated grading form fields when Moderated Grading is disabled', () => {
     view.afterRender()
-    view.handleModeratedGradingChanged({target: {checked: false}})
-
     const moderatedGradingFormGroup = document.querySelector(
       '[data-component="ModeratedGradingFormFieldGroup"]',
     )
     moderatedGradingFormGroup.style.display = 'none'
+    view.handleModeratedGradingChanged(false)
     expect(moderatedGradingFormGroup.style.display).toBe('none')
   })
 })
