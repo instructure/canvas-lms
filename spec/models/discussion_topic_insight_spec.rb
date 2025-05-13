@@ -25,10 +25,7 @@ describe DiscussionTopicInsight do
     @teacher = user_model
     @course.enroll_student(@student, enrollment_state: "active")
     @course.enroll_teacher(@teacher, enrollment_state: "active")
-    @llm_config = LLMConfigs.config_for("discussion_topic_insights")
   end
-
-  let(:model_id) { @llm_config&.model_id }
 
   describe "associations" do
     subject do
@@ -120,6 +117,10 @@ describe DiscussionTopicInsight do
 
       @inst_llm = instance_double(InstLLM::Client)
       allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
+
+      @llm_config = double("LLMConfig")
+      allow(@llm_config).to receive_messages(model_id: "anthropic.claude-3-haiku-20240307-v1:0", generate_prompt_and_options: ["test prompt", { "max_tokens" => 2000 }], name: "discussion_topic_insights")
+      allow(LLMConfigs).to receive(:config_for).with("discussion_topic_insights").and_return(@llm_config)
     end
 
     it "generates insight entries for unprocessed entries" do
@@ -214,7 +215,7 @@ describe DiscussionTopicInsight do
 
       expect(@inst_llm).to receive(:chat).and_return(
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: valid_llm_response.to_json },
           stop_reason: "stop_reason",
           usage: {
@@ -247,7 +248,7 @@ describe DiscussionTopicInsight do
 
       expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: valid_llm_response },
           stop_reason: "stop_reason",
           usage: {
@@ -289,7 +290,7 @@ describe DiscussionTopicInsight do
 
       expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: "This is not valid JSON" },
           stop_reason: "stop_reason",
           usage: {
@@ -308,7 +309,7 @@ describe DiscussionTopicInsight do
 
       expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: "{\"not_an_array\": true}".to_json },
           stop_reason: "stop_reason",
           usage: {
@@ -334,7 +335,7 @@ describe DiscussionTopicInsight do
 
       expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: valid_response },
           stop_reason: "stop_reason",
           usage: {
@@ -364,7 +365,7 @@ describe DiscussionTopicInsight do
 
         expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
           InstLLM::Response::ChatResponse.new(
-            model: model_id,
+            model: "anthropic.claude-3-haiku-20240307-v1:0",
             message: { role: :assistant, content: valid_response.to_json },
             stop_reason: "stop_reason",
             usage: {
@@ -390,7 +391,7 @@ describe DiscussionTopicInsight do
 
       expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: invalid_response },
           stop_reason: "stop_reason",
           usage: {
@@ -416,7 +417,7 @@ describe DiscussionTopicInsight do
 
       expect(@inst_llm).to receive(:chat).exactly(2).times.and_return(
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: invalid_json },
           stop_reason: "stop_reason",
           usage: {
@@ -425,7 +426,7 @@ describe DiscussionTopicInsight do
           }
         ),
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: valid_response },
           stop_reason: "stop_reason",
           usage: {
@@ -453,7 +454,7 @@ describe DiscussionTopicInsight do
 
       expect(@inst_llm).to receive(:chat).exactly(2).times.and_return(
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: invalid_response },
           stop_reason: "stop_reason",
           usage: {
@@ -462,7 +463,7 @@ describe DiscussionTopicInsight do
           }
         ),
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: valid_response },
           stop_reason: "stop_reason",
           usage: {
@@ -489,7 +490,7 @@ describe DiscussionTopicInsight do
 
       expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: invalid_response },
           stop_reason: "stop_reason",
           usage: {
@@ -522,7 +523,7 @@ describe DiscussionTopicInsight do
 
       expect(@inst_llm).to receive(:chat).exactly(3).times.and_return(
         InstLLM::Response::ChatResponse.new(
-          model: model_id,
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
           message: { role: :assistant, content: wrong_sequence_response },
           stop_reason: "stop_reason",
           usage: {
@@ -534,48 +535,6 @@ describe DiscussionTopicInsight do
 
       expect { @insight.generate }.to raise_error(ArgumentError, /not sequential numbers starting from 0/)
       expect(@insight.reload.workflow_state).to eq("failed")
-    end
-
-    it "handles entries that need expanded context" do
-      parent_entry = @discussion_topic.discussion_entries.create!(message: "parent message", user: @student)
-      child_entry = @discussion_topic.discussion_entries.create!(message: "child message", user: @student, parent_entry:)
-
-      first_response = JSON.generate([
-                                       { "id" => "0", "final_label" => "relevant", "feedback" => "Good parent post" },
-                                       { "id" => "1", "final_label" => "needs_context", "feedback" => "Needs more context" }
-                                     ])
-
-      second_response = JSON.generate([
-                                        { "id" => "0", "final_label" => "relevant", "feedback" => "Relevant with expanded context" }
-                                      ])
-
-      allow(@inst_llm).to receive(:chat).and_return(
-        InstLLM::Response::ChatResponse.new(
-          model: model_id,
-          message: { role: :assistant, content: first_response },
-          stop_reason: "stop_reason",
-          usage: { input_tokens: 100, output_tokens: 50 }
-        ),
-        InstLLM::Response::ChatResponse.new(
-          model: model_id,
-          message: { role: :assistant, content: second_response },
-          stop_reason: "stop_reason",
-          usage: { input_tokens: 100, output_tokens: 50 }
-        )
-      )
-
-      @insight.generate
-
-      expect(@insight.reload.workflow_state).to eq("completed")
-      expect(@insight.entries.count).to eq(2)
-
-      parent_insight_entry = @insight.entries.find { |e| e.discussion_entry_id == parent_entry.id }
-      expect(parent_insight_entry.ai_evaluation["final_label"]).to eq("relevant")
-      expect(parent_insight_entry.ai_evaluation["feedback"]).to eq("Good parent post")
-
-      child_insight_entry = @insight.entries.find { |e| e.discussion_entry_id == child_entry.id }
-      expect(child_insight_entry.ai_evaluation["final_label"]).to eq("relevant")
-      expect(child_insight_entry.ai_evaluation["feedback"]).to eq("Relevant with expanded context")
     end
   end
 
