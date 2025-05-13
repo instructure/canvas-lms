@@ -294,6 +294,10 @@ class SubmissionComment < ActiveRecord::Base
       end
     end
 
+    if submission.user_id == user.id && submission.needs_review? && submission.submitted_at.present? && assignment.external_tool?
+      return true
+    end
+
     # The student who owns the submission can't see draft or hidden comments (or,
     # generally, any instructor comments if the assignment is muted); the same
     # holds for anyone observing the student
