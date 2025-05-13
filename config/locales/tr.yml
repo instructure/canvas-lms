@@ -2283,6 +2283,7 @@ tr:
   allow_switching_to_the_enhanced_rce_317e746f: "Gelişmiş RCE'ye geçişe izin ver"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Bildirimlerin gönderim kuyruğumuz ile gönderilebilmesine izin ver"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Bu aracın IMS İsileri ve Rol Sağlama Servisine erişimine izin verin"
+  allow_threaded_replies_43b2311e: "Yanıtlara izin ver"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Kullanıcıları eklerken onaylanmamış e-posta adreslerine izin ver"
   allow_users_to_comment_45b8f753: "Kullanıcıların yorum yapmasına izin ver"
   allowed_attempts_4e229caa: "İzin Verilen Hak"
@@ -20263,6 +20264,7 @@ tr:
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "Kullanıcılar - derslere öğretmen, ders tasarımcısı ya da Öğretim elamanı yardımcısı ekle veya sil"
   users_d1b60cb0: Kullanıcılar
   users_manage_login_details_9462b30f: "Kullanıcılar - oturum açma ayrıntılarını yönet"
+  users_must_post_before_seeing_replies_d1761968: "Kullanıcılar cevapları görmeden önce gönderi yapmalıdırlar"
   users_view_list_861c7a3f: "Kullanıcılar - listeyi göster"
   users_view_login_ids_a2e6a85: "Kullanıcılar - Giriş ID'lerini göster"
   users_view_primary_email_address_14f4978f: "Kullanıcılar - birincil eposta adresini göster"
