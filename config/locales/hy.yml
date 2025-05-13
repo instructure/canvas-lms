@@ -1775,6 +1775,7 @@ hy:
   allow_self_sign_up_7520f8c5: "Թույլատրել ինքնագրանցում"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Թույլ տալ ունկնդիրներին տեսնել, թե ով է գրանցվել ժամանակային միջակայքերում:"
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: "Թույլ տալ ուղարկել ծանուցումներ ըստ մեր ուղարկման հերթականության"
+  allow_threaded_replies_43b2311e: "Թույլ տալ շղթայական պատասխաններ"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Թույլ տալ դասավանդողներին նշել այն գնահատականները, որոնք պետք է խմբով արտահանվեն դեպի SIS:"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Թույլ տալ օգտատերերին ստանալ Canvas համակարգից հաղորդագրություններ արտասահմանյան հեռախոսահամարին "
   alphabetically_60ab47e4: "Այբբենական կարգով"
@@ -17655,6 +17656,7 @@ hy:
           և նավարկման վերին տողում: Միևնույն ժամանակ կարող եք գրանցվել
           լրացուցիչ դասընթացների կամ ստեղծել ձեր պրոֆիլը:
       welcome_to_happiness: "Ձեզ ողջունում է Canvas-ը"
+  users_must_post_before_seeing_replies_d1761968: "Օգտատերերի մասնակցությունը պարտադիր է պատասխանները տեսնելու համար"
   users_with_no_enrollments_5dddce33: "Օգտատերեր առանց գրանցման "
   utc_e44049af: UTC
   validate: 
