@@ -2607,7 +2607,6 @@ $(() => {
   const allModules = Array.from(document.querySelectorAll('.context_module'))
     .map(m => parseInt(m.dataset.moduleId, 10))
     .filter(mid => !isNaN(mid))
-  const allPages = false
 
   if (ENV.FEATURE_MODULES_PERF) {
     // ENV.COLLAPSED_MODULES are those that have been collapsed by the user
@@ -2639,7 +2638,7 @@ $(() => {
         ENV.COLLAPSED_MODULES = allModules.filter(mid => !ENV.EXPANDED_MODULES.includes(mid))
       }
 
-      modules.lazyLoadItems(ENV.EXPANDED_MODULES, allPages)
+      modules.lazyLoadItems(ENV.EXPANDED_MODULES)
     }
     for (const module of allModules) {
       addShowAllOrLess(module)
@@ -2654,14 +2653,22 @@ $(() => {
       )
     })
     document.addEventListener(MODULE_LOAD_ALL, event => {
-      modules.lazyLoadItems([event.detail.moduleId], true)
+      const moduleId = event.detail.moduleId
+      document
+        .querySelector(`#context_module_content_${moduleId} ul.context_module_items`)
+        ?.remove()
+      modules.lazyLoadItems([moduleId], true)
     })
     document.addEventListener(MODULE_LOAD_FIRST_PAGE, event => {
       // TODO: rather than re-querying, maybe delete all items
       //       beyond the first page and trigger
       //       re-render of ModuleItemPaging
       //       (but this is easier)
-      modules.lazyLoadItems([event.detail.moduleId], false)
+      const moduleId = event.detail.moduleId
+      document
+        .querySelector(`#context_module_content_${moduleId} ul.context_module_items`)
+        ?.remove()
+      modules.lazyLoadItems([moduleId], false)
     })
   } else {
     if ($('#context_modules').hasClass('editable')) {

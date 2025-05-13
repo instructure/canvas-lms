@@ -266,6 +266,70 @@ describe('fetchModuleItems utility', () => {
       expect(fetchMock.calls()).toHaveLength(1)
     })
 
+    describe('allPages storing', () => {
+      describe('get', () => {
+        let getShowAllSpy: jest.SpyInstance
+
+        beforeEach(() => {
+          getShowAllSpy = jest.spyOn(mockStore, 'getShowAll')
+        })
+
+        describe('when allPagesParam is provided', () => {
+          const allPagesParam = true
+
+          it('should not call the getPageNumber', async () => {
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, undefined, allPagesParam)
+            expect(getShowAllSpy).not.toHaveBeenCalled()
+          })
+        })
+
+        describe('when allPagesParam is not provided', () => {
+          it('should call the getPageNumber', async () => {
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId)
+            expect(getShowAllSpy).toHaveBeenCalledWith(moduleId)
+          })
+        })
+      })
+
+      describe('set', () => {
+        let setShowAllSpy: jest.SpyInstance
+        let removePageNumberSpy: jest.SpyInstance
+
+        beforeEach(() => {
+          setShowAllSpy = jest.spyOn(mockStore, 'setShowAll')
+          removePageNumberSpy = jest.spyOn(mockStore, 'removePageNumber')
+        })
+
+        describe('when allPage is false', () => {
+          const allPages = false
+
+          it('should not call removePageNumber', async () => {
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, undefined, allPages)
+            expect(removePageNumberSpy).not.toHaveBeenCalled()
+          })
+
+          it('should call setShowAll', async () => {
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, undefined, allPages)
+            expect(setShowAllSpy).toHaveBeenCalledWith(moduleId, allPages)
+          })
+        })
+
+        describe('when allPage is true', () => {
+          const allPages = true
+
+          it('should call removePageNumber', async () => {
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, undefined, allPages)
+            expect(removePageNumberSpy).toHaveBeenCalledWith(moduleId)
+          })
+
+          it('should call setShowAll', async () => {
+            await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, undefined, allPages)
+            expect(setShowAllSpy).toHaveBeenCalledWith(moduleId, allPages)
+          })
+        })
+      })
+    })
+
     describe('pageNumber storing', () => {
       describe('get', () => {
         let getPageNumberSpy: jest.SpyInstance
@@ -347,7 +411,7 @@ describe('fetchModuleItems utility', () => {
           const pageParam = 2
           const allPages = false
 
-          it('should call removePageNumber', async () => {
+          it('should not call removePageNumber', async () => {
             await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, pageParam, allPages)
             expect(removePageNumberSpy).not.toHaveBeenCalled()
           })
@@ -425,14 +489,19 @@ describe('fetchModuleItems utility', () => {
       })
 
       it('does not render the Pagination component if there is only one page', async () => {
-        fetchMock.mock('/courses/23/modules/1083/items_html?page=1&per_page=10', {
-          body: modules['1083'].items,
-        })
         await moduleItemsLazyLoader.fetchModuleItemsHtml('1083', 1)
         expect(document.querySelector(`#context_module_content_1083 ul`)?.outerHTML).toEqual(
           modules['1083'].items,
         )
         expect(screen.queryByTestId('module-1083-pagination')).not.toBeInTheDocument()
+      })
+
+      it('does not render the Pagination component if allPages is on', async () => {
+        await moduleItemsLazyLoader.fetchModuleItemsHtml('1083', 1, true)
+
+        await waitFor(() => {
+          expect(screen.queryByTestId('module-1083-pagination')).not.toBeInTheDocument()
+        })
       })
     })
   })

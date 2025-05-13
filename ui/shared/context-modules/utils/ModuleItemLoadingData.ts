@@ -21,7 +21,7 @@ import {type ModuleId, type PaginationData} from './types'
 
 type ModuleData = {
   moduleId: ModuleId
-  paginationData: PaginationData
+  paginationData?: PaginationData
   root?: Root
 }
 
@@ -38,19 +38,23 @@ class ModuleItemLoadingData {
   private addModule(moduleId: ModuleId): ModuleData {
     this.modules[moduleId] = {
       moduleId,
-      paginationData: {currentPage: 1, totalPages: 1},
     }
     return this.modules[moduleId]
   }
 
-  getPaginationData(moduleId: ModuleId): PaginationData {
+  getPaginationData(moduleId: ModuleId): PaginationData | undefined {
     const moduleData = this.getModuleData(moduleId)
-    return {...moduleData.paginationData}
+    return moduleData.paginationData ? {...moduleData.paginationData} : undefined
   }
 
   setPaginationData(moduleId: ModuleId, paginationData: PaginationData): void {
     const moduleData = this.getModuleData(moduleId)
     moduleData.paginationData = {...paginationData}
+  }
+
+  removePaginationData(moduleId: ModuleId): void {
+    const moduleData = this.getModuleData(moduleId)
+    delete moduleData.paginationData
   }
 
   getModuleRoot(moduleId: ModuleId): Root | undefined {

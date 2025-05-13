@@ -15,34 +15,37 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React from 'react'
-import {Flex} from '@instructure/ui-flex'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconRefreshLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
+import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modulespublic')
 
-type FetchErrorProps = {
-  retryCallback: () => void
+type ModuleItemsLoadingProps = {
+  isLoading: boolean
 }
 
-export const FetchError = ({retryCallback}: FetchErrorProps) => {
+export const ModuleItemsLoadingSpinner = ({isLoading}: ModuleItemsLoadingProps) => {
+  if (!isLoading) return null
   return (
-    <Alert variant="error" data-testid="items-failed-to-load">
-      <Flex justifyItems="space-between">
-        {I18n.t('Items failed to load')}
-        <IconButton
-          data-testid="retry-items-failed-to-load"
-          screenReaderLabel={I18n.t('Retry')}
-          withBackground={false}
-          withBorder={false}
-          onClick={retryCallback}
-        >
-          <IconRefreshLine />
-        </IconButton>
-      </Flex>
-    </Alert>
+    <View
+      as="div"
+      textAlign="center"
+      minHeight="3em"
+      minWidth="3em"
+      className="module-spinner-container"
+    >
+      <Alert
+        variant="info"
+        screenReaderOnly={true}
+        liveRegion={() => document.querySelector('#flash_screenreader_holder') as HTMLElement}
+      >
+        {I18n.t('Loading items')}
+      </Alert>
+      <Spinner size="small" renderTitle={I18n.t('Loading items')} />
+    </View>
   )
 }

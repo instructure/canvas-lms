@@ -21,6 +21,7 @@ import {type Links} from '@canvas/parse-link-header'
 import {FetchError} from './FetchError'
 import {ModuleItemPaging, type PaginationData} from './ModuleItemPaging'
 import {ModuleItemLoadingData} from './ModuleItemLoadingData'
+import {ModuleItemsLoadingSpinner} from './ModuleItemsLoadingSpinner'
 import {ModuleItemsStore} from './ModuleItemsStore'
 import {moduleFromId} from './showAllOrLess'
 import {DEFAULT_PAGE_SIZE, type ModuleId} from './types'
@@ -64,8 +65,9 @@ class ModuleItemsLazyLoader {
     if (!module) return
     module.dataset.loadstate = 'loaded'
 
-    const paginationData: PaginationData =
-      ModuleItemsLazyLoader.loadingData.getPaginationData(moduleId)
+    const paginationData: PaginationData = ModuleItemsLazyLoader.loadingData.getPaginationData(
+      moduleId,
+    ) || {currentPage: 1, totalPages: 1}
 
     if (links?.current && links?.first && links?.last) {
       const page = parseInt(links.current.page, 10)
@@ -115,7 +117,7 @@ class ModuleItemsLazyLoader {
   async fetchModuleItemsHtml(
     moduleId: ModuleId,
     pageParam?: number,
-    allPages: boolean = false,
+    allPagesParam?: boolean,
   ): Promise<void> {
     const moduleItemContainer = document.querySelector(`#context_module_content_${moduleId}`)
     if (!moduleItemContainer) return
@@ -123,12 +125,15 @@ class ModuleItemsLazyLoader {
     if (!module) return
 
     const page = this.getPageNumber(moduleId, pageParam)
+    const allPages = this.getAllPages(moduleId, allPagesParam)
+
     try {
       module.dataset.loadstate = 'loading'
-      const paginationData = ModuleItemsLazyLoader.loadingData.getPaginationData(moduleId)
+
       const root = ModuleItemsLazyLoader.loadingData.getModuleRoot(moduleId)
-      if (root) {
-        root.render(
+      if (!allPages) {
+        const paginationData = ModuleItemsLazyLoader.loadingData.getPaginationData(moduleId)
+        root?.render(
           <ModuleItemPaging
             moduleId={moduleId}
             isLoading={true}
@@ -136,6 +141,9 @@ class ModuleItemsLazyLoader {
             onPageChange={this.onPageChange}
           />,
         )
+      } else {
+        ModuleItemsLazyLoader.loadingData.removePaginationData(moduleId)
+        root?.render(<ModuleItemsLoadingSpinner isLoading={true} />)
       }
 
       const pathParams = allPages ? 'no_pagination=1' : `page=${page}&per_page=${this.perPage}`
@@ -147,13 +155,19 @@ class ModuleItemsLazyLoader {
         },
       })
 
+      this.clearPageNumberIfAllPages(moduleId, allPages)
       this.savePageNumber(moduleId, allPages, page)
+      this.saveAllPage(moduleId, allPages)
       this.renderResult(moduleId, moduleItemContainer, result.text, result.link)
       this.callback(moduleId)
     } catch (_e) {
       module.dataset.loadstate = 'error'
       this.renderError(moduleId, page)
     }
+  }
+
+  private getAllPages(moduleId: ModuleId, allPagesParam?: boolean) {
+    return allPagesParam !== undefined ? allPagesParam : this.moduleItemStore.getShowAll(moduleId)
   }
 
   private getPageNumber(moduleId: ModuleId, pageParam?: number) {
@@ -164,13 +178,19 @@ class ModuleItemsLazyLoader {
     if (!allPages && page) {
       this.moduleItemStore.setPageNumber(moduleId, page)
     }
+  }
 
+  private saveAllPage(moduleId: ModuleId, allPages: boolean) {
+    this.moduleItemStore.setShowAll(moduleId, allPages)
+  }
+
+  private clearPageNumberIfAllPages(moduleId: ModuleId, allPages: boolean) {
     if (allPages) {
       this.moduleItemStore.removePageNumber(moduleId)
     }
   }
 
-  async fetchModuleItems(moduleIds: ModuleId[], allPages: boolean = false): Promise<void[]> {
+  async fetchModuleItems(moduleIds: ModuleId[], allPages?: boolean): Promise<void[]> {
     const allPromises: Promise<void>[] = []
     for (let i = 0; i < moduleIds.length; i += BATCH_SIZE) {
       const batch = moduleIds.slice(i, i + BATCH_SIZE)

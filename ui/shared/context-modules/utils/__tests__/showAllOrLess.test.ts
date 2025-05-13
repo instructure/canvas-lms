@@ -258,5 +258,44 @@ describe('showAllOrLess', () => {
       addShowAllOrLess('1')
       expect(module.querySelector('.show-all-or-less-button')).not.toBeInTheDocument()
     })
+
+    it('should set the button dataset isLoading to false when method is called', () => {
+      const module = makeModule()
+      module.dataset.loadstate = 'paginated'
+      const button = document.createElement('button')
+      button.className = 'show-all-or-less-button ui-button'
+      button.dataset.moduleId = '1'
+      button.disabled = true
+      module.appendChild(button)
+
+      addShowAllOrLess('1')
+
+      expect(button.dataset.isLoading).toBe('false')
+    })
+
+    it('should set the button dataset isLoading to true when method is called', () => {
+      const module = makeModule()
+      module.dataset.loadstate = 'paginated'
+
+      addShowAllOrLess('1')
+      const button = module.querySelector('.show-all-or-less-button') as HTMLButtonElement
+      button.click()
+
+      expect(button.dataset.isLoading).toBe('true')
+    })
+
+    it('should not call document dispatchEvent on isLoading true', () => {
+      const spy = jest.spyOn(document, 'dispatchEvent')
+      const module = makeModule()
+      module.dataset.loadstate = 'paginated'
+
+      addShowAllOrLess('1')
+      const button = module.querySelector('.show-all-or-less-button') as HTMLButtonElement
+      button.dataset.isLoading = 'true'
+      button.click()
+
+      expect(spy).not.toHaveBeenCalled()
+      spy.mockRestore()
+    })
   })
 })
