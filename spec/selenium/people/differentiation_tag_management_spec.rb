@@ -922,6 +922,30 @@ describe "Differentiation Tag Management" do
           get "/courses/#{@course_with_tags_disabled.id}/users"
           expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
         end
+
+        it "does show 'Manage Tags' button when parent ff is off and unlocked" do
+          Account.default.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_OFF
+          @sub1_account.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
+          @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          @sub1_account.save!
+          @sub1_account.reload
+          user_session @teacher
+          get "/courses/#{@course_with_tags_disabled.id}/users"
+          expect(f("body")).to contain_jqcss("button:contains('Manage Tags')")
+        end
+
+        it "does not show 'Manage Tags' button when parent ff is off and locked" do
+          Account.default.disable_feature! :assign_to_differentiation_tags
+          # when you disable parent FF and lock it sub accounts FF and settings won't work even if
+          # enabled by code without using the ui
+          @sub1_account.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
+          @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          @sub1_account.save!
+          @sub1_account.reload
+          user_session @teacher
+          get "/courses/#{@course_with_tags_disabled.id}/users"
+          expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
+        end
       end
     end
   end
