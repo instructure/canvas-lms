@@ -450,7 +450,7 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
 
       it('Enter opens the "Options" menu', () => {
         handleKeyDown(13) // Enter
-        expect($menuContent).toBeTruthy()
+        expect(getOptionsMenuContent()).toBeTruthy()
       })
 
       it('returns false for Enter', () => {
