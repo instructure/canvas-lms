@@ -72,6 +72,7 @@ describe('ViewSettings', () => {
       expandedLocked: false,
     })
     const locked = queryByTestId('view-expanded-locked')
+    expect(locked).toHaveAttribute('data-action-state', 'lockExpandedState')
     expect(locked).toBeDisabled()
     fireEvent.click(screen.queryByTestId('view-default-thread-state-expanded'))
     fireEvent.click(locked)
@@ -79,9 +80,34 @@ describe('ViewSettings', () => {
     expect(locked).toBeDisabled()
   })
 
+  it('when expanded lock is set, then it sets the trackable attribute accordingly', () => {
+    const {queryByTestId} = setup({
+      ...defaultProps,
+      expanded: true,
+      expandedLocked: true,
+    })
+    const locked = queryByTestId('view-expanded-locked')
+    expect(locked).toHaveAttribute('data-action-state', 'unlockExpandedState')
+  })
+
   it('renders sort order settings, if enabled in ENV', () => {
     const {queryByTestId} = setup(defaultProps)
     expect(queryByTestId('view-default-sort-order')).toBeInTheDocument()
+    expect(queryByTestId('view-sort-order-locked')).toHaveAttribute(
+      'data-action-state',
+      'lockSortOrder',
+    )
+  })
+
+  it('when sort order is locked it sets the trackable attribute accordingly', () => {
+    const {queryByTestId} = setup({
+      ...defaultProps,
+      sortOrderLocked: true,
+    })
+    expect(queryByTestId('view-sort-order-locked')).toHaveAttribute(
+      'data-action-state',
+      'unlockSortOrder',
+    )
   })
 
   it('does not render sort order settings, if disabled in ENV', () => {
