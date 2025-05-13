@@ -75,12 +75,9 @@ export default class QuizArrowApplicator {
         this.css({[direction('left')]: -128, top: 5})
       },
     )
-    $.each(
-      [this.creditFullTpl, this.creditNoneTpl, this.creditPartialTpl],
-      function () {
-        this.css({[direction('left')]: -108, top: 9})
-      },
-    )
+    $.each([this.creditFullTpl, this.creditNoneTpl, this.creditPartialTpl], function () {
+      this.css({[direction('left')]: -108, top: 9})
+    })
   }
 
   applyCorrectAndIncorrectArrows() {
@@ -110,6 +107,8 @@ export default class QuizArrowApplicator {
     this.surveyAnswerTpl.text(I18n.t('answers.you_answered', 'You Answered'))
     this.unansweredQ.prepend(this.unansweredTpl)
     this.surveyAnswers.prepend(this.surveyAnswerTpl)
+
+    this.unansweredQ.addClass('bordered')
   }
 
   makeArrowsAccessible() {
@@ -120,7 +119,7 @@ export default class QuizArrowApplicator {
     //
     // Enable a11y for <input /> elements that receive focus by speaking the
     // answer result which is contained in the arrow marker.
-    $('#questions .answer_arrow').each(function () {
+    $('#questions .answer_arrow, #questions .answer_indicator').each(function () {
       const $arrow = $(this)
 
       // This might be either an ".answer", or an ".answers_wrapper" in case
