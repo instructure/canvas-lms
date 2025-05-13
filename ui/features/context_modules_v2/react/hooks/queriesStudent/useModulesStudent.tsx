@@ -19,12 +19,8 @@
 import {useAllPages} from '@canvas/query'
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/query/graphql'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {ModulesResponse, GraphQLResult} from '../../utils/types.d'
+import {ModulesResponse, GraphQLResult} from '../../utils/types'
 import {InfiniteData} from '@tanstack/react-query'
-
-const I18n = createI18nScope('context_modules_v2')
 
 const MODULES_STUDENT_QUERY = gql`
   query GetModulesStudentQuery($courseId: ID!, $cursor: String) {
@@ -98,38 +94,33 @@ async function getModulesStudent({
 }: {queryKey: any; pageParam?: unknown}): Promise<ModulesResponse> {
   const [_key, courseId] = queryKey
   const cursor = pageParam ? String(pageParam) : null
-  try {
-    const result = await executeQuery<GraphQLResult>(MODULES_STUDENT_QUERY, {
-      courseId,
-      cursor,
-    })
 
-    if (result.errors) {
-      throw new Error(result.errors.map((err: {message: string}) => err.message).join(', '))
-    }
+  const result = await executeQuery<GraphQLResult>(MODULES_STUDENT_QUERY, {
+    courseId,
+    cursor,
+  })
 
-    const edges = result.legacyNode?.modulesConnection?.edges || []
-    const pageInfo = result.legacyNode?.modulesConnection?.pageInfo || {
-      hasNextPage: false,
-      endCursor: null,
-    }
+  if (result.errors) {
+    throw new Error(result.errors.map((err: {message: string}) => err.message).join(', '))
+  }
 
-    const modules = edges.map(edge => {
-      const node = edge.node
-      return {
-        ...node,
-      }
-    })
+  const edges = result.legacyNode?.modulesConnection?.edges || []
+  const pageInfo = result.legacyNode?.modulesConnection?.pageInfo || {
+    hasNextPage: false,
+    endCursor: null,
+  }
 
+  const modules = edges.map(edge => {
+    const node = edge.node
     return {
-      courseName: result.legacyNode?.name,
-      modules,
-      pageInfo,
+      ...node,
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    showFlashError(I18n.t('Failed to load modules: %{error}', {error: errorMessage}))
-    throw error
+  })
+
+  return {
+    courseName: result.legacyNode?.name,
+    modules,
+    pageInfo,
   }
 }
 

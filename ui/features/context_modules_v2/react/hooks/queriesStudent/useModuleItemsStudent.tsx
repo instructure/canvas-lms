@@ -18,14 +18,10 @@
 
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/query/graphql'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {ModuleItemsResponse, ModuleItemsGraphQLResult, ModuleItem} from '../../utils/types.d'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {ModuleItemsResponse, ModuleItemsGraphQLResult, ModuleItem} from '../../utils/types'
 import {useQuery} from '@tanstack/react-query'
 
-const I18n = createI18nScope('context_modules_v2')
-
-const MODULE_ITEMS_STUDENT_QUERY = gql`
+export const MODULE_ITEMS_STUDENT_QUERY = gql`
   query GetModuleItemsStudentQuery($moduleId: ID!) {
     legacyNode(_id: $moduleId, type: Module) {
       ... on Module {
@@ -120,24 +116,19 @@ const transformItems = (items: ModuleItem[], moduleId: string) => {
 
 async function getModuleItemsStudent({queryKey}: {queryKey: any}): Promise<ModuleItemsResponse> {
   const [_key, moduleId] = queryKey
-  try {
-    const result = await executeQuery<ModuleItemsGraphQLResult>(MODULE_ITEMS_STUDENT_QUERY, {
-      moduleId,
-    })
 
-    if (result.errors) {
-      throw new Error(result.errors.map(err => err.message).join(', '))
-    }
+  const result = await executeQuery<ModuleItemsGraphQLResult>(MODULE_ITEMS_STUDENT_QUERY, {
+    moduleId,
+  })
 
-    const moduleItems = result.legacyNode?.moduleItems || []
+  if (result.errors) {
+    throw new Error(result.errors.map(err => err.message).join(', '))
+  }
 
-    return {
-      moduleItems: transformItems(moduleItems, moduleId),
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    showFlashError(I18n.t('Failed to load module items: %{error}', {error: errorMessage}))
-    throw error
+  const moduleItems = result.legacyNode?.moduleItems || []
+
+  return {
+    moduleItems: transformItems(moduleItems, moduleId),
   }
 }
 
