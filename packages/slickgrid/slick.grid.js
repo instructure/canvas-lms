@@ -452,7 +452,7 @@ if (typeof Slick === 'undefined') {
       }
 
       $viewport_1 = $(
-        "<div class='viewport_1 slick-viewport' style='width:100%;overflow:auto;outline:0;position:relative;'>"
+        "<div class='viewport_1 slick-viewport' style='z-index:0;width:100%;overflow:auto;outline:0;position:relative;'>"
       ).appendTo($container_1)
       $viewport_1.css('overflow-y', options.autoHeight ? 'hidden' : 'auto')
 
