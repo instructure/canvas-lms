@@ -249,6 +249,11 @@ describe('DiscussionTopicForm', () => {
       expect(queryByTestId('checkpoints-checkbox')).toBeInTheDocument()
     })
 
+    it('renders the cancel button', () => {
+      const {queryByTestId} = setup()
+      expect(queryByTestId('announcement-cancel-button')).toBeInTheDocument()
+    })
+
     it('does not display the checkpoints checkbox when the Graded option is not selected and discussion checkpoints flag is on', () => {
       const {queryByTestId} = setup()
 
@@ -322,6 +327,7 @@ describe('DiscussionTopicForm', () => {
       const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'side_comment'}})
 
       const checkbox = getByTestId('disallow_threaded_replies')
+      expect(checkbox).toHaveAttribute('data-action-state', 'allowThreads')
       expect(checkbox.checked).toBe(true)
     })
 
@@ -352,6 +358,7 @@ describe('DiscussionTopicForm', () => {
       const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'threaded'}})
 
       const checkbox = getByTestId('disallow_threaded_replies')
+      expect(checkbox).toHaveAttribute('data-action-state', 'disallowThreads')
       expect(checkbox.disabled).toBe(false)
       expect(checkbox.checked).toBe(false)
     })
