@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {FileManagementProvider} from '../../../../contexts/FileManagementContext'
@@ -85,9 +85,13 @@ describe('PermissionsModal', () => {
           screen.getByText('Schedule availability').click()
 
           await userEvent.click(screen.getByTestId('permissions-save-button'))
-          const messages = await screen.getAllByText('Invalid date.')
-          expect(messages[0]).toBeInTheDocument()
-          expect(messages[1]).toBeInTheDocument()
+
+          await waitFor(() => {
+            const messages = screen.getAllByText('Invalid date.')
+            expect(messages).toHaveLength(2)
+            expect(messages[0]).toBeInTheDocument()
+            expect(messages[1]).toBeInTheDocument()
+          })
         })
       })
     })
