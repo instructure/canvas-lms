@@ -92,7 +92,15 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
             </div>
           </div>
         </div>
-
+      <% if @context.root_account.suppress_assignments? %>
+        <div class="controls">
+          <p class="option-caption"><strong><%= t("Grading Visibility") %></strong></p>
+          <label class="checkbox" id=suppress_assignment_option>
+            <%= check_box :quiz, :suppress_assignment, :checked => !!@quiz.assignment&.suppress_assignment %>
+            <%= t("Hide from gradebook view and student grades view") %>
+          </label>
+        </div>
+      <% end %>
         <div class="control-group">
           <div class="controls">
             <p class="option-caption"><strong><%= t("Options") %></strong></p>

@@ -45,6 +45,7 @@ export const Assignment = {
       lockAt
       name
       omitFromFinalGrade
+      suppressAssignment
       pointsPossible
       position
       published
@@ -107,6 +108,7 @@ export const Assignment = {
     lockAt: string,
     name: string,
     omitFromFinalGrade: bool,
+    suppressAssignment: bool,
     pointsPossible: number,
     position: number,
     published: bool,

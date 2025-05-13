@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-
+import fakeENV from '@canvas/test-utils/fakeENV'
 import AssignmentTable from '../AssignmentTable'
 
 import {Assignment} from '../../../graphql/Assignment'
@@ -45,6 +45,14 @@ const defaultProps = {
 }
 
 describe('AssignmentTable', () => {
+  beforeEach(() => {
+    fakeENV.setup()
+    ENV.SETTINGS = {suppress_assignments: false}
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
   it('renders', () => {
     const {getByText} = render(<AssignmentTable {...defaultProps} />)
     expect(getByText(Assignment.mock().name)).toBeInTheDocument()

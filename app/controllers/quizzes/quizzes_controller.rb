@@ -540,6 +540,7 @@ class Quizzes::QuizzesController < ApplicationController
               old_assignment.id = @quiz.assignment.id
 
               @quiz.assignment.post_to_sis = params[:post_to_sis] == "1"
+              @quiz.assignment.suppress_assignment = params[:suppress_assignment] == "1" if @context.root_account.suppress_assignments?
               @quiz.assignment.validate_overrides_for_sis(prepared_batch) if overrides
 
               @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])

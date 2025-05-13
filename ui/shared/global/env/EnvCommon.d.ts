@@ -30,6 +30,7 @@ type Setting =
   | 'hide_dashcard_color_overlays'
   | 'comment_library_suggestions_enabled'
   | 'elementary_dashboard_disabled'
+  | 'suppress_assignments'
 
 type Role = {
   addable_by_user: boolean

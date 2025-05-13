@@ -59,6 +59,7 @@ describe('EditHeaderView', () => {
       FEATURES: {
         instui_nav: true,
       },
+      SETTINGS: {},
     })
     container = document.createElement('div')
     container.id = 'fixtures'
@@ -172,7 +173,7 @@ describe('EditHeaderView', () => {
 
   describe('delete functionality', () => {
     it('calls onDeleteSuccess for unsaved assignments', () => {
-      fakeENV.setup({ASSIGNMENT_INDEX_URL: '/assignments'})
+      fakeENV.setup({ASSIGNMENT_INDEX_URL: '/assignments', SETTINGS: {}})
       const view = createEditHeaderView()
       const onDeleteSuccess = jest.spyOn(view, 'onDeleteSuccess')
       view.delete()
@@ -221,7 +222,7 @@ describe('EditHeaderView', () => {
 
   describe('SpeedGrader link', () => {
     beforeEach(() => {
-      fakeENV.setup({SHOW_SPEED_GRADER_LINK: true})
+      fakeENV.setup({SHOW_SPEED_GRADER_LINK: true, SETTINGS: {}})
     })
 
     afterEach(() => {

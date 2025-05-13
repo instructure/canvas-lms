@@ -237,6 +237,7 @@ module UserLearningObjectScopes
 
       assignments = assignments.need_submitting_info(id, limit) if purpose == "submitting"
       assignments = assignments.having_submissions_for_user(id) if purpose == "submitted"
+      assignments = assignments.without_suppressed_assignments
       if purpose == "submitting"
         assignments = assignments.submittable.or(assignments.where("assignments.user_due_date > ?", Time.zone.now))
       end

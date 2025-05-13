@@ -197,6 +197,20 @@
           </div>
         </div>
 
+        {{#if ENV.SETTINGS.suppress_assignments}}
+          <div class="control-group">
+            <div class="form-column-left no-group"></div>
+            <div class="form-column-right">
+            <label class="checkbox short-label" for="suppress_assignment" >
+              {{checkbox "assignment.suppressAssignment"
+              id="assignment_suppress_from_gradebook"
+              name="suppress_from_gradebook"}}
+              {{#t "suppress_assignment_label"}}Hide from gradebook view and student grades view{{/t}}
+            </label>
+            </div>
+          </div>
+        {{/if}}
+
         <div id="grading_type_options" class="control-group"></div>
 
         <div id="post_to_sis_options" class="control-group"></div>

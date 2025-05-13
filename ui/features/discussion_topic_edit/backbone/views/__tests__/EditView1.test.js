@@ -70,7 +70,9 @@ describe('EditView', () => {
           is_announcement: false,
         },
       },
+      SETTINGS: {},
     })
+
     fetchMock
       .mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200, {
         overwriteRoutes: true,

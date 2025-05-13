@@ -102,6 +102,41 @@ describe UsersController, type: :request do
     assert_forbidden
   end
 
+  context "with suppress_assignments setting on" do
+    before(:once) do
+      root_account = @course.root_account
+      root_account.settings[:suppress_assignment] = true
+      root_account.save
+    end
+
+    it "does not return todo items for suppressed assignments" do
+      @course.assignments.create(title: "suppressed", due_at: "2012-01-08", suppress_assignment: true)
+      json = api_call(:get, "/api/v1/planner/items?start_date=2012-01-07&end_date=2012-01-16&context_codes[]=course_#{@course.id}&context_codes[]=user_#{@student_course.id}", {
+                        controller: "planner",
+                        action: "index",
+                        format: "json",
+                        context_codes: ["course_#{@course.id}", "user_#{@student_course.id}"],
+                        start_date: "2012-01-07",
+                        end_date: "2012-01-16"
+                      })
+      expect(json.count).to eq(0)
+    end
+
+    it "returns todo items for unsuppressed assignments" do
+      new_assignment = @course.assignments.create(title: "unsuppressed", due_at: "2012-01-08", suppress_assignment: false)
+      json = api_call(:get, "/api/v1/planner/items?start_date=2012-01-07&end_date=2012-01-16&context_codes[]=course_#{@course.id}&context_codes[]=user_#{@student_course.id}", {
+                        controller: "planner",
+                        action: "index",
+                        format: "json",
+                        context_codes: ["course_#{@course.id}", "user_#{@student_course.id}"],
+                        start_date: "2012-01-07",
+                        end_date: "2012-01-16"
+                      })
+      expect(json.count).to eq(1)
+      expect(json.first["plannable_id"]).to eq(new_assignment.id)
+    end
+  end
+
   it "returns a global user todo list" do
     json = api_call(:get,
                     "/api/v1/users/self/todo",

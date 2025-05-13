@@ -234,6 +234,11 @@ module Types
 
     field :lock_info, LockInfoType, null: true
 
+    # needed for instructure.atlassian.net/browse/PFS-23713
+    field :suppress_assignment,
+          Boolean,
+          "internal use",
+          null: false
     field :post_to_sis,
           Boolean,
           "present if Sync Grades to SIS feature is enabled",

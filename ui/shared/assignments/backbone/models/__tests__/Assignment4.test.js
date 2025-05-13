@@ -24,7 +24,7 @@ import Assignment from '../Assignment'
 describe('Assignment', () => {
   describe('#toView', () => {
     beforeEach(() => {
-      fakeENV.setup({current_user_roles: ['teacher']})
+      fakeENV.setup({current_user_roles: ['teacher'], SETTINGS: {}})
     })
 
     afterEach(() => {
