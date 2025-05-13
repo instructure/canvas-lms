@@ -2173,6 +2173,7 @@ he:
   allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: "הרשאה לתלמידים לעיין ברשימת הנרשמים לחלונות הזמן שעדיין זמינים"
   allow_switching_to_the_new_assignments_page_9ac0ad93: "הרשאה לעבור לדף המשימות החדש"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "אפשר/י את היכולת לשגר תזכורות באמצעות תור השדרים שלנו"
+  allow_threaded_replies_43b2311e: "הרשאת שירשור תגובות"
   allowed_attempts_4e229caa: "נסיונות מותרים"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "מאפשר יצירת הכרזות לסעיף יעודי"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "התרה למורים לסמן נתוני הערכה לייצוא במנות לסינכרון עם המערכת הבית ספרית"
@@ -20559,6 +20560,7 @@ he:
       welcome_to_happiness: "ברוכים הבאים לקנבס!"
   users_d1b60cb0: משתמשים
   users_matching_search_term_c604db9e: "משתמשים העונים על תנאי החיפוש \"%{search_term}\""
+  users_must_post_before_seeing_replies_d1761968: "התלמיד חייב לפרסם לפני שיעיין בתגובות"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "יתכן שמשתמשי תוכנות קריאת מסך יצטרכו לנטרל את פעולת הסמן הוירטואלי כדי להשתמש בקיצורי המקלדת הללו"
   users_with_no_enrollments_5dddce33: "משתמשים ללא רישומים לקורסים"
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "משתמש בכלי התזמון החדש וביכולות שלו"
