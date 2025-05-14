@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../lti_1_3_tool_configuration_spec_helper"
 require_relative "../lib/token_scopes/last_known_accepted_scopes"
 require_relative "../lib/token_scopes/spec_helper"
 
@@ -1129,17 +1130,89 @@ describe DeveloperKey do
         end
       end
     end
+  end
 
-    describe "destroy_registration" do
-      let(:developer_key) { lti_developer_key_model(account:) }
+  describe "destroy" do
+    subject { developer_key.destroy }
 
-      before do
-        developer_key.save!
+    # Introduces canvas_lti_configuration and internal_lti_configuration
+    include_context "lti_1_3_tool_configuration_spec_helper"
+
+    let_once(:admin) { account_admin_user(account:) }
+    let_once(:account) { account_model }
+    let_once(:developer_key) { developer_key_model(account:) }
+
+    it "marks the key as deleted" do
+      subject
+      expect(developer_key.reload).to be_deleted
+    end
+
+    context "with an LTI developer key" do
+      let_once(:lti_registration) do
+        Lti::CreateRegistrationService.call(
+          account:,
+          created_by: admin,
+          registration_params:,
+          configuration_params: internal_lti_configuration
+        )
+      end
+      let_once(:developer_key) { lti_registration.developer_key }
+      let(:registration_params) do
+        {
+          name: "Test LTI Registration",
+        }
       end
 
-      it "destroys the associated lti registration" do
-        developer_key.destroy
-        expect(developer_key.lti_registration).to be_deleted
+      it "deletes all associated objects" do
+        subject
+        expect(lti_registration.reload).to be_deleted
+        expect(developer_key.reload.tool_configuration).to be_nil
+        expect(developer_key.developer_key_account_bindings.all?(&:deleted?)).to be true
+      end
+
+      context "and the key has tools associated with it" do
+        let_once(:course) { course_model(account:) }
+        let_once(:course_tool) { lti_registration.new_external_tool(course) }
+        let_once(:account_tool) { lti_registration.new_external_tool(account) }
+
+        it "destroys the tools in a job" do
+          # Force rails to reset/refetch these from the database
+          # to mimic what might actually happen when someone calls destroy on a singular
+          # developer key.
+          developer_key.reset_tool_configuration
+          developer_key.reset_lti_registration
+          developer_key.reset_ims_registration
+          subject
+          run_jobs
+          expect(course_tool.reload).to be_deleted
+          expect(account_tool.reload).to be_deleted
+        end
+      end
+    end
+
+    context "with a dynamic registration developer key" do
+      let_once(:lti_registration) { developer_key.lti_registration }
+      let_once(:ims_registration) { developer_key.ims_registration }
+      let_once(:developer_key) { dev_key_model_dyn_reg(account:) }
+
+      it "marks the lti registration and ims registration as deleted" do
+        subject
+        expect(lti_registration.reload).to be_deleted
+        expect(ims_registration.reload).to be_deleted
+        expect(developer_key.reload).to be_deleted
+      end
+
+      context "and the key has tools associated with it" do
+        let_once(:course) { course_model(account:) }
+        let_once(:course_tool) { lti_registration.new_external_tool(course) }
+        let_once(:account_tool) { lti_registration.new_external_tool(account) }
+
+        it "destroys the tools in a job" do
+          subject
+          run_jobs
+          expect(course_tool.reload).to be_deleted
+          expect(account_tool.reload).to be_deleted
+        end
       end
     end
   end
@@ -1165,6 +1238,17 @@ describe DeveloperKey do
       expect(developer_key_saved.context_external_tools).to match_array [
         tool
       ]
+    end
+
+    it "destroys an lti ims registration when destroyed" do
+      account = account_model
+      key = dev_key_model_dyn_reg(account:)
+
+      expect(key.destroy).to be true
+      key.reload
+      expect(key).to be_deleted
+      expect(key.lti_registration).to be_deleted
+      expect(key.ims_registration).to be_deleted
     end
   end
 

@@ -42,16 +42,22 @@ class DeveloperKey < ActiveRecord::Base
   belongs_to :account
   belongs_to :root_account, class_name: "Account"
   belongs_to :service_user, class_name: "User"
-  belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :developer_key, dependent: :destroy
-
+  belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :developer_key
   has_many :page_views
   has_many :access_tokens, -> { where(workflow_state: "active") }
-  has_many :developer_key_account_bindings, inverse_of: :developer_key, dependent: :destroy
+  has_many :developer_key_account_bindings, inverse_of: :developer_key
   has_many :context_external_tools
 
   has_one :tool_consumer_profile, class_name: "Lti::ToolConsumerProfile", inverse_of: :developer_key
-  has_one :tool_configuration, class_name: "Lti::ToolConfiguration", dependent: :destroy, inverse_of: :developer_key
-  has_one :ims_registration, class_name: "Lti::IMS::Registration", dependent: :destroy, inverse_of: :developer_key
+  has_one :tool_configuration, class_name: "Lti::ToolConfiguration", inverse_of: :developer_key
+  # This *cannot* be dependent: :destroy. Lti::IMS::Registration includes Canvas::SoftDeletable, which overrides
+  # what it means to destroy a record. If we set this to dependent: :destroy, it will try to destroy the
+  # Lti::IMS::Registration, which will only set the workflow_state to deleted. Rails will then
+  # check to see if the record was actually deleted from the database, and if it wasn't,
+  # will abort the callback. This leaves us in a weird state where the developer key doesn't get "destroyed",
+  # but the IMS Registration does. Thus, we let the lti_registration take care of deleting
+  # all LTI associated records.
+  has_one :ims_registration, class_name: "Lti::IMS::Registration", inverse_of: :developer_key
   serialize :scopes, type: Array
 
   before_validation :normalize_public_jwk_url
@@ -69,7 +75,9 @@ class DeveloperKey < ActiveRecord::Base
   after_save :clear_cache
   after_update :invalidate_access_tokens_if_scopes_removed!
   after_update :destroy_external_tools!, if: :destroy_external_tools?
-  before_destroy :destroy_registration!
+  # See comment on destroy_associated_records! for why we don't use
+  # lifecycle callbacks here.
+  before_destroy :destroy_associated_records!
 
   validates :client_type, inclusion: { in: [PUBLIC_CLIENT_TYPE, CONFIDENTIAL_CLIENT_TYPE] }
   validates_as_url :redirect_uri, :oidc_initiation_url, :public_jwk_url, allowed_schemes: nil
@@ -117,8 +125,11 @@ class DeveloperKey < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
+    return true if deleted?
+
     self.workflow_state = "deleted"
-    run_callbacks(:destroy) { save }
+    destroy_associated_records!
+    save!
   end
 
   def confidential_client?
@@ -192,6 +203,22 @@ class DeveloperKey < ActiveRecord::Base
 
   def set_visible
     self.visible = !site_admin?
+  end
+
+  def destroy_associated_records!
+    # You might wonder why we aren't using lifecycle callbacks here.
+    # The answer is that if we do, Rails will also try to destroy the IMS Registration.
+    # However, Lti::IMS::Registration includes Canvas::SoftDeletable,
+    # which means that `destroy` only sets the workflow_state to deleted. Rails will then
+    # go "Hey, I called destroy but you didn't get actually get deleted from the database! Abort!"
+    # and then we'll be left in a weird state where the developer key doesn't get "destroyed",
+    # but the IMS Registration does. Additionally, the order here is important, as we need to
+    # destroy the tool configuration before the LTI registration and IMS registration.
+    tool_configuration&.destroy
+    lti_registration&.destroy
+    ims_registration&.destroy
+    lti_registration&.destroy
+    developer_key_account_bindings&.find_each(&:destroy)
   end
 
   class << self
@@ -546,10 +573,6 @@ class DeveloperKey < ActiveRecord::Base
       :destroy_tools_from_active_shard!,
       account
     )
-  end
-
-  def destroy_registration!
-    lti_registration&.destroy
   end
 
   def destroy_tools_from_active_shard!(affected_account)
