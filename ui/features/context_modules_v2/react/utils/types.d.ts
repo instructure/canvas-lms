@@ -153,6 +153,7 @@ export interface Module {
 
 export interface ModulesResponse {
   modules: Module[]
+  courseName?: string
   pageInfo: {
     hasNextPage: boolean
     endCursor: string | null
@@ -161,6 +162,7 @@ export interface ModulesResponse {
 
 interface GraphQLResult {
   legacyNode?: {
+    name?: string
     modulesConnection?: {
       edges: Array<{
         cursor: string
