@@ -8079,6 +8079,7 @@ tr:
   ending_date_e1ea13a4: "Bitiş tarihi"
   ends_4fcb632: "Bitiyor:"
   ends_at_9a62b528: "Şu zaman bitiyor"
+  ends_e3a6843f: Bitiyor
   english_c60612e2: İngilizce
   enhanced_individual_gradebook: 
     avg_score: "Ortalama Puan"
@@ -14423,6 +14424,7 @@ tr:
   please_add_at_least_one_non_blank_answer_213c2c8e: "Lütfen en az bir tane boş olmayan cevap ekleyin."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Lütfen her değişken için en az bir tane boş olmayan cevap ekleyin."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Lütfen üç veya daha fazla karakter içeren bir arama terimi girin"
+  please_enter_a_valid_format_for_a_date_66ed0587: "Bu bir tarih değil!"
   please_enter_the_details_for_the_new_course_dc705b8c: "Lütfen yeni dersin detaylarını girin."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Token'da gözüken doğrulama kodunu giriniz"
   please_enter_your_label_name_7745272d: "Lütfen %{label_name} inizi girin:"
@@ -18711,6 +18713,7 @@ tr:
   start_participating_f0c75256: "Katılımı Başlat"
   started_5e138638: Başladı
   starts_at_29843f98: "Şu zamanda başlıyor"
+  starts_fa6bf3f5: Başlangıç
   state_66a67ba2: Durum
   state_standards_c9b1affd: "Eyalet Standartları"
   statistics: 
