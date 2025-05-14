@@ -7802,6 +7802,7 @@ he:
   ending_date_e1ea13a4: "תאריך סיום"
   ends_4fcb632: "מסתיים:"
   ends_at_9a62b528: "מסתיים ב"
+  ends_e3a6843f: מסתיים
   enhanced_individual_gradebook: 
     avg_score: "ציון ממוצע"
     high_score: "ציון גבוה"
@@ -14330,6 +14331,7 @@ he:
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "בבקשה להוסיף תאריך יעד ב %{earliestDate} או מאוחר יותר"
   please_enter_a_name_for_this_link_318f01a4: "בבקשה להקליד שם לקישור זה"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "בבקשה להקליד מונח חיפוש עם 3 תווים ומעלה "
+  please_enter_a_valid_format_for_a_date_66ed0587: "זה לא תאריך!"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "בבקשה להקליד כתובת אינטרנט תקינה כולל קידומת, למשל.  ( http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "בבקשה לספק כתובת אינטרנט תקינה, כוול הקידומת (כגון http://, https://, ftp://)."
   please_enter_the_details_for_the_new_course_dc705b8c: "נא להזין את פרטי הקורס החדש"
@@ -18793,6 +18795,7 @@ he:
   started_5e138638: התחיל
   starts_at_29843f98: "מתחיל ב"
   starts_ce584f1c: "מתחיל:"
+  starts_fa6bf3f5: מתחיל
   state_standards_c9b1affd: "תקני מדינה"
   statistics: 
     csv_columns: 
