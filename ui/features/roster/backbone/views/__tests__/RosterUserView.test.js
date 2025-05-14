@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import {Collection} from '@canvas/backbone'
 import RosterUserView from '../RosterUserView'
 import RosterUser from '../../models/RosterUser'
 
@@ -126,5 +127,204 @@ describe('RosterUserView', () => {
 
     const sectionCell = document.querySelector('[data-testid="section-column-cell"]')
     expect(sectionCell).not.toBeNull()
+  })
+})
+
+describe('RosterUserView Range Selection', () => {
+  let collection, userViews, container
+
+  beforeEach(() => {
+    // Set up DOM container
+    container = document.createElement('table')
+    document.body.appendChild(container)
+
+    // Mock collection with 5 users
+    collection = new Collection([
+      new RosterUser({id: 1, enrollments: [{type: 'StudentEnrollment'}]}),
+      new RosterUser({id: 2, enrollments: [{type: 'StudentEnrollment'}]}),
+      new RosterUser({id: 3, enrollments: [{type: 'StudentEnrollment'}]}),
+      new RosterUser({id: 4, enrollments: [{type: 'StudentEnrollment'}]}),
+      new RosterUser({id: 5, enrollments: [{type: 'StudentEnrollment'}]}),
+    ])
+    collection.selectedUserIds = []
+    collection.deselectedUserIds = []
+    collection.masterSelected = false
+    collection.lastCheckedIndex = null
+
+    // Create views and render checkboxes
+    userViews = collection.map(model => {
+      model.collection = collection
+      const view = new RosterUserView({model})
+      const $el = $(
+        '<tr><td><input type="checkbox" class="select-user-checkbox" data-user-id="' +
+          model.id +
+          '"></td></tr>',
+      )
+      view.setElement($el)
+      view.render = () => {}
+      view.$el.appendTo(container)
+      model.view = view
+      return view
+    })
+  })
+
+  afterEach(() => {
+    $(container).remove()
+  })
+
+  function getCheckbox(index) {
+    return $(container).find('.select-user-checkbox').get(index)
+  }
+
+  it('selects a range of checkboxes with shift+click', () => {
+    // Simulate clicking first checkbox
+    const firstCheckbox = getCheckbox(0)
+    $(firstCheckbox).prop('checked', true)
+    userViews[0].handleCheckboxChange({
+      currentTarget: firstCheckbox,
+      isShiftPressed: false,
+      preventDefault: () => {},
+    })
+
+    // Simulate shift+click on fourth checkbox
+    const fourthCheckbox = getCheckbox(3)
+    $(fourthCheckbox).prop('checked', true)
+    userViews[3].isShiftPressed = true
+    userViews[3].handleCheckboxChange({
+      currentTarget: fourthCheckbox,
+      isShiftPressed: true,
+      preventDefault: () => {},
+    })
+
+    // All checkboxes from 0 to 3 should be checked
+    for (let i = 0; i <= 3; i++) {
+      expect(getCheckbox(i).checked).toBe(true)
+      expect(collection.selectedUserIds).toContain(collection.at(i).id)
+    }
+    expect(collection.selectedUserIds).toHaveLength(4)
+  })
+
+  it('deselects a range of checkboxes with shift+click', () => {
+    // Select all first
+    const firstCheckbox = getCheckbox(0)
+    $(firstCheckbox).prop('checked', true)
+    userViews[0].handleCheckboxChange({
+      currentTarget: firstCheckbox,
+      isShiftPressed: false,
+      preventDefault: () => {},
+    })
+
+    // Simulate shift+click on fourth checkbox
+    const fifthCheckbox = getCheckbox(4)
+    $(fifthCheckbox).prop('checked', true)
+    userViews[4].isShiftPressed = true
+    userViews[4].handleCheckboxChange({
+      currentTarget: fifthCheckbox,
+      isShiftPressed: true,
+      preventDefault: () => {},
+    })
+
+    // Simulate shift+click to deselect from 1 to 4
+    const secondCheckbox = getCheckbox(1)
+    $(secondCheckbox).prop('checked', false)
+    userViews[1].isShiftPressed = true
+    userViews[1].handleCheckboxChange({
+      currentTarget: secondCheckbox,
+      isShiftPressed: true,
+      preventDefault: () => {},
+    })
+
+    // Checkboxes 1-4 should be unchecked
+    for (let i = 1; i <= 4; i++) {
+      expect(getCheckbox(i).checked).toBe(false)
+      expect(collection.selectedUserIds).not.toContain(collection.at(i).id)
+    }
+    // Checkbox 0 should remain checked
+    expect(getCheckbox(0).checked).toBe(true)
+    expect(collection.selectedUserIds).toContain(collection.at(0).id)
+  })
+
+  it('does not select range if shift is not pressed', () => {
+    // Click first checkbox
+    const firstCheckbox = getCheckbox(0)
+    $(firstCheckbox).prop('checked', true)
+    userViews[0].handleCheckboxChange({
+      currentTarget: firstCheckbox,
+      isShiftPressed: false,
+      preventDefault: () => {},
+    })
+    collection.lastCheckedIndex = 0
+
+    // Click third checkbox without shift
+    const thirdCheckbox = getCheckbox(2)
+    $(thirdCheckbox).prop('checked', true)
+    userViews[2].isShiftPressed = false
+    userViews[2].handleCheckboxChange({
+      currentTarget: thirdCheckbox,
+      isShiftPressed: false,
+      preventDefault: () => {},
+    })
+
+    // Only first and third should be checked
+    expect(getCheckbox(0).checked).toBe(true)
+    expect(getCheckbox(2).checked).toBe(true)
+    expect(getCheckbox(1).checked).toBe(false)
+    expect(collection.selectedUserIds).toContain(collection.at(0).id)
+    expect(collection.selectedUserIds).toContain(collection.at(2).id)
+    expect(collection.selectedUserIds).toHaveLength(2)
+  })
+
+  it('does not select range on the same checkbox', () => {
+    // Simulate clicking the second checkbox
+    const secondCheckbox = getCheckbox(1)
+    $(secondCheckbox).prop('checked', true)
+    userViews[1].handleCheckboxChange({
+      currentTarget: secondCheckbox,
+      isShiftPressed: false,
+      preventDefault: () => {},
+    })
+    // Now select the same checkbox
+    userViews[1].isShiftPressed = true
+    userViews[1].handleCheckboxChange({
+      currentTarget: secondCheckbox,
+      isShiftPressed: true,
+      preventDefault: () => {},
+    })
+    // Only the second checkbox should be checked
+    for (let i = 0; i < 5; i++) {
+      if (i === 1) {
+        expect(getCheckbox(i).checked).toBe(true)
+        expect(collection.selectedUserIds).toContain(collection.at(i).id)
+      } else {
+        expect(getCheckbox(i).checked).toBe(false)
+        expect(collection.selectedUserIds).not.toContain(collection.at(i).id)
+      }
+    }
+  })
+
+  it('sets lastCheckedIndex to null after deselecting all checkboxes', () => {
+    // Select a checkbox first
+    const firstCheckbox = getCheckbox(0)
+    $(firstCheckbox).prop('checked', true)
+    userViews[0].handleCheckboxChange({
+      currentTarget: firstCheckbox,
+      isShiftPressed: false,
+      preventDefault: () => {},
+    })
+
+    // Verify lastCheckedIndex is set
+    expect(collection.lastCheckedIndex).toBe(0)
+
+    // Deselect the checkbox
+    $(firstCheckbox).prop('checked', false)
+    userViews[0].handleCheckboxChange({
+      currentTarget: firstCheckbox,
+      isShiftPressed: false,
+      preventDefault: () => {},
+    })
+
+    // Verify lastCheckedIndex is null when no checkboxes are selected
+    expect(collection.lastCheckedIndex).toBeNull()
+    expect(collection.selectedUserIds).toHaveLength(0)
   })
 })

@@ -28,6 +28,9 @@ export default class RosterUserCollection extends PaginatedCollection {
 
     // Keep track of *manually* de-selected users when masterSelected is true
     this.deselectedUserIds = []
+
+    // Keep track of the last checked index for the checkbox
+    this.lastCheckedIndex = null
   }
 
   url() {

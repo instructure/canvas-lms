@@ -57,10 +57,23 @@ export default class RosterUserView extends View {
       'blur *': 'blur',
       'change .select-user-checkbox': 'handleCheckboxChange',
       'click .user-tags-icon': 'handleTagIconClick',
+      'keydown .select-user-checkbox': 'handleKeyDown',
     }
   }
 
   attach() {
+    $(document).on('keydown', e => {
+      if (e.key === 'Shift') {
+        this.isShiftPressed = true
+      }
+    })
+
+    $(document).on('keyup', e => {
+      if (e.key === 'Shift') {
+        this.isShiftPressed = false
+      }
+    })
+
     return this.model.on('change', this.render, this)
   }
 
@@ -71,6 +84,8 @@ export default class RosterUserView extends View {
     this.model.currentRole = __guard__(this.model.get('enrollments')[0], x => x.role)
 
     this.$el.attr('id', `user_${options.model.get('id')}`)
+
+    this.isShiftPressed = false
     return Array.from(this.model.get('enrollments')).map(e => this.$el.addClass(e.type))
   }
 
@@ -349,29 +364,47 @@ export default class RosterUserView extends View {
     return this[method].call(this, e)
   }
 
-  // If unchecking a user while master is on, add them to the "deselected" list
-  handleCheckboxChange(e) {
-    const isChecked = $(e.currentTarget).is(':checked')
-    const userId = this.model.id
-    const {selectedUserIds, masterSelected, deselectedUserIds} = this.model.collection
+  // Helper for range selection
+  handleRangeSelection(isChecked, currentIndex) {
+    const {selectedUserIds, masterSelected, deselectedUserIds, lastCheckedIndex} =
+      this.model.collection
+    const $checkboxes = $(
+      this.model.collection
+        .map(model => model.view.$('.select-user-checkbox').get(0))
+        .filter(Boolean),
+    )
+    const start = Math.min(lastCheckedIndex, currentIndex)
+    const end = Math.max(lastCheckedIndex, currentIndex)
 
-    if (isChecked) {
-      // Add user to selected list if not already
-      if (!selectedUserIds.includes(userId)) {
-        selectedUserIds.push(userId)
-      }
-      // Also remove from the deselected list if present
-      this.model.collection.deselectedUserIds = deselectedUserIds.filter(id => id !== userId)
-    } else {
-      // Remove from selected
-      this.model.collection.selectedUserIds = selectedUserIds.filter(id => id !== userId)
-
-      // If master is set, remember that this user was explicitly unchecked
-      if (masterSelected && !deselectedUserIds.includes(userId)) {
-        this.model.collection.deselectedUserIds.push(userId)
-      }
+    if (start === end) {
+      return
     }
 
+    for (let i = start; i <= end; i++) {
+      const checkbox = $checkboxes[i]
+      const checkboxUserId = this.model.collection.models.filter(rosterUser =>
+        rosterUser.hasEnrollmentType('StudentEnrollment'),
+      )[i].id
+      if (isChecked) {
+        if (!selectedUserIds.includes(checkboxUserId)) {
+          selectedUserIds.push(checkboxUserId)
+        }
+        this.model.collection.deselectedUserIds = deselectedUserIds.filter(
+          id => id !== checkboxUserId,
+        )
+      } else {
+        selectedUserIds.splice(
+          0,
+          selectedUserIds.length,
+          ...selectedUserIds.filter(id => id !== checkboxUserId),
+        )
+        if (masterSelected && !deselectedUserIds.includes(checkboxUserId)) {
+          this.model.collection.deselectedUserIds.push(checkboxUserId)
+        }
+      }
+      $(checkbox).prop('checked', isChecked)
+    }
+    this.model.collection.lastCheckedIndex = currentIndex
     MessageBus.trigger('userSelectionChanged', {
       model: this.model,
       selected: isChecked,
@@ -381,7 +414,71 @@ export default class RosterUserView extends View {
     })
   }
 
-  handleTagIconClick(e) {
+  // If unchecking a user while master is on, add them to the "deselected" list
+  handleCheckboxChange(e) {
+    const isChecked = $(e.currentTarget).is(':checked')
+    const userId = this.model.id
+    const {selectedUserIds, masterSelected, deselectedUserIds, lastCheckedIndex} =
+      this.model.collection
+    const $checkboxes = $(
+      this.model.collection
+        .map(model => model.view.$('.select-user-checkbox').get(0))
+        .filter(Boolean),
+    )
+    const currentIndex = $checkboxes.index($(e.currentTarget))
+    if (this.isShiftPressed && lastCheckedIndex !== null) {
+      this.handleRangeSelection(isChecked, currentIndex)
+    } else {
+      if (isChecked) {
+        // Add user to selected list if not already
+        if (!selectedUserIds.includes(userId)) {
+          selectedUserIds.push(userId)
+        }
+        // Remove from deselected list if present
+        this.model.collection.deselectedUserIds = deselectedUserIds.filter(id => id !== userId)
+      } else {
+        // Remove from selected list
+        this.model.collection.selectedUserIds = selectedUserIds.filter(id => id !== userId)
+
+        // If master is set, add to deselected list
+        if (masterSelected && !deselectedUserIds.includes(userId)) {
+          this.model.collection.deselectedUserIds.push(userId)
+        }
+      }
+
+      this.model.collection.lastCheckedIndex = this.model.collection.selectedUserIds.length
+        ? currentIndex
+        : null
+
+      MessageBus.trigger('userSelectionChanged', {
+        model: this.model,
+        selected: isChecked,
+        selectedUsers: this.model.collection.selectedUserIds,
+        deselectedUserIds: this.model.collection.deselectedUserIds,
+        masterSelected: this.model.collection.masterSelected,
+      })
+    }
+  }
+
+  handleKeyDown(e) {
+    // Only act if the focused element is a checkbox
+    if (e.key === 'Shift') {
+      e.preventDefault()
+      const isChecked = !$(e.currentTarget).is(':checked')
+      const $checkboxes = $(
+        this.model.collection
+          .map(model => model.view.$('.select-user-checkbox').get(0))
+          .filter(Boolean),
+      )
+      const currentIndex = $checkboxes.index($(e.currentTarget))
+      const {lastCheckedIndex} = this.model.collection
+      if (lastCheckedIndex !== null) {
+        this.handleRangeSelection(isChecked, currentIndex)
+      }
+    }
+  }
+
+  handleTagIconClick() {
     this.renderUserTagModal(true, this.model.id, this.model.get('name'))
   }
 
@@ -435,6 +532,9 @@ export default class RosterUserView extends View {
   }
 
   remove() {
+    $(document).off('keydown')
+    $(document).off('keyup')
+
     if (this._reactRoot) {
       this._reactRoot.unmount()
     }
