@@ -21,16 +21,20 @@ import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHeader'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('context_modules_v2')
 
 interface ModulePageActionHeaderStudentProps {
+  courseName?: string
   onCollapseAll: () => void
   onExpandAll: () => void
   anyModuleExpanded?: boolean
 }
 
 const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps> = ({
+  courseName,
   onCollapseAll,
   onExpandAll,
   anyModuleExpanded = true,
@@ -67,13 +71,27 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
 
   return (
     <View as="div" padding="small">
-      <ContextModulesHeader
-        // @ts-expect-error
-        {...ENV.CONTEXT_MODULES_HEADER_PROPS}
-        overrides={{
-          expandCollapseAll: {renderComponent: renderExpandCollapseAll},
-        }}
-      />
+      <View as="div" margin="0 0 medium 0">
+        <Heading level="h1">{`${I18n.t('Welcome to ')} ${courseName}!`}</Heading>
+      </View>
+      <View as="div" margin="0 0 medium 0">
+        <Text size="large">
+          {I18n.t(
+            'Your course content is organized into modules below. Explore each one to learn and complete activities.',
+          )}
+        </Text>
+      </View>
+      {/* @ts-expect-error */}
+      {ENV.CONTEXT_MODULES_HEADER_PROPS && (
+        <ContextModulesHeader
+          // @ts-expect-error
+          {...ENV.CONTEXT_MODULES_HEADER_PROPS}
+          overrides={{
+            expandCollapseAll: {renderComponent: renderExpandCollapseAll},
+            hideTitle: true,
+          }}
+        />
+      )}
     </View>
   )
 }

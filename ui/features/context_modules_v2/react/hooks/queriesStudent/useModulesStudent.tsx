@@ -30,6 +30,7 @@ const MODULES_STUDENT_QUERY = gql`
   query GetModulesStudentQuery($courseId: ID!, $cursor: String) {
     legacyNode(_id: $courseId, type: Course) {
       ... on Course {
+        name
         modulesConnection(first: 100, after: $cursor) {
           edges {
             cursor
@@ -120,6 +121,7 @@ async function getModulesStudent({
     })
 
     return {
+      courseName: result.legacyNode?.name,
       modules,
       pageInfo,
     }
