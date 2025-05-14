@@ -1716,6 +1716,18 @@ if (typeof Slick === 'undefined') {
         applyColumnWidths()
         handleScroll()
       }
+
+      // After the list of frozen/scrollable columns has changed, the header layout falls apart
+      // It fixes the issue if the width of the column wrapper is set to 0px and then back to the
+      // original width.
+      // For some reason, the scrollable wrapper width does not need to be changed.
+      if($headers_0) {
+        const frozenWidth = $headers_0.width()
+        $headers_0.width(0)
+        setTimeout(() => {
+          $headers_0.width(frozenWidth)
+        }, 0)
+      }
     }
 
     function getOptions() {
