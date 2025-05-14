@@ -202,27 +202,81 @@ describe('AnnouncementRow', () => {
     expect(screen.queryByText('/images/stuff/things.png')).not.toBeInTheDocument()
   })
 
-  it('does not render manage menu if canManage is false', () => {
-    renderAnnouncementRow({canManage: false})
+  describe('manage menu', () => {
+    describe('when canManage is false', () => {
+      it('does not render manage menu', () => {
+        renderAnnouncementRow({canManage: false})
 
-    expect(screen.queryByText(/Manage options for /)).not.toBeInTheDocument()
-  })
-
-  it('renders manage menu if canManage is true', () => {
-    renderAnnouncementRow({canManage: true})
-
-    expect(screen.getByText(/Manage options for /)).toBeInTheDocument()
-  })
-
-  it('does not render Allow Comments menu item if announcements are globally locked', () => {
-    renderAnnouncementRow({
-      canManage: true,
-      canDelete: false,
-      announcementsLocked: true,
+        expect(screen.queryByText(/Manage options for /)).not.toBeInTheDocument()
+      })
     })
 
-    fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+    describe('when canManage is true', () => {
+      it('renders manage menu', () => {
+        renderAnnouncementRow({canManage: true})
 
-    expect(screen.queryByText(/Allow Comments/)).not.toBeInTheDocument()
+        expect(screen.getByText(/Manage options for /)).toBeInTheDocument()
+      })
+
+      describe('when canDelete is false', () => {
+        it('does not render delete button in manage menu', () => {
+          renderAnnouncementRow({canManage: true, canDelete: false})
+          fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+          expect(screen.queryByText(/Delete/)).not.toBeInTheDocument()
+        })
+      })
+
+      describe('when canDelete is true', () => {
+        it('renders delete button in manage menu', () => {
+          renderAnnouncementRow({canManage: true, canDelete: true, announcementsLocked: true})
+          fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+          const menuItems = screen.getAllByRole('menuitem')
+          expect(menuItems).toHaveLength(1)
+          expect(menuItems[0]).toHaveTextContent(/Delete/)
+        })
+      })
+
+      describe('when announcements are globally locked', () => {
+        it('does not render lock button in manage menu', () => {
+          renderAnnouncementRow({canManage: true, canDelete: false, announcementsLocked: true})
+          fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+          expect(screen.queryByText(/Allow Comments/)).not.toBeInTheDocument()
+        })
+      })
+
+      describe('when announcements are not globally locked', () => {
+        describe('when announcement is locked', () => {
+          it('renders unlock button in manage menu', () => {
+            renderAnnouncementRow({
+              canManage: true,
+              canDelete: false,
+              announcementsLocked: false,
+              announcement: {locked: true},
+            })
+            fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+            const menuItems = screen.getAllByRole('menuitem')
+            expect(menuItems).toHaveLength(1)
+            expect(menuItems[0]).toHaveTextContent(/Allow Comments/)
+            expect(menuItems[0]).toHaveAttribute('data-action-state', 'allowCommentsButton')
+          })
+        })
+
+        describe('when announcement is not locked', () => {
+          it('renders lock button in manage menu', () => {
+            renderAnnouncementRow({
+              canManage: true,
+              canDelete: false,
+              announcementsLocked: false,
+              announcement: {locked: false},
+            })
+            fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+            const menuItems = screen.getAllByRole('menuitem')
+            expect(menuItems).toHaveLength(1)
+            expect(menuItems[0]).toHaveTextContent(/Disallow Comments/)
+            expect(menuItems[0]).toHaveAttribute('data-action-state', 'disallowCommentsButton')
+          })
+        })
+      })
+    })
   })
 })
