@@ -19,19 +19,22 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import CollaborationsToolLaunch from '../CollaborationsToolLaunch'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 let fixtures
 
 describe('CollaborationsToolLaunch screenreader functionality', () => {
   beforeEach(() => {
+    fakeENV.setup({
+      LTI_LAUNCH_FRAME_ALLOWANCES: ['midi', 'media'],
+    })
     document.body.innerHTML = '<div id="main" style="height: 700px; width: 700px" />'
     fixtures = document.getElementById('main')
-    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
   })
 
   afterEach(() => {
     fixtures.innerHTML = ''
-    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
+    fakeENV.teardown()
   })
 
   test('shows beginning info alert and adds styles to iframe', () => {

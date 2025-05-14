@@ -56,11 +56,16 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
   const renderFooter = useCallback((): JSX.Element => {
     return (
       <Flex as="section" justifyItems="end">
-        {/* @ts-expect-error */}
-        <Button color="secondary" margin="0 small 0" onClick={handleCancel}>
+        <Button
+          color="secondary"
+          margin="0 small 0"
+          // @ts-expect-error
+          onClick={handleCancel}
+          data-testid="cancel-button"
+        >
           {I18n.t('Cancel')}
         </Button>
-        <Button color="primary" onClick={handleSubmit}>
+        <Button color="primary" onClick={handleSubmit} data-testid="confirm-button">
           {I18n.t('Confirm')}
         </Button>
       </Flex>
@@ -75,6 +80,7 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
       size="small"
       label={I18n.t('Confirm Changes')}
       footer={renderFooter}
+      data-testid="update-calendar-dialog"
     >
       <View as="div" margin="0 small">
         <RadioInputGroup
@@ -82,11 +88,16 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
           defaultValue="one"
           description={I18n.t('Change:')}
           onChange={(_event, value: any) => setWhich(value)}
+          data-testid="radio-group"
         >
-          <RadioInput value="one" label={I18n.t('This event')} />
-          <RadioInput value="all" label={I18n.t('All events')} />
+          <RadioInput value="one" label={I18n.t('This event')} data-testid="this-event-option" />
+          <RadioInput value="all" label={I18n.t('All events')} data-testid="all-events-option" />
           {!event.series_head && (
-            <RadioInput value="following" label={I18n.t('This and all following events')} />
+            <RadioInput
+              value="following"
+              label={I18n.t('This and all following events')}
+              data-testid="following-events-option"
+            />
           )}
         </RadioInputGroup>
       </View>
