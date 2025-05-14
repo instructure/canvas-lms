@@ -57,24 +57,22 @@ module Types
         object.message = doc.to_html
       end
 
-      if object.message&.include?("instructure_inline_media_comment")
-        load_association(:discussion_topic).then do |topic|
-          Loaders::ApiContentAttachmentLoader.for(topic.context).load(object.message).then do |preloaded_attachments|
-            object.message = GraphQLHelpers::UserContent.process(
-              object.message,
-              context: topic.context,
-              in_app: true,
-              request:,
-              preloaded_attachments:,
-              user: current_user,
-              options: { rewrite_api_urls: true, domain_root_account: context[:domain_root_account] },
-              location: object.asset_string
-            )
-          end
-        end
-      end
+      return object.message unless rich_content_attachment?
 
-      object.message
+      load_association(:discussion_topic).then do |topic|
+        Loaders::ApiContentAttachmentLoader.for(topic.context).load(object.message).then do |preloaded_attachments|
+          object.message = GraphQLHelpers::UserContent.process(
+            object.message,
+            context: topic.context,
+            in_app: true,
+            request:,
+            preloaded_attachments:,
+            user: current_user,
+            options: { rewrite_api_urls: true, domain_root_account: context[:domain_root_account] },
+            location: object.asset_string
+          )
+        end
+      end.then { object.message }
     end
 
     field :root_entry_page_number, Integer, null: true do
@@ -293,5 +291,11 @@ module Types
 
     field :depth, Integer, null: true
     delegate :depth, to: :object
+
+    private
+
+    def rich_content_attachment?
+      !Api::Html::Content.collect_attachment_ids(object.message).empty?
+    end
   end
 end
