@@ -10827,6 +10827,7 @@ nn:
   ending_date_e1ea13a4: Sluttdato
   ends_4fcb632: "Sluttar:"
   ends_at_9a62b528: "Sluttar den"
+  ends_e3a6843f: Sluttar
   enforce_scopes_be28989c: "Kontroller omfang"
   engagement_report_986e9621: Aktivitetsrapport
   english_australia_dc405d82: "Engelsk (Australia)"
@@ -19694,6 +19695,7 @@ nn:
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "Oppgi eit nummer mellom 0 og 100 som migreringsrate"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Oppgi eit søkeord med tre eller fleire teikn"
   please_enter_a_url_d2c868b5: "Oppgi ein URL"
+  please_enter_a_valid_format_for_a_date_66ed0587: "Det er ikkje ein dato."
   please_enter_a_valid_search_term_5c69b0b0: "Vennligst skriv inn en gyldig søkefrase"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Skriv inn ein gyldig URL (til dømes http://example.com)"
   please_enter_a_valid_url_e_g_https_example_com_87675bca: "Skriv inn ein gyldig URL (til dømes https://example.com)"
@@ -25231,6 +25233,7 @@ nn:
   starting_publish_5e4f16b9: "Publisering startar ..."
   starts_at_29843f98: Startar
   starts_ce584f1c: Startar
+  starts_fa6bf3f5: Startar
   starttime_to_endtime_4c46601f: "%{startTime} til %{endTime}"
   state_66a67ba2: Tilstand
   state_published_e42697da: "tilstand: publisert"
