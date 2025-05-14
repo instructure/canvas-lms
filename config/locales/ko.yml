@@ -5497,6 +5497,7 @@ ko:
   end_date_e0093ed7: 종료일
   end_time_250391e8: "종료 시각"
   ending_date_e1ea13a4: "끝 날짜"
+  ends_e3a6843f: 끝
   english_c60612e2: 영어
   enhanced_individual_gradebook: 
     avg_score: "평균 점수"
@@ -13412,6 +13413,7 @@ ko:
   start_participating_f0c75256: "참여 시작"
   started_5e138638: 시작됨
   starts_at_29843f98: "시작 날짜"
+  starts_fa6bf3f5: 시작
   state_66a67ba2: 상태
   state_standards_c9b1affd: "전국 표준"
   statistics: 
