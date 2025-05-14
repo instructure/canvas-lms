@@ -45,14 +45,13 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
 
   def self.validate_submission(submission:)
     submission_issues = []
-    if submission.blank? || submission.body.blank? || submission.attempt < 1
-      submission_issues << I18n.t("No essay submission found.")
-    elsif submission.word_count < 5
-      submission_issues << I18n.t("Submission must be at least 5 words.")
-    end
 
-    unless submission.submission_type == "online_text_entry"
+    if submission.submission_type != "online_text_entry"
       submission_issues << I18n.t("Submission must be a text entry type.")
+    elsif submission.blank? || submission.body.blank? || submission.attempt < 1 || (word_count = submission.word_count).nil?
+      submission_issues << I18n.t("No essay submission found.")
+    elsif word_count < 5
+      submission_issues << I18n.t("Submission must be at least 5 words.")
     end
 
     unless submission.attachments.empty?
