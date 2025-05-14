@@ -127,7 +127,7 @@ describe('DirectShareCoursePanel', () => {
     fireEvent.click(getByText('abc'))
     fireEvent.click(getByText(/select a module/i))
     fireEvent.click(getByText(/Module 1/))
-    expect(getByText(/Position/)).toBeInTheDocument()
+    expect(getByText(/Place/)).toBeInTheDocument()
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
       success([{id: 'ghi', name: 'foo'}])
     })
@@ -135,7 +135,7 @@ describe('DirectShareCoursePanel', () => {
     const input = getByLabelText(/select a course/i)
     fireEvent.change(input, {target: {value: 'f'}})
     fireEvent.click(getByText('foo'))
-    expect(queryByText(/Position/)).not.toBeInTheDocument()
+    expect(queryByText(/Place/)).not.toBeInTheDocument()
     expect(useCourseModuleItemApi).not.toHaveBeenCalled()
   })
 

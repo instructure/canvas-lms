@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useId} from 'react'
 import {string, func, bool, arrayOf, node, oneOfType, shape} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ConnectorIcon from './ConnectorIcon'
@@ -55,10 +55,13 @@ RenderSelect.defaultProps = {
 }
 
 export function RenderSelect({label, onChange, options, className, selectOneDefault, testId}) {
+  const id = useId()
+
   return (
     <View margin="medium 0" display="block" className={className}>
-      <FormField id="move-select-form" label={<ScreenReaderContent>{label}</ScreenReaderContent>}>
+      <FormField id={id} label={label}>
         <select
+          id={id}
           data-testid={testId}
           onChange={onChange}
           className="move-select-form"
@@ -155,9 +158,8 @@ export default function SelectPosition({
 
   return (
     <div>
-      {renderPlaceTitle()}
       <RenderSelect
-        label={I18n.t('Position Select')}
+        label={renderPlaceTitle()}
         className="move-select__position"
         onChange={selectPosition}
         options={Object.keys(positions).map(pos => (
