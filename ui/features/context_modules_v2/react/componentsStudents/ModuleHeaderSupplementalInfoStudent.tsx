@@ -63,14 +63,14 @@ export const ModuleHeaderSupplementalInfoStudent: React.FC<Props> = ({
 
   return (
     <View as="div" margin="0 0 0">
-      <Flex>
+      <Flex wrap="wrap">
         <Flex.Item>
-          {dueDate && dueDate.getMilliseconds() > 0 && (
+          {dueDate && dueDate.getTime() > 0 && (
             <Text size="x-small">Due: {dueDate.toDateString()}</Text>
           )}
-          {dueDate &&
-            dueDate.getMilliseconds() > 0 &&
-            (overdueCount || hasCompletionRequirements) && <Text size="x-small"> | </Text>}
+          {dueDate && dueDate.getTime() > 0 && (overdueCount || hasCompletionRequirements) && (
+            <Text size="x-small"> | </Text>
+          )}
           {overdueCount > 0 && (
             <Text size="x-small" color="danger">
               {overdueCount} Overdue Assignment

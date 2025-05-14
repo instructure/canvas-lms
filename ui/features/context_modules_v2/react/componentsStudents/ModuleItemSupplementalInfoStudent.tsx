@@ -44,7 +44,7 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
   const hasCompletionRequirement = !!completionRequirement
 
   return (
-    <Flex gap="xx-small">
+    <Flex gap="xx-small" wrap="wrap">
       {hasDueDate && (
         <Flex.Item padding="0 0 0 small">
           <Text weight="normal" size="x-small">

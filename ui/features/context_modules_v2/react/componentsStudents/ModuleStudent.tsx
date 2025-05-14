@@ -83,7 +83,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
   return (
     <View
       as="div"
-      margin="0 0 0 0"
+      margin="0 0 large 0"
       padding="0"
       background="primary"
       borderWidth="small"
