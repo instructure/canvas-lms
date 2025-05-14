@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../lti_1_3_tool_configuration_spec_helper"
+
 describe DeveloperKeysController do
   let(:test_domain_root_account) { Account.create! }
   let(:site_admin_key) { DeveloperKey.create!(name: "Site Admin Key", visible: false) }
@@ -423,6 +425,129 @@ describe DeveloperKeysController do
         delete :destroy, params: { id: dk.id, account_id: Account.site_admin.id }
         expect(response).to be_successful
         expect(dk.reload.state).to eq :deleted
+      end
+
+      # These tests might seem odd, but we've run into issues in the past where a destroy call
+      # actually returned false, but we still returned a 200 and were left in a weird state.
+      # These are regression tests for that.
+      context "when the destroy fails" do
+        subject { delete :destroy, params: { id: dk.id, account_id: account.id } }
+
+        let_once(:account) { account_model }
+
+        before do
+          allow_any_instance_of(DeveloperKey).to receive(:destroy).and_return(false)
+        end
+
+        it "rolls everything back" do
+          subject
+          expect(dk.reload).to be_active
+        end
+
+        context "when the dev key is associated with a dynamic registration" do
+          let(:reg) { dk.ims_registration }
+          let(:dk) { dev_key_model_dyn_reg(account: account_model) }
+
+          it "still rolls back properly" do
+            subject
+            expect(dk.reload).to be_active
+            expect(reg.reload).to be_active
+            expect(dk.lti_registration).to be_active
+          end
+        end
+
+        context "when the dev key is associated with a tool configuration" do
+          let(:dk) { lti_developer_key_model(account:) }
+          let(:registration) { dk.lti_registration }
+
+          it "still rolls back properly" do
+            subject
+            expect(dk.reload).to be_active
+            expect(registration.reload).to be_active
+          end
+        end
+      end
+
+      context "when the key is associated with a tool configuration" do
+        include_context "lti_1_3_tool_configuration_spec_helper"
+
+        let(:dk) { lti_registration.developer_key }
+        let(:account) { account_model }
+        let(:lti_registration) do
+          Lti::CreateRegistrationService.call(
+            account:,
+            created_by: @admin,
+            registration_params: {
+              name: "Test Registration",
+            },
+            configuration_params: internal_lti_configuration
+          )
+        end
+        let(:tool_config) { lti_registration.manual_configuration }
+
+        it "hard deletes the tool configuration and soft deletes the registration" do
+          # Ensure config is initialized before it's hard deleted
+          tool_config
+          delete :destroy, params: { id: dk.id, account_id: account.id }
+          expect(lti_registration.reload).to be_deleted
+          expect(Lti::ToolConfiguration.where(id: tool_config.id)).to be_empty
+        end
+
+        context "tools were installed from that config" do
+          let(:tool) { lti_registration.new_external_tool(account) }
+          let(:course_tool) { lti_registration.new_external_tool(course) }
+          let(:course) { course_model(account:) }
+
+          before do
+            tool
+          end
+
+          it "deletes the tools in a job" do
+            # Ensure config is initialized before it's hard deleted
+            tool_config
+            expect { delete :destroy, params: { id: dk.id, account_id: account.id } }
+              .to change { lti_registration.reload.workflow_state }.to "deleted"
+            expect(Lti::ToolConfiguration.where(id: tool_config.id)).to be_empty
+            expect(dk.reload).to be_deleted
+            run_jobs
+            expect(tool.reload).to be_deleted
+          end
+        end
+      end
+
+      context "when the key is associated with a dynamic registration" do
+        let(:account) { account_model }
+        let(:dk) { dev_key_model_dyn_reg(account:) }
+        let(:lti_registration) { dk.lti_registration }
+        let(:ims_registration) { dk.ims_registration }
+
+        it "soft deletes the registration" do
+          delete :destroy, params: { id: dk.id, account_id: account.id }
+          expect(dk.reload).to be_deleted
+          expect(lti_registration.reload).to be_deleted
+          expect(ims_registration.reload).to be_deleted
+        end
+
+        context "tools were installed from the ims registration" do
+          let(:tool) { lti_registration.new_external_tool(account) }
+          let(:course_tool) { lti_registration.new_external_tool(course) }
+          let(:course) { course_model(account:) }
+
+          before do
+            tool
+            course_tool
+          end
+
+          it "deletes the tools in a job" do
+            expect { delete :destroy, params: { id: dk.id, account_id: account.id } }
+              .to change { lti_registration.reload.workflow_state }.to "deleted"
+            expect(ims_registration.reload).to be_deleted
+            expect(dk.reload).to be_deleted
+            run_jobs
+            expect(tool.reload).to be_deleted
+            expect(course_tool.reload).to be_deleted
+          end
+        end
       end
 
       context "when request errors" do
