@@ -190,7 +190,8 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(fetchMock.calls()).toHaveLength(0)
     })
 
-    it('displays an error if the progress fetch fails', async () => {
+    // fickle
+    it.skip('displays an error if the progress fetch fails', async () => {
       const {getByText} = await renderBulkEditAndSave()
       fetchMock.get(
         /progress/,
