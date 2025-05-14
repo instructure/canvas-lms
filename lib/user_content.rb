@@ -21,6 +21,13 @@ require "nokogiri"
 require "ritex"
 
 module UserContent
+  def self.associate_attachments_to_rce_object(html, context, context_field_name = nil, user = @current_user, session = nil)
+    attachment_ids = Api::Html::Content.collect_attachment_ids(html)
+    return if attachment_ids.blank?
+
+    AttachmentAssociation.update_associations(context, attachment_ids, user, session, context_field_name)
+  end
+
   def self.escape(
     str,
     current_host = nil,
