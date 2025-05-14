@@ -105,7 +105,7 @@ export default class IndexHeader extends Component {
     this.props.searchAnnouncements({term: data.searchTerm})
   }
 
-  renderLockToggleButton(icon, label, screenReaderLabel, responsiveStyles) {
+  renderLockToggleButton(icon, label, screenReaderLabel, responsiveStyles, dataActionState) {
     return (
       <Button
         disabled={this.props.isBusy || this.props.selectedCount === 0}
@@ -113,6 +113,7 @@ export default class IndexHeader extends Component {
         display={responsiveStyles.buttonDisplay}
         id="lock_announcements"
         data-testid="lock_announcements"
+        data-action-state={dataActionState}
         onClick={this.props.toggleSelectedAnnouncementsLock}
         renderIcon={icon}
         key="lockButton"
@@ -226,12 +227,14 @@ export default class IndexHeader extends Component {
             I18n.t('Lock'),
             I18n.t('Lock Selected Announcements'),
             responsiveStyles,
+            'lockSelectedButton',
           )
         : this.renderLockToggleButton(
             <IconUnlockLine />,
             I18n.t('Unlock'),
             I18n.t('Unlock Selected Announcements'),
             responsiveStyles,
+            'unlockSelectedButton',
           ))
     )
   }
