@@ -178,7 +178,7 @@ export default class MoveSelect extends React.Component {
     return (
       <div>
         <RenderSelect
-          label={I18n.t('Group Select')}
+          label={this.props.moveOptions.groupsLabel ? this.props.moveOptions.groupsLabel : null}
           className="move-select__group"
           onChange={this.selectGroup}
           options={groups.map(group => (
@@ -206,9 +206,6 @@ export default class MoveSelect extends React.Component {
     const {selectedPosition} = this.state
     return (
       <div className="move-select">
-        {this.props.moveOptions.groupsLabel && (
-          <InstText weight="bold">{this.props.moveOptions.groupsLabel}</InstText>
-        )}
         {groups ? (
           this.renderSelectGroup()
         ) : (
