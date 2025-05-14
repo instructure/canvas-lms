@@ -53,14 +53,14 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   return (
     <View
       as="div"
-      padding="x-small medium x-small x-small"
+      padding="medium small medium x-small"
       background="transparent"
       borderWidth="0"
       borderRadius="medium"
       overflowX="hidden"
       data-item-id={_id}
     >
-      <Flex>
+      <Flex wrap="wrap">
         <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`} shouldGrow>
           <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>
             <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
@@ -85,7 +85,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
               </Flex.Item>
               {/* Due Date and Points Possible */}
               <Flex.Item>
-                <Flex>
+                <Flex wrap="wrap">
                   {/* Item Type Icon */}
                   {itemIcon && (
                     <>

@@ -22,6 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {CompletionRequirement, ModuleProgression} from '../utils/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ProgressBar} from '@instructure/ui-progress'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -49,31 +50,24 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
   })
 
   return (
-    <View as="div" margin="small 0 0 0">
-      <Flex direction="column" gap="x-small">
-        <Flex.Item>
-          <View
-            as="div"
-            background="primary"
-            borderWidth="small"
-            borderRadius="medium"
-            width="70%"
+    <View as="div" margin="xx-small 0 0 0">
+      <Flex direction="column">
+        <Flex.Item overflowY="hidden">
+          <ProgressBar
+            screenReaderLabel={completionText}
+            valueNow={completionPercentage}
+            valueMax={100}
+            size="small"
+            meterColor={isComplete ? 'success' : 'brand'}
             height="0.5rem"
+            width="70%"
             themeOverride={{
-              backgroundPrimary: 'white',
+              borderRadius: 'small',
             }}
-          >
-            <View
-              as="div"
-              background={isComplete ? 'success' : 'brand'}
-              borderRadius="medium"
-              width={`${completionPercentage}%`}
-              height="100%"
-            />
-          </View>
+          />
         </Flex.Item>
         <Flex.Item>
-          <Text size="small" weight="normal">
+          <Text size="x-small" weight="normal">
             {completionText}
           </Text>
         </Flex.Item>

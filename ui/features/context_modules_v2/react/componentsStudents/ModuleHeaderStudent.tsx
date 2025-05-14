@@ -21,8 +21,8 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import ModuleHeaderStatusIcon from './ModuleHeaderStatusIcon'
 import {ModuleProgression, CompletionRequirement} from '../utils/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -55,8 +55,14 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
   }, [onToggleExpand, id])
 
   return (
-    <View as="div" background="secondary" borderWidth="0 0 small 0" borderRadius="small">
-      <Flex padding="small" justifyItems="space-between" direction="row">
+    <View
+      as="div"
+      background="secondary"
+      borderWidth="0 0 small 0"
+      borderRadius="small"
+      overflowX="hidden"
+    >
+      <Flex padding="small" justifyItems="space-between" direction="row" wrap="wrap">
         <Flex.Item>
           <IconButton
             size="small"
@@ -67,13 +73,13 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             onClick={onToggleExpandRef}
           />
         </Flex.Item>
-        <Flex.Item shouldGrow overflowX="hidden" overflowY="hidden" margin="0 0 0 medium">
+        <Flex.Item shouldGrow overflowX="hidden" overflowY="hidden" margin="0 0 0 small">
           <Flex justifyItems="space-between" direction="column">
             <Flex.Item shouldGrow>
               <Flex gap="small" alignItems="center">
                 <Flex.Item>
                   <Heading level="h3">
-                    <TruncateText maxLines={1}>{name}</TruncateText>
+                    <Text size="medium">{name}</Text>
                   </Heading>
                 </Flex.Item>
               </Flex>
