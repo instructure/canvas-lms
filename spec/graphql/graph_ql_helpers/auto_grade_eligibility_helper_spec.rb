@@ -153,5 +153,76 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         expect(issues).to include("Submission must be a text entry type.")
       end
     end
+
+    context "when word count is null" do
+      it "returns missing submission error like this" do
+        submission = submission_model(
+          user: @student,
+          assignment: @assignment,
+          body: "This is a valid-looking submission.",
+          submission_type: "online_text_entry",
+          attachments: []
+        )
+        allow(submission).to receive(:word_count).and_return(nil)
+        issues = described_class.validate_submission(submission:)
+        expect(issues).to include("No essay submission found.")
+      end
+    end
+
+    context "when submission contains attachments" do
+      it "returns attachment error" do
+        submission = submission_model(
+          user: @student,
+          assignment:,
+          body: "This is a valid essay.",
+          submission_type: "online_text_entry",
+          attachments: []
+        )
+
+        fake_attachment = double("Attachment", id: 123, context: assignment, recently_created?: true)
+        allow(submission).to receive(:attachments).and_return([fake_attachment])
+
+        issues = described_class.validate_submission(submission:)
+        expect(issues).to include("Submission contains file attachments.")
+      end
+    end
+
+    context "when submission has multiple issues" do
+      it "returns all applicable issues" do
+        submission = submission_model(
+          user: @student,
+          assignment:,
+          body: "",
+          submission_type: "online_upload",
+          attachments: []
+        )
+
+        fake_attachment = double("Attachment", id: 123, context: assignment, recently_created?: true)
+        allow(submission).to receive_messages(word_count: nil, attachments: [fake_attachment])
+
+        issues = described_class.validate_submission(submission:)
+
+        expect(issues).to include("Submission must be a text entry type.")
+        expect(issues).to include("Submission contains file attachments.")
+      end
+    end
+
+    context "when attempt is less than 1" do
+      it "returns missing submission error" do
+        submission = submission_model(
+          user: @student,
+          assignment:,
+          body: "This is a valid essay.",
+          submission_type: "online_text_entry",
+          attachments: [],
+          attempt: 0
+        )
+
+        allow(submission).to receive(:attempt).and_return(0)
+
+        issues = described_class.validate_submission(submission:)
+        expect(issues).to include("No essay submission found.")
+      end
+    end
   end
 end
