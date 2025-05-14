@@ -2555,7 +2555,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   getVisibleGridColumns = () => {
     let parentColumnIds = this.gridData.columns.frozen.filter(
-      columnId => !/^custom_col_/.test(columnId) && !/^student/.test(columnId),
+      columnId =>
+        !/^custom_col_/.test(columnId) && !/^student/.test(columnId) && !/^total/.test(columnId),
     )
     if (this.gridDisplaySettings.showSeparateFirstLastNames) {
       parentColumnIds = ['student_lastname', 'student_firstname'].concat(parentColumnIds)
