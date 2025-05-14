@@ -103,6 +103,7 @@ module DataFixup::NormalizePseudonyms
     end
 
     def throttle
+      Canvas::Reloader.reload
       sleep_interval_per_batch = Setting.get("sleep_interval_per_backfill_nulls_batch", nil).presence&.to_f
       sleep(sleep_interval_per_batch) if sleep_interval_per_batch # rubocop:disable Lint/NoSleep
     end
