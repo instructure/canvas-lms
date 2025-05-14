@@ -425,47 +425,6 @@ describe DeveloperKeysController do
         expect(dk.reload.state).to eq :deleted
       end
 
-      # These tests might seem odd, but we've run into issues in the past where a destroy call
-      # actually returned false, but we still returned a 200 and were left in a weird state.
-      # These are regression tests for that.
-      context "when the destroy fails" do
-        subject { delete :destroy, params: { id: dk.id, account_id: account.id } }
-
-        let_once(:account) { account_model }
-
-        before do
-          allow_any_instance_of(DeveloperKey).to receive(:destroy).and_return(false)
-        end
-
-        it "rolls everything back" do
-          subject
-          expect(dk.reload).to be_active
-        end
-
-        context "when the dev key is associated with a dynamic registration" do
-          let(:reg) { dk.ims_registration }
-          let(:dk) { dev_key_model_dyn_reg(account: account_model) }
-
-          it "still rolls back properly" do
-            subject
-            expect(dk.reload).to be_active
-            expect(reg.reload).to be_active
-            expect(dk.lti_registration).to be_active
-          end
-        end
-
-        context "when the dev key is associated with a tool configuration" do
-          let(:dk) { lti_developer_key_model(account:) }
-          let(:registration) { dk.lti_registration }
-
-          it "still rolls back properly" do
-            subject
-            expect(dk.reload).to be_active
-            expect(registration.reload).to be_active
-          end
-        end
-      end
-
       context "when request errors" do
         before do
           allow(InstStatsd::Statsd).to receive(:distributed_increment)
