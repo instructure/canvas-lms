@@ -87,10 +87,7 @@ describe('PermissionsModal', () => {
           await userEvent.click(screen.getByTestId('permissions-save-button'))
 
           await waitFor(() => {
-            const messages = screen.getAllByText('Invalid date.')
-            expect(messages).toHaveLength(2)
-            expect(messages[0]).toBeInTheDocument()
-            expect(messages[1]).toBeInTheDocument()
+            expect(screen.getAllByText('Invalid date.')).toHaveLength(2)
           })
         })
       })
