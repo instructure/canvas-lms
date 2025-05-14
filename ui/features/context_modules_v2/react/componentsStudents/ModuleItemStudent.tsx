@@ -25,7 +25,6 @@ import {getItemIcon, INDENT_LOOKUP} from '../utils/utils'
 import {CompletionRequirement, ModuleItemContent, ModuleProgression} from '../utils/types'
 import ModuleItemSupplementalInfoStudent from './ModuleItemSupplementalInfoStudent'
 import ModuleItemStatusIcon from './ModuleItemStatusIcon'
-import {IconLockLine} from '@instructure/ui-icons'
 
 export interface ModuleItemStudentProps {
   _id: string
@@ -47,8 +46,12 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   completionRequirements,
   progression,
 }) => {
-  const itemIcon = useMemo(() => getItemIcon(content, true), [content])
+  // Hooks must be called unconditionally
+  const itemIcon = useMemo(() => (content ? getItemIcon(content, true) : null), [content])
   const itemLeftMargin = useMemo(() => INDENT_LOOKUP[indent ?? 0], [indent])
+
+  // Early return after hooks
+  if (!content) return null
 
   return (
     <View
@@ -69,10 +72,9 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
                 <Flex.Item shouldGrow={true}>
                   {progression?.locked ? (
                     <Flex alignItems="center">
-                      <Text weight="bold" color="secondary">
+                      <Text weight="light" color="secondary">
                         {content?.title || 'Untitled Item'}
                       </Text>
-                      <IconLockLine size="x-small" />
                     </Flex>
                   ) : (
                     <Link href={url} isWithinText={false} onClick={onClick}>

@@ -17,18 +17,18 @@
  */
 
 import React from 'react'
-import {IconPublishSolid, IconLockLine, IconEmptyLine} from '@instructure/ui-icons'
+import {IconPublishSolid, IconEmptyLine, IconLockSolid} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ModuleProgression} from '../utils/types'
 
 export interface ModuleHeaderStatusIconProps {
   progression: ModuleProgression
 }
 
-const ModuleHeaderStatusIcon: React.FC<ModuleHeaderStatusIconProps> = ({progression}) => {
-  const I18n = useI18nScope('context_modules_v2')
+const I18n = createI18nScope('context_modules_v2')
 
+const ModuleHeaderStatusIcon: React.FC<ModuleHeaderStatusIconProps> = ({progression}) => {
   if (!progression) return null
 
   const {completed, locked, started} = progression
@@ -36,8 +36,9 @@ const ModuleHeaderStatusIcon: React.FC<ModuleHeaderStatusIconProps> = ({progress
   let icon = null
   let screenReaderMessage = ''
 
+  console.log('progression', {completed, locked, started})
   if (locked) {
-    icon = <IconLockLine data-testid="module-header-status-icon-lock" color="secondary" />
+    icon = <IconLockSolid data-testid="module-header-status-icon-lock" color="primary" />
     screenReaderMessage = I18n.t('Locked')
   } else if (completed) {
     icon = <IconPublishSolid data-testid="module-header-status-icon-success" color="success" />
