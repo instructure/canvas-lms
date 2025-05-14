@@ -31,6 +31,7 @@ describe('Webzip export app', () => {
     openKeyboardShortcutsModal() {},
     showHelpMenuItem: false,
     showModerationMenuItem: false,
+    showKeyboardShortcutsMenuItem: false, // Add missing required prop
   }
 
   beforeEach(() => {
@@ -85,11 +86,12 @@ describe('Webzip export app', () => {
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     wrapper.getByText('Keyboard Shortcuts').click()
-    expect(props.openOptionsModal).toHaveBeenCalledTimes(1)
+    expect(props.openKeyboardShortcutsModal).toHaveBeenCalledTimes(1)
   })
 
   test('does not include a "Moderation Page" menu item if passed showModerationMenuItem: false', async () => {
-    props.showKeyboardShortcutsMenuItem = false
+    // Make sure showModerationMenuItem is explicitly set to false
+    props.showModerationMenuItem = false
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     expect(wrapper.queryByText('Moderation Page')).toBeNull()
@@ -129,7 +131,8 @@ describe('Webzip export app', () => {
   })
 
   test('does not include a "Help" menu item if passed showHelpMenuItem: false', async () => {
-    props.showModerationMenuItem = false
+    // Explicitly set showHelpMenuItem to false
+    props.showHelpMenuItem = false
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     expect(wrapper.queryByText('Help')).toBeNull()

@@ -22,10 +22,25 @@ import App from '../App'
 import CourseEpubExportStore from '../CourseStore'
 
 describe('EpubExportApp', () => {
-  let props
+  let courseData
+  let mockGetState
 
   beforeEach(() => {
-    props = {
+    // Initial empty state
+    mockGetState = jest.spyOn(CourseEpubExportStore, 'getState').mockReturnValue({})
+
+    // Mock getAll to do nothing (we'll control state changes manually)
+    jest.spyOn(CourseEpubExportStore, 'getAll').mockImplementation(() => {})
+
+    // Mock setState to update our mock getState
+    jest.spyOn(CourseEpubExportStore, 'setState').mockImplementation(newState => {
+      mockGetState.mockReturnValue(newState)
+      // Simulate the store triggering change listeners
+      CourseEpubExportStore.emitChange()
+    })
+
+    // Sample course data
+    courseData = {
       1: {
         name: 'Maths 101',
         id: 1,
@@ -35,7 +50,6 @@ describe('EpubExportApp', () => {
         id: 2,
       },
     }
-    jest.spyOn(CourseEpubExportStore, 'getAll').mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -49,9 +63,12 @@ describe('EpubExportApp', () => {
 
   it('updates state when CourseEpubExportStore changes', () => {
     const {container} = render(<App />)
+
+    // Use act to properly handle React state updates
     act(() => {
-      CourseEpubExportStore.setState(props)
+      CourseEpubExportStore.setState(courseData)
     })
+
     expect(container.querySelectorAll('li')).toHaveLength(2)
   })
 

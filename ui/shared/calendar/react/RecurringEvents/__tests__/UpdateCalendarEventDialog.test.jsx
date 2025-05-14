@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {render, act, within} from '@testing-library/react'
-import {getByText as domGetByText, waitFor} from '@testing-library/dom'
+import {render, act} from '@testing-library/react'
+import {getByText as domGetByText} from '@testing-library/dom'
 
 import {
   UpdateCalendarEventDialog,
