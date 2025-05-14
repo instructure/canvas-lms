@@ -16,10 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from '@canvas/round'
 import {reduce, filter, values, map, groupBy, keyBy} from 'lodash'
 import AssignmentGroupGradeCalculator from './AssignmentGroupGradeCalculator'
-import {bigSum, sum, sumBy, toNumber, weightedPercent} from './GradeCalculationHelper'
+import {
+  bigSum,
+  sum,
+  sumBy,
+  toNumber,
+  weightedPercent,
+  totalGradeRound,
+} from './GradeCalculationHelper'
 import type {Assignment, AssignmentGroup, UserDueDateMap} from '../../api.d'
 import type {
   AssignmentGroupCriteriaMap,
@@ -31,6 +37,7 @@ import type {
   // GradingPeriodGradeMap,
   SubmissionGradeCriteria,
 } from './grading.d'
+import Big from 'big.js'
 
 function combineAssignmentGroupGrades(
   assignmentGroupGrades: AssignmentGroupGrade[],
@@ -64,7 +71,7 @@ function combineAssignmentGroupGrades(
     const submissionCount = sumBy(relevantGroupGrades, 'submission_count')
     const possible = submissionCount > 0 || includeUngraded ? 100 : 0
     // @ts-expect-error
-    let score = finalGrade && round(finalGrade, 2)
+    let score = finalGrade && totalGradeRound(finalGrade, 2)
     // @ts-expect-error
     score = Number.isNaN(Number(score)) ? null : score
 
@@ -101,7 +108,7 @@ function combineGradingPeriodGrades(
     totalWeight === 0 ? 0 : toNumber(scoreSum.times(100).div(Math.min(totalWeight, 100)))
 
   return {
-    score: round(totalScore, 2),
+    score: totalGradeRound(totalScore, 2),
     possible: 100,
   }
 }
