@@ -6053,6 +6053,7 @@ el:
   end_date_cannot_be_before_start_date_eb62ed6d: "Η ημερομηνία Λήξης δεν μπορεί να υπάρχει πριν την ημερομηνία Έναρξης"
   end_date_e0093ed7: "Ημερομηνία Λήξης"
   ending_date_e1ea13a4: "Ημερομηνία Λήξης"
+  ends_e3a6843f: Τελειώνει
   enhanced_individual_gradebook: 
     avg_score: "Μέσος όρος"
     high_score: "Υψηλή Βαθμολογία"
@@ -10888,6 +10889,7 @@ el:
     video: "Αρχείο Βίντεο"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Παρακαλώ προσθέστε τουλάχιστον μια όχι κενή απάντηση."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Παρακαλώ προσθέστε τουλάχιστον μια όχι κενή απάντηση για κάθε μεταβλητή."
+  please_enter_a_valid_format_for_a_date_66ed0587: "Αυτή η καταχώριση δεν είναι ημερομηνία!"
   please_enter_the_details_for_the_new_course_dc705b8c: "Παρακαλώ πληκτρολογείστε τις λεπτομέρειες του νέου μαθήματος."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Παρακαλώ, εισαγάγετε τον κωδικό επιβεβαίωσης που εμφανίζει το token σας."
   please_enter_your_label_name_7745272d: "Παρακαλώ, πληκτρολογήστε το %{label_name} σας:"
@@ -14462,6 +14464,7 @@ el:
   start_tls_26e4b0dc: "Έναρξη TLS"
   started_5e138638: Εκκίνηση
   starts_at_29843f98: "Ξεκινάει σε"
+  starts_fa6bf3f5: Ξεκινά
   state_standards_c9b1affd: "Πρότυπα της Πολιτείας"
   statistics: 
     csv_columns: 
