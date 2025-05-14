@@ -75,11 +75,18 @@ export default function CommentArea({
   }
 
   const insertEmoji = emoji => {
-    setComment(comment + emoji.native)
+    if (useRCELite) {
+      textAreaRef.current?.editor?.insertContent(emoji.native)
+      // handleCommentChange will be called onContentChange
+    } else {
+      const value = comment + emoji.native
+      setComment(value)
+      handleCommentChange(value, false)
+    }
+
     if (textAreaRef.current) {
       textAreaRef.current.focus()
     }
-    handleCommentChange(comment + emoji.native, useRCELite)
   }
 
   return (
