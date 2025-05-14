@@ -42,63 +42,132 @@ class Lti::ContextControl < ActiveRecord::Base
 
   before_create :set_path
 
-  # Keep paths in sync when the account chain changes for
-  # an account or a course.
-  # This references an account's "parent account" or a course's "account".
-  #
-  # This is the only time when paths can be changed post-creation.
-  #
-  # @param context [Account|Course] the account or course that was reparented
-  # @param old_parent_id [Integer] the account or course's previous parent account ID
-  # @param new_parent_id [Integer] the account or course's new parent account ID
-  def self.update_paths_for_reparent(context, old_parent_id, new_parent_id)
-    old_parent = Account.find_by(id: old_parent_id)
-    new_parent = Account.find_by(id: new_parent_id)
-    return unless old_parent && new_parent && context
+  scope :active, -> { where.not(workflow_state: :deleted) }
 
-    context_segment = path_segment_for(context)
-    old_path = calculate_path(old_parent) + context_segment
-    new_path = calculate_path(new_parent) + context_segment
+  class << self
+    # Generate a path string based on the given account chain.
+    # A path looks like "a1.a2.c3.", where "a" represents an account and "c" represents a course.
+    # The path starts at the root account and ends at the given context.
+    def calculate_path(context)
+      if context.is_a?(Group) || context.is_a?(Assignment)
+        context = context.context
+      end
 
-    where("path like ?", "%#{old_path}%").update_all(sanitize_sql("path = replace(path, '#{old_path}', '#{new_path}')"))
-  end
-
-  # Generate a path string based on the given account chain.
-  # A path looks like "a1.a2.c3.", where "a" represents an account and "c" represents a course.
-  # The path starts at the root account and ends at the given context.
-  def self.calculate_path(context)
-    segments = context.account_chain_ids.reverse.map { |id| "a#{id}" }
-    if context.is_a?(Course)
-      segments << "c#{context.id}"
+      segments = context.account_chain_ids.reverse.map { |id| "a#{id}" }
+      if context.is_a?(Course)
+        segments << "c#{context.id}"
+      end
+      segments.join(".").concat(".")
     end
-    segments.join(".").concat(".")
-  end
 
-  def self.path_segment_for(context)
-    prefix = context.is_a?(Course) ? "c" : "a"
+    # Given a context and a registration, returns the nearest non-deleted context control that
+    # is associated with that registration.
+    #
+    # @example Imagine the following context chain
+    #     Account 1 > SubAccount 2 > Course 3
+    # Where there's a context control in Account 1 and Course 3. Calling this method from the course
+    # will return the context control that's associated with the course, while calling it from the
+    # account or subaccount will return the context control associated with Account 1.
+    #
+    # @param [Account | Course | Group | Assignment] context
+    # @param [Lti::Registration] registration
+    # @param [ContextExternalTool] deployment
+    def nearest_control_for_registration(context, registration, deployment)
+      query_by_paths(context:, registration:, deployment:).take
+    end
 
-    "#{prefix}#{context.id}."
-  end
+    # Given a context, will return all the ids of all LTI 1.3 ContextExternalTools that are available
+    # in that context, based on the configured, active context controls.
+    # @param [Account | Course | Group | Assignment] context
+    def deployment_ids_for_context(context)
+      # Need to use map, not pluck, because pluck will override the select statement,
+      # and we need to use the special "DISTINCT ON (registration_id)" select statement
+      # here.
+      where(id: query_by_paths(context:).map(&:id), available: true).pluck(:deployment_id)
+    end
 
-  # Generate a path string based on the given course ID and account IDs.
-  # A path looks like "a1.a2.c3.", where "a" represents an account and "c" represents a course.
-  # The path starts at the root account and ends at the given course.
-  # Note that account_ids are expected to be in leaf-to-root order, as returned by
-  # Account#account_chain_ids or Account#account_chain_ids_for_multiple_accounts.
-  def self.calculate_path_for_course_id(course_id, account_ids)
-    segments = calculate_path_for_account_ids(account_ids)
-    segments << "c#{course_id}."
-    segments
-  end
+    # Generate a path string based on the given course ID and account IDs.
+    # A path looks like "a1.a2.c3.", where "a" represents an account and "c" represents a course.
+    # The path starts at the root account and ends at the given course.
+    # Note that account_ids are expected to be in leaf-to-root order, as returned by
+    # Account#account_chain_ids or Account#account_chain_ids_for_multiple_accounts.
+    def calculate_path_for_course_id(course_id, account_ids)
+      segments = calculate_path_for_account_ids(account_ids)
+      segments << "c#{course_id}."
+      segments
+    end
 
-  # Generate a path string based on the given account IDs.
-  # A path looks like "a1.a2.", where "a" represents an account.
-  # The path starts at the root account and ends at the given account.
-  # Note that account_ids are expected to be in leaf-to-root order, as returned by
-  # Account#account_chain_ids or Account#account_chain_ids_for_multiple_accounts.
-  def self.calculate_path_for_account_ids(account_ids)
-    segments = account_ids.reverse.map { |id| "a#{id}." }
-    segments.join
+    # Generate a path string based on the given account IDs.
+    # A path looks like "a1.a2.", where "a" represents an account.
+    # The path starts at the root account and ends at the given account.
+    # Note that account_ids are expected to be in leaf-to-root order, as returned by
+    # Account#account_chain_ids or Account#account_chain_ids_for_multiple_accounts.
+    def calculate_path_for_account_ids(account_ids)
+      segments = account_ids.reverse.map { |id| "a#{id}." }
+      segments.join
+    end
+
+    # Keep paths in sync when the account chain changes for
+    # an account or a course.
+    # This references an account's "parent account" or a course's "account".
+    #
+    # This is the only time when paths can be changed post-creation.
+    #
+    # @param context [Account|Course] the account or course that was reparented
+    # @param old_parent_id [Integer] the account or course's previous parent account ID
+    # @param new_parent_id [Integer] the account or course's new parent account ID
+    def update_paths_for_reparent(context, old_parent_id, new_parent_id)
+      old_parent = Account.find_by(id: old_parent_id)
+      new_parent = Account.find_by(id: new_parent_id)
+      return unless old_parent && new_parent && context
+
+      context_segment = path_segment_for(context)
+      old_path = calculate_path(old_parent) + context_segment
+      new_path = calculate_path(new_parent) + context_segment
+
+      where("path like ?", "%#{old_path}%").update_all(sanitize_sql("path = replace(path, '#{old_path}', '#{new_path}')"))
+    end
+
+    def path_segment_for(context)
+      prefix = context.is_a?(Course) ? "c" : "a"
+
+      "#{prefix}#{context.id}."
+    end
+
+    private
+
+    # Get the path for a context (account or course) and the paths of all of
+    # its parent accounts.
+    #
+    # E.g. with a root account 1, subaccount 3, and course 1, for
+    # context = course 1 this will return:
+    # [ "a1", "a1.a3", "a1.a3.c1" ]
+    #
+    # This method should be used when searching for context controls by path, to
+    # get all context controls for any account that the
+    #
+    # @returns An array of strings, with each string being a path like what is
+    #          returned from calculate_path.
+    #
+    # @param context [Account|Course] the account or course to find paths for
+    def self_and_all_parent_paths(context)
+      path = calculate_path(context)
+      path_parts = path.split(".")
+      path_parts.reduce([]) do |all_paths, segment|
+        appended_path = (all_paths.last || "") + "#{segment}."
+        all_paths.push(appended_path)
+      end
+    end
+
+    def query_by_paths(context:, registration: nil, deployment: nil)
+      paths = self_and_all_parent_paths(context)
+      query = active.where(path: paths)
+      query = query.where(registration:) if registration.present?
+      query = query.where(deployment:) if deployment.present?
+      # Because all ancestors will have the same prefix path, we can safely order by path length instead
+      # of splitting on segments and worrying about that.
+      query.order("deployment_id, LENGTH(path) DESC").select("DISTINCT ON (deployment_id) *")
+    end
   end
 
   def context_name
