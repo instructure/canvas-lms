@@ -168,9 +168,21 @@ describe('FrequencyPicker', () => {
       expect(container.querySelector('label')).toHaveStyle({width: 'auto'})
     })
 
-    // it's really annoying that I can't supress the exception being logged to the console
-    // even though it's being caught by the error boundary
+    // Test error boundary cases by mocking console.error to prevent test output pollution
     describe('with errors', () => {
+      // Save original console.error
+      const originalConsoleError = console.error
+
+      beforeEach(() => {
+        // Mock console.error to prevent error output in test results
+        console.error = jest.fn()
+      })
+
+      afterEach(() => {
+        // Restore original console.error
+        console.error = originalConsoleError
+      })
+
       it('the error boundary fallback when enabled with no date', () => {
         const props = defaultProps({date: undefined})
         const {getByText} = render(
