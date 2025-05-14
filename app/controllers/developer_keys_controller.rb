@@ -323,10 +323,7 @@ class DeveloperKeysController < ApplicationController
   #
   # @returns DeveloperKey
   def destroy
-    DeveloperKey.transaction do
-      raise ActiveRecord::RecordNotDestroyed unless @key.destroy
-    end
-
+    @key.destroy
     render json: developer_key_json(@key, @current_user, session, account_context)
   rescue => e
     report_error(e)
