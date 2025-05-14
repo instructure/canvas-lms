@@ -9998,6 +9998,7 @@ hu:
   ending_date_e1ea13a4: Záródátum
   ends_4fcb632: "Véget ér:"
   ends_at_9a62b528: "Befejezés ideje"
+  ends_e3a6843f: "Véget ér"
   enforce_scopes_be28989c: "Alkalmazási körök érvényesítése"
   engagement_report_986e9621: "Kötelezettségi jelentés"
   english_australia_dc405d82: "English (Australia)"
@@ -18359,6 +18360,7 @@ hu:
   please_enter_a_name_for_this_link_318f01a4: "Kérjük, adjon nevet ennek a hivatkozásnak"
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "Kérjük, adjon meg egy 0 és 100 közötti számot a migrációs arányhoz."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Kérjük, olyan keresési kifejezést írjon be, ami három vagy több karakterből áll"
+  please_enter_a_valid_format_for_a_date_66ed0587: "Ez nem egy dátum!"
   please_enter_a_valid_search_term_5c69b0b0: "Kérjük, adjon meg egy érvényes keresési kifejezést"
   please_enter_a_valid_url_e_g_https_example_com_87675bca: "Kérjük, adjon meg egy érvényes url-t (pl. https://example.com)."
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: " Kérjük, adjon meg egy érvényes URL-t. Protokoll szükséges (pl. http://, https://, ftp://, tel:, mailto:)."
@@ -23567,6 +23569,7 @@ hu:
   starting_publish_5e4f16b9: "Publikálás megkezdése..."
   starts_at_29843f98: Kezdés
   starts_ce584f1c: "Kezdődik:"
+  starts_fa6bf3f5: Kezdődik
   starttime_to_endtime_4c46601f: "%{startTime} - %{endTime}"
   state_66a67ba2: Állapot
   state_published_e42697da: "állapot: publikált"
