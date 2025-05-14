@@ -65,6 +65,65 @@ describe ContextExternalTool do
     end
   end
 
+  describe "available_in_context?" do
+    let_once(:account) { account_model }
+    let_once(:registration) do
+      lti_developer_key_model(account:).tap do |k|
+        lti_tool_configuration_model(account: k.account, developer_key: k, lti_registration: k.lti_registration)
+      end.lti_registration
+    end
+    let_once(:tool) { registration.new_external_tool(account) }
+
+    context "with the lti_registrations_next flag off" do
+      before do
+        account.disable_feature!(:lti_registrations_next)
+      end
+
+      it "returns true" do
+        expect(tool.available_in_context?(account)).to be true
+      end
+
+      it "returns true even if the tool is not set to available" do
+        tool.context_controls.first.update!(available: false)
+        expect(tool.available_in_context?(account)).to be true
+      end
+    end
+
+    it "returns true for 1.1 tools" do
+      lti_1_1_tool = external_tool_model(context: account)
+      expect(lti_1_1_tool.available_in_context?(account)).to be true
+    end
+
+    it "returns true if the tool is set to available" do
+      expect(tool.available_in_context?(account)).to be true
+    end
+
+    it "returns false if the tool is set to unavailable" do
+      tool.context_controls.first.update!(available: false)
+
+      expect(tool.available_in_context?(account)).to be false
+    end
+
+    it "ignores context controls associated with other tools from the same registration" do
+      duplicate_tool = registration.new_external_tool(account)
+      duplicate_tool.context_controls.first.update!(available: false)
+
+      expect(tool.available_in_context?(account)).to be true
+    end
+
+    it "sends an error to sentry if no context control is found" do
+      tool.context_controls.destroy_all
+
+      sentry_scope = double(Sentry::Scope)
+      expect(Sentry).to receive(:with_scope).and_yield(sentry_scope)
+      expect(sentry_scope).to receive(:set_tags).with(context_id: account.global_id)
+      expect(sentry_scope).to receive(:set_tags).with(lti_registration_id: tool.lti_registration.global_id)
+      expect(sentry_scope).to receive(:set_context).with("tool", tool.global_id)
+
+      expect(tool.available_in_context?(account)).to be true
+    end
+  end
+
   describe "#permission_given?" do
     subject { tool.permission_given?(launch_type, user, context) }
 

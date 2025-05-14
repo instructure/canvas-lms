@@ -34,7 +34,12 @@ describe Lti::ContextControl do
   let(:account) { account_model }
   let(:course) { nil }
   let(:deployment) { external_tool_1_3_model(context: account) }
-  let(:registration) { lti_registration_model(account:) }
+  let(:registration) do
+    reg = lti_registration_model(account:)
+    reg.ims_registration = lti_ims_registration_model(account:, lti_registration: reg)
+    reg.developer_key = reg.ims_registration.developer_key
+    reg
+  end
   let(:available) { true }
 
   describe "validations" do
@@ -246,6 +251,406 @@ describe Lti::ContextControl do
           course.update!(account: parent_account)
           expect(control.reload.path).to eq(path_for(root_account, parent_account, course))
         end
+      end
+    end
+  end
+
+  describe ".self_and_all_parent_paths" do
+    it "returns the correct list of paths for a course in a subaccount" do
+      subaccount = account.sub_accounts.create!
+      course = course_model(account: subaccount)
+      result = Lti::ContextControl.send(:self_and_all_parent_paths, course)
+      expect(result).to eq([
+                             "a#{account.id}.",
+                             "a#{account.id}.a#{subaccount.id}.",
+                             "a#{account.id}.a#{subaccount.id}.c#{course.id}.",
+                           ])
+    end
+  end
+
+  describe ".deployment_ids_for_context" do
+    let_once(:dev_key) { create_dev_key_with_registration(root_account) }
+    let_once(:registration) { dev_key.lti_registration }
+    let_once(:tool) { registration.new_external_tool(root_account) }
+    let_once(:root_account) { account_model }
+    # This must always exist! TODO: when Paul's commit is merged, we can remove this,
+    # as CETs will always create a control set to available wherever they're installed at.
+    let_once(:root_control) { tool.context_controls.first }
+
+    def create_dev_key_with_registration(account)
+      lti_developer_key_model(account:).tap do |k|
+        lti_tool_configuration_model(account: k.account, developer_key: k, lti_registration: k.lti_registration)
+      end
+    end
+
+    it "finds the deployment in the account" do
+      expect(Lti::ContextControl.deployment_ids_for_context(root_account)).to eq([tool.id])
+    end
+
+    it "finds the deployment in a course within that account" do
+      course = course_model(account: root_account)
+      expect(Lti::ContextControl.deployment_ids_for_context(course)).to eq([tool.id])
+    end
+
+    context "when tool is disabled at the root account level" do
+      before do
+        root_control.update!(available: false)
+      end
+
+      it "returns empty array for any context" do
+        course = course_model(account: root_account)
+        subaccount = root_account.sub_accounts.create!
+        subcourse = course_model(account: subaccount)
+
+        expect(Lti::ContextControl.deployment_ids_for_context(root_account)).to be_empty
+        expect(Lti::ContextControl.deployment_ids_for_context(course)).to be_empty
+        expect(Lti::ContextControl.deployment_ids_for_context(subaccount)).to be_empty
+        expect(Lti::ContextControl.deployment_ids_for_context(subcourse)).to be_empty
+      end
+    end
+
+    context "with account hierarchy" do
+      let_once(:subaccount) { root_account.sub_accounts.create! }
+      let_once(:course) { course_model(account: subaccount) }
+
+      context "with course-level overrides" do
+        before do
+          Lti::ContextControl.create!(account: subaccount, registration:, deployment: tool, available: false)
+          Lti::ContextControl.create!(course:, registration:, deployment: tool, available: true)
+        end
+
+        it "uses course override when available" do
+          expect(Lti::ContextControl.deployment_ids_for_context(course)).to match_array([tool.id])
+        end
+
+        it "respects account settings for the account itself" do
+          expect(Lti::ContextControl.deployment_ids_for_context(subaccount)).to be_empty
+          expect(Lti::ContextControl.deployment_ids_for_context(root_account)).to match_array([tool.id])
+        end
+      end
+
+      context "with disabled root account and enabled subaccount" do
+        before do
+          root_control.update!(available: false)
+          Lti::ContextControl.create!(
+            account: subaccount,
+            registration:,
+            deployment: tool,
+            available: true
+          )
+        end
+
+        it "finds deployment in the subaccount with enabled deployment" do
+          expect(Lti::ContextControl.deployment_ids_for_context(subaccount)).to match_array([tool.id])
+        end
+
+        it "returns empty for the root account" do
+          expect(Lti::ContextControl.deployment_ids_for_context(root_account)).to be_empty
+        end
+
+        it "returns empty for other subaccounts" do
+          subaccount2 = root_account.sub_accounts.create!
+          expect(Lti::ContextControl.deployment_ids_for_context(subaccount2)).to be_empty
+        end
+      end
+
+      context "with multiple registrations across account hierarchy" do
+        let_once(:dev_key1) { create_dev_key_with_registration(root_account) }
+        let_once(:dev_key2) { create_dev_key_with_registration(root_account) }
+        let_once(:registration1) { dev_key1.lti_registration }
+        let_once(:registration2) { dev_key2.lti_registration }
+        let_once(:tool1) { registration1.new_external_tool(root_account) }
+        let_once(:tool2) { registration2.new_external_tool(root_account) }
+
+        context "when registrations have different availability at different levels" do
+          before(:once) do
+            tool1.context_controls.find_by(account: root_account).update!(available: true)
+            tool2.context_controls.find_by(account: root_account).update!(available: false)
+            Lti::ContextControl.create!(account: subaccount, registration: registration2, deployment: tool2, available: true)
+          end
+
+          it "finds all tools in the course" do
+            expect(Lti::ContextControl.deployment_ids_for_context(course))
+              .to match_array([
+                                tool.id,
+                                tool1.id,
+                                tool2.id
+                              ])
+          end
+
+          it "doesn't find the disabled tool in the root account" do
+            expect(Lti::ContextControl.deployment_ids_for_context(root_account))
+              .to match_array([
+                                tool.id,
+                                tool1.id
+                              ])
+          end
+
+          it "finds all tools in the subaccount" do
+            expect(Lti::ContextControl.deployment_ids_for_context(subaccount))
+              .to match_array([
+                                tool.id,
+                                tool1.id,
+                                tool2.id
+                              ])
+          end
+
+          context "and the context control for the subaccount is deleted" do
+            before(:once) do
+              Lti::ContextControl.find_by(account: subaccount, registration: registration2, deployment: tool2).destroy
+            end
+
+            it "doesn't find the tool in the subaccount" do
+              expect(Lti::ContextControl.deployment_ids_for_context(subaccount)).not_to include(tool2.id)
+            end
+
+            it "doesn't find the tool in the course" do
+              expect(Lti::ContextControl.deployment_ids_for_context(course)).not_to include(tool2.id)
+            end
+          end
+        end
+      end
+    end
+
+    context "with multiple subaccounts" do
+      let_once(:subaccount1) { root_account.sub_accounts.create! }
+      let_once(:subaccount2) { root_account.sub_accounts.create! }
+
+      context "with enabled root account and mixed subaccount settings" do
+        before do
+          Lti::ContextControl.create!(account: subaccount1, registration:, deployment: tool, available: false)
+        end
+
+        it "returns empty for subaccount with disabled registration" do
+          expect(Lti::ContextControl.deployment_ids_for_context(subaccount1)).to be_empty
+        end
+
+        it "inherits from root account for subaccount without explicit setting" do
+          expect(Lti::ContextControl.deployment_ids_for_context(subaccount2)).to match_array([tool.id])
+        end
+
+        context "with explicit available control in second subaccount" do
+          before do
+            Lti::ContextControl.create!(account: subaccount2, registration:, deployment: tool, available: true)
+          end
+
+          it "still returns registration for explicitly enabled subaccount" do
+            expect(Lti::ContextControl.deployment_ids_for_context(subaccount2)).to match_array([tool.id])
+          end
+        end
+      end
+
+      context "with disabled root account and enabled subaccount" do
+        before do
+          root_control.update!(available: false)
+          Lti::ContextControl.create!(account: subaccount1, registration:, deployment: tool, available: true)
+        end
+
+        it "returns registration for subaccount with enabled registration" do
+          expect(Lti::ContextControl.deployment_ids_for_context(subaccount1)).to match_array([tool.id])
+        end
+
+        it "returns empty for subaccount with no explicit setting" do
+          expect(Lti::ContextControl.deployment_ids_for_context(subaccount2)).to be_empty
+        end
+      end
+    end
+
+    context "with multiple deployments associated with the same registration" do
+      let_once(:other_tool) { registration.new_external_tool(root_account) }
+
+      it "returns both tools' ids" do
+        expect(Lti::ContextControl.deployment_ids_for_context(root_account)).to match_array([tool.id, other_tool.id])
+      end
+
+      context "one tool is marked as unavailable" do
+        before(:once) do
+          root_control.update!(available: false)
+        end
+
+        it "only returns the other tool's id" do
+          expect(Lti::ContextControl.deployment_ids_for_context(root_account)).to eql([other_tool.id])
+        end
+      end
+    end
+  end
+
+  describe ".nearest_control_for_registration" do
+    let_once(:root_account) { account_model }
+    let_once(:subaccount) { root_account.sub_accounts.create! }
+    let_once(:course) { course_model(account: subaccount) }
+    let_once(:tool) { registration.new_external_tool(root_account) }
+    let_once(:developer_key) do
+      lti_developer_key_model(account: root_account).tap do |k|
+        lti_tool_configuration_model(developer_key: k, lti_registration: k.lti_registration)
+      end
+    end
+    let_once(:registration) { developer_key.lti_registration }
+    let_once(:root_account_control) { tool.context_controls.first }
+
+    # Simple tests with control in specified context
+    context "with direct context" do
+      it "finds the control for root account context" do
+        expect(Lti::ContextControl.nearest_control_for_registration(root_account, registration, tool))
+          .to eq(root_account_control)
+      end
+
+      it "finds the control for subaccount context" do
+        control = Lti::ContextControl.create!(
+          account: subaccount,
+          available: true,
+          registration:,
+          deployment: tool
+        )
+        expect(Lti::ContextControl.nearest_control_for_registration(subaccount, registration, tool))
+          .to eq(control)
+      end
+
+      it "finds the control for course context" do
+        control = Lti::ContextControl.create!(
+          course:,
+          available: true,
+          registration:,
+          deployment: tool
+        )
+        expect(Lti::ContextControl.nearest_control_for_registration(course, registration, tool))
+          .to eq(control)
+      end
+    end
+
+    context "and the context's control is deleted" do
+      it "ignores the deleted control in a course and finds the subaccount control" do
+        tool.context_controls.create!(
+          course:,
+          available: false,
+          registration:,
+          workflow_state: "deleted"
+        )
+
+        expect(Lti::ContextControl.nearest_control_for_registration(course, registration, tool))
+          .to eq(root_account_control)
+      end
+
+      it "ignores the deleted control in a subaccount and finds the root account control" do
+        tool.context_controls.create!(
+          account: subaccount,
+          available: false,
+          registration:,
+          workflow_state: "deleted"
+        )
+
+        expect(Lti::ContextControl.nearest_control_for_registration(subaccount, registration, tool))
+          .to eq(root_account_control)
+      end
+    end
+
+    # Tests for fallback behavior (when a context doesn't have its own control)
+    context "when the context doesn't have it's own control" do
+      it "finds root account control if context is subaccount" do
+        expect(Lti::ContextControl.nearest_control_for_registration(subaccount, registration, tool))
+          .to eq(root_account_control)
+      end
+
+      it "finds root account control if context is course" do
+        expect(Lti::ContextControl.nearest_control_for_registration(course, registration, tool))
+          .to eq(root_account_control)
+      end
+
+      context "with subaccount control" do
+        let_once(:subaccount_control) do
+          Lti::ContextControl.create!(
+            account: subaccount,
+            available: true,
+            registration:,
+            deployment: tool
+          )
+        end
+
+        it "finds subaccount control if context is course" do
+          subaccount_control
+          expect(Lti::ContextControl.nearest_control_for_registration(course, registration, tool))
+            .to eq(subaccount_control)
+        end
+      end
+    end
+
+    # Tests for special contexts (groups, assignments)
+    context "with specialized contexts" do
+      context "with group contexts" do
+        it "uses the course control for a group in a course" do
+          group = group_model(context: course)
+
+          course_control = Lti::ContextControl.create!(
+            course:,
+            available: true,
+            registration:,
+            deployment: tool
+          )
+
+          expect(Lti::ContextControl.nearest_control_for_registration(group, registration, tool))
+            .to eq(course_control)
+        end
+
+        it "uses the account control for a group in a course without a CC" do
+          group = group_model(context: course)
+          subaccount_control = Lti::ContextControl.create!(
+            account: subaccount,
+            available: true,
+            registration:,
+            deployment: tool
+          )
+          expect(Lti::ContextControl.nearest_control_for_registration(group, registration, tool))
+            .to eq(subaccount_control)
+        end
+
+        it "uses the account control for a group in an account" do
+          group = group_model(context: subaccount)
+
+          subaccount_control = Lti::ContextControl.create!(
+            account: subaccount,
+            available: true,
+            registration:,
+            deployment: tool
+          )
+
+          expect(Lti::ContextControl.nearest_control_for_registration(group, registration, tool))
+            .to eq(subaccount_control)
+        end
+      end
+
+      context "with assignment context" do
+        it "uses the course control for an assignment" do
+          assignment = assignment_model(course:)
+
+          course_control = Lti::ContextControl.create!(
+            course:,
+            available: true,
+            registration:,
+            deployment: tool
+          )
+
+          expect(Lti::ContextControl.nearest_control_for_registration(assignment, registration, tool))
+            .to eq(course_control)
+        end
+      end
+    end
+
+    context "with duplicate tools" do
+      let_once(:duplicate_tool) { registration.new_external_tool(root_account) }
+
+      it "returns the control for the original tool, not the duplicate in the root account" do
+        expect(Lti::ContextControl.nearest_control_for_registration(root_account, registration, tool))
+          .to eql(root_account_control)
+      end
+
+      it "returns the control for the original tool, not the duplicate in the subaccount" do
+        expect(Lti::ContextControl.nearest_control_for_registration(subaccount, registration, tool))
+          .to eql(root_account_control)
+      end
+
+      it "returns the control for the original tool, not the duplicate in the course" do
+        expect(Lti::ContextControl.nearest_control_for_registration(course, registration, tool))
+          .to eql(root_account_control)
       end
     end
   end

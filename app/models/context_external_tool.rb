@@ -153,6 +153,29 @@ class ContextExternalTool < ActiveRecord::Base
     account || course&.account
   end
 
+  def available_in_context?(context)
+    return true unless context.root_account.feature_enabled?(:lti_registrations_next)
+    return true unless lti_registration
+
+    control = Lti::ContextControl.nearest_control_for_registration(context, lti_registration, self)
+
+    # If we don't have a control, log to Sentry so that we can fix it.
+    # We expect there to be an automatically created control for each tool.
+    if control.nil?
+      Sentry.with_scope do |scope|
+        scope.set_tags(context_id: context.global_id)
+        scope.set_tags(lti_registration_id: lti_registration.global_id)
+        scope.set_context("tool", global_id)
+        Sentry.capture_message("ContextExternalTool#available_in_context", level: :warning)
+      end
+    end
+
+    # Given that we expect to have auto-created a control for each tool, which should
+    # have defaulted to "available," if we are missing a context control we assume that
+    # the tool is available.
+    control.nil? || control.available?
+  end
+
   class << self
     # because global navigation tool visibility can depend on a user having particular permissions now
     # this needs to expand from being a simple "admins/members" check to something more full-fledged
