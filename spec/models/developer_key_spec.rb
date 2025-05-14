@@ -1196,6 +1196,17 @@ describe DeveloperKey do
         tool
       ]
     end
+
+    it "destroys an lti ims registration when destroyed" do
+      account = account_model
+      key = dev_key_model_dyn_reg(account:)
+
+      expect(key.destroy).to be true
+      key.reload
+      expect(key).to be_deleted
+      expect(key.lti_registration).to be_deleted
+      expect(key.ims_registration).to be_deleted
+    end
   end
 
   describe "#account_binding_for" do
