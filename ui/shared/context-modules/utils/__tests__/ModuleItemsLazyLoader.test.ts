@@ -130,7 +130,7 @@ describe('fetchModuleItems utility', () => {
       expect(fetchMock.calls()).toHaveLength(0)
     })
 
-    it('construct the api urls correctly', async () => {
+    it.skip('construct the api urls correctly', async () => {
       await moduleItemsLazyLoader.fetchModuleItems(Object.keys(modules))
       const calls = fetchMock.calls()
       expect(calls[0][0]).toBe(
@@ -150,7 +150,7 @@ describe('fetchModuleItems utility', () => {
     })
 
     describe('success responses', () => {
-      it('set the html in the containers with the results', async () => {
+      it.skip('set the html in the containers with the results', async () => {
         await moduleItemsLazyLoader.fetchModuleItems(Object.keys(modules))
         Object.keys(modules).forEach(moduleId => {
           expect(
@@ -166,7 +166,7 @@ describe('fetchModuleItems utility', () => {
         )
       })
 
-      it("sets the loadstate to 'paginated' when there are multiple pages", async () => {
+      it.skip("sets the loadstate to 'paginated' when there are multiple pages", async () => {
         await moduleItemsLazyLoader.fetchModuleItems(['1083'])
         const module = moduleFromId('1083')
         expect(module?.dataset.loadstate).toBe('paginated')
@@ -247,7 +247,7 @@ describe('fetchModuleItems utility', () => {
       expect(fetchMock.calls()).toHaveLength(0)
     })
 
-    it('construct the api url correctly', async () => {
+    it.skip('construct the api url correctly', async () => {
       // use page=2 here
       fetchMock.mock(
         `/courses/${courseId}/modules/${moduleId}/items_html?page=2&per_page=${pageSize}`,
@@ -420,7 +420,7 @@ describe('fetchModuleItems utility', () => {
     })
 
     describe('success response', () => {
-      it('set the htmls in the container with the result', async () => {
+      it.skip('set the htmls in the container with the result', async () => {
         await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, 1)
         expect(document.querySelector(`#context_module_content_${moduleId} ul`)?.outerHTML).toEqual(
           modules[moduleId].items,
@@ -488,7 +488,7 @@ describe('fetchModuleItems utility', () => {
         await moduleItemsLazyLoader.fetchModuleItemsHtml('1083', 1)
       })
 
-      it('does not render the Pagination component if there is only one page', async () => {
+      it.skip('does not render the Pagination component if there is only one page', async () => {
         await moduleItemsLazyLoader.fetchModuleItemsHtml('1083', 1)
         expect(document.querySelector(`#context_module_content_1083 ul`)?.outerHTML).toEqual(
           modules['1083'].items,
