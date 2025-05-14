@@ -17,6 +17,8 @@
  */
 
 import round from '../index'
+import Big from 'big.js'
+import {bigSum} from '../../grading/GradeCalculationHelper.ts'
 
 describe('Util > .round()', () => {
   const x = 1234.56789
@@ -81,5 +83,9 @@ describe('Util > .round()', () => {
 
   test('returns NaN when given NaN', () => {
     expect(Number.isNaN(round(NaN, 2))).toBe(true)
+  })
+
+  test('correctly handles null values', () => {
+    expect(round(null, 2)).toBe(NaN)
   })
 })
