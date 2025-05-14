@@ -33,14 +33,19 @@ describe DataFixup::NormalizePseudonyms do
       user = User.create!
       p1 = user.pseudonyms.create!(unique_id: "12345", account:)
       p2 = user.pseudonyms.create!(unique_id: "  12    345", account:)
-      Pseudonym.where(id: [p1, p2].map(&:id)).update_all(unique_id_normalized: nil)
+      p3 = user.pseudonyms.create!(unique_id: "1234", account:)
+      Pseudonym.where(id: [p1, p2, p3].map(&:id)).update_all(unique_id_normalized: nil)
+      Pseudonym.where(id: p3).update_all(unique_id: "1234\ufffd")
       expect(p1.reload.unique_id_normalized).to be_nil
       expect(p2.reload.unique_id_normalized).to be_nil
+      expect(p3.reload.unique_id).to eql "1234\ufffd"
+      expect(p3.reload.unique_id_normalized).to be_nil
 
       described_class.backfill_unique_id_normalized
 
       expect(p1.reload.unique_id_normalized).to eql "12345"
       expect(p2.reload.unique_id_normalized).to eql "12 345"
+      expect(p3.reload.unique_id_normalized).to eql "1234\u25a1"
     end
   end
 

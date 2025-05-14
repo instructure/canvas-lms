@@ -25,6 +25,20 @@ module DataFixup::NormalizePseudonyms
         batch.pluck(:id, :unique_id, :unique_id_normalized).each do |id, unique_id, unique_id_normalized|
           next if unique_id_normalized # just in case it got set elsewhere somehow
 
+          # invalid characters are not allowed in normalized pseudonyms.
+          # during normal pseudonym creation, they'll fail, but we can't fail
+          # this migration so just replace them. these pseudonyms will no
+          # longer work to log in if the user tries their original characters.
+          # the most common case of this is emojis that didn't exist in Unicode 3.2.
+          # Note that we can't use the regular Unicode replacement character, as
+          # that is not allowed in a normalized id either.
+          [Net::IMAP::StringPrep::Tables::IN_A_1,
+           Net::IMAP::StringPrep::Tables::IN_C_3,
+           Net::IMAP::StringPrep::Tables::IN_C_4,
+           Net::IMAP::StringPrep::Tables::IN_C_5,
+           "\ufffd"].each do |table|
+            unique_id.gsub!(table, "\u25a1")
+          end
           updates[id] = Pseudonym.normalize(unique_id)
         end
         next if updates.empty?

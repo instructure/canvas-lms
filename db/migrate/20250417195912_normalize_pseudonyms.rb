@@ -29,7 +29,30 @@ class NormalizePseudonyms < ActiveRecord::Migration[7.1]
 
     change_column_null :pseudonyms, :unique_id_normalized, false # rubocop:disable Migration/ChangeColumnNull
 
+    connection.execute("SET inst.backfilling_pseudonyms_auth_type = 'true'")
     DataFixup::NormalizePseudonyms.backfill_auth_type
+
+    connection.execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
+      CREATE OR REPLACE FUNCTION #{connection.quote_table_name("pseudonyms_before_insert_or_update_infer_auth_type__tr_fn")}()
+      RETURNS trigger AS $$
+      BEGIN
+          -- Disallow directly setting auth_type
+          IF OLD.auth_type IS DISTINCT FROM NEW.auth_type THEN
+            RAISE EXCEPTION 'pseudonyms.auth_type cannot be set directly';
+          END IF;
+
+          -- If authentication_provider_id changed, infer the auth_type
+          IF OLD.authentication_provider_id IS DISTINCT FROM NEW.authentication_provider_id THEN
+            IF NEW.authentication_provider_id IS NOT NULL THEN
+              SELECT auth_type INTO NEW.auth_type FROM authentication_providers WHERE id = NEW.authentication_provider_id;
+            ELSE
+              NEW.auth_type := NULL;
+            END IF;
+          END IF;
+          RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql SET search_path TO #{Shard.current.name};
+    SQL
 
     add_check_constraint :pseudonyms,
                          "(auth_type IS NULL) = (authentication_provider_id IS NULL)",
