@@ -7133,6 +7133,7 @@ uk:
   ending_date_e1ea13a4: "Дата завершення"
   ends_4fcb632: "Закінчення:"
   ends_at_9a62b528: "Закінчується в:"
+  ends_e3a6843f: Кінці
   enhanced_individual_gradebook: 
     avg_score: "Середній бал"
     high_score: "Висока оцінка"
@@ -12859,6 +12860,7 @@ uk:
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Будь ласка, введіть кінцеву дату або після того, як %{earliestDate} "
   please_enter_a_name_for_this_link_318f01a4: "Будь ласка, введіть назву для цього посилання."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Будь ласка. введіть пошукові терміни з трьома і більше символами"
+  please_enter_a_valid_format_for_a_date_66ed0587: "Це не дата!"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Будь ласка, введіть правильний URL. Протокол потрібен (e.g. http://, https://, ftp://, tel:, mailto:)."
   please_enter_the_details_for_the_new_course_dc705b8c: "Будь ласка, введіть деталі для нового курсу."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Будь ласка, введіть код підтвердження, показаний вашим токеном."
@@ -16913,6 +16915,7 @@ uk:
   started_5e138638: Початок
   starts_at_29843f98: "Починається о"
   starts_ce584f1c: "Починається:"
+  starts_fa6bf3f5: Починається
   state_standards_c9b1affd: "Державні Стандарти"
   statistics: 
     csv_columns: 
