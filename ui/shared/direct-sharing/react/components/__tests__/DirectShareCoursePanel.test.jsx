@@ -17,13 +17,15 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act, screen} from '@testing-library/react'
+import {render, fireEvent, act} from '@testing-library/react'
+import * as rtl from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import useManagedCourseSearchApi from '../../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi, {
   useCourseModuleItemApi,
 } from '../../effects/useModuleCourseSearchApi'
 import DirectShareCoursePanel from '../DirectShareCoursePanel'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('../../effects/useManagedCourseSearchApi')
 jest.mock('../../effects/useModuleCourseSearchApi')
@@ -43,6 +45,13 @@ describe('DirectShareCoursePanel', () => {
   })
 
   beforeEach(() => {
+    // Setup default ENV values
+    fakeENV.setup({
+      FEATURES: {
+        validate_call_to_action: false,
+      },
+    })
+
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', name: 'abc'},
@@ -53,6 +62,7 @@ describe('DirectShareCoursePanel', () => {
 
   afterEach(() => {
     fetchMock.restore()
+    fakeENV.teardown()
   })
 
   it('shows the overwrite warning', () => {
@@ -132,12 +142,16 @@ describe('DirectShareCoursePanel', () => {
   describe('Form validation', () => {
     describe('when validate_call_to_action is off', () => {
       beforeEach(() => {
-        window.ENV.FEATURES.validate_call_to_action = false
+        fakeENV.setup({
+          FEATURES: {
+            validate_call_to_action: false,
+          },
+        })
       })
 
       it('hides asterisk for course input', () => {
         render(<DirectShareCoursePanel />)
-        expect(screen.getByLabelText(/select a course/i).getAttribute('required')).toBe(null)
+        expect(rtl.screen.getByLabelText(/select a course/i).getAttribute('required')).toBe(null)
       })
 
       it('disables the copy button initially', () => {
@@ -169,29 +183,33 @@ describe('DirectShareCoursePanel', () => {
 
     describe('validate_call_to_action is on', () => {
       beforeEach(() => {
-        window.ENV.FEATURES.validate_call_to_action = true
+        fakeENV.setup({
+          FEATURES: {
+            validate_call_to_action: true,
+          },
+        })
       })
 
       it('shows asterisk for course input', () => {
         render(<DirectShareCoursePanel />)
-        expect(screen.getByLabelText(/select a course/i).getAttribute('required')).toBe('')
+        expect(rtl.screen.getByLabelText(/select a course/i).getAttribute('required')).toBe('')
       })
 
       it('enables the copy button initially', () => {
         render(<DirectShareCoursePanel />)
-        expect(screen.getByText(/copy/i).closest('button').getAttribute('disabled')).toBe(null)
+        expect(rtl.screen.getByText(/copy/i).closest('button').getAttribute('disabled')).toBe(null)
       })
 
       it('shows error message after course selection validation error', () => {
         render(<DirectShareCoursePanel />)
-        fireEvent.click(screen.getByText(/copy/i))
-        expect(screen.getByText(/please select a course/i)).toBeInTheDocument()
+        fireEvent.click(rtl.screen.getByText(/copy/i))
+        expect(rtl.screen.getByText(/please select a course/i)).toBeInTheDocument()
       })
 
       it('focuses on course input after course selection validation error', () => {
         render(<DirectShareCoursePanel />)
-        fireEvent.click(screen.getByText(/copy/i))
-        expect(screen.getByLabelText(/select a course/i)).toHaveFocus()
+        fireEvent.click(rtl.screen.getByText(/copy/i))
+        expect(rtl.screen.getByLabelText(/select a course/i)).toHaveFocus()
       })
     })
   })

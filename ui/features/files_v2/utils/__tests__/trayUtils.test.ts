@@ -30,6 +30,7 @@ describe('trayUtils', () => {
   describe('getTrayHeight', () => {
     it('defaults tray height to 100vh when the masquerade bar is not present', () => {
       resetTrayHeight()
+      document.body.classList.remove('is-masquerading-or-student-view')
       expect(getTrayHeight()).toBe('100vh')
     })
 

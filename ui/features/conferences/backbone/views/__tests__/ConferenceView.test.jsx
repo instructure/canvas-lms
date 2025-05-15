@@ -20,10 +20,38 @@ import axe from 'axe-core'
 import Conference from '../../models/Conference'
 import ConferenceView from '../ConferenceView'
 import $ from 'jquery'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('ConferenceView', () => {
   let container
   let mockScreenReaderMessage
+
+  beforeAll(() => {
+    fakeENV.setup({
+      CONFERENCES: {
+        permissions: {
+          create: true,
+          update: true,
+          delete: true,
+        },
+        urls: {
+          add_conference_url: '/api/v1/courses/1/conferences',
+          join_url: '/courses/1/conferences/1/join',
+        },
+        conference_types: [
+          {
+            name: 'Adobe Connect',
+            type: 'AdobeConnect',
+            settings: [],
+          },
+        ],
+      },
+    })
+  })
+
+  afterAll(() => {
+    fakeENV.teardown()
+  })
 
   const createConferenceView = (conferenceOpts = {}) => {
     const defaultOpts = {
@@ -66,7 +94,7 @@ describe('ConferenceView', () => {
     }
     mockScreenReaderMessage = jest.fn()
     $.screenReaderFlashMessage = mockScreenReaderMessage
-    
+
     // Create a mock jQuery promise
     const mockDeferred = $.Deferred()
     mockDeferred.resolve({deleted: true})

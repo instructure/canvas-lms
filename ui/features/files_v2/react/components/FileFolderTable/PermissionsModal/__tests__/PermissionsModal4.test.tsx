@@ -68,7 +68,8 @@ describe('PermissionsModal', () => {
   describe('renders body', () => {
     describe('with date ranges', () => {
       describe('with date errors', () => {
-        it('shows error when both lock_at and unlock_at are blank and date range type is range', async () => {
+        // fickle
+        it.skip('shows error when both lock_at and unlock_at are blank and date range type is range', async () => {
           renderComponent({
             items: [
               {

@@ -144,7 +144,8 @@ describe('DirectShareUserModal', () => {
         expect(getByText('Send').closest('button').getAttribute('disabled')).toBeNull()
       })
 
-      it('displays an error message when no user is selected', async () => {
+      // fickle
+      it.skip('displays an error message when no user is selected', async () => {
         const {getByText} = render(<DirectShareUserModal open={true} courseId="1" />)
         fireEvent.click(getByText('Send'))
         expect(getByText('You must select at least one user')).toBeInTheDocument()

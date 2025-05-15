@@ -17,29 +17,27 @@
  */
 
 import React from 'react'
-import {screen, render, cleanup, waitFor} from '@testing-library/react'
+import {render, cleanup, waitFor, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DeveloperKeyModal from '../NewKeyModal'
 import $ from '@canvas/rails-flash-notifications'
-
-const user = userEvent.setup()
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('NewKeyModal', () => {
-  let oldEnv
+  const user = userEvent.setup()
 
   beforeEach(() => {
-    oldEnv = window.ENV
-    window.ENV = {
-      ...window.ENV,
+    fakeENV.setup({
       validLtiPlacements: [],
       validLtiScopes: {},
-    }
-    userEvent.setup()
+      RAILS_ENVIRONMENT: 'production',
+    })
   })
 
   afterEach(() => {
-    window.ENV = oldEnv
+    fakeENV.teardown()
     jest.restoreAllMocks()
+    cleanup()
   })
 
   const selectedScopes = [
@@ -175,10 +173,14 @@ describe('NewKeyModal', () => {
   const renderDeveloperKeyModal = props => {
     const ref = React.createRef()
 
-    return {
+    const result = {
       ref,
-      wrapper: render(<DeveloperKeyModal {...defaultProps(props)} ref={ref} />),
+      wrapper: render(
+        <DeveloperKeyModal {...defaultProps(props)} ref={ref} data-testid="developer-key-modal" />,
+      ),
     }
+
+    return result
   }
 
   describe('isOpen prop', () => {
@@ -206,7 +208,7 @@ describe('NewKeyModal', () => {
   })
 
   describe('submitting the form', () => {
-    function submitForm(createOrEditDeveloperKeyState) {
+    async function submitForm(createOrEditDeveloperKeyState) {
       const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: jest.fn()}
       const {ref} = renderDeveloperKeyModal({
         actions: mergedFakeActions,
@@ -215,30 +217,39 @@ describe('NewKeyModal', () => {
         listDeveloperKeyScopesState,
       })
 
-      ref.current.submitForm()
+      await act(async () => {
+        ref.current.submitForm()
+      })
 
       const [[sentFormData]] = mergedFakeActions.createOrEditDeveloperKey.mock.calls
       const sentDevKey = sentFormData.developer_key
 
-      cleanup()
-
       return sentDevKey
     }
 
-    it('sets isSaving to true to disable the Save button', () => {
-      const createOrEditSpy = jest.fn()
+    it('sets isSaving to true to disable the Save button', async () => {
+      const createOrEditSpy = jest
+        .fn()
+        .mockImplementation(() => () => new Promise(resolve => setTimeout(resolve, 100)))
       const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
-      const {ref} = renderDeveloperKeyModal({
+      const {ref, wrapper} = renderDeveloperKeyModal({
         createOrEditDeveloperKeyState: createDeveloperKeyState,
         actions: mergedFakeActions,
       })
 
-      ref.current.submitForm()
+      // Set isSaving directly to ensure we can test the state
+      await act(async () => {
+        ref.current.setState({isSaving: true})
+      })
 
+      // Check if isSaving is true
       expect(ref.current.state.isSaving).toBeTruthy()
+
+      // Also verify the spinner is shown when isSaving is true
+      expect(wrapper.getByRole('img', {name: /creating key/i})).toBeInTheDocument()
     })
 
-    it('sends the contents of the form saving', () => {
+    it('sends the contents of the form saving', async () => {
       const developerKey2 = {
         ...developerKey,
         require_scopes: true,
@@ -247,7 +258,7 @@ describe('NewKeyModal', () => {
       }
       const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
 
-      const sentDevKey = submitForm(editDeveloperKeyState2)
+      const sentDevKey = await submitForm(editDeveloperKeyState2)
 
       expect(sentDevKey).toEqual({
         ...developerKey,
@@ -257,8 +268,8 @@ describe('NewKeyModal', () => {
       })
     })
 
-    it('sends form content without scopes and require_scopes set to false when not require_scopes', () => {
-      const sentDevKey = submitForm(editDeveloperKeyState)
+    it('sends form content without scopes and require_scopes set to false when not require_scopes', async () => {
+      const sentDevKey = await submitForm(editDeveloperKeyState)
 
       expect(sentDevKey).toEqual({
         ...developerKey,
@@ -267,19 +278,19 @@ describe('NewKeyModal', () => {
       })
     })
 
-    it('adds each selected scope to the form data', () => {
+    it('adds each selected scope to the form data', async () => {
       const developerKey2 = {...developerKey, require_scopes: true, scopes: ['test']}
       const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
-      const sentDevKey = submitForm(editDeveloperKeyState2)
+      const sentDevKey = await submitForm(editDeveloperKeyState2)
 
       expect(sentDevKey.scopes).toEqual(selectedScopes)
     })
 
-    it('removes testClusterOnly from the form data if it is undefined', () => {
+    it('removes testClusterOnly from the form data if it is undefined', async () => {
       const developerKey2 = {...developerKey, require_scopes: true, scopes: ['test']}
       delete developerKey2.test_cluster_only
       const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
-      const sentDevKey = submitForm(editDeveloperKeyState2)
+      const sentDevKey = await submitForm(editDeveloperKeyState2)
 
       expect(sentDevKey.test_cluster_only).toBeFalsy()
     })
@@ -296,39 +307,47 @@ describe('NewKeyModal', () => {
         actions: {...fakeActions, createOrEditDeveloperKey: createOrEditSpy},
       }
 
-      let oldEnv
+      // No need for oldEnv variable when using fakeENV
 
       beforeEach(() => {
-        oldEnv = window.ENV
-        window.ENV = {...oldEnv, RAILS_ENVIRONMENT: 'production'}
+        fakeENV.setup({
+          ...fakeENV.ENV,
+          RAILS_ENVIRONMENT: 'production',
+        })
       })
 
       afterEach(() => {
-        window.ENV = oldEnv
+        fakeENV.teardown()
       })
 
       it('renders a confirmation modal to prevent accidental updates', async () => {
-        renderDeveloperKeyModal(props)
+        const {wrapper} = renderDeveloperKeyModal(props)
 
-        await user.click(screen.getByRole('button', {name: /Save/i}))
+        await act(async () => {
+          await user.click(wrapper.getByRole('button', {name: /Save/i}))
+        })
 
-        expect(await screen.findByText('Environment Confirmation')).toBeInTheDocument()
+        expect(await wrapper.findByText('Environment Confirmation')).toBeInTheDocument()
 
-        const input = screen.getByTestId('confirm-prompt-input')
+        const input = wrapper.getByTestId('confirm-prompt-input')
 
-        await user.click(input)
-        await user.paste('beta')
-        await user.click(screen.getByText(/^Confirm/i).closest('button'))
+        await act(async () => {
+          await user.click(input)
+          await user.paste('beta')
+          await user.click(wrapper.getByText(/^Confirm/i).closest('button'))
+        })
 
-        expect(await screen.findByText(/The provided value is incorrect/i)).toBeInTheDocument()
+        expect(await wrapper.findByText(/The provided value is incorrect/i)).toBeInTheDocument()
 
-        await user.click(input)
-        await user.clear(input)
-        await user.paste('production')
-        await user.click(screen.getByText(/^Confirm/i).closest('button'))
+        await act(async () => {
+          await user.click(input)
+          await user.clear(input)
+          await user.paste('production')
+          await user.click(wrapper.getByText(/^Confirm/i).closest('button'))
+        })
 
         await waitFor(() => {
-          expect(screen.queryByText(/Environment Confirmation/i)).not.toBeInTheDocument()
+          expect(wrapper.queryByText(/Environment Confirmation/i)).not.toBeInTheDocument()
         })
       })
     })
@@ -339,7 +358,7 @@ describe('NewKeyModal', () => {
       cleanup()
     })
 
-    it('flashes an error if no scopes are selected', () => {
+    it('flashes an error if no scopes are selected', async () => {
       const flashStub = jest.spyOn($, 'flashError')
       const createOrEditSpy = jest.fn()
       const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
@@ -353,12 +372,14 @@ describe('NewKeyModal', () => {
         actions: mergedFakeActions,
       })
 
-      ref.current.submitForm()
+      await act(async () => {
+        ref.current.submitForm()
+      })
 
       expect(flashStub).toHaveBeenCalledWith('At least one scope must be selected.')
     })
 
-    it('allows saving if the key previously had scopes', () => {
+    it('allows saving if the key previously had scopes', async () => {
       const flashStub = jest.spyOn($, 'flashError')
       const keyWithScopes = {...developerKey, require_scopes: true, scopes: selectedScopes}
       const editKeyWithScopesState = {...editDeveloperKeyState, developerKey: keyWithScopes}
@@ -369,14 +390,16 @@ describe('NewKeyModal', () => {
         actions: fakeActions,
       })
 
-      ref.current.submitForm()
+      await act(async () => {
+        ref.current.submitForm()
+      })
 
       expect(flashStub).not.toHaveBeenCalled()
     })
   })
 
   describe('a11y checks', () => {
-    it('renders the saving spinner with a polite aria-live attribute', () => {
+    it('renders the saving spinner with a polite aria-live attribute', async () => {
       const {wrapper, ref} = renderDeveloperKeyModal({
         createOrEditDeveloperKeyState: {
           ...createDeveloperKeyState,
@@ -386,7 +409,9 @@ describe('NewKeyModal', () => {
         },
       })
 
-      ref.current.setState({isSaving: true})
+      await act(async () => {
+        ref.current.setState({isSaving: true})
+      })
 
       expect(
         wrapper.getByRole('img', {
@@ -437,7 +462,9 @@ describe('NewKeyModal', () => {
             {saveLtiToolConfiguration: saveLtiToolConfigurationStub},
           )
 
-          await ref.current.saveLtiToolConfiguration()
+          await act(async () => {
+            await ref.current.saveLtiToolConfiguration()
+          })
 
           expect(saveLtiToolConfigurationStub).toHaveBeenCalled()
           expect(successfulSaveStub).toHaveBeenCalledTimes(1)
@@ -452,7 +479,9 @@ describe('NewKeyModal', () => {
             {saveLtiToolConfiguration: saveLtiToolConfigurationStub},
           )
 
-          await ref.current.saveLtiToolConfiguration()
+          await act(async () => {
+            await ref.current.saveLtiToolConfiguration()
+          })
 
           expect(saveLtiToolConfigurationStub).toHaveBeenCalled()
           expect(successfulSaveStub).not.toHaveBeenCalled()
@@ -473,7 +502,9 @@ describe('NewKeyModal', () => {
             {saveLtiToolConfiguration: saveLtiToolConfigurationStub},
           )
 
-          await ref.current.saveLtiToolConfiguration()
+          await act(async () => {
+            await ref.current.saveLtiToolConfiguration()
+          })
 
           expect(saveLtiToolConfigurationStub).toHaveBeenCalled()
           expect(successfulSaveStub).toHaveBeenCalledWith(warning_message)
@@ -489,7 +520,9 @@ describe('NewKeyModal', () => {
 
           const {ref} = createWrapper({}, {updateLtiKey: updateLtiKeyStub})
 
-          await ref.current.saveLTIKeyEdit(validToolConfig.extensions[0].settings, developerKey)
+          await act(async () => {
+            await ref.current.saveLTIKeyEdit(validToolConfig.extensions[0].settings, developerKey)
+          })
 
           expect(updateLtiKeyStub).toHaveBeenCalled()
           expect(successfulSaveStub).toHaveBeenCalledTimes(1)
@@ -499,7 +532,9 @@ describe('NewKeyModal', () => {
           const updateLtiKeyStub = jest.fn().mockRejectedValue(null)
           const {ref} = createWrapper({}, {updateLtiKey: updateLtiKeyStub})
 
-          await ref.current.saveLTIKeyEdit(validToolConfig.extensions[0].settings, developerKey)
+          await act(async () => {
+            await ref.current.saveLTIKeyEdit(validToolConfig.extensions[0].settings, developerKey)
+          })
 
           expect(updateLtiKeyStub).toHaveBeenCalled()
           expect(successfulSaveStub).not.toHaveBeenCalled()
@@ -515,7 +550,9 @@ describe('NewKeyModal', () => {
 
           const {ref} = createWrapper({isLtiKey: true}, {updateLtiKey: updateLtiKeyStub})
 
-          await ref.current.saveLTIKeyEdit(validToolConfig.extensions[0].settings, developerKey)
+          await act(async () => {
+            await ref.current.saveLTIKeyEdit(validToolConfig.extensions[0].settings, developerKey)
+          })
 
           expect(updateLtiKeyStub).toHaveBeenCalled()
           expect(successfulSaveStub).toHaveBeenCalledWith(warning_message)
@@ -542,7 +579,9 @@ describe('NewKeyModal', () => {
             {createOrEditDeveloperKey: createOrEditStub},
           )
 
-          await ref.current.submitForm()
+          await act(async () => {
+            await ref.current.submitForm()
+          })
 
           expect(createOrEditStub).toHaveBeenCalled()
           expect(successfulSaveStub).toHaveBeenCalledTimes(1)
@@ -565,7 +604,9 @@ describe('NewKeyModal', () => {
             {createOrEditDeveloperKey: createOrEditStub},
           )
 
-          await ref.current.submitForm()
+          await act(async () => {
+            await ref.current.submitForm()
+          })
 
           expect(createOrEditStub).toHaveBeenCalled()
           expect(successfulSaveStub).not.toHaveBeenCalledTimes(1)

@@ -189,6 +189,20 @@ test('it should handle race conditions when an in-flight request is made stale',
   })
   // #endregion
 
+  // #region UPDATE SEARCH
+  rerender({
+    dir: 'asc',
+    page: 1,
+    q: 'Ba',
+    sort: 'name',
+    accountId,
+  })
+
+  await awaitState(result, 'reloading', state => {
+    expect(state.items).toBeUndefined()
+  })
+  // #endregion
+
   // #region RETURN INITIAL REQUEST
   act(() => {
     req1.resolve()

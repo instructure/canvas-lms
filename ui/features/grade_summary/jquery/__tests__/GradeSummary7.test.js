@@ -196,6 +196,7 @@ describe('GradeSummary', () => {
 
   describe('SubmissionCommentsTray', () => {
     beforeEach(() => {
+      fakeENV.setup()
       ENV.submissions = [
         {
           assignment_id: '22',
@@ -204,23 +205,30 @@ describe('GradeSummary', () => {
         },
       ]
 
-      // Set up the DOM for comments thread
       $fixtures.innerHTML = `
         <div id="comments_thread_22">
           <button data-assignment-id="22" class="comments-button">Comments</button>
         </div>
         <div id="submission_22"></div>
       `
+
+      // Reset the store state before each test
+      useStore.setState({
+        submissionTrayOpen: false,
+        submissionTrayAssignmentId: undefined,
+        submissionCommentsTray: {attempts: {}},
+      })
     })
 
     afterEach(() => {
+      fakeENV.teardown()
       $fixtures.innerHTML = ''
       jest.restoreAllMocks()
     })
 
     describe('handleSubmissionsCommentTray', () => {
       it('should open tray with no prior assignmentId', () => {
-        jest.spyOn(useStore, 'setState')
+        jest.spyOn(useStore, 'setState').mockClear()
         jest.spyOn($.fn, 'addClass')
         jest.spyOn($.fn, 'removeClass')
 
@@ -238,14 +246,15 @@ describe('GradeSummary', () => {
       })
 
       it('should close tray when clicking the same assignment twice', () => {
-        jest.spyOn(useStore, 'setState')
+        jest.spyOn(useStore, 'setState').mockClear()
         jest.spyOn($.fn, 'addClass')
         jest.spyOn($.fn, 'removeClass')
 
-        // Mock initial state
+        // Set initial state
         useStore.setState({
           submissionTrayAssignmentId: '22',
           submissionTrayOpen: true,
+          submissionCommentsTray: {attempts: {}},
         })
 
         GradeSummary.handleSubmissionsCommentTray('22')
@@ -274,14 +283,15 @@ describe('GradeSummary', () => {
           <div id="submission_23"></div>
         `
 
-        jest.spyOn(useStore, 'setState')
+        jest.spyOn(useStore, 'setState').mockClear()
         jest.spyOn($.fn, 'addClass')
         jest.spyOn($.fn, 'removeClass')
 
-        // Mock initial state
+        // Set initial state
         useStore.setState({
           submissionTrayAssignmentId: '22',
           submissionTrayOpen: true,
+          submissionCommentsTray: {attempts: {}},
         })
 
         // Switch to assignment 23
@@ -301,6 +311,7 @@ describe('GradeSummary', () => {
       })
 
       it('should handle comments with attempts', () => {
+        // Reset ENV.submissions to ensure clean state
         ENV.submissions = [
           {
             assignment_id: '22',
@@ -314,7 +325,7 @@ describe('GradeSummary', () => {
           },
         ]
 
-        jest.spyOn(useStore, 'setState')
+        jest.spyOn(useStore, 'setState').mockClear()
 
         GradeSummary.handleSubmissionsCommentTray('22')
 
@@ -336,7 +347,7 @@ describe('GradeSummary', () => {
       })
 
       it('should handle non-existent assignment', () => {
-        jest.spyOn(useStore, 'setState')
+        jest.spyOn(useStore, 'setState').mockClear()
         jest.spyOn(console, 'error').mockImplementation(() => {})
 
         expect(() => {
