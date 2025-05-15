@@ -18,6 +18,15 @@
 
 import {string, shape, arrayOf, oneOfType, bool} from 'prop-types'
 
+export const ErrorPropType = (props, propName, componentName) => {
+  if (props[propName] != null && !(props[propName] instanceof Error)) {
+    return new Error(
+      `Invalid prop '${propName}' supplied to '${componentName}'. Expected an Error object.`,
+    )
+  }
+  return null
+}
+
 export const itemShape = shape({
   id: string.isRequired,
   title: string.isRequired,
@@ -27,12 +36,14 @@ export const itemShape = shape({
 export const groupShape = shape({
   id: string.isRequired,
   title: string.isRequired,
-  items: arrayOf(itemShape),
+  items: oneOfType([arrayOf(itemShape), bool]),
 })
+
+export const siblingPropType = oneOfType([arrayOf(itemShape), ErrorPropType])
 
 export const moveOptionsType = oneOfType([
   shape({
-    siblings: arrayOf(itemShape).isRequired,
+    siblings: siblingPropType,
   }),
   shape({
     groupsLabel: string.isRequired,

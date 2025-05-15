@@ -18,8 +18,40 @@
 
 import React from 'react'
 import {positions} from '@canvas/positions'
-import {render, screen} from '@testing-library/react'
+import {screen as testScreen, render, waitFor} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import MoveSelect from '../MoveSelect'
+
+const server = setupServer()
+
+beforeAll(() => {
+  // Set up DOM environment
+  if (typeof window !== 'undefined') {
+    window.ENV = {COURSE_ID: '123'}
+  }
+  // Start the interception
+  server.listen()
+})
+
+beforeEach(() => {
+  // Set up DOM environment for each test
+  document.body.innerHTML = `
+    <div id="flash_message_holder"></div>
+    <div id="flash_screenreader_holder" role="alert"></div>
+    <div id="flashalert_message_holder"></div>
+  `
+})
+
+afterEach(() => {
+  // Reset handlers between tests
+  server.resetHandlers()
+})
+
+afterAll(() => {
+  // Stop the interception
+  server.close()
+})
 
 const stubs = {
   onSelect: jest.fn(),
@@ -98,12 +130,93 @@ const setupRefForMultipleItems = () => {
 describe('MoveSelect', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    server.resetHandlers()
+    window.ENV = {COURSE_ID: '123'}
+
+    server.use(
+      http.get('/api/v1/courses/:course_id/modules/:module_id/items', ({params}) => {
+        if (params.module_id === '17') {
+          return HttpResponse.json({error: 'Not found'}, {status: 404})
+        }
+        return HttpResponse.json([
+          {id: '1', title: 'Item 1'},
+          {id: '2', title: 'Item 2'},
+        ])
+      }),
+    )
+  })
+
+  describe('lazy loading module items', () => {
+    let props
+
+    beforeEach(() => {
+      props = defaultProps({
+        moveOptions: {
+          groupsLabel: 'Modules',
+          groups: [
+            {
+              id: '1',
+              title: 'Module 1',
+              items: undefined,
+            },
+          ],
+        },
+      })
+    })
+
+    it('fetches items when they are not loaded', async () => {
+      expect(props.moveOptions.groups[0].items).toBe(undefined)
+
+      render(<MoveSelect {...props} />)
+
+      await waitFor(() => {
+        const group = props.moveOptions.groups[0]
+        expect(group.items).toEqual([
+          {id: '1', title: 'Item 1'},
+          {id: '2', title: 'Item 2'},
+        ])
+      })
+    })
+
+    it('renders the sibling select when items are loaded', async () => {
+      render(<MoveSelect {...props} />)
+
+      // Wait for initial position select to be loaded
+      await waitFor(() => {
+        expect(testScreen.getByTestId('select-position')).toBeInTheDocument()
+      })
+
+      // Select 'Before..' option
+      const positionSelect = testScreen.getByTestId('select-position')
+      positionSelect.value = 'before'
+      positionSelect.dispatchEvent(new Event('change', {bubbles: true}))
+
+      // Wait for sibling select to appear and verify options
+      await waitFor(() => {
+        const siblingSelect = testScreen.getByTestId('select-sibling')
+        expect(siblingSelect).toBeInTheDocument()
+
+        const options = Array.from(siblingSelect.options)
+        expect(options.map(o => o.text)).toEqual(['Item 1', 'Item 2'])
+      })
+    })
+
+    it('shows an error when fetching items fails', async () => {
+      props.moveOptions.groups[0].id = '17'
+      render(<MoveSelect {...props} />)
+
+      await waitFor(() => {
+        const alert = testScreen.getByRole('alert')
+        expect(alert).toBeInTheDocument()
+        expect(alert).toHaveTextContent('Failed loading module items')
+      })
+    })
   })
 
   it('renders the MoveSelect component', () => {
     renderMoveSelect()
 
-    expect(screen.getByText('Move')).toBeInTheDocument()
+    expect(testScreen.getByText('Move')).toBeInTheDocument()
   })
 
   it('hasSelectedPosition() is false if selectedPosition is false-y', () => {
