@@ -27,6 +27,7 @@ module LoggingFilter
     api_key
     client_secret
     fb_sig_friends
+    refresh_token
     session_token
   ].freeze
 
