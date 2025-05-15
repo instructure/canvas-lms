@@ -16,16 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {assignLocation} from '@canvas/util/globalUtils'
-import {render, screen, waitFor} from '@testing-library/react'
-import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
+import {render, screen} from '@testing-library/react'
 import {merge} from 'lodash'
 import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
 }))
+
+beforeEach(() => {
+  fakeENV.setup()
+})
+
+afterEach(() => {
+  fakeENV.teardown()
+})
 
 // We can't call the wrapped component because a lot of these tests are depending
 // on the class component instances. So we've got to cobble up enough of the date
@@ -40,8 +47,6 @@ const dateFormatter = date => {
     throw e
   }
 }
-
-const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
 
 describe('DiscussionRow', () => {
   const makeProps = (props = {}) =>
@@ -99,28 +104,9 @@ describe('DiscussionRow', () => {
       props,
     )
 
-  const openManageMenu = async title => {
-    const menu = screen.getByText(`Manage options for ${title}`)
-    expect(menu).toBeInTheDocument()
-    await user.click(menu)
-    const list = await waitFor(() => screen.getByRole('menu'))
-    expect(list).toBeInTheDocument()
-
-    return list
-  }
-
-  const oldEnv = window.ENV
-
-  afterEach(() => {
-    window.ENV = oldEnv
-  })
-
   it('renders the latest available until date for ungraded overrides', () => {
-    const now = new Date()
-    const futureDate = new Date(now)
-    futureDate.setFullYear(futureDate.getFullYear() + 1)
-    const furtherFutureDate = new Date(now)
-    furtherFutureDate.setFullYear(furtherFutureDate.getFullYear() + 2)
+    const futureDate = new Date('2026-05-15T00:00:00Z')
+    const furtherFutureDate = new Date('2027-05-15T00:00:00Z')
     const discussion = {
       ungraded_discussion_overrides: [
         {assignment_override: {lock_at: futureDate}},
