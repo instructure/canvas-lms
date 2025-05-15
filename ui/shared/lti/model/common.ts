@@ -19,8 +19,8 @@
 import {z} from 'zod'
 
 export const ZIframeDimensions = z.object({
-  width: z.number().optional(), // TODO: int().positive() ?
-  height: z.number().optional(),
+  width: z.number().int().nonnegative().optional(),
+  height: z.number().int().nonnegative().optional(),
 })
 
 export type IframeDimensions = z.infer<typeof ZIframeDimensions>

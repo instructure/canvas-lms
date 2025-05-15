@@ -49,16 +49,17 @@ class Lti::AssetProcessor < ApplicationRecord
 
     return nil unless tool
 
+    # TODO: add thumbnail to asset_processor model and add it here as well
     new(
       context_external_tool: tool,
       url: content_item["url"],
       title: content_item["title"],
       text: content_item["text"],
-      custom: content_item["custom"],
-      icon: content_item["icon"],
-      window: content_item["window"],
-      iframe: content_item["iframe"],
-      report: content_item["report"]
+      custom: content_item["custom"].present? ? Schemas::Lti::AssetProcessor::CustomVariables.filter_and_validate!(content_item["custom"].to_unsafe_h) : nil,
+      icon: content_item["icon"].present? ? Schemas::Lti::AssetProcessor::UrlWithDimensions.filter_and_validate!(content_item["icon"].to_unsafe_h) : nil,
+      window: content_item["window"].present? ? Schemas::Lti::AssetProcessor::WindowSettings.filter_and_validate!(content_item["window"].to_unsafe_h) : nil,
+      iframe: content_item["iframe"].present? ? Schemas::Lti::AssetProcessor::IframeDimensions.filter_and_validate!(content_item["iframe"].to_unsafe_h) : nil,
+      report: content_item["report"].present? ? Schemas::Lti::AssetProcessor::ReportSettings.filter_and_validate!(content_item["report"].to_unsafe_h) : nil
     )
   end
 

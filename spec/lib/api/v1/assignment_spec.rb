@@ -1146,11 +1146,9 @@ describe "Api::V1::Assignment" do
           "url" => "",
           "title" => title,
           "text" => "Lti 1.3 Tool Text",
-          "custom" => "",
-          "icon" => "{\"url\":\"https://img.icons8.com/metro/1600/unicorn.png\",\"width\":64,\"height\":64}",
-          "window" => "",
-          "iframe" => "",
-          "report" => "{\"released\":true,\"indicator\":false,\"custom\":{\"some_setting\":\"az-123\"}}",
+          "custom" => { k: "v" },
+          "icon" => {},
+          "report" => { released: true, indicator: false, custom: { some_setting: "az-123" } },
           "context_external_tool_id" => tool.id,
         }
       end
@@ -1311,7 +1309,7 @@ describe "Api::V1::Assignment" do
             "new_content_item" => {
               "title" => "AP Title",
               "text" => "AP Text",
-              "report" => "{}",
+              "report" => {},
               "context_external_tool_id" => tool.id,
             }
           }

@@ -1125,8 +1125,12 @@ module Api::V1::Assignment
     end
 
     apply_external_tool_settings(assignment, assignment_params)
-    apply_asset_processor_settings(assignment, assignment_params) if assignment.root_account.feature_enabled?(:lti_asset_processor)
-
+    begin
+      apply_asset_processor_settings(assignment, assignment_params) if assignment.root_account.feature_enabled?(:lti_asset_processor)
+    rescue Schemas::Base::InvalidSchema
+      assignment.errors.add("asset_processors", I18n.t("The document processing app is invalid. Please contact the tool provider"))
+      return invalid
+    end
     overrides = pull_overrides_from_params(assignment_params)
 
     if assignment_params[:allowed_extensions].present? && assignment_params[:allowed_extensions].length > Assignment.maximum_string_length

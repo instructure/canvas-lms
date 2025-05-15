@@ -1263,6 +1263,9 @@ EditView.prototype.afterRender = function () {
       courseId: ENV.COURSE_ID,
       secureParams: this.$secureParams.val(),
       initialAttachedProcessors: ENV.ASSET_PROCESSORS || [],
+      hideErrors: () => {
+        this.hideErrors('asset_processors_errors')
+      },
     })
   }
 
@@ -1587,6 +1590,9 @@ EditView.prototype.fieldSelectors = Object.assign(
   },
   {
     usage_rights_legal_copyright: COPYRIGHT_HOLDER,
+  },
+  {
+    asset_processors: '#asset_processors_container',
   },
 )
 

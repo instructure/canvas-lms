@@ -18,39 +18,53 @@
 
 import {create} from 'zustand'
 
-import {LtiLaunchDefinition} from "@canvas/select-content-dialog/jquery/select_content_dialog"
+import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
 
 // Tagged union of the state of the modal
 export type AssetProcessorsAddModalState =
   | {
-    tag: 'closed'
+      tag: 'closed'
     }
   | {
-    tag: 'toolList',
+      tag: 'toolList'
     }
   | {
-    tag: 'toolLaunch',
-    tool: LtiLaunchDefinition
+      tag: 'toolLaunch'
+      tool: LtiLaunchDefinition
+    }
+  | {
+      tag: 'invalidDeepLinkingResponse'
+      tool: LtiLaunchDefinition
     }
 
 // Since these don't change, you can efficiently do
 //   const {close} = useAssetProcessorsAddModalState(s => s.actions)
 interface AssetProcessorsAddModalActions {
-  showToolList: () => void,
-  close: () => void,
-  launchTool: (tool: LtiLaunchDefinition) => void,
+  showToolList: () => void
+  close: () => void
+  launchTool: (tool: LtiLaunchDefinition) => void
+  showInvlidDeepLinkingResponse: (tool: LtiLaunchDefinition) => void
 }
 
 export const useAssetProcessorsAddModalState = create<
   {state: AssetProcessorsAddModalState} & {actions: AssetProcessorsAddModalActions}
 >(set => ({
   state: {
-    tag: 'closed'
+    tag: 'closed',
   },
 
   actions: {
-    showToolList: () => { set({state: {tag: 'toolList'}}) },
-    close: () => { set({state: {tag: 'closed'}}) },
-    launchTool: (tool) => { set({state: {tag: 'toolLaunch', tool}}) },
-  }
+    showToolList: () => {
+      set({state: {tag: 'toolList'}})
+    },
+    close: () => {
+      set({state: {tag: 'closed'}})
+    },
+    launchTool: tool => {
+      set({state: {tag: 'toolLaunch', tool}})
+    },
+    showInvlidDeepLinkingResponse: tool => {
+      set({state: {tag: 'invalidDeepLinkingResponse', tool}})
+    },
+  },
 }))
