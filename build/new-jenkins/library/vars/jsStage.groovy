@@ -127,17 +127,6 @@ def queueJestDistribution(index) {
   }
 }
 
-def queueRandomizedJestDistribution(index) {
-  { stages ->
-    def jestEnvVars = [
-      "CI_NODE_INDEX=${index.toInteger() + 1}",
-      "CI_NODE_TOTAL=${JEST_NODE_COUNT}",
-    ]
-
-    callableWithDelegate(queueTestStage())(stages, "jest-${index}", jestEnvVars, 'yarn test:jest:randomized')
-  }
-}
-
 def queuePackagesDistribution() {
   { stages ->
     callableWithDelegate(queueTestStage())(stages, 'packages', [], 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages')
