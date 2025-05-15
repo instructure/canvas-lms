@@ -54,14 +54,21 @@ describe "terms of use test" do
       user_session(@admin)
     end
 
-    it "is able to update custom terms", :ignore_js_errors do
+    it "is able to update custom terms" do
       get "/accounts/#{@account.id}/settings"
-
+      expect(f("#account_settings")).to be_present
       click_option("#account_terms_of_service_terms_type", "custom", :value)
+      rce_container = f("#custom_tos_rce_container")
+      expect(rce_container).to be_displayed
       wait_for_tiny(f("#custom_tos_rce_container textarea"))
       type_in_tiny("textarea", "stuff")
       submit_form("#account_settings")
 
+      expect_new_page_load do
+        submit_form("#account_settings")
+      end
+
+      @account.reload
       expect(@account.terms_of_service.terms_of_service_content.content).to include("stuff")
     end
 
