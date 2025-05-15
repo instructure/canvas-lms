@@ -91,6 +91,7 @@ const InsightsSearchBar: React.FC<InsightsSearchBarProps> = ({onSearch, debounce
         placeholder={I18n.t('Search...')}
         value={value}
         onChange={e => handleChange(e.target.value)}
+        data-testid="discussion-insights-search-bar"
         inputRef={inputElement => {
           inputRef.current = inputElement
         }}

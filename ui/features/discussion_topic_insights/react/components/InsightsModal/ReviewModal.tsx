@@ -91,6 +91,7 @@ const ReviewModal = () => {
       onDismiss={handleClose}
       size="large"
       label={I18n.t('Review Evaluation')}
+      data-testid="reviewModal"
       shouldCloseOnDocumentClick
     >
       <Modal.Header>
@@ -115,7 +116,7 @@ const ReviewModal = () => {
                 <Text color="secondary">{formatDate(new Date(entry.entry_updated_at))}</Text>
               </FlexItem>
             </Flex>
-            <Button as="a" href={replyUrl} size="small">
+            <Button as="a" href={replyUrl} size="small" data-testid="seeReplyInContext">
               {I18n.t('See Reply in Context')}
             </Button>
           </Flex>

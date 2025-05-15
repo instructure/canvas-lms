@@ -175,7 +175,7 @@ const DiscussionInsights: React.FC = () => {
     notes: item.relevance_ai_evaluation_notes,
     date: formatDate(new Date(item.entry_updated_at)),
     actions: (
-      <Button size="small" onClick={() => handleSeeReply(item)}>
+      <Button size="small" data-testid="viewOriginalReply" onClick={() => handleSeeReply(item)}>
         {I18n.t('See Reply')}
       </Button>
     ),
