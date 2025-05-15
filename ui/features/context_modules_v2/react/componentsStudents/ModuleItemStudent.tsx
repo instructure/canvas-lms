@@ -78,7 +78,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
                     </Flex>
                   ) : (
                     <Link href={url} isWithinText={false} onClick={onClick}>
-                      <Text weight="bold" color="primary">
+                      <Text weight="bold" color="primary" data-testid="module-item-title">
                         {content?.title || 'Untitled Item'}
                       </Text>
                     </Link>

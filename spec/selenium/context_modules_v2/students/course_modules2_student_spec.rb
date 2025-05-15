@@ -39,4 +39,26 @@ describe "context modules", :ignore_js_errors do
     go_to_modules
     expect(student_modules_container).to be_displayed
   end
+
+  it "toggles collapse" do
+    # load page
+    go_to_modules
+    expect(student_modules_container).to be_displayed
+
+    # module should default to collapsed
+    expect(page_body).not_to contain_jqcss(module_item_title_selector)
+    expand_btn = module_header_expand_toggle
+    expect(expand_btn).to be_displayed
+    expand_btn.click
+
+    # module should be expanded
+    expect(module_item_title).to be_displayed
+
+    # reload page
+    go_to_modules
+    expect(student_modules_container).to be_displayed
+
+    # module should be expanded
+    expect(module_item_title).to be_displayed
+  end
 end

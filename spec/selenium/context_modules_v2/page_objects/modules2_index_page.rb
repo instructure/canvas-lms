@@ -60,6 +60,19 @@ module Modules2IndexPage
   def send_to_modal_input_selector
     "#content-share-user-search"
   end
+
+  def module_header_expand_toggle_selector
+    "[data-testid='module-header-expand-toggle']"
+  end
+
+  def module_item_title_selector
+    "[data-testid='module-item-title']"
+  end
+
+  def page_body
+    f("body")
+  end
+
   #------------------------------ Elements ------------------------------
 
   def student_modules_container
@@ -108,6 +121,14 @@ module Modules2IndexPage
 
   def send_to_form_selected_elements
     ff("button[type='button']", send_to_modal_input_container)
+  end
+
+  def module_header_expand_toggle
+    f(module_header_expand_toggle_selector)
+  end
+
+  def module_item_title
+    f(module_item_title_selector)
   end
   #------------------------------ Actions -------------------------------
 

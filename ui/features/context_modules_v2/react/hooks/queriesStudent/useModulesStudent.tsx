@@ -58,6 +58,7 @@ const MODULES_STUDENT_QUERY = gql`
                 id
                 _id
                 workflowState
+                collapsed
                 completedAt
                 completed
                 locked
