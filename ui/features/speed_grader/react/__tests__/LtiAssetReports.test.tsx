@@ -19,8 +19,9 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {LtiAssetReports, LtiAssetReportsProps, joinAttachmentsAndReports} from '../LtiAssetReports'
-import {ExistingAttachedAssetProcessor, LtiAssetReport} from '@canvas/lti/model/AssetProcessor'
+import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {LtiAssetReportsByProcessor} from 'features/speed_grader/jquery/speed_grader.d'
+import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
 
 let lastMockReportId = 0
 
