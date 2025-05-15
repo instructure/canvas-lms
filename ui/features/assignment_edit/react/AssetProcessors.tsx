@@ -117,7 +117,7 @@ export function AssetProcessors(props: AssetProcessorsProps) {
               className="error-message"
             />
             <span>
-              <Button color="secondary" onClick={openAddDialog}>
+              <Button color="secondary" onClick={openAddDialog} id="asset-processor-add-button">
                 {I18n.t('Add Document Processing App')}
               </Button>
             </span>

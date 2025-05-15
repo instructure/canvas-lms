@@ -25,9 +25,9 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
+import type {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
-import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
+import type {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
 
 import {
   AssetProcessorsAddModalState,
@@ -67,6 +67,11 @@ export function AssetProcessorsAddModal(props: AssetProcessorsAddModalProps) {
     >
       <Modal.Header>
         <CloseButton
+          elementRef={el => {
+            if (el) {
+              el.setAttribute('data-pendo', 'asset-processors-add-modal-close-button')
+            }
+          }}
           onClick={close}
           offset="medium"
           placement="end"
@@ -95,7 +100,9 @@ function assetProcessorsAddModelFooter({tag, showToolList}: AssetProcessorsAddMo
     case 'toolLaunch':
       return (
         <Modal.Footer>
-          <Button onClick={showToolList}>{I18n.t('Back')}</Button>
+          <Button id="asset-processors-add-modal-back-button" onClick={showToolList}>
+            {I18n.t('Back')}
+          </Button>
         </Modal.Footer>
       )
   }
