@@ -322,10 +322,18 @@ describe SubmissionSearch do
       end
 
       it "returns the group rep's submission when provided with a different group member's ID" do
-        results = SubmissionSearch.new(assignment, teacher, nil, user_id: amanda.id).search
+        results = SubmissionSearch.new(assignment, teacher, nil, user_representative_id: amanda.id).search
         aggregate_failures do
           expect(results.count).to eq 1
           expect(results.first.user.id).to eq jonah.id
+        end
+      end
+
+      it "returns empty submissions if the user is searching for another group member user_representative_id and cannot view all grades" do
+        results = SubmissionSearch.new(assignment, amanda, nil, user_representative_id: jonah.id).search
+        aggregate_failures do
+          expect(results.count).to eq 0
+          expect(results.first).to be_nil
         end
       end
     end
