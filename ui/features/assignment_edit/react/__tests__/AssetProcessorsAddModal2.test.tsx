@@ -25,11 +25,14 @@ import {act, renderHook} from '@testing-library/react-hooks'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 import {
   mockDeepLinkResponse,
+  mockInvalidDeepLinkResponse,
   mockDoFetchApi,
   mockTools as tools,
 } from './assetProcessorsTestHelpers'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import DeepLinkingResponse from 'features/deep_linking_response/react/DeepLinkingResponse'
+import {invalid} from 'moment'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/external-tools/messages')
@@ -91,7 +94,7 @@ describe('AssetProcessorsAddModal', () => {
     expect(iframe.style.height).toBe('500px')
   })
 
-  describe('when a deep linking response is received from the launch', () => {
+  describe('when valid deep linking response is received from the launch', () => {
     it('closes the modal and send calls the onProcessorResponse callback with the content items', () => {
       // Data returned by handleExternalContentMessages's ready() callback
       const mockHECM = handleExternalContentMessages as jest.Mock
@@ -111,6 +114,35 @@ describe('AssetProcessorsAddModal', () => {
       expect(mockOnProcessorResponse).toHaveBeenCalledWith({
         tool: tools[1],
         data: mockDeepLinkResponse,
+      })
+    })
+  })
+
+  describe('when invalid deep linking response is received from the launch', () => {
+    it('renders error message', () => {
+      // Data returned by handleExternalContentMessages's ready() callback
+      const mockHECM = handleExternalContentMessages as jest.Mock
+      mockHECM.mockImplementationOnce(({onDeepLinkingResponse}) => {
+        onDeepLinkingResponse(mockInvalidDeepLinkResponse)
+      })
+      const {getByText} = renderModal()
+      const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+        .showToolList
+      open()
+      const t2Card = getByText('t4')
+      act(() => t2Card.click())
+
+      waitFor(() =>
+        expect(
+          getByText(
+            `The document processing app ${tools[3].name} could not be added. Please contact the tool provider.`,
+          ),
+        ).not.toBeNull(),
+      )
+
+      expect(mockOnProcessorResponse).toHaveBeenCalledWith({
+        tool: tools[3],
+        data: mockInvalidDeepLinkResponse,
       })
     })
   })

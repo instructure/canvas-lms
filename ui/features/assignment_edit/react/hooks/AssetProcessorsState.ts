@@ -30,6 +30,7 @@ import {
   AssetProcessorWindowSettings,
   ExistingAttachedAssetProcessor,
   safeDigIconUrl,
+  ZAssetProcessorContentItem,
 } from '@canvas/lti/model/AssetProcessor'
 import {IframeDimensions} from '@canvas/lti/model/common'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -42,7 +43,7 @@ export type AssetProcessorsState = {
   attachedProcessors: AttachedAssetProcessor[]
 
   addAttachedProcessors: ({tool, data}: {tool: LtiLaunchDefinition; data: DeepLinkResponse}) => void
-  deleteAttachedProcessor: (index: number) => Promise<void>
+  deleteAttachedProcessor: (index: number, onDelete: () => void) => Promise<void>
   setFromExistingAttachedProcessors: (processors: ExistingAttachedAssetProcessor[]) => void
 }
 
@@ -150,13 +151,16 @@ export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) =
     showFlashMessagesFromDeepLinkingResponse(data)
 
     const items = data.content_items.filter(item => item.type === 'ltiAssetProcessor')
+
+    items.forEach(item => ZAssetProcessorContentItem.parse(item))
+
     const newProcessors: AttachedAssetProcessor[] = items.map(contentItem =>
       newAttachedAssetProcessor({tool, contentItem}),
     )
     set({attachedProcessors: [...get().attachedProcessors, ...newProcessors]})
   },
 
-  deleteAttachedProcessor: async (index: number) => {
+  deleteAttachedProcessor: async (index: number, onDelete?: () => void) => {
     const attachedProcessors = get().attachedProcessors
     const processor = attachedProcessors[index]
 
@@ -176,6 +180,7 @@ export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) =
       })
     ) {
       set({attachedProcessors: get().attachedProcessors.filter((_, i) => i !== index)})
+      onDelete?.()
     }
   },
 

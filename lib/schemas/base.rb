@@ -20,6 +20,9 @@
 
 module Schemas
   class Base
+    class InvalidSchema < RuntimeError
+    end
+
     def self.create_schema
       raise "Implement self.create_schema or define @schema directly"
     end
@@ -48,6 +51,14 @@ module Schemas
           json_hash = Utils::HashUtils.nested_compact(json_hash)
         end
         validate(json_hash).pluck("error")
+      end
+
+      def filter_and_validate!(json_hash)
+        unless schema_checker_with_filter.valid?(json_hash)
+          raise InvalidSchema, "Invalid #{name}: #{validation_errors(json_hash)}"
+        end
+
+        json_hash
       end
 
       private
@@ -87,6 +98,23 @@ module Schemas
 
       def schema_checker
         @schema_checker ||= JSONSchemer.schema(schema)
+      end
+
+      def schema_checker_with_filter
+        @schema_checker_with_filter ||= JSONSchemer.schema(schema, before_property_validation: property_stripper_hook)
+      end
+
+      def property_stripper_hook
+        proc do |data, _property, _property_schema, parent_shema|
+          if data.is_a?(Hash) && parent_shema.is_a?(Hash) && parent_shema.key?("properties") && parent_shema["additionalProperties"].blank?
+            defined_properties = parent_shema["properties"].keys.to_set(&:to_s)
+            data.each_key do |key|
+              unless defined_properties.include?(key.to_s)
+                data.delete(key)
+              end
+            end
+          end
+        end
       end
     end
   end
