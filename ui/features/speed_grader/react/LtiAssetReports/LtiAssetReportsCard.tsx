@@ -71,7 +71,7 @@ function defaultInfoText(progress: LtiAssetReport['processingProgress']) {
   switch (progress) {
     case 'Processed':
     case 'Failed':
-      throw 'Unreacheable'
+      throw 'Unreachable'
 
     case 'Processing':
       return t('The content is being processed and the final report being generated.')
@@ -204,6 +204,7 @@ export function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
           report.launchUrlPath && (
             <Flex.Item overflowY="visible">
               <Button
+                id="asset-processor-view-report-button"
                 size="small"
                 onClick={() =>
                   // TS/biome complain without the || ""
