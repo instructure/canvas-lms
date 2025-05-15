@@ -64,6 +64,11 @@ module Types
       There is no character restriction on this field
     MD
 
+    argument :user_representative_id, ID, <<~MD, required: false
+      Return only submissions related to group representative for the user_id
+      There is no character restriction on this field
+    MD
+
     argument :anonymous_id, ID, <<~MD, required: false
       Return only submissions related to the given anonymous_id
       There is no character restriction on this field
