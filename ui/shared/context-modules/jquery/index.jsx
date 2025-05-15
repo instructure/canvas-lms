@@ -2024,7 +2024,7 @@ function initContextModuleItems(moduleId) {
       const id = module.getAttribute('id').substring('context_module_'.length)
       const title = module.querySelector('.header > .collapse_module_link > .name').textContent
       if (ENV.FEATURE_MODULES_PERF && (isModuleCollapsed(module) || isModulePaginated(module))) {
-        return {id, title, items: false}
+        return {id, title, items: undefined}
       }
       const moduleItems = module.querySelectorAll('.context_module_item')
       const items = Array.from(moduleItems).map(item => ({
@@ -2068,31 +2068,12 @@ function initContextModuleItems(moduleId) {
       focusOnExit: () => currentItem.querySelector('.al-trigger'),
     }
 
-    fetchModuleItemsAndRenderTray(moveTrayProps, document.getElementById('not_right_side'))
+    renderTray(moveTrayProps, document.getElementById('not_right_side'))
   })
 
   if (ENV.FEATURE_MODULES_PERF) {
     addShowAllOrLess(moduleId)
   }
-}
-
-async function fetchModuleItemsAndRenderTray(moveTrayProps, rootContainer) {
-  const missing_groups = moveTrayProps.moveOptions.groups.filter(group => {
-    return group.items === false
-  })
-
-  const promises = missing_groups.map(async group => {
-    return fetch(
-      `/api/v1/courses/${ENV.COURSE_ID}/modules/${group.id}/items?include[]=title_only&per_page=1000`,
-    )
-      .then(res => res.json())
-      .then(items => {
-        group.items = items.map(item => ({id: String(item.id), title: item.title}))
-      })
-  })
-
-  await Promise.all(promises)
-  renderTray(moveTrayProps, rootContainer)
 }
 
 // TODO: call this on the current page when getting a new page of items
