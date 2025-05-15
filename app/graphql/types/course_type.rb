@@ -572,6 +572,13 @@ module Types
       course.sis_course_id
     end
 
+    field :submission_statistics, SubmissionStatisticsType, "Returns submission-related statistics for the current user", null: true
+    def submission_statistics
+      return nil unless course.grants_right?(current_user, :read)
+
+      course
+    end
+
     field :allow_final_grade_override, Boolean, null: true
     def allow_final_grade_override
       course.allow_final_grade_override?
