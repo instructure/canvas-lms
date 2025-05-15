@@ -64,6 +64,7 @@ describe "Discussion Insight" do
       user_session(@teacher)
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/insights"
       expect(f("body")).to contain_jqcss("[data-testid='discussion-insights-generate-button']")
+      expect(f("body")).to contain_jqcss("[data-testid='discussion-insights-search-bar']")
       expect(f("body")).to contain_jqcss("[data-testid='placeholder-action-button']")
     end
 
