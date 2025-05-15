@@ -428,11 +428,11 @@
 
   <div id="module_sequence_footer"></div>
 
-  <% if can_do(@quiz, @current_user, :update) && Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+  <% if can_do(@quiz, @current_user, :update) && @assignment && Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
     <div id="enhanced-rubric-assignment-edit-mount-point"></div>
   <% end %>
 
-  <% if can_do(@quiz, @current_user, :update) && !Rubric.rubric_self_assessment_enabled?(@context) && Rubric.rubric_self_assessment_enabled?(@context) %>
+  <% if can_do(@quiz, @current_user, :update) && @assignment && !Rubric.rubric_self_assessment_enabled?(@context) && Rubric.rubric_self_assessment_enabled?(@context) %>
     <div id="enhanced-rubric-self-assessment-edit"></div>
   <% end %>
 </div>

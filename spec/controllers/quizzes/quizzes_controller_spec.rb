@@ -846,6 +846,17 @@ describe Quizzes::QuizzesController do
           expect(assigns[:js_env][:assigned_rubric]).to be_nil
           expect(assigns[:js_env][:rubric_association]).to be_nil
         end
+
+        it "does not set assigned_rubric when quiz is not associated with an assignment" do
+          @quiz.quiz_type = "survey"
+          @quiz.assignment = nil
+          @quiz.save!
+
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: @quiz.id }
+          expect(assigns[:js_env][:assigned_rubric]).to be_nil
+          expect(assigns[:js_env][:rubric_association]).to be_nil
+        end
       end
     end
   end
