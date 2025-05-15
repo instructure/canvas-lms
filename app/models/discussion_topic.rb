@@ -44,6 +44,10 @@ class DiscussionTopic < ActiveRecord::Base
                                  allow_rating
                                  only_graders_can_rate
                                  sort_by_rating
+                                 sort_order
+                                 expanded
+                                 sort_order_locked
+                                 expanded_locked
                                  group_category_id]
   restrict_columns :state, [:workflow_state]
   restrict_columns :availability_dates, %i[unlock_at delayed_post_at lock_at]
@@ -292,6 +296,10 @@ class DiscussionTopic < ActiveRecord::Base
       allow_rating
       only_graders_can_rate
       sort_by_rating
+      sort_order
+      sort_order_locked
+      expanded
+      expanded_locked
     ].each { |attr| self[attr] = false if self[attr].nil? }
   end
   protected :default_values
@@ -534,6 +542,10 @@ class DiscussionTopic < ActiveRecord::Base
                           allow_rating:,
                           only_graders_can_rate:,
                           sort_by_rating:,
+                          sort_order:,
+                          sort_order_locked:,
+                          expanded:,
+                          expanded_locked:,
                           todo_date:,
                           is_section_specific:,
                           anonymous_state:,
