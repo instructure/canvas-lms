@@ -47,6 +47,7 @@ describe "PastGlobalAnnouncements Select" do
 
     it "tabs should not be visible on low resolution" do
       driver.manage.window.resize_to(700, 1200)
+      wait_for_ajaximations
       expect { PastGlobalAnnouncements.tabs }.to raise_error(Selenium::WebDriver::Error::NoSuchElementError)
     end
 
