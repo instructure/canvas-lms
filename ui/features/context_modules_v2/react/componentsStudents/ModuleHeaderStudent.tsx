@@ -65,6 +65,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
       <Flex padding="small" justifyItems="space-between" direction="row" wrap="wrap">
         <Flex.Item>
           <IconButton
+            data-testid="module-header-expand-toggle"
             size="small"
             withBorder={false}
             screenReaderLabel={expanded ? I18n.t('Collapse module') : I18n.t('Expand module')}
