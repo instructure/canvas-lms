@@ -40,6 +40,7 @@ export type TagInputRowProps = {
   onChange: (id: number, value: string) => void
   onRemove: (id: number) => void
   inputRef?: (el: HTMLInputElement | null) => void
+  focusElRef?: React.MutableRefObject<(HTMLElement | null)[]>
 }
 
 const TagInputRow: React.FC<TagInputRowProps> = ({
@@ -50,6 +51,7 @@ const TagInputRow: React.FC<TagInputRowProps> = ({
   onChange,
   onRemove,
   inputRef,
+  focusElRef,
 }) => {
   return (
     <Flex direction="column" margin="0 0 medium 0">
@@ -91,6 +93,11 @@ const TagInputRow: React.FC<TagInputRowProps> = ({
         />
         {totalTags > 1 && (
           <IconButton
+            elementRef={el => {
+              if (focusElRef?.current && el instanceof HTMLElement) {
+                focusElRef.current[tag.id] = el
+              }
+            }}
             screenReaderLabel={I18n.t('Remove tag')}
             onClick={() => onRemove(tag.id)}
             withBackground={false}
