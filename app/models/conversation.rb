@@ -36,6 +36,37 @@ class Conversation < ActiveRecord::Base
 
   attr_accessor :latest_messages_from_stream_item
 
+  # rubocop:disable Style/Caller
+  def self.caller_tag
+    immediate_caller = caller[2]
+    file_line, method_name = immediate_caller.split(":in `")
+    file_name = File.basename(file_line.split(":").first)
+    method_name = method_name&.delete("'") || "unknown"
+
+    "#{file_name}:#{method_name}"
+  end
+  # rubocop:enable Style/Caller
+
+  module DeleteAllLogger
+    def delete_all(*args)
+      InstStatsd::Statsd.distributed_increment(
+        "conversation.delete_all",
+        tags: { caller: klass.caller_tag }
+      )
+      super
+    end
+  end
+
+  # rubocop:disable Rails/DefaultScope
+  default_scope { extending(DeleteAllLogger) }
+  # rubocop:enable Rails/DefaultScope
+
+  def delete
+    InstStatsd::Statsd.distributed_increment("conversation.delete", tags: { caller: self.class.send(:caller_tag) })
+
+    super
+  end
+
   def participants(reload = false)
     if !@participants || reload
       Conversation.preload_participants([self])
