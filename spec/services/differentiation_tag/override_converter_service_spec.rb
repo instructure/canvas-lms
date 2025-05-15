@@ -153,5 +153,59 @@ describe DifferentiationTag::OverrideConverterService do
         let(:standard_dates) { { unlock_at: Time.zone.now, lock_at: 4.days.from_now } }
       end
     end
+
+    context "checkpointed discussion" do
+      def enable_discussion_checkpoints_for_context
+        @course.account.enable_feature!(:discussion_checkpoints)
+        @course.account.save!
+      end
+
+      def create_checkpointed_discussion(title:, course:, dates:, points_possible:)
+        discussion = DiscussionTopic.create_graded_topic!(course:, title:)
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: dates[:topic_dates],
+          points_possible:
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: dates[:entry_dates],
+          points_possible:
+        )
+
+        discussion
+      end
+
+      it "checkpointed discussion" do
+        enable_discussion_checkpoints_for_context
+
+        topic_dates = []
+        entry_dates = []
+
+        topic_dates.push({ type: "override", set_type: "Group", set_id: @diff_tag1.id, due_at: 1.day.from_now })
+        entry_dates.push({ type: "override", set_type: "Group", set_id: @diff_tag1.id, due_at: 2.days.from_now })
+
+        topic_dates.push({ type: "override", set_type: "Group", set_id: @diff_tag2.id, due_at: 3.days.from_now })
+        entry_dates.push({ type: "override", set_type: "Group", set_id: @diff_tag2.id, due_at: 4.days.from_now })
+
+        discussion = create_checkpointed_discussion(
+          title: "Test Checkpointed Discussion",
+          course: @course,
+          dates: { topic_dates:, entry_dates: },
+          points_possible: 10
+        )
+
+        expect(discussion.assignment.assignment_overrides.active.count).to eq(2)
+        expect(discussion.assignment.assignment_overrides.active.where(set_type: "Group").count).to eq(2)
+
+        service.convert_tags_to_adhoc_overrides_for(learning_object: discussion.assignment, course: @course)
+
+        expect(discussion.assignment.assignment_overrides.active.count).to eq(2)
+        expect(discussion.assignment.assignment_overrides.active.where(set_type: "ADHOC").count).to eq(2)
+      end
+    end
   end
 end

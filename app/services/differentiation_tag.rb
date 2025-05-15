@@ -20,6 +20,5 @@
 module DifferentiationTag
   class DifferentiationTagServiceError < StandardError; end
 
-  # Will be expanded to cover all overridable types in next ticket
   OVERRIDABLE_LEARNING_OBJECTS = %w[ContextModule Assignment Quizzes::Quiz WikiPage DiscussionTopic].freeze
 end
