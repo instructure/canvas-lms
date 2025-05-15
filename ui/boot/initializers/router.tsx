@@ -36,6 +36,7 @@ import {queryClient} from '@canvas/query'
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
     <Route>
+      <Route path="/login/otp" lazy={() => import('../../features/otp_login/index')} />
       <Route
         path="/groups/:groupId/*"
         lazy={() => import('@canvas/group-navigation-selector/GroupNavigationSelectorRoute')}
