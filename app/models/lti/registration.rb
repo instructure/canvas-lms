@@ -242,6 +242,7 @@ class Lti::Registration < ActiveRecord::Base
   # causes the destroy callbacks to fail, leaving the registration undeleted. Foreign key maybe?
   # The ims_registration and developer_key delete just fine, so we'll just handle it manually.
   # Additionally, dependent: :destroy removes the bindings from the association which we do not want.
+  # Finally, dependent: :destroy on the tool_configuration will also hard delete it, which we also don't want.
   def destroy_associations
     ims_registration&.destroy
     developer_key&.destroy
