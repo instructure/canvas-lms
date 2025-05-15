@@ -74,7 +74,7 @@ module Api::V1::Rubric
   end
 
   def enhanced_rubrics_assignments_js_env(assignment)
-    return unless Rubric.enhanced_rubrics_assignments_enabled?(@context)
+    return unless assignment && Rubric.enhanced_rubrics_assignments_enabled?(@context)
 
     rubric_association = nil
     assigned_rubric = nil
