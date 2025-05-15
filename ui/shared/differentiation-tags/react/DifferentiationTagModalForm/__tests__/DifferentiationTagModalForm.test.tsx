@@ -140,6 +140,36 @@ describe('DifferentiationTagModalForm', () => {
       // With one tag left, the option should revert to "Add as a single tag".
       expect(screen.getByTitle('Add as a single tag')).toBeInTheDocument()
     })
+
+    it('moves focus to previous row remove button when a tag input row is deleted', async () => {
+      renderComponent({mode: CREATE_MODE})
+
+      await user.click(screen.getByLabelText('+ Add another tag'))
+      await user.click(screen.getByLabelText('+ Add another tag'))
+
+      // Get all remove buttons in reverse order as we want to delete the last one
+      const removeButtons = screen
+        .getAllByRole('button', {name: /remove tag/i, hidden: true})
+        .reverse()
+      await user.click(removeButtons[0])
+
+      // Verify that focus has moved to the previous row's remove button
+      expect(removeButtons[1]).toHaveFocus()
+    })
+
+    it('moves focus to the first tag input row if the second tag input row is deleted', async () => {
+      renderComponent({mode: CREATE_MODE})
+
+      await user.click(screen.getByLabelText('+ Add another tag'))
+      await user.click(screen.getByLabelText('+ Add another tag'))
+
+      const removeButtons = screen.getAllByRole('button', {name: /remove tag/i, hidden: true})
+      // Remove the second tag input row (first one is the default one)
+      await user.click(removeButtons[0])
+
+      // Verify that focus has moved to the first tag input row
+      expect(screen.getAllByLabelText(/Tag Name/i)[0]).toHaveFocus()
+    })
   })
 
   describe('edit mode UI', () => {
@@ -195,7 +225,7 @@ describe('DifferentiationTagModalForm', () => {
       expect(screen.getByTestId('tag-set-name')).toBeInTheDocument()
     })
 
-    it("focuses on the first element on error on edit mode", async () => {
+    it('focuses on the first element on error on edit mode', async () => {
       renderComponent({mode: EDIT_MODE, differentiationTagSet: multipleTagsCategory})
       const tagSetNameInput = screen.getByTestId('tag-set-name')
       await user.clear(tagSetNameInput)

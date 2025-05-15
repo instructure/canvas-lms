@@ -74,6 +74,8 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
 
   const tagSetNameRef = useRef<HTMLInputElement | null>(null)
   const inputRefs = useRef<Record<number, HTMLInputElement | null>>({})
+  const focusElRef = useRef<(HTMLElement | null)[]>([])
+  const [focusIndex, setFocusIndex] = useState<number | null>(null)
 
   const getInitialState = useCallback(() => {
     let computedTagMode: ModalTagMode = MULTIPLE_TAGS
@@ -134,6 +136,15 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
     setPreviousTags(newState.previousTags)
   }, [mode, differentiationTagSet, getInitialState])
 
+  useEffect(() => {
+    if (focusIndex === -1) {
+      inputRefs.current[tags[0].id]?.focus()
+      setFocusIndex(null)
+    } else if (focusIndex !== null) {
+      focusElRef.current[focusIndex]?.focus()
+    }
+  }, [focusIndex])
+
   const handleSetSubmitting = (submitting: boolean) => {
     setIsSubmitting(submitting)
   }
@@ -189,6 +200,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
   }
 
   const handleRemoveTag = (id: number) => {
+    const tagIndex = tags.findIndex(t => t.id === id)
     setTags(prev => {
       const newTags = prev.filter(t => t.id !== id)
       if (newTags.length === 1 && selectedCategoryId === CREATE_NEW_SET_OPTION) {
@@ -202,6 +214,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
       delete newErrors[String(id)]
       return newErrors
     })
+    setFocusIndex((tagIndex > 1 && tags[tagIndex - 1]?.id) || -1)
   }
 
   const handleChangeTag = (id: number, value: string) => {
@@ -494,6 +507,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
                 onChange={(id, value) => handleChangeTag(id, value)}
                 onRemove={handleRemoveTagClick}
                 inputRef={el => (inputRefs.current[tag.id] = el)}
+                focusElRef={focusElRef}
               />
             ))}
 
