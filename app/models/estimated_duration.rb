@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -44,5 +44,9 @@ class EstimatedDuration < ActiveRecord::Base
     if references.compact.size != 1
       errors.add(:base, "Exactly one reference must be present.")
     end
+  end
+
+  def minutes=(minutes)
+    self.duration = "PT#{minutes}M"
   end
 end
