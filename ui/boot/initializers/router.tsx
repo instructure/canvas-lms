@@ -38,6 +38,11 @@ import {InstUISettingsProvider} from '@instructure/emotion'
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
     <Route>
+      <Route path="/users/:userId/messages" lazy={() => import('../../features/messages/index')} />
+      <Route
+        path="/users/:userId/messages/:messageId"
+        lazy={() => import('../../features/messages/index')}
+      />
       <Route path="/login/otp" lazy={() => import('../../features/otp_login/index')} />
       <Route
         path="/groups/:groupId/*"
