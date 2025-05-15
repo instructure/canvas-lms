@@ -107,17 +107,33 @@ describe Pseudonym do
     Pseudonym.create!(unique_id: "cody@instructure.com", user: u)
 
     # Failed; conflicts with the nil auth provider version
-    p3 = Pseudonym.create(unique_id: "cody@instructure.com",
-                          user: u,
-                          authentication_provider: Account.default.canvas_authentication_provider)
-    expect(p3).to be_new_record
-
+    expect do
+      Pseudonym.create!(unique_id: "cody@instructure.com",
+                        user: u,
+                        authentication_provider: Account.default.canvas_authentication_provider)
+    end.to raise_error(ActiveRecord::RecordInvalid)
     Pseudonym.create!(unique_id: "cody2@instructure.com",
                       user: u,
                       authentication_provider: Account.default.canvas_authentication_provider)
     # Failed; conflicts with the canvas auth provider version
-    p4 = Pseudonym.create(unique_id: "cody2@instructure.com", user: u)
-    expect(p4).to be_new_record
+    expect do
+      Pseudonym.create!(unique_id: "cody2@instructure.com", user: u)
+    end.to raise_error(ActiveRecord::RecordInvalid)
+
+    saml1 = Account.default.authentication_providers.create!(auth_type: "saml")
+    saml2 = Account.default.authentication_providers.create!(auth_type: "saml")
+
+    # duplicates across SAML auth providers or SAML-and-Canvas are okay
+    Pseudonym.create!(unique_id: "cody3@instructure.com", user: u, authentication_provider: saml1)
+    Pseudonym.create!(unique_id: "cody3@instructure.com", user: u, authentication_provider: saml2)
+    Pseudonym.create!(unique_id: "cody2@instructure.com", user: u, authentication_provider: saml1)
+
+    # duplicates between no auth provider and SAML are not okay
+    # and vice versa
+    expect { Pseudonym.create!(unique_id: "cody@instructure.com", user: u, authentication_provider: saml1) }
+      .to raise_error(ActiveRecord::RecordInvalid)
+    expect { Pseudonym.create!(unique_id: "cody3@instructure.com", user: u) }
+      .to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it "does not allow a login_attribute without an authentication provider" do
@@ -133,42 +149,6 @@ describe Pseudonym do
 
     p.update!(authentication_provider_id: nil)
     expect(p.reload.login_attribute).to be_nil
-  end
-
-  it "populates auth_type automatically" do
-    u = User.create!
-    ap = Account.default.authentication_providers.create!(auth_type: "microsoft", tenant: "microsoft")
-    p = u.pseudonyms.create!(unique_id: "a@b.com", authentication_provider: ap)
-    expect(p.reload.auth_type).to eql "microsoft"
-  end
-
-  def check_auth_type_not_set_directly(&block)
-    expect do
-      Pseudonym.transaction(requires_new: true, &block)
-    end.to raise_error(include("pseudonyms.auth_type cannot be set directly"))
-  end
-
-  it "does not allow you to populate auth type" do
-    u = User.create!
-    ap = Account.default.authentication_providers.create!(auth_type: "microsoft", tenant: "microsoft")
-    check_auth_type_not_set_directly do
-      u.pseudonyms.create!(unique_id: "a@b.com", authentication_provider: ap, auth_type: "microsoft")
-    end
-
-    p = u.pseudonyms.create!(unique_id: "a@b.com", authentication_provider: ap)
-    check_auth_type_not_set_directly do
-      Pseudonym.where(id: p.id).update_all(auth_type: "something else")
-    end
-    check_auth_type_not_set_directly do
-      Pseudonym.where(id: p.id).update_all(authentication_provider_id: nil, auth_type: nil)
-    end
-    check_auth_type_not_set_directly do
-      u.pseudonyms.create!(unique_id: "b@b.com", auth_type: "microsoft")
-    end
-    p = u.pseudonyms.create!(unique_id: "b@b.com")
-    check_auth_type_not_set_directly do
-      Pseudonym.where(id: p.id).update_all(auth_type: "something else")
-    end
   end
 
   describe ".by_unique_id" do
