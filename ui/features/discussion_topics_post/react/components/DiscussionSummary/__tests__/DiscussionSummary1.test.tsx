@@ -22,17 +22,11 @@ import {DiscussionSummary, DiscussionSummaryProps} from '../DiscussionSummary'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {MockedProvider} from '@apollo/client/testing'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {DiscussionSummaryRatings} from '../DiscussionSummaryRatings'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/do-fetch-api-effect')
-
-declare const ENV: {
-  discussion_topic_id: string
-  context_id: string
-  context_type: string
-}
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -71,25 +65,21 @@ describe('DiscussionSummary', () => {
     obsolete: false,
     usage: {currentCount: 3, limit: 5},
   }
-  let oldEnv: GlobalEnv
 
   beforeEach(() => {
-    oldEnv = window.ENV
-    window.ENV = {
-      ...window.ENV,
-      // @ts-expect-error
+    fakeENV.setup({
       discussion_topic_id: '5678',
       context_id: '1234',
       context_type: 'Course',
-    }
+    })
+    // Reset mock for each test
+    jest.clearAllMocks()
+    ;(doFetchApi as jest.Mock).mockReset()
   })
 
   afterEach(() => {
+    fakeENV.teardown()
     ;(doFetchApi as jest.Mock).mockClear()
-  })
-
-  afterAll(() => {
-    window.ENV = oldEnv
   })
   describe('DiscussionSummaryUsagePill', () => {
     it('should display a pill with summary usage information and an enabled Generate button if some usage left', async () => {
@@ -180,6 +170,7 @@ describe('DiscussionSummary', () => {
 
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'POST',
+        // @ts-expect-error
         path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
         params: {userInput: 'focus on student feedback'},
       })
@@ -211,11 +202,15 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call postDiscussionSummaryFeedback with dislike when dislike button is clicked', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: false, disliked: false}})
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: false, disliked: true}})
+      // Setup mocks specifically for this test
+      const mockFetchApi = doFetchApi as jest.Mock
+      mockFetchApi.mockImplementation(() =>
+        Promise.resolve({json: {liked: false, disliked: false}}),
+      )
 
       const setDisliked = jest.fn()
-      const postDiscussionSummaryFeedback = jest.fn()
+      const postDiscussionSummaryFeedback = jest.fn().mockResolvedValue({})
+
       const {getByTestId} = setup({
         summary: expectedSummary,
         postDiscussionSummaryFeedback,
@@ -223,39 +218,47 @@ describe('DiscussionSummary', () => {
         disliked: false,
         onSetDisliked: setDisliked,
       })
-      let dislikeButton: HTMLElement | null = null
+
+      // Find the dislike button
+      const dislikeButton = await waitFor(() => getByTestId('summary-dislike-button'))
+      expect(dislikeButton).toBeInTheDocument()
+
+      // Click the dislike button
       await waitFor(() => {
-        dislikeButton = getByTestId('summary-dislike-button')
-      })
-      await waitFor(() => {
-        fireEvent.click(dislikeButton!)
+        fireEvent.click(dislikeButton)
       })
 
+      // Verify the expected function calls
       expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('seen')
       expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('dislike')
     })
 
     it('should call postDiscussionSummaryFeedback with reset_like when dislike is true and dislike button is clicked', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: false, disliked: true}})
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: false, disliked: false}})
+      // Setup mocks specifically for this test
+      const mockFetchApi = doFetchApi as jest.Mock
+      mockFetchApi.mockImplementation(() => Promise.resolve({json: {liked: false, disliked: true}}))
 
       const setDisliked = jest.fn()
-      const postDiscussionSummaryFeedback = jest.fn()
+      const postDiscussionSummaryFeedback = jest.fn().mockResolvedValue({})
+
       const {getByTestId} = setup({
         summary: expectedSummary,
         postDiscussionSummaryFeedback,
         liked: false,
-        disliked: true,
+        disliked: true, // Already disliked
         onSetDisliked: setDisliked,
       })
-      let dislikeButton: HTMLElement | null = null
+
+      // Find the dislike button
+      const dislikeButton = await waitFor(() => getByTestId('summary-dislike-button'))
+      expect(dislikeButton).toBeInTheDocument()
+
+      // Click the dislike button
       await waitFor(() => {
-        dislikeButton = getByTestId('summary-dislike-button')
-      })
-      await waitFor(() => {
-        fireEvent.click(dislikeButton!)
+        fireEvent.click(dislikeButton)
       })
 
+      // Verify the expected function calls
       expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('seen')
       expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('reset_like')
     })

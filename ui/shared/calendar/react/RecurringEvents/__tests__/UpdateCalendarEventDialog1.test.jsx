@@ -63,7 +63,7 @@ describe('UpdateCalendarEventDialog', () => {
   })
 
   it('renders event series dialog', () => {
-    const {containerId} = renderDialog()
+    renderDialog()
 
     // Find the dialog that was rendered for this specific test
     const dialog = document.querySelector(`[aria-label="Confirm Changes"]`)

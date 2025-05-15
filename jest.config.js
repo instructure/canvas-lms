@@ -27,6 +27,7 @@ const setupFilesAfterEnv = process.env.LOG_PLAYGROUND_URL_ON_FAILURE
   : baseSetupFilesAfterEnv
 
 module.exports = {
+  randomize: true,
   testRunner: process.env.LOG_PLAYGROUND_URL_ON_FAILURE && 'jest-circus/runner',
   moduleNameMapper: {
     '\\.svg$': '<rootDir>/jest/imageMock.js',
@@ -56,6 +57,7 @@ module.exports = {
         outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage-js/junit-reports',
         outputName: 'jest.xml',
         addFileAttribute: 'true',
+        stripAnsi: true,
       },
     ],
   ],

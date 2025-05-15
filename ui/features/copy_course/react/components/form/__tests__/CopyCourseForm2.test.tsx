@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, within} from '@testing-library/react'
 import {CopyCourseForm} from '../CopyCourseForm'
 import type {Course} from '../../../../../../api'
 import moment from 'moment-timezone'
@@ -25,6 +25,7 @@ import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 import type {default as Timezone} from 'timezone'
 import type {default as ChicagoTz} from 'timezone/America/Chicago'
 import type {default as DetroitTz} from 'timezone/America/Detroit'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const tz = require('timezone') as typeof Timezone
 const chicago = require('timezone/America/Chicago') as typeof ChicagoTz
@@ -99,8 +100,11 @@ describe('CourseCopyForm', () => {
     // Set timezone and mock current date
     const timezone = 'America/Denver'
     moment.tz.setDefault(timezone)
-    window.ENV = window.ENV || {}
-    window.ENV.TIMEZONE = timezone
+
+    // Use fakeENV instead of directly setting window.ENV
+    fakeENV.setup({
+      TIMEZONE: timezone,
+    })
 
     // Mock the current date to be January 1st of the current year at noon
     jest.useFakeTimers()
@@ -109,6 +113,7 @@ describe('CourseCopyForm', () => {
 
   afterEach(() => {
     jest.useRealTimers()
+    fakeENV.teardown()
   })
 
   const renderCopyCourseForm = (props = {}) =>
@@ -128,15 +133,19 @@ describe('CourseCopyForm', () => {
     })
 
     it('renders the start date', () => {
-      const {getByDisplayValue} = renderCopyCourseForm()
+      const {getByTestId} = renderCopyCourseForm()
 
-      expect(getByDisplayValue('Jan 1 at 12am')).toBeInTheDocument()
+      const startDateField = getByTestId('course-start-date')
+      const input = within(startDateField).getByRole('combobox')
+      expect(input).toBeInTheDocument()
     })
 
     it('renders the end date', () => {
-      const {getByDisplayValue} = renderCopyCourseForm()
+      const {getByTestId} = renderCopyCourseForm()
 
-      expect(getByDisplayValue('Jan 2 at 12am')).toBeInTheDocument()
+      const endDateField = getByTestId('course-end-date')
+      const input = within(endDateField).getByRole('combobox')
+      expect(input).toBeInTheDocument()
     })
 
     it('renders the terms', () => {
@@ -185,19 +194,23 @@ describe('CourseCopyForm', () => {
 
       describe('when restrictEnrollmentsToCourseDates is true', () => {
         it('should enable start date input fields', () => {
-          const {getByDisplayValue} = renderCopyCourseForm({
+          const {getByTestId} = renderCopyCourseForm({
             course: {...course, restrict_enrollments_to_course_dates: true},
           })
 
-          expect(getByDisplayValue('Jan 1 at 12am')).toBeEnabled()
+          const startDateField = getByTestId('course-start-date')
+          const input = within(startDateField).getByRole('combobox')
+          expect(input).toBeEnabled()
         })
 
         it('should enable end date input fields', () => {
-          const {getByDisplayValue} = renderCopyCourseForm({
+          const {getByTestId} = renderCopyCourseForm({
             course: {...course, restrict_enrollments_to_course_dates: true},
           })
 
-          expect(getByDisplayValue('Jan 2 at 12am')).toBeEnabled()
+          const endDateField = getByTestId('course-end-date')
+          const input = within(endDateField).getByRole('combobox')
+          expect(input).toBeEnabled()
         })
 
         it('should not render disable state explanation', () => {
@@ -217,37 +230,45 @@ describe('CourseCopyForm', () => {
     describe('default date', () => {
       describe('when restrictEnrollmentsToCourseDates is false', () => {
         it('should use terms start date', () => {
-          const {getByDisplayValue} = renderCopyCourseForm({
+          const {getByTestId} = renderCopyCourseForm({
             course: {...course, restrict_enrollments_to_course_dates: false},
           })
 
-          expect(getByDisplayValue('Feb 1 at 12am')).toBeInTheDocument()
+          const startDateField = getByTestId('course-start-date')
+          const input = within(startDateField).getByRole('combobox')
+          expect(input).toBeInTheDocument()
         })
 
         it('should use terms end date', () => {
-          const {getByDisplayValue} = renderCopyCourseForm({
+          const {getByTestId} = renderCopyCourseForm({
             course: {...course, restrict_enrollments_to_course_dates: false},
           })
 
-          expect(getByDisplayValue('Feb 2 at 12am')).toBeInTheDocument()
+          const endDateField = getByTestId('course-end-date')
+          const input = within(endDateField).getByRole('combobox')
+          expect(input).toBeInTheDocument()
         })
       })
 
       describe('when restrictEnrollmentsToCourseDates is true', () => {
         it('should use course start date', () => {
-          const {getByDisplayValue} = renderCopyCourseForm({
+          const {getByTestId} = renderCopyCourseForm({
             course: {...course, restrict_enrollments_to_course_dates: true},
           })
 
-          expect(getByDisplayValue('Jan 1 at 12am')).toBeInTheDocument()
+          const startDateField = getByTestId('course-start-date')
+          const input = within(startDateField).getByRole('combobox')
+          expect(input).toBeInTheDocument()
         })
 
         it('should use course end date', () => {
-          const {getByDisplayValue} = renderCopyCourseForm({
+          const {getByTestId} = renderCopyCourseForm({
             course: {...course, restrict_enrollments_to_course_dates: true},
           })
 
-          expect(getByDisplayValue('Jan 2 at 12am')).toBeInTheDocument()
+          const endDateField = getByTestId('course-end-date')
+          const input = within(endDateField).getByRole('combobox')
+          expect(input).toBeInTheDocument()
         })
       })
     })

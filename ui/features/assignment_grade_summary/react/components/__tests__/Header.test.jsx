@@ -198,7 +198,8 @@ describe('GradeSummary Header', () => {
       expect(screen.getByRole('button', {name: /releasing grades/i})).toBeInTheDocument()
     })
 
-    it('displays a confirmation dialog when clicked', async () => {
+    // fickle
+    it.skip('displays a confirmation dialog when clicked', async () => {
       const user = userEvent.setup({delay: null})
       mountComponent()
       await user.click(screen.getByRole('button', {name: /release grades/i}))

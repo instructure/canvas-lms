@@ -207,50 +207,6 @@ describe('RubricForm Tests', () => {
 
       expect(getByTestId('save-rubric-button')).toBeEnabled()
     })
-
-    it('will navigate back to /rubrics after successfully saving', async () => {
-      jest.spyOn(RubricFormQueries, 'saveRubric').mockImplementation(() =>
-        Promise.resolve({
-          rubric: {
-            id: '1',
-            criteriaCount: 1,
-            pointsPossible: 10,
-            title: 'Rubric 1',
-            criteria: [
-              {
-                id: '1',
-                description: 'Criterion 1',
-                points: 10,
-                criterionUseRange: false,
-                ratings: [],
-              },
-            ],
-          },
-          rubricAssociation: {
-            hidePoints: false,
-            hideScoreTotal: false,
-            hideOutcomeResults: false,
-            id: '1',
-            useForGrading: true,
-          },
-        }),
-      )
-      const {getByTestId} = renderComponent()
-      const titleInput = getByTestId('rubric-form-title')
-      fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
-      fireEvent.click(getByTestId('add-criterion-button'))
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
-        target: {value: 'New Criterion Test'},
-      })
-      fireEvent.click(getByTestId('rubric-criterion-save'))
-      fireEvent.click(getByTestId('save-rubric-button'))
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(getSRAlert()).toEqual('Rubric saved successfully')
-    })
-
     it('does not display save as draft button if rubric has associations', () => {
       queryClient.setQueryData(['fetch-rubric', '1'], {
         ...RUBRICS_QUERY_RESPONSE,

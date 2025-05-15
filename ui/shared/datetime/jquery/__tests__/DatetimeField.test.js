@@ -37,11 +37,17 @@ describe('DatetimeField', () => {
 
   beforeEach(() => {
     fakeENV.setup()
+    // Mock moment.localeData to provide firstDayOfWeek method
+    jest.spyOn(moment, 'localeData').mockImplementation(locale => ({
+      firstDayOfWeek: () => 0,
+      longDateFormat: _format => (locale === 'es' ? 'DD/MM/YYYY' : 'MM/DD/YYYY'),
+    }))
   })
 
   afterEach(() => {
     fakeENV.teardown()
     $field?.remove()
+    moment.localeData.mockRestore()
   })
 
   const createField = (options = {}) => {
@@ -504,12 +510,21 @@ describe('DatetimeField', () => {
   })
 
   describe('getFormatExample', () => {
+    beforeEach(() => {
+      createField()
+    })
+
     it('returns example date format', () => {
+      fakeENV.setup({
+        MOMENT_LOCALE: 'en',
+      })
       expect(field.getFormatExample()).toBe('MM/DD/YYYY')
     })
 
     it('returns example date format based on locale', () => {
-      ENV.MOMENT_LOCALE = 'es'
+      fakeENV.setup({
+        MOMENT_LOCALE: 'es',
+      })
       expect(field.getFormatExample()).toBe('DD/MM/YYYY')
     })
 

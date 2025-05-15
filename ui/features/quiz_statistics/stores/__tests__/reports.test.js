@@ -28,6 +28,12 @@ import assertChange from 'chai-assert-change'
 let fakeServer
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+// Helper to clean up any iframes created during tests
+const cleanupIframes = () => {
+  const iframes = document.querySelectorAll('iframe')
+  iframes.forEach(iframe => iframe.parentNode.removeChild(iframe))
+}
 const jsonResponse = (statusCode, payload) => [
   statusCode,
   {'Content-Type': 'application/json'},
@@ -38,12 +44,13 @@ beforeEach(() => {
   fakeServer = sinon.useFakeServer()
   config.ajax = $.ajax
   config.quizReportsUrl = '/reports'
+  cleanupIframes()
 })
 
 afterEach(() => {
   fakeServer.restore()
   fakeServer = null
-
+  cleanupIframes()
   subject.__reset__()
 })
 
@@ -119,6 +126,9 @@ describe('.populate', function () {
   })
 
   it('but it does not auto-download them when generated', async () => {
+    // Make sure no iframes exist before the test
+    cleanupIframes()
+
     subject.populate(
       {
         quiz_reports: [
@@ -132,7 +142,7 @@ describe('.populate', function () {
           },
         ],
       },
-      {track: true},
+      {track: true}, // track: true but autoDownload defaults to false
     )
 
     await sleep(1) // let Promise tick
@@ -170,7 +180,10 @@ describe('.populate', function () {
 
     expect(fakeServer.requests).toHaveLength(2)
 
-    expect(document.body.querySelector('iframe[src="/files/1/download"]')).toBeFalsy()
+    // Use waitFor to ensure the DOM has been updated
+    // Since autoDownload is false, no iframe should be created
+    const iframes = document.body.querySelectorAll('iframe[src="/files/1/download"]')
+    expect(iframes).toHaveLength(0)
   })
 
   it('does not track the same report multiple times simultaneously', async function () {

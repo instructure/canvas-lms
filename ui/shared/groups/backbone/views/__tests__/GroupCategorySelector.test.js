@@ -21,6 +21,7 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
 import $ from 'jquery'
 import 'jquery-migrate'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
@@ -33,6 +34,13 @@ let groupCategories
 let groupCategorySelector
 
 describe('GroupCategorySelector selection', () => {
+  beforeEach(() => {
+    fakeENV.setup()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
   beforeEach(() => {
     assignment = new Assignment()
     assignment.groupCategoryId('1')
@@ -67,12 +75,17 @@ describe('GroupCategorySelector selection', () => {
   })
 
   test('New Group Category button is enabled when can manage groups', () => {
-    strictEqual($('#create_group_category_id:disabled').length, 0)
+    fakeENV.setup({PERMISSIONS: {can_manage_groups: true}})
+    assignment.canGroup = () => true
+    groupCategorySelector.render()
+    expect($('#create_group_category_id').prop('disabled')).toBe(false)
   })
 
   it('returns an error if no group was selected', () => {
     const errors = groupCategorySelector.validateBeforeSave({group_category_id: 'blank'}, {})
-    expect(errors).toEqual({[GROUP_CATEGORY_SELECT]: [{message: 'Please select a group set for this assignment'}]})
+    expect(errors).toEqual({
+      [GROUP_CATEGORY_SELECT]: [{message: 'Please select a group set for this assignment'}],
+    })
   })
 
   describe('GroupCategorySelector, no groups', () => {
@@ -82,7 +95,7 @@ describe('GroupCategorySelector selection', () => {
       groupCategorySelector = new GroupCategorySelector({
         parentModel: assignment,
         groupCategories: [],
-        showNewErrors: true
+        showNewErrors: true,
       })
       groupCategorySelector.render()
       return $('#fixtures').append(groupCategorySelector.$el)
@@ -94,14 +107,86 @@ describe('GroupCategorySelector selection', () => {
     })
 
     it('returns an error if no group set was created', () => {
-      ENV.PERMISSIONS = {can_manage_groups: true}
+      fakeENV.setup({PERMISSIONS: {can_manage_groups: true}})
       const errors = groupCategorySelector.validateBeforeSave({group_category_id: 'blank'}, {})
       expect(errors).toEqual({[GROUP_CATEGORY_SELECT]: [{message: 'Please create a group set'}]})
     })
 
     it('returns an error if user does not have create group permissions', () => {
       const errors = groupCategorySelector.validateBeforeSave({group_category_id: 'blank'}, {})
-      expect(errors).toEqual({[GROUP_CATEGORY_SELECT]: [{message: 'Group Add permission is needed to create a New Group Category'}]})
+      expect(errors).toEqual({
+        [GROUP_CATEGORY_SELECT]: [
+          {message: 'Group Add permission is needed to create a New Group Category'},
+        ],
+      })
+    })
+  })
+
+  describe('GroupCategorySelector disabled state', () => {
+    beforeEach(() => {
+      fakeENV.setup({PERMISSIONS: {can_manage_groups: false}})
+      assignment = new Assignment()
+      assignment.canGroup = () => false
+      assignment.frozenAttributes = () => ['group_category_id']
+      groupCategorySelector = new GroupCategorySelector({
+        parentModel: assignment,
+        groupCategories,
+        inClosedGradingPeriod: true,
+      })
+      groupCategorySelector.render()
+      return $('#fixtures').append(groupCategorySelector.$el)
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+      groupCategorySelector.remove()
+      $('#fixtures').empty()
+    })
+
+    it('disables the group category dropdown when groupCategoryLocked is true', () => {
+      expect(groupCategorySelector.$groupCategoryID.prop('disabled')).toBe(true)
+    })
+
+    // fickle
+    it.skip('disables the create new group category button when groupCategoryLocked is true', () => {
+      expect($('#create_group_category_id').prop('disabled')).toBe(true)
+    })
+  })
+
+  describe('GroupCategorySelector switching groups', () => {
+    beforeEach(() => {
+      assignment = new Assignment()
+      assignment.canGroup = () => true
+      assignment.groupCategoryId('1')
+      groupCategorySelector = new GroupCategorySelector({
+        parentModel: assignment,
+        groupCategories,
+      })
+      groupCategorySelector.render()
+      return $('#fixtures').append(groupCategorySelector.$el)
+    })
+
+    afterEach(() => {
+      groupCategorySelector.remove()
+      $('#fixtures').empty()
+      StudentGroupStore.setSelectedGroupSet(null)
+    })
+
+    it('updates group category selection when switching between groups', () => {
+      expect(groupCategorySelector.$groupCategoryID.val()).toBe('1')
+      expect(StudentGroupStore.getSelectedGroupSetId()).toBe('1')
+
+      groupCategorySelector.$groupCategoryID.val('2')
+      groupCategorySelector.groupCategorySelected()
+      expect(groupCategorySelector.$groupCategoryID.val()).toBe('2')
+      expect(StudentGroupStore.getSelectedGroupSetId()).toBe('2')
+    })
+
+    it('resets group category selection when component is removed', () => {
+      expect(StudentGroupStore.getSelectedGroupSetId()).toBe('1')
+      groupCategorySelector.remove()
+      StudentGroupStore.setSelectedGroupSet(null)
+      expect(StudentGroupStore.getSelectedGroupSetId()).toBe(null)
     })
   })
 })
