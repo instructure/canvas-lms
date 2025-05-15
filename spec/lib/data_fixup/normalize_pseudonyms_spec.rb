@@ -21,7 +21,7 @@ describe DataFixup::NormalizePseudonyms do
   before do
     account.email_pseudonyms = false
 
-    require_relative "../../../db/migrate/20250417195912_normalize_pseudonyms"
+    require_relative "../../../db/migrate/20250417195913_normalize_pseudonyms"
     # we need the new constraints out of the way
     NormalizePseudonyms.new.down
   end
@@ -137,6 +137,22 @@ describe DataFixup::NormalizePseudonyms do
       # to ensure it's choosing the normalized one
 
       dedup_and_check({ unique_id: "123456\u2003" }, { unique_id: "123456\u2003\u2003" })
+    end
+
+    it "relinks to Canvas auth provider if possible" do
+      p1 = user.pseudonyms.create!(unique_id: "123456",
+                                   account:,
+                                   password: "password",
+                                   password_confirmation: "password",
+                                   current_login_at: Time.zone.now)
+      p2 = user.pseudonyms.create!(unique_id: "123456a", account:, authentication_provider: ap1)
+      p2.unique_id = "123456"
+      p2.unique_id_normalized = Pseudonym.normalize(p2.unique_id)
+      p2.save(validate: false)
+
+      described_class.dedup_all
+
+      expect(p1.reload.authentication_provider).to eql account.canvas_authentication_provider
     end
   end
 end
