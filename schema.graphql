@@ -2135,6 +2135,11 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
   state: CourseWorkflowState!
 
   """
+  Returns course statistics for the current user
+  """
+  statistics: CourseStatistics
+
+  """
   all the submissions for assignments in this course
   """
   submissionsConnection(
@@ -2198,6 +2203,17 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
     """
     userIds: [ID!]
   ): UserConnection
+  usersConnectionCount(
+    filter: CourseUsersFilter
+    sort: CourseUsersSortInputType
+
+    """
+    Only include users with the given ids.
+
+    **This field is deprecated, use `filter: {userIds}` instead.**
+    """
+    userIds: [ID!]
+  ): Int
 }
 
 """
@@ -2369,6 +2385,11 @@ input CourseSectionsFilter {
   Only include sections associated with users assigned to this assignment
   """
   assignmentId: ID
+}
+
+type CourseStatistics {
+  assignmentsDueThisWeek: Int!
+  missingAssignmentCount: Int!
 }
 
 input CourseUsersFilter {

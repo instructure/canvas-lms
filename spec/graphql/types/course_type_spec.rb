@@ -1925,6 +1925,145 @@ describe Types::CourseType do
     end
   end
 
+  describe "submissionStatistics" do
+    let(:now) { Time.zone.now }
+
+    context "when user doesn't have read permission" do
+      it "returns null" do
+        other_student = user_factory
+        expect(course_type.resolve("submissionStatistics { submissionsDueThisWeek }", current_user: other_student)).to be_nil
+      end
+    end
+
+    context "when user has read permission" do
+      describe "submissionsDueThisWeek" do
+        it "counts submissions with due dates within the next 7 days" do
+          Timecop.freeze(now) do
+            # Set up a submission due within this week
+            assignment = course.assignments.create!(
+              title: "Assignment due this week",
+              workflow_state: "published",
+              submission_types: "online_text_entry"
+            )
+            submission = assignment.submissions.find_by(user_id: @student.id)
+            submission.update!(cached_due_date: now + 2.days)
+
+            expect(course_type.resolve("submissionStatistics { submissionsDueThisWeek }")).to eq 1
+          end
+        end
+
+        it "excludes submissions due beyond this week" do
+          Timecop.freeze(now) do
+            # Set up a submission due far in the future
+            assignment = course.assignments.create!(
+              title: "Future assignment",
+              workflow_state: "published",
+              submission_types: "online_text_entry"
+            )
+            submission = assignment.submissions.find_by(user_id: @student.id)
+            submission.update!(cached_due_date: now + 10.days)
+
+            expect(course_type.resolve("submissionStatistics { submissionsDueThisWeek }")).to eq 0
+          end
+        end
+
+        it "excludes submissions from unpublished assignments" do
+          Timecop.freeze(now) do
+            # Set up a submission for an unpublished assignment
+            assignment = course.assignments.create!(
+              title: "Unpublished assignment",
+              workflow_state: "unpublished",
+              submission_types: "online_text_entry"
+            )
+            submission = assignment.submissions.find_by(user_id: @student.id)
+            submission.update!(cached_due_date: now + 2.days)
+
+            expect(course_type.resolve("submissionStatistics { submissionsDueThisWeek }")).to eq 0
+          end
+        end
+      end
+
+      describe "missingSubmissionsCount" do
+        # Create a fresh course and enrollment for each test to ensure isolation
+        let(:isolated_course_with_student) do
+          course_with_student(active_all: true)
+          @course
+        end
+
+        let(:isolated_course_type) do
+          GraphQLTypeTester.new(isolated_course_with_student, current_user: @student)
+        end
+
+        it "counts past-due submissions that aren't submitted" do
+          course = isolated_course_with_student
+          Timecop.freeze(now) do
+            # Set up a past-due submission
+            assignment = course.assignments.create!(
+              title: "Past due assignment",
+              workflow_state: "published",
+              submission_types: "online_text_entry"
+            )
+            submission = assignment.submissions.find_by(user_id: @student.id)
+            submission.update!(cached_due_date: now - 2.days)
+
+            expect(isolated_course_type.resolve("submissionStatistics { missingSubmissionsCount }")).to eq 1
+          end
+        end
+
+        it "excludes submissions due in the future" do
+          course = isolated_course_with_student
+          Timecop.freeze(now) do
+            # Set up a submission due far in the future
+            assignment = course.assignments.create!(
+              title: "Future assignment",
+              workflow_state: "published",
+              submission_types: "online_text_entry"
+            )
+            submission = assignment.submissions.find_by(user_id: @student.id)
+            submission.update!(cached_due_date: now + 10.days)
+
+            expect(isolated_course_type.resolve("submissionStatistics { missingSubmissionsCount }")).to eq 0
+          end
+        end
+
+        it "counts submissions explicitly marked as missing" do
+          course = isolated_course_with_student
+          Timecop.freeze(now) do
+            # Set up a submission marked as missing
+            assignment = course.assignments.create!(
+              title: "Assignment marked missing",
+              workflow_state: "published",
+              submission_types: "online_text_entry"
+            )
+            submission = assignment.submissions.find_by(user_id: @student.id)
+            submission.update!(late_policy_status: "missing")
+
+            expect(isolated_course_type.resolve("submissionStatistics { missingSubmissionsCount }")).to eq 1
+          end
+        end
+
+        it "excludes submitted submissions" do
+          Timecop.freeze(now) do
+            # Set up a past-due but submitted submission
+            assignment = course.assignments.create!(
+              title: "Submitted assignment",
+              workflow_state: "published",
+              submission_types: "online_text_entry"
+            )
+            submission = assignment.submissions.find_by(user_id: @student.id)
+            submission.update!(
+              cached_due_date: now - 2.days,
+              submission_type: "online_text_entry",
+              workflow_state: "submitted"
+            )
+
+            expect(course_type.resolve("submissionStatistics { missingSubmissionsCount }")).to eq 0
+          end
+        end
+      end
+    end
+  end
+
   describe "moderators" do
     def execute_query(pagination_options: {}, user: @teacher)
       options_string = pagination_options.empty? ? "" : "(#{pagination_options.map { |key, value| "#{key}: #{value.inspect}" }.join(", ")})"
