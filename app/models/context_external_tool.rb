@@ -32,6 +32,8 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :lti_asset_processor_eula_acceptances, class_name: "Lti::AssetProcessorEulaAcceptance", inverse_of: :context_external_tool, dependent: :destroy
   has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :deployment
 
+  has_one :estimated_duration, dependent: :destroy, inverse_of: :external_tool
+
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
   belongs_to :root_account, class_name: "Account"
@@ -52,6 +54,8 @@ class ContextExternalTool < ActiveRecord::Base
   validate :url_or_domain_is_set
   validate :validate_urls
   attr_reader :config_type, :config_url, :config_xml
+
+  accepts_nested_attributes_for :estimated_duration, allow_destroy: true
 
   # handles both serialized Hashes and HashWithIndifferentAccesses
   # and always returns a HashWithIndifferentAccess

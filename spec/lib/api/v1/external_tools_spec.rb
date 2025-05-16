@@ -130,5 +130,21 @@ describe Api::V1::ExternalTools do
         expect(json).not_to have_key(:is_top_nav_favorite)
       end
     end
+
+    context "in a horizon course" do
+      before do
+        @course.update!(horizon_course: true)
+        account = @course.account
+        account.update!(horizon_account: true)
+        account.enable_feature!(:horizon_course_setting)
+      end
+
+      it "includes estimated duration" do
+        tool.estimated_duration_attributes = { minutes: 15 }
+        tool.save
+        json = controller.external_tool_json(tool, @course, @student, nil)
+        expect(json["estimated_duration"]["duration"]).to eq 15.minutes
+      end
+    end
   end
 end

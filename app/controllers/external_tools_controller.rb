@@ -1712,6 +1712,7 @@ class ExternalToolsController < ApplicationController
                 is_top_nav_favorite
                 unified_tool_id]
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
+    attrs += [:estimated_duration_attributes] if @context.try(:horizon_course?)
 
     attrs.each do |prop|
       tool.send(:"#{prop}=", params[prop]) if params.key?(prop)

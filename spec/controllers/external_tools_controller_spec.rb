@@ -2629,6 +2629,32 @@ describe ExternalToolsController do
         end
       end
     end
+
+    context "in a horizon course" do
+      before do
+        @course.update!(horizon_course: true)
+        account = @course.account
+        account.update!(horizon_account: true)
+        account.enable_feature!(:horizon_course_setting)
+      end
+
+      it "can set estimated duration" do
+        user_session(@teacher)
+        post "create",
+             params: {
+               course_id: @course.id,
+               external_tool: {
+                 name: "tool name",
+                 url: "http://example.com",
+                 consumer_key: "key",
+                 shared_secret: "secret",
+                 estimated_duration_attributes: { minutes: 5 }
+               }
+             },
+             format: "json"
+        expect(ContextExternalTool.last.estimated_duration.duration).to eq 5.minutes
+      end
+    end
   end
 
   describe "PUT 'update'" do
@@ -2716,6 +2742,36 @@ describe ExternalToolsController do
           format: "json"
       expect(response).to be_successful
       expect(@tool.reload.editor_button).to be_nil
+    end
+
+    context "in a horizon course" do
+      before do
+        @course.update!(horizon_course: true)
+        account = @course.account
+        account.update!(horizon_account: true)
+        account.enable_feature!(:horizon_course_setting)
+      end
+
+      it "can remove estimated duration" do
+        user_session(@teacher)
+        @tool = new_valid_tool(@course)
+        @tool.estimated_duration_attributes = { minutes: 5 }
+        @tool.save!
+
+        put :update,
+            params: {
+              course_id: @course.id,
+              external_tool_id: @tool.id,
+              external_tool: {
+                estimated_duration_attributes: {
+                  id: @tool.estimated_duration.id,
+                  _destroy: "true"
+                }
+              }
+            },
+            format: "json"
+        expect(@tool.reload.estimated_duration).to be_nil
+      end
     end
   end
 
