@@ -301,6 +301,7 @@ export type SiteAdminFeatureId =
   | 'new_quizzes_navigation_updates'
   | 'create_wiki_page_mastery_path_overrides'
   | 'create_external_apps_side_tray_overrides'
+  | 'ams_service'
   | 'files_a11y_rewrite_toggle'
   | 'files_a11y_rewrite'
 /**
