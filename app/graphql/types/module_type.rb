@@ -104,6 +104,11 @@ module Types
       ModuleItemsVisibleLoader.for(current_user).load(context_module)
     end
 
+    field :statistics, Types::ModuleStatisticsType, null: true
+    def statistics
+      Loaders::ModuleStatisticsLoader.for(current_user:).load(context_module)
+    end
+
     field :estimated_duration, GraphQL::Types::ISO8601Duration, null: true
     def estimated_duration
       module_items.then do |content_tags|
