@@ -1374,6 +1374,9 @@ class FilesController < ApplicationController
       @attachment.locked = value_to_boolean(params[:locked]) if params.key?(:locked)
       @attachment.hidden = value_to_boolean(params[:hidden]) if params.key?(:hidden)
       @attachment.visibility_level = params[:visibility_level] if params.key?(:visibility_level)
+      if @context.try(:horizon_course?) && params[:estimated_duration_attributes]
+        @attachment.estimated_duration_attributes = params[:estimated_duration_attributes].permit(:id, :minutes, :_destroy)
+      end
 
       @attachment.set_publish_state_for_usage_rights if @attachment.context.is_a?(Group)
       if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:usage_rights_required?) && @context.usage_rights_required?

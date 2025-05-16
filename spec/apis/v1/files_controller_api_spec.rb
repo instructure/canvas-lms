@@ -142,6 +142,35 @@ describe "Files API", type: :request do
       end
     end
 
+    context "in a canvas career course" do
+      before :once do
+        account = @course.account
+        account.enable_feature!(:horizon_course_setting)
+        @course.update horizon_course: true
+      end
+
+      it "allows setting estimated duration" do
+        api_call(
+          :post,
+          "/api/v1/courses/#{@course.id}/files",
+          {
+            controller: "courses",
+            action: "create_file",
+            course_id: @course.id,
+            format: "json",
+            name: "test_file.png",
+            size: "12345",
+            content_type: "image/png",
+            no_redirect: "true",
+            estimated_duration_attributes: { minutes: 5 }
+          },
+          {},
+          expected_status: 200
+        )
+        expect(Attachment.last.estimated_duration.duration).to eq 5.minutes
+      end
+    end
+
     context "as student" do
       before do
         course_with_student_logged_in(course: @course)
