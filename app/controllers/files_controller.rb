@@ -1120,7 +1120,7 @@ class FilesController < ApplicationController
     model = Object.const_get(params[:context_type])
     @context = model.where(id: params[:context_id]).first
 
-    overwritten_instfs_uuid = nil
+    unused_instfs_uuid = nil
     @attachment = if params.key?(:precreated_attachment_id)
                     att = Attachment.find_by(id: params[:precreated_attachment_id])
                     if att.nil?
@@ -1133,12 +1133,15 @@ class FilesController < ApplicationController
                     @context.shard.activate do
                       # avoid creating an identical Attachment
                       unless params[:on_duplicate] == "rename"
-                        att = Attachment.active.find_by(context: @context,
-                                                        folder_id: params[:folder_id],
-                                                        display_name: params[:display_name] || params[:name],
-                                                        size: params[:size],
-                                                        md5: params[:sha512])
-                        overwritten_instfs_uuid = att.instfs_uuid if att
+                        att = Attachment
+                              .active
+                              .where.not(instfs_uuid: nil)
+                              .find_by(context: @context,
+                                       folder_id: params[:folder_id],
+                                       display_name: params[:display_name] || params[:name],
+                                       size: params[:size],
+                                       md5: params[:sha512])
+                        unused_instfs_uuid = params[:instfs_uuid] if att
                       end
                       att || Attachment.where(context: @context).build
                     end
@@ -1160,7 +1163,7 @@ class FilesController < ApplicationController
     @attachment.display_name = params[:display_name] || params[:name]
     @attachment.size = params[:size]
     @attachment.content_type = process_content_type_from_instfs(params[:content_type], @attachment.display_name)
-    @attachment.instfs_uuid = params[:instfs_uuid]
+    @attachment.instfs_uuid = params[:instfs_uuid] unless unused_instfs_uuid
     @attachment.md5 = params[:sha512]
     @attachment.modified_at = Time.zone.now
     @attachment.workflow_state = "processed"
@@ -1176,8 +1179,8 @@ class FilesController < ApplicationController
     @attachment.save!
 
     # apply duplicate handling
-    if overwritten_instfs_uuid
-      @attachment.delay_if_production.safe_delete_overwritten_instfs_uuid(overwritten_instfs_uuid)
+    if unused_instfs_uuid
+      @attachment.delay_if_production.safe_delete_unused_instfs_uuid(unused_instfs_uuid)
     else
       @attachment.handle_duplicates(params[:on_duplicate])
     end
