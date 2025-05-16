@@ -641,7 +641,7 @@ describe Types::DiscussionEntryType do
     end
 
     it "returns nil if it is not a root entry" do
-      expect(discussion_sub_entry_type.resolve("allRootEntries { _id }")).to be_nil
+      expect(discussion_sub_entry_type.resolve("allRootEntries { _id }")).to eq []
     end
   end
 end
