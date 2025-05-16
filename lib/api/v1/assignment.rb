@@ -1197,6 +1197,11 @@ module Api::V1::Assignment
     :created
   end
 
+  def remove_differentiation_tag_overrides(overrides_to_delete)
+    tag_overrides = overrides_to_delete.select { |o| o.set_type == "Group" && o.set.non_collaborative? }
+    tag_overrides.each(&:destroy!)
+  end
+
   def update_api_assignment_with_overrides(prepared_update, user)
     assignment = prepared_update[:assignment]
     overrides = prepared_update[:overrides]
@@ -1209,6 +1214,13 @@ module Api::V1::Assignment
 
     assignment.transaction do
       assignment.validate_overrides_for_sis(prepared_batch)
+
+      # remove differentiation tag overrides if they are being deleted
+      # and account setting is disabled. The assignment will fail validation
+      # if these overrides exist and the account setting is disabled
+      unless @context.account.allow_assign_to_differentiation_tags?
+        remove_differentiation_tag_overrides(prepared_batch[:overrides_to_delete])
+      end
 
       # validate_assignment_overrides runs as a save callback, but if the group
       # category is changing, remove overrides for old groups first so we don't

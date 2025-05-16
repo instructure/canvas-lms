@@ -64,24 +64,48 @@ describe('DifferentiationTagConverterMessage', () => {
       ).toBeInTheDocument()
     })
 
-    it('renders the correct message for discussion_topic', () => {
-      renderComponent({learningObjectType: 'discussion'})
+    describe('discussion_topic', () => {
+      it('renders the correct message for "discussion" type', () => {
+        renderComponent({learningObjectType: 'discussion'})
 
-      expect(
-        screen.getByText(
-          'This discussion was previously assigned via differentiation tag. To make any edits to this assignment you must convert differentiation tags to individual tags.',
-        ),
-      ).toBeInTheDocument()
+        expect(
+          screen.getByText(
+            'This discussion was previously assigned via differentiation tag. To make any edits to this assignment you must convert differentiation tags to individual tags.',
+          ),
+        ).toBeInTheDocument()
+      })
+
+      it('renders the correct message for "discussion_topic" type', () => {
+        renderComponent({learningObjectType: 'discussion_topic'})
+
+        expect(
+          screen.getByText(
+            'This discussion was previously assigned via differentiation tag. To make any edits to this assignment you must convert differentiation tags to individual tags.',
+          ),
+        ).toBeInTheDocument()
+      })
     })
 
-    it('renders the correct message for page', () => {
-      renderComponent({learningObjectType: 'page'})
+    describe('wiki_page', () => {
+      it('renders the correct message for "wiki_page" type', () => {
+        renderComponent({learningObjectType: 'wiki_page'})
 
-      expect(
-        screen.getByText(
-          'This page was previously assigned via differentiation tag. To make any edits to this assignment you must convert differentiation tags to individual tags.',
-        ),
-      ).toBeInTheDocument()
+        expect(
+          screen.getByText(
+            'This page was previously assigned via differentiation tag. To make any edits to this assignment you must convert differentiation tags to individual tags.',
+          ),
+        ).toBeInTheDocument()
+      })
+
+      it('renders the correct message for "page" type', () => {
+        renderComponent({learningObjectType: 'page'})
+
+        expect(
+          screen.getByText(
+            'This page was previously assigned via differentiation tag. To make any edits to this assignment you must convert differentiation tags to individual tags.',
+          ),
+        ).toBeInTheDocument()
+      })
     })
   })
 

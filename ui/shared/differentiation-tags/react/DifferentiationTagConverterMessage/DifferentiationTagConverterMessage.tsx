@@ -43,9 +43,23 @@ const DifferentiationTagConverterMessage = ({
   onFinish,
 }: DifferentiationTagConverterMessageProps) => {
   const [isLoading, setIsLoading] = useState(false)
+
+  const getObjectTypeForMessage = () => {
+    switch (learningObjectType) {
+      case 'discussion':
+      case 'discussion_topic':
+        return 'discussion'
+      case 'page':
+      case 'wiki_page':
+        return 'page'
+      default:
+        return learningObjectType
+    }
+  }
+
   const message = I18n.t(
     'This %{lo_type} was previously assigned via differentiation tag. To make any edits to this assignment you must convert differentiation tags to individual tags.',
-    {lo_type: learningObjectType},
+    {lo_type: getObjectTypeForMessage()},
   )
 
   const getLearningObjectUrl = () => {
@@ -56,9 +70,11 @@ const DifferentiationTagConverterMessage = ({
         return `/api/v1/courses/${courseId}/assignments/${learningObjectId}/date_details/convert_tag_overrides`
       case 'quiz':
         return `/api/v1/courses/${courseId}/quizzes/${learningObjectId}/date_details/convert_tag_overrides`
+      case 'discussion':
       case 'discussion_topic':
         return `/api/v1/courses/${courseId}/discussion_topics/${learningObjectId}/date_details/convert_tag_overrides`
       case 'wiki_page':
+      case 'page':
         return `/api/v1/courses/${courseId}/pages/${learningObjectId}/date_details/convert_tag_overrides`
       default:
         throw new Error(`Unsupported learning object type: ${learningObjectType}`)
