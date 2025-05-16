@@ -226,6 +226,7 @@ class AbstractAssignment < ActiveRecord::Base
     validate :final_grader_ok?
   end
 
+  accepts_nested_attributes_for :estimated_duration, allow_destroy: true
   accepts_nested_attributes_for :external_tool_tag, update_only: true, reject_if: proc { |attrs|
     # only accept the url, link_settings, content_type, content_id and new_tab params
     # the other accessible params don't apply to an content tag being used as an external_tool_tag
