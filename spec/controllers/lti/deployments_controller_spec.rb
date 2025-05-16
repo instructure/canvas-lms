@@ -380,8 +380,10 @@ RSpec.describe Lti::DeploymentsController do
       deployment
     end
 
-    it "soft-deletes the deployment" do
-      expect { subject }.to change { ContextExternalTool.active.count }.by(-1)
+    it "soft-deletes the deployment and controls" do
+      expect { subject }.to change { ContextExternalTool.active.count }
+        .by(-1)
+        .and change { Lti::ContextControl.active.count }.by(-1)
     end
   end
 end
