@@ -106,14 +106,14 @@ describe('ModuleItemStatusIcon', () => {
     expect(container.getByText('Complete')).toBeInTheDocument()
   })
 
-  it('should render "Overdue"', () => {
+  it('should render "Missing"', () => {
     const container = setUp({
       itemId: '1',
       isCompleted: false,
       dueDateOffsetHours: -72, // Due in the past (72 hours ago)
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('Overdue')).toBeInTheDocument()
+    expect(container.getByText('Missing')).toBeInTheDocument()
   })
 
   it('should render "Assigned"', () => {

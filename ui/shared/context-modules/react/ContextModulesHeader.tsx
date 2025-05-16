@@ -185,8 +185,6 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
     }) as EventListener)
   }, [])
 
-  console.log(props)
-
   resetExpandAllButtonBindings()
   return (
     <>

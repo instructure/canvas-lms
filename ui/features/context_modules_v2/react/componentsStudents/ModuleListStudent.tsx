@@ -105,7 +105,6 @@ const ModulesListStudent: React.FC = () => {
   return (
     <View as="div" margin="medium">
       <ModulePageActionHeaderStudent
-        courseName={data?.pages[0]?.courseName}
         onCollapseAll={() => handleCollapseAll(data, setExpandedModules)}
         onExpandAll={() => handleExpandAll(data, setExpandedModules)}
         anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}

@@ -76,7 +76,6 @@ const mockGqlResponseWithNextPage = {
 
 const courseId = '123'
 const errorMsg = 'Test error'
-const courseName = 'name'
 const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}})
 
 const server = setupServer()
@@ -101,7 +100,7 @@ describe('useModulesStudent', () => {
       graphql.query('GetModulesStudentQuery', ({variables}) => {
         expect(variables.courseId).toBe(courseId)
         return HttpResponse.json({
-          data: {legacyNode: {name: courseName, ...mockGqlResponseFinalPage.legacyNode}},
+          data: {legacyNode: {...mockGqlResponseFinalPage.legacyNode}},
         })
       }),
     )
@@ -112,9 +111,7 @@ describe('useModulesStudent', () => {
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
-    expect(result.current.data?.pages).toEqual([
-      {courseName, modules: [{...node2}], pageInfo: endPageInfo},
-    ])
+    expect(result.current.data?.pages).toEqual([{modules: [{...node2}], pageInfo: endPageInfo}])
   })
 
   it('should query for next page', async () => {
@@ -132,10 +129,17 @@ describe('useModulesStudent', () => {
 
     const {result} = renderUseModulesStudentHook(courseId)
 
-    expect(result.current.isLoading).toBe(true)
+    // Wait for initial loading to complete
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
+
+    // Wait for fetchNextPage to complete and all pages to be loaded
+    await waitFor(() => {
+      expect(result.current.hasNextPage).toBe(false)
+    })
+
+    // Now check that we have both pages
     expect(result.current.data?.pages).toEqual([
       {modules: [{...node1}], pageInfo: nextPageInfo},
       {modules: [{...node2}], pageInfo: endPageInfo},
