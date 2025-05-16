@@ -5147,6 +5147,7 @@ type Module implements LegacyIDInterface & Node & Timestamped {
   published: Boolean
   requireSequentialProgress: Boolean
   requirementCount: Int
+  statistics: ModuleStatistics
   unlockAt: DateTime
   updatedAt: DateTime
 }
@@ -5432,6 +5433,11 @@ type ModuleProgressionEdge {
   The item at the end of the edge.
   """
   node: ModuleProgression
+}
+
+type ModuleStatistics {
+  latestDueAt: Int!
+  overdueAssignmentCount: Int!
 }
 
 """
@@ -9411,6 +9417,8 @@ type User implements LegacyIDInterface & Node & Timestamped {
   htmlUrl(courseId: ID): URL
   id: ID!
   inboxLabels: [String!]
+  instructureIdentityGlobalUserId: String
+  instructureIdentityOrganizationUserId: String
   integrationId: String
   loginId: String
   name: HtmlEncodedString
