@@ -19,6 +19,7 @@
 #
 
 module Api::V1::Attachment
+  include Api::V1::EstimatedDuration
   include Api::V1::Json
   include Api::V1::Locked
   include Api::V1::Progress
@@ -149,6 +150,10 @@ module Api::V1::Attachment
 
     if attachment.supports_visibility?
       hash["visibility_level"] = attachment.visibility_level
+    end
+
+    if attachment.context.try(:horizon_course?) && attachment.estimated_duration&.marked_for_destruction? == false
+      hash["estimated_duration"] = estimated_duration_json(attachment.estimated_duration, user, nil)
     end
 
     if includes.include? "user"
@@ -467,6 +472,9 @@ module Api::V1::Attachment
     attachment.workflow_state = opts[:temporary] ? "unattached_temporary" : "unattached"
     attachment.modified_at = Time.now.utc
     attachment.category = params[:category] if params[:category].present?
+    if context.try(:horizon_course?) && params[:estimated_duration_attributes].present?
+      attachment.estimated_duration_attributes = params[:estimated_duration_attributes].slice(:minutes)
+    end
     attachment.save!
     attachment
   end
