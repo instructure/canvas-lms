@@ -40,7 +40,7 @@ export const ModuleHeaderSupplementalInfoStudent: React.FC<Props> = ({
   progression,
 }) => {
   const {data: moduleItemData} = useModuleItemsStudent(moduleId)
-  const {dueDate, overdueCount} = useMemo(() => {
+  const {dueDate, missingCount} = useMemo(() => {
     const availableDueDates = moduleItemData?.moduleItems?.filter(
       item => item?.content?.submissionsConnection?.nodes?.[0]?.cachedDueDate,
     )
@@ -48,14 +48,14 @@ export const ModuleHeaderSupplementalInfoStudent: React.FC<Props> = ({
       const dueDate = item?.content?.submissionsConnection?.nodes?.[0]?.cachedDueDate
       return dueDate ? new Date(dueDate) : max
     }, new Date(0))
-    const overdueCount =
+    const missingCount =
       moduleItemData?.moduleItems?.filter(
         item =>
           item?.content?.submissionsConnection?.nodes?.[0]?.cachedDueDate &&
           new Date(item?.content?.submissionsConnection?.nodes?.[0]?.cachedDueDate) < new Date() &&
           !progression?.requirementsMet?.some(req => req.id === item?._id),
       ).length || 0
-    return {dueDate, overdueCount}
+    return {dueDate, missingCount}
   }, [moduleItemData, progression])
 
   // Ensure we only proceed if completionRequirements exists
@@ -68,15 +68,15 @@ export const ModuleHeaderSupplementalInfoStudent: React.FC<Props> = ({
           {dueDate && dueDate.getTime() > 0 && (
             <Text size="x-small">Due: {dueDate.toDateString()}</Text>
           )}
-          {dueDate && dueDate.getTime() > 0 && (overdueCount || hasCompletionRequirements) && (
+          {dueDate && dueDate.getTime() > 0 && (missingCount || hasCompletionRequirements) && (
             <Text size="x-small"> | </Text>
           )}
-          {overdueCount > 0 && (
+          {missingCount > 0 && (
             <Text size="x-small" color="danger">
-              {overdueCount} Overdue Assignment
+              {missingCount} {I18n.t('Missing Assignment')}
             </Text>
           )}
-          {overdueCount > 0 && hasCompletionRequirements && <Text size="x-small"> | </Text>}
+          {missingCount > 0 && hasCompletionRequirements && <Text size="x-small"> | </Text>}
           {hasCompletionRequirements && (
             <Text size="x-small">
               {`Requirement: ${requirementCount ? I18n.t('Complete One Item') : I18n.t('Complete All Items')}`}

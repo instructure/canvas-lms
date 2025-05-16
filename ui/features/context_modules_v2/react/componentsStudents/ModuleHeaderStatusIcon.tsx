@@ -36,7 +36,6 @@ const ModuleHeaderStatusIcon: React.FC<ModuleHeaderStatusIconProps> = ({progress
   let icon = null
   let screenReaderMessage = ''
 
-  console.log('progression', {completed, locked, started})
   if (locked) {
     icon = <IconLockSolid data-testid="module-header-status-icon-lock" color="primary" />
     screenReaderMessage = I18n.t('Locked')

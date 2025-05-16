@@ -162,9 +162,26 @@ export interface ModulesResponse {
   }
 }
 
-interface GraphQLResult {
+interface CoursesubmissionStatistics {
+  submissionsDueThisWeek: number
+  missingSubmissionsCount: number
+}
+
+interface CourseStudentResponse {
+  name?: string
+  submissionStatistics?: CoursesubmissionStatistics
+}
+
+interface CourseStudentGraphQLResult {
   legacyNode?: {
     name?: string
+    submissionStatistics?: CoursesubmissionStatistics
+  }
+  errors?: {message: string}[]
+}
+
+interface GraphQLResult {
+  legacyNode?: {
     modulesConnection?: {
       edges: Array<{
         cursor: string

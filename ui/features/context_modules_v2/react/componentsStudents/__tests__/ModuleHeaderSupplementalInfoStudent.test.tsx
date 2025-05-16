@@ -43,7 +43,7 @@ const setUp = (
 }
 
 describe('ModuleHeaderSupplementalInfoStudent', () => {
-  it('renders date, overdue count, and requirement', () => {
+  it('renders date, missing count, and requirement', () => {
     const testDate = new Date(Date.now() - 72 * 60 * 60 * 1000)
     queryClient.setQueryData(['moduleItemsStudent', '1'], {
       moduleItems: [
@@ -85,7 +85,7 @@ describe('ModuleHeaderSupplementalInfoStudent', () => {
     )
     expect(container.container).toBeInTheDocument()
     expect(container.getByText(`Due: ${testDate.toDateString()}`)).toBeInTheDocument()
-    expect(container.getByText('1 Overdue Assignment')).toBeInTheDocument()
+    expect(container.getByText('1 Missing Assignment')).toBeInTheDocument()
     expect(container.getByText('Requirement: Complete All Items')).toBeInTheDocument()
     expect(container.getAllByText('|')).toHaveLength(2)
   })
@@ -167,7 +167,7 @@ describe('ModuleHeaderSupplementalInfoStudent', () => {
     expect(container.queryAllByText('|')).toHaveLength(0)
   })
 
-  it('renders due date and overdue count', () => {
+  it('renders due date and missing count', () => {
     const testDate = new Date(Date.now() - 72 * 60 * 60 * 1000)
     queryClient.setQueryData(['moduleItemsStudent', '1'], {
       moduleItems: [
@@ -197,7 +197,7 @@ describe('ModuleHeaderSupplementalInfoStudent', () => {
     })
     expect(container.container).toBeInTheDocument()
     expect(container.getByText(`Due: ${testDate.toDateString()}`)).toBeInTheDocument()
-    expect(container.getByText('1 Overdue Assignment')).toBeInTheDocument()
+    expect(container.getByText('1 Missing Assignment')).toBeInTheDocument()
     expect(container.queryAllByText('|')).toHaveLength(1)
   })
 })

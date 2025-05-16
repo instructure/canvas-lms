@@ -72,7 +72,7 @@ const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
     if (isCompleted) {
       return <StatusPill color="success" text={I18n.t('Complete')} />
     } else if (isPastDue) {
-      return <StatusPill color="danger" text={I18n.t('Overdue')} />
+      return <StatusPill color="danger" text={I18n.t('Missing')} />
     } else if (content?.submissionsConnection?.nodes?.length) {
       return <StatusPill color="info" text={I18n.t('Assigned')} />
     } else {

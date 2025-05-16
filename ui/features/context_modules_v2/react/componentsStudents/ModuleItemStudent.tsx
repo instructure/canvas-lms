@@ -56,7 +56,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   return (
     <View
       as="div"
-      padding="medium small medium x-small"
+      padding="small small small x-small"
       background="transparent"
       borderWidth="0"
       borderRadius="medium"
