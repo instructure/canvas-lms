@@ -25,7 +25,7 @@ class AuthenticationProvider::SAML::InCommon < AuthenticationProvider::SAML::Fed
 
   class << self
     def endpoint
-      Setting.get("incommon_metadata_url", "http://md.incommon.org/InCommon/InCommon-metadata.xml")
+      Setting.get("incommon_metadata_url", "https://mdq.incommon.org/entities/idps/all")
     end
 
     protected
