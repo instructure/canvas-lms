@@ -50,6 +50,28 @@ const innerHtml3 = `<form>
   </table>
   </form>`
 
+const innerHtml4 = `<form>
+  <table>
+    <tr>
+      <td>
+        <input type="checkbox" data-testid="show_text" id="show_text" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p id="invisible_text">This text is visible</p>
+      </td>
+    </tr>
+  </table>
+  </form>
+
+  <script>
+    document.getElementById('invisible_text').style.display = 'none';
+    document.getElementById('show_text').onclick = function(){
+        document.getElementById('invisible_text').style.display = 'block';
+    };
+</script>`
+
 const props = {
   formHTML: innerHtml1,
   path: '/api/fake_post',
@@ -59,9 +81,6 @@ const props = {
   onRender: jest.fn(),
 }
 
-// usually, we swap the jQuery date input for the CanvasDatePicker
-// but since this is a jest test, that won't happen
-// so we won't test date input (see selenium tests for that)
 describe('RunReportForm', () => {
   beforeEach(() => {
     fakeENV.setup({
@@ -179,5 +198,15 @@ describe('RunReportForm', () => {
     await waitFor(() => {
       expect(getAllByText('Failed to start report.')[0]).toBeInTheDocument()
     })
+  })
+
+  it('executes script tags', async () => {
+    const user = userEvent.setup()
+    const {getByText, getByTestId} = render(<RunReportForm {...props} formHTML={innerHtml4} />)
+
+    expect(getByText('This text is visible').getAttribute('style')).toBe('display: none;')
+    const checkbox = getByTestId('show_text')
+    await user.click(checkbox)
+    expect(getByText('This text is visible').getAttribute('style')).toBe('display: block;')
   })
 })

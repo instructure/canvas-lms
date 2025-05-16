@@ -110,6 +110,25 @@ export default function ConfigureReportForm(props: Props) {
         record[name] = [inputLabel, closestTd]
       })
       setDateRefs({...record})
+
+      const script = $form.find('script')
+      if (script) {
+        // there's only one script tag in each form
+        const scriptElem = script.get(0)
+        const newScript = document.createElement('script')
+        if (scriptElem?.src) {
+          newScript.src = scriptElem.src
+        } else {
+          newScript.textContent = script.text()
+        }
+        if (scriptElem) {
+          Array.from(scriptElem.attributes).forEach(attr =>
+            newScript.setAttribute(attr.name, attr.value),
+          )
+        }
+        // replacing the script with a "new" script makes the script run
+        script.replaceWith(newScript)
+      }
     }
     // don't run this effect when dateRefs change; causes looping
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -134,6 +153,7 @@ export default function ConfigureReportForm(props: Props) {
           method: 'POST',
         })
         props.onSuccess(props.reportName)
+        props.closeModal()
       } catch (e) {
         showFlashError(I18n.t('Failed to start report.'))(e as Error)
         setIsLoading(false)
@@ -201,7 +221,11 @@ export default function ConfigureReportForm(props: Props) {
           data-testid="close-button"
           placement="end"
           size="medium"
-          onClick={props.closeModal}
+          onClick={() => {
+            if (formRef.current) {
+              props.closeModal()
+            }
+          }}
           screenReaderLabel={I18n.t('Close')}
         />
       </Modal.Header>
