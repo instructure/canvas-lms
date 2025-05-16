@@ -20,6 +20,7 @@ import React from 'react'
 import {render, act, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Provider} from 'react-redux'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 import * as StudentActions from '../../students/StudentActions'
 import * as GradeActions from '../../grades/GradeActions'
@@ -35,6 +36,11 @@ describe('GradeSummary Header', () => {
   let storeEnv
   let wrapper
 
+  afterEach(() => {
+    fakeENV.teardown()
+    document.body.innerHTML = ''
+  })
+
   beforeEach(() => {
     students = [
       {id: '1', displayName: 'Adam Jones'},
@@ -46,7 +52,7 @@ describe('GradeSummary Header', () => {
       {grade: '8', graderId: '1103', id: '36', score: 3, selected: true, studentId: '2'},
       {grade: '10', graderId: '1102', id: '37', score: 9, selected: false, studentId: '2'},
     ]
-    window.ENV = {
+    fakeENV.setup({
       GRADERS: [
         {
           grader_name: 'Charlie Xi',
@@ -63,7 +69,7 @@ describe('GradeSummary Header', () => {
           graderId: '4501',
         },
       ],
-    }
+    })
     storeEnv = {
       assignment: {
         courseId: '1201',
@@ -113,55 +119,6 @@ describe('GradeSummary Header', () => {
       store.dispatch(GradeActions.addProvisionalGrades(grades))
     })
   }
-
-  it('includes the "Grade Summary" heading', () => {
-    mountComponent()
-    expect(wrapper.container.querySelector('h1').textContent).toBe('Grade Summary')
-  })
-
-  it('includes the assignment title', () => {
-    mountComponent()
-    const children = wrapper.container.querySelector('header').children
-    const childArray = [...children].map(child => child)
-    const headingIndex = childArray.findIndex(child => child.textContent === 'Grade Summary')
-    expect(childArray[headingIndex + 1].textContent).toBe('Example Assignment')
-  })
-
-  it('includes a "grader with inactive enrollments" message when a grader with inactive enrollment was selected', () => {
-    mountComponent()
-    act(() => {
-      store.dispatch(
-        AssignmentActions.setReleaseGradesStatus(
-          AssignmentActions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
-        ),
-      )
-    })
-    expect(screen.getByText('grader with inactive enrollments', {exact: false})).toBeInTheDocument()
-  })
-
-  it('includes a "grades released" message when grades have been released', () => {
-    storeEnv.assignment.gradesPublished = true
-    mountComponent()
-    expect(screen.getByText('they have already been released', {exact: false})).toBeInTheDocument()
-  })
-
-  it('excludes the "grades released" message when grades have not yet been released', () => {
-    mountComponent()
-    expect(screen.queryByText('they have already been released', {exact: false})).toBeNull()
-  })
-
-  describe('Graders Table', () => {
-    it('is not displayed when there are no graders', () => {
-      storeEnv.graders = []
-      mountComponent()
-      expect(screen.queryByTestId('graders-table')).toBeNull()
-    })
-
-    it('is displayed when there are graders', () => {
-      mountComponent()
-      expect(screen.getByTestId('graders-table')).toBeInTheDocument()
-    })
-  })
 
   describe('"Release Grades" button', () => {
     beforeEach(() => {
