@@ -163,6 +163,9 @@ If you need to change a button's size, you can do so by adding the appropriate c
     opacity: 0.5;
   }
 
+  // https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum
+  min-width: 24px;
+  min-height: 24px;
 }
 
 
