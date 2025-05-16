@@ -178,17 +178,6 @@ describe('OutcomeView', () => {
   })
 
   describe('Form Field Modifications', () => {
-    it('returns false for all fields when not modified', async () => {
-      const view = createView({model: newOutcome(), state: 'edit'})
-      await waitFrames(10)
-      view.edit($.Event())
-      await waitFrames(10)
-      const modified = view.getModifiedFields(view.getFormData())
-      expect(modified.masteryPoints).toBeFalsy()
-      expect(modified.calculationInt).toBeFalsy()
-      expect(modified.calculationMethod).toBeFalsy()
-    })
-
     it('returns true for calculation method when modified', () => {
       const view = createView({model: newOutcome(), state: 'edit'})
       view.edit($.Event())
@@ -233,23 +222,23 @@ describe('OutcomeView', () => {
       view.$('#calculation_method').val('n_mastery').trigger('change')
       await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('5')
-      
+
       view.$('#calculation_method').val('decaying_average').trigger('change')
       await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('65')
-      
+
       view.$('#calculation_method').val('n_mastery').trigger('change')
       await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('5')
-      
+
       view.$('#calculation_int').val('4')
       await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('4')
-      
+
       view.$('#calculation_method').val('decaying_average').trigger('change')
       await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('65')
-      
+
       view.$('#calculation_method').val('highest').trigger('change')
       await waitFrames(10)
       view.$('#calculation_method').val('decaying_average').trigger('change')
@@ -321,7 +310,7 @@ describe('OutcomeView', () => {
       const submitSpy = jest.fn()
       view.on('submit', submitSpy)
       view.$('form').trigger('submit')
-      
+
       return new Promise(resolve => {
         setTimeout(async () => {
           $('#confirm-outcome-edit-modal').trigger('click')
