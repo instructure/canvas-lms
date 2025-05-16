@@ -32,8 +32,8 @@ function getGradebookHistory(courseId, input) {
 
   const params = {
     params: {
-      start_time: input.from,
-      end_time: input.to,
+      start_time: input.from?.value,
+      end_time: input.to?.value,
       include: ['current_grade'],
     },
   }
