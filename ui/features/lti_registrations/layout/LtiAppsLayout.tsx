@@ -105,11 +105,6 @@ export const LtiAppsLayout = React.memo(() => {
             <Flex.Item>
               <Heading level="h1">{I18n.t('Apps')}</Heading>
             </Flex.Item>
-            <Flex.Item>
-              <Pill margin="0 0 0 x-small" color="info">
-                {I18n.t('Feature Preview')}
-              </Pill>
-            </Flex.Item>
           </Flex>
         </Flex.Item>
         {isManage ? (
