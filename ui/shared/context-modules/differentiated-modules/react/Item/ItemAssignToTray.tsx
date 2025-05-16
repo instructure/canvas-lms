@@ -224,6 +224,7 @@ export default function ItemAssignToTray({
   }
 
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
+  const [hasDifferentiationTagOverrides, setHasDifferentiationTagOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState<string[]>([])
   const [groupCategoryId, setGroupCategoryId] = useState<string | null>(defaultGroupCategoryId)
   const [overridesFetched, setOverridesFetched] = useState(
@@ -322,6 +323,10 @@ export default function ItemAssignToTray({
   })
 
   const focusErrors = useCallback(() => {
+    if (!ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides) {
+      return true
+    }
+
     const hasErrors = assignToCards.some(card => !card.isValid)
     // If a card has errors it should not save and the respective card should be focused
     if (hasErrors) {
@@ -392,8 +397,12 @@ export default function ItemAssignToTray({
   ])
 
   const allCardsValid = useCallback(() => {
-    return assignToCardsRef.current.every(card => card.isValid)
-  }, [assignToCardsRef])
+    if (!ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides) {
+      return false
+    } else {
+      return assignToCardsRef.current.every(card => card.isValid)
+    }
+  }, [assignToCardsRef, hasDifferentiationTagOverrides])
 
   const handleEntered = useCallback(() => {
     // When tray entered and the initial load already happened,
@@ -556,6 +565,8 @@ export default function ItemAssignToTray({
               handleDismiss={handleDismiss}
               hasModuleOverrides={hasModuleOverrides}
               setHasModuleOverrides={setHasModuleOverrides}
+              hasDifferentiationTagOverrides={hasDifferentiationTagOverrides}
+              setHasDifferentiationTagOverrides={setHasDifferentiationTagOverrides}
               cardsRefs={cardsRefs}
               setModuleAssignees={setModuleAssignees}
               defaultGroupCategoryId={defaultGroupCategoryId}
@@ -622,6 +633,8 @@ export default function ItemAssignToTray({
           handleDismiss={handleDismiss}
           hasModuleOverrides={hasModuleOverrides}
           setHasModuleOverrides={setHasModuleOverrides}
+          hasDifferentiationTagOverrides={hasDifferentiationTagOverrides}
+          setHasDifferentiationTagOverrides={setHasDifferentiationTagOverrides}
           cardsRefs={cardsRefs}
           setModuleAssignees={setModuleAssignees}
           defaultGroupCategoryId={defaultGroupCategoryId}
