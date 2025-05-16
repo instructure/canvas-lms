@@ -416,6 +416,7 @@ class ApplicationController < ActionController::Base
     create_wiki_page_mastery_path_overrides
     remove_rce_resize_button
     create_external_apps_side_tray_overrides
+    ams_service
     files_a11y_rewrite_toggle
     files_a11y_rewrite
   ].freeze
