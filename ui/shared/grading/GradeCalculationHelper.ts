@@ -85,3 +85,16 @@ export function weightedPercent({
 }) {
   return score && weight && possible ? Big(score).div(possible).times(weight) : Big(0)
 }
+
+// this function is in place to ensure we round consistently with the backend when calculating total grades
+export function totalGradeRound(n: number | string | null, digits = 0) {
+  try {
+    if (n == null) {
+      return NaN
+    }
+    const floatNumber = parseFloat(n.toString())
+    return parseFloat(Big(floatNumber).round(digits).toString())
+  } catch (error) {
+    return NaN
+  }
+}

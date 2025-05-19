@@ -94,6 +94,37 @@ describe GradeCalculator do
       end.not_to raise_error
     end
 
+    it "correctly rounds weighted assignment groups by percent with irrational numbers" do
+      # matches test found in ui/shared/round/__tests__/round.spec.js to check rounding consistency
+      group1 = @course.assignment_groups.create!(name: "Group 1", group_weight: 12)
+      group2 = @course.assignment_groups.create!(name: "Group 2", group_weight: 10)
+      group3 = @course.assignment_groups.create!(name: "Group 3", group_weight: 15)
+      group4 = @course.assignment_groups.create!(name: "Group 4", group_weight: 21)
+      group5 = @course.assignment_groups.create!(name: "Group 5", group_weight: 21)
+      group6 = @course.assignment_groups.create!(name: "Group 6", group_weight: 21)
+
+      @course.update!(group_weighting_scheme: "percent")
+
+      a1 = @course.assignments.create!(title: "Assignment 1", points_possible: 12, assignment_group: group1)
+      a2 = @course.assignments.create!(title: "Assignment 2", points_possible: 82, assignment_group: group2)
+      a3 = @course.assignments.create!(title: "Assignment 3", points_possible: 100, assignment_group: group3)
+      a4 = @course.assignments.create!(title: "Assignment 4", points_possible: 100, assignment_group: group4)
+      a5 = @course.assignments.create!(title: "Assignment 5", points_possible: 100, assignment_group: group5)
+      a6 = @course.assignments.create!(title: "Assignment 6", points_possible: 100, assignment_group: group6)
+
+      a1.grade_student(@student, grade: 11.8, grader: @teacher)
+      a2.grade_student(@student, grade: 82, grader: @teacher)
+      a3.grade_student(@student, grade: 89.5, grader: @teacher)
+      a4.grade_student(@student, grade: 85, grader: @teacher)
+      a5.grade_student(@student, grade: 85, grader: @teacher)
+      a6.grade_student(@student, grade: 83, grader: @teacher)
+
+      GradeCalculator.recompute_final_score(@student.id, @course.id)
+      @student.reload
+
+      expect(@student.enrollments.first.computed_current_score).to eq 88.36
+    end
+
     it "deletes irrelevant scores for inactive grading periods" do
       grading_period_set = @course.root_account.grading_period_groups.create!
       grading_period_set.enrollment_terms << @course.enrollment_term

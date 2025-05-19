@@ -16,7 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {scoreToPercentage, sum, sumBy, toNumber, weightedPercent} from '../GradeCalculationHelper'
+import Big from 'big.js'
+import {
+  scoreToPercentage,
+  sum,
+  sumBy,
+  toNumber,
+  weightedPercent,
+  bigSum,
+  totalGradeRound,
+} from '../GradeCalculationHelper'
 
 describe('GradeCalculationHelper', () => {
   describe('.sum()', () => {
@@ -213,6 +222,23 @@ describe('GradeCalculationHelper', () => {
 
     test('returns 0 when score and weight are > 0 and possible is 0', () => {
       expect(toNumber(weightedPercent({score: 10, possible: 0, weight: 25}))).toBe(0)
+    })
+  })
+
+  describe('.totalGradeRound()', () => {
+    test('correctly handles a sum of irrational Big.js values', () => {
+      // matches test found in spec/lib/grade_calculator_spec.rb to check rounding consistency
+      // We want to move to a rounding strategy that will keep value as a fraction using rationals.
+      // Remove/Edit this comment and update the test when we do that.
+      const group1 = Big(11.8).div(12).times(12)
+      const group2 = Big(82).div(82).times(10)
+      const group3 = Big(89.5).div(100).times(15)
+      const group4 = Big(85).div(100).times(21)
+      const group5 = Big(85).div(100).times(21)
+      const group6 = Big(83).div(100).times(21)
+      const sum = bigSum([group1, group2, group3, group4, group5, group6])
+
+      expect(totalGradeRound(sum, 2)).toBe(88.36)
     })
   })
 })
