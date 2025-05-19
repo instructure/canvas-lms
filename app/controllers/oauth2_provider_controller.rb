@@ -95,6 +95,8 @@ class OAuth2ProviderController < ApplicationController
         redirect_params = Canvas::OAuth::Provider.final_redirect_params(session[:oauth2], @current_user, logged_in_user)
         return redirect_to Canvas::OAuth::Provider.final_redirect(self, redirect_params)
       end
+    when "login"
+      params[:force_login] = true
     else
       return redirect_to Canvas::OAuth::Provider.final_redirect(self,
                                                                 state: params[:state],
