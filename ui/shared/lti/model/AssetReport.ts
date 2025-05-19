@@ -46,17 +46,17 @@ const ZLtiAssetReportPriority = z.union([
  */
 export const ZLtiAssetReport = z.object({
   comment: z.string().optional(),
-  error_code: z.string().optional(),
+  errorCode: z.string().optional(),
   id: z.number(),
-  indication_alt: z.string().optional(),
-  indication_color: z.string().optional(),
-  launch_url_path: z.string().optional(),
+  indicationAlt: z.string().optional(),
+  indicationColor: z.string().optional(),
+  launchUrlPath: z.string().optional(),
   priority: ZLtiAssetReportPriority,
-  processing_progress: ZLtiAssetReportProcessingProgress,
-  report_type: z.string(),
-  resubmit_url_path: z.string().optional(),
+  processingProgress: ZLtiAssetReportProcessingProgress,
+  reportType: z.string(),
+  resubmitUrlPath: z.string().optional(),
   result: z.string().optional(),
-  result_truncated: z.string().optional(),
+  resultTruncated: z.string().optional(),
   title: z.string().optional(),
 })
 export type LtiAssetReport = z.infer<typeof ZLtiAssetReport>

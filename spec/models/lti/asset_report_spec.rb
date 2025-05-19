@@ -251,21 +251,21 @@ RSpec.describe Lti::AssetReport do
       expect(subject[:title]).to eq("My cool report")
       expect(subject[:comment]).to eq("What a great report")
       expect(subject[:result]).to eq("8/10")
-      expect(subject).to_not have_key(:result_truncated)
-      expect(subject[:indication_color]).to eq("#008800")
-      expect(subject[:indication_alt]).to eq("WOW")
-      expect(subject[:error_code]).to eq("MYERRORCODE")
-      expect(subject[:processing_progress]).to eq("Processed")
+      expect(subject).to_not have_key(:resultTruncated)
+      expect(subject[:indicationColor]).to eq("#008800")
+      expect(subject[:indicationAlt]).to eq("WOW")
+      expect(subject[:errorCode]).to eq("MYERRORCODE")
+      expect(subject[:processingProgress]).to eq("Processed")
     end
 
     it "truncates result_truncated to 16 characters" do
       report.update!(result: "12345678901234567890")
-      expect(subject[:result_truncated]).to eq("123456789012345…")
+      expect(subject[:resultTruncated]).to eq("123456789012345…")
       expect(subject[:result]).to eq("12345678901234567890")
     end
 
-    it "includes launch_url_path for processed reports" do
-      expect(subject[:launch_url_path]).to \
+    it "includes launchUrlPath for processed reports" do
+      expect(subject[:launchUrlPath]).to \
         eq "/asset_processors/#{report.lti_asset_processor_id}/reports/#{report.id}/launch"
     end
   end
