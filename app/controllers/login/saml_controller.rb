@@ -30,9 +30,17 @@ class Login::SamlController < ApplicationController
   def new
     aac
     increment_statsd(:attempts)
-    redirect_to aac.generate_authn_request_redirect(host: request.host_with_port,
-                                                    parent_registration: session[:parent_registration],
-                                                    relay_state: Rails.env.development? && params[:RelayState])
+    redirect_to aac.generate_authn_request_redirect(
+      host: request.host_with_port,
+      relay_state: forced_relay_state,
+      force_login: force_login_after_logout? ||
+       session[:parent_registration] ||
+       Canvas::Plugin.value_to_boolean(params[:force_login])
+    )
+  end
+
+  def forced_relay_state
+    Rails.env.development? && params[:RelayState]
   end
 
   def create
@@ -407,7 +415,7 @@ class Login::SamlController < ApplicationController
   def observee_validation
     redirect_to
     @domain_root_account.parent_registration_ap.generate_authn_request_redirect(host: request.host_with_port,
-                                                                                parent_registration: session[:parent_registration])
+                                                                                force_login: session[:parent_registration])
   end
 
   protected

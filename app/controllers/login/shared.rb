@@ -183,6 +183,12 @@ module Login::Shared
     Canvas::LiveEvents.logged_out
     Lti::LogoutService.queue_callbacks(@current_pseudonym)
     super
+    session[:just_logged_out] = Time.now.utc if @current_pseudonym&.account&.feature_enabled?(:force_login_after_logout)
+  end
+
+  def force_login_after_logout?
+    t = session.delete(:just_logged_out)
+    t && t > 1.minute.ago
   end
 
   def forbid_on_files_domain
