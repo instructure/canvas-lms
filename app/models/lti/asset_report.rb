@@ -88,6 +88,7 @@ class Lti::AssetReport < ApplicationRecord
   validates :indication_alt, length: { minimum: 1, maximum: 1024 }, allow_nil: true
   validates :error_code, length: { minimum: 1, maximum: 1024 }, allow_nil: true
   validates :priority, inclusion: { in: PRIORITIES }
+  validates :processing_progress, presence: true
 
   validate :validate_extensions
   validate :validate_asset_compatible_with_processor

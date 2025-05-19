@@ -34,6 +34,7 @@ export type LtiAssetReportProcessingProgress = z.infer<typeof ZLtiAssetReportPro
 
 // Can update this when zod is updated to allow z.literal(ARRAY): https://github.com/colinhacks/zod/issues/2686
 const ZLtiAssetReportPriority = z.union([
+  z.literal(0),
   z.literal(1),
   z.literal(2),
   z.literal(3),
