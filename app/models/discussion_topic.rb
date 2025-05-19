@@ -394,6 +394,10 @@ class DiscussionTopic < ActiveRecord::Base
         topic.allow_rating = allow_rating
         topic.only_graders_can_rate = only_graders_can_rate
         topic.sort_by_rating = sort_by_rating
+        topic.sort_order = sort_order
+        topic.sort_order_locked = sort_order_locked
+        topic.expanded = expanded
+        topic.expanded_locked = expanded_locked
         topic.save if topic.changed?
         topic
       end
