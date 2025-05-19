@@ -413,6 +413,12 @@ class FilesController < ApplicationController
       @contexts = [@context]
       files_version_2 = Account.site_admin.feature_enabled?(:files_a11y_rewrite) && (!Account.site_admin.feature_enabled?(:files_a11y_rewrite_toggle) || @current_user.files_ui_version != "v1")
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
+
+      root_folders_by_context = {}
+      if files_version_2 && @contexts.any?
+        root_folders_by_context = Folder.preload_root_folders(@contexts)
+      end
+
       files_contexts = @contexts.map do |context|
         tool_context = case context
                        when Course
@@ -431,7 +437,10 @@ class FilesController < ApplicationController
                                 else
                                   []
                                 end
-        root_folder_id = Folder.root_folders(context)&.first&.id if files_version_2
+        root_folder_id = if files_version_2
+                           folder = root_folders_by_context[context.asset_string]
+                           folder&.id
+                         end
         {
           asset_string: context.asset_string,
           name: (context == @current_user) ? t("my_files", "My Files") : context.name,
