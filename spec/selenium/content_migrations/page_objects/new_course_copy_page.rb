@@ -70,6 +70,14 @@ class NewCourseCopyPage
       f("[data-testid = 'new_end_date']")
     end
 
+    def course_start_date_input
+      f("[data-testid = 'course_start_date']")
+    end
+
+    def course_end_date_input
+      f("[data-testid = 'course_end_date']")
+    end
+
     def date_remove_option
       fxpath("//label[../input[@data-testid='remove-dates']]")
     end
