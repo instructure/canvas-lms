@@ -19,8 +19,8 @@
 import React from 'react'
 import {arrayOf, string, bool, func, shape, oneOf} from 'prop-types'
 import {isEqual, groupBy, map, compact} from 'lodash'
-import {IconPlusLine} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
+import {IconPlusLine, IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Grid} from '@instructure/ui-grid'
@@ -91,6 +91,20 @@ export default function CoursesToolbar({
       ),
     ),
   )
+  const renderClearButton = () =>
+    draftFilters.search_term.length ? (
+      <IconButton
+        type="button"
+        size="small"
+        data-testid="clear-search"
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel="Clear search"
+        onClick={() => onUpdateFilters({search_term: ''})}
+      >
+        <IconTroubleLine />
+      </IconButton>
+    ) : undefined
 
   return (
     <div>
@@ -107,7 +121,7 @@ export default function CoursesToolbar({
                       isLoading={terms.loading}
                       label={<ScreenReaderContent>{I18n.t('Filter by term')}</ScreenReaderContent>}
                       value={draftFilters.enrollment_term_id}
-                      onChange={(e, {value}) => onUpdateFilters({enrollment_term_id: value})}
+                      onChange={(_e, {value}) => onUpdateFilters({enrollment_term_id: value})}
                     >
                       {termOptions}
                     </SearchableSelect>
@@ -117,7 +131,7 @@ export default function CoursesToolbar({
                       id="searchByFilter"
                       label={<ScreenReaderContent>{I18n.t('Search by')}</ScreenReaderContent>}
                       value={draftFilters.search_by || 'course'}
-                      onChange={(e, value) => onUpdateFilters({search_by: value})}
+                      onChange={(_e, value) => onUpdateFilters({search_by: value})}
                     >
                       <CanvasSelect.Group
                         key="search"
@@ -136,6 +150,10 @@ export default function CoursesToolbar({
                   <Grid.Col width={6}>
                     <TextInput
                       type="search"
+                      renderBeforeInput={
+                        <IconSearchLine inline={false} data-testid="icon-search-line" />
+                      }
+                      renderAfterInput={renderClearButton()}
                       renderLabel={<ScreenReaderContent>{searchLabel}</ScreenReaderContent>}
                       value={draftFilters.search_term}
                       placeholder={searchLabel}
