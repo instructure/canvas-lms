@@ -70,13 +70,13 @@ describe('GradeSummary Header "Post to Students" button', () => {
     jest.mock('../../assignment/AssignmentActions', () => ({
       releaseGrades: jest.fn().mockImplementation(() => ({
         type: 'SET_RELEASE_GRADES_STATUS',
-        payload: 'STARTED',
+        payload: {status: 'STARTED'},
       })),
       setReleaseGradesStatus: jest.fn(),
       setUnmuteAssignmentStatus: jest.fn(),
       unmuteAssignment: jest.fn().mockImplementation(() => ({
         type: 'SET_UNMUTE_ASSIGNMENT_STATUS',
-        payload: 'STARTED',
+        payload: {status: 'STARTED'},
       })),
       STARTED: 'STARTED',
       SUCCESS: 'SUCCESS',
