@@ -18,57 +18,32 @@
 
 import React from 'react'
 import {createRoot} from 'react-dom/client'
-import {
-  canvasThemeLocal as canvasBaseTheme,
-  canvasHighContrastThemeLocal as canvasHighContrastTheme,
-} from '@instructure/ui-themes'
+import ReactDOM from 'react-dom'
 import {InstUISettingsProvider} from '@instructure/emotion'
-import {memoize} from 'lodash'
-
-// Set up the default InstUI theme
-// Override the fontFamily to include "Lato Extended", which we prefer
-// to load over plain Lato (see LS-1559)
-const typography = {
-  fontFamily: 'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif',
-}
-
-const EMPTY_OBJ = {}
-
-type BrandVariables = Record<string, unknown>
+import {getTheme} from '@canvas/instui-bindings'
 
 type Options = {
   highContrast?: boolean
   brandVariables?: Record<string, unknown>
 }
 
-function getTheme(highContrast: boolean, brandVariables: BrandVariables) {
-  // Set CSS transitions to 0ms in Selenium and JS tests
-  let transitionOverride: {
-    transitions?: {
-      duration: string
-    }
-  } = {}
-  if (process.env.NODE_ENV === 'test' || window.INST.environment === 'test') {
-    transitionOverride = {
-      transitions: {
-        duration: '0ms',
-      },
-    }
+export function legacyRender(
+  element: React.ReactElement,
+  container: Element | null,
+  options: Options = {},
+) {
+  if (!(container instanceof HTMLElement)) {
+    throw new Error('Container must be an HTMLElement')
   }
 
-  return highContrast
-    ? {
-        ...canvasHighContrastTheme,
-        typography,
-      }
-    : {
-        ...transitionOverride,
-        ...canvasBaseTheme,
-        ...brandVariables,
-        typography,
-      }
+  const theme = getTheme(options.highContrast, options.brandVariables)
+
+  // eslint-disable-next-line react/no-render-return-value
+  return ReactDOM.render(
+    <InstUISettingsProvider theme={theme}>{element}</InstUISettingsProvider>,
+    container,
+  )
 }
-const memoizedGetTheme = memoize(getTheme)
 
 export function render(
   element: React.ReactElement,
@@ -79,19 +54,7 @@ export function render(
     throw new Error('Container must be an HTMLElement')
   }
 
-  // Check for high contrast mode from either options, ENV variable, or URL query parameter
-  const urlParams = new URLSearchParams(window.location.search)
-  const hasHighContrastQueryParam = urlParams.get('instui_theme') === 'canvas_high_contrast'
-
-  const highContrast =
-    typeof options.highContrast === 'boolean'
-      ? options.highContrast
-      : Boolean(ENV.use_high_contrast || hasHighContrastQueryParam)
-
-  // @ts-expect-error
-  const brandVariables = options.brandVariables || window.CANVAS_ACTIVE_BRAND_VARIABLES || EMPTY_OBJ
-
-  const theme = memoizedGetTheme(highContrast, brandVariables)
+  const theme = getTheme(options.highContrast, options.brandVariables)
 
   const root = createRoot(container)
   root.render(<InstUISettingsProvider theme={theme}>{element}</InstUISettingsProvider>)
