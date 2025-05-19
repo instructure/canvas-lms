@@ -88,6 +88,13 @@ RSpec.describe Lti::AssetReport do
       ar.update!(workflow_state: "deleted")
       expect(lti_asset_report_model(attrs)).to be_valid
     end
+
+    it "requres a processing_progress" do
+      model = lti_asset_report_model
+      expect(model).to be_valid
+      model.processing_progress = nil
+      expect(model).not_to be_valid
+    end
   end
 
   describe "PRIORITIES" do
