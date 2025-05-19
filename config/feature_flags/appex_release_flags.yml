@@ -32,3 +32,10 @@ login_registration_ui_identity:
       state: hidden
     production:
       state: hidden
+force_login_after_logout:
+  state: allowed
+  applies_to: RootAccount
+  display_name: Force Login After Delegated Logout
+  description:
+    After logging out of Canvas, instruct identity providers to re-authenticate the user on their next login attempt.
+    This can prevent unexpected login loops.

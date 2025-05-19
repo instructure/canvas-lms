@@ -115,6 +115,31 @@ describe Login::OpenidConnectController do
       uri = URI.parse(response.location)
       expect(uri.host).to eql "secondprovider"
     end
+
+    it "forwards force_login param" do
+      get login_openid_connect_url, params: { force_login: "1" }
+      expect(response).to be_redirect
+      uri = URI.parse(response.location)
+      prompt = Rack::Utils.parse_nested_query(uri.query)["prompt"]
+      expect(prompt).to eql "login"
+    end
+
+    it "sets prompt if just_logged_out is set" do
+      allow_any_instance_of(Login::OpenidConnectController).to receive(:session).and_return({ just_logged_out: Time.now.utc })
+      get login_openid_connect_url
+      expect(response).to be_redirect
+      uri = URI.parse(response.location)
+      prompt = Rack::Utils.parse_nested_query(uri.query)["prompt"]
+      expect(prompt).to eql "login"
+    end
+
+    it "does not set prompt otherwise" do
+      get login_openid_connect_url
+      expect(response).to be_redirect
+      uri = URI.parse(response.location)
+      query = Rack::Utils.parse_nested_query(uri.query)
+      expect(query).not_to have_key("prompt")
+    end
   end
 
   describe "#create" do
