@@ -56,6 +56,22 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/page_views/react/PageViewsRoute')}
       />
       <Route
+        path="/courses/:courseId/wiki"
+        lazy={() => import('../../features/wiki_page_show/index')}
+      />
+      <Route
+        path="/courses/:courseId/pages/:pageId"
+        lazy={() => import('../../features/wiki_page_show/index')}
+      />
+      <Route
+        path="/groups/:groupId/wiki"
+        lazy={() => import('../../features/wiki_page_show/index')}
+      />
+      <Route
+        path="/groups/:groupId/pages/:pageId"
+        lazy={() => import('../../features/wiki_page_show/index')}
+      />
+      <Route
         path="/accounts/site_admin/release_notes"
         lazy={() => import('../../features/release_notes_edit/react/ReleaseNotesEditRoute')}
       />

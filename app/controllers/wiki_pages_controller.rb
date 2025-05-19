@@ -125,7 +125,6 @@ class WikiPagesController < ApplicationController
         @padless = true
       end
 
-      js_bundle :wiki_page_show
       css_bundle :wiki_page
     end
   end
