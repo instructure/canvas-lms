@@ -29,7 +29,8 @@ import {
   IconGroupLine,
   IconMoreSolid,
   IconPermissionsLine,
-IconAiLine} from '@instructure/ui-icons'
+  IconAiLine,
+} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import {
   CURRENT_USER,
@@ -63,9 +64,13 @@ const DiscussionPostButtonsToolbar = props => {
     setShowTranslationControl(!showTranslationControl)
   }
 
+  const translationText = props.isAnnouncement
+    ? I18n.t('Translate Announcement')
+    : I18n.t('Translate Discussion')
+
   const translationOptionText = showTranslationControl
     ? I18n.t('Turn off Translation')
-    : I18n.t('Translate Discussion')
+    : translationText
 
   const renderGroup = () =>
     props.childTopics?.length &&
@@ -390,6 +395,7 @@ DiscussionPostButtonsToolbar.propTypes = {
   isExpandedLocked: PropTypes.bool,
   discDefaultSortEnabled: PropTypes.bool,
   discDefaultExpandEnabled: PropTypes.bool,
+  isAnnouncement: PropTypes.bool,
 }
 
 export default DiscussionPostButtonsToolbar
