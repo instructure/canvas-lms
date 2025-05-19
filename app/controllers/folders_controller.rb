@@ -187,8 +187,8 @@ class FoldersController < ApplicationController
     file_sort = file_column_map[params[:sort]] || "display_name"
     file_desc = params[:order] == "desc"
 
-    folder_scope = folder_index_scope(opts[:can_view_hidden_files])
-    file_scope = file_index_scope(@folder, @current_user, session)
+    folder_scope = folder_index_scope(opts[:can_view_hidden_files]).preload(:active_file_attachments, :active_sub_folders)
+    file_scope = file_index_scope(@folder, @current_user, session).preload(:attachment_upload_statuses, :root_attachment)
 
     # Explicit LEFT JOIN for sorting by modified_by and rights
     if params[:sort] == "modified_by"
