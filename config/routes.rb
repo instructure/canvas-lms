@@ -1112,10 +1112,10 @@ CanvasRails::Application.routes.draw do
   get "privacy_policy" => "legal_information#privacy_policy", :as => "privacy_policy_redirect"
 
   scope(controller: :career) do
-    get "courses/:course_id/career", action: :catch_all, as: :course_career
-    get "courses/:course_id/career/*path", action: :catch_all, as: :course_career_path
-    get "accounts/:account_id/career", action: :catch_all, as: :account_career
-    get "accounts/:account_id/career/*path", action: :catch_all, as: :account_career_path
+    get "career/courses/:course_id", action: :catch_all, as: :course_career
+    get "career/courses/:course_id/*path", action: :catch_all, as: :course_career_path
+    get "career/accounts/:account_id", action: :catch_all, as: :account_career
+    get "career/accounts/:account_id/*path", action: :catch_all, as: :account_career_path
   end
 
   scope(controller: :smart_search) do

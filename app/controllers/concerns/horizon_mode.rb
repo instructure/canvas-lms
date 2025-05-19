@@ -18,12 +18,48 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module HorizonMode
+  # Use this function after @context is set
+  # Combines both student and provider career loading in one method
+  def load_canvas_career
+    return if Canvas::Plugin.value_to_boolean(params[:force_classic])
+
+    if @context.is_a?(Account)
+      # We'd only ever load the provider app for an account
+      load_canvas_career_for_provider
+    else
+      # Otherwise, try the learner app and then the provider app
+      load_canvas_career_for_student
+      load_canvas_career_for_provider unless performed?
+    end
+  end
+
+  def canvas_career_learning_provider_app_launch_url
+    uri = @context.root_account.horizon_url("learning-provider/remoteEntry.js")
+    uri.to_s
+  end
+
+  def canvas_career_learning_provider_app_enabled?
+    if @context.is_a?(Course)
+      canvas_career_learning_provider_app_enabled_for_courses?
+    elsif @context.is_a?(Account)
+      canvas_career_learning_provider_app_enabled_for_accounts?
+    else
+      false
+    end
+  end
+
+  private
+
   def horizon_course?
-    @context.is_a?(Course) && @context.horizon_course?
+    return @_horizon_course unless @_horizon_course.nil?
+
+    @_horizon_course = @context.is_a?(Course) && @context.horizon_course?
   end
 
   def horizon_account?
-    @context.is_a?(Account) && @context.horizon_account?
+    return @_horizon_account unless @_horizon_account.nil?
+
+    @_horizon_account = @context.is_a?(Account) && @context.horizon_account?
   end
 
   def horizon_student?
@@ -49,45 +85,34 @@ module HorizonMode
   # Use this function after @context is set
   def load_canvas_career_for_provider
     return unless canvas_career_learning_provider_app_enabled?
-
     return if request.path.include?("/career")
 
     if @context.is_a?(Course)
-      redirect_to course_career_path(course_id: @context.id)
+      path = request.path.sub("/courses/#{@context.id}", "")
+      redirect_to "#{course_career_path(course_id: @context.id)}#{path}"
     elsif @context.is_a?(Account)
-      redirect_to account_career_path(account_id: @context.id)
+      path = request.path.sub("/accounts/#{@context.id}", "")
+      redirect_to "#{account_career_path(account_id: @context.id)}#{path}"
     else
       redirect_to root_path
     end
   end
 
-  # Use this function after @context is set
-  # Combines both student and provider career loading in one method
-  def load_canvas_career
-    return if Canvas::Plugin.value_to_boolean(params[:force_classic])
-
-    # First try student path
-    load_canvas_career_for_student
-    # If no redirect happened, try provider path
-    load_canvas_career_for_provider unless performed?
-  end
-
-  def canvas_career_learning_provider_app_launch_url
-    uri = @context.root_account.horizon_url("learning-provider/remoteEntry.js")
-    uri.to_s
-  end
-
-  def canvas_career_learning_provider_app_enabled?
-    return false unless horizon_course? || horizon_account?
+  def canvas_career_learning_provider_app_enabled_for_courses?
+    return false unless horizon_course?
     return false unless horizon_admin?
     return false if canvas_career_learning_provider_app_launch_url.blank?
-    return false unless Account.site_admin.feature_enabled?(:horizon_learning_provider_app)
+    return false unless @context.account.feature_enabled?(:horizon_learning_provider_app_for_courses)
 
     true
   end
 
-  def load_canvas_career_learning_provider_app
-    remote_env(canvascareer: canvas_career_learning_provider_app_launch_url)
-    deferred_js_bundle :canvas_career
+  def canvas_career_learning_provider_app_enabled_for_accounts?
+    return false unless horizon_account?
+    return false unless horizon_admin?
+    return false if canvas_career_learning_provider_app_launch_url.blank?
+    return false unless @context.feature_enabled?(:horizon_learning_provider_app_for_accounts)
+
+    true
   end
 end
