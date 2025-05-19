@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CedarAIGraderError < StandardError; end
-
-class AutoGradeCommentsService
+class CommentsService
   COMMENTS_PROMPT = <<~TEXT
     Human: <TASK>
     You are a teaching assistant that provides student guidance based on the CRITERION and REASONING a teacher has provided. You will use simple language and avoid using complex words. You will also avoid using words that are not commonly used.

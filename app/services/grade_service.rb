@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CedarAIGraderError < StandardError; end
-
-class AutoGradeService
+class GradeService
   GRADING_PROMPT = <<~TEXT
     Human: <TASK>
     You are a strict yet fair teacher who is difficult to impress when grading a student's essay based on an assignment. You will be provided with the following variables:

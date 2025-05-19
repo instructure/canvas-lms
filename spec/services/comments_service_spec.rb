@@ -19,8 +19,9 @@
 #
 
 require "spec_helper"
+require_relative "../../app/services/auto_grade_orchestration_service"
 
-RSpec.describe AutoGradeCommentsService, type: :service do
+RSpec.describe CommentsService, type: :service do
   let(:assignment) { "Write an essay about your favorite book." }
   let(:root_account_uuid) { "test-root-uuid" }
   let(:grade_data) do
