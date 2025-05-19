@@ -21,10 +21,10 @@ import {arrayOf, func} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {positions} from '@canvas/positions'
 import SelectPosition, {RenderSelect} from '@canvas/select-position'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Button} from '@instructure/ui-buttons'
 import {Text as InstText} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {fetchItemTitles} from '@canvas/context-modules/utils/fetchItemTitles'
 import {itemShape, moveOptionsType} from './propTypes'
 
 const I18n = createI18nScope('move_select')
@@ -110,43 +110,26 @@ export default class MoveSelect extends React.Component {
   }
 
   fetchItems() {
-    try {
-      fetch(
-        `/api/v1/courses/${ENV.COURSE_ID}/modules/${this.state.selectedGroup.id}/items?include[]=title_only&per_page=1000`,
-      )
-        .then(res => {
-          if (!res.ok) {
-            throw new Error(res.statusText)
+    fetchItemTitles(ENV.COURSE_ID, this.state.selectedGroup.id)
+      .then(items => {
+        const groupitems = items.map(item => ({id: String(item.id), title: item.title}))
+        this.setState(state => {
+          const selectedGroup = state.selectedGroup
+          selectedGroup.items = groupitems
+          return {
+            selectedGroup,
           }
-          return res.json()
         })
-        .then(items => {
-          const groupitems = items.map(item => ({id: String(item.id), title: item.title}))
-          this.setState(state => {
-            const selectedGroup = state.selectedGroup
-            selectedGroup.items = groupitems
-            return {
-              selectedGroup,
-            }
-          })
+      })
+      .catch(error => {
+        this.setState(state => {
+          const selectedGroup = state.selectedGroup
+          selectedGroup.items = error
+          return {
+            selectedGroup,
+          }
         })
-        .catch(error => {
-          showFlashAlert({
-            message: I18n.t('Failed loading module items'),
-            err: error,
-            type: 'error',
-          })
-          this.setState(state => {
-            const selectedGroup = state.selectedGroup
-            selectedGroup.items = error
-            return {
-              selectedGroup,
-            }
-          })
-        })
-    } catch (error) {
-      showFlashAlert({message: I18n.t('Failed loading module items'), err: error, type: 'error'})
-    }
+      })
   }
 
   componentDidMount() {

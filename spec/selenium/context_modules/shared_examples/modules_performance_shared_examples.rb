@@ -268,6 +268,7 @@ shared_examples_for "add module items to list" do |context|
     end
 
     it "paginated list created after refresh when item is added to initiate pagination" do
+      skip "not a valid test now that we save the show all/less state"
       get @mod_url
       wait_for_dom_ready
 
