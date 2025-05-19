@@ -12,7 +12,7 @@ assignment_edit_enhancements_teacher_view:
 assign_to_differentiation_tags:
   state: hidden
   applies_to: Account
-  shadow: true
+  beta: true
   display_name: Differentiation Tags
   description: Let instructors tag enrolled users and assign course content based on those tags, supporting more personalized learning experiences.
   environments:
