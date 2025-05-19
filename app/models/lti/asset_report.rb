@@ -120,14 +120,14 @@ class Lti::AssetReport < ApplicationRecord
       title:,
       comment:,
       result:,
-      result_truncated:,
-      indication_color:,
-      indication_alt:,
-      error_code:,
-      processing_progress:,
+      resultTruncated: result_truncated,
+      indicationColor: indication_color,
+      indicationAlt: indication_alt,
+      errorCode: error_code,
+      processingProgress: processing_progress,
       priority:,
-      launch_url_path:,
-      resubmit_url_path:
+      launchUrlPath: launch_url_path,
+      resubmitUrlPath: resubmit_url_path,
     }.compact
   end
 
