@@ -92,7 +92,9 @@ module Types
     field :require_sequential_progress, Boolean, null: true
 
     field :completion_requirements, [ModuleCompletionRequirementType], null: true
-    delegate :completion_requirements, to: :context_module
+    def completion_requirements
+      context_module.completion_requirements_visible_to(current_user, is_teacher: false)
+    end
 
     field :requirement_count, Integer, null: true
     delegate :requirement_count, to: :context_module
