@@ -150,7 +150,11 @@ describe('OutcomeView', () => {
         state: 'edit',
       })
       await waitFrames(10)
-      view.$('input[name="mastery_points"]').val('-1')
+      // Wait for React components to mount
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const input = view.$('#mastery_points')[0]
+      input.value = '-1'
+      input.dispatchEvent(new Event('change', {bubbles: true}))
       expect(view.isValid()).toBeFalsy()
       expect(view.errors.mastery_points).toBeTruthy()
       view.remove()

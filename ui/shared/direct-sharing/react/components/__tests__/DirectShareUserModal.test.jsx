@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act} from '@testing-library/react'
+import {render, fireEvent, waitFor, act} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import useContentShareUserSearchApi from '../../effects/useContentShareUserSearchApi'
 import DirectShareUserModal from '../DirectShareUserModal'
@@ -161,12 +161,14 @@ describe('DirectShareUserModal', () => {
         expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
       })
 
-      it('focuses on user select after error', () => {
+      it('focuses on user select after error', async () => {
         const {getByText, getByLabelText} = render(
           <DirectShareUserModal open={true} courseId="1" />,
         )
         fireEvent.click(getByText('Send'))
-        expect(getByLabelText(/send to:/i)).toHaveFocus()
+        await waitFor(() => {
+          expect(getByLabelText(/send to:/i)).toHaveFocus()
+        })
       })
     })
 

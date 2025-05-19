@@ -39,6 +39,19 @@ describe('PeopleSearchBar', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    // Ensure the screenreader message holder exists
+    const holder = document.createElement('div')
+    holder.id = screenreaderMessageHolderId
+    holder.setAttribute('role', 'alert')
+    document.body.appendChild(holder)
+  })
+
+  afterEach(() => {
+    // Clean up the screenreader message holder
+    const holder = document.getElementById(screenreaderMessageHolderId)
+    if (holder) {
+      holder.remove()
+    }
   })
 
   it('renders the search input with correct placeholder', () => {
@@ -82,17 +95,23 @@ describe('PeopleSearchBar', () => {
 
     it('shows message when no search results', () => {
       renderComponent({numberOfResults: 0})
-      expect(document.getElementById(screenreaderMessageHolderId)).toHaveTextContent('No people found')
+      expect(document.getElementById(screenreaderMessageHolderId)).toHaveTextContent(
+        'No people found',
+      )
     })
 
     it('shows message when one search result', () => {
       renderComponent({numberOfResults: 1})
-      expect(document.getElementById(screenreaderMessageHolderId)).toHaveTextContent('1 person found')
+      expect(document.getElementById(screenreaderMessageHolderId)).toHaveTextContent(
+        '1 person found',
+      )
     })
 
     it('shows pluralized message when more than one search result', () => {
       renderComponent({numberOfResults: 5})
-      expect(document.getElementById(screenreaderMessageHolderId)).toHaveTextContent('5 people found')
+      expect(document.getElementById(screenreaderMessageHolderId)).toHaveTextContent(
+        '5 people found',
+      )
     })
   })
 })
