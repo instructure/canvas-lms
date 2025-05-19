@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {LtiAssetReports, LtiAssetReportsProps, joinAttachmentsAndReports} from '../LtiAssetReports'
+import {LtiAssetReports, LtiAssetReportsProps} from '../LtiAssetReports'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReportsByProcessor} from 'features/speed_grader/jquery/speed_grader.d'
 import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportsByProcessor} from 'features/speed_grader/jquery/speed_grader.d'
 
 let lastMockReportId = 0
 
@@ -44,33 +44,30 @@ function makeMockReport(
 
 describe('LtiAssetReports', () => {
   let assetProcessors: ExistingAttachedAssetProcessor[] = []
-  let attachmentsAndReports: LtiAssetReportsProps['attachmentsAndReports'] = []
+  let versionedAttachments: {attachment: {id: string; display_name: string}}[] = []
+  let reportsByAttachment: Record<string, LtiAssetReportsByProcessor> = {}
   let firstRep: LtiAssetReport
 
   const setup = () => {
-    const props = {attachmentsAndReports, assetProcessors}
+    const props = {versionedAttachments, reportsByAttachment, assetProcessors}
     return render(<LtiAssetReports {...props} />)
   }
 
   beforeEach(() => {
-    attachmentsAndReports = [
-      {
-        attachmentName: 'file1.pdf',
-        reportsByProcessor: {
-          '123': [makeMockReport('file1-AP123-report1'), makeMockReport('file1-AP123-report2')],
-          '456': [makeMockReport('file1-AP456-report1')],
-        },
-      },
-      {
-        attachmentName: 'file2.pdf',
-        reportsByProcessor: {
-          '123': [makeMockReport('file2-AP123-report1')],
-        },
-      },
+    versionedAttachments = [
+      {attachment: {id: '20001', display_name: 'file1.pdf'}},
+      {attachment: {id: '20002', display_name: 'file2.pdf'}},
     ]
-
-    firstRep = attachmentsAndReports[0].reportsByProcessor['123'][0]
-
+    reportsByAttachment = {
+      '20001': {
+        '123': [makeMockReport('file1-AP123-report1'), makeMockReport('file1-AP123-report2')],
+        '456': [makeMockReport('file1-AP456-report1')],
+      },
+      '20002': {
+        '123': [makeMockReport('file2-AP123-report1')],
+      },
+    }
+    firstRep = reportsByAttachment['20001']['123'][0]
     assetProcessors = [
       {
         id: 123,
@@ -91,14 +88,14 @@ describe('LtiAssetReports', () => {
     ]
   })
 
-  it('shows a heading for each file', () => {
+  it('shows a heading for each file per AP', () => {
     const {getAllByText} = setup()
-    expect(getAllByText('file1.pdf')).toHaveLength(1)
+    expect(getAllByText('file1.pdf')).toHaveLength(2)
   })
 
-  it('shows a heading with tool title and AP title per AP and file', () => {
+  it('shows a heading per AP (with tool title and AP title)', () => {
     const {getAllByText} = setup()
-    expect(getAllByText('tool1000label · ap123title')).toHaveLength(2)
+    expect(getAllByText('tool1000label · ap123title')).toHaveLength(1)
     expect(getAllByText('tool1001label · ap456title')).toHaveLength(1)
   })
 
@@ -142,7 +139,7 @@ describe('LtiAssetReports', () => {
     ).toHaveLength(1)
   })
 
-  it("doesn't renders default info text if there is a comment", () => {
+  it("doesn't render default info text if there is a comment", () => {
     firstRep.processingProgress = 'Processing'
     const {queryByText} = setup()
     expect(
@@ -189,49 +186,12 @@ describe('LtiAssetReports', () => {
     const {getAllByText} = setup()
     expect(getAllByText('There is no processing occurring by the tool.')).toHaveLength(1)
   })
-})
 
-describe('joinAttachmentsAndReports', () => {
-  const mockReports: Record<string, LtiAssetReportsByProcessor> = {
-    '1001': {'123': [makeMockReport('report1')], '345': [makeMockReport('report2')]},
-    '1002': {'123': [makeMockReport('report3')]},
-  }
-
-  it('returns undefined if versionedAttachments is undefined', () => {
-    expect(joinAttachmentsAndReports(undefined, mockReports)).toBeUndefined()
-  })
-
-  it('returns undefined if reportsByAttachment is undefined', () => {
-    const versionedAttachments = [{attachment: {id: '1', display_name: 'test.pdf'}}]
-    expect(joinAttachmentsAndReports(versionedAttachments, undefined)).toBeUndefined()
-  })
-
-  it('returns undefined if there are no matching reports', () => {
-    const versionedAttachments = [{attachment: {id: '2', display_name: 'test.pdf'}}]
-    expect(joinAttachmentsAndReports(versionedAttachments, mockReports)).toBeUndefined()
-  })
-
-  it('joins attachments with their reports', () => {
-    const versionedAttachments = [
-      {attachment: {id: '1001', display_name: 'test.pdf'}},
-      {attachment: {id: '1002', display_name: 'test2.pdf'}},
-    ]
-    const result = joinAttachmentsAndReports(versionedAttachments, mockReports)
-
-    expect(result).toEqual([
-      {
-        attachmentName: 'test.pdf',
-        reportsByProcessor: {
-          '123': [expect.objectContaining({title: 'report1'})],
-          '345': [expect.objectContaining({title: 'report2'})],
-        },
-      },
-      {
-        attachmentName: 'test2.pdf',
-        reportsByProcessor: {
-          '123': [expect.objectContaining({title: 'report3'})],
-        },
-      },
-    ])
+  it('renders a "no reports" message if there is no report for an (attachment, AP) combo', () => {
+    const {getAllByText} = setup()
+    // AP 123 has no reports for attachment 20002
+    expect(
+      getAllByText('The document processor has not returned any reports for this file.'),
+    ).toHaveLength(1)
   })
 })

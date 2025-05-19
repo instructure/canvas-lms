@@ -628,13 +628,12 @@ module SpeedGrader
       return unless assignment.root_account.feature_enabled?(:lti_asset_processor)
 
       submission_ids = response_hash["submissions"].pluck("id")
-      Lti::AssetReport.info_for_display_by_submission(submission_ids:) =>
-        {asset_processor_ids:, reports_by_submission:}
+      reports_by_submission = Lti::AssetReport.info_for_display_by_submission(submission_ids:)
 
       return unless reports_by_submission.present?
 
       response_hash[:lti_asset_processors] =
-        Lti::AssetProcessor.where(id: asset_processor_ids).info_for_display
+        Lti::AssetProcessor.where(assignment:).info_for_display
       response_hash["submissions"].each do |sub|
         reports = reports_by_submission[sub["id"]]
         sub[:lti_asset_reports] = reports if reports
