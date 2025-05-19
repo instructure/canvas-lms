@@ -17,8 +17,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "spec_helper"
+require_relative "../../app/services/auto_grade_orchestration_service"
 
-RSpec.describe AutoGradeService do
+RSpec.describe GradeService do
   let(:assignment_text) { "Write an essay about your summer vacation" }
   let(:essay) { "I went to the beach and had a great time..." }
   let(:root_account_uuid) { "mock-root-uuid" }
