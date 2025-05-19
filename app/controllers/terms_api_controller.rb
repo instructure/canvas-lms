@@ -97,6 +97,9 @@ class TermsApiController < ApplicationController
 
   before_action :require_context, :require_root_account, :require_account_access
 
+  include HorizonMode
+  before_action :load_canvas_career, only: [:index]
+
   include Api::V1::EnrollmentTerm
 
   # @API List enrollment terms

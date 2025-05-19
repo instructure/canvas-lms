@@ -27,6 +27,9 @@ class BrandConfigsController < ApplicationController
   before_action :require_account_branding, except: [:destroy]
   before_action { |c| c.active_tab = "brand_configs" }
 
+  include HorizonMode
+  before_action :load_canvas_career, only: [:index]
+
   def index
     add_crumb t("Themes")
     @page_title = join_title(t("Themes"), @account.name)

@@ -231,6 +231,9 @@ class AuthenticationProvidersController < ApplicationController
   before_action :require_user, only: :show
   include Api::V1::AuthenticationProvider
 
+  include HorizonMode
+  before_action :load_canvas_career, only: [:index]
+
   # @API List authentication providers
   # Returns a paginated list of authentication providers
   #
