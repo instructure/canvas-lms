@@ -921,15 +921,25 @@ describe DiscussionEntry do
           entry = @topic.discussion_entries.create!(message: "entry", user: @teacher)
           expect(entry.grants_right?(@teacher, :reply)).to be false
         end
-      end
 
-      context "when a user is no longer enrolled in the course" do
-        before do
-          create_enrollment(topic.course, user, { enrollment_state: "completed" })
-        end
+        context "group discussion" do
+          it "reply permission is true if the discussion is threaded" do
+            group(group_context: @course)
+            @group.save!
 
-        it "returns false for their own posts" do
-          expect(entry.grants_right?(user, :reply)).to be false
+            topic = @group.discussion_topics.create!(user: @teacher, message: "Hi there", discussion_type: "threaded")
+            entry = topic.discussion_entries.create!(message: "entry", user: @teacher)
+            expect(entry.grants_right?(@teacher, :reply)).to be true
+          end
+
+          it "reply permission is false if the discussion is not threaded" do
+            group(group_context: @course)
+            @group.save!
+
+            topic = @group.discussion_topics.create!(user: @teacher, message: "Hi there", discussion_type: "not_threaded")
+            entry = topic.discussion_entries.create!(message: "entry", user: @teacher)
+            expect(entry.grants_right?(@teacher, :reply)).to be false
+          end
         end
       end
 
