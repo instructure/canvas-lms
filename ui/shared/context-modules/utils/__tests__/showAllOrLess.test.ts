@@ -17,10 +17,12 @@
  */
 
 import {DEFAULT_PAGE_SIZE} from '../types'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {
   addShowAllOrLess,
   shouldShowAllOrLess,
   itemCount,
+  hasAllItemsInTheDOM,
   isModuleCurrentPageEmpty,
   isModuleCollapsed,
   isModulePaginated,
@@ -85,10 +87,14 @@ const makeModule = (options: MakeModuleOptions = {}): HTMLElement => {
 
 describe('showAllOrLess', () => {
   beforeEach(() => {
-    ENV.IS_STUDENT = false
+    fakeENV.setup({
+      IS_STUDENT: false,
+      FEATURE_MODULES_PERF: true,
+    })
   })
   afterEach(() => {
     document.body.innerHTML = ''
+    fakeENV.teardown()
   })
 
   describe('isModuleCurrentPageEmpty', () => {
@@ -146,6 +152,26 @@ describe('showAllOrLess', () => {
     it('should return false if the module is not collapsed', () => {
       const module = document.createElement('div')
       expect(isModuleCollapsed(module)).toBe(false)
+    })
+  })
+
+  describe('hasAllItemsInTheDOM', () => {
+    it('should return false if the module is paginated', () => {
+      const module = document.createElement('div')
+      module.setAttribute('data-module-id', '1')
+      module.dataset.loadstate = 'paginated'
+      expect(hasAllItemsInTheDOM(module)).toBe(false)
+    })
+
+    it('should return false if the module is collapsed', () => {
+      const module = document.createElement('div')
+      module.classList.add('collapsed_module')
+      expect(hasAllItemsInTheDOM(module)).toBe(false)
+    })
+
+    it('should return true if the module is not collapsed and not paginated', () => {
+      const module = document.createElement('div')
+      expect(hasAllItemsInTheDOM(module)).toBe(true)
     })
   })
 

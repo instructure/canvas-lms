@@ -31,6 +31,10 @@ function moduleFromId(moduleId: string | number): HTMLElement {
   return document.querySelector(`#context_module_${moduleId}`) as HTMLElement
 }
 
+function hasAllItemsInTheDOM(module: HTMLElement) {
+  return !(ENV.FEATURE_MODULES_PERF && (isModuleCollapsed(module) || isModulePaginated(module)))
+}
+
 function isModuleLoading(module: HTMLElement) {
   return module.dataset.loadstate === 'loading'
 }
@@ -143,13 +147,13 @@ function handleShowAllOrLessClick(event: Event) {
   }
 }
 
-function maybeExpandAndLoadAll(moduleId: ModuleId) {
+function maybeExpandAndLoadAll(moduleId: ModuleId, forceLoadAll = false) {
   const module = moduleFromId(moduleId)
   if (!module) return
 
   if (isModuleCollapsed(module)) {
     expandModuleAndLoadAll(moduleId)
-  } else if (isModulePaginated(module)) {
+  } else if (isModulePaginated(module) || itemCount(module) === 0 || forceLoadAll) {
     loadAll(moduleId)
   }
 }
@@ -206,6 +210,7 @@ export {
   addShowAllOrLess,
   shouldShowAllOrLess,
   itemCount,
+  hasAllItemsInTheDOM,
   isModuleCurrentPageEmpty,
   isModuleCollapsed,
   isModulePaginated,
