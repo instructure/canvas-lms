@@ -163,20 +163,16 @@ class Lti::AssetReport < ApplicationRecord
   end
 
   # Returns all reports for the given asset processor and submission IDs.
-  # Returns hash with:
-  #   asset_processors_ids: array of ids
-  #   reports_by_submission: hash of form
-  #     {
-  #       submission_id => {
-  #         by_attachment: {
-  #           attachment_id => {
-  #             lti_asset_processor_id => [
-  #               { id: report1.id, title: report1.title, ... },
-  #               { id: report2.id, title: report2.title, ... },
-  #             ],
+  # Returns reports by submission, hash of form:
+  #   submission_id => {
+  #     by_attachment: {
+  #       attachment_id => {
+  #         lti_asset_processor_id => [
+  #           { id: report1.id, title: report1.title, ... },
+  #           { id: report2.id, title: report2.title, ... },
+  #         ],
   # ...
   def self.info_for_display_by_submission(submission_ids:)
-    asset_processor_ids = Set.new
     reports_by_submission = {}
 
     if submission_ids.present?
@@ -189,8 +185,6 @@ class Lti::AssetReport < ApplicationRecord
         .select("lti_asset_reports.*, lti_assets.submission_id as asset_sub_id, lti_assets.attachment_id as asset_att_id")
 
       scope.find_each do |report|
-        asset_processor_ids << report.lti_asset_processor_id
-
         sub_reports = (reports_by_submission[report.asset_sub_id] ||= {})
 
         if report.asset_att_id
@@ -203,6 +197,6 @@ class Lti::AssetReport < ApplicationRecord
       end
     end
 
-    { reports_by_submission:, asset_processor_ids: asset_processor_ids.to_a }
+    reports_by_submission
   end
 end

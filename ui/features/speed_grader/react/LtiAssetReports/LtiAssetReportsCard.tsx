@@ -120,6 +120,28 @@ const resubmit = async function (url: string) {
 }
 /* END Resubmit stuff will be moved soon */
 
+export function LtiAssetReportsMissingReportsCard() {
+  return (
+    <View
+      as="div"
+      borderColor="primary"
+      borderRadius="medium"
+      borderWidth="small"
+      padding="small"
+      aria-label={t('No reports from Document Processing App')}
+    >
+      <Flex direction="column" gap="xx-small">
+        <Flex.Item>
+          <Text as="div" size="small">
+            <IconInfoSolid inline={true} style={{paddingRight: '0.3em'}} />
+            {t('The document processor has not returned any reports for this file.')}
+          </Text>
+        </Flex.Item>
+      </Flex>
+    </View>
+  )
+}
+
 export function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
   const {comment, infoText} = reportCommentAndInfoText(report)
 

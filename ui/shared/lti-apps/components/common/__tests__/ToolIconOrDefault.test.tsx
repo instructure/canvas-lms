@@ -21,26 +21,23 @@ import '@testing-library/jest-dom/extend-expect'
 import {ToolIconOrDefault} from '../ToolIconOrDefault'
 
 describe('ToolIConOrDefault', () => {
-  const toolName = 'toolName'
+  const toolName = 'tool&Name'
   const toolId = 1
-  const defaultIconUrlRegex = /\/lti\/tool_default_icon\?id=1&name=toolName$/
+  const defaultIconUrlRegex = /\/lti\/tool_default_icon\?id=1&name=tool%26Name$/
   const baseProps = {toolName, toolId, size: 32, margin: 1, marginRight: 2}
 
   function renderGetImg(el: React.ReactElement) {
     const {getByAltText} = render(el)
-    return getByAltText(toolName) as HTMLImageElement 
+    return getByAltText(toolName) as HTMLImageElement
   }
 
   it('renders the icon url with the given size, margin, and marginRight', () => {
     const img = renderGetImg(
-      <ToolIconOrDefault
-        iconUrl={'http://instructure.com/iconurl'}
-        {...baseProps}
-      />
+      <ToolIconOrDefault iconUrl={'http://instructure.com/iconurl'} {...baseProps} />,
     )
     expect(img.src).toBe('http://instructure.com/iconurl')
-    expect(img.style.width).toBe("32px")
-    expect(img.style.height).toBe("32px")
+    expect(img.style.width).toBe('32px')
+    expect(img.style.height).toBe('32px')
     expect(img.style.margin).toBe('1px 2px 1px 1px')
   })
 

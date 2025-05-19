@@ -25,13 +25,19 @@ type ToolIconUrlOrDefaultProps = {
   // requires margin to not have the border clippped,
   // But the Apps page usage isn't treating margin="0 12 0 0"
   // the same as marginRight=12
-  margin?: string | number,
+  margin?: string | number
   marginRight?: string | number
 }
 
-export const ToolIconOrDefault = (
-  {iconUrl, toolId, toolName, size, margin, marginRight}: ToolIconUrlOrDefaultProps
-) => {
+export const ToolIconOrDefault = ({
+  iconUrl,
+  toolId,
+  toolName,
+  size,
+  margin,
+  marginRight,
+}: ToolIconUrlOrDefaultProps) => {
+  const defaultIconUrl = `/lti/tool_default_icon?id=${toolId}&name=${encodeURIComponent(toolName)}`
   if (iconUrl) {
     return (
       <img
@@ -45,7 +51,9 @@ export const ToolIconOrDefault = (
           border: '0.75px solid #E8EAEC',
         }}
         src={iconUrl}
-        onError={e => { (e.target as HTMLImageElement).src = `/lti/tool_default_icon?id=${toolId}&name=${toolName}`}}
+        onError={e => {
+          ;(e.target as HTMLImageElement).src = defaultIconUrl
+        }}
       />
     )
   } else {
@@ -53,7 +61,7 @@ export const ToolIconOrDefault = (
       <img
         alt={toolName}
         style={{height: size, width: size, margin, marginRight}}
-        src={`/lti/tool_default_icon?id=${toolId}&name=${toolName}`}
+        src={defaultIconUrl}
       />
     )
   }

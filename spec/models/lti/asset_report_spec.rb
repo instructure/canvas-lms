@@ -147,22 +147,16 @@ RSpec.describe Lti::AssetReport do
     let(:rep2aIi) { lti_asset_report_model(asset: asset2a, asset_processor: processorI) }
     let(:rep2aIIi) { lti_asset_report_model(asset: asset2a, asset_processor: processorII) }
 
-    let(:by_submission) { subject[:reports_by_submission] }
-
-    it "includes the asset processor ID in the asset_processor_ids set" do
-      expect(subject[:asset_processor_ids]).to match_array([processorI.id, processorII.id])
-    end
-
     it "organizes reports by submission and attachment" do
-      expect(by_submission.keys).to match_array([sub1.id, sub2.id])
-      expect(by_submission[sub1.id]).to \
+      expect(subject.keys).to match_array([sub1.id, sub2.id])
+      expect(subject[sub1.id]).to \
         match({
                 by_attachment: {
                   att1a.id => { processorI.id => an_instance_of(Array) },
                   att1b.id => { processorI.id => an_instance_of(Array) },
                 }
               })
-      expect(by_submission[sub2.id]).to \
+      expect(subject[sub2.id]).to \
         match({
                 by_attachment: {
                   att2a.id => {
@@ -172,8 +166,8 @@ RSpec.describe Lti::AssetReport do
                 }
               })
 
-      sub1_reports = by_submission[sub1.id][:by_attachment]
-      sub2_reports = by_submission[sub2.id][:by_attachment]
+      sub1_reports = subject[sub1.id][:by_attachment]
+      sub2_reports = subject[sub2.id][:by_attachment]
 
       expect(sub1_reports[att1a.id][processorI.id].map { _1[:id] }).to \
         match_array([rep1aIi.id, rep1aIii.id])
@@ -186,7 +180,7 @@ RSpec.describe Lti::AssetReport do
     end
 
     it "includes report details in the result" do
-      r = by_submission[sub1.id][:by_attachment][att1a.id][processorI.id].find do |r|
+      r = subject[sub1.id][:by_attachment][att1a.id][processorI.id].find do |r|
         r[:id] == rep1aIi.id
       end
       expect(r).to eq(rep1aIi.info_for_display)
@@ -195,9 +189,8 @@ RSpec.describe Lti::AssetReport do
     context "when some reports are deleted" do
       before { rep2aIIi.destroy! }
 
-      it "does not include the reports or their processor ids" do
-        expect(subject[:asset_processor_ids]).not_to include(processorII.id)
-        expect(subject[:reports_by_submission][sub2.id][:by_attachment][att2a.id].keys).not_to \
+      it "does not include the reports" do
+        expect(subject[sub2.id][:by_attachment][att2a.id].keys).not_to \
           include(processorII.id)
       end
     end
@@ -205,9 +198,8 @@ RSpec.describe Lti::AssetReport do
     context "when a processor is deleted" do
       before { processorII.destroy! }
 
-      it "does not include the reports or their processor ids" do
-        expect(subject[:asset_processor_ids]).not_to include(processorII.id)
-        expect(subject[:reports_by_submission][sub2.id][:by_attachment][att2a.id].keys).not_to \
+      it "does not include the reports" do
+        expect(subject[sub2.id][:by_attachment][att2a.id].keys).not_to \
           include(processorII.id)
       end
     end
@@ -215,16 +207,14 @@ RSpec.describe Lti::AssetReport do
     it "returns empty results when no matching reports exist" do
       rep1aIi
       result = Lti::AssetReport.info_for_display_by_submission(submission_ids: Submission.last.id + 1)
-      expect(result[:asset_processor_ids]).to be_empty
-      expect(result[:reports_by_submission]).to be_empty
+      expect(result).to be_empty
     end
 
     context "when submission_ids is nil" do
       it "returns empty results" do
         rep1aIi
         result = Lti::AssetReport.info_for_display_by_submission(submission_ids: nil)
-        expect(result[:asset_processor_ids]).to be_empty
-        expect(result[:reports_by_submission]).to be_empty
+        expect(result).to be_empty
       end
     end
 
@@ -232,8 +222,7 @@ RSpec.describe Lti::AssetReport do
       it "returns empty results" do
         rep1aIi
         result = Lti::AssetReport.info_for_display_by_submission(submission_ids: [])
-        expect(result[:asset_processor_ids]).to be_empty
-        expect(result[:reports_by_submission]).to be_empty
+        expect(result).to be_empty
       end
     end
   end
