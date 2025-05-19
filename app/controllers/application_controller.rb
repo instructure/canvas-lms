@@ -456,6 +456,7 @@ class ApplicationController < ActionController::Base
     course_pace_weighted_assignments
     modules_requirements_allow_percentage
     course_pace_allow_bulk_pace_assign
+    lti_apps_page_ai_translation
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[

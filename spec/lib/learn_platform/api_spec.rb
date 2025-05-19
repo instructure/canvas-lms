@@ -244,4 +244,60 @@ describe LearnPlatform::Api do
       expect(response.size).to eq 0
     end
   end
+
+  describe "translate_lang parameter" do
+    let(:ok_response) do
+      double(body: { tools: [{ id: 1, name: "First Tool" }] }.to_json, code: 200)
+    end
+
+    it "passes translate_lang param to products API call" do
+      expect(CanvasHttp).to receive(:get) do |url|
+        params = uri_params(url)
+        expect(params["translate_lang"]).to eq("es")
+        ok_response
+      end
+      api.products({ translate_lang: :es })
+    end
+
+    it "does not include translate_lang param if not present" do
+      expect(CanvasHttp).to receive(:get) do |url|
+        params = uri_params(url)
+        expect(params).not_to have_key("translate_lang")
+        ok_response
+      end
+      api.products({})
+    end
+
+    it "passes translate_lang param to products_by_category API call" do
+      expect(CanvasHttp).to receive(:get) do |url|
+        params = uri_params(url)
+        expect(params["translate_lang"]).to eq("fr")
+        ok_response
+      end
+      api.products_by_category({ translate_lang: :fr })
+    end
+
+    it "passes translate_lang param to product_filters API call" do
+      expect(CanvasHttp).to receive(:get) do |url|
+        params = uri_params(url)
+        expect(params["translate_lang"]).to eq("de")
+        ok_response
+      end
+      api.product_filters({ translate_lang: :de })
+    end
+
+    it "passes translate_lang param to product API call" do
+      expect(CanvasHttp).to receive(:get) do |url|
+        params = uri_params(url)
+        expect(params["translate_lang"]).to eq("it")
+        ok_response
+      end
+      api.product(1, { translate_lang: :it })
+    end
+  end
+
+  def uri_params(url)
+    uri = URI.parse(url)
+    Rack::Utils.parse_query(uri.query)
+  end
 end
