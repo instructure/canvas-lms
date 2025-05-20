@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "The first heading on a page should be an H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "The following content is partner provided"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "The material is in the public domain"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "The preceding content is partner provided"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "The pretty html editor is not keyboard accessible. Press Shift O to open the raw HTML editor."

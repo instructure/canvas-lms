@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "किसी पेज पर पहली हेडिंग H2 होनी चाहिए।"
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "निम्नलिखित सामग्री भागीदार द्वारा प्रदान की गई है"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "यह सामग्री सार्वजनिक डोमेन में है"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "सामग्री अपवाद के अधीन है - उदाहरण के लिए, उचित उपयोग, उद्धरण का अधिकार, या लागू कॉपीराइट कानूनों के तहत अन्य"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "पूर्ववर्ती सामग्री भागीदार द्वारा प्रदान की गई है"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "सुंदर HTML संपादक में कुंजीपटल इस्तेमाल नहीं किया जा सकता। Shift O दबा कर रॉ HTML संपादक खोलें।"

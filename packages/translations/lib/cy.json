@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Dylai’r pennawd cyntaf ar dudalen fod yn H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Mae’r cynnwys canlynol yn cael ei ddarparu gan bartner"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Mae’r deunydd yn y parth cyhoeddus"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Mae eithriad yn berthnasol i’r deunydd - e.e. defnydd teg, yr hawl i ddyfynnu, neu eraill o dan gyfreithiau hawlfraint perthnasol"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Mae’r cynnwys blaenorol yn cael ei ddarparu gan bartner"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Dydy’r golygydd html hardd ddim ar gael drwy fysellfwrdd. Pwyswch Shift-O i agor y golygydd html crai."

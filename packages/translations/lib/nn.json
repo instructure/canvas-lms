@@ -2198,9 +2198,6 @@
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Førehandsvisinga av dokumentet blir behandla no. Prøv på nytt seinare."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Følgande innhald er lagt til av partnar"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Materialet er ikkje opphavsrettbeskytta"
     },
@@ -2209,9 +2206,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Materialet er brukt i samsvar med sitatretten"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Det føregåande innhaldet er lagt til av partnar"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "I den pene HTML-editoren kan du ikkje redigere med tastatur. Trykk Shift-O for å opne den reine HTML-editoren."

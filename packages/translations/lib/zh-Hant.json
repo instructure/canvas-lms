@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "頁面的第一個標題應該是 H2。"
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "以下內容由合作夥伴提供"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "該材料位於公用網域中。"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "可能有適用於此資料的例外情況 - 如：合理使用、引用權，或適用版權法下的其他情況"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "上述內容由合作夥伴提供"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "美觀 HTML 編輯器無法用鍵盤存取。按 ShiftO 開啟原始 HTML 編輯器。"
