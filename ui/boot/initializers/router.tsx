@@ -72,6 +72,10 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/wiki_page_show/index')}
       />
       <Route
+        path="/accounts/:accountId/grading_standards"
+        lazy={() => import('../../features/account_grading_standards/index')}
+      />
+      <Route
         path="/accounts/site_admin/release_notes"
         lazy={() => import('../../features/release_notes_edit/react/ReleaseNotesEditRoute')}
       />
