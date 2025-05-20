@@ -331,7 +331,7 @@ customizable_default_due_time:
 platform_service_speedgrader:
   state: hidden
   applies_to: Course
-  display_name: Modernized SpeedGrader Platform
+  display_name: Performance and Usability Upgrades for SpeedGrader
   description: This feature provides a new SpeedGrader platform experience with a focus on improved performance for large courses.
   after_state_change_proc: log_modernized_speedgrader_metrics
   environments:
