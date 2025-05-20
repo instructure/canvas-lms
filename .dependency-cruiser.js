@@ -268,7 +268,6 @@ module.exports = {
           'ui/shared/proxy-submission/react/ProxyUploadModal.tsx',
           'ui/shared/global/env/EnvCoursePaces.d.ts',
           'ui/shared/global/env/EnvCourse.d.ts',
-          'ui/shared/discussions/react/components/AnonymousAvatar/AnonymousAvatar.stories.jsx',
         ],
       },
       to: {
