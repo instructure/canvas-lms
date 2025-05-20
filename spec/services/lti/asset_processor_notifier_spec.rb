@@ -133,5 +133,43 @@ describe Lti::AssetProcessorNotifier do
       asset_filenames = builder_params[:assets].map { _1[:filename] }
       expect(asset_filenames).to eq([attachment.display_name])
     end
+
+    context "when the submission is a text entry" do
+      before do
+        lti_asset_processor_model(tool:, assignment:)
+        allow(Lti::PlatformNotificationService).to receive(:notify_tools)
+        allow(Rails.application.routes.url_helpers).to receive(:lti_asset_processor_asset_show_url).and_return("http://example.com")
+      end
+
+      it "creates Lti::Asset for text entry submission" do
+        submission = assignment.submit_homework(student, body: "Hello world")
+        expect(Lti::Asset.where(submission:).active.count).to eq(1)
+        expect(Lti::Asset.first.text_entry?).to be true
+      end
+
+      it "calculates the SHA256 checksum for text entry" do
+        assignment.submit_homework(student, body: "Hello world")
+        asset = Lti::Asset.first
+        asset.calculate_sha256_checksum!
+        expect(asset.sha256_checksum).to eq("ZOyIygCyaOW6GjVnihtTFtIS9PNmskdyMlNKiuyjfzw=")
+      end
+
+      it "sends correct notice content for text entry asset" do
+        received_notifications = []
+        allow(Lti::PlatformNotificationService).to receive(:notify_tools) do |payload|
+          received_notifications << payload
+        end
+        assignment.submit_homework(student, body: "Hello world")
+        expect(Lti::PlatformNotificationService).to have_received(:notify_tools)
+        notice_params = received_notifications.first
+        builder_params = notice_params[:builders].first.instance_variable_get(:@params)
+        asset = builder_params[:assets].first
+        expect(asset[:filename]).to be_nil
+        expect(asset[:title]).to eq(assignment.title)
+        expect(asset[:sha256_checksum]).to eq("ZOyIygCyaOW6GjVnihtTFtIS9PNmskdyMlNKiuyjfzw=")
+        expect(asset[:content_type]).to eq("text/html")
+        expect(asset[:size]).to eq("Hello world".bytesize)
+      end
+    end
   end
 end

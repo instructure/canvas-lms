@@ -1025,6 +1025,14 @@ class Submission < ActiveRecord::Base
     turnitin_data.any? { |_, v| v.is_a?(Hash) && v.key?(:outcome_response) }
   end
 
+  def text_entry_submission?
+    submission_type == "online_text_entry" && body.present?
+  end
+
+  def asset_processor_compatible?
+    (submission_type == "online_upload" || text_entry_submission?) && root_account.feature_enabled?(:lti_asset_processor)
+  end
+
   # VeriCite
 
   # this function will check if the score needs to be updated and update/save the new score if so,
@@ -1636,6 +1644,13 @@ class Submission < ActiveRecord::Base
 
     submission = submission_history.find { |sub| sub.attempt == attempt }
     submission&.submission_type
+  end
+
+  def body_for_attempt(attempt)
+    return body if attempt == self.attempt
+
+    submission = submission_history.find { |sub| sub.attempt == attempt }
+    submission&.body
   end
 
   def submission_history(include_version: false)

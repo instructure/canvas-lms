@@ -1327,7 +1327,8 @@ module Api::V1::Assignment
   end
 
   def asset_processor_capable?(submission_types:)
-    submission_types.presence&.include?("online_upload")
+    submission_types.presence&.include?("online_upload") ||
+      submission_types.presence&.include?("online_text_entry")
   end
 
   def submissions_download_url(context, assignment)
