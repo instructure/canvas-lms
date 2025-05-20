@@ -61,4 +61,20 @@ describe "context modules", :ignore_js_errors do
     # module should be expanded
     expect(module_item_title).to be_displayed
   end
+
+  context "course home page" do
+    before do
+      @course.default_view = "modules"
+      @course.save
+
+      @course.root_account.enable_feature!(:modules_page_rewrite_student_view)
+    end
+
+    it "shows the new modules" do
+      visit_course(@course)
+      wait_for_ajaximations
+
+      expect(f('[data-testid="modules-rewrite-student-container"]')).to be_displayed
+    end
+  end
 end
