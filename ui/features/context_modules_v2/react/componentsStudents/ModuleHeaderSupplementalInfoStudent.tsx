@@ -16,47 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {CompletionRequirement, ModuleProgression} from '../utils/types.d'
-import {useModuleItemsStudent} from '../hooks/queriesStudent/useModuleItemsStudent'
+import {CompletionRequirement, ModuleStatistics} from '../utils/types.d'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_v2')
 
 type Props = {
-  moduleId: string
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
-  progression?: ModuleProgression
+  statistics?: ModuleStatistics
 }
 
 export const ModuleHeaderSupplementalInfoStudent: React.FC<Props> = ({
-  moduleId,
   completionRequirements = [],
   requirementCount,
-  progression,
+  statistics,
 }) => {
-  const {data: moduleItemData} = useModuleItemsStudent(moduleId)
-  const {dueDate, missingCount} = useMemo(() => {
-    const availableDueDates = moduleItemData?.moduleItems?.filter(
-      item => item?.content?.submissionsConnection?.nodes?.[0]?.cachedDueDate,
-    )
-    const dueDate = availableDueDates?.reduce((max, item) => {
-      const dueDate = item?.content?.submissionsConnection?.nodes?.[0]?.cachedDueDate
-      return dueDate ? new Date(dueDate) : max
-    }, new Date(0))
-    const missingCount =
-      moduleItemData?.moduleItems?.filter(
-        item =>
-          item?.content?.submissionsConnection?.nodes?.[0]?.cachedDueDate &&
-          new Date(item?.content?.submissionsConnection?.nodes?.[0]?.cachedDueDate) < new Date() &&
-          !progression?.requirementsMet?.some(req => req.id === item?._id),
-      ).length || 0
-    return {dueDate, missingCount}
-  }, [moduleItemData, progression])
+  // Get due date and overdue count from the statistics object
+  const dueDate = statistics?.latestDueAt ? new Date(statistics.latestDueAt) : null
+  const missingCount = statistics?.overdueAssignmentCount || 0
 
   // Ensure we only proceed if completionRequirements exists
   const hasCompletionRequirements = completionRequirements && completionRequirements.length > 0
@@ -65,10 +47,8 @@ export const ModuleHeaderSupplementalInfoStudent: React.FC<Props> = ({
     <View as="div" margin="0 0 0">
       <Flex wrap="wrap">
         <Flex.Item>
-          {dueDate && dueDate.getTime() > 0 && (
-            <Text size="x-small">Due: {dueDate.toDateString()}</Text>
-          )}
-          {dueDate && dueDate.getTime() > 0 && (missingCount || hasCompletionRequirements) && (
+          {dueDate && <Text size="x-small">Due: {dueDate.toDateString()}</Text>}
+          {dueDate && (missingCount > 0 || hasCompletionRequirements) && (
             <Text size="x-small"> | </Text>
           )}
           {missingCount > 0 && (

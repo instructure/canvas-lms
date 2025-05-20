@@ -137,6 +137,11 @@ export interface Prerequisite {
   name: string
 }
 
+export interface ModuleStatistics {
+  latestDueAt: string | null
+  overdueAssignmentCount: number
+}
+
 export interface Module {
   id: string
   _id: string
@@ -151,6 +156,7 @@ export interface Module {
   moduleItems: ModuleItem[]
   progression?: ModuleProgression
   hasActiveOverrides: boolean
+  statistics?: ModuleStatistics
 }
 
 export interface ModulesResponse {
