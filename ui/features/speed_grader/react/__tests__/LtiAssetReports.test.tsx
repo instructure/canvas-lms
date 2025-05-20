@@ -17,18 +17,32 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import {LtiAssetReports, LtiAssetReportsProps} from '../LtiAssetReports'
+import {render, waitFor} from '@testing-library/react'
+import {LtiAssetReports} from '../LtiAssetReports'
+import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
 import {LtiAssetReportsByProcessor} from 'features/speed_grader/jquery/speed_grader.d'
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashSuccess: jest.fn(),
+  showFlashError: jest.fn(),
+}))
+
+jest.mock('@canvas/do-fetch-api-effect')
+beforeEach(() => {
+  // @ts-expect-error
+  doFetchApi.mockClear()
+  // @ts-expect-error
+  showFlashSuccess.mockClear()
+  // @ts-expect-error
+  showFlashError.mockClear()
+})
+
 let lastMockReportId = 0
 
-function makeMockReport(
-  title: string,
-  overrides: Partial<ExistingAttachedAssetProcessor> = {},
-): LtiAssetReport {
+function makeMockReport(title: string, overrides: Partial<LtiAssetReport> = {}): LtiAssetReport {
   const id = lastMockReportId++
   return {
     id,
@@ -38,6 +52,7 @@ function makeMockReport(
     priority: 1,
     launchUrlPath: `/launch/report/${id}`,
     comment: `comment for ${title}`,
+    resubmitAvailable: false,
     ...overrides,
   }
 }
@@ -49,7 +64,9 @@ describe('LtiAssetReports', () => {
   let firstRep: LtiAssetReport
 
   const setup = () => {
-    const props = {versionedAttachments, reportsByAttachment, assetProcessors}
+    const attempt = 1
+    const studentId = '101'
+    const props = {versionedAttachments, reportsByAttachment, assetProcessors, attempt, studentId}
     return render(<LtiAssetReports {...props} />)
   }
 
@@ -187,11 +204,62 @@ describe('LtiAssetReports', () => {
     expect(getAllByText('There is no processing occurring by the tool.')).toHaveLength(1)
   })
 
-  it('renders a "no reports" message if there is no report for an (attachment, AP) combo', () => {
-    const {getAllByText} = setup()
-    // AP 123 has no reports for attachment 20002
-    expect(
-      getAllByText('The document processor has not returned any reports for this file.'),
-    ).toHaveLength(1)
+  describe('when there is no report for an (attachment, AP) combo', () => {
+    it('renders a "no reports" message', () => {
+      const {getAllByText} = setup()
+      // AP 123 has no reports for attachment 20002
+      expect(
+        getAllByText('The document processor has not returned any reports for this file.'),
+      ).toHaveLength(1)
+    })
+  })
+
+  describe('resubmit button', () => {
+    it('allows resubmit if there are missing reports', async () => {
+      const {getAllByText} = setup()
+      const resubmitButtons = getAllByText('Resubmit All Files')
+
+      // AP 456 has a missing report for attachment 20002
+      expect(resubmitButtons).toHaveLength(1)
+
+      // @ts-expect-error
+      doFetchApi.mockResolvedValue({status: 204})
+
+      resubmitButtons[0].click()
+
+      await waitFor(() => {
+        expect(doFetchApi).toHaveBeenCalledWith({
+          method: 'POST',
+          path: '/api/lti/asset_processors/456/notices/101/attempts/1',
+        })
+      })
+
+      await waitFor(() => {
+        expect(showFlashSuccess).toHaveBeenCalledWith('Resubmitted to Document Processing App')
+      })
+    })
+
+    it('does not show resubmit button if there are no resubmittable/missing reports', () => {
+      // Now AP 456 cannot be resubmitted as it has all reports
+      reportsByAttachment['20002']['456'] = [makeMockReport('file2-AP456-report1')]
+      const {queryByText} = setup()
+      expect(queryByText('Resubmit All Files')).not.toBeInTheDocument()
+    })
+
+    it('shows resubmit button if there is at least one resubmittable report', () => {
+      const badreport = makeMockReport('file2-AP456-report1', {resubmitAvailable: true})
+      reportsByAttachment['20002']['456'] = [badreport]
+      const {getAllByText} = setup()
+      const resubmitButtons = getAllByText('Resubmit All Files')
+      expect(resubmitButtons).toHaveLength(1)
+    })
+
+    it('shows a resubmit button per AP', () => {
+      const badreport = makeMockReport('file2-AP123-report1', {resubmitAvailable: true})
+      reportsByAttachment['20002']['123'] = [badreport]
+      const {getAllByText} = setup()
+      const resubmitButtons = getAllByText('Resubmit All Files')
+      expect(resubmitButtons).toHaveLength(2)
+    })
   })
 })

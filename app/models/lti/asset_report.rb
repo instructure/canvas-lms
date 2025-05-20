@@ -128,7 +128,7 @@ class Lti::AssetReport < ApplicationRecord
       processingProgress: processing_progress,
       priority:,
       launchUrlPath: launch_url_path,
-      resubmitUrlPath: resubmit_url_path,
+      resubmitAvailable: resubmit_available?,
     }.compact
   end
 
@@ -138,15 +138,6 @@ class Lti::AssetReport < ApplicationRecord
     Rails.application.routes.url_helpers.asset_report_launch_path(
       asset_processor_id: lti_asset_processor_id,
       report_id: id
-    )
-  end
-
-  def resubmit_url_path
-    return nil unless resubmit_available?
-
-    Rails.application.routes.url_helpers.lti_asset_processor_notice_resubmit_path(
-      asset_processor_id: lti_asset_processor_id,
-      student_id: asset.submission.user_id
     )
   end
 

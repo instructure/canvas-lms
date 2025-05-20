@@ -55,7 +55,7 @@ export const ZLtiAssetReport = z.object({
   priority: ZLtiAssetReportPriority,
   processingProgress: ZLtiAssetReportProcessingProgress,
   reportType: z.string(),
-  resubmitUrlPath: z.string().optional(),
+  resubmitAvailable: z.boolean(),
   result: z.string().optional(),
   resultTruncated: z.string().optional(),
   title: z.string().optional(),

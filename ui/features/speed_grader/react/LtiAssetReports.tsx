@@ -26,17 +26,26 @@ import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWith
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {buildAPDisplayTitle, ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
-import {QueryClientProvider} from '@tanstack/react-query'
+import {QueryClientProvider, useMutation} from '@tanstack/react-query'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import {queryClient} from '@canvas/query'
 import {
   LtiAssetReportsCard,
   LtiAssetReportsMissingReportsCard,
 } from './LtiAssetReports/LtiAssetReportsCard'
+import {Button} from '@instructure/ui-buttons'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {useEffect} from 'react'
+
+const I18n = createI18nScope('speed_grader')
 
 export type LtiAssetReportsProps = {
   versionedAttachments: {attachment: {id: string; display_name: string}}[] | undefined
   reportsByAttachment: Record<string, LtiAssetReportsByProcessor> | undefined
   assetProcessors: ExistingAttachedAssetProcessor[]
+  studentId: string | undefined
+  attempt: number | null | undefined
 }
 
 function ltiAssetProcessorHeader(assetProcessor: ExistingAttachedAssetProcessor) {
@@ -85,10 +94,70 @@ function LtiAssetReportsCardGroup({attachment, reports}: LtiAssetReportsCardGrou
   )
 }
 
+function shouldShowResubmitButton({
+  processorId,
+  reportsByAttachment,
+  versionedAttachments,
+}: {
+  processorId: number
+  reportsByAttachment: Record<string, LtiAssetReportsByProcessor>
+  versionedAttachments: {attachment: {id: string}}[]
+}) {
+  return versionedAttachments.some(({attachment}) => {
+    const reports = (reportsByAttachment[attachment.id] || {})[processorId]
+
+    // Resubmit button is available for a processor if there are any
+    // attachments missing reports, or if any reports are resubmittable
+    return !reports || reports.length === 0 || reports.some(rep => rep.resubmitAvailable)
+  })
+}
+
+const resubmit = async function (url: string) {
+  return await doFetchApi({
+    path: url,
+    method: 'POST',
+  })
+}
+
+// TODO: figure out what happens for anonymous grading here
+function resubmitPath({processorId, studentId, attempt}: ResubmitButtonProps) {
+  return `/api/lti/asset_processors/${processorId}/notices/${encodeURIComponent(studentId)}/attempts/${attempt ?? 'latest'}`
+}
+
+type ResubmitButtonProps = {
+  processorId: number
+  studentId: string
+  attempt: number | undefined | null
+}
+
+function ResubmitButton(props: ResubmitButtonProps) {
+  const resubmitMutation = useMutation({
+    mutationFn: resubmit,
+    onSuccess: () => showFlashSuccess(I18n.t('Resubmitted to Document Processing App'))(),
+    onError: () => showFlashError(I18n.t('Resubmission failed'))(),
+    mutationKey: ['resubmit-asset-reports', props.processorId, props.studentId, props.attempt],
+  })
+  return (
+    <Flex.Item>
+      <Button
+        size="small"
+        disabled={!(resubmitMutation.isIdle || resubmitMutation.isError)}
+        onClick={() => {
+          resubmitMutation.mutate(resubmitPath(props))
+        }}
+      >
+        {I18n.t('Resubmit All Files')}
+      </Button>
+    </Flex.Item>
+  )
+}
+
 export function LtiAssetReports({
   versionedAttachments,
   reportsByAttachment,
   assetProcessors,
+  studentId,
+  attempt,
 }: LtiAssetReportsProps) {
   if (!versionedAttachments || !reportsByAttachment) {
     return null
@@ -96,31 +165,45 @@ export function LtiAssetReports({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Flex direction="column" gap="small">
-        {assetProcessors.map(processor => (
-          <ToggleDetails
-            summary={ltiAssetProcessorHeader(processor)}
-            key={processor.id}
-            iconPosition="end"
-            icon={() => <IconArrowOpenDownSolid />}
-            iconExpanded={() => <IconArrowOpenUpSolid />}
-            defaultExpanded
-            fluidWidth
-          >
-            <View as="div" padding="small none">
-              <Flex direction="column" gap="medium">
-                {versionedAttachments.map(({attachment}) => (
-                  <LtiAssetReportsCardGroup
-                    key={attachment.id}
-                    attachment={attachment}
-                    reports={(reportsByAttachment[attachment.id] || {})[processor.id]}
-                  />
-                ))}
-              </Flex>
-            </View>
-          </ToggleDetails>
-        ))}
-      </Flex>
+      <View as="div" padding="small none none none">
+        <Flex direction="column" gap="small">
+          {assetProcessors.map(processor => (
+            <ToggleDetails
+              summary={ltiAssetProcessorHeader(processor)}
+              key={processor.id}
+              iconPosition="end"
+              icon={() => <IconArrowOpenDownSolid />}
+              iconExpanded={() => <IconArrowOpenUpSolid />}
+              defaultExpanded
+              fluidWidth
+            >
+              <View as="div" padding="small none">
+                <Flex direction="column" gap="small">
+                  {versionedAttachments.map(({attachment}) => (
+                    <LtiAssetReportsCardGroup
+                      key={attachment.id}
+                      attachment={attachment}
+                      reports={(reportsByAttachment[attachment.id] || {})[processor.id]}
+                    />
+                  ))}
+                  {studentId &&
+                    shouldShowResubmitButton({
+                      processorId: processor.id,
+                      reportsByAttachment,
+                      versionedAttachments,
+                    }) && (
+                      <ResubmitButton
+                        processorId={processor.id}
+                        studentId={studentId}
+                        attempt={attempt}
+                      />
+                    )}
+                </Flex>
+              </View>
+            </ToggleDetails>
+          ))}
+        </Flex>
+      </View>
     </QueryClientProvider>
   )
 }
