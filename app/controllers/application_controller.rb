@@ -3384,4 +3384,15 @@ class ApplicationController < ActionController::Base
   def require_feature_enabled(feature)
     not_found unless context&.root_account&.feature_enabled?(feature)
   end
+
+  # Make it sure the file we send is in a trusted folder
+  def safe_send_file(filepath, options = {})
+    full_path = Pathname.new(File.expand_path(filepath.to_s))
+    allowed_dirs = [Rails.root.join("lib/cc/xsd")]
+    allowed_dirs << Rails.root.join(Attachment.file_store_config["path_prefix"]) if Attachment.file_store_config["path_prefix"].present?
+
+    allowed = allowed_dirs.any? { |base_dir| full_path.ascend.include?(base_dir) }
+    reject! "Invalid file path" unless allowed
+    send_file(full_path.to_s, options)
+  end
 end
