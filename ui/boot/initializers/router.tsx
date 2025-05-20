@@ -122,6 +122,15 @@ const portalRouter = createBrowserRouter(
 
       {window.ENV.enhanced_rubrics_enabled && RubricRoutes}
 
+      <Route
+        path="/courses/:courseId/assignments/new"
+        lazy={() => import('../../features/assignment_edit/index')}
+      />
+      <Route
+        path="/courses/:courseId/assignments/:assignmentId/edit"
+        lazy={() => import('../../features/assignment_edit/index')}
+      />
+
       <Route path="*" element={<></>} />
     </Route>,
   ),
