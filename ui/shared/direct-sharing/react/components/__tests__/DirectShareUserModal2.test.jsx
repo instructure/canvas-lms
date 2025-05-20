@@ -21,6 +21,7 @@ import {render, fireEvent, waitFor, act} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import useContentShareUserSearchApi from '../../effects/useContentShareUserSearchApi'
 import DirectShareUserModal from '../DirectShareUserModal'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('../../effects/useContentShareUserSearchApi')
 
@@ -36,7 +37,7 @@ describe('DirectShareUserModal', () => {
   let ariaLive
 
   beforeAll(() => {
-    window.ENV = {COURSE_ID: '42'}
+    fakeENV.setup({COURSE_ID: '42'})
     ariaLive = document.createElement('div')
     ariaLive.id = 'flash_screenreader_holder'
     ariaLive.setAttribute('role', 'alert')
@@ -44,7 +45,7 @@ describe('DirectShareUserModal', () => {
   })
 
   afterAll(() => {
-    delete window.ENV
+    fakeENV.teardown()
     if (ariaLive) ariaLive.remove()
   })
 
@@ -73,7 +74,10 @@ describe('DirectShareUserModal', () => {
   describe('Validation call to action', () => {
     describe('when the feature flag is enabled', () => {
       beforeEach(() => {
-        window.ENV.FEATURES = {validate_call_to_action: true}
+        fakeENV.setup({
+          COURSE_ID: '42',
+          FEATURES: {validate_call_to_action: true},
+        })
       })
 
       it('does not disable the send button immediately', () => {
@@ -102,16 +106,26 @@ describe('DirectShareUserModal', () => {
         const {getByText, getByLabelText} = render(
           <DirectShareUserModal open={true} courseId="1" />,
         )
+        // Wait for component to fully render
+        await act(async () => jest.runAllTimers())
+        // Click the send button to trigger the error
         fireEvent.click(getByText('Send'))
-        await waitFor(() => {
-          expect(getByLabelText(/send to:/i)).toHaveFocus()
-        })
+        // Wait for the focus to be applied
+        await waitFor(
+          () => {
+            expect(getByLabelText(/send to:/i)).toHaveFocus()
+          },
+          {timeout: 1000},
+        )
       })
     })
 
     describe('when the feature flag is disabled', () => {
       beforeEach(() => {
-        window.ENV.FEATURES = {validate_call_to_action: false}
+        fakeENV.setup({
+          COURSE_ID: '42',
+          FEATURES: {validate_call_to_action: false},
+        })
       })
 
       it('disables the send button immediately', () => {

@@ -115,7 +115,7 @@ export default function ContentShareUserSearchSelector({
     messages: requredErrorMessages,
     id: 'content-share-user-search',
     isRequired: shouldValidateCallToAction,
-    inputRef: userSelectInputRef
+    inputRef: userSelectInputRef,
   }
 
   let userOptions: any = []
@@ -131,10 +131,7 @@ export default function ContentShareUserSearchSelector({
   }
 
   return (
-    <CanvasAsyncSelect
-      {...restOfSelectProps}
-      {...selectProps}
-    >
+    <CanvasAsyncSelect {...restOfSelectProps} {...selectProps} data-testid="user-search-selector">
       {userOptions}
     </CanvasAsyncSelect>
   )
