@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Den første overskriften på en side skal være en H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Følgende innhold er gitt av en partner"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Materialet er i det offentlige domenet"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Dette materialet er underlagt et unntak - f.eks. fair use, retten til å sitere eller andre i henhold til gjeldende lover for opphavsrett"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Det foregående innholdet er gitt av en partner"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Elegante HTML-redigering ikke tilgjengelig med tastaturet. Trykk Skift-O for å åpne rå html-redigering."
