@@ -50,6 +50,10 @@ function itemCount(module: HTMLElement): number {
   return module.querySelectorAll('.context_module_item').length
 }
 
+function getModuleContentElement(module: HTMLElement): HTMLElement {
+  return module.querySelector('.content ul') as HTMLElement
+}
+
 function shouldShowAllOrLess(module: HTMLElement): AllOrLess {
   if (isModuleCollapsed(module)) {
     return 'none'
@@ -71,7 +75,8 @@ function addOrRemoveButton(module: HTMLElement) {
   const shouldShow = shouldShowAllOrLess(module)
 
   let button = module.querySelector('.show-all-or-less-button.ui-button') as HTMLButtonElement
-  const totalItems = (module.querySelector('.content ul') as HTMLElement)?.dataset?.totalItems || ''
+  const moduleContentElement = getModuleContentElement(module)
+  const totalItems = moduleContentElement?.dataset?.totalItems || ''
 
   if (shouldShow === 'none' || shouldShow === 'loading') {
     if (button) {
@@ -172,6 +177,30 @@ function buttonKeyDown(event: KeyboardEvent) {
   }
 }
 
+function decrementModuleItemsCount(moduleId: ModuleId) {
+  const module = moduleFromId(moduleId)
+  if (!module) {
+    return
+  }
+
+  const moduleContentElement = getModuleContentElement(module)
+  if (!moduleContentElement) {
+    return
+  }
+
+  const totalItems = moduleContentElement.dataset.totalItems
+  if (!totalItems) {
+    return
+  }
+  const totalItemsCount = parseInt(totalItems, 10)
+  if (Number.isNaN(totalItemsCount) || totalItemsCount <= 0) {
+    return
+  }
+
+  moduleContentElement.dataset.totalItems = (totalItemsCount - 1).toString()
+  addOrRemoveButton(module)
+}
+
 export {
   moduleFromId,
   addShowAllOrLess,
@@ -185,6 +214,7 @@ export {
   loadAll,
   loadFirstPage,
   maybeExpandAndLoadAll,
+  decrementModuleItemsCount,
   MODULE_EXPAND_AND_LOAD_ALL,
   MODULE_LOAD_ALL,
   MODULE_LOAD_FIRST_PAGE,

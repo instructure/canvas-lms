@@ -236,7 +236,7 @@ shared_examples_for "add module items to list" do |context|
     driver.switch_to.alert.accept
     expect(ff(module_items_selector(@module.id)).size).to eq(9)
     expect(pagination_exists?(@module.id)).to be_truthy
-    expect(show_all_button.text).to include("(11)")
+    expect(show_all_button.text).to include("(10)")
 
     refresh_page
     wait_for_dom_ready
