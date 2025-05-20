@@ -88,6 +88,7 @@ import {
   maybeExpandAndLoadAll,
   loadFirstPage,
   isModuleCurrentPageEmpty,
+  decrementModuleItemsCount,
   MODULE_EXPAND_AND_LOAD_ALL,
   MODULE_LOAD_ALL,
   MODULE_LOAD_FIRST_PAGE,
@@ -1426,12 +1427,18 @@ modules.initModuleManagement = async function (duplicate) {
             modules.updateEstimatedDurations()
             $placeToFocus.focus()
             refreshDuplicateLinkStatus($currentModule)
+
+            const moduleId = $currentModule[0]?.dataset.moduleId
+            if (ENV.FEATURE_MODULES_PERF && moduleId) {
+              decrementModuleItemsCount(moduleId)
+            }
+
             if (
               ENV.FEATURE_MODULES_PERF &&
               isModulePaginated($currentModule[0]) &&
               isModuleCurrentPageEmpty($currentModule[0])
             ) {
-              loadFirstPage($currentModule[0]?.dataset.moduleId)
+              loadFirstPage(moduleId)
             }
           })
           $.flashMessage(
