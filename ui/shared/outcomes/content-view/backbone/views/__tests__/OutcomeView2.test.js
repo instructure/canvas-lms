@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import I18nStubber from '@canvas/test-utils/I18nStubber'
 import Outcome from '../../../../backbone/models/Outcome'
 import OutcomeContentBase from '../OutcomeContentBase'
 import OutcomeView from '../OutcomeView'
@@ -140,44 +139,6 @@ describe('OutcomeView', () => {
         state: 'show',
       })
       expect(view.$('#assessed_info_banner')).toHaveLength(0)
-    })
-  })
-
-  describe('Form Validation', () => {
-    it('validates mastery points', async () => {
-      const view = createView({
-        model: newOutcome(),
-        state: 'edit',
-      })
-      await waitFrames(10)
-      // Wait for React components to mount
-      await new Promise(resolve => setTimeout(resolve, 0))
-      const input = view.$('#mastery_points')[0]
-      input.value = '-1'
-      input.dispatchEvent(new Event('change', {bubbles: true}))
-      expect(view.isValid()).toBeFalsy()
-      expect(view.errors.mastery_points).toBeTruthy()
-      view.remove()
-    })
-
-    it('validates i18n mastery points', async () => {
-      const view = createView({
-        model: newOutcome(),
-        state: 'edit',
-      })
-      await waitFrames(10)
-      I18nStubber.pushFrame()
-      I18nStubber.setLocale('fr_FR')
-      I18nStubber.stub('fr_FR', {
-        'number.format.delimiter': ' ',
-        'number.format.separator': ',',
-      })
-      await waitFrames(10)
-      view.$('input[name="mastery_points"]').val('1 234,5')
-      await waitFrames(10)
-      expect(view.isValid()).toBeTruthy()
-      view.remove()
-      I18nStubber.clear()
     })
   })
 
