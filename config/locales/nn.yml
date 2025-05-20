@@ -18100,6 +18100,7 @@ nn:
   new_activity_8b84847d: "Ny aktivitet"
   new_activity_for_title_c5cc74: "Ny aktivitet for%{title}"
   new_analytics_api_access_7eec1ead: "Nye analysar API-tilgang"
+  new_analytics_description: "Vis Nye analysar for emne- og brukardata. Det kan ta 24 timer før data er tilgjengeleg i Nye analysar etter at funksjonen er satt til ON. For fleire detaljar, sjå på temaet \"New Analytics user group\" i Canvas Community."
   new_analytics_f6147886: "Nye analysar"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Nye analysar er eit interaktivt verktøy som hjelper deg og studentane å følgje med på prestasjon og aktivitet i emnet. Sjå kven som har sett sider og ressursar og deltatt i oppgåver—og kven som treng
