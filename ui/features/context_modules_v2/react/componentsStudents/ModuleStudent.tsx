@@ -23,7 +23,12 @@ import {ModuleItemProps} from '../componentsTeacher/ModuleItem'
 import ModuleHeaderStudent from './ModuleHeaderStudent'
 import ModuleItemListStudent from './ModuleItemListStudent'
 import {useModuleItemsStudent} from '../hooks/queriesStudent/useModuleItemsStudent'
-import {CompletionRequirement, ModuleItem, ModuleProgression} from '../utils/types'
+import {
+  CompletionRequirement,
+  ModuleItem,
+  ModuleProgression,
+  ModuleStatistics,
+} from '../utils/types'
 
 export interface ModuleStudentProps {
   id: string
@@ -33,6 +38,7 @@ export interface ModuleStudentProps {
   onToggleExpand?: (id: string) => void
   progression?: ModuleProgression
   requirementCount?: number
+  statistics?: ModuleStatistics
 }
 
 const ModuleStudent: React.FC<ModuleStudentProps> = ({
@@ -43,6 +49,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
   name,
   progression,
   requirementCount,
+  statistics,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
   const {data, isLoading, error} = useModuleItemsStudent(id, !!isExpanded)
@@ -105,6 +112,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
             progression={progression}
             completionRequirements={completionRequirements}
             requirementCount={requirementCount}
+            statistics={statistics}
           />
         </Flex.Item>
         {isExpanded && (

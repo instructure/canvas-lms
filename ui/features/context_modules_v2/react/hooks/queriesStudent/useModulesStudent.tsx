@@ -75,6 +75,10 @@ const MODULES_STUDENT_QUERY = gql`
                   type
                 }
               }
+              statistics {
+                latestDueAt
+                overdueAssignmentCount
+              }
             }
           }
           pageInfo {

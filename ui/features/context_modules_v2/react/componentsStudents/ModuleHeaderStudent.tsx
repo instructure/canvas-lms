@@ -24,7 +24,7 @@ import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import ModuleHeaderStatusIcon from './ModuleHeaderStatusIcon'
-import {ModuleProgression, CompletionRequirement} from '../utils/types'
+import {ModuleProgression, CompletionRequirement, ModuleStatistics} from '../utils/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleProgressionStatusBar from './ModuleProgressionStatusBar'
 import {ModuleHeaderSupplementalInfoStudent} from './ModuleHeaderSupplementalInfoStudent'
@@ -39,6 +39,7 @@ export interface ModuleHeaderStudentProps {
   progression?: ModuleProgression
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
+  statistics?: ModuleStatistics
 }
 
 const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
@@ -49,6 +50,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
   progression,
   completionRequirements,
   requirementCount,
+  statistics,
 }) => {
   const onToggleExpandRef = useCallback(() => {
     onToggleExpand(id)
@@ -87,10 +89,9 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
             </Flex.Item>
             <Flex.Item overflowX="hidden" overflowY="hidden">
               <ModuleHeaderSupplementalInfoStudent
-                moduleId={id}
                 completionRequirements={completionRequirements || []}
                 requirementCount={requirementCount}
-                progression={progression}
+                statistics={statistics}
               />
             </Flex.Item>
             {completionRequirements?.length && (
