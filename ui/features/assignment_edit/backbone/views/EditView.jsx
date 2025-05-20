@@ -1221,7 +1221,8 @@ EditView.prototype.handleOnlineSubmissionTypeChange = function (_env) {
   const showAssetProcessors =
     window.ENV?.FEATURES?.lti_asset_processor &&
     this.$submissionType.val() === 'online' &&
-    this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked')
+    (this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked') ||
+      this.$onlineSubmissionTypes.find(ALLOW_TEXT_ENTRY).prop('checked'))
   this.$assetProcessorsContainer.toggleAccessibly(showAssetProcessors)
 
   const showConfigTools =

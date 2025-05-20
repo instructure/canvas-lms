@@ -88,5 +88,35 @@ RSpec.describe Lti::Asset, type: :model do
       asset.calculate_sha256_checksum!
       expect(asset.reload.sha256_checksum).to eq "existing_checksum"
     end
+
+    context "text entry submission" do
+      let(:asset) { lti_asset_model(submission: submission_model(submission_type: "online_text_entry", body: content)) }
+
+      it "calculates checksum for text entry submissions" do
+        asset.calculate_sha256_checksum!
+        expect(asset.reload.sha256_checksum).to eq "uU0nuZNNPgilLlLX2n2r+sSE7+N6U4DukIj3rOLvzek="
+      end
+    end
+  end
+
+  describe "#content_size" do
+    let(:content) { "hello world" }
+
+    context "with attachment" do
+      let(:attachment) { attachment_model(uploaded_data: stub_file_data("test.txt", content, "text/plain")) }
+      let(:asset) { lti_asset_model(attachment:) }
+
+      it "returns the size of the attachment content" do
+        expect(asset.content_size).to eq(11)
+      end
+    end
+
+    context "with text entry submission" do
+      let(:asset) { lti_asset_model(submission: submission_model(submission_type: "online_text_entry", body: content)) }
+
+      it "returns the size of the text entry content" do
+        expect(asset.content_size).to eq(11)
+      end
+    end
   end
 end

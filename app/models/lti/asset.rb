@@ -39,14 +39,14 @@ class Lti::Asset < ApplicationRecord
   # and attachment can be made optional
   belongs_to :attachment,
              inverse_of: :lti_assets,
-             class_name: "Attachment",
-             optional: false
+             class_name: "Attachment"
+
   belongs_to :submission,
              inverse_of: :lti_assets,
              class_name: "Submission",
              optional: false
 
-  validates :attachment_id, uniqueness: { scope: :submission_id }
+  validate :attachment_id_or_submission_attempt_present
 
   before_validation :generate_uuid, on: :create
 
@@ -62,20 +62,50 @@ class Lti::Asset < ApplicationRecord
 
     timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     digester = Digest::SHA256.new
-    attachment.open do |chunk|
-      digester << chunk
+    if text_entry?
+      digester << submission.body_for_attempt(submission_attempt)
+    else
+      attachment.open do |chunk|
+        digester << chunk
+      end
     end
     digest = digester.base64digest
     timing_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     InstStatsd::Statsd.timing("lti.asset_processor_asset_sha256_calculation", timing_end - timing_start)
-    InstStatsd::Statsd.gauge("lti.asset_processor_asset_size", attachment.size)
+    InstStatsd::Statsd.gauge("lti.asset_processor_asset_size", content_size)
 
     update(sha256_checksum: digest)
+  end
+
+  def text_entry?
+    attachment_id.blank?
+  end
+
+  def content_type
+    if text_entry?
+      "text/html"
+    else
+      attachment.content_type
+    end
+  end
+
+  def content_size
+    if text_entry?
+      submission.body_for_attempt(submission_attempt).bytesize
+    else
+      attachment.size
+    end
   end
 
   private
 
   def generate_uuid
     self.uuid ||= SecureRandom.uuid
+  end
+
+  def attachment_id_or_submission_attempt_present
+    if attachment_id.present? == submission_attempt.present?
+      errors.add(:base, "Exactly one of attachment_id or submission_attempt must be present")
+    end
   end
 end
