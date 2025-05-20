@@ -26,6 +26,7 @@ const props = {
   onUpdateFilters: jest.fn(),
   isLoading: true,
   errors: {search_term: ''},
+  search_term: '',
 }
 
 let old_env
@@ -49,6 +50,31 @@ describe('UsersToolbar', () => {
 
       enrollCheck.click()
       expect(props.onUpdateFilters).toHaveBeenCalledWith({include_deleted_users: true})
+    })
+  })
+
+  describe('Search functionality', () => {
+    it('renders search icon before the input field', () => {
+      const {getByTestId} = render(<UsersToolbar {...props} />)
+      expect(getByTestId('icon-search-line')).toBeInTheDocument()
+    })
+
+    it('does not render clear button when search term is empty', () => {
+      const {queryByTestId} = render(<UsersToolbar {...props} search_term="" />)
+      expect(queryByTestId('clear-search')).toBeNull()
+    })
+
+    it('renders clear button when search term is not empty', () => {
+      const {getByTestId} = render(<UsersToolbar {...props} search_term="test" />)
+      expect(getByTestId('clear-search')).toBeInTheDocument()
+    })
+
+    it('clears search term when clear button is clicked', () => {
+      const {getByTestId} = render(<UsersToolbar {...props} search_term="test" />)
+      const clearButton = getByTestId('clear-search')
+
+      clearButton.click()
+      expect(props.onUpdateFilters).toHaveBeenCalledWith({search_term: ''})
     })
   })
 })
