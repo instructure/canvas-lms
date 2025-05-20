@@ -26,9 +26,9 @@ describe('parseModule', () => {
     moment.tz.setDefault('America/Denver')
   })
 
-  it('parses the name', () => {
+  it('parses the name', async () => {
     const element = getFixture('name')
-    expect(parseModule(element)).toEqual({
+    expect(await parseModule(element)).toEqual({
       moduleId: '8',
       moduleName: 'Module 1',
       unlockAt: undefined,
@@ -42,9 +42,9 @@ describe('parseModule', () => {
     })
   })
 
-  it('parses unlockAt', () => {
+  it('parses unlockAt', async () => {
     const element = getFixture('unlockAt')
-    expect(parseModule(element)).toEqual({
+    expect(await parseModule(element)).toEqual({
       moduleId: '8',
       moduleName: '',
       unlockAt: '2023-08-02T06:00:00.000Z',
@@ -58,9 +58,9 @@ describe('parseModule', () => {
     })
   })
 
-  it('parses requirementCount', () => {
+  it('parses requirementCount', async () => {
     const element = getFixture('requirementCount')
-    expect(parseModule(element)).toEqual({
+    expect(await parseModule(element)).toEqual({
       moduleId: '8',
       moduleName: '',
       unlockAt: undefined,
@@ -74,9 +74,9 @@ describe('parseModule', () => {
     })
   })
 
-  it('parses requireSequentialProgress', () => {
+  it('parses requireSequentialProgress', async () => {
     const element = getFixture('requiresSequentialProgress')
-    expect(parseModule(element)).toEqual({
+    expect(await parseModule(element)).toEqual({
       moduleId: '8',
       moduleName: '',
       unlockAt: undefined,
@@ -90,9 +90,9 @@ describe('parseModule', () => {
     })
   })
 
-  it('parses publishFinalGrade', () => {
+  it('parses publishFinalGrade', async () => {
     const element = getFixture('publishFinalGrade')
-    expect(parseModule(element)).toEqual({
+    expect(await parseModule(element)).toEqual({
       moduleId: '8',
       moduleName: '',
       unlockAt: undefined,
@@ -106,17 +106,17 @@ describe('parseModule', () => {
     })
   })
 
-  it('parses prerequisites', () => {
+  it('parses prerequisites', async () => {
     const element = getFixture('prerequisites')
-    expect(parseModule(element).prerequisites).toEqual([
+    expect((await parseModule(element)).prerequisites).toEqual([
       {id: '14', name: 'Module A'},
       {id: '15', name: 'Module B'},
     ])
   })
 
-  it('parses requirements', () => {
+  it('parses requirements', async () => {
     const element = getFixture('requirements')
-    expect(parseModule(element).requirements).toEqual([
+    expect((await parseModule(element)).requirements).toEqual([
       {
         id: '93',
         name: 'HW 1',
@@ -165,9 +165,9 @@ describe('parseModule', () => {
     ])
   })
 
-  it('parses moduleItems', () => {
+  it('parses moduleItems', async () => {
     const element = getFixture('moduleItems')
-    expect(parseModule(element).moduleItems).toEqual([
+    expect((await parseModule(element)).moduleItems).toEqual([
       {
         id: '93',
         name: 'HW 1',

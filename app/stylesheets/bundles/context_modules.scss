@@ -24,3 +24,7 @@
   padding: .5rem;
   margin-inline-end: .5rem;
 }
+
+body.waiting_for_modules * {
+  cursor: wait !important;
+}

@@ -21,16 +21,15 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules')
 
-const fetchItemTitles = (courseId: string, moduleId: string) => {
+const fetchItemTitles = (courseId: string, moduleId: string, otherFields: string[] = []) => {
   try {
-    return fetch(
-      `/api/v1/courses/${courseId}/modules/${moduleId}/items?include[]=title_only&per_page=1000`,
-      {
-        headers: new Headers({
-          accept: 'application/json+canvas-string-ids',
-        }),
-      },
-    )
+    document.body.classList.add('waiting_for_modules')
+    const url = `/api/v1/courses/${courseId}/modules/${moduleId}/items?only[]=title${otherFields.map(f => `&only[]=${f}`)}&per_page=1000`
+    return fetch(url, {
+      headers: new Headers({
+        accept: 'application/json+canvas-string-ids',
+      }),
+    })
       .then((res: Response) => {
         if (!res.ok) {
           throw new Error(res.statusText)
@@ -44,9 +43,13 @@ const fetchItemTitles = (courseId: string, moduleId: string) => {
           type: 'error',
         })
       })
+      .finally(() => {
+        document.body.classList.remove('waiting_for_modules')
+      })
   } catch (error: unknown) {
     const err = error instanceof Error ? error : new Error(String(error))
     showFlashAlert({message: I18n.t('Failed loading module items'), err, type: 'error'})
+    document.body.classList.remove('waiting_for_modules')
     return Promise.reject(err)
   }
 }
