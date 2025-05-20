@@ -31,6 +31,34 @@ import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 const I18n = createI18nScope('discussion_posts')
 
 export const PeerReview = props => {
+  const reviewLinkUrl = props.reviewLinkUrl
+  const interaction = props.disabled ? 'disabled' : 'enabled'
+
+  const renderNotCompletedMobileView = responsiveProps => {
+    const mobileIcon = <IconPeerReviewLine />
+    const mobileMmessage = (
+      <Text weight="bold" size="x-small">
+        {responsiveProps.textNotCompleted}
+      </Text>
+    )
+
+    return (
+      <Flex>
+        <span className="discussions-peer-review">
+          <Link
+            href={reviewLinkUrl}
+            isWithinText={false}
+            interaction={interaction}
+            margin="0 xx-small 0 x-small"
+          >
+            <Flex.Item>{mobileIcon}</Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">{mobileMmessage}</Flex.Item>
+          </Link>
+        </span>
+      </Flex>
+    )
+  }
+
   return (
     <Responsive
       match="media"
@@ -69,29 +97,19 @@ export const PeerReview = props => {
           icon = <IconPeerGradedLine />
           message = <Text size={responsiveProps.textSize}>{responsiveProps.textCompleted}</Text>
         } else if (matches.includes('mobile')) {
-          icon = <IconPeerReviewLine />
-          message = (
-            <Text weight="bold" size="x-small">
-              {responsiveProps.textNotCompleted}
-            </Text>
-          )
-
-          return (
-            <Flex>
-              <span className="discussions-peer-review">
-                <Link href={props.reviewLinkUrl} isWithinText={false} margin="0 xx-small 0 x-small">
-                  <Flex.Item>{icon}</Flex.Item>
-                  <Flex.Item margin="0 0 0 x-small">{message}</Flex.Item>
-                </Link>
-              </span>
-            </Flex>
-          )
+          // Early return the mobile view when it is not completed
+          return renderNotCompletedMobileView(responsiveProps)
         } else {
           icon = <IconPeerReviewLine />
           message = (
             <Text>
               {responsiveProps.textNotCompleted}
-              <Link href={props.reviewLinkUrl} isWithinText={false} margin="0 xx-small 0 x-small">
+              <Link
+                href={reviewLinkUrl}
+                isWithinText={false}
+                interaction={interaction}
+                margin="0 xx-small 0 x-small"
+              >
                 <Text weight="bold" size={responsiveProps.textSize}>
                   {I18n.t('Review Now')}
                 </Text>
@@ -118,4 +136,5 @@ PeerReview.propTypes = {
   revieweeName: PropTypes.string.isRequired,
   reviewLinkUrl: PropTypes.string,
   workflowState: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
 }
