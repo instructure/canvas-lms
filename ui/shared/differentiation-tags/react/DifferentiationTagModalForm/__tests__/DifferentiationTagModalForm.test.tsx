@@ -122,6 +122,19 @@ describe('DifferentiationTagModalForm', () => {
       })
       expect(document.activeElement).toBe(tagInput)
     })
+
+    it('puts focus on the newly added tag input field', async () => {
+      renderComponent({mode: CREATE_MODE})
+
+      const initialInputs = screen.getAllByLabelText(/Tag Name/i)
+      await user.click(screen.getByLabelText('+ Add another tag'))
+      await user.click(screen.getByLabelText('+ Add another tag'))
+      const newInputs = screen.getAllByLabelText(/Tag Name/i)
+
+      expect(newInputs).toHaveLength(initialInputs.length + 2)
+      expect(newInputs[newInputs.length - 1]).toHaveFocus()
+    })
+
     it('updates category to "Add as a single tag" when removing a tag leaves one input (create mode)', async () => {
       renderComponent({mode: CREATE_MODE})
 
