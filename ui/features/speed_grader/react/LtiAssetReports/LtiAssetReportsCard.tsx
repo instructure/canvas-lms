@@ -29,9 +29,6 @@ import {Tooltip} from '@instructure/ui-tooltip'
 // Canvas-specific imports:
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useMutation} from '@tanstack/react-query'
 
 const I18n = createI18nScope('speed_grader')
 const t = I18n.t.bind(I18n)
@@ -111,15 +108,6 @@ function TooltipIfTruncated({
   )
 }
 
-/* BEGIN Resubmit stuff will be moved soon */
-const resubmit = async function (url: string) {
-  return await doFetchApi({
-    path: url,
-    method: 'POST',
-  })
-}
-/* END Resubmit stuff will be moved soon */
-
 export function LtiAssetReportsMissingReportsCard() {
   return (
     <View
@@ -144,14 +132,6 @@ export function LtiAssetReportsMissingReportsCard() {
 
 export function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
   const {comment, infoText} = reportCommentAndInfoText(report)
-
-  /* BEGIN Resubmit stuff will be moved soon */
-  const resubmitMutation = useMutation({
-    mutationFn: resubmit,
-    onSuccess: () => showFlashSuccess(t('Resubmitted to Document Processing App'))(),
-    onError: () => showFlashError(t('Resubmission failed'))(),
-  })
-  /* END Resubmit stuff will be moved soon */
 
   return (
     <View
@@ -238,20 +218,6 @@ export function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
             </Flex.Item>
           )
         }
-
-        {/* BEGIN Resubmit stuff will be moved soon */}
-        {report.resubmitUrlPath && !resubmitMutation.isSuccess && (
-          <Flex.Item overflowY="visible">
-            <Button
-              data-pendo="asset-processor-resubmit-notice"
-              size="small"
-              onClick={() => resubmitMutation.mutate(report.resubmitUrlPath!)}
-            >
-              {t('Resubmit')}
-            </Button>
-          </Flex.Item>
-        )}
-        {/* END Resubmit stuff will be moved soon */}
       </Flex>
     </View>
   )

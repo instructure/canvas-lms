@@ -252,6 +252,7 @@ RSpec.describe Lti::AssetReport do
       expect(subject[:indicationAlt]).to eq("WOW")
       expect(subject[:errorCode]).to eq("MYERRORCODE")
       expect(subject[:processingProgress]).to eq("Processed")
+      expect(subject[:resubmitAvailable]).to be(false)
     end
 
     it "truncates result_truncated to 16 characters" do
@@ -266,7 +267,9 @@ RSpec.describe Lti::AssetReport do
     end
   end
 
-  describe "#resubmit_url_path" do
+  describe "#resubmit_available?" do
+    subject { standard_report.resubmit_available? }
+
     let(:processing_progress) { "Failed" }
     let(:error_code) { "MYERRORCODE" }
     let(:standard_report) { lti_asset_report_model(processing_progress:, error_code:) }
@@ -276,37 +279,25 @@ RSpec.describe Lti::AssetReport do
         context "when error_code is #{error_code}" do
           let(:error_code) { error_code }
 
-          it "returns a resubmit URL path" do
-            expect(standard_report.resubmit_url_path).to eq(
-              "/api/lti/asset_processors/#{standard_report.lti_asset_processor_id}/notices/#{standard_report.asset.submission.user_id}"
-            )
-          end
+          it { is_expected.to be true }
         end
       end
 
       context "when error_code does not need action" do
-        it "resubmit_url_path is nil" do
-          expect(standard_report.resubmit_url_path).to be_nil
-        end
+        it { is_expected.to be false }
       end
     end
 
     context "when processing_progress is PendingManual" do
       let(:processing_progress) { "PendingManual" }
 
-      it "returns a resubmit URL path" do
-        expect(standard_report.resubmit_url_path).to eq(
-          "/api/lti/asset_processors/#{standard_report.lti_asset_processor_id}/notices/#{standard_report.asset.submission.user_id}"
-        )
-      end
+      it { is_expected.to be true }
     end
 
     context "when processing_progress is not Failed or PendingManual" do
       let(:processing_progress) { "Processed" }
 
-      it "returns nil" do
-        expect(standard_report.resubmit_url_path).to be_nil
-      end
+      it { is_expected.to be false }
     end
   end
 end

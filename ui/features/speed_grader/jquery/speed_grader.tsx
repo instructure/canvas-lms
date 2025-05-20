@@ -888,6 +888,8 @@ function renderLtiAssetReports(
     versionedAttachments: historicalSubmission?.versioned_attachments,
     reportsByAttachment: submission.lti_asset_reports?.by_attachment,
     assetProcessors: jsonData.lti_asset_processors,
+    studentId: submission.user_id,
+    attempt: historicalSubmission.attempt,
   }
   ReactDOM.render(<LtiAssetReports {...props} />, mountPoint)
 }
