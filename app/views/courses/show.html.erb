@@ -63,7 +63,9 @@
   <% if @course_home_view == 'wiki' %>
     <div id="wiki_page_show"></div>
   <% elsif @course_home_view == 'modules' %>
-    <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
+    <% unless (@context.grants_right?(@current_user, session, :read_as_admin) && @context.root_account.feature_enabled?(:modules_page_rewrite)) || (@is_student && @context.feature_enabled?(:modules_page_rewrite_student_view)) %> 
+      <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
+    <% end %>
   <% elsif @course_home_view == 'assignments' %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>

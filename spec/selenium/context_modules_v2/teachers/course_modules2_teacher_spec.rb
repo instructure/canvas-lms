@@ -153,4 +153,20 @@ describe "context modules", :ignore_js_errors do
       end
     end
   end
+
+  context "course home page" do
+    before do
+      @course.default_view = "modules"
+      @course.save
+
+      @course.root_account.enable_feature!(:modules_page_rewrite)
+    end
+
+    it "shows the new modules" do
+      visit_course(@course)
+      wait_for_ajaximations
+
+      expect(f('[data-testid="modules-rewrite-container"]')).to be_displayed
+    end
+  end
 end
