@@ -42,6 +42,7 @@ export const MODULE_ITEMS_STUDENT_QUERY = gql`
                 nodes {
                   _id
                   cachedDueDate
+                  missing
                 }
               }
             }

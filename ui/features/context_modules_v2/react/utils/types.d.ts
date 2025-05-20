@@ -49,6 +49,7 @@ export type ModuleItemContent = {
     nodes: Array<{
       _id: string
       cachedDueDate?: string
+      missing?: boolean
     }>
   }
   url?: string

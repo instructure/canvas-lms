@@ -39,18 +39,22 @@ const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
   requirementsMet = [],
   content,
 }) => {
-  const isPastDue = useMemo(() => {
+  const isMissing = useMemo(() => {
     if (!content) return false
 
-    const dueDate = content.submissionsConnection?.nodes?.[0]?.cachedDueDate
-    if (!dueDate) return false
-
-    const now = new Date()
-    const dueDateObj = new Date(dueDate)
-    return now > dueDateObj
+    return !!content?.submissionsConnection?.nodes?.[0]?.missing
   }, [content])
 
-  const isCompleted = requirementsMet.some(req => req.id.toString() === itemId.toString())
+  const isCompleted = useMemo(
+    () =>
+      requirementsMet.some(req => req.id.toString() === itemId.toString()) && completionRequirement,
+    [requirementsMet, itemId, completionRequirement],
+  )
+
+  const isSubmissionEmpty = useMemo(
+    () => !!content?.submissionsConnection?.nodes?.length,
+    [content],
+  )
 
   const StatusPill = ({
     color,
@@ -69,18 +73,18 @@ const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
   )
 
   const renderPill = useMemo(() => {
-    if (isCompleted) {
-      return <StatusPill color="success" text={I18n.t('Complete')} />
-    } else if (isPastDue) {
+    if (isMissing) {
       return <StatusPill color="danger" text={I18n.t('Missing')} />
-    } else if (content?.submissionsConnection?.nodes?.length) {
+    } else if (isCompleted) {
+      return <StatusPill color="success" text={I18n.t('Complete')} />
+    } else if (completionRequirement) {
       return <StatusPill color="info" text={I18n.t('Assigned')} />
     } else {
       return null
     }
-  }, [isCompleted, isPastDue, content])
+  }, [isCompleted, isMissing, completionRequirement])
 
-  return renderPill && completionRequirement ? (
+  return renderPill && (completionRequirement || isSubmissionEmpty) ? (
     <View as="div" margin="0 0 0 small">
       {renderPill}
     </View>
