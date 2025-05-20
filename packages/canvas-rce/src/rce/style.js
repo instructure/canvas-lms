@@ -468,7 +468,7 @@ export default function buildStyle() {
     color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-edit-area {
-    border: 1px solid rgba(122, 122, 122, 0.6);
+    border: 1px solid ${theme.canvasBorderColor};
     border-radius: 3px;
   }
   .tox .tox-edit-area__iframe {
