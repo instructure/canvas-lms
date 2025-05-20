@@ -1682,7 +1682,7 @@ class FilesController < ApplicationController
       thumbnail = Thumbnail.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       raise ActiveRecord::RecordNotFound unless thumbnail
 
-      send_file thumbnail.full_filename, content_type: thumbnail.content_type
+      safe_send_file thumbnail.full_filename, content_type: thumbnail.content_type
     else
       image_thumbnail
     end

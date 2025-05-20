@@ -803,17 +803,48 @@ describe SubmissionsController do
       get "index", params: { course_id: @course.id, assignment_id: @assignment.id, zip: "1" }, format: "json"
       expect(response).to be_successful
 
-      a = Attachment.last
-      expect(a.user).to eq @teacher
-      expect(a.workflow_state).to eq "to_be_zipped"
-      a.update_attribute("workflow_state", "zipped")
-      allow_any_instantiation_of(a).to receive("full_filename").and_return(File.expand_path(__FILE__)) # just need a valid file
-      allow_any_instantiation_of(a).to receive("content_type").and_return("test/file")
+      attachment = Attachment.last
+      expect(attachment.user).to eq @teacher
+      expect(attachment.workflow_state).to eq "to_be_zipped"
+      attachment.update_attribute("workflow_state", "zipped")
 
+      test_filename = Rails.root.join(Attachment.file_store_config["path_prefix"], "test_file.txt").to_s
+      invalid_filename = "#{File.dirname(test_filename)}_extended/something.txt"
+
+      FileUtils.mkdir_p(File.dirname(test_filename))
+      FileUtils.mkdir_p(File.dirname(invalid_filename))
+      FileUtils.touch test_filename
+      FileUtils.touch invalid_filename
+
+      allow_any_instantiation_of(attachment).to receive("content_type").and_return("test/file")
+
+      # Should allow files in a safe directory
+      allow_any_instantiation_of(attachment).to receive("full_filename").and_return(test_filename)
       request.headers["HTTP_ACCEPT"] = "*/*"
       get "index", params: { course_id: @course.id, assignment_id: @assignment.id, zip: "1" }
       expect(response).to be_successful
       expect(response.media_type).to eq "test/file"
+
+      # Don't accept path that might be a directory or a file too, starting with the same path
+      allow_any_instantiation_of(attachment).to receive("full_filename").and_return(invalid_filename)
+      request.headers["HTTP_ACCEPT"] = "*/*"
+      get "index", params: { course_id: @course.id, assignment_id: @assignment.id, zip: "1" }
+      expect(response).to be_bad_request
+
+      # Should not allow files elsewhere
+      allow_any_instantiation_of(attachment).to receive("full_filename").and_return(File.expand_path(__FILE__))
+      request.headers["HTTP_ACCEPT"] = "*/*"
+      get "index", params: { course_id: @course.id, assignment_id: @assignment.id, zip: "1" }
+      expect(response).to be_bad_request
+
+      allow_any_instantiation_of(attachment).to receive("full_filename").and_return("../../../etc/hosts") # Path Traversal
+      request.headers["HTTP_ACCEPT"] = "*/*"
+      get "index", params: { course_id: @course.id, assignment_id: @assignment.id, zip: "1" }
+      expect(response).to be_bad_request
+
+      FileUtils.rm test_filename
+      FileUtils.rm invalid_filename
+      FileUtils.rmdir File.dirname invalid_filename
     end
   end
 
