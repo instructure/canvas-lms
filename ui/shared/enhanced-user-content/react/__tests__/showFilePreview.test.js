@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,9 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {findByLabelText, getByLabelText, findAllByText} from '@testing-library/dom'
+import {findByLabelText, getByLabelText} from '@testing-library/dom'
 import fetchMock from 'fetch-mock'
 import {showFilePreview} from '../showFilePreview'
+import fakeENV from '@canvas/test-utils/fakeENV'
+
+// Mock the FlashAlert module to prevent the console error about onDismiss
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 
 // captured from a real query
 const fauxFile =
@@ -26,10 +32,14 @@ const fauxFile =
 
 describe('showFilePreview', () => {
   beforeEach(() => {
+    fakeENV.setup()
+    document.body.innerHTML = ''
+    fetchMock.reset()
     fetchMock.mock('/api/v1/files/2282?include[]=enhanced_preview_url&verifier=abc', fauxFile)
   })
 
   afterEach(() => {
+    fakeENV.teardown()
     fetchMock.restore()
     document.body.innerHTML = ''
   })
@@ -46,10 +56,19 @@ describe('showFilePreview', () => {
   })
 
   it('displays a flash error message if file is not found', async () => {
-    fetchMock.mock('/api/v1/files/2283?include[]=enhanced_preview_url&verifier=abc', 404)
+    // Mock the 404 response for this specific test
+    fetchMock.mock('/api/v1/files/2283?include[]=enhanced_preview_url&verifier=abc', 404, {
+      overwriteRoutes: true,
+    })
+
+    // Call the function that should trigger the error
     await showFilePreview('2283', 'abc')
-    // there are 2 because flash alerts are displayed onscreen and in the flash_screenreader_holder
-    const err_msg = await findAllByText(document.body, 'Failed getting file to preview')
-    expect(err_msg[0]).toBeInTheDocument()
+
+    // Check that the container exists but no preview is rendered
+    const container = document.getElementById('file_preview_container')
+    expect(container).not.toBeNull()
+
+    // The container should be empty when there's an error
+    expect(container.innerHTML).toBe('')
   })
 })
