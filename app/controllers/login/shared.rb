@@ -38,7 +38,7 @@ module Login::Shared
             session[:return_to] = url
           elsif (target_account == domain_root_account) ||
                 (target_account && target_account != domain_root_account &&
-                pseudonym.works_for_account?(target_account, true))
+                pseudonym&.works_for_account?(target_account, true))
             token = SessionToken.new(pseudonym.global_id,
                                      current_user_id: pseudonym.global_user_id).to_s
             uri.query&.concat("&")
