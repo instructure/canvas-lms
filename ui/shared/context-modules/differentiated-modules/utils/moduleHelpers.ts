@@ -21,6 +21,8 @@ import type {Module, Requirement} from '../react/types'
 import {updateModulePublishedState} from '../../utils/publishAllModulesHelper'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {convertFriendlyDatetimeToUTC} from './miscHelpers'
+import {isModuleCollapsed, isModulePaginated} from '@canvas/context-modules/utils/showAllOrLess'
+import {fetchItemTitles} from '@canvas/context-modules/utils/fetchItemTitles'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('differentiated_modules')
@@ -84,7 +86,7 @@ function requirementScreenreaderMessage(requirement: Requirement) {
   }
 }
 
-export function parseModule(element: HTMLDivElement) {
+export async function parseModule(element: HTMLDivElement) {
   const moduleId = element.getAttribute('data-module-id')
   const moduleName = element.querySelector('.name')?.getAttribute('title') ?? ''
   const unlockAt = convertFriendlyDatetimeToUTC(element.querySelector('.unlock_at')?.textContent)
@@ -96,7 +98,7 @@ export function parseModule(element: HTMLDivElement) {
   const prerequisites = parsePrerequisites(element)
   const moduleList = parseModuleList()
   const requirements = parseRequirements(element)
-  const moduleItems = parseModuleItems(element)
+  const moduleItems = await parseModuleItems(element)
 
   return {
     moduleId,
@@ -145,9 +147,21 @@ function parseRequirements(element: HTMLDivElement) {
   ) as Requirement[]
 }
 
-function parseModuleItems(element: HTMLDivElement) {
-  const moduleItemElements = Array.from(element.querySelectorAll('.ig-row'))
-  return moduleItemElements.map(moduleItem => parseModuleItemData(moduleItem, false))
+async function parseModuleItems(element: HTMLDivElement) {
+  if (ENV.FEATURE_MODULES_PERF && (isModuleCollapsed(element) || isModulePaginated(element))) {
+    const moduleId = element.getAttribute('data-module-id')
+    const courseId = ENV.COURSE_ID
+    if (!moduleId || !courseId) return []
+    const items = await fetchItemTitles(courseId, moduleId, ['type'])
+    return items.map((item: any) => ({
+      id: item.id,
+      name: item.title,
+      resource: resourceTypeMap[item.type],
+    }))
+  } else {
+    const moduleItemElements = Array.from(element.querySelectorAll('.ig-row'))
+    return moduleItemElements.map(moduleItem => parseModuleItemData(moduleItem, false))
+  }
 }
 
 export function updateModuleUI(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
@@ -339,11 +353,11 @@ function updateRequirements(moduleElement: HTMLDivElement, moduleSettings: Setti
       const descriptionElement = moduleItemElement.querySelector('.requirement-description')
       if (descriptionElement) {
         const scoreElement =
-          (requirement.type === 'score' || requirement.type === 'percentage')
+          requirement.type === 'score' || requirement.type === 'percentage'
             ? `<span class="min_score"> ${requirement.minimumScore}</span>`
             : ''
 
-        const percentageSymbol = requirement.type === 'percentage' ? '%' : '';
+        const percentageSymbol = requirement.type === 'percentage' ? '%' : ''
         descriptionElement.innerHTML = `
           <span class="requirement_type ${requirementTypeMapReverse[requirement.type]}">
             <span class="unfulfilled">
@@ -396,8 +410,8 @@ function parseModuleItemData(element: Element, isRequirement: boolean) {
     data.pointsPossible = pointsPossibleString ? pointsPossibleString.split(/\s/)[0] : null
     if (isRequirement) {
       // @ts-expect-error
-      data.minimumScore = activeRequirementNode.querySelector('.min_score, .min_percentage')?.textContent || '0'
-      
+      data.minimumScore =
+        activeRequirementNode?.querySelector('.min_score, .min_percentage')?.textContent || '0'
     }
   }
   return data

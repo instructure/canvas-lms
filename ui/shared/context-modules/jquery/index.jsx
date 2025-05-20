@@ -2548,21 +2548,21 @@ function initContextModules() {
     renderSendToTray(true, selection, returnFocusTo)
   })
 
-  $(document).on('click', '.assign_module_link, .view_assign_link', function (event) {
+  $(document).on('click', '.assign_module_link, .view_assign_link', async function (event) {
     event.preventDefault()
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
     const moduleElement = $(event.target).parents('.context_module')[0]
-    const settingsProps = parseModule(moduleElement)
+    const settingsProps = await parseModule(moduleElement)
     renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
       initialTab: 'assign-to',
     })
   })
 
-  $(document).on('click', '.edit_module_link', function (event) {
+  $(document).on('click', '.edit_module_link', async function (event) {
     event.preventDefault()
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
     const moduleElement = $(event.target).parents('.context_module')[0]
-    const settingsProps = parseModule(moduleElement)
+    const settingsProps = await parseModule(moduleElement)
     renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
       initialTab: 'settings',
     })
