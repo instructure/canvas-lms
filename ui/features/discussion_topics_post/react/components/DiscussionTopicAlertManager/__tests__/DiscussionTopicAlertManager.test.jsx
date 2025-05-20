@@ -43,6 +43,26 @@ describe('DiscussionTopicAlertManager', () => {
     expect(container.getByTestId('post-required')).toBeTruthy()
   })
 
+  it('should render alert if peer review is enabled and did not post yet', () => {
+    const container = setup({
+      userHasEntry: false,
+      discussionTopic: Discussion.mock({
+        assignment: Assignment.mock({assessmentRequestsForCurrentUser: [{}]}),
+      }),
+    })
+    expect(container.getByTestId('post-required-for-peer-review')).toBeTruthy()
+  })
+
+  it('should NOT render alert if peer review is enabled and user has entry', () => {
+    const container = setup({
+      userHasEntry: true,
+      discussionTopic: Discussion.mock({
+        assignment: Assignment.mock({assessmentRequestsForCurrentUser: [{}]}),
+      }),
+    })
+    expect(container.queryByTestId('post-required-for-peer-review')).not.toBeInTheDocument()
+  })
+
   it('should render differentiated group topics alert', () => {
     const container = setup({
       discussionTopic: Discussion.mock({
