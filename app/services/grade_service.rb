@@ -146,15 +146,15 @@ class GradeService
   end
 
   def map_criteria_ids_to_grades(grader_response_array, rubric_data)
-    grader_response_array.map do |item|
+    grader_response_array.filter_map do |item|
       rubric_category = item["rubric_category"]
       selected_description = item["criterion"]
 
       criterion_data = rubric_data.find { |c| c[:description] == rubric_category }
-      raise CedarAIGraderError, "Cedar GraphQL error: Missing Rubric Category '#{rubric_category}'" unless criterion_data
+      next unless criterion_data
 
       matched_rating = (criterion_data[:ratings] || []).find { |r| r[:long_description] == selected_description }
-      raise CedarAIGraderError, "Cedar GraphQL error: Missing Criterion '#{selected_description}' from Rubric Category '#{rubric_category}'" unless matched_rating
+      next unless matched_rating
 
       {
         "id" => criterion_data[:id],
