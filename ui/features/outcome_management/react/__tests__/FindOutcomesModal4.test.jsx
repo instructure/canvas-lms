@@ -45,18 +45,6 @@ describe('FindOutcomesModal', () => {
   let setTargetGroupIdsToRefetchMock
   let setImportsTargetGroupMock
   let isMobileView
-  const withFindGroupRefetch = true
-  const courseImportMocks = [
-    ...findModalMocks(),
-    ...groupMocks({groupId: '100'}),
-    ...findOutcomesMocks({
-      groupId: '300',
-      isImported: false,
-      contextType: 'Course',
-      outcomesCount: 51,
-      withFindGroupRefetch,
-    }),
-  ]
   const defaultProps = (props = {}) => ({
     open: true,
     importsTargetGroup: {},
@@ -216,36 +204,6 @@ describe('FindOutcomesModal', () => {
       expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
     })
 
-    // Skipping this test because something appears to be wrong with the mocks
-    // and they aren't getting called properly.  This will be resolved in:
-    // https://instructure.atlassian.net/browse/EGG-1064
-    it.skip('debounces the search string entered by the user', async () => {
-      const {getByText, getByLabelText, queryByText} = render(
-        <FindOutcomesModal {...defaultProps()} />,
-        {
-          mocks: [...findModalMocks(), ...findOutcomesMocks()],
-        },
-      )
-      await act(async () => jest.runAllTimers())
-      await clickWithinMobileSelect(queryByText('Groups'))
-      fireEvent.click(getByText('Account Standards'))
-      fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await act(async () => jest.runAllTimers())
-      await clickWithinMobileSelect(queryByText('View 25 Outcomes'))
-      await act(async () => jest.runAllTimers())
-      expect(getByText('25 Outcomes')).toBeInTheDocument()
-      const input = getByLabelText('Search field')
-      fireEvent.change(input, {target: {value: 'mathemati'}})
-      await act(async () => jest.advanceTimersByTime(100))
-      expect(getByText('25 Outcomes')).toBeInTheDocument()
-      fireEvent.change(input, {target: {value: 'mathematic'}})
-      await act(async () => jest.advanceTimersByTime(300))
-      expect(getByText('25 Outcomes')).toBeInTheDocument()
-      fireEvent.change(input, {target: {value: 'mathematics'}})
-      await act(async () => jest.advanceTimersByTime(500))
-      expect(getByText('15 Outcomes')).toBeInTheDocument()
-    })
-
     describe('within an account context', () => {
       it('renders Account Standards groups for non root accounts', async () => {
         const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
@@ -278,31 +236,6 @@ describe('FindOutcomesModal', () => {
         type: 'error',
         srOnly: false,
       })
-    })
-
-    // Skipping this test because something appears to be wrong with the mocks
-    // and they aren't getting called properly.  This will be resolved in:
-    // https://instructure.atlassian.net/browse/EGG-1064
-    it.skip('should not disable search input and clear search button if there are no results', async () => {
-      const {getByText, getByLabelText, queryByTestId, queryByText} = render(
-        <FindOutcomesModal {...defaultProps()} />,
-        {
-          mocks: [...findModalMocks(), ...findOutcomesMocks()],
-        },
-      )
-      await act(async () => jest.runAllTimers())
-      await clickWithinMobileSelect(queryByText('Groups'))
-      fireEvent.click(getByText('Account Standards'))
-      fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await act(async () => jest.runAllTimers())
-      await clickWithinMobileSelect(queryByText('View 25 Outcomes'))
-      await act(async () => jest.runAllTimers())
-      expect(getByText('25 Outcomes')).toBeInTheDocument()
-      const input = getByLabelText('Search field')
-      fireEvent.change(input, {target: {value: 'no results'}})
-      await act(async () => jest.advanceTimersByTime(500))
-      expect(getByLabelText('Search field')).toBeEnabled()
-      expect(queryByTestId('clear-search-icon')).toBeInTheDocument()
     })
 
     describe('global standards', () => {
