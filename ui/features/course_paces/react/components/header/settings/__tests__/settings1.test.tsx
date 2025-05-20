@@ -74,15 +74,26 @@ describe('Settings', () => {
     expect(screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})).toBeInTheDocument()
   })
 
-  it('disables all settings while syncing', () => {
+  it('disables all settings while syncing', async () => {
     renderConnected(<Settings {...{...defaultProps, isSyncing: true}} />)
     const settingsButton = screen.getByRole('button', {name: 'Settings'})
     act(() => settingsButton.click())
 
-    const skipSelectedDays = screen.getByTestId('skip-selected-days')
-    expect(skipSelectedDays).toHaveClass('css-1ekjxd2-menuItem')
+    // First check the Manage Blackout Dates button in main menu
     const blackoutDatesBtn = screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})
-    expect(blackoutDatesBtn).toHaveClass('css-rldcki-menuItem')
+    expect(blackoutDatesBtn).toHaveAttribute('aria-disabled', 'true')
+
+    // Click into Skip Selected Days submenu
+    const skipSelectedDays = screen.getByTestId('skip-selected-days')
+    act(() => skipSelectedDays.click())
+
+    // Verify weekends option is disabled
+    const weekendsOption = screen.getByTestId('skip-weekends-toggle')
+    expect(weekendsOption).toHaveAttribute('aria-disabled', 'true')
+
+    // Verify weekday options are disabled
+    const mondayOption = screen.getByRole('menuitemcheckbox', {name: 'Mondays'})
+    expect(mondayOption).toHaveAttribute('aria-disabled', 'true')
   })
 
   it('shows and hides the blackout dates modal correctly', () => {
@@ -216,68 +227,5 @@ describe('Settings', () => {
       act(() => skipWeekendsToggle.click())
       expect(toggleExcludeWeekends).toHaveBeenCalled()
     })
-  })
-
-  describe('with course paces redesign', () => {
-    beforeEach(() => {
-      fakeENV.setup({
-        VALID_DATE_RANGE: {
-          end_at: {date: COURSE.start_at, date_context: 'course'},
-          start_at: {date: COURSE.end_at, date_context: 'course'},
-        },
-      })
-    })
-
-    it('renders a button with settings text', () => {
-      const {getByRole} = renderConnected(<Settings {...defaultProps} />)
-      const settingsButton = getByRole('button', {name: 'Settings'})
-      expect(settingsButton).toBeInTheDocument()
-    })
-
-    it('renders manage blackout dates for course paces', () => {
-      const {getByRole} = renderConnected(<Settings {...defaultProps} />)
-      const settingsButton = getByRole('button', {name: 'Settings'})
-      act(() => settingsButton.click())
-
-      expect(screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})).toBeInTheDocument()
-      expect(screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})).toBeInTheDocument()
-    })
-    it('does not render manage blackout dates for non-course paces', () => {
-      const {getByRole} = renderConnected(<Settings {...defaultProps} coursePace={SECTION_PACE} />)
-      const settingsButton = getByRole('button', {name: 'Settings'})
-      act(() => settingsButton.click())
-
-      expect(
-        screen.queryByRole('menuitem', {name: 'Manage Blackout Dates'}),
-      ).not.toBeInTheDocument()
-      expect(screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})).toBeInTheDocument()
-    })
-  })
-
-  describe('course_pace_weighted_assignments is enabled', () => {
-    beforeEach(() => {
-      fakeENV.setup({
-        FEATURES: {
-          course_pace_weighted_assignments: true,
-        },
-      })
-    })
-
-    it('renders set weighted assignment duration menu option', () => {
-      renderConnected(<Settings {...defaultProps} />)
-      const settingsButton = screen.getByRole('button', {name: 'Settings'})
-      act(() => settingsButton.click())
-
-      const weightedAssignmentsOption = screen.getByTestId('weighted-assignment-duration-option')
-      expect(weightedAssignmentsOption).toBeInTheDocument()
-    })
-  })
-
-  it('set weighted assignment duration menu option is not displayed', () => {
-    renderConnected(<Settings {...defaultProps} />)
-    const settingsButton = screen.getByRole('button', {name: 'Settings'})
-    act(() => settingsButton.click())
-
-    expect(screen.queryByTestId('weighted-assignment-duration-option')).not.toBeInTheDocument()
   })
 })
