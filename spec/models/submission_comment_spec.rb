@@ -177,8 +177,8 @@ RSpec.describe SubmissionComment do
     end
 
     it "calls the request_captions method if FF is on" do
-      root_account = @submission.context.root_account
-      root_account.enable_feature!(:submission_comment_media_auto_captioning)
+      account = @submission.context.account
+      account.enable_feature!(:submission_comment_media_auto_captioning)
       submission_comment = @submission.submission_comments.create!(valid_attributes)
       expect(submission_comment).to receive(:request_captions)
       submission_comment.save!

@@ -69,7 +69,7 @@ class SubmissionComment < ActiveRecord::Base
   before_save :set_edited_at
   after_save :update_participation
   after_save :check_for_media_object
-  after_save :request_captions, if: -> { root_account&.feature_enabled?(:submission_comment_media_auto_captioning) }
+  after_save :request_captions, if: -> { context.account.feature_enabled?(:submission_comment_media_auto_captioning) }
   after_update :publish_other_comments_in_this_group
   after_update :post_submission_for_finalized_draft, if: -> { saved_change_to_draft?(from: true, to: false) }
   after_destroy :delete_other_comments_in_this_group
@@ -193,6 +193,7 @@ class SubmissionComment < ActiveRecord::Base
     obj = media_object
     return unless obj.present? && obj.auto_caption_status.nil? && obj.media_id.present? && obj.media_type.include?("video") && obj.media_tracks.where(kind: "subtitles").none?
 
+    InstStatsd::Statsd.distributed_increment("submission_comment.request_captions")
     obj&.generate_captions
   end
 
