@@ -905,6 +905,7 @@ CanvasRails::Application.routes.draw do
   get "login/oauth2" => "login/oauth2#new" if Rails.env.test?
 
   get "login/apple" => "login/apple#new", :as => :apple_login
+  post "login/apple" => "login/apple#new"
   get "login/clever" => "login/clever#new", :as => :clever_login
   # Clever gets their own callback, cause we have to add additional processing
   # for their Instant Login feature
@@ -913,11 +914,14 @@ CanvasRails::Application.routes.draw do
   get "login/facebook" => "login/facebook#new", :as => :facebook_login
   get "login/github" => "login/github#new", :as => :github_login
   get "login/google" => "login/google#new", :as => :google_login
+  post "login/google" => "login/google#new"
   get "login/google/:id" => "login/google#new"
   get "login/linkedin" => "login/linkedin#new", :as => :linkedin_login
   get "login/microsoft" => "login/microsoft#new"
+  post "login/microsoft" => "login/microsoft#new"
   get "login/microsoft/:id" => "login/microsoft#new", :as => :microsoft_login
   get "login/openid_connect" => "login/openid_connect#new"
+  post "login/openid_connect" => "login/openid_connect#new"
   get "login/openid_connect/:id" => "login/openid_connect#new", :as => :openid_connect_login
   post "login/openid_connect/logout" => "login/openid_connect#destroy", :as => :openid_connect_logout
 
