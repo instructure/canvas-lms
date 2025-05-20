@@ -57,30 +57,7 @@ class AutoGradeOrchestrationService
     root_account_uuid = submission.course.account.root_account.uuid
 
     auto_grade_result = get_grade_data(assignment_text:, root_account_uuid:, submission:, progress:)
-
-    missing_comments = auto_grade_result.grade_data.none? { |item| item.key?("comments") }
-
-    if missing_comments
-      begin
-        grade_data_with_comments = CommentsService.new(
-          assignment: assignment_text,
-          grade_data: auto_grade_result.grade_data,
-          root_account_uuid:
-        ).call
-        auto_grade_result.update!(
-          root_account_id: submission.course.root_account_id,
-          grade_data: grade_data_with_comments,
-          error_message: nil,
-          grading_attempts: auto_grade_result.grading_attempts + 1
-        )
-      rescue => e
-        Rails.logger.warn("[AutoGrade] Failed to fetch comments for submission #{submission.id}: #{e.message}")
-        current_attempts = progress&.delayed_job&.attempts&.+ 1
-        if current_attempts < MAX_ATTEMPTS
-          raise Delayed::RetriableError, e.message
-        end
-      end
-    end
+    auto_grade_result = generate_comments(assignment_text:, root_account_uuid:, submission:, auto_grade_result:, progress:)
 
     progress&.results = auto_grade_result.grade_data
     progress&.message = nil
@@ -90,27 +67,82 @@ class AutoGradeOrchestrationService
   def get_grade_data(assignment_text:, root_account_uuid:, submission:, progress:)
     essay = ActionView::Base.full_sanitizer.sanitize(submission.body || "")
     rubric = submission.assignment.rubric_association&.rubric
-    raise CedarAIGraderError, "Missing rubric" unless rubric&.data
+    raise StandardError, "Missing rubric" unless rubric&.data
 
     auto_grade_result = AutoGradeResult.find_or_initialize_by(
       submission:,
       attempt: submission.attempt
     )
+    missing_criteria = get_criteria_missing_grades(auto_grade_result.grade_data, rubric)
 
-    if auto_grade_result.grade_data.blank?
+    unless missing_criteria.empty?
+      # filter rubric to only include missing criteria
+      relevant_rubric = rubric.data.select { |item| missing_criteria.include?(item[:description]) }
+
       grade_data = GradeService.new(
         assignment: assignment_text,
         essay:,
-        rubric: rubric.data,
+        rubric: relevant_rubric,
         root_account_uuid:
       ).call
 
+      # Merge new grade data with existing data
+      existing_data = auto_grade_result.grade_data || []
+      merged_data = existing_data + grade_data
+
       auto_grade_result.update!(
         root_account_id: submission.course.root_account_id,
-        grade_data:,
+        grade_data: merged_data,
         error_message: nil,
         grading_attempts: auto_grade_result.grading_attempts + 1
       )
+
+      unless get_criteria_missing_grades(auto_grade_result.grade_data, rubric).empty?
+        raise CedarAIGraderError, "Number of graded criteria (#{merged_data.length}) is less than the number of rubric criteria (#{rubric.data.length})"
+      end
+    end
+
+    auto_grade_result
+  rescue => e
+    Rails.logger.warn("[AutoGrade] Grading failed for submission #{submission.id}: #{e.message}")
+    retryable = e.is_a?(CedarAIGraderError)
+    handle_grading_failure(
+      error_message: "Grading failed: #{e.message}",
+      submission:,
+      auto_grade_result:,
+      progress:,
+      retryable:
+    )
+  end
+
+  def generate_comments(assignment_text:, root_account_uuid:, submission:, auto_grade_result:, progress:)
+    rubric = submission.assignment.rubric_association&.rubric
+    missing_criteria = get_criteria_missing_comments(auto_grade_result.grade_data, rubric)
+
+    unless missing_criteria.empty?
+      # filter grade_data to only include missing criteria
+      relevant_grade_data = auto_grade_result.grade_data.select { |item| missing_criteria.include?(item["description"]) }
+
+      grade_data_with_comments = CommentsService.new(
+        assignment: assignment_text,
+        grade_data: relevant_grade_data,
+        root_account_uuid:
+      ).call
+
+      # Merge new grade data with existing data
+      existing_data = auto_grade_result.grade_data.reject { |item| missing_criteria.include?(item["description"]) }
+      merged_data = existing_data + grade_data_with_comments
+
+      auto_grade_result.update!(
+        root_account_id: submission.course.root_account_id,
+        grade_data: merged_data,
+        error_message: nil,
+        grading_attempts: auto_grade_result.grading_attempts + 1
+      )
+
+      unless get_criteria_missing_comments(merged_data, rubric).empty?
+        raise CedarAIGraderError, "Number of comments (#{merged_data.length}) is less than the number of rubric criteria (#{rubric.data.length})"
+      end
     end
 
     auto_grade_result
@@ -175,5 +207,20 @@ class AutoGradeOrchestrationService
     end
 
     progress
+  end
+
+  def get_criteria_missing_grades(grade_data, rubric)
+    return rubric.data.pluck(:description) unless grade_data
+
+    graded_criteria = grade_data.pluck("description")
+    all_criteria = rubric.data.pluck(:description)
+    all_criteria - graded_criteria
+  end
+
+  def get_criteria_missing_comments(grade_data, rubric)
+    return rubric.data.pluck(:description) unless grade_data
+
+    grade_data.reject { |item| item["comments"] }
+              .pluck("description")
   end
 end
