@@ -2637,7 +2637,7 @@ nl:
   admin_analytics_course_readiness_c79f13e1: "Admin Analytics - Cursusgereedheid"
   admin_analytics_dap_30f431d6: "Admin Analytics DAP"
   admin_analytics_dap_model_description: "Maakt gebruik van DAP voor Analytics op accountniveau mogelijk."
-  admin_analytics_description: "Schakelt Analytics op accountniveau in. Admin Analytics-dashboards bieden details over het gebruik van Canvas, het succes van Canavas-cursussen en de betrokkenheid van studenten. Je vindt meer informatie hierover in de *Admin Analytics Hub* van de Canvas Community."
+  admin_analytics_description: "Schakelt Analytics op accountniveau in. Admin Analytics-dashboards bieden details over het gebruik van Canvas, het succes van Canavas-cursussen en de betrokkenheid van studenten. Je vindt meer informatie hierover in de Admin Analytics Hub van de Canvas Community."
   admin_analytics_eacba735: "Admin Analytics"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Analytics voor beheerders - cursussen zonder inschrijvingen verbergen"
   admin_analytics_hide_courses_with_no_enrollments_description: "Wanneer ingeschakeld verbergt Admin Analytics + Intelligent Insights cursussen zonder inschrijvingen standaard op alle gegevensgrafieken. Er zal in de app een optie zijn om deze cursussen weer te geven."
@@ -22378,7 +22378,7 @@ nl:
   new_alert_f757d585: "Nieuwe waarschuwing"
   new_analytics_api_access_7eec1ead: "Toegang tot Nieuwe analyse-API"
   new_analytics_attendance_config_v2_5f7a9e2c: "New Analytics - Aanwezigheid config V2"
-  new_analytics_description: "Nieuwe analyse voor cursus- en gebruikersgegevens weergeven. Het kan 24 uur duren voordat gegevens worden weergegeven in Nieuwe analyse nadat deze functie is ingeschakeld. Zie voor alle details de *Nieuwe analyse gebruikersgroep* in de Canvas Community."
+  new_analytics_description: "Nieuwe analyse voor cursus- en gebruikersgegevens weergeven. Het kan 24 uur duren voordat gegevens worden weergegeven in Nieuwe analyse nadat deze functie is ingeschakeld. Zie voor alle details de Nieuwe analyse gebruikersgroep in de Canvas Community."
   new_analytics_f6147886: "Nieuwe analyse"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Nieuwe analyse is een interactieve tool waarmee jij en je cursisten de prestaties
