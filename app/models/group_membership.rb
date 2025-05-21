@@ -191,10 +191,15 @@ class GroupMembership < ActiveRecord::Base
   def update_cached_due_dates
     return unless update_cached_due_dates?
 
-    assignments = Assignment.where(context_type: group.context_type, context_id: group.context_id)
-                            .where(group_category_id: group.group_category_id).pluck(:id)
-    assignments += DiscussionTopic.where(context_type: group.context_type, context_id: group.context_id)
-                                  .where.not(assignment_id: nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
+    assignments = []
+    if group.non_collaborative
+      assignments += AssignmentOverride.active.where(set_type: "Group", set_id: group.id).pluck(:assignment_id)
+    else
+      assignments += Assignment.where(context_type: group.context_type, context_id: group.context_id)
+                               .where(group_category_id: group.group_category_id).pluck(:id)
+      assignments += DiscussionTopic.where(context_type: group.context_type, context_id: group.context_id)
+                                    .where.not(assignment_id: nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
+    end
 
     SubmissionLifecycleManager.recompute_users_for_course(user.id, group.context_id, assignments) if assignments.any?
   end
