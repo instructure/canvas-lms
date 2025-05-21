@@ -38,7 +38,7 @@ export interface ModuleStudentProps {
   onToggleExpand?: (id: string) => void
   progression?: ModuleProgression
   requirementCount?: number
-  statistics?: ModuleStatistics
+  submissionStatistics?: ModuleStatistics
 }
 
 const ModuleStudent: React.FC<ModuleStudentProps> = ({
@@ -49,7 +49,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
   name,
   progression,
   requirementCount,
-  statistics,
+  submissionStatistics,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
   const {data, isLoading, error} = useModuleItemsStudent(id, !!isExpanded)
@@ -112,7 +112,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
             progression={progression}
             completionRequirements={completionRequirements}
             requirementCount={requirementCount}
-            statistics={statistics}
+            submissionStatistics={submissionStatistics}
           />
         </Flex.Item>
         {isExpanded && (

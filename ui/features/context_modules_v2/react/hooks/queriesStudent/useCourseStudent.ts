@@ -28,7 +28,7 @@ const COURSE_STUDENT_QUERY = gql`
         name
         submissionStatistics {
           missingSubmissionsCount
-          submissionsDueThisWeek
+          submissionsDueThisWeekCount
         }
       }
     }

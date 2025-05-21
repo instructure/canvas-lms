@@ -140,7 +140,7 @@ export interface Prerequisite {
 
 export interface ModuleStatistics {
   latestDueAt: string | null
-  overdueAssignmentCount: number
+  missingAssignmentCount: number
 }
 
 export interface Module {
@@ -157,7 +157,7 @@ export interface Module {
   moduleItems: ModuleItem[]
   progression?: ModuleProgression
   hasActiveOverrides: boolean
-  statistics?: ModuleStatistics
+  submissionStatistics?: ModuleStatistics
 }
 
 export interface ModulesResponse {
@@ -170,7 +170,7 @@ export interface ModulesResponse {
 }
 
 interface CoursesubmissionStatistics {
-  submissionsDueThisWeek: number
+  submissionsDueThisWeekCount: number
   missingSubmissionsCount: number
 }
 

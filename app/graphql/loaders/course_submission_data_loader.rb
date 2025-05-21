@@ -31,27 +31,36 @@ class Loaders::CourseSubmissionDataLoader < GraphQL::Batch::Loader
   end
 
   def perform(objects)
-    objects.each do |object|
-      course = if object.is_a?(Course)
-                 object
-               elsif object.is_a?(Integer) || object.is_a?(String)
-                 # Handle direct course ID loading pattern used in tests
-                 Course.find(object)
-               else
-                 nil
-               end
+    # Assume most objects are course IDs (common case)
+    course_ids = []
+    course_objects = {}
 
-      user = if object.is_a?(User)
-               object
-             else
-               @current_user
-             end
+    # Separate course objects from IDs
+    objects.each do |object|
+      if object.is_a?(Course)
+        course_objects[object.id.to_s] = object
+      elsif object.is_a?(Integer) || object.is_a?(String)
+        course_ids << object.to_s
+      end
+    end
+
+    # Fetch all courses by ID that weren't already provided as objects
+    remaining_ids = course_ids - course_objects.keys
+    unless remaining_ids.empty?
+      Course.where(id: remaining_ids).find_each do |course|
+        course_objects[course.id.to_s] = course
+      end
+    end
+
+    # Process all objects
+    objects.each do |object|
+      object_id = object.is_a?(Course) ? object.id.to_s : object.to_s
+      course = object.is_a?(Course) ? object : course_objects[object_id]
 
       next if course.nil?
 
-      # We either have a course object or a course ID, and we have a user
-      result = get_data(course, user)
-
+      # Use current_user since we're not expecting User objects
+      result = get_data(course, @current_user)
       fulfill(object, result)
     end
   end
@@ -65,34 +74,28 @@ class Loaders::CourseSubmissionDataLoader < GraphQL::Batch::Loader
       # A submission is considered missing when it:
       # - Has been marked as "missing" via late_policy_status, OR
       # - Has not been submitted, is past due, and has not been excused
-      if course.is_a?(Course)
-        user.submissions
-            .where(course_id: course.id)
-            .except(:order)
-            .missing
-            .merge(Assignment.published)
-            .count
-      else
-        0
-      end
-    when :submissions_due_this_week
+      user.submissions
+          .where(course_id: course.id)
+          .except(:order)
+          .missing
+          .merge(Assignment.published)
+          .distinct
+          .count
+    when :submissions_due_this_week_count
       start_date = @options[:start_date] || Time.zone.now
       end_date = @options[:end_date] || start_date.advance(days: 7)
 
       # Count submissions with due dates in the provided date range for this course
-      if course.is_a?(Course)
-        # Use submissions with cached_due_date within the specified range
-        # This matches the test setup which sets cached_due_date on submissions
-        user.submissions
-            .where(course_id: course.id)
-            .where(cached_due_date: start_date..end_date)
-            .joins(:assignment)
-            .merge(Assignment.published)
-            .distinct
-            .count
-      else
-        0
-      end
+      # Use submissions with cached_due_date within the specified range
+      # This matches the test setup which sets cached_due_date on submissions
+      user.submissions
+          .where(course_id: course.id)
+          .where(cached_due_date: start_date..end_date)
+          .except(:order)
+          .joins(:assignment)
+          .merge(Assignment.published)
+          .distinct
+          .count
     else
       raise ArgumentError, "Unknown data type: #{@data_type}"
     end

@@ -75,9 +75,9 @@ const MODULES_STUDENT_QUERY = gql`
                   type
                 }
               }
-              statistics {
+              submissionStatistics {
                 latestDueAt
-                overdueAssignmentCount
+                missingAssignmentCount
               }
             }
           }

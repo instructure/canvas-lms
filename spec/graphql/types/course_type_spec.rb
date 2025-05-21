@@ -1931,12 +1931,12 @@ describe Types::CourseType do
     context "when user doesn't have read permission" do
       it "returns null" do
         other_student = user_factory
-        expect(course_type.resolve("submissionStatistics { submissionsDueThisWeek }", current_user: other_student)).to be_nil
+        expect(course_type.resolve("submissionStatistics { submissionsDueThisWeekCount }", current_user: other_student)).to be_nil
       end
     end
 
     context "when user has read permission" do
-      describe "submissionsDueThisWeek" do
+      describe "submissionsDueThisWeekCount" do
         it "counts submissions with due dates within the next 7 days" do
           Timecop.freeze(now) do
             # Set up a submission due within this week
@@ -1948,7 +1948,7 @@ describe Types::CourseType do
             submission = assignment.submissions.find_by(user_id: @student.id)
             submission.update!(cached_due_date: now + 2.days)
 
-            expect(course_type.resolve("submissionStatistics { submissionsDueThisWeek }")).to eq 1
+            expect(course_type.resolve("submissionStatistics { submissionsDueThisWeekCount }")).to eq 1
           end
         end
 
@@ -1963,7 +1963,7 @@ describe Types::CourseType do
             submission = assignment.submissions.find_by(user_id: @student.id)
             submission.update!(cached_due_date: now + 10.days)
 
-            expect(course_type.resolve("submissionStatistics { submissionsDueThisWeek }")).to eq 0
+            expect(course_type.resolve("submissionStatistics { submissionsDueThisWeekCount }")).to eq 0
           end
         end
 
@@ -1978,7 +1978,7 @@ describe Types::CourseType do
             submission = assignment.submissions.find_by(user_id: @student.id)
             submission.update!(cached_due_date: now + 2.days)
 
-            expect(course_type.resolve("submissionStatistics { submissionsDueThisWeek }")).to eq 0
+            expect(course_type.resolve("submissionStatistics { submissionsDueThisWeekCount }")).to eq 0
           end
         end
       end

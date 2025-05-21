@@ -50,7 +50,7 @@ describe Types::ModuleStatisticsType do
 
   let_once(:module_type) { GraphQLTypeTester.new(module1, current_user: @student) }
 
-  describe "module statistics" do
+  describe "module submissionStatistics" do
     let(:now) { Time.zone.now }
 
     describe "latestDueAt" do
@@ -62,25 +62,25 @@ describe Types::ModuleStatisticsType do
           submission2 = assignment2.submissions.find_by(user_id: @student.id)
           submission2.update!(cached_due_date: now + 1.day)
 
-          result = module_type.resolve("statistics { latestDueAt }")
+          result = module_type.resolve("submissionStatistics { latestDueAt }")
 
           expect(Time.zone.parse(result)).to be_within(1.second).of(now + 2.days)
         end
       end
 
       it "returns nil when no assignments have due dates" do
-        result = module_type.resolve("statistics { latestDueAt }")
+        result = module_type.resolve("submissionStatistics { latestDueAt }")
         expect(result).to be_nil
       end
     end
 
-    describe "overdueAssignmentCount" do
+    describe "missingAssignmentCount" do
       it "returns the count of overdue assignments" do
         Timecop.freeze(now) do
           submission = assignment1.submissions.find_by(user_id: @student.id)
           submission.update!(cached_due_date: now - 1.day, late_policy_status: nil, grader_id: nil)
 
-          result = module_type.resolve("statistics { overdueAssignmentCount }")
+          result = module_type.resolve("submissionStatistics { missingAssignmentCount }")
 
           expect(result).to eq 1
         end
@@ -91,7 +91,7 @@ describe Types::ModuleStatisticsType do
           submission = assignment1.submissions.find_by(user_id: @student.id)
           submission.update!(cached_due_date: now - 1.day, late_policy_status: "missing")
 
-          result = module_type.resolve("statistics { overdueAssignmentCount }")
+          result = module_type.resolve("submissionStatistics { missingAssignmentCount }")
 
           expect(result).to eq 1
         end
@@ -102,9 +102,30 @@ describe Types::ModuleStatisticsType do
           submission = assignment1.submissions.find_by(user_id: @student.id)
           submission.update!(cached_due_date: now + 1.day)
 
-          result = module_type.resolve("statistics { overdueAssignmentCount }")
+          result = module_type.resolve("submissionStatistics { missingAssignmentCount }")
 
           expect(result).to eq 0
+        end
+      end
+
+      it "excludes unpublished assignments from the overdue count" do
+        Timecop.freeze(now) do
+          # Setup: One published and one unpublished assignment, both overdue
+          assignment1.update!(workflow_state: "unpublished")
+          submission1 = assignment1.submissions.find_by(user_id: @student.id)
+          submission1.update!(cached_due_date: now - 1.day, late_policy_status: "missing")
+
+          assignment2.update!(workflow_state: "published")
+          submission2 = assignment2.submissions.find_by(user_id: @student.id)
+          submission2.update!(cached_due_date: now - 1.day, late_policy_status: "missing")
+
+          expect(assignment1.published?).to be false
+          expect(assignment2.published?).to be true
+          expect(submission1.missing?).to be true
+          expect(submission2.missing?).to be true
+
+          result = module_type.resolve("submissionStatistics { missingAssignmentCount }")
+          expect(result).to eq 1
         end
       end
     end
@@ -115,7 +136,7 @@ describe Types::ModuleStatisticsType do
       empty_module = course.context_modules.create!(name: "Empty Module")
       module_type = GraphQLTypeTester.new(empty_module, current_user: @student)
 
-      result = module_type.resolve("statistics { overdueAssignmentCount }")
+      result = module_type.resolve("submissionStatistics { missingAssignmentCount }")
       expect(result).to eq 0
     end
 
@@ -130,7 +151,7 @@ describe Types::ModuleStatisticsType do
 
       module_type = GraphQLTypeTester.new(module1, current_user: new_student)
 
-      result = module_type.resolve("statistics { overdueAssignmentCount }")
+      result = module_type.resolve("submissionStatistics { missingAssignmentCount }")
       expect(result).to eq 0
     end
 
@@ -138,7 +159,7 @@ describe Types::ModuleStatisticsType do
       empty_module = course.context_modules.create!(name: "Empty Module")
       module_type = GraphQLTypeTester.new(empty_module, current_user: @student)
 
-      result = module_type.resolve("statistics { latestDueAt }")
+      result = module_type.resolve("submissionStatistics { latestDueAt }")
       expect(result).to be_nil
     end
 
@@ -147,7 +168,7 @@ describe Types::ModuleStatisticsType do
       assignment2.submissions.find_by(user_id: @student.id).update!(cached_due_date: nil)
       assignment3.submissions.find_by(user_id: @student.id).update!(cached_due_date: nil)
 
-      result = module_type.resolve("statistics { latestDueAt }")
+      result = module_type.resolve("submissionStatistics { latestDueAt }")
       expect(result).to be_nil
     end
   end

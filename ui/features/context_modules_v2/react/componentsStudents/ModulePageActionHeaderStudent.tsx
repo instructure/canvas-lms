@@ -92,11 +92,11 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
           )}
         </Text>
       </View>
-      {(data?.submissionStatistics?.submissionsDueThisWeek ||
+      {(data?.submissionStatistics?.submissionsDueThisWeekCount ||
         data?.submissionStatistics?.missingSubmissionsCount) && (
         <View as="div" margin="0 0 medium 0">
           <Flex gap="small">
-            {data?.submissionStatistics?.submissionsDueThisWeek > 0 && (
+            {data?.submissionStatistics?.submissionsDueThisWeekCount > 0 && (
               <Flex.Item>
                 <Pill color="info">
                   {I18n.t(
@@ -105,7 +105,7 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
                       other: '%{count} Assignments Due This Week',
                     },
                     {
-                      count: data?.submissionStatistics?.submissionsDueThisWeek || 0,
+                      count: data?.submissionStatistics?.submissionsDueThisWeekCount || 0,
                     },
                   )}
                 </Pill>

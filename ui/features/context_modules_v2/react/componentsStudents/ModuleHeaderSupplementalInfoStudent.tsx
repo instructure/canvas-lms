@@ -28,17 +28,19 @@ const I18n = createI18nScope('context_modules_v2')
 type Props = {
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
-  statistics?: ModuleStatistics
+  submissionStatistics?: ModuleStatistics
 }
 
 export const ModuleHeaderSupplementalInfoStudent: React.FC<Props> = ({
   completionRequirements = [],
   requirementCount,
-  statistics,
+  submissionStatistics,
 }) => {
-  // Get due date and overdue count from the statistics object
-  const dueDate = statistics?.latestDueAt ? new Date(statistics.latestDueAt) : null
-  const missingCount = statistics?.overdueAssignmentCount || 0
+  // Get due date and overdue count from the submissionStatistics object
+  const dueDate = submissionStatistics?.latestDueAt
+    ? new Date(submissionStatistics.latestDueAt)
+    : null
+  const missingCount = submissionStatistics?.missingAssignmentCount || 0
 
   // Ensure we only proceed if completionRequirements exists
   const hasCompletionRequirements = completionRequirements && completionRequirements.length > 0

@@ -28,7 +28,7 @@ const mockCourseStudentData = {
   name: 'Test Course',
   submissionStatistics: {
     missingSubmissionsCount: 5,
-    submissionsDueThisWeek: 10,
+    submissionsDueThisWeekCount: 10,
   },
 }
 

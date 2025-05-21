@@ -24,16 +24,16 @@ import {CompletionRequirement, ModuleStatistics} from '../../utils/types'
 type Props = {
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
-  statistics?: ModuleStatistics
+  submissionStatistics?: ModuleStatistics
 }
 
 const buildDefaultProps = (overrides: Partial<Props> = {}) => {
   return {
     completionRequirements: overrides.completionRequirements || [],
     requirementCount: overrides.requirementCount !== undefined ? overrides.requirementCount : 0,
-    statistics: overrides.statistics || {
+    submissionStatistics: overrides.submissionStatistics || {
       latestDueAt: null,
-      overdueAssignmentCount: 0,
+      missingAssignmentCount: 0,
     },
   }
 }
@@ -43,7 +43,7 @@ const setUp = (props = buildDefaultProps()) => {
     <ModuleHeaderSupplementalInfoStudent
       completionRequirements={props.completionRequirements}
       requirementCount={props.requirementCount}
-      statistics={props.statistics}
+      submissionStatistics={props.submissionStatistics}
     />,
   )
 }
@@ -61,9 +61,9 @@ describe('ModuleHeaderSupplementalInfoStudent', () => {
             minPercentage: 100,
           },
         ],
-        statistics: {
+        submissionStatistics: {
           latestDueAt: testDate.toISOString(),
-          overdueAssignmentCount: 1,
+          missingAssignmentCount: 1,
         },
       }),
     )
@@ -78,9 +78,9 @@ describe('ModuleHeaderSupplementalInfoStudent', () => {
     const testDate = new Date(Date.now() + 72 * 60 * 60 * 1000)
     const container = setUp(
       buildDefaultProps({
-        statistics: {
+        submissionStatistics: {
           latestDueAt: testDate.toISOString(),
-          overdueAssignmentCount: 0,
+          missingAssignmentCount: 0,
         },
       }),
     )
@@ -112,9 +112,9 @@ describe('ModuleHeaderSupplementalInfoStudent', () => {
     const testDate = new Date(Date.now() - 72 * 60 * 60 * 1000)
     const container = setUp(
       buildDefaultProps({
-        statistics: {
+        submissionStatistics: {
           latestDueAt: testDate.toISOString(),
-          overdueAssignmentCount: 1,
+          missingAssignmentCount: 1,
         },
       }),
     )
