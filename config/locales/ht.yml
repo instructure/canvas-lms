@@ -2556,7 +2556,7 @@ ht:
   admin_analytics_course_readiness_c79f13e1: "Analiz Admin - Preparasyon Kou yo"
   admin_analytics_dap_30f431d6: "Analiz Admin DAP"
   admin_analytics_dap_model_description: "Aktive itilizasyon DAP pou Analitik onivo kont."
-  admin_analytics_description: "Aktive Analytics onivo kont lan. Tablodbò Admin Analytics la bay detay sou itilizasyon Canvas, siksè kou Cancas la ak angajman etidyan yo. Aprann plis sou *Sant Analytics Admin* nan nan kominote Canvas la."
+  admin_analytics_description: "Aktive Analytics onivo kont lan. Tablodbò Admin Analytics la bay detay sou itilizasyon Canvas, siksè kou Cancas la ak angajman etidyan yo. Aprann plis sou Sant Analytics Admin nan nan kominote Canvas la."
   admin_analytics_eacba735: "Admin Analitics"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Admin Analytics - maske kou ki pa gen enskripsyon yo"
   admin_analytics_hide_courses_with_no_enrollments_description: "Lè opsyon sa a aktive, Admin Analytics + Intelligent Insights ap maske kou ki pa gen enspripsyon yo pa defo nan tout grafik done yo. Ap gen yon opsyon nan aplikasyon an pou montre kou sa yo."
@@ -20937,7 +20937,7 @@ ht:
   new_alert_f757d585: "Nouvo Alèt"
   new_analytics_api_access_7eec1ead: "Nouvo Aksè API Analitics"
   new_analytics_attendance_config_v2_5f7a9e2c: "Nouvo Analytics - Konfigirasyon prezans V2"
-  new_analytics_description: "Afiche nouvo analitics pou kou ak done itilizatè yo. Done yo ka pran 24 èdtan pou yo parèt nan Nouvo Analitics aprè w fin mete fonksyon sa a sou ON. Pou tout detay gade *Nouvo Gwoup itilizatè Analys* nan Kominote Canvas la."
+  new_analytics_description: "Afiche nouvo analitics pou kou ak done itilizatè yo. Done yo ka pran 24 èdtan pou yo parèt nan Nouvo Analitics aprè w fin mete fonksyon sa a sou ON. Pou tout detay gade Nouvo Gwoup itilizatè Analys nan Kominote Canvas la."
   new_analytics_f6147886: "Nouvo Analiz"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Nouvo Analiz se yon zouti entèaktif ki pi byen ede ou menm ak elèv ou yo
