@@ -2082,7 +2082,7 @@ ga:
   admin_4d3ba42f: Riarthóir
   admin_analytics_dap_30f431d6: "DAP Anailísíocht Riarthóra"
   admin_analytics_dap_model_description: "Cumasaíonn sé úsáid DAP le haghaidh Anailísíocht ag leibhéal an chuntais."
-  admin_analytics_description: "Cumasaíonn sé Anailísíocht ag leibhéal an chuntais. Soláthraíonn deais Anailísíochta Riaracháin sonraí maidir le húsáid Canvas, rathúlacht chúrsa Canvas, agus rannpháirtíocht na mac léinn. Foghlaim níos mó sa *Lárionad Anailísíocht Riaracháin* i bpobal Canvas."
+  admin_analytics_description: "Cumasaíonn sé Anailísíocht ag leibhéal an chuntais. Soláthraíonn deais Anailísíochta Riaracháin sonraí maidir le húsáid Canvas, rathúlacht chúrsa Canvas, agus rannpháirtíocht na mac léinn. Foghlaim níos mó sa Lárionad Anailísíocht Riaracháin i bpobal Canvas."
   admin_analytics_eacba735: "Anailísíocht Riaracháin"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Anailísíocht Riaracháin - cuir cúrsaí i bhfolach gan aon rollú"
   admin_analytics_hide_courses_with_no_enrollments_description: "Nuair a bheidh sé cumasaithe, cuirfidh Admin Analytics + Intelligent Insights cúrsaí i bhfolach gan aon rolluithe ó na cairteacha sonraí go léir de réir réamhshocraithe. Beidh rogha san aip na cúrsaí seo a thaispeáint."
@@ -16747,7 +16747,7 @@ ga:
   new_alert_f757d585: "Foláireamh Nua"
   new_analytics_api_access_7eec1ead: "Rochtain API Anailísíocht Nua"
   new_analytics_attendance_config_v2_5f7a9e2c: "Anailísíocht Nua - Cumraíocht Tinrimh V2"
-  new_analytics_description: "Taispeáin anailísíocht nua do shonraí cúrsa agus úsáideora. Seans go dtógfaidh sé 24 uair an chloig sonraí a thaispeáint in New Analytics tar éis an bhratach gné seo a shocrú go Ar Siúl. Le haghaidh sonraí iomlána, féach le do thoil ar an *nGrúpa úsáideoirí Anailísíocht Nua* i bPobal Canvas."
+  new_analytics_description: "Taispeáin anailísíocht nua do shonraí cúrsa agus úsáideora. Seans go dtógfaidh sé 24 uair an chloig sonraí a thaispeáint in New Analytics tar éis an bhratach gné seo a shocrú go Ar Siúl. Le haghaidh sonraí iomlána, féach le do thoil ar an nGrúpa úsáideoirí Anailísíocht Nua i bPobal Canvas."
   new_analytics_f6147886: "Anailísíocht Nua"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Is uirlis idirghníomhach é Anailísíocht Nua a chuidíonn leat féin agus le do mhic léinn feidhmíocht agus gníomhaíocht níos fearr
