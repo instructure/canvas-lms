@@ -77,6 +77,13 @@ describe('DifferentiationTagTray', () => {
     expect(modalManager).toHaveAttribute('data-cat-id', '')
   })
 
+  it('renders link to community documentation when in empty state', () => {
+    renderComponent({differentiationTagCategories: []})
+    expect(
+      screen.getByText(/Learn more about how we used your input to create differentiation tags./),
+    ).toBeInTheDocument()
+  })
+
   it('shows loading spinner when isLoading is true', () => {
     renderComponent({isLoading: true})
     expect(screen.getByTitle('Loading...')).toBeInTheDocument()
