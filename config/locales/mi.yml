@@ -2633,7 +2633,7 @@ mi:
   admin_analytics_course_readiness_c79f13e1: "Kaitiaki Kaiwhakahaere - Riri Akoranga"
   admin_analytics_dap_30f431d6: "Kaiwhakahaere tātaritanga DAP"
   admin_analytics_dap_model_description: "Whakahohehia te whakamahi i te DAP mo nga tātaritanga i te taumata kaute."
-  admin_analytics_description: "Whakahohe te matawai taumata-kaute. Ka whakaratohia e nga papatohu tātaritanga kaiwhakahaere nga korero mo te whakamahinga Canvas, te otinga akoranga Canvas, me te whakaurunga o nga akonga. Ki te ako atu, tirohia te *Te Tari Taatari Whakahaere* i roto i te Kanawete Hapori."
+  admin_analytics_description: "Whakahohe te matawai taumata-kaute. Ka whakaratohia e nga papatohu tātaritanga kaiwhakahaere nga korero mo te whakamahinga Canvas, te otinga akoranga Canvas, me te whakaurunga o nga akonga. Ki te ako atu, tirohia te Te Tari Taatari Whakahaere i roto i te Kanawete Hapori."
   admin_analytics_eacba735: "Nga Tatari Whakahaere"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Kaitiaki Kaiwhakahaere - huna nga akoranga kaore he whakaurunga"
   admin_analytics_hide_courses_with_no_enrollments_description: "Ina whakahohea, ka huna e te Kaiwhakahaere Whakahaere + Maramatanga Maramatanga nga akoranga kaore he whakaurunga mai i nga mahere raraunga katoa ma te taunoa. Ka puta he whiringa i roto i te taupānga hei whakaatu i enei akoranga."
@@ -22308,7 +22308,7 @@ mi:
   new_alert_f757d585: "Matohi Hou"
   new_analytics_api_access_7eec1ead: "Tātaritanga Hou API Whakauru"
   new_analytics_attendance_config_v2_5f7a9e2c: "Tātaritanga Hou - Whirihora Taataki V2"
-  new_analytics_description: "Whakātu tātaritanga hou mo te akoranga me te kaiwhakamahi raraunga. Ka taea pea e te kitea i te 24 haora i roto i te Tātaritanga Hou i muri o te tautuhinga i tēnei āhuatanga haki kī WHAKAKĀ. Mo ngā taipitopito katoa tēnā koa titiro ki *Ngā Tātaritanga Hou kaiwhakamahi rōpū* i roto i te Hāpori Canvas."
+  new_analytics_description: "Whakātu tātaritanga hou mo te akoranga me te kaiwhakamahi raraunga. Ka taea pea e te kitea i te 24 haora i roto i te Tātaritanga Hou i muri o te tautuhinga i tēnei āhuatanga haki kī WHAKAKĀ. Mo ngā taipitopito katoa tēnā koa titiro ki Ngā Tātaritanga Hou kaiwhakamahi rōpū i roto i te Hāpori Canvas."
   new_analytics_f6147886: "Ngā Tātaritanga Hou"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Ngā Tātaritanga Hou he taputapu taunekeneke hei āwhina ia koe me ō ākonga pai ake
