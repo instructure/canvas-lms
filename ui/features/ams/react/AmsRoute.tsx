@@ -40,7 +40,11 @@ export function Component(): JSX.Element | null {
         if (stillMounting && containerRef.current) {
           moduleRef.current = module
           mountedContainer.current = containerRef.current
-          module.render(mountedContainer.current, {routerBasename: '/ams'})
+          module.render(mountedContainer.current, {
+            routerBasename: '/ams',
+            themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
+            useHighContrast: window.ENV.use_high_contrast ?? false,
+          })
         }
       })
       .catch(err => {
