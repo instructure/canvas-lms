@@ -21,6 +21,7 @@ import type {Result} from '../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import ResultCard from './ResultCard'
+import {Heading} from '@instructure/ui-heading'
 
 const I18n = createI18nScope('SmartSearch')
 
@@ -36,9 +37,7 @@ export default function SimilarResults(props: Props) {
   return (
     <Flex gap="small" direction="column">
       <Flex.Item>
-        <Text as="h2" size="x-large" weight="bold">
-          {I18n.t('Similar Results')}
-        </Text>
+        <Heading variant="titleSection">{I18n.t('Similar Results')}</Heading>
         <Text>
           {I18n.t(
             'While not a direct match, these results could still provide useful information.',
