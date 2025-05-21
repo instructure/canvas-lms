@@ -181,7 +181,7 @@ module UserContent
       @user = user
       @contextless_types = contextless_types
       @context_prefix = "/#{context.class.name.tableize}/#{context.id}"
-      @context_regex = %r{(?:/(#{context.class.name.tableize})/(#{context.id})|/(assessment_questions|users)/(\d+))}
+      @context_regex = %r{(?:/(#{context.class.name.tableize})/(#{context.id})|/(assessment_questions|users)/([^\s"<'?/]+))}
       @absolute_part = '(https?://[\w-]+(?:\.[\w-]+)*(?:\:\d{1,5})?)?'
       @toplevel_regex = %r{#{@absolute_part}#{@context_regex}?/(\w+)(?:/([^\s"<'?/]*)([^\s"<']*))?}
       @handlers = {}
@@ -277,8 +277,8 @@ module UserContent
       return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix && context_type != "users"
 
       if type != "wiki" && type != "pages"
-        if obj_id.to_i > 0
-          obj_id = obj_id.to_i
+        if Shard.integral_id_for(obj_id).to_i > 0
+          obj_id = Shard.integral_id_for(obj_id)
         else
           rest = "/#{obj_id}#{rest}" if obj_id && rest
           obj_id = nil
