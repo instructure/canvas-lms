@@ -21,6 +21,16 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ZipFileOptionsForm from '../ZipFileOptionsForm'
 
+// Mock jQuery for flashError function
+jest.mock('jquery', () => {
+  return {
+    __esModule: true,
+    default: {
+      flashError: jest.fn(),
+    },
+  }
+})
+
 const zipFile = new File(['foo'], 'foo.zip', {type: 'application/zip'})
 
 const defaultProps = {
@@ -39,6 +49,8 @@ const renderComponent = (props = {}) => render(<ZipFileOptionsForm {...defaultPr
 describe('ZipFileOptionsForm', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    // Reset all mocks before each test
+    jest.resetModules()
   })
 
   it('renders header', () => {
@@ -63,8 +75,9 @@ describe('ZipFileOptionsForm', () => {
 
   describe('calls onZipOptionsResolved', () => {
     it('when expands', async () => {
+      const user = userEvent.setup()
       renderComponent()
-      await userEvent.click(screen.getByTestId('zip-expand-button'))
+      await user.click(screen.getByTestId('zip-expand-button'))
 
       expect(defaultProps.onZipOptionsResolved).toHaveBeenCalledWith({
         expandZip: true,
@@ -73,8 +86,9 @@ describe('ZipFileOptionsForm', () => {
     })
 
     it('when uploads', async () => {
+      const user = userEvent.setup()
       renderComponent()
-      await userEvent.click(screen.getByTestId('zip-upload-button'))
+      await user.click(screen.getByTestId('zip-upload-button'))
 
       expect(defaultProps.onZipOptionsResolved).toHaveBeenCalledWith({
         expandZip: false,
