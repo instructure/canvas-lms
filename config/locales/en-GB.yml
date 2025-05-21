@@ -2640,7 +2640,7 @@ en-GB:
   admin_analytics_course_readiness_c79f13e1: "Admin Analytics - Course Readiness"
   admin_analytics_dap_30f431d6: "Admin Analytics DAP"
   admin_analytics_dap_model_description: "Enables the use of DAP for Analytics at the account-level."
-  admin_analytics_description: "Enables Analytics at the account-level. Admin Analytics dashboards provide details on Canvas usage, Canvas course success, and student engagement. Learn more in the *Admin Analytics Hub* in the Canvas community."
+  admin_analytics_description: "Enables Analytics at the account-level. Admin Analytics dashboards provide details on Canvas usage, Canvas course success, and student engagement. Learn more in the Admin Analytics Hub in the Canvas community."
   admin_analytics_eacba735: "Admin Analytics"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Admin Analytics - hide courses with no enrolments"
   admin_analytics_hide_courses_with_no_enrollments_description: "When enabled, Admin Analytics + Intelligent Insights will hide courses with no enrolments from all data charts by default. There will be an option in the app to show these courses."
@@ -22429,7 +22429,7 @@ en-GB:
   new_alert_f757d585: "New Alert"
   new_analytics_api_access_7eec1ead: "New Analytics API Access"
   new_analytics_attendance_config_v2_5f7a9e2c: "New Analytics - Attendance Config V2"
-  new_analytics_description: "Show new analytics for course and user data. Data may take 24 hours to appear in New Analytics after setting this feature flag to ON. For full details, please see the *New Analytics user group* in the Canvas Community."
+  new_analytics_description: "Show new analytics for course and user data. Data may take 24 hours to appear in New Analytics after setting this feature flag to ON. For full details, please see the New Analytics user group in the Canvas Community."
   new_analytics_f6147886: "New Analytics"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       New Analytics is an interactive tool that helps you and your students better
