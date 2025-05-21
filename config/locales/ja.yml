@@ -2637,7 +2637,7 @@ ja:
   admin_analytics_course_readiness_c79f13e1: "管理者分析 - コース準備状況"
   admin_analytics_dap_30f431d6: "Admin Analytics DAP"
   admin_analytics_dap_model_description: "アカウントレベルでのDAP for Analyticsの使用を有効にします。"
-  admin_analytics_description: アカウントレベルで「分析」を有効にします。「アドミ分析」ダッシュボードは、Canvasの使用状況、Canvasコースの成功、および受講者のエンゲージメントに関する詳細を提供しています。詳しくは、Canvasコミュニティの*アドミ分析ハブ*でご確認ください。
+  admin_analytics_description: アカウントレベルで「分析」を有効にします。「アドミ分析」ダッシュボードは、Canvasの使用状況、Canvasコースの成功、および受講者のエンゲージメントに関する詳細を提供しています。詳しくは、Canvasコミュニティのアドミ分析ハブでご確認ください。
   admin_analytics_eacba735: "Admin Analytics（管理者向けアナリティクス）"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Admin Analytics - 登録のないコースを非表示にする"
   admin_analytics_hide_courses_with_no_enrollments_description: "有効にすると、Admin Analytics + Intelligent Insights は、デフォルトで登録のないコースをすべてのデータチャートから非表示にします。これらのコースを表示するオプションがアプリに表示されます。"
@@ -22384,7 +22384,7 @@ ja:
   new_alert_f757d585: 新しいアラート
   new_analytics_api_access_7eec1ead: "New Analytics APIアクセス"
   new_analytics_attendance_config_v2_5f7a9e2c: "新しい分析 - 出席設定 V2"
-  new_analytics_description: "コースとユーザデータの新しい分析を表示します。新しい分析にデータが表示されるまで、この機能フラグをオンに設定してから 24 時間かかる場合があります。詳細については、Canvas コミュニティの*新しい分析ユーザグループ*を参照してください。"
+  new_analytics_description: "コースとユーザデータの新しい分析を表示します。新しい分析にデータが表示されるまで、この機能フラグをオンに設定してから 24 時間かかる場合があります。詳細については、Canvas コミュニティの新しい分析ユーザグループを参照してください。"
   new_analytics_f6147886: 新しい分析
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       New Analytics は、あなたと受講者がコース内のパフォーマンスとアクティビティをよりよく
