@@ -135,7 +135,7 @@ const ModulesListStudent: React.FC = () => {
                   progression={module.progression}
                   expanded={!!expandedModules.get(module._id)}
                   onToggleExpand={handleToggleExpandRef}
-                  statistics={module.statistics}
+                  submissionStatistics={module.submissionStatistics}
                 />
               ))
           )}

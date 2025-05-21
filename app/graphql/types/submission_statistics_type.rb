@@ -24,13 +24,13 @@ module Types
 
     alias_method :course, :object
 
-    field :submissions_due_this_week, Integer, null: false
-    def submissions_due_this_week
+    field :submissions_due_this_week_count, Integer, null: false
+    def submissions_due_this_week_count
       return 0 unless current_user
 
       one_week_from_now = Time.zone.now.advance(days: 7)
       Loaders::CourseSubmissionDataLoader.for(
-        :submissions_due_this_week,
+        :submissions_due_this_week_count,
         {
           start_date: Time.zone.now,
           end_date: one_week_from_now,

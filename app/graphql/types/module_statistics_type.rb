@@ -24,9 +24,9 @@ module Types
 
     # The object being passed is a hash with statistics data from the loader
 
-    field :overdue_assignment_count, Integer, null: false
-    def overdue_assignment_count
-      object[:overdue_assignment_count] || 0
+    field :missing_assignment_count, Integer, null: false
+    def missing_assignment_count
+      object[:missing_assignment_count] || 0
     end
 
     field :latest_due_at, GraphQL::Types::ISO8601DateTime, null: true

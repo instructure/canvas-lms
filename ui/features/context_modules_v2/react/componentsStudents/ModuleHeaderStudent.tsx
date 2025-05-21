@@ -39,7 +39,7 @@ export interface ModuleHeaderStudentProps {
   progression?: ModuleProgression
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
-  statistics?: ModuleStatistics
+  submissionStatistics?: ModuleStatistics
 }
 
 const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
@@ -50,7 +50,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
   progression,
   completionRequirements,
   requirementCount,
-  statistics,
+  submissionStatistics,
 }) => {
   const onToggleExpandRef = useCallback(() => {
     onToggleExpand(id)
@@ -91,7 +91,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
               <ModuleHeaderSupplementalInfoStudent
                 completionRequirements={completionRequirements || []}
                 requirementCount={requirementCount}
-                statistics={statistics}
+                submissionStatistics={submissionStatistics}
               />
             </Flex.Item>
             {completionRequirements?.length && (

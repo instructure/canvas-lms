@@ -56,7 +56,7 @@ module Loaders
         module_id = mod.id
 
         fulfill(mod, {
-                  overdue_assignment_count: overdue_counts[module_id] || 0,
+                  missing_assignment_count: overdue_counts[module_id] || 0,
                   latest_due_at: latest_due_dates[module_id]
                 })
       end
@@ -74,6 +74,7 @@ module Loaders
         count = @current_user.submissions
                              .except(:order)
                              .where(assignment_id: assignment_ids)
+                             .merge(Assignment.published)
                              .missing
                              .distinct
                              .count

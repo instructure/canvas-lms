@@ -61,7 +61,7 @@ const setupTest = (
     courseData || {
       name: 'Test Course',
       submissionStatistics: {
-        submissionsDueThisWeek: 5,
+        submissionsDueThisWeekCount: 5,
         missingSubmissionsCount: 3,
       },
     },
@@ -105,7 +105,7 @@ describe('ModulePageActionHeaderStudent', () => {
     const {queryByText} = setupTest(buildDefaultProps(), {
       name: undefined,
       submissionStatistics: {
-        submissionsDueThisWeek: 0,
+        submissionsDueThisWeekCount: 0,
         missingSubmissionsCount: 0,
       },
     })
@@ -120,7 +120,7 @@ describe('ModulePageActionHeaderStudent', () => {
     const {getByText} = setupTest(buildDefaultProps(), {
       name: 'Test Course',
       submissionStatistics: {
-        submissionsDueThisWeek: 1,
+        submissionsDueThisWeekCount: 1,
         missingSubmissionsCount: 2,
       },
     })
@@ -134,7 +134,7 @@ describe('ModulePageActionHeaderStudent', () => {
     const {getByText, queryByText} = setupTest(buildDefaultProps(), {
       name: 'Test Course',
       submissionStatistics: {
-        submissionsDueThisWeek: 0,
+        submissionsDueThisWeekCount: 0,
         missingSubmissionsCount: 1,
       },
     })

@@ -1392,8 +1392,14 @@ type CommunicationChannel implements LegacyIDInterface & Node & Timestamped {
   _id: ID!
   createdAt: DateTime
   id: ID!
-  notificationPolicies(contextType: NotificationPreferencesContextType): [NotificationPolicy!]
-  notificationPolicyOverrides(accountId: ID, contextType: NotificationPreferencesContextType!, courseId: ID): [NotificationPolicy!]
+  notificationPolicies(
+    contextType: NotificationPreferencesContextType
+  ): [NotificationPolicy!]
+  notificationPolicyOverrides(
+    accountId: ID
+    contextType: NotificationPreferencesContextType!
+    courseId: ID
+  ): [NotificationPolicy!]
   path: String
   pathType: String
   updatedAt: DateTime
@@ -3264,7 +3270,14 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
     """
     roleTypes: [String!]
   ): User
-  entriesTotalPages(filter: DiscussionFilterType, perPage: Int!, rootEntries: Boolean, searchTerm: String, sortOrder: DiscussionSortOrderType, unreadBefore: String): Int
+  entriesTotalPages(
+    filter: DiscussionFilterType
+    perPage: Int!
+    rootEntries: Boolean
+    searchTerm: String
+    sortOrder: DiscussionSortOrderType
+    unreadBefore: String
+  ): Int
   entryCounts: DiscussionEntryCounts
   expanded: Boolean
   expandedLocked: Boolean
@@ -3316,7 +3329,12 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
   published: Boolean!
   replyToEntryRequiredCount: Int!
   requireInitialPost: Boolean
-  rootEntriesTotalPages(filter: DiscussionFilterType, perPage: Int!, searchTerm: String, sortOrder: DiscussionSortOrderType): Int
+  rootEntriesTotalPages(
+    filter: DiscussionFilterType
+    perPage: Int!
+    searchTerm: String
+    sortOrder: DiscussionSortOrderType
+  ): Int
   rootTopic: Discussion
   searchEntryCount(filter: DiscussionFilterType, searchTerm: String): Int
   sortByRating: Boolean
@@ -4679,7 +4697,8 @@ scalar HtmlEncodedString
 """
 An ISO 8601-encoded datetime
 """
-scalar ISO8601DateTime @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc3339")
+scalar ISO8601DateTime
+  @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc3339")
 
 """
 An ISO 8601-encoded duration
@@ -4762,7 +4781,10 @@ type LearningOutcome implements LegacyIDInterface & Node & Timestamped {
   createdAt: DateTime
   description: String
   displayName: String
-  friendlyDescription(contextId: ID!, contextType: String!): OutcomeFriendlyDescriptionType
+  friendlyDescription(
+    contextId: ID!
+    contextType: String!
+  ): OutcomeFriendlyDescriptionType
   id: ID!
   isImported(targetContextId: ID!, targetContextType: String!): Boolean
   masteryPoints: Float
@@ -5461,7 +5483,7 @@ type ModuleProgressionEdge {
 
 type ModuleStatistics {
   latestDueAt: ISO8601DateTime
-  overdueAssignmentCount: Int!
+  missingAssignmentCount: Int!
 }
 
 """
@@ -8243,7 +8265,14 @@ input SubmissionHistoryFilterInput {
   history results. Defaults to true.
   """
   includeCurrentSubmission: Boolean = true
-  states: [SubmissionState!] = [deleted, graded, pending_review, submitted, ungraded, unsubmitted]
+  states: [SubmissionState!] = [
+    deleted
+    graded
+    pending_review
+    submitted
+    ungraded
+    unsubmitted
+  ]
 }
 
 """
@@ -8533,7 +8562,7 @@ enum SubmissionState {
 
 type SubmissionStatistics {
   missingSubmissionsCount: Int!
-  submissionsDueThisWeek: Int!
+  submissionsDueThisWeekCount: Int!
 }
 
 enum SubmissionStatusTagType {
@@ -9459,7 +9488,11 @@ type User implements LegacyIDInterface & Node & Timestamped {
   loginId: String
   name: HtmlEncodedString
   notificationPreferences: NotificationPreferences
-  notificationPreferencesEnabled(accountId: ID, contextType: NotificationPreferencesContextType!, courseId: ID): Boolean!
+  notificationPreferencesEnabled(
+    accountId: ID
+    contextType: NotificationPreferencesContextType!
+    courseId: ID
+  ): Boolean!
   pronouns: String
   recipients(context: String, search: String): Recipients
   recipientsObservers(

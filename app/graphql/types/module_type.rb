@@ -106,8 +106,8 @@ module Types
       ModuleItemsVisibleLoader.for(current_user).load(context_module)
     end
 
-    field :statistics, Types::ModuleStatisticsType, null: true
-    def statistics
+    field :submission_statistics, Types::ModuleStatisticsType, null: true
+    def submission_statistics
       Loaders::ModuleStatisticsLoader.for(current_user:).load(context_module)
     end
 
