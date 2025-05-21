@@ -2697,7 +2697,7 @@ ar:
   admin_analytics_course_readiness_c79f13e1: "تحليلات المسؤول - جاهزية المساق"
   admin_analytics_dap_30f431d6: "DAP لتحليلات المسؤول"
   admin_analytics_dap_model_description: "لتمكين استخدام DAP للتحليلات على مستوى الحساب."
-  admin_analytics_description: "لتمكين التحليلات على مستوى الحساب. توفر لوحات معلومات تحليلات المسؤول تفاصيل حول استخدام Canvas ونجاح مساق Canvas وتفاعل الطلاب. اعرف المزيد في *مركز تحليلات المسؤول* في مجتمع Canvas."
+  admin_analytics_description: "لتمكين التحليلات على مستوى الحساب. توفر لوحات معلومات تحليلات المسؤول تفاصيل حول استخدام Canvas ونجاح مساق Canvas وتفاعل الطلاب. اعرف المزيد في مركز تحليلات المسؤول في مجتمع Canvas."
   admin_analytics_eacba735: "تحليلات المسؤول"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "تحليلات المسؤول - إخفاء المساقات الخالية من التسجيلات"
   admin_analytics_hide_courses_with_no_enrollments_description: "عند التمكين، ستقوم Admin Analytics + Intelligent Insights (تحليلات المسؤول و الرؤى الذكية) بإخفاء المساقات الخالية من التسجيلات من كل مخططات البيانات بشكل افتراضي. سيتوفر خيار في التطبيق لإظهار هذه المساقات."
@@ -23416,7 +23416,7 @@ ar:
   new_alert_f757d585: "تنبيه جديد"
   new_analytics_api_access_7eec1ead: "الوصول إلى واجهة برمجة تطبيقات New Analytics"
   new_analytics_attendance_config_v2_5f7a9e2c: "التحليلات الجديدة - تكوين الحضور النسخة الثانية"
-  new_analytics_description: "اعرض التحليلات الجديدة للمساق وبيانات المستخدم. قد يستغرق ظهور البيانات 24 ساعة في التحليلات الجديدة بعد تعيين علامة هذه الميزة على تشغيل. للحصول على التفاصيل الكاملة، يرجى الاطلاع على *مجموعة مستخدم التحليلات الجديدة* في Canvas Community."
+  new_analytics_description: "اعرض التحليلات الجديدة للمساق وبيانات المستخدم. قد يستغرق ظهور البيانات 24 ساعة في التحليلات الجديدة بعد تعيين علامة هذه الميزة على تشغيل. للحصول على التفاصيل الكاملة، يرجى الاطلاع على مجموعة مستخدم التحليلات الجديدة في Canvas Community."
   new_analytics_f6147886: "تحليلات جديدة"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       التحليلات الجديدة أداة تفاعلية تساعدك أنت وطلابك على تتبع
