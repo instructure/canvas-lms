@@ -2307,7 +2307,7 @@ fi:
   admin_analytics_course_readiness_c79f13e1: "Järjestelmäkäyttäjän analyysi - kurssin valmius"
   admin_analytics_dap_30f431d6: "Pääkäyttäjän analyysi-DAP"
   admin_analytics_dap_model_description: "Mahdollistaa DAP:n käytön Analyticsille tilitasolla."
-  admin_analytics_description: "Ottaa käyttöön tilitason analyysit Järjestelmäkäyttäjän analyysikoontonäytöt antavat tietoja Canvasin käytöstä, Canvas-kurssimenestyksestä ja opiskelijan osallistumisesta. Lue lisää *järjestelmäkäyttäjän analyysikeskuksessa * Canvas-yhteisössä."
+  admin_analytics_description: "Ottaa käyttöön tilitason analyysit Järjestelmäkäyttäjän analyysikoontonäytöt antavat tietoja Canvasin käytöstä, Canvas-kurssimenestyksestä ja opiskelijan osallistumisesta. Lue lisää järjestelmäkäyttäjän analyysikeskuksessa Canvas-yhteisössä."
   admin_analytics_eacba735: "Pääkäyttäjän analyysi"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Admin Analytics - piilota kurssit ilman ilmoittautumisia"
   admin_analytics_hide_courses_with_no_enrollments_description: "Kun Admin Analytics + Intelligent Insights on käytössä, se piilottaa oletusarvoisesti kaikista datakaavioista kurssit, joihin ei ole ilmoittautunut. Sovelluksessa on mahdollisuus näyttää nämä kurssit."
@@ -19441,7 +19441,7 @@ fi:
   new_alert_f757d585: "Uusi hälytys"
   new_analytics_api_access_7eec1ead: "Uuden analytiikan API-rajapinnan käyttöoikeus"
   new_analytics_attendance_config_v2_5f7a9e2c: "Uusi analyysin - läsnäolon konfigurointi V2"
-  new_analytics_description: "Näyttää uuden kurssi- ja käyttäjätietojen analytiikan. Saattaa kestää 24 tuntia ennen kuin tiedot ilmestyvät uuteen analytiikkaan sen jälkeen, kun tämä ominaisuus on kytketty päälle (ON-asentoon). Lisätietoja on *Uudet analyysit -käyttäjäryhmässä* Canvas-yhteisössä."
+  new_analytics_description: "Näyttää uuden kurssi- ja käyttäjätietojen analytiikan. Saattaa kestää 24 tuntia ennen kuin tiedot ilmestyvät uuteen analytiikkaan sen jälkeen, kun tämä ominaisuus on kytketty päälle (ON-asentoon). Lisätietoja on Uudet analyysit -käyttäjäryhmässä Canvas-yhteisössä."
   new_analytics_f6147886: "Uusi analyysi"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Uusi analyysi on interaktiivinen työkalu, joka auttaa sinua ja opiskelijoita
