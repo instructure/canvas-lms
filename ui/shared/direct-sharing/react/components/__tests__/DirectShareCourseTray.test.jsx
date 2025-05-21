@@ -17,9 +17,11 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import useManagedCourseSearchApi from '../../effects/useManagedCourseSearchApi'
 import DirectShareCourseTray from '../DirectShareCourseTray'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('../../effects/useManagedCourseSearchApi')
 
@@ -38,7 +40,12 @@ describe('DirectShareCourseTray', () => {
   })
 
   beforeEach(() => {
+    fakeENV.setup()
     useManagedCourseSearchApi.mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
   it('displays interface for selecting a course', async () => {
@@ -49,8 +56,10 @@ describe('DirectShareCourseTray', () => {
 
   it('calls onDismiss when cancel is clicked', async () => {
     const handleDismiss = jest.fn()
-    const {getByText} = render(<DirectShareCourseTray open={true} onDismiss={handleDismiss} />)
-    fireEvent.click(await waitFor(() => getByText(/cancel/i)))
+    const user = userEvent.setup()
+    const {getByTestId} = render(<DirectShareCourseTray open={true} onDismiss={handleDismiss} />)
+    const cancelButton = await waitFor(() => getByTestId('confirm-action-secondary-button'))
+    await user.click(cancelButton)
     expect(handleDismiss).toHaveBeenCalled()
   })
 })
