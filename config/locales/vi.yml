@@ -2170,7 +2170,7 @@ vi:
   admin_analytics_course_readiness_c79f13e1: "Phân Tích của Quản Trị Viên - Tình Trạng Sẵn Sàng của Khóa Học"
   admin_analytics_dap_30f431d6: "DAP Phân Tích của Quản Trị Viên"
   admin_analytics_dap_model_description: "Bật sử dụng DAP cho Phân Tích ở cấp độ tài khoản."
-  admin_analytics_description: "Bật Phân Tích ở cấp độ tài khoản. Bảng điều khiển Phân Tích của Quản Trị Viên cung cấp thông tin chi tiết về việc sử dụng Canvas, sự thành công của khóa học Canvas và sự tham gia của sinh viên. Tìm hiểu thêm về *Trung Tâm Phân Tích của Quản Trị Viên* ở cộng đồng Canvas."
+  admin_analytics_description: "Bật Phân Tích ở cấp độ tài khoản. Bảng điều khiển Phân Tích của Quản Trị Viên cung cấp thông tin chi tiết về việc sử dụng Canvas, sự thành công của khóa học Canvas và sự tham gia của sinh viên. Tìm hiểu thêm về Trung Tâm Phân Tích của Quản Trị Viên ở cộng đồng Canvas."
   admin_analytics_eacba735: "Phân Tích Quản Trị"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Phân Tích của Quản Trị Viên - ẩn các khóa học không có lượt ghi danh"
   admin_analytics_hide_courses_with_no_enrollments_description: "Khi được bật, Phân Tích của Quản Trị Viên + Intelligent Insights sẽ mặc định ẩn các khóa học không có lượt ghi danh khỏi tất cả biểu đồ dữ liệu. Sẽ có một tùy chọn trong ứng dụng để hiển thị các khóa học này."
@@ -17495,7 +17495,7 @@ vi:
   new_alert_f757d585: "Cảnh Báo Mới"
   new_analytics_api_access_7eec1ead: "Truy Cập Phân Tích API Mới"
   new_analytics_attendance_config_v2_5f7a9e2c: "Phân Tích Mới - Cấu Hình Chuyên Cần V2"
-  new_analytics_description: "Hiển thị số liệu phân tích mới cho dữ liệu người dùng và khóa học. Dữ liệu có thể mất 24 giờ để hiển thị trong Phân Tích Mới sau khi cài đặt cờ đặc tính này sang BẬT. Để biết chi tiết đầy đủ, vui lòng xem *nhóm người dùng Phân Tích Mới* trong Cộng đồng Canvas."
+  new_analytics_description: "Hiển thị số liệu phân tích mới cho dữ liệu người dùng và khóa học. Dữ liệu có thể mất 24 giờ để hiển thị trong Phân Tích Mới sau khi cài đặt cờ đặc tính này sang BẬT. Để biết chi tiết đầy đủ, vui lòng xem nhóm người dùng Phân Tích Mới trong Cộng đồng Canvas."
   new_analytics_f6147886: "Phân Tích Mới"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Phân Tích Mới là một công cụ tương tác hỗ trợ bạn và sinh viên tốt hơn, có thể theo dõi
