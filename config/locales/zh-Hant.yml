@@ -2637,7 +2637,7 @@ zh-Hant:
   admin_analytics_course_readiness_c79f13e1: "管理員分析工具 - 課程就緒"
   admin_analytics_dap_30f431d6: "管理員分析工具 DAP"
   admin_analytics_dap_model_description: "允許在帳戶級別使用 DAP for Analytics。"
-  admin_analytics_description: "在帳戶級別啟用「分析工具」。管理員「分析工具」控制面板提供與 Canvas 使用情況、Canvas 課程成功和學生參與有關的詳細資料。了解更多有關 Canvas 社群中的*管理員分析工具中心*。"
+  admin_analytics_description: "在帳戶級別啟用「分析工具」。管理員「分析工具」控制面板提供與 Canvas 使用情況、Canvas 課程成功和學生參與有關的詳細資料。了解更多有關 Canvas 社群中的管理員分析工具中心。"
   admin_analytics_eacba735: 管理員分析工具
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "管理員分析工具 - 隱藏沒有註冊學生的課程"
   admin_analytics_hide_courses_with_no_enrollments_description: "啟用後，管理員分析工具 + 智慧見解將預設從所有資料圖表中隱藏沒有註冊的課程。應用程式中將有一個選項來顯示這些課程。"
@@ -22376,7 +22376,7 @@ zh-Hant:
   new_alert_f757d585: 新提醒
   new_analytics_api_access_7eec1ead: "新分析工具 API 存取"
   new_analytics_attendance_config_v2_5f7a9e2c: "新分析工具 - 出席紀錄配置 V2"
-  new_analytics_description: "顯示使用於課程和使用者資料的新分析工具。將此功能新增標記設定為 ON（開）後，資料在「新分析工具」中出現可能需要花費 24 小時的時間。如需完整詳細資料，請參閱「Canvas 社群」中的*「新分析工具使用者」*。"
+  new_analytics_description: "顯示使用於課程和使用者資料的新分析工具。將此功能新增標記設定為 ON（開）後，資料在「新分析工具」中出現可能需要花費 24 小時的時間。如需完整詳細資料，請參閱「Canvas 社群」中的「新分析工具使用者」。"
   new_analytics_f6147886: 新分析工具
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       新分析工具是一項互動工具，能助您和您的學生更有效地
