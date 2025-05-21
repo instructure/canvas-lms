@@ -245,16 +245,20 @@ class RubricsController < ApplicationController
     end
   end
 
-  ALLOWED_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion use_range].freeze
+  ALLOWED_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion use_range additional_prompt_info].freeze
   def llm_criteria
     association_object = RubricAssociation.get_association_object(params[:rubric_association])
     generate_options = (params[:generate_options] || {}).permit(*ALLOWED_GENERATE_PARAMS)
     generate_options[:use_range] = value_to_boolean(generate_options[:use_range])
+    generate_options[:additional_prompt_info] = generate_options[:additional_prompt_info].presence
     if generate_options[:criteria_count].present? && !(2..8).cover?(generate_options[:criteria_count].to_i)
       return render json: { error: "criteria_count must be between 2 and 8 inclusive" }, status: :bad_request
     end
     if generate_options[:rating_count].present? && !(2..8).cover?(generate_options[:rating_count].to_i)
       return render json: { error: "rating_count must be between 2 and 8 inclusive" }, status: :bad_request
+    end
+    if generate_options[:additional_prompt_info].present? && generate_options[:additional_prompt_info].length > 1000
+      return render json: { error: "additional_prompt_info must be less than 1000 characters" }, status: :bad_request
     end
 
     return render_unauthorized_action unless Rubric.ai_rubrics_enabled?(context)
