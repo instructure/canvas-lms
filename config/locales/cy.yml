@@ -2402,7 +2402,7 @@ cy:
   admin_analytics_course_readiness_c79f13e1: "Admin Analytics - Parodrwydd Cwrs"
   admin_analytics_dap_30f431d6: "Admin Analytics DAP"
   admin_analytics_dap_model_description: "Yn galluogi defnyddio DAP ar gyfer Dadansoddiadau ar lefel y cyfrif."
-  admin_analytics_description: "Galluogi Dadansoddiadau ar lefel y cyfrif. Mae’r dangosfwrddau Admin Analytics yn darparu manylion am ddefnydd Canvas, llwyddiant cyrsiau Canvas, ac ymgysylltiad myfyrwyr. Dysgwch fwy yn yr *Admin Analytics Hub* yng nghymuned Canvas."
+  admin_analytics_description: "Galluogi Dadansoddiadau ar lefel y cyfrif. Mae’r dangosfwrddau Admin Analytics yn darparu manylion am ddefnydd Canvas, llwyddiant cyrsiau Canvas, ac ymgysylltiad myfyrwyr. Dysgwch fwy yn yr Admin Analytics Hub yng nghymuned Canvas."
   admin_analytics_eacba735: "Admin Analytics"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Admin Analytics - cuddio cyrsiau sydd heb ymrestriadau"
   admin_analytics_hide_courses_with_no_enrollments_description: "Pan fydd Admin Analytics + Intelligent Insights wedi’i alluogi, bydd cyrsiau sydd heb ymrestriadau’n cael eu cuddio o’r siartiau data yn ddiofyn. Bydd opsiwn yn yr ap i ddangos y cyrsiau hyn."
@@ -20552,7 +20552,7 @@ cy:
   new_alert_f757d585: "Neges Hysbysu Newydd"
   new_analytics_api_access_7eec1ead: "Mynediad Dadansoddiadau API Newydd"
   new_analytics_attendance_config_v2_5f7a9e2c: "Dadansoddiadau Newydd – Ffurfweddu Presenoldeb F2"
-  new_analytics_description: "Dangos dadansoddiadau newydd ar gyfer data cwrs a data defnyddiwr. Mae’n bosib y bydd data yn cymryd 24 awr i ymddangos yn Dadansoddiadau Newydd ar ôl gosod y fflag nodwedd hon YMLAEN. I gael y manylion llawn, gweler *grŵp defnyddwyr Dadansoddiadau Newydd* yng Nghymuned Canvas."
+  new_analytics_description: "Dangos dadansoddiadau newydd ar gyfer data cwrs a data defnyddiwr. Mae’n bosib y bydd data yn cymryd 24 awr i ymddangos yn Dadansoddiadau Newydd ar ôl gosod y fflag nodwedd hon YMLAEN. I gael y manylion llawn, gweler grŵp defnyddwyr Dadansoddiadau Newydd yng Nghymuned Canvas."
   new_analytics_f6147886: "Dadansoddiadau Newydd"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Mae Dadansoddiadau Newydd yn adnodd rhyngweithiol sy’n eich helpu chi a’ch myfyrwyr
