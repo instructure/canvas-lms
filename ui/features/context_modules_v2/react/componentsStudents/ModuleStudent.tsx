@@ -19,7 +19,6 @@
 import React, {useState, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {ModuleItemProps} from '../componentsTeacher/ModuleItem'
 import ModuleHeaderStudent from './ModuleHeaderStudent'
 import ModuleItemListStudent from './ModuleItemListStudent'
 import {useModuleItemsStudent} from '../hooks/queriesStudent/useModuleItemsStudent'
@@ -36,6 +35,7 @@ export interface ModuleStudentProps {
   completionRequirements?: CompletionRequirement[]
   expanded?: boolean
   onToggleExpand?: (id: string) => void
+  requireSequentialProgress?: boolean
   progression?: ModuleProgression
   requirementCount?: number
   submissionStatistics?: ModuleStatistics
@@ -47,13 +47,14 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
   expanded: propExpanded,
   onToggleExpand,
   name,
+  requireSequentialProgress,
   progression,
   requirementCount,
   submissionStatistics,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
   const {data, isLoading, error} = useModuleItemsStudent(id, !!isExpanded)
-  const [moduleItems, setModuleItems] = useState<ModuleItemProps[]>([])
+  const [moduleItems, setModuleItems] = useState<ModuleItem[]>([])
 
   const toggleExpanded = (moduleId: string) => {
     const newExpandedState = !isExpanded
@@ -119,6 +120,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
           <Flex.Item>
             <ModuleItemListStudent
               moduleItems={moduleItems}
+              requireSequentialProgress={requireSequentialProgress}
               completionRequirements={completionRequirements}
               progression={progression}
               isLoading={isLoading}

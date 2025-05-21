@@ -35,6 +35,7 @@ const MemoizedModuleItemStudent = memo(
 export interface ModuleItemListStudentProps {
   moduleItems: ModuleItem[]
   completionRequirements?: CompletionRequirement[]
+  requireSequentialProgress?: boolean
   progression?: ModuleProgression
   isLoading: boolean
   error: any
@@ -43,6 +44,7 @@ export interface ModuleItemListStudentProps {
 const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
   moduleItems,
   completionRequirements,
+  requireSequentialProgress,
   progression,
   isLoading,
   error,
@@ -73,6 +75,7 @@ const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
               {...item}
               index={index}
               completionRequirements={completionRequirements}
+              requireSequentialProgress={!!requireSequentialProgress}
               progression={progression}
             />
           </View>

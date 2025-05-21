@@ -128,6 +128,9 @@ module Types
       end
     end
 
+    field :position, Integer, null: true
+    delegate :position, to: :object
+
     field :content, Interfaces::ModuleItemInterface, null: true
     def content
       # External Urls don't have a seperate content_id, and external tools don't
