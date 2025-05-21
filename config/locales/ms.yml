@@ -2133,7 +2133,7 @@ ms:
   admin_analytics_course_readiness_c79f13e1: "Analisis Pentadbir - Ketersediaan Kursus"
   admin_analytics_dap_30f431d6: "DAP Analisis Pentadbir"
   admin_analytics_dap_model_description: "Mendayakan penggunaan DAP untuk Analisis pada tahap akaun."
-  admin_analytics_description: "Mendayakan Analisis pada tahap akaun. Papan pemuka Analisis pentadbir menyediakan butiran tentang penggunaan Canvas, kejayaan kursus Canvas dan penglibatan pelajar. Ketahui lebih lanjut dalam *Hab Analisis Pentadbir* dalam komuniti Canvas."
+  admin_analytics_description: "Mendayakan Analisis pada tahap akaun. Papan pemuka Analisis pentadbir menyediakan butiran tentang penggunaan Canvas, kejayaan kursus Canvas dan penglibatan pelajar. Ketahui lebih lanjut dalam Hab Analisis Pentadbir dalam komuniti Canvas."
   admin_analytics_eacba735: "Analisis Pentadbir"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Analisis Pentadbir - sembunyikan kursus tanpa pendaftaran"
   admin_analytics_hide_courses_with_no_enrollments_description: "Apabila didayakan, Analisis Pentadbir + Cerapan Pintar akan menyembunyikan kursus tanpa pendaftaran daripada semua carta data secara lalai. Pilihan dalam aplikasi akan tersedia untuk menunjukkan kursus ini."
@@ -17075,7 +17075,7 @@ ms:
   new_alert_f757d585: "Isyarat Baharu"
   new_analytics_api_access_7eec1ead: "Akses API Analisis Baharu"
   new_analytics_attendance_config_v2_5f7a9e2c: "Analisis Baharu - Konfigurasi Kehadiran V2"
-  new_analytics_description: "Tunjuk analisis baharu untuk data kursus dan pengguna. Data mungkin mengambil masa 24 jam untuk muncul dalam Analisis Baharu selepas menetapkan bendera ciri ini kepada HIDUP. Untuk butiran penuh, sila lihat *kumpulan pengguna Analisis Baharu* dalam Komuniti Canvas."
+  new_analytics_description: "Tunjuk analisis baharu untuk data kursus dan pengguna. Data mungkin mengambil masa 24 jam untuk muncul dalam Analisis Baharu selepas menetapkan bendera ciri ini kepada HIDUP. Untuk butiran penuh, sila lihat kumpulan pengguna Analisis Baharu dalam Komuniti Canvas."
   new_analytics_f6147886: "Analisis Baharu"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Analisis baharu ialah alat interaktif yang membantu anda dan pelajar anda menjejak
