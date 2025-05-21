@@ -2668,7 +2668,7 @@ pl:
   admin_analytics_course_readiness_c79f13e1: "Admin Analytics – gotowość kursu"
   admin_analytics_dap_30f431d6: "DAP dla Admin Analytics"
   admin_analytics_dap_model_description: "Włącza użycie DAP dla analityki na poziomie konta."
-  admin_analytics_description: "Włącza analizę na poziomie konta. Pulpity nawigacyjne analizy administratorów zapewniają dane o użyciu Canvas, pomyślnym przejściu szkoleń Canvas oraz zaangażowaniu uczestników. Dowiedz się więcej w *Admin Analytics Hub* w ramach społeczności Canvas."
+  admin_analytics_description: "Włącza analizę na poziomie konta. Pulpity nawigacyjne analizy administratorów zapewniają dane o użyciu Canvas, pomyślnym przejściu szkoleń Canvas oraz zaangażowaniu uczestników. Dowiedz się więcej w Admin Analytics Hub w ramach społeczności Canvas."
   admin_analytics_eacba735: "Dane analityczne administratora"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Admin Analytics – ukryj kursy bez zapisów"
   admin_analytics_hide_courses_with_no_enrollments_description: "Po włączeniu, Admin Analytics + Intelligent Insights domyślnie ukryje kursy bez zapisów przed wszystkimi wykresami danych. W aplikacji dostępna będzie opcja umożliwiająca pokazanie tych kursów."
@@ -22903,7 +22903,7 @@ pl:
   new_alert_f757d585: "Nowy alert"
   new_analytics_api_access_7eec1ead: "Dostęp do New Analytics API"
   new_analytics_attendance_config_v2_5f7a9e2c: "New Analytics – Konfiguracja uczestnictwa V2"
-  new_analytics_description: "Pokaż nową analizę kursów i danych użytkowników. Po aktywacji flagi tej funkcji, dane w New Analytics mogą się wyświetlać przez 24 godziny. Aby uzyskać pełne informacje, patrz *grupa użytkowników New Analytics*w społeczności Canvas."
+  new_analytics_description: "Pokaż nową analizę kursów i danych użytkowników. Po aktywacji flagi tej funkcji, dane w New Analytics mogą się wyświetlać przez 24 godziny. Aby uzyskać pełne informacje, patrz grupa użytkowników New Analytics w społeczności Canvas."
   new_analytics_f6147886: "New Analytics"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       New Analytics to interaktywne narzędzie, które pomoże Tobie i uczestnikom szybciej śledzić
