@@ -2175,7 +2175,7 @@ es-ES:
   admin_analytics_course_readiness_c79f13e1: "Administrador de Analytics - Preparación de curso"
   admin_analytics_dap_30f431d6: "DAP de analíticas del administrador"
   admin_analytics_dap_model_description: "Habilitar el uso de DAP para analíticas en el nivel de cuenta."
-  admin_analytics_description: "Habilita Analytics a nivel de la cuenta. Los cuadros de mando de administrador de Analytics proporcionan datos sobre el uso de Canvas, el grado de éxito del curso de Canvas y la participación de los estudiantes. Puedes obtener más información en el *centro del administrador de Analytics* en la comunidad Canvas."
+  admin_analytics_description: "Habilita Analytics a nivel de la cuenta. Los cuadros de mando de administrador de Analytics proporcionan datos sobre el uso de Canvas, el grado de éxito del curso de Canvas y la participación de los estudiantes. Puedes obtener más información en el Centro del administrador de Analytics en la comunidad Canvas."
   admin_analytics_eacba735: "Analíticas de administrador"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Analíticas de administrador: ocultar asignaturas sin inscripciones"
   admin_analytics_hide_courses_with_no_enrollments_description: "Cuando se habilitan, Analíticas de administrador e Intelligent Insights ocultarán de forma predeterminada las asignaturas sin inscripciones en todos los gráficos de datos. Habrá una opción en la aplicación para mostrar estas asignaturas."
@@ -17623,7 +17623,7 @@ es-ES:
   new_alert_f757d585: "Nueva alerta"
   new_analytics_api_access_7eec1ead: "Acceso a la API de nuevas analíticas"
   new_analytics_attendance_config_v2_5f7a9e2c: "Nuevas analíticas: configuración de asistencia V2"
-  new_analytics_description: "Mostrar nuevas analíticas para datos de la asignatura y del usuario. Es posible que los datos tarden 24 horas en aparecer en nuevas analíticas tras configurar esta marca de funcionalidad como ACTIVADA. Para obtener más información, consulta el *grupo de usuarios de Nuevas analíticas* en la Comunidad Canvas."
+  new_analytics_description: "Mostrar nuevas analíticas para datos de la asignatura y del usuario. Es posible que los datos tarden 24 horas en aparecer en nuevas analíticas tras configurar esta marca de funcionalidad como ACTIVADA. Para obtener más información, consulta el grupo de usuarios de Nuevas analíticas en la Comunidad Canvas."
   new_analytics_f6147886: "Nuevas analíticas"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Nuevas analíticas es una herramienta interactiva que te ayuda, a ti y al estudiante, a monitorizar
