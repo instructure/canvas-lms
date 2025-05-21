@@ -2075,7 +2075,7 @@ id:
   admin_4d3ba42f: Admin
   admin_analytics_dap_30f431d6: "DAP Analitik DAP"
   admin_analytics_dap_model_description: "Mengaktifkan penggunakan DAP untuk Analytics pada level akun."
-  admin_analytics_description: "Mengaktifkan Analytics pada level akun. Dashboard Admin Analytics menyediakan detail tentang penggunaan Canvas, sukses kursus Canvas, dan keterlibatan siswa. Pelajari selengkapnya di *Admin Analytics Hub* di komunitas Canvas."
+  admin_analytics_description: "Mengaktifkan Analytics pada level akun. Dashboard Admin Analytics menyediakan detail tentang penggunaan Canvas, sukses kursus Canvas, dan keterlibatan siswa. Pelajari selengkapnya di Admin Analytics Hub di komunitas Canvas."
   admin_analytics_eacba735: "Analytics Admin"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Admin Analytics - sembunyikan kursus tanpa pendaftaran"
   admin_analytics_hide_courses_with_no_enrollments_description: "Saat diaktifkan, Admin Analytics + Intelligent Insights akan menyembunyikan kursus tanpa pendaftaran dari semua diagram data secara default. Akan ada opsi di aplikasi untuk menampilkan kursus ini."
@@ -16665,7 +16665,7 @@ id:
   new_alert_f757d585: "Peringatan Baru"
   new_analytics_api_access_7eec1ead: "Akses Analytics API Baru"
   new_analytics_attendance_config_v2_5f7a9e2c: "Analytics Baru - Attendance Config V2"
-  new_analytics_description: "Tampilkan analytics baru untuk data kursus dan pengguna. Data dapat membutuhkan waktu 24 jam hingga muncul di New Analytics setelah mengatur penanda fitur ini ke ON. Untuk detail penuh, silakan lihat *grup pengguna New Analytics* di Canvas Community."
+  new_analytics_description: "Tampilkan analytics baru untuk data kursus dan pengguna. Data dapat membutuhkan waktu 24 jam hingga muncul di New Analytics setelah mengatur penanda fitur ini ke ON. Untuk detail penuh, silakan lihat grup pengguna New Analytics di Canvas Community."
   new_analytics_f6147886: "New Analytics"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       New Analytics adalah suatu alat interaktif yang membantu Anda dan siswa Anda melacak
