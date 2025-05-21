@@ -2270,7 +2270,7 @@ sl:
   admin_analytics_course_readiness_c79f13e1: "Skrbniška analitika – pripravljenost predmeta"
   admin_analytics_dap_30f431d6: "DAP skrbniške analitike"
   admin_analytics_dap_model_description: "Omogoča uporabo DAP za analitiko na ravni računa."
-  admin_analytics_description: "Omogoča analitiko na ravni računa. Nadzorne plošče skrbniške analitike zagotavljajo podrobnosti o uporabi sistema Canvas, uspešnosti predmeta Canvas in zavzetost študentov. Več o tem v *središču skrbniške analitike* v Canvas Community."
+  admin_analytics_description: "Omogoča analitiko na ravni računa. Nadzorne plošče skrbniške analitike zagotavljajo podrobnosti o uporabi sistema Canvas, uspešnosti predmeta Canvas in zavzetost študentov. Več o tem v središču skrbniške analitike v Canvas Community."
   admin_analytics_eacba735: "Skrbniška analitika"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Skrbniška analitika – skrij predmete brez vpisov"
   admin_analytics_hide_courses_with_no_enrollments_description: "Ko je ta možnost omogočena, Skrbniška analitika + Intelligent Insights privzeto skrije predmete brez vpisov iz vseh podatkovnih grafikonov. V aplikaciji bo na voljo možnost za prikaz teh predmetov."
@@ -18772,7 +18772,7 @@ sl:
   new_alert_f757d585: "Novo opozorilo"
   new_analytics_api_access_7eec1ead: "Nov dostop do API za Google Analytics"
   new_analytics_attendance_config_v2_5f7a9e2c: "Nova analitika – konfiguracija prisotnosti V2"
-  new_analytics_description: "Prikaži novo analitiko za predmet in uporabnikove podatke. Po nastavitvi oznake za to funkcijo na ON (vklop) se bodo podatki v Novi analitiki pojavili z zamikom največ 24 ur. Za vse podrobnosti si oglejte *Novo uporabniško skupino za analitiko* v Canvas Community."
+  new_analytics_description: "Prikaži novo analitiko za predmet in uporabnikove podatke. Po nastavitvi oznake za to funkcijo na ON (vklop) se bodo podatki v Novi analitiki pojavili z zamikom največ 24 ur. Za vse podrobnosti si oglejte Novo uporabniško skupino za analitiko v Canvas Community."
   new_analytics_f6147886: "Nova analitika"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Nova analitika je interaktivno orodje, ki vam in vašim študentom omogoča boljše
