@@ -155,6 +155,10 @@ class ModuleItemsLazyLoader {
         },
       })
 
+      if (!allPages && !result.link?.last && page > 1) {
+        return await this.fetchModuleItemsHtml(moduleId, page - 1)
+      }
+
       this.clearPageNumberIfAllPages(moduleId, allPages)
       this.savePageNumber(moduleId, allPages, page)
       this.saveAllPage(moduleId, allPages)

@@ -503,6 +503,47 @@ describe('fetchModuleItems utility', () => {
           expect(screen.queryByTestId('module-1083-pagination')).not.toBeInTheDocument()
         })
       })
+
+      describe('behavior when a page get empty', () => {
+        const pageParam = 2
+        const moduleId = '2000'
+        fetchMock.mock(
+          `/courses/${courseId}/modules/${moduleId}/items_html?page=${pageParam}&per_page=${pageSize}`,
+          {
+            headers: {
+              // Missing rel="last" to simulate the problematic state
+              Link: '</api/v1/accounts/1/account_calendars?page=2&per_page=100>; rel="next"',
+            },
+          },
+        )
+        fetchMock.mock(
+          `/courses/${courseId}/modules/${moduleId}/items_html?page=${pageParam - 1}&per_page=${pageSize}`,
+          {
+            headers: {
+              Link: '</courses/23/modules/1085/items_html?page=1&per_page=2>; rel="current",</courses/23/modules/1085/items_html?page=2&per_page=2>; rel="next",</courses/23/modules/1085/items_html?page=1&per_page=2>; rel="first",</courses/23/modules/1085/items_html?page=2&per_page=2>; rel="last"',
+            },
+          },
+        )
+
+        beforeEach(() => {
+          createMockModule(moduleId)
+        })
+
+        afterEach(() => {
+          const container = document.querySelector(`#context_module_content_${moduleId}`)
+          if (container) {
+            container.innerHTML = ''
+          }
+        })
+
+        it('should render pagination with latest state', async () => {
+          await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, 2, false)
+
+          await waitFor(() => {
+            expect(screen.queryByTestId(`module-${moduleId}-pagination`)).toBeInTheDocument()
+          })
+        })
+      })
     })
   })
 })
