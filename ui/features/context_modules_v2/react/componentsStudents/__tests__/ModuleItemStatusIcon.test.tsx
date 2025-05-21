@@ -128,14 +128,14 @@ describe('ModuleItemStatusIcon', () => {
     expect(container.getByText('Missing')).toBeInTheDocument()
   })
 
-  it('should render "Assigned" when completionRequirement exists but not completed', () => {
+  it('should render assigned icon when completionRequirement exists but not completed', () => {
     const container = setUp({
       itemId: '1',
       isCompleted: false,
       dueDateOffsetHours: 72,
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('Assigned')).toBeInTheDocument()
+    expect(container.getByTestId('assigned-icon')).toBeInTheDocument()
   })
 
   it('should prioritize "Missing" over "Complete" status', () => {

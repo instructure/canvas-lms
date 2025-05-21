@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {CompletionRequirement, ModuleItemContent, ModuleRequirement} from '../utils/types'
+import {IconShapeOvalLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -78,7 +79,7 @@ const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
     } else if (isCompleted) {
       return <StatusPill color="success" text={I18n.t('Complete')} />
     } else if (completionRequirement) {
-      return <StatusPill color="info" text={I18n.t('Assigned')} />
+      return <IconShapeOvalLine data-testid="assigned-icon" />
     } else {
       return null
     }
