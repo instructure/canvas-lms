@@ -29,17 +29,25 @@ const I18n = createI18nScope('context_modules_v2')
 
 export interface ModuleItemStatusIconProps {
   itemId: string
-  completionRequirement?: CompletionRequirement
+  moduleCompleted: boolean
+  completionRequirements?: CompletionRequirement[]
   requirementsMet?: ModuleRequirement[]
   content?: ModuleItemContent
 }
 
 const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
   itemId,
-  completionRequirement,
+  moduleCompleted,
+  completionRequirements,
   requirementsMet = [],
   content,
 }) => {
+  const completionRequirement = useMemo(
+    () => completionRequirements?.find(req => req.id === itemId),
+    [completionRequirements, itemId],
+  )
+  const hasCompletionRequirements = !!completionRequirements?.length
+
   const isMissing = useMemo(() => {
     if (!content) return false
 
@@ -74,16 +82,16 @@ const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
   )
 
   const renderPill = useMemo(() => {
-    if (isMissing) {
+    if (isMissing && (!moduleCompleted || !hasCompletionRequirements)) {
       return <StatusPill color="danger" text={I18n.t('Missing')} />
     } else if (isCompleted) {
       return <StatusPill color="success" text={I18n.t('Complete')} />
-    } else if (completionRequirement) {
+    } else if (completionRequirement && !moduleCompleted) {
       return <IconShapeOvalLine data-testid="assigned-icon" />
     } else {
       return null
     }
-  }, [isCompleted, isMissing, completionRequirement])
+  }, [isCompleted, isMissing, completionRequirement, moduleCompleted, hasCompletionRequirements])
 
   return renderPill && (completionRequirement || isSubmissionEmpty) ? (
     <View as="div" margin="0 0 0 small">

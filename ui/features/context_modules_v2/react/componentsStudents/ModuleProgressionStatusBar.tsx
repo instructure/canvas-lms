@@ -27,11 +27,13 @@ import {ProgressBar} from '@instructure/ui-progress'
 const I18n = createI18nScope('context_modules_v2')
 
 interface ModuleProgressionStatusBarProps {
+  requirementCount?: number
   completionRequirements: CompletionRequirement[]
   progression?: ModuleProgression
 }
 
 const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
+  requirementCount,
   completionRequirements,
   progression,
 }) => {
@@ -40,12 +42,12 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
   }
 
   const completedCount = progression.requirementsMet?.length || 0
-  const totalCount = completionRequirements.length
+  const totalCount = requirementCount ? 1 : completionRequirements?.length
 
   const completionPercentage = Math.round((completedCount / totalCount) * 100)
-  const isComplete = completionPercentage === 100
+  const isComplete = completionPercentage >= 100
   const completionText = I18n.t('%{completed}/%{total} Required Items Completed', {
-    completed: completedCount,
+    completed: completedCount > totalCount ? totalCount : completedCount,
     total: totalCount,
   })
 

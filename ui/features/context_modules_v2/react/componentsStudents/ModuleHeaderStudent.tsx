@@ -92,11 +92,13 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
                 completionRequirements={completionRequirements || []}
                 requirementCount={requirementCount}
                 submissionStatistics={submissionStatistics}
+                moduleCompleted={progression?.completed}
               />
             </Flex.Item>
             {completionRequirements?.length && (
               <Flex.Item>
                 <ModuleProgressionStatusBar
+                  requirementCount={requirementCount}
                   completionRequirements={completionRequirements}
                   progression={progression}
                 />

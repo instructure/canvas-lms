@@ -121,7 +121,8 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
         <Flex.Item>
           <ModuleItemStatusIcon
             itemId={_id || ''}
-            completionRequirement={completionRequirements?.find(req => req.id === _id)}
+            moduleCompleted={progression?.completed || false}
+            completionRequirements={completionRequirements}
             requirementsMet={progression?.requirementsMet || []}
             content={content}
           />
