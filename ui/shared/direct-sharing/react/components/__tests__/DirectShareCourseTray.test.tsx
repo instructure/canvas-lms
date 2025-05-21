@@ -19,14 +19,14 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import useManagedCourseSearchApi from '../../effects/useManagedCourseSearchApi'
+import * as useManagedCourseSearchApi from '../../effects/useManagedCourseSearchApi'
 import DirectShareCourseTray from '../DirectShareCourseTray'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('../../effects/useManagedCourseSearchApi')
 
 describe('DirectShareCourseTray', () => {
-  let ariaLive
+  let ariaLive: HTMLElement
 
   beforeAll(() => {
     ariaLive = document.createElement('div')
@@ -41,7 +41,8 @@ describe('DirectShareCourseTray', () => {
 
   beforeEach(() => {
     fakeENV.setup()
-    useManagedCourseSearchApi.mockImplementation(() => {})
+    // Reset the mock implementation
+    jest.spyOn(useManagedCourseSearchApi, 'default').mockImplementation(() => undefined)
   })
 
   afterEach(() => {
@@ -49,7 +50,14 @@ describe('DirectShareCourseTray', () => {
   })
 
   it('displays interface for selecting a course', async () => {
-    const {getByText} = render(<DirectShareCourseTray open={true} />)
+    const {getByText} = render(
+      <DirectShareCourseTray
+        open={true}
+        sourceCourseId=""
+        contentSelection={{}}
+        onDismiss={() => {}}
+      />,
+    )
     // loads the panel asynchronously, so we have to wait for it
     expect(await waitFor(() => getByText(/select a course/i))).toBeInTheDocument()
   })
@@ -57,7 +65,16 @@ describe('DirectShareCourseTray', () => {
   it('calls onDismiss when cancel is clicked', async () => {
     const handleDismiss = jest.fn()
     const user = userEvent.setup()
-    const {getByTestId} = render(<DirectShareCourseTray open={true} onDismiss={handleDismiss} />)
+    const {getByTestId} = render(
+      <DirectShareCourseTray
+        open={true}
+        onDismiss={handleDismiss}
+        sourceCourseId=""
+        contentSelection={{}}
+      />,
+    )
+
+    // Wait for the cancel button to be in the document
     const cancelButton = await waitFor(() => getByTestId('confirm-action-secondary-button'))
     await user.click(cancelButton)
     expect(handleDismiss).toHaveBeenCalled()
