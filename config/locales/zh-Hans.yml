@@ -2636,7 +2636,7 @@ zh-Hans:
   admin_analytics_course_readiness_c79f13e1: 管理分析-课程准备状态
   admin_analytics_dap_30f431d6: "管理员分析 DAP"
   admin_analytics_dap_model_description: "在帐户级别启用 DAP for Analytics。"
-  admin_analytics_description: "启用帐户级别分析。管理员分析控制面板提供有关 Canvas 使用情况、Canvas 课程通过率和学生参与度的详细信息。在 Canvas 社区的*管理分析中心*了解更多信息。"
+  admin_analytics_description: "启用帐户级别分析。管理员分析控制面板提供有关 Canvas 使用情况、Canvas 课程通过率和学生参与度的详细信息。在 Canvas 社区的管理分析中心了解更多信息。"
   admin_analytics_eacba735: 管理员分析工具
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "管理员分析 - 隐藏无注册学生的课程"
   admin_analytics_hide_courses_with_no_enrollments_description: "“管理员分析 + 智能见解”启用后，所有数据图表中将默认隐藏无注册学生的课程。应用程序有一个选项可显示这些课程。"
@@ -22361,7 +22361,7 @@ zh-Hans:
   new_alert_f757d585: 新警报
   new_analytics_api_access_7eec1ead: "New Analytics API 访问"
   new_analytics_attendance_config_v2_5f7a9e2c: "新分析 - 考勤配置 V2"
-  new_analytics_description: "显示课程和用户数据的新分析。将此功能标志设置为“开启”后，可能需要24小时才能在“新分析”中显示数据。有关完整详情，请查看 Canvas 社区中的*新分析用户组*。"
+  new_analytics_description: "显示课程和用户数据的新分析。将此功能标志设置为“开启”后，可能需要24小时才能在“新分析”中显示数据。有关完整详情，请查看 Canvas 社区中的新分析用户组。"
   new_analytics_f6147886: 新分析
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       新分析是一个互动工具，有助于您和学生更好地
