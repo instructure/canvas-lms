@@ -2492,7 +2492,7 @@ it:
   admin_analytics_course_readiness_c79f13e1: "Admin Analytics - Disponibilità corso"
   admin_analytics_dap_30f431d6: "DAP Admin Analytics"
   admin_analytics_dap_model_description: "Consente l’utilizzo di DAP per Analytics a livello di account."
-  admin_analytics_description: "Abilita l’analisi a livello di account. Le dashboard Admin Analytics forniscono i dettagli sull’utilizzo di Canvas, il successo del corso Canvas e il coinvolgimento degli studenti. Scopri ulteriori informazioni nell’*Admin Analytics Hub* nella comunità Canvas."
+  admin_analytics_description: "Abilita l’analisi a livello di account. Le dashboard Admin Analytics forniscono i dettagli sull’utilizzo di Canvas, il successo del corso Canvas e il coinvolgimento degli studenti. Scopri ulteriori informazioni nell’Admin Analytics Hub nella comunità Canvas."
   admin_analytics_eacba735: "Admin Analytics"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Admin Analytics - nascondi corsi senza iscrizioni"
   admin_analytics_hide_courses_with_no_enrollments_description: "Quando abilitato, Admin Analytics + Intelligent Insights nasconderà i corsi senza iscrizioni da tutti i dati dei grafici per impostazione predefinita. L’app conterrà un’opzione per la visualizzazione di questi corsi."
@@ -20435,7 +20435,7 @@ it:
   new_alert_f757d585: "Nuovo avviso"
   new_analytics_api_access_7eec1ead: "Nuovo accesso Analytics API"
   new_analytics_attendance_config_v2_5f7a9e2c: "Nuove analisi - Configurazione presenza V2"
-  new_analytics_description: "Mostra i dati analitici del corso e i dati utente. Dopo aver impostato i flag di funzionalità su On, ci possono volere fino a 24 ore prima che i dati appaiano in New Analytics. Per i dettagli completi, consultare il *gruppo di utenti Nuove analisi* nella Canvas Community."
+  new_analytics_description: "Mostra i dati analitici del corso e i dati utente. Dopo aver impostato i flag di funzionalità su On, ci possono volere fino a 24 ore prima che i dati appaiano in New Analytics. Per i dettagli completi, consultare il gruppo di utenti Nuove analisi nella Canvas Community."
   new_analytics_f6147886: "Nuove analisi"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       New Analytics è uno strumento interattivo che aiuta te e i tuoi studenti a
