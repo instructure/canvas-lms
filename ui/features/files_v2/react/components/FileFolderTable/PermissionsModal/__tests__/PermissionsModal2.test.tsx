@@ -26,11 +26,7 @@ import {resetAndGetFilesEnv} from '../../../../../utils/filesEnvUtils'
 import {createFilesContexts} from '../../../../../fixtures/fileContexts'
 import {RowsProvider} from '../../../../contexts/RowsContext'
 import PermissionsModal from '../PermissionsModal'
-import {
-  type AvailabilityOptionId,
-  DATE_RANGE_TYPE_OPTIONS,
-  parseNewRows,
-} from '../PermissionsModalUtils'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -51,27 +47,24 @@ const renderComponent = (props?: any) =>
 
 describe('PermissionsModal', () => {
   beforeEach(() => {
-    // Reset the environment before each test
+    fakeENV.setup()
     const filesContexts = createFilesContexts()
     resetAndGetFilesEnv(filesContexts)
-    // Set up a default mock implementation for doFetchApi to prevent unhandled rejections
     ;(doFetchApi as jest.Mock).mockResolvedValue({})
   })
 
   afterEach(() => {
     jest.clearAllMocks()
     jest.resetAllMocks()
-    // Reset the environment after each test to ensure clean state
     const filesContexts = createFilesContexts()
     resetAndGetFilesEnv(filesContexts)
+    fakeENV.teardown()
   })
 
   it('performs fetch request and shows alert', async () => {
     renderComponent({
       items: [Object.assign({}, FAKE_FILES[0], {usage_rights: {}})],
     })
-
-    // PUT request response
     ;(doFetchApi as jest.Mock).mockResolvedValueOnce({})
     await userEvent.click(screen.getByTestId('permissions-save-button'))
 
@@ -119,21 +112,23 @@ describe('PermissionsModal', () => {
   })
 
   it('with alert after trying to save', async () => {
+    // Reset environment with usage rights required
     const usageFilesContexts = createFilesContexts({
       usageRightsRequired: true,
     })
     resetAndGetFilesEnv(usageFilesContexts)
 
-    const {getByTestId} = renderComponent()
+    // Render with destructured queries
+    const {getByTestId, findByTestId} = renderComponent()
 
+    // Click the save button
     await userEvent.click(getByTestId('permissions-save-button'))
 
-    // Wait for any state updates and re-renders
-    await waitFor(async () => {
-      const alert = await screen.findByText(
-        'Selected items must have usage rights assigned before they can be published.',
-      )
-      expect(alert).toBeInTheDocument()
-    })
+    // Wait for the alert to appear with a more specific query
+    const alert = await findByTestId('permissions-usage-rights-alert')
+    expect(alert).toBeInTheDocument()
+    expect(alert).toHaveTextContent(
+      'Selected items must have usage rights assigned before they can be published.',
+    )
   })
 })
