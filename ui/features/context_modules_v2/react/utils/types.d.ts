@@ -225,6 +225,7 @@ export interface ModuleItem {
   _id: string
   url: string
   indent: number
+  position: number
   content: ModuleItemContent
 }
 

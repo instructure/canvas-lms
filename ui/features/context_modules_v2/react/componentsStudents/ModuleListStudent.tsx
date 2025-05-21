@@ -132,6 +132,7 @@ const ModulesListStudent: React.FC = () => {
                   id={module._id}
                   name={module.name}
                   completionRequirements={module.completionRequirements}
+                  requireSequentialProgress={module.requireSequentialProgress}
                   progression={module.progression}
                   expanded={!!expandedModules.get(module._id)}
                   onToggleExpand={handleToggleExpandRef}

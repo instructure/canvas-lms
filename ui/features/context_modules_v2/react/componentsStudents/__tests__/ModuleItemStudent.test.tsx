@@ -29,6 +29,8 @@ const buildDefaultProps = (overrides = {}) => {
     _id: '1',
     url: 'https://canvas.instructure.com/courses/1/assignments/1',
     indent: 0,
+    position: 0,
+    requireSequentialProgress: false,
     index: 0,
     content: {
       id: '1',
@@ -51,5 +53,68 @@ describe('ModuleItemStudent', () => {
   it('renders a module item', () => {
     const {container} = setUp(buildDefaultProps())
     expect(container).not.toBeEmptyDOMElement()
+  })
+
+  it('renders locked styling when sequential progression is required and current position < item position', () => {
+    const progression = {
+      completedAt: null,
+      currentPosition: 1,
+      locked: false,
+      requirementsMet: [],
+      state: 'unlocked',
+    }
+
+    const container = setUp(
+      buildDefaultProps({
+        requireSequentialProgress: true,
+        position: 2,
+        progression,
+      }),
+    )
+
+    const titleElement = container.getByTestId('module-item-title-locked')
+    expect(titleElement).toBeInTheDocument()
+  })
+
+  it('renders normal styling when sequential progression is required but position is accessible', () => {
+    const progression = {
+      completedAt: null,
+      currentPosition: 2,
+      locked: false,
+      requirementsMet: [],
+      state: 'unlocked',
+    }
+
+    const container = setUp(
+      buildDefaultProps({
+        requireSequentialProgress: true,
+        position: 1,
+        progression,
+      }),
+    )
+
+    const titleElement = container.getByTestId('module-item-title')
+    expect(titleElement).toBeInTheDocument()
+  })
+
+  it('renders unlocked styling when sequential progression is required and current position = item position', () => {
+    const progression = {
+      completedAt: null,
+      currentPosition: 1,
+      locked: false,
+      requirementsMet: [],
+      state: 'unlocked',
+    }
+
+    const container = setUp(
+      buildDefaultProps({
+        requireSequentialProgress: true,
+        position: 1,
+        progression,
+      }),
+    )
+
+    const titleElement = container.getByTestId('module-item-title')
+    expect(titleElement).toBeInTheDocument()
   })
 })

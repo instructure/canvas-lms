@@ -30,6 +30,7 @@ export const MODULE_ITEMS_STUDENT_QUERY = gql`
           id
           url
           indent
+          position
           content {
             ... on Assignment {
               _id

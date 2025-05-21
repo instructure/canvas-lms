@@ -30,6 +30,8 @@ export interface ModuleItemStudentProps {
   _id: string
   url: string
   indent: number
+  position: number
+  requireSequentialProgress: boolean
   index: number
   content: ModuleItemContent
   onClick?: () => void
@@ -41,6 +43,8 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   _id,
   url,
   indent,
+  position,
+  requireSequentialProgress,
   content,
   onClick,
   completionRequirements,
@@ -70,9 +74,12 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
               {/* Item Title */}
               <Flex.Item>
                 <Flex.Item shouldGrow={true}>
-                  {progression?.locked ? (
+                  {progression?.locked ||
+                  (requireSequentialProgress &&
+                    progression?.currentPosition &&
+                    progression?.currentPosition < position) ? (
                     <Flex alignItems="center">
-                      <Text weight="light" color="secondary">
+                      <Text weight="light" color="secondary" data-testid="module-item-title-locked">
                         {content?.title || 'Untitled Item'}
                       </Text>
                     </Flex>
