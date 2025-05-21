@@ -52,10 +52,8 @@ const setupTest = (
   courseData?: CourseStudentResponse,
   courseId: string = '1',
 ) => {
-  // Clear any previous data
   queryClient.clear()
 
-  // Set up the query data
   queryClient.setQueryData(
     ['courseStudent', courseId],
     courseData || {
@@ -109,14 +107,29 @@ describe('ModulePageActionHeaderStudent', () => {
         missingSubmissionsCount: 0,
       },
     })
-    // Since we changed our component to only render the welcome section if data?.name exists,
-    // we should check that the welcome text is not present
     expect(queryByText('Welcome!')).not.toBeInTheDocument()
   })
 
+  it('renders submissionStatistics as buttons', () => {
+    const {getByTestId} = setupTest(buildDefaultProps(), {
+      name: 'Test Course',
+      submissionStatistics: {
+        submissionsDueThisWeekCount: 5,
+        missingSubmissionsCount: 3,
+      },
+    })
+
+    expect(getByTestId('assignment-due-this-week-button')).toHaveAttribute(
+      'href',
+      `/courses/1/assignments`,
+    )
+    expect(getByTestId('missing-assignment-button')).toHaveAttribute(
+      'href',
+      `/courses/1/assignments`,
+    )
+  })
+
   it('shows assignment submissionStatistics with proper pluralization', () => {
-    // We need to force the component to render the pills by updating our tests
-    // to match the conditional rendering in the component
     const {getByText} = setupTest(buildDefaultProps(), {
       name: 'Test Course',
       submissionStatistics: {
@@ -130,7 +143,6 @@ describe('ModulePageActionHeaderStudent', () => {
   })
 
   it('handles singular/plural text for submissionStatistics correctly', () => {
-    // Since our component only shows pills for counts > 0, we need to update our expectations
     const {getByText, queryByText} = setupTest(buildDefaultProps(), {
       name: 'Test Course',
       submissionStatistics: {
@@ -139,7 +151,6 @@ describe('ModulePageActionHeaderStudent', () => {
       },
     })
 
-    // This should not be present because of our > 0 condition
     expect(queryByText('0 Assignments Due This Week')).not.toBeInTheDocument()
     expect(getByText('1 Missing Assignment')).toBeInTheDocument()
   })
