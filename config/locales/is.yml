@@ -2545,7 +2545,7 @@ is:
   admin_analytics_course_readiness_c79f13e1: "Greining stjórnanda - Námskeiðsundirbúningur"
   admin_analytics_dap_30f431d6: "DAP greiningar stjórnanda"
   admin_analytics_dap_model_description: "Virkjar notkun DAP til greininga á reikningsstigi."
-  admin_analytics_description: "Gerir greiningu á reikningsstigi. Greiningarmælaborð stjórnanda veita upplýsingar um Canvas notkun, árangur Canvas námskeiðs og þátttöku nemenda. Lærðu meira í *Greiningarmiðstöð stjórnanda* í Canvas samfélaginu."
+  admin_analytics_description: "Gerir greiningu á reikningsstigi. Greiningarmælaborð stjórnanda veita upplýsingar um Canvas notkun, árangur Canvas námskeiðs og þátttöku nemenda. Lærðu meira í Greiningarmiðstöð stjórnanda í Canvas samfélaginu."
   admin_analytics_eacba735: "Greining stjórnanda"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Greining stjórnanda - fela námskeið með engum innritunum"
   admin_analytics_hide_courses_with_no_enrollments_description: "Þegar kveikt er á því mun Greining stjórnanda + Intelligent Insights fela námskeið án skráningar á öllum gagnatöflum sjálfgefið. Það verður möguleiki í appinu að sýna þessi námskeið"
@@ -20581,7 +20581,7 @@ is:
   new_alert_f757d585: "Ný viðvörun"
   new_analytics_api_access_7eec1ead: "New Analytics API aðgangur"
   new_analytics_attendance_config_v2_5f7a9e2c: "Nýjar greiningar - Mætingarstilling V2"
-  new_analytics_description: "Sýna nýjar greiningar fyrir námskeið og notandagögn. Gögn gætu tekið sólarhring að birtast í nýjum greiningum eftir að kveikt er á þessari stillingu. Fyrir allar upplýsingar, vinsamlegast skoðið *notendahópinn Nýjar greiningar* í Canvas samfélaginu."
+  new_analytics_description: "Sýna nýjar greiningar fyrir námskeið og notandagögn. Gögn gætu tekið sólarhring að birtast í nýjum greiningum eftir að kveikt er á þessari stillingu. Fyrir allar upplýsingar, vinsamlegast skoðið notendahópinn Nýjar greiningar í Canvas samfélaginu."
   new_analytics_f6147886: "Nýjar greiningar"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       New Analytics er gagnvirkt verkfæri sem hjálpar þér og nemendum þínum að fylgjast betur með
