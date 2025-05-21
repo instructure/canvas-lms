@@ -608,6 +608,7 @@ describe('RubricForm Tests', () => {
       expect(getByTestId('criteria-count-input')).toHaveValue('5')
       expect(getByTestId('rating-count-input')).toHaveValue('4')
       expect(getByTestId('points-per-criterion-input')).toHaveValue('20')
+      expect(getByTestId('additional-prompt-info-input')).toBeInTheDocument()
     })
 
     it('does not show the form when aiRubricsEnabled is false', () => {
@@ -646,6 +647,24 @@ describe('RubricForm Tests', () => {
       )
     })
 
+    it('validates additional prompt info length', async () => {
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const longText = 'a'.repeat(1001)
+      const additionalPromptInput = getByTestId('additional-prompt-info-input')
+      fireEvent.change(additionalPromptInput, {target: {value: longText}})
+
+      expect(getByTestId('generate-criteria-button')).toBeDisabled()
+      const form = getByTestId('generate-criteria-form')
+      expect(form).toHaveTextContent(
+        'Additional prompt information must be less than 1000 characters',
+      )
+    })
+
     it('calls generateCriteria with correct parameters when generate button is clicked', async () => {
       const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
       generateCriteriaMock.mockResolvedValue({
@@ -658,10 +677,10 @@ describe('RubricForm Tests', () => {
         (
           progressId: string,
           setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
-          onFetchError: (error: Error) => void,
+          _onFetchError: (error: Error) => void,
         ) => {
           setCurrentProgress({
-            id: '1',
+            id: progressId,
             workflow_state: 'completed',
             message: null,
             completion: 100,
@@ -686,6 +705,7 @@ describe('RubricForm Tests', () => {
         ratingCount: 4,
         pointsPerCriterion: '20',
         useRange: false,
+        additionalPromptInfo: '',
       })
       expect(getByTestId('rubric-criteria-container')).toHaveTextContent('Generated Criterion 1')
     })
