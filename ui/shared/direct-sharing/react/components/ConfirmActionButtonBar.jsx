@@ -52,7 +52,9 @@ export default function ConfirmActionButtonBar({
   )
 
   const secondaryButton = !secondaryLabel ? null : (
-    <Button onClick={onSecondaryClick}>{secondaryLabel}</Button>
+    <Button onClick={onSecondaryClick} data-testid="confirm-action-secondary-button">
+      {secondaryLabel}
+    </Button>
   )
 
   return (
