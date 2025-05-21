@@ -272,17 +272,19 @@ describe('OutcomeView', () => {
       await waitFrames(10)
       view.edit($.Event())
       await waitFrames(10)
+
+      view.$('#calculation_method').val('latest').trigger('change')
+      await waitFrames(10)
+
       const submitSpy = jest.fn()
       view.on('submit', submitSpy)
       view.$('form').trigger('submit')
 
       return new Promise(resolve => {
         setTimeout(async () => {
-          $('#confirm-outcome-edit-modal').trigger('click')
-          await waitFrames(10)
           expect(submitSpy).toHaveBeenCalled()
           resolve()
-        })
+        }, 100)
       })
     })
   })

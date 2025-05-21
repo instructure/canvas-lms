@@ -28,6 +28,13 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: jest.fn(() => jest.fn()),
 }))
 
+jest.mock('jquery', () => {
+  const mockFlashError = jest.fn()
+  const jqueryMock = jest.fn() as jest.Mock & {flashError: jest.Mock}
+  jqueryMock.flashError = mockFlashError
+  return jqueryMock
+})
+
 jest.mock('../../../../utils/downloadUtils', () => ({
   addDownloadListener: jest.fn(fn => window.addEventListener('download_utils_event', fn)),
   removeDownloadListener: jest.fn(fn => window.removeEventListener('download_utils_event', fn)),
