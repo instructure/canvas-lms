@@ -64,9 +64,9 @@ const buildDefaultProps = (overrides: TestPropsOverrides = {}) => {
   const defaultProgression: ModuleProgression = {
     id: 'module-1',
     _id: 'module-1',
-    workflowState: metRequirementsCount === requirementCount ? 'completed' : 'started',
+    workflowState: metRequirementsCount >= requirementCount ? 'completed' : 'started',
     requirementsMet,
-    completed: metRequirementsCount === requirementCount,
+    completed: metRequirementsCount >= requirementCount,
     locked: false,
     unlocked: true,
     started: true,
@@ -128,5 +128,13 @@ describe('ModuleProgressionStatusBar', () => {
     })
     expect(container.container).toBeInTheDocument()
     expect(container.getByText('2/4 Required Items Completed')).toBeInTheDocument()
+  })
+
+  it('should render progress bar with a x/1 when requirementCount is 1', () => {
+    const container = setUp({
+      requirementCount: 1,
+    })
+    expect(container.container).toBeInTheDocument()
+    expect(container.getByText('1/1 Required Items Completed')).toBeInTheDocument()
   })
 })

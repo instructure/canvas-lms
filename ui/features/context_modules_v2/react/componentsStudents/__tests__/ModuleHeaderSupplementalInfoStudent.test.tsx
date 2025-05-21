@@ -25,6 +25,7 @@ type Props = {
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
   submissionStatistics?: ModuleStatistics
+  moduleCompleted?: boolean
 }
 
 const buildDefaultProps = (overrides: Partial<Props> = {}) => {
@@ -35,6 +36,7 @@ const buildDefaultProps = (overrides: Partial<Props> = {}) => {
       latestDueAt: null,
       missingAssignmentCount: 0,
     },
+    moduleCompleted: overrides?.moduleCompleted || false,
   }
 }
 
@@ -44,6 +46,7 @@ const setUp = (props = buildDefaultProps()) => {
       completionRequirements={props.completionRequirements}
       requirementCount={props.requirementCount}
       submissionStatistics={props.submissionStatistics}
+      moduleCompleted={props.moduleCompleted}
     />,
   )
 }

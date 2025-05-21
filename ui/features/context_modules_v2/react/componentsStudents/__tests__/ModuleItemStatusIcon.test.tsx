@@ -23,6 +23,7 @@ import {CompletionRequirement, ModuleItemContent, ModuleRequirement} from '../..
 
 interface TestPropsOverrides {
   itemId?: string
+  moduleCompleted?: boolean
   completionRequirement?: Partial<CompletionRequirement>
   requirementsMet?: ModuleRequirement[]
   content?: Partial<ModuleItemContent>
@@ -80,18 +81,21 @@ const buildDefaultProps = (overrides: TestPropsOverrides = {}) => {
 
   return {
     itemId,
-    completionRequirement: defaultCompletionRequirement,
+    moduleCompleted: overrides?.moduleCompleted ?? false,
+    completionRequirements: defaultCompletionRequirement ? [defaultCompletionRequirement] : [],
     requirementsMet: overrides.requirementsMet ?? defaultRequirementsMet,
     content: defaultContent,
   }
 }
 
 const setUp = (overrides: TestPropsOverrides = {}) => {
-  const {itemId, completionRequirement, requirementsMet, content} = buildDefaultProps(overrides)
+  const {itemId, moduleCompleted, completionRequirements, requirementsMet, content} =
+    buildDefaultProps(overrides)
   return render(
     <ModuleItemStatusIcon
       itemId={itemId}
-      completionRequirement={completionRequirement}
+      moduleCompleted={moduleCompleted}
+      completionRequirements={completionRequirements}
       requirementsMet={requirementsMet}
       content={content}
     />,
@@ -138,6 +142,16 @@ describe('ModuleItemStatusIcon', () => {
     expect(container.getByTestId('assigned-icon')).toBeInTheDocument()
   })
 
+  it('should not render assigned icon when module is completed', () => {
+    const container = setUp({
+      itemId: '1',
+      moduleCompleted: true,
+      dueDateOffsetHours: 72,
+    })
+    expect(container.container).toBeInTheDocument()
+    expect(container.queryByTestId('assigned-icon')).toBeNull()
+  })
+
   it('should prioritize "Missing" over "Complete" status', () => {
     const container = setUp({
       itemId: '1',
@@ -156,6 +170,26 @@ describe('ModuleItemStatusIcon', () => {
     expect(container.container).toBeInTheDocument()
     expect(container.getByText('Missing')).toBeInTheDocument()
     expect(container.queryByText('Complete')).not.toBeInTheDocument()
+  })
+
+  it('should not render "Missing" when module is completed', () => {
+    const container = setUp({
+      itemId: '1',
+      moduleCompleted: true,
+      isCompleted: false,
+      content: {
+        submissionsConnection: {
+          nodes: [
+            {
+              _id: 'submission-1',
+              missing: true,
+            },
+          ],
+        },
+      },
+    })
+    expect(container.container).toBeInTheDocument()
+    expect(container.queryByText('Missing')).not.toBeInTheDocument()
   })
 
   it('should render nothing when no completionRequirement and submissions array is empty', () => {
