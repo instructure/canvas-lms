@@ -53,18 +53,28 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
     <View as="div" margin="xx-small 0 0 0">
       <Flex direction="column">
         <Flex.Item overflowY="hidden">
-          <ProgressBar
-            screenReaderLabel={completionText}
-            valueNow={completionPercentage}
-            valueMax={100}
-            size="small"
-            meterColor={isComplete ? 'success' : 'brand'}
-            height="0.5rem"
+          <View
+            as="div"
             width="70%"
-            themeOverride={{
-              borderRadius: 'small',
-            }}
-          />
+            overflowX="hidden"
+            overflowY="hidden"
+            borderRadius="large"
+            borderColor={isComplete ? 'success' : 'brand'}
+            borderWidth="small"
+          >
+            <ProgressBar
+              screenReaderLabel={completionText}
+              valueNow={completionPercentage}
+              valueMax={100}
+              size="small"
+              meterColor={isComplete ? 'success' : 'brand'}
+              height="0.5rem"
+              width="100%"
+              themeOverride={{
+                borderRadius: 'small',
+              }}
+            />
+          </View>
         </Flex.Item>
         <Flex.Item>
           <Text size="x-small" weight="normal">
