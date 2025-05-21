@@ -2272,7 +2272,7 @@ ca:
   admin_analytics_course_readiness_c79f13e1: "Analítica d’administrador: disposició de l'assignatura"
   admin_analytics_dap_30f431d6: "DAP d’Analítica d’administrador"
   admin_analytics_dap_model_description: "Activa l’ús de DAP per a Analítica a nivell del compte."
-  admin_analytics_description: "Activa l’analítica al compte. Els panells de control d'analítica d’administrador proporcionen informació sobre l’ús i l’èxit de les assignatures del Canvas, així com sobre la interacció dels estudiants. Obteniu més informació sobre el *Centre d’analítica d’administrador* a Canvas Community."
+  admin_analytics_description: "Activa l’analítica al compte. Els panells de control d'analítica d’administrador proporcionen informació sobre l’ús i l’èxit de les assignatures del Canvas, així com sobre la interacció dels estudiants. Obteniu més informació sobre el Centre d’analítica d’administrador a Canvas Community."
   admin_analytics_eacba735: "Analítica d’administrador"
   admin_analytics_hide_courses_with_no_enrollments_8a604e53: "Analítica d’administrador: amaga les assignatures sense inscripcions."
   admin_analytics_hide_courses_with_no_enrollments_description: "Quan aquesta opció està activada, per defecte, la combinació Analítica d’administrador + Dades intel·ligents amagarà les assignatures sense inscripcions en totes les gràfiques de dades. Hi haurà una opció a l’aplicació per mostrar aquestes assignatures."
@@ -18473,7 +18473,7 @@ ca:
   new_alert_f757d585: "Avís nou"
   new_analytics_api_access_7eec1ead: "Accés a l'API Noves analítiques"
   new_analytics_attendance_config_v2_5f7a9e2c: "Noves analítiques: Attendance Config V2"
-  new_analytics_description: "Permet mostrar analítiques noves per a les dades d'assignatures i usuaris. Les dades poden tardar fins a 24 hores a mostrar-se a Analítiques noves, després de marcar aquesta característica com a activa. Per obtenir informació completa, consulteu el *grup d’usuaris d’Analítiques noves* a la Canvas Community."
+  new_analytics_description: "Permet mostrar analítiques noves per a les dades d'assignatures i usuaris. Les dades poden tardar fins a 24 hores a mostrar-se a Analítiques noves, després de marcar aquesta característica com a activa. Per obtenir informació completa, consulteu el grup d’usuaris d’Analítiques noves a la Canvas Community."
   new_analytics_f6147886: "Noves analítiques"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Noves analítiques és una eina interactiva que us permet a vós i als estudiants fer un millor
