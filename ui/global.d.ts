@@ -71,6 +71,7 @@ declare global {
     bundles: string[]
     deferredBundles: string[]
     canvasReadyState?: 'loading' | 'complete'
+    CANVAS_ACTIVE_BRAND_VARIABLES?: Record<string, unknown>
   }
 
   /**
