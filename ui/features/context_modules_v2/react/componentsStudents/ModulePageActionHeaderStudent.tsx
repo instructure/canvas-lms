@@ -26,7 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {useCourseStudent} from '../hooks/queriesStudent/useCourseStudent'
 import {useContextModule} from '../hooks/useModuleContext'
 import {Flex} from '@instructure/ui-flex'
-import {Pill} from '@instructure/ui-pill'
+import {IconAssignmentLine, IconWarningLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -98,7 +98,13 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
           <Flex gap="small">
             {data?.submissionStatistics?.submissionsDueThisWeekCount > 0 && (
               <Flex.Item>
-                <Pill color="info">
+                <Button
+                  data-testid="assignment-due-this-week-button"
+                  color="primary"
+                  renderIcon={() => <IconAssignmentLine />}
+                  withBackground={false}
+                  href={`/courses/${courseId}/assignments`}
+                >
                   {I18n.t(
                     {
                       one: '1 Assignment Due This Week',
@@ -108,12 +114,18 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
                       count: data?.submissionStatistics?.submissionsDueThisWeekCount || 0,
                     },
                   )}
-                </Pill>
+                </Button>
               </Flex.Item>
             )}
             {data?.submissionStatistics?.missingSubmissionsCount > 0 && (
               <Flex.Item>
-                <Pill color="danger">
+                <Button
+                  data-testid="missing-assignment-button"
+                  color="danger"
+                  renderIcon={() => <IconWarningLine />}
+                  withBackground={false}
+                  href={`/courses/${courseId}/assignments`}
+                >
                   {I18n.t(
                     {
                       one: '1 Missing Assignment',
@@ -123,7 +135,7 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
                       count: data?.submissionStatistics?.missingSubmissionsCount || 0,
                     },
                   )}
-                </Pill>
+                </Button>
               </Flex.Item>
             )}
           </Flex>
