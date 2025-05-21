@@ -36,12 +36,30 @@ import {TempEnrollNavigation} from './TempEnrollNavigation'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {captureException} from '@sentry/browser'
-import {useQuery, queryClient, useMutation} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {useMutation, useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('temporary_enrollment')
 
 // initialize analytics props
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
+
+type TemporaryEnrollmentsQueryKey = readonly [
+  string, // 'enrollments'
+  string, // userId
+  boolean, // isRecipient
+  number, // currentBookmark
+  string, // page
+]
+
+const fetchTemporaryEnrollmentsWithQueryKey = async ({
+  queryKey,
+}: {
+  queryKey: TemporaryEnrollmentsQueryKey
+}) => {
+  const [, userId, isRecipient, , pageRequest] = queryKey
+  return fetchTemporaryEnrollments(userId, isRecipient, pageRequest)
+}
 
 interface Props {
   user: User
@@ -124,28 +142,29 @@ export function TempEnrollView(props: Props) {
   const enrollmentTypeLabel =
     props.enrollmentType === PROVIDER ? I18n.t('Recipient') : I18n.t('Provider')
 
-  const fetchAndUpdateBookmarks = async (
-    userId: string,
-    isRecipient: boolean,
-    pageRequest: string,
-  ) => {
-    const results = await fetchTemporaryEnrollments(userId, isRecipient, pageRequest)
-
-    // add to bookmarks if there is a next page
-    if (results.link?.next != null && allBookmarks[currentBookmark + 1] == null) {
-      setAllBookmarks([...allBookmarks, results.link?.next])
-    }
-    return results
-  }
-
   const isRecipient = props.enrollmentType === RECIPIENT
+
+  // Define the query key
+  const queryKey = [
+    'enrollments',
+    props.user.id,
+    isRecipient,
+    currentBookmark,
+    allBookmarks[currentBookmark].page,
+  ] as const
+
   const {isFetching, error, data} = useQuery({
-    queryKey: ['enrollments', props.user.id, isRecipient, currentBookmark],
-    queryFn: () =>
-      fetchAndUpdateBookmarks(props.user.id, isRecipient, allBookmarks[currentBookmark].page),
+    queryKey,
+    queryFn: fetchTemporaryEnrollmentsWithQueryKey,
     staleTime: 10_000,
     refetchOnMount: 'always',
   })
+
+  useEffect(() => {
+    if (data?.link?.next && allBookmarks[currentBookmark + 1] == null) {
+      setAllBookmarks(prevBookmarks => [...prevBookmarks, data.link!.next!])
+    }
+  }, [data, currentBookmark, allBookmarks])
 
   const {mutate} = useMutation({
     mutationFn: async (enrollments: Enrollment[]) => handleConfirmAndDeleteEnrollment(enrollments),
@@ -154,13 +173,15 @@ export function TempEnrollView(props: Props) {
   })
 
   useEffect(() => {
-    isFetching ? props.disableModal(true) : props.disableModal(false)
+    props.disableModal(isFetching)
   }, [isFetching, props])
 
   const handleBookmarkChange = async (bookmark: Bookmark) => {
-    bookmark.rel === 'next'
-      ? setCurrentBookmark(currentBookmark + 1)
-      : setCurrentBookmark(currentBookmark - 1)
+    if (bookmark.rel === 'next') {
+      setCurrentBookmark(currentBookmark + 1)
+    } else {
+      setCurrentBookmark(currentBookmark - 1)
+    }
   }
 
   const handleEditClick = (enrollments: Enrollment[]) => {
@@ -270,7 +291,6 @@ export function TempEnrollView(props: Props) {
   }
 
   if (error) {
-    // @ts-expect-error
     const errorMsg = error.message
 
     console.error(`Failed to fetch enrollments for user ${props.user.id}:`, errorMsg)

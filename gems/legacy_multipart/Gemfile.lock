@@ -8,18 +8,20 @@ PATH
   remote: .
   specs:
     legacy_multipart (0.0.1)
+      base64
       canvas_slug
       mime-types (~> 3.2)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    base64 (0.2.0)
     diff-lcs (1.6.1)
     logger (1.7.0)
     mime-types (3.6.2)
       logger
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2025.0408)
+    mime-types-data (3.2025.0429)
     rack (2.2.9)
     rack-test (2.2.0)
       rack (>= 1.3)

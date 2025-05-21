@@ -66,7 +66,7 @@ const SearchBar = ({initialValue = '', onSearch}: SearchBarProps) => {
 
   return (
     <form style={{margin: 0}} name="files-search" autoComplete="off" onSubmit={handleSearch}>
-      <Flex gap='small'>
+      <Flex gap="small">
         <Flex.Item shouldGrow shouldShrink>
           <TextInput
             renderLabel={<ScreenReaderContent>{I18n.t('Search files...')}</ScreenReaderContent>}
@@ -75,18 +75,13 @@ const SearchBar = ({initialValue = '', onSearch}: SearchBarProps) => {
             onChange={(_e, value) => setSearchValue(value)}
             shouldNotWrap
             // fragment fixes a weird focus issue - INSTUI-4466
-            renderBeforeInput={<></>}
+            renderBeforeInput={<IconSearchLine inline={false} />}
             renderAfterInput={() => renderClearButton(searchValue, handleClear)}
             data-testid="files-search-input"
           />
         </Flex.Item>
         <Flex.Item>
-          <Button
-            color="secondary"
-            type="submit"
-            renderIcon={<IconSearchLine inline={false} />}
-            data-testid="files-search-button"
-          >
+          <Button color="secondary" type="submit" data-testid="files-search-button">
             {I18n.t('Search')}
           </Button>
         </Flex.Item>

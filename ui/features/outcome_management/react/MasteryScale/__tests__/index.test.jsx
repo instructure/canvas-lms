@@ -24,6 +24,11 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {ACCOUNT_OUTCOME_PROFICIENCY_QUERY} from '@canvas/outcomes/graphql/MasteryScale'
 import MasteryScale from '../index'
 import {masteryScalesGraphqlMocks} from '@canvas/outcomes/mocks/Outcomes'
+import {useAllPages} from '@canvas/query'
+
+jest.mock('@canvas/query', () => ({
+  useAllPages: jest.fn(),
+}))
 
 jest.useFakeTimers()
 
@@ -68,23 +73,35 @@ describe('MasteryScale', () => {
   }
 
   it('loads proficiency data', async () => {
-    const {getByText, getByDisplayValue} = render(<MasteryScale />)
-    expect(getByText('Loading')).toBeInTheDocument()
+    useAllPages.mockReturnValue({
+      data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+      isError: false,
+      isLoading: false,
+    })
+    const {getByDisplayValue} = render(<MasteryScale />)
     await waitFor(() => expect(getByDisplayValue(/Rating A/)).toBeInTheDocument())
   })
 
   it('loads proficiency data to Course', async () => {
-    const {getByText, getByDisplayValue} = render(
-      <MasteryScale contextType="Course" contextId="12" />,
-      {contextType: 'Course', contextId: '12'},
-    )
-    expect(getByText('Loading')).toBeInTheDocument()
+    useAllPages.mockReturnValue({
+      data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+      isError: false,
+      isLoading: false,
+    })
+    const {getByDisplayValue} = render(<MasteryScale contextType="Course" contextId="12" />, {
+      contextType: 'Course',
+      contextId: '12',
+    })
     await waitFor(() => expect(getByDisplayValue(/Rating A/)).toBeInTheDocument())
   })
 
   it('loads role list', async () => {
+    useAllPages.mockReturnValue({
+      data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+      isError: false,
+      isLoading: false,
+    })
     const {getByText, getAllByText} = render(<MasteryScale />)
-    expect(getByText('Loading')).toBeInTheDocument()
     await waitFor(() => {
       expect(
         getByText(/Permission to change this mastery scale at the account level is enabled for/),
@@ -98,14 +115,22 @@ describe('MasteryScale', () => {
   })
 
   it('displays an error on failed request', async () => {
-    const mocks = [...masteryScalesGraphqlMocks]
-    mocks[0] = {...mocks[0], result: {errors: new Error('aw shucks')}}
+    useAllPages.mockReturnValue({
+      data: {},
+      isError: true,
+      isLoading: false,
+    })
 
-    const {getByText} = render(<MasteryScale />, {mocks: mocks})
+    const {getByText} = render(<MasteryScale />)
     await waitFor(() => expect(getByText(/An error occurred/)).toBeInTheDocument())
   })
 
   it('loads default data when request returns no ratings/method', async () => {
+    useAllPages.mockReturnValue({
+      data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+      isError: false,
+      isLoading: false,
+    })
     const emptyMocks = [
       {
         request: {
@@ -138,6 +163,11 @@ describe('MasteryScale', () => {
     })
 
     it('submits a request when ratings are saved', async () => {
+      useAllPages.mockReturnValue({
+        data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+        isError: false,
+        isLoading: false,
+      })
       const {findAllByLabelText, getByText} = render(<MasteryScale />)
       const pointsInput = (await findAllByLabelText(/Change points/))[0]
       fireEvent.change(pointsInput, {target: {value: '100'}})
@@ -164,8 +194,12 @@ describe('MasteryScale', () => {
     })
 
     it('hides mastery info', async () => {
+      useAllPages.mockReturnValue({
+        data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+        isError: false,
+        isLoading: false,
+      })
       const {getByText, queryByText} = render(<MasteryScale />)
-      expect(getByText('Loading')).toBeInTheDocument()
       await waitFor(() =>
         expect(
           queryByText(

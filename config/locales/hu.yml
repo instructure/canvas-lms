@@ -2521,6 +2521,7 @@ hu:
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Annak engedélyezése, hogy az értesítések az elküldési soron kerüljenek kiküldésre."
   allow_the_item_banks_share_with_subaccounts_permis_a8a6e87f: "Engedélyezze a \"Tételbankok - megosztás alfiókokkal\" engedélyt."
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Engedélyezze ennek az eszköznek az IMS-nevek és szerepkör-kiosztási szolgáltatás elérését"
+  allow_threaded_replies_43b2311e: "Engedélyezi a szálakba rendezett válaszokat"
   allow_to_clone_alignments_after_the_course_copy_pr_2f3a6421: "Engedélyezi az összehangolások klónozását a kurzus másolási folyamat után"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Meg nem erősített e-mail címek engedélyezése felhasználók hozzáadásakor"
   allow_users_to_comment_45b8f753: "Felhasználói hozzászólások engedélyezése"
@@ -7178,6 +7179,9 @@ hu:
     one: "1 szűrő"
     other: "{{count}} Szűrők"
     zero: "Nincsenek szűrők"
+  count_groups_90e215b1: 
+    one: "1 csoport"
+    other: "%{count} csoport"
   count_hidden_e8d2c57c: "%{count} elrejtve"
   count_hours_1bd03883: 
     one: "1 óra"
@@ -7300,6 +7304,9 @@ hu:
   count_rows_added_dacc9daf: "%{count} sor hozzáadva"
   count_rows_removed_c6ff7bc: "%{count} sor eltávolítva"
   count_sections_466dcd5c: 
+    one: "1 szekció"
+    other: "%{count} szekció"
+  count_sections_bf1baf0a: 
     one: "1 szekció"
     other: "%{count} szekció"
   count_sets_of_grading_periods_found_c8857ae9: 
@@ -9991,6 +9998,7 @@ hu:
   ending_date_e1ea13a4: Záródátum
   ends_4fcb632: "Véget ér:"
   ends_at_9a62b528: "Befejezés ideje"
+  ends_e3a6843f: "Véget ér"
   enforce_scopes_be28989c: "Alkalmazási körök érvényesítése"
   engagement_report_986e9621: "Kötelezettségi jelentés"
   english_australia_dc405d82: "English (Australia)"
@@ -18352,6 +18360,7 @@ hu:
   please_enter_a_name_for_this_link_318f01a4: "Kérjük, adjon nevet ennek a hivatkozásnak"
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "Kérjük, adjon meg egy 0 és 100 közötti számot a migrációs arányhoz."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Kérjük, olyan keresési kifejezést írjon be, ami három vagy több karakterből áll"
+  please_enter_a_valid_format_for_a_date_66ed0587: "Ez nem egy dátum!"
   please_enter_a_valid_search_term_5c69b0b0: "Kérjük, adjon meg egy érvényes keresési kifejezést"
   please_enter_a_valid_url_e_g_https_example_com_87675bca: "Kérjük, adjon meg egy érvényes url-t (pl. https://example.com)."
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: " Kérjük, adjon meg egy érvényes URL-t. Protokoll szükséges (pl. http://, https://, ftp://, tel:, mailto:)."
@@ -23560,6 +23569,7 @@ hu:
   starting_publish_5e4f16b9: "Publikálás megkezdése..."
   starts_at_29843f98: Kezdés
   starts_ce584f1c: "Kezdődik:"
+  starts_fa6bf3f5: Kezdődik
   starttime_to_endtime_4c46601f: "%{startTime} - %{endTime}"
   state_66a67ba2: Állapot
   state_published_e42697da: "állapot: publikált"
@@ -26423,6 +26433,7 @@ hu:
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Használja ezt a panelt a duplikált találatok vagy a kereséssel nem talált személyek feloldására."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Ezen a panelen kereshet olyan személyeket, akiket hozzá szeretne adni ehhez a kurzushoz.                        "
   use_this_photo_3a594830: "Használja ezt a fotót"
+  use_this_rubric_for_assignment_grading_a02fd079: "Értékelőtábla használata a feladat értékeléséhez"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Az újraküldött megoldásnál is legyen ugyanez az osztályzat"
   use_webcam_1ed0bf6b: "Webkamera használata"
   use_window_parent_in_deep_linking_response_8fe5f845: "A window.parent használata a Deep Linking válaszban"
@@ -26905,6 +26916,7 @@ hu:
   users_manage_students_in_courses_d6168815: "Felhasználók - a hallgatók kezelése a kurzusokban"
   users_matching_search_term_c604db9e: "\"%{search_term}\" keresésnek megfelelő felhasználók"
   users_moderate_content_36d6eed7: "Felhasználók - moderálja a tartalmat"
+  users_must_post_before_seeing_replies_d1761968: "A felhasználóknak először bejegyzést kell írniuk ahhoz, hogy láthassák a válaszokat."
   users_observers_e0e66c52: "Felhasználók - Megfigyelők"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "A képernyőfelolvasót használóknak ki kell kapcsolniuk a virtuális kurzort, hogy használhassák a billentyűparancsokat"
   users_over_time_9a2ee74a: "felhasználók időn túl"

@@ -25,8 +25,8 @@ class AssignmentApiHarness
 
   delegate :value_to_boolean, to: :"Canvas::Plugin"
 
-  def api_user_content(description, course, user, _)
-    "api_user_content(#{description}, #{course.id}, #{user.id})"
+  def api_user_content(description, course, user, _, location: nil)
+    "api_user_content(#{description}, #{course.id}, #{user.id}, location: #{location})"
   end
 
   def course_assignment_url(context_id, assignment)
@@ -399,6 +399,16 @@ describe "Api::V1::Assignment" do
       end
     end
 
+    context "when file_association_access feature flag is enabled" do
+      it "adds location tag to description" do
+        attachment = Attachment.create!(context: user, filename: "user_avatar_pic", uploaded_data: StringIO.new("sometextgoeshere"))
+        assignment.description = "<img src='/users/#{user.id}/files/#{attachment.id}>"
+
+        json = api.assignment_json(assignment, user, session, { override_dates: false })
+        expect(json["description"]).to eq(api.api_user_content(assignment.description, @course, user, {}, location: assignment.asset_string))
+      end
+    end
+
     it "includes all assignment overrides fields when an assignment_override exists" do
       assignment.assignment_overrides.create(workflow_state: "active")
       overrides = assignment.assignment_overrides
@@ -415,7 +425,7 @@ describe "Api::V1::Assignment" do
                                  { override_dates: false })
       expect(json).to be_a(Hash)
       expect(json).to have_key "description"
-      expect(json["description"]).to eq(api.api_user_content("Foobers", @course, user, {}))
+      expect(json["description"]).to eq(api.api_user_content("Foobers", @course, user, {}, location: assignment.asset_string))
 
       json = api.assignment_json(assignment,
                                  user,
@@ -430,7 +440,7 @@ describe "Api::V1::Assignment" do
                                  { override_dates: false })
       expect(json).to be_a(Hash)
       expect(json).to have_key "description"
-      expect(json["description"]).to eq(api.api_user_content("Foobers", @course, user, {}))
+      expect(json["description"]).to eq(api.api_user_content("Foobers", @course, user, {}, location: assignment.asset_string))
     end
 
     it "excludes needs_grading_counts when exclude_response_fields flag is " \

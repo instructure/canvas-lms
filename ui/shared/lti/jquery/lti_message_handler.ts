@@ -25,5 +25,10 @@ export interface LtiMessageHandler<T = unknown> {
    * @param params includes the message
    * @returns true if the handler has already sent a response
    */
-  (params: {message: T; event: MessageEvent<unknown>; responseMessages: ResponseMessages}): boolean
+  (params: {
+    message: T
+    event: MessageEvent<unknown>
+    responseMessages: ResponseMessages
+    callback?: () => void
+  }): boolean
 }

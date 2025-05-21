@@ -19,16 +19,21 @@
 import {up as enableDTNPI, down as disableDTNPI} from '../enableDTNPI'
 import {log} from '@canvas/datetime-natural-parsing-instrument'
 import fetchMock from 'fetch-mock'
+import $ from 'jquery'
 
 describe('enableDTNPI', () => {
   let consoleLog
 
   beforeEach(() => {
     consoleLog = jest.spyOn(console, 'log').mockImplementation(() => {})
+    // Mock jQuery's flashError function
+    $.flashError = jest.fn()
   })
 
   afterEach(async () => {
     consoleLog.mockReset()
+    // Clean up the jQuery mock
+    $.flashError.mockReset()
 
     await disableDTNPI()
   })
@@ -38,7 +43,7 @@ describe('enableDTNPI', () => {
     log({id: 'foo'})
     await new Promise(resolve => setTimeout(resolve, 1))
     const events = JSON.parse(localStorage.getItem('dtnpi'))
-    expect(events.length).toEqual(1)
+    expect(events).toHaveLength(1)
     expect(events[0]).toMatchObject({id: 'foo'})
   })
 
@@ -47,7 +52,7 @@ describe('enableDTNPI', () => {
     log({value: Array(65).join('*')})
     await new Promise(resolve => setTimeout(resolve, 1))
     const events = JSON.parse(localStorage.getItem('dtnpi'))
-    expect(events.length).toEqual(1)
+    expect(events).toHaveLength(1)
     expect(events[0].value).toEqual(Array(33).join('*'))
   })
 
@@ -59,7 +64,7 @@ describe('enableDTNPI', () => {
     log({id: '4'})
     await new Promise(resolve => setTimeout(resolve, 1))
     const events = JSON.parse(localStorage.getItem('dtnpi'))
-    expect(events.length).toEqual(3)
+    expect(events).toHaveLength(3)
     expect(events.map(x => x.id)).toEqual(['2', '3', '4'])
   })
 
@@ -76,7 +81,7 @@ describe('enableDTNPI', () => {
           parsed: '2021-08-18T06:00:00.000Z',
           value: 'wed aug 18',
         },
-      ])
+      ]),
     )
 
     fetchMock.put(endpoint, 200)
@@ -90,7 +95,7 @@ describe('enableDTNPI', () => {
 
     const payload = JSON.parse(fetchMock.lastCall()[1].body)
 
-    expect(payload.length).toEqual(1)
+    expect(payload).toHaveLength(1)
     expect(payload.map(x => x.id)).toEqual(['a'])
   })
 })

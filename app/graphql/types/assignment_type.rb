@@ -395,7 +395,11 @@ module Types
                                               context: assignment.context,
                                               user: current_user,
                                               in_app: context[:in_app],
-                                              preloaded_attachments:)
+                                              preloaded_attachments:,
+                                              options: {
+                                                domain_root_account: context[:domain_root_account],
+                                              },
+                                              location: assignment.asset_string)
         end
       end
     end

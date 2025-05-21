@@ -347,6 +347,37 @@ describe PageView do
     end
   end
 
+  describe ".app_name" do
+    specs_require_sharding
+
+    before do
+      @attributes = valid_page_view_attributes.stringify_keys
+    end
+
+    it "when developer_key_id obtained return app name" do
+      @attributes["developer_key_id"] = "10000000000001"
+      pv = PageView.from_attributes(@attributes)
+      allow(DeveloperKey).to receive(:find_cached).and_return(double(name: "Test App"))
+
+      expect(pv.app_name).to eq "Test App"
+    end
+
+    it "when developer_key_id not obtained return nil" do
+      @attributes["developer_key_id"] = nil
+      pv = PageView.from_attributes(@attributes)
+
+      expect(pv.app_name).to be_nil
+    end
+
+    it "when non-existing developer_key_id obtained return the key id" do
+      @attributes["developer_key_id"] = "99000000000001"
+      pv = PageView.from_attributes(@attributes)
+      allow(DeveloperKey).to receive(:find_cached).and_raise(ActiveRecord::RecordNotFound)
+
+      expect(pv.app_name).to eq "99000000000001"
+    end
+  end
+
   context "pv4" do
     before do
       allow(PageView).to receive_messages(pv4?: true, page_view_method: :pv4)

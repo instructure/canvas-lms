@@ -31,7 +31,8 @@ const assignmentRubricDialog = {
     const $trigger = $('.rubric_dialog_trigger')
     if ($trigger) {
       this.noRubricExists = $trigger.data('noRubricExists')
-      const selector = $trigger.data('focusReturnsTo') ?? '[data-testid="discussion-post-menu-trigger"]'
+      const selector =
+        $trigger.data('focusReturnsTo') ?? '[data-testid="discussion-post-menu-trigger"]'
       try {
         this.$focusReturnsTo = $(document.querySelector(selector))
       } catch (err) {
@@ -71,20 +72,23 @@ const assignmentRubricDialog = {
       // since that is the point of why they clicked the link.
       if (assignmentRubricDialog.noRubricExists) {
         $.subscribe('edit_rubric/initted', () =>
-            assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click(),
+          assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click(),
         )
       }
 
       // weird hackery because the server returns a <div id="rubrics" style="display:none">
       // as it's root node, so we need to show it before we inject it
       assignmentRubricDialog.$dialog.html($(html).show())
+      assignmentRubricDialog.$dialog
+        .find('#rubrics .rubric_container div.rubric-screenreader-title')
+        .remove()
     })
   },
 
   openDialog() {
     if (!this.dialogInited) this.initDialog()
     this.$dialog.dialog('open')
-  }
+  },
 }
 
 export default assignmentRubricDialog

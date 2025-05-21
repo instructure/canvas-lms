@@ -2173,6 +2173,7 @@ he:
   allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: "הרשאה לתלמידים לעיין ברשימת הנרשמים לחלונות הזמן שעדיין זמינים"
   allow_switching_to_the_new_assignments_page_9ac0ad93: "הרשאה לעבור לדף המשימות החדש"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "אפשר/י את היכולת לשגר תזכורות באמצעות תור השדרים שלנו"
+  allow_threaded_replies_43b2311e: "הרשאת שירשור תגובות"
   allowed_attempts_4e229caa: "נסיונות מותרים"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "מאפשר יצירת הכרזות לסעיף יעודי"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "התרה למורים לסמן נתוני הערכה לייצוא במנות לסינכרון עם המערכת הבית ספרית"
@@ -5562,6 +5563,10 @@ he:
     one: "קובץ אחד הועלה"
     other: "%{count} קבצים הועלו"
     two: "%{count} קבצים הועלו"
+  count_groups_90e215b1: 
+    one: "קבוצה אחת"
+    other: "%{count} קבוצות"
+    two: "%{count} קבוצות"
   count_hours_1bd03883: 
     many: "%{count} שעות"
     one: "שעה אחת"
@@ -5638,6 +5643,10 @@ he:
     one: "תוצאה אחת הוצגה"
     other: "%{count} תוצאות הוצגו"
     two: "%{count} תוצאות הוצגו"
+  count_sections_bf1baf0a: 
+    one: "סעיף אחד"
+    other: "%{count} הקבצות"
+    two: "%{count} הקבצות"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "נמצא אוגדן אחד של תקופות הערכה"
     other: "%{count} אודנים של תקופות הערכה נמצאו ."
@@ -7793,6 +7802,7 @@ he:
   ending_date_e1ea13a4: "תאריך סיום"
   ends_4fcb632: "מסתיים:"
   ends_at_9a62b528: "מסתיים ב"
+  ends_e3a6843f: מסתיים
   enhanced_individual_gradebook: 
     avg_score: "ציון ממוצע"
     high_score: "ציון גבוה"
@@ -14321,6 +14331,7 @@ he:
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "בבקשה להוסיף תאריך יעד ב %{earliestDate} או מאוחר יותר"
   please_enter_a_name_for_this_link_318f01a4: "בבקשה להקליד שם לקישור זה"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "בבקשה להקליד מונח חיפוש עם 3 תווים ומעלה "
+  please_enter_a_valid_format_for_a_date_66ed0587: "זה לא תאריך!"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "בבקשה להקליד כתובת אינטרנט תקינה כולל קידומת, למשל.  ( http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "בבקשה לספק כתובת אינטרנט תקינה, כוול הקידומת (כגון http://, https://, ftp://)."
   please_enter_the_details_for_the_new_course_dc705b8c: "נא להזין את פרטי הקורס החדש"
@@ -18784,6 +18795,7 @@ he:
   started_5e138638: התחיל
   starts_at_29843f98: "מתחיל ב"
   starts_ce584f1c: "מתחיל:"
+  starts_fa6bf3f5: מתחיל
   state_standards_c9b1affd: "תקני מדינה"
   statistics: 
     csv_columns: 
@@ -20078,6 +20090,7 @@ he:
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "השתמש/י ברשימה זו כדי להסיר תלמידים רשומים. הוספת תלמידים נעשית בתיבת קומבו בהמשך הרשימה."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "השתמש/י בפאנל זה לפתור כפילויות או אנשים שלא אותרו בחיפוש"
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "השתמש/י בפאנל זה לחיפוש אנשים שברצונך להוסיף לקורס"
+  use_this_rubric_for_assignment_grading_a02fd079: "יש להשתמש ברובריקה זו להערכת המשימה"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "השתמש/י באותה הערכה לשיגור מחדש"
   used_by_permission_314a78dd: "שומש ברשות"
   user: 
@@ -20550,6 +20563,7 @@ he:
       welcome_to_happiness: "ברוכים הבאים לקנבס!"
   users_d1b60cb0: משתמשים
   users_matching_search_term_c604db9e: "משתמשים העונים על תנאי החיפוש \"%{search_term}\""
+  users_must_post_before_seeing_replies_d1761968: "התלמיד חייב לפרסם לפני שיעיין בתגובות"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "יתכן שמשתמשי תוכנות קריאת מסך יצטרכו לנטרל את פעולת הסמן הוירטואלי כדי להשתמש בקיצורי המקלדת הללו"
   users_with_no_enrollments_5dddce33: "משתמשים ללא רישומים לקורסים"
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "משתמש בכלי התזמון החדש וביכולות שלו"

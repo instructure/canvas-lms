@@ -26,7 +26,6 @@ describe('PublishIconButton', () => {
     defaultProps = {
       item: {
         id: '1',
-        uuid: '1',
         folder_id: '1',
         display_name: 'file',
         filename: 'file',

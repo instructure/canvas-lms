@@ -19,6 +19,18 @@
 #
 
 describe AttachmentAssociation do
+  let(:enrollment) { course_with_teacher({ active_all: true }) }
+  let(:course) { enrollment.course }
+  let(:teacher) { enrollment.user }
+  let(:course_attachment) { attachment_with_context(course) }
+  let(:course_attachment2) { attachment_with_context(course) }
+  let(:course_attachment3) { attachment_with_context(course) }
+  let(:another_user) { user_with_pseudonym({ account: enrollment.course.account }) }
+  let(:user_attachment) { attachment_with_context(another_user) }
+  let(:teacher_attachment) { attachment_with_context(teacher) }
+  let(:student_enrollment) { course_with_user("StudentEnrollment", { course:, active_all: true }) }
+  let(:student) { student_enrollment.user }
+
   context "create" do
     it "sets the root_account_id using course context" do
       attachment_model filename: "test.txt", context: account_model(root_account_id: nil)
@@ -38,24 +50,15 @@ describe AttachmentAssociation do
   end
 
   describe "#update_associations" do
-    let(:enrollment) { course_with_teacher }
-    let(:course) { enrollment.course }
-    let(:teacher) { enrollment.user }
-    let(:course_attachment) { attachment_with_context(course) }
-    let(:course_attachment2) { attachment_with_context(course) }
-    let(:course_attachment3) { attachment_with_context(course) }
-    let(:another_user) { user_with_pseudonym({ account: enrollment.course.account }) }
-    let(:user_attachment) { attachment_with_context(another_user) }
-
     def fetch_list_with_field_name(field_name)
       AttachmentAssociation.where(context: course, field_name:).pluck(:attachment_id)
     end
 
-    def make_association_update(attachment_ids, field_name)
+    def make_association_update(attachment_ids, field_name, user = teacher)
       AttachmentAssociation.update_associations(
         course,
         attachment_ids,
-        teacher,
+        user,
         nil,
         field_name
       )
@@ -83,11 +86,89 @@ describe AttachmentAssociation do
       expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id])
     end
 
+    it "does not allow associations to files the editing user doesn't have update access to" do
+      make_association_update([course_attachment.id, user_attachment.id], nil, student)
+      expect(fetch_list_with_field_name(nil)).to be_empty
+    end
+
     it "works with fields" do
       make_association_update([course_attachment.id, course_attachment2.id], nil)
       make_association_update([course_attachment3.id], "syllabus_body")
       expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id, course_attachment2.id])
       expect(fetch_list_with_field_name("syllabus_body")).to match_array([course_attachment3.id])
+    end
+  end
+
+  describe "#verify_access" do
+    before do
+      course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+    end
+
+    def make_associations
+      AttachmentAssociation.update_associations(
+        course,
+        [course_attachment.id, course_attachment2.id],
+        teacher,
+        nil
+      )
+      AttachmentAssociation.update_associations(
+        course,
+        [course_attachment3.id],
+        teacher,
+        nil,
+        "syllabus_body"
+      )
+    end
+
+    it "returns false if the attachment is not associated with the context" do
+      make_associations
+      expect(AttachmentAssociation.verify_access("course_#{course.id}", course_attachment3.id, teacher)).to be_falsey
+    end
+
+    it "returns false if the user is not allowed to read the context" do
+      make_associations
+      expect(AttachmentAssociation.verify_access("course_#{course.id}", course_attachment.id, another_user)).to be_falsey
+    end
+
+    it "returns true if the attachment is associated with the context and the user has read rights to the context" do
+      make_associations
+      expect(AttachmentAssociation.verify_access("course_#{course.id}", course_attachment.id, teacher)).to be_truthy
+    end
+
+    context "with a syllabus body attachment" do
+      context "when the course syllabus is public" do
+        before do
+          course.public_syllabus = true
+          course.save!
+        end
+
+        it "returns true for a public syllabus for an unassociated user" do
+          make_associations
+          expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment3.id, another_user)).to be_truthy
+        end
+
+        it "returns true for a public syllabus for an enrolled student" do
+          make_associations
+          expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment3.id, student)).to be_truthy
+        end
+      end
+
+      context "when the course syllabus is not public" do
+        before do
+          course.public_syllabus = false
+          course.save!
+        end
+
+        it "returns false for a nonpublic syllabus for an unassociated user" do
+          make_associations
+          expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment3.id, another_user)).to be_falsey
+        end
+
+        it "returns true for a nonpublic syllabus for an enrolled student" do
+          make_associations
+          expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment3.id, student)).to be_truthy
+        end
+      end
     end
   end
 end

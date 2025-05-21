@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useQuery} from '@tanstack/react-query'
+import {useQuery, keepPreviousData} from '@tanstack/react-query'
 import {useParams} from 'react-router-dom'
 import splitAssetString from '@canvas/util/splitAssetString'
-import filesEnv from '../../../../shared/files_v2/react/modules/filesEnv'
+import {getFilesEnv} from '../../utils/filesEnvUtils'
 import {createStubRootFolder} from '../../utils/folderUtils'
 import {generateFolderByPathUrl} from '../../utils/apiUtils'
 import {Folder} from '../../interfaces/File'
@@ -39,7 +39,7 @@ export class NotFoundError extends Error {
 }
 
 function getRootFolder(pluralContextType: string, contextId: string) {
-  return createStubRootFolder(filesEnv.contextsDictionary[`${pluralContextType}_${contextId}`])
+  return createStubRootFolder(getFilesEnv().contextsDictionary[`${pluralContextType}_${contextId}`])
 }
 
 async function loadFolders(pluralContextType: string, contextId: string, path?: string) {
@@ -65,6 +65,7 @@ async function loadFolders(pluralContextType: string, contextId: string, path?: 
 }
 
 export const useGetFolders = () => {
+  const filesEnv = getFilesEnv()
   const pathParams = useParams()
   const pathContext = pathParams.context
   const path = pathParams['*']
@@ -76,7 +77,7 @@ export const useGetFolders = () => {
   return useQuery<Folder[], Error, Folder[], typeof queryKey>({
     queryKey,
     staleTime: 0,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     queryFn: async ({queryKey}) => {
       const [, {path, contextType, contextId}] = queryKey
       return path

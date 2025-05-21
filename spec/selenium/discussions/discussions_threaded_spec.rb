@@ -1660,8 +1660,8 @@ describe "threaded discussions" do
         user_session(@teacher)
       end
 
-      it "should not have sticky header even when :discussions_speedgrader_revisit feature flag is ON" do
-        @course.account.enable_feature! :discussions_speedgrader_revisit
+      it "should not have sticky header when checkpoints is enabled since we are not in speedgrader" do
+        @course.account.enable_feature! :discussion_checkpoints
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         expect(f("body")).not_to contain_css("div[data-testid='sticky-toolbar']")
       end

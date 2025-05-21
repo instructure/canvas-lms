@@ -26,7 +26,8 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 import {ContextModuleProvider} from './react/hooks/useModuleContext'
 
 const I18n = createI18nScope('context_modules_v2')
@@ -52,21 +53,22 @@ ready(() => {
           />
         }
       >
-        <QueryProvider>
+        <QueryClientProvider client={queryClient}>
           <ContextModuleProvider
             courseId={ENV.course_id}
             isMasterCourse={ENV.MASTER_COURSE_SETTINGS?.IS_MASTER_COURSE ?? false}
             isChildCourse={ENV.MASTER_COURSE_SETTINGS?.IS_CHILD_COURSE ?? false}
-            // @ts-expect-error
             permissions={ENV.MODULES_PERMISSIONS}
-            // @ts-expect-error
             NEW_QUIZZES_BY_DEFAULT={ENV.NEW_QUIZZES_BY_DEFAULT}
-            // @ts-expect-error
             DEFAULT_POST_TO_SIS={ENV.DEFAULT_POST_TO_SIS}
           >
-            {ENV.current_user_is_student ? <ModulesStudentContainer /> : <ModulesContainer />}
+            {ENV.MODULES_PERMISSIONS?.readAsAdmin ? (
+              <ModulesContainer />
+            ) : (
+              <ModulesStudentContainer />
+            )}
           </ContextModuleProvider>
-        </QueryProvider>
+        </QueryClientProvider>
       </ErrorBoundary>,
     )
   }

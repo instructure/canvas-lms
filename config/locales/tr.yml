@@ -2283,6 +2283,7 @@ tr:
   allow_switching_to_the_enhanced_rce_317e746f: "Gelişmiş RCE'ye geçişe izin ver"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Bildirimlerin gönderim kuyruğumuz ile gönderilebilmesine izin ver"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Bu aracın IMS İsileri ve Rol Sağlama Servisine erişimine izin verin"
+  allow_threaded_replies_43b2311e: "Yanıtlara izin ver"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Kullanıcıları eklerken onaylanmamış e-posta adreslerine izin ver"
   allow_users_to_comment_45b8f753: "Kullanıcıların yorum yapmasına izin ver"
   allowed_attempts_4e229caa: "İzin Verilen Hak"
@@ -5825,6 +5826,9 @@ tr:
   count_files_updated_4570a8a: 
     one: "1 dosya güncellendi"
     other: "%{count} dosya güncellendi"
+  count_groups_90e215b1: 
+    one: "1 grup"
+    other: "%{count} grup"
   count_hours_1bd03883: 
     one: "1 saat"
     other: "%{count} saat"
@@ -5879,6 +5883,9 @@ tr:
   count_results_displayed_ed39a0f0: 
     one: "Bir sonuç gösteriliyor"
     other: "%{count} sonuç gösteriliyor"
+  count_sections_bf1baf0a: 
+    one: "1 bölüm"
+    other: "%{count} bölüm"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "1 notlandırma peryodu seti bulundu."
     other: "%{count} notlandırma peryodu seti bulundu."
@@ -8072,6 +8079,7 @@ tr:
   ending_date_e1ea13a4: "Bitiş tarihi"
   ends_4fcb632: "Bitiyor:"
   ends_at_9a62b528: "Şu zaman bitiyor"
+  ends_e3a6843f: Bitiyor
   english_c60612e2: İngilizce
   enhanced_individual_gradebook: 
     avg_score: "Ortalama Puan"
@@ -14416,6 +14424,7 @@ tr:
   please_add_at_least_one_non_blank_answer_213c2c8e: "Lütfen en az bir tane boş olmayan cevap ekleyin."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Lütfen her değişken için en az bir tane boş olmayan cevap ekleyin."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Lütfen üç veya daha fazla karakter içeren bir arama terimi girin"
+  please_enter_a_valid_format_for_a_date_66ed0587: "Bu bir tarih değil!"
   please_enter_the_details_for_the_new_course_dc705b8c: "Lütfen yeni dersin detaylarını girin."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Token'da gözüken doğrulama kodunu giriniz"
   please_enter_your_label_name_7745272d: "Lütfen %{label_name} inizi girin:"
@@ -18704,6 +18713,7 @@ tr:
   start_participating_f0c75256: "Katılımı Başlat"
   started_5e138638: Başladı
   starts_at_29843f98: "Şu zamanda başlıyor"
+  starts_fa6bf3f5: Başlangıç
   state_66a67ba2: Durum
   state_standards_c9b1affd: "Eyalet Standartları"
   statistics: 
@@ -19800,6 +19810,7 @@ tr:
   use_the_new_assignments_page_dd292b9d: "Yeni ödevler sayfasını kullan"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "İşbirliğine yönelik çalışmalarda kullanmak amacıyla daha fazla seçeneği etkilnleştirmek için yeni İşbirliği harici aracını kullanın"
   use_the_new_scheduler_1273b832: "Yeni zamanlayıcıyı kullanın"
+  use_this_rubric_for_assignment_grading_a02fd079: "Ödev değerlendirmesi için bu ölçeği kullan"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Tekrar gönderimde aynı notu kullan"
   used_by_permission_314a78dd: "İzinli Kullanıldı"
   user: 
@@ -20256,6 +20267,7 @@ tr:
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "Kullanıcılar - derslere öğretmen, ders tasarımcısı ya da Öğretim elamanı yardımcısı ekle veya sil"
   users_d1b60cb0: Kullanıcılar
   users_manage_login_details_9462b30f: "Kullanıcılar - oturum açma ayrıntılarını yönet"
+  users_must_post_before_seeing_replies_d1761968: "Kullanıcılar cevapları görmeden önce gönderi yapmalıdırlar"
   users_view_list_861c7a3f: "Kullanıcılar - listeyi göster"
   users_view_login_ids_a2e6a85: "Kullanıcılar - Giriş ID'lerini göster"
   users_view_primary_email_address_14f4978f: "Kullanıcılar - birincil eposta adresini göster"

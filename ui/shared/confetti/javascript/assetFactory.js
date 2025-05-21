@@ -31,7 +31,6 @@ import hot_air_balloon from '../images/HotAirBalloon.svg'
 import magic_mystery_thumbs_up from '../images/MagicMysteryThumbsUp.svg'
 import medal from '../images/Medal.svg'
 import moon from '../images/Moon.svg'
-import ninja from '../images/Ninja.svg'
 import panama_rocket from '../images/PanamaRocket.svg'
 import panda from '../images/Panda.svg'
 import panda_unicycle from '../images/PandaUnicycle.svg'
@@ -74,8 +73,6 @@ export default function assetFactory(key) {
       return medal
     case 'moon':
       return moon
-    case 'ninja':
-      return ninja
     case 'panama_rocket':
       return panama_rocket
     case 'panda':

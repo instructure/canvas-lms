@@ -20,10 +20,6 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import CoursePeopleApp from '../CoursePeopleApp'
 
-jest.mock('@canvas/query', () => ({
-  QueryProvider: ({children}: {children: React.ReactNode}) => <div data-testid="query-provider">{children}</div>,
-}))
-
 const mockContextValue = {
   courseId: '1',
   canReadRoster: true,
@@ -32,19 +28,25 @@ const mockContextValue = {
 jest.mock('../contexts/CoursePeopleContext', () => ({
   __esModule: true,
   default: {
-    Provider: ({children, value}: {children: React.ReactNode, value: unknown}) => (
+    Provider: ({children, value}: {children: React.ReactNode; value: unknown}) => (
       <div data-testid="course-people-context-provider" data-context-value={JSON.stringify(value)}>
         {children}
       </div>
-    )
+    ),
   },
-  getCoursePeopleContext: jest.fn(() => mockContextValue)
+  getCoursePeopleContext: jest.fn(() => mockContextValue),
 }))
 
 jest.mock('@canvas/error-boundary', () => ({
   __esModule: true,
-  default: ({children, errorComponent}: {children: React.ReactNode, errorComponent: React.ReactNode}) => (
-    <div data-testid="error-boundary" data-error-component={errorComponent ? 'has-error-component' : undefined}>
+  default: ({
+    children,
+    errorComponent,
+  }: {children: React.ReactNode; errorComponent: React.ReactNode}) => (
+    <div
+      data-testid="error-boundary"
+      data-error-component={errorComponent ? 'has-error-component' : undefined}
+    >
       {children}
     </div>
   ),
@@ -52,7 +54,7 @@ jest.mock('@canvas/error-boundary', () => ({
 
 jest.mock('../CoursePeople', () => ({
   __esModule: true,
-  default: () => <div data-testid="course-people" />
+  default: () => <div data-testid="course-people" />,
 }))
 
 describe('CoursePeopleApp', () => {
@@ -80,20 +82,11 @@ describe('CoursePeopleApp', () => {
     expect(contextProvider).toHaveAttribute('data-context-value', JSON.stringify(mockContextValue))
   })
 
-  it('wraps CoursePeople in QueryProvider', () => {
-    const queryProvider = screen.getByTestId('query-provider')
-    const coursePeople = screen.getByTestId('course-people')
-    expect(queryProvider).toBeInTheDocument()
-    expect(queryProvider).toContainElement(coursePeople)
-  })
-
   it('maintains correct component hierarchy', () => {
-    const queryProvider = screen.getByTestId('query-provider')
     const contextProvider = screen.getByTestId('course-people-context-provider')
     const errorBoundary = screen.getByTestId('error-boundary')
     const coursePeople = screen.getByTestId('course-people')
 
-    expect(queryProvider).toContainElement(contextProvider)
     expect(contextProvider).toContainElement(errorBoundary)
     expect(errorBoundary).toContainElement(coursePeople)
   })

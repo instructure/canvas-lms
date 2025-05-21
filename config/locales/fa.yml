@@ -2395,6 +2395,7 @@ fa:
   allow_switching_to_the_enhanced_rce_317e746f: "اجازه تغییر به RCE پیشرفته"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "اجازه دادن به ارسال اطلاعیه ها از طریق صف ارسال"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "امکان دادن به این ابزار برای دسترسی به نام های IMS و سرویس Role Provisioning"
+  allow_threaded_replies_43b2311e: "اجازه دادن به پاسخ های نخ کشی شده"
   allow_users_to_comment_45b8f753: " به کاربران اجازه ارسال نظر داده شود"
   allowed_attempts_4e229caa: "تلاش های مجاز"
   allowed_domains_ee7868c8: "دامنه های مجاز"
@@ -7004,6 +7005,9 @@ fa:
   count_files_updated_4570a8a: 
     one: "%{count} فایل بهنگام سازی شد"
     other: "%{count} فایل بهنگام سازی شد"
+  count_groups_90e215b1: 
+    one: "%{count} گروه"
+    other: "%{count} گروه"
   count_hidden_e8d2c57c: "%{count} مخفی"
   count_hours_1bd03883: 
     one: "%{count} ساعت"
@@ -7083,6 +7087,9 @@ fa:
   count_sections_466dcd5c: 
     one: "1 بخش"
     other: "%{count} بخش ها"
+  count_sections_bf1baf0a: 
+    one: "%{count} بخش"
+    other: "%{count} بخش"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "1 مجموعه برای دوره های نمره گذاری موجود است."
     other: "%{count} مجموعه دوره های نمره گذاری موجود است."
@@ -9729,6 +9736,7 @@ fa:
   ending_date_e1ea13a4: "تاریخ پایان"
   ends_4fcb632: "پایان می‌یابد:"
   ends_at_9a62b528: "پایان می یابد در"
+  ends_e3a6843f: "پایان در"
   enforce_scopes_be28989c: "اجبار کردن محدوده‌ها"
   engagement_report_986e9621: "گزارش اشتغال"
   english_australia_dc405d82: "انگلیسی (استرالیا)"
@@ -17707,6 +17715,7 @@ fa:
   please_enter_a_name_for_this_link_318f01a4: "لطفا یک نام برای این پیوند وارد کنید."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "لطفا یک عبارت جستجو با سه نویسه یا بیشتر وارد نمایید"
   please_enter_a_url_d2c868b5: "لطفا یک نشانی اینترنتی وارد کنید"
+  please_enter_a_valid_format_for_a_date_66ed0587: "این یک تاریخ نیست!"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "لطفا یک نشانی اینترنتی معتبر وارد کنید. پروتکل لازم است (به عنوان مثال http: //، https: //، ftp: //، tel :، mailto :)."
   please_enter_the_details_for_the_new_course_dc705b8c: "لطفا اطلاعات مربوط به درس جدید را وارد نمایید."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "لطفا رمز تأیید نشان داده شده توسط نشانه خود را وارد کنید."
@@ -22829,6 +22838,7 @@ fa:
   starting_publish_5e4f16b9: "شروع انتشار..."
   starts_at_29843f98: "شروع می شود در"
   starts_ce584f1c: "شروع می‌شود:"
+  starts_fa6bf3f5: "شروع در"
   state_66a67ba2: وضعیت
   state_published_e42697da: "وضعیت: منتشر شده "
   state_standards_c9b1affd: "استانداردهای استانی"
@@ -24985,6 +24995,7 @@ fa:
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "از این پنل برای حل و فصل نتایج تکراری یا افرادی که در جستجوی شما نیستند استفاده کنید. "
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "از این پنل برای جستجوی افرادی که می‌خواهید به این درس اضافه شوند استفاده کنید."
   use_this_photo_3a594830: "از این عکس استفاده کنید"
+  use_this_rubric_for_assignment_grading_a02fd079: "استفاده از این دستورالعمل ارزیابی برای نمره گذاری تکلیف"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "استفاده از همان نمره برای مورد دوباره ارسال شده"
   use_webcam_1ed0bf6b: "از وب کم استفاده کنید"
   used_by_permission_314a78dd: "استفاده شده از طریق مجوز"
@@ -25497,6 +25508,7 @@ fa:
   users_manage_students_in_courses_d6168815: "کاربران - مدیریت دانشجویان در دوره ها"
   users_matching_search_term_c604db9e: "کاربران نظیر با \"%{search_term}\""
   users_moderate_content_36d6eed7: "کاربران - محتوای متوسط"
+  users_must_post_before_seeing_replies_d1761968: "کاربران باید قبل از دیدن پاسخ ها ارسال کنند"
   users_observers_e0e66c52: "کاربران - ناظران"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "کاربران صفحه خوان ها ممکن است لازم باشد مکان نمای مجازی را به منظور استفاده از این میانبرهای صفحه کلید غیر فعال کنند"
   users_over_time_9a2ee74a: "کاربران در طول زمان"

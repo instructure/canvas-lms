@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen, waitFor, act} from '@testing-library/react'
 import CurrentDownloads from '../CurrentDownloads'
-import {FileManagementProvider} from '../../Contexts'
+import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {performRequest} from '../../../../utils/downloadUtils'

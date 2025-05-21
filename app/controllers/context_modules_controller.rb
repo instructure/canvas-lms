@@ -26,7 +26,7 @@ class ContextModulesController < ApplicationController
   before_action :require_context
 
   include HorizonMode
-  before_action :redirect_student_to_horizon, only: [:index, :show]
+  before_action :load_canvas_career, only: [:index, :show]
 
   add_crumb(proc { t("#crumbs.modules", "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_context_modules_url }
   before_action { |c| c.active_tab = "modules" }
@@ -331,6 +331,7 @@ class ContextModulesController < ApplicationController
           canDelete: @can_delete,
           canViewUnpublished: @can_view_unpublished,
           canDirectShare: can_do(@context, @current_user, :direct_share),
+          readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin)
         }
 
         js_env(MODULES_PERMISSIONS: modules_permissions)
@@ -408,6 +409,7 @@ class ContextModulesController < ApplicationController
       return render status: :not_found, template: "shared/errors/404_message" unless @module
 
       @items = load_content_tags(@module, @current_user)
+      @items_count = @items.count
       unless params[:no_pagination]
         @items = Api.paginate(@items, self, course_context_module_context_modules_items_html_url)
       end
@@ -998,20 +1000,25 @@ class ContextModulesController < ApplicationController
   def progressions
     if authorized_action(@context, @current_user, :read)
       if request.format == :json
+        base_modules_query = @context.context_modules.active
+        if context.account.feature_enabled?(:modules_perf) && params[:context_module_id]
+          base_modules_query = base_modules_query.where(id: params[:context_module_id])
+          return render json: [], status: :not_found if base_modules_query.empty?
+        end
         if @context.grants_right?(@current_user, session, :view_all_grades)
           if params[:user_id] && (@user = @context.students.find(params[:user_id]))
-            @progressions = @context.context_modules.active.map { |m| m.evaluate_for(@user) }
+            @progressions = base_modules_query.map { |m| m.evaluate_for(@user) }
           elsif @context.large_roster
             @progressions = []
           else
-            context_module_ids = @context.context_modules.active.pluck(:id)
+            context_module_ids = base_modules_query.pluck(:id)
             @progressions = ContextModuleProgression.where(context_module_id: context_module_ids).each(&:evaluate)
           end
         elsif @context.grants_right?(@current_user, session, :participate_as_student)
-          @progressions = @context.context_modules.active.order(:id).map { |m| m.evaluate_for(@current_user) }
+          @progressions = base_modules_query.order(:id).map { |m| m.evaluate_for(@current_user) }
         else
           # module progressions don't apply, but unlock_at still does
-          @progressions = @context.context_modules.active.order(:id).map do |m|
+          @progressions = base_modules_query.order(:id).map do |m|
             { context_module_progression: { context_module_id: m.id,
                                             workflow_state: (m.to_be_unlocked ? "locked" : "unlocked"),
                                             requirements_met: [],

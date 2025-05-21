@@ -30,9 +30,7 @@ const setUp = (
   },
 ) => {
   return render(
-    <ContextModuleProvider
-      {...contextModuleDefaultProps}
-    >
+    <ContextModuleProvider {...contextModuleDefaultProps}>
       <CompletionRequirementInfo
         id="19"
         type={type}

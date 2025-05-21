@@ -136,3 +136,13 @@ analytics_hub:
       state: allowed_on
     development:
       state: allowed_on
+
+# Admin Analytics - Contextual Messaging
+intelligent_insights_contextual_messaging:
+  state: hidden
+  applies_to: Account
+  display_name: "Intelligent Insights - Contextual Messaging"
+  description: Show Intelligent Insights new contextual messaging feature.
+  root_opt_in: true
+  beta: true
+  shadow: true

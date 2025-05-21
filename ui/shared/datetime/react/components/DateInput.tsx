@@ -24,8 +24,11 @@ import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Calendar} from '@instructure/ui-calendar'
 import {DateInput} from '@instructure/ui-date-input'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconArrowOpenEndSolid, IconArrowOpenStartSolid} from '@instructure/ui-icons'
-import {IconWarningSolid} from '@instructure/ui-icons'
+import {
+  IconArrowOpenEndSolid,
+  IconArrowOpenStartSolid,
+  IconWarningSolid,
+} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 
 import type {ViewProps} from '@instructure/ui-view'
@@ -39,6 +42,7 @@ import type {
   SyntheticEvent,
 } from 'react'
 import type {DateInputProps} from '@instructure/ui-date-input'
+import {parseDateToMomentWithTimezone} from '../date-utils'
 
 type Messages = DateInputProps['messages']
 
@@ -154,6 +158,12 @@ export type CanvasDateInputProps = {
    * Provides a ref to the underlying input element.
    */
   inputRef?: (element: HTMLInputElement | null) => void
+  /**
+   * While the user is typing in the input, error messages
+   * will be hidden. Once the input is blurred,
+   * error messages will appear.
+   */
+  hideMessagesWhenFocused?: boolean
 }
 
 /**
@@ -185,6 +195,7 @@ export default function CanvasDateInput({
   width,
   withRunningValue,
   inputRef,
+  hideMessagesWhenFocused,
 }: CanvasDateInputProps) {
   const todayMoment = moment().tz(timezone)
 
@@ -199,6 +210,7 @@ export default function CanvasDateInput({
     method: 'paste' | 'pick'
     value: string
   } | null>(null)
+  const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
 
   const priorSelectedMoment = useRef<Moment | null>(null)
 
@@ -346,6 +358,8 @@ export default function CanvasDateInput({
     const errorsExist = isInError()
     let newDate = null
 
+    setIsInputFocused(false)
+
     if (defaultToToday) {
       if (errorsExist) {
         onSelectedDateChange(null, 'error')
@@ -356,8 +370,10 @@ export default function CanvasDateInput({
       }
     } else {
       newDate = errorsExist || inputEmpty ? null : renderedMoment.toDate()
+      if (!hideMessagesWhenFocused) {
+        syncInput(newDate ? moment.tz(newDate, timezone) : priorSelectedMoment.current)
+      }
 
-      syncInput(newDate ? moment.tz(newDate, timezone) : priorSelectedMoment.current)
       onSelectedDateChange(newDate, 'other')
     }
 
@@ -369,11 +385,25 @@ export default function CanvasDateInput({
     onBlur?.(event)
   }
 
+  function handleFocus(event: FocusEvent<DateInputProps>) {
+    setIsInputFocused(true)
+    onFocus?.(event)
+  }
+
   function handleKey(e: KeyboardEvent<DateInputProps>) {
     if (e.key === 'Enter') {
       handleBlur(e)
     } else if (e.key === 'Escape') {
       setIsShowingCalendar(false)
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      const newDate = parseDateToMomentWithTimezone(inputValue, timezone)
+      if (!isShowingCalendar && newDate) {
+        // If valid, select the date to what the user just typed if they just opened the calendar
+        syncInput(newDate)
+        onSelectedDateChange(newDate.toDate(), 'pick')
+        setInputDetails({method: 'pick', value: newDate.toISOString()})
+      }
+      setIsShowingCalendar(true)
     }
   }
 
@@ -396,11 +426,18 @@ export default function CanvasDateInput({
     const ne: unknown = e.nativeEvent
     if (withRunningValue) {
       if ((ne as InputEvent).constructor.name === 'InputEvent') return
-      if ((ne as KeyboardEvent)?.key === ' ') {
-        setInputValue(v => v + ' ')
+    }
+
+    const isSpaceKey = (ne as KeyboardEvent)?.key === ' ' || (ne as KeyboardEvent)?.code === 'Space'
+    if (inputSourceRef.current === 'keyboard') {
+      if (!isSpaceKey) {
         return
       }
+      // If it's a space key, dont show the calendar but also dont block typing
+      setInputValue(v => v + ' ')
+      return
     }
+
     setIsShowingCalendar(true)
   }
 
@@ -458,6 +495,30 @@ export default function CanvasDateInput({
     )
   }
 
+  const allMessages =
+    hideMessagesWhenFocused && isInputFocused ? [] : messages.concat(internalMessages)
+
+  const inputSourceRef = useRef<'keyboard' | 'mouse' | null>(null)
+
+  useEffect(() => {
+    const handleMouseDown = () => {
+      inputSourceRef.current = 'mouse'
+    }
+    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (['Tab', 'ArrowDown', 'ArrowUp', 'Enter'].includes(e.key)) {
+        inputSourceRef.current = 'keyboard'
+      }
+    }
+
+    window.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('mousedown', handleMouseDown)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
   return (
     // @ts-expect-error
     <DateInput
@@ -469,10 +530,10 @@ export default function CanvasDateInput({
       onKeyUp={handleKey}
       isInline={true}
       placement={placement}
-      messages={messages.concat(internalMessages)}
+      messages={allMessages}
       isShowingCalendar={isShowingCalendar}
       onBlur={handleBlur}
-      onFocus={onFocus}
+      onFocus={handleFocus}
       onRequestShowCalendar={handleShowCalendar}
       onRequestHideCalendar={handleHideCalendar}
       onRequestSelectNextDay={() => modifySelectedMoment(1, 'day')}

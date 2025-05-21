@@ -2996,6 +2996,33 @@ describe User do
       expect(user).not_to receive(:pseudonyms)
       expect(user.mfa_settings(pseudonym_hint: p)).to eq :required
     end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      before :once do
+        account = Account.create!(settings: { mfa_settings: :disabled })
+        @p = user.pseudonyms.create!(account:, unique_id: "user")
+        @shard1.activate do
+          account = Account.create!(settings: { mfa_settings: :required })
+          course = course_model(account:)
+          course.enroll_student(user)
+          @p2 = user.pseudonyms.create!(account:, unique_id: "user")
+        end
+      end
+
+      it "does not include deleted pseudonyms when checking associated accounts" do
+        @p2.destroy
+
+        expect(user.mfa_settings).to eq :disabled
+        expect(user.mfa_settings(pseudonym_hint: @p)).to eq :disabled
+      end
+
+      it "includes all active user pseudonyms and returns most restrictive when checking associated accounts" do
+        expect(user.mfa_settings).to eq :required
+        expect(user.mfa_settings(pseudonym_hint: @p)).to eq :required
+      end
+    end
   end
 
   context "crocodoc attributes" do
@@ -4655,6 +4682,120 @@ describe User do
         expect(@user.create_courses_right(@account)).to be(:student)
         expect(@user.create_courses_right(@other_account)).to be_nil
       end
+    end
+  end
+
+  describe "create_courses_permissions" do
+    before do
+      @account = Account.default
+      @account.enable_feature!(:create_course_subaccount_picker)
+      @account.settings[:teachers_can_create_courses] = true
+      @account.settings[:students_can_create_courses] = true
+      @account.save!
+    end
+
+    context "as a teacher" do
+      before do
+        @user = user_factory(active_all: true)
+      end
+
+      it "teachers can create without restriction" do
+        @account.settings[:teachers_can_create_courses_anywhere] = true
+        @account.save!
+        course_with_teacher_logged_in(user: @user, active_all: true)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be(:teacher)
+        expect(permissions[:restrict_to_mcc]).to be_falsey
+      end
+
+      it "teacher enrollments can only create in MCC" do
+        @account.settings[:teachers_can_create_courses_anywhere] = false
+        @account.save!
+        course_with_teacher_logged_in(user: @user, active_all: true)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be(:teacher)
+        expect(permissions[:restrict_to_mcc]).to be_truthy
+      end
+    end
+
+    context "as a student" do
+      before do
+        @user = user_factory(active_all: true)
+      end
+
+      it "students can create without restriction" do
+        @account.settings[:students_can_create_courses_anywhere] = true
+        @account.save!
+        course_with_student_logged_in(user: @user, active_all: true)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be(:student)
+        expect(permissions[:restrict_to_mcc]).to be_falsey
+      end
+
+      it "student enrollments can only create in MCC" do
+        @account.settings[:students_can_create_courses_anywhere] = false
+        @account.save!
+        course_with_student_logged_in(user: @user, active_all: true)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be(:student)
+        expect(permissions[:restrict_to_mcc]).to be_truthy
+      end
+    end
+
+    context "as non-enrolled user" do
+      before do
+        @user = user_factory(active_all: true)
+      end
+
+      it "non-enrolled users can only create in MCC" do
+        @account.settings[:no_enrollments_can_create_courses] = true
+        @account.save!
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be(:no_enrollments)
+        expect(permissions[:restrict_to_mcc]).to be_truthy
+      end
+
+      it "non-enrolled users cannot create courses" do
+        @account.settings[:no_enrollments_can_create_courses] = false
+        @account.save!
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:can_create]).to be_nil
+        expect(permissions[:restrict_to_mcc]).to be_truthy
+      end
+    end
+
+    it "admin users can always create under a sub-account" do
+      @user = user_factory(active_all: true)
+      account_admin_user(account: @account, user: @user)
+
+      permissions = @user.create_courses_permissions(@account)
+
+      expect(permissions[:can_create]).to be(:admin)
+      expect(permissions[:restrict_to_mcc]).to be_falsey
+    end
+
+    it "enrolled users can create courses under a sub-account" do
+      @account.settings[:students_can_create_courses_anywhere] = true
+      @account.save!
+      @subaccount = @account.sub_accounts.create!(name: "SA")
+      course_with_student_logged_in(active_all: true, account: @subaccount)
+
+      permissions = @user.create_courses_permissions(@account)
+
+      expect(permissions[:can_create]).to be(:student)
+      expect(permissions[:restrict_to_mcc]).to be_falsey
     end
   end
 

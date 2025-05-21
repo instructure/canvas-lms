@@ -24,28 +24,33 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
-export const TranslationTriggerModal = ({isModalOpen, closeModal, closeModalAndKeepTranslations, closeModalAndRemoveTranslations}) => {
-
+export const TranslationTriggerModal = ({
+  isModalOpen,
+  closeModal,
+  closeModalAndKeepTranslations,
+  closeModalAndRemoveTranslations,
+  isAnnouncement,
+}) => {
   const I18n = createI18nScope('discussions_posts')
 
+  const description = isAnnouncement
+    ? I18n.t('Closing this module will also remove the translated announcement')
+    : I18n.t('Closing this module will also remove the translated discussion')
+
   return (
-    <Modal
-      label={I18n.t('Close translation')}
-      open={isModalOpen}
-      size="medium">
+    <Modal label={I18n.t('Close translation')} open={isModalOpen} size="medium">
       <Modal.Header>
-          <CloseButton placement="end"
-                       offset="small"
-                       onClick={closeModal}
-                       screenReaderLabel="Close"
-                       data-testid="translations-modal-close-button"
-          />
+        <CloseButton
+          placement="end"
+          offset="small"
+          onClick={closeModal}
+          screenReaderLabel="Close"
+          data-testid="translations-modal-close-button"
+        />
         <Heading>{I18n.t('Are you sure you want to close?')}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <Text>
-          {I18n.t('Closing this module will also remove the translated discussion')}
-        </Text>
+        <Text>{description}</Text>
       </Modal.Body>
       <Modal.Footer>
         <Flex gap="small">
@@ -53,10 +58,16 @@ export const TranslationTriggerModal = ({isModalOpen, closeModal, closeModalAndK
             <Button onClick={closeModal}> {I18n.t('Cancel')}</Button>
           </Flex.Item>
           <Flex.Item>
-            <Button onClick={closeModalAndKeepTranslations}> {I18n.t('Close and Keep Translations')}</Button>
+            <Button onClick={closeModalAndKeepTranslations}>
+              {' '}
+              {I18n.t('Close and Keep Translations')}
+            </Button>
           </Flex.Item>
           <Flex.Item>
-            <Button onClick={closeModalAndRemoveTranslations} color="primary"> {I18n.t('Close and Remove Translations')}</Button>
+            <Button onClick={closeModalAndRemoveTranslations} color="primary">
+              {' '}
+              {I18n.t('Close and Remove Translations')}
+            </Button>
           </Flex.Item>
         </Flex>
       </Modal.Footer>
@@ -68,5 +79,5 @@ TranslationTriggerModal.propTypes = {
   closeModal: PropTypes.func,
   closeModalAndKeepTranslations: PropTypes.func,
   closeModalAndRemoveTranslations: PropTypes.func,
-  isModalOpen: PropTypes.bool
+  isModalOpen: PropTypes.bool,
 }

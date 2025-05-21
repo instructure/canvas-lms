@@ -93,6 +93,15 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
+  describe "#question_count" do
+    let(:assignment) { Assignment.new }
+
+    it "sets and gets the question_count correctly" do
+      assignment.question_count = 10
+      expect(assignment.question_count).to eq(10)
+    end
+  end
+
   describe "default values" do
     it "sets grader_count to 0" do
       assignment = Assignment.create!(
@@ -4889,6 +4898,30 @@ describe Assignment do
           expect(res.map(&:asset)).to include(s)
           expect(res.map(&:assessor_asset)).to include(s)
         end
+      end
+
+      it "links RubricAssociation to AssessmentRequest when done at the same time" do
+        # This test simulates a race condition between associating a rubric and
+        # assigning peer reviews where previously the AssessmentRequests being created
+        # wheren't all linked to the RubricAssociation. This test ensures that is no
+        # longer happening.
+        rubric = Rubric.create!(user: @teacher, context: @course)
+        @a.peer_review_count = 1
+        call_count = 0
+        ra_result = nil
+        original_method = @submissions.first.method(:assign_assessor)
+
+        allow_any_instance_of(Submission).to receive(:assign_assessor) do |_instance, arg|
+          call_count += 1
+          if call_count == 5
+            ra_result = rubric.associate_with(@a, @course, purpose: "grading")
+          end
+
+          original_method.call(arg)
+        end
+
+        @a.assign_peer_reviews
+        expect(ra_result.assessment_requests.count).to eq(10)
       end
 
       it "does not assign peer reviews to fake students" do
@@ -11890,6 +11923,47 @@ describe Assignment do
 
         expect(@parent.reload.unlock_at).to eq new_unlock_at
         expect(@second_checkpoint.reload.unlock_at).to eq new_unlock_at
+      end
+
+      describe "has_sub_assignments" do
+        def create_extra_checkpoint
+          @parent.sub_assignments.create!(
+            context: @course,
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+            title: SecureRandom.hex(4)
+          )
+        end
+
+        it "sets has_sub_assignments to true once the first sub assignment is added" do
+          expect(@parent.reload.has_sub_assignments).to be true
+        end
+
+        it "keeps has_sub_assignments true while at least one active checkpoint exists" do
+          # destroy one of two checkpoints – flag should stay true
+          @first_checkpoint.destroy
+          expect(@parent.reload.has_sub_assignments).to be true
+
+          # add another active checkpoint – still true
+          create_extra_checkpoint
+          expect(@parent.reload.has_sub_assignments).to be true
+        end
+
+        it "sets has_sub_assignments false when all checkpoints are hard deleted" do
+          @first_checkpoint.destroy_permanently!
+          @second_checkpoint.destroy_permanently!
+          expect(@parent.reload.has_sub_assignments).to be false
+        end
+
+        it "updates flag on soft delete and soft undelete transitions" do
+          # soft‑delete both checkpoints
+          @first_checkpoint.destroy
+          @second_checkpoint.destroy
+          expect(@parent.reload.has_sub_assignments).to be false
+
+          # soft‑undelete one checkpoint – flag should toggle back to true
+          @first_checkpoint.update!(workflow_state: "published")
+          expect(@parent.reload.has_sub_assignments).to be true
+        end
       end
     end
   end

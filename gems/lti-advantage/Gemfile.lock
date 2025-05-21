@@ -8,31 +8,30 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (7.1.5.1)
-      activesupport (= 7.1.5.1)
-    activesupport (7.1.5.1)
+    activemodel (7.2.2.1)
+      activesupport (= 7.2.2.1)
+    activesupport (7.2.2.1)
       base64
       benchmark (>= 0.3)
       bigdecimal
-      concurrent-ruby (~> 1.0, >= 1.0.2)
+      concurrent-ruby (~> 1.0, >= 1.3.1)
       connection_pool (>= 2.2.5)
       drb
       i18n (>= 1.6, < 2)
       logger (>= 1.4.2)
       minitest (>= 5.1)
-      mutex_m
       securerandom (>= 0.3)
-      tzinfo (~> 2.0)
+      tzinfo (~> 2.0, >= 2.0.5)
     aes_key_wrap (1.1.0)
     base64 (0.2.0)
     benchmark (0.4.0)
     bigdecimal (3.1.9)
-    bindata (2.5.0)
+    bindata (2.5.1)
     concurrent-ruby (1.3.5)
-    connection_pool (2.5.0)
+    connection_pool (2.5.3)
     diff-lcs (1.6.1)
     drb (2.2.1)
-    faraday (2.13.0)
+    faraday (2.13.1)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -42,7 +41,7 @@ GEM
       net-http (>= 0.5.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    json (2.10.2)
+    json (2.11.3)
     json-jwt (1.16.7)
       activesupport (>= 4.2)
       aes_key_wrap
@@ -52,7 +51,6 @@ GEM
       faraday-follow_redirects
     logger (1.7.0)
     minitest (5.25.5)
-    mutex_m (0.3.0)
     net-http (0.6.0)
       uri
     rake (13.2.1)

@@ -21,7 +21,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AsyncComponents from '../default_gradebook/AsyncComponents'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 export const showMessageStudentsWithObserversModal = async (props, focusAtEnd) => {
   const mountPoint = document.querySelector("[data-component='MessageStudentsWithObserversModal']")
@@ -36,9 +37,9 @@ export const showMessageStudentsWithObserversModal = async (props, focusAtEnd) =
     const MessageStudentsWhoDialog = await AsyncComponents.loadMessageStudentsWithObserversDialog()
 
     ReactDOM.render(
-      <QueryProvider>
+      <QueryClientProvider client={queryClient}>
         <MessageStudentsWhoDialog {...dialogeProps} />
-      </QueryProvider>,
+      </QueryClientProvider>,
       mountPoint,
     )
   }

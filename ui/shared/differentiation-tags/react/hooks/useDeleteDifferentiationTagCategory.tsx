@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMutation, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {useMutation} from '@tanstack/react-query'
 
 const I18n = createI18nScope('differentiation_tags')
 

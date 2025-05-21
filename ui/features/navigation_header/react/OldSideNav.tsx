@@ -29,9 +29,9 @@ import useHoverIntent from './hooks/useHoverIntent'
 import coursesQuery from './queries/coursesQuery'
 import groupsQuery from './queries/groupsQuery'
 import NavigationBadges from './NavigationBadges'
-import {prefetchQuery} from '@canvas/query'
 import profileQuery from './queries/profileQuery'
 import getAccounts from '@canvas/api/accounts/getAccounts'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('Navigation')
 
@@ -90,22 +90,34 @@ const Navigation = () => {
 
   useHoverIntent(profileNavLink, () => {
     import('./trays/ProfileTray')
-    prefetchQuery(['profile'], profileQuery)
+    queryClient.prefetchQuery({
+      queryKey: ['profile'],
+      queryFn: profileQuery,
+    })
   })
 
   useHoverIntent(coursesNavLink, () => {
     import('./trays/CoursesTray')
-    prefetchQuery(['courses'], coursesQuery)
+    queryClient.prefetchQuery({
+      queryKey: ['courses'],
+      queryFn: coursesQuery,
+    })
   })
 
   useHoverIntent(accountsNavLink, () => {
     import('./trays/AccountsTray')
-    prefetchQuery(['accounts', {pageIndex: 1}], getAccounts)
+    queryClient.prefetchQuery({
+      queryKey: ['accounts', {pageIndex: 1}],
+      queryFn: getAccounts,
+    })
   })
 
   useHoverIntent(groupsNavLink, () => {
     import('./trays/GroupsTray')
-    prefetchQuery(['groups'], groupsQuery)
+    queryClient.prefetchQuery({
+      queryKey: ['groups'],
+      queryFn: groupsQuery,
+    })
   })
 
   useEffect(() => {

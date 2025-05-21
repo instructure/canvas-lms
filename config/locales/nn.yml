@@ -2697,6 +2697,7 @@ nn:
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Tillat å sende varsel gjennom vår dispatch-kø"
   allow_the_item_banks_share_with_subaccounts_permis_a8a6e87f: "Tillat løyve \"Spørsmålsbank - del med underkontoar\""
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Tillat at verktøyet får tilgang til IMS-namn og rolletildelingsteneste. "
+  allow_threaded_replies_43b2311e: "Tillat tråda svar"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Tillat ikkje-verifiserte e-postadresser når du legg til brukarar"
   allow_users_to_comment_45b8f753: "La studentane få kommentere"
   allow_users_to_submit_an_additional_email_at_regis_75b54a9d: "La brukarar leggje til ein ekstra e-post ved registrering."
@@ -7774,6 +7775,9 @@ nn:
     one: "1 Filter"
     other: "{{count}} Filter"
     zero: "Ingen filter"
+  count_groups_90e215b1: 
+    one: "1 gruppe"
+    other: "%{count} grupper"
   count_hidden_e8d2c57c: "%{count} skjult"
   count_hours_1bd03883: 
     one: "1 time"
@@ -7899,6 +7903,9 @@ nn:
   count_rows_removed_c6ff7bc: "%{count} rader fjerna"
   count_sections_466dcd5c: 
     one: "1 seksjon"
+    other: "%{count} seksjonar"
+  count_sections_bf1baf0a: 
+    one: "1 klasse"
     other: "%{count} seksjonar"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "Fann 1 sett med karaktersetjingsperiodar"
@@ -10820,6 +10827,7 @@ nn:
   ending_date_e1ea13a4: Sluttdato
   ends_4fcb632: "Sluttar:"
   ends_at_9a62b528: "Sluttar den"
+  ends_e3a6843f: Sluttar
   enforce_scopes_be28989c: "Kontroller omfang"
   engagement_report_986e9621: Aktivitetsrapport
   english_australia_dc405d82: "Engelsk (Australia)"
@@ -18092,6 +18100,7 @@ nn:
   new_activity_8b84847d: "Ny aktivitet"
   new_activity_for_title_c5cc74: "Ny aktivitet for%{title}"
   new_analytics_api_access_7eec1ead: "Nye analysar API-tilgang"
+  new_analytics_description: "Vis Nye analysar for emne- og brukardata. Det kan ta 24 timer før data er tilgjengeleg i Nye analysar etter at funksjonen er satt til ON. For fleire detaljar, sjå på temaet \"New Analytics user group\" i Canvas Community."
   new_analytics_f6147886: "Nye analysar"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       Nye analysar er eit interaktivt verktøy som hjelper deg og studentane å følgje med på prestasjon og aktivitet i emnet. Sjå kven som har sett sider og ressursar og deltatt i oppgåver—og kven som treng
@@ -19687,6 +19696,7 @@ nn:
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "Oppgi eit nummer mellom 0 og 100 som migreringsrate"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Oppgi eit søkeord med tre eller fleire teikn"
   please_enter_a_url_d2c868b5: "Oppgi ein URL"
+  please_enter_a_valid_format_for_a_date_66ed0587: "Det er ikkje ein dato."
   please_enter_a_valid_search_term_5c69b0b0: "Vennligst skriv inn en gyldig søkefrase"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Skriv inn ein gyldig URL (til dømes http://example.com)"
   please_enter_a_valid_url_e_g_https_example_com_87675bca: "Skriv inn ein gyldig URL (til dømes https://example.com)"
@@ -25224,6 +25234,7 @@ nn:
   starting_publish_5e4f16b9: "Publisering startar ..."
   starts_at_29843f98: Startar
   starts_ce584f1c: Startar
+  starts_fa6bf3f5: Startar
   starttime_to_endtime_4c46601f: "%{startTime} til %{endTime}"
   state_66a67ba2: Tilstand
   state_published_e42697da: "tilstand: publisert"
@@ -28271,6 +28282,7 @@ nn:
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Panelet kan brukast for å luke ut dupliserte resultat eller personar som du ikkje fann gjennom søk."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Panelet kan brukast til å søke etter brukarar du vil legge til emnet. "
   use_this_photo_3a594830: "Bruk dette bildet"
+  use_this_rubric_for_assignment_grading_a02fd079: "Bruk vurderingsskjemaet for karaktersetjing av oppgåver"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Bruk same vurdering for den nye innleveringa"
   use_webcam_1ed0bf6b: "Bruk Webkamera"
   used_by_permission_314a78dd: "Med løyve"
@@ -28797,6 +28809,7 @@ nn:
   users_manage_students_in_courses_d6168815: "Brukarar - handtere studentar i emne"
   users_matching_search_term_c604db9e: "Brukarar som samsvarar med \"%{search_term}\""
   users_moderate_content_36d6eed7: "Brukarar - endre innhald"
+  users_must_post_before_seeing_replies_d1761968: "Studentane må poste innlegg før dei kan sjå svar"
   users_observers_e0e66c52: "Brukarar - Observatørar"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Brukarar med skjermlesar bør skru av musepeikar for å nytte desse tastatursnarvegane"
   users_over_time_9a2ee74a: "brukarar over tid"

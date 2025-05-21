@@ -19,15 +19,18 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {shape, func} from 'prop-types'
-import {Button, CloseButton} from "@instructure/ui-buttons"
-import {Modal} from "@instructure/ui-modal"
-import {Heading} from "@instructure/ui-heading"
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Modal} from '@instructure/ui-modal'
+import {Heading} from '@instructure/ui-heading'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
+import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 const I18n = createI18nScope('external_tools')
 
 export default class ConfigureExternalToolButton extends React.Component {
+  removeCloseListener
+
   static propTypes = {
     tool: shape({}).isRequired,
     returnFocus: func.isRequired,
@@ -43,11 +46,16 @@ export default class ConfigureExternalToolButton extends React.Component {
     }
   }
 
-  getLaunchUrl = toolConfiguration => {
-    const toolConfigUrl = toolConfiguration.url || toolConfiguration.target_link_uri
-    return `${ENV.CONTEXT_BASE_URL}/external_tools/retrieve?url=${encodeURIComponent(
-      toolConfigUrl,
-    )}&display=borderless&placement=tool_configuration`
+  componentDidMount() {
+    this.removeCloseListener = onLtiClosePostMessage('tool_configuration', this.closeModal)
+  }
+
+  componentWillUnmount() {
+    this.removeCloseListener?.()
+  }
+
+  getLaunchUrl = tool => {
+    return `${ENV.CONTEXT_BASE_URL}/external_tools/${tool.app_id}?display=borderless&placement=tool_configuration`
   }
 
   openModal = e => {
@@ -65,7 +73,7 @@ export default class ConfigureExternalToolButton extends React.Component {
   }
 
   handleAlertFocus = event => {
-    const newState = { alertFocused: true }
+    const newState = {alertFocused: true}
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
     } else if (event.target.className.search('after') > -1) {
@@ -86,7 +94,7 @@ export default class ConfigureExternalToolButton extends React.Component {
   }
 
   handleAlertBlur = event => {
-    const newState = { alertFocused: false }
+    const newState = {alertFocused: false}
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = 'screenreader-only'
     } else if (event.target.className.search('after') > -1) {
@@ -116,7 +124,7 @@ export default class ConfigureExternalToolButton extends React.Component {
           </div>
         </div>
         <ToolLaunchIframe
-          src={this.getLaunchUrl(this.props.tool.tool_configuration)}
+          src={this.getLaunchUrl(this.props.tool)}
           title={I18n.t('Tool Configuration')}
           style={this.iframeStyle()}
           ref={e => {
@@ -149,11 +157,11 @@ export default class ConfigureExternalToolButton extends React.Component {
 
   iframeWidth = () => this.props.tool?.tool_configuration.selection_width || undefined
   iframeHeight = () => this.props.tool?.tool_configuration.selection_height || undefined
-  modalSize = () => this.iframeWidth() ? undefined : "large"
+  modalSize = () => (this.iframeWidth() ? undefined : 'large')
   // If we don't explicitly set header width, long tool names will cause header
   // to be wider than iframe (plus 40 pixels for close button / padding) and
   // make dialog be too wide.
-  headingWidth = () => ((this.iframeWidth() || 0) > 50) ? (this.iframeWidth() - 40) : undefined
+  headingWidth = () => ((this.iframeWidth() || 0) > 50 ? this.iframeWidth() - 40 : undefined)
 
   render() {
     const title = I18n.t('Configure %{toolName} App', {toolName: this.props.tool.name})
@@ -177,9 +185,9 @@ export default class ConfigureExternalToolButton extends React.Component {
           open={this.state.modalIsOpen}
           onDismiss={this.closeModal}
           onEnter={this.onAfterOpen}
-          label={"label why"}
+          label={title}
           size={this.modalSize()}
-         >
+        >
           <Modal.Header style={{width: this.headingWidth()}} width={this.headingWidth()}>
             <CloseButton
               onClick={this.closeModal}
@@ -187,7 +195,9 @@ export default class ConfigureExternalToolButton extends React.Component {
               placement="end"
               screenReaderLabel={I18n.t('Close')}
             />
-            <Heading width={this.headingWidth()} style={{width: this.headingWidth()}}>{I18n.t('Configure %{tool} App?', {tool: this.props.tool.name})}</Heading>
+            <Heading width={this.headingWidth()} style={{width: this.headingWidth()}}>
+              {title}
+            </Heading>
           </Modal.Header>
           <Modal.Body>{this.renderIframe()}</Modal.Body>
           <Modal.Footer>

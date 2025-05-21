@@ -301,6 +301,7 @@ class Course < ActiveRecord::Base
   before_save :set_horizon_course, if: -> { account_id_changed? || new_record? }
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
+  after_save :update_lti_context_controls_if_necessary
   after_save :update_enrollment_states_if_necessary
   after_save :clear_caches_if_necessary
   after_save :log_published_assignment_count
@@ -472,6 +473,13 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def update_lti_context_controls_if_necessary
+    # course has been reparented, and this is not a new record
+    if saved_change_to_account_id? && !saved_change_to_id?
+      Lti::ContextControl.update_paths_for_reparent(self, account_id_before_last_save, account_id)
+    end
+  end
+
   def update_enrollment_states_if_necessary
     return if saved_change_to_id # new object, nothing to possibly invalidate
 
@@ -530,7 +538,7 @@ class Course < ActiveRecord::Base
   end
 
   def visible_module_items_by_module(user, context_module)
-    module_items_visible_to(user).where(context_modules: { id: context_module.id })
+    module_items_visible_to(user).where(context_module_id: context_module.id)
   end
 
   def module_items_visible_to(user)
@@ -1568,6 +1576,10 @@ class Course < ActiveRecord::Base
 
   def discussion_checkpoints_enabled?
     account&.discussion_checkpoints_enabled?
+  end
+
+  def checkpoints_group_discussions_enabled?
+    account&.checkpoints_group_discussions_enabled?
   end
 
   def wiki
@@ -3352,6 +3364,7 @@ class Course < ActiveRecord::Base
   TAB_SCHEDULE = 19
   TAB_COURSE_PACES = 20
   TAB_SEARCH = 21
+  TAB_ACCESSIBILITY = 22
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3548,6 +3561,16 @@ class Course < ActiveRecord::Base
                    else
                      Course.default_tabs
                    end
+
+    if feature_enabled?(:accessibility_tab_enable)
+      default_tabs.insert(1,
+                          {
+                            id: TAB_ACCESSIBILITY,
+                            label: t("#tabs.accessibility", "Accessibility"),
+                            css_class: "accessibility",
+                            href: :course_accessibility_path
+                          })
+    end
 
     if SmartSearch.smart_search_available?(self)
       default_tabs.insert(1,

@@ -38,6 +38,14 @@ import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExterna
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import {
+  RubricAssignmentContainer,
+  RubricSelfAssessmentSettingsWrapper,
+} from '@canvas/rubrics/react/RubricAssignment'
+import {
+  mapRubricUnderscoredKeysToCamelCase,
+  mapRubricAssociationUnderscoredKeysToCamelCase,
+} from '@canvas/rubrics/react/utils'
 
 const I18n = createI18nScope('quizzes.show')
 
@@ -61,6 +69,45 @@ function unmountRoot(elementId) {
     root.unmount()
     roots.delete(elementId)
   }
+}
+
+function renderRubric() {
+  const $mountPoint = document.getElementById('enhanced-rubric-assignment-edit-mount-point')
+
+  if ($mountPoint) {
+    const envRubric = ENV.assigned_rubric
+    const envRubricAssociation = ENV.rubric_association
+    const assignmentRubric = envRubric
+      ? {
+          ...mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric),
+          can_update: ENV.assigned_rubric?.can_update,
+          association_count: ENV.assigned_rubric?.association_count,
+        }
+      : undefined
+    const assignmentRubricAssociation = envRubricAssociation
+      ? mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association)
+      : undefined
+
+    createOrUpdateRoot(
+      'enhanced-rubric-assignment-edit-mount-point',
+      <RubricAssignmentContainer
+        accountMasterScalesEnabled={ENV.ACCOUNT_LEVEL_MASTERY_SCALES}
+        assignmentId={ENV.ASSIGNMENT_ID}
+        assignmentRubric={assignmentRubric}
+        assignmentRubricAssociation={assignmentRubricAssociation}
+        canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
+        contextAssetString={ENV.context_asset_string}
+        courseId={ENV.COURSE_ID}
+        rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
+        aiRubricsEnabled={ENV.ai_rubrics_enabled}
+      />,
+    )
+  }
+
+  createOrUpdateRoot(
+    'enhanced-rubric-self-assessment-edit',
+    <RubricSelfAssessmentSettingsWrapper assignmentId={ENV.ASSIGNMENT_ID} />,
+  )
 }
 
 $(document).ready(function () {
@@ -298,7 +345,8 @@ $(document).ready(function () {
   })
 
   function renderItemAssignToTray(open, returnFocusTo, itemProps) {
-    createOrUpdateRoot('assign-to-mount-point',
+    createOrUpdateRoot(
+      'assign-to-mount-point',
       <ItemAssignToManager
         open={open}
         onClose={() => {
@@ -357,4 +405,6 @@ $(document).ready(function () {
       parseInt(ENV.QUIZ.assignment_id, 10),
     )
   }
+
+  renderRubric()
 })

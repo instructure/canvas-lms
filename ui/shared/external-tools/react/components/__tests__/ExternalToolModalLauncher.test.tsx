@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render, waitFor, fireEvent} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ExternalToolModalLauncher from '../ExternalToolModalLauncher'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 function generateProps(overrides = {}) {
   return {
@@ -35,6 +35,10 @@ function generateProps(overrides = {}) {
 }
 
 describe('ExternalToolModalLauncher', () => {
+  const origin = 'http://example.com'
+  const sendPostMessage = (data: any) =>
+    fireEvent(window, new MessageEvent('message', {data, origin, source: window}))
+
   beforeEach(() => {
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
   })
@@ -66,11 +70,8 @@ describe('ExternalToolModalLauncher', () => {
 
   describe('handling external content events', () => {
     const origEnv = {...window.ENV}
-    const origin = 'http://example.com'
     beforeAll(() => (window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = origin))
     afterAll(() => (window.ENV = origEnv))
-    const sendPostMessage = (data: any) =>
-      fireEvent(window, new MessageEvent('message', {data, origin}))
 
     test('invokes onRequestClose prop when window receives externalContentReady event', async () => {
       const onRequestCloseMock = jest.fn()
@@ -113,7 +114,9 @@ describe('ExternalToolModalLauncher', () => {
     it('calls onRequestClose when clicking a button element', async () => {
       const onRequestCloseMock = jest.fn()
       const {getByText} = render(
-        <ExternalToolModalLauncher {...generateProps({ onRequestClose: onRequestCloseMock, isOpen: true })} />
+        <ExternalToolModalLauncher
+          {...generateProps({onRequestClose: onRequestCloseMock, isOpen: true})}
+        />,
       )
 
       const closeButton = getByText('Close').closest('button')
@@ -126,7 +129,9 @@ describe('ExternalToolModalLauncher', () => {
     it('does not call onRequestClose when clicking outside the diaglog', async () => {
       const onRequestCloseMock = jest.fn()
       const {getByRole} = render(
-        <ExternalToolModalLauncher {...generateProps({ onRequestClose: onRequestCloseMock, isOpen: true })} />
+        <ExternalToolModalLauncher
+          {...generateProps({onRequestClose: onRequestCloseMock, isOpen: true})}
+        />,
       )
 
       const backdrop = getByRole('dialog').parentElement
@@ -134,6 +139,23 @@ describe('ExternalToolModalLauncher', () => {
       await userEvent.click(backdrop)
 
       expect(onRequestCloseMock).not.toHaveBeenCalled()
+    })
+
+    it('calls onRequestClose when tool sends lti.close event', async () => {
+      monitorLtiMessages()
+
+      const onRequestCloseMock = jest.fn()
+      render(
+        <ExternalToolModalLauncher
+          {...generateProps({onRequestClose: onRequestCloseMock, isOpen: true})}
+        />,
+      )
+
+      sendPostMessage({subject: 'lti.close'})
+
+      await waitFor(() => {
+        expect(onRequestCloseMock).toHaveBeenCalled()
+      })
     })
   })
 
@@ -158,22 +180,45 @@ describe('ExternalToolModalLauncher', () => {
       const iframe = getByTitle(props.title)
       expect(iframe).toHaveAttribute(
         'src',
-        `/courses/${props.contextId}/external_tools/${props.tool.definition_id}?display=borderless&launch_type=${props.launchType}`
+        `/courses/${props.contextId}/external_tools/${props.tool.definition_id}?display=borderless&launch_type=${props.launchType}`,
       )
     })
 
     test('with resourceSelection param', () => {
       const props = generateProps({isOpen: true, resourceSelection: true})
-      const {getByTitle} = render(
-        <ExternalToolModalLauncher
-          {...props}
-        />
-      )
+      const {getByTitle} = render(<ExternalToolModalLauncher {...props} />)
       const iframe = getByTitle(props.title)
       expect(iframe).toHaveAttribute(
         'src',
-        `/courses/${props.contextId}/external_tools/${props.tool.definition_id}/resource_selection?display=borderless&launch_type=${props.launchType}`
+        `/courses/${props.contextId}/external_tools/${props.tool.definition_id}/resource_selection?display=borderless&launch_type=${props.launchType}`,
       )
+    })
+
+    test('with simplified props', () => {
+      const directSrc = '/asset_processors/123/launch'
+      const customWidth = 850
+      const customHeight = 550
+      const customTitle = 'Direct Src Modal'
+
+      const {getByTitle} = render(
+        <ExternalToolModalLauncher
+          title={customTitle}
+          isOpen={true}
+          iframeSrc={directSrc}
+          onRequestClose={() => {}}
+          width={customWidth}
+          height={customHeight}
+        />,
+      )
+
+      const iframe = getByTitle(customTitle)
+
+      // Verify all simplified props are correctly applied
+      expect(iframe).toHaveAttribute('src', directSrc)
+      expect(iframe).toHaveStyle(`width: ${customWidth}px`)
+      expect(iframe).toHaveStyle(`height: ${customHeight}px`)
+      expect(iframe).toHaveAttribute('title', customTitle)
+      expect(iframe).toHaveAttribute('data-lti-launch', 'true')
     })
   })
 })

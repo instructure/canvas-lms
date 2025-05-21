@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
-import {QueryProvider} from '@canvas/query'
 import DifferentiationTagTray from './DifferentiationTagTray'
 import {useDifferentiationTagCategoriesIndex} from '../hooks/useDifferentiationTagCategoriesIndex'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -63,12 +64,12 @@ export default function DifferentiationTagTrayManager({
   courseID,
 }: DifferentiationTagTrayManagerProps) {
   return (
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <DifferentiationTagTrayContainer
         isOpen={isOpen}
         onClose={onClose}
         courseID={Number(courseID)}
       />
-    </QueryProvider>
+    </QueryClientProvider>
   )
 }

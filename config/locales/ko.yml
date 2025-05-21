@@ -1477,6 +1477,7 @@ ko:
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "사용자가 개별적으로 대시보드 카드 순서 변경을 할 수 있도록 허용함"
   allow_reorder_dashboard_cards_78215947: "대시보드 카드 순서 변경을 허용함"
   allow_self_sign_up_7520f8c5: "직접 등록 허용"
+  allow_threaded_replies_43b2311e: "계층 구조 답변 허용"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "달력 행사 복제 허용하기"
   always_3a59e701: 항상
   an_alert_is_generated_for_each_student_that_meets__c36e3561: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사, 계정 관리자에게 보냅니다."
@@ -4032,6 +4033,9 @@ ko:
   count_days_de0c6a32: 
     one: "%{count}일"
     other: "%{count}일"
+  count_groups_90e215b1: 
+    one: "그룹 %{count}개"
+    other: "그룹 %{count}개"
   count_hours_ago_322dcc79: 
     one: "%{count}시간 전"
     other: "%{count}시간 전"
@@ -4051,6 +4055,9 @@ ko:
   count_points_4735a2e8: 
     one: "%{count} 점"
     other: "%{count} 점"
+  count_sections_bf1baf0a: 
+    one: "섹션 %{count}개"
+    other: "섹션 %{count}개"
   count_students_c9920376: 
     one: "학생(%{count})"
     other: "학생(%{count})"
@@ -5490,6 +5497,7 @@ ko:
   end_date_e0093ed7: 종료일
   end_time_250391e8: "종료 시각"
   ending_date_e1ea13a4: "끝 날짜"
+  ends_e3a6843f: 끝
   english_c60612e2: 영어
   enhanced_individual_gradebook: 
     avg_score: "평균 점수"
@@ -13405,6 +13413,7 @@ ko:
   start_participating_f0c75256: "참여 시작"
   started_5e138638: 시작됨
   starts_at_29843f98: "시작 날짜"
+  starts_fa6bf3f5: 시작
   state_66a67ba2: 상태
   state_standards_c9b1affd: "전국 표준"
   statistics: 
@@ -14145,6 +14154,7 @@ ko:
   upper_limit_of_range_c454a8f2: "범위의 상한"
   url_22a5f3b8: URL
   url_preview_5d1f4a4e: "URL 미리 보기"
+  use_this_rubric_for_assignment_grading_a02fd079: "과제 평가에 이 루브릭 사용"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "다시 제출한 것에 대해 같은 평점 사용"
   user: 
     default_user_name: 사용자
@@ -14554,6 +14564,7 @@ ko:
           탐색에서 볼 수 있습니다. 그 동안 다른 과목에 등록하거나
           프로필을 설정하십시오.
       welcome_to_happiness: "Canvas에 오신 것을 환영합니다!"
+  users_must_post_before_seeing_replies_d1761968: "답변을 보기 전에 게시해야 함"
   users_with_no_enrollments_5dddce33: "등록하지 않은 사용자"
   utc_e44049af: "협정 세계시"
   validate: 

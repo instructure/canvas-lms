@@ -21,13 +21,13 @@ import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Folder} from '../../../interfaces/File'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateUrlPath} from '../../../utils/folderUtils'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 import {Link as RouterLink} from 'react-router-dom'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {IconArrowOpenStartLine} from '@instructure/ui-icons'
-import {useFileManagement} from '../Contexts'
+import {useFileManagement} from '../../contexts/FileManagementContext'
 
 type BreadcrumData = {
   id: string
@@ -108,7 +108,7 @@ const ResponsiveBreadcrumbs = ({folders, size, search}: ResponsiveBreadcrumbsPro
 
     let name
     if (!folder.parent_folder_id) {
-      const context = filesEnv.contextFor({
+      const context = getFilesEnv().contextFor({
         contextType: folderContextType,
         contextId: folderContextId,
       })
@@ -117,7 +117,7 @@ const ResponsiveBreadcrumbs = ({folders, size, search}: ResponsiveBreadcrumbsPro
     name ||= folder.custom_name || folder.name
 
     const url = isRootCrumb && !showingAllContexts ? '/' : generateUrlPath(folder)
-    return {id: folder.id, name, url}
+    return {id: folder.id.toString(), name, url}
   })
 
   if (search) {

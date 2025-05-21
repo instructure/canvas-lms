@@ -19,9 +19,7 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
 import {render} from '@testing-library/react'
-import {
-  mockAssignmentAndSubmission,
-} from '@canvas/assignments/graphql/studentMocks'
+import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import StudentViewContext from '../Context'
@@ -47,10 +45,17 @@ describe('Assignment Student Content View', () => {
     oldEnv = window.ENV
     window.ENV = {...window.ENV}
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve([]),
+      }),
+    )
   })
 
   afterEach(() => {
     window.ENV = oldEnv
+    jest.restoreAllMocks()
   })
 
   describe('Add Comment/View Feedback button', () => {

@@ -17,9 +17,15 @@
  */
 
 import {generateUrlPath} from '../folderUtils'
-import {setupFilesEnv} from '../../fixtures/fakeFilesEnv'
+import {windowPathname} from '@canvas/util/globalUtils'
 import {FAKE_COURSE_FOLDER, FAKE_USER_FOLDER} from '../../fixtures/fakeData'
 import {type Folder} from '../../interfaces/File'
+import {resetFilesEnv} from '../filesEnvUtils'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  ...jest.requireActual('@canvas/util/globalUtils'),
+  windowPathname: jest.fn(),
+}))
 
 describe('generateUrlPath', () => {
   let courseFolder: Folder, userFolder: Folder
@@ -31,7 +37,12 @@ describe('generateUrlPath', () => {
 
   describe('when showing all contexts', () => {
     beforeAll(() => {
-      setupFilesEnv(true)
+      ;(windowPathname as jest.Mock).mockReturnValue('/files/')
+    })
+
+    afterAll(() => {
+      resetFilesEnv()
+      jest.resetAllMocks()
     })
 
     it('returns the correct path for a course folder', () => {
@@ -47,7 +58,12 @@ describe('generateUrlPath', () => {
 
   describe('when not showing all contexts', () => {
     beforeAll(() => {
-      setupFilesEnv()
+      ;(windowPathname as jest.Mock).mockReturnValue('/')
+    })
+
+    afterAll(() => {
+      resetFilesEnv()
+      jest.resetAllMocks()
     })
 
     it('returns the correct path for a course folder', () => {

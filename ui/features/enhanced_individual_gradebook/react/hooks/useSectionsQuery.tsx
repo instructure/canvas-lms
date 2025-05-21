@@ -16,20 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMemo, useState} from 'react'
+import {useMemo} from 'react'
 import {fetchSections, getNextSectionsPage} from '../../queries/Queries'
 import {useAllPages} from '@canvas/query'
+import type {InfiniteData} from '@tanstack/react-query'
+import {SectionConnection} from '../../types'
+
+type SectionResponse = {
+  course: {
+    sectionsConnection: {
+      nodes: SectionConnection[]
+      pageInfo: {
+        hasNextPage: boolean
+        endCursor: string | null
+      }
+    }
+  }
+}
 
 export const useSectionsQuery = (courseId: string) => {
-  const [queryKey] = useState(['individual-gradebook-sections', courseId])
+  const queryKey: [string, string] = ['individual-gradebook-sections', courseId]
 
-  const {data, hasNextPage, isError, isLoading} = useAllPages({
+  const {data, hasNextPage, isError, isLoading} = useAllPages<
+    SectionResponse,
+    Error,
+    InfiniteData<SectionResponse>,
+    [string, string]
+  >({
     queryKey,
     queryFn: fetchSections,
     getNextPageParam: getNextSectionsPage,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    initialPageParam: null,
   })
 
   const sections = useMemo(

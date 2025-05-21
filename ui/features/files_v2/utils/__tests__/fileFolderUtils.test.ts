@@ -23,6 +23,7 @@ import {
   getName,
   getCheckboxLabel,
   isLockedBlueprintItem,
+  getIdFromUniqueId,
 } from '../fileFolderUtils'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../fixtures/fakeData'
 
@@ -38,11 +39,23 @@ describe('isFile', () => {
 
 describe('getUniqueId', () => {
   it('returns the correct key for a file', () => {
-    expect(getUniqueId(FAKE_FILES[0])).toBe(FAKE_FILES[0].uuid)
+    expect(getUniqueId(FAKE_FILES[0])).toBe(`file-${FAKE_FILES[0].id}`)
   })
 
   it('returns the correct key for a folder', () => {
-    expect(getUniqueId(FAKE_FOLDERS[0])).toBe(FAKE_FOLDERS[0].id)
+    expect(getUniqueId(FAKE_FOLDERS[0])).toBe(`folder-${FAKE_FOLDERS[0].id}`)
+  })
+})
+
+describe('getIdFromUniqueId', () => {
+  it('returns the correct id for a file', () => {
+    const uniqueId = `file-${FAKE_FILES[0].id}`
+    expect(getIdFromUniqueId(uniqueId)).toBe(FAKE_FILES[0].id.toString())
+  })
+
+  it('returns the correct id for a folder', () => {
+    const uniqueId = `folder-${FAKE_FOLDERS[0].id}`
+    expect(getIdFromUniqueId(uniqueId)).toBe(FAKE_FOLDERS[0].id.toString())
   })
 })
 

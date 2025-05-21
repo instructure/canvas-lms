@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMutation, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import type {DifferentiationTagCategory, DifferentiationTagGroup} from '../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {useMutation} from '@tanstack/react-query'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -110,9 +111,14 @@ export const useBulkManageDifferentiationTags = () => {
       // We are invalidating all queries that start with 'differentiationTagCategories'
       // undefined: we aren't using any other query filters to determine what to invalidate
       // cancelRefetch: tells the query client to cancel any ongoing refetch for the matching queries
-      await queryClient.invalidateQueries(['differentiationTagCategories'], undefined, {
-        cancelRefetch: true,
-      })
+      await queryClient.invalidateQueries(
+        {
+          queryKey: ['differentiationTagCategories'],
+        },
+        {
+          cancelRefetch: true,
+        },
+      )
     },
     onError: error => {
       console.error(I18n.t('Error bulk-managing differentiation tags:'), error)

@@ -24,6 +24,7 @@
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
   js_bundle :context_modules_publish_icon
+  css_bundle :context_modules
 %>
 
 <% cache_if_module(context_module, @can_view, @can_add, @can_edit, @can_delete, @is_student, @can_view_unpublished, @current_user, @context) do %>
@@ -212,9 +213,28 @@
               </li>
             <% end %>
             <% if @can_view %>
-              <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
-              <%= external_tools_menu_items(@menu_tools[:module_group_menu], {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
-              <%= external_tools_menu_items(@menu_tools[:module_menu_modal], {link_class: "menu_tray_tool_link", settings_key: :module_menu_modal, in_list: true}) %>
+             <% if Account.site_admin.feature_enabled?(:create_external_apps_side_tray_overrides) %>
+                <% json_data = external_tools_menu_items_grouped_json(
+                  @menu_tools.slice(:module_menu, :module_group_menu, :module_menu_modal),
+                  module_menu: { modules: [context_module&.id || "{{ id }}" ] }
+                ) %>
+                <% if json_data.present? %>
+                  <li role="presentation">
+                    <%= tag.a href: "#",
+                              class: "module_external_apps icon-integrations",
+                              aria: { label: t("View external apps...") },
+                              title: t("View external apps..."),
+                              data: { external_tools: json_data },
+                              role: "presentation" do %>
+                      <%= t("External Apps...") %>
+                    <% end %>
+                  </li>
+                <% end %>
+              <% else %>
+                <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
+                <%= external_tools_menu_items(@menu_tools[:module_group_menu], {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
+                <%= external_tools_menu_items(@menu_tools[:module_menu_modal], {link_class: "menu_tray_tool_link", settings_key: :module_menu_modal, in_list: true}) %>
+              <% end %>
             <% end %>
           </ul>
         <% end %>

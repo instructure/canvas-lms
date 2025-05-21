@@ -54,6 +54,11 @@ describe "Account Reports API", type: :request do
           expect(parameter).to have_key("description")
         end
       end
+
+      report_csv = json.find { |r| r["report"] == @report.report_type }
+      expect(report_csv["last_run"]["id"]).to eq @report.id
+      expect(report_csv["last_run"]["status"]).to eq @report.workflow_state
+      expect(report_csv["last_run"]["progress"]).to eq @report.progress
     end
   end
 

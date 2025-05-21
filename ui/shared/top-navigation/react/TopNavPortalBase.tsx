@@ -19,9 +19,10 @@
 import React from 'react'
 import {Portal} from '@instructure/ui-portal'
 import TopNav, {type ITopNavProps} from './TopNav'
-import {QueryProvider} from '@canvas/query'
 import type {ItemChild} from '@instructure/ui-top-nav-bar/types/TopNavBar/props'
 import type {EnvCommon} from '@canvas/global/env/EnvCommon'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 export type Crumb = Exclude<EnvCommon['breadcrumbs'], undefined>[number]
 
@@ -43,9 +44,9 @@ export const TopNavPortalBase: React.FC<ITopNavProps> = props => {
 
   return (
     <Portal open={true} mountNode={mountPoint}>
-      <QueryProvider>
+      <QueryClientProvider client={queryClient}>
         <TopNav {...props} />
-      </QueryProvider>
+      </QueryClientProvider>
     </Portal>
   )
 }

@@ -49,7 +49,7 @@ import type JQuery from 'jquery'
 import $ from 'jquery'
 import {filter, find, includes, isEqual, keyBy, map, reject, some, values} from 'lodash'
 import qs from 'qs'
-import React from 'react'
+import React, {useRef} from 'react'
 import ReactDOM from 'react-dom'
 import JQuerySelectorCache from '../JQuerySelectorCache'
 import QuizzesNextSpeedGrading from '../QuizzesNextSpeedGrading'
@@ -73,6 +73,7 @@ import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
+import {LtiAssetReports, joinAttachmentsAndReports} from '../react/LtiAssetReports'
 import useStore from '../stores/index'
 import type {
   Attachment,
@@ -159,7 +160,6 @@ import {isPreviewable} from '@instructure/canvas-rce/es/rce/plugins/shared/Previ
 import {createRoot} from 'react-dom/client'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
-import {SpeedGraderDiscussionsNavigation} from '../react/SpeedGraderDiscussionsNavigation'
 import {SpeedGraderDiscussionsNavigation2} from '../react/SpeedGraderDiscussionsNavigation2'
 
 declare global {
@@ -177,6 +177,7 @@ declare const ENV: GlobalEnv & EnvGradebookSpeedGrader
 const I18n = createI18nScope('speed_grader')
 
 const selectors = new JQuerySelectorCache()
+const SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT = 'speed_grader_lti_asset_reports_mount_point'
 const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point'
 const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT =
   'speed_grader_submission_comments_download_mount_point'
@@ -872,6 +873,30 @@ function renderHiddenSubmissionPill(submission: Submission) {
   }
 }
 
+function renderLtiAssetReports(
+  submission: Submission,
+  historicalSubmission: HistoricalSubmission,
+  jsonData: SpeedGraderResponse,
+) {
+  if (!ENV.FEATURES?.lti_asset_processor) return
+  if (!jsonData.lti_asset_processors) return
+
+  const mountPoint = document.getElementById(SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT)
+  if (!mountPoint) throw new Error('LTI Asset Reports mount point not found')
+
+  const attachmentsAndReports = joinAttachmentsAndReports(
+    historicalSubmission?.versioned_attachments,
+    submission.lti_asset_reports?.by_attachment,
+  )
+
+  if (attachmentsAndReports) {
+    const props = {attachmentsAndReports, assetProcessors: jsonData.lti_asset_processors}
+    ReactDOM.render(<LtiAssetReports {...props} />, mountPoint)
+  } else {
+    ReactDOM.unmountComponentAtNode(mountPoint)
+  }
+}
+
 function renderCheckpoints(submission: Submission) {
   const mountPoint = document.getElementById(SPEED_GRADER_CHECKPOINTS_MOUNT_POINT)
   if (mountPoint) {
@@ -904,11 +929,8 @@ function renderRubricsCheckpointsInfo() {
 
 function getDefaultDiscussionView() {
   const discussionCheckpointsEnabled = ENV.FEATURES?.discussion_checkpoints
-  const discussionsSpeedgraderRevisitEnabled = ENV.FEATURES?.discussions_speedgrader_revisit
-  if (discussionsSpeedgraderRevisitEnabled) {
+  if (discussionCheckpointsEnabled) {
     return userSettings.get('default_discussion_view') || 'discussion_view_no_context'
-  } else if (discussionCheckpointsEnabled) {
-    return 'discussion_view_with_context'
   } else {
     return 'discussion_view_no_context'
   }
@@ -921,29 +943,21 @@ function renderDiscussionsNavigation(temporaryDiscussionContextView = null) {
     if (temporaryDiscussionContextView === 'discussion_view_no_context') {
       return
     } else if (temporaryDiscussionContextView === 'discussion_view_with_context' && mountPoint) {
-      if (ENV.FEATURES.discussions_speedgrader_revisit) {
-        const currentUrl = new URL(window.location.href)
-        const params = new URLSearchParams(currentUrl.search)
-        ReactDOM.render(
-          <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
-          mountPoint,
-        )
-      } else {
-        ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
-      }
-      return
-    }
-  } else if (getDefaultDiscussionView() === 'discussion_view_with_context' && mountPoint) {
-    if (ENV.FEATURES.discussions_speedgrader_revisit) {
       const currentUrl = new URL(window.location.href)
       const params = new URLSearchParams(currentUrl.search)
       ReactDOM.render(
         <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
         mountPoint,
       )
-    } else {
-      ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
+      return
     }
+  } else if (getDefaultDiscussionView() === 'discussion_view_with_context' && mountPoint) {
+    const currentUrl = new URL(window.location.href)
+    const params = new URLSearchParams(currentUrl.search)
+    ReactDOM.render(
+      <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
+      mountPoint,
+    )
     return
   } else {
     return
@@ -2515,6 +2529,8 @@ EG = {
         submissionHistory[currentSelectedIndex]
     }
 
+    renderLtiAssetReports(submissionHolder, submission, window.jsonData)
+
     const turnitinEnabled =
       submission.turnitin_data && typeof submission.turnitin_data.provider === 'undefined'
     const vericiteEnabled =
@@ -3087,8 +3103,8 @@ EG = {
           : ''
     }
     // since we are in speedgrader, and not the student submission page, we want to use the toggler version of the link
-    // when the discussions_speedgrader_revisit feature flag is enabled
-    const useDiscussionToggleLink = ENV.FEATURES?.discussions_speedgrader_revisit
+    // when the discussion_checkpoints feature flag is enabled
+    const useDiscussionToggleLink = ENV.FEATURES?.discussion_checkpoints
       ? `&use_discussion_toggle_link=1`
       : ''
     const queryParams = `${iframePreviewVersion}${hideStudentNames}${entryId}${showFullDiscussionImmediately}${useDiscussionToggleLink}`
@@ -3278,6 +3294,13 @@ EG = {
       const assessmentsByMe = EG.currentStudent.rubric_assessments.filter(assessment =>
         assessmentBelongsToCurrentUser(assessment),
       )
+      const hasPeerReviewAssessments = EG.currentStudent.rubric_assessments.some(
+        assessment => assessment.assessment_type === 'peer_review',
+      )
+      const hasGradedAssessments = EG.currentStudent.rubric_assessments.some(
+        assessment => assessment.assessment_type === 'grading',
+      )
+
       if (assessmentsByMe.length > 0) {
         assessmentsByMe.forEach(assessment => {
           const displayName = isModerator ? customProvisionalGraderLabel : assessment.assessor_name
@@ -3286,6 +3309,8 @@ EG = {
       } else if (isModerator) {
         // Moderators can create a custom assessment if they don't have one
         selectMenuOptions.push({id: '', name: customProvisionalGraderLabel})
+      } else if (hasPeerReviewAssessments && !hasGradedAssessments) {
+        selectMenuOptions.unshift({id: '', name: I18n.t('Add your assessment')})
       }
 
       const {assessmentsByOthers, selfAssessment} = EG.currentStudent.rubric_assessments.reduce(

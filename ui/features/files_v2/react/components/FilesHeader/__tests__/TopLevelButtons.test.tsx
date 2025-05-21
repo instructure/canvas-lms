@@ -19,7 +19,10 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import TopLevelButtons from '../TopLevelButtons'
-import {FileManagementProvider, FileManagementContextProps} from '../../Contexts'
+import {
+  FileManagementProvider,
+  FileManagementContextProps,
+} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
@@ -103,5 +106,19 @@ describe('TopLevelButtons', () => {
 
     const externalToolsButton = screen.queryByText(/external tools menu/i)
     expect(externalToolsButton).not.toBeInTheDocument()
+  })
+
+  it('renders switch to Old Files button when toggle flag is on', () => {
+    ENV.FEATURES.files_a11y_rewrite_toggle = true
+    renderComponent()
+    const switchButton = screen.getByText(/Switch to Old Files Page/i)
+    expect(switchButton).toBeInTheDocument()
+  })
+
+  it('does not render switch to Old Files button when toggle flag is off', () => {
+    ENV.FEATURES.files_a11y_rewrite_toggle = false
+    renderComponent()
+    const switchButton = screen.queryByText(/Switch to Old Files Page/i)
+    expect(switchButton).not.toBeInTheDocument()
   })
 })

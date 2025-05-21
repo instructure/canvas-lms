@@ -18,8 +18,9 @@
 
 import React from 'react'
 import {userEvent} from '@testing-library/user-event'
-import {render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import PostGradesFrameModal, {PostGradesFrameModalProps} from '../PostGradesFrameModal'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 const postGradesLtis = [
   {
@@ -54,5 +55,25 @@ describe('PostGradesFrameModal', () => {
 
     await userEvent.click(getByRole('button', {name: /Close/i}))
     expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls onClose when tool sends lti.close message', async () => {
+    const onClose = jest.fn()
+
+    renderComponent({selectedLtiId: '1', onClose})
+    monitorLtiMessages()
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {subject: 'lti.close'},
+        origin: 'http://example.com',
+        source: window,
+      }),
+    )
+
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalledTimes(1)
+    })
   })
 })

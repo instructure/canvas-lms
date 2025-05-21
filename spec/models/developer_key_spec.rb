@@ -53,27 +53,6 @@ describe DeveloperKey do
   describe "#tokens_expire_in" do
     let(:developer_key) { DeveloperKey.new }
 
-    context "when the client is public" do
-      before do
-        allow(developer_key).to receive(:public_client?).and_return(true)
-      end
-
-      it "returns the token TTL from settings" do
-        expect(developer_key.tokens_expire_in).to eq(120.minutes)
-      end
-    end
-
-    context "when the client is a mobile app" do
-      before do
-        allow(developer_key).to receive(:mobile_app?).and_return(true)
-        allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: { mobile_timeout: 240 }))
-      end
-
-      it "returns the mobile timeout from session settings" do
-        expect(developer_key.tokens_expire_in).to eq(240.minutes)
-      end
-    end
-
     context "when the client is neither public nor a mobile app" do
       before do
         allow(developer_key).to receive_messages(public_client?: false, mobile_app?: false)
@@ -81,6 +60,57 @@ describe DeveloperKey do
 
       it "returns nil" do
         expect(developer_key.tokens_expire_in).to be_nil
+      end
+    end
+
+    context "when the client is public but not a mobile app" do
+      before do
+        allow(developer_key).to receive_messages(public_client?: true, mobile_app?: false)
+      end
+
+      it "returns the public client token TTL from settings" do
+        expect(developer_key.tokens_expire_in).to eq(120.minutes)
+      end
+    end
+
+    context "when the client is a public mobile app" do
+      before do
+        allow(developer_key).to receive_messages(public_client?: true, mobile_app?: true)
+      end
+
+      context "with plugin configuration available" do
+        it "returns the mobile timeout from session settings" do
+          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: { mobile_timeout: 45 }))
+          expect(developer_key.tokens_expire_in).to eq(45.minutes)
+        end
+      end
+
+      context "without plugin configuration" do
+        it "falls back to the mobile_public_client_token_ttl_days setting" do
+          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: {}))
+          allow(Setting).to receive(:get).with("mobile_public_client_token_ttl_days", "90").and_return("30")
+          expect(developer_key.tokens_expire_in).to eq(30.days)
+        end
+      end
+    end
+
+    context "when the client is a confidential mobile app" do
+      before do
+        allow(developer_key).to receive_messages(public_client?: false, mobile_app?: true)
+      end
+
+      context "with plugin configuration available" do
+        it "returns the mobile timeout from session settings" do
+          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: { mobile_timeout: 60 }))
+          expect(developer_key.tokens_expire_in).to eq(60.minutes)
+        end
+      end
+
+      context "without plugin configuration" do
+        it "returns nil (no expiration)" do
+          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: {}))
+          expect(developer_key.tokens_expire_in).to be_nil
+        end
       end
     end
   end

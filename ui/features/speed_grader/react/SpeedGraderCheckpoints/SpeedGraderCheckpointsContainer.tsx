@@ -17,7 +17,6 @@
  */
 
 import React, {useContext, useEffect, useState, useCallback} from 'react'
-import {useQuery} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -25,7 +24,7 @@ import {SpeedGraderCheckpoint, EXCUSED} from './SpeedGraderCheckpoint'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 import AssessmentGradeInput from './AssessmentGradeInput'
 import {Flex} from '@instructure/ui-flex'
-import {useMutation, useQueryClient} from '@tanstack/react-query'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import {showFlashWarning} from '@canvas/alerts/react/FlashAlert'
@@ -33,12 +32,12 @@ import {showFlashWarning} from '@canvas/alerts/react/FlashAlert'
 const I18n = createI18nScope('SpeedGraderCheckpoints')
 
 type SpeedGrader = {
-  setOrUpdateSubmission: (submission: any) => any,
-  updateSelectMenuStatus: (student: any) => any,
+  setOrUpdateSubmission: (submission: any) => any
+  updateSelectMenuStatus: (student: any) => any
 }
 
 type Props = {
-  EG: SpeedGrader,
+  EG: SpeedGrader
   courseId: string
   assignmentId: string
   studentId: string
@@ -219,7 +218,7 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
     queryKey: ['speedGraderCheckpointsAssignment', props.courseId, props.assignmentId],
     queryFn: fetchAssignmentFunction,
     enabled: true,
-    cacheTime: 0,
+    gcTime: 0,
     staleTime: 0,
   })
 
@@ -236,7 +235,7 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
     ],
     queryFn: fetchSubmissionFunction,
     enabled: true,
-    cacheTime: 0,
+    gcTime: 0,
     staleTime: 0,
   })
 
@@ -282,20 +281,22 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
   ])
 
   const invalidateSubmission = () => {
-    queryClient.invalidateQueries([
-      'speedGraderCheckpointsSubmission',
-      props.courseId,
-      props.assignmentId,
-      props.studentId,
-    ])
+    queryClient.invalidateQueries({
+      queryKey: [
+        'speedGraderCheckpointsSubmission',
+        props.courseId,
+        props.assignmentId,
+        props.studentId,
+      ],
+    })
   }
 
-  const updateSubmissionUI = (data: object) =>{
-    if(props.EG){
+  const updateSubmissionUI = (data: object) => {
+    if (props.EG) {
       // all_submissions[0] has submission_history vs data?.json which is a submission, but does not.
       /* @ts-expect-error */
       const submissionData = data?.json?.all_submissions[0]
-      if(submissionData){
+      if (submissionData) {
         const student = props.EG.setOrUpdateSubmission(submissionData)
         props.EG.updateSelectMenuStatus(student)
       }
@@ -306,14 +307,14 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
 
   const {mutate: updateSubmissionGrade} = useMutation({
     mutationFn: putSubmissionGrade,
-    onSuccess: (data) => {
+    onSuccess: data => {
       updateSubmissionUI(data)
     },
   })
 
   const {mutate: updateSubmissionStatus} = useMutation({
     mutationFn: putSubmissionStatus,
-    onSuccess: (data) => {
+    onSuccess: data => {
       updateSubmissionUI(data)
     },
   })

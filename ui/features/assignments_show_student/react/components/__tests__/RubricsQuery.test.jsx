@@ -28,7 +28,6 @@ jest.mock('@canvas/query', () => ({
   useAllPages: jest.fn(),
 }))
 
-
 async function makeMocks() {
   const variables = {
     courseID: '1',
@@ -68,7 +67,7 @@ async function makeProps() {
 describe('RubricsQuery', () => {
   it('renders the rubric tab', async () => {
     useAllPages.mockReturnValue({
-      data: {pages:[]},
+      data: {pages: []},
       isError: false,
       isLoading: false,
     })

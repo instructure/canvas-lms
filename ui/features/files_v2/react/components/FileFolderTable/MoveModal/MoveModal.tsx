@@ -27,15 +27,20 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {getFilesEnv} from '../../../../utils/filesEnvUtils'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
-import {useFileManagement} from '../../Contexts'
+import {useFileManagement} from '../../../contexts/FileManagementContext'
+import {useRowFocus, SELECT_ALL_FOCUS_STRING} from '../../../contexts/RowFocusContext'
 import FileFolderInfo from '../../shared/FileFolderInfo'
 import {getName, isFile} from '../../../../utils/fileFolderUtils'
 import {type Folder, type File} from '../../../../interfaces/File'
 import FolderTreeBrowser, {FolderTreeBrowserRef} from './FolderTreeBrowser'
 import FileRenameForm from '../../FilesHeader/UploadButton/FileRenameForm'
-import {FileOptionsResults} from '../../FilesHeader/UploadButton/FileOptions'
+import {
+  FileOptions,
+  FileOptionsResults,
+  ResolvedName,
+} from '../../FilesHeader/UploadButton/FileOptions'
 import {FileFolderWrapper, BBFolderWrapper} from '../../../../utils/fileFolderWrappers'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
@@ -44,11 +49,12 @@ export type MoveModalProps = {
   open: boolean
   items: (File | Folder)[]
   onDismiss: () => void
+  rowIndex?: number
 }
 
 const I18n = createI18nScope('files_v2')
 
-const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
+const MoveModal = ({open, items, onDismiss, rowIndex}: MoveModalProps) => {
   const {contextType, contextId, rootFolder} = useFileManagement()
   const folderTreeBrowserRef: Ref<FolderTreeBrowserRef> = createRef<FolderTreeBrowserRef>()
   const [selectedFolder, setSelectedFolder] = useState<Collection | null>(null)
@@ -58,6 +64,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
   const [fileOptions, setFileOptions] = useState<FileOptionsResults>(() =>
     FileOptionsCollection.getState(),
   )
+  const {setRowToFocus} = useRowFocus()
 
   const resetState = useCallback(() => {
     setSelectedFolder(null)
@@ -72,6 +79,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
       parent_folder_id: selectedFolder?.id,
     }
     const {resolvedNames} = FileOptionsCollection.getState() as FileOptionsResults
+    const nameCollisions: FileOptions[] = []
 
     showFlashAlert({message: I18n.t('Starting copy operation...')})
     return Promise.all(
@@ -81,16 +89,16 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
           additionalParams = {
             on_duplicate: 'overwrite',
           }
-        } else if (options.dup === 'rename') {
+        } else if (options.dup === 'error' || options.dup === 'rename') {
           if (options.name) {
             additionalParams = {
               display_name: options.name,
               name: options.name,
-              on_duplicate: 'rename',
+              on_duplicate: 'error',
             }
           } else {
             additionalParams = {
-              on_duplicate: 'rename',
+              on_duplicate: 'error',
             }
           }
         }
@@ -110,16 +118,41 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
               }),
             )()
           })
-          .catch(
-            showFlashError(
-              I18n.t('Error moving %{name} to %{folderName}.', {
-                name: getName(item),
-                folderName: selectedFolder?.name,
-              }),
-            ),
-          )
+          .catch(error => {
+            if (error.response.status === 409 && isFile(item)) {
+              nameCollisions.push({
+                ...options,
+                file: options.file as globalThis.File,
+                cannotOverwrite: false,
+              })
+            } else {
+              showFlashError(
+                I18n.t('Error moving %{name} to %{folderName}.', {
+                  name: getName(item),
+                  folderName: selectedFolder?.name,
+                }),
+              )
+            }
+          })
       }),
-    )
+    ).then(() => {
+      if (nameCollisions.length > 0) {
+        FileOptionsCollection.setState({
+          nameCollisions: [...nameCollisions],
+          resolvedNames: [],
+          zipOptions: [],
+          newOptions: false,
+        })
+        setFileOptions({
+          ...fileOptions,
+          nameCollisions: [...nameCollisions],
+        })
+        setFixingNameCollisions(true)
+      } else {
+        queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+        setRowToFocus(rowIndex ?? SELECT_ALL_FOCUS_STRING)
+      }
+    })
   }, [selectedFolder])
 
   useEffect(() => {
@@ -127,9 +160,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
       setFixingNameCollisions(false)
 
       if (fileOptions.resolvedNames.length > 0) {
-        startMoveOperation()
-          .then(onDismiss)
-          .then(() => queryClient.refetchQueries({queryKey: ['files'], type: 'active'}))
+        startMoveOperation().then(onDismiss)
       } else {
         onDismiss()
       }
@@ -157,7 +188,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
       })
   }, [selectedFolder])
 
-  const checkNameCollisions = useCallback(
+  const separateOptions = useCallback(
     (folder: BBFolderWrapper) => {
       FileOptionsCollection.setFolder(folder)
 
@@ -178,8 +209,10 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
       const {collisions, resolved, zips} =
         FileOptionsCollection.segregateOptionBuckets(filesAndFolders)
       FileOptionsCollection.setState({
-        nameCollisions: collisions,
-        resolvedNames: resolved,
+        // we handle collisions from the api due to pagination, so they do not need to be marked separately
+        // this ensures all the collisions can be handled at once
+        nameCollisions: [],
+        resolvedNames: [...collisions, ...resolved],
         zipOptions: zips,
         // Does not queue the uploads
         newOptions: false,
@@ -189,6 +222,20 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
     [items],
   )
 
+  const onNameConflictResolved = (fileNameOptions: ResolvedName) => {
+    const {resolvedNames, nameCollisions, zipOptions} =
+      FileOptionsCollection.getState() as FileOptionsResults
+    if (fileNameOptions.dup != 'skip') resolvedNames.push(fileNameOptions)
+    nameCollisions.shift()
+
+    FileOptionsCollection.setState({
+      nameCollisions: nameCollisions,
+      resolvedNames: resolvedNames,
+      zipOptions: zipOptions,
+    })
+    setFileOptions(FileOptionsCollection.getState())
+  }
+
   const handleMoveClick = useCallback(async () => {
     if (!folderTreeBrowserRef.current?.validate()) return
 
@@ -196,7 +243,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
     try {
       const folderData = await fetchFolderData()
 
-      const fileOptions = checkNameCollisions(folderData)
+      const fileOptions = separateOptions(folderData)
       setFileOptions(fileOptions)
 
       if (fileOptions.nameCollisions.length > 0) {
@@ -204,14 +251,13 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
       } else {
         await startMoveOperation()
         onDismiss()
-        queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
       }
     } catch (_) {
       setError(I18n.t('Failed to load folder data.'))
     } finally {
       setPostStatus(false)
     }
-  }, [checkNameCollisions, fetchFolderData, folderTreeBrowserRef, onDismiss, startMoveOperation])
+  }, [separateOptions, fetchFolderData, folderTreeBrowserRef, onDismiss, startMoveOperation])
 
   const renderHelperModals = () => {
     if (!fileOptions) return null
@@ -228,10 +274,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
             setFileOptions(FileOptionsCollection.getState())
           }}
           fileOptions={nameCollisions[0]}
-          onNameConflictResolved={fileNameOptions => {
-            FileOptionsCollection.onNameConflictResolved(fileNameOptions)
-            setFileOptions(FileOptionsCollection.getState())
-          }}
+          onNameConflictResolved={onNameConflictResolved}
         />
       </>
     )
@@ -267,7 +310,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
       )
     }
 
-    const context = filesEnv.contextFor({
+    const context = getFilesEnv().contextFor({
       contextType,
       contextId,
     })
@@ -335,17 +378,19 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
 
   return (
     <>
-      <Modal
-        open={open && !fixingNameCollisions}
-        onDismiss={onDismiss}
-        size="small"
-        label={I18n.t('Copy')}
-        shouldCloseOnDocumentClick={false}
-      >
-        <Modal.Header>{renderHeader()}</Modal.Header>
-        <Modal.Body>{renderBody()}</Modal.Body>
-        <Modal.Footer>{renderFooter()}</Modal.Footer>
-      </Modal>
+      {!fixingNameCollisions && (
+        <Modal
+          open={open}
+          onDismiss={onDismiss}
+          size="small"
+          label={I18n.t('Copy')}
+          shouldCloseOnDocumentClick={false}
+        >
+          <Modal.Header>{renderHeader()}</Modal.Header>
+          <Modal.Body>{renderBody()}</Modal.Body>
+          <Modal.Footer>{renderFooter()}</Modal.Footer>
+        </Modal>
+      )}
       {renderHelperModals()}
     </>
   )

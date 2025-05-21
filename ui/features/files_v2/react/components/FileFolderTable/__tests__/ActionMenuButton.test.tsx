@@ -19,10 +19,16 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
-import ActionMenuButton from '../ActionMenuButton'
+import ActionMenuButton, {ActionMenuButtonProps} from '../ActionMenuButton'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
-import {FileManagementProvider, FileManagementContextProps} from '../../Contexts'
+import {
+  FileManagementProvider,
+  FileManagementContextProps,
+} from '../../../contexts/FileManagementContext'
+import {RowFocusProvider} from '../../../contexts/RowFocusContext'
+import {RowsProvider} from '../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
+import {mockRowFocusContext} from './testUtils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
@@ -36,30 +42,34 @@ jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
 }))
 
-let defaultProps: any
+const defaultProps: ActionMenuButtonProps = {
+  size: 'large',
+  userCanEditFilesForContext: true,
+  userCanDeleteFilesForContext: true,
+  userCanRestrictFilesForContext: true,
+  usageRightsRequiredForContext: true,
+  row: FAKE_FILES[0],
+  rowIndex: 0,
+}
 
-const renderComponent = (props = {}, context: Partial<FileManagementContextProps> = {}) => {
+const renderComponent = (
+  props: ActionMenuButtonProps = {...defaultProps},
+  context: Partial<FileManagementContextProps> = {},
+) => {
   return render(
     <Router>
       <FileManagementProvider value={createMockFileManagementContext(context)}>
-        <ActionMenuButton {...defaultProps} {...props} />
+        <RowFocusProvider value={mockRowFocusContext}>
+          <RowsProvider value={{currentRows: [props.row], setCurrentRows: jest.fn()}}>
+            <ActionMenuButton {...defaultProps} {...props} />
+          </RowsProvider>
+        </RowFocusProvider>
       </FileManagementProvider>
     </Router>,
   )
 }
 
 describe('ActionMenuButton', () => {
-  beforeEach(() => {
-    defaultProps = {
-      size: 'large',
-      userCanEditFilesForContext: true,
-      userCanDeleteFilesForContext: true,
-      userCanRestrictFilesForContext: true,
-      usageRightsRequiredForContext: true,
-      row: FAKE_FILES[0],
-    }
-  })
-
   afterEach(() => {
     fetchMock.restore()
     jest.clearAllMocks()
@@ -92,7 +102,10 @@ describe('ActionMenuButton', () => {
 
     it('renders items when context is groups', async () => {
       const user = userEvent.setup()
-      renderComponent({userCanRestrictFilesForContext: false}, {contextType: 'groups'})
+      renderComponent(
+        {...defaultProps, userCanRestrictFilesForContext: false},
+        {contextType: 'groups'},
+      )
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
@@ -113,7 +126,11 @@ describe('ActionMenuButton', () => {
     it('does not render items when userCanEditFilesForContext is false', async () => {
       const user = userEvent.setup()
       // if userCanEditFilesForContext is false, userCanRestrictFilesForContext will also be false
-      renderComponent({userCanEditFilesForContext: false, userCanRestrictFilesForContext: false})
+      renderComponent({
+        ...defaultProps,
+        userCanEditFilesForContext: false,
+        userCanRestrictFilesForContext: false,
+      })
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
@@ -133,7 +150,7 @@ describe('ActionMenuButton', () => {
 
     it('does not render items when userCanDeleteFilesForContext is false', async () => {
       const user = userEvent.setup()
-      renderComponent({userCanDeleteFilesForContext: false})
+      renderComponent({...defaultProps, userCanDeleteFilesForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
@@ -153,7 +170,7 @@ describe('ActionMenuButton', () => {
 
     it('does not render items when usageRightsRequiredForContext is false', async () => {
       const user = userEvent.setup()
-      renderComponent({usageRightsRequiredForContext: false})
+      renderComponent({...defaultProps, usageRightsRequiredForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
@@ -174,6 +191,7 @@ describe('ActionMenuButton', () => {
     it('does not render items when locked by blueprint', async () => {
       const user = userEvent.setup()
       renderComponent({
+        ...defaultProps,
         row: {
           ...FAKE_FILES[0],
           ...{restricted_by_master_course: true, is_master_course_child_content: true},
@@ -197,7 +215,7 @@ describe('ActionMenuButton', () => {
     })
 
     it('render small size button', async () => {
-      renderComponent({size: 'small'})
+      renderComponent({...defaultProps, size: 'small'})
 
       const button = screen.getByTestId('action-menu-button-small')
       expect(button).toBeInTheDocument()
@@ -221,7 +239,9 @@ describe('ActionMenuButton', () => {
     it('closes and reopens the rename modal without clearing the name', async () => {
       const user = userEvent.setup()
       renderComponent()
-      const menuButton = await screen.findByRole('button', {name: `Actions for "${FAKE_FILES[0].display_name}"`})
+      const menuButton = await screen.findByRole('button', {
+        name: `Actions for "${FAKE_FILES[0].display_name}"`,
+      })
       await user.click(menuButton)
       // can't just re-use the variable because it gets removed from DOM
       const renameButton = async () => await screen.findByRole('menuitem', {name: 'Rename'})
@@ -252,7 +272,7 @@ describe('ActionMenuButton', () => {
           icon_url: '',
         },
       ]
-      renderComponent({}, {fileMenuTools})
+      renderComponent({...defaultProps}, {fileMenuTools})
       const menuButton = screen.getByTestId('action-menu-button-large')
       await user.click(menuButton)
 
@@ -268,7 +288,7 @@ describe('ActionMenuButton', () => {
         {id: '1', title: 'Tool1', base_url: 'http://toolone.com', icon_url: ''},
         {id: '2', title: 'Tool2', base_url: 'http://tooltwo.com', icon_url: ''},
       ]
-      renderComponent({}, {fileMenuTools})
+      renderComponent({...defaultProps}, {fileMenuTools})
       const menuButton = screen.getByTestId('action-menu-button-large')
       await user.click(menuButton)
       expect(await screen.findByText('Tool1')).toBeInTheDocument()
@@ -319,7 +339,7 @@ describe('ActionMenuButton', () => {
       const fileMenuTools = [
         {id: '1', title: 'Tool1', base_url: 'http://toolone.com', icon_url: ''},
       ]
-      renderComponent({}, {fileMenuTools})
+      renderComponent({...defaultProps}, {fileMenuTools})
       const menuButton = screen.getByTestId('action-menu-button-large')
       await user.click(menuButton)
       // necessary to make sure the menu is open
@@ -365,7 +385,7 @@ describe('ActionMenuButton', () => {
 
     it('does not render "Delete" when userCanDeleteFilesForContext is false', async () => {
       const user = userEvent.setup()
-      renderComponent({userCanDeleteFilesForContext: false})
+      renderComponent({...defaultProps, userCanDeleteFilesForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()

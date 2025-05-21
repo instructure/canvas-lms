@@ -78,7 +78,7 @@ describe "QR for mobile login" do
     it "shows message and no code when confirm modal is canceled" do
       get "/profile"
       fln("QR for Mobile Login").click
-      login_container = f("#qr_login_container")
+      login_container = f("#content")
       f("button[data-testid='qr-cancel-button']").click
       expect(login_container).to contain_jqcss("span:contains('code display was canceled')")
       expect(login_container).not_to contain_css("img[data-testid='qr-code-image']")

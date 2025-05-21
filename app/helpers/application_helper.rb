@@ -286,10 +286,12 @@ module ApplicationHelper
     I18n.rtl? ? { "left" => "right", "right" => "left" }[left_or_right] : left_or_right
   end
 
-  def css_variant(force_high_contrast: false)
+  def css_variant(opts = {})
     use_high_contrast =
-      @current_user&.prefers_high_contrast? || force_high_contrast
+      @current_user&.prefers_high_contrast? || opts[:force_high_contrast]
+    use_dyslexic_font = @current_user&.prefers_dyslexic_font?
     "new_styles" + + (use_high_contrast ? "_high_contrast" : "_normal_contrast") +
+      (use_dyslexic_font ? "_dyslexic" : "") +
       (I18n.rtl? ? "_rtl" : "")
   end
 

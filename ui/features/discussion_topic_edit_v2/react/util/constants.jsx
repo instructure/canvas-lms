@@ -82,6 +82,7 @@ export const useShouldShowContent = (
   isStudent,
   published,
   isCheckpoints,
+  isAlreadyAGroupDiscussion,
 ) => {
   const shouldShowTodoSettings =
     !isGraded &&
@@ -109,7 +110,7 @@ export const useShouldShowContent = (
     !isAnnouncement &&
     !isGroupContext &&
     ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP &&
-    !isCheckpoints
+    (!isCheckpoints || isAlreadyAGroupDiscussion || ENV.CHECKPOINTS_GROUP_DISCUSSIONS_ENABLED)
 
   const shouldShowGradedDiscussionOptions =
     !isAnnouncement && !isGroupContext && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT

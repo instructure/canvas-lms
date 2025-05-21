@@ -18,7 +18,6 @@
 
 import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {QueryProvider} from '@canvas/query'
 import type {SaveRubricResponse} from '@canvas/rubrics/react/RubricForm/queries/RubricFormQueries'
 import {View} from '@instructure/ui-view'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -41,6 +40,8 @@ import {CopyEditConfirmModal} from './CopyEditConfirmModal'
 import {RubricSelfAssessmentSettings} from './RubricSelfAssessmentSettings'
 import {DeleteConfirmModal} from './DeleteConfirmModal'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('enhanced-rubrics-assignment-container')
 
@@ -121,7 +122,7 @@ export const RubricAssignmentContainer = ({
   }
 
   return (
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <View
         as="div"
         display="inline-block"
@@ -270,6 +271,6 @@ export const RubricAssignmentContainer = ({
         }}
         onAddRubric={handleAddRubric}
       />
-    </QueryProvider>
+    </QueryClientProvider>
   )
 }

@@ -23,6 +23,11 @@ export default class RosterUserCollection extends PaginatedCollection {
     super(models, options)
     // Keep track of selected user IDs in this collection
     this.selectedUserIds = []
+    // Flag to remember if the 'master checkbox' is fully checked
+    this.masterSelected = false
+
+    // Keep track of *manually* de-selected users when masterSelected is true
+    this.deselectedUserIds = []
   }
 
   url() {

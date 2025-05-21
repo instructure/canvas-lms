@@ -17,6 +17,7 @@
  */
 
 export const SUBJECT_ALLOW_LIST = [
+  'lti.close',
   'lti.enableScrollEvents',
   'lti.fetchWindowSize',
   'lti.frameResize',

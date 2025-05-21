@@ -19,4 +19,4 @@
 import * as z from 'zod'
 
 export type LtiDeploymentId = z.infer<typeof ZLtiDeploymentId>
-export const ZLtiDeploymentId = z.string().brand('AccountId')
+export const ZLtiDeploymentId = z.string().brand('LtiDeploymentId')

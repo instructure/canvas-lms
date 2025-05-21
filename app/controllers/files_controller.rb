@@ -162,7 +162,7 @@ class FilesController < ApplicationController
   ]
 
   include HorizonMode
-  before_action :redirect_student_to_horizon, only: [:index, :show]
+  before_action :load_canvas_career, only: [:index, :show]
 
   before_action :open_limited_cors, only: [:show]
   before_action :open_cors, only: %i[
@@ -411,6 +411,7 @@ class FilesController < ApplicationController
     if authorized_action(@context, @current_user, [:read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]) &&
        tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
+      files_version_2 = Account.site_admin.feature_enabled?(:files_a11y_rewrite) && (!Account.site_admin.feature_enabled?(:files_a11y_rewrite_toggle) || @current_user.files_ui_version != "v1")
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
         tool_context = case context
@@ -430,7 +431,7 @@ class FilesController < ApplicationController
                                 else
                                   []
                                 end
-        root_folder_id = Folder.root_folders(context)&.first&.id if Account.site_admin.feature_enabled?(:files_a11y_rewrite)
+        root_folder_id = Folder.root_folders(context)&.first&.id if files_version_2
         {
           asset_string: context.asset_string,
           name: (context == @current_user) ? t("my_files", "My Files") : context.name,
@@ -448,7 +449,7 @@ class FilesController < ApplicationController
 
       @page_title = t("files_page_title", "Files")
       @body_classes << "full-width padless-content"
-      if Account.site_admin.feature_enabled?(:files_a11y_rewrite)
+      if files_version_2
         js_bundle :files_v2
       else
         js_bundle :files
@@ -702,7 +703,8 @@ class FilesController < ApplicationController
         if params[:download]
           if jwt_resource_match(@attachment) ||
              (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, @domain_root_account, session)) ||
-             @attachment.grants_right?(@current_user, session, :download)
+             @attachment.grants_right?(@current_user, session, :download) ||
+             access_via_location?(@attachment, @current_user, :download)
             disable_page_views if params[:preview]
             begin
               send_attachment(@attachment)
@@ -1717,7 +1719,7 @@ class FilesController < ApplicationController
   end
 
   def access_allowed(attachment, user, access_type)
-    return true if jwt_resource_match(attachment)
+    return true if jwt_resource_match(attachment) || access_via_location?(attachment, user, access_type)
 
     if params[:verifier]
       verifier_checker = Attachments::Verification.new(attachment)
@@ -1728,6 +1730,14 @@ class FilesController < ApplicationController
     return true if submissions.any? { |submission| submission.grants_right?(user, session, access_type) }
 
     authorized_action(attachment, user, access_type)
+  end
+
+  def access_via_location?(attachment, user, access_type)
+    if params[:location] && [:read, :download].include?(access_type)
+      return AttachmentAssociation.verify_access(params[:location], attachment.id, user, session)
+    end
+
+    false
   end
 
   def strong_attachment_params

@@ -23,8 +23,10 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
 import MoveModal from '../MoveModal'
 import {useFoldersQuery} from '../hooks'
-import {FileManagementProvider} from '../../../Contexts'
+import {FileManagementProvider} from '../../../../contexts/FileManagementContext'
+import {RowFocusProvider} from '../../../../contexts/RowFocusContext'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
+import {mockRowFocusContext} from '../../__tests__/testUtils'
 
 jest.mock('../hooks', () => ({
   useFoldersQuery: jest.fn(),
@@ -45,7 +47,9 @@ const renderComponent = (props: any = {}) =>
         rootFolder: FAKE_FOLDERS[0],
       })}
     >
-      <MoveModal {...defaultProps} {...props} />
+      <RowFocusProvider value={mockRowFocusContext}>
+        <MoveModal {...defaultProps} {...props} />
+      </RowFocusProvider>
     </FileManagementProvider>,
   )
 
@@ -53,7 +57,7 @@ describe('MoveModal', () => {
   let flashElements: any
 
   beforeEach(() => {
-    (useFoldersQuery as jest.Mock).mockReturnValue({
+    ;(useFoldersQuery as jest.Mock).mockReturnValue({
       folders: {[FAKE_FOLDERS[1].id]: FAKE_FOLDERS[1]},
       foldersLoading: false,
       foldersSuccessful: true,
@@ -134,13 +138,13 @@ describe('MoveModal', () => {
   })
 
   it('performs fetch request', async () => {
-    (useFoldersQuery as jest.Mock).mockReturnValue({
+    ;(useFoldersQuery as jest.Mock).mockReturnValue({
       folders: {[FAKE_FOLDERS[2].id]: FAKE_FOLDERS[2]},
       foldersLoading: false,
       foldersSuccessful: true,
       foldersError: false,
     })
-    
+
     const rootFolder = FAKE_FOLDERS[1]
     const childFolder = FAKE_FOLDERS[2]
     // Fetch inner folders request

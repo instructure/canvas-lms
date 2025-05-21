@@ -23,8 +23,8 @@ import {View, ViewProps} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import { Tooltip } from '@instructure/ui-tooltip'
-import { IconCopyLine, IconRefreshLine } from '@instructure/ui-icons'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {IconCopyLine, IconRefreshLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Spacing} from '@instructure/emotion'
@@ -38,8 +38,11 @@ import {ToolConfigurationFooter} from './ToolConfigurationFooter'
 import {isForcedOn} from '../../../model/LtiRegistration'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
-import {resetLtiRegistration, fetchLtiRegistrationWithLegacyConfig} from '../../../api/registrations'
-import { isSuccessful } from '../../../../common/lib/apiResult/ApiResult'
+import {
+  resetLtiRegistration,
+  fetchLtiRegistrationWithLegacyConfig,
+} from '../../../api/registrations'
+import {isSuccessful} from '../../../../common/lib/apiResult/ApiResult'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -109,47 +112,57 @@ export const ToolConfigurationView = () => {
 
   const canRestoreDefault = !registration.inherited
 
-  const handleRestoreDefault = React.useCallback(async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
-    e.preventDefault()
-    const confirmed = await showConfirmationDialog({
-      body: I18n.t('Are you sure you want to reset this app’s settings to their default values? Once they are reverted the action cannot be undone.'),
-      confirmColor: 'danger',
-      confirmText: I18n.t('Reset'),
-      label: I18n.t('Reset App Configuration'),
-      size: 'small',
-    })
+  const handleRestoreDefault = React.useCallback(
+    async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
+      e.preventDefault()
+      const confirmed = await showConfirmationDialog({
+        body: I18n.t(
+          'Are you sure you want to reset this app’s settings to their default values? Once they are reverted the action cannot be undone.',
+        ),
+        confirmColor: 'danger',
+        confirmText: I18n.t('Reset'),
+        label: I18n.t('Reset App Configuration'),
+        size: 'small',
+      })
 
-    if (confirmed) {
-      resetAppConfiguration()
-    }
-  }, [])
+      if (confirmed) {
+        resetAppConfiguration()
+      }
+    },
+    [],
+  )
 
-  const handleCopyJsonConfig = React.useCallback(async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
-    e.preventDefault()
-    const legacyConfigResponse = await fetchLtiRegistrationWithLegacyConfig(registration.account_id, registration.id)
+  const handleCopyJsonConfig = React.useCallback(
+    async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
+      e.preventDefault()
+      const legacyConfigResponse = await fetchLtiRegistrationWithLegacyConfig(
+        registration.account_id,
+        registration.id,
+      )
 
-    if (isSuccessful(legacyConfigResponse)) {
-      const legacyConfig = legacyConfigResponse.data['overlaid_legacy_configuration']
-      try {
-        await navigator.clipboard.writeText(JSON.stringify(legacyConfig))
-        showFlashAlert({
-          type: 'info',
-          message: I18n.t('JSON configuration copied'),
-        })
-      } catch {
+      if (isSuccessful(legacyConfigResponse)) {
+        const legacyConfig = legacyConfigResponse.data['overlaid_legacy_configuration']
+        try {
+          await navigator.clipboard.writeText(JSON.stringify(legacyConfig, null, 2))
+          showFlashAlert({
+            type: 'info',
+            message: I18n.t('JSON configuration copied'),
+          })
+        } catch {
+          showFlashAlert({
+            type: 'error',
+            message: I18n.t('Unable to copy JSON code to clipboard'),
+          })
+        }
+      } else {
         showFlashAlert({
           type: 'error',
-          message: I18n.t('Unable to copy JSON code to clipboard'),
+          message: I18n.t('Unable to get JSON configuration to be copied.'),
         })
       }
-    }
-    else {
-      showFlashAlert({
-        type: 'error',
-        message: I18n.t('Unable to get JSON configuration to be copied.'),
-      })
-    }
-  }, [registration])
+    },
+    [registration],
+  )
 
   return (
     <div>
@@ -358,19 +371,21 @@ export const ToolConfigurationView = () => {
             <Flex gap="small">
               <Flex.Item>
                 <Tooltip
-                  renderTip={I18n.t("This account does not own this app and therefore can't reset its configuration.")}
+                  renderTip={I18n.t(
+                    "This account does not own this app and therefore can't reset its configuration.",
+                  )}
                   isShowingContent={tooltipShowing}
-                  onShowContent={(e) => {
+                  onShowContent={e => {
                     // The tooltip should only be shown if they *can't* click the restore default button
                     setTooltipShowing(!canRestoreDefault)
                   }}
-                  onHideContent={(e) => {
+                  onHideContent={e => {
                     setTooltipShowing(false)
                   }}
                 >
                   <Button
                     color="primary-inverse"
-                    interaction={canRestoreDefault ? "enabled" : "disabled"}
+                    interaction={canRestoreDefault ? 'enabled' : 'disabled'}
                     renderIcon={<IconRefreshLine />}
                     margin="0"
                     onClick={handleRestoreDefault}

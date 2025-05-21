@@ -31,6 +31,7 @@ class Folder < ActiveRecord::Base
   MY_FILES_FOLDER_NAME = "my files"
   CONVERSATION_ATTACHMENTS_FOLDER_NAME = "conversation attachments"
   STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE = "student annotation documents"
+  FLAMEGRAPHS_FOLDER_NAME = "flamegraphs"
 
   belongs_to :context, polymorphic: %i[user group account course], optional: false
   belongs_to :cloned_item

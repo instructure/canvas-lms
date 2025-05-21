@@ -16,20 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMemo, useState} from 'react'
-import {fetchSubmissions, getNextSubmissionsPage} from '../../queries/Queries'
+import {useMemo} from 'react'
+import {
+  fetchSubmissions,
+  FetchSubmissionsResponse,
+  getNextSubmissionsPage,
+} from '../../queries/Queries'
 import {useAllPages} from '@canvas/query'
+import type {InfiniteData} from '@tanstack/react-query'
 
 export const useSubmissionsQuery = (courseId: string) => {
-  const [queryKey] = useState(['individual-gradebook-submissions', courseId])
+  const queryKey: [string, string] = ['individual-gradebook-submissions', courseId]
 
-  const {data, hasNextPage, isError, isLoading} = useAllPages({
+  const {data, hasNextPage, isError, isLoading} = useAllPages<
+    FetchSubmissionsResponse,
+    Error,
+    InfiniteData<FetchSubmissionsResponse>,
+    [string, string]
+  >({
     queryKey,
     queryFn: fetchSubmissions,
     getNextPageParam: getNextSubmissionsPage,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    initialPageParam: null,
   })
 
   const submissions = useMemo(

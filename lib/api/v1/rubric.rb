@@ -72,4 +72,33 @@ module Api::V1::Rubric
       )
     end
   end
+
+  def enhanced_rubrics_assignments_js_env(assignment)
+    return unless assignment && Rubric.enhanced_rubrics_assignments_enabled?(@context)
+
+    rubric_association = nil
+    assigned_rubric = nil
+    if assignment.active_rubric_association?
+      rubric_association = assignment.rubric_association
+      can_update_rubric = can_do(rubric_association.rubric, @current_user, :update)
+      assigned_rubric = rubric_json(rubric_association.rubric, @current_user, session, style: "full")
+      assigned_rubric[:unassessed] = Rubric.active.unassessed.where(id: rubric_association.rubric.id).exists?
+      assigned_rubric[:can_update] = can_update_rubric
+      assigned_rubric[:association_count] = RubricAssociation.active.where(rubric_id: rubric_association.rubric.id, association_type: "Assignment").count
+      rubric_association = rubric_association_json(rubric_association, @current_user, session)
+    end
+
+    rubrics_hash = {
+      ACCOUNT_LEVEL_MASTERY_SCALES: @context.root_account.feature_enabled?(:account_level_mastery_scales),
+      ASSIGNMENT_ID: assignment.id,
+      COURSE_ID: @context.id,
+      ai_rubrics_enabled: Rubric.ai_rubrics_enabled?(@context),
+      assigned_rubric:,
+      rubric_association:,
+      rubric_self_assessment_ff_enabled: Rubric.rubric_self_assessment_enabled?(@context),
+      rubric_self_assessment_enabled: @assignment.rubric_self_assessment_enabled?,
+      can_update_rubric_self_assessment: @assignment.can_update_rubric_self_assessment?,
+    }
+    js_env(rubrics_hash)
+  end
 end

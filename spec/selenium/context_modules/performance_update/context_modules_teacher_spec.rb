@@ -32,7 +32,7 @@ require_relative "../../dashboard/pages/k5_dashboard_page"
 require_relative "../../dashboard/pages/k5_dashboard_common_page"
 require_relative "../../../helpers/k5_common"
 require_relative "../shared_examples/context_modules_teacher_shared_examples"
-require_relative "../shared_examples/modules_performance_teacher_shared_examples"
+require_relative "../shared_examples/modules_performance_shared_examples"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
@@ -158,8 +158,8 @@ describe "context modules" do
       user_session(@teacher)
     end
 
-    it_behaves_like "module performance for teachers", :context_modules
-    it_behaves_like "module performance for teachers", :course_homepage
+    it_behaves_like "module performance with module items", :context_modules
+    it_behaves_like "module performance with module items", :course_homepage
   end
 
   context "as a canvas for elementary teacher with many module items", :ignore_js_errors do
@@ -176,6 +176,26 @@ describe "context modules" do
       user_session(@teacher)
     end
 
-    it_behaves_like "module performance for teachers", :canvas_for_elementary
+    it_behaves_like "module performance with module items", :canvas_for_elementary
+  end
+
+  context "as a canvas for elementary teacher with module items to show", :ignore_js_errors do
+    before(:once) do
+      teacher_setup
+      @subject_course.account.enable_feature!(:modules_perf)
+      Setting.set("module_perf_threshold", -1)
+      @course = @subject_course
+      @module = @course.context_modules.create!(name: "module 1")
+      11.times do |i|
+        @module.add_item(type: "assignment", id: @course.assignments.create!(title: "assignment #{i}").id)
+      end
+      @subject_course.reload
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it_behaves_like "module show all or less", :canvas_for_elementary
   end
 end

@@ -1,0 +1,151 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2025 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require "spec_helper"
+
+describe AccessibilityController do
+  render_views
+  let(:mock_rule) do
+    Class.new do
+      def self.test(_elem) = true
+      def self.id = "mock-rule"
+      def self.message = "No issue"
+      def self.why = "Just a mock"
+      def self.form = []
+    end
+  end
+
+  let(:rules) { [mock_rule] }
+
+  before do
+    allow_any_instance_of(AccessibilityController).to receive(:require_context).and_return(true)
+    allow_any_instance_of(AccessibilityController).to receive(:require_user).and_return(true)
+    allow_any_instance_of(AccessibilityController).to receive(:setup_ruleset) do |controller|
+      controller.instance_variable_set(:@ruleset, rules)
+    end
+    allow_any_instance_of(AccessibilityController).to receive(:allowed?).and_return(true)
+  end
+
+  describe "#create_accessibility_issues" do
+    it "returns issues for pages" do
+      page = double("WikiPage", id: 1, body: "<div>content</div>", title: "Page 1", published?: true, updated_at: Time.zone.now)
+      # Set up explicit doubles for the chain
+      wiki_pages = double("WikiPages")
+      not_deleted = double("NotDeletedRelation")
+      assignments = double("Assignments")
+      active_assignments = double("ActiveAssignments")
+      context_double = double("Context")
+
+      allow(wiki_pages).to receive_messages(not_deleted:)
+      allow(not_deleted).to receive_messages(order: [page])
+      allow(context_double).to receive_messages(wiki_pages:, assignments:)
+      allow(assignments).to receive_messages(active: active_assignments)
+      allow(active_assignments).to receive_messages(order: [])
+      allow(controller).to receive(:polymorphic_url).with([context_double, page]).and_return("https://fake.url")
+
+      controller.instance_variable_set(:@context, context_double)
+
+      result = controller.create_accessibility_issues(rules)
+      expect(result[:pages][1][:title]).to eq("Page 1")
+      expect(result[:pages][1][:published]).to be true
+      expect(result[:assignments]).to eq({})
+      expect(result[:last_checked]).to be_a(String)
+    end
+
+    it "returns issues for assignments" do
+      assignment = double("Assignment", id: 2, description: "<div>desc</div>", title: "Assignment 1", published?: false, updated_at: Time.zone.now)
+      # Set up explicit doubles for the chain
+      wiki_pages = double("WikiPages")
+      not_deleted = double("NotDeletedRelation")
+      assignments = double("Assignments")
+      active_assignments = double("ActiveAssignments")
+      context_double = double("Context")
+
+      allow(wiki_pages).to receive_messages(not_deleted:)
+      allow(not_deleted).to receive_messages(order: [])
+      allow(context_double).to receive_messages(wiki_pages:, assignments:)
+      allow(assignments).to receive_messages(active: active_assignments)
+      allow(active_assignments).to receive_messages(order: [assignment])
+      allow(controller).to receive(:polymorphic_url).with([context_double, assignment]).and_return("https://fake.url")
+
+      controller.instance_variable_set(:@context, context_double)
+
+      result = controller.create_accessibility_issues(rules)
+      expect(result[:pages]).to eq({})
+      expect(result[:assignments][2][:title]).to eq("Assignment 1")
+      expect(result[:assignments][2][:published]).to be false
+      expect(result[:last_checked]).to be_a(String)
+    end
+  end
+
+  describe "GET #issues" do
+    before do
+      allow_any_instance_of(AccessibilityController).to receive(:t).and_return("Accessibility")
+      allow_any_instance_of(AccessibilityController).to receive(:add_crumb)
+    end
+
+    it "returns issues for pages" do
+      allow_any_instance_of(AccessibilityController).to receive(:create_accessibility_issues).and_return({
+                                                                                                           pages: { 1 => { title: "Page 1", published: true } },
+                                                                                                           assignments: {},
+                                                                                                           last_checked: "Apr 22, 2025"
+                                                                                                         })
+      get :issues, params: { course_id: 1 }, format: :json
+      json = response.parsed_body
+      expect(json["pages"]["1"]["title"]).to eq("Page 1")
+      expect(json["pages"]["1"]["published"]).to be true
+      expect(json["assignments"]).to eq({})
+      expect(json["last_checked"]).to be_a(String)
+    end
+
+    it "returns issues for assignments" do
+      allow_any_instance_of(AccessibilityController).to receive(:create_accessibility_issues).and_return({
+                                                                                                           pages: {},
+                                                                                                           assignments: { 2 => { title: "Assignment 1", published: false } },
+                                                                                                           last_checked: "Apr 22, 2025"
+                                                                                                         })
+      get :issues, params: { course_id: 1 }, format: :json
+      json = response.parsed_body
+      expect(json["assignments"]["2"]["title"]).to eq("Assignment 1")
+      expect(json["assignments"]["2"]["published"]).to be false
+      expect(json["pages"]).to eq({})
+      expect(json["last_checked"]).to be_a(String)
+    end
+  end
+
+  describe "#show" do
+    before do
+      @course = Course.create!(name: "Test Course", id: 42)
+      controller.instance_variable_set(:@context, @course)
+    end
+
+    it "renders the accessibility checker container if allowed" do
+      get :show, params: { course_id: 42 }
+      expect(response).to be_successful
+      expect(response.body).to include("accessibility-checker-container")
+    end
+
+    it "returns nothing if not allowed" do
+      allow_any_instance_of(AccessibilityController).to receive(:allowed?).and_return(false)
+      get :show, params: { course_id: 42 }
+      expect(response.body).not_to include("accessibility-checker-container")
+    end
+  end
+end

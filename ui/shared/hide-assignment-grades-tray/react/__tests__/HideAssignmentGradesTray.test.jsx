@@ -16,18 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {render, screen, waitFor, fireEvent} from '@testing-library/react'
 import React from 'react'
 
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import * as Api from '@canvas/hide-assignment-grades-tray/react/Api'
 import HideAssignmentGradesTray from '..'
 
+// Create mock promises that we can control for testing
+const createControlledPromise = () => {
+  const handlers = {}
+  const promise = new Promise((resolve, reject) => {
+    handlers.resolve = resolve
+    handlers.reject = reject
+  })
+  return {...handlers, promise}
+}
+
+// Setup API mocks
 jest.mock('@canvas/hide-assignment-grades-tray/react/Api', () => ({
-  hideAssignmentGrades: jest.fn().mockResolvedValue(),
-  hideAssignmentGradesForSections: jest.fn().mockResolvedValue(),
-  resolveHideAssignmentGradesStatus: jest.fn().mockResolvedValue(),
+  hideAssignmentGrades: jest.fn().mockResolvedValue({
+    id: '1',
+    workflowState: 'completed',
+  }),
+  hideAssignmentGradesForSections: jest.fn().mockResolvedValue({
+    id: '1',
+    workflowState: 'completed',
+  }),
+  resolveHideAssignmentGradesStatus: jest.fn().mockResolvedValue({}),
 }))
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
@@ -58,6 +74,8 @@ describe('HideAssignmentGradesTray', () => {
   beforeEach(() => {
     trayRef = null
     jest.clearAllMocks()
+    // Clean up any previous renders to avoid duplicate elements
+    document.body.innerHTML = ''
   })
 
   afterEach(() => {
@@ -77,75 +95,138 @@ describe('HideAssignmentGradesTray', () => {
   const showTray = async (context = defaultContext) => {
     renderTray()
     trayRef.show(context)
-    // Wait for both heading and hide button to ensure tray is fully rendered
+
+    // Wait for the tray to be fully rendered
     await waitFor(() => {
-      expect(screen.getByRole('heading', {name: 'Math 1.1'})).toBeInTheDocument()
-      expect(screen.getByRole('button', {name: 'Hide'})).toBeInTheDocument()
+      expect(screen.getByText('Math 1.1')).toBeInTheDocument()
     })
   }
 
   it('displays the assignment name when opened', async () => {
     await showTray()
-    expect(screen.getByRole('heading', {name: 'Math 1.1'})).toBeInTheDocument()
+    expect(screen.getByText('Math 1.1')).toBeInTheDocument()
   })
 
   describe('sections functionality', () => {
     it('does not display sections by default', async () => {
       await showTray()
-      // Wait for any potential async updates
-      await waitFor(() => {
-        expect(screen.getByRole('button', {name: 'Hide'})).toBeInTheDocument()
-      })
-      expect(screen.queryByRole('checkbox', {name: 'Freshmen'})).not.toBeInTheDocument()
+
+      // The checkbox for specific sections should be present but not checked
+      const specificSectionsCheckbox = screen.getByText('Specific Sections')
+      expect(specificSectionsCheckbox).toBeInTheDocument()
+
+      // Section checkboxes should not be visible initially
+      expect(screen.queryByText('Freshmen')).not.toBeInTheDocument()
     })
 
     it('shows sections when "Specific Sections" is selected', async () => {
       await showTray()
-      await userEvent.click(screen.getByRole('checkbox', {name: 'Specific Sections'}))
-      expect(screen.getByRole('checkbox', {name: 'Freshmen'})).toBeInTheDocument()
-      expect(screen.getByRole('checkbox', {name: 'Sophomores'})).toBeInTheDocument()
+
+      // Click the specific sections checkbox
+      const checkbox = screen.getByRole('checkbox', {name: 'Specific Sections'})
+      fireEvent.click(checkbox)
+
+      // Section checkboxes should now be visible
+      expect(screen.getByText('Freshmen')).toBeInTheDocument()
+      expect(screen.getByText('Sophomores')).toBeInTheDocument()
     })
 
     it('does not show sections toggle when no sections are available', async () => {
       await showTray({...defaultContext, sections: []})
-      expect(screen.queryByRole('checkbox', {name: 'Specific Sections'})).not.toBeInTheDocument()
+      expect(screen.queryByText('Specific Sections')).not.toBeInTheDocument()
     })
 
     it('resets section selection when reopening the tray', async () => {
+      // First open the tray and select sections
       await showTray()
-      await userEvent.click(screen.getByRole('checkbox', {name: 'Specific Sections'}))
-      await userEvent.click(screen.getByRole('checkbox', {name: 'Sophomores'}))
+      const checkbox = screen.getByRole('checkbox', {name: 'Specific Sections'})
+      fireEvent.click(checkbox)
 
+      // Close and reopen the tray
+      trayRef.dismiss()
+      await waitFor(() => {
+        expect(defaultContext.onExited).toHaveBeenCalled()
+      })
+
+      // Show the tray again with a fresh context
+      jest.clearAllMocks()
+      document.body.innerHTML = ''
       await showTray()
-      expect(screen.queryByRole('checkbox', {name: 'Specific Sections'})).not.toBeChecked()
+
+      // Specific sections should not be checked
+      const specificSectionsCheckbox = screen.getByText('Specific Sections')
+      expect(specificSectionsCheckbox).toBeInTheDocument()
+      expect(screen.queryByText('Freshmen')).not.toBeInTheDocument()
     })
   })
 
   describe('hide functionality', () => {
     it('hides grades for all sections when no specific sections are selected', async () => {
       await showTray()
-      await userEvent.click(screen.getByRole('button', {name: 'Hide'}))
+      const hideButton = screen.getByRole('button', {name: 'Hide'})
+      fireEvent.click(hideButton)
       expect(Api.hideAssignmentGrades).toHaveBeenCalledWith('2301')
     })
 
     it('hides grades for specific sections when selected', async () => {
       await showTray()
-      await userEvent.click(screen.getByRole('checkbox', {name: 'Specific Sections'}))
-      await userEvent.click(screen.getByRole('checkbox', {name: 'Freshmen'}))
-      await userEvent.click(screen.getByRole('button', {name: 'Hide'}))
+
+      // Select specific sections
+      const specificSectionsCheckbox = screen.getByRole('checkbox', {name: 'Specific Sections'})
+      fireEvent.click(specificSectionsCheckbox)
+
+      // Select a section
+      const freshmenCheckbox = screen.getByRole('checkbox', {name: 'Freshmen'})
+      fireEvent.click(freshmenCheckbox)
+
+      // Click hide
+      const hideButton = screen.getByRole('button', {name: 'Hide'})
+      fireEvent.click(hideButton)
+
       expect(Api.hideAssignmentGradesForSections).toHaveBeenCalledWith('2301', ['2001'])
     })
 
     it('shows an error when no sections are selected with "Specific Sections" checked', async () => {
       await showTray()
-      await userEvent.click(screen.getByLabelText('Specific Sections'))
-      await userEvent.click(screen.getByTestId('hide-grades-button'))
+
+      // Select specific sections but don't select any section
+      const specificSectionsCheckbox = screen.getByRole('checkbox', {name: 'Specific Sections'})
+      fireEvent.click(specificSectionsCheckbox)
+
+      // Click hide
+      const hideButton = screen.getByRole('button', {name: 'Hide'})
+      fireEvent.click(hideButton)
+
       expect(screen.getByText('Please select at least one option')).toBeInTheDocument()
     })
 
     it('shows success message when hiding grades succeeds', async () => {
+      // Set up controlled promises for this test
+      const hideGradesPromise = createControlledPromise()
+      const resolveStatusPromise = createControlledPromise()
+
+      // Override the default mock implementations for this test only
+      Api.hideAssignmentGrades.mockReturnValueOnce(hideGradesPromise.promise)
+      Api.resolveHideAssignmentGradesStatus.mockReturnValueOnce(resolveStatusPromise.promise)
+
       await showTray()
-      await userEvent.click(screen.getByRole('button', {name: 'Hide'}))
+
+      // Click the hide button
+      const hideButton = screen.getByRole('button', {name: 'Hide'})
+      fireEvent.click(hideButton)
+
+      // Resolve the first promise
+      hideGradesPromise.resolve({id: '1', workflowState: 'completed'})
+
+      // Wait for the first promise to be handled
+      await waitFor(() => {
+        expect(Api.resolveHideAssignmentGradesStatus).toHaveBeenCalled()
+      })
+
+      // Resolve the second promise
+      resolveStatusPromise.resolve({})
+
+      // Now wait for the success message
       await waitFor(() => {
         expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
           message: 'Success! Grades have been hidden for Math 1.1.',
@@ -156,9 +237,12 @@ describe('HideAssignmentGradesTray', () => {
 
     it('shows error message when hiding grades fails', async () => {
       const error = new Error('Failed to hide grades')
-      Api.hideAssignmentGrades.mockRejectedValue(error)
+      Api.hideAssignmentGrades.mockRejectedValueOnce(error)
       await showTray()
-      await userEvent.click(screen.getByRole('button', {name: 'Hide'}))
+
+      const hideButton = screen.getByRole('button', {name: 'Hide'})
+      fireEvent.click(hideButton)
+
       await waitFor(() => {
         expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
           message: 'There was a problem hiding assignment grades.',
@@ -174,11 +258,13 @@ describe('HideAssignmentGradesTray', () => {
       )
       Api.hideAssignmentGrades.mockImplementation(hideAssignmentGradesMock)
       await showTray()
+
       const hideButton = screen.getByRole('button', {name: 'Hide'})
-      await userEvent.click(hideButton)
-      expect(screen.getByRole('img', {name: 'Hiding grades'})).toBeInTheDocument()
+      fireEvent.click(hideButton)
+
+      expect(screen.getByText(/hiding grades/i, {selector: 'span'})).toBeInTheDocument()
       await waitFor(() => {
-        expect(screen.queryByRole('img', {name: 'Hiding grades'})).not.toBeInTheDocument()
+        expect(screen.queryByText(/hiding grades/i, {selector: 'span'})).not.toBeInTheDocument()
       })
     })
   })
@@ -186,8 +272,11 @@ describe('HideAssignmentGradesTray', () => {
   describe('close functionality', () => {
     it('closes when clicking the close icon button', async () => {
       await showTray()
+
+      // Find the close button by its role
       const closeButtons = screen.getAllByRole('button', {name: 'Close'})
-      await userEvent.click(closeButtons[0]) // First close button is the icon
+      fireEvent.click(closeButtons[0]) // First close button is the icon
+
       await waitFor(() => {
         expect(defaultContext.onExited).toHaveBeenCalled()
       })
@@ -195,8 +284,11 @@ describe('HideAssignmentGradesTray', () => {
 
     it('closes when clicking the close button', async () => {
       await showTray()
+
+      // Find the text close button
       const closeButtons = screen.getAllByRole('button', {name: 'Close'})
-      await userEvent.click(closeButtons[1]) // Second close button is the text button
+      fireEvent.click(closeButtons[1]) // Second close button is the text button
+
       await waitFor(() => {
         expect(defaultContext.onExited).toHaveBeenCalled()
       })

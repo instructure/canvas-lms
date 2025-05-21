@@ -24,13 +24,14 @@ import {Heading} from '@instructure/ui-heading'
 import FileFolderInfo from './shared/FileFolderInfo'
 import {TextInput} from '@instructure/ui-text-input'
 import type {File, Folder} from '../../interfaces/File'
-import {queryClient} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {isFile, getName} from '../../utils/fileFolderUtils'
+import {isFile, getName, getUniqueId} from '../../utils/fileFolderUtils'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
+import {MAX_FOLDER_NAME_LENGTH} from '../../utils/folderUtils'
+import {useRows} from '../contexts/RowsContext'
 
 const I18n = createI18nScope('files_v2')
 
@@ -55,6 +56,7 @@ export const RenameModal = ({
   const [errorMessages, setErrorMessages] = useState<FormMessage[]>()
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
   const inputRef = useRef<TextInput>(null)
+  const {currentRows, setCurrentRows} = useRows()
 
   const handleSave = () => {
     const trimmedNewItemName = newItemName.trim()
@@ -66,20 +68,9 @@ export const RenameModal = ({
       return
     }
 
-    if (trimmedNewItemName == '' || trimmedNewItemName?.indexOf('/') !== -1) {
-      if (isFile(renamingItem)) {
-        setErrorMessages(
-          !trimmedNewItemName
-            ? [{text: I18n.t('File name cannot be blank'), type: 'newError'}]
-            : [{text: I18n.t('File name cannot contain /'), type: 'newError'}],
-        )
-      } else {
-        setErrorMessages(
-          !trimmedNewItemName
-            ? [{text: I18n.t('Folder name cannot be blank'), type: 'newError'}]
-            : [{text: I18n.t('Folder name cannot contain /'), type: 'newError'}],
-        )
-      }
+    const errors = validateNewItemName(isFile(renamingItem), trimmedNewItemName)
+    if (errors.length > 0) {
+      setErrorMessages(errors)
       inputRef.current?.focus()
       return
     }
@@ -90,8 +81,18 @@ export const RenameModal = ({
         showFlashSuccess(
           I18n.t('Successfully renamed %{item}.', {item: isFile(renamingItem) ? 'file' : 'folder'}),
         )()
+        const newRows = [...currentRows]
+        const index = newRows.findIndex(row => getUniqueId(row) === getUniqueId(renamingItem))
+        if (index !== -1) {
+          if (isFile(renamingItem)) {
+            newRows[index].filename = trimmedNewItemName
+            newRows[index].display_name = trimmedNewItemName
+          } else {
+            newRows[index].name = trimmedNewItemName
+          }
+          setCurrentRows(newRows)
+        }
         onClose()
-        await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
       })
       .catch(err => {
         if (err?.response?.status == 409) {
@@ -117,6 +118,29 @@ export const RenameModal = ({
     setNewItemName(getName(renamingItem))
     setErrorMessages([])
     setIsRequestInFlight(false)
+  }
+
+  const validateNewItemName = (isFile: boolean, trimmedName: string): FormMessage[] => {
+    const errorMessages: FormMessage[] = []
+    if (trimmedName === '') {
+      errorMessages.push({
+        text: isFile ? I18n.t('File name cannot be blank') : I18n.t('Folder name cannot be blank'),
+        type: 'newError',
+      })
+    } else if (trimmedName.indexOf('/') !== -1) {
+      errorMessages.push({
+        text: isFile
+          ? I18n.t('File name cannot contain /')
+          : I18n.t('Folder name cannot contain /'),
+        type: 'newError',
+      })
+    } else if (!isFile && trimmedName.length > MAX_FOLDER_NAME_LENGTH) {
+      errorMessages.push({
+        text: I18n.t('Folder name cannot exceed 255 characters'),
+        type: 'newError',
+      })
+    }
+    return errorMessages
   }
 
   return (

@@ -19,13 +19,14 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {createRoot} from 'react-dom/client'
-import {QueryProvider} from '@canvas/query'
 import HelpDialog from '.'
 import {Modal} from '@instructure/ui-modal'
 import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
 import type {ViewOwnProps} from '@instructure/ui-view'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('HelpLinks')
 
@@ -89,9 +90,9 @@ export function renderLoginHelp(loginLink: Element): void {
 
   const root = createRoot(wrapper)
   root.render(
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <LoginHelp linkText={anchorElement.innerText} />
-    </QueryProvider>,
+    </QueryClientProvider>,
   )
 }
 

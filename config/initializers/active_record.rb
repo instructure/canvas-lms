@@ -26,25 +26,16 @@ class ActiveRecord::Base
   class << self
     delegate :distinct_on, :find_ids_in_batches, :explain, to: :all
 
-    if Rails.version < "7.2"
-      def internal_metadata
-        ActiveRecord::InternalMetadata.new(connection)
-      end
+    def internal_metadata
+      ActiveRecord::InternalMetadata.new(connection.pool)
+    end
 
-      delegate :migration_context, to: :connection
-      delegate :schema_migration, to: :connection
-    else
-      def internal_metadata
-        ActiveRecord::InternalMetadata.new(connection.pool)
-      end
+    def migration_context
+      connection.pool.migration_context
+    end
 
-      def migration_context
-        connection.pool.migration_context
-      end
-
-      def schema_migration
-        connection.pool.schema_migration
-      end
+    def schema_migration
+      connection.pool.schema_migration
     end
 
     def find_ids_in_ranges(loose: true, **, &)
@@ -524,7 +515,7 @@ class ActiveRecord::Base
     polymorphic_prefix = options.delete(:polymorphic_prefix)
     exhaustive = options.delete(:exhaustive)
 
-    reflection = super[(::Rails.version < "7.2") ? name.to_s : name.to_sym]
+    reflection = super[name.to_sym]
 
     if name.to_s == "developer_key"
       reflection.instance_eval do
@@ -795,11 +786,7 @@ class ActiveRecord::Base
         @previously_new_record = true
       end
 
-      if Rails.version < "7.2"
-        block.call(nil)
-      else
-        self.class.with_connection(&block)
-      end
+      self.class.with_connection(&block)
     else
       update_columns(
         attributes_with_values(attribute_names_for_partial_updates)
@@ -2075,11 +2062,7 @@ module RestoreConnectionConnectionPool
     synchronize do
       adopt_connection(conn)
       # check if a new connection was checked out in the meantime, and check it back in
-      old_conn = if Rails.version < "7.2"
-                   @thread_cached_conns[connection_cache_key(current_thread)]
-                 else
-                   connection_lease.connection
-                 end
+      old_conn = connection_lease.connection
 
       if old_conn && old_conn != conn
         # this is just the necessary parts of #checkin
@@ -2092,11 +2075,7 @@ module RestoreConnectionConnectionPool
         end
       end
 
-      if Rails.version < "7.2"
-        @thread_cached_conns[connection_cache_key(current_thread)] = conn
-      else
-        connection_lease.connection = conn
-      end
+      connection_lease.connection = conn
     end
   end
 end

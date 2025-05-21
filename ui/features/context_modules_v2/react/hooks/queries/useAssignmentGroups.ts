@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useQuery} from '@canvas/query'
-import gql from 'graphql-tag'
+import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/query/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {useQuery, type QueryFunctionContext} from '@tanstack/react-query'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -81,7 +81,10 @@ const ASSIGNMENT_GROUPS_QUERY = gql`
 async function getAssignmentGroups({
   queryKey,
   pageParam,
-}: {queryKey: any; pageParam?: string}): Promise<AssignmentGroupsResponse> {
+}: {
+  queryKey: QueryFunctionContext['queryKey']
+  pageParam?: unknown
+}): Promise<AssignmentGroupsResponse> {
   const [_key, courseId] = queryKey
   const cursor = pageParam || null
   try {

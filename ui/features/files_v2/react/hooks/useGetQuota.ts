@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useQuery } from "@tanstack/react-query"
-import { generateFilesQuotaUrl } from "../../utils/apiUtils"
+import {useQuery} from '@tanstack/react-query'
+import {generateFilesQuotaUrl} from '../../utils/apiUtils'
 
 const fetchQuota = async (contextType: string, contextId: string) => {
   const response = await fetch(generateFilesQuotaUrl(contextType, contextId))
@@ -27,13 +27,15 @@ const fetchQuota = async (contextType: string, contextId: string) => {
   return response.json()
 }
 
+const queryFn = ({queryKey}: {queryKey: [string, string, string]}) => {
+  const [, contextType, contextId] = queryKey
+  return fetchQuota(contextType, contextId)
+}
+
 export const useGetQuota = (contextType: string, contextId: string) => {
   return useQuery({
-    queryKey: ['quota', {contextType, contextId}] as const,
-    queryFn: ({ queryKey }) => {
-      const [, { contextType, contextId }] = queryKey
-      return fetchQuota(contextType, contextId)
-    },
+    queryKey: ['quota', contextType, contextId],
+    queryFn,
     staleTime: 0,
   })
 }

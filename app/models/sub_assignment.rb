@@ -28,6 +28,7 @@ class SubAssignment < AbstractAssignment
   SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[unlock_at lock_at].freeze
   after_save :sync_with_parent, if: :should_sync_with_parent?
   after_commit :aggregate_checkpoint_assignments, if: :checkpoint_changes?
+  after_commit :sync_parent_has_sub_flag, if: :needs_parent_flag_sync?
 
   set_broadcast_policy do |p|
     p.dispatch :checkpoints_created
@@ -115,6 +116,15 @@ class SubAssignment < AbstractAssignment
 
   private
 
+  def sync_parent_has_sub_flag
+    return unless parent_assignment
+
+    has_sub_assignments = parent_assignment.sub_assignments.active.exists?
+    return if has_sub_assignments == parent_assignment.has_sub_assignments
+
+    parent_assignment.update!(has_sub_assignments:)
+  end
+
   def sync_with_parent
     # saved by discussion_topic happens during assignment importer, where update from sub assignment breaks the import of the asset
     # saved by transaction happens when we update the dates for both checkpoints at the same time (e.g. via learning object dates controller)
@@ -153,6 +163,14 @@ class SubAssignment < AbstractAssignment
 
   def governs_submittable?
     false
+  end
+
+  def needs_parent_flag_sync?
+    return true if destroyed? # hard‑delete
+    return true if previous_changes.key?("id") # freshly created
+
+    state_change = previous_changes["workflow_state"]
+    state_change&.include?("deleted") # soft‑delete or soft‑undelete
   end
 
   # visibility of sub_assignments is determined by the visibility of their parent assignment

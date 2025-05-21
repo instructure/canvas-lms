@@ -15,12 +15,26 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useMutation, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useMutation} from '@tanstack/react-query'
 
 export const useAddTagMembership = () => {
-  return useMutation<{ok: boolean}, Error, {groupId: number | string; userIds: number[]}>({
-    mutationFn: async ({groupId, userIds}) => {
+  return useMutation<
+    {ok: boolean},
+    Error,
+    {
+      groupId: number | string
+      userIds?: number[]
+      allInCourse?: boolean
+      userExceptions?: number[]
+    }
+  >({
+    mutationFn: async ({groupId, userIds, allInCourse, userExceptions}) => {
+      const body = allInCourse
+        ? {all_in_group_course: true, exclude_user_ids: userExceptions}
+        : {members: userIds}
+
       try {
         const result = await doFetchApi<{ok: boolean}>({
           path: `/api/v1/groups/${groupId}/memberships`,
@@ -29,8 +43,9 @@ export const useAddTagMembership = () => {
             Accept: 'application/json',
             'Content-Type': 'application/json',
           },
-          body: {members: userIds},
+          body,
         })
+
         if (!result.response.ok) {
           throw new Error(`Failed to add users membership: ${result.response.statusText}`)
         }

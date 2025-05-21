@@ -307,6 +307,18 @@ describe UsersController, type: :request do
     }]
   end
 
+  it "add file attachment location to returned message when file_association_access feature flag is enabled" do
+    @context = @course
+    attachment = attachment_model(context: @course, content_type: "application/pdf")
+    attachment.root_account.enable_feature!(:file_association_access)
+    discussion_topic_model(message: "<img src='/users/#{@user.id}/files/#{attachment.id}' />")
+
+    json = api_call(:get,
+                    "/api/v1/users/activity_stream.json",
+                    { controller: "users", action: "activity_stream", format: "json" })
+    expect(json.first["message"]).to include("location=#{StreamItem.last.asset_string}")
+  end
+
   it "does not return discussion entries if user has not posted" do
     @context = @course
     course_with_teacher(course: @context, active_all: true)

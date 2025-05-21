@@ -99,14 +99,14 @@ describe "better_file_browsing" do
         get "/courses/#{@course.id}/files"
       end
 
-      it "unpublishes and publish a file", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "unpublishes and publish a file", priority: "1", upgrade_files_v2: "done" do
         set_item_permissions(:unpublish, :cloud_icon)
         expect(f(".btn-link.published-status.unpublished")).to be_displayed
         set_item_permissions(:publish, :cloud_icon)
         expect(f(".btn-link.published-status.published")).to be_displayed
       end
 
-      it "makes file available to student with link", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "makes file available to student with link", priority: "1", upgrade_files_v2: "done" do
         set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
         expect(f(".btn-link.published-status.hiddenState")).to be_displayed
       end
@@ -125,7 +125,7 @@ describe "better_file_browsing" do
         expect(f("body")).not_to contain_css(".ef-item-row")
       end
 
-      it "unpublishes and publish a file", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "unpublishes and publish a file", priority: "1", upgrade_files_v2: "done" do
         get "/courses/#{@course.id}/files"
         set_item_permissions(:unpublish, :toolbar_menu)
         expect(f(".btn-link.published-status.unpublished")).to be_displayed
@@ -133,7 +133,7 @@ describe "better_file_browsing" do
         expect(f(".btn-link.published-status.published")).to be_displayed
       end
 
-      it "makes file available to student with link from toolbar", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "makes file available to student with link from toolbar", priority: "1", upgrade_files_v2: "done" do
         get "/courses/#{@course.id}/files"
         set_item_permissions(:restricted_access, :available_with_link, :toolbar_menu)
         expect(f(".btn-link.published-status.hiddenState")).to be_displayed
@@ -324,7 +324,7 @@ describe "better_file_browsing" do
       expect(f(".btn-link.published-status.published")).to be_displayed
     end
 
-    it "sets focus to the close button when opening the dialog", priority: "1", upgrade_files_v2: "waiting for deployment" do
+    it "sets focus to the close button when opening the dialog", priority: "1", upgrade_files_v2: "done" do
       f(".btn-link.published-status").click
       wait_for_ajaximations
       should_focus = f(".ui-dialog-titlebar-close")
@@ -503,7 +503,7 @@ describe "better_file_browsing" do
     end
 
     context "course files" do
-      it "sets usage rights on a file via the modal by clicking the indicator", priority: "1", upgrade_files_v2: "waiting for deployment (RCX-2535)" do
+      it "sets usage rights on a file via the modal by clicking the indicator", priority: "1", upgrade_files_v2: "done" do
         get "/courses/#{@course.id}/files"
         f(".UsageRightsIndicator__openModal").click
         set_usage_rights_in_modal
@@ -512,7 +512,7 @@ describe "better_file_browsing" do
         verify_usage_rights_ui_updates
       end
 
-      it "sets usage rights on a file via the cog menu", priority: "1", upgrade_files_v2: "waiting for deployment (RCX-2535)" do
+      it "sets usage rights on a file via the cog menu", priority: "1", upgrade_files_v2: "done" do
         get "/courses/#{@course.id}/files"
         f(".ef-links-col .al-trigger").click
         f(".ItemCog__OpenUsageRights a").click
@@ -522,7 +522,7 @@ describe "better_file_browsing" do
         verify_usage_rights_ui_updates
       end
 
-      it "sets usage rights on a file via the toolbar", priority: "1", upgrade_files_v2: "waiting for deployment (RCX-2535)" do
+      it "sets usage rights on a file via the toolbar", priority: "1", upgrade_files_v2: "done" do
         get "/courses/#{@course.id}/files"
         f(".ef-item-row").click
         f(".Toolbar__ManageUsageRights").click
@@ -532,7 +532,7 @@ describe "better_file_browsing" do
         verify_usage_rights_ui_updates
       end
 
-      it "sets usage rights on a file inside a folder via the toolbar", priority: "1", upgrade_files_v2: "waiting for deployment (RCX-2535)" do
+      it "sets usage rights on a file inside a folder via the toolbar", priority: "1", upgrade_files_v2: "done" do
         folder_model name: "new folder"
         get "/courses/#{@course.id}/files"
         move("a_file.txt", 0, :cog_icon)
@@ -548,7 +548,7 @@ describe "better_file_browsing" do
         verify_usage_rights_ui_updates
       end
 
-      it "does not show the creative commons selection if creative commons isn't selected", priority: "1", upgrade_files_v2: "waiting for deployment (RCX-2535)" do
+      it "does not show the creative commons selection if creative commons isn't selected", priority: "1", upgrade_files_v2: "done" do
         get "/courses/#{@course.id}/files"
         f(".UsageRightsIndicator__openModal").click
         set_value f(".UsageRightsSelectBox__select"), "fair_use"

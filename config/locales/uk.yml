@@ -2002,6 +2002,7 @@ uk:
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Дозволити студентам бачити, хто підписався на часові інтервали."
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Дозволити можливість відправки повідомлень через нашу чергу відправки"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Дозволити засобу доспуп до системи забезпечення імен і ролей IMS"
+  allow_threaded_replies_43b2311e: "Дозволити зв'язані відповіді"
   allow_users_to_comment_45b8f753: "Дозволити користувачам коментувати"
   allowed_attempts_4e229caa: "Дозволені спроби"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Дозволяє створення оголошень для конкретного розділу"
@@ -5104,6 +5105,11 @@ uk:
     many: "%{count} файлів оновлено"
     one: "1 файл оновлено"
     other: "%{count} файлів оновлено"
+  count_groups_90e215b1: 
+    few: "%{count}групи"
+    many: "%{count}груп"
+    one: "1 група"
+    other: "%{count}груп"
   count_hours_1bd03883: 
     few: "%{count} годин"
     many: "%{count} годин"
@@ -5180,6 +5186,11 @@ uk:
     many: "%{count} результатів показано"
     one: "один результат показано"
     other: "%{count} результатів показано"
+  count_sections_bf1baf0a: 
+    few: "%{count}розділи"
+    many: "%{count}розділів"
+    one: "1 розділ"
+    other: "%{count}розділів"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "1 налаштування періоду оцінювання знайдено."
     other: "%{count} налаштувань періодів оцінювання знайдено."
@@ -7122,6 +7133,7 @@ uk:
   ending_date_e1ea13a4: "Дата завершення"
   ends_4fcb632: "Закінчення:"
   ends_at_9a62b528: "Закінчується в:"
+  ends_e3a6843f: Кінці
   enhanced_individual_gradebook: 
     avg_score: "Середній бал"
     high_score: "Висока оцінка"
@@ -12848,6 +12860,7 @@ uk:
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Будь ласка, введіть кінцеву дату або після того, як %{earliestDate} "
   please_enter_a_name_for_this_link_318f01a4: "Будь ласка, введіть назву для цього посилання."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Будь ласка. введіть пошукові терміни з трьома і більше символами"
+  please_enter_a_valid_format_for_a_date_66ed0587: "Це не дата!"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Будь ласка, введіть правильний URL. Протокол потрібен (e.g. http://, https://, ftp://, tel:, mailto:)."
   please_enter_the_details_for_the_new_course_dc705b8c: "Будь ласка, введіть деталі для нового курсу."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Будь ласка, введіть код підтвердження, показаний вашим токеном."
@@ -16902,6 +16915,7 @@ uk:
   started_5e138638: Початок
   starts_at_29843f98: "Починається о"
   starts_ce584f1c: "Починається:"
+  starts_fa6bf3f5: Починається
   state_standards_c9b1affd: "Державні Стандарти"
   statistics: 
     csv_columns: 
@@ -18246,6 +18260,7 @@ uk:
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Використовуйте цей список для видалення призначених студентів. Додайте нових студентів з вікна під списком."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Використовуйте цю панель для вирішення проблеми дублювання результатів або людей, не знайдені у вашому пошуку."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Використовуйте цю панель, щоб шукати людей, яких ви хочете додати до цього курсу."
+  use_this_rubric_for_assignment_grading_a02fd079: "Використовуйте цю рубрику для оцінювання завдання"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Використати саме цю оцінку для цього  повторного завдання"
   used_by_permission_314a78dd: "Використовується дозволом"
   user: 
@@ -18675,6 +18690,7 @@ uk:
       welcome_to_happiness: "Ласкаво просимо до Canvas!"
   users_d1b60cb0: Користувачі
   users_matching_search_term_c604db9e: "Відповідність користувачів \"%{search_term}\""
+  users_must_post_before_seeing_replies_d1761968: "Користувачі повинні опублікувати, перш ніж побачать відповіді"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Користувачам електронних книжок, можливо, доведеться вимкнути віртуальний курсор для використання цих комбінацій клавіш"
   users_with_no_enrollments_5dddce33: "Користувачі без реєстрацій"
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Використовує новий планувальник та його функціональність"

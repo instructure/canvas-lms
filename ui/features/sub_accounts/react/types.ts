@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Account} from 'api'
+import type {Account} from 'api'
 
-export type AccountWithCounts = Account & {sub_account_count: number; course_count: number}
+export interface AccountWithCounts extends Account {
+  sub_account_count: number
+  course_count: number
+}

@@ -47,7 +47,8 @@ module Types
                 request: context[:request],
                 preloaded_attachments:,
                 user: current_user,
-                options: { rewrite_api_urls: rewrite_urls }
+                options: { rewrite_api_urls: rewrite_urls, domain_root_account: context[:domain_root_account] },
+                location: object.asset_string
               )
             end
           end

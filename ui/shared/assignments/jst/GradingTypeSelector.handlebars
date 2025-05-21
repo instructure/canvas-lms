@@ -11,7 +11,7 @@
   {{else}}
     <select id="assignment_grading_type"
       name="{{#if nested}}assignment[grading_type]{{else}}grading_type{{/if}}"
-      aria-controls="graded_assignment_fields view-grading-levels">
+      aria-controls="graded_assignment_fields{{#unless grading_scheme_updates}} view-grading-levels{{/unless}}">
 
         <option value="percent" {{selectedIf gradingType "percent"}}>
           {{gradingTypeMap.percent}}

@@ -57,9 +57,9 @@ export default {
   },
 
   updatePublishClassElements() {
-    return this.props.togglePublishClassOn.classList[this.state.published ? 'add' : 'remove'](
-      'ig-published',
-    )
+    const el = this.props.togglePublishClassOn
+    if (!el || !el.classList) return
+    return el.classList[this.state.published ? 'add' : 'remove']('ig-published')
   },
 
   getRestrictedText() {

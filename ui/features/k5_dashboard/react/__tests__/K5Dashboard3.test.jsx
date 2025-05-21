@@ -205,11 +205,22 @@ describe('K-5 Dashboard with dashboard_graphql_integration on', () => {
     })
     it('shows loading skeletons for course cards while they load', () => {
       queryClient.clear()
-      // Hack to prevent the useQuery hook from returning data
-      jest
-        .spyOn(ReactQuery, 'useQuery')
-        .mockImplementation(jest.fn().mockReturnValue({isLoading: true}))
-      const {container} = render(<K5Dashboard {...defaultProps} />)
+      // Create a new query client with default options to simulate loading state
+      const loadingQueryClient = new ReactQuery.QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+            // Force loading state
+            enabled: false,
+          },
+        },
+      })
+
+      const {container} = testingLibraryRender(
+        <ReactQuery.QueryClientProvider client={loadingQueryClient}>
+          <K5Dashboard {...defaultProps} />
+        </ReactQuery.QueryClientProvider>,
+      )
       expect(container.querySelector('[data-testid="skeleton-wrapper"]')).toBeInTheDocument()
     })
     it('only fetches announcements based on cards once per page load', async () => {

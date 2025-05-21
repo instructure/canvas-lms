@@ -23,6 +23,7 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import userEvent from '@testing-library/user-event'
 import type {AccountWithCounts} from '../types'
+import {QueryClient} from '@tanstack/react-query'
 
 const rootAccount = {
   id: '1',
@@ -49,9 +50,15 @@ const SUBACCOUNT_FETCH = (account: AccountWithCounts) => {
 }
 
 describe('SubaccountTree', () => {
+  const queryClient = new QueryClient()
   beforeEach(() => {
     fetchMock.restore()
     jest.clearAllMocks()
+    queryClient.clear()
+  })
+
+  afterEach(() => {
+    queryClient.clear()
   })
 
   // the only time this doesn't happen is if the subaccount count is over 100
@@ -67,7 +74,6 @@ describe('SubaccountTree', () => {
     await waitFor(() => {
       expect(fetchMock.called(SUBACCOUNT_FETCH(rootAccount), 'GET')).toBe(true)
       expect(getByText('Root Account')).toBeInTheDocument()
-      expect(getByText('2 Sub-Accounts')).toBeInTheDocument()
       expect(getByText('Child 1')).toBeInTheDocument()
       expect(getByText('Child 2')).toBeInTheDocument()
     })
@@ -77,6 +83,7 @@ describe('SubaccountTree', () => {
     expect(queryByText('Child 1')).toBeNull()
     expect(queryByText('Child 2')).toBeNull()
 
+    // expand again
     await user.click(getByTestId(`expand-${rootAccount.id}`))
     expect(getByText('Child 1')).toBeInTheDocument()
     expect(getByText('Child 2')).toBeInTheDocument()

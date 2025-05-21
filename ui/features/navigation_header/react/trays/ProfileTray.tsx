@@ -28,11 +28,13 @@ import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import LogoutButton from '../LogoutButton'
 import HighContrastModeToggle from './HighContrastModeToggle'
+import DyslexicFontToggle from './UseDyslexicFontToggle'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
-import {useQuery} from '@canvas/query'
 import profileQuery from '../queries/profileQuery'
 import {getUnreadCount} from '../queries/unreadCountQuery'
 import type {ProfileTab, TabCountsObj} from '../../../../api.d'
+import {useQuery} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
 
 const I18n = createI18nScope('ProfileTray')
 
@@ -78,9 +80,7 @@ export default function ProfileTray() {
   } = useQuery<ProfileTab[], Error>({
     queryKey: ['profile'],
     queryFn: profileQuery,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    persister: sessionStoragePersister,
   })
 
   const countsEnabled = Boolean(
@@ -92,9 +92,7 @@ export default function ProfileTray() {
     queryFn: getUnreadCount,
     staleTime: 60 * 60 * 1000, // 1 hour
     enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    persister: sessionStoragePersister,
   })
 
   const counts: TabCountsObj = {
@@ -149,6 +147,7 @@ export default function ProfileTray() {
       </List>
       <hr role="presentation" />
       <HighContrastModeToggle />
+      {'use_dyslexic_font' in window.ENV && <DyslexicFontToggle />}
     </View>
   )
 }

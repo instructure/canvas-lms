@@ -19,7 +19,7 @@
 import React, {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import outcomeGrid from '@canvas/outcome-gradebook-grid'
-import {useQuery as useCanvasQuery} from '@canvas/query'
+import {useQuery as useCanvasQuery} from '@tanstack/react-query'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 import {useSearchParams} from 'react-router-dom'

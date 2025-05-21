@@ -75,9 +75,9 @@ module Api::V1::CalendarEvent
     hash["type"] = "event"
     if event.context_type == "CourseSection"
       hash["title"] += " (#{context.name})" unless hash["title"].end_with?(" (#{context.name})")
-      hash["description"] = api_user_content(event.description, event.context.course, location: event) unless excludes.include?("description")
+      hash["description"] = api_user_content(event.description, event.context.course, location: event.asset_string) unless excludes.include?("description")
     else
-      hash["description"] = api_user_content(event.description, context, location: event) unless excludes.include?("description")
+      hash["description"] = api_user_content(event.description, context, location: event.asset_string) unless excludes.include?("description")
     end
 
     appointment_group = options[:appointment_group]
@@ -211,7 +211,7 @@ module Api::V1::CalendarEvent
     target_fields = %w[created_at updated_at title all_day all_day_date workflow_state submission_types]
     target_fields << "description" unless excludes.include?("description")
     hash = api_json(assignment, user, session, only: target_fields)
-    hash["description"] = api_user_content(hash["description"], assignment.context) unless excludes.include?("description")
+    hash["description"] = api_user_content(hash["description"], assignment.context, location: assignment.asset_string) unless excludes.include?("description")
 
     hash["id"] = "assignment_#{assignment.id}"
     hash["type"] = "assignment"
@@ -250,7 +250,7 @@ module Api::V1::CalendarEvent
     hash = api_json(sub_assignment, user, session, only: target_fields)
 
     hash["title"] = sub_assignment.title_with_required_replies
-    hash["description"] = api_user_content(hash["description"], sub_assignment.context) unless excludes.include?("description")
+    hash["description"] = api_user_content(hash["description"], sub_assignment.context, location: sub_assignment.asset_string) unless excludes.include?("description")
     hash["id"] = "sub_assignment_#{sub_assignment.id}"
     hash["type"] = "sub_assignment"
 

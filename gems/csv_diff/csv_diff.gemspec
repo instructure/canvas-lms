@@ -12,5 +12,6 @@ Gem::Specification.new do |spec|
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w[test.sh]
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "csv"
   spec.add_dependency "sqlite3"
 end

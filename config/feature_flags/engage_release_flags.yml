@@ -12,9 +12,9 @@ assignment_edit_enhancements_teacher_view:
 assign_to_differentiation_tags:
   state: hidden
   applies_to: Account
-  shadow: true
-  display_name: Assign to Differentiation Tags
-  description: Allows instructors to assign course content to differentiation tags via Account/Sub-account setting.
+  beta: true
+  display_name: Differentiation Tags
+  description: Let instructors tag enrolled users and assign course content based on those tags, supporting more personalized learning experiences.
   environments:
     ci:
       state: allowed_on
@@ -30,16 +30,19 @@ people_page_modernization:
   applies_to: Account
   display_name: People Page Modernization
   description: People page modernization
-discussions_speedgrader_revisit:
-  state: hidden
-  applies_to: Account
-  display_name: Discussions SpeedGrader Revisit
-  description: Contains improvements to Discussions in Speedgrader. i.e. Toggling, Traversal, Overall experience. Requires react_discussions_post and discussion_checkpoints feature flags to completely work.
-  environments:
-    development:
-      state: allowed_on
 deprecate_context_groups_old_view:
   state: hidden
   applies_to: SiteAdmin
   display_name: Deprecate Legacy View of Context Groups
   description: Removes dead code from the context groups view that is no longer used.
+checkpoints_group_discussions:
+  state: hidden
+  applies_to: Account
+  shadow: true
+  display_name: Checkpoints Group Discussions
+  description: Allows instructors to create group discussions with checkpoints.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

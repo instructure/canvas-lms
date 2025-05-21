@@ -43,8 +43,7 @@ import {
 } from '@instructure/ui-icons'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useQuery} from '@canvas/query'
-import {useMutation, useQueryClient} from '@tanstack/react-query'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import type {ExternalTool} from './utils'
 import {
@@ -56,6 +55,8 @@ import {
 } from './utils'
 import {getSettingAsync, setSetting} from '@canvas/settings-query/react/settingsQuery'
 import {SVGIcon} from '@instructure/ui-svg-images'
+import {sessionStoragePersister} from '@canvas/query'
+import {useBroadcastQuery} from '@canvas/query/broadcast'
 
 const I18n = createI18nScope('sidenav')
 
@@ -165,9 +166,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     queryKey: ['settings', 'release_notes_badge_disabled'],
     queryFn: getSettingAsync,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    meta: {
-      fetchAtLeastOnce: true,
-    },
+    persister: sessionStoragePersister,
   })
 
   const {data: unreadContentSharesCount} = useQuery({
@@ -176,6 +175,11 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     staleTime: 60 * 60 * 1000, // 1 hour
     enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
     refetchOnWindowFocus: true,
+    persister: sessionStoragePersister,
+  })
+
+  useBroadcastQuery({
+    queryKey: ['unread_count', 'content_shares'],
   })
 
   const {data: unreadConversationsCount} = useQuery({
@@ -183,16 +187,20 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
-    meta: {
-      broadcast: true,
-    },
+    persister: sessionStoragePersister,
     refetchOnWindowFocus: true,
+  })
+
+  useBroadcastQuery({
+    queryKey: ['unread_count', 'conversations'],
   })
 
   const {data: unreadReleaseNotesCount} = useQuery({
     queryKey: ['unread_count', 'release_notes'],
     queryFn: getUnreadCount,
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes && !releaseNotesBadgeDisabled,
+    persister: sessionStoragePersister,
   })
 
   useLayoutEffect(() => {

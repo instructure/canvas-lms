@@ -89,7 +89,7 @@ describe "Outcome Reports" do
     @a = @rubric.associate_with(@assignment, @course1, purpose: "grading")
     @assignment.reload
     @assignment.sub_assignments.create!(title: "sub assignment", context: @assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
-    @submission = @assignment.grade_student(@user1, grade: "10", grader: @teacher).first
+    @submission = @assignment.grade_student(@user1, grade: "10", grader: @teacher, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC).first
     @submission.submission_type = "online_url"
     @submission.submitted_at = 1.week.ago
     @submission.save!

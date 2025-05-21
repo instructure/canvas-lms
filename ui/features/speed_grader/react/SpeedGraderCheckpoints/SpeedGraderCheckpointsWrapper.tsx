@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
-import {QueryProvider} from '@canvas/query'
 import AlertManager from '@canvas/alerts/react/AlertManager'
 import {SpeedGraderCheckpointsContainer} from './SpeedGraderCheckpointsContainer'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 type SpeedGrader = {
-  setOrUpdateSubmission: (submission: any) => any,
-  updateSelectMenuStatus: (student: any) => any,
+  setOrUpdateSubmission: (submission: any) => any
+  updateSelectMenuStatus: (student: any) => any
 }
 
 type Props = {
@@ -38,7 +39,7 @@ export const SpeedGraderCheckpointsWrapper = ({EG, courseId, assignmentId, stude
   const lateSubmissionInterval = ENV?.late_policy?.late_submission_interval || 'day'
 
   return (
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       {/* @ts-expect-error */}
       <AlertManager>
         <SpeedGraderCheckpointsContainer
@@ -51,6 +52,6 @@ export const SpeedGraderCheckpointsWrapper = ({EG, courseId, assignmentId, stude
           lateSubmissionInterval={lateSubmissionInterval}
         />
       </AlertManager>
-    </QueryProvider>
+    </QueryClientProvider>
   )
 }

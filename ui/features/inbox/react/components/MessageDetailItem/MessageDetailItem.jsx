@@ -55,6 +55,7 @@ export const MessageDetailItem = ({...props}) => {
   const elementId = mediaComment?._id
     ? `media-player-${props.conversationMessage?._id}-${mediaComment._id}`
     : ''
+
   return (
     <Responsive
       match="media"

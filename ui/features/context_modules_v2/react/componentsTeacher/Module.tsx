@@ -22,12 +22,11 @@ import {Flex} from '@instructure/ui-flex'
 import ModuleHeader from '../componentsTeacher/ModuleHeader'
 import ModuleItemList from '../componentsTeacher/ModuleItemList'
 import {useModuleItems} from '../hooks/queries/useModuleItems'
-import {ModuleItem, Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
+import {Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
 
 export interface ModuleProps {
   id: string
   name: string
-  handleOpeningModuleUpdateTray?: (moduleId?: string, moduleName?: string) => void
   published?: boolean
   prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
@@ -44,7 +43,6 @@ export interface ModuleProps {
 const Module: React.FC<ModuleProps> = ({
   id,
   name,
-  handleOpeningModuleUpdateTray,
   published = false,
   prerequisites,
   completionRequirements,
@@ -59,7 +57,6 @@ const Module: React.FC<ModuleProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
   const {data, isLoading, error} = useModuleItems(id, !!isExpanded)
-  const [moduleItems, setModuleItems] = useState<ModuleItem[]>([])
 
   const toggleExpanded = () => {
     const newExpandedState = !isExpanded
@@ -74,12 +71,6 @@ const Module: React.FC<ModuleProps> = ({
       setIsExpanded(propExpanded)
     }
   }, [propExpanded])
-
-  useEffect(() => {
-    if (data?.moduleItems) {
-      setModuleItems(data.moduleItems)
-    }
-  }, [data])
 
   return (
     <View
@@ -108,8 +99,7 @@ const Module: React.FC<ModuleProps> = ({
             completionRequirements={completionRequirements}
             requirementCount={requirementCount || 0}
             dragHandleProps={dragHandleProps}
-            handleOpeningModuleUpdateTray={handleOpeningModuleUpdateTray}
-            itemCount={moduleItems?.length || 0}
+            itemCount={data?.moduleItems?.length || 0}
             setModuleAction={setModuleAction}
             setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
             setSourceModule={setSourceModule}
@@ -120,7 +110,7 @@ const Module: React.FC<ModuleProps> = ({
             <ModuleItemList
               moduleId={id}
               moduleTitle={name}
-              moduleItems={moduleItems}
+              moduleItems={data?.moduleItems || []}
               completionRequirements={completionRequirements}
               isLoading={isLoading}
               error={error}

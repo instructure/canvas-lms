@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
+import {QueryFunctionContext, useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {useQuery as useApolloQuery} from '@apollo/client'
 import {EntryCountResponse, GET_ENTRY_COUNT} from '../../graphql/Queries'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -88,6 +88,18 @@ const fetchInsightEntries = async (
   return data
 }
 
+const insightQueryFn = ({queryKey}: QueryFunctionContext<[string, string, string, string]>) => {
+  const [, context, contextId, discussionId] = queryKey
+  return fetchInsight(context, contextId, discussionId)
+}
+
+const insightEntriesQueryFn = ({
+  queryKey,
+}: QueryFunctionContext<[string, string, string, string]>) => {
+  const [, context, contextId, discussionId] = queryKey
+  return fetchInsightEntries(context, contextId, discussionId)
+}
+
 export const useInsight = (context: string, contextId: string, discussionId: string) => {
   const queryClient = useQueryClient()
   const [shouldRefetch, setShouldRefetch] = useState(false)
@@ -99,7 +111,7 @@ export const useInsight = (context: string, contextId: string, discussionId: str
     refetch,
   } = useQuery({
     queryKey: ['insight', context, contextId, discussionId],
-    queryFn: () => fetchInsight(context, contextId, discussionId),
+    queryFn: insightQueryFn,
     refetchInterval: shouldRefetch ? 5000 : false,
     enabled: true,
   })
@@ -111,13 +123,13 @@ export const useInsight = (context: string, contextId: string, discussionId: str
     isFetching,
   } = useQuery({
     queryKey: ['insightEntries', context, contextId, discussionId],
-    queryFn: () => fetchInsightEntries(context, contextId, discussionId),
+    queryFn: insightEntriesQueryFn,
     enabled: insightData?.workflow_state === 'completed',
   })
 
   const {
     isError: generateError,
-    isLoading: mutationLoading,
+    isPending: mutationLoading,
     mutateAsync,
   } = useMutation({
     mutationKey: ['generate-insight', context, contextId, discussionId],
@@ -143,7 +155,9 @@ export const useInsight = (context: string, contextId: string, discussionId: str
 
   const handleGenerateInsight = async () => {
     await mutateAsync()
-    queryClient.invalidateQueries(['insight', context, contextId, discussionId])
+    queryClient.invalidateQueries({
+      queryKey: ['insight', context, contextId, discussionId],
+    })
     setShouldRefetch(true)
   }
 

@@ -21,7 +21,8 @@ import {useOutletContext} from 'react-router-dom'
 import {ToolDetailsOutletContext} from '../ToolDetails'
 import {Button} from '@instructure/ui-buttons'
 import {useApiResult} from '../../../../common/lib/apiResult/useApiResult'
-import {createDeployment, deleteDeployment, fetchDeployments} from '../../../api/deployments'
+import {createDeployment, deleteDeployment} from '../../../api/deployments'
+import {fetchControlsByDeployment} from '../../../api/contextControls'
 import {confirm} from '@canvas/instui-bindings/react/Confirm'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -34,9 +35,8 @@ export const ToolAccess = () => {
   const deployments = useApiResult(
     React.useCallback(
       () =>
-        fetchDeployments({
+        fetchControlsByDeployment({
           registrationId: registration.id,
-          accountId: registration.account_id,
         }),
       [registration],
     ),
@@ -59,7 +59,7 @@ export const ToolAccess = () => {
                 {data &&
                   data.map(dep => (
                     <li key={dep.id}>
-                      {dep.context_name} - {dep.deployment_id}{' '}
+                      {dep.context_name} - {dep.deployment_id}
                       <Button
                         onClick={() => {
                           confirm({
@@ -94,6 +94,14 @@ export const ToolAccess = () => {
                       >
                         Delete
                       </Button>
+                      <ul>
+                        {dep.context_controls.map(control => (
+                          <li key={control.id}>
+                            {control.available ? 'Available' : 'Unavailable'} in{' '}
+                            {control.context_name}
+                          </li>
+                        ))}
+                      </ul>
                     </li>
                   ))}
               </ul>

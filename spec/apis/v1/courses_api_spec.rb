@@ -31,7 +31,7 @@ class TestCourseApi
     "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"
   end
 
-  def api_user_content(syllabus, course)
+  def api_user_content(syllabus, course, location: nil)
     "api_user_content(#{syllabus}, #{course.id})"
   end
 end

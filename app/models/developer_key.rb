@@ -420,11 +420,18 @@ class DeveloperKey < ActiveRecord::Base
   def tokens_expire_in
     return nil unless mobile_app? || public_client?
 
-    # By default, public clients have a two-hour rolling refresh window
-    return Setting.get("public_client_token_ttl", "120").to_f.minutes if public_client?
+    # By default, non-mobile public clients have a two-hour rolling refresh window
+    return Setting.get("public_client_token_ttl", "120").to_f.minutes if public_client? && !mobile_app?
 
+    # Public client mobile apps expiration is configurable by the sessions plugin
+    # and falls back to a globally-configurable default, so these tokens always expire
     sessions_settings = Canvas::Plugin.find("sessions").settings || {}
-    sessions_settings[:mobile_timeout]&.to_f&.minutes
+    configured_timeout = sessions_settings[:mobile_timeout]&.to_f&.minutes
+    return configured_timeout || Setting.get("mobile_public_client_token_ttl_days", "90").to_f.days if public_client?
+
+    # Confidential client mobile apps expiration is configurable by the sessions plugin
+    # and might be nil (meaning no expiration)
+    configured_timeout
   end
 
   # In an OAuth context, setting this field to true means that access tokens

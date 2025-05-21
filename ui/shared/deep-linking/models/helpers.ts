@@ -17,16 +17,14 @@
  */
 
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+import {IframeDimensions} from '@canvas/lti/model/common'
 
-export type ContentItemIframeDimensions = {
-  width?: string | number
-  height?: string | number
-}
+export type ContentItemIframeDimensions = IframeDimensions
 
 export type ContentItemIframe = {
   src: string
-  width?: string | number
-  height?: string | number
+  width?: number
+  height?: number
 }
 export type ContentItemThumbnail =
   | string

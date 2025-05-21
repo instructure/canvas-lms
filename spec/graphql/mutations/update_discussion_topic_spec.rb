@@ -1221,6 +1221,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     end
 
     it "returns an error when attempting add a group category to a discussion with checkpoints" do
+      @course.account.disable_feature!(:checkpoints_group_discussions)
       group_category = @course.group_categories.create!(name: "My Group Category")
       # even though @graded_topic has checkpoints, we still need to pass in the actual checkpoints so they are not cleared out
       result = run_mutation(id: @graded_topic.id, group_category_id: group_category.id, assignment: { forCheckpoints: true, groupCategoryId: group_category.id }, checkpoints: [
@@ -1232,6 +1233,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     end
 
     it "returns an error when attempting to add checkpoints to a graded group discussion" do
+      @course.account.disable_feature!(:checkpoints_group_discussions)
       group_category = @course.group_categories.create!(name: "My Group Category")
       topic = group_discussion_assignment
 
@@ -1243,7 +1245,25 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect_error(result, "Group discussions cannot have checkpoints.")
     end
 
-    it "returns an error when attempting to add checkpoins to a graded discussion with student submissions" do
+    it "group discussions can still become checkpointed if checkpoints_group_discussions feature is enabled" do
+      group_category = @course.group_categories.create!(name: "My Group Category")
+      topic = group_discussion_assignment
+
+      result = run_mutation(id: topic.id, group_category_id: group_category.id, assignment: { forCheckpoints: true, groupCategoryId: group_category.id }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+
+      expect(result["errors"]).to be_nil
+
+      assignment = Assignment.last
+      expect(assignment.has_sub_assignments?).to be true
+      topic.reload
+      expect(topic.reply_to_entry_required_count).to eq 5
+      expect(topic.sub_assignments.count).to eq 2
+    end
+
+    it "returns an error when attempting to add checkpoints to a graded discussion with student submissions" do
       discussion_assignment = @course.assignments.create!(
         title: "Topic 1",
         submission_types: "discussion_topic"

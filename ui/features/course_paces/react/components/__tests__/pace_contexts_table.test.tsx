@@ -19,60 +19,58 @@
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 
-import PaceContextTable, { PaceContextsTableProps } from '../pace_contexts_table'
-import { paceContextsActions } from '../../actions/pace_contexts'
-import { Course } from '../../shared/types'
-import { PaceContext } from '../../types'
+import PaceContextTable, {PaceContextsTableProps} from '../pace_contexts_table'
+import {paceContextsActions} from '../../actions/pace_contexts'
+import {Course} from '../../shared/types'
+import {PaceContext} from '../../types'
 
 const context1: PaceContext = {
-  name: "context1",
-  type: "section",
-  item_id: "1",
+  name: 'context1',
+  type: 'section',
+  item_id: '1',
   associated_section_count: 1,
   associated_student_count: 2,
   applied_pace: null,
-  on_pace: null
+  on_pace: null,
 }
 
 const context2: PaceContext = {
-  name: "context2",
-  type: "section",
-  item_id: "2",
+  name: 'context2',
+  type: 'section',
+  item_id: '2',
   associated_section_count: 1,
   associated_student_count: 1,
   applied_pace: null,
-  on_pace: null
+  on_pace: null,
 }
 
 const course: Course = {
-  id: "1",
-  name: "CourseName",
-  start_at: "01-01-2020",
-  end_at: "10-10-2020",
-  created_at: "01-01-2020"
+  id: '1',
+  name: 'CourseName',
+  start_at: '01-01-2020',
+  end_at: '10-10-2020',
+  created_at: '01-01-2020',
 }
 
 const defaultProps: PaceContextsTableProps = {
   paceContexts: [context1, context2],
-  contextType: "section",
+  contextType: 'section',
   pageCount: 1,
   currentPage: 1,
   currentSortBy: null,
-  currentOrderType: "asc",
+  currentOrderType: 'asc',
   isLoading: false,
-  responsiveSize: "small",
+  responsiveSize: 'small',
   setPage: (page: number) => {},
   setOrderType: paceContextsActions.setOrderType,
   handleContextSelect: () => {},
   contextsPublishing: [],
   course: course,
-  getLastCourseReport: jest.fn(),
   showCourseReport: jest.fn(),
-  createCourseReport: jest.fn()
+  createCourseReport: jest.fn(),
 }
 
 beforeEach(() => {
-  defaultProps.getLastCourseReport = jest.fn()
   defaultProps.showCourseReport = jest.fn()
   defaultProps.createCourseReport = jest.fn()
 })
@@ -90,11 +88,6 @@ describe('PaceContextTable', () => {
   describe('when download document feature is enabled', () => {
     beforeEach(() => {
       ENV.FEATURES.course_pace_download_document = true
-    })
-    it('fetches the last requested docx report', () => {
-      render(<PaceContextTable {...defaultProps} />)
-
-      expect(defaultProps.getLastCourseReport).toHaveBeenCalledWith(course.id, 'course_pace_docx')
     })
 
     it('shows selectable contexts', () => {
@@ -130,8 +123,9 @@ describe('PaceContextTable', () => {
           report_type: 'course_pace_docx',
           parameters: {
             enrollment_ids: [],
-            section_ids: [context1.item_id, context2.item_id]
-          }
+            section_ids: [context1.item_id, context2.item_id],
+          },
+          progress: 0,
         })
       })
     })

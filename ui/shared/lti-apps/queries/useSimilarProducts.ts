@@ -17,31 +17,35 @@
  */
 
 import {fetchProducts} from './productsQuery'
-import type {UseQueryOptions} from '@tanstack/react-query'
 import type {Product} from '../models/Product'
 import type {DiscoverParams} from '../hooks/useDiscoverQueryParams'
-import type {ProductResponse} from './productsQuery'
 import {useQuery} from '@tanstack/react-query'
+import {useCallback} from 'react'
+
+const fetchSimilarProductsByCompany = (params: Partial<DiscoverParams>) => {
+  return fetchProducts({
+    ...params,
+    search: params.search ?? '',
+  } as DiscoverParams)
+}
 
 export type UseSimilarProductsProps = {
   params: Partial<DiscoverParams>
-  product: Product
-  queryOptions?: Partial<UseQueryOptions>
+  product?: Product | null
 }
 
-const useSimilarProducts = ({params, product, queryOptions = {}}: UseSimilarProductsProps) => {
-  const {data: otherProductsByCompany} = useQuery({
-    enabled: !!params?.filters?.companies[0].id,
+const useSimilarProducts = ({params, product}: UseSimilarProductsProps) => {
+  const queryFn = useCallback(() => {
+    return fetchSimilarProductsByCompany(params)
+  }, [params])
+
+  const {data} = useQuery({
+    enabled: !!params?.filters?.companies?.[0]?.id,
     queryKey: ['lti_similar_products_by_company', product?.company],
-    queryFn: () =>
-      fetchProducts({
-        ...params,
-        search: params.search ?? '',
-      } as DiscoverParams),
-    ...queryOptions,
+    queryFn,
   })
 
-  return {otherProductsByCompany: otherProductsByCompany as ProductResponse}
+  return {otherProductsByCompany: data}
 }
 
 export default useSimilarProducts

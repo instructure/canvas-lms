@@ -24,7 +24,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {uniqBy} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {type AssigneeOption} from '../../react/Item/types'
-import {useQuery} from '@canvas/query'
+import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('differentiated_modules')
 
@@ -82,7 +82,7 @@ const useFetchAssignees = ({
   const baseDefaultOptions = useMemo(() => {
     const defaultOptions = everyoneOption ? [everyoneOption] : []
     if (courseSettingsIsSuccess) {
-      const courseSettings = fetchedCourseSettings?.json as {conditional_release: boolean}
+      const courseSettings = fetchedCourseSettings
       if (courseSettings?.conditional_release) {
         defaultOptions.push({id: 'mastery_paths', value: I18n.t('Mastery Paths')})
       }

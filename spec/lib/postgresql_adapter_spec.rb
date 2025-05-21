@@ -57,11 +57,7 @@ describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
     # so we need to flatten
     config[:host] = (["nonexistent"] + [config[:host]]).flatten
     db_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(db_config.env_name, db_config.name, config)
-    conn = if $canvas_rails == "7.2"
-             db_config.new_connection
-           else
-             ActiveRecord::Base.public_send(db_config.adapter_method, db_config.configuration_hash)
-           end
+    conn = db_config.new_connection
     conn.execute("SELECT 1")
   ensure
     conn&.disconnect!

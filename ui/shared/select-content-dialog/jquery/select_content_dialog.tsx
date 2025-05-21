@@ -48,6 +48,7 @@ import type {EnvContextModules} from '@canvas/global/env/EnvContextModules'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import replaceTags from '@canvas/util/replaceTags'
 import {EXTERNAL_CONTENT_READY, EXTERNAL_CONTENT_CANCEL} from '@canvas/external-tools/messages'
+import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
@@ -70,12 +71,17 @@ type LtiLaunchPlacement = {
   selection_width: number
   selection_height: number
   icon_url?: string
+  tool_name_for_default_icon?: string
 }
 
 /**
  * A subset of all the placement types, the ones used
  */
-type SelectContentPlacementType = 'resource_selection' | 'assignment_selection' | 'link_selection' | 'ActivityAssetProcessor'
+type SelectContentPlacementType =
+  | 'resource_selection'
+  | 'assignment_selection'
+  | 'link_selection'
+  | 'ActivityAssetProcessor'
 
 export type LtiLaunchDefinition = {
   definition_type: 'ContextExternalTool' | 'Lti::MessageHandler'
@@ -331,7 +337,7 @@ export const Events = {
         (tool.placements.assignment_selection && 'assignment_selection') ||
         (tool.placements.link_selection && 'link_selection')
       if (!placement_type) {
-        return;
+        return
       }
       const placement = tool.placements[placement_type]!
       const width = placement.selection_width
@@ -413,12 +419,14 @@ export const Events = {
         $('body').append($dialog.hide())
         $dialog.on('dialogbeforeclose', dialogCancelHandler)
         const ltiPostMessageHandlerForTool = ltiPostMessageHandler(tool)
+        let removeCloseListener = () => {}
         $dialog
           .dialog({
             autoOpen: false,
             width: 'auto',
             resizable: true,
             close() {
+              removeCloseListener()
               window.removeEventListener('message', ltiPostMessageHandlerForTool)
               $(window).off('beforeunload', beforeUnloadHandler)
               $dialog
@@ -426,6 +434,9 @@ export const Events = {
                 .attr('src', '/images/ajax-loader-medium-444.gif')
             },
             open: () => {
+              removeCloseListener = onLtiClosePostMessage(placement_type, () => {
+                $('#resource_selection_dialog').dialog('close')
+              })
               $dialog.parent().find('.ui-dialog-titlebar-close').focus()
               window.addEventListener('message', ltiPostMessageHandlerForTool)
             },

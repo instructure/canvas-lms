@@ -215,4 +215,10 @@ describe QuizzesNext::QuizSerializer do
                                                })
     end
   end
+
+  describe "#question_count" do
+    it "serializes question_count" do
+      expect(subject[:question_count]).to eq(assignment.question_count || 0)
+    end
+  end
 end

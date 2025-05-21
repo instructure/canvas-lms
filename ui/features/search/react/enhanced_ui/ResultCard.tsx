@@ -31,6 +31,7 @@ import {
 } from '@instructure/ui-icons'
 import stopwords from '../stopwords'
 import type {Module, Result} from '../types'
+import {htmlEscape} from '@instructure/html-escape'
 
 const I18n = createI18nScope('SmartSearch')
 
@@ -173,7 +174,7 @@ export default function ResultCard(props: Props) {
       <Text
         as="p"
         dangerouslySetInnerHTML={{
-          __html: addSearchHighlighting(props.searchTerm, body),
+          __html: addSearchHighlighting(props.searchTerm, htmlEscape(body)),
         }}
       />
       {props.result.modules && renderModuleList(props.result.modules)}

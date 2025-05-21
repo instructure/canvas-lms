@@ -184,3 +184,25 @@ create_wiki_page_mastery_path_overrides:
   description: |-
     In Mastery Paths create AssignmentOverrides directly onto WikiPages instead of creating a hidden Assignment.
   applies_to: SiteAdmin
+
+create_external_apps_side_tray_overrides:
+  state: hidden
+  display_name: Enable External Apps Side Tray
+  description: |-
+    If enabled, an External Apps menu item will appear in the Module popover menu. When clicked, a side tray
+    displaying the external apps will appear
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+use_dyslexic_font:
+  state: hidden
+  shadow: true
+  display_name: Use a dyslexia friendly font
+  description: |-
+    When enabled, this setting replaces the default font in Canvas with OpenDyslexic,
+    an open source font created to help increase readability for readers with dyslexia.
+  applies_to: User

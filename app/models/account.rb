@@ -81,6 +81,7 @@ class Account < ActiveRecord::Base
   has_many :child_courses, -> { where(course_account_associations: { depth: 0 }) }, through: :course_account_associations, source: :course
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Assignment"
+  has_many :attachment_associations, inverse_of: :root_account
   has_many :folders, -> { order("folders.name") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_folders, -> { where("folder.workflow_state<>'deleted'").order("folders.name") }, class_name: "Folder", as: :context, inverse_of: :context
   has_many :developer_keys
@@ -176,6 +177,7 @@ class Account < ActiveRecord::Base
   before_save :remove_template_id, if: ->(a) { a.workflow_state_changed? && a.deleted? }
   before_create :enable_sis_imports, if: :root_account?
   after_save :update_account_associations_if_changed
+  after_save :update_lti_context_controls_if_necessary
   after_save :check_downstream_caches
 
   before_save :setup_cache_invalidation
@@ -705,6 +707,13 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def update_lti_context_controls_if_necessary
+    # if the account structure changed, but this is _not_ a new object
+    if saved_change_to_parent_account_id? && !saved_change_to_id?
+      Lti::ContextControl.update_paths_for_reparent(self, parent_account_id_before_last_save, parent_account_id)
+    end
+  end
+
   def check_downstream_caches
     # dummy account has no downstream
     return if dummy?
@@ -875,6 +884,10 @@ class Account < ActiveRecord::Base
 
   def discussion_checkpoints_enabled?
     feature_enabled?(:discussion_checkpoints)
+  end
+
+  def checkpoints_group_discussions_enabled?
+    feature_enabled?(:checkpoints_group_discussions)
   end
 
   def file_namespace
@@ -2653,11 +2666,17 @@ class Account < ActiveRecord::Base
     settings[:horizon_domain]
   end
 
-  def horizon_redirect_url(canvas_url, reauthenticate: false, preview: false)
+  def horizon_url(path)
     return nil unless horizon_domain
 
     protocol = horizon_domain.include?("localhost") ? "http" : "https"
-    uri = Addressable::URI.parse("#{protocol}://#{horizon_domain}/redirect")
+    Addressable::URI.parse("#{protocol}://#{horizon_domain}/#{path}")
+  end
+
+  def horizon_redirect_url(canvas_url, reauthenticate: false, preview: false)
+    return nil unless horizon_domain
+
+    uri = horizon_url("redirect")
     uri.query_values = { canvas_url:, reauthenticate:, preview: }
     uri.to_s
   end

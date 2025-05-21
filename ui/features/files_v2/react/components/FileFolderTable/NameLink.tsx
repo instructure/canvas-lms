@@ -24,10 +24,14 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {FilePreviewModal} from './FilePreviewModal'
 import {type File, type Folder} from '../../../interfaces/File'
-import {getIcon} from '../../../utils/fileFolderUtils'
+import {getIcon, getName} from '../../../utils/fileFolderUtils'
 import {generateUrlPath} from '../../../utils/folderUtils'
 import {generatePreviewUrlPath} from '../../../utils/fileUtils'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {windowPathname} from '@canvas/util/globalUtils'
 
+const I18n = createI18nScope('files_v2')
 interface NameLinkProps {
   item: File | Folder
   collection: (File | Folder)[]
@@ -41,7 +45,7 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
     const previewId = searchParams.get('preview')
-    if (previewId === item.id) {
+    if (previewId === item.id.toString()) {
       setIsModalOpen(true)
     } else {
       setIsModalOpen(false)
@@ -53,9 +57,16 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
       e.preventDefault()
       setIsModalOpen(true)
       const searchParams = new URLSearchParams(location.search)
-      searchParams.set('preview', item.id)
-      const newPath = `${window.location.pathname}?${searchParams.toString()}`
+      searchParams.set('preview', item.id.toString())
+      const newPath = `${windowPathname()}?${searchParams.toString()}`
       window.history.pushState(null, '', newPath)
+    } else if (item.locked_for_user) {
+      e.preventDefault()
+      showFlashError(
+        I18n.t('%{name} is currently locked and unavailable to view.', {
+          name: getName(item),
+        }),
+      )()
     }
   }
 
@@ -63,12 +74,12 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
     setIsModalOpen(false)
     const searchParams = new URLSearchParams(location.search)
     searchParams.delete('preview')
-    const newPath = `${window.location.pathname}${searchParams.toString() ? '?' : ''}${searchParams.toString()}`
+    const newPath = `${windowPathname()}${searchParams.toString() ? '?' : ''}${searchParams.toString()}`
     window.history.pushState(null, '', newPath)
   }
 
   const isFile = 'display_name' in item
-  const name = isFile ? item.display_name : item.name
+  const name = getName(item)
   const iconUrl = isFile ? item.thumbnail_url : undefined
   const icon = getIcon(item, isFile, iconUrl)
   const pxSize = isStacked ? '18px' : '36px'

@@ -16,35 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Discussion} from '../../../graphql/Discussion'
-import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
+import {useMutation} from '@apollo/client'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {breakpointsShape} from '@canvas/with-breakpoints'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {IconArrowDownLine, IconArrowUpLine} from '@instructure/ui-icons'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {View} from '@instructure/ui-view'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
+import {Discussion} from '../../../graphql/Discussion'
+import {UPDATE_DISCUSSION_TOPIC_PARTICIPANT} from '../../../graphql/Mutations'
+import DiscussionPostButtonsToolbar from '../../components/DiscussionPostToolbar/DiscussionPostButtonsToolbar'
+import DiscussionPostSearchTool from '../../components/DiscussionPostToolbar/DiscussionPostSearchTool'
+import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
+import SortOrderDropDown from '../../components/DiscussionPostToolbar/SortOrderDropDown'
+import useSpeedGrader from '../../hooks/useSpeedGrader'
+import {hideStudentNames} from '../../utils'
 import {
   DiscussionManagerUtilityContext,
   SEARCH_TERM_DEBOUNCE_DELAY,
   SearchContext,
   isSpeedGraderInTopUrl,
 } from '../../utils/constants'
-import {View} from '@instructure/ui-view'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useMutation} from '@apollo/client'
-import {UPDATE_DISCUSSION_TOPIC_PARTICIPANT} from '../../../graphql/Mutations'
 import DiscussionTopicTitleContainer from '../DiscussionTopicTitleContainer/DiscussionTopicTitleContainer'
-import DiscussionPostButtonsToolbar from '../../components/DiscussionPostToolbar/DiscussionPostButtonsToolbar'
-import {Flex} from '@instructure/ui-flex'
-import {hideStudentNames} from '../../utils'
-import DiscussionPostSearchTool from '../../components/DiscussionPostToolbar/DiscussionPostSearchTool'
-import {breakpointsShape} from '@canvas/with-breakpoints'
-import useSpeedGrader from '../../hooks/useSpeedGrader'
-import SortOrderDropDown from '../../components/DiscussionPostToolbar/SortOrderDropDown'
-import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {Button} from '@instructure/ui-buttons'
-import {
-  IconArrowDownLine,
-  IconArrowUpLine,
-} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('discussion_topic')
 
@@ -157,9 +154,7 @@ const DiscussionTopicToolbarContainer = props => {
   }
 
   const background =
-    ENV?.FEATURES?.discussions_speedgrader_revisit && isSpeedGraderInTopUrl
-      ? 'secondary'
-      : 'primary'
+    ENV?.FEATURES?.discussion_checkpoints && isSpeedGraderInTopUrl ? 'secondary' : 'primary'
   return (
     <View as="div" padding="0" margin="0 0 x-small 0" background={background}>
       {instUINavEnabled() ? (
@@ -216,6 +211,7 @@ const DiscussionTopicToolbarContainer = props => {
                   (props.discussionTopic.assignment !== null ||
                     !props.discussionTopic.groupSet !== null)
                 }
+                isAnnouncement={props.discussionTopic.isAnnouncement}
               />
             </Flex.Item>
           </Flex>
@@ -237,10 +233,7 @@ const DiscussionTopicToolbarContainer = props => {
               height="100%"
               padding="xxx-small 0"
             >
-              <Flex.Item
-                shouldGrow={true}
-                shouldShrink={true}
-              >
+              <Flex.Item shouldGrow={true} shouldShrink={true}>
                 {!hideStudentNames && (
                   <DiscussionPostSearchTool
                     discussionAnonymousState={props.discussionTopic.anonymousState}

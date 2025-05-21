@@ -60,7 +60,7 @@ function PageList(props: Props) {
     pageParam = '1',
   }: QueryFunctionContext): Promise<{json: ePortfolioPage[]; nextPage: string | null}> => {
     const params = {
-      page: pageParam,
+      page: String(pageParam),
       per_page: '10',
     }
     const {json, link} = await doFetchApi<ePortfolioPage[]>({
@@ -83,6 +83,7 @@ function PageList(props: Props) {
       queryFn: fetchPages,
       staleTime: 10 * 60 * 1000, // 10 minutes
       getNextPageParam: lastPage => lastPage.nextPage,
+      initialPageParam: '1',
     })
 
   const onConfirm = (json?: undefined | ePortfolioPage) => {

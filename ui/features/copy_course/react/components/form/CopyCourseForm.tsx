@@ -94,9 +94,7 @@ export const CopyCourseForm = ({
   const dateOrNullEndAt = dateOrNull(course?.end_at)
   const [courseName, setCourseName] = useState<string>(course.name)
   const [courseCode, setCourseCode] = useState<string>(course?.course_code || '')
-  const [newCourseStartDate, setNewCourseStartDate] = useState<Date | null>(
-    dateOrNullStartAt
-  )
+  const [newCourseStartDate, setNewCourseStartDate] = useState<Date | null>(dateOrNullStartAt)
   const [newCourseEndDate, setNewCourseEndDate] = useState<Date | null>(dateOrNullEndAt)
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(
     terms.find(term => term.id === course.enrollment_term_id.toString()) || null,
@@ -161,9 +159,7 @@ export const CopyCourseForm = ({
   const newStartDateToParse = restrictEnrollmentsToCourseDates
     ? dateOrNullStartAt
     : selectedTerm?.startAt
-  const newEndDateToParse = restrictEnrollmentsToCourseDates
-    ? dateOrNullEndAt
-    : selectedTerm?.endAt
+  const newEndDateToParse = restrictEnrollmentsToCourseDates ? dateOrNullEndAt : selectedTerm?.endAt
   const isoNewCourseStartDate = parseDateToISOString(newStartDateToParse)
   const isoNewCourseEndDate = parseDateToISOString(newEndDateToParse)
 
@@ -172,9 +168,11 @@ export const CopyCourseForm = ({
   const invalidNewCourseStartDateMessage = invalidForm.elements.newCourseStartDateErrorMsg
   const invalidCourseNameMessage = invalidForm.elements.courseNameErrorMsg
   const invalidCourseCodeMessage = invalidForm.elements.courseCodeErrorMsg
-  const disableStartEndDateMessage = !restrictEnrollmentsToCourseDates ?
-    I18n.t('Term start and end dates cannot be modified here, only on the Term Details page under Admin.') :
-    null
+  const disableStartEndDateMessage = !restrictEnrollmentsToCourseDates
+    ? I18n.t(
+        'Term start and end dates cannot be modified here, only on the Term Details page under Admin.',
+      )
+    : null
 
   return (
     <View as="div">

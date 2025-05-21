@@ -23,28 +23,16 @@ import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useM
 
 const setUpMasterCourse = (initialLockState: boolean = false) => {
   return render(
-    <ContextModuleProvider
-      {...contextModuleDefaultProps} isMasterCourse={true}
-    >
-      <BlueprintLockIcon
-        initialLockState={initialLockState}
-        contentId=""
-        contentType=""
-      />
+    <ContextModuleProvider {...contextModuleDefaultProps} isMasterCourse={true}>
+      <BlueprintLockIcon initialLockState={initialLockState} contentId="" contentType="" />
     </ContextModuleProvider>,
   )
 }
 
 const setUpChildCourse = (initialLockState: boolean = false) => {
   return render(
-    <ContextModuleProvider
-      {...contextModuleDefaultProps} isChildCourse={true}
-    >
-      <BlueprintLockIcon
-        initialLockState={initialLockState}
-        contentId=""
-        contentType=""
-      />
+    <ContextModuleProvider {...contextModuleDefaultProps} isChildCourse={true}>
+      <BlueprintLockIcon initialLockState={initialLockState} contentId="" contentType="" />
     </ContextModuleProvider>,
   )
 }

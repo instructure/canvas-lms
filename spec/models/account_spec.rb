@@ -1583,6 +1583,32 @@ describe Account do
     end
   end
 
+  describe "#update_lti_context_controls" do
+    let(:account) { account_model(parent_account:) }
+    let(:parent_account) { account_model }
+    let(:new_parent_account) { account_model }
+
+    before do
+      allow(Lti::ContextControl).to receive(:update_paths_for_reparent)
+    end
+
+    describe "when account parent changes" do
+      it "updates paths for Controls" do
+        account.update!(parent_account: new_parent_account)
+        expect(Lti::ContextControl).to have_received(:update_paths_for_reparent).with(account, parent_account.id, new_parent_account.id)
+      end
+    end
+
+    describe "with new account" do
+      let(:new_account) { account_model }
+
+      it "does not update paths" do
+        new_account
+        expect(Lti::ContextControl).not_to have_received(:update_paths_for_reparent)
+      end
+    end
+  end
+
   describe "default_time_zone" do
     context "root account" do
       before :once do
@@ -2985,6 +3011,30 @@ describe Account do
         expect(subaccount.horizon_account[:value]).to be false
         expect(subaccount.horizon_account[:inherited]).to be true
       end
+    end
+  end
+
+  describe "horizon_url" do
+    before :once do
+      @account = Account.default
+      @account.settings[:horizon_domain] = "test.canvasforcareer.com"
+      @account.save!
+    end
+
+    it "returns the url with the specified path" do
+      expect(@account.horizon_url("api/v1/test").to_s).to eq("https://test.canvasforcareer.com/api/v1/test")
+    end
+
+    it "returns nil if horizon_domain is not set" do
+      @account.settings[:horizon_domain] = nil
+      @account.save!
+      expect(@account.horizon_url("api/v1/test")).to be_nil
+    end
+
+    it "uses http protocol for localhost domains" do
+      @account.settings[:horizon_domain] = "localhost:3002"
+      @account.save!
+      expect(@account.horizon_url("api/v1/test").to_s).to eq("http://localhost:3002/api/v1/test")
     end
   end
 

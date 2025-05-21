@@ -239,7 +239,18 @@ class Enrollment < ActiveRecord::Base
     end
 
     p.dispatch :enrollment_accepted
-    p.to { course.participating_admins.restrict_to_sections([course_section_id]) - [user] }
+    p.to do |record|
+      course_admins = record.course.participating_admins.restrict_to_sections([record.course_section_id]) - [user]
+      if record.root_account.feature_enabled?(:temporary_enrollments)
+        user_ids =
+          Enrollment.joins(:enrollment_state).where(user_id: course_admins, course_section_id: record.course_section_id)
+                    .where("enrollments.temporary_enrollment_source_user_id IS NULL AND enrollments.workflow_state = 'active' OR
+                           (enrollments.temporary_enrollment_source_user_id IS NOT NULL AND enrollment_states.state = 'active')")
+                    .distinct.pluck(:user_id)
+        course_admins = course_admins.select { |admin| Array(user_ids).include?(admin.id) }
+      end
+      course_admins
+    end
     p.whenever do |record|
       record.course &&
         !record.observer? &&

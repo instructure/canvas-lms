@@ -17,14 +17,16 @@
  */
 
 import {createRoot} from 'react-dom/client'
-import {RubricAssignmentContainer} from '@canvas/rubrics/react/RubricAssignment'
+import {
+  RubricAssignmentContainer,
+  RubricSelfAssessmentSettingsWrapper,
+} from '@canvas/rubrics/react/RubricAssignment'
 import {
   mapRubricUnderscoredKeysToCamelCase,
   mapRubricAssociationUnderscoredKeysToCamelCase,
   RubricAssociationUnderscore,
   RubricUnderscoreType,
 } from '@canvas/rubrics/react/utils'
-import {RubricSelfAssessmentSettingsWrapper} from './RubricSelfAssessmentSettingsWrapper'
 
 type ENVType = {
   ACCOUNT_LEVEL_MASTERY_SCALES: boolean

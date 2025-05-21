@@ -1564,7 +1564,6 @@ describe Enrollment do
     end
 
     it "does not send out notifications for enrollment acceptance to admins who are section restricted and in other sections" do
-      # even though section restrictions are still basically meaningless at this point
       teacher = user_with_pseudonym(active_all: true)
       n = Notification.create!(name: "Enrollment Accepted")
       NotificationPolicy.create!(notification: n, communication_channel: @user.communication_channel, frequency: "immediately")
@@ -1573,10 +1572,56 @@ describe Enrollment do
       other_section = @course.course_sections.create!
       e1 = @course.enroll_student(user_factory, section: other_section)
       e1.accept!
-      expect(teacher.messages).to_not be_exists
+      expect(teacher.messages).not_to exist
       e2 = @course.enroll_student(user_factory, section: @course.default_section)
       e2.accept!
-      expect(teacher.messages).to be_exists
+      expect(teacher.reload.messages).to exist
+    end
+
+    context "for course admin temporary enrollments" do
+      before(:once) do
+        Account.default.enable_feature!(:temporary_enrollments)
+        provider = user_factory(active_all: true)
+        @recipient = user_with_pseudonym(active_all: true)
+        @course = course_with_teacher(active_all: true, user: provider).course
+        pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
+        @temp_enrollment = @course.enroll_user(@recipient,
+                                               "TeacherEnrollment",
+                                               {
+                                                 role: teacher_role,
+                                                 temporary_enrollment_source_user_id: provider.id,
+                                                 temporary_enrollment_pairing_id: pairing.id,
+                                               })
+      end
+
+      it "does not send out notifications for enrollment acceptance with inactive / future enrollments" do
+        @temp_enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
+        n = Notification.create!(name: "Enrollment Accepted")
+        NotificationPolicy.create!(notification: n, communication_channel: @recipient.communication_channel, frequency: "immediately")
+        e = @course.enroll_student(user_factory, section: @course.default_section)
+        e.accept!
+        expect(@recipient.reload.messages).not_to exist
+      end
+
+      it "sends out notifications for enrollment acceptance with active temp enrollments" do
+        @temp_enrollment.update!(start_at: 1.day.ago, end_at: 1.day.from_now)
+        n = Notification.create!(name: "Enrollment Accepted")
+        NotificationPolicy.create!(notification: n, communication_channel: @recipient.communication_channel, frequency: "immediately")
+        e = @course.enroll_student(user_factory, section: @course.default_section)
+        e.accept!
+        expect(@recipient.reload.messages).to exist
+        expect(@recipient.messages.take.notification).to eq(n)
+      end
+
+      it "sends out notifications for enrollment acceptance with non-temporary enrollments" do
+        @course.enroll_user(@recipient, "TeacherEnrollment", { role: teacher_role })
+        n = Notification.create!(name: "Enrollment Accepted")
+        NotificationPolicy.create!(notification: n, communication_channel: @recipient.communication_channel, frequency: "immediately")
+        e = @course.enroll_student(user_factory, section: @course.default_section)
+        e.accept!
+        expect(@recipient.reload.messages).to exist
+        expect(@recipient.messages.take.notification).to eq(n)
+      end
     end
   end
 

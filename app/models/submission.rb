@@ -2525,7 +2525,7 @@ class Submission < ActiveRecord::Base
     @assessment_request_count ||= 0
     @assessment_request_count += 1
     user = obj.try(:user)
-    association = assignment.active_rubric_association? ? assignment.rubric_association : nil
+    association = AbstractAssignment.find(assignment_id).active_rubric_association? ? assignment.rubric_association : nil
     res = assessment_requests.where(assessor_asset_id: obj.id, assessor_asset_type: obj.class.to_s, assessor_id: user.id, rubric_association_id: association.try(:id))
                              .first_or_initialize
     res.user_id = user_id

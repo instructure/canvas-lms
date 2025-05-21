@@ -4,7 +4,14 @@
     <thead>
       <tr>
         {{#ifAll ENV.permissions.can_manage_differentiation_tags ENV.permissions.allow_assign_to_differentiation_tags}}
-          <th scope="col"><span class="screenreader-only">{{#t}}Select User{{/t}}</span></th>
+          <th scope="col">
+            <span class="screenreader-only">{{#t}}Select All Users{{/t}}</span>
+            <input
+              type="checkbox"
+              class="select-all-users-checkbox"
+              aria-label="{{#t}}Select All Users{{/t}}"
+            >
+          </th>
         {{/ifAll}}
         <th scope="col"><span class="screenreader-only">{{#t}}Profile Picture{{/t}}</span></th>
         <th scope="col">{{#t "name"}}Name{{/t}}</th>

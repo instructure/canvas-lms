@@ -15,6 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// Uses stuff from lti/model which is new models with zod stuff. We should try
+// not to import the other way around.
+import {AssetProcessorWindowSettings} from '@canvas/lti/model/AssetProcessor'
 import {ContentItemIframeDimensions} from './helpers'
 
 export type AssetProcessorContentItemReport = {
@@ -22,7 +26,7 @@ export type AssetProcessorContentItemReport = {
   custom?: Record<string, string>
 }
 
-export type AssetProcessorContentItem = { 
+export type AssetProcessorContentItem = {
   type: 'ltiAssetProcessor'
   // Not sure where this comes from. Cargo cult from ResourceLinkContentItem, needed by usages of ContentItem.
   // presumably Canvas is adding it somewhere
@@ -32,7 +36,7 @@ export type AssetProcessorContentItem = {
 // Part of the the JSON sent to the API when saving (creating/editing) assignments
 // Should match up with ruby app/models/lti/asset_processor.rb#build_for_assignment
 export type AssetProcessorContentItemDto = {
-  context_external_tool_id: number | string,
+  context_external_tool_id: number | string
 } & AssetProcessorCommonFields
 
 export type AssetProcessorCommonFields = {
@@ -55,12 +59,7 @@ export type AssetProcessorCommonFields = {
     height?: number
   }
   // The window property indicates how to open the asset processor settings in a new window/tab.
-  window?: {
-    targetName?: string
-    width?: number
-    height?: number
-    windowFeatures?: string
-  }
+  window?: AssetProcessorWindowSettings
   // The iframe property indicates the asset processor settings can be embedded using an iframe.
   iframe?: ContentItemIframeDimensions
   // A map of key/value custom parameters.
@@ -70,7 +69,7 @@ export type AssetProcessorCommonFields = {
 }
 
 export function assetProcessorContentItemToDto(
-  contentItem: AssetProcessorContentItem, 
+  contentItem: AssetProcessorContentItem,
   toolId: number | string,
 ): AssetProcessorContentItemDto {
   const {type, errors, ...commonFields} = contentItem

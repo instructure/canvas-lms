@@ -16,19 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useRef, useState} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
-import {useMutation, queryClient} from '@canvas/query'
-import {useFileManagement} from '../Contexts'
+import {queryClient} from '@canvas/query'
+import {useFileManagement} from '../../contexts/FileManagementContext'
 import {generateFolderPostUrl} from '../../../utils/apiUtils'
 import getCookie from '@instructure/get-cookie'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
+import {useMutation} from '@tanstack/react-query'
+import {FormMessage} from '@instructure/ui-form-field'
+import {MAX_FOLDER_NAME_LENGTH} from '../../../utils/folderUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -42,6 +45,8 @@ const CreateFolderModal = ({isOpen, onRequestClose, onExited}: CreateFolderModal
   const [folderName, setFolderName] = useState('')
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
   const [wasRequestSuccessful, setWasRequestSuccessful] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<FormMessage>()
+  const textInputRef = useRef<TextInput>(null)
   const {folderId: parentFolderId} = useFileManagement()
 
   const createFolderMutation = useMutation({
@@ -74,6 +79,14 @@ const CreateFolderModal = ({isOpen, onRequestClose, onExited}: CreateFolderModal
   })
 
   const handleSubmit = () => {
+    if (folderName.length > MAX_FOLDER_NAME_LENGTH) {
+      setErrorMessage({
+        text: I18n.t('Folder name cannot exceed 255 characters'),
+        type: 'newError',
+      })
+      textInputRef.current?.focus()
+      return
+    }
     createFolderMutation.mutate(folderName)
   }
 
@@ -82,6 +95,7 @@ const CreateFolderModal = ({isOpen, onRequestClose, onExited}: CreateFolderModal
     setIsRequestInFlight(false)
     onExited(wasRequestSuccessful)
     setWasRequestSuccessful(false)
+    setErrorMessage(undefined)
   }
 
   return (
@@ -120,6 +134,8 @@ const CreateFolderModal = ({isOpen, onRequestClose, onExited}: CreateFolderModal
             renderLabel={I18n.t('Folder Name')}
             name="folderName"
             value={folderName}
+            ref={textInputRef}
+            messages={errorMessage ? [errorMessage] : []}
             onChange={(_e, newValue) => setFolderName(newValue)}
             onKeyDown={e => {
               if (e.key === 'Enter') {

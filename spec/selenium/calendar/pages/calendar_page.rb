@@ -303,6 +303,10 @@ module CalendarPage
     edit_event_date_input.send_keys(:enter)
   end
 
+  def handle_event_date_input_arrow_down
+    edit_event_date_input.send_keys(:arrow_down)
+  end
+
   def enter_event_title(title_text)
     replace_content(event_title_input, title_text)
     event_title_input.send_keys(:tab)

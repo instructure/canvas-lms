@@ -29,6 +29,8 @@ import {
 } from '../jquery/select_content_dialog'
 import $ from 'jquery'
 import 'jquery-migrate' // required
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import {fireEvent, waitFor} from '@testing-library/dom'
 
 // The tests here, and the code they test, use jQuery's is(":visible") method. This is necessary to make them work as expected with jest.
 // https://stackoverflow.com/questions/64136050/visible-selector-not-working-in-jquery-jest/
@@ -203,6 +205,20 @@ describe('SelectContentDialog', () => {
     expect(window.confirm).toHaveBeenCalledTimes(0)
     expect($.flashError).toHaveBeenCalledTimes(1)
     expect($.flashError).toHaveBeenCalledWith('helloerror')
+  })
+
+  it('closes the dialog when tool sends lti.close', async () => {
+    monitorLtiMessages()
+    callOnContextExternalToolSelect()
+
+    const closeEvent = {
+      subject: 'lti.close',
+    }
+    fireEvent(window, new MessageEvent('message', {data: closeEvent, origin, source: window}))
+
+    await waitFor(() => {
+      expect(window.confirm).toHaveBeenCalledTimes(1)
+    })
   })
 })
 

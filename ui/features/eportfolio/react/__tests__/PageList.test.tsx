@@ -25,10 +25,15 @@ describe('PageList', () => {
   const portfolio = {id: 0, name: 'Test Portfolio', public: true, profile_url: '/path/to/portfolio'}
   const section = {id: 10, name: 'Test Section', position: 1, category_url: '/path/to/section'}
 
-  const pageList = [{json: [
-    {name: 'First Page', id: 1, entry_url: '/path/to/first'},
-    {name: 'Second Page', id: 2, entry_url: 'path/to/second'},
-  ]}]
+  const pageList = [
+    {
+      json: [
+        {name: 'First Page', id: 1, entry_url: '/path/to/first'},
+        {name: 'Second Page', id: 2, entry_url: 'path/to/second'},
+      ],
+      nextPage: null,
+    },
+  ]
 
   const props = {
     isLoading: false,
@@ -36,20 +41,21 @@ describe('PageList', () => {
     sectionId: section.id,
     sectionName: section.name,
     onUpdate: jest.fn(),
-    isOwner: true
+    isOwner: true,
   }
 
   beforeAll(() => {
+    // Set up the query data in the format expected by useInfiniteQuery
     queryClient.setQueryData(['portfolioPageList', portfolio.id, section.id], {
-      section: section,
       pages: pageList,
+      pageParams: ['1'],
     })
   })
 
   it('fetches and renders a list of pages', async () => {
     const {findByText} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <PageList {...props}/>
+        <PageList {...props} />
       </MockedQueryClientProvider>,
     )
     expect(await findByText('First Page')).toBeInTheDocument()
@@ -59,7 +65,7 @@ describe('PageList', () => {
   it('does not render menu if user is not the owner', async () => {
     const {queryByTestId, findByText} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <PageList {...props} isOwner={false}/>
+        <PageList {...props} isOwner={false} />
       </MockedQueryClientProvider>,
     )
     expect(await findByText('First Page')).toBeInTheDocument()
@@ -69,7 +75,7 @@ describe('PageList', () => {
   it('opens add modal', async () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <PageList {...props}/>
+        <PageList {...props} />
       </MockedQueryClientProvider>,
     )
     const addPage = await findByTestId('add-page-button')
@@ -80,7 +86,7 @@ describe('PageList', () => {
   it('open rename modal', async () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <PageList {...props}/>
+        <PageList {...props} />
       </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('1-menu')
@@ -93,7 +99,7 @@ describe('PageList', () => {
   it('opens delete modal', async () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <PageList {...props}/>
+        <PageList {...props} />
       </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('2-menu')
@@ -106,7 +112,7 @@ describe('PageList', () => {
   it('open move modal', async () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <PageList {...props}/>
+        <PageList {...props} />
       </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('1-menu')

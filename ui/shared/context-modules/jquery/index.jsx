@@ -56,6 +56,7 @@ import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
+import ExternalAppsMenuTray from '@canvas/external-apps/react/components/ExternalAppsMenuTray'
 import {
   initPublishButton,
   onContainerOverlapped,
@@ -81,6 +82,17 @@ import {addModuleElement} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ModuleItemsLazyLoader} from '../utils/ModuleItemsLazyLoader'
+import {
+  isModuleCollapsed,
+  isModulePaginated,
+  addShowAllOrLess,
+  maybeExpandAndLoadAll,
+  loadFirstPage,
+  isModuleCurrentPageEmpty,
+  MODULE_EXPAND_AND_LOAD_ALL,
+  MODULE_LOAD_ALL,
+  MODULE_LOAD_FIRST_PAGE,
+} from '../utils/showAllOrLess'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -164,62 +176,73 @@ window.modules = (function () {
       )
     },
 
-    updateEstimatedDurations() {
+    updateEstimatedDurations(moduleId) {
       if (!ENV.horizon_course) {
         return
       }
-      return $.ajaxJSON(ENV.CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL, 'GET', {}, data => {
-        $(() => {
-          $.each(data, (module_id, durations_by_id) => {
-            let estimatedDurationSum = 0
-            let $context_module_item
+      return $.ajaxJSON(
+        ENV.CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL,
+        'GET',
+        {context_module_id: moduleId},
+        data => {
+          $(() => {
+            $.each(data, (module_id, durations_by_id) => {
+              let estimatedDurationSum = 0
+              let $context_module_item
 
-            $.each(durations_by_id, (id, info) => {
-              $context_module_item = $('#context_module_item_' + id)
-              const data = {
-                estimated_duration_minutes: info.estimated_duration_minutes,
-                can_set_estimated_duration: info.can_set_estimated_duration,
-                estimated_duration_display: '',
-              }
-              if (info.estimated_duration_minutes != null && info.estimated_duration_minutes > 0) {
-                estimatedDurationSum += info.estimated_duration_minutes
-                $context_module_item.find('.ig-row').removeClass('no-estimated-duration')
-                data.estimated_duration_display = I18n.t('%{minutes} Mins', {
-                  minutes: info.estimated_duration_minutes,
+              $.each(durations_by_id, (id, info) => {
+                $context_module_item = $('#context_module_item_' + id)
+                const data = {
+                  estimated_duration_minutes: info.estimated_duration_minutes,
+                  can_set_estimated_duration: info.can_set_estimated_duration,
+                  estimated_duration_display: '',
+                }
+                if (
+                  info.estimated_duration_minutes != null &&
+                  info.estimated_duration_minutes > 0
+                ) {
+                  estimatedDurationSum += info.estimated_duration_minutes
+                  $context_module_item.find('.ig-row').removeClass('no-estimated-duration')
+                  data.estimated_duration_display = I18n.t('%{minutes} Mins', {
+                    minutes: info.estimated_duration_minutes,
+                  })
+                } else {
+                  $context_module_item.find('.ig-row').addClass('no-estimated-duration')
+                }
+                $context_module_item.fillTemplateData({
+                  data,
+                  htmlValues: [
+                    'estimated_duration_display',
+                    'estimated_duration_minutes',
+                    'can_set_estimated_duration',
+                  ],
                 })
-              } else {
-                $context_module_item.find('.ig-row').addClass('no-estimated-duration')
+              })
+
+              const $moduleHeader = $('#context_module_' + module_id).find('.ig-header')
+              const headerData = {
+                estimated_duration_header_title: '',
+                estimated_duration_header_minutes: '',
               }
-              $context_module_item.fillTemplateData({
-                data,
+
+              if (estimatedDurationSum > 0) {
+                headerData.estimated_duration_header_title = I18n.t('Time to Complete:')
+                headerData.estimated_duration_header_minutes = I18n.t('%{minutes} Mins', {
+                  minutes: estimatedDurationSum,
+                })
+              }
+
+              $moduleHeader.fillTemplateData({
+                data: headerData,
                 htmlValues: [
-                  'estimated_duration_display',
-                  'estimated_duration_minutes',
-                  'can_set_estimated_duration',
+                  'estimated_duration_header_title',
+                  'estimated_duration_header_minutes',
                 ],
               })
             })
-
-            const $moduleHeader = $('#context_module_' + module_id).find('.ig-header')
-            const headerData = {
-              estimated_duration_header_title: '',
-              estimated_duration_header_minutes: '',
-            }
-
-            if (estimatedDurationSum > 0) {
-              headerData.estimated_duration_header_title = I18n.t('Time to Complete:')
-              headerData.estimated_duration_header_minutes = I18n.t('%{minutes} Mins', {
-                minutes: estimatedDurationSum,
-              })
-            }
-
-            $moduleHeader.fillTemplateData({
-              data: headerData,
-              htmlValues: ['estimated_duration_header_title', 'estimated_duration_header_minutes'],
-            })
           })
-        })
-      })
+        },
+      )
     },
 
     updateModuleItemPositions(_event, ui) {
@@ -260,7 +283,7 @@ window.modules = (function () {
       })
     },
 
-    updateProgressions(callback) {
+    updateProgressions(callback, moduleId) {
       if (!ENV.IS_STUDENT) {
         if (callback) {
           callback()
@@ -274,7 +297,7 @@ window.modules = (function () {
       $.ajaxJSON(
         url,
         'GET',
-        {},
+        {context_module_id: moduleId},
         function (data) {
           $('.loading_module_progressions_link').remove()
           const $user_progression_list = $('#current_user_progression_list')
@@ -340,11 +363,11 @@ window.modules = (function () {
       )
     },
 
-    updateAssignmentData(callback) {
+    updateAssignmentData(callback, moduleId) {
       return $.ajaxJSON(
         ENV.CONTEXT_MODULE_ASSIGNMENT_INFO_URL,
         'GET',
-        {},
+        {context_module_id: moduleId},
         data => {
           $(() => {
             $.each(data, (id, info) => {
@@ -416,10 +439,11 @@ window.modules = (function () {
       )
     },
 
-    async loadMasterCourseData(tag_id) {
+    async loadMasterCourseData(tag_id, moduleId) {
       if (ENV.MASTER_COURSE_SETTINGS) {
+        const params = {tag_id, context_module_id: moduleId}
         // Grab the stuff for master courses if needed
-        $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id}, data => {
+        $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', params, data => {
           if (data.tag_restrictions) {
             Object.entries(data.tag_restrictions).forEach(([id, restriction]) => {
               const item = document.querySelector(
@@ -573,27 +597,31 @@ window.modules = (function () {
       } else {
         $before.before($item.show())
       }
+      if (ENV.FEATURE_MODULES_PERF && $module[0]?.dataset.moduleId) {
+        maybeExpandAndLoadAll($module[0].dataset.moduleId)
+      }
       refreshDuplicateLinkStatus($module)
       return $item
     },
 
-    lazyLoadItems(moduleIds) {
+    lazyLoadItems(moduleIds, allPages) {
       const itemsCallback = moduleId => {
         initContextModuleItems(moduleId)
+        modules.updateAssignmentData(
+          () => modules.updateProgressions(modules.afterUpdateProgressions, moduleId),
+          moduleId,
+        )
+        if ($('#context_modules').hasClass('editable')) {
+          modules.loadMasterCourseData(undefined, moduleId)
+        }
+        if (ENV.horizon_course) {
+          modules.updateEstimatedDurations(moduleId)
+        }
+        addShowAllOrLess(moduleId)
       }
 
       const moduleItemsLazyLoader = new ModuleItemsLazyLoader(ENV.COURSE_ID, itemsCallback)
-      moduleItemsLazyLoader.fetchModuleItems(moduleIds).then(() => {
-        modules.updateAssignmentData(() => {
-          modules.updateProgressions(modules.afterUpdateProgressions)
-        })
-        if ($('#context_modules').hasClass('editable')) {
-          modules.loadMasterCourseData()
-        }
-        if (ENV.horizon_course) {
-          modules.updateEstimatedDurations()
-        }
-      })
+      moduleItemsLazyLoader.fetchModuleItems(moduleIds, allPages)
     },
 
     evaluateItemCyoe($item, data) {
@@ -1378,6 +1406,13 @@ modules.initModuleManagement = async function (duplicate) {
             modules.updateEstimatedDurations()
             $placeToFocus.focus()
             refreshDuplicateLinkStatus($currentModule)
+            if (
+              ENV.FEATURE_MODULES_PERF &&
+              isModulePaginated($currentModule[0]) &&
+              isModuleCurrentPageEmpty($currentModule[0])
+            ) {
+              loadFirstPage($currentModule[0]?.dataset.moduleId)
+            }
           })
           $.flashMessage(
             I18n.t('Module item %{module_item_name} was successfully removed.', {
@@ -1797,12 +1832,13 @@ modules.initModuleManagement = async function (duplicate) {
   window.dispatchEvent(new Event('module-publish-models-ready'))
 }
 
-function toggleModuleCollapse(event) {
+function toggleModuleCollapse(event, fetchAllPages) {
   event.preventDefault()
   const expandCallback = null
   const collapse = $(this).hasClass('collapse_module_link') ? '1' : '0'
   const $module = $(this).parents('.context_module')
-  const reload_entries = $module.find('.content .context_module_items').children().length === 0
+  const reload_entries =
+    fetchAllPages || $module.find('.content .context_module_items').children().length === 0
   const toggle = function (show) {
     const callback = function () {
       $module
@@ -1828,6 +1864,9 @@ function toggleModuleCollapse(event) {
       if (expandCallback && $.isFunction(expandCallback)) {
         expandCallback()
       }
+      if (ENV.FEATURE_MODULES_PERF) {
+        addShowAllOrLess($module.data('moduleId'))
+      }
     }
     if (show) {
       $module.find('.content').show()
@@ -1847,7 +1886,7 @@ function toggleModuleCollapse(event) {
     async data => {
       if (reload_entries) {
         if (ENV.FEATURE_MODULES_PERF) {
-          await modules.lazyLoadItems([parseInt($module.data('moduleId'), 10)])
+          await modules.lazyLoadItems([parseInt($module.data('moduleId'), 10)], fetchAllPages)
           $module.loadingImage('remove')
         } else {
           $module.loadingImage('remove')
@@ -1959,11 +1998,14 @@ function initContextModuleItems(moduleId) {
 
     const currentItem = $(this).parents('.context_module_item')[0]
     const modules = document.querySelectorAll('#context_modules .context_module')
-    const groups = Array.prototype.map.call(modules, module => {
+    const groups = Array.from(modules).map(module => {
       const id = module.getAttribute('id').substring('context_module_'.length)
       const title = module.querySelector('.header > .collapse_module_link > .name').textContent
+      if (ENV.FEATURE_MODULES_PERF && (isModuleCollapsed(module) || isModulePaginated(module))) {
+        return {id, title, items: false}
+      }
       const moduleItems = module.querySelectorAll('.context_module_item')
-      const items = Array.prototype.map.call(moduleItems, item => ({
+      const items = Array.from(moduleItems).map(item => ({
         id: item.getAttribute('id').substring('context_module_item_'.length),
         title: item.querySelector('.title').textContent.trim(),
       }))
@@ -1985,21 +2027,50 @@ function initContextModuleItems(moduleId) {
       formatSaveUrl: ({groupId}) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
       onMoveSuccess: ({data, itemIds, groupId}) => {
         const itemId = itemIds[0]
-        const $container = $(`#context_module_${groupId} .ui-sortable`)
-        $container.sortable('disable')
-
         const item = document.querySelector(`#context_module_item_${itemId}`)
-        $container[0].appendChild(item)
+        const $container = $(`#context_module_${groupId} .ui-sortable`)
+        if ($container.length) {
+          $container.sortable('disable')
+          $container[0].appendChild(item)
 
-        const order = data.context_module.content_tags.map(item => item.content_tag.id)
-        reorderElements(order, $container[0], id => `#context_module_item_${id}`)
-        $container.sortable('enable').sortable('refresh')
+          const order = data.context_module.content_tags.map(item => item.content_tag.id)
+          reorderElements(order, $container[0], id => `#context_module_item_${id}`)
+          $container.sortable('enable').sortable('refresh')
+        } else {
+          item.remove()
+        }
+        if (ENV.FEATURE_MODULES_PERF) {
+          maybeExpandAndLoadAll(groupId)
+        }
       },
       focusOnExit: () => currentItem.querySelector('.al-trigger'),
     }
 
-    renderTray(moveTrayProps, document.getElementById('not_right_side'))
+    fetchModuleItemsAndRenderTray(moveTrayProps, document.getElementById('not_right_side'))
   })
+
+  if (ENV.FEATURE_MODULES_PERF) {
+    addShowAllOrLess(moduleId)
+  }
+}
+
+async function fetchModuleItemsAndRenderTray(moveTrayProps, rootContainer) {
+  const missing_groups = moveTrayProps.moveOptions.groups.filter(group => {
+    return group.items === false
+  })
+
+  const promises = missing_groups.map(async group => {
+    return fetch(
+      `/api/v1/courses/${ENV.COURSE_ID}/modules/${group.id}/items?include[]=title_only&per_page=1000`,
+    )
+      .then(res => res.json())
+      .then(items => {
+        group.items = items.map(item => ({id: String(item.id), title: item.title}))
+      })
+  })
+
+  await Promise.all(promises)
+  renderTray(moveTrayProps, rootContainer)
 }
 
 // TODO: call this on the current page when getting a new page of items
@@ -2086,6 +2157,22 @@ function renderSendToTray(open, contentSelection, returnFocusTo) {
       contentShare={contentSelection}
       onDismiss={() => {
         renderSendToTray(false, contentSelection, returnFocusTo)
+        returnFocusTo.focus()
+      }}
+    />,
+    document.getElementById('direct-share-mount-point'),
+  )
+}
+
+function renderExternalAppsTray(open, contentSelection, moduleId, returnFocusTo) {
+  ReactDOM.render(
+    <ExternalAppsMenuTray
+      open={open}
+      sourceCourseId={ENV.COURSE_ID}
+      contentSelection={contentSelection}
+      moduleId={moduleId}
+      onDismiss={() => {
+        renderExternalAppsTray(false, contentSelection, moduleId, returnFocusTo)
         returnFocusTo.focus()
       }}
     />,
@@ -2368,6 +2455,17 @@ function initContextModules() {
     renderCopyToTray(true, selection, returnFocusTo)
   })
 
+  if (window.ENV.FEATURES?.create_external_apps_side_tray_overrides) {
+    $(document).on('click', '.module_external_apps', event => {
+      event.preventDefault()
+      const $target = $(event.target)
+      const moduleId = $target.closest('.context_module').data('module-id')?.toString()
+      const data = $target.data('externalTools')
+      const returnFocusTo = $(`#context_module_${moduleId} .al-trigger`)[0]
+      renderExternalAppsTray(true, data, moduleId, returnFocusTo)
+    })
+  }
+
   $(document).on('click', '.module_send_to', event => {
     event.preventDefault()
     const moduleId = $(event.target).closest('.context_module').data('module-id').toString()
@@ -2466,21 +2564,31 @@ function initContextModules() {
       })
     })
   }
-
-  initContextModuleItems()
 }
 
 $(() => {
+  const allModules = Array.from(document.querySelectorAll('.context_module'))
+    .map(m => parseInt(m.dataset.moduleId, 10))
+    .filter(mid => !isNaN(mid))
+  const allPages = false
+
   if (ENV.FEATURE_MODULES_PERF) {
     // ENV.COLLAPSED_MODULES are those that have been collapsed by the user
     // ENV.EXPANDED_MODULES are those that have been expanded by the user
     // If the user has not manually changed a module's state, it will not appear in either list
     // This implies that if both arrays are empty, the user has done nothing and we will expand the first module
     // After that, default to collapsed and expand only those in the ENV.EXPANDED_MODULES array
-    const allModules = Array.from(document.querySelectorAll('.context_module'))
-      .map(m => parseInt(m.dataset.moduleId, 10))
-      .filter(mid => !isNaN(mid))
+    // Because other places in the code rely on the values in these ENV vars, mutate them here to reflect the current state.
     if (allModules.length > 0) {
+      if (ENV.MODULE_FEATURES?.TEACHER_MODULE_SELECTION) {
+        const moduleId = parseInt(document.getElementById('show_teacher_only_module_id')?.value, 10)
+        if (!isNaN(moduleId)) {
+          if (allModules.includes(moduleId)) {
+            ENV.EXPANDED_MODULES = [moduleId]
+            ENV.COLLAPSED_MODULES = []
+          }
+        }
+      }
       const isInitialState = ENV.EXPANDED_MODULES.length === 0 && ENV.COLLAPSED_MODULES.length === 0
       if (isInitialState) {
         ENV.EXPANDED_MODULES.push(allModules.shift())
@@ -2493,10 +2601,36 @@ $(() => {
       } else {
         ENV.COLLAPSED_MODULES = allModules.filter(mid => !ENV.EXPANDED_MODULES.includes(mid))
       }
-      modules.lazyLoadItems(ENV.EXPANDED_MODULES)
+
+      modules.lazyLoadItems(ENV.EXPANDED_MODULES, allPages)
     }
+    for (const module of allModules) {
+      addShowAllOrLess(module)
+    }
+    // Handle Show All and Show Less events
+    // I don't bother with removeEventListener because the events are
+    // bound to the document and will be dealt with on page unload
+    document.addEventListener(MODULE_EXPAND_AND_LOAD_ALL, event => {
+      $(`#context_module_${event.detail.moduleId} .expand_module_link`).trigger(
+        'click',
+        event.detail.allPages,
+      )
+    })
+    document.addEventListener(MODULE_LOAD_ALL, event => {
+      modules.lazyLoadItems([event.detail.moduleId], true)
+    })
+    document.addEventListener(MODULE_LOAD_FIRST_PAGE, event => {
+      // TODO: rather than re-querying, maybe delete all items
+      //       beyond the first page and trigger
+      //       re-render of ModuleItemPaging
+      //       (but this is easier)
+      modules.lazyLoadItems([event.detail.moduleId], false)
+    })
   } else {
     if ($('#context_modules').hasClass('editable')) {
+      for (const moduleId of allModules) {
+        initContextModuleItems(moduleId)
+      }
       modules.loadMasterCourseData()
     }
   }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {getFilesEnv} from './filesEnvUtils'
 import {windowPathname} from '@canvas/util/globalUtils'
 
 const SEARCH_AND_ALL_QUERY_PARAMS =
@@ -31,7 +31,11 @@ interface TableUrlParams {
   pageQueryParam?: string
 }
 
-export const generateFolderByPathUrl = (pluralContextType: string, contextId: string, path?: string) => {
+export const generateFolderByPathUrl = (
+  pluralContextType: string,
+  contextId: string,
+  path?: string,
+) => {
   const baseUrl = `/api/v1/${pluralContextType}/${contextId}/folders/by_path`
   if (!path) {
     return baseUrl
@@ -68,7 +72,7 @@ export const generateTableUrl = ({
 export const generateSearchNavigationUrl = (searchValue: string) => {
   const path = windowPathname()
   const pluralContext = path.split('/')[3]
-  return filesEnv.showingAllContexts
+  return getFilesEnv().showingAllContexts
     ? `/folder/${pluralContext}?search_term=${searchValue}`
     : `/?search_term=${searchValue}`
 }

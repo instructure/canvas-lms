@@ -35,6 +35,26 @@ class ModuleItemsVisibleLoader < GraphQL::Batch::Loader
   end
 end
 
+class ModuleProgressionLoader < GraphQL::Batch::Loader
+  def initialize(user)
+    super()
+    @user = user
+  end
+
+  def perform(context_modules)
+    GuardRail.activate(:secondary) do
+      progressions = ContextModuleProgression.where(
+        context_module_id: context_modules.map(&:id),
+        user_id: @user.id
+      ).index_by(&:context_module_id)
+      context_modules.each do |context_module|
+        progression = progressions[context_module.id]
+        fulfill(context_module, progression)
+      end
+    end
+  end
+end
+
 module Types
   class ModuleType < ApplicationObjectType
     graphql_name "Module"
@@ -69,6 +89,8 @@ module Types
     field :prerequisites, [ModulePrerequisiteType], null: true
     delegate :prerequisites, to: :context_module
 
+    field :require_sequential_progress, Boolean, null: true
+
     field :completion_requirements, [ModuleCompletionRequirementType], null: true
     delegate :completion_requirements, to: :context_module
 
@@ -89,6 +111,11 @@ module Types
 
         content_tags.sum { |item| item.estimated_duration&.duration || 0 }.iso8601
       end
+    end
+
+    field :progression, Types::ModuleProgressionType, null: true, description: "The current user's progression through the module"
+    def progression
+      ModuleProgressionLoader.for(current_user).load(context_module)
     end
   end
 end

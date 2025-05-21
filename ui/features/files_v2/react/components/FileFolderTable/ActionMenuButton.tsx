@@ -23,7 +23,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import {useFileManagement} from '../Contexts'
+import {useFileManagement} from '../../contexts/FileManagementContext'
+import {useRowFocus} from '../../contexts/RowFocusContext'
 import {type File, type Folder} from '../../../interfaces/File'
 import {RenameModal} from '../RenameModal'
 import {DeleteModal} from './DeleteModal'
@@ -51,13 +52,14 @@ import PermissionsModal from './PermissionsModal'
 
 const I18n = createI18nScope('files_v2')
 
-interface ActionMenuButtonProps {
+export interface ActionMenuButtonProps {
   size: 'small' | 'medium' | 'large'
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
   usageRightsRequiredForContext: boolean
   userCanRestrictFilesForContext: boolean
   row: File | Folder
+  rowIndex: number
 }
 
 type ActionMenuModalOrTrayId =
@@ -76,11 +78,13 @@ const ActionMenuButton = ({
   usageRightsRequiredForContext,
   userCanRestrictFilesForContext,
   row,
+  rowIndex,
 }: ActionMenuButtonProps) => {
   const [modalOrTray, setModalOrTray] = useState<ActionMenuModalOrTrayId | null>(null)
   const name = getName(row)
   const actionLabel = I18n.t('Actions for "%{name}"', {name})
   const {contextType, fileMenuTools} = useFileManagement()
+  const {handleActionButtonRef} = useRowFocus()
 
   const iconForTrayTool = useCallback((tool: {canvas_icon_class?: string; icon_url?: string}) => {
     if (tool.canvas_icon_class) {
@@ -242,7 +246,7 @@ const ActionMenuButton = ({
             {
               icon: IconDownloadLine,
               text: I18n.t('Download'),
-              onClick: () => downloadZip(new Set([row.id])),
+              onClick: () => downloadZip(new Set([row.id.toString()])),
             },
             {
               icon: IconPermissionsLine,
@@ -317,11 +321,17 @@ const ActionMenuButton = ({
           isOpen={modalOrTray === 'rename'}
           onClose={onDismissModalOrTray}
         />
-        <DeleteModal open={modalOrTray === 'delete'} items={[row]} onClose={onDismissModalOrTray} />
+        <DeleteModal
+          open={modalOrTray === 'delete'}
+          items={[row]}
+          onClose={onDismissModalOrTray}
+          rowIndex={rowIndex}
+        />
         <MoveModal
           items={[row]}
           open={modalOrTray === 'move-to'}
           onDismiss={onDismissModalOrTray}
+          rowIndex={rowIndex}
         />
         <UsageRightsModal
           items={[row]}
@@ -335,16 +345,16 @@ const ActionMenuButton = ({
         />
       </>
     )
-  }, [modalOrTray, onDismissModalOrTray, row])
+  }, [modalOrTray, onDismissModalOrTray, row, rowIndex])
 
   return (
-    <>
+    <div ref={el => handleActionButtonRef(el, rowIndex)}>
       <Menu placement="bottom" trigger={triggerButton()}>
         {filteredItems.map((item, i) => renderMenuItem(i, item))}
       </Menu>
       {buildTrays()}
       {buildModals()}
-    </>
+    </div>
   )
 }
 

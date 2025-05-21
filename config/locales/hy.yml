@@ -1775,6 +1775,7 @@ hy:
   allow_self_sign_up_7520f8c5: "Թույլատրել ինքնագրանցում"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Թույլ տալ ունկնդիրներին տեսնել, թե ով է գրանցվել ժամանակային միջակայքերում:"
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: "Թույլ տալ ուղարկել ծանուցումներ ըստ մեր ուղարկման հերթականության"
+  allow_threaded_replies_43b2311e: "Թույլ տալ շղթայական պատասխաններ"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Թույլ տալ դասավանդողներին նշել այն գնահատականները, որոնք պետք է խմբով արտահանվեն դեպի SIS:"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Թույլ տալ օգտատերերին ստանալ Canvas համակարգից հաղորդագրություններ արտասահմանյան հեռախոսահամարին "
   alphabetically_60ab47e4: "Այբբենական կարգով"
@@ -4666,6 +4667,9 @@ hy:
   count_files_updated_4570a8a: 
     one: "1 ֆայլ թարմացվել է"
     other: "%{count}  ֆայլեր թարմացվել են"
+  count_groups_90e215b1: 
+    one: "1 խումբ"
+    other: "%{count} խումբ"
   count_hours_1bd03883: 
     one: "1 ժամ"
     other: "%{count} ժամ"
@@ -4695,6 +4699,9 @@ hy:
   count_people_489946e7: "%{count} մարդ"
   count_people_found_1ab374c0: 
     zero: "Ոչ մի օգտատեր չի գտնվել"
+  count_sections_bf1baf0a: 
+    one: "1 բաժին"
+    other: "%{count} բաժին"
   count_students_30e46120: 
     one: "1 ուսանող"
     other: "%{count} ունկնդիր"
@@ -6531,6 +6538,7 @@ hy:
   end_date_cannot_be_before_start_date_eb62ed6d: "Ավարտման օրը չի կարող նախորդել սկսելու օրվան"
   end_date_e0093ed7: "Ավարտման ամսաթիվ"
   ending_date_e1ea13a4: "Ավարտման ամսաթիվ"
+  ends_e3a6843f: Ավարտը
   enhanced_individual_gradebook: 
     avg_score: "Միջին գնահատական"
     high_score: "Բարձր գնահատական"
@@ -12152,6 +12160,7 @@ hy:
     video: Վիդեո
   please_add_at_least_one_non_blank_answer_213c2c8e: "Ավելացրեք առնվազն մեկ լրացված պատասխան"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Խնդրում ենք ավելացնել առնվազն մեկ լրացված պատասխան յուրաքանչյուր փոփոխականի համար:"
+  please_enter_a_valid_format_for_a_date_66ed0587: "Դա ամսաթիվ չէ:"
   please_enter_the_details_for_the_new_course_dc705b8c: "Մուտքագրեք նոր դասընթացի մանրամասները:"
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Մուտքագրեք ձեր token-ում ցույց տրված հաստատման կոդը"
   please_enter_your_label_name_7745272d: "Մուտքագրեք ձեր  %{label_name}՝"
@@ -16218,6 +16227,7 @@ hy:
   start_tls_26e4b0dc: "Սկսել TLS"
   started_5e138638: "Սկսվել է"
   starts_at_29843f98: "Սկսվում է "
+  starts_fa6bf3f5: Սկիզբ
   state_standards_c9b1affd: "Պետական ստանդարտներ"
   statistics: 
     csv_columns: 
@@ -17206,6 +17216,7 @@ hy:
   use_new_folder_tree_in_files_eb5a451b: "Ֆայլերում օգտագործել նոր թղթապանակի ծառը "
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Օգտագործել նոր թեստերի LTI գործիքը Canvas սովորական թեստերի փոխարեն:"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Օգտագործել այս կոնֆիգուրացիան ծնողի/դիտորդի գրանցման համար"
+  use_this_rubric_for_assignment_grading_a02fd079: "Օգտագործել այս ռուբրիկը հանձնարարությունը գնահատելու համար"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Օգտագործել գնահատման նույն սխեման հանձնարարության կրկնակի ուղարկման համար"
   used_by_permission_314a78dd: "Օգտագործվում է թույլտվության հիման վրա"
   user: 
@@ -17648,6 +17659,7 @@ hy:
           և նավարկման վերին տողում: Միևնույն ժամանակ կարող եք գրանցվել
           լրացուցիչ դասընթացների կամ ստեղծել ձեր պրոֆիլը:
       welcome_to_happiness: "Ձեզ ողջունում է Canvas-ը"
+  users_must_post_before_seeing_replies_d1761968: "Օգտատերերի մասնակցությունը պարտադիր է պատասխանները տեսնելու համար"
   users_with_no_enrollments_5dddce33: "Օգտատերեր առանց գրանցման "
   utc_e44049af: UTC
   validate: 

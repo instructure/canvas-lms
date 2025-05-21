@@ -193,6 +193,7 @@ function makeMocks() {
         },
       },
     ],
+    pageParams: [null],
   })
 }
 
@@ -944,7 +945,7 @@ describe('MessageStudentsWhoDialog', () => {
       students[1].score = 5.2
       students[2].score = 4
       students[3].score = 0
-      const {getAllByRole, getByRole, getByText, findByLabelText, getByTestId} = render(
+      const {getAllByRole, getByRole, findByLabelText, getByText, getByTestId} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps()} />
         </MockedQueryClientProvider>,
@@ -1552,7 +1553,7 @@ describe('MessageStudentsWhoDialog', () => {
       const messageTextArea = getByTestId('message-input')
       fireEvent.change(messageTextArea, {target: {value: 'FOO BAR'}})
 
-      const checkbox = (await findByLabelText(/Students/)) as HTMLInputElement;
+      const checkbox = (await findByLabelText(/Students/)) as HTMLInputElement
       fireEvent.click(checkbox)
 
       const sendButton = await findByRole('button', {name: 'Send'})

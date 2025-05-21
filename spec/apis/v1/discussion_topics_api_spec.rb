@@ -681,6 +681,22 @@ describe DiscussionTopicsController, type: :request do
     end
   end
 
+  context "when file_association_access feature flag is enabled" do
+    before do
+      @attachment = create_attachment(@course)
+      @attachment.root_account.enable_feature!(:file_association_access)
+      @topic = create_topic(@course, title: "Topic 1", message: "/users/#{@user.id}/files/#{@attachment.id}", attachment: @attachment)
+    end
+
+    it "return topic response with tagging files with their location in message key" do
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                      { controller: "discussion_topics", action: "index", format: "json", course_id: @course.id.to_s })
+
+      expect(json.first["message"]).to include("location=#{@topic.asset_string}")
+    end
+  end
+
   context "With item" do
     before :once do
       @attachment = create_attachment(@course)
@@ -2801,6 +2817,25 @@ describe DiscussionTopicsController, type: :request do
       @attachment = create_attachment(@course)
       @entry = create_entry(@topic, message: "first top-level entry", attachment: @attachment)
       @reply = create_reply(@entry, message: "reply to first top-level entry")
+    end
+
+    context "when file_association_access ff is enabled" do
+      it "tags attachment urls with location of the asset" do
+        @attachment.root_account.enable_feature!(:file_association_access)
+        message = "<img src='/courses/#{@course.id}/files/#{@attachment.id}'>"
+        @entry.update!(message:)
+        json = api_call(
+          :get,
+          "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
+          { controller: "discussion_topics_api",
+            action: "entries",
+            format: "json",
+            course_id: @course.id.to_s,
+            topic_id: @topic.id.to_s }
+        )
+
+        expect(json.first["message"]).to include("location=#{@entry.asset_string}")
+      end
     end
 
     it "returns top level entries for a topic" do

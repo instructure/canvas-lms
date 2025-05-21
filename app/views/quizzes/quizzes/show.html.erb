@@ -159,7 +159,7 @@
             <span class="screenreader-only"><%= admin_manage_title %></span>
           </button>
           <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
-            <% if can_do(@quiz, @current_user, :update) && @assignment %>
+            <% if can_do(@quiz, @current_user, :update) && @assignment && !Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
               <li role="presentation">
                 <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link" tabindex="-1" role="menuitem">
                   <i class="icon-rubric"><span class="screenreader-only"><%= admin_show_rubric_title %></span></i>
@@ -428,4 +428,11 @@
 
   <div id="module_sequence_footer"></div>
 
+  <% if can_do(@quiz, @current_user, :update) && @assignment && Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+    <div id="enhanced-rubric-assignment-edit-mount-point"></div>
+  <% end %>
+
+  <% if can_do(@quiz, @current_user, :update) && @assignment && !Rubric.rubric_self_assessment_enabled?(@context) && Rubric.rubric_self_assessment_enabled?(@context) %>
+    <div id="enhanced-rubric-self-assessment-edit"></div>
+  <% end %>
 </div>

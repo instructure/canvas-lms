@@ -38,9 +38,15 @@ interface FileTableUploadProps {
     rejected: ArrayLike<DataTransferItem | File>,
     e: React.DragEvent<Element>,
   ) => void
+  handleFileDropRef?: (el: HTMLInputElement | null) => void
 }
 
-const FileTableUpload = ({currentFolder, isDragging, handleDrop}: FileTableUploadProps) => {
+const FileTableUpload = ({
+  currentFolder,
+  isDragging,
+  handleDrop,
+  handleFileDropRef,
+}: FileTableUploadProps) => {
   const isEmptyFolder = currentFolder?.folders.length === 0 && currentFolder?.files.length === 0
 
   const classes = classnames({
@@ -57,6 +63,7 @@ const FileTableUpload = ({currentFolder, isDragging, handleDrop}: FileTableUploa
         // Called when dropping files or when clicking,
         // after the file dialog window exits successfully
         onDrop={handleDrop}
+        inputRef={handleFileDropRef}
         renderLabel={
           <Flex direction="column" height="100%" alignItems="center" justifyItems="center">
             <Billboard

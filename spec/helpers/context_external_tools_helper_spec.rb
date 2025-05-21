@@ -177,4 +177,59 @@ describe ContextExternalToolsHelper do
     include_examples "#external_tools_menu_items"
     include_examples "#external_tools_menu_items_raw"
   end
+
+  context "external_tools_menu_items_grouped_json" do
+    let(:tools_hash) do
+      {
+        module_menu: [
+          {
+            id: 101,
+            title: "Tool A",
+            base_url: "http://example.com/launch",
+            launch_method: "modal"
+          }
+        ],
+        module_group_menu: [
+          {
+            id: 102,
+            title: "Tool B",
+            base_url: "http://example.com/launch?foo=bar",
+            launch_method: "tray"
+          }
+        ]
+      }
+    end
+
+    let(:url_params_by_group) do
+      {
+        module_menu: { modules: [1] },
+        module_group_menu: { modules: [2], bar: "baz" }
+      }
+    end
+
+    before(:once) do
+      Account.site_admin.enable_feature!(:create_external_apps_side_tray_overrides)
+    end
+
+    it "returns grouped JSON with merged query params and tool data" do
+      result = external_tools_menu_items_grouped_json(tools_hash, url_params_by_group)
+
+      expect(result.keys).to contain_exactly("module_menu", "module_group_menu")
+
+      tool_a = result["module_menu"].first[:context_external_tool]
+      expect(tool_a[:id]).to eq 101
+      expect(URI(tool_a[:base_url]).query).to include("modules%5B%5D=1")
+
+      tool_b = result["module_group_menu"].first[:context_external_tool]
+      expect(tool_b[:id]).to eq 102
+      parsed_query = Rack::Utils.parse_nested_query(URI(tool_b[:base_url]).query)
+      expect(parsed_query).to include("foo" => "bar", "modules" => ["2"], "bar" => "baz")
+    end
+
+    it "skips empty tool groups" do
+      tools_hash[:module_index_menu] = []
+      result = external_tools_menu_items_grouped_json(tools_hash, url_params_by_group)
+      expect(result).not_to have_key("module_index_menu")
+    end
+  end
 end

@@ -1087,45 +1087,44 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
     ActiveRecord::ConnectionAdapters::PoolConfig.new(ActiveRecord::Base, config, :primary, :test)
   end
   let(:pool) { ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec) }
-  let(:connection_method) { (Rails.version < "7.2") ? :connection : :lease_connection }
 
   it "doesn't evict a normal cycle" do
-    conn1 = pool.public_send(connection_method)
+    conn1 = pool.lease_connection
     conn1.connect
     pool.checkin(conn1)
     expect(pool).to be_connected
-    conn2 = pool.public_send(connection_method)
+    conn2 = pool.lease_connection
     expect(conn2).to eql conn1
   end
 
   it "doesn't evict a normal cycle that is almost over" do
     allow(Process).to receive(:clock_gettime).and_return(0)
 
-    conn1 = pool.public_send(connection_method)
+    conn1 = pool.lease_connection
     conn1.connect
     pool.checkin(conn1)
 
     allow(Process).to receive(:clock_gettime).and_return(29)
-    conn2 = pool.public_send(connection_method)
+    conn2 = pool.lease_connection
     expect(conn2).to eql conn1
   end
 
   it "evicts connections on checkout" do
     allow(Process).to receive(:clock_gettime).and_return(0)
 
-    conn1 = pool.public_send(connection_method)
+    conn1 = pool.lease_connection
     conn1.connect
     pool.checkin(conn1)
 
     allow(Process).to receive(:clock_gettime).and_return(60)
-    conn2 = pool.public_send(connection_method)
+    conn2 = pool.lease_connection
     expect(conn2).not_to eql conn1
   end
 
   it "evicts connections on checkin" do
     allow(Process).to receive(:clock_gettime).and_return(0)
 
-    conn1 = pool.public_send(connection_method)
+    conn1 = pool.lease_connection
     conn1.connect
     expect(conn1.runtime).to eq 0
 
@@ -1140,7 +1139,7 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   it "evicts connections if you call flush" do
     allow(Process).to receive(:clock_gettime).and_return(0)
 
-    conn1 = pool.public_send(connection_method)
+    conn1 = pool.lease_connection
     conn1.connect
     pool.checkin(conn1)
 

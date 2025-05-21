@@ -525,17 +525,7 @@ class UsersController < ApplicationController
     k5_user = k5_user?(check_disabled: false)
     js_env({ K5_USER: k5_user && !k5_disabled }, true)
 
-    # things needed on both k5 and classic dashboards
-    create_permission_root_account = @current_user.create_courses_right(@domain_root_account, check_subaccounts: true)
-    create_permission_mcc_account = @current_user.create_courses_right(@domain_root_account.manually_created_courses_account)
-    create_permission_alternate_account = @current_user.alternate_account_for_course_creation && @current_user.create_courses_right(@current_user.alternate_account_for_course_creation)
-
-    mcc_only = if create_permission_alternate_account
-                 # admin can always create courses in other accounts/subaccounts
-                 false
-               else
-                 !(create_permission_root_account && @domain_root_account.feature_enabled?(:create_course_subaccount_picker))
-               end
+    course_permissions = @current_user.create_courses_permissions(@domain_root_account)
     js_env({
              PREFERENCES: {
                dashboard_view: @current_user.dashboard_view(@domain_root_account),
@@ -547,8 +537,8 @@ class UsersController < ApplicationController
              STUDENT_PLANNER_GROUPS: planner_enabled? && map_groups_for_planner(@current_user.current_groups),
              ALLOW_ELEMENTARY_DASHBOARD: k5_disabled && k5_user,
              CREATE_COURSES_PERMISSIONS: {
-               PERMISSION: create_permission_alternate_account || create_permission_root_account || create_permission_mcc_account,
-               RESTRICT_TO_MCC_ACCOUNT: mcc_only,
+               PERMISSION: course_permissions[:can_create],
+               RESTRICT_TO_MCC_ACCOUNT: course_permissions[:restrict_to_mcc],
              },
              OBSERVED_USERS_LIST: observed_users_list,
              CAN_ADD_OBSERVEE: @current_user
@@ -1987,6 +1977,41 @@ class UsersController < ApplicationController
 
     if user.set_preference(:text_editor_preference, params[:text_editor_preference])
       render(json: { text_editor_preference: user.reload.get_preference(:text_editor_preference) })
+    else
+      render(json: user.errors, status: :bad_request)
+    end
+  end
+
+  # @API Update files UI version preference
+  # Updates a user's default choice for files UI version. This allows
+  # the files UI to preload the user's preference.
+  #
+  # @argument files_ui_version [String, "v1"|"v2"]
+  #   The identifier for the files UI version.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/files_ui_version_preference \
+  #     -X PUT \
+  #     -F 'files_ui_version=v2'
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "files_ui_version": "v2"
+  #   }
+
+  def set_files_ui_version_preference
+    user = api_find(User, params[:id])
+
+    return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
+
+    if %w[v1 v2].exclude?(params[:files_ui_version])
+      return render(json: { message: "Invalid files_ui_version provided" }, status: :bad_request)
+    end
+
+    if user.set_preference(:files_ui_version, params[:files_ui_version])
+      render(json: { files_ui_version: user.reload.get_preference(:files_ui_version) })
     else
       render(json: user.errors, status: :bad_request)
     end

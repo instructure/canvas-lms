@@ -20,6 +20,7 @@ import {gql} from '@apollo/client'
 import qs from 'qs'
 import {executeQuery} from '@canvas/query/graphql'
 import type {RubricFormProps, GenerateCriteriaFormProps} from '../types/RubricForm'
+import type {CanvasProgress} from '@canvas/progress/ProgressHelpers'
 import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {
   mapRubricAssociationUnderscoredKeysToCamelCase,
@@ -220,16 +221,11 @@ export const saveRubric = async (
   }
 }
 
-export type GenerateCriteriaResponse = {
-  rubric: {
-    criteria: RubricCriterion[]
-  }
-}
 export const generateCriteria = async (
   courseId: string,
   assignmentId: string,
   generateCriteriaProps: GenerateCriteriaFormProps,
-): Promise<GenerateCriteriaResponse> => {
+): Promise<CanvasProgress> => {
   const url = `/courses/${courseId}/rubrics/llm_criteria`
   const method = 'POST'
 
@@ -249,6 +245,7 @@ export const generateCriteria = async (
         criteria_count: generateCriteriaProps.criteriaCount,
         rating_count: generateCriteriaProps.ratingCount,
         points_per_criterion: generateCriteriaProps.pointsPerCriterion,
+        use_range: generateCriteriaProps.useRange,
       },
     }),
   })
@@ -257,17 +254,6 @@ export const generateCriteria = async (
     throw new Error(`Failed to generate criteria: ${response.statusText}`)
   }
 
-  const {rubric: generatedRubric, error} = await response.json()
-
-  if (error) {
-    throw new Error(`Failed to generate criteria`)
-  }
-
-  const transformed = mapRubricUnderscoredKeysToCamelCase(generatedRubric)
-
-  return {
-    rubric: {
-      criteria: transformed.criteria ?? [],
-    },
-  }
+  const progress: CanvasProgress = await response.json()
+  return progress
 }

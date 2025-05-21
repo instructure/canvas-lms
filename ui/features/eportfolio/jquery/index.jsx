@@ -28,7 +28,8 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 import PortfolioPortal from '../react/PortfolioPortal'
 import ReactDOM from 'react-dom/client'
 import userSettings from '@canvas/user-settings'
@@ -196,7 +197,7 @@ function renderPortal(portfolio_id) {
   const pageListContainer = document.getElementById('page_list_mount')
 
   return (
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <PortfolioPortal
         portfolioId={portfolio_id}
         sectionListNode={sectionListContainer}
@@ -204,7 +205,7 @@ function renderPortal(portfolio_id) {
         submissionNode={submissionContainer}
         onPageUpdate={json => $(document).triggerHandler('page_updated', json)}
       />
-    </QueryProvider>
+    </QueryClientProvider>
   )
 }
 

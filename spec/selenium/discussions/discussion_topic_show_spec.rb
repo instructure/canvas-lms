@@ -73,7 +73,7 @@ describe "Discussion Topic Show" do
 
       f("button[data-testid='discussion-post-menu-trigger']").click
       fj("span[role='menuitem']:contains('Show Rubric')").click
-      f(".find_rubric_link").click
+      f("div.links.displaying.pull-right a.find_rubric_link").click
 
       expect(fj(".select_rubric_link:contains(#{rubric.title})")).to be_present
       expect(ffj(".rubrics_dialog_rubric:visible").count).to eq 1
@@ -249,16 +249,10 @@ describe "Discussion Topic Show" do
         )
       end
 
-      context "discussions_speedgrader_revisit" do
-        before do
-          @course.account.enable_feature!(:discussions_speedgrader_revisit)
-        end
-
-        it "does not show the switch to individual posts button" do
-          user_session(@teacher)
-          get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
-          expect(f("body")).not_to contain_css("button#switch-to-individual-posts-link")
-        end
+      it "does not show the switch to individual posts button" do
+        user_session(@teacher)
+        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
+        expect(f("body")).not_to contain_css("button#switch-to-individual-posts-link")
       end
 
       it "lets students see the checkpoints tray" do

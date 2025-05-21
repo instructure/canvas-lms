@@ -112,7 +112,7 @@ describe('InboxSettingsModalContainer', () => {
 
     it('shows loader for inbox settings', async () => {
       const {getAllByText} = setup({...defaultProps()})
-      expect(getAllByText('Loading Inbox Settings').length).toBe(2)
+      expect(getAllByText('Loading Inbox Settings')).toHaveLength(2)
     })
 
     it('shows modal', async () => {
@@ -181,7 +181,7 @@ describe('InboxSettingsModalContainer', () => {
         fireEvent.click(getByText('16').closest('button'))
         await waitFor(() => {
           fireEvent.click(getByText('Save'))
-          expect(getAllByText('Date cannot be in the past').length).toBe(2)
+          expect(getAllByText('Date cannot be in the past')).toHaveLength(2)
         })
       })
 
@@ -273,22 +273,22 @@ describe('InboxSettingsModalContainer', () => {
   })
 
   it('displays signature and auto response settings when inboxSignatureBlock and inboxAutoResponse props are true', async () => {
-    const {getByText} = setup({...defaultProps()})
+    const {getByText, getByTestId} = setup({...defaultProps()})
     await waitFor(() => {
-      expect(getByText('Signature*')).toBeInTheDocument()
+      expect(getByTestId('inbox-signature-input')).toHaveValue('My signature');
       expect(getByText('Out of Office')).toBeInTheDocument()
     })
   })
 
   it('displays only signature settings when only inboxSignatureBlock prop is true', async () => {
-    const {getByText, queryByText} = setup({
+    const {queryByText, getByTestId} = setup({
       ...defaultProps({
         inboxSignatureBlock: true,
         inboxAutoResponse: false,
       }),
     })
     await waitFor(() => {
-      expect(getByText('Signature*')).toBeInTheDocument()
+      expect(getByTestId('inbox-signature-input')).toHaveValue('My signature');
       expect(queryByText('Out of Office')).not.toBeInTheDocument()
     })
   })

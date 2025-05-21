@@ -25,6 +25,7 @@ class AttachmentAssociation < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :context, polymorphic: %i[conversation_message submission course group]
   belongs_to :user
+  belongs_to :root_account, class_name: "Account", optional: true, inverse_of: :attachment_associations
 
   before_create :set_root_account_id
 
@@ -40,11 +41,40 @@ class AttachmentAssociation < ActiveRecord::Base
 
     if to_create.any?
       Attachment.where(id: to_create).find_each do |attachment|
-        next unless attachment.grants_right?(user, session, :download)
+        next unless attachment.grants_right?(user, session, :update)
 
         AttachmentAssociation.create!(context:, attachment:, user:, field_name:)
       end
     end
+  end
+
+  def self.verify_access(location_param, attachment_id, user, session = nil)
+    splat = location_param.split("_")
+    return false unless splat.length >= 2
+
+    context_id = splat.pop
+    context_type = splat.join("_").camelize
+    field_name = nil
+    right_to_check = :read
+
+    if context_type == "CourseSyllabus"
+      field_name = "syllabus_body"
+      context_type = "Course"
+      right_to_check = :read_syllabus
+    end
+
+    association = AttachmentAssociation.find_by(
+      attachment: attachment_id,
+      context_id:,
+      context_type:,
+      field_name:
+    )
+
+    return false unless association
+
+    root_account = Account.find_by(id: association.root_account_id)
+    root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus) &&
+      association.context&.grants_right?(user, session, right_to_check)
   end
 
   def set_root_account_id

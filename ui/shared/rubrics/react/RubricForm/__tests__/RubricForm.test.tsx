@@ -23,14 +23,20 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {RubricForm, type RubricFormComponentProp} from '../index'
 import {RUBRIC_CRITERIA_IGNORED_FOR_SCORING, RUBRICS_QUERY_RESPONSE} from './fixtures'
 import * as RubricFormQueries from '../queries/RubricFormQueries'
+import * as ProgressHelpers from '@canvas/progress/ProgressHelpers'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import {reorder} from '../CriterionModal'
 import {WarningModal} from '../WarningModal'
+import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('../queries/RubricFormQueries', () => ({
   ...jest.requireActual('../queries/RubricFormQueries'),
   saveRubric: jest.fn(),
   generateCriteria: jest.fn(),
+}))
+
+jest.mock('@canvas/progress/ProgressHelpers', () => ({
+  monitorProgress: jest.fn(),
 }))
 
 const mockCriteria = [
@@ -72,6 +78,7 @@ describe('RubricForm Tests', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+    destroyFlashAlertContainer()
   })
 
   const renderComponent = (props?: Partial<RubricFormComponentProp>) => {
@@ -686,10 +693,26 @@ describe('RubricForm Tests', () => {
     it('calls generateCriteria with correct parameters when generate button is clicked', async () => {
       const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
       generateCriteriaMock.mockResolvedValue({
-        rubric: {
-          criteria: mockCriteria,
-        },
+        id: 1,
+        workflow_state: 'running',
       })
+
+      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
+      progressUpdateMock.mockImplementation(
+        (
+          progressId: string,
+          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
+          onFetchError: (error: Error) => void,
+        ) => {
+          setCurrentProgress({
+            id: '1',
+            workflow_state: 'completed',
+            message: null,
+            completion: 100,
+            results: {criteria: mockCriteria},
+          })
+        },
+      )
 
       const {getByTestId} = renderComponent({
         aiRubricsEnabled: true,
@@ -706,6 +729,7 @@ describe('RubricForm Tests', () => {
         criteriaCount: 5,
         ratingCount: 4,
         pointsPerCriterion: '20',
+        useRange: false,
       })
       expect(getByTestId('rubric-criteria-container')).toHaveTextContent('Generated Criterion 1')
     })
@@ -713,10 +737,28 @@ describe('RubricForm Tests', () => {
     it('renders the ai icon for generated criteria', async () => {
       const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
       generateCriteriaMock.mockResolvedValue({
-        rubric: {
-          criteria: mockCriteria,
-        },
+        id: 1,
+        workflow_state: 'running',
+        message: null,
+        completion: 1,
       })
+
+      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
+      progressUpdateMock.mockImplementation(
+        (
+          progressId: string,
+          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
+          _onFetchError: (error: Error) => void,
+        ) => {
+          setCurrentProgress({
+            id: progressId,
+            workflow_state: 'completed',
+            message: null,
+            completion: 100,
+            results: {criteria: mockCriteria},
+          })
+        },
+      )
 
       const {getByTestId} = renderComponent({
         aiRubricsEnabled: true,
@@ -738,6 +780,84 @@ describe('RubricForm Tests', () => {
     it('shows error when generateCriteria fails', async () => {
       const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
       generateCriteriaMock.mockRejectedValueOnce(new Error('Failed to generate'))
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const generateButton = getByTestId('generate-criteria-button')
+      fireEvent.click(generateButton)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
+        'Failed to generate criteria',
+      )
+    })
+
+    it('shows error when progress fails', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
+      generateCriteriaMock.mockResolvedValue({
+        id: 1,
+        workflow_state: 'running',
+        message: null,
+        completion: 1,
+      })
+
+      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
+      progressUpdateMock.mockImplementation(
+        (
+          progressId: string,
+          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
+          _onFetchError: (error: Error) => void,
+        ) => {
+          setCurrentProgress({
+            id: progressId,
+            workflow_state: 'failed',
+            message: null,
+            completion: 1,
+            results: undefined,
+          })
+        },
+      )
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const generateButton = getByTestId('generate-criteria-button')
+      fireEvent.click(generateButton)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
+        'Failed to generate criteria',
+      )
+    })
+
+    it('shows error when progress errors', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
+      generateCriteriaMock.mockResolvedValue({
+        id: 1,
+        workflow_state: 'running',
+        message: null,
+        completion: 1,
+      })
+
+      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
+      progressUpdateMock.mockImplementation(
+        (
+          _progressId: string,
+          _setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
+          onFetchError: (error: Error) => void,
+        ) => {
+          onFetchError(new Error('Failed to generate'))
+        },
+      )
 
       const {getByTestId} = renderComponent({
         aiRubricsEnabled: true,

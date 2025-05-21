@@ -529,6 +529,8 @@ CanvasRails::Application.routes.draw do
     get "canvas_career_validation" => "horizon#validate_course"
     post "canvas_career_conversion" => "horizon#convert_course"
     post "canvas_career_reversion" => "horizon#revert_course"
+    get "accessibility", controller: :accessibility, action: :show
+    get "accessibility/issues", controller: :accessibility, action: :issues
   end
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
 
@@ -1108,6 +1110,11 @@ CanvasRails::Application.routes.draw do
   get "terms_of_use" => "legal_information#terms_of_use", :as => "terms_of_use_redirect"
   get "privacy_policy" => "legal_information#privacy_policy", :as => "privacy_policy_redirect"
 
+  scope(controller: :career) do
+    get "career", action: :catch_all
+    get "career/*path", action: :catch_all, as: :career_path
+  end
+
   scope(controller: :smart_search) do
     get "courses/:course_id/search", action: :show, as: :course_search
     # TODO: Add back global search once we have a good way to handle it
@@ -1676,6 +1683,8 @@ CanvasRails::Application.routes.draw do
 
       put "users/:id/text_editor_preference", controller: "users", action: "set_text_editor_preference"
 
+      put "users/:id/files_ui_version_preference", controller: "users", action: "set_files_ui_version_preference"
+
       get "users/:id/new_user_tutorial_statuses", action: "get_new_user_tutorial_statuses"
       put "users/:id/new_user_tutorial_statuses/:page_name", action: "set_new_user_tutorial_status"
 
@@ -1984,6 +1993,11 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :list
       post "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :create
       delete "accounts/:account_id/lti_registrations/:registration_id/deployments/:id", action: :destroy
+    end
+
+    scope(controller: "lti/context_controls") do
+      get "lti_registrations/:registration_id/controls", action: :index
+      get "lti_registrations/:registration_id/controls/:id", action: :show
     end
 
     scope(controller: "lti/resource_links") do

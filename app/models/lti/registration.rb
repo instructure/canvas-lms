@@ -30,15 +30,16 @@ class Lti::Registration < ActiveRecord::Base
 
   # If this tool has been installed via dynamic registration, it will have an ims_registration.
   has_one :ims_registration, class_name: "Lti::IMS::Registration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
-  has_many :context_external_tool, inverse_of: :lti_registration, foreign_key: :lti_registration_id
-
-  has_one :developer_key, inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
   # If this tool has been installed via "paste JSON" or other manual install methods, it will have a manual_configuration.
   has_one :manual_configuration, class_name: "Lti::ToolConfiguration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
+  has_many :deployments, class_name: "ContextExternalTool", inverse_of: :lti_registration, foreign_key: :lti_registration_id
+  has_one :developer_key, inverse_of: :lti_registration, foreign_key: :lti_registration_id
+
   has_many :lti_registration_account_bindings, class_name: "Lti::RegistrationAccountBinding", inverse_of: :registration
   has_many :lti_overlays, class_name: "Lti::Overlay", inverse_of: :registration
+  has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :registration
 
   validates :name, :admin_nickname, :vendor, length: { maximum: 255 }
   validates :description, length: { maximum: 2048 }, allow_blank: true
