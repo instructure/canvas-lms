@@ -251,14 +251,46 @@ window.modules = (function () {
       )
     },
 
-    updateModuleItemPositions(_event, ui) {
+    async updateModuleItemPositions(_event, ui) {
       const $module = ui.item.parents('.context_module')
       const moduleId = $module.attr('id').substring('context_module_'.length)
       const url = `${ENV.CONTEXT_URL_ROOT}/modules/${moduleId}/reorder`
-      const items = []
-      $module.find('.context_module_items .context_module_item').each(function () {
-        items.push($(this).getTemplateData({textValues: ['id']}).id)
-      })
+      let items = []
+      if (ENV.FEATURE_MODULES_PERF && isModulePaginated($module[0])) {
+        const pageItemsIds = []
+        // the DOM holds just the current page. get their ids
+        $module.find('.context_module_items .context_module_item').each(function () {
+          pageItemsIds.push($(this).getTemplateData({textValues: ['id']}).id)
+        })
+        // now get all the module's item ids
+        try {
+          const allItemsList = await fetchItemTitles(ENV.COURSE_ID, moduleId)
+          const allItemsIds = allItemsList.map(item => item.id)
+          // find the first index of the pageItemsIds
+          const pageItemsIndex = Math.min(
+            ...pageItemsIds.map(id => {
+              const idx = allItemsIds.indexOf(id)
+              return idx === -1 ? Number.MAX_SAFE_INTEGER : idx
+            }),
+          )
+
+          // replace the slice of allItemsIds with pageItemsIds
+          // we know they're contiguous in the array because they're together on the page
+          // length-1 becuase we just added an item to the page so there's 1 more id on the page
+          // than we want to replace in the allItemsIds array
+          allItemsIds.splice(pageItemsIndex, pageItemsIds.length - 1, ...pageItemsIds)
+          items = allItemsIds // \o/
+        } catch (_e) {
+          $module
+            .find('.content')
+            .errorBox(I18n.t('errors.reorder', 'Reorder failed, please try again.'))
+          return
+        }
+      } else {
+        $module.find('.context_module_items .context_module_item').each(function () {
+          items.push($(this).getTemplateData({textValues: ['id']}).id)
+        })
+      }
       $module.find('.context_module_items.ui-sortable').sortable('disable')
       $module.disableWhileLoading(
         $.ajaxJSON(
