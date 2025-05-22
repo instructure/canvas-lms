@@ -339,6 +339,21 @@ class DeveloperKey < ActiveRecord::Base
     false
   end
 
+  # Verify that the given uri has the same scheme, domain and port as this key's
+  # redirect_uri's.
+  def redirect_uri_matches?(redirect_uri)
+    return false if redirect_uri.blank?
+
+    normalized_redirect_uri = Addressable::URI.parse(redirect_uri).normalized_site
+    return false if normalized_redirect_uri.blank?
+    return true if redirect_uris.include?(redirect_uri)
+
+    redirect_uris.map { |uri| Addressable::URI.parse(uri).normalized_site }
+                 .include?(normalized_redirect_uri)
+  rescue Addressable::URI::InvalidURIError
+    false
+  end
+
   def account_binding_for(binding_account)
     # If no account was specified return nil to prevent unneeded searching
     return if binding_account.blank?
