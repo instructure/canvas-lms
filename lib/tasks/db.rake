@@ -14,21 +14,21 @@ end
   end
 end
 
+def consul_key(table_name)
+  "store/canvas/#{DynamicSettings.environment}/activerecord/ignored_columns/#{table_name}"
+end
+
 namespace :db do
   desc "Clear columns to be ignored for each model"
   task :clear_ignored_columns, [:table_name] => :environment do |_t, args|
-    Diplomat::Kv.delete(
-      "store/canvas/#{DynamicSettings.environment}/activerecord/ignored_columns/#{args[:table_name]}"
-    )
+    Diplomat::Kv.delete(consul_key(args[:table_name]))
 
     MultiCache.delete("schema_cache")
   end
 
   desc "Get columns to be ignored for each model"
   task :get_ignored_columns, [:table_name] => :environment do |_t, args|
-    ignored_columns = Diplomat::Kv.get(
-      "store/canvas/#{DynamicSettings.environment}/activerecord/ignored_columns/#{args[:table_name]}"
-    )
+    ignored_columns = Diplomat::Kv.get(consul_key(args[:table_name]))
 
     puts "Ignored Columns: #{ignored_columns}"
   rescue Diplomat::KeyNotFound
@@ -41,17 +41,22 @@ namespace :db do
     Zeitwerk::Loader.eager_load_all
     model = ActiveRecord::Base.descendants.reject(&:abstract_class).find { |clazz| clazz.table_name == args[:table_name] }
     # we will happily ignore any columns on tables that don't currently exist, since nothing can depend on them yet
+    columns = args[:columns].split(",")
     unless model.nil?
-      real_columns = model.column_names & args[:columns].split(",")
+      real_columns = model.column_names & columns
       if real_columns.size.positive?
-        raise "Cannot proactively ignore '#{real_columns.join(",")}' from '#{args[:table_name]}' since the column(s) already exist"
+        warn "NOT ignoring column '#{real_columns.join(",")}' from '#{args[:table_name]}' since the column(s) already exist. " \
+             "Has the migration already run?"
+        columns -= real_columns
       end
     end
-
-    Diplomat::Kv.put(
-      "store/canvas/#{DynamicSettings.environment}/activerecord/ignored_columns/#{args[:table_name]}",
-      args[:columns]
-    )
+    key = consul_key(args[:table_name])
+    if columns.empty?
+      warn "No columns set for ignoring; removing all ignored columns for '#{args[:table_name]}' instead."
+      Diplomat::Kv.delete(key)
+    else
+      Diplomat::Kv.put(key, columns.join(","))
+    end
 
     MultiCache.delete("schema_cache")
   end
