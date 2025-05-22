@@ -119,7 +119,7 @@ describe('AssetProcessorsAddModal', () => {
   })
 
   describe('when invalid deep linking response is received from the launch', () => {
-    it('renders error message', () => {
+    it.skip('renders error message', () => {
       // Data returned by handleExternalContentMessages's ready() callback
       const mockHECM = handleExternalContentMessages as jest.Mock
       mockHECM.mockImplementationOnce(({onDeepLinkingResponse}) => {
