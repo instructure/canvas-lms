@@ -34,7 +34,7 @@ type NewCriteriaRowProps = {
 
 export const NewCriteriaRow = ({rowIndex, onEditCriterion, onAddOutcome}: NewCriteriaRowProps) => {
   return (
-    <View>
+    <View as="div" padding="medium small">
       <Flex>
         <Flex.Item align="start">
           <View as="div" cursor="pointer">
