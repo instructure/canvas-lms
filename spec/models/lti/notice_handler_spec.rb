@@ -30,9 +30,16 @@ RSpec.describe Lti::NoticeHandler, type: :model do
 
     it { is_expected.to be_valid }
 
-    it "validates url matches tool" do
+    it "validates url matches tool domain" do
       subject.url = "http://definitely-not-the-tool-url.com/"
       expect(subject).not_to be_valid
+    end
+
+    it "validates url matches tool redirect uris" do
+      tool.developer_key.redirect_uris = ["http://redirect-url.com/"]
+      tool.developer_key.save!
+      subject.url = "http://redirect-url.com/"
+      expect(subject).to be_valid
     end
 
     it "allows deletion of handlers with bad urls, max_batch_size, or notice_type" do

@@ -119,7 +119,7 @@ describe Lti::PlatformNotificationService do
     context "when handler_url does not match tool's host" do
       it "raises an InvalidNoticeHandler" do
         expect { subscribe!(handler_url: "http://www.invalid.com/handler") }.to \
-          raise_error(described_class::InvalidNoticeHandler, "Validation failed: Url should match tool's domain")
+          raise_error(described_class::InvalidNoticeHandler, "Validation failed: Url should match tool's domain or redirect uri")
         expect(Lti::NoticeHandler.count).to eq(0)
       end
     end
