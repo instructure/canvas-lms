@@ -11061,6 +11061,7 @@ he:
   login_link_color_a887a109: "צבע קישור הלוג-אין"
   login_logo_5eecf564: "לוגו הלוג-אין"
   login_screen_83518c07: "מסך הלוג-אין"
+  login_sis_id_942859: "לוג-אין/ מזהה המערכת הבית ספרית"
   login_with_auth_type_a0aaa52a: "התחברות עם *%{auth_type}*"
   login_with_provider_3fd3998e: "התחברות עם %{provider}"
   loginrequest_encoded_url_44c49c18: "כתובת בקשת התחברות מוצפנת"
@@ -13757,6 +13758,7 @@ he:
   notifications_sent_to_external_services_c4a86b78: "הודעות שנשלחו למערכות חיצוניות"
   notify_users_this_quiz_has_changed_c5b05995: "הודעה למשתמשים שבוחן זה השתנה"
   now_click_the_agenda_button_607fb40e: "כעת יש להקליק על כפתור *אג'נדה*"
+  now_d1785853: כעת
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "כעת, כשהקורס הוגדר וזמין, רשימת תיוג זו כבר אינה נחוצה. אך אנו בכל זאת נשמור אותה בסביבה במקרה שיש צורך לנסות משהו חדש, או סתם כעזרה נוספת בעת ביצוע שינויים לתוכן הקורס."
   num_messages_c1949bbc: 
     one: "הודעה אחת"
@@ -17447,6 +17449,7 @@ he:
   search_for_a_deleted_course_by_id_f553398d: "חיפוש על פי מזהה של קורסים שבוטלו"
   search_for_assignment_8149cb1: "חיפוש משימה"
   search_for_files_7541fb28: "חיפוש קבצים"
+  search_for_people_by_id_or_name_36107593: "חפש אנשים לפי מזהה או שם"
   search_grading_periods_e947a3e9: "חיפוש תקופות הערכה..."
   search_groups_or_people_6c15d6ad: "חיפוש קבוצות או אנשים"
   search_people_402e622c: "חיפוש אנשים"
@@ -17700,6 +17703,7 @@ he:
   sending_message_8ac5bc90: "שולח הודעה..."
   sending_message_failed_please_try_again_b53cc904: "משלוח הודעה נכשל, יש לנסות שוב"
   sends_international_text_messages_from_a_phone_num_10afbad6: "שליחת מסרון בינלאומי מטלפון שבמדינת הנמען, אם אפשרי."
+  sent_at_23cccc07: "נשלח אל"
   sent_f4ee89ec: נשלח!
   sent_fe0a1eb4: נשלח
   sequence_footer: 
