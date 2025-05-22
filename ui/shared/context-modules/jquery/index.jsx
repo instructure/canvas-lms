@@ -1600,10 +1600,16 @@ modules.initModuleManagement = async function (duplicate) {
         }
 
         if (ENV.FEATURE_MODULES_PERF && currentModule) {
-          if (!isModuleCollapsed(currentModule)) {
-            // this gets rid of the paginator and show all button
+          if (isModuleCollapsed(currentModule)) {
+            // this gets rid of the items in a collapsed module
+            expandModuleAndLoadAll(currentModule.dataset.moduleId)
+          } else {
+            // this gets rid of the paginator
             const ll = new ModuleItemsLazyLoader(ENV.course_id, () => {}, new ModuleItemsStore())
             ll.renderResult(currentModule.dataset.moduleId, '')
+
+            // this gets rid of the show all/less button
+            addShowAllOrLess(currentModule.dataset.moduleId)
           }
         }
       },

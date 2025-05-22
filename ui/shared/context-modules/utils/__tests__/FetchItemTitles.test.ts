@@ -51,7 +51,7 @@ describe('fetchItemTitles', () => {
   })
 
   it('should handle API errors', async () => {
-    await fetchItemTitles('17', '2')
+    await expect(fetchItemTitles('17', '2')).rejects.toThrow()
     expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith(
       expect.objectContaining({
         message: 'Failed loading module items',
