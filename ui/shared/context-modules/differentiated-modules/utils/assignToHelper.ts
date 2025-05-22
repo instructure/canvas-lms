@@ -43,7 +43,10 @@ export const setContainScrollBehavior = (element: HTMLElement | null) => {
 
 /********************* Generating Assignment Override Payload *********************/
 
-const studentOverridePayload = (students: AssigneeOption[], overrideId: string | undefined): AssignmentOverridePayload => ({
+const studentOverridePayload = (
+  students: AssigneeOption[],
+  overrideId: string | undefined,
+): AssignmentOverridePayload => ({
   student_ids: students.map(student => student.id.split('-')[1]),
   id: overrideId,
 })
@@ -74,14 +77,17 @@ const getDifferentiationTagOverrides = (differentiationTagAssignees: AssigneeOpt
 const separateAssigneesByType = (selectedAssignees: AssigneeOption[]) => {
   const studentAssignees = selectedAssignees.filter(assignee => assignee.id.includes('student'))
   const sectionAssignees = selectedAssignees.filter(assignee => assignee.id.includes('section'))
-  const differentiationTagAssignees = selectedAssignees.filter(assignee => assignee.id.includes('tag'))
+  const differentiationTagAssignees = selectedAssignees.filter(assignee =>
+    assignee.id.includes('tag'),
+  )
   return {studentAssignees, sectionAssignees, differentiationTagAssignees}
 }
 
 export const generateAssignmentOverridesPayload = (
   selectedAssignees: AssigneeOption[],
 ): AssignmentOverridesPayload => {
-  const {studentAssignees, sectionAssignees, differentiationTagAssignees} = separateAssigneesByType(selectedAssignees)
+  const {studentAssignees, sectionAssignees, differentiationTagAssignees} =
+    separateAssigneesByType(selectedAssignees)
   const sectionOverrides = getSectionOverrides(sectionAssignees)
   const differentiationTagOverrides = getDifferentiationTagOverrides(differentiationTagAssignees)
 
@@ -107,7 +113,12 @@ export const generateDateDetailsPayload = (
   const overrideCards = getOverrideCards(cards)
   const everyoneCard = getEveryoneCard(cards)
   const payload = defaultDateDetailsPayload(overrideCards, everyoneCard, hasModuleOverrides)
-  payload.assignment_overrides = createAssignmentOverrides(overrideCards, everyoneCard, hasModuleOverrides, deletedModuleAssignees)
+  payload.assignment_overrides = createAssignmentOverrides(
+    overrideCards,
+    everyoneCard,
+    hasModuleOverrides,
+    deletedModuleAssignees,
+  )
 
   return payload
 }
@@ -115,7 +126,7 @@ export const generateDateDetailsPayload = (
 const defaultDateDetailsPayload = (
   overrideCards: ItemAssignToCardSpec[],
   everyoneCard: ItemAssignToCardSpec | undefined,
-  hasModuleOverrides: boolean
+  hasModuleOverrides: boolean,
 ): DateDetailsPayload => {
   const payload: DateDetailsPayload = {} as DateDetailsPayload
   if (everyoneCard !== undefined && !hasModuleOverrides) {
@@ -140,7 +151,7 @@ const createAssignmentOverrides = (
   overrideCards: ItemAssignToCardSpec[],
   everyoneCard: ItemAssignToCardSpec | undefined,
   hasModuleOverrides: boolean,
-  deletedModuleAssignees: string[]
+  deletedModuleAssignees: string[],
 ) => {
   let overrides: DateDetailsOverride[] = []
   overrideCards.forEach(card => {
@@ -148,7 +159,11 @@ const createAssignmentOverrides = (
     const sectionOverrides = generateSectionOverrides(card, everyoneCard, isUpdatedModuleOverride)
     const groupOverrides = generateGroupOverrides(card, isUpdatedModuleOverride)
     const differentiationTagOverrides = generateGroupOverrides(card, isUpdatedModuleOverride, true)
-    overrides = overrides.concat([...sectionOverrides, ...groupOverrides, ...differentiationTagOverrides])
+    overrides = overrides.concat([
+      ...sectionOverrides,
+      ...groupOverrides,
+      ...differentiationTagOverrides,
+    ])
 
     // the following overrides need to be individually added and are not always
     // included when generating the overrides depending on certain situations
@@ -166,7 +181,11 @@ const createAssignmentOverrides = (
   return overrides.flat()
 }
 
-const generateSectionOverrides = (card: ItemAssignToCardSpec, everyoneCard: ItemAssignToCardSpec | undefined, isUpdatedModuleOverride: boolean) => {
+const generateSectionOverrides = (
+  card: ItemAssignToCardSpec,
+  everyoneCard: ItemAssignToCardSpec | undefined,
+  isUpdatedModuleOverride: boolean,
+) => {
   const overrides: DateDetailsOverride[] = []
   const sectionAssignees = getAssigneesByType(card.selectedAssigneeIds, 'section')
   sectionAssignees.map(section => {
@@ -179,9 +198,10 @@ const createSectionOverride = (
   card: ItemAssignToCardSpec,
   section: string,
   isUpdatedModuleOverride: boolean,
-  everyoneCard: ItemAssignToCardSpec | undefined
+  everyoneCard: ItemAssignToCardSpec | undefined,
 ): DateDetailsOverride => {
-  const isDefaultSectionOverride = everyoneCard?.defaultOptions?.[0]?.includes(section) && everyoneCard.overrideId !== everyoneCard?.overrideId
+  const isDefaultSectionOverride =
+    card?.defaultOptions?.[0]?.includes(section) && card.overrideId !== everyoneCard?.overrideId
   const shouldUpdate = isDefaultSectionOverride && !isUpdatedModuleOverride
   const overrideId = shouldUpdate ? card.overrideId : undefined
   return {
@@ -197,12 +217,22 @@ const createSectionOverride = (
 //   - Context module overrides cannot contain dates
 const shouldCreateGroupOverride = (card: ItemAssignToCardSpec, group: string): boolean => {
   const isDefaultGroupOverride = card.defaultOptions?.[0]?.includes(group)
-  const cardHasADate = Boolean(card.due_at || card.unlock_at || card.lock_at || card.reply_to_topic_due_at || card.required_replies_due_at)
+  const cardHasADate = Boolean(
+    card.due_at ||
+      card.unlock_at ||
+      card.lock_at ||
+      card.reply_to_topic_due_at ||
+      card.required_replies_due_at,
+  )
 
-  return (!isDefaultGroupOverride || cardHasADate)
+  return !isDefaultGroupOverride || cardHasADate
 }
 
-const generateGroupOverrides = (card: ItemAssignToCardSpec, isUpdatedModuleOverride: boolean, isDifferentiationTag = false) => {
+const generateGroupOverrides = (
+  card: ItemAssignToCardSpec,
+  isUpdatedModuleOverride: boolean,
+  isDifferentiationTag = false,
+) => {
   const overrides: DateDetailsOverride[] = []
   const groupType = isDifferentiationTag ? 'tag' : 'group'
   const groupAssignees = getAssigneesByType(card.selectedAssigneeIds, groupType)
@@ -214,16 +244,25 @@ const generateGroupOverrides = (card: ItemAssignToCardSpec, isUpdatedModuleOverr
   return overrides
 }
 
-const createGroupOverride = (card: ItemAssignToCardSpec, group: string, isUpdatedModuleOverride: boolean): DateDetailsOverride => {
+const createGroupOverride = (
+  card: ItemAssignToCardSpec,
+  group: string,
+  isUpdatedModuleOverride: boolean,
+): DateDetailsOverride => {
   const isDefaultGroupOverride = card.defaultOptions?.[0]?.includes(group)
-  const overrideId = isDefaultGroupOverride && !isUpdatedModuleOverride ? card.overrideId : undefined
+  const overrideId =
+    isDefaultGroupOverride && !isUpdatedModuleOverride ? card.overrideId : undefined
   return {
     group_id: group.split('-')[1],
     ...createOverride(overrideId, card),
   }
 }
 
-const addStudentOverridesIfApplicable = (overrides: DateDetailsOverride[], card: ItemAssignToCardSpec, isUpdatedModuleOverride: boolean) => {
+const addStudentOverridesIfApplicable = (
+  overrides: DateDetailsOverride[],
+  card: ItemAssignToCardSpec,
+  isUpdatedModuleOverride: boolean,
+) => {
   const studentAssignees = getAssigneesByType(card.selectedAssigneeIds, 'student')
   // Add override if there are student assignees
   // All students are grouped into one override per card
@@ -233,10 +272,14 @@ const addStudentOverridesIfApplicable = (overrides: DateDetailsOverride[], card:
   }
 }
 
-const createStudentOverride = (card: ItemAssignToCardSpec, isUpdatedModuleOverride: boolean): DateDetailsOverride => {
+const createStudentOverride = (
+  card: ItemAssignToCardSpec,
+  isUpdatedModuleOverride: boolean,
+): DateDetailsOverride => {
   const studentAssignees = getAssigneesByType(card.selectedAssigneeIds, 'student')
   const {studentIds, isDefaultAdhocOverride} = parseStudentIds(card, studentAssignees)
-  const overrideId = isDefaultAdhocOverride && !isUpdatedModuleOverride ? card.overrideId : undefined
+  const overrideId =
+    isDefaultAdhocOverride && !isUpdatedModuleOverride ? card.overrideId : undefined
   return {
     student_ids: studentIds,
     ...createOverride(overrideId, card),
@@ -260,12 +303,13 @@ const addCourseOverrideIfApplicable = (
   overrides: DateDetailsOverride[],
   card: ItemAssignToCardSpec,
   hasModuleOverrides: boolean,
-  isUpdatedModuleOverride: boolean
+  isUpdatedModuleOverride: boolean,
 ) => {
   const courseOverrideCard = card.selectedAssigneeIds.includes('everyone')
   if (courseOverrideCard && hasModuleOverrides) {
     const isDefaultCourseOverride = card.defaultOptions?.[0]?.includes('everyone')
-    const overrideId = isDefaultCourseOverride && !isUpdatedModuleOverride ? card.overrideId : undefined
+    const overrideId =
+      isDefaultCourseOverride && !isUpdatedModuleOverride ? card.overrideId : undefined
     const courseOverride = {
       course_id: 'everyone',
       ...createOverride(overrideId, card),
@@ -274,7 +318,10 @@ const addCourseOverrideIfApplicable = (
   }
 }
 
-const addMasteryPathsOverrideIfApplicable = (overrides: DateDetailsOverride[], card: ItemAssignToCardSpec) => {
+const addMasteryPathsOverrideIfApplicable = (
+  overrides: DateDetailsOverride[],
+  card: ItemAssignToCardSpec,
+) => {
   if (card.selectedAssigneeIds.includes('mastery_paths')) {
     const isAlreadyMasteryPath = card.defaultOptions?.[0]?.includes('Mastery Paths')
     const overrideId = isAlreadyMasteryPath ? card.overrideId : undefined
@@ -287,8 +334,13 @@ const addMasteryPathsOverrideIfApplicable = (overrides: DateDetailsOverride[], c
   }
 }
 
-const addUnassignStudentOverrides = (overrides: DateDetailsOverride[], deletedModuleAssignees: string[]) => {
-  const studentIds = getAssigneesByType(deletedModuleAssignees, 'student').map(id => id.split('-')[1])
+const addUnassignStudentOverrides = (
+  overrides: DateDetailsOverride[],
+  deletedModuleAssignees: string[],
+) => {
+  const studentIds = getAssigneesByType(deletedModuleAssignees, 'student').map(
+    id => id.split('-')[1],
+  )
   if (studentIds.length > 0) {
     const studentOverride = {
       id: undefined,
@@ -304,8 +356,13 @@ const addUnassignStudentOverrides = (overrides: DateDetailsOverride[], deletedMo
   }
 }
 
-const addUnassignSectionOverrides = (overrides: DateDetailsOverride[], deletedModuleAssignees: string[]) => {
-  const sectionIds = getAssigneesByType(deletedModuleAssignees, 'section').map(id => id.split('-')[1])
+const addUnassignSectionOverrides = (
+  overrides: DateDetailsOverride[],
+  deletedModuleAssignees: string[],
+) => {
+  const sectionIds = getAssigneesByType(deletedModuleAssignees, 'section').map(
+    id => id.split('-')[1],
+  )
   sectionIds.forEach(section => {
     const sectionOverride = {
       id: undefined,
@@ -321,7 +378,11 @@ const addUnassignSectionOverrides = (overrides: DateDetailsOverride[], deletedMo
   })
 }
 
-const createOverride = (overrideId: string | undefined, card: ItemAssignToCardSpec, unassignItem = false): DateDetailsOverride => {
+const createOverride = (
+  overrideId: string | undefined,
+  card: ItemAssignToCardSpec,
+  unassignItem = false,
+): DateDetailsOverride => {
   return {
     id: overrideId,
     due_at: card.due_at,
@@ -382,9 +443,7 @@ export function getOverriddenAssignees(overrides?: DateDetailsOverride[]) {
       }
       const differentiationTagOverride = overrides?.find(
         tmp =>
-          tmp.group_id !== undefined &&
-          tmp.group_id === current.group_id &&
-          !tmp.context_module_id,
+          tmp.group_id !== undefined && tmp.group_id === current.group_id && !tmp.context_module_id,
       )
       if (differentiationTagOverride && current.group_id) {
         acc.differentiationTags.push(current.group_id)
