@@ -21,6 +21,7 @@ import 'jquery-migrate'
 import Outcome from '../../../../backbone/models/Outcome'
 import OutcomeContentBase from '../OutcomeContentBase'
 import OutcomeView from '../OutcomeView'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 // stub function that creates the RCE to avoid
 // its async initialization
@@ -69,6 +70,9 @@ describe('OutcomeView Form Field Modifications', () => {
   let view
 
   beforeEach(() => {
+    fakeENV.setup({
+      ACCOUNT_LEVEL_MASTERY_SCALES: false,
+    })
     document.body.innerHTML = '<div id="fixtures"></div>'
   })
 
@@ -78,6 +82,7 @@ describe('OutcomeView Form Field Modifications', () => {
       view = null
     }
     document.body.innerHTML = ''
+    fakeENV.teardown()
   })
 
   it('returns false for all fields when not modified', async () => {
@@ -85,12 +90,16 @@ describe('OutcomeView Form Field Modifications', () => {
       model: new Outcome(buildOutcome(), {parse: true}),
       state: 'edit',
     })
-    await waitFrames(10)
+
+    await waitFrames(20)
+
     view.edit($.Event())
-    await waitFrames(10)
+    await new Promise(resolve => setTimeout(resolve, 100))
+
     const modified = view.getModifiedFields(view.getFormData())
+
     expect(modified.masteryPoints).toBeFalsy()
     expect(modified.calculationInt).toBeFalsy()
-    expect(modified.calculationMethod).toBeFalsy()
+    expect(modified.scoringMethod).toBeFalsy()
   })
 })

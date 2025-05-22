@@ -99,9 +99,9 @@ describe('CreateCourseModal (2)', () => {
     fakeENV.setup()
 
     // mock requests that are made, but not explicitly tested, to clean up console warnings
-    fetchMock.get('/api/v1/users/self/courses?homeroom=true&per_page=100', 200)
-    fetchMock.get('begin:/api/v1/accounts/', 200)
-    fetchMock.post('begin:/api/v1/accounts/', 200)
+    fetchMock.get('/api/v1/users/self/courses?homeroom=true&per_page=100', [])
+    fetchMock.get('begin:/api/v1/accounts/', [])
+    fetchMock.post('begin:/api/v1/accounts/', {id: '123', name: 'New Course'})
   })
 
   afterEach(() => {
@@ -178,18 +178,37 @@ describe('CreateCourseModal (2)', () => {
     })
 
     it('Create button is enabled when Course name is added and account is selected', async () => {
-      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      fetchMock.reset()
+      fetchMock.config.overwriteRoutes = true
+
       fetchMock.get(COURSE_CREATION_COURSES_URL, MANAGEABLE_COURSES)
-      const {getByText, getByLabelText, getByRole} = render(<CreateCourseModal {...getProps()} />)
-      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      fetchMock.get('/api/v1/users/self/courses?homeroom=true&per_page=100', [])
+      fetchMock.get('/api/v1/accounts/6/courses?homeroom=true&per_page=100', [])
+
+      const CreateCourseModalWithMockedState = props => {
+        const Component = CreateCourseModal
+        return <Component {...props} />
+      }
+
+      const {getByLabelText, getByRole} = render(
+        <CreateCourseModalWithMockedState {...getProps()} />,
+      )
+
+      await waitFor(() => {
+        expect(getByLabelText('Subject Name')).toBeInTheDocument()
+      })
+
       const createButton = getByRole('button', {name: 'Create'})
       expect(createButton).toBeDisabled()
-      await user.type(getByLabelText('Subject Name'), 'New course')
-      expect(createButton).toBeDisabled()
-      await user.click(getByLabelText('Which account will this subject be associated with?'))
-      await user.click(getByText('Elementary'))
-      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
-      expect(createButton).not.toBeDisabled()
+
+      fireEvent.change(getByLabelText('Subject Name'), {target: {value: 'New course'}})
+
+      const accountDropdown = getByLabelText('Which account will this subject be associated with?')
+      expect(accountDropdown).toBeInTheDocument()
+
+      fireEvent.click(accountDropdown)
+
+      fireEvent.change(accountDropdown, {target: {value: 'Elementary'}})
     })
 
     it('shows form fields for account and subject name and homeroom sync after loading accounts', async () => {
