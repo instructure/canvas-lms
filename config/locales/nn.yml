@@ -10928,6 +10928,7 @@ nn:
   enter_a_workflow_state_to_narrow_results_162903af: "Legg inn ein arbeidsflyt for å snevre inn søkeresultatet"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Skriv inn \"{{ACCOUNT_DOMAIN}}\" som erstatning for brukaren sitt rotdomene"
   enter_and_distribute_grades_c1216df: "Registrer og fordel vurderingar"
+  enter_at_least_3_characters_to_search_4f037ee0: "Oppgi minst 3 teikn for å søke"
   enter_at_least_count_characters_1c7a0b36: "Må vere minst %{count} teikn"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Skriv inn \"{{CANVAS_USER_ID}}\" som erstatning for brukaren sin unike Canvas-ID"
   enter_grades_as_e113e606: "Legg inn vurderingar som"
@@ -15433,6 +15434,7 @@ nn:
   login_link_color_a887a109: "Farge påloggingslenke"
   login_logo_5eecf564: Påloggingslogo
   login_screen_83518c07: Påloggingsskjerm
+  login_sis_id_942859: Pålogging/SIS-ID
   login_with_auth_type_a0aaa52a: "Logg på med *%{auth_type}*"
   login_with_provider_3fd3998e: "Logg på med %{provider}"
   loginrequest_encoded_url_44c49c18: "LoginRequest-koda URL"
@@ -18776,6 +18778,7 @@ nn:
   notify_users_bbb522c1: "Varsle brukarar"
   notify_users_this_quiz_has_changed_c5b05995: "Varsle brukarane om at quizen er endra"
   november_ca6fa5a6: November
+  now_d1785853: "no"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Emnet ditt er oppretta og tilgjengeleg og du treng sannsynlegvis ikkje sjekklista lenger. Vi tek likevel vare på ho i tilfelle du seinare vil prøve noko nytt, eller treng litt ekstra hjelp når du endrar emneinnhaldet."
   now_viewing_attempt_current_attempt_918e616: "Syner no forsøk %{current_attempt}"
   nuco_submission_data_ded12af8: "Nuco innleveringsdata"
@@ -23371,6 +23374,7 @@ nn:
   search_for_a_deleted_user_by_id_32f109e7: "Søk etter sletta brukar etter ID"
   search_for_assignment_8149cb1: "Søk etter oppgåve"
   search_for_files_7541fb28: "Søk etter filer"
+  search_for_people_by_id_or_name_36107593: "Søk etter personar etter ID eller namn"
   search_for_sections_62e90cf4: "Søk etter seksjonar"
   search_for_students_ed16c2de: "Søk etter studentar"
   search_for_your_school_or_institution_1eb2eeaf: "Søk etter skolen eller institusjonen din"
@@ -23809,6 +23813,7 @@ nn:
   sending_message_failed_please_try_again_b53cc904: "Sending av melding mislukkast, prøv på nytt seinare"
   sending_messages_effc7237: "Sender meldingar"
   sending_messages_f8f41998: "sender meldingar..."
+  sent_at_23cccc07: "Sendt den"
   sent_f4ee89ec: Send.
   sent_fe0a1eb4: Sendt
   separate_columns_for_first_last_names_in_gradebook_419126c3: "Adskilde kolonnar for fornamn/etternamn i Vurderingsoversikt"
