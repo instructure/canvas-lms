@@ -152,7 +152,7 @@ function QuizEngineModal({setOpen, onDismiss}) {
         name="quizEngine"
         onChange={handleChange}
         defaultValue={option}
-        description=""
+        description={I18n.t('Select a quiz engine')}
       >
         <RadioInput
           key={NEW}
