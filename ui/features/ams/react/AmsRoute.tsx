@@ -24,8 +24,7 @@ interface AmsModule {
 }
 
 export function Component(): JSX.Element | null {
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const mountedContainer = useRef<HTMLDivElement | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(document.querySelector('#ams_container'))
   const moduleRef = useRef<AmsModule | null>(null)
 
   React.useEffect(() => {
@@ -39,8 +38,7 @@ export function Component(): JSX.Element | null {
       .then(module => {
         if (stillMounting && containerRef.current) {
           moduleRef.current = module
-          mountedContainer.current = containerRef.current
-          module.render(mountedContainer.current, {
+          module.render(containerRef.current, {
             routerBasename: '/ams',
             themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
             useHighContrast: window.ENV.use_high_contrast ?? false,
@@ -53,13 +51,13 @@ export function Component(): JSX.Element | null {
 
     return () => {
       stillMounting = false
-      if (mountedContainer.current && moduleRef.current) {
-        moduleRef.current.unmount(mountedContainer.current)
+      if (containerRef.current && moduleRef.current) {
+        moduleRef.current.unmount(containerRef.current)
       }
     }
   }, [])
 
-  return <div ref={containerRef} id="ams-container" />
+  return null
 }
 
 async function loadAmsModule() {

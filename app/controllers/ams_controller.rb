@@ -27,6 +27,6 @@ class AmsController < ApplicationController
     js_env(AMS_SERVICE_ENABLED: ams_service_enabled)
     remote_env(ams: { launch_url: Services::Ams.launch_url })
 
-    render html: "", layout: true
+    render html: '<div id="ams_container"></div>'.html_safe, layout: true
   end
 end
