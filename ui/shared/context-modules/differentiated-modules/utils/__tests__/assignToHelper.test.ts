@@ -30,30 +30,30 @@ describe('assitnToHelper', () => {
     it('returns the correct payload', () => {
       const selectedAssignees: AssigneeOption[] = [
         {
-          id: "section-1",
-          value: "Math 101",
-          group: "Sections",
+          id: 'section-1',
+          value: 'Math 101',
+          group: 'Sections',
         },
         {
-          id: "student-1",
-          value: "Ben",
-          group: "Students",
-          sisID: "student_1",
+          id: 'student-1',
+          value: 'Ben',
+          group: 'Students',
+          sisID: 'student_1',
         },
         {
-          id: "tag-1",
-          value: "Tag 1",
-          group: "Tags",
-          groupCategoryId: "1",
-          groupCategoryName: "Non Collaborative Group Category",
-        }
+          id: 'tag-1',
+          value: 'Tag 1',
+          group: 'Tags',
+          groupCategoryId: '1',
+          groupCategoryName: 'Non Collaborative Group Category',
+        },
       ]
       const expectedPayload: AssignmentOverridesPayload = {
         overrides: [
-          { course_section_id: "1", id: undefined },
-          { group_id: "1" },
-          { student_ids: ["1"], id: undefined},
-        ]
+          {course_section_id: '1', id: undefined},
+          {group_id: '1'},
+          {student_ids: ['1'], id: undefined},
+        ],
       }
       expect(generateAssignmentOverridesPayload(selectedAssignees)).toEqual(expectedPayload)
     })
@@ -61,33 +61,33 @@ describe('assitnToHelper', () => {
     it('returns the correct payload when overrides exist', () => {
       const selectedAssignees: AssigneeOption[] = [
         {
-          id: "section-1",
-          value: "Math 101",
-          group: "Sections",
+          id: 'section-1',
+          value: 'Math 101',
+          group: 'Sections',
           overrideId: '1',
         },
         {
-          id: "student-1",
-          value: "Ben",
-          group: "Students",
-          sisID: "student_1",
+          id: 'student-1',
+          value: 'Ben',
+          group: 'Students',
+          sisID: 'student_1',
           overrideId: '2',
         },
         {
-          id: "tag-1",
-          value: "Tag 1",
-          group: "Tags",
-          groupCategoryId: "1",
-          groupCategoryName: "Non Collaborative Group Category",
+          id: 'tag-1',
+          value: 'Tag 1',
+          group: 'Tags',
+          groupCategoryId: '1',
+          groupCategoryName: 'Non Collaborative Group Category',
           overrideId: '3',
-        }
+        },
       ]
       const expectedPayload: AssignmentOverridesPayload = {
         overrides: [
-          { course_section_id: "1", id: '1' },
-          { group_id: "1", id: '3' },
-          { student_ids: ["1"], id: '2'},
-        ]
+          {course_section_id: '1', id: '1'},
+          {group_id: '1', id: '3'},
+          {student_ids: ['1'], id: '2'},
+        ],
       }
       expect(generateAssignmentOverridesPayload(selectedAssignees)).toEqual(expectedPayload)
     })
@@ -114,7 +114,7 @@ describe('assitnToHelper', () => {
       }
       expect(generateDateDetailsPayload(cards, false, [])).toEqual(expectedPayload)
     })
-  
+
     it('returns a mastery paths override if a MP card was setup', () => {
       const cards: ItemAssignToCardSpec[] = [
         {
@@ -326,7 +326,7 @@ describe('assitnToHelper', () => {
         expectedPayload,
       )
     })
-  
+
     it('only_visible_to_overrides is false if there are only module overrides', () => {
       const cards: ItemAssignToCardSpec[] = []
       const expectedPayload = <DateDetailsPayload>{
@@ -335,7 +335,7 @@ describe('assitnToHelper', () => {
       }
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
     })
-  
+
     it('only_visible_to_overrides is true if there are module overrides and no everyone card', () => {
       const cards: ItemAssignToCardSpec[] = [
         {
@@ -371,6 +371,37 @@ describe('assitnToHelper', () => {
           {
             due_at: '2021-01-01T00:00:00Z',
             id: undefined,
+            lock_at: undefined,
+            course_section_id: '1',
+            unlock_at: undefined,
+            reply_to_topic_due_at: undefined,
+            required_replies_due_at: undefined,
+            unassign_item: false,
+          },
+        ] as unknown as DateDetailsOverride[],
+        only_visible_to_overrides: true,
+      }
+      expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
+    })
+
+    it('returns ids for section overrides with the same default section', () => {
+      // overrides should be overwritten not created if the default section is the same
+      // and the override is not a module override.
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '1',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['section-1'] as string[],
+          defaultOptions: ['section-1'],
+          due_at: '2021-01-01T00:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+      const expectedPayload = <DateDetailsPayload>{
+        assignment_overrides: [
+          {
+            due_at: '2021-01-01T00:00:00Z',
+            id: '1',
             lock_at: undefined,
             course_section_id: '1',
             unlock_at: undefined,
