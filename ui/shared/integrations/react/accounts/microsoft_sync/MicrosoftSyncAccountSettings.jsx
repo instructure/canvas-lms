@@ -20,6 +20,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconInfoLine, IconUploadLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -113,7 +114,7 @@ export default function MicrosoftSyncAccountSettings() {
                       payload: {microsoft_sync_tenant: event.target.value},
                     })
                   }
-                  messages={state.tenantErrorMessages.concat(state.tenantInfoMessages)}
+                  messages={state.tenantErrorMessages}
                   tenant={state.microsoft_sync_tenant}
                 />
               </Table.Cell>
@@ -235,6 +236,13 @@ export default function MicrosoftSyncAccountSettings() {
           redirectUri={ENV.MICROSOFT_SYNC.REDIRECT_URI}
           tenant={state.microsoft_sync_tenant}
         />
+        <View display="block" margin="small 0 0 0">
+          <Text>
+            {I18n.t(
+              "Modifying existing settings will affect courses once an enrollment changes. Consider manually triggering a sync on the Course Settings page. Note that incorrect settings may result in Canvas users not mapping to Microsoft users, which may cause users to be removed from a course's existing Microsoft group.",
+            )}
+          </Text>
+        </View>
       </View>
     )
   }
