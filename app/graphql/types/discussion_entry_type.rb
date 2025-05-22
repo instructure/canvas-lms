@@ -38,41 +38,49 @@ module Types
     def message
       return nil if object.deleted?
 
+      # You'll see the reassignment "work_to_do = work_to_do.then" below. Its important to remember then returns a new
+      # promise and doesn't mutate an existing one, since we want to build a chain we need to keep reassigning to
+      # work_to_do.
+      work_to_do = Promise.new.tap(&:fulfill)
+
       if object.message&.include?("<span class=\"mceNonEditable mention\"")
-        doc = Nokogiri::HTML::DocumentFragment.parse(object.message)
-        mentioned_spans = doc.css("span[data-mention]")
-        mentioned_user_ids = mentioned_spans.pluck("data-mention").map(&:to_i)
+        work_to_do = work_to_do.then do
+          doc = Nokogiri::HTML::DocumentFragment.parse(object.message)
+          mentioned_spans = doc.css("span[data-mention]")
+          mentioned_user_ids = mentioned_spans.pluck("data-mention").map(&:to_i)
 
-        users = GraphQL::Batch.batch do
-          Loaders::DiscussionEntryUserLoader.load_many(mentioned_user_ids).sync
+          Loaders::DiscussionEntryUserLoader.load_many(mentioned_user_ids).then do |users|
+            mentioned_spans.each do |span|
+              user = users.find { |u| u.id == span["data-mention"].to_i }
+              if user
+                mention_node = span.children.find { |node| node.text? && node.content.start_with?("@") }
+                mention_node.content = "@" + user.name if mention_node
+              end
+            end
+          end.then { object.message = doc.to_html }
         end
-
-        mentioned_spans.each do |span|
-          user = users.find { |u| u.id == span["data-mention"].to_i }
-          if user
-            mention_node = span.children.find { |node| node.text? && node.content.start_with?("@") }
-            mention_node.content = "@" + user.name if mention_node
-          end
-        end
-        object.message = doc.to_html
       end
 
-      return object.message unless rich_content_attachment?
-
-      load_association(:discussion_topic).then do |topic|
-        Loaders::ApiContentAttachmentLoader.for(topic.context).load(object.message).then do |preloaded_attachments|
-          object.message = GraphQLHelpers::UserContent.process(
-            object.message,
-            context: topic.context,
-            in_app: true,
-            request:,
-            preloaded_attachments:,
-            user: current_user,
-            options: { rewrite_api_urls: true, domain_root_account: context[:domain_root_account] },
-            location: object.asset_string
-          )
+      if rich_content_attachment?
+        work_to_do = work_to_do.then do
+          load_association(:discussion_topic).then do |topic|
+            Loaders::ApiContentAttachmentLoader.for(topic.context).load(object.message).then do |preloaded_attachments|
+              object.message = GraphQLHelpers::UserContent.process(
+                object.message,
+                context: topic.context,
+                in_app: true,
+                request:,
+                preloaded_attachments:,
+                user: current_user,
+                options: { rewrite_api_urls: true, domain_root_account: context[:domain_root_account] },
+                location: object.asset_string
+              )
+            end
+          end
         end
-      end.then { object.message }
+      end
+
+      work_to_do.then { object.message }
     end
 
     field :root_entry_page_number, Integer, null: true do
