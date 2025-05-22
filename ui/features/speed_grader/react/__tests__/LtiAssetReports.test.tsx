@@ -18,12 +18,12 @@
 
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import {LtiAssetReports} from '../LtiAssetReports'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
 import {LtiAssetReportsByProcessor} from 'features/speed_grader/jquery/speed_grader.d'
+import {LtiAssetReportsWrapper} from '../LtiAssetReportsWrapper'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(),
@@ -43,14 +43,14 @@ beforeEach(() => {
 let lastMockReportId = 0
 
 function makeMockReport(title: string, overrides: Partial<LtiAssetReport> = {}): LtiAssetReport {
-  const id = lastMockReportId++
+  const _id = lastMockReportId++
   return {
-    id,
+    _id,
     title,
     processingProgress: 'Processed',
     reportType: 'originality',
     priority: 1,
-    launchUrlPath: `/launch/report/${id}`,
+    launchUrlPath: `/launch/report/${_id}`,
     comment: `comment for ${title}`,
     resubmitAvailable: false,
     ...overrides,
@@ -67,7 +67,7 @@ describe('LtiAssetReports', () => {
     const attempt = 1
     const studentId = '101'
     const props = {versionedAttachments, reportsByAttachment, assetProcessors, attempt, studentId}
-    return render(<LtiAssetReports {...props} />)
+    return render(<LtiAssetReportsWrapper {...props} />)
   }
 
   beforeEach(() => {

@@ -31,7 +31,7 @@ module Lti
         submission,
         asset_processor
       )
-      head :created
+      head :no_content
     end
 
     def assignment

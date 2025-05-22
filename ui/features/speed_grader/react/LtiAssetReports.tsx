@@ -26,19 +26,20 @@ import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWith
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {buildAPDisplayTitle, ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
-import {QueryClientProvider, useMutation} from '@tanstack/react-query'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {queryClient} from '@canvas/query'
 import {
   LtiAssetReportsCard,
   LtiAssetReportsMissingReportsCard,
 } from './LtiAssetReports/LtiAssetReportsCard'
+import {
+  ResubmitLtiAssetReportsProps,
+  useResubmitLtiAssetReports,
+} from './LtiAssetReports/useResubmitLtiAssetReports'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useEffect} from 'react'
 
 const I18n = createI18nScope('speed_grader')
+
+// Below here, code should be copiable to SG2
 
 export type LtiAssetReportsProps = {
   versionedAttachments: {attachment: {id: string; display_name: string}}[] | undefined
@@ -86,7 +87,7 @@ function LtiAssetReportsCardGroup({attachment, reports}: LtiAssetReportsCardGrou
     <Flex direction="column" gap="x-small">
       <Heading level="h4">{attachment.display_name}</Heading>
       {anyReports ? (
-        reports.map(r => <LtiAssetReportsCard key={r.id} report={r} />)
+        reports.map(r => <LtiAssetReportsCard key={r._id} report={r} />)
       ) : (
         <LtiAssetReportsMissingReportsCard />
       )}
@@ -99,12 +100,12 @@ function shouldShowResubmitButton({
   reportsByAttachment,
   versionedAttachments,
 }: {
-  processorId: number
+  processorId: string
   reportsByAttachment: Record<string, LtiAssetReportsByProcessor>
   versionedAttachments: {attachment: {id: string}}[]
 }) {
   return versionedAttachments.some(({attachment}) => {
-    const reports = (reportsByAttachment[attachment.id] || {})[processorId]
+    const reports = reportsByAttachment[attachment.id]?.[processorId]
 
     // Resubmit button is available for a processor if there are any
     // attachments missing reports, or if any reports are resubmittable
@@ -112,38 +113,15 @@ function shouldShowResubmitButton({
   })
 }
 
-const resubmit = async function (url: string) {
-  return await doFetchApi({
-    path: url,
-    method: 'POST',
-  })
-}
-
-// TODO: figure out what happens for anonymous grading here
-function resubmitPath({processorId, studentId, attempt}: ResubmitButtonProps) {
-  return `/api/lti/asset_processors/${processorId}/notices/${encodeURIComponent(studentId)}/attempts/${attempt ?? 'latest'}`
-}
-
-type ResubmitButtonProps = {
-  processorId: number
-  studentId: string
-  attempt: number | undefined | null
-}
-
-function ResubmitButton(props: ResubmitButtonProps) {
-  const resubmitMutation = useMutation({
-    mutationFn: resubmit,
-    onSuccess: () => showFlashSuccess(I18n.t('Resubmitted to Document Processing App'))(),
-    onError: () => showFlashError(I18n.t('Resubmission failed'))(),
-    mutationKey: ['resubmit-asset-reports', props.processorId, props.studentId, props.attempt],
-  })
+export function ResubmitButton(props: ResubmitLtiAssetReportsProps) {
+  const resubmitMutation = useResubmitLtiAssetReports()
   return (
     <Flex.Item>
       <Button
         size="small"
         disabled={!(resubmitMutation.isIdle || resubmitMutation.isError)}
         onClick={() => {
-          resubmitMutation.mutate(resubmitPath(props))
+          resubmitMutation.mutate(props)
         }}
       >
         {I18n.t('Resubmit All Files')}
@@ -164,46 +142,44 @@ export function LtiAssetReports({
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <View as="div" padding="small none none none">
-        <Flex direction="column" gap="small">
-          {assetProcessors.map(processor => (
-            <ToggleDetails
-              summary={ltiAssetProcessorHeader(processor)}
-              key={processor.id}
-              iconPosition="end"
-              icon={() => <IconArrowOpenDownSolid />}
-              iconExpanded={() => <IconArrowOpenUpSolid />}
-              defaultExpanded
-              fluidWidth
-            >
-              <View as="div" padding="small none">
-                <Flex direction="column" gap="small">
-                  {versionedAttachments.map(({attachment}) => (
-                    <LtiAssetReportsCardGroup
-                      key={attachment.id}
-                      attachment={attachment}
-                      reports={(reportsByAttachment[attachment.id] || {})[processor.id]}
+    <View as="div" padding="small none none none">
+      <Flex direction="column" gap="small">
+        {assetProcessors.map(processor => (
+          <ToggleDetails
+            summary={ltiAssetProcessorHeader(processor)}
+            key={processor.id}
+            iconPosition="end"
+            icon={() => <IconArrowOpenDownSolid />}
+            iconExpanded={() => <IconArrowOpenUpSolid />}
+            defaultExpanded
+            fluidWidth
+          >
+            <View as="div" padding="small none">
+              <Flex direction="column" gap="small">
+                {versionedAttachments.map(({attachment}) => (
+                  <LtiAssetReportsCardGroup
+                    key={attachment.id}
+                    attachment={attachment}
+                    reports={reportsByAttachment[attachment.id]?.[processor.id]}
+                  />
+                ))}
+                {studentId &&
+                  shouldShowResubmitButton({
+                    processorId: processor.id.toString(),
+                    reportsByAttachment,
+                    versionedAttachments,
+                  }) && (
+                    <ResubmitButton
+                      processorId={processor.id.toString()}
+                      studentId={studentId}
+                      attempt={attempt}
                     />
-                  ))}
-                  {studentId &&
-                    shouldShowResubmitButton({
-                      processorId: processor.id,
-                      reportsByAttachment,
-                      versionedAttachments,
-                    }) && (
-                      <ResubmitButton
-                        processorId={processor.id}
-                        studentId={studentId}
-                        attempt={attempt}
-                      />
-                    )}
-                </Flex>
-              </View>
-            </ToggleDetails>
-          ))}
-        </Flex>
-      </View>
-    </QueryClientProvider>
+                  )}
+              </Flex>
+            </View>
+          </ToggleDetails>
+        ))}
+      </Flex>
+    </View>
   )
 }

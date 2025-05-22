@@ -65,7 +65,7 @@ describe Types::LtiAssetReportType do
       error_code: nil,
       indication_color: nil,
       indication_alt: nil,
-      processing_progress: "Pending",
+      processing_progress: "UnrecognizedCountsAsNotReady",
       result: nil
     )
     [rep1, rep2, rep3, rep4]
@@ -148,7 +148,7 @@ describe Types::LtiAssetReportType do
   end
 
   it "provides processingProgress" do
-    expect(rep_query("processingProgress")).to match_array(%w[Failed Processing Pending])
+    expect(rep_query("processingProgress")).to match_array(%w[Failed Processing NotReady])
   end
 
   it "provides result" do

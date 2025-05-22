@@ -73,7 +73,7 @@ import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
-import {LtiAssetReports} from '../react/LtiAssetReports'
+import {LtiAssetReportsWrapper} from '../react/LtiAssetReportsWrapper'
 import useStore from '../stores/index'
 import type {
   Attachment,
@@ -891,7 +891,7 @@ function renderLtiAssetReports(
     studentId: submission.user_id,
     attempt: historicalSubmission.attempt,
   }
-  ReactDOM.render(<LtiAssetReports {...props} />, mountPoint)
+  ReactDOM.render(<LtiAssetReportsWrapper {...props} />, mountPoint)
 }
 
 function renderCheckpoints(submission: Submission) {

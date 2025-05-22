@@ -129,7 +129,7 @@ class Lti::AssetReport < ApplicationRecord
   # in New Speedgrader)
   def info_for_display
     {
-      id:,
+      _id: id,
       title:,
       comment:,
       result:,
@@ -137,11 +137,20 @@ class Lti::AssetReport < ApplicationRecord
       indicationColor: indication_color,
       indicationAlt: indication_alt,
       errorCode: error_code,
-      processingProgress: processing_progress,
+      processingProgress: effective_processing_progress,
       priority:,
       launchUrlPath: launch_url_path,
       resubmitAvailable: resubmit_available?,
     }.compact
+  end
+
+  def effective_processing_progress
+    if PROGRESSES.include?(processing_progress)
+      processing_progress
+    else
+      # Per spec
+      PROGRESS_NOT_READY
+    end
   end
 
   def launch_url_path

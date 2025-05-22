@@ -145,7 +145,7 @@ export function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
       <Flex direction="column" gap="xx-small">
         {report.title && (
           <Flex.Item>
-            <Heading>{report.title}</Heading>
+            <Heading level="h4">{report.title}</Heading>
           </Flex.Item>
         )}
         {comment && (

@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This file is used in SG2, if making changes, consider updating the code
+// there too by re-copying the contents of this file.
+
 type ToolIconUrlOrDefaultProps = {
   iconUrl: string | null | undefined
   toolId: number | string
@@ -56,13 +59,13 @@ export const ToolIconOrDefault = ({
         }}
       />
     )
-  } else {
-    return (
-      <img
-        alt={toolName}
-        style={{height: size, width: size, margin, marginRight}}
-        src={defaultIconUrl}
-      />
-    )
   }
+
+  return (
+    <img
+      alt={toolName}
+      style={{height: size, width: size, margin, marginRight}}
+      src={defaultIconUrl}
+    />
+  )
 }

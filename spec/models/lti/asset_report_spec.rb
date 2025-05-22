@@ -169,19 +169,19 @@ RSpec.describe Lti::AssetReport do
       sub1_reports = subject[sub1.id][:by_attachment]
       sub2_reports = subject[sub2.id][:by_attachment]
 
-      expect(sub1_reports[att1a.id][processorI.id].map { _1[:id] }).to \
+      expect(sub1_reports[att1a.id][processorI.id].map { _1[:_id] }).to \
         match_array([rep1aIi.id, rep1aIii.id])
-      expect(sub1_reports[att1b.id][processorI.id].map { _1[:id] }).to \
+      expect(sub1_reports[att1b.id][processorI.id].map { _1[:_id] }).to \
         match_array([rep1bIi.id])
-      expect(sub2_reports[att2a.id][processorI.id].map { _1[:id] }).to \
+      expect(sub2_reports[att2a.id][processorI.id].map { _1[:_id] }).to \
         match_array([rep2aIi.id])
-      expect(sub2_reports[att2a.id][processorII.id].map { _1[:id] }).to \
+      expect(sub2_reports[att2a.id][processorII.id].map { _1[:_id] }).to \
         match_array([rep2aIIi.id])
     end
 
     it "includes report details in the result" do
       r = subject[sub1.id][:by_attachment][att1a.id][processorI.id].find do |r|
-        r[:id] == rep1aIi.id
+        r[:_id] == rep1aIi.id
       end
       expect(r).to eq(rep1aIi.info_for_display)
     end
@@ -243,7 +243,7 @@ RSpec.describe Lti::AssetReport do
     end
 
     it "returns a hash with the report's details" do
-      expect(subject[:id]).to eq(report.id)
+      expect(subject[:_id]).to eq(report.id)
       expect(subject[:title]).to eq("My cool report")
       expect(subject[:comment]).to eq("What a great report")
       expect(subject[:result]).to eq("8/10")
@@ -253,6 +253,11 @@ RSpec.describe Lti::AssetReport do
       expect(subject[:errorCode]).to eq("MYERRORCODE")
       expect(subject[:processingProgress]).to eq("Processed")
       expect(subject[:resubmitAvailable]).to be(false)
+    end
+
+    it "defaults processingProgress to NotReady if it is unrecognized" do
+      report.update! processing_progress: "something unrecognized"
+      expect(subject[:processingProgress]).to eq("NotReady")
     end
 
     it "truncates result_truncated to 16 characters" do
