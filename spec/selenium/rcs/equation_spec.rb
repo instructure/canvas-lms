@@ -24,7 +24,6 @@ describe "equation editor" do
   include QuizzesCommon
   include RCENextPage
   it "keeps cursor position when clicking close" do
-    skip "RCX-3441"
     course_with_teacher_logged_in
     quiz_model(course: @course)
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
