@@ -46,7 +46,12 @@
   <div class="ic-Label header-bar">
   <%= t 'links.add_rubric', "Rubric" %>
   </div>
-  <% if can_do(@assignment, @current_user, :update) %>
+
+  <% if can_do(@assignment, @current_user, :update) && Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+    <div id="enhanced-rubric-assignment-edit-mount-point"></div>
+  <% end %>
+
+  <% if can_do(@assignment, @current_user, :update) && !Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
     <div class="content-box">
       <a
         href="<%= context_url(@context, :context_rubrics_url) %>"
@@ -58,5 +63,8 @@
       </a>
     </div>
   <% end %>
-  <%= render partial: "shared/rubrics_component" %>
+
+  <% if !Rubric.enhanced_rubrics_assignments_enabled?(@context)%>
+    <%= render partial: "shared/rubrics_component" %>
+  <% end %>
 <% end %>

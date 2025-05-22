@@ -1241,6 +1241,7 @@ EditView.prototype.afterRender = function () {
   this.$anonymousGradingBox = $('' + ANONYMOUS_GRADING_BOX)
   this.renderModeratedGradingFormFieldGroup()
   this.renderAllowedAttempts()
+  // this.renderEnhancedRubrics()
   this.$graderCommentsVisibleToGradersBox = $('#assignment_grader_comment_visibility')
   this.$gradersAnonymousToGradersLabel = $('label[for="assignment_graders_anonymous_to_graders"]')
   this.similarityDetectionTools = SimilarityDetectionTools.attach(

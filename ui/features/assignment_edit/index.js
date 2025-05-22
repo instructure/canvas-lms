@@ -32,6 +32,7 @@ import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsS
 import '@canvas/grading-standards'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import renderEditAssignmentsApp from './react/index'
+import {renderEnhancedRubrics} from './react/AssignmentRubric'
 
 ready(() => {
   window.addEventListener('load', () => {
@@ -124,6 +125,7 @@ ready(() => {
       },
     })
     editHeaderView.render()
+    renderEnhancedRubrics()
   }
 })
 

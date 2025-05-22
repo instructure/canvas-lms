@@ -3115,6 +3115,52 @@ describe AssignmentsController do
         expect(assigns[:js_env][:ASSET_PROCESSORS]).to eq []
       end
     end
+
+    context "assigned_rubric and rubric_association" do
+      before do
+        Account.site_admin.enable_feature!(:enhanced_rubrics_assignments)
+        @course.enable_feature!(:enhanced_rubrics)
+        rubric = @course.rubrics.create!(user: @teacher, data: [])
+        rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                   hide_score_total: "0",
+                                                                                   purpose: "grading",
+                                                                                   skip_updating_points_possible: false,
+                                                                                   update_if_existing: true,
+                                                                                   use_for_grading: "1",
+                                                                                   association_object: @assignment
+                                                                                 })
+        rubric_assoc = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
+        @assignment.rubric_association = rubric_assoc
+        @assignment.save!
+        user_session(@teacher)
+      end
+
+      it "sets assigned_rubric and rubric_association in the ENV when FF is ON" do
+        allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(true)
+        get :edit, params: { course_id: @course.id, id: @assignment.id, quiz_lti: true }
+        expect(assigns[:js_env][:assigned_rubric][:id]).to eq @assignment.rubric_association.rubric_id
+        expect(assigns[:js_env][:assigned_rubric][:title]).to eq "Unnamed Course Rubric"
+        expect(assigns[:js_env][:assigned_rubric][:can_update]).to be_truthy
+        expect(assigns[:js_env][:assigned_rubric][:association_count]).to eq 1
+        expect(assigns[:js_env][:rubric_association][:id]).to eq @assignment.rubric_association.id
+      end
+
+      it "does not set assigned_rubric and rubric_association in the ENV when FF is OFF" do
+        allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(true)
+        Account.site_admin.disable_feature!(:enhanced_rubrics_assignments)
+        get :edit, params: { course_id: @course.id, id: @assignment.id, quiz_lti: true }
+        expect(assigns[:js_env][:assigned_rubric]).to be_nil
+        expect(assigns[:js_env][:rubric_association]).to be_nil
+      end
+
+      it "does not set assigned_rubric and rubric_association in the ENV when FF is OFF and quiz_lti is false" do
+        allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(false)
+        Account.site_admin.disable_feature!(:enhanced_rubrics_assignments)
+        get :edit, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:assigned_rubric]).to be_nil
+        expect(assigns[:js_env][:rubric_association]).to be_nil
+      end
+    end
   end
 
   describe "DELETE 'destroy'" do
