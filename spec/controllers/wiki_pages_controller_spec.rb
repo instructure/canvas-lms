@@ -56,6 +56,47 @@ describe WikiPagesController do
       expect(assigns[:js_env][:FEATURES][:BLOCK_EDITOR]).to be(true)
     end
 
+    it "sets up js_env for the canvas content builder" do
+      @course.account.enable_feature!(:canvas_content_builder)
+      get "index", params: { course_id: @course.id }
+      expect(response).to be_successful
+      expect(assigns[:js_env][:FEATURES][:CANVAS_CONTENT_BUILDER]).to be(true)
+    end
+
+    describe "js_env for EDITOR_FEATURE" do
+      context "when the block editor is enabled" do
+        it "sets EDITOR_FEATURE to block_editor" do
+          @course.account.enable_feature!(:block_editor)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :block_editor
+        end
+      end
+
+      context "when the canvas content builder is enabled" do
+        it "sets EDITOR_FEATURE to canvas_content_builder" do
+          @course.account.enable_feature!(:canvas_content_builder)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :canvas_content_builder
+        end
+      end
+
+      context "when both features are enabled" do
+        it "sets EDITOR_FEATURE to canvas_content_builder" do
+          @course.account.enable_feature!(:block_editor)
+          @course.account.enable_feature!(:canvas_content_builder)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :canvas_content_builder
+        end
+      end
+
+      context "when neither feature is enabled" do
+        it "sets EDITOR_FEATURE to nil" do
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:js_env][:EDITOR_FEATURE]).to be_nil
+        end
+      end
+    end
+
     context "assign to differentiation tags" do
       before do
         @course.account.enable_feature! :assign_to_differentiation_tags
