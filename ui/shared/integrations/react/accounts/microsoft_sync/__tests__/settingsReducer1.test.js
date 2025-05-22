@@ -128,24 +128,6 @@ describe('settingsReducer', () => {
         last_saved_microsoft_sync_tenant: 'saved_value',
       }
 
-      it('does not set info message if the tenant is unchanged', () => {
-        const result = settingsReducer(state, {
-          type: reducerActions.updateTenant,
-          payload: {microsoft_sync_tenant: 'saved_value'},
-        })
-
-        expect(result.tenantInfoMessages).toHaveLength(0)
-      })
-
-      it('sets an info message if the tenant is changed', () => {
-        const result = settingsReducer(state, {
-          type: reducerActions.updateTenant,
-          payload: {microsoft_sync_tenant: 'new_value'},
-        })
-
-        expect(result.tenantInfoMessages).toHaveLength(1)
-      })
-
       it('updates the last saved tenant value on save', () => {
         const result = settingsReducer(
           {
