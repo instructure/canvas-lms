@@ -2065,6 +2065,27 @@ describe Submission do
       submission.update! score: 1, workflow_state: :graded, posted_at: Time.zone.now
       submission.grade_change_audit(force_audit: true)
     end
+
+    it "uses persisted values for mastery path evaluation even when attributes change within transaction" do
+      allow(submission.assignment).to receive(:queue_conditional_release_grade_change_handler?).and_return(true)
+      expect(submission).to receive(:queue_conditional_release_grade_change_handler).once
+
+      ActiveRecord::Base.transaction do
+        submission.update!(score: 11, workflow_state: :graded, posted_at: Time.zone.now)
+        submission.posted_at = nil
+      end
+    end
+
+    it "uses persisted values for mastery path evaluation even when attributes are updated with a different instance of the record" do
+      allow(submission.assignment).to receive(:queue_conditional_release_grade_change_handler?).and_return(true)
+      expect(submission).to receive(:queue_conditional_release_grade_change_handler).once
+
+      ActiveRecord::Base.transaction do
+        submission.update!(score: 11, workflow_state: :graded, posted_at: nil)
+        submission2 = Submission.find(submission.id)
+        submission2.update(posted_at: Time.zone.now)
+      end
+    end
   end
 
   describe "#graded_anonymously" do
