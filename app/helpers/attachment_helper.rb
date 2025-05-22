@@ -188,7 +188,7 @@ module AttachmentHelper
 
   def access_via_location?(attachment, user, access_type)
     if params[:location] && [:read, :download].include?(access_type)
-      return AttachmentAssociation.verify_access(params[:location], attachment.id, user, session)
+      return AttachmentAssociation.verify_access(params[:location], attachment, user, session)
     end
 
     false

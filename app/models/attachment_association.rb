@@ -38,7 +38,9 @@ class AttachmentAssociation < ActiveRecord::Base
     to_delete = currently_has - global_ids
     to_create = global_ids - currently_has
 
-    AttachmentAssociation.where(context:, field_name:, attachment_id: to_delete).destroy_all if to_delete.any?
+    if to_delete.any?
+      context.attachment_associations.where(field_name:, attachment_id: to_delete).in_batches(of: 1000).destroy_all
+    end
 
     if to_create.any?
       to_create.each_slice(1000) do |att_ids|
@@ -47,30 +49,27 @@ class AttachmentAssociation < ActiveRecord::Base
         Attachment.where(id: att_ids).find_each do |attachment|
           next if !(user.nil? && blank_user) && !attachment.grants_right?(user, session, :update)
 
-          all_attachment_associations << {
-            context_type: context.class.name,
-            context_id: context.id,
-            attachment_id: attachment.id,
-            user_id: user&.id,
-            field_name:
-          }
+          context.shard.activate do
+            att_shard = Shard.shard_for(attachment.id)
+            user_shard = user && Shard.shard_for(user.id)
+            all_attachment_associations << {
+              context_type: context.class.name,
+              context_id: context.id,
+              attachment_id: Shard.relative_id_for(attachment.id, att_shard, Shard.current),
+              user_id: user && Shard.relative_id_for(user.id, user_shard, Shard.current),
+              field_name:,
+              root_account_id: context.root_account_id,
+            }
+          end
         end
-        insert_all(all_attachment_associations, context.root_account_id)
+        context.shard.activate do
+          insert_all(all_attachment_associations)
+        end
       end
     end
   end
 
-  def self.insert_all(records, root_account_id)
-    records_with_root_account_id = records.map do |record|
-      unless record[:root_account_id]
-        record[:root_account_id] = root_account_id
-      end
-      record
-    end
-    super(records_with_root_account_id)
-  end
-
-  def self.verify_access(location_param, attachment_id, user, session = nil)
+  def self.verify_access(location_param, attachment, user, session = nil)
     splat = location_param.split("_")
     return false unless splat.length >= 2
 
@@ -85,17 +84,13 @@ class AttachmentAssociation < ActiveRecord::Base
       right_to_check = :read_syllabus
     end
 
-    association = AttachmentAssociation.find_by(
-      attachment: attachment_id,
-      context_id:,
-      context_type:,
-      field_name:
-    )
+    association = Shard.shard_for(context_id).activate do
+      AttachmentAssociation.find_by(attachment:, context_id:, context_type:, field_name:)
+    end
 
     return false unless association
 
-    root_account = Account.find_by(id: association.root_account_id)
-    root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus) &&
+    association.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus) &&
       association.context&.grants_right?(user, session, right_to_check)
   end
 
