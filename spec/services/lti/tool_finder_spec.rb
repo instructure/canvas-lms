@@ -354,15 +354,22 @@ describe Lti::ToolFinder do
 
     let(:arguments) { [content_tag, tool.context] }
     let(:assignment) { assignment_model(course: tool.context) }
-    let(:tool) { external_tool_model }
+    let(:course) { course_model }
+    let(:tool) { external_tool_model(context: course) }
     let(:content_tag_opts) { { url: tool.url, content_type: "ContextExternalTool", context: assignment } }
     let(:content_tag) { ContentTag.new(content_tag_opts) }
-    let(:developer_key) { DeveloperKey.create! }
+    let(:developer_key) { lti_developer_key_model(account: tool.context.root_account) }
     let(:lti_1_3_tool) do
       t = tool.dup
+      t.lti_registration = developer_key.lti_registration
       t.developer_key_id = developer_key.id
       t.lti_version = "1.3"
       t.save!
+      t.context_controls.create!(
+        account: tool.context.root_account,
+        available: true,
+        registration: t.lti_registration
+      )
       t
     end
 
@@ -389,13 +396,41 @@ describe Lti::ToolFinder do
       let(:duplicate_1_3_tool) do
         t = lti_1_3_tool.dup
         t.save!
+        t.context_controls.create!(
+          account: course.root_account,
+          registration: t.lti_registration,
+          available: true
+        )
         t
+      end
+
+      context "with the lti_registrations_next flag off" do
+        before do
+          course.root_account.disable_feature!(:lti_registrations_next)
+        end
+
+        it "finds the tool with an available CC" do
+          expect(subject).to eq(lti_1_3_tool)
+        end
+
+        it "finds the tool with an unavailable CC" do
+          lti_1_3_tool.context_controls.first.update!(available: false)
+          expect(subject).to eq(lti_1_3_tool)
+        end
       end
 
       context "and an LTI 1.1 tool has a conflicting URL" do
         before { tool } # initialized already, but included for clarity
 
         it { is_expected.to eq lti_1_3_tool }
+
+        context "and the LTI 1.3 tool is unavailable" do
+          before do
+            lti_1_3_tool.context_controls.first.update!(available: false)
+          end
+
+          it { is_expected.to eq tool }
+        end
 
         context "and there are multiple matching LTI 1.3 tools" do
           before { duplicate_1_3_tool }
@@ -404,6 +439,16 @@ describe Lti::ToolFinder do
           let(:content_tag_opts) { super().merge({ content_id: lti_1_3_tool.id }) }
 
           it { is_expected.to eq lti_1_3_tool }
+
+          context "and the original LTI 1.3 tool is unavailable" do
+            before do
+              lti_1_3_tool.context_controls.first.update!(available: false)
+            end
+
+            it "returns the duplicate tool instead" do
+              expect(subject).to eq duplicate_1_3_tool
+            end
+          end
         end
 
         context "and the LTI 1.3 tool gets reinstalled" do
@@ -698,13 +743,20 @@ describe Lti::ToolFinder do
         expect(Lti::ToolFinder.from_url(nil, c1, preferred_tool_id: preferred.id)).to eq preferred
       end
 
+      it "bypasses tool lookup if the url is nil and check_availability is false" do
+        c1 = @course
+        preferred = c1.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
+        expect(Lti::ToolFinder).not_to receive(:potential_matching_tools)
+        expect(Lti::ToolFinder.from_url(nil, c1, preferred_tool_id: preferred.id)).to eq preferred
+      end
+
       it "does not return preferred tool if it is 1.1 and there is a matching 1.3 tool" do
-        developer_key = DeveloperKey.create!
+        registration = lti_developer_key_model(account: @course.root_account).tap do |k|
+          lti_tool_configuration_model(developer_key: k, lti_registration: k.lti_registration)
+        end.lti_registration
         @tool1_1 = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-        @tool1_3 = @course.context_external_tools.create!(name: "b", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-        @tool1_3.lti_version = "1.3"
-        @tool1_3.developer_key = developer_key
-        @tool1_3.save!
+        @tool1_3 = registration.new_external_tool(@course)
+        @tool1_3.update!(name: "b", consumer_key: "12345", shared_secret: "secret", url: "http://www.google.com")
 
         @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @tool1_1.id)
         expect(@found_tool).to eql(@tool1_3)
@@ -714,10 +766,8 @@ describe Lti::ToolFinder do
         @tool1_3.destroy
 
         @tool1_1 = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-        @tool1_3 = @course.context_external_tools.create!(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-        @tool1_3.lti_version = "1.3"
-        @tool1_3.developer_key = developer_key
-        @tool1_3.save!
+        @tool1_3 = registration.new_external_tool(@course)
+        @tool1_3.update!(name: "b", consumer_key: "12345", shared_secret: "secret", domain: "google.com")
         @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @tool1_1.id)
         expect(@found_tool).to eql(@tool1_3)
         @found_tool = Lti::ToolFinder.from_url("http://www.google.com", Course.find(@course.id), preferred_tool_id: @tool1_3.id)
@@ -771,7 +821,16 @@ describe Lti::ToolFinder do
         let(:opts) { { url:, domain: } }
         let(:url) { "https://www.test.com/foo?bar=1" }
         let(:lti_1_1_tool) { external_tool_model(context:, opts:) }
-        let(:lti_1_3_tool) { external_tool_1_3_model(context:, opts:) }
+        let(:registration) do
+          lti_developer_key_model(account: context.root_account).tap do |k|
+            lti_tool_configuration_model(developer_key: k, lti_registration: k.lti_registration)
+          end.lti_registration
+        end
+        let(:lti_1_3_tool) do
+          t = registration.new_external_tool(context)
+          t.update!(**opts)
+          t
+        end
 
         it "prefers LTI 1.3 tools when there is an exact URL match" do
           expect(find_tool(url)).to eq lti_1_3_tool
@@ -797,6 +856,22 @@ describe Lti::ToolFinder do
           it "prefers LTI 1.1 tools when there is an domain match" do
             expect(find_tool("https://www.test.com/another_endpoint", prefer_1_1: true)).to \
               eq lti_1_1_tool
+          end
+        end
+
+        context "when the LTI Registrations Next flag is disabled" do
+          before do
+            context.root_account.disable_feature!(:lti_registrations_next)
+          end
+
+          it "still finds the available LTI 1.3 tool" do
+            expect(subject).to eql(lti_1_3_tool)
+          end
+
+          it "still finds an unavailable LTI 1.3 tool" do
+            registration.context_controls.find_by(course: context, deployment: lti_1_3_tool).update!(available: false)
+
+            expect(subject).to eql(lti_1_3_tool)
           end
         end
       end
@@ -885,9 +960,12 @@ describe Lti::ToolFinder do
 
       context "when duplicate is 1.3" do
         before do
+          dev_key = lti_developer_key_model(account: @course.root_account)
           duplicate.lti_version = "1.3"
-          duplicate.developer_key = DeveloperKey.create!
+          duplicate.developer_key = dev_key
+          duplicate.lti_registration = dev_key.lti_registration
           duplicate.save!
+          duplicate.context_controls.create!(course: @course, registration: dev_key.lti_registration, available: true)
           duplicate.update_column :identity_hash, "duplicate"
         end
 
@@ -911,9 +989,12 @@ describe Lti::ToolFinder do
 
       context "when the matching tool is 1.3" do
         before do
+          dev_key = lti_developer_key_model(account: @course.root_account)
           tool.lti_version = "1.3"
-          tool.developer_key = DeveloperKey.create!
+          tool.developer_key = dev_key
+          tool.lti_registration = dev_key.lti_registration
           tool.save!
+          tool.context_controls.create!(course: @course, registration: dev_key.lti_registration, available: true)
         end
 
         it "returns the tool" do
@@ -1071,8 +1152,11 @@ describe Lti::ToolFinder do
       let(:account_tool) { external_tool_model(context: @course.account, opts: { name: "Account Tool" }) }
 
       before do
-        tool2.destroy
-        tool3.destroy
+        # We can't just soft-delete tools because the finder doesn't actually filter them out and our
+        # sorting criteria doesn't currently account for soft-deleted tools, so they might actually
+        # end up at the front of the list, depending on how Postgres is feeling that day.
+        tool2.destroy_permanently!
+        tool3.destroy_permanently!
         account_tool
       end
 
@@ -1106,11 +1190,15 @@ describe Lti::ToolFinder do
     end
 
     context "with different LTI versions" do
+      let(:registration) do
+        lti_developer_key_model(account: @course.root_account).tap do |k|
+          lti_tool_configuration_model(developer_key: k, lti_registration: k.lti_registration)
+        end.lti_registration
+      end
+      let(:tool3) { registration.new_external_tool(@course) }
+
       before do
         tool1.destroy_permanently!
-        tool3.developer_key_id = key.id
-        tool3.lti_version = "1.3"
-        tool3.save!
       end
 
       it "sorts 1.3 tools to the front" do
@@ -1136,6 +1224,7 @@ describe Lti::ToolFinder do
     context "with duplicate tools" do
       before do
         tool2.update!(name: "tool1")
+        tool3.update!(name: "tool1")
       end
 
       it "sorts non-duplicate tools to the front" do
@@ -1143,7 +1232,9 @@ describe Lti::ToolFinder do
       end
 
       it "sorts duplicate tools to the back" do
-        expect(subject.last).to eq tool2
+        # The order here is not guaranteed, but we know that the duplicates
+        # will be at the end of the list.
+        expect(subject[1..]).to match_array([tool2, tool3])
       end
     end
 
@@ -1194,31 +1285,30 @@ describe Lti::ToolFinder do
     end
 
     context "with many tools that mix all ordering conditions" do
-      before do
-        tool3.developer_key_id = key.id
-        tool3.lti_version = "1.3"
-        tool3.domain = "c.com"
-        tool3.save!
-
-        tool1.developer_key_id = key.id
-        tool1.lti_version = "1.3"
-        tool1.domain = "a.b.c.com"
-        tool1.save
-
-        account_tool.developer_key_id = key.id
-        account_tool.lti_version = "1.3"
-        account_tool.domain = "b.c.com"
-        account_tool.save!
-
-        lti1tool
-        preferred_tool
-        dupe_tool
+      let(:registration) do
+        lti_developer_key_model(account: @course.root_account).tap do |k|
+          lti_tool_configuration_model(developer_key: k, lti_registration: k.lti_registration)
+        end.lti_registration
       end
-
-      let(:account_tool) { external_tool_model(context: @course.account, opts: { name: "Account Tool" }) }
+      let(:tool3) do
+        t = registration.new_external_tool(@course)
+        t.update!(domain: "c.com")
+        t
+      end
+      let(:tool1) do
+        t = registration.new_external_tool(@course)
+        t.update!(domain: "a.b.c.com")
+        t
+      end
+      let(:account_tool) do
+        t = registration.new_external_tool(@course.account)
+        t.update!(domain: "b.c.com")
+        t
+      end
       let(:lti1tool) do
         t = tool1.dup
         t.developer_key_id = nil
+        t.lti_registration_id = nil
         t.lti_version = "1.1"
         t.domain = "b.c.com"
         t.save!
@@ -1227,15 +1317,35 @@ describe Lti::ToolFinder do
       let(:dupe_tool) do
         t = tool1.dup
         t.save!
+        t.context_controls.create!(
+          account: @course.root_account,
+          registration:,
+          available: true
+        )
         t
       end
       let(:preferred_tool) do
         t = tool1.dup
         t.name = "preferred"
         t.save!
+        t.context_controls.create!(
+          account: @course.root_account,
+          registration:,
+          available: true
+        )
         t
       end
       let(:preferred_tool_id) { preferred_tool.id }
+
+      before do
+        tool3
+        tool2
+        tool1
+        account_tool
+        lti1tool
+        preferred_tool
+        dupe_tool
+      end
 
       it "sorts tools in order of order clauses" do
         expect(subject.map(&:id)).to eq [
@@ -1318,6 +1428,54 @@ describe Lti::ToolFinder do
         let!(:specific_1_1_tool) { external_tool_model(context:, opts: specific_opts) }
 
         it { is_expected.to eq(specific_1_1_tool) }
+      end
+    end
+  end
+
+  describe "filter_by_unavailable_context_controls" do
+    subject { Lti::ToolFinder.send(:filter_by_unavailable_context_controls, scope, root_account) }
+
+    let_once(:root_account) { account_model }
+    let_once(:dev_key) do
+      lti_developer_key_model(account: root_account).tap do |k|
+        lti_tool_configuration_model(account: k.account, developer_key: k, lti_registration: k.lti_registration)
+      end
+    end
+    let_once(:registration) { dev_key.lti_registration }
+    let_once(:tool) { registration.new_external_tool(root_account) }
+    let_once(:old_tool) { external_tool_model(context: root_account) }
+
+    let(:scope) { ContextExternalTool.all }
+
+    it "allows 1.3 and 1.1 tools if they are available" do
+      expect(subject).to include(tool, old_tool)
+    end
+
+    context "with multiple 1.3 tools associated with the same registration" do
+      let_once(:other_tool) { registration.new_external_tool(root_account) }
+
+      context "one of the tools is unavailable" do
+        before(:once) do
+          tool.context_controls.first.update!(available: false)
+        end
+
+        it "only returns the other tool in the root account" do
+          expect(subject).not_to include(tool)
+          expect(subject).to include(other_tool)
+        end
+
+        it "only returns the other tool in a subaccount" do
+          subaccount = account_model(parent_account: root_account)
+          expect(Lti::ToolFinder.send(:filter_by_unavailable_context_controls, scope, subaccount)).not_to include(tool)
+          expect(Lti::ToolFinder.send(:filter_by_unavailable_context_controls, scope, subaccount)).to include(other_tool)
+        end
+
+        it "only returns the other tool in a course" do
+          subaccount = account_model(parent_account: root_account)
+          course = course_model(account: subaccount)
+          expect(Lti::ToolFinder.send(:filter_by_unavailable_context_controls, scope, course)).not_to include(tool)
+          expect(Lti::ToolFinder.send(:filter_by_unavailable_context_controls, scope, course)).to include(other_tool)
+        end
       end
     end
   end

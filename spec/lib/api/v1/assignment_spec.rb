@@ -1041,7 +1041,10 @@ describe "Api::V1::Assignment" do
       Assignment.last
     end
 
-    let_once(:tool) { external_tool_1_3_model(context: account, developer_key:) }
+    let_once(:registration) do
+      lti_registration_with_tool(account:)
+    end
+    let_once(:tool) { registration.deployments.first }
     let_once(:assignment_create_params) do
       ActionController::Parameters.new(
         name: "New Assignment",
@@ -1054,7 +1057,6 @@ describe "Api::V1::Assignment" do
     let_once(:assignment) { Assignment.new(context: course) }
     let_once(:course) { course_model }
     let_once(:account) { assignment.root_account }
-    let_once(:developer_key) { lti_developer_key_model(account:) }
     let_once(:user) { user_model }
 
     context "external tool url" do
@@ -1123,7 +1125,6 @@ describe "Api::V1::Assignment" do
     end
 
     context "when asset processor content items are passed in" do
-      let_once(:tool) { external_tool_1_3_model(context: account, developer_key:) }
       let_once(:assignment_create_params) do
         ActionController::Parameters.new(
           name: "New Assignment",

@@ -766,24 +766,28 @@ describe AssignmentsController do
 
       let(:assignment) { assignment_model }
       let(:launch_url) { "https://www.my-tool.com/login" }
-      let(:key) do
-        DeveloperKey.create!(
-          scopes: [
-            TokenScopes::LTI_AGS_LINE_ITEM_SCOPE,
-            TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE,
-            TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE,
-            TokenScopes::LTI_AGS_SCORE_SCOPE
-          ]
-        )
-      end
       let(:external_tool) do
-        external_tool_1_3_model(
-          context: assignment.course,
-          opts: {
-            url: launch_url,
-            developer_key: key
+        lti_registration_with_tool(
+          account: assignment.root_account,
+          configuration_params: {
+            domain: "www.my-tool.com",
+            target_link_uri: launch_url,
+            oidc_initiation_url: launch_url,
+            placements: [
+              {
+                placement: "course_navigation"
+              }
+            ]
+          },
+          developer_key_params: {
+            scopes: [
+              TokenScopes::LTI_AGS_LINE_ITEM_SCOPE,
+              TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE,
+              TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE,
+              TokenScopes::LTI_AGS_SCORE_SCOPE
+            ]
           }
-        )
+        ).deployments.first
       end
 
       before do

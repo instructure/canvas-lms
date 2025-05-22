@@ -66,36 +66,30 @@ RSpec.shared_context "lti_advantage_shared_examples" do
     @course
   end
 
-  let(:tool) do
-    tool = course.context_external_tools.new(
-      name: "bob",
-      consumer_key: "key",
-      shared_secret: "secret",
-      url: "http://www.example.com/basic_lti"
-    )
-    tool.course_navigation = {
-      enabled: true,
-      message_type: "ResourceLinkRequest",
-      selection_width: "500",
-      selection_height: "400",
-      custom_fields: {
-        has_expansion: "$User.id",
-        no_expansion: "foo"
-      }
-    }
-    tool.use_1_3 = true
-    tool.developer_key = developer_key
-    tool.save!
-    tool
-  end
-  let(:developer_key) do
-    DeveloperKey.create!(
-      name: "Developer Key With Scopes",
+  let(:registration) do
+    lti_registration_with_tool(
       account: course.root_account,
-      scopes: developer_key_scopes,
-      require_scopes: true
+      developer_key_params: { scopes: developer_key_scopes },
+      configuration_params: {
+        target_link_uri: "http://www.example.com/basic_lti",
+        oidc_initiation_url: "http://www.example.com/basic_lti",
+        domain: "www.example.com",
+        placements: [
+          {
+            placement: "course_navigation",
+            message_type: "LtiResourceLinkRequest",
+            selection_width: 500,
+            selection_height: 400,
+            custom_fields: {
+              has_expansion: "$User.id",
+              no_expansion: "foo"
+            }
+          }
+        ]
+      }
     )
   end
+  let(:tool) { registration.deployments.first }
   let(:developer_key_scopes) { [] }
 
   shared_examples_for "lti 1.3 message initialization" do

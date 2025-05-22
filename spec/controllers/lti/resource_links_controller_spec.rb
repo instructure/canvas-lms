@@ -27,8 +27,8 @@ describe Lti::ResourceLinksController, type: :request do
   let_once(:account) { account_model }
   let_once(:admin) { account_admin_user(name: "A User", account:) }
   let_once(:course) { course_model(account:) }
-  let_once(:developer_key) { developer_key_model(account:) }
-  let_once(:tool) { external_tool_1_3_model(context: account, developer_key:) }
+  let_once(:registration) { lti_registration_with_tool(account:) }
+  let_once(:tool) { registration.deployments.first }
 
   before do
     user_session(admin)
@@ -250,7 +250,11 @@ describe Lti::ResourceLinksController, type: :request do
   describe "PUT #update" do
     subject { put "/api/v1/courses/#{course.id}/lti_resource_links/#{id}", params: }
 
-    let(:resource_link) { resource_link_model(context: course, course:) }
+    let(:resource_link) do
+      resource_link_model(context: course, course:, overrides: {
+                            url: tool.url
+                          })
+    end
     let(:id) { resource_link.id }
     let(:params) { {} }
 
@@ -349,7 +353,7 @@ describe Lti::ResourceLinksController, type: :request do
     end
 
     context "with tool id" do
-      let(:tool2) { external_tool_1_3_model(context: account, developer_key:) }
+      let(:tool2) { registration.new_external_tool(account) }
       let(:params) { { context_external_tool_id: tool2.id } }
 
       it "updates the resource link" do
@@ -368,7 +372,20 @@ describe Lti::ResourceLinksController, type: :request do
       end
 
       context "that does not match original url" do
-        let(:tool2) { external_tool_1_3_model(context: account, developer_key:, opts: { url: "https://otherurl.com", domain: "otherurl.com" }) }
+        let(:registration) do
+          lti_registration_with_tool(account:,
+                                     configuration_params: {
+                                       target_link_uri: "https://otherurl.com",
+                                       oidc_initiation_url: "https://otherurl.com/oidc",
+                                       domain: "otherurl.com",
+                                       placements: [
+                                         {
+                                           placement: "course_navigation",
+                                         }
+                                       ]
+                                     })
+        end
+        let(:tool2) { registration.deployments.first }
         let(:params) { { context_external_tool_id: tool2.id } }
 
         it "returns 422" do
@@ -383,7 +400,7 @@ describe Lti::ResourceLinksController, type: :request do
     subject { post "/api/v1/courses/#{course.id}/lti_resource_links", params: }
 
     let(:custom) { { "hello" => "world" } }
-    let(:url) { "https://example.com/lti/launch" }
+    let(:url) { "#{tool.url}/launch" }
     let(:title) { "My LTI Link" }
     let(:params) { { url:, custom:, title: } }
 
@@ -452,8 +469,8 @@ describe Lti::ResourceLinksController, type: :request do
 
     let(:params) do
       [
-        { url: "https://example.com/lti/launch", title: "My LTI Link 1" },
-        { url: "https://example.com/lti/launch", title: "My LTI Link 2", custom: { "hello" => "world" } }
+        { url: tool.url, title: "My LTI Link 1" },
+        { url: tool.url, title: "My LTI Link 2", custom: { "hello" => "world" } }
       ]
     end
 
@@ -484,10 +501,10 @@ describe Lti::ResourceLinksController, type: :request do
       expect { subject }.to change { course.lti_resource_links.count }.by(2)
       first = course.lti_resource_links.find_by(title: "My LTI Link 1")
       expect(first.custom).to be_nil
-      expect(first.url).to eq("https://example.com/lti/launch")
+      expect(first.url).to eq(params[0][:url])
       second = course.lti_resource_links.find_by(title: "My LTI Link 2")
       expect(second.custom).to eq({ "hello" => "world" })
-      expect(second.url).to eq("https://example.com/lti/launch")
+      expect(second.url).to eq(params[1][:url])
     end
 
     it "returns the resource links" do

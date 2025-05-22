@@ -27,7 +27,7 @@ shared_context "advantage services context" do
 
   let(:tool_context) { root_account }
   let!(:tool) do
-    ContextExternalTool.create!(
+    tool = ContextExternalTool.create!(
       context: tool_context,
       consumer_key: "key",
       shared_secret: "secret",
@@ -37,6 +37,14 @@ shared_context "advantage services context" do
       lti_version: "1.3",
       workflow_state: "public"
     )
+    control = tool.context_controls.new(registration: tool.developer_key.lti_registration, available: true)
+    if tool_context.is_a?(Course)
+      control.course = tool_context
+    else
+      control.account = tool_context
+    end
+    control.save!
+    tool
   end
   let(:course_account) do
     root_account

@@ -42,10 +42,14 @@ module Importers
         # have the same ID as the one in the source course. We can skip a lot of
         # the work though if the preferred_tool is available for use in this
         # context.
+        # We have to ignore availability checks as it's possible that this context control
+        # is going to enable the tool in the course, but otherwise the tool isn't available,
+        # either because it was just copied or it's set to not available at a higher context.
         matching_tool = Lti::ToolFinder.from_url(hash["deployment_url"],
                                                  context,
                                                  only_1_3: true,
-                                                 preferred_tool_id: hash["preferred_deployment_id"])
+                                                 preferred_tool_id: hash["preferred_deployment_id"],
+                                                 check_availability: false)
 
         if matching_tool.nil?
           migration.add_import_warning(t("#migration.lti_context_control_type", "LTI Context Control"),
