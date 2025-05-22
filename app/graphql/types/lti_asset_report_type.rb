@@ -34,6 +34,10 @@ module Types
     field :launch_url_path, String, null: true
     field :priority, Integer, null: false
     field :processing_progress, String, null: false
+    def processing_progress
+      object.effective_processing_progress
+    end
+
     field :processor_id, ID, method: :lti_asset_processor_id, null: false
     field :report_type, String, null: false
     field :resubmit_available, Boolean, null: false, method: :resubmit_available?

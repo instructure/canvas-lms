@@ -55,7 +55,7 @@ describe Lti::AssetProcessorController do
         end
 
         post(:resubmit_notice, params:)
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:no_content)
 
         expect(received_submission.attempt).to eq(attempt)
         expect(received_submission.attachment_ids).to eq(attachment_ids)
