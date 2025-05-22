@@ -10099,6 +10099,7 @@ hu:
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Írja be azt, hogy \"{{ACCOUNT_DOMAIN}}\" ahhoz, hogy helyettesítse a felhasználónak a gyökérfiók-tartományát"
   enter_an_id_or_an_original_job_id_d81ad1c7: "Adjon meg egy azonosítót vagy egy original_job_id-t."
   enter_and_distribute_grades_c1216df: "Osztályzatok megadása és szétosztása"
+  enter_at_least_3_characters_to_search_4f037ee0: "Legalább 3 karaktert be kell írni a kereséshez"
   enter_at_least_count_characters_1c7a0b36: "Írjon be legalább %{count} karaktert"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Írja be azt, hogy \"{{CANVAS_USER_ID}}\", ahhoz, hogy a felhasználó egyedi Canvas azonosítója kerüljön a helyére"
   enter_grades_as_e113e606: "Írja be az osztályzatokat mint"
@@ -14175,6 +14176,7 @@ hu:
   login_link_color_a887a109: "Bejelentkezési link színe"
   login_logo_5eecf564: "Belépési logó"
   login_screen_83518c07: "Belépési képernyő"
+  login_sis_id_942859: "Belépési / SIS azonosító"
   login_with_auth_type_a0aaa52a: "Belépés így *%{auth_type}*"
   login_with_provider_3fd3998e: "Belépés ezzel: %{provider}"
   loginrequest_encoded_url_44c49c18: "LoginRequest enkódolt URL"
@@ -17467,6 +17469,7 @@ hu:
   notify_users_bbb522c1: "Értesítse a felhasználókat"
   notify_users_this_quiz_has_changed_c5b05995: "A felhasználók értesítése arról, hogy a kvíz megváltozott"
   november_ca6fa5a6: November
+  now_d1785853: most
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "A kurzus fel lett töltve és elérhetővé vált, így lehet, hogy erre az ellenőrzőlistára nincs többé szüksége. Ennek ellenére a lehetőség továbbra is megmarad arra, hogy új elemekkel bővítse a kurzust, vagy segítséget kapjon a kurzus módosítására vonatkozóan."
   now_viewing_attempt_current_attempt_918e616: "Most a %{current_attempt} próbálkozás megtekintése"
   nuco_submission_data_ded12af8: "Nuco benyújtási adatok"
@@ -21907,6 +21910,7 @@ hu:
   search_for_a_deleted_user_by_id_32f109e7: "Törölt felhasználó keresése azonosító alapján"
   search_for_assignment_8149cb1: "Feladat keresése"
   search_for_files_7541fb28: "Fájlok keresése"
+  search_for_people_by_id_or_name_36107593: "Résztvevő keresése azonosító vagy név alapján"
   search_for_sections_62e90cf4: "Szekciók keresése"
   search_for_students_ed16c2de: "Hallgatók keresése"
   search_form_fcaa38f7: "Keresés űrlap"
@@ -22329,6 +22333,7 @@ hu:
   sending_message_failed_please_try_again_b53cc904: "Az üzenet küldése sikertelen, kérjük, próbálja újra!"
   sending_messages_effc7237: "Üzenetek küldése"
   sending_messages_f8f41998: "üzenetek küldése..."
+  sent_at_23cccc07: "Küldés időpontja: "
   sent_f4ee89ec: Elküldve!
   sent_fe0a1eb4: Elküldött
   separate_columns_for_first_last_names_in_gradebook_419126c3: "Külön oszlopok a kereszt- és vezetéknevek számára az osztálynaplóban"

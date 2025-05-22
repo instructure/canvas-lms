@@ -13490,6 +13490,7 @@ el:
   search_for_a_deleted_course_by_id_f553398d: "Εύρευση για ένα μάθημα που έχει αφαιρεθεί με αριθμό ταυτοποίησης/ID"
   search_for_assignment_8149cb1: "Αναζήτηση Εργασίας"
   search_for_files_7541fb28: "Αναζήτηση αρχείων"
+  search_for_people_by_id_or_name_36107593: "Εύρευση ατόμων με αριθμό ταυτοποίησης/ID ή όνομα"
   search_groups_or_people_6c15d6ad: "Αναζήτηση Ομάδων ή Ατόμων"
   search_people_402e622c: "Search people"
   search_term_must_be_at_least_num_characters_669098ed: "Ο όρος αναζήτησης πρέπει να έχει τουλάχιστον %{num} χαρακτήρες"
