@@ -33,6 +33,14 @@ module FilesPage
     fxpath("//button[descendant::text()[contains(., 'All My Files')]]")
   end
 
+  def switch_to_new_files_page_toggle
+    f("[aria-label='Switch to New Files Page']")
+  end
+
+  def switch_to_old_files_page_toggle
+    fxpath("//button[descendant::text()[contains(., 'Switch to Old Files Page')]]")
+  end
+
   def upload_button
     fxpath("//button[descendant::text()[contains(., 'Upload')]]")
   end
@@ -111,6 +119,10 @@ module FilesPage
 
   def checked_boxes
     ff("[name='IconCheckMark']")
+  end
+
+  def folder_icon
+    f("[data-testid='folder-icon']")
   end
 
   def all_files_table_rows

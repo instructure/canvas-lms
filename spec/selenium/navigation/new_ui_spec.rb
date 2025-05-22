@@ -20,6 +20,7 @@
 require_relative "../common"
 require_relative "../helpers/files_common"
 require_relative "../rcs/pages/rce_next_page"
+require_relative "../files_v2/pages/files_page"
 
 describe "new ui" do
   include_context "in-process server selenium tests"
@@ -78,6 +79,49 @@ describe "new ui" do
       expect(f(".ellipsible")).to include_text(@course.course_code)
     end
 
+    context("files rewrite tooggle") do
+      include FilesPage
+      folder_name = "base folder"
+
+      before(:once) do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
+      end
+
+      before do
+        user_session @teacher
+      end
+
+      it "breadcrumbs show for course files navigation menu item", priority: "2" do
+        @teacher.set_preference(:files_ui_version, "v1")
+        get "/courses/#{@course.id}/files"
+        expect(f("#breadcrumbs .ellipsis")).to include_text("Files")
+        expect(f(".ellipsible")).to include_text(@course.course_code)
+      end
+
+      it "breadcrumbs show for course files navigation menu item on new files UI", priority: "2" do
+        @teacher.set_preference(:files_ui_version, "v2")
+        get "/courses/#{@course.id}/files"
+        expect(breadcrumb).to include_text(@course.course_code)
+      end
+
+      it "shows new files folder icon in course files", priority: "2" do
+        @teacher.set_preference(:files_ui_version, "v1")
+        get "/courses/#{@course.id}/files"
+        add_folder(folder_name)
+        # verifying new files folder icon css property still displays with new ui
+        expect(f(".media-object.ef-big-icon.FilesystemObjectThumbnail.mimeClass-folder")).to be_displayed
+      end
+
+      it "shows new files folder icon in course files on new files UI", priority: "2" do
+        @teacher.set_preference(:files_ui_version, "v2")
+        get "/courses/#{@course.id}/files"
+        create_folder(folder_name)
+        # verifying new files folder icon css property still displays with new ui
+        expect(folder_icon).to be_displayed
+      end
+    end
+
     it "breadcrumbs show for course syllabus navigation menu item", priority: "2" do
       get "/courses/#{@course.id}/assignments/syllabus"
       expect(f(".home + li + li .ellipsible")).to include_text("Syllabus")
@@ -106,13 +150,6 @@ describe "new ui" do
       get "/courses/#{@course.id}/settings"
       expect(f(".home + li + li .ellipsible")).to include_text("Settings")
       expect(f(".home + li .ellipsible")).to include_text(@course.course_code)
-    end
-
-    it "shows new files folder icon in course files", priority: "2" do
-      get "/courses/#{@course.id}/files"
-      add_folder
-      # verifying new files folder icon css property still displays with new ui
-      expect(f(".media-object.ef-big-icon.FilesystemObjectThumbnail.mimeClass-folder")).to be_displayed
     end
 
     it "does not override high contrast theme", priority: "2" do

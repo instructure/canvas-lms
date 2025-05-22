@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../common"
+require_relative "../files_v2/pages/files_page"
 
 describe "links", priority: "2" do
   include_context "in-process server selenium tests"
@@ -71,9 +72,29 @@ describe "links", priority: "2" do
       validate_breadcrumb_link(link, "Pages")
     end
 
-    it "navigates user to files page after files link is clicked" do
-      link = find_link(".files")
-      validate_breadcrumb_link(link, "Files")
+    context("files rewrite tooggle") do
+      include FilesPage
+      before(:once) do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
+      end
+
+      before do
+        user_session @teacher
+      end
+
+      it "navigates user to files page after files link is clicked" do
+        @teacher.set_preference(:files_ui_version, "v1")
+        link = find_link(".files")
+        validate_breadcrumb_link(link, "Files")
+      end
+
+      it "navigates user to files page after files link is clicked on new files UI" do
+        @teacher.set_preference(:files_ui_version, "v2")
+        link = find_link(".files")
+        expect_new_page_load { link.click }
+        expect(heading).to include_text("Files")
+      end
     end
 
     it "navigates user to syllabus page after syllabus link is clicked" do
