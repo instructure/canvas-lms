@@ -11101,6 +11101,7 @@ tr:
   login_link_color_a887a109: "Oturum Açma Bağlantı Rengi"
   login_logo_5eecf564: "Oturum Açma Logo"
   login_screen_83518c07: "Oturum Açma Ekranı"
+  login_sis_id_942859: "Giriş / ÖBS ID :"
   login_with_auth_type_a0aaa52a: "*%{auth_type}* ile oturum aç"
   login_with_provider_3fd3998e: "%{provider} ile oturum aç"
   loginrequest_encoded_url_44c49c18: "LoginRequest Şifrelenmiş URL'si"
@@ -13834,6 +13835,7 @@ tr:
   notifications_view_f9a60770: "Bildirimler - göster"
   notify_users_this_quiz_has_changed_c5b05995: "Kısa sınav değişikliği ile ilgili kullanıcıları bilgilendir"
   now_click_the_agenda_button_607fb40e: "Şimdi *Gündem* butonuna tıklayın"
+  now_d1785853: şimdi
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Dersiniz hazır olduğuna göre muhtemelen artık bu denetim listesine ihtiyacınız olmayacak. Fakat daha sonra yeni bir şeyler denemek istersiniz diye veya dersinizin içeriğinde değişiklikler yaparken biraz yardıma ihtiyacınız olabilir diye hazır tutacağız."
   num_messages_c1949bbc: 
     one: "1 mesaj"
@@ -17491,12 +17493,14 @@ tr:
   search_for_a_deleted_course_by_id_f553398d: "ID 'ye Göre silinmiş ders ara"
   search_for_assignment_8149cb1: "Ödevlerde Ara"
   search_for_files_7541fb28: "Dosyaları ara"
+  search_for_people_by_id_or_name_36107593: "İsme veya ID'ye göre kişileri ara"
   search_grading_periods_e947a3e9: "Notlandırma Peryotlarında Ara"
   search_groups_or_people_6c15d6ad: "Grupları veya İnsanları Ara"
   search_people_402e622c: "Kişi ara"
   search_people_44f36cd2: "Kişi ara ..."
   search_people_4782671a: "Kişi Ara"
   search_permissions_915bbd09: "İzinlerde Ara"
+  search_results_82e7cd77: "Arama sonuçları"
   search_title_body_or_author_1d26711f: "Başlık, metin veya yazar ara"
   searching_b0207e7f: Aranıyor
   second_reviewer_90046c68: "2. Gözden geçiren"
@@ -17691,6 +17695,7 @@ tr:
   send_quiz_to_user_e8c47177: "Kullanıcıya Kısa Sınavı Gönder"
   sending_message_8ac5bc90: "Mesajınız Gönderiliyor..."
   sending_message_failed_please_try_again_b53cc904: "Mesah gönderimi başarısız, lütfen tekrar deneyin"
+  sent_at_23cccc07: "Şu zamanda gönderildi"
   sent_f4ee89ec: Gönderildi!
   sent_fe0a1eb4: Gönderilmiş
   sequence_footer: 
