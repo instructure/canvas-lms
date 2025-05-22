@@ -177,7 +177,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     const createPageAction = editor => {
       this.createNewPage(e, editor)
     }
-    ENV.FEATURES?.BLOCK_EDITOR
+    ENV.EDITOR_FEATURE !== null
       ? renderChooseEditorModal(e, createPageAction)
       : this.createNewPage(e)
   }
