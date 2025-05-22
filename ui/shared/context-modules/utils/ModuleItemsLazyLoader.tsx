@@ -52,7 +52,7 @@ class ModuleItemsLazyLoader {
   }
 
   emptyModuleOfItems(moduleItemContainer: Element) {
-    moduleItemContainer.querySelector('.context_module_items')?.replaceChildren()
+    moduleItemContainer.querySelector('.context_module_items')?.remove()
   }
 
   renderResult(moduleId: ModuleId, text: string, links?: Links) {
