@@ -216,7 +216,7 @@ class Enrollment < ActiveRecord::Base
         record.course &&
         record.user.registered? &&
         !record.observer? &&
-        ((record.invited? && (record.just_created || record.saved_change_to_workflow_state?)) || @re_send_confirmation)
+        ((record.invited? && (record.previously_new_record? || record.saved_change_to_workflow_state?)) || @re_send_confirmation)
     end
 
     p.dispatch :enrollment_registration
@@ -225,7 +225,7 @@ class Enrollment < ActiveRecord::Base
       !record.self_enrolled &&
         record.course &&
         !record.user.registered? &&
-        ((record.invited? && (record.just_created || record.saved_change_to_workflow_state?)) || @re_send_confirmation)
+        ((record.invited? && (record.previously_new_record? || record.saved_change_to_workflow_state?)) || @re_send_confirmation)
     end
 
     p.dispatch :enrollment_notification
@@ -235,7 +235,7 @@ class Enrollment < ActiveRecord::Base
         record.course &&
         !record.course.created? &&
         !record.observer? &&
-        record.just_created && record.active?
+        record.previously_new_record? && record.active?
     end
 
     p.dispatch :enrollment_accepted
@@ -254,13 +254,13 @@ class Enrollment < ActiveRecord::Base
     p.whenever do |record|
       record.course &&
         !record.observer? &&
-        !record.just_created && (record.changed_state(:active, :invited) || record.changed_state(:active, :creation_pending))
+        !record.previously_new_record? && (record.changed_state(:active, :invited) || record.changed_state(:active, :creation_pending))
     end
   end
 
   def dispatch_invitations_later
     # if in an invited state but not frd "invited?" because of future date restrictions, send it later
-    if (just_created || saved_change_to_workflow_state? || @re_send_confirmation) && workflow_state == "invited" && inactive? && available_at &&
+    if (previously_new_record? || saved_change_to_workflow_state? || @re_send_confirmation) && workflow_state == "invited" && inactive? && available_at &&
        !self_enrolled && !(observer? && user.registered?)
       # this won't work if they invite them and then change the course/term/section dates _afterwards_ so hopefully people don't do that
       delay(run_at: available_at, singleton: "send_enrollment_invitations_#{global_id}").re_send_confirmation_if_invited!
@@ -383,14 +383,14 @@ class Enrollment < ActiveRecord::Base
   end
 
   def should_update_user_account_association?
-    id_before_last_save.nil? || saved_change_to_course_id? || saved_change_to_course_section_id? ||
+    new_record? || previously_new_record? || saved_change_to_course_id? || saved_change_to_course_section_id? ||
       saved_change_to_root_account_id? || being_restored?
   end
 
   def update_user_account_associations_if_necessary
     return if fake_student?
 
-    if id_before_last_save.nil? || being_restored?
+    if previously_new_record? || being_restored?
       return if %w[creation_pending deleted].include?(user.workflow_state)
 
       associations = User.calculate_account_associations_from_accounts([course.account_id, course_section.course.account_id, course_section.nonxlist_course.try(:account_id)].compact.uniq)
@@ -526,7 +526,7 @@ class Enrollment < ActiveRecord::Base
     if @update_cached_due_dates
       update_grades = being_restored?(to_state: "active") ||
                       being_restored?(to_state: "inactive") ||
-                      saved_change_to_id?
+                      previously_new_record?
       SubmissionLifecycleManager.recompute_users_for_course(user_id, course, nil, update_grades:)
     end
   end
@@ -1583,7 +1583,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def need_to_copy_scores?
-    return false unless saved_change_to_id? || being_restored?
+    return false unless previously_new_record? || being_restored?
 
     student_or_fake_student? && other_enrollment_of_same_type_with_score.present?
   end

@@ -32,7 +32,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Heading} from '@instructure/ui-heading'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import ModalSpinner from '../ComposeModalContainer/ModalSpinner'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
 import {UPDATE_INBOX_SETTINGS} from '../../../graphql/Mutations'
 import {useQuery, useMutation} from '@apollo/client'
@@ -345,11 +345,11 @@ const InboxSettingsModalContainer = ({
   }
 
   const firstDateInput = () => (
-    <CanvasDateInput
+    <CanvasDateInput2
       renderLabel={I18n.t('Start Date')}
       formatDate={dateFormatter}
       width="100%"
-      display="block"
+      isInline={false}
       timezone={timezone}
       messages={firstDateError}
       onSelectedDateChange={date => date && onFirstDayChange(date)}
@@ -360,11 +360,11 @@ const InboxSettingsModalContainer = ({
   )
 
   const lastDateInput = () => (
-    <CanvasDateInput
+    <CanvasDateInput2
       renderLabel={I18n.t('End Date')}
       formatDate={dateFormatter}
       width="100%"
-      display="block"
+      isInline={false}
       timezone={timezone}
       messages={lastDateError}
       onSelectedDateChange={date => date && onLastDayChange(date)}

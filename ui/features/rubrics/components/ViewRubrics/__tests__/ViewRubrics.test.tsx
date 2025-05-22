@@ -634,6 +634,11 @@ describe('ViewRubrics Tests', () => {
   })
 
   describe('canManageRubrics permissions is false', () => {
+    beforeEach(() => {
+      // Make sure to mock useParams for this test case
+      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+    })
+
     it('should not render popover or create button', () => {
       queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {queryByTestId} = renderComponent({canManageRubrics: false})

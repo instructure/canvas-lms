@@ -2036,6 +2036,56 @@ describe AccountsController do
         expect(res.detect { |r| r["id"] == @c2.global_id }["total_students"]).to eq(1)
       end
     end
+
+    context "copied assets" do
+      it "is able to filter courses by a copied page" do
+        @c1 = course_factory(account: @account, course_name: "source course")
+        asset = @c1.wiki_pages.create!(title: "My Asset")
+        @c2 = course_factory(account: @account, course_name: "copied course")
+        migration_id = CC::CCHelper.create_key(asset, global: true)
+        @c2.wiki_pages.create!(title: "My Page", migration_id:)
+        admin_logged_in(@account)
+
+        get "courses_api", params: { account_id: @account.id, copied_asset: "page_#{asset.id}" }
+        expect(response.body).to match(/"name":"copied course"/)
+      end
+
+      it "is able to filter courses by a copied assignment" do
+        @c1 = course_factory(account: @account, course_name: "source course")
+        asset = @c1.assignments.create!(title: "My Asset")
+        @c2 = course_factory(account: @account, course_name: "copied course")
+        migration_id = CC::CCHelper.create_key(asset, global: true)
+        @c2.assignments.create!(title: "My Page", migration_id:)
+        admin_logged_in(@account)
+
+        get "courses_api", params: { account_id: @account.id, copied_asset: "assignment_#{asset.id}" }
+        expect(response.body).to match(/"name":"copied course"/)
+      end
+
+      it "is able to filter courses by a copied external tool" do
+        @c1 = course_factory(account: @account, course_name: "source course")
+        asset = @c1.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
+        @c2 = course_factory(account: @account, course_name: "copied course")
+        migration_id = CC::CCHelper.create_key(asset, global: true)
+        @c2.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret", migration_id:)
+        admin_logged_in(@account)
+
+        get "courses_api", params: { account_id: @account.id, copied_asset: "external_tool_#{asset.id}" }
+        expect(response.body).to match(/"name":"copied course"/)
+      end
+
+      it "is able to filter courses by a copied attachment" do
+        @c1 = course_factory(account: @account, course_name: "source course")
+        asset = @c1.attachments.create!(filename: "coolpdf.pdf", uploaded_data: StringIO.new("test"))
+        @c2 = course_factory(account: @account, course_name: "copied course")
+        migration_id = CC::CCHelper.create_key(asset, global: true)
+        @c2.attachments.create!(filename: "coolpdf.pdf", uploaded_data: StringIO.new("test"), migration_id:)
+        admin_logged_in(@account)
+
+        get "courses_api", params: { account_id: @account.id, copied_asset: "file_#{asset.id}" }
+        expect(response.body).to match(/"name":"copied course"/)
+      end
+    end
   end
 
   describe "#eportfolio_moderation" do

@@ -103,12 +103,67 @@ describe Types::ModuleType do
     expect(module2_type.resolve("prerequisites { type }")).to eq ["context_module"]
   end
 
-  it "returns completion requirements" do
-    mod2.completion_requirements = [{ id: content_tag.id, type: "must_submit" }]
-    mod2.save!
-    expect(module2_type.resolve("completionRequirements { id }")).to eq [content_tag.id.to_s]
-    expect(module2_type.resolve("completionRequirements { type }")).to eq ["must_submit"]
-    expect(module2_type.resolve("completionRequirements { minScore }")).to match [be_nil]
-    expect(module2_type.resolve("completionRequirements { minPercentage }")).to match [be_nil]
+  describe "completion requirements" do
+    it "returns completion requirements" do
+      mod2.completion_requirements = [{ id: content_tag.id, type: "must_submit" }]
+      mod2.save!
+      expect(module2_type.resolve("completionRequirements { id }")).to eq [content_tag.id.to_s]
+      expect(module2_type.resolve("completionRequirements { type }")).to eq ["must_submit"]
+      expect(module2_type.resolve("completionRequirements { minScore }")).to match [be_nil]
+      expect(module2_type.resolve("completionRequirements { minPercentage }")).to match [be_nil]
+    end
+
+    describe "visibility" do
+      let_once(:published_assignment) { assignment_model({ context: course, name: "Published Assignment" }) }
+      let_once(:unpublished_assignment) do
+        assignment = assignment_model({ context: course, name: "Unpublished Assignment" })
+        assignment.workflow_state = "unpublished"
+        assignment.save!
+        assignment
+      end
+      let_once(:published_tag) { mod2.content_tags.create!(content: published_assignment, context: course) }
+      let_once(:unpublished_tag) { mod2.content_tags.create!(content: unpublished_assignment, context: course) }
+
+      before do
+        mod2.completion_requirements = [
+          { id: published_tag.id, type: "must_submit" },
+          { id: unpublished_tag.id, type: "must_submit" }
+        ]
+        mod2.save!
+      end
+
+      it "shows all requirements to teachers" do
+        teacher = course_with_teacher(course:, active_all: true).user
+        teacher_module_type = GraphQLTypeTester.new(mod2, current_user: teacher)
+        expect(teacher_module_type.resolve("completionRequirements { id }").sort).to eq(
+          [published_tag.id.to_s, unpublished_tag.id.to_s].sort
+        )
+      end
+
+      it "shows only published requirements to students" do
+        student_module_type = GraphQLTypeTester.new(mod2, current_user: @student)
+        expect(student_module_type.resolve("completionRequirements { id }")).to eq [published_tag.id.to_s]
+      end
+    end
+  end
+
+  it "returns false when there are no overrides" do
+    expect(module_type.resolve("hasActiveOverrides")).to be false
+  end
+
+  it "returns false when overrides are not active" do
+    AssignmentOverride.create!(
+      context_module_id: mod.id,
+      workflow_state: "deleted"
+    )
+    expect(module_type.resolve("hasActiveOverrides")).to be false
+  end
+
+  it "returns true when there is at least one active override" do
+    AssignmentOverride.create!(
+      context_module_id: mod.id,
+      workflow_state: "active"
+    )
+    expect(module_type.resolve("hasActiveOverrides")).to be true
   end
 end

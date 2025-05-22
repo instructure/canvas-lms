@@ -2530,9 +2530,8 @@ class Submission < ActiveRecord::Base
                              .first_or_initialize
     res.user_id = user_id
     res.workflow_state = "assigned" if res.new_record?
-    just_created = res.new_record?
     res.send_reminder! # this method also saves the assessment_request
-    obj.assign_assessment(res) if obj.is_a?(Submission) && just_created
+    obj.assign_assessment(res) if obj.is_a?(Submission) && res.previously_new_record?
     res
   end
 

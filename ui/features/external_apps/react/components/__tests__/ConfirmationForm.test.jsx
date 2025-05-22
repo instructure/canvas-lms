@@ -60,11 +60,12 @@ it('uses the specified message', async () => {
 
 it('calls "onCancel" when cancel button is clicked', async () => {
   const props = newProps()
-  const {user, findByText} = mountSubject(props)
-  const button = await findByText('Nope!')
+  const {user, findByText, unmount} = mountSubject(props)
+  const button = await findByText('Nope!', {exact: false})
   await user.click(button)
   expect(props.onCancel).toHaveBeenCalled()
-})
+  unmount()
+}, 5000)
 
 it('calls "onConfirm" when confirm button is clicked', async () => {
   const props = newProps()

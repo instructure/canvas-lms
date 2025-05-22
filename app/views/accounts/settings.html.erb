@@ -1245,16 +1245,14 @@ acknowledge that you have read and agreed to the
           <div class="col-xs-12 col-lg-6">
 
             <div class="ic-Form-control">
-              <label class="ic-Label" id="announcement_starts_at_label">
+              <label class="ic-Label" for="account_notification_start_at">
                 <%= t("Announcement starts at") %>
-                <span class="screenreader-only">
-                  <%= datepicker_screenreader_prompt %>
-                </span>
               </label>
+              <span id="announcement_starts_at_hint"><%= datepicker_screenreader_prompt %></span>
               <%= f.text_field :start_at,
                                :id => "account_notification_start_at",
                                :class => 'datetime_field',
-                               "aria-labelledby" => "announcement_starts_at_label",
+                               "aria-describedby" => "announcement_starts_at_hint",
                                "data-tooltip" => "",
                                :title => accessible_date_format %>
             </div>
@@ -1262,16 +1260,14 @@ acknowledge that you have read and agreed to the
 
           <div class="col-xs-12 col-lg-6">
             <div class="ic-Form-control">
-              <label class="ic-Label" id="announcement_ends_at_label">
+              <label class="ic-Label" for="account_notification_end_at">
                 <%= t("Announcement ends at") %>
-                <span class="screenreader-only">
-                  <%= datepicker_screenreader_prompt %>
-                </span>
               </label>
+              <span id="announcement_ends_at_hint"><%= datepicker_screenreader_prompt %></span>
               <%= f.text_field :end_at,
                                :id => "account_notification_end_at",
                                :class => 'datetime_field',
-                               "aria-labelledby" => "announcement_ends_at_label",
+                               "aria-describedby" => "announcement_ends_at_hint",
                                "data-tooltip" => "",
                                :title => accessible_date_format %>
             </div>

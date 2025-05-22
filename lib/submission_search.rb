@@ -57,7 +57,9 @@ class SubmissionSearch
 
     if @options[:user_id]
       # Since user_id requires an ID and not just a partial name, the user_search_scope is not needed and the 3 characters limit is not applied
-      search_scope = search_scope.where(user_id: representative_id(@options[:user_id]))
+      search_scope = search_scope.where(user_id: @options[:user_id])
+    elsif @options[:user_representative_id]
+      search_scope = search_scope.where(user_id: representative_id(@options[:user_representative_id]))
     end
 
     if @options[:anonymous_id].present?

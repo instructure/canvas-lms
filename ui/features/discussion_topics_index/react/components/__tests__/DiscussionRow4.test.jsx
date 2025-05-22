@@ -170,7 +170,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu(discussion.title)
-    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']")
     expect(allKeys).toHaveLength(3)
     expect(allKeys[0].textContent.includes('Close for comments')).toBe(true)
     expect(allKeys[1].textContent.includes('Pin')).toBe(true)
@@ -262,25 +262,150 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']")
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Move To')).toBe(true)
   })
 
-  it('renders pin item in manage menu if permitted', async () => {
-    render(
-      <DiscussionRow
-        {...makeProps({
-          displayManageMenu: true,
-          displayPinMenuItem: true,
-        })}
-      />,
-    )
+  describe('pin item', () => {
+    it('renders if permitted', async () => {
+      render(
+        <DiscussionRow
+          {...makeProps({
+            displayManageMenu: true,
+            displayPinMenuItem: true,
+          })}
+        />,
+      )
 
-    const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
-    expect(allKeys).toHaveLength(1)
-    expect(allKeys[0].textContent.includes('Pin')).toBe(true)
+      const list = await openManageMenu('Hello World')
+      const allKeys = list.querySelectorAll('#togglepinned-discussion-menu-option')
+      expect(allKeys).toHaveLength(1)
+      expect(allKeys[0].textContent.includes('Pin')).toBe(true)
+    })
+
+    it('should add trackable attribute correctly', async () => {
+      render(
+        <DiscussionRow
+          {...makeProps({
+            displayManageMenu: true,
+            displayPinMenuItem: true,
+          })}
+        />,
+      )
+
+      const list = await openManageMenu('Hello World')
+      const allKeys = list.querySelectorAll('#togglepinned-discussion-menu-option')
+      expect(allKeys).toHaveLength(1)
+      expect(allKeys[0]).toHaveAttribute('data-action-state', 'pinButton')
+    })
+
+    describe('when pinned', () => {
+      it('renders unpin item in manage menu if permitted', async () => {
+        render(
+          <DiscussionRow
+            {...makeProps({
+              displayManageMenu: true,
+              displayPinMenuItem: true,
+              discussion: {pinned: true},
+            })}
+          />,
+        )
+
+        const list = await openManageMenu('Hello World')
+        const allKeys = list.querySelectorAll('#togglepinned-discussion-menu-option')
+        expect(allKeys).toHaveLength(1)
+        expect(allKeys[0].textContent.includes('Unpin')).toBe(true)
+      })
+
+      it('should add trackable attribute correctly', async () => {
+        render(
+          <DiscussionRow
+            {...makeProps({
+              displayManageMenu: true,
+              displayPinMenuItem: true,
+              discussion: {pinned: true},
+            })}
+          />,
+        )
+
+        const list = await openManageMenu('Hello World')
+        const allKeys = list.querySelectorAll('#togglepinned-discussion-menu-option')
+        expect(allKeys).toHaveLength(1)
+        expect(allKeys[0]).toHaveAttribute('data-action-state', 'unpinButton')
+      })
+    })
+  })
+
+  describe('lock item', () => {
+    it('renders if permitted', async () => {
+      render(
+        <DiscussionRow
+          {...makeProps({
+            displayManageMenu: true,
+            displayLockMenuItem: true,
+          })}
+        />,
+      )
+
+      const list = await openManageMenu('Hello World')
+      const allKeys = list.querySelectorAll('#togglelocked-discussion-menu-option')
+      expect(allKeys).toHaveLength(1)
+      expect(allKeys[0].textContent.includes('Close for comments')).toBe(true)
+    })
+
+    it('should add trackable attribute correctly', async () => {
+      render(
+        <DiscussionRow
+          {...makeProps({
+            displayManageMenu: true,
+            displayLockMenuItem: true,
+            discussion: {locked: false},
+          })}
+        />,
+      )
+
+      const list = await openManageMenu('Hello World')
+      const allKeys = list.querySelectorAll('#togglelocked-discussion-menu-option')
+      expect(allKeys).toHaveLength(1)
+      expect(allKeys[0]).toHaveAttribute('data-action-state', 'lockButton')
+    })
+
+    describe('when locked', () => {
+      it('renders unpin item in manage menu if permitted', async () => {
+        render(
+          <DiscussionRow
+            {...makeProps({
+              displayManageMenu: true,
+              displayLockMenuItem: true,
+              discussion: {locked: true},
+            })}
+          />,
+        )
+
+        const list = await openManageMenu('Hello World')
+        const allKeys = list.querySelectorAll('#togglelocked-discussion-menu-option')
+        expect(allKeys).toHaveLength(1)
+        expect(allKeys[0].textContent.includes('Open for comments')).toBe(true)
+      })
+
+      it('should add trackable attribute correctly', async () => {
+        render(
+          <DiscussionRow
+            {...makeProps({
+              displayManageMenu: true,
+              displayLockMenuItem: true,
+              discussion: {locked: true},
+            })}
+          />,
+        )
+
+        const list = await openManageMenu('Hello World')
+        const allKeys = list.querySelectorAll('#togglelocked-discussion-menu-option')
+        expect(allKeys).toHaveLength(1)
+        expect(allKeys[0]).toHaveAttribute('data-action-state', 'unlockButton')
+      })
+    })
   })
 
   it('renders speedgrader link in manage menu if permitted', async () => {
@@ -301,7 +426,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']")
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('SpeedGrader')).toBe(true)
   })
@@ -318,7 +443,7 @@ describe('DiscussionRow', () => {
 
     const list = await openManageMenu('Hello World')
 
-    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']")
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Duplicate')).toBe(true)
   })

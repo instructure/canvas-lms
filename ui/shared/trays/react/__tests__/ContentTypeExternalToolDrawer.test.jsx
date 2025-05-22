@@ -61,11 +61,6 @@ describe('ContentTypeExternalToolDrawer', () => {
     jest.resetAllMocks()
   })
 
-  it('renders', () => {
-    const wrapper = renderTray()
-    expect(wrapper).toMatchSnapshot()
-  })
-
   it('labels page content with LTI title', () => {
     const {getByLabelText} = renderTray()
     expect(getByLabelText(pageContentTitle)).toBeInTheDocument()

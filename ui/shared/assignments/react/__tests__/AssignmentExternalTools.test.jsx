@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
  *
@@ -21,7 +20,6 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentExternalTools from '../AssignmentExternalTools'
 import fetchMock from 'fetch-mock'
-
 
 var toolDefinitions = [
   {
@@ -122,9 +120,7 @@ describe('AssignmentExternalTools', () => {
       />,
     )
     ref.current.setState({tools: toolDefinitions})
-    expect(wrapper.container.querySelectorAll('.tool_launch')).toHaveLength(
-      toolDefinitions.length,
-    )
+    expect(wrapper.container.querySelectorAll('.tool_launch')).toHaveLength(toolDefinitions.length)
   })
 
   test('it builds the correct Launch URL for LTI 1 tools', () => {
@@ -145,88 +141,6 @@ describe('AssignmentExternalTools', () => {
     }`
     const computedUrl = ref.current.getLaunch(tool)
     expect(computedUrl).toEqual(correctUrl)
-  })
-
-  test('shows beginning info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    wrapper = render(
-      <AssignmentExternalTools.configTools
-        ref={ref}
-        placement="assignment_edit"
-        courseId={1}
-        assignmentId={1}
-      />,
-    )
-    ref.current.setState({tools: toolDefinitions})
-    wrapper.container.querySelector('.before_external_content_info_alert').focus()
-    expect(ref.current.state.beforeExternalContentAlertClass).toEqual('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
-  })
-
-  test('shows ending info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    wrapper = render(
-      <AssignmentExternalTools.configTools
-        ref={ref}
-        placement="assignment_edit"
-        courseId={1}
-        assignmentId={1}
-      />,
-    )
-    ref.current.setState({tools: toolDefinitions})
-    wrapper.container.querySelector('.after_external_content_info_alert').focus()
-    expect(ref.current.state.afterExternalContentAlertClass).toEqual('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #2B7ABC', width: '-4px'})
-  })
-
-  test('hides beginning info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    wrapper = render(
-      <AssignmentExternalTools.configTools
-        ref={ref}
-        placement="assignment_edit"
-        courseId={1}
-        assignmentId={1}
-      />,
-    )
-    ref.current.setState({tools: toolDefinitions})
-    wrapper.container.querySelector('.before_external_content_info_alert').focus()
-    wrapper.container.querySelector('.before_external_content_info_alert').blur()
-    expect(ref.current.state.beforeExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-  })
-
-  test('hides ending info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    wrapper = render(
-      <AssignmentExternalTools.configTools
-        ref={ref}
-        placement="assignment_edit"
-        courseId={1}
-        assignmentId={1}
-      />,
-    )
-    ref.current.setState({tools: toolDefinitions})
-    wrapper.container.querySelector('.after_external_content_info_alert').focus()
-    wrapper.container.querySelector('.after_external_content_info_alert').blur()
-    expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-  })
-
-  test("doesn't show alerts or add border to iframe by default", () => {
-    const ref = React.createRef()
-    wrapper = render(
-      <AssignmentExternalTools.configTools
-        ref={ref}
-        placement="assignment_edit"
-        courseId={1}
-        assignmentId={1}
-      />,
-    )
-    ref.current.setState({tools: toolDefinitions})
-    expect(ref.current.state.beforeExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({})
   })
 
   test('it renders multiple iframes', () => {

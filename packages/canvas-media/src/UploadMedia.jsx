@@ -147,8 +147,8 @@ export class UploadMediaModal extends React.Component {
   handleSubmit = () => {
     switch (this.state.selectedPanel) {
       case PANELS.COMPUTER: {
-        this.computerPanelRef.current?.updateValidationMessages();
         const {computerFile} = this.state
+        this.computerPanelRef.current?.updateValidationMessages(computerFile)
         if (computerFile?.title?.trim()) {
           this.uploadFile(computerFile)
         }
@@ -205,11 +205,11 @@ export class UploadMediaModal extends React.Component {
         let captions
         if (selectedPanel === PANELS.COMPUTER && subtitles.length > 0) {
           captions = await saveClosedCaptionsForAttachment(
-                media_object.attachment_id,
-                subtitles,
-                rcsConfig,
-                CC_FILE_MAX_BYTES,
-              )
+            media_object.attachment_id,
+            subtitles,
+            rcsConfig,
+            CC_FILE_MAX_BYTES,
+          )
         }
         onUploadComplete?.(null, data, captions?.data)
       } catch (ex) {

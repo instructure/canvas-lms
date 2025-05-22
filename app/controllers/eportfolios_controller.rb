@@ -203,8 +203,16 @@ class EportfoliosController < ApplicationController
           if @attachment.zipped?
             if @attachment.stored_locally?
               cancel_cache_buster
-              format.html { send_file(@attachment.full_filename, type: @attachment.content_type_with_encoding, disposition: "inline") }
-              format.zip { send_file(@attachment.full_filename, type: @attachment.content_type_with_encoding, disposition: "inline") }
+              format.html do
+                safe_send_file(@attachment.full_filename,
+                               type: @attachment.content_type_with_encoding,
+                               disposition: "inline")
+              end
+              format.zip do
+                safe_send_file(@attachment.full_filename,
+                               type: @attachment.content_type_with_encoding,
+                               disposition: "inline")
+              end
             else
               inline_url = authenticated_inline_url(@attachment)
               format.html { redirect_to inline_url }

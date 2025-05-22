@@ -169,9 +169,8 @@ describe "report helper" do
     end
 
     it "allows aborting" do
-      account_report.workflow_state = "deleted"
-      account_report.save!
-      expect { report.write_report(["header"]) { |csv| csv << "hi" } }.to raise_error(/aborted/)
+      allow(account_report).to receive(:stopped?).and_return(true)
+      expect { report.write_report(["header"]) { |csv| csv << "hi" } }.to raise_error(AccountReports::ReportHelper::ReportStopped)
     end
   end
 

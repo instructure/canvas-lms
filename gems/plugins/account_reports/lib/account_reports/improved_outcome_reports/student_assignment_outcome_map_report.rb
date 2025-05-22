@@ -136,7 +136,9 @@ module AccountReports
                                  INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = e.course_section_id
                                  INNER JOIN #{Assignment.quoted_table_name} a ON (a.context_id = c.id
                                                                AND a.context_type = 'Course'
-                                                               AND a.type = 'Assignment')
+                                                               AND a.type = 'Assignment'
+                                                               #{"AND a.workflow_state <> 'deleted'" unless @include_deleted}
+                                                               )
                                  INNER JOIN #{ContentTag.quoted_table_name} ct ON (ct.content_id = a.id
                                                                  AND ct.content_type = 'Assignment')
                                  INNER JOIN #{LearningOutcome.quoted_table_name} lo ON lo.id = ct.learning_outcome_id

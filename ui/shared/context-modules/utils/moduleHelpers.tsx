@@ -61,9 +61,7 @@ export function addModuleElement(
       .addClass('publish-module-link')
       .removeClass('unpublish-module-link')
     $module.addClass('unpublished_module')
-    $module
-      .find('h2')
-      .html(data.context_module.name)
+    $module.find('h2').html(data.context_module.name)
   }
 
   $('#no_context_modules_message').slideUp()
@@ -110,7 +108,7 @@ export function addModuleElement(
   const module_dnd = $module.find('.module_dnd')[0]
   if (module_dnd) {
     const contextModules = document.getElementById('context_modules')
-     
+
     ReactDOM.render(
       <ModuleFileDrop
         courseId={ENV.course_id}

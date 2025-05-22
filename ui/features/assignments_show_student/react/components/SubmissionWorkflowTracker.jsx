@@ -80,7 +80,7 @@ function currentWorkflowState({submission}) {
   let currentState
   if (submission.state === 'graded') {
     currentState = submission.gradeHidden ? possibleStates.submitted : possibleStates.completed
-  } else if (submission.state === 'submitted') {
+  } else if (submission.state === 'submitted' || submission.state === 'pending_review') {
     currentState = possibleStates.submitted
   } else {
     // Also show "In Progress" when the assignment has not been started

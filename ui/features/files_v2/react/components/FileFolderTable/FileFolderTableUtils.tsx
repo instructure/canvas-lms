@@ -58,46 +58,78 @@ export const setColumnWidths = (headers: ColumnHeader[]) => {
   document.body.removeChild(temp)
 }
 
-export const getColumnHeaders = (actionsTitle: string): ColumnHeader[] => [
-  {id: 'name', title: I18n.t('Name'), textAlign: 'start', width: '12.5em'},
+export const getColumnHeaders = (actionsTitle: string, currentSortId: string): ColumnHeader[] => [
+  {
+    id: 'name',
+    title: I18n.t('Name'),
+    textAlign: 'start',
+    width: '12.5em',
+    isSortable: true,
+    screenReaderLabel: currentSortId === 'name' ? I18n.t('Sorted by name') : I18n.t('Sort by name'),
+  },
   {
     id: 'created_at',
     title: I18n.t('Created'),
     textAlign: 'start',
     width: undefined,
+    isSortable: true,
+    screenReaderLabel:
+      currentSortId === 'created_at' ? I18n.t('Sorted by created') : I18n.t('Sort by created'),
   },
   {
     id: 'updated_at',
     title: I18n.t('Last Modified'),
     textAlign: 'start',
     width: undefined,
+    isSortable: true,
+    screenReaderLabel:
+      currentSortId === 'updated_at'
+        ? I18n.t('Sorted by last modified')
+        : I18n.t('Sort by last modified'),
   },
   {
     id: 'modified_by',
     title: I18n.t('Modified By'),
     textAlign: 'start',
     width: undefined,
+    isSortable: true,
+    screenReaderLabel:
+      currentSortId === 'modified_by'
+        ? I18n.t('Sorted by modified by')
+        : I18n.t('Sort by modified by'),
   },
-  {id: 'size', title: I18n.t('Size'), textAlign: 'start', width: ''},
+  {
+    id: 'size',
+    title: I18n.t('Size'),
+    textAlign: 'start',
+    width: '',
+    isSortable: true,
+    screenReaderLabel: currentSortId === 'size' ? I18n.t('Sorted by size') : I18n.t('Sort by size'),
+  },
   {
     id: 'rights',
     title: I18n.t('Rights'),
     textAlign: 'center',
     width: undefined,
+    isSortable: true,
+    screenReaderLabel:
+      currentSortId === 'rights' ? I18n.t('Sorted by rights') : I18n.t('Sort by rights'),
   },
   {
     id: 'blueprint',
     title: I18n.t('Blueprint'),
     textAlign: 'center',
     width: undefined,
+    isSortable: false,
   },
   {
     id: 'permissions',
     title: I18n.t('Status'),
     textAlign: 'center',
     width: undefined,
+    isSortable: false,
   },
-  {id: 'actions', title: actionsTitle, textAlign: 'center', width: ''},
+  {id: 'actions', title: actionsTitle, textAlign: 'center', width: '', isSortable: false},
 ]
 
 export const columnRenderers: {

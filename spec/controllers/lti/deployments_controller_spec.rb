@@ -68,8 +68,7 @@ RSpec.describe Lti::DeploymentsController do
     context "correctness verifications" do
       before do
         3.times do
-          deployment = registration.new_external_tool(account)
-          deployment.save!
+          registration.new_external_tool(account)
         end
       end
 
@@ -87,6 +86,20 @@ RSpec.describe Lti::DeploymentsController do
         end
       end
 
+      context "when paginated" do
+        let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/deployments?per_page=2" }
+
+        it "returns the correct number of deployments" do
+          subject
+          expect(response_json.length).to eq(2)
+        end
+
+        it "returns the correct pagination headers" do
+          subject
+          expect(response.headers["Link"]).to include('rel="next"')
+        end
+      end
+
       it "is successful" do
         subject
         expect(response).to be_successful
@@ -101,7 +114,13 @@ RSpec.describe Lti::DeploymentsController do
         subject
 
         expect(response_json.first)
-          .to include({ id: an_instance_of(Integer), context_name: an_instance_of(String), deployment_id: an_instance_of(String) })
+          .to include(
+            {
+              id: an_instance_of(Integer),
+              context_name: an_instance_of(String),
+              deployment_id: an_instance_of(String)
+            }
+          )
       end
 
       context "without user session" do
@@ -130,6 +149,155 @@ RSpec.describe Lti::DeploymentsController do
           expect(response).to be_not_found
         end
       end
+    end
+  end
+
+  describe "GET list_controls", type: :request do
+    subject do
+      get url
+      response
+    end
+
+    let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/deployments/#{deployment.id}/controls" }
+    let(:deployment) { registration.new_external_tool(account) }
+
+    before do
+      3.times do
+        course = course_model(account:)
+        Lti::ContextControl.create!(course:, registration:, deployment:)
+      end
+    end
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_registrations_next) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    it { is_expected.to be_successful }
+
+    it "returns a list of context controls" do
+      subject
+      expect(response_json.length).to eq(4)
+    end
+
+    it "has the expected fields in the results" do
+      subject
+      expect(response_json.first).to include(
+        {
+          account_id: account.id,
+          available: true,
+          context_name: an_instance_of(String),
+          course_id: nil,
+          created_at: an_instance_of(String),
+          created_by: nil,
+          deployment_id: deployment.id,
+          depth: 0,
+          display_path: [an_instance_of(String)],
+          id: an_instance_of(Integer),
+          path: an_instance_of(String),
+          registration_id: registration.id,
+          updated_at: an_instance_of(String),
+          updated_by: nil,
+          workflow_state: "active"
+        }.with_indifferent_access
+      )
+    end
+
+    context "when paginated" do
+      let(:url) do
+        "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/deployments/#{deployment.id}/controls?per_page=2"
+      end
+
+      it "returns the correct number of context controls" do
+        subject
+        expect(response_json.length).to eq(2)
+      end
+
+      it "returns the correct pagination headers" do
+        subject
+        expect(response.headers["Link"]).to include('rel="next"')
+      end
+    end
+  end
+
+  describe "GET show", type: :request do
+    subject do
+      get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/deployments/#{deployment.id}"
+      response
+    end
+
+    let(:deployment) { registration.new_external_tool(account) }
+
+    before { deployment.save! }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_registrations_next) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    it { is_expected.to be_successful }
+
+    it "returns the requested deployment" do
+      subject
+      expect(response_json).to eq(
+        {
+          id: deployment.id,
+          context_id: account.id,
+          context_type: "Account",
+          context_name: account.name,
+          deployment_id: deployment.deployment_id,
+          registration_id: registration.id,
+          workflow_state: "active",
+        }.with_indifferent_access
+      )
     end
   end
 
@@ -185,6 +353,14 @@ RSpec.describe Lti::DeploymentsController do
       expect(response_json[:registration_id]).to eq(registration.id)
       expect(response_json[:context_id]).to eq(account.id)
     end
+
+    it "creates a context control for the deployment" do
+      expect { subject }.to change { Lti::ContextControl.count }.by(1)
+      expect(Lti::ContextControl.last.deployment.id).to eql(
+        ContextExternalTool.last.id
+      )
+      expect(Lti::ContextControl.last.created_by).to eql(admin)
+    end
   end
 
   describe "DELETE destroy", type: :request do
@@ -200,11 +376,14 @@ RSpec.describe Lti::DeploymentsController do
     let(:admin) { account_admin_user(account:) }
 
     before do
-      deployment.save!
+      # creates the deployment
+      deployment
     end
 
-    it "soft-deletes the deployment" do
-      expect { subject }.to change { ContextExternalTool.active.count }.by(-1)
+    it "soft-deletes the deployment and controls" do
+      expect { subject }.to change { ContextExternalTool.active.count }
+        .by(-1)
+        .and change { Lti::ContextControl.active.count }.by(-1)
     end
   end
 end

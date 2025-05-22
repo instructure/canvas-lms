@@ -40,7 +40,9 @@ type DyslexicFontLabelProps = {
 type TipTrigger = 'click' | 'hover' | 'focus'
 
 const DyslexicFontLabel = ({loading, isMobile}: DyslexicFontLabelProps) => {
-  const labelText = isMobile ? I18n.t('Dyslexic font') : I18n.t('Use Dyslexic Friendly Font')
+  const labelText = isMobile
+    ? I18n.t('Dyslexia Friendly Font')
+    : I18n.t('Use a Dyslexia Friendly Font')
   const mobileTipText = I18n.t('Use OpenDyslexia font')
   const dekstopTipText = I18n.t('Enhances the readability of text for users with dyslexia')
   const tipText = isMobile ? mobileTipText : dekstopTipText

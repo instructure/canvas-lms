@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {TimeSelect} from '@instructure/ui-time-select'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {FormField, FormFieldGroup} from '@instructure/ui-form-field'
@@ -424,7 +424,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
               : []
           }
         />
-        <CanvasDateInput
+        <CanvasDateInput2
           dataTestid="edit-calendar-event-form-date"
           renderLabel={
             <Flex>
@@ -453,7 +453,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
           formatDate={dateFormatter}
           onSelectedDateChange={handleDateChange}
           width="100%"
-          display="block"
+          isInline={false}
           timezone={timezone}
           defaultToToday={true}
           invalidDateMessage={I18n.t('This date is invalid.')}
@@ -502,7 +502,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             initialFrequency={frequency}
             rrule={rrule}
             onChange={(newFrequency, newRRule) => handleFrequencyChange(newFrequency, newRRule)}
-          courseEndAt={context.course_conclude_at || undefined}
+            courseEndAt={context.course_conclude_at || undefined}
           />
         )}
         {shouldShowLocationField() && (

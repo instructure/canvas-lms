@@ -352,6 +352,19 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       toolConfigurationUrl: null,
       developerKey: {},
     })
+    // Find the appropriate button to focus on based on whether we were editing or adding
+    if (
+      this.props.createOrEditDeveloperKeyState.editing &&
+      this.props.createOrEditDeveloperKeyState.developerKey?.id
+    ) {
+      document
+        .getElementById(
+          `edit-developer-key-button-${this.props.createOrEditDeveloperKeyState.developerKey.id}`,
+        )
+        ?.focus()
+    } else {
+      document.getElementById('add-developer-key-button')?.focus()
+    }
   }
 
   confirmSave = () => {

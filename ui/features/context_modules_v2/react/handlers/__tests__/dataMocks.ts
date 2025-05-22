@@ -24,6 +24,7 @@ export const defaultModuleItems: ModuleItem[] = [
     id: '',
     url: '',
     indent: 0,
+    position: 0,
     content: null,
   },
   {
@@ -31,6 +32,7 @@ export const defaultModuleItems: ModuleItem[] = [
     id: '',
     url: '',
     indent: 0,
+    position: 1,
     content: null,
   },
   {
@@ -38,6 +40,7 @@ export const defaultModuleItems: ModuleItem[] = [
     id: '',
     url: '',
     indent: 0,
+    position: 2,
     content: null,
   },
   {
@@ -45,6 +48,7 @@ export const defaultModuleItems: ModuleItem[] = [
     id: '',
     url: '',
     indent: 0,
+    position: 3,
     content: null,
   },
   {
@@ -52,6 +56,7 @@ export const defaultModuleItems: ModuleItem[] = [
     id: '',
     url: '',
     indent: 0,
+    position: 4,
     content: null,
   },
   {
@@ -59,6 +64,7 @@ export const defaultModuleItems: ModuleItem[] = [
     id: '',
     url: '',
     indent: 0,
+    position: 5,
     content: null,
   },
   {
@@ -66,6 +72,7 @@ export const defaultModuleItems: ModuleItem[] = [
     id: '',
     url: '',
     indent: 0,
+    position: 6,
     content: null,
   },
   {
@@ -73,6 +80,7 @@ export const defaultModuleItems: ModuleItem[] = [
     id: '',
     url: '',
     indent: 0,
+    position: 7,
     content: null,
   },
   {
@@ -80,6 +88,7 @@ export const defaultModuleItems: ModuleItem[] = [
     id: '',
     url: '',
     indent: 0,
+    position: 8,
     content: null,
   },
   {
@@ -87,6 +96,7 @@ export const defaultModuleItems: ModuleItem[] = [
     id: '',
     url: '',
     indent: 0,
+    position: 9,
     content: null,
   },
 ]
@@ -104,6 +114,7 @@ export const defaultModules: Module[] = [
     unlockAt: null,
     moduleItems: [],
     requireSequentialProgress: false,
+    hasActiveOverrides: false,
   },
   {
     id: '1',
@@ -117,6 +128,7 @@ export const defaultModules: Module[] = [
     unlockAt: null,
     moduleItems: [],
     requireSequentialProgress: false,
+    hasActiveOverrides: false,
   },
   {
     id: '2',
@@ -130,6 +142,7 @@ export const defaultModules: Module[] = [
     unlockAt: null,
     moduleItems: [],
     requireSequentialProgress: false,
+    hasActiveOverrides: false,
   },
   {
     id: '3',
@@ -143,6 +156,7 @@ export const defaultModules: Module[] = [
     unlockAt: null,
     moduleItems: [],
     requireSequentialProgress: false,
+    hasActiveOverrides: false,
   },
   {
     id: '4',
@@ -156,5 +170,6 @@ export const defaultModules: Module[] = [
     unlockAt: null,
     moduleItems: [],
     requireSequentialProgress: false,
+    hasActiveOverrides: false,
   },
 ]

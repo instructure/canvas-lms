@@ -23,147 +23,266 @@ describe HorizonMode do
     def show
       render json: {}
     end
+
+    def test_performed?
+      performed?
+    end
   end
 
   before :once do
     @course = course_factory(active_all: true)
     course_with_student(active_all: true)
-    account = @course.root_account
-    account.settings[:horizon_domain] = "test.canvasforcareer.com"
-    account.save!
+    @admin = account_admin_user(account: @account)
+    root_account = @course.root_account
+    root_account.settings[:horizon_domain] = "test.canvasforcareer.com"
+    root_account.save!
+    @account = @course.account
   end
 
   before do
-    @context = Course.find(@course.id)
-    controller.instance_variable_set(:@context, @context)
+    request.path = "/courses/#{@course.id}"
   end
 
-  context "when course is not a Horizon course" do
-    it "does not redirect" do
-      get :show, params: { id: @course.id }
-      expect(response).to have_http_status :ok
-    end
+  def setup(user, context)
+    user_session(user)
+    controller.instance_variable_set(:@current_user, user)
+    controller.instance_variable_set(:@context, context)
   end
 
-  context "when course is a Horizon course" do
-    before :once do
-      Account.site_admin.enable_feature!(:horizon_course_setting)
-      @course.update!(horizon_course: true)
+  describe "#load_canvas_career" do
+    context "when course is not a Horizon course" do
+      it "does not redirect" do
+        setup(@student, @course)
+        get :show, params: { id: @course.id }
+        expect(response).to have_http_status :ok
+      end
     end
 
-    it "does not redirect if user is not student" do
-      user_session(@teacher)
-      get :show, params: { id: @course.id }
-      expect(response).to have_http_status :ok
-    end
-
-    it "does not redirect if user is account admin" do
-      admin = account_admin_user(account: @course.account)
-      user_session(admin)
-      get :show, params: { id: @course.id }
-      expect(response).to have_http_status :ok
-    end
-
-    it "redirects to horizon if user is student" do
-      user_session(@student)
-      get :show, params: { id: @course.id }
-      expect(response).to redirect_to("https://test.canvasforcareer.com/redirect?canvas_url=%2Fcourses%2F#{@course.id}&preview=false&reauthenticate=false")
-    end
-
-    it "does not redirect if horizon domain is not set, even if student" do
-      @course.account.settings[:horizon_domain] = nil
-      @course.account.save!
-      user_session(@student)
-      get :show, params: { id: @course.id }
-      expect(response).to have_http_status :ok
-    end
-
-    context "canvas career learning provider app" do
+    context "when course is a Horizon course" do
       before :once do
-        Account.site_admin.enable_feature!(:horizon_learning_provider_app)
+        @account.enable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: true)
       end
 
-      it "identifies when learning provider app is enabled" do
-        admin = account_admin_user(account: @course.account)
-        user_session(admin)
-        get :show, params: { id: @course.id }
-        expect(controller.canvas_career_learning_provider_app_enabled?).to be true
+      it "does not redirect when force_classic param is true" do
+        setup(@student, @course)
+        controller.params[:force_classic] = "true"
+
+        expect(controller).not_to receive(:load_canvas_career_for_student)
+        expect(controller).not_to receive(:load_canvas_career_for_provider)
+
+        controller.load_canvas_career
       end
 
-      it "does not enable learning provider app when feature flag is off" do
-        Account.site_admin.disable_feature!(:horizon_learning_provider_app)
-        admin = account_admin_user(account: @course.account)
-        user_session(admin)
-        get :show, params: { id: @course.id }
-        expect(controller.canvas_career_learning_provider_app_enabled?).to be false
+      it "calls both student and provider methods in correct order" do
+        setup(@teacher, @course)
+
+        allow(controller).to receive(:performed?).and_return(false)
+
+        expect(controller).to receive(:load_canvas_career_for_student).ordered
+        expect(controller).to receive(:load_canvas_career_for_provider).ordered
+
+        controller.load_canvas_career
       end
 
-      it "does not enable learning provider app for non-admin users" do
-        user_session(@student)
-        get :show, params: { id: @course.id }
-        expect(controller.canvas_career_learning_provider_app_enabled?).to be false
+      it "does not call provider method if student method performed a redirect" do
+        setup(@student, @course)
+
+        allow(controller).to receive(:performed?).and_return(true)
+
+        expect(controller).to receive(:load_canvas_career_for_student)
+        expect(controller).not_to receive(:load_canvas_career_for_provider)
+
+        controller.load_canvas_career
       end
 
-      it "returns the correct learning provider app launch URL" do
-        admin = account_admin_user(account: @course.account)
-        user_session(admin)
-        get :show, params: { id: @course.id }
-        expected_url = "https://test.canvasforcareer.com/learning-provider/remoteEntry.js"
-        expect(controller.canvas_career_learning_provider_app_launch_url).to eq expected_url
-      end
-    end
-
-    context "load_canvas_career_for_provider" do
-      before :once do
-        Account.site_admin.enable_feature!(:horizon_learning_provider_app)
-      end
-
-      it "sets session career_course_id and redirects to /career for admin users" do
-        admin = account_admin_user(account: @course.account)
-        user_session(admin)
-
-        # Mock the controller to allow testing the redirect
-        allow(controller).to receive(:load_canvas_career_for_provider).and_wrap_original do |original, *args|
-          original.call(*args)
-          controller.instance_variable_set(:@performed_redirect, true) if controller.session[:career_course_id].present?
-        end
-
-        get :show, params: { id: @course.id }
-        expect(controller.session[:career_course_id]).to eq @course.id
-      end
-
-      it "does not redirect for non-admin users" do
-        user_session(@student)
-
-        # We need to bypass the student redirect to test this specific case
-        allow(controller).to receive(:load_canvas_career_for_student).and_return(nil)
-
-        get :show, params: { id: @course.id }
-        expect(controller.session[:career_course_id]).to be_nil
-      end
-    end
-
-    context "load_canvas_career" do
       it "tries student path first for student users" do
-        user_session(@student)
+        setup(@student, @course)
         get :show, params: { id: @course.id }
         expect(response).to redirect_to("https://test.canvasforcareer.com/redirect?canvas_url=%2Fcourses%2F#{@course.id}&preview=false&reauthenticate=false")
       end
 
       it "tries provider path for admin users when feature is enabled" do
-        Account.site_admin.enable_feature!(:horizon_learning_provider_app)
-        admin = account_admin_user(account: @course.account)
-        user_session(admin)
+        setup(@admin, @course)
+        @account.enable_feature!(:horizon_learning_provider_app_for_accounts)
 
-        # Mock the controller to allow testing the redirect
-        allow(controller).to receive(:load_canvas_career_for_provider).and_wrap_original do |original, *args|
-          original.call(*args)
-          controller.instance_variable_set(:@performed_redirect, true) if controller.session[:career_course_id].present?
+        allow(controller).to receive(:performed?).and_return(false)
+
+        expect(controller).to receive(:load_canvas_career_for_provider)
+
+        controller.load_canvas_career
+      end
+
+      it "does not redirect if user is not student" do
+        setup(@teacher, @course)
+        get :show, params: { id: @course.id }
+        expect(response).to have_http_status :ok
+      end
+
+      it "does not redirect if user is account admin" do
+        setup(@admin, @course)
+        get :show, params: { id: @course.id }
+        expect(response).to have_http_status :ok
+      end
+
+      it "does not redirect if horizon domain is not set, even if student" do
+        setup(@student, @course)
+        @course.root_account.settings[:horizon_domain] = nil
+        @course.root_account.save!
+        get :show, params: { id: @course.id }
+        expect(response).to have_http_status :ok
+      end
+
+      it "does not redirect when invitation param is present" do
+        setup(@student, @course)
+        get :show, params: { id: @course.id, invitation: "some_value" }
+        expect(response).to have_http_status :ok
+      end
+
+      context "when context is an Account" do
+        before :once do
+          @account.horizon_account = true
+          @account.save!
         end
 
-        get :show, params: { id: @course.id }
-        expect(controller.session[:career_course_id]).to eq @course.id
+        it "only tries provider path for account contexts" do
+          setup(@admin, @account)
+
+          expect(controller).not_to receive(:load_canvas_career_for_student)
+          expect(controller).to receive(:load_canvas_career_for_provider)
+
+          controller.load_canvas_career
+        end
+
+        it "redirects to account career path" do
+          setup(@admin, @account)
+          @account.enable_feature!(:horizon_learning_provider_app_for_accounts)
+
+          request.path = "/accounts/#{@account.id}/settings"
+
+          expect(controller).to receive(:redirect_to).with("/career/accounts/#{@account.id}/settings")
+
+          controller.load_canvas_career
+        end
       end
+
+      context "when context is a Course" do
+        it "redirects to course career path when appropriate" do
+          setup(@admin, @course)
+          @account.enable_feature!(:horizon_learning_provider_app_for_courses)
+
+          allow(controller).to receive(:performed?).and_return(false)
+
+          request.path = "/courses/#{@course.id}/settings"
+
+          expect(controller).to receive(:redirect_to).with("/career/courses/#{@course.id}/settings")
+
+          controller.load_canvas_career
+        end
+
+        it "does not redirect when path already includes /career" do
+          setup(@admin, @course)
+          @account.enable_feature!(:horizon_learning_provider_app_for_courses)
+
+          request.path = "/career/courses/#{@course.id}/settings"
+
+          get :show, params: { id: @course.id }
+          expect(response).to have_http_status :ok
+        end
+      end
+    end
+  end
+
+  describe "#canvas_career_learning_provider_app_launch_url" do
+    it "returns the correct learning provider app launch URL" do
+      setup(@admin, @course)
+      expected_url = "https://test.canvasforcareer.com/learning-provider/remoteEntry.js"
+      expect(controller.canvas_career_learning_provider_app_launch_url).to eq expected_url
+    end
+
+    it "constructs URL from the account's horizon domain" do
+      setup(@admin, @course)
+      @course.root_account.settings[:horizon_domain] = "custom.domain.com"
+      @course.root_account.save!
+
+      expected_url = "https://custom.domain.com/learning-provider/remoteEntry.js"
+      expect(controller.canvas_career_learning_provider_app_launch_url).to eq expected_url
+    end
+  end
+
+  describe "#canvas_career_learning_provider_app_enabled?" do
+    before :once do
+      @account.enable_feature!(:horizon_course_setting)
+      @course.update!(horizon_course: true)
+      @account.enable_feature!(:horizon_learning_provider_app_for_accounts)
+      @account.enable_feature!(:horizon_learning_provider_app_for_courses)
+    end
+
+    context "for Course contexts" do
+      it "identifies when learning provider app is enabled" do
+        @course.update!(horizon_course: true)
+        setup(@admin, @course)
+        expect(controller.canvas_career_learning_provider_app_enabled?).to be true
+      end
+
+      it "does not enable learning provider app when feature flag is off" do
+        setup(@admin, @course)
+        @account.disable_feature!(:horizon_learning_provider_app_for_courses)
+        expect(controller.canvas_career_learning_provider_app_enabled?).to be false
+      end
+
+      it "does not enable learning provider app for non-admin users" do
+        setup(@student, @course)
+        expect(controller.canvas_career_learning_provider_app_enabled?).to be false
+      end
+
+      it "returns false when course is not a horizon course" do
+        @course.update!(horizon_course: false)
+        setup(@admin, @course)
+
+        expect(controller.canvas_career_learning_provider_app_enabled?).to be false
+      end
+
+      it "returns false when launch URL is blank" do
+        setup(@admin, @course)
+
+        allow(controller).to receive(:canvas_career_learning_provider_app_launch_url).and_return("")
+
+        expect(controller.canvas_career_learning_provider_app_enabled?).to be false
+      end
+    end
+
+    context "for Account contexts" do
+      before :once do
+        @account.horizon_account = true
+        @account.save!
+      end
+
+      it "returns true when account is a horizon account and all other conditions are met" do
+        setup(@admin, @account)
+
+        expect(controller.canvas_career_learning_provider_app_enabled?).to be true
+      end
+
+      it "returns false when feature flag is disabled" do
+        setup(@admin, @account)
+        @account.disable_feature!(:horizon_learning_provider_app_for_accounts)
+
+        expect(controller.canvas_career_learning_provider_app_enabled?).to be false
+      end
+
+      it "returns false when account is not a horizon account" do
+        @account.update!(horizon_account: false)
+        setup(@admin, @account)
+
+        expect(controller.canvas_career_learning_provider_app_enabled?).to be false
+      end
+    end
+
+    it "returns false when user is not an admin" do
+      setup(@student, @course)
+
+      expect(controller.canvas_career_learning_provider_app_enabled?).to be false
     end
   end
 end

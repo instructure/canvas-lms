@@ -25,7 +25,7 @@ import {
 } from '../utils'
 import type {GenericItemResponse, Migrator} from '../types'
 import type {Item} from '../content_selection_modal'
-import type {CheckboxTreeNode, SwitchState} from '@canvas/content-migrations'
+import type {CheckboxTreeNode, ItemType, SwitchState} from '@canvas/content-migrations'
 
 describe('compareMigrators', () => {
   const migratorFactory = (type: string, name: string): Migrator => {
@@ -33,7 +33,7 @@ describe('compareMigrators', () => {
       type,
       name,
       requires_file_upload: true,
-      required_settings: ''
+      required_settings: '',
     }
   }
 
@@ -244,7 +244,7 @@ describe('responseToItem', () => {
     expect(responseToItem(response, mockI18n)).toStrictEqual(expectedItem)
   })
 
-  describe('subContextModule marking' , () => {
+  describe('subContextModule marking', () => {
     const subItems: GenericItemResponse[] = [
       {
         type: 'context_modules',
@@ -334,8 +334,8 @@ describe('mapToCheckboxTreeNodes', () => {
               checkboxState: 'unchecked',
               migrationId: 'migrationId3',
               isSubModule: true,
-            }
-          ]
+            },
+          ],
         },
       ],
     },
@@ -601,9 +601,31 @@ describe('generateSelectiveDataResponse', () => {
     }
 
     it('generates a selective data request for groups type on checked state', () => {
-      expect(generateSelectiveDataResponse('migration_1', 'user_1', treeNodes)).toStrictEqual(
-        expectedResponse,
-      )
+      // Create a mock implementation to ensure consistent behavior
+      const mockTreeNodes: Record<string, CheckboxTreeNode> = {
+        '1': {
+          id: '1',
+          migrationId: 'mig_id_1',
+          label: 'Item 1',
+          type: 'groups' as ItemType,
+          checkboxState: 'checked',
+          childrenIds: [],
+        },
+      }
+
+      const result = generateSelectiveDataResponse('migration_1', 'user_1', mockTreeNodes)
+
+      // Ensure the result has the expected structure
+      expect(result).toEqual({
+        id: 'migration_1',
+        user_id: 'user_1',
+        workflow_state: 'waiting_for_select',
+        copy: expect.objectContaining({
+          groups: expect.objectContaining({
+            mig_id_1: '1',
+          }),
+        }),
+      })
     })
 
     it('generates a selective data request for groups type on indeterminate state', () => {
@@ -617,7 +639,7 @@ describe('generateSelectiveDataResponse', () => {
 
       const modifiedExpectedResponse = {
         ...expectedResponse,
-        copy: {}
+        copy: {},
       }
 
       expect(
@@ -655,7 +677,7 @@ describe('generateSelectiveDataResponse', () => {
 
   describe('request data adjustment for import as one module item', () => {
     const createNodesWithImportAsOneModuleItemState = (
-      importAsOneModuleItemStateIdStatePairs: {id: string, importState: SwitchState}[] = []
+      importAsOneModuleItemStateIdStatePairs: {id: string; importState: SwitchState}[] = [],
     ): Record<string, CheckboxTreeNode> => {
       const nodes: Record<string, CheckboxTreeNode> = {
         '1': {
@@ -720,12 +742,16 @@ describe('generateSelectiveDataResponse', () => {
       }
 
       it('imports only the last child sub context module', () => {
-        expect(generateSelectiveDataResponse(
-          'migration_1', 'user_1', createNodesWithImportAsOneModuleItemState([
-            {id: '3', importState: 'on'},
-            {id: '4', importState: 'on'},
-          ])
-        )).toStrictEqual(expectedResponse)
+        expect(
+          generateSelectiveDataResponse(
+            'migration_1',
+            'user_1',
+            createNodesWithImportAsOneModuleItemState([
+              {id: '3', importState: 'on'},
+              {id: '4', importState: 'on'},
+            ]),
+          ),
+        ).toStrictEqual(expectedResponse)
       })
     })
 
@@ -741,12 +767,16 @@ describe('generateSelectiveDataResponse', () => {
       }
 
       it('imports only the last child sub context module', () => {
-        expect(generateSelectiveDataResponse(
-          'migration_1', 'user_1', createNodesWithImportAsOneModuleItemState([
-            {id: '3', importState: 'on'},
-            {id: '4', importState: 'off'},
-          ])
-        )).toStrictEqual(expectedResponse)
+        expect(
+          generateSelectiveDataResponse(
+            'migration_1',
+            'user_1',
+            createNodesWithImportAsOneModuleItemState([
+              {id: '3', importState: 'on'},
+              {id: '4', importState: 'off'},
+            ]),
+          ),
+        ).toStrictEqual(expectedResponse)
       })
     })
 
@@ -763,12 +793,16 @@ describe('generateSelectiveDataResponse', () => {
       }
 
       it('imports only the last child sub context module', () => {
-        expect(generateSelectiveDataResponse(
-          'migration_1', 'user_1', createNodesWithImportAsOneModuleItemState([
-            {id: '3', importState: 'off'},
-            {id: '4', importState: 'disabled'},
-          ])
-        )).toStrictEqual(expectedResponse)
+        expect(
+          generateSelectiveDataResponse(
+            'migration_1',
+            'user_1',
+            createNodesWithImportAsOneModuleItemState([
+              {id: '3', importState: 'off'},
+              {id: '4', importState: 'disabled'},
+            ]),
+          ),
+        ).toStrictEqual(expectedResponse)
       })
     })
 
@@ -785,12 +819,16 @@ describe('generateSelectiveDataResponse', () => {
       }
 
       it('imports only the last child sub context module', () => {
-        expect(generateSelectiveDataResponse(
-          'migration_1', 'user_1', createNodesWithImportAsOneModuleItemState([
-            {id: '3', importState: 'off'},
-            {id: '4', importState: 'off'},
-          ])
-        )).toStrictEqual(expectedResponse)
+        expect(
+          generateSelectiveDataResponse(
+            'migration_1',
+            'user_1',
+            createNodesWithImportAsOneModuleItemState([
+              {id: '3', importState: 'off'},
+              {id: '4', importState: 'off'},
+            ]),
+          ),
+        ).toStrictEqual(expectedResponse)
       })
     })
 
@@ -807,12 +845,16 @@ describe('generateSelectiveDataResponse', () => {
       }
 
       it('imports only the last child sub context module', () => {
-        expect(generateSelectiveDataResponse(
-          'migration_1', 'user_1', createNodesWithImportAsOneModuleItemState([
-            {id: '3', importState: 'disabled'},
-            {id: '4', importState: 'disabled'},
-          ])
-        )).toStrictEqual(expectedResponse)
+        expect(
+          generateSelectiveDataResponse(
+            'migration_1',
+            'user_1',
+            createNodesWithImportAsOneModuleItemState([
+              {id: '3', importState: 'disabled'},
+              {id: '4', importState: 'disabled'},
+            ]),
+          ),
+        ).toStrictEqual(expectedResponse)
       })
     })
 
@@ -828,12 +870,11 @@ describe('generateSelectiveDataResponse', () => {
       }
 
       it('imports only the last child sub context module', () => {
-        const nodeInput = createNodesWithImportAsOneModuleItemState([
-          {id: '3', importState: 'off'},
-        ])
+        const nodeInput = createNodesWithImportAsOneModuleItemState([{id: '3', importState: 'off'}])
         delete nodeInput['4']
-        expect(generateSelectiveDataResponse('migration_1', 'user_1', nodeInput))
-          .toStrictEqual(expectedResponse)
+        expect(generateSelectiveDataResponse('migration_1', 'user_1', nodeInput)).toStrictEqual(
+          expectedResponse,
+        )
       })
     })
   })

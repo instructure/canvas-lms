@@ -92,7 +92,9 @@ module Types
     field :require_sequential_progress, Boolean, null: true
 
     field :completion_requirements, [ModuleCompletionRequirementType], null: true
-    delegate :completion_requirements, to: :context_module
+    def completion_requirements
+      context_module.completion_requirements_visible_to(current_user, is_teacher: false)
+    end
 
     field :requirement_count, Integer, null: true
     delegate :requirement_count, to: :context_module
@@ -102,6 +104,11 @@ module Types
     field :module_items, [Types::ModuleItemType], null: true
     def module_items
       ModuleItemsVisibleLoader.for(current_user).load(context_module)
+    end
+
+    field :submission_statistics, Types::ModuleStatisticsType, null: true
+    def submission_statistics
+      Loaders::ModuleStatisticsLoader.for(current_user:).load(context_module)
     end
 
     field :estimated_duration, GraphQL::Types::ISO8601Duration, null: true
@@ -116,6 +123,15 @@ module Types
     field :progression, Types::ModuleProgressionType, null: true, description: "The current user's progression through the module"
     def progression
       ModuleProgressionLoader.for(current_user).load(context_module)
+    end
+
+    field :has_active_overrides, Boolean, null: false
+
+    def has_active_overrides
+      AssignmentOverride.where(
+        context_module_id: object.id,
+        workflow_state: "active"
+      ).exists?
     end
   end
 end

@@ -270,6 +270,10 @@ export const togglePlannerItemCompletion = plannerItem => {
     const savingItem = {...plannerItem, toggleAPIPending: true, show: true}
     dispatch(savingPlannerItem({item: savingItem, isNewItem: false, wasToggled: true}))
     const apiOverride = transformInternalToApiOverride(plannerItem, getState().currentUser.id)
+    // Ensure marked_complete has a default value if it's undefined
+    if (apiOverride.marked_complete === undefined) {
+      apiOverride.marked_complete = false
+    }
     apiOverride.marked_complete = !apiOverride.marked_complete
     let promise = apiOverride.id
       ? saveExistingPlannerOverride(apiOverride)

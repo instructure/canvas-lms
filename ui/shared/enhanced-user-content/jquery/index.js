@@ -602,10 +602,10 @@ function confirmAndDeleteRightSideTodoItemsWhenClicked() {
 // this it'll be too time consuming to decouple it from canvas in our
 // timeframe. Solve it for now by using postMessage from enhanced-user-content2
 // (which we hope to decouple from canvas) to ask canvas to render the preview
-function showFilePreviewInOverlayHandler({file_id, verifier, access_token, instfs_id}) {
+function showFilePreviewInOverlayHandler({file_id, verifier, access_token, instfs_id, location}) {
   import('../react/showFilePreview')
     .then(module => {
-      module.showFilePreview(file_id, verifier, access_token, instfs_id)
+      module.showFilePreview(file_id, verifier, access_token, instfs_id, location)
     })
     .catch(err => {
       showFlashAlert({

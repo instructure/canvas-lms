@@ -24,9 +24,8 @@ import ExternalTool from '../../models/ExternalTool'
 let view
 let el
 let iframe
-let info
 
-describe('ExternalContentReturnView screenreader only content', () => {
+describe('ExternalContentReturnView', () => {
   beforeEach(() => {
     fakeENV.setup({
       context_asset_string: 'courses_1',
@@ -40,45 +39,6 @@ describe('ExternalContentReturnView screenreader only content', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-  })
-
-  test('shows beginning info alert and adds class to iframe', () => {
-    info = el.find('.before_external_content_info_alert')
-    info.focus()
-    expect(info.hasClass('screenreader-only')).toBe(false)
-    expect(iframe.hasClass('info_alert_outline')).toBe(true)
-  })
-
-  test('shows ending info alert and adds class to iframe', () => {
-    info = el.find('.after_external_content_info_alert')
-    info.focus()
-    expect(info.hasClass('screenreader-only')).toBe(false)
-    expect(iframe.hasClass('info_alert_outline')).toBe(true)
-  })
-
-  test('hides beginning info alert and removes class from iframe', () => {
-    info = el.find('.before_external_content_info_alert')
-    info.focus()
-    info.blur()
-    expect(info.hasClass('screenreader-only')).toBe(true)
-    expect(iframe.hasClass('info_alert_outline')).toBe(false)
-  })
-
-  test('hides ending info alert and removes class from iframe', () => {
-    info = el.find('.after_external_content_info_alert')
-    info.focus()
-    info.blur()
-    expect(info.hasClass('screenreader-only')).toBe(true)
-    expect(iframe.hasClass('info_alert_outline')).toBe(false)
-  })
-
-  test("doesn't show infos or add border to iframe by default", () => {
-    expect(
-      el.find(
-        '.before_external_content_info_alert.screenreader-only, .after_external_content_info_alert.screenreader-only',
-      ),
-    ).toHaveLength(2)
-    expect(iframe.hasClass('info_alert_outline')).toBe(false)
   })
 
   test("sets the proper values for the iframe 'allow' attribute", () => {

@@ -37,27 +37,33 @@ export const INDENT_LOOKUP: Record<number, string> = {
   5: `${pixelOffset * 5}px`,
 }
 
-export const getItemIcon = (content: ModuleItemContent) => {
+export const getIconColor = (published: boolean | undefined, isStudentView = false) => {
+  return published && !isStudentView ? 'success' : 'primary'
+}
+
+export const getItemIcon = (content: ModuleItemContent, isStudentView = false) => {
   if (!content?.type) return <IconDocumentLine />
 
-  const type = content.type.toLowerCase()
+  const type = content.type
+  const color = getIconColor(content?.published, isStudentView)
 
-  if (type.includes('assignment'))
-    return <IconAssignmentLine color={content.published ? 'success' : 'primary'} />
-  if (type.includes('quiz'))
-    return <IconQuizLine color={content.published ? 'success' : 'primary'} />
-  if (type.includes('discussion'))
-    return <IconDiscussionLine color={content.published ? 'success' : 'primary'} />
-  if (type.includes('attachment') || type.includes('file'))
-    return <IconPaperclipLine color={content.published ? 'success' : 'primary'} />
-  if (type.includes('external') || type.includes('url'))
-    return <IconLinkLine color={content.published ? 'success' : 'primary'} />
-  if (type.includes('wiki') || type.includes('page'))
-    return <IconDocumentLine color={content.published ? 'success' : 'primary'} />
-  if (type.includes('link'))
-    return <IconLinkLine color={content.published ? 'success' : 'primary'} />
-
-  return null
+  switch (type) {
+    case 'Assignment':
+      return <IconAssignmentLine color={color} data-testid="assignment-icon" />
+    case 'Quiz':
+      return <IconQuizLine color={color} data-testid="quiz-icon" />
+    case 'Discussion':
+      return <IconDiscussionLine color={color} data-testid="discussion-icon" />
+    case 'File':
+    case 'Attachment':
+      return <IconPaperclipLine color={color} data-testid="attachment-icon" />
+    case 'ExternalUrl':
+      return <IconLinkLine color={color} data-testid="url-icon" />
+    case 'Page':
+      return <IconDocumentLine color={color} data-testid="page-icon" />
+    default:
+      return <IconDocumentLine color="primary" data-testid="document-icon" />
+  }
 }
 
 export const mapContentSelection = (id: string, contentType: string) => {
@@ -82,4 +88,23 @@ export const mapContentSelection = (id: string, contentType: string) => {
   if (type === 'link') return {links: [id]}
 
   return {modules: [id]}
+}
+
+export const validateModuleStudentRenderRequirements = (prevProps: any, nextProps: any) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.expanded === nextProps.expanded &&
+    prevProps.name === nextProps.name &&
+    prevProps.completionRequirements === nextProps.completionRequirements
+  )
+}
+
+export const validateModuleItemStudentRenderRequirements = (prevProps: any, nextProps: any) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.url === nextProps.url &&
+    prevProps.indent === nextProps.indent &&
+    prevProps.index === nextProps.index &&
+    prevProps.content === nextProps.content
+  )
 }

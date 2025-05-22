@@ -169,6 +169,13 @@ module Accessibility
                          end
         { foreground: new_foreground, background: }
       end
+
+      def self.form(_elem)
+        Accessibility::Forms::ColorPickerField.new(
+          label: "Change color",
+          value: ""
+        )
+      end
     end
   end
 end

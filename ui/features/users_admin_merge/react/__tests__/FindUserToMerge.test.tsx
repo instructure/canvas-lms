@@ -139,6 +139,8 @@ describe('FindUserToMerge', () => {
   describe('when the user is search by name', () => {
     beforeEach(async () => {
       renderComponent()
+      // Wait for the source user data to load and the spinner to disappear
+      await screen.findByText(`${sourceUser.name} (${sourceUser.email})`)
       const findBySelect = screen.getByLabelText('Find by')
       await userEvent.click(findBySelect)
       const nameOption = screen.getByRole('option', {

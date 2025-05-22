@@ -43,6 +43,7 @@ class DiscussionEntriesController < ApplicationController
     parent_id = params[:discussion_entry].delete(:parent_id)
 
     entry_params = params.require(:discussion_entry).permit(:message, :plaintext_message)
+    entry_params[:message] = process_incoming_html_content(entry_params[:message]) if entry_params[:message]
 
     @entry = @topic.discussion_entries.temp_record(entry_params)
     @entry.current_user = @current_user

@@ -32,6 +32,8 @@ import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 import {RubricTable} from './RubricTable'
 import type {RubricQueryResponse} from '../../types/Rubric'
+import {Responsive} from '@instructure/ui-responsive'
+import {canvas} from '@instructure/ui-themes'
 import {
   type FetchRubricVariables,
   fetchAccountRubrics,
@@ -288,169 +290,187 @@ export const ViewRubrics = ({
   }
 
   return (
-    <View as="div">
-      <Flex>
-        <FlexItem shouldShrink={true} shouldGrow={true}>
-          {showHeader && (
-            <Heading level="h1" themeOverride={{h1FontWeight: 700}} margin="medium 0 0 0">
-              {I18n.t('Rubrics')}
-            </Heading>
-          )}
-        </FlexItem>
-        <FlexItem>
-          <TextInput
-            renderLabel={<ScreenReaderContent>{I18n.t('Search Rubrics')}</ScreenReaderContent>}
-            placeholder={I18n.t('Search...')}
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            width="17"
-            renderBeforeInput={<IconSearchLine inline={false} />}
-            data-testid="rubric-search-bar"
-          />
-        </FlexItem>
-        <FlexItem margin="small">
-          {canManageRubrics && canImportExportRubrics && (
-            <Button
-              // @ts-expect-error
-              renderIcon={IconImportLine}
-              color="secondary"
-              data-testid="import-rubric-button"
-              onClick={() => setImportTrayIsOpen(true)}
+    <Responsive
+      match="media"
+      query={{
+        expanded: {minWidth: canvas.breakpoints.medium},
+      }}
+      render={(_, matches) => {
+        const expanded = matches?.includes('expanded')
+        return (
+          <View as="div">
+            <Flex
+              justifyItems="end"
+              gap="small medium"
+              wrap="wrap"
+              direction={expanded ? 'row' : 'column'}
             >
-              {I18n.t('Import Rubric')}
-            </Button>
-          )}
-        </FlexItem>
-        <FlexItem>
-          {canManageRubrics && (
-            <Button
-              // @ts-expect-error
-              renderIcon={IconAddLine}
-              color="primary"
-              onClick={() => navigate('./create')}
-              data-testid="create-new-rubric-button"
-            >
-              {I18n.t('Create New Rubric')}
-            </Button>
-          )}
-        </FlexItem>
-      </Flex>
-
-      <Tabs
-        margin="large auto"
-        padding="medium"
-        onRequestTabChange={(_e: any, {id}: {id?: string}) => setSelectedTab(id)}
-      >
-        <Tabs.Panel
-          id={TABS.saved}
-          data-testid="saved-rubrics-panel"
-          renderTitle={I18n.t('Saved')}
-          isSelected={selectedTab === TABS.saved}
-          padding="none"
-        >
-          <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
-            <RubricTable
-              canImportExportRubrics={canImportExportRubrics}
-              handleCheckboxChange={handleCheckboxChange}
-              selectedRubricIds={selectedRubricIds}
-              canManageRubrics={canManageRubrics}
-              rubrics={filteredActiveRubrics}
-              onLocationsClick={rubricId => handleLocationsClick(rubricId)}
-              onPreviewClick={rubricId => handlePreviewClick(rubricId)}
-              handleArchiveRubricChange={handleArchiveRubric}
-              active={true}
-            />
-          </View>
-        </Tabs.Panel>
-        <Tabs.Panel
-          id={TABS.archived}
-          data-testid="archived-rubrics-panel"
-          renderTitle={I18n.t('Archived')}
-          isSelected={selectedTab === TABS.archived}
-          padding="none"
-        >
-          <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
-            <RubricTable
-              canImportExportRubrics={canImportExportRubrics}
-              selectedRubricIds={selectedRubricIds}
-              handleCheckboxChange={handleCheckboxChange}
-              canManageRubrics={canManageRubrics}
-              rubrics={filteredArchivedRubrics}
-              onLocationsClick={rubricId => handleLocationsClick(rubricId)}
-              onPreviewClick={rubricId => handlePreviewClick(rubricId)}
-              handleArchiveRubricChange={handleUnarchiveRubric}
-              active={false}
-            />
-          </View>
-        </Tabs.Panel>
-      </Tabs>
-
-      {canImportExportRubrics && (
-        <div
-          id="enhanced-rubric-builder-footer"
-          style={{backgroundColor: colors.contrasts.white1010}}
-        >
-          <View
-            as="div"
-            margin="small large"
-            themeOverride={{marginLarge: '48px', marginSmall: '12px'}}
-          >
-            <Flex justifyItems="end">
-              <Flex.Item margin="0 medium 0 0">
-                <Button
-                  onClick={() => setSelectedRubricIds([])}
-                  data-testid="cancel-select-mode-button"
-                >
-                  {I18n.t('Cancel')}
-                </Button>
-              </Flex.Item>
-
-              <Flex.Item margin="0 medium 0 0">
-                <Button
-                  color="primary"
-                  // @ts-expect-error
-                  renderIcon={IconDownloadLine}
-                  data-testid="download-rubrics"
-                  disabled={selectedRubricIds.length === 0}
-                  onClick={handleDownloadRubrics}
-                >
-                  {I18n.t('Download Selected Rubrics')}
-                </Button>
-              </Flex.Item>
+              {showHeader && (
+                <FlexItem shouldGrow={true}>
+                  <Heading level="h1" themeOverride={{h1FontWeight: 700}} margin="medium 0 0 0">
+                    {I18n.t('Rubrics')}
+                  </Heading>
+                </FlexItem>
+              )}
+              <FlexItem>
+                <TextInput
+                  renderLabel={
+                    <ScreenReaderContent>{I18n.t('Search Rubrics')}</ScreenReaderContent>
+                  }
+                  placeholder={I18n.t('Search...')}
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  width="17"
+                  renderBeforeInput={<IconSearchLine inline={false} />}
+                  data-testid="rubric-search-bar"
+                />
+              </FlexItem>
+              <FlexItem>
+                {canManageRubrics && canImportExportRubrics && (
+                  <Button
+                    // @ts-expect-error
+                    renderIcon={IconImportLine}
+                    color="secondary"
+                    data-testid="import-rubric-button"
+                    onClick={() => setImportTrayIsOpen(true)}
+                  >
+                    {I18n.t('Import Rubric')}
+                  </Button>
+                )}
+              </FlexItem>
+              <FlexItem>
+                {canManageRubrics && (
+                  <Button
+                    // @ts-expect-error
+                    renderIcon={IconAddLine}
+                    color="primary"
+                    onClick={() => navigate('./create')}
+                    data-testid="create-new-rubric-button"
+                  >
+                    {I18n.t('Create New Rubric')}
+                  </Button>
+                )}
+              </FlexItem>
             </Flex>
+
+            <Tabs
+              margin="large auto"
+              padding="medium"
+              onRequestTabChange={(_e: any, {id}: {id?: string}) => setSelectedTab(id)}
+            >
+              <Tabs.Panel
+                id={TABS.saved}
+                data-testid="saved-rubrics-panel"
+                renderTitle={I18n.t('Saved')}
+                isSelected={selectedTab === TABS.saved}
+                padding="none"
+              >
+                <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
+                  <RubricTable
+                    canImportExportRubrics={canImportExportRubrics}
+                    handleCheckboxChange={handleCheckboxChange}
+                    selectedRubricIds={selectedRubricIds}
+                    canManageRubrics={canManageRubrics}
+                    rubrics={filteredActiveRubrics}
+                    onLocationsClick={rubricId => handleLocationsClick(rubricId)}
+                    onPreviewClick={rubricId => handlePreviewClick(rubricId)}
+                    handleArchiveRubricChange={handleArchiveRubric}
+                    active={true}
+                  />
+                </View>
+              </Tabs.Panel>
+              <Tabs.Panel
+                id={TABS.archived}
+                data-testid="archived-rubrics-panel"
+                renderTitle={I18n.t('Archived')}
+                isSelected={selectedTab === TABS.archived}
+                padding="none"
+              >
+                <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
+                  <RubricTable
+                    canImportExportRubrics={canImportExportRubrics}
+                    selectedRubricIds={selectedRubricIds}
+                    handleCheckboxChange={handleCheckboxChange}
+                    canManageRubrics={canManageRubrics}
+                    rubrics={filteredArchivedRubrics}
+                    onLocationsClick={rubricId => handleLocationsClick(rubricId)}
+                    onPreviewClick={rubricId => handlePreviewClick(rubricId)}
+                    handleArchiveRubricChange={handleUnarchiveRubric}
+                    active={false}
+                  />
+                </View>
+              </Tabs.Panel>
+            </Tabs>
+
+            {canImportExportRubrics && (
+              <div
+                id="enhanced-rubric-builder-footer"
+                style={{backgroundColor: colors.contrasts.white1010}}
+              >
+                <View
+                  as="div"
+                  margin="small large"
+                  themeOverride={{marginLarge: '48px', marginSmall: '12px'}}
+                >
+                  <Flex justifyItems="end">
+                    <Flex.Item margin="0 medium 0 0">
+                      <Button
+                        onClick={() => setSelectedRubricIds([])}
+                        data-testid="cancel-select-mode-button"
+                      >
+                        {I18n.t('Cancel')}
+                      </Button>
+                    </Flex.Item>
+
+                    <Flex.Item margin="0 medium 0 0">
+                      <Button
+                        color="primary"
+                        // @ts-expect-error
+                        renderIcon={IconDownloadLine}
+                        data-testid="download-rubrics"
+                        disabled={selectedRubricIds.length === 0}
+                        onClick={handleDownloadRubrics}
+                      >
+                        {I18n.t('Download Selected Rubrics')}
+                      </Button>
+                    </Flex.Item>
+                  </Flex>
+                </View>
+              </div>
+            )}
+
+            <RubricAssessmentTray
+              isLoading={isLoadingPreview}
+              isOpen={isPreviewTrayOpen}
+              isPreviewMode={false}
+              rubric={rubricPreview}
+              rubricAssessmentData={[]}
+              onDismiss={() => {
+                setRubricIdForPreview(undefined)
+                setIsPreviewTrayOpen(false)
+              }}
+            />
+
+            <UsedLocationsModal
+              isLoading={loadingUsedLocations}
+              fetchUsedLocations={executeFetchLocations}
+              itemId={rubricIdForLocations}
+              isOpen={!!rubricIdForLocations}
+              onClose={handleLocationsUsedModalClose}
+            />
+
+            {canImportExportRubrics && (
+              <ImportRubric
+                accountId={accountId}
+                courseId={courseId}
+                isTrayOpen={importTrayIsOpen}
+                handleImportSuccess={handleImportSuccess}
+                handleTrayClose={() => setImportTrayIsOpen(false)}
+              />
+            )}
           </View>
-        </div>
-      )}
-
-      <RubricAssessmentTray
-        isLoading={isLoadingPreview}
-        isOpen={isPreviewTrayOpen}
-        isPreviewMode={false}
-        rubric={rubricPreview}
-        rubricAssessmentData={[]}
-        onDismiss={() => {
-          setRubricIdForPreview(undefined)
-          setIsPreviewTrayOpen(false)
-        }}
-      />
-
-      <UsedLocationsModal
-        isLoading={loadingUsedLocations}
-        fetchUsedLocations={executeFetchLocations}
-        itemId={rubricIdForLocations}
-        isOpen={!!rubricIdForLocations}
-        onClose={handleLocationsUsedModalClose}
-      />
-
-      {canImportExportRubrics && (
-        <ImportRubric
-          accountId={accountId}
-          courseId={courseId}
-          isTrayOpen={importTrayIsOpen}
-          handleImportSuccess={handleImportSuccess}
-          handleTrayClose={() => setImportTrayIsOpen(false)}
-        />
-      )}
-    </View>
+        )
+      }}
+    />
   )
 }

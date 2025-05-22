@@ -37,6 +37,10 @@ const createMockStore = state => ({
 })
 
 describe('Redux Notifications', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   afterEach(() => {
     FlashAlert.destroyContainer.mockClear()
   })
@@ -52,13 +56,16 @@ describe('Redux Notifications', () => {
     subscribeFlashNotifications(mockStore)
     mockStore.mockStateChange()
 
-    setTimeout(() => {
-      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(2)
-      expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({id: '1', message: 'hello'})
-      expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({id: '2', message: 'world'})
+    // Use jest.runAllTimers instead of setTimeout for more reliable testing
+    jest.useFakeTimers()
+    jest.runAllTimers()
 
-      done()
-    }, 1)
+    expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(2)
+    expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({id: '1', message: 'hello'})
+    expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({id: '2', message: 'world'})
+
+    jest.useRealTimers()
+    done()
   })
 
   test('subscribes to a store and dispatches clearNotifications for each notification in state', done => {
@@ -72,13 +79,16 @@ describe('Redux Notifications', () => {
     subscribeFlashNotifications(mockStore)
     mockStore.mockStateChange()
 
-    setTimeout(() => {
-      expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
-      expect(mockStore.dispatch).toHaveBeenCalledWith(notificationActions.clearNotification('1'))
-      expect(mockStore.dispatch).toHaveBeenCalledWith(notificationActions.clearNotification('2'))
+    // Use jest.runAllTimers instead of setTimeout for more reliable testing
+    jest.useFakeTimers()
+    jest.runAllTimers()
 
-      done()
-    }, 1)
+    expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
+    expect(mockStore.dispatch).toHaveBeenCalledWith(notificationActions.clearNotification('1'))
+    expect(mockStore.dispatch).toHaveBeenCalledWith(notificationActions.clearNotification('2'))
+
+    jest.useRealTimers()
+    done()
   })
 })
 

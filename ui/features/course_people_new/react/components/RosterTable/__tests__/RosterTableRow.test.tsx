@@ -26,7 +26,7 @@ import {
   DESIGNER_ENROLLMENT,
   OBSERVER_ENROLLMENT,
   PENDING_ENROLLMENT,
-  INACTIVE_ENROLLMENT
+  INACTIVE_ENROLLMENT,
 } from '../../../../util/constants'
 import {mockUser, mockEnrollment} from '../../../../graphql/Mocks'
 
@@ -38,7 +38,7 @@ describe('RosterTableRow', () => {
   const defaultProps = {
     user: mockedUser,
     isSelected: false,
-    handleSelectRow: jest.fn()
+    handleSelectRow: jest.fn(),
   }
 
   const defaultContextValues = {
@@ -49,7 +49,7 @@ describe('RosterTableRow', () => {
     canManageDifferentiationTags: true,
     canAllowCourseAdminActions: true,
     allowAssignToDifferentiationTags: true,
-    activeGranularEnrollmentPermissions: []
+    activeGranularEnrollmentPermissions: [],
   }
 
   const renderRosterTableRow = (props: Partial<RosterTableRowProps> = {}) =>
@@ -68,12 +68,15 @@ describe('RosterTableRow', () => {
     expect(getByText(mockedUser.name)).toBeInTheDocument()
     expect(getByText(mockedUser.loginId)).toBeInTheDocument()
     expect(getByText(mockedUser.sisId)).toBeInTheDocument()
-    expect(getByTestId(`avatar-user-${mockedUser._id}`)).toHaveAttribute('src', mockedUser.avatarUrl)
+    expect(getByTestId(`avatar-user-${mockedUser._id}`)).toHaveAttribute(
+      'src',
+      mockedUser.avatarUrl,
+    )
   })
 
   it('renders user with pronouns', () => {
     const props = {
-      user: {...mockedUser, pronouns: 'he/him'}
+      user: {...mockedUser, pronouns: 'he/him'},
     }
     const {getByText} = renderRosterTableRow(props)
     expect(getByText(mockedUser.name)).toBeInTheDocument()
@@ -82,7 +85,7 @@ describe('RosterTableRow', () => {
 
   it('renders inactive status correctly', () => {
     const props = {
-      user: mockUser({firstEnrollment: mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT})})
+      user: mockUser({firstEnrollment: mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT})}),
     }
     const {getByText} = renderRosterTableRow(props)
     expect(getByText(/Inactive/)).toBeInTheDocument()
@@ -90,7 +93,7 @@ describe('RosterTableRow', () => {
 
   it('renders pending status correctly', () => {
     const props = {
-      user: mockUser({firstEnrollment: mockEnrollment({enrollmentState: PENDING_ENROLLMENT})})
+      user: mockUser({firstEnrollment: mockEnrollment({enrollmentState: PENDING_ENROLLMENT})}),
     }
     const {getByText} = renderRosterTableRow(props)
     expect(getByText(/Pending/)).toBeInTheDocument()
@@ -110,54 +113,54 @@ describe('RosterTableRow', () => {
   })
 
   it('hides user selection checkbox when allowAssignToDifferentiationTags is false', () => {
-    (useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
       ...defaultContextValues,
-      allowAssignToDifferentiationTags: false
+      allowAssignToDifferentiationTags: false,
     })
     const {queryByTestId} = renderRosterTableRow()
     expect(queryByTestId(`select-user-${mockedUser._id}`)).not.toBeInTheDocument()
   })
 
   it('hides user selection checkbox when canManageDifferentiationTags is false', () => {
-    (useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
       ...defaultContextValues,
-      canManageDifferentiationTags: false
+      canManageDifferentiationTags: false,
     })
     const {queryByTestId} = renderRosterTableRow()
     expect(queryByTestId(`select-user-${mockedUser._id}`)).not.toBeInTheDocument()
   })
 
   it('hides login ID column when canViewLoginIdColumn is false', () => {
-    (useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
       ...defaultContextValues,
-      canViewLoginIdColumn: false
+      canViewLoginIdColumn: false,
     })
     const {queryByTestId} = renderRosterTableRow()
     expect(queryByTestId(`login-id-user-${mockedUser._id}`)).not.toBeInTheDocument()
   })
 
   it('hides SIS ID column when canViewSisIdColumn is false', () => {
-    (useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
       ...defaultContextValues,
-      canViewSisIdColumn: false
+      canViewSisIdColumn: false,
     })
     const {queryByTestId} = renderRosterTableRow()
     expect(queryByTestId(`sis-id-user-${mockedUser._id}`)).not.toBeInTheDocument()
   })
 
   it('hides sections when hideSectionsOnCourseUsersPage is true', () => {
-    (useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
       ...defaultContextValues,
-      hideSectionsOnCourseUsersPage: true
+      hideSectionsOnCourseUsersPage: true,
     })
     const {queryByTestId} = renderRosterTableRow()
-    expect(queryByTestId(`sections-user-${mockedUser._id}`)).not.toBeInTheDocument()
+    expect(queryByTestId(`section-name-user-${mockedUser._id}`)).not.toBeInTheDocument()
   })
 
   it('hides last activity when canReadReports is false', () => {
-    (useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
       ...defaultContextValues,
-      canReadReports: false
+      canReadReports: false,
     })
     const {queryByTestId} = renderRosterTableRow()
     expect(queryByTestId(`last-activity-user-${mockedUser._id}`)).not.toBeInTheDocument()
@@ -165,12 +168,12 @@ describe('RosterTableRow', () => {
 
   describe('Option Menu Visibility', () => {
     it('hides menu for students when enrollments cannot be removed', () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
         ...defaultContextValues,
-        canManageStudents: false
+        canManageStudents: false,
       })
       const props = {
-        user: mockUser({firstEnrollment: mockEnrollment({canBeRemoved: false})})
+        user: mockUser({firstEnrollment: mockEnrollment({canBeRemoved: false})}),
       }
       const {queryByTestId} = renderRosterTableRow(props)
 
@@ -178,12 +181,17 @@ describe('RosterTableRow', () => {
     })
 
     it('hides menu for teachers when canAllowCourseAdminActions is false', () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
         ...defaultContextValues,
-        canAllowCourseAdminActions: false
+        canAllowCourseAdminActions: false,
       })
       const props = {
-        user: mockUser({firstEnrollment: mockEnrollment({enrollmentType: TEACHER_ENROLLMENT, canBeRemoved: false})})
+        user: mockUser({
+          firstEnrollment: mockEnrollment({
+            enrollmentType: TEACHER_ENROLLMENT,
+            canBeRemoved: false,
+          }),
+        }),
       }
       const {queryByTestId} = renderRosterTableRow(props)
 
@@ -191,12 +199,14 @@ describe('RosterTableRow', () => {
     })
 
     it('hides menu for teaching assistants when canAllowCourseAdminActions is false', () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
         ...defaultContextValues,
-        canAllowCourseAdminActions: false
+        canAllowCourseAdminActions: false,
       })
       const props = {
-        user: mockUser({firstEnrollment: mockEnrollment({enrollmentType: TA_ENROLLMENT, canBeRemoved: false})})
+        user: mockUser({
+          firstEnrollment: mockEnrollment({enrollmentType: TA_ENROLLMENT, canBeRemoved: false}),
+        }),
       }
       const {queryByTestId} = renderRosterTableRow(props)
 
@@ -204,12 +214,17 @@ describe('RosterTableRow', () => {
     })
 
     it('hides menu for designers when canAllowCourseAdminActions is false', () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
         ...defaultContextValues,
-        canAllowCourseAdminActions: false
+        canAllowCourseAdminActions: false,
       })
       const props = {
-        user: mockUser({firstEnrollment: mockEnrollment({enrollmentType: DESIGNER_ENROLLMENT, canBeRemoved: false})})
+        user: mockUser({
+          firstEnrollment: mockEnrollment({
+            enrollmentType: DESIGNER_ENROLLMENT,
+            canBeRemoved: false,
+          }),
+        }),
       }
       const {queryByTestId} = renderRosterTableRow(props)
 
@@ -217,13 +232,18 @@ describe('RosterTableRow', () => {
     })
 
     it('hides menu for observers when canManageStudents and canAllowCourseAdminActions are false', () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
         ...defaultContextValues,
         canManageStudents: false,
-        canAllowCourseAdminActions: false
+        canAllowCourseAdminActions: false,
       })
       const props = {
-        user: mockUser({firstEnrollment: mockEnrollment({enrollmentType: OBSERVER_ENROLLMENT, canBeRemoved: false})})
+        user: mockUser({
+          firstEnrollment: mockEnrollment({
+            enrollmentType: OBSERVER_ENROLLMENT,
+            canBeRemoved: false,
+          }),
+        }),
       }
       const {queryByTestId} = renderRosterTableRow(props)
       expect(queryByTestId(`options-menu-user-${mockedUser._id}`)).not.toBeInTheDocument()

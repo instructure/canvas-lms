@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,6 +19,15 @@ import React, {createRef} from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ConfigurationFormLti2 from '../configuration_forms/ConfigurationFormLti2'
+
+// Mock jQuery and its flashError function
+jest.mock('jquery', () => {
+  const mockJQuery = () => ({
+    // Add any jQuery methods used in the component
+  })
+  mockJQuery.flashError = jest.fn()
+  return mockJQuery
+})
 
 describe('ConfigurationFormLti2', () => {
   const props = (overrides?: any) => ({

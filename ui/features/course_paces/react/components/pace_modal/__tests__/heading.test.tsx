@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -27,6 +27,7 @@ import {
   SECTION_PACE,
   STUDENT_PACE,
 } from '../../../__tests__/fixtures'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 import PaceModalHeading from '../heading'
 
@@ -42,7 +43,20 @@ const defaultProps = {
 }
 
 describe('PaceModalHeading', () => {
+  beforeEach(() => {
+    fakeENV.setup()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   it('renders course variant', () => {
+    // Ensure the feature flag is disabled for this test
+    fakeENV.setup({
+      FEATURES: {course_pace_time_selection: false},
+    })
+
     const {getByTestId} = renderConnected(
       <PaceModalHeading {...defaultProps} contextName={PRIMARY_PACE.name || ''} />,
     )
@@ -53,6 +67,11 @@ describe('PaceModalHeading', () => {
     )
   })
   it('renders section variant', () => {
+    // Ensure the feature flag is disabled for this test
+    fakeENV.setup({
+      FEATURES: {course_pace_time_selection: false},
+    })
+
     const {getByTestId} = renderConnected(
       <PaceModalHeading
         {...defaultProps}
@@ -68,6 +87,11 @@ describe('PaceModalHeading', () => {
     )
   })
   it('renders student variant', () => {
+    // Ensure the feature flag is disabled for this test
+    fakeENV.setup({
+      FEATURES: {course_pace_time_selection: false},
+    })
+
     const {getByTestId} = renderConnected(
       <PaceModalHeading
         {...defaultProps}
@@ -81,9 +105,10 @@ describe('PaceModalHeading', () => {
   })
 
   describe('course_pace_time_selection is enabled', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_pace_time_selection = true
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {course_pace_time_selection: true},
+      })
     })
 
     it('pace info component is not rendered', () => {

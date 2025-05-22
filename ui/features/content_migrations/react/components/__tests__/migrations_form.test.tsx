@@ -81,6 +81,7 @@ describe('ContentMigrationForm', () => {
     migration_type: 'course_copy_importer',
     migration_type_title: 'Test',
     pre_attachment: true,
+    workflow_state: 'queued',
   }
 
   beforeEach(() => {
@@ -108,7 +109,7 @@ describe('ContentMigrationForm', () => {
     })
     fetchMock.mock(
       /users\/1\/manageable_courses\?(.*&)?term=.*(&.*)?current_course_id=.*|current_course_id=.*(&.*)?term=.*/,
-      [{ id: '3', label: 'MyCourse' }]
+      [{id: '3', label: 'MyCourse'}],
     )
   })
 
@@ -165,6 +166,9 @@ describe('ContentMigrationForm', () => {
   })
 
   it('performs file upload request when submitting', async () => {
+    // Reset the mock before this test to ensure clean state
+    setMigrationsMock.mockReset()
+
     fetchMock.mock(
       '/api/v1/courses/0/content_migrations',
       {
@@ -205,10 +209,13 @@ describe('ContentMigrationForm', () => {
           onProgress: expect.any(Function),
         },
       )
-      const secondSetterFunction = setMigrationsMock.mock.calls[1][0]
-      const result = secondSetterFunction([])
-      expect(result?.[0].attachment.display_name).toBe(attachment.display_name)
-      expect(result?.[0].attachment.url).toBe(attachment.url)
+
+      // The setMigrations function should have been called once
+      expect(setMigrationsMock).toHaveBeenCalledTimes(1)
+      const setterFunction = setMigrationsMock.mock.calls[0][0]
+      const result = setterFunction([])
+      expect(result[0].attachment.display_name).toBe(attachment.display_name)
+      expect(result[0].attachment.url).toBe(attachment.url)
     })
   })
 
@@ -291,18 +298,24 @@ describe('ContentMigrationForm', () => {
     })
 
     describe('when content_migration workflow_state is not waiting_for_select', () => {
-      const workflow_state = 'running'
-
       it('set workflow_state to queued', async () => {
-        fetchMock.mock(
-          '/api/v1/courses/0/content_migrations',
-          {...postResponseMock, workflow_state},
-          {
-            overwriteRoutes: true,
-          },
-        )
+        // Reset the mock before this test to ensure clean state
+        setMigrationsMock.mockReset()
+
+        // Create a specific response with running workflow state
+        const runningResponse = {
+          ...postResponseMock,
+          workflow_state: 'running', // Explicitly set the workflow_state
+        }
+
+        fetchMock.mock('/api/v1/courses/0/content_migrations', runningResponse, {
+          overwriteRoutes: true,
+        })
         renderComponent()
         await submitAMigration()
+
+        // Verify the mock was called
+        expect(setMigrationsMock).toHaveBeenCalledTimes(1)
 
         const setterFunction = setMigrationsMock.mock.calls[0][0]
         const setterFunctionResult = setterFunction([])
@@ -312,18 +325,24 @@ describe('ContentMigrationForm', () => {
     })
 
     describe('when content_migration workflow_state is in waiting_for_select', () => {
-      const workflow_state = 'waiting_for_select'
+      it('preserves waiting_for_select workflow_state', async () => {
+        // Reset the mock before this test to ensure clean state
+        setMigrationsMock.mockReset()
 
-      it('set workflow_state to queued', async () => {
-        fetchMock.mock(
-          '/api/v1/courses/0/content_migrations',
-          {...postResponseMock, workflow_state},
-          {
-            overwriteRoutes: true,
-          },
-        )
+        // Create a specific response with waiting_for_select workflow state
+        const waitingForSelectResponse = {
+          ...postResponseMock,
+          workflow_state: 'waiting_for_select', // Explicitly set the workflow_state
+        }
+
+        fetchMock.mock('/api/v1/courses/0/content_migrations', waitingForSelectResponse, {
+          overwriteRoutes: true,
+        })
         renderComponent()
         await submitAMigration()
+
+        // Verify the mock was called
+        expect(setMigrationsMock).toHaveBeenCalledTimes(1)
 
         const setterFunction = setMigrationsMock.mock.calls[0][0]
         const setterFunctionResult = setterFunction([])

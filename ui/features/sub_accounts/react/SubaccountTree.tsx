@@ -18,14 +18,14 @@
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import SubaccountItem from './SubaccountItem'
-import type {AccountWithCounts} from './types'
+import type {AccountWithCounts, SubaccountQueryKey} from './types'
 import {Flex} from '@instructure/ui-flex'
 import SubaccountNameForm from './SubaccountNameForm'
-import {calculateIndent, fetchSubAccounts, FetchSubAccountsResponse, useFocusContext} from './util'
+import {calculateIndent, fetchSubAccounts, FetchSubAccountsResponse, generateQueryKey} from './util'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {queryClient, useAllPages} from '@canvas/query'
 import DeleteSubaccountModal from './DeleteSubaccountModal'
@@ -40,48 +40,60 @@ const THRESHOLD_FOR_AUTO_EXPAND = 100
 
 interface Props {
   parentAccount?: AccountWithCounts
-  handleParent?: (account: AccountWithCounts, decreaseCount: boolean) => void
+  handleParent?: (account: AccountWithCounts, modifyType: string) => void
   rootAccount: AccountWithCounts
   depth: number
   parentExpanded?: boolean
+  defaultExpanded: boolean
+  isFocus?: boolean
 }
 
 export default function SubaccountTree(props: Props) {
-  const subCount = useRef(props.rootAccount.sub_account_count || 0)
+  const defaultExpanded = useRef(false)
+  const newSubaccount = useRef('')
+  const [hasFocus, setHasFocus] = useState(props.isFocus || false)
+  const [subCount, setSubCount] = useState(props.rootAccount.sub_account_count || 0)
   const [subaccounts, setSubaccounts] = useState([] as AccountWithCounts[])
-  const {focusId} = useFocusContext()
   const [showForm, setShowForm] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(false)
   const [displayConfirmation, setDisplayConfirmation] = useState(false)
 
-  const {data, isFetching, isLoading, hasNextPage, isFetchingNextPage, error} = useAllPages<
+  const {data, isFetching, isLoading, isFetchingNextPage, hasNextPage, error} = useAllPages<
     FetchSubAccountsResponse,
     unknown,
     InfiniteData<FetchSubAccountsResponse>,
-    [string, string]
+    SubaccountQueryKey
   >({
-    queryKey: ['subAccountList', props.rootAccount.id],
+    queryKey: generateQueryKey(props.rootAccount.id),
     queryFn: fetchSubAccounts,
-    getNextPageParam: lastPage => lastPage.nextPage,
-    enabled: isExpanded && subCount.current > 0,
+    getNextPageParam: (lastPage: {nextPage: any}) => lastPage.nextPage,
+    enabled: isExpanded,
+    staleTime: 5 * 60 * 1000, // 5 minutes
     initialPageParam: '1',
   })
 
   useEffect(() => {
     if (!isFetching && data != null) {
       const subaccounts =
-        data.pages.reduce((acc, page) => {
+        data.pages.reduce((acc: AccountWithCounts[], page: {json: AccountWithCounts[]}) => {
           return acc.concat(page.json)
         }, [] as AccountWithCounts[]) || []
       setSubaccounts(subaccounts || [])
+      if (!hasNextPage) {
+        setSubCount(subaccounts.length)
+      }
     }
-  }, [data, isFetching])
+  }, [data, hasNextPage, isFetching])
 
   useEffect(() => {
-    setIsExpanded(
-      subCount.current < THRESHOLD_FOR_AUTO_EXPAND && subCount.current > 0 && props.depth < 3,
-    )
-  }, [props.depth])
+    const count = subCount
+    const expandByDefault =
+      count < THRESHOLD_FOR_AUTO_EXPAND && count > 0 && props.depth < 3 && props.defaultExpanded
+    if (expandByDefault) {
+      setIsExpanded(true)
+      defaultExpanded.current = true
+    }
+  }, [props.depth, props.defaultExpanded, subCount])
 
   const deleteAccount = async () => {
     await doFetchApi({
@@ -89,12 +101,23 @@ export default function SubaccountTree(props: Props) {
       method: 'DELETE',
     })
     if (props.handleParent) {
-      props.handleParent(props.rootAccount, true)
+      props.handleParent(props.rootAccount, 'delete')
     }
   }
 
-  const handleDelete = () => {
-    if (subCount.current > 0) {
+  const handleCollapse = useCallback(() => {
+    setShowForm(false)
+    setIsExpanded(false)
+    setHasFocus(false)
+  }, [])
+
+  const handleExpand = useCallback(() => {
+    setIsExpanded(true)
+    setHasFocus(false)
+  }, [])
+
+  const handleDelete = useCallback(() => {
+    if (subCount > 0) {
       showFlashAlert({
         message: I18n.t('You cannot delete accounts with active subaccounts'),
         type: 'warning',
@@ -107,89 +130,103 @@ export default function SubaccountTree(props: Props) {
     } else {
       setDisplayConfirmation(true)
     }
-  }
+  }, [props.rootAccount.course_count, subCount])
 
-  const updateList = (json: AccountWithCounts, isDeleted: boolean) => {
-    const account = subaccounts.find(account => account.id === json.id)
-    // updating
-    if (account) {
-      if (isDeleted) {
-        // deleted
-        subCount.current--
-        setSubaccounts(subaccounts.filter(account => account.id !== json.id))
-        focusId.current = props.rootAccount.id
+  const handleAdd = useCallback(() => {
+    setShowForm(true)
+    setIsExpanded(true)
+    setHasFocus(false)
+  }, [])
+
+  const handleEdit = useCallback(
+    (json: AccountWithCounts) => {
+      if (props.handleParent) {
+        props.handleParent(json, 'edit')
       } else {
-        // updated
-        setSubaccounts(
-          subaccounts.map(account => {
-            if (account.id !== json.id) {
-              return account
-            } else {
-              return json as AccountWithCounts
-            }
-          }),
-        )
-        focusId.current = json.id
+        // root node should just be re-fetched
+        queryClient.invalidateQueries({queryKey: ['account', props.rootAccount.id]})
       }
+      setHasFocus(true)
+    },
+    // already exhaustive
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [props.handleParent, props.rootAccount],
+  )
+
+  const updateList = useCallback((json: AccountWithCounts, modifyType: string) => {
+    if (modifyType === 'delete') {
+      // deleted
+      setSubaccounts(subs => subs.filter(account => account.id !== json.id))
+      setSubCount(count => count - 1)
+      setHasFocus(true)
+    } else if (modifyType === 'edit') {
+      // updated
+      setSubaccounts(subs =>
+        subs.map(account => {
+          if (account.id !== json.id) {
+            return account
+          } else {
+            return json as AccountWithCounts
+          }
+        }),
+      )
     } else {
       // adding
-      subCount.current++
-      setSubaccounts([...subaccounts, json as AccountWithCounts])
-      focusId.current = json.id
+      setSubaccounts(subs => [...subs, json as AccountWithCounts])
+      setSubCount(count => count + 1)
+      newSubaccount.current = json.id
     }
-  }
+  }, [])
 
-  const renderRoot = (showRoot: boolean) => {
+  const renderRoot = useMemo(() => {
+    console.log('rendering root: ', props.rootAccount.id)
     const show = props.parentExpanded != null ? props.parentExpanded : true
     return (
       <SubaccountItem
-        account={{...props.rootAccount, sub_account_count: subCount.current}}
+        account={{...props.rootAccount, sub_account_count: subCount}}
         depth={props.depth}
-        onExpand={() => {
-          setIsExpanded(true)
-          focusId.current = ''
-        }}
-        onCollapse={() => {
-          setShowForm(false)
-          setIsExpanded(false)
-          focusId.current = ''
-        }}
-        onAdd={() => {
-          setShowForm(true)
-          setIsExpanded(true)
-          focusId.current = ''
-        }}
+        onExpand={handleExpand}
+        onCollapse={handleCollapse}
+        onAdd={handleAdd}
         onDelete={handleDelete}
-        onEditSaved={(json: AccountWithCounts) => {
-          if (props.handleParent) {
-            props.handleParent(json, false)
-          } else {
-            // root node should just be re-fetched
-            queryClient.invalidateQueries({
-              queryKey: ['account', props.rootAccount.id],
-            })
-          }
-        }}
+        onEditSaved={handleEdit}
         isExpanded={isExpanded}
         canDelete={props.depth != 1}
-        show={show && showRoot}
-        isFocus={focusId.current === props.rootAccount.id}
+        show={show}
+        isFocus={hasFocus}
       />
     )
-  }
+  }, [
+    props.rootAccount,
+    props.parentExpanded,
+    props.depth,
+    subCount,
+    handleExpand,
+    handleCollapse,
+    handleAdd,
+    handleDelete,
+    handleEdit,
+    isExpanded,
+    hasFocus,
+  ])
 
   const renderChildren = (subaccounts: AccountWithCounts[], parentExpanded: boolean) => {
     const childTree = subaccounts.map((account: AccountWithCounts) => {
+      let isFocus = false
+      if (account.id === newSubaccount.current) {
+        newSubaccount.current = ''
+        isFocus = true
+      }
       return (
         <SubaccountTree
           key={`${account.id}_tree`}
           rootAccount={account}
-          parentAccount={{...props.rootAccount, sub_account_count: subCount.current}}
-          handleParent={(account: AccountWithCounts, isDeleted: boolean) => {
-            updateList(account, isDeleted)
-          }}
+          parentAccount={{...props.rootAccount, sub_account_count: subCount}}
+          handleParent={updateList}
           depth={props.depth + 1}
           parentExpanded={parentExpanded}
+          defaultExpanded={defaultExpanded.current}
+          isFocus={isFocus}
         />
       )
     })
@@ -212,41 +249,38 @@ export default function SubaccountTree(props: Props) {
   const childIndent = calculateIndent(props.depth + 1)
   if (error) {
     return (
-      <Flex>
-        <Flex.Item width={`${childIndent}%`} />
-        <Flex.Item align="center">
-          <Alert variant="error">{I18n.t('Failed loading subaccounts')}</Alert>
-        </Flex.Item>
-      </Flex>
+      <>
+        {renderRoot}
+        <Flex>
+          <Flex.Item width={`${childIndent}%`} />
+          <Flex.Item align="center">
+            <Alert variant="error">{I18n.t('Failed loading subaccounts')}</Alert>
+          </Flex.Item>
+        </Flex>
+      </>
     )
   } else if (isLoading && !isFetching && !showForm) {
     return (
       <>
-        {renderRoot(true)}
+        {renderRoot}
         {displayConfirmation ? renderDeleteConfirmation() : null}
       </>
     )
   } else {
     const showSpinner = isFetching && !isFetchingNextPage
-    // we only want to do this if the query was made
-    const updateCount = subCount.current !== subaccounts.length && !isFetching && !hasNextPage
-    if (updateCount) {
-      subCount.current = subaccounts.length
-    }
     const parentExpanded =
       props.parentExpanded != null ? props.parentExpanded && isExpanded : isExpanded
-    const spinnerSize = props.depth === 1 ? 'medium' : 'small'
     return (
       <>
+        {renderRoot}
         {showSpinner ? (
           <Flex>
             <Flex.Item width={`${childIndent}%`} />
             <Flex.Item>
-              <Spinner size={spinnerSize} renderTitle={I18n.t('Loading subaccounts')} />
+              <Spinner size="small" renderTitle={I18n.t('Loading subaccounts')} />
             </Flex.Item>
           </Flex>
         ) : null}
-        {renderRoot(!showSpinner)}
         {displayConfirmation ? renderDeleteConfirmation() : null}
         {renderChildren(subaccounts, parentExpanded)}
         {isFetchingNextPage ? (
@@ -263,7 +297,7 @@ export default function SubaccountTree(props: Props) {
             accountId={props.rootAccount.id}
             onSuccess={(json: AccountWithCounts) => {
               setShowForm(false)
-              updateList(json, false)
+              updateList(json, 'add')
             }}
             onCancel={() => setShowForm(false)}
             depth={props.depth + 1}

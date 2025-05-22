@@ -415,6 +415,52 @@ describe DiscussionEntry do
     end
   end
 
+  context "discussion checkpoints" do
+    before do
+      Account.site_admin.enable_feature!(:react_discussions_post)
+      course_with_student(active_all: true)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+
+      @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+      @replies_required = 3
+
+      @reply_to_topic_checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 2.days.from_now }],
+        points_possible: 3
+      )
+      @reply_to_entry_checkpint = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 3.days.from_now }],
+        points_possible: 9,
+        replies_required: @replies_required
+      )
+    end
+
+    describe "#update_topic_submission" do
+      it "doesnt break if dt.assignment.has_sub_assignments && dt.assignment.sub_assignments.empty?" do
+        entry = @checkpointed_discussion.discussion_entries.create!(message: "hello", user: @user)
+        # create the error state where dt.assignment.has_sub_assignments == true, but dt.assignment.sub_assignments == []
+        # in this case it's through discussion_topic&.assignment&.checkpoints_parent?
+        dt_assignment = @checkpointed_discussion.assignment
+        dt_sub_assignments = @checkpointed_discussion.assignment.sub_assignments
+        sub1 = dt_sub_assignments.first
+        sub2 = dt_sub_assignments.last
+        sub1.workflow_state = "deleted"
+        sub1.save(validate: false)
+        sub2.workflow_state = "deleted"
+        sub2.save(validate: false)
+        dt_assignment.reload
+        dt_assignment.has_sub_assignments = true
+        dt_assignment.save(validate: false)
+
+        expect { entry.destroy }.to_not raise_error
+      end
+    end
+  end
+
   it "touches all parent discussion_topics through root_topic_id, on update" do
     course_with_student(active_all: true)
     @topic = @course.discussion_topics.create!(title: "title", message: "message")

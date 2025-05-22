@@ -20,7 +20,7 @@ import React, {useState} from 'react'
 import {useScope as i18nScope} from '@canvas/i18n'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {PageViewsTable} from './PageViewsTable'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
@@ -64,7 +64,7 @@ export default function PageViews({userId}: PageViewsProps): React.JSX.Element {
   return (
     <Flex direction="column">
       <Flex.Item padding="small">
-        <CanvasDateInput
+        <CanvasDateInput2
           placeholder={I18n.t('Limit to a specific date')}
           selectedDate={filterDate.date?.toISOString()}
           formatDate={formatDateForDisplay}

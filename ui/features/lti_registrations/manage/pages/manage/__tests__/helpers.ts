@@ -33,6 +33,8 @@ import type {LtiOverlay} from '../../../model/LtiOverlay'
 import {type LtiOverlayVersion, ZLtiOverlayVersionId} from '../../../model/LtiOverlayVersion'
 import {ZLtiOverlayId} from '../../../model/ZLtiOverlayId'
 import type {User} from '../../../model/User'
+import {LtiDeployment} from '../../../model/LtiDeployment'
+import {ZLtiDeploymentId} from '../../../model/LtiDeploymentId'
 
 export const mockPageOfRegistrations = (
   ...names: Array<string>
@@ -116,6 +118,12 @@ export const mockRegistration = (
   }
 }
 
+export const mockNonDynamicRegistration = (n: string, i: number) => {
+  const reg = mockRegistrationWithAllInformation({n, i})
+  reg.ims_registration_id = null
+  return reg
+}
+
 export const mockLtiOverlayVersion = ({
   id = '1',
   date = new Date(),
@@ -187,3 +195,14 @@ export const mockSiteAdminRegistration = (n: string, i: number) => {
   }
 }
 
+export const mockDeployment = (overrides: Partial<LtiDeployment>): LtiDeployment => ({
+  id: ZLtiDeploymentId.parse('1'),
+  context_id: '1',
+  context_type: 'Account',
+  context_name: 'Test Account',
+  workflow_state: 'active',
+  deployment_id: '1',
+  registration_id: ZLtiRegistrationId.parse('1'),
+  context_controls: [],
+  ...overrides,
+})

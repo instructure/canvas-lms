@@ -42,6 +42,8 @@ describe('DialogFormView', () => {
     ])
 
   beforeEach(() => {
+    // Reset variables for each test
+    $dialog = null
     closeSpy = jest.spyOn(DialogFormView.prototype, 'close')
     server = {
       respond: jest.fn(),
@@ -54,6 +56,10 @@ describe('DialogFormView', () => {
     model.url = '/test'
     document.body.innerHTML = '<div id="fixtures"></div>'
     trigger = $('<button title="Edit Stuff" />').appendTo($('#fixtures'))
+
+    // Store original jQuery methods before mocking
+    $.fn._originalDialog = $.fn.dialog
+    $.fn._originalFixDialogButtons = $.fn.fixDialogButtons
 
     // Mock jQuery UI dialog
     $.fn.dialog = function (options) {
@@ -145,17 +151,32 @@ describe('DialogFormView', () => {
     trigger.remove()
     if ($dialog) {
       $dialog.remove()
+      $dialog = null
     }
     server.restore()
     view.remove()
     closeSpy.mockRestore()
     document.body.innerHTML = ''
+
+    // Restore original jQuery methods if they were mocked
+    if ($.fn._originalDialog) {
+      $.fn.dialog = $.fn._originalDialog
+      delete $.fn._originalDialog
+    }
+
+    if ($.fn._originalFixDialogButtons) {
+      $.fn.fixDialogButtons = $.fn._originalFixDialogButtons
+      delete $.fn._originalFixDialogButtons
+    }
   })
 
   it('opens and closes the dialog with the trigger', async () => {
-    expect($dialog).toBeFalsy()
+    // Ensure $dialog is null at the start of the test
+    expect($dialog).toBeNull()
     openDialog()
     await waitFor(() => {
+      // Now $dialog should exist and be visible
+      expect($dialog).not.toBeNull()
       expect($dialog.css('display')).not.toBe('none')
       expect(view.$el.css('display')).not.toBe('none')
     })

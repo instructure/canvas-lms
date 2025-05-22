@@ -19,11 +19,19 @@
 import {useRef, useState} from 'react'
 import {keepPreviousData, useQuery} from '@tanstack/react-query'
 import {File, Folder} from '../../interfaces/File'
-import {generateTableUrl, parseBookmarkFromUrl, parseLinkHeader} from '../../utils/apiUtils'
+import {
+  parseLinkHeader,
+  parseBookmarkFromUrl,
+  generateTableUrl,
+  UnauthorizedError,
+} from '../../utils/apiUtils'
 import {useSearchTerm} from './useSearchTerm'
 
 const fetchFilesAndFolders = async (url: string) => {
   const response = await fetch(url)
+  if (response.status === 401) {
+    throw new UnauthorizedError()
+  }
   if (!response.ok) {
     throw new Error()
   }

@@ -107,6 +107,7 @@ export const PermissionsModalBody = ({
           variant="error"
           renderCloseButtonLabel={I18n.t('Close warning message')}
           onDismiss={onDismissAlert}
+          data-testid="permissions-usage-rights-alert"
         >
           {error}
         </Alert>

@@ -46,7 +46,8 @@ const MemoizedModule = memo(Module, (prevProps, nextProps) => {
     prevProps.id === nextProps.id &&
     prevProps.expanded === nextProps.expanded &&
     prevProps.published === nextProps.published &&
-    prevProps.name === nextProps.name
+    prevProps.name === nextProps.name &&
+    prevProps.hasActiveOverrides === nextProps.hasActiveOverrides
   )
 })
 
@@ -264,6 +265,7 @@ const ModulesList: React.FC = () => {
                                 completionRequirements={module.completionRequirements}
                                 requirementCount={module.requirementCount}
                                 expanded={!!expandedModules.get(module._id)}
+                                hasActiveOverrides={module.hasActiveOverrides}
                                 onToggleExpand={onToggleExpandRef}
                                 dragHandleProps={dragProvided.dragHandleProps}
                                 setModuleAction={setModuleAction}

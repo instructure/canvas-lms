@@ -20,13 +20,13 @@
 describe CareerController do
   before :once do
     course_with_teacher(active_all: true)
-    Account.site_admin.enable_feature!(:horizon_learning_provider_app)
+    @course.account.enable_feature!(:horizon_learning_provider_app_for_accounts)
     @course.update!(horizon_course: true)
   end
 
   describe "GET catch_all" do
     it "returns unauthorized without a valid session" do
-      get "catch_all", params: { course_id: @course.id }
+      get :catch_all, params: { course_id: @course.id }
       assert_unauthorized
     end
 
@@ -36,41 +36,48 @@ describe CareerController do
       end
 
       it "renders with bare layout when course_id is valid" do
-        # Setup the controller to pass all the checks in set_context_from_params
         allow(controller).to receive_messages(
           canvas_career_learning_provider_app_enabled?: true,
           canvas_career_learning_provider_app_launch_url: "https://example.com/app.js"
         )
-        allow(controller).to receive(:load_canvas_career_learning_provider_app)
 
-        get "catch_all", params: { course_id: @course.id }
+        get :catch_all, params: { course_id: @course.id }
 
         expect(response).to be_successful
         expect(response).to render_template("layouts/bare")
       end
 
-      it "redirects to root path when no course_id is provided and no session course_id exists" do
-        # Ensure session doesn't have a course_id
-        session.delete(:career_course_id)
+      it "sets course context for content-libraries route" do
+        allow(controller).to receive(:canvas_career_learning_provider_app_enabled?).and_return(true)
 
-        get "catch_all"
+        get :catch_all, params: { path: "content-libraries", course_id: @course.id }
 
-        expect(response).to redirect_to(root_path)
+        expect(assigns(:context)).to eq(@course)
+        expect(response).to be_successful
       end
 
-      it "uses session career_course_id when available" do
-        # Setup the controller to pass all the checks
+      it "calls remote_env and deferred_js_bundle when app is enabled" do
+        allow(controller).to receive_messages(
+          canvas_career_learning_provider_app_enabled?: true,
+          canvas_career_learning_provider_app_launch_url: "https://test.canvasforcareer.com/learning-provider/remoteEntry.js"
+        )
+
+        expect(controller).to receive(:remote_env).with(canvascareer: "https://test.canvasforcareer.com/learning-provider/remoteEntry.js")
+        expect(controller).to receive(:deferred_js_bundle).with(:canvas_career)
+
+        get :catch_all, params: { course_id: @course.id }
+      end
+
+      it "adds career features to js_env" do
+        @course.account.enable_feature!(:horizon_crm_integration)
         allow(controller).to receive_messages(
           canvas_career_learning_provider_app_enabled?: true,
           canvas_career_learning_provider_app_launch_url: "https://example.com/app.js"
         )
-        allow(controller).to receive(:load_canvas_career_learning_provider_app)
 
-        session[:career_course_id] = @course.id
-        get "catch_all"
+        get :catch_all, params: { course_id: @course.id }
 
-        expect(response).to be_successful
-        expect(response).to render_template("layouts/bare")
+        expect(assigns[:js_env][:CANVAS_CAREER][:FEATURES][:horizon_crm_integration]).to be(true)
       end
     end
 
@@ -81,46 +88,66 @@ describe CareerController do
       end
 
       it "renders successfully when horizon_redirect_url is nil" do
-        # Mock the load_canvas_career_for_student method to do nothing
-        allow(controller).to receive(:load_canvas_career_for_student)
-
-        # Mock the Account method to return nil for horizon_redirect_url
+        allow(controller).to receive(:canvas_career_learning_provider_app_enabled?).and_return(true)
         allow_any_instance_of(Account).to receive(:horizon_redirect_url).and_return(nil)
 
-        get "catch_all", params: { course_id: @course.id }
+        get :catch_all, params: { course_id: @course.id }
 
         expect(response).to be_successful
       end
     end
   end
 
-  describe "#require_enabled_feature_flag" do
+  describe "#require_enabled_learning_provider_app" do
     before do
       user_session(@teacher)
     end
 
-    it "redirects to root_path when horizon_learning_provider_app feature is disabled" do
-      # Disable the feature flag
-      Account.site_admin.disable_feature!(:horizon_learning_provider_app)
+    it "redirects to root_path when canvas_career_learning_provider_app_enabled? returns false" do
+      allow(controller).to receive(:canvas_career_learning_provider_app_enabled?).and_return(false)
 
-      get "catch_all", params: { course_id: @course.id }
+      get :catch_all, params: { course_id: @course.id }
 
       expect(response).to redirect_to(root_path)
     end
 
-    it "allows access when horizon_learning_provider_app feature is enabled" do
-      # Feature is already enabled in the top-level before block
-      # Mock necessary methods to pass other checks
+    it "allows access when canvas_career_learning_provider_app_enabled? returns true" do
+      allow(controller).to receive(:canvas_career_learning_provider_app_enabled?).and_return(true)
+
+      get :catch_all, params: { course_id: @course.id }
+
+      expect(response).not_to redirect_to(root_path)
+      expect(response).to be_successful
+    end
+  end
+
+  describe "#require_context" do
+    before do
+      user_session(@teacher)
+
       allow(controller).to receive_messages(
         canvas_career_learning_provider_app_enabled?: true,
         canvas_career_learning_provider_app_launch_url: "https://example.com/app.js"
       )
-      allow(controller).to receive(:load_canvas_career_learning_provider_app)
+    end
 
-      get "catch_all", params: { course_id: @course.id }
+    it "sets context from params when course_id is provided" do
+      get :catch_all, params: { course_id: @course.id }
 
-      expect(response).not_to redirect_to(root_path)
-      expect(response).to be_successful
+      expect(assigns(:context)).to eq(@course)
+    end
+
+    it "sets context from params when account_id is provided" do
+      account = Account.default
+      get :catch_all, params: { account_id: account.id }
+
+      expect(assigns(:context)).to eq(account)
+    end
+  end
+
+  describe "HorizonMode inclusion" do
+    it "includes the HorizonMode module" do
+      expect(CareerController.included_modules).to include(HorizonMode)
     end
   end
 end

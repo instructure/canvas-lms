@@ -110,13 +110,13 @@ module SIS
       end
 
       def should_build_roll_back_data?(group_category)
-        return true if group_category.id_before_last_save.nil? || group_category.saved_change_to_deleted_at?
+        return true if group_category.previously_new_record? || group_category.saved_change_to_deleted_at?
 
         false
       end
 
       def old_status(group_category)
-        if group_category.id_before_last_save.nil?
+        if group_category.previously_new_record?
           "non-existent"
         elsif group_category.deleted_at_before_last_save.nil?
           group_category.deleted_at.nil? ? nil : "active"

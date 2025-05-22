@@ -23,6 +23,8 @@ export interface ColumnHeader {
   title: string
   textAlign: 'start' | 'center' | 'end'
   width?: string
+  isSortable: boolean
+  screenReaderLabel?: string
 }
 
 export type ModalOrTrayOptions = {

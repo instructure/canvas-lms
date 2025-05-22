@@ -36,7 +36,6 @@ import MissingDateDialog from '@canvas/due-dates/backbone/views/MissingDateDialo
 import ConditionalRelease from '@canvas/conditional-release-editor'
 import deparam from 'deparam'
 import numberHelper from '@canvas/i18n/numberHelper'
-import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
@@ -46,6 +45,7 @@ import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import 'jqueryui/tabs'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import {DiscussionFormOptions} from '../../react/DiscussionFormOptions'
 
 const I18n = createI18nScope('discussion_topics')
 
@@ -63,8 +63,7 @@ function EditView() {
   this.submit = this.submit.bind(this)
   this.saveFormData = this.saveFormData.bind(this)
   this.updateAssignment = this.updateAssignment.bind(this)
-  this.handleStudentTodoUpdate = this.handleStudentTodoUpdate.bind(this)
-  this.renderStudentTodoAtDate = this.renderStudentTodoAtDate.bind(this)
+  this.renderFormOptions = this.renderFormOptions.bind(this)
   this.loadConditionalRelease = this.loadConditionalRelease.bind(this)
   this.renderTabs = this.renderTabs.bind(this)
   this.renderPostToSisOptions = this.renderPostToSisOptions.bind(this)
@@ -86,6 +85,9 @@ function EditView() {
   this.locationAfterSave = this.locationAfterSave.bind(this)
   this.setRenderSectionsAutocomplete = this.setRenderSectionsAutocomplete.bind(this)
   this.handleMessageEvent = this.handleMessageEvent.bind(this)
+  this.toggleGradingDependentOptions = this.toggleGradingDependentOptions.bind(this)
+  this.toggleAvailabilityOptions = this.toggleAvailabilityOptions.bind(this)
+  this.toggleConditionalReleaseTab = this.toggleConditionalReleaseTab.bind(this)
   window.addEventListener('message', this.handleMessageEvent.bind(this))
   return EditView.__super__.constructor.apply(this, arguments)
 }
@@ -100,31 +102,23 @@ EditView.prototype.dontRenableAfterSaveSuccess = true
 
 EditView.prototype.els = {
   '#availability_options': '$availabilityOptions',
-  '#use_for_grading': '$useForGrading',
   '#discussion_topic_assignment_points_possible': '$assignmentPointsPossible',
   '#discussion_point_change_warning': '$discussionPointPossibleWarning',
   '#discussion-edit-view': '$discussionEditView',
   '#discussion-details-tab': '$discussionDetailsTab',
   '#conditional-release-target': '$conditionalReleaseTarget',
-  '#todo_options': '$todoOptions',
-  '#todo_date_input': '$todoDateInput',
-  '#allow_todo_date': '$allowTodoDate',
-  '#allow_user_comments': '$allowUserComments',
-  '#require_initial_post': '$requireInitialPost',
   '#assignment_external_tools': '$AssignmentExternalTools',
+  '#discussion_form_options': '$discussionFormOptions',
 }
 
 EditView.prototype.events = lodashExtend(EditView.prototype.events, {
   'click .removeAttachment': 'removeAttachment',
   'click .save_and_publish': 'saveAndPublish',
   'click .cancel_button': 'handleCancel',
-  'change #use_for_grading': 'toggleGradingDependentOptions',
   'change .delay_post_at_date': 'hanldeDelayedPostAtChange',
   'change #discussion_topic_assignment_points_possible': 'handlePointsChange',
   change: 'onChange',
   'tabsbeforeactivate #discussion-edit-view': 'onTabChange',
-  'change #allow_todo_date': 'toggleTodoDateInput',
-  'change #allow_user_comments': 'updateAllowComments',
 })
 
 EditView.prototype.messages = {
@@ -399,9 +393,8 @@ EditView.prototype.render = function () {
     defer(this.loadConditionalRelease)
   }
   renderDatetimeField(this.$('.datetime_field'))
-  if (!this.model.get('locked')) {
-    this.updateAllowComments()
-  }
+
+  this.renderFormOptions()
   return this
 }
 
@@ -410,9 +403,6 @@ EditView.prototype.shouldRenderUsageRights = function () {
 }
 
 EditView.prototype.afterRender = function () {
-  if (this.$todoDateInput.length) {
-    this.renderStudentTodoAtDate()
-  }
   const ref = ENV.context_asset_string.split('_')
   const context = ref[0]
   const context_id = ref[1]
@@ -550,30 +540,26 @@ EditView.prototype.loadConditionalRelease = function () {
   ))
 }
 
-EditView.prototype.renderStudentTodoAtDate = function () {
-  this.toggleTodoDateInput()
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(
-    React.createElement(DueDateCalendarPicker, {
-      dateType: 'todo_date',
-      name: 'todo_date',
-      handleUpdate: this.handleStudentTodoUpdate,
-      rowKey: 'student_todo_at_date',
-      labelledBy: 'student_todo_at_date_label',
-      inputClasses: '',
-      disabled: false,
-      isFancyMidnight: true,
-      dateValue: this.studentTodoAtDateValue,
-      labelText: I18n.t('Discussion Topic will show on student to-do list for date'),
-      labelClasses: 'screenreader-only',
-    }),
-    this.$todoDateInput[0],
-  )
-}
+EditView.prototype.renderFormOptions = function () {
+  const target = this.$discussionFormOptions
+  if (target.length > 0) {
+    const component = React.createElement(DiscussionFormOptions, {
+      options: {
+        studentTodoAtDateValue: this.studentTodoAtDateValue,
+        studentPlannerEnabled: ENV.STUDENT_PLANNER_ENABLED,
+        createAnnouncementsUnlocked: ENV.CREATE_ANNOUNCEMENTS_UNLOCKED,
+        ...this.toJSON(),
+      },
+      onGradedChange: this.toggleGradingDependentOptions,
+      handleStudentTodoUpdate: date => {
+        this.studentTodoAtDateValue = date
+      },
+    })
 
-EditView.prototype.handleStudentTodoUpdate = function (newDate) {
-  this.studentTodoAtDateValue = newDate
-  return this.renderStudentTodoAtDate()
+    ReactDOM.render(component, target[0], () => {
+      this.$useForGrading = this.$('#use_for_grading')
+    })
+  }
 }
 
 EditView.prototype.getFormData = function () {
@@ -925,10 +911,12 @@ EditView.prototype.showErrors = function (errors) {
   return EditView.__super__.showErrors.call(this, errors)
 }
 
-EditView.prototype.toggleGradingDependentOptions = function () {
+EditView.prototype.toggleGradingDependentOptions = function (isGraded) {
   this.toggleAvailabilityOptions()
   this.toggleConditionalReleaseTab()
-  this.toggleTodoDateBox()
+
+  this.$('#assignment_options').toggle(isGraded)
+
   if (this.renderSectionsAutocomplete != null) {
     return this.renderSectionsAutocomplete()
   }
@@ -944,17 +932,19 @@ EditView.prototype.hanldeDelayedPostAtChange = function () {
 }
 
 EditView.prototype.gradedChecked = function () {
-  return this.$useForGrading.is(':checked')
+  return this.$useForGrading?.is(':checked') || false
 }
 
 // Graded discussions and section specific discussions are mutually exclusive
 EditView.prototype.disableGradedCheckBox = function () {
-  return this.$useForGrading.prop('disabled', true)
+  return document.dispatchEvent(new CustomEvent('toggleGradedCheckBox', {detail: {disabled: true}}))
 }
 
 // Graded discussions and section specific discussions are mutually exclusive
 EditView.prototype.enableGradedCheckBox = function () {
-  return this.$useForGrading.prop('disabled', false)
+  return document.dispatchEvent(
+    new CustomEvent('toggleGradedCheckBox', {detail: {disabled: false}}),
+  )
 }
 
 EditView.prototype.toggleAvailabilityOptions = function () {
@@ -978,29 +968,6 @@ EditView.prototype.toggleConditionalReleaseTab = function () {
       return this.$discussionEditView.tabs('option', 'active', 0)
     }
   }
-}
-
-EditView.prototype.toggleTodoDateBox = function () {
-  if (this.gradedChecked()) {
-    return this.$todoOptions.hide()
-  } else {
-    return this.$todoOptions.show()
-  }
-}
-
-EditView.prototype.toggleTodoDateInput = function () {
-  if (this.$allowTodoDate.is(':checked')) {
-    return this.$todoDateInput.show()
-  } else {
-    return this.$todoDateInput.hide()
-  }
-}
-
-EditView.prototype.updateAllowComments = function () {
-  const allowsComments =
-    this.$allowUserComments.is(':checked') || !this.model.get('is_announcement')
-  this.$requireInitialPost.prop('disabled', !allowsComments)
-  return this.model.set('locked', !allowsComments)
 }
 
 EditView.prototype.onChange = function () {

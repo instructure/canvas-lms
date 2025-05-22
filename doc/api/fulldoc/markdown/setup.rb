@@ -302,7 +302,7 @@ def transform_html_links(content)
   modified_content = content.gsub(html_link_regex) do |match|
     url = $1
     match = match.gsub(".html", ".md") unless url.start_with?("http", "https")
-    match.gsub(/\s*target="_blank"\s*/, "")
+    match
   end
 
   # matches Markdown-style links with URLs ending in .html or .html#fragment

@@ -85,6 +85,9 @@ describe('IndexHeader', () => {
       />,
     )
     expect(screen.getByText('Lock Selected Announcements')).toBeInTheDocument()
+
+    const lockButton = screen.getByTestId('lock_announcements')
+    expect(lockButton).toHaveAttribute('data-action-state', 'lockSelectedButton')
   })
 
   it('lets me unlock an announcement when I have the permission and it is locked', () => {
@@ -95,6 +98,9 @@ describe('IndexHeader', () => {
       />,
     )
     expect(screen.getByText('Unlock Selected Announcements')).toBeInTheDocument()
+
+    const lockButton = screen.getByTestId('lock_announcements')
+    expect(lockButton).toHaveAttribute('data-action-state', 'unlockSelectedButton')
   })
 
   it('lets me delete an announcement when I have the permission', () => {

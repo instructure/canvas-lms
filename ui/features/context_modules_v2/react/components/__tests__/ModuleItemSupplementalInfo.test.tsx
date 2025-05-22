@@ -71,7 +71,7 @@ describe('ModuleItemSupplementalInfo', () => {
     it('renders', () => {
       const container = setUp(defaultContent, null)
       expect(container.container).toBeInTheDocument()
-      expect(container.getByText(new Date(currentDate).toLocaleDateString())).toBeInTheDocument()
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
       expect(container.getAllByText('|')).toHaveLength(1)
     })
 

@@ -145,6 +145,7 @@ describe('EditUserDetails', () => {
         name: 'new name',
         short_name: 'new short_name',
         sortable_name: 'new sortable_name',
+        time_zone: timezones[0].name,
       }
       const newProps: EditUserDetailsProps = {
         ...props,
@@ -152,8 +153,15 @@ describe('EditUserDetails', () => {
       }
       fetchMock.patch(EDIT_USER_DETAILS_URI, newUserDetails, {overwriteRoutes: true})
       render(<EditUserDetails {...newProps} />)
+
+      const name = screen.getByLabelText('Full Name')
+      const shortName = screen.getByLabelText('Display Name')
+      const sortableName = screen.getByLabelText('Sortable Name')
       const submit = screen.getByLabelText('Update Details')
 
+      fireEvent.input(name, {target: {value: newUserDetails.name}})
+      fireEvent.input(shortName, {target: {value: newUserDetails.short_name}})
+      fireEvent.input(sortableName, {target: {value: newUserDetails.sortable_name}})
       fireEvent.click(submit)
 
       await waitFor(() => {

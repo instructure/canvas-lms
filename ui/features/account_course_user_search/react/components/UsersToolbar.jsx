@@ -18,8 +18,15 @@
 
 import React, {useState} from 'react'
 import {bool, string, func, shape, arrayOf} from 'prop-types'
-import {IconGroupLine, IconMoreLine, IconPlusLine, IconStudentViewLine} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
+import {
+  IconGroupLine,
+  IconMoreLine,
+  IconPlusLine,
+  IconSearchLine,
+  IconStudentViewLine,
+  IconTroubleLine,
+} from '@instructure/ui-icons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Grid} from '@instructure/ui-grid'
 import {Menu} from '@instructure/ui-menu'
@@ -59,7 +66,22 @@ export default function UsersToolbar(props) {
     }
   }
 
+  const renderClearButton = () =>
+    props.search_term.length ? (
+      <IconButton
+        type="button"
+        size="small"
+        data-testid="clear-search"
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel="Clear search"
+        onClick={() => props.onUpdateFilters({search_term: ''})}
+      >
+        <IconTroubleLine />
+      </IconButton>
+    ) : undefined
   const placeholder = I18n.t('Search people...')
+
   return (
     <form onSubmit={preventDefault(props.onApplyFilters)}>
       <Grid vAlign="top" startAt="medium">
@@ -90,6 +112,10 @@ export default function UsersToolbar(props) {
                   <TextInput
                     type="search"
                     value={props.search_term}
+                    renderBeforeInput={
+                      <IconSearchLine inline={false} data-testid="icon-search-line" />
+                    }
+                    renderAfterInput={renderClearButton()}
                     renderLabel={<ScreenReaderContent>{placeholder}</ScreenReaderContent>}
                     placeholder={placeholder}
                     onChange={e => props.onUpdateFilters({search_term: e.target.value})}

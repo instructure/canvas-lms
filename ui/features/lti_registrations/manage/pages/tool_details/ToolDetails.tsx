@@ -29,7 +29,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
 import {View, ViewProps} from '@instructure/ui-view'
 import {Tooltip} from '@instructure/ui-tooltip'
-import { IconCopyLine, IconTrashLine } from '@instructure/ui-icons'
+import {IconCopyLine, IconTrashLine} from '@instructure/ui-icons'
 import * as React from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {matchApiResultState} from '../../../common/lib/apiResult/matchApiResultState'
@@ -37,11 +37,16 @@ import {useApiResult} from '../../../common/lib/apiResult/useApiResult'
 import {useZodParams} from '../../../common/lib/useZodParams/useZodParams'
 import {fetchRegistrationWithAllInfoForId, deleteRegistration} from '../../api/registrations'
 import type {AccountId} from '../../model/AccountId'
-import {isForcedOn, LtiRegistration, type LtiRegistrationWithAllInformation} from '../../model/LtiRegistration'
+import {
+  isForcedOn,
+  LtiRegistration,
+  type LtiRegistrationWithAllInformation,
+} from '../../model/LtiRegistration'
 import {type LtiRegistrationId, ZLtiRegistrationId} from '../../model/LtiRegistrationId'
 import {ltiToolDefaultIconUrl} from '../../model/ltiToolIcons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {ApiResultErrorPage} from '../../../common/lib/apiResult/ApiResultErrorPage'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -86,12 +91,8 @@ export const ToolDetailsRequest = ({
         refreshRegistration={refresh}
       />
     ),
-    error: message => (
-      <GenericErrorPage
-        imageUrl={errorShipUrl}
-        errorSubject={I18n.t('LTI Tool details fetch error')}
-        errorMessage={message}
-      />
+    error: error => (
+      <ApiResultErrorPage errorSubject={I18n.t('LTI Tool details fetch error')} error={error} />
     ),
     loading: () => (
       <Flex direction="column" alignItems="center" padding="large 0">
@@ -149,52 +150,64 @@ export const ToolDetailsInner = ({
   const [tooltipShowing, setTooltipShowing] = React.useState(false)
   const canDelete = !registration.inherited
 
-  const handleCopyClientId = React.useCallback(async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
-    e.preventDefault()
-    const clientId = registration.developer_key_id
-    if (clientId) {
-      try {
-        await navigator.clipboard.writeText(clientId)
-        showFlashAlert({
-          type: 'info',
-          message: I18n.t('Client ID copied (%{clientId})', { clientId }),
-        })
-      } catch {
-        showFlashAlert({
-          type: 'error',
-          message: I18n.t('Unable to copy client ID to clipboard (%{clientId})', { clientId }),
-        })
+  const handleCopyClientId = React.useCallback(
+    async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
+      e.preventDefault()
+      const clientId = registration.developer_key_id
+      if (clientId) {
+        try {
+          await navigator.clipboard.writeText(clientId)
+          showFlashAlert({
+            type: 'info',
+            message: I18n.t('Client ID copied (%{clientId})', {clientId}),
+          })
+        } catch {
+          showFlashAlert({
+            type: 'error',
+            message: I18n.t('Unable to copy client ID to clipboard (%{clientId})', {clientId}),
+          })
+        }
       }
-    }
-  }, [registration])
+    },
+    [registration],
+  )
 
-  const handleDelete = React.useCallback(async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
-    e.preventDefault()
-    const confirmed = await showConfirmationDialog({
-      body: [
-        <Text weight="bold">{I18n.t('You are about to delete "%{name}"', { name: registration.name } )}</Text>,
-        <br />,
-        <Text>{I18n.t('Removing this registration will remove the app from the entire account. It will be removed from its placements and existing links to it will stop working. To reestablish placements and links, you will need to reinstall the app.')}</Text>
-      ],
-      confirmColor: 'danger',
-      confirmText: I18n.t('Delete'),
-      label: I18n.t('Delete App Configuration'),
-      size: 'small',
-    })
+  const handleDelete = React.useCallback(
+    async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
+      e.preventDefault()
+      const confirmed = await showConfirmationDialog({
+        body: [
+          <Text weight="bold">
+            {I18n.t('You are about to delete "%{name}"', {name: registration.name})}
+          </Text>,
+          <br />,
+          <Text>
+            {I18n.t(
+              'Removing this registration will remove the app from the entire account. It will be removed from its placements and existing links to it will stop working. To reestablish placements and links, you will need to reinstall the app.',
+            )}
+          </Text>,
+        ],
+        confirmColor: 'danger',
+        confirmText: I18n.t('Delete'),
+        label: I18n.t('Delete App Configuration'),
+        size: 'small',
+      })
 
-    if (confirmed) {
-      const result = await deleteRegistration(registration.account_id, registration.id)
-      if (result._type === 'Success') {
-        refreshRegistration()
-        navigate('/manage')
-      } else {
-        showFlashAlert({
-          type: 'error',
-          message: I18n.t('There was an error when attempting to delete the registration.'),
-        })
+      if (confirmed) {
+        const result = await deleteRegistration(registration.account_id, registration.id)
+        if (result._type === 'Success') {
+          refreshRegistration()
+          navigate('/manage')
+        } else {
+          showFlashAlert({
+            type: 'error',
+            message: I18n.t('There was an error when attempting to delete the registration.'),
+          })
+        }
       }
-    }
-  }, [registration])
+    },
+    [registration],
+  )
 
   return (
     <Flex direction="column">
@@ -272,13 +285,15 @@ export const ToolDetailsInner = ({
                 {I18n.t('Copy Client ID')}
               </Button>
               <Tooltip
-                renderTip={I18n.t("This account does not own this app and therefore can't delete it.")}
+                renderTip={I18n.t(
+                  "This account does not own this app and therefore can't delete it.",
+                )}
                 isShowingContent={tooltipShowing}
-                onShowContent={(e) => {
+                onShowContent={e => {
                   // The tooltip should only be shown if they *can't* click the delete button
                   setTooltipShowing(!canDelete)
                 }}
-                onHideContent={(e) => {
+                onHideContent={e => {
                   setTooltipShowing(false)
                 }}
               >
@@ -287,7 +302,7 @@ export const ToolDetailsInner = ({
                   renderIcon={<IconTrashLine />}
                   margin="0"
                   data-testid="delete-app"
-                  interaction={canDelete ? "enabled" : "disabled"}
+                  interaction={canDelete ? 'enabled' : 'disabled'}
                   onClick={handleDelete}
                 >
                   {I18n.t('Delete App')}
@@ -305,7 +320,9 @@ export const ToolDetailsInner = ({
           padding="medium 0"
           href="/"
           renderTitle={
-            <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Access')}</Text>
+            <Text style={{color: 'initial', textDecoration: 'initial'}}>
+              {I18n.t('Availability & Exceptions')}
+            </Text>
           }
           themeOverride={OverflowThemeOverride}
         >

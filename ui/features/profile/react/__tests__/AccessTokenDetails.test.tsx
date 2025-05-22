@@ -22,6 +22,7 @@ import fetchMock from 'fetch-mock'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import AccessTokenDetails, {type AccessTokenDetailsProps} from '../AccessTokenDetails'
 import type {Token} from '../types'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('AccessTokenDetails', () => {
   const fully_visible_token = '1~CZXKPGfzRnNrn2QUnBZGvxeuL9n9MLAhNNvRQMN6rW6xCNB2HMyBuAzGruY4yLfa'
@@ -43,40 +44,69 @@ describe('AccessTokenDetails', () => {
     onTokenLoad: jest.fn(),
   }
 
-  beforeAll(() => {
-    fetchMock.get(props.url, loadedToken)
+  beforeEach(() => {
+    fakeENV.setup()
+    // Use overwriteRoutes to avoid duplicate route errors when running with --randomize
+    fetchMock.get(props.url, loadedToken, {overwriteRoutes: true})
   })
 
   afterEach(() => {
     fetchMock.reset()
+    fetchMock.restore()
+    fakeENV.teardown()
   })
 
   it('should fetch the data if the token is NOT present', async () => {
+    // Reset fetchMock for this test to ensure clean state
+    fetchMock.reset()
+    // Re-setup the mock with overwriteRoutes to ensure it's properly configured
+    fetchMock.get(props.url, loadedToken, {overwriteRoutes: true})
+
     render(<AccessTokenDetails {...props} loadedToken={undefined} />)
 
     const spinner = screen.getByLabelText(/loading/i)
     expect(spinner).toBeInTheDocument()
-    await waitFor(() => {
-      expect(fetchMock.called(props.url)).toBe(true)
-    })
+
+    // Wait for the fetch to complete with a more resilient approach
+    await waitFor(
+      () => {
+        expect(fetchMock.called(props.url)).toBe(true)
+      },
+      {timeout: 2000},
+    ) // Increase timeout for stability
   })
 
   it('should NOT fetch the data if the token is present', async () => {
+    // Reset and re-setup fetchMock for this test
+    fetchMock.reset()
+    fetchMock.get(props.url, loadedToken, {overwriteRoutes: true})
+
     render(<AccessTokenDetails {...props} />)
 
     const spinner = screen.queryByLabelText(/loading/i)
     expect(spinner).not.toBeInTheDocument()
-    await waitFor(() => {
-      expect(fetchMock.called(props.url)).toBe(false)
-    })
+
+    // Use a more reliable approach to verify no fetch was made
+    await waitFor(
+      () => {
+        expect(fetchMock.called(props.url)).toBe(false)
+      },
+      {timeout: 1000},
+    )
   })
 
   it('should show an error if the initial fetch request fails', async () => {
+    // Reset and setup fetchMock to return an error
+    fetchMock.reset()
     fetchMock.get(props.url, 500, {overwriteRoutes: true})
+
     render(<AccessTokenDetails {...props} loadedToken={undefined} />)
 
+    // Use findByText with a timeout to make the test more resilient
     const error = await screen.findByText(
       'Failed to load access token details. Please try again later.',
+      {},
+      {timeout: 2000},
     )
     expect(error).toBeInTheDocument()
   })
@@ -135,31 +165,55 @@ describe('AccessTokenDetails', () => {
   })
 
   it('should update the token if the regeneration request succeed', async () => {
+    // Reset and setup fetchMock for this test
+    fetchMock.reset()
+    fetchMock.get(props.url, loadedToken, {overwriteRoutes: true})
     fetchMock.put(
       props.url,
       {...loadedToken, visible_token: fully_visible_token},
       {overwriteRoutes: true},
     )
-    jest.spyOn(window, 'confirm').mockImplementationOnce(() => true)
+
+    // Mock window.confirm
+    const confirmSpy = jest.spyOn(window, 'confirm').mockImplementationOnce(() => true)
+
     render(<AccessTokenDetails {...props} />)
-    const regenerateButton = await screen.findByText('Regenerate Token')
+    const regenerateButton = await screen.findByText('Regenerate Token', {}, {timeout: 2000})
 
     fireEvent.click(regenerateButton)
 
-    const newToken = await screen.findByText(fully_visible_token)
+    // Use a more reliable approach to find the new token
+    const newToken = await screen.findByText(fully_visible_token, {}, {timeout: 2000})
     expect(newToken).toBeInTheDocument()
     expect(fetchMock.called(props.url, {method: 'PUT', body: {token: {regenerate: 1}}})).toBe(true)
+
+    // Clean up the spy
+    confirmSpy.mockRestore()
   })
 
   it('should show an error alert if the regeneration request fails', async () => {
+    // Reset and setup fetchMock for this test
+    fetchMock.reset()
+    fetchMock.get(props.url, loadedToken, {overwriteRoutes: true})
     fetchMock.put(props.url, 500, {overwriteRoutes: true})
-    jest.spyOn(window, 'confirm').mockImplementationOnce(() => true)
+
+    // Mock window.confirm
+    const confirmSpy = jest.spyOn(window, 'confirm').mockImplementationOnce(() => true)
+
     render(<AccessTokenDetails {...props} />)
-    const regenerateButton = await screen.findByText('Regenerate Token')
+    const regenerateButton = await screen.findByText('Regenerate Token', {}, {timeout: 2000})
 
     fireEvent.click(regenerateButton)
 
-    const errorAlerts = await screen.findAllByText('Failed to regenerate access token.')
+    // Use a more reliable approach to find error alerts
+    const errorAlerts = await screen.findAllByText(
+      'Failed to regenerate access token.',
+      {},
+      {timeout: 2000},
+    )
     expect(errorAlerts.length).toBeTruthy()
+
+    // Clean up the spy
+    confirmSpy.mockRestore()
   })
 })

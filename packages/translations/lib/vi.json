@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Đầu đề đầu tiên trên một trang phải là H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Nội dung sau do đối tác cung cấp"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Tài liệu này thuộc phạm vi công cộng"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Tài liệu này thuộc trường hợp ngoại lệ - ví dụ như sử dụng công bằng, quyền trích dẫn hoặc trường hợp khác theo luật bản quyền hiện hành"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Nội dung trước do đối tác cung cấp"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Không thể sử dụng bàn phím trong trình chỉnh sửa html đẹp. Nhấn Shift O để mở trình chỉnh sửa html thô."

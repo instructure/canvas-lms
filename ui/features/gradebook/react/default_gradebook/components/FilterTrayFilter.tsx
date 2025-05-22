@@ -19,7 +19,7 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import type {MomentInput} from 'moment-timezone'
 import * as tz from '@instructure/moment-utils'
 import {isoDateFromInput} from '../../../util/DateUtils'
@@ -177,8 +177,7 @@ export default function ({
         </SimpleSelect>
       )}
       {['start-date', 'end-date'].includes(filter.type || '') && (
-        <CanvasDateInput
-          size="small"
+        <CanvasDateInput2
           dataTestid={`${filter.type}-input`}
           renderLabel={dateLabels[filter.type as 'start-date' | 'end-date']}
           selectedDate={filter.value}

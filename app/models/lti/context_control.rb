@@ -80,6 +80,27 @@ class Lti::ContextControl < ActiveRecord::Base
     "#{prefix}#{context.id}."
   end
 
+  # Generate a path string based on the given course ID and account IDs.
+  # A path looks like "a1.a2.c3.", where "a" represents an account and "c" represents a course.
+  # The path starts at the root account and ends at the given course.
+  # Note that account_ids are expected to be in leaf-to-root order, as returned by
+  # Account#account_chain_ids or Account#account_chain_ids_for_multiple_accounts.
+  def self.calculate_path_for_course_id(course_id, account_ids)
+    segments = calculate_path_for_account_ids(account_ids)
+    segments << "c#{course_id}."
+    segments
+  end
+
+  # Generate a path string based on the given account IDs.
+  # A path looks like "a1.a2.", where "a" represents an account.
+  # The path starts at the root account and ends at the given account.
+  # Note that account_ids are expected to be in leaf-to-root order, as returned by
+  # Account#account_chain_ids or Account#account_chain_ids_for_multiple_accounts.
+  def self.calculate_path_for_account_ids(account_ids)
+    segments = account_ids.reverse.map { |id| "a#{id}." }
+    segments.join
+  end
+
   def context_name
     account&.name || course.name
   end

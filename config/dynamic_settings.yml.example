@@ -145,6 +145,8 @@ development:
       #   sampling_rate: '0.0'
       #   queue_url: ''
       #   region: 'us-west-2'
+      # ams.yml: |
+      #   launch_url: http://ams-ux.inseng.test:5173/src/remote-adapter.js
   store:
     canvas:
       lti-keys:

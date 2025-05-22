@@ -144,13 +144,13 @@ describe "Differentiation Tag Management" do
           it "Stops displaying differentiation tag UI if the setting is turned off" do
             expect(f("body")).to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
             expect(f("body")).to contain_jqcss("button[data-testid='user-diff-tag-manager-tag-as-button']")
-            expect(f("body")).to contain_jqcss("a[aria-label='View user tags']")
+            expect(f("body")).to contain_jqcss("a[aria-label^='View '][aria-label$=' user tags']")
             @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
             @course.account.save!
             refresh_page
             expect(f("body")).not_to contain_jqcss("input[type='checkbox'][aria-label^='Select']")
             expect(f("body")).not_to contain_jqcss("button[data-testid='user-diff-tag-manager-tag-as-button']")
-            expect(f("body")).not_to contain_jqcss("a[aria-label='View user tags']")
+            expect(f("body")).not_to contain_jqcss("a[aria-label^='View '][aria-label$=' user tags']")
           end
 
           it "properly handles paginated users" do
@@ -437,7 +437,7 @@ describe "Differentiation Tag Management" do
           expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_2.name}')").text).to include("0 students")
 
           # remove the user from the tag
-          f("a[aria-label='View user tags']").click
+          f("a[aria-label='View #{@student.name} user tags']").click
           wait_for_ajaximations
           f("button[data-testid='user-tag-#{@multiple_tags_1.id}']").click
           wait_for_ajaximations
@@ -448,6 +448,16 @@ describe "Differentiation Tag Management" do
           # Verify counts in tray
           expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_1.name}')").text).to include("0 students")
           expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_2.name}')").text).to include("0 students")
+        end
+
+        it "shows accessibility information for tag pills in users tag modal" do
+          @multiple_tags_2.add_user(@third_student)
+          refresh_page
+          wait_for_ajaximations
+          f("#tag-icon-id-#{@third_student.id}").click
+          wait_for_ajaximations
+          expect(f("body")).to contain_jqcss("span:contains('Remove #{@multiple_tags.name} | #{@multiple_tags_2.name}')")
+          expect(f("body")).to contain_jqcss("span:contains('Remove #{@single_tag_1.name}')")
         end
       end
 
@@ -908,6 +918,30 @@ describe "Differentiation Tag Management" do
 
         it "does not show the 'Manage Tags' button when sub account setting is off" do
           @sub1_account.disable_feature! :assign_to_differentiation_tags
+          user_session @teacher
+          get "/courses/#{@course_with_tags_disabled.id}/users"
+          expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
+        end
+
+        it "does show 'Manage Tags' button when parent ff is off and unlocked" do
+          Account.default.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_OFF
+          @sub1_account.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
+          @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          @sub1_account.save!
+          @sub1_account.reload
+          user_session @teacher
+          get "/courses/#{@course_with_tags_disabled.id}/users"
+          expect(f("body")).to contain_jqcss("button:contains('Manage Tags')")
+        end
+
+        it "does not show 'Manage Tags' button when parent ff is off and locked" do
+          Account.default.disable_feature! :assign_to_differentiation_tags
+          # when you disable parent FF and lock it sub accounts FF and settings won't work even if
+          # enabled by code without using the ui
+          @sub1_account.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
+          @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          @sub1_account.save!
+          @sub1_account.reload
           user_session @teacher
           get "/courses/#{@course_with_tags_disabled.id}/users"
           expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")

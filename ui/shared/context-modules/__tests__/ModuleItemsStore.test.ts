@@ -20,7 +20,7 @@ import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_SHOW_ALL,
   ModuleItemsStore,
-  PREFIX
+  PREFIX,
 } from '../utils/ModuleItemsStore'
 
 describe('ModuleItemsStore', () => {
@@ -30,8 +30,6 @@ describe('ModuleItemsStore', () => {
   const userId = 'user789'
   const moduleId = 'module001'
   const composedKey = `${PREFIX}_${accountId}_${userId}_${courseId}_${moduleId}`
-
-  // const getItemFromLocalStorage =
 
   beforeEach(() => {
     store = new ModuleItemsStore(courseId, accountId, userId)
@@ -56,11 +54,23 @@ describe('ModuleItemsStore', () => {
         const result = store.getPageNumber(moduleId)
         expect(result).toBe(DEFAULT_PAGE_NUMBER)
       })
+
+      it('should handle when localStorage is not available', () => {
+        const originalLocalStorage = global.localStorage
+        // @ts-expect-error
+        delete global.localStorage
+
+        expect(() => {
+          store.getPageNumber(moduleId)
+        }).not.toThrow()
+
+        global.localStorage = originalLocalStorage
+      })
     })
 
     describe('set', () => {
       it('should save and retrieve pageNumber', () => {
-        store.setPageNumber(moduleId, '2')
+        store.setPageNumber(moduleId, 2)
         const item = localStorage.getItem(composedKey)
         expect(item).not.toBeNull()
         expect(JSON.parse(item as string).p).toBe('2')
@@ -68,7 +78,7 @@ describe('ModuleItemsStore', () => {
 
       it('should update pageNumber in existing data', () => {
         localStorage.setItem(composedKey, '{"p": "1"}')
-        store.setPageNumber(moduleId, '3')
+        store.setPageNumber(moduleId, 3)
         const item = localStorage.getItem(composedKey)
         expect(item).not.toBeNull()
         expect(JSON.parse(item as string).p).toBe('3')
@@ -77,9 +87,48 @@ describe('ModuleItemsStore', () => {
       it('should handle existing invalid JSON in localStorage for pageNumber', () => {
         // Initial invalid JSON
         localStorage.setItem(composedKey, 'invalid JSON')
-        store.setPageNumber(moduleId, '1')
+        store.setPageNumber(moduleId, 1)
         const data = JSON.parse(localStorage.getItem(composedKey) || '{}')
         expect(data.p).toBe('1')
+      })
+
+      it('should handle when localStorage is not available', () => {
+        const originalLocalStorage = global.localStorage
+        // @ts-expect-error
+        delete global.localStorage
+
+        expect(() => {
+          store.setPageNumber(moduleId, 2)
+        }).not.toThrow()
+
+        global.localStorage = originalLocalStorage
+      })
+    })
+
+    describe('delete', () => {
+      it('should remove the pageNumber from localStorage', () => {
+        localStorage.setItem(composedKey, '{"p": "2"}')
+        store.removePageNumber(moduleId)
+        const data = JSON.parse(localStorage.getItem(composedKey) || '{}')
+        expect(data.p).toBeUndefined()
+      })
+
+      it('should handle deleting pageNumber when no data exists', () => {
+        store.removePageNumber(moduleId)
+        const data = JSON.parse(localStorage.getItem(composedKey) || '{}')
+        expect(data.p).toBeUndefined()
+      })
+
+      it('should handle when localStorage is not available', () => {
+        const originalLocalStorage = global.localStorage
+        // @ts-expect-error
+        delete global.localStorage
+
+        expect(() => {
+          store.removePageNumber(moduleId)
+        }).not.toThrow()
+
+        global.localStorage = originalLocalStorage
       })
     })
   })
@@ -101,6 +150,18 @@ describe('ModuleItemsStore', () => {
         localStorage.setItem(composedKey, 'invalid JSON')
         const result = store.getShowAll(moduleId)
         expect(result).toBe(DEFAULT_SHOW_ALL)
+      })
+
+      it('should handle when localStorage is not available', () => {
+        const originalLocalStorage = global.localStorage
+        // @ts-expect-error
+        delete global.localStorage
+
+        expect(() => {
+          store.getShowAll(moduleId)
+        }).not.toThrow()
+
+        global.localStorage = originalLocalStorage
       })
     })
 
@@ -124,6 +185,18 @@ describe('ModuleItemsStore', () => {
         store.setShowAll(moduleId, true)
         const data = JSON.parse(localStorage.getItem(composedKey) || '{}')
         expect(data.s).toBe(true)
+      })
+
+      it('should handle when localStorage is not available', () => {
+        const originalLocalStorage = global.localStorage
+        // @ts-expect-error
+        delete global.localStorage
+
+        expect(() => {
+          store.setShowAll(moduleId, true)
+        }).not.toThrow()
+
+        global.localStorage = originalLocalStorage
       })
     })
   })

@@ -30,7 +30,9 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :lti_notice_handlers, class_name: "Lti::NoticeHandler"
   has_many :lti_asset_processors, class_name: "Lti::AssetProcessor"
   has_many :lti_asset_processor_eula_acceptances, class_name: "Lti::AssetProcessorEulaAcceptance", inverse_of: :context_external_tool, dependent: :destroy
-  has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :deployment
+  has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :deployment, dependent: :destroy
+
+  has_one :estimated_duration, dependent: :destroy, inverse_of: :external_tool
 
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
@@ -52,6 +54,8 @@ class ContextExternalTool < ActiveRecord::Base
   validate :url_or_domain_is_set
   validate :validate_urls
   attr_reader :config_type, :config_url, :config_xml
+
+  accepts_nested_attributes_for :estimated_duration, allow_destroy: true
 
   # handles both serialized Hashes and HashWithIndifferentAccesses
   # and always returns a HashWithIndifferentAccess
@@ -84,6 +88,8 @@ class ContextExternalTool < ActiveRecord::Base
 
   scope :disabled, -> { where(workflow_state: DISABLED_STATE) }
   scope :quiz_lti, -> { where(tool_id: QUIZ_LTI) }
+  scope :lti_1_3, -> { where(lti_version: "1.3") }
+  scope :lti_1_1, -> { where(lti_version: "1.1") }
 
   STANDARD_EXTENSION_KEYS = [
     :canvas_icon_class,
@@ -893,6 +899,10 @@ class ContextExternalTool < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
+    # update all the associated context_control's workflow_state to deleted
+    Lti::ContextControl
+      .where(deployment_id: id)
+      .update_all(workflow_state: "deleted")
     save!
   end
 
@@ -978,8 +988,8 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def check_for_duplication(verify_uniqueness)
-    if duplicated_in_context? && verify_uniqueness
+  def check_for_duplication
+    if duplicated_in_context?
       errors.add(:tool_currently_installed, "The tool is already installed in this context.")
     end
   end

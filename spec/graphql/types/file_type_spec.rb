@@ -27,7 +27,9 @@ describe Types::FileType do
   end
   let_once(:student) { student_in_course(course: @course) }
   let_once(:file) { attachment_with_context(course) }
-  let(:file_type) { GraphQLTypeTester.new(file, current_user: @teacher) }
+  let(:file_type) do
+    GraphQLTypeTester.new(file, current_user: @teacher, in_app: true, domain_root_account: Account.default)
+  end
 
   it "has display name" do
     expect(file_type.resolve("displayName")).to eq file.display_name
@@ -60,6 +62,22 @@ describe Types::FileType do
     expect(
       file_type.resolve("url", request: ActionDispatch::TestRequest.create, current_user: @student)
     ).to eq "http://test.host/files/#{file.id}/download?download_frd=1"
+  end
+
+  it "returns a verifier in the url unless the disable_adding_uuid_verifier_in_api flag is on" do
+    file.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
+    uuid = file.uuid
+    expect(
+      file_type.resolve("url", request: ActionDispatch::TestRequest.create, current_user: @student)
+    ).to include("verifier=#{uuid}")
+  end
+
+  it "does not return a verifier in the url if the disable_adding_uuid_verifier_in_api flag is on" do
+    file.root_account.enable_feature!(:disable_adding_uuid_verifier_in_api)
+    uuid = file.uuid
+    expect(
+      file_type.resolve("url", request: ActionDispatch::TestRequest.create, current_user: @student)
+    ).not_to include("verifier=#{uuid}")
   end
 
   it "returns nil for the url if the file is locked" do

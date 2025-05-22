@@ -27,6 +27,7 @@ const setupFilesAfterEnv = process.env.LOG_PLAYGROUND_URL_ON_FAILURE
   : baseSetupFilesAfterEnv
 
 module.exports = {
+  randomize: true,
   testRunner: process.env.LOG_PLAYGROUND_URL_ON_FAILURE && 'jest-circus/runner',
   moduleNameMapper: {
     '\\.svg$': '<rootDir>/jest/imageMock.js',
@@ -56,11 +57,17 @@ module.exports = {
         outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage-js/junit-reports',
         outputName: 'jest.xml',
         addFileAttribute: 'true',
+        stripAnsi: true,
       },
     ],
   ],
   snapshotSerializers: ['enzyme-to-json/serializer'],
-  setupFiles: ['jest-localstorage-mock', 'jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
+  setupFiles: [
+    'jest-localstorage-mock',
+    'jest-canvas-mock',
+    '<rootDir>/jest/jest-setup.js',
+    '<rootDir>/jest/punycodeWarningFilter.js',
+  ],
   setupFilesAfterEnv: setupFilesAfterEnv,
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
 
@@ -95,7 +102,21 @@ module.exports = {
     '^.+\\.(j|t)sx?$': [
       '@swc/jest',
       {
-        jsc: swc[1].use.options.jsc,
+        jsc: {
+          ...swc[1].use.options.jsc,
+          transform: {
+            ...swc[1].use.options.jsc.transform,
+            react: {
+              ...swc[1].use.options.jsc.transform.react,
+              runtime: 'automatic',
+              // These are `process.env.NODE_ENV === 'development'` in the webpack config
+              // but Jest doesn't set that env var until after this file is loaded, so
+              // we need to set it manually here.
+              development: false,
+              refresh: false,
+            },
+          },
+        },
       },
     ],
   },

@@ -105,6 +105,22 @@ describe WikiPagesApiController, type: :request do
           end
         end
 
+        context "when the page is in a horizon course" do
+          before :once do
+            @course.update! horizon_course: true
+            account = @course.account
+            account.enable_feature!(:horizon_course_setting)
+            account.horizon_account = true
+            account.save!
+          end
+
+          it "allows setting estimated duration" do
+            estimated_duration_attributes = { minutes: 5 }
+            create_wiki_page(@teacher, { title: "New Page", estimated_duration_attributes: })
+            expect(WikiPage.last.estimated_duration.duration).to eq 5.minutes
+          end
+        end
+
         context "when the user does not have manage_wiki_update permission" do
           before :once do
             teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)

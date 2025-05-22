@@ -33,6 +33,7 @@ export interface ModuleProps {
   requirementCount?: number
   dragHandleProps?: any
   expanded?: boolean
+  hasActiveOverrides: boolean
   onToggleExpand?: (id: string) => void
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
@@ -49,6 +50,7 @@ const Module: React.FC<ModuleProps> = ({
   requirementCount,
   dragHandleProps,
   expanded: propExpanded,
+  hasActiveOverrides,
   onToggleExpand,
   setModuleAction,
   setIsManageModuleContentTrayOpen,
@@ -100,6 +102,7 @@ const Module: React.FC<ModuleProps> = ({
             requirementCount={requirementCount || 0}
             dragHandleProps={dragHandleProps}
             itemCount={data?.moduleItems?.length || 0}
+            hasActiveOverrides={hasActiveOverrides}
             setModuleAction={setModuleAction}
             setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
             setSourceModule={setSourceModule}

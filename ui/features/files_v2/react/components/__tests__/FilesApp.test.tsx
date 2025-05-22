@@ -24,7 +24,7 @@ import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
 import {createMemoryRouter, RouterProvider} from 'react-router-dom'
 import {FAKE_FOLDERS} from '../../../fixtures/fakeData'
-import {NotFoundError} from '../../hooks/useGetFolders'
+import {NotFoundError} from '../../../utils/apiUtils'
 import {resetAndGetFilesEnv} from '../../../utils/filesEnvUtils'
 import {createFilesContexts} from '../../../fixtures/fileContexts'
 

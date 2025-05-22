@@ -80,7 +80,11 @@ module Types
         host: context[:request].host_with_port,
         protocol: context[:request].protocol
       }
-      opts[:verifier] = object.uuid if context[:in_app]
+
+      unless context[:domain_root_account]&.feature_enabled?(:disable_adding_uuid_verifier_in_api)
+        opts[:verifier] = object.uuid if context[:in_app]
+      end
+
       GraphQLHelpers::UrlHelpers.file_download_url(object, opts)
     end
 

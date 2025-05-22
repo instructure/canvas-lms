@@ -78,7 +78,7 @@ class GroupMembership < ActiveRecord::Base
     p.dispatch :new_context_group_membership
     p.to { user }
     p.whenever do |record|
-      record.just_created &&
+      record.previously_new_record? &&
         record.accepted? &&
         record.group &&
         record.group.context_available? &&
@@ -90,7 +90,7 @@ class GroupMembership < ActiveRecord::Base
     p.dispatch :new_context_group_membership_invitation
     p.to { user }
     p.whenever do |record|
-      record.just_created &&
+      record.previously_new_record? &&
         record.invited? &&
         record.group &&
         record.group.context_available? &&
@@ -113,7 +113,7 @@ class GroupMembership < ActiveRecord::Base
     p.to { group.context.participating_admins }
     p.whenever do |record|
       record.group.context.is_a?(Course) &&
-        record.just_created &&
+        record.previously_new_record? &&
         record.group.group_memberships.count == 1 &&
         record.group.student_organized?
     end

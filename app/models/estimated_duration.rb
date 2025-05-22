@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -25,6 +25,7 @@ class EstimatedDuration < ActiveRecord::Base
   belongs_to :discussion_topic, inverse_of: :estimated_duration, optional: true
   belongs_to :attachment, inverse_of: :estimated_duration, optional: true
   belongs_to :content_tag, inverse_of: :estimated_duration, optional: true
+  belongs_to :external_tool, class_name: "ContextExternalTool", inverse_of: :estimated_duration, optional: true
 
   before_create :set_root_account_id
 
@@ -32,7 +33,7 @@ class EstimatedDuration < ActiveRecord::Base
   validate :exactly_one_reference_present
 
   def overridable
-    assignment || quiz || content_tag || discussion_topic || wiki_page || attachment
+    assignment || quiz || content_tag || discussion_topic || wiki_page || attachment || external_tool
   end
 
   def set_root_account_id
@@ -40,9 +41,13 @@ class EstimatedDuration < ActiveRecord::Base
   end
 
   def exactly_one_reference_present
-    references = [assignment, quiz, wiki_page, discussion_topic, attachment, content_tag]
+    references = [assignment, quiz, wiki_page, discussion_topic, attachment, content_tag, external_tool]
     if references.compact.size != 1
       errors.add(:base, "Exactly one reference must be present.")
     end
+  end
+
+  def minutes=(minutes)
+    self.duration = "PT#{minutes}M"
   end
 end

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState, useMemo, useCallback, useEffect} from 'react'
+import React, {useState, useMemo, useCallback, useEffect, useRef} from 'react'
 import pandasBalloonUrl from '../images/pandasBalloon.svg'
 import {Tray} from '@instructure/ui-tray'
 import {Flex} from '@instructure/ui-flex'
@@ -101,6 +101,15 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 4
+  const addTagRef = useRef<HTMLElement | null>(null)
+  const focusElRef = useRef<(HTMLElement | null)[]>([])
+  const [focusIndex, setFocusIndex] = useState<number | null>(null)
+
+  const setAddTagRef = useCallback((el: Element | null) => {
+    if (el instanceof HTMLElement) {
+      addTagRef.current = el
+    }
+  }, [])
 
   useEffect(() => {
     setCurrentPage(1)
@@ -111,6 +120,15 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
     setSelectedCategoryId(undefined)
     setIsModalOpen(true)
   }
+
+  useEffect(() => {
+    if (focusIndex === -1) {
+      addTagRef.current?.focus()
+      setFocusIndex(null)
+    } else if (focusIndex !== null) {
+      focusElRef.current[focusIndex]?.focus()
+    }
+  }, [focusIndex])
 
   // Filter categories based on the search term.
   const filteredCategories = useMemo(() => {
@@ -142,10 +160,18 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
   }, [])
 
   const categoryCards = useMemo(() => {
-    return paginatedCategories.map(category => (
-      <TagCategoryCard key={category.id} category={category} onEditCategory={handleEditCategory} />
+    return paginatedCategories.map((category, index) => (
+      <TagCategoryCard
+        key={category.id}
+        category={category}
+        onEditCategory={handleEditCategory}
+        focusElRef={focusElRef}
+        onDeleteFocusFallback={() =>
+          setFocusIndex((index >= 1 && paginatedCategories[index - 1]?.id) || -1)
+        }
+      />
     ))
-  }, [paginatedCategories, handleEditCategory])
+  }, [paginatedCategories, handleEditCategory, focusElRef])
 
   const handlePageChange = useCallback((newPage: number) => {
     setCurrentPage(newPage)
@@ -173,7 +199,12 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
                 />
               </Flex.Item>
               <Flex.Item overflowX="visible" overflowY="visible">
-                <Button onClick={handleCreateNewTag} color="primary" margin="x-small none">
+                <Button
+                  onClick={handleCreateNewTag}
+                  color="primary"
+                  margin="x-small none"
+                  elementRef={setAddTagRef}
+                >
                   {I18n.t('+ Tag')}
                 </Button>
               </Flex.Item>

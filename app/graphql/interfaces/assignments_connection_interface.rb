@@ -32,6 +32,11 @@ module Interfaces::AssignmentsConnectionInterface
       assignments = assignments.where(Assignment.wildcard(:title, search_term))
     end
 
+    # Apply hide_in_gradebook filter if the feature flag is enabled
+    if Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option)
+      assignments = assignments.not_hidden_in_gradebook
+    end
+
     if grading_period_id
       assignments
         .joins(:submissions)

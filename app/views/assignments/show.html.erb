@@ -147,6 +147,9 @@
         <%= assignment_submission_button(@assignment, @current_user, @current_user_submission, @first_annotation_submission) %>
       </div>
     </div>
+    <% if @domain_root_account&.feature_enabled?(:lti_asset_processor) %>
+      <div id="assignment_asset_processor_eula"></div>
+    <% end %>
     <%= render "student_assignment_overview" %>
   <% end %>
 
@@ -162,7 +165,7 @@
   <div id="assignment_external_tools"></div>
   <% end %>
 
-  <% description = @assignment.description.present? ? public_user_content(@assignment.description, location: (@assignmen.asset_string if @domain_root_account.feature_enabled?(:file_association_access))) : t("No additional details were added for this assignment.") %>
+  <% description = @assignment.description.present? ? public_user_content(@assignment.description, location: (@assignment.asset_string if @domain_root_account.feature_enabled?(:file_association_access))) : t("No additional details were added for this assignment.") %>
 
   <% if @assignment.annotated_document? %>
     <div class="accessibility_warning">

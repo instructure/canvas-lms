@@ -317,10 +317,24 @@ describe "assignment rubrics" do
       f(".assess_submission_link").click
       wait_for_ajaximations
       check_element_has_focus(f(".hide_rubric_link"))
-      expect(f(".save_rubric_button").enabled?).to be_falsey
       f(".hide_rubric_link").click
       wait_for_ajaximations
       check_element_has_focus(f(".assess_submission_link"))
+    end
+
+    it "blocks rubric submission if comment is empty", priority: "2" do
+      student_in_course(active_all: true)
+      outcome_with_rubric
+      @assignment = @course.assignments.create(name: "assignment with rubric")
+      @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+      @submission = @assignment.submit_homework(@student, { url: "http://www.instructure.com/" })
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+      wait_for_ajaximations
+      f(".assess_submission_link").click
+      wait_for_ajaximations
+      f("button[data-testid=\"add-comment-button\"]").click
+      f(".save_rubric_button").click
+      expect(ff('[class="error-message"]')[0].text).to eq "A comment is required."
     end
 
     it "allows multiple rubric associations for grading", priority: "1" do

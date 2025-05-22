@@ -28,7 +28,7 @@ type FetchErrorProps = {
   retryCallback: () => void
 }
 
-export const FetchError = ({ retryCallback } : FetchErrorProps) => {
+export const FetchError = ({retryCallback}: FetchErrorProps) => {
   return (
     <Alert variant="error" data-testid="items-failed-to-load">
       <Flex justifyItems="space-between">

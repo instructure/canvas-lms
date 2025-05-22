@@ -65,6 +65,7 @@ class WikiPage < ActiveRecord::Base
   has_one :estimated_duration, dependent: :destroy, inverse_of: :wiki_page
 
   accepts_nested_attributes_for :block_editor, allow_destroy: true
+  accepts_nested_attributes_for :estimated_duration, allow_destroy: true
   acts_as_url :title, sync_url: true
 
   validate :validate_front_page_visibility

@@ -22,6 +22,7 @@
 class Lti::AssetReport < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
+  self.ignored_columns += %i[score_given score_maximum]
 
   resolves_root_account through: :asset_processor
 
@@ -78,12 +79,8 @@ class Lti::AssetReport < ApplicationRecord
             },
             if: -> { !deleted? }
   validates :title, length: { minimum: 1, maximum: 1.kilobyte }, allow_nil: true
+  validates :result, length: { maximum: 255 }, allow_nil: true
   validates :comment, length: { minimum: 1, maximum: 64.kilobytes }, allow_nil: true
-  validates :score_given, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :score_maximum, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :score_maximum,
-            presence: { message: I18n.t("must be present if score_given is present") },
-            if: -> { score_given.present? }
   # For now, spec implies must be a hex code if present
   validates :indication_color,
             format: { with: /\A#[0-9a-fA-F]{6}\z/, message: I18n.t("Indication color must be a valid hex code") },
@@ -91,6 +88,7 @@ class Lti::AssetReport < ApplicationRecord
   validates :indication_alt, length: { minimum: 1, maximum: 1024 }, allow_nil: true
   validates :error_code, length: { minimum: 1, maximum: 1024 }, allow_nil: true
   validates :priority, inclusion: { in: PRIORITIES }
+  validates :processing_progress, presence: true
 
   validate :validate_extensions
   validate :validate_asset_compatible_with_processor
@@ -122,14 +120,15 @@ class Lti::AssetReport < ApplicationRecord
       id:,
       title:,
       comment:,
-      score_given:,
-      score_maximum:,
-      indication_color:,
-      indication_alt:,
-      error_code:,
-      processing_progress:,
+      result:,
+      resultTruncated: result_truncated,
+      indicationColor: indication_color,
+      indicationAlt: indication_alt,
+      errorCode: error_code,
+      processingProgress: processing_progress,
       priority:,
-      launch_url_path:,
+      launchUrlPath: launch_url_path,
+      resubmitUrlPath: resubmit_url_path,
     }.compact
   end
 
@@ -140,6 +139,27 @@ class Lti::AssetReport < ApplicationRecord
       asset_processor_id: lti_asset_processor_id,
       report_id: id
     )
+  end
+
+  def resubmit_url_path
+    return nil unless resubmit_available?
+
+    Rails.application.routes.url_helpers.lti_asset_processor_notice_resubmit_path(
+      asset_processor_id: lti_asset_processor_id,
+      student_id: asset.submission.user_id
+    )
+  end
+
+  def resubmit_available?
+    processing_progress == PROGRESS_PENDING_MANUAL ||
+      (processing_progress == PROGRESS_FAILED && [ERROR_CODE_EULA_NOT_ACCEPTED, ERROR_CODE_DOWNLOAD_FAILED].include?(error_code))
+  end
+
+  def result_truncated
+    return nil unless result.is_a?(String) && result.present?
+    return nil if result.length <= 16
+
+    "#{result.first(15)}…"
   end
 
   # Returns all reports for the given asset processor and submission IDs.

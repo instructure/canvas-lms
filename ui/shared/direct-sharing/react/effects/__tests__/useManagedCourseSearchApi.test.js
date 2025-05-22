@@ -19,6 +19,7 @@
 import fetchMock from 'fetch-mock'
 import {renderHook} from '@testing-library/react-hooks/dom'
 import useManagedCourseSearchApi from '../useManagedCourseSearchApi'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 function setupManagedCoursesResponse() {
   const response = [
@@ -37,15 +38,21 @@ function setupManagedCoursesResponse() {
 
 const defaultEnv = {
   current_user_roles: ['user', 'teacher'],
+  current_user_is_admin: false,
 }
 
 describe('useManagedCourseSearchApi', () => {
   beforeEach(() => {
-    global.ENV = defaultEnv
+    // Setup fakeENV with default values
+    fakeENV.setup(defaultEnv)
+
+    // Reset fetchMock to ensure clean state
+    fetchMock.restore()
   })
 
   afterEach(() => {
-    global.ENV = {}
+    // Properly teardown fakeENV
+    fakeENV.teardown()
     fetchMock.restore()
   })
 
@@ -93,18 +100,43 @@ describe('useManagedCourseSearchApi', () => {
   })
 
   describe('when user is a teacher', () => {
+    beforeEach(() => {
+      // Setup fakeENV with teacher role and ensure admin flag is false
+      fakeENV.setup({
+        current_user_roles: ['user', 'teacher'],
+        current_user_is_admin: false,
+      })
+
+      // Reset fetchMock to ensure clean state
+      fetchMock.restore()
+    })
+
     it('makes network request when search term is not included', async () => {
+      // Setup the mock response
       setupManagedCoursesResponse()
-      renderHook(useManagedCourseSearchApi)
+
+      // Render the hook with no parameters
+      renderHook(() => useManagedCourseSearchApi())
+
+      // Wait for all fetch calls to complete
       await fetchMock.flush(true)
+
+      // Verify a network request was made
       expect(fetchMock.calls()).toHaveLength(1)
+      expect(fetchMock.lastCall()[0]).toBe('/users/self/manageable_courses')
     })
   })
 
   describe('when user is an admin', () => {
     beforeEach(() => {
-      global.ENV.current_user_roles.push('admin')
-      global.ENV.current_user_is_admin = true
+      // Setup fakeENV with admin role and flag
+      fakeENV.setup({
+        current_user_roles: ['user', 'teacher', 'admin'],
+        current_user_is_admin: true,
+      })
+
+      // Reset fetchMock to ensure clean state
+      fetchMock.restore()
     })
 
     it('does not make network request if search term is not included', async () => {

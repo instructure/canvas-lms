@@ -157,13 +157,9 @@ h3 .tally {
       </label>
     </td>
     <td>
-      <%= f.text_field :start_at,
-                       class: "datetime_field",
-                       value: datetime_string(@section.start_at),
-                       style: 'width: 120px;',
-                       "aria-labelledby" => "section_starts_at_label",
-                       "data-tooltip" => "",
-                       title: accessible_date_format %>
+      <%= hidden_field_tag :start_datetime_value, @section.start_at ? @section.start_at.iso8601 : "" %>
+      <%# Mount point for Start Date React Component %>
+      <div id="course_section_start_datetime_input"></div>
     </td>
   </tr>
   <tr>
@@ -175,15 +171,9 @@ h3 .tally {
       </label>
     </td>
     <td>
-      <%= f.text_field :end_at,
-                       class: "datetime_field",
-                       value: datetime_string(@section.end_at),
-                       style: 'width: 120px;',
-                       "aria-labelledby" => "section_ends_at_label",
-                       "aria-describedby" => "course_section_end_at_errors",
-                       "data-tooltip" => "",
-                       title: accessible_date_format %>
-      <div id="course_section_end_at_errors"></div>
+      <%= hidden_field_tag :end_datetime_value, @section.end_at ? @section.end_at.iso8601 : "" %>
+      <%# Mount point for End Date React Component %>
+      <div id="course_section_end_datetime_input"></div>
     </td>
   </tr>
   <tr>

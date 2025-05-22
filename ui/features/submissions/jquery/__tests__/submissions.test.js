@@ -26,8 +26,19 @@ import {waitFor} from '@testing-library/dom'
 
 describe('submissions', () => {
   beforeEach(async () => {
-    // Mock jQuery's ajaxJSON method
-    $.ajaxJSON = jest.fn()
+    // Mock jQuery's ajaxJSON method with a proper implementation that returns a mock promise
+    $.ajaxJSON = jest.fn().mockImplementation(() => ({
+      // Mock the jQuery promise-like object
+      done: jest.fn().mockReturnThis(),
+      fail: jest.fn().mockReturnThis(),
+      always: jest.fn().mockReturnThis(),
+      then: jest.fn().mockReturnThis(),
+      catch: jest.fn().mockReturnThis(),
+      pipe: jest.fn().mockReturnThis(),
+      promise: jest.fn().mockReturnThis(),
+      state: jest.fn().mockReturnThis(),
+      statusCode: jest.fn().mockReturnThis(),
+    }))
 
     fakeENV.setup()
     window.ENV.SUBMISSION = {
@@ -117,9 +128,14 @@ describe('submissions', () => {
   })
 
   test('comment_change submits the grading_comment but not grade', async () => {
+    // Reset the mock to ensure clean state for this test
+    $.ajaxJSON.mockClear()
+
+    // Set the comment value and trigger the save
     $('.grading_comment').val('Hello again.')
     $('.save_comment_button').click()
 
+    // Verify the AJAX call was made correctly
     expect($.ajaxJSON).toHaveBeenCalledTimes(1)
     expect($.ajaxJSON).toHaveBeenCalledWith(
       expect.any(String),
@@ -132,6 +148,7 @@ describe('submissions', () => {
       expect.any(Function),
     )
 
+    // Check that grade was not included in the form data
     const [, , formData] = $.ajaxJSON.mock.calls[0]
     expect(formData).not.toHaveProperty('submission[grade]')
   })

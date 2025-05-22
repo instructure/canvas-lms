@@ -237,14 +237,14 @@ module Interfaces::SubmissionInterface
         method: :excused?,
         null: true
 
-  field :submitted_at, Types::DateTimeType, null: true
-  field :graded_at, Types::DateTimeType, null: true
-  field :posted_at, Types::DateTimeType, null: true
   field :cached_due_date, Types::DateTimeType, null: true
-  field :seconds_late, Float, null: true
+  field :graded_at, Types::DateTimeType, null: true
   field :posted, Boolean, method: :posted?, null: false
-  field :state, Types::SubmissionStateType, method: :workflow_state, null: false
+  field :posted_at, Types::DateTimeType, null: true
   field :redo_request, Boolean, null: true
+  field :seconds_late, Float, null: true
+  field :state, Types::SubmissionStateType, method: :workflow_state, null: false
+  field :submitted_at, Types::DateTimeType, null: true
 
   field :has_postable_comments, Boolean, null: false
   def has_postable_comments # rubocop:disable Naming/PredicateName
@@ -285,13 +285,13 @@ module Interfaces::SubmissionInterface
     Loaders::LastCommentedByUserAtLoader.for(current_user:).load(submission.id)
   end
 
-  field :late_policy_status, LatePolicyStatusType, null: true
-  field :late, Boolean, method: :late?, null: true
-  field :missing, Boolean, method: :missing?, null: true
   field :grade_matches_current_submission,
         Boolean,
         "was the grade given on the current submission (resubmission)",
         null: true
+  field :late, Boolean, method: :late?, null: true
+  field :late_policy_status, LatePolicyStatusType, null: true
+  field :missing, Boolean, method: :missing?, null: true
   field :submission_type, Types::AssignmentSubmissionType, null: true
 
   field :attachment, Types::FileType, null: true

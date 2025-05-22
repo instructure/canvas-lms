@@ -23,7 +23,7 @@ module Accessibility
       attr_accessor :id, :link
 
       def registry
-        [
+        rules = [
           Accessibility::Rules::AdjacentLinksRule,
           Accessibility::Rules::HeadingsSequenceRule,
           Accessibility::Rules::HeadingsStartAtH2Rule,
@@ -38,41 +38,30 @@ module Accessibility
           Accessibility::Rules::TableHeaderRule,
           Accessibility::Rules::TableHeaderScopeRule
         ]
+
+        rules.index_by(&:id)
       end
 
       # Tests if an element passes this accessibility rule
       # @param elem [Nokogiri::XML::Element] The element to test
       # @return [Boolean] True if the element passes, false if there's an issue
       def test(elem)
-        raise NotImplementedError, "#{self} must implement test"
-      end
-
-      # Gets data needed for rendering and correcting the issue
-      # @param _elem [Nokogiri::XML::Element] The element that failed the test
-      # @return [Hash] Data describing the issue
-      def data(_elem)
-        {}
+        raise NotImplementedError, "#{self} must implement/override test"
       end
 
       # Gets a form definition for correcting the issue
-      # @return [Array<FormField>] Form fields for correcting the issue
-      def form
-        []
+      # @param _elem [Nokogiri::XML::Element] The element in the content to fix
+      # @return [FormField] Form field for correcting the issue
+      def form(_elem)
+        {}
       end
 
-      # Updates an element to fix accessibility issues
-      # @param _elem [Nokogiri::XML::Element] The element to update
-      # @param _data [Hash] Data from the form submission
+      # Fixes the issue in content, returning the updated element
+      # @param _elem [Nokogiri::XML::Element] The element in the content to fix
+      # @param _value [String] The value received back from the correction form
       # @return [Nokogiri::XML::Element] The updated element
-      def update(_elem, _data)
-        raise NotImplementedError, "#{self} must implement update"
-      end
-
-      # Gets the root node for this rule's updates
-      # @param elem [Nokogiri::XML::Element] The original element
-      # @return [Nokogiri::XML::Element] The root element for updates
-      def root_node(elem)
-        elem
+      def fix(_elem, _value)
+        raise NotImplementedError, "#{self} must implement fix"
       end
 
       # Gets the message for users about this rule
@@ -84,13 +73,13 @@ module Accessibility
       # Gets the explanation of why this issue is important
       # @return [String] The explanation of the issue
       def why
-        raise NotImplementedError, "#{self} must implement why"
+        raise NotImplementedError, "#{self} must implement/override why"
       end
 
       # Gets text for the link to documentation
       # @return [String] The link text
       def link_text
-        I18n.t("Learn more")
+        ""
       end
     end
   end

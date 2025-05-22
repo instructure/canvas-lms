@@ -3,13 +3,13 @@
 exports[`ProficiencyRating can not manage renders the ProficiencyRating component 1`] = `
 <div>
   <span
-    class="css-19ccdvz-view--flex-flex"
+    class="css-z9i8tq-view--flex-flex"
     dir="ltr"
     direction="row"
     wrap="no-wrap"
   >
     <span
-      class="css-1rpx839-view-flexItem"
+      class="css-1xez2b2-view-flexItem"
       dir="ltr"
     >
       <div
@@ -17,7 +17,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
       />
     </span>
     <span
-      class="css-oq8bbm-view-flexItem"
+      class="css-1333inx-view-flexItem"
       dir="ltr"
     >
       <div
@@ -42,14 +42,14 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
       </div>
     </span>
     <span
-      class="css-e8lrz5-view-flexItem"
+      class="css-15mppfp-view-flexItem"
       dir="ltr"
     >
       <div
         class="points"
       >
         <span
-          class="css-p03wbd-view"
+          class="css-k7j00b-view"
           dir="ltr"
         >
           <span
@@ -71,7 +71,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
       </div>
     </span>
     <span
-      class="css-jx4x1f-view-flexItem"
+      class="css-2lonl-view-flexItem"
       dir="ltr"
     >
       <div

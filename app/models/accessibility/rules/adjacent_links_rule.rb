@@ -56,6 +56,13 @@ module Accessibility
       def self.root_node(elem)
         elem.parent_node
       end
+
+      def self.form(_elem)
+        Accessibility::Forms::CheckboxField.new(
+          label: "Merge links",
+          value: "false"
+        )
+      end
     end
   end
 end

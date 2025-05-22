@@ -105,6 +105,7 @@ class LearningObjectDatesController < ApplicationController
   include Api::V1::Assignment
   include Api::V1::AssignmentOverride
   include SubmittableHelper
+  include DifferentiationTag
 
   OBJECTS_WITH_ASSIGNMENTS = %w[DiscussionTopic WikiPage].freeze
 
@@ -214,6 +215,19 @@ class LearningObjectDatesController < ApplicationController
     when "Attachment"
       update_ungraded_object(asset, object_update_params)
     end
+  end
+
+  def convert_tag_overrides_to_adhoc_overrides
+    errors = OverrideConverterService.convert_tags_to_adhoc_overrides_for(
+      learning_object: asset,
+      course: @context
+    )
+
+    if errors
+      return render json: { errors: }, status: :bad_request
+    end
+
+    head :no_content
   end
 
   private

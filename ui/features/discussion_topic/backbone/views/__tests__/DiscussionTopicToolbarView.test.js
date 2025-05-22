@@ -19,9 +19,7 @@
 import $ from 'jquery'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
 import DiscussionTopicToolbarView from '../DiscussionTopicToolbarView'
-
-const ok = x => expect(x).toBeTruthy()
-const strictEqual = (x, y) => expect(x).toStrictEqual(y)
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
@@ -40,13 +38,28 @@ let info
 
 describe('DiscussionTopicToolbarView', () => {
   beforeEach(() => {
+    // Setup with default ENV values
+    fakeENV.setup({
+      disable_keyboard_shortcuts: false,
+    })
+
+    // Reset the DOM fixture
     $('#fixtures').html(fixture)
+
+    // Initialize the view
     view = new DiscussionTopicToolbarView({el: '#discussion-topic-toolbar'})
     info = view.$('#keyboard-shortcut-modal-info .accessibility-warning')
   })
 
   afterEach(() => {
+    // Clean up the view
+    view.remove()
+
+    // Clean up the DOM
     $('#fixtures').empty()
+
+    // Reset the ENV
+    fakeENV.teardown()
   })
 
   test('it should be accessible', function (done) {
@@ -54,26 +67,46 @@ describe('DiscussionTopicToolbarView', () => {
   })
 
   test('keyboard shortcut modal info shows when it has focus', function () {
-    ok(info.css('display') === 'none')
+    // Initial state check
+    expect(info.css('display')).toBe('none')
+
+    // Trigger focus event
     view.$('#keyboard-shortcut-modal-info').focus()
-    ok(info.css('display') !== 'none')
+
+    // Check that the warning is now visible
+    expect(info.css('display')).not.toBe('none')
   })
 
   test('keyboard shortcut modal info hides when it loses focus', function () {
+    // First focus to make it visible
     view.$('#keyboard-shortcut-modal-info').focus()
-    ok(info.css('display') !== 'none')
+    expect(info.css('display')).not.toBe('none')
+
+    // Then blur to hide it
     view.$('#keyboard-shortcut-modal-info').blur()
-    ok(info.css('display') === 'none')
+    expect(info.css('display')).toBe('none')
   })
 
   test('keyboard shortcut modal stays hidden when setting disabled', function () {
-    // Stubbing Feature Flag
-    try {
-      window.ENV.disable_keyboard_shortcuts = true
-      view.$('#keyboard-shortcut-modal-info').focus()
-      strictEqual(info.css('display'), 'none')
-    } finally {
-      window.ENV.DISABLE_KEYBOARD_SHORTCUTS = undefined
-    }
+    // Teardown the previous ENV setup
+    fakeENV.teardown()
+
+    // Setup with the feature flag disabled
+    fakeENV.setup({
+      disable_keyboard_shortcuts: true,
+    })
+
+    // Reset the DOM fixture to ensure a clean state
+    $('#fixtures').empty().html(fixture)
+
+    // Re-initialize the view to pick up the new ENV setting
+    view = new DiscussionTopicToolbarView({el: '#discussion-topic-toolbar'})
+    info = view.$('#keyboard-shortcut-modal-info .accessibility-warning')
+
+    // Try to make it visible by focusing
+    view.$('#keyboard-shortcut-modal-info').focus()
+
+    // It should remain hidden
+    expect(info.css('display')).toBe('none')
   })
 })

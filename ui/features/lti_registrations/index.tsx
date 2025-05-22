@@ -43,7 +43,7 @@ import type {InheritedKeyService} from './manage/inherited_key_registration_wiza
 import type {Lti1p3RegistrationWizardService} from './manage/lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 import {type AccountId, ZAccountId} from './manage/model/AccountId'
 import {ToolDetails} from './manage/pages/tool_details/ToolDetails'
-import {ToolAccess} from './manage/pages/tool_details/access/ToolAccess'
+import {ToolAvailability} from './manage/pages/tool_details/availability/ToolAvailability'
 import {ToolConfigurationView} from './manage/pages/tool_details/configuration/ToolConfigurationView'
 import {ToolHistory} from './manage/pages/tool_details/history/ToolHistory'
 import {ToolUsage} from './manage/pages/tool_details/usage/ToolUsage'
@@ -52,6 +52,7 @@ import {RegistrationWizardModal} from './manage/registration_wizard/Registration
 import {route as MonitorRoute} from './monitor/route'
 import {isLtiRegistrationsUsageEnabled} from './monitor/utils'
 import {ToolConfigurationEdit} from './manage/pages/tool_details/configuration/ToolConfigurationEdit'
+import {fetchControlsByDeployment} from './manage/api/contextControls'
 
 const accountId = ZAccountId.parse(window.ENV.ACCOUNT_ID)
 
@@ -89,12 +90,12 @@ const router = createBrowserRouter(
           path: 'product_detail/:id',
           element: (
             <ProductDetail
-              renderConfigureButton={(buttonWidth, ltiConfiguration) => {
+              renderConfigureButton={(buttonWidth, product) => {
                 return (
                   <ProductConfigureButton
                     accountId={accountId}
                     buttonWidth={buttonWidth}
-                    ltiConfiguration={ltiConfiguration}
+                    product={product}
                   />
                 )
               }}
@@ -107,7 +108,12 @@ const router = createBrowserRouter(
           children: [
             {
               path: '',
-              element: <ToolAccess />,
+              element: (
+                <ToolAvailability
+                  fetchControlsByDeployment={fetchControlsByDeployment}
+                  accountId={accountId}
+                />
+              ),
             },
             {
               path: 'configuration',

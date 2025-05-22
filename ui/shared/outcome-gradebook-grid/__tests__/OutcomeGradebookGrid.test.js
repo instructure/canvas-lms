@@ -60,6 +60,8 @@ describe('OutcomeGradebookGrid', () => {
 
   test('Grid.View.masteryDetails', () => {
     const outcome = {mastery_points: 5, points_possible: 10}
+    // Ensure Grid.ratings is empty to force using legacyMasteryDetails
+    Grid.ratings = []
     const spy = jest.spyOn(Grid.View, 'legacyMasteryDetails')
     Grid.View.masteryDetails(10, outcome)
     expect(spy).toHaveBeenCalledTimes(1)

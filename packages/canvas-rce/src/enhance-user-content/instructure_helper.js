@@ -105,6 +105,7 @@ export function showFilePreviewInOverlay(event, canvasOrigin) {
     const verifier = url?.searchParams.get('verifier')
     const access_token = url?.searchParams.get('access_token')
     const instfs_id = url?.searchParams.get('instfs_id')
+    const location = url?.searchParams.get('location')
     const file_id = matches[1]
 
     const params = {subject: 'preview_file', file_id}
@@ -112,6 +113,9 @@ export function showFilePreviewInOverlay(event, canvasOrigin) {
     if (access_token && instfs_id) {
       params.access_token = access_token
       params.instfs_id = instfs_id
+    }
+    if (location) {
+      params.location = location
     }
     // TODO:
     // 1. what window should we be using

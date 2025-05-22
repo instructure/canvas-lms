@@ -199,8 +199,7 @@ describe('EditView', () => {
       view.loadConditionalRelease()
       view.renderTabs()
       expect(view.$discussionEditView.tabs('option', 'disabled')[0]).toBe(1)
-      view.$useForGrading.prop('checked', true)
-      view.$useForGrading.trigger('change')
+      view.$("label[for='use_for_grading']").click()
       expect(view.$discussionEditView.tabs('option', 'disabled')).toBe(false)
     })
 
@@ -209,8 +208,7 @@ describe('EditView', () => {
       view.loadConditionalRelease()
       view.renderTabs()
       expect(view.$discussionEditView.tabs('option', 'disabled')).toBe(false)
-      view.$useForGrading.prop('checked', false)
-      view.$useForGrading.trigger('change')
+      view.$("label[for='use_for_grading']").click()
       expect(view.$discussionEditView.tabs('option', 'disabled')[0]).toBe(1)
     })
 

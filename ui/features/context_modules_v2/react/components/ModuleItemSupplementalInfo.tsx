@@ -19,10 +19,10 @@
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {ModuleItemContent, CompletionRequirement} from '../utils/types'
 import CompletionRequirementInfo from '../components/CompletionRequirementInfo'
+import DueDateLabel from './DueDateLabel'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -33,12 +33,16 @@ export interface ModuleItemSupplementalInfoProps {
 }
 
 const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
+  contentTagId,
   content,
   completionRequirement,
 }) => {
   if (!content) return null
 
-  const hasDueOrLockDate = content.dueAt || content.lockAt
+  const hasDueOrLockDate =
+    content.dueAt ||
+    content.lockAt ||
+    content.assignmentOverrides?.edges.some(({node}) => node.dueAt)
   const hasPointsPossible = content.pointsPossible !== undefined && content.pointsPossible !== null
   const hasCompletionRequirement = !!completionRequirement
 
@@ -64,17 +68,7 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
 
   return (
     <Flex gap="xx-small">
-      {hasDueOrLockDate && (
-        <Flex.Item>
-          <Text weight="normal" size="x-small">
-            <FriendlyDatetime
-              data-testid="due-date"
-              format={I18n.t('#date.formats.medium')}
-              dateTime={content.dueAt || content.lockAt || null}
-            />
-          </Text>
-        </Flex.Item>
-      )}
+      <DueDateLabel content={content} contentTagId={contentTagId} />
 
       {hasDueOrLockDate && (hasPointsPossible || hasCompletionRequirement) && (
         <Flex.Item>

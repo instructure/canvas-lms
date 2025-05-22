@@ -78,7 +78,7 @@ describe "jquery ui" do
     active.send_keys(:tab)
     expect(active.tag_name).to eq "input"
     active.send_keys(:tab)
-    expect(active.tag_name).to eq "a"
+    expect(active.tag_name).to eq "button"
     active.send_keys(:tab)
     expect(active.tag_name).to eq "select"
   end

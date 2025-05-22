@@ -37,7 +37,7 @@ describe "sync grades to sis" do
     before do
       get "/courses/#{@course.id}/discussion_topics/new"
       f("#discussion-title").send_keys("New Discussion Title")
-      f("#use_for_grading").click
+      f("label[for='use_for_grading']").click
       f("#assignment_post_to_sis").click
       wait_for_ajaximations
       click_option("#assignment_group_id", "Assignment Group")
@@ -50,12 +50,51 @@ describe "sync grades to sis" do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
       expect(f("#assignment_post_to_sis")).to be_enabled
     end
+
+    describe "checkpoints" do
+      it "works if has_sub_assignments is true but missing sub_assignments" do
+        Account.site_admin.enable_feature!(:react_discussions_post)
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+
+        @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        @replies_required = 3
+
+        @reply_to_topic_checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          points_possible: 3
+        )
+        @reply_to_entry_checkpint = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 9,
+          replies_required: @replies_required
+        )
+        dt_assignment = @checkpointed_discussion.assignment
+
+        dt_sub_assignments = @checkpointed_discussion.assignment.sub_assignments
+        sub1 = dt_sub_assignments.first
+        sub2 = dt_sub_assignments.last
+        sub1.workflow_state = "deleted"
+        sub1.save(validate: false)
+        sub2.workflow_state = "deleted"
+        sub2.save(validate: false)
+        dt_assignment.reload
+        dt_assignment.has_sub_assignments = true
+        dt_assignment.save(validate: false)
+
+        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}/edit"
+        expect(f("#assignment_post_to_sis")).to be_enabled
+      end
+    end
   end
 
   it "does not display Sync to SIS option when feature not configured", priority: "1" do
     mock_feature_flag(:post_grades, false)
     get "/courses/#{@course.id}/discussion_topics/new"
-    f("#use_for_grading").click
+    f("label[for='use_for_grading']").click
     expect(f("#content")).not_to contain_css("#assignment_post_to_sis")
   end
 

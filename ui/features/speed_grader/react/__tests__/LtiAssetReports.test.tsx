@@ -19,8 +19,9 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {LtiAssetReports, LtiAssetReportsProps, joinAttachmentsAndReports} from '../LtiAssetReports'
-import {ExistingAttachedAssetProcessor, LtiAssetReport} from '@canvas/lti/model/AssetProcessor'
+import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {LtiAssetReportsByProcessor} from 'features/speed_grader/jquery/speed_grader.d'
+import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
 
 let lastMockReportId = 0
 
@@ -32,10 +33,10 @@ function makeMockReport(
   return {
     id,
     title,
-    processing_progress: 'Processed',
-    report_type: 'originality',
+    processingProgress: 'Processed',
+    reportType: 'originality',
     priority: 1,
-    launch_url_path: `/launch/report/${id}`,
+    launchUrlPath: `/launch/report/${id}`,
     comment: `comment for ${title}`,
     ...overrides,
   }
@@ -109,23 +110,23 @@ describe('LtiAssetReports', () => {
     expect(getAllByText('comment for file2-AP123-report1')).toHaveLength(1)
   })
 
-  it('renders View Report button if launch_url_path is present', () => {
-    delete firstRep.launch_url_path
+  it('renders View Report button if launchUrlPath is present', () => {
+    delete firstRep.launchUrlPath
     const {getAllByText} = setup()
     expect(getAllByText('View Report')).toHaveLength(3)
   })
 
   it('renders error message (and comment) for failed reports', () => {
-    firstRep.processing_progress = 'Failed'
-    firstRep.error_code = 'UNSUPPORTED_ASSET_TYPE'
+    firstRep.processingProgress = 'Failed'
+    firstRep.errorCode = 'UNSUPPORTED_ASSET_TYPE'
     const {getAllByText} = setup()
     expect(getAllByText('Unable to process: Invalid file type.')).toHaveLength(1)
     expect(getAllByText('comment for file1-AP123-report1')).toHaveLength(1)
   })
 
   it('provides a default error message for unrecognized error codes', () => {
-    firstRep.processing_progress = 'Failed'
-    firstRep.error_code = 'UNKNOWN_ERROR'
+    firstRep.processingProgress = 'Failed'
+    firstRep.errorCode = 'UNKNOWN_ERROR'
     const {getAllByText} = setup()
     expect(
       getAllByText('The content could not be processed, or the processing failed.'),
@@ -133,7 +134,7 @@ describe('LtiAssetReports', () => {
   })
 
   it('renders default info text for processing reports', () => {
-    firstRep.processing_progress = 'Processing'
+    firstRep.processingProgress = 'Processing'
     delete firstRep.comment
     const {getAllByText} = setup()
     expect(
@@ -142,7 +143,7 @@ describe('LtiAssetReports', () => {
   })
 
   it("doesn't renders default info text if there is a comment", () => {
-    firstRep.processing_progress = 'Processing'
+    firstRep.processingProgress = 'Processing'
     const {queryByText} = setup()
     expect(
       queryByText('The content is being processed and the final report being generated.'),
@@ -150,7 +151,7 @@ describe('LtiAssetReports', () => {
   })
 
   it('renders default info text for pending reports', () => {
-    firstRep.processing_progress = 'Pending'
+    firstRep.processingProgress = 'Pending'
     delete firstRep.comment
     const {getAllByText} = setup()
     expect(
@@ -161,7 +162,7 @@ describe('LtiAssetReports', () => {
   })
 
   it('renders default info text for pending manual reports', () => {
-    firstRep.processing_progress = 'PendingManual'
+    firstRep.processingProgress = 'PendingManual'
     delete firstRep.comment
     const {getAllByText} = setup()
     expect(
@@ -172,7 +173,7 @@ describe('LtiAssetReports', () => {
   })
 
   it('renders default info text for not processed reports', () => {
-    firstRep.processing_progress = 'NotProcessed'
+    firstRep.processingProgress = 'NotProcessed'
     delete firstRep.comment
     const {getAllByText} = setup()
     expect(
@@ -183,7 +184,7 @@ describe('LtiAssetReports', () => {
   })
 
   it('renders default info text for not ready reports', () => {
-    firstRep.processing_progress = 'NotReady'
+    firstRep.processingProgress = 'NotReady'
     delete firstRep.comment
     const {getAllByText} = setup()
     expect(getAllByText('There is no processing occurring by the tool.')).toHaveLength(1)

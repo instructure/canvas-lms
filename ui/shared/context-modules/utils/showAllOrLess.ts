@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DEFAULT_PAGE_SIZE} from './ModuleItemsLazyLoader'
-import {type ModuleId} from './ModuleItemLoadingData'
+import {DEFAULT_PAGE_SIZE, type ModuleId} from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modulespublic')
@@ -28,19 +27,19 @@ const MODULE_EXPAND_AND_LOAD_ALL = 'module-expand-and-load-all'
 const MODULE_LOAD_ALL = 'module-load-all'
 const MODULE_LOAD_FIRST_PAGE = 'module-load-first-page'
 
-function moduleFromId(moduleId: ModuleId): HTMLElement {
+function moduleFromId(moduleId: string | number): HTMLElement {
   return document.querySelector(`#context_module_${moduleId}`) as HTMLElement
 }
 
 function isModuleLoading(module: HTMLElement) {
-  return !!module.querySelector('.module-spinner-container')
+  return module.dataset.loadstate === 'loading'
 }
 
 function isModuleCurrentPageEmpty(module: HTMLElement) {
   return module.querySelectorAll('.context_module_item').length === 0
 }
 function isModulePaginated(module: HTMLElement) {
-  return !!module.querySelector(`[data-testid="module-${module.dataset.moduleId}-pagination"]`)
+  return module.dataset.loadstate === 'paginated'
 }
 
 function isModuleCollapsed(module: HTMLElement) {
@@ -49,6 +48,10 @@ function isModuleCollapsed(module: HTMLElement) {
 
 function itemCount(module: HTMLElement): number {
   return module.querySelectorAll('.context_module_item').length
+}
+
+function getModuleContentElement(module: HTMLElement): HTMLElement {
+  return module.querySelector('.content ul') as HTMLElement
 }
 
 function shouldShowAllOrLess(module: HTMLElement): AllOrLess {
@@ -71,10 +74,11 @@ function shouldShowAllOrLess(module: HTMLElement): AllOrLess {
 function addOrRemoveButton(module: HTMLElement) {
   const shouldShow = shouldShowAllOrLess(module)
 
-  let button = module.querySelector('.show-all-or-less-button.ui-button') as HTMLElement
-  const totalItems = (module.querySelector('.content ul') as HTMLElement)?.dataset?.totalItems || ''
+  let button = module.querySelector('.show-all-or-less-button.ui-button') as HTMLButtonElement
+  const moduleContentElement = getModuleContentElement(module)
+  const totalItems = moduleContentElement?.dataset?.totalItems || ''
 
-  if (shouldShow === 'none') {
+  if (shouldShow === 'none' || shouldShow === 'loading') {
     if (button) {
       button.removeEventListener('click', handleShowAllOrLessClick)
       button.removeEventListener('keydown', buttonKeyDown)
@@ -93,6 +97,7 @@ function addOrRemoveButton(module: HTMLElement) {
     reqMsg?.after(button)
   }
 
+  button.dataset.isLoading = 'false'
   if (shouldShow === 'all') {
     button.classList.add('show-all')
     button.classList.remove('show-less')
@@ -108,28 +113,10 @@ function addOrRemoveButton(module: HTMLElement) {
   }
 }
 
-// TODO: should probably be caching the requestAnimationFrame timestamp
-//       and throttling calls back here, but it's not too bad as is.
-function maybeShowAllOrLess(moduleId: ModuleId) {
-  const module = moduleFromId(moduleId)
-  if (!module) return
-
-  const shouldShow = shouldShowAllOrLess(module)
-  if (shouldShow === 'loading') {
-    requestAnimationFrame(() => {
-      maybeShowAllOrLess(moduleId)
-    })
-    return
-  } else {
-    addOrRemoveButton(module)
-  }
-}
-
 function addShowAllOrLess(moduleId: ModuleId) {
   const module = moduleFromId(moduleId)
   if (!module) return
-
-  maybeShowAllOrLess(moduleId)
+  addOrRemoveButton(module)
 }
 
 function handleShowAllOrLessClick(event: Event) {
@@ -139,8 +126,11 @@ function handleShowAllOrLessClick(event: Event) {
   const module = moduleFromId(moduleId)
   if (!module) return
 
-  const button = module.querySelector('.show-all-or-less-button') as HTMLElement
+  const button = module.querySelector('.show-all-or-less-button') as HTMLButtonElement
   if (!button) return
+
+  if (button.dataset.isLoading === 'true') return
+  button.dataset.isLoading = 'true'
 
   if (button.classList.contains('show-all')) {
     if (isModuleCollapsed(module)) {
@@ -187,7 +177,32 @@ function buttonKeyDown(event: KeyboardEvent) {
   }
 }
 
+function decrementModuleItemsCount(moduleId: ModuleId) {
+  const module = moduleFromId(moduleId)
+  if (!module) {
+    return
+  }
+
+  const moduleContentElement = getModuleContentElement(module)
+  if (!moduleContentElement) {
+    return
+  }
+
+  const totalItems = moduleContentElement.dataset.totalItems
+  if (!totalItems) {
+    return
+  }
+  const totalItemsCount = parseInt(totalItems, 10)
+  if (Number.isNaN(totalItemsCount) || totalItemsCount <= 0) {
+    return
+  }
+
+  moduleContentElement.dataset.totalItems = (totalItemsCount - 1).toString()
+  addOrRemoveButton(module)
+}
+
 export {
+  moduleFromId,
   addShowAllOrLess,
   shouldShowAllOrLess,
   itemCount,
@@ -199,6 +214,7 @@ export {
   loadAll,
   loadFirstPage,
   maybeExpandAndLoadAll,
+  decrementModuleItemsCount,
   MODULE_EXPAND_AND_LOAD_ALL,
   MODULE_LOAD_ALL,
   MODULE_LOAD_FIRST_PAGE,

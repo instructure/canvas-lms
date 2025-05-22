@@ -37,7 +37,7 @@ const compareStrings = (a: string | undefined, b: string | undefined): number =>
 }
 
 export const compareMigrators = (a: Migrator, b: Migrator): number => {
-  const higherPriority = ['course_copy_importer', 'canvas_cartridge_importer'];
+  const higherPriority = ['course_copy_importer', 'canvas_cartridge_importer']
   if (higherPriority.includes(a.type) && higherPriority.includes(b.type)) {
     return compareStrings(a.name, b.name)
   }
@@ -57,8 +57,10 @@ export const timeout = (delay: number) => {
   return new Promise(resolve => setTimeout(resolve, delay))
 }
 
-const adjustCheckboxTreeNodesByImportAsOneModuleItemState = (checkboxTreeNodes: Record<string, CheckboxTreeNode>): void => {
-  const typesForRootNodeUncheck: Set<ItemType> = new Set<ItemType>
+const adjustCheckboxTreeNodesByImportAsOneModuleItemState = (
+  checkboxTreeNodes: Record<string, CheckboxTreeNode>,
+): void => {
+  const typesForRootNodeUncheck: Set<ItemType> = new Set<ItemType>()
 
   Object.values(checkboxTreeNodes).forEach(node => {
     // set parent checkbox state to false if the node importAsOneModuleItemState is set to
@@ -87,13 +89,10 @@ export const generateSelectiveDataResponse = (
   adjustCheckboxTreeNodesByImportAsOneModuleItemState(checkboxTreeNodes)
 
   Object.values(checkboxTreeNodes).forEach(node => {
-    if (
-      node.migrationId && node.checkboxState === 'checked'
-    ) {
+    if (node.migrationId && node.checkboxState === 'checked') {
       nonRootElements[node.type] ||= {}
       nonRootElements[node.type][node.migrationId] = '1'
     }
-
 
     // These are the all_discussions, all_assignments, all_* elements
     if (!node.migrationId && node.checkboxState === 'checked') {
@@ -109,7 +108,10 @@ export const generateSelectiveDataResponse = (
     id: migrationId,
     user_id: userId,
     workflow_state: 'waiting_for_select',
-    copy: {...rootElements, ...nonRootElements},
+    copy:
+      Object.keys(nonRootElements).length > 0 || Object.keys(rootElements).length > 0
+        ? {...rootElements, ...nonRootElements}
+        : {},
   }
 }
 
@@ -163,7 +165,15 @@ export const mapToCheckboxTreeNodes = (
 }
 
 export const responseToItem = (
-  {type, title, property, sub_items, linked_resource, migration_id, submodule_count}: GenericItemResponse,
+  {
+    type,
+    title,
+    property,
+    sub_items,
+    linked_resource,
+    migration_id,
+    submodule_count,
+  }: GenericItemResponse,
   translator: {t: Function},
 ): Item => {
   const base: Item = {

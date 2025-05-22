@@ -17,18 +17,33 @@
  */
 
 export enum ContentItemType {
-  Page = 'page',
-  Assignment = 'assignment',
+  WikiPage = 'Page',
+  Assignment = 'Assignment',
+}
+
+export enum FormType {
+  TextInput = 'textinput',
+  DropDown = 'dropdown',
+  Checkbox = 'checkbox',
+  ColorPicker = 'colorpicker',
+}
+
+export interface IssueForm {
+  type: FormType
+  label?: string
+  value?: string
+  options?: string[]
 }
 
 export interface AccessibilityIssue {
   id: string
-  rule_id?: string
+  ruleId?: string
   message: string
   why: string
   element: string
   path: string
   issueUrl?: string
+  form: IssueForm
 }
 
 export interface AccessibilityData {
@@ -38,10 +53,9 @@ export interface AccessibilityData {
 }
 
 export interface ContentItem {
-  id: string
+  id: number
   type: ContentItemType
   title: string
-  contentType: string
   published: boolean
   updatedAt: string
   count: number

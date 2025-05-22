@@ -120,7 +120,10 @@ describe('CalendarEventDetailsForm', () => {
     const endInput = getByTestId('event-form-end-time')
     await user.type(startInput, '8:14 AM')
     //this is necessary due to flaky insUI-jest interactions
-    await userEvent.type(endInput, "{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}9:38 AM{Enter}")
+    await userEvent.type(
+      endInput,
+      '{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}9:38 AM{Enter}',
+    )
     expect(startInput.value).toBe('8:14 AM')
     expect(endInput.value).toBe('9:38 AM')
   })
@@ -155,17 +158,6 @@ describe('CalendarEventDetailsForm', () => {
     const errMessage = component.queryByText('This date is invalid.')
     expect(errMessage).not.toBeInTheDocument()
     expect(component.getByRole('button', {name: 'Submit'})).toBeEnabled()
-  })
-
-  it('shows an error when user input is an invalid string', () => {
-    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-    changeValue(component, 'edit-calendar-event-form-date', 'avocado')
-    // Work-around to raise blur event listener on date field
-    component.getByTestId('edit-calendar-event-form-title').focus()
-
-    expect(component.getByRole('button', {name: 'Submit'})).toBeDisabled()
-    expect(component.getByText('This date is invalid.')).toBeInTheDocument()
-    expect(component.getByTestId('edit-calendar-event-form-date')).toHaveValue('avocado')
   })
 
   it('does not show error with when choosing another date time format', async () => {

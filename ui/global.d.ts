@@ -57,6 +57,11 @@ declare global {
      */
     INST: GlobalInst
 
+    /**
+     * Remote locations for various pure front-end functionality.
+     */
+    REMOTES: GlobalRemotes
+
     webkitSpeechRecognition: any
     messageStudents: (
       options: ReturnType<typeof MessageStudentsWhoHelper.sendMessageStudentsWho>,

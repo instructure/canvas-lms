@@ -538,7 +538,7 @@ export const RubricForm = ({
             <Flex margin="medium 0 0" gap="medium">
               <Flex.Item>
                 <Checkbox
-                  label={"Don't post to Learning Mastery Gradebook"}
+                  label={I18n.t("Don't post to Learning Mastery Gradebook")}
                   checked={rubricForm.hideOutcomeResults}
                   onChange={e => setRubricFormField('hideOutcomeResults', e.target.checked)}
                   data-testid="hide-outcome-results-checkbox"
@@ -548,7 +548,7 @@ export const RubricForm = ({
                 <>
                   <Flex.Item>
                     <Checkbox
-                      label="Use this rubric for assignment grading"
+                      label={I18n.t('Use this rubric for assignment grading')}
                       checked={rubricForm.useForGrading}
                       onChange={e => {
                         setRubricFormField('useForGrading', e.target.checked)
@@ -561,7 +561,7 @@ export const RubricForm = ({
                   {!rubricForm.useForGrading && (
                     <Flex.Item>
                       <Checkbox
-                        label="Hide rubric score total from students"
+                        label={I18n.t('Hide rubric score total from students')}
                         checked={rubricForm.hideScoreTotal}
                         onChange={e => setRubricFormField('hideScoreTotal', e.target.checked)}
                         data-testid="hide-score-total-checkbox"

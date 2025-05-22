@@ -31,21 +31,43 @@ class AttachmentAssociation < ActiveRecord::Base
 
   after_save :set_word_count
 
-  def self.update_associations(context, attachment_ids, user, session, field_name = nil)
-    currently_has = AttachmentAssociation.where(context:, field_name:).pluck(:attachment_id)
+  def self.update_associations(context, attachment_ids, user, session, field_name = nil, blank_user: false)
+    global_ids = attachment_ids.map { |id| Shard.global_id_for(id) }
+    currently_has = AttachmentAssociation.where(context:, field_name:).pluck(:attachment_id).map { |id| Shard.global_id_for(id) }
 
-    to_delete = currently_has - attachment_ids
-    to_create = attachment_ids - currently_has
+    to_delete = currently_has - global_ids
+    to_create = global_ids - currently_has
 
     AttachmentAssociation.where(context:, field_name:, attachment_id: to_delete).destroy_all if to_delete.any?
 
     if to_create.any?
-      Attachment.where(id: to_create).find_each do |attachment|
-        next unless attachment.grants_right?(user, session, :update)
+      to_create.each_slice(1000) do |att_ids|
+        all_attachment_associations = []
 
-        AttachmentAssociation.create!(context:, attachment:, user:, field_name:)
+        Attachment.where(id: att_ids).find_each do |attachment|
+          next if !(user.nil? && blank_user) && !attachment.grants_right?(user, session, :update)
+
+          all_attachment_associations << {
+            context_type: context.class.name,
+            context_id: context.id,
+            attachment_id: attachment.id,
+            user_id: user&.id,
+            field_name:
+          }
+        end
+        insert_all(all_attachment_associations, context.root_account_id)
       end
     end
+  end
+
+  def self.insert_all(records, root_account_id)
+    records_with_root_account_id = records.map do |record|
+      unless record[:root_account_id]
+        record[:root_account_id] = root_account_id
+      end
+      record
+    end
+    super(records_with_root_account_id)
   end
 
   def self.verify_access(location_param, attachment_id, user, session = nil)

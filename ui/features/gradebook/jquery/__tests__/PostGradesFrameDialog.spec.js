@@ -39,48 +39,7 @@ describe('Gradebook > PostGradesFrameDialog', () => {
     fakeENV.teardown()
   })
 
-  describe('screenreader only content', () => {
-    test('shows beginning info alert and adds class to iframe', () => {
-      const info = el.find('.before_external_content_info_alert')
-      info.focus()
-      expect(info.children().hasClass('screenreader-only')).toBeFalsy()
-      expect(iframe.hasClass('info_alert_outline')).toBeTruthy()
-    })
-
-    test('shows ending info alert and adds class to iframe', () => {
-      const info = el.find('.after_external_content_info_alert')
-      info.focus()
-      expect(info.children().hasClass('screenreader-only')).toBeFalsy()
-      expect(iframe.hasClass('info_alert_outline')).toBeTruthy()
-    })
-
-    test('hides beginning info alert and removes class from iframe', () => {
-      const info = el.find('.before_external_content_info_alert')
-      info.focus()
-      info.blur()
-      expect(info.children().hasClass('screenreader-only')).toBeTruthy()
-      expect(iframe.hasClass('info_alert_outline')).toBeFalsy()
-    })
-
-    test('hides ending info alert and removes class from iframe', () => {
-      const info = el.find('.after_external_content_info_alert')
-      info.focus()
-      info.blur()
-      expect(info.children().hasClass('screenreader-only')).toBeTruthy()
-      expect(iframe.hasClass('info_alert_outline')).toBeFalsy()
-    })
-
-    test("doesn't show infos or add border to iframe by default", () => {
-      expect(
-        el.find(
-          '.before_external_content_info_alert > .screenreader-only, .after_external_content_info_alert > .screenreader-only',
-        ),
-      ).toHaveLength(2)
-      expect(iframe.hasClass('info_alert_outline')).toBeFalsy()
-    })
-
-    test("sets the 'data-lti-launch' attribute on the iframe", () => {
-      expect(iframe.attr('data-lti-launch')).toBe('true')
-    })
+  test("sets the 'data-lti-launch' attribute on the iframe", () => {
+    expect(iframe.attr('data-lti-launch')).toBe('true')
   })
 })

@@ -21,6 +21,15 @@ require "nokogiri"
 require "ritex"
 
 module UserContent
+  def self.associate_attachments_to_rce_object(html, context, context_field_name = nil, user = @current_user, session = nil, blank_user: false)
+    return if html.blank?
+
+    attachment_ids = Api::Html::Content.collect_attachment_ids(html)
+    return if attachment_ids.blank?
+
+    AttachmentAssociation.update_associations(context, attachment_ids, user, session, context_field_name, blank_user:)
+  end
+
   def self.escape(
     str,
     current_host = nil,
@@ -299,7 +308,7 @@ module UserContent
       return false if user.blank? && content.respond_to?(:locked?) && content.locked?
       return true unless user
 
-      return content.grants_right?(user, :read) if content.is_a?(Attachment) && content.context != context
+      return content.grants_right?(user, :download) if content.is_a?(Attachment) && content.context != context
 
       # if user given, check that the user is allowed to manage all
       # context content, or read that specific item (and it's not locked)

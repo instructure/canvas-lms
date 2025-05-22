@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState, useRef, useMemo, Ref} from 'react'
+import React, {useCallback, useState, useRef, useMemo, Ref} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {queryClient} from '@canvas/query'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {type File, type Folder} from '../../../interfaces/File'
 import {ModalOrTrayOptions, type ColumnHeader} from '../../../interfaces/FileFolderTable'
@@ -30,7 +29,6 @@ import SubTableContent from './SubTableContent'
 import renderTableHead from './RenderTableHead'
 import renderTableBody from './RenderTableBody'
 import {useFileManagement} from '../../contexts/FileManagementContext'
-import {FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
 import {Alert} from '@instructure/ui-alerts'
 import UsageRightsModal from './UsageRightsModal'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
@@ -86,10 +84,10 @@ const FileFolderTable = ({
   const isStacked = size !== 'large'
   const columnHeaders: ColumnHeader[] = useMemo(() => {
     const actionsTitle = isStacked ? '' : I18n.t('Actions')
-    const headers = getColumnHeaders(actionsTitle)
+    const headers = getColumnHeaders(actionsTitle, sort.by)
     setColumnWidths(headers)
     return headers
-  }, [isStacked])
+  }, [isStacked, sort.by])
 
   const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>(() => {
     return getSelectionScreenReaderText(selectedRows.size, rows.length)
@@ -100,18 +98,6 @@ const FileFolderTable = ({
   const [directoryMinHeight, setDirectoryMinHeight] = useState('auto')
 
   const filesDirectoryRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    const listener = (event: FilesCollectionEvent) => {
-      if (['add', 'remove', 'refetch'].includes(event)) {
-        queryClient.refetchQueries({queryKey: ['quota'], type: 'active'})
-        queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
-      }
-    }
-    currentFolder?.addListener(listener)
-
-    return () => currentFolder?.removeListener(listener)
-  }, [currentFolder])
 
   const setModalOrTrayOptions = useCallback(
     (options: ModalOrTrayOptions | null) => () => _setModalOrTrayOptions(options),
@@ -306,7 +292,9 @@ const FileFolderTable = ({
                 usageRightsRequiredForContext,
                 setModalOrTrayOptions,
               )}
-              {userCanEditFilesForContext && showDrop && (
+              {/* Only render the upload row when needed, else screenreaders count an extra row 
+                  and the upload has to be in a <tr> else browsers will complain */}
+              {userCanEditFilesForContext && showDrop && (isDragging || rows.length === 0) && (
                 <Table.Row data-upload>
                   <Table.Cell>
                     <FileTableUpload

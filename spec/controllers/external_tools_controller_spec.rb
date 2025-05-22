@@ -2213,8 +2213,7 @@ describe ExternalToolsController do
         let_once(:developer_key) { lti_developer_key_model(account: @course.account) }
 
         before do
-          tool = developer_key.lti_registration.new_external_tool(@course)
-          tool.save!
+          developer_key.lti_registration.new_external_tool(@course)
           enable_developer_key_account_binding!(developer_key)
         end
 
@@ -2630,6 +2629,32 @@ describe ExternalToolsController do
         end
       end
     end
+
+    context "in a horizon course" do
+      before do
+        @course.update!(horizon_course: true)
+        account = @course.account
+        account.update!(horizon_account: true)
+        account.enable_feature!(:horizon_course_setting)
+      end
+
+      it "can set estimated duration" do
+        user_session(@teacher)
+        post "create",
+             params: {
+               course_id: @course.id,
+               external_tool: {
+                 name: "tool name",
+                 url: "http://example.com",
+                 consumer_key: "key",
+                 shared_secret: "secret",
+                 estimated_duration_attributes: { minutes: 5 }
+               }
+             },
+             format: "json"
+        expect(ContextExternalTool.last.estimated_duration.duration).to eq 5.minutes
+      end
+    end
   end
 
   describe "PUT 'update'" do
@@ -2717,6 +2742,36 @@ describe ExternalToolsController do
           format: "json"
       expect(response).to be_successful
       expect(@tool.reload.editor_button).to be_nil
+    end
+
+    context "in a horizon course" do
+      before do
+        @course.update!(horizon_course: true)
+        account = @course.account
+        account.update!(horizon_account: true)
+        account.enable_feature!(:horizon_course_setting)
+      end
+
+      it "can remove estimated duration" do
+        user_session(@teacher)
+        @tool = new_valid_tool(@course)
+        @tool.estimated_duration_attributes = { minutes: 5 }
+        @tool.save!
+
+        put :update,
+            params: {
+              course_id: @course.id,
+              external_tool_id: @tool.id,
+              external_tool: {
+                estimated_duration_attributes: {
+                  id: @tool.estimated_duration.id,
+                  _destroy: "true"
+                }
+              }
+            },
+            format: "json"
+        expect(@tool.reload.estimated_duration).to be_nil
+      end
     end
   end
 
@@ -3001,9 +3056,7 @@ describe ExternalToolsController do
         end
       end
       let(:tool) do
-        t = developer_key.lti_registration.new_external_tool(@course)
-        t.save!
-        t
+        developer_key.lti_registration.new_external_tool(@course)
       end
       let(:rl) do
         Lti::ResourceLink.create!(
@@ -3096,9 +3149,7 @@ describe ExternalToolsController do
         specs_require_sharding
 
         let!(:tool) do
-          t = developer_key.lti_registration.new_external_tool(course)
-          t.save!
-          t
+          developer_key.lti_registration.new_external_tool(course)
         end
 
         let(:course) do
@@ -3145,9 +3196,7 @@ describe ExternalToolsController do
 
         context "when the context is not a course" do
           let!(:tool) do
-            t = developer_key.lti_registration.new_external_tool(course.account)
-            t.save!
-            t
+            developer_key.lti_registration.new_external_tool(course.account)
           end
 
           let(:params) { { account_id: course.account.global_id, id: tool.global_id, redirect: true } }

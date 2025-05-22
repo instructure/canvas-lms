@@ -211,7 +211,7 @@ export default class CanvasMediaRecorder extends React.Component {
     const dialog = this.dialogRef.current
     this.removeIndicatorBar()
     this.toggleBackgroundItems(false)
-    const closeButton = dialog.querySelector('a.ui-dialog-titlebar-close')
+    const closeButton = dialog.querySelector('button.ui-dialog-titlebar-close')
     closeButton?.click()
   }
 

@@ -45,6 +45,16 @@ describe Api::V1::Attachment do
       expect(json.fetch("url")).not_to include("verifier")
     end
 
+    it "includes the location parameter in the url when the opts contains it" do
+      params = {
+        include: ["preview_url"],
+        location: "course_123",
+        skip_permission_checks: true
+      }
+      json = attachment_json(attachment, teacher, {}, params)
+      expect(json.fetch("url")).to include("location=course_123")
+    end
+
     it "includes the submission id in the url_opts when preview_url is included" do
       params = {
         include: ["preview_url"],

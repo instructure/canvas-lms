@@ -32,7 +32,7 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
-import fetchMock from 'jest-fetch-mock'
+import fetchMock from 'fetch-mock'
 
 const s_params = 'some super secure params'
 const currentOrigin = window.location.origin
@@ -140,7 +140,10 @@ describe('EditView', () => {
       USAGE_RIGHTS_REQUIRED: true,
     })
 
-    fetchMock.mockResponse(JSON.stringify({}))
+    fetchMock.get('/api/v1/courses/1/settings', {})
+    fetchMock.get('/api/v1/courses/1/sections?per_page=100', [])
+    fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions*/, [])
+    fetchMock.post(/.*\/api\/graphql/, {})
     RCELoader.RCE = null
     return RCELoader.loadRCE()
   })
@@ -151,7 +154,7 @@ describe('EditView', () => {
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
     fixtures.remove()
-    fetchMock.resetMocks()
+    fetchMock.reset()
   })
 
   it('routes to return_to', () => {
@@ -160,29 +163,29 @@ describe('EditView', () => {
   })
 
   describe('routes to the build page normally regardless of the return_to param', () => {
-    let view;
+    let view
 
     beforeEach(() => {
-      view = editView({ html_url: 'http://foo' });
-    });
+      view = editView({html_url: 'http://foo'})
+    })
 
     const testLocationAfterSave = (isFeatureFlagEnabled, expectedDisplay) => {
       ENV.FEATURES.new_quizzes_navigation_updates = isFeatureFlagEnabled
       jest.spyOn(view.assignment, 'showBuildButton').mockReturnValue(true)
       view.preventBuildNavigation = false
 
-      expect(view.locationAfterSave({ return_to: 'http://calendar' })).toBe(
-        `http://foo?display=${expectedDisplay}`
-      );
-    };
+      expect(view.locationAfterSave({return_to: 'http://calendar'})).toBe(
+        `http://foo?display=${expectedDisplay}`,
+      )
+    }
 
     it('returns with ?display=full_width_with_nav when feature flag is enabled', () => {
-      testLocationAfterSave(true, 'full_width_with_nav');
-    });
+      testLocationAfterSave(true, 'full_width_with_nav')
+    })
 
     it('returns with ?display=full_width when feature flag is disabled', () => {
-      testLocationAfterSave(false, 'full_width');
-    });
+      testLocationAfterSave(false, 'full_width')
+    })
   })
 
   it('does not route to return_to with javascript protocol', () => {
@@ -271,11 +274,11 @@ describe('EditView', () => {
 
   describe('#togglePeerReviewsAndGroupCategoryEnabled', () => {
     beforeEach(() => {
-      fetchMock.mockResponse(JSON.stringify({}))
+      fetchMock.mock('*', {})
     })
 
     afterEach(() => {
-      fetchMock.resetMocks()
+      fetchMock.reset()
     })
 
     it('locks down group category after students submit', () => {

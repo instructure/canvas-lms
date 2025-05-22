@@ -44,7 +44,7 @@ class AutoGradeService
 
     Here is the output schema:
     ```
-    {"properties": {"rubric_category": {"title": "Rubric Category", "description": "The name of the rubric category for which the criterion is selected", "type": "string"}, "reasoning": {"title": "Reasoning", "description": "A detailed explanation of how you arrived at the awarded score, including reference to the threshold criteria that were met.", "type": "string"}, "criterion": {"title": "Criterion", "description": "The specific rubric criterion (i.e., the highest threshold met) that best fits your evaluation.", "type": "string"}}, "required": ["rubric_category", "reasoning", "criterion"]}
+    {"properties": {"rubric_category": {"title": "Rubric Category", "description": "The name of the rubric category for which the criterion is selected", "type": "string"}, "reasoning": {"title": "Reasoning", "description": "A concise but descriptive two sentence explanation of how you arrived at the awarded score, including reference to the threshold criteria that were met.", "type": "string"}, "criterion": {"title": "Criterion", "description": "The specific rubric criterion (i.e., the highest threshold met) that best fits your evaluation.", "type": "string"}}, "required": ["rubric_category", "reasoning", "criterion"]}
     ```
     For each rubric category, select the most appropriate criterion that matches the essay.
     Your response must contain ONLY the JSON array - no additional text, explanations, or formatting. Any non-JSON content will cause parsing errors.

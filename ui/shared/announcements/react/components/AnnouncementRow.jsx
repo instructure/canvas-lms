@@ -97,6 +97,7 @@ export default function AnnouncementRow({
           key="lock"
           value={{action: 'lock', id: announcement.id, lock: !announcement.locked}}
           id="lock-announcement-menu-option"
+          data-action-state={announcement.locked ? 'allowCommentsButton' : 'disallowCommentsButton'}
         >
           {announcement.locked ? (
             <span aria-hidden="true">

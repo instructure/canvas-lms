@@ -31,6 +31,7 @@ import {ltiState} from '@canvas/lti/jquery/messages'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {getResourceTypes} from '@canvas/util/resourceTypeUtil'
+import {addShowAllOrLess} from '../utils/showAllOrLess'
 
 const I18n = createI18nScope('context_modulespublic')
 
@@ -262,6 +263,7 @@ export function setExpandAllButtonHandler(lazy_load_callback) {
           $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
           $module.find('.footer .manage_module').css('display', '')
           $module.toggleClass('collapsed_module', !shouldExpand)
+          addShowAllOrLess($module.data('module-id'))
         }
         $module.find('.content').slideToggle({
           queue: false,

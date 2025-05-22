@@ -17,6 +17,8 @@
  */
 
 import {useCallback, useEffect, useState} from 'react'
+import {usePrevious} from 'react-use'
+import {queryClient} from '@canvas/query'
 import UploadQueue from '@canvas/files/react/modules/UploadQueue'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -25,20 +27,33 @@ import FileRenameForm from '../FilesHeader/UploadButton/FileRenameForm'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import {type ResolvedName} from '../FilesHeader/UploadButton/FileOptions'
 
-type CurrentUploadsProps = {
-  onUploadChange?: (uploadsCount: number) => void
+const hasInProgressUploads = (uploaders: Uploader[], conflicted: Uploader[]) => {
+  // we can't just use UploadQueue.pendingUploads() because errored uploads are counted
+  // so if there is at least one non-errored upload, or at least one name-conflicted upload
+  // then there is an upload in progress
+  return uploaders.some(uploader => !uploader.error) || conflicted.length > 0
 }
 
-const CurrentUploads = ({onUploadChange}: CurrentUploadsProps) => {
+const CurrentUploads = () => {
   const [currentUploads, setCurrentUploads] = useState<Uploader[]>([])
   const [conflictedUploads, setConflictedUploads] = useState<Uploader[]>([])
+  const previouslyHadInProgressUploads = usePrevious(
+    hasInProgressUploads(currentUploads, conflictedUploads),
+  )
 
   const handleUploadQueueChange = useCallback(() => {
     const allUploaders = UploadQueue.getAllUploaders()
     const conflicted = allUploaders.filter(uploader => uploader.error?.response.status === 409)
     setCurrentUploads(allUploaders)
     setConflictedUploads(conflicted)
-  }, [])
+
+    // we only want to refetch when we go from having active uploads to not having any
+    // otherwise we will refetch every time a user removes an errored upload from the queue
+    if (previouslyHadInProgressUploads && !hasInProgressUploads(allUploaders, conflicted)) {
+      queryClient.refetchQueries({queryKey: ['quota'], type: 'active'})
+      queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+    }
+  }, [previouslyHadInProgressUploads])
 
   const onNameConflictResolved = (fileNameOptions: ResolvedName): void => {
     FileOptionsCollection.resetState()
@@ -50,14 +65,10 @@ const CurrentUploads = ({onUploadChange}: CurrentUploadsProps) => {
     conflictedUploads[0].cancel?.()
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => onUploadChange?.(currentUploads.length), [currentUploads])
-
   useEffect(() => {
     UploadQueue.addChangeListener(handleUploadQueueChange)
     return () => UploadQueue.removeChangeListener(handleUploadQueueChange)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [handleUploadQueueChange])
 
   if (currentUploads.length) {
     return (

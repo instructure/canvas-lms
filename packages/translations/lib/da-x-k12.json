@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Den første overskrift på en side skal være H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Følgende indhold er partnerleveret"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Materialer er på det offentlige domæne"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Materialet er underlagt en undtagelse - fx fair brug, retten til at citere eller andre i henhold til gældende copyright-love"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Foregående indhold er partnerleveret"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Det pæne html-redigeringsværktøj er ikke tilgængeligt på tastaturet. Tryk på Shift-O for at åbne det rå html-redigeringsværktøj."

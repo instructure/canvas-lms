@@ -1,0 +1,226 @@
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {MockedProvider} from '@apollo/client/testing'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {assignLocation, openWindow} from '@canvas/util/globalUtils'
+import {waitFor} from '@testing-library/dom'
+import {fireEvent, render} from '@testing-library/react'
+import React from 'react'
+import {ChildTopic} from '../../../../graphql/ChildTopic'
+import {updateUserDiscussionsSplitscreenViewMock} from '../../../../graphql/Mocks'
+import * as constants from '../../../utils/constants'
+import {DiscussionManagerUtilityContext} from '../../../utils/constants'
+import {DiscussionPostToolbar} from '../DiscussionPostToolbar'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+  openWindow: jest.fn(),
+}))
+
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
+}))
+
+jest.mock('../../../utils/constants', () => ({
+  ...jest.requireActual('../../../utils/constants'),
+  isSpeedGraderInTopUrl: false,
+}))
+
+const onFailureStub = jest.fn()
+const onSuccessStub = jest.fn()
+
+beforeEach(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+    }
+  })
+
+  window.ENV = {
+    course_id: '1',
+    SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
+    DISCUSSION: {
+      preferences: {
+        discussions_splitscreen_view: false,
+      },
+    },
+  }
+})
+
+afterEach(() => {
+  onFailureStub.mockClear()
+  onSuccessStub.mockClear()
+  jest.clearAllMocks()
+})
+
+const setup = (
+  props,
+  mocks,
+  discussionManagerProviderValues = {translationLanguages: {current: []}},
+) => {
+  return render(
+    <MockedProvider mocks={mocks}>
+      <AlertManagerContext.Provider
+        value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
+      >
+        <DiscussionManagerUtilityContext.Provider value={discussionManagerProviderValues}>
+          <DiscussionPostToolbar {...props} />
+        </DiscussionManagerUtilityContext.Provider>
+      </AlertManagerContext.Provider>
+    </MockedProvider>,
+  )
+}
+
+describe('DiscussionPostToolbar', () => {
+  describe('Rendering', () => {
+    it('should render', () => {
+      const component = setup()
+      expect(component).toBeTruthy()
+    })
+
+    it('should not render Collapse Toggle by default', () => {
+      const {queryByTestId} = setup()
+      expect(queryByTestId('collapseToggle')).toBeNull()
+    })
+
+    it('should not render clear search button by default', () => {
+      const {queryByTestId} = setup()
+      expect(queryByTestId('clear-search-button')).toBeNull()
+    })
+  })
+
+  describe('Splitscreen Button', () => {
+    it('should call updateUserDiscussionsSplitscreenView mutation when clicked', async () => {
+      // Reset mocks to ensure clean state
+      jest.clearAllMocks()
+
+      // Mock functions
+      const setUserSplitScreenPreference = jest.fn()
+      const closeView = jest.fn()
+
+      const {getByTestId} = setup(
+        {
+          setUserSplitScreenPreference,
+          userSplitScreenPreference: false,
+          closeView,
+        },
+        updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true}),
+      )
+
+      // Get and click the button
+      const splitscreenButton = getByTestId('splitscreenButton')
+      fireEvent.click(splitscreenButton)
+
+      // Wait for the success callback to be called
+      await waitFor(
+        () => {
+          expect(onSuccessStub).toHaveBeenCalled()
+        },
+        {timeout: 2000},
+      )
+
+      // Verify the preference was updated
+      expect(setUserSplitScreenPreference).toHaveBeenCalled()
+    })
+  })
+
+  describe('Search Field', () => {
+    it('should call onChange when typing occurs', () => {
+      const onSearchChangeMock = jest.fn()
+      const {getByLabelText} = setup({onSearchChange: onSearchChangeMock})
+      const searchInput = getByLabelText('Search entries or author...')
+      fireEvent.change(searchInput, {target: {value: 'A'}})
+      window.setTimeout(() => expect(onSearchChangeMock.mock.calls).toHaveLength(1), 1500)
+      fireEvent.change(searchInput, {target: {value: 'B'}})
+      window.setTimeout(() => expect(onSearchChangeMock.mock.calls).toHaveLength(2), 1500)
+    })
+  })
+
+  describe('View Dropdown', () => {
+    it('should call onChange when event is fired', () => {
+      const onViewFilterMock = jest.fn()
+      const {getByText, getByLabelText} = setup({onViewFilter: onViewFilterMock})
+      const simpleSelect = getByLabelText('Filter by')
+      fireEvent.click(simpleSelect)
+      const unread = getByText('Unread')
+      fireEvent.click(unread)
+      expect(onViewFilterMock.mock.calls).toHaveLength(1)
+      expect(onViewFilterMock.mock.calls[0][1].id).toBe('unread')
+    })
+  })
+
+  describe('Sort control', () => {
+    it('should show up arrow when ascending', () => {
+      const {getByTestId} = setup({
+        sortDirection: 'asc',
+      })
+      const upArrow = getByTestId('UpArrow')
+      expect(upArrow).toBeTruthy()
+    })
+
+    it('should show down arrow when descending', () => {
+      const {getByTestId} = setup({
+        sortDirection: 'desc',
+      })
+      const downArrow = getByTestId('DownArrow')
+      expect(downArrow).toBeTruthy()
+    })
+
+    it('should call onClick when clicked', () => {
+      const onSortClickMock = jest.fn()
+      const {getByTestId} = setup({
+        onSortClick: onSortClickMock,
+      })
+      const button = getByTestId('sortButton')
+      button.click()
+      expect(onSortClickMock.mock.calls).toHaveLength(1)
+    })
+  })
+
+  describe('Groups Menu Button', () => {
+    it('should not render when there are no child topics and the user is an admin', () => {
+      const container = setup({
+        childTopics: [],
+        isAdmin: true,
+      })
+      expect(container.queryByTestId('groups-menu-button')).toBeNull()
+    })
+
+    it('should render when there are child topics and the user is an admin', () => {
+      const container = setup({
+        childTopics: [ChildTopic.mock()],
+        isAdmin: true,
+      })
+      expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
+    })
+
+    it('should not render when the user is not an admin', () => {
+      const container = setup({
+        childTopics: [ChildTopic.mock()],
+        isAdmin: false,
+      })
+      expect(container.queryByTestId('groups-menu-button')).toBeNull()
+    })
+  })
+})

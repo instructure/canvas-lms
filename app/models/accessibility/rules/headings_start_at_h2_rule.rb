@@ -40,6 +40,14 @@ module Accessibility
       def self.link_text
         "Learn more about proper heading structure"
       end
+
+      def self.form(_elem)
+        Accessibility::Forms::DropdownField.new(
+          label: "Choose action",
+          value: "Leave as is",
+          options: ["Leave as is", "Change only this headings level", "Remove heading style"]
+        )
+      end
     end
   end
 end

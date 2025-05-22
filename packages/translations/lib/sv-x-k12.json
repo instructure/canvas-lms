@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Den första rubriken på en sida ska vara i H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Följande innehåll har tillhandahållits av partner"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Materialet är i den offentliga domänen"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Undantag finns för materialet – t.ex. rättvis användning, rätt att citera, eller andra gällande copyright-lagar."
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Det föregående innehållet har tillhandahållits av partner"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Tangentbordet fungerar inte i den nätta HTML-redigeraren. Tryck på Skift+O för att öppna den råa HTML-redigeraren."

@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Die erste Überschrift auf einer Seite sollte eine H2-Überschrift sein."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Der folgende Inhalt stammt von einem Partner."
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Das Material ist gemeinfrei."
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Das Material unterliegt einer Ausnahme – z. B. Fair Use, das Recht zum Zitieren oder anderen nach geltendem Urheberrecht."
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Der vorhergehende Inhalt stammt von einem Partner."
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Der Pretty HTML-Editor ist nicht über die Tastatur zugänglich. Shift-O, um den Editor für reines HTML zu öffnen."

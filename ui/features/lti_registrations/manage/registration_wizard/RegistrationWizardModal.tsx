@@ -247,8 +247,8 @@ const InitializationModal = (props: InitializationModalBodyProps) => {
                 console.warn(`Invalid value for lti_version: ${value}`)
               }
             }}
-            name="example1"
-            defaultValue="1p3"
+            name="LTI Version"
+            defaultValue={props.state.lti_version || '1p3'}
           >
             <RadioInput value="1p3" label="1.3" />
             <RadioInput value="1p1" label="1.1" data-pendo="lti-registration-1p1-interest" />
@@ -347,14 +347,14 @@ const InitializationModal = (props: InitializationModalBodyProps) => {
             <Text
               dangerouslySetInnerHTML={{
                 __html: I18n.t(
-                  "Thank you for your interest in 1.1. We are exploring the possibility of enabling 1.1 installs from the new apps page in future releases. For now, you can install 1.1 tools from the *%{legacyAppPage}*.",
+                  'Thank you for your interest in 1.1. We are exploring the possibility of enabling 1.1 installs from the new apps page in future releases. For now, you can install 1.1 tools from the *%{legacyAppPage}*.',
                   {
-                    legacyAppPage: "legacy apps page",
+                    legacyAppPage: 'legacy apps page',
                     wrappers: [
-                      `<a href=/accounts/${props.accountId}/settings/configurations#tab-tools>$1</a>`
-                    ]
-                  }
-                )
+                      `<a href=/accounts/${props.accountId}/settings/configurations#tab-tools>$1</a>`,
+                    ],
+                  },
+                ),
               }}
             />
           </View>

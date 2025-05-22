@@ -907,7 +907,7 @@ describe "context modules" do
 
   context "with modules page rewrite feature flag enabled" do
     before do
-      @course.root_account.enable_feature!(:modules_page_rewrite)
+      @course.root_account.enable_feature!(:modules_page_rewrite_student_view)
       module_1 = @course.context_modules.create!(name: "Module 1")
       assignment_1 = @course.assignments.create!(name: "Assignment 1")
       module_1.add_item({ id: assignment_1.id, type: "assignment" })

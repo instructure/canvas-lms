@@ -47,6 +47,7 @@ type Props = {
   readonly isRepeating: boolean
   readonly isSeriesHead: boolean
   readonly eventType: string
+  readonly testIdPrefix?: string
 }
 
 const DeleteCalendarEventDialog = ({
@@ -59,6 +60,7 @@ const DeleteCalendarEventDialog = ({
   isRepeating,
   isSeriesHead,
   eventType,
+  testIdPrefix,
 }: Props) => {
   const [which, setWhich] = useState<Which>('one')
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
@@ -119,12 +121,21 @@ const DeleteCalendarEventDialog = ({
     return (
       <Flex as="section" justifyItems="end">
         <Tooltip renderTip={isDeleting && tiptext} on={isDeleting ? ['hover', 'focus'] : []}>
-          <Button color="secondary" margin="0 small 0" onClick={() => isDeleting || handleCancel()}>
+          <Button
+            color="secondary"
+            margin="0 small 0"
+            onClick={() => isDeleting || handleCancel()}
+            data-testid={`${testIdPrefix || ''}cancel-button`}
+          >
             {I18n.t('Cancel')}
           </Button>
         </Tooltip>
         <Tooltip renderTip={isDeleting && tiptext} on={isDeleting ? ['hover', 'focus'] : []}>
-          <Button color="danger" onClick={() => isDeleting || handleDelete()}>
+          <Button
+            color="danger"
+            onClick={() => isDeleting || handleDelete()}
+            data-testid={`${testIdPrefix || ''}delete-button`}
+          >
             {isDeleting ? (
               <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
                 <Spinner size="x-small" renderTitle={I18n.t('Deleting')} />
@@ -136,7 +147,7 @@ const DeleteCalendarEventDialog = ({
         </Tooltip>
       </Flex>
     )
-  }, [handleCancel, handleDelete, isDeleting])
+  }, [handleCancel, handleDelete, isDeleting, testIdPrefix])
 
   const renderRepeating = (): JSX.Element => {
     return (
@@ -148,10 +159,22 @@ const DeleteCalendarEventDialog = ({
           setWhich(value)
         }}
       >
-        <RadioInput value="one" label={I18n.t('This event')} />
-        <RadioInput value="all" label={I18n.t('All events')} />
+        <RadioInput
+          value="one"
+          label={I18n.t('This event')}
+          data-testid={`${testIdPrefix || ''}this-event-radio`}
+        />
+        <RadioInput
+          value="all"
+          label={I18n.t('All events')}
+          data-testid={`${testIdPrefix || ''}all-events-radio`}
+        />
         {!isSeriesHead && (
-          <RadioInput value="following" label={I18n.t('This and all following events')} />
+          <RadioInput
+            value="following"
+            label={I18n.t('This and all following events')}
+            data-testid={`${testIdPrefix || ''}following-events-radio`}
+          />
         )}
       </RadioInputGroup>
     )
@@ -181,8 +204,9 @@ const DeleteCalendarEventDialog = ({
       size="small"
       label={I18n.t('Confirm Deletion')}
       footer={renderFooter}
+      data-testid={`${testIdPrefix || ''}dialog`}
     >
-      <View as="div" margin="0 small">
+      <View as="div" margin="0 small" data-testid={`${testIdPrefix || ''}dialog-content`}>
         {isRepeating ? renderRepeating() : renderOne()}
       </View>
     </CanvasModal>

@@ -99,10 +99,42 @@ export const ZLtiAssetReport = z.object({
 
   title: z.string().optional(),
   comment: z.string().optional(),
-  score_given: z.number().optional(),
-  score_maximum: z.number().optional(),
+  result: z.string().optional(),
+  result_truncated: z.string().optional(),
   indication_color: z.string().optional(),
   indication_alt: z.string().optional(),
   error_code: z.string().optional(),
 })
 export type LtiAssetReport = z.infer<typeof ZLtiAssetReport>
+
+/**
+ * Data sent by tool in deep linking response content item.
+ */
+export const ZImageUrlWithDimensions = z.object({
+  url: z.string().optional(),
+  width: z.number().int().nonnegative().optional(),
+  height: z.number().int().nonnegative().optional(),
+})
+
+/**
+ * Data sent by tool in deep linking response content item.
+ */
+export const ZAssetProcessorContentItem = z.object({
+  type: z.literal('ltiAssetProcessor'),
+  url: z.string().optional(),
+  title: z.string().optional(),
+  text: z.string().optional(),
+  icon: ZImageUrlWithDimensions.optional(),
+  thumbnail: ZImageUrlWithDimensions.optional(),
+  window: ZAssetProcessorWindowSettings.optional(),
+  iframe: ZIframeDimensions.optional(),
+  custom: z.record(z.string()).optional(),
+  report: z
+    .object({
+      url: z.string().optional(),
+      custom: z.record(z.string()).optional(),
+    })
+    .optional(),
+})
+
+export type AssetProcessorContentItem = z.infer<typeof ZAssetProcessorContentItem>

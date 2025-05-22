@@ -112,7 +112,7 @@ exports[`renders the base component correctly 1`] = `
         class="Opportunity-styles__title"
       >
         <a
-          class="css-k51cc7-view-link"
+          class="css-alh7x7-view-link"
           dir="ltr"
           href="http://www.non_default_url.com"
         >
@@ -127,7 +127,7 @@ exports[`renders the base component correctly 1`] = `
         class="Opportunity-styles__status"
       >
         <span
-          class="css-1nkcirr-view--inlineBlock"
+          class="css-1ch5jdt-view--inlineBlock"
           dir="ltr"
         >
           <div
@@ -176,7 +176,7 @@ exports[`renders the base component correctly 1`] = `
       class="Opportunity-styles__close"
     >
       <button
-        class="css-11auhcu-view--inlineBlock-baseButton"
+        class="css-1lsv873-view--inlineBlock-baseButton"
         cursor="pointer"
         dir="ltr"
         type="button"
@@ -340,7 +340,7 @@ exports[`renders the base component correctly with 0 points 1`] = `
         class="Opportunity-styles__title"
       >
         <a
-          class="css-k51cc7-view-link"
+          class="css-alh7x7-view-link"
           dir="ltr"
           href="http://www.non_default_url.com"
         >
@@ -355,7 +355,7 @@ exports[`renders the base component correctly with 0 points 1`] = `
         class="Opportunity-styles__status"
       >
         <span
-          class="css-1nkcirr-view--inlineBlock"
+          class="css-1ch5jdt-view--inlineBlock"
           dir="ltr"
         >
           <div
@@ -404,7 +404,7 @@ exports[`renders the base component correctly with 0 points 1`] = `
       class="Opportunity-styles__close"
     >
       <button
-        class="css-11auhcu-view--inlineBlock-baseButton"
+        class="css-1lsv873-view--inlineBlock-baseButton"
         cursor="pointer"
         dir="ltr"
         type="button"
@@ -568,7 +568,7 @@ exports[`renders the base component correctly without points 1`] = `
         class="Opportunity-styles__title"
       >
         <a
-          class="css-k51cc7-view-link"
+          class="css-alh7x7-view-link"
           dir="ltr"
           href="http://www.non_default_url.com"
         >
@@ -583,7 +583,7 @@ exports[`renders the base component correctly without points 1`] = `
         class="Opportunity-styles__status"
       >
         <span
-          class="css-1nkcirr-view--inlineBlock"
+          class="css-1ch5jdt-view--inlineBlock"
           dir="ltr"
         >
           <div
@@ -618,7 +618,7 @@ exports[`renders the base component correctly without points 1`] = `
       class="Opportunity-styles__close"
     >
       <button
-        class="css-11auhcu-view--inlineBlock-baseButton"
+        class="css-1lsv873-view--inlineBlock-baseButton"
         cursor="pointer"
         dir="ltr"
         type="button"

@@ -207,15 +207,54 @@ describe('ContentTabs', () => {
 
     it('renders the file preview tab when the submission is submitted', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_upload']},
+        Assignment: {
+          submissionTypes: ['online_upload'],
+          courseId: '1',
+        },
         Submission: {
           ...SubmissionMocks.submitted,
-          attachments: [{}],
+          attachments: [
+            {
+              displayName: 'test.jpg',
+              submissionPreviewUrl: 'http://example.com/preview',
+              mimeClass: 'image',
+              _id: '1',
+              id: '1',
+            },
+          ],
         },
       })
       props.submitButtonRef = createSubmitButtonRef()
 
-      const {findByTestId} = render(<AttemptTab {...props} focusAttemptOnInit={false} />)
+      const mocks = [
+        {
+          request: {
+            query: EXTERNAL_TOOLS_QUERY,
+            variables: {courseID: '1'},
+          },
+          result: {
+            data: {
+              course: {
+                externalToolsConnection: {
+                  nodes: [],
+                },
+              },
+            },
+          },
+        },
+      ]
+
+      const {findByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <AttemptTab {...props} focusAttemptOnInit={false} />
+        </MockedProvider>,
+      )
+
+      // First wait for the loading spinner to appear
+      const spinner = await findByTestId('attempt-tab')
+      expect(spinner).toBeInTheDocument()
+
+      // Then wait for the preview to appear
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
     })
 
@@ -241,138 +280,6 @@ describe('ContentTabs', () => {
           </MockedProvider>,
         )
         expect(await waitFor(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('the submission type is student_annotation', () => {
-    it('renders the canvadocs iframe', async () => {
-      const assignmentAndSubmission = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['student_annotation']},
-      })
-      const props = {
-        ...assignmentAndSubmission,
-        createSubmissionDraft: jest.fn().mockResolvedValue({}),
-      }
-      props.submitButtonRef = createSubmitButtonRef()
-
-      const {getByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
-      )
-      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
-      expect(await waitFor(() => getByTestId('canvadocs-pane'))).toBeInTheDocument()
-    })
-  })
-
-  describe('the submission type is online_text_entry', () => {
-    let submitButtonRef
-    beforeAll(async () => {
-      $('body').append('<div role="alert" id="flash_screenreader_holder" />')
-      uploadFileModule.uploadFiles = jest.fn()
-      submitButtonRef = createSubmitButtonRef()
-
-      // This gets the lazy loaded components loaded before our specs.
-      // otherwise, the first one (at least) will fail.
-      const {unmount} = render(
-        <TextEntry focusOnInit={false} submission={{id: '1', _id: '1', state: 'unsubmitted'}} submitButtonRef={submitButtonRef} />,
-      )
-      await waitFor(() => {
-        expect(tinymce.get('textentry_text')).toBeDefined()
-      })
-      unmount()
-    })
-
-    describe('uploading a text draft', () => {
-      it('renders the text entry tab', async () => {
-        const props = await mockAssignmentAndSubmission({
-          Assignment: {submissionTypes: ['online_text_entry']},
-        })
-        props.submitButtonRef = submitButtonRef
-
-        const {findByTestId} = await renderAttemptTab(props)
-        expect(await findByTestId('text-editor')).toBeInTheDocument()
-      })
-
-      // The following tests don't match how the text editor actually works.
-      // The RCE doesn't play nicely with our test environment, so we stub it
-      // out and instead test for the read-only property (and possibly others
-      // eventually) on the TextEntry component's placeholder text-area. This
-      // does not mirror real-world usage but at least lets us verify that our
-      // props are being passed through and correctly on the initial render.
-      describe('text area', () => {
-        it('renders as read-only if the submission has been submitted', async () => {
-          const props = await mockAssignmentAndSubmission({
-            Assignment: {submissionTypes: ['online_text_entry']},
-            Submission: {
-              state: 'submitted',
-            },
-          })
-          props.submitButtonRef = submitButtonRef
-
-          const {findByTestId} = await renderAttemptTab(props)
-          expect(await findByTestId('read-only-content')).toBeInTheDocument()
-        })
-
-        it('does not render as read-only if the submission has been graded pre-submission', async () => {
-          const props = await mockAssignmentAndSubmission({
-            Assignment: {submissionTypes: ['online_text_entry']},
-            Submission: {
-              state: 'graded',
-              attempt: 0,
-            },
-          })
-          props.submitButtonRef = submitButtonRef
-
-          const {queryByTestId} = await renderAttemptTab(props)
-          expect(queryByTestId('read-only-content')).not.toBeInTheDocument()
-        })
-
-        it('renders as read-only if the submission has been graded post-submission', async () => {
-          const props = await mockAssignmentAndSubmission({
-            Assignment: {submissionTypes: ['online_text_entry']},
-            Submission: {
-              state: 'graded',
-              attempt: 1,
-            },
-          })
-          props.submitButtonRef = submitButtonRef
-
-          const {findByTestId} = await renderAttemptTab(props)
-          expect(await findByTestId('read-only-content')).toBeInTheDocument()
-        })
-
-        it('renders as read-only if changes are not allowed to the submission', async () => {
-          const props = await mockAssignmentAndSubmission({
-            Assignment: {submissionTypes: ['online_text_entry']},
-            Submission: {
-              state: 'unsubmitted',
-            },
-          })
-          props.submitButtonRef = submitButtonRef
-
-          const {findByTestId} = render(
-            <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
-              <AttemptTab {...props} focusAttemptOnInit={false} />
-            </StudentViewContext.Provider>,
-          )
-
-          expect(await findByTestId('read-only-content')).toBeInTheDocument()
-        })
-
-        it('does not render as read-only if changes are allowed and the submission is not submitted', async () => {
-          const props = await mockAssignmentAndSubmission({
-            Assignment: {submissionTypes: ['online_text_entry']},
-            Submission: {
-              state: 'unsubmitted',
-            },
-          })
-          props.submitButtonRef = submitButtonRef
-
-          const {queryByTestId} = await renderAttemptTab(props)
-          expect(queryByTestId('read-only-content')).not.toBeInTheDocument()
-        })
       })
     })
   })

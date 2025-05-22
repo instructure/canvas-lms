@@ -159,10 +159,10 @@ describe('GradingSchemeTable', () => {
     const gradingScheme = {
       ...AccountGradingSchemeCards[0].gradingScheme,
       assessed_assignment: false,
-      used_as_default: false
+      used_as_default: false,
     }
     const {getByTestId, openDeleteModal} = renderGradingSchemeTable({
-      gradingSchemeCards: [{gradingScheme, editing: false}]
+      gradingSchemeCards: [{gradingScheme, editing: false}],
     })
     const deleteButton = getByTestId('grading-scheme-1-delete-button')
     await userEvent.click(deleteButton)
@@ -205,12 +205,14 @@ describe('GradingSchemeTable', () => {
     })
 
     it('should display the tooltip over the delete button if disabled', async () => {
-      const {getByTestId, getByText} = renderGradingSchemeTable({
+      const {getByTestId, queryAllByText} = renderGradingSchemeTable({
         defaultAccountGradingSchemeEnabled: true,
       })
       const deleteButton = getByTestId('grading-scheme-3-delete-button')
+      expect(deleteButton).toBeDisabled()
       await userEvent.hover(deleteButton)
-      expect(getByText("You can't delete this grading scheme because it is in use.")).toBeInTheDocument()
+      const tooltips = queryAllByText("You can't delete this grading scheme because it is in use.")
+      expect(tooltips.length).toBeGreaterThan(0)
     })
 
     it('should display "Show Locations Used" as the Locations Used text', () => {

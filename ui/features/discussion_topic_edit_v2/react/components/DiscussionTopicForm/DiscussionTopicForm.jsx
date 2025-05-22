@@ -475,7 +475,7 @@ function DiscussionTopicForm({
   }, [gradingSchemeId, displayGradeAs, pointsPossible, isGraded])
 
   useEffect(() => {
-    if (isCheckpoints) {
+    if (isCheckpoints && !ENV.CHECKPOINTS_GROUP_DISCUSSIONS_ENABLED) {
       setIsGroupDiscussion(false)
       setGroupCategoryId(null)
     }
@@ -1149,6 +1149,7 @@ function DiscussionTopicForm({
             {shouldShowGradedDiscussionOptions && (
               <Checkbox
                 data-testid="graded-checkbox"
+                data-pendo="graded-checkbox"
                 label={I18n.t('Graded')}
                 value="graded"
                 inline={true}
@@ -1163,6 +1164,7 @@ function DiscussionTopicForm({
                 <View display="inline-block" padding="0 0 0 medium">
                   <Checkbox
                     data-testid="checkpoints-checkbox"
+                    data-pendo="checkpoints-checkbox"
                     label={I18n.t('Assign graded checkpoints')}
                     value="checkpoints"
                     inline={true}

@@ -21,7 +21,7 @@ import {shallow} from 'enzyme'
 import {render} from '@testing-library/react'
 import {SearchFormComponent} from '../SearchForm'
 import {Button} from '@instructure/ui-buttons'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import Fixtures from './Fixtures'
@@ -86,9 +86,9 @@ describe('SearchForm', () => {
   })
 
   test('has date pickers for from date and to date', function () {
-    const inputs = wrapper.find(CanvasDateInput)
+    const inputs = wrapper.find(CanvasDateInput2)
     expect(inputs).toHaveLength(2)
-    expect(inputs.every(CanvasDateInput)).toBeTruthy()
+    expect(inputs.every(CanvasDateInput2)).toBeTruthy()
   })
 
   test('has a Button for submitting', function () {

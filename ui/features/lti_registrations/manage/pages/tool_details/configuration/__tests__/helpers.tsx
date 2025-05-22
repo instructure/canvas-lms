@@ -79,11 +79,9 @@ export const mockOverlay = (
   }
 }
 
-export const renderApp =
-  (...p: Parameters<typeof mockRegistrationWithAllInformation>) =>
+export const renderAppWithRegistration =
+  (registration: LtiRegistrationWithAllInformation, refreshRegistration: () => void = jest.fn()) =>
   (element: React.ReactNode) => {
-    const registration = mockRegistrationWithAllInformation(...p)
-
     const router = createMemoryRouter([
       {
         path: '*',
@@ -95,7 +93,7 @@ export const renderApp =
                 <Outlet
                   context={{
                     registration,
-                    refreshRegistration: jest.fn(),
+                    refreshRegistration,
                   }}
                 />
               }
@@ -108,3 +106,6 @@ export const renderApp =
     ])
     return render(<RouterProvider router={router} />)
   }
+
+export const renderApp = (...p: Parameters<typeof mockRegistrationWithAllInformation>) =>
+  renderAppWithRegistration(mockRegistrationWithAllInformation(...p))

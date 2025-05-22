@@ -23,7 +23,6 @@ import React, {useEffect, useState} from 'react'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Button} from '@instructure/ui-buttons'
 import {ExternalTool as ExternalToolModel} from '@canvas/assignments/graphql/student/ExternalTool'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -36,16 +35,12 @@ export const EXTERNAL_TOOL_ERROR_MESSAGE = I18n.t('Please launch the tool and se
 // A generic component that shows an iframe for a given URL, used for both
 // launching the LTI to select content and showing selected content
 const ContentLaunchView = ({launchURL}) => (
-  <>
-    <ScreenReaderContent>{I18n.t('The following content is partner provided')}</ScreenReaderContent>
-    <ToolLaunchIframe
-      allow={iframeAllowances()}
-      data-testid="lti-launch-frame"
-      src={launchURL}
-      title={I18n.t('Tool content')}
-    />
-    <ScreenReaderContent>{I18n.t('The preceding content is partner provided')}</ScreenReaderContent>
-  </>
+  <ToolLaunchIframe
+    allow={iframeAllowances()}
+    data-testid="lti-launch-frame"
+    src={launchURL}
+    title={I18n.t('Tool content')}
+  />
 )
 
 // A wrapper component for the above component, showing a specific URL
@@ -61,7 +56,13 @@ function SelectedContentView({url, resourceLinkLookupUuid}) {
   return <ContentLaunchView launchURL={launchURL} />
 }
 
-function ExternalToolDraftView({createSubmissionDraft, onFileUploadRequested, submission, tool, submitButtonRef}) {
+function ExternalToolDraftView({
+  createSubmissionDraft,
+  onFileUploadRequested,
+  submission,
+  tool,
+  submitButtonRef,
+}) {
   const {submissionDraft} = submission
   const draftExistsForThisTool =
     submissionDraft?.externalTool?._id === tool._id && submissionDraft?.ltiLaunchUrl != null
@@ -161,7 +162,7 @@ function ExternalToolDraftView({createSubmissionDraft, onFileUploadRequested, su
         )}
       </View>
       {showErrorMessage && (
-        <View as='div' background='primary' padding='small 0 0 0'>
+        <View as="div" background="primary" padding="small 0 0 0">
           <FormattedErrorMessage message={EXTERNAL_TOOL_ERROR_MESSAGE} />
         </View>
       )}
@@ -174,7 +175,7 @@ const ExternalToolSubmission = ({
   onFileUploadRequested,
   submission,
   tool,
-  submitButtonRef
+  submitButtonRef,
 }) =>
   isSubmitted(submission) ? (
     <SelectedContentView
@@ -202,7 +203,7 @@ ExternalToolSubmission.propTypes = {
     url: string,
   }).isRequired,
   tool: ExternalToolModel.shape,
-  submitButtonRef: object
+  submitButtonRef: object,
 }
 
 ExternalToolSubmission.defaultProps = {

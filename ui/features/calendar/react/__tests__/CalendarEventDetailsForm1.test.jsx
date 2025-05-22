@@ -37,7 +37,11 @@ const changeValue = (component, testid, value) => {
   expect(child).toBeInTheDocument()
   act(() => child.click())
   fireEvent.change(child, {target: {value}})
-  act(() => child.blur())
+  if (testid == 'edit-calendar-event-form-date') {
+    fireEvent.keyUp(child, {key: 'Enter', code: 'Enter'})
+  } else {
+    act(() => child.blur())
+  }
   return child
 }
 
@@ -51,8 +55,8 @@ const setTime = (component, testid, time) => {
 const testTimezone = async (timezone, inputDate, expectedDate, time) => {
   defaultProps.timezone = timezone
   const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-  const date = changeValue(component, 'edit-calendar-event-form-date', inputDate)
-  expect(date.value).toBe('Thu, Jul 14, 2022')
+  // CanvasDateInput2 now stores values as an ISO8601 compliant string
+  changeValue(component, 'edit-calendar-event-form-date', inputDate)
   if (time) setTime(component, 'event-form-end-time', time)
   component.getByText('Submit').click()
 
@@ -258,6 +262,7 @@ describe('CalendarEventDetailsForm', () => {
     }
 
     component.getByText('Submit').click()
+    expect(date.value).toBe('Thu, Jul 14, 2022')
 
     await waitFor(() =>
       expect(defaultProps.event.save).toHaveBeenCalledWith(
@@ -334,8 +339,8 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('does not show FrequencyPicker when the event is section-specific', () => {
-    defaultProps.event.object.all_context_codes = "course_2"
-    defaultProps.event.object.context_code = "course_section_22"
+    defaultProps.event.object.all_context_codes = 'course_2'
+    defaultProps.event.object.context_code = 'course_section_22'
 
     render(<CalendarEventDetailsForm {...defaultProps} />)
 
@@ -344,8 +349,8 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('show FrequencyPicker when the event is not section-specific', () => {
-    defaultProps.event.object.all_context_codes = "course_2"
-    defaultProps.event.object.context_code = "course_2"
+    defaultProps.event.object.all_context_codes = 'course_2'
+    defaultProps.event.object.context_code = 'course_2'
 
     render(<CalendarEventDetailsForm {...defaultProps} />)
 

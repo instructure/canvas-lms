@@ -83,7 +83,7 @@ const FreeFormComments = props => {
   const label = I18n.t('Comments')
   const toScreenReader = el => <ScreenReaderContent>{el}</ScreenReaderContent>
 
-  const commentClass = `edit-freeform-comments-${large ? 'large' : 'small'}`
+  const commentClass = `rubric-comment edit-freeform-comments-${large ? 'large' : 'small'}`
   return (
     <div className={commentClass}>
       {options.length > 0 ? selector : null}

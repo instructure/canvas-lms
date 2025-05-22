@@ -145,6 +145,7 @@ class User < ActiveRecord::Base
   has_many :current_group_memberships, -> { GroupMembership.for_collaborative_groups.where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'") }, class_name: "GroupMembership"
   has_many :groups, -> { where("group_memberships.workflow_state<>'deleted'").merge(Group.collaborative) }, class_name: "Group", through: :group_memberships
   has_many :current_groups, -> { merge(Group.collaborative).where("groups.workflow_state <> 'deleted'") }, class_name: "Group", through: :current_group_memberships, source: :group
+  has_many :current_active_groups, -> { merge(Group.collaborative.active.context_active) }, class_name: "Group", through: :current_group_memberships, source: :group
   has_many :differentiation_tag_memberships, -> { GroupMembership.for_non_collaborative_groups }, class_name: "GroupMembership", dependent: :destroy
   has_many :current_differentiation_tag_memberships, -> { GroupMembership.for_non_collaborative_groups.where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'") }, class_name: "GroupMembership"
   has_many :differentiation_tags, -> { where("group_memberships.workflow_state<>'deleted'").merge(Group.non_collaborative) }, class_name: "Group", through: :differentiation_tag_memberships, source: :group
@@ -626,7 +627,7 @@ class User < ActiveRecord::Base
   end
 
   def update_account_associations_if_necessary
-    update_account_associations if !self.class.skip_updating_account_associations? && saved_change_to_workflow_state? && id_before_last_save
+    update_account_associations if !self.class.skip_updating_account_associations? && saved_change_to_workflow_state? && !previously_new_record?
   end
 
   def update_account_associations(opts = nil)
@@ -2623,8 +2624,8 @@ class User < ActiveRecord::Base
 
     sorted_events = events.sort_by do |e|
       due_date = e.start_at
-      if e.respond_to? :dates_hash_visible_to
-        e.dates_hash_visible_to(self).any? do |due_hash|
+      if e.respond_to? :formatted_dates_hash_visible_to
+        e.formatted_dates_hash_visible_to(self).any? do |due_hash|
           due_date = due_hash[:due_at] if due_hash[:due_at]
         end
       end
@@ -2656,7 +2657,7 @@ class User < ActiveRecord::Base
     time = opts[:time] || Time.zone.now
     assignments.select do |a|
       if a.context.grants_any_right?(self, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-        a.dates_hash_visible_to(self).any? do |due_hash|
+        a.formatted_dates_hash_visible_to(self).any? do |due_hash|
           due_hash[:due_at] && due_hash[:due_at] >= time && due_hash[:due_at] <= opts[:end_at]
         end
       else

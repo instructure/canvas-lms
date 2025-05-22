@@ -473,7 +473,7 @@ class LearningOutcome < ActiveRecord::Base
 
   def propagate_changes_to_rubrics
     # exclude new outcomes
-    return if saved_change_to_id?
+    return if previously_new_record?
     return if !saved_change_to_data? &&
               !saved_change_to_short_description? &&
               !saved_change_to_description?

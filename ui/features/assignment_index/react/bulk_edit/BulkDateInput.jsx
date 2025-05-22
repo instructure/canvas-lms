@@ -22,7 +22,7 @@ import moment from 'moment-timezone'
 import {View} from '@instructure/ui-view'
 import {DateTime} from '@instructure/ui-i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 BulkDateInput.propTypes = {
@@ -117,7 +117,7 @@ function BulkDateInput({
 
   return (
     <View as="div" minWidth={width} margin="x-small 0">
-      <CanvasDateInput
+      <CanvasDateInput2
         renderLabel={renderLabel}
         selectedDate={selectedDateString}
         formatDate={formatDate}
@@ -126,7 +126,6 @@ function BulkDateInput({
         interaction={interaction}
         messages={messages}
         width={width}
-        size="small"
         withRunningValue={true}
       />
     </View>

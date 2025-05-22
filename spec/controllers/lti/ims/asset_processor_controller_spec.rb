@@ -38,8 +38,7 @@ describe Lti::IMS::AssetProcessorController do
         timestamp: 1.hour.ago.utc.iso8601,
         title: "Test asset processor report",
         type: "originality",
-        scoreGiven: 150,
-        scoreMaximum: 300,
+        result: "150/300",
         priority: 0,
         processingProgress: Lti::AssetReport::PROGRESS_PROCESSED,
         "https://example.com/foo/extra": { "extra value" => true },
@@ -80,8 +79,7 @@ describe Lti::IMS::AssetProcessorController do
       expect(report.timestamp).to be_within(1.second).of(Time.zone.parse(expected_values[:timestamp]))
       expect(report.report_type).to eq(expected_values[:type])
       expect(report.asset_processor).to eq(asset_processor)
-      expect(report.score_given).to eq(expected_values[:scoreGiven])
-      expect(report.score_maximum).to eq(expected_values[:scoreMaximum])
+      expect(report.result).to eq(expected_values[:result])
       expect(report.processing_progress).to eq(expected_values[:processingProgress])
       expect(report.workflow_state).to eq("active")
       expect(report.extensions).to eq({
@@ -182,11 +180,11 @@ describe Lti::IMS::AssetProcessorController do
     end
 
     context "when non-scalar values are provided" do
-      let(:body_overrides) { super().merge(scoreMaximum: {}, scoreGiven: [1, 2, 3], title: { "foo" => "bar" }) }
+      let(:body_overrides) { super().merge(result: [1, 2, 3], title: { "foo" => "bar" }) }
 
       # This is actually done by params.permit(...)
       it "strips them out and returns only the values actually stored to the database" do
-        expect_successful_creation(scoreGiven: nil, scoreMaximum: nil, title: nil)
+        expect_successful_creation(result: nil, title: nil)
       end
     end
   end

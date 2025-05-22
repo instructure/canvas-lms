@@ -119,6 +119,7 @@ describe('CourseItemRow', () => {
     renderCourseItemRow({selectable: true})
 
     expect(screen.getByRole('checkbox')).toBeInTheDocument()
+    expect(screen.getByTestId('select-announcement-checkbox')).toBeInTheDocument()
   })
 
   it('renders a drag handle if draggable: true', () => {

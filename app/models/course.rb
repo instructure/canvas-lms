@@ -30,6 +30,7 @@ class Course < ActiveRecord::Base
   include Courses::ExportWarnings
   include OutcomeImportContext
   include MaterialChanges
+  include CopiedAssets
 
   attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
@@ -469,7 +470,7 @@ class Course < ActiveRecord::Base
 
   def update_account_associations_if_changed
     if (saved_change_to_root_account_id? || saved_change_to_account_id?) && !self.class.skip_updating_account_associations?
-      delay(synchronous: !Rails.env.production? || saved_change_to_id?).update_account_associations
+      delay(synchronous: !Rails.env.production? || previously_new_record?).update_account_associations
     end
   end
 
@@ -481,7 +482,7 @@ class Course < ActiveRecord::Base
   end
 
   def update_enrollment_states_if_necessary
-    return if saved_change_to_id # new object, nothing to possibly invalidate
+    return if previously_new_record? # new object, nothing to possibly invalidate
 
     # a lot of things can change the date logic here :/
     if (saved_changes.keys.intersect?(%w[restrict_enrollments_to_course_dates account_id enrollment_term_id]) ||
@@ -1088,7 +1089,7 @@ class Course < ActiveRecord::Base
     p.to { root_account.account_users.active }
     p.whenever do |record|
       record.root_account &&
-        ((record.just_created && record.name != Course.default_name) ||
+        ((record.previously_new_record? && record.name != Course.default_name) ||
          (record.name_before_last_save == Course.default_name &&
            record.name != Course.default_name)
         )
@@ -2510,6 +2511,25 @@ class Course < ActiveRecord::Base
         auto_grade_result.update!(
           root_account_id: submission.course.root_account_id,
           grade_data:,
+          error_message: nil,
+          grading_attempts: auto_grade_result.grading_attempts + 1
+        )
+      end
+
+      grade_data = auto_grade_result.grade_data
+      all_missing_comments = grade_data.all? { |item| !item.key?("comments") }
+
+      if all_missing_comments
+
+        grade_data_with_comments = AutoGradeCommentsService.new(
+          assignment: assignment_text,
+          grade_data:,
+          root_account_uuid:
+        ).call
+
+        auto_grade_result.update!(
+          root_account_id: submission.course.root_account_id,
+          grade_data: grade_data_with_comments,
           error_message: nil,
           grading_attempts: auto_grade_result.grading_attempts + 1
         )
