@@ -189,6 +189,7 @@ export const AssetProcessorsCard = ({
 }: AssetProcessorsCardProps) => (
   <View
     data-pendo="asset-processor-add-modal-tool"
+    data-testid="asset-processor-card"
     aria-label={title}
     as="div"
     background="secondary"
