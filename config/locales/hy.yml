@@ -9140,6 +9140,7 @@ hy:
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "Օգտատիրոջ անունը սխալ է, պետք է լինի տառերի և թվերի համադրություն կամ էլեկտրոնային փոստի հասցե"
   login_is_too_long_25373f95: "Մուտքային անունը չափազանց երկար է"
   login_label_1dea0f9d: "Մուտքի տարբերանշան"
+  login_sis_id_942859: "Մուտքի / SIS ID"
   login_with_auth_type_a0aaa52a: "Մուտք *%{auth_type}* միջոցով"
   login_with_provider_3fd3998e: "Մուտք %{provider} միջոցով"
   loginrequest_encoded_url_44c49c18: "Մուտք գործելու հարցման կոդավորված URL"
@@ -11668,6 +11669,7 @@ hy:
   notifications_cbfa7704: Ծանուցումներ
   notifications_sent_to_external_services_c4a86b78: "Արտաքին ծառայություններին ուղարկված ծանուցումներ"
   now_click_the_agenda_button_607fb40e: "Այժմ սեղմեք *Օրակարգ* կոճակը"
+  now_d1785853: Այժմ
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Այժմ, երբ ձեր դասընթացը կարգաբերված և հասանելի է, ձեզ հավանաբար այլևս պետք չեն այս ստուգիչ հարցերը: Բայց մենք դրանք կպահենք այն դեպքերի համար, երբ դուք հետագայում ինչ-որ նոր բան կցանկանաք կամ ձեզ լրացուցիչ օգնություն պետք լինի ձեր դասընթացի բովանդակությունը փոխելիս:   "
   num_messages_c1949bbc: 
     one: "1 հաղորդագրություն"
@@ -15051,6 +15053,7 @@ hy:
   search_for_a_deleted_course_by_id_f553398d: "Հեռացված դասընթացի որոնում ըստ նույնականացուցչի"
   search_for_assignment_8149cb1: "Հանձնարարությունների որոնում"
   search_for_files_7541fb28: "Որոնել ֆայլեր"
+  search_for_people_by_id_or_name_36107593: "Մարդկանց որոնում ըստ նույնականացուցչի կամ անվան"
   search_groups_or_people_6c15d6ad: "Որոնել խմբեր կամ մարդկանց"
   search_people_402e622c: "Մարդկանց որոնում"
   search_term_must_be_at_least_num_characters_669098ed: "Որոնվող բառը պետք է ունենա առնվազն %{num} նիշ"
@@ -15245,6 +15248,7 @@ hy:
   self_sign_up_c8d23585: Ինքնագրանցում
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Ուղարկել Օգտագործողի դաշտերը  (հանել դրոշակը, եթե չեք օգտագործում  Canvas zendesk)"
   send_e3bd0ed0: Ուղարկել
+  sent_at_23cccc07: Ուղարկել
   sent_f4ee89ec: "Ուղարկվել է"
   sent_fe0a1eb4: "Ուղարկված է"
   sequence_footer: 
