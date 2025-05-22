@@ -7614,6 +7614,7 @@ ko:
       debug: 
         logout_response_redirect_from_idp: "IdP에서 받은 LogoutResponse"
         redirect_from_idp: "IdP에서 받은 LoginResponse"
+  login_sis_id_942859: "로그인 / SIS ID"
   loginrequest_encoded_url_44c49c18: "LoginRequest 인코딩된 URL"
   loginrequest_xml_sent_to_idp_9fafd03a: "IdP로 전송된 LoginRequest XML"
   logins_9aee0cbe: 로그인
@@ -9873,6 +9874,7 @@ ko:
   notification_settings_652dc60b: "알림 설정"
   notifications_cbfa7704: 알림
   notifications_sent_to_external_services_c4a86b78: "외부 서비스에 보낸 알림"
+  now_d1785853: 지금
   number: 
     currency: 
       format: 
@@ -12607,6 +12609,7 @@ ko:
       not_available_yet: "과목이 시작하기 직전에 이메일을 보냅니다."
   self_sign_up_c8d23585: "직접 등록"
   send_e3bd0ed0: 보내기
+  sent_at_23cccc07: "발송:"
   sent_f4ee89ec: 전송했습니다!
   sent_fe0a1eb4: "보낸 메시지"
   sequence_footer: 
