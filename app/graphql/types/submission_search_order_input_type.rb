@@ -23,16 +23,22 @@ module Types
     graphql_name "SubmissionSearchOrderField"
     description "The user or submission field to sort by"
     # user sorts
+    value "group_name"
     value "username"
+    value "username_first_last"
+    value "test_student"
 
     # submission sorts
+    value "needs_grading"
+    value "random"
     value "score"
+    value "submission_status"
     value "submitted_at"
   end
 
   class SubmissionSearchOrderInputType < Types::BaseInputObject
     graphql_name "SubmissionSearchOrder"
-    description "Specify a sort for the results"
+    description "Specify a sort for the results. The 'direction' argument is ignored for 'random' sorts. For sorts of boolean fields, 'true' comes before 'false' for ascending sorts."
     argument :direction, OrderDirectionType, required: false
     argument :field, SubmissionSearchOrderFieldInputType, required: true
   end
