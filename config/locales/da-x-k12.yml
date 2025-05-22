@@ -20158,7 +20158,7 @@ da-x-k12:
   new_alert_f757d585: "Ny varsling"
   new_analytics_api_access_7eec1ead: "Ny Analytics API-adgang"
   new_analytics_attendance_config_v2_5f7a9e2c: "New Analytics – Attendance Config V2"
-  new_analytics_description: "Vis ny analyse for fag- og brugerdata. Det kan tage 24 timer, før datene vises i New Analytics, efter at dette funktionsflag er blevet indstillet til ON. For flere detaljer henvises der til *New Analytics brugergruppe* i Canvas Community."
+  new_analytics_description: "Vis ny analyse for fag- og brugerdata. Det kan tage 24 timer, før datene vises i New Analytics, efter at dette funktionsflag er blevet indstillet til ON. For flere detaljer henvises der til New Analytics brugergruppe i Canvas Community."
   new_analytics_f6147886: "New Analytics"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       New Analytics er et interaktivt værktøj, som hjælper dig og dine elever med at

@@ -9696,6 +9696,7 @@ uk:
   login_link_color_a887a109: "Колір посилання входу до системи"
   login_logo_5eecf564: "Логотип логіну"
   login_screen_83518c07: "Екран входу до системи"
+  login_sis_id_942859: "Login / SIS ID"
   login_with_auth_type_a0aaa52a: "Увійти з *%{auth_type}*"
   login_with_provider_3fd3998e: "Увійти з %{provider}"
   loginrequest_encoded_url_44c49c18: "LoginRequest закодованої URL-адреси"
@@ -12320,6 +12321,7 @@ uk:
   notifications_search_results_80a0b06f: "Повідомлення про результати пошуку"
   notifications_sent_to_external_services_c4a86b78: "Повідомлення надіслані зовнішнім сервісам"
   notify_users_this_quiz_has_changed_c5b05995: "Повідомляти користувачів, що цей тест був змінений"
+  now_d1785853: зараз
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Тепер, коли ваш курс налаштований і доступний, вам мабуть більше не знадобиться цей контрольний список. Проте, ми триматимемо його під рукою на випадок, якщо ви пізніше зрозумієте, що хочете спробувати щось нове, або просто потребуватимете трохи додакової допомоги для внесення змін до вмісту курсу. "
   number: 
     currency: 
@@ -15737,6 +15739,7 @@ uk:
   search_for_a_deleted_course_by_id_f553398d: "Шукайте видалений курс за ідентифікатором"
   search_for_assignment_8149cb1: "Пошук Завдання"
   search_for_files_7541fb28: "Шукати файли"
+  search_for_people_by_id_or_name_36107593: "Пошук людей за ID або іменем"
   search_form_fcaa38f7: "Форма пошуку"
   search_grading_periods_e947a3e9: "Шукати періоди оцінювання..."
   search_groups_or_people_6c15d6ad: "Пошук груп або людей"
@@ -15999,6 +16002,7 @@ uk:
   sending_bf324366: Відправка...
   sending_message_8ac5bc90: "Надіслати повідомлення..."
   sending_message_failed_please_try_again_b53cc904: "Не вдалося надіслати повідомлення, спробуйте ще раз"
+  sent_at_23cccc07: Відправлено
   sent_f4ee89ec: Надісланий!
   sent_fe0a1eb4: Надіслати
   sequence_footer: 
