@@ -20,6 +20,13 @@ horizon_learning_provider_app_for_courses:
   display_name: "Canvas Career: Learning Provider App (Course Contexts)"
   description: |-
     Enables the Canvas Career Learning Provider App in course contexts.
+horizon_learner_app_for_students:
+  applies_to: Account
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Learner App (Course Contexts)"
+  description: |-
+    Enables the Learner app in Canvas Career.
 horizon_crm_integration:
   applies_to: Account
   state: hidden
