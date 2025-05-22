@@ -2185,10 +2185,13 @@ class Submission < ActiveRecord::Base
 
   def maybe_queue_conditional_release_grade_change_handler
     shard.activate do
-      return unless graded? && posted?
+      reloaded = Submission.find(id)
+      return unless reloaded.graded? && reloaded.posted?
 
       if assignment.present? && assignment.queue_conditional_release_grade_change_handler?
         queue_conditional_release_grade_change_handler
+      elsif assignment.blank?
+        logger.warn("No assignment present for submission #{id}; skipping conditional release handler")
       end
     end
   end
