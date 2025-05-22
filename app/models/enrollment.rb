@@ -495,10 +495,14 @@ class Enrollment < ActiveRecord::Base
   end
 
   def conclude
-    self.workflow_state = "completed"
-    self.completed_at = Time.now
-    self.user.touch
-    self.save
+    User.transaction do
+      self.user.with_lock do
+        self.workflow_state = "completed"
+        self.completed_at = Time.now
+        self.user.touch
+        save
+      end
+    end
   end
 
   def unconclude
