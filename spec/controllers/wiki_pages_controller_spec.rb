@@ -24,6 +24,33 @@ describe WikiPagesController do
     @wiki = @course.wiki
   end
 
+  describe "new page" do
+    render_views
+
+    context "when 'canvas_content_builder' feature is enabled" do
+      before do
+        @course.account.enable_feature!(:canvas_content_builder)
+      end
+
+      it "renders new page" do
+        get :new, params: { course_id: @course.id }
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("New Page placeholder")
+      end
+    end
+
+    context "when 'canvas_content_builder' feature is disabled" do
+      before do
+        @course.account.disable_feature!(:canvas_content_builder)
+      end
+
+      it "renders error page" do
+        get :new, params: { course_id: @course.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
   describe "GET 'front_page'" do
     it "redirects" do
       get "front_page", params: { course_id: @course.id }
