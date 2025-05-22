@@ -151,7 +151,12 @@ module Lti
         # We can return the tool in content if we
         # know it uses the preferred LTI version.
         # No need to go through the tool lookup logic.
-        return content if content&.active? && content&.uses_preferred_lti_version?
+        if content.present? &&
+           content.active? &&
+           content.uses_preferred_lti_version? &&
+           content.available_in_context?(context)
+          return content
+        end
 
         # Lookup the tool by the usual
         # method. Fall back on the tag's content if
@@ -181,6 +186,10 @@ module Lti
       #   unless the tool is an LTI 1.1 tool and another matched tool is an LTI 1.3 tool.
       # @param exclude_tool_id [Integer] Will never return this tool
       # @param preferred_client_id [Integer] Matches only against tools from this registration
+      # @param use_context_controls [Boolean] If true, filters out tools that are marked as
+      #  unavailable in the given context, based on LTI::ContextControls. Note that this will only
+      #  filter LTI 1.3 tools, since LTI 1.1 tools do not support context controls, and are always considered
+      #  available so long as they are active.
       # @param only_1_3 [Boolean] Matches only against LTI 1.3 tools
       # @param prefer_1_1 [Boolean] Sorts LTI 1.1 tools in front of LTI 1.3 tools
       # @return [ContextExternalTool] the tool that matches the given URL
@@ -190,13 +199,18 @@ module Lti
         preferred_tool_id: nil,
         exclude_tool_id: nil,
         preferred_client_id: nil,
+        check_availability: true,
         only_1_3: false,
         prefer_1_1: false
       )
         GuardRail.activate(:secondary) do
           preferred_tool = ContextExternalTool.where(id: preferred_tool_id).first if preferred_tool_id # don't raise an exception if it's not found
           original_client_id = preferred_tool&.developer_key_id
-          can_use_preferred_tool = preferred_tool&.active? && Lti::ContextToolFinder.contexts_to_search(context).member?(preferred_tool.context)
+          can_use_preferred_tool = preferred_tool.present? &&
+                                   preferred_tool.active? &&
+                                   Lti::ContextToolFinder.contexts_to_search(context).member?(preferred_tool.context)
+
+          can_use_preferred_tool &&= preferred_tool.available_in_context?(context) if check_availability
 
           # always use the preferred_tool_id if url isn't provided
           return preferred_tool if url.blank? && can_use_preferred_tool
@@ -208,6 +222,9 @@ module Lti
             original_client_id:,
             prefer_1_1:
           ).active
+
+          potential_tools = filter_by_unavailable_context_controls(potential_tools, context) if check_availability
+
           potential_tools = potential_tools.where(developer_key_id: preferred_client_id) if preferred_client_id
           potential_tools = potential_tools.where.not(id: exclude_tool_id) if exclude_tool_id
           potential_tools = potential_tools.where(lti_version: "1.3") if only_1_3
@@ -256,6 +273,23 @@ module Lti
 
       private
 
+      # Filters the given scope of ContextExternalTools by the context controls
+      # that are set for the given context.
+      #
+      # @param scope [ActiveRecord::Relation] a ContextExternalTool query to narrow the search
+      # @param context [Account | Course | Group | Assignment] the current context
+      # @return [ActiveRecord::Relation] the scope filtered by context controls. All LTI 1.1 tools are included
+      #  since they do not support context controls and are always considered available so long as they are active.
+      def filter_by_unavailable_context_controls(scope, context)
+        return scope unless context.root_account.feature_enabled?(:lti_registrations_next)
+
+        deployment_ids = Lti::ContextControl.deployment_ids_for_context(context)
+
+        context.shard.activate do
+          scope.where(id: deployment_ids).or(scope.lti_1_1)
+        end
+      end
+
       # Sorts all tools in the context chain by a variety of criteria in SQL
       # as opposed to in memory, in order to make it easier to find a tool that matches
       # the given URL.
@@ -271,6 +305,18 @@ module Lti
       # Theoretically once this method is done, the very first tool to match the URL will be
       # the right tool, making it possible to eventually perform the rest of the URL matching
       # in SQL as well.
+      # Note that currently, this mehod does *not* filter out deleted tools. We
+      # need to be able to look at deleted tools to find an associated LTI 1.1
+      # tool for an LTI 1.3 tool. This could likely be resolved in the future by
+      # adding yet another boolean here, but for now, be aware of this behavior.
+      # @param context [Course|Group|Assignment|Account] Base context for
+      # searching
+      # @param preferred_tool_id [Integer | nil] If provided, moves
+      # this tool to the front of the list
+      # @param original_client_id [Integer | nil] If provided, sorts tools from
+      # this developer key to the front
+      # @param prefer_1_1 [Boolean] If true, sorts LTI 1.1 tools in front of LTI
+      # 1.3 tools (you almost certainly don't want this)
       def potential_matching_tools(
         context:,
         preferred_tool_id: nil,

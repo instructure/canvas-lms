@@ -24,7 +24,9 @@ describe Importers::LtiResourceLinkImporter do
   let!(:source_course) { course_model }
   let!(:destination_course) { course_model }
   let!(:migration) { ContentMigration.create(context: destination_course, source_course:) }
-  let!(:tool) { external_tool_1_3_model(context: destination_course) }
+
+  let_once(:registration) { lti_registration_with_tool(account: destination_course.root_account, created_by: user_model) }
+  let_once(:tool) { registration.deployments.first }
 
   context "when `lti_resource_links` is not given" do
     let(:hash) { { lti_resource_links: nil } }

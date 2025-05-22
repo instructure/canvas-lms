@@ -564,6 +564,7 @@ describe ContentMigration do
       registration2 = lti_developer_key_model(account: @copy_from.root_account).tap do |k|
         lti_tool_configuration_model(developer_key: k,
                                      lti_registration: k.lti_registration,
+                                     domain: "example.com",
                                      target_link_uri: "https://example.com/other-tool")
       end.lti_registration
       account_tool = registration2.new_external_tool(@copy_from.root_account)
@@ -578,6 +579,7 @@ describe ContentMigration do
       duplicate_cross_account_registration = lti_developer_key_model(account: @copy_to.root_account).tap do |k|
         lti_tool_configuration_model(developer_key: k,
                                      lti_registration: k.lti_registration,
+                                     domain: "example.com",
                                      target_link_uri: "https://example.com/other-tool")
       end.lti_registration
       duplicate_cross_account_registration.new_external_tool(@copy_from.root_account)

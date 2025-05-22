@@ -10873,17 +10873,16 @@ describe Assignment do
 
     describe "#update_line_items" do
       let(:use_1_3) { true }
-      let(:dev_key) { DeveloperKey.create! }
+      let(:registration) do
+        lti_registration_with_tool(account: course.root_account,
+                                   created_by: user_model,
+                                   configuration_params: {
+                                     target_link_uri: "http://www.tool.com/launch",
+                                     oidc_initiation_url: "https://www.tool.com/launch",
+                                   })
+      end
       let(:tool) do
-        course.context_external_tools.create!(
-          consumer_key: "key",
-          shared_secret: "secret",
-          name: "test tool",
-          url: "http://www.tool.com/launch",
-          lti_version: use_1_3 ? "1.3" : "1.1",
-          workflow_state: "public",
-          developer_key: dev_key
-        )
+        registration.new_external_tool(course)
       end
       let(:custom_params) do
         {
@@ -11136,7 +11135,16 @@ describe Assignment do
       end
 
       context "given an assignment bound to a non-LTI 1.3 tool" do
-        let(:use_1_3) { false }
+        let(:tool) do
+          course.context_external_tools.create!(
+            consumer_key: "key",
+            shared_secret: "secret",
+            name: "test tool",
+            url: "http://www.tool.com/launch",
+            lti_version: "1.1",
+            workflow_state: "public"
+          )
+        end
 
         it "does not create line items and resource links" do
           expect(assignment.line_items).to be_empty

@@ -63,16 +63,24 @@ module Lti
 
       shared_examples "assignment with wrong tool" do
         let(:other_tool) do
-          ContextExternalTool.create!(
+          tool = ContextExternalTool.create!(
             context: tool_context,
             consumer_key: "key",
             shared_secret: "secret",
             name: "wrong tool",
             url: "http://www.wrong_tool.com/launch",
-            developer_key: DeveloperKey.create!,
+            developer_key: lti_developer_key_model(account: tool_context.root_account),
             lti_version: "1.3",
             workflow_state: "public"
           )
+          control = tool.context_controls.new(registration: tool.developer_key.lti_registration, available: true)
+          if tool_context.is_a?(Course)
+            control.course = tool_context
+          else
+            control.account = tool_context
+          end
+          control.save!
+          tool
         end
         let(:line_item) do
           line_item_model(

@@ -974,25 +974,31 @@ describe ExternalToolsController do
     end
 
     context "LTI 1.3" do
-      let(:developer_key) do
-        key = DeveloperKey.create!(account: @course.account)
-        key.generate_rsa_keypair!
-        key.developer_key_account_bindings.first.update!(
-          workflow_state: "on"
-        )
-        key.save!
-        key
+      let(:registration) do
+        lti_registration_with_tool(account: @course.account,
+                                   created_by: @teacher,
+                                   configuration_params:)
       end
 
       let(:lti_1_3_tool) do
-        tool = @course.context_external_tools.new(name: "test",
-                                                  consumer_key: "key",
-                                                  shared_secret: "secret")
-        tool.url = "http://www.example.com/launch"
-        tool.use_1_3 = true
-        tool.developer_key = developer_key
-        tool.save!
-        tool
+        registration.deployments.first
+      end
+      let(:configuration_params) do
+        {
+          "domain" => "www.example.com",
+          "oidc_initiation_url" => "http://www.example.com/launch",
+          "target_link_uri" => "http://www.example.com/launch",
+          "placements" => [
+            {
+              "placement" => "course_navigation",
+              "target_link_uri" => "http://www.example.com/launch"
+            },
+            {
+              "placement" => "account_navigation",
+              "target_link_uri" => "http://www.example.com/launch"
+            }
+          ]
+        }
       end
 
       let(:decoded_jwt) do

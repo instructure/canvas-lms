@@ -238,9 +238,7 @@ describe Lti::Messages::ResourceLinkRequest do
 
       context "when the tool has been re-installed" do
         let(:tool_override) do
-          t = tool.dup
-          t.save!
-          t
+          registration.new_external_tool(course)
         end
 
         before do
