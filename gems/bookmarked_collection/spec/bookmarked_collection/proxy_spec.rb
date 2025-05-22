@@ -104,6 +104,15 @@ describe BookmarkedCollection::Proxy do
         expect(pager).to eq [@scope.first, @scope.last]
         expect(pager.next_bookmark).to be_nil
       end
+
+      it "handles an empty last page" do
+        pager = @proxy.paginate(per_page: 6)
+        expect(pager).to eq [@scope.first, @scope.last]
+        pager.has_more!
+        pager = @proxy.paginate(page: pager.next_page, per_page: 6)
+        expect(pager).to eq []
+        expect(pager.next_bookmark).to be_nil
+      end
     end
 
     it "doesn't blow up when filtering everything out" do
@@ -149,6 +158,15 @@ describe BookmarkedCollection::Proxy do
         expect(pager.next_bookmark).not_to be_nil
         pager = @proxy.paginate(page: pager.next_page, per_page: 2)
         expect(pager).to eq [@scope.last]
+        expect(pager.next_bookmark).to be_nil
+      end
+
+      it "handles an empty last page" do
+        pager = @proxy.paginate(per_page: 6)
+        expect(pager).to eq [@scope.first, @scope.last]
+        pager.has_more!
+        pager = @proxy.paginate(page: pager.next_page, per_page: 6)
+        expect(pager).to eq []
         expect(pager.next_bookmark).to be_nil
       end
     end
