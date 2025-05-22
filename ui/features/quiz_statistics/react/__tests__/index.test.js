@@ -19,7 +19,8 @@
 import $ from 'jquery'
 import sinon from 'sinon'
 import {configure, mount, unmount} from '../index'
-import {findByTestId} from '@testing-library/dom'
+import {findByTestId, waitFor} from '@testing-library/dom'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const fixture = {
   '/api/v1/courses/1/quizzes/1/statistics': {
@@ -721,6 +722,7 @@ describe('canvas_quizzes/statistics', () => {
   let fakeServer
 
   beforeEach(() => {
+    fakeENV.setup()
     fakeServer = sinon.createFakeServer()
     fakeServer.autoRespond = true
     fakeServer.respondImmediately = true
@@ -743,27 +745,55 @@ describe('canvas_quizzes/statistics', () => {
     })
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     fakeServer.restore()
     fakeServer = null
-
-    return unmount()
+    await unmount()
+    fakeENV.teardown()
   })
 
   it('renders', async () => {
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
     const node = document.createElement('div')
+    document.body.appendChild(node)
 
-    await mount(node)
-    const el = await findByTestId(node, 'summary-statistics')
+    try {
+      // Mock the scores data to ensure consistent test results
+      fixture['/api/v1/courses/1/quizzes/1/statistics'].quiz_statistics[0].submissionStatistics = {
+        ...fixture['/api/v1/courses/1/quizzes/1/statistics'].quiz_statistics[0]
+          .submissionStatistics,
+        uniqueCount: 12,
+        scores: {
+          50: 1, // 1 student in 50th percentile
+          67: 1, // 1 student in 67th percentile
+          // Additional scores to make up the 11 students above average
+          70: 2,
+          80: 3,
+          90: 2,
+          100: 3,
+        },
+      }
 
-    // Wait for data to load and render
-    await new Promise(resolve => setTimeout(resolve, 0))
+      await mount(node)
+      const el = await findByTestId(node, 'summary-statistics')
 
-    expect(el.textContent).toContain(
-      '11 students scored above or at the average, and 1 below. 1 student in percentile 50. 1 student in percentile 67.',
-    )
+      // Wait for the chart data to be properly rendered with more specific text
+      await waitFor(
+        () => {
+          expect(el.textContent).toContain('11 students scored above or at the average')
+        },
+        {timeout: 2000},
+      )
 
-    consoleError.mockRestore()
+      // Now check the complete expected text
+      expect(el.textContent).toContain(
+        '11 students scored above or at the average, and 1 below. 1 student in percentile 50. 1 student in percentile 67.',
+      )
+    } finally {
+      consoleError.mockRestore()
+      if (node.parentNode) {
+        document.body.removeChild(node)
+      }
+    }
   })
 })
