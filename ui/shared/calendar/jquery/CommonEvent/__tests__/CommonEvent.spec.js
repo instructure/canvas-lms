@@ -216,4 +216,17 @@ describe('CommonEvent#iconType', () => {
     expect(event.fullDetailsURL()).toBe('http://example.org/courses/1/pages/some-page')
     expect(event.readableType()).toBe('Page')
   })
+
+  test('should not throw an error if the assignment_overrides is an empty array', () => {
+    const event = commonEventFactory(
+      {
+        title: 'some title',
+        start_at: '2016-12-01T12:30:00Z',
+        assignment_overrides: [],
+      },
+      ['course_1'],
+    )
+    expect(event).toBeTruthy()
+    expect(event.assignment_overrides).toBeUndefined()
+  })
 })

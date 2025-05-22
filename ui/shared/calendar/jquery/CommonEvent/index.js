@@ -38,7 +38,9 @@ export default function commonEventFactory(data, contexts) {
   let actualContextCode = data.context_code
   let contextCode = data.effective_context_code || actualContextCode
 
-  const type = data.assignment_overrides
+  const assignmentOverrides = data.assignment_overrides?.length ? data.assignment_overrides : null
+
+  const type = assignmentOverrides
     ? 'assignment_override'
     : data.sub_assignment_overrides
       ? 'sub_assignment_override'
@@ -52,8 +54,8 @@ export default function commonEventFactory(data, contexts) {
               ? 'todo_item'
               : 'calendar_event'
 
-  data = data.assignment_overrides
-    ? {assignment: data.assignment, assignment_override: data.assignment_overrides[0]}
+  data = assignmentOverrides
+    ? {assignment: data.assignment, assignment_override: assignmentOverrides[0]}
     : data.sub_assignment_overrides
       ? {
           sub_assignment: data.sub_assignment,
