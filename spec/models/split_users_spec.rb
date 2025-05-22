@@ -671,6 +671,28 @@ describe SplitUsers do
         expect(unsubmitted_submission.reload.user).to eq shard1_source_user
       end
 
+      it "retains unsubmitted/deleted submissions on conflict with the same assignment" do
+        course1.enroll_student(restored_user, enrollment_state: "active")
+        course1.enroll_student(source_user, enrollment_state: "active")
+
+        assignment = course1.assignments.create!(title: "test assignment", workflow_state: "published")
+
+        restore_user_submission = assignment.submissions.find_by!(user: restored_user)
+        source_user_submission = assignment.submissions.find_by!(user: source_user)
+
+        UserMerge.from(restored_user).into(source_user)
+
+        expect(restore_user_submission.reload).to be_deleted
+        expect(restore_user_submission.user).to eq restored_user
+        expect(source_user_submission.reload).to be_unsubmitted
+        expect(source_user_submission.user).to eq source_user
+
+        SplitUsers.split_db_users(shard1_source_user)
+
+        expect(restore_user_submission.reload.user).to eq restored_user
+        expect(source_user_submission.reload.user).to eq source_user
+      end
+
       it "restores admins to the original state" do
         admin = account1.account_users.create(user: restored_user)
         shard1_source_user.associate_with_shard(sub_account.shard)
