@@ -625,6 +625,30 @@ describe FilesController do
             get "show", params: params_with_location, format: "json"
             valid_download_response(response)
           end
+
+          context "with sharding" do
+            specs_require_sharding
+
+            before do
+              @shard1.activate do
+                user_factory(active_all: true)
+                @course.enroll_teacher(@user)
+                attachment_model(context: @user, filename: "shard1.txt")
+                AttachmentAssociation.update_associations(@course, [@attachment.id], @user, nil, "syllabus_body")
+              end
+            end
+
+            it "allows access to the file" do
+              user_session(@student)
+              get "show", params: { user_id: @user.global_id, id: @attachment.global_id, download: 1, location: "course_syllabus_#{@course.id}" }, format: "json"
+              expect(response.headers["location"]).to include("download_frd")
+
+              @shard1.activate do
+                get "show", params: { user_id: @user.id, id: @attachment.id, download: 1, location: "course_syllabus_#{@course.global_id}" }, format: "json"
+                expect(response.headers["location"]).to include("download_frd")
+              end
+            end
+          end
         end
 
         context "with disable_file_verifiers_in_public_syllabus disabled" do
