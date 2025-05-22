@@ -21,12 +21,15 @@ describe DataFixup::NormalizePseudonyms do
   before do
     account.email_pseudonyms = false
 
-    require_relative "../../../db/migrate/20250417195913_normalize_pseudonyms"
+    require_relative "../../../db/migrate/20250417195914_normalize_pseudonyms"
     # we need the new constraints out of the way
     NormalizePseudonyms.new.down
   end
 
   let(:account) { Account.default }
+  let(:user) { User.create! }
+  let(:ap1) { account.authentication_providers.create!(auth_type: "cas") }
+  let(:ap2) { account.authentication_providers.create!(auth_type: "openid_connect") }
 
   describe ".backfill_unique_id_normalized" do
     it "backfills unique_id_normalized" do
@@ -50,10 +53,6 @@ describe DataFixup::NormalizePseudonyms do
   end
 
   describe ".dedup_all" do
-    let(:user) { User.create! }
-    let(:ap1) { account.authentication_providers.create!(auth_type: "cas") }
-    let(:ap2) { account.authentication_providers.create!(auth_type: "openid_connect") }
-
     def dedup_and_check(renamed, remaining)
       if renamed.is_a?(Hash)
         renamed = user.pseudonyms.create!(unique_id: "12345Ⅳ", account:, **renamed)
@@ -153,6 +152,56 @@ describe DataFixup::NormalizePseudonyms do
       described_class.dedup_all
 
       expect(p1.reload.authentication_provider).to eql account.canvas_authentication_provider
+    end
+  end
+
+  describe ".relink_canvas_auth_provider" do
+    let(:p1) do
+      p1 = user.pseudonyms.create!(unique_id: "123456a",
+                                   account:,
+                                   password: "password",
+                                   password_confirmation: "password",
+                                   current_login_at: Time.zone.now)
+      p1.unique_id = "123456"
+      p1.unique_id_normalized = Pseudonym.normalize(p1.unique_id)
+      p1.save(validate: false)
+      p1
+    end
+    let(:p2) do
+      p2 = user.pseudonyms.create!(unique_id: "123456b", account:, authentication_provider: ap1)
+      p2.unique_id = "123456"
+      p2.unique_id_normalized = Pseudonym.normalize(p2.unique_id)
+      p2.save(validate: false)
+      p2
+    end
+
+    let(:p3) do
+      p3 = user.pseudonyms.create!(unique_id: "123456c", account:)
+      p3.unique_id = "123456 "
+      p3.unique_id_normalized = Pseudonym.normalize(p3.unique_id)
+      p3.save(validate: false)
+      p3
+    end
+
+    it "avoids collisions as it re-links (order 1)" do
+      p1
+      p2
+      p3
+      described_class.send(:relink_canvas_auth_provider)
+
+      expect(p1.reload.authentication_provider).to eql account.canvas_authentication_provider
+      expect(p3.reload.unique_id).to start_with("NORMALIZATION-COLLISION-")
+    end
+
+    it "avoids collisions as it re-links (order 2)" do
+      p3
+      p2
+      p1
+
+      described_class.send(:relink_canvas_auth_provider)
+
+      expect(p1.reload.authentication_provider).to eql account.canvas_authentication_provider
+      expect(p3.reload.unique_id).to start_with("NORMALIZATION-COLLISION-")
     end
   end
 end

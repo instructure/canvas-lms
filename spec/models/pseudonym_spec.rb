@@ -136,6 +136,50 @@ describe Pseudonym do
       .to raise_error(ActiveRecord::RecordInvalid)
   end
 
+  it "allows deleted duplicates" do
+    saml = Account.default.authentication_providers.create!(auth_type: "saml")
+    canvas = Account.default.canvas_authentication_provider
+    u = User.create!
+
+    # each of these cases creates an active pseudonym, then two deleted, then vice verse
+    # in order to ensure the trigger is okay with multiples, and order of creation
+    # doesn't matter
+
+    # duplication within the same auth provider
+    Pseudonym.create!(unique_id: "a@instructure.com", user: u)
+    Pseudonym.create!(unique_id: "a@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "a@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "b@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "b@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "b@instructure.com", user: u)
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: saml)
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: saml)
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: canvas)
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: canvas)
+
+    # duplication across a specific auth provider and no auth provider
+    Pseudonym.create!(unique_id: "e@instructure.com", user: u, authentication_provider: saml)
+    Pseudonym.create!(unique_id: "e@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "e@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "f@instructure.com", user: u)
+    Pseudonym.create!(unique_id: "f@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "f@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "g@instructure.com", user: u, authentication_provider: canvas)
+    Pseudonym.create!(unique_id: "g@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "g@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "h@instructure.com", user: u)
+    Pseudonym.create!(unique_id: "h@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "h@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
+  end
+
   it "does not allow a login_attribute without an authentication provider" do
     u = User.create!
     expect { u.pseudonyms.create!(unique_id: "a@b.com", login_attribute: "b") }.to raise_error(ActiveRecord::StatementInvalid)
