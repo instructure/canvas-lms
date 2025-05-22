@@ -21,6 +21,7 @@ import {render, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CourseImagePicker from '../CourseImagePicker'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import $ from 'jquery'
 
 describe('CourseImagePicker Component', () => {
   let oldEnv
@@ -32,10 +33,16 @@ describe('CourseImagePicker Component', () => {
         course_images: true,
       },
     })
+
+    // Mock jQuery's flashError function to prevent the test from failing
+    $.flashError = jest.fn()
   })
 
   afterEach(() => {
     fakeENV.teardown(oldEnv)
+
+    // Clean up jQuery mocks
+    jest.restoreAllMocks()
   })
 
   const renderComponent = (props = {}) => {
