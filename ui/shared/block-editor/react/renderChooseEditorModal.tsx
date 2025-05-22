@@ -50,7 +50,7 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
   }
 
   const validEditorChoice = () => {
-    if (['rce', 'block_editor'].includes(editorChoice)) {
+    if (['rce', 'block_editor', 'canvas_content_builder'].includes(editorChoice)) {
       return true
     } else {
       setErroredForm(true)

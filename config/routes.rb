@@ -170,6 +170,7 @@ CanvasRails::Application.routes.draw do
     get "wiki/:id" => "wiki_pages#show_redirect", :id => %r{[^/]+}
     get "wiki/:id/revisions" => "wiki_pages#revisions_redirect", :id => %r{[^/]+}
     get "wiki/:id/revisions/:revision_id" => "wiki_pages#revisions_redirect", :id => %r{[^/]+}
+    get "new_page" => "wiki_pages#new", :as => :new_page
   end
 
   concern :conferences do
