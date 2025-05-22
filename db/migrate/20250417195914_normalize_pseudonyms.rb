@@ -63,9 +63,11 @@ class NormalizePseudonyms < ActiveRecord::Migration[7.1]
       DECLARE
         auth_type TEXT;
       BEGIN
-        IF OLD.authentication_provider_id IS DISTINCT FROM NEW.authentication_provider_id OR
+        IF (OLD.authentication_provider_id IS DISTINCT FROM NEW.authentication_provider_id OR
             OLD.unique_id_normalized IS DISTINCT FROM NEW.unique_id_normalized OR
-            OLD.account_id IS DISTINCT FROM NEW.account_id THEN
+            OLD.account_id IS DISTINCT FROM NEW.account_id OR
+            OLD.workflow_state IS DISTINCT FROM NEW.workflow_state) AND
+            NEW.workflow_state <> 'deleted' THEN
           IF NEW.authentication_provider_id IS NOT NULL THEN
             SELECT ap.auth_type
             INTO auth_type
@@ -81,6 +83,7 @@ class NormalizePseudonyms < ActiveRecord::Migration[7.1]
               FROM pseudonyms p
               WHERE p.unique_id_normalized = NEW.unique_id_normalized
                 AND p.account_id = NEW.account_id
+                AND p.workflow_state <> 'deleted'
                 AND p.authentication_provider_id IS NULL
                 AND p.id <> NEW.id
             ) THEN
@@ -95,6 +98,7 @@ class NormalizePseudonyms < ActiveRecord::Migration[7.1]
               JOIN authentication_providers ap ON ap.id = p.authentication_provider_id
               WHERE p.unique_id_normalized = NEW.unique_id_normalized
                 AND p.account_id = NEW.account_id
+                AND p.workflow_state <> 'deleted'
                 AND ap.auth_type IN ('cas', 'saml', 'canvas', 'ldap')
                 AND p.id <> NEW.id
             ) THEN

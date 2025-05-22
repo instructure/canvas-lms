@@ -98,6 +98,7 @@ module DataFixup::NormalizePseudonyms
           sis_user_id IS NULL,
           current_login_at DESC NULLS LAST,
           authentication_provider_id IS NULL,
+          password_auto_generated,
           lower(unique_id)<>unique_id_normalized,
           id DESC
         SQL
@@ -116,6 +117,7 @@ module DataFixup::NormalizePseudonyms
     # the pseudonym to Canvas auth, so that it won't count as a conflict between CAS/LDAP/SAML and
     # NULL later.
     def relink_canvas_auth_provider
+      already_moved = Set.new
       Pseudonym.active
                .joins(<<~SQL.squish)
                  INNER JOIN #{Pseudonym.quoted_table_name} p2
@@ -143,6 +145,35 @@ module DataFixup::NormalizePseudonyms
                SQL
                .preload(:account)
                .find_each(strategy: :id) do |p|
+        next if already_moved.include?(p.id)
+
+        conflict_set = Pseudonym.active
+                                .where(account_id: p.account_id,
+                                       unique_id_normalized: p.unique_id_normalized,
+                                       authentication_provider_id: nil)
+                                .order(Arel.sql(<<~SQL.squish))
+                                  sis_user_id IS NULL,
+                                  password_auto_generated,
+                                  current_login_at DESC NULLS LAST,
+                                  unique_id<>unique_id_normalized, id DESC
+                                SQL
+                                .pluck(:id, :unique_id)
+        if conflict_set.size > 1
+          to_leave_alone = conflict_set.shift
+
+          updates = {}
+          conflict_set.each do |id, unique_id|
+            unique_id = "NORMALIZATION-COLLISION-#{SecureRandom.uuid}-#{unique_id}"
+            unique_id_normalized = Pseudonym.normalize(unique_id)
+            updates[id] = [unique_id, unique_id_normalized]
+          end
+          already_moved.merge(updates.keys)
+
+          Pseudonym.all.update_many(updates, :unique_id, :unique_id_normalized)
+
+          # we should still see the one we left alone in a later iteration
+          next unless to_leave_alone.first == p.id
+        end
         p.authentication_provider = p.account.canvas_authentication_provider
         p.save(validate: false)
       end
