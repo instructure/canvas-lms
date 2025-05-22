@@ -575,7 +575,7 @@ export const RubricForm = ({
             </Flex>
           )}
 
-          <View as="div" margin="large 0 large 0">
+          <View as="div" margin="large 0 small 0">
             <Flex>
               <Flex.Item shouldGrow={true}>
                 <Heading
@@ -605,7 +605,7 @@ export const RubricForm = ({
           {showGenerateCriteriaForm && (
             <View
               as="div"
-              margin="large 0 large 0"
+              margin="medium 0 small 0"
               padding="small"
               borderRadius="medium"
               background="secondary"
@@ -774,6 +774,7 @@ export const RubricForm = ({
                             rowIndex={index + 1}
                             unassessed={rubricForm.unassessed}
                             isGenerated={criterion.isGenerated}
+                            nextIsGenerated={rubricForm.criteria[index + 1]?.isGenerated}
                             onDeleteCriterion={() => deleteCriterion(criterion)}
                             onDuplicateCriterion={() => duplicateCriterion(criterion)}
                             onEditCriterion={() => openCriterionModal(criterion)}
