@@ -65,6 +65,7 @@ describe('MasteryCalculation', () => {
       PERMISSIONS: {
         manage_proficiency_calculations: true,
       },
+      OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: false,
     }
   })
 
@@ -88,14 +89,12 @@ describe('MasteryCalculation', () => {
 
   function setupSubmissionHandler(contextType, contextId, payload) {
     server.use(
-      http.post(
-        `/${contextType.toLowerCase()}s/${contextId}/outcome_calculation_method`,
-        async ({request}) => {
-          return new Response(JSON.stringify(payload), {
-            headers: {'Content-Type': 'application/json'},
-          })
-        },
-      ),
+      http.post(`/${contextType.toLowerCase()}s/${contextId}/outcome_calculation_method`, () => {
+        return new Response(JSON.stringify(payload), {
+          headers: {'Content-Type': 'application/json'},
+          status: 200,
+        })
+      }),
     )
   }
 
@@ -198,6 +197,7 @@ describe('MasteryCalculation', () => {
     ]
 
     beforeEach(() => {
+      server.resetHandlers()
       setupSubmissionHandler('Account', '11', {
         calculation_method: variables.calculationMethod,
         calculation_int: variables.calculationInt,
@@ -207,10 +207,13 @@ describe('MasteryCalculation', () => {
     it('submits a request when calculation method is saved', async () => {
       const {getByText, findByLabelText} = render(<MasteryCalculation />, {mocks: updateMocks})
       await act(async () => jest.runAllTimers())
+
       const parameter = await findByLabelText(/Parameter/)
       fireEvent.input(parameter, {target: {value: '88'}})
+
       fireEvent.click(getByText('Save Mastery Calculation'))
       fireEvent.click(getByText('Save'))
+
       await waitFor(() => {
         expect(updateCall).toHaveBeenCalled()
       })
