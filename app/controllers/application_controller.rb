@@ -403,6 +403,7 @@ class ApplicationController < ActionController::Base
     rce_find_replace
     courses_popout_sisid
     dashboard_graphql_integration
+    discussion_ai_survey_link
     discussion_checkpoints
     discussion_default_sort
     discussion_default_expand

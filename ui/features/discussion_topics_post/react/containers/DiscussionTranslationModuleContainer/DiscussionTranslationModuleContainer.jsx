@@ -23,6 +23,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
+import {SurveyLinkBox} from '@canvas/discussions/react/components/SurveyLinkBox/SurveyLinkBox'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconRefreshLine, IconEndLine, IconAiLine} from '@instructure/ui-icons'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
@@ -160,6 +161,12 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
           </Button>
         </Flex.Item>
       </Flex>
+      <SurveyLinkBox
+        text={I18n.t('What do you think of *Discussion Translate*?', {
+          wrappers: [`<strong>$1</strong>`],
+        })}
+        marginTop="medium"
+      />
     </View>
   )
 }
