@@ -1287,9 +1287,8 @@ modules.initModuleManagement = async function (duplicate) {
         {'content_tag[indent]': indent},
         data => {
           $item.loadingImage('remove')
-          const $module = $('#context_module_' + data.content_tag.context_module_id)
-          modules.addItemToModule($module, data.content_tag)
-          $module.find('.context_module_items.ui-sortable').sortable('refresh')
+          $item.removeClass((_, cls) => (cls.match(/indent_\d+/g) || []).join(' '))
+          $item.addClass('indent_' + data.content_tag.indent)
           modules.updateAssignmentData()
           modules.updateEstimatedDurations()
         },
