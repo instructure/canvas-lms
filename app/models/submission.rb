@@ -257,8 +257,8 @@ class Submission < ActiveRecord::Base
         AND custom_grade_status_id IS NULL
         AND (late_policy_status IS DISTINCT FROM 'extended')
         AND NOT (
-          /* teacher said it's missing, 'nuff said. */
-          /* we're doing a double 'NOT' here to avoid 'ORs' that could slow down the query */
+          /* teacher said it is missing, nuff said. */
+          /* we are doing a double NOT here to avoid ORs that could slow down the query */
           late_policy_status IS DISTINCT FROM 'missing' AND NOT
           (
             cached_due_date IS NOT NULL
@@ -345,6 +345,30 @@ class Submission < ActiveRecord::Base
 
   def self.anonymous_ids_for(assignment)
     anonymized.for_assignment(assignment).pluck(:anonymous_id)
+  end
+
+  def self.anonymous_id_order_clause
+    'anonymous_id COLLATE "C"'
+  end
+
+  def self.submission_status_conditions
+    <<~SQL.squish
+      CASE
+        WHEN submissions.workflow_state = 'unsubmitted'
+          OR (
+            submissions.submitted_at IS NULL
+            AND submissions.grade IS NULL
+            AND submissions.excused IS NOT TRUE
+          ) THEN 'not_submitted'
+        WHEN submissions.excused IS NOT TRUE
+          AND (
+            submissions.grade IS NULL
+            OR submissions.workflow_state = 'pending_review'
+          ) THEN 'not_graded'
+        WHEN submissions.grade_matches_current_submission IS FALSE THEN 'resubmitted'
+        ELSE 'graded'
+      END
+    SQL
   end
 
   # see #needs_grading?
