@@ -219,3 +219,8 @@ wiki_page_mastery_path_no_assignment_group:
   description: |-
     In WikiPage create/update annd assign to Mastery Path hidden Assignment has not an Assignment Group.
   applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
