@@ -38,9 +38,10 @@ class BookmarkedCollection::SyncFilterProxy < BookmarkedCollection::Proxy
       subpager.current_bookmark = bookmark
       subpager.next_bookmark = nil # reset the next_bookmark so we don't re-use the old one forever if the next_bookmark is not set next time
       subpager = @collection.execute_pager(subpager)
-      break if subpager.empty?
 
       bookmark = subpager.next_bookmark
+      break if subpager.empty?
+
       until subpager.empty?
         item = subpager.shift
         next unless @filter_proc.call(item)

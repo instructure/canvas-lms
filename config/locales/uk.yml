@@ -5799,8 +5799,10 @@ uk:
       tab_hidden_if_disabled: "Сторінка відключена, не буде з'являтися в навігації"
       tabs: 
         alerts: "Сповіщення про небезпеку"
+        apps: Застосунки
         details: "Детальна інформація про курc"
-        feature_options: "Особливі можливості"
+        feature_options: "Варіанти функції"
+        grade_syncing: "Синхронізація оцінок"
         navigation: Навігація
         sections: Розділи
         tools: Застосунки

@@ -8071,8 +8071,11 @@ hu:
       tab_hidden_if_disabled_k5: "Tab letiltva, nem jelenik meg a navigációban"
       tabs: 
         alerts: Figyelmeztetések
+        apps: Alkalmazások
         details: Kurzusrészletek
         feature_options: "Funkciók beállítása"
+        grade_syncing: "Értékelés szinkronizálása"
+        integrations: Integrációk
         navigation: Navigáció
         sections: Szekciók
         tools: Alkalmazások
