@@ -127,7 +127,7 @@ class NormalizePseudonyms < ActiveRecord::Migration[7.1]
 
     # at this point we've re-written every row in the table, so let's try and
     # clean things up before doing too much more work
-    Pseudonym.vacuum
+    Pseudonym.vacuum unless connection.transaction_open?
 
     # this unique index can't be built until the backfill above is complete,
     # and it's okay that they're in a postdeploy because they won't be used
