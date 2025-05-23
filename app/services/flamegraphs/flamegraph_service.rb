@@ -21,6 +21,7 @@ class Flamegraphs::FlamegraphService < ApplicationService
   class NoBlockError < StandardError; end
   class NonSiteAdminError < StandardError; end
 
+  MAX_BACKTRACE_LINES = 1_000
   SAMPLING_INTERVAL_MICROSECONDS = 1_000
 
   def initialize(user:, source_name:, custom_name: nil, &block)
@@ -36,8 +37,12 @@ class Flamegraphs::FlamegraphService < ApplicationService
   def call
     raise NonSiteAdminError, "Must be a siteadmin user!" unless Account.site_admin.grants_right?(@user, :update)
 
-    report = create_report
-    save_flamegraph_to_attachment(report)
+    begin
+      report = create_report
+      save_flamegraph_to_attachment(report)
+    rescue => e
+      save_error_to_attachment(e)
+    end
   end
 
   private
@@ -56,6 +61,13 @@ class Flamegraphs::FlamegraphService < ApplicationService
     end
   end
 
+  def save_error_to_attachment(error)
+    StringIO.open do |file|
+      create_error_html_file(error, file)
+      create_attachment(file, is_error: true)
+    end
+  end
+
   def save_flamegraph_to_attachment(report)
     StringIO.open do |file|
       create_d3_flamegraph_file(report, file)
@@ -68,18 +80,52 @@ class Flamegraphs::FlamegraphService < ApplicationService
     file.rewind
   end
 
-  def create_attachment(file)
+  def create_error_html_file(error, file)
+    html = error_html(error)
+    file.print(html)
+    file.rewind
+  end
+
+  def create_attachment(file, is_error: false)
+    display_name = title(is_error:)
     @user.flamegraphs_folder.attachments.create!(
       context: @user,
       root_account: Account.site_admin,
       content_type: "text/html",
       uploaded_data: file,
-      display_name: title,
-      filename: "#{title}.html"
+      filename: "#{display_name}.html",
+      display_name:
     )
   end
 
-  def title
-    @title ||= ["flamegraph", @custom_name.presence, @source_name, Time.now.iso8601].compact.join("-")
+  def title(is_error:)
+    @common_title ||= [@custom_name.presence, @source_name, Time.now.iso8601].compact.join("-")
+
+    if is_error
+      "flamegraph-error-#{@common_title}"
+    else
+      "flamegraph-#{@common_title}"
+    end
+  end
+
+  def error_html(error)
+    <<~HTML
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <title>Error Generating Flamegraph</title>
+        </head>
+        <body>
+          <h1>Error Generating Flamegraph</h1>
+          <h2>#{error.detailed_message}</h2>
+          <pre><code>#{backtrace_sample(error)}</code></pre>
+        </body>
+      </html>
+    HTML
+  end
+
+  def backtrace_sample(error)
+    error.backtrace.first(MAX_BACKTRACE_LINES).join("\n")
   end
 end
