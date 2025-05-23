@@ -42,6 +42,12 @@ module Accessibility
         rules.index_by(&:id)
       end
 
+      def pdf_registry
+        [
+          Accessibility::Rules::HasLangEntryRule,
+        ]
+      end
+
       # Tests if an element passes this accessibility rule
       # @param elem [Nokogiri::XML::Element] The element to test
       # @return [Boolean] True if the element passes, false if there's an issue
