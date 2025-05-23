@@ -6632,9 +6632,11 @@ tr:
       tab_hidden_if_disabled: "Sayfa etkisizleştirildi, gezinme menüsünde görünmeyecek"
       tabs: 
         alerts: Uyarılar
+        apps: Uygulamalar
         details: "Ders Detayları"
         feature_options: "Özellik Seçenekleri"
         grade_publishing: "Not Yayınlama"
+        integrations: Entegrasyonlar
         navigation: Gezinme
         sections: Bölümler
         tools: Uygulamalar
