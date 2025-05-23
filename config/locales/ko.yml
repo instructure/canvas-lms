@@ -4583,6 +4583,7 @@ ko:
       tab_hidden_if_disabled: "페이지가 비활성이므로 탐색에 표시되지 않음"
       tabs: 
         alerts: 알림
+        apps: 앱
         details: "과목 세부 정보"
         feature_options: "기능 옵션"
         grade_publishing: "평점 게시"
