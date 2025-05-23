@@ -50,6 +50,25 @@ module Accessibility
           options: ["None", "Row", "Column", "Row group", "Column group"]
         )
       end
+
+      def self.fix(elem, value)
+        value_symbol = value.to_sym
+
+        scope_lookup_table = {
+          Row: "row",
+          Column: "column",
+          "Row group": "rowgroup",
+          "Column group": "colgroup"
+        }
+
+        if value_symbol == :None
+          elem.remove_attribute("scope")
+        elsif scope_lookup_table.key?(value_symbol)
+          elem["scope"] = scope_lookup_table[value_symbol]
+        end
+
+        elem
+      end
     end
   end
 end

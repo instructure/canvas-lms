@@ -48,5 +48,14 @@ RSpec.describe "TableCaptionRule", type: :feature do
         expect(file_issues.first[:data][:id]).to include("file-789")
       end
     end
+
+    it "fixes tables without captions by adding a caption" do
+      input_html = "<table><tr><th>Header 1</th><th>Header 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
+      expected_html = "<table><caption>Table description</caption><tr><th>Header 1</th><th>Header 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
+
+      fixed_html = fix_issue(:table_caption, input_html, "./*", "Table description")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
   end
 end

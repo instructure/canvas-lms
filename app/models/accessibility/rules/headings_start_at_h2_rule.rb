@@ -48,6 +48,19 @@ module Accessibility
           options: ["Leave as is", "Change only this headings level", "Remove heading style"]
         )
       end
+
+      def self.fix(elem, value)
+        case value
+        when "Leave as is"
+          # Do nothing
+        when "Change only this headings level"
+          elem.name = "h2"
+        when "Remove heading style"
+          elem.name = "p"
+        else
+          raise ArgumentError, "Invalid value for form: #{value}"
+        end
+      end
     end
   end
 end

@@ -54,6 +54,10 @@ module Accessibility
           value: elem.get_attribute("alt") || ""
         )
       end
+
+      def self.fix(elem, value)
+        elem["alt"] = value
+      end
     end
   end
 end

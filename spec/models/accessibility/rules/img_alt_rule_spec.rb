@@ -49,4 +49,13 @@ RSpec.describe "ImgAltRule", type: :feature do
       end
     end
   end
+
+  context "when fixing image alt text" do
+    it "updates the alt text of an image" do
+      input_html = '<div><img id="test-element" src="image.jpg" alt=""></div>'
+      fixed_html = fix_issue(:img_alt, input_html, './/img[@id="test-element"]', "Descriptive alt text")
+
+      expect(fixed_html).to include('<img id="test-element" src="image.jpg" alt="Descriptive alt text">')
+    end
+  end
 end

@@ -43,10 +43,10 @@ module Accessibility
       end
 
       def self.prepend(parent, child)
-        if parent.first_child
-          parent.insert_before(child, parent.first_child)
+        if parent.first_element_child
+          parent.first_element_child.add_previous_sibling(child)
         else
-          parent.append_child(child)
+          parent.add_child(child)
         end
       end
 
@@ -55,6 +55,16 @@ module Accessibility
           label: "Change table caption",
           value: ""
         )
+      end
+
+      def self.fix(elem, value)
+        caption = elem.at_css("caption")
+        unless caption
+          caption = elem.document.create_element("caption")
+          prepend(elem, caption)
+        end
+        caption.content = value
+        elem
       end
     end
   end
