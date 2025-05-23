@@ -4984,6 +4984,7 @@ el:
       tab_hidden_if_disabled: "Η σελίδα απενεργοποιήθηκε, δεν θα εμφανιστεί στην πλοήγηση"
       tabs: 
         alerts: Συναγερμοί
+        apps: Εφαρμογές
         details: "Λεπτομέρειες Μαθήματος"
         feature_options: "Επιλογές χαρακτηριστικών"
         navigation: Πλοήγηση
@@ -8129,6 +8130,7 @@ el:
   login_link_color_a887a109: "Χρώμα Συνδέσμου Σύνδεσης"
   login_logo_5eecf564: "Λογότυπο Σύνδεσης"
   login_screen_83518c07: "Οθόνη Σύνδεσης"
+  login_sis_id_942859: "ΙD Σύνδεσης/SIS"
   login_with_auth_type_a0aaa52a: "Σύνδεση με *%{auth_type}*"
   login_with_provider_3fd3998e: "Σύνδεση με %{provider}"
   loginrequest_encoded_url_44c49c18: "LoginRequest encoded URL"
@@ -10419,6 +10421,7 @@ el:
   notification_preferences_cf47083d: "Προτιμήσεις Ειδοποιήσεων"
   notifications_cbfa7704: Ειδοποιήσεις
   notifications_sent_to_external_services_c4a86b78: "Οι ειδοποιήσεις στάλθηκαν σε εξωτερικές υπηρεσίες"
+  now_d1785853: τώρα
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "<mrk mid=\"4332\" mtype=\"seg\">Τώρα που το μάθημά σας δημιουργήθηκε και είναι διαθέσιμο, μάλλον δεν χρειάζεστε πια αυτή τη λίστα ελέγχου.</mrk> <mrk mid=\"4333\" mtype=\"seg\">Θα την έχουμε, πάντως, πρόχειρη σε περίπτωση που θελήσετε αργότερα να δοκιμάσετε κάτι καινούργιο ή χρειαστείτε λίγη επιπλέον βοήθεια κατά την πραγματοποίηση αλλαγών στο περιεχόμενο του μαθήματός σας.</mrk>"
   number: 
     currency: 
@@ -13686,6 +13689,7 @@ el:
   self_registration_156392d6: Αυτο-εγγραφή
   self_sign_up_c8d23585: Αυτο-εγγραφή
   send_e3bd0ed0: Αποστολή
+  sent_at_23cccc07: "Στάλθηκε στις"
   sent_f4ee89ec: Εστάλη!
   sent_fe0a1eb4: Απεστάλη
   sequence_footer: 
