@@ -2733,7 +2733,7 @@ class Account < ActiveRecord::Base
   end
 
   def horizon_account?
-    feature_enabled?(:horizon_course_setting) && horizon_account[:value]
+    horizon_account[:value] && feature_enabled?(:horizon_course_setting)
   end
 
   def horizon_account=(value)
