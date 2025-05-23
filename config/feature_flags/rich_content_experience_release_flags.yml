@@ -134,6 +134,11 @@ file_verifiers_for_quiz_links:
   description: |-
     Links to Canvas files created in New Quizzes will always add file verifiers to allow authentication
   applies_to: RootAccount
+  environments:
+    development:
+      state: allowed
+    ci:
+      state: allowed
 
 files_a11y_rewrite:
   applies_to: SiteAdmin

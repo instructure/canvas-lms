@@ -991,7 +991,7 @@ describe ContentMigrationsController, type: :request do
       @user = @dst.teachers.first
     end
 
-    def test_asset_id_mapping(json, verifiers: true)
+    def test_asset_id_mapping(json, verifiers: false)
       expect(@dst.announcements.find(json["announcements"][@ann.id.to_s]).title).to eq "ann"
       expect(@dst.assignments.find(json["assignments"][@assign.id.to_s]).name).to eq "assign"
       expect(@dst.assignments.find(json["assignments"][@shell_assign.id.to_s]).description).to eq "assigned"
@@ -1011,7 +1011,7 @@ describe ContentMigrationsController, type: :request do
     end
 
     # accepts block which should return the migration id
-    def test_asset_migration_id_mapping(json, verifiers: true)
+    def test_asset_migration_id_mapping(json, verifiers: false)
       expect(@dst.announcements.find(json["announcements"][yield(@ann)]["destination"]["id"]).title).to eq "ann"
       expect(@dst.assignments.find(json["assignments"][yield(@assign)]["destination"]["id"]).name).to eq "assign"
       expect(@dst.assignments.find(json["assignments"][yield(@shell_assign)]["destination"]["id"]).description).to eq "assigned"
