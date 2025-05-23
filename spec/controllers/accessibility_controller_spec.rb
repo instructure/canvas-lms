@@ -34,6 +34,20 @@ describe AccessibilityController do
 
   let(:rules) { [mock_rule] }
 
+  let(:mock_pdf_rule) do # MUST be at this level
+    Class.new do
+      def self.test(_elem)
+        [{ id: "pdf-mock-issue", message: "PDF Mock issue found", why: "Just a mock PDF issue" }]
+      end
+
+      def self.id = "mock-pdf-rule-class"
+      def self.message = "PDF Mock rule message"
+      def self.why = "Because it's a mock PDF rule"
+      def self.form = []
+    end
+  end
+  let(:pdf_rules) { [mock_pdf_rule] }
+
   before do
     allow_any_instance_of(AccessibilityController).to receive(:require_context).and_return(true)
     allow_any_instance_of(AccessibilityController).to receive(:require_user).and_return(true)
@@ -52,13 +66,17 @@ describe AccessibilityController do
       assignments = double("Assignments")
       active_assignments = double("ActiveAssignments")
       context_double = double("Context")
+      attachments = double("Attachments")
+      not_deleted_attachments = double("NotDeletedAttachmentsRelation")
 
       allow(wiki_pages).to receive_messages(not_deleted:)
       allow(not_deleted).to receive_messages(order: [page])
-      allow(context_double).to receive_messages(wiki_pages:, assignments:)
+      allow(context_double).to receive_messages(wiki_pages:, assignments:, attachments:)
       allow(assignments).to receive_messages(active: active_assignments)
       allow(active_assignments).to receive_messages(order: [])
       allow(controller).to receive(:polymorphic_url).with([context_double, page]).and_return("https://fake.url")
+      allow(attachments).to receive_messages(not_deleted: not_deleted_attachments)
+      allow(not_deleted_attachments).to receive_messages(order: [])
 
       controller.instance_variable_set(:@context, context_double)
 
@@ -77,10 +95,14 @@ describe AccessibilityController do
       assignments = double("Assignments")
       active_assignments = double("ActiveAssignments")
       context_double = double("Context")
+      attachments = double("Attachments")
+      not_deleted_attachments = double("NotDeletedAttachmentsRelation")
 
       allow(wiki_pages).to receive_messages(not_deleted:)
       allow(not_deleted).to receive_messages(order: [])
-      allow(context_double).to receive_messages(wiki_pages:, assignments:)
+      allow(attachments).to receive_messages(not_deleted: not_deleted_attachments)
+      allow(not_deleted_attachments).to receive_messages(order: [])
+      allow(context_double).to receive_messages(wiki_pages:, assignments:, attachments:)
       allow(assignments).to receive_messages(active: active_assignments)
       allow(active_assignments).to receive_messages(order: [assignment])
       allow(controller).to receive(:polymorphic_url).with([context_double, assignment]).and_return("https://fake.url")
@@ -93,6 +115,78 @@ describe AccessibilityController do
       expect(result[:assignments][2][:published]).to be false
       expect(result[:last_checked]).to be_a(String)
     end
+  end
+
+  it "returns issues for attachments" do
+    attachment_pdf = double("AttachmentPDF",
+                            id: 3,
+                            title: "Document.pdf",
+                            content_type: "application/pdf",
+                            published?: true,
+                            updated_at: Time.zone.now)
+    attachment_other = double("AttachmentOther",
+                              id: 4,
+                              title: "Image.png",
+                              content_type: "image/png",
+                              published?: false,
+                              updated_at: Time.zone.now)
+
+    context_double = double("Context")
+    wiki_pages_collection = double("WikiPagesCollection")
+    # These are the variables that were undefined in the original error
+    not_deleted_wiki_pages_relation = double("NotDeletedWikiPagesRelation")
+    assignments_collection = double("AssignmentsCollection")
+    active_assignments_relation = double("ActiveAssignmentsRelation")
+    attachments_collection = double("AttachmentsCollection")
+    not_deleted_attachments_relation = double("NotDeletedAttachmentsRelation")
+
+    # Set up the context chain
+    allow(context_double).to receive_messages(
+      wiki_pages: wiki_pages_collection,
+      assignments: assignments_collection,
+      attachments: attachments_collection
+    )
+    allow(wiki_pages_collection).to receive_messages(not_deleted: not_deleted_wiki_pages_relation)
+    allow(assignments_collection).to receive_messages(active: active_assignments_relation)
+    allow(attachments_collection).to receive_messages(not_deleted: not_deleted_attachments_relation)
+
+    # Now use these defined doubles
+    allow(not_deleted_wiki_pages_relation).to receive_messages(order: [])
+    allow(active_assignments_relation).to receive_messages(order: [])
+    allow(not_deleted_attachments_relation).to receive_messages(order: [attachment_pdf, attachment_other])
+
+    # Set the @context for the controller instance
+    controller.instance_variable_set(:@context, context_double)
+
+    allow(controller).to receive(:course_files_url).with(context_double, preview: attachment_pdf.id).and_return("https://fake.url/files/3/preview")
+    allow(controller).to receive(:course_files_url).with(context_double, preview: attachment_other.id).and_return("https://fake.url/files/4/preview")
+
+    # Expect check_pdf_accessibility to be called with the attachment and the pdf_rules (which is [mock_pdf_rule class])
+    # The return value should be a hash containing the :issues key, whose value comes from mock_pdf_rule.test
+    expect(AccessibilityControllerHelper).to receive(:check_pdf_accessibility)
+      .with(attachment_pdf, pdf_rules) # pdf_rules from let block
+      .and_return({ issues: mock_pdf_rule.test(attachment_pdf) }) # call class method 'test'
+
+    # Call the method under test, passing both sets of rules
+    result = controller.create_accessibility_issues(rules, pdf_rules)
+
+    expect(result[:pages]).to eq({})
+    expect(result[:assignments]).to eq({})
+
+    expect(result[:attachments][3][:title]).to eq("Document.pdf")
+    expect(result[:attachments][3][:content_type]).to eq("application/pdf")
+    expect(result[:attachments][3][:published]).to be true
+    expect(result[:attachments][3][:url]).to eq("https://fake.url/files/3/preview")
+    expect(result[:attachments][3][:issues].first[:id]).to eq("pdf-mock-issue")
+    expect(result[:attachments][3][:issues].first[:message]).to eq("PDF Mock issue found")
+
+    expect(result[:attachments][4][:title]).to eq("Image.png")
+    expect(result[:attachments][4][:content_type]).to eq("image/png")
+    expect(result[:attachments][4][:published]).to be false
+    expect(result[:attachments][4][:url]).to eq("https://fake.url/files/4/preview")
+    expect(result[:attachments][4][:issues]).to be_nil
+
+    expect(result[:last_checked]).to be_a(String)
   end
 
   describe "GET #issues" do

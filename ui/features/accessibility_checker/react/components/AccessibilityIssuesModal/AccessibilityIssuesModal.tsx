@@ -56,7 +56,7 @@ export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> =
   const [issueFormState, setIssueFormState] = useState(
     new Map(
       item.issues?.map(issue => {
-        return [issue.id, issue.form.value]
+        return [issue.id, issue.form?.value]
       }) || [],
     ),
   )

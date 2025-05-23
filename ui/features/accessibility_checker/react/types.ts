@@ -19,6 +19,7 @@
 export enum ContentItemType {
   WikiPage = 'Page',
   Assignment = 'Assignment',
+  Attachment = 'attachment',
 }
 
 export enum FormType {
@@ -49,6 +50,7 @@ export interface AccessibilityIssue {
 export interface AccessibilityData {
   pages?: Record<string, ContentItem>
   assignments?: Record<string, ContentItem>
+  attachments?: Record<string, ContentItem>
   lastChecked?: string
 }
 
@@ -60,6 +62,6 @@ export interface ContentItem {
   updatedAt: string
   count: number
   url: string
-  editUrl: string
+  editUrl?: string
   issues?: AccessibilityIssue[]
 }
