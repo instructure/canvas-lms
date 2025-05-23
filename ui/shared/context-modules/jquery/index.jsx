@@ -23,7 +23,6 @@ import {createRoot} from 'react-dom/client'
 import {reorderElements, renderTray} from '@canvas/move-item-tray'
 import LockIconView from '@canvas/lock-icon'
 import MasterCourseModuleLock from '../backbone/models/MasterCourseModuleLock'
-import ModuleFileDrop from '@canvas/context-module-file-drop'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
@@ -77,7 +76,7 @@ import {selectContentDialog} from '@canvas/select-content-dialog'
 import DifferentiatedModulesTray from '../differentiated-modules'
 import ItemAssignToManager from '../differentiated-modules/react/Item/ItemAssignToManager'
 import {parseModule, parseModuleList} from '../differentiated-modules/utils/moduleHelpers'
-import {addModuleElement} from '../utils/moduleHelpers'
+import {addModuleElement, removeModuleFileDrop, updateModuleFileDrop} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ModuleItemsLazyLoader} from '../utils/ModuleItemsLazyLoader'
@@ -254,6 +253,10 @@ window.modules = (function () {
     async updateModuleItemPositions(_event, ui) {
       const $module = ui.item.parents('.context_module')
       const moduleId = $module.attr('id').substring('context_module_'.length)
+
+      const $originalParentModule = ui.item.data('original-parent')
+      const originalParentModuleId = $originalParentModule.data('module-id')
+
       const url = `${ENV.CONTEXT_URL_ROOT}/modules/${moduleId}/reorder`
       let items = []
       if (ENV.FEATURE_MODULES_PERF && isModulePaginated($module[0])) {
@@ -307,6 +310,11 @@ window.modules = (function () {
               }
             }
             $module.find('.context_module_items.ui-sortable').sortable('enable')
+            updateModuleFileDrop($module[0])
+
+            if (originalParentModuleId !== moduleId) {
+              updateModuleFileDrop($originalParentModule[0])
+            }
           },
           _data => {
             $module.find('.content').loadingImage('remove')
@@ -812,6 +820,10 @@ window.modules = (function () {
       forcePlaceholderSize: true,
       axis: 'y',
       containment: '#content',
+      start: (_event, ui) => {
+        // save the original parent module
+        ui.item.data('original-parent', ui.item.parents('.context_module'))
+      },
     },
     async initMasterCourseLockButton(item, tagRestriction) {
       // add the lock button|icon
@@ -1200,22 +1212,7 @@ modules.initModuleManagement = async function (duplicate) {
           spinnerContainer?.reactRoot?.unmount()
           $tempElement.remove()
           $newModule.insertAfter(duplicatedModuleElement)
-          const module_dnd = $newModule.find('.module_dnd')[0]
-          if (module_dnd) {
-            const contextModules = document.getElementById('context_modules')
-            if (!module_dnd.reactRoot) {
-              module_dnd.reactRoot = createRoot(module_dnd)
-            }
-
-            module_dnd.reactRoot.render(
-              <ModuleFileDrop
-                courseId={ENV.course_id}
-                moduleId={newModuleId}
-                contextModules={contextModules}
-                moduleName={moduleName}
-              />,
-            )
-          }
+          updateModuleFileDrop($newModule[0])
           $newModule.find('.collapse_module_link').focus()
           if (ENV.FEATURE_MODULES_PERF) {
             await modules.lazyLoadItems([parseInt(newModuleId, 10)])
@@ -1274,14 +1271,7 @@ modules.initModuleManagement = async function (duplicate) {
           const $toFocus = $prevModule.length
             ? $('.ig-header-admin .al-trigger', $prevModule)
             : $addModuleButton
-          const module_dnd = $(this).find('.module_dnd')[0]
-          if (module_dnd) {
-            const module_dnd_root = module_dnd.reactRoot
-            if (module_dnd_root) {
-              module_dnd_root.unmount()
-              module_dnd.reactRoot = undefined
-            }
-          }
+          removeModuleFileDrop($(this)[0])
           $(this).slideUp(function () {
             $(this).remove()
             modules.updateTaggedItems()
@@ -1471,11 +1461,7 @@ modules.initModuleManagement = async function (duplicate) {
               decrementModuleItemsCount(moduleId)
             }
 
-            if (
-              ENV.FEATURE_MODULES_PERF &&
-              isModulePaginated($currentModule[0]) &&
-              isModuleCurrentPageEmpty($currentModule[0])
-            ) {
+            if (ENV.FEATURE_MODULES_PERF && isModuleCurrentPageEmpty($currentModule[0])) {
               loadFirstPage(moduleId)
             }
           })
@@ -1597,19 +1583,24 @@ modules.initModuleManagement = async function (duplicate) {
           reorderElements(order, $container[0], id => `#context_module_item_${id}`)
 
           $container.sortable('enable').sortable('refresh')
+          updateModuleFileDrop(targetModule)
         }
 
-        if (ENV.FEATURE_MODULES_PERF && currentModule) {
-          if (isModuleCollapsed(currentModule)) {
-            // this gets rid of the items in a collapsed module
-            expandModuleAndLoadAll(currentModule.dataset.moduleId)
-          } else {
-            // this gets rid of the paginator
-            const ll = new ModuleItemsLazyLoader(ENV.course_id, () => {}, new ModuleItemsStore())
-            ll.renderResult(currentModule.dataset.moduleId, '')
+        if (currentModule) {
+          if (ENV.FEATURE_MODULES_PERF) {
+            if (isModuleCollapsed(currentModule)) {
+              // this gets rid of the items in a collapsed module
+              expandModuleAndLoadAll(currentModule.dataset.moduleId)
+            } else {
+              // this gets rid of the paginator
+              const ll = new ModuleItemsLazyLoader(ENV.course_id, () => {}, new ModuleItemsStore())
+              ll.renderResult(currentModule.dataset.moduleId, '')
 
-            // this gets rid of the show all/less button
-            addShowAllOrLess(currentModule.dataset.moduleId)
+              // this gets rid of the show all/less button
+              addShowAllOrLess(currentModule.dataset.moduleId)
+            }
+          } else {
+            updateModuleFileDrop(currentModule)
           }
         }
       },
@@ -2114,6 +2105,7 @@ function initContextModuleItems(moduleId) {
     event.preventDefault()
 
     const currentItem = $(this).parents('.context_module_item')[0]
+    const currentModule = $(this).parents('.context_module')[0]
     const modules = document.querySelectorAll('#context_modules .context_module')
     const groups = Array.from(modules).map(module => {
       const id = module.getAttribute('id').substring('context_module_'.length)
@@ -2159,6 +2151,8 @@ function initContextModuleItems(moduleId) {
         if (ENV.FEATURE_MODULES_PERF) {
           maybeExpandAndLoadAll(groupId, true)
         }
+        updateModuleFileDrop(document.querySelector(`#context_module_${groupId}`))
+        updateModuleFileDrop(currentModule)
       },
       focusOnExit: () => currentItem.querySelector('.al-trigger'),
     }
@@ -2169,15 +2163,6 @@ function initContextModuleItems(moduleId) {
   if (ENV.FEATURE_MODULES_PERF) {
     addShowAllOrLess(moduleId)
   }
-}
-
-// TODO: call this on the current page when getting a new page of items
-function cleanupContextModuleItems(moduleId) {
-  const $module = $(`#context_module_content_${moduleId}`)
-  $module.off('mouseover focus', '.context_module_item')
-  $('.context_module_item_hover').removeClass('context_module_item_hover')
-
-  // TODO: do we need to remove item handlers? or is it sufficient for the elements to go away
 }
 
 // I don't think this is a long-term solution. We're going to need access
