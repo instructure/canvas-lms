@@ -103,6 +103,11 @@ class GradebookImporter
       end
     end
 
+    if @assignments.nil?
+      Rails.logger.error("No valid header row found in CSV import")
+      raise "No valid header row found in the gradebook CSV. Please check the format and try again."
+    end
+
     @missing_assignments = []
     @missing_assignments = @all_assignments.values - @assignments if @missing_assignment
     @missing_students = []
@@ -248,18 +253,41 @@ class GradebookImporter
   end
 
   def process_header(row)
-    raise "Couldn't find header row" unless header?(row)
+    begin
+      unless header?(row)
+        error_message = "Couldn't find header row"
+        if row.present?
+          sample = row.first(5).map { |v| v.to_s.truncate(20) }.inspect
+          error_message += ". Sample of row: #{sample}"
+        else
+          error_message += ". Row was empty or nil."
+        end
+        raise error_message
+      end
 
-    row = strip_non_assignment_columns(row)
-    parse_assignments(row) # requires non-assignment columns to be stripped
+      row = strip_non_assignment_columns(row)
+      parse_assignments(row) # requires non-assignment columns to be stripped
+    rescue => e
+      Rails.logger.error("Error processing gradebook header: #{e.message}")
+      raise e
+    end
   end
 
   def header?(row)
     return false unless row_has_student_headers? row
 
-    update_column_count row
-
-    return false if last_student_info_column(row) !~ /Section/
+    begin
+      update_column_count row
+      
+      if @student_columns - 1 >= row.length
+        return false
+      end
+      
+      return false if last_student_info_column(row) !~ /Section/
+    rescue => e
+      Rails.logger.error("Error in gradebook_importer header? method: #{e.message}")
+      return false
+    end
 
     true
   end
@@ -445,8 +473,27 @@ class GradebookImporter
     # using "foreach" rather than "parse" processes a chunk of the
     # file at a time rather than loading the whole file into memory
     # at once, a boon for memory consumption
-    CSV.foreach(csv_file.path, CSV_PARSE_OPTIONS) do |row|
-      yield row
+    begin
+      CSV.foreach(csv_file.path, CSV_PARSE_OPTIONS) do |row|
+        begin
+          yield row
+        rescue => e
+          Rails.logger.error("Error processing CSV row: #{e.message}")
+
+          if row.present?
+            sample = row.first(5).map { |v| v.to_s.truncate(20) }.inspect
+            Rails.logger.error("Problem row sample: #{sample}")
+          end
+        end
+      end
+    rescue CSV::MalformedCSVError => e
+      Rails.logger.error("CSV parsing error: #{e.message}")
+      raise "The CSV file is malformed and could not be processed. Please check the file format."
+    rescue => e
+      Rails.logger.error("Unexpected error parsing CSV: #{e.message}")
+      raise e
+    ensure
+      csv_file.close
     end
   end
 
