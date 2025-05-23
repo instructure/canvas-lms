@@ -8752,9 +8752,12 @@ nn:
       tab_hidden_if_disabled_k5: "Fanen er deaktivert, og vert ikkje vist i navigasjon"
       tabs: 
         alerts: Varsel
+        apps: Appar
         details: Emnedetaljar
         feature_options: Funksjonsval
         grade_publishing: "Publisering av karakterar"
+        grade_syncing: "Synkronisering av vurderingar"
+        integrations: Integrasjonar
         navigation: Navigasjon
         sections: Seksjonar
         tools: Appar
