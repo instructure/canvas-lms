@@ -46,23 +46,33 @@ class AccessibilityController < ApplicationController
     content = request.body.read
     content_data = JSON.parse(content)
 
-    unless Accessibility::Rule.registry.key?(content_data["rule"])
-      render json: {
-               error: "Invalid rule identifier '#{content_data["rule"]}', should be one of #{Accessibility::Rule.registry.keys}"
-             },
-             status: :bad_request and return
+    response = update_accessibility_issues(content_data)
+
+    render json: response[:json], status: response[:status]
+  end
+
+  def update_accessibility_issues(content_data, rules = Accessibility::Rule.registry)
+    unless rules.key?(content_data["rule"])
+      return {
+        json: {
+          error: "Invalid rule identifier '#{content_data["rule"]}', should be one of #{Accessibility::Rule.registry.keys}"
+        },
+        status: :bad_request
+      }
     end
 
-    rule = Accessibility::Rule.registry[content_data["rule"]]
+    rule = rules[content_data["rule"]]
 
     case content_data["content_type"]
     when "Page"
       wiki_page = @context.wiki_pages.find_by(id: content_data["content_id"])
       unless wiki_page
-        render json: {
-                 error: "Wiki page #{content_data["content_id"]} not found"
-               },
-               status: :not_found and return
+        return {
+          json: {
+            error: "Wiki page #{content_data["content_id"]} not found"
+          },
+          status: :not_found
+        }
       end
 
       wiki_page.body = AccessibilityControllerHelper.fix_content(
@@ -72,21 +82,23 @@ class AccessibilityController < ApplicationController
     when "Assignment"
       assignment = @context.assignments.find_by(id: content_data["content_id"])
       unless assignment
-        render json: {
-                 error: "Assignment #{content_data["content_id"]} not found"
-               },
-               status: :not_found and return
+        return {
+          json: {
+            error: "Assignment #{content_data["content_id"]} not found"
+          },
+          status: :not_found
+        }
       end
 
       assignment.description = AccessibilityControllerHelper.fix_content(
-        assignment.body, rule, content_data["path"], content_data["value"]
+        assignment.description, rule, content_data["path"], content_data["value"]
       )
       assignment.save!
     else
-      render json: { error: "Invalid content type" }, status: :unprocessable_entity and return
+      return { json: { error: "Invalid content type" }, status: :unprocessable_entity }
     end
 
-    render json: { success: true }
+    { json: { success: true }, status: :ok }
   end
 
   def create_accessibility_issues(rules = Accessibility::Rule.registry, pdf_rules = Accessibility::Rule.pdf_registry)

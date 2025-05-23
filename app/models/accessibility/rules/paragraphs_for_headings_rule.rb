@@ -58,6 +58,13 @@ module Accessibility
           value: "false"
         )
       end
+
+      def self.fix(elem, value)
+        return elem unless value == "true"
+
+        elem.name = "p"
+        elem
+      end
     end
   end
 end

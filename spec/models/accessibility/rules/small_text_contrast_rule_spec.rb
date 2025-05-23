@@ -59,5 +59,15 @@ RSpec.describe "SmallTextContrastRule", type: :feature do
         expect(file_issues.first[:data][:id]).to include("file-789")
       end
     end
+
+    it "fixes small text contrast issues by updating the text color" do
+      input_html = '<p style="color: #CCCCCC; background-color: #FFFFFF;">Low contrast text</p>'
+      compliant_color = "#000000"
+      expected_html = "<p style=\"color: #{compliant_color}; background-color: #FFFFFF;\">Low contrast text</p>"
+
+      fixed_html = fix_issue(:small_text_contrast, input_html, "./*", compliant_color)
+
+      expect(fixed_html).to eq(expected_html)
+    end
   end
 end

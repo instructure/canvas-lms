@@ -65,4 +65,14 @@ RSpec.describe "LargeTextContrastRule", type: :feature do
       end
     end
   end
+
+  context "when fixing large text contrast" do
+    it "updates the text color to meet contrast requirements" do
+      input_html = '<h1 style="color: #BBBBBB; background-color: #FFFFFF; font-size: 24px;">Low contrast heading</h1>'
+      fixed_html = fix_issue(:large_text_contrast, input_html, "./*", "#000000")
+
+      expect(fixed_html).to include("color: #000000")
+      expect(fixed_html).to include("background-color: #FFFFFF")
+    end
+  end
 end

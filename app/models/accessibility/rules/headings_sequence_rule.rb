@@ -141,6 +141,20 @@ module Accessibility
       def self.link_text
         "Learn more about proper heading sequences"
       end
+
+      def self.fix(elem, value)
+        case value
+        when "Leave as is"
+          return elem
+        when "Fix heading hierarchy"
+          prior_h = get_prior_heading(elem)
+          h_idx = prior_h ? prior_h.tag_name[1..].to_i : 0
+          elem.name = "h#{h_idx + 1}"
+        when "Remove heading style"
+          elem.name = "p"
+        end
+        elem
+      end
     end
   end
 end

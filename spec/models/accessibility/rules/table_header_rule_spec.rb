@@ -48,5 +48,14 @@ RSpec.describe "TableHeaderRule", type: :feature do
         expect(file_issues.first[:data][:id]).to include("file-789")
       end
     end
+
+    it "fixes tables by adding headers to the first row" do
+      input_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
+      expected_html = "<table><tr><th scope=\"col\">Cell 1</th><th scope=\"col\">Cell 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
+
+      fixed_html = fix_issue(:table_header, input_html, "./*", "Header row")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
   end
 end

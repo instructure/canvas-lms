@@ -51,9 +51,6 @@ describe AccessibilityController do
   before do
     allow_any_instance_of(AccessibilityController).to receive(:require_context).and_return(true)
     allow_any_instance_of(AccessibilityController).to receive(:require_user).and_return(true)
-    allow_any_instance_of(AccessibilityController).to receive(:setup_ruleset) do |controller|
-      controller.instance_variable_set(:@ruleset, rules)
-    end
     allow_any_instance_of(AccessibilityController).to receive(:allowed?).and_return(true)
   end
 
@@ -240,6 +237,84 @@ describe AccessibilityController do
       allow_any_instance_of(AccessibilityController).to receive(:allowed?).and_return(false)
       get :show, params: { course_id: 42 }
       expect(response.body).not_to include("accessibility-checker-container")
+    end
+  end
+
+  describe "#update" do
+    let(:mock_rule) do
+      Class.new do
+        def self.test(_elem) = true
+        def self.id = "mock-rule"
+        def self.message = "No issue"
+        def self.why = "Just a mock"
+        def self.form = []
+      end
+    end
+
+    let(:rules) { { "mock-rule" => mock_rule } }
+
+    before do
+      allow(Accessibility::Rule).to receive(:registry).and_return(rules)
+      allow_any_instance_of(AccessibilityController).to receive(:require_context).and_return(true)
+      allow_any_instance_of(AccessibilityController).to receive(:require_user).and_return(true)
+      allow_any_instance_of(AccessibilityController).to receive(:allowed?).and_return(true)
+      allow_any_instance_of(AccessibilityController).to receive(:setup_ruleset)
+    end
+
+    it "returns bad request for empty input" do
+      response = controller.update_accessibility_issues({}, rules)
+      expect(response[:status]).to eq(:bad_request)
+      expect(response[:json][:error]).to include("Invalid rule identifier")
+    end
+
+    it "returns unprocessable entity for invalid content type" do
+      response = controller.update_accessibility_issues({ rule: "mock-rule", content_type: "InvalidType" }.transform_keys(&:to_s), rules)
+      expect(response[:status]).to eq(:unprocessable_entity)
+      expect(response[:json][:error]).to eq("Invalid content type")
+    end
+
+    it "returns bad request for invalid rule name" do
+      response = controller.update_accessibility_issues({ rule: "invalid-rule", content_type: "Page", content_id: 1 }.transform_keys(&:to_s), rules)
+      expect(response[:status]).to eq(:bad_request)
+      expect(response[:json][:error]).to include("Invalid rule identifier")
+    end
+
+    it "updates a page successfully" do
+      page = double("Page", id: 1, body: "<div>content</div>", save!: true)
+      context_double = double("Context")
+      wiki_pages_double = double("WikiPages")
+      controller.instance_variable_set(:@context, context_double)
+      allow(context_double).to receive(:wiki_pages).and_return(wiki_pages_double)
+      allow(wiki_pages_double).to receive(:find_by).and_return(page)
+      allow(page).to receive(:body).and_return("<div>content</div>")
+      allow(page).to receive(:body=)
+      allow(AccessibilityControllerHelper).to receive(:fix_content).and_return("<div>fixed content</div>")
+
+      response = controller.update_accessibility_issues({ rule: "mock-rule", content_type: "Page", content_id: 1, path: "path", value: "value" }.transform_keys(&:to_s), rules)
+
+      expect(response[:status]).to eq(:ok)
+      expect(response[:json][:success]).to be true
+      expect(page).to have_received(:body=).with("<div>fixed content</div>")
+      expect(page).to have_received(:save!)
+    end
+
+    it "updates an assignment successfully" do
+      assignment = double("Assignment", id: 2, description: "<div>desc</div>", save!: true)
+      context_double = double("Context")
+      assignments_double = double("Assignments")
+      controller.instance_variable_set(:@context, context_double)
+      allow(context_double).to receive(:assignments).and_return(assignments_double)
+      allow(assignments_double).to receive(:find_by).and_return(assignment)
+      allow(assignment).to receive(:description).and_return("<div>desc</div>")
+      allow(assignment).to receive(:description=)
+      allow(AccessibilityControllerHelper).to receive(:fix_content).and_return("<div>fixed description</div>")
+
+      response = controller.update_accessibility_issues({ rule: "mock-rule", content_type: "Assignment", content_id: 2, path: "path", value: "value" }.transform_keys(&:to_s), rules)
+
+      expect(response[:status]).to eq(:ok)
+      expect(response[:json][:success]).to be true
+      expect(assignment).to have_received(:description=).with("<div>fixed description</div>")
+      expect(assignment).to have_received(:save!)
     end
   end
 end

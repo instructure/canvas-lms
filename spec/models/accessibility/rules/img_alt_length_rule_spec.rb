@@ -53,4 +53,35 @@ RSpec.describe "ImgAltLengthRule", type: :feature do
       end
     end
   end
+
+  context "when fixing image alt text length" do
+    it "updates overly long alt text to a concise value" do
+      long_alt = "This is an extremely long description that contains far too many words and details about the image. The alt text should be concise and to the point, not unnecessarily verbose. Screen readers will read all of this text to users, making for a poor experience."
+      concise_alt = "A concise description of the image."
+
+      input_html = "<div><img id=\"test-element\" src=\"image.jpg\" alt=\"#{long_alt}\"></div>"
+      fixed_html = fix_issue(:img_alt_length, input_html, './/img[@id="test-element"]', concise_alt)
+
+      expect(fixed_html).to include("alt=\"#{concise_alt}\"")
+    end
+
+    it "does not modify alt text if it is already concise" do
+      concise_alt = "A concise description of the image."
+
+      input_html = "<div><img id=\"test-element\" src=\"image.jpg\" alt=\"#{concise_alt}\"></div>"
+      fixed_html = fix_issue(:img_alt_length, input_html, './/img[@id="test-element"]', concise_alt)
+
+      expect(fixed_html).to include("alt=\"#{concise_alt}\"")
+    end
+
+    it "fixes overly long alt text by updating it to a new value" do
+      long_alt = "This is an extremely long description that contains far too many words and details about the image. The alt text should be concise and to the point, not unnecessarily verbose. Screen readers will read all of this text to users, making for a poor experience."
+      new_alt = "A concise description of the image."
+
+      input_html = "<div><img id=\"test-element\" src=\"image.jpg\" alt=\"#{long_alt}\"></div>"
+      fixed_html = fix_issue(:img_alt_length, input_html, './/img[@id="test-element"]', new_alt)
+
+      expect(fixed_html).to include("alt=\"#{new_alt}\"")
+    end
+  end
 end

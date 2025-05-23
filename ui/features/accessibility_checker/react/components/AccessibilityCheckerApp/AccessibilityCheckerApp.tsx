@@ -137,9 +137,11 @@ export const AccessibilityCheckerApp: React.FC = () => {
     window.location.reload()
   }
 
-  const closeModal = () => {
+  const closeModal = (shallReload: boolean) => {
     setShowModal(false)
-    window.location.reload()
+    if (shallReload) {
+      window.location.reload()
+    }
   }
 
   if (loading)

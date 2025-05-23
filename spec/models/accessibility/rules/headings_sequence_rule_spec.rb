@@ -49,4 +49,22 @@ RSpec.describe "HeadingsSequenceRule", type: :feature do
       end
     end
   end
+
+  context "when fixing heading sequences" do
+    it "fixes a skipped heading level" do
+      input_html = '<div id="test-element"><h2>First heading</h2><h4 id="test-element">Skipped heading level</h4></div>'
+      fixed_html = fix_issue(:headings_sequence, input_html, ".//h4[@id='test-element']", "Fix heading hierarchy")
+
+      expect(fixed_html).to include('<h3 id="test-element">Skipped heading level</h3>')
+      expect(fixed_html).not_to include('<h4 id="test-element">Skipped heading level</h4>')
+    end
+
+    it "removes heading style" do
+      input_html = '<div id="test-element"><h2>First heading</h2><h4 id="test-element">Skipped heading level</h4></div>'
+      fixed_html = fix_issue(:headings_sequence, input_html, ".//h4[@id='test-element']", "Remove heading style")
+
+      expect(fixed_html).to include('<p id="test-element">Skipped heading level</p>')
+      expect(fixed_html).not_to include('<h4 id="test-element">Skipped heading level</h4>')
+    end
+  end
 end
