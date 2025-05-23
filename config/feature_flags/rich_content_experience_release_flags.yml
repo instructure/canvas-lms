@@ -235,6 +235,19 @@ reset_uuid_on_course_reset:
     Reset the UUID of a course when it is reset.  This allows course restore to work better for New Quizzes.
   applies_to: RootAccount
 
+safe_files_token:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Safe Files Token
+  description: |-
+    Adds a one time use token when redirecting to the safe files domain.
+    This allows access to files within iframes in rich content that would be blocked by cross-site cookie protections.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
 visibility_performance_improvements:
   state: hidden
   display_name: Selective Release Visibility Performance Improvements

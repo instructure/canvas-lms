@@ -769,7 +769,7 @@ describe FilesController do
       get "show", params: verifier.merge(id: file.id)
       expect(response).to be_redirect
 
-      expect(response.headers["Location"]).to eq "http://test.host/files/#{file.id}"
+      expect(response.headers["Location"]).not_to include "sf_verifier=#{verifier}"
     end
 
     it "ignores invalid sf_verifiers" do
