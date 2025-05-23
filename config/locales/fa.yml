@@ -7916,9 +7916,12 @@ fa:
       tab_hidden_if_disabled_k5: "برگه غیرفعال است، در پیمایش موضوع ظاهر نمی شود"
       tabs: 
         alerts: هشدارها
+        apps: "برنامه ها"
         details: "اطلاعات درس"
         feature_options: "گزینه‌های ویژگی"
         grade_publishing: "انتشار نمره"
+        grade_syncing: "همگام‌سازی نمره"
+        integrations: "یکپارچگی ها"
         navigation: پیمایش
         sections: "بخش ها"
         tools: "برنامه ها"
