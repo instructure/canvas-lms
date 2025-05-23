@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom'
 import React from 'react'
+import {createRoot, Root} from 'react-dom/client'
 import {Mathml} from '@instructure/canvas-rce/es/enhance-user-content/mathml'
 import ModuleFileDrop from '@canvas/context-module-file-drop/react'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
@@ -31,6 +31,11 @@ import {
   setExpandAllButtonVisible,
 } from '../jquery/utils'
 import RelockModulesDialog from '@canvas/relock-modules-dialog'
+import {itemCount} from './showAllOrLess'
+
+export interface HTMLElementWithRoot extends HTMLElement {
+  reactRoot?: Root
+}
 
 export function addModuleElement(
   data: Record<string, any>,
@@ -105,20 +110,8 @@ export function addModuleElement(
   )
   relockModulesDialog.renderIfNeeded(data.context_module)
   $module.triggerHandler('update', data)
-  const module_dnd = $module.find('.module_dnd')[0]
-  if (module_dnd) {
-    const contextModules = document.getElementById('context_modules')
 
-    ReactDOM.render(
-      <ModuleFileDrop
-        courseId={ENV.course_id}
-        moduleId={data.context_module.id}
-        contextModules={contextModules}
-        moduleName={data.context_module.name}
-      />,
-      module_dnd,
-    )
-  }
+  renderModuleFileDrop($module[0])
 
   const mathml = new Mathml(
     {
@@ -135,3 +128,55 @@ export function addModuleElement(
     }
   }
 }
+
+export function renderModuleFileDrop(module: HTMLElement) {
+  if (!module) return
+
+  const moduleId = module.dataset.moduleId
+  const moduleName = module.getAttribute('aria-label')
+  if (!moduleId || !moduleName) return
+
+  let module_dnd = module.querySelector('.module_dnd') as HTMLElementWithRoot
+  if (!module_dnd) {
+    module_dnd = document.createElement('div')
+    module_dnd.className = 'module_dnd'
+    module_dnd.setAttribute('data-context-module-id', moduleId)
+    module.querySelector('.footer')?.insertAdjacentElement('beforebegin', module_dnd)
+  }
+
+  const contextModules = document.getElementById('context_modules')
+
+  if (!module_dnd.reactRoot) {
+    module_dnd.reactRoot = createRoot(module_dnd)
+  }
+
+  module_dnd.reactRoot.render(
+    <ModuleFileDrop
+      courseId={ENV.course_id}
+      moduleId={moduleId}
+      contextModules={contextModules}
+      moduleName={moduleName}
+    />,
+  )
+}
+
+export function removeModuleFileDrop(module: HTMLElement) {
+  const module_dnd = module.querySelector('.module_dnd') as HTMLElementWithRoot
+  if (!module_dnd) return
+
+  module_dnd.reactRoot?.unmount()
+  module_dnd.reactRoot = undefined
+}
+
+export function updateModuleFileDrop(module: HTMLElement) {
+  if (!module) return
+
+  if (itemCount(module) === 0) {
+    renderModuleFileDrop(module)
+    return
+  }
+  removeModuleFileDrop(module)
+}
+
+export const MODULE_ITEM_LIST =
+  '<ul class="ig-list items context_module_items manageable ui-sortable" data-total-items="0"></ul>'

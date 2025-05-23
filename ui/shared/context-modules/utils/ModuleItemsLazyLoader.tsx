@@ -24,6 +24,7 @@ import {ModuleItemLoadingData} from './ModuleItemLoadingData'
 import {ModuleItemsLoadingSpinner} from './ModuleItemsLoadingSpinner'
 import {ModuleItemsStore} from './ModuleItemsStore'
 import {moduleFromId} from './showAllOrLess'
+import {updateModuleFileDrop} from './moduleHelpers'
 import {DEFAULT_PAGE_SIZE, type ModuleId} from './types'
 
 const BATCH_SIZE = 6
@@ -51,16 +52,21 @@ class ModuleItemsLazyLoader {
     this.moduleItemStore = moduleItemStore
   }
 
-  emptyModuleOfItems(moduleItemContainer: Element) {
-    moduleItemContainer.querySelector('.context_module_items')?.remove()
+  emptyModuleOfItems(moduleItemContainer: Element, leaveList?: boolean) {
+    if (leaveList) {
+      moduleItemContainer.querySelector('.context_module_items')?.replaceChildren()
+    } else {
+      moduleItemContainer.querySelector('.context_module_items')?.remove()
+    }
   }
 
   renderResult(moduleId: ModuleId, text: string, links?: Links) {
     const moduleItemContainer = document.querySelector(`#context_module_content_${moduleId}`)
     if (!moduleItemContainer) return
 
-    this.emptyModuleOfItems(moduleItemContainer)
+    this.emptyModuleOfItems(moduleItemContainer, text.trim().length === 0)
     moduleItemContainer.insertAdjacentHTML('afterbegin', text)
+
     const module = moduleFromId(moduleId)
     if (!module) return
     module.dataset.loadstate = 'loaded'
@@ -96,6 +102,7 @@ class ModuleItemsLazyLoader {
     } else {
       ModuleItemsLazyLoader.loadingData.unmountModuleRoot(moduleId)
     }
+    updateModuleFileDrop(module)
   }
 
   onPageChange = (page: number, moduleId: ModuleId) => {
