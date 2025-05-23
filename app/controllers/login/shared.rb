@@ -239,7 +239,7 @@ module Login::Shared
     tags ||= {}
     tags = tags.reverse_merge({ auth_type:, domain: request.host })
 
-    tags[:target_auth_type] = target_provider.auth_type if target_provider
+    tags[:target_auth_type] = target_provider&.auth_type || auth_type
     tags[:auth_provider_id] = authentication_provider.global_id if authentication_provider
     tags[:reason] = reason if reason
 
