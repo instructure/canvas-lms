@@ -52,37 +52,37 @@ export default function CoursesTray() {
         {k5User ? I18n.t('Subjects') : I18n.t('Courses')}
       </Heading>
       <hr role="presentation" />
-      <List isUnstyled={true} margin="small 0" itemSpacing="small">
-        <List.Item key="all">
+      <View>
+        <View margin="x-small 0">
           <Link isWithinText={false} href="/courses">
             {k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
           </Link>
-        </List.Item>
-        <List.Item key="hr">
-          <hr role="presentation" />
-        </List.Item>
+        </View>
+
+        <hr role="presentation" />
+
         {isLoading && (
-          <List.Item>
+          <View margin="x-small 0">
             <Spinner delay={500} size="small" renderTitle={I18n.t('Loading')} />
-          </List.Item>
+          </View>
         )}
+
         {isSuccess && showSplitList && (
-          <List.Item>
+          <View margin="x-small 0">
             <SplitCoursesList courses={data} k5User={k5User} />
-          </List.Item>
+          </View>
         )}
+
         {isSuccess && !showSplitList && (
-          <List.Item>
-            <List isUnstyled={true} margin="small 0" itemSpacing="small">
-              {data.map(course => (
-                <List.Item key={course.id}>
-                  <CourseListItemContent course={course} />
-                </List.Item>
-              ))}
-            </List>
-          </List.Item>
+          <List isUnstyled margin="small 0" itemSpacing="small">
+            {data.map(course => (
+              <List.Item key={course.id}>
+                <CourseListItemContent course={course} />
+              </List.Item>
+            ))}
+          </List>
         )}
-      </List>
+      </View>
       <br />
       <Text as="div">
         {k5User
