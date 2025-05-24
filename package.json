@@ -185,7 +185,7 @@
     "react-modal": "^3",
     "react-moveable": "0.56.0",
     "react-popper": "^2.2.5",
-    "react-redux": "^5.1.1",
+    "react-redux": "^7",
     "react-refresh": "^0.17.0",
     "react-router-dom": "^6.16.0",
     "react-slick": "^0.30.2",
