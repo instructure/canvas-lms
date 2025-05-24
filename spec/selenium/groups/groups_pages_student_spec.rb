@@ -399,67 +399,39 @@ describe "groups" do
     end
 
     #-------------------------------------------------------------------------------------------------------------------
-    describe "Files page" do
-      it_behaves_like "files_page", :student
-
-      it "allows group members to add a new folder", priority: "1" do
-        get files_page
-        add_folder
-        expect(ff(".ef-name-col__text").first.text).to eq "new folder"
+    describe "Files page on old UI" do
+      before(:once) do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
       end
 
-      it "allows group members to delete a folder", priority: "1" do
-        skip("RCX-1829: files cog items not working with react 18")
-        skip_if_safari(:alert)
-        get files_page
-        add_folder
-        delete_file(0, :cog_icon)
-        expect(f("body")).not_to contain_css(".ef-item-row")
+      before do
+        @student.set_preference(:files_ui_version, "v1")
       end
 
-      it "allows group members to move a folder", priority: "1" do
-        get files_page
-        create_folder_structure
-        move_folder(@inner_folder)
-      end
+      it_behaves_like "files_page_old_ui", :student
 
       it "only allows group members to access files", priority: "1" do
         get files_page
         verify_no_course_user_access(files_page)
       end
+    end
 
-      it "allows a group member to delete a file", priority: "1" do
-        skip("RCX-1829: files cog items not working")
-        skip_if_safari(:alert)
-        add_test_files(false)
-        get files_page
-        delete_file(0, :cog_icon)
-        wait_for_ajaximations
-        expect(all_files_folders.count).to eq 1
-        # Now try to delete the other one using toolbar menu
-        delete_file(0, :toolbar_menu)
-        expect(f("body")).not_to contain_css(".ef-item-row")
+    describe "Files page on files rewrite UI" do
+      before(:once) do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
       end
 
-      it "allows group members to move a file", priority: "1" do
-        add_test_files
-        get files_page
-        add_folder("destination_folder")
-        move_file_to_folder("example.pdf", "destination_folder")
+      before do
+        @student.set_preference(:files_ui_version, "v2")
       end
 
-      it "hides the publish cloud", priority: "1" do
-        add_test_files
-        get files_page
-        expect(f("#content")).not_to contain_css(".btn-link.published-status")
-      end
+      it_behaves_like "files_page_files_rewrite_ui", :student
 
-      it "does not allow group members to restrict access to a file", priority: "1" do
-        add_test_files
+      it "only allows group members to access files on new files UI", priority: "1" do
         get files_page
-        f(".ef-item-row .ef-date-created-col").click
-        expect(f(".ef-header")).to contain_css(".ef-header__secondary")
-        expect(f(".ef-header__secondary")).not_to contain_css(".btn-restrict")
+        verify_no_course_user_access(files_page)
       end
     end
 

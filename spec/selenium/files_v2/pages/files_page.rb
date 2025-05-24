@@ -187,6 +187,14 @@ module FilesPage
     f("[data-testid='action-menu-button-large']")
   end
 
+  def action_menu_modal
+    f('div[role="menu"]')
+  end
+
+  def bulk_action_menu_modal
+    f('span[class*="view--inlineBlock-contextView"] div[role="menu"]')
+  end
+
   def action_menu_item_by_name_selector(name)
     "[data-testid='action-menu-button-#{name}']"
   end
