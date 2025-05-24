@@ -154,7 +154,7 @@ Which is you?", :count => @merge_opportunities.length %>
       </div>
       <div class="control-group">
         <label class="control-label" for="<%= form.field_id(:password) %>">
-          <%= t("Password") %>: <span aria-hidden="true">*</span>
+          <%= t("Password") %>: *
         </label>
         <div class="controls">
           <%= form.password_field :password,
