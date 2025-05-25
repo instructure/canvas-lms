@@ -24,8 +24,8 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {IconArrowOpenStartSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import {ConnectedGranularCheckbox} from './GranularCheckbox'
-import {ConnectedPermissionButton} from './PermissionButton'
+import GranularCheckbox from './GranularCheckbox'
+import PermissionButton from './PermissionButton'
 import permissionPropTypes from '@canvas/permissions/react/propTypes'
 
 const I18n = createI18nScope('permissions_role_tray_table_row')
@@ -131,6 +131,6 @@ RoleTrayTableRow.propTypes = {
 RoleTrayTableRow.defaultProps = {
   description: '',
   expandable: false,
-  permButton: ConnectedPermissionButton,
-  permCheckbox: ConnectedGranularCheckbox,
+  permButton: PermissionButton,
+  permCheckbox: GranularCheckbox,
 }

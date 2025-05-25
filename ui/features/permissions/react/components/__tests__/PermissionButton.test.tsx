@@ -19,19 +19,21 @@
 import React from 'react'
 import {noop} from 'lodash'
 import {render} from '@testing-library/react'
-import {
-  ENABLED_FOR_NONE,
-  ENABLED_FOR_ALL,
-  ENABLED_FOR_PARTIAL,
-} from '@canvas/permissions/react/propTypes'
+import {EnabledState} from '../types'
+import * as reduxHooks from 'react-redux'
 
 import PermissionButton from '../PermissionButton'
 
 const PERM_LABEL = 'Add widgets'
 const ROLE_LABEL = 'Superuser'
 
+jest.mock('react-redux', () => ({
+  useSelector: jest.fn(),
+  useDispatch: jest.fn(),
+}))
+
 function buildProps({
-  enabled = ENABLED_FOR_ALL,
+  enabled = EnabledState.ALL,
   locked = false,
   readonly = false,
   explicit = true,
@@ -43,32 +45,52 @@ function buildProps({
     onFocus: noop,
     cleanFocus: noop,
     inTray: false,
-    setFocus: false,
     roleId: '1',
     roleLabel: ROLE_LABEL,
-    fixButtonFocus: noop,
-    handleClick: noop,
-    apiBusy: false,
   }
 }
 
-describe('permissions::PermissionButton', () => {
-  function getThings(div) {
-    const check = div.querySelector('svg[name="IconPublish"]')
-    const x = div.querySelector('svg[name="IconTrouble"]')
-    const oval = div.querySelector('svg[name="IconOvalHalf"]')
-    const locked = div.querySelector('svg[name="IconLock"]')
+function getThings(div: HTMLElement) {
+  const check = div.querySelector('svg[name="IconPublish"]')
+  const x = div.querySelector('svg[name="IconTrouble"]')
+  const oval = div.querySelector('svg[name="IconOvalHalf"]')
+  const locked = div.querySelector('svg[name="IconLock"]')
 
-    return {check, x, oval, locked}
-  }
+  return {check, x, oval, locked}
+}
+
+// TODO:  this doesn't test the click/menu actions, just the display!
+// Maybe some integration tests do that but it should also be tested here.
+
+describe('permissions::PermissionButton', () => {
+  const mockUseSelector = jest.spyOn(reduxHooks, 'useSelector')
+  const mockUseDispatch = jest.spyOn(reduxHooks, 'useDispatch')
+
+  // if anything needs to examine how PermissionButton calls the Redux
+  // dispatching methods, this is the way to do it.
+  let mockDispatch: jest.Mock | undefined = undefined
+
+  beforeEach(() => {
+    // Reset all redux hook mocks before each test
+    mockUseSelector.mockClear()
+    mockUseDispatch.mockClear()
+    mockDispatch = jest.fn()
+    mockUseDispatch.mockReturnValue(mockDispatch)
+  })
 
   it('displays a spinner whilst the API is in flight', () => {
-    const {getByText} = render(<PermissionButton {...buildProps({})} apiBusy={true} />)
+    mockUseSelector
+      .mockReturnValueOnce(true) // for apiBusy
+      .mockReturnValueOnce(false) // for setFocus
+
+    const {getByText} = render(<PermissionButton {...buildProps({})} />)
 
     expect(getByText('Waiting for request to complete')).toBeInTheDocument()
   })
 
   it('displays the enabled state', () => {
+    mockUseSelector.mockReturnValue(false) // both apiBusy and setFocus
+
     const {container, getByText, queryByText} = render(<PermissionButton {...buildProps({})} />)
     const {check, x, oval, locked} = getThings(container)
 
@@ -81,8 +103,10 @@ describe('permissions::PermissionButton', () => {
   })
 
   it('displays the disabled state', () => {
+    mockUseSelector.mockReturnValue(false) // both apiBusy and setFocus
+
     const {container, getByText} = render(
-      <PermissionButton {...buildProps({enabled: ENABLED_FOR_NONE})} />,
+      <PermissionButton {...buildProps({enabled: EnabledState.NONE})} />,
     )
     const {check, x, oval, locked} = getThings(container)
 
@@ -94,8 +118,10 @@ describe('permissions::PermissionButton', () => {
   })
 
   it('displays the partially-enabled state', () => {
+    mockUseSelector.mockReturnValue(false) // both apiBusy and setFocus
+
     const {container, getByText} = render(
-      <PermissionButton {...buildProps({enabled: ENABLED_FOR_PARTIAL})} />,
+      <PermissionButton {...buildProps({enabled: EnabledState.PARTIAL})} />,
     )
     const {check, x, oval, locked} = getThings(container)
 
@@ -107,6 +133,8 @@ describe('permissions::PermissionButton', () => {
   })
 
   it('displays enabled and locked', () => {
+    mockUseSelector.mockReturnValue(false) // both apiBusy and setFocus
+
     const {container, getByText} = render(<PermissionButton {...buildProps({locked: true})} />)
     const {check, x, oval, locked} = getThings(container)
 
@@ -118,8 +146,10 @@ describe('permissions::PermissionButton', () => {
   })
 
   it('displays disabled and locked', () => {
+    mockUseSelector.mockReturnValue(false) // both apiBusy and setFocus
+
     const {container, getByText} = render(
-      <PermissionButton {...buildProps({enabled: ENABLED_FOR_NONE, locked: true})} />,
+      <PermissionButton {...buildProps({enabled: EnabledState.NONE, locked: true})} />,
     )
     const {check, x, oval, locked} = getThings(container)
 
@@ -131,8 +161,10 @@ describe('permissions::PermissionButton', () => {
   })
 
   it('displays partially-enabled and locked', () => {
+    mockUseSelector.mockReturnValue(false) // both apiBusy and setFocus
+
     const {container, getByText} = render(
-      <PermissionButton {...buildProps({enabled: ENABLED_FOR_PARTIAL, locked: true})} />,
+      <PermissionButton {...buildProps({enabled: EnabledState.PARTIAL, locked: true})} />,
     )
     const {check, x, oval, locked} = getThings(container)
 
@@ -146,14 +178,18 @@ describe('permissions::PermissionButton', () => {
   })
 
   it('displays a not-disabled button by default', () => {
+    mockUseSelector.mockReturnValue(false) // both apiBusy and setFocus
+
     const {container} = render(<PermissionButton {...buildProps({})} />)
     const button = container.querySelector('button')
-    expect(button.disabled).toBeFalsy()
+    expect(button!.disabled).toBeFalsy()
   })
 
   it('disables the button when permission is readonly', () => {
+    mockUseSelector.mockReturnValue(false) // both apiBusy and setFocus
+
     const {container} = render(<PermissionButton {...buildProps({readonly: true, locked: true})} />)
     const button = container.querySelector('button')
-    expect(button.disabled).toBe(true)
+    expect(button!.disabled).toBe(true)
   })
 })
