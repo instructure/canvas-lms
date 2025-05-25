@@ -50,19 +50,21 @@ import {isEqual} from 'lodash'
  * by lodash isEqual) to the old value.
  */
 
+type ValOrFunc<T> = T | ((arg: T) => T)
+type Callback<T> = (arg: T) => void
+type Setter<T> = (valOrFunc: ValOrFunc<T>, callback?: Callback<T>) => void
+
 export default function useStateWithCallback<T>(
   initialValue: T,
   makeMultipleCallbacks: boolean = false,
-) {
-  type Callback = (arg: T) => void
+): [T, Setter<T>] {
   type BoundCallback = () => void // argument is bound when the callback is created
-  type ValOrFunc = T | ((arg: T) => T)
 
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState<T>(initialValue)
   const curValue = useRef<T>(value)
   const callbackList = useRef<Array<BoundCallback>>([])
 
-  function ourSetter(valOrFunc: ValOrFunc, callback?: Callback) {
+  function ourSetter(valOrFunc: ValOrFunc<T>, callback?: Callback<T>): void {
     setValue(valOrFunc)
     const oldValue = curValue.current
     curValue.current = valOrFunc instanceof Function ? valOrFunc(oldValue) : valOrFunc

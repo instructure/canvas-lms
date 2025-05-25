@@ -19,20 +19,27 @@
 import React from 'react'
 import {noop} from 'lodash'
 import {render} from '@testing-library/react'
-import {ENABLED_FOR_ALL, ENABLED_FOR_NONE} from '@canvas/permissions/react/propTypes'
+import {EnabledState} from '../types'
+import * as reduxHooks from 'react-redux'
 
 import GranularCheckbox from '../GranularCheckbox'
 
 const ROLE_LABEL = 'Superuser'
 const PERM_LABEL = 'Add widgets'
 
-function buildProps({enabled = ENABLED_FOR_ALL, readonly = false}) {
+jest.mock('react-redux', () => ({
+  useSelector: jest.fn(),
+  useDispatch: jest.fn(),
+}))
+
+function buildProps({enabled = EnabledState.ALL, readonly = false}) {
   return {
     permission: {enabled, readonly, locked: false, explicit: true},
     permissionName: PERM_LABEL,
     permissionLabel: PERM_LABEL,
     roleLabel: ROLE_LABEL,
     roleId: '1',
+    inTray: false,
     handleScroll: noop,
     handleClick: noop,
     apiBusy: false,
@@ -40,13 +47,31 @@ function buildProps({enabled = ENABLED_FOR_ALL, readonly = false}) {
 }
 
 describe('permissions::GranularCheckbox', () => {
+  const mockUseSelector = jest.spyOn(reduxHooks, 'useSelector')
+  const mockUseDispatch = jest.spyOn(reduxHooks, 'useDispatch')
+
+  // if anything needs to examine how GranularCheckbox calls the Redux
+  // dispatching methods, this is the way to do it.
+  let mockDispatch: jest.Mock | undefined = undefined
+
+  beforeEach(() => {
+    // Reset all redux hook mocks before each test
+    mockUseSelector.mockClear()
+    mockUseDispatch.mockClear()
+    mockDispatch = jest.fn()
+    mockUseDispatch.mockReturnValue(mockDispatch)
+  })
+
   it('displays a spinner whilst the API is in flight', () => {
-    const {getByText} = render(<GranularCheckbox {...buildProps({})} apiBusy={true} />)
+    mockUseSelector.mockReturnValue(true) // apiBusy
+    const {getByText} = render(<GranularCheckbox {...buildProps({})} />)
 
     expect(getByText('Waiting for request to complete')).toBeInTheDocument()
   })
 
   it('displays the enabled state', () => {
+    mockUseSelector.mockReturnValue(false) // apiBusy
+
     const {container, getByText, queryByText} = render(<GranularCheckbox {...buildProps({})} />)
     const checkbox = container.querySelector('input')
 
@@ -57,8 +82,10 @@ describe('permissions::GranularCheckbox', () => {
   })
 
   it('displays the disabled state', () => {
+    mockUseSelector.mockReturnValue(false) // apiBusy
+
     const {container, getByText, queryByText} = render(
-      <GranularCheckbox {...buildProps({enabled: ENABLED_FOR_NONE})} />,
+      <GranularCheckbox {...buildProps({enabled: EnabledState.NONE})} />,
     )
     const checkbox = container.querySelector('input')
 
@@ -69,6 +96,8 @@ describe('permissions::GranularCheckbox', () => {
   })
 
   it('displays the readonly state', () => {
+    mockUseSelector.mockReturnValue(false) // apiBusy
+
     const {container, getByText, queryByText} = render(
       <GranularCheckbox {...buildProps({readonly: true})} />,
     )
