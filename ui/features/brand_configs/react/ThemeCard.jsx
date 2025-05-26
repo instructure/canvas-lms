@@ -33,9 +33,14 @@ const I18n = createI18nScope('theme_editor')
 export default function ThemeCard(props) {
   const getVar = props.getVariable
 
+  const handleOpen = e => {
+    e.preventDefault()
+    props.open()
+  }
+
   return (
     <div className={`ic-ThemeCard ${props.isActiveBrandConfig && 'ic-ThemeCard--is-active-theme'}`}>
-      <Link as="a" onClick={props.open} forceButtonRole={false}>
+      <Link href="#" onClick={props.open} forceButtonRole={false}>
         <div className="ic-ThemeCard-thumbnail" aria-hidden="true">
           <div className="ic-ThemeCard-thumbnail__primary-content">
             <div className="ic-ThemeCard-fake-text" />
@@ -124,9 +129,10 @@ export default function ThemeCard(props) {
         <div className="ic-ThemeCard-main__name">
           <View padding="x-small" as="div">
             <Link
-              as="a"
+              href="#"
+              forceButtonRole={false}
               data-testid="themecard-name-button"
-              onClick={props.open}
+              onClick={handleOpen}
               isWithinText={false}
             >
               <ScreenReaderContent>
