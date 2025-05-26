@@ -338,6 +338,7 @@ export type RootAccountFeatureId =
   | 'course_pace_allow_bulk_pace_assign'
   | 'disable_iframe_sandbox_file_show'
   | 'ams_service'
+  | 'lti_apps_page_ai_translation'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_SERVICES
