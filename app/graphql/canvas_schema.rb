@@ -131,6 +131,7 @@ class CanvasSchema < GraphQL::Schema
                 Types::InternalSettingType]
 
   # GraphQL tuning and defensive settings
-  query_analyzer(CanvasAntiabuseAnalyzer)
-  query_analyzer(LogQueryComplexity)
+  query_analyzer(Analyzers::CanvasAntiabuseAnalyzer)
+  query_analyzer(Analyzers::LogQueryComplexity)
+  query_analyzer(Analyzers::ConversationComplexityAnalyzer)
 end

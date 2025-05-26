@@ -52,3 +52,44 @@
     </tr>
   </table>
 <% end %>
+
+<h4>
+  Create Conversation Rate Limit
+</h4>
+<p>Values for rate limiting. The values accumulate when sending messages to the groups. After reaching threshold, new messages are rejected for 10 minutes.</p>
+
+<%= fields_for :settings do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <% rate_limit_settings = (settings[:create_conversation_rate_limit] || {}).reverse_merge(GraphQLTuning.create_conversation_rate_limit_defaults) %>
+
+    <tr>
+      <td><%= f.blabel :teachers_score, :en => "Score for sending message to all teachers in course" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][teachers_score]", value: rate_limit_settings[:teachers_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :group_score, :en => "Score for sending message to each members of a group" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][group_score]", value: rate_limit_settings[:group_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :observers_score, :en => "Score for sending message to all observers in course" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][observers_score]", value: rate_limit_settings[:observers_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :section_score, :en => "Score for sending message to each members in section" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][section_score]", value: rate_limit_settings[:section_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :students_score, :en => "Score for sending message to all students in course" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][students_score]", value: rate_limit_settings[:students_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :course_score, :en => "Score for sending message to everyone in course" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][course_score]", value: rate_limit_settings[:course_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :threshold, :en => "The score limit. When exceeded, subsequent requests are rejected for 10 minutes" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][threshold]", value: rate_limit_settings[:threshold] %></td>
+    </tr>
+  </table>
+<% end %>
+

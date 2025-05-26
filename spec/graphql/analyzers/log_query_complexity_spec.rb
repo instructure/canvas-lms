@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2024 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,10 +17,28 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+describe Analyzers::LogQueryComplexity do
+  let(:schema) do
+    Class.new(GraphQL::Schema) do
+      query(Class.new(GraphQL::Schema::Object) do
+        graphql_name "Query"
+        field :hello, String, null: false
 
-class LogQueryComplexity < GraphQL::Analysis::QueryComplexity
-  def result
-    complexity = super
-    Rails.logger.info { "GraphQL: Query Complexity #{complexity}" }
+        def hello
+          "world"
+        end
+      end)
+    end
+  end
+
+  let(:query_string) { "{ hello }" }
+  let(:query) { GraphQL::Query.new(schema, query_string) }
+  let(:analyzer) { described_class.new(query) }
+
+  describe "#result" do
+    it "logs the computed query complexity" do
+      expect(Rails.logger).to receive(:info)
+      analyzer.result
+    end
   end
 end
