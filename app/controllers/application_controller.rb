@@ -2656,16 +2656,19 @@ class ApplicationController < ActionController::Base
   end
   helper_method :verified_file_download_url
 
-  def user_content(str)
+  # safe_html is used to indicate that the HTML is already safe and should not be escaped,
+  # please also note that if the html has any attachments, safe_html should be set to true!!!
+  # since we neet to process the attachments in the html.
+  def user_content(str, context: @context, user: @current_user, is_public: false, location: nil, safe_html: false)
     return nil unless str
-    return str.html_safe unless str.match?(/object|embed|equation_image/)
+    return str if safe_html
 
-    UserContent.escape(str, request.host_with_port, use_new_math_equation_handling?)
-  end
-  helper_method :user_content
-
-  def public_user_content(str, context: @context, user: @current_user, is_public: false, location: nil)
-    return nil unless str
+    is_course_syllabus = location&.include?("course_syllabus_") && context.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+    render_location_tag = if is_course_syllabus || (location && context.root_account.feature_enabled?(:file_association_access))
+                            location
+                          else
+                            nil
+                          end
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
     file_handler = proc do |match|
@@ -2676,14 +2679,14 @@ class ApplicationController < ActionController::Base
         preloaded_attachments: {},
         in_app: in_app?,
         is_public:,
-        location:
+        location: render_location_tag
       ).processed_url
     end
     rewriter.set_handler("files", &file_handler)
     rewriter.set_handler("media_attachments_iframe", &file_handler)
     UserContent.escape(rewriter.translate_content(str), request.host_with_port, use_new_math_equation_handling?)
   end
-  helper_method :public_user_content
+  helper_method :user_content
 
   def find_bank(id, check_context_chain = true)
     bank = @context.assessment_question_banks.active.where(id:).first || @current_user.assessment_question_banks.active.where(id:).first

@@ -88,6 +88,32 @@ RSpec.describe ApplicationController do
       end
     end
 
+    describe "#user_content" do
+      before do
+        course_with_teacher(active_all: true)
+        controller.instance_variable_set(:@context, @course)
+      end
+
+      context "with disable_file_verifiers_in_public_syllabus ff" do
+        it "adds location tag to attachment urls" do
+          @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          attachment = @course.attachments.create!(uploaded_data: stub_png_data("my-pic.png"))
+          @course.syllabus_body = "<img src='/courses/#{@course.id}/files/#{attachment.id}'/>"
+          @course.save!
+          expect(controller.send(:user_content, @course.syllabus_body, location: "course_syllabus_#{@course.id}")).to include("location=course_syllabus_#{@course.id}")
+        end
+      end
+
+      context "with file_association_access ff" do
+        it "adds location tag to attachment urls" do
+          @course.root_account.enable_feature!(:file_association_access)
+          attachment = @course.attachments.create!(uploaded_data: stub_png_data("my-pic.png"))
+          discussion_topic = discussion_topic_model(message: "<img src='/courses/#{@course.id}/files/#{attachment.id}' />")
+          expect(controller.send(:user_content, @course.discussion_topics.first.message, location: discussion_topic.asset_string.to_s)).to include("location=#{discussion_topic.asset_string}")
+        end
+      end
+    end
+
     describe "js_env" do
       before do
         allow(controller).to receive(:api_request?).and_return(false)
