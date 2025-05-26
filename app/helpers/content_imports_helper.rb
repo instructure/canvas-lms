@@ -31,7 +31,7 @@ module ContentImportsHelper
     if string =~ /ErrorReport(?: id)?: ?(\d+)\z/
       %(<a href="#{error_url($1)}">Error Report #{$1}</a>).html_safe
     else
-      user_content(string)
+      user_content(string, safe_html: true)
     end
   end
 

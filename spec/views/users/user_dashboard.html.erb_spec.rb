@@ -23,7 +23,7 @@ require_relative "../views_helper"
 describe "users/user_dashboard" do
   it "renders" do
     course_with_student
-    view_context
+    view_context(@course, @user)
     assign(:courses, [@course])
     assign(:enrollments, [@enrollment])
     assign(:group_memberships, [])
@@ -37,7 +37,7 @@ describe "users/user_dashboard" do
 
   it "shows announcements to users with no enrollments" do
     user_factory
-    view_context
+    view_context(@user)
     assign(:courses, [])
     assign(:enrollments, [])
     assign(:group_memberships, [])
@@ -57,7 +57,7 @@ describe "users/user_dashboard" do
 
   it "shows announcements (site_admin) to users with no enrollments" do
     user_factory
-    view_context
+    view_context(@user)
     assign(:courses, [])
     assign(:enrollments, [])
     assign(:group_memberships, [])
