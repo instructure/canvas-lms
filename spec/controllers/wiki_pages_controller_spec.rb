@@ -49,20 +49,6 @@ describe WikiPagesController do
       expect(assigns[:js_env].keys).not_to include(:text_editor_preference)
     end
 
-    it "sets up js_env for the block editor" do
-      @course.account.enable_feature!(:block_editor)
-      get "index", params: { course_id: @course.id }
-      expect(response).to be_successful
-      expect(assigns[:js_env][:FEATURES][:BLOCK_EDITOR]).to be(true)
-    end
-
-    it "sets up js_env for the canvas content builder" do
-      @course.account.enable_feature!(:canvas_content_builder)
-      get "index", params: { course_id: @course.id }
-      expect(response).to be_successful
-      expect(assigns[:js_env][:FEATURES][:CANVAS_CONTENT_BUILDER]).to be(true)
-    end
-
     describe "js_env for EDITOR_FEATURE" do
       context "when the block editor is enabled" do
         it "sets EDITOR_FEATURE to block_editor" do

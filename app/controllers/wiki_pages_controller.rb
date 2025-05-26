@@ -221,8 +221,6 @@ class WikiPagesController < ApplicationController
       @wiki_pages_env[:TITLE_AVAILABILITY_PATH] = title_availability_path
     end
     js_env(@wiki_pages_env)
-    @js_env[:FEATURES][:BLOCK_EDITOR] = true if editor_feature == :block_editor
-    @js_env[:FEATURES][:CANVAS_CONTENT_BUILDER] = true if editor_feature == :canvas_content_builder
     @wiki_pages_env
   end
 end
