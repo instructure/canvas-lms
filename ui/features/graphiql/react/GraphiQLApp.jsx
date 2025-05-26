@@ -23,6 +23,7 @@ import {ToolbarButton, PrettifyIcon, ChevronLeftIcon, ChevronDownIcon} from '@gr
 import {getIntrospectionQuery, buildClientSchema} from 'graphql'
 import axios from '@canvas/axios'
 import 'graphiql/graphiql.css'
+import './graphiql-overrides.css'
 import {makeDefaultArg, getDefaultScalarArgValue} from '../CustomArgs'
 
 function fetcher(params) {
