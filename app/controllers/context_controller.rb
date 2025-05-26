@@ -236,11 +236,9 @@ class ContextController < ApplicationController
             @aua_expiration_date = AssetUserAccess.expiration_date
             js_env(context_url: context_url(@context, :context_user_usage_url, @user, format: :json),
                    accesses_total_pages: @accesses.total_pages)
-            @accesses.reject!(&:bad_discussion_context?)
           end
           format.json do
             @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
-            @accesses.reject!(&:bad_discussion_context?)
             render json: @accesses.map { |a| a.as_json(methods: %i[readable_name asset_class_name icon]) }
           end
         end
