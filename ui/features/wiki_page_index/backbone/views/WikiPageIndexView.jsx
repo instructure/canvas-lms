@@ -451,7 +451,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     json.rce_is_preferred = window.ENV.text_editor_preference === 'rce'
     json.no_preferred_editor = window.ENV.text_editor_preference === null
 
-    json.block_editor = !!ENV.FEATURES?.BLOCK_EDITOR
+    json.block_editor = ENV.EDITOR_FEATURE === 'block_editor'
     return json
   }
 }
