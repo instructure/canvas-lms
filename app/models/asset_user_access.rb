@@ -330,16 +330,6 @@ class AssetUserAccess < ActiveRecord::Base
     ICON_MAP[asset_category.to_sym]&.[](1) || ""
   end
 
-  # This is a temporary measure to filter out bad access records
-  # until we figure out how to clear up them from the DB
-  #
-  # For more info, see: FOO-5161
-  def bad_discussion_context?
-    return false unless asset_code.match?(/^discussion_topic_(\d+)$/)
-
-    asset.nil?
-  end
-
   def self.expiration_date
     2.years.ago
   end
