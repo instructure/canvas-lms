@@ -4250,6 +4250,7 @@ type Grades {
   """
   finalScore: Float
   gradingPeriod: GradingPeriod
+  htmlUrl: URL
 
   """
   The override grade. Supersedes the computed final grade if set.
