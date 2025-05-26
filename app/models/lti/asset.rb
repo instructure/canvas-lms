@@ -65,7 +65,7 @@ class Lti::Asset < ApplicationRecord
     attachment.open do |chunk|
       digester << chunk
     end
-    digest = digester.hexdigest
+    digest = digester.base64digest
     timing_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     InstStatsd::Statsd.timing("lti.asset_processor_asset_sha256_calculation", timing_end - timing_start)
     InstStatsd::Statsd.gauge("lti.asset_processor_asset_size", attachment.size)

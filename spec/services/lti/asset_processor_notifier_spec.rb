@@ -79,8 +79,8 @@ describe Lti::AssetProcessorNotifier do
       expect(assets.pluck(:title)).to eq([assignment.title, assignment.title])
       expect(assets.pluck(:filename)).to eq([attachment, attachment2].map(&:display_name))
       expect(assets.pluck(:sha256_checksum)).to eq([
-                                                     "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
-                                                     "486ea46224d1bb4fb680f34f7c9ad96a8f24ec88be73ea8e5a6c65260e9cb8a7",
+                                                     "LPJNul+wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ=",
+                                                     "SG6kYiTRu0+2gPNPfJrZao8k7Ii+c+qOWmxlJg6cuKc="
                                                    ])
     end
 
