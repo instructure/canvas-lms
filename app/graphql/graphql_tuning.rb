@@ -54,6 +54,22 @@ class GraphQLTuning
     config["max_query_directives"].to_i
   end
 
+  def self.create_conversation_rate_limit_defaults
+    {
+      teachers_score: 5,
+      group_score: 50,
+      observers_score: 100,
+      section_score: 50,
+      students_score: 100,
+      course_score: 250,
+      threshold: 1500,
+    }
+  end
+
+  def self.create_conversation_rate_limit(value)
+    config.dig("create_conversation_rate_limit", value.to_s)&.to_i ||
+      create_conversation_rate_limit_defaults[value]
+  end
   class << self
     private
 
