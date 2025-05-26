@@ -3856,6 +3856,7 @@ input EnrollmentFilterInput {
   associatedUserIds: [ID!] = []
   states: [EnrollmentWorkflowState!] = null
   types: [EnrollmentType!] = null
+  userIds: [ID!] = []
 }
 
 enum EnrollmentType {

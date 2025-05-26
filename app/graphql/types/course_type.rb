@@ -337,16 +337,16 @@ module Types
       current_user.course_nickname(course)
     end
 
-    field :enrollments_connection, EnrollmentType.connection_type, null: true do
-      argument :filter, EnrollmentFilterInputType, required: false
-    end
-
     field :custom_grade_statuses_connection, CustomGradeStatusType.connection_type, null: true
     def custom_grade_statuses_connection
       return unless Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
       return unless course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
 
       course.custom_grade_statuses.active.order(:id)
+    end
+
+    field :enrollments_connection, EnrollmentType.connection_type, null: true do
+      argument :filter, EnrollmentFilterInputType, required: false
     end
 
     def enrollments_connection(filter: {})
@@ -362,6 +362,7 @@ module Types
       scope = course.apply_enrollment_visibility(course.all_enrollments, current_user)
       scope = filter[:states].present? ? scope.where(workflow_state: filter[:states]) : scope.active
       scope = scope.where(associated_user_id: filter[:associated_user_ids]) if filter[:associated_user_ids].present?
+      scope = scope.where(user_id: filter[:user_ids]) if filter[:user_ids].present?
       scope = scope.where(type: filter[:types]) if filter[:types].present?
       scope
     end
