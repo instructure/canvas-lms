@@ -29314,6 +29314,10 @@ nn:
     index: 
       titles: 
         pages: Sider
+    new: 
+      titles: 
+        new_page: "Ny side"
+        pages: Sider
     notices: 
       cannot_edit: "Du har ikkje løyve til å redigere sida \"%{title}\"."
       cannot_read_revisions: "Du har ikkje løyve til å gå gjennom historikkrevisjonane for \"%{title}\"."

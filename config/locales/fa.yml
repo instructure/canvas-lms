@@ -25913,6 +25913,10 @@ fa:
     index: 
       titles: 
         pages: "صفحه ها"
+    new: 
+      titles: 
+        new_page: "صفحه جدید"
+        pages: "صفحه ها"
     notices: 
       cannot_edit: "اجازه ندارید صفحه \"%{title}\" را ویرایش کنید."
       cannot_read_revisions: "مجاز به بازبینی بازنگری های تاریخی \"%{title}\" نیستید."
