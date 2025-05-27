@@ -61,7 +61,7 @@ module QuizzesIndexPage
   end
 
   def manage_quiz_menu(quiz_id)
-    f("button[aria-owns='ui-id-#{quiz_id}-1']")
+    f("button#btn-id-#{quiz_id}-1")
   end
 
   def quiz_settings_menu(quiz_id)
