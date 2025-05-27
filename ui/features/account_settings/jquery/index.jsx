@@ -581,4 +581,17 @@ $(document).ready(function () {
       lockbox.prop('disabled', true)
     }
   })
+
+  $('#account_settings_allow_assign_to_differentiation_tags_value').click(event => {
+    const warningMsg = $('#differentiation_tags_account_settings_warning_message')
+    const descriptionMsg = $('#differentiation_tags_account_settings_description_message')
+    const diffTagsOriginallyEnabled = warningMsg.data('diffTagsOriginallyEnabled') === true
+    if (!event.target.checked && diffTagsOriginallyEnabled) {
+      warningMsg.show()
+      descriptionMsg.hide()
+    } else {
+      warningMsg.hide()
+      descriptionMsg.show()
+    }
+  })
 })

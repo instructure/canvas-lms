@@ -187,6 +187,25 @@
       }
     }
   }
+  .account_settings__diff-tags-help-text {
+    display: flex;
+    font-size: 90%;
+    align-items: start;
+    gap: 0.5rem;
+    margin: 0.25rem 0 0;
+    & i {
+      color: $ic-color-danger;
+    }
+    & .account_settings__diff-tags-help-text-container {
+      display: flex;
+      align-items: start;
+      flex-direction: column;
+      margin-bottom: 0.5rem;
+      & p {
+        margin: 0;
+      }
+    }
+  }
 }
 
 #account_settings_tabs {
