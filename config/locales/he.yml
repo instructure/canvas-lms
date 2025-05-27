@@ -20838,6 +20838,10 @@ he:
     index: 
       titles: 
         pages: דפים
+    new: 
+      titles: 
+        new_page: "דף הבא"
+        pages: דפים
     notices: 
       cannot_edit: "אין לך הרשאות לעריכת הדף \"%{title}\"."
       cannot_read_revisions: "אין לך הרשאות לעיון בהסטורית הגירסאות של \"%{title}\"."
