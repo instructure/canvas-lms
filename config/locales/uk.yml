@@ -18967,6 +18967,10 @@ uk:
     index: 
       titles: 
         pages: Сторінки
+    new: 
+      titles: 
+        new_page: "Нова сторінка"
+        pages: Сторінки
     notices: 
       cannot_edit: "Ви не можете редагувати сторінку \"%{title}\"."
       cannot_read_revisions: "Ви не маєте права переглядати історію редакцій \"%{title}\"."
