@@ -170,4 +170,43 @@ describe "wiki pages edit page assign to" do
       end
     end
   end
+
+  context "differentiation tags" do
+    before :once do
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        a.save!
+      end
+
+      @differentiation_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+      @diff_tag1 = @course.groups.create!(name: "Differentiation Tag 1", group_category: @differentiation_tag_category, non_collaborative: true)
+      @diff_tag1.add_user(@student1)
+      @page.assignment_overrides.create!(set_type: "Group", set_id: @diff_tag1.id, title: @diff_tag1.name)
+      @page.update!(only_visible_to_overrides: true)
+    end
+
+    it "shows the convert override message when diff tags setting disabled" do
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      visit_wiki_edit_page(@course.id, @page.title)
+      wait_for_ajaximations
+      expect(element_exists?(convert_override_alert_selector)).to be_truthy
+    end
+
+    it "clicking convert overrides button converts the override and refreshes the cards" do
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      visit_wiki_edit_page(@course.id, @page.title)
+      wait_for_ajaximations
+      expect(f(assignee_selected_option_selector).text).to include(@diff_tag1.name)
+      f(convert_override_button_selector).click
+      wait_for_ajaximations
+      expect(f(assignee_selected_option_selector).text).to include(@student1.name)
+    end
+  end
 end

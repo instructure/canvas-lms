@@ -122,6 +122,9 @@ describe('DiscussionTopicForm', () => {
             CAN_MANAGE_CONTENT: true,
             CAN_CREATE_ASSIGNMENT: true,
           },
+          ATTRIBUTES: {
+            id: 1,
+          },
         },
       }
       Object.assign(window.ENV, ENV)

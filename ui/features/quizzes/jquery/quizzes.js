@@ -72,7 +72,7 @@ import {underscoreString} from '@canvas/convert-case'
 import replaceTags from '@canvas/util/replaceTags'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import MasteryPathToggleView from '@canvas/mastery-path-toggle/backbone/views/MasteryPathToggle'
-import { renderError, restoreOriginalMessage } from '@canvas/quizzes/jquery/quiz_form_utils'
+import {renderError, restoreOriginalMessage} from '@canvas/quizzes/jquery/quiz_form_utils'
 
 const I18n = createI18nScope('quizzes_public')
 const QUESTIONS_NUMBER = 'questions_number'
@@ -1994,8 +1994,8 @@ function hideAlertBox(inputField) {
 
 function getActiveInnerForms() {
   return {
-    question: $(".question_form").not("#question_form_template"),
-    group: $(".group_top.editing").find(".quiz_group_form")
+    question: $('.question_form').not('#question_form_template'),
+    group: $('.group_top.editing').find('.quiz_group_form'),
   }
 }
 
@@ -2007,7 +2007,7 @@ function submitOpenFormsAndCheckValidity() {
 
   $forms.each(function () {
     const $form = $(this)
-    $form.trigger('submit', { disableInputFocus: !isValid })
+    $form.trigger('submit', {disableInputFocus: !isValid})
 
     if (!isValid) {
       return
@@ -2029,7 +2029,8 @@ function submitOpenFormsAndCheckValidity() {
         const $firstIframe = $iframes.first()
         const $drawerLayoutContent = $('#drawer-layout-content')
         $drawerLayoutContent.scrollTo({
-          top: $drawerLayoutContent.scrollTop() + $firstIframe.get(0).getBoundingClientRect().y - 20,
+          top:
+            $drawerLayoutContent.scrollTop() + $firstIframe.get(0).getBoundingClientRect().y - 20,
           left: 0,
         })
       }
@@ -2088,7 +2089,7 @@ function focusOnFirstError() {
 
   if (errorsOnOptionsTab.length > 0) {
     $('#quiz_tabs').tabs('option', 'active', 0)
-    errorsOnOptionsTab?.first()?.focus();
+    errorsOnOptionsTab?.first()?.focus()
   } else if (errorsOnQuestionsTab.length > 0) {
     $('#quiz_tabs').tabs('option', 'active', 1)
     errorsOnQuestionsTab?.first()?.focus()
@@ -2548,6 +2549,11 @@ ready(function () {
       }
       data.allowed_attempts = attempts
       data['quiz[allowed_attempts]'] = attempts
+      const sectionViewRef = document.getElementById(
+        'manage-assign-to-container',
+      )?.reactComponentInstance
+      sectionViewRef?.focusErrors()
+      if (sectionViewRef?.mustConvertTags()) return false
       let overrides = overrideView.getOverrides()
       data['quiz[only_visible_to_overrides]'] = overrideView.setOnlyVisibleToOverrides()
       if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
@@ -3577,25 +3583,25 @@ ready(function () {
   })
 
   $('#add_question_group_dialog .submit_button').click(event => {
-    const restoreDialogButton = (dialog) => {
+    const restoreDialogButton = dialog => {
       dialog
         .find('button')
         .prop('disabled', false)
         .filter('.submit_button')
-        .text(I18n.t('buttons.create_group', "Create Group"))
+        .text(I18n.t('buttons.create_group', 'Create Group'))
     }
 
-    const renderNameError = (message) => {
+    const renderNameError = message => {
       renderError($('#add_question_group_dialog .name'), message)
       restoreDialogButton($dialog)
     }
 
-    const renderPickError = (message) => {
+    const renderPickError = message => {
       renderError($('#add_question_group_dialog .pick'), message)
       restoreDialogButton($dialog)
     }
 
-    const renderPointsError = (message) => {
+    const renderPointsError = message => {
       renderError($('#add_question_group_dialog .points'), message)
       restoreDialogButton($dialog)
     }
@@ -3667,7 +3673,7 @@ ready(function () {
     if (quizGroupQuestionPoints && quizGroupQuestionPoints < 0) {
       renderError(
         $('#add_question_group_dialog .points'),
-        I18n.t('question.positive_points', 'Must be zero or greater')
+        I18n.t('question.positive_points', 'Must be zero or greater'),
       )
       restoreDialogButton($dialog)
       return false
@@ -4220,7 +4226,7 @@ ready(function () {
       renderAlertBox(
         $form.find('.answers_warning'),
         error_text,
-        !data?.disableInputFocus ? focused_element : null
+        !data?.disableInputFocus ? focused_element : null,
       )
       return
     }
@@ -4531,15 +4537,26 @@ ready(function () {
       const quizGroupQuestionPoints = numberHelper.parse(data['quiz_group[question_points]'])
       const validationErrors = validateQuestionGroupData(
         quizGroupQuestionsNumber,
-        quizGroupQuestionPoints
+        quizGroupQuestionPoints,
       )
       const $form = $(this)
-      if (validationErrors.QUESTIONS_NUMBER.length > 0 || validationErrors.QUESTION_POINTS.length > 0) {
+      if (
+        validationErrors.QUESTIONS_NUMBER.length > 0 ||
+        validationErrors.QUESTION_POINTS.length > 0
+      ) {
         if (validationErrors.QUESTIONS_NUMBER.length > 0) {
-          renderQuestionGroupError(QUESTIONS_NUMBER, validationErrors.QUESTIONS_NUMBER.join(', '), $form)
+          renderQuestionGroupError(
+            QUESTIONS_NUMBER,
+            validationErrors.QUESTIONS_NUMBER.join(', '),
+            $form,
+          )
         }
         if (validationErrors.QUESTION_POINTS.length > 0) {
-          renderQuestionGroupError(QUESTION_POINTS, validationErrors.QUESTION_POINTS.join(', '), $form)
+          renderQuestionGroupError(
+            QUESTION_POINTS,
+            validationErrors.QUESTION_POINTS.join(', '),
+            $form,
+          )
         }
         if (!extraData?.disableInputFocus) {
           $form.find('.invalid input').first().focus(150)
@@ -4627,23 +4644,33 @@ ready(function () {
   function validateQuestionGroupData(questionsNumber, questionPoints) {
     const errors = {
       QUESTIONS_NUMBER: [],
-      QUESTION_POINTS: []
+      QUESTION_POINTS: [],
     }
     if (Number.isNaN(questionsNumber) || typeof questionsNumber === 'undefined') {
-      errors.QUESTIONS_NUMBER.push(I18n.t('question_group.questions_number.defined', 'Questions number must be a number'))
+      errors.QUESTIONS_NUMBER.push(
+        I18n.t('question_group.questions_number.defined', 'Questions number must be a number'),
+      )
     }
     if (Number.isNaN(questionPoints) || typeof questionPoints === 'undefined') {
-      errors.QUESTION_POINTS.push(I18n.t('question_group.question_points.defined', 'Question points must be a number'))
+      errors.QUESTION_POINTS.push(
+        I18n.t('question_group.question_points.defined', 'Question points must be a number'),
+      )
     }
     if (questionsNumber < 0) {
-      errors.QUESTIONS_NUMBER.push(I18n.t(
-        'question_group.questions_number.positive_points', 'The amount of questions must be zero or greater'
-      ))
+      errors.QUESTIONS_NUMBER.push(
+        I18n.t(
+          'question_group.questions_number.positive_points',
+          'The amount of questions must be zero or greater',
+        ),
+      )
     }
     if (questionPoints < 0) {
-      errors.QUESTION_POINTS.push(I18n.t(
-        'question_group.question_points.positive_points', 'The amount of points must be zero or greater'
-      ))
+      errors.QUESTION_POINTS.push(
+        I18n.t(
+          'question_group.question_points.positive_points',
+          'The amount of points must be zero or greater',
+        ),
+      )
     }
     return errors
   }

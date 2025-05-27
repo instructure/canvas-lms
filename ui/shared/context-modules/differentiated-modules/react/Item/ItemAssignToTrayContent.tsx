@@ -85,6 +85,7 @@ export interface ItemAssignToTrayContentProps
   assignToCardsRef: React.MutableRefObject<ItemAssignToCardSpec[]>
   disabledOptionIdsRef: React.MutableRefObject<string[]>
   isTray: boolean
+  setStagedOverrides?: (overrides: exportedOverride[] | null) => void
 }
 
 const MAX_PAGES = 10
@@ -169,6 +170,7 @@ const ItemAssignToTrayContent = ({
   assignToCardsRef,
   disabledOptionIdsRef,
   isTray,
+  setStagedOverrides = () => {},
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
@@ -306,14 +308,19 @@ const ItemAssignToTrayContent = ({
   }, [JSON.stringify(defaultDisabledOptionIds)])
 
   useEffect(() => {
-    if (defaultCards !== undefined || itemContentId === undefined) {
+    if ((defaultCards !== undefined || itemContentId === undefined) && !refetchPages) {
       if (initHasModuleOverrides !== undefined && hasModuleOverrides !== undefined) {
         setHasModuleOverrides(initHasModuleOverrides)
+      }
+
+      if (assignToCardsRef.current.length > 0) {
+        checkForDifferentiationTagOverrides()
       }
       return
     }
 
     const fetchAllPages = async () => {
+      if (itemContentId === undefined) return
       setFetchInFlight(true)
       let url = itemTypeToApiURL(courseId, itemType, itemContentId)
       const allResponses = []
@@ -522,6 +529,10 @@ const ItemAssignToTrayContent = ({
         setInitialCards(cards)
         onInitialStateSet?.(cards)
         setAssignToCards(cards)
+        if (refetchPages) {
+          // we refetched so update the staged overrides for assignment save
+          setStagedOverrides(overrides)
+        }
       } catch {
         showFlashError()()
         handleDismiss()
@@ -529,6 +540,7 @@ const ItemAssignToTrayContent = ({
         setHasFetched(true)
         setFetchInFlight(false)
         initialLoadRef.current = true
+        setRefetchPages(false)
       }
     }
     if (!hasFetched || refetchPages) {

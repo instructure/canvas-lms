@@ -1501,7 +1501,11 @@ EditView.prototype.submit = function (event) {
   event.preventDefault()
   event.stopPropagation()
   this.cacheAssignmentSettings()
-  if (this.dueDateOverrideView.containsSectionsWithoutOverrides()) {
+  if (
+    (ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS ||
+      !this.dueDateOverrideView.containsDiffTagOverrides()) &&
+    this.dueDateOverrideView.containsSectionsWithoutOverrides()
+  ) {
     missingDateDialog = new MissingDateDialog({
       success: (function (_this) {
         return function (dateDialog) {
@@ -1788,6 +1792,15 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
     if (crErrors) {
       errors.conditional_release = crErrors
     }
+  }
+  const sectionViewRef = document.getElementById(
+    'manage-assign-to-container',
+  )?.reactComponentInstance
+  const invalidInput = sectionViewRef?.focusErrors()
+  if (invalidInput) {
+    errors.invalid_card = {$input: null, showError: this.showError}
+  } else {
+    delete errors.invalid_card
   }
   return errors
 }
