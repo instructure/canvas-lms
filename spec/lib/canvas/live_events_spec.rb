@@ -3329,6 +3329,27 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".get_account_data" do
+    before do
+      @root_account = Account.create!
+      @nonroot_account = Account.create!(root_account: @root_account)
+    end
+
+    context "for root accounts" do
+      it "root_account_id is the account's global id" do
+        account_data = Canvas::LiveEvents.get_account_data(@root_account)
+        expect(account_data[:root_account_id]).to eq @root_account.global_id
+      end
+    end
+
+    context "for non-root accounts" do
+      it "root_account_id is root account's global id" do
+        account_data = Canvas::LiveEvents.get_account_data(@nonroot_account)
+        expect(account_data[:root_account_id]).to eq @root_account.global_id
+      end
+    end
+  end
+
   describe "heartbeat" do
     context "when database region is not set (local/open source)" do
       it "sets region to not_configured" do
