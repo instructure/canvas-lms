@@ -16,17 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Flex} from '@instructure/ui-flex'
-import React from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {TextInput} from '@instructure/ui-text-input'
 
-export const MainLayout = (props: {
-  header: React.ReactNode
-  body: React.ReactNode
-}) => {
-  return (
-    <Flex direction="column" gap="medium">
-      <Flex>{props.header}</Flex>
-      <Flex>{props.body}</Flex>
-    </Flex>
-  )
+const I18n = createI18nScope('pages')
+
+export const PageTitle = () => {
+  return <TextInput renderLabel={I18n.t('Page title')} />
 }
