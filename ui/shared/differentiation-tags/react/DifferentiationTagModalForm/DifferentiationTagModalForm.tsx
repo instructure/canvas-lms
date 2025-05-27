@@ -525,7 +525,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
               <CondensedButton
                 onClick={handleAddTagClick}
                 margin="0 0 small 0"
-                aria-label={I18n.t('+ Add another tag')}
+                aria-label={I18n.t('Add another tag')}
               >
                 {I18n.t('+ Add another tag')}
               </CondensedButton>
