@@ -76,7 +76,7 @@ import {selectContentDialog} from '@canvas/select-content-dialog'
 import DifferentiatedModulesTray from '../differentiated-modules'
 import ItemAssignToManager from '../differentiated-modules/react/Item/ItemAssignToManager'
 import {parseModule, parseModuleList} from '../differentiated-modules/utils/moduleHelpers'
-import {addModuleElement, removeModuleFileDrop, updateModuleFileDrop} from '../utils/moduleHelpers'
+import {addModuleElement, removeEmptyModuleUI, updateModuleFileDrop} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ModuleItemsLazyLoader} from '../utils/ModuleItemsLazyLoader'
@@ -1271,7 +1271,7 @@ modules.initModuleManagement = async function (duplicate) {
           const $toFocus = $prevModule.length
             ? $('.ig-header-admin .al-trigger', $prevModule)
             : $addModuleButton
-          removeModuleFileDrop($(this)[0])
+          removeEmptyModuleUI($(this)[0])
           $(this).slideUp(function () {
             $(this).remove()
             modules.updateTaggedItems()

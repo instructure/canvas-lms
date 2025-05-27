@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {renderModuleFileDrop, MODULE_ITEM_LIST} from '@canvas/context-modules/utils/moduleHelpers'
+import {addEmptyModuleUI, MODULE_ITEM_LIST} from '@canvas/context-modules/utils/moduleHelpers'
 import ready from '@instructure/ready'
 
 ready(() => {
@@ -30,7 +30,7 @@ ready(() => {
     }
     const moduleDnd = zone.querySelector('.module_dnd')
     if (moduleDnd) {
-      renderModuleFileDrop(zone)
+      addEmptyModuleUI(zone)
     }
   })
 })
