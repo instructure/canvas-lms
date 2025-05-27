@@ -20,11 +20,15 @@ import {findByLabelText, getByLabelText} from '@testing-library/dom'
 import fetchMock from 'fetch-mock'
 import {showFilePreview} from '../showFilePreview'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import $ from 'jquery'
 
 // Mock the FlashAlert module to prevent the console error about onDismiss
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: jest.fn(),
 }))
+
+// Mock jQuery's flashError function
+$.flashError = jest.fn()
 
 // captured from a real query
 const fauxFile =
@@ -36,6 +40,8 @@ describe('showFilePreview', () => {
     document.body.innerHTML = ''
     fetchMock.reset()
     fetchMock.mock('/api/v1/files/2282?include[]=enhanced_preview_url&verifier=abc', fauxFile)
+    // Reset jQuery mock before each test
+    $.flashError.mockClear()
   })
 
   afterEach(() => {
