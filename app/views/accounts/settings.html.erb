@@ -624,7 +624,17 @@
                   <%= diff.check_box :value, checked: diff_tags[:value], disabled: disabled %>
                   <%= diff.label :value, t("Differentiation Tags") %>
                 <% end %>
-                <div class="account_settings__help-text">
+                <div id="differentiation_tags_account_settings_warning_message" class="account_settings__diff-tags-help-text" data-diff-tags-originally-enabled="<%= diff_tags[:value] %>" <%= hidden(include_style: true) %>>
+                  <i class='icon-warning-borderless'></i>
+                  <div class="account_settings__diff-tags-help-text-container">
+                    <p>
+                      <%= t do %>
+                        Disabling tags will block users who have used tags to assign content from being able to modify that content (assignments, modules, etc) until the differentiation tags have been converted to be assigned to individual students or assigning via tag has been removed from that content. For more details, please refer to <a href="<%= t(:'#community.differentiation_tags_settings') %>" target="_blank">our documentation</a>.
+                      <% end %>
+                    </p>
+                  </div>
+                </div>
+                <div id="differentiation_tags_account_settings_description_message" class="account_settings__help-text">
                   <%= t("Differentiation Tags allow instructors to organize students by tags for a more personalized learning experience.") %>
                 </div>
                 <% unless disabled %>

@@ -460,4 +460,42 @@ describe "root account basic settings" do
       end
     end
   end
+
+  context "Differentiation Tags" do
+    before :once do
+      account_admin_user(active_all: true)
+    end
+
+    before do
+      user_session(@admin)
+    end
+
+    describe "allow_assign_to_differentiation_tags originally enabled" do
+      before do
+        account.enable_feature!(:assign_to_differentiation_tags)
+        account.settings[:allow_assign_to_differentiation_tags] = true
+        account.save!
+        get account_settings_url
+      end
+
+      it "shows warning message when differentiation tags settings is unchecked" do
+        differentiation_checkbox = f("#account_settings_allow_assign_to_differentiation_tags_value")
+        expect(differentiation_checkbox.selected?).to be true
+        scroll_into_view(differentiation_checkbox)
+        differentiation_checkbox.click
+
+        warning_message = f("#differentiation_tags_account_settings_warning_message")
+        description = f("#differentiation_tags_account_settings_description_message")
+        expect(warning_message).to be_displayed
+        expect(description).not_to be_displayed
+      end
+
+      it "shows description message when differentiation tags settings is checked" do
+        differentiation_checkbox = f("#account_settings_allow_assign_to_differentiation_tags_value")
+        expect(differentiation_checkbox.selected?).to be true
+        expect(f("#differentiation_tags_account_settings_warning_message")).not_to be_displayed
+        expect(f("#differentiation_tags_account_settings_description_message")).to be_displayed
+      end
+    end
+  end
 end
