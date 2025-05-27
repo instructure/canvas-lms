@@ -255,6 +255,22 @@ describe "context modules" do
       expect(published_module_icon(@mod.id)).to be_present
       expect(f("span.publish-icon.unpublished.publish-icon-published > i.icon-publish")).to be_present
     end
+
+    it "toggles visibility of the move contents link when items are added or removed" do
+      go_to_modules
+      expect(f(".move-contents-container")[:style]).to include("display: none;")
+
+      @assignment = Assignment.create!(context: @course, title: "some assignment in a module")
+      @assignment.save!
+      @mod.add_item(type: "assignment", id: @assignment.id)
+      @mod.save!
+      refresh_page
+      expect(f(".move-contents-container")[:style]).not_to include("display: none;")
+
+      @assignment.destroy!
+      refresh_page
+      expect(f(".move-contents-container")[:style]).to include("display: none;")
+    end
   end
 
   context "edit inline items on module page" do

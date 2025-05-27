@@ -111,7 +111,7 @@ export function addModuleElement(
   relockModulesDialog.renderIfNeeded(data.context_module)
   $module.triggerHandler('update', data)
 
-  renderModuleFileDrop($module[0])
+  addEmptyModuleUI($module[0])
 
   const mathml = new Mathml(
     {
@@ -129,9 +129,17 @@ export function addModuleElement(
   }
 }
 
-export function renderModuleFileDrop(module: HTMLElement) {
+export function showMoveContentsLink(module: HTMLElement, isVisible: boolean): void {
+  const linkContainer = module.querySelector('.move-contents-container') as HTMLElement | null
+  if (linkContainer) {
+    linkContainer.style.display = isVisible ? '' : 'none'
+  }
+}
+
+export function addEmptyModuleUI(module: HTMLElement) {
   if (!module) return
 
+  showMoveContentsLink(module, false)
   const moduleId = module.dataset.moduleId
   const moduleName = module.getAttribute('aria-label')
   if (!moduleId || !moduleName) return
@@ -160,7 +168,8 @@ export function renderModuleFileDrop(module: HTMLElement) {
   )
 }
 
-export function removeModuleFileDrop(module: HTMLElement) {
+export function removeEmptyModuleUI(module: HTMLElement) {
+  showMoveContentsLink(module, true)
   const module_dnd = module.querySelector('.module_dnd') as HTMLElementWithRoot
   if (!module_dnd) return
 
@@ -172,10 +181,10 @@ export function updateModuleFileDrop(module: HTMLElement) {
   if (!module) return
 
   if (itemCount(module) === 0) {
-    renderModuleFileDrop(module)
+    addEmptyModuleUI(module)
     return
   }
-  removeModuleFileDrop(module)
+  removeEmptyModuleUI(module)
 }
 
 export const MODULE_ITEM_LIST =

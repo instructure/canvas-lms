@@ -20,8 +20,8 @@ import {screen, waitFor} from '@testing-library/dom'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {
   updateModuleFileDrop,
-  renderModuleFileDrop,
-  removeModuleFileDrop,
+  addEmptyModuleUI,
+  removeEmptyModuleUI,
   type HTMLElementWithRoot,
 } from '../moduleHelpers'
 
@@ -67,10 +67,10 @@ describe('moduleHelpers', () => {
     document.body.innerHTML = ''
   })
 
-  describe('renderModuleFileDrop', () => {
+  describe('addEmptyModuleUI', () => {
     it('renders the file drop component', async () => {
       const module = buildModule()
-      renderModuleFileDrop(module)
+      addEmptyModuleUI(module)
       expect(module.querySelector('.module_dnd')).toBeInTheDocument()
       await waitFor(() => {
         expect((module.querySelector('.module_dnd') as HTMLElementWithRoot).reactRoot).toBeDefined()
@@ -79,14 +79,14 @@ describe('moduleHelpers', () => {
     })
   })
 
-  describe('removeModuleFileDrop', () => {
+  describe('removeEmptyModuleUI', () => {
     it('removes the file drop component', async () => {
       const module = buildModule()
-      renderModuleFileDrop(module)
+      addEmptyModuleUI(module)
       await waitFor(() => {
         expect(screen.getByTestId('module-file-drop')).toBeInTheDocument()
       })
-      removeModuleFileDrop(module)
+      removeEmptyModuleUI(module)
       expect(module.querySelector('.module_dnd')).toBeInTheDocument()
       expect((module.querySelector('.module_dnd') as HTMLElementWithRoot).reactRoot).toBeUndefined()
       await waitFor(() => {
@@ -108,7 +108,7 @@ describe('moduleHelpers', () => {
 
     it('removes the file drop component when the module has items', async () => {
       const module = buildModule(true)
-      renderModuleFileDrop(module)
+      addEmptyModuleUI(module)
       await waitFor(() => {
         expect(screen.getByTestId('module-file-drop')).toBeInTheDocument()
       })

@@ -20,6 +20,7 @@
   context_module_next ||= nil
   context_module ||= context_module_next
   module_data = context_module ? process_module_data(context_module, @current_user, @session, student: @is_student) : { published_status: 'unpublished' }
+  had_data = module_data[:items].present? && module_data[:items].length > 0
   can_direct_share = can_do(@context, @current_user, :direct_share)
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
@@ -155,11 +156,12 @@
                   class="icon-edit edit_module_link"
                   title="<%= t('links.title.edit_module', %{Edit}) %>"><%= t('links.text.edit_module', %{Edit}) %></a>
               </li>
-              <li role="presentation">
+              <li role="presentation" class="move-contents-container" style="<%= had_data ? '' : 'display:none;' %>">
                 <a
                   href="#<%= context_module ? context_module.id : "{{ id }}" %>"
                   class="move_module_contents_link icon-move-down"
-                  title="<%= t('Move module contents') %>"><%= t('Move Contents...') %></a>
+                  title="<%= t('Move module contents') %>"><%= t('Move Contents...') %>
+                </a>
               </li>
               <li role="presentation">
                 <a
@@ -167,13 +169,13 @@
                   class="move_module_link icon-updown"
                   title="<%= t('Move this module') %>"><%= t('Move Module...') %></a>
               </li>
-                <li role="presentation">
-                    <a
-                      href="#<%= context_module ? context_module.id : "{{ id }}" %>"
-                      class="assign_module_link icon-permissions"
-                      title="<%= t('Assign this module') %>"><%= t('Assign To...') %>
-                    </a>
-                </li>
+              <li role="presentation">
+                  <a
+                    href="#<%= context_module ? context_module.id : "{{ id }}" %>"
+                    class="assign_module_link icon-permissions"
+                    title="<%= t('Assign this module') %>"><%= t('Assign To...') %>
+                  </a>
+              </li>
             <% end %>
             <% if @can_delete %>
               <li role="presentation">
