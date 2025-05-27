@@ -55,24 +55,14 @@ const TagInputRow: React.FC<TagInputRowProps> = ({
 }) => {
   return (
     <Flex direction="column" margin="0 0 medium 0">
-      <View margin="0 0 small 0">
-        <Text weight="bold">
-          {totalTags > 1
-            ? I18n.t('Tag Name (Variant %{tagCount}) *', {tagCount: index + 1})
-            : I18n.t('Tag Name *')}
-        </Text>
-      </View>
-
-      <Flex alignItems="start">
+      <Flex alignItems="end">
         <TextInput
           inputRef={inputRef}
           name={`tag-name-${tag.id}`}
           renderLabel={
-            <ScreenReaderContent>
-              {totalTags > 1
-                ? I18n.t('Tag Name (Variant %{tagCount})', {tagCount: index + 1})
-                : I18n.t('Tag Name')}
-            </ScreenReaderContent>
+            totalTags > 1
+              ? I18n.t('Tag Name (Variant %{tagCount})', {tagCount: index + 1})
+              : I18n.t('Tag Name')
           }
           display="inline-block"
           width={totalTags > 1 ? '95%' : '100%'}
@@ -98,7 +88,13 @@ const TagInputRow: React.FC<TagInputRowProps> = ({
                 focusElRef.current[tag.id] = el
               }
             }}
-            screenReaderLabel={I18n.t('Remove tag')}
+            screenReaderLabel={
+              tag.name
+                ? I18n.t('Remove %{tag}', {tag: tag.name})
+                : totalTags > 1
+                  ? I18n.t('Remove Tag Name Variant %{tagCount}', {tagCount: index + 1})
+                  : I18n.t('Remove Tag Name')
+            }
             onClick={() => onRemove(tag.id)}
             withBackground={false}
             withBorder={false}

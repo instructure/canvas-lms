@@ -156,7 +156,7 @@ function TagCategoryCard({
                   size="small"
                   withBackground={false}
                   withBorder={false}
-                  screenReaderLabel={I18n.t('Delete')}
+                  screenReaderLabel={I18n.t('Delete %{name}', {name})}
                   onClick={handleDelete}
                 >
                   <IconTrashLine />

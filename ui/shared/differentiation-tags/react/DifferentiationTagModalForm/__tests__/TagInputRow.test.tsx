@@ -42,7 +42,7 @@ describe('TagInputRow', () => {
 
   it('renders an input with variant label when totalTags > 1', () => {
     render(<TagInputRow {...defaultProps} />)
-    expect(screen.getByText('Tag Name (Variant 1) *')).toBeInTheDocument()
+    expect(screen.getByText('Tag Name (Variant 1)')).toBeInTheDocument()
     const input = screen.getByDisplayValue('Test Tag')
     const removeTagButton = screen.queryByTestId('remove-tag')
 
@@ -53,7 +53,7 @@ describe('TagInputRow', () => {
   it('renders an input with single tag label when totalTags is 1', () => {
     const props: TagInputRowProps = {...defaultProps, totalTags: 1}
     render(<TagInputRow {...props} />)
-    expect(screen.getByText('Tag Name *')).toBeInTheDocument()
+    expect(screen.getByText('Tag Name')).toBeInTheDocument()
   })
 
   it('calls onChange when input value changes', async () => {
