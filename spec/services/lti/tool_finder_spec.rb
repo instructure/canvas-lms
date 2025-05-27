@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "lti2_spec_helper"
+
 describe Lti::ToolFinder do
   before(:once) do
     @root_account = Account.default
@@ -424,6 +426,22 @@ describe Lti::ToolFinder do
 
         it { is_expected.to be_nil }
       end
+    end
+
+    context "when tag is not linked to an LTI tool" do
+      let(:content_tag) { ContentTag.create!(content: assignment, context: tool.context) }
+      let(:assignment) { assignment_model(course: tool.context) }
+
+      it { is_expected.to be_nil }
+    end
+
+    context "when tag is linked to an LTI 2.0 tool" do
+      # introduces message_handler and all required LTI 2 models
+      include_context "lti2_spec_helper"
+
+      let(:content_tag) { ContentTag.create!(content: message_handler, context: tool.context) }
+
+      it { is_expected.to be_nil }
     end
   end
 
