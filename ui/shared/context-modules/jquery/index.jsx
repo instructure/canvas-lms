@@ -663,7 +663,9 @@ window.modules = (function () {
         itemsCallback,
         new ModuleItemsStore(ENV.COURSE_ID, ENV.current_user_id, ENV.ACCOUNT_ID),
       )
-      moduleItemsLazyLoader.fetchModuleItems(moduleIds, allPages)
+      moduleItemsLazyLoader.fetchModuleItems(moduleIds, allPages).then(() => {
+        $('#expand_collapse_all').prop('disabled', false)
+      })
     },
 
     evaluateItemCyoe($item, data) {
@@ -2531,8 +2533,11 @@ function initContextModules() {
           '.context_module:not(:has(.context_module_item)):not(#context_module_blank)',
         ),
       ).map(d => d.dataset.moduleId)
+      $('#expand_all_modules_link').prop('disabled', true)
       if (moduleIds.length) {
         modules.lazyLoadItems(moduleIds)
+      } else {
+        $('#expand_collapse_all').prop('disabled', false)
       }
     })
   }
