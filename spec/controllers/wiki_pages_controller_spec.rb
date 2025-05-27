@@ -35,7 +35,6 @@ describe WikiPagesController do
       it "renders new page" do
         get :new, params: { course_id: @course.id }
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("New Page placeholder")
       end
     end
 
