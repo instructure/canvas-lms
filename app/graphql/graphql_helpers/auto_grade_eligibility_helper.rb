@@ -60,4 +60,11 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
 
     submission_issues
   end
+
+  def self.contains_rce_file_link?(html_body)
+    return false if html_body.blank?
+
+    doc = Nokogiri::HTML.fragment(html_body)
+    doc.css("a.instructure_file_link").any? || doc.css("a[data-api-returntype=\"File\"]").any?
+  end
 end
