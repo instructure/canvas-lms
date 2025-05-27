@@ -220,11 +220,10 @@ module Lti::Messages
         @tool.developer_key.scopes.intersect?(TokenScopes::LTI_AGS_SCOPES)
     end
 
-    # Follows 1EdTech Platform Notification Spec (not final/public as of Oct 2024)
+    # Follows 1EdTech Platform Notification Spec at https://www.imsglobal.org/spec/lti-pns/v1p0/main
     def include_platform_notification_service_claims?
       include_claims?(:platform_notification_service) &&
-        @tool.developer_key.scopes.include?(TokenScopes::LTI_PNS_SCOPE) &&
-        @tool.root_account.feature_enabled?(:platform_notification_service)
+        @tool.developer_key.scopes.include?(TokenScopes::LTI_PNS_SCOPE)
     end
 
     def include_eulaservice_claims?

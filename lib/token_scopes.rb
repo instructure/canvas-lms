@@ -124,7 +124,6 @@ class TokenScopes
   ALL_LTI_SCOPES = [*LTI_SCOPES.keys, *LTI_HIDDEN_SCOPES.keys].uniq.freeze
 
   SCOPES_MADE_VISIBLE_BY_FEATURE_FLAG = {
-    platform_notification_service: [LTI_PNS_SCOPE],
     lti_asset_processor: [
       LTI_ASSET_READ_ONLY_SCOPE,
       LTI_ASSET_REPORT_SCOPE,

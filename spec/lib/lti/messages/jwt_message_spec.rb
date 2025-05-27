@@ -755,22 +755,6 @@ describe Lti::Messages::JwtMessage do
       include_context "with lti advantage group context"
       it_behaves_like "all PNS claim presence and absence checks"
     end
-
-    context "when the platform_notification_service feature flag is disabled" do
-      before do
-        context.root_account.disable_feature!(:platform_notification_service)
-      end
-
-      %w[course account group].each do |context_type|
-        context "when context is a #{context_type}" do
-          unless context_type == "course"
-            include_context "with lti advantage #{context_type} context"
-          end
-
-          it_behaves_like "absent lti advantage service claim check"
-        end
-      end
-    end
   end
 
   describe "custom parameters" do

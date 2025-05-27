@@ -135,7 +135,7 @@ class SecurityController < ApplicationController
   end
 
   def lti_platform_configuration(account)
-    notice_types_supported = SecurityController.notice_types_supported if account.feature_enabled?(:platform_notification_service)
+    notice_types_supported = SecurityController.notice_types_supported
     {
       product_family_code: "canvas",
       version: canvas_ims_product_version,

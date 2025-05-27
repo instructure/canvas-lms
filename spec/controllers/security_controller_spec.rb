@@ -199,18 +199,6 @@ RSpec.describe SecurityController, type: :request do
       expect(response.parsed_body["scopes_supported"]).to match_array(expected_scopes)
     end
 
-    context "when the platform_notification_service feature flag is off" do
-      before do
-        Account.default.disable_feature!(:platform_notification_service)
-      end
-
-      it "contains the correct information" do
-        get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
-        expect(response).to have_http_status :ok
-        expect(response.parsed_body["scopes_supported"]).to match_array(["openid", *TokenScopes::LTI_SCOPES.keys] - [TokenScopes::LTI_PNS_SCOPE])
-      end
-    end
-
     context "when the lti_asset_processor feature flag is off" do
       before do
         Account.default.disable_feature!(:lti_asset_processor)
