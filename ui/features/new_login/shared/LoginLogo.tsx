@@ -24,9 +24,9 @@ import React from 'react'
 import {useNewLoginData} from '../context'
 
 const LoginLogo = () => {
-  const {loginLogoUrl: src} = useNewLoginData()
+  const {loginLogoUrl, loginLogoText} = useNewLoginData()
 
-  if (!src) return null
+  if (!loginLogoUrl) return null
 
   return (
     <Responsive
@@ -49,7 +49,15 @@ const LoginLogo = () => {
             justifyItems="center"
           >
             <Flex.Item width={width} shouldShrink={true} shouldGrow={true}>
-              <Img constrain="contain" display="block" height="100%" src={src} width="100%" />
+              <Img
+                alt={loginLogoText ?? ''}
+                constrain="contain"
+                data-testid="login-logo-img"
+                display="block"
+                height="100%"
+                src={loginLogoUrl}
+                width="100%"
+              />
             </Flex.Item>
           </Flex>
         )
