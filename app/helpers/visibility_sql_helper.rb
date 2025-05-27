@@ -20,14 +20,24 @@
 # shared SQL between AssignmentVisibleToStudentRepository,  DiscussionTopicVisibleToStudentRepository, WikiPageVisibleToStudentRepository, etc
 module VisibilitySqlHelper
   class << self
-    def enrollment_join_sql
-      <<~SQL.squish
-        JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = o.context_id
-        AND o.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      SQL
+    def enrollment_join_sql(include_concluded: true)
+      if include_concluded
+        <<~SQL.squish
+          JOIN #{Enrollment.quoted_table_name} e
+          ON e.course_id = o.context_id
+          AND o.context_type = 'Course'
+          AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+          AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+        SQL
+      else
+        <<~SQL.squish
+          JOIN #{Enrollment.quoted_table_name} e
+          ON e.course_id = o.context_id
+          AND o.context_type = 'Course'
+          AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+          AND e.workflow_state NOT IN ('completed', 'deleted', 'rejected', 'inactive')
+        SQL
+      end
     end
 
     # NOTE: the method for ContextModule is different

@@ -977,7 +977,9 @@ class UsersController < ApplicationController
       submitting_scope = @current_user
                          .assignments_needing_submitting(
                            include_ungraded: true,
-                           scope_only: true
+                           scope_only: true,
+                           course_ids: @current_user.courses.pluck(:id),
+                           include_concluded: false
                          )
                          .reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
 
