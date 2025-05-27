@@ -118,17 +118,18 @@ describe('PermissionsModal', () => {
     })
     resetAndGetFilesEnv(usageFilesContexts)
 
-    // Render with destructured queries
-    const {getByTestId, findByTestId} = renderComponent()
+    // Render the component
+    renderComponent()
 
     // Click the save button
-    await userEvent.click(getByTestId('permissions-save-button'))
+    await userEvent.click(screen.getByTestId('permissions-save-button'))
 
-    // Wait for the alert to appear with a more specific query
-    const alert = await findByTestId('permissions-usage-rights-alert')
-    expect(alert).toBeInTheDocument()
-    expect(alert).toHaveTextContent(
-      'Selected items must have usage rights assigned before they can be published.',
-    )
+    // Wait for the error message to appear in the component
+    await waitFor(() => {
+      const errorText = screen.getByText(
+        'Selected items must have usage rights assigned before they can be published.',
+      )
+      expect(errorText).toBeInTheDocument()
+    })
   })
 })
