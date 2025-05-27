@@ -14736,6 +14736,10 @@ ko:
     index: 
       titles: 
         pages: 페이지
+    new: 
+      titles: 
+        new_page: "새 페이지"
+        pages: 페이지
     notices: 
       cannot_edit: "\"%{title}\" 페이지를 편집할 수 없습니다."
       cannot_read_revisions: "\"%{title}\"의 수정 이력을 검토할 권한이 없습니다."
