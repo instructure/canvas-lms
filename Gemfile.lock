@@ -1083,13 +1083,13 @@ GEM
       activesupport (>= 3.0.0)
       i18n
       iso8601
-    ruby-lsp (0.23.16)
+    ruby-lsp (0.23.23)
       language_server-protocol (~> 3.17.0)
       prism (>= 1.2, < 2.0)
-      rbs (>= 3, < 4)
+      rbs (>= 3, < 5)
       sorbet-runtime (>= 0.5.10782)
-    ruby-lsp-rspec (0.1.22)
-      ruby-lsp (~> 0.23.0)
+    ruby-lsp-rspec (0.1.23)
+      ruby-lsp (~> 0.23.19)
     ruby-progressbar (1.13.0)
     ruby-rc4 (0.1.5)
     ruby-rtf (0.0.5)
