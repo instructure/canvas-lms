@@ -76,7 +76,7 @@ describe Lti::AssetProcessorNotifier do
       expect(builder_params[:submission_lti_id]).to eq(submission.lti_attempt_id)
       expect(builder_params[:assets][0][:title]).to eq(assignment.title)
       expect(builder_params[:assets][0][:filename]).to eq(attachment.display_name)
-      expect(builder_params[:assets][0][:sha256_checksum]).to eq "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
+      expect(builder_params[:assets][0][:sha256_checksum]).to eq "uU0nuZNNPgilLlLX2n2r+sSE7+N6U4DukIj3rOLvzek="
     end
 
     it "creates Lti::Asset for each attachment" do
