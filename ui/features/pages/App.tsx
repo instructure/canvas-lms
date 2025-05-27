@@ -17,9 +17,11 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {MainLayout} from './react/layouts/MainLayout'
 import {ContentBuilderWrapper} from './react/components/ContentBuilderWrapper'
+import {PageTitle} from './react/components/PageTitle'
 
 const I18n = createI18nScope('pages')
 
@@ -27,7 +29,12 @@ export const App = () => {
   return (
     <MainLayout
       header={<Heading variant="titlePageDesktop">{I18n.t('Page Editor')}</Heading>}
-      body={<ContentBuilderWrapper />}
+      body={
+        <Flex direction="column" width="100%">
+          <PageTitle />
+          <ContentBuilderWrapper />
+        </Flex>
+      }
     />
   )
 }
