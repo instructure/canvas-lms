@@ -546,4 +546,41 @@ describe "due date validations", :ignore_js_errors do
       expect(assign_to_date_and_time[0].text).not_to include("Due date cannot be before course start")
     end
   end
+
+  context "differentiation tags" do
+    before do
+      @course.account.enable_feature!(:assign_to_differentiation_tags)
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        a.save!
+      end
+      @group_category = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
+      @group_category.create_groups(1)
+      @differentiation_tag_group_1 = @group_category.groups.first_or_create
+      @differentiation_tag_group_1.add_user(@student1)
+      @assignment1.assignment_overrides.create!(set: @differentiation_tag_group_1)
+      @assignment1.update!(only_visible_to_overrides: true)
+    end
+
+    it "shows convert override message when diff tags setting disabled" do
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment1.id)
+      expect(element_exists?(convert_override_alert_selector)).to be_truthy
+    end
+
+    it "clicking convert overrides button converts the override and refreshes the cards" do
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment1.id)
+      expect(f(assignee_selected_option_selector).text).to include(@differentiation_tag_group_1.name)
+      f(convert_override_button_selector).click
+      wait_for_ajaximations
+      expect(f(assignee_selected_option_selector).text).to include(@student1.name)
+    end
+  end
 end

@@ -55,6 +55,7 @@ const AssignToContent = ({
   isCheckpointed,
   postToSIS = false,
   defaultGroupCategoryId = null,
+  discussionId = null,
 }) => {
   // stagedCards are the itemAssignToCards that will be saved when the assignment is saved
   const [stagedCards, setStagedCardsInner] = useState([])
@@ -515,7 +516,7 @@ const AssignToContent = ({
       <ItemAssignToManager
         courseId={ENV.COURSE_ID}
         itemType={type}
-        itemContentId={assignmentId}
+        itemContentId={type === 'discussion' ? discussionId : assignmentId}
         initHasModuleOverrides={hasModuleOverrides}
         defaultGroupCategoryId={groupCategoryId}
         useApplyButton={true}
@@ -532,6 +533,7 @@ const AssignToContent = ({
         isCheckpointed={isCheckpointed}
         postToSIS={postToSIS}
         isTray={false}
+        setStagedOverrides={setStagedOverrides}
       />
     </View>
   )

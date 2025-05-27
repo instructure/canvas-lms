@@ -745,6 +745,12 @@ function DiscussionTopicForm({
           assignedTo == `course_${ENV.context_id}`,
       )
 
+      const sectionViewRef = document.getElementById(
+        'manage-assign-to-container',
+      )?.reactComponentInstance
+      sectionViewRef?.focusErrors()
+      if (sectionViewRef?.mustConvertTags()) return false
+
       if (!isEveryoneOrEveryoneElseSelected && !masteryPathsWithCoursePaces) {
         const selectedSectionIds = selectedAssignedTo
           .filter(assignedTo => String(assignedTo).startsWith('course_section_'))
