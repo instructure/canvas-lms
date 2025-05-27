@@ -384,6 +384,7 @@ class DiscussionTopic < ActiveRecord::Base
         topic = DiscussionTopic.where(context_id: group, context_type: "Group", root_topic_id: self).first
         topic ||= group.discussion_topics.build { |dt| dt.root_topic = self }
         topic.message = message
+        topic.reply_to_entry_required_count = reply_to_entry_required_count if reply_to_entry_required_count
         topic.title = CanvasTextHelper.truncate_text("#{title} - #{group.name}", { max_length: 250 }) # because of course people do this
         topic.assignment_id = assignment_id
         topic.attachment_id = attachment_id
