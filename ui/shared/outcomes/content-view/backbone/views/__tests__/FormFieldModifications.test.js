@@ -93,11 +93,20 @@ describe('OutcomeView Form Field Modifications', () => {
 
     await waitFrames(20)
 
+    // Call edit to set originalConfirmableValues
     view.edit($.Event())
-    await new Promise(resolve => setTimeout(resolve, 100))
 
-    const modified = view.getModifiedFields(view.getFormData())
+    // Wait longer than the 50ms timeout in the edit method to ensure
+    // originalConfirmableValues is fully updated
+    await new Promise(resolve => setTimeout(resolve, 200))
 
+    // Get the form data without modifying any fields
+    const formData = view.getFormData()
+
+    // Check if fields are modified
+    const modified = view.getModifiedFields(formData)
+
+    // Verify no fields are detected as modified
     expect(modified.masteryPoints).toBeFalsy()
     expect(modified.calculationInt).toBeFalsy()
     expect(modified.scoringMethod).toBeFalsy()

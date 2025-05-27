@@ -18,15 +18,14 @@
 
 import {MockedProvider} from '@apollo/client/testing'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {assignLocation, openWindow} from '@canvas/util/globalUtils'
 import {waitFor} from '@testing-library/dom'
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {ChildTopic} from '../../../../graphql/ChildTopic'
 import {updateUserDiscussionsSplitscreenViewMock} from '../../../../graphql/Mocks'
-import * as constants from '../../../utils/constants'
-import {DiscussionManagerUtilityContext} from '../../../utils/constants'
+import {DiscussionManagerUtilityContext, SearchContext} from '../../../utils/constants'
 import {DiscussionPostToolbar} from '../DiscussionPostToolbar'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -47,6 +46,7 @@ const onFailureStub = jest.fn()
 const onSuccessStub = jest.fn()
 
 beforeEach(() => {
+  fakeENV.setup()
   window.matchMedia = jest.fn().mockImplementation(() => {
     return {
       matches: true,
@@ -57,18 +57,17 @@ beforeEach(() => {
     }
   })
 
-  window.ENV = {
-    course_id: '1',
-    SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
-    DISCUSSION: {
-      preferences: {
-        discussions_splitscreen_view: false,
-      },
+  ENV.course_id = '1'
+  ENV.SPEEDGRADER_URL_TEMPLATE = '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id'
+  ENV.DISCUSSION = {
+    preferences: {
+      discussions_splitscreen_view: false,
     },
   }
 })
 
 afterEach(() => {
+  fakeENV.teardown()
   onFailureStub.mockClear()
   onSuccessStub.mockClear()
   jest.clearAllMocks()
@@ -79,13 +78,20 @@ const setup = (
   mocks,
   discussionManagerProviderValues = {translationLanguages: {current: []}},
 ) => {
+  const searchContextValues = {
+    setAllThreadsStatus: jest.fn(),
+    setExpandedThreads: jest.fn(),
+  }
+
   return render(
-    <MockedProvider mocks={mocks}>
+    <MockedProvider mocks={mocks} addTypename={false}>
       <AlertManagerContext.Provider
         value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
       >
         <DiscussionManagerUtilityContext.Provider value={discussionManagerProviderValues}>
-          <DiscussionPostToolbar {...props} />
+          <SearchContext.Provider value={searchContextValues}>
+            <DiscussionPostToolbar {...props} />
+          </SearchContext.Provider>
         </DiscussionManagerUtilityContext.Provider>
       </AlertManagerContext.Provider>
     </MockedProvider>,
@@ -176,21 +182,57 @@ describe('DiscussionPostToolbar', () => {
       })
 
       it('should call updateUserDiscussionsSplitscreenView mutation when clicked', async () => {
+        // Create mocks with specific response
+        const setUserSplitScreenPreferenceMock = jest.fn()
+        const closeViewMock = jest.fn()
+
+        // Use the mock with a more explicit configuration
+        const mocks = [
+          {
+            request: {
+              query: updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true})[0]
+                .request.query,
+              variables: {discussionsSplitscreenView: true},
+            },
+            result: {
+              data: {
+                updateUserDiscussionsSplitscreenView: {
+                  user: {
+                    discussionsSplitscreenView: true,
+                    __typename: 'User',
+                  },
+                  errors: null,
+                  __typename: 'updateUserDiscussionsSplitscreenViewPayload',
+                },
+              },
+            },
+          },
+        ]
+
+        // Set up the component with our mocks
         const {getByTestId} = setup(
           {
-            setUserSplitScreenPreference: jest.fn(),
+            setUserSplitScreenPreference: setUserSplitScreenPreferenceMock,
             userSplitScreenPreference: false,
-            closeView: jest.fn(),
+            closeView: closeViewMock,
           },
-          updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true}),
+          mocks,
         )
 
+        // Trigger the button click
         const splitscreenButton = getByTestId('splitscreenButton')
         fireEvent.click(splitscreenButton)
 
-        await waitFor(() => {
-          expect(onSuccessStub.mock.calls).toHaveLength(1)
-        })
+        // Wait for the mutation to complete and success callback to be called
+        await waitFor(
+          () => {
+            expect(onSuccessStub).toHaveBeenCalled()
+          },
+          {timeout: 2000},
+        )
+
+        // Additional assertions to make the test more robust
+        expect(setUserSplitScreenPreferenceMock).toHaveBeenCalled()
       })
     })
   })

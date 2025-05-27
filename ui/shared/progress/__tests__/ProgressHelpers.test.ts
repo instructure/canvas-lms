@@ -19,12 +19,14 @@
 import {waitFor} from '@testing-library/dom'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {monitorProgress, cancelProgressAction} from '../ProgressHelpers'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/do-fetch-api-effect')
 const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
 
 describe('ProgressHelpers', () => {
   beforeEach(() => {
+    fakeENV.setup()
     mockDoFetchApi.mockResolvedValue({
       response: new Response('', {status: 200}),
       json: {published: true},
@@ -35,6 +37,7 @@ describe('ProgressHelpers', () => {
   afterEach(() => {
     jest.clearAllMocks()
     mockDoFetchApi.mockReset()
+    fakeENV.teardown()
   })
 
   describe('monitorProgress', () => {
@@ -174,7 +177,8 @@ describe('ProgressHelpers', () => {
     })
 
     it('calls onCancelComplete with the error on failure', async () => {
-      mockDoFetchApi.mockRejectedValueOnce('whoops')
+      const mockError = new Error('API request failed')
+      mockDoFetchApi.mockRejectedValueOnce(mockError)
       const onCancelComplete = jest.fn()
       cancelProgressAction(
         {id: '17', workflow_state: 'running', message: 'canceled', completion: 25, results: {}},
@@ -188,7 +192,7 @@ describe('ProgressHelpers', () => {
       })
       await waitFor(() => expect(onCancelComplete).toHaveBeenCalled())
       expect(onCancelComplete).toHaveBeenCalledTimes(1)
-      expect(onCancelComplete).toHaveBeenCalledWith('whoops')
+      expect(onCancelComplete).toHaveBeenCalledWith(mockError)
     })
   })
 })
