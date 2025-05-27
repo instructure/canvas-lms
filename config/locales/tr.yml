@@ -20527,6 +20527,10 @@ tr:
     index: 
       titles: 
         pages: Sayfalar
+    new: 
+      titles: 
+        new_page: "Yeni Sayfa"
+        pages: Sayfalar
     notices: 
       cannot_edit: "Bu sayfayı düzenlemeye yetkiniz yok \"%{title}\"."
       cannot_read_revisions: "\"%{title}\"nın geçmiş gözden geçirmelerini görmeye izniniz yok."
