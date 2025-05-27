@@ -135,6 +135,8 @@ module Lti
       #
       # Prefers the tool directly linked to the ContentTag
       # if it uses LTI 1.3. Otherwise, searches using from_url.
+      # Ignores tags linked to content that aren't LTI tools,
+      # including those linked to LTI 2.0 tools.
       #
       # @param tag [ContentTag] an LTI content item, like module item or assignment.external_tool_tag
       # @param context [Context] the context in which the tag is being used
@@ -142,10 +144,13 @@ module Lti
       def from_content_tag(tag, context)
         return nil if tag.blank? || context.blank?
 
+        content = tag.content
+        is_external_tool_tag = content.blank? || content.is_a?(ContextExternalTool)
+        return nil unless is_external_tool_tag
+
         # We can return the tool in content if we
         # know it uses the preferred LTI version.
         # No need to go through the tool lookup logic.
-        content = tag.content
         return content if content&.active? && content&.uses_preferred_lti_version?
 
         # Lookup the tool by the usual
