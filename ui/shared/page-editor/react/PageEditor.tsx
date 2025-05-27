@@ -15,13 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {render, screen} from '@testing-library/react'
-import {ContentBuilderWrapper} from '../ContentBuilderWrapper'
+const I18n = createI18nScope('page_editor')
 
-describe('ContentBuilderWrapper', () => {
-  it('renders without crashing', () => {
-    render(<ContentBuilderWrapper />)
-    expect(screen.getByText(/Content Builder placeholder/)).toBeInTheDocument()
-  })
-})
+export const PageEditor = () => {
+  return <p>{I18n.t('Content Builder placeholder from package')}</p>
+}
