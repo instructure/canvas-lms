@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
-
-const I18n = createI18nScope('pages')
+import {PageEditor} from '@canvas/page-editor'
 
 export const ContentBuilderWrapper = () => {
-  return <p>{I18n.t('Content Builder wrapper placeholder')}</p>
+  return <PageEditor />
 }
