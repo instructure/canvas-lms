@@ -53,6 +53,10 @@ describe Api::V1::PlannerItem do
         "course_assignment_submission_url"
       end
 
+      def course_assignment_url(*)
+        "course_assignment_url"
+      end
+
       def calendar_url_for(*); end
     end
   end
@@ -243,6 +247,33 @@ describe Api::V1::PlannerItem do
         json = api.planner_item_json(@peer_review, @reviewer, session)
         expected_url = "/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
         expect(json[:html_url]).to eq expected_url
+      end
+
+      context "assignments_2_student feature flag" do
+        before do
+          @submission = @assignment.submit_homework(@student, body: "student submission")
+          @assessor_submission = @assignment.find_or_create_submission(@reviewer)
+          @peer_review = AssessmentRequest.create!(
+            assessor: @reviewer,
+            assessor_asset: @assessor_submission,
+            asset: @submission,
+            user: @student
+          )
+        end
+
+        it "returns legacy peer review url when feature flag is disabled" do
+          @course.disable_feature!(:assignments_2_student)
+          json = api.planner_item_json(@peer_review, @reviewer, session)
+          legacy_peer_review_url = "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+          expect(json[:html_url]).to eq legacy_peer_review_url
+        end
+
+        it "returns enhanced peer review url when feature flag is enabled" do
+          @course.enable_feature!(:assignments_2_student)
+          allow(api).to receive(:student_peer_review_url_in_a2_for).with(@course, @assignment, @peer_review).and_return("enhanced_peer_review_url")
+          json = api.planner_item_json(@peer_review, @reviewer, session)
+          expect(json[:html_url]).to eq "enhanced_peer_review_url"
+        end
       end
     end
 
