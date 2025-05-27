@@ -297,22 +297,22 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             end
 
             it "sees the assignment" do
-              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map(&:assignment_id)
-              expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
+              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map { |x| x.assignment_id.to_i }
+              expect(visible_assignment_ids.include?(@assignment.id)).to be_truthy
             end
 
             it "does not see the assignment if the override is deleted" do
               @assignment.assignment_overrides.each(&:destroy)
 
-              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map(&:assignment_id)
-              expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsy
+              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map { |x| x.assignment_id.to_i }
+              expect(visible_assignment_ids.include?(@assignment.id)).to be_falsy
             end
 
             it "does not see the assignment if the feature flag is disabled" do
               @course.account.disable_feature!(:assign_to_differentiation_tags)
 
-              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map(&:assignment_id)
-              expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsy
+              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map { |x| x.assignment_id.to_i }
+              expect(visible_assignment_ids.include?(@assignment.id)).to be_falsy
             end
 
             it "does not show the assignment if course_ids is not present" do
@@ -715,6 +715,180 @@ describe AssignmentVisibility::AssignmentVisibilityService do
               ensure_user_sees_assignment
             end
           end
+        end
+      end
+    end
+
+    context "discussion topics with section or adhoc overrides" do
+      before do
+        course_with_differentiated_assignments_enabled
+        add_multiple_sections
+        @student = user_model
+        @course.enroll_user(@student, "StudentEnrollment")
+        @course.save!
+      end
+
+      context "section specific discussion topics" do
+        it "shows an assignment if it's created for a section specific discussion where user has posted" do
+          # Create a discussion topic
+          @discussion_topic = @course.discussion_topics.create!(
+            title: "Section specific discussion",
+            message: "Discuss this topic"
+          )
+
+          # Create an assignment override for the discussion topic (limit to section_foo)
+          ao = AssignmentOverride.new
+          ao.discussion_topic = @discussion_topic
+          ao.set_type = "CourseSection"
+          ao.set_id = @section_foo.id
+          ao.workflow_state = "active"
+          ao.save!
+
+          # Enroll student in section_foo
+          enroller_user_in_section(@section_foo, { user: @student })
+
+          # Post in the discussion as the student
+          entry = @discussion_topic.discussion_entries.create!(
+            message: "I'm participating in this discussion",
+            user: @student
+          )
+          expect(entry.workflow_state).to eq "active"
+
+          # Now convert the discussion to an assignment
+          @assignment = @course.assignments.create!(
+            title: @discussion_topic.title,
+            submission_types: "discussion_topic",
+            only_visible_to_overrides: true
+          )
+          @discussion_topic.assignment = @assignment
+          @discussion_topic.save!
+
+          # The assignment should be visible to the student who has posted in the discussion
+          visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService
+                                   .assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id)
+                                   .map { |x| x.assignment_id.to_i }
+
+          expect(visible_assignment_ids).to include(@assignment.id)
+        end
+
+        it "does not show an assignment if the student is not in the visible section" do
+          # Create a discussion topic
+          @discussion_topic = @course.discussion_topics.create!(
+            title: "Section specific discussion",
+            message: "Discuss this topic"
+          )
+
+          # Create an assignment override for the discussion topic (limit to section_foo)
+          ao = AssignmentOverride.new
+          ao.discussion_topic = @discussion_topic
+          ao.set_type = "CourseSection"
+          ao.set_id = @section_foo.id
+          ao.workflow_state = "active"
+          ao.save!
+
+          # Enroll student in section_bar (NOT in section_foo which has visibility)
+          enroller_user_in_section(@section_bar, { user: @student })
+
+          # Now create an assignment for the discussion
+          @assignment = @course.assignments.create!(
+            title: @discussion_topic.title,
+            submission_types: "discussion_topic",
+            only_visible_to_overrides: true
+          )
+          @discussion_topic.assignment = @assignment
+          @discussion_topic.save!
+
+          # The assignment should NOT be visible to the student in a different section
+          visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService
+                                   .assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id)
+                                   .map { |x| x.assignment_id.to_i }
+
+          expect(visible_assignment_ids).not_to include(@assignment.id)
+        end
+      end
+
+      context "adhoc overridden discussion topics" do
+        it "shows an assignment if it's created for a discussion with adhoc overrides for the user" do
+          # Create a discussion topic
+          @discussion_topic = @course.discussion_topics.create!(
+            title: "Discussion with adhoc overrides",
+            message: "Discuss this topic"
+          )
+
+          # Create assignment override for the discussion topic
+          ao = AssignmentOverride.new
+          ao.discussion_topic = @discussion_topic
+          ao.title = "ADHOC OVERRIDE"
+          ao.workflow_state = "active"
+          ao.set_type = "ADHOC"
+          ao.save!
+
+          # Add the student to the override
+          override_student = ao.assignment_override_students.build
+          override_student.user = @student
+          override_student.save!
+
+          # Post in the discussion as the student
+          entry = @discussion_topic.discussion_entries.create!(
+            message: "I'm participating in this discussion with adhoc override",
+            user: @student
+          )
+          expect(entry.workflow_state).to eq "active"
+
+          # Now convert the discussion to an assignment
+          @assignment = @course.assignments.create!(
+            title: @discussion_topic.title,
+            submission_types: "discussion_topic",
+            only_visible_to_overrides: true
+          )
+          @discussion_topic.assignment = @assignment
+          @discussion_topic.save!
+
+          # The assignment should be visible to the student with adhoc override
+          visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService
+                                   .assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id)
+                                   .map { |x| x.assignment_id.to_i }
+
+          expect(visible_assignment_ids).to include(@assignment.id)
+        end
+
+        it "does not show an assignment if student has no adhoc override for the discussion" do
+          # Create a discussion topic
+          @discussion_topic = @course.discussion_topics.create!(
+            title: "Discussion with adhoc overrides",
+            message: "Discuss this topic"
+          )
+
+          # Create assignment override for the discussion topic but for a different student
+          ao = AssignmentOverride.new
+          ao.discussion_topic = @discussion_topic
+          ao.title = "ADHOC OVERRIDE"
+          ao.workflow_state = "active"
+          ao.set_type = "ADHOC"
+          ao.save!
+
+          # Add a different student to the override
+          other_student = user_model
+          @course.enroll_user(other_student, "StudentEnrollment")
+          override_student = ao.assignment_override_students.build
+          override_student.user = other_student
+          override_student.save!
+
+          # Now convert the discussion to an assignment
+          @assignment = @course.assignments.create!(
+            title: @discussion_topic.title,
+            submission_types: "discussion_topic",
+            only_visible_to_overrides: true
+          )
+          @discussion_topic.assignment = @assignment
+          @discussion_topic.save!
+
+          # The assignment should NOT be visible to our student without adhoc override
+          visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService
+                                   .assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id)
+                                   .map { |x| x.assignment_id.to_i }
+
+          expect(visible_assignment_ids).not_to include(@assignment.id)
         end
       end
     end
