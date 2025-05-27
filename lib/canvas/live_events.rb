@@ -182,7 +182,7 @@ module Canvas::LiveEvents
     {
       name: account.name,
       account_id: account.global_id,
-      root_account_id: account.global_root_account_id,
+      root_account_id: account.root_account.global_id,
       root_account_uuid: account.root_account.uuid,
       parent_account_id: account.global_parent_account_id,
       external_status: account.external_status,
