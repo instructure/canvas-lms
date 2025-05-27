@@ -1252,10 +1252,22 @@ describe "MessageableUser::Calculator" do
             .to be_a(BookmarkedCollection::Proxy)
         end
 
-        it "does not include yourself if you're not in that context" do
-          @enrollment.destroy
-          expect(messageable_user_ids(context: @course.asset_string))
-            .not_to include(@student.id)
+        context "when recipient list is restricted to teachers" do
+          it "excludes the current user from the messageable list even if you are in a context" do
+            expect(messageable_user_ids(restrict_to_teacher_recipients: true)).not_to include(@viewing_user.id)
+          end
+        end
+
+        context "when recipient list is not restricted to teachers" do
+          it "includes the current user if enrolled in any context" do
+            expect(messageable_user_ids).to include(@viewing_user.id)
+          end
+
+          it "does not include yourself if you're not in that context" do
+            @enrollment.destroy
+            expect(messageable_user_ids(context: @course.asset_string))
+              .not_to include(@student.id)
+          end
         end
 
         it "includes messageable users from that context" do
@@ -1297,8 +1309,16 @@ describe "MessageableUser::Calculator" do
             .to be_a(BookmarkedCollection::Proxy)
         end
 
-        it "includes yourself even if you're not in any contexts" do
-          expect(messageable_user_ids).to include(@viewing_user.id)
+        context "when recipient list is restricted to teachers" do
+          it "excludes the current user from the messageable list" do
+            expect(messageable_user_ids(restrict_to_teacher_recipients: true)).not_to include(@viewing_user.id)
+          end
+        end
+
+        context "when recipient list is not restricted to teachers" do
+          it "includes the current user even if not enrolled in any context" do
+            expect(messageable_user_ids).to include(@viewing_user.id)
+          end
         end
 
         it "includes users messageable via courses" do
@@ -1363,20 +1383,51 @@ describe "MessageableUser::Calculator" do
 
       context "search parameter" do
         before do
-          course_with_teacher(user: @viewing_user, active_all: true)
+          student_in_course(user: @viewing_user, active_all: true)
           student_in_course(name: "Jim Bob")
+          course_with_teacher(user: @teacher, active_all: true)
         end
 
-        it "includes users that match all search terms" do
-          expect(messageable_user_ids(search: "Jim Bob")).to include(@student.id)
+        context "when recipient list is restricted to teachers" do
+          it "excludes the current user from the messageable list" do
+            expect(
+              messageable_user_ids(search: @viewing_user.name, restrict_to_teacher_recipients: true)
+            ).not_to include(@viewing_user.id)
+          end
+
+          it "excludes the other students even if it match all the search term" do
+            expect(
+              messageable_user_ids(search: "Jim Bob", restrict_to_teacher_recipients: true)
+            ).not_to include(@student.id)
+          end
+
+          it "includes teachers that match all search terms" do
+            expect(
+              messageable_user_ids(search: @teacher.name, restrict_to_teacher_recipients: true)
+            ).to include(@teacher.id)
+          end
         end
 
-        it "excludes users that match only some terms" do
-          expect(messageable_user_ids(search: "Uncle Jim")).not_to include(@student.id)
-        end
+        context "when recipient list is not restricted to teachers" do
+          it "includes the current user even if not enrolled in any context" do
+            expect(messageable_user_ids(search: @viewing_user.name)).to include(@viewing_user.id)
+          end
 
-        it "ignores case when matching search terms" do
-          expect(messageable_user_ids(search: "jim")).to include(@student.id)
+          it "includes teachers that match all search terms" do
+            expect(messageable_user_ids(search: @teacher.name)).to include(@teacher.id)
+          end
+
+          it "includes users that match all search terms" do
+            expect(messageable_user_ids(search: "Jim Bob")).to include(@student.id)
+          end
+
+          it "excludes users that match only some terms" do
+            expect(messageable_user_ids(search: "Uncle Jim")).not_to include(@student.id)
+          end
+
+          it "ignores case when matching search terms" do
+            expect(messageable_user_ids(search: "jim")).to include(@student.id)
+          end
         end
       end
 
