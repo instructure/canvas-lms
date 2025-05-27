@@ -334,14 +334,21 @@ module Types
           base_url: self.context[:request].base_url
         )
 
-        collections = search_contexts_and_users(
+        search_options = {
           search:,
           context:,
           synthetic_contexts: true,
           messageable_only: true,
           base_url: self.context[:request].base_url,
           include_concluded: false
-        )
+        }
+
+        # Only allow students to search for teachers to prevent them from messaging other students
+        if object.has_student_enrollment? && object.account.root_account.feature_enabled?(:restrict_student_access)
+          search_options[:restrict_to_teacher_recipients] = true
+        end
+
+        collections = search_contexts_and_users(**search_options)
 
         contexts_collection = collections.select { |c| c[0] == "contexts" }
         users_collection = collections.select { |c| c[0] == "participants" }

@@ -108,7 +108,8 @@ module AddressBook
         context: asset_string,
         admin_context: admin_context?(options[:context]),
         strict_checks: !options[:weak_checks],
-        include_concluded: options[:include_concluded]
+        include_concluded: options[:include_concluded],
+        restrict_to_teacher_recipients: options[:restrict_to_teacher_recipients]
       )
       Collection.new(collection, @cache)
     end
