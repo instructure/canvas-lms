@@ -27464,6 +27464,10 @@ hu:
     index: 
       titles: 
         pages: Oldalak
+    new: 
+      titles: 
+        new_page: "Új oldal"
+        pages: Oldalak
     notices: 
       cannot_edit: "Az oldal \"%{title}\" szerkesztésére Ön nem jogosult."
       cannot_read_revisions: "Ön nem bírálhatja \"%{title}\" előző verzióit."
