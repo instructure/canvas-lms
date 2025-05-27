@@ -17885,6 +17885,10 @@ hy:
     index: 
       titles: 
         pages: Էջեր
+    new: 
+      titles: 
+        new_page: "Նոր էջ"
+        pages: Էջեր
     notices: 
       cannot_edit: "Դուք թույլտվություն չունեք խմբագրելու էջը \"%{title}\":"
       cannot_read_revisions: "Դուք թույլտվություն չունեք նայելու \"%{title}\" վերանայումների պատմությունը:"
