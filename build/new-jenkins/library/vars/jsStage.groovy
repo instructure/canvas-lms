@@ -79,7 +79,6 @@ def packagesNodeRequirementsTemplate() {
     ports: [9876],
     envVars: [
       SELENIUM_SERVER: 'http://selenium-hub:4444/wd/hub',
-      TESTCAFE_PROVIDER: 'selenium:chrome'
     ]
   ]
 
