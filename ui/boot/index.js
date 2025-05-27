@@ -35,6 +35,7 @@ import {up as activateCourseMenuToggler} from '@canvas/common/activateCourseMenu
 // Import is required, workaround for ARC-8398
 // eslint-disable-next-line import/no-nodejs-modules
 import {Buffer} from 'buffer'
+import {loadCareerTheme} from '@canvas/instui-bindings/react/career-theme-loader'
 
 window.Buffer = Buffer
 
@@ -99,6 +100,7 @@ if (ENV.use_dyslexic_font) {
 // Check for high contrast mode from either ENV variable or URL query parameter
 const urlParams = new URLSearchParams(window.location.search)
 const hasHighContrastQueryParam = urlParams.get('instui_theme') === 'canvas_high_contrast'
+const hasCareerQueryParam = urlParams.get('instui_theme') === 'career'
 
 if (ENV.use_high_contrast || hasHighContrastQueryParam) {
   canvasHighContrastTheme.use({overrides: {typography}})
@@ -116,6 +118,18 @@ if (ENV.use_high_contrast || hasHighContrastQueryParam) {
   }
 
   canvasBaseTheme.use({overrides: {...transitionOverride, ...brandvars, typography}})
+}
+
+if (hasCareerQueryParam) {
+  const baseTheme =
+    window.ENV.use_high_contrast || hasHighContrastQueryParam
+      ? canvasHighContrastTheme
+      : canvasBaseTheme
+  loadCareerTheme().then(careerTheme => {
+    if (careerTheme !== null) {
+      baseTheme.use({overrides: careerTheme})
+    }
+  })
 }
 
 /* #__PURE__ */ if (process.env.NODE_ENV === 'test' || window.INST.environment === 'test') {

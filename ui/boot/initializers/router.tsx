@@ -33,7 +33,7 @@ import {AUPRoutes} from '../../features/acceptable_use_policy/routes/AUPRoutes'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import {getTheme} from '@canvas/instui-bindings'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {DynamicInstUISettingsProvider} from '@canvas/instui-bindings/react/DynamicInstUISettingProvider'
 
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -161,11 +161,11 @@ export function loadReactRouter() {
     const theme = getTheme()
     const root = ReactDOM.createRoot(mountNode)
     root.render(
-      <InstUISettingsProvider theme={theme}>
+      <DynamicInstUISettingsProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={portalRouter} fallbackElement={<FallbackSpinner />} />
         </QueryClientProvider>
-      </InstUISettingsProvider>,
+      </DynamicInstUISettingsProvider>,
     )
   }
 }
