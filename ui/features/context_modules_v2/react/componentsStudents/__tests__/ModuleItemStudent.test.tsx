@@ -117,4 +117,23 @@ describe('ModuleItemStudent', () => {
     const titleElement = container.getByTestId('module-item-title')
     expect(titleElement).toBeInTheDocument()
   })
+
+  it('renders subheader title without extra info', () => {
+    const container = setUp(
+      buildDefaultProps({
+        content: {
+          id: '1',
+          _id: '1',
+          title: 'Test Item',
+          type: 'SubHeader',
+          url: 'https://canvas.instructure.com/courses/1/assignments/1',
+        },
+      }),
+    )
+
+    const titleElement = container.getByTestId('subheader-title-text')
+    expect(titleElement).toBeInTheDocument()
+    expect(container.queryByTestId('module-item-supplemental-info')).toBeNull()
+    expect(container.queryByTestId('module-item-status-icon')).toBeNull()
+  })
 })
