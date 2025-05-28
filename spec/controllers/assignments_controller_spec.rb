@@ -1383,7 +1383,8 @@ describe AssignmentsController do
         shared_secret: "test_secret",
         consumer_key: "test_key",
         name: "test tool",
-        domain: "example.com"
+        domain: "example.com",
+        settings: { selection_width: 800, selection_height: 600 }
       )
       user_session(@teacher)
       @assignment.submission_types = "external_tool"
@@ -1393,6 +1394,8 @@ describe AssignmentsController do
       get "show", params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).not_to be_nil
       expect(assigns[:js_env][:LTI_TOOL_ID]).not_to be_nil
+      expect(assigns[:js_env][:LTI_TOOL_SELECTION_WIDTH]).to eq 800
+      expect(assigns[:js_env][:LTI_TOOL_SELECTION_HEIGHT]).to eq 600
     end
 
     it "sets first_annotation_submission to true if it's the first submission and the assignment is annotatable" do

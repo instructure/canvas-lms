@@ -50,17 +50,10 @@ describe('Assignment Student Content View', () => {
     oldEnv = window.ENV
     window.ENV = {...window.ENV}
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([]),
-      }),
-    )
   })
 
   afterEach(() => {
     window.ENV = oldEnv
-    jest.restoreAllMocks()
   })
 
   it('does not render the attempt select if allSubmissions is not provided', async () => {

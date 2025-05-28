@@ -44,17 +44,10 @@ describe('Assignment Student Content View', () => {
     oldEnv = window.ENV
     window.ENV = {...window.ENV}
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([]),
-      }),
-    )
   })
 
   afterEach(() => {
     window.ENV = oldEnv
-    jest.restoreAllMocks()
   })
 
   describe('concluded enrollment notice', () => {
