@@ -27,21 +27,14 @@ describe('LtiToolIframe', () => {
     ASSIGNMENT_ID: '2',
     current_user_id: '3',
     LTI_TOOL_ID: '1',
+    LTI_TOOL_SELECTION_HEIGHT: '500',
+    LTI_TOOL_SELECTION_WIDTH: '800',
   }
 
   let globalEnv: GlobalEnv
 
   const mockSubmission = {state: 'graded'}
   const mockAssignment = {submissionTypes: ['external_tool']}
-  const mockLtiConfig = {
-    definition_id: '1',
-    placements: {
-      assignment_selection: {
-        selection_height: 500,
-        selection_width: 800,
-      },
-    },
-  }
 
   beforeAll(() => {
     globalEnv = {...window.ENV}
@@ -49,11 +42,6 @@ describe('LtiToolIframe', () => {
 
   beforeEach(() => {
     window.ENV = {...globalEnv, ...ENV}
-
-    jest.spyOn(global, 'fetch').mockResolvedValueOnce({
-      ok: true,
-      json: async () => [mockLtiConfig],
-    } as Response)
   })
 
   it('renders the submission details link when submission is graded and includes external_tool', () => {
