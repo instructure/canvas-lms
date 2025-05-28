@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useRef, useEffect} from 'react'
+import {debounce} from '@instructure/debounce'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {IconButton} from '@instructure/ui-buttons'
@@ -52,9 +53,18 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
   requirementCount,
   submissionStatistics,
 }) => {
-  const onToggleExpandRef = useCallback(() => {
-    onToggleExpand(id)
+  const debouncedToggleExpandRef = useRef<() => void>()
+
+  useEffect(() => {
+    debouncedToggleExpandRef.current = debounce(() => {
+      onToggleExpand(id)
+    }, 500)
+    return () => {}
   }, [onToggleExpand, id])
+
+  const onToggleExpandRef = useCallback(() => {
+    if (debouncedToggleExpandRef.current) debouncedToggleExpandRef.current()
+  }, [])
 
   return (
     <View
@@ -71,7 +81,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
             size="small"
             withBorder={false}
             screenReaderLabel={expanded ? I18n.t('Collapse module') : I18n.t('Expand module')}
-            renderIcon={expanded ? IconArrowOpenUpLine : IconArrowOpenDownLine}
+            renderIcon={expanded ? IconArrowOpenDownLine : IconArrowOpenUpLine}
             withBackground={false}
             onClick={onToggleExpandRef}
           />
