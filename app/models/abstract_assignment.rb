@@ -68,6 +68,7 @@ class AbstractAssignment < ActiveRecord::Base
   DUPLICATED_IN_CONTEXT = "duplicated_in_context"
   QUIZ_SUBMISSION_VERSIONS_LIMIT = 65
   QUIZZES_NEXT_TIMEOUT = 15.minutes
+  QUIZZES_NEXT_IMPORTING_TIMEOUT = 30.minutes
 
   attr_accessor(
     :resource_map,
@@ -3354,7 +3355,7 @@ class AbstractAssignment < ActiveRecord::Base
   scope :importing_for_too_long, lambda {
     where(
       "workflow_state = 'importing' AND importing_started_at < ?",
-      QUIZZES_NEXT_TIMEOUT.ago
+      QUIZZES_NEXT_IMPORTING_TIMEOUT.ago
     )
   }
 

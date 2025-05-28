@@ -1938,7 +1938,7 @@ describe Assignment do
     let_once(:old_importing_assignment) do
       @course.assignments.create!(
         workflow_state: "importing",
-        importing_started_at: 20.minutes.ago,
+        importing_started_at: 35.minutes.ago,
         **assignment_valid_attributes
       )
     end
