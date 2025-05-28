@@ -39,8 +39,8 @@ const buildDefaultProps = (overrides: ModuleProgressionOverrides = {}) => {
     (_, index) => ({
       id: `req-${index + 1}`,
       type: 'assignment',
-      min_score: 100,
-      min_percentage: 100,
+      minScore: 100,
+      minPercentage: 100,
     }),
   )
 
@@ -107,8 +107,8 @@ describe('ModuleHeaderStatusIcon', () => {
     const container = setUp({
       workflowState: 'unlocked',
       requirementsMet: [
-        {id: '1', type: 'assignment', min_score: 100, min_percentage: 100},
-        {id: '2', type: 'assignment', min_score: 100, min_percentage: 100},
+        {id: '1', type: 'assignment', minScore: 100, minPercentage: 100},
+        {id: '2', type: 'assignment', minScore: 100, minPercentage: 100},
       ],
       completed: false,
       locked: false,

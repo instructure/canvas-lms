@@ -105,15 +105,14 @@ export interface CompletionRequirement {
   minScore?: number
   minPercentage?: number
   completed?: boolean
-  fulfillmentStatus?: string
 }
 
 export interface ModuleRequirement {
   id: string | number
   type: string
-  min_score?: number
-  min_percentage?: number
-  score?: number
+  minScore?: number
+  minPercentage?: number
+  completed?: boolean
 }
 
 export interface ModuleProgression {

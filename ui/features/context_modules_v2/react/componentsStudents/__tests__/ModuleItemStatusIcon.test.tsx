@@ -39,10 +39,9 @@ const buildDefaultProps = (overrides: TestPropsOverrides = {}) => {
   if (!('completionRequirement' in overrides && overrides.completionRequirement === undefined)) {
     defaultCompletionRequirement = {
       id: itemId,
-      type: 'assignment',
+      type: 'min_score',
       minScore: 100,
       minPercentage: 100,
-      ...overrides.completionRequirement,
     }
   }
 
@@ -72,9 +71,9 @@ const buildDefaultProps = (overrides: TestPropsOverrides = {}) => {
     ? [
         {
           id: itemId,
-          type: 'assignment',
-          min_score: 100,
-          min_percentage: 100,
+          type: 'min_score',
+          minScore: 100,
+          minPercentage: 100,
         },
       ]
     : []
@@ -218,5 +217,24 @@ describe('ModuleItemStatusIcon', () => {
     })
     expect(container.container).toBeInTheDocument()
     expect(container.container).toBeEmptyDOMElement()
+  })
+
+  it('should render assigned icon when a requirement is met but does not match a completion requirement', () => {
+    const container = setUp({
+      itemId: '1',
+      isCompleted: false,
+      completionRequirement: {
+        id: '1',
+        type: 'must_view',
+      },
+      requirementsMet: [
+        {
+          id: '1',
+          type: 'must_mark_done',
+        },
+      ],
+    })
+    expect(container.container).toBeInTheDocument()
+    expect(container.getByTestId('assigned-icon')).toBeInTheDocument()
   })
 })

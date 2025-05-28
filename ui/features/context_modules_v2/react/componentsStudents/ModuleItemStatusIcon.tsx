@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {CompletionRequirement, ModuleItemContent, ModuleRequirement} from '../utils/types'
+import {filterRequirementsMet} from '../utils/utils'
 import {IconShapeOvalLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('context_modules_v2')
@@ -54,10 +55,15 @@ const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
     return !!content?.submissionsConnection?.nodes?.[0]?.missing
   }, [content])
 
+  const filteredRequirementsMet = useMemo(() => {
+    return filterRequirementsMet(requirementsMet, completionRequirements ?? []).some(
+      req => req.id === itemId,
+    )
+  }, [requirementsMet, completionRequirements, itemId])
+
   const isCompleted = useMemo(
-    () =>
-      requirementsMet.some(req => req.id.toString() === itemId.toString()) && completionRequirement,
-    [requirementsMet, itemId, completionRequirement],
+    () => filteredRequirementsMet && !!completionRequirement,
+    [filteredRequirementsMet, completionRequirement],
   )
 
   const isSubmissionEmpty = useMemo(

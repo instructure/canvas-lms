@@ -23,6 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {CompletionRequirement, ModuleProgression} from '../utils/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ProgressBar} from '@instructure/ui-progress'
+import {filterRequirementsMet} from '../utils/utils'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -41,8 +42,9 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
     return null
   }
 
-  const completedCount = progression.requirementsMet?.length || 0
   const totalCount = requirementCount ? 1 : completionRequirements?.length
+  const completedCount =
+    filterRequirementsMet(progression.requirementsMet, completionRequirements).length || 0
 
   const completionPercentage = Math.round((completedCount / totalCount) * 100)
   const isComplete = completionPercentage >= 100

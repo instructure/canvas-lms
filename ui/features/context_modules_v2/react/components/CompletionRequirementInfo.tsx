@@ -24,18 +24,21 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_v2')
 
+interface CompletionRequirementInfoProps extends CompletionRequirement {
+  completed: boolean
+}
+
 const CompletionRequirementInfo = ({
   type,
   minScore,
   minPercentage,
   completed,
-  fulfillmentStatus,
-}: CompletionRequirement) => {
+}: CompletionRequirementInfoProps) => {
   switch (type) {
     case 'min_score':
       return (
         <Flex.Item>
-          <Text weight="normal" size="x-small" className={fulfillmentStatus}>
+          <Text weight="normal" size="x-small">
             {completed
               ? I18n.t('Scored at least %{score}', {score: minScore?.toFixed(1)})
               : I18n.t('Score at least %{score}', {score: minScore?.toFixed(1)})}
@@ -54,7 +57,7 @@ const CompletionRequirementInfo = ({
     case 'min_percentage':
       return (
         <Flex.Item>
-          <Text weight="normal" size="x-small" className={fulfillmentStatus}>
+          <Text weight="normal" size="x-small">
             {completed
               ? I18n.t('Scored at least %{score}%', {score: minPercentage})
               : I18n.t('Score at least %{score}%', {score: minPercentage})}
@@ -73,7 +76,7 @@ const CompletionRequirementInfo = ({
     case 'must_view':
       return (
         <Flex.Item>
-          <Text weight="normal" size="x-small" className={fulfillmentStatus}>
+          <Text weight="normal" size="x-small">
             {completed ? I18n.t('Viewed') : I18n.t('View')}
             <ScreenReaderContent>
               {completed
@@ -86,7 +89,7 @@ const CompletionRequirementInfo = ({
     case 'must_mark_done':
       return (
         <Flex.Item>
-          <Text weight="normal" size="x-small" className={fulfillmentStatus}>
+          <Text weight="normal" size="x-small">
             {completed ? I18n.t('Marked done') : I18n.t('Mark done')}
             <ScreenReaderContent>
               {completed
@@ -99,7 +102,7 @@ const CompletionRequirementInfo = ({
     case 'must_contribute':
       return (
         <Flex.Item>
-          <Text weight="normal" size="x-small" className={fulfillmentStatus}>
+          <Text weight="normal" size="x-small">
             {completed ? I18n.t('Contributed') : I18n.t('Contribute')}
             <ScreenReaderContent>
               {completed
@@ -112,7 +115,7 @@ const CompletionRequirementInfo = ({
     case 'must_submit':
       return (
         <Flex.Item>
-          <Text weight="normal" size="x-small" className={fulfillmentStatus}>
+          <Text weight="normal" size="x-small">
             {completed ? I18n.t('Submitted') : I18n.t('Submit')}
             <ScreenReaderContent>
               {completed
