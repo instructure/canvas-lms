@@ -85,6 +85,8 @@ module CC
     EVENTS = "events.xml"
     LATE_POLICY = "late_policy.xml"
     LEARNING_OUTCOMES = "learning_outcomes.xml"
+    LTI_CONTEXT_CONTROLS = "lti_context_controls.xml"
+    LTI_CONTEXT_CONTROLS_FOLDER = "lti_context_controls"
     MANIFEST = "imsmanifest.xml"
     MODULE_META = "module_meta.xml"
     COURSE_PACES = "course_paces.xml"
