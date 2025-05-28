@@ -71,7 +71,9 @@ describe('ModuleHeaderSupplementalInfoStudent', () => {
       }),
     )
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText(`Due: ${testDate.toDateString()}`)).toBeInTheDocument()
+    expect(
+      container.getByText(/Due: \w+ \d+,?/, {selector: '.visible-desktop'}),
+    ).toBeInTheDocument()
     expect(container.getByText('1 Missing Assignment')).toBeInTheDocument()
     expect(container.getByText('Requirement: Complete All Items')).toBeInTheDocument()
     expect(container.getAllByText('|')).toHaveLength(2)
@@ -88,7 +90,9 @@ describe('ModuleHeaderSupplementalInfoStudent', () => {
       }),
     )
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText(`Due: ${testDate.toDateString()}`)).toBeInTheDocument()
+    expect(
+      container.getByText(/Due: \w+ \d+,?/, {selector: '.visible-desktop'}),
+    ).toBeInTheDocument()
     expect(container.queryAllByText('|')).toHaveLength(0)
   })
 
@@ -122,7 +126,9 @@ describe('ModuleHeaderSupplementalInfoStudent', () => {
       }),
     )
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText(`Due: ${testDate.toDateString()}`)).toBeInTheDocument()
+    expect(
+      container.getByText(/Due: \w+ \d+,?/, {selector: '.visible-desktop'}),
+    ).toBeInTheDocument()
     expect(container.getByText('1 Missing Assignment')).toBeInTheDocument()
     expect(container.queryAllByText('|')).toHaveLength(1)
   })

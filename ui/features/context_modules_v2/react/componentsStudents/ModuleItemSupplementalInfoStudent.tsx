@@ -50,7 +50,9 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
           <Text weight="normal" size="x-small">
             <FriendlyDatetime
               data-testid="due-date"
-              format={I18n.t('#date.formats.medium')}
+              prefix={I18n.t('Due: ')}
+              format={I18n.t('#date.formats.date_at_time')}
+              showTime={true}
               dateTime={cachedDueDate || null}
             />
           </Text>
