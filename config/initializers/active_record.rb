@@ -2307,4 +2307,20 @@ module RollbackIgnoreNonDatedMigrations
 end
 ActiveRecord::MigrationContext.prepend(RollbackIgnoreNonDatedMigrations)
 
+class NullSchemaMigration
+  def create_table; end
+  def integer_versions = []
+end
+
+module WithMigrationAdvisoryLock
+  def with_advisory_lock(&)
+    return yield if ActiveRecord::Base.in_migration
+
+    ActiveRecord::MigrationContext.new([], NullSchemaMigration.new)
+                                  .open
+                                  .send(:with_advisory_lock, &)
+  end
+end
+ActiveRecord::Migrator.singleton_class.include(WithMigrationAdvisoryLock)
+
 ActiveRecord::Enum.prepend(Extensions::ActiveRecord::Enum)
