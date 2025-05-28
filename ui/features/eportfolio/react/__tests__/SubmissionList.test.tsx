@@ -23,6 +23,7 @@ import SubmissionList from '../SubmissionList'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {generatePageListKey} from '../utils'
 import fetchMock from 'fetch-mock'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('SubmissionList', () => {
   let queryClient: QueryClient
@@ -49,6 +50,11 @@ describe('SubmissionList', () => {
   }
 
   beforeEach(() => {
+    fakeENV.setup({
+      LOCALE: 'en',
+      flashAlertTimeout: 5000,
+    })
+
     // Set up a fresh QueryClient for each test
     queryClient = new QueryClient({
       defaultOptions: {
@@ -75,6 +81,7 @@ describe('SubmissionList', () => {
   afterEach(() => {
     queryClient.clear()
     fetchMock.restore()
+    fakeENV.teardown()
   })
 
   const renderWithClient = (ui: React.ReactElement) => {
