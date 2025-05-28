@@ -65,10 +65,14 @@ module Importers
       item.not_selectable = hash[:not_selectable] if hash[:not_selectable]
       item.consumer_key ||= hash[:consumer_key] || "fake"
       item.shared_secret ||= hash[:shared_secret] || "fake"
-      item.developer_key_id ||= hash.dig(:settings, :client_id)
       item.lti_version = hash[:lti_version] || (hash.dig(:settings, :client_id) && "1.3") || (hash.dig(:settings, :use_1_3) && "1.3") || "1.1"
       item.unified_tool_id = hash[:unified_tool_id] if hash[:unified_tool_id]
       item.settings = create_tool_settings(hash)
+
+      if (developer_key_id = hash.dig(:settings, :client_id)).present?
+        item.developer_key_id ||= developer_key_id
+        item.lti_registration_id ||= item.developer_key&.lti_registration_id
+      end
 
       Lti::ResourcePlacement::PLACEMENTS.each do |placement|
         next unless item.settings.key?(placement)

@@ -79,7 +79,11 @@ describe Importers::ContextExternalToolImporter do
     end
 
     let(:course) { @course }
-    let(:developer_key) { DeveloperKey.create!(account: course.account) }
+    let(:developer_key) do
+      lti_developer_key_model(account: course.account).tap do |key|
+        lti_tool_configuration_model(developer_key: key, lti_registration: key.lti_registration)
+      end
+    end
     let(:migration) { course.content_migrations.create! }
     let(:settings) { { client_id: developer_key.global_id } }
     let(:tool_hash) do
@@ -91,8 +95,9 @@ describe Importers::ContextExternalToolImporter do
       }
     end
 
-    it "sets the developer key id" do
+    it "sets the developer key and lti registration" do
       expect(subject.developer_key).to eq developer_key
+      expect(subject.lti_registration).to eq developer_key.lti_registration
     end
 
     it "sets the lti_version" do
