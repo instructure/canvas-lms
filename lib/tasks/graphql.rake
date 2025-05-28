@@ -3,35 +3,13 @@
 namespace :graphql do
   desc "Dump GraphQL schema and fragment types"
   task schema: :environment do
-    Rails.root.join("schema.graphql").open("w") do |f|
-      # The front-end library in use doesn't support @specifiedBy until v15.1.0 - remove it for now
-      # and match the behaviour of the previous schema dump
-      f.puts CanvasSchema.to_definition
-    end
+    Rails.root.join("schema.graphql").write(CanvasSchema.to_definition)
 
-    types = CanvasSchema.execute(<<~GQL)
-      {
-        __schema {
-          types {
-            kind
-            name
-            possibleTypes {
-              name
-            }
-          }
-        }
-      }
-    GQL
-    types["data"]["__schema"]["types"].reject! { |t| t["possibleTypes"].nil? }
+    possible_types_map = CanvasSchema.possible_types.select { |k, _| k.kind.abstract? }
+                                     .transform_keys(&:graphql_name)
+                                     .transform_values { |x| x.map(&:graphql_name).sort }
+                                     .sort_by { |k, _| k }.to_h
 
-    Rails.root.join("ui/shared/apollo-v3/possibleTypes.json").open("w") do |f|
-      possible_types = {}
-
-      types["data"]["__schema"]["types"].each do |type|
-        possible_types[type["name"]] = type["possibleTypes"].pluck("name")
-      end
-
-      f.puts JSON.pretty_generate(possible_types)
-    end
+    Rails.root.join("ui/shared/apollo-v3/possibleTypes.json").write(JSON.pretty_generate(possible_types_map))
   end
 end
