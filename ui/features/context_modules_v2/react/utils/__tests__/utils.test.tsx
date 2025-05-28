@@ -22,6 +22,7 @@ import {
   validateModuleStudentRenderRequirements,
   validateModuleItemStudentRenderRequirements,
   getIconColor,
+  getItemTypeText,
 } from '../utils'
 
 describe('utils', () => {
@@ -50,6 +51,14 @@ describe('utils', () => {
       const container = render(getItemIcon({type: 'Quiz', title: 'Quiz'}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('quiz-icon')).toBeInTheDocument()
+    })
+
+    it('should return the correct icon for a new quiz', () => {
+      const container = render(
+        getItemIcon({type: 'Assignment', title: 'New Quiz', isNewQuiz: true}),
+      )
+      expect(container.container).toBeInTheDocument()
+      expect(container.getByTestId('new-quiz-icon')).toBeInTheDocument()
     })
 
     it('should return the correct icon for a discussion', () => {
@@ -86,6 +95,50 @@ describe('utils', () => {
       const container = render(getItemIcon({type: 'unknown' as any, title: 'Unknown'}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('document-icon')).toBeInTheDocument()
+    })
+  })
+
+  describe('getItemTypeText', () => {
+    it('should return "Assignment" for an assignment', () => {
+      expect(getItemTypeText({type: 'Assignment', title: 'Assignment'})).toBe('Assignment')
+    })
+
+    it('should return "New Quiz" for a new quiz', () => {
+      expect(getItemTypeText({type: 'Assignment', title: 'New Quiz', isNewQuiz: true})).toBe(
+        'New Quiz',
+      )
+    })
+
+    it('should return "Quiz" for a quiz', () => {
+      expect(getItemTypeText({type: 'Quiz', title: 'Quiz'})).toBe('Quiz')
+    })
+
+    it('should return "Discussion" for a discussion', () => {
+      expect(getItemTypeText({type: 'Discussion', title: 'Discussion'})).toBe('Discussion')
+    })
+
+    it('should return "File" for a file', () => {
+      expect(getItemTypeText({type: 'File', title: 'File'})).toBe('File')
+    })
+
+    it('should return "File" for an attachment', () => {
+      expect(getItemTypeText({type: 'Attachment', title: 'Attachment'})).toBe('File')
+    })
+
+    it('should return "External Url" for an external URL', () => {
+      expect(getItemTypeText({type: 'ExternalUrl', title: 'ExternalUrl'})).toBe('External Url')
+    })
+
+    it('should return "Page" for a page', () => {
+      expect(getItemTypeText({type: 'Page', title: 'Page'})).toBe('Page')
+    })
+
+    it('should return "Unknown" for an unknown type', () => {
+      expect(getItemTypeText({type: 'unknown' as any, title: 'Unknown'})).toBe('Unknown')
+    })
+
+    it('should return "Unknown" on missing content', () => {
+      expect(getItemTypeText(null)).toBe('Unknown')
     })
   })
 

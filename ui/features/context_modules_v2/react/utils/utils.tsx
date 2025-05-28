@@ -22,10 +22,13 @@ import {
   IconDiscussionLine,
   IconAssignmentLine,
   IconQuizLine,
+  IconQuizSolid,
   IconLinkLine,
 } from '@instructure/ui-icons'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ModuleItemContent} from './types'
 
+const I18n = createI18nScope('context_modules_v2')
 const pixelOffset = 20
 
 export const INDENT_LOOKUP: Record<number, string> = {
@@ -49,7 +52,11 @@ export const getItemIcon = (content: ModuleItemContent, isStudentView = false) =
 
   switch (type) {
     case 'Assignment':
-      return <IconAssignmentLine color={color} data-testid="assignment-icon" />
+      return content.isNewQuiz ? (
+        <IconQuizSolid color={color} data-testid="new-quiz-icon" />
+      ) : (
+        <IconAssignmentLine color={color} data-testid="assignment-icon" />
+      )
     case 'Quiz':
       return <IconQuizLine color={color} data-testid="quiz-icon" />
     case 'Discussion':
@@ -63,6 +70,28 @@ export const getItemIcon = (content: ModuleItemContent, isStudentView = false) =
       return <IconDocumentLine color={color} data-testid="page-icon" />
     default:
       return <IconDocumentLine color="primary" data-testid="document-icon" />
+  }
+}
+
+export const getItemTypeText = (content: ModuleItemContent) => {
+  if (!content?.type) return I18n.t('Unknown')
+
+  switch (content.type) {
+    case 'Assignment':
+      return content.isNewQuiz ? I18n.t('New Quiz') : I18n.t('Assignment')
+    case 'Quiz':
+      return I18n.t('Quiz')
+    case 'Discussion':
+      return I18n.t('Discussion')
+    case 'File':
+    case 'Attachment':
+      return I18n.t('File')
+    case 'ExternalUrl':
+      return I18n.t('External Url')
+    case 'Page':
+      return I18n.t('Page')
+    default:
+      return I18n.t('Unknown')
   }
 }
 

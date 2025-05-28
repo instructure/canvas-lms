@@ -640,6 +640,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   specifies all other variables that can determine visiblity.
   """
   visibleToEveryone: Boolean!
+  isNewQuiz: Boolean!
 }
 
 """
