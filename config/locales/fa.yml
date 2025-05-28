@@ -7669,6 +7669,8 @@ fa:
     link_validator: 
       link_validator: "تأیید کننده پیوند درس"
       page_title: "تأیید کننده پیوند درس"
+    links: 
+      student_progress: "مشاهده پیشرفت"
     master_course_restrictions: 
       labels: 
         availability_dates: "تاریخ‌های دسترسی"
@@ -17463,6 +17465,7 @@ fa:
   page_not_found_2b0d05f5: "صفحه موجود نیست"
   page_page_59070cd8: "صفحه %{page}"
   page_pagenum_20dbfeb8: "صفحه %{pageNum}"
+  page_title_106304bb: "عنوان صفحه"
   page_title_ascending_b5df950c: "عنوان صفحه: صعودی"
   page_title_d1a22bbf: "عنوان صفحه"
   page_title_descending_70c1483d: "عنوان صفحه: نزولی"

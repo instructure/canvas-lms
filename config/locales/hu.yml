@@ -7845,6 +7845,8 @@ hu:
     link_validator: 
       link_validator: Kurzushivatkozás-ellenőrző
       page_title: Kurzushivatkozás-ellenőrző
+    links: 
+      student_progress: "Előrehaladás megtekintése"
     master_course_restrictions: 
       labels: 
         availability_dates: "Elérhetőségi dátumok"
@@ -18045,6 +18047,7 @@ hu:
   page_not_found_2b0d05f5: "Az oldal nem található"
   page_page_59070cd8: "Oldal %{page}"
   page_pagenum_20dbfeb8: "%{pageNum}. oldal"
+  page_title_106304bb: "Oldal címe"
   page_title_ascending_b5df950c: "Oldal címe: Növekvő"
   page_title_d1a22bbf: "Oldal címe"
   page_title_descending_70c1483d: "Oldal címe: csökkenő"
