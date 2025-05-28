@@ -1387,6 +1387,11 @@ Rails.application.config.to_prepare do
           AccountAdmin
         ]
       },
+      new_quizzes_view_ip_address: {
+        label: -> { I18n.t("New Quizzes - view IP address") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin]
+      },
       post_to_forum: {
         label: -> { I18n.t("permissions.post_to_forum", "Post to discussions") },
         label_v2: -> { I18n.t("Discussions - post") },
