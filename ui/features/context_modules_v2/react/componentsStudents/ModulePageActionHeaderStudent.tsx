@@ -93,11 +93,11 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
             )}
           </Text>
         </View>
-        {(data?.submissionStatistics?.submissionsDueThisWeekCount ||
-          data?.submissionStatistics?.missingSubmissionsCount) && (
+        {data?.submissionStatistics?.submissionsDueThisWeekCount ||
+        data?.submissionStatistics?.missingSubmissionsCount ? (
           <View as="div" margin="0 0 medium 0">
             <Flex gap="small">
-              {data?.submissionStatistics?.submissionsDueThisWeekCount > 0 && (
+              {data?.submissionStatistics?.submissionsDueThisWeekCount > 0 ? (
                 <Flex.Item>
                   <Button
                     data-testid="assignment-due-this-week-button"
@@ -117,8 +117,8 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
                     )}
                   </Button>
                 </Flex.Item>
-              )}
-              {data?.submissionStatistics?.missingSubmissionsCount > 0 && (
+              ) : null}
+              {data?.submissionStatistics?.missingSubmissionsCount > 0 ? (
                 <Flex.Item>
                   <Button
                     data-testid="missing-assignment-button"
@@ -138,10 +138,10 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
                     )}
                   </Button>
                 </Flex.Item>
-              )}
+              ) : null}
             </Flex>
           </View>
-        )}
+        ) : null}
         {/* @ts-expect-error */}
         {ENV.CONTEXT_MODULES_HEADER_PROPS && (
           <ContextModulesHeader
