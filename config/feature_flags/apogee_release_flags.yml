@@ -339,6 +339,16 @@ platform_service_speedgrader:
       state: allowed
     development:
       state: allowed
+moderated_grading_modernized_speedgrader:
+  state: hidden
+  display_name: Performance and Usability Updates for Moderated Grading in SpeedGrader
+  description: This feature provides the new SpeedGrader platform experience with a focus on improved performance for large courses for Moderated Grading assignments
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
 grading_periods_filter_dates:
   state: hidden
   applies_to: SiteAdmin
