@@ -22,6 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {CompletionRequirement, ModuleStatistics} from '../utils/types.d'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -38,13 +39,11 @@ export const ModuleHeaderSupplementalInfoStudent: React.FC<Props> = ({
   submissionStatistics,
   moduleCompleted,
 }) => {
-  // Get due date and overdue count from the submissionStatistics object
   const dueDate = submissionStatistics?.latestDueAt
     ? new Date(submissionStatistics.latestDueAt)
     : null
   const missingCount = submissionStatistics?.missingAssignmentCount || 0
 
-  // Ensure we only proceed if completionRequirements exists
   const hasCompletionRequirements = completionRequirements && completionRequirements.length > 0
 
   const showMissingCount = missingCount > 0 && (!moduleCompleted || !hasCompletionRequirements)
@@ -53,7 +52,15 @@ export const ModuleHeaderSupplementalInfoStudent: React.FC<Props> = ({
     <View as="div" margin="0 0 0">
       <Flex wrap="wrap">
         <Flex.Item>
-          {dueDate && <Text size="x-small">Due: {dueDate.toDateString()}</Text>}
+          {dueDate && (
+            <Text size="x-small">
+              <FriendlyDatetime
+                prefix={I18n.t('Due: ')}
+                format={I18n.t('#date.formats.short')}
+                dateTime={dueDate}
+              />
+            </Text>
+          )}
           {dueDate && (showMissingCount || hasCompletionRequirements) && (
             <Text size="x-small"> | </Text>
           )}
