@@ -109,17 +109,21 @@ class Lti::Registration < ActiveRecord::Base
     Lti::Overlay.find_in_site_admin(self)
   end
 
-  # Returns a new ContextExternalTool for this Registration and the given context.
-  # If an existing tool is provided, it will be updated with the new configuration.
+  # Deploys a new ContextExternalTool for this Registration into the given context.
+  # If an existing tool is provided, propagates configuration changes from this Registration to the tool.
   # If errors occur during the update, a ContextExternalToolErrors exception will be raised,
   # containing the errors from the update.
+  # Also creates a "root" ContextControl for this new tool, which can be used to control the
+  # availability of this tool without the need for deletion.
   #
   # @param context [Account | Course] The context for which to create the tool.
   # @param existing_tool [ContextExternalTool | nil] An existing tool to update.
   # @param verify_uniqueness [Boolean] Whether or not to check for uniqueness.
   # @param current_user [User] The user who is creating the tool.
+  # @param available [Boolean] Sets availability on the ContextControl created alongside this tool. Defaults to true,
+  #   which means the tool will be available for use directly after creation.
   # @return [ContextExternalTool] A new ContextExternalTool for this Registration and the given context.
-  def new_external_tool(context, existing_tool: nil, verify_uniqueness: false, current_user: nil)
+  def new_external_tool(context, existing_tool: nil, verify_uniqueness: false, current_user: nil, available: true)
     # disabled tools should stay disabled while getting updated
     # deleted tools are never updated during a dev key update so can be safely ignored
     tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
@@ -144,8 +148,13 @@ class Lti::Registration < ActiveRecord::Base
       raise Lti::ContextExternalToolErrors, tool.errors
     end
 
+    if existing_tool
+      # Do not update availability when propagating tool changes
+      available = nil
+    end
     Lti::ContextControlService.create_or_update(
       {
+        available:,
         course_id: context.is_a?(Course) ? context.id : nil,
         account_id: context.is_a?(Account) ? context.id : nil,
         registration_id: id,
