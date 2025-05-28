@@ -5129,6 +5129,8 @@ hy:
         student: Ուսանող
       loading: "Ունկնդիրների ցուցակի բեռնում"
       select_student: "Ընտրել ունկնդրին"
+    links: 
+      student_progress: "Դիտել կատարման ընթացքը"
     notices: 
       backup_restored: "Պահուստային տարբերակը հաջողությամբ վերականգնվել է:"
       concluded: "Դասընթացը հաջողությամբ ավարտված է "
@@ -12022,6 +12024,7 @@ hy:
       create_failed: "Մեկնաբանության ստեղծումը չհաջողվեց"
   page_name_21defa75: "Էջի անվանում"
   page_not_found_2b0d05f5: "Էջը չի գտնվել"
+  page_title_106304bb: "Էջի վերնագիրը"
   page_title_d1a22bbf: "Էջի անվանում"
   page_views: 
     browsers: 
