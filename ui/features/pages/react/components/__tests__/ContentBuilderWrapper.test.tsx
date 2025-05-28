@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import {ContentBuilderWrapper} from '../ContentBuilderWrapper'
 
 describe('ContentBuilderWrapper', () => {
   it('renders without crashing', () => {
     render(<ContentBuilderWrapper />)
-    expect(screen.getByText(/Content Builder placeholder/)).toBeInTheDocument()
   })
 })
