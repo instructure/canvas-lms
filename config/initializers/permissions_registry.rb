@@ -1733,7 +1733,12 @@ Rails.application.config.to_prepare do
         available_to: %w[TeacherEnrollment DesignerEnrollment AccountAdmin AccountMembership],
         true_for: %w[AccountAdmin],
         account_allows: ->(a) { a.feature_enabled?(:block_editor) && a.feature_enabled?(:block_template_editor) }
-      }
+      },
+      new_quizzes_multiple_session_detection: {
+        label: -> { I18n.t("New Quizzes - view multi session information") },
+        available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin]
+      },
     }
   )
 end
