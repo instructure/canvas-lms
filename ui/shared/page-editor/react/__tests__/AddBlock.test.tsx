@@ -15,8 +15,22 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {AddBlock} from './AddBlock'
 
-export const PageEditor = () => {
-  return <AddBlock onAddBlock={() => {}} />
-}
+import {render, screen} from '@testing-library/react'
+import {AddBlock} from '../AddBlock'
+
+describe('AddBlock', () => {
+  it('renders', async () => {
+    render(<AddBlock onAddBlock={jest.fn()} />)
+    expect(await screen.findByTestId('add-block-heading')).toBeInTheDocument()
+    expect(await screen.findByTestId('add-block-button')).toBeInTheDocument()
+  })
+
+  it('calls onAddBlock when button is clicked', async () => {
+    const onAddBlockMock = jest.fn()
+    render(<AddBlock onAddBlock={onAddBlockMock} />)
+    const button = await screen.findByTestId('add-block-button')
+    button.click()
+    expect(onAddBlockMock).toHaveBeenCalledWith('dummy_block')
+  })
+})
