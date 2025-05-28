@@ -59,7 +59,15 @@ export const ModuleHeaderSupplementalInfoStudent: React.FC<Props> = ({
           )}
           {showMissingCount && (
             <Text size="x-small" color="danger">
-              {missingCount} {I18n.t('Missing Assignment')}
+              {I18n.t(
+                {
+                  one: '1 Missing Assignment',
+                  other: '%{count} Missing Assignments',
+                },
+                {
+                  count: missingCount,
+                },
+              )}
             </Text>
           )}
           {showMissingCount && hasCompletionRequirements && <Text size="x-small"> | </Text>}
