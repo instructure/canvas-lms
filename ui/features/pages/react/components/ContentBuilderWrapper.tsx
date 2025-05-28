@@ -19,5 +19,5 @@
 import {PageEditor} from '@canvas/page-editor'
 
 export const ContentBuilderWrapper = () => {
-  return <PageEditor />
+  return <PageEditor data={null} />
 }
