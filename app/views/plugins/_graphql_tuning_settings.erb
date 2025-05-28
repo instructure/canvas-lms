@@ -1,0 +1,54 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%= fields_for :settings do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td><%= f.blabel :max_depth, :en => "The number of nested fields allowed per query" %></td>
+      <td><%= f.number_field :max_depth, value: settings[:max_depth] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :max_complexity, :en => "The max allowed value for the complexity score of the query" %></td>
+      <td><%= f.number_field :max_complexity, value: settings[:max_complexity] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :default_page_size, :en => "The default number of entries returned without specifying a size" %></td>
+      <td><%= f.number_field :default_page_size, value: settings[:default_page_size] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :default_max_page_size, :en => "The max number of entries that can be returned regardless of the size specified" %></td>
+      <td><%= f.number_field :default_max_page_size, value: settings[:default_max_page_size] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :validate_max_errors, :en => "The max number of errors returned from a single query" %></td>
+      <td><%= f.number_field :validate_max_errors, value: settings[:validate_max_errors] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :max_query_string_tokens, :en => "The max size (in tokens) of parameters allowed in a single query request" %></td>
+      <td><%= f.number_field :max_query_string_tokens, value: settings[:max_query_string_tokens] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :max_query_aliases, :en => "The max number of query aliases allowed in a single query" %></td>
+      <td><%= f.number_field :max_query_aliases, value: settings[:max_query_aliases] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :max_query_directives, :en => "The max number of query directives allowed in a single query" %></td>
+      <td><%= f.number_field :max_query_directives, value: settings[:max_query_directives] %></td>
+    </tr>
+  </table>
+<% end %>
