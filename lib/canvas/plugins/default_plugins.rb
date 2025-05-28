@@ -415,5 +415,24 @@ module Canvas::Plugins::DefaultPlugins
                                 write_path: "update" # member of { update, log }
                               }
                             })
+
+    Canvas::Plugin.register("graphql_tuning", nil, {
+                              name: -> { t :name, "GraphQL Tuning" },
+                              description: -> { t :description, "GraphQL performance tuning" },
+                              author: "Instructure",
+                              author_website: "http://www.instructure.com",
+                              version: "1.0.0",
+                              settings_partial: "plugins/graphql_tuning_settings",
+                              settings: {
+                                max_depth: 15,
+                                max_complexity: 375_000,
+                                default_page_size: 20,
+                                default_max_page_size: 100,
+                                validate_max_errors: 100,
+                                max_query_string_tokens: 5_000,
+                                max_query_aliases: 20,
+                                max_query_directives: 5,
+                              }
+                            })
   end
 end
