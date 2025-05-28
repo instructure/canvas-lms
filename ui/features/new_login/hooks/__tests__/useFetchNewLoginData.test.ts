@@ -379,4 +379,26 @@ describe('useFetchNewLoginData', () => {
     expect(data.authProviders).toBeUndefined()
     expect(data.helpLink).toBeUndefined()
   })
+
+  // returns raw values; escaping/sanitizing is the responsibility of the rendering layer
+  it('returns potentially unsafe-looking strings without decoding or sanitizing', () => {
+    const xssString = '" onmouseover="alert(\'xss\')'
+    const xssScript = '<script>alert("xss")</script>'
+    const weirdUnicode = 'string with 𝒲𝒺𝒾𝓇𝒹 chars 💣'
+    const helpLink = {
+      text: xssScript,
+      trackCategory: 'category',
+      trackLabel: 'label',
+    }
+    const container = document.createElement('div')
+    container.id = 'new_login_data'
+    container.setAttribute('data-login-handle-name', xssString)
+    container.setAttribute('data-login-logo-text', `${xssScript} ${weirdUnicode}`)
+    container.setAttribute('data-help-link', JSON.stringify(helpLink))
+    document.body.appendChild(container)
+    const {result} = renderHook(() => useFetchNewLoginData())
+    expect(result.current.data.loginHandleName).toBe(xssString)
+    expect(result.current.data.loginLogoText).toBe(`${xssScript} ${weirdUnicode}`)
+    expect(result.current.data.helpLink).toEqual(helpLink)
+  })
 })
