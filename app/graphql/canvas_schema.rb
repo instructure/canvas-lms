@@ -126,13 +126,8 @@ class CanvasSchema < GraphQL::Schema
 
   query_analyzer(CanvasAntiabuseAnalyzer)
 
-  # This enable_deferred check is temporary. We need to simulate a release flag (before feature flags are available) and
-  # this will fit that need. As soon as this is on in prod after the release date, we will remove this whole if
-  # statement.
-  if Rails.env.development? || GraphQLTuning.enable_deferred_graphql_tuning?
-    max_complexity GraphQLTuning.max_complexity
-    default_page_size GraphQLTuning.default_page_size
-    default_max_page_size GraphQLTuning.default_max_page_size
-    query_analyzer(LogQueryComplexity)
-  end
+  max_complexity GraphQLTuning.max_complexity
+  default_page_size GraphQLTuning.default_page_size
+  default_max_page_size GraphQLTuning.default_max_page_size
+  query_analyzer(LogQueryComplexity)
 end
