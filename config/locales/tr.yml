@@ -6398,6 +6398,8 @@ tr:
     link_validator: 
       link_validator: "Ders Bağlantı Doğrulama"
       page_title: "Ders Bağlantı Doğrulama"
+    links: 
+      student_progress: "İlerleme Durumunu Göster"
     master_course_restrictions: 
       labels: 
         availability_dates: "Geçerlilik Tarihleri"
@@ -14250,6 +14252,7 @@ tr:
   page_name_is_required_d8c2736e: "Sayfa Adı zounludur"
   page_not_found_2b0d05f5: "Sayfa bulunamadı"
   page_pagenum_20dbfeb8: "Sayfa %{pageNum}"
+  page_title_106304bb: "Sayfa başlığı"
   page_title_d1a22bbf: "Sayfa Başlığı"
   page_views: 
     browsers: 
