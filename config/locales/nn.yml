@@ -8509,6 +8509,8 @@ nn:
     link_validator: 
       link_validator: Emnekoplingsvalidator
       page_title: Emnekoplingsvalidator
+    links: 
+      student_progress: "Vis framdrift"
     master_course_restrictions: 
       labels: 
         availability_dates: "Tilgjengelege datoar"
@@ -19377,6 +19379,7 @@ nn:
   page_not_found_2b0d05f5: "Finn ikkje side"
   page_page_59070cd8: "Side %{page}"
   page_pagenum_20dbfeb8: "Side %{pageNum}"
+  page_title_106304bb: Sidetittel
   page_title_ascending_b5df950c: "Sidetittel: Aukande"
   page_title_d1a22bbf: Sidetittel
   page_title_descending_70c1483d: "Sidetittel: sortert i fallande rekkefølge"
