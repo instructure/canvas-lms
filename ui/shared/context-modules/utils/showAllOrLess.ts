@@ -94,6 +94,7 @@ function addOrRemoveButton(module: HTMLElement) {
   if (!button) {
     button = document.createElement('button')
     button.className = 'show-all-or-less-button ui-button'
+    button.setAttribute('aria-live', 'polite')
     button.dataset.moduleId = module.dataset.moduleId
     button.addEventListener('click', handleShowAllOrLessClick)
     button.addEventListener('keydown', buttonKeyDown)
@@ -102,18 +103,21 @@ function addOrRemoveButton(module: HTMLElement) {
   }
 
   button.dataset.isLoading = 'false'
+  button.removeAttribute('disabled')
+
   if (shouldShow === 'all') {
     button.classList.add('show-all')
     button.classList.remove('show-less')
-    if (totalItems) {
-      button.textContent = I18n.t('Show All (%{totalItems})', {totalItems: totalItems})
-    } else {
-      button.textContent = I18n.t('Show All')
-    }
+    const showAllText = totalItems
+      ? I18n.t('Show All (%{totalItems})', {totalItems: totalItems})
+      : I18n.t('Show All')
+    button.textContent = showAllText
+    button.setAttribute('aria-label', showAllText)
   } else {
     button.classList.add('show-less')
     button.classList.remove('show-all')
     button.textContent = I18n.t('Show Less')
+    button.setAttribute('aria-label', I18n.t('Show Less'))
   }
 }
 
@@ -135,6 +139,7 @@ function handleShowAllOrLessClick(event: Event) {
 
   if (button.dataset.isLoading === 'true') return
   button.dataset.isLoading = 'true'
+  button.setAttribute('disabled', 'true')
 
   if (button.classList.contains('show-all')) {
     if (isModuleCollapsed(module)) {
