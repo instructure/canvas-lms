@@ -155,4 +155,61 @@ describe "new login Sign In page" do
       expect(element_exists?('[data-testid="username-input"]')).to be false
     end
   end
+
+  describe "xss and weird character handling" do
+    let(:xss_string)             { %{" onmouseover="alert('xss')} }
+    let(:xss_string_with_script) { "<script>alert('xss')</script>" }
+    let(:weird_unicode)          { "string with 𝒲𝒺𝒾𝓇𝒹 chars 💣" }
+    let(:updated_login_logo)     { "canvas-logo@2x.png" }
+
+    before do
+      brand_config = BrandConfig.for(
+        # using the 2x image from public/images/login/ to avoid CORS issues
+        # this will trigger the helper to use the new login logo as it differs from the default
+        variables: { "ic-brand-Login-logo" => updated_login_logo }
+      )
+      brand_config.save!
+      Account.default.brand_config_md5 = brand_config.md5
+      Account.default.settings[:help_link_name] = xss_string_with_script
+      Account.default.settings[:login_handle_name] = xss_string
+      Account.default.name = "#{xss_string_with_script} #{weird_unicode}"
+      Account.default.save!
+    end
+
+    it "renders unsafe characters in attributes and visible text safely" do
+      get "/login/canvas"
+
+      el = f("#new_login_data")
+
+      login_logo = f("[data-testid='login-logo-img']")
+
+      help_link_attr = el.attribute("data-help-link")
+      help_link_attr_parsed = JSON.parse(help_link_attr)
+
+      login_handle_attr = el.attribute("data-login-handle-name")
+
+      help_button = f("button[data-testid='help-link']")
+      # intentionally inspecting raw outerHTML to verify that XSS vectors
+      # (e.g., onmouseover) are not injected into rendered output
+      # this can’t be validated through normal user interactions
+      # rubocop:disable Specs/NoExecuteScript
+      help_button_outer_html = driver.execute_script("return arguments[0].outerHTML;", help_button)
+      # rubocop:enable Specs/NoExecuteScript
+
+      aggregate_failures "XSS protections in rendered DOM" do
+        expect(login_logo[:src]).to include(updated_login_logo)
+        expect(login_logo[:alt]).to include(xss_string_with_script)
+        expect(login_logo[:alt]).to include(weird_unicode)
+
+        expect(help_link_attr_parsed["text"]).to eq(xss_string_with_script)
+
+        expect(login_handle_attr).to eq(xss_string)
+        expect(login_handle_attr).not_to include("<")
+        expect(login_handle_attr).not_to include(">")
+
+        expect(help_button.text).to include(xss_string_with_script)
+        expect(help_button_outer_html).not_to include("onmouseover=")
+      end
+    end
+  end
 end

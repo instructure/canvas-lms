@@ -16,83 +16,14 @@
   # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%
-  provide :page_title, t("Log in to Canvas")
+<% provide :page_title, t("Log in to Canvas") %>
 
-  # course catalog link boolean
-  enable_course_catalog = @domain_root_account.enable_course_catalog?
-
-  # json-encoded array of authentication providers with each object containing id and auth_type
-  auth_providers_json = ERB::Util.json_escape(@auth_providers.to_json)
-
-  # sso settings custom “login label”
-  login_handle_name = @domain_root_account.login_handle_name_with_inference
-
-  # custom logo
-  possibly_customized_login_logo = brand_variable("ic-brand-Login-logo")
-  default_login_logo = BrandableCSS.brand_variable_value("ic-brand-Login-logo")
-  login_logo_url = possibly_customized_login_logo != default_login_logo ? possibly_customized_login_logo : nil
-  login_logo_text = login_logo_url.present? ? @domain_root_account.short_name : nil
-
-  # custom background
-  body_bg_color = brand_variable("ic-brand-Login-body-bgd-color")
-  body_bg_image = brand_variable("ic-brand-Login-body-bgd-image")
-
-  # theme editor preview mode boolean
-  is_preview_mode = params[:previewing_from_themeeditor].to_s.downcase == "true"
-
-  # self-registration (none, all, observer)
-  allowed_self_registration_type = @domain_root_account.self_registration_type if %w[all observer].include?(@domain_root_account.self_registration_type)
-
-  # captcha
-  recaptcha_key = @domain_root_account.recaptcha_key
-
-  # terms required
-  terms_required = @domain_root_account.terms_required?
-
-  # terms and privacy policy URLs
-  tou_url = terms_of_use_url
-  pp_url = privacy_policy_url
-
-  # require email
-  require_email = @domain_root_account.require_email_for_registration?
-
-  # json-encoded object of password policy rules
-  password_policy_data = @domain_root_account.password_policy&.slice(:minimum_character_length, :require_number_characters, :require_symbol_characters)&.compact
-  password_policy_json = password_policy_data.present? ? ERB::Util.json_escape(password_policy_data.to_json) : nil
-
-  # custom forgot password URL
-  forgot_password_url = (params[:canvas_login] != '1' && @domain_root_account.try(:forgot_password_external_url)) || nil
-
-  # invalid login FAQ URL
-  invalid_login_faq_url = Setting.get("invalid_login_faq_url", nil)
-
-  # help link attributes
-  help_link_json = ERB::Util.json_escape({ text: help_link_name,
-                                           trackCategory: help_link_data[:"track-category"],
-                                           trackLabel: help_link_data[:"track-label"]
-                                         }.to_json)
+<%#
+  renders a container <div> with data attributes used by the new login UI
+  uses Rails’s `tag.div` with a `data:` hash to auto-generate `data-*` attributes
+  keys are dasherized, and values are properly escaped for valid HTML output
+  https://api.rubyonrails.org/v7.2/classes/ActionView/Helpers/TagHelper.html#method-i-tag
 %>
-
-<div id="new_login_data"
-     <%= "data-enable-course-catalog='true'".html_safe if enable_course_catalog.present? %>
-     <%= "data-auth-providers='#{auth_providers_json}'".html_safe if auth_providers_json.present? %>
-     <%= "data-login-handle-name='#{login_handle_name}'".html_safe if login_handle_name.present? %>
-     <%= "data-login-logo-url='#{login_logo_url}'".html_safe if login_logo_url.present? %>
-     <%= "data-login-logo-text='#{login_logo_text}'".html_safe if login_logo_text.present? %>
-     <%= "data-body-bg-color='#{body_bg_color}'".html_safe if body_bg_color.present? %>
-     <%= "data-body-bg-image='#{body_bg_image}'".html_safe if body_bg_image.present? %>
-     <%= "data-is-preview-mode='true'".html_safe if is_preview_mode %>
-     <%= "data-self-registration-type='#{allowed_self_registration_type}'".html_safe if allowed_self_registration_type.present? %>
-     <%= "data-recaptcha-key='#{recaptcha_key}'".html_safe if recaptcha_key.present? %>
-     <%= "data-terms-required='true'".html_safe if terms_required %>
-     <%= "data-terms-of-use-url='#{tou_url}'".html_safe if tou_url.present? %>
-     <%= "data-privacy-policy-url='#{pp_url}'".html_safe if pp_url.present? %>
-     <%= "data-require-email='true'".html_safe if require_email %>
-     <%= "data-password-policy='#{password_policy_json}'".html_safe if password_policy_json.present? %>
-     <%= "data-forgot-password-url='#{forgot_password_url}'".html_safe if forgot_password_url.present? %>
-     <%= "data-invalid-login-faq-url='#{h(invalid_login_faq_url)}'".html_safe if invalid_login_faq_url.present? %>
-     <%= "data-help-link='#{help_link_json}'".html_safe if help_link_json.present? %>
-></div>
+<%= tag.div id: "new_login_data", data: new_login_data_attributes %>
 
 <div id="new_login_safe_to_mount"></div>
