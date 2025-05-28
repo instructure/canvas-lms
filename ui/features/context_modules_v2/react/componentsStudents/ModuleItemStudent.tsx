@@ -21,7 +21,7 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {getItemIcon, INDENT_LOOKUP} from '../utils/utils'
+import {getItemIcon, getItemTypeText, INDENT_LOOKUP} from '../utils/utils'
 import {CompletionRequirement, ModuleItemContent, ModuleProgression} from '../utils/types'
 import ModuleItemSupplementalInfoStudent from './ModuleItemSupplementalInfoStudent'
 import ModuleItemStatusIcon from './ModuleItemStatusIcon'
@@ -52,6 +52,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
 }) => {
   // Hooks must be called unconditionally
   const itemIcon = useMemo(() => (content ? getItemIcon(content, true) : null), [content])
+  const itemTypeText = useMemo(() => (content ? getItemTypeText(content) : null), [content])
   const itemLeftMargin = useMemo(() => INDENT_LOOKUP[indent ?? 0], [indent])
 
   // Early return after hooks
@@ -102,7 +103,9 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
                         <View as="div">{itemIcon}</View>
                       </Flex.Item>
                       <Flex.Item margin="0 small 0 0">
-                        <Text size="x-small">{content?.type}</Text>
+                        <Text size="x-small" transform="capitalize">
+                          {itemTypeText}
+                        </Text>
                       </Flex.Item>
                     </>
                   )}

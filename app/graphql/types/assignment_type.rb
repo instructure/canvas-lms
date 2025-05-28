@@ -680,5 +680,10 @@ module Types
     def auto_grade_assignment_errors
       GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
     end
+
+    field :is_new_quiz, Boolean, null: false, description: "Assignment is connected to a New Quiz"
+    def is_new_quiz
+      assignment.quiz_lti?
+    end
   end
 end

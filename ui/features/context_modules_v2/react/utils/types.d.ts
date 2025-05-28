@@ -67,6 +67,7 @@ export type ModuleItemContent = {
   locked?: boolean
   graded?: boolean
   assignmentOverrides?: AssignmentOverrideGraphQLResult
+  isNewQuiz?: boolean
 } | null
 
 interface AssignmentOverrideGraphQLResult {

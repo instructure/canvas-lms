@@ -38,6 +38,7 @@ export const MODULE_ITEMS_STUDENT_QUERY = gql`
               title
               type: __typename
               pointsPossible
+              isNewQuiz
               published
               submissionsConnection(filter: {includeUnsubmitted: true}) {
                 nodes {
