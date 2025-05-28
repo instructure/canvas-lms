@@ -6129,6 +6129,8 @@ he:
       link_validator: "בודק תקינות קישורי קורס"
       link_validator_desc: "מאמת תקינות הקישורים מבצע חיפוש בתוכן הקורס ומאתר כל קישור לא תקין או לא מגיב אשר מוצא. התהליך יכול להמשך מספר דקות"
       page_title: "בודק תקינות קישורי קורס"
+    links: 
+      student_progress: "צפיה בהתקדמות"
     master_course_restrictions: 
       labels: 
         availability_dates: "תאריכי זמינות"
@@ -14153,6 +14155,7 @@ he:
   page_name_21defa75: "שם דף"
   page_name_is_required_d8c2736e: "נדרש שם דף"
   page_not_found_2b0d05f5: "הדף לא נמצא"
+  page_title_106304bb: "כותרת דף"
   page_title_d1a22bbf: "כותרת דף"
   page_views: 
     browsers: 
