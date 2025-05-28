@@ -20,9 +20,10 @@ import React from 'react'
 import userEvent from '@testing-library/user-event'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {useNode} from '@craftjs/core'
-import {render} from '@testing-library/react'
+import {render, cleanup} from '@testing-library/react'
 // @ts-expect-error
 import {BlockResizer, type Sz} from '../BlockResizer'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const user = userEvent.setup()
 
@@ -68,8 +69,19 @@ describe('BlockResizer', () => {
   })
 
   beforeEach(() => {
+    fakeENV.setup()
     props = {width: 100, height: 125}
     maintainAspectRatio = false
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    cleanup()
+    jest.clearAllMocks()
+  })
+
+  afterAll(() => {
+    document.body.innerHTML = ''
   })
 
   it('renders', () => {
