@@ -140,7 +140,8 @@ export function useModuleItemsStudent(moduleId: string, enabled: boolean = false
     queryKey: ['moduleItemsStudent', moduleId],
     queryFn: getModuleItemsStudent,
     enabled,
-    refetchOnWindowFocus: enabled,
-    refetchOnReconnect: enabled,
+    refetchOnWindowFocus: true,
+    // 15 minutes, will reload on refresh because there is no persistence
+    staleTime: 15 * 60 * 1000,
   })
 }

@@ -133,5 +133,8 @@ export function useModulesStudent(courseId: string) {
     initialPageParam: undefined,
     getNextPageParam: (lastPage: ModulesResponse) =>
       lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined,
+    refetchOnWindowFocus: true,
+    // 15 minutes, will reload on refresh because there is no persistence
+    staleTime: 15 * 60 * 1000,
   })
 }

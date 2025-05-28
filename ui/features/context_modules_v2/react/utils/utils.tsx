@@ -25,7 +25,7 @@ import {
   IconLinkLine,
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ModuleItemContent} from './types'
+import {CompletionRequirement, ModuleItemContent, ModuleRequirement} from './types'
 
 const I18n = createI18nScope('context_modules_v2')
 const pixelOffset = 20
@@ -134,5 +134,24 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
     prevProps.indent === nextProps.indent &&
     prevProps.index === nextProps.index &&
     prevProps.content === nextProps.content
+  )
+}
+
+export const filterRequirementsMet = (
+  requirementsMet: ModuleRequirement[],
+  completionRequirements: CompletionRequirement[],
+) => {
+  return requirementsMet.filter(req =>
+    completionRequirements.some(cr => {
+      const idMatch = String(req.id) === String(cr.id)
+
+      const typeMatch = req?.type === cr?.type
+
+      const scoreMatch = req?.minScore === cr?.minScore
+
+      const percentageMatch = req?.minPercentage === cr?.minPercentage
+
+      return idMatch && typeMatch && scoreMatch && percentageMatch
+    }),
   )
 }

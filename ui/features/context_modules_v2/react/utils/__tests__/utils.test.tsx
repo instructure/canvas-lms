@@ -23,7 +23,9 @@ import {
   validateModuleItemStudentRenderRequirements,
   getIconColor,
   getItemTypeText,
+  filterRequirementsMet,
 } from '../utils'
+import {CompletionRequirement, ModuleRequirement} from '../types'
 
 describe('utils', () => {
   describe('getIconColor', () => {
@@ -287,6 +289,113 @@ describe('utils', () => {
         },
       }
       expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+  })
+
+  describe('filterRequirementsMet', () => {
+    it('should return the correct filtered requirements', () => {
+      const requirementsMet = [
+        {id: '1', type: 'must_view'},
+        {id: '2', type: 'must_view'},
+        {id: '3', type: 'must_view'},
+      ]
+      const completionRequirements = [
+        {id: '1', type: 'must_view'},
+        {id: '2', type: 'must_view'},
+      ]
+      expect(filterRequirementsMet(requirementsMet, completionRequirements)).toEqual([
+        {id: '1', type: 'must_view'},
+        {id: '2', type: 'must_view'},
+      ])
+    })
+
+    it('should return the correct filtered requirements when ids do not match', () => {
+      const requirementsMet = [
+        {id: '1', type: 'must_view'},
+        {id: '2', type: 'must_view'},
+        {id: '3', type: 'must_view'},
+      ]
+      const completionRequirements = [
+        {id: '1', type: 'must_view'},
+        {id: '2', type: 'must_view'},
+      ]
+      expect(filterRequirementsMet(requirementsMet, completionRequirements)).toEqual([
+        {id: '1', type: 'must_view'},
+        {id: '2', type: 'must_view'},
+      ])
+    })
+
+    it('should return the correct filtered requirements when types do not match', () => {
+      const requirementsMet = [
+        {id: '1', type: 'must_view'},
+        {id: '2', type: 'must_view'},
+        {id: '3', type: 'must_view'},
+      ]
+      const completionRequirements = [
+        {id: '1', type: 'must_view'},
+        {id: '2', type: 'must_mark_done'},
+      ]
+      expect(filterRequirementsMet(requirementsMet, completionRequirements)).toEqual([
+        {id: '1', type: 'must_view'},
+      ])
+    })
+
+    it('should return the correct filtered requirements when scores do not match', () => {
+      const requirementsMet = [
+        {id: '1', type: 'must_score', minScore: 100},
+        {id: '2', type: 'must_score', minScore: 80},
+        {id: '3', type: 'must_score', minScore: 75},
+      ]
+      const completionRequirements = [
+        {id: '1', type: 'must_score', minScore: 100},
+        {id: '2', type: 'must_score', minScore: 100},
+      ]
+      expect(filterRequirementsMet(requirementsMet, completionRequirements)).toEqual([
+        {id: '1', type: 'must_score', minScore: 100},
+      ])
+    })
+
+    it('should return the correct filtered requirements when percentages do not match', () => {
+      const requirementsMet = [
+        {id: '1', type: 'min_percentage', minPercentage: 100},
+        {id: '2', type: 'min_percentage', minPercentage: 80},
+        {id: '3', type: 'min_percentage', minPercentage: 75},
+      ]
+      const completionRequirements = [
+        {id: '1', type: 'min_percentage', minPercentage: 100},
+        {id: '2', type: 'min_percentage', minPercentage: 100},
+      ]
+      expect(filterRequirementsMet(requirementsMet, completionRequirements)).toEqual([
+        {id: '1', type: 'min_percentage', minPercentage: 100},
+      ])
+    })
+
+    it('should return empty array when no requirements match', () => {
+      const requirementsMet = [
+        {id: '1', type: 'must_view'},
+        {id: '2', type: 'must_view'},
+        {id: '3', type: 'must_view'},
+      ]
+      const completionRequirements = [
+        {id: '1', type: 'must_mark_done'},
+        {id: '2', type: 'must_mark_done'},
+      ]
+      expect(filterRequirementsMet(requirementsMet, completionRequirements)).toEqual([])
+    })
+
+    it('should return empty array when no requirements are met', () => {
+      const requirementsMet = [] as ModuleRequirement[]
+      const completionRequirements = [
+        {id: '1', type: 'must_view'},
+        {id: '2', type: 'must_view'},
+      ] as CompletionRequirement[]
+      expect(filterRequirementsMet(requirementsMet, completionRequirements)).toEqual([])
+    })
+
+    it('should return empty array when no requirements are set', () => {
+      const requirementsMet = [] as ModuleRequirement[]
+      const completionRequirements = [] as CompletionRequirement[]
+      expect(filterRequirementsMet(requirementsMet, completionRequirements)).toEqual([])
     })
   })
 })
