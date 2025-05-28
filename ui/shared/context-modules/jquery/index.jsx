@@ -1709,6 +1709,7 @@ modules.initModuleManagement = async function (duplicate) {
         $.ajaxJSON(url, 'POST', item_data, data => {
           if (ENV.FEATURE_MODULES_PERF) {
             maybeExpandAndLoadAll(id, true)
+            modules.addContentTagToEnv(data.content_tag)
           } else {
             $item?.remove()
             data.content_tag.type = item_data['item[type]']
