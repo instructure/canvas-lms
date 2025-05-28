@@ -146,6 +146,7 @@ function QuizEngineModal({setOpen, onDismiss}) {
       padding="medium"
       label={I18n.t('Choose a Quiz Engine')}
       footer={footer}
+      aria-modal={true}
     >
       {description}
       <RadioInputGroup
