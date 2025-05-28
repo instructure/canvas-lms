@@ -28,10 +28,20 @@ jest.mock('@canvas/util/globalUtils', () => ({
 
 beforeEach(() => {
   fakeENV.setup()
+  // Mock Date.now() to return a consistent timestamp for stable testing
+  jest.spyOn(Date, 'now').mockReturnValue(new Date('2025-01-01T00:00:00Z').getTime())
+  // Mock timezone to ensure consistent date formatting
+  jest.spyOn(Intl, 'DateTimeFormat').mockImplementation(() => ({
+    format: date => {
+      const d = new Date(date)
+      return `${d.getUTCMonth() + 1}/${d.getUTCDate()}/${d.getUTCFullYear()}`
+    },
+  }))
 })
 
 afterEach(() => {
   fakeENV.teardown()
+  jest.restoreAllMocks()
 })
 
 // We can't call the wrapped component because a lot of these tests are depending
@@ -105,12 +115,12 @@ describe('DiscussionRow', () => {
     )
 
   it('renders the latest available until date for ungraded overrides', () => {
-    const futureDate = new Date('2026-05-15T00:00:00Z')
-    const furtherFutureDate = new Date('2027-05-15T00:00:00Z')
+    const earlierDate = new Date('2026-05-15T00:00:00Z')
+    const laterDate = new Date('2027-05-15T00:00:00Z')
     const discussion = {
       ungraded_discussion_overrides: [
-        {assignment_override: {lock_at: futureDate}},
-        {assignment_override: {lock_at: furtherFutureDate}},
+        {assignment_override: {lock_at: earlierDate}},
+        {assignment_override: {lock_at: laterDate}},
       ],
     }
     render(<DiscussionRow {...makeProps({discussion})} />)
@@ -119,8 +129,8 @@ describe('DiscussionRow', () => {
     const availabilityElement = screen.getByText(/^Available until/)
     expect(availabilityElement).toBeInTheDocument()
 
-    // Verify it has the latest date
-    const formattedDate = dateFormatter(furtherFutureDate)
-    expect(availabilityElement.textContent).toContain(formattedDate)
+    // The component should show the latest (furthest in future) date
+    // Expected format: "Available until 5/15/2027"
+    expect(availabilityElement.textContent).toContain('5/15/2027')
   })
 })
