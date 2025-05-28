@@ -22,7 +22,6 @@ import {
   IconDiscussionLine,
   IconAssignmentLine,
   IconQuizLine,
-  IconQuizSolid,
   IconLinkLine,
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -53,7 +52,7 @@ export const getItemIcon = (content: ModuleItemContent, isStudentView = false) =
   switch (type) {
     case 'Assignment':
       return content.isNewQuiz ? (
-        <IconQuizSolid color={color} data-testid="new-quiz-icon" />
+        <IconQuizLine color={color} data-testid="new-quiz-icon" />
       ) : (
         <IconAssignmentLine color={color} data-testid="assignment-icon" />
       )
