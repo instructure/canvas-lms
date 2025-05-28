@@ -31,6 +31,17 @@ class CanvasSchema < GraphQL::Schema
   connections.add(AddressBook::MessageableUser::Collection, CollectionConnection)
   connections.add(BookmarkedCollection::Proxy, CollectionConnection)
 
+  def self.execute(...)
+    max_depth GraphQLTuning.max_depth
+    validate_max_errors GraphQLTuning.validate_max_errors
+    max_query_string_tokens GraphQLTuning.max_query_string_tokens
+    max_complexity GraphQLTuning.max_complexity
+    default_page_size GraphQLTuning.default_page_size
+    default_max_page_size GraphQLTuning.default_max_page_size
+
+    super
+  end
+
   def self.id_from_object(obj, type_def, _ctx)
     case obj
     when MediaObject
@@ -120,14 +131,6 @@ class CanvasSchema < GraphQL::Schema
                 Types::InternalSettingType]
 
   # GraphQL tuning and defensive settings
-  max_depth GraphQLTuning.max_depth
-  validate_max_errors GraphQLTuning.validate_max_errors
-  max_query_string_tokens GraphQLTuning.max_query_string_tokens
-
   query_analyzer(CanvasAntiabuseAnalyzer)
-
-  max_complexity GraphQLTuning.max_complexity
-  default_page_size GraphQLTuning.default_page_size
-  default_max_page_size GraphQLTuning.default_max_page_size
   query_analyzer(LogQueryComplexity)
 end
