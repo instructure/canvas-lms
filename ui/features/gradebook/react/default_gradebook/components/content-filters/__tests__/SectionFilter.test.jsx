@@ -17,9 +17,10 @@
  */
 
 import SectionFilter from '@canvas/gradebook-content-filters/react/SectionFilter'
-import {render, screen} from '@testing-library/react'
+import {render, screen, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('Gradebook > Default Gradebook > Components > Content Filters > SectionFilter', () => {
   const defaultProps = {
@@ -33,70 +34,91 @@ describe('Gradebook > Default Gradebook > Components > Content Filters > Section
   }
 
   const renderSectionFilter = (props = {}) => {
-    return render(<SectionFilter {...defaultProps} {...props} />)
+    const {container, getByRole, getByText, getByLabelText, getByDisplayValue} = render(
+      <SectionFilter {...defaultProps} {...props} />,
+    )
+    return {container, getByRole, getByText, getByLabelText, getByDisplayValue}
   }
 
+  beforeEach(() => {
+    fakeENV.setup()
+  })
+
   afterEach(() => {
+    cleanup()
+    fakeENV.teardown()
     jest.clearAllMocks()
   })
 
   it('labels the filter with "Section Filter"', () => {
-    renderSectionFilter()
-    expect(screen.getByLabelText('Section Filter')).toBeInTheDocument()
+    const {getByLabelText} = renderSectionFilter()
+    expect(getByLabelText('Section Filter')).toBeInTheDocument()
   })
 
   it('displays the name of the selected section as the value', () => {
-    renderSectionFilter({selectedSectionId: '2002'})
-    expect(screen.getByDisplayValue('Section 2')).toBeInTheDocument()
+    const {getByDisplayValue} = renderSectionFilter({selectedSectionId: '2002'})
+    expect(getByDisplayValue('Section 2')).toBeInTheDocument()
   })
 
   it('displays "All Sections" as the value when selected', () => {
-    renderSectionFilter()
-    expect(screen.getByDisplayValue('All Sections')).toBeInTheDocument()
+    const {getByDisplayValue} = renderSectionFilter()
+    expect(getByDisplayValue('All Sections')).toBeInTheDocument()
   })
 
   describe('sections list', () => {
     it('labels the "all items" option with "All Sections"', async () => {
-      renderSectionFilter()
-      await userEvent.click(screen.getByRole('combobox'))
-      expect(screen.getByText('All Sections')).toBeInTheDocument()
+      const user = userEvent.setup()
+      const {getByRole, getByText} = renderSectionFilter()
+      const combobox = getByRole('combobox')
+      await user.click(combobox)
+      expect(getByText('All Sections')).toBeInTheDocument()
     })
 
     it('labels each option using the related section name in alphabetical order', async () => {
-      renderSectionFilter()
-      await userEvent.click(screen.getByRole('combobox'))
+      const user = userEvent.setup()
+      const {getByRole} = renderSectionFilter()
+      const combobox = getByRole('combobox')
+      await user.click(combobox)
       const options = screen.getAllByRole('option')
       expect(options[1]).toHaveTextContent('Section 1')
       expect(options[2]).toHaveTextContent('Section 2')
     })
 
     it('disables non-selected options when the filter is disabled', async () => {
-      renderSectionFilter({disabled: true})
-      await userEvent.click(screen.getByRole('combobox'))
-      const option = screen.getByText('Section 2')
+      const user = userEvent.setup()
+      const {getByRole, getByText} = renderSectionFilter({disabled: true})
+      const combobox = getByRole('combobox')
+      await user.click(combobox)
+      const option = getByText('Section 2')
       expect(option).toHaveAttribute('aria-disabled', 'true')
     })
   })
 
   describe('selecting an option', () => {
     it('calls the onSelect callback', async () => {
-      renderSectionFilter()
-      await userEvent.click(screen.getByRole('combobox'))
-      await userEvent.click(screen.getByText('Section 1'))
+      const user = userEvent.setup()
+      const {getByRole, getByText} = renderSectionFilter()
+      const combobox = getByRole('combobox')
+      await user.click(combobox)
+      await user.click(getByText('Section 1'))
       expect(defaultProps.onSelect).toHaveBeenCalledTimes(1)
     })
 
     it('includes the section id when calling the onSelect callback', async () => {
-      renderSectionFilter()
-      await userEvent.click(screen.getByRole('combobox'))
-      await userEvent.click(screen.getByText('Section 1'))
+      const user = userEvent.setup()
+      const {getByRole, getByText} = renderSectionFilter()
+      const combobox = getByRole('combobox')
+      await user.click(combobox)
+      await user.click(getByText('Section 1'))
       expect(defaultProps.onSelect).toHaveBeenCalledWith('2001')
     })
 
     it('includes "0" when "All Sections" is clicked', async () => {
-      renderSectionFilter({selectedSectionId: '2001'})
-      await userEvent.click(screen.getByRole('combobox'))
-      await userEvent.click(screen.getByText('All Sections'))
+      const user = userEvent.setup()
+      const {getByRole, getByText} = renderSectionFilter({selectedSectionId: '2001'})
+      const combobox = getByRole('combobox')
+      await user.click(combobox)
+      await user.click(getByText('All Sections'))
       expect(defaultProps.onSelect).toHaveBeenCalledWith('0')
     })
   })
