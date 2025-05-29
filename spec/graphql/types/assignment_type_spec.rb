@@ -63,6 +63,8 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("published")).to eq assignment.published?
     expect(assignment_type.resolve("importantDates")).to eq assignment.important_dates
     expect(assignment_type.resolve("isNewQuiz")).to eq assignment.quiz_lti?
+    expect(assignment_type.resolve("muted")).to eq assignment.muted?
+    expect(assignment_type.resolve("hasRubric")).to eq assignment.active_rubric_association?
   end
 
   describe "graded_submissions_exist" do
@@ -385,15 +387,27 @@ describe Types::AssignmentType do
   end
 
   describe "gradingStandard" do
-    it "returns the grading standard" do
-      grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
-      assignment.update(grading_type: "letter_grade", grading_standard_id: grading_standard.id)
-      assignment.save!
-      expect(assignment_type.resolve("gradingStandard { title }")).to eq grading_standard.title
+    context "is set" do
+      before do
+        @grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+        assignment.update(grading_type: "letter_grade", grading_standard_id: @grading_standard.id)
+        assignment.save!
+      end
+
+      it "returns the grading standard id" do
+        expect(assignment_type.resolve("gradingStandardId")).to eq @grading_standard.id.to_s
+      end
+
+      it "returns the grading standard" do
+        expect(assignment_type.resolve("gradingStandard { title }")).to eq @grading_standard.title
+      end
     end
 
-    it "returns null if no grading standard is set" do
-      expect(assignment_type.resolve("gradingStandard { title }")).to be_nil
+    context "is not set" do
+      it "returns null if no grading standard is set" do
+        expect(assignment_type.resolve("gradingStandardId")).to be_nil
+        expect(assignment_type.resolve("gradingStandard { title }")).to be_nil
+      end
     end
   end
 

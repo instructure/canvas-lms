@@ -422,6 +422,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   gradesPublishedAt: String
   gradingPeriodId: String
   gradingStandard: GradingStandard
+  gradingStandardId: ID
   gradingType: GradingType
   groupCategoryId: Int
   groupSet: GroupSet
@@ -458,6 +459,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   """
   hasGroupCategory: Boolean!
   hasMultipleDueDates: Boolean
+  hasRubric: Boolean
   hasSubAssignments: Boolean!
 
   """
@@ -512,6 +514,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   moderatedGrading: ModeratedGrading
   moderatedGradingEnabled: Boolean
   modules: [Module!]
+  muted: Boolean
   mySubAssignmentSubmissionsConnection(
     """
     Returns the elements in the list that come after the specified cursor.

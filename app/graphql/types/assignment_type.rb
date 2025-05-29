@@ -300,6 +300,9 @@ module Types
     field :can_unpublish, Boolean, method: :can_unpublish?, null: true
     field :due_date_required, Boolean, method: :due_date_required?, null: true
 
+    field :has_rubric, Boolean, method: :active_rubric_association?
+    field :muted, Boolean, null: true
+
     field :originality_report_visibility, String, null: true
     def originality_report_visibility
       return nil if object.turnitin_settings.empty?
@@ -563,6 +566,8 @@ module Types
         submissions.active.where(user_id: current_user)
       end
     end
+
+    field :grading_standard_id, ID, null: true
 
     field :grading_standard, GradingStandardType, null: true
     def grading_standard
