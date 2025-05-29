@@ -5848,6 +5848,7 @@ hy:
   delete_grading_period_dba36e59: "Ջնջել գնահատման ժամանակահատվածը"
   delete_grading_scheme_6b308832: "Ջնջել գնահատման սխեման"
   delete_my_account_41060aad: "Ջնջել իմ հաշիվը"
+  delete_name_81c1b5b2: "Ջնջել %{name}"
   delete_quiz_142b8099: "Ջնջել թեստը"
   delete_requirement_bce2d943: "Ջնջել պահանջը"
   delete_selected_a023ccf8: "Ջնջել նշվածը"
