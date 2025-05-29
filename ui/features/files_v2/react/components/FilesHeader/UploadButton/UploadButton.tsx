@@ -16,23 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Button, type ButtonProps} from '@instructure/ui-buttons'
-import UploadForm from '@canvas/files/react/components/UploadForm'
 import {useFileManagement} from '../../../contexts/FileManagementContext'
 import UploadQueue from '@canvas/files/react/modules/UploadQueue'
-import FileRenameForm from './FileRenameForm'
-import ZipFileOptionsForm from './ZipFileOptionsForm'
 import {pluralizeContextTypeString} from '../../../../utils/fileFolderUtils'
-import {type FileOptionsResults} from './FileOptions'
 import {createPortal} from 'react-dom'
+import {UploadForm} from './UploadForm'
 
 type UploadButtonProps = ButtonProps
 
 const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) => {
   const {contextId, contextType, currentFolder} = useFileManagement()
-  const [fileOptions, setFileOptions] = useState<FileOptionsResults | null>(null)
-  const formRef = useRef<UploadForm>(null)
+  const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const [hasPendingUploads, setHasPendingUploads] = useState<boolean>(
     !!UploadQueue.pendingUploads(),
@@ -43,36 +39,9 @@ const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) =
     [],
   )
 
-  const handleUploadClick = useCallback(() => formRef.current?.addFiles(), [])
-
-  const renderModal = useCallback(() => {
-    if (!fileOptions || !formRef.current) return null
-
-    const zipOptions = fileOptions.zipOptions
-    const nameCollisions = fileOptions.nameCollisions
-
-    if (zipOptions.length)
-      return createPortal(
-        <ZipFileOptionsForm
-          open={!!zipOptions.length}
-          onClose={formRef.current?.onClose}
-          fileOptions={zipOptions[0]}
-          onZipOptionsResolved={formRef.current?.onZipOptionsResolved}
-        />,
-        document.body,
-      )
-    else if (nameCollisions.length)
-      return createPortal(
-        <FileRenameForm
-          open={!!nameCollisions.length}
-          onClose={formRef.current?.onClose}
-          fileOptions={nameCollisions[0]}
-          onNameConflictResolved={formRef.current?.onNameConflictResolved}
-        />,
-        document.body,
-      )
-    else return null
-  }, [fileOptions])
+  const handleUploadClick = useCallback(() => {
+    setIsOpen(true)
+  }, [])
 
   useEffect(() => {
     UploadQueue.addChangeListener(handleQueueChange)
@@ -85,14 +54,13 @@ const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) =
       {contextType &&
         createPortal(
           <UploadForm
-            allowSkip={true}
-            errorOnDuplicate={true}
-            ref={formRef}
-            currentFolder={currentFolder}
+            open={isOpen}
+            onClose={() => {
+              setIsOpen(false)
+            }}
+            currentFolder={currentFolder!}
             contextId={contextId}
             contextType={pluralizeContextTypeString(contextType)}
-            useCanvasModals={false}
-            onFileOptionsChange={(fileOptions: FileOptionsResults) => setFileOptions(fileOptions)}
           />,
           document.body,
         )}
@@ -105,8 +73,6 @@ const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) =
       >
         {children}
       </Button>
-      {/* eslint-disable-next-line react-compiler/react-compiler */}
-      {renderModal()}
     </>
   )
 }
