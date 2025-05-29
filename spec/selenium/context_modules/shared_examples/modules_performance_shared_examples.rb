@@ -561,4 +561,105 @@ shared_examples_for "module moving items" do |context|
       expect(show_all_button(@module2).text).to include("(13)")
     end
   end
+
+  context "drag and drop module items" do
+    before do
+      @module2 = @course.context_modules.create!(name: "module 2")
+      2.times do |i|
+        @module2.add_item(type: "assignment", id: @course.assignments.create!(title: "assignment 2-#{i}").id)
+      end
+      @course.reload
+    end
+
+    it "drag and drops item within a paginated module" do
+      get @mod_url
+      wait_for_dom_ready
+
+      module_items_elements = ff(module_items_selector(@module.id))
+      module_item_ids = module_items_elements.map { |item| item.attribute("id") }
+
+      module_item_selector1 = module_item_drag_handle_selector(module_item_ids[5])
+      module_item_selector2 = module_item_drag_handle_selector(module_item_ids[1])
+      drag_and_drop_module_item(module_item_selector1, module_item_selector2)
+
+      expect(show_all_button(@module)).to be_displayed
+      module_items_elements_after = ff(module_items_selector(@module.id))
+      module_item_ids_after = module_items_elements_after.map { |item| item.attribute("id") }
+      expect(module_item_ids_after[1]).to eq(module_item_ids[5])
+    end
+
+    it "drag and drops item within a non-paginated module" do
+      get @mod_url
+      wait_for_dom_ready
+
+      module_items_elements = ff(module_items_selector(@module.id))
+      module_item_ids = module_items_elements.map { |item| item.attribute("id") }
+      expect(show_all_button(@module)).to be_displayed
+      show_all_button(@module).click
+      expect(show_less_button(@module)).to be_displayed
+
+      module_item_selector1 = module_item_drag_handle_selector(module_item_ids[5])
+      module_item_selector2 = module_item_drag_handle_selector(module_item_ids[1])
+      drag_and_drop_module_item(module_item_selector1, module_item_selector2)
+
+      expect(show_less_button(@module)).to be_displayed
+      module_items_elements_after = ff(module_items_selector(@module.id))
+      module_item_ids_after = module_items_elements_after.map { |item| item.attribute("id") }
+      expect(module_item_ids_after[1]).to eq(module_item_ids[5])
+    end
+
+    it "drag and drops item from a module to a paginated module" do
+      get @mod_url
+      wait_for_dom_ready
+
+      module_items_elements = ff(module_items_selector(@module.id))
+      module_item_ids = module_items_elements.map { |item| item.attribute("id") }
+
+      expand_module_link(@module2.id).click
+      wait_for_ajaximations
+      module2_item_elements = ff(module_items_selector(@module2.id))
+      module2_item_ids = module2_item_elements.map { |item| item.attribute("id") }
+
+      module_item_selector1 = module_item_drag_handle_selector(module2_item_ids[1])
+      module_item_selector2 = module_item_drag_handle_selector(module_item_ids[1])
+      drag_and_drop_module_item(module_item_selector1, module_item_selector2)
+
+      expect(show_all_button(@module)).to be_displayed
+
+      module_items_elements_after = ff(module_items_selector(@module.id))
+      module_item_ids_after = module_items_elements_after.map { |item| item.attribute("id") }
+
+      expect(module_item_ids_after[2]).to eq(module2_item_ids[1])
+
+      expect(ff(module_items_selector(@module2.id)).size).to eq(1)
+    end
+
+    it "drag and drops item from a module to a non-paginated module" do
+      get @mod_url
+      wait_for_dom_ready
+
+      show_all_button(@module).click
+
+      module_items_elements = ff(module_items_selector(@module.id))
+      module_item_ids = module_items_elements.map { |item| item.attribute("id") }
+
+      expand_module_link(@module2.id).click
+      wait_for_ajaximations
+      module2_item_elements = ff(module_items_selector(@module2.id))
+      module2_item_ids = module2_item_elements.map { |item| item.attribute("id") }
+
+      module_item_selector1 = module_item_drag_handle_selector(module2_item_ids[1])
+      module_item_selector2 = module_item_drag_handle_selector(module_item_ids[1])
+      drag_and_drop_module_item(module_item_selector1, module_item_selector2)
+
+      expect(show_less_button(@module)).to be_displayed
+
+      module_items_elements_after = ff(module_items_selector(@module.id))
+      module_item_ids_after = module_items_elements_after.map { |item| item.attribute("id") }
+
+      expect(module_item_ids_after[2]).to eq(module2_item_ids[1])
+
+      expect(ff(module_items_selector(@module2.id)).size).to eq(1)
+    end
+  end
 end
