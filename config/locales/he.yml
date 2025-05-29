@@ -6957,6 +6957,7 @@ he:
   delete_grading_scheme_6b308832: "ביטול סכימת הערכה"
   delete_group_86c381ec: "ביטול קבוצה"
   delete_my_account_41060aad: "ביטול חשבוני"
+  delete_name_81c1b5b2: "מחיקת %{name}"
   delete_outcome_cc6546f1: "ביטול השגי למידה"
   delete_outcome_group_6b399d34: "ביטול קבוצת השגי למידה"
   delete_quiz_142b8099: "ביטול בוחן"
