@@ -17,7 +17,7 @@
  */
 
 import {Editor, Frame, SerializedNodes} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
+import {AddBlock} from './AddBlock/AddBlock'
 
 export const PageEditor = (props: {
   data: SerializedNodes | null
