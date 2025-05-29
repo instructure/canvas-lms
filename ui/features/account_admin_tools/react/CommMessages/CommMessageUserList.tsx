@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import UserDateRangeSearch from '../UserDateRangeSearch'
-import {TextInput, type TextInputProps} from '@instructure/ui-text-input'
+import {TextInput} from '@instructure/ui-text-input'
 import {Avatar} from '@instructure/ui-avatar'
 import {Link, type LinkProps} from '@instructure/ui-link'
 import {Alert} from '@instructure/ui-alerts'
@@ -26,7 +26,7 @@ import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {IconSearchLine} from '@instructure/ui-icons'
-import {debounce} from 'lodash'
+import {useDebouncedCallback} from 'use-debounce'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {FormMessage, MessagesQueryParams, User} from './types'
@@ -176,8 +176,6 @@ export interface CommMessageUserListProps {
   onUserAndDateSelected: (selection: MessagesQueryParams | null) => void
 }
 
-type DebouncedOnChange = ReturnType<typeof debounce<NonNullable<TextInputProps['onChange']>>>
-
 export default function CommMessageUserList({
   accountId,
   onUserAndDateSelected,
@@ -186,8 +184,12 @@ export default function CommMessageUserList({
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [firstUse, setFirstUse] = useState<boolean>(true)
   const [messages, setMessages] = useState<FormMessage[]>([])
-  const debouncedSearch = useRef<DebouncedOnChange | null>(null)
   const userListDivRef = useRef<HTMLDivElement | null>(null)
+  const [debouncedSetSearchTerm] = useDebouncedCallback((s: string) => {
+    setSearchTerm(s)
+    onUserAndDateSelected(null)
+    if (firstUse) setFirstUse(false)
+  }, 500)
 
   const {
     data,
@@ -206,20 +208,6 @@ export default function CommMessageUserList({
     initialPageParam: '1',
     enabled: searchTerm.length >= 3,
   })
-
-  // This sure is a lot of rigmarole just to keep the React Compiler happy.
-  // But we need to make sure that the debounced function is created only once
-  // and that it is cleaned up when the component is unmounted, and useCallback
-  // cannot be used because `debounce` is going to return a new function every time
-  // and useCallback expects a constant inline function expression. 🤷
-  useEffect(() => {
-    debouncedSearch.current = debounce((_e, value) => {
-      setSearchTerm(value)
-      onUserAndDateSelected(null)
-      setFirstUse(false)
-    }, 300)
-    return () => debouncedSearch.current!.cancel()
-  }, [onUserAndDateSelected])
 
   // Make sure the messages under the search input are kept up to date
   useEffect(() => {
@@ -246,7 +234,7 @@ export default function CommMessageUserList({
   }, [searchTerm, data, firstUse, isFetching])
 
   function handleSearchChange(_e: any, v: string) {
-    debouncedSearch.current!(_e, v)
+    debouncedSetSearchTerm(v)
   }
 
   const isTriggerRow = (row: number, lastRow: number) =>
