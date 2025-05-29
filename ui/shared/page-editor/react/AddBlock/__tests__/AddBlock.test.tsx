@@ -18,6 +18,12 @@
 
 import {render, screen} from '@testing-library/react'
 import {AddBlock} from '../AddBlock'
+import {AddBlockModal} from '../AddBlockModal'
+
+jest.mock('../AddBlockModal', () => ({
+  __esModule: true,
+  AddBlockModal: jest.fn(() => <div data-testid="mock-modal" />),
+}))
 
 describe('AddBlock', () => {
   it('renders', async () => {
@@ -26,11 +32,25 @@ describe('AddBlock', () => {
     expect(await screen.findByTestId('add-block-button')).toBeInTheDocument()
   })
 
-  it('calls onAddBlock when button is clicked', async () => {
+  it('renders modal with "open" when add button is clicked', async () => {
     const onAddBlockMock = jest.fn()
     render(<AddBlock onAddBlock={onAddBlockMock} />)
     const button = await screen.findByTestId('add-block-button')
     button.click()
-    expect(onAddBlockMock).toHaveBeenCalledWith('dummy_block')
+    expect(AddBlockModal).toHaveBeenCalledWith(
+      expect.objectContaining({open: true}),
+      expect.anything(),
+    )
+  })
+
+  it('renders modal and passes "onAddBlock" method when add button is clicked', async () => {
+    const onAddBlockMock = jest.fn()
+    render(<AddBlock onAddBlock={onAddBlockMock} />)
+    const button = await screen.findByTestId('add-block-button')
+    button.click()
+    expect(AddBlockModal).toHaveBeenCalledWith(
+      expect.objectContaining({onAddBlock: onAddBlockMock}),
+      expect.anything(),
+    )
   })
 })

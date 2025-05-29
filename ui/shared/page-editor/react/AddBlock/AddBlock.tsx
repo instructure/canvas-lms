@@ -23,16 +23,14 @@ import {Heading} from '@instructure/ui-heading'
 import {IconAddSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {AddBlockModal} from './AddBlockModal'
+import {useState} from 'react'
 
 const I18n = createI18nScope('page_editor')
 
-export const AddBlock = (props: {
-  onAddBlock: (type: string) => void
+const AddBlockContent = (props: {
+  onAddBlockClicked: () => void
 }) => {
-  const onAddBlockClicked = () => {
-    props.onAddBlock('dummy_block')
-  }
-
   return (
     <View borderWidth="small" borderRadius="medium">
       <Flex direction="column" padding="large" gap="large" alignItems="center">
@@ -54,11 +52,27 @@ export const AddBlock = (props: {
           shape="circle"
           color="primary"
           screenReaderLabel={I18n.t('Add a block')}
-          onClick={onAddBlockClicked}
+          onClick={props.onAddBlockClicked}
         >
           <IconAddSolid />
         </IconButton>
       </Flex>
     </View>
+  )
+}
+
+export const AddBlock = (props: {
+  onAddBlock: (type: string) => void
+}) => {
+  const [isOpen, setIsOpen] = useState(false)
+  return (
+    <>
+      <AddBlockModal
+        open={isOpen}
+        onDismiss={() => setIsOpen(false)}
+        onAddBlock={props.onAddBlock}
+      />
+      <AddBlockContent onAddBlockClicked={() => setIsOpen(true)} />
+    </>
   )
 }
