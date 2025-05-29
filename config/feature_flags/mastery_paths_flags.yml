@@ -20,3 +20,9 @@ mastery_path_invalidate_assignment_visibility_cache:
       state: allowed_on
     development:
       state: allowed_on
+
+mastery_path_submission_trigger_reloaded_evaluation:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Mastery Path Reload Submission Properties
+  description: When evaluating whether to invoke mastery path handler, reload submission properties for comparison
