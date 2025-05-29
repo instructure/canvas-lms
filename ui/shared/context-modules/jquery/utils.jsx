@@ -150,11 +150,15 @@ export function initPublishButton($el, data) {
     const fileFauxView = {
       render: () => {
         const model = $el.data('view').model
-
-        const root = createRoot($el[0])
-        root.render(<PublishCloud {...props} model={model} disabled={model.get('disabled')} />)
+        const elem = $el[0]
+        if (!elem.reactRoot) {
+          elem.reactRoot = createRoot(elem)
+        }
+        elem.reactRoot.render(
+          <PublishCloud {...props} model={model} disabled={model.get('disabled')} />,
+        )
         // to look disable, we need to add the class here
-        $el[0].classList[model.get('disabled') ? 'add' : 'remove']('disabled')
+        elem.classList[model.get('disabled') ? 'add' : 'remove']('disabled')
       },
       model: file,
     }
