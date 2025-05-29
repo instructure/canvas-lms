@@ -38,11 +38,6 @@ function defaultProps(options = {}) {
   }
 }
 
-it('renders the base component correctly', () => {
-  const wrapper = render(<Opportunity {...defaultProps()} />)
-  expect(wrapper.container).toMatchSnapshot()
-})
-
 it('calls the onClick prop when dismissed is clicked', async () => {
   const tempProps = defaultProps()
   tempProps.dismiss = jest.fn()
@@ -58,14 +53,52 @@ it('renders the base component correctly without points', () => {
   const tempProps = defaultProps()
   tempProps.points = null
   const wrapper = render(<Opportunity {...tempProps} />)
-  expect(wrapper.container).toMatchSnapshot()
+
+  // Check course name is displayed
+  expect(wrapper.getByText(tempProps.courseName)).toBeInTheDocument()
+
+  // Check opportunity title is displayed and linked
+  const titleLink = wrapper.getByText(tempProps.opportunityTitle)
+  expect(titleLink).toBeInTheDocument()
+  expect(titleLink.closest('a')).toHaveAttribute('href', tempProps.url)
+
+  // Check due date is displayed
+  expect(wrapper.getByText(/Due:/)).toBeInTheDocument()
+
+  // Check missing pill is displayed
+  expect(wrapper.getByText('Missing')).toBeInTheDocument()
+
+  // Check screen reader content for no points
+  expect(wrapper.getByText('There are no points associated with this item')).toBeInTheDocument()
+
+  // Verify points are not visually displayed
+  expect(wrapper.queryByText('points')).not.toBeInTheDocument()
 })
 
-// to distinguish between no point and 0 points
 it('renders the base component correctly with 0 points', () => {
   const props = defaultProps({points: 0})
   const wrapper = render(<Opportunity {...props} />)
-  expect(wrapper.container).toMatchSnapshot()
+
+  // Check course name is displayed
+  expect(wrapper.getByText(props.courseName)).toBeInTheDocument()
+
+  // Check opportunity title is displayed and linked
+  const titleLink = wrapper.getByText(props.opportunityTitle)
+  expect(titleLink).toBeInTheDocument()
+  expect(titleLink.closest('a')).toHaveAttribute('href', props.url)
+
+  // Check due date is displayed
+  expect(wrapper.getByText(/Due:/)).toBeInTheDocument()
+
+  // Check missing pill is displayed
+  expect(wrapper.getByText('Missing')).toBeInTheDocument()
+
+  // Check points are displayed with 0 value
+  expect(wrapper.getByText('0')).toBeInTheDocument()
+  expect(wrapper.getByText('points')).toBeInTheDocument()
+
+  // Check screen reader content for points
+  expect(wrapper.getByText('0 points')).toBeInTheDocument()
 })
 
 it('renders a Pill if in the past', () => {

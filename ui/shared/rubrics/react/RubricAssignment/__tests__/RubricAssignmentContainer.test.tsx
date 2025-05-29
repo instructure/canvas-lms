@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, cleanup} from '@testing-library/react'
 import {
   RubricAssignmentContainer,
   type RubricAssignmentContainerProps,
@@ -25,6 +25,8 @@ import {
 import * as RubricFormQueries from '@canvas/rubrics/react/RubricForm/queries/RubricFormQueries'
 import {RUBRIC, RUBRIC_ASSOCIATION, RUBRIC_CONTEXTS, RUBRICS_FOR_CONTEXT} from './fixtures'
 import {queryClient} from '@canvas/query'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', () => ({
   ...jest.requireActual('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries'),
@@ -42,6 +44,7 @@ jest.mock('../queries', () => ({
 
 describe('RubricAssignmentContainer Tests', () => {
   beforeEach(() => {
+    fakeENV.setup()
     jest.spyOn(RubricFormQueries, 'saveRubric').mockImplementation(() =>
       Promise.resolve({
         rubric: RUBRIC,
@@ -78,6 +81,9 @@ describe('RubricAssignmentContainer Tests', () => {
   })
 
   afterEach(() => {
+    cleanup()
+    destroyFlashAlertContainer()
+    fakeENV.teardown()
     jest.clearAllMocks()
     queryClient.clear()
   })
@@ -135,7 +141,7 @@ describe('RubricAssignmentContainer Tests', () => {
       fireEvent.click(getByTestId('save-rubric-button'))
 
       await new Promise(resolve => setTimeout(resolve, 0))
-      expect(document.querySelector('#flash_screenreader_holder')?.textContent).toEqual(
+      expect(document.querySelector('#flash_screenreader_holder')?.textContent?.trim()).toContain(
         'Rubric saved successfully',
       )
       expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()

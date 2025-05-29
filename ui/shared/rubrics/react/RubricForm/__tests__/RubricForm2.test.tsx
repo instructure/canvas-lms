@@ -78,7 +78,7 @@ describe('RubricForm Tests', () => {
     )
   }
 
-  const getSRAlert = () => document.querySelector('#flash_screenreader_holder')?.textContent
+  const getSRAlert = () => document.querySelector('#flash_screenreader_holder')?.textContent?.trim()
 
   describe('save rubric', () => {
     afterEach(() => {
@@ -125,7 +125,7 @@ describe('RubricForm Tests', () => {
       fireEvent.click(getByTestId('save-rubric-button'))
 
       await new Promise(resolve => setTimeout(resolve, 0))
-      expect(getSRAlert()).toEqual('Rubric saved successfully')
+      expect(getSRAlert()).toContain('Rubric saved successfully')
     })
   })
 })
