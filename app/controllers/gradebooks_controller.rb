@@ -465,6 +465,8 @@ class GradebooksController < ApplicationController
 
   # TODO: stop using this for speedgrader
   def update_submission
+    Rails.logger.info "[SUBMISSION_FIX] GradebooksController#update_submission called by user_id=#{@current_user&.id}"
+    
     if authorized_action(@context, @current_user, :manage_grades)
       if params[:submissions].blank? && params[:submission].blank?
         render nothing: true, status: 400
@@ -516,6 +518,11 @@ class GradebooksController < ApplicationController
 
             submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
             submission.delete(:final) if submission[:final] && !@context.grants_right?(@current_user, :moderate_grades)
+            
+            Rails.logger.info "[SUBMISSION_FIX] Calling grade_student for assignment_id=#{@assignment.id}, " \
+                              "user_id=#{@user.id}, assignment_submission_types='#{@assignment.submission_types}', " \
+                              "submission_params=#{submission.inspect}"
+            
             subs = @assignment.grade_student(@user, submission)
             if submission[:provisional]
               subs.each do |sub|

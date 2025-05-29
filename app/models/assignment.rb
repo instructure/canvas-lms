@@ -415,7 +415,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_student_submissions
-    graded_at = Time.zone.now
+    graded_at = Time.current
     submissions.graded.preload(:user).find_each do |s|
       if grading_type == 'pass_fail' && ['complete', 'pass'].include?(s.grade)
         s.score = points_possible
@@ -1481,7 +1481,7 @@ class Assignment < ActiveRecord::Base
       submission.workflow_state = "graded"
     end
     submission.group = group
-    submission.graded_at = Time.zone.now if did_grade
+    submission.graded_at = Time.current if did_grade
     previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
 
     if opts[:provisional]
@@ -1659,7 +1659,7 @@ class Assignment < ActiveRecord::Base
           :workflow_state => submitted ? "submitted" : "unsubmitted",
           :group => group
         })
-        homework.submitted_at = Time.zone.now
+        homework.submitted_at = Time.current
 
         homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
@@ -2201,7 +2201,7 @@ class Assignment < ActiveRecord::Base
   }
 
   def overdue?
-    due_at && due_at <= Time.zone.now
+    due_at && due_at <= Time.current
   end
 
   def readable_submission_types

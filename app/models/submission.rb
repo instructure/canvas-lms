@@ -1174,14 +1174,21 @@ class Submission < ActiveRecord::Base
     elsif self.late_policy_status_changed? && self.late_policy_status.present?
       self.excused = false
     end
-    self.submitted_at ||= Time.now if self.has_submission?
+    # Only set submitted_at for genuine student submissions, not teacher grading actions
+    # on assignments that don't expect submissions (submission_type 'none')
+    if self.has_submission? && !self.submitted_at && should_set_submitted_at?
+      Rails.logger.info "[SUBMISSION_FIX] Setting submitted_at=#{Time.current} for submission_id=#{id}"
+      self.submitted_at = Time.current
+    elsif self.has_submission? && !self.submitted_at
+      Rails.logger.info "[SUBMISSION_FIX] NOT setting submitted_at for submission_id=#{id} (should_set_submitted_at? returned false)"
+    end
     self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'submitted' if self.unsubmitted? && self.submitted_at
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
     self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
     if self.workflow_state_changed? && self.graded?
-      self.graded_at = Time.now
+      self.graded_at = Time.current
     end
     self.media_comment_id = nil if self.media_comment_id && self.media_comment_id.strip.empty?
     if self.media_comment_id && (self.media_comment_id_changed? || !self.media_object_id)
@@ -1995,7 +2002,7 @@ class Submission < ActiveRecord::Base
     end
 
     def time_of_submission
-      time = submitted_at || Time.zone.now
+      time = submitted_at || Time.current
       time -= 60.seconds if submission_type == 'online_quiz'
       time
     end
@@ -2317,5 +2324,44 @@ class Submission < ActiveRecord::Base
     user_ids = graded_user_ids.to_a
     Rails.logger.info "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
     context.recompute_student_scores(user_ids)
+  end
+
+  private
+
+  # Determines if submitted_at should be set for this submission
+  # Prevents setting submitted_at during teacher grading actions on assignments that don't expect submissions
+  def should_set_submitted_at?
+    assignment_submission_types = assignment&.submission_types
+    
+    # Log context for monitoring
+    Rails.logger.info "[SUBMISSION_FIX] Checking should_set_submitted_at? for submission_id=#{id}, " \
+                      "assignment_id=#{assignment_id}, user_id=#{user_id}, " \
+                      "assignment_submission_types='#{assignment_submission_types}', " \
+                      "grader_id=#{grader_id}, has_body=#{body.present?}, " \
+                      "has_url=#{url.present?}, has_attachments=#{attachment_ids.present? && attachment_ids != ''}"
+    
+    # Always set submitted_at for assignments that expect actual submissions
+    unless assignment_submission_types == 'none'
+      Rails.logger.info "[SUBMISSION_FIX] Assignment expects submissions (type='#{assignment_submission_types}'), allowing submitted_at"
+      return true
+    end
+    
+    # For assignments with submission_type 'none' (teacher graded components),
+    # only set submitted_at if there's actual student content
+    has_student_content = body.present? || url.present? || 
+                         (attachment_ids.present? && attachment_ids != "")
+    
+    # Also check if this is being set during a student submission vs teacher grading
+    # If there's a grader but no student content, this is likely a teacher grading action
+    if grader_id.present? && !has_student_content
+      Rails.logger.info "[SUBMISSION_FIX] Teacher grading action detected (grader_id=#{grader_id}, no student content), preventing submitted_at"
+      return false
+    end
+    
+    # Log the decision for other cases
+    Rails.logger.info "[SUBMISSION_FIX] Allowing submitted_at (has_student_content=#{has_student_content})"
+    
+    # Default to true for other cases to preserve existing behavior
+    true
   end
 end
