@@ -98,7 +98,7 @@ class Announcement < DiscussionTopic
                             record.changed_state(:active, :unpublished) ||
                             record.changed_state(:active, :post_delayed)
 
-      record.send_notification_for_context? && is_new_announcement
+      record.send_notification_for_context? && (is_new_announcement || record.notify_users)
     end
     data { course_broadcast_data }
   end
