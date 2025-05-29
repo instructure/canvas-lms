@@ -876,7 +876,9 @@ type AssignmentOverride implements Timestamped {
   """
   _id: ID
   allDay: Boolean
+  allDayDate: DateTime
   assignment: Assignment
+  assignmentId: ID
   contextModule: Module
   createdAt: DateTime
   dueAt: DateTime
