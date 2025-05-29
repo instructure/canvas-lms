@@ -277,6 +277,7 @@ export interface EnvCommon {
   top_navigation_tools: Tool[]
 
   BLUEPRINT_COURSES_DATA: BlueprintCoursesData | undefined
+  AI_FEEDBACK_LINK?: string
 }
 
 /**

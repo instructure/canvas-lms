@@ -149,6 +149,7 @@ export const RubricForm = ({
   const [showGenerateCriteriaForm, setShowGenerateCriteriaForm] = useState(
     aiRubricsEnabled && !!assignmentId && !rubric?.id,
   )
+  const [showGenerateCriteriaHeader, setShowGenerateCriteriaHeader] = useState(false)
   const [currentProgress, setCurrentProgress] = useState<CanvasProgress>()
   const criteriaRef = useRef(rubricForm.criteria)
 
@@ -357,6 +358,7 @@ export const RubricForm = ({
         })),
       ]
       setShowGenerateCriteriaForm(false)
+      setShowGenerateCriteriaHeader(true)
       setRubricFormField('criteria', newCriteria)
       setRubricFormField('pointsPossible', calcPointsPossible(newCriteria))
     } else if (progress.workflow_state === 'failed') {
@@ -740,6 +742,41 @@ export const RubricForm = ({
                     </Button>
                   </span>
                 </Flex.Item>
+              </Flex>
+            </View>
+          )}
+
+          {showGenerateCriteriaHeader && (
+            <View
+              as="div"
+              margin="medium 0 small 0"
+              padding="small"
+              borderRadius="medium"
+              background="secondary"
+              data-testid="generate-criteria-header"
+            >
+              <Flex gap="medium">
+                <Flex.Item>
+                  <Heading level="h4">
+                    <Flex alignItems="center" gap="small">
+                      <IgniteAiIcon />
+                      <Text>{I18n.t('Auto-Generate Criteria')}</Text>
+                    </Flex>
+                  </Heading>
+                </Flex.Item>
+                <Flex.Item shouldGrow={true}></Flex.Item>
+                {window.ENV.AI_FEEDBACK_LINK && (
+                  <Flex.Item>
+                    <a
+                      data-testid="give-feedback-link"
+                      href={window.ENV.AI_FEEDBACK_LINK}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {I18n.t('Give Feedback')}
+                    </a>
+                  </Flex.Item>
+                )}
               </Flex>
             </View>
           )}
