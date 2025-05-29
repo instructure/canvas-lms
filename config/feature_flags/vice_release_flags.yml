@@ -192,3 +192,10 @@ discussion_insights:
   display_name: Discussion Insights
   description: |-
     Allow access to discussion insights
+
+discussion_ai_survey_link:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Discussion AI survey link
+  description: |-
+    Displays a survey link for Discussion Translate and Discussion Insights
