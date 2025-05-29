@@ -4788,6 +4788,8 @@ el:
     link_validator: 
       link_validator: "Λειτουργία Επικύρωσης Συνδέσμων Μαθήματος"
       page_title: "Λειτουργία Επικύρωσης Συνδέσμων Μαθήματος"
+    links: 
+      student_progress: "Εμφάνιση Προόδου"
     master_course_restrictions: 
       labels: 
         due_dates: "Καταληκτικές Ημερομηνίες"
@@ -10740,6 +10742,7 @@ el:
       create_failed: "Αποτυχία δημιουργίας σχολίου"
   page_name_21defa75: "Όνομα Σελίδας"
   page_not_found_2b0d05f5: "Η Σελίδα δεν βρέθηκε"
+  page_title_106304bb: "Τίτλος Σελίδας"
   page_title_d1a22bbf: "Τίτλος Σελίδας"
   page_views: 
     browsers: 
