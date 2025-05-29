@@ -108,6 +108,15 @@ k20_lti_usage:
   root_opt_in: true
   beta: true
   shadow: true
+title_iv_financial_aid_report:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Financial Aid Compliance
+  description:
+    title-iv-financial-aid-report: Enables the Intelligent Insights - Financial Aid Compliance feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
 
 # Intelligent Insights - Provided through Ask Your Data LTI App
 advanced_analytics_ask_questions:
