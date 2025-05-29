@@ -127,8 +127,8 @@ describe('DifferentiationTagModalForm', () => {
       renderComponent({mode: CREATE_MODE})
 
       const initialInputs = screen.getAllByLabelText(/Tag Name/i)
-      await user.click(screen.getByLabelText('+ Add another tag'))
-      await user.click(screen.getByLabelText('+ Add another tag'))
+      await user.click(screen.getByLabelText('Add another tag'))
+      await user.click(screen.getByLabelText('Add another tag'))
       const newInputs = screen.getAllByLabelText(/Tag Name/i)
 
       expect(newInputs).toHaveLength(initialInputs.length + 2)
