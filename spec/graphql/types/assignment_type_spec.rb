@@ -40,6 +40,12 @@ describe Types::AssignmentType do
   let(:teacher_assignment_type) { GraphQLTypeTester.new(assignment, current_user: teacher) }
   let(:admin_user_assignment_type) { GraphQLTypeTester.new(assignment, current_user: admin_user) }
 
+  let(:assignment_visibility) do
+    AssignmentVisibility::AssignmentVisibilityService.users_with_visibility_by_assignment(
+      course_id: course.id, user_ids: [student.id], assignment_ids: [assignment.id]
+    )[assignment.id].map(&:to_s)
+  end
+
   it "works" do
     expect(assignment_type.resolve("_id")).to eq assignment.id.to_s
     expect(assignment_type.resolve("name")).to eq assignment.name
@@ -1427,6 +1433,16 @@ describe Types::AssignmentType do
           expect(result).to match_array(assignment.submissions.pluck(:anonymous_id))
         end
       end
+    end
+  end
+
+  describe "assignmentVisibility" do
+    it "returns assignment visiblity for teachers" do
+      expect(teacher_assignment_type.resolve("assignmentVisibility")).to eq assignment_visibility
+    end
+
+    it "returns nil as assignment visiblity for non-authorized users" do
+      expect(assignment_type.resolve("assignmentVisibility")).to be_nil
     end
   end
 end
