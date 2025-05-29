@@ -57,13 +57,15 @@ describe('ModuleItemsStore', () => {
 
       it('should handle when localStorage is not available', () => {
         const originalLocalStorage = global.localStorage
+        // Temporarily set localStorage to undefined to simulate it not being available
         // @ts-expect-error
-        delete global.localStorage
+        global.localStorage = undefined
 
         expect(() => {
           store.getPageNumber(moduleId)
         }).not.toThrow()
 
+        // Restore localStorage
         global.localStorage = originalLocalStorage
       })
     })
@@ -94,13 +96,15 @@ describe('ModuleItemsStore', () => {
 
       it('should handle when localStorage is not available', () => {
         const originalLocalStorage = global.localStorage
+        // Temporarily set localStorage to undefined to simulate it not being available
         // @ts-expect-error
-        delete global.localStorage
+        global.localStorage = undefined
 
         expect(() => {
           store.setPageNumber(moduleId, 2)
         }).not.toThrow()
 
+        // Restore localStorage
         global.localStorage = originalLocalStorage
       })
     })
@@ -121,13 +125,15 @@ describe('ModuleItemsStore', () => {
 
       it('should handle when localStorage is not available', () => {
         const originalLocalStorage = global.localStorage
+        // Temporarily set localStorage to undefined to simulate it not being available
         // @ts-expect-error
-        delete global.localStorage
+        global.localStorage = undefined
 
         expect(() => {
           store.removePageNumber(moduleId)
         }).not.toThrow()
 
+        // Restore localStorage
         global.localStorage = originalLocalStorage
       })
     })
@@ -154,13 +160,15 @@ describe('ModuleItemsStore', () => {
 
       it('should handle when localStorage is not available', () => {
         const originalLocalStorage = global.localStorage
+        // Temporarily set localStorage to undefined to simulate it not being available
         // @ts-expect-error
-        delete global.localStorage
+        global.localStorage = undefined
 
         expect(() => {
           store.getShowAll(moduleId)
         }).not.toThrow()
 
+        // Restore localStorage
         global.localStorage = originalLocalStorage
       })
     })
@@ -189,13 +197,15 @@ describe('ModuleItemsStore', () => {
 
       it('should handle when localStorage is not available', () => {
         const originalLocalStorage = global.localStorage
+        // Temporarily set localStorage to undefined to simulate it not being available
         // @ts-expect-error
-        delete global.localStorage
+        global.localStorage = undefined
 
         expect(() => {
           store.setShowAll(moduleId, true)
         }).not.toThrow()
 
+        // Restore localStorage
         global.localStorage = originalLocalStorage
       })
     })
