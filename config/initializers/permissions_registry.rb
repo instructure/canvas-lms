@@ -1706,6 +1706,15 @@ Rails.application.config.to_prepare do
         account_only: true,
         account_allows: ->(a) { a.feature_enabled?(:k20_lti_usage) }
       },
+      view_title_iv_financial_aid_report: {
+        label: -> { I18n.t("Financial Aid Compliance") },
+        group: "view_advanced_analytics",
+        group_label: -> { I18n.t("Intelligent Insights") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_only: true,
+        account_allows: ->(a) { a.feature_enabled?(:title_iv_financial_aid_report) }
+      },
       manage_impact: {
         label: -> { I18n.t("Manage Impact") },
         label_v2: -> { I18n.t("Impact - Manage") },
