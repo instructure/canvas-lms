@@ -6366,6 +6366,7 @@ uk:
   delete_grading_scheme_6b308832: "Видалити схему оцінювання"
   delete_group_86c381ec: "Видалити групу"
   delete_my_account_41060aad: "Видалити мій обліковий запис"
+  delete_name_81c1b5b2: "Видалити %{name}"
   delete_outcome_cc6546f1: "Видалити результати"
   delete_outcome_group_6b399d34: "Видалити результати групи"
   delete_quiz_142b8099: "Видалити контрольну роботу"
