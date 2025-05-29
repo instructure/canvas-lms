@@ -30,6 +30,7 @@ import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobal
 import StudentViewContext from '../Context'
 import StudentContent from '../StudentContent'
 import ContextModuleApi from '../../apis/ContextModuleApi'
+import {withSubmissionContext} from '../../test-utils/submission-context'
 
 injectGlobalAlertContainers()
 
@@ -86,7 +87,10 @@ describe('Assignment Student Content View', () => {
     const props = await mockAssignmentAndSubmission()
     const {getByTestId} = render(
       <MockedProvider>
-        <StudentContent {...props} />
+        {withSubmissionContext(<StudentContent {...props} />, {
+          assignmentId: '1',
+          submissionId: '1',
+        })}
       </MockedProvider>,
     )
     expect(getByTestId('assignments-2-student-view')).toBeInTheDocument()
@@ -124,7 +128,10 @@ describe('Assignment Student Content View', () => {
 
     const {getByTestId} = render(
       <MockedProvider mocks={mocks}>
-        <StudentContent {...props} />
+        {withSubmissionContext(<StudentContent {...props} />, {
+          assignmentId: '1',
+          submissionId: '1',
+        })}
       </MockedProvider>,
     )
     expect(getByTestId('assignment-student-header')).toBeInTheDocument()
@@ -134,7 +141,10 @@ describe('Assignment Student Content View', () => {
     const props = await mockAssignmentAndSubmission()
     const {getByText, queryByText} = render(
       <MockedProvider>
-        <StudentContent {...props} />
+        {withSubmissionContext(<StudentContent {...props} />, {
+          assignmentId: '1',
+          submissionId: '1',
+        })}
       </MockedProvider>,
     )
     expect(getByText('Details')).toBeInTheDocument()
@@ -146,7 +156,10 @@ describe('Assignment Student Content View', () => {
     const props = await mockAssignmentAndSubmission({Submission: {sticker: 'apple'}})
     const {getByRole} = render(
       <MockedProvider>
-        <StudentContent {...props} />
+        {withSubmissionContext(<StudentContent {...props} />, {
+          assignmentId: '1',
+          submissionId: '1',
+        })}
       </MockedProvider>,
     )
 
@@ -159,7 +172,10 @@ describe('Assignment Student Content View', () => {
     const props = await mockAssignmentAndSubmission()
     const {queryByRole} = render(
       <MockedProvider>
-        <StudentContent {...props} />
+        {withSubmissionContext(<StudentContent {...props} />, {
+          assignmentId: '1',
+          submissionId: '1',
+        })}
       </MockedProvider>,
     )
 
@@ -172,7 +188,10 @@ describe('Assignment Student Content View', () => {
     const props = await mockAssignmentAndSubmission({Submission: {sticker: 'apple'}})
     const {queryByRole} = render(
       <MockedProvider>
-        <StudentContent {...props} />
+        {withSubmissionContext(<StudentContent {...props} />, {
+          assignmentId: '1',
+          submissionId: '1',
+        })}
       </MockedProvider>,
     )
     const sticker = queryByRole('button', {name: 'A sticker with a picture of an apple.'})
@@ -197,7 +216,10 @@ describe('Assignment Student Content View', () => {
         value={{lastSubmittedSubmission: props.submission, latestSubmission: props.submission}}
       >
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>
       </StudentViewContext.Provider>,
     )
@@ -229,7 +251,10 @@ describe('Assignment Student Content View', () => {
         value={{lastSubmittedSubmission, latestSubmission: props.submission}}
       >
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>
       </StudentViewContext.Provider>,
     )
@@ -262,7 +287,10 @@ describe('Assignment Student Content View', () => {
         value={{lastSubmittedSubmission, latestSubmission: props.submission}}
       >
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>
       </StudentViewContext.Provider>,
     )
@@ -295,7 +323,10 @@ describe('Assignment Student Content View', () => {
         value={{lastSubmittedSubmission, latestSubmission: props.submission}}
       >
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>
       </StudentViewContext.Provider>,
     )
@@ -310,7 +341,10 @@ describe('Assignment Student Content View', () => {
     props.allSubmissions = [props.submission]
     const {queryByTestId} = render(
       <MockedProvider>
-        <StudentContent {...props} />
+        {withSubmissionContext(<StudentContent {...props} />, {
+          assignmentId: '1',
+          submissionId: '1',
+        })}
       </MockedProvider>,
     )
     expect(queryByTestId('attemptSelect')).toBeInTheDocument()
@@ -321,7 +355,10 @@ describe('Assignment Student Content View', () => {
     props.allSubmissions = [{id: '1', _id: '1'}]
     const {queryByTestId} = render(
       <MockedProvider>
-        <StudentContent {...props} />
+        {withSubmissionContext(<StudentContent {...props} />, {
+          assignmentId: '1',
+          submissionId: '1',
+        })}
       </MockedProvider>,
     )
     expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()

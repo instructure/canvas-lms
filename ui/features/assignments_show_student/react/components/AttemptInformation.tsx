@@ -238,7 +238,7 @@ export default ({
 
               {assignment.env.currentUser && !lockAssignment && !peerReviewModeEnabled && (
                 <Flex.Item>
-                  <SubmissionWorkflowTracker submission={submission} />
+                  <SubmissionWorkflowTracker />
                 </Flex.Item>
               )}
 
