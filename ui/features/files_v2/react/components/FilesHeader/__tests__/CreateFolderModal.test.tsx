@@ -46,10 +46,12 @@ describe('CreateFolderModal', () => {
   beforeEach(() => {
     fakeENV.setup()
     jest.clearAllMocks()
+    fetchMock.reset()
     fetchMock.post(/.*\/folders/, 200)
   })
 
   afterEach(() => {
+    fetchMock.reset()
     fetchMock.restore()
     fakeENV.teardown()
   })
