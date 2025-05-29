@@ -53,7 +53,7 @@ export type AssignmentsState = {
   assignmentMap: AssignmentMap
 }
 
-type AssignmentLoaderParams = {
+export type AssignmentLoaderParams = {
   include: string[]
   override_assignment_dates: boolean
   hide_zero_point_quizzes: boolean
