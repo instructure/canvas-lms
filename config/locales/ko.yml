@@ -5020,6 +5020,7 @@ ko:
   delete_failed_6285e600: "삭제 실패"
   delete_grading_scheme_6b308832: "평가 구성표 삭제"
   delete_my_account_41060aad: "내 계정 삭제"
+  delete_name_81c1b5b2: "%{name} 삭제"
   delete_quiz_142b8099: "퀴즈 삭제"
   delete_sub_account_c267a6e5: "하위 계정 삭제"
   delete_survey_56fddbbd: "설문 삭제"
