@@ -19,14 +19,11 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
 import {render} from '@testing-library/react'
-import {
-  mockAssignmentAndSubmission,
-  mockQuery,
-  mockSubmission,
-} from '@canvas/assignments/graphql/studentMocks'
+import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import StudentContent from '../StudentContent'
 import ContextModuleApi from '../../apis/ContextModuleApi'
+import {withSubmissionContext} from '../../test-utils/submission-context'
 
 injectGlobalAlertContainers()
 
@@ -71,7 +68,10 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.originalityReportsForA2Enabled = true
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).toBeInTheDocument()
@@ -93,7 +93,10 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.originalityReportsForA2Enabled = false
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
@@ -120,7 +123,10 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.originalityReportsForA2Enabled = true
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
@@ -147,7 +153,10 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.originalityReportsForA2Enabled = true
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).toBeInTheDocument()
@@ -178,7 +187,10 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.originalityReportsForA2Enabled = true
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).toBeInTheDocument()
@@ -226,7 +238,10 @@ describe('Assignment Student Content View', () => {
       ]
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
@@ -237,7 +252,10 @@ describe('Assignment Student Content View', () => {
       props.allSubmissions = [{id: '1', _id: '1'}]
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
@@ -248,7 +266,10 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.currentUser = null
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
@@ -259,7 +280,10 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.modulePrereq = 'simulate not null'
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
@@ -270,7 +294,10 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.unlockDate = 'soon'
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
@@ -282,7 +309,10 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.unlockDate = 'soon'
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
@@ -303,7 +333,10 @@ describe('Assignment Student Content View', () => {
     it('not renders the anonymous label', () => {
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('assignment-student-anonymous-label')).not.toBeInTheDocument()
@@ -324,7 +357,10 @@ describe('Assignment Student Content View', () => {
     it('not renders the anonymous label', () => {
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('assignment-student-anonymous-label')).not.toBeInTheDocument()
@@ -346,7 +382,10 @@ describe('Assignment Student Content View', () => {
       props.submission.gradedAnonymously = true
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('assignment-student-anonymus-label')).toHaveTextContent(
@@ -358,7 +397,10 @@ describe('Assignment Student Content View', () => {
       props.submission.gradedAnonymously = false
       const {queryByTestId} = render(
         <MockedProvider>
-          <StudentContent {...props} />
+          {withSubmissionContext(<StudentContent {...props} />, {
+            assignmentId: '1',
+            submissionId: '1',
+          })}
         </MockedProvider>,
       )
       expect(queryByTestId('assignment-student-anonymus-label')).toHaveTextContent(
