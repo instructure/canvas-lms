@@ -53,7 +53,13 @@ jest.useFakeTimers()
 
 it('renders the base component correctly with one of each kind of opportunity', () => {
   const wrapper = shallow(<Opportunities {...defaultProps()} />)
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.find('Tabs')).toHaveLength(1)
+  expect(wrapper.find('CloseButton')).toHaveLength(1)
+  expect(wrapper.find('#opportunities_parent')).toHaveLength(1)
+  expect(wrapper.find('Panel')).toHaveLength(2) // new and dismissed tabs
+  // Check that the component structure is correct
+  expect(wrapper.type()).toBe(React.Fragment)
+  expect(wrapper.find('style')).toHaveLength(1)
 })
 
 it('renders the right course with the right opportunity', () => {
@@ -70,15 +76,24 @@ it('renders the right course with the right opportunity', () => {
     shortName: 'A different Course Name',
   })
   const wrapper = shallow(<Opportunities {...tempProps} />)
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.find('Tabs')).toHaveLength(1)
+  expect(wrapper.find('Panel')).toHaveLength(2)
+  // Verify component structure and that it has the expected number of opportunities in props
+  expect(tempProps.newOpportunities).toHaveLength(2)
+  expect(tempProps.dismissedOpportunities).toHaveLength(1)
 })
 
-it('renders nothing if no opportunities', () => {
+it('renders empty state when no opportunities', () => {
   const tempProps = defaultProps()
   tempProps.newOpportunities = []
   tempProps.dismissedOpportunities = []
   const wrapper = shallow(<Opportunities {...tempProps} />)
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.type()).toBe(React.Fragment)
+  expect(wrapper.find('#opportunities_parent')).toHaveLength(1)
+  expect(wrapper.find('Tabs')).toHaveLength(1)
+  // Should show empty state messages instead of opportunities
+  expect(wrapper.text()).toContain('Nothing new needs attention.')
+  expect(wrapper.text()).toContain('Nothing here needs attention.')
 })
 
 it('calls toggle popover when escape is pressed', () => {

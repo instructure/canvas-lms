@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-// eslint-disable-next-line import/no-named-as-default
+
 import DashboardHeader, {observerMode} from './DashboardHeader'
 
 import {useFetchDashboardCards} from '../../../shared/dashboard-card/dashboardCardQueries'

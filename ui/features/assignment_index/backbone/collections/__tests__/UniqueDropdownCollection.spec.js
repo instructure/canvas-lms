@@ -38,9 +38,9 @@ describe('UniqueDropdownCollection', () => {
   })
 
   test('#initialize', () => {
-    expect(coll.length).toBe(records.length)
-    expect(coll.takenValues.length).toBe(3)
-    expect(coll.availableValues.length).toBe(1)
+    expect(coll).toHaveLength(records.length)
+    expect(coll.takenValues).toHaveLength(3)
+    expect(coll.availableValues).toHaveLength(1)
     expect(coll.availableValues instanceof Backbone.Collection).toBe(true)
   })
 
@@ -80,8 +80,8 @@ describe('UniqueDropdownCollection', () => {
 
     coll.add({})
 
-    expect(coll.availableValues.length).toBe(0)
-    expect(coll.takenValues.length).toBe(4)
+    expect(coll.availableValues).toHaveLength(0)
+    expect(coll.takenValues).toHaveLength(4)
     expect(coll.takenValues.get('4') instanceof Backbone.Model).toBe(true)
     expect(coll.at(coll.length - 1).get('state')).toBe('4')
   })
@@ -119,8 +119,8 @@ describe('UniqueDropdownCollection, lazy setup', () => {
   })
 
   test('reset of collection recalculates availableValues', () => {
-    expect(coll.availableValues.length).toBe(4)
+    expect(coll.availableValues).toHaveLength(4)
     coll.reset(records)
-    expect(coll.availableValues.length).toBe(1)
+    expect(coll.availableValues).toHaveLength(1)
   })
 })

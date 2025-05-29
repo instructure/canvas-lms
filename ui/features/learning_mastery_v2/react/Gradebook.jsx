@@ -74,7 +74,6 @@ const Gradebook = ({
           elementRef={el => (headerRow.current = el)}
         >
           {outcomes.map((outcome, index) => (
-            // eslint-disable-next-line react/no-array-index-key
             <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`} key={`${outcome.id}.${index}`}>
               <OutcomeHeader outcome={outcome} />
             </Flex.Item>

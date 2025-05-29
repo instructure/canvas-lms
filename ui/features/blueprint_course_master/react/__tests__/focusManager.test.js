@@ -27,19 +27,19 @@ describe('FocusManager', () => {
 
   test('allocateNext() adds on to items', () => {
     const manager = new FocusManager()
-    expect(manager.items.length).toBe(0)
+    expect(manager.items).toHaveLength(0)
 
     manager.allocateNext()
     manager.allocateNext()
 
-    expect(manager.items.length).toBe(2)
+    expect(manager.items).toHaveLength(2)
   })
 
   test('allocateNext() returns an appropriate register ref function', () => {
     const manager = new FocusManager()
     const nextNode = manager.allocateNext()
     nextNode.ref({name: 'foo'})
-    expect(manager.items.length).toBe(1)
+    expect(manager.items).toHaveLength(1)
     expect(manager.items[0]).toEqual({name: 'foo'})
   })
 
@@ -47,16 +47,16 @@ describe('FocusManager', () => {
     const manager = new FocusManager()
     manager.allocateNext()
 
-    expect(manager.items.length).toBe(1)
+    expect(manager.items).toHaveLength(1)
     manager.reset()
-    expect(manager.items.length).toBe(0)
+    expect(manager.items).toHaveLength(0)
   })
 
   test('registerItem() sets a node at an index', () => {
     const manager = new FocusManager()
     manager.registerItem({name: 'foo'}, 0)
 
-    expect(manager.items.length).toBe(1)
+    expect(manager.items).toHaveLength(1)
     expect(manager.items[0]).toEqual({name: 'foo'})
   })
 
@@ -65,7 +65,7 @@ describe('FocusManager', () => {
     const ref = manager.registerItemRef(0)
     ref({name: 'foo'})
 
-    expect(manager.items.length).toBe(1)
+    expect(manager.items).toHaveLength(1)
     expect(manager.items[0]).toEqual({name: 'foo'})
   })
 

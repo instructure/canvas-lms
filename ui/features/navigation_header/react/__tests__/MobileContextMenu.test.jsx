@@ -98,7 +98,7 @@ describe('MobileContextMenu', () => {
     const iconOff = container.querySelectorAll("svg[name='IconOff']")
     expect(getByText('Discussions')).toBeVisible()
     expect(getByText('- Disabled. Not visible to students.')).toBeVisible()
-    expect(iconOff.length).toEqual(3)
+    expect(iconOff).toHaveLength(3)
     expect(iconOff[0]).toBeVisible()
   })
 
@@ -107,7 +107,7 @@ describe('MobileContextMenu', () => {
     await waitFor(() => getAllByRole('link'))
     const iconOff = container.querySelectorAll("svg[name='IconOff']")
     expect(getByText('Grades')).toBeVisible()
-    expect(iconOff.length).toEqual(3)
+    expect(iconOff).toHaveLength(3)
     expect(iconOff[1]).toBeVisible()
   })
 
@@ -116,7 +116,7 @@ describe('MobileContextMenu', () => {
     await waitFor(() => getAllByRole('link'))
     const iconOff = container.querySelectorAll("svg[name='IconOff']")
     expect(getByText('DIG')).toBeVisible()
-    expect(iconOff.length).toEqual(3)
+    expect(iconOff).toHaveLength(3)
     expect(iconOff[2]).toBeVisible()
   })
 })

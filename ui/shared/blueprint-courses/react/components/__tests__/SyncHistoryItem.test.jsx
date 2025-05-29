@@ -56,7 +56,7 @@ describe('SyncHistoryItem component', () => {
     props.ChangeComponent = () => <div className="test-change" />
     const tree = render(<SyncHistoryItem {...props} />)
     const node = tree.container.querySelectorAll('.bcs__history-item .test-change')
-    expect(node.length).toEqual(props.migration.changes.length)
+    expect(node).toHaveLength(props.migration.changes.length)
   })
 
   test('includes the name of the person who started the sync', () => {

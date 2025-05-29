@@ -23,7 +23,16 @@ import ShowOnFocusButton from '../index'
 it('renders a ScreenReaderContent by default', () => {
   const wrapper = shallow(<ShowOnFocusButton>Button</ShowOnFocusButton>)
 
-  expect(wrapper).toMatchSnapshot()
+  // Should render ScreenReaderContent as the root element
+  expect(wrapper.find('ScreenReaderContent').exists()).toBe(true)
+  expect(wrapper.find('ScreenReaderContent').prop('data-testid')).toBe('screenreader-content')
+
+  // Should contain a Link component configured as a button
+  const link = wrapper.find('Link')
+  expect(link.exists()).toBe(true)
+  expect(link.prop('as')).toBe('button')
+  expect(link.prop('isWithinText')).toBe(false)
+  expect(link.children().text()).toBe('Button')
 })
 
 it('renders a Button when it has focus', () => {

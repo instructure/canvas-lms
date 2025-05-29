@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-throw-literal */
-
 import I18n from '@canvas/i18n'
 import enTranslations from 'translations/en.json'
 

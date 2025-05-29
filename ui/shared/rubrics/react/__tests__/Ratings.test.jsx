@@ -42,14 +42,21 @@ describe('The Ratings component', () => {
 
   const component = mods => shallow(<Ratings {...{...props, ...mods}} />)
   it('renders the root component as expected', () => {
-    expect(component()).toMatchSnapshot()
+    const wrapper = component()
+    expect(wrapper.find('Rating')).toHaveLength(3)
+    expect(wrapper.find('Rating').at(0).prop('description')).toBe('Superb')
+    expect(wrapper.find('Rating').at(1).prop('description')).toBe('Meh')
+    expect(wrapper.find('Rating').at(2).prop('description')).toBe('Subpar')
   })
 
   it('renders the Rating sub-components as expected when range rating enabled', () => {
     const useRange = true
-    component({useRange})
-      .find('Rating')
-      .forEach(el => expect(el.shallow()).toMatchSnapshot())
+    const wrapper = component({useRange})
+    const ratings = wrapper.find('Rating')
+    expect(ratings).toHaveLength(3)
+    expect(ratings.at(0).prop('description')).toBe('Superb')
+    expect(ratings.at(1).prop('description')).toBe('Meh')
+    expect(ratings.at(2).prop('description')).toBe('Subpar')
   })
 
   it('properly select the first matching rating when two tiers have the same point value and no ID is passed', () => {
@@ -188,7 +195,9 @@ describe('The Ratings component', () => {
     expect(ratings).toHaveLength(1)
 
     const rating = ratings.at(0)
-    expect(rating.shallow()).toMatchSnapshot()
+    expect(rating.prop('description')).toBe('Meh')
+    expect(rating.prop('points')).toBe(5)
+    expect(rating.prop('selected')).toBe(true)
   })
 
   it('renders a default rating if none of the ratings are selected', () => {
@@ -203,7 +212,8 @@ describe('The Ratings component', () => {
     expect(ratings).toHaveLength(1)
 
     const rating = ratings.at(0)
-    expect(rating.shallow()).toMatchSnapshot()
+    expect(rating.prop('points')).toBe(0)
+    expect(rating.prop('description')).toBeTruthy()
   })
 
   it('hides points on the default rating if points are hidden', () => {

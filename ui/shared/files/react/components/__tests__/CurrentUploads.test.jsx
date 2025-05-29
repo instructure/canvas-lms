@@ -36,7 +36,7 @@ describe('CurrentUploads', () => {
     UploadQueue.onChange()
     expect(getByText('name')).toBeInTheDocument()
     expect(getByText('other')).toBeInTheDocument()
-    expect(getAllByRole('progressbar').length).toEqual(2)
+    expect(getAllByRole('progressbar')).toHaveLength(2)
   })
 
   it('responds to changes in progress', () => {

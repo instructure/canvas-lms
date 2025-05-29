@@ -127,7 +127,7 @@ it('does focus action before other operations', () => {
   elt.getBoundingClientRect.mockReturnValue({top: 10, left: 0, bottom: 20, right: 42})
   animator.scrollTo(elt, 42)
   animator.focusElement(elt)
-  expect(mocks.window.queue.length).toBe(2)
+  expect(mocks.window.queue).toHaveLength(2)
   expect(elt.focus).not.toHaveBeenCalled()
   mocks.window.queue[0]()
   expect(elt.focus).toHaveBeenCalled()

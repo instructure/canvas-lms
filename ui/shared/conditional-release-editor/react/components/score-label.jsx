@@ -24,7 +24,6 @@ import {transformScore} from '../score-helpers'
 
 const {string, object, bool} = PropTypes
 
-// eslint-disable-next-line react/prefer-stateless-function
 export default class ScoreLabel extends React.Component {
   static get propTypes() {
     return {

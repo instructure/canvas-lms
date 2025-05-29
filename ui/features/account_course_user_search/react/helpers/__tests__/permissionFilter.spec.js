@@ -29,7 +29,7 @@ describe('Permissions Filter Helper Function', () => {
     const permissions = {}
     const results = applyPermissions(items, permissions)
 
-    expect(results.length).toBe(1) // item is not filtered
+    expect(results).toHaveLength(1) // item is not filtered
   })
 
   test('User permissions fully match item permissions', () => {
@@ -46,7 +46,7 @@ describe('Permissions Filter Helper Function', () => {
 
     const results = applyPermissions(items, permissions)
 
-    expect(results.length).toBe(1) // item is not filtered
+    expect(results).toHaveLength(1) // item is not filtered
   })
 
   test('User permissions partially match item permissions', () => {
@@ -62,7 +62,7 @@ describe('Permissions Filter Helper Function', () => {
 
     const results = applyPermissions(items, permissions)
 
-    expect(results.length).toBe(0) // item is filtered
+    expect(results).toHaveLength(0) // item is filtered
   })
 
   test('User permissions fully mismatch required permissions', () => {
@@ -75,6 +75,6 @@ describe('Permissions Filter Helper Function', () => {
     const permissions = {}
     const results = applyPermissions(items, permissions)
 
-    expect(results.length).toBe(0) // item is filtered
+    expect(results).toHaveLength(0) // item is filtered
   })
 })

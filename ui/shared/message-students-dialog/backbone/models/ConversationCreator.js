@@ -30,7 +30,7 @@ ConversationCreator.prototype.save = function (data, saveOpts) {
     const chunkData = {...data, recipients: chunk}
     return new Conversation().save(chunkData, saveOpts)
   })
-  // eslint-disable-next-line prefer-spread
+
   return $.when.apply($, xhrs)
 }
 

@@ -50,7 +50,7 @@ describe('MigrationOptions component', () => {
   test('renders the course-settings and notification-enable checkboxes', () => {
     const tree = render(<MigrationOptions {...defaultProps} />)
     const checkboxes = tree.container.querySelectorAll('input[type="checkbox"]')
-    expect(checkboxes.length).toEqual(2)
+    expect(checkboxes).toHaveLength(2)
     expect(checkboxes[0].checked).toEqual(false)
     expect(checkboxes[1].checked).toEqual(false)
   })
@@ -60,7 +60,7 @@ describe('MigrationOptions component', () => {
     props.itemNotificationFeatureEnabled = true
     const tree = render(<MigrationOptions {...props} />)
     const checkboxes = tree.container.querySelectorAll('input[type="checkbox"]')
-    expect(checkboxes.length).toEqual(3)
+    expect(checkboxes).toHaveLength(3)
     expect(checkboxes[2].checked).toEqual(false)
   })
 

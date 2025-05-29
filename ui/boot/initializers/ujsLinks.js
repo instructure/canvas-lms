@@ -47,7 +47,6 @@ function allowAction(element) {
   const message = element.data('confirm')
   if (!message) return true
 
-  // eslint-disable-next-line no-alert
   return window.confirm(message)
 }
 

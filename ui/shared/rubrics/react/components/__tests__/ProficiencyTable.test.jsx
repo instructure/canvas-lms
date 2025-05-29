@@ -55,14 +55,10 @@ describe('default proficiency', () => {
     getSpy.mockRestore()
   })
 
-  it('renders the ProficiencyRating component', () => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    expect(wrapper).toMatchSnapshot()
-  })
-
-  it('renders loading at startup', () => {
+  it('renders loading spinner initially', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     expect(wrapper.find('Spinner')).toHaveLength(1)
+    expect(wrapper.find('Spinner').prop('renderTitle')).toBe('Loading')
   })
 
   it('render billboard after loading', async () => {

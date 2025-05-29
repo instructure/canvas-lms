@@ -62,22 +62,22 @@ describe('Filterable', () => {
   })
 
   test("hides items that don't match the filter", () => {
-    expect(view.$list.children().length).toBe(2)
-    expect(view.$list.children('.hidden').length).toBe(0)
+    expect(view.$list.children()).toHaveLength(2)
+    expect(view.$list.children('.hidden')).toHaveLength(0)
 
     view.$filter.val('b')
     view.$filter.trigger('input')
-    expect(view.$list.children().length).toBe(2)
-    expect(view.$list.children('.hidden').length).toBe(1)
+    expect(view.$list.children()).toHaveLength(2)
+    expect(view.$list.children('.hidden')).toHaveLength(1)
 
     view.$filter.val('bb')
     view.$filter.trigger('input')
-    expect(view.$list.children().length).toBe(2)
-    expect(view.$list.children('.hidden').length).toBe(2)
+    expect(view.$list.children()).toHaveLength(2)
+    expect(view.$list.children('.hidden')).toHaveLength(2)
 
     view.$filter.val('B')
     view.$filter.trigger('input')
-    expect(view.$list.children().length).toBe(2)
-    expect(view.$list.children('.hidden').length).toBe(1)
+    expect(view.$list.children()).toHaveLength(2)
+    expect(view.$list.children('.hidden')).toHaveLength(1)
   })
 })

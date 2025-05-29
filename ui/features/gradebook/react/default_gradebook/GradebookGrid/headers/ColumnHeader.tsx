@@ -44,7 +44,7 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
 
     this.state = {
       // @ts-expect-error
-      hasFocus: false, // eslint-disable-line react/no-unused-state
+      hasFocus: false,
       menuShown: false,
       skipFocusOnClose: false,
     }
@@ -89,12 +89,12 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
 
   handleBlur() {
     // @ts-expect-error
-    this.setState({hasFocus: false}) // eslint-disable-line react/no-unused-state
+    this.setState({hasFocus: false})
   }
 
   handleFocus() {
     // @ts-expect-error
-    this.setState({hasFocus: true}) // eslint-disable-line react/no-unused-state
+    this.setState({hasFocus: true})
   }
 
   onToggle = (menuShown: boolean) => {

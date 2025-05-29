@@ -89,9 +89,7 @@ describe('Shared > Network > NaiveRequestDispatch', () => {
 
     function getJSON(resourceIndex) {
       return new Promise((resolve, reject) => {
-        /* eslint-disable promise/catch-or-return */
         dispatch.getJSON(URL, {resourceIndex}).then(resolve).fail(reject)
-        /* eslint-enable promise/catch-or-return */
       })
     }
 
@@ -139,9 +137,7 @@ describe('Shared > Network > NaiveRequestDispatch', () => {
 
     function getDepaginated(resourceIndex) {
       return new Promise((resolve, reject) => {
-        /* eslint-disable promise/catch-or-return */
         dispatch.getDepaginated(URL, {resourceIndex}).then(resolve).fail(reject)
-        /* eslint-enable promise/catch-or-return */
       })
     }
 

@@ -20,12 +20,52 @@ import {shallow} from 'enzyme'
 import CriterionInfo from '../CriterionInfo'
 
 describe('The CriterionInfo component', () => {
-  it('renders the root component as expected', () => {
+  it('renders an info button that toggles a modal with help content', () => {
     const component = shallow(<CriterionInfo />)
-    expect(component).toMatchSnapshot()
 
-    component.find('IconButton').prop('onClick')()
+    // Initially should show just the info button
+    expect(component.find('IconButton')).toHaveLength(1)
+    expect(component.find('Modal')).toHaveLength(0)
+
+    // Check IconButton properties
+    const iconButton = component.find('IconButton')
+    expect(iconButton.prop('screenReaderLabel')).toBe('More Information About Ratings')
+    expect(iconButton.prop('color')).toBe('secondary')
+    expect(iconButton.prop('withBackground')).toBe(false)
+    expect(iconButton.prop('withBorder')).toBe(false)
+    expect(iconButton.prop('renderIcon').type.name).toBe('IconQuestionLine')
+
+    // Click the button to open modal
+    iconButton.prop('onClick')()
     component.update()
-    expect(component).toMatchSnapshot()
+
+    // Should now show both button and modal
+    expect(component.find('IconButton')).toHaveLength(1)
+    expect(component.find('Modal')).toHaveLength(1)
+
+    // Check Modal properties
+    const modal = component.find('Modal')
+    expect(modal.prop('label')).toBe('Criterion Ratings')
+    expect(modal.prop('open')).toBe(true)
+    expect(modal.prop('size')).toBe('medium')
+
+    // Check modal content structure
+    expect(modal.find('ModalHeader')).toHaveLength(1)
+    expect(modal.find('ModalBody')).toHaveLength(1)
+    expect(modal.find('CloseButton')).toHaveLength(1)
+    expect(modal.find('Heading')).toHaveLength(1)
+
+    // Check modal text content
+    const modalText = modal.find('Text')
+    expect(modalText).toHaveLength(1)
+    expect(modalText.children().text()).toContain(
+      'Learning outcomes can be included in assignment rubrics',
+    )
+    expect(modalText.children().text()).toContain('define mastery of this outcome')
+
+    // Check heading content
+    const heading = modal.find('Heading')
+    expect(heading.children().text()).toBe('Criterion Ratings')
+    expect(heading.prop('level')).toBe('h2')
   })
 })

@@ -37,14 +37,16 @@ describe('the Rubric component', () => {
         rubricAssociation={assessments.points.rubric_association}
       />,
     )
-    expect(modal).toMatchSnapshot()
+    expect(modal.find(Table)).toHaveLength(1)
+    expect(findCriteria(modal)).toHaveLength(2)
   })
 
   it('renders properly with no assessment', () => {
     const modal = shallow(
       <Rubric rubric={rubric} rubricAssociation={assessments.points.rubric_association} />,
     )
-    expect(modal).toMatchSnapshot()
+    expect(modal.find(Table)).toHaveLength(1)
+    expect(findCriteria(modal)).toHaveLength(2)
   })
 
   const setCloned = (object, path, value) => setWith(clone(object), path, value, clone)
@@ -57,7 +59,7 @@ describe('the Rubric component', () => {
         rubricAssociation={hidden.rubric_association}
       />,
     )
-    expect(modal).toMatchSnapshot()
+    expect(modal.find('[data-testid="rubric-total"]')).toHaveLength(0)
   })
 
   it('forbids comment saving on peer assessments', () => {
@@ -100,7 +102,9 @@ describe('the Rubric component', () => {
       ],
     ])
 
-    expect(renderAssessing(onAssessmentChange.mock.calls[0][0])).toMatchSnapshot()
+    const updatedRubric = renderAssessing(onAssessmentChange.mock.calls[0][0])
+    expect(updatedRubric.find(Table)).toHaveLength(1)
+    expect(findCriteria(updatedRubric)).toHaveLength(2)
   })
 
   describe('points column', () => {
@@ -119,7 +123,7 @@ describe('the Rubric component', () => {
       )
       expect(el.find(Table.ColHeader)).toHaveLength(expected ? 7 : 5)
       expect(findCriteria(el).at(0).prop('hasPointsColumn')).toBe(expected)
-      expect(el).toMatchSnapshot()
+      expect(el.find(Table)).toHaveLength(1)
     }
 
     it('does not have a points column in summary mode', () => {

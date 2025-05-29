@@ -20,13 +20,23 @@ import * as Actions from '../actions'
 
 describe('setCspEnabledAction', () => {
   it('creates a SET_CSP_ENABLED action when passed a boolean value', () => {
-    expect(Actions.setCspEnabledAction(true)).toMatchSnapshot()
+    const action = Actions.setCspEnabledAction(true)
+    expect(action.type).toBe('SET_CSP_ENABLED')
+    expect(action.payload).toBe(true)
+    expect(action.error).toBeUndefined()
   })
   it('creates an error action if passed a non-boolean value', () => {
-    expect(Actions.setCspEnabledAction('yes')).toMatchSnapshot()
+    const action = Actions.setCspEnabledAction('yes')
+    expect(action.type).toBe('SET_CSP_ENABLED')
+    expect(action.error).toBe(true)
+    expect(action.payload).toBeInstanceOf(Error)
+    expect(action.payload.message).toBe('Can only set to Boolean values')
   })
   it('creates a SET_CSP_ENABLED_OPTIMISTIC action when optimistic option is given', () => {
-    expect(Actions.setCspEnabledAction(true, {optimistic: true})).toMatchSnapshot()
+    const action = Actions.setCspEnabledAction(true, {optimistic: true})
+    expect(action.type).toBe('SET_CSP_ENABLED_OPTIMISTIC')
+    expect(action.payload).toBe(true)
+    expect(action.error).toBeUndefined()
   })
 })
 
@@ -110,19 +120,31 @@ describe('getCspEnabled', () => {
 
 describe('addDomainAction', () => {
   it('creates an ADD_DOMAIN action when passed string value', () => {
-    expect(Actions.addDomainAction('instructure.com', 'account')).toMatchSnapshot()
+    const action = Actions.addDomainAction('instructure.com', 'account')
+    expect(action.type).toBe('ADD_DOMAIN')
+    expect(action.payload).toEqual({account: 'instructure.com'})
+    expect(action.error).toBeUndefined()
   })
   it('creates an error action if passed a non-string value', () => {
-    expect(Actions.addDomainAction(true, 'account')).toMatchSnapshot()
+    const action = Actions.addDomainAction(true, 'account')
+    expect(action.type).toBe('ADD_DOMAIN')
+    expect(action.error).toBe(true)
+    expect(action.payload).toBeInstanceOf(Error)
+    expect(action.payload.message).toBe('Can only set to String values')
   })
   it('creates an error action if given an invalid domainType', () => {
-    expect(Actions.addDomainAction('instructure', 'subaccount')).toMatchSnapshot()
+    const action = Actions.addDomainAction('instructure', 'subaccount')
+    expect(action.type).toBe('ADD_DOMAIN')
+    expect(action.error).toBe(true)
+    expect(action.payload).toBeInstanceOf(Error)
+    expect(action.payload.message).toBe('domainType is invalid')
   })
 
   it('creates an ADD_DOMAIN_OPTIMISTIC action when optimistic option is given', () => {
-    expect(
-      Actions.addDomainAction('instructure.com', 'account', {optimistic: true}),
-    ).toMatchSnapshot()
+    const action = Actions.addDomainAction('instructure.com', 'account', {optimistic: true})
+    expect(action.type).toBe('ADD_DOMAIN_OPTIMISTIC')
+    expect(action.payload).toEqual({account: 'instructure.com'})
+    expect(action.error).toBeUndefined()
   })
 })
 
@@ -174,27 +196,42 @@ describe('addDomain', () => {
 
 describe('addDomainBulkAction', () => {
   it('creates a ADD_DOMAIN_BULK action when passed an value', () => {
-    expect(
-      Actions.addDomainBulkAction({
-        account: ['instructure.com'],
-        tools: {
-          'google.com': [
-            {
-              id: '1',
-              name: 'Cool Tool 1',
-              account_id: '1',
-            },
-          ],
-        },
-      }),
-    ).toMatchSnapshot()
+    const domainMap = {
+      account: ['instructure.com'],
+      tools: {
+        'google.com': [
+          {
+            id: '1',
+            name: 'Cool Tool 1',
+            account_id: '1',
+          },
+        ],
+      },
+    }
+    const action = Actions.addDomainBulkAction(domainMap)
+    expect(action.type).toBe('ADD_DOMAIN_BULK')
+    expect(action.payload).toEqual({
+      account: ['instructure.com'],
+      tools: {
+        'google.com': [
+          {
+            id: '1',
+            name: 'Cool Tool 1',
+            account_id: '1',
+          },
+        ],
+      },
+    })
+    expect(action.error).toBeUndefined()
   })
   it('creates an error action if passed an invalid domainMap', () => {
-    expect(
-      Actions.addDomainBulkAction({
-        lti: ['google.com'],
-      }),
-    ).toMatchSnapshot()
+    const action = Actions.addDomainBulkAction({
+      lti: ['google.com'],
+    })
+    expect(action.type).toBe('ADD_DOMAIN_BULK')
+    expect(action.error).toBe(true)
+    expect(action.payload).toBeInstanceOf(Error)
+    expect(action.payload.message).toBe('Invalid domain type key provided in domainsMap')
   })
 })
 
@@ -248,13 +285,24 @@ describe('getCurrentWhitelist', () => {
 
 describe('removeDomainAction', () => {
   it('creates an REMOVE_DOMAIN action when passed a string value', () => {
-    expect(Actions.removeDomainAction('instructure.com')).toMatchSnapshot()
+    const action = Actions.removeDomainAction('instructure.com')
+    expect(action.type).toBe('REMOVE_DOMAIN')
+    expect(action.payload).toBe('instructure.com')
+    expect(action.error).toBeUndefined()
   })
   it('creates an error action if passed a non-string value', () => {
-    expect(Actions.removeDomainAction(false)).toMatchSnapshot()
+    const action = Actions.removeDomainAction(false)
+    expect(action.type).toBe('REMOVE_DOMAIN')
+    expect(action.error).toBe(true)
+    expect(action.payload).toBeInstanceOf(Error)
+    expect(action.payload.message).toBe('Domain can only set to String values')
   })
   it('creates a REMOVE_DOMAIN_OPTIMISTIC action when optimistic option is given', () => {
-    expect(Actions.setCspEnabledAction('instructure.com', {optimistic: true})).toMatchSnapshot()
+    const action = Actions.setCspEnabledAction('instructure.com', {optimistic: true})
+    expect(action.type).toBe('SET_CSP_ENABLED_OPTIMISTIC')
+    expect(action.error).toBe(true)
+    expect(action.payload).toBeInstanceOf(Error)
+    expect(action.payload.message).toBe('Can only set to Boolean values')
   })
 })
 
@@ -284,13 +332,23 @@ describe('removeDomain', () => {
 
 describe('setCspInheritedAction', () => {
   it('creates an SET_CSP_INHERITED action when passed a boolean value', () => {
-    expect(Actions.setCspInheritedAction(true)).toMatchSnapshot()
+    const action = Actions.setCspInheritedAction(true)
+    expect(action.type).toBe('SET_CSP_INHERITED')
+    expect(action.payload).toBe(true)
+    expect(action.error).toBeUndefined()
   })
   it('creates an error action if passed a non-boolean value', () => {
-    expect(Actions.setCspInheritedAction('string')).toMatchSnapshot()
+    const action = Actions.setCspInheritedAction('string')
+    expect(action.type).toBe('SET_CSP_INHERITED')
+    expect(action.error).toBe(true)
+    expect(action.payload).toBeInstanceOf(Error)
+    expect(action.payload.message).toBe('Can only set to Boolean values')
   })
   it('creates a SET_CSP_INHERITED_OPTIMISTIC action when optimistic option is given', () => {
-    expect(Actions.setCspInheritedAction(true, {optimistic: true})).toMatchSnapshot()
+    const action = Actions.setCspInheritedAction(true, {optimistic: true})
+    expect(action.type).toBe('SET_CSP_INHERITED_OPTIMISTIC')
+    expect(action.payload).toBe(true)
+    expect(action.error).toBeUndefined()
   })
 })
 
@@ -398,19 +456,34 @@ describe('getCspInherited', () => {
 
 describe('setDirtyAction', () => {
   it('creates a SET_DIRTY action when passed a boolean value', () => {
-    expect(Actions.setDirtyAction(true)).toMatchSnapshot()
+    const action = Actions.setDirtyAction(true)
+    expect(action.type).toBe('SET_DIRTY')
+    expect(action.payload).toBe(true)
+    expect(action.error).toBeUndefined()
   })
   it('creates an error action if passed a non-boolean value', () => {
-    expect(Actions.setDirtyAction('yes')).toMatchSnapshot()
+    const action = Actions.setDirtyAction('yes')
+    expect(action.type).toBe('SET_DIRTY')
+    expect(action.error).toBe(true)
+    expect(action.payload).toBeInstanceOf(Error)
+    expect(action.payload.message).toBe('Can only set to Boolean values')
   })
 })
 
 describe('copyInheritedAction', () => {
   it('creates a COPY_INHERITED_SUCCESS action', () => {
-    expect(Actions.copyInheritedAction([])).toMatchSnapshot()
+    const action = Actions.copyInheritedAction([])
+    expect(action.type).toBe('COPY_INHERITED_SUCCESS')
+    expect(action.payload).toEqual([])
+    expect(action.error).toBeUndefined()
   })
   it('creates an error action if passed an error param', () => {
-    expect(Actions.copyInheritedAction([], new Error('something happened'))).toMatchSnapshot()
+    const error = new Error('something happened')
+    const action = Actions.copyInheritedAction([], error)
+    expect(action.type).toBe('COPY_INHERITED_FAILURE')
+    expect(action.error).toBe(true)
+    expect(action.payload).toBeInstanceOf(Error)
+    expect(action.payload.message).toContain('something happened')
   })
 })
 

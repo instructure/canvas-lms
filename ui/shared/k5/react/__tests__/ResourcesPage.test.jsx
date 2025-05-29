@@ -27,7 +27,7 @@ jest.mock('@canvas/util/globalUtils', () => ({
 }))
 
 jest.mock('@canvas/k5/react/utils')
-const utils = require('../utils') // eslint-disable-line import/no-commonjs
+const utils = require('../utils')
 
 const defaultImportantInfoResponse = [
   {

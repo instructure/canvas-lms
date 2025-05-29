@@ -39,16 +39,16 @@ describe('DialogBaseView', () => {
 
   test('it removes the created dialog upon close when the destroy option is set', () => {
     const dialog = new DialogBaseView({destroy: true, container: '#fixtures'})
-    expect($('.ui-dialog').length).toBe(1)
+    expect($('.ui-dialog')).toHaveLength(1)
     dialog.close()
-    expect($('.ui-dialog').length).toBe(0)
+    expect($('.ui-dialog')).toHaveLength(0)
   })
 
   test('if destroy is not specified as an option it only hides the dialog', () => {
     const dialog = new DialogBaseView({id: 'test_id_314', container: '#fixtures'})
-    expect($('.ui-dialog').length).toBe(1)
+    expect($('.ui-dialog')).toHaveLength(1)
     dialog.close()
-    expect($('.ui-dialog').length).toBe(1)
-    expect($('.ui-dialog:visible').length).toBe(0)
+    expect($('.ui-dialog')).toHaveLength(1)
+    expect($('.ui-dialog:visible')).toHaveLength(0)
   })
 })

@@ -51,6 +51,6 @@ describe('SyncHistory component', () => {
     const tree = render(<SyncHistory {...defaultProps()} />)
     console.log(tree.container.innerHTML)
     const node = tree.container.querySelectorAll('.bcs__history-item')
-    expect(node.length).toEqual(1)
+    expect(node).toHaveLength(1)
   })
 })

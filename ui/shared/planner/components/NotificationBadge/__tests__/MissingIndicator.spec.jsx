@@ -20,7 +20,9 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import MissingIndicator from '../MissingIndicator'
 
-it('renders an indicator with the danger variant and a title', () => {
+it('renders an indicator with the invisible variant and a title', () => {
   const wrapper = shallow(<MissingIndicator title="blah" />)
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.find('Indicator')).toHaveLength(1)
+  expect(wrapper.find('Indicator').prop('variant')).toBe('invisible')
+  expect(wrapper.find('Indicator').prop('title')).toBe('Missing items for blah')
 })

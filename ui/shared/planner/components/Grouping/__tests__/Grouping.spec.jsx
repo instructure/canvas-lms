@@ -56,14 +56,36 @@ const getDefaultProps = () => ({
 
 it('renders the base component with required props', () => {
   const wrapper = shallow(<Grouping {...getDefaultProps()} />)
-  expect(wrapper).toMatchSnapshot()
+
+  // Check that the main grouping container is rendered
+  expect(wrapper.find('.planner-grouping')).toHaveLength(1)
+
+  // Check that the grouping link is rendered with the correct href
+  const groupLink = wrapper.find('a.Grouping-styles__hero')
+  expect(groupLink).toHaveLength(1)
+  expect(groupLink.prop('href')).toBe('example.com')
+
+  // Check that the title is rendered
+  const titleSpan = wrapper.find('.Grouping-styles__title')
+  expect(titleSpan).toHaveLength(1)
+  expect(titleSpan.text()).toBe('Board Games')
+
+  // Check that planner items are rendered
+  const plannerItems = wrapper.find('Animatable(PlannerItem_raw)')
+  expect(plannerItems).toHaveLength(2)
 })
 
 it('grouping contains link pointing to course url', () => {
   const props = getDefaultProps()
   const wrapper = shallow(<Grouping {...props} />)
 
-  expect(wrapper).toMatchSnapshot()
+  const groupLink = wrapper.find('a.Grouping-styles__hero')
+  expect(groupLink).toHaveLength(1)
+  expect(groupLink.prop('href')).toBe('example.com')
+
+  // Check that the link contains the title
+  const titleSpan = groupLink.find('.Grouping-styles__title')
+  expect(titleSpan.text()).toBe('Board Games')
 })
 
 it('renders to do items correctly', () => {
@@ -86,7 +108,18 @@ it('renders to do items correctly', () => {
     animatableIndex: 1,
   }
   const wrapper = shallow(<Grouping {...props} />)
-  expect(wrapper).toMatchSnapshot()
+
+  // When no title is provided, should show "To Do"
+  const titleSpan = wrapper.find('.Grouping-styles__title')
+  expect(titleSpan.text()).toBe('To Do')
+
+  // Should render a span instead of a link when no URL
+  const heroSpan = wrapper.find('span.Grouping-styles__hero')
+  expect(heroSpan).toHaveLength(1)
+
+  // Should render the to-do item
+  const plannerItems = wrapper.find('Animatable(PlannerItem_raw)')
+  expect(plannerItems).toHaveLength(1)
 })
 
 it('does not render completed items by default', () => {
@@ -103,7 +136,14 @@ it('renders a CompletedItemsFacade when completed items are present by default',
 
   const wrapper = shallow(<Grouping {...props} />)
 
-  expect(wrapper).toMatchSnapshot()
+  // Should render CompletedItemsFacade for completed items
+  const facade = wrapper.find('Animatable(undefined)')
+  expect(facade).toHaveLength(1)
+  expect(facade.prop('itemCount')).toBe(1)
+
+  // Should only render one non-completed item
+  const plannerItems = wrapper.find('Animatable(PlannerItem_raw)')
+  expect(plannerItems).toHaveLength(1)
 })
 
 it('renders completed items when the facade is clicked', () => {

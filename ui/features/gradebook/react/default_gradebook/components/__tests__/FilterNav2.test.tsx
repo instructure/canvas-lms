@@ -29,7 +29,7 @@ import '@testing-library/jest-dom/extend-expect'
 
 beforeEach(() => {
   // Ensure a live region for screenreader alerts exists for Alert component
-  let existing = document.getElementById('flash_screenreader_holder')
+  const existing = document.getElementById('flash_screenreader_holder')
   if (!existing) {
     const div = document.createElement('div')
     div.id = 'flash_screenreader_holder'

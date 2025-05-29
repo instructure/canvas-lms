@@ -24,7 +24,7 @@ describe('ltiCollaboratorsReducer', () => {
 
   test('there are defaults', () => {
     expect(Array.isArray(defaults.ltiCollaboratorsData)).toBe(true)
-    expect(defaults.ltiCollaboratorsData.length).toBe(0)
+    expect(defaults.ltiCollaboratorsData).toHaveLength(0)
     expect(defaults.listLTICollaboratorsPending).toBe(false)
     expect(defaults.listLTICollaboratorsSuccessful).toBe(false)
     expect(defaults.listLTICollaboratorsError).toBeNull()

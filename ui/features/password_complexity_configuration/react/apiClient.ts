@@ -60,7 +60,6 @@ export const deleteForbiddenWordsFile = async (attachmentId: number): Promise<vo
       throw new Error('Failed to update password policy settings.')
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Error deleting forbidden words file:', error)
     throw error
   }

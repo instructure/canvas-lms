@@ -108,7 +108,7 @@ describe('SpeedGrader Timeouts', () => {
       SpeedGrader.setup()
       await new Promise(resolve => setTimeout(resolve, 2))
 
-      expect($('#speed_grader_timeout_alert a').length).toBe(0)
+      expect($('#speed_grader_timeout_alert a')).toHaveLength(0)
     })
   })
 })

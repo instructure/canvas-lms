@@ -86,7 +86,6 @@ export default class NaiveRequestDispatch {
       return pagesEnqueuedCallback(deferreds)
     }
 
-    /* eslint-disable promise/catch-or-return */
     request.start = () => {
       /*
        * Update the request as "active" so that it is counted as an active
@@ -107,7 +106,6 @@ export default class NaiveRequestDispatch {
           this.clearRequest(request)
         })
     }
-    /* eslint-enable promise/catch-or-return */
 
     this.addRequest(request)
 
@@ -120,7 +118,6 @@ export default class NaiveRequestDispatch {
       active: false,
     }
 
-    /* eslint-disable promise/catch-or-return */
     request.start = () => {
       /*
        * Update the request as "active" so that it is counted as an active
@@ -135,7 +132,6 @@ export default class NaiveRequestDispatch {
           this.clearRequest(request)
         })
     }
-    /* eslint-enable promise/catch-or-return */
 
     this.addRequest(request)
 

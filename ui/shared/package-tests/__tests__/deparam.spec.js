@@ -59,7 +59,7 @@ describe('deparam', () => {
     test('deparam() prevents prototype pollution', () => {
       const safe_result = Object.create(null)
       safe_result.a = '1'
-      // eslint-disable-next-line no-proto
+
       safe_result.__proto__ = {
         div: ['1', '<img/src/onerror=alert(document.domain)>', '1'],
       }

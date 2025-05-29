@@ -53,7 +53,7 @@ it('adds items to the state on ADD_OPPORTUNITIES', () => {
       nextUrl: null,
     },
   })
-  expect(newState.items.length).toBe(2)
+  expect(newState.items).toHaveLength(2)
 })
 
 it('discards duplicate items on ADD_OPPORTUNITIES', () => {
@@ -72,7 +72,7 @@ it('discards duplicate items on ADD_OPPORTUNITIES', () => {
       nextUrl: null,
     },
   })
-  expect(newState.items.length).toBe(2)
+  expect(newState.items).toHaveLength(2)
 })
 
 it('updates state correctly on DISMISSED_OPPORTUNITY with opportunity that has override', () => {

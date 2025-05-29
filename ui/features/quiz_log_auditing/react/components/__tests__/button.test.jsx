@@ -28,8 +28,8 @@ describe('canvas_quizzes/components/button', () => {
   it('calls onClick on click', () => {
     const onClick = jest.fn()
     const {getByTestId} = setup({onClick})
-    expect(onClick.mock.calls.length).toBe(0)
+    expect(onClick.mock.calls).toHaveLength(0)
     fireEvent.click(getByTestId('button'))
-    expect(onClick.mock.calls.length).toBe(1)
+    expect(onClick.mock.calls).toHaveLength(1)
   })
 })

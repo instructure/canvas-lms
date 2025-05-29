@@ -32,7 +32,6 @@ async function groupsQuery({signal}: QueryFunctionContext): Promise<AccessibleGr
   let path = GROUPS_PATH
 
   while (path) {
-    // eslint-disable-next-line no-await-in-loop
     const {json, link} = await doFetchApi<AccessibleGroup[]>({path, fetchOpts})
     if (json) data.push(...json.filter(groupFilter))
     // @ts-expect-error

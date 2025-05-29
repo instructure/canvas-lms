@@ -37,7 +37,7 @@ describe('Button', () => {
       onChange: onChangeMock,
     })
     fireEvent.change(subjectInput, {target: {value: '42'}})
-    expect(onChangeMock.mock.calls.length).toBe(1)
+    expect(onChangeMock.mock.calls).toHaveLength(1)
   })
 
   it('should call onBlur when blur event triggered', () => {
@@ -47,7 +47,7 @@ describe('Button', () => {
     })
     fireEvent.focus(subjectInput)
     fireEvent.blur(subjectInput)
-    expect(onBlurMock.mock.calls.length).toBe(1)
+    expect(onBlurMock.mock.calls).toHaveLength(1)
   })
 
   it('should call onFocus when focus event triggered', () => {
@@ -57,6 +57,6 @@ describe('Button', () => {
     })
     fireEvent.focus(subjectInput)
     fireEvent.blur(subjectInput)
-    expect(onFocusMock.mock.calls.length).toBe(1)
+    expect(onFocusMock.mock.calls).toHaveLength(1)
   })
 })

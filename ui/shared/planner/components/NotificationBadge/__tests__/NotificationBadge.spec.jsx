@@ -20,18 +20,24 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import {NotificationBadge, NewActivityIndicator} from '../index'
 
-// it would be better if the snapshots contained the proper class names, but
-// jest doesn't deal with how themeable turns styles.css into code.
 it('renders an indicator', () => {
   const wrapper = shallow(
     <NotificationBadge>
       <NewActivityIndicator title="blah" itemIds={['first', 'second']} />
     </NotificationBadge>,
   )
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.find('div')).toHaveLength(1)
+  expect(wrapper.find('style')).toHaveLength(1)
+  // The child should exist but may be wrapped by animatable HOC
+  expect(wrapper.children()).toHaveLength(2) // style + div
+  const contentDiv = wrapper.find('div').first()
+  expect(contentDiv.children()).toHaveLength(1) // should have the NewActivityIndicator
 })
 
-it('renders an empty div', () => {
+it('renders an empty div when no children', () => {
   const wrapper = shallow(<NotificationBadge>{null}</NotificationBadge>)
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.find('div')).toHaveLength(1)
+  expect(wrapper.find('NewActivityIndicator')).toHaveLength(0)
+  expect(wrapper.find('style')).toHaveLength(1)
+  expect(wrapper.find('div').children()).toHaveLength(0)
 })

@@ -40,7 +40,7 @@ describe('BlackoutDates', () => {
     const blackoutTable = getByTestId('blackout_dates_table')
     expect(blackoutTable).toBeInTheDocument()
 
-    expect(blackoutTable.querySelectorAll('tr').length).toBe(2)
+    expect(blackoutTable.querySelectorAll('tr')).toHaveLength(2)
     const newBlackoutDatesRow = blackoutTable.querySelectorAll('tr')[1]
     expect(within(newBlackoutDatesRow).getByText('Spring break')).toBeInTheDocument()
     expect(within(newBlackoutDatesRow).getByText('Mon, Mar 21, 2022')).toBeInTheDocument()
@@ -53,7 +53,7 @@ describe('BlackoutDates', () => {
     const blackoutTable = getByTestId('blackout_dates_table')
     expect(blackoutTable).toBeInTheDocument()
 
-    expect(blackoutTable.querySelectorAll('tr').length).toBe(2)
+    expect(blackoutTable.querySelectorAll('tr')).toHaveLength(2)
     const newBlackoutDatesRow = blackoutTable.querySelectorAll('tr')[1]
     expect(within(newBlackoutDatesRow).getByText('No blackout dates')).toBeInTheDocument()
   })
@@ -92,7 +92,7 @@ describe('BlackoutDates', () => {
       addBtn.click()
     })
     expect(onChange).toHaveBeenCalled()
-    expect(onChange.mock.calls[0][0].length).toBe(2)
+    expect(onChange.mock.calls[0][0]).toHaveLength(2)
   })
 
   it('deletes a blackout date', () => {
@@ -102,6 +102,6 @@ describe('BlackoutDates', () => {
 
     act(() => delBtn.click())
     expect(onChange).toHaveBeenCalled()
-    expect(onChange.mock.calls[0][0].length).toBe(0)
+    expect(onChange.mock.calls[0][0]).toHaveLength(0)
   })
 })

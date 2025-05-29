@@ -51,7 +51,7 @@ it('generates the toolConfiguration', () => {
   const ref = React.createRef()
   render(<Placements {...props({ref})} />)
   const toolConfig = ref.current.generateToolConfigurationPart()
-  expect(toolConfig.length).toEqual(1)
+  expect(toolConfig).toHaveLength(1)
   expect(toolConfig[0].icon_url).toEqual('http://example.com/icon')
 })
 
@@ -74,6 +74,6 @@ it('adds new placements to output', () => {
   render(<Placements {...props({ref})} />)
   ref.current.handlePlacementSelect(['account_navigation', 'course_navigation'])
   const toolConfig = ref.current.generateToolConfigurationPart()
-  expect(toolConfig.length).toEqual(2)
+  expect(toolConfig).toHaveLength(2)
   expect(toolConfig[1].placement).toEqual('course_navigation')
 })

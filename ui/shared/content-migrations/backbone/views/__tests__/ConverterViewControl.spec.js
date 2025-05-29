@@ -35,7 +35,7 @@ describe('ConverterViewControlSpec', () => {
       value: 'backbone_view',
       view: new BackboneSubView(),
     })
-    expect(ConverterViewControl.registeredViews.length).toBe(1)
+    expect(ConverterViewControl.registeredViews).toHaveLength(1)
   })
 
   test('before registering a view subscribed is false', () => {
@@ -61,8 +61,8 @@ describe('ConverterViewControlSpec', () => {
       value: 'backbone_view',
       view: new BackboneSubView(),
     })
-    expect(ConverterViewControl.registeredViews.length).toBe(1)
+    expect(ConverterViewControl.registeredViews).toHaveLength(1)
     ConverterViewControl.resetControl()
-    expect(ConverterViewControl.registeredViews.length).toBe(0)
+    expect(ConverterViewControl.registeredViews).toHaveLength(0)
   })
 })

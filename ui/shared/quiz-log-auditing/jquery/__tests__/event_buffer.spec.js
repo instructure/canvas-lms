@@ -67,6 +67,6 @@ describe('Quizzes::LogAuditing::EventBuffer', () => {
     buffer.push(new QuizEvent('some_type', {foo: 'bar'}))
     const json = buffer.toJSON()
     expect(Array.isArray(json)).toBe(true)
-    expect(json.length).toBe(1)
+    expect(json).toHaveLength(1)
   })
 })

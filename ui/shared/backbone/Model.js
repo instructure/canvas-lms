@@ -39,7 +39,7 @@ export function patch(Backbone) {
     // @api public
     Model.mixin = function () {
       const mixins = arguments.length >= 1 ? slice.call(arguments, 0) : []
-      // eslint-disable-next-line prefer-spread
+
       return mixin.apply(null, [this].concat(slice.call(mixins)))
     }
 

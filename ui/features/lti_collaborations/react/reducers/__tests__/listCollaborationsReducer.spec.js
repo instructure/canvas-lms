@@ -24,7 +24,7 @@ describe('collaborationsReducer', () => {
 
   test('there are defaults', () => {
     expect(Array.isArray(defaults.list)).toBe(true)
-    expect(defaults.list.length).toBe(0)
+    expect(defaults.list).toHaveLength(0)
     expect(defaults.listCollaborationsPending).toBe(false)
     expect(defaults.listCollaborationsSuccessful).toBe(false)
     expect(defaults.listCollaborationsError).toBeNull()
@@ -55,7 +55,7 @@ describe('collaborationsReducer', () => {
     const newState = reducer(state, action)
     expect(newState.listCollaborationsPending).toBe(false)
     expect(newState.listCollaborationsSuccessful).toBe(true)
-    expect(newState.list.length).toBe(payload.collaborations.length)
+    expect(newState.list).toHaveLength(payload.collaborations.length)
   })
 
   test('responds to listCollaborationsFailed', () => {

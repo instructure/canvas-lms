@@ -159,13 +159,13 @@ describe('IndexView', () => {
     ENV.flags.quiz_lti_enabled = true
     view = createIndexView()
     const $button = view.$('.choose-quiz-engine')
-    expect($button.length).toBe(1)
+    expect($button).toHaveLength(1)
   })
 
   it("does not show modified '+ Quiz' button when quiz lti disabled", () => {
     ENV.flags.quiz_lti_enabled = false
     view = createIndexView()
-    expect(view.$('.choose-quiz-engine').length).toBe(0)
+    expect(view.$('.choose-quiz-engine')).toHaveLength(0)
   })
 
   it('renders choose quiz engine modal', () => {
@@ -204,7 +204,7 @@ describe('IndexView', () => {
     ])
     view = createIndexView(assignments, open)
     view.render()
-    expect(view.$el.find('.collectionViewItems li.quiz').length).toBe(4)
+    expect(view.$el.find('.collectionViewItems li.quiz')).toHaveLength(4)
   })
 
   it('should filter by search term', () => {
@@ -232,7 +232,7 @@ describe('IndexView', () => {
     assignmentView.render()
 
     // Initial count should be 2
-    expect(assignmentView.$el.find('.ig-list.collectionViewItems li.quiz').length).toBe(2)
+    expect(assignmentView.$el.find('.ig-list.collectionViewItems li.quiz')).toHaveLength(2)
 
     // Filter for 'Foo'
     assignmentView.filterResults('Foo')
@@ -241,6 +241,6 @@ describe('IndexView', () => {
     const visibleQuizzes = assignmentView.$el
       .find('.ig-list.collectionViewItems li.quiz')
       .filter((_i, el) => !$(el).hasClass('hidden'))
-    expect(visibleQuizzes.length).toBe(1)
+    expect(visibleQuizzes).toHaveLength(1)
   })
 })

@@ -565,7 +565,6 @@ export default function loadLocale(locale: string) {
       )
 
     default:
-      // eslint-disable-next-line no-console
       console.warn("couldn't load moment/locale/", locale)
   }
 }

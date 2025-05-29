@@ -190,7 +190,7 @@ describe('ConversationListHolder', () => {
   it('renders the provided conversations', () => {
     const {getAllByTestId} = render(<ConversationListHolder {...props} />)
     const conversations = getAllByTestId('conversation')
-    expect(conversations.length).toBe(5)
+    expect(conversations).toHaveLength(5)
   })
 
   it('should be able to select conversations', () => {
@@ -198,7 +198,7 @@ describe('ConversationListHolder', () => {
     const conversation = getAllByText('This is a different subject line')
     fireEvent.click(conversation[0])
     const checkboxes = getAllByTestId('conversationListItem-Checkbox')
-    expect(checkboxes.filter(c => c.checked === true).length).toBe(1)
+    expect(checkboxes.filter(c => c.checked === true)).toHaveLength(1)
   })
 
   it('Sets the selected conversation as the conversation not the conversation participant', () => {
@@ -229,7 +229,7 @@ describe('ConversationListHolder', () => {
       metaKey: true,
     })
     const checkboxes = getAllByTestId('conversationListItem-Checkbox')
-    expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
+    expect(checkboxes.filter(c => c.checked === true)).toHaveLength(3)
   })
 
   it('should be able to select multiple conversations using crtl key', () => {
@@ -243,7 +243,7 @@ describe('ConversationListHolder', () => {
       ctrlKey: true,
     })
     const checkboxes = getAllByTestId('conversationListItem-Checkbox')
-    expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
+    expect(checkboxes.filter(c => c.checked === true)).toHaveLength(3)
   })
 
   it('should unselect multi select when conversation opened', () => {
@@ -258,7 +258,7 @@ describe('ConversationListHolder', () => {
     })
     fireEvent.click(conversations[4])
     const checkboxes = getAllByTestId('conversationListItem-Checkbox')
-    expect(checkboxes.filter(c => c.checked === true).length).toBe(1)
+    expect(checkboxes.filter(c => c.checked === true)).toHaveLength(1)
   })
 
   it('Should display No Conversations to Show Panda SVG', async () => {

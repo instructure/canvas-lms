@@ -26,22 +26,21 @@ describe('The Points component', () => {
   const validPoints = text => ({text, valid: true, value: parseFloat(text)})
 
   it('renders the root component as expected', () => {
-    expect(
-      component({
-        assessment: {...id, points: validPoints('1')},
-        pointsPossible: 2,
-      }),
-    ).toMatchSnapshot()
+    const wrapper = component({
+      assessment: {...id, points: validPoints('1')},
+      pointsPossible: 2,
+    })
+    expect(wrapper.find('div').text()).toEqual('1 / 2 pts')
   })
 
   it('renders the component when assessing with the expected layout', () => {
-    expect(
-      component({
-        assessment: {...id, points: validPoints('1')},
-        assessing: true,
-        pointsPossible: 2,
-      }),
-    ).toMatchSnapshot()
+    const wrapper = component({
+      assessment: {...id, points: validPoints('1')},
+      assessing: true,
+      pointsPossible: 2,
+    })
+    expect(wrapper.find('TextInput')).toHaveLength(1)
+    expect(wrapper.find('TextInput').prop('value')).toBe('1')
   })
 
   it('renders the right text for fractional points', () => {

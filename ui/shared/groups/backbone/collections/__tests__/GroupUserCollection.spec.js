@@ -59,13 +59,13 @@ describe('GroupUserCollection', () => {
 
   test("moves user to target group's collection when group changes", () => {
     users[0].set('group', group)
-    expect(source.length).toBe(1)
-    expect(target.length).toBe(1)
+    expect(source).toHaveLength(1)
+    expect(target).toHaveLength(1)
   })
 
   test("removes user when target group's collection is not yet loaded", () => {
     users[0].set('group', new Group({id: 2})) // not the target
-    expect(source.length).toBe(1)
-    expect(target.length).toBe(0)
+    expect(source).toHaveLength(1)
+    expect(target).toHaveLength(0)
   })
 })

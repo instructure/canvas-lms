@@ -85,7 +85,7 @@ describe('UserSearchResultsView', () => {
 
   it('displays restore options when a deleted user is found', () => {
     userRestore.set(userJSON)
-    expect(userSearchResultsView.$el.find('#restoreUserBtn').length).toBe(1)
+    expect(userSearchResultsView.$el.find('#restoreUserBtn')).toHaveLength(1)
   })
 
   it('shows screenreader text when user not found', () => {
@@ -114,13 +114,13 @@ describe('UserSearchResultsView', () => {
     userRestore.set(userJSON, {silent: true})
     userRestore.set('restored', true, {silent: true})
     userRestore.set('login_id', 'du')
-    expect(userSearchResultsView.$el.find('.alert-success').length).toBe(1)
-    expect(userSearchResultsView.$el.find('#viewUser').length).toBe(1)
+    expect(userSearchResultsView.$el.find('.alert-success')).toHaveLength(1)
+    expect(userSearchResultsView.$el.find('#viewUser')).toHaveLength(1)
   })
 
   it('shows options to view a user', () => {
     userRestore.set(userJSON, {silent: true})
     userRestore.set('login_id', 'du')
-    expect(userSearchResultsView.$el.find('#viewUser').length).toBe(1)
+    expect(userSearchResultsView.$el.find('#viewUser')).toHaveLength(1)
   })
 })

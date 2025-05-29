@@ -32,7 +32,12 @@ function defaultProps(opts = {}) {
 
 it('renders desert when completely empty', () => {
   const wrapper = shallow(<PlannerEmptyState {...defaultProps()} />)
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.find('.desert')).toHaveLength(1)
+  expect(wrapper.find('.balloons')).toHaveLength(0)
+  expect(wrapper.contains('No Due Dates Assigned')).toBeTruthy()
+  expect(wrapper.contains("Looks like there isn't anything here")).toBeTruthy()
+  expect(wrapper.contains('Go to Card View Dashboard')).toBeTruthy()
+  expect(wrapper.contains('Add To-Do')).toBeTruthy()
 })
 
 it('renders balloons when not completely empty', () => {

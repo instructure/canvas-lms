@@ -28,7 +28,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 class BreadcrumbLinkWithTip extends Breadcrumb.Link {
   renderLink = () => {
     const {children, href, icon, iconPlacement, onClick} = this.props
-    // eslint-disable-next-line react/forbid-foreign-prop-types
+
     const props = omitProps(this.props, Breadcrumb.Link.propTypes)
 
     return (
@@ -47,7 +47,7 @@ class BreadcrumbLinkWithTip extends Breadcrumb.Link {
 
   render() {
     const {onClick} = this.props
-    // eslint-disable-next-line react/forbid-foreign-prop-types
+
     const props = omitProps(this.props, Breadcrumb.Link.propTypes)
 
     return (

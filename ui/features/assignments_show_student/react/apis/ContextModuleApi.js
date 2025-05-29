@@ -30,7 +30,6 @@ function getContextModuleData(courseID, assignmentID) {
   // jQuery Deferred object, which we wrap in a promise so callers don't have
   // to deal with it.)
   return new Promise((resolve, reject) => {
-    // eslint-disable-next-line promise/catch-or-return
     instance.fetch().then(() => resolve(instance), reject)
   })
 }

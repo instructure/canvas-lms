@@ -57,6 +57,6 @@ describe('MentionDropdownOption tests', () => {
     const selectSpy = jest.fn()
     const {container} = setup({onSelect: selectSpy})
     fireEvent.click(container.querySelector('li'))
-    expect(selectSpy.mock.calls.length).toBe(1)
+    expect(selectSpy.mock.calls).toHaveLength(1)
   })
 })
