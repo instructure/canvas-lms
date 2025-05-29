@@ -3400,4 +3400,8 @@ class ApplicationController < ActionController::Base
     reject! "Invalid file path" unless allowed
     send_file(full_path.to_s, options)
   end
+
+  def inject_ai_feedback_link
+    js_env(AI_FEEDBACK_LINK: Setting.get("ai_feedback_link", "https://inst.bid/ai/feedback"))
+  end
 end

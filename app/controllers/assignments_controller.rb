@@ -492,6 +492,7 @@ class AssignmentsController < ApplicationController
         append_default_due_time_js_env(@context, hash)
         js_env(hash)
         enhanced_rubrics_assignments_js_env(@assignment) if Rubric.enhanced_rubrics_assignments_enabled?(@context)
+        inject_ai_feedback_link
 
         set_master_course_js_env_data(@assignment, @context)
         conditional_release_js_env(@assignment, includes: :rule)
