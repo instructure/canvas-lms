@@ -23,6 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import ModuleStudent from './ModuleStudent'
 import ModulePageActionHeaderStudent from './ModulePageActionHeaderStudent'
 import {handleCollapseAll, handleExpandAll} from '../handlers/modulePageActionHandlers'
+import {useIsFetching} from '@tanstack/react-query'
 
 import {validateModuleStudentRenderRequirements} from '../utils/utils'
 import {useModulesStudent} from '../hooks/queriesStudent/useModulesStudent'
@@ -38,6 +39,8 @@ const MemoizedModuleStudent = memo(ModuleStudent, validateModuleStudentRenderReq
 const ModulesListStudent: React.FC = () => {
   const {courseId} = useContextModule()
   const {data, isLoading, error, isFetchingNextPage, hasNextPage} = useModulesStudent(courseId)
+  const moduleFetchingCount = useIsFetching({queryKey: ['moduleItemsStudent']})
+  const [expandCollapseButtonDisabled, setExpandCollapseButtonDisabled] = useState(false)
 
   // Initialize with an empty Map - all modules will be collapsed by default
   const [expandedModules, setExpandedModules] = useState<Map<string, boolean>>(new Map())
@@ -80,6 +83,14 @@ const ModulesListStudent: React.FC = () => {
     }
   }, [data?.pages])
 
+  useEffect(() => {
+    if (moduleFetchingCount > 0) {
+      setExpandCollapseButtonDisabled(true)
+    } else {
+      setExpandCollapseButtonDisabled(false)
+    }
+  }, [moduleFetchingCount])
+
   const toggleCollapseMutation = useToggleCollapse(courseId)
 
   const handleToggleExpandRef = useCallback(
@@ -106,8 +117,12 @@ const ModulesListStudent: React.FC = () => {
     <View as="div" margin="medium">
       <ModulePageActionHeaderStudent
         onCollapseAll={() => handleCollapseAll(data, setExpandedModules)}
-        onExpandAll={() => handleExpandAll(data, setExpandedModules)}
+        onExpandAll={() => {
+          handleExpandAll(data, setExpandedModules)
+          setExpandCollapseButtonDisabled(true)
+        }}
         anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
+        disabled={expandCollapseButtonDisabled}
       />
       {isLoading && !data ? (
         <View as="div" textAlign="center" padding="large">
