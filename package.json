@@ -94,7 +94,7 @@
     "@ns0m/hermite-resize": "^2.2.10",
     "@peculiar/asn1-schema": "^2.3.6",
     "@peculiar/x509": "^1.9.3",
-    "@pendo/agent": "^2.275.1",
+    "@pendo/agent": "^2.278.0",
     "@popperjs/core": "^2.9.2",
     "@rspack/cli": "^0.7.5",
     "@rspack/core": "^0.7.5",
