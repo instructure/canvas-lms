@@ -34,12 +34,14 @@ interface ModulePageActionHeaderStudentProps {
   onCollapseAll: () => void
   onExpandAll: () => void
   anyModuleExpanded?: boolean
+  disabled?: boolean
 }
 
 const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps> = ({
   onCollapseAll,
   onExpandAll,
   anyModuleExpanded = true,
+  disabled = false,
 }) => {
   const {courseId} = useContextModule()
   const {data, isLoading} = useCourseStudent(courseId)
@@ -66,12 +68,13 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
           aria-expanded={displayOptions?.ariaExpanded}
           data-expand={displayOptions?.dataExpand}
           aria-label={displayOptions?.ariaLabel}
+          disabled={disabled}
         >
           {anyModuleExpanded ? I18n.t('Collapse All') : I18n.t('Expand All')}
         </Button>
       )
     },
-    [anyModuleExpanded, handleCollapseExpandClick],
+    [anyModuleExpanded, handleCollapseExpandClick, disabled],
   )
 
   return (
