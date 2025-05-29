@@ -118,18 +118,23 @@ describe('PermissionsModal', () => {
     })
     resetAndGetFilesEnv(usageFilesContexts)
 
-    // Render the component
-    renderComponent()
+    // Render the component with items that don't have usage rights
+    const itemsWithoutUsageRights = FAKE_FOLDERS_AND_FILES.map(item => ({
+      ...item,
+      usage_rights: null,
+    }))
+    renderComponent({items: itemsWithoutUsageRights})
 
     // Click the save button
     await userEvent.click(screen.getByTestId('permissions-save-button'))
 
     // Wait for the error message to appear in the component
     await waitFor(() => {
-      const errorText = screen.getByText(
-        'Selected items must have usage rights assigned before they can be published.',
-      )
-      expect(errorText).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          'Selected items must have usage rights assigned before they can be published.',
+        ),
+      ).toBeInTheDocument()
     })
   })
 })
