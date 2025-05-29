@@ -2064,7 +2064,7 @@ function updateSubAssignmentData(contextModuleItem, subAssignments) {
 }
 
 // need the assignment data to check past due state
-if (!ENV.FEATURE_MODULES_PERF) {
+if (!ENV.FEATURE_MODULES_PERF || ENV.IS_STUDENT) {
   modules.updateAssignmentData(() => {
     modules.updateProgressions(modules.afterUpdateProgressions)
   })
