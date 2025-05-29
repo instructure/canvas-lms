@@ -16,18 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Frame, SerializedNodes} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
+import {Flex} from '@instructure/ui-flex'
+import {ReactNode} from 'react'
 
-export const PageEditor = (props: {
-  data: SerializedNodes | null
+export const GroupedSelectLayout = (props: {
+  groups: ReactNode
+  items: ReactNode
 }) => {
   return (
-    <>
-      <Editor>
-        <AddBlock onAddBlock={() => {}} />
-        <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
-      </Editor>
-    </>
+    <Flex alignItems="start" gap="medium">
+      <Flex direction="column" gap="xx-small">
+        {props.groups}
+      </Flex>
+      <Flex direction="column" gap="xx-small">
+        {props.items}
+      </Flex>
+    </Flex>
   )
 }

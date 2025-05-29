@@ -16,18 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Frame, SerializedNodes} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-export const PageEditor = (props: {
-  data: SerializedNodes | null
-}) => {
-  return (
-    <>
-      <Editor>
-        <AddBlock onAddBlock={() => {}} />
-        <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
-      </Editor>
-    </>
-  )
+const I18n = createI18nScope('page_editor')
+
+export type BlockData = {
+  groupName: string
+  items: {
+    itemName: string
+    id: string
+  }[]
 }
+
+export const blockData: BlockData[] = [
+  {
+    groupName: I18n.t('Text'),
+    items: [
+      {itemName: I18n.t('Simple text block'), id: 'simple_text'},
+      {itemName: I18n.t('Image + text'), id: 'image_text'},
+    ],
+  },
+  {
+    groupName: I18n.t('Image'),
+    items: [{itemName: I18n.t('Image'), id: 'image'}],
+  },
+]

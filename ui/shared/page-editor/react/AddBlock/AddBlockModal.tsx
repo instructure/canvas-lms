@@ -21,6 +21,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
+import {AddBlockModalBody} from './AddBlockModalBody'
 
 const I18n = createI18nScope('page_editor')
 
@@ -46,7 +47,9 @@ export const AddBlockModal = (props: {
           />
         </Flex>
       </Modal.Header>
-      <Modal.Body></Modal.Body>
+      <Modal.Body>
+        <AddBlockModalBody onBlockSelected={() => {}} />
+      </Modal.Body>
       <Modal.Footer>
         <Flex justifyItems="end" gap="small">
           <Button color="secondary" onClick={props.onDismiss} data-testid="add-modal-cancel-button">
