@@ -172,10 +172,15 @@ export default function GradebookData(props: Props) {
   useEffect(() => {
     if (gradingPeriodSet) {
       fetchGradingPeriodAssignments().then(() => {
-        loadAssignmentGroups(props.gradebookEnv.hide_zero_point_quizzes, currentGradingPeriodId)
+        loadAssignmentGroups({
+          hideZeroPointQuizzes: props.gradebookEnv.hide_zero_point_quizzes,
+          currentGradingPeriodId,
+        })
       })
     } else {
-      loadAssignmentGroups(props.gradebookEnv.hide_zero_point_quizzes)
+      loadAssignmentGroups({
+        hideZeroPointQuizzes: props.gradebookEnv.hide_zero_point_quizzes,
+      })
     }
   }, [
     gradingPeriodSet,
