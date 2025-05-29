@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {createRef} from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ConfigurationFormUrl from '../configuration_forms/ConfigurationFormUrl'
 
 describe('ConfigurationFormUrl', () => {
+  afterEach(cleanup)
   const props = (overrides?: any) => ({
     name: '',
     consumerKey: '',
@@ -39,30 +40,34 @@ describe('ConfigurationFormUrl', () => {
     it('returns true when only required fields are input', async () => {
       const ref = createRef<ConfigurationFormUrl>()
       renderComponent({ref})
-      await userEvent.type(screen.getByLabelText('Name *'), 'Test App')
-      await userEvent.type(screen.getByLabelText('Config URL *'), 'https://example.com')
+      const user = userEvent.setup()
+      await user.type(screen.getByLabelText('Name *'), 'Test App')
+      await user.type(screen.getByLabelText('Config URL *'), 'https://example.com')
       expect(ref.current!.isValid()).toEqual(true)
     })
 
-    it('returns false when Name is missing', () => {
+    it('returns false when Name is missing', async () => {
       const ref = createRef<ConfigurationFormUrl>()
       renderComponent({ref})
-      userEvent.type(screen.getByLabelText('Config URL *'), 'https://example.com')
+      const user = userEvent.setup()
+      await user.type(screen.getByLabelText('Config URL *'), 'https://example.com')
       expect(ref.current!.isValid()).toEqual(false)
     })
 
-    it('returns false when Config URL is missing', () => {
+    it('returns false when Config URL is missing', async () => {
       const ref = createRef<ConfigurationFormUrl>()
       renderComponent({ref})
-      userEvent.type(screen.getByLabelText('Name *'), 'Test App')
+      const user = userEvent.setup()
+      await user.type(screen.getByLabelText('Name *'), 'Test App')
       expect(ref.current!.isValid()).toEqual(false)
     })
 
-    it('returns false when Config URL is not a valid url', () => {
+    it('returns false when Config URL is not a valid url', async () => {
       const ref = createRef<ConfigurationFormUrl>()
       renderComponent({ref})
-      userEvent.type(screen.getByLabelText('Name *'), 'Test App')
-      userEvent.type(screen.getByLabelText('Config URL *'), 'example.com')
+      const user = userEvent.setup()
+      await user.type(screen.getByLabelText('Name *'), 'Test App')
+      await user.type(screen.getByLabelText('Config URL *'), 'example.com')
       expect(ref.current!.isValid()).toEqual(false)
     })
   })

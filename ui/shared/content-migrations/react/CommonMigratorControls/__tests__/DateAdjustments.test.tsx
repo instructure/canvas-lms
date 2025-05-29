@@ -32,6 +32,13 @@ import chicago from 'timezone/America/Chicago'
 import detroit from 'timezone/America/Detroit'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+// Mock jQuery.flashError to fix the test failure
+jest.mock('jquery', () => {
+  const mockJQuery = jest.requireActual('jquery')
+  mockJQuery.flashError = jest.fn()
+  return mockJQuery
+})
+
 declare module 'timezone' {
   interface Timezone {
     (timezoneData: unknown, ...args: string[]): string
