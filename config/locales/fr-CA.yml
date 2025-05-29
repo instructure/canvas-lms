@@ -20459,9 +20459,9 @@ fr-CA:
     topic_unpublished_module: "Cette rubrique fait partie d’un module non publié et n’est pas encore disponible."
     updated_wiki_page: 
       email: 
-        body: "La page %{title} a été supprimée."
+        body: "La page %{title} a été mise à jour."
         html: 
-          body: "La page %{title} a été supprimée."
+          body: "La page %{title} a été mise à jour."
           link_message: "Cliquez ici pour la consulter"
           subject: "Page mise à jour : %{title}, %{user}"
         link_message: "Vous pouvez la consulter ici : %{link}"
