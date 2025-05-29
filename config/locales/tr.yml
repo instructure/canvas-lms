@@ -7228,6 +7228,7 @@ tr:
   delete_grading_scheme_6b308832: "Notlandırma Şemasını Sil"
   delete_group_86c381ec: "Grubu Sil"
   delete_my_account_41060aad: "Hesabımı Sil"
+  delete_name_81c1b5b2: "Sil %{name}"
   delete_outcome_cc6546f1: "Öğrenme Çıktısını Sil"
   delete_outcome_group_6b399d34: "Öğrenme Çıktısı Grubunu Sil"
   delete_quiz_142b8099: "Kısa Sınavı Sil"
