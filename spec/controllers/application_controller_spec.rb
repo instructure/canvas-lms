@@ -2086,6 +2086,59 @@ RSpec.describe ApplicationController do
         end
       end
     end
+
+    describe "#check_restricted_file_access_for_students" do
+      context "when current_user is not present" do
+        it "does nothing" do
+          expect(controller).not_to receive(:render_unauthorized_action)
+          expect(controller.send(:check_restricted_file_access_for_students)).to be_nil
+        end
+      end
+
+      context "when current_user is present" do
+        before do
+          user_factory
+          controller.instance_variable_set(:@current_user, @user)
+        end
+
+        context "when context_account is not present" do
+          it "does nothing" do
+            expect(controller).not_to receive(:render_unauthorized_action)
+            expect(controller.send(:check_restricted_file_access_for_students)).to be_nil
+          end
+        end
+
+        context "when context_account is present" do
+          let(:account) { Account.default }
+
+          before do
+            controller.instance_variable_set(:@context_account, account)
+          end
+
+          context "when account does not have restricted file access for user" do
+            before do
+              allow(account).to receive(:restricted_file_access_for_user?).with(@user).and_return(false)
+            end
+
+            it "does nothing" do
+              expect(controller).not_to receive(:render_unauthorized_action)
+              expect(controller.send(:check_restricted_file_access_for_students)).to be_nil
+            end
+          end
+
+          context "when account has restricted file access for user" do
+            before do
+              allow(account).to receive(:restricted_file_access_for_user?).with(@user).and_return(true)
+            end
+
+            it "renders unauthorized action" do
+              expect(controller).to receive(:render_unauthorized_action)
+              controller.send(:check_restricted_file_access_for_students)
+            end
+          end
+        end
+      end
+    end
   end
 
   describe "flash_notices" do

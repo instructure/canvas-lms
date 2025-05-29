@@ -3248,4 +3248,45 @@ describe Account do
       expect(account).not_to be_valid
     end
   end
+
+  describe "#restricted_file_access_for_user?" do
+    let(:root_account) { Account.create!(root_account: nil) }
+    let(:sub_account) { Account.create!(root_account:) }
+    let!(:user)         { User.create! }
+
+    context "when the feature flag is disabled" do
+      before do
+        root_account.disable_feature!(:restrict_student_access)
+      end
+
+      it "always returns false, even if the user has enrollments" do
+        course = course_factory(account: sub_account)
+        Enrollment.create!(user:, course:, type: "StudentEnrollment")
+        expect(sub_account.restricted_file_access_for_user?(user)).to be_falsey
+      end
+    end
+
+    context "when the feature flag is enabled" do
+      before do
+        root_account.enable_feature!(:restrict_student_access)
+      end
+
+      context "and the user has a student enrollment in that account" do
+        before do
+          course = course_factory(account: sub_account)
+          Enrollment.create!(user:, course:, type: "StudentEnrollment")
+        end
+
+        it "returns true" do
+          expect(sub_account.restricted_file_access_for_user?(user)).to be_truthy
+        end
+      end
+
+      context "and the user does NOT have a student enrollment in that account" do
+        it "returns false" do
+          expect(sub_account.restricted_file_access_for_user?(user)).to be_falsey
+        end
+      end
+    end
+  end
 end

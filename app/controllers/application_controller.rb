@@ -2950,6 +2950,13 @@ class ApplicationController < ActionController::Base
     render_unauthorized_action if limit_access
   end
 
+  def check_restricted_file_access_for_students
+    return if @context.blank? && @current_user.blank?
+
+    account = @context.blank? ? @current_user&.account : context_account
+    render_unauthorized_action if account&.restricted_file_access_for_user?(@current_user)
+  end
+
   def context_account
     @context_account ||= if @context.is_a?(Account)
                            @context
