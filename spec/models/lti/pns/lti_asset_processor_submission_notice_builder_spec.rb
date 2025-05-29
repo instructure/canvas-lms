@@ -175,7 +175,7 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model 
             "scope" => ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"]
           },
           "https://purl.imsglobal.org/spec/lti/claim/eulaservice" => {
-            "scope" => ["https://purl.imsglobal.org/spec/lti/scope/eula"],
+            "scope" => ["https://purl.imsglobal.org/spec/lti/scope/eula/user", "https://purl.imsglobal.org/spec/lti/scope/eula/deployment"],
             "url" => "https://example.com/eula"
           },
         },

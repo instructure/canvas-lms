@@ -53,7 +53,10 @@ describe Lti::Messages::EulaRequest do
   it "includes eulaservice type claim" do
     expect(subject["#{IMS_CLAIM_PREFIX}/eulaservice"]).to eq({
                                                                "url" => tool.asset_processor_eula_url,
-                                                               "scope" => ["https://purl.imsglobal.org/spec/lti/scope/eula"]
+                                                               "scope" => [
+                                                                 "https://purl.imsglobal.org/spec/lti/scope/eula/user",
+                                                                 "https://purl.imsglobal.org/spec/lti/scope/eula/deployment"
+                                                               ]
                                                              })
   end
 

@@ -38,6 +38,12 @@ module Lti::IMS
       only: [:create_acceptance]
     )
 
+    ACTION_SCOPE_MATCHERS = {
+      create_acceptance: all_of(TokenScopes::LTI_EULA_USER_SCOPE),
+      delete_acceptances: all_of(TokenScopes::LTI_EULA_USER_SCOPE),
+      update_tool_eula: all_of(TokenScopes::LTI_EULA_DEPLOYMENT_SCOPE)
+    }.with_indifferent_access.freeze
+
     def validate_tool_id
       render_error("not found", :not_found) unless tool
     end
@@ -156,7 +162,7 @@ module Lti::IMS
     end
 
     def scopes_matcher
-      self.class.all_of(TokenScopes::LTI_EULA_SCOPE)
+      ACTION_SCOPE_MATCHERS.fetch(action_name, self.class.none)
     end
 
     def context
