@@ -30,7 +30,7 @@ class ReuploadSubmissionsDialogManager {
 
   userAssetString: string
 
-  assignment: Assignment
+  assignment: Pick<Assignment, 'id'>
 
   downloadedSubmissionsMap: {
     [assignmentId: string]: boolean
@@ -39,7 +39,7 @@ class ReuploadSubmissionsDialogManager {
   reuploadForm: JQuery | null
 
   constructor(
-    assignment: Assignment,
+    assignment: Pick<Assignment, 'id'>,
     reuploadUrlTemplate: string,
     userAssetString: string,
     downloadedSubmissionsMap: {

@@ -86,7 +86,11 @@ function needsGrading(submission: Submission, pendingGradeInfo: PendingGradeInfo
   )
 }
 
-function formatGrade(submissionData: SubmissionData, assignment: Assignment, options: Getters) {
+function formatGrade(
+  submissionData: SubmissionData,
+  assignment: Pick<Assignment, 'id' | 'points_possible'>,
+  options: Getters,
+) {
   const formatOptions = {
     formatType: options.getEnterGradesAsSetting(assignment.id),
     gradingScheme: options.getGradingSchemeData(assignment.id),
