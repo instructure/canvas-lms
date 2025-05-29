@@ -16,18 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Frame, SerializedNodes} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
+import './grouped-select.css'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
-export const PageEditor = (props: {
-  data: SerializedNodes | null
+export const GroupedSelectEntry = (props: {
+  variant: 'item' | 'group'
+  title: string
+  active: boolean
+  onClick: () => void
 }) => {
+  const isItem = props.variant === 'item'
+  const className = isItem ? 'grouped-select-item' : 'grouped-select-group'
   return (
-    <>
-      <Editor>
-        <AddBlock onAddBlock={() => {}} />
-        <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
-      </Editor>
-    </>
+    <View
+      as="div"
+      className={`${className} ${props.active ? 'selected' : ''}`}
+      onClick={props.onClick}
+    >
+      <Text variant="content">{props.title}</Text>
+    </View>
   )
 }

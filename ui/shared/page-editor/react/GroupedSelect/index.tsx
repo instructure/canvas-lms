@@ -16,18 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Frame, SerializedNodes} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
-
-export const PageEditor = (props: {
-  data: SerializedNodes | null
-}) => {
-  return (
-    <>
-      <Editor>
-        <AddBlock onAddBlock={() => {}} />
-        <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
-      </Editor>
-    </>
-  )
-}
+export * from './GroupedSelect'

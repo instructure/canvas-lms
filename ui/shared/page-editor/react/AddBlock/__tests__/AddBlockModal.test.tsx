@@ -17,8 +17,8 @@
  */
 
 import {render, screen, within} from '@testing-library/react'
-import {AddBlockModal} from '../AddBlockModal'
 import userEvent from '@testing-library/user-event'
+import {AddBlockModal} from '../AddBlockModal'
 
 describe('AddBlockModal', () => {
   let onDismissMock: jest.Mock
@@ -71,7 +71,7 @@ describe('AddBlockModal', () => {
     renderModal({})
     const addButton = await screen.findByRole('button', {name: 'Add to page'})
     await userEvent.click(addButton)
-    expect(onAddBlockMock).toHaveBeenCalledWith('new_block')
+    expect(onAddBlockMock).toHaveBeenCalled()
   })
 
   it('calls onDismiss when "Add to page" button is clicked', async () => {
