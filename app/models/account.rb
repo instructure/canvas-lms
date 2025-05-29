@@ -586,6 +586,11 @@ class Account < ActiveRecord::Base
     limited_access_for_students? && user.active_student_enrollments_in_account?(self)
   end
 
+  def restricted_file_access_for_user?(user)
+    root_account.feature_enabled?(:restrict_student_access) &&
+      user.has_student_enrollment?
+  end
+
   def conditional_release?
     conditional_release[:value]
   end
