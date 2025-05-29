@@ -336,13 +336,6 @@ describe "Differentiation Tag Management" do
           expect(f("body")).to contain_jqcss("[data-testid='differentiation-tag-pagination']")
         end
 
-        it "opens the edit modal when the + tag variant button is pressed" do
-          fj("button:contains('+ Add a variant')").click
-          wait_for_ajaximations
-
-          expect(fj("span:contains('Edit Tag')")).to be_displayed
-        end
-
         it "shows an empty state if there are no categories" do
           @course.differentiation_tag_categories.destroy_all
           refresh_page

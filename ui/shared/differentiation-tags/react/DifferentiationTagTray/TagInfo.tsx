@@ -20,7 +20,6 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Tag} from '@instructure/ui-tag'
-import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('differentiation_tags')
@@ -33,32 +32,13 @@ export interface TagData {
 
 export interface TagInfoProps {
   tags: TagData[]
-  onEdit: React.MouseEventHandler<any>
   multiMode?: boolean
 }
 
-const TagInfo: React.FC<TagInfoProps> = ({tags, onEdit, multiMode = false}) => {
-  if (tags.length === 0) {
+const TagInfo: React.FC<TagInfoProps> = ({tags, multiMode = false}) => {
+  if (tags.length === 1 && !multiMode) {
     return (
-      <Flex direction="column" margin="small 0 0 0">
-        <Flex.Item overflowX="visible" overflowY="visible">
-          <Text size="small">
-            <Link
-              href="#"
-              margin="small 0 0 0"
-              as="button"
-              onClick={onEdit}
-              aria-label={I18n.t('Add a variant to the tag')}
-            >
-              {I18n.t('+ Add a variant')}
-            </Link>
-          </Text>
-        </Flex.Item>
-      </Flex>
-    )
-  } else if (tags.length === 1 && !multiMode) {
-    return (
-      <Text>
+      <Text size="small" aria-hidden="true" data-testid="tag-member-count">
         {I18n.t(
           {
             one: '1 student',
@@ -84,10 +64,18 @@ const TagInfo: React.FC<TagInfoProps> = ({tags, onEdit, multiMode = false}) => {
               data-testid="tag-info"
             >
               <Flex.Item shouldGrow shouldShrink>
-                <Tag text={tagData.name} size="small" />
+                <Tag
+                  text={tagData.name}
+                  size="small"
+                  aria-label={I18n.t(
+                    {one: '%{name} - 1 student', other: '%{name} - %{count} students'},
+                    {name: tagData.name, count: tagData.members_count},
+                  )}
+                  data-testid={`tag-${tagData.name}`}
+                />
               </Flex.Item>
               <Flex.Item shouldShrink={false}>
-                <Text size="small">
+                <Text size="small" aria-hidden="true">
                   {I18n.t(
                     {
                       one: '1 student',
@@ -101,19 +89,6 @@ const TagInfo: React.FC<TagInfoProps> = ({tags, onEdit, multiMode = false}) => {
               </Flex.Item>
             </Flex>
           ))}
-        </Flex.Item>
-        <Flex.Item overflowX="visible" overflowY="visible">
-          <Text size="small">
-            <Link
-              href="#"
-              margin="small 0 0 0"
-              as="button"
-              onClick={onEdit}
-              aria-label={I18n.t('Add a variant to the tag')}
-            >
-              {I18n.t('+ Add a variant')}
-            </Link>
-          </Text>
         </Flex.Item>
       </Flex>
     )
