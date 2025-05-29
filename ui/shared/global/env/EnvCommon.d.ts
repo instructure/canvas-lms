@@ -302,7 +302,6 @@ export type SiteAdminFeatureId =
   | 'new_quizzes_navigation_updates'
   | 'create_wiki_page_mastery_path_overrides'
   | 'create_external_apps_side_tray_overrides'
-  | 'ams_service'
   | 'files_a11y_rewrite_toggle'
   | 'files_a11y_rewrite'
 /**
@@ -338,6 +337,7 @@ export type RootAccountFeatureId =
   | 'course_pace_weighted_assignments'
   | 'course_pace_allow_bulk_pace_assign'
   | 'disable_iframe_sandbox_file_show'
+  | 'ams_service'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_SERVICES

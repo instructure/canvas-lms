@@ -2860,10 +2860,6 @@ CanvasRails::Application.routes.draw do
 
   get "lti/tool_default_icon" => "lti/tool_default_icon#show"
 
-  scope(controller: :ams) do
-    get "ams(/*path)", action: :show, as: :ams
-  end
-
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"
     post "tools/:tool_id/ext_grade_passback", controller: :lti_api, action: :legacy_grade_passback, as: "blti_legacy_grade_passback_api"

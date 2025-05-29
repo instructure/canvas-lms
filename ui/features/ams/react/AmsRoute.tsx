@@ -28,7 +28,7 @@ export function Component(): JSX.Element | null {
   const moduleRef = useRef<AmsModule | null>(null)
 
   React.useEffect(() => {
-    if (!window.ENV.FEATURES.ams_service || !containerRef.current) {
+    if (!ENV.FEATURES.ams_service || !containerRef.current) {
       return
     }
 
@@ -39,9 +39,9 @@ export function Component(): JSX.Element | null {
         if (stillMounting && containerRef.current) {
           moduleRef.current = module
           module.render(containerRef.current, {
-            routerBasename: '/ams',
+            routerBasename: ENV.context_url ?? '',
             themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
-            useHighContrast: window.ENV.use_high_contrast ?? false,
+            useHighContrast: ENV.use_high_contrast ?? false,
           })
         }
       })
@@ -61,7 +61,7 @@ export function Component(): JSX.Element | null {
 }
 
 async function loadAmsModule() {
-  const moduleUrl = window.REMOTES?.ams?.launch_url
+  const moduleUrl = REMOTES?.ams?.launch_url
 
   if (!moduleUrl) {
     throw new Error('AMS module URL not found')
