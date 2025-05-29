@@ -367,6 +367,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
     last: Int
     orderBy: AssignmentTargetSortOrder
   ): AssignmentOverrideConnection
+  assignmentVisibility: [ID!]
 
   """
   Issues related to the assignment

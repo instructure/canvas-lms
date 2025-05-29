@@ -303,6 +303,13 @@ module Types
     field :has_rubric, Boolean, method: :active_rubric_association?
     field :muted, Boolean, null: true
 
+    field :assignment_visibility, [ID], null: true
+    def assignment_visibility
+      return unless object.course.grants_any_right?(current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+
+      Loaders::AssignmentVisibilityLoader.load(object.id)
+    end
+
     field :originality_report_visibility, String, null: true
     def originality_report_visibility
       return nil if object.turnitin_settings.empty?
