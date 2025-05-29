@@ -66,6 +66,10 @@ module ModulesIndexPage
     "[role='dialog'][aria-label='Copy To...']"
   end
 
+  def module_item_drag_handle_selector(module_item_id)
+    "##{module_item_id} .move_item_link"
+  end
+
   def manage_module_item_indent_selector(module_item_id)
     "#context_module_item_#{module_item_id} .indent_item_link"
   end
@@ -296,6 +300,10 @@ module ModulesIndexPage
     fxpath(module_item_page_button_selector(module_id, button_text))
   end
 
+  def module_item_drag_handle(module_item_id)
+    f(module_item_drag_handle_selector(module_item_id))
+  end
+
   def module_item_duplicate(module_item_id)
     f(module_item_duplicate_selector(module_item_id))
   end
@@ -328,10 +336,6 @@ module ModulesIndexPage
     f(module_item_move_tray_sibling_selector)
   end
 
-  def module_move_contents_tray_sibling
-    f(module_move_contents_tray_sibling_selector)
-  end
-
   def module_item_move_tray_move_button
     f(module_item_move_tray_move_button_selector)
   end
@@ -346,6 +350,10 @@ module ModulesIndexPage
 
   def module_move_contents(module_id)
     f(module_move_contents_selector(module_id))
+  end
+
+  def module_move_contents_tray_sibling
+    f(module_move_contents_tray_sibling_selector)
   end
 
   def module_row(module_id)
@@ -647,6 +655,10 @@ module ModulesIndexPage
 
   def close_editor_dialog
     fj(".ui-dialog-titlebar-close:visible").click
+  end
+
+  def drag_and_drop_module_item(module_item_selector1, module_item_selector2)
+    js_drag_and_drop(module_item_selector1, module_item_selector2)
   end
 
   def save_edit_item_form
