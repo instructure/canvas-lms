@@ -24,7 +24,7 @@ import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServe
 import {clearPrefetchedXHRs, getPrefetchedXHR, setPrefetchedXHR} from '@canvas/util/xhr'
 import PerformanceControls from '../../PerformanceControls'
 import {maxAssignmentCount} from '../../Gradebook.utils'
-import {Assignment, AssignmentMap} from 'api'
+import {Assignment, AssignmentGroup, AssignmentMap} from 'api'
 
 jest.mock('../../Gradebook.utils', () => {
   const actual = jest.requireActual('../../Gradebook.utils')
@@ -341,7 +341,7 @@ describe('Gradebook', () => {
 
       // Verify fetchAssignmentGroups was called with expected parameters
       expect(mockFetchAssignmentGroups).toHaveBeenCalledTimes(1)
-      const [{params, isSelectedGradingPeriodId}] = mockFetchAssignmentGroups.mock.calls[0]
+      const [{params}] = mockFetchAssignmentGroups.mock.calls[0]
 
       expect(params).toMatchObject({
         include: expect.arrayContaining([
@@ -357,7 +357,6 @@ describe('Gradebook', () => {
         hide_zero_point_quizzes: false,
         exclude_assignment_submission_types: ['wiki_page'],
       })
-      expect(isSelectedGradingPeriodId).toBe(true)
     })
 
     it('sends request with hide_zero_point_quizzes parameter when specified', async () => {
@@ -490,57 +489,6 @@ describe('Gradebook', () => {
         expect(store.getState().assignmentMap[assignment.id]).toBeDefined()
       })
     })
-
-    it('properly merges new assignments into assignmentMap and assignmentList', async () => {
-      // Set up initial state with an existing assignment to verify merging behavior
-      const existingAssignment = {
-        id: 'existing-1',
-        name: 'Existing Assignment',
-        points_possible: 15,
-        submission_types: ['online_text_entry'],
-        muted: false,
-        html_url: 'http://www.example.com/courses/1201/assignments/existing-1',
-        assignment_group_id: 'ag1',
-        omit_from_final_grade: false,
-        published: true,
-      }
-
-      store.setState({
-        assignmentMap: {'existing-1': existingAssignment} as unknown as AssignmentMap,
-        assignmentList: [existingAssignment] as Assignment[],
-        assignmentGroups: [],
-      })
-
-      // Execute request
-      await store.getState().fetchAssignmentGroups({
-        params: {
-          include: ['assignments'],
-          override_assignment_dates: false,
-          hide_zero_point_quizzes: false,
-          exclude_response_fields: ['description'],
-          exclude_assignment_submission_types: ['wiki_page'],
-          per_page: 50,
-        },
-        isSelectedGradingPeriodId: true,
-      })
-
-      // Get the flattened list of all assignments from our example data
-      const allNewAssignments = exampleData.assignmentGroups.flatMap(group => group.assignments)
-
-      // Verify assignmentMap contains both existing and new assignments
-      expect(Object.keys(store.getState().assignmentMap)).toHaveLength(allNewAssignments.length + 1)
-      expect(store.getState().assignmentMap['existing-1']).toEqual(existingAssignment)
-      allNewAssignments.forEach(assignment => {
-        expect(store.getState().assignmentMap[assignment.id]).toBeDefined()
-      })
-
-      // Verify assignmentList contains all assignments
-      expect(store.getState().assignmentList).toHaveLength(allNewAssignments.length + 1)
-      expect(store.getState().assignmentList).toContainEqual(existingAssignment)
-
-      // Verify assignment groups were added to state
-      expect(store.getState().assignmentGroups).toEqual(exampleData.assignmentGroups)
-    })
   })
 
   describe('loadAssignmentGroupsForGradingPeriods', () => {
@@ -587,7 +535,11 @@ describe('Gradebook', () => {
 
     it('calls fetchAssignmentGroups with assignment IDs for the selected grading period', async () => {
       const mockFetchAssignmentGroups = jest.fn()
-      store.setState({fetchAssignmentGroups: mockFetchAssignmentGroups})
+      const mockHandleAssignmentGroupsResponse = jest.fn()
+      store.setState({
+        fetchAssignmentGroups: mockFetchAssignmentGroups,
+        handleAssignmentGroupsResponse: mockHandleAssignmentGroupsResponse,
+      })
 
       const params = createParams()
       await store.getState().loadAssignmentGroupsForGradingPeriods({params, selectedPeriodId: 'g1'})
@@ -598,6 +550,11 @@ describe('Gradebook', () => {
           params: expect.objectContaining({
             assignment_ids: 'a1', // The assignments in g1
           }),
+        }),
+      )
+
+      expect(mockHandleAssignmentGroupsResponse).toHaveBeenCalledWith(
+        expect.objectContaining({
           isSelectedGradingPeriodId: true,
           gradingPeriodIds: ['g1'],
         }),
@@ -606,7 +563,10 @@ describe('Gradebook', () => {
 
     it('calls fetchAssignmentGroups for other grading period assignments too', async () => {
       const mockFetchAssignmentGroups = jest.fn()
-      store.setState({fetchAssignmentGroups: mockFetchAssignmentGroups})
+
+      store.setState({
+        fetchAssignmentGroups: mockFetchAssignmentGroups,
+      })
 
       await store
         .getState()
@@ -623,10 +583,14 @@ describe('Gradebook', () => {
 
     it('falls back to fetching all assignments when selected grading period has too many assignments', async () => {
       const mockFetchAssignmentGroups = jest.fn()
+      const mockHandleAssignmentGroupsResponse = jest.fn()
       // Mock maxAssignmentCount to return a small number to trigger the fallback
       ;(maxAssignmentCount as jest.Mock).mockReturnValue(0)
 
-      store.setState({fetchAssignmentGroups: mockFetchAssignmentGroups})
+      store.setState({
+        fetchAssignmentGroups: mockFetchAssignmentGroups,
+        handleAssignmentGroupsResponse: mockHandleAssignmentGroupsResponse,
+      })
 
       await store
         .getState()
@@ -635,17 +599,21 @@ describe('Gradebook', () => {
       // Should be called once with no assignment_ids parameter
       expect(mockFetchAssignmentGroups).toHaveBeenCalledTimes(1)
 
-      const [{params, isSelectedGradingPeriodId}] = mockFetchAssignmentGroups.mock.calls[0]
+      const [{params}] = mockFetchAssignmentGroups.mock.calls[0]
       expect(params.assignment_ids).toBeUndefined()
-      expect(isSelectedGradingPeriodId).toBe(true)
+      expect(mockHandleAssignmentGroupsResponse).toHaveBeenCalledWith(
+        expect.objectContaining({isSelectedGradingPeriodId: true}),
+      )
     })
 
     it('falls back to fetching all assignments when selected grading period has no assignments', async () => {
       const mockFetchAssignmentGroups = jest.fn()
+      const mockHandleAssignmentGroupsResponse = jest.fn()
 
       // Set up a grading period with no assignments
       store.setState({
         fetchAssignmentGroups: mockFetchAssignmentGroups,
+        handleAssignmentGroupsResponse: mockHandleAssignmentGroupsResponse,
         gradingPeriodAssignments: {
           ...exampleData.gradingPeriodAssignments,
           empty: [],
@@ -658,17 +626,21 @@ describe('Gradebook', () => {
 
       // Should be called once with no assignment_ids parameter
       expect(mockFetchAssignmentGroups).toHaveBeenCalledTimes(1)
-      const [{params, isSelectedGradingPeriodId}] = mockFetchAssignmentGroups.mock.calls[0]
+      const [{params}] = mockFetchAssignmentGroups.mock.calls[0]
       expect(params.assignment_ids).toBeUndefined()
-      expect(isSelectedGradingPeriodId).toBe(true)
+      expect(mockHandleAssignmentGroupsResponse).toHaveBeenCalledWith(
+        expect.objectContaining({isSelectedGradingPeriodId: true}),
+      )
     })
 
     it('handles empty gradingPeriodAssignments object', async () => {
       const mockFetchAssignmentGroups = jest.fn()
+      const mockHandleAssignmentGroupsResponse = jest.fn()
 
       // Set up with empty gradingPeriodAssignments
       store.setState({
         fetchAssignmentGroups: mockFetchAssignmentGroups,
+        handleAssignmentGroupsResponse: mockHandleAssignmentGroupsResponse,
         gradingPeriodAssignments: {},
       })
 
@@ -678,20 +650,22 @@ describe('Gradebook', () => {
 
       // Should fall back to fetching all assignments
       expect(mockFetchAssignmentGroups).toHaveBeenCalledTimes(1)
-      const [{params, isSelectedGradingPeriodId}] = mockFetchAssignmentGroups.mock.calls[0]
+      const [{params}] = mockFetchAssignmentGroups.mock.calls[0]
       expect(params.assignment_ids).toBeUndefined()
-      expect(isSelectedGradingPeriodId).toBe(true)
+      expect(mockHandleAssignmentGroupsResponse).toHaveBeenCalledWith(
+        expect.objectContaining({isSelectedGradingPeriodId: true}),
+      )
     })
 
     it('returns the promise from the selected grading period fetch', async () => {
       const expectedResult = [{id: 'test'}]
-      const mockFetchAssignmentGroups = jest
+      const mockHandleAssignmentGroupsResponse = jest
         .fn()
         .mockImplementation(({isSelectedGradingPeriodId}) => {
           return Promise.resolve(isSelectedGradingPeriodId ? expectedResult : [])
         })
 
-      store.setState({fetchAssignmentGroups: mockFetchAssignmentGroups})
+      store.setState({handleAssignmentGroupsResponse: mockHandleAssignmentGroupsResponse})
 
       const params = createParams()
       const result = await store
@@ -746,7 +720,7 @@ describe('Gradebook', () => {
         expect(store.getState().isAssignmentGroupsLoading).toBe(false)
 
         // Start the request
-        const promise = store.getState().fetchAssignmentGroups({
+        store.getState().fetchAssignmentGroups({
           params: {
             include: ['assignments'],
             override_assignment_dates: false,
@@ -755,146 +729,179 @@ describe('Gradebook', () => {
             exclude_assignment_submission_types: ['wiki_page'],
             per_page: 50,
           },
-          isSelectedGradingPeriodId: true,
         })
 
         // Check loading state was set synchronously
         expect(store.getState().isAssignmentGroupsLoading).toBe(true)
+      })
+    })
+  })
 
-        // Wait for promise to resolve
-        await promise
+  describe('handleAssignmentGroupsResponse', () => {
+    afterEach(() => {
+      jest.resetAllMocks()
+      store.setState(initialState, true)
+    })
 
-        // Verify loading state is reset when done
-        expect(store.getState().isAssignmentGroupsLoading).toBe(false)
+    it('handles assignment groups with no assignments', async () => {
+      // Create assignment groups with empty assignments array
+      const assignmentGroupsWithNoAssignments: AssignmentGroup[] = [
+        {
+          id: 'ag1',
+          name: 'Assignment Group 1',
+          position: 1,
+          group_weight: 100,
+          rules: {},
+          assignments: [], // Empty assignments array
+          integration_data: {},
+          sis_source_id: null,
+        },
+      ]
+
+      await store.getState().handleAssignmentGroupsResponse({
+        promise: Promise.resolve(assignmentGroupsWithNoAssignments),
+        isSelectedGradingPeriodId: true,
       })
 
-      it('sets recentlyLoadedAssignmentGroups when isSelectedGradingPeriodId is true', async () => {
-        // Clear any existing data
-        store.setState({
-          recentlyLoadedAssignmentGroups: {
-            assignmentGroups: [],
-            gradingPeriodIds: [],
-          },
-        })
+      // Verify state was updated with empty assignments
+      expect(store.getState().assignmentGroups).toEqual(assignmentGroupsWithNoAssignments)
+      expect(store.getState().assignmentList).toEqual([])
+    })
 
-        // Execute with isSelectedGradingPeriodId = true
-        await store.getState().fetchAssignmentGroups({
-          params: {
-            include: ['assignments'],
-            override_assignment_dates: false,
-            hide_zero_point_quizzes: false,
-            exclude_response_fields: ['description'],
-            exclude_assignment_submission_types: ['wiki_page'],
-            per_page: 50,
-          },
-          isSelectedGradingPeriodId: true,
-          gradingPeriodIds: ['g1'],
-        })
+    it('properly merges new assignments into assignmentMap and assignmentList', async () => {
+      // Set up initial state with an existing assignment to verify merging behavior
+      const existingAssignment = {
+        id: 'existing-1',
+        name: 'Existing Assignment',
+        points_possible: 15,
+        submission_types: ['online_text_entry'],
+        muted: false,
+        html_url: 'http://www.example.com/courses/1201/assignments/existing-1',
+        assignment_group_id: 'ag1',
+        omit_from_final_grade: false,
+        published: true,
+      }
 
-        // Verify recentlyLoadedAssignmentGroups is updated
-        expect(store.getState().recentlyLoadedAssignmentGroups).toEqual({
-          assignmentGroups: exampleData.assignmentGroups,
-          gradingPeriodIds: ['g1'],
-        })
+      store.setState({
+        assignmentMap: {'existing-1': existingAssignment} as unknown as AssignmentMap,
+        assignmentList: [existingAssignment] as Assignment[],
+        assignmentGroups: [],
       })
 
-      it('does not set recentlyLoadedAssignmentGroups when isSelectedGradingPeriodId is false', async () => {
-        // Set initial data
-        const initialRecentlyLoaded = {
-          assignmentGroups: [],
-          gradingPeriodIds: ['test'],
-        }
+      // Execute request
+      await store.getState().handleAssignmentGroupsResponse({
+        promise: Promise.resolve(exampleData.assignmentGroups) as Promise<AssignmentGroup[]>,
+        isSelectedGradingPeriodId: true,
+      })
 
-        store.setState({recentlyLoadedAssignmentGroups: initialRecentlyLoaded})
+      // Get the flattened list of all assignments from our example data
+      const allNewAssignments = exampleData.assignmentGroups.flatMap(group => group.assignments)
 
-        // Execute with isSelectedGradingPeriodId = false
-        await store.getState().fetchAssignmentGroups({
-          params: {
-            include: ['assignments'],
-            override_assignment_dates: false,
-            hide_zero_point_quizzes: false,
-            exclude_response_fields: ['description'],
-            exclude_assignment_submission_types: ['wiki_page'],
-            per_page: 50,
-          },
-          isSelectedGradingPeriodId: false,
-          gradingPeriodIds: ['g2'],
-        })
+      // Verify assignmentMap contains both existing and new assignments
+      expect(Object.keys(store.getState().assignmentMap)).toHaveLength(allNewAssignments.length + 1)
+      expect(store.getState().assignmentMap['existing-1']).toEqual(existingAssignment)
+      allNewAssignments.forEach(assignment => {
+        expect(store.getState().assignmentMap[assignment.id]).toBeDefined()
+      })
 
-        // Verify recentlyLoadedAssignmentGroups remains unchanged
-        expect(store.getState().recentlyLoadedAssignmentGroups).toEqual(initialRecentlyLoaded)
+      // Verify assignmentList contains all assignments
+      expect(store.getState().assignmentList).toHaveLength(allNewAssignments.length + 1)
+      expect(store.getState().assignmentList).toContainEqual(existingAssignment)
+
+      // Verify assignment groups were added to state
+      expect(store.getState().assignmentGroups).toEqual(exampleData.assignmentGroups)
+    })
+
+    it('sets loading state flags correctly during fetch', async () => {
+      store.setState({isAssignmentGroupsLoading: true})
+      // Initial state check
+      expect(store.getState().isAssignmentGroupsLoading).toBe(true)
+
+      // Wait for promise to resolve
+      await store.getState().handleAssignmentGroupsResponse({
+        promise: Promise.resolve(exampleData.assignmentGroups) as Promise<AssignmentGroup[]>,
+        isSelectedGradingPeriodId: true,
+      })
+
+      // Verify loading state is reset when done
+      expect(store.getState().isAssignmentGroupsLoading).toBe(false)
+    })
+
+    it('sets recentlyLoadedAssignmentGroups when isSelectedGradingPeriodId is true', async () => {
+      await store.getState().handleAssignmentGroupsResponse({
+        promise: Promise.resolve(exampleData.assignmentGroups) as Promise<AssignmentGroup[]>,
+        isSelectedGradingPeriodId: true,
+        gradingPeriodIds: ['g1'],
+      })
+
+      // Verify recentlyLoadedAssignmentGroups is updated
+      expect(store.getState().recentlyLoadedAssignmentGroups).toEqual({
+        assignmentGroups: exampleData.assignmentGroups,
+        gradingPeriodIds: ['g1'],
       })
     })
 
-    describe('request fails', () => {
-      beforeEach(() => {
-        server.for(urls.assignmentGroupsUrl).respond({status: 500})
+    it('does not set recentlyLoadedAssignmentGroups when isSelectedGradingPeriodId is false', async () => {
+      // Set initial data
+      const initialRecentlyLoaded = {
+        assignmentGroups: [],
+        gradingPeriodIds: ['test'],
+      }
+
+      store.setState({recentlyLoadedAssignmentGroups: initialRecentlyLoaded})
+
+      await store.getState().handleAssignmentGroupsResponse({
+        promise: Promise.resolve(exampleData.assignmentGroups) as Promise<AssignmentGroup[]>,
+        isSelectedGradingPeriodId: false,
+        gradingPeriodIds: ['g2'],
       })
 
-      it('adds a flash message when the request fails', async () => {
-        // Initial state check
-        expect(store.getState().flashMessages).toHaveLength(0)
+      // Verify recentlyLoadedAssignmentGroups remains unchanged
+      expect(store.getState().recentlyLoadedAssignmentGroups).toEqual(initialRecentlyLoaded)
+    })
 
-        // Execute with error
-        await store.getState().fetchAssignmentGroups({
-          params: {
-            include: ['assignments'],
-            override_assignment_dates: false,
-            hide_zero_point_quizzes: false,
-            exclude_response_fields: ['description'],
-            exclude_assignment_submission_types: ['wiki_page'],
-            per_page: 50,
-          },
-          isSelectedGradingPeriodId: true,
-        })
-
-        // Verify flash message was added
-        expect(store.getState().flashMessages).toHaveLength(1)
-        expect(store.getState().flashMessages[0]).toMatchObject({
-          key: 'assignments-groups-loading-error',
-          variant: 'error',
-        })
+    it('adds a flash message when the request fails', async () => {
+      // Initial state check
+      expect(store.getState().flashMessages).toHaveLength(0)
+      await store.getState().handleAssignmentGroupsResponse({
+        promise: Promise.reject(':('),
+        isSelectedGradingPeriodId: true,
+        gradingPeriodIds: ['g1'],
       })
 
-      it('clears loading state even when request fails', async () => {
-        // Start with loading state set
-        store.setState({isAssignmentGroupsLoading: true})
-
-        // Execute with error
-        await store.getState().fetchAssignmentGroups({
-          params: {
-            include: ['assignments'],
-            override_assignment_dates: false,
-            hide_zero_point_quizzes: false,
-            exclude_response_fields: ['description'],
-            exclude_assignment_submission_types: ['wiki_page'],
-            per_page: 50,
-          },
-          isSelectedGradingPeriodId: true,
-        })
-
-        // Verify loading state is reset
-        expect(store.getState().isAssignmentGroupsLoading).toBe(false)
+      // Verify flash message was added
+      expect(store.getState().flashMessages).toHaveLength(1)
+      expect(store.getState().flashMessages[0]).toMatchObject({
+        key: 'assignments-groups-loading-error',
+        variant: 'error',
       })
+    })
+
+    it('clears loading state even when request fails', async () => {
+      // Start with loading state set
+      store.setState({isAssignmentGroupsLoading: true})
+      expect(store.getState().isAssignmentGroupsLoading).toBe(true)
+
+      // Execute with error
+      await store.getState().handleAssignmentGroupsResponse({
+        promise: Promise.reject(':('),
+        isSelectedGradingPeriodId: true,
+        gradingPeriodIds: ['g1'],
+      })
+
+      // Verify loading state is reset
+      expect(store.getState().isAssignmentGroupsLoading).toBe(false)
     })
 
     it('handles undefined return from getDepaginated', async () => {
       // Mock dispatch.getDepaginated to return undefined
-      const mockGetDepaginated = jest.fn().mockResolvedValue(undefined)
-      const dispatch = store.getState().dispatch
-      dispatch.getDepaginated = mockGetDepaginated
+      store.setState({assignmentGroups: [], assignmentList: [], assignmentMap: {}})
 
       // Execute the function
-      const result = await store.getState().fetchAssignmentGroups({
-        params: {
-          include: ['assignments'],
-          override_assignment_dates: false,
-          hide_zero_point_quizzes: false,
-          exclude_response_fields: ['description'],
-          exclude_assignment_submission_types: ['wiki_page'],
-          per_page: 50,
-        },
+      const result = await store.getState().handleAssignmentGroupsResponse({
+        promise: Promise.resolve(undefined) as unknown as Promise<AssignmentGroup[]>,
         isSelectedGradingPeriodId: true,
+        gradingPeriodIds: ['g1'],
       })
 
       // Verify result is undefined
@@ -904,44 +911,6 @@ describe('Gradebook', () => {
       expect(store.getState().assignmentGroups).toEqual([])
       expect(store.getState().assignmentList).toEqual([])
       expect(Object.keys(store.getState().assignmentMap)).toHaveLength(0)
-    })
-
-    it('handles assignment groups with no assignments', async () => {
-      // Create assignment groups with empty assignments array
-      const assignmentGroupsWithNoAssignments = [
-        {
-          params: {
-            id: 'ag1',
-            name: 'Assignment Group 1',
-            position: 1,
-            group_weight: 100,
-            rules: {},
-            assignments: [], // Empty assignments array
-          },
-        },
-      ]
-
-      // Override server response
-      server
-        .for(urls.assignmentGroupsUrl)
-        .respond({status: 200, body: assignmentGroupsWithNoAssignments})
-
-      // Execute the function
-      await store.getState().fetchAssignmentGroups({
-        params: {
-          include: ['assignments'],
-          override_assignment_dates: false,
-          hide_zero_point_quizzes: false,
-          exclude_response_fields: ['description'],
-          exclude_assignment_submission_types: ['wiki_page'],
-          per_page: 50,
-        },
-        isSelectedGradingPeriodId: true,
-      })
-
-      // Verify state was updated with empty assignments
-      expect(store.getState().assignmentGroups).toEqual(assignmentGroupsWithNoAssignments)
-      expect(store.getState().assignmentList).toEqual([])
     })
   })
 })

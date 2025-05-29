@@ -45,13 +45,16 @@ type LoadAssignmentGroups = (
   params: LoadAssignmentGroupsParams,
 ) => Promise<AssignmentGroup[] | undefined>
 
-type FetchAssignmentGroupsParams = {
-  params: AssignmentLoaderParams
+type FetchAssignmentGroupsParams = {params: AssignmentLoaderParams}
+type FetchAssignmentGroups = (params: FetchAssignmentGroupsParams) => Promise<AssignmentGroup[]>
+
+type HandleAssignmentGroupsResponseParams = {
+  promise: Promise<AssignmentGroup[]>
   isSelectedGradingPeriodId: boolean
   gradingPeriodIds?: string[]
 }
-type FetchAssignmentGroups = (
-  params: FetchAssignmentGroupsParams,
+type HandleAssignmentGroupsResponse = (
+  params: HandleAssignmentGroupsResponseParams,
 ) => Promise<AssignmentGroup[] | undefined>
 
 const I18n = createI18nScope('gradebook')
@@ -64,6 +67,7 @@ export type AssignmentsState = {
   loadAssignmentGroupsForGradingPeriods: LoadAssignmentGroupsForGradingPeriods
   loadAssignmentGroups: LoadAssignmentGroups
   fetchAssignmentGroups: FetchAssignmentGroups
+  handleAssignmentGroupsResponse: HandleAssignmentGroupsResponse
   recentlyLoadedAssignmentGroups: {
     assignmentGroups: AssignmentGroup[]
     gradingPeriodIds?: string[]
@@ -181,7 +185,10 @@ export default (
       return get().loadAssignmentGroupsForGradingPeriods({params, selectedPeriodId})
     }
 
-    return get().fetchAssignmentGroups({params, isSelectedGradingPeriodId: true})
+    return get().handleAssignmentGroupsResponse({
+      promise: get().fetchAssignmentGroups({params}),
+      isSelectedGradingPeriodId: true,
+    })
   },
 
   loadAssignmentGroupsForGradingPeriods: ({params, selectedPeriodId}) => {
@@ -203,77 +210,88 @@ export default (
       selectedAssignmentIds.length > maxAssignments ||
       otherAssignmentIds.length > maxAssignments
     ) {
-      return get().fetchAssignmentGroups({params, isSelectedGradingPeriodId: true})
+      return get().handleAssignmentGroupsResponse({
+        promise: get().fetchAssignmentGroups({params}),
+        isSelectedGradingPeriodId: true,
+      })
     }
 
     // If there are no assignments in the selected grading period, request all
     // assignments in a single query
     if (selectedAssignmentIds.length === 0) {
-      return get().fetchAssignmentGroups({params, isSelectedGradingPeriodId: true})
+      return get().handleAssignmentGroupsResponse({
+        promise: get().fetchAssignmentGroups({params}),
+        isSelectedGradingPeriodId: true,
+      })
     }
 
     // fetch otther grading periods
     const ids2 = otherAssignmentIds.join()
-    get().fetchAssignmentGroups({
-      params: {...params, assignment_ids: ids2},
+    get().handleAssignmentGroupsResponse({
+      promise: get().fetchAssignmentGroups({params: {...params, assignment_ids: ids2}}),
       isSelectedGradingPeriodId: false,
       gradingPeriodIds: otherGradingPeriodIds,
     })
 
     // fetch selected grading period
     const ids1 = selectedAssignmentIds.join()
-    return get().fetchAssignmentGroups({
-      params: {...params, assignment_ids: ids1},
+    return get().handleAssignmentGroupsResponse({
+      promise: get().fetchAssignmentGroups({params: {...params, assignment_ids: ids1}}),
       isSelectedGradingPeriodId: true,
       gradingPeriodIds: [selectedPeriodId],
     })
   },
 
-  fetchAssignmentGroups: ({params, isSelectedGradingPeriodId, gradingPeriodIds}) => {
+  fetchAssignmentGroups: ({params}) => {
     set({isAssignmentGroupsLoading: true})
 
     const path = `/api/v1/courses/${get().courseId}/assignment_groups`
 
-    return get()
-      .dispatch.getDepaginated<AssignmentGroup[]>(path, params)
-      .then(assignmentGroups => {
-        if (assignmentGroups) {
-          const assignments = assignmentGroups.flatMap(group => group.assignments ?? [])
-          const assignmentMap = {
-            ...get().assignmentMap,
-            ...Object.fromEntries(assignments.map(assignment => [assignment.id, assignment])),
-          }
-          const assignmentList = get().assignmentList.concat(assignments)
-          if (isSelectedGradingPeriodId) {
-            set({
-              recentlyLoadedAssignmentGroups: {
-                assignmentGroups,
-                gradingPeriodIds,
-              },
-            })
-          }
+    return get().dispatch.getDepaginated<AssignmentGroup[]>(path, params)
+  },
+
+  handleAssignmentGroupsResponse: async ({
+    promise,
+    isSelectedGradingPeriodId,
+    gradingPeriodIds,
+  }) => {
+    try {
+      const assignmentGroups = await promise
+      if (assignmentGroups) {
+        const assignments = assignmentGroups.flatMap(group => group.assignments ?? [])
+        const assignmentMap = {
+          ...get().assignmentMap,
+          ...Object.fromEntries(assignments.map(assignment => [assignment.id, assignment])),
+        }
+        const assignmentList = get().assignmentList.concat(assignments)
+        if (isSelectedGradingPeriodId) {
           set({
-            assignmentMap,
-            assignmentList,
-            assignmentGroups: get().assignmentGroups.concat(assignmentGroups),
+            recentlyLoadedAssignmentGroups: {
+              assignmentGroups,
+              gradingPeriodIds,
+            },
           })
         }
-        return assignmentGroups
-      })
-      .catch(() => {
         set({
-          flashMessages: get().flashMessages.concat([
-            {
-              key: 'assignments-groups-loading-error',
-              message: I18n.t('There was an error fetching assignment groups data.'),
-              variant: 'error',
-            },
-          ]),
+          assignmentMap,
+          assignmentList,
+          assignmentGroups: get().assignmentGroups.concat(assignmentGroups),
         })
-        return undefined
+      }
+      return assignmentGroups
+    } catch {
+      set({
+        flashMessages: get().flashMessages.concat([
+          {
+            key: 'assignments-groups-loading-error',
+            message: I18n.t('There was an error fetching assignment groups data.'),
+            variant: 'error',
+          },
+        ]),
       })
-      .finally(() => {
-        set({isAssignmentGroupsLoading: false})
-      })
+      return undefined
+    } finally {
+      set({isAssignmentGroupsLoading: false})
+    }
   },
 })
