@@ -33,7 +33,10 @@ describe('DiscussionTopicForm', () => {
     currentDiscussionTopic = {},
     assignmentGroups = [],
     isStudent = false,
-    sections = [],
+    sections = [
+      {id: 1, name: 'Section 1'},
+      {id: 2, name: 'Section 2'},
+    ],
     groupCategories = [],
     onSubmit = () => {},
     isGroupContext = false,
@@ -314,6 +317,7 @@ describe('DiscussionTopicForm', () => {
     expect(document.getByText('Topic Title')).toBeInTheDocument()
     expect(document.queryByText('Attach')).toBeTruthy()
     expect(document.queryByTestId('section-select')).toBeTruthy()
+    expect(document.queryByText('All Sections')).toBeTruthy()
     expect(document.queryByLabelText('Allow Participants to Comment')).toBeInTheDocument()
     expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
     expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
@@ -329,6 +333,36 @@ describe('DiscussionTopicForm', () => {
 
     // hides mastery paths
     expect(document.queryByText('Mastery Paths')).toBeFalsy()
+  })
+
+  describe('when user is restricted', () => {
+    it('sets all the sections as default sections', () => {
+      window.ENV.USER_HAS_RESTRICTED_VISIBILITY = true
+      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+      window.ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+
+      const document = setup()
+      expect(document.queryByText('Section 1')).toBeTruthy()
+      expect(document.queryByText('Section 2')).toBeTruthy()
+    })
+
+    it('when there are section visibilities already it sets the visibilities as default', () => {
+      window.ENV.USER_HAS_RESTRICTED_VISIBILITY = true
+      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+      window.ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+
+      const {getByText} = setup({
+        currentDiscussionTopic: DiscussionTopic.mock({
+          groupSet: false,
+          courseSections: [{_id: 1, name: 'Section 1'}],
+        }),
+      })
+      expect(getByText('Section 1')).toBeTruthy()
+    })
   })
 
   it('renders comment related fields when participants commenting is enabled in an announcement', () => {

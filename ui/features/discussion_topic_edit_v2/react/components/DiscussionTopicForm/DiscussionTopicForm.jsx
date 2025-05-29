@@ -149,6 +149,7 @@ function DiscussionTopicForm({
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
     ENV.IN_PACED_COURSE &&
     ENV.FEATURES.course_pace_pacing_with_mastery_paths
+  const userIsRestricted = ENV.USER_HAS_RESTRICTED_VISIBILITY
 
   const announcementAlertProps = () => {
     if (isUnpublishedAnnouncement) {
@@ -211,10 +212,15 @@ function DiscussionTopicForm({
     !currentDiscussionTopic?.isSectionSpecific ||
     currentDiscussionTopic?.courseSections?.length > 0
   ) {
-    sectionsDefault =
-      currentDiscussionTopic?.courseSections?.length > 0
-        ? currentDiscussionTopic.courseSections.map(section => section._id)
-        : ['all']
+    if (currentDiscussionTopic?.courseSections?.length > 0) {
+      sectionsDefault = currentDiscussionTopic.courseSections.map(section => section._id)
+    } else {
+      if (userIsRestricted) {
+        sectionsDefault = sections.map(section => section.id)
+      } else {
+        sectionsDefault = ['all']
+      }
+    }
   }
 
   const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(sectionsDefault)
@@ -404,6 +410,14 @@ function DiscussionTopicForm({
     isGraded,
     isCheckpoints,
     postToSis: postToSisForCards.current,
+  }
+
+  const getSectionList = () => {
+    const sectionsForUser = [...sections]
+    if (!userIsRestricted) {
+      sectionsForUser.push(allSectionsOption)
+    }
+    return sectionsForUser
   }
 
   useEffect(() => {
@@ -1039,7 +1053,7 @@ function DiscussionTopicForm({
                   sectionInputRef.current = ref
                 }}
               >
-                {[allSectionsOption, ...sections].map(({id, name: label}) => (
+                {getSectionList().map(({id, name: label}) => (
                   <CanvasMultiSelect.Option
                     id={id}
                     value={`opt-${id}`}
