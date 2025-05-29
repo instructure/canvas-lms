@@ -55,7 +55,8 @@ export const LtiScopeTranslations: Record<LtiScope, string> = {
   ),
   [LtiScopes.AssetReadonly]: I18n.t('Can fetch assets from the platform using the Asset Service'),
   [LtiScopes.AssetReport]: I18n.t('Can create reports using the Asset Report Service'),
-  [LtiScopes.Eula]: I18n.t("Can update or remove the tool's EULA accepted flag"),
+  [LtiScopes.EulaUser]: I18n.t("Can update or remove the tool's EULA accepted flag"),
+  [LtiScopes.EulaDeployment]: I18n.t("Can update or remove the tool's EULA requirement flag"),
   [LtiScopes.PublicJwkUpdate]: I18n.t('Can update public jwk for LTI services'),
   [LtiScopes.AccountLookupShow]: I18n.t('Can lookup Account information'),
   [LtiScopes.AgsProgressShow]: I18n.t(

@@ -266,7 +266,7 @@ module Lti::Messages
 
     def add_eulaservice_claims!
       @message.eulaservice.url = @tool.asset_processor_eula_url
-      @message.eulaservice.scope = [TokenScopes::LTI_EULA_SCOPE]
+      @message.eulaservice.scope = [TokenScopes::LTI_EULA_USER_SCOPE, TokenScopes::LTI_EULA_DEPLOYMENT_SCOPE]
     end
 
     def associated_1_1_tool

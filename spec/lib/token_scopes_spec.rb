@@ -184,7 +184,8 @@ describe TokenScopes do
         asset_scopes = [
           TokenScopes::LTI_ASSET_READ_ONLY_SCOPE,
           TokenScopes::LTI_ASSET_REPORT_SCOPE,
-          TokenScopes::LTI_EULA_SCOPE
+          TokenScopes::LTI_EULA_USER_SCOPE,
+          TokenScopes::LTI_EULA_DEPLOYMENT_SCOPE
         ]
         expect(scopes_hash).to eq TokenScopes::LTI_SCOPES.except(*asset_scopes)
         expect(scopes_list).to eq TokenScopes::LTI_SCOPES.keys - asset_scopes

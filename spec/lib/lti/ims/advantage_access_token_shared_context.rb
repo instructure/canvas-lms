@@ -50,7 +50,8 @@ shared_context "advantage access token context" do
       https://purl.imsglobal.org/spec/lti/scope/noticehandlers
       https://purl.imsglobal.org/spec/lti/scope/asset.readonly
       https://purl.imsglobal.org/spec/lti/scope/report
-      https://purl.imsglobal.org/spec/lti/scope/eula
+      https://purl.imsglobal.org/spec/lti/scope/eula/user
+      https://purl.imsglobal.org/spec/lti/scope/eula/deployment
     ].join(" ")
   end
   let(:access_token_signing_key) { Canvas::Security.encryption_key }

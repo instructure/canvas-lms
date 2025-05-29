@@ -1176,7 +1176,8 @@ describe Lti::Messages::JwtMessage do
     it "adds the EULA service claims to the message" do
       expect(subject).to eq({
                               "url" => "http://localhost/api/lti/asset_processor_eulas/#{tool.id}",
-                              "scope" => ["https://purl.imsglobal.org/spec/lti/scope/eula"]
+                              "scope" => ["https://purl.imsglobal.org/spec/lti/scope/eula/user",
+                                          "https://purl.imsglobal.org/spec/lti/scope/eula/deployment"]
                             })
     end
   end
