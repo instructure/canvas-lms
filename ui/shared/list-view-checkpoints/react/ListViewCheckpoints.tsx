@@ -36,11 +36,11 @@ export type StudentViewCheckpointProps = {
 
 export type CheckpointProps = {
   assignment: AssignmentCheckpoints
-  checkpoint: Checkpoint
+  checkpoint: Pick<Checkpoint, 'due_at' | 'overrides' | 'tag'>
 }
 
 export const ListViewCheckpoints = ({assignment}: StudentViewCheckpointProps) => {
-  const sortCheckpoints = (a: Checkpoint, b: Checkpoint) => {
+  const sortCheckpoints = (a: Pick<Checkpoint, 'tag'>, b: Pick<Checkpoint, 'tag'>) => {
     const order = {
       [REPLY_TO_TOPIC]: 1,
       [REPLY_TO_ENTRY]: 2,

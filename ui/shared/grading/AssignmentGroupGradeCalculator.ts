@@ -99,8 +99,7 @@ function estimateQHigh(
   return grades[grades.length - 1]
 }
 
-// @ts-expect-error
-function buildBigF(keepCount: number, cannotDrop: DroppableSubmission[], sortAsc) {
+function buildBigF(keepCount: number, cannotDrop: DroppableSubmission[], sortAsc: boolean) {
   return function bigF(q: number, submissions: SubmissionGradeCriteria[]) {
     const ratedScores = submissions.map(submission => [
       // @ts-expect-error
@@ -133,7 +132,7 @@ function setUpGrades(pointed, unpointed) {
 }
 
 // @ts-expect-error
-function keepHelper(submissions, initialKeepCount, sortAsc, cannotDrop, maxTotal) {
+function keepHelper(submissions, initialKeepCount, sortAsc: boolean, cannotDrop, maxTotal) {
   const keepCount = Math.max(1, initialKeepCount)
 
   if (submissions.length <= keepCount) {
@@ -262,7 +261,7 @@ function dropAssignments(
 }
 
 function calculateGroupGrade(
-  group: AssignmentGroup,
+  group: Pick<AssignmentGroup, 'rules' | 'assignments'>,
   allSubmissions: SubmissionGradeCriteria[],
   opts: {
     ignoreUnpostedAnonymous: boolean
@@ -278,7 +277,12 @@ function calculateGroupGrade(
       result[submission.assignment_id] = submission
       return result
     }, {})
-  const ungradeableCriteria = (assignment: Assignment) =>
+  const ungradeableCriteria = (
+    assignment: Pick<
+      Assignment,
+      'omit_from_final_grade' | 'workflow_state' | 'submission_types' | 'anonymize_students'
+    >,
+  ) =>
     assignment.omit_from_final_grade ||
     // @ts-expect-error
     hiddenAssignmentsById[assignment.id] ||
@@ -286,7 +290,7 @@ function calculateGroupGrade(
     assignment.workflow_state === 'unpublished' ||
     (opts.ignoreUnpostedAnonymous && assignment.anonymize_students)
   const gradeableAssignments =
-    group?.assignments?.filter((assignment: Assignment) => !ungradeableCriteria(assignment)) || []
+    group?.assignments?.filter(assignment => !ungradeableCriteria(assignment)) || []
   const assignments = gradeableAssignments.reduce((result, item) => {
     // @ts-expect-error
     result[item.id] = item
@@ -396,7 +400,7 @@ function calculateGroupGrade(
 // }
 function calculate(
   allSubmissions: SubmissionGradeCriteria[],
-  assignmentGroup: AssignmentGroup,
+  assignmentGroup: Pick<AssignmentGroup, 'id' | 'assignments' | 'group_weight' | 'rules'>,
   ignoreUnpostedAnonymous: boolean,
 ): AssignmentGroupGrade {
   const uniqAssignmentIds = new Set()
