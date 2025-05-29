@@ -95,7 +95,7 @@ describe Types::AssignmentGroupType do
         .to eq @group.assignments.map(&:to_param)
     end
 
-    describe "assignmentsGroupConnection" do
+    describe "assignmentsConnection" do
       it "returns assignments in position order" do
         @assignment.update! position: 2
         assignment2 = @course.assignments.create! name: "a2", assignment_group: @group, position: 1
@@ -109,6 +109,45 @@ describe Types::AssignmentGroupType do
         expect(
           @group_type.resolve("assignmentsConnection { nodes { _id } }")
         ).not_to include @other_assignment.id.to_s
+      end
+
+      context "submission types" do
+        before(:once) do
+          @assignment1 = @course.assignments.create!(
+            name: "Online Upload Assignment",
+            submission_types: "online_upload",
+            assignment_group: @group,
+            workflow_state: "published"
+          )
+          @assignment2 = @course.assignments.create!(
+            name: "Online Quiz Assignment",
+            submission_types: "online_quiz",
+            assignment_group: @group,
+            workflow_state: "published"
+          )
+          @assignment3 = @course.assignments.create!(
+            name: "No Submission Assignment",
+            submission_types: "none",
+            assignment_group: @group,
+            workflow_state: "published"
+          )
+          @assignment4 = @course.assignments.create!(
+            name: "Multiple Submission Types Assignment",
+            submission_types: "online_upload,online_quiz",
+            assignment_group: @group,
+            workflow_state: "published"
+          )
+        end
+
+        it "only returns assignments with online_upload submission type" do
+          result = @group_type.resolve("assignmentsConnection(filter: { submissionTypes: [online_upload] }) { edges { node { _id } } }", current_user: @student)
+          expect(result).to eq [@assignment1.id.to_s, @assignment4.id.to_s]
+        end
+
+        it "only returns assignments with online_upload, online_quiz submission type" do
+          result = @group_type.resolve("assignmentsConnection(filter: { submissionTypes: [online_upload, online_quiz] }) { edges { node { _id } } }", current_user: @student)
+          expect(result).to eq [@assignment1.id.to_s, @assignment2.id.to_s, @assignment4.id.to_s]
+        end
       end
     end
 

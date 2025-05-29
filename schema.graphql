@@ -716,6 +716,12 @@ input AssignmentFilter {
   searchTerm: String
 
   """
+  only return assignments for the given submission types. Defaults to
+  all.
+  """
+  submissionTypes: [SubmissionType!]
+
+  """
   only return assignments for the given user. Defaults to
   the current user.
   """
