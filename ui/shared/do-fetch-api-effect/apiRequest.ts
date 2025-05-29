@@ -48,7 +48,6 @@ export async function executeApiRequest<T>(request: ApiRequest): Promise<ApiResp
   return {
     data: json as T,
     status: (response as Response).status,
-    // @ts-expect-error
     link,
   }
 }

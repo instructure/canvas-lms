@@ -112,7 +112,7 @@ describe('publishAllModulesHelper', () => {
       mockDoFetchApi.mockResolvedValueOnce({
         response: new Response('', {status: 200}),
         json: [{id: 1, published: true, items: []}],
-        link: {next: {url: '/another/page'}},
+        link: {next: {url: '/another/page', rel: 'next'}},
         text: '',
       })
 

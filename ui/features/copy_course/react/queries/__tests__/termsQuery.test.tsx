@@ -182,10 +182,10 @@ describe('termsQuery', () => {
 
 describe('getTermsNextPage', () => {
   const exampleTerm = {id: '1', name: 'Term 1', start_at: '2024-01-01', end_at: '2024-01-02'}
-  const next = {page: '2', per_page: '10'}
+  const next = {page: '2', per_page: '10', url: 'test', rel: 'next'}
 
   it('should return the next page link if it exists', () => {
-    const expectedNext = {page: '2', per_page: '10'}
+    const expectedNext = {page: '2', per_page: '10', url: 'test', rel: 'next'}
     const lastPage: DoFetchApiResults<EnrollmentTerms> = {
       json: {
         enrollment_terms: [exampleTerm],
