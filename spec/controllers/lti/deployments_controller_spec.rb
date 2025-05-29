@@ -58,6 +58,7 @@ RSpec.describe Lti::DeploymentsController do
 
   before do
     user_session(admin)
+    registration
   end
 
   describe "GET list", type: :request do
@@ -82,7 +83,7 @@ RSpec.describe Lti::DeploymentsController do
             .once
             .and_return(account)
           subject
-          expect(response_json.length).to eq(3)
+          expect(response_json.length).to eq(4) # deployment is auto-created on registration
         end
       end
 
@@ -107,7 +108,7 @@ RSpec.describe Lti::DeploymentsController do
 
       it "returns a list of deployments" do
         subject
-        expect(response_json.length).to eq(3)
+        expect(response_json.length).to eq(4) # deployment is auto-created on registration
       end
 
       it "has the expected fields in the results" do

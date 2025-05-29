@@ -58,6 +58,7 @@ describe Lti::ContextControlsController, type: :request do
 
   before do
     user_session(admin)
+    registration # auto-create deployment and control first
   end
 
   def deployment_for(context)
@@ -68,7 +69,7 @@ describe Lti::ContextControlsController, type: :request do
     subject { get "/api/v1/lti_registrations/#{registration.id}/controls" }
 
     context "with deployments" do
-      let(:deployment) { deployment_for(account) }
+      let(:deployment) { registration.deployments.first }
       let(:control) { deployment.context_controls.first }
       let(:course) { course_model(account:) }
       let(:subaccount) { account_model(parent_account: account) }
@@ -135,6 +136,10 @@ describe Lti::ContextControlsController, type: :request do
     end
 
     context "with no deployments" do
+      before do
+        registration.deployments.each(&:destroy)
+      end
+
       it "is successful" do
         subject
         expect(response).to be_successful
@@ -245,7 +250,7 @@ describe Lti::ContextControlsController, type: :request do
 
     let(:params) { { course_id: course.id } }
     let(:course) { course_model(account:) }
-    let(:root_deployment) { registration.new_external_tool(account).tap(&:save!) }
+    let(:root_deployment) { registration.deployments.first }
 
     before { root_deployment }
 
@@ -427,7 +432,7 @@ describe Lti::ContextControlsController, type: :request do
     end
 
     let(:params) { [] }
-    let(:root_deployment) { registration.new_external_tool(account).tap(&:save!) }
+    let(:root_deployment) { registration.deployments.first }
 
     before { root_deployment }
 

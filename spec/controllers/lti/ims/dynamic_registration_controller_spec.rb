@@ -157,7 +157,6 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(created_registration.canvas_configuration["custom_fields"]).to eq({ "global_foo" => "global_bar" })
           expect(created_registration.unified_tool_id).to eq("asdf")
           expect(created_registration.registration_url).to eq("https://example.com/registration")
-          expect(created_registration.lti_registration.vendor).to eq("Vendor")
         end
 
         it "validates using the schema's to_model_attrs" do
@@ -187,6 +186,46 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(dk.is_lti_key).to be(true)
           expect(dk.icon_url).to eq("https://example.com/logo.jpg")
           expect(dk.oidc_initiation_url).to eq(registration_params["initiate_login_uri"])
+        end
+
+        it "creates an Lti::Registration with expected values" do
+          subject
+          registration = Lti::Registration.last
+          expect(registration.account.global_id).to eq(token_hash[:root_account_global_id])
+          expect(registration.workflow_state).to eq("active")
+          expect(registration.created_by.id).to eq(token_hash[:user_id])
+          expect(registration.updated_by.id).to eq(token_hash[:user_id])
+          expect(registration.admin_nickname).to eq(registration_params["client_name"])
+          expect(registration.name).to eq(registration_params["client_name"])
+          expect(registration.vendor).to eq("Vendor")
+          expect(registration.ims_registration).to eq(Lti::IMS::Registration.last)
+        end
+
+        context "with flag disabled" do
+          before do
+            Account.default.disable_feature!(:lti_registrations_next)
+          end
+
+          it "does not deploy the tool" do
+            expect { subject }.not_to change { ContextExternalTool.count }
+          end
+        end
+
+        context "with flag enabled" do
+          before do
+            Account.default.enable_feature!(:lti_registrations_next)
+          end
+
+          it "deploys the tool" do
+            expect { subject }.to change { ContextExternalTool.count }.by(1)
+          end
+
+          it "marks the tool as unavailable" do
+            subject
+            context_control = Lti::ContextControl.last
+            expect(context_control.deployment).to eq ContextExternalTool.last
+            expect(context_control.available).to be false
+          end
         end
       end
 
