@@ -506,7 +506,11 @@ class GradebooksController < ApplicationController
           submission[:comment_attachments] = attachments
         end
         begin
-          if [:grade, :score, :excuse, :excused].any? { |k| submission.key? k }
+          # Track if we're processing both grading and commenting to prevent duplicate submission updates
+          has_grading = [:grade, :score, :excuse, :excused].any? { |k| submission.key? k }
+          has_commenting = [:comment, :media_comment_id, :comment_attachments].any? { |k| submission.key? k }
+          
+          if has_grading
             # if it's a percentage graded assignment, we need to ensure there's a
             # percent sign on the end. eventually this will probably be done in
             # the javascript.
@@ -516,6 +520,14 @@ class GradebooksController < ApplicationController
 
             submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
             submission.delete(:final) if submission[:final] && !@context.grants_right?(@current_user, :moderate_grades)
+            
+            # If we also have comments, include them in the grading call to prevent separate submission updates
+            if has_commenting
+              submission[:commenter] = @current_user
+              submission[:hidden] = @assignment.muted?
+              Rails.logger.info "GRADES: Processing combined grading and commenting for user #{@user.id} on assignment #{@assignment.id}"
+            end
+            
             subs = @assignment.grade_student(@user, submission)
             if submission[:provisional]
               subs.each do |sub|
@@ -523,11 +535,13 @@ class GradebooksController < ApplicationController
               end
             end
             @submissions += subs
-          end
-          if [:comment, :media_comment_id, :comment_attachments].any? { |k| submission.key? k }
+          elsif has_commenting
+            # Only commenting, no grading
             submission[:commenter] = @current_user
             submission[:hidden] = @assignment.muted?
 
+            Rails.logger.info "GRADES: Processing comment-only for user #{@user.id} on assignment #{@assignment.id}"
+            
             subs = @assignment.update_submission(@user, submission)
             if submission[:provisional]
               subs.each do |sub|
