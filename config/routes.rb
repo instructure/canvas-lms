@@ -2008,7 +2008,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "lti/context_controls") do
-      get "lti_registrations/:registration_id/controls", action: :index
+      get "lti_registrations/:registration_id/controls", action: :index, as: :lti_context_controls_index
       post "lti_registrations/:registration_id/controls", action: :create
       post "lti_registrations/:registration_id/controls/bulk", action: :create_many
       get "lti_registrations/:registration_id/controls/:id", action: :show
