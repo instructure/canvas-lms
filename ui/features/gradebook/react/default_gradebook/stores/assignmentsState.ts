@@ -24,26 +24,46 @@ import type {GradebookStore} from './index'
 import type {GradingPeriodAssignmentMap} from '../gradebook.d'
 import type {AssignmentGroup, Assignment, AssignmentMap, SubmissionType} from '../../../../../api.d'
 
+type FetchGradingPeriodAssignmentsResponse = {
+  grading_period_assignments: GradingPeriodAssignmentMap
+}
+type FetchGradingPeriodAssignments = () => Promise<GradingPeriodAssignmentMap | void>
+
+type LoadAssignmentGroupsForGradingPeriodsParams = {
+  params: AssignmentLoaderParams
+  selectedPeriodId: string
+}
+type LoadAssignmentGroupsForGradingPeriods = ({
+  params,
+}: LoadAssignmentGroupsForGradingPeriodsParams) => Promise<AssignmentGroup[] | undefined>
+
+type LoadAssignmentGroupsParams = {
+  hideZeroPointQuizzes: boolean
+  currentGradingPeriodId?: string
+}
+type LoadAssignmentGroups = (
+  params: LoadAssignmentGroupsParams,
+) => Promise<AssignmentGroup[] | undefined>
+
+type FetchAssignmentGroupsParams = {
+  params: AssignmentLoaderParams
+  isSelectedGradingPeriodId: boolean
+  gradingPeriodIds?: string[]
+}
+type FetchAssignmentGroups = (
+  params: FetchAssignmentGroupsParams,
+) => Promise<AssignmentGroup[] | undefined>
+
 const I18n = createI18nScope('gradebook')
 
 export type AssignmentsState = {
   gradingPeriodAssignments: GradingPeriodAssignmentMap
   isGradingPeriodAssignmentsLoading: boolean
   isAssignmentGroupsLoading: boolean
-  fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
-  loadAssignmentGroupsForGradingPeriods: (
-    params: AssignmentLoaderParams,
-    selectedPeriodId: string,
-  ) => Promise<AssignmentGroup[] | undefined>
-  loadAssignmentGroups: (
-    hideZeroPointQuizzes: boolean,
-    currentGradingPeriodId?: string,
-  ) => Promise<AssignmentGroup[] | undefined>
-  fetchAssignmentGroups: (
-    params: AssignmentLoaderParams,
-    isSelectedGradingPeriodId: boolean,
-    gradingPeriodIds?: string[],
-  ) => Promise<AssignmentGroup[] | undefined>
+  fetchGradingPeriodAssignments: FetchGradingPeriodAssignments
+  loadAssignmentGroupsForGradingPeriods: LoadAssignmentGroupsForGradingPeriods
+  loadAssignmentGroups: LoadAssignmentGroups
+  fetchAssignmentGroups: FetchAssignmentGroups
   recentlyLoadedAssignmentGroups: {
     assignmentGroups: AssignmentGroup[]
     gradingPeriodIds?: string[]
@@ -98,44 +118,36 @@ export default (
      * will force all subsequent requests for user ids to call through the
      * network.
      */
-    let promise = consumePrefetchedXHR('grading_period_assignments')
-    if (promise) {
-      promise = asJson(promise)
-    } else {
-      promise = dispatch.getJSON(`/courses/${courseId}/gradebook/grading_period_assignments`)
-    }
+    const prefetched = consumePrefetchedXHR('grading_period_assignments')
+    const promise = prefetched
+      ? (asJson(prefetched) as Promise<FetchGradingPeriodAssignmentsResponse>)
+      : dispatch.getJSON<FetchGradingPeriodAssignmentsResponse>(
+          `/courses/${courseId}/gradebook/grading_period_assignments`,
+        )
 
-    return (
-      // @ts-expect-error
-      promise
-        // @ts-expect-error until consumePrefetchedXHR and dispatch.getJSON support generics
-        .then((data: {grading_period_assignments: GradingPeriodAssignmentMap}) => {
-          set({
-            gradingPeriodAssignments: data.grading_period_assignments,
-            isGradingPeriodAssignmentsLoading: false,
-          })
-          return data.grading_period_assignments
+    return promise
+      .then(({grading_period_assignments}) => {
+        set({
+          gradingPeriodAssignments: grading_period_assignments,
+          isGradingPeriodAssignmentsLoading: false,
         })
-        .catch(() => {
-          set({
-            isGradingPeriodAssignmentsLoading: false,
-            flashMessages: get().flashMessages.concat([
-              {
-                key: 'grading-period-assignments-loading-error',
-                message: I18n.t('There was an error fetching grading period assignments data.'),
-                variant: 'error',
-              },
-            ]),
-          })
-          return {}
+        return grading_period_assignments
+      })
+      .catch(() => {
+        set({
+          isGradingPeriodAssignmentsLoading: false,
+          flashMessages: get().flashMessages.concat([
+            {
+              key: 'grading-period-assignments-loading-error',
+              message: I18n.t('There was an error fetching grading period assignments data.'),
+              variant: 'error',
+            },
+          ]),
         })
-    )
+      })
   },
 
-  loadAssignmentGroups: (
-    hideZeroPointQuizzes: boolean = false,
-    selectedGradingPeriodId?: string,
-  ) => {
+  loadAssignmentGroups: ({hideZeroPointQuizzes = false, currentGradingPeriodId}) => {
     const include = [
       'assignment_group_id',
       'assignment_visibility',
@@ -164,15 +176,15 @@ export default (
       per_page: get().performanceControls.assignmentGroupsPerPage,
     }
 
-    const normalizeGradingdPeriodId = normalizeGradingPeriodId(selectedGradingPeriodId)
-    if (normalizeGradingdPeriodId) {
-      return get().loadAssignmentGroupsForGradingPeriods(params, normalizeGradingdPeriodId)
+    const selectedPeriodId = normalizeGradingPeriodId(currentGradingPeriodId)
+    if (selectedPeriodId) {
+      return get().loadAssignmentGroupsForGradingPeriods({params, selectedPeriodId})
     }
 
-    return get().fetchAssignmentGroups(params, true)
+    return get().fetchAssignmentGroups({params, isSelectedGradingPeriodId: true})
   },
 
-  loadAssignmentGroupsForGradingPeriods(params: AssignmentLoaderParams, selectedPeriodId: string) {
+  loadAssignmentGroupsForGradingPeriods: ({params, selectedPeriodId}) => {
     const selectedAssignmentIds: string[] = get().gradingPeriodAssignments[selectedPeriodId] || []
 
     const {otherAssignmentIds, otherGradingPeriodIds} = otherGradingPeriodAssignmentIds(
@@ -191,40 +203,42 @@ export default (
       selectedAssignmentIds.length > maxAssignments ||
       otherAssignmentIds.length > maxAssignments
     ) {
-      return get().fetchAssignmentGroups(params, true)
+      return get().fetchAssignmentGroups({params, isSelectedGradingPeriodId: true})
     }
 
     // If there are no assignments in the selected grading period, request all
     // assignments in a single query
     if (selectedAssignmentIds.length === 0) {
-      return get().fetchAssignmentGroups(params, true)
+      return get().fetchAssignmentGroups({params, isSelectedGradingPeriodId: true})
     }
 
-    const ids1 = selectedAssignmentIds.join()
-    const gotGroups = get().fetchAssignmentGroups({...params, assignment_ids: ids1}, true, [
-      selectedPeriodId,
-    ])
-
+    // fetch otther grading periods
     const ids2 = otherAssignmentIds.join()
-    get().fetchAssignmentGroups({...params, assignment_ids: ids2}, false, otherGradingPeriodIds)
+    get().fetchAssignmentGroups({
+      params: {...params, assignment_ids: ids2},
+      isSelectedGradingPeriodId: false,
+      gradingPeriodIds: otherGradingPeriodIds,
+    })
 
-    return gotGroups
+    // fetch selected grading period
+    const ids1 = selectedAssignmentIds.join()
+    return get().fetchAssignmentGroups({
+      params: {...params, assignment_ids: ids1},
+      isSelectedGradingPeriodId: true,
+      gradingPeriodIds: [selectedPeriodId],
+    })
   },
 
-  fetchAssignmentGroups: (
-    params: AssignmentLoaderParams,
-    isSelectedGradingPeriodId: boolean,
-    gradingPeriodIds?: string[],
-  ): Promise<undefined | AssignmentGroup[]> => {
+  fetchAssignmentGroups: ({params, isSelectedGradingPeriodId, gradingPeriodIds}) => {
     set({isAssignmentGroupsLoading: true})
 
     const path = `/api/v1/courses/${get().courseId}/assignment_groups`
 
     return get()
       .dispatch.getDepaginated<AssignmentGroup[]>(path, params)
-      .then((assignmentGroups: undefined | AssignmentGroup[]) => {
+      .then(assignmentGroups => {
         if (assignmentGroups) {
-          const assignments = assignmentGroups.flatMap(group => group.assignments)
+          const assignments = assignmentGroups.flatMap(group => group.assignments ?? [])
           const assignmentMap = {
             ...get().assignmentMap,
             ...Object.fromEntries(assignments.map(assignment => [assignment.id, assignment])),
