@@ -19,7 +19,6 @@
 import {isCrossSite} from '../injectAuthTokenIntoForms'
 
 describe('isCrossSite', () => {
-  // eslint-disable-next-line no-restricted-globals
   const currentHostname = location.hostname
 
   it('works for absolute urls', () => {

@@ -25,7 +25,6 @@ const getHostname = function (href) {
 }
 
 const isCrossSite = function (href) {
-  // eslint-disable-next-line no-restricted-globals
   return getHostname(href) !== location.hostname
 }
 

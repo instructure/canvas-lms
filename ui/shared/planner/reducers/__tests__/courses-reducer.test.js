@@ -30,7 +30,21 @@ it('merges grades into courses', () => {
   }
   const action = gotGradesSuccess(grades)
   const nextState = reducer(courses, action)
-  expect(nextState).toMatchSnapshot()
+
+  expect(nextState).toEqual([
+    {
+      id: '1',
+      otherData: 'first-other-fields',
+      grade: '34.42%',
+      hasGradingPeriods: true,
+    },
+    {
+      id: '2',
+      otherData: 'second-other-fields',
+      grade: '42.34%',
+      hasGradingPeriods: false,
+    },
+  ])
 })
 
 describe('CLEAR_COURSES', () => {

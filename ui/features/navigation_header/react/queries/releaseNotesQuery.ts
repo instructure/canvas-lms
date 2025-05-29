@@ -29,7 +29,6 @@ async function releaseNotesQuery({signal}: QueryFunctionContext): Promise<Releas
   let path = RELEASE_NOTES_PATH
 
   while (path) {
-    // eslint-disable-next-line no-await-in-loop
     const {json, link} = await doFetchApi<ReleaseNote[]>({path, fetchOpts})
     if (json) data.push(...json)
     // @ts-expect-error

@@ -81,13 +81,12 @@ describe('response_messages', () => {
       })
 
       afterEach(() => {
-        // eslint-disable-next-line no-console
         console.error.mockRestore()
       })
 
       it('logs an error to the console', () => {
         builder.sendResponse()
-        // eslint-disable-next-line no-console
+
         expect(console.error).toHaveBeenCalled()
       })
     })

@@ -52,7 +52,7 @@ describe('WikiPageIndex', () => {
       const $previousEl = view.$el.find('> *:first-child')
       view.publishIconView.$el.data('test-data', 'test-is-good')
       view.render()
-      expect($previousEl.parent().length).toBe(0)
+      expect($previousEl.parent()).toHaveLength(0)
       expect(view.publishIconView.$el.data('test-data')).toBe('test-is-good')
     })
 
@@ -81,8 +81,8 @@ describe('WikiPageIndex', () => {
         CAN: {MANAGE: true},
       })
       view.render()
-      expect(view.$('.send-wiki-page-to').length).toBe(0)
-      expect(view.$('.copy-wiki-page-to').length).toBe(0)
+      expect(view.$('.send-wiki-page-to')).toHaveLength(0)
+      expect(view.$('.copy-wiki-page-to')).toHaveLength(0)
 
       ENV.DIRECT_SHARE_ENABLED = true
       view.render()

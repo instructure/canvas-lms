@@ -37,33 +37,101 @@ _.toPairs(rubrics).forEach(([key, rubric]) => {
         freeForm: key === 'freeForm',
       }
 
-      const testRenderedSnapshots = props => {
+      const testRenderedComponents = props => {
         const component = mods => shallow(<Criterion {...{...props, ...mods}} />)
 
         it('renders the root component as expected', () => {
-          expect(component()).toMatchSnapshot()
+          const wrapper = component()
+
+          // Should render a Table.Row as the root element
+          expect(wrapper.find(Table.Row)).toHaveLength(1)
+
+          // Should render appropriate content based on freeForm
+          if (props.freeForm) {
+            // For freeForm rubrics, should render Comments component instead of Ratings
+            expect(wrapper.find('Comments')).toHaveLength(1)
+          } else {
+            // For non-freeForm rubrics, should render Ratings component
+            expect(wrapper.find('Ratings')).toHaveLength(1)
+          }
+
+          // Should have the criterion description
+          const criterion = props.criterion
+          if (criterion.description) {
+            expect(wrapper.text()).toContain(criterion.description)
+          }
         })
 
         subComponents.forEach(name => {
           it(`renders the ${name} sub-component(s) as expected`, () => {
-            component()
-              .find(name)
-              .forEach(el => expect(el.shallow()).toMatchSnapshot())
+            const wrapper = component()
+            const subComponents = wrapper.find(name)
+
+            if (name === 'OutcomeIcon') {
+              // OutcomeIcon should only appear for outcome criteria
+              if (criteriaType === 'outcome') {
+                expect(subComponents.length).toBeGreaterThan(0)
+                // Should contain screen reader text about learning outcomes
+                if (subComponents.length > 0) {
+                  expect(subComponents.dive().text()).toContain('Learning Outcome')
+                }
+              }
+            } else if (name === 'Threshold') {
+              // Threshold appears when mastery_points is set
+              if (props.criterion.mastery_points != null) {
+                expect(subComponents.length).toBeGreaterThan(0)
+              }
+            } else if (name === 'LongDescription') {
+              // LongDescription appears when there's a long_description
+              if (props.criterion.long_description) {
+                expect(subComponents.length).toBeGreaterThan(0)
+              }
+            } else if (name === 'LongDescriptionDialog') {
+              // Dialog should always be present when LongDescription exists
+              if (props.criterion.long_description) {
+                expect(subComponents.length).toBeGreaterThan(0)
+                expect(subComponents.prop('open')).toBe(false) // Should start closed
+              }
+            }
           })
         })
       }
 
       describe(`with a ${criteriaType} criterion`, () => {
         describe('by default', () => {
-          testRenderedSnapshots(basicProps)
+          testRenderedComponents(basicProps)
         })
 
         describe('when assessing', () => {
-          testRenderedSnapshots({...basicProps, onAssessmentChange: () => {}})
+          testRenderedComponents({...basicProps, onAssessmentChange: () => {}})
+
+          it('should render Points component when assessing', () => {
+            const wrapper = shallow(
+              <Criterion {...{...basicProps, onAssessmentChange: () => {}}} />,
+            )
+
+            if (!basicProps.criterion.ignore_for_scoring) {
+              expect(wrapper.find('Points')).toHaveLength(1)
+            }
+          })
         })
 
         describe('without an assessment', () => {
-          testRenderedSnapshots({...basicProps, assessment: undefined})
+          testRenderedComponents({...basicProps, assessment: undefined})
+
+          it('should handle missing assessment gracefully', () => {
+            const wrapper = shallow(<Criterion {...{...basicProps, assessment: undefined}} />)
+
+            // Should still render the basic structure
+            expect(wrapper.find(Table.Row)).toHaveLength(1)
+
+            // Should render appropriate content based on freeForm
+            if (basicProps.freeForm) {
+              expect(wrapper.find('Comments')).toHaveLength(1)
+            } else {
+              expect(wrapper.find('Ratings')).toHaveLength(1)
+            }
+          })
         })
       })
     })
@@ -88,8 +156,12 @@ describe('Criterion', () => {
     expectState(false)
     render.find('LongDescription').prop('showLongDescription')()
     expectState(true)
+
     const dialog = render.find('LongDescriptionDialog')
-    expect(dialog.shallow().find('div').html()).toMatchSnapshot()
+    const dialogContent = dialog.dive().find('div')
+    expect(dialogContent).toHaveLength(1)
+    expect(dialogContent.html()).toContain('a wild paragraph appears')
+
     dialog.prop('close')()
     expectState(false)
   })

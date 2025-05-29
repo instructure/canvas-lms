@@ -157,7 +157,7 @@ describe('ConferenceAddressBook', () => {
     })
     const tag = container.getAllByTestId('address-tag')
     expect(tag).toBeTruthy()
-    expect(tag.length).toBe(2)
+    expect(tag).toHaveLength(2)
   })
 
   it('should initially render sections that have all users selected', () => {
@@ -168,7 +168,7 @@ describe('ConferenceAddressBook', () => {
     })
     const tag = container.getAllByTestId('address-tag')
     expect(tag).toBeTruthy()
-    expect(tag.length).toBe(2)
+    expect(tag).toHaveLength(2)
   })
 
   it('should remove selected user when backspace is pressed and input is empty', () => {

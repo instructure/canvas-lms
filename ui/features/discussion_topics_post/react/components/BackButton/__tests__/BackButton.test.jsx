@@ -38,6 +38,6 @@ describe('BackButton', () => {
     const {getByTestId} = setup({onClick})
 
     fireEvent.click(getByTestId('back-button'))
-    expect(onClick.mock.calls.length).toBe(1)
+    expect(onClick.mock.calls).toHaveLength(1)
   })
 })

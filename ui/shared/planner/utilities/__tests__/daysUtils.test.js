@@ -446,9 +446,26 @@ describe('deleteItemFromDays', () => {
       ['2018-01-02', [{uniqueId: 3}, {uniqueId: 4}]],
     ]
     const newDays = deleteItemFromDays(days, {uniqueId: 3})
-    expect(newDays).toMatchSnapshot()
+
+    // Should return a new array structure with the item removed
+    expect(newDays).toEqual([
+      ['2018-01-01', [{uniqueId: 1}, {uniqueId: 2}]],
+      ['2018-01-02', [{uniqueId: 4}]],
+    ])
+
+    // Should not mutate the original arrays
     expect(newDays).not.toBe(days)
     expect(newDays[1]).not.toBe(days[1])
+
+    // Should still have 2 days
+    expect(newDays).toHaveLength(2)
+
+    // First day should remain unchanged
+    expect(newDays[0][1]).toHaveLength(2)
+
+    // Second day should have only one item (the one that wasn't deleted)
+    expect(newDays[1][1]).toHaveLength(1)
+    expect(newDays[1][1][0].uniqueId).toBe(4)
   })
 
   it('returns days if item does not exist', () => {
@@ -457,18 +474,46 @@ describe('deleteItemFromDays', () => {
       ['2018-01-02', [{uniqueId: 3}, {uniqueId: 4}]],
     ]
     const newDays = deleteItemFromDays(days, {uniqueId: 0})
-    expect(newDays).toMatchSnapshot() // should be unchanged and match above days
+
+    // Should return the exact same reference since no changes were made
     expect(newDays).toBe(days)
+
+    // Should remain unchanged
+    expect(newDays).toEqual([
+      ['2018-01-01', [{uniqueId: 1}, {uniqueId: 2}]],
+      ['2018-01-02', [{uniqueId: 3}, {uniqueId: 4}]],
+    ])
+
+    // Should still have all original items
+    expect(newDays).toHaveLength(2)
+    expect(newDays[0][1]).toHaveLength(2)
+    expect(newDays[1][1]).toHaveLength(2)
   })
 
   it('deletes the day if it is empty', () => {
     const days = [
       ['2018-01-01', [{uniqueId: 1}, {uniqueId: 2}]],
       ['2018-01-02', [{uniqueId: 3}]],
-      ['2018-01-02', [{uniqueId: 4}]],
+      ['2018-01-03', [{uniqueId: 4}]],
     ]
     const newDays = deleteItemFromDays(days, {uniqueId: 3})
-    expect(newDays).toMatchSnapshot()
+
+    // Should remove the day that becomes empty after item deletion
+    expect(newDays).toEqual([
+      ['2018-01-01', [{uniqueId: 1}, {uniqueId: 2}]],
+      ['2018-01-03', [{uniqueId: 4}]],
+    ])
+
+    // Should not mutate the original array
     expect(newDays).not.toBe(days)
+
+    // Should have one less day
+    expect(newDays).toHaveLength(2)
+    expect(days).toHaveLength(3)
+
+    // Remaining days should have the expected items
+    expect(newDays[0][1]).toHaveLength(2)
+    expect(newDays[1][1]).toHaveLength(1)
+    expect(newDays[1][1][0].uniqueId).toBe(4)
   })
 })

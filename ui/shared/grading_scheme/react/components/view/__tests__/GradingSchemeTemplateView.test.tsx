@@ -43,7 +43,7 @@ describe('GradingSchemeTemplateView', () => {
 
     const dataTable = getByTestId('default_canvas_grading_scheme_data_table')
     expect(dataTable).toBeInTheDocument()
-    expect(dataTable.querySelectorAll('tr').length).toBe(6) // 5 data rows plus a table header row
+    expect(dataTable.querySelectorAll('tr')).toHaveLength(6) // 5 data rows plus a table header row
 
     const row1 = dataTable.querySelectorAll('tr')[1]
     expect(within(row1).getByText('A')).toBeInTheDocument()

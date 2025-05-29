@@ -85,13 +85,13 @@ describe('TabsBlockToolbar', () => {
   it('call calls setProp with a new tab on clicking Add Tab', async () => {
     const {getByText} = render(<TabsBlockToolbar />)
 
-    expect(props.tabs.length).toBe(2)
+    expect(props.tabs).toHaveLength(2)
 
     const addTab = getByText('Add Tab').closest('button') as HTMLButtonElement
     await userEvent.click(addTab)
 
     expect(mockSetProp).toHaveBeenCalled()
-    expect(props.tabs.length).toBe(3)
+    expect(props.tabs).toHaveLength(3)
     expect(props.tabs[2].title).toBe('New Tab')
   })
 })

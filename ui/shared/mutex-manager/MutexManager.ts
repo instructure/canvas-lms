@@ -28,7 +28,7 @@ class MutexManager {
   private static instance: MutexManager
 
   // This prevents the class from being instantiated
-  // eslint-disable-next-line no-useless-constructor, no-empty-function
+
   private constructor() {}
 
   static getInstance(): MutexManager {

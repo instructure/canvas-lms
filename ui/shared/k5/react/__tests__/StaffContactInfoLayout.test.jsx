@@ -76,7 +76,7 @@ describe('StaffContactInfoLayout', () => {
   it('renders 3 loading skeletons if isLoading set', () => {
     const {getAllByText} = render(<StaffContactInfoLayout {...getProps({isLoading: true})} />)
     const skeletons = getAllByText('Loading staff...')
-    expect(skeletons.length).toBe(2)
+    expect(skeletons).toHaveLength(2)
   })
 
   it('renders no loading indicator if isLoading not set', () => {

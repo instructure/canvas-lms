@@ -46,9 +46,43 @@ const defaultProps = (props = {}) => ({
   ...props,
 })
 
-it('renders the AlignmentResult component', () => {
+it('renders the AlignmentResult component with correct structure', () => {
   const wrapper = shallow(<AssignmentResult {...defaultProps()} />)
-  expect(wrapper).toMatchSnapshot()
+
+  // Should render main Flex container with column layout
+  const mainFlex = wrapper.find('Flex')
+  expect(mainFlex).toHaveLength(1)
+  expect(mainFlex.prop('direction')).toBe('column')
+  expect(mainFlex.prop('padding')).toBe('small')
+
+  // Should have three main sections (assignment link, score, ratings)
+  const items = wrapper.find('Item')
+  expect(items).toHaveLength(3)
+
+  // First item should contain assignment link
+  const linkItem = items.at(0)
+  const link = linkItem.find('Link')
+  expect(link).toHaveLength(1)
+  expect(link.prop('href')).toBe('http://foo')
+  expect(link.children().text()).toBe('My assignment')
+
+  // Second item should contain score display
+  const scoreItem = items.at(1)
+  const scoreText = scoreItem.find('Text')
+  expect(scoreText).toHaveLength(1)
+  expect(scoreText.prop('fontStyle')).toBe('italic')
+  expect(scoreText.prop('weight')).toBe('bold')
+
+  // Third item should contain ratings component
+  const ratingsItem = items.at(2)
+  const ratings = ratingsItem.find('Ratings')
+  expect(ratings).toHaveLength(1)
+  expect(ratings.prop('points')).toBe(1)
+  expect(ratings.prop('pointsPossible')).toBe(5)
+  expect(ratings.prop('tiers')).toEqual([
+    {description: 'My first rating'},
+    {description: 'My second rating'},
+  ])
 })
 
 it('includes the assignment name', () => {

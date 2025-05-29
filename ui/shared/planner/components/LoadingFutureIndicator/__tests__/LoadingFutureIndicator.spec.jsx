@@ -21,19 +21,31 @@ import LoadingFutureIndicator from '../index'
 
 it('renders load more by default', () => {
   const wrapper = shallow(<LoadingFutureIndicator />)
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.find('Link')).toHaveLength(1)
+  expect(wrapper.find('Link').prop('children')).toBe('Load more')
+  expect(wrapper.find('Spinner')).toHaveLength(0)
+  expect(wrapper.find('Text')).toHaveLength(0)
+  expect(wrapper.find('ErrorAlert')).toHaveLength(0)
 })
 
 it('renders loading when indicated', () => {
   const wrapper = shallow(<LoadingFutureIndicator loadingFuture={true} />)
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.find('Link')).toHaveLength(0)
+  expect(wrapper.find('Spinner')).toHaveLength(1)
+  expect(wrapper.find('Text')).toHaveLength(1)
+  expect(wrapper.find('Text').prop('children')).toBe('Loading...')
+  expect(wrapper.find('Spinner').prop('renderTitle')()).toBe('Loading...')
 })
 
 it('renders all future items loaded regardless of other props', () => {
   const wrapper = shallow(
     <LoadingFutureIndicator loadingFuture={true} allFutureItemsLoaded={true} />,
   )
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.find('Link')).toHaveLength(0)
+  expect(wrapper.find('Spinner')).toHaveLength(0)
+  expect(wrapper.find('Text')).toHaveLength(1)
+  expect(wrapper.find('Text').prop('children')).toBe('No more items to show')
+  expect(wrapper.find('Text').prop('color')).toBe('secondary')
 })
 
 it('invokes the callback when the load more button is clicked', () => {
@@ -45,5 +57,10 @@ it('invokes the callback when the load more button is clicked', () => {
 
 it("shows an Alert when there's a query error", () => {
   const wrapper = shallow(<LoadingFutureIndicator loadingError="uh oh" />)
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.find('ErrorAlert')).toHaveLength(1)
+  expect(wrapper.find('ErrorAlert').prop('error')).toBe('uh oh')
+  expect(wrapper.find('ErrorAlert').prop('children')).toBe('Error loading more items')
+  // The load more button still shows when there's an error, since error doesn't prevent loading more
+  expect(wrapper.find('Link')).toHaveLength(1)
+  expect(wrapper.find('Spinner')).toHaveLength(0)
 })

@@ -34,7 +34,6 @@ describe('SimilarityIcon', () => {
   })
 
   function mountComponent(props = {}) {
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<SimilarityIcon {...props} />, $container)
   }
 

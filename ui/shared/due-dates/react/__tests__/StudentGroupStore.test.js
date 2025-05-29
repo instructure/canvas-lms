@@ -131,10 +131,10 @@ describe('StudentGroupStore', () => {
     ENV.context_asset_string = 'course_2'
     StudentGroupStore.fetchGroupsForCourse()
     server.respond()
-    expect(_.values(StudentGroupStore.getGroups()).length).toBe(2)
+    expect(_.values(StudentGroupStore.getGroups())).toHaveLength(2)
     expect(StudentGroupStore.fetchComplete()).toBe(false)
     server.respond()
-    expect(_.values(StudentGroupStore.getGroups()).length).toBe(4)
+    expect(_.values(StudentGroupStore.getGroups())).toHaveLength(4)
     expect(StudentGroupStore.fetchComplete()).toBe(true)
   })
 })

@@ -28,5 +28,34 @@ it('renders Pill components as list items', () => {
       <Pill>Pill 3</Pill>
     </BadgeList>,
   )
-  expect(wrapper).toMatchSnapshot()
+
+  // Should render a ul element
+  const list = wrapper.find('ul')
+  expect(list).toHaveLength(1)
+
+  // Should have proper CSS class
+  expect(list.hasClass('BadgeList-styles__root')).toBe(true)
+
+  // Should render 3 list items
+  const items = wrapper.find('li')
+  expect(items).toHaveLength(3)
+
+  // Each list item should have the proper CSS class
+  items.forEach(item => {
+    expect(item.hasClass('BadgeList-styles__item')).toBe(true)
+  })
+
+  // Should contain 3 Pill components
+  const pills = wrapper.find('Pill')
+  expect(pills).toHaveLength(3)
+
+  // Check that Pills have correct text content
+  expect(pills.at(0).children().text()).toBe('Pill 1')
+  expect(pills.at(1).children().text()).toBe('Pill 2')
+  expect(pills.at(2).children().text()).toBe('Pill 3')
+
+  // Pills should have default color
+  pills.forEach(pill => {
+    expect(pill.prop('color')).toBe('primary')
+  })
 })

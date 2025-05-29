@@ -96,11 +96,11 @@ ConverterViewControl.renderView = function (options) {
   const migrationConverterView = options.migrationConverter
   const regView = ConverterViewControl.getView(value)
   let ref
-  // eslint-disable-next-line no-void
+
   if (regView != null ? ((ref = regView.view) != null ? ref.validateBeforeSave : void 0) : void 0) {
     migrationConverterView.validateBeforeSave = regView.view.validateBeforeSave
   }
-  // eslint-disable-next-line no-void
+
   return migrationConverterView.renderConverter(regView != null ? regView.view : void 0)
 }
 

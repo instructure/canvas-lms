@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {shallow} from 'enzyme'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import moment from 'moment-timezone'
 import {PlannerHeader} from '../index'
@@ -112,7 +112,16 @@ afterAll(() => {
 
 it('renders the base component correctly with buttons and trays', () => {
   const wrapper = shallow(<PlannerHeader {...defaultProps()} />)
-  expect(wrapper).toMatchSnapshot()
+  // Check for main header elements
+  expect(wrapper.find('StickyButton').exists()).toBe(true)
+  expect(wrapper.find('#planner-today-btn').exists()).toBe(true)
+  expect(wrapper.find('[data-testid="add-to-do-button"]').exists()).toBe(true)
+  expect(wrapper.find('[data-testid="show-my-grades-button"]').exists()).toBe(true)
+  // Check for trays
+  expect(wrapper.find('Tray').at(0).prop('label')).toBe('Add To Do')
+  expect(wrapper.find('Tray').at(1).prop('label')).toBe('My Grades')
+  // Check opportunities popover exists
+  expect(wrapper.find('Animatable(Opportunities_)').exists()).toBe(true)
 })
 
 it('does not render the Add To Do option when isObserving', () => {
@@ -124,15 +133,15 @@ it('does not render the Add To Do option when isObserving', () => {
 
 it('toggles the new item tray', async () => {
   const mockCancel = jest.fn()
-  const {getByTestId} = render(
+  const {getByTestId, getByRole, queryByRole} = render(
     <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />,
   )
   const button = getByTestId('add-to-do-button')
   await userEvent.click(button)
-  const heading1 = screen.getByRole('heading', {name: /Add To Do/i})
+  const heading1 = getByRole('heading', {name: /Add To Do/i})
   expect(heading1).toBeInTheDocument()
   await userEvent.click(button)
-  const heading2 = screen.queryByRole('heading', {name: /Add To Do/i})
+  const heading2 = queryByRole('heading', {name: /Add To Do/i})
   expect(heading2).not.toBeInTheDocument()
   expect(mockCancel).toHaveBeenCalled()
 })
@@ -630,12 +639,12 @@ it('opens the tray when it gets an updateTodoItem prop', () => {
 })
 
 it('toggles the grades tray', async () => {
-  const {getByTestId} = render(<PlannerHeader {...defaultProps()} />)
+  const {getByTestId, getByRole, queryByRole} = render(<PlannerHeader {...defaultProps()} />)
 
   const button = getByTestId('show-my-grades-button')
   await userEvent.click(button)
 
-  const heading1 = screen.getByRole('heading', {name: /My Grades/i})
+  const heading1 = getByRole('heading', {name: /My Grades/i})
   expect(heading1).toBeInTheDocument()
 
   await userEvent.click(button)
@@ -643,7 +652,7 @@ it('toggles the grades tray', async () => {
   // Wait for animation to complete
   await new Promise(resolve => setTimeout(resolve, 500))
 
-  const heading2 = screen.queryByRole('heading', {name: /My Grades/i})
+  const heading2 = queryByRole('heading', {name: /My Grades/i})
   expect(heading2).not.toBeInTheDocument()
 })
 
@@ -695,14 +704,14 @@ describe('new activity button', () => {
   it('does not show when there is no new activity', () => {
     spy.mockReturnValue(false)
     const wrapper = shallow(<PlannerHeader {...defaultProps()} />)
-    expect(wrapper).toMatchSnapshot()
+    expect(wrapper.find('Portal').prop('open')).toBe(false)
     expect(spy.mock.calls).toHaveLength(1)
   })
 
   it('shows when there is new activity', () => {
     spy.mockReturnValue(true)
     const wrapper = shallow(<PlannerHeader {...defaultProps()} />)
-    expect(wrapper).toMatchSnapshot()
+    expect(wrapper.find('Portal').prop('open')).toBe(true)
     expect(spy.mock.calls).toHaveLength(1)
   })
 })

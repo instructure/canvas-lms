@@ -22,7 +22,27 @@ import StickyButton from '../index'
 
 it('renders', () => {
   const wrapper = shallow(<StickyButton id="sb">I am a Sticky Button</StickyButton>)
-  expect(wrapper).toMatchSnapshot()
+
+  // Should render a span containing a button
+  expect(wrapper.find('span').exists()).toBe(true)
+
+  // Should render button with correct attributes
+  const button = wrapper.find('button')
+  expect(button.exists()).toBe(true)
+  expect(button.prop('id')).toBe('sb')
+  expect(button.prop('type')).toBe('button')
+  expect(button.prop('aria-disabled')).toBe(null)
+  expect(button.prop('aria-hidden')).toBe(null)
+  expect(button.prop('aria-describedby')).toBe(null)
+
+  // Should have the correct class names
+  expect(button.hasClass('StickyButton-styles__root')).toBe(true)
+  expect(button.hasClass('StickyButton-styles__newActivityButton')).toBe(true)
+
+  // Should render children within layout span
+  const layoutSpan = button.find('span.StickyButton-styles__layout')
+  expect(layoutSpan.exists()).toBe(true)
+  expect(layoutSpan.text()).toBe('I am a Sticky Button')
 })
 
 it('calls the onClick prop when clicked', () => {
@@ -77,7 +97,8 @@ it('adds aria-hidden when specified', () => {
     </StickyButton>,
   )
 
-  expect(wrapper).toMatchSnapshot()
+  const button = wrapper.find('button')
+  expect(button.prop('aria-hidden')).toBe('true')
 })
 
 it('shows aria-describedby when a description is given', () => {

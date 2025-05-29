@@ -69,7 +69,7 @@ describe('Rce Abstraction - integration', () => {
     loadNewEditor()
     await waitFor(() => RCELoader.loadRCE.callCount > 0)
     expect(target.parent().attr('id')).toBe('tinymce-parent-of-big_rce_text')
-    expect(target.parent().find('#fake-editor').length).toBe(1)
+    expect(target.parent().find('#fake-editor')).toHaveLength(1)
   })
 })
 

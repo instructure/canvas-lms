@@ -21,7 +21,6 @@ import {render} from '@testing-library/react'
 import {notifier} from '../notifier'
 import {DynamicUiProvider} from '../provider'
 
- 
 class MockComponent extends React.Component {
   render() {
     return <div data-testid="mockcomponent" />
@@ -47,7 +46,6 @@ it('passes trigger property functions and forwards the calls to the dynamic ui m
       <Wrapped forwardedRef={ref} />
     </DynamicUiProvider>,
   )
-  expect(wrapper).toMatchSnapshot()
 
   expect(await wrapper.findByTestId('mockcomponent')).toBeInTheDocument()
 

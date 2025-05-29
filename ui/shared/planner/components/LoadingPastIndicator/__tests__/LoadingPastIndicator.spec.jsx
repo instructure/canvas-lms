@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,32 +16,69 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import LoadingPastIndicator from '../index'
 
 jest.mock('../../../utilities/scrollUtils')
 
-it('renders very little', () => {
-  const wrapper = shallow(<LoadingPastIndicator />)
-  expect(wrapper).toMatchSnapshot()
-})
+describe('LoadingPastIndicator', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
-it('renders spinner while loading', () => {
-  const wrapper = shallow(<LoadingPastIndicator loadingPast={true} />)
-  expect(wrapper).toMatchSnapshot()
-})
+  it('renders an empty container when no props are provided', () => {
+    const {container} = render(<LoadingPastIndicator />)
 
-it('prioritizes loading complete over currently loading', () => {
-  const wrapper = shallow(<LoadingPastIndicator loadingPast={true} allPastItemsLoaded={true} />)
-  expect(wrapper).toMatchSnapshot()
-})
+    // Should render an empty div without any content
+    expect(container.firstChild).toBeEmptyDOMElement()
+  })
 
-it('renders TV when all past items loaded', () => {
-  const wrapper = shallow(<LoadingPastIndicator allPastItemsLoaded={true} />)
-  expect(wrapper).toMatchSnapshot()
-})
+  it('renders a spinner with loading text while loading past items', () => {
+    const {getAllByText, getByRole} = render(<LoadingPastIndicator loadingPast={true} />)
 
-it("shows an Alert when there's a query error", () => {
-  const wrapper = shallow(<LoadingPastIndicator loadingError="uh oh" />)
-  expect(wrapper).toMatchSnapshot()
+    // Should show the loading spinner
+    const spinner = getByRole('img')
+    expect(spinner).toBeInTheDocument()
+
+    // Should show the loading text (there are multiple elements with this text)
+    const loadingTexts = getAllByText('Loading past items')
+    expect(loadingTexts.length).toBeGreaterThan(0)
+  })
+
+  it('prioritizes showing completed state over loading state', () => {
+    const {getByText, queryByTitle} = render(
+      <LoadingPastIndicator loadingPast={true} allPastItemsLoaded={true} />,
+    )
+
+    // Should not show the loading spinner
+    expect(queryByTitle('Loading past items')).not.toBeInTheDocument()
+
+    // Should show the completion message
+    expect(getByText('Beginning of Your To-Do History')).toBeInTheDocument()
+    expect(getByText("You've scrolled back to your very first To-Do!")).toBeInTheDocument()
+  })
+
+  it('renders TV icon and completion message when all past items are loaded', () => {
+    const {getByText, container} = render(<LoadingPastIndicator allPastItemsLoaded={true} />)
+
+    // Should show the TV icon
+    const tvIcon = container.querySelector('svg')
+    expect(tvIcon).toBeInTheDocument()
+    expect(tvIcon).toHaveAttribute('role', 'img')
+    expect(tvIcon).toHaveAttribute('aria-hidden', 'true')
+
+    // Should show the completion messages
+    expect(getByText('Beginning of Your To-Do History')).toBeInTheDocument()
+    expect(getByText("You've scrolled back to your very first To-Do!")).toBeInTheDocument()
+  })
+
+  it('shows an error alert when there is a loading error', () => {
+    const {getByText} = render(<LoadingPastIndicator loadingError="uh oh" />)
+
+    // Should show the error message
+    expect(getByText('Error loading past items')).toBeInTheDocument()
+
+    // Should include the actual error message in the DOM for debugging
+    expect(getByText('uh oh')).toBeInTheDocument()
+  })
 })

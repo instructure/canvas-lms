@@ -94,7 +94,7 @@ describe('fixDialogButtons', () => {
 
     expect($regularButton.css('display')).not.toBe('none')
     expect($containerButtons.length).toBeGreaterThan(0)
-    expect($containerButtons.filter(':visible').length).toBe(0)
+    expect($containerButtons.filter(':visible')).toHaveLength(0)
   })
 
   it('handles form submission with loading state', () => {

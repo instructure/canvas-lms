@@ -23,7 +23,10 @@ import {NewActivityIndicator} from '../NewActivityIndicator'
 
 it('passes props to Indicator', () => {
   const wrapper = shallow(<NewActivityIndicator title="some title" itemIds={['1', '2']} />)
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.find('Indicator')).toHaveLength(1)
+  expect(wrapper.find('Indicator').prop('variant')).toBe('primary')
+  expect(wrapper.find('Indicator').prop('title')).toBe('New activity for some title')
+  expect(wrapper.find('Indicator').prop('indicatorRef')).toBeInstanceOf(Function)
 })
 
 it('registers itself as animatable', () => {

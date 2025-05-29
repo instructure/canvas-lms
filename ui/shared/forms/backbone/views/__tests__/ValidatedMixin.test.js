@@ -54,6 +54,6 @@ describe('ValidatedMixin', () => {
     }
 
     const element = ValidatedMixin.findField('message')
-    expect(element.length).toBe(1)
+    expect(element).toHaveLength(1)
   })
 })

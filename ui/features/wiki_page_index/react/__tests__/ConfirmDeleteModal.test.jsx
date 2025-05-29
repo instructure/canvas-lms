@@ -35,7 +35,7 @@ test('renders the ConfirmDeleteModal component', () => {
 test('renders cancel and delete button', () => {
   const modal = shallow(<ConfirmDeleteModal {...defaultProps()} />)
   const node = modal.find('Button')
-  expect(node.length).toEqual(2)
+  expect(node).toHaveLength(2)
 })
 
 test('closes the ConfirmDeleteModal when cancel pressed', () => {

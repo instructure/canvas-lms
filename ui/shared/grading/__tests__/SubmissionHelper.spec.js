@@ -167,7 +167,7 @@ describe('SubmissionHelper', () => {
         })
 
         it('returns an item for each attachment with plagiarism data', () => {
-          expect(extractSimilarityInfo(submissionWithAttachments).entries.length).toBe(4)
+          expect(extractSimilarityInfo(submissionWithAttachments).entries).toHaveLength(4)
         })
 
         it('sorts entries by status', () => {
@@ -238,7 +238,7 @@ describe('SubmissionHelper', () => {
         })
 
         it('returns at most one plagiarism entry even if data exists for multiple versions', () => {
-          expect(extractSimilarityInfo(versionedSubmission).entries.length).toBe(1)
+          expect(extractSimilarityInfo(versionedSubmission).entries).toHaveLength(1)
         })
 
         it('returns plagiarism data for the base submission if no version-specific data exists', () => {

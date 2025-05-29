@@ -49,15 +49,33 @@ const props = {
 describe('ActAsModal', () => {
   it('renders with panda svgs, user avatar, table, and proceed button present', () => {
     const wrapper = shallow(<ActAsModal {...props} />)
-    expect(wrapper).toMatchSnapshot()
 
+    // Check for required SVG components
     const mask = wrapper.find(ActAsMask)
     const panda = wrapper.find(ActAsPanda)
-    const button = wrapper.find(Button)
-
     expect(mask.exists()).toBeTruthy()
     expect(panda.exists()).toBeTruthy()
+
+    // Check for proceed button
+    const button = wrapper.find(Button)
     expect(button.exists()).toBeTruthy()
+    expect(button.prop('href')).toBe('/users/5/masquerade')
+    expect(button.children().text()).toBe('Proceed')
+
+    // Verify modal is properly configured
+    const modal = wrapper.find('CanvasInstUIModal')
+    expect(modal.prop('label')).toBe('Act as User')
+    expect(modal.prop('open')).toBe(true)
+    expect(modal.prop('size')).toBe('fullscreen')
+
+    // Check that Tables are present for displaying user info
+    const tables = wrapper.find('Table')
+    expect(tables.length).toBeGreaterThan(0)
+
+    // Verify avatar component is present
+    const avatar = wrapper.find('ForwardRef').filterWhere(n => n.prop('src') === 'testImageUrl')
+    expect(avatar.exists()).toBeTruthy()
+    expect(avatar.prop('name')).toBe('foo')
   })
 
   it('renders avatar with user image url', async () => {

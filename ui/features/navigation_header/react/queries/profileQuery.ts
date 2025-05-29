@@ -29,7 +29,6 @@ export default async function profileQuery({signal}: QueryFunctionContext): Prom
   let path = PROFILE_TABS_PATH
 
   while (path) {
-    // eslint-disable-next-line no-await-in-loop
     const {json, link} = await doFetchApi<ProfileTab[]>({path, fetchOpts})
     if (json) data.push(...json)
     // @ts-expect-error

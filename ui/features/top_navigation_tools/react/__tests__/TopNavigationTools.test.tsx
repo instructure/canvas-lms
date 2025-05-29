@@ -23,10 +23,10 @@ import {
   MobileTopNavigationTools,
   handleToolIconError,
 } from '../TopNavigationTools'
-import type {Tool, TopNavigationToolsProps} from '../types'
+import type {Tool, TopNavigationToolsProps as _TopNavigationToolsProps} from '../types'
 
 describe('TopNavigationTools', () => {
-  it('renders', () => {
+  it('renders pinned tools as icon buttons and unpinned tools in menu', () => {
     const tools = [
       {
         id: '1',
@@ -47,19 +47,43 @@ describe('TopNavigationTools', () => {
     const wrapper = shallow(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
-    expect(wrapper).toMatchSnapshot()
+
+    // Check container structure
+    const rootFlex = wrapper.find('Flex').first()
+    expect(rootFlex.prop('direction')).toBe('row-reverse')
+
+    // Should have one IconButton for pinned tool
+    const iconButtons = wrapper.find('IconButton')
+    expect(iconButtons).toHaveLength(1)
+    expect(iconButtons.at(0).prop('data-tool-id')).toBe('1')
+    expect(iconButtons.at(0).prop('screenReaderLabel')).toBe('Tool 1')
+
+    // Should have one Menu for unpinned tools
+    const menus = wrapper.find('Menu')
+    expect(menus).toHaveLength(1)
+    expect(menus.at(0).prop('label')).toBe('LTI Tools Menu')
+
+    // Menu should contain one MenuItem for unpinned tool
+    const menuItems = wrapper.find('MenuItem')
+    expect(menuItems).toHaveLength(1)
+    expect(menuItems.at(0).prop('value')).toBe('2')
+    expect(menuItems.at(0).prop('label')).toBe('Launch Tool 2')
   })
 
-  it('renders with no tools', () => {
+  it('renders empty container when no tools provided', () => {
     const tools: Tool[] = []
     const handleToolLaunch = jest.fn()
     const wrapper = shallow(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
-    expect(wrapper).toMatchSnapshot()
+
+    // Should render empty Flex container
+    expect(wrapper.find('Flex')).toHaveLength(1)
+    expect(wrapper.find('IconButton')).toHaveLength(0)
+    expect(wrapper.find('Menu')).toHaveLength(0)
   })
 
-  it('renders with no pinned tools', () => {
+  it('renders all tools in menu when no tools are pinned', () => {
     const tools = [
       {
         id: '1',
@@ -80,12 +104,24 @@ describe('TopNavigationTools', () => {
     const wrapper = shallow(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
-    expect(wrapper).toMatchSnapshot()
+
+    // Should have no IconButtons (no pinned tools)
+    expect(wrapper.find('IconButton')).toHaveLength(0)
+
+    // Should have one Menu containing all tools
+    const menus = wrapper.find('Menu')
+    expect(menus).toHaveLength(1)
+
+    // Menu should contain MenuItems for both tools
+    const menuItems = wrapper.find('MenuItem')
+    expect(menuItems).toHaveLength(2)
+    expect(menuItems.at(0).prop('value')).toBe('1')
+    expect(menuItems.at(1).prop('value')).toBe('2')
   })
 })
 
 describe('MobileTopNavigationTools', () => {
-  it('renders', () => {
+  it('renders all tools in a single menu with pinned tools at top', () => {
     const tools = [
       {
         id: '1',
@@ -106,7 +142,29 @@ describe('MobileTopNavigationTools', () => {
     const wrapper = shallow(
       <MobileTopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
-    expect(wrapper).toMatchSnapshot()
+
+    // Should render single Menu component
+    const menu = wrapper.find('Menu')
+    expect(menu).toHaveLength(1)
+
+    // Menu trigger should be an IconButton with proper accessibility label
+    const trigger = menu.prop('trigger') as React.ReactElement
+    expect(trigger.props.screenReaderLabel).toBe('LTI Tool Menu')
+
+    // Should have MenuItems for all tools
+    const menuItems = wrapper.find('MenuItem')
+    expect(menuItems).toHaveLength(2)
+
+    // Pinned tool (Tool 2) should be listed first
+    expect(menuItems.at(0).prop('value')).toBe('2')
+    expect(menuItems.at(0).prop('label')).toBe('Launch Tool 2')
+
+    // Unpinned tool (Tool 1) should be after separator
+    expect(menuItems.at(1).prop('value')).toBe('1')
+    expect(menuItems.at(1).prop('label')).toBe('Launch Tool 1')
+
+    // Should have a separator between pinned and unpinned tools
+    expect(wrapper.find('MenuItemSeparator')).toHaveLength(1)
   })
 })
 
