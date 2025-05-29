@@ -416,7 +416,6 @@ class ApplicationController < ActionController::Base
     new_quizzes_navigation_updates
     create_wiki_page_mastery_path_overrides
     create_external_apps_side_tray_overrides
-    ams_service
     files_a11y_rewrite_toggle
     files_a11y_rewrite
     rce_a11y_resize
@@ -458,6 +457,7 @@ class ApplicationController < ActionController::Base
     modules_requirements_allow_percentage
     course_pace_allow_bulk_pace_assign
     lti_apps_page_ai_translation
+    ams_service
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
