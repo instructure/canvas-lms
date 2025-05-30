@@ -395,6 +395,14 @@ describe GroupsController do
         end
       end
     end
+
+    it "forces IS_LARGE_ROSTER to true for account groups" do
+      account_admin_user
+      @account = Account.default
+      user_session(@admin)
+      get "index", params: { account_id: @account.id }, format: :html
+      expect(assigns[:js_env][:IS_LARGE_ROSTER]).to be true
+    end
   end
 
   describe "group_json" do
