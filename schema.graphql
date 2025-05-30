@@ -3812,6 +3812,7 @@ type Enrollment implements AssetString & Node & Timestamped {
   section: Section
   sisImportId: ID
   sisRole: String
+  sisSectionId: ID
   startAt: DateTime
   state: EnrollmentWorkflowState!
   totalActivityTime: Int
