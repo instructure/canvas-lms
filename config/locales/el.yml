@@ -5434,6 +5434,7 @@ el:
   delete_grading_scheme_6b308832: "Διαγραφή Κανονισμού Βαθμολόγησης"
   delete_group_86c381ec: "Αφαίρεση Ομάδας"
   delete_my_account_41060aad: "Διαγραφή του λογαριασμού μου"
+  delete_name_81c1b5b2: "Αφαίρεση %{name}"
   delete_outcome_cc6546f1: "Αφαίρεση Αποτελέσματος"
   delete_quiz_142b8099: "Αφαίρεση του Κουίζ"
   delete_requirement_bce2d943: "Διαγραφή απαίτησης"
