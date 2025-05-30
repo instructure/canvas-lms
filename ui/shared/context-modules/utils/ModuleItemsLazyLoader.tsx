@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {type Links} from '@canvas/parse-link-header'
 import {FetchError} from './FetchError'
 import {ModuleItemPaging, type PaginationData} from './ModuleItemPaging'
@@ -125,7 +125,7 @@ class ModuleItemsLazyLoader {
     moduleId: ModuleId,
     pageParam?: number,
     allPagesParam?: boolean,
-  ): Promise<void> {
+  ): Promise<DoFetchApiResults<string> | undefined> {
     const module = moduleFromId(moduleId)
     if (!module) return
 
@@ -161,7 +161,7 @@ class ModuleItemsLazyLoader {
       })
 
       if (!allPages && !result.link?.last && page > 1) {
-        return await this.fetchModuleItemsHtml(moduleId, page - 1)
+        return this.fetchModuleItemsHtml(moduleId, page - 1)
       }
 
       this.clearPageNumberIfAllPages(moduleId, allPages)
@@ -169,9 +169,11 @@ class ModuleItemsLazyLoader {
       this.saveAllPage(moduleId, allPages)
       this.renderResult(moduleId, result.text, result.link)
       this.callback(moduleId)
-    } catch (_e) {
+      return result
+    } catch (e) {
       module.dataset.loadstate = 'error'
       this.renderError(moduleId, page)
+      return undefined
     }
   }
 
@@ -199,19 +201,18 @@ class ModuleItemsLazyLoader {
     }
   }
 
-  async fetchModuleItems(moduleIds: ModuleId[], allPages?: boolean): Promise<void[]> {
-    const allPromises: Promise<void>[] = []
+  async fetchModuleItems(moduleIds: ModuleId[], allPages?: boolean) {
     for (let i = 0; i < moduleIds.length; i += BATCH_SIZE) {
       const batch = moduleIds.slice(i, i + BATCH_SIZE)
       await Promise.all(
         batch.map(moduleId => {
-          const p = this.fetchModuleItemsHtml(moduleId, undefined, allPages)
-          allPromises.push(p)
-          return p
+          return this.fetchModuleItemsHtml(moduleId, undefined, allPages).catch(error => {
+            console.error(`Error fetching module ${moduleId} items:`, error)
+            // swallow the error to ensure other fetches continue
+          })
         }),
       )
     }
-    return Promise.all(allPromises)
   }
 }
 
