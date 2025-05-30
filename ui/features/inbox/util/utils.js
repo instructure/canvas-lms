@@ -40,6 +40,19 @@ const DEFAULT_USER_PROPERTIES = {
   shortName: I18n.t('DELETED USER'),
 }
 
+export const decodeHTMLAuthor = author => {
+  if (!author || !author.name) return author
+  return {
+    ...author,
+    name: decodeHTMLShortName(author.name),
+    shortName: decodeHTMLShortName(author.shortName),
+  }
+}
+
+const decodeHTMLShortName = name => {
+  return new DOMParser().parseFromString(name, 'text/html').body.innerHTML
+}
+
 // Takes in data from either a VIEWABLE_SUBMISSIONS_QUERY or CONVERSATIONS_QUERY
 // Outputs an inbox conversation wrapper
 export const inboxConversationsWrapper = (data, isSubmissionComments = false) => {
@@ -111,7 +124,8 @@ export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
         inboxMessage._id = message?._id
         inboxMessage.contextName = message?.contextName
         inboxMessage.createdAt = message?.createdAt
-        inboxMessage.author = message?.author || User.mock(DEFAULT_USER_PROPERTIES)
+        inboxMessage.author =
+          decodeHTMLAuthor(message?.author) || User.mock(DEFAULT_USER_PROPERTIES)
         inboxMessage.recipients = []
         inboxMessage.body = message?.comment
         inboxMessage.htmlBody = message?.htmlComment
@@ -125,7 +139,8 @@ export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
         inboxMessage._id = message?._id
         inboxMessage.contextName = message?.contextName
         inboxMessage.createdAt = message?.createdAt
-        inboxMessage.author = message?.author || User.mock(DEFAULT_USER_PROPERTIES)
+        inboxMessage.author =
+          decodeHTMLAuthor(message?.author) || User.mock(DEFAULT_USER_PROPERTIES)
         inboxMessage.recipients = message?.recipients
         inboxMessage.body = message?.body
         inboxMessage.htmlBody = message?.htmlComment
@@ -149,7 +164,9 @@ const getSubmissionCommentsParticipantString = messages => {
       uniqueParticipants.push({_id: messageAuthor._id, authorName: messageAuthor.name})
     }
   })
-  const uniqueParticipantNames = uniqueParticipants.map(participant => participant.authorName)
+  const uniqueParticipantNames = uniqueParticipants.map(participant =>
+    decodeHTMLShortName(participant.authorName),
+  )
   return uniqueParticipantNames.join(', ')
 }
 const getConversationParticipantString = (participants, conversationOwnerName) => {
@@ -158,9 +175,9 @@ const getConversationParticipantString = (participants, conversationOwnerName) =
     .reduce((prev, curr) => {
       if (!curr?.user?.shortName && DEFAULT_USER_PROPERTIES.name === conversationOwnerName)
         return prev
-      return prev + ', ' + (curr?.user?.shortName || DEFAULT_USER_PROPERTIES.name)
+      return `${prev}, ${decodeHTMLShortName(curr?.user?.shortName) || DEFAULT_USER_PROPERTIES.name}`
     }, '')
-  return conversationOwnerName + participantString
+  return decodeHTMLShortName(conversationOwnerName) + participantString
 }
 
 const getParticipantsString = (
