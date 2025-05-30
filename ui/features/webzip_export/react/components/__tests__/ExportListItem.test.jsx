@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import enzyme from 'enzyme'
+import {render} from '@testing-library/react'
 import ExportListItem from '../ExportListItem'
 
 describe('ExportListItem', () => {
@@ -28,9 +28,9 @@ describe('ExportListItem', () => {
       workflowState: 'generated',
       newExport: false,
     }
-    const tree = enzyme.shallow(<ExportListItem {...props} />)
-    const node = tree.find('.webzipexport__list__item')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<ExportListItem {...props} />)
+    const node = container.querySelector('.webzipexport__list__item')
+    expect(node).toBeInTheDocument()
   })
 
   it('renders different text for last success', () => {
@@ -40,9 +40,8 @@ describe('ExportListItem', () => {
       workflowState: 'generated',
       newExport: true,
     }
-    const tree = enzyme.shallow(<ExportListItem {...props} />)
-    const node = tree.find('.webzipexport__list__item')
-    expect(node.text().startsWith('Most recent export')).toBeTruthy()
+    const {getByText} = render(<ExportListItem {...props} />)
+    expect(getByText('Most recent export')).toBeInTheDocument()
   })
 
   it('renders error text if last object failed', () => {
@@ -52,8 +51,7 @@ describe('ExportListItem', () => {
       workflowState: 'failed',
       newExport: true,
     }
-    const tree = enzyme.shallow(<ExportListItem {...props} />)
-    const node = tree.find('.text-error')
-    expect(node.text().startsWith('Export failed')).toBeTruthy()
+    const {getByText} = render(<ExportListItem {...props} />)
+    expect(getByText('Export failed')).toBeInTheDocument()
   })
 })

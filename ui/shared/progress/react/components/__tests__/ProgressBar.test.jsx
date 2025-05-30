@@ -17,20 +17,20 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import ProgressBar from '../ProgressBar'
 
 it('sets width on progress bar', () => {
-  const wrapper = shallow(<ProgressBar progress={35} />)
-  expect(wrapper.find('[role="progressbar"]').prop('style').width).toBe('35%')
+  const {getByRole} = render(<ProgressBar progress={35} />)
+  expect(getByRole('progressbar')).toHaveStyle('width: 35%')
 })
 
 it('shows indeterminate loader when progress is 100 but not yet complete', () => {
-  const wrapper = shallow(<ProgressBar progress={100} />)
-  expect(wrapper.hasClass('almost-done')).toBeTruthy()
+  const {container} = render(<ProgressBar progress={100} />)
+  expect(container.firstChild).toHaveClass('almost-done')
 })
 
 test('style width value never reaches over 100%', () => {
-  const wrapper = shallow(<ProgressBar progress={200} />)
-  expect(wrapper.find('[role="progressbar"]').prop('style').width).toBe('100%')
+  const {getByRole} = render(<ProgressBar progress={200} />)
+  expect(getByRole('progressbar')).toHaveStyle('width: 100%')
 })

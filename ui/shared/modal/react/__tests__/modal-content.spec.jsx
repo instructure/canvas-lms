@@ -17,21 +17,21 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import ModalContent from '../content'
 
 describe('ModalContent', () => {
   test('applies className to parent node', () => {
-    const wrapper = shallow(<ModalContent className="cat" />)
-    expect(wrapper.hasClass('cat')).toBe(true)
+    const {container} = render(<ModalContent className="cat" />)
+    expect(container.firstChild).toHaveClass('cat')
   })
 
   test('renders children components', () => {
-    const wrapper = shallow(
+    const {container} = render(
       <ModalContent>
         <div className="my_fun_div" />
       </ModalContent>,
     )
-    expect(wrapper.find('.my_fun_div').exists()).toBe(true)
+    expect(container.querySelector('.my_fun_div')).toBeInTheDocument()
   })
 })

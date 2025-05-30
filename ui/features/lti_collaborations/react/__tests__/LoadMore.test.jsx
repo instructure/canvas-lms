@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import React from 'react'
 import LoadMore from '../LoadMore'
 
@@ -28,13 +29,18 @@ describe('LoadMore', () => {
   }
 
   it('renders the load more component', () => {
-    expect(shallow(<LoadMore {...defaultProps} />)).toHaveLength(1)
+    const {container} = render(<LoadMore {...defaultProps} />)
+    expect(container.firstChild).toBeInTheDocument()
   })
 
-  it('function is called on load more link click', () => {
+  it('function is called on load more link click', async () => {
+    const user = userEvent.setup()
     const mockLoadMore = jest.fn()
-    const wrapper = shallow(<LoadMore {...defaultProps} hasMore={true} loadMore={mockLoadMore} />)
-    wrapper.find('.Button--link').simulate('click')
+    const {container} = render(
+      <LoadMore {...defaultProps} hasMore={true} loadMore={mockLoadMore} />,
+    )
+    const button = container.querySelector('.Button--link')
+    await user.click(button)
     expect(mockLoadMore).toHaveBeenCalled()
   })
 })

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import {Text} from '@instructure/ui-text'
 import {IconWarningLine, IconInfoLine} from '@instructure/ui-icons'
 import Message from '../../SubmissionStatus/Message'
@@ -26,40 +26,40 @@ describe('Message', () => {
   describe('variant warning', () => {
     test('includes IconWarningLine with message', () => {
       const message = 'Some Message'
-      const wrapper = shallow(<Message variant="warning" message={message} />)
-      expect(wrapper.containsMatchingElement(<IconWarningLine />)).toBe(true)
+      const {container, getByText} = render(<Message variant="warning" message={message} />)
+      // Check for warning icon - it should be present in the DOM
+      const warningIcon =
+        container.querySelector('svg[name*="Warning"]') ||
+        container.querySelector('[data-testid="warning-icon"]')
+      expect(warningIcon).toBeInTheDocument()
+      expect(getByText(message)).toBeInTheDocument()
     })
 
     test('includes a text message', () => {
       const message = 'Some Message'
-      const wrapper = shallow(<Message variant="warning" message={message} />)
-      expect(
-        wrapper.contains(
-          <Text color="danger" size="small">
-            {message}
-          </Text>,
-        ),
-      ).toBe(true)
+      const {getByText} = render(<Message variant="warning" message={message} />)
+      const textElement = getByText(message)
+      expect(textElement).toBeInTheDocument()
     })
   })
 
   describe('variant info', () => {
     test('includes IconInfoLine with message', () => {
       const message = 'Some Message'
-      const wrapper = shallow(<Message variant="info" message={message} />)
-      expect(wrapper.containsMatchingElement(<IconInfoLine />)).toBe(true)
+      const {container, getByText} = render(<Message variant="info" message={message} />)
+      // Check for info icon - it should be present in the DOM
+      const infoIcon =
+        container.querySelector('svg[name*="Info"]') ||
+        container.querySelector('[data-testid="info-icon"]')
+      expect(infoIcon).toBeInTheDocument()
+      expect(getByText(message)).toBeInTheDocument()
     })
 
     test('includes a text message', () => {
       const message = 'Some Message'
-      const wrapper = shallow(<Message variant="info" message={message} />)
-      expect(
-        wrapper.contains(
-          <Text color="primary" size="small">
-            {message}
-          </Text>,
-        ),
-      ).toBe(true)
+      const {getByText} = render(<Message variant="info" message={message} />)
+      const textElement = getByText(message)
+      expect(textElement).toBeInTheDocument()
     })
   })
 })

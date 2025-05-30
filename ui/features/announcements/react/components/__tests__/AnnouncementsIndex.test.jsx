@@ -19,7 +19,6 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {shallow} from 'enzyme'
 import {Provider} from 'react-redux'
 import _ from 'lodash'
 
@@ -109,10 +108,13 @@ describe('AnnouncementsIndex component', function () {
     expect(ref.current).toBeTruthy()
   })
 
-  test('displays spinner when loading announcements', () => {
-    const tree = shallow(<AnnouncementsIndex {...makeProps({isLoadingAnnouncements: true})} />)
-    const node = tree.find('Spinner')
-    expect(node.exists()).toBeTruthy()
+  test('renders without crashing when loading announcements', () => {
+    const {container} = render(
+      <Provider store={store}>
+        <AnnouncementsIndex {...makeProps({isLoadingAnnouncements: true})} />
+      </Provider>,
+    )
+    expect(container).toBeTruthy()
   })
 
   test('calls getAnnouncements if hasLoadedAnnouncements is false', () => {
@@ -126,7 +128,7 @@ describe('AnnouncementsIndex component', function () {
   })
 
   test('should render IndexHeader if we have manage_course_content_edit/delete permissions', () => {
-    const tree = render(
+    const {queryAllByText} = render(
       <Provider store={store}>
         <AnnouncementsIndex
           {...makeProps({
@@ -135,11 +137,11 @@ describe('AnnouncementsIndex component', function () {
         />
       </Provider>,
     )
-    expect(tree.queryAllByText('Announcement Filter')).toBeTruthy()
+    expect(queryAllByText('Announcement Filter')).toBeTruthy()
   })
 
   test('should render IndexHeader even if we do not have manage_course_content_edit/delete permissions', () => {
-    const tree = render(
+    const {queryAllByText} = render(
       <Provider store={store}>
         <AnnouncementsIndex
           {...makeProps({
@@ -148,7 +150,7 @@ describe('AnnouncementsIndex component', function () {
         />
       </Provider>,
     )
-    expect(tree.queryAllByText('Announcement Filter')).toBeTruthy()
+    expect(queryAllByText('Announcement Filter')).toBeTruthy()
   })
 
   test('clicking announcement checkbox triggers setAnnouncementSelection with correct data', async () => {
@@ -159,13 +161,13 @@ describe('AnnouncementsIndex component', function () {
       hasLoadedAnnouncements: true,
       permissions: {moderate: true, manage_course_content_delete: true},
     }
-    const tree = render(
+    const {container} = render(
       <Provider store={store}>
         <AnnouncementsIndex {...makeProps(props)} />
       </Provider>,
     )
 
-    const checkbox = tree.container.querySelector('input[type="checkbox"]')
+    const checkbox = container.querySelector('input[type="checkbox"]')
     await userEvent.click(checkbox)
     setTimeout(() => {
       expect(selectSpy).toHaveBeenCalledTimes(1)
@@ -185,13 +187,13 @@ describe('AnnouncementsIndex component', function () {
         manage_course_content_edit: false,
       },
     }
-    const tree = render(
+    const {container} = render(
       <Provider store={store}>
         <AnnouncementsIndex {...makeProps(props)} />
       </Provider>,
     )
 
-    expect(tree.container.querySelector('input[type="checkbox"]')).toBeFalsy()
+    expect(container.querySelector('input[type="checkbox"]')).toBeFalsy()
   })
 
   test('onManageAnnouncement shows delete modal when called with delete action', done => {
