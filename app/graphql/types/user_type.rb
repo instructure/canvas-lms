@@ -47,6 +47,8 @@ module Types
 
     global_id_field :id
 
+    field :first_name, HtmlEncodedStringType, null: true
+    field :last_name, HtmlEncodedStringType, null: true
     field :name, HtmlEncodedStringType, null: true
     field :short_name,
           HtmlEncodedStringType,
