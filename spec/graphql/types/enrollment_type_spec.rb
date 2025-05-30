@@ -28,11 +28,15 @@ describe Types::EnrollmentType do
   let(:teacher_enrollment_type) { GraphQLTypeTester.new(teacher_enrollment, current_user: @teacher) }
 
   it "works" do
+    # must update enrolmment start_at, end_at here, otherwise it causes concluded test to fail
+    enrollment.update!(start_at: Time.zone.now, end_at: 1.year.from_now)
     expect(enrollment_type.resolve("_id")).to eq enrollment.id.to_s
     expect(enrollment_type.resolve("type")).to eq "StudentEnrollment"
     expect(enrollment_type.resolve("state")).to eq "active"
     expect(enrollment_type.resolve("sisImportId")).to eq enrollment.sis_batch_id
     expect(enrollment_type.resolve("limitPrivilegesToCourseSection")).to eq enrollment.limit_privileges_to_course_section
+    expect(enrollment_type.resolve("startAt")).to eq enrollment.start_at.iso8601
+    expect(enrollment_type.resolve("endAt")).to eq enrollment.end_at.iso8601
   end
 
   it "returns correct value for limitPrivilegesToCourseSection" do
