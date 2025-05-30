@@ -108,6 +108,9 @@ module Types
 
     field :limit_privileges_to_course_section, Boolean, null: true
 
+    field :end_at, DateTimeType, null: true
+    field :start_at, DateTimeType, null: true
+
     field :sis_import_id, ID, null: true
     def sis_import_id
       enrollment.sis_batch_id
