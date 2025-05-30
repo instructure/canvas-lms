@@ -104,6 +104,21 @@ module Types
 
     field :state, EnrollmentWorkflowState, method: :workflow_state, null: false
 
+    # This field has been copied from Api::V1::User#enrollment_json
+    # This field is provided for the gradebook
+    field :enrollment_state, EnrollmentWorkflowState, null: false
+    def enrollment_state
+      load_association(:course).then do |course|
+        if course.workflow_state == "deleted"
+          "deleted"
+        else
+          load_association(:course_section).then do |section|
+            (section.workflow_state == "deleted") ? "deleted" : enrollment.workflow_state
+          end
+        end
+      end
+    end
+
     field :type, EnrollmentTypeType, null: false
 
     field :limit_privileges_to_course_section, Boolean, null: true
