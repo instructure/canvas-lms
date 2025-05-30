@@ -3809,6 +3809,7 @@ type Enrollment implements AssetString & Node & Timestamped {
   id: ID!
   lastActivityAt: DateTime
   limitPrivilegesToCourseSection: Boolean
+  role: EnrollmentRole
   section: Section
   sisImportId: ID
   sisRole: String
@@ -3862,6 +3863,14 @@ input EnrollmentFilterInput {
   states: [EnrollmentWorkflowState!] = null
   types: [EnrollmentType!] = null
   userIds: [ID!] = []
+}
+
+type EnrollmentRole {
+  """
+  legacy canvas id
+  """
+  _id: ID
+  name: String
 }
 
 enum EnrollmentType {

@@ -19,6 +19,11 @@
 #
 
 module Types
+  class EnrollmentRoleType < ApplicationObjectType
+    field :_id, ID, "legacy canvas id", method: :id, null: true
+    field :name, String, null: true
+  end
+
   class EnrollmentWorkflowState < Types::BaseEnum
     graphql_name "EnrollmentWorkflowState"
     value "invited"
@@ -141,6 +146,11 @@ module Types
         end
         nil
       end
+    end
+
+    field :role, EnrollmentRoleType, null: true
+    def role
+      load_association(:role)
     end
 
     field :grades, GradesType, null: true do
