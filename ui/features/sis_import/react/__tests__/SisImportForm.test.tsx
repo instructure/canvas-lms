@@ -49,7 +49,7 @@ describe('SisImportForm', () => {
     fakeENV.setup({ACCOUNT_ID})
 
     // Mock the terms API endpoint
-    fetchMock.get(`${TERMS_API_URI}?per_page=50&page=1`, {
+    fetchMock.get(`${TERMS_API_URI}?per_page=100&page=1`, {
       body: enrollmentTerms,
       headers: {
         Link: '<>; rel="current"',
