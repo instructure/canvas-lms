@@ -43,3 +43,21 @@ export const useToggleCollapse = (courseId: string) => {
     },
   })
 }
+
+export const useToggleAllCollapse = (courseId: string) => {
+  return useMutation({
+    mutationFn: async (collapse: boolean) => {
+      const {json} = await doFetchApi({
+        path: `/courses/${courseId}/collapse_all_modules`,
+        method: 'POST',
+        params: {
+          collapse: collapse ? 1 : 0,
+        },
+      })
+      return json
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['modules', courseId]})
+    },
+  })
+}
