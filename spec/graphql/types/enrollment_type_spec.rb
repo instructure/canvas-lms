@@ -39,6 +39,16 @@ describe Types::EnrollmentType do
     expect(enrollment_type.resolve("endAt")).to eq enrollment.end_at.iso8601
   end
 
+  context "sisImportId returns" do
+    it "nil if current user has no permission :manage_sis" do
+      expect(enrollment_type.resolve("sisImportId")).to be_nil
+    end
+
+    it "sisImportId" do
+      expect(enrollment_type.resolve("sisImportId", current_user: @teacher)).to eq enrollment.sis_batch_id
+    end
+  end
+
   it "returns correct value for limitPrivilegesToCourseSection" do
     Enrollment.limit_privileges_to_course_section!(@course, @student, true)
     expect(enrollment_type.resolve("limitPrivilegesToCourseSection")).to be true
