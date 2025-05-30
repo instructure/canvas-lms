@@ -203,7 +203,7 @@ export default class AssignmentCellFormatter {
     columnDef: {
       postAssignmentGradesTrayOpenForAssignmentId?: string
     },
-    student: Student,
+    student: Pick<Student, 'id' | 'loaded' | 'initialized' | 'isInactive' | 'isConcluded'>,
   ) => {
     let submissionState
     if (submission) {

@@ -43,6 +43,8 @@ export type Enrollment = Readonly<{
   updated_at: string
   user_id: string
   grades: {
+    // *_grades are represented as strings in the backend, but for some reason they are defined as
+    // number here
     html_url: string
     current_grade: null | number
     current_score: null | number
