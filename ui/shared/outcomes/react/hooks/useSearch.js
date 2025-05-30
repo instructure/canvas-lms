@@ -23,7 +23,7 @@ const useSearch = (debounceTime = 500) => {
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
 
-  const [debouncedCallback] = useDebouncedCallback(value => {
+  const debouncedCallback = useDebouncedCallback(value => {
     setDebouncedSearch(value)
   }, debounceTime)
 
