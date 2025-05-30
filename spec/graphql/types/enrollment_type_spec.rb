@@ -68,6 +68,34 @@ describe Types::EnrollmentType do
     end
   end
 
+  context "sisSectionId returns" do
+    let(:enrollment) { student_in_course(active_all: true) }
+
+    let(:admin) { account_admin_user }
+
+    it "nil when requesting user has no persmission [:read_sis, :manage_sis]" do
+      account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: false })
+      expect(enrollment_type.resolve("sisSectionId")).to be_nil
+    end
+
+    context "sisSectionId" do
+      it "if requesting user has permission :read_sis" do
+        account_admin_user_with_role_changes(role_changes: { read_sis: true, manage_sis: false })
+        expect(enrollment_type.resolve("sisSectionId")).to eq enrollment.course_section.sis_source_id
+      end
+
+      it "if requesting user has permission :manage_sis" do
+        account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: true })
+        expect(enrollment_type.resolve("sisSectionId")).to eq enrollment.course_section.sis_source_id
+      end
+
+      it "if requesting user has both permissions" do
+        account_admin_user_with_role_changes(role_changes: { read_sis: true, manage_sis: true })
+        expect(enrollment_type.resolve("sisSectionId")).to eq enrollment.course_section.sis_source_id
+      end
+    end
+  end
+
   it "returns correct value for limitPrivilegesToCourseSection" do
     Enrollment.limit_privileges_to_course_section!(@course, @student, true)
     expect(enrollment_type.resolve("limitPrivilegesToCourseSection")).to be true

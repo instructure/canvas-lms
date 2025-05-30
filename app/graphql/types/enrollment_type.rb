@@ -133,6 +133,16 @@ module Types
       enrollment.sis_batch_id
     end
 
+    field :sis_section_id, ID, null: true
+    def sis_section_id
+      load_association(:course).then do |course|
+        if course.grants_right?(current_user, :read_sis) || enrollment.root_account.grants_right?(current_user, :manage_sis)
+          load_association(:course_section).then(&:sis_source_id)
+        end
+        nil
+      end
+    end
+
     field :grades, GradesType, null: true do
       argument :grading_period_id,
                ID,
