@@ -37,13 +37,23 @@ const ModuleHeaderStatusIcon: React.FC<ModuleHeaderStatusIconProps> = ({progress
   let screenReaderMessage = ''
 
   if (locked) {
-    icon = <IconLockSolid data-testid="module-header-status-icon-lock" color="primary" />
+    icon = (
+      <IconLockSolid data-testid="module-header-status-icon-lock" color="primary" size="small" />
+    )
     screenReaderMessage = I18n.t('Locked')
   } else if (completed) {
-    icon = <IconPublishSolid data-testid="module-header-status-icon-success" color="success" />
+    icon = (
+      <IconPublishSolid
+        data-testid="module-header-status-icon-success"
+        color="success"
+        size="small"
+      />
+    )
     screenReaderMessage = I18n.t('Completed')
   } else if (started) {
-    icon = <IconEmptyLine data-testid="module-header-status-icon-empty" color="primary" />
+    icon = (
+      <IconEmptyLine data-testid="module-header-status-icon-empty" color="primary" size="small" />
+    )
     screenReaderMessage = I18n.t('In Progress')
   } else {
     return null

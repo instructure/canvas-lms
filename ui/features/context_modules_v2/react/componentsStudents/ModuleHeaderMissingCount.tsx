@@ -17,12 +17,10 @@
  */
 
 import React from 'react'
-import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Flex} from '@instructure/ui-flex'
-import {ModuleStatistics} from '../utils/types.d'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
+import {ModuleStatistics} from '../utils/types.d'
+import {Pill} from '@instructure/ui-pill'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -30,26 +28,21 @@ type Props = {
   submissionStatistics?: ModuleStatistics
 }
 
-export const ModuleHeaderSupplementalInfoStudent = ({submissionStatistics}: Props) => {
-  const dueDate = submissionStatistics?.latestDueAt
-    ? new Date(submissionStatistics.latestDueAt)
-    : null
-
+export const ModuleHeaderMissingCount = ({submissionStatistics}: Props) => {
+  const missingCount = submissionStatistics?.missingAssignmentCount || 0
   return (
-    <View as="div" margin="0 0 0">
-      <Flex wrap="wrap">
-        <Flex.Item>
-          {dueDate && (
-            <Text size="medium" color="ai-highlight" themeOverride={{aiBackgroundColor: ''}}>
-              <FriendlyDatetime
-                prefix={I18n.t('Due: ')}
-                format={I18n.t('#date.formats.short')}
-                dateTime={dueDate}
-              />
-            </Text>
-          )}
-        </Flex.Item>
-      </Flex>
-    </View>
+    <Pill color="danger">
+      <Text size="x-small" color="danger">
+        {I18n.t(
+          {
+            one: '1 Missing Assignment',
+            other: '%{count} Missing Assignments',
+          },
+          {
+            count: missingCount,
+          },
+        )}
+      </Text>
+    </Pill>
   )
 }

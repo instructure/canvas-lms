@@ -48,18 +48,19 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
 
   const completionPercentage = Math.round((completedCount / totalCount) * 100)
   const isComplete = completionPercentage >= 100
-  const completionText = I18n.t('%{completed}/%{total} Required Items Completed', {
+  const completionText = I18n.t('%{completed} of %{total} Required Items', {
     completed: completedCount > totalCount ? totalCount : completedCount,
     total: totalCount,
   })
 
   return (
     <View as="div" margin="xx-small 0 0 0">
-      <Flex direction="column">
-        <Flex.Item overflowY="hidden">
+      <Flex alignItems="center">
+        <Flex.Item overflowY="hidden" width="33%" margin="xxx-small 0 0 0">
           <View
             as="div"
-            width="70%"
+            width="100%"
+            minWidth="100%"
             overflowX="hidden"
             overflowY="hidden"
             borderRadius="large"
@@ -80,7 +81,12 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
             />
           </View>
         </Flex.Item>
-        <Flex.Item>
+        <Flex.Item margin="0 0 0 x-small">
+          <Text size="x-small" weight="normal">
+            {completionPercentage}%
+          </Text>
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
           <Text size="x-small" weight="normal">
             {completionText}
           </Text>

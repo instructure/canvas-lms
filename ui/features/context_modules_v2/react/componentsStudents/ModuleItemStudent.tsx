@@ -62,11 +62,12 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
     <View
       as="div"
       padding="small small small x-small"
-      background="transparent"
+      background="primary"
       borderWidth="0"
-      borderRadius="medium"
+      borderRadius="large"
       overflowX="hidden"
       data-item-id={_id}
+      margin="small"
     >
       <Flex wrap="wrap">
         <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`} shouldGrow>
