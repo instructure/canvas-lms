@@ -78,6 +78,45 @@ describe Types::UserType do
     end
   end
 
+  context "login_id" do
+    before(:once) do
+      @student.pseudonyms.create!(
+        account: @course.account,
+        unique_id: "alex@columbia.edu",
+        workflow_state: "active"
+      )
+    end
+
+    let(:admin) { account_admin_user }
+    let(:user_type_as_admin) do
+      GraphQLTypeTester.new(@student,
+                            current_user: admin,
+                            domain_root_account: @course.account.root_account,
+                            request: ActionDispatch::TestRequest.create)
+    end
+
+    context "returns login_id" do
+      it "if there is no pseudonym" do
+        expect(user_type_as_admin.resolve("loginId")).to be_nil
+      end
+    end
+
+    context "returns nil" do
+      it "when there is no course in context" do
+        expect(user_type_as_admin.resolve("loginId")).to be_nil
+      end
+
+      it "when requesting user has no permission :view_user_logins" do
+        account_admin_user_with_role_changes(role_changes: { view_user_logins: false })
+        expect(user_type_as_admin.resolve("loginId")).to be_nil
+      end
+
+      it "when there is no pseudonym created" do
+        expect(user_type_as_admin.resolve("loginId", current_user: @other_student)).to be_nil
+      end
+    end
+  end
+
   context "name" do
     it "encodes html entities" do
       @student.update! name: "<script>alert(1)</script>"
