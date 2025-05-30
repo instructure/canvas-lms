@@ -27,6 +27,8 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GradeSummaryContainer from './GradeSummaryContainer'
 
 import LoadingIndicator from '@canvas/loading-indicator'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('grade_summary')
 
@@ -53,18 +55,20 @@ const GradeSummaryManager = () => {
   }
 
   return (
-    <ApolloProvider client={client}>
-      <ErrorBoundary
-        errorComponent={
-          <GenericErrorPage
-            imageUrl={errorShipUrl}
-            errorCategory={I18n.t('Grade Summary Error Page')}
-          />
-        }
-      >
-        <GradeSummaryContainer />
-      </ErrorBoundary>
-    </ApolloProvider>
+    <QueryClientProvider client={queryClient}>
+      <ApolloProvider client={client}>
+        <ErrorBoundary
+          errorComponent={
+            <GenericErrorPage
+              imageUrl={errorShipUrl}
+              errorCategory={I18n.t('Grade Summary Error Page')}
+            />
+          }
+        >
+          <GradeSummaryContainer />
+        </ErrorBoundary>
+      </ApolloProvider>
+    </QueryClientProvider>
   )
 }
 
