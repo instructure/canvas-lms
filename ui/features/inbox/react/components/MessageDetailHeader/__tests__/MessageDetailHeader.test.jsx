@@ -78,6 +78,47 @@ describe('MessageDetailHeader', () => {
     expect(queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
   })
 
+  describe('when restrict_student_access feature is enabled', () => {
+    const props = {
+      text: 'Message Header Text',
+      onReplyAll: jest.fn(),
+      onForward: jest.fn(),
+      onArchive: jest.fn(),
+      onStar: jest.fn(),
+      onDelete: jest.fn(),
+    }
+
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.restrict_student_access = true
+    })
+
+    afterAll(() => {
+      delete window.ENV.FEATURES.restrict_student_access
+    })
+
+    it('does not render the reply all & delete button', async () => {
+      const {getByText, queryByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByText('More options for Message Header Text')
+
+      fireEvent.click(moreOptionsButton)
+
+      expect(queryByText('Reply All')).not.toBeInTheDocument()
+      expect(queryByText('Delete')).not.toBeInTheDocument()
+    })
+
+    it('renders all other expected buttons', async () => {
+      const {getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByText('More options for Message Header Text')
+
+      fireEvent.click(moreOptionsButton)
+
+      expect(getByText('Forward')).toBeInTheDocument()
+      expect(getByText('Star')).toBeInTheDocument()
+      expect(getByText('Archive')).toBeInTheDocument()
+    })
+  })
+
   describe('sends the selected option to the provided callback function', () => {
     const props = {
       text: 'Button Test',

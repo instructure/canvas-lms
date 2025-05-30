@@ -503,6 +503,7 @@ class ApplicationController < ActionController::Base
     lti_apps_page_ai_translation
     ams_service
     open_tools_in_new_tab
+    restrict_student_access
     horizon_learner_app
     horizon_learning_provider_app_on_contextless_routes
     youtube_migration
