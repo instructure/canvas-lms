@@ -9613,6 +9613,7 @@ type User implements LegacyIDInterface & Node & Timestamped {
     """
     last: Int
   ): GroupConnection
+  firstName: HtmlEncodedString
 
   """
   **NOTE**: this only returns groups for the currently logged-in user.
@@ -9622,6 +9623,7 @@ type User implements LegacyIDInterface & Node & Timestamped {
   id: ID!
   inboxLabels: [String!]
   integrationId: String
+  lastName: HtmlEncodedString
   loginId: String
   name: HtmlEncodedString
   notificationPreferences: NotificationPreferences
