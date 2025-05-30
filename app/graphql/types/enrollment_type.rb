@@ -48,13 +48,13 @@ module Types
              prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
              required: false,
              default_value: []
+    argument :states, [EnrollmentWorkflowState], required: false, default_value: nil
+    argument :types, [EnrollmentTypeType], required: false, default_value: nil
     argument :user_ids,
              [ID],
              prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
              required: false,
              default_value: []
-    argument :states, [EnrollmentWorkflowState], required: false, default_value: nil
-    argument :types, [EnrollmentTypeType], required: false, default_value: nil
   end
 
   class EnrollmentType < ApplicationObjectType
@@ -73,6 +73,11 @@ module Types
     field :_id, ID, "legacy canvas id", method: :id, null: true
     def _id
       unless_hiding_user_for_anonymous_grading { enrollment.id }
+    end
+
+    field :user_id, ID, null: true
+    def user_id
+      unless_hiding_user_for_anonymous_grading { object.user_id }
     end
 
     field :user, UserType, null: true

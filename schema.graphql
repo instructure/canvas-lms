@@ -3815,6 +3815,7 @@ type Enrollment implements AssetString & Node & Timestamped {
   type: EnrollmentType!
   updatedAt: DateTime
   user: User
+  userId: ID
 }
 
 """
