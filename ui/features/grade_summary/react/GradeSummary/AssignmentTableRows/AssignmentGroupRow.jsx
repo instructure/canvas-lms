@@ -31,15 +31,16 @@ import {
 export const assignmentGroupRow = (
   assignmentGroup,
   queryData,
+  assignmentsData,
   calculateOnlyGradedAssignments = false,
   courseLevelGrades = {},
 ) => {
-  const groupAssignments = queryData?.assignmentsConnection?.nodes?.filter(assignment => {
+  const groupAssignments = assignmentsData?.assignments?.filter(assignment => {
     return assignment?.assignmentGroup?._id === assignmentGroup?._id
   })
 
   const applicableAssignments = filteredAssignments(
-    queryData,
+    assignmentsData,
     calculateOnlyGradedAssignments,
   ).filter(assignment => {
     return assignment?.assignmentGroup?._id === assignmentGroup?._id

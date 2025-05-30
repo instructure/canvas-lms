@@ -42,12 +42,12 @@ export const getGradingPeriodID = () => {
 }
 
 export const filteredAssignments = (
-  data,
+  assignmentsData,
   calculateOnlyGradedAssignments = false,
   activeWhatIfScores = [],
 ) => {
   let assignments =
-    data?.assignmentsConnection?.nodes.filter(assignment => {
+    assignmentsData?.assignments?.filter(assignment => {
       return !assignment?.submissionsConnection?.nodes[0]?.hideGradeFromStudent
     }) || []
 
@@ -296,6 +296,7 @@ export const filterDroppedAssignments = (
 
 export const listDroppedAssignments = (
   queryData,
+  assignmentsData,
   byGradingPeriod,
   calculateOnlyGradedAssignments,
 ) => {
@@ -303,9 +304,11 @@ export const listDroppedAssignments = (
     return data?.assignmentGroupsConnection?.nodes
       ?.map(assignmentGroup => {
         const assignments = filterDroppedAssignments(
-          filteredAssignments(data, calculateOnlyGradedAssignments).filter(assignment => {
-            return checkAssignment(assignment, assignmentGroup)
-          }),
+          filteredAssignments(assignmentsData, calculateOnlyGradedAssignments).filter(
+            assignment => {
+              return checkAssignment(assignment, assignmentGroup)
+            },
+          ),
           assignmentGroup,
           true,
         )
