@@ -2185,10 +2185,17 @@ class Submission < ActiveRecord::Base
 
   def maybe_queue_conditional_release_grade_change_handler
     shard.activate do
-      return unless graded? && posted?
+      if Account.site_admin.feature_enabled? :mastery_path_submission_trigger_reloaded_evaluation
+        reloaded = Submission.find(id)
+        return unless reloaded.graded? && reloaded.posted?
+      else
+        return unless graded? && posted?
+      end
 
       if assignment.present? && assignment.queue_conditional_release_grade_change_handler?
         queue_conditional_release_grade_change_handler
+      elsif assignment.blank?
+        logger.warn("No assignment present for submission #{id}; skipping conditional release handler")
       end
     end
   end
