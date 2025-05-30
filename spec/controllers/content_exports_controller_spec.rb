@@ -134,6 +134,12 @@ describe ContentExportsController do
       expect(assigns(:css_bundles).flatten).to include(:k5_theme)
       expect(assigns(:js_bundles).flatten).to include(:k5_theme)
     end
+
+    it "redirects to login if no user is logged in" do
+      remove_user_session
+      get :index, params: { course_id: @course.id }
+      expect(response).to redirect_to(login_path)
+    end
   end
 
   describe "GET xml_schema" do
