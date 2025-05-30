@@ -183,10 +183,12 @@ module Types
                required: false
     end
 
+    # TODO: handle N+1
     field :login_id, String, null: true
     def login_id
       course = context[:course]
       return nil unless course
+      return nil unless course.grants_right?(current_user, session, :view_user_logins)
 
       pseudonym = SisPseudonym.for(
         object,
@@ -196,7 +198,7 @@ module Types
         root_account: context[:domain_root_account],
         in_region: true
       )
-      return nil unless pseudonym && course.grants_right?(context[:current_user], context[:session], :view_user_logins)
+      return nil unless pseudonym
 
       pseudonym.unique_id
     end
