@@ -113,6 +113,8 @@ module Types
 
     field :sis_import_id, ID, null: true
     def sis_import_id
+      return nil unless enrollment.root_account.grants_right?(current_user, :manage_sis)
+
       enrollment.sis_batch_id
     end
 
