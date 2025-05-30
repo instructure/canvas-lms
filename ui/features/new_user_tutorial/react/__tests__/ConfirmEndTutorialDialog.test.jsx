@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import axios from '@canvas/axios'
 import moxios from 'moxios'
 import ConfirmEndTutorialDialog from '../ConfirmEndTutorialDialog'
@@ -38,10 +39,12 @@ describe('ConfirmEndTutorialDialog Spec', () => {
   }
 
   // fails in Jest, passes in QUnit
-  test.skip('handleOkayButtonClick calls the proper api endpoint and data', () => {
+  test.skip('handleOkayButtonClick calls the proper api endpoint and data', async () => {
+    const user = userEvent.setup()
     const putSpy = jest.spyOn(axios, 'put')
-    const wrapper = shallow(<ConfirmEndTutorialDialog {...defaultProps} />)
-    wrapper.find('Button[color="primary"]').simulate('click')
+    const {getByRole} = render(<ConfirmEndTutorialDialog {...defaultProps} />)
+    const okButton = getByRole('button', {name: /okay/i})
+    await user.click(okButton)
 
     expect(putSpy).toHaveBeenCalledWith(
       '/api/v1/users/self/features/flags/new_user_tutorial_on_off',
@@ -51,11 +54,13 @@ describe('ConfirmEndTutorialDialog Spec', () => {
 
   // fails in Jest, passes in QUnit
   test.skip('handleOkayButtonClick calls onSuccessFunc after calling the api', async () => {
+    const user = userEvent.setup()
     const onSuccessSpy = jest
       .spyOn(ConfirmEndTutorialDialog.prototype, 'onSuccess')
       .mockImplementation(() => {})
-    const wrapper = shallow(<ConfirmEndTutorialDialog {...defaultProps} />)
-    wrapper.find('Button[color="primary"]').simulate('click')
+    const {getByRole} = render(<ConfirmEndTutorialDialog {...defaultProps} />)
+    const okButton = getByRole('button', {name: /okay/i})
+    await user.click(okButton)
 
     await moxios.wait(() => {
       const request = moxios.requests.mostRecent()

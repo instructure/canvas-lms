@@ -16,56 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import CriterionInfo from '../CriterionInfo'
 
 describe('The CriterionInfo component', () => {
-  it('renders an info button that toggles a modal with help content', () => {
-    const component = shallow(<CriterionInfo />)
+  it('renders an info button that toggles a modal with help content', async () => {
+    const user = userEvent.setup()
+    const {getByRole, queryByRole, getByText} = render(<CriterionInfo />)
 
     // Initially should show just the info button
-    expect(component.find('IconButton')).toHaveLength(1)
-    expect(component.find('Modal')).toHaveLength(0)
-
-    // Check IconButton properties
-    const iconButton = component.find('IconButton')
-    expect(iconButton.prop('screenReaderLabel')).toBe('More Information About Ratings')
-    expect(iconButton.prop('color')).toBe('secondary')
-    expect(iconButton.prop('withBackground')).toBe(false)
-    expect(iconButton.prop('withBorder')).toBe(false)
-    expect(iconButton.prop('renderIcon').type.name).toBe('IconQuestionLine')
+    const infoButton = getByRole('button', {name: 'More Information About Ratings'})
+    expect(infoButton).toBeInTheDocument()
+    expect(queryByRole('dialog')).not.toBeInTheDocument()
 
     // Click the button to open modal
-    iconButton.prop('onClick')()
-    component.update()
+    await user.click(infoButton)
 
-    // Should now show both button and modal
-    expect(component.find('IconButton')).toHaveLength(1)
-    expect(component.find('Modal')).toHaveLength(1)
+    // Should now show the modal
+    const modal = getByRole('dialog')
+    expect(modal).toBeInTheDocument()
+    expect(modal).toHaveAttribute('aria-label', 'Criterion Ratings')
 
-    // Check Modal properties
-    const modal = component.find('Modal')
-    expect(modal.prop('label')).toBe('Criterion Ratings')
-    expect(modal.prop('open')).toBe(true)
-    expect(modal.prop('size')).toBe('medium')
+    // Check modal content
+    expect(getByRole('heading', {name: 'Criterion Ratings', level: 2})).toBeInTheDocument()
+    expect(getByText(/Learning outcomes can be included in assignment rubrics/)).toBeInTheDocument()
+    expect(getByText(/define mastery of this outcome/)).toBeInTheDocument()
 
-    // Check modal content structure
-    expect(modal.find('ModalHeader')).toHaveLength(1)
-    expect(modal.find('ModalBody')).toHaveLength(1)
-    expect(modal.find('CloseButton')).toHaveLength(1)
-    expect(modal.find('Heading')).toHaveLength(1)
-
-    // Check modal text content
-    const modalText = modal.find('Text')
-    expect(modalText).toHaveLength(1)
-    expect(modalText.children().text()).toContain(
-      'Learning outcomes can be included in assignment rubrics',
-    )
-    expect(modalText.children().text()).toContain('define mastery of this outcome')
-
-    // Check heading content
-    const heading = modal.find('Heading')
-    expect(heading.children().text()).toBe('Criterion Ratings')
-    expect(heading.prop('level')).toBe('h2')
+    // Check that close button is present
+    expect(getByRole('button', {name: /close/i})).toBeInTheDocument()
   })
 })
