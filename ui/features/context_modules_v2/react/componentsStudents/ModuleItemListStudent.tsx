@@ -65,12 +65,7 @@ const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
         </View>
       ) : (
         moduleItems.map((item, index) => (
-          <View
-            as="div"
-            borderWidth={`${index === 0 ? '0' : 'small'} 0 0 0`}
-            borderRadius="small"
-            key={item._id}
-          >
+          <View as="div" key={item._id}>
             <MemoizedModuleItemStudent
               {...item}
               index={index}

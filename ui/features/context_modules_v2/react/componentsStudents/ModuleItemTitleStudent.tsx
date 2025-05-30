@@ -49,17 +49,17 @@ const ModuleItemTitleStudent = ({
       position &&
       progression?.currentPosition < position) ? (
     <Flex alignItems="center">
-      <Text weight="light" color="secondary" data-testid="module-item-title-locked">
+      <Text size="small" weight="light" color="secondary" data-testid="module-item-title-locked">
         {content?.title || missingTitleText}
       </Text>
     </Flex>
   ) : content?.type === 'SubHeader' ? (
-    <Text weight="bold" color="primary" data-testid="subheader-title-text">
+    <Text size="small" weight="bold" color="primary" data-testid="subheader-title-text">
       {content?.title || missingTitleText}
     </Text>
   ) : (
     <Link href={url} isWithinText={false} onClick={onClick}>
-      <Text weight="bold" color="primary" data-testid="module-item-title">
+      <Text size="small" weight="bold" color="primary" data-testid="module-item-title">
         {content?.title || missingTitleText}
       </Text>
     </Link>

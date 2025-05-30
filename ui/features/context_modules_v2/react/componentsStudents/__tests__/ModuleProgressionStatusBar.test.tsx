@@ -99,7 +99,7 @@ describe('ModuleProgressionStatusBar', () => {
       completionRequirements: [],
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.queryByText('0/0 Required Items Completed')).not.toBeInTheDocument()
+    expect(container.queryByText('0 of 0 Required Items')).not.toBeInTheDocument()
   })
 
   it('should render the correct completion percentage 100%', () => {
@@ -137,7 +137,7 @@ describe('ModuleProgressionStatusBar', () => {
       },
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('2/2 Required Items Completed')).toBeInTheDocument()
+    expect(container.getByText('2 of 2 Required Items')).toBeInTheDocument()
   })
 
   it('should render the correct completion percentage 50%', () => {
@@ -168,7 +168,7 @@ describe('ModuleProgressionStatusBar', () => {
       },
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('1/2 Required Items Completed')).toBeInTheDocument()
+    expect(container.getByText('1 of 2 Required Items')).toBeInTheDocument()
   })
 
   it('should render the correct completion percentage 0%', () => {
@@ -192,7 +192,7 @@ describe('ModuleProgressionStatusBar', () => {
       ],
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('0/2 Required Items Completed')).toBeInTheDocument()
+    expect(container.getByText('0 of 2 Required Items')).toBeInTheDocument()
   })
 
   it('should handle custom requirement counts', () => {
@@ -203,7 +203,7 @@ describe('ModuleProgressionStatusBar', () => {
       },
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('2/4 Required Items Completed')).toBeInTheDocument()
+    expect(container.getByText('2 of 4 Required Items')).toBeInTheDocument()
   })
 
   it('should render progress bar with a x/1 when requirementCount is 1', () => {
@@ -215,7 +215,7 @@ describe('ModuleProgressionStatusBar', () => {
       },
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('1/1 Required Items Completed')).toBeInTheDocument()
+    expect(container.getByText('1 of 1 Required Items')).toBeInTheDocument()
   })
 
   it('should render the correct completion percentage 50% when a requirement is met but does not match a completion requirement', () => {
@@ -244,6 +244,6 @@ describe('ModuleProgressionStatusBar', () => {
       },
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('1/2 Required Items Completed')).toBeInTheDocument()
+    expect(container.getByText('1 of 2 Required Items')).toBeInTheDocument()
   })
 })
