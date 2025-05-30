@@ -208,7 +208,7 @@ module CanvasRails
             end
           end
 
-          raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
+          raise "Canvas requires PostgreSQL 14 or newer" unless postgresql_version >= 14_00_00 # rubocop:disable Style/NumericLiterals
 
           break
           # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
