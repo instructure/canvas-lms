@@ -731,7 +731,7 @@ export const filterStudentBySubmissionFn = (
     appliedFilters,
   ) as SubmissionFilterValue[]
 
-  return (student: Student) => {
+  return (student: Pick<Student, 'id'>) => {
     if (submissionFilters.length === 0) {
       return true
     }
@@ -766,7 +766,11 @@ export const filterStudentBySectionFn = (
     appliedFilters,
   ) as SubmissionFilterValue[]
 
-  return (student: Student) => {
+  return (
+    student: Pick<Student, 'sections'> & {
+      enrollments: Pick<Student['enrollments'][number], 'course_section_id' | 'enrollment_state'>[]
+    },
+  ) => {
     if (sectionFilters.length === 0) {
       return true
     }

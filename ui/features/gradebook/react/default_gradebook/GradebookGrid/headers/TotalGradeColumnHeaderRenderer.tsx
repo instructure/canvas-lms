@@ -52,7 +52,11 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
     }
   }
 
-  const processStudent = (student: Student): PartialStudent => {
+  const processStudent = (
+    student: Pick<Student, 'id' | 'isInactive' | 'name' | 'sortable_name'> & {
+      enrollments: Pick<Student['enrollments'][number], 'type'>[]
+    },
+  ): PartialStudent => {
     return {
       id: student.id,
       isInactive: Boolean(student.isInactive),
