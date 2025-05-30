@@ -96,6 +96,16 @@ describe Types::EnrollmentType do
     end
   end
 
+  context "role" do
+    it "returns role id" do
+      expect(enrollment_type.resolve("role { _id }")).to eq enrollment.role.id.to_s
+    end
+
+    it "returns role name" do
+      expect(enrollment_type.resolve("role { name }")).to eq enrollment.role.name
+    end
+  end
+
   it "returns correct value for limitPrivilegesToCourseSection" do
     Enrollment.limit_privileges_to_course_section!(@course, @student, true)
     expect(enrollment_type.resolve("limitPrivilegesToCourseSection")).to be true
