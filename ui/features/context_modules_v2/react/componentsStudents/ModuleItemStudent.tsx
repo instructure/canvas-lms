@@ -93,10 +93,10 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
                     {/* Item Type Icon */}
                     {itemIcon && (
                       <>
-                        <Flex.Item margin="0 small 0 0">
+                        <Flex.Item margin="0 small 0 0" aria-hidden="true">
                           <View as="div">{itemIcon}</View>
                         </Flex.Item>
-                        <Flex.Item margin="0 small 0 0">
+                        <Flex.Item margin="0 small 0 0" aria-hidden="true">
                           <Text size="x-small" transform="capitalize">
                             {itemTypeText}
                           </Text>
