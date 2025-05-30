@@ -30,12 +30,10 @@ import {useDebouncedCallback} from 'use-debounce'
 import {Img} from '@instructure/ui-img'
 import {
   isLtiPlacementWithDefaultIcon,
-  LtiPlacements,
   LtiPlacementsWithIcons,
   type LtiPlacement,
   type LtiPlacementWithIcon,
 } from '../model/LtiPlacement'
-import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
@@ -43,7 +41,7 @@ import {ltiToolDefaultIconUrl} from '../model/ltiToolIcons'
 import {getInputIdForField} from '../registration_overlay/validateLti1p3RegistrationOverlayState'
 
 const I18n = createI18nScope('lti_registration.wizard')
-export type IconConfirmationProps = {
+export interface IconConfirmationProps {
   internalConfig: InternalLtiConfiguration
   name: string
   developerKeyId?: DeveloperKeyId
@@ -88,7 +86,7 @@ export const IconConfirmation = React.memo(
     const [placementImgValues, setPlacementImgValues] =
       React.useState<Partial<Record<LtiPlacementWithIcon, string>>>(placementIconOverrides)
 
-    const [debouncedImgUrlsUpdate, _, callPending] = useDebouncedCallback(
+    const debouncedImgUrlsUpdate = useDebouncedCallback(
       (placement: LtiPlacementWithIcon, value: string) =>
         setPlacementImgValues(prev => ({...prev, [placement]: value})),
       500,
@@ -99,14 +97,14 @@ export const IconConfirmation = React.memo(
         setPlacementIconUrl(placement, value)
         debouncedImgUrlsUpdate(placement, value)
       },
-      [setPlacementImgValues, debouncedImgUrlsUpdate, setPlacementIconUrl],
+      [debouncedImgUrlsUpdate, setPlacementIconUrl],
     )
 
     React.useEffect(() => {
       return () => {
-        callPending()
+        debouncedImgUrlsUpdate.flush()
       }
-    }, [callPending])
+    }, [debouncedImgUrlsUpdate])
 
     return (
       <>

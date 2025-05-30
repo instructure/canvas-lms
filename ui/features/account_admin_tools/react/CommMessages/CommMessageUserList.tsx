@@ -185,7 +185,7 @@ export default function CommMessageUserList({
   const [firstUse, setFirstUse] = useState<boolean>(true)
   const [messages, setMessages] = useState<FormMessage[]>([])
   const userListDivRef = useRef<HTMLDivElement | null>(null)
-  const [debouncedSetSearchTerm] = useDebouncedCallback((s: string) => {
+  const debouncedSetSearchTerm = useDebouncedCallback((s: string) => {
     setSearchTerm(s)
     onUserAndDateSelected(null)
     if (firstUse) setFirstUse(false)

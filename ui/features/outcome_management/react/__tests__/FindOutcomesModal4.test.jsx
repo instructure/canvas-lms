@@ -26,7 +26,7 @@ import OutcomesContext, {
 } from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo-v3'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
-import {findOutcomesMocks, groupMocks, treeGroupMocks} from '@canvas/outcomes/mocks/Management'
+import {groupMocks} from '@canvas/outcomes/mocks/Management'
 import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -36,7 +36,7 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 jest.mock('@canvas/progress/resolve_progress')
-jest.useFakeTimers({legacyFakeTimers: true})
+jest.useFakeTimers()
 
 // passes locally, flaky on Jenkins
 describe('FindOutcomesModal', () => {
