@@ -23,8 +23,6 @@ require "canvas/draft_state_validations"
 class AbstractAssignment < ActiveRecord::Base
   self.table_name = "assignments"
 
-  self.ignored_columns += ["group_category"]
-
   include Workflow
   include TextHelper
   include HasContentTags

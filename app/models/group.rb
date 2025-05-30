@@ -19,8 +19,6 @@
 #
 
 class Group < ActiveRecord::Base
-  self.ignored_columns += ["category"]
-
   include Context
   include Workflow
   include CustomValidations
