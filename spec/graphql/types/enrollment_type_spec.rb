@@ -49,6 +49,25 @@ describe Types::EnrollmentType do
     end
   end
 
+  context "enrollmentState returns" do
+    let(:enrollment) { student_in_course(active_all: true) }
+
+    it '"deleted" if course is deleted' do
+      enrollment.course.update!(workflow_state: "deleted")
+      expect(enrollment_type.resolve("enrollmentState")).to eq "deleted"
+    end
+
+    it '"deleted" if course section is deleted' do
+      enrollment.course_section.update!(workflow_state: "deleted")
+      expect(enrollment.course.workflow_state).not_to eq "deleted"
+      expect(enrollment_type.resolve("enrollmentState")).to eq "deleted"
+    end
+
+    it "enrollment's workflow state" do
+      expect(enrollment_type.resolve("enrollmentState")).to eq enrollment.workflow_state
+    end
+  end
+
   it "returns correct value for limitPrivilegesToCourseSection" do
     Enrollment.limit_privileges_to_course_section!(@course, @student, true)
     expect(enrollment_type.resolve("limitPrivilegesToCourseSection")).to be true

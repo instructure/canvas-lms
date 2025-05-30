@@ -3796,6 +3796,7 @@ type Enrollment implements AssetString & Node & Timestamped {
   courseSectionId: ID
   createdAt: DateTime
   endAt: DateTime
+  enrollmentState: EnrollmentWorkflowState!
   grades(
     """
     The grading period to return grades for. If not specified, will use the
