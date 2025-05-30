@@ -29,11 +29,12 @@ const I18n = createI18nScope('grade_summary')
 
 export const totalRow = (
   queryData,
+  assignmentsData,
   calculateOnlyGradedAssignments = false,
   courseLevelGrades,
   overrideGrade,
 ) => {
-  const applicableAssignments = filteredAssignments(queryData, calculateOnlyGradedAssignments)
+  const applicableAssignments = filteredAssignments(assignmentsData, calculateOnlyGradedAssignments)
   let total = getTotal(
     applicableAssignments,
     queryData?.assignmentGroupsConnection?.nodes,

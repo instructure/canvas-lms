@@ -64,6 +64,7 @@ const getCurrentOrFinalGrade = (
 
 const AssignmentTable = ({
   queryData,
+  assignmentsData,
   layout,
   handleReadStateChange,
   handleRubricReadStateChange,
@@ -80,7 +81,7 @@ const AssignmentTable = ({
     calculateCourseGrade(
       queryData?.relevantGradingPeriodGroup,
       queryData?.assignmentGroupsConnection?.nodes,
-      filteredAssignments(queryData, calculateOnlyGradedAssignments, activeWhatIfScores),
+      filteredAssignments(assignmentsData, calculateOnlyGradedAssignments, activeWhatIfScores),
       calculateOnlyGradedAssignments,
       queryData?.applyGroupWeights,
       activeWhatIfScores,
@@ -93,23 +94,25 @@ const AssignmentTable = ({
     const grades = calculateCourseGrade(
       queryData?.relevantGradingPeriodGroup,
       queryData?.assignmentGroupsConnection?.nodes,
-      filteredAssignments(queryData, calculateOnlyGradedAssignments, activeWhatIfScores),
+      filteredAssignments(assignmentsData, calculateOnlyGradedAssignments, activeWhatIfScores),
       calculateOnlyGradedAssignments,
       queryData?.applyGroupWeights,
       activeWhatIfScores,
     )
     setCourseGrades(grades)
-  }, [activeWhatIfScores, calculateOnlyGradedAssignments, queryData])
+  }, [activeWhatIfScores, assignmentsData, calculateOnlyGradedAssignments, queryData])
 
   const [droppedAssignments, setDroppedAssignments] = useState(
-    listDroppedAssignments(queryData, getGradingPeriodID() === '0', true),
+    listDroppedAssignments(queryData, assignmentsData, getGradingPeriodID() === '0', true),
   )
 
   const handleCalculateOnlyGradedAssignmentsChange = useCallback(() => {
     const checked = document.querySelector('#only_consider_graded_assignments').checked
     setCalculateOnlyGradedAssignments(checked)
-    setDroppedAssignments(listDroppedAssignments(queryData, getGradingPeriodID() === '0', checked))
-  }, [queryData])
+    setDroppedAssignments(
+      listDroppedAssignments(queryData, assignmentsData, getGradingPeriodID() === '0', checked),
+    )
+  }, [assignmentsData, queryData])
 
   useEffect(() => {
     const checkbox = document.querySelector('#only_consider_graded_assignments')
@@ -151,7 +154,7 @@ const AssignmentTable = ({
         </Table.Row>
       </Table.Head>
       <Table.Body>
-        {sortAssignments(assignmentSortBy, queryData?.assignmentsConnection?.nodes)
+        {sortAssignments(assignmentSortBy, assignmentsData?.assignments)
           ?.map(assignment => {
             const modifiedAssignment = {
               ...assignment,
@@ -193,6 +196,7 @@ const AssignmentTable = ({
               return assignmentGroupRow(
                 assignmentGroup,
                 queryData,
+                assignmentsData,
                 calculateOnlyGradedAssignments,
                 calculateOnlyGradedAssignments
                   ? courseGrades?.assignmentGroups[assignmentGroup._id]?.current
@@ -204,6 +208,7 @@ const AssignmentTable = ({
                 ? gradingPeriodRow(
                     gradingPeriod,
                     queryData,
+                    assignmentsData,
                     calculateOnlyGradedAssignments,
                     calculateOnlyGradedAssignments
                       ? courseGrades?.gradingPeriods[gradingPeriod._id].current
@@ -214,6 +219,7 @@ const AssignmentTable = ({
         {!hideTotalRow &&
           totalRow(
             queryData,
+            assignmentsData,
             calculateOnlyGradedAssignments,
             getCurrentOrFinalGrade(
               getGradingPeriodID() === '0',
@@ -231,6 +237,7 @@ const AssignmentTable = ({
 
 AssignmentTable.propTypes = {
   queryData: PropTypes.object,
+  assignmentsData: PropTypes.object,
   layout: PropTypes.string,
   handleReadStateChange: PropTypes.func,
   handleRubricReadStateChange: PropTypes.func,
