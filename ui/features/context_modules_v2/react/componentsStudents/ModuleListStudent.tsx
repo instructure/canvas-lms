@@ -27,7 +27,7 @@ import {useIsFetching} from '@tanstack/react-query'
 
 import {validateModuleStudentRenderRequirements} from '../utils/utils'
 import {useModulesStudent} from '../hooks/queriesStudent/useModulesStudent'
-import {useToggleCollapse} from '../hooks/mutations/useToggleCollapse'
+import {useToggleCollapse, useToggleAllCollapse} from '../hooks/mutations/useToggleCollapse'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
@@ -44,6 +44,8 @@ const ModulesListStudent: React.FC = () => {
 
   // Initialize with an empty Map - all modules will be collapsed by default
   const [expandedModules, setExpandedModules] = useState<Map<string, boolean>>(new Map())
+
+  const toggleAllCollapse = useToggleAllCollapse(courseId)
 
   // Set initial expanded state for modules when data is loaded
   useEffect(() => {
@@ -116,10 +118,14 @@ const ModulesListStudent: React.FC = () => {
   return (
     <View as="div" margin="medium">
       <ModulePageActionHeaderStudent
-        onCollapseAll={() => handleCollapseAll(data, setExpandedModules)}
+        onCollapseAll={() => {
+          handleCollapseAll(data, setExpandedModules)
+          toggleAllCollapse.mutate(true)
+        }}
         onExpandAll={() => {
           handleExpandAll(data, setExpandedModules)
           setExpandCollapseButtonDisabled(true)
+          toggleAllCollapse.mutate(false)
         }}
         anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
         disabled={expandCollapseButtonDisabled}
