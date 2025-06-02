@@ -29,7 +29,7 @@ import {
 import getCookie from '@instructure/get-cookie'
 
 const RUBRIC_QUERY = gql`
-  query RubricQuery($rubricId: ID!) {
+  query SharedRubricQuery($rubricId: ID!) {
     rubric(id: $rubricId) {
       id: _id
       title
