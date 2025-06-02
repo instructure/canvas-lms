@@ -3112,13 +3112,13 @@ describe CoursesController do
         @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
 
         att1 = attachment_model(context: @course)
-        aa1 = AttachmentAssociation.create!(attachment: @attachment, context: @course, user: @teacher, field_name: "syllabus_body")
+        aa1 = AttachmentAssociation.create!(attachment: @attachment, context: @course, user: @teacher, context_concern: "syllabus_body")
         att2 = nil
         @shard1.activate do
           user_model
           att2 = attachment_model(context: @user)
         end
-        aa2 = AttachmentAssociation.create!(attachment: @attachment, context: @course, user: @user, field_name: "syllabus_body")
+        aa2 = AttachmentAssociation.create!(attachment: @attachment, context: @course, user: @user, context_concern: "syllabus_body")
 
         body = <<~HTML
           <p><img src="/courses/#{@course.id}/files/#{att1.id}/preview" /></p>

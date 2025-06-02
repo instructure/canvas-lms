@@ -19,27 +19,39 @@
 #
 
 class AttachmentAssociation < ActiveRecord::Base
-  # removing this definition until we figure out how to unbreak rake db:set_ignored_columns
-  # enum :field_name, %i[syllabus_body]
+  self.ignored_columns += %w[field_name]
 
   belongs_to :attachment
   belongs_to :context, polymorphic: %i[conversation_message submission course group]
   belongs_to :user
   belongs_to :root_account, class_name: "Account", optional: true, inverse_of: :attachment_associations
 
+  validates :context_concern, inclusion: { in: [
+    nil, # default for all
+    "syllabus_body", # for Course
+    "terms_of_use", # for Account
+  ] }
+
   before_create :set_root_account_id
 
   after_save :set_word_count
 
-  def self.update_associations(context, attachment_ids, user, session, field_name = nil, blank_user: false)
+  # NB: context_concern is a virtual subdivision of context.
+  # It is on purpose not a field name as it more denotes a sub-concern of
+  # the context model, not necessarily an exact field.
+  # Example: "terms_of_use" with an Account context denotes the custom
+  # "terms of use" HTML, which should be treated as a publicly viewable
+  # property of accounts, even for anonymous users, therefore any and all
+  # attachments to it should also be viewable without restrictions.
+  def self.update_associations(context, attachment_ids, user, session, context_concern = nil, blank_user: false)
     global_ids = attachment_ids.map { |id| Shard.global_id_for(id) }
-    currently_has = AttachmentAssociation.where(context:, field_name:).pluck(:attachment_id).map { |id| Shard.global_id_for(id) }
+    currently_has = AttachmentAssociation.where(context:, context_concern:).pluck(:attachment_id).map { |id| Shard.global_id_for(id) }
 
     to_delete = currently_has - global_ids
     to_create = global_ids - currently_has
 
     if to_delete.any?
-      context.attachment_associations.where(field_name:, attachment_id: to_delete).in_batches(of: 1000).destroy_all
+      context.attachment_associations.where(context_concern:, attachment_id: to_delete).in_batches(of: 1000).destroy_all
     end
 
     if to_create.any?
@@ -57,7 +69,7 @@ class AttachmentAssociation < ActiveRecord::Base
               context_id: context.id,
               attachment_id: Shard.relative_id_for(attachment.id, att_shard, Shard.current),
               user_id: user && Shard.relative_id_for(user.id, user_shard, Shard.current),
-              field_name:,
+              context_concern:,
               root_account_id: context.root_account_id,
             }
           end
@@ -75,23 +87,28 @@ class AttachmentAssociation < ActiveRecord::Base
 
     context_id = splat.pop
     context_type = splat.join("_").camelize
-    field_name = nil
+    context_concern = nil
     right_to_check = :read
 
     if context_type == "CourseSyllabus"
-      field_name = "syllabus_body"
+      context_concern = "syllabus_body"
       context_type = "Course"
       right_to_check = :read_syllabus
     end
 
     association = Shard.shard_for(context_id).activate do
-      AttachmentAssociation.find_by(attachment:, context_id:, context_type:, field_name:)
+      AttachmentAssociation.find_by(attachment:, context_id:, context_type:, context_concern:)
     end
 
     return false unless association
 
-    association.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus) &&
-      association.context&.grants_right?(user, session, right_to_check)
+    feature_is_on = if association.context.is_a?(Course) && context_concern == "syllabus_body"
+                      association.context.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+                    elsif association.context.respond_to?(:root_account)
+                      association.context.root_account.feature_enabled?(:file_association_access)
+                    end
+
+    feature_is_on && association.context&.grants_right?(user, session, right_to_check)
   end
 
   def set_root_account_id
