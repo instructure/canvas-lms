@@ -462,7 +462,7 @@ describe ExternalToolsController, type: :request do
       )
     end
 
-    describe "#add_rce_favorite" do
+    describe "#mark_rce_favorite" do
       before :once do
         @root_tool = create_editor_tool(Account.default)
         @sub_account = Account.default.sub_accounts.create!
@@ -470,11 +470,11 @@ describe ExternalToolsController, type: :request do
         account_admin_user(active_all: true)
       end
 
-      def add_favorite_tool(account, tool)
+      def mark_favorite_tool(account, tool)
         json = api_call(:post,
                         "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
                         { controller: "external_tools",
-                          action: "add_rce_favorite",
+                          action: "mark_rce_favorite",
                           format: "json",
                           account_id: account.id.to_s,
                           id: tool.id.to_s },
@@ -491,7 +491,7 @@ describe ExternalToolsController, type: :request do
         api_call(:post,
                  "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
                  { controller: "external_tools",
-                   action: "add_rce_favorite",
+                   action: "mark_rce_favorite",
                    format: "json",
                    account_id: Account.default.id.to_s,
                    id: @root_tool.id.to_s },
@@ -504,7 +504,7 @@ describe ExternalToolsController, type: :request do
         api_call(:post,
                  "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@sub_tool.id}",
                  { controller: "external_tools",
-                   action: "add_rce_favorite",
+                   action: "mark_rce_favorite",
                    format: "json",
                    account_id: Account.default.id.to_s,
                    id: @sub_tool.id.to_s },
@@ -524,7 +524,7 @@ describe ExternalToolsController, type: :request do
         json = api_call(:post,
                         "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
                         { controller: "external_tools",
-                          action: "add_rce_favorite",
+                          action: "mark_rce_favorite",
                           format: "json",
                           account_id: Account.default.id.to_s,
                           id: @root_tool.id.to_s },
@@ -546,7 +546,7 @@ describe ExternalToolsController, type: :request do
         json = api_call(:post,
                         "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
                         { controller: "external_tools",
-                          action: "add_rce_favorite",
+                          action: "mark_rce_favorite",
                           format: "json",
                           account_id: Account.default.id.to_s,
                           id: @root_tool.id.to_s },
@@ -568,7 +568,7 @@ describe ExternalToolsController, type: :request do
 
         it "handles adding a favorite after a previous tool is deleted" do
           @tool3.destroy
-          add_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
+          mark_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
         end
 
         it "uses Lti::ContextToolFinder to return tools and can handle global ids" do
@@ -578,34 +578,34 @@ describe ExternalToolsController, type: :request do
           )
           expect(scope_union_double).to receive(:pluck).with(:id).and_return([@tool2.global_id])
 
-          add_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
+          mark_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
         end
       end
 
       it "adds to existing favorites configured with old column if not specified on account" do
         @root_tool.update_attribute(:is_rce_favorite, true)
         tool2 = create_editor_tool(Account.default)
-        add_favorite_tool(Account.default, tool2)
+        mark_favorite_tool(Account.default, tool2)
         expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to be true
         expect(tool2.is_rce_favorite_in_context?(Account.default)).to be true
       end
 
       it "can add a root account tool as a favorite for a sub-account" do
-        add_favorite_tool(@sub_account, @root_tool)
+        mark_favorite_tool(@sub_account, @root_tool)
         expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to be true
         expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to be false # didn't affect parent account
       end
 
       it "adds to existing favorites for a sub-account inherited from a root account" do
-        add_favorite_tool(Account.default, @root_tool)
-        add_favorite_tool(@sub_account, @sub_tool)
+        mark_favorite_tool(Account.default, @root_tool)
+        mark_favorite_tool(@sub_account, @sub_tool)
 
         expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to be true # now saved directly on sub-account
         expect(@sub_tool.is_rce_favorite_in_context?(@sub_account)).to be true
       end
     end
 
-    describe "#remove_rce_favorite" do
+    describe "#unmark_rce_favorite" do
       before :once do
         @root_tool = create_editor_tool(Account.default)
         @sub_account = Account.default.sub_accounts.create!
@@ -613,11 +613,11 @@ describe ExternalToolsController, type: :request do
         account_admin_user(active_all: true)
       end
 
-      def remove_favorite_tool(account, tool)
+      def unmark_favorite_tool(account, tool)
         json = api_call(:delete,
                         "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
                         { controller: "external_tools",
-                          action: "remove_rce_favorite",
+                          action: "unmark_rce_favorite",
                           format: "json",
                           account_id: account.id.to_s,
                           id: tool.id.to_s },
@@ -634,7 +634,7 @@ describe ExternalToolsController, type: :request do
         api_call(:delete,
                  "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
                  { controller: "external_tools",
-                   action: "remove_rce_favorite",
+                   action: "unmark_rce_favorite",
                    format: "json",
                    account_id: Account.default.id.to_s,
                    id: @root_tool.id.to_s },
@@ -647,7 +647,7 @@ describe ExternalToolsController, type: :request do
         @root_tool.update_attribute(:is_rce_favorite, true)
         tool2 = create_editor_tool(Account.default)
         tool2.update_attribute(:is_rce_favorite, true)
-        remove_favorite_tool(Account.default, @root_tool)
+        unmark_favorite_tool(Account.default, @root_tool)
         expect(Account.default.reload.settings[:rce_favorite_tool_ids][:value]).to eq [tool2.global_id] # saves it onto the account
       end
 
@@ -658,7 +658,7 @@ describe ExternalToolsController, type: :request do
           ra.save!
         end
 
-        remove_favorite_tool(@sub_account, @root_tool)
+        unmark_favorite_tool(@sub_account, @root_tool)
         expect(@sub_account.settings[:rce_favorite_tool_ids][:value]).to eq [root_tool2.global_id]
       end
     end

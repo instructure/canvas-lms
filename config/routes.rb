@@ -1567,8 +1567,8 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :external_tools) do
-      post "/accounts/:account_id/external_tools/rce_favorites/:id", action: :add_rce_favorite, as: :account_external_tools_add_rce_favorite
-      delete "/accounts/:account_id/external_tools/rce_favorites/:id", action: :remove_rce_favorite, as: :account_external_tools_remove_rce_favorite
+      post "/accounts/:account_id/external_tools/rce_favorites/:id", action: :mark_rce_favorite, as: :account_external_tools_mark_rce_favorite
+      delete "/accounts/:account_id/external_tools/rce_favorites/:id", action: :unmark_rce_favorite, as: :account_external_tools_unmark_rce_favorite
 
       post "/accounts/:account_id/external_tools/top_nav_favorites/:id", action: :add_top_nav_favorite, as: :account_external_tools_add_top_nav_favorite
       delete "/accounts/:account_id/external_tools/top_nav_favorites/:id", action: :remove_top_nav_favorite, as: :account_external_tools_remove_top_nav_favorite
