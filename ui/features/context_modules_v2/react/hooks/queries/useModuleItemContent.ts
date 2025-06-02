@@ -261,7 +261,6 @@ const EXTERNAL_TOOLS_QUERY = gql`
         externalToolsConnection(first: 100) {
           nodes {
             _id
-            id
             name
             url
           }
