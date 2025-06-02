@@ -24,7 +24,8 @@ import {IconAddSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {AddBlockModal} from './AddBlockModal'
-import {useState} from 'react'
+import {ReactElement, useState} from 'react'
+import {useAddNode} from '../hooks/useAddNode'
 
 const I18n = createI18nScope('page_editor')
 
@@ -61,17 +62,16 @@ const AddBlockContent = (props: {
   )
 }
 
-export const AddBlock = (props: {
-  onAddBlock: (type: string) => void
-}) => {
+export const AddBlock = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const addNode = useAddNode()
+  const onAddBlock = (block: ReactElement) => {
+    addNode(block, 'ROOT')
+  }
+
   return (
     <>
-      <AddBlockModal
-        open={isOpen}
-        onDismiss={() => setIsOpen(false)}
-        onAddBlock={props.onAddBlock}
-      />
+      <AddBlockModal open={isOpen} onDismiss={() => setIsOpen(false)} onAddBlock={onAddBlock} />
       <AddBlockContent onAddBlockClicked={() => setIsOpen(true)} />
     </>
   )
