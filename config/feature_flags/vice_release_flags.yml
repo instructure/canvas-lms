@@ -199,3 +199,10 @@ discussion_ai_survey_link:
   display_name: Discussion AI survey link
   description: |-
     Displays a survey link for Discussion Translate and Discussion Insights
+
+disallow_threaded_replies_manage:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Manage Disallow Threaded Replies in Discussions
+  description: |-
+    This feature flag controls the visibility of the alert that allows teachers to manage threaded replies for each discussion topic on the Discussions Index page, this will override the Dissalow Threaded Replies Fix Alert.

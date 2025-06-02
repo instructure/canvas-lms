@@ -411,6 +411,7 @@ class ApplicationController < ActionController::Base
     discussion_permalink
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
+    disallow_threaded_replies_manage
     horizon_course_setting
     new_quizzes_media_type
     validate_call_to_action
