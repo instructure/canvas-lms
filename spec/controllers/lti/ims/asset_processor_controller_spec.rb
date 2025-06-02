@@ -45,6 +45,7 @@ describe Lti::IMS::AssetProcessorController do
         processingProgress: Lti::AssetReport::PROGRESS_PROCESSED,
         "https://example.com/foo/extra": { "extra value" => true },
         "https://example.com/foo/extra2": 1,
+        visibleToOwner: true,
       }
     end
 
@@ -88,6 +89,7 @@ describe Lti::IMS::AssetProcessorController do
                                         "https://example.com/foo/extra" => { "extra value" => true },
                                         "https://example.com/foo/extra2" => 1,
                                       })
+      expect(report.visible_to_owner).to eq(expected_values[:visibleToOwner])
     end
 
     def expect_no_creation(expected_status, expected_error = nil)
@@ -132,6 +134,12 @@ describe Lti::IMS::AssetProcessorController do
 
     context "when an arbitrary string type is given" do
       let(:body_overrides) { super().merge(type: "anything") }
+
+      it { expect_successful_creation }
+    end
+
+    context "when visibleToOwner is false" do
+      let(:body_overrides) { super().merge(visibleToOwner: false) }
 
       it { expect_successful_creation }
     end

@@ -128,10 +128,9 @@ module Types
           null: true
     def lti_asset_reports_connection
       load_association(:root_account).then do |root_account|
-        if root_account.feature_enabled?(:lti_asset_processor) && object.assignment.context.grants_right?(current_user, :manage_grades)
-          # We may need to adjust this in the future to allow students
-          # to see their own reports
-          Loaders::SubmissionLtiAssetReportsLoader.load(submission.id)
+        if root_account.feature_enabled?(:lti_asset_processor) &&
+           object.assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
+          Loaders::SubmissionLtiAssetReportsLoader.load(object.id)
         end
       end
     end

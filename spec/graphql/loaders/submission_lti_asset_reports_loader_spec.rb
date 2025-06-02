@@ -66,7 +66,7 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
 
   # Student 2 (submission 2) reports:
   let(:rep2aIi) { lti_asset_report_model(asset: asset2a, asset_processor: processorI) }
-  let(:rep2aIIi) { lti_asset_report_model(asset: asset2a, asset_processor: processorII) }
+  let(:rep2aIIi) { lti_asset_report_model(asset: asset2a, asset_processor: processorII, visible_to_owner: true) }
 
   it "returns report by submission" do
     expect(subject.keys).to match_array([sub1.id, sub2.id])

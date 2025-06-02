@@ -91,6 +91,7 @@ class Lti::AssetReport < ApplicationRecord
   validates :error_code, length: { minimum: 1, maximum: 1024 }, allow_nil: true
   validates :priority, inclusion: { in: PRIORITIES }
   validates :processing_progress, presence: true
+  validates :visible_to_owner, inclusion: { in: [true, false] }
 
   validate :validate_extensions
   validate :validate_asset_compatible_with_processor
@@ -179,6 +180,11 @@ class Lti::AssetReport < ApplicationRecord
     "#{result.first(15)}…"
   end
 
+  def visible_to_user?(user)
+    (visible_to_owner && asset.submission.user_id == user.id) ||
+      asset.submission.assignment.context.grants_any_right?(user, :manage_grades, :view_all_grades)
+  end
+
   # Returns all reports for the given asset processor and submission IDs.
   # Returns reports by submission, hash of form:
   #   submission_id => {
@@ -189,7 +195,7 @@ class Lti::AssetReport < ApplicationRecord
   #           { id: report2.id, title: report2.title, ... },
   #         ],
   # ...
-  def self.info_for_display_by_submission(submission_ids:)
+  def self.info_for_display_by_submission(submission_ids:, for_student: false)
     reports_by_submission = {}
 
     if submission_ids.present?
@@ -198,6 +204,8 @@ class Lti::AssetReport < ApplicationRecord
         .for_active_processors
         .for_submissions(submission_ids)
         .select("lti_asset_reports.*, lti_assets.submission_id as asset_sub_id, lti_assets.attachment_id as asset_att_id")
+
+      scope = scope.where(visible_to_owner: true) if for_student
 
       scope.find_each do |report|
         sub_reports = (reports_by_submission[report.asset_sub_id] ||= {})
