@@ -214,6 +214,13 @@ class WikiPagesApiController < ApplicationController
 
     new_page = @page.duplicate
     new_page.save!
+
+    UserContent.associate_attachments_to_rce_object(
+      new_page.body,
+      new_page,
+      user: @current_user
+    )
+
     render json: wiki_page_json(new_page, @current_user, session)
   end
 
@@ -377,6 +384,12 @@ class WikiPagesApiController < ApplicationController
       update_params = get_update_params(allowed_fields)
       assign_todo_date
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
+        UserContent.associate_attachments_to_rce_object(
+          @page.body,
+          @page,
+          user: @current_user
+        )
+
         log_asset_access(@page, "wiki", @wiki, "participate")
         render json: wiki_page_json(@page, @current_user, session)
       else
@@ -463,6 +476,11 @@ class WikiPagesApiController < ApplicationController
       assign_todo_date
       update_params = get_update_params(allowed_fields)
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
+        UserContent.associate_attachments_to_rce_object(
+          @page.body,
+          @page,
+          user: @current_user
+        )
 
         # This ensures the context module's UI items are updated
         @page.context_module_tags.each { |content_tag| content_tag.context_module&.touch }

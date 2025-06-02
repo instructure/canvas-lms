@@ -22,7 +22,24 @@ class AttachmentAssociation < ActiveRecord::Base
   self.ignored_columns += %w[field_name]
 
   belongs_to :attachment
-  belongs_to :context, polymorphic: %i[conversation_message submission course group]
+  belongs_to :context, polymorphic: [
+    :account,
+    :account_notification,
+    :assignment,
+    :calendar_event,
+    :course,
+    :conversation_message,
+    :discussion_entry,
+    :discussion_topic,
+    :group,
+    :learning_outcome,
+    :learning_outcome_group,
+    :submission,
+    :wiki_page,
+    {
+      quiz: "Quizzes::Quiz",
+    }
+  ]
   belongs_to :user
   belongs_to :root_account, class_name: "Account", optional: true, inverse_of: :attachment_associations
 
