@@ -29,9 +29,15 @@ const defaultProps = {
   queryData: {
     name: 'Course Name',
     _id: '1',
-    assignmentsConnection: {nodes: [Assignment.mock()]},
     assignmentGroupsConnection: {nodes: [AssignmentGroup.mock()]},
     gradingStandard: GradingStandard.mock(),
+  },
+  assignmentsData: {
+    assignments: [Assignment.mock()],
+    pageInfo: {
+      hasNextPage: false,
+      endCursor: null,
+    },
   },
   layout: 'fixed',
   setShowTray: () => {},

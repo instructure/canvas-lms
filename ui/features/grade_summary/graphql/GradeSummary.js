@@ -19,30 +19,17 @@
 import {gql} from '@apollo/client'
 
 import {AssignmentGroup} from './AssignmentGroup'
-import {Assignment} from './Assignment'
 import {GradingStandard} from './GradingStandard'
 import {GradingPeriod} from './GradingPeriod'
 import {GradingPeriodGroup} from './GradingPeriodGroup'
-import {Submission} from './Submission'
 
-export const ASSIGNMENTS = gql`
-  query GetAssignments($courseID: ID!, $gradingPeriodID: ID, $studentId: ID!) {
+export const GRADE_SUMMARY = gql`
+  query GetGradeSummary($courseID: ID!, $studentId: ID!) {
     legacyNode(_id: $courseID, type: Course) {
       ... on Course {
         id
         name
         applyGroupWeights
-        assignmentsConnection(filter: {gradingPeriodId: $gradingPeriodID, userId: $studentId}) {
-          nodes {
-            ...Assignment
-            submissionsConnection(filter: {userId: $studentId, includeUnsubmitted: true}) {
-              nodes {
-                ...Submission
-                submittedAt
-              }
-            }
-          }
-        }
         assignmentGroupsConnection {
           nodes {
             ...AssignmentGroup
@@ -72,9 +59,7 @@ export const ASSIGNMENTS = gql`
     }
   }
   ${AssignmentGroup.fragment}
-  ${Assignment.fragment}
   ${GradingStandard.fragment}
   ${GradingPeriod.fragment}
   ${GradingPeriodGroup.fragment}
-  ${Submission.fragment}
 `
