@@ -17,7 +17,8 @@
  */
 
 import type {DocumentNode} from 'graphql'
-import request, {type Variables} from 'graphql-request'
+import {request} from 'graphql-request'
+import type {Variables} from 'graphql-request'
 import getCookie from '@instructure/get-cookie'
 
 export interface QueryVariables extends Variables {
