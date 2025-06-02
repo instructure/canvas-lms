@@ -1126,6 +1126,21 @@ describe FilesController do
         expect(response).to be_successful
         expect(assigns[:show_left_side]).to be false
       end
+
+      it "renders unauthorized when account restricts file access for user" do
+        user_session(@student)
+        @course.account.root_account.enable_feature!(:restrict_student_access)
+        allow(@course.account).to receive(:restricted_file_access_for_user?).with(@student).and_return(true)
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(response).to be_unauthorized
+      end
+
+      it "allows access when account does not restrict file access for user" do
+        user_session(@student)
+        allow(@course.account).to receive(:restricted_file_access_for_user?).with(@student).and_return(false)
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(response).not_to be_unauthorized
+      end
     end
 
     describe "as a teacher" do
