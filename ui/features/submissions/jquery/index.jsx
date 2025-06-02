@@ -22,7 +22,6 @@ import {createRoot} from 'react-dom/client'
 import round from '@canvas/round'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import isNumber from 'lodash/isNumber'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
@@ -41,8 +40,10 @@ import '@canvas/rubrics/jquery/rubric_assessment'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 import CheckpointGradeRoot from '../react/CheckpointGradeRoot'
+import StudentAssetReportModalWrapper from '../react/StudentAssetReportModalWrapper'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import theme from '@instructure/canvas-theme'
+import ready from '@instructure/ready'
 
 const I18n = createI18nScope('submissions')
 /* global rubricAssessment */
@@ -208,7 +209,7 @@ function closeRubric() {
   })
 }
 function openRubric() {
-  validateComments();
+  validateComments()
   $('#rubric_holder').fadeIn(function () {
     toggleRubric($(this))
     refreshEventHandlers()
@@ -216,19 +217,19 @@ function openRubric() {
   })
 }
 
-function validateComments(){
-  $('.rubric-comment textarea').each(function(){
+function validateComments() {
+  $('.rubric-comment textarea').each(function () {
     validateComment($(this))
-  });
+  })
 }
 
-function validateComment($commentTextArea){
-  const newValue = $commentTextArea.val().trim();
+function validateComment($commentTextArea) {
+  const newValue = $commentTextArea.val().trim()
   if (newValue !== '') {
-    handleValidationClear($commentTextArea);
-  }else{
-    const $wrapper = $commentTextArea.closest('.rubric-comment');
-    showErrorMessage($wrapper, I18n.t('A comment is required.'));
+    handleValidationClear($commentTextArea)
+  } else {
+    const $wrapper = $commentTextArea.closest('.rubric-comment')
+    showErrorMessage($wrapper, I18n.t('A comment is required.'))
   }
 }
 
@@ -236,35 +237,34 @@ function handleValidationClear($textArea) {
   const $wrapper = $textArea.closest('.rubric-comment')
   if ($wrapper.find('.error-message').length) {
     setTimeout(() => {
-      $wrapper.find('.error-message').remove();
-      $textArea.removeClass('error-textarea');
-      $textArea.next('span').css('border-color', theme.colors?.ui?.surfaceAttention);
-    }, 100);
+      $wrapper.find('.error-message').remove()
+      $textArea.removeClass('error-textarea')
+      $textArea.next('span').css('border-color', theme.colors?.ui?.surfaceAttention)
+    }, 100)
   }
 }
-
 
 function refreshEventHandlers() {
   $('.add-comment-button-wrapper button')
     .off('click.commentHandler')
     .on('click.commentHandler', function () {
-      const $row = $(this).closest('tr[data-testid="rubric-criterion"]');
+      const $row = $(this).closest('tr[data-testid="rubric-criterion"]')
       setTimeout(() => {
-        const $comment = $row.find('.rubric-comment textarea');
-        addEvents($comment);
-      }, 500);
-    });
+        const $comment = $row.find('.rubric-comment textarea')
+        addEvents($comment)
+      }, 500)
+    })
 
   function addEvents($textAreas = $('.rubric-comment textarea')) {
     $textAreas
       .off('input.commentHandler blur.commentHandler') // avoid multiple bindings
       .on('input.commentHandler blur.commentHandler', function () {
-        const $commentTextArea = $(this);
-        validateComment($commentTextArea);
-      });
+        const $commentTextArea = $(this)
+        validateComment($commentTextArea)
+      })
   }
 
-  addEvents();
+  addEvents()
 }
 function showErrorMessage(selector, message) {
   let errorContainer = selector.find('.error-message')
@@ -283,8 +283,8 @@ function showErrorMessage(selector, message) {
   })
     .text(message)
     .appendTo(errorContainer)
-    selector.find('textarea').addClass('error-textarea');
-    selector.find('.error-textarea').next('span').css('border-color', theme.colors?.ui?.surfaceError);
+  selector.find('textarea').addClass('error-textarea')
+  selector.find('.error-textarea').next('span').css('border-color', theme.colors?.ui?.surfaceError)
 }
 
 function windowResize() {
@@ -413,17 +413,18 @@ export function setup() {
         if ($('.grading_comment').val() && $('.grading_comment').val != '') {
           formData['submission[comment]'] = $('.grading_comment').val()
         }
-        if (
-          !formData['submission[comment]'] &&
-          hasFiles
-        ) {
+        if (!formData['submission[comment]'] && hasFiles) {
           formData['submission[comment]'] = I18n.t(
             'see_attached_files',
             'Please see attached files',
           )
         }
       }
-      if (!formData['submission[comment]'] && !formData['submission[media_comment_id]'] && !hasFiles) {
+      if (
+        !formData['submission[comment]'] &&
+        !formData['submission[media_comment_id]'] &&
+        !hasFiles
+      ) {
         $('.submission_header').loadingImage('remove')
         $('.save_comment_button').prop('disabled', false)
         textAreaElement?.focus()
@@ -437,18 +438,12 @@ export function setup() {
             message={message}
             margin="xx-small 0 small 0"
             iconMargin="0 xx-small xxx-small 0"
-          />
+          />,
         )
         return
       }
       if (hasFiles) {
-        $.ajaxJSONFiles(
-          url + '.text',
-          method,
-          formData,
-          fileInputs,
-          submissionLoaded,
-        )
+        $.ajaxJSONFiles(url + '.text', method, formData, fileInputs, submissionLoaded)
       } else {
         $.ajaxJSON(url, method, formData, submissionLoaded)
       }
@@ -485,7 +480,7 @@ export function setup() {
       $attachment.find('input').attr('name', 'attachments[' + fileIndex++ + '][uploaded_data]')
       $('#add_comment_form .comment_attachments').append($attachment.slideDown())
     })
-    document.addEventListener('change', function(event) {
+    document.addEventListener('change', function (event) {
       if (event.target.matches('#add_comment_form input[type="file"]')) {
         const inputElement = event.target
         const parentElement = inputElement.parentNode
@@ -497,8 +492,8 @@ export function setup() {
           inputElement.style.height = '0'
           inputElement.style.width = '0'
           // Also remove the link to remove the input
-          const deleteLink = Array.from(parentElement.children).find(
-            child => child.classList.contains('delete_comment_attachment_link')
+          const deleteLink = Array.from(parentElement.children).find(child =>
+            child.classList.contains('delete_comment_attachment_link'),
           )
           deleteLink?.remove()
 
@@ -514,7 +509,7 @@ export function setup() {
             input.remove()
           }
           fileRoot.render(
-            <Flex direction='column' margin="0 0 small 0">
+            <Flex direction="column" margin="0 0 small 0">
               <Flex.Item>
                 <Tag
                   text={<AccessibleContent alt={fileName}>{fileName}</AccessibleContent>}
@@ -523,7 +518,7 @@ export function setup() {
                   data-testid="submission_comment_file_tag"
                 />
               </Flex.Item>
-            </Flex>
+            </Flex>,
           )
         } else {
           console.log('No file selected')
@@ -540,30 +535,30 @@ export function setup() {
     })
     $('.save_rubric_button').click(function () {
       const $rubric = $(this).parents('#rubric_holder').find('.rubric')
-      const submitted_data = rubricAssessment.assessmentData($rubric)      
-      const $rubricComments = $('.rubric-comment');
+      const submitted_data = rubricAssessment.assessmentData($rubric)
+      const $rubricComments = $('.rubric-comment')
 
-      let hasError = false;
+      let hasError = false
       $rubricComments.each(function () {
-        const $wrapper = $(this);
-        const $commentTextArea = $wrapper.find('textarea');
-      
+        const $wrapper = $(this)
+        const $commentTextArea = $wrapper.find('textarea')
+
         if ($commentTextArea.length > 0 && $commentTextArea.val().trim() === '') {
-          showErrorMessage($wrapper, I18n.t('A comment is required.'));
-          hasError = true;
+          showErrorMessage($wrapper, I18n.t('A comment is required.'))
+          hasError = true
         } else {
           // If the textarea has a value, remove any existing error styles/messages
           setTimeout(() => {
-            $wrapper.find('.error-message').remove();
-            $commentTextArea.removeClass('error-textarea');
-            $commentTextArea.next('span').removeClass('error-textarea__outline');
-          }, 1000);
+            $wrapper.find('.error-message').remove()
+            $commentTextArea.removeClass('error-textarea')
+            $commentTextArea.next('span').removeClass('error-textarea__outline')
+          }, 1000)
         }
-      });
+      })
 
       // If any comment is invalid, prevent submission
       if (hasError) {
-        return false;
+        return false
       }
 
       const url = $('.update_rubric_assessment_url').attr('href')
@@ -742,4 +737,12 @@ $(document).ready(() => {
     },
     false,
   )
+})
+
+ready(() => {
+  const mountPoint = document.getElementById('asset_report_modal')
+  if (mountPoint) {
+    const root = createRoot(mountPoint)
+    root.render(<StudentAssetReportModalWrapper />)
+  }
 })

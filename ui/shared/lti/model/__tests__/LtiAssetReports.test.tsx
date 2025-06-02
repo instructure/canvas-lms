@@ -21,9 +21,8 @@ import {render, waitFor} from '@testing-library/react'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
-import {LtiAssetReportsByProcessor} from 'features/speed_grader/jquery/speed_grader.d'
-import {LtiAssetReportsWrapper} from '../LtiAssetReportsWrapper'
+import {LtiAssetReport, LtiAssetReportsByProcessor} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportsWrapper} from '../../react/LtiAssetReportsWrapper'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(),
