@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {LtiAssetReportsByProcessor} from '../jquery/speed_grader.d'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -24,14 +23,17 @@ import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icon
 import {ToolIconOrDefault} from '@canvas/lti-apps/components/common/ToolIconOrDefault'
 import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import {buildAPDisplayTitle, ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
+import {
+  buildAPDisplayTitle,
+  type ExistingAttachedAssetProcessor,
+} from '@canvas/lti/model/AssetProcessor'
+import type {LtiAssetReport, LtiAssetReportsByProcessor} from '@canvas/lti/model/AssetReport'
 import {
   LtiAssetReportsCard,
   LtiAssetReportsMissingReportsCard,
 } from './LtiAssetReports/LtiAssetReportsCard'
 import {
-  ResubmitLtiAssetReportsProps,
+  type ResubmitLtiAssetReportsProps,
   useResubmitLtiAssetReports,
 } from './LtiAssetReports/useResubmitLtiAssetReports'
 import {Button} from '@instructure/ui-buttons'
@@ -42,7 +44,7 @@ const I18n = createI18nScope('speed_grader')
 // Below here, code should be copiable to SG2
 
 export type LtiAssetReportsProps = {
-  versionedAttachments: {attachment: {id: string; display_name: string}}[] | undefined
+  versionedAttachments: {attachment: {id: string; display_name?: string}}[] | undefined
   reportsByAttachment: Record<string, LtiAssetReportsByProcessor> | undefined
   assetProcessors: ExistingAttachedAssetProcessor[]
   studentId: string | undefined
@@ -76,7 +78,7 @@ function ltiAssetProcessorHeader(assetProcessor: ExistingAttachedAssetProcessor)
 }
 
 type LtiAssetReportsCardGroupProps = {
-  attachment: {id: string; display_name: string}
+  attachment: {id: string; display_name?: string}
   reports: LtiAssetReport[] | undefined
 }
 
@@ -85,7 +87,7 @@ function LtiAssetReportsCardGroup({attachment, reports}: LtiAssetReportsCardGrou
 
   return (
     <Flex direction="column" gap="x-small">
-      <Heading level="h4">{attachment.display_name}</Heading>
+      {attachment.display_name && <Heading level="h4">{attachment.display_name}</Heading>}
       {anyReports ? (
         reports.map(r => <LtiAssetReportsCard key={r._id} report={r} />)
       ) : (

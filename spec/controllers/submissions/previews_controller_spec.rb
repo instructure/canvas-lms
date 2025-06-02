@@ -18,7 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../../lti_spec_helper"
+
 describe Submissions::PreviewsController do
+  include LtiSpecHelper
+
   describe "GET :show" do
     before do
       course_with_student_and_submitted_homework
@@ -121,6 +125,51 @@ describe Submissions::PreviewsController do
 
         get :show, params: { course_id: @course.id, assignment_id: assignment.id, id: @student.id, preview: true }
         expect(response).to be_unauthorized
+      end
+    end
+
+    context "when Asset Processor is attached" do
+      render_views
+
+      before do
+        @attachment1 = attachment_with_context @student, { display_name: "a1.txt", uploaded_data: StringIO.new("hello") }
+        @attachment2 = attachment_with_context @student, { display_name: "a2.txt", uploaded_data: StringIO.new("world") }
+        @submission = @assignment.submit_homework(@student, attachments: [@attachment1, @attachment2], submission_type: "online_upload")
+        @context = @course
+        user_session(@student)
+      end
+
+      it "renders show_preview with asset processor data in js ENV" do
+        # Use random ids and display_names for the mock attachments
+        allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return([
+                                                                                                   { title: "Asset Report 1", asset: { id: 101, attachment_id: @attachment1.id, attachment_name: @attachment1.display_name } },
+                                                                                                   { title: "Asset Report 2", asset: { id: 102, attachment_id: @attachment2.id, attachment_name: @attachment2.display_name } }
+                                                                                                 ])
+        allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_processors).and_return([
+                                                                                                      { title: "Live AP" }
+                                                                                                    ])
+
+        get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id, preview: true }
+
+        body = response.body
+        # The page includes Asset Processor data js ENV
+        expect(body).to include("ASSET_PROCESSORS")
+        # The page includes ASSIGNMENT_NAME in js ENV
+        expect(body).to include("ASSIGNMENT_NAME")
+        # The page includes ASSET_REPORTS in js ENV
+        expect(body).to include("ASSET_REPORTS")
+        # Both random attachments are listed on the page
+        expect(body).to include('data-attachment-id="' + @attachment1.id.to_s + '"')
+        expect(body).to include('data-attachment-id="' + @attachment2.id.to_s + '"')
+      end
+
+      it "renders show_preview without Document Processors column if asset reports is nil" do
+        allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return(nil)
+
+        get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id, preview: true }
+
+        body = response.body
+        expect(body).not_to include("Document Processors")
       end
     end
   end

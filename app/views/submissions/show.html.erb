@@ -319,6 +319,7 @@
   </div>
   <div class="submission-details-container">
     <div class="submission-details-frame">
+      <div id="asset_report_modal"></div>
       <iframe id="preview_frame" src="<%= presenter.submission_preview_frame_url %>" allowfullscreen="true" allow="<%= Lti::Launch.iframe_allowances.join('; ') %>" frameborder="0" style="border: 0; width: 100%; height: 300px; display: block;" title="<%= t('Preview') %>"></iframe>
     </div>
     <div class="submission-details-comments" style="word-wrap: break-word; min-width: 1%;">

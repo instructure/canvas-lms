@@ -21,7 +21,6 @@ import type JQuery from 'jquery'
 import {ZSubmissionOriginalityData, ZVericiteOriginalityData} from '@canvas/grading/grading.d'
 import type {SubmissionOriginalityData} from '@canvas/grading/grading.d'
 import {ZExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {ZLtiAssetReport} from '@canvas/lti/model/AssetReport'
 import PostPolicies from '../react/PostPolicies/index'
 import AssessmentAuditTray from '../react/AssessmentAuditTray'
 
@@ -214,10 +213,6 @@ export const ZSubmissionHistoryEntry = z.object({
 })
 
 export type SubmissionHistoryEntry = z.infer<typeof ZSubmissionHistoryEntry>
-
-export const ZLtiAssetReportsByProcessor = z.record(z.string(), z.array(ZLtiAssetReport))
-
-export type LtiAssetReportsByProcessor = z.infer<typeof ZLtiAssetReportsByProcessor>
 
 export const ZSubmission = ZBaseSubmission.extend({
   submission_history: z.array(ZSubmissionHistoryEntry),

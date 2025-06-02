@@ -204,6 +204,8 @@ const featureBundles: {
   submissions_show_preview_media: () => import('./features/submissions_show_preview_media/index'),
   submissions_show_preview_text: () => import('./features/submissions_show_preview_text/index'),
   submissions_show_preview_upload: () => import('./features/submissions_show_preview_upload/index'),
+  submissions_show_preview_asset_report_status: () =>
+    import('./features/submissions_show_preview_asset_report_status/index'),
   submissions: () => import('./features/submissions/index'),
   submit_assignment: () => import('./features/submit_assignment/index'),
   syllabus: () => import('./features/syllabus/index'),

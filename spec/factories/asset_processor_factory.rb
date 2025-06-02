@@ -61,7 +61,8 @@ module Factories
         submission: props.delete(:submission) || submission_model(
           user: props[:user],
           assignment: props[:asset_processor].assignment
-        )
+        ),
+        attachment: props.delete(:attachment)
       )
 
     Lti::AssetReport.create!(**props)
