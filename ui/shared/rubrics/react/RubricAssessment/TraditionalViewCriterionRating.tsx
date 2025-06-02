@@ -90,7 +90,7 @@ export const TraditionalViewCriterionRating: FC<TraditionalViewCriterionRatingPr
           tabIndex={0}
           background="transparent"
           height="100%"
-          width="100%"
+          maxWidth={ratingCellMinWidth}
           borderWidth="small"
           borderColor={borderColor}
           overflowX="visible"
