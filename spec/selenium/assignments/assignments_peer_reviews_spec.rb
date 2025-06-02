@@ -333,6 +333,7 @@ describe "assignments" do
                            }
                          })
     end
+    let!(:anonymous_submission_page) { "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}" }
 
     before { assignment.assign_peer_review(reviewer, reviewed) }
 
@@ -364,6 +365,12 @@ describe "assignments" do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(comment.author_name)
       end
+
+      it "allows reviewer to access the anonymous submission page" do
+        get anonymous_submission_page
+        expect(driver.current_url).to include(anonymous_submission_page)
+        expect(f("h1.submission_header")).to include_text("Peer Review")
+      end
     end
 
     context "when teacher is logged in" do
@@ -379,6 +386,12 @@ describe "assignments" do
         f(".assess_submission_link").click
         wait_for_animations
         expect(f("#rubric_assessment_option_#{assessment.id}")).to include_text(assessment.assessor_name)
+      end
+
+      it "allows teacher to access the anonymous submission page" do
+        get anonymous_submission_page
+        expect(driver.current_url).to include(anonymous_submission_page)
+        expect(f("h1.submission_header")).to include_text("Submission Details")
       end
     end
 
