@@ -672,4 +672,12 @@ module ModulesIndexPage
     duplicate_module_button(context_module).click
     wait_for_ajax_requests
   end
+
+  def show_all_button_exists?(context_module)
+    element_exists?(show_all_button_selector(context_module))
+  end
+
+  def show_less_button_exists?(context_module)
+    element_exists?(show_less_button_selector(context_module))
+  end
 end
