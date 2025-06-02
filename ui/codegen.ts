@@ -20,10 +20,15 @@ import type {CodegenConfig} from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
   schema: './schema.graphql',
-  documents: ['ui/**/*.tsx', 'ui/**/*.ts'],
+  documents: [
+    'ui/**/*.tsx',
+    'ui/**/*.ts',
+    '!ui/features/context_modules_v2/**/*',
+    '!ui/features/grade_summary/**/*',
+  ],
   ignoreNoDocuments: true,
   generates: {
-    './ui/shared/query/graphql/': {
+    './ui/shared/graphql/': {
       preset: 'client',
       config: {
         documentMode: 'string',
