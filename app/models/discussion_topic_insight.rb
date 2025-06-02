@@ -50,7 +50,11 @@ class DiscussionTopicInsight < ActiveRecord::Base
     pretty_locale = available_locales[locale] || "English"
 
     # TODO: chunking should probably be sliced based on total tokens
-    unprocessed_entries(should_preload: true).each_slice(BATCH_SIZE) do |batch|
+
+    unprocessed_entries_list = unprocessed_entries(should_preload: true)
+    InstStatsd::Statsd.gauge("discussion_topic.insight.entry_batch", unprocessed_entries_list.size)
+
+    unprocessed_entries_list.each_slice(BATCH_SIZE) do |batch|
       content = prompt_presenter.content_for_insight(entries: batch.map(&:first))
       prompt, options = llm_config.generate_prompt_and_options(substitutions: { CONTENT: content, LOCALE: pretty_locale })
 
