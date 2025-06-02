@@ -16,12 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BaseBlockLayout} from './BaseBlock'
-
-export const DummyBlock = () => {
-  return (
-    <BaseBlockLayout title="Dummy block">
-      This is a dummy block. It serves as a placeholder for testing purposes.
-    </BaseBlockLayout>
-  )
-}
+export * from './BaseBlockLayout'

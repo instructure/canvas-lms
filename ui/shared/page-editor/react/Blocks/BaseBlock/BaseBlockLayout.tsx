@@ -16,12 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BaseBlockLayout} from './BaseBlock'
+import './base-block-layout.css'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import {PropsWithChildren} from 'react'
 
-export const DummyBlock = () => {
+export const BaseBlockLayout = (
+  props: PropsWithChildren<{
+    title: string
+  }>,
+) => {
   return (
-    <BaseBlockLayout title="Dummy block">
-      This is a dummy block. It serves as a placeholder for testing purposes.
-    </BaseBlockLayout>
+    <Flex
+      direction="column"
+      padding="paddingCardLarge"
+      elementRef={el => el?.classList.add('base-block-layout')}
+      gap="mediumSmall"
+    >
+      <Flex justifyItems="space-between">
+        <Flex data-header>
+          <Text data-title variant="descriptionSection">
+            {props.title}
+          </Text>
+        </Flex>
+        <Flex>{/*Menu items*/}</Flex>
+      </Flex>
+      <Flex>{props.children}</Flex>
+    </Flex>
   )
 }
