@@ -61,56 +61,68 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   return (
     <View
       as="div"
-      padding="small small small x-small"
+      padding="paddingCardMedium"
       background="primary"
       borderWidth="0"
       borderRadius="large"
       overflowX="hidden"
       data-item-id={_id}
-      margin="small"
+      margin="paddingCardMedium"
+      minHeight="5.125rem"
+      display="flex"
     >
-      <Flex wrap="wrap">
+      <Flex wrap="wrap" width="100%">
         <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`} shouldGrow>
           <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>
-            <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
+            <Flex
+              alignItems="start"
+              justifyItems="start"
+              wrap="no-wrap"
+              gap="space8"
+              direction="column"
+            >
               {/* Item Title */}
-              <Flex.Item>
-                <Flex.Item shouldGrow={true}>
-                  <ModuleItemTitleStudent
-                    content={content}
-                    url={url}
-                    onClick={onClick}
-                    position={position}
-                    requireSequentialProgress={requireSequentialProgress}
-                    progression={progression}
-                  />
-                </Flex.Item>
+              <Flex.Item shouldGrow={true}>
+                <ModuleItemTitleStudent
+                  content={content}
+                  url={url}
+                  onClick={onClick}
+                  position={position}
+                  requireSequentialProgress={requireSequentialProgress}
+                  progression={progression}
+                />
               </Flex.Item>
               {/* Due Date and Points Possible */}
               {content.type !== 'SubHeader' && (
-                <Flex.Item>
-                  <Flex wrap="wrap">
-                    {/* Item Type Icon */}
-                    {itemIcon && (
-                      <>
-                        <Flex.Item margin="0 small 0 0" aria-hidden="true">
-                          <View as="div">{itemIcon}</View>
-                        </Flex.Item>
-                        <Flex.Item margin="0 small 0 0" aria-hidden="true">
-                          <Text size="x-small" transform="capitalize">
-                            {itemTypeText}
-                          </Text>
-                        </Flex.Item>
-                      </>
-                    )}
-                    <Flex.Item>
-                      <ModuleItemSupplementalInfoStudent
-                        contentTagId={_id}
-                        content={content}
-                        completionRequirement={completionRequirements?.find(req => req.id === _id)}
-                      />
-                    </Flex.Item>
-                  </Flex>
+                <Flex.Item type="span">
+                  <div style={{lineHeight: '0.9375rem'}}>
+                    <Flex wrap="wrap">
+                      {/* Item Type Icon */}
+                      {itemIcon && (
+                        <>
+                          <Flex.Item margin="0 space4 0 0" aria-hidden="true">
+                            <View as="div" height="x-small">
+                              {itemIcon}
+                            </View>
+                          </Flex.Item>
+                          <Flex.Item margin="0 small 0 0" aria-hidden="true">
+                            <Text size="x-small" transform="capitalize">
+                              {itemTypeText}
+                            </Text>
+                          </Flex.Item>
+                        </>
+                      )}
+                      <Flex.Item>
+                        <ModuleItemSupplementalInfoStudent
+                          contentTagId={_id}
+                          content={content}
+                          completionRequirement={completionRequirements?.find(
+                            req => req.id === _id,
+                          )}
+                        />
+                      </Flex.Item>
+                    </Flex>
+                  </div>
                 </Flex.Item>
               )}
             </Flex>
