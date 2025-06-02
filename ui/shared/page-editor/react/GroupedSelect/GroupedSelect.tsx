@@ -17,18 +17,18 @@
  */
 
 import {useEffect, useState} from 'react'
-import {BlockData} from '../AddBlock/block-data'
+import {BlockData, BlockTypes} from '../AddBlock/block-data'
 import {GroupedSelectLayout} from './GroupedSelectLayout'
 import {GroupedSelectEntry} from './GroupedSelectEntry'
 
 export const GroupedSelect = (props: {
   data: BlockData[]
-  onChange: (id: string) => void
+  onChange: (id: BlockTypes) => void
 }) => {
   const [selectedGroup, setSelectedGroup] = useState<string>(props.data[0].groupName)
-  const [selectedItem, setSelectedItem] = useState<string>(props.data[0].items[0].id)
+  const [selectedItem, setSelectedItem] = useState<BlockTypes>(props.data[0].items[0].id)
 
-  const handleItemClick = (id: string) => {
+  const handleItemClick = (id: BlockTypes) => {
     setSelectedItem(id)
     props.onChange(id)
   }

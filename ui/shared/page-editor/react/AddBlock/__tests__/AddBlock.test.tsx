@@ -25,31 +25,23 @@ jest.mock('../AddBlockModal', () => ({
   AddBlockModal: jest.fn(() => <div data-testid="mock-modal" />),
 }))
 
+jest.mock('../../hooks/useAddNode', () => ({
+  useAddNode: jest.fn(),
+}))
+
 describe('AddBlock', () => {
   it('renders', async () => {
-    render(<AddBlock onAddBlock={jest.fn()} />)
+    render(<AddBlock />)
     expect(await screen.findByTestId('add-block-heading')).toBeInTheDocument()
     expect(await screen.findByTestId('add-block-button')).toBeInTheDocument()
   })
 
   it('renders modal with "open" when add button is clicked', async () => {
-    const onAddBlockMock = jest.fn()
-    render(<AddBlock onAddBlock={onAddBlockMock} />)
+    render(<AddBlock />)
     const button = await screen.findByTestId('add-block-button')
     button.click()
     expect(AddBlockModal).toHaveBeenCalledWith(
       expect.objectContaining({open: true}),
-      expect.anything(),
-    )
-  })
-
-  it('renders modal and passes "onAddBlock" method when add button is clicked', async () => {
-    const onAddBlockMock = jest.fn()
-    render(<AddBlock onAddBlock={onAddBlockMock} />)
-    const button = await screen.findByTestId('add-block-button')
-    button.click()
-    expect(AddBlockModal).toHaveBeenCalledWith(
-      expect.objectContaining({onAddBlock: onAddBlockMock}),
       expect.anything(),
     )
   })

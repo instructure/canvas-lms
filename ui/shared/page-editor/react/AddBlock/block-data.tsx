@@ -17,14 +17,27 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {DummyBlock} from '../Blocks/DummyBlock'
+import {ReactElement} from 'react'
 
 const I18n = createI18nScope('page_editor')
+
+type BlockFactory = {[key: string]: () => ReactElement}
+
+export const blockFactory = {
+  dummyBlock: () => <DummyBlock />,
+  simpleText: () => <p>text</p>,
+  imageText: () => <p>image_text</p>,
+  image: () => <p>image</p>,
+} as const satisfies BlockFactory
+
+export type BlockTypes = keyof typeof blockFactory
 
 export type BlockData = {
   groupName: string
   items: {
     itemName: string
-    id: string
+    id: BlockTypes
   }[]
 }
 
@@ -32,8 +45,9 @@ export const blockData: BlockData[] = [
   {
     groupName: I18n.t('Text'),
     items: [
-      {itemName: I18n.t('Simple text block'), id: 'simple_text'},
-      {itemName: I18n.t('Image + text'), id: 'image_text'},
+      {itemName: I18n.t('Simple text block'), id: 'simpleText'},
+      {itemName: I18n.t('Image + text'), id: 'imageText'},
+      {itemName: I18n.t('Dummy block'), id: 'dummyBlock'},
     ],
   },
   {

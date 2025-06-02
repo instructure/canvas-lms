@@ -27,15 +27,15 @@ describe('AddBlockModal', () => {
     {
       groupName: 'G1',
       items: [
-        {itemName: 'G1-I1', id: 'ID1'},
-        {itemName: 'G1-I2', id: 'ID2'},
+        {itemName: 'G1-I1', id: 'image'},
+        {itemName: 'G1-I2', id: 'imageText'},
       ],
     },
     {
       groupName: 'G2',
       items: [
-        {itemName: 'G2-I1', id: 'ID3'},
-        {itemName: 'G2-I2', id: 'ID4'},
+        {itemName: 'G2-I1', id: 'simpleText'},
+        {itemName: 'G2-I2', id: 'imageText'},
       ],
     },
   ]

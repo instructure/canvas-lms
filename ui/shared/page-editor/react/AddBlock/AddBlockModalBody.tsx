@@ -16,11 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ReactElement} from 'react'
 import {GroupedSelect} from '../GroupedSelect'
-import {blockData} from './block-data'
+import {blockData, blockFactory, BlockTypes} from './block-data'
 
 export const AddBlockModalBody = (props: {
-  onBlockSelected: (type: string) => void
+  onBlockSelected: (block: ReactElement) => void
 }) => {
-  return <GroupedSelect data={blockData} onChange={props.onBlockSelected} />
+  return (
+    <GroupedSelect
+      data={blockData}
+      onChange={(id: BlockTypes) => {
+        props.onBlockSelected(blockFactory[id]())
+      }}
+    />
+  )
 }
