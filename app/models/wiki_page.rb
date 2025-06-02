@@ -63,6 +63,7 @@ class WikiPage < ActiveRecord::Base
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
   has_one :block_editor, as: :context, dependent: :destroy
   has_one :estimated_duration, dependent: :destroy, inverse_of: :wiki_page
+  has_many :attachment_associations, as: :context, inverse_of: :context
 
   accepts_nested_attributes_for :block_editor, allow_destroy: true
   accepts_nested_attributes_for :estimated_duration, allow_destroy: true
