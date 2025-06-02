@@ -23,11 +23,17 @@ module Factories
     props = {
       title: "title",
       text: "text",
-      custom: { customkey: "customvar" },
+      custom: { customkey: "customvar", raid: "$Canvas.root_account.id" },
       icon: { url: "https://example.com/icon.png", width: 32, height: 32 },
       window: { targetName: "mytoolwin", width: 500, height: 400, windowFeatures: "left=100,top=100" },
       iframe: { width: 500, height: 400 },
-      report: { released: false, indicator: true, url: "https://example.com/my_special_target_uri", custom: {} },
+      report: { released: false,
+                indicator: true,
+                url: "https://example.com/my_special_target_uri",
+                custom: {
+                  customkey: "report_overrided",
+                  raid2: "$Canvas.root_account.id",
+                } },
     }.with_indifferent_access.merge(overrides)
     props[:context_external_tool] ||=
       props.delete(:tool) || external_tool_1_3_model(context: external_tool_context, placements: ["ActivityAssetProcessor"])
