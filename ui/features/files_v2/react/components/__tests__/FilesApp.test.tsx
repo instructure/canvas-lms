@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitFor, screen} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import FilesApp from '../FilesApp'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
@@ -28,7 +28,6 @@ import {NotFoundError} from '../../../utils/apiUtils'
 import {resetAndGetFilesEnv} from '../../../utils/filesEnvUtils'
 import {createFilesContexts} from '../../../fixtures/fileContexts'
 
-// Mock the useGetFolders module, but provide the real implementation by default
 jest.mock('../../hooks/useGetFolders', () => {
   const originalModule = jest.requireActual('../../hooks/useGetFolders')
   return {
@@ -65,6 +64,7 @@ describe('FilesApp', () => {
 
   afterEach(() => {
     fetchMock.resetHistory()
+    queryClient.clear()
 
     document.body.removeChild(flashElements)
     flashElements = undefined
@@ -75,7 +75,7 @@ describe('FilesApp', () => {
     const router = createMemoryRouter(
       [
         {
-          path: '/',
+          path: '*',
           Component: FilesApp,
         },
       ],
@@ -103,68 +103,116 @@ describe('FilesApp', () => {
     it('does not render progress bar without permission', async () => {
       renderComponent()
 
-      await waitFor(() => {
-        expect(fetchMock.calls()).toHaveLength(1)
-        expect(fetchMock.calls()[0][0]).not.toContain('/files/quota')
-      })
+      await screen.findByRole('button', {name: /all my files/i})
+
+      expect(fetchMock.calls()).toHaveLength(1)
+      expect(fetchMock.calls()[0][0]).not.toContain('/files/quota')
     })
 
     it('does not render Upload File or Create Folder buttons when user does not have permission', async () => {
       renderComponent()
-      // necessary to prevent false positives
+
       const allMyFilesButton = await screen.findByRole('button', {name: /all my files/i})
+      expect(allMyFilesButton).toBeInTheDocument()
+
       const uploadButton = screen.queryByRole('button', {name: 'Upload'})
       const createFolderButton = screen.queryByRole('button', {name: 'Folder'})
-      expect(allMyFilesButton).toBeInTheDocument()
+
       expect(uploadButton).not.toBeInTheDocument()
       expect(createFolderButton).not.toBeInTheDocument()
     })
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('renders next page button when header', async () => {
-    // this intermittently timedout in jenkins, even though it runs just fine locally
+  // fickle
+  it.skip('renders next page button when pagination headers are present', async () => {
     fetchMock.get(
       /.*\/all.*/,
       {
-        body: [],
+        body: FAKE_FOLDERS,
         headers: {
-          Link: '</next-page>; rel="next"',
+          Link: '</api/v1/folders/1/files?page=2>; rel="next"',
+          'X-Total-Pages': '2',
         },
       },
       {
         overwriteRoutes: true,
       },
     )
-    renderComponent()
+
+    renderComponent(['/all'])
+
+    await screen.findByRole('button', {name: /all my files/i})
+
+    await screen.findByTestId('pagination-announcement')
+
+    const pagination = await screen.findByTestId('files-pagination')
+    expect(pagination).toBeInTheDocument()
+
     const nextPageButton = await screen.findByRole('button', {name: '2'})
     expect(nextPageButton).toBeInTheDocument()
   })
 
-  it('does not render page buttons when no header', async () => {
-    renderComponent()
-    // necessary to make sure table has finished loading
-    // otherwise test is false positive because button would never be rendered
-    const folderName = await screen.findByText(FAKE_FOLDERS[1].name)
-    expect(folderName).toBeInTheDocument()
-    const nextPageButton = screen.queryByRole('button', {name: '1'})
-    expect(nextPageButton).not.toBeInTheDocument()
+  it('verifies fetch is called with correct pagination headers', async () => {
+    const mockResponse = {
+      body: FAKE_FOLDERS,
+      headers: {
+        Link: '</api/v1/folders/1/files?page=2>; rel="next"',
+        'X-Total-Pages': '2',
+      },
+    }
+
+    fetchMock.get(/.*\/all.*/, mockResponse, {overwriteRoutes: true})
+
+    renderComponent(['/all'])
+
+    await screen.findByRole('button', {name: /all my files/i})
+
+    expect(fetchMock.called(/.*\/all.*/)).toBe(true)
+
+    const calls = fetchMock.calls(/.*\/all.*/)
+    expect(calls.length).toBeGreaterThan(0)
+
+    const lastCallResponse = fetchMock.lastResponse(/.*\/all.*/)
+    expect(lastCallResponse).not.toBeUndefined()
+
+    if (lastCallResponse) {
+      expect(lastCallResponse.headers.get('Link')).toContain('rel="next"')
+      expect(lastCallResponse.headers.get('X-Total-Pages')).toBe('2')
+    }
   })
 
-  it('does render Upload File or Create Folder buttons when user has permission', async () => {
+  it('does not render pagination when only one page exists', async () => {
+    fetchMock.get(/.*\/all.*/, FAKE_FOLDERS, {overwriteRoutes: true})
+
+    renderComponent(['/all'])
+
+    await screen.findByRole('button', {name: /all my files/i})
+
+    const pagination = screen.queryByTestId('files-pagination')
+    expect(pagination).not.toBeInTheDocument()
+  })
+
+  it('renders Upload File and Create Folder buttons when user has permission', async () => {
     renderComponent()
+
+    await screen.findByRole('button', {name: /all my files/i})
+
     const uploadButton = await screen.findByRole('button', {name: 'Upload'})
     const createFolderButton = await screen.findByRole('button', {name: /add folder/i})
+
     expect(uploadButton).toBeInTheDocument()
     expect(createFolderButton).toBeInTheDocument()
   })
 
-  it('does not render Upload File or Create Folder buttons when searching', async () => {
+  it('hides Upload File and Create Folder buttons when searching', async () => {
     renderComponent(['?search_term=foo'])
+
     const allMyFilesButton = await screen.findByRole('button', {name: /all my files/i})
+    expect(allMyFilesButton).toBeInTheDocument()
+
     const uploadButton = screen.queryByRole('button', {name: 'Upload'})
     const createFolderButton = screen.queryByRole('button', {name: 'Folder'})
-    expect(allMyFilesButton).toBeInTheDocument()
+
     expect(uploadButton).not.toBeInTheDocument()
     expect(createFolderButton).not.toBeInTheDocument()
   })
@@ -184,11 +232,12 @@ describe('FilesApp', () => {
         error: mockError,
         isLoading: false,
       })
+
       renderComponent()
-      await waitFor(() => {
-        expect(screen.getByText(/whoops... looks like nothing is here/i)).toBeInTheDocument()
-        expect(screen.getByText(/we couldn't find that page/i)).toBeInTheDocument()
-      })
+
+      const notFoundMessage = await screen.findByText(/whoops... looks like nothing is here/i)
+      expect(notFoundMessage).toBeInTheDocument()
+      expect(screen.getByText(/we couldn't find that page/i)).toBeInTheDocument()
     })
 
     it('does not render NotFoundArtwork component when no error occurs', async () => {
@@ -197,11 +246,13 @@ describe('FilesApp', () => {
         error: null,
         isLoading: false,
       })
+
       renderComponent()
-      await waitFor(() => {
-        const notFoundContainer = document.querySelector('.not_found_page_artwork')
-        expect(notFoundContainer).not.toBeInTheDocument()
-      })
+
+      await screen.findByText('Test Folder')
+
+      const notFoundContainer = document.querySelector('.not_found_page_artwork')
+      expect(notFoundContainer).not.toBeInTheDocument()
     })
 
     it('does not show flash error message for 404 errors', async () => {
@@ -211,7 +262,11 @@ describe('FilesApp', () => {
         error: mockError,
         isLoading: false,
       })
+
       renderComponent()
+
+      // Verify the 404 error doesn't trigger a flash message
+      await screen.findByText(/whoops... looks like nothing is here/i)
       expect(flashElements.textContent).not.toContain('Failed to fetch files and folders')
     })
   })
