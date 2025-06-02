@@ -552,13 +552,46 @@ shared_examples_for "module moving items" do |context|
       wait_for_ajaximations
 
       expect(ff(module_items_selector(@module2.id))[1].text).to include(first_tag_title)
-      # LX-2731 will fix this expectation
-      # expect(any_module_items?(@module.id)).to be_falsey
+      expect(any_module_items?(@module.id)).to be_falsey
       expect(ff(module_items_selector(@module2.id)).size).to eq(13)
       driver.execute_script("window.scrollTo(0, 0)")
       expect(show_less_button(@module2)).to be_displayed
       show_less_button(@module2).click
       expect(show_all_button(@module2).text).to include("(13)")
+    end
+
+    it "moves content from one module to another module and show all is removed in original module" do
+      get @mod_url
+      wait_for_dom_ready
+      expect(show_all_button(@module).text).to include("(11)")
+      click_manage_module_button(@module)
+      click_module_move_contents(@module.id)
+      wait_for_ajaximations
+
+      select_module_move_contents_tray_module(@module2.name)
+      select_module_move_contents_tray_place("At the Top")
+      click_module_item_move_tray_move_button
+      wait_for_ajaximations
+
+      expect(show_all_button_exists?(@module)).to be_falsey
+    end
+
+    it "moves content from one module to another module and show less is removed in original module" do
+      get @mod_url
+      wait_for_dom_ready
+      show_all_button(@module).click
+      expect(show_less_button(@module)).to be_displayed
+
+      click_manage_module_button(@module)
+      click_module_move_contents(@module.id)
+      wait_for_ajaximations
+
+      select_module_move_contents_tray_module(@module2.name)
+      select_module_move_contents_tray_place("At the Top")
+      click_module_item_move_tray_move_button
+      wait_for_ajaximations
+
+      expect(show_less_button_exists?(@module)).to be_falsey
     end
   end
 
