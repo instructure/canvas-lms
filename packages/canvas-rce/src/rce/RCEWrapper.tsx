@@ -2043,7 +2043,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     const statusBarOptions: StatusBarOptions = {
       aiTextTools: this.props.ai_text_tools,
       isDesktop: tinymce.Env.deviceType.isDesktop(),
-      removeResizeButton: !!this.props.features?.remove_rce_resize_button,
     }
     const statusBarFeatures = getStatusBarFeaturesForVariant(this.variant, statusBarOptions)
     return (

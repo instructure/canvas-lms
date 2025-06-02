@@ -415,7 +415,6 @@ class ApplicationController < ActionController::Base
     validate_call_to_action
     new_quizzes_navigation_updates
     create_wiki_page_mastery_path_overrides
-    remove_rce_resize_button
     create_external_apps_side_tray_overrides
     ams_service
     files_a11y_rewrite_toggle
