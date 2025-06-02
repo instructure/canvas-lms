@@ -415,22 +415,4 @@ describe('RCE StatusBar', () => {
       expect(container.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).not.toBeInTheDocument()
     })
   })
-
-  describe('remove resize button enabled', () => {
-    it('does not show the resize button', () => {
-      const {container} = renderStatusBar({
-        features: getStatusBarFeaturesForVariant('full', {removeResizeButton: true}),
-      })
-      expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).not.toBeInTheDocument()
-    })
-  })
-
-  describe('remove resize button disabled', () => {
-    it('shows the resize button', () => {
-      const {container} = renderStatusBar({
-        features: getStatusBarFeaturesForVariant('full', {removeResizeButton: false}),
-      })
-      expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).toBeInTheDocument()
-    })
-  })
 })

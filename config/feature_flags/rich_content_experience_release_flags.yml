@@ -219,14 +219,6 @@ rce_transform_loaded_content:
     ci:
       state: allowed_on
 
-remove_rce_resize_button:
-  applies_to: SiteAdmin
-  state: hidden
-  shadow: true
-  display_name: Remove RCE Resize Button
-  description: |-
-    Remove the resize button from the status bar of RCE.
-
 reset_uuid_on_course_reset:
   state: allowed_on
   display_name: Reset UUID on Course Reset
