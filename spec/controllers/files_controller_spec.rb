@@ -2490,6 +2490,36 @@ describe FilesController do
     end
   end
 
+  describe "PUT 'api_update'" do
+    before(:once) do
+      @student = user_model
+      @root_folder = Folder.root_folders(@student).first
+      @file = attachment_model(context: @user, uploaded_data: default_uploaded_data, folder: @root_folder)
+      @sub_folder = @student.submissions_folder
+      @sub_file = attachment_model(context: @user, uploaded_data: default_uploaded_data, folder: @sub_folder)
+    end
+
+    describe "as a student" do
+      before do
+        user_session(@student)
+      end
+
+      it "renders unauthorized when account restricts file access for user" do
+        @course.account.root_account.enable_feature!(:restrict_student_access)
+        allow(@course.account).to receive(:restricted_file_access_for_user?).with(@student).and_return(true)
+        put "api_update", params: { parent_folder_id: @sub_folder.id, id: @file.id }
+        expect(response).to be_unauthorized
+      end
+
+      it "allows access when account does not restrict file access for user" do
+        @root = Folder.root_folders(@student).first
+        allow(@course.account).to receive(:restricted_file_access_for_user?).with(@student).and_return(false)
+        put "api_update", params: { parent_folder_id: @root.id, id: @file.id }
+        expect(response).not_to be_unauthorized
+      end
+    end
+  end
+
   describe "GET 'show_thumbnail'" do
     let(:user) { user_factory }
     let(:course) { course_factory }

@@ -2321,6 +2321,15 @@ class User < ActiveRecord::Base
     end
   end
 
+  def teacher_enrollment?
+    return @_teacher_enrollment if defined?(@_teacher_enrollment)
+
+    @_teacher_enrollment = Rails.cache.fetch_with_batched_keys(["has_teacher_enrollment", ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
+      enrollments.shard(in_region_associated_shards).where(type: %w[TeacherEnrollment])
+                 .where.not(workflow_state: %w[rejected inactive deleted]).exists?
+    end
+  end
+
   def non_student_enrollment?
     # We should be able to remove this method when the planner works for teachers/other course roles
     return @_non_student_enrollment if defined?(@_non_student_enrollment)

@@ -1341,6 +1341,8 @@ class FilesController < ApplicationController
     if authorized_action(@attachment, @current_user, :update)
       @context = @attachment.context
       if @context && params[:parent_folder_id]
+        return if check_restricted_file_access_and_return?
+
         folder = @context.folders.active.find(params[:parent_folder_id])
         if authorized_action(folder, @current_user, :update)
           @attachment.folder = folder

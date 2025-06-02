@@ -306,6 +306,9 @@ class ApplicationController < ActionController::Base
           RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session) && !mobile_device?
+        if @domain_root_account&.feature_enabled?(:restrict_student_access)
+          @js_env[:current_user_has_teacher_enrollment] = @current_user&.teacher_enrollment?
+        end
         @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.is_a?(Course)
         unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {
@@ -2954,26 +2957,49 @@ class ApplicationController < ActionController::Base
   def check_restricted_file_access_for_students
     return if @context.blank? && @current_user.blank?
 
-    account = @context.blank? ? @current_user&.account : context_account
-    render_unauthorized_action if account&.restricted_file_access_for_user?(@current_user)
+    account = @context.blank? ? @current_user&.account : context_account_for_student
+
+    if account&.restricted_file_access_for_user?(@current_user)
+      render_unauthorized_action and return
+    end
+  end
+
+  def check_restricted_file_access_and_return?
+    check_restricted_file_access_for_students
+    performed?
+  end
+
+  def context_account_for_student
+    @context_account_for_student ||= resolve_context_account(allow_user_root_account: true)
   end
 
   def context_account
-    @context_account ||= if @context.is_a?(Account)
-                           @context
-                         elsif @context.is_a?(Course) || @context.is_a?(Group)
-                           @context.account
-                         elsif @context.is_a?(User)
-                           raise "Account can't be derived from a User context"
-                         elsif @context.is_a?(CourseSection)
-                           @context.course.account
-                         else
-                           a = @context.try(:account)
-                           raise ActiveRecord::RecordNotFound, "No account found for context" unless a.present?
-
-                           a
-                         end
+    @context_account ||= resolve_context_account(allow_user_root_account: false)
   end
+
+  def resolve_context_account(allow_user_root_account: false)
+    case @context
+    when Account
+      @context
+    when Course, Group
+      @context.account
+    when User
+      if allow_user_root_account
+        @context.account.root_account
+      else
+        raise "Account can't be derived from a User context"
+      end
+    when CourseSection
+      @context.course.account
+    else
+      account = @context.try(:account)
+      raise ActiveRecord::RecordNotFound, "No account found for context" unless account.present?
+
+      account
+    end
+  end
+
+  private :resolve_context_account
 
   def set_site_admin_context
     @context = Account.site_admin
