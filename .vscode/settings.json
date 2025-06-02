@@ -73,5 +73,7 @@
   "biome.enabled": true,
   "prettier.enable": false,
   "typescript.preferences.importModuleSpecifier": "project-relative",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
   "json.format.keepLines": true
 }

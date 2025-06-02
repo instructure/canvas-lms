@@ -236,6 +236,8 @@
     "@biomejs/biome": "1.9.4",
     "@eslint-community/eslint-plugin-eslint-comments": "^4.4.1",
     "@eslint/js": "^9.16.0",
+    "@graphql-codegen/cli": "^5.0.6",
+    "@graphql-codegen/schema-ast": "^4.1.0",
     "@graphql-tools/mock": "^9",
     "@graphql-tools/schema": "^9",
     "@instructure/browserslist-config-canvas-lms": ">=2",
