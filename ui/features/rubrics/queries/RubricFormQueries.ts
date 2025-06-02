@@ -25,7 +25,7 @@ import {mapRubricUnderscoredKeysToCamelCase} from '@canvas/rubrics/react/utils'
 import getCookie from '@instructure/get-cookie'
 
 const RUBRIC_QUERY = gql`
-  query RubricQuery($id: ID!) {
+  query FeaturesRubricQuery($id: ID!) {
     rubric(id: $id) {
       id: _id
       title
