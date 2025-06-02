@@ -31,11 +31,12 @@ import {
 export const gradingPeriodRow = (
   gradingPeriod,
   queryData,
+  assignmentsData,
   calculateOnlyGradedAssignments = false,
   courseLevelGrades = {},
 ) => {
   const filterByGradingPeriod = filteredAssignments(
-    queryData,
+    assignmentsData,
     calculateOnlyGradedAssignments,
   ).filter(assignment => {
     return assignment?.gradingPeriodId === gradingPeriod?._id

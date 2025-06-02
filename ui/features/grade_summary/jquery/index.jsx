@@ -27,7 +27,7 @@ import '@canvas/media-comments' /* mediaComment */
 import axios from '@canvas/axios'
 import {camelizeProperties} from '@canvas/convert-case'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import gradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import htmlEscape from '@instructure/html-escape'
 import {useScope as createI18nScope} from '@canvas/i18n'
