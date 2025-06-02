@@ -439,6 +439,9 @@ class Account < ActiveRecord::Base
 
   add_setting :horizon_account, boolean: true, default: false, inheritable: true
 
+  add_setting :decimal_separator, inheritable: true
+  add_setting :thousand_separator, inheritable: true
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|

@@ -514,6 +514,44 @@ describe "accounts/settings" do
     end
   end
 
+  describe "New Quizzes settings" do
+    let_once(:account) { Account.default }
+    let_once(:admin) { account_admin_user(account:) }
+
+    before do
+      account.settings[:provision] = { Account::SERVICE_IDS[:new_quizzes] => "new_quizzes" }
+      account.save!
+      view_context(account, admin)
+      assign(:account, account)
+      assign(:context, account)
+      assign(:root_account, account)
+      assign(:current_user, admin)
+      assign(:announcements, AccountNotification.none.paginate)
+      Account.site_admin.enable_feature!(:new_quizzes_separators)
+    end
+
+    it "shows up when the new_quizzes_separators feature is enabled and new quizzes is provosioned" do
+      render
+
+      expect(response).to have_tag("select#account_settings_decimal_separator_value")
+    end
+
+    it "does not show up if the new_quizzes_separators feature is disabled" do
+      Account.site_admin.disable_feature!(:new_quizzes_separators)
+      render
+
+      expect(response).to_not have_tag("select#account_settings_decimal_separator_value")
+    end
+
+    it "does not show up if new quizzes is not provisioned" do
+      account.settings[:provision] = nil
+      account.save!
+      render
+
+      expect(response).to_not have_tag("select#account_settings_decimal_separator_value")
+    end
+  end
+
   describe "quotas" do
     before do
       @account = Account.default

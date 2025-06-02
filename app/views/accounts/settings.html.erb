@@ -940,6 +940,48 @@
           <% end %>
         <% end %>
 
+        <% if Account.site_admin.feature_enabled?(:new_quizzes_separators) &&
+              !@account.site_admin? &&
+              @account.grants_right?(@current_user, :manage_account_settings) &&
+              @context.root_account.settings[:provision]&.key?(Account::SERVICE_IDS[:new_quizzes]) %>
+          <fieldset>
+            <legend><%= t(:new_quizzes_settings_title, "New Quizzes Settings") %></legend>
+            <table class="formtable narrow">
+              <%= f.fields_for :settings do |settings| %>
+                <%= settings.fields_for :decimal_separator do |ds| %>
+                  <tr>
+                    <td><%= ds.blabel :value, :decimal_separator_label, :en => "Decimal separator" %></td>
+                    <td>
+                      <%= ds.select :value, [[t(:decimal_separator_no_language_preference, "Not set (defaults to Language setting)"), nil],
+                                             [t(:decimal_separator_period, "Period (.) - Example: 123.45"), :period],
+                                             [t(:decimal_separator_comma, "Comma (,) - Example: 123,45"), :comma],
+                      ], :selected => @account.decimal_separator[:value] %>
+                      <p class="aside">
+                        <%= t("If the wrong separator is used (e.g., 1,5 instead of 1.5), student answers might be marked incorrect.") %>
+                      </p>
+                    </td>
+                  </tr>
+                <% end %>
+                <%= settings.fields_for :thousand_separator do |ds| %>
+                  <tr>
+                    <td><%= ds.blabel :value, :thousand_separator_label, :en => "Thousand separator" %></td>
+                    <td>
+                      <%= ds.select :value, [[t(:thousand_separator_no_language_preference, "Not set (defaults to Language setting)"), nil],
+                                             [t(:thousand_separator_period, "Period (.) - Example: 1.234.567"), :period],
+                                             [t(:thousand_separator_comma, "Comma (,) - Example: 1,234,567"), :comma],
+                                             [t(:thousand_separator_space, "Space ( ) - Example: 1 234 567"), :space],
+                      ], :selected => @account.thousand_separator[:value] %>
+                      <p class="aside">
+                        <%= t("If the wrong separator is used (e.g., 1,5 instead of 1.5), student answers might be marked incorrect.") %>
+                      </p>
+                    </td>
+                  </tr>
+                <% end %>
+              <% end %>
+            </table>
+          </fieldset>
+        <% end %>
+
         <% if !@account.site_admin? &&
             @account.primary_settings_root_account? &&
             @account.feature_allowed?(:submission_comment_emojis) &&
