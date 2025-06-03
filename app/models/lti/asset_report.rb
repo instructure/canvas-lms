@@ -68,6 +68,8 @@ class Lti::AssetReport < ApplicationRecord
     PRIORITY_TIME_CRITICAL = 5
   ].freeze
 
+  before_validation :filter_non_namespaced_extension_keys
+
   validates :timestamp, presence: true
   # report_type is "type" from the 1EdTech spec (Rails prevents us from naming column 'type')
   validates :report_type,
@@ -109,6 +111,14 @@ class Lti::AssetReport < ApplicationRecord
     end
   end
 
+  def filter_non_namespaced_extension_keys
+    return if extensions.blank?
+
+    self.extensions = extensions.select do |key, _value|
+      key.is_a?(String) && key.start_with?("http://", "https://")
+    end
+  end
+
   MAX_EXTENSIONS_SIZE = 1.megabyte
 
   def validate_extensions
@@ -117,11 +127,6 @@ class Lti::AssetReport < ApplicationRecord
     # rough size limit just to keep things reasonable
     if extensions.inspect.length > MAX_EXTENSIONS_SIZE
       errors.add(:extensions, "size limit exceeded")
-    end
-
-    bad_extensions = extensions.keys.reject { |k| k.start_with?("http://", "https://") }
-    if bad_extensions.present?
-      errors.add(:extensions, "unrecognized fields #{bad_extensions.to_json} -- extensions property keys must be namespaced (URIs)")
     end
   end
 

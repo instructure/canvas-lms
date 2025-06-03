@@ -102,6 +102,17 @@ describe Lti::IMS::NoticeHandlersController do
         expect(Lti::PlatformNotificationService).to have_received(:subscribe_tool_for_notice).with(tool: cet, notice_type:, handler_url:, max_batch_size: nil)
       end
 
+      context "when the request has extra fields" do
+        let(:body_overrides) { { notice_type:, handler: handler_url, extraField: "Canvas should ignore this" } }
+
+        it "subscribes the tool for given notice and returns the created handler while ignoring the extra field" do
+          send_request
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body).to eq(JSON.parse(handler_object.to_json))
+          expect(Lti::PlatformNotificationService).to have_received(:subscribe_tool_for_notice).with(tool: cet, notice_type:, handler_url:, max_batch_size: nil)
+        end
+      end
+
       context "with max_batch_size" do
         let(:handler_object) { { notice_type:, handler: handler_url, max_batch_size: "20" } }
 

@@ -55,16 +55,41 @@ RSpec.describe Lti::AssetReport do
         end
       end
 
-      it "rejects fields in 'extensions' that do not have a url scheme" do
-        expect(lti_asset_report_model(extensions: { "http://valid.url" => "value" })).to be_valid
-        expect(lti_asset_report_model(extensions: { "https://valid.url" => "value" })).to be_valid
-        expect do
-          lti_asset_report_model(extensions: { "invalid.url" => "value" })
-        end.to raise_error(ActiveRecord::RecordInvalid, /invalid.url.*extensions property keys must be namespaced \(URIs\)/)
+      it "filters out non-URL scheme fields in 'extensions' and remains valid" do
+        # Case 1: Only valid http URL
+        report1 = lti_asset_report_model(extensions: { "http://valid.url" => "value" })
+        expect(report1).to be_valid
+        expect(report1.extensions).to eq({ "http://valid.url" => "value" })
 
-        expect do
-          lti_asset_report_model(extensions: { "invalid.url" => "value", "https://valid.url" => "value" })
-        end.to raise_error(ActiveRecord::RecordInvalid, /extensions property keys must be namespaced \(URIs\)/)
+        # Case 2: Only valid https URL
+        report2 = lti_asset_report_model(extensions: { "https://valid.url" => "value" })
+        expect(report2).to be_valid
+        expect(report2.extensions).to eq({ "https://valid.url" => "value" })
+
+        # Case 3: Only invalid URL (should be filtered out)
+        report3 = lti_asset_report_model(extensions: { "invalid.url" => "value" })
+        expect(report3).to be_valid
+        expect(report3.extensions).to be_empty
+
+        # Case 4: Mix of invalid and valid URLs (invalid should be filtered, valid should remain)
+        report4 = lti_asset_report_model(extensions: { "invalid.url" => "value", "https://valid.url" => "another_value" })
+        expect(report4).to be_valid
+        expect(report4.extensions).to eq({ "https://valid.url" => "another_value" })
+
+        # Case 5: Non-string key (should be filtered out)
+        report5 = lti_asset_report_model(extensions: { :symbol_key => "value", "http://another.valid.url" => "yet_another_value" })
+        expect(report5).to be_valid
+        expect(report5.extensions).to eq({ "http://another.valid.url" => "yet_another_value" })
+
+        # Case 6: Extensions is nil (should remain empty and be valid)
+        report6 = lti_asset_report_model(extensions: nil)
+        expect(report6).to be_valid
+        expect(report6.extensions).to be_empty
+
+        # Case 7: Extensions is an empty hash (should remain empty and be valid)
+        report7 = lti_asset_report_model(extensions: {})
+        expect(report7).to be_valid
+        expect(report7.extensions).to be_empty
       end
     end
 
