@@ -2430,7 +2430,7 @@ class CoursesController < ApplicationController
           js_bundle :wiki_page_show
           css_bundle :wiki_page, :tinymce
         when "modules"
-          if (@context.grants_right?(@current_user, session, :read_as_admin) && @context.root_account.feature_enabled?(:modules_page_rewrite)) || (@is_student && @context.feature_enabled?(:modules_page_rewrite_student_view))
+          if @context.use_modules_rewrite_view?(@current_user, session)
             # Load new modules page assets
             context_modules_header_props = {
               title: t("Modules"),

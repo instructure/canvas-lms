@@ -278,7 +278,7 @@ class ContextModulesController < ApplicationController
       js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
       css_bundle :content_next, :context_modules2
 
-      if (@context.grants_right?(@current_user, session, :read_as_admin) && @context.root_account.feature_enabled?(:modules_page_rewrite)) || (@is_student && @context.feature_enabled?(:modules_page_rewrite_student_view))
+      if @context.use_modules_rewrite_view?(@current_user, session)
         # Load new modules page assets
         context_modules_header_props = {
           title: t("Modules"),

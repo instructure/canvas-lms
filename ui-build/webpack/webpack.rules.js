@@ -205,3 +205,8 @@ exports.istanbul = {
   },
   enforce: 'post',
 }
+
+exports.yaml = {
+  test: /\.ya?ml$/,
+  use: 'yaml-loader',
+}

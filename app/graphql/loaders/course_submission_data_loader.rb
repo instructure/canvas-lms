@@ -25,11 +25,15 @@ class Loaders::CourseSubmissionDataLoader < GraphQL::Batch::Loader
   end
 
   def perform(courses)
-    submissions_by_course_id = @current_user.submissions
-                                            .where(course_id: (courses || []).map(&:id))
-                                            .joins(:assignment)
-                                            .merge(AbstractAssignment.published)
-                                            .group_by(&:course_id)
+    submissions_by_course_id = if @current_user
+                                 @current_user.submissions
+                                              .where(course_id: (courses || []).map(&:id))
+                                              .joins(:assignment)
+                                              .merge(AbstractAssignment.published)
+                                              .group_by(&:course_id)
+                               else
+                                 {}
+                               end
 
     courses.each do |course|
       fulfill(course, submissions_by_course_id[course.id] || [])

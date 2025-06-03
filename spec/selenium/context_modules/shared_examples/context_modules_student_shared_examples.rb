@@ -914,5 +914,36 @@ shared_examples "context modules for students" do
       get "/courses/#{@course.id}/modules"
       expect(f("[data-testid='modules-rewrite-student-container']")).to be_present
     end
+
+    it "page renders for nonenrolled users when the course visibility is institution" do
+      @course.update(is_public_to_auth_users: true)
+      user_session(user_model)
+      get "/courses/#{@course.id}/modules"
+      expect(f("[data-testid='modules-rewrite-student-container']")).to be_present
+    end
+
+    context "with disable_graphql_authentication flag" do
+      before do
+        Account.site_admin.enable_feature!(:disable_graphql_authentication)
+      end
+
+      it "page renders for anonymous users when the course visibility is public" do
+        @course.update(is_public: true)
+        get "/courses/#{@course.id}/modules"
+        expect(f("[data-testid='modules-rewrite-student-container']")).to be_present
+      end
+    end
+
+    context "with graphql_persisted_queries flag" do
+      before do
+        @course.root_account.enable_feature!(:graphql_persisted_queries)
+      end
+
+      it "page renders for anonymous users when the course visibility is public" do
+        @course.update(is_public: true)
+        get "/courses/#{@course.id}/modules"
+        expect(f("[data-testid='modules-rewrite-student-container']")).to be_present
+      end
+    end
   end
 end

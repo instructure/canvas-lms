@@ -4537,6 +4537,16 @@ class Course < ActiveRecord::Base
     horizon_course && account&.feature_enabled?(:horizon_course_setting)
   end
 
+  def use_modules_rewrite_view?(user, session)
+    if grants_right?(user, session, :read_as_admin)
+      return root_account.feature_enabled?(:modules_page_rewrite)
+    elsif feature_enabled?(:modules_page_rewrite_student_view)
+      return user || Account.site_admin.feature_enabled?(:disable_graphql_authentication) || root_account.feature_enabled?(:graphql_persisted_queries)
+    end
+
+    false
+  end
+
   private
 
   def effective_due_dates
