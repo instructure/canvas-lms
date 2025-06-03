@@ -396,6 +396,13 @@ CanvasRails::Application.routes.draw do
     concerns :conferences
     concerns :question_banks
 
+    resources :item_banks, controller: "item_banks", only: [] do
+      collection do
+        get "/", to: "item_banks#show"
+        get "*path", to: "item_banks#show"
+      end
+    end
+
     post "quizzes/publish"   => "quizzes/quizzes#publish"
     post "quizzes/unpublish" => "quizzes/quizzes#unpublish"
 
