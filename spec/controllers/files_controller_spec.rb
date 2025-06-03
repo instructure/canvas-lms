@@ -2354,11 +2354,15 @@ describe FilesController do
     end
 
     it "fixes xls files" do
-      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.xls")).to eq "application/excel"
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.xls")).to eq "application/vnd.ms-excel"
     end
 
     it "fixes ppt files" do
-      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.ppt")).to eq "application/mspowerpoint"
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.ppt")).to eq "application/vnd.ms-powerpoint"
+    end
+
+    it "ignores case" do
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.DOC")).to eq "application/msword"
     end
 
     it "leaves other CFB types alone" do
