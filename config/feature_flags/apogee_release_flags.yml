@@ -483,4 +483,9 @@ performance_improvements_for_gradebook:
   applies_to: Course
   display_name: Performance Improvements for Gradebook Data Loading
   description: Reduce Gradebook load time by improving back end performance and reducing unnecessary background data
+grading_assistance_file_uploads:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Grading Assistance File Uploads
+  description: Enables support for uploading files as part of the AI-assisted grading tool in the Modernized Speedgrader.
   shadow: true
