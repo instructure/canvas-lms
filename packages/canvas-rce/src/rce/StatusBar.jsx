@@ -35,6 +35,8 @@ import {
   IconMiniArrowEndLine,
   IconFullScreenLine,
   IconExitFullScreenLine,
+  IconAddLine,
+  IconCheckMarkIndeterminateLine,
 } from '@instructure/ui-icons'
 import formatMessage from '../format-message'
 import ResizeHandle from './ResizeHandle'
@@ -344,11 +346,12 @@ export default function StatusBar(props) {
     )
   }
 
-  function renderSection3(html_view, fullscreen, resize_handle) {
+  function renderSection3({html_view, fullscreen, resize_handle, a11y_resize_handlers}) {
     return (
       <>
         <div className={css(styles.separator)} />
         {html_view && renderToggleHtml()}
+        {a11y_resize_handlers && renderAccessibleResizeHandle()}
         {fullscreen && renderFullscreen()}
         {resize_handle && renderResizeHandle()}
       </>
@@ -452,10 +455,53 @@ export default function StatusBar(props) {
     )
   }
 
+  function renderAccessibleResizeHandle() {
+    if (props.rceIsFullscreen) return null
+
+    const increaseBtnId = 'rce-resize-increase-btn'
+    const decreaseBtnId = 'rce-resize-decrease-btn'
+
+    const handleResize = deltaY => {
+      props.onResize(null, {deltaY, deltaX: 0})
+    }
+
+    return (
+      <>
+        <IconButton
+          data-btn-id={increaseBtnId}
+          data-testid={increaseBtnId}
+          color="secondary"
+          title={formatMessage('Increase Rich Content Area')}
+          tabIndex={tabIndexForBtn(increaseBtnId)}
+          onFocus={() => setFocusedBtnId(increaseBtnId)}
+          withBackground={false}
+          withBorder={false}
+          onClick={() => handleResize(5)}
+        >
+          <IconAddLine />
+        </IconButton>
+        <IconButton
+          data-btn-id={decreaseBtnId}
+          data-testid={decreaseBtnId}
+          color="secondary"
+          title={formatMessage('Decrease Rich Content Area')}
+          tabIndex={tabIndexForBtn(decreaseBtnId)}
+          onFocus={() => setFocusedBtnId(decreaseBtnId)}
+          withBackground={false}
+          withBorder={false}
+          onClick={() => handleResize(-5)}
+        >
+          <IconCheckMarkIndeterminateLine />
+        </IconButton>
+      </>
+    )
+  }
+
   const flexJustify = isHtmlView() ? 'end' : 'start'
   const html_view = isFeature('html_view') && isAvailable('instructure_html_view')
   const fullscreen = isFeature('fullscreen') && isAvailable('instructure_fullscreen')
   const resize_handle = isFeature('resize_handle')
+  const a11y_resize_handlers = isFeature('a11y_resize_handlers')
 
   return (
     <InstUISettingsProvider
@@ -484,7 +530,7 @@ export default function StatusBar(props) {
 
           {isFeature('word_count') && isAvailable('instructure_wordcount') && renderWordCount()}
           {(html_view || fullscreen || resize_handle) &&
-            renderSection3(html_view, fullscreen, resize_handle)}
+            renderSection3({html_view, fullscreen, resize_handle, a11y_resize_handlers})}
         </Flex.Item>
       </Flex>
     </InstUISettingsProvider>
