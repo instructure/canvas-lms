@@ -30,7 +30,7 @@ const getDefaultValues = overrides => {
     moment.tz(TZ).add(2, 'day'),
   ]
   return {
-    days: days.map(d => [
+    days: days.map((d, index) => [
       d.format('YYYY-MM-DD'),
       [
         {
@@ -39,6 +39,18 @@ const getDefaultValues = overrides => {
             color: '#5a92de',
             title: 'Test Course',
           },
+          items: [
+            {
+              id: `item-${index}`,
+              uniqueId: `item-${index}`,
+              title: `Test Item ${index}`,
+              date: d,
+              context: {
+                color: '#5a92de',
+                title: 'Test Course',
+              },
+            },
+          ],
         },
       ],
     ]),
