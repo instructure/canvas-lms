@@ -65,8 +65,9 @@ const HomeroomPage = ({
     {deep: true},
   )
 
-  const skeletonCard = props => (
+  const skeletonCard = ({key, ...props}) => (
     <div
+      key={key}
       {...props}
       className="ic-DashboardCard"
       style={{
