@@ -172,6 +172,28 @@ describe('fetchModuleItems utility', () => {
 
   afterEach(() => {
     server.resetHandlers()
+
+    // Clean up React roots before clearing DOM
+    // @ts-expect-error - Accessing private static property for testing
+    const loadingData = ModuleItemsLazyLoader.loadingData
+    Object.keys(modules).forEach((moduleId: string) => {
+      try {
+        loadingData.unmountModuleRoot(moduleId)
+      } catch (_e) {
+        // Ignore unmount errors during cleanup
+      }
+    })
+    try {
+      loadingData.unmountModuleRoot(badModule.moduleId)
+    } catch (_e) {
+      // Ignore unmount errors during cleanup
+    }
+    try {
+      loadingData.unmountModuleRoot(singlePageModules.moduleId)
+    } catch (_e) {
+      // Ignore unmount errors during cleanup
+    }
+
     document.body.innerHTML = ''
     jest.restoreAllMocks()
 
@@ -531,14 +553,35 @@ describe('fetchModuleItems utility', () => {
         server.events.on('request:match', requestSpy)
         try {
           await moduleItemsLazyLoader.fetchModuleItemsHtml(badModule.moduleId, 1)
-          await waitFor(() => {
-            expect(screen.getByTestId('items-failed-to-load')).toBeInTheDocument()
-            expect(screen.getByTestId('retry-items-failed-to-load')).toBeInTheDocument()
-          })
+
+          // Wait for the error state to be set and the React component to render
+          await waitFor(
+            () => {
+              const module = moduleFromId(badModule.moduleId)
+              expect(module?.dataset.loadstate).toBe('error')
+            },
+            {timeout: 5000},
+          )
+
+          // Give React an additional tick to render the error component
+          await waitFor(
+            () => {
+              expect(screen.getByTestId('items-failed-to-load')).toBeInTheDocument()
+            },
+            {timeout: 5000},
+          )
+
+          await waitFor(
+            () => {
+              expect(screen.getByTestId('retry-items-failed-to-load')).toBeInTheDocument()
+            },
+            {timeout: 1000},
+          )
+
           const retryButton = screen.getByTestId('retry-items-failed-to-load').closest('button')
-          // We can't easily track the number of retries with MSW, so we'll just verify the retry button exists and is clickable
           expect(retryButton).toBeInTheDocument()
           expect(requestSpy).toHaveBeenCalledTimes(1)
+
           retryButton?.click()
           await waitFor(() => {
             expect(requestSpy).toHaveBeenCalledTimes(2)
