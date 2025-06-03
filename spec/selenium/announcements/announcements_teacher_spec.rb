@@ -191,6 +191,8 @@ describe "announcements" do
 
           # Choose sending Notification along with our change
           AnnouncementNewEdit.notification_modal_send.click
+
+          wait_for_new_page_load
           expect(driver.current_url).not_to end_with("/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit")
         end
       end
