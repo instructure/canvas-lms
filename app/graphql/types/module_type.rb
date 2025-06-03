@@ -45,7 +45,7 @@ class ModuleProgressionLoader < GraphQL::Batch::Loader
     GuardRail.activate(:secondary) do
       progressions = ContextModuleProgression.where(
         context_module_id: context_modules.map(&:id),
-        user_id: @user.id
+        user_id: @user&.id
       ).index_by(&:context_module_id)
       context_modules.each do |context_module|
         progression = progressions[context_module.id]
@@ -108,7 +108,11 @@ module Types
 
     field :submission_statistics, Types::ModuleStatisticsType, null: true
     def submission_statistics
-      Loaders::ModuleStatisticsLoader.for(current_user:).load(context_module)
+      if current_user
+        Loaders::ModuleStatisticsLoader.for(current_user:).load(context_module)
+      else
+        {}
+      end
     end
 
     field :estimated_duration, GraphQL::Types::ISO8601Duration, null: true
