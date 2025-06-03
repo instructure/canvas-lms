@@ -17,13 +17,11 @@
  */
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Alert} from '@instructure/ui-alerts'
 import {debounce} from '@instructure/debounce'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {IconWarningSolid} from '@instructure/ui-icons'
-import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text';
-import {Flex} from '@instructure/ui-flex';
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('wiki_pages')
 
@@ -34,23 +32,18 @@ type AvailabilityResponse = {
 
 export function conflictMessage(): FormMessage {
   const text = ENV.context_asset_string.startsWith('group')
-    ? I18n.t('There is already a page in this group with this title. Hitting save will create a duplicate.')
-    : I18n.t('There is already a page in this course with this title. Hitting save will create a duplicate.')
+    ? I18n.t(
+        'There is already a page in this group with this title. Hitting save will create a duplicate.',
+      )
+    : I18n.t(
+        'There is already a page in this course with this title. Hitting save will create a duplicate.',
+      )
   return {
     type: 'hint',
     text: (
       <Flex as="div" alignItems="center" gap="x-small">
-        <IconWarningSolid data-testid="warning-icon" color="warning"/>
-        <Text size="small">
-          {text}
-        </Text>
-        <Alert
-          variant="warning"
-          liveRegion={() => document.getElementById('flash_screenreader_holder')!}
-          screenReaderOnly={true}
-        >
-          {text}
-        </Alert>
+        <IconWarningSolid data-testid="warning-icon" color="warning" />
+        <Text size="small">{text}</Text>
       </Flex>
     ),
   }
@@ -69,7 +62,10 @@ export function generateUrl(title: string, currentPageId?: string): string {
   return url.toString()
 }
 
-export async function fetchTitleAvailability(title: string, currentPageId?: string): Promise<boolean> {
+export async function fetchTitleAvailability(
+  title: string,
+  currentPageId?: string,
+): Promise<boolean> {
   const response = await fetch(generateUrl(title, currentPageId))
   const {conflict, errors}: AvailabilityResponse = await response.json()
   if (response.ok) {
@@ -82,7 +78,7 @@ export async function fetchTitleAvailability(title: string, currentPageId?: stri
 export async function checkForTitleConflict(
   title: string,
   callback: (messages: FormMessage[]) => void,
-  currentPageId?: string
+  currentPageId?: string,
 ) {
   try {
     const conflict = await fetchTitleAvailability(title, currentPageId)
