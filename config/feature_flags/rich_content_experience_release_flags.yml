@@ -192,6 +192,15 @@ precise_link_replacements:
     elements only, as opposed to all texts
   applies_to: SiteAdmin
 
+rce_a11y_resize:
+  state: hidden
+  applies_to: SiteAdmin
+  shadow: true
+  display_name: RCE Accessible Resize
+  description: |-
+    Enable the Rich Content Editor to resize editor's size in a way that is accessible.
+    This will allow users to resize editor without losing accessibility features.
+
 rce_find_replace:
   state: hidden
   display_name: Find and Replace RCE Plugin

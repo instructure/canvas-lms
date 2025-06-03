@@ -419,6 +419,7 @@ class ApplicationController < ActionController::Base
     ams_service
     files_a11y_rewrite_toggle
     files_a11y_rewrite
+    rce_a11y_resize
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
