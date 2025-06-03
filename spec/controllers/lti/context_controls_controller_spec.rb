@@ -81,7 +81,7 @@ describe Lti::ContextControlsController, type: :request do
     let(:params) { { per_page: 15 } }
 
     context "with multiple deployments and lots of controls" do
-      let(:deployment) { deployment_for(account) }
+      let(:account_deployment) { ContextExternalTool.find_by(lti_registration: registration, context: account) }
       let(:course) { course_model(account:) }
       let(:subaccount) { account_model(parent_account: account) }
       let(:course_deployment) { deployment_for(course) }
@@ -93,7 +93,7 @@ describe Lti::ContextControlsController, type: :request do
           other_subaccount = account_model(parent_account: account)
           subaccount_course = course_model(account: other_subaccount)
 
-          control_for(deployment, account_course)
+          control_for(account_deployment, account_course)
           control_for(course_deployment, other_subaccount)
           control_for(subaccount_deployment, subaccount_course)
         end
@@ -104,10 +104,10 @@ describe Lti::ContextControlsController, type: :request do
         expect(response).to be_successful
         # Expecting 2 deployments for a total of 15 controls
         expect(response_json.length).to eq(2)
-        expect(response_json[0]["id"]).to eq(deployment.id)
+        expect(response_json[0]["id"]).to eq(account_deployment.id)
         expect(response_json[0]["context_controls"].length).to eq(10)
         response_json[0]["context_controls"].each do |control|
-          expect(control["deployment_id"]).to eq(deployment.id)
+          expect(control["deployment_id"]).to eq(account_deployment.id)
         end
         expect(response_json[1]["id"]).to eq(course_deployment.id)
         expect(response_json[1]["context_controls"].length).to eq(5)
