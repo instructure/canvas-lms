@@ -1148,7 +1148,7 @@ class FilesController < ApplicationController
     @attachment.filename = params[:name]
     @attachment.display_name = params[:display_name] || params[:name]
     @attachment.size = params[:size]
-    @attachment.content_type = params[:content_type]
+    @attachment.content_type = process_content_type_from_instfs(params[:content_type], @attachment.display_name)
     @attachment.instfs_uuid = params[:instfs_uuid]
     @attachment.md5 = params[:sha512]
     @attachment.modified_at = Time.zone.now
@@ -1741,5 +1741,21 @@ class FilesController < ApplicationController
     Canvas::Security.decode_jwt(sf_verifier, ignore_expiration: true)[:skip_redirect_for_inline_content].blank?
   rescue Canvas::Security::InvalidToken
     true
+  end
+
+  # inst-fs recently started identifying files by content via the NPM file-type package,
+  # which doesn't support legacy Office files and detects them as their binary container type
+  def process_content_type_from_instfs(content_type, display_name)
+    case content_type
+    when "application/x-cfb"
+      case File.extname(display_name)
+      when ".doc" then "application/msword"
+      when ".xls" then "application/excel"
+      when ".ppt" then "application/mspowerpoint"
+      else content_type
+      end
+    else
+      content_type
+    end
   end
 end
