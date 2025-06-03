@@ -869,6 +869,77 @@ describe Types::AssignmentType do
     end
   end
 
+  describe "provisional_grading_locked" do
+    let(:moderated_assignment) do
+      course.assignments.create!(
+        title: "moderated assignment",
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: teacher
+      )
+    end
+
+    let(:moderated_assignment_type) { GraphQLTypeTester.new(moderated_assignment, current_user: teacher) }
+
+    context "when user is a student" do
+      it "returns false" do
+        student_type = GraphQLTypeTester.new(moderated_assignment, current_user: student)
+        expect(student_type.resolve("provisionalGradingLocked")).to be false
+      end
+    end
+
+    context "when user is the final grader" do
+      it "returns false" do
+        expect(moderated_assignment_type.resolve("provisionalGradingLocked")).to be false
+      end
+    end
+
+    context "when grades are published" do
+      it "returns false" do
+        other_teacher = teacher_in_course(course:, active_all: true).user
+        other_teacher_type = GraphQLTypeTester.new(moderated_assignment, current_user: other_teacher)
+
+        moderated_assignment.update!(grades_published_at: Time.now.utc)
+
+        expect(other_teacher_type.resolve("provisionalGradingLocked")).to be false
+      end
+    end
+
+    context "when user is already a provisional grader" do
+      it "returns false" do
+        other_teacher = teacher_in_course(course:, active_all: true).user
+        other_teacher_type = GraphQLTypeTester.new(moderated_assignment, current_user: other_teacher)
+
+        moderated_assignment.moderation_graders.create!(user: other_teacher, anonymous_id: "abcde")
+
+        expect(other_teacher_type.resolve("provisionalGradingLocked")).to be false
+      end
+    end
+
+    context "when grader limit is not reached" do
+      it "returns false" do
+        other_teacher = teacher_in_course(course:, active_all: true).user
+        other_teacher_type = GraphQLTypeTester.new(moderated_assignment, current_user: other_teacher)
+
+        expect(other_teacher_type.resolve("provisionalGradingLocked")).to be false
+      end
+    end
+
+    context "when grader limit is reached" do
+      it "returns true for a teacher who is not already a grader" do
+        grader1 = teacher_in_course(course:, active_all: true).user
+        grader2 = teacher_in_course(course:, active_all: true).user
+        extra_teacher = teacher_in_course(course:, active_all: true).user
+
+        moderated_assignment.moderation_graders.create!(user: grader1, anonymous_id: "abcde")
+        moderated_assignment.moderation_graders.create!(user: grader2, anonymous_id: "fghij")
+
+        extra_teacher_type = GraphQLTypeTester.new(moderated_assignment, current_user: extra_teacher)
+        expect(extra_teacher_type.resolve("provisionalGradingLocked")).to be true
+      end
+    end
+  end
+
   describe "restrictQuantitativeData" do
     it "returns false when restrictQuantitativeData is off" do
       expect(

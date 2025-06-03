@@ -196,6 +196,17 @@ module Types
       assignment.restrict_quantitative_data?(current_user, check_extra_permissions)
     end
 
+    field :provisional_grading_locked, Boolean, "Indicates if the user is locked out of provisional grading for this assignment.", null: false
+    def provisional_grading_locked
+      return false unless assignment.moderated_grader_limit_reached?
+      return false unless assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
+      return false if assignment.grades_published?
+      return false if assignment.permits_moderation?(current_user)
+      return false if assignment.provisional_moderation_graders.where(user: current_user).exists?
+
+      true
+    end
+
     def self.overridden_field(field_name, description)
       field field_name, DateTimeType, description, null: true do
         argument :apply_overrides, Boolean, <<~MD, required: false, default_value: true
