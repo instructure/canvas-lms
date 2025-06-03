@@ -1058,6 +1058,10 @@ class GradebooksController < ApplicationController
     track_speedgrader_metrics(platform_speedgrader_param_enabled, platform_speedgrader_feature_enabled)
     platform_service_speedgrader_enabled = platform_speedgrader_param_enabled && platform_speedgrader_feature_enabled
 
+    if @assignment.moderated_grading? && !@assignment.user_is_moderation_grader?(@current_user)
+      @assignment.create_moderation_grader(@current_user, occupy_slot: false)
+    end
+
     if platform_service_speedgrader_enabled
       InstStatsd::Statsd.distributed_increment("speedgrader.platform_service.load")
       @page_title = t("SpeedGrader")
@@ -1098,10 +1102,6 @@ class GradebooksController < ApplicationController
                          "SpeedGrader is enabled only for published content.")
       redirect_to polymorphic_url([@context, @assignment])
       return
-    end
-
-    if @assignment.moderated_grading? && !@assignment.user_is_moderation_grader?(@current_user)
-      @assignment.create_moderation_grader(@current_user, occupy_slot: false)
     end
 
     @can_comment_on_submission = !@context.completed? && !@context_enrollment.try(:completed?)
