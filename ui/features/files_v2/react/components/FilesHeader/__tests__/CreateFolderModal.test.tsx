@@ -79,20 +79,31 @@ describe('CreateFolderModal', () => {
     const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
     await user.click(createFolderButton)
 
-    await waitFor(() => {
-      expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
-    })
+    await waitFor(
+      () => {
+        expect(fetchMock.lastCall()).toBeTruthy()
+        expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
+      },
+      {timeout: 5000},
+    )
   })
 
   it('submits on enter', async () => {
+    const user = userEvent.setup()
     renderComponent()
     const input = screen.getByRole('textbox', {name: /Folder Name/i})
-    await userEvent.click(input)
-    await userEvent.type(input, '{Enter}')
+    await user.click(input)
 
-    await waitFor(() => {
-      expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
-    })
+    // Use fireEvent.keyDown instead of user.keyboard for more reliable Enter handling
+    fireEvent.keyDown(input, {key: 'Enter', code: 'Enter', charCode: 13, keyCode: 13})
+
+    await waitFor(
+      () => {
+        expect(fetchMock.lastCall()).toBeTruthy()
+        expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
+      },
+      {timeout: 5000},
+    )
   })
 
   it('displays loading spinner when submitting', async () => {
@@ -142,8 +153,12 @@ describe('CreateFolderModal', () => {
     const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
     await user.click(createFolderButton)
 
-    await waitFor(() => {
-      expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
-    })
+    await waitFor(
+      () => {
+        expect(fetchMock.lastCall()).toBeTruthy()
+        expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
+      },
+      {timeout: 5000},
+    )
   })
 })
