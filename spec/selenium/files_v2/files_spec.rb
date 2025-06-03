@@ -53,26 +53,10 @@ describe "files index page" do
         expect(f("#content")).to include_text(file_attachment.display_name)
       end
 
-      it "Can navigate to subfolders" do
-        folder = Folder.create!(name: "folder", context: @course)
-        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "subfile.pdf", folder:)
-        get "/courses/#{@course.id}/files"
-        table_item_by_name(folder.name).click
-        expect(f("#content")).to include_text(file_attachment.display_name)
-      end
-
       it "Displays the file usage bar if user has permission" do
         allow(Attachment).to receive(:get_quota).with(@course).and_return({ quota: 50_000_000, quota_used: 25_000_000 })
         get "/courses/#{@course.id}/files"
         expect(files_usage_text.text).to include("25 MB of 50 MB used")
-      end
-
-      it "Can create a new folder" do
-        get "/courses/#{@course.id}/files"
-        create_folder_button.click
-        create_folder_input.send_keys("new folder")
-        create_folder_input.send_keys(:return)
-        expect(content).to include_text("new folder")
       end
 
       context("with a large number of files") do

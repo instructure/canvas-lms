@@ -81,6 +81,10 @@ module FilesPage
     '[aria-label="Copy"]'
   end
 
+  def move_folder_form_selector_root(course)
+    fxpath("//button[.//span[contains(@class,'treeButton__textName') and text()='#{course}']]")
+  end
+
   def breadcrumb
     f('[aria-label="You are here:"]')
   end
