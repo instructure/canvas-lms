@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {gql} from '@apollo/client'
 import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {

@@ -17,7 +17,7 @@
  */
 
 import {z} from 'zod'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {gql} from '@apollo/client'
 

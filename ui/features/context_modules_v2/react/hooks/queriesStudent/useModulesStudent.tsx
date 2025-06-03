@@ -18,7 +18,7 @@
 
 import {useAllPages} from '@canvas/query'
 import {gql} from 'graphql-tag'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {ModulesResponse, GraphQLResult} from '../../utils/types'
 import {InfiniteData} from '@tanstack/react-query'
 

@@ -18,7 +18,7 @@
 
 import {useQuery} from '@tanstack/react-query'
 import {COURSE_PEOPLE_QUERY} from '../../graphql/Queries'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import useCoursePeopleContext from './useCoursePeopleContext'
 import {User, SortField, SortDirection} from '../../types'
 import {

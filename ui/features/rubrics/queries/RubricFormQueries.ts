@@ -18,7 +18,7 @@
 
 import {gql} from '@apollo/client'
 import qs from 'qs'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import type {RubricFormProps} from '../types/RubricForm'
 import type {Rubric, RubricAssociation} from '@canvas/rubrics/react/types/rubric'
 import {mapRubricUnderscoredKeysToCamelCase} from '@canvas/rubrics/react/utils'

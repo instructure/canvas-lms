@@ -26,7 +26,7 @@ import {
   mapRubricAssociationUnderscoredKeysToCamelCase,
 } from '../../utils'
 import type {QueryOptions} from '@tanstack/react-query'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 
 export const removeRubricFromAssignment = async (courseId: string, rubricAssociationId: string) => {
   return fetch(`/courses/${courseId}/rubric_associations/${rubricAssociationId}`, {
