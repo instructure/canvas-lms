@@ -142,8 +142,8 @@ const ImportantDates = ({
 
   const closeCalendarsModal = () => setCalendarsModalOpen(false)
 
-  const datesSkeleton = props => (
-    <div {...props}>
+  const datesSkeleton = ({key, ...otherProps}) => (
+    <div key={key} {...otherProps}>
       <LoadingSkeleton
         id="skeleton-date"
         screenReaderLabel={I18n.t('Loading Important Date')}
