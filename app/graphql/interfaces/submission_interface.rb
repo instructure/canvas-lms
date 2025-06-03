@@ -86,13 +86,6 @@ module Types
     value "asc", value: :asc
     value "desc", value: :desc
   end
-end
-
-module Interfaces::SubmissionInterface
-  include Interfaces::BaseInterface
-  include GraphQLHelpers::AnonymousGrading
-
-  description "Types for submission or submission history"
 
   class LatePolicyStatusType < Types::BaseEnum
     graphql_name "LatePolicyStatusType"
@@ -101,6 +94,13 @@ module Interfaces::SubmissionInterface
     value "extended"
     value "none"
   end
+end
+
+module Interfaces::SubmissionInterface
+  include Interfaces::BaseInterface
+  include GraphQLHelpers::AnonymousGrading
+
+  description "Types for submission or submission history"
 
   def submission
     object
@@ -270,11 +270,18 @@ module Interfaces::SubmissionInterface
 
   field :sub_assignment_submissions, [Types::SubAssignmentSubmissionType], null: true
   def sub_assignment_submissions
-    Loaders::AssociationLoader.for(Submission, :assignment).then do
-      return nil unless object.assignment.checkpoints_parent?
+    # TODO: remove this antipattern as soon as EGG-1372 is resolved
+    # data should not be created while fetching
+    # Code to use after EGG-1372 is resolved:
+    # Loaders::SubmissionLoaders::SubAssignmentSubmissionsLoader.load(object)
 
-      Loaders::AssociationLoader.for(Assignment, :sub_assignment_submissions).then do
-        object.assignment.sub_assignment_submissions.where(user_id: object.user_id)
+    load_association(:assignment).then do
+      next nil unless object.assignment.checkpoints_parent?
+
+      Loaders::AssociationLoader.for(Assignment, :sub_assignments).load(object.assignment).then do |sub_assignments|
+        sub_assignments&.map do |sub_assignment|
+          sub_assignment.find_or_create_submission(submission.user)
+        end
       end
     end
   end
@@ -290,7 +297,7 @@ module Interfaces::SubmissionInterface
         "was the grade given on the current submission (resubmission)",
         null: true
   field :late, Boolean, method: :late?
-  field :late_policy_status, LatePolicyStatusType, null: true
+  field :late_policy_status, Types::LatePolicyStatusType, null: true
   field :missing, Boolean, method: :missing?
   field :submission_type, Types::AssignmentSubmissionType, null: true
 
@@ -437,7 +444,7 @@ module Interfaces::SubmissionInterface
       )
       .map do |asset_string, data|
         Loaders::AssetStringLoader
-          .load(asset_string)
+          .load(asset_string.to_s)
           .then do |target|
             next if target.nil?
 

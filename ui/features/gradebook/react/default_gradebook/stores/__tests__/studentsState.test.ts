@@ -23,6 +23,12 @@ import PerformanceControls from '../../PerformanceControls'
 import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import {NetworkFake} from '@canvas/network/NetworkFake/index'
 import {getUsers} from '../graphql/users/getUsers'
+import {
+  getSubmissions,
+  GetSubmissionsParams,
+  Submission,
+} from '../graphql/submissions/getSubmissions'
+import {numberToLetters} from '../graphql/buildGraphQLQuery'
 
 // Helper function to validate student data loading
 const verifyStudentDataLoaded = () => {
@@ -30,7 +36,7 @@ const verifyStudentDataLoaded = () => {
   expect(store.getState().isSubmissionDataLoaded).toStrictEqual(true)
   expect(store.getState().studentIds).toMatchObject(['1101', '1102', '1103'])
   expect(store.getState().recentlyLoadedStudents).toMatchObject([{id: '1103'}])
-  expect(store.getState().recentlyLoadedSubmissions).toStrictEqual([
+  expect(store.getState().recentlyLoadedSubmissions).toMatchObject([
     {
       submissions: [
         {
@@ -97,6 +103,22 @@ jest.mock('../graphql/enrollments/getEnrollments', () => {
 
 jest.mock('../graphql/users/transformUser', () => ({
   transformUser: jest.fn(user => ({id: user._id})),
+}))
+
+jest.mock('../graphql/submissions/getSubmissions', () => {
+  const actual = jest.requireActual('../graphql/submissions/getSubmissions')
+  return {
+    ...actual,
+    getSubmissions: jest.fn(),
+  }
+})
+
+jest.mock('../graphql/submissions/transformSubmission', () => ({
+  transformSubmission: jest.fn(submission => ({
+    assignment_id: submission.assignmentId,
+    score: submission.score,
+    user_id: submission.userId,
+  })),
 }))
 
 const initialState = store.getState()
@@ -293,6 +315,30 @@ describe('#loadGraphqlStudentData()', () => {
       }
       return Promise.resolve(res)
     })
+    ;(getSubmissions as jest.Mock).mockImplementation(({userIds}: GetSubmissionsParams) => {
+      const res: Awaited<ReturnType<typeof getSubmissions>> = {course: {}}
+
+      userIds.forEach(userId => {
+        const nodes = (
+          exampleData.submissions.find(it => userId === it.user_id)?.submissions ?? []
+        ).map(it => ({
+          assignmentId: it.assignment_id,
+          score: it.score,
+          userId: it.user_id,
+        })) as unknown as Submission[]
+        if (nodes) {
+          const alias = numberToLetters(parseInt(userId, 10))
+          res.course[alias] = {
+            nodes,
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: '',
+            },
+          }
+        }
+      })
+      return Promise.resolve(res)
+    })
 
     const performanceControls = new PerformanceControls({
       studentsChunkSize: 2,
@@ -307,12 +353,6 @@ describe('#loadGraphqlStudentData()', () => {
 
     server = new FakeServer()
     server.for(urls.studentIds).respond({status: 200, body: {user_ids: exampleData.studentIds}})
-    server
-      .for(urls.submissions, {student_ids: exampleData.studentIds.slice(0, 2)})
-      .respond([{status: 200, body: exampleData.submissions.slice(0, 2)}])
-    server
-      .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
-      .respond([{status: 200, body: exampleData.submissions.slice(2, 3)}])
   })
 
   afterEach(() => {

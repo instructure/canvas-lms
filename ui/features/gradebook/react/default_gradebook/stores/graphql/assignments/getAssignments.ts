@@ -42,7 +42,7 @@ const ZGradingType = z.enum([
   'points',
 ])
 
-const ZSubmissionType = z.enum([
+export const ZSubmissionType = z.enum([
   'attendance',
   'basic_lti_launch',
   'discussion_topic',

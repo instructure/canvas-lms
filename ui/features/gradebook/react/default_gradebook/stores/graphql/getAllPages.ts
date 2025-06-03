@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {flatten} from 'lodash'
+import {mapValues} from 'lodash'
 import {NextPageInfo} from './PaginatedResult'
 
 export type GetAllPagesCallbacks<TPage, TError = unknown> = {
@@ -24,47 +24,65 @@ export type GetAllPagesCallbacks<TPage, TError = unknown> = {
   onSuccess?: (result: TPage) => Promise<void> | void
 }
 
-type GetAllPagesParams<TPage, TResult, TError = unknown> = {
-  flattenPages: (pages: TPage[]) => TResult
-  getPageInfo: (result: TPage) => NextPageInfo
-  query: (after: string) => Promise<TPage>
-} & GetAllPagesCallbacks<TPage, TError>
-
 export type GetAllPagesReturnValue<TResult> = Promise<{
   data: TResult
   onSuccessCallbacks: Promise<void>[]
   onErrorCallbacks: Promise<void>[]
 }>
 
-export const getAllPages = async <TPage, TResult, TError = unknown>({
-  flattenPages,
-  getPageInfo,
-  onError,
-  onSuccess,
-  query,
-}: GetAllPagesParams<TPage, TResult, TError>): GetAllPagesReturnValue<TResult> => {
-  let after = ''
+type GetAllPagesSingleParams<TPage, TResult, TError = unknown> = {
+  flattenPages: (pages: TPage[]) => TResult
+  getPageInfo: (result: TPage) => NextPageInfo
+  query: (after: string) => Promise<TPage>
+  isMulti?: false
+} & GetAllPagesCallbacks<TPage, TError>
+type GetAllPagesMultiParams<TPage, TResult, TError = unknown> = {
+  flattenPages: (pages: TPage[]) => TResult
+  getPageInfo: (result: TPage) => Record<string, NextPageInfo>
+  query: (after: Record<string, string | null>) => Promise<TPage>
+  isMulti: true
+} & GetAllPagesCallbacks<TPage, TError>
+
+type GetAllPagesParams<TPage, TResult, TError = unknown> =
+  | GetAllPagesSingleParams<TPage, TResult, TError>
+  | GetAllPagesMultiParams<TPage, TResult, TError>
+
+export const getAllPages = async <TPage, TResult, TError = unknown>(
+  params: GetAllPagesParams<TPage, TResult, TError>,
+): GetAllPagesReturnValue<TResult> => {
+  let singleAfter = ''
+  // empty object unless the first response arrives
+  // if there are more pages, the cursor will be set to endCursor
+  // if there are no more pages, cursor will be set to null
+  // IMPORTANT: make sure to bypass adding the subquery part if the value is null
+  let multiAfter: Record<string, string | null> = {}
+
   let hasNextPage = true
   const pages: TPage[] = []
-
   const onSuccessCallbacks: Promise<void>[] = []
   const onErrorCallbacks: Promise<void>[] = []
 
   while (hasNextPage) {
     try {
-      const res = await query(after)
+      const res = await (params.isMulti ? params.query(multiAfter) : params.query(singleAfter))
       pages.push(res)
-      const pageInfo = getPageInfo(res)
-      hasNextPage = pageInfo.hasNextPage
-      // how is endCursor null?
-      after = pageInfo.endCursor ?? ''
-      const promise = onSuccess?.(res)
+
+      if (params.isMulti) {
+        const pageInfo = params.getPageInfo(res)
+        hasNextPage = Object.values(pageInfo).some(it => it.hasNextPage)
+        multiAfter = mapValues(pageInfo, it => (it.hasNextPage ? it.endCursor : null))
+      } else {
+        hasNextPage = params.getPageInfo(res)?.hasNextPage ?? false
+        singleAfter = params.getPageInfo(res)?.endCursor ?? ''
+      }
+
+      const promise = params.onSuccess?.(res)
       if (promise) onSuccessCallbacks.push(promise)
     } catch (e) {
-      const promise = onError?.(e as TError)
+      const promise = params.onError?.(e as TError)
       if (promise) onErrorCallbacks.push(promise)
       return Promise.reject(e)
     }
   }
-  return {data: flattenPages(pages), onSuccessCallbacks, onErrorCallbacks}
+  return {data: params.flattenPages(pages), onSuccessCallbacks, onErrorCallbacks}
 }
