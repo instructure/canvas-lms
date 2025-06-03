@@ -156,6 +156,12 @@ describe Assignment do
         expect(a).to be_unsupported_in_speedgrader_2
       end
 
+      it "returns false if feature flag is enabled" do
+        Account.site_admin.enable_feature!(:moderated_grading_modernized_speedgrader)
+        a = @course.assignments.create!(moderated_grading: true, grader_count: 1)
+        expect(a).not_to be_unsupported_in_speedgrader_2
+      end
+
       it "conditionally allows moderated assignments" do
         a = @course.assignments.create!(moderated_grading: true, grader_count: 1)
         expect do

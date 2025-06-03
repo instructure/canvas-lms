@@ -3385,7 +3385,6 @@ class AbstractAssignment < ActiveRecord::Base
     return true if unsupported_grading_types.include?(grading_type)
 
     known_features = {
-      moderated: -> { moderated_grading? },
       peer: -> { peer_reviews? },
       group: -> { has_group_category? },
       group_graded_group: -> { grade_as_group? },
@@ -3395,6 +3394,11 @@ class AbstractAssignment < ActiveRecord::Base
       new_quiz: -> { quiz_lti? },
       rubric: -> { active_rubric_association? },
     }
+
+    unless Account.site_admin.feature_enabled?(:moderated_grading_modernized_speedgrader)
+      known_features[:moderated] = -> { moderated_grading? }
+    end
+
     unsupported_features = Setting.get("assignment_features_unsupported_in_sg2", "moderated").strip.split(",").map(&:to_sym).intersection(known_features.keys)
     unsupported_features.any? { |feature| known_features.fetch(feature).call }
   end
