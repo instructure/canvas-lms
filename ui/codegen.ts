@@ -30,9 +30,6 @@ const config: CodegenConfig = {
   generates: {
     './ui/shared/graphql/': {
       preset: 'client',
-      config: {
-        documentMode: 'string',
-      },
     },
   },
 }
