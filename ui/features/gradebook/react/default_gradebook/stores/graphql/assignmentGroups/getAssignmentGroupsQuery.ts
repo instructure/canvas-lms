@@ -16,9 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const GRADEBOOK_GRAPHQL_CONFIG = {
-  usersPageSize: 100, // Number of users to fetch per page in the gradebook
-  maxAssignmentRequestCount: 10, // Maximum number of assignments to request concurrently
-}
+import {gql} from '@apollo/client'
 
-export default Object.freeze(GRADEBOOK_GRAPHQL_CONFIG)
+export const GET_ASSIGNMENT_GROUPS_QUERY = gql`
+query getAssignmentGroups(
+  $after: String,
+  $courseId: ID!,
+) {
+  course(id: $courseId) {
+    assignmentGroupsConnection (
+      after: $after
+      first: 100
+    ) {
+      pageInfo{
+        hasNextPage
+        endCursor
+      }
+      nodes{
+        _id
+        name
+        position
+        groupWeight
+        sisId
+        rules {
+          dropHighest
+          dropLowest
+          neverDrop {
+            _id
+          }
+        }
+      }
+    }
+  }
+}`

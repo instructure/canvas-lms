@@ -16,9 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const GRADEBOOK_GRAPHQL_CONFIG = {
-  usersPageSize: 100, // Number of users to fetch per page in the gradebook
-  maxAssignmentRequestCount: 10, // Maximum number of assignments to request concurrently
-}
+import {AssignmentGroup as ApiAssignmentGroup} from 'api.d'
+import {AssignmentGroup} from './getAssignmentGroups'
 
-export default Object.freeze(GRADEBOOK_GRAPHQL_CONFIG)
+export const transformAssignmentGroup = (it: AssignmentGroup): ApiAssignmentGroup => ({
+  id: it._id,
+  name: it.name ?? '',
+  position: it.position ?? 0,
+  assignments: [],
+  group_weight: it.groupWeight ?? 0,
+  rules: {
+    drop_highest: it.rules?.dropHighest ?? undefined,
+    drop_lowest: it.rules?.dropLowest ?? undefined,
+    never_drop: it.rules?.neverDrop?.map(it => it._id),
+  },
+  sis_source_id: it.sisId,
+  integration_data: null,
+})

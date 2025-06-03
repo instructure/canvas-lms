@@ -173,12 +173,14 @@ export default function GradebookData(props: Props) {
     if (gradingPeriodSet) {
       fetchGradingPeriodAssignments().then(() => {
         loadAssignmentGroups({
+          useGraphQL: props.gradebookEnv.use_graphql_for_gradebook,
           hideZeroPointQuizzes: props.gradebookEnv.hide_zero_point_quizzes,
           currentGradingPeriodId,
         })
       })
     } else {
       loadAssignmentGroups({
+        useGraphQL: props.gradebookEnv.use_graphql_for_gradebook,
         hideZeroPointQuizzes: props.gradebookEnv.hide_zero_point_quizzes,
       })
     }
@@ -188,6 +190,7 @@ export default function GradebookData(props: Props) {
     fetchGradingPeriodAssignments,
     loadAssignmentGroups,
     props.gradebookEnv.hide_zero_point_quizzes,
+    props.gradebookEnv.use_graphql_for_gradebook,
   ])
 
   const reloadStudentData = useCallback(() => {

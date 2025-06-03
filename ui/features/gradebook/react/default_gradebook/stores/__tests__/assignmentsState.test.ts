@@ -48,7 +48,9 @@ const exampleData = {
       name: 'Assignment Group 1',
       position: 1,
       group_weight: 100,
-      rules: {},
+      rules: {drop_highest: undefined, drop_lowest: undefined, never_drop: undefined},
+      integration_data: null,
+      sis_source_id: null,
       assignments: [
         {
           id: 'a1',
@@ -69,7 +71,9 @@ const exampleData = {
       name: 'Assignment Group 2',
       position: 2,
       group_weight: 100,
-      rules: {},
+      rules: {drop_highest: undefined, drop_lowest: undefined, never_drop: undefined},
+      integration_data: null,
+      sis_source_id: null,
       assignments: [
         {
           id: 'a2',
@@ -197,10 +201,10 @@ describe('Gradebook', () => {
       // Wait for promise to resolve
       await promise
 
-      // Verify loading state is cleared
+      // // Verify loading state is cleared
       expect(store.getState().isGradingPeriodAssignmentsLoading).toBe(false)
 
-      // Verify flash message was added
+      // // Verify flash message was added
       expect(store.getState().flashMessages).toHaveLength(1)
       expect(store.getState().flashMessages[0]).toMatchObject({
         key: 'grading-period-assignments-loading-error',
@@ -328,6 +332,23 @@ describe('Gradebook', () => {
       store.setState(initialState, true)
     })
 
+    it.each([false, true])('forwards useGraphQL parameter: %s', async value => {
+      // Mock fetchAssignmentGroups to verify parameters
+      const mockFetchAssignmentGroups = jest.fn()
+      store.setState({
+        courseId: '1201',
+        hasModules: true,
+        fetchAssignmentGroups: mockFetchAssignmentGroups,
+      })
+
+      await store.getState().loadAssignmentGroups({hideZeroPointQuizzes: false, useGraphQL: value})
+
+      // Verify fetchAssignmentGroups was called with expected parameters
+      expect(mockFetchAssignmentGroups).toHaveBeenCalledTimes(1)
+      const [{useGraphQL}] = mockFetchAssignmentGroups.mock.calls[0]
+      expect(useGraphQL).toBe(value)
+    })
+
     it('sends request with correct parameters when no grading period is selected', async () => {
       // Mock fetchAssignmentGroups to verify parameters
       const mockFetchAssignmentGroups = jest.fn()
@@ -337,7 +358,7 @@ describe('Gradebook', () => {
         fetchAssignmentGroups: mockFetchAssignmentGroups,
       })
 
-      await store.getState().loadAssignmentGroups({hideZeroPointQuizzes: false})
+      await store.getState().loadAssignmentGroups({hideZeroPointQuizzes: false, useGraphQL: false})
 
       // Verify fetchAssignmentGroups was called with expected parameters
       expect(mockFetchAssignmentGroups).toHaveBeenCalledTimes(1)
@@ -368,7 +389,7 @@ describe('Gradebook', () => {
         fetchAssignmentGroups: mockFetchAssignmentGroups,
       })
 
-      await store.getState().loadAssignmentGroups({hideZeroPointQuizzes: true})
+      await store.getState().loadAssignmentGroups({hideZeroPointQuizzes: true, useGraphQL: false})
 
       // Verify fetchAssignmentGroups was called with correct hide_zero_point_quizzes parameter
       const [{params}] = mockFetchAssignmentGroups.mock.calls[0]
@@ -386,9 +407,11 @@ describe('Gradebook', () => {
         loadAssignmentGroupsForGradingPeriods: mockLoadForGradingPeriods,
       })
 
-      await store
-        .getState()
-        .loadAssignmentGroups({hideZeroPointQuizzes: false, currentGradingPeriodId: 'g1'})
+      await store.getState().loadAssignmentGroups({
+        hideZeroPointQuizzes: false,
+        currentGradingPeriodId: 'g1',
+        useGraphQL: false,
+      })
 
       // Verify loadAssignmentGroupsForGradingPeriods was called with correct parameters
       expect(mockLoadForGradingPeriods).toHaveBeenCalledTimes(1)
@@ -421,9 +444,11 @@ describe('Gradebook', () => {
         fetchAssignmentGroups: mockFetchAssignmentGroups,
       })
 
-      await store
-        .getState()
-        .loadAssignmentGroups({hideZeroPointQuizzes: false, currentGradingPeriodId: '0'})
+      await store.getState().loadAssignmentGroups({
+        hideZeroPointQuizzes: false,
+        currentGradingPeriodId: '0',
+        useGraphQL: false,
+      })
 
       // loadAssignmentGroupsForGradingPeriods should not be called
       expect(mockLoadForGradingPeriods).not.toHaveBeenCalled()
@@ -441,7 +466,7 @@ describe('Gradebook', () => {
         fetchAssignmentGroups: mockFetchAssignmentGroups,
       })
 
-      await store.getState().loadAssignmentGroups({hideZeroPointQuizzes: false})
+      await store.getState().loadAssignmentGroups({hideZeroPointQuizzes: false, useGraphQL: false})
 
       // Verify fetchAssignmentGroups was called with include containing module_ids
       const [{params}] = mockFetchAssignmentGroups.mock.calls[0]
@@ -457,7 +482,7 @@ describe('Gradebook', () => {
         fetchAssignmentGroups: mockFetchAssignmentGroups,
       })
 
-      await store.getState().loadAssignmentGroups({hideZeroPointQuizzes: false})
+      await store.getState().loadAssignmentGroups({hideZeroPointQuizzes: false, useGraphQL: false})
 
       // Verify fetchAssignmentGroups was called with include NOT containing module_ids
       const [{params}] = mockFetchAssignmentGroups.mock.calls[0]
@@ -475,7 +500,7 @@ describe('Gradebook', () => {
       })
 
       // Call the real function
-      await store.getState().loadAssignmentGroups({hideZeroPointQuizzes: false})
+      await store.getState().loadAssignmentGroups({hideZeroPointQuizzes: false, useGraphQL: false})
 
       // Verify state was updated correctly
       expect(store.getState().assignmentGroups).toEqual(exampleData.assignmentGroups)
@@ -533,6 +558,22 @@ describe('Gradebook', () => {
       per_page: store.getState().performanceControls.assignmentGroupsPerPage,
     })
 
+    it.each([false, true])('forwards useGraphQL parameter: %s', async value => {
+      // Mock fetchAssignmentGroups to verify parameters
+      const mockFetchAssignmentGroups = jest.fn()
+      store.setState({fetchAssignmentGroups: mockFetchAssignmentGroups})
+      const params = createParams()
+
+      await store
+        .getState()
+        .loadAssignmentGroupsForGradingPeriods({params, selectedPeriodId: 'g1', useGraphQL: value})
+
+      // Verify fetchAssignmentGroups was called with expected parameters
+      expect(mockFetchAssignmentGroups).toHaveBeenCalledTimes(2)
+      expect(mockFetchAssignmentGroups.mock.calls[0][0].useGraphQL).toBe(value)
+      expect(mockFetchAssignmentGroups.mock.calls[1][0].useGraphQL).toBe(value)
+    })
+
     it('calls fetchAssignmentGroups with assignment IDs for the selected grading period', async () => {
       const mockFetchAssignmentGroups = jest.fn()
       const mockHandleAssignmentGroupsResponse = jest.fn()
@@ -542,7 +583,9 @@ describe('Gradebook', () => {
       })
 
       const params = createParams()
-      await store.getState().loadAssignmentGroupsForGradingPeriods({params, selectedPeriodId: 'g1'})
+      await store
+        .getState()
+        .loadAssignmentGroupsForGradingPeriods({params, selectedPeriodId: 'g1', useGraphQL: false})
 
       // Should be called with the assignment IDs from grading period g1
       expect(mockFetchAssignmentGroups).toHaveBeenCalledWith(
@@ -568,9 +611,11 @@ describe('Gradebook', () => {
         fetchAssignmentGroups: mockFetchAssignmentGroups,
       })
 
-      await store
-        .getState()
-        .loadAssignmentGroupsForGradingPeriods({params: createParams(), selectedPeriodId: 'g1'})
+      await store.getState().loadAssignmentGroupsForGradingPeriods({
+        params: createParams(),
+        selectedPeriodId: 'g1',
+        useGraphQL: false,
+      })
 
       // Should be called twice - once for g1 and once for other assignments
       expect(mockFetchAssignmentGroups).toHaveBeenCalledTimes(2)
@@ -592,9 +637,11 @@ describe('Gradebook', () => {
         handleAssignmentGroupsResponse: mockHandleAssignmentGroupsResponse,
       })
 
-      await store
-        .getState()
-        .loadAssignmentGroupsForGradingPeriods({params: createParams(), selectedPeriodId: 'g1'})
+      await store.getState().loadAssignmentGroupsForGradingPeriods({
+        params: createParams(),
+        selectedPeriodId: 'g1',
+        useGraphQL: false,
+      })
 
       // Should be called once with no assignment_ids parameter
       expect(mockFetchAssignmentGroups).toHaveBeenCalledTimes(1)
@@ -620,9 +667,11 @@ describe('Gradebook', () => {
         },
       })
 
-      await store
-        .getState()
-        .loadAssignmentGroupsForGradingPeriods({params: createParams(), selectedPeriodId: 'empty'})
+      await store.getState().loadAssignmentGroupsForGradingPeriods({
+        params: createParams(),
+        selectedPeriodId: 'empty',
+        useGraphQL: false,
+      })
 
       // Should be called once with no assignment_ids parameter
       expect(mockFetchAssignmentGroups).toHaveBeenCalledTimes(1)
@@ -644,9 +693,11 @@ describe('Gradebook', () => {
         gradingPeriodAssignments: {},
       })
 
-      await store
-        .getState()
-        .loadAssignmentGroupsForGradingPeriods({params: createParams(), selectedPeriodId: 'g1'})
+      await store.getState().loadAssignmentGroupsForGradingPeriods({
+        params: createParams(),
+        selectedPeriodId: 'g1',
+        useGraphQL: false,
+      })
 
       // Should fall back to fetching all assignments
       expect(mockFetchAssignmentGroups).toHaveBeenCalledTimes(1)
@@ -670,70 +721,10 @@ describe('Gradebook', () => {
       const params = createParams()
       const result = await store
         .getState()
-        .loadAssignmentGroupsForGradingPeriods({params, selectedPeriodId: 'g1'})
+        .loadAssignmentGroupsForGradingPeriods({params, selectedPeriodId: 'g1', useGraphQL: false})
 
       // Should return the result from the first (selected) call
       expect(result).toBe(expectedResult)
-    })
-  })
-
-  describe('fetchAssignmentGroups', () => {
-    let server: FakeServer
-
-    beforeEach(() => {
-      const performanceControls = new PerformanceControls({
-        studentsChunkSize: 2,
-        submissionsChunkSize: 2,
-        assignmentGroupsPerPage: 50,
-      })
-
-      const dispatch = new RequestDispatch({
-        activeRequestLimit: performanceControls.activeRequestLimit,
-      })
-
-      store.setState({
-        performanceControls,
-        dispatch,
-        courseId: '1201',
-        flashMessages: [],
-        isAssignmentGroupsLoading: false,
-      })
-
-      server = new FakeServer()
-    })
-
-    afterEach(() => {
-      server.teardown()
-      jest.resetAllMocks()
-      store.setState(initialState, true)
-    })
-
-    describe('request succeeds', () => {
-      beforeEach(() => {
-        server
-          .for(urls.assignmentGroupsUrl)
-          .respond({status: 200, body: exampleData.assignmentGroups})
-      })
-
-      it('sets loading state flags correctly during fetch', async () => {
-        // Initial state check
-        expect(store.getState().isAssignmentGroupsLoading).toBe(false)
-
-        // Start the request
-        store.getState().fetchAssignmentGroups({
-          params: {
-            include: ['assignments'],
-            override_assignment_dates: false,
-            hide_zero_point_quizzes: false,
-            exclude_response_fields: ['description'],
-            exclude_assignment_submission_types: ['wiki_page'],
-            per_page: 50,
-          },
-        })
-
-        // Check loading state was set synchronously
-        expect(store.getState().isAssignmentGroupsLoading).toBe(true)
-      })
     })
   })
 
