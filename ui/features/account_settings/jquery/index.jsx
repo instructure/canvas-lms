@@ -536,6 +536,10 @@ $(document).ready(function () {
         $rce_container.show()
 
         try {
+          if (RichContentEditor.callOnRCE($textarea, 'exists?')) {
+            return
+          }
+
           const {json, response} = await doFetchApi({
             path: '/api/v1/acceptable_use_policy',
           })
