@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2019 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,15 +17,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 module Types
-  class TurnitinDataType < ApplicationObjectType
-    graphql_name "TurnitinData"
+  class VericiteContextType < BaseUnion
+    possible_types SubmissionType, FileType
+    def self.resolve_type(object, _)
+      case object
+      when Submission then SubmissionType
+      when Attachment then FileType
+      end
+    end
+  end
+
+  class VericiteDataType < ApplicationObjectType
     field :asset_string, String, null: false
     field :report_url, String, null: true
     field :score, Float, null: true
     field :state, String, null: true
     field :status, String, null: true
-    field :target, Types::TurnitinContextType, null: false
+    field :target, Types::VericiteContextType, null: false
   end
 end

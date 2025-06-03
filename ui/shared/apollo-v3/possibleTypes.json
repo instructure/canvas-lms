@@ -217,5 +217,9 @@
   "TurnitinContext": [
     "File",
     "Submission"
+  ],
+  "VericiteContext": [
+    "File",
+    "Submission"
   ]
 }

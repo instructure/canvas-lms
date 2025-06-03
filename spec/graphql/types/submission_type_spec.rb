@@ -923,22 +923,38 @@ describe Types::SubmissionType do
       @submission.save!
     end
 
-    it "returns turnitin_data" do
+    it "returns submission _id" do
       expect(
         submission_type.resolve("turnitinData { target { ...on Submission { _id } } }")
       ).to eq [@submission.id.to_s]
+    end
+
+    it "returns status" do
       expect(
         submission_type.resolve("turnitinData { status }")
       ).to eq [@tii_data[:status]]
+    end
+
+    it "returns score" do
       expect(
         submission_type.resolve("turnitinData { score }")
       ).to eq [@tii_data[:similarity_score]]
+    end
+
+    it "returns state" do
       expect(
         submission_type.resolve("turnitinData { state }")
       ).to eq [@tii_data[:state]]
+    end
+
+    it "returns reportUrl" do
       expect(
         submission_type.resolve("turnitinData { reportUrl }")
       ).to eq [@tii_data[:report_url]]
+    end
+
+    it "returns assetString" do
+      expect(submission_type.resolve("turnitinData { assetString }")).to eq [@submission.asset_string]
     end
   end
 
