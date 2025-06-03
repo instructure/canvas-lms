@@ -16,22 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {DocumentNode} from 'graphql'
 import {request} from 'graphql-request'
-import type {Variables} from 'graphql-request'
 import getCookie from '@instructure/get-cookie'
+import type {Variables} from 'graphql-request'
+import type {TypedDocumentNode} from '@graphql-typed-document-node/core'
 
-export interface QueryVariables extends Variables {
-  [key: string]: unknown
-}
-
-export const executeQuery = async <QueryResponse>(
-  query: DocumentNode,
-  variables: QueryVariables,
-) => {
-  return request<QueryResponse>(`${window.location.origin}/api/graphql`, query, variables, {
+export const graphqlDefaults = {
+  url: `${window.location.origin}/api/graphql`,
+  requestHeaders: {
     'X-Requested-With': 'XMLHttpRequest',
     'GraphQL-Metrics': 'true',
-    'X-CSRF-Token': getCookie('_csrf_token'),
-  })
+    'X-CSRF-Token': String(getCookie('_csrf_token')),
+  },
+}
+
+/**
+ * Execute a GraphQL query
+ * @template TResult
+ * @template TVariables
+ * @param query - The typed GraphQL query document
+ * @param variables - The variables to pass to the query
+ * @param customHeaders - Optional additional headers to include with the request
+ * @returns A promise that resolves to the response
+ */
+export const executeQuery = async <TResult, TVariables extends Variables = Variables>(
+  query: TypedDocumentNode<TResult, TVariables>,
+  variables: TVariables,
+  customHeaders?: Record<string, string>,
+): Promise<TResult> => {
+  const requestHeaders = customHeaders
+    ? {...graphqlDefaults.requestHeaders, ...customHeaders}
+    : graphqlDefaults.requestHeaders
+  return request<TResult>(graphqlDefaults.url, query, variables, requestHeaders)
 }
