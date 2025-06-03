@@ -179,7 +179,6 @@ export default function SubaccountTree(props: Props) {
   }, [])
 
   const renderRoot = useMemo(() => {
-    console.log('rendering root: ', props.rootAccount.id)
     const show = props.parentExpanded != null ? props.parentExpanded : true
     return (
       <SubaccountItem
