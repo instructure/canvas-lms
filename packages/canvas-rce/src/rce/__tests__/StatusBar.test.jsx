@@ -410,9 +410,82 @@ describe('RCE StatusBar', () => {
       const aiTextTools = false
       const isDesktop = false
       const {container} = renderStatusBar({
-        features: getStatusBarFeaturesForVariant('full', aiTextTools, isDesktop),
+        features: getStatusBarFeaturesForVariant('full', {aiTextTools, isDesktop}),
       })
       expect(container.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('accessible resize buttons', () => {
+    describe('when the a11y_resize_handlers feature is enabled', () => {
+      it('renders + and - buttons for resizing when RCE is not in full screen', () => {
+        const {container} = renderStatusBar({
+          rceIsFullscreen: false,
+          features: getStatusBarFeaturesForVariant('full', {a11yResizers: true}),
+        })
+
+        expect(
+          container.querySelector('[data-btn-id="rce-resize-increase-btn"]'),
+        ).toBeInTheDocument()
+        expect(
+          container.querySelector('[data-btn-id="rce-resize-decrease-btn"]'),
+        ).toBeInTheDocument()
+      })
+
+      it('calls the onResize callback when clicking + button', () => {
+        const onResize = jest.fn()
+        const {getByTestId} = renderStatusBar({
+          rceIsFullscreen: false,
+          features: getStatusBarFeaturesForVariant('full', {a11yResizers: true}),
+          onResize,
+        })
+
+        const increaseBtn = getByTestId('rce-resize-increase-btn')
+        increaseBtn.click()
+        expect(onResize).toHaveBeenCalled()
+      })
+
+      it('calls the onResize callback when clicking - button', () => {
+        const onResize = jest.fn()
+        const {getByTestId} = renderStatusBar({
+          rceIsFullscreen: false,
+          features: getStatusBarFeaturesForVariant('full', {a11yResizers: true}),
+          onResize,
+        })
+
+        const increaseBtn = getByTestId('rce-resize-decrease-btn')
+        increaseBtn.click()
+        expect(onResize).toHaveBeenCalled()
+      })
+
+      it('does not redner + and - buttons for resizing when RCE is in full screen', () => {
+        const {container} = renderStatusBar({
+          rceIsFullscreen: true,
+          features: getStatusBarFeaturesForVariant('full', {a11yResizers: true}),
+        })
+        expect(
+          container.querySelector('[data-btn-id="rce-resize-increase-btn"]'),
+        ).not.toBeInTheDocument()
+        expect(
+          container.querySelector('[data-btn-id="rce-resize-decrease-btn"]'),
+        ).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when the a11y_resize_handlers feature is not enabled', () => {
+      it('does not render + and - buttons for resizing when RCE is not in full screen', () => {
+        const {container} = renderStatusBar({
+          rceIsFullscreen: false,
+          features: getStatusBarFeaturesForVariant('full', {a11yResizers: false}),
+        })
+
+        expect(
+          container.querySelector('[data-btn-id="rce-resize-increase-btn"]'),
+        ).not.toBeInTheDocument()
+        expect(
+          container.querySelector('[data-btn-id="rce-resize-decrease-btn"]'),
+        ).not.toBeInTheDocument()
+      })
     })
   })
 })
