@@ -43,7 +43,7 @@ const I18n = createI18nScope('discussion_create')
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
 function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
-  const {setOnFailure} = useContext(AlertManagerContext)
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [usageRightData, setUsageRightData] = useState()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const contextType = ENV.context_is_not_group ? 'Course' : 'Group'
@@ -125,7 +125,7 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
     }
   }
 
-  const handleDiscussionTopicMutationCompletion = async discussionTopic => {
+  const handleDiscussionTopicMutationCompletion = async (discussionTopic, delayRedirection = 0) => {
     const {_id: discussionTopicId, contextType: discussionContextType, attachment} = discussionTopic
 
     if (discussionTopicId && discussionContextType) {
@@ -165,7 +165,11 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
         // Always navigate to the discussion topic on a successful mutation
         // In some scenarios, like when saving mastery paths, we don't want to navigate unless it happens via event
         if (shouldNavigateToDiscussionTopic) {
-          navigateToDiscussionTopic(discussionContextType, discussionTopicId)
+          // Use setTimeout to allow the user or the SR to read the success message before redirecting
+          setTimeout(
+            () => navigateToDiscussionTopic(discussionContextType, discussionTopicId),
+            delayRedirection,
+          )
         }
       }
     } else {
@@ -252,9 +256,12 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
         return
       }
 
-      handleDiscussionTopicMutationCompletion(updatedDiscussionTopic).catch(() => {
-        setOnFailure(I18n.t('Error updating file usage rights'))
-      })
+      // 2 seconds delay for the success message to be read by screen readers
+      handleDiscussionTopicMutationCompletion(updatedDiscussionTopic, 1600)
+        .then(() => setOnSuccess(I18n.t('Changes saved successfully'), true))
+        .catch(() => {
+          setOnFailure(I18n.t('Error updating file usage rights'))
+        })
     },
     onError: () => {
       setIsSubmitting(false)
