@@ -20,7 +20,7 @@ import {difference, chunk, keyBy, groupBy, cloneDeep, setWith as lodashSetWith} 
 import type {StoreApi} from 'zustand'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {GradebookStore} from './index'
-import {getContentForStudentIdChunk, getSubmissionsForStudents} from './studentsState.utils'
+import {getContentForStudentIdChunk} from './studentsState.utils'
 import {asJson, consumePrefetchedXHR} from '@canvas/util/xhr'
 import type {
   AssignmentUserSubmissionMap,
@@ -36,6 +36,9 @@ import {Enrollment} from './graphql/enrollments/getEnrollments'
 import {getAllEnrollments} from './graphql/enrollments/getAllEnrollments'
 import {transformEnrollment} from './graphql/enrollments/transformEnrollment'
 import GRADEBOOK_GRAPHQL_CONFIG from './graphql/config'
+import pLimit from 'p-limit'
+import {getAllSubmissions} from './graphql/submissions/getAllSubmissions'
+import {transformSubmission} from './graphql/submissions/transformSubmission'
 
 const I18n = createI18nScope('gradebook')
 
@@ -249,10 +252,8 @@ export default (
   },
 
   loadGraphqlStudentData: async () => {
-    const dispatch = get().dispatch
     const courseId = get().courseId
     const loadedStudentIds = get().studentIds
-    const performanceControls = get().performanceControls
 
     set({
       isStudentDataLoaded: false,
@@ -296,6 +297,8 @@ export default (
     }
 
     const onEnrollmentSuccess = async (users: User[], enrollments: Enrollment[]) => {
+      // 10 submissions request max concurrently
+      const limit = pLimit(GRADEBOOK_GRAPHQL_CONFIG.maxSubmissionRequestCount)
       const userIds = users.map(it => it._id)
 
       // Group enrollments by user_id into arrays, using lodash groupBy
@@ -316,23 +319,30 @@ export default (
         studentMap,
       })
 
-      const submissionRequests: Promise<void>[] = []
-
       // fetch submissions for userIds
-      const submissionRequestChunks = chunk(userIds, performanceControls.submissionsChunkSize)
+      const userIdChunks = chunk(
+        userIds,
+        GRADEBOOK_GRAPHQL_CONFIG.initialNumberOfStudentsPerSubmissionRequest,
+      )
 
-      submissionRequestChunks.forEach(submissionRequestChunkIds => {
-        const submissionRequest = getSubmissionsForStudents(
-          performanceControls.submissionsPerPage,
-          courseId,
-          submissionRequestChunkIds,
-          undefined,
-          dispatch,
-        ).then(onSubmissionPageSuccess)
+      const promises = userIdChunks.map(userIdChunk =>
+        limit(async () => {
+          const {data} = await getAllSubmissions({
+            queryParams: {userIds: userIdChunk, courseId},
+          })
+          const submissionsByUserId = groupBy(data.map(transformSubmission), 'user_id')
 
-        submissionRequests.push(submissionRequest)
-      })
-      await Promise.all(submissionRequests)
+          onSubmissionPageSuccess(
+            Object.entries(submissionsByUserId).map(([userId, submissions]) => ({
+              user_id: userId,
+              submissions,
+              // section_id is not used
+              section_id: '',
+            })),
+          )
+        }),
+      )
+      await Promise.all(promises)
     }
 
     const onUserPageSuccess = async (users: GetUsersResult) => {
