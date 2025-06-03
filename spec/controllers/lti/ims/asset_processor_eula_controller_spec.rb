@@ -43,6 +43,18 @@ describe Lti::IMS::AssetProcessorEulaController do
           expect(cet.reload.asset_processor_eula_required).to eq(eula_required)
         end
       end
+
+      context "when the request has extra fields" do
+        let(:eula_required) { eula_value }
+        let(:body_overrides) { { eulaRequired: eula_required, extraField: "Canvas should ignore this" } }
+
+        it "updates the tool's EULA requirement and returns the updated value while ignore the extra field" do
+          send_request
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body).to eq({ "eulaRequired" => eula_required })
+          expect(cet.reload.asset_processor_eula_required).to eq(eula_required)
+        end
+      end
     end
 
     context "when eulaRequired in the request body is null" do
@@ -109,6 +121,22 @@ describe Lti::IMS::AssetProcessorEulaController do
       let(:accepted) { acc }
       context "when the acceptance is successfully created and accepted is #{acc}" do
         it "creates a new EULA acceptance and returns 201 created" do
+          send_request
+          expect(response).to have_http_status(:created)
+          expect(response.parsed_body).to eq({
+                                               "userId" => user_id,
+                                               "accepted" => accepted,
+                                               "timestamp" => timestamp
+                                             })
+          expect(user.lti_asset_processor_eula_acceptances.count).to eq(1)
+          expect(user.lti_asset_processor_eula_acceptances.first.accepted).to eq(accepted)
+        end
+      end
+
+      context "when the request has extra fields and accepted is #{acc}" do
+        let(:body_overrides) { { userId: user_id, accepted:, timestamp:, extraField: "Canvas should ignore this" } }
+
+        it "creates a new EULA acceptance and returns 201 created while ignoring the extra field" do
           send_request
           expect(response).to have_http_status(:created)
           expect(response.parsed_body).to eq({
