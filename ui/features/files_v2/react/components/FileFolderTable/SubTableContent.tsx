@@ -24,6 +24,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {NoResultsFound} from './NoResultsFound'
 import {FileUploadDrop} from '../shared/FileUploadDrop'
 import {useFileManagement} from '../../contexts/FileManagementContext'
+import {pluralizeContextTypeString} from '../../../utils/fileFolderUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -63,7 +64,7 @@ const SubTableContent = ({
       <div className="FileDrag">
         <FileUploadDrop
           contextId={contextId}
-          contextType={contextType}
+          contextType={pluralizeContextTypeString(contextType)}
           currentFolder={currentFolder!}
           fileDropHeight={FILE_DROP_HEIGHT}
           handleFileDropRef={handleFileDropRef}
