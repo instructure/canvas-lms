@@ -19,29 +19,27 @@
 import './base-block-layout.css'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {PropsWithChildren} from 'react'
+import React, {PropsWithChildren} from 'react'
 
-export const BaseBlockLayout = (
-  props: PropsWithChildren<{
+export const BaseBlockLayout = React.forwardRef<
+  HTMLDivElement,
+  PropsWithChildren<{
     title: string
-  }>,
-) => {
+  }>
+>((props, ref) => {
   return (
-    <Flex
-      direction="column"
-      padding="paddingCardLarge"
-      elementRef={el => el?.classList.add('base-block-layout')}
-      gap="mediumSmall"
-    >
-      <Flex justifyItems="space-between">
-        <Flex data-header>
-          <Text data-title variant="descriptionSection">
-            {props.title}
-          </Text>
+    <div ref={ref} className="base-block-layout">
+      <Flex direction="column" padding="paddingCardLarge" gap="mediumSmall">
+        <Flex justifyItems="space-between">
+          <Flex data-header>
+            <Text data-title variant="descriptionSection">
+              {props.title}
+            </Text>
+          </Flex>
+          <Flex>{/*Menu items*/}</Flex>
         </Flex>
-        <Flex>{/*Menu items*/}</Flex>
+        <Flex>{props.children}</Flex>
       </Flex>
-      <Flex>{props.children}</Flex>
-    </Flex>
+    </div>
   )
-}
+})

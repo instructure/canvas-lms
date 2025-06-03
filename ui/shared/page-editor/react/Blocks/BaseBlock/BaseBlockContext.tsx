@@ -16,19 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BaseBlock, useIsEditMode} from './BaseBlock'
+import {createContext, useContext} from 'react'
 
-export const DummyBlock = () => {
-  return (
-    <BaseBlock title="Dummy Block">
-      <DummyBlockContent />
-    </BaseBlock>
-  )
-}
-
-const DummyBlockContent = () => {
-  const isEditMode = useIsEditMode()
-  return isEditMode
-    ? 'EDIT MODE: This is a dummy block. It serves as a placeholder for testing purposes.'
-    : 'This is a dummy block. It serves as a placeholder for testing purposes.'
-}
+export const BlockContext = createContext<{isEditMode: boolean}>({isEditMode: false})
+export const useBlockContext = () => useContext(BlockContext)
