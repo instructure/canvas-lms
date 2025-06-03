@@ -16,19 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BaseBlock, useIsEditMode} from './BaseBlock'
+import {PropsWithChildren, useRef, useState} from 'react'
+import {BaseBlockLayout} from './BaseBlockLayout'
+import {BlockContext} from './BaseBlockContext'
+import {useSetEditMode} from './useSetEditMode'
 
-export const DummyBlock = () => {
+export const BaseBlock = (
+  props: PropsWithChildren<{
+    title: string
+  }>,
+) => {
+  const [isEditMode, setIsEditMode] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useSetEditMode(ref, setIsEditMode)
+
   return (
-    <BaseBlock title="Dummy Block">
-      <DummyBlockContent />
-    </BaseBlock>
+    <BlockContext.Provider value={{isEditMode}}>
+      <BaseBlockLayout ref={ref} title={props.title}>
+        {props.children}
+      </BaseBlockLayout>
+    </BlockContext.Provider>
   )
-}
-
-const DummyBlockContent = () => {
-  const isEditMode = useIsEditMode()
-  return isEditMode
-    ? 'EDIT MODE: This is a dummy block. It serves as a placeholder for testing purposes.'
-    : 'This is a dummy block. It serves as a placeholder for testing purposes.'
 }

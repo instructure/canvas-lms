@@ -16,19 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BaseBlock, useIsEditMode} from './BaseBlock'
+import {useEffect} from 'react'
 
-export const DummyBlock = () => {
-  return (
-    <BaseBlock title="Dummy Block">
-      <DummyBlockContent />
-    </BaseBlock>
-  )
-}
+export const useSetEditMode = (ref: React.RefObject<Element>, setter: (value: boolean) => void) => {
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent | TouchEvent) => {
+      if (!ref.current) return
+      setter(ref.current.contains(event.target as Node))
+    }
 
-const DummyBlockContent = () => {
-  const isEditMode = useIsEditMode()
-  return isEditMode
-    ? 'EDIT MODE: This is a dummy block. It serves as a placeholder for testing purposes.'
-    : 'This is a dummy block. It serves as a placeholder for testing purposes.'
+    document.addEventListener('mousedown', handleDocumentClick)
+    document.addEventListener('touchstart', handleDocumentClick)
+    return () => {
+      document.removeEventListener('mousedown', handleDocumentClick)
+      document.removeEventListener('touchstart', handleDocumentClick)
+    }
+  }, [ref, setter])
 }
