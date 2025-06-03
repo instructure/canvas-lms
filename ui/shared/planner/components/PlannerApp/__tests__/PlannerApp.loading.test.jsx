@@ -30,12 +30,20 @@ const getDefaultValues = overrides => {
     moment.tz(TZ).add(2, 'day'),
   ]
   return {
-    days: days.map(d => [
+    days: days.map((d, index) => [
       d.format('YYYY-MM-DD'),
       [
         {
           dateBucketMoment: d,
+          uniqueId: `test-item-${index}`,
+          title: `Test Assignment ${index + 1}`,
+          id: `assignment-${index}`,
+          type: 'assignment',
+          date: d.toISOString(),
+          completed: false,
           context: {
+            id: 'test-course-1',
+            type: 'Course',
             color: '#5a92de',
             title: 'Test Course',
           },
