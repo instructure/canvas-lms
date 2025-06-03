@@ -2347,4 +2347,26 @@ describe FilesController do
       end
     end
   end
+
+  describe "process_content_type_from_instfs" do
+    it "fixes doc files" do
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.doc")).to eq "application/msword"
+    end
+
+    it "fixes xls files" do
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.xls")).to eq "application/excel"
+    end
+
+    it "fixes ppt files" do
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.ppt")).to eq "application/mspowerpoint"
+    end
+
+    it "leaves other CFB types alone" do
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.msi")).to eq "application/x-cfb"
+    end
+
+    it "leaves non-CFB types alone" do
+      expect(controller.send(:process_content_type_from_instfs, "application/pdf", "file.pdf")).to eq "application/pdf"
+    end
+  end
 end
