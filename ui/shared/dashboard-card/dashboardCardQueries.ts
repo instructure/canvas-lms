@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {
   LOAD_DASHBOARD_CARDS_QUERY,
   DASHBOARD_ACTIVITY_STREAM_SUMMARY_QUERY,

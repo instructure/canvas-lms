@@ -18,7 +18,7 @@
 
 import {useAllPages} from '@canvas/query'
 import {gql} from 'graphql-tag'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 

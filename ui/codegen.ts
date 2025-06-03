@@ -28,7 +28,7 @@ const config: CodegenConfig = {
   ],
   ignoreNoDocuments: true,
   generates: {
-    './ui/shared/graphql/': {
+    './ui/shared/graphql/codegen/': {
       preset: 'client',
     },
   },

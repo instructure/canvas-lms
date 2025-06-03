@@ -17,7 +17,7 @@
  */
 
 import {gql} from 'graphql-tag'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {ModuleItemsResponse, ModuleItemsGraphQLResult, ModuleItem} from '../../utils/types'
 import {useQuery} from '@tanstack/react-query'
 

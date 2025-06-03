@@ -17,7 +17,7 @@
  */
 
 import {gql} from '@apollo/client'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import type {
   RubricQueryResponse,
   DeleteRubricQueryResponse,

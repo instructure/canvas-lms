@@ -17,7 +17,7 @@
  */
 
 import {gql} from '@apollo/client'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import getCookie from '@instructure/get-cookie'
 
 export const ASSIGNMENT_RUBRIC_ASSESSMENTS_QUERY = gql`

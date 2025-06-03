@@ -28,7 +28,7 @@ import {
   COURSE_OUTCOME_PROFICIENCY_QUERY,
 } from '@canvas/outcomes/graphql/MasteryScale'
 import {useAllPages} from '@canvas/query'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const I18n = createI18nScope('MasteryScale')

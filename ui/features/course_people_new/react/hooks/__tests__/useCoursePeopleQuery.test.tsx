@@ -20,13 +20,13 @@ import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks'
 import useCoursePeopleQuery, {CoursePeopleQueryResponse, QueryProps} from '../useCoursePeopleQuery'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {DEFAULT_OPTION, DEFAULT_SORT_FIELD, DEFAULT_SORT_DIRECTION} from '../../../util/constants'
 import type {User} from '../../../types'
 
 jest.mock('../useCoursePeopleContext')
-jest.mock('@canvas/query/graphql')
+jest.mock('@canvas/graphql')
 const mockExecuteQuery = executeQuery as jest.Mock
 
 describe('useCoursePeopleQuery', () => {
