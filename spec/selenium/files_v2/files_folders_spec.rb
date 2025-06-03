@@ -25,6 +25,7 @@ describe "files index page" do
 
   before(:once) do
     Account.site_admin.enable_feature! :files_a11y_rewrite
+    Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
   end
 
   context "Folders" do
@@ -36,17 +37,15 @@ describe "files index page" do
 
       before do
         user_session @teacher
+        @teacher.set_preference(:files_ui_version, "v2")
+        @base_folder = Folder.create!(name: folder_name, context: @course)
         get "/courses/#{@course.id}/files"
-        create_folder(folder_name)
-      end
-
-      it "displays the new folder form" do
-        create_folder_button.click
-        expect(body).to contain_css(create_folder_form_selector)
       end
 
       it "creates a new folder" do
-        expect(content).to include_text(folder_name)
+        new_folder_name = "new-folder"
+        create_folder(new_folder_name)
+        expect(content).to include_text(new_folder_name)
       end
 
       it "displays all cog icon options" do
@@ -73,23 +72,74 @@ describe "files index page" do
         expect(content).to include_text('<script>alert("Hi");<_script>')
       end
 
-      it "moves a folder", priority: "1" do
+      it "moves a folder using cog menu", priority: "1" do
+        # Place the new folder into the base folder
         folder_to_move = "moved folder name"
-        create_folder(folder_to_move)
+        Folder.create!(name: folder_to_move, context: @course)
+        get "/courses/#{@course.id}/files"
         move_file_from(2, :kebab_menu)
         expect(alert).to include_text("#{folder_to_move} successfully moved to #{folder_name}")
-        get "/courses/#{@course.id}/files/folder/base%20folder"
+        table_item_by_name(@base_folder.name).click
         expect(get_item_content_files_table(1, 1)).to include(folder_to_move)
       end
 
-      it "deletes a folder from cog icon", priority: "1" do
+      it "moves multiple folder using toolbar menu", priority: "1" do
+        # Move the folders out of the base folder
+        folder_to_move1 = "move-this-folder1"
+        folder_to_move2 = "move-this-folder2"
+        @folder_to_move1 = Folder.create!(name: folder_to_move1, parent_folder: @base_folder, context: @course)
+        @folder_to_move2 = Folder.create!(name: folder_to_move2, parent_folder: @base_folder, context: @course)
+        get "/courses/#{@course.id}/files/folder/base%20folder"
+        get_row_header_files_table(1).click # select first folder
+        get_row_header_files_table(2).click # select second folder
+        toolbox_menu_button("more-button").click
+        toolbox_menu_button("move-button").click
+        move_folder_form_selector_root(@course.name).click # move all selected to root
+        move_folder_move_button.click
+        get "/courses/#{@course.id}/files"
+        expect(get_item_content_files_table(2, 1)).to include(folder_to_move1)
+        expect(get_item_content_files_table(3, 1)).to include(folder_to_move2)
+      end
+
+      it "moves a folder and a file using toolbar menu", priority: "1" do
+        # Place the new items into the base folder
+        folder_to_move = "move-this-folder"
+        file_name = "move-this-file.pdf"
+        Folder.create!(name: folder_to_move, context: @course)
+        attachment_model(content_type: "application/pdf", context: @course, display_name: file_name)
+        get "/courses/#{@course.id}/files"
+        get_row_header_files_table(3).click # select the file
+        move_file_from(2, :toolbar_menu)
+        expect(alert).to include_text("#{folder_to_move} successfully moved to #{folder_name}")
+        get "/courses/#{@course.id}/files/folder/base%20folder"
+        expect(get_item_content_files_table(1, 1)).to include(folder_to_move)
+        expect(get_item_content_files_table(2, 1)).to include(file_name)
+      end
+
+      it "deletes a folder using cog menu", priority: "1" do
         delete_file_from(1, :kebab_menu)
         expect(content).not_to contain_link(folder_name)
       end
 
-      it "deletes folder from toolbar", priority: "1" do
+      it "deletes a folder and contained file using toolbar", priority: "1" do
+        file_name = "delete-this-file.pdf"
+        attachment_model(content_type: "application/pdf", context: @course, display_name: file_name, folder: @base_folder)
+        get "/courses/#{@course.id}/files"
         delete_file_from(1, :toolbar_menu)
         expect(content).not_to contain_link(folder_name)
+        search_input.send_keys(file_name)
+        search_button.click
+        expect(content).to include_text("No results found")
+      end
+
+      it "deletes a folder and a file using toolbar", priority: "1" do
+        file_name = "delete-this-file.pdf"
+        attachment_model(content_type: "application/pdf", context: @course, display_name: file_name)
+        get "/courses/#{@course.id}/files"
+        get_row_header_files_table(1).click # select a folder
+        delete_file_from(2, :toolbar_menu) # select a file and delete all selected
+        expect(content).not_to contain_link(folder_name)
+        expect(content).not_to contain_link(file_name)
       end
 
       it "is able to create and view a new folder with uri characters" do
@@ -116,6 +166,72 @@ describe "files index page" do
         create_folder_input.send_keys(test_folder_name)
         create_folder_input.send_keys(:return)
         expect(content).to include_text("New Folder 2")
+      end
+
+      it "unpublishes and publish a folder using cloud icon", priority: "1" do
+        published_status_button.click
+        edit_item_permissions(:unpublished)
+        expect(unpublished_status_button).to be_present
+        unpublished_status_button.click
+        edit_item_permissions(:published)
+        expect(published_status_button).to be_present
+      end
+
+      it "unpublishes and publish a folder using action menu", priority: "1" do
+        action_menu_button.click
+        action_menu_item_by_name("Edit Permissions").click
+        edit_item_permissions(:available_with_link)
+        expect(link_only_status_button).to be_present
+      end
+
+      it "unpublishes and publish a folder and a file using toolbar menu", priority: "1" do
+        file_name = "edit-permission-file.pdf"
+        attachment_model(content_type: "application/pdf", context: @course, display_name: file_name)
+        get "/courses/#{@course.id}/files"
+        get_row_header_files_table(2).click # select the file
+        select_item_to_edit_from_kebab_menu(1)
+        toolbox_menu_button("edit-permissions-button").click
+        edit_item_permissions(:unpublished)
+        expect(unpublished_status_button).to be_present
+        expect(f(all_files_table_row)).not_to contain_css("[data-testid='published-button-icon']") # all items unpublished
+        toolbox_menu_button("more-button").click
+        toolbox_menu_button("edit-permissions-button").click
+        edit_item_permissions(:published)
+        expect(published_status_button).to be_present
+        expect(f(all_files_table_row)).not_to contain_css("[data-testid='unpublished-button-icon']") # all items published
+      end
+
+      context "Usage Rights" do
+        before :once do
+          @course.usage_rights_required = true
+          @course.save!
+        end
+
+        before do
+          file_name = "edit-usage-rights-file.pdf"
+          attachment_model(content_type: "application/pdf", context: @course, display_name: file_name, folder: @base_folder)
+          get "/courses/#{@course.id}/files"
+        end
+
+        it "sets usage rights on a folder and contained file using cog menu", priority: "1" do
+          action_menu_button.click
+          action_menu_item_by_name("Manage Usage Rights").click
+          set_usage_rights_in_modal(:creative_commons)
+          # a11y: focus should go back to the element that was clicked.
+          check_element_has_focus(action_menu_button)
+          get "/courses/#{@course.id}/files/folder/base%20folder"
+          verify_usage_rights_ui_updates(:creative_commons)
+        end
+
+        it "sets usage rights on a folder and contained file using toolbar menu", priority: "1" do
+          select_item_to_edit_from_kebab_menu(1)
+          toolbox_menu_button("manage-usage-rights-button").click
+          set_usage_rights_in_modal(:public_domain)
+          # a11y: focus should go back to the element that was clicked.
+          check_element_has_focus(toolbox_menu_button("more-button"))
+          get "/courses/#{@course.id}/files/folder/base%20folder"
+          verify_usage_rights_ui_updates(:public_domain)
+        end
       end
     end
   end
