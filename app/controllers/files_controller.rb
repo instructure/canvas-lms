@@ -1748,10 +1748,10 @@ class FilesController < ApplicationController
   def process_content_type_from_instfs(content_type, display_name)
     case content_type
     when "application/x-cfb"
-      case File.extname(display_name)
+      case File.extname(display_name).downcase
       when ".doc" then "application/msword"
-      when ".xls" then "application/excel"
-      when ".ppt" then "application/mspowerpoint"
+      when ".xls" then "application/vnd.ms-excel"
+      when ".ppt" then "application/vnd.ms-powerpoint"
       else content_type
       end
     else
