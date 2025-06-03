@@ -147,7 +147,8 @@ describe Lti::ContextControlsController, type: :request do
             expect(control_json).to include(
               "child_control_count" => control.child_control_count,
               "subaccount_count" => control.subaccount_count,
-              "course_count" => control.course_count
+              "course_count" => control.course_count,
+              "depth" => a_kind_of(Integer)
             )
           end
         end
@@ -218,7 +219,7 @@ describe Lti::ContextControlsController, type: :request do
           expect(deployment_json["context_controls"].map { |cc| cc["id"] }).to include(other_control.id)
         end
 
-        it "includes calculated attributes for controls" do
+        it "includes calculated attributes for a top-level control" do
           subject
 
           control_json = response_json.find { |d| d["id"] == deployment.id }["context_controls"].find { |cc| cc["id"] == control.id }
@@ -226,7 +227,22 @@ describe Lti::ContextControlsController, type: :request do
             {
               child_control_count: 1,
               subaccount_count: 1,
-              course_count: 2
+              course_count: 2,
+              depth: 0
+            }.with_indifferent_access
+          )
+        end
+
+        it "includes calculated attributes for a sub-level control" do
+          subject
+
+          control_json = response_json.find { |d| d["id"] == deployment.id }["context_controls"].find { |cc| cc["id"] == other_control.id }
+          expect(control_json).to include(
+            {
+              child_control_count: 0,
+              subaccount_count: 0,
+              course_count: 0,
+              depth: 1
             }.with_indifferent_access
           )
         end

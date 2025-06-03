@@ -134,8 +134,6 @@ class Lti::ContextControl < ActiveRecord::Base
       "#{prefix}#{context.id}."
     end
 
-    private
-
     # Get the path for a context (account or course) and the paths of all of
     # its parent accounts.
     #
@@ -158,6 +156,8 @@ class Lti::ContextControl < ActiveRecord::Base
         all_paths.push(appended_path)
       end
     end
+
+    private
 
     def query_by_paths(context:, registration: nil, deployment: nil)
       paths = self_and_all_parent_paths(context)
