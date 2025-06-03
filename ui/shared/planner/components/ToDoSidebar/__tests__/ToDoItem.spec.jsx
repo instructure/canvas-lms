@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import moment from 'moment-timezone'
 import ToDoItem from '../ToDoItem'
@@ -25,7 +24,7 @@ import ToDoItem from '../ToDoItem'
 const getDefaultProps = overrides => ({
   handleDismissClick() {},
   item: {
-    type: 'Assignment',
+    type: overrides?.type || 'Assignment',
     title: 'Introduction to Board Games',
     course_id: null,
     date: moment('2017-07-15T20:00:00-0600'),
@@ -44,50 +43,49 @@ const getDefaultProps = overrides => ({
 })
 
 it('renders assignment icon for assignments', () => {
-  const wrapper = shallow(<ToDoItem {...getDefaultProps({type: 'Assignment'})} />)
-  expect(wrapper.find('IconAssignmentLine').exists()).toBe(true)
+  const {container} = render(<ToDoItem {...getDefaultProps({type: 'Assignment'})} />)
+  expect(container.querySelector('svg[name="IconAssignment"]')).toBeInTheDocument()
 })
 
 it('renders quiz icon for quizzes', () => {
-  const wrapper = shallow(<ToDoItem {...getDefaultProps({type: 'Quiz'})} />)
-  expect(wrapper.find('IconQuizLine').exists()).toBe(true)
+  const {container} = render(<ToDoItem {...getDefaultProps({type: 'Quiz'})} />)
+  expect(container.querySelector('svg[name="IconQuiz"]')).toBeInTheDocument()
 })
 
 it('renders discussion icon for discussions', () => {
-  const wrapper = shallow(<ToDoItem {...getDefaultProps({type: 'Discussion'})} />)
-  expect(wrapper.find('IconDiscussionLine').exists()).toBe(true)
+  const {container} = render(<ToDoItem {...getDefaultProps({type: 'Discussion'})} />)
+  expect(container.querySelector('svg[name="IconDiscussion"]')).toBeInTheDocument()
 })
 
 it('renders discussion icon for discussion checkpoints', () => {
-  const wrapper = shallow(<ToDoItem {...getDefaultProps({type: 'Discussion Checkpoint'})} />)
-  expect(wrapper.find('IconDiscussionLine').exists()).toBe(true)
+  const {container} = render(<ToDoItem {...getDefaultProps({type: 'Discussion Checkpoint'})} />)
+  expect(container.querySelector('svg[name="IconDiscussion"]')).toBeInTheDocument()
 })
 
 it('renders announcement icon for announcements', () => {
-  const wrapper = shallow(<ToDoItem {...getDefaultProps({type: 'Announcement'})} />)
-  expect(wrapper.find('IconAnnouncementLine').exists()).toBe(true)
+  const {container} = render(<ToDoItem {...getDefaultProps({type: 'Announcement'})} />)
+  expect(container.querySelector('svg[name="IconAnnouncement"]')).toBeInTheDocument()
 })
 
 it('renders calendar icon for calendar events', () => {
-  const wrapper = shallow(<ToDoItem {...getDefaultProps({type: 'Calendar Event'})} />)
-  expect(wrapper.find('IconCalendarMonthLine').exists()).toBe(true)
+  const {container} = render(<ToDoItem {...getDefaultProps({type: 'Calendar Event'})} />)
+  expect(container.querySelector('svg[name="IconCalendarMonth"]')).toBeInTheDocument()
 })
 
 it('renders page icon for pages', () => {
-  const wrapper = shallow(<ToDoItem {...getDefaultProps({type: 'Page'})} />)
-  expect(wrapper.find('IconDocumentLine').exists()).toBe(true)
+  const {container} = render(<ToDoItem {...getDefaultProps({type: 'Page'})} />)
+  expect(container.querySelector('svg[name="IconDocument"]')).toBeInTheDocument()
 })
 
 it('renders peer review icon and title for peer reviews', () => {
-  const wrapper = shallow(<ToDoItem {...getDefaultProps({type: 'Peer Review'})} />)
-  expect(wrapper.find('IconPeerReviewLine').exists()).toBe(true)
-  const title = wrapper.find('.ToDoSidebarItem__Title')
-  expect(title.html()).toMatch(/Peer Review for/)
+  const {container, getByText} = render(<ToDoItem {...getDefaultProps({type: 'Peer Review'})} />)
+  expect(container.querySelector('svg[name="IconPeerReview"]')).toBeInTheDocument()
+  expect(getByText(/Peer Review for/)).toBeInTheDocument()
 })
 
 it('renders note icon for planner_notes', () => {
-  const wrapper = shallow(<ToDoItem {...getDefaultProps({type: ''})} />)
-  expect(wrapper.find('IconNoteLine').exists()).toBe(true)
+  const {container} = render(<ToDoItem {...getDefaultProps({type: ''})} />)
+  expect(container.querySelector('svg[name="IconNote"]')).toBeInTheDocument()
 })
 
 it('renders the courses short name when the item has an associated course', () => {
@@ -128,19 +126,25 @@ it('renders unique text for dismiss button', () => {
 
 it('calls the handleDismissClick prop when the dismiss X is clicked', () => {
   const handleDismissClick = jest.fn()
+  const item = {
+    type: 'Assignment',
+    title: 'Introduction to Board Games',
+    course_id: null,
+    date: moment('2017-07-15T20:00:00-0600'),
+  }
   const wrapper = render(
-    <ToDoItem {...getDefaultProps()} handleDismissClick={handleDismissClick} />,
+    <ToDoItem
+      handleDismissClick={handleDismissClick}
+      item={item}
+      courses={[
+        {id: '1', shortName: 'BGG 101'},
+        {id: '2', shortName: 'BGG 201'},
+      ]}
+    />,
   )
-  const btn = wrapper.getByTestId('todo-sidebar-item-close-button')
+  const btn = wrapper.getByRole('button', {name: /Dismiss Introduction to Board Games/i})
   fireEvent.click(btn)
-  waitFor(() => {
-    expect(handleDismissClick).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'Assignment',
-        title: 'Introduction to Board Games',
-      }),
-    )
-  })
+  expect(handleDismissClick).toHaveBeenCalledWith(item)
 })
 
 it('does not render the dismiss button when isObserving', () => {
