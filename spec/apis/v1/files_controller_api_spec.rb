@@ -541,6 +541,15 @@ describe "Files API", type: :request do
       assert_status(201)
     end
 
+    it "fixes broken content_types" do
+      params = base_params.merge(name: "file.doc", content_type: "application/x-cfb")
+      api_call(:post,
+               "/api/v1/files/capture?#{params.to_query}",
+               params.merge(controller: "files", action: "api_capture", format: "json"))
+      attachment = Attachment.where(instfs_uuid:).first
+      expect(attachment.content_type).to eq "application/msword"
+    end
+
     describe "re-uploading a file" do
       before :once do
         @existing = Attachment.create!(
