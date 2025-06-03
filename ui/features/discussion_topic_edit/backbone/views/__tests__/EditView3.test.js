@@ -76,6 +76,7 @@ describe('EditView', () => {
         .get('path:/api/v1/courses/1/lti_apps/launch_definitions', {
           tools: [],
         })
+        .post('path:/api/graphql', {data: {}})
         .get('*', 200) // Catch any other requests
     })
 

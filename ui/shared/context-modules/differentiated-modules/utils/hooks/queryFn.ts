@@ -108,12 +108,21 @@ export const getSections = async ({queryKey}: {queryKey: any}) => {
   return parsedResult || []
 }
 
-export const getCourseSettings = async ({queryKey}: {queryKey: any}) => {
+export interface CourseSettings {
+  conditional_release?: boolean
+}
+
+export const getCourseSettings = async ({
+  queryKey,
+}: {queryKey: readonly unknown[]}): Promise<CourseSettings> => {
   const [, currentCourseId] = queryKey
-  const {json} = await doFetchApi<{conditional_release: boolean}>({
+  if (!currentCourseId) {
+    return {}
+  }
+  const {json} = await doFetchApi<CourseSettings>({
     path: `/api/v1/courses/${currentCourseId}/settings`,
   })
-  return json
+  return json || {}
 }
 
 export const getGroups = async ({queryKey}: {queryKey: any}) => {
