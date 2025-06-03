@@ -31,7 +31,11 @@ export const OutcomeTag = ({displayName}: OutcomeTagProps) => {
   return (
     <Tag
       text={
-        <AccessibleContent alt={I18n.t('Outcome Name')}>
+        <AccessibleContent
+          alt={I18n.t('Outcome: %{displayName}', {
+            displayName,
+          })}
+        >
           <Text>
             {I18n.t('%{displayName}', {
               displayName,
