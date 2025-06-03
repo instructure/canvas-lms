@@ -83,7 +83,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
             <ModuleHeaderStatusIcon progression={progression} />
           ) : null}
         </Flex.Item>
-        <Flex.Item shouldGrow margin="0 0 0 small">
+        <Flex.Item shouldGrow shouldShrink margin="0 0 0 small">
           <Flex justifyItems="space-between" direction="column">
             <Flex.Item>
               <Flex gap="small" alignItems="center" justifyItems="end">
