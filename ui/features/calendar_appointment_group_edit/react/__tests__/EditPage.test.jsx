@@ -22,9 +22,13 @@ import {render, waitFor, fireEvent, screen as testScreen} from '@testing-library
 import EditPage from '../EditPage'
 import axios from '@canvas/axios'
 import MessageParticipantsDialog from '@canvas/calendar/jquery/MessageParticipantsDialog'
+import {assignLocation} from '@canvas/util/globalUtils'
 
 jest.mock('@canvas/axios')
 jest.mock('@canvas/calendar/jquery/MessageParticipantsDialog')
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 // Mock jQuery dialog and form methods
 $.fn.dialog = jest.fn()
@@ -137,13 +141,14 @@ describe('AppointmentGroup EditPage', () => {
   })
 
   describe('Delete Group', () => {
-    it('sends delete request with correct id', async () => {
+    it('sends delete request with correct id and redirects', async () => {
       axios.delete.mockResolvedValueOnce({})
       render(<EditPage {...defaultProps} />)
       const deleteButton = await testScreen.findByText('Delete Group')
       fireEvent.click(deleteButton)
       await waitFor(() => {
         expect(axios.delete).toHaveBeenCalledWith('/api/v1/appointment_groups/1')
+        expect(assignLocation).toHaveBeenCalledWith('/calendar')
       })
     })
 
@@ -273,6 +278,16 @@ describe('AppointmentGroup EditPage', () => {
         expect($.flashError).toHaveBeenCalledWith(
           'An error occurred while saving the appointment group',
         )
+      })
+    })
+
+    it('redirects to calendar on successful save', async () => {
+      axios.put.mockResolvedValueOnce({})
+      render(<EditPage {...defaultProps} />)
+      const saveButton = testScreen.getByText('Save')
+      fireEvent.click(saveButton)
+      await waitFor(() => {
+        expect(assignLocation).toHaveBeenCalledWith('/calendar?edit_appointment_group_success=1')
       })
     })
   })
