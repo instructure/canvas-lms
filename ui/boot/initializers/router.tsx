@@ -124,6 +124,13 @@ const portalRouter = createBrowserRouter(
         />
       )}
 
+      {ENV.FEATURES.ams_service && (
+        <Route
+          path="/courses/:courseId/item_banks/*"
+          lazy={() => import('../../features/ams/react/AmsRoute')}
+        />
+      )}
+
       {accountGradingSettingsRoutes}
 
       {(window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) &&
