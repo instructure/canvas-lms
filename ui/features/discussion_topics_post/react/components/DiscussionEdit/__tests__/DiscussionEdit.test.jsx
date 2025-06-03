@@ -37,7 +37,7 @@ const defaultProps = ({
   canReplyAnonymously = false,
   discussionAnonymousState = null,
   isAnnouncement = false,
-  quotedEntry = {message: true},
+  quotedEntry = {message: 'quoted message'},
 } = {}) => ({
   show,
   value,
