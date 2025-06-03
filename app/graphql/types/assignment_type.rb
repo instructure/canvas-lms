@@ -305,7 +305,10 @@ module Types
     field :can_unpublish, Boolean, method: :can_unpublish?, null: true
     field :due_date_required, Boolean, method: :due_date_required?, null: true
 
-    field :has_rubric, Boolean, method: :active_rubric_association?
+    field :has_rubric, Boolean, null: false
+    def has_rubric
+      Loaders::AssignmentLoaders::HasRubricLoader.load(object.id)
+    end
     field :muted, Boolean, null: true
 
     field :assignment_visibility, [ID], null: true
@@ -490,7 +493,7 @@ module Types
 
     field :post_manually, Boolean, null: true
     def post_manually
-      assignment.post_manually?
+      Loaders::AssignmentLoaders::PostManuallyLoader.load(object.id)
     end
 
     field :published, Boolean, null: true
