@@ -128,6 +128,10 @@ describe Lti::ContextControlService do
       it "does not have child controls" do
         expect(subject.dig(control.id, :child_control_count)).to eq 0
       end
+
+      it "has a depth of 0" do
+        expect(subject.dig(control.id, :depth)).to eq 0
+      end
     end
 
     context "with one account-level control" do
@@ -152,6 +156,10 @@ describe Lti::ContextControlService do
 
       it "correctly counts child controls" do
         expect(subject.dig(control.id, :child_control_count)).to eq 2
+      end
+
+      it "has a depth of 0" do
+        expect(subject.dig(control.id, :depth)).to eq 0
       end
     end
 
@@ -205,6 +213,40 @@ describe Lti::ContextControlService do
         expect(subject.dig(control3.id, :subaccount_count)).to eq control3.subaccount_count
         expect(subject.dig(control3.id, :course_count)).to eq control3.course_count
         expect(subject.dig(control3.id, :child_control_count)).to eq control3.child_control_count
+      end
+
+      it "finds the depth for all controls" do
+        expect(subject.dig(control1.id, :depth)).to eq 0
+        expect(subject.dig(control2.id, :depth)).to eq 1
+        expect(subject.dig(control3.id, :depth)).to eq 0
+      end
+    end
+
+    context "with nested subaccounts that lack controls" do
+      let!(:control) { deployment.context_controls.first }
+      # subaccount lacks a CC
+      let!(:subaccount) { account_model(name: "Subaccount", parent_account: account) }
+      # subaccount_2, inside of subaccount, also lacks a CC
+      let!(:subaccount_2) { account_model(name: "Subaccount 2", parent_account: subaccount) }
+      # subaccount_3, inside of subaccount_2, *has* a CC
+      let!(:subaccount_3) do
+        account_model(name: "Subaccount 2", parent_account: subaccount_2)
+      end
+      let!(:subaccount_3_control) do
+        Lti::ContextControl.create!(registration:, deployment:, account: subaccount_3)
+      end
+
+      let!(:subaccount_3_course) { course_model(account: subaccount_3) }
+      let!(:subaccount_3_course_control) do
+        Lti::ContextControl.create!(registration:, deployment:, course: subaccount_3_course)
+      end
+
+      let(:controls) { [control, subaccount_3_control, subaccount_3_course_control] }
+
+      it "finds the correct depths" do
+        expect(subject.dig(control.id, :depth)).to eq 0
+        expect(subject.dig(subaccount_3_control.id, :depth)).to eq 1
+        expect(subject.dig(subaccount_3_course_control.id, :depth)).to eq 2
       end
     end
   end

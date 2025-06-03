@@ -89,17 +89,32 @@ module Lti
       end
 
       unique_paths = account_controls.map { |cc| "#{cc.path}%" }.uniq
-      all_control_paths = Lti::ContextControl
-                          .where("path LIKE ANY (?)", "{#{unique_paths.join(",")}}")
-                          .where(deployment_id: account_controls.map(&:deployment_id).uniq)
-                          .active.pluck(:deployment_id, :path)
-                          .group_by(&:first) # deployment_id
-                          .transform_values { |ccs| ccs.map(&:last) } # path
+      child_paths_of_controls = group_by_deployment_id(
+        base_query_for_paths(account_controls)
+          .where("path LIKE ANY (?)", "{#{unique_paths.join(",")}}")
+      )
+
       child_control_counts = account_controls.each_with_object({}) do |control, counts|
-        deployment_paths = all_control_paths[control.deployment_id] || []
+        deployment_paths = child_paths_of_controls[control.deployment_id] || []
 
         counts[control.id] = deployment_paths.count do |path|
           path.start_with?(control.path) && path != control.path
+        end
+      end
+
+      all_possible_parent_paths = controls.map do |control|
+        Lti::ContextControl.self_and_all_parent_paths(control.account || control.course)
+      end.flatten.uniq
+
+      parent_paths_of_controls = group_by_deployment_id(
+        base_query_for_paths(controls)
+          .where(path: all_possible_parent_paths)
+      )
+      control_depths = controls.each_with_object({}) do |control, depths|
+        deployment_paths = parent_paths_of_controls[control.deployment_id] || []
+
+        depths[control.id] = deployment_paths.count do |path|
+          control.path.start_with?(path) && path != control.path
         end
       end
 
@@ -107,7 +122,8 @@ module Lti
         attrs[control.id] = {
           subaccount_count: subaccount_ids[control.account_id].size,
           course_count: course_counts[control.account_id],
-          child_control_count: child_control_counts[control.id]
+          child_control_count: child_control_counts[control.id],
+          depth: control_depths[control.id]
         }
       end
 
@@ -115,11 +131,25 @@ module Lti
         attrs[control.id] = {
           subaccount_count: 0,
           course_count: 0,
-          child_control_count: 0
+          child_control_count: 0,
+          depth: control_depths[control.id]
         }
       end
 
       attrs
+    end
+
+    def self.base_query_for_paths(controls)
+      Lti::ContextControl
+        .where(deployment_id: controls.map(&:deployment_id).uniq)
+        .active
+    end
+
+    def self.group_by_deployment_id(results)
+      results
+        .pluck(:deployment_id, :path)
+        .group_by(&:first) # deployment_id
+        .transform_values { |ccs| ccs.map(&:last) } # path
     end
   end
 
