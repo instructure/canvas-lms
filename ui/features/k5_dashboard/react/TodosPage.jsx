@@ -63,8 +63,8 @@ export const TodosPage = ({timeZone, visible, openTodosInNewTab}) => {
     [visible],
   )
 
-  const todoSkeleton = props => (
-    <div data-testid="todo-loading-skeleton" {...props}>
+  const todoSkeleton = ({key, ...otherProps}) => (
+    <div key={key} data-testid="todo-loading-skeleton" {...otherProps}>
       <LoadingSkeleton
         screenReaderLabel={I18n.t('Loading Todo Title')}
         margin="medium 0 0 large"

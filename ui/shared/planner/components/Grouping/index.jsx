@@ -149,12 +149,13 @@ export class Grouping extends Component {
     }
 
     const componentsToRender = this.renderItems(itemsToRender)
-    componentsToRender.push(
-      this.renderFacade(
-        completedItems,
-        this.props.animatableIndex * 100 + itemsToRender.length + 1,
-      ),
+    const facade = this.renderFacade(
+      completedItems,
+      this.props.animatableIndex * 100 + itemsToRender.length + 1,
     )
+    if (facade) {
+      componentsToRender.push(facade)
+    }
     return componentsToRender
   }
 
