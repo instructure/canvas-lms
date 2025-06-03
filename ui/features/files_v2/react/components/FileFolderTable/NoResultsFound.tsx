@@ -25,6 +25,7 @@ import {Heading} from '@instructure/ui-heading'
 import {List} from '@instructure/ui-list'
 import {Flex} from '@instructure/ui-flex'
 import EmptyDesert from '@canvas/images/react/EmptyDesert'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
 const I18n = createI18nScope('files_v2')
 
@@ -63,7 +64,7 @@ export const NoResultsFound = ({searchTerm}: NoResultsFoundProps) => {
         </Flex.Item>
       </Flex>
       <Alert
-        liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+        liveRegion={getLiveRegion}
         liveRegionPoliteness="assertive"
         screenReaderOnly
         data-testid="search-announcement"
