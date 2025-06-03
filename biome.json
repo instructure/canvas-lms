@@ -23,7 +23,8 @@
       "ui/shared/apollo-v3/possibleTypes.json",
       "ui/shared/graphql/fragment-masking.ts",
       "ui/shared/graphql/gql.ts",
-      "ui/shared/graphql/graphql.ts"
+      "ui/shared/graphql/graphql.ts",
+      "schema.graphql"
     ]
   },
   "formatter": {
