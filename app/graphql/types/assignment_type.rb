@@ -50,6 +50,13 @@ module Types
       Assignment::ALLOWED_GRADING_TYPES.each { |type| value(type) }
     end
 
+    class GradingRole < Types::BaseEnum
+      description "The grading role of the current user for this assignment"
+      value "moderator", "User is a moderator for the assignment"
+      value "provisional_grader", "User is a provisional grader for the assignment"
+      value "grader", "User is a standard grader for the assignment"
+    end
+
     class AssignmentPeerReviews < ApplicationObjectType
       graphql_name "PeerReviews"
       description "Settings for Peer Reviews on an Assignment"
@@ -205,6 +212,16 @@ module Types
       return false if assignment.provisional_moderation_graders.where(user: current_user).exists?
 
       true
+    end
+
+    field :grading_role, GradingRole, "The grading role of the current user for this assignment. Returns null if the user does not have sufficient grading permissions.", null: true
+    def grading_role
+      unless assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
+        return nil
+      end
+
+      role = assignment.grading_role(current_user)
+      role&.to_s
     end
 
     def self.overridden_field(field_name, description)

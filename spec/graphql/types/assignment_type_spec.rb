@@ -956,6 +956,44 @@ describe Types::AssignmentType do
     end
   end
 
+  describe "grading_role" do
+    context "when user does not have grading permissions" do
+      it "returns nil" do
+        expect(assignment_type.resolve("gradingRole")).to be_nil
+      end
+    end
+
+    context "when user has grading permissions" do
+      let(:moderated_assignment) do
+        course.assignments.create!(
+          title: "moderated assignment",
+          moderated_grading: true,
+          grader_count: 2,
+          final_grader: teacher
+        )
+      end
+
+      let(:moderated_assignment_type) { GraphQLTypeTester.new(moderated_assignment, current_user: teacher) }
+
+      it "returns 'moderator' when user is the final grader and grades are not published" do
+        expect(moderated_assignment_type.resolve("gradingRole")).to eq "moderator"
+      end
+
+      it "returns 'provisional_grader' when user is not the final grader and grades are not published" do
+        other_teacher = teacher_in_course(course:, active_all: true).user
+        other_teacher_assignment_type = GraphQLTypeTester.new(moderated_assignment, current_user: other_teacher)
+
+        expect(other_teacher_assignment_type.resolve("gradingRole")).to eq "provisional_grader"
+      end
+
+      it "returns 'grader' when grades are published" do
+        moderated_assignment.update!(grades_published_at: Time.now.utc)
+
+        expect(moderated_assignment_type.resolve("gradingRole")).to eq "grader"
+      end
+    end
+  end
+
   describe "restrictQuantitativeData" do
     it "returns false when restrictQuantitativeData is off" do
       expect(
