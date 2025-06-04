@@ -99,7 +99,10 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
       props.updateExportState,
     )
     if (props.setExportManager) {
-      props.setExportManager(exportManager.current)
+      // Use setTimeout to ensure setState is called after component is mounted
+      setTimeout(() => {
+        props.setExportManager(exportManager.current || undefined)
+      }, 0)
     }
 
     const {lastExport} = props
