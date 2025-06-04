@@ -21,6 +21,9 @@ import {HorizonAccount} from '../HorizonAccount'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 jest.mock('@canvas/do-fetch-api-effect')
+jest.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: jest.fn(),
+}))
 
 describe('HorizonAccount', () => {
   const setup = (propOverrides = {}) => {
