@@ -19,27 +19,30 @@
 import React from 'react'
 import fetchMock from 'fetch-mock'
 import {statusColors} from '../../constants/colors'
-import {render, within} from '@testing-library/react'
+import {render, within, cleanup} from '@testing-library/react'
 import StatusesModal from '../StatusesModal'
 import store from '../../stores/index'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
-
-const originalState = store.getState()
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('Statuses Modal', () => {
-  let oldEnv: typeof ENV.FEATURES
+  const originalState = store.getState()
+
   beforeEach(() => {
     fetchMock.mock('*', 200)
-    oldEnv = ENV.FEATURES
-    ENV.FEATURES = {
-      extended_submission_state: true,
-    }
+    fakeENV.setup({
+      FEATURES: {
+        extended_submission_state: true,
+      },
+    })
   })
+
   afterEach(() => {
+    cleanup() // Clean up any rendered components
     store.setState(originalState, true)
     fetchMock.restore()
-    ENV.FEATURES = oldEnv
+    fakeENV.teardown()
   })
 
   it('renders heading', () => {
@@ -78,7 +81,7 @@ describe('Statuses Modal', () => {
     const onClose = jest.fn()
     const afterUpdateStatusColors = jest.fn()
 
-    render(
+    const {getByRole} = render(
       <StatusesModal
         onClose={onClose}
         colors={statusColors({})}
@@ -86,9 +89,12 @@ describe('Statuses Modal', () => {
       />,
     )
 
-    const {getByRole} = within(document.body)
+    // Find the close button by its text content
+    const closeButton = getByRole('button', {name: /Done/i})
+    expect(closeButton).toBeInTheDocument()
 
-    await userEvent.click(getByRole('button', {name: /Close/i}))
+    // Click the button and verify onClose was called
+    await userEvent.click(closeButton)
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 })
