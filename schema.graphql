@@ -4531,6 +4531,7 @@ type GroupMembership implements LegacyIDInterface & Timestamped {
   """
   _id: ID!
   createdAt: DateTime
+  group: Group!
   state: GroupMembershipState!
   updatedAt: DateTime
   user: User
