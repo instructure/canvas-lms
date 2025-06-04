@@ -17,27 +17,25 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import {NotificationBadge, NewActivityIndicator} from '../index'
 
 it('renders an indicator', () => {
-  const wrapper = shallow(
+  const {container} = render(
     <NotificationBadge>
       <NewActivityIndicator title="blah" itemIds={['first', 'second']} />
     </NotificationBadge>,
   )
-  expect(wrapper.find('div')).toHaveLength(1)
-  expect(wrapper.find('style')).toHaveLength(1)
-  // The child should exist but may be wrapped by animatable HOC
-  expect(wrapper.children()).toHaveLength(2) // style + div
-  const contentDiv = wrapper.find('div').first()
-  expect(contentDiv.children()).toHaveLength(1) // should have the NewActivityIndicator
+  expect(container.querySelectorAll('style')).toHaveLength(1)
+  const contentDiv = container.querySelector('.NotificationBadge-styles__activityIndicator')
+  expect(contentDiv).toBeInTheDocument()
+  expect(contentDiv.children).toHaveLength(1)
 })
 
 it('renders an empty div when no children', () => {
-  const wrapper = shallow(<NotificationBadge>{null}</NotificationBadge>)
-  expect(wrapper.find('div')).toHaveLength(1)
-  expect(wrapper.find('NewActivityIndicator')).toHaveLength(0)
-  expect(wrapper.find('style')).toHaveLength(1)
-  expect(wrapper.find('div').children()).toHaveLength(0)
+  const {container} = render(<NotificationBadge>{null}</NotificationBadge>)
+  expect(container.querySelectorAll('style')).toHaveLength(1)
+  const contentDiv = container.querySelector('.NotificationBadge-styles__activityIndicator')
+  expect(contentDiv).toBeInTheDocument()
+  expect(contentDiv.children).toHaveLength(0)
 })
