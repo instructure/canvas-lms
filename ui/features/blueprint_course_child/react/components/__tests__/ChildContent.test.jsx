@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {shallow} from 'enzyme'
 import ChildContent from '../ChildContent'
 import getSampleData from '@canvas/blueprint-courses/getSampleData'
 
@@ -34,16 +33,17 @@ describe('ChildContent app', () => {
   })
 
   test('renders the ChildContent component', () => {
-    const tree = shallow(<ChildContent {...defaultProps()} />)
-    const node = tree.find('.bcc__wrapper')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<ChildContent {...defaultProps()} />)
+    const node = container.querySelector('.bcc__wrapper')
+    expect(node).toBeInTheDocument()
   })
 
   test('clearRoutes removes blueprint path', () => {
     const props = defaultProps()
     props.routeTo = jest.fn()
-    const tree = shallow(<ChildContent {...props} />)
-    const instance = tree.instance()
+    const ref = React.createRef()
+    render(<ChildContent {...props} ref={ref} />)
+    const instance = ref.current
     instance.clearRoutes()
     expect(props.routeTo).toHaveBeenCalledWith('#!/blueprint')
   })
@@ -51,8 +51,9 @@ describe('ChildContent app', () => {
   test('showChangeLog calls selectChangeLog prop with argument', () => {
     const props = defaultProps()
     props.selectChangeLog = jest.fn()
-    const tree = shallow(<ChildContent {...props} />)
-    const instance = tree.instance()
+    const ref = React.createRef()
+    render(<ChildContent {...props} ref={ref} />)
+    const instance = ref.current
     instance.showChangeLog('5')
     expect(props.selectChangeLog).toHaveBeenCalledWith('5')
   })
@@ -60,8 +61,9 @@ describe('ChildContent app', () => {
   test('hideChangeLog calls selectChangeLog prop with null', () => {
     const props = defaultProps()
     props.selectChangeLog = jest.fn()
-    const tree = shallow(<ChildContent {...props} />)
-    const instance = tree.instance()
+    const ref = React.createRef()
+    render(<ChildContent {...props} ref={ref} />)
+    const instance = ref.current
     instance.hideChangeLog()
     expect(props.selectChangeLog).toHaveBeenCalledWith(null)
   })
