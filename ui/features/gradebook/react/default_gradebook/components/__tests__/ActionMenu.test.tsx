@@ -25,6 +25,10 @@ import GradebookExportManager from '../../../shared/GradebookExportManager'
 import ActionMenu from '../ActionMenu'
 import {getActionMenuProps} from './helpers'
 
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
+
 let props: any = {}
 
 describe('ActionMenu', () => {
