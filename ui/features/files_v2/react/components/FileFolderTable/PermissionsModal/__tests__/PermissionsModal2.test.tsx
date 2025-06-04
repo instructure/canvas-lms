@@ -128,13 +128,13 @@ describe('PermissionsModal', () => {
     // Click the save button
     await userEvent.click(screen.getByTestId('permissions-save-button'))
 
-    // Wait for the error message to appear in the component
+    // Wait for the error alert to appear and check its content
     await waitFor(() => {
-      expect(
-        screen.getByText(
-          'Selected items must have usage rights assigned before they can be published.',
-        ),
-      ).toBeInTheDocument()
+      const alert = screen.getByTestId('permissions-usage-rights-alert')
+      expect(alert).toBeInTheDocument()
+      expect(alert).toHaveTextContent(
+        'Selected items must have usage rights assigned before they can be published.',
+      )
     })
   })
 })
