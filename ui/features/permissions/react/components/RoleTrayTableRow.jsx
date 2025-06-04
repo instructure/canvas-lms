@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {bool, func, node, oneOfType, string} from 'prop-types'
+import PropTypes, {bool, func, node, oneOfType, string} from 'prop-types'
 import React from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -55,6 +55,8 @@ export default function RoleTrayTableRow({
         permissionLabel={permissionLabel}
         roleId={role.id}
         roleLabel={role.label}
+        inTray={true}
+        handleScroll={() => {}}
       />
     )
   } else {
@@ -124,8 +126,8 @@ RoleTrayTableRow.propTypes = {
   permissionLabel: string.isRequired,
   role: permissionPropTypes.role.isRequired,
   title: string.isRequired,
-  permButton: oneOfType([node, func]), // used for tests only
-  permCheckbox: oneOfType([node, func]), // used for tests only
+  permButton: oneOfType([node, func, PropTypes.elementType]), // used for tests only
+  permCheckbox: oneOfType([node, func, PropTypes.elementType]), // used for tests only
 }
 
 RoleTrayTableRow.defaultProps = {
