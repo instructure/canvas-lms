@@ -151,7 +151,7 @@ module CanvasSecurity
         end
 
         describe "via .for_user" do
-          let(:user) { double(global_id: 42) }
+          let(:user) { double(global_id: 42, uuid: "9e17836c-2b62-4d5b-b3c5-b3fbc25a31ed") }
           let(:ctx) { double(id: 47) }
           let(:host) { "example.instructure.com" }
           let(:masq_user) { double(global_id: 24) }
@@ -160,6 +160,7 @@ module CanvasSecurity
             jwt = ServicesJwt.for_user(host, user)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body[:sub]).to eq(42)
+            expect(decrypted_token_body[:user_uuid]).to eq("9e17836c-2b62-4d5b-b3c5-b3fbc25a31ed")
             expect(decrypted_token_body[:domain]).to eq("example.instructure.com")
           end
 
@@ -258,8 +259,8 @@ module CanvasSecurity
         end
 
         describe "refresh_for_user" do
-          let(:user1) { double(global_id: 42) }
-          let(:user2) { double(global_id: 43) }
+          let(:user1) { double(global_id: 42, uuid: "9e17836c-2b62-4d5b-b3c5-b3fbc25a31ed") }
+          let(:user2) { double(global_id: 43, uuid: "9e17836c-2b62-4d5b-b3c5-b3fbc25a31ee") }
           let(:host) { "testhost" }
 
           it "is invalid if jwt cannot be decoded" do
