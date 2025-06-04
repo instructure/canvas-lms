@@ -89,7 +89,7 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
         {data?.submissionStatistics?.submissionsDueThisWeekCount ||
         data?.submissionStatistics?.missingSubmissionsCount ? (
           <View as="div" margin="0 0 medium 0">
-            <Flex gap="small">
+            <Flex gap="small" wrap="wrap">
               {data?.submissionStatistics?.submissionsDueThisWeekCount > 0 ? (
                 <Flex.Item>
                   <Button
