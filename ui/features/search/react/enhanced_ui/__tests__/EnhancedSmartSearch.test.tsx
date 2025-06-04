@@ -104,6 +104,7 @@ describe('EnhancedSmartSearch', () => {
       status: 'indexing',
       progress: 75,
     })
+    fetchMock.get(SEARCH_URL, {results: []})
     const {getByTestId, queryByText, getByText} = renderSearch()
 
     expect(queryByText('Similar Results')).toBeNull()
@@ -119,6 +120,7 @@ describe('EnhancedSmartSearch', () => {
       status: 'complete',
       progress: 100,
     })
+    fetchMock.get(SEARCH_URL, {results: []})
     const {getByTestId, queryByTestId, queryByText} = renderSearch()
 
     expect(getByTestId('search-input')).toBeInTheDocument()
