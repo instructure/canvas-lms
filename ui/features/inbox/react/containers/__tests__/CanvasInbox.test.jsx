@@ -195,9 +195,10 @@ describe('CanvasInbox App Container', () => {
         await waitForApolloLoading()
 
         const listbox = await container.findByRole('listbox')
-        await waitFor(() => within(listbox).getByRole('option', {name: /Ipsum/}))
-        const option = within(listbox).getByRole('option', {name: /Ipsum/})
-        await userEvent.click(option)
+        await waitFor(() => within(listbox).getAllByRole('option', {name: /Ipsum/}))
+        const options = within(listbox).getAllByRole('option', {name: /Ipsum/})
+        expect(options).toHaveLength(4)
+        await userEvent.click(options[0])
         await waitForApolloLoading()
 
         expect(window.location.hash).toBe('#filter=type=inbox&course=course_195')
