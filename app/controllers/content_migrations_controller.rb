@@ -642,6 +642,9 @@ class ContentMigrationsController < ApplicationController
       @content_migration.migration_settings[:migration_ids_to_import] ||= {}
       @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
       @content_migration.copy_options = copy_options
+      if params[:import_immediately] && @context.try(:horizon_course?)
+        @content_migration.migration_settings[:import_immediately] = true
+      end
     else
       @content_migration.migration_settings[:import_immediately] = true
       @content_migration.copy_options = { everything: true }

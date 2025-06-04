@@ -127,7 +127,7 @@ class ContentSharesController < ApplicationController
   #
   # @returns ContentShare
   def create
-    create_params = params.permit(:content_type, :content_id)
+    create_params = params.permit(:content_type, :content_id, :include_module)
     allowed_types = %w[assignment attachment discussion_topic page quiz module module_item]
     unless create_params[:content_type] && create_params[:content_id]
       return render(json: { message: "Content type and id required" }, status: :bad_request)
@@ -147,8 +147,15 @@ class ContentSharesController < ApplicationController
     content = content&.take
     return render(json: { message: "Requested share content not found" }, status: :bad_request) unless content
 
+    select = { create_params[:content_type].pluralize => [create_params[:content_id]] }
+
+    include_module = Canvas::Plugin.value_to_boolean(create_params[:include_module])
+    if content_type == ContentTag && include_module && content.context.try(:horizon_course?)
+      select[:modules] = [content.context_module_id]
+    end
+
     export_params = ActionController::Parameters.new(skip_notifications: true,
-                                                     select: { create_params[:content_type].pluralize => [create_params[:content_id]] },
+                                                     select:,
                                                      export_type: ContentExport::COMMON_CARTRIDGE)
     export = create_content_export_from_api(export_params, content.context, @current_user)
     return unless export.instance_of?(ContentExport)

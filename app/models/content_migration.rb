@@ -574,6 +574,14 @@ class ContentMigration < ActiveRecord::Base
     migration_settings[:migration_ids_to_import][:copy][asset_type][mig_id] = "1"
   end
 
+  def import_module?(mig_id)
+    import_object?("context_modules", mig_id) || import_object?("modules", mig_id)
+  end
+
+  def import_module_item?(mig_id)
+    import_object?("module_items", mig_id)
+  end
+
   def is_set?(option)
     Canvas::Plugin.value_to_boolean option
   end

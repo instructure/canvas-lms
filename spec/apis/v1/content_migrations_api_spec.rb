@@ -429,6 +429,43 @@ describe ContentMigrationsController, type: :request do
       expect(migration.migration_settings[:source_course_id]).to eql @course.id
     end
 
+    context "in a horizon course" do
+      before do
+        @course.account.enable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: true)
+      end
+
+      it "queues immediately with copy and import_immediately params" do
+        p = Canvas::Plugin.new("hi")
+        allow(p).to receive(:default_settings).and_return({ "worker" => "CCWorker", "valid_contexts" => ["Course"] }.with_indifferent_access)
+        allow(Canvas::Plugin).to receive(:find).and_return(p)
+        @post_params.delete :pre_attachment
+        @post_params[:import_immediately] = true
+        @post_params[:copy] = { all_module_items: true }
+        json = api_call(:post, @migration_url, @params, @post_params)
+        migration = ContentMigration.find json["id"]
+        expect(migration.import_immediately?).to be true
+      end
+    end
+
+    context "not in a horizon course" do
+      before do
+        @course.update!(horizon_course: false)
+      end
+
+      it "ignores import_immediately param" do
+        p = Canvas::Plugin.new("hi")
+        allow(p).to receive(:default_settings).and_return({ "worker" => "CCWorker", "valid_contexts" => ["Course"] }.with_indifferent_access)
+        allow(Canvas::Plugin).to receive(:find).and_return(p)
+        @post_params.delete :pre_attachment
+        @post_params[:import_immediately] = true
+        @post_params[:copy] = { all_module_items: true }
+        json = api_call(:post, @migration_url, @params, @post_params)
+        migration = ContentMigration.find json["id"]
+        expect(migration.import_immediately?).to be false
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 

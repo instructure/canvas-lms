@@ -175,6 +175,10 @@ module Importers
           Importers::LtiResourceLinkImporter.process_migration(data, migration)
           Importers::CoursePaceImporter.process_migration(data, migration)
 
+          if migration.context.try(:horizon_course?)
+            Importers::ContentTagImporter.process_migration(data, migration)
+          end
+
           everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
 
           if (everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])) && !(migration.should_skip_import? "all_course_settings")
