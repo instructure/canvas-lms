@@ -389,6 +389,13 @@ module Types
       normalize_recipients(recipients: course_observers_observing_recipients_ids, context_code:)
     end
 
+    field :group_memberships, [GroupMembershipType], null: false do
+      argument :filter, Types::UserGroupMembershipsFilterInputType, required: false
+    end
+    def group_memberships(filter: {})
+      Loaders::UserLoaders::GroupMembershipsLoader.for(filter:).load(object.id)
+    end
+
     # TODO: deprecate this
     #
     # we should probably have some kind of top-level field called `self` or

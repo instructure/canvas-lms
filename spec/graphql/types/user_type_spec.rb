@@ -685,6 +685,24 @@ describe Types::UserType do
     end
   end
 
+  context "groupMemberships" do
+    before(:once) do
+      @group_category_a = @course.group_categories.create!(name: "Test Category A", non_collaborative: true)
+      @group_category_b = @course.group_categories.create!(name: "Test Category B", non_collaborative: false)
+      @group_a = @course.groups.create!(name: "Group A", group_category: @group_category_a)
+      @group_b = @course.groups.create!(name: "Group B", group_category: @group_category_b)
+
+      @gm1 = @group_a.add_user(@student)
+      @gm2 = @group_b.add_user(@student)
+    end
+
+    it "returns group memberships for the user" do
+      expect(
+        user_type.resolve("groupMemberships { group { _id } }")
+      ).to match_array [@gm1.group.id.to_s, @gm2.group.id.to_s]
+    end
+  end
+
   context "notificationPreferences" do
     it "returns the users notification preferences" do
       Notification.delete_all

@@ -9621,6 +9621,7 @@ type User implements LegacyIDInterface & Node & Timestamped {
     last: Int
   ): GroupConnection
   firstName: HtmlEncodedString
+  groupMemberships(filter: UserGroupMembershipsFilterInput): [GroupMembership!]!
 
   """
   **NOTE**: this only returns groups for the currently logged-in user.
@@ -9741,6 +9742,23 @@ type UserEdge {
   The item at the end of the edge.
   """
   node: User
+}
+
+input UserGroupMembershipsFilterInput {
+  """
+  Only return group memberships in the specified group course ids
+  """
+  groupCourseId: [ID!]
+
+  """
+  Only return group memberships with the specified group workflow states
+  """
+  groupState: [GroupState!]
+
+  """
+  Only return group memberships with the specified workflow states
+  """
+  state: [GroupMembershipState!]
 }
 
 type ValidationError {
