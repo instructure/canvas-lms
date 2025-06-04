@@ -1491,6 +1491,38 @@ describe "Users API", type: :request do
       expect(json.length).to eq 1
       expect(response.headers["Link"]).to_not include("rel=\"next\"")
     end
+
+    it "does bookmarked pagination when sorting by id" do
+      @account = Account.default
+      3.times { |x| user_with_pseudonym(name: "testuser #{x}") }
+      account_admin_user
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@account.id}/users?search_term=testuser&sort=id&per_page=1",
+                      { controller: "users",
+                        action: "api_index",
+                        format: "json",
+                        account_id: @account.id.to_param,
+                        search_term: "testuser",
+                        per_page: "1",
+                        sort: "id" })
+      expect(json.map { |user| user["name"] }).to eq ["testuser 0"]
+
+      links = Api.parse_pagination_links(response.headers["Link"])
+      next_link = links.detect { |link| link[:rel] == "next" }
+      expect(next_link["page"]).to start_with "bookmark:"
+
+      json = api_call(:get,
+                      next_link[:uri].to_s,
+                      { controller: "users",
+                        action: "api_index",
+                        format: "json",
+                        account_id: @account.id.to_param,
+                        search_term: "testuser",
+                        per_page: "1",
+                        sort: "id",
+                        page: next_link["page"] })
+      expect(json.map { |user| user["name"] }).to eq ["testuser 1"]
+    end
   end
 
   describe "user account creation" do

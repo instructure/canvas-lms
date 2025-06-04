@@ -178,6 +178,13 @@ modules_perf:
     Improves modules page performance on courses with a large number of modules or module items.
   applies_to: Account
 
+modules_page_rewrite_student_view:
+  state: hidden
+  display_name: Modules Page Rewrite Student View
+  description: |-
+    If enabled, the modules page will use the new modules page rewrite on student view.
+  applies_to: Course
+
 create_wiki_page_mastery_path_overrides:
   state: hidden
   display_name: In MasteryPaths Create AssignmentOverrides on WikiPages Instead of Creating a Hidden Assignment
@@ -200,9 +207,15 @@ create_external_apps_side_tray_overrides:
 
 use_dyslexic_font:
   state: hidden
-  shadow: true
   display_name: Use a dyslexia friendly font
   description: |-
     When enabled, this setting replaces the default font in Canvas with OpenDyslexic,
     an open source font created to help increase readability for readers with dyslexia.
   applies_to: User
+
+wiki_page_mastery_path_no_assignment_group:
+  state: hidden
+  display_name: In MasteryPaths WikiPages Hidden Assignment has not Assignment Group
+  description: |-
+    In WikiPage create/update annd assign to Mastery Path hidden Assignment has not an Assignment Group.
+  applies_to: SiteAdmin

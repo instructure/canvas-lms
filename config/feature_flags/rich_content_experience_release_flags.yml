@@ -53,6 +53,14 @@ buttons_and_icons_root_account:
     production:
       state: hidden
 
+canvas_content_builder:
+  applies_to: Account
+  state: hidden
+  display_name: Canvas Content Builder
+  description: |-
+    Enable the new Canvas Content Builder for the Rich Content Editor.
+  shadow: true
+
 consolidated_media_player:
   applies_to: SiteAdmin
   state: hidden

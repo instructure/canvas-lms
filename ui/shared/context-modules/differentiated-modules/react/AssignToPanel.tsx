@@ -31,6 +31,7 @@ import {generateAssignmentOverridesPayload, updateModuleUI} from '../utils/assig
 import type {AssignmentOverride} from './types'
 import LoadingOverlay from './LoadingOverlay'
 import type {FormMessage} from '@instructure/ui-form-field'
+import DifferentiationTagConverterMessage from '@canvas/differentiation-tags/react/DifferentiationTagConverterMessage/DifferentiationTagConverterMessage'
 
 const I18n = createI18nScope('differentiated_modules')
 
@@ -73,8 +74,13 @@ const CUSTOM_OPTION: Option = {
 
 const EMPTY_ASSIGNEE_ERROR_MESSAGE: FormMessage = {
   text: ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS
-      ? I18n.t('A student, section, or tag must be selected')
-      : I18n.t('A student or section must be selected'),
+    ? I18n.t('A student, section, or tag must be selected')
+    : I18n.t('A student or section must be selected'),
+  type: 'error',
+}
+
+const DIFFERENTIATION_TAG_ASSIGNEE_ERROR_MESSAGE: FormMessage = {
+  text: I18n.t('Differentiation tag overrides must be removed'),
   type: 'error',
 }
 
@@ -135,8 +141,10 @@ export default function AssignToPanel({
     defaultAssignees || [],
   )
   const [isLoading, setIsLoading] = useState(false)
+  const [refetchOverrides, setRefetchOverrides] = useState(false)
   const changed = useRef(false)
   const [suppressEmptyAssigneeError, setSuppressEmptyAssigneeError] = useState(true)
+  const [hasDifferentiationTagOverrides, setHasDifferentiationTagOverrides] = useState(false)
   const [errors, setErrors] = useState<FormMessage[]>([])
   const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
 
@@ -159,7 +167,10 @@ export default function AssignToPanel({
             path: url,
             params: {per_page: 100},
           })
-          if (response.json.length === 0) return
+          if (response.json.length === 0) {
+            setSelectedAssignees([])
+            return
+          }
           allResponses.push(response.json)
           url = response.link?.next?.url || null
         }
@@ -183,6 +194,7 @@ export default function AssignToPanel({
             })
           }
           if (override.group !== undefined && override.group.non_collaborative === true) {
+            setHasDifferentiationTagOverrides(true)
             const groupId = `tag-${override.group.id}`
             overrideOptions.push({
               id: groupId,
@@ -207,7 +219,7 @@ export default function AssignToPanel({
     }
     !isLoading && fetchAllOverrides()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [refetchOverrides])
 
   const visibleErrors = errors.filter(error => {
     // hide empty assignee error on initial load
@@ -253,6 +265,14 @@ export default function AssignToPanel({
     if (selectedOption === CUSTOM_OPTION.value && selectedAssignees.length === 0) {
       newErrors.push(EMPTY_ASSIGNEE_ERROR_MESSAGE)
     }
+    if (!ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS) {
+      if (selectedAssignees.some(assignee => assignee.id.startsWith('tag-'))) {
+        newErrors.push(DIFFERENTIATION_TAG_ASSIGNEE_ERROR_MESSAGE)
+        setHasDifferentiationTagOverrides(true)
+      } else {
+        setHasDifferentiationTagOverrides(false)
+      }
+    }
     setErrors(newErrors)
   }, [selectedAssignees, selectedOption])
 
@@ -265,6 +285,14 @@ export default function AssignToPanel({
       <LoadingOverlay showLoadingOverlay={isLoading} mountNode={mountNodeRef.current} />
       <Flex.Item padding="medium medium small" size={bodyHeight}>
         <Flex direction="column">
+          {!ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides && (
+            <DifferentiationTagConverterMessage
+              courseId={courseId}
+              learningObjectId={moduleId}
+              learningObjectType="module"
+              onFinish={() => setRefetchOverrides(true)}
+            />
+          )}
           <Flex.Item>
             <Text>{I18n.t('By default, this module is visible to everyone.')}</Text>
           </Flex.Item>

@@ -20,22 +20,11 @@
 module DataFixup::AddLtiIdToUsers
   def self.run
     User.where(lti_id: nil).find_ids_in_batches(batch_size: 10_000) do |batch|
-      updates = batch.map { |id| [id, SecureRandom.uuid] }
-      sql_updates = updates.map { |v| "(#{v.first},'#{v.last}')" }.join(",")
-
-      User.connection.select_values(update_sql(sql_updates))
+      updates = batch.index_with { SecureRandom.uuid }
+      User.all.update_many(updates, :lti_id)
 
       delay = Setting.get("lti_id_datafixup_delay", "0").to_i
       sleep(delay) if delay > 0
     end
-  end
-
-  def self.update_sql(sql_updates)
-    <<~SQL.squish
-      UPDATE #{User.quoted_table_name} AS t
-      SET lti_id = x.lti_id
-      FROM (VALUES #{sql_updates}) AS x(id, lti_id)
-      WHERE t.id=x.id
-    SQL
   end
 end

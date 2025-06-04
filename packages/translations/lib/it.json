@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "La prima intestazione su una pagina deve essere H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "I contenuti seguenti sono forniti dal partner"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Il materiale è nel dominio pubblico"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Il materiale è soggetto a eccezioni, per es. l’uso equo, il diritto di citare o altre in base alle leggi applicabili sul diritto d’autore"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "I contenuti precedenti sono forniti dal partner"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "L’editor html sicuro non è accessibile dalla tastiera. Premere Maiusc+O per aprire l’editor html non elaborato."

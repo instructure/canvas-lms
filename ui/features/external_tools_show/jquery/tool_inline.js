@@ -119,20 +119,6 @@ ready(() => {
   const $window = $(window)
   const toolResizer = new ToolLaunchResizer(tool_height)
 
-  const $external_content_info_alerts = $tool_content_wrapper.find(
-    '.before_external_content_info_alert, .after_external_content_info_alert',
-  )
-
-  $external_content_info_alerts.on('focus', function () {
-    $tool_content_wrapper.find('iframe').css('border', '2px solid #2B7ABC')
-    $(this).removeClass('screenreader-only-tool')
-  })
-
-  $external_content_info_alerts.on('blur', function () {
-    $tool_content_wrapper.find('iframe').css('border', 'none')
-    $(this).addClass('screenreader-only-tool')
-  })
-
   const is_full_screen = $('body').hasClass('ic-full-screen-lti-tool')
 
   if (!is_full_screen) {
@@ -148,12 +134,6 @@ ready(() => {
 
         if (!$tool_content_wrapper.data('height_overridden')) {
           if (is_full_screen) {
-            // divs from app/views/lti/_lti_message.html.erb that usually have 1px
-            const div_before_iframe =
-              document.querySelector('div.before_external_content_info_alert')?.offsetHeight || 0
-            const div_after_iframe =
-              document.querySelector('div.after_external_content_info_alert')?.offsetHeight || 0
-
             // header#mobile-header
             //   hidden when screen width > 768px
             //   see app/stylesheets/base/_ic_app_header.scss
@@ -161,8 +141,7 @@ ready(() => {
             const mobile_header_height =
               document.querySelector('header#mobile-header')?.offsetHeight || 0
 
-            tool_height =
-              window.innerHeight - mobile_header_height - div_before_iframe - div_after_iframe
+            tool_height = window.innerHeight - mobile_header_height
 
             toolResizer.resize_tool_content_wrapper(tool_height, $tool_content_wrapper, true)
           } else {

@@ -227,6 +227,7 @@ export default class CourseItemRow extends Component {
           {this.props.selectable && (
             <div className="ic-item-row__select-col">
               <Checkbox
+                data-testid="select-announcement-checkbox"
                 defaultChecked={this.props.defaultSelected}
                 onChange={this.onSelectChanged}
                 label={<ScreenReaderContent>{this.props.title}</ScreenReaderContent>}

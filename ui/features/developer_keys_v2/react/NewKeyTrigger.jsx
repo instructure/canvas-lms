@@ -41,15 +41,18 @@ export default class DeveloperKeyModalTrigger extends React.Component {
 
   triggerButton() {
     return (
-      <Button
-        data-pendo="add-developer-key-button"
-        color="primary"
-        elementRef={this.props.setAddKeyButtonRef}
-        renderIcon={IconPlusLine}
-      >
-        <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
-        {I18n.t('Developer Key')}
-      </Button>
+      <div>
+        <Button
+          data-pendo="add-developer-key-button"
+          id="add-developer-key-button"
+          color="primary"
+          elementRef={this.props.setAddKeyButtonRef}
+          renderIcon={IconPlusLine}
+        >
+          <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
+          {I18n.t('Developer Key')}
+        </Button>
+      </div>
     )
   }
 

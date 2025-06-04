@@ -18,7 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# These methods are mixed into the classes that can be considered a "context".
+# These methods are mixed into the classes that can be considered a "context"
+# EXCEPT for CourseSection.
 # See Context::CONTEXT_TYPES below.
 module Context
   CONTEXT_TYPES = %i[Account Course CourseSection User Group].freeze

@@ -603,7 +603,7 @@ describe "student planner" do
       Timecop.freeze(Time.zone.today) do
         @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: "here is a message", user: @teacher)
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
-        f("#allow_todo_date").click
+        f("label[for='allow_todo_date']").click
         wait_for_ajaximations
         replace_content(f('input[name="todo_date"]'), format_date_for_view(Time.zone.now).to_s, tab_out: true)
         expect_new_page_load { submit_form(".form-actions") }

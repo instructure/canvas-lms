@@ -24,7 +24,9 @@ export const COURSE_PEOPLE_QUERY = gql`
     $searchTerm: String,
     $enrollmentRoleIds: [ID!],
     $sortField: CourseUsersSortFieldType!,
-    $sortDirection: CourseUsersSortDirectionType
+    $sortDirection: CourseUsersSortDirectionType,
+    $enrollmentsSortField: EnrollmentsSortFieldType!,
+    $enrollmentsSortDirection: EnrollmentsSortDirectionType
   ) {
     course(id: $courseId) {
       usersConnection(
@@ -47,7 +49,11 @@ export const COURSE_PEOPLE_QUERY = gql`
           loginId
           enrollments(
             courseId: $courseId,
-            excludeConcluded: true
+            excludeConcluded: true,
+            sort: {
+              field: $enrollmentsSortField,
+              direction: $enrollmentsSortDirection
+            }
           ) {
             _id
             type

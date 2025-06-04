@@ -17,7 +17,7 @@
  */
 
 import {SyntheticEvent, useCallback, useEffect, useState} from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../../../utils/apiUtils'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
@@ -93,7 +93,7 @@ const ModulePositionPicker = ({
 
   useEffect(() => {
     setIsLoading(true)
-    doFetchApi<ModuleItem[]>({
+    doFetchApiWithAuthCheck<ModuleItem[]>({
       path: `/api/v1/courses/${courseId}/modules/${moduleId}/items`,
     })
       .then(response => response.json)
@@ -102,7 +102,11 @@ const ModulePositionPicker = ({
         setModuleItems(items)
         setError(null)
       })
-      .catch(() => {
+      .catch(error => {
+        if (error instanceof UnauthorizedError) {
+          window.location.href = '/login'
+          return
+        }
         setError(I18n.t('Error retrieving module items'))
       })
       .finally(() => {

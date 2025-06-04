@@ -142,6 +142,8 @@ class Attachment < ActiveRecord::Base
   before_validation :assert_attachment
   acts_as_list scope: :folder
 
+  accepts_nested_attributes_for :estimated_duration, allow_destroy: true
+
   def self.file_store_config
     # Return existing value, even if nil, as long as it's defined
     @file_store_config ||= ConfigFile.load("file_store").dup

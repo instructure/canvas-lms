@@ -569,17 +569,17 @@ class SubmissionsController < SubmissionsBaseController
           cancel_cache_buster
 
           format.html do
-            send_file(attachment.full_filename, {
-                        type: attachment.content_type_with_encoding,
-                        disposition: "inline"
-                      })
+            safe_send_file(attachment.full_filename, {
+                             type: attachment.content_type_with_encoding,
+                             disposition: "inline"
+                           })
           end
 
           format.zip do
-            send_file(attachment.full_filename, {
-                        type: attachment.content_type_with_encoding,
-                        disposition: "inline"
-                      })
+            safe_send_file(attachment.full_filename, {
+                             type: attachment.content_type_with_encoding,
+                             disposition: "inline"
+                           })
           end
         else
           inline_url = authenticated_inline_url(attachment)

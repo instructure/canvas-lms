@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {UnsuccessfulApiResult} from './ApiResult'
 import {WithApiResultState} from './WithApiResultState'
 
 /**
@@ -36,7 +37,7 @@ export const matchApiResultState =
   <A>(apiResultState: WithApiResultState<A>) =>
   <Z>(matcher: {
     data: (data: A, stale: boolean, requested?: number) => Z
-    error: (message?: string) => Z
+    error: (error: UnsuccessfulApiResult) => Z
     loading: () => Z
   }): Z => {
     if ('data' in apiResultState && typeof apiResultState.data !== 'undefined') {
@@ -46,7 +47,7 @@ export const matchApiResultState =
         'requested' in apiResultState ? apiResultState.requested : undefined,
       )
     } else if (apiResultState._type === 'error') {
-      return matcher.error(apiResultState.message)
+      return matcher.error(apiResultState.error)
     } else {
       return matcher.loading()
     }

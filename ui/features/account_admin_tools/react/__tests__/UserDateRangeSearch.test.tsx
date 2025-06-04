@@ -23,6 +23,7 @@ import UserDateRangeSearch, {type UserDateRangeSearchProps} from '../UserDateRan
 
 describe('UserDateRangeSearch', () => {
   const props: UserDateRangeSearchProps = {
+    isOpen: true,
     userName: 'John Doe',
     onSubmit: jest.fn(),
     onClose: jest.fn(),
@@ -60,16 +61,16 @@ describe('UserDateRangeSearch', () => {
 
     await waitFor(() => {
       fireEvent.input(fromDate, {target: {value: fromDateValue}})
-    }) 
+    })
     await waitFor(() => {
       fireEvent.blur(fromDate)
-    }) 
+    })
     await waitFor(() => {
       fireEvent.input(fromTime, {target: {value: fromTimeValue}})
-    }) 
+    })
     await waitFor(() => {
       fireEvent.blur(fromTime)
-    }) 
+    })
     await waitFor(() => {
       fireEvent.click(submit)
     })
@@ -88,16 +89,15 @@ describe('UserDateRangeSearch', () => {
     const submit = screen.getByLabelText('Find')
     const expectedToDate = new Date(`${toDateValue}, ${toTimeValue}`).toISOString()
 
-     
     await waitFor(() => {
       fireEvent.input(toDate, {target: {value: toDateValue}})
-    }) 
+    })
     await waitFor(() => {
       fireEvent.blur(toDate)
-    }) 
+    })
     await waitFor(() => {
       fireEvent.input(toTime, {target: {value: toTimeValue}})
-    }) 
+    })
     await waitFor(() => {
       fireEvent.blur(toTime)
     })
@@ -125,28 +125,28 @@ describe('UserDateRangeSearch', () => {
 
     await waitFor(() => {
       fireEvent.input(fromDate, {target: {value: fromDateValue}})
-    })  
+    })
     await waitFor(() => {
       fireEvent.blur(fromDate)
-    }) 
+    })
     await waitFor(() => {
       fireEvent.input(fromTime, {target: {value: timeValue}})
-    }) 
+    })
     await waitFor(() => {
       fireEvent.blur(fromTime)
-    }) 
+    })
     await waitFor(() => {
       fireEvent.input(toDate, {target: {value: toDateValue}})
-    }) 
+    })
     await waitFor(() => {
       fireEvent.blur(toDate)
-    }) 
+    })
     await waitFor(() => {
       fireEvent.input(toTime, {target: {value: timeValue}})
-    }) 
+    })
     await waitFor(() => {
       fireEvent.blur(toTime)
-    }) 
+    })
     await waitFor(() => {
       fireEvent.click(submit)
     })

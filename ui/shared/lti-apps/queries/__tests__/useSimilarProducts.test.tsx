@@ -47,7 +47,18 @@ describe('Promise resolution', () => {
           unified_tool_id: '1234',
         },
       ],
-      integration_badges: [{name: 'badge1', image_url: 'http://badge1.com', link: 'http://badge1.com', description: 'badge1'}],
+      tool_integration_configurations: {
+        lti_11: [],
+        lti_13: [],
+      },
+      integration_badges: [
+        {
+          name: 'badge1',
+          image_url: 'http://badge1.com',
+          link: 'http://badge1.com',
+          description: 'badge1',
+        },
+      ],
       screenshots: ['http://screenshot1.com'],
       terms_of_service_url: 'http://tos.com',
       privacy_policy_url: 'http://privacy.com',

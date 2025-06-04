@@ -22,7 +22,6 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import Modal from './InstuiModal'
-import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {FormMessage} from '@instructure/ui-form-field'
 

@@ -48,7 +48,7 @@ describe('GroupModal', () => {
 
   describe('Add', () => {
     it('renders join level in add group dialog for student organized group categories', () => {
-      const {getByText, queryByText} = render(
+      const {getByText, queryByLabelText} = render(
         <GroupModal
           groupCategory={groupCategory}
           group={{...group, role: 'student_organized'}}
@@ -60,11 +60,11 @@ describe('GroupModal', () => {
         />,
       )
       expect(getByText(/Joining/i)).toBeVisible()
-      expect(queryByText(/Group Membership Limit/i)).toBeNull()
+      expect(queryByLabelText(/Group Membership Limit/i)).toBeNull()
     })
 
     it('does not render join level in add group dialog for non student organized group categories', () => {
-      const {getByText, queryByText} = render(
+      const {getByLabelText, queryByText} = render(
         <GroupModal
           groupCategory={groupCategory}
           group={group}
@@ -75,7 +75,7 @@ describe('GroupModal', () => {
           onDismiss={onDismiss}
         />,
       )
-      expect(getByText(/Group Membership Limit/i)).toBeVisible()
+      expect(getByLabelText(/Group Membership Limit/i)).toBeVisible()
       expect(queryByText(/Joining/i)).toBeNull()
     })
 
@@ -390,7 +390,7 @@ describe('GroupModal', () => {
     })
 
     afterEach(() => {
-      console.error.mockRestore()  
+      console.error.mockRestore()
     })
 
     it('reports an error if the fetch fails', async () => {

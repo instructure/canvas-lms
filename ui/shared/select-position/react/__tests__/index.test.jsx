@@ -113,4 +113,37 @@ describe('SelectPosition', () => {
     fireEvent.change(getByTestId('select-sibling'), {target: {value: 'Item 3'}})
     expect(selectSibling).toHaveBeenCalled()
   })
+
+  it('handles undefined siblings prop', () => {
+    const {getByText} = render(
+      <SelectPosition
+        items={[{id: '1', title: 'Item 1', groupId: '1'}]}
+        selectedPosition={{type: 'relative'}}
+      />,
+    )
+    expect(getByText('Loading items')).toBeInTheDocument()
+  })
+
+  it('handles empty siblings array', () => {
+    const {getByText} = render(
+      <SelectPosition
+        items={[{id: '1', title: 'Item 1', groupId: '1'}]}
+        siblings={[]}
+        selectedPosition={{type: 'relative'}}
+      />,
+    )
+    expect(getByText('No items found')).toBeInTheDocument()
+  })
+
+  it('handles error siblings prop', () => {
+    const error = new Error('Failed to fetch')
+    const {getByText} = render(
+      <SelectPosition
+        items={[{id: '1', title: 'Item 1', groupId: '1'}]}
+        siblings={error}
+        selectedPosition={{type: 'relative'}}
+      />,
+    )
+    expect(getByText('Failed loading items')).toBeInTheDocument()
+  })
 })

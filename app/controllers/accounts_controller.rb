@@ -310,6 +310,9 @@ class AccountsController < ApplicationController
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
 
+  include HorizonMode
+  before_action :load_canvas_career, only: %i[show users sis_import admin_tools settings]
+
   include Api::V1::Account
   include CustomSidebarLinksHelper
   include DefaultDueTimeHelper
@@ -890,6 +893,10 @@ class AccountsController < ApplicationController
 
         @courses = @courses.merge(or_clause)
       end
+    end
+
+    if params[:copied_asset] && @account.horizon_account?
+      @courses = @courses.copied_asset(params[:copied_asset])
     end
 
     includes = Set.new(Array(params[:include]))

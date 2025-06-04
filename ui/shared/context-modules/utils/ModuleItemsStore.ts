@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ModuleId} from './types'
+
 // Shorten the names for memory cost reason
 // p => page, s => showAll
 export type ModuleData = {
-  p?: string,
+  p?: string
   s?: boolean
 }
 
@@ -51,34 +53,44 @@ export class ModuleItemsStore {
   }
 
   private getFromStorage(moduleId: string): ModuleData {
-    const existingData = localStorage.getItem(this.composeKey(moduleId))
-
     try {
+      const existingData = localStorage.getItem(this.composeKey(moduleId))
       return existingData ? JSON.parse(existingData) : {}
     } catch (_e) {
       return {}
     }
   }
 
-  setPageNumber(moduleId: string, pageNumber: string) {
-    const moduleData = this.getFromStorage(moduleId)
-    moduleData.p = pageNumber
-    this.saveToStorage(moduleId, moduleData)
+  setPageNumber(moduleId: ModuleId, pageNumber: number) {
+    const moduleIdStr = moduleId.toString()
+    const moduleData = this.getFromStorage(moduleIdStr)
+    moduleData.p = pageNumber.toString()
+    this.saveToStorage(moduleIdStr, moduleData)
   }
 
-  getPageNumber(moduleId: string): string {
-    const moduleData = this.getFromStorage(moduleId)
+  removePageNumber(moduleId: ModuleId) {
+    const moduleIdStr = moduleId.toString()
+    const moduleData = this.getFromStorage(moduleIdStr)
+    delete moduleData.p
+    this.saveToStorage(moduleIdStr, moduleData)
+  }
+
+  getPageNumber(moduleId: ModuleId): string {
+    const moduleIdStr = moduleId.toString()
+    const moduleData = this.getFromStorage(moduleIdStr)
     return moduleData.p || DEFAULT_PAGE_NUMBER
   }
 
-  setShowAll(moduleId: string, showAll: boolean) {
-    const moduleData = this.getFromStorage(moduleId)
+  setShowAll(moduleId: ModuleId, showAll: boolean) {
+    const moduleIdStr = moduleId.toString()
+    const moduleData = this.getFromStorage(moduleIdStr)
     moduleData.s = showAll
-    this.saveToStorage(moduleId, moduleData)
+    this.saveToStorage(moduleIdStr, moduleData)
   }
 
-  getShowAll(moduleId: string): boolean {
-    const moduleData = this.getFromStorage(moduleId)
+  getShowAll(moduleId: ModuleId): boolean {
+    const moduleIdStr = moduleId.toString()
+    const moduleData = this.getFromStorage(moduleIdStr)
     return moduleData.s || DEFAULT_SHOW_ALL
   }
 }

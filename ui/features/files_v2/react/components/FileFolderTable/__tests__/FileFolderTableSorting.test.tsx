@@ -49,7 +49,13 @@ describe('FileFolderTable', () => {
         const {findByTestId} = renderComponent({sort: {by: title, direction: 'asc'}, onSortChange})
         const header = await findByTestId(title)
         fireEvent.click(header.querySelector('button') as HTMLButtonElement)
-        expect(onSortChange).toHaveBeenCalledWith({ by: title, direction: 'desc' })
+        expect(onSortChange).toHaveBeenCalledWith({by: title, direction: 'desc'})
+      })
+
+      it('has correct screen reader label', async () => {
+        const {findByText} = renderComponent({sort: {by: title, direction: 'asc'}})
+        const header = await findByText('Sorted by name')
+        expect(header).toBeInTheDocument()
       })
     })
 
@@ -64,7 +70,13 @@ describe('FileFolderTable', () => {
         const {findByTestId} = renderComponent({sort: {by: title, direction: 'desc'}, onSortChange})
         const header = await findByTestId(title)
         fireEvent.click(header.querySelector('button') as HTMLButtonElement)
-        expect(onSortChange).toHaveBeenCalledWith({ by: title, direction: 'asc' })
+        expect(onSortChange).toHaveBeenCalledWith({by: title, direction: 'asc'})
+      })
+
+      it('has correct screen reader label', async () => {
+        const {findByText} = renderComponent({sort: {by: title, direction: 'desc'}})
+        const header = await findByText('Sorted by name')
+        expect(header).toBeInTheDocument()
       })
     })
 
@@ -72,7 +84,10 @@ describe('FileFolderTable', () => {
       const unsortedTitle = 'created_at'
       let findByTestId: ReturnType<typeof renderComponent>['findByTestId']
       beforeEach(() => {
-        findByTestId = renderComponent({sort: {by: title, direction: 'desc'}, onSortChange}).findByTestId
+        findByTestId = renderComponent({
+          sort: {by: title, direction: 'desc'},
+          onSortChange,
+        }).findByTestId
       })
 
       it('displays as none', async () => {
@@ -83,14 +98,16 @@ describe('FileFolderTable', () => {
       it('clicking on header calls onSortChange with ascending', async () => {
         const header = await findByTestId(unsortedTitle)
         fireEvent.click(header.querySelector('button') as HTMLButtonElement)
-        expect(onSortChange).toHaveBeenCalledWith({ by: unsortedTitle, direction: 'asc' })
+        expect(onSortChange).toHaveBeenCalledWith({by: unsortedTitle, direction: 'asc'})
       })
     })
 
     it('updates sorting screenreader alert', async () => {
-      renderComponent({ sort: { by: title, direction: 'asc' }})
+      renderComponent({sort: {by: title, direction: 'asc'}})
       // this includes sr alert and the table caption
-      const alert = await screen.findAllByText(new RegExp(`sorted by ${title} in ascending order`, 'i'))
+      const alert = await screen.findAllByText(
+        new RegExp(`sorted by ${title} in ascending order`, 'i'),
+      )
       expect(alert).toHaveLength(2)
     })
   })

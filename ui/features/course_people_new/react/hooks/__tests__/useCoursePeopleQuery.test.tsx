@@ -35,54 +35,52 @@ describe('useCoursePeopleQuery', () => {
     {...DEFAULT_OPTION, id: '2', label: 'Student', count: 2},
   ]
   const filterOptions = [DEFAULT_OPTION, ...allRoles]
-  const [defaultRole, otherRole,] = filterOptions
+  const [defaultRole, otherRole] = filterOptions
 
   const defaultProps: QueryProps = {
     courseId: '123',
     searchTerm: '',
     optionId: defaultRole.id,
     sortField: DEFAULT_SORT_FIELD,
-    sortDirection: DEFAULT_SORT_DIRECTION
+    sortDirection: DEFAULT_SORT_DIRECTION,
   }
 
   const useCoursePeopleContextMocks = {
-    allRoles
+    allRoles,
   }
 
   const defaultQueryProps = {
     courseId: '123',
+    enrollmentRoleIds: undefined,
+    enrollmentsSortDirection: 'asc',
+    enrollmentsSortField: 'section_name',
     searchTerm: '',
     sortField: DEFAULT_SORT_FIELD,
-    sortDirection: DEFAULT_SORT_DIRECTION
+    sortDirection: DEFAULT_SORT_DIRECTION,
   }
 
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        retry: false
-      }
-    }
+        retry: false,
+      },
+    },
   })
 
   const mockData: CoursePeopleQueryResponse = {
     course: {
       usersConnection: {
-        nodes: [
-          {_id: '1', name: 'Test User'} as User,
-          {_id: '2', name: 'Another User'} as User
-        ]
-      }
-    }
+        nodes: [{_id: '1', name: 'Test User'} as User, {_id: '2', name: 'Another User'} as User],
+      },
+    },
   }
 
   const filteredMockData: CoursePeopleQueryResponse = {
     course: {
       usersConnection: {
-        nodes: [
-          {_id: '1', name: 'Test User'} as User
-        ]
-      }
-    }
+        nodes: [{_id: '1', name: 'Test User'} as User],
+      },
+    },
   }
 
   const wrapper = (props: any) => (
@@ -102,10 +100,7 @@ describe('useCoursePeopleQuery', () => {
   it('fetches roster data successfully', async () => {
     mockExecuteQuery.mockResolvedValue(mockData)
 
-    const {result} = renderHook(
-      () => useCoursePeopleQuery(defaultProps),
-      {wrapper}
-    )
+    const {result} = renderHook(() => useCoursePeopleQuery(defaultProps), {wrapper})
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true)
@@ -118,10 +113,7 @@ describe('useCoursePeopleQuery', () => {
   it('handles empty response', async () => {
     mockExecuteQuery.mockResolvedValue({})
 
-    const {result} = renderHook(
-      () => useCoursePeopleQuery(defaultProps),
-      {wrapper}
-    )
+    const {result} = renderHook(() => useCoursePeopleQuery(defaultProps), {wrapper})
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true)
@@ -135,10 +127,7 @@ describe('useCoursePeopleQuery', () => {
     const error = new Error('Failed to fetch')
     mockExecuteQuery.mockRejectedValue(error)
 
-    const {result} = renderHook(
-      () => useCoursePeopleQuery(defaultProps),
-      {wrapper}
-    )
+    const {result} = renderHook(() => useCoursePeopleQuery(defaultProps), {wrapper})
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
@@ -150,30 +139,30 @@ describe('useCoursePeopleQuery', () => {
   it('includes searchTerm in query parameters', async () => {
     mockExecuteQuery.mockResolvedValue(filteredMockData)
 
-    const {result} = renderHook(
-      () => useCoursePeopleQuery({...defaultProps, searchTerm: 'Test'}),
-      {wrapper}
-    )
+    const {result} = renderHook(() => useCoursePeopleQuery({...defaultProps, searchTerm: 'Test'}), {
+      wrapper,
+    })
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), {...defaultQueryProps, searchTerm: 'Test'})
+    expect(executeQuery).toHaveBeenCalledWith(expect.anything(), {
+      ...defaultQueryProps,
+      searchTerm: 'Test',
+    })
   })
 
   it('updates data when searchTerm changes', async () => {
-    mockExecuteQuery
-      .mockResolvedValueOnce(mockData)
-      .mockResolvedValueOnce(filteredMockData)
+    mockExecuteQuery.mockResolvedValueOnce(mockData).mockResolvedValueOnce(filteredMockData)
 
-    const {result, rerender} = renderHook<{searchTerm: string}, ReturnType<typeof useCoursePeopleQuery>>(
-      ({searchTerm}) => useCoursePeopleQuery({...defaultProps, searchTerm}),
-      {
-        wrapper,
-        initialProps: {searchTerm: ''}
-      }
-    )
+    const {result, rerender} = renderHook<
+      {searchTerm: string},
+      ReturnType<typeof useCoursePeopleQuery>
+    >(({searchTerm}) => useCoursePeopleQuery({...defaultProps, searchTerm}), {
+      wrapper,
+      initialProps: {searchTerm: ''},
+    })
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true)
@@ -191,10 +180,9 @@ describe('useCoursePeopleQuery', () => {
   it('does not fetch when search term is one character', () => {
     mockExecuteQuery.mockResolvedValue(mockData)
 
-    const {result} = renderHook(
-      () => useCoursePeopleQuery({...defaultProps, searchTerm: 'a'}),
-      {wrapper}
-    )
+    const {result} = renderHook(() => useCoursePeopleQuery({...defaultProps, searchTerm: 'a'}), {
+      wrapper,
+    })
 
     expect(result.current.isFetching).toBe(false)
     expect(executeQuery).not.toHaveBeenCalled()
@@ -203,13 +191,13 @@ describe('useCoursePeopleQuery', () => {
   it('updates data when filter role changes', async () => {
     mockExecuteQuery.mockResolvedValue(mockData)
 
-    const {result, rerender} = renderHook<{optionId: string}, ReturnType<typeof useCoursePeopleQuery>>(
-      ({optionId}) => useCoursePeopleQuery({...defaultProps, optionId}),
-      {
-        wrapper,
-        initialProps: {optionId: defaultRole.id}
-      }
-    )
+    const {result, rerender} = renderHook<
+      {optionId: string},
+      ReturnType<typeof useCoursePeopleQuery>
+    >(({optionId}) => useCoursePeopleQuery({...defaultProps, optionId}), {
+      wrapper,
+      initialProps: {optionId: defaultRole.id},
+    })
 
     rerender({optionId: otherRole.id})
 
@@ -220,8 +208,8 @@ describe('useCoursePeopleQuery', () => {
     expect(executeQuery).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
-        enrollmentRoleIds: [otherRole.id]
-      })
+        enrollmentRoleIds: [otherRole.id],
+      }),
     )
   })
 })

@@ -16,23 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../utils/apiUtils'
 import {InfiniteData} from '@tanstack/react-query'
 
 export type ApiFolderItem = {id: string | number; name: string}
 export type ApiFoldersResponse = ApiFolderItem[]
-export type MultiPagePartialResponse = {json: ApiFoldersResponse, nextPage: string | null}
-export type MultiPageResponse = InfiniteData<{json: ApiFoldersResponse, nextPage: string | null }>
+export type MultiPagePartialResponse = {json: ApiFoldersResponse; nextPage: string | null}
+export type MultiPageResponse = InfiniteData<{json: ApiFoldersResponse; nextPage: string | null}>
 
-export const fetchFolders = async (folderId: string, page: string | null): Promise<MultiPagePartialResponse> => {
-  const params = { per_page: '25', page: page ?? '1' }
+export const fetchFolders = async (
+  folderId: string,
+  page: string | null,
+): Promise<MultiPagePartialResponse> => {
+  const params = {per_page: '25', page: page ?? '1'}
 
-  const {json, link} = await doFetchApi<ApiFoldersResponse>({
-    path: `/api/v1/folders/${folderId}/folders`,
-    method: 'GET',
-    params,
-  })
+  try {
+    const {json, link} = await doFetchApiWithAuthCheck<ApiFoldersResponse>({
+      path: `/api/v1/folders/${folderId}/folders`,
+      method: 'GET',
+      params,
+    })
 
-  const nextPage = link?.next?.page ?? null
-  return { json: json!, nextPage }
+    const nextPage = link?.next?.page ?? null
+    return {json: json!, nextPage}
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      window.location.href = '/login'
+    }
+    throw error
+  }
 }

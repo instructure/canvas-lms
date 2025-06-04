@@ -31,6 +31,7 @@ jest.mock('@canvas/user-settings', () => ({
 // Mock OverrideStudentStore
 jest.mock('../OverrideStudentStore', () => ({
   fetchStudentsForCourse: jest.fn(),
+  fetchStudentsByName: jest.fn(),
   getContextPath: jest.fn(() => '/courses/1'),
 }))
 

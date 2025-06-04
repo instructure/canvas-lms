@@ -67,15 +67,6 @@ CollaborationsPage.Events = {
     $('#collaboration_collaboration_type').on('change', this.onTypeChange).change()
     addDeepLinkingListener()
     handleExternalContentMessages({ready: onExternalContentReady})
-    $('.before_external_content_info_alert, .after_external_content_info_alert')
-      .on('focus', function (_e) {
-        $(this).removeClass('screenreader-only')
-        $('#lti_new_collaboration_iframe').addClass('info_alert_outline')
-      })
-      .on('blur', function (_e) {
-        $(this).addClass('screenreader-only')
-        $('#lti_new_collaboration_iframe').removeClass('info_alert_outline')
-      })
   },
 
   onClose(_e) {
@@ -122,10 +113,8 @@ CollaborationsPage.Events = {
       $('.collaborate_data, #google_docs_description').hide()
       $('#collaborate_authorize_google_docs').hide()
       $('#lti_new_collaboration_iframe').attr('src', launch_url).show()
-      $('.before_external_content_info_alert, .after_external_content_info_alert').show()
     } else {
       $('#lti_new_collaboration_iframe').hide()
-      $('.before_external_content_info_alert, .after_external_content_info_alert').hide()
       $('.collaborate_data, #google_docs_description').show()
       if (ENV.collaboration_types) {
         for (const i in ENV.collaboration_types) {

@@ -22,6 +22,7 @@ import {DiscussionTopicAlertManager} from '../DiscussionTopicAlertManager'
 
 import {Discussion} from '../../../../graphql/Discussion'
 import {Assignment} from '../../../../graphql/Assignment'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -71,6 +72,17 @@ describe('DiscussionTopicAlertManager', () => {
   })
 
   describe('Full anonymous discussion', () => {
+    beforeEach(() => {
+      // Setup fakeENV with student role
+      fakeENV.setup({
+        current_user_roles: ['User', 'student'],
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
     it('should render anon alert when status is present', async () => {
       const {findByTestId} = setup({
         discussionTopic: Discussion.mock({
@@ -85,6 +97,11 @@ describe('DiscussionTopicAlertManager', () => {
     })
 
     it('should render non-anon alert when user is teacher, ta, or designer', async () => {
+      // Set teacher role
+      fakeENV.setup({
+        current_user_roles: ['User', 'teacher'],
+      })
+
       const {findByTestId} = setup({
         discussionTopic: Discussion.mock({
           anonymousState: 'full_anonymity',
@@ -114,8 +131,18 @@ describe('DiscussionTopicAlertManager', () => {
   })
 
   describe('Partial anonymous discussion', () => {
+    beforeEach(() => {
+      // Setup fakeENV with student role
+      fakeENV.setup({
+        current_user_roles: ['User', 'student'],
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
     it('should render partial anon alert when status is present', async () => {
-      window.ENV.current_user_roles = ['User', 'student']
       const {findByTestId} = setup({
         discussionTopic: Discussion.mock({
           anonymousState: 'partial_anonymity',
@@ -129,7 +156,9 @@ describe('DiscussionTopicAlertManager', () => {
     })
 
     it('should render non-anon alert when user is teacher, ta, or designer', async () => {
-      window.ENV.current_user_roles = ['User', 'teacher']
+      fakeENV.setup({
+        current_user_roles: ['User', 'teacher'],
+      })
       const {findByTestId} = setup({
         discussionTopic: Discussion.mock({
           anonymousState: 'partial_anonymity',

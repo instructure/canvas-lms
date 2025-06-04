@@ -57,7 +57,7 @@ class LoadAccount
   end
 
   def clear_caches
-    Canvas::Reloader.reload! if Canvas::Reloader.pending_reload
+    Canvas::Reloader.reload
     ::Account.clear_special_account_cache!(::LoadAccount.force_special_account_reload)
     ::LoadAccount.clear_shard_cache
     Account.current_domain_root_account = nil

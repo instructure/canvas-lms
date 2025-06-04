@@ -20,10 +20,8 @@ import {z} from 'zod'
 import type JQuery from 'jquery'
 import {ZSubmissionOriginalityData, ZVericiteOriginalityData} from '@canvas/grading/grading.d'
 import type {SubmissionOriginalityData} from '@canvas/grading/grading.d'
-import type {
-  ZExistingAttachedAssetProcessor,
-  ZLtiAssetReport,
-} from '@canvas/lti/model/AssetProcessor'
+import {ZExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
+import {ZLtiAssetReport} from '@canvas/lti/model/AssetReport'
 import PostPolicies from '../react/PostPolicies/index'
 import AssessmentAuditTray from '../react/AssessmentAuditTray'
 

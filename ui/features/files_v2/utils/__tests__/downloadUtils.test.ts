@@ -22,6 +22,7 @@ import {
   downloadZip,
   performRequest,
 } from '../downloadUtils'
+import {waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../fixtures/fakeData'
 
@@ -112,11 +113,13 @@ describe('performRequest', () => {
       }),
     )
 
-    expect(doFetchApi).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({
-        path: mockResponse.json.progress_url,
-      }),
+    await waitFor(() =>
+      expect(doFetchApi).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          path: mockResponse.json.progress_url,
+        }),
+      ),
     )
   })
 })

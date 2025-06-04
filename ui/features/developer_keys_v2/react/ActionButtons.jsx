@@ -137,7 +137,7 @@ class DeveloperKeyActionButtons extends React.Component {
     return developerKey.is_lti_registration ? (
       <Tooltip renderTip={I18n.t('Edit this key')}>
         <IconButton
-          id="edit-developer-key-button"
+          id={`edit-developer-key-button-${developerKey.id}`}
           as="a"
           href={`/accounts/${this.props.contextId}/developer_keys/${developerKey.id}`}
           withBackground={false}
@@ -152,7 +152,7 @@ class DeveloperKeyActionButtons extends React.Component {
     ) : (
       <Tooltip renderTip={I18n.t('Edit this key')}>
         <IconButton
-          id="edit-developer-key-button"
+          id={`edit-developer-key-button-${developerKey.id}`}
           withBackground={false}
           withBorder={false}
           screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}

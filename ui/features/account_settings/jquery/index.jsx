@@ -252,12 +252,12 @@ $(document).ready(function () {
             })
 
             $('.configure_report_link').click(function (_event) {
-              const closeModal = () => {
+              const closeModal = (html, reportForm) => {
+                reportForm.innerHTML = html
                 reportRoot.render(null)
               }
 
               const onSuccess = reportName => {
-                reportRoot.render(null)
                 $('#' + reportName)
                   .find('.run_report_link')
                   .hide()
@@ -342,17 +342,27 @@ $(document).ready(function () {
                 }
               }
 
+              const extractHtml = reportForm => {
+                const html = reportForm[0].innerHTML
+                const path = reportForm.find('form').attr('action')
+                // for scripts to work, we need to remove the form content from the DOM
+                reportForm[0].innerHTML = ''
+
+                return {html, path}
+              }
+
               event.preventDefault()
               const reportCell = $(this).closest('td')
               const reportRow = reportCell.closest('tr')
               const reportName = reportRow[0].id
-              const path = reportCell.find('.report_dialog form').attr('action')
-              const html = reportCell.find('.report_dialog').html()
+              const reportForm = reportRow.find('.report_dialog')
+              const {html, path} = extractHtml(reportForm)
+
               reportRoot.render(
                 <RunReportForm
                   formHTML={html}
                   onRender={setupJQuery}
-                  closeModal={closeModal}
+                  closeModal={() => closeModal(html, reportForm[0])}
                   onSuccess={onSuccess}
                   path={path}
                   reportName={reportName}

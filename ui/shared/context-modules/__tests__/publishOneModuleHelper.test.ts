@@ -28,6 +28,14 @@ jest.mock('@canvas/do-fetch-api-effect', () => ({
   default: jest.fn(),
 }))
 
+// tests fail if I don't mock the showAllOrLess module
+// This has something to do with '../jquery/utils' importing
+// the showAllOrLess module, but the imported function is never called
+// so I don't know why this is necessary. it does make the tests pass.
+jest.mock('../utils/showAllOrLess', () => ({
+  addShowAllOrLess: jest.fn(),
+}))
+
 jest.mock('@canvas/relock-modules-dialog', () => {
   return jest.fn().mockImplementation(() => ({
     renderIfNeeded: jest.fn().mockImplementation(json => {

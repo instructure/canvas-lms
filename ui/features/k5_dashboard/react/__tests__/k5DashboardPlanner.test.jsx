@@ -29,11 +29,9 @@ import {
   defaultK5DashboardProps as defaultProps,
   defaultEnv,
 } from './mocks'
+import fetchMock from 'fetch-mock'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
-import {enableFetchMocks} from 'jest-fetch-mock'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-
-enableFetchMocks()
 
 jest.mock('@canvas/observer-picker/react/utils', () => ({
   ...jest.requireActual('@canvas/observer-picker/react/utils'),
@@ -48,6 +46,10 @@ const moxiosWait = () => new Promise(resolve => moxios.wait(resolve))
 
 describe('K5Dashboard Schedule Section', () => {
   beforeEach(() => {
+    fetchMock.get(/\/api\/v1\/announcements/, [])
+    fetchMock.get(/\/api\/v1\/calendar_events/, [])
+    fetchMock.put(/.*\/api\/v1\/users\/\d+\/colors/, {})
+    fetchMock.spy()
     moxios.install()
     createPlannerMocks()
     global.ENV = defaultEnv
@@ -60,6 +62,7 @@ describe('K5Dashboard Schedule Section', () => {
     moxios.uninstall()
     global.ENV = {}
     resetPlanner()
+    fetchMock.reset()
   })
 
   // FOO-3831

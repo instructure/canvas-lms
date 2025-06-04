@@ -16,19 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {memo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ModuleItemStudent from './ModuleItemStudent'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {CompletionRequirement, ModuleItem} from '../utils/types'
+import {validateModuleItemStudentRenderRequirements} from '../utils/utils'
+import type {CompletionRequirement, ModuleItem, ModuleProgression} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
+
+const MemoizedModuleItemStudent = memo(
+  ModuleItemStudent,
+  validateModuleItemStudentRenderRequirements,
+)
 
 export interface ModuleItemListStudentProps {
   moduleItems: ModuleItem[]
   completionRequirements?: CompletionRequirement[]
+  requireSequentialProgress?: boolean
+  progression?: ModuleProgression
   isLoading: boolean
   error: any
 }
@@ -36,6 +44,8 @@ export interface ModuleItemListStudentProps {
 const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
   moduleItems,
   completionRequirements,
+  requireSequentialProgress,
+  progression,
   isLoading,
   error,
 }) => {
@@ -61,10 +71,12 @@ const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
             borderRadius="small"
             key={item._id}
           >
-            <ModuleItemStudent
+            <MemoizedModuleItemStudent
               {...item}
               index={index}
               completionRequirements={completionRequirements}
+              requireSequentialProgress={!!requireSequentialProgress}
+              progression={progression}
             />
           </View>
         ))

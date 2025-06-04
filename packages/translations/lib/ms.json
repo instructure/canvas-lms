@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Pengepala pertama pada halaman sepatutnya bersaiz H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Kandungan berikut disediakan oleh rakan kongsi"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Bahan berada dalam domain awam"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Bahan ini tertakluk pada pengecualian - cth. penggunaan adil, hak untuk kuota atau lain-lain hak bawah undang-undang hak cipta yang terpakai"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Kandungan sebelumnya disediakan oleh rakan kongsi"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Editor HTML rapi tidak dapat diakses dengan papan kekunci. Tekan Shift+O untuk membuka editor HTML rapm"

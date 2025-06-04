@@ -86,6 +86,8 @@ export default class RosterView extends Backbone.View {
     const isChecked = e.currentTarget.checked
     this.collection.masterSelected = isChecked
 
+    this.collection.lastCheckedIndex = null
+
     if (isChecked) {
       // Clear the de-selected list
       this.collection.deselectedUserIds = []

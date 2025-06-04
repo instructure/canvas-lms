@@ -21,11 +21,23 @@ import {render} from '@testing-library/react'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemTitle from '../ModuleItemTitle'
 
-const setUp = (
-  type: string = 'Assignment',
-  title: string = 'Test Assignment',
-  newTab: boolean = false,
-) => {
+const setUp = ({
+  type = 'Assignment',
+  title = 'Test Assignment',
+  newTab = false,
+}: {
+  type?:
+    | 'Assignment'
+    | 'Quiz'
+    | 'Discussion'
+    | 'File'
+    | 'Page'
+    | 'ExternalUrl'
+    | 'Attachment'
+    | 'SubHeader'
+  title?: string
+  newTab?: boolean
+} = {}) => {
   return render(
     <ContextModuleProvider {...contextModuleDefaultProps}>
       <ModuleItemTitle
@@ -38,20 +50,30 @@ const setUp = (
 
 describe('ModuleItemTitle', () => {
   it('renders', () => {
-    const container = setUp()
+    const container = setUp({
+      type: 'Assignment',
+      title: 'Test Assignment',
+    })
     expect(container.container).toBeInTheDocument()
     expect(container.getByTestId('module-item-title-link')).toBeInTheDocument()
   })
 
   it('renders new tab link', () => {
-    const container = setUp('ExternalUrl', 'Test ExternalUrl', true)
+    const container = setUp({
+      type: 'ExternalUrl',
+      title: 'Test ExternalUrl',
+      newTab: true,
+    })
     expect(container.container).toBeInTheDocument()
     expect(container.getByText('Test ExternalUrl')).toBeInTheDocument()
     expect(container.getByTestId('external-link-icon')).toBeInTheDocument()
   })
 
   it('renders subheader', () => {
-    const container = setUp('SubHeader', 'Test SubHeader')
+    const container = setUp({
+      type: 'SubHeader',
+      title: 'Test SubHeader',
+    })
     expect(container.container).toBeInTheDocument()
     expect(container.getByText('Test SubHeader')).toBeInTheDocument()
     expect(container.getByTestId('subheader-title-text')).toBeInTheDocument()

@@ -183,7 +183,6 @@
   }
 }
 
-.react-rubric .rating-tier.assessing:focus,
 .react-rubric .rating-tier.assessing:hover {
   background-color: #ad9;
   cursor: pointer;
@@ -191,6 +190,13 @@
 
 .rating-all-footer {
     border-top: 1px solid #E8EAEC;
+    .error-message {
+      color: $ic-color-danger;
+      line-height: 1.75;
+      i {
+        margin: 0 0.5rem;
+      }
+    }
 }
 
 .react-rubric .graded-points {

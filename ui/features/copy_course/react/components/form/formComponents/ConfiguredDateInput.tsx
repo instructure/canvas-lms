@@ -19,7 +19,7 @@
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import type {FormMessage} from '@instructure/ui-form-field'
@@ -89,7 +89,7 @@ export const ConfiguredDateInput = ({
     <>
       <Text weight="bold">{renderLabelText}</Text>
       <Flex as="div" padding="xx-small 0 0 0" direction="column">
-        <CanvasDateInput
+        <CanvasDateInput2
           selectedDate={selectedDate}
           onSelectedDateChange={onSelectedDateChange}
           formatDate={formatDate}

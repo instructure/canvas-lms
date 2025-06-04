@@ -22,12 +22,17 @@ class CareerController < ApplicationController
   include HorizonMode
 
   before_action :require_user
-  before_action :require_enabled_feature_flag
-  before_action :set_context_from_params
-  before_action :load_canvas_career_learning_provider_app
+  before_action :require_context
+  before_action :require_enabled_learning_provider_app
 
-  # This action will handle all routes under /career*
   def catch_all
+    env = {
+      FEATURES: features_env
+    }
+    js_env(CANVAS_CAREER: env)
+    remote_env(canvascareer: canvas_career_learning_provider_app_launch_url)
+    deferred_js_bundle :canvas_career
+
     respond_to do |format|
       format.html { render html: "", layout: "bare" }
     end
@@ -35,20 +40,23 @@ class CareerController < ApplicationController
 
   private
 
-  # Set the context from the course_id parameter if available
-  # This ensures that @context is properly set for HorizonMode methods
-  def set_context_from_params
-    course_id = params[:course_id].presence || session[:career_course_id]
-    if course_id.present?
-      @context = Course.find(course_id)
-    else
+  def require_enabled_learning_provider_app
+    unless canvas_career_learning_provider_app_enabled?
       redirect_to root_path and return
     end
   end
 
-  def require_enabled_feature_flag
-    unless Account.site_admin.feature_enabled?(:horizon_learning_provider_app)
-      redirect_to root_path and return
-    end
+  def features_env
+    account = @context.is_a?(Account) ? @context : @context.account
+    %i[
+      horizon_crm_integration
+      horizon_leader_dashboards
+      horizon_admin_dashboards
+      horizon_roles_and_permissions
+      horizon_agent
+      horizon_content_library
+      horizon_program_management
+      horizon_skill_management
+    ].index_with { |feature| account.feature_enabled?(feature) }
   end
 end

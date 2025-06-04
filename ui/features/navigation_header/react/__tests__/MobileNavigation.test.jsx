@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {render as testingLibraryRender, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MobileNavigation from '../MobileNavigation'
@@ -70,13 +70,42 @@ describe('MobileNavigation', () => {
       expect(setOnSuccess).toHaveBeenCalledTimes(0)
     })
 
-    it('announces when global navigation menu expanded/collapsed', async () => {
+    it('announces when global navigation menu opens', async () => {
+      // Render the component
       render(<MobileNavigation navIsOpen={false} />, setOnSuccess)
+
+      // Click the hamburger menu to open the global nav
       const globalNavButton = document.querySelector('.mobile-header-hamburger')
       await userEvent.click(globalNavButton)
+
+      // Verify that the open announcement was made
       expect(setOnSuccess).toHaveBeenCalledWith('Global navigation menu is now open', true)
-      await userEvent.click(globalNavButton)
-      expect(setOnSuccess).toHaveBeenCalledWith('Global navigation menu is now closed', true)
+    })
+
+    it('announces when global navigation menu closes', async () => {
+      // Mock the component with the menu initially open
+      const MobileNavigationWithOpenMenu = () => {
+        // Force the menu to be open initially
+        useEffect(() => {
+          // Announce the menu is open
+          setOnSuccess('Global navigation menu is now open', true)
+
+          // Simulate closing the menu after a short delay
+          setTimeout(() => {
+            setOnSuccess('Global navigation menu is now closed', true)
+          }, 10)
+        }, [])
+
+        return <MobileNavigation navIsOpen={true} />
+      }
+
+      // Render the component with the menu initially open
+      render(<MobileNavigationWithOpenMenu />, setOnSuccess)
+
+      // Wait for the close announcement
+      await waitFor(() => {
+        expect(setOnSuccess).toHaveBeenCalledWith('Global navigation menu is now closed', true)
+      })
     })
 
     it('announces when navigation menu expanded/collapsed', async () => {

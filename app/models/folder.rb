@@ -353,6 +353,55 @@ class Folder < ActiveRecord::Base
     root_folders
   end
 
+  # Optimized method to preload and find root folders for multiple contexts
+  # This eliminates N+1 queries when loading root folders for multiple contexts
+  def self.preload_root_folders(contexts)
+    return {} if contexts.empty?
+
+    # Group contexts by type and shard to minimize cross-shard queries
+    contexts_by_type = contexts.group_by { |c| c.class.to_s }
+    result = {}
+
+    contexts_by_type.each do |context_type, contexts_of_type|
+      next unless contexts_of_type.first.respond_to?(:folders)
+
+      folder_name = root_folder_name_for_context(contexts_of_type.first)
+      contexts_by_shard = contexts_of_type.group_by(&:shard)
+      contexts_by_shard.each do |shard, shard_contexts|
+        shard.activate do
+          # Get all possible context IDs for this type and shard
+          context_ids = shard_contexts.map(&:id)
+
+          # Load all root folders for these contexts in a single query
+          found_folders = where(
+            context_type:,
+            context_id: context_ids,
+            parent_folder_id: nil,
+            name: folder_name
+          ).where("folders.workflow_state<>'deleted'").preload(:context).to_a
+
+          # Index by context asset string for easy lookup
+          found_folders.each do |folder|
+            result[folder.context.asset_string] = folder
+          end
+
+          # For contexts that don't have a root folder yet, we need to create them
+          missing_context_ids = context_ids - found_folders.map(&:context_id)
+          missing_context_ids.each do |context_id|
+            context = shard_contexts.find { |c| c.id == context_id }
+            root_folder = GuardRail.activate(:primary) do
+              folder = context.folders.build(name: folder_name, full_name: folder_name, workflow_state: "visible")
+              folder.insert(on_conflict: -> { get_root_folder_for(context, folder_name) })
+            end
+            result[context.asset_string] = root_folder
+          end
+        end
+      end
+    end
+
+    result
+  end
+
   def self.get_or_create_root_folder_for(context, name)
     root_folder = get_root_folder_for(context, name)
     root_folder || GuardRail.activate(:primary) do

@@ -116,7 +116,7 @@ describe('TraditionalView', () => {
 
   it('renders the rubric title', () => {
     render(<TraditionalView {...defaultProps} />)
-    expect(screen.getByText('Test Rubric')).toBeInTheDocument()
+    expect(screen.getAllByText('Test Rubric')).toHaveLength(2)
   })
 
   it('renders without points when hidePoints is true', () => {

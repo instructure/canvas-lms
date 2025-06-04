@@ -29,6 +29,7 @@ import {ConversationContext} from '../../../util/constants'
 import * as utils from '../../../util/utils'
 import * as uploadFileModule from '@canvas/upload-file'
 import {graphql} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/upload-file')
 
@@ -57,13 +58,13 @@ describe('ComposeModalContainer', () => {
 
   beforeEach(() => {
     uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
-    window.ENV = {
+    fakeENV.setup({
       current_user_id: '1',
       CONVERSATIONS: {
         ATTACHMENTS_FOLDER_ID: 1,
         CAN_MESSAGE_ACCOUNT_CONTEXT: false,
       },
-    }
+    })
   })
 
   afterEach(async () => {
@@ -72,6 +73,8 @@ describe('ComposeModalContainer', () => {
     jest.clearAllTimers()
     // Wait for any pending Apollo operations
     await waitForApolloLoading()
+    // Clean up ENV
+    fakeENV.teardown()
   })
 
   afterAll(() => {
@@ -127,7 +130,55 @@ describe('ComposeModalContainer', () => {
 
   describe('Include Observers Button', () => {
     beforeEach(() => {
-      window.ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT = true
+      fakeENV.setup({
+        current_user_id: '1',
+        CONVERSATIONS: {
+          ATTACHMENTS_FOLDER_ID: 1,
+          CAN_MESSAGE_ACCOUNT_CONTEXT: true,
+        },
+      })
+      // Mock the courses data to ensure we have a teacher enrollment
+      server.use(
+        graphql.query('GetConversationCourses', (_req, res, ctx) => {
+          return res(
+            ctx.data({
+              legacyNode: {
+                id: '1',
+                __typename: 'User',
+                enrollments: [
+                  {
+                    id: '1',
+                    type: 'TeacherEnrollment',
+                    course: {
+                      name: 'Fighting Magneto 101',
+                      assetString: 'course_1',
+                      id: '1',
+                      __typename: 'Course',
+                    },
+                    __typename: 'Enrollment',
+                  },
+                ],
+                favoriteCoursesConnection: {
+                  nodes: [
+                    {
+                      name: 'Fighting Magneto 101',
+                      assetString: 'course_1',
+                      id: '1',
+                      __typename: 'Course',
+                    },
+                  ],
+                  __typename: 'CourseConnection',
+                },
+                // User __typename is already defined in the parent object
+              },
+            }),
+          )
+        }),
+      )
+    })
+
+    afterEach(() => {
+      jest.clearAllMocks()
     })
 
     it('should not render if context is not selected', async () => {
@@ -138,14 +189,40 @@ describe('ComposeModalContainer', () => {
     })
 
     it('should render if context is selected', async () => {
-      const component = setup()
+      // Create a spy for the getRecipientsObserver function
+      const getRecipientsObserverMock = jest.fn()
 
-      const select = await component.findByTestId('course-select-modal')
-      fireEvent.click(select)
-      const selectOptions = await component.findAllByText('Fighting Magneto 101')
-      fireEvent.click(selectOptions[0])
+      // Setup the component with the necessary props
+      const component = render(
+        <ApolloProvider client={mswClient}>
+          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+            <ConversationContext.Provider value={{isSubmissionCommentsType: false}}>
+              <ComposeModalManager
+                open={true}
+                onDismiss={jest.fn()}
+                selectedIds={['1']}
+                onSelectedIdsChange={jest.fn()}
+                // This is the key part - we need to set the activeCourseFilterID
+                activeCourseFilterID="course_1"
+                // Mock the getRecipientsObserver function
+                getRecipientsObserver={getRecipientsObserverMock}
+              />
+            </ConversationContext.Provider>
+          </AlertManagerContext.Provider>
+        </ApolloProvider>,
+      )
 
-      expect(await component.findByTestId('include-observer-button')).toBeTruthy()
+      // Wait for Apollo queries to complete
+      await waitForApolloLoading()
+
+      // Wait for the component to update and check if the button is visible
+      await waitFor(
+        () => {
+          const button = component.queryByTestId('include-observer-button')
+          expect(button).toBeInTheDocument()
+        },
+        {timeout: 3000},
+      )
     })
   })
 

@@ -29,11 +29,13 @@ describe('PublishCloud', () => {
   beforeEach(() => {
     container = document.createElement('div')
     document.body.appendChild(container)
+    $('.ui-dialog').remove()
   })
 
   afterEach(() => {
     document.body.removeChild(container)
     $('#ui-datepicker-div').empty()
+    $('.ui-dialog').remove()
   })
 
   describe('when user can edit files', () => {

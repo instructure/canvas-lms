@@ -464,17 +464,11 @@
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Попередній перегляд документа в даний момент обробляється. Будь-ласка спробуйте пізніше."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Наступний контент наданий партнером"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Матеріал в публічному домені"
     },
     "the_material_is_licensed_under_creative_commons_3242cb5e": {
         "message": "Матеріал опубліковано під ліцензією Creative Commons"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Попередній контент наданий партнером"
     },
     "this_document_cannot_be_displayed_within_canvas_7aba77be": {
         "message": "Цей документ не може бути показаний в Canvas."

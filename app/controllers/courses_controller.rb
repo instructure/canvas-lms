@@ -966,7 +966,7 @@ class CoursesController < ApplicationController
       respond_to do |format|
         if @course.save
           if @course.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
-            process_attachment_links(@course.syllabus_body, @course, "syllabus_body", @current_user)
+            UserContent.associate_attachments_to_rce_object(@course.syllabus_body, @course, "syllabus_body", @current_user)
           end
           Auditors::Course.record_created(@course, @current_user, changes, source: (api_request? ? :api : :manual))
           @course.enroll_user(@current_user, "TeacherEnrollment", enrollment_state: "active") if params[:enroll_me].to_s == "true"
@@ -3385,7 +3385,7 @@ class CoursesController < ApplicationController
           @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
         end
         if @course.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
-          process_attachment_links(@course.syllabus_body, @course, "syllabus_body", @current_user)
+          UserContent.associate_attachments_to_rce_object(@course.syllabus_body, @course, "syllabus_body", @current_user)
         end
         # Sync homeroom enrollments and participation if enabled and course isn't a SIS import
         if @course.can_sync_with_homeroom?

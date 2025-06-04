@@ -199,6 +199,12 @@ describe DeveloperKey do
         let(:key_attributes) { super().merge(account: root_account) }
 
         it { is_expected.to be false }
+
+        context "and the key allows service user client credentials" do
+          let(:key_attributes) { super().merge(authorized_flows: ["service_user_client_credentials"]) }
+
+          it { is_expected.to be true }
+        end
       end
     end
   end
@@ -1016,14 +1022,10 @@ describe DeveloperKey do
           let(:shard_1_account) { @shard1.activate { account_model } }
           let(:shard_2_account) { @shard2.activate { account_model } }
           let(:shard_1_tool) do
-            t = @shard1.activate { key.lti_registration.new_external_tool(shard_1_account) }
-            t.save!
-            t
+            @shard1.activate { key.lti_registration.new_external_tool(shard_1_account) }
           end
           let(:shard_2_tool) do
-            t = @shard2.activate { key.lti_registration.new_external_tool(shard_2_account) }
-            t.save!
-            t
+            @shard2.activate { key.lti_registration.new_external_tool(shard_2_account) }
           end
 
           before do
@@ -1041,9 +1043,7 @@ describe DeveloperKey do
           context "when tools are installed at the course level" do
             let(:shard_1_course) { shard_1_account.shard.activate { course_model(account: shard_1_account) } }
             let(:shard_1_course_tool) do
-              t = @shard1.activate { key.lti_registration.new_external_tool(shard_1_course) }
-              t.save!
-              t
+              @shard1.activate { key.lti_registration.new_external_tool(shard_1_course) }
             end
 
             before do
@@ -1075,9 +1075,7 @@ describe DeveloperKey do
         let(:developer_key) { lti_developer_key_model(account:) }
         let(:tool_configuration) { lti_tool_configuration_model(developer_key:) }
         let(:tool) do
-          t = developer_key.lti_registration.new_external_tool(account)
-          t.save!
-          t
+          developer_key.lti_registration.new_external_tool(account)
         end
 
         before do
@@ -1095,9 +1093,7 @@ describe DeveloperKey do
           context "when tools are installed at the course level" do
             let(:course) { course_model(account:) }
             let(:course_tool) do
-              t = developer_key.lti_registration.new_external_tool(course)
-              t.save!
-              t
+              developer_key.lti_registration.new_external_tool(course)
             end
 
             before { course_tool }
@@ -1618,6 +1614,58 @@ describe DeveloperKey do
 
       expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to be true
       expect(developer_key_not_saved.redirect_domain_matches?("intents://www.example.com/a/b")).to be false
+    end
+  end
+
+  describe "redirect_uri_matches?" do
+    it "returns true when the URI exactly matches a URI in redirect_uris" do
+      developer_key_not_saved.redirect_uris = ["https://example.com/callback", "http://example.org/cb"]
+      expect(developer_key_not_saved.redirect_uri_matches?("https://example.com/callback")).to be true
+      expect(developer_key_not_saved.redirect_uri_matches?("https://exAmple.com:443/cb")).to be true
+      expect(developer_key_not_saved.redirect_uri_matches?("http://exAmple.org:80/cb")).to be true
+    end
+
+    it "returns false when the URI doesn't match any in redirect_uris" do
+      developer_key_not_saved.redirect_uris = ["https://example.com/callback"]
+      expect(developer_key_not_saved.redirect_uri_matches?("https://example2.com/different")).to be false
+      expect(developer_key_not_saved.redirect_uri_matches?("https://different.com/callback")).to be false
+      expect(developer_key_not_saved.redirect_uri_matches?("http://example.com/callback")).to be false
+    end
+
+    it "returns false when both the redirect uris and the input url is invalid" do
+      developer_key_not_saved.redirect_uris = ["string"]
+      expect(developer_key_not_saved.redirect_uri_matches?("string")).to be false
+    end
+
+    it "returns true when the normalized site matches a URI in redirect_uris" do
+      developer_key_not_saved.redirect_uris = ["https://example.com/callback"]
+      expect(developer_key_not_saved.redirect_uri_matches?("https://example.com/callback?param=value")).to be true
+    end
+
+    it "returns false when the site matches but the scheme doesn't" do
+      developer_key_not_saved.redirect_uris = ["https://example.com/callback"]
+      expect(developer_key_not_saved.redirect_uri_matches?("http://example.com/callback")).to be false
+    end
+
+    it "returns false when the port doesn't match" do
+      developer_key_not_saved.redirect_uris = ["https://example.com:8080/callback"]
+      expect(developer_key_not_saved.redirect_uri_matches?("https://example.com/callback")).to be false
+    end
+
+    it "returns false for invalid URIs" do
+      developer_key_not_saved.redirect_uris = ["https://example.com/callback"]
+      expect(developer_key_not_saved.redirect_uri_matches?("not a uri")).to be false
+    end
+
+    it "returns false when redirect_uri is blank" do
+      developer_key_not_saved.redirect_uris = ["https://example.com/callback"]
+      expect(developer_key_not_saved.redirect_uri_matches?("")).to be false
+      expect(developer_key_not_saved.redirect_uri_matches?(nil)).to be false
+    end
+
+    it "returns true when the site matches including port" do
+      developer_key_not_saved.redirect_uris = ["http://example.com/callback"]
+      expect(developer_key_not_saved.redirect_uri_matches?("http://example.com:80/different_path")).to be true
     end
   end
 

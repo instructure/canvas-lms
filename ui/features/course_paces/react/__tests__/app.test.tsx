@@ -20,10 +20,8 @@ import React from 'react'
 import {renderConnected} from './utils'
 import {PRIMARY_PACE} from './fixtures'
 import {App, type ResponsiveComponentProps} from '../app'
-import {enableFetchMocks} from 'jest-fetch-mock'
+import fetchMock from 'fetch-mock'
 import fakeENV from '@canvas/test-utils/fakeENV'
-
-enableFetchMocks()
 
 const pollForPublishStatus = jest.fn()
 const setBlueprintLocked = jest.fn()
@@ -47,17 +45,19 @@ beforeEach(() => {
     VALID_DATE_RANGE: {
       end_at: {date: '2021-09-30', date_context: 'course'},
       start_at: {date: '2021-09-01', date_context: 'course'},
-    }
+    },
   })
 })
 
 afterEach(() => {
   jest.clearAllMocks()
   fakeENV.teardown()
+  fetchMock.reset()
 })
 
 describe('App', () => {
   it('renders empty state if supplied shell course pace', () => {
+    fetchMock.get(/\/api\/v1\/courses\/30\/pace_contexts.*/, {})
     const {getByRole} = renderConnected(
       <App
         {...defaultProps}

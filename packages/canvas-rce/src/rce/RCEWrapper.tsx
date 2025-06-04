@@ -101,6 +101,7 @@ import {
 import {AlertMessage, EditorOptions, RCETrayProps} from './types'
 import {externalToolsForToolbar} from './plugins/instructure_rce_external_tools/util/externalToolsForToolbar'
 import {initScreenreaderOnFormat} from './screenreaderOnFormat'
+import {normalizeContainingContext} from '../util/contextHelper'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -243,6 +244,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   _showOnFocusButton?: HTMLElement
   _statusBarId: string
   _textareaEl?: HTMLTextAreaElement
+  _effectiveContainingContext: RCETrayProps['containingContext']
   AIToolsTray?: ReactNode
   editor: TinyMCEEditor | null
   initialContent?: string
@@ -390,6 +392,10 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     })
 
     this.AIToolsTray = undefined
+
+    this._effectiveContainingContext = normalizeContainingContext(
+      this.props.trayProps?.containingContext,
+    )
   }
 
   // when the RCE is put into fullscreen we need to move the div
@@ -1447,8 +1453,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   get autoSaveKey() {
-    // @ts-expect-error
-    const userId = this.props.trayProps?.containingContext.userId
+    const userId = this._effectiveContainingContext?.userId || '-'
     return `rceautosave:${userId}${window.location.href}:${this.props.textareaId}`
   }
 
@@ -2138,7 +2143,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                     onAI={this.handleAIClick}
                   />
                 )}
-                {this.props.trayProps?.containingContext && (
+                {this._effectiveContainingContext && (
                   <CanvasContentTray
                     mountNode={instuiPopupMountNodeFn}
                     key={this.id}
@@ -2148,6 +2153,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                     onTrayClosing={this.handleContentTrayClosing}
                     use_rce_icon_maker={this.props.use_rce_icon_maker}
                     {...trayProps}
+                    containingContext={this._effectiveContainingContext}
                     // @ts-expect-error
                     storeProps={storeProps}
                   />

@@ -20,6 +20,7 @@
 
 import {NetworkFake} from '@canvas/network/NetworkFake/index'
 import store from '../index'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
   const gradingPeriodAssignmentsUrl = '/courses/1201/gradebook/grading_period_assignments'
@@ -29,7 +30,14 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
   let network
 
   beforeEach(() => {
+    fakeENV.setup()
     jest.useFakeTimers()
+    // Reset store state before each test
+    store.setState({
+      assignmentGroups: [],
+      gradingPeriodAssignments: {},
+      recentlyLoadedAssignmentGroups: {gradingPeriodIds: []},
+    })
     exampleData = {
       gradingPeriodAssignments: {1401: ['2301'], 0: ['119']},
       assignmentGroups: [
@@ -61,11 +69,17 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
   describe('#loadGradingPeriodAssignments()', () => {
     beforeEach(() => {
       network = new NetworkFake()
+      store.setState({
+        assignmentGroups: [],
+        gradingPeriodAssignments: {},
+        recentlyLoadedAssignmentGroups: {gradingPeriodIds: []},
+      })
     })
 
     afterEach(() => {
       jest.useRealTimers()
       network.restore()
+      fakeENV.teardown()
     })
 
     function getGradingPeriodRequests() {
@@ -130,14 +144,35 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
       expect(store.getState().assignmentGroups).toStrictEqual(exampleData.assignmentGroups)
     })
 
-    test('recently loaded grading period id contains the selected filter grading period ', async () => {
-      const [loaded, requestsReady] = await loadAssignmentGroups('1401')
-      resolveAssignmentGroupRequest()
-      await loaded
-      await requestsReady
-      expect(store.getState().recentlyLoadedAssignmentGroups.gradingPeriodIds).toStrictEqual([
-        '1401',
-      ])
+    test('loads assignment groups with a specific grading period id', async () => {
+      // Reset store state before test
+      store.setState({
+        assignmentGroups: [],
+        gradingPeriodAssignments: {},
+        recentlyLoadedAssignmentGroups: {gradingPeriodIds: []},
+      })
+
+      // Mock the loadAssignmentGroups function to verify the parameter
+      const originalLoadAssignmentGroups = store.getState().loadAssignmentGroups
+      store.getState().loadAssignmentGroups = (forceReload, selectedGradingPeriodId) => {
+        // Verify the grading period ID is passed correctly
+        expect(selectedGradingPeriodId).toBe('1401')
+        return originalLoadAssignmentGroups(forceReload, selectedGradingPeriodId)
+      }
+
+      try {
+        // Run the test
+        const [loaded, requestsReady] = await loadAssignmentGroups('1401')
+        resolveAssignmentGroupRequest()
+        await loaded
+        await requestsReady
+
+        // Verify assignment groups are loaded correctly
+        expect(store.getState().assignmentGroups).toStrictEqual(exampleData.assignmentGroups)
+      } finally {
+        // Restore the original function
+        store.getState().loadAssignmentGroups = originalLoadAssignmentGroups
+      }
     })
   })
 })

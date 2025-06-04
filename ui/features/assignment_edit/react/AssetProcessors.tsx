@@ -39,6 +39,7 @@ export type AssetProcessorsProps = {
   courseId: number
   secureParams: string
   initialAttachedProcessors: ExistingAttachedAssetProcessor[]
+  hideErrors: () => void
 }
 
 /**
@@ -100,7 +101,7 @@ export function AssetProcessors(props: AssetProcessorsProps) {
                 description={processor.text}
                 windowSettings={processor.window}
                 iframeSettings={processor.iframe}
-                onDelete={() => deleteAttachedProcessor(index)}
+                onDelete={() => deleteAttachedProcessor(index, props.hideErrors)}
               >
                 <input
                   data-testid={`asset_processors[${index}]`}
@@ -110,6 +111,11 @@ export function AssetProcessors(props: AssetProcessorsProps) {
                 />
               </AssetProcessorsAttachedProcessorCard>
             ))}
+            <span
+              data-testid="asset-processor-errors"
+              id="asset_processors_errors"
+              className="error-message"
+            />
             <span>
               <Button color="secondary" onClick={openAddDialog}>
                 {I18n.t('Add Document Processing App')}

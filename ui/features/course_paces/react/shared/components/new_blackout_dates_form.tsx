@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TextInput} from '@instructure/ui-text-input'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {coursePaceTimezone} from '../api/backend_serializer'
 
 import type {BlackoutDate} from '../types'
@@ -214,7 +214,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                 <Flex.Item>
                   <Flex alignItems="start" justifyItems="space-between" wrap="wrap">
                     <Flex.Item data-testid="blackout-start-date" margin="0 small small 0">
-                      <CanvasDateInput
+                      <CanvasDateInput2
                         key={`start-${this.state.key}`}
                         renderLabel={I18n.t('Start Date')}
                         timezone={coursePaceTimezone}
@@ -226,10 +226,11 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                         // @ts-expect-error
                         messages={this.state.startMessages}
                         withRunningValue={true}
+                        dataTestid="new-blackout-dates-start"
                       />
                     </Flex.Item>
                     <Flex.Item data-testid="blackout-end-date" margin="0 small small 0">
-                      <CanvasDateInput
+                      <CanvasDateInput2
                         key={`end-${this.state.key}`}
                         renderLabel={I18n.t('End Date')}
                         timezone={coursePaceTimezone}
@@ -240,6 +241,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                         // @ts-expect-error
                         messages={this.state.endMessages}
                         withRunningValue={true}
+                        dataTestid="new-blackout-dates-end"
                       />
                     </Flex.Item>
                   </Flex>

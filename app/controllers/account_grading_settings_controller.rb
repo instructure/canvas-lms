@@ -27,6 +27,9 @@ class AccountGradingSettingsController < ApplicationController
   before_action { |c| c.active_tab = "grading_standards" }
   before_action :require_user
 
+  include HorizonMode
+  before_action :load_canvas_career, only: [:index]
+
   def index
     if authorized_action(@account, @current_user, :read_as_admin)
       js_env({

@@ -531,6 +531,7 @@ CanvasRails::Application.routes.draw do
     post "canvas_career_reversion" => "horizon#revert_course"
     get "accessibility", controller: :accessibility, action: :show
     get "accessibility/issues", controller: :accessibility, action: :issues
+    post "accessibility/update", controller: :accessibility, action: :update
   end
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
 
@@ -1111,8 +1112,10 @@ CanvasRails::Application.routes.draw do
   get "privacy_policy" => "legal_information#privacy_policy", :as => "privacy_policy_redirect"
 
   scope(controller: :career) do
-    get "career", action: :catch_all
-    get "career/*path", action: :catch_all, as: :career_path
+    get "career/courses/:course_id", action: :catch_all, as: :course_career
+    get "career/courses/:course_id/*path", action: :catch_all, as: :course_career_path
+    get "career/accounts/:account_id", action: :catch_all, as: :account_career
+    get "career/accounts/:account_id/*path", action: :catch_all, as: :account_career_path
   end
 
   scope(controller: :smart_search) do
@@ -1722,11 +1725,17 @@ CanvasRails::Application.routes.draw do
         get "courses/:course_id/discussion_topics/:discussion_topic_id/date_details", action: :show, as: "course_discussion_topic_date_details"
         get "courses/:course_id/pages/:url_or_id/date_details", action: :show, as: "course_wiki_page_date_details"
         get "courses/:course_id/files/:attachment_id/date_details", action: :show, as: "course_attachment_date_details"
+
         put "courses/:course_id/assignments/:assignment_id/date_details", action: :update
         put "courses/:course_id/quizzes/:quiz_id/date_details", action: :update
         put "courses/:course_id/discussion_topics/:discussion_topic_id/date_details", action: :update
         put "courses/:course_id/pages/:url_or_id/date_details", action: :update
         put "courses/:course_id/files/:attachment_id/date_details", action: :update
+
+        put "courses/:course_id/assignments/:assignment_id/date_details/convert_tag_overrides", action: :convert_tag_overrides_to_adhoc_overrides
+        put "courses/:course_id/quizzes/:quiz_id/date_details/convert_tag_overrides", action: :convert_tag_overrides_to_adhoc_overrides
+        put "courses/:course_id/discussion_topics/:discussion_topic_id/date_details/convert_tag_overrides", action: :convert_tag_overrides_to_adhoc_overrides
+        put "courses/:course_id/pages/:url_or_id/date_details/convert_tag_overrides", action: :convert_tag_overrides_to_adhoc_overrides
       end
 
       scope(controller: :login) do
@@ -1990,14 +1999,20 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "lti/deployments") do
-      get "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :list
+      get "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :list, as: :list_deployments
       post "accounts/:account_id/lti_registrations/:registration_id/deployments", action: :create
       delete "accounts/:account_id/lti_registrations/:registration_id/deployments/:id", action: :destroy
+      get "accounts/:account_id/lti_registrations/:registration_id/deployments/:id", action: :show
+      get "accounts/:account_id/lti_registrations/:registration_id/deployments/:id/controls", action: :list_controls, as: :list_deployment_controls
     end
 
     scope(controller: "lti/context_controls") do
       get "lti_registrations/:registration_id/controls", action: :index
+      post "lti_registrations/:registration_id/controls", action: :create
+      post "lti_registrations/:registration_id/controls/bulk", action: :create_many
       get "lti_registrations/:registration_id/controls/:id", action: :show
+      put "lti_registrations/:registration_id/controls/:id", action: :update
+      delete "lti_registrations/:registration_id/controls/:id", action: :delete
     end
 
     scope(controller: "lti/resource_links") do
@@ -2844,6 +2859,10 @@ CanvasRails::Application.routes.draw do
 
   get "lti/tool_default_icon" => "lti/tool_default_icon#show"
 
+  scope(controller: :ams) do
+    get "ams(/*path)", action: :show, as: :ams
+  end
+
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"
     post "tools/:tool_id/ext_grade_passback", controller: :lti_api, action: :legacy_grade_passback, as: "blti_legacy_grade_passback_api"
@@ -2975,6 +2994,11 @@ CanvasRails::Application.routes.draw do
       put "asset_processor_eulas/:context_external_tool_id/deployment", action: :update_tool_eula, as: :update_tool_eula
       delete "asset_processor_eulas/:context_external_tool_id/user", action: :delete_acceptances, as: :delete_tool_eula_acceptances
       post "asset_processor_eulas/:context_external_tool_id/user", action: :create_acceptance, as: :create_user_eula_acceptance
+    end
+
+    # Asset Processor internal endpoints
+    scope(controller: "lti/asset_processor") do
+      post "asset_processors/:asset_processor_id/notices/:student_id", action: :resubmit_notice, as: :lti_asset_processor_notice_resubmit
     end
 
     # Dynamic Registration Service

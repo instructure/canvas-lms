@@ -827,7 +827,12 @@ class ContentTag < ActiveRecord::Base
       end
 
       # Republish the course pace if changes were made
-      course_pace.create_publish_progress if deleted? || cpmi.destroyed? || cpmi.saved_change_to_id? || saved_change_to_position?
+      if deleted? ||
+         cpmi.destroyed? ||
+         cpmi.previously_new_record? ||
+         saved_change_to_position?
+        course_pace.create_publish_progress
+      end
     end
   end
 

@@ -213,10 +213,6 @@
       &.infinitesimal .range_rating {
         display: none;
       }
-
-      &.selected {
-        background-color: #cfa;
-      }
     }
   }
 
@@ -227,10 +223,6 @@
 
   td.criterion_description.completed {
     background-color: #ddd;
-  }
-
-  div.rating-tier.selected {
-    background-color: #cfa;
   }
 
   td.points_form {

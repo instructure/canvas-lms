@@ -19,10 +19,14 @@
 import sanitizeData from '../sanitizeData'
 
 describe('sanitizeData()', () => {
-  let data = {
-    text: '<script>console.log("hi!")</script>',
-  }
+  let data
   const dataItems = ['text']
+
+  beforeEach(() => {
+    data = {
+      text: '<script>console.log("hi!")</script>',
+    }
+  })
 
   const subject = () => sanitizeData(data, dataItems)
 
@@ -55,9 +59,13 @@ describe('sanitizeData()', () => {
   })
 
   describe('when the specified field is blank', () => {
-    beforeEach(() => (data = {foo: 'bar'}))
+    beforeEach(() => {
+      data = {foo: 'bar'}
+    })
 
-    sharedExamplesForNoModifiers()
+    it('does not modify the field', () => {
+      expect(subject()).toMatchObject(data)
+    })
   })
 
   describe('with elements/attributes that are disallowed by default', () => {

@@ -28,6 +28,7 @@ import {Portal} from '@instructure/ui-portal'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
+import $ from 'jquery'
 
 const I18n = createI18nScope('account_reports')
 
@@ -38,6 +39,18 @@ interface Props {
   closeModal: () => void
   onSuccess: (reportName: string) => void
   onRender: () => void
+}
+
+const getParameterName = (name: string) => {
+  const match = name.match(/parameters\[(.*)\]/)
+  if (match) {
+    return match[1]
+  }
+  return name
+}
+
+const wrapParameterName = (name: string) => {
+  return `parameters[${name}]`
 }
 
 const getElementValue = (element: Element) => {
@@ -77,39 +90,61 @@ const getFormData = (form: HTMLDivElement) => {
 export default function ConfigureReportForm(props: Props) {
   const formRef = useRef<HTMLDivElement | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [startRef, setStartRef] = useState<HTMLElement | null>(null)
-  const [endRef, setEndRef] = useState<HTMLElement | null>(null)
-  const [startAt, setStartAt] = useState<string>()
-  const [endAt, setEndAt] = useState<string>()
+  const [dateRefs, setDateRefs] = useState<Record<string, [string, HTMLElement]>>({})
+  const [dateValues, setDateValues] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    props.onRender()
-    // testing purposes only; don't swap date pickers if in jest
-    if (formRef.current && typeof $ !== 'undefined') {
+    if (formRef.current) {
+      props.onRender()
       const $form = $(formRef.current)
+      const record = dateRefs
 
       // Find all datetime inputs and remove the closest <tr>
       $form.find('input.datetime_field').each(function () {
         const closestTd = $(this).closest('td')[0]
+        // delete html content but store label
+        const inputLabel = closestTd.innerText
         closestTd.innerHTML = ''
-        if ($(this).attr('name') === 'parameters[start_at]') {
-          setStartRef(closestTd)
-        } else {
-          setEndRef(closestTd)
-        }
+
+        const name = getParameterName($(this).attr('name') ?? '')
+        record[name] = [inputLabel, closestTd]
       })
+      setDateRefs({...record})
+
+      const script = $form.find('script')
+      if (script) {
+        // there's only one script tag in each form
+        const scriptElem = script.get(0)
+        const newScript = document.createElement('script')
+        if (scriptElem?.src) {
+          newScript.src = scriptElem.src
+        } else {
+          newScript.textContent = script.text()
+        }
+        if (scriptElem) {
+          Array.from(scriptElem.attributes).forEach(attr =>
+            newScript.setAttribute(attr.name, attr.value),
+          )
+        }
+        // replacing the script with a "new" script makes the script run
+        script.replaceWith(newScript)
+      }
     }
-  }, [])
+    // don't run this effect when dateRefs change; causes looping
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props])
 
   const onSubmit = async () => {
     setIsLoading(true)
     if (formRef.current) {
       const formData = getFormData(formRef.current)
-      if (formData.has('parameters[start_at]')) {
-        formData.set('parameters[start_at]', startAt ?? '')
-      }
-      if (formData.has('parameters[end_at]')) {
-        formData.set('parameters[end_at]', endAt ?? '')
+      if (dateRefs != null) {
+        Object.entries(dateRefs).forEach(pair => {
+          const dateKey = wrapParameterName(pair[0])
+          if (pair[0]) {
+            formData.set(dateKey, dateValues[pair[0]] ?? '')
+          }
+        })
       }
       try {
         await doFetchApi({
@@ -118,6 +153,7 @@ export default function ConfigureReportForm(props: Props) {
           method: 'POST',
         })
         props.onSuccess(props.reportName)
+        props.closeModal()
       } catch (e) {
         showFlashError(I18n.t('Failed to start report.'))(e as Error)
         setIsLoading(false)
@@ -142,38 +178,38 @@ export default function ConfigureReportForm(props: Props) {
           ref={formRef}
           dangerouslySetInnerHTML={{__html: props.formHTML}}
         ></div>
-        <Portal open mountNode={startRef}>
-          <DateTimeInput
-            layout="columns"
-            dateInputRef={dateInputRef => {
-              dateInputRef?.setAttribute('data-testid', 'parameters[start_at]')
-            }}
-            onChange={(_, isoValue) => setStartAt(isoValue)}
-            description={<ScreenReaderContent>{I18n.t('Start at')}</ScreenReaderContent>}
-            dateRenderLabel={I18n.t('Start Date')}
-            prevMonthLabel={I18n.t('Previous month')}
-            nextMonthLabel={I18n.t('Next month')}
-            timeRenderLabel={I18n.t('Time')}
-            invalidDateTimeMessage={I18n.t('Invalid date and time.')}
-          />
-          <br />
-        </Portal>
-        <Portal open mountNode={endRef}>
-          <DateTimeInput
-            layout="columns"
-            dateInputRef={dateInputRef => {
-              dateInputRef?.setAttribute('data-testid', 'parameters[end_at]')
-            }}
-            onChange={(_, isoValue) => setEndAt(isoValue)}
-            description={<ScreenReaderContent>{I18n.t('End at')}</ScreenReaderContent>}
-            dateRenderLabel={I18n.t('End Date')}
-            prevMonthLabel={I18n.t('Previous month')}
-            nextMonthLabel={I18n.t('Next month')}
-            timeRenderLabel={I18n.t('Time')}
-            invalidDateTimeMessage={I18n.t('Invalid date and time.')}
-          />
-          <br />
-        </Portal>
+
+        {Object.entries(dateRefs).map(pair => {
+          const dateKey = pair[0]
+          const dateLabel = pair[1][0]
+          const dateNode = pair[1][1]
+          return (
+            <Portal open mountNode={dateNode} key={dateKey}>
+              <DateTimeInput
+                layout="columns"
+                dateInputRef={dateInputRef => {
+                  dateInputRef?.setAttribute('data-testid', wrapParameterName(dateKey))
+                }}
+                onChange={(_, isoValue) => {
+                  const record = dateValues
+                  if (isoValue) {
+                    record[dateKey] = isoValue
+                    setDateValues({...record})
+                  }
+                }}
+                description={<ScreenReaderContent>{dateLabel}</ScreenReaderContent>}
+                dateRenderLabel={dateLabel}
+                prevMonthLabel={I18n.t('Previous month')}
+                nextMonthLabel={I18n.t('Next month')}
+                timeRenderLabel={I18n.t('Time')}
+                invalidDateTimeMessage={I18n.t('Invalid date and time.')}
+                timezone={ENV.TIMEZONE}
+                locale={ENV.LOCALE}
+              />
+              <br />
+            </Portal>
+          )
+        })}
       </Modal.Body>
     )
   }
@@ -185,7 +221,11 @@ export default function ConfigureReportForm(props: Props) {
           data-testid="close-button"
           placement="end"
           size="medium"
-          onClick={props.closeModal}
+          onClick={() => {
+            if (formRef.current) {
+              props.closeModal()
+            }
+          }}
           screenReaderLabel={I18n.t('Close')}
         />
       </Modal.Header>

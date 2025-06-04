@@ -33,7 +33,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import SearchFormActions from './actions/SearchFormActions'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import environment from './environment'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 
 const I18n = createI18nScope('gradebook_history')
 
@@ -349,16 +349,26 @@ class SearchFormComponent extends Component {
                     messages={this.dateInputErrors()}
                     width="auto"
                   >
-                    <CanvasDateInput
+                    <CanvasDateInput2
                       renderLabel={I18n.t('Start Date')}
                       formatDate={formatDate}
+                      disabledDates={isoDate =>
+                        this.state.selected.to.value
+                          ? isoDate >= this.state.selected.to.value
+                          : false
+                      }
                       selectedDate={this.state.selected.from.value}
                       onSelectedDateChange={this.setSelectedFrom}
                       withRunningValue={true}
                     />
-                    <CanvasDateInput
+                    <CanvasDateInput2
                       renderLabel={I18n.t('End Date')}
                       formatDate={formatDate}
+                      disabledDates={isoDate =>
+                        this.state.selected.from.value
+                          ? isoDate <= this.state.selected.from.value
+                          : false
+                      }
                       selectedDate={this.state.selected.to.value}
                       onSelectedDateChange={this.setSelectedTo}
                       withRunningValue={true}

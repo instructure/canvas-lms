@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Fyrsti haus á síðu ætti að vera H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Eftirfarandi efni er gefið upp af samstarfsaðila"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Efnið er öllum heimilt"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Efnið er háð undantekningum - t.d. lögleg notkun, tilvitnunarréttur eða annað undir viðeigandi höfundarréttarlögum"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Framangreint efni er gefið upp af samstarfsaðila"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Ekki hægt að nota lyklaborð með pretty HTML ritlinum. Ýttu á Shift O til að opna hráa html ritilinn."

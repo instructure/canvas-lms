@@ -17,6 +17,7 @@
  */
 
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
+import AssignmentAssetProcessorEula from '@canvas/assignments/react/AssignmentAssetProcessorEula'
 import AssignmentDetails from './AssignmentDetails'
 import PeerReviewsCounter from './PeerReviewsCounter'
 import {Flex} from '@instructure/ui-flex'
@@ -183,7 +184,9 @@ class Header extends React.Component {
               h1 to actually come before them for a11y */}
           <ScreenReaderContent> {this.props.assignment.name} </ScreenReaderContent>
         </Heading>
-
+        {window.ENV.FEATURES?.lti_asset_processor && (
+          <AssignmentAssetProcessorEula launches={ENV.ASSET_PROCESSOR_EULA_LAUNCH_URLS} />
+        )}
         <Flex
           margin="0"
           alignItems="start"

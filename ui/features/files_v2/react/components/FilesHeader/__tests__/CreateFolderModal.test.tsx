@@ -86,13 +86,18 @@ describe('CreateFolderModal', () => {
 
   it('displays loading spinner when submitting', async () => {
     const user = userEvent.setup()
+    // Use a never-resolving promise to keep the loading state active
     fetchMock.post(/.*\/folders/, new Promise(() => {}), {overwriteRoutes: true})
     renderComponent()
     const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
     await user.click(createFolderButton)
+
+    // Verify the spinner is shown
     expect(screen.getByTestId('create-folder-spinner')).toBeInTheDocument()
-    expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
-    expect(screen.getByRole('button', {name: 'Create Folder'})).toBeDisabled()
+
+    // Verify buttons are disabled during submission
+    expect(screen.getByRole('button', {name: /Cancel/i})).toBeDisabled()
+    expect(screen.getByRole('button', {name: /Create Folder/i})).toBeDisabled()
   })
 
   it('does not close when there is an error', async () => {

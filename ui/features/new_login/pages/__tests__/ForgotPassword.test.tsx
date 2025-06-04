@@ -68,6 +68,8 @@ describe('ForgotPassword', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.restoreAllMocks()
+    mockNavigationType.mockReturnValue('PUSH')
+    mockLocation.mockReturnValue({key: 'default'})
     // reset the mock implementation to return the default values
     ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
       loginHandleName: 'Email',

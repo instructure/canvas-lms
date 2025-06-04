@@ -54,7 +54,10 @@ class CourseProgress
                                  prog.nil? || prog.completed? == false
                                end
                              else
-                               modules.select { |m| m.evaluate_for(user).completed? == false }
+                               modules.select do |m|
+                                 progression = m.evaluate_for(user)
+                                 progression.nil? || progression.completed? == false
+                               end
                              end
   end
 
@@ -82,7 +85,7 @@ class CourseProgress
         prog&.current_position
       end
     else
-      @current_position ||= current_module.evaluate_for(user).current_position
+      @current_position ||= current_module.evaluate_for(user)&.current_position
     end
   end
 

@@ -7669,6 +7669,8 @@ fa:
     link_validator: 
       link_validator: "تأیید کننده پیوند درس"
       page_title: "تأیید کننده پیوند درس"
+    links: 
+      student_progress: "مشاهده پیشرفت"
     master_course_restrictions: 
       labels: 
         availability_dates: "تاریخ‌های دسترسی"
@@ -7916,9 +7918,12 @@ fa:
       tab_hidden_if_disabled_k5: "برگه غیرفعال است، در پیمایش موضوع ظاهر نمی شود"
       tabs: 
         alerts: هشدارها
+        apps: "برنامه ها"
         details: "اطلاعات درس"
         feature_options: "گزینه‌های ویژگی"
         grade_publishing: "انتشار نمره"
+        grade_syncing: "همگام‌سازی نمره"
+        integrations: "یکپارچگی ها"
         navigation: پیمایش
         sections: "بخش ها"
         tools: "برنامه ها"
@@ -17460,6 +17465,7 @@ fa:
   page_not_found_2b0d05f5: "صفحه موجود نیست"
   page_page_59070cd8: "صفحه %{page}"
   page_pagenum_20dbfeb8: "صفحه %{pageNum}"
+  page_title_106304bb: "عنوان صفحه"
   page_title_ascending_b5df950c: "عنوان صفحه: صعودی"
   page_title_d1a22bbf: "عنوان صفحه"
   page_title_descending_70c1483d: "عنوان صفحه: نزولی"
@@ -25909,6 +25915,10 @@ fa:
       page_header_title: "ویرایش %{page_name}"
     index: 
       titles: 
+        pages: "صفحه ها"
+    new: 
+      titles: 
+        new_page: "صفحه جدید"
         pages: "صفحه ها"
     notices: 
       cannot_edit: "اجازه ندارید صفحه \"%{title}\" را ویرایش کنید."

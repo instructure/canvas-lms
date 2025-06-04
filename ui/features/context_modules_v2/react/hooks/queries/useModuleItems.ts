@@ -41,6 +41,7 @@ const MODULE_ITEMS_QUERY = gql`
               title
               type: __typename
               pointsPossible
+              graded
               dueAt
               lockAt
               unlockAt
@@ -48,6 +49,33 @@ const MODULE_ITEMS_QUERY = gql`
               canUnpublish
               isLockedByMasterCourse
               canDuplicate
+              assignmentOverrides(first: 100) {
+                edges {
+                  cursor
+                  node {
+                    _id
+                    dueAt
+                    lockAt
+                    unlockAt
+                    set {
+                      ... on AdhocStudents {
+                        students {
+                          id
+                        }
+                      }
+                      ... on Course {
+                        courseId: id
+                      }
+                      ... on Group {
+                        groupId: id
+                      }
+                      ... on Section {
+                        sectionId: id
+                      }
+                    }
+                  }
+                }
+              }
             }
             ... on Discussion {
               _id
@@ -61,6 +89,7 @@ const MODULE_ITEMS_QUERY = gql`
               canUnpublish
               isLockedByMasterCourse
               canDuplicate
+              graded
             }
             ... on File {
               _id
@@ -79,6 +108,7 @@ const MODULE_ITEMS_QUERY = gql`
               locked
               lockAt
               unlockAt
+              graded
             }
             ... on Page {
               _id
@@ -89,6 +119,7 @@ const MODULE_ITEMS_QUERY = gql`
               type: __typename
               isLockedByMasterCourse
               canDuplicate
+              graded
             }
             ... on Quiz {
               _id
@@ -100,6 +131,7 @@ const MODULE_ITEMS_QUERY = gql`
               canUnpublish
               isLockedByMasterCourse
               canDuplicate
+              graded
             }
             ... on ExternalUrl {
               title
@@ -108,6 +140,7 @@ const MODULE_ITEMS_QUERY = gql`
               published
               canUnpublish
               newTab
+              graded
             }
             ... on ModuleExternalTool {
               title
@@ -115,6 +148,7 @@ const MODULE_ITEMS_QUERY = gql`
               url
               published
               canUnpublish
+              graded
             }
             ... on SubHeader {
               title
@@ -133,13 +167,6 @@ const transformItems = (items: ModuleItem[], moduleId: string) => {
     ...item,
     moduleId,
     index,
-    content: item.content
-      ? {
-          ...item.content,
-          id: item.content.id || item._id,
-          type: item.content.type || 'unknown',
-        }
-      : null,
   }))
 }
 

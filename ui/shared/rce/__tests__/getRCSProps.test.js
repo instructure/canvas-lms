@@ -1,4 +1,4 @@
-// Copyright (C) 2021 - present Instructure, Inc.
+// Copyright (C) 2024 - present Instructure, Inc.
 //
 // This file is part of Canvas.
 //
@@ -15,19 +15,29 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import getRCSProps from '../getRCSProps'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('getRCSProps', () => {
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   it('returns null if there is no context_asset_string in the environment', () => {
+    // Setup with explicitly undefined context_asset_string
+    fakeENV.setup({
+      context_asset_string: undefined,
+      current_user_id: undefined,
+    })
     expect(getRCSProps()).toBeNull()
   })
 
   it('returns user context if cannot upload files', () => {
-    ENV = {
-      ...ENV,
+    fakeENV.setup({
       current_user_id: 'user_id',
       RICH_CONTENT_CAN_UPLOAD_FILES: false,
       context_asset_string: 'course_1',
-    }
+    })
+
     expect(getRCSProps()).toMatchObject({
       contextId: 'user_id',
       contextType: 'user',
@@ -35,12 +45,12 @@ describe('getRCSProps', () => {
   })
 
   it('returns user context contextType is "account"', () => {
-    ENV = {
-      ...ENV,
+    fakeENV.setup({
       current_user_id: 'user_id',
       RICH_CONTENT_CAN_UPLOAD_FILES: true,
       context_asset_string: 'account_1',
-    }
+    })
+
     expect(getRCSProps()).toMatchObject({
       contextId: 'user_id',
       contextType: 'user',
@@ -48,13 +58,13 @@ describe('getRCSProps', () => {
   })
 
   it('returns user host and jwt from ENV', () => {
-    ENV = {
-      ...ENV,
+    fakeENV.setup({
       current_user_id: 'user_id',
       context_asset_string: 'course_1',
       JWT: 'the jwt',
       RICH_CONTENT_APP_HOST: 'the.host',
-    }
+    })
+
     expect(getRCSProps()).toMatchObject({
       jwt: 'the jwt',
       host: 'the.host',
@@ -62,12 +72,12 @@ describe('getRCSProps', () => {
   })
 
   it('returns containing context form context_asset_string', () => {
-    ENV = {
-      ...ENV,
+    fakeENV.setup({
       current_user_id: 'user_id',
       RICH_CONTENT_CAN_UPLOAD_FILES: true,
       context_asset_string: 'course_1',
-    }
+    })
+
     expect(getRCSProps()).toMatchObject({
       containingContext: {
         contextType: 'course',
@@ -80,8 +90,7 @@ describe('getRCSProps', () => {
   })
 
   it('returns other constants from the environment', () => {
-    ENV = {
-      ...ENV,
+    fakeENV.setup({
       current_user_id: 'user_id',
       context_asset_string: 'course_1',
       RICH_CONTENT_CAN_UPLOAD_FILES: true,
@@ -89,7 +98,8 @@ describe('getRCSProps', () => {
       active_brand_config_json_url: 'http://the.theme.here/',
       DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://canvas.instructure.com',
       FEATURES: {},
-    }
+    })
+
     expect(getRCSProps()).toMatchObject({
       canUploadFiles: true,
       filesTabDisabled: false,
@@ -98,11 +108,11 @@ describe('getRCSProps', () => {
   })
 
   it('returns the refreshToken function', () => {
-    ENV = {
-      ...ENV,
+    fakeENV.setup({
       current_user_id: 'user_id',
       context_asset_string: 'course_1',
-    }
+    })
+
     expect(typeof getRCSProps().refreshToken).toEqual('function')
   })
 })

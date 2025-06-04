@@ -17,13 +17,16 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, within} from '@testing-library/react'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {DiscussionsContainer, discussionTarget, mapState} from '../DiscussionContainer'
 import {Provider} from 'react-redux'
 import {applyMiddleware, createStore} from 'redux'
 import {thunk} from 'redux-thunk'
 import rootReducer from '../../rootReducer'
 import moment from 'moment/moment'
+
+const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
 
 describe('DiscussionsContainer', () => {
   const defaultProps = {
@@ -101,6 +104,23 @@ describe('DiscussionsContainer', () => {
     expect(() => {
       renderConnectedComponent()
     }).not.toThrow()
+  })
+
+  it('should add trackable attribute correctly', async () => {
+    const {getByTestId} = renderConnectedComponent()
+    const toggle = getByTestId(`discussions-container-${defaultProps.title}`)
+    expect(toggle).toHaveAttribute(
+      'data-action-state',
+      `discussions-container-${defaultProps.title}-expanded`,
+    )
+
+    const button = within(toggle).getAllByRole('button')
+    await user.click(button[0])
+
+    expect(toggle).toHaveAttribute(
+      'data-action-state',
+      `discussions-container-${defaultProps.title}-collapsed`,
+    )
   })
 
   describe('for pinned discussions', () => {

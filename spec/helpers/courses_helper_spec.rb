@@ -275,20 +275,20 @@ describe CoursesHelper do
 
   describe "sortable user course list helpers" do
     context "get_sorting_order" do
-      it "returns 'desc' if we are sorting on the current col that is in ascending order" do
+      it "returns 'desc' if you click the same column when there is no prior order" do
         expect(get_sorting_order("favorite", "favorite", nil)).to eq("desc")
       end
 
-      it "returns 'desc' if the default col is being sorted on in ascending order" do
-        expect(get_sorting_order("published", nil, nil)).to eq("desc")
+      it "starts new columns in ascending order" do
+        expect(get_sorting_order("published", nil, nil)).to eq("asc")
       end
 
-      it "returns nil if we are not sorting on the current col" do
-        expect(get_sorting_order("enrolled_as", "favorite", nil)).to be_nil
+      it "starts any column you click (that wasn’t already sorted) in ascending order" do
+        expect(get_sorting_order("enrolled_as", "favorite", nil)).to eq("asc")
       end
 
-      it "returns nil if we are sorting on the current col that is in descending order" do
-        expect(get_sorting_order("favorite", "favorite", "desc")).to be_nil
+      it "toggles back to 'asc' when you click the same column a second time" do
+        expect(get_sorting_order("favorite", "favorite", "desc")).to eq("asc")
       end
     end
 
@@ -311,7 +311,7 @@ describe CoursesHelper do
         table = "cc"
         column = "favorite"
         old_params = ActionController::Parameters.new
-        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: nil, focus: table)
+        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: "asc", focus: table)
         expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:cc_sort, :cc_order, :focus))
       end
 
@@ -319,7 +319,7 @@ describe CoursesHelper do
         table = "cc"
         column = "favorite"
         old_params = ActionController::Parameters.new(pc_sort: "published")
-        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: nil, focus: table, pc_sort: "published")
+        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: "asc", focus: table, pc_sort: "published")
         expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:cc_sort, :cc_order, :focus, :pc_sort))
       end
 
@@ -327,7 +327,7 @@ describe CoursesHelper do
         table = "cc"
         column = "favorite"
         old_params = ActionController::Parameters.new(foo: "bar")
-        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: nil, focus: table)
+        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: "asc", focus: table)
         expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:cc_sort, :cc_order, :focus))
       end
 

@@ -289,7 +289,7 @@ export const ToolConfigurationView = () => {
           </Flex.Item>
         </Flex>
 
-        <Heading level="h3" margin="small 0">
+        <Heading level="h3" margin="small 0" id="placements">
           {I18n.t('Placement Names')}
         </Heading>
         {enabledPlacements.map((p, i) => (
@@ -394,16 +394,18 @@ export const ToolConfigurationView = () => {
                   </Button>
                 </Tooltip>
               </Flex.Item>
-              <Flex.Item>
-                <Button
-                  color="primary-inverse"
-                  renderIcon={<IconCopyLine />}
-                  margin="0"
-                  onClick={handleCopyJsonConfig}
-                >
-                  {I18n.t('Copy JSON Code')}
-                </Button>
-              </Flex.Item>
+              {registration.ims_registration_id === null ? (
+                <Flex.Item>
+                  <Button
+                    color="primary-inverse"
+                    renderIcon={<IconCopyLine />}
+                    margin="0"
+                    onClick={handleCopyJsonConfig}
+                  >
+                    {I18n.t('Copy JSON Code')}
+                  </Button>
+                </Flex.Item>
+              ) : null}
             </Flex>
           </Flex.Item>
           <Flex.Item>

@@ -122,6 +122,8 @@ function AssetProcessorsAddModalBody(props: AssetProcessorsAddModalProps) {
       }
     case 'toolLaunch':
       return <AssetProcessorsAddModalBodyToolLaunch {...props} tool={state.tool} />
+    case 'invalidDeepLinkingResponse':
+      return <Text>{invalidDeepLinkingResponseText(state.tool)}</Text>
   }
 }
 
@@ -161,7 +163,7 @@ function AssetProcessorsAddModalBodyToolLaunch(
   props: AssetProcessorsAddModalProps & {tool: LtiLaunchDefinition},
 ) {
   const {courseId, secureParams, onProcessorResponse, tool} = props
-  const {close} = useAssetProcessorsAddModalState(s => s.actions)
+  const {close, showInvlidDeepLinkingResponse} = useAssetProcessorsAddModalState(s => s.actions)
 
   const placement = tool.placements?.ActivityAssetProcessor
   const toolName = placement?.title || tool.name
@@ -172,7 +174,12 @@ function AssetProcessorsAddModalBodyToolLaunch(
     () =>
       handleExternalContentMessages({
         onDeepLinkingResponse: data => {
-          tool && onProcessorResponse({tool, data})
+          try {
+            tool && onProcessorResponse({tool, data})
+          } catch (e) {
+            showInvlidDeepLinkingResponse(tool)
+            return
+          }
           close()
         },
         ready: close,
@@ -203,5 +210,12 @@ function AssetProcessorsAddModalBodyToolLaunch(
         />
       </div>
     </>
+  )
+}
+
+function invalidDeepLinkingResponseText(tool: LtiLaunchDefinition) {
+  return I18n.t(
+    'The document processing app %{title} could not be added. Please contact the tool provider.',
+    {title: tool.name},
   )
 }

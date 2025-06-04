@@ -1407,6 +1407,19 @@ describe MediaObjectsController do
         )
       end
 
+      it "returns the media_attachment redirect url as the source when attachment is present and attached location if passed" do
+        expect(controller.media_sources_json(@media_object, attachment: @attachment, location: "blah")).to eq(
+          [
+            {
+              bitrate: 12_345,
+              label: "12 kbps",
+              src: "http://test.host/media_attachments/#{@attachment.id}/redirect?bitrate=12345&location=blah",
+              url: "http://test.host/media_attachments/#{@attachment.id}/redirect?bitrate=12345&location=blah"
+            }
+          ]
+        )
+      end
+
       describe "with JWT access token" do
         include_context "InstAccess setup"
 

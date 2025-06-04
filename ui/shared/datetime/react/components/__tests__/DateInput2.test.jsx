@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {fireEvent, render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import MockDate from 'mockdate'
 import moment from 'moment-timezone'
 import * as tz from '@instructure/moment-utils'
@@ -126,6 +127,34 @@ describe('clean input state', () => {
   })
 })
 
+describe('choosing a day on the calendar', () => {
+  it('selects the date when clicked', async () => {
+    const user = userEvent.setup({
+      advanceTimers: jest.advanceTimersByTime,
+    })
+    const {props, getInput} = renderInput()
+    await user.click(getInput())
+    await user.tab()
+    await user.keyboard('[Space]') // Open the date picker
+    const button15 = screen.getByText('15').closest('button')
+    await user.click(button15)
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2025-04-15'), 'pick')
+  })
+
+  it('hides the calendar when clicked', async () => {
+    const user = userEvent.setup({
+      advanceTimers: jest.advanceTimersByTime,
+    })
+    const {queryByText, getInput} = renderInput()
+    await user.click(getInput())
+    await user.tab()
+    await user.keyboard('[Space]')
+    const button15 = screen.getByText('15').closest('button')
+    await user.click(button15)
+    expect(queryByText('15')).toBeNull()
+  })
+})
+
 describe('dirty input state', () => {
   it('clears the input when blurred with invalid input', () => {
     const {getInput} = renderAndDirtyInput('asdf')
@@ -217,6 +246,34 @@ describe('messages', () => {
     const {getByText} = renderAndDirtyInput('sat', {withRunningValue: true})
     // The Saturday after our "current date" is 4/12/2025
     expect(getByText('Apr 12, 2025')).toBeInTheDocument()
+  })
+})
+
+describe('disabled dates', () => {
+  it('renders disabled dates as disabled', async () => {
+    const user = userEvent.setup({
+      advanceTimers: jest.advanceTimersByTime,
+    })
+    const {getInput} = renderInput({disabledDates: () => true})
+    await user.click(getInput())
+    await user.tab()
+    await user.keyboard('[Space]') // Open the date picker
+    const button12 = screen.getByText('12').closest('button')
+    const button22 = screen.getByText('22').closest('button')
+    ;[button12, button22].forEach(b => expect(b).toBeDisabled())
+  })
+
+  it('does not select a disabled date when clicked', async () => {
+    const user = userEvent.setup({
+      advanceTimers: jest.advanceTimersByTime,
+    })
+    const {props, getInput} = renderInput({disabledDates: () => true})
+    await user.click(getInput())
+    await user.tab()
+    await user.keyboard('[Space]')
+    const button15 = screen.getByText('15').closest('button')
+    await user.click(button15)
+    expect(props.onSelectedDateChange).not.toHaveBeenCalledWith(new Date('2025-04-15'))
   })
 })
 

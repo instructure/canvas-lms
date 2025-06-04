@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {genericError} from '../ApiResult'
 import {matchApiResultState} from '../matchApiResultState'
 import {WithApiResultState} from '../WithApiResultState'
 
@@ -82,7 +83,7 @@ test('it should render stale values', () => {
 test('it should render error values', () => {
   const state: WithApiResultState<number> = {
     _type: 'error',
-    message: 'Erroar',
+    error: genericError('Erroar'),
   }
 
   const result = matchApiResultState(state)<any>({
@@ -91,5 +92,10 @@ test('it should render error values', () => {
     loading: () => 0,
   })
 
-  expect(result).toStrictEqual(['Erroar'])
+  expect(result).toStrictEqual([
+    {
+      _type: 'GenericError',
+      message: 'Erroar',
+    },
+  ])
 })

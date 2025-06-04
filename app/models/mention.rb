@@ -32,7 +32,7 @@ class Mention < ApplicationRecord
   set_broadcast_policy do |p|
     p.dispatch :discussion_mention
     p.to { user }
-    p.whenever { |record| record.just_created && record.active? && user != discussion_entry.user }
+    p.whenever { |record| record.previously_new_record? && record.active? && user != discussion_entry.user }
     p.data { discussion_entry.course_broadcast_data }
   end
 

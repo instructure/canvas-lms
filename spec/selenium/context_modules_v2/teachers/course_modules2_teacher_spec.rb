@@ -79,6 +79,42 @@ describe "context modules", :ignore_js_errors do
 
         expect(assignment_title.text).to eq("New Title")
       end
+
+      context "send to kebab form" do
+        before do
+          student_in_course
+          @first_user = @course.students.first
+        end
+
+        it "shows the send to kebab form" do
+          go_to_modules
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Send To...").click
+
+          expect(send_to_modal).to be_displayed
+        end
+
+        it "module is correctly sent" do
+          go_to_modules
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Send To...").click
+
+          set_value(send_to_modal_input, "User")
+          option_list_id = send_to_modal_input.attribute("aria-controls")
+
+          expect(ff("##{option_list_id} [role='option']").count).to eq 1
+
+          fj("##{option_list_id} [role='option']:contains(#{@first_user.first_name})").click
+          selected_element = send_to_form_selected_elements.first
+
+          expect(selected_element.text).to eq("User")
+
+          fj("button:contains('Send')").click
+
+          wait_for_ajaximations
+          expect(f("body")).not_to contain_css(send_to_modal_modal_selector)
+        end
+      end
     end
 
     context "send to kebab form" do

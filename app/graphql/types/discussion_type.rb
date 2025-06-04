@@ -149,7 +149,9 @@ module Types
     end
 
     field :reply_to_entry_required_count, Integer, null: false
-    delegate :reply_to_entry_required_count, to: :object
+    def reply_to_entry_required_count
+      object.root_topic ? object.root_topic.reply_to_entry_required_count : object.reply_to_entry_required_count
+    end
 
     field :assignment, Types::AssignmentType, null: true
     def assignment

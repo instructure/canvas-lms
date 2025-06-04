@@ -21,12 +21,12 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {BasicUser, ContentShareUserSearchSelectorRef} from './ContentShareUserSearchSelector'
 import FileFolderInfo from '../../shared/FileFolderInfo'
 import {type File} from '../../../../interfaces/File'
 import DirectShareUserPanel from './DirectShareUserPanel'
+import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../../../utils/apiUtils'
 import FileFolderTray from '../../shared/TrayWrapper'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
@@ -151,7 +151,7 @@ const DirectShareUserTray = ({open, onDismiss, courseId, file}: DirectShareUserT
 
   const startSendOperation = useCallback(
     () =>
-      doFetchApi({
+      doFetchApiWithAuthCheck({
         method: 'POST',
         path: '/api/v1/users/self/content_shares',
         body: {
@@ -175,7 +175,13 @@ const DirectShareUserTray = ({open, onDismiss, courseId, file}: DirectShareUserT
     setRequestInFlight(true)
     startSendOperation()
       .then(sendSuccessful)
-      .catch(showFlashError(I18n.t('Error starting content share.')))
+      .catch(error => {
+        if (error instanceof UnauthorizedError) {
+          window.location.href = '/login'
+          return
+        }
+        showFlashError(I18n.t('Error starting content share.'))(error)
+      })
       .finally(() => setRequestInFlight(false))
   }, [selectorRef, sendSuccessful, startSendOperation])
 

@@ -776,7 +776,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
         <span
           className="PlannerItem-styles__feedbackAvatar"
         >
-          <Avatar
+          <ForwardRef
             data-fs-exclude={true}
             name="Dr. David Bowman"
             size="small"
@@ -9607,7 +9607,7 @@ exports[`renders Note correctly with everything 1`] = `
         }
       }
     >
-      <Avatar
+      <ForwardRef
         data-fs-exclude={true}
         name="Jane"
         size="small"
@@ -10028,7 +10028,7 @@ exports[`renders Note correctly without Course 1`] = `
         }
       }
     >
-      <Avatar
+      <ForwardRef
         data-fs-exclude={true}
         name="Jane"
         size="small"
@@ -14344,7 +14344,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
         <span
           className="PlannerItem-styles__feedbackAvatar"
         >
-          <Avatar
+          <ForwardRef
             data-fs-exclude={true}
             name="?"
             size="small"
@@ -14742,7 +14742,7 @@ exports[`renders feedback if available 1`] = `
         <span
           className="PlannerItem-styles__feedbackAvatar"
         >
-          <Avatar
+          <ForwardRef
             data-fs-exclude={true}
             name="Boyd Crowder"
             size="small"
@@ -15141,7 +15141,7 @@ exports[`renders media feedback if available 1`] = `
         <span
           className="PlannerItem-styles__feedbackAvatar"
         >
-          <Avatar
+          <ForwardRef
             data-fs-exclude={true}
             name="Howard Stern"
             size="small"
@@ -16247,7 +16247,7 @@ exports[`renders user-created Todo correctly 1`] = `
         }
       }
     >
-      <Avatar
+      <ForwardRef
         data-fs-exclude={true}
         name="Jane"
         size="small"

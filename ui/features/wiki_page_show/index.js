@@ -58,3 +58,7 @@ ready(() => {
 
   wikiPageView.render()
 })
+
+export function Component() {
+  return null
+}

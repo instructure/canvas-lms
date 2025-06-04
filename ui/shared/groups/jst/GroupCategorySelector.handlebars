@@ -72,7 +72,7 @@
             aria-labelledby="assignment_group_category_id_label" {{disabledIf groupCategoryIdDisabled}}>
             <option value="blank" {{selectedIf groupCategoryUnselected}}>{{#t}}Select a group category{{/t}}</option>
             {{#each groupCategories}}
-            <option value="{{id}}" {{selectedIf ../groupCategoryId this.id}}>
+            <option value="{{id}}" {{selectedIfNumber ../groupCategoryId this.id}}>
               {{name}}
             </option>
             {{/each}}

@@ -31,8 +31,10 @@ const I18n = createI18nScope('AddGroup')
 
 const validateTitle = title => {
   const MAX_TITLE_LENGTH = 255
-  if (!title || title.trim().length <= 0) return [{type: 'newError', text: I18n.t('Cannot be blank')}]
-  if (title.trim().length > MAX_TITLE_LENGTH) return [{type: 'newError', text: I18n.t('Must be 255 characters or less')}]
+  if (!title || title.trim().length <= 0)
+    return [{type: 'newError', text: I18n.t('Cannot be blank')}]
+  if (title.trim().length > MAX_TITLE_LENGTH)
+    return [{type: 'newError', text: I18n.t('Must be 255 characters or less')}]
   return []
 }
 
@@ -53,7 +55,7 @@ const AddContentItem = ({
   }
 
   const save = () => {
-    if(errorMessages.length > 0) {
+    if (errorMessages.length > 0) {
       titleRef.current?.focus()
       return
     }
@@ -65,11 +67,11 @@ const AddContentItem = ({
   }
 
   return (
-    <View as="div" padding="xx-small">
+    <View as="div" padding="xx-small" onFocus={e => e.stopPropagation()}>
       <Flex alignItems="start">
         <Focus>
           <TextInput
-            elementRef={ref => titleRef.current = ref}
+            elementRef={ref => (titleRef.current = ref)}
             renderLabel={<ScreenReaderContent>{textInputInstructions}</ScreenReaderContent>}
             placeholder={textInputInstructions}
             display="inline-block"

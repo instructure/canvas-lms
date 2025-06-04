@@ -140,6 +140,27 @@ describe('FileFolderTable', () => {
     expect(folderCheckbox).toBeInTheDocument()
   })
 
+  it('does not render an extra row for the filedrop', async () => {
+    renderComponent({rows: [FAKE_FOLDERS_AND_FILES[0]]})
+    const rows = document.querySelectorAll('tr')
+    // the header row counts as a row
+    expect(rows).toHaveLength(2)
+  })
+
+  it('renders screen reader labels for headers', async () => {
+    renderComponent({rows: FAKE_FOLDERS_AND_FILES})
+
+    const nameHeader = screen.getByText('Sort by created')
+    expect(nameHeader).toBeInTheDocument()
+  })
+
+  it('does not render screen reader label when stacked', async () => {
+    renderComponent({size: 'medium', rows: FAKE_FOLDERS_AND_FILES})
+
+    const nameHeader = screen.queryByText('Sort by created')
+    expect(nameHeader).not.toBeInTheDocument()
+  })
+
   describe('modified_by column', () => {
     it('renders link with user profile of file rows when modified by user', async () => {
       const {display_name, html_url} = FAKE_FILES[0].user || {}

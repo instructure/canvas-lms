@@ -45,6 +45,8 @@ jest.mock('../AssetProcessorsAddModal', () => ({
   },
 }))
 
+const hideErrorsMocked = jest.fn()
+
 describe('AssetProcessors', () => {
   const queryClient = new QueryClient()
   let oldWindowOpen: typeof window.open
@@ -105,6 +107,7 @@ describe('AssetProcessors', () => {
           initialAttachedProcessors={aps}
           courseId={123}
           secureParams="my-secure-params"
+          hideErrors={hideErrorsMocked}
         />
       </MockedQueryClientProvider>,
     )
@@ -165,6 +168,7 @@ describe('AssetProcessors', () => {
     if (queryByText('t2 · Lti 1.3 Tool Title')) {
       await waitForElementToBeRemoved(() => queryByText('t2 · Lti 1.3 Tool Title'))
     }
+    expect(hideErrorsMocked).toHaveBeenCalled()
   })
 
   it('allows removing existing attached processors', async () => {
@@ -271,5 +275,12 @@ describe('AssetProcessors', () => {
       '_blank',
       'width=1000,height=900,toolbar=yes',
     )
+  })
+
+  it('has an element with asset_processors_errors class where backend errors are shown', () => {
+    const {getByTestId} = renderAssetProcessors()
+    const el = getByTestId('asset-processor-errors')
+    expect(el).toBeInTheDocument()
+    expect(el.id).toBe('asset_processors_errors')
   })
 })

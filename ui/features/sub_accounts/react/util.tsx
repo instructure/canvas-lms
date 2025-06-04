@@ -16,13 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {QueryFunctionContext} from '@tanstack/react-query'
-import {createContext, type MutableRefObject, useContext, useRef} from 'react'
-import {AccountWithCounts} from './types'
+import {AccountWithCounts, SubaccountQueryKey} from './types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+
+const SUBACCOUNTS_PER_PAGE = 100
+
+export const generateQueryKey = (accountId: string, isRoot = false): SubaccountQueryKey => {
+  return isRoot ? ['account', accountId] : ['subAccountList', accountId]
+}
 
 export const calculateIndent = (indent: number) => {
   return indent * 3
+}
+
+export const fetchRootAccount = async (id: string): Promise<AccountWithCounts> => {
+  const params = {
+    includes: ['course_count', 'sub_account_count'],
+  }
+  const {json} = await doFetchApi<AccountWithCounts>({
+    path: `/api/v1/accounts/${id}`,
+    method: 'GET',
+    params,
+  })
+  return json!
 }
 
 export type FetchSubAccountsResponse = {
@@ -34,12 +50,12 @@ export const fetchSubAccounts = async ({
   queryKey,
   pageParam,
 }: {
-  queryKey: [string, string]
+  queryKey: SubaccountQueryKey
   pageParam: unknown
 }): Promise<FetchSubAccountsResponse> => {
   const accountId = queryKey[1]
   const params = {
-    per_page: '100',
+    per_page: SUBACCOUNTS_PER_PAGE,
     page: (pageParam || '1').toString(),
     include: ['course_count', 'sub_account_count'],
     order: 'name',
@@ -52,19 +68,3 @@ export const fetchSubAccounts = async ({
   const nextPage = link?.next ? link.next.page : null
   return {json: json!, nextPage}
 }
-
-interface FocusContextType {
-  focusId: MutableRefObject<string>
-}
-
-const Context = createContext<FocusContextType>({
-  focusId: {current: ''},
-})
-
-export function FocusProvider({children}: {children: React.ReactNode}) {
-  const focusId = useRef('')
-
-  return <Context.Provider value={{focusId}}>{children}</Context.Provider>
-}
-
-export const useFocusContext = () => useContext(Context)

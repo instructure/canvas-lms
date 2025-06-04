@@ -42,7 +42,7 @@ const RosterTableHeader: FC<RosterTableHeaderProps> = ({
   sortField,
   sortDirection,
   handleSelectAll,
-  handleSort
+  handleSort,
 }) => {
   const {
     canViewLoginIdColumn,
@@ -50,18 +50,14 @@ const RosterTableHeader: FC<RosterTableHeaderProps> = ({
     canReadReports,
     hideSectionsOnCourseUsersPage,
     canManageDifferentiationTags,
-    allowAssignToDifferentiationTags
+    allowAssignToDifferentiationTags,
   } = useCoursePeopleContext()
 
   const CustomColHeader: FC<{
     id: string
     name: string
     width?: string
-  }> = ({
-    id,
-    name,
-    width
-  }) => {
+  }> = ({id, name, width}) => {
     let sortOrder: TableHeaderSortDirection = 'none'
     if (id === sortField) {
       sortOrder = sortDirection === ASC ? ASCENDING : DESCENDING
@@ -81,102 +77,50 @@ const RosterTableHeader: FC<RosterTableHeaderProps> = ({
   }
 
   return (
-    <Table.Head
-      renderSortLabel={
-        <ScreenReaderContent>
-          {I18n.t('Sort by')}
-        </ScreenReaderContent>
-      }
-    >
+    <Table.Head renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
       <Table.Row>
-        {allowAssignToDifferentiationTags && canManageDifferentiationTags
-          ? (
-              <Table.ColHeader
-                id="select"
-                width="36px"
-              >
-                <Checkbox
-                  label={
-                    <ScreenReaderContent>
-                      {I18n.t('Select all')}
-                    </ScreenReaderContent>
-                  }
-                  onChange={() => handleSelectAll(allSelected)}
-                  checked={allSelected}
-                  indeterminate={someSelected}
-                  data-testid="header-select-all"
-                />
-              </Table.ColHeader>
-            )
-          : <></>
-        }
-        <CustomColHeader
-          id="name"
-          name={I18n.t("Name")}
-        />
-        {canViewLoginIdColumn
-          ? (
-              <CustomColHeader
-                id="login_id"
-                name= {I18n.t("Login ID")}
-                width="13%"
-              />
-            )
-          : <></>
-        }
-        {canViewSisIdColumn
-          ? (
-              <CustomColHeader
-                id="sis_id"
-                name={I18n.t("SIS ID")}
-                width="9%"
-              />
-            )
-          : <></>
-        }
-        {!hideSectionsOnCourseUsersPage
-          ? (
-            <CustomColHeader
-              id="section"
-              name={I18n.t("Section")}
-              width="12%"
+        {allowAssignToDifferentiationTags && canManageDifferentiationTags ? (
+          <Table.ColHeader id="select" width="36px">
+            <Checkbox
+              label={<ScreenReaderContent>{I18n.t('Select all')}</ScreenReaderContent>}
+              onChange={() => handleSelectAll(allSelected)}
+              checked={allSelected}
+              indeterminate={someSelected}
+              data-testid="header-select-all"
             />
-          )
-          : <></>
-        }
-        <CustomColHeader
-          id="role"
-          name={I18n.t("Role")}
-          width="8%"
-        />
-        {canReadReports
-          ? (
-              <CustomColHeader
-                id="lastActivity"
-                name={I18n.t("Last Activity")}
-                width="13%"
-              />
-            )
-          : <></>
-        }
-        {canReadReports
-          ? (
-              <CustomColHeader
-                id="total_activity_time"
-                name={I18n.t("Total Activity")}
-                width="13%"
-              />
-            )
-          : <></>
-        }
-        <Table.ColHeader
-          id="userOptionsMenu"
-          width="36px"
-          data-testid="header-admin-links"
-        >
-          <ScreenReaderContent>
-            {I18n.t('Administrative Links')}
-          </ScreenReaderContent>
+          </Table.ColHeader>
+        ) : (
+          <></>
+        )}
+        <CustomColHeader id="name" name={I18n.t('Name')} />
+        {canViewLoginIdColumn ? (
+          <CustomColHeader id="login_id" name={I18n.t('Login ID')} width="13%" />
+        ) : (
+          <></>
+        )}
+        {canViewSisIdColumn ? (
+          <CustomColHeader id="sis_id" name={I18n.t('SIS ID')} width="9%" />
+        ) : (
+          <></>
+        )}
+        {!hideSectionsOnCourseUsersPage ? (
+          <CustomColHeader id="section_name" name={I18n.t('Section')} width="12%" />
+        ) : (
+          <></>
+        )}
+        <CustomColHeader id="role" name={I18n.t('Role')} width="8%" />
+        {canReadReports ? (
+          <CustomColHeader id="last_activity_at" name={I18n.t('Last Activity')} width="13%" />
+        ) : (
+          <></>
+        )}
+        {canReadReports ? (
+          <CustomColHeader id="total_activity_time" name={I18n.t('Total Activity')} width="13%" />
+        ) : (
+          <></>
+        )}
+        <Table.ColHeader id="userOptionsMenu" width="36px" data-testid="header-admin-links">
+          <ScreenReaderContent>{I18n.t('Administrative Links')}</ScreenReaderContent>
         </Table.ColHeader>
       </Table.Row>
     </Table.Head>

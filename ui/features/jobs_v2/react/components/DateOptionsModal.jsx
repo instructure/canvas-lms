@@ -23,7 +23,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
@@ -87,14 +87,14 @@ export default function DateOptionsModal({open, startDate, endDate, timeZone, on
           layout="columns"
           vAlign="top"
         >
-          <CanvasDateInput
+          <CanvasDateInput2
             selectedDate={newStartDate}
             renderLabel={I18n.t('After')}
             formatDate={formatDate}
             withRunningValue={true}
             onSelectedDateChange={date => setNewStartDate(date?.toISOString() || '')}
           />
-          <CanvasDateInput
+          <CanvasDateInput2
             selectedDate={newEndDate}
             renderLabel={I18n.t('Before')}
             formatDate={formatDate}

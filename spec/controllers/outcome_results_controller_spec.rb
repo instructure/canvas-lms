@@ -1847,6 +1847,13 @@ describe OutcomeResultsController do
           expect(rollups_student2.count).to eq(3) # enrolled in 3 sections
           expect(rollups_student3.count).to eq(2) # enrolled in 2 sections
         end
+
+        it "handles section_id as a string" do
+          json = parse_response(get_rollups({ section_id: @section1.id.to_s }))
+          rollups = json["rollups"].select { |r| r["links"]["user"] == @student1.id.to_s }
+          expect(rollups.count).to eq(1)
+          expect(json["rollups"].first["links"]["user"]).to eq @student1.id.to_s
+        end
       end
     end
 

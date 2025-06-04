@@ -2185,10 +2185,17 @@ class Submission < ActiveRecord::Base
 
   def maybe_queue_conditional_release_grade_change_handler
     shard.activate do
-      return unless graded? && posted?
+      if Account.site_admin.feature_enabled? :mastery_path_submission_trigger_reloaded_evaluation
+        reloaded = Submission.find(id)
+        return unless reloaded.graded? && reloaded.posted?
+      else
+        return unless graded? && posted?
+      end
 
       if assignment.present? && assignment.queue_conditional_release_grade_change_handler?
         queue_conditional_release_grade_change_handler
+      elsif assignment.blank?
+        logger.warn("No assignment present for submission #{id}; skipping conditional release handler")
       end
     end
   end
@@ -2530,9 +2537,8 @@ class Submission < ActiveRecord::Base
                              .first_or_initialize
     res.user_id = user_id
     res.workflow_state = "assigned" if res.new_record?
-    just_created = res.new_record?
     res.send_reminder! # this method also saves the assessment_request
-    obj.assign_assessment(res) if obj.is_a?(Submission) && just_created
+    obj.assign_assessment(res) if obj.is_a?(Submission) && res.previously_new_record?
     res
   end
 

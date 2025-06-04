@@ -26,6 +26,7 @@ import {type File, type Folder} from '../../../../interfaces/File'
 import {isFile} from '../../../../utils/fileFolderUtils'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import getCookie from '@instructure/get-cookie'
+import {UnauthorizedError} from '../../../../utils/apiUtils'
 import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -62,6 +63,10 @@ export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) 
           },
         )
 
+        if (response.status === 401) {
+          throw new UnauthorizedError()
+        }
+
         if (!response.ok) {
           const errorText = await response.text()
           throw new Error(`Failed to delete ${item.id}: ${response.status} - ${errorText}`)
@@ -77,7 +82,11 @@ export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) 
       showFlashSuccess(successMessage)()
       queryClient.refetchQueries({queryKey: ['quota'], type: 'active'})
       await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
-    } catch (_error) {
+    } catch (error) {
+      if (error instanceof UnauthorizedError) {
+        window.location.href = '/login'
+        return
+      }
       const errorMessage = I18n.t('Failed to delete items. Please try again.')
       showFlashError(errorMessage)
     } finally {

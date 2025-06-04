@@ -132,14 +132,14 @@ class DiscussionEntry < ActiveRecord::Base
     p.dispatch :new_discussion_entry
     p.to { discussion_topic.subscribers - [user] - mentioned_users }
     p.whenever do |record|
-      record.just_created && record.active?
+      record.previously_new_record? && record.active?
     end
     p.data { course_broadcast_data }
 
     p.dispatch :announcement_reply
     p.to { discussion_topic.user }
     p.whenever do |record|
-      record.discussion_topic.is_announcement && record.just_created && record.active?
+      record.discussion_topic.is_announcement && record.previously_new_record? && record.active?
     end
     p.data { course_broadcast_data }
   end
@@ -276,7 +276,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def update_topic_submission
-    if discussion_topic&.assignment&.checkpoints_parent?
+    if discussion_topic&.assignment&.checkpoints_parent? && discussion_topic&.assignment&.sub_assignments&.length == 2
       entry_checkpoint_type = parent_id ? CheckpointLabels::REPLY_TO_ENTRY : CheckpointLabels::REPLY_TO_TOPIC
       submission = if entry_checkpoint_type == CheckpointLabels::REPLY_TO_TOPIC
                      discussion_topic.reply_to_topic_checkpoint.submissions.find_by(user_id:)

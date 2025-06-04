@@ -152,8 +152,7 @@ describe "communication_channels/confirm" do
       page = Nokogiri::HTML5("<document>" + response.body + "</document>")
       label = page.css("label[for='pseudonym_password']").first
       expect(label).not_to be_nil
-      expect(label.text).to include("Password")
-      expect(label.inner_html).to include('<span aria-hidden="true">*</span>')
+      expect(label.text).to match(/Password:?\s*\*/)
       field = page.css("#pseudonym_password").first
       expect(field).not_to be_nil
       expect(field["required"]).to eq "required"

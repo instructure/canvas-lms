@@ -26,6 +26,13 @@ import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import MoreOptions from '../MoreOptions/index'
 import React from 'react'
 
+// Mock TruncateText component to avoid canvas measurement issues
+jest.mock('@instructure/ui-truncate-text', () => {
+  return {
+    TruncateText: ({children}) => children,
+  }
+})
+
 const createGraphqlMocks = async (overrides = {}) => {
   const userGroupOverrides = [{Node: () => ({__typename: 'User'})}]
   userGroupOverrides.push(overrides)

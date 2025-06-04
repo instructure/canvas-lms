@@ -918,7 +918,7 @@ GEM
     pygments.rb (3.0.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (3.1.13)
+    rack (3.1.14)
     rack-session (2.1.0)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -1102,7 +1102,7 @@ GEM
     rubycas-client (2.3.9)
       activesupport
     rubyzip (2.3.2)
-    saml2 (3.2.0)
+    saml2 (3.2.1)
       activesupport (>= 3.2, < 8.2)
       nokogiri (>= 1.5.8, < 2.0)
       nokogiri-xmlsec-instructure (~> 0.9, >= 0.9.5)

@@ -99,6 +99,11 @@ input[type=text].loading {
   border-radius: 3px;
 }
 
+.error-textarea {
+  @extend .error-outline;
+  border: none !important;
+}
+
 .error-text {
   color: $ic-bg-light-danger-text !important
 }

@@ -112,6 +112,7 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
 
       root.render(
         <UserDateRangeSearch
+          isOpen
           userName={userName}
           onSubmit={({from, to}) => {
             self.$hiddenDateStart.val(from)

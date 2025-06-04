@@ -4389,6 +4389,8 @@ ko:
         student: 학생
       loading: "학생 로딩 중..."
       select_student: "학생 선택"
+    links: 
+      student_progress: "진행 상황 보기"
     master_course_restrictions: 
       labels: 
         points: 배점
@@ -4583,6 +4585,7 @@ ko:
       tab_hidden_if_disabled: "페이지가 비활성이므로 탐색에 표시되지 않음"
       tabs: 
         alerts: 알림
+        apps: 앱
         details: "과목 세부 정보"
         feature_options: "기능 옵션"
         grade_publishing: "평점 게시"
@@ -5017,6 +5020,7 @@ ko:
   delete_failed_6285e600: "삭제 실패"
   delete_grading_scheme_6b308832: "평가 구성표 삭제"
   delete_my_account_41060aad: "내 계정 삭제"
+  delete_name_81c1b5b2: "%{name} 삭제"
   delete_quiz_142b8099: "퀴즈 삭제"
   delete_sub_account_c267a6e5: "하위 계정 삭제"
   delete_survey_56fddbbd: "설문 삭제"
@@ -10141,6 +10145,7 @@ ko:
     errors: 
       create_failed: "의견 생성 실패함"
   page_name_21defa75: "페이지 이름"
+  page_title_106304bb: "페이지 제목"
   page_title_d1a22bbf: "페이지 제목"
   page_views: 
     browsers: 
@@ -14734,6 +14739,10 @@ ko:
   wiki_pages: 
     index: 
       titles: 
+        pages: 페이지
+    new: 
+      titles: 
+        new_page: "새 페이지"
         pages: 페이지
     notices: 
       cannot_edit: "\"%{title}\" 페이지를 편집할 수 없습니다."

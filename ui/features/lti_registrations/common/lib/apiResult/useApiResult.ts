@@ -17,7 +17,7 @@
  */
 
 import * as React from 'react'
-import {ApiResult, formatApiResultError, isSuccessful} from './ApiResult'
+import {ApiResult, exception, formatApiResultError, isSuccessful} from './ApiResult'
 import {WithApiResultState} from './WithApiResultState'
 
 export type ApiResultFetch<A> = () => Promise<ApiResult<A>>
@@ -69,16 +69,17 @@ export const useApiResult = <A>(fetch: ApiResultFetch<A>) => {
                 }
               : {
                   _type: 'error',
-                  message: formatApiResultError(result),
+                  error: result,
                 }
           } else {
             return prev
           }
         })
       })
-      .catch(() => {
+      .catch(err => {
         setState({
           _type: 'error',
+          error: exception(err),
         })
       })
   }, [fetch])

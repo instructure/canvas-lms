@@ -53,6 +53,7 @@ export type DifferentiatedModulesTrayProps = {
   moduleList?: Module[]
   courseId: string
   addModuleUI?: (data: Record<string, any>, element: HTMLDivElement) => void
+  onChangeAssignedTo?: () => void
 }
 
 const SettingsPanel = React.lazy(() => import('./SettingsPanel'))
@@ -115,6 +116,7 @@ function Body({
   initialTab = ASSIGN_TO_ID,
   courseId,
   trayRef,
+  onChangeAssignedTo,
   ...settingsProps
 }: DifferentiatedModulesTrayProps & {trayRef: React.RefObject<HTMLElement>}) {
   const isPacedCourse = ENV.IN_PACED_COURSE
@@ -165,6 +167,13 @@ function Body({
     } else {
       onDismiss()
     }
+  }
+
+  const handleOnDidSubmitAssignedTo = () => {
+    if (onChangeAssignedTo) {
+      onChangeAssignedTo()
+    }
+    handleSubmitMissingTabs()
   }
 
   return (
@@ -236,7 +245,7 @@ function Body({
                 }}
                 defaultOption={assignToData.current?.selectedOption}
                 defaultAssignees={assignToData.current?.selectedAssignees}
-                onDidSubmit={handleSubmitMissingTabs}
+                onDidSubmit={handleOnDidSubmitAssignedTo}
               />
             )}
           </Tabs.Panel>
@@ -250,8 +259,8 @@ export default function DifferentiatedModulesTray(props: DifferentiatedModulesTr
   const {onDismiss, moduleElement, moduleId} = props
   const headerLabel = moduleId ? I18n.t('Edit Module Settings') : I18n.t('Add Module')
   const trayRef = useRef<HTMLElement | null>(null)
-  const themeOverride = (window.ENV.FEATURES.modules_requirements_allow_percentage)
-    ? { regularWidth: '32.375em' }
+  const themeOverride = window.ENV.FEATURES.modules_requirements_allow_percentage
+    ? {regularWidth: '32.375em'}
     : undefined
 
   return (

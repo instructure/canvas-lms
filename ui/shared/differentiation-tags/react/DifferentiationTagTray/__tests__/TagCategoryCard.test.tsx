@@ -183,4 +183,10 @@ describe('TagCategoryCard', () => {
       expect(screen.getByText('Delete Tag')).toBeInTheDocument()
     })
   })
+
+  it('has the proper role and aria-label attributes', () => {
+    const {container} = renderComponent({category: noTagsCategory})
+    const card = container.querySelector('span[role="group"]')
+    expect(card).toHaveAttribute('aria-label', noTagsCategory.name)
+  })
 })

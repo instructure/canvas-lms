@@ -5589,6 +5589,8 @@ uk:
     link_validator: 
       link_validator: "Валідатор посилання курсу"
       page_title: "Оцінювач посилання курсу"
+    links: 
+      student_progress: "Переглянути прогрес"
     master_course_restrictions: 
       labels: 
         availability_dates: "Дати доступності"
@@ -5799,8 +5801,10 @@ uk:
       tab_hidden_if_disabled: "Сторінка відключена, не буде з'являтися в навігації"
       tabs: 
         alerts: "Сповіщення про небезпеку"
+        apps: Застосунки
         details: "Детальна інформація про курc"
-        feature_options: "Особливі можливості"
+        feature_options: "Варіанти функції"
+        grade_syncing: "Синхронізація оцінок"
         navigation: Навігація
         sections: Розділи
         tools: Застосунки
@@ -6362,6 +6366,7 @@ uk:
   delete_grading_scheme_6b308832: "Видалити схему оцінювання"
   delete_group_86c381ec: "Видалити групу"
   delete_my_account_41060aad: "Видалити мій обліковий запис"
+  delete_name_81c1b5b2: "Видалити %{name}"
   delete_outcome_cc6546f1: "Видалити результати"
   delete_outcome_group_6b399d34: "Видалити результати групи"
   delete_quiz_142b8099: "Видалити контрольну роботу"
@@ -12680,6 +12685,7 @@ uk:
   page_name_21defa75: "Назва сторінки"
   page_name_is_required_d8c2736e: "Назва сторінки обов'язкова"
   page_not_found_2b0d05f5: "Сторінку не знайдено"
+  page_title_106304bb: "Заголовок сторінки"
   page_title_d1a22bbf: "Заголовок сторінки"
   page_views: 
     browsers: 
@@ -18964,6 +18970,10 @@ uk:
       page_header_title: "Редагувати %{page_name}"
     index: 
       titles: 
+        pages: Сторінки
+    new: 
+      titles: 
+        new_page: "Нова сторінка"
         pages: Сторінки
     notices: 
       cannot_edit: "Ви не можете редагувати сторінку \"%{title}\"."

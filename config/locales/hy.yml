@@ -5129,6 +5129,8 @@ hy:
         student: Ուսանող
       loading: "Ունկնդիրների ցուցակի բեռնում"
       select_student: "Ընտրել ունկնդրին"
+    links: 
+      student_progress: "Դիտել կատարման ընթացքը"
     notices: 
       backup_restored: "Պահուստային տարբերակը հաջողությամբ վերականգնվել է:"
       concluded: "Դասընթացը հաջողությամբ ավարտված է "
@@ -5345,6 +5347,7 @@ hy:
       tab_hidden_if_disabled: "Էջն անջատված է, չի երևա նավարկման ժամանակ"
       tabs: 
         alerts: Զգուշացումներ
+        apps: Հավելվածներ
         details: "Դասընթացի մասին տեղեկություններ"
         feature_options: "Ֆունկցիաների պարամետրերը"
         grade_publishing: "Գնահատականների հրապարակում"
@@ -5845,6 +5848,7 @@ hy:
   delete_grading_period_dba36e59: "Ջնջել գնահատման ժամանակահատվածը"
   delete_grading_scheme_6b308832: "Ջնջել գնահատման սխեման"
   delete_my_account_41060aad: "Ջնջել իմ հաշիվը"
+  delete_name_81c1b5b2: "Ջնջել %{name}"
   delete_quiz_142b8099: "Ջնջել թեստը"
   delete_requirement_bce2d943: "Ջնջել պահանջը"
   delete_selected_a023ccf8: "Ջնջել նշվածը"
@@ -12021,6 +12025,7 @@ hy:
       create_failed: "Մեկնաբանության ստեղծումը չհաջողվեց"
   page_name_21defa75: "Էջի անվանում"
   page_not_found_2b0d05f5: "Էջը չի գտնվել"
+  page_title_106304bb: "Էջի վերնագիրը"
   page_title_d1a22bbf: "Էջի անվանում"
   page_views: 
     browsers: 
@@ -17883,6 +17888,10 @@ hy:
       page_header_title: "Խմբագրել %{page_name}"
     index: 
       titles: 
+        pages: Էջեր
+    new: 
+      titles: 
+        new_page: "Նոր էջ"
         pages: Էջեր
     notices: 
       cannot_edit: "Դուք թույլտվություն չունեք խմբագրելու էջը \"%{title}\":"

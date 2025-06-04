@@ -127,14 +127,11 @@ export default {
         .parent()
         .find('input[name="account_notification[start_at]"]')
       target_start_at_disp_el.val(source_start_at_disp_el.val())
-      if (source_start_at_disp_el.is('[readonly]')) {
-        target_start_at_value_el.val(source_start_at_disp_el.attr('data-initial-value'))
-      } else {
-        const source_start_at_value_el = source_start_at_disp_el
-          .parent()
-          .find('input[name="account_notification[start_at]"]')
-        target_start_at_value_el.val(source_start_at_value_el.val())
-      }
+
+      const source_start_at_value_el = source_start_at_disp_el
+        .parent()
+        .find('input[name="account_notification[start_at]"]')
+      target_start_at_value_el.val(source_start_at_value_el.val())
 
       const source_end_at_disp_el = $(source_form_id).find(
         '#account_notification_end_at_' + announcement_id,
@@ -144,14 +141,11 @@ export default {
         .parent()
         .find('input[name="account_notification[end_at]"]')
       target_end_at_disp_el.val(source_end_at_disp_el.val())
-      if (source_end_at_disp_el.is('[readonly]')) {
-        target_end_at_value_el.val(source_end_at_disp_el.attr('data-initial-value'))
-      } else {
-        const source_end_at_value_el = source_end_at_disp_el
-          .parent()
-          .find('input[name="account_notification[end_at]"]')
-        target_end_at_value_el.val(source_end_at_value_el.val())
-      }
+
+      const source_end_at_value_el = source_end_at_disp_el
+        .parent()
+        .find('input[name="account_notification[end_at]"]')
+      target_end_at_value_el.val(source_end_at_value_el.val())
 
       const send_message = $(source_form_id)
         .find('#account_notification_send_message_' + announcement_id)

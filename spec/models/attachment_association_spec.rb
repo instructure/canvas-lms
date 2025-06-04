@@ -49,6 +49,35 @@ describe AttachmentAssociation do
     end
   end
 
+  describe "#insert_all" do
+    let(:submission) { submission_model({ course: }) }
+
+    let(:attachment_association_params_1) do
+      {
+        context_type: "Course",
+        context_id: course.id,
+        attachment_id: user_attachment.id,
+        user_id: student.id,
+        field_name: "syllabus_body"
+      }
+    end
+
+    let(:attachment_association_params_2) do
+      {
+        context_type: "Course",
+        context_id: course.id,
+        attachment_id: teacher_attachment.id,
+        user_id: student.id,
+        field_name: "syllabus_body"
+      }
+    end
+
+    it "batch inserts all attachment association and makes sure root_account_id is set" do
+      AttachmentAssociation.insert_all([attachment_association_params_1, attachment_association_params_2], course.root_account_id)
+      expect(AttachmentAssociation.pluck(:root_account_id)).to eq [course.root_account_id, course.root_account_id]
+    end
+  end
+
   describe "#update_associations" do
     def fetch_list_with_field_name(field_name)
       AttachmentAssociation.where(context: course, field_name:).pluck(:attachment_id)

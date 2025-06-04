@@ -370,7 +370,7 @@ module Lti::IMS
 
           context "with gradingProgress set to PendingManual" do
             let(:params_overrides) do
-              super().merge(gradingProgress: "PendingManual", scoreGiven: 10, scoreMaximum: line_item.score_maximum)
+              super().merge(gradingProgress: "PendingManual", scoreGiven: 10, scoreMaximum: line_item.score_maximum, comment: "Test comment")
             end
 
             it "updates the submission" do
@@ -383,6 +383,13 @@ module Lti::IMS
               result.reload
               expect(result.needs_review?).to be true
               expect(result.submission.needs_review?).to be true
+            end
+
+            it "student can read their own comments" do
+              send_request
+              result.reload
+              comment = SubmissionComment.find_by(submission_id: result.submission.id)
+              expect(comment.grants_right?(user, :read)).to be true
             end
 
             context "with submission already graded and using preserve_score param" do

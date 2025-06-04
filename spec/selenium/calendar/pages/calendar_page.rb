@@ -300,7 +300,7 @@ module CalendarPage
 
   def enter_new_event_date(date_text)
     replace_content(edit_event_date_input, date_text)
-    edit_event_date_input.send_keys(:enter)
+    edit_event_date_input.send_keys(:tab)
   end
 
   def handle_event_date_input_arrow_down

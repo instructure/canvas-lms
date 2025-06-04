@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Assignment} from 'api'
+
 export type Result = {
   content_id: string
   content_type: string
@@ -25,9 +27,8 @@ export type Result = {
   html_url: string
   distance: number
   relevance: number
-  // added in follow-up API call
-  modules?: Module[]
-}
+} & Partial<AssetStatus> &
+  Partial<ModuleSequence>
 
 export type IndexProgress = {
   progress: number
@@ -45,4 +46,20 @@ export type Module = {
   prerequisite_module_ids: number[]
   published: boolean
   items_url: string
+}
+
+export type AssetStatus = {
+  due_date: string | null
+  published: boolean
+}
+
+export type WikiPage = {
+  id: string
+  published: boolean
+}
+
+export type DiscussionTopic = {
+  id: string
+  published: boolean
+  assignment: Assignment
 }

@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {windowConfirm} from '@canvas/util/globalUtils'
 
 import * as AssignmentActions from '../assignment/AssignmentActions'
 import GradersTable from './GradersTable/index'
@@ -102,7 +103,7 @@ class Header extends Component {
     // cancel themselves in certain cases.
     // See https://stackoverflow.com/questions/51250430/chrome-dismisses-confirm-promps-immediately-without-any-user-interaction
     setTimeout(() => {
-      if (window.confirm(message)) this.props.releaseGrades()
+      if (windowConfirm(message)) this.props.releaseGrades()
     }, 100)
   }
 
@@ -113,7 +114,7 @@ class Header extends Component {
     // cancel themselves in certain cases.
     // See https://stackoverflow.com/questions/51250430/chrome-dismisses-confirm-promps-immediately-without-any-user-interaction
     setTimeout(() => {
-      if (window.confirm(message)) this.props.unmuteAssignment()
+      if (windowConfirm(message)) this.props.unmuteAssignment()
     }, 100)
   }
 

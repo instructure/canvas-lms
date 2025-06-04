@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {arrayOf, func} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {itemShape, moveOptionsType} from './propTypes'
 import {positions} from '@canvas/positions'
 import SelectPosition, {RenderSelect} from '@canvas/select-position'
-import React from 'react'
-
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-text'
+import {Text as InstText} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {itemShape, moveOptionsType} from './propTypes'
 
 const I18n = createI18nScope('move_select')
 
@@ -109,15 +109,76 @@ export default class MoveSelect extends React.Component {
     }
   }
 
+  fetchItems() {
+    try {
+      fetch(
+        `/api/v1/courses/${ENV.COURSE_ID}/modules/${this.state.selectedGroup.id}/items?include[]=title_only&per_page=1000`,
+      )
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(res.statusText)
+          }
+          return res.json()
+        })
+        .then(items => {
+          const groupitems = items.map(item => ({id: String(item.id), title: item.title}))
+          this.setState(state => {
+            const selectedGroup = state.selectedGroup
+            selectedGroup.items = groupitems
+            return {
+              selectedGroup,
+            }
+          })
+        })
+        .catch(error => {
+          showFlashAlert({
+            message: I18n.t('Failed loading module items'),
+            err: error,
+            type: 'error',
+          })
+          this.setState(state => {
+            const selectedGroup = state.selectedGroup
+            selectedGroup.items = error
+            return {
+              selectedGroup,
+            }
+          })
+        })
+    } catch (error) {
+      showFlashAlert({message: I18n.t('Failed loading module items'), err: error, type: 'error'})
+    }
+  }
+
+  componentDidMount() {
+    const {selectedGroup} = this.state
+    if (selectedGroup && selectedGroup.items === undefined) {
+      this.fetchItems()
+    }
+  }
+
+  componentDidUpdate(_prevProps, prevState) {
+    const {selectedGroup} = this.state
+    const prevSelectedGroup = prevState.selectedGroup
+
+    // Only fetch items if we have a selected group that's different from the previous one
+    // and it doesn't have items loaded yet
+    if (
+      selectedGroup &&
+      (!prevSelectedGroup || prevSelectedGroup.id !== selectedGroup.id) &&
+      selectedGroup.items === undefined
+    ) {
+      this.fetchItems()
+    }
+  }
+
   renderSelectGroup() {
     const {selectedGroup, selectedPosition} = this.state
     const {items} = this.props
-    const selectPosition = !!(selectedGroup && selectedGroup.items && selectedGroup.items.length)
     const groups = this.getFilteredGroups(this.props)
     return (
       <div>
         <RenderSelect
-          label={I18n.t('Group Select')}
+          label={this.props.moveOptions.groupsLabel ? this.props.moveOptions.groupsLabel : null}
           className="move-select__group"
           onChange={this.selectGroup}
           options={groups.map(group => (
@@ -127,15 +188,14 @@ export default class MoveSelect extends React.Component {
           ))}
           selectOneDefault={false}
         />
-        {selectPosition ? (
-          <SelectPosition
-            items={items}
-            siblings={selectedGroup.items}
-            selectedPosition={selectedPosition}
-            selectPosition={this.selectPosition}
-            selectSibling={this.selectSibling}
-          />
-        ) : null}
+
+        <SelectPosition
+          items={items}
+          siblings={selectedGroup?.items}
+          selectedPosition={selectedPosition}
+          selectPosition={this.selectPosition}
+          selectSibling={this.selectSibling}
+        />
       </div>
     )
   }
@@ -146,9 +206,6 @@ export default class MoveSelect extends React.Component {
     const {selectedPosition} = this.state
     return (
       <div className="move-select">
-        {this.props.moveOptions.groupsLabel && (
-          <Text weight="bold">{this.props.moveOptions.groupsLabel}</Text>
-        )}
         {groups ? (
           this.renderSelectGroup()
         ) : (

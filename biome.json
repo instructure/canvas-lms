@@ -9,6 +9,7 @@
   "files": {
     "ignoreUnknown": false,
     "ignore": [
+      "Jenkinsfile.js",
       "**/coverage/**",
       "**/dist/**",
       "**/es/**",

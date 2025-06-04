@@ -127,17 +127,16 @@
   <div class="grid-row">
     <div class="col-xs-12 col-lg-6">
       <div class="ic-Form-control">
-        <label class="ic-Label" id="announcement_starts_at_label">
+        <label class="ic-Label" for="account_notification_start_at_<%= announcement.id %>">
           <%= t("Announcement starts at") %>
-          <span class="screenreader-only">
-            <%= datepicker_screenreader_prompt %>
-          </span>
         </label>
+        <span id="announcement_starts_at_hint"><%= datepicker_screenreader_prompt %></span>
         <% if announcement.start_at < Date.today %>
           <%= f.text_field :start_at,
                            :value => datetime_string(announcement.start_at),
                            :id => "account_notification_start_at_#{announcement.id}",
-                           "aria-labelledby" => "announcement_starts_at_label",
+                           :class => 'datetime_field',
+                           "aria-describedby" => "announcement_starts_at_hint",
                            "data-initial-value" => announcement.start_at.iso8601,
                            :title => accessible_date_format,
                            :readonly => true %>
@@ -146,7 +145,7 @@
                            :value => datetime_string(announcement.start_at),
                            :id => "account_notification_start_at_#{announcement.id}",
                            :class => 'datetime_field',
-                           "aria-labelledby" => "announcement_starts_at_label",
+                           "aria-describedby" => "announcement_starts_at_hint",
                            "data-initial-value" => announcement.start_at.iso8601,
                            "data-tooltip" => "",
                            :title => accessible_date_format %>
@@ -155,17 +154,16 @@
     </div>
     <div class="col-xs-12 col-lg-6">
       <div class="ic-Form-control">
-        <label class="ic-Label" id="announcement_ends_at_label">
+        <label class="ic-Label" for="account_notification_end_at_<%= announcement.id %>">
           <%= t("Announcement ends at") %>
-          <span class="screenreader-only">
-            <%= datepicker_screenreader_prompt %>
-          </span>
         </label>
+        <span id="announcement_ends_at_hint"><%= datepicker_screenreader_prompt %></span>
         <% if announcement.end_at < Date.today %>
           <%= f.text_field :end_at,
                            :value => datetime_string(announcement.end_at),
                            :id => "account_notification_end_at_#{announcement.id}",
-                           "aria-labelledby" => "announcement_ends_at_label",
+                           :class => 'datetime_field',
+                           "aria-describedby" => "announcement_ends_at_hint",
                            "data-initial-value" => announcement.end_at.iso8601,
                            :title => accessible_date_format,
                            :readonly => true %>
@@ -174,7 +172,7 @@
                            :value => datetime_string(announcement.end_at),
                            :id => "account_notification_end_at_#{announcement.id}",
                            :class => 'datetime_field',
-                           "aria-labelledby" => "announcement_ends_at_label",
+                           "aria-describedby" => "announcement_ends_at_hint",
                            "data-initial-value" => announcement.end_at.iso8601,
                            "data-tooltip" => "",
                            :title => accessible_date_format %>

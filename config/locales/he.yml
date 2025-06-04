@@ -6129,6 +6129,8 @@ he:
       link_validator: "בודק תקינות קישורי קורס"
       link_validator_desc: "מאמת תקינות הקישורים מבצע חיפוש בתוכן הקורס ומאתר כל קישור לא תקין או לא מגיב אשר מוצא. התהליך יכול להמשך מספר דקות"
       page_title: "בודק תקינות קישורי קורס"
+    links: 
+      student_progress: "צפיה בהתקדמות"
     master_course_restrictions: 
       labels: 
         availability_dates: "תאריכי זמינות"
@@ -6355,9 +6357,11 @@ he:
       tab_hidden_if_disabled: "הדף אינו פעיל יותר ולא יופיע בניווט"
       tabs: 
         alerts: התראות
+        apps: אפליקציות
         details: "פרטי קורס: "
-        feature_options: "תכונות אפשריות"
+        feature_options: "אפשרויות תכונה"
         grade_publishing: "פרסום הערכות "
+        grade_syncing: "סינכרון הציון"
         navigation: ניווט
         sections: הקבצות
         tools: אפליקציות
@@ -6953,6 +6957,7 @@ he:
   delete_grading_scheme_6b308832: "ביטול סכימת הערכה"
   delete_group_86c381ec: "ביטול קבוצה"
   delete_my_account_41060aad: "ביטול חשבוני"
+  delete_name_81c1b5b2: "מחיקת %{name}"
   delete_outcome_cc6546f1: "ביטול השגי למידה"
   delete_outcome_group_6b399d34: "ביטול קבוצת השגי למידה"
   delete_quiz_142b8099: "ביטול בוחן"
@@ -14151,6 +14156,7 @@ he:
   page_name_21defa75: "שם דף"
   page_name_is_required_d8c2736e: "נדרש שם דף"
   page_not_found_2b0d05f5: "הדף לא נמצא"
+  page_title_106304bb: "כותרת דף"
   page_title_d1a22bbf: "כותרת דף"
   page_views: 
     browsers: 
@@ -20835,6 +20841,10 @@ he:
       page_header_title: "עריכת %{page_name}"
     index: 
       titles: 
+        pages: דפים
+    new: 
+      titles: 
+        new_page: "דף הבא"
         pages: דפים
     notices: 
       cannot_edit: "אין לך הרשאות לעריכת הדף \"%{title}\"."

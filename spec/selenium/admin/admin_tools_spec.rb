@@ -30,11 +30,18 @@ describe "admin_tools" do
     wait_for_ajaximations
   end
 
-  def perform_user_search(form_sel, search_term, click_row = 0)
-    set_value f("#{form_sel} input[name=search_term]"), search_term
+  def perform_auth_user_search(search_term)
+    set_value f("#authLoggingSearchForm input[name=search_term]"), search_term
     sleep 0.2 # 0.2 s delay before the search fires
     wait_for_ajaximations
-    fj("#{form_sel} .roster tbody tr:nth(#{click_row}) td").click
+    fj("#authLoggingSearchForm .roster tbody tr:nth(0) td").click
+  end
+
+  def perform_view_user_search(search_term)
+    set_value f(%(#commMessagesPane input[data-testid="notifications-search-box"])), search_term
+    sleep 0.3 # 300ms delay before search fires
+    wait_for_ajaximations
+    f("#commMessagesPane table tbody th button").click
   end
 
   def perform_autocomplete_search(input, search_term, row_index_to_select = 0)
@@ -116,11 +123,11 @@ describe "admin_tools" do
 
         load_admin_tools_page
         click_view_notifications_tab
-        perform_user_search("#commMessagesSearchForm", @student.id)
+        perform_view_user_search(@student.id)
         dialog = f("[aria-label='Generate Activity for #{@student.name}'")
         dialog.find_element(:css, "button[type='submit']").click
         wait_for_ajaximations
-        expect(f("#commMessagesSearchResults .message-body").text).to include("this is my message")
+        expect(f(%(#commMessagesPane [data-testid="message-result-0"] [data-testid="body"])).text).to include("this is my message")
       end
     end
 
@@ -130,26 +137,26 @@ describe "admin_tools" do
           message_model(user_id: @student.id, body: "foo bar", root_account_id: @account.id)
           load_admin_tools_page
           click_view_notifications_tab
-          perform_user_search("#commMessagesSearchForm", @student.id)
+          perform_view_user_search(@student.id)
           dialog = f("[aria-label='Generate Activity for #{@student.name}'")
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchResults .message-body").text).to include("foo bar")
+          expect(f(%(#commMessagesPane [data-testid="message-result-0"] [data-testid="body"])).text).to include("foo bar")
         end
 
         it "displays nothing found" do
           message_model(user_id: @student.id, body: "foo bar", root_account_id: @account.id)
           load_admin_tools_page
           click_view_notifications_tab
-          perform_user_search("#commMessagesSearchForm", @student.id)
+          perform_view_user_search(@student.id)
           dialog = f("[aria-label='Generate Activity for #{@student.name}'")
           to_date = dialog.find_element(:css, "[data-testid='to-date']")
           set_value(to_date, 2.months.ago.to_date)
           to_date.send_keys(:tab)
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchResults .alert").text).to include("No messages found")
-          expect(f("#content")).not_to contain_css("#commMessagesSearchResults .message-body")
+          expect(f(%(#commMessagesPane [data-testid="no-msgs-alert"])).text).to include("No messages found")
+          expect(f("#content")).not_to contain_css(%(#commMessagesSearchResults [data-testid="message-result-0"]))
         end
 
         it "displays valid search params used" do
@@ -157,27 +164,32 @@ describe "admin_tools" do
           load_admin_tools_page
           click_view_notifications_tab
           # Search with no dates
-          perform_user_search("#commMessagesSearchForm", @student.id)
+          perform_view_user_search(@student.id)
           dialog = f("[aria-label='Generate Activity for #{@student.name}'")
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from the beginning to now.")
+          expect(f("#commMessagesPane h3").text).to include("Notifications sent to #{@student.name}")
+          expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from the beginning of time to now")
           # Search with begin date and end date - should show time actually being used
-          perform_user_search("#commMessagesSearchForm", @student.id)
+          perform_view_user_search(@student.id)
           dialog = f("[aria-label='Generate Activity for #{@student.name}'")
           replace_and_proceed(dialog.find_element(:css, "[data-testid='from-date']"), "Mar 3, 2001")
           replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "Mar 9, 2001")
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12am to Mar 9, 2001 at 12am.")
+          expect(f("#commMessagesPane h3").text).to include("Notifications sent to #{@student.name}")
+          expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from Mar 3, 2001, 12:00 AM to Mar 9, 2001, 12:00 AM")
           # Search with begin date/time and end date/time - should use and show given time
-          perform_user_search("#commMessagesSearchForm", @student.id)
+          perform_view_user_search(@student.id)
           dialog = f("[aria-label='Generate Activity for #{@student.name}'")
-          replace_and_proceed(dialog.find_element(:css, "[data-testid='from-date']"), "Mar 3, 2001 1:05p", { press_return: true, tab_out: false })
-          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "Mar 9, 2001 3:00p", { press_return: true, tab_out: false })
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='from-date']"), "Mar 3, 2001", { tab_out: true })
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='from-time']"), "1:15 PM", { tab_out: true })
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "Mar 9, 2001", { tab_out: true })
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-time']"), "3:00 PM", { tab_out: true })
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
+          expect(f("#commMessagesPane h3").text).to include("Notifications sent to #{@student.name}")
+          expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from Mar 3, 2001, 1:15 PM to Mar 9, 2001, 3:00 PM")
         end
 
         it "filters with spanish" do
@@ -198,24 +210,26 @@ describe "admin_tools" do
           click_view_notifications_tab
 
           # Search should find message, ene == Enero == January
-          perform_user_search("#commMessagesSearchForm", @student.id)
-          replace_and_proceed(f(".userDateRangeSearchModal .dateEndSearchField"), "4 ene 2010")
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          perform_view_user_search(@student.id)
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "4 ene 2010", { tab_out: true })
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchResults .message-body").text).to include("foo bar")
+          expect(f(%(#commMessagesPane [data-testid="message-result-0"] [data-testid="body"])).text).to include("foo bar")
 
           # Search should not message
-          perform_user_search("#commMessagesSearchForm", "")
-          replace_and_proceed(f(".userDateRangeSearchModal .dateEndSearchField"), "2 ene 2010")
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          perform_view_user_search("")
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "4 ene 2010", { tab_out: true })
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchResults .alert").text).to include("No messages found")
+          expect(f(%(#commMessagesPane [data-testid="no-msgs-alert"])).text).to include("No messages found")
         end
 
         it "displays an error when given invalid input data" do
           load_admin_tools_page
           click_view_notifications_tab
-          perform_user_search("#commMessagesSearchForm", @student.id)
+          perform_view_user_search(@student.id)
           # Search with invalid dates
           dialog = f("[aria-label='Generate Activity for #{@student.name}'")
           from_date = dialog.find_element(:css, "[data-testid='from-date']")
@@ -369,7 +383,7 @@ describe "admin_tools" do
     end
 
     it "shows log history" do
-      perform_user_search("#authLoggingSearchForm", @student.id)
+      perform_auth_user_search(@student.id)
       dialog = f("[aria-label='Generate Activity for #{@student.name}'")
       dialog.find_element(:css, "button[type='submit']").click
       wait_for_ajaximations
@@ -380,7 +394,7 @@ describe "admin_tools" do
     end
 
     it "searches by user name" do
-      perform_user_search("#authLoggingSearchForm", "testuser")
+      perform_auth_user_search("testuser")
       dialog = f("[aria-label='Generate Activity for #{@student.name}'")
       dialog.find_element(:css, "button[type='submit']").click
       wait_for_ajaximations

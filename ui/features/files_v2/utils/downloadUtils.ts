@@ -22,6 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {type File, type Folder} from '../interfaces/File'
 import {getIdFromUniqueId} from './fileFolderUtils'
+import {doFetchApiWithAuthCheck, UnauthorizedError} from './apiUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -97,7 +98,7 @@ export const performRequest = ({
 
   window.addEventListener('beforeunload', promptBeforeLeaving, true)
 
-  doFetchApi<ContentExportResponse>({
+  doFetchApiWithAuthCheck<ContentExportResponse>({
     path: `${url}`,
     method: 'POST',
     body: bodyToQueryString(selectedItems),
@@ -125,6 +126,10 @@ export const performRequest = ({
       }
     })
     .catch(error => {
+      if (error instanceof UnauthorizedError) {
+        window.location.href = '/login'
+        return
+      }
       showFlashError(I18n.t('An error occurred trying to prepare download, please try again.'))(
         error,
       )
@@ -140,7 +145,7 @@ export const performRequest = ({
 const poolProgress = (url: string, onProgress: (progress: number) => void) => {
   return new Promise((resolve, reject) => {
     const poolRequest = () => {
-      doFetchApi<PoolProgressResponse>({path: url})
+      doFetchApiWithAuthCheck<PoolProgressResponse>({path: url})
         .then(response => {
           onProgress(response.json?.completion || 0)
           switch (response.json?.workflow_state || 'failed') {
@@ -157,6 +162,10 @@ const poolProgress = (url: string, onProgress: (progress: number) => void) => {
           }
         })
         .catch(error => {
+          if (error instanceof UnauthorizedError) {
+            window.location.href = '/login'
+            return
+          }
           reject(error)
         })
     }

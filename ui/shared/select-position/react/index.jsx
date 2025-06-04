@@ -16,15 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {string, func, bool, arrayOf, node, shape} from 'prop-types'
+import React, {useId} from 'react'
+import {string, func, bool, arrayOf, node, oneOfType, shape} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ConnectorIcon from './ConnectorIcon'
 import {Heading} from '@instructure/ui-heading'
+import {Flex} from '@instructure/ui-flex'
 import {FormField} from '@instructure/ui-form-field'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Spinner} from '@instructure/ui-spinner'
+import {Text as InstText} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {positions} from '@canvas/positions'
+import {siblingPropType} from '@canvas/move-item-tray/react/propTypes'
 
 export const itemShape = shape({
   id: string.isRequired,
@@ -51,10 +55,13 @@ RenderSelect.defaultProps = {
 }
 
 export function RenderSelect({label, onChange, options, className, selectOneDefault, testId}) {
+  const id = useId()
+
   return (
     <View margin="medium 0" display="block" className={className}>
-      <FormField id="move-select-form" label={<ScreenReaderContent>{label}</ScreenReaderContent>}>
+      <FormField id={id} label={label}>
         <select
+          id={id}
           data-testid={testId}
           onChange={onChange}
           className="move-select-form"
@@ -73,7 +80,7 @@ export function RenderSelect({label, onChange, options, className, selectOneDefa
 
 SelectPosition.propTypes = {
   items: arrayOf(itemShape).isRequired,
-  siblings: arrayOf(itemShape).isRequired,
+  siblings: siblingPropType,
   selectedPosition: shape({type: string}),
   selectPosition: func,
   selectSibling: func,
@@ -94,21 +101,52 @@ export default function SelectPosition({
 }) {
   const positionSelected = !!(selectedPosition && selectedPosition.type === 'relative')
 
-  function renderSelectSibling() {
-    const filteredItems = siblings.filter(item => item.id !== items[0]?.id)
+  function renderMessage(string, color) {
     return (
-      <RenderSelect
-        label={I18n.t('Item Select')}
-        className="move-select__sibling"
-        onChange={selectSibling}
-        options={filteredItems.map((item, index) => (
-          <option key={item.id} value={index}>
-            {item.title}
-          </option>
-        ))}
-        selectOneDefault={false}
-        testId="select-sibling"
-      />
+      <View
+        as="div"
+        borderWidth="small"
+        borderColor="secondary"
+        borderRadius="small"
+        padding="x-small"
+      >
+        <InstText color={color}>{string}</InstText>
+      </View>
+    )
+  }
+
+  function renderSelectSibling() {
+    if (siblings instanceof Error) {
+      return renderMessage(I18n.t('Failed loading items'), 'danger')
+    }
+    if (Array.isArray(siblings)) {
+      const filteredItems = siblings.filter(item => item.id !== items?.[0]?.id)
+
+      if (filteredItems.length === 0) {
+        return renderMessage(I18n.t('No items found'), 'primary')
+      }
+
+      return (
+        <RenderSelect
+          label={I18n.t('Item Select')}
+          className="move-select__sibling"
+          onChange={selectSibling}
+          options={filteredItems.map((item, index) => (
+            <option key={item.id} value={index}>
+              {item.title}
+            </option>
+          ))}
+          selectOneDefault={false}
+          testId="select-sibling"
+        />
+      )
+    }
+
+    return (
+      <Flex gap="x-small" margin="0 x-small 0 0">
+        <Spinner size="x-small" renderTitle={I18n.t('Loading items')} />
+        <PresentationContent>{I18n.t('Loading...')}</PresentationContent>
+      </Flex>
     )
   }
 
@@ -120,9 +158,8 @@ export default function SelectPosition({
 
   return (
     <div>
-      {renderPlaceTitle()}
       <RenderSelect
-        label={I18n.t('Position Select')}
+        label={renderPlaceTitle()}
         className="move-select__position"
         onChange={selectPosition}
         options={Object.keys(positions).map(pos => (
@@ -139,7 +176,7 @@ export default function SelectPosition({
             aria-hidden={true}
             style={{position: 'absolute', transform: 'translate(-15px, -35px)'}}
           />
-          {renderSelectSibling(items)}
+          {renderSelectSibling()}
         </div>
       ) : null}
     </div>

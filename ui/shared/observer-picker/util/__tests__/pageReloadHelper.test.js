@@ -31,14 +31,19 @@ describe('getHandleChangeObservedUser', () => {
   })
 
   describe('returned function', () => {
-    let oldLocation
     let oldSessionStorage
     let handleChangeObservedUser
 
     beforeEach(() => {
       oldSessionStorage = window.sessionStorage
-      oldLocation = window.location
       delete window.location
+
+      // Mock sessionStorage
+      window.sessionStorage = {
+        getItem: jest.fn(),
+        setItem: jest.fn(),
+        removeItem: jest.fn(),
+      }
 
       handleChangeObservedUser = getHandleChangeObservedUser()
     })
@@ -60,8 +65,9 @@ describe('getHandleChangeObservedUser', () => {
     })
 
     it('stores auto focus setting in session storage', () => {
+      handleChangeObservedUser('initialValue')
       handleChangeObservedUser('newValue')
-      expect(window.sessionStorage.autoFocusObserverPicker).toBe('true')
+      expect(window.sessionStorage.setItem).toHaveBeenCalledWith('autoFocusObserverPicker', true)
     })
   })
 })

@@ -185,7 +185,11 @@ module CoursesHelper
   end
 
   def get_sorting_order(curr_col, sorted_col, order)
-    "desc" if (sorted_col.nil? && curr_col == "published") || (curr_col == sorted_col && order != "desc")
+    if curr_col == sorted_col
+      (order == "desc") ? "asc" : "desc"
+    else
+      "asc"
+    end
   end
 
   def get_sorting_icon(curr_col, sorted_col, order)
@@ -196,15 +200,46 @@ module CoursesHelper
     end
   end
 
+  def sortable_th(table:, column:, label:, css: "")
+    sort_param  = "#{table}_sort"
+    order_param = "#{table}_order"
+
+    current_sort = params[sort_param]
+    sort_ord     = ((current_sort == column) ? params[order_param] : nil)
+    aria_sort    = case sort_ord
+                   when "asc"  then "ascending"
+                   when "desc" then "descending"
+                   end
+
+    aria_label = "#{label} column, sorted #{aria_sort || "none"}, click to sort"
+
+    th_attrs = { scope: "col", class: css }
+    th_attrs[:"aria-sort"] = aria_sort if aria_sort
+
+    link_url  = courses_path(get_courses_params(table, column, params))
+    link_id   = "#{table}_#{column}"
+    icon_cls  = [
+      "course-list-sort-icon",
+      ("sorted" if current_sort == column),
+      get_sorting_icon(column, current_sort, params[order_param])
+    ].compact.join(" ")
+
+    content_tag(:th, **th_attrs) do
+      link_to(link_url, id: link_id, "aria-label": aria_label) do
+        safe_join([label, content_tag(:i, "", class: icon_cls)], " ")
+      end
+    end
+  end
+
   def get_courses_params(table, col, params)
-    sort = "#{table}_sort"
-    order = "#{table}_order"
+    sort_param  = "#{table}_sort"
+    order_param = "#{table}_order"
 
     params
       .permit(:cc_sort, :cc_order, :pc_sort, :pc_order, :fc_sort, :fc_order)
       .merge(
-        sort => col,
-        order => get_sorting_order(col, params[sort], params[order]),
+        sort_param => col,
+        order_param => get_sorting_order(col, params[sort_param], params[order_param]),
         :focus => table
       )
   end

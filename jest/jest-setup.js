@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'cross-fetch/polyfill'
-// eslint-disable-next-line import/no-nodejs-modules, no-redeclare
 import {loadDevMessages, loadErrorMessages} from '@apollo/client/dev'
 import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
 import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDateTimeMomentParser'

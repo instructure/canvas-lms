@@ -22,7 +22,6 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import axios from '@canvas/axios'
-import qs from 'qs'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import PublishButtonView from '@canvas/publish-button-view'
 import SpeedgraderLinkView from './backbone/views/SpeedgraderLinkView'
@@ -32,6 +31,7 @@ import CyoeStats from '@canvas/conditional-release-stats/react/index'
 import '@canvas/jquery/jquery.instructure_forms'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
+import AssignmentAssetProcessorEula from '@canvas/assignments/react/AssignmentAssetProcessorEula'
 import StudentGroupFilter from '@canvas/student-group-filter'
 import SpeedGraderLink from '@canvas/speed-grader-link'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
@@ -386,7 +386,7 @@ $(() => {
 
   setupSubmitHandler(ENV.USER_ASSET_STRING)
 
-  $('#edit_assignment_form').bind('assignment_updated', (event, data) => {
+  $('#edit_assignment_form').bind('assignment_updated', (_, data) => {
     if (data.assignment && data.assignment.peer_reviews) {
       $('.assignment_peer_reviews_link').slideDown()
     } else {
@@ -418,3 +418,12 @@ ready(() => {
     $('#accessibility_warning').addClass('screenreader-only')
   })
 })
+
+if (ENV.FEATURES.lti_asset_processor) {
+  ready(() => {
+    createOrUpdateRoot(
+      'assignment_asset_processor_eula',
+      <AssignmentAssetProcessorEula launches={ENV.ASSET_PROCESSOR_EULA_LAUNCH_URLS} />,
+    )
+  })
+}

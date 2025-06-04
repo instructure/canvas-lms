@@ -167,8 +167,7 @@ class ModuleAssignmentOverridesController < ApplicationController
   def convert_tag_overrides_to_adhoc_overrides
     errors = OverrideConverterService.convert_tags_to_adhoc_overrides_for(
       learning_object: @context_module,
-      course: @context,
-      executing_user: @current_user
+      course: @context
     )
 
     if errors

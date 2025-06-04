@@ -65,19 +65,35 @@ describe Lti::AssetProcessor do
     let(:context_external_tool) { external_tool_1_3_model(context: course_model) }
 
     let(:content_item) do
+      ActionController::Parameters.new({
+                                         "context_external_tool_id" => context_external_tool.id,
+                                         "url" => "http://example.com",
+                                         "title" => "Example Title",
+                                         "text" => "Example Text",
+                                         "custom" => custom,
+                                         "icon" => icon,
+                                         "window" => window,
+                                         "iframe" => iframe,
+                                         "report" => report,
+                                       })
+    end
+    let(:report) do
       {
-        "context_external_tool_id" => context_external_tool.id,
-        "url" => "http://example.com",
-        "title" => "Example Title",
-        "text" => "Example Text",
-        "custom" => { "key" => "value" },
-        "icon" => { "icon_key" => "icon_value" },
-        "window" => { "window_key" => "window_value" },
-        "iframe" => { "iframe_key" => "iframe_value" },
-        "report" => { "report_key" => "report_value" }
+        "invalid_key" => "value1",
+        "url" => "https://example.com/report.png",
+        "custom" => { "key" => "value" }
       }
     end
-
+    let(:icon) do
+      {
+        "extra_field1" => "value1",
+        "url" => "https://example.com/icon.png",
+        "width" => 20,
+      }
+    end
+    let(:custom) { { "key" => "value" } }
+    let(:window) { { "width" => 20, "height" => 10 } }
+    let(:iframe) { { "width" => 20, "height" => 10 } }
     let(:context) { context_external_tool.context }
 
     context "when context_external_tool is found" do
@@ -88,10 +104,53 @@ describe Lti::AssetProcessor do
         expect(subject.title).to eq("Example Title")
         expect(subject.text).to eq("Example Text")
         expect(subject.custom).to eq({ "key" => "value" })
-        expect(subject.icon).to eq({ "icon_key" => "icon_value" })
-        expect(subject.window).to eq({ "window_key" => "window_value" })
-        expect(subject.iframe).to eq({ "iframe_key" => "iframe_value" })
-        expect(subject.report).to eq({ "report_key" => "report_value" })
+        expect(subject.icon).to eq({ "width" => 20, "url" => "https://example.com/icon.png" })
+        expect(subject.window).to eq({ "height" => 10, "width" => 20 })
+        expect(subject.iframe).to eq({ "height" => 10, "width" => 20 })
+        expect(subject.report).to eq({
+                                       "url" => "https://example.com/report.png",
+                                       "custom" => { "key" => "value" }
+                                     })
+      end
+
+      context "with invalid report in content_item" do
+        let(:report) { { "url" => { "invalid_value" => "value1" } } }
+
+        it "raises an error" do
+          expect { subject }.to raise_error(Schemas::Base::InvalidSchema)
+        end
+      end
+
+      context "with invalid custom in content_item" do
+        let(:custom) { { "key" => 123 } }
+
+        it "raises an error" do
+          expect { subject }.to raise_error(Schemas::Base::InvalidSchema)
+        end
+      end
+
+      context "with invalid window in content_item" do
+        let(:window) { { "width" => [] } }
+
+        it "raises an error" do
+          expect { subject }.to raise_error(Schemas::Base::InvalidSchema)
+        end
+      end
+
+      context "with invalid iframe in content_item" do
+        let(:iframe) { { "width" => [] } }
+
+        it "raises an error" do
+          expect { subject }.to raise_error(Schemas::Base::InvalidSchema)
+        end
+      end
+
+      context "with invalid icon in content_item" do
+        let(:icon) { { "width" => -2 } }
+
+        it "raises an error" do
+          expect { subject }.to raise_error(Schemas::Base::InvalidSchema)
+        end
       end
     end
 

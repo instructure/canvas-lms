@@ -886,9 +886,8 @@ describe ContentMigration do
       end
 
       it "copies only noop overrides" do
-        account = Account.default
-        account.settings[:conditional_release] = { value: true }
-        account.save!
+        @copy_from.conditional_release = true
+        @copy_from.save!
         assignment_override_model(assignment: @assignment, set_type: "ADHOC")
         assignment_override_model(assignment: @assignment,
                                   set_type: AssignmentOverride::SET_TYPE_NOOP,
@@ -922,9 +921,8 @@ describe ContentMigration do
       end
 
       it "copies dates" do
-        account = Account.default
-        account.settings[:conditional_release] = { value: true }
-        account.save!
+        @copy_from.conditional_release = true
+        @copy_from.save!
         due_at = 1.hour.from_now.round
         assignment_override_model(assignment: @assignment,
                                   set_type: "Noop",

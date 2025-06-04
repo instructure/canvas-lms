@@ -19,6 +19,25 @@
 #
 
 describe Pseudonym do
+  describe ".normalize" do
+    delegate :normalize, to: :Pseudonym
+
+    it "normalizes according to RFC4518" do
+      # Ⅳ ligature gets decomposed to IV (and downcased)
+      expect(normalize("Ⅳ")).to eql "iv"
+      expect(normalize("interior  spaces")).to eql "interior spaces"
+      expect(normalize("  leading")).to eql "leading"
+      expect(normalize("trailing  ")).to eql "trailing"
+      expect(normalize("  leading  trailing Ⅳ  ")).to eql "leading trailing iv"
+      expect(normalize(" ")).to eql " "
+      expect(normalize("   ")).to eql " "
+      expect(normalize("\u200fcody")).to eql "cody"
+      expect(normalize("cody\u200f")).to eql "cody"
+      expect(normalize("\u202a\u202a\u202acody\u202c\u202c\u202c")).to eql "cody"
+      expect(normalize("\u200f\u202acody\u202c\u200f")).to eql "cody"
+    end
+  end
+
   it "creates a new instance given valid attributes" do
     user_model
     expect { Pseudonym.create!(valid_pseudonym_attributes) }.to change(Pseudonym, :count).by(1)
@@ -44,6 +63,17 @@ describe Pseudonym do
                               password_confirmation: "password")
     pseudonym.user_id = 1
     expect(pseudonym).to be_valid
+  end
+
+  it "normalizes on validation (preserving the original input)" do
+    # Ⅳ ligature gets decomposed to IV
+    pseudonym = Pseudonym.new(unique_id: "HenryⅣ@instructure.com",
+                              password: "password",
+                              password_confirmation: "password")
+    pseudonym.user_id = 1
+    expect(pseudonym).to be_valid
+    expect(pseudonym.unique_id).to eql "HenryⅣ@instructure.com"
+    expect(pseudonym.unique_id_normalized).to eql "henryiv@instructure.com"
   end
 
   it "validates the presence of user and infer default account" do
@@ -75,6 +105,79 @@ describe Pseudonym do
     p1.save!
     # Should allow creating a new active one if the others are deleted
     Pseudonym.create!(unique_id: "cody@instructure.com", user: u)
+
+    # Failed; conflicts with the nil auth provider version
+    expect do
+      Pseudonym.create!(unique_id: "cody@instructure.com",
+                        user: u,
+                        authentication_provider: Account.default.canvas_authentication_provider)
+    end.to raise_error(ActiveRecord::RecordInvalid)
+    Pseudonym.create!(unique_id: "cody2@instructure.com",
+                      user: u,
+                      authentication_provider: Account.default.canvas_authentication_provider)
+    # Failed; conflicts with the canvas auth provider version
+    expect do
+      Pseudonym.create!(unique_id: "cody2@instructure.com", user: u)
+    end.to raise_error(ActiveRecord::RecordInvalid)
+
+    saml1 = Account.default.authentication_providers.create!(auth_type: "saml")
+    saml2 = Account.default.authentication_providers.create!(auth_type: "saml")
+
+    # duplicates across SAML auth providers or SAML-and-Canvas are okay
+    Pseudonym.create!(unique_id: "cody3@instructure.com", user: u, authentication_provider: saml1)
+    Pseudonym.create!(unique_id: "cody3@instructure.com", user: u, authentication_provider: saml2)
+    Pseudonym.create!(unique_id: "cody2@instructure.com", user: u, authentication_provider: saml1)
+
+    # duplicates between no auth provider and SAML are not okay
+    # and vice versa
+    expect { Pseudonym.create!(unique_id: "cody@instructure.com", user: u, authentication_provider: saml1) }
+      .to raise_error(ActiveRecord::RecordInvalid)
+    expect { Pseudonym.create!(unique_id: "cody3@instructure.com", user: u) }
+      .to raise_error(ActiveRecord::RecordInvalid)
+  end
+
+  it "allows deleted duplicates" do
+    saml = Account.default.authentication_providers.create!(auth_type: "saml")
+    canvas = Account.default.canvas_authentication_provider
+    u = User.create!
+
+    # each of these cases creates an active pseudonym, then two deleted, then vice verse
+    # in order to ensure the trigger is okay with multiples, and order of creation
+    # doesn't matter
+
+    # duplication within the same auth provider
+    Pseudonym.create!(unique_id: "a@instructure.com", user: u)
+    Pseudonym.create!(unique_id: "a@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "a@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "b@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "b@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "b@instructure.com", user: u)
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: saml)
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: saml)
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: canvas)
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "c@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "d@instructure.com", user: u, authentication_provider: canvas)
+
+    # duplication across a specific auth provider and no auth provider
+    Pseudonym.create!(unique_id: "e@instructure.com", user: u, authentication_provider: saml)
+    Pseudonym.create!(unique_id: "e@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "e@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "f@instructure.com", user: u)
+    Pseudonym.create!(unique_id: "f@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "f@instructure.com", user: u, authentication_provider: saml, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "g@instructure.com", user: u, authentication_provider: canvas)
+    Pseudonym.create!(unique_id: "g@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "g@instructure.com", user: u, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "h@instructure.com", user: u)
+    Pseudonym.create!(unique_id: "h@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
+    Pseudonym.create!(unique_id: "h@instructure.com", user: u, authentication_provider: canvas, workflow_state: "deleted")
   end
 
   it "does not allow a login_attribute without an authentication provider" do
@@ -92,18 +195,36 @@ describe Pseudonym do
     expect(p.reload.login_attribute).to be_nil
   end
 
-  it "finds the correct pseudonym for logins" do
-    user = User.create!
-    p1 = Pseudonym.create!(unique_id: "Cody@instructure.com", user:)
-    Pseudonym.create!(unique_id: "codY@instructure.com", user:) { |p| p.workflow_state = "deleted" }
-    expect(Pseudonym.active.by_unique_id("cody@instructure.com").first).to eq p1
-    account = Account.create!
-    p3 = Pseudonym.create!(unique_id: "cOdy@instructure.com", account:, user:)
-    expect(Pseudonym.active.by_unique_id("cody@instructure.com").sort).to eq [p1, p3]
-  end
+  describe ".by_unique_id" do
+    it "finds the correct pseudonym for logins" do
+      user = User.create!
+      p1 = Pseudonym.create!(unique_id: "Cody@instructure.com", user:)
+      Pseudonym.create!(unique_id: "codY@instructure.com", user:) { |p| p.workflow_state = "deleted" }
+      expect(Pseudonym.active.by_unique_id("cody@instructure.com").first).to eq p1
+      account = Account.create!
+      p3 = Pseudonym.create!(unique_id: "cOdy@instructure.com", account:, user:)
+      expect(Pseudonym.active.by_unique_id("cody@instructure.com").sort).to eq [p1, p3]
+      p4 = Pseudonym.create!(unique_id: "c①dy@instructure.com", account:, user:)
+      expect(Pseudonym.active.by_unique_id("c①dy@instructure.com")).to eq [p4]
 
-  it "does not blow up if by_unique_id is passed a non-string" do
-    expect(Pseudonym.active.by_unique_id(123)).to eq []
+      scope = Pseudonym.active
+      shard = instance_double(Shard)
+      allow(shard).to receive(:settings).and_return({})
+      allow(shard).to receive(:is_a?).with(Shard).and_return(true)
+      allow(shard).to receive(:is_a?).with(Switchman::DefaultShard).and_return(false)
+      # return our double once for the named scope, then the real thing for the query
+      allow(scope).to receive(:primary_shard).and_return(shard, Shard.default)
+      expect(scope.by_unique_id("c1dy@instructure.com")).not_to exist
+
+      # mark the migration as complete, and it will start doing a normalized lookup
+      allow(shard).to receive(:settings).and_return({ "pseudonyms_normalized" => true })
+      allow(scope).to receive(:primary_shard).and_return(shard, Shard.default)
+      expect(scope.by_unique_id("c1dy@instructure.com")).to eq [p4]
+    end
+
+    it "does not blow up if by_unique_id is passed a non-string" do
+      expect(Pseudonym.active.by_unique_id(123)).to eq []
+    end
   end
 
   it "associates to another user" do

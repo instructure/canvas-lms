@@ -5,10 +5,9 @@ analytics_2:
   applies_to: Course
   display_name: New Course and User Analytics
   description:
-    wrapper: <a href="https://community.canvaslms.com/t5/New-Analytics-Users/gh-p/analytics">\1</a>
     new_analytics_description: Show new analytics for course and user data. Data
       may take 24 hours to appear in New Analytics after setting this feature flag
-      to ON. For full details, please see the *New Analytics user group* in the Canvas
+      to ON. For full details, please see the New Analytics user group in the Canvas
       Community.
   after_state_change_proc: analytics_2_after_state_change_hook
   beta: false
@@ -45,10 +44,9 @@ admin_analytics:
   applies_to: Account
   display_name: Admin Analytics
   description:
-    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
     admin_analytics_description: Enables Analytics at the account-level. Admin Analytics dashboards provide
       details on Canvas usage, Canvas course success, and student engagement.
-      Learn more in the *Admin Analytics Hub* in the Canvas community.
+      Learn more in the Admin Analytics Hub in the Canvas community.
   after_state_change_proc: analytics_2_after_state_change_hook
   root_opt_in: true
   beta: false

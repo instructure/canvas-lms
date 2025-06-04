@@ -106,7 +106,7 @@ class AccountUser < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :new_account_user
     p.to { |record| record.account.users }
-    p.whenever(&:just_created)
+    p.whenever(&:previously_new_record?)
 
     p.dispatch :account_user_registration
     p.to(&:user)

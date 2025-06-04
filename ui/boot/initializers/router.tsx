@@ -32,10 +32,18 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {AUPRoutes} from '../../features/acceptable_use_policy/routes/AUPRoutes'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
+import {getTheme} from '@canvas/instui-bindings'
+import {InstUISettingsProvider} from '@instructure/emotion'
 
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
     <Route>
+      <Route path="/users/:userId/messages" lazy={() => import('../../features/messages/index')} />
+      <Route
+        path="/users/:userId/messages/:messageId"
+        lazy={() => import('../../features/messages/index')}
+      />
+      <Route path="/login/otp" lazy={() => import('../../features/otp_login/index')} />
       <Route
         path="/groups/:groupId/*"
         lazy={() => import('@canvas/group-navigation-selector/GroupNavigationSelectorRoute')}
@@ -53,8 +61,32 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/page_views/react/PageViewsRoute')}
       />
       <Route
+        path="/courses/:courseId/wiki"
+        lazy={() => import('../../features/wiki_page_show/index')}
+      />
+      <Route
+        path="/courses/:courseId/pages/:pageId"
+        lazy={() => import('../../features/wiki_page_show/index')}
+      />
+      <Route
+        path="/groups/:groupId/wiki"
+        lazy={() => import('../../features/wiki_page_show/index')}
+      />
+      <Route
+        path="/groups/:groupId/pages/:pageId"
+        lazy={() => import('../../features/wiki_page_show/index')}
+      />
+      <Route
+        path="/accounts/:accountId/grading_standards"
+        lazy={() => import('../../features/account_grading_standards/index')}
+      />
+      <Route
         path="/accounts/site_admin/release_notes"
         lazy={() => import('../../features/release_notes_edit/react/ReleaseNotesEditRoute')}
+      />
+      <Route
+        path="/accounts/:accountId/admin_tools"
+        lazy={() => import('../../features/account_admin_tools/react/AccountAdminToolsRoute')}
       />
       <Route
         path="/accounts/:accountId/settings"
@@ -84,6 +116,7 @@ const portalRouter = createBrowserRouter(
         path="/profile/qr_mobile_login"
         lazy={() => import('../../features/qr_mobile_login/react/QRMobileLoginRoute')}
       />
+      <Route path="/ams/*" lazy={() => import('../../features/ams/react/AmsRoute')} />
 
       {accountGradingSettingsRoutes}
 
@@ -102,6 +135,15 @@ const portalRouter = createBrowserRouter(
 
       {window.ENV.enhanced_rubrics_enabled && RubricRoutes}
 
+      <Route
+        path="/courses/:courseId/assignments/new"
+        lazy={() => import('../../features/assignment_edit/index')}
+      />
+      <Route
+        path="/courses/:courseId/assignments/:assignmentId/edit"
+        lazy={() => import('../../features/assignment_edit/index')}
+      />
+
       <Route path="*" element={<></>} />
     </Route>,
   ),
@@ -116,11 +158,14 @@ export function FallbackSpinner() {
 export function loadReactRouter() {
   const mountNode = document.querySelector('#react-router-portals')
   if (mountNode) {
+    const theme = getTheme()
     const root = ReactDOM.createRoot(mountNode)
     root.render(
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={portalRouter} fallbackElement={<FallbackSpinner />} />
-      </QueryClientProvider>,
+      <InstUISettingsProvider theme={theme}>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={portalRouter} fallbackElement={<FallbackSpinner />} />
+        </QueryClientProvider>
+      </InstUISettingsProvider>,
     )
   }
 }

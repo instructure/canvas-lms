@@ -102,18 +102,6 @@ div.content_notice {
   height: 100% !important;
 }
 
-.before_external_content_info_alert,
-.after_external_content_info_alert {
-  &:focus {
-    margin: 20px 0px;
-    outline: none;
-  }
-}
-
-iframe.info_alert_outline {
-  border: 2px solid #2B7ABC !important;
-}
-
 body.ic-full-screen-lti-tool iframe.tool_launch {
   // gets the height of the parent element (div.tool_content_wrapper) which is calculated in
   // ui/features/external_tools_show/jquery/tool_inline.js

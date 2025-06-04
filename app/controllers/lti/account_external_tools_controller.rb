@@ -43,16 +43,12 @@ module Lti
     }.freeze.with_indifferent_access
 
     def create
-      tool = target_developer_key.lti_registration.new_external_tool(context)
-      tool.check_for_duplication(params[:verify_uniqueness].present?)
+      tool = target_developer_key.lti_registration.new_external_tool(context, verify_uniqueness: params[:verify_uniqueness].present?, current_user: @current_user)
 
-      if tool.errors.blank? && tool.save
-        ContextExternalTool.invalidate_nav_tabs_cache(tool, @domain_root_account)
-        render json: external_tool_json(tool, context, @current_user, session), content_type: MIME_TYPE
-      else
-        tool.destroy if tool.persisted?
-        render json: tool.errors, status: :bad_request, content_type: MIME_TYPE
-      end
+      ContextExternalTool.invalidate_nav_tabs_cache(tool, @domain_root_account)
+      render json: external_tool_json(tool, context, @current_user, session), content_type: MIME_TYPE
+    rescue Lti::ContextExternalToolErrors => e
+      render json: e.errors, status: :bad_request
     end
 
     def show

@@ -6398,6 +6398,8 @@ tr:
     link_validator: 
       link_validator: "Ders Bağlantı Doğrulama"
       page_title: "Ders Bağlantı Doğrulama"
+    links: 
+      student_progress: "İlerleme Durumunu Göster"
     master_course_restrictions: 
       labels: 
         availability_dates: "Geçerlilik Tarihleri"
@@ -6632,9 +6634,11 @@ tr:
       tab_hidden_if_disabled: "Sayfa etkisizleştirildi, gezinme menüsünde görünmeyecek"
       tabs: 
         alerts: Uyarılar
+        apps: Uygulamalar
         details: "Ders Detayları"
         feature_options: "Özellik Seçenekleri"
         grade_publishing: "Not Yayınlama"
+        integrations: Entegrasyonlar
         navigation: Gezinme
         sections: Bölümler
         tools: Uygulamalar
@@ -7224,6 +7228,7 @@ tr:
   delete_grading_scheme_6b308832: "Notlandırma Şemasını Sil"
   delete_group_86c381ec: "Grubu Sil"
   delete_my_account_41060aad: "Hesabımı Sil"
+  delete_name_81c1b5b2: "Sil %{name}"
   delete_outcome_cc6546f1: "Öğrenme Çıktısını Sil"
   delete_outcome_group_6b399d34: "Öğrenme Çıktısı Grubunu Sil"
   delete_quiz_142b8099: "Kısa Sınavı Sil"
@@ -14248,6 +14253,7 @@ tr:
   page_name_is_required_d8c2736e: "Sayfa Adı zounludur"
   page_not_found_2b0d05f5: "Sayfa bulunamadı"
   page_pagenum_20dbfeb8: "Sayfa %{pageNum}"
+  page_title_106304bb: "Sayfa başlığı"
   page_title_d1a22bbf: "Sayfa Başlığı"
   page_views: 
     browsers: 
@@ -20524,6 +20530,10 @@ tr:
       page_header_title: "%{page_name} ı düzenle"
     index: 
       titles: 
+        pages: Sayfalar
+    new: 
+      titles: 
+        new_page: "Yeni Sayfa"
         pages: Sayfalar
     notices: 
       cannot_edit: "Bu sayfayı düzenlemeye yetkiniz yok \"%{title}\"."

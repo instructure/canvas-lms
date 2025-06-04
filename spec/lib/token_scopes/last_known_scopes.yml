@@ -229,6 +229,10 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments'
 - verb: DELETE
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id/controls'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
 - verb: GET
@@ -581,6 +585,8 @@
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/date_details'
 - verb: PUT
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/date_details'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/assignments/:assignment_id/date_details/convert_tag_overrides'
 - verb: POST
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/duplicate'
 - verb: POST
@@ -837,6 +843,8 @@
   path: '/api/v1/courses/:course_id/discussion_topics/:discussion_topic_id/date_details'
 - verb: PUT
   path: '/api/v1/courses/:course_id/discussion_topics/:discussion_topic_id/date_details'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/discussion_topics/:discussion_topic_id/date_details/convert_tag_overrides'
 - verb: DELETE
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id'
 - verb: GET
@@ -1197,6 +1205,8 @@
   path: '/api/v1/courses/:course_id/pages/:url_or_id/date_details'
 - verb: PUT
   path: '/api/v1/courses/:course_id/pages/:url_or_id/date_details'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/pages/:url_or_id/date_details/convert_tag_overrides'
 - verb: POST
   path: '/api/v1/courses/:course_id/pages/:url_or_id/duplicate'
 - verb: GET
@@ -1239,6 +1249,8 @@
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/date_details'
 - verb: PUT
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/date_details'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/quizzes/:quiz_id/date_details/convert_tag_overrides'
 - verb: POST
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/extensions'
 - verb: POST
@@ -1819,8 +1831,16 @@
   path: '/api/v1/login/session_token'
 - verb: GET
   path: '/api/v1/lti_registrations/:registration_id/controls'
+- verb: POST
+  path: '/api/v1/lti_registrations/:registration_id/controls'
+- verb: DELETE
+  path: '/api/v1/lti_registrations/:registration_id/controls/:id'
 - verb: GET
   path: '/api/v1/lti_registrations/:registration_id/controls/:id'
+- verb: PUT
+  path: '/api/v1/lti_registrations/:registration_id/controls/:id'
+- verb: POST
+  path: '/api/v1/lti_registrations/:registration_id/controls/bulk'
 - verb: GET
   path: '/api/v1/manageable_accounts'
 - verb: GET

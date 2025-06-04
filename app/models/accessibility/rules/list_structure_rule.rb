@@ -75,6 +75,13 @@ module Accessibility
       def self.link_text
         I18n.t("Learn more about using lists")
       end
+
+      def self.form(_elem)
+        Accessibility::Forms::CheckboxField.new(
+          label: "Format as list",
+          value: "false"
+        )
+      end
     end
   end
 end

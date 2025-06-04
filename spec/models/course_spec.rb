@@ -8475,4 +8475,15 @@ describe Course do
       expect(course.reload.horizon_course).to be_falsey
     end
   end
+
+  describe "copied assets" do
+    it "returns courses that copied a page" do
+      source_course = Course.create!
+      source_page = source_course.wiki_pages.create!(title: "My Page")
+      copied_course = Course.create!
+      migration_id = CC::CCHelper.create_key(source_page, global: true)
+      copied_course.wiki_pages.create!(title: "My Page", migration_id:)
+      expect(Course.copied_asset("page_#{source_page.id}")).to include(copied_course)
+    end
+  end
 end

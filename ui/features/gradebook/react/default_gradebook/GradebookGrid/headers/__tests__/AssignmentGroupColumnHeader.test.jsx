@@ -413,9 +413,8 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
       props.onApplyScoreToUngraded = jest.fn()
       props.isRunningScoreToUngraded = true
       mountAndOpenOptionsMenu()
-      expect(
-        applyScoreToUngradedItem({showAlternativeText: true}).getAttribute('aria-disabled'),
-      ).toBe('true')
+      const menuItem = applyScoreToUngradedItem({showAlternativeText: true})
+      expect(menuItem.getAttribute('aria-disabled')).toBe('true')
     })
   })
 
@@ -450,7 +449,7 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
 
       it('Enter opens the "Options" menu', () => {
         handleKeyDown(13) // Enter
-        expect($menuContent).toBeTruthy()
+        expect(getOptionsMenuContent()).toBeTruthy()
       })
 
       it('returns false for Enter', () => {

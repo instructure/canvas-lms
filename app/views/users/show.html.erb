@@ -76,6 +76,7 @@
 <div id="user-info-fieldsets">
   <%= render :partial => 'users/name', locals: { login_history: true } %>
   <%= render :partial => 'users/logins' %>
+  <%= render :partial => 'users/observers' %>
   <% if @domain_root_account.feature_enabled?(:temporary_enrollments) &&
         @enrollments.detect(&:temporary_enrollment_source_user_id).present? &&
         @context_account.grants_any_right?(@current_user, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)%>

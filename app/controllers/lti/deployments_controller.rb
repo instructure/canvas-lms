@@ -83,12 +83,27 @@ module Lti
   #
   class DeploymentsController < ApplicationController
     include Api::V1::Lti::Deployment
+    include Api::V1::Lti::ContextControl
 
     before_action :require_account_context
     before_action :require_root_account
     before_action :require_user
     before_action :require_feature_flag
     before_action :require_manage_lti_registrations
+
+    # @API Show LTI Deployment
+    #
+    # Display details of the specified deployment for the specified LTI registration in this context.
+    #
+    # @returns Lti::Deployment
+    #
+    # @example_request
+    #
+    #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/deployments/<deployment_id>' \
+    #        -H "Authorization: Bearer <token>"
+    def show
+      render json: lti_deployment_json(deployment, @current_user, session, @context)
+    end
 
     # @API Create LTI Deployment
     #
@@ -102,20 +117,12 @@ module Lti
     #        -H "Authorization: Bearer <token>"
     def create
       lti_registration = Lti::Registration.find(params[:registration_id])
-      if lti_registration.nil?
-        render json: { error: "LTI registration not found" }, status: :not_found, content_type: MIME_TYPE
-        return
-      end
+      deployment = lti_registration.new_external_tool(@context, current_user: @current_user)
 
-      deployment = lti_registration.new_external_tool(@context)
-
-      if deployment.save
-        ContextExternalTool.invalidate_nav_tabs_cache(deployment, @domain_root_account)
-        render json: lti_deployment_json(deployment, @current_user, session, @context)
-      else
-        deployment.destroy if deployment.persisted?
-        render json: deployment.errors, status: :bad_request, content_type: MIME_TYPE
-      end
+      ContextExternalTool.invalidate_nav_tabs_cache(deployment, @domain_root_account)
+      render json: lti_deployment_json(deployment, @current_user, session, @context)
+    rescue Lti::ContextExternalToolErrors => e
+      render json: e.errors, status: :bad_request, content_type: MIME_TYPE
     end
 
     # @API Delete LTI Deployment
@@ -129,16 +136,9 @@ module Lti
     #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/deployments/<deployment_id>' \
     #        -H "Authorization: Bearer <token>"
     def destroy
-      tool = ContextExternalTool.find_by(
-        id: params[:id]
-      )
-      if tool.nil?
-        render json: { error: "LTI deployment not found" }, status: :not_found
-        return
-      end
-      if tool.destroy
-        ContextExternalTool.invalidate_nav_tabs_cache(tool, @domain_root_account)
-        render json: lti_deployment_json(tool, @current_user, session, @context)
+      if deployment.destroy
+        ContextExternalTool.invalidate_nav_tabs_cache(deployment, @domain_root_account)
+        render json: lti_deployment_json(deployment, @current_user, session, @context)
       else
         render json: { error: "Failed to delete LTI deployment" }, status: :internal_server_error
       end
@@ -155,21 +155,45 @@ module Lti
     #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/deployments' \
     #        -H "Authorization: Bearer <token>"
     def list
-      registration = Lti::Registration.find(params[:registration_id])
-      if registration.nil?
-        render json: { error: "LTI registration not found" }, status: :not_found, content_type: MIME_TYPE
-        return
-      end
-
-      tools = ContextExternalTool.where(
-        account: @context,
-        lti_registration_id: params[:registration_id]
-      ).active
+      lti_registration = Lti::Registration.find(params[:registration_id])
+      bookmark = BookmarkedCollection::SimpleBookmarker.new(ContextExternalTool, :id)
+      tool_collection = BookmarkedCollection.wrap(bookmark, ContextExternalTool.active.where(account: @context, lti_registration:))
+      tools = Api.paginate(tool_collection, self, api_v1_list_deployments_path)
 
       render json: tools.map { |tool| lti_deployment_json(tool, @current_user, session, @context) }
     end
 
+    # @API List LTI Context Controls
+    #
+    # List all context controls for the specified deployment. Context Controls are used to manage
+    # LTI tool availability in contexts across Canvas.
+    #
+    # @returns [Lti::ContextControl]
+    #
+    # @example_request
+    #
+    #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/deployments/<deployment_id>/controls' \
+    #        -H "Authorization: Bearer <token>"
+    def list_controls
+      per_page = Api.per_page_for(self, default: 100)
+      bookmark = BookmarkedCollection::SimpleBookmarker.new(Lti::ContextControl, :id)
+      control_collection = BookmarkedCollection.wrap(bookmark, deployment.context_controls.active)
+      controls = Api.paginate(control_collection, self, api_v1_list_deployment_controls_path, per_page:)
+
+      json = controls.map do |control|
+        lti_context_control_json(control, @current_user, session, @context, include_users: true)
+      end
+      render json:
+    end
+
     private
+
+    def deployment
+      @deployment ||= ContextExternalTool.find_by(id: params[:id], lti_registration_id: params[:registration_id])
+      raise ActiveRecord::RecordNotFound unless @deployment
+
+      @deployment
+    end
 
     def require_manage_lti_registrations
       require_context_with_permission(@context, :manage_lti_registrations)

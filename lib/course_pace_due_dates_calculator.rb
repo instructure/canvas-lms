@@ -28,7 +28,7 @@ class CoursePaceDueDatesCalculator
     due_dates = {}
 
     if by_assignment
-      items.preload(:module_item)
+      items.preload!(:module_item)
     end
 
     enrollment_start_date = enrollment&.start_at || [enrollment&.effective_start_at, enrollment&.created_at].compact.max

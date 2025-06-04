@@ -33,6 +33,10 @@ module Modules2IndexPage
     "#context_module_item_#{module_item_id}"
   end
 
+  def module_action_menu_selector(module_id)
+    "[data-testid='module-action-menu_#{module_id}']"
+  end
+
   def manage_module_item_button_selector(module_item_id)
     "[data-testid='module-item-action-menu_#{module_item_id}']"
   end
@@ -56,6 +60,19 @@ module Modules2IndexPage
   def send_to_modal_input_selector
     "#content-share-user-search"
   end
+
+  def module_header_expand_toggle_selector
+    "[data-testid='module-header-expand-toggle']"
+  end
+
+  def module_item_title_selector
+    "[data-testid='module-item-title']"
+  end
+
+  def page_body
+    f("body")
+  end
+
   #------------------------------ Elements ------------------------------
 
   def student_modules_container
@@ -64,6 +81,10 @@ module Modules2IndexPage
 
   def teacher_modules_container
     f(teacher_modules_container_selector)
+  end
+
+  def module_action_menu(module_id)
+    f(module_action_menu_selector(module_id))
   end
 
   def manage_module_item_button(module_item_id)
@@ -101,10 +122,22 @@ module Modules2IndexPage
   def send_to_form_selected_elements
     ff("button[type='button']", send_to_modal_input_container)
   end
+
+  def module_header_expand_toggle
+    f(module_header_expand_toggle_selector)
+  end
+
+  def module_item_title
+    f(module_item_title_selector)
+  end
   #------------------------------ Actions -------------------------------
 
   def set_rewrite_flag(rewrite_status: true)
     rewrite_status ? @course.root_account.enable_feature!(:modules_page_rewrite) : @course.root_account.disable_feature!(:modules_page_rewrite)
+  end
+
+  def set_rewrite_student_flag(rewrite_status: true)
+    rewrite_status ? @course.root_account.enable_feature!(:modules_page_rewrite_student_view) : @course.root_account.disable_feature!(:modules_page_rewrite_student_view)
   end
 
   def modules2_teacher_setup
@@ -114,11 +147,11 @@ module Modules2IndexPage
 
   def modules2_student_setup
     course_with_student(active_all: true)
-    course_modules_setup
+    course_modules_setup(student_view: true)
   end
 
-  def course_modules_setup
-    set_rewrite_flag
+  def course_modules_setup(student_view: false)
+    student_view ? set_rewrite_student_flag : set_rewrite_flag
     @quiz = @course.assignments.create!(title: "quiz assignment", submission_types: "online_quiz")
     @assignment = @course.assignments.create!(title: "assignment 1", submission_types: "online_text_entry")
     @assignment2 = @course.assignments.create!(title: "assignment 2",

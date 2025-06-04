@@ -163,7 +163,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def update_grading_period_grades
-    return true unless due_at_overridden && saved_change_to_due_at? && !saved_change_to_id?
+    return true unless due_at_overridden && saved_change_to_due_at? && !previously_new_record?
 
     course = overridable&.context || quiz&.assignment&.context
     return true unless course&.grading_periods?
@@ -533,7 +533,7 @@ class AssignmentOverride < ActiveRecord::Base
   def destroy_if_empty_set
     return unless set_type == "ADHOC"
 
-    assignment_override_students.reload if id_before_last_save.nil? # fixes a problem with rails 4.2 caching an empty association scope
+    assignment_override_students.reload if previously_new_record? # fixes a problem with rails 4.2 caching an empty association scope
     destroy if set.empty?
   end
 

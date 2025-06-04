@@ -167,5 +167,25 @@ module Schemas
         end
       end
     end
+
+    describe ".filter_and_validate!" do
+      it "returns filtered hash when valid" do
+        input = { "some_str" => "foo", "some_num" => 1, "some_bool" => true, "other_str" => "bar", "extra" => "should be removed" }
+        filtered = BaseSpecsTest.filter_and_validate!(input.dup)
+        expect(filtered).to eq({ "some_str" => "foo", "some_num" => 1, "some_bool" => true, "other_str" => "bar" })
+      end
+
+      it "raises InvalidSchema when invalid" do
+        input = { "some_str" => "baz", "some_num" => "not a number" }
+        expect { BaseSpecsTest.filter_and_validate!(input) }.to raise_error(Schemas::Base::InvalidSchema)
+      end
+
+      it "removes extra top-level keys but not nested ones" do
+        input = { "str1" => "foo", "str2" => "bar", "things" => [{ "str3" => "baz", "str4" => "qux", "more_things" => [{ "str5" => "abc", "str6" => "def", "extra_nested" => "keep" }] }], "extra" => "remove" }
+        filtered = NestedValidationTest.filter_and_validate!(input.dup)
+        expect(filtered["things"][0]["more_things"][0]).not_to have_key("extra_nested")
+        expect(filtered).not_to have_key("extra")
+      end
+    end
   end
 end

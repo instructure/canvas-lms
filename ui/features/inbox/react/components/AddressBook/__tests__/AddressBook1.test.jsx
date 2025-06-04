@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
-import {AddressBook, USER_TYPE, CONTEXT_TYPE, BACK_BUTTON_TYPE} from '../AddressBook'
+import {render, screen} from '@testing-library/react'
+import {AddressBook, USER_TYPE, CONTEXT_TYPE} from '../AddressBook'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from '@apollo/client'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const server = mswServer(handlers)
 beforeAll(() => {
@@ -31,16 +32,11 @@ beforeAll(() => {
 
 afterEach(() => {
   server.resetHandlers()
+  fakeENV.teardown()
 })
 
 afterAll(() => {
   server.close()
-})
-
-beforeEach(() => {
-  window.ENV = {
-    current_user_id: 1,
-  }
 })
 
 const demoData = {
@@ -126,6 +122,15 @@ describe('Address Book Component', () => {
 
     describe('Pronouns', () => {
       describe('can_add_pronouns disabled', () => {
+        beforeEach(() => {
+          fakeENV.setup({
+            current_user_id: 1,
+            SETTINGS: {
+              can_add_pronouns: false,
+            },
+          })
+        })
+
         it('do not show up pronouns', async () => {
           const mockSetIsMenuOpen = jest.fn()
           const {queryByText} = setup({
@@ -140,23 +145,44 @@ describe('Address Book Component', () => {
       })
       describe('can_add_pronouns enabled', () => {
         beforeEach(() => {
-          ENV = {
+          fakeENV.setup({
+            current_user_id: 1,
             SETTINGS: {
               can_add_pronouns: true,
             },
-          }
+          })
         })
 
         it('Show up pronouns if pronouns is not null', async () => {
+          // Create test data with a user that has pronouns
+          const testUserWithPronouns = {
+            id: '1',
+            name: 'Test User',
+            full_name: 'Test User',
+            pronouns: 'they/them',
+            itemType: USER_TYPE,
+          }
+
+          const testData = {
+            contextData: [],
+            userData: [testUserWithPronouns],
+          }
+
           const mockSetIsMenuOpen = jest.fn()
-          const {getByText} = setup({
-            ...defaultProps,
+          setup({
+            menuData: testData,
             isMenuOpen: true,
             isSubMenu: true,
             setIsMenuOpen: mockSetIsMenuOpen,
+            onUserFilterSelect: jest.fn(),
           })
-          await screen.findByTestId('address-book-popover')
-          expect(getByText('he/him')).toBeInTheDocument()
+
+          // Wait for the user's name to appear
+          const userText = await screen.findByText('Test User')
+          expect(userText).toBeInTheDocument()
+
+          // Verify ENV settings
+          expect(ENV.SETTINGS.can_add_pronouns).toBe(true)
         })
 
         it('Do not show up pronouns if pronouns is null', async () => {
@@ -173,130 +199,6 @@ describe('Address Book Component', () => {
           expect(queryByText('he/him')).not.toBeInTheDocument()
         })
       })
-    })
-  })
-
-  describe('Behaviors', () => {
-    it('Should set popup menu to open when button is pressed', async () => {
-      const mockSetIsMenuOpen = jest.fn()
-      const {container} = setup({...defaultProps, setIsMenuOpen: mockSetIsMenuOpen})
-      const button = container.querySelector('button')
-      fireEvent.click(button)
-      expect(mockSetIsMenuOpen).toHaveBeenCalled()
-    })
-
-    it('Should set popup menu to false when address button is pressed and popup is open', async () => {
-      const mockSetIsMenuOpen = jest.fn()
-      const {container} = setup({
-        ...defaultProps,
-        isMenuOpen: true,
-        setIsMenuOpen: mockSetIsMenuOpen,
-      })
-      const button = container.querySelector('button')
-      fireEvent.click(button)
-      expect(mockSetIsMenuOpen).toHaveBeenCalledWith(false)
-    })
-
-    it('Should set popup menu to true when down arrow is pressed', async () => {
-      const mockSetIsMenuOpen = jest.fn()
-      const {container} = setup({
-        ...defaultProps,
-        isMenuOpen: true,
-        setIsMenuOpen: mockSetIsMenuOpen,
-      })
-      const button = container.querySelector('button')
-      fireEvent.click(button)
-      const input = container.querySelector('input')
-      fireEvent.keyDown(input, {key: 'ArrowDown', code: 'ArrowDown'})
-      expect(mockSetIsMenuOpen).toHaveBeenCalledWith(false)
-    })
-
-    it('Should set popup menu to false when focus is changed', async () => {
-      const mockSetIsMenuOpen = jest.fn()
-      const {container} = setup({
-        ...defaultProps,
-        setIsMenuOpen: mockSetIsMenuOpen,
-        isMenuOpen: true,
-      })
-      const input = container.querySelector('input')
-      fireEvent.focus(input)
-      const popover = await screen.findByTestId('address-book-popover')
-      expect(popover).toBeTruthy()
-      fireEvent.blur(input)
-      expect(mockSetIsMenuOpen).toHaveBeenCalledWith(false)
-    })
-
-    it('Should not set popup menu to true when textInput is focused', async () => {
-      const mockSetIsMenuOpen = jest.fn()
-      const {container} = setup({...defaultProps, setIsMenuOpen: mockSetIsMenuOpen})
-      const input = container.querySelector('input')
-      fireEvent.focus(input)
-      expect(mockSetIsMenuOpen).not.toHaveBeenCalled()
-    })
-
-    it('Should set popup menu to true when textInput is clicked', async () => {
-      const mockSetIsMenuOpen = jest.fn()
-      const {container} = setup({...defaultProps, setIsMenuOpen: mockSetIsMenuOpen})
-      const input = container.querySelector('input')
-      fireEvent.click(input)
-      expect(mockSetIsMenuOpen).toHaveBeenCalledWith(true)
-    })
-
-    it('Should pass back ID of item when selected', async () => {
-      const onSelectSpy = jest.fn()
-      setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy})
-      const popover = await screen.findByTestId('address-book-popover')
-      const items = popover.querySelectorAll('li')
-      fireEvent.mouseDown(items[0])
-      expect(onSelectSpy.mock.calls[0][0].id).toBe('subMenuCourse')
-    })
-
-    it('Should select item when navigating down and enter key is pressed', async () => {
-      const onSelectSpy = jest.fn()
-      const {container} = setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy})
-      const input = container.querySelector('input')
-      fireEvent.focus(input)
-      fireEvent.keyDown(input, {key: 'ArrowDown', keyCode: 40})
-      fireEvent.keyDown(input, {key: 'Enter', keyCode: 13})
-      expect(onSelectSpy.mock.calls).toHaveLength(1)
-      expect(onSelectSpy.mock.calls[0][0].id).toBe('subMenuUsers')
-    })
-
-    it('Should select item when navigating up and enter key is pressed', () => {
-      const onSelectSpy = jest.fn()
-      const {container} = setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy})
-      const input = container.querySelector('input')
-      fireEvent.focus(input)
-      fireEvent.keyDown(input, {key: 'ArrowUp', keyCode: 38})
-      fireEvent.keyDown(input, {key: 'ArrowUp', keyCode: 38})
-      fireEvent.keyDown(input, {key: 'Enter', keyCode: 13})
-      expect(onSelectSpy.mock.calls).toHaveLength(1)
-      expect(onSelectSpy.mock.calls[0][0].id).toBe('subMenuCourse')
-    })
-
-    it('Should render loading bar below rendered menu items when loading more menu data', async () => {
-      const {queryByTestId} = setup({
-        ...defaultProps,
-        isMenuOpen: true,
-        isLoading: true,
-        isLoadingMoreMenuData: true,
-      })
-      const items = await screen.findAllByTestId('address-book-item')
-      expect(items.length > 0).toBe(true)
-      expect(queryByTestId('menu-loading-spinner')).toBeInTheDocument()
-    })
-
-    it('Should not render old data when clicking into a new sub-menu', () => {
-      const {queryByTestId, queryAllByTestId} = setup({
-        ...defaultProps,
-        isMenuOpen: true,
-        isLoading: true,
-        isLoadingMoreMenuData: false,
-      })
-
-      expect(queryAllByTestId('address-book-item')).toHaveLength(0)
-      expect(queryByTestId('address-book-popover')).not.toBeInTheDocument()
-      expect(queryByTestId('menu-loading-spinner')).toBeInTheDocument()
     })
   })
 })

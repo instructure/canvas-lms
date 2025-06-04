@@ -618,4 +618,103 @@ describe Folder do
       expect(child.full_name).to eql("course files/child 2")
     end
   end
+
+  describe ".preload_root_folders" do
+    it "returns an empty hash when given no contexts" do
+      expect(Folder.preload_root_folders([])).to eq({})
+    end
+
+    it "preloads root folders for multiple contexts of the same type" do
+      course1 = course_factory
+      course2 = course_factory
+      course3 = course_factory
+
+      # Create a root folder for course1 in advance
+      root_folder1 = Folder.root_folders(course1).first
+
+      # Verify that before preloading we'd need separate queries for each
+      expect(Folder).to receive(:get_root_folder_for).once.and_call_original
+      Folder.root_folders(course2).first
+
+      expect(Folder).not_to receive(:get_root_folder_for)
+      result = Folder.preload_root_folders([course1, course2, course3])
+
+      # Verify correct structure and content
+      expect(result.keys).to match_array([course1.asset_string, course2.asset_string, course3.asset_string])
+      expect(result[course1.asset_string].id).to eq(root_folder1.id)
+      expect(result[course2.asset_string]).to be_persisted
+      expect(result[course3.asset_string]).to be_persisted
+      expect(result[course2.asset_string].name).to eq("course files")
+      expect(result[course3.asset_string].name).to eq("course files")
+    end
+
+    it "preloads root folders for multiple contexts of different types" do
+      course = course_factory
+      group = group_model
+      user = user_factory
+
+      result = Folder.preload_root_folders([course, group, user])
+
+      expect(result.keys).to match_array([course.asset_string, group.asset_string, user.asset_string])
+      expect(result[course.asset_string].name).to eq("course files")
+      expect(result[group.asset_string].name).to eq("files")
+      expect(result[user.asset_string].name).to eq("my files")
+    end
+
+    it "handles contexts that don't have folders" do
+      course = course_factory
+      non_folder_context = attachment_model
+
+      result = Folder.preload_root_folders([course, non_folder_context])
+
+      expect(result.keys).to match_array([course.asset_string])
+      expect(result[course.asset_string].name).to eq("course files")
+    end
+
+    it "reuses existing folders rather than creating duplicates" do
+      course1 = course_factory
+      course2 = course_factory
+
+      # Create root folders in advance
+      root1 = Folder.root_folders(course1).first
+      root2 = Folder.root_folders(course2).first
+
+      expect(Folder).not_to receive(:insert)
+      result = Folder.preload_root_folders([course1, course2])
+
+      expect(result[course1.asset_string].id).to eq(root1.id)
+      expect(result[course2.asset_string].id).to eq(root2.id)
+    end
+
+    it "creates missing folders when needed" do
+      course = course_factory
+      # Ensure no root folder exists yet
+      Folder.where(context: course, parent_folder_id: nil).delete_all
+
+      result = Folder.preload_root_folders([course])
+
+      expect(result[course.asset_string]).to be_persisted
+      expect(result[course.asset_string].name).to eq("course files")
+      expect(result[course.asset_string].parent_folder_id).to be_nil
+    end
+
+    describe "sharding" do
+      specs_require_sharding
+
+      it "works across shards if multiple shards exist" do
+        course1 = course_factory
+        course2 = course_factory
+        @shard2.activate do
+          @shard2_course = course_factory
+        end
+
+        result = Folder.preload_root_folders([course1, course2, @shard2_course])
+
+        expect(result.keys).to match_array([course1.asset_string, course2.asset_string, @shard2_course.asset_string])
+        expect(result[course1.asset_string]).to be_persisted
+        expect(result[course2.asset_string]).to be_persisted
+        expect(result[@shard2_course.asset_string]).to be_persisted
+      end
+    end
+  end
 end

@@ -2205,6 +2205,56 @@ describe Account do
         end
       end
     end
+
+    describe "account_chain_ids_for_multiple_accounts" do
+      let(:account1) { Account.default.sub_accounts.create! }
+      let(:account2) { Account.default.sub_accounts.create! }
+      let(:account3) { account1.sub_accounts.create! }
+
+      before do
+        account1
+        account2
+      end
+
+      it "is correct" do
+        expect(Account.account_chain_ids_for_multiple_accounts([account1.id, account2.id, account3.id])).to eq(
+          {
+            account1.id => [account1.id, Account.default.id],
+            account2.id => [account2.id, Account.default.id],
+            account3.id => [account3.id, account1.id, Account.default.id],
+          }
+        )
+      end
+
+      it "can handle account chain changes" do
+        account3.update_attribute(:parent_account, account2)
+        expect(Account.account_chain_ids_for_multiple_accounts([account1.id, account2.id, account3.id])).to eq(
+          {
+            account1.id => [account1.id, Account.default.id],
+            account2.id => [account2.id, Account.default.id],
+            account3.id => [account3.id, account2.id, Account.default.id],
+          }
+        )
+      end
+
+      it "can handle root accounts" do
+        expect(Account.account_chain_ids_for_multiple_accounts([Account.default.id, account1.id])).to eq(
+          {
+            Account.default.id => [Account.default.id],
+            account1.id => [account1.id, Account.default.id],
+          }
+        )
+      end
+
+      it "can handle lots of accounts" do
+        accounts = Array.new(100) { Account.default.sub_accounts.create! }
+        expect(Account.account_chain_ids_for_multiple_accounts(accounts.map(&:id))).to eq(
+          accounts.each_with_object({}) do |account, hash|
+            hash[account.id] = [account.id, Account.default.id]
+          end
+        )
+      end
+    end
   end
 
   describe "#destroy on sub accounts" do

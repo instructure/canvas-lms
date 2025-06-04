@@ -102,7 +102,7 @@ class RubricAssociation < ActiveRecord::Base
     p.to { context.respond_to?(:students) ? context.students : [] }
 
     p.whenever do |record|
-      record.just_created && !record.context.is_a?(Course)
+      record.previously_new_record? && !record.context.is_a?(Course)
     end
     p.data { course_broadcast_data }
   end
@@ -133,7 +133,7 @@ class RubricAssociation < ActiveRecord::Base
   # submissions were already sent when peer-review links and a *then* a rubric is created.
   def link_to_assessments
     # this is implemented as an after_save (and not an after_create) in order to have it run after assert_uniqueness
-    return unless saved_change_to_id?
+    return unless previously_new_record?
 
     # Go up to the assignment and loop through all submissions.
     # Update each submission's assessment_requests with a link to this rubric association

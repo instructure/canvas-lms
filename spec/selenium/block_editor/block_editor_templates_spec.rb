@@ -104,7 +104,7 @@ describe "Block Editor templates", :ignore_js_errors do
       toolbox_template_block_action("edit").click
       edit_template_modal_checkbox_published.click
       edit_template_modal_button_save.click
-      expect(blocks_panel_view_item_template_block.css_value("border-color")).to eq("rgb(232, 234, 236)"), "Expected border color to be gray:" + blocks_panel_view_item_template_block.css_value("border-color")
+      expect(blocks_panel_view_item_template_block.css_value("border-color")).to eq("rgb(215, 218, 222)"), "Expected border color to be gray:" + blocks_panel_view_item_template_block.css_value("border-color")
     end
 
     it "can edit a block template's name" do

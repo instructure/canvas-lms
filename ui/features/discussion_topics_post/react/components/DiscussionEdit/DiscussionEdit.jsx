@@ -107,6 +107,9 @@ export const DiscussionEdit = props => {
       )}
       <View display="block">
         <span className="discussions-editor">
+          <label htmlFor={textAreaId.current} style={{fontWeight: 'bold'}}>
+            {I18n.t('Write a reply')}
+          </label>
           <CanvasRce
             textareaId={textAreaId.current}
             onFocus={() => {}}

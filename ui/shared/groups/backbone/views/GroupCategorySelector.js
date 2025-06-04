@@ -237,7 +237,9 @@ GroupCategorySelector.prototype.toJSON = function () {
   const groupCategoryLocked = !this.parentModel.canGroup()
   return {
     isGroupAssignment:
-      this.parentModel.groupCategoryId() && this.parentModel.groupCategoryId() !== 'blank' && this.parentModel.groupCategoryId() !== 'new',
+      this.parentModel.groupCategoryId() &&
+      this.parentModel.groupCategoryId() !== 'blank' &&
+      this.parentModel.groupCategoryId() !== 'new',
     groupCategoryId: this.parentModel.groupCategoryId(),
     groupCategories: this.groupCategories,
     groupCategoryUnselected:
@@ -246,7 +248,7 @@ GroupCategorySelector.prototype.toJSON = function () {
       this.parentModel.groupCategoryId() === 'new' ||
       (!chain(this.groupCategories)
         .map('id')
-        .includes(this.parentModel.groupCategoryId())
+        .includes(this.parentModel.groupCategoryId().toString())
         .value() &&
         !isEmpty(this.groupCategories)),
     hideGradeIndividually: this.hideGradeIndividually,

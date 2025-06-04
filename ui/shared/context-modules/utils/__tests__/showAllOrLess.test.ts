@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {waitFor} from '@testing-library/dom'
-import {DEFAULT_PAGE_SIZE} from '../ModuleItemsLazyLoader'
+import {DEFAULT_PAGE_SIZE} from '../types'
 import {
   addShowAllOrLess,
   shouldShowAllOrLess,
@@ -33,6 +32,7 @@ import {
   MODULE_EXPAND_AND_LOAD_ALL,
   MODULE_LOAD_ALL,
   MODULE_LOAD_FIRST_PAGE,
+  decrementModuleItemsCount,
 } from '../showAllOrLess'
 
 declare const ENV: {
@@ -47,11 +47,48 @@ const addItemsToModule = (module: HTMLElement, count: number) => {
   }
 }
 
+type MakeModuleOptions = {
+  module_id?: string
+  totalItemsValue?: string | number
+  loadstate?: string
+}
+
+const makeModule = (options: MakeModuleOptions = {}): HTMLElement => {
+  const module_id = options.module_id || '1'
+  const module = document.createElement('div')
+  module.id = `context_module_${module_id}`
+  module.setAttribute('data-module-id', module_id)
+  const header = document.createElement('div')
+  header.className = 'header'
+  const admin = document.createElement('div')
+  admin.className = 'ig-header-admin'
+  header.appendChild(admin)
+  const reqMsg = document.createElement('div')
+  reqMsg.className = 'requirements_message'
+  admin.appendChild(reqMsg)
+  module.appendChild(header)
+  const content = document.createElement('div')
+  content.className = 'content'
+  const contextModuleItems = document.createElement('ul')
+  contextModuleItems.className = 'context_module_items'
+  if (options.totalItemsValue !== undefined) {
+    contextModuleItems.setAttribute('data-total-items', options.totalItemsValue.toString())
+  }
+  content.appendChild(contextModuleItems)
+  module.appendChild(content)
+  if (options.loadstate) {
+    module.dataset.loadstate = options.loadstate
+  }
+  document.body.appendChild(module)
+  return module
+}
+
 describe('showAllOrLess', () => {
   beforeEach(() => {
-    document.body.innerHTML = ''
-
     ENV.IS_STUDENT = false
+  })
+  afterEach(() => {
+    document.body.innerHTML = ''
   })
 
   describe('isModuleCurrentPageEmpty', () => {
@@ -73,9 +110,7 @@ describe('showAllOrLess', () => {
     it('should return true if the module is loading', () => {
       const module = document.createElement('div')
       module.setAttribute('data-module-id', '1')
-      const spinner = document.createElement('div')
-      spinner.classList.add('module-spinner-container')
-      module.appendChild(spinner)
+      module.dataset.loadstate = 'loading'
       expect(isModuleLoading(module)).toBe(true)
     })
 
@@ -90,9 +125,7 @@ describe('showAllOrLess', () => {
     it('should return true if the module is paginated', () => {
       const module = document.createElement('div')
       module.setAttribute('data-module-id', '1')
-      const pager = document.createElement('div')
-      pager.setAttribute('data-testid', 'module-1-pagination')
-      module.appendChild(pager)
+      module.dataset.loadstate = 'paginated'
       expect(isModulePaginated(module)).toBe(true)
     })
 
@@ -134,9 +167,7 @@ describe('showAllOrLess', () => {
     it('should return "all" if the module is paginated', () => {
       const module = document.createElement('div')
       module.setAttribute('data-module-id', '1')
-      const pager = document.createElement('div')
-      pager.setAttribute('data-testid', 'module-1-pagination')
-      module.appendChild(pager)
+      module.dataset.loadstate = 'paginated'
       expect(shouldShowAllOrLess(module)).toBe('all')
     })
 
@@ -213,9 +244,7 @@ describe('showAllOrLess', () => {
       const module = document.createElement('div')
       module.id = 'context_module_1'
       module.setAttribute('data-module-id', '1')
-      const pager = document.createElement('div')
-      pager.setAttribute('data-testid', 'module-1-pagination')
-      module.appendChild(pager)
+      module.dataset.loadstate = 'paginated'
       document.body.appendChild(module)
       document.addEventListener(MODULE_LOAD_ALL, ((event: Event) => {
         const customEvent = event as CustomEvent<{moduleId: string}>
@@ -227,43 +256,156 @@ describe('showAllOrLess', () => {
   })
 
   describe('addShowAllOrLess', () => {
-    const makeModule = (): HTMLElement => {
-      const module = document.createElement('div')
-      module.id = 'context_module_1'
-      module.setAttribute('data-module-id', '1')
-      const header = document.createElement('div')
-      header.className = 'header'
-      const admin = document.createElement('div')
-      admin.className = 'ig-header-admin'
-      header.appendChild(admin)
-      const reqMsg = document.createElement('div')
-      reqMsg.className = 'requirements_message'
-      admin.appendChild(reqMsg)
-      module.appendChild(header)
-      document.body.appendChild(module)
-      return module
-    }
-
-    it('should add the show all button to the module', async () => {
+    it('should add the show all button to the module', () => {
       const module = makeModule()
-      const pager = document.createElement('div')
-      pager.setAttribute('data-testid', 'module-1-pagination')
-      module.appendChild(pager)
+      module.dataset.loadstate = 'paginated'
       addShowAllOrLess('1')
-      await waitFor(() => {
-        expect(document.querySelector('.show-all-or-less-button')).toBeInTheDocument()
-      })
-      expect(document.querySelector('.show-all')).toBeInTheDocument()
+      expect(module.querySelector('.show-all-or-less-button')).toBeInTheDocument()
+      expect(module.querySelector('.show-all')).toBeInTheDocument()
     })
 
-    it('should add the show less button to the module', async () => {
+    it('should add the show less button to the module', () => {
       const module = makeModule()
       addItemsToModule(module, DEFAULT_PAGE_SIZE + 1)
       addShowAllOrLess('1')
-      await waitFor(() => {
-        expect(document.querySelector('.show-all-or-less-button')).toBeInTheDocument()
+      expect(module.querySelector('.show-all-or-less-button')).toBeInTheDocument()
+      expect(module.querySelector('.show-less')).toBeInTheDocument()
+    })
+
+    it('should not add either button while the module is loading', () => {
+      const module = makeModule()
+      module.dataset.loadstate = 'loading'
+      addShowAllOrLess('1')
+      expect(module.querySelector('.show-all-or-less-button')).not.toBeInTheDocument()
+    })
+
+    it('should set the button dataset isLoading to false when method is called', () => {
+      const module = makeModule()
+      module.dataset.loadstate = 'paginated'
+      const button = document.createElement('button')
+      button.className = 'show-all-or-less-button ui-button'
+      button.dataset.moduleId = '1'
+      button.disabled = true
+      module.appendChild(button)
+
+      addShowAllOrLess('1')
+
+      expect(button.dataset.isLoading).toBe('false')
+    })
+
+    it('should set the button dataset isLoading to true when method is called', () => {
+      const module = makeModule()
+      module.dataset.loadstate = 'paginated'
+
+      addShowAllOrLess('1')
+      const button = module.querySelector('.show-all-or-less-button') as HTMLButtonElement
+      button.click()
+
+      expect(button.dataset.isLoading).toBe('true')
+    })
+
+    it('should not call document dispatchEvent on isLoading true', () => {
+      const spy = jest.spyOn(document, 'dispatchEvent')
+      const module = makeModule()
+      module.dataset.loadstate = 'paginated'
+
+      addShowAllOrLess('1')
+      const button = module.querySelector('.show-all-or-less-button') as HTMLButtonElement
+      button.dataset.isLoading = 'true'
+      button.click()
+
+      expect(spy).not.toHaveBeenCalled()
+      spy.mockRestore()
+    })
+  })
+
+  describe('decrementModuleItemsCount', () => {
+    const setupSingleModuleTest = (totalItemsValue?: string | number): HTMLElement => {
+      const module = makeModule({module_id: '1', totalItemsValue, loadstate: 'paginated'})
+      addShowAllOrLess('1')
+      return module
+    }
+
+    const validateButtonCaption = (module: HTMLElement, expectedCount: number) => {
+      const button = module.querySelector('.show-all-or-less-button') as HTMLButtonElement
+      expect(button.textContent).toBe(`Show All (${expectedCount})`)
+    }
+
+    const validateTotalItemsAttribute = (module: HTMLElement, expectedValue?: string | number) => {
+      const moduleContentElement = module.querySelector('.content ul') as HTMLElement
+      expect(moduleContentElement.dataset.totalItems).toBe(expectedValue?.toString())
+    }
+
+    it('should decrement totalItems attribute by 1 when value is positive', () => {
+      const module = setupSingleModuleTest(DEFAULT_PAGE_SIZE)
+      decrementModuleItemsCount('1')
+      validateTotalItemsAttribute(module, DEFAULT_PAGE_SIZE - 1)
+    })
+
+    it('should update button caption to reflect decremented count value', () => {
+      const module = setupSingleModuleTest(DEFAULT_PAGE_SIZE)
+      decrementModuleItemsCount('1')
+      validateButtonCaption(module, DEFAULT_PAGE_SIZE - 1)
+    })
+
+    it('should not decrement when totalItems is 0', () => {
+      const module = setupSingleModuleTest(0)
+      decrementModuleItemsCount('1')
+      validateTotalItemsAttribute(module, 0)
+    })
+
+    it('should not decrement when totalItems is negative', () => {
+      const module = setupSingleModuleTest(-1)
+      decrementModuleItemsCount('1')
+      validateTotalItemsAttribute(module, -1)
+    })
+
+    it('should not decrement when totalItems is not a number', () => {
+      const module = setupSingleModuleTest('abcd')
+      decrementModuleItemsCount('1')
+      validateTotalItemsAttribute(module, 'abcd')
+    })
+
+    it('should not decrement when totalItems is undefined', () => {
+      const module = setupSingleModuleTest(undefined)
+      decrementModuleItemsCount('1')
+      validateTotalItemsAttribute(module, undefined)
+    })
+
+    describe('multiple modules', () => {
+      const module1Count = 2
+      const module2Count = 5
+      let module1: HTMLElement
+      let module2: HTMLElement
+
+      const setupMultipleModulesTest = () => {
+        module1 = makeModule({
+          module_id: '1',
+          totalItemsValue: module1Count,
+          loadstate: 'paginated',
+        })
+        module2 = makeModule({
+          module_id: '2',
+          totalItemsValue: module2Count,
+          loadstate: 'paginated',
+        })
+        addShowAllOrLess('1')
+        addShowAllOrLess('2')
+      }
+
+      it("should only modify targeted module's totalItems attribute and leave others unchanged", () => {
+        setupMultipleModulesTest()
+        decrementModuleItemsCount('2')
+        validateTotalItemsAttribute(module1, module1Count)
+        validateTotalItemsAttribute(module2, module2Count - 1)
       })
-      expect(document.querySelector('.show-less')).toBeInTheDocument()
+
+      it("should only update the targeted module's button caption", () => {
+        setupMultipleModulesTest()
+        decrementModuleItemsCount('2')
+        validateButtonCaption(module1, module1Count)
+        validateButtonCaption(module2, module2Count - 1)
+      })
     })
   })
 })

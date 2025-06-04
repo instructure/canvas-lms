@@ -91,7 +91,7 @@ class ContentExportsController < ApplicationController
   def xml_schema
     if (filename = CC::Schema.for_version(params[:version]))
       cancel_cache_buster
-      send_file(filename, type: "text/xml", disposition: "inline")
+      safe_send_file(filename, type: "text/xml", disposition: "inline")
     else
       render "shared/errors/404_message", status: :not_found, formats: [:html]
     end

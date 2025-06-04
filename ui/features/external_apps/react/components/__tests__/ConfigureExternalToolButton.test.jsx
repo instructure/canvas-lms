@@ -67,21 +67,6 @@ test('includes the tool_configuration placement', () => {
   )
 })
 
-test('shows beginning info alert and adds styles to iframe', () => {
-  renderComponentOpen()
-  ref.current.handleAlertFocus({target: {className: 'before'}})
-  expect(ref.current.state.beforeExternalContentAlertClass).toEqual('')
-  // Note: The width here is normally 300px, but because these are older JS files, the CSS isn't included,
-  // so the offsetWidth is 0.
-  expect(ref.current.iframeStyle()).toEqual({
-    border: '2px solid #2B7ABC',
-    padding: '0px',
-    width: '100%',
-    height: undefined,
-    minHeight: undefined,
-  })
-})
-
 test('adds iframe width/height when it is in the tool configuration', () => {
   tool.tool_configuration.selection_width = 500
   tool.tool_configuration.selection_height = 600
@@ -95,60 +80,8 @@ test('adds iframe width/height when it is in the tool configuration', () => {
   })
 })
 
-test('shows ending info alert and adds styles to iframe', () => {
-  renderComponentOpen()
-  ref.current.handleAlertFocus({target: {className: 'after'}})
-  expect(ref.current.state.afterExternalContentAlertClass).toEqual('')
-  // Note: The width here is normally 300px, but because these are older JS files, the CSS isn't included,
-  // so the offsetWidth is 0.
-  expect(ref.current.iframeStyle()).toEqual({
-    border: '2px solid #2B7ABC',
-    padding: '0px',
-    width: '100%',
-    height: undefined,
-    minHeight: undefined,
-  })
-})
-
-test('hides beginning info alert and adds styles to iframe', async () => {
-  renderComponent()
-  ref.current.openModal(event)
-  ref.current.handleAlertBlur({target: {className: 'before'}})
-  expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-  expect(ref.current.iframeStyle()).toEqual({
-    border: 'none',
-    padding: '2px',
-    width: '100%',
-    height: undefined,
-    minHeight: undefined,
-  })
-})
-
-test('hides ending info alert and adds styles to iframe', () => {
-  renderComponent()
-  ref.current.openModal(event)
-  ref.current.handleAlertBlur({target: {className: 'after'}})
-  expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-  expect(ref.current.iframeStyle()).toEqual({
-    border: 'none',
-    padding: '2px',
-    width: '100%',
-    height: undefined,
-    minHeight: undefined,
-  })
-})
-
-test("doesn't show alerts or add border to iframe by default", () => {
-  renderComponent()
-  ref.current.openModal(event)
-  const iframe = screen.getByTitle(/Tool Configuration/i)
-  expect(iframe).toHaveClass('tool_launch')
-  expect(iframe).not.toHaveStyle('border: 2px solid #2B7ABC;')
-})
-
 test('sets the iframe allowances', () => {
   renderComponentOpen()
-  ref.current.handleAlertFocus({target: {className: 'before'}})
   const iframe = screen.getByTitle(/Tool Configuration/i)
   expect(iframe).toHaveAttribute('allow', 'midi; media')
 })

@@ -32,14 +32,16 @@ ready(() => {
       arrowApplicator.applyArrows()
     } else {
       // Delete all quiz arrows
-      $('.answer_arrow').remove()
+      $('.answer_arrow, .answer_indicator').remove()
+      $('.question.unanswered.bordered').removeClass('bordered')
     }
   })
 
   // Subscribe to custom event that is triggered as an 'aftersave' on a question form
   $('body').on('saved', '.question', () => {
     // Remove all arrows and recreate all if option is checked
-    $('.answer_arrow').remove()
+    $('.answer_arrow, .answer_indicator').remove()
+    $('.question.unanswered.bordered').removeClass('bordered')
     if ($('#show_question_details').is(':checked')) {
       const arrowApplicator = new QuizArrowApplicator()
       arrowApplicator.applyArrows()

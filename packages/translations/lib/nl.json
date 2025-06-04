@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "De eerste koptekst op een pagina moet een H2 zijn."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "De volgende inhoud is door een partner geleverd"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Het materiaal bevindt zich in het openbaar domein"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Op het materiaal is een uitzondering van toepassing, bijvoorbeeld redelijk gebruik, het recht om te citeren of andere toepasselijke wetgeving op het auteursrecht"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "De voorgaande inhoud is door een partner geleverd"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "De pretty HTML-editor is niet toetsenbordtoegankelijk. Druk op Shift O om de raw HTML-editor te openen."

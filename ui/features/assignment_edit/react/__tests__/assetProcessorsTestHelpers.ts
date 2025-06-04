@@ -16,37 +16,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DeepLinkResponse} from "@canvas/deep-linking/DeepLinkResponse"
-import {LtiLaunchDefinition} from "@canvas/select-content-dialog/jquery/select_content_dialog"
+import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
+import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
 
-function makeMockTool(
-  {name, description, url, definition_id}:
-  {name: string, description: string, url: string, definition_id: number}
-): LtiLaunchDefinition {
+function makeMockTool({
+  name,
+  description,
+  url,
+  definition_id,
+}: {name: string; description: string; url: string; definition_id: number}): LtiLaunchDefinition {
   return {
-    definition_type: "ContextExternalTool",
+    definition_type: 'ContextExternalTool',
     definition_id: definition_id.toString(),
     url,
     name,
     description,
-    domain: "http://lti-13-test-tool.inseng.test",
+    domain: 'http://lti-13-test-tool.inseng.test',
     placements: {
       ActivityAssetProcessor: {
-        message_type: "LtiDeepLinkingRequest",
+        message_type: 'LtiDeepLinkingRequest',
         url,
         title: name,
         selection_width: 600,
-        selection_height: 500
-      }
-    }
+        selection_height: 500,
+      },
+    },
   }
 }
 
-function makeMockTools() : LtiLaunchDefinition[] {
+function makeMockTools(): LtiLaunchDefinition[] {
   return [
-    makeMockTool({ name: 't1', description: 'd1', url: 'http://t1.instructure.com.com', definition_id: 11 }),
-    makeMockTool({ name: 't2', description: 'd2', url: 'http://t2.instructure.com.com', definition_id: 22 }),
-    makeMockTool({ name: 't3', description: 'd3', url: 'http://t3.instructure.com.com', definition_id: 33 }),
+    makeMockTool({
+      name: 't1',
+      description: 'd1',
+      url: 'http://t1.instructure.com.com',
+      definition_id: 11,
+    }),
+    makeMockTool({
+      name: 't2',
+      description: 'd2',
+      url: 'http://t2.instructure.com.com',
+      definition_id: 22,
+    }),
+    makeMockTool({
+      name: 't3',
+      description: 'd3',
+      url: 'http://t3.instructure.com.com',
+      definition_id: 33,
+    }),
+    makeMockTool({
+      name: 't4',
+      description: 'd4',
+      url: 'http://t4.instructure.com.com',
+      definition_id: 44,
+    }),
   ]
 }
 
@@ -56,7 +79,7 @@ export function mockDoFetchApi(expectedPath: string, doFetchApi: jest.Mock) {
     if (path === expectedPath) {
       return {
         response: {ok: true, statusText: 'OK'},
-        json: mockTools
+        json: mockTools,
       }
     }
     throw new Error(`Unexpected path: ${path}`)
@@ -71,13 +94,31 @@ export const mockDeepLinkResponse: DeepLinkResponse = {
       type: 'ltiAssetProcessor',
       report: {},
       text: 'Lti 1.3 Tool Text',
-      title: 'Lti 1.3 Tool Title'
-    }
+      title: 'Lti 1.3 Tool Title',
+    },
   ],
   ltiEndpoint: 'http://canvas-web.inseng.test/courses/1/external_tools/retrieve',
   reloadpage: false,
   replaceEditorContents: false,
-  tool_id: '22'
+  tool_id: '22',
 }
 
-
+export const mockInvalidDeepLinkResponse: any = {
+  content_items: [
+    {
+      type: 'ltiAssetProcessor',
+      report: {
+        custom: {
+          // Custom values must be strings
+          error_code: 123,
+        },
+      },
+      text: 'Lti 1.3 Tool Text',
+      title: 'Lti 1.3 Tool Title',
+    },
+  ],
+  ltiEndpoint: 'http://canvas-web.inseng.test/courses/1/external_tools/retrieve',
+  reloadpage: false,
+  replaceEditorContents: false,
+  tool_id: '44',
+}

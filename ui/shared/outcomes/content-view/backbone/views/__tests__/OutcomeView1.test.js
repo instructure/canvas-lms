@@ -176,10 +176,6 @@ describe('OutcomeView', () => {
       })
 
       const $calcMethods = view.$('#calculation_method option')
-      console.log(
-        'Calculation method values:',
-        Array.from($calcMethods).map(el => $(el).val()),
-      )
       expect($calcMethods).toHaveLength(5) // Includes default empty option
       expect($calcMethods.eq(0).val()).toBe('decaying_average')
       expect($calcMethods.eq(1).val()).toBe('n_mastery')

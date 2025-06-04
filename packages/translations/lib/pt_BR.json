@@ -2408,9 +2408,6 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "O primeiro cabeçalho em uma página deve ser um H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "O seguinte conteúdo é fornecido por parceiro"
-    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "O material está no domínio público"
     },
@@ -2419,9 +2416,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "O material está sujeito a uma exceção, por exemplo, uso justo, o direito de citar ou outros sob leis de direitos autorais"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "O conteúdo precedente é fornecido por parceiro"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "O lindo editor de html não é acessível por teclado. Pressione Shift+O para abrir o editor de HTML bruto."

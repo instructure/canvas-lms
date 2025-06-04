@@ -76,7 +76,7 @@ describe Lti::AssetProcessorNotifier do
       expect(builder_params[:submission_lti_id]).to eq(submission.lti_attempt_id)
       expect(builder_params[:assets][0][:title]).to eq(assignment.title)
       expect(builder_params[:assets][0][:filename]).to eq(attachment.display_name)
-      expect(builder_params[:assets][0][:sha256_checksum]).to eq "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
+      expect(builder_params[:assets][0][:sha256_checksum]).to eq "uU0nuZNNPgilLlLX2n2r+sSE7+N6U4DukIj3rOLvzek="
     end
 
     it "creates Lti::Asset for each attachment" do
@@ -91,6 +91,25 @@ describe Lti::AssetProcessorNotifier do
       expect(Lti::Asset.where(attachment:, submission:).active).to be_present
       expect(Lti::Asset.where(attachment: attachment2, submission:).active).to be_present
       expect(Lti::PlatformNotificationService).to have_received(:notify_tools).twice
+    end
+
+    it "can resubmit for a specific asset processor" do
+      tool = new_valid_external_tool course
+      ap = lti_asset_processor_model(tool:, assignment:)
+      lti_asset_processor_model(tool:, assignment:)
+      allow(Lti::PlatformNotificationService).to receive(:notify_tools)
+      allow(Rails.application.routes.url_helpers).to receive(:lti_asset_processor_asset_show_url).and_return("http://example.com")
+
+      submission = assignment.submit_homework(student, attachments: [attachment, attachment2])
+
+      expect(Lti::Asset.where(attachment:, submission:).active).to be_present
+      expect(Lti::Asset.where(attachment: attachment2, submission:).active).to be_present
+      expect(Lti::PlatformNotificationService).to have_received(:notify_tools).twice
+
+      # Notify only for the first asset processor
+      Lti::AssetProcessorNotifier.notify_asset_processors(submission, ap)
+
+      expect(Lti::PlatformNotificationService).to have_received(:notify_tools).exactly(3).times
     end
   end
 end

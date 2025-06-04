@@ -35,6 +35,10 @@ class AuthenticationProvider::Canvas < AuthenticationProvider
     false
   end
 
+  def auth_provider_filter
+    [nil, self]
+  end
+
   # Rename db field
   def self_registration=(val)
     case val
