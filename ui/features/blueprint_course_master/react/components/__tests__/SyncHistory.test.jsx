@@ -49,7 +49,6 @@ describe('SyncHistory component', () => {
 
   test('renders SyncHistoryItem components for each migration', () => {
     const tree = render(<SyncHistory {...defaultProps()} />)
-    console.log(tree.container.innerHTML)
     const node = tree.container.querySelectorAll('.bcs__history-item')
     expect(node).toHaveLength(1)
   })
