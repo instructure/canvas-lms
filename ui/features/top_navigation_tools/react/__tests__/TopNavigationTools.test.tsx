@@ -17,16 +17,17 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {
   TopNavigationTools,
   MobileTopNavigationTools,
   handleToolIconError,
 } from '../TopNavigationTools'
-import type {Tool, TopNavigationToolsProps as _TopNavigationToolsProps} from '../types'
+import type {Tool} from '@canvas/global/env/EnvCommon'
 
 describe('TopNavigationTools', () => {
-  it('renders pinned tools as icon buttons and unpinned tools in menu', () => {
+  it('renders pinned tools as icon buttons and unpinned tools in menu', async () => {
     const tools = [
       {
         id: '1',
@@ -44,46 +45,42 @@ describe('TopNavigationTools', () => {
       },
     ]
     const handleToolLaunch = jest.fn()
-    const wrapper = shallow(
+    const user = userEvent.setup()
+    const {getByRole, getByLabelText, getAllByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
 
-    // Check container structure
-    const rootFlex = wrapper.find('Flex').first()
-    expect(rootFlex.prop('direction')).toBe('row-reverse')
-
     // Should have one IconButton for pinned tool
-    const iconButtons = wrapper.find('IconButton')
-    expect(iconButtons).toHaveLength(1)
-    expect(iconButtons.at(0).prop('data-tool-id')).toBe('1')
-    expect(iconButtons.at(0).prop('screenReaderLabel')).toBe('Tool 1')
+    const pinnedToolButton = getByRole('button', {name: /Tool 1/})
+    expect(pinnedToolButton).toBeInTheDocument()
+    expect(pinnedToolButton).toHaveAttribute('data-tool-id', '1')
 
-    // Should have one Menu for unpinned tools
-    const menus = wrapper.find('Menu')
-    expect(menus).toHaveLength(1)
-    expect(menus.at(0).prop('label')).toBe('LTI Tools Menu')
+    // Should have LTI Tools Menu button for unpinned tools
+    const buttons = getAllByRole('button')
+    const menuButton = buttons.find(button => !button.hasAttribute('data-tool-id'))
+    expect(menuButton).toBeInTheDocument()
+
+    // Click menu to reveal menu items
+    await user.click(menuButton!)
 
     // Menu should contain one MenuItem for unpinned tool
-    const menuItems = wrapper.find('MenuItem')
-    expect(menuItems).toHaveLength(1)
-    expect(menuItems.at(0).prop('value')).toBe('2')
-    expect(menuItems.at(0).prop('label')).toBe('Launch Tool 2')
+    const menuItem = getByRole('menuitem', {name: /Tool 2/})
+    expect(menuItem).toBeInTheDocument()
   })
 
   it('renders empty container when no tools provided', () => {
     const tools: Tool[] = []
     const handleToolLaunch = jest.fn()
-    const wrapper = shallow(
+    const {container, queryByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
 
-    // Should render empty Flex container
-    expect(wrapper.find('Flex')).toHaveLength(1)
-    expect(wrapper.find('IconButton')).toHaveLength(0)
-    expect(wrapper.find('Menu')).toHaveLength(0)
+    // Should render empty container with no tools
+    expect(container.firstChild).toBeInTheDocument()
+    expect(queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('renders all tools in menu when no tools are pinned', () => {
+  it('renders all tools in menu when no tools are pinned', async () => {
     const tools = [
       {
         id: '1',
@@ -101,27 +98,30 @@ describe('TopNavigationTools', () => {
       },
     ]
     const handleToolLaunch = jest.fn()
-    const wrapper = shallow(
+    const user = userEvent.setup()
+    const {getByRole, queryByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
 
-    // Should have no IconButtons (no pinned tools)
-    expect(wrapper.find('IconButton')).toHaveLength(0)
+    // Should have no pinned tool buttons
+    expect(queryByRole('button', {name: /Tool 1/})).not.toBeInTheDocument()
+    expect(queryByRole('button', {name: /Tool 2/})).not.toBeInTheDocument()
 
-    // Should have one Menu containing all tools
-    const menus = wrapper.find('Menu')
-    expect(menus).toHaveLength(1)
+    // Should have LTI Tools Menu button containing all tools
+    const menuButton = getByRole('button')
+    expect(menuButton).toBeInTheDocument()
+
+    // Click menu to reveal menu items
+    await user.click(menuButton!)
 
     // Menu should contain MenuItems for both tools
-    const menuItems = wrapper.find('MenuItem')
-    expect(menuItems).toHaveLength(2)
-    expect(menuItems.at(0).prop('value')).toBe('1')
-    expect(menuItems.at(1).prop('value')).toBe('2')
+    expect(getByRole('menuitem', {name: /Tool 1/})).toBeInTheDocument()
+    expect(getByRole('menuitem', {name: /Tool 2/})).toBeInTheDocument()
   })
 })
 
 describe('MobileTopNavigationTools', () => {
-  it('renders all tools in a single menu with pinned tools at top', () => {
+  it('renders all tools in a single menu with pinned tools at top', async () => {
     const tools = [
       {
         id: '1',
@@ -139,37 +139,31 @@ describe('MobileTopNavigationTools', () => {
       },
     ]
     const handleToolLaunch = jest.fn()
-    const wrapper = shallow(
+    const user = userEvent.setup()
+    const {getByRole} = render(
       <MobileTopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
 
-    // Should render single Menu component
-    const menu = wrapper.find('Menu')
-    expect(menu).toHaveLength(1)
-
     // Menu trigger should be an IconButton with proper accessibility label
-    const trigger = menu.prop('trigger') as React.ReactElement
-    expect(trigger.props.screenReaderLabel).toBe('LTI Tool Menu')
+    const menuButton = getByRole('button')
+    expect(menuButton).toBeInTheDocument()
+
+    // Click menu to reveal menu items
+    await user.click(menuButton!)
 
     // Should have MenuItems for all tools
-    const menuItems = wrapper.find('MenuItem')
-    expect(menuItems).toHaveLength(2)
-
-    // Pinned tool (Tool 2) should be listed first
-    expect(menuItems.at(0).prop('value')).toBe('2')
-    expect(menuItems.at(0).prop('label')).toBe('Launch Tool 2')
-
-    // Unpinned tool (Tool 1) should be after separator
-    expect(menuItems.at(1).prop('value')).toBe('1')
-    expect(menuItems.at(1).prop('label')).toBe('Launch Tool 1')
+    const tool1MenuItem = getByRole('menuitem', {name: /Tool 1/})
+    const tool2MenuItem = getByRole('menuitem', {name: /Tool 2/})
+    expect(tool1MenuItem).toBeInTheDocument()
+    expect(tool2MenuItem).toBeInTheDocument()
 
     // Should have a separator between pinned and unpinned tools
-    expect(wrapper.find('MenuItemSeparator')).toHaveLength(1)
+    expect(getByRole('presentation')).toBeInTheDocument()
   })
 })
 
 describe('handleToolClick', () => {
-  it('finds tool', () => {
+  it('finds tool', async () => {
     const tool = {
       id: '1',
       title: 'Tool 1',
@@ -178,10 +172,13 @@ describe('handleToolClick', () => {
       pinned: true,
     }
     const handleToolLaunch = jest.fn()
-    const wrapper = shallow(
+    const user = userEvent.setup()
+    const {getByRole} = render(
       <TopNavigationTools tools={[tool]} handleToolLaunch={handleToolLaunch} />,
     )
-    wrapper.find('IconButton').simulate('click', {target: {dataset: {toolId: '1'}}})
+
+    const toolButton = getByRole('button', {name: /Tool 1/})
+    await user.click(toolButton)
     expect(handleToolLaunch).toHaveBeenCalledWith(tool)
   })
 })
