@@ -21,7 +21,6 @@ import 'jquery-migrate'
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import ContentFilterDriver from '@canvas/grading/content-filters/ContentFilterDriver'
 import PostGradesStore from '../../SISGradePassback/PostGradesStore'
-import sinon from 'sinon'
 
 beforeEach(() => {
   document.body.innerHTML = '<div id="fixtures"></div>'
@@ -34,10 +33,8 @@ afterEach(() => {
 describe('Gradebook#updateModulesFilterVisibility', () => {
   let gradebook
   let container
-  let sandbox
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     const modulesFilterContainerSelector = 'modules-filter-container'
     setFixtureHtml(document.getElementById('fixtures'))
     container = document
@@ -49,10 +46,6 @@ describe('Gradebook#updateModulesFilterVisibility', () => {
       {id: '2', name: 'Module 2', position: 2},
     ])
     gradebook.setSelectedViewOptionsFilters(['modules'])
-  })
-
-  afterEach(() => {
-    sandbox.restore()
   })
 
   test('renders the module select when not already rendered', () => {
@@ -76,10 +69,8 @@ describe('Gradebook#updateModulesFilterVisibility', () => {
 describe('Gradebook#updateAssignmentGroupFilterVisibility', () => {
   let gradebook
   let container
-  let sandbox
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     const agfContainer = 'assignment-group-filter-container'
     setFixtureHtml(document.getElementById('fixtures'))
     container = document.getElementById('fixtures').querySelector(`#${agfContainer}`)
@@ -89,10 +80,6 @@ describe('Gradebook#updateAssignmentGroupFilterVisibility', () => {
       {id: '2', name: 'Other', position: 2},
     ])
     gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
-  })
-
-  afterEach(() => {
-    sandbox.restore()
   })
 
   test('renders the assignment group select when not already rendered', () => {
@@ -116,10 +103,8 @@ describe('Gradebook#updateAssignmentGroupFilterVisibility', () => {
 
 describe('Gradebook#getFilterSettingsViewOptionsMenuProps', () => {
   let gradebook
-  let sandbox
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     gradebook = createGradebook()
     gradebook.setAssignmentGroups({
       301: {name: 'Assignments', group_weight: 40},
@@ -129,13 +114,9 @@ describe('Gradebook#getFilterSettingsViewOptionsMenuProps', () => {
     gradebook.setContextModules([{id: '2601'}, {id: '2602'}])
     gradebook.sections_enabled = true
     gradebook.studentGroupsEnabled = true
-    sandbox.stub(gradebook, 'renderViewOptionsMenu')
-    sandbox.stub(gradebook, 'renderFilters')
-    sandbox.stub(gradebook, 'saveSettings')
-  })
-
-  afterEach(() => {
-    sandbox.restore()
+    gradebook.renderViewOptionsMenu = jest.fn()
+    gradebook.renderFilters = jest.fn()
+    gradebook.saveSettings = jest.fn()
   })
 
   test('includes available filters', () => {
@@ -209,7 +190,7 @@ describe('Gradebook#getFilterSettingsViewOptionsMenuProps', () => {
 
   test('onSelect renders the view options menu after setting the selected filters', () => {
     const props = gradebook.getFilterSettingsViewOptionsMenuProps()
-    gradebook.renderViewOptionsMenu.callsFake(() => {
+    gradebook.renderViewOptionsMenu.mockImplementation(() => {
       expect(gradebook.listSelectedViewOptionsFilters()).toHaveLength(2)
     })
     props.onSelect(['gradingPeriods', 'sections'])
@@ -217,7 +198,7 @@ describe('Gradebook#getFilterSettingsViewOptionsMenuProps', () => {
 
   test('onSelect renders the filters after setting the selected filters', () => {
     const props = gradebook.getFilterSettingsViewOptionsMenuProps()
-    gradebook.renderFilters.callsFake(() => {
+    gradebook.renderFilters.mockImplementation(() => {
       expect(gradebook.listSelectedViewOptionsFilters()).toHaveLength(2)
     })
     props.onSelect(['gradingPeriods', 'sections'])
@@ -225,7 +206,7 @@ describe('Gradebook#getFilterSettingsViewOptionsMenuProps', () => {
 
   test('onSelect saves settings after setting the selected filters', () => {
     const props = gradebook.getFilterSettingsViewOptionsMenuProps()
-    gradebook.saveSettings.callsFake(() => {
+    gradebook.saveSettings.mockImplementation(() => {
       expect(gradebook.listSelectedViewOptionsFilters()).toHaveLength(2)
     })
     props.onSelect(['gradingPeriods', 'sections'])
@@ -235,10 +216,8 @@ describe('Gradebook#getFilterSettingsViewOptionsMenuProps', () => {
 describe('Gradebook#updateStudentGroupFilterVisibility', () => {
   let gradebook
   let container
-  let sandbox
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     const studentGroupFilterContainerSelector = 'student-group-filter-container'
     setFixtureHtml(document.getElementById('fixtures'))
     container = document
@@ -267,10 +246,6 @@ describe('Gradebook#updateStudentGroupFilterVisibility', () => {
     gradebook = createGradebook({student_groups: studentGroups})
     gradebook.studentGroupsEnabled = true
     gradebook.setSelectedViewOptionsFilters(['studentGroups'])
-  })
-
-  afterEach(() => {
-    sandbox.restore()
   })
 
   test('renders the student group filter when not already rendered', () => {
@@ -358,10 +333,8 @@ describe('Gradebook#updateStudentGroupFilterVisibility', () => {
 describe('Gradebook#updateSectionFilterVisibility', () => {
   let gradebook
   let container
-  let sandbox
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     const sectionsFilterContainerSelector = 'sections-filter-container'
     setFixtureHtml(document.getElementById('fixtures'))
     container = document
@@ -374,10 +347,6 @@ describe('Gradebook#updateSectionFilterVisibility', () => {
     gradebook = createGradebook({sections})
     gradebook.sections_enabled = true
     gradebook.setSelectedViewOptionsFilters(['sections'])
-  })
-
-  afterEach(() => {
-    sandbox.restore()
   })
 
   test('renders the section filter when not already rendered', () => {
@@ -452,30 +421,20 @@ describe('Gradebook#updateSectionFilterVisibility', () => {
 describe('Gradebook#updateCurrentSection', () => {
   let gradebook
   let postGradesStore
-  let sandbox
-  let server
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
-    server = sinon.fakeServer.create({respondImmediately: true})
-    server.respondWith([200, {}, ''])
     postGradesStore = PostGradesStore({
       course: {id: '1', sis_id: null},
       selected: {id: '1', type: 'course'},
     })
-    postGradesStore.setSelectedSection = sandbox.stub()
+    postGradesStore.setSelectedSection = jest.fn()
 
     gradebook = createGradebook({
       settings_update_url: '/settingUrl',
       postGradesStore: postGradesStore,
     })
-    sandbox.stub(gradebook, 'saveSettings').returns(Promise.resolve())
-    sandbox.stub(gradebook, 'updateSectionFilterVisibility')
-  })
-
-  afterEach(() => {
-    sandbox.restore()
-    server.restore()
+    gradebook.saveSettings = jest.fn().mockResolvedValue({})
+    gradebook.updateSectionFilterVisibility = jest.fn()
   })
 
   test('updates the filter setting with the given section id', () => {
@@ -485,18 +444,18 @@ describe('Gradebook#updateCurrentSection', () => {
 
   test('sets the selected section on the post grades store', () => {
     gradebook.updateCurrentSection('2001')
-    expect(postGradesStore.setSelectedSection.callCount).toBe(3)
+    expect(postGradesStore.setSelectedSection).toHaveBeenCalledTimes(3)
   })
 
   test('includes the selected section when updating the post grades store', () => {
     gradebook.updateCurrentSection('2001')
-    const [sectionId] = postGradesStore.setSelectedSection.thirdCall.args
+    const [sectionId] = postGradesStore.setSelectedSection.mock.calls[2]
     expect(sectionId).toBe('2001')
   })
 
   test('saves settings', () => {
     gradebook.updateCurrentSection('2001')
-    expect(gradebook.saveSettings.callCount).toBe(1)
+    expect(gradebook.saveSettings).toHaveBeenCalledTimes(1)
   })
 
   test('saves settings after updating the filter setting', () => {
@@ -507,8 +466,8 @@ describe('Gradebook#updateCurrentSection', () => {
   test('has no effect when the section has not changed', () => {
     gradebook.setFilterRowsBySetting('sectionId', '2001')
     gradebook.updateCurrentSection('2001')
-    expect(gradebook.saveSettings.callCount).toBe(0)
-    expect(gradebook.updateSectionFilterVisibility.callCount).toBe(0)
+    expect(gradebook.saveSettings).not.toHaveBeenCalled()
+    expect(gradebook.updateSectionFilterVisibility).not.toHaveBeenCalled()
   })
 })
 
