@@ -30,15 +30,20 @@ const getDefaultValues = overrides => {
     moment.tz(TZ).add(2, 'day'),
   ]
   return {
-    days: days.map(d => [
+    days: days.map((d, dayIndex) => [
       d.format('YYYY-MM-DD'),
       [
         {
+          id: `test-item-${dayIndex}`,
+          uniqueId: `test-item-${dayIndex}`,
+          title: `Test Item ${dayIndex + 1}`,
+          date: d,
           dateBucketMoment: d,
           context: {
             color: '#5a92de',
             title: 'Test Course',
           },
+          completed: false,
         },
       ],
     ]),
@@ -71,15 +76,20 @@ describe('PlannerApp empty day calculations', () => {
       moment.tz(TZ).add(-5, 'day'),
       moment.tz(TZ).add(-4, 'day'),
     ]
-    days = days.map(d => [
+    days = days.map((d, dayIndex) => [
       d.format('YYYY-MM-DD'),
       [
         {
+          id: `test-item-${Math.random().toString(36).substr(2, 9)}-${dayIndex}`,
+          uniqueId: `test-item-${Math.random().toString(36).substr(2, 9)}-${dayIndex}`,
+          title: `Test Item ${dayIndex + 1}`,
+          date: d,
           dateBucketMoment: d,
           context: {
             color: '#5a92de',
             title: 'Test Course',
           },
+          completed: false,
         },
       ],
     ])
@@ -94,15 +104,20 @@ describe('PlannerApp empty day calculations', () => {
 
   it('always renders yesterday, today and tomorrow', () => {
     let days = [moment.tz(TZ).add(-5, 'day'), moment.tz(TZ).add(+5, 'day')]
-    days = days.map(d => [
+    days = days.map((d, dayIndex) => [
       d.format('YYYY-MM-DD'),
       [
         {
+          id: `test-item-${Math.random().toString(36).substr(2, 9)}-${dayIndex}`,
+          uniqueId: `test-item-${Math.random().toString(36).substr(2, 9)}-${dayIndex}`,
+          title: `Test Item ${dayIndex + 1}`,
+          date: d,
           dateBucketMoment: d,
           context: {
             color: '#5a92de',
             title: 'Test Course',
           },
+          completed: false,
         },
       ],
     ])
@@ -120,15 +135,20 @@ describe('PlannerApp empty day calculations', () => {
       moment.tz(TZ).add(1, 'day'),
       moment.tz(TZ).add(4, 'day'),
     ]
-    days = days.map(d => [
+    days = days.map((d, dayIndex) => [
       d.format('YYYY-MM-DD'),
       [
         {
+          id: `test-item-${Math.random().toString(36).substr(2, 9)}-${dayIndex}`,
+          uniqueId: `test-item-${Math.random().toString(36).substr(2, 9)}-${dayIndex}`,
+          title: `Test Item ${dayIndex + 1}`,
+          date: d,
           dateBucketMoment: d,
           context: {
             color: '#5a92de',
             title: 'Test Course',
           },
+          completed: false,
         },
       ],
     ])
@@ -146,15 +166,20 @@ describe('PlannerApp empty day calculations', () => {
       moment.tz(TZ).add(1, 'day'),
       moment.tz(TZ).add(5, 'day'),
     ]
-    days = days.map(d => [
+    days = days.map((d, dayIndex) => [
       d.format('YYYY-MM-DD'),
       [
         {
+          id: `test-item-${Math.random().toString(36).substr(2, 9)}-${dayIndex}`,
+          uniqueId: `test-item-${Math.random().toString(36).substr(2, 9)}-${dayIndex}`,
+          title: `Test Item ${dayIndex + 1}`,
+          date: d,
           dateBucketMoment: d,
           context: {
             color: '#5a92de',
             title: 'Test Course',
           },
+          completed: false,
         },
       ],
     ])
@@ -180,15 +205,20 @@ describe('PlannerApp empty day calculations', () => {
       moment.tz(TZ).add(10, 'day'),
       moment.tz(TZ).add(14, 'day'),
     ]
-    days = days.map(d => [
+    days = days.map((d, dayIndex) => [
       d.format('YYYY-MM-DD'),
       [
         {
+          id: `test-item-${Math.random().toString(36).substr(2, 9)}-${dayIndex}`,
+          uniqueId: `test-item-${Math.random().toString(36).substr(2, 9)}-${dayIndex}`,
+          title: `Test Item ${dayIndex + 1}`,
+          date: d,
           dateBucketMoment: d,
           context: {
             color: '#5a92de',
             title: 'Test Course',
           },
+          completed: false,
         },
       ],
     ])
