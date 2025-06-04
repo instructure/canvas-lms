@@ -17,7 +17,6 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -30,9 +29,33 @@ import Todo, {getBaseDueAt} from './Todo'
 
 const I18n = createI18nScope('todos_page')
 
+interface TodosPageProps {
+  timeZone: string
+  visible: boolean
+  openTodosInNewTab: boolean
+}
+
+interface TodoItem {
+  type: string
+  assignment?: {
+    id: string
+    all_dates: Array<{
+      base?: boolean
+      due_at?: string
+    }>
+    due_at?: string
+    name: string
+    points_possible: number
+  }
+  context_name: string
+  html_url: string
+  ignore: string
+  needs_grading_count?: number
+}
+
 // Sort to-dos based on the assignment's base due date (aka the "Everyone else"
 // override when there are multiple due dates, putting those with no due date last
-export const sortTodos = (t1, t2) => {
+export const sortTodos = (t1: TodoItem, t2: TodoItem) => {
   const d1 = t1.assignment && getBaseDueAt(t1.assignment)
   const d2 = t2.assignment && getBaseDueAt(t2.assignment)
   if (d1 === d2) return 0
@@ -41,20 +64,20 @@ export const sortTodos = (t1, t2) => {
   return d1.localeCompare(d2)
 }
 
-export const TodosPage = ({timeZone, visible, openTodosInNewTab}) => {
+export const TodosPage: React.FC<TodosPageProps> = ({timeZone, visible, openTodosInNewTab}) => {
   const [loading, setLoading] = useState(true)
-  const [todos, setTodos] = useState(null)
+  const [todos, setTodos] = useState<TodoItem[] | null>(null)
 
   useFetchApi(
     {
       path: '/api/v1/users/self/todo',
-      success: useCallback(data => {
-        if (data) {
-          setTodos(data.filter(todo => todo.type === 'grading').sort(sortTodos))
+      success: useCallback((data: any) => {
+        if (data && Array.isArray(data)) {
+          setTodos(data.filter((todo: TodoItem) => todo.type === 'grading').sort(sortTodos))
           setLoading(false)
         }
       }, []),
-      error: useCallback(showFlashError(I18n.t('Failed to load todos')), []),
+      error: useCallback(() => showFlashError(I18n.t('Failed to load todos'))(), []),
       forceResult: visible && !todos ? undefined : false,
       params: {
         per_page: '100',
@@ -63,7 +86,10 @@ export const TodosPage = ({timeZone, visible, openTodosInNewTab}) => {
     [visible],
   )
 
-  const todoSkeleton = ({key, ...otherProps}) => (
+  const todoSkeleton = ({
+    key,
+    ...otherProps
+  }: {key: React.Key} & React.HTMLAttributes<HTMLDivElement>) => (
     <div key={key} data-testid="todo-loading-skeleton" {...otherProps}>
       <LoadingSkeleton
         screenReaderLabel={I18n.t('Loading Todo Title')}
@@ -96,11 +122,11 @@ export const TodosPage = ({timeZone, visible, openTodosInNewTab}) => {
         id="homeroom-todos"
         isLoading={loading}
         renderCustomSkeleton={todoSkeleton}
-        skeletonsNum={todos?.length}
+        skeletonsNum={todos?.length || 0}
         defaultSkeletonsNum={5}
         allowZeroSkeletons={false}
       >
-        {todos?.length > 0 ? (
+        {todos && todos.length > 0 ? (
           todos.map(todo => (
             <Todo
               key={`todo-assignment-${todo.assignment?.id}`}
@@ -115,10 +141,4 @@ export const TodosPage = ({timeZone, visible, openTodosInNewTab}) => {
       </LoadingWrapper>
     </section>
   )
-}
-
-TodosPage.propTypes = {
-  timeZone: PropTypes.string.isRequired,
-  visible: PropTypes.bool.isRequired,
-  openTodosInNewTab: PropTypes.bool.isRequired,
 }
