@@ -50,7 +50,7 @@ async function makeProps(opts = {}) {
     onContentsChanged: jest.fn(),
     submission: mockedSubmission,
     updateEditingDraft: jest.fn(),
-    submitButtonRef: createRef()
+    submitButtonRef: createRef(),
   }
 }
 
@@ -463,8 +463,10 @@ describe('TextEntry', () => {
     it('displays error when meetsTextEntryCriteria is false and user clicks submit', async () => {
       const props = await makeProps({
         submission: {
-          submissionDraft: { meetsTextEntryCriteria: false }
-        }
+          id: '1',
+          _id: '1',
+          submissionDraft: {meetsTextEntryCriteria: false},
+        },
       })
       const mockButton = document.createElement('button')
       props.submitButtonRef.current = mockButton
@@ -476,8 +478,10 @@ describe('TextEntry', () => {
     it('clears errors when user starts typing in rce', async () => {
       const props = await makeProps({
         submission: {
-          submissionDraft: { meetsTextEntryCriteria: false }
-        }
+          id: '1',
+          _id: '1',
+          submissionDraft: {meetsTextEntryCriteria: false},
+        },
       })
       const mockButton = document.createElement('button')
       props.submitButtonRef.current = mockButton
