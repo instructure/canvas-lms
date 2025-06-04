@@ -45,6 +45,7 @@ const defaultProps = {
 const SECTIONS_URL = `/api/v1/courses/1/sections?per_page=100`
 const STUDENTS_URL = `api/v1/courses/1/users?per_page=100&enrollment_type=student`
 const COURSE_SETTINGS_URL = `/api/v1/courses/1/settings`
+const GRAPHQL_URL = `http://localhost/api/graphql`
 
 const renderGradedDiscussionOptions = (props = {}) => {
   return render(<GradedDiscussionOptions {...defaultProps} {...props} />)
@@ -80,7 +81,21 @@ describe('GradedDiscussionOptions', () => {
       fetchMock.get(SECTIONS_URL, [])
       fetchMock.get(STUDENTS_URL, [])
       fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
+      fetchMock.post(GRAPHQL_URL, {
+        data: {
+          course: {
+            usersConnection: {
+              pageInfo: {hasNextPage: false, endCursor: null},
+              nodes: [],
+            },
+          },
+        },
+      })
       ENV.COURSE_ID = '1'
+    })
+
+    afterEach(() => {
+      fetchMock.restore()
     })
 
     it('does not render assignment settings if canManageAssignTo is false', () => {
