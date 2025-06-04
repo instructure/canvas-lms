@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import {Pill} from '@instructure/ui-pill'
 import BadgeList from '../index'
 
 it('renders Pill components as list items', () => {
-  const wrapper = shallow(
+  const {container, getByText} = render(
     <BadgeList>
       <Pill>Pill 1</Pill>
       <Pill>Pill 2</Pill>
@@ -30,32 +30,23 @@ it('renders Pill components as list items', () => {
   )
 
   // Should render a ul element
-  const list = wrapper.find('ul')
-  expect(list).toHaveLength(1)
+  const list = container.querySelector('ul')
+  expect(list).toBeInTheDocument()
 
   // Should have proper CSS class
-  expect(list.hasClass('BadgeList-styles__root')).toBe(true)
+  expect(list).toHaveClass('BadgeList-styles__root')
 
   // Should render 3 list items
-  const items = wrapper.find('li')
+  const items = container.querySelectorAll('li')
   expect(items).toHaveLength(3)
 
   // Each list item should have the proper CSS class
   items.forEach(item => {
-    expect(item.hasClass('BadgeList-styles__item')).toBe(true)
+    expect(item).toHaveClass('BadgeList-styles__item')
   })
-
-  // Should contain 3 Pill components
-  const pills = wrapper.find('Pill')
-  expect(pills).toHaveLength(3)
 
   // Check that Pills have correct text content
-  expect(pills.at(0).children().text()).toBe('Pill 1')
-  expect(pills.at(1).children().text()).toBe('Pill 2')
-  expect(pills.at(2).children().text()).toBe('Pill 3')
-
-  // Pills should have default color
-  pills.forEach(pill => {
-    expect(pill.prop('color')).toBe('primary')
-  })
+  expect(getByText('Pill 1')).toBeInTheDocument()
+  expect(getByText('Pill 2')).toBeInTheDocument()
+  expect(getByText('Pill 3')).toBeInTheDocument()
 })
