@@ -32,6 +32,11 @@ class ZipFileOptionsForm extends React.Component {
     onZipOptionsResolved: PropTypes.func.isRequired,
   }
 
+  constructor(props) {
+    super(props)
+    this.canvasModalRef = React.createRef()
+  }
+
   handleExpandClick = () => {
     this.props.onZipOptionsResolved({file: this.props.fileOptions.file, expandZip: true})
   }
@@ -58,7 +63,7 @@ class ZipFileOptionsForm extends React.Component {
       <Modal
         className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
         isOpen={!!this.props.fileOptions}
-        ref="canvasModal"
+        ref={this.canvasModalRef}
         title={I18n.t('zip_options', 'Zip file options')}
         onRequestClose={this.props.onClose}
       >
