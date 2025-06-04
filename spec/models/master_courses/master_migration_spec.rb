@@ -743,6 +743,63 @@ describe MasterCourses::MasterMigration do
                                                    ])
         end
       end
+
+      context "when we replace a file multiple times that attached to a module item" do
+        it "does not delete module item(ContentTag) and not set the associated MasterCourse::ChildContentTag to manually_deleted" do
+          original_attachment = master_course.attachments.first
+
+          master_module = master_course.context_modules.create!(
+            name: "Test Module",
+            workflow_state: "active",
+            position: 1
+          )
+
+          master_module.content_tags.create!(
+            context: master_course,
+            content: original_attachment,
+            tag_type: "context_module",
+            title: "Test Attachment Module Item",
+            position: 1,
+            workflow_state: "active"
+          )
+
+          master_module.save!
+          # First migration
+          run_master_migration
+
+          child_module = child_course.context_modules.find_by(name: "Test Module")
+          child_content_tag = child_module.content_tags.first
+          child_attachment = child_content_tag.content
+
+          # First replacement
+          Timecop.travel(1.minute.from_now) do
+            master_course.attachments.create!(attachment_attributes).handle_duplicates(:overwrite)
+          end
+
+          # Second migration
+          run_master_migration
+
+          # Second replacement
+          Timecop.travel(2.minutes.from_now) do
+            master_course.attachments.create!(attachment_attributes).handle_duplicates(:overwrite)
+          end
+
+          # Third migration
+          run_master_migration
+
+          child_content_tag.reload
+
+          expect(child_content_tag.workflow_state).to eq("active")
+
+          newest_attachment = child_course.attachments.where(file_state: "available").order(created_at: :desc).first
+          expect(child_content_tag.content_id).to eq(newest_attachment.id)
+          expect(child_content_tag.content_id).not_to eq(child_attachment.id)
+
+          # It should not have manually_deleted downstream_changes
+          child_child_content_tag = MasterCourses::ChildContentTag.find_by(content: child_content_tag)
+          expect(child_child_content_tag.downstream_changes).not_to include("manually_deleted")
+        end
+      end
     end
 
     it "syncs deleted quiz questions (unless changed downstream)" do
