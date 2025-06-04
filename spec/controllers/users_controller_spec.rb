@@ -104,6 +104,32 @@ describe UsersController do
       end
     end
 
+    context "when 'open_tools_in_new_tab' feature flag is enabled" do
+      before do
+        Account.default.enable_feature! :open_tools_in_new_tab
+      end
+
+      it "uses borderless display type when windowTarget is _blank" do
+        tool.settings[:user_navigation][:windowTarget] = "_blank"
+        tool.save!
+
+        get :external_tool, params: { id: tool.id, user_id: user.id }
+
+        expect(assigns[:lti_launch]).not_to be_nil
+        expect(assigns[:display_override]).to eq "borderless"
+      end
+
+      it "renders with default display type when windowTarget is not _blank" do
+        tool.settings[:user_navigation][:windowTarget] = "_self"
+        tool.save!
+
+        get :external_tool, params: { id: tool.id, user_id: user.id }
+
+        expect(assigns[:lti_launch]).not_to be_nil
+        expect(assigns[:display_override]).to be_nil
+      end
+    end
+
     it "removes query string when post_only = true" do
       tool.user_navigation = { text: "example" }
       tool.settings["post_only"] = "true"

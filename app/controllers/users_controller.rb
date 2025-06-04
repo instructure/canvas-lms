@@ -1530,7 +1530,14 @@ class UsersController < ApplicationController
 
     set_active_tab @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
-    render Lti::AppUtil.display_template
+
+    @display_override = if @domain_root_account.feature_enabled?("open_tools_in_new_tab") && @tool.extension_setting("user_navigation", "windowTarget") == "_blank"
+                          "borderless"
+                        else
+                          nil
+                        end
+
+    render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: @display_override)
     timing_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     InstStatsd::Statsd.timing("lti.user_external_tool.request_time", timing_end - timing_start, tags: { lti_version: @tool.lti_version })
   end

@@ -459,6 +459,7 @@ class ApplicationController < ActionController::Base
     course_pace_allow_bulk_pace_assign
     lti_apps_page_ai_translation
     ams_service
+    open_tools_in_new_tab
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
