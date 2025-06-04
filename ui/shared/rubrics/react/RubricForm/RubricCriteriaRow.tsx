@@ -30,6 +30,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
 import {
+  IconAiColoredSolid,
   IconDragHandleLine,
   IconDuplicateLine,
   IconEditLine,
@@ -37,7 +38,6 @@ import {
   IconTrashLine,
   IconLockLine,
 } from '@instructure/ui-icons'
-import {IgniteAiIcon} from '@canvas/ignite-ai-icon/react/IgniteAiIcon'
 import {Draggable} from 'react-beautiful-dnd'
 import './drag-and-drop/styles.css'
 
@@ -160,7 +160,7 @@ export const RubricCriteriaRow = ({
                       <Flex alignItems="center" gap="x-small">
                         {isGenerated && (
                           <span data-testid="rubric-criteria-row-ai-icon">
-                            <IgniteAiIcon />
+                            <IconAiColoredSolid />
                           </span>
                         )}
                         <Text weight="bold">{description}</Text>
