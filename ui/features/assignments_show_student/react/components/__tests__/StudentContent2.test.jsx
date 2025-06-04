@@ -28,6 +28,7 @@ import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import {AssignmentMocks} from '@canvas/assignments/graphql/student/Assignment'
 import {RUBRIC_QUERY, SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import StudentContent from '../StudentContent'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 
@@ -44,16 +45,13 @@ jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
 })
 
 describe('Assignment Student Content View', () => {
-  let oldEnv
-
   beforeEach(() => {
-    oldEnv = window.ENV
-    window.ENV = {...window.ENV}
+    fakeENV.setup({current_user: {id: '1'}})
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
   })
 
   afterEach(() => {
-    window.ENV = oldEnv
+    fakeENV.teardown()
   })
 
   it('does not render the attempt select if allSubmissions is not provided', async () => {
@@ -126,9 +124,6 @@ describe('Assignment Student Content View', () => {
     let props
 
     beforeEach(async () => {
-      oldEnv = window.ENV
-      window.ENV = {...window.ENV}
-
       props = await mockAssignmentAndSubmission({
         Assignment: {
           ...AssignmentMocks.onPaper,
@@ -136,10 +131,6 @@ describe('Assignment Student Content View', () => {
         },
         Submission: {},
       })
-    })
-
-    afterEach(() => {
-      window.ENV = oldEnv
     })
 
     it('renders the assignment details', async () => {
