@@ -16,6 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+declare global {
+  interface Window {
+    pendo: any
+  }
+}
+
 export type Product = {
   id: string
   global_product_id: string
