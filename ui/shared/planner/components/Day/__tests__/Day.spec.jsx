@@ -173,6 +173,8 @@ describe('Day items grouping', () => {
   it('groups items by context correctly', () => {
     const items = [
       {
+        id: '1',
+        uniqueId: 'assignment_1',
         title: 'Assignment 1',
         date: moment.tz('2025-01-01T12:00:00Z', TZ),
         context: {
@@ -182,6 +184,8 @@ describe('Day items grouping', () => {
         },
       },
       {
+        id: '2',
+        uniqueId: 'assignment_2',
         title: 'Assignment 2',
         date: moment.tz('2025-01-01T12:00:00Z', TZ),
         context: {
@@ -191,6 +195,8 @@ describe('Day items grouping', () => {
         },
       },
       {
+        id: '3',
+        uniqueId: 'assignment_3',
         title: 'Assignment 3',
         date: moment.tz('2025-01-01T12:00:00Z', TZ),
         context: {
@@ -217,10 +223,14 @@ describe('Day items grouping', () => {
   it('groups items without context into Notes category', () => {
     const items = [
       {
+        id: '4',
+        uniqueId: 'note_1',
         title: 'Note 1',
         date: moment.tz('2025-01-01T12:00:00Z', TZ),
       },
       {
+        id: '5',
+        uniqueId: 'note_2',
         title: 'Note 2',
         date: moment.tz('2025-01-01T12:00:00Z', TZ),
       },
