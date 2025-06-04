@@ -19,7 +19,6 @@
 import React from 'react'
 import {render, cleanup, waitFor, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import sinon from 'sinon'
 
 import AsyncComponents from '../../../AsyncComponents'
 import AssignmentColumnHeader from '../AssignmentColumnHeader'
@@ -439,15 +438,15 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
     beforeEach(() => {
       loadMessageStudentsWhoDialogPromise = Promise.resolve(MessageStudentsWhoDialog)
-      sinon
-        .stub(AsyncComponents, 'loadMessageStudentsWhoDialog')
-        .returns(loadMessageStudentsWhoDialogPromise)
-      sinon.stub(MessageStudentsWhoDialog, 'show')
+      jest
+        .spyOn(AsyncComponents, 'loadMessageStudentsWhoDialog')
+        .mockReturnValue(loadMessageStudentsWhoDialogPromise)
+      jest.spyOn(MessageStudentsWhoDialog, 'show').mockImplementation(() => {})
       mountAndOpenOptionsMenu()
     })
 
     afterEach(() => {
-      sinon.restore()
+      jest.restoreAllMocks()
     })
 
     test('is always present', () => {
@@ -484,7 +483,10 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         const menuItem = getMenuItem(menuContent, 'Message Students Who')
         fireEvent.click(menuItem)
         await loadMessageStudentsWhoDialogPromise
-        const [, onClose] = MessageStudentsWhoDialog.show.lastCall.args
+        const [, onClose] =
+          MessageStudentsWhoDialog.show.mock.calls[
+            MessageStudentsWhoDialog.show.mock.calls.length - 1
+          ]
         onClose()
         expect(document.activeElement).toBe(getOptionsMenuTrigger())
       })
@@ -494,7 +496,10 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         const menuItem = getMenuItem(menuContent, 'Message Students Who')
         fireEvent.click(menuItem)
         await loadMessageStudentsWhoDialogPromise
-        const [settings] = MessageStudentsWhoDialog.show.lastCall.args
+        const [settings] =
+          MessageStudentsWhoDialog.show.mock.calls[
+            MessageStudentsWhoDialog.show.mock.calls.length - 1
+          ]
         expect(settings.students).toHaveLength(2)
       })
 
@@ -504,7 +509,10 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         const menuItem = getMenuItem(menuContent, 'Message Students Who')
         fireEvent.click(menuItem)
         await loadMessageStudentsWhoDialogPromise
-        const [settings] = MessageStudentsWhoDialog.show.lastCall.args
+        const [settings] =
+          MessageStudentsWhoDialog.show.mock.calls[
+            MessageStudentsWhoDialog.show.mock.calls.length - 1
+          ]
         expect(settings.students.map(student => student.name)).toEqual(['Betty Ford'])
       })
     })
@@ -535,7 +543,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.curveGradesAction.onSelect = sinon.stub()
+        props.curveGradesAction.onSelect = jest.fn()
       })
 
       test('does not restore focus to the "Options" menu trigger', () => {
@@ -547,13 +555,16 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
       test('calls the .curveGradesAction.onSelect callback', () => {
         const menuItem = getMenuItem(menuContent, 'Curve Grades')
         fireEvent.click(menuItem)
-        expect(props.curveGradesAction.onSelect.callCount).toBe(1)
+        expect(props.curveGradesAction.onSelect).toHaveBeenCalledTimes(1)
       })
 
       test('includes a callback for restoring focus upon dialog close', () => {
         const menuItem = getMenuItem(menuContent, 'Curve Grades')
         fireEvent.click(menuItem)
-        const [callback] = props.curveGradesAction.onSelect.lastCall.args
+        const [callback] =
+          props.curveGradesAction.onSelect.mock.calls[
+            props.curveGradesAction.onSelect.mock.calls.length - 1
+          ]
         callback()
         expect(document.activeElement).toBe(getOptionsMenuTrigger())
       })
@@ -585,7 +596,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.setDefaultGradeAction.onSelect = sinon.stub()
+        props.setDefaultGradeAction.onSelect = jest.fn()
       })
 
       test('does not restore focus to the "Options" menu trigger', () => {
@@ -597,13 +608,16 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
       test('calls the .setDefaultGradeAction.onSelect callback', () => {
         const menuItem = getMenuItem(menuContent, 'Set Default Grade')
         fireEvent.click(menuItem)
-        expect(props.setDefaultGradeAction.onSelect.callCount).toBe(1)
+        expect(props.setDefaultGradeAction.onSelect).toHaveBeenCalledTimes(1)
       })
 
       test('includes a callback for restoring focus upon dialog close', () => {
         const menuItem = getMenuItem(menuContent, 'Set Default Grade')
         fireEvent.click(menuItem)
-        const [callback] = props.setDefaultGradeAction.onSelect.lastCall.args
+        const [callback] =
+          props.setDefaultGradeAction.onSelect.mock.calls[
+            props.setDefaultGradeAction.onSelect.mock.calls.length - 1
+          ]
         callback()
         expect(document.activeElement).toBe(getOptionsMenuTrigger())
       })
@@ -661,7 +675,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.postGradesAction.onSelect = sinon.stub()
+        props.postGradesAction.onSelect = jest.fn()
       })
 
       test('does not restore focus to the "Options" menu trigger', () => {
@@ -671,12 +685,15 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
       test('calls the .postGradesAction.onSelect callback', () => {
         getMenuItem(menuContent, 'Post grades').click()
-        expect(props.postGradesAction.onSelect.callCount).toBe(1)
+        expect(props.postGradesAction.onSelect).toHaveBeenCalledTimes(1)
       })
 
       test('includes a callback for restoring focus upon dialog close', () => {
         getMenuItem(menuContent, 'Post grades').click()
-        const [callback] = props.postGradesAction.onSelect.lastCall.args
+        const [callback] =
+          props.postGradesAction.onSelect.mock.calls[
+            props.postGradesAction.onSelect.mock.calls.length - 1
+          ]
         callback()
         expect(document.activeElement).toBe(getOptionsMenuTrigger())
       })
