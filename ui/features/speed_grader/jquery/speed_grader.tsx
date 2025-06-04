@@ -285,6 +285,7 @@ let externalToolLaunchOptions = {singleLtiLaunch: false}
 let externalToolLoaded = false
 let provisionalGraderDisplayNames: Record<string, string | null>
 let EG: SpeedGrader
+let submittedAtText: string | null
 
 const customProvisionalGraderLabel = I18n.t('Custom')
 const anonymousAssignmentDetailedReportTooltip = I18n.t(
@@ -312,6 +313,10 @@ function setupHandleStatePopped() {
 
 function setupBeforeLeavingSpeedgrader() {
   window.addEventListener('beforeunload', EG.beforeLeavingSpeedgrader)
+}
+
+function setupHandleSGMessages() {
+  window.addEventListener('message', EG.handleSGMessages)
 }
 
 function teardownBeforeLeavingSpeedgrader() {
@@ -1515,6 +1520,7 @@ EG = {
       initDropdown()
       initGroupAssignmentMode()
       setupHandleStatePopped()
+      setupHandleSGMessages()
 
       if (ENV.student_group_reason_for_change != null) {
         SpeedGraderAlerts.showStudentGroupChangeAlert({
@@ -2801,6 +2807,7 @@ EG = {
         String($('#submission_to_view').val() || submissionHistory.length - 1),
         10,
       )
+      submittedAtText = datetimeString(s.submitted_at) || noSubmittedAt
       const templateSubmissions = map(submissionHistory, (o: unknown, i: number) => {
         // The submission objects nested in the submission_history array
         // can have two different shapes, because the `this.currentStudent.submission`
@@ -2851,7 +2858,7 @@ EG = {
           selected: selectedIndex === i,
           proxy_submitter: s.proxy_submitter,
           proxy_submitter_label_text: s.proxy_submitter ? ` by ${s.proxy_submitter}` : null,
-          submittedAt: datetimeString(s.submitted_at) || noSubmittedAt,
+          submittedAt: submittedAtText,
           grade,
         }
       })
@@ -4351,6 +4358,19 @@ EG = {
     teardownHandleStatePopped(EG)
     teardownBeforeLeavingSpeedgrader()
     return undefined
+  },
+
+  handleSGMessages(event: MessageEvent) {
+    const submittedAtLabel = document.getElementById('submitted_at_label')
+    if (!submittedAtLabel) return
+
+    if (event.data?.subject === 'SG.handleHighlightedEntryChange' && event.data?.entryTimestamp) {
+      submittedAtLabel.innerHTML = datetimeString(event.data?.entryTimestamp)
+    }
+
+    if (event.data?.subject === 'SG.switchToIndividualPosts' && submittedAtText) {
+      submittedAtLabel.innerHTML = submittedAtText
+    }
   },
 
   handleGradingError(data: GradingError = {}) {
