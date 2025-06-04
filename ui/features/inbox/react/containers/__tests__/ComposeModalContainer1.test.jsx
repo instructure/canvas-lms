@@ -335,7 +335,7 @@ describe('ComposeModalContainer', () => {
       const select = await component.findByTestId('course-select-modal')
       fireEvent.click(select)
 
-      const selectOptions = await component.findAllByText('Fighting Magneto 101')
+      const selectOptions = await component.findAllByText('Ipsum')
       expect(selectOptions.length).toBeGreaterThan(0)
     })
 
@@ -345,8 +345,8 @@ describe('ComposeModalContainer', () => {
       const select = await component.findByTestId('course-select-modal')
       fireEvent.click(select) // This will fail without the fix because of an unhandled error. We can't have items with duplicate keys because of our jest-setup.
 
-      const selectOptions = await component.findAllByText('Flying The Blackbird')
-      expect(selectOptions).toHaveLength(1)
+      const selectOptions = await component.findAllByText('Ipsum')
+      expect(selectOptions).toHaveLength(3) // Should only have 3 unique courses
     })
 
     it('does not render All Courses option', async () => {
