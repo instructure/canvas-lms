@@ -100,6 +100,8 @@ export class PlannerItem_raw extends Component {
     readOnly: bool,
     onlineMeetingURL: string,
     isObserving: bool,
+    newActivityTestId: string,
+    missingIndicatorTestId: string,
   }
 
   static defaultProps = {
@@ -364,7 +366,9 @@ export class PlannerItem_raw extends Component {
             themeOverride={{
               mediumPaddingHorizontal: '0',
               linkColor: this.props.simplifiedControls ? colors.contrasts.grey125125 : undefined,
-              linkHoverColor: this.props.simplifiedControls ? colors.contrasts.grey125125 : undefined,
+              linkHoverColor: this.props.simplifiedControls
+                ? colors.contrasts.grey125125
+                : undefined,
             }}
             elementRef={link => {
               this.itemLink = link
@@ -389,8 +393,8 @@ export class PlannerItem_raw extends Component {
         href={this.props.html_url}
         isWithinText={false}
         themeOverride={{
-          ...(this.props.simplifiedControls? {color: colors.contrasts.grey125125} :{}),
-          ...(this.props.simplifiedControls? {linkHoverColor: colors.contrasts.grey125125} :{}),
+          ...(this.props.simplifiedControls ? {color: colors.contrasts.grey125125} : {}),
+          ...(this.props.simplifiedControls ? {linkHoverColor: colors.contrasts.grey125125} : {}),
         }}
         elementRef={link => {
           this.itemLink = link
@@ -563,6 +567,7 @@ export class PlannerItem_raw extends Component {
 
     if (newItem || missing) {
       const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator
+      const testId = newItem ? this.props.newActivityTestId : this.props.missingIndicatorTestId
       return (
         <NotificationBadge responsiveSize={this.props.responsiveSize}>
           <div className={this.style.classNames.activityIndicator}>
@@ -571,6 +576,7 @@ export class PlannerItem_raw extends Component {
               itemIds={[this.props.uniqueId]}
               animatableIndex={this.props.animatableIndex}
               getFocusable={this.getFocusable}
+              testId={testId}
             />
           </div>
         </NotificationBadge>

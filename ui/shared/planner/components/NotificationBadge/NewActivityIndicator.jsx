@@ -32,6 +32,7 @@ export class NewActivityIndicator extends Component {
     deregisterAnimatable: func,
     animatableIndex: number,
     getFocusable: func,
+    testId: string,
   }
 
   static defaultProps = {
@@ -77,6 +78,7 @@ export class NewActivityIndicator extends Component {
         indicatorRef={ref => (this.indicatorElt = ref)}
         title={badgeMessage}
         variant="primary"
+        testId={this.props.testId || 'new-activity-indicator'}
       />
     )
   }
