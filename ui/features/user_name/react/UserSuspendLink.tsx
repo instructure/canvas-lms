@@ -34,15 +34,19 @@ const REACTIVATE = 'unsuspend'
 const CUSTOM_EVENT = 'username:pseudonymstatuschange'
 
 function linksToShow() {
+  // @ts-expect-error
   if (ENV && typeof ENV.user_suspend_status === 'undefined') return []
+  // @ts-expect-error
   const pseuds = ENV.user_suspend_status.pseudonyms
-  const result = []
-  if (pseuds.some(e => e.workflow_state !== 'suspended')) result.push(SUSPEND)
-  if (pseuds.some(e => e.workflow_state === 'suspended')) result.push(REACTIVATE)
+  const result: string[] = []
+  if (pseuds.some((e: {workflow_state: string}) => e.workflow_state !== 'suspended'))
+    result.push(SUSPEND)
+  if (pseuds.some((e: {workflow_state: string}) => e.workflow_state === 'suspended'))
+    result.push(REACTIVATE)
   return result
 }
 
-const notifyEvents = {
+const notifyEvents: Record<string, CustomEvent> = {
   [SUSPEND]: new CustomEvent(CUSTOM_EVENT, {detail: {action: SUSPEND}}),
   [REACTIVATE]: new CustomEvent(CUSTOM_EVENT, {detail: {action: REACTIVATE}}),
 }
@@ -62,13 +66,14 @@ export default function UserSuspendLink() {
   //
   // Eventually both bundles should be rewritten into one larger tree of React
   // components, and then this can be redone in more standard ways.
-  function crossNotify(action) {
+  function crossNotify(action: string) {
     window.dispatchEvent(notifyEvents[action])
   }
 
-  async function handleAction(action) {
+  async function handleAction(action: string) {
     try {
       await doFetchApi({
+        // @ts-expect-error
         path: `/api/v1/users/${ENV.USER_ID}`,
         method: 'PUT',
         body: {user: {event: action}},
@@ -80,13 +85,13 @@ export default function UserSuspendLink() {
         action === SUSPEND
           ? I18n.t("Could not suspend this user's access")
           : I18n.t("Could not reactivate this user's access")
-      showFlashAlert({message, err, type: 'error'})
+      showFlashAlert({message, err: err instanceof Error ? err : null, type: 'error'})
     } finally {
       setModalIsOpen(false)
     }
   }
 
-  function handleClick(action) {
+  function handleClick(action: string) {
     setSelectedAction(action)
     setModalIsOpen(true)
   }
@@ -107,7 +112,7 @@ export default function UserSuspendLink() {
     )
   }
 
-  function renderInfoText(infoText) {
+  function renderInfoText(infoText: string) {
     return (
       <>
         <br />
@@ -120,9 +125,15 @@ export default function UserSuspendLink() {
     setModalIsOpen(false)
   }
 
-  function renderModal(action) {
+  function renderModal(action: string) {
+    // @ts-expect-error
     const name = ENV.CONTEXT_USER_DISPLAY_NAME
-    let modalLabel, actionColor, actionFunc, actionName, actionText, infoText
+    let modalLabel: string,
+      actionColor: 'danger' | 'primary',
+      actionFunc: () => void,
+      actionName: string,
+      actionText: string,
+      infoText: string
     if (action === SUSPEND) {
       modalLabel = I18n.t('Confirm suspension')
       actionColor = 'danger'
@@ -163,6 +174,7 @@ export default function UserSuspendLink() {
         <Modal.Body>
           <View as="div" margin="medium">
             <Text as="div">{actionText}</Text>
+            {/* @ts-expect-error */}
             {ENV.PERMISSIONS.can_manage_sis_pseudonyms ? null : renderInfoText(infoText)}
           </View>
         </Modal.Body>
