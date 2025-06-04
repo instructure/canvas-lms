@@ -38,7 +38,13 @@ const OutcomeHeader = ({outcome}) => {
 
   return (
     <>
-      <View background="secondary" as="div" width={COLUMN_WIDTH} borderWidth="large 0 medium 0">
+      <View
+        background="secondary"
+        as="div"
+        width={COLUMN_WIDTH}
+        borderWidth="large 0 medium 0"
+        data-testid="outcome-header"
+      >
         <Flex alignItems="center" justifyItems="space-between" height={CELL_HEIGHT}>
           <Flex.Item size="80%" padding="0 0 0 small">
             <TruncateText>

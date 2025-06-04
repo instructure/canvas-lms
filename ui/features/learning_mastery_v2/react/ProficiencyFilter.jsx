@@ -38,7 +38,7 @@ const ProficiencyFilter = ({ratings, visibleRatings, setVisibleRatings}) => {
   }
 
   return (
-    <View display="flex" padding="small 0 small 0">
+    <View display="flex" padding="small 0 small 0" data-testid="proficiency-filter">
       <View display="flex">
         {ratings.map(({points, color, description, masteryAt}) => (
           <ProficiencyRating
