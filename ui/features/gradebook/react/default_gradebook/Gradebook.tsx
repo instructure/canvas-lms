@@ -414,6 +414,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   gradingPeriodId = '0'
 
+  _isMounted = false
+
   options: GradebookOptions
 
   sections_enabled = false
@@ -607,6 +609,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         ? this.props.enhancedActionMenuNode
         : this.props.actionMenuNode
     ).querySelector('button')
+
+    this._isMounted = false
   }
 
   bindGridEvents = () => {
@@ -4150,7 +4154,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   setCurrentGradingPeriod = () => {
     if (this.gradingPeriodSet == null) {
       this.gradingPeriodId = '0'
-      this.setState({gradingPeriodId: this.gradingPeriodId})
+      if (this._isMounted) {
+        this.setState({gradingPeriodId: this.gradingPeriodId})
+      }
       return
     }
 
@@ -4162,7 +4168,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     } else {
       this.gradingPeriodId = '0'
     }
-    this.setState({gradingPeriodId: this.gradingPeriodId})
+    if (this._isMounted) {
+      this.setState({gradingPeriodId: this.gradingPeriodId})
+    }
   }
 
   getCurrentGradingPeriod = (): string => {
@@ -4950,6 +4958,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   destroy = () => {
+    this._isMounted = false
     $(window).unbind('resize.fillWindowWithMe')
     $(document).unbind('gridready')
     this.gradebookGrid?.destroy()
@@ -4979,6 +4988,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   componentDidMount() {
+    this._isMounted = true
     this.onShow()
   }
 
