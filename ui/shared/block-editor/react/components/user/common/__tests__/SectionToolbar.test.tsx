@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {useNode} from '@craftjs/core'
 import {SectionToolbar} from '../SectionToolbar'
@@ -39,21 +39,50 @@ jest.mock('@craftjs/core', () => {
   }
 })
 
+// Mock the ColorModal component to avoid the InstUI ColorPicker issue
+jest.mock('../ColorModal', () => ({
+  ColorModal: ({open, onSubmit}: {open: boolean; onSubmit: (color: string) => void}) => {
+    if (!open) return null
+    return (
+      <div>
+        <div>Enter a hex color value</div>
+        <button onClick={() => onSubmit('#ffffff')}>Set Color</button>
+      </div>
+    )
+  },
+}))
+
 describe('SectionToolbar', () => {
+  beforeEach(() => {
+    mockSetProp.mockClear()
+  })
+
   it('renders', () => {
     const {getByText} = render(<SectionToolbar />)
 
     expect(getByText('Background Color')).toBeInTheDocument()
   })
 
-  it.skip('opens the color modal when the color button is clicked', () => {
-    // can't render ColorModal yet due to instui issue. See ColorModal.test.tsx for details
-    const {getByText, queryByText} = render(<SectionToolbar />)
+  it('opens the color modal when the color button is clicked', () => {
+    const {getByTitle, queryByText} = render(<SectionToolbar />)
 
     expect(queryByText('Enter a hex color value')).not.toBeInTheDocument()
 
-    getByText('Background Color').click()
+    fireEvent.click(getByTitle('Background Color'))
 
-    expect(getByText('Enter a hex color value')).toBeInTheDocument()
+    expect(queryByText('Enter a hex color value')).toBeInTheDocument()
+  })
+
+  it('sets the background color when the color is submitted', () => {
+    const {getByTitle, getByText} = render(<SectionToolbar />)
+
+    fireEvent.click(getByTitle('Background Color'))
+    fireEvent.click(getByText('Set Color'))
+
+    expect(mockSetProp).toHaveBeenCalled()
+    const setterFunction = mockSetProp.mock.calls[0][0]
+    const testProps = {}
+    setterFunction(testProps)
+    expect(testProps).toEqual({background: '#ffffff'})
   })
 })
