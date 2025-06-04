@@ -168,12 +168,12 @@ const TimeSelection = (props: TimeSelectionProps) => {
     const calendarDays =
       coursePace.time_to_complete_calendar_days === 0
         ? 0
-        : coursePace.time_to_complete_calendar_days
+        : coursePace.time_to_complete_calendar_days || 0
     const endDateValue = startDateMoment.add(calendarDays, 'days').startOf('day').toISOString()
     setEndDate(endDateValue)
 
     const originalPaceDuration = calendarDaysToPaceDuration(
-      coursePace.time_to_complete_calendar_days,
+      coursePace.time_to_complete_calendar_days || 0,
     )
     setWeeks(originalPaceDuration.weeks)
     setDays(originalPaceDuration.days)
