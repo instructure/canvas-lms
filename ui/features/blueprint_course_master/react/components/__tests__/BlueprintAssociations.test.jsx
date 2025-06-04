@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {shallow} from 'enzyme'
 import BlueprintAssociations from '../BlueprintAssociations'
 import getSampleData from './getSampleData'
 
@@ -42,28 +41,28 @@ describe('BlueprintAssociations component', () => {
   })
 
   test('renders the BlueprintAssociations component', () => {
-    const tree = shallow(<BlueprintAssociations {...defaultProps()} />)
-    const node = tree.find('.bca__wrapper')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<BlueprintAssociations {...defaultProps()} />)
+    const node = container.querySelector('.bca__wrapper')
+    expect(node).toBeTruthy()
   })
 
   test('displays saving spinner when saving', () => {
     const props = defaultProps()
     props.isSavingAssociations = true
-    const tree = shallow(<BlueprintAssociations {...props} />)
-    const node = tree.find('.bca__overlay__save-wrapper Spinner')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<BlueprintAssociations {...props} />)
+    const node = container.querySelector('.bca__overlay__save-wrapper [class*="spinner"]')
+    expect(node).toBeTruthy()
   })
 
   test('renders a child CoursePicker component', () => {
-    const tree = render(<BlueprintAssociations {...defaultProps()} />)
-    const node = tree.container.querySelector('.bca-course-picker')
+    const {container} = render(<BlueprintAssociations {...defaultProps()} />)
+    const node = container.querySelector('.bca-course-picker')
     expect(node).toBeTruthy()
   })
 
   test('renders a child AssociationsTable component', () => {
-    const tree = render(<BlueprintAssociations {...defaultProps()} />)
-    const node = tree.container.querySelector('.bca-associations-table')
+    const {container} = render(<BlueprintAssociations {...defaultProps()} />)
+    const node = container.querySelector('.bca-associations-table')
     expect(node).toBeTruthy()
   })
 
@@ -72,9 +71,9 @@ describe('BlueprintAssociations component', () => {
     props.existingAssociations = getSampleData().courses
     props.addedAssociations = getSampleData().courses
     props.hasUnsyncedChanges = true
-    const tree = shallow(<BlueprintAssociations {...props} />)
-    const node = tree.find('Alert')
-    expect(node.exists()).toBeTruthy()
+    const {getByText} = render(<BlueprintAssociations {...props} />)
+    const node = getByText('Warning:')
+    expect(node).toBeTruthy()
   })
 
   test('render no save warning if there are existing associations, new associations, but no unsynced changes', () => {
@@ -82,9 +81,9 @@ describe('BlueprintAssociations component', () => {
     props.existingAssociations = getSampleData().courses
     props.addedAssociations = getSampleData().courses
     props.hasUnsyncedChanges = false
-    const tree = shallow(<BlueprintAssociations {...props} />)
-    const node = tree.find('Alert')
-    expect(node.exists()).toBeFalsy()
+    const {queryByText} = render(<BlueprintAssociations {...props} />)
+    const node = queryByText('Warning:')
+    expect(node).toBeFalsy()
   })
 
   test('render no save warning if there are existing associations, unsynced changes, but no new associations', () => {
@@ -92,9 +91,9 @@ describe('BlueprintAssociations component', () => {
     props.existingAssociations = getSampleData().courses
     props.addedAssociations = []
     props.hasUnsyncedChanges = true
-    const tree = shallow(<BlueprintAssociations {...props} />)
-    const node = tree.find('Alert')
-    expect(node.exists()).toBeFalsy()
+    const {queryByText} = render(<BlueprintAssociations {...props} />)
+    const node = queryByText('Warning:')
+    expect(node).toBeFalsy()
   })
 
   test('render no save warning if there are new associations, unsynced changes, but no existing associations', () => {
@@ -102,8 +101,8 @@ describe('BlueprintAssociations component', () => {
     props.existingAssociations = []
     props.addedAssociations = getSampleData().courses
     props.hasUnsyncedChanges = true
-    const tree = shallow(<BlueprintAssociations {...props} />)
-    const node = tree.find('Alert')
-    expect(node.exists()).toBeFalsy()
+    const {queryByText} = render(<BlueprintAssociations {...props} />)
+    const node = queryByText('Warning:')
+    expect(node).toBeFalsy()
   })
 })
