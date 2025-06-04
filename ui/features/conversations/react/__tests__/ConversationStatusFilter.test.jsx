@@ -19,9 +19,7 @@
 import _ from 'lodash'
 import ConversationStatusFilter from '../ConversationStatusFilter'
 import React from 'react'
-import {shallow} from 'enzyme'
-
-const strictEqual = (x, y) => expect(x).toStrictEqual(y)
+import {render} from '@testing-library/react'
 
 const makeProps = (props = {}) =>
   _.merge(
@@ -44,47 +42,57 @@ const makeProps = (props = {}) =>
 
 describe('ConversationStatusFilter component', () => {
   test('default initial selected option', () => {
-    const wrapper1 = shallow(<ConversationStatusFilter {...makeProps()} />)
-    strictEqual(wrapper1.state().selected, 'foo')
+    const ref1 = React.createRef()
+    render(<ConversationStatusFilter {...makeProps()} ref={ref1} />)
+    expect(ref1.current.state.selected).toStrictEqual('foo')
 
-    const wrapper2 = shallow(<ConversationStatusFilter {...makeProps({initialFilter: 'bar'})} />)
-    strictEqual(wrapper2.state().selected, 'bar')
+    const ref2 = React.createRef()
+    render(<ConversationStatusFilter {...makeProps({initialFilter: 'bar'})} ref={ref2} />)
+    expect(ref2.current.state.selected).toStrictEqual('bar')
   })
 
   test('getUrlFilter accepts valid filters', () => {
-    const wrapper = shallow(<ConversationStatusFilter {...makeProps()} />)
-    strictEqual(wrapper.instance().getUrlFilter('type=foo'), 'foo')
-    strictEqual(wrapper.instance().getUrlFilter('type=bar'), 'bar')
-    strictEqual(wrapper.instance().getUrlFilter('type=baz'), 'baz')
-    strictEqual(wrapper.instance().getUrlFilter('jar=jar&type=foo'), 'foo')
-    strictEqual(wrapper.instance().getUrlFilter('jar=jar&type=bar'), 'bar')
-    strictEqual(wrapper.instance().getUrlFilter('jar=jar&type=baz'), 'baz')
+    const ref = React.createRef()
+    render(<ConversationStatusFilter {...makeProps()} ref={ref} />)
+    const instance = ref.current
+    expect(instance.getUrlFilter('type=foo')).toStrictEqual('foo')
+    expect(instance.getUrlFilter('type=bar')).toStrictEqual('bar')
+    expect(instance.getUrlFilter('type=baz')).toStrictEqual('baz')
+    expect(instance.getUrlFilter('jar=jar&type=foo')).toStrictEqual('foo')
+    expect(instance.getUrlFilter('jar=jar&type=bar')).toStrictEqual('bar')
+    expect(instance.getUrlFilter('jar=jar&type=baz')).toStrictEqual('baz')
   })
 
   test('getUrlFilter uses defaults when invalid', () => {
-    const wrapper1 = shallow(<ConversationStatusFilter {...makeProps()} />)
-    strictEqual(wrapper1.instance().getUrlFilter('type=NOT_A_VALID_FILTER'), 'foo')
-    strictEqual(wrapper1.instance().getUrlFilter('jar=jar&type=NOT_A_VALID_FILTER'), 'foo')
-    strictEqual(wrapper1.instance().getUrlFilter(''), 'foo')
-    strictEqual(wrapper1.instance().getUrlFilter('jar=jar'), 'foo')
+    const ref1 = React.createRef()
+    render(<ConversationStatusFilter {...makeProps()} ref={ref1} />)
+    const instance1 = ref1.current
+    expect(instance1.getUrlFilter('type=NOT_A_VALID_FILTER')).toStrictEqual('foo')
+    expect(instance1.getUrlFilter('jar=jar&type=NOT_A_VALID_FILTER')).toStrictEqual('foo')
+    expect(instance1.getUrlFilter('')).toStrictEqual('foo')
+    expect(instance1.getUrlFilter('jar=jar')).toStrictEqual('foo')
 
-    const wrapper2 = shallow(<ConversationStatusFilter {...makeProps({defaultFilter: 'bar'})} />)
-    strictEqual(wrapper2.instance().getUrlFilter('type=NOT_A_VALID_FILTER'), 'bar')
-    strictEqual(wrapper2.instance().getUrlFilter('jar=jar&type=NOT_A_VALID_FILTER'), 'bar')
-    strictEqual(wrapper2.instance().getUrlFilter(''), 'bar')
-    strictEqual(wrapper2.instance().getUrlFilter('jar=jar'), 'bar')
+    const ref2 = React.createRef()
+    render(<ConversationStatusFilter {...makeProps({defaultFilter: 'bar'})} ref={ref2} />)
+    const instance2 = ref2.current
+    expect(instance2.getUrlFilter('type=NOT_A_VALID_FILTER')).toStrictEqual('bar')
+    expect(instance2.getUrlFilter('jar=jar&type=NOT_A_VALID_FILTER')).toStrictEqual('bar')
+    expect(instance2.getUrlFilter('')).toStrictEqual('bar')
+    expect(instance2.getUrlFilter('jar=jar')).toStrictEqual('bar')
   })
 
   test('updateBackboneState only allows valid filters', () => {
-    const wrapper = shallow(<ConversationStatusFilter {...makeProps()} />)
+    const ref = React.createRef()
+    render(<ConversationStatusFilter {...makeProps()} ref={ref} />)
+    const instance = ref.current
 
-    wrapper.instance().updateBackboneState('foo')
-    strictEqual(wrapper.state().selected, 'foo')
+    instance.updateBackboneState('foo')
+    expect(instance.state.selected).toStrictEqual('foo')
 
-    wrapper.instance().updateBackboneState('bar')
-    strictEqual(wrapper.state().selected, 'bar')
+    instance.updateBackboneState('bar')
+    expect(instance.state.selected).toStrictEqual('bar')
 
-    wrapper.instance().updateBackboneState('NOT_A_VALID_FILTER')
-    strictEqual(wrapper.state().selected, 'foo')
+    instance.updateBackboneState('NOT_A_VALID_FILTER')
+    expect(instance.state.selected).toStrictEqual('foo')
   })
 })
