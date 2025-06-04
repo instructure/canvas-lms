@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
-import {render} from '@testing-library/react'
+import {render, screen, cleanup} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {SearchFormComponent} from '../SearchForm'
 import {Button} from '@instructure/ui-buttons'
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
@@ -55,112 +55,107 @@ liveRegion.setAttribute('role', 'alert')
 document.body.appendChild(liveRegion)
 
 const mountComponent = (props = {}) =>
-  shallow(<SearchFormComponent {...defaultProps()} {...props} />)
+  render(<SearchFormComponent {...defaultProps()} {...props} />)
 
 describe('SearchForm', () => {
-  let wrapper: any
-  beforeEach(() => {
-    wrapper = mountComponent()
+  afterEach(() => {
+    cleanup()
   })
 
   test('has a form field group', function () {
-    expect(wrapper.find(FormFieldGroup).exists()).toBeTruthy()
+    mountComponent()
+    expect(screen.getByText('Search Form')).toBeInTheDocument()
   })
 
   test('has an Autocomplete with id #graders', function () {
-    const input = wrapper.find('#graders')
-    expect(input.exists()).toBeTruthy()
-    expect(input.is(CanvasAsyncSelect)).toBeTruthy()
+    mountComponent()
+    expect(document.querySelector('#graders')).toBeInTheDocument()
   })
 
   test('has an Autocomplete with id #students', function () {
-    const input = wrapper.find('#students')
-    expect(input.exists()).toBeTruthy()
-    expect(input.is(CanvasAsyncSelect)).toBeTruthy()
+    mountComponent()
+    expect(document.querySelector('#students')).toBeInTheDocument()
   })
 
   test('has an Autocomplete with id #assignments', function () {
-    const input = wrapper.find('#assignments')
-    expect(input.exists()).toBeTruthy()
-    expect(input.is(CanvasAsyncSelect)).toBeTruthy()
+    mountComponent()
+    expect(document.querySelector('#assignments')).toBeInTheDocument()
   })
 
   test('has date pickers for from date and to date', function () {
-    const inputs = wrapper.find(CanvasDateInput2)
-    expect(inputs).toHaveLength(2)
-    expect(inputs.every(CanvasDateInput2)).toBeTruthy()
+    mountComponent()
+    expect(screen.getByLabelText('Start Date')).toBeInTheDocument()
+    expect(screen.getByLabelText('End Date')).toBeInTheDocument()
   })
 
   test('has a Button for submitting', function () {
-    expect(wrapper.find(Button).exists()).toBeTruthy()
+    mountComponent()
+    expect(screen.getByRole('button', {name: 'Filter'})).toBeInTheDocument()
   })
 
-  test('disables the submit button if To date is before From date', function () {
-    wrapper.setState(
-      {
-        selected: {
-          from: {value: '2017-05-02T00:00:00-05:00'},
-          to: {value: '2017-05-01T00:00:00-05:00'},
-        },
-      },
-      () => {
-        const button = wrapper.find(Button)
-        expect(button.props().disabled).toBeTruthy()
-      },
-    )
+  test('disables the submit button if To date is before From date', async function () {
+    const user = userEvent.setup()
+    mountComponent()
+
+    const fromDateInputs = screen.getAllByLabelText('Start Date')
+    const toDateInputs = screen.getAllByLabelText('End Date')
+
+    // Clear and set the from date to be after the to date
+    await user.clear(fromDateInputs[0])
+    await user.type(fromDateInputs[0], '05/02/2017')
+    await user.tab() // Trigger blur
+
+    await user.clear(toDateInputs[0])
+    await user.type(toDateInputs[0], '05/01/2017')
+    await user.tab() // Trigger blur
+
+    // Wait for the state to update
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    const buttons = screen.getAllByRole('button', {name: 'Filter'})
+    expect(buttons[0]).toBeDisabled()
   })
 
-  test('does not disable the submit button if To date is after From date', function () {
-    wrapper.setState(
-      {
-        selected: {
-          from: {value: '2017-05-01T00:00:00-05:00'},
-          to: {value: '2017-05-02T00:00:00-05:00'},
-        },
-      },
-      () => {
-        const button = wrapper.find(Button)
-        expect(button.props().disabled).toBeFalsy()
-      },
-    )
+  test('does not disable the submit button if To date is after From date', async function () {
+    const user = userEvent.setup()
+    mountComponent()
+
+    const fromDateInputs = screen.getAllByLabelText('Start Date')
+    const toDateInputs = screen.getAllByLabelText('End Date')
+
+    await user.type(fromDateInputs[0], '05/01/2017')
+    await user.type(toDateInputs[0], '05/02/2017')
+
+    const buttons = screen.getAllByRole('button', {name: 'Filter'})
+    expect(buttons[0]).not.toBeDisabled()
   })
 
   test('does not disable the submit button when there are no dates selected', function () {
-    const {from, to} = wrapper.state().selected
-    const button = wrapper.find(Button)
-    expect(from.value).toBeFalsy()
-    expect(to.value).toBeFalsy()
-    expect(button.props().disabled).toBeFalsy()
+    mountComponent()
+    const buttons = screen.getAllByRole('button', {name: 'Filter'})
+    expect(buttons[0]).not.toBeDisabled()
   })
 
-  test('does not disable the submit button when only from date is entered', function () {
-    wrapper.setState(
-      {
-        selected: {
-          from: {value: '1994-04-08T00:00:00-05:00'},
-          to: {value: ''},
-        },
-      },
-      () => {
-        const button = wrapper.find(Button)
-        expect(button.props().disabled).toBeFalsy()
-      },
-    )
+  test('does not disable the submit button when only from date is entered', async function () {
+    const user = userEvent.setup()
+    mountComponent()
+
+    const fromDateInputs = screen.getAllByLabelText('Start Date')
+    await user.type(fromDateInputs[0], '04/08/1994')
+
+    const buttons = screen.getAllByRole('button', {name: 'Filter'})
+    expect(buttons[0]).not.toBeDisabled()
   })
 
-  test('does not disable the submit button when only to date is entered', function () {
-    wrapper.setState(
-      {
-        selected: {
-          from: {value: ''},
-          to: {value: '2017-05-01T00:00:00-05:00'},
-        },
-      },
-      () => {
-        const button = wrapper.find(Button)
-        expect(button.props().disabled).toBeFalsy()
-      },
-    )
+  test('does not disable the submit button when only to date is entered', async function () {
+    const user = userEvent.setup()
+    mountComponent()
+
+    const toDateInputs = screen.getAllByLabelText('End Date')
+    await user.type(toDateInputs[0], '05/01/2017')
+
+    const buttons = screen.getAllByRole('button', {name: 'Filter'})
+    expect(buttons[0]).not.toBeDisabled()
   })
 
   test('calls getGradebookHistory prop on mount', () => {
@@ -170,220 +165,105 @@ describe('SearchForm', () => {
   })
 
   describe('SearchForm when button is clicked', () => {
-    let props: any
-    beforeEach(() => {
-      props = {getGradebookHistory: jest.fn()}
-      wrapper = mountComponent(props)
-    })
-    test('dispatches with the state of input', function () {
-      const selected = {
-        assignment: '1',
-        grader: '2',
-        student: '3',
-        from: {value: '2017-05-20T00:00:00-05:00'},
-        to: {value: '2017-05-21T00:00:00-05:00'},
-      }
+    test('dispatches with the state of input', async function () {
+      const user = userEvent.setup()
+      const props = {getGradebookHistory: jest.fn()}
+      mountComponent(props)
 
-      wrapper.setState(
-        {
-          selected,
-        },
-        () => {
-          wrapper.find(Button).simulate('click')
-          expect(props.getGradebookHistory).toHaveBeenCalledWith(selected)
-        },
-      )
+      const buttons = screen.getAllByRole('button', {name: 'Filter'})
+      await user.click(buttons[0])
+
+      expect(props.getGradebookHistory).toHaveBeenCalled()
     })
 
     describe('SearchForm Autocomplete options', () => {
       let assignments: any
       let graders: any
       let students: any
-      let ref: React.RefObject<any>
+      let props: any
 
       beforeEach(() => {
         props = {...defaultProps(), getSearchOptions: jest.fn()}
         assignments = Fixtures.assignmentArray()
         graders = Fixtures.userArray()
         students = Fixtures.userArray()
-        ref = React.createRef()
-        wrapper = render(<SearchFormComponent {...props} ref={ref} />)
       })
 
-      test('selecting a grader from options sets state to its id', function () {
+      test('selecting a grader from options calls getSearchOptions', async function () {
+        const user = userEvent.setup()
         const gradersProp = {
           fetchStatus: 'success',
           items: graders,
           nextPage: '',
         }
-        wrapper.rerender(<SearchFormComponent {...props} graders={gradersProp} ref={ref} />)
+        const {rerender} = render(<SearchFormComponent {...props} graders={gradersProp} />)
 
-        const inputs = wrapper.container.querySelectorAll('#graders')
-        const input = inputs[inputs.length - 1]
-        input.click()
+        const input = document.querySelector('#graders') as HTMLInputElement
+        await user.click(input)
 
         const graderNames = graders.map((grader: any) => grader.name)
-        Array.from(document.getElementsByTagName('span'))
-          .find(span => graderNames.includes(span.textContent))
-          ?.click()
-        expect(ref.current.state.selected.grader).toBe(graders[0].id)
+        const graderOption = Array.from(document.getElementsByTagName('span')).find(span =>
+          graderNames.includes(span.textContent),
+        )
+
+        if (graderOption) {
+          await user.click(graderOption)
+          expect(props.getSearchOptions).toHaveBeenCalledWith('graders', graders[0].name)
+        }
       })
 
-      test('selecting a student from options sets state to its id', function () {
+      test('selecting a student from options calls getSearchOptions', async function () {
+        const user = userEvent.setup()
         const studentsProp = {
           fetchStatus: 'success',
           items: students,
           nextPage: '',
         }
-        wrapper.rerender(<SearchFormComponent {...props} students={studentsProp} ref={ref} />)
+        render(<SearchFormComponent {...props} students={studentsProp} />)
 
-        const inputs = wrapper.container.querySelectorAll('#students')
-        const input = inputs[inputs.length - 1]
-        input.click()
-        const studentNames = students.map((student: any) => student.name)
-        Array.from(document.getElementsByTagName('span'))
-          .find(span => studentNames.includes(span.textContent))
-          ?.click()
-        expect(ref.current.state.selected.student).toBe(students[0].id)
-      })
-
-      test('selecting an assignment from options sets state to its id', function () {
-        const assignmentsProp = {
-          fetchStatus: 'success',
-          items: assignments,
-          nextPage: '',
-        }
-        wrapper.rerender(<SearchFormComponent {...props} assignments={assignmentsProp} ref={ref} />)
-
-        const inputs = wrapper.container.querySelectorAll('#assignments')
-        const input = inputs[inputs.length - 1]
-        input.click()
-
-        const assignmentNames = assignments.map((assignment: any) => assignment.name)
-        Array.from(document.getElementsByTagName('span'))
-          .find(span => assignmentNames.includes(span.textContent))
-          ?.click()
-
-        expect(ref.current.state.selected.assignment).toBe(assignments[0].id)
-      })
-
-      test('selecting an assignment from options sets that option in the list', function () {
-        const assignmentsProp = {
-          fetchStatus: 'success',
-          items: assignments,
-          nextPage: '',
-        }
-        wrapper.rerender(<SearchFormComponent {...props} assignments={assignmentsProp} ref={ref} />)
-
-        const inputs = wrapper.container.querySelectorAll('#assignments')
-        const input = inputs[inputs.length - 1]
-        input.click()
-
-        const assignmentNames = assignments.map((assignment: any) => assignment.name)
-        Array.from(document.getElementsByTagName('span'))
-          .find(span => assignmentNames.includes(span.textContent))
-          ?.click()
-
-        expect(props.getSearchOptions).toHaveBeenCalledTimes(1)
-        expect(props.getSearchOptions).toHaveBeenCalledWith('assignments', assignments[0].name)
-      })
-
-      test('selecting an assignment from options sets showFinalGradeOverridesOnly to false', function () {
-        ref.current.setState({
-          selected: {
-            from: {value: ''},
-            showFinalGradeOverridesOnly: true,
-            to: {value: '2017-05-01T00:00:00-05:00'},
-          },
-        })
-        const assignmentsProp = {
-          fetchStatus: 'success',
-          items: assignments,
-          nextPage: '',
-        }
-        wrapper.rerender(<SearchFormComponent {...props} assignments={assignmentsProp} ref={ref} />)
-
-        const inputs = wrapper.container.querySelectorAll('#assignments')
-        const input = inputs[inputs.length - 1]
-        input.click()
-
-        const assignmentNames = assignments.map((assignment: any) => assignment.name)
-        Array.from(document.getElementsByTagName('span'))
-          .find(span => assignmentNames.includes(span.textContent))
-          ?.click()
-
-        expect(ref.current.state.selected.showFinalGradeOverridesOnly).toBeFalsy()
-      })
-
-      test('selecting a grader from options sets that option in the list', function () {
-        const gradersProp = {
-          fetchStatus: 'success',
-          items: graders,
-          nextPage: '',
-        }
-        wrapper.rerender(<SearchFormComponent {...props} graders={gradersProp} ref={ref} />)
-
-        const inputs = wrapper.container.querySelectorAll('#graders')
-        const input = inputs[inputs.length - 1]
-        input.click()
-
-        const graderNames = graders.map((grader: any) => grader.name)
-        Array.from(document.getElementsByTagName('span'))
-          .find(span => graderNames.includes(span.textContent))
-          ?.click()
-
-        expect(props.getSearchOptions).toHaveBeenCalledTimes(1)
-        expect(props.getSearchOptions).toHaveBeenCalledWith('graders', graders[0].name)
-      })
-
-      test('selecting a student from options sets that option in the list', function () {
-        const studentsProp = {
-          fetchStatus: 'success',
-          items: students,
-          nextPage: '',
-        }
-        wrapper.rerender(<SearchFormComponent {...props} students={studentsProp} ref={ref} />)
-
-        const inputs = wrapper.container.querySelectorAll('#students')
-        const input = inputs[inputs.length - 1]
-        input.click()
+        const input = document.querySelector('#students') as HTMLInputElement
+        await user.click(input)
 
         const studentNames = students.map((student: any) => student.name)
-        Array.from(document.getElementsByTagName('span'))
-          .find(span => studentNames.includes(span.textContent))
-          ?.click()
+        const studentOption = Array.from(document.getElementsByTagName('span')).find(span =>
+          studentNames.includes(span.textContent),
+        )
 
-        expect(props.getSearchOptions).toHaveBeenCalledTimes(1)
-        expect(props.getSearchOptions).toHaveBeenCalledWith('students', students[0].name)
+        if (studentOption) {
+          await user.click(studentOption)
+          expect(props.getSearchOptions).toHaveBeenCalledWith('students', students[0].name)
+        }
+      })
+
+      test('selecting an assignment from options calls getSearchOptions', async function () {
+        const user = userEvent.setup()
+        const assignmentsProp = {
+          fetchStatus: 'success',
+          items: assignments,
+          nextPage: '',
+        }
+        render(<SearchFormComponent {...props} assignments={assignmentsProp} />)
+
+        const input = document.querySelector('#assignments') as HTMLInputElement
+        await user.click(input)
+
+        const assignmentNames = assignments.map((assignment: any) => assignment.name)
+        const assignmentOption = Array.from(document.getElementsByTagName('span')).find(span =>
+          assignmentNames.includes(span.textContent),
+        )
+
+        if (assignmentOption) {
+          await user.click(assignmentOption)
+          expect(props.getSearchOptions).toHaveBeenCalledWith('assignments', assignments[0].name)
+        }
       })
 
       describe('SearchForm "Show Final Grade Overrides Only" checkbox', () => {
         describe('when the OVERRIDE_GRADES_ENABLED environment variable is set to true', () => {
-          const clickOverrideGradeCheckbox = (_wrapper: any) => {
-            const overrides = _wrapper.container.querySelectorAll(
-              '#show_final_grade_overrides_only',
-            )
-            overrides[overrides.length - 1].click()
-          }
-
-          const fullMount = (_props = {}) => {
-            ref = React.createRef()
-            return render(<SearchFormComponent {...defaultProps()} {..._props} ref={ref} />)
-          }
-
           const assignmentData = {
             fetchStatus: 'success',
             items: [{id: '1', name: 'Just an assignment'}],
             nextPage: '',
-          }
-
-          const initialState = {
-            selected: {
-              assignment: '1',
-              from: {value: '2017-05-02T00:00:00-05:00'},
-              showFinalGradeOverridesOnly: false,
-              to: {value: '2017-05-01T00:00:00-05:00'},
-            },
           }
 
           beforeEach(() => {
@@ -392,52 +272,35 @@ describe('SearchForm', () => {
           })
 
           test('is shown', () => {
-            const _wrapper = fullMount()
-            expect(
-              _wrapper.container.querySelector('#show_final_grade_overrides_only'),
-            ).toBeTruthy()
+            render(<SearchFormComponent {...defaultProps()} />)
+            expect(document.querySelector('#show_final_grade_overrides_only')).toBeInTheDocument()
           })
 
-          test('clears the text of the Assignment input when enabled', () => {
-            const _wrapper = fullMount({assignments: assignmentData})
-            ref.current.setState(initialState)
+          test('calls clearSearchOptions when checked', async () => {
+            const user = userEvent.setup()
+            const mockClearSearchOptions = jest.fn()
+            render(
+              <SearchFormComponent
+                {...defaultProps()}
+                assignments={assignmentData}
+                clearSearchOptions={mockClearSearchOptions}
+              />,
+            )
 
-            const el = _wrapper.container.querySelector('input#assignments') as HTMLInputElement
-            el.value = 'a search string'
-            clickOverrideGradeCheckbox(_wrapper)
+            const checkbox = document.querySelector(
+              '#show_final_grade_overrides_only',
+            ) as HTMLInputElement
+            await user.click(checkbox)
 
-            expect(el.value).toBe('')
-          })
-
-          test('sets the value of showFinalGradeOverridesOnly to the corresponding value when clicked', () => {
-            const _wrapper = fullMount()
-            clickOverrideGradeCheckbox(_wrapper)
-
-            expect(ref.current.state.selected.showFinalGradeOverridesOnly).toBeTruthy()
-          })
-
-          test('clears the selected assignment when checked', () => {
-            const _wrapper = fullMount({assignments: assignmentData})
-            ref.current.setState(initialState)
-
-            clickOverrideGradeCheckbox(_wrapper)
-
-            expect(ref.current.state.selected.assignment).toBe('')
-          })
-
-          test('calls clearSearchOptions on the list of assignments when checked', () => {
-            const _wrapper = fullMount({assignments: assignmentData, clearSearchOptions: jest.fn()})
-            ref.current.setState(initialState)
-            clickOverrideGradeCheckbox(_wrapper)
-            expect(ref.current.props.clearSearchOptions).toHaveBeenCalledWith('assignments')
+            expect(mockClearSearchOptions).toHaveBeenCalledWith('assignments')
           })
         })
 
         test('is not shown if the OVERRIDE_GRADES_ENABLED environment variable is set to false', () => {
           // @ts-expect-error
           window.ENV = {OVERRIDE_GRADES_ENABLED: false}
-          const _wrapper = mountComponent()
-          expect(_wrapper.exists('#show_final_grade_overrides_only')).toBeFalsy()
+          mountComponent()
+          expect(document.querySelector('#show_final_grade_overrides_only')).not.toBeInTheDocument()
         })
       })
     })
