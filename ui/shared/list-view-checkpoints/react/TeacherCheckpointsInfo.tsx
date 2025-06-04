@@ -119,7 +119,7 @@ const getAvailabilityText = (unlockAt: string | null, lockAt: string | null): Du
 
 const renderRequiredRepliesTitle = (assignment: AssignmentCheckpoints): string => {
   const translatedReplyToEntryRequiredCount = I18n.n(
-    assignment.discussion_topic.reply_to_entry_required_count,
+    assignment.discussion_topic?.reply_to_entry_required_count ?? 0,
   )
   return I18n.t('Required Replies (%{requiredReplies})', {
     requiredReplies: translatedReplyToEntryRequiredCount,
