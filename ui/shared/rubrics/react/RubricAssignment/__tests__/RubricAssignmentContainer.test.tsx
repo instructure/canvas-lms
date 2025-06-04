@@ -37,9 +37,12 @@ jest.mock('../queries', () => ({
   ...jest.requireActual('../queries'),
   removeRubricFromAssignment: jest.fn(),
   addRubricToAssignment: jest.fn(),
-  getGradingRubricContexts: jest.fn(),
-  getGradingRubricsForContext: jest.fn(),
-  getRubricSelfAssessmentSettings: jest.fn(),
+  getGradingRubricContexts: jest.fn().mockResolvedValue([]),
+  getGradingRubricsForContext: jest.fn().mockResolvedValue([]),
+  getRubricSelfAssessmentSettings: jest.fn().mockResolvedValue({
+    canUpdateRubricSelfAssessment: true,
+    rubricSelfAssessmentEnabled: true,
+  }),
 }))
 
 describe('RubricAssignmentContainer Tests', () => {
