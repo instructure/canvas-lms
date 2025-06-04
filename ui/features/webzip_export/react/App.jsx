@@ -21,6 +21,7 @@ import axios from '@canvas/axios'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import splitAssetString from '@canvas/util/splitAssetString'
+import {assignLocation} from '@canvas/util/globalUtils'
 import ExportList from './components/ExportList'
 import ExportInProgress from './components/ExportInProgress'
 import Errors from './components/Errors'
@@ -98,7 +99,7 @@ class WebZipExportApp extends React.Component {
   }
 
   downloadLink(link) {
-    window.location = link
+    assignLocation(link)
   }
 
   render() {
