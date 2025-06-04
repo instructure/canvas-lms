@@ -27,7 +27,7 @@ import {queryClient} from '@canvas/query'
 const defaultProps: FilePreviewTrayProps = {
   item: {
     id: '1',
-    name: 'Sample File',
+    display_name: 'Sample File',
     type: 'document',
     restricted_by_master_course: false,
   } as unknown as File,
