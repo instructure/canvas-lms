@@ -153,6 +153,31 @@ module Types
       object.root_topic ? object.root_topic.reply_to_entry_required_count : object.reply_to_entry_required_count
     end
 
+    field :submissions_connection, SubmissionType.connection_type, null: true do
+      description "submissions for this assignment"
+      argument :filter, SubmissionSearchFilterInputType, required: false
+      argument :order_by, [SubmissionSearchOrderInputType], required: false
+    end
+    def submissions_connection(filter: nil, order_by: nil)
+      return nil if current_user.nil? || object.assignment.nil?
+
+      filter = filter.to_h
+      order_by ||= []
+      filter[:states] ||= DEFAULT_SUBMISSION_STATES
+      filter[:states] = filter[:states] + ["unsubmitted"].freeze if filter[:include_unsubmitted]
+      filter[:order_by] = order_by.map(&:to_h)
+      SubmissionSearch.new(object.assignment, current_user, session, filter).search
+    end
+
+    field :checkpoints, [CheckpointType], null: true
+    def checkpoints
+      load_association(:assignment).then do |assignment|
+        if assignment&.context&.discussion_checkpoints_enabled?
+          assignment.sub_assignments
+        end
+      end
+    end
+
     field :assignment, Types::AssignmentType, null: true
     def assignment
       load_association(:assignment)
