@@ -27,6 +27,14 @@ import '@canvas/rails-flash-notifications'
 const I18n = createI18nScope('external_tools')
 
 export default class ReregisterExternalToolButton extends React.Component {
+  constructor(props) {
+    super(props)
+    this.reactModalRef = React.createRef()
+    this.lti2IframeRef = React.createRef()
+    this.reregModalRef = React.createRef()
+    this.reregisterExternalToolButtonRef = React.createRef()
+  }
+
   state = {
     tool: this.props.tool,
     modalIsOpen: false,
@@ -59,19 +67,19 @@ export default class ReregisterExternalToolButton extends React.Component {
     this.props.tool.has_update = true
     store.triggerUpdate()
     this.closeModal()
-    this.refs.reregModal.openModal(e)
+    this.reregModalRef.current.openModal(e)
   }
 
   getModal = () => (
     <Modal
-      ref="reactModal"
+      ref={this.reactModalRef}
       open={this.state.modalIsOpen}
       onDismiss={this.closeModal}
       label={I18n.t('App Reregistration')}
     >
       <Modal.Body>
         <Lti2Iframe
-          ref="lti2Iframe"
+          ref={this.lti2IframeRef}
           handleInstall={this.handleReregistration}
           registrationUrl={this.props.tool.reregistration_url}
           reregistration={true}
@@ -89,7 +97,7 @@ export default class ReregisterExternalToolButton extends React.Component {
       <a
         href="#"
         tabIndex="-1"
-        ref="reregisterExternalToolButton"
+        ref={this.reregisterExternalToolButtonRef}
         role="menuitem"
         aria-label={editAriaLabel}
         className="icon-refresh"
@@ -106,7 +114,7 @@ export default class ReregisterExternalToolButton extends React.Component {
         <li role="presentation" className="ReregisterExternalToolButton">
           {this.getButton()}
           {this.getModal()}
-          <Lti2ReregistrationUpdateModal tool={this.props.tool} ref="reregModal" />
+          <Lti2ReregistrationUpdateModal tool={this.props.tool} ref={this.reregModalRef} />
         </li>
       )
     }
