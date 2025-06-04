@@ -17,12 +17,10 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import MissingIndicator from '../MissingIndicator'
 
-it('renders an indicator with the invisible variant and a title', () => {
-  const wrapper = shallow(<MissingIndicator title="blah" />)
-  expect(wrapper.find('Indicator')).toHaveLength(1)
-  expect(wrapper.find('Indicator').prop('variant')).toBe('invisible')
-  expect(wrapper.find('Indicator').prop('title')).toBe('Missing items for blah')
+it('renders missing items message for screen readers', () => {
+  const {getByText} = render(<MissingIndicator title="blah" />)
+  expect(getByText('Missing items for blah')).toBeInTheDocument()
 })
