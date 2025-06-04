@@ -35,6 +35,16 @@ class DataRow extends React.Component {
 
   state = {showBottomBorder: false}
 
+  constructor(props) {
+    super(props)
+    this.viewContainerRef = React.createRef()
+    this.nameRef = React.createRef()
+    this.maxScoreRef = React.createRef()
+    this.minScoreRef = React.createRef()
+    this.editContainerRef = React.createRef()
+    this.nameInputRef = React.createRef()
+  }
+
   UNSAFE_componentWillReceiveProps() {
     this.setState({showBottomBorder: false})
   }
@@ -137,12 +147,12 @@ class DataRow extends React.Component {
   renderViewMode = () => (
     <tr
       className="grading_standard_row react_grading_standard_row"
-      ref="viewContainer"
+      ref={this.viewContainerRef}
       data-testid="grading-standard-row-view"
     >
       <td className="insert_row_icon_container" />
       <td className="row_name_container">
-        <div className="name" ref="name" data-testid="row-name">
+        <div className="name" ref={this.nameRef} data-testid="row-name">
           {this.getRowData().name}
         </div>
       </td>
@@ -150,7 +160,7 @@ class DataRow extends React.Component {
         <div>
           <span
             className="max_score"
-            ref="maxScore"
+            ref={this.maxScoreRef}
             title="Upper limit of range"
             data-testid="max-score"
           >
@@ -160,7 +170,7 @@ class DataRow extends React.Component {
       </td>
       <td className="row_cell">
         <div>
-          <span className="range_to" ref="minScore" data-testid="min-score">
+          <span className="range_to" ref={this.minScoreRef} data-testid="min-score">
             {I18n.t('to %{minScore}%', {minScore: this.renderMinScore()})}
           </span>
           <span className="min_score" />
@@ -177,7 +187,7 @@ class DataRow extends React.Component {
           ? 'grading_standard_row react_grading_standard_row border_below'
           : 'grading_standard_row react_grading_standard_row'
       }
-      ref="editContainer"
+      ref={this.editContainerRef}
       data-testid="grading-standard-row-edit"
     >
       <td className="insert_row_icon_container">{this.renderInsertRowButton()}</td>
@@ -185,7 +195,7 @@ class DataRow extends React.Component {
         <div>
           <input
             type="text"
-            ref="nameInput"
+            ref={this.nameInputRef}
             onChange={this.triggerRowNameChange}
             className="standard_name"
             title={I18n.t('Range name')}
