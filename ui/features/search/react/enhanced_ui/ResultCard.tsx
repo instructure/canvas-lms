@@ -28,7 +28,7 @@ import {
   IconDiscussionLine,
   IconModuleLine,
   IconCalendarMonthLine,
-  IconUnpublishLine,
+  IconUnpublishedLine,
 } from '@instructure/ui-icons'
 import type {Module, Result} from '../types'
 import {htmlEscape} from '@instructure/html-escape'
@@ -108,7 +108,7 @@ export default function ResultCard(props: Props) {
     }
     if (published === false) {
       publishPill = (
-        <Pill data-testid={`${id}-publish`} renderIcon={<IconUnpublishLine />}>
+        <Pill data-testid={`${id}-publish`} renderIcon={<IconUnpublishedLine />}>
           {I18n.t('Unpublished')}
         </Pill>
       )
