@@ -1248,6 +1248,7 @@ describe "Files API", type: :request do
 
     it "passes along given verifiers when creating the enhanced_preview_url" do
       user_session(@user)
+      @att.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
       get @file_path + "?include[]=enhanced_preview_url&verifier=#{@att.uuid}"
       expect(response).to be_successful
       json = json_parse

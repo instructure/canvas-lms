@@ -48,8 +48,8 @@ module Api::V1::SubmissionComment
 
     if submission_comment.media_comment?
       sc_hash["media_comment"] = media_comment_json(
-        media_id: submission_comment.media_comment_id,
-        media_type: submission_comment.media_comment_type
+        { media_id: submission_comment.media_comment_id,
+          media_type: submission_comment.media_comment_type }
       )
     end
 

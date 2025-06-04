@@ -549,7 +549,7 @@ module Api
     end
   end
 
-  def media_comment_json(media_object_or_hash)
+  def media_comment_json(media_object_or_hash, location: nil)
     media_object_or_hash = OpenStruct.new(media_object_or_hash) if media_object_or_hash.is_a?(Hash)
     convert_media_type = Attachment.mime_class(media_object_or_hash.media_type)
     {
@@ -560,7 +560,8 @@ module Api
       "url" => user_media_download_url(user_id: @current_user.id,
                                        entryId: media_object_or_hash.media_id,
                                        type: "mp4",
-                                       redirect: "1")
+                                       redirect: "1",
+                                       location:)
     }
   end
 
