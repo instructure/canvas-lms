@@ -19,9 +19,6 @@
 import jQuery from 'jquery'
 import 'jquery.cookie'
 import {submitHtmlForm} from '../submitHtmlForm'
-import sinon from 'sinon'
-
-const sandbox = sinon.createSandbox()
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toBe(y)
@@ -30,23 +27,36 @@ const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
 document.body.appendChild(container)
 
-let action, method, md5, csrfToken, triggerStub
+let action, method, md5, csrfToken
+let appendToSpy, triggerMock
 
 function getForm() {
   submitHtmlForm(action, method, md5)
-  return jQuery.fn.appendTo.firstCall.thisValue
+  // The form is the jQuery object that appendTo was called on
+  return appendToSpy.mock.instances[0]
 }
 
 describe('submitHtmlForm', () => {
-  beforeAll(() => {
-    sandbox.spy(jQuery.fn, 'appendTo')
-    sandbox.stub(jQuery.fn, 'submit')
-    triggerStub = sandbox.stub(jQuery.fn, 'trigger')
+  beforeEach(() => {
+    // Reset mocks before each test to ensure clean state
+    appendToSpy = jest.spyOn(jQuery.fn, 'appendTo').mockImplementation(function () {
+      return this
+    })
+    jest.spyOn(jQuery.fn, 'submit').mockImplementation(function () {
+      return this
+    })
+    triggerMock = jest.spyOn(jQuery.fn, 'trigger').mockImplementation(function () {
+      return this
+    })
     action = '/foo'
     method = 'PUT'
     md5 = '0123456789abcdef0123456789abcdef'
     csrfToken = 'csrftoken'
-    sandbox.stub(jQuery, 'cookie').returns(csrfToken)
+    jest.spyOn(jQuery, 'cookie').mockReturnValue(csrfToken)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   test('sets action', () => {
@@ -83,11 +93,17 @@ describe('submitHtmlForm', () => {
 
   test('appends form to body', () => {
     submitHtmlForm(action, method, md5)
-    ok(jQuery.fn.appendTo.calledWith('body'), 'appends form to body')
+    ok(
+      appendToSpy.mock.calls.some(call => call[0] === 'body'),
+      'appends form to body',
+    )
   })
 
   test('submits the form', () => {
     getForm()
-    ok(triggerStub.calledWith('submit'), 'submit event triggered')
+    ok(
+      triggerMock.mock.calls.some(call => call[0] === 'submit'),
+      'submit event triggered',
+    )
   })
 })
