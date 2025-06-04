@@ -50,10 +50,12 @@ const defaultInitialState = () => ({
   roles: ROLES,
   permissions: PERMISSIONS,
   apiBusy: [],
-  trays: {
-    roleTray: {open: false},
-    permissionTray: {open: false},
-  },
+  selectedRoles: [],
+  activeRoleTray: null,
+  activeAddTray: null,
+  activePermissionTray: null,
+  contextId: '',
+  nextFocus: {permissionName: null, roleId: null, targetArea: null},
 })
 
 const createStateWithGranulars = () => ({
