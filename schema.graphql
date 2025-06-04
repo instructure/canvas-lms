@@ -4486,6 +4486,7 @@ type Group implements AssetString & LegacyIDInterface & Node & Timestamped {
   name: String
   nonCollaborative: Boolean
   sisId: String
+  state: GroupState!
   updatedAt: DateTime
 }
 
@@ -4661,6 +4662,11 @@ type GroupSetEdge {
   The item at the end of the edge.
   """
   node: GroupSet
+}
+
+enum GroupState {
+  available
+  deleted
 }
 
 """
