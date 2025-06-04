@@ -57,6 +57,19 @@ export const MODULE_ITEMS_STUDENT_QUERY = gql`
               todoDate
               discussionType
               published
+              replyToEntryRequiredCount
+              submissionsConnection(filter: {includeUnsubmitted: true}) {
+                nodes {
+                  _id
+                  cachedDueDate
+                  missing
+                }
+              }
+              checkpoints {
+                dueAt(applyOverrides: true)
+                name
+                tag
+              }
             }
             ... on File {
               _id
