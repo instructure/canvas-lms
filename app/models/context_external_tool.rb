@@ -1392,6 +1392,10 @@ class ContextExternalTool < ActiveRecord::Base
     ).delete_suffix("/deployment")
   end
 
+  def eula_launch_url
+    extension_setting(:ActivityAssetProcessor, :eula)&.dig("target_link_uri") || launch_url
+  end
+
   private
 
   # Locally and in OSS installations, this can be configured in config/dynamic_settings.yml.
