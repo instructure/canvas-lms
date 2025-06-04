@@ -19,6 +19,15 @@
 import React from 'react'
 import AbstractTextQuestion from './abstract_text_question'
 
-const Calculated = props => <AbstractTextQuestion {...props} />
+interface CalculatedProps {
+  responses: number
+  participantCount: number
+  questionText: string
+  position: number
+  answers: unknown[]
+  linkButtonComponent?: React.ReactNode
+}
+
+const Calculated = (props: CalculatedProps) => <AbstractTextQuestion {...props} />
 
 export default Calculated
