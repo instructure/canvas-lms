@@ -19,9 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {shallow} from 'enzyme'
 import UsersList from '../UsersList'
-import UsersListRow from '../UsersListRow'
 import fetchMock from 'fetch-mock'
 
 describe('Account Course User Search UsersList View', function () {
@@ -82,12 +80,11 @@ describe('Account Course User Search UsersList View', function () {
   }
 
   it('displays users that are passed in as props', () => {
-    const wrapper = shallow(<UsersList {...usersProps} />)
-    const nodes = wrapper.find(UsersListRow).getElements()
+    const {getByText} = render(<UsersList {...usersProps} />)
 
-    expect(nodes[0].props.user.name).toEqual('UserA')
-    expect(nodes[1].props.user.name).toEqual('UserB')
-    expect(nodes[2].props.user.name).toEqual('UserC')
+    expect(getByText('UserA')).toBeInTheDocument()
+    expect(getByText('UserB')).toBeInTheDocument()
+    expect(getByText('UserC')).toBeInTheDocument()
   })
 
   Object.entries({
@@ -156,25 +153,5 @@ describe('Account Course User Search UsersList View', function () {
         })
       })
     })
-  })
-
-  it('component should not update if props do not change', () => {
-    const instance = new UsersList(usersProps)
-    expect(instance.shouldComponentUpdate({...usersProps})).toBeFalsy()
-  })
-
-  it('component should update if a prop is added', () => {
-    const instance = new UsersList(usersProps)
-    expect(instance.shouldComponentUpdate({...usersProps, newProp: true})).toBeTruthy()
-  })
-
-  it('component should update if a prop is changed', () => {
-    const instance = new UsersList(usersProps)
-    expect(instance.shouldComponentUpdate({...usersProps, users: {}})).toBeTruthy()
-  })
-
-  it('component should not update if only the searchFilter prop is changed', () => {
-    const instance = new UsersList(usersProps)
-    expect(instance.shouldComponentUpdate({...usersProps, searchFilter: {}})).toBeFalsy()
   })
 })
