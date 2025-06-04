@@ -30,7 +30,10 @@ module Lti
     def launch_eula
       @lti_launch = create_and_log_launch(
         message_type: LtiAdvantage::Messages::EulaRequest::MESSAGE_TYPE,
-        return_url: url_for(context)
+        return_url: url_for(context),
+        adapter_opts: {
+          launch_url: tool.eula_launch_url,
+        }
       )
       render Lti::AppUtil.display_template("borderless")
     end
