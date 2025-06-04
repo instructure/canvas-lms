@@ -1922,7 +1922,9 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def touch_assignment_and_submittable
+    self.skip_schedule_peer_reviews = true
     touch
+    self.skip_schedule_peer_reviews = nil
     submittable_object&.touch
     if submittable_object.is_a?(DiscussionTopic) && submittable_object.root_topic?
       submittable_object.child_topics.touch_all

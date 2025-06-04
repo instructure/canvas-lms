@@ -5443,6 +5443,14 @@ describe Assignment do
           end
         end
       end
+
+      context "touch_assignment_and_submittables" do
+        it "does not schedule 'do_auto_peer_review' job" do
+          expects_job_with_tag("Assignment#do_auto_peer_review", 0) do
+            @assignment.touch_assignment_and_submittable
+          end
+        end
+      end
     end
   end
 
