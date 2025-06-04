@@ -200,6 +200,7 @@ describe('Course paces actions', () => {
     })
 
     it('stops polling and displays an error message if checking the progress API fails', async () => {
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
       const getState = () => ({
         ...DEFAULT_STORE_STATE,
         coursePace: {...DEFAULT_STORE_STATE.coursePace, publishingProgress: {...PROGRESS_RUNNING}},
@@ -213,6 +214,7 @@ describe('Course paces actions', () => {
         [uiActions.setCategoryError('checkPublishStatus', error?.toString())],
       ])
       expect(setTimeout).not.toHaveBeenCalled()
+      consoleSpy.mockRestore()
     })
   })
 
@@ -302,6 +304,7 @@ describe('Course paces actions', () => {
     })
 
     it('Sets an error message if compression fails', async () => {
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
       const updatedPace = {...PRIMARY_PACE}
       const error = new Error('Whoops!')
       const getState = mockGetState(updatedPace, PRIMARY_PACE)
@@ -318,6 +321,7 @@ describe('Course paces actions', () => {
         [uiActions.hideLoadingOverlay()],
         [uiActions.setCategoryError('compress', error.toString())],
       ])
+      consoleSpy.mockRestore()
     })
   })
 
