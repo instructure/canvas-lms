@@ -33,8 +33,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
-import {IconEyeLine, IconAiSolid} from '@instructure/ui-icons'
-import {IgniteAiIcon} from '@canvas/ignite-ai-icon/react/IgniteAiIcon'
+import {IconEyeLine, IconAiSolid, IconAiColoredSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {RubricCriteriaRow} from './RubricCriteriaRow'
@@ -615,7 +614,7 @@ export const RubricForm = ({
             >
               <Heading level="h4">
                 <Flex alignItems="center" gap="small">
-                  <IgniteAiIcon />
+                  <IconAiColoredSolid />
                   <Text>{I18n.t('Auto-Generate Criteria')}</Text>
                 </Flex>
               </Heading>
@@ -730,17 +729,15 @@ export const RubricForm = ({
                   />
                 </Flex.Item>
                 <Flex.Item>
-                  <span className="instui-button-ignite-ai-gradient">
-                    <Button
-                      onClick={handleGenerateButton}
-                      data-testid="generate-criteria-button"
-                      color="primary"
-                      renderIcon={<IconAiSolid />}
-                      disabled={generateCriteriaForm.additionalPromptInfo.length > 1000}
-                    >
-                      {I18n.t('Generate Criteria')}
-                    </Button>
-                  </span>
+                  <Button
+                    onClick={handleGenerateButton}
+                    data-testid="generate-criteria-button"
+                    color="ai-primary"
+                    renderIcon={<IconAiSolid />}
+                    disabled={generateCriteriaForm.additionalPromptInfo.length > 1000}
+                  >
+                    {I18n.t('Generate Criteria')}
+                  </Button>
                 </Flex.Item>
               </Flex>
             </View>
@@ -759,7 +756,7 @@ export const RubricForm = ({
                 <Flex.Item>
                   <Heading level="h4">
                     <Flex alignItems="center" gap="small">
-                      <IgniteAiIcon />
+                      <IconAiColoredSolid />
                       <Text>{I18n.t('Auto-Generate Criteria')}</Text>
                     </Flex>
                   </Heading>

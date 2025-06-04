@@ -431,23 +431,3 @@ input[type="button"] {
   white-space: nowrap;
   border-radius: 4px;
 }
-
-// "IgniteAI" button branding
-// ---------------------------------------------------
-//
-// This is a hack (requested by leadership) until it is available in inst-ui.
-// Add the class to a span around the inst-ui button.
-.instui-button-ignite-ai-gradient>button>span {
-  background: linear-gradient(#7F61B3, #32759C);
-  border-color: #764CA9;
-}
-
-.instui-button-ignite-ai-gradient>button:hover>span {
-  background: linear-gradient(#644f8c, #30506a) !important;
-  border-color: #764CA9;
-}
-
-.instui-button-ignite-ai-gradient>button:disabled>span {
-  background: linear-gradient(#b2a3ca, #8faabe) !important;
-  border: none;
-}
