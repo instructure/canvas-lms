@@ -18,11 +18,12 @@
 
 import {isEmpty} from 'lodash'
 import ProgressStore from '../ProgressStore'
-import sinon from 'sinon'
+import $ from 'jquery'
+
+jest.mock('jquery')
 
 let progress_id
 let progress
-let server
 
 describe('ProgressStoreSpec', () => {
   beforeEach(() => {
@@ -36,25 +37,26 @@ describe('ProgressStoreSpec', () => {
       completion: 0,
       workflow_state: 'queued',
     }
-    server = sinon.fakeServer.create()
   })
 
   afterEach(() => {
     ProgressStore.clearState()
-    server.restore()
+    jest.clearAllMocks()
   })
 
   it('get', function () {
-    server.respondWith('GET', `/api/v1/progress/${progress_id}`, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(progress),
-    ])
+    $.getJSON.mockImplementation((url, callback) => {
+      if (url === `/api/v1/progress/${progress_id}`) {
+        callback(progress)
+      }
+    })
+
     // precondition
     expect(isEmpty(ProgressStore.getState())).toBeTruthy()
     ProgressStore.get(progress_id)
-    server.respond()
+
     const state = ProgressStore.getState()
     expect(state[progress.id]).toEqual(progress)
+    expect($.getJSON).toHaveBeenCalledWith(`/api/v1/progress/${progress_id}`, expect.any(Function))
   })
 })
