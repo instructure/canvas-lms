@@ -43,28 +43,11 @@ function bold(text) {
   return colorize('bold', text)
 }
 
-const sections = {
-  skipped: 'skipped',
-  enzyme: 'enzyme',
-  reactStringRefs: 'string-refs',
-  propTypes: 'proptypes',
-  defaultProps: 'defaultprops',
-  handlebars: 'handlebars',
-  jquery: 'jquery',
-  sinon: 'sinon',
-  reactDom: 'reactdom',
-  classComponents: 'class',
-  javascript: 'javascript',
-  typescript: 'typescript',
-  outdatedPackages: 'outdated',
-  reactCompiler: 'react-compiler',
-}
-
 // Parse command line arguments
 function parseArgs() {
   const args = process.argv.slice(2)
   const options = {
-    section: null,
+    sections: [],
     verbose: false,
     help: false,
   }
@@ -83,7 +66,9 @@ function parseArgs() {
       case '-s':
       case '--section':
         if (i + 1 < args.length) {
-          options.section = args[i + 1]
+          // Split by comma to support multiple sections
+          const sectionArg = args[i + 1]
+          options.sections = sectionArg.split(',').map(s => s.trim())
           i++ // Skip the next argument since we used it
         }
         break
@@ -100,7 +85,7 @@ Usage: node techdebt_stats.js [options]
 Options:
   -h, --help                Show this help message
   -v, --verbose            Show all files instead of just examples
-  -s, --section <name>     Show only a specific section
+  -s, --section <n>     Show only specific section(s), comma-separated (e.g., skipped,enzyme)
 
 Available sections:
   skipped         - Skipped tests
@@ -891,76 +876,76 @@ async function printDashboard() {
 
     console.log(bold(colorize('green', '\nTech Debt Summary\n')))
 
-    const selectedSection = options.section
+    const selectedSections = options.sections
     const verbose = options.verbose
 
-    if (!selectedSection || selectedSection === 'skipped') {
+    if (selectedSections.length === 0 || selectedSections.includes('skipped')) {
       console.log(getSectionTitle('skipped'))
       await countSkippedTests(verbose)
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'enzyme') {
+    if (selectedSections.length === 0 || selectedSections.includes('enzyme')) {
       console.log(getSectionTitle('enzyme'))
       await showEnzymeImportStats(verbose)
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'string-refs') {
+    if (selectedSections.length === 0 || selectedSections.includes('string-refs')) {
       console.log(getSectionTitle('string-refs'))
       await showReactStringRefStats(verbose)
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'proptypes') {
+    if (selectedSections.length === 0 || selectedSections.includes('proptypes')) {
       console.log(getSectionTitle('proptypes'))
       await showPropTypesStats(verbose)
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'defaultprops') {
+    if (selectedSections.length === 0 || selectedSections.includes('defaultprops')) {
       console.log(getSectionTitle('defaultprops'))
       await showDefaultPropsStats(verbose)
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'handlebars') {
+    if (selectedSections.length === 0 || selectedSections.includes('handlebars')) {
       console.log(getSectionTitle('handlebars'))
       await countAndShowFiles('\\.handlebars$', 'Total Handlebars files', verbose)
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'jquery') {
+    if (selectedSections.length === 0 || selectedSections.includes('jquery')) {
       console.log(getSectionTitle('jquery'))
       await showJqueryImportStats(verbose)
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'sinon') {
+    if (selectedSections.length === 0 || selectedSections.includes('sinon')) {
       console.log(getSectionTitle('sinon'))
       await showSinonImportStats(verbose)
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'reactdom') {
+    if (selectedSections.length === 0 || selectedSections.includes('reactdom')) {
       console.log(getSectionTitle('reactdom'))
       await countReactDomRenderFiles(verbose)
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'class') {
+    if (selectedSections.length === 0 || selectedSections.includes('class')) {
       console.log(getSectionTitle('class'))
       await countReactClassComponentFiles(verbose)
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'javascript') {
+    if (selectedSections.length === 0 || selectedSections.includes('javascript')) {
       console.log(getSectionTitle('javascript'))
       await countAndShowFiles('\\.(js|jsx)$', 'Total JavaScript files', verbose)
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'typescript') {
+    if (selectedSections.length === 0 || selectedSections.includes('typescript')) {
       console.log(getSectionTitle('typescript'))
       await showTsSuppressionStats('ts-nocheck', verbose)
       await showTsSuppressionStats('ts-ignore', verbose)
@@ -968,16 +953,17 @@ async function printDashboard() {
       console.log()
     }
 
-    if (!selectedSection || selectedSection === 'outdated') {
+    if (selectedSections.length === 0 || selectedSections.includes('outdated')) {
       console.log(getSectionTitle('outdated'))
       console.log()
       await checkOutdatedPackages(verbose)
+      console.log()
     }
 
-    if (!selectedSection || selectedSection === 'react-compiler') {
-      console.log(getSectionTitle('react-compiler'))
-      await showReactCompilerViolationStats(verbose)
+    if (selectedSections.length === 0 || selectedSections.includes('react-compiler')) {
+      console.log(getSectionTitle('reactCompiler'))
       console.log()
+      await showReactCompilerViolationStats(verbose)
     }
   } catch (error) {
     console.error(colorize('red', `Error: ${error.message}`))
