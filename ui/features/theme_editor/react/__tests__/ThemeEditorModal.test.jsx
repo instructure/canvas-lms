@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import ThemeEditorModal from '../ThemeEditorModal'
 
 describe('ThemeEditorModal Component', () => {
@@ -30,26 +30,30 @@ describe('ThemeEditorModal Component', () => {
 
   test('modalOpen', () => {
     // Test when modal is closed
-    expect(shallow(<ThemeEditorModal {...defaultProps} />).prop('open')).toBeFalsy()
-
-    // Test when modal is open due to `showProgressModal`
-    expect(
-      shallow(<ThemeEditorModal {...defaultProps} showProgressModal={true} />).prop('open'),
-    ).toBeTruthy()
-
-    // Test when modal is open due to `showSubAccountProgress`
-    expect(
-      shallow(<ThemeEditorModal {...defaultProps} showSubAccountProgress={true} />).prop('open'),
-    ).toBeTruthy()
+    const {queryByRole} = render(<ThemeEditorModal {...defaultProps} />)
+    expect(queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  test('modalContent', () => {
-    // Test for ProgressBar when `showProgressModal` is true
-    let wrapper = shallow(<ThemeEditorModal {...defaultProps} showProgressModal={true} />)
-    expect(wrapper.find('ProgressBar').prop('title')).toBe('1% complete')
+  test('modal opens when showProgressModal is true', () => {
+    const {getByRole} = render(<ThemeEditorModal {...defaultProps} showProgressModal={true} />)
+    expect(getByRole('dialog')).toBeInTheDocument()
+  })
 
-    // Test for text content when `showSubAccountProgress` is true
-    wrapper = shallow(<ThemeEditorModal {...defaultProps} showSubAccountProgress={true} />)
-    expect(wrapper.find('p').text()).toBe('Changes will still apply if you leave this page.')
+  test('modal opens when showSubAccountProgress is true', () => {
+    const {getByRole} = render(<ThemeEditorModal {...defaultProps} showSubAccountProgress={true} />)
+    expect(getByRole('dialog')).toBeInTheDocument()
+  })
+
+  test('shows progress content when showProgressModal is true', () => {
+    const {getByText, getByRole} = render(
+      <ThemeEditorModal {...defaultProps} showProgressModal={true} />,
+    )
+    expect(getByText('Generating preview...')).toBeInTheDocument()
+    expect(getByRole('progressbar')).toBeInTheDocument()
+  })
+
+  test('shows sub-account content when showSubAccountProgress is true', () => {
+    const {getByText} = render(<ThemeEditorModal {...defaultProps} showSubAccountProgress={true} />)
+    expect(getByText('Changes will still apply if you leave this page.')).toBeInTheDocument()
   })
 })
