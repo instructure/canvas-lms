@@ -106,6 +106,8 @@ class AttachmentAssociation < ActiveRecord::Base
                       association.context.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
                     elsif association.context.respond_to?(:root_account)
                       association.context.root_account.feature_enabled?(:file_association_access)
+                    elsif association.context.is_a?(ConversationMessage)
+                      association.context.root_account_feature_enabled?(:file_association_access)
                     end
 
     feature_is_on && association.context&.grants_right?(user, session, right_to_check)

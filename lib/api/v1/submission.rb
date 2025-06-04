@@ -278,8 +278,8 @@ module Api::V1::Submission
     unless attempt.media_comment_id.blank?
       hash["media_comment"] =
         media_comment_json(
-          media_id: attempt.media_comment_id,
-          media_type: attempt.media_comment_type
+          { media_id: attempt.media_comment_id,
+            media_type: attempt.media_comment_type }
         )
     end
 
