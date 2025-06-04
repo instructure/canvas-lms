@@ -59,6 +59,28 @@ describe('generateFolderByPathUrl', () => {
       `/api/v1/${expectedPluralContextType}/${expectedContextId}/folders/by_path/${expectedPath}`,
     )
   })
+
+  it('returns the correct url when path includes % character', () => {
+    // some folder/this%could+be bad?maybe
+    // % character is encoded as &#37; in html
+    const path = 'some folder/this&#37;could+be bad?maybe'
+    const expectedPath = 'some%20folder/this%25could%2Bbe%20bad%3Fmaybe'
+    const url = generateFolderByPathUrl(expectedPluralContextType, expectedContextId, path)
+    expect(url).toBe(
+      `/api/v1/${expectedPluralContextType}/${expectedContextId}/folders/by_path/${expectedPath}`,
+    )
+  })
+
+  it('returns the correct url when path includes multiple % characters', () => {
+    // folder name = %%
+    // % character is encoded as &#37; in html
+    const path = '&#37;&#37;'
+    const expectedPath = '%25%25'
+    const url = generateFolderByPathUrl(expectedPluralContextType, expectedContextId, path)
+    expect(url).toBe(
+      `/api/v1/${expectedPluralContextType}/${expectedContextId}/folders/by_path/${expectedPath}`,
+    )
+  })
 })
 
 describe('generateFilesQuotaUrl', () => {
