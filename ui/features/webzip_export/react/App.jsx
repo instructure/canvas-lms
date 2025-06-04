@@ -32,11 +32,11 @@ class WebZipExportApp extends React.Component {
   static webZipFormat(webZipExports, newExportId = null) {
     return webZipExports
       .map(webZipExport => {
-        const url = webZipExport.zip_attachment ? webZipExport.zip_attachment.url : null
+        const url = webZipExport.zip_attachment ? webZipExport.zip_attachment.url : ''
         const isNewExport = newExportId === webZipExport.progress_id
         return {
           date: webZipExport.created_at,
-          link: url,
+          link: url || '',
           workflowState: webZipExport.workflow_state,
           progressId: webZipExport.progress_id,
           newExport: isNewExport,
