@@ -53,7 +53,6 @@ describe('LockToggle component', () => {
     const props = defaultProps()
     props.isLocked = true
     const tree = render(<LockToggle {...props} />)
-    console.log(tree.container.innerHTML)
     const node = tree.container.querySelector('svg[name="IconBlueprintLock"]')
     expect(node).toBeTruthy()
   })
@@ -62,7 +61,6 @@ describe('LockToggle component', () => {
     const props = defaultProps()
     props.isLocked = false
     const tree = render(<LockToggle {...props} />)
-    console.log(tree.container.innerHTML)
     const node = tree.container.querySelector('svg[name="IconBlueprint"]')
     expect(node).toBeTruthy()
   })
