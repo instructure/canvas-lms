@@ -20,11 +20,14 @@ import React from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {string} from 'prop-types'
 
 const I18n = createI18nScope('course_people')
 
-const RosterTableRowMenuButton = ({name}) => {
+interface RosterTableRowMenuButtonProps {
+  name: string
+}
+
+const RosterTableRowMenuButton: React.FC<RosterTableRowMenuButtonProps> = ({name}) => {
   return (
     <IconButton
       renderIcon={<IconMoreLine />}
@@ -34,11 +37,5 @@ const RosterTableRowMenuButton = ({name}) => {
     />
   )
 }
-
-RosterTableRowMenuButton.propTypes = {
-  name: string.isRequired,
-}
-
-RosterTableRowMenuButton.defaultProps = {}
 
 export default RosterTableRowMenuButton
