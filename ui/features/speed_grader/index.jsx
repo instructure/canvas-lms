@@ -144,7 +144,6 @@ ready(() => {
         postMessageAliases,
         context: {
           userId: window.ENV.current_user_id,
-          grading_role: window.ENV.grading_role,
           assignmentId: params.get('assignment_id'),
           studentId: params.get('student_id'),
           hrefs: {
