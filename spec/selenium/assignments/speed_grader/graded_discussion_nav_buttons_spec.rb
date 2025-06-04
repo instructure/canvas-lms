@@ -79,6 +79,7 @@ describe "Screenreader Gradebook grading" do
     context "sort_order asc" do
       it "goes to last entry", :ignore_js_errors do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_first_entry.id}"
+        expect(f("#submitted_at_label").text).to eq(format_time_for_view(@student_2_first_entry.created_at))
         f("button[title='Settings']").click
         fj("[class*='menuItem__label']:contains('Options')").click
         fj("label:contains('Show replies in context')").click
@@ -89,21 +90,32 @@ describe "Screenreader Gradebook grading" do
         expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
         expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
         expect(f("body").text).to include("Reply 1 of 6")
+        expect(f("#submitted_at_label").text).to eq(format_time_for_view(@student_2_first_entry.created_at))
+
+        saved_window = driver.window_handle
+
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          expect(f("body").text).to include("reply to topic i0")
+        end
+
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load
+        Speedgrader.wait_for_first_reply_button
+        expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
+        expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
+        expect(f("button[data-testid='discussions-next-reply-button']")).to be_enabled
+        expect(f("button[data-testid='discussions-last-reply-button']")).to be_enabled
 
         f("button[data-testid='discussions-last-reply-button']").click
         expect(f("body").text).to include("Reply 6 of 6")
 
-        # we are not doing anything inside the iframes yet, the buttons are reliant
-        # on their contents to load, though
-        Speedgrader.wait_for_all_speedgrader_iframes_to_load
-        Speedgrader.wait_for_first_reply_button
-        expect(f("button[data-testid='discussions-first-reply-button']")).to be_enabled
-        expect(f("button[data-testid='discussions-previous-reply-button']")).to be_enabled
-        expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
-        expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
-
         Speedgrader.wait_for_all_speedgrader_iframes_to_load do
           expect(f("body").text).to include("reply to topic j2")
+          driver.switch_to.window saved_window
+          expect(f("button[data-testid='discussions-first-reply-button']")).to be_enabled
+          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_enabled
+          expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
+          expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
+          expect(f("#submitted_at_label").text).to eq(format_time_for_view(@student_2_last_entry.created_at))
         end
       end
 
@@ -120,19 +132,33 @@ describe "Screenreader Gradebook grading" do
         expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
         expect(f("body").text).to include("Reply 6 of 6")
 
+        saved_window = driver.window_handle
+
+        Speedgrader.wait_for_all_speedgrader_iframes_to_load do
+          expect(f("body").text).to include("reply to topic j2")
+          driver.switch_to.window saved_window
+          expect(f("#submitted_at_label").text).to eq(format_time_for_view(@student_2_last_entry.created_at))
+        end
+
         Speedgrader.wait_for_all_speedgrader_iframes_to_load
         Speedgrader.wait_for_first_reply_button
+        expect(f("button[data-testid='discussions-first-reply-button']")).to be_enabled
+        expect(f("button[data-testid='discussions-previous-reply-button']")).to be_enabled
+        expect(f("button[data-testid='discussions-next-reply-button']")).to be_disabled
+        expect(f("button[data-testid='discussions-last-reply-button']")).to be_disabled
+
         f("button[data-testid='discussions-first-reply-button']").click
         expect(f("body").text).to include("Reply 1 of 6")
 
-        expect(f("button[data-testid='discussions-last-reply-button']")).to be_enabled
-        expect(f("button[data-testid='discussions-next-reply-button']")).to be_enabled
-        expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
-        expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
-
         Speedgrader.wait_for_all_speedgrader_iframes_to_load do
           wait_for(timeout: 5, method: nil) { f("div[data-testid='isHighlighted']") }
-          expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i0")
+          expect(f("body").text).to include("reply to topic i0")
+          driver.switch_to.window saved_window
+          expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
+          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
+          expect(f("button[data-testid='discussions-next-reply-button']")).to be_enabled
+          expect(f("button[data-testid='discussions-last-reply-button']")).to be_enabled
+          expect(f("#submitted_at_label").text).to eq(format_time_for_view(@student_2_first_entry.created_at))
         end
       end
     end
@@ -213,9 +239,14 @@ describe "Screenreader Gradebook grading" do
       expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
       expect(f("button[data-testid='discussions-first-reply-button']")).to be_disabled
       expect(f("button[data-testid='discussions-previous-reply-button']")).to be_disabled
+
+      saved_window = driver.window_handle
+
       Speedgrader.wait_for_all_speedgrader_iframes_to_load do
         expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
         expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i0")
+        driver.switch_to.window saved_window
+        expect(f("#submitted_at_label").text).to eq(format_time_for_view(@student_2_first_entry.created_at))
       end
       expect(f("body").text).to include("Reply 1 of 7")
 
@@ -223,6 +254,8 @@ describe "Screenreader Gradebook grading" do
       Speedgrader.wait_for_all_speedgrader_iframes_to_load do
         expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
         expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i1")
+        driver.switch_to.window saved_window
+        expect(f("#submitted_at_label").text).to eq(format_time_for_view(DiscussionEntry.where(message: " reply to entry i1 ").first.created_at))
       end
       expect(f("body").text).to include("Reply 2 of 7")
 
@@ -230,6 +263,8 @@ describe "Screenreader Gradebook grading" do
       Speedgrader.wait_for_all_speedgrader_iframes_to_load do
         expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
         expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i2")
+        driver.switch_to.window saved_window
+        expect(f("#submitted_at_label").text).to eq(format_time_for_view(DiscussionEntry.where(message: " reply to entry i2 ").first.created_at))
       end
       expect(f("body").text).to include("Reply 3 of 7")
 
@@ -237,6 +272,8 @@ describe "Screenreader Gradebook grading" do
       Speedgrader.wait_for_all_speedgrader_iframes_to_load do
         expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
         expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i1")
+        driver.switch_to.window saved_window
+        expect(f("#submitted_at_label").text).to eq(format_time_for_view(DiscussionEntry.where(message: " reply to entry i1 ").first.created_at))
       end
       expect(f("body").text).to include("Reply 2 of 7")
 
@@ -244,6 +281,8 @@ describe "Screenreader Gradebook grading" do
       Speedgrader.wait_for_all_speedgrader_iframes_to_load do
         expect(f("div[data-testid='isHighlighted']").text).to include(@student1.name)
         expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic i0")
+        driver.switch_to.window saved_window
+        expect(f("#submitted_at_label").text).to eq(format_time_for_view(DiscussionEntry.where(message: " reply to entry i0 ").first.created_at))
       end
 
       expect(f("body").text).to include("Reply 1 of 7")

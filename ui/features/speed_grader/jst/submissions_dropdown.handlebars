@@ -1,7 +1,7 @@
 {{#if singleSubmission}}
   {{#each submissions}}
     {{#if ../showSubmissionStatus}}
-      {{#t "submitted"}}<label>Submitted:</label> {{submittedAt}}{{proxy_submitter_label_text}}{{/t}}
+      {{#t "submitted"}}<label>Submitted:</label> <span id="submitted_at_label">{{submittedAt}}{{proxy_submitter_label_text}}</span>{{/t}}
     {{/if}}
     {{#if custom_grade_status_id}}
       <span class="submission-custom-grade-status-pill-{{custom_grade_status_id}}"></span>
