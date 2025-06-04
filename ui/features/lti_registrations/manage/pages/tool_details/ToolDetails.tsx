@@ -105,9 +105,9 @@ export const ToolDetailsRequest = ({
 export type ToolDetailsRoute = 'access' | 'configuration' | 'usage' | 'history'
 
 const useToolDetailsRoute = () => {
-  const isConfiguration = useMatch('/manage/:registration_id/configuration*')
-  const isUsage = useMatch('/manage/:registration_id/usage*')
-  const isHistory = useMatch('/manage/:registration_id/history*')
+  const isConfiguration = useMatch('/manage/:registration_id/configuration/*')
+  const isUsage = useMatch('/manage/:registration_id/usage/*')
+  const isHistory = useMatch('/manage/:registration_id/history/*')
 
   return isConfiguration ? 'configuration' : isUsage ? 'usage' : isHistory ? 'history' : 'access'
 }
@@ -177,11 +177,11 @@ export const ToolDetailsInner = ({
       e.preventDefault()
       const confirmed = await showConfirmationDialog({
         body: [
-          <Text weight="bold">
+          <Text key="warning" weight="bold">
             {I18n.t('You are about to delete "%{name}"', {name: registration.name})}
           </Text>,
-          <br />,
-          <Text>
+          <br key="break" />,
+          <Text key="description">
             {I18n.t(
               'Removing this registration will remove the app from the entire account. It will be removed from its placements and existing links to it will stop working. To reestablish placements and links, you will need to reinstall the app.',
             )}
