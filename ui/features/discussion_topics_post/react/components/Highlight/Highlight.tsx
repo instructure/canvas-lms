@@ -17,19 +17,31 @@
  */
 
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 import React, {useLayoutEffect, useRef, useContext} from 'react'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import theme from '@instructure/canvas-theme'
 import {scrollToHighlight} from './ScrollToHighlight'
-export function Highlight({...props}) {
-  const highlightRef = useRef()
+
+interface HighlightProps {
+  /**
+   * Boolean to define if the Highlight is highlighted.
+   */
+  isHighlighted?: boolean
+  children?: React.ReactNode
+  discussionEntryId?: string
+}
+
+export function Highlight({isHighlighted = false, children, discussionEntryId}: HighlightProps) {
+  const highlightRef = useRef<HTMLDivElement>(null)
   const urlParams = new URLSearchParams(window.location.search)
   const isPersistEnabled = urlParams.get('persist') === '1'
   const className = isPersistEnabled ? 'highlight-discussion' : 'highlight-fadeout'
-  const {focusSelector, setFocusSelector} = useContext(DiscussionManagerUtilityContext)
+  const {focusSelector, setFocusSelector} = useContext(DiscussionManagerUtilityContext) as {
+    focusSelector: string
+    setFocusSelector: (value: string) => void
+  }
 
-  const triggerFocus = element => {
+  const triggerFocus = (element: HTMLElement | null) => {
     if (!element) {
       return
     }
@@ -45,53 +57,50 @@ export function Highlight({...props}) {
     }
 
     element.focus()
-    element.dispatchEvent(event)
+    if (event) {
+      element.dispatchEvent(event)
+    }
   }
 
   useLayoutEffect(() => {
-    if (props.isHighlighted && highlightRef.current) {
+    if (isHighlighted && highlightRef.current) {
       setTimeout(() => {
         if (focusSelector) {
-          const speedGraderDiv = highlightRef.current?.querySelector('#speedgrader-navigator')
-          triggerFocus(speedGraderDiv)
-          highlightRef.current?.querySelector(focusSelector).focus({preventScroll: true})
+          const speedGraderDiv = highlightRef.current?.querySelector(
+            '#speedgrader-navigator',
+          ) as HTMLElement | null
+          if (speedGraderDiv) {
+            triggerFocus(speedGraderDiv)
+          }
+          const focusElement = highlightRef.current?.querySelector(
+            focusSelector,
+          ) as HTMLElement | null
+          focusElement?.focus({preventScroll: true})
           setFocusSelector('')
         } else {
-          highlightRef.current?.querySelector('button').focus({preventScroll: true})
+          const button = highlightRef.current?.querySelector('button') as HTMLButtonElement | null
+          button?.focus({preventScroll: true})
         }
-        scrollToHighlight(highlightRef.current)
+        void scrollToHighlight(highlightRef.current)
       }, 0)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.isHighlighted, highlightRef])
+  }, [isHighlighted, highlightRef])
 
   return (
     <div
       style={{
         borderRadius: theme.borders.radiusLarge,
-        padding: `${props.isHighlighted ? theme.spacing.xSmall : 0} 0 0 0`,
+        padding: `${isHighlighted ? theme.spacing.xSmall : 0} 0 0 0`,
       }}
-      className={classNames({[className]: props.isHighlighted})}
-      data-testid={props.isHighlighted ? 'isHighlighted' : 'notHighlighted'}
+      className={classNames({[className]: isHighlighted})}
+      data-testid={isHighlighted ? 'isHighlighted' : 'notHighlighted'}
       ref={highlightRef}
-      data-entry-id={props.discussionEntryId}
+      data-entry-id={discussionEntryId}
     >
-      {props.children}
+      {children}
     </div>
   )
-}
-
-Highlight.propTypes = {
-  /**
-   * Boolean to define if the Highlight is highlighted.
-   */
-  isHighlighted: PropTypes.bool,
-  children: PropTypes.node,
-  discussionEntryId: PropTypes.string,
-}
-
-Highlight.defaultProps = {
-  isHighlighted: false,
 }
 
 export default Highlight
