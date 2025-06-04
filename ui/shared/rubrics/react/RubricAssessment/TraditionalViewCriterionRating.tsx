@@ -67,7 +67,7 @@ export const TraditionalViewCriterionRating: FC<TraditionalViewCriterionRatingPr
   const selectedText = rubricSelectedAriaLabel(isSelected, isSelfAssessmentSelected)
 
   return (
-    <Flex.Item as="div" shouldGrow>
+    <Flex.Item as="div" shouldGrow shouldShrink>
       <View
         as="div"
         borderColor={borderColor}
@@ -90,7 +90,7 @@ export const TraditionalViewCriterionRating: FC<TraditionalViewCriterionRatingPr
           tabIndex={0}
           background="transparent"
           height="100%"
-          maxWidth={ratingCellMinWidth}
+          width="100%"
           borderWidth="small"
           borderColor={borderColor}
           overflowX="visible"
@@ -127,7 +127,7 @@ export const TraditionalViewCriterionRating: FC<TraditionalViewCriterionRatingPr
             <Flex.Item>
               <Text weight="bold">{rating.description}</Text>
             </Flex.Item>
-            <Flex.Item margin="small 0 0 0" shouldGrow={true} textAlign="start">
+            <Flex.Item margin="small 0 0 0" textAlign="start" shouldGrow shouldShrink>
               <View as="div">
                 <Text
                   size="small"

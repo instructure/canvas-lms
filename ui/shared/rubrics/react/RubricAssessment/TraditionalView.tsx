@@ -119,7 +119,7 @@ export const TraditionalView = ({
         <Text weight="bold">{rubricTitle}</Text>
       </View>
 
-      <table style={{width: '100%'}}>
+      <table style={{width: '100%', height: '100%'}}>
         <caption aria-hidden="true">
           <ScreenReaderContent>{rubricTitle || I18n.t('Rubric')}</ScreenReaderContent>
         </caption>
