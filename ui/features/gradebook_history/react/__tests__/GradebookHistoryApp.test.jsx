@@ -17,63 +17,67 @@
  */
 
 import React from 'react'
-import {Provider} from 'react-redux'
-import {shallow} from 'enzyme'
-import SearchForm from '../SearchForm'
-import SearchResults from '../SearchResults'
+import {render} from '@testing-library/react'
 import GradebookHistoryApp from '../GradebookHistoryApp'
-import GradebookHistoryStore from '../store/GradebookHistoryStore'
-import GradebookMenu from '@canvas/gradebook-menu'
 
-const equal = (value, expected) => expect(value).toEqual(expected)
-const strictEqual = (value, expected) => expect(value).toBe(expected)
+jest.mock('../SearchForm', () => {
+  return function MockSearchForm() {
+    return <div data-testid="search-form">SearchForm</div>
+  }
+})
 
-let wrapper
+jest.mock('../SearchResults', () => {
+  return function MockSearchResults() {
+    return <div data-testid="search-results">SearchResults</div>
+  }
+})
 
-describe('GradebookHistoryApp has component', () => {
-  beforeEach(() => {
-    wrapper = shallow(<GradebookHistoryApp />)
+jest.mock('@canvas/gradebook-menu', () => {
+  return function MockGradebookMenu(props) {
+    return (
+      <div
+        data-testid="gradebook-menu"
+        data-course-url={props.courseUrl}
+        data-learning-mastery-enabled={props.learningMasteryEnabled}
+      >
+        GradebookMenu
+      </div>
+    )
+  }
+})
+
+describe('GradebookHistoryApp', () => {
+  it('renders the heading', () => {
+    const {getByRole} = render(<GradebookHistoryApp courseUrl="/courseUrl" />)
+    const heading = getByRole('heading', {name: 'Gradebook History'})
+    expect(heading).toBeInTheDocument()
   })
 
-  afterEach(() => {
-    wrapper.unmount()
-  })
-  test('Provider with a store prop', function () {
-    const provider = wrapper.find(Provider)
-    equal(provider.length, 1)
-    equal(provider.props().store, GradebookHistoryStore)
+  it('renders SearchForm component', () => {
+    const {getByTestId} = render(<GradebookHistoryApp courseUrl="/courseUrl" />)
+    expect(getByTestId('search-form')).toBeInTheDocument()
   })
 
-  test('Heading', function () {
-    const heading = wrapper.find('h1')
-    strictEqual(heading.length, 1)
-  })
-
-  test('SearchForm', function () {
-    const form = wrapper.find(SearchForm)
-    strictEqual(form.length, 1)
-  })
-
-  test('SearchResults', function () {
-    const results = wrapper.find(SearchResults)
-    strictEqual(results.length, 1)
+  it('renders SearchResults component', () => {
+    const {getByTestId} = render(<GradebookHistoryApp courseUrl="/courseUrl" />)
+    expect(getByTestId('search-results')).toBeInTheDocument()
   })
 
   describe('GradebookMenu', () => {
-    test('is passed the provided courseUrl prop', () => {
-      const wrapper = shallow(
+    it('is passed the provided courseUrl prop', () => {
+      const {getByTestId} = render(
         <GradebookHistoryApp courseUrl="/courseUrl" learningMasteryEnabled={true} />,
       )
-      const menu = wrapper.find(GradebookMenu)
-      strictEqual(menu.prop('courseUrl'), '/courseUrl')
+      const menu = getByTestId('gradebook-menu')
+      expect(menu).toHaveAttribute('data-course-url', '/courseUrl')
     })
 
-    test('is passed the provided learningMasteryEnabled prop', () => {
-      const wrapper = shallow(
+    it('is passed the provided learningMasteryEnabled prop', () => {
+      const {getByTestId} = render(
         <GradebookHistoryApp courseUrl="/courseUrl" learningMasteryEnabled={false} />,
       )
-      const menu = wrapper.find(GradebookMenu)
-      strictEqual(menu.prop('learningMasteryEnabled'), false)
+      const menu = getByTestId('gradebook-menu')
+      expect(menu).toHaveAttribute('data-learning-mastery-enabled', 'false')
     })
   })
 })
