@@ -341,6 +341,7 @@ export type RootAccountFeatureId =
   | 'disable_iframe_sandbox_file_show'
   | 'ams_service'
   | 'lti_apps_page_ai_translation'
+  | 'open_tools_in_new_tab'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_SERVICES

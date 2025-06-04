@@ -634,7 +634,7 @@ The following settings only apply to certain placements.
     </tr>
     <tr class="request-param">
       <td>windowTarget</td>
-      <td>account_navigation, course_navigation</td>
+      <td>account_navigation, course_navigation, global_navigation, user_navigation</td>
       <td>string</td>
       <td class="param-desc">
         <p>Whether the tool should be launched in a new tab.</p>
