@@ -78,10 +78,15 @@ describe('OutcomeView', () => {
   beforeEach(() => {
     fakeENV.setup()
     document.body.innerHTML = '<div id="fixtures"></div>'
+    $('body').attr('class', '')
+    $('.ui-dialog').remove()
   })
 
   afterEach(() => {
+    $('.ui-dialog').remove()
+    $('.ui-widget-overlay').remove()
     document.body.innerHTML = ''
+    $('body').attr('class', '')
     fakeENV.teardown()
   })
 
@@ -188,37 +193,46 @@ describe('OutcomeView', () => {
       })
 
       view.edit($.Event())
-      await waitFrames(20)
+      await waitFrames(30)
 
       expect(view.$('#calculation_method')).toHaveLength(1)
 
       view.$('#calculation_method').val('n_mastery').trigger('change')
-      await waitFrames(20)
+      await waitFrames(30)
 
       const calcIntField = view.$('#calculation_int')
       expect(calcIntField).toHaveLength(1)
-      expect(calcIntField.val()).toBe('5')
+
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      const calcIntValue = calcIntField.val()
+      expect(calcIntValue).toBeDefined()
+      expect(calcIntValue).toBe('5')
 
       view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(20)
+      await waitFrames(30)
+      await new Promise(resolve => setTimeout(resolve, 50))
       expect(view.$('#calculation_int').val()).toBe('65')
 
       view.$('#calculation_method').val('n_mastery').trigger('change')
-      await waitFrames(20)
+      await waitFrames(30)
+      await new Promise(resolve => setTimeout(resolve, 50))
       expect(view.$('#calculation_int').val()).toBe('5')
 
-      view.$('#calculation_int').val('4')
-      await waitFrames(20)
+      view.$('#calculation_int').val('4').trigger('change')
+      await waitFrames(30)
       expect(view.$('#calculation_int').val()).toBe('4')
 
       view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(20)
+      await waitFrames(30)
+      await new Promise(resolve => setTimeout(resolve, 50))
       expect(view.$('#calculation_int').val()).toBe('65')
 
       view.$('#calculation_method').val('highest').trigger('change')
-      await waitFrames(20)
+      await waitFrames(30)
       view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(20)
+      await waitFrames(30)
+      await new Promise(resolve => setTimeout(resolve, 50))
       expect(view.$('#calculation_int').val()).toBe('65')
       view.remove()
     })
@@ -233,11 +247,15 @@ describe('OutcomeView', () => {
       })
 
       view.edit($.Event())
-      await waitFrames(20)
+      await waitFrames(30)
 
       view.$('#calculation_method').val('n_mastery').trigger('change')
-      await waitFrames(20)
-      expect(view.$('#calculation_int').val()).toBe('5')
+      await waitFrames(30)
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      const calcIntValue = view.$('#calculation_int').val()
+      expect(calcIntValue).toBeDefined()
+      expect(calcIntValue).toBe('5')
       view.remove()
     })
   })
