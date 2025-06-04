@@ -16,19 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useEffect} from 'react'
 import {BaseBlock, useIsEditMode} from './BaseBlock'
+import {useSave} from './BaseBlock/useSave'
 
-export const DummyBlock = () => {
+export const DummyBlock = (props: {
+  dummyValue: string
+}) => {
   return (
     <BaseBlock title="Dummy Block">
-      <DummyBlockContent />
+      <DummyBlockContent dummyValue={props.dummyValue} />
     </BaseBlock>
   )
 }
 
-const DummyBlockContent = () => {
+const DummyBlockContent = (props: {dummyValue: string}) => {
   const isEditMode = useIsEditMode()
+  const save = useSave<typeof DummyBlock>()
+
+  useEffect(() => {
+    if (!isEditMode) {
+      save({
+        dummyValue: Math.random().toString(),
+      })
+    }
+  }, [isEditMode])
+
   return isEditMode
     ? 'EDIT MODE: This is a dummy block. It serves as a placeholder for testing purposes.'
-    : 'This is a dummy block. It serves as a placeholder for testing purposes.'
+    : `This is a dummy block. It serves as a placeholder for testing purposes. ${props.dummyValue}`
 }
