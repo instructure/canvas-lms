@@ -25,7 +25,7 @@ const I18n = createI18nScope('page_editor')
 type BlockFactory = {[key: string]: () => ReactElement}
 
 export const blockFactory = {
-  dummyBlock: () => <DummyBlock />,
+  dummyBlock: () => <DummyBlock dummyValue="" />,
   simpleText: () => <p>text</p>,
   imageText: () => <p>image_text</p>,
   image: () => <p>image</p>,
