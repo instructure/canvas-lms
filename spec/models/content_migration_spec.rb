@@ -2702,4 +2702,66 @@ describe ContentMigration do
                                               })
     end
   end
+
+  describe "#import_module?" do
+    it "returns true if explicitly importing module" do
+      mig_id = "123"
+      @cm.migration_settings[:migration_ids_to_import] = {
+        copy: {
+          modules: { mig_id => "1" },
+        }
+      }
+      expect(@cm.import_module?(mig_id)).to be true
+      expect(@cm.import_module?("foo")).to be false
+    end
+
+    it "returns true if explicitly importing context_module" do
+      mig_id = "123"
+      @cm.migration_settings[:migration_ids_to_import] = {
+        copy: {
+          context_modules: { mig_id => "1" },
+        }
+      }
+      expect(@cm.import_module?(mig_id)).to be true
+    end
+
+    it "returns true if importing all modules" do
+      @cm.migration_settings[:migration_ids_to_import] = {
+        copy: { all_modules: true }
+      }
+      expect(@cm.import_module?("anything")).to be true
+    end
+
+    it "returns true if importing all context_modules" do
+      @cm.migration_settings[:migration_ids_to_import] = {
+        copy: { all_context_modules: true }
+      }
+      expect(@cm.import_module?("anything")).to be true
+    end
+
+    it "returns true if importing everything" do
+      @cm.migration_settings[:migration_ids_to_import] = {
+        copy: { everything: true }
+      }
+      expect(@cm.import_module?("anything")).to be true
+    end
+  end
+
+  describe "#import_module_item?" do
+    it "returns true if importing all module items" do
+      @cm.migration_settings[:migration_ids_to_import] = {
+        copy: { all_module_items: true }
+      }
+      expect(@cm.import_module_item?("anything")).to be true
+    end
+
+    it "returns true if explicitly importing items" do
+      mig_id = "123"
+      @cm.migration_settings[:migration_ids_to_import] = {
+        copy: { module_items: { mig_id => "1" } }
+      }
+      expect(@cm.import_module_item?(mig_id)).to be true
+      expect(@cm.import_module_item?("other")).to be false
+    end
+  end
 end
