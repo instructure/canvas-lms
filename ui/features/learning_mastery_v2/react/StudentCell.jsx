@@ -32,7 +32,13 @@ const StudentCell = ({courseId, student}) => {
 
   return (
     <>
-      <Flex maxWidth="100%" height="100%" alignItems="center" justifyItems="start">
+      <Flex
+        maxWidth="100%"
+        height="100%"
+        alignItems="center"
+        justifyItems="start"
+        data-testid="student-cell"
+      >
         <Flex.Item as="div" padding="0 0 0 small" maxWidth="25%">
           <Avatar
             alt={student.display_name}

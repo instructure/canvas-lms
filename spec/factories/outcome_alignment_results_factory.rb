@@ -44,21 +44,25 @@ module Factories
   end
 
   def create_learning_outcome_result(user, score, args = {})
-    title = "#{user.name}, #{@assignment.name}"
-    mastery = (score || 0) >= @outcome.mastery_points
-    submitted_at = args[:submitted_at] || time
+    assignment = args[:assignment] || @assignment
+    title = "#{user.name}, #{assignment.name}"
+    outcome = args[:outcome] || @outcome
+    mastery = (score || 0) >= outcome.mastery_points
+    submitted_at = args[:submitted_at] || Time.zone.now
+    alignment = args[:alignment] || @alignment
+    context = args[:context] || @course
 
     LearningOutcomeResult.create!(
-      learning_outcome: @outcome,
+      learning_outcome: outcome,
       user:,
-      context: @course,
-      alignment: @alignment,
-      associated_asset: @assignment,
+      context:,
+      alignment:,
+      associated_asset: assignment,
       association_type: "Assignment",
-      association_id: @assignment.id,
+      association_id: assignment.id,
       title:,
       score:,
-      possible: @outcome.points_possible,
+      possible: outcome.points_possible,
       mastery:,
       created_at: submitted_at,
       updated_at: submitted_at,

@@ -43,6 +43,7 @@ const ScoresGrid = ({students, outcomes, rollups, visibleRatings}) => {
             <Flex.Item
               size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}
               key={`${student.id}${outcome.id}${index}`}
+              data-testid={`student-outcome-score-${student.id}-${outcome.id}`}
             >
               <View
                 as="div"
