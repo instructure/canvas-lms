@@ -19,7 +19,6 @@
 import CourseRestoreModel from '../CourseRestore'
 import $ from 'jquery'
 import 'jquery-migrate'
-import sinon from 'sinon'
 
 const fixturesDiv = document.createElement('div')
 fixturesDiv.id = 'fixtures'
@@ -79,23 +78,81 @@ describe('CourseRestore', () => {
     account_id = 4
     course_id = 42
     courseRestore = new CourseRestoreModel({account_id})
-    server = sinon.fakeServer.create()
-    clock = sinon.useFakeTimers()
+
+    // Mock XMLHttpRequest for server
+    const xhrMockClass = {
+      open: jest.fn(),
+      send: jest.fn(),
+      setRequestHeader: jest.fn(),
+      readyState: 4,
+      status: 200,
+      responseText: '',
+      onreadystatechange: null,
+      getAllResponseHeaders: jest.fn().mockReturnValue(''),
+      getResponseHeader: jest.fn(),
+    }
+
+    window.XMLHttpRequest = jest.fn().mockImplementation(() => xhrMockClass)
+    server = {
+      requests: [],
+      respond: (method, url, response) => {
+        const request = server.requests.find(req => req.method === method && req.url === url)
+        if (request) {
+          request.xhr.status = response[0]
+          request.xhr.responseText = response[2]
+          request.xhr.readyState = 4
+          if (request.xhr.onreadystatechange) {
+            request.xhr.onreadystatechange()
+          }
+        }
+      },
+    }
+
+    // Override jQuery's ajax to capture requests
+    const originalAjax = $.ajax
+    jest.spyOn($, 'ajax').mockImplementation(function (options) {
+      const xhr = new window.XMLHttpRequest()
+      server.requests.push({
+        method: options.type || 'GET',
+        url: options.url,
+        xhr: xhr,
+      })
+
+      // Return a promise-like object
+      const deferred = $.Deferred()
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            const data = JSON.parse(xhr.responseText)
+            deferred.resolve(data)
+            if (options.success) options.success(data)
+          } else {
+            deferred.reject(xhr)
+            if (options.error) options.error(xhr)
+          }
+        }
+      }
+
+      return deferred.promise()
+    })
+
+    jest.useFakeTimers()
     return $('#fixtures').append($('<div id="flash_screenreader_holder" />'))
   })
 
   afterEach(() => {
-    server.restore()
-    clock.restore()
+    jest.restoreAllMocks()
+    jest.useRealTimers()
     account_id = null
     $('#fixtures').empty()
   })
   // Describes searching for a course by ID
   test("triggers 'searching' when search is called", function () {
-    const callback = sinon.spy()
+    const callback = jest.fn()
     courseRestore.on('searching', callback)
     courseRestore.search(account_id)
-    ok(callback.called, 'Searching event is called when searching')
+    ok(callback.mock.calls.length > 0, 'Searching event is called when searching')
   })
 
   test('populates CourseRestore model with response, keeping its original account_id', function () {
@@ -138,7 +195,7 @@ describe('CourseRestore', () => {
       `${courseRestore.baseUrl()}/?course_ids[]=${courseRestore.get('id')}&event=undelete`,
       [200, {'Content-Type': 'application/json'}, JSON.stringify(progressQueuedJSON)],
     )
-    clock.tick(1000)
+    jest.advanceTimersByTime(1000)
     server.respond('GET', progressQueuedJSON.url, [
       200,
       {'Content-Type': 'application/json'},
