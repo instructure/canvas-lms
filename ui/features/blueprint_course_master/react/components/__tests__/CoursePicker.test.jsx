@@ -17,41 +17,64 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import {shallow} from 'enzyme'
+import {render, screen as rtlScreen} from '@testing-library/react'
 import CoursePicker from '../CoursePicker'
 import getSampleData from './getSampleData'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('CoursePicker component', () => {
+  let originalENV
+
+  beforeEach(() => {
+    originalENV = window.ENV
+    fakeENV.setup()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    window.ENV = originalENV
+  })
+
   const defaultProps = () => ({
     courses: getSampleData().courses,
     selectedCourses: [],
     subAccounts: getSampleData().subAccounts,
     terms: getSampleData().terms,
     isLoadingCourses: false,
-    loadCourses: () => {},
-    onSelectedChanged: () => {},
+    loadCourses: jest.fn(),
+    onSelectedChanged: jest.fn(),
   })
 
   test('renders the CoursePicker component', () => {
-    const tree = shallow(<CoursePicker {...defaultProps()} />)
-    const node = tree.find('.bca-course-picker')
-    expect(node.exists()).toBeTruthy()
+    render(<CoursePicker {...defaultProps()} />)
+    expect(document.querySelector('.bca-course-picker')).toBeInTheDocument()
+  })
+
+  test('displays courses text label', () => {
+    render(<CoursePicker {...defaultProps()} />)
+    expect(rtlScreen.getByText('Courses')).toBeInTheDocument()
   })
 
   test('displays spinner when loading courses', () => {
     const props = defaultProps()
     props.isLoadingCourses = true
-    const tree = shallow(<CoursePicker {...props} />)
-    const node = tree.find('.bca-course-picker__loading')
-    expect(node.exists()).toBeTruthy()
+    render(<CoursePicker {...props} />)
+    expect(rtlScreen.getByTitle('Loading Courses')).toBeInTheDocument()
+    expect(document.querySelector('.bca-course-picker__loading')).toBeInTheDocument()
+  })
+
+  test('does not display spinner when not loading courses', () => {
+    const props = defaultProps()
+    props.isLoadingCourses = false
+    render(<CoursePicker {...props} />)
+    expect(rtlScreen.queryByTitle('Loading Courses')).not.toBeInTheDocument()
+    expect(document.querySelector('.bca-course-picker__loading')).not.toBeInTheDocument()
   })
 
   test('calls loadCourses when filters are updated', () => {
     const props = defaultProps()
-    props.loadCourses = jest.fn()
     const ref = React.createRef()
-    const tree = render(<CoursePicker {...props} ref={ref} />)
+    render(<CoursePicker {...props} ref={ref} />)
     const picker = ref.current
 
     picker.onFilterChange({
@@ -61,5 +84,22 @@ describe('CoursePicker component', () => {
     })
 
     expect(props.loadCourses).toHaveBeenCalledTimes(1)
+    expect(props.loadCourses).toHaveBeenCalledWith({
+      term: '',
+      subAccount: '',
+      search: 'one',
+    })
+  })
+
+  test('calls onSelectedChanged when course selection changes', () => {
+    const props = defaultProps()
+    const ref = React.createRef()
+    render(<CoursePicker {...props} ref={ref} />)
+    const picker = ref.current
+
+    picker.onSelectedChanged(['1', '2'])
+
+    expect(props.onSelectedChanged).toHaveBeenCalledTimes(1)
+    expect(props.onSelectedChanged).toHaveBeenCalledWith(['1', '2'])
   })
 })
