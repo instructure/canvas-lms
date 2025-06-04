@@ -37,6 +37,7 @@ export default class DeleteExternalToolButton extends React.Component {
   }
 
   isDeleting = false
+  btnTriggerDelete = React.createRef()
 
   shouldComponentUpdate() {
     return !this.isDeleting
@@ -76,7 +77,7 @@ export default class DeleteExternalToolButton extends React.Component {
             href="#"
             tabIndex="-1"
             role="button"
-            ref="btnTriggerDelete"
+            ref={this.btnTriggerDelete}
             aria-label={I18n.t('Delete %{toolName} App', {toolName: this.props.tool.name})}
             className="icon-trash"
             onClick={this.openModal}
