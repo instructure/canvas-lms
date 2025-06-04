@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React, {useCallback, useEffect, useState, useMemo, useRef} from 'react'
+import React, {useCallback, useEffect, useState, useMemo} from 'react'
 import {func, string} from 'prop-types'
 import moment from 'moment-timezone'
 import produce from 'immer'
@@ -34,8 +34,6 @@ import useMonitorJobCompletion from './hooks/useMonitorJobCompletion'
 import DateValidator from '@canvas/grading/DateValidator'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import {originalDateField, canEditAll, anyAssignmentEdited} from './utils'
-import { CloseButton } from '@instructure/ui-buttons'
-
 
 const I18n = createI18nScope('assignments_bulk_edit')
 
@@ -69,9 +67,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   const [loading, setLoading] = useState(true)
   const [moveDatesModalOpen, setMoveDatesModalOpen] = useState(false)
   const [noAssignmentsSelectedError, setNoAssignmentsSelectedError] = useState(false)
-  const noAssignmentsSelectedCloseButtonRef = useRef(null)
   const [noAssignmentsEditedError, setNoAssignmentsEditedError] = useState(false)
-  const noAssignmentsEditedCloseButtonRef = useRef(null)
   const {saveAssignments, startingSave, startingSaveError, progressUrl, setProgressUrl} =
     useSaveAssignments(courseId)
   const {jobCompletion, jobRunning, jobSuccess, jobErrors, setJobSuccess} = useMonitorJobCompletion(
@@ -151,18 +147,6 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     }
     if (jobErrors && !jobErrors.hasOwnProperty('message')) recordJobErrors(jobErrors)
   }, [jobErrors])
-
-  useEffect(() => {
-    if (noAssignmentsEditedError && noAssignmentsEditedCloseButtonRef.current) {
-      noAssignmentsEditedCloseButtonRef.current.focus()
-    }
-  }, [noAssignmentsEditedError])
-
-  useEffect(() => {
-    if (noAssignmentsSelectedError && noAssignmentsSelectedCloseButtonRef.current) {
-      noAssignmentsSelectedCloseButtonRef.current.focus()
-    }
-  }, [noAssignmentsSelectedError])
 
   const setDateOnOverride = useCallback(
     (override, dateFieldName, newDate) => {
@@ -278,24 +262,26 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
 
   const handleSave = useCallback(() => {
     const assignmentEdited = anyAssignmentEdited(assignments)
-    if(assignmentEdited){
+    if (assignmentEdited) {
       onSave()
       saveAssignments(assignments)
-    }
-    else{
+    } else {
       setNoAssignmentsEditedError(true)
     }
   }, [assignments, onSave, saveAssignments])
 
-  const handleOpenBatchEdit = useCallback((value = true) => {
-    const selectedAssignmentsCount = assignments.filter(a => a.selected).length
-    if(value && selectedAssignmentsCount === 0){
-      setNoAssignmentsSelectedError(true)
-      return
-    }
-    setNoAssignmentsSelectedError(false)
-    setMoveDatesModalOpen(!!value)
-  }, [assignments])
+  const handleOpenBatchEdit = useCallback(
+    (value = true) => {
+      const selectedAssignmentsCount = assignments.filter(a => a.selected).length
+      if (value && selectedAssignmentsCount === 0) {
+        setNoAssignmentsSelectedError(true)
+        return
+      }
+      setNoAssignmentsSelectedError(false)
+      setMoveDatesModalOpen(!!value)
+    },
+    [assignments],
+  )
 
   const handleBatchEditShift = useCallback(
     nDays => {
@@ -375,20 +361,13 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     )
   }
 
-  function renderNoAssignmentsSelectedError(){
-    if(noAssignmentsSelectedError){
-      return(
+  function renderNoAssignmentsSelectedError() {
+    if (noAssignmentsSelectedError) {
+      return (
         <CanvasInlineAlert
           variant="error"
           liveAlert={true}
-          renderCloseButtonLabel={() => {
-            return (
-              <CloseButton 
-                elementRef={element => noAssignmentsSelectedCloseButtonRef.current = element} 
-                screenReaderLabel={I18n.t('Close')}
-              />
-            )
-          }}
+          renderCloseButtonLabel={() => I18n.t('Close')}
           onDismiss={() => setNoAssignmentsSelectedError(false)}
           timeout={5000}
         >
@@ -398,20 +377,13 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     }
   }
 
-  function renderNoAssignmentsEditedError(){
-    if(noAssignmentsEditedError){
-      return(
+  function renderNoAssignmentsEditedError() {
+    if (noAssignmentsEditedError) {
+      return (
         <CanvasInlineAlert
           variant="error"
           liveAlert={true}
-          renderCloseButtonLabel={() => {
-            return (
-              <CloseButton 
-                elementRef={element => noAssignmentsEditedCloseButtonRef.current = element} 
-                screenReaderLabel={I18n.t('Close')}
-              />
-            )
-          }}
+          renderCloseButtonLabel={() => I18n.t('Close')}
           onDismiss={() => setNoAssignmentsEditedError(false)}
           timeout={5000}
         >
