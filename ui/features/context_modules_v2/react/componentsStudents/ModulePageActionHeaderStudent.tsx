@@ -59,6 +59,7 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
     return (
       <Button
         onClick={handleCollapseExpandClick}
+        disabled={disabled}
         display="block"
         aria-expanded={anyModuleExpanded}
         data-expand={anyModuleExpanded}
@@ -67,7 +68,7 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
         {labelText}
       </Button>
     )
-  }, [anyModuleExpanded, handleCollapseExpandClick])
+  }, [anyModuleExpanded, disabled, handleCollapseExpandClick])
 
   return (
     !isLoading && (

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useRef, useEffect} from 'react'
-import {debounce} from '@instructure/debounce'
+import React, {useCallback} from 'react'
+
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {IconButton} from '@instructure/ui-buttons'
@@ -55,18 +55,9 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
   requirementCount,
   submissionStatistics,
 }) => {
-  const debouncedToggleExpandRef = useRef<() => void>()
-
-  useEffect(() => {
-    debouncedToggleExpandRef.current = debounce(() => {
-      onToggleExpand(id)
-    }, 500)
-    return () => {}
-  }, [onToggleExpand, id])
-
   const onToggleExpandRef = useCallback(() => {
-    if (debouncedToggleExpandRef.current) debouncedToggleExpandRef.current()
-  }, [])
+    onToggleExpand(id)
+  }, [onToggleExpand, id])
 
   const missingCount = submissionStatistics?.missingAssignmentCount || 0
 

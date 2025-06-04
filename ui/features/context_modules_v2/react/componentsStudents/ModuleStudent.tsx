@@ -22,12 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import ModuleHeaderStudent from './ModuleHeaderStudent'
 import ModuleItemListStudent from './ModuleItemListStudent'
 import {useModuleItemsStudent} from '../hooks/queriesStudent/useModuleItemsStudent'
-import {
-  CompletionRequirement,
-  ModuleItem,
-  ModuleProgression,
-  ModuleStatistics,
-} from '../utils/types'
+import {CompletionRequirement, ModuleProgression, ModuleStatistics} from '../utils/types'
 
 export interface ModuleStudentProps {
   id: string
