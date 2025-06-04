@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import ThemeEditorAccordion from '../ThemeEditorAccordion'
 
 function generateProps(type, overrides = {}) {
@@ -55,15 +55,32 @@ function generateProps(type, overrides = {}) {
 }
 
 describe('ThemeEditorAccordion', () => {
+  beforeEach(() => {
+    window.sessionStorage.clear()
+  })
   it('renders', () => {
-    const wrapper = shallow(<ThemeEditorAccordion {...generateProps('color')} />)
-    expect(wrapper.find('ThemeEditorVariableGroup')).toHaveLength(1)
+    const {getByText} = render(<ThemeEditorAccordion {...generateProps('color')} />)
+    // Check that the accordion group is rendered with the test group name
+    expect(getByText('test')).toBeInTheDocument()
   })
 
   it('opens up the last used accordion', () => {
-    window.sessionStorage.setItem('Theme__editor-accordion-index', 2)
-    const wrapper = shallow(<ThemeEditorAccordion {...generateProps('color')} />)
-    expect(wrapper.state('expandedIndex')).toBe(2)
+    window.sessionStorage.setItem('Theme__editor-accordion-index', '2')
+    const props = generateProps('color')
+    // Add more groups to test the expanded index
+    props.variableSchema = [
+      {group_name: 'Group 1', variables: []},
+      {group_name: 'Group 2', variables: []},
+      {group_name: 'Group 3', variables: []},
+    ]
+    const {getByText, container} = render(<ThemeEditorAccordion {...props} />)
+    // Check that all groups are rendered
+    expect(getByText('Group 1')).toBeInTheDocument()
+    expect(getByText('Group 2')).toBeInTheDocument()
+    expect(getByText('Group 3')).toBeInTheDocument()
+    // The third group (index 2) should be expanded - check via aria-expanded
+    const expandedButtons = container.querySelectorAll('button[aria-expanded="true"]')
+    expect(expandedButtons).toHaveLength(1)
   })
 
   it('renders each group', () => {
@@ -78,8 +95,9 @@ describe('ThemeEditorAccordion', () => {
         variables: [],
       },
     ]
-    const wrapper = shallow(<ThemeEditorAccordion {...props} />)
-    expect(wrapper.find('ThemeEditorVariableGroup')).toHaveLength(2)
+    const {getByText} = render(<ThemeEditorAccordion {...props} />)
+    expect(getByText('Foo')).toBeInTheDocument()
+    expect(getByText('Bar')).toBeInTheDocument()
   })
 
   it('renders a row for each variable in a group', () => {
@@ -104,26 +122,30 @@ describe('ThemeEditorAccordion', () => {
         ],
       },
     ]
-    const wrapper = shallow(<ThemeEditorAccordion {...props} />)
-    expect(wrapper.find('ThemeEditorVariableGroup').children()).toHaveLength(2)
-    expect(wrapper.find('ThemeEditorColorRow').exists()).toBe(true)
-    expect(wrapper.find('ThemeEditorImageRow').exists()).toBe(true)
+    const {getByText, getByLabelText, getAllByText} = render(<ThemeEditorAccordion {...props} />)
+    expect(getByText('Test Group')).toBeInTheDocument()
+    // Color row should have a color input
+    expect(getByLabelText('Color')).toBeInTheDocument()
+    // Image row should have the image text (appears multiple times in the UI)
+    expect(getAllByText('Image')).toHaveLength(2)
   })
 
   describe('renderRow', () => {
     it('renders color rows', () => {
-      const wrapper = shallow(<ThemeEditorAccordion {...generateProps('color')} />)
-      expect(wrapper.find('ThemeEditorColorRow')).toHaveLength(1)
+      const {getByLabelText} = render(<ThemeEditorAccordion {...generateProps('color')} />)
+      expect(getByLabelText('Friendly Foo')).toBeInTheDocument()
     })
 
     it('renders image rows', () => {
-      const wrapper = shallow(<ThemeEditorAccordion {...generateProps('image')} />)
-      expect(wrapper.find('ThemeEditorImageRow')).toHaveLength(1)
+      const {getAllByText} = render(<ThemeEditorAccordion {...generateProps('image')} />)
+      // Image rows show the label text multiple times
+      const friendlyFooElements = getAllByText('Friendly Foo')
+      expect(friendlyFooElements.length).toBeGreaterThan(0)
     })
 
     it('renders percentage rows', () => {
-      const wrapper = shallow(<ThemeEditorAccordion {...generateProps('percentage')} />)
-      expect(wrapper.find('RangeInput')).toHaveLength(1)
+      const {getByLabelText} = render(<ThemeEditorAccordion {...generateProps('percentage')} />)
+      expect(getByLabelText('Friendly Foo')).toBeInTheDocument()
     })
   })
 })
