@@ -19,17 +19,24 @@
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconRssLine} from '@instructure/ui-icons'
-import PropTypes from 'prop-types'
 import React from 'react'
 
 const I18n = createI18nScope('discussion_posts')
 
-export const PodcastFeed = ({...props}) => {
+interface PodcastFeedProps {
+  /**
+   * Link to discussions RSS feed
+   */
+  linkUrl: string
+  isMobile?: boolean
+}
+
+export const PodcastFeed: React.FC<PodcastFeedProps> = ({...props}) => {
   return (
     <span className="discussion-podcast-feed">
       <Button
         display={props.isMobile ? 'block' : 'inline-block'}
-        renderIcon={IconRssLine}
+        renderIcon={<IconRssLine />}
         href={props.linkUrl}
         data-testid="post-rssfeed"
       >
@@ -37,12 +44,4 @@ export const PodcastFeed = ({...props}) => {
       </Button>
     </span>
   )
-}
-
-PodcastFeed.propTypes = {
-  /**
-   * Link to discussions RSS feed
-   */
-  linkUrl: PropTypes.string.isRequired,
-  isMobile: PropTypes.bool,
 }
