@@ -20,6 +20,7 @@ import Backbone from '@canvas/backbone'
 import fromJSONAPI from '@canvas/quiz-legacy-client-apps/util/from_jsonapi'
 import K from '../../constants'
 import pickAndNormalize from '@canvas/quiz-legacy-client-apps/util/pick_and_normalize'
+import config from '../../config'
 
 const isGenerating = function (report) {
   const workflowState = report.progress.workflowState
@@ -27,6 +28,10 @@ const isGenerating = function (report) {
 }
 
 export default Backbone.Model.extend({
+  url() {
+    return config.quizReportsUrl
+  },
+
   parse(payload) {
     payload = fromJSONAPI(payload, 'quiz_reports', true)
     const attrs = pickAndNormalize(payload, K.QUIZ_REPORT_ATTRS)

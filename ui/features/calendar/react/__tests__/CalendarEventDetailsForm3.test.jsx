@@ -50,13 +50,22 @@ const testBlackoutDateSuccess = async component => {
   const title = changeValue(component, 'edit-calendar-event-form-title', 'title')
   expect(title.value).toBe('title')
 
-  const blackoutCheckbox = component.getByRole('checkbox', {name: /blackout date/i})
+  const blackoutCheckbox = component.getByRole('checkbox', {
+    name: 'Add to Course Pacing blackout dates',
+  })
   expect(blackoutCheckbox).toBeInTheDocument()
-  act(() => blackoutCheckbox.click())
+
+  fireEvent.click(blackoutCheckbox)
+
   expect(blackoutCheckbox.checked).toBe(true)
 
-  component.getByText('Submit').click()
-  await waitFor(() => expect(defaultProps.event.save).toHaveBeenCalled())
+  const submitButton = component.getByText('Submit')
+  expect(submitButton).toBeInTheDocument()
+  fireEvent.click(submitButton)
+
+  await waitFor(() => {
+    expect(defaultProps.event.save).toHaveBeenCalled()
+  })
 }
 
 const expectFieldsToBeEnabled = (component, fieldNames) => {
@@ -78,6 +87,7 @@ describe('CalendarEventDetailsForm', () => {
     defaultProps = eventFormProps()
     defaultProps.event.object.all_context_codes = 'course_2'
     defaultProps.event.object.context_code = 'course_2'
+
     fakeENV.setup({
       FEATURES: {
         calendar_series: true,
@@ -102,7 +112,33 @@ describe('CalendarEventDetailsForm', () => {
       save: jest.fn().mockResolvedValue({}),
     }))
     $.ajaxJSON = (_url, _method, _params, onSuccess, _onError) => {
-      onSuccess([])
+      const mockResponse = []
+      setTimeout(() => onSuccess(mockResponse), 0)
+
+      return {
+        abort: jest.fn(),
+        always: jest.fn(),
+        catch: jest.fn(),
+        done: jest.fn(),
+        fail: jest.fn(),
+        getAllResponseHeaders: jest.fn(),
+        getResponseHeader: jest.fn(),
+        overrideMimeType: jest.fn(),
+        pipe: jest.fn(),
+        progress: jest.fn(),
+        promise: jest.fn(),
+        readyState: 1,
+        responseJSON: mockResponse,
+        setRequestHeader: jest.fn(),
+        state: jest.fn().mockReturnValue('resolved'),
+        status: 200,
+        statusCode: jest.fn(),
+        statusText: 'OK',
+        then: jest.fn(callback => {
+          callback(mockResponse)
+          return this
+        }),
+      }
     }
     jest
       .spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog')
@@ -178,14 +214,33 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can create a blackout date event for a course with course pacing enabled', async () => {
-    defaultProps.event.contextInfo = courseContext
-    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+    defaultProps.event.contextInfo = {...courseContext}
+
+    // Use destructuring to get specific query methods from render
+    const {getByTestId, getByRole, getByText} = render(
+      <CalendarEventDetailsForm {...defaultProps} data-testid="calendar-event-form" />,
+    )
+
+    // Create component object with the same interface as the original test
+    const component = {getByTestId, getByRole, getByText}
+
+    // Run the test with our component wrapper
     await testBlackoutDateSuccess(component)
   })
 
   it('can create a blackout date event for an account with course pacing enabled', async () => {
-    defaultProps.event.contextInfo = accountContext
-    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+    // Set up the context and ensure it's properly assigned before rendering
+    defaultProps.event.contextInfo = {...accountContext}
+
+    // Use destructuring to get specific query methods from render
+    const {getByTestId, getByRole, getByText} = render(
+      <CalendarEventDetailsForm {...defaultProps} data-testid="calendar-event-form" />,
+    )
+
+    // Create component object with the same interface as the original test
+    const component = {getByTestId, getByRole, getByText}
+
+    // Run the test with our component wrapper
     await testBlackoutDateSuccess(component)
   })
 

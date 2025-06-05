@@ -52,7 +52,7 @@ beforeEach(() => {
 describe('.load', () => {
   it('should load and deserialize reports', async () => {
     server.use(
-      http.get('*/reports*', () => {
+      http.get('http://localhost/reports*', () => {
         return HttpResponse.json(quizReportsFixture)
       }),
     )
@@ -68,7 +68,7 @@ describe('.load', () => {
     const onChange = jest.fn()
 
     server.use(
-      http.get('*/reports*', () => {
+      http.get('http://localhost/reports*', () => {
         return HttpResponse.json(quizReportsFixture)
       }),
     )
@@ -85,7 +85,7 @@ describe('.load', () => {
   it('should request both "file" and "progress" to be included with quiz reports', async () => {
     let capturedUrl = null
     server.use(
-      http.get('*/reports*', ({request}) => {
+      http.get('http://localhost/reports*', ({request}) => {
         capturedUrl = new URL(request.url).pathname + new URL(request.url).search
         return HttpResponse.json({quiz_reports: []})
       }),
@@ -148,7 +148,7 @@ describe('.populate', function () {
           completion: 100,
         })
       }),
-      http.get('*/reports/1*', () => {
+      http.get('http://localhost/reports*', () => {
         reportRequestMade = true
         return HttpResponse.json({
           quiz_reports: [
@@ -168,6 +168,7 @@ describe('.populate', function () {
         quiz_reports: [
           {
             id: '1',
+            url: 'http://localhost/reports/1',
             progress: {
               url: '/progress/1',
               workflow_state: K.PROGRESS_ACTIVE,
@@ -247,7 +248,7 @@ describe('quizReports:generate', function () {
     let capturedRequest = null
 
     server.use(
-      http.post('*/reports', async ({request}) => {
+      http.post('http://localhost/reports', async ({request}) => {
         capturedRequest = {
           url: new URL(request.url).pathname,
           method: request.method,
@@ -292,7 +293,7 @@ describe('quizReports:generate', function () {
     let progressRequestMade = false
 
     server.use(
-      http.post('*/reports', () => {
+      http.post('http://localhost/reports', () => {
         postRequestMade = true
         return HttpResponse.json({
           quiz_reports: [
@@ -316,7 +317,7 @@ describe('quizReports:generate', function () {
         })
       }),
       // Handle the eventual fetch request that happens during progress tracking
-      http.get('**/reports/1*', () => {
+      http.get('http://localhost/reports*', () => {
         return HttpResponse.json({
           quiz_reports: [
             {
