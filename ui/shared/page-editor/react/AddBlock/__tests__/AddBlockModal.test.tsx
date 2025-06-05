@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, within} from '@testing-library/react'
+import {render, screen, within, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {AddBlockModal} from '../AddBlockModal'
 
 describe('AddBlockModal', () => {
@@ -36,8 +37,13 @@ describe('AddBlockModal', () => {
   }
 
   beforeEach(() => {
+    fakeENV.setup()
     onDismissMock = jest.fn()
     onAddBlockMock = jest.fn()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
   it('does not renders when open is false', () => {
@@ -70,14 +76,30 @@ describe('AddBlockModal', () => {
   it('calls onAddBlock when "Add to page" button is clicked', async () => {
     renderModal({})
     const addButton = await screen.findByRole('button', {name: 'Add to page'})
+
+    await waitFor(() => {
+      expect(onAddBlockMock).not.toHaveBeenCalled()
+    })
+
     await userEvent.click(addButton)
-    expect(onAddBlockMock).toHaveBeenCalled()
+
+    await waitFor(() => {
+      expect(onAddBlockMock).toHaveBeenCalled()
+    })
   })
 
   it('calls onDismiss when "Add to page" button is clicked', async () => {
     renderModal({})
     const addButton = await screen.findByRole('button', {name: 'Add to page'})
+
+    await waitFor(() => {
+      expect(onDismissMock).not.toHaveBeenCalled()
+    })
+
     await userEvent.click(addButton)
-    expect(onDismissMock).toHaveBeenCalled()
+
+    await waitFor(() => {
+      expect(onDismissMock).toHaveBeenCalled()
+    })
   })
 })
