@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {shallow} from 'enzyme'
 import ChangeLogRow, {ChangeRow} from '../ChangeLogRow'
 import getSampleData from '@canvas/blueprint-courses/getSampleData'
 
@@ -32,24 +31,24 @@ describe('ChangeLogRow component', () => {
   })
 
   test('renders the ChangeLogRow component', () => {
-    const tree = shallow(<ChangeLogRow {...defaultProps()} />)
-    const node = tree.find('.bcs__history-item__change-log-row')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<ChangeLogRow {...defaultProps()} />)
+    const node = container.querySelector('.bcs__history-item__change-log-row')
+    expect(node).toBeTruthy()
   })
 
   test('renders the ChangeLogRow component as a heading', () => {
     const props = defaultProps()
     props.isHeading = true
-    const tree = shallow(<ChangeLogRow {...props} />)
-    const node = tree.find('.bcs__history-item__change-log-row__heading')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<ChangeLogRow {...props} />)
+    const node = container.querySelector('.bcs__history-item__change-log-row__heading')
+    expect(node).toBeTruthy()
   })
 
   test('renders children inside content', () => {
     const children = <div className="test-children" />
-    const tree = shallow(<ChangeLogRow {...defaultProps()}>{children}</ChangeLogRow>)
-    const node = tree.find('.bcs__history-item__content .test-children')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<ChangeLogRow {...defaultProps()}>{children}</ChangeLogRow>)
+    const node = container.querySelector('.bcs__history-item__content .test-children')
+    expect(node).toBeTruthy()
   })
 
   test('renders the ChangeRow component', () => {
