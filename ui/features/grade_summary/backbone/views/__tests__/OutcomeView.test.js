@@ -24,9 +24,6 @@ import OutcomeDialogView from '../OutcomeDialogView'
 import OutcomeView from '../OutcomeView'
 import ProgressBarView from '../ProgressBarView'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
-import sinon from 'sinon'
-
-const sandbox = sinon.createSandbox()
 
 const ok = x => expect(x).toBeTruthy()
 
@@ -65,11 +62,12 @@ describe('OutcomeViewSpec', () => {
 
   test('click & keydown .more-details', function () {
     outcomeView.render()
-    const showSpy = sandbox.stub(outcomeView.dialog, 'show')
+    const showSpy = jest.spyOn(outcomeView.dialog, 'show').mockImplementation(() => {})
     outcomeView.$el.find('a.more-details').trigger(e('click'))
-    ok(showSpy.called)
-    showSpy.reset()
+    expect(showSpy).toHaveBeenCalled()
+    showSpy.mockClear()
     outcomeView.$el.find('a.more-details').trigger(e('keydown'))
-    ok(showSpy.called)
+    expect(showSpy).toHaveBeenCalled()
+    showSpy.mockRestore()
   })
 })
