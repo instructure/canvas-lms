@@ -19,9 +19,9 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import ProficiencyRating from '../ProficiencyRating'
-import {svgUrl} from '../icons'
+import {svgUrl} from '../utils/icons'
 
-jest.mock('../icons', () => ({
+jest.mock('../utils/icons', () => ({
   svgUrl: jest.fn(() => 'http://test.com'),
 }))
 

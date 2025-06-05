@@ -20,7 +20,7 @@ import PropTypes from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import SVGWrapper from '@canvas/svg-wrapper'
-import {svgUrl} from './icons'
+import {svgUrl} from './utils/icons'
 import {outcomeShape, outcomeRollupShape} from './shapes'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
