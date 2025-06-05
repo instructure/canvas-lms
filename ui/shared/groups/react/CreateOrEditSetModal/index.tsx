@@ -18,17 +18,14 @@
 
 import React, {useEffect, useRef, useReducer, useState} from 'react'
 import {createRoot} from 'react-dom/client'
-import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
-import {bool, func, number, string} from 'prop-types'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {GroupContext, SPLIT, API_STATE, stateToContext} from './context'
-import {Text} from '@instructure/ui-text'
 
 import {GroupSetName} from './GroupSetName'
 import {SelfSignup} from './SelfSignup'
@@ -40,7 +37,52 @@ import {Responsive} from '@instructure/ui-responsive'
 
 const I18n = createI18nScope('groups')
 
-const INITIAL_STATE = Object.freeze({
+interface State {
+  name: string
+  selfSignup: boolean
+  bySection: boolean
+  splitGroups: string
+  createGroupCount: string
+  groupLimit: string
+  createGroupMemberCount: string
+  enableAutoLeader: boolean
+  autoLeaderType: string
+  apiState: number
+  errors: {
+    name?: string
+    structure?: string
+  }
+}
+
+interface CreateOrEditSetModalProps {
+  closed?: boolean
+  onDismiss?: (result: any) => void
+  studentSectionCount?: number
+  context?: string
+  contextId?: string
+  allowSelfSignup: boolean
+  mockApi?: typeof doFetchApi
+}
+
+type Action =
+  | {ev: 'reset'}
+  | {ev: 'error'; name?: string; structure?: string}
+  | {ev: 'api-change'; to: string}
+  | {ev: 'name-change'; to: string}
+  | {
+      ev: 'structure-change'
+      to: {
+        createGroupCount: string
+        createGroupMemberCount: string
+        groupLimit: string
+        splitGroups: string
+        bySection: boolean
+      }
+    }
+  | {ev: 'selfsignup-change'; to: {selfSignup: boolean; bySection: boolean}}
+  | {ev: 'leadership-change'; to: {enableAutoLeader: boolean; autoLeaderType: string}}
+
+const INITIAL_STATE: State = Object.freeze({
   name: '',
   selfSignup: false,
   bySection: false,
@@ -54,7 +96,7 @@ const INITIAL_STATE = Object.freeze({
   errors: {},
 })
 
-function reducer(prevState, action) {
+function reducer(prevState: State, action: Action): State {
   switch (action.ev) {
     case 'reset':
       return INITIAL_STATE
@@ -65,7 +107,7 @@ function reducer(prevState, action) {
       return {...prevState, errors}
     }
     case 'api-change':
-      return {...prevState, apiState: API_STATE[action.to]}
+      return {...prevState, apiState: (API_STATE as any)[action.to]}
     case 'name-change': {
       const errors = {...prevState.errors}
       delete errors.name
@@ -118,27 +160,28 @@ const Divider = () => (
   </View>
 )
 
-export const CreateOrEditSetModal = ({
-  closed,
-  onDismiss,
+export const CreateOrEditSetModal: React.FC<CreateOrEditSetModalProps> = ({
+  closed = false,
+  onDismiss = Function.prototype,
   studentSectionCount,
   context,
   contextId,
   allowSelfSignup,
 }) => {
   const [st, dispatch] = useReducer(reducer, INITIAL_STATE)
-  const topElement = useRef(null)
-  const creationJSON = useRef(undefined)
-  const [selfSignupEndDate, setSelfSignupEndDate] = useState(null)
+  const topElement = useRef<HTMLElement | null>(null)
+  const creationJSON = useRef<any>(undefined)
+  const [selfSignupEndDate, setSelfSignupEndDate] = useState<string | null>(null)
   const areErrors = Object.keys(st.errors).length > 0
   const apiCall = doFetchApi
   const isApiActive = st.apiState !== API_STATE.inactive
-  const isApiAssigning = st.apiState === API_STATE.assigning && creationJSON.current
+  const creationJSONValue = creationJSON.current
+  const isApiAssigning = st.apiState === API_STATE.assigning && creationJSONValue
 
   function buildPayload() {
     if (!allowSelfSignup) return {name: st.name}
 
-    const parms = {
+    const parms: any = {
       name: st.name,
       group_limit: st.groupLimit,
       enable_self_signup: st.selfSignup ? '1' : '0',
@@ -162,7 +205,7 @@ export const CreateOrEditSetModal = ({
 
   useEffect(resetValues, [closed])
 
-  async function onAssignmentCompletion(id) {
+  async function onAssignmentCompletion(id: string) {
     creationJSON.current = undefined
     const groupSetUrl = `/api/v1/group_categories/${id}?includes[]=unassigned_users_count&includes[]=groups_count`
     const {json} = await apiCall({path: groupSetUrl})
@@ -177,7 +220,7 @@ export const CreateOrEditSetModal = ({
     onDismiss(result)
   }
 
-  function isInvalidNumber(str) {
+  function isInvalidNumber(str: string) {
     const val = parseInt(str, 10)
     return Number.isNaN(val) || val < 0
   }
@@ -193,7 +236,7 @@ export const CreateOrEditSetModal = ({
   function validateStructureSection() {
     let valid = true
 
-    function structureError(str) {
+    function structureError(str: string) {
       dispatch({ev: 'error', structure: str})
       valid = false
     }
@@ -236,10 +279,10 @@ export const CreateOrEditSetModal = ({
     return nameSectionValid && structureSectionValid
   }
 
-  async function handleApiCall({path, body, method}) {
+  async function handleApiCall({path, body, method}: {path: string; body?: any; method?: string}) {
     try {
       return await apiCall({path, body, method})
-    } catch (e) {
+    } catch (e: any) {
       if (e?.response instanceof Response) {
         const response = await e.response.json()
 
@@ -268,17 +311,17 @@ export const CreateOrEditSetModal = ({
       const contextStem = context === 'course' ? 'courses' : 'accounts'
       const path = `/api/v1/${contextStem}/${contextId}/group_categories`
       dispatch({ev: 'api-change', to: 'submitting'})
-      const {json} = await handleApiCall({path, body, method: 'POST'})
+      const {json} = (await handleApiCall({path, body, method: 'POST'})) as {json: any}
       showFlashSuccess(I18n.t('Group Set was successfully created'))()
       if (body.assign_async) {
         step = I18n.t('assigning members to the new groups')
         const assignPath = `/api/v1/group_categories/${json.id}/assign_unassigned_members`
         const assignBody = {group_by_section: body.group_by_section}
-        const {json: assignJson} = await handleApiCall({
+        const {json: assignJson} = (await handleApiCall({
           path: assignPath,
           body: assignBody,
           method: 'POST',
-        })
+        })) as {json: any}
         if (ASYNC_ACTIVE_STATES.includes(assignJson.workflow_state)) {
           creationJSON.current = assignJson
           dispatch({ev: 'api-change', to: 'assigning'})
@@ -287,7 +330,7 @@ export const CreateOrEditSetModal = ({
       }
       dispatch({ev: 'api-change', to: 'inactive'})
       onDismiss(json)
-    } catch (e) {
+    } catch (e: any) {
       showFlashError(
         I18n.t('An error occurred while %{performingSomeTask}: %{errorMessage}', {
           performingSomeTask: step,
@@ -312,11 +355,11 @@ export const CreateOrEditSetModal = ({
       }}
       render={(props, _) => {
         return (
-          <GroupContext.Provider value={stateToContext(st)}>
+          <GroupContext.Provider value={stateToContext(st) as any}>
             <GroupSetName
               errormsg={st.errors.name}
-              onChange={newName => dispatch({ev: 'name-change', to: newName})}
-              elementRef={el => {
+              onChange={(newName: string) => dispatch({ev: 'name-change', to: newName})}
+              elementRef={(el: HTMLElement | null) => {
                 topElement.current = el
               }}
               {...props}
@@ -325,7 +368,7 @@ export const CreateOrEditSetModal = ({
               <>
                 <SelfSignup
                   onChange={to => dispatch({ev: 'selfsignup-change', to})}
-                  selfSignupEndDateEnabled={ENV.self_signup_deadline_enabled}
+                  selfSignupEndDateEnabled={(ENV as any).self_signup_deadline_enabled}
                   endDateOnChange={value => setSelfSignupEndDate(value)}
                   {...props}
                 />
@@ -365,7 +408,7 @@ export const CreateOrEditSetModal = ({
       <Modal.Body id="foobar">
         {isApiAssigning ? (
           <AssignmentProgress
-            url={creationJSON.current.url}
+            url={creationJSONValue.url}
             apiCall={apiCall}
             onCompletion={onAssignmentCompletion}
           />
@@ -396,49 +439,32 @@ export const CreateOrEditSetModal = ({
   )
 }
 
-// TODO: I think allowSelfSignup and context are both conveying the same information...
-// check this and remove the redundant prop if true
-CreateOrEditSetModal.propTypes = {
-  closed: bool,
-  onDismiss: func,
-  studentSectionCount: number,
-  context: string,
-  contextId: string,
-  allowSelfSignup: bool.isRequired,
-  mockApi: func,
-}
-
-CreateOrEditSetModal.defaultProps = {
-  closed: false,
-  onDismiss: Function.prototype,
-}
-
 // Brings up the create groupset modal and returns a Promise that resolves when it is dismissed.
 // The resolution value is either null if the dialog was dismissed without action or if an error
 // occurred, or contains the object returned by the create API call. For testing
 // purposes, it's also possible to pass in a function which will stand in for doFetchApi to mock
 // the API call process. Note that it must return a Promise that resolves to the same data
 // structure that doFetchApi returns.
-export function renderCreateDialog(div, mockApi) {
+export function renderCreateDialog(div: HTMLElement, mockApi?: typeof doFetchApi) {
   const root = createRoot(div)
   return new Promise(resolve => {
-    function onDismiss(result) {
+    function onDismiss(result: any) {
       root.render(
         <CreateOrEditSetModal
-          allowSelfSignup={ENV.allow_self_signup}
+          allowSelfSignup={(ENV as any).allow_self_signup}
           mockApi={mockApi}
           closed={true}
         />,
       )
       resolve(result)
     }
-    const context = ENV.context_asset_string.split('_')
+    const context = (ENV as any).context_asset_string.split('_')
     root.render(
       <CreateOrEditSetModal
-        studentSectionCount={ENV.student_section_count}
+        studentSectionCount={(ENV as any).student_section_count}
         context={context[0]}
         contextId={context[1]}
-        allowSelfSignup={ENV.allow_self_signup}
+        allowSelfSignup={(ENV as any).allow_self_signup}
         onDismiss={onDismiss}
         mockApi={mockApi}
       />,
