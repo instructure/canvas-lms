@@ -30,14 +30,14 @@ import {Responsive} from '@instructure/ui-responsive'
 const I18n = createI18nScope('conversations_2')
 
 const ConversationListContainer = ({
-  scope,
-  onSelectConversation,
+  scope = 'inbox',
+  onSelectConversation = () => {},
   onReadStateChange,
   onStarStateChange,
   commonQueryVariables,
   conversationsQuery,
   submissionCommentsQuery,
-  setConversationIdToGoBackTo,
+  setConversationIdToGoBackTo = () => {},
 }) => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
@@ -220,10 +220,4 @@ ConversationListContainer.propTypes = {
   conversationsQuery: PropTypes.object,
   submissionCommentsQuery: PropTypes.object,
   setConversationIdToGoBackTo: PropTypes.func,
-}
-
-ConversationListContainer.defaultProps = {
-  scope: 'inbox',
-  onSelectConversation: () => {},
-  setConversationIdToGoBackTo: () => {},
 }
