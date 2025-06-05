@@ -1891,6 +1891,20 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  # Determines if an originality report is associated with this submission version
+  # based on matching submission times or attachment relationships.
+  #
+  # @param originality_report [OriginalityReport] The report to check
+  # @return [Boolean] true if the report is associated with this submission version
+  def originality_report_matches_current_version?(originality_report)
+    originality_report.submission_time&.iso8601(6) == submitted_at&.iso8601(6) ||
+      # ...and sometimes originality reports don't have submission times, so we're doing our
+      # best to guess based on attachment_id (or the lack) and creation times
+      (originality_report.attachment_id.present? && attachment_ids&.split(",")&.include?(originality_report.attachment_id.to_s)) ||
+      (originality_report.submission_time.nil? && originality_report.created_at > submitted_at &&
+        (attachment_ids&.split(",").presence || [""]).include?(originality_report.attachment_id.to_s))
+  end
+
   def versioned_originality_reports
     # Turns out the database stores timestamps with 9 decimal places, but Ruby/Rails only serves
     # up 6 (plus three zeros). However, submission versions (when deserialized into a Submission
@@ -1900,14 +1914,7 @@ class Submission < ActiveRecord::Base
       if submitted_at.nil?
         []
       else
-        originality_reports.select do |o|
-          o.submission_time&.iso8601(6) == submitted_at&.iso8601(6) ||
-            # ...and sometimes originality reports don't have submission times, so we're doing our
-            # best to guess based on attachment_id (or the lack) and creation times
-            (o.attachment_id.present? && attachment_ids&.split(",")&.include?(o.attachment_id.to_s)) ||
-            (o.submission_time.nil? && o.created_at > submitted_at &&
-              (attachment_ids&.split(",").presence || [""]).include?(o.attachment_id.to_s))
-        end
+        originality_reports.select { |o| originality_report_matches_current_version?(o) }
       end
   end
 

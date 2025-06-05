@@ -371,7 +371,16 @@ module Interfaces::SubmissionInterface
     Loaders::MediaObjectLoader.load(object.media_comment_id)
   end
 
-  field :has_originality_report, Boolean, method: :has_originality_report?, null: false
+  field :has_originality_report, Boolean, null: false
+  def has_originality_report
+    if submission.submitted_at.nil?
+      []
+    else
+      load_association(:originality_reports).then do |originality_reports|
+        originality_reports.any? { |o| originality_report_matches_current_version?(o) }
+      end
+    end
+  end
 
   field :vericite_data, [Types::VericiteDataType], null: true
   def vericite_data
