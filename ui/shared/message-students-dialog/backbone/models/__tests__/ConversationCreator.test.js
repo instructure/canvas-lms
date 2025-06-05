@@ -17,23 +17,33 @@
  */
 
 import ConversationCreator from '../ConversationCreator'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 const ok = value => expect(value).toBeTruthy()
 const equal = (value, expected) => expect(value).toEqual(expected)
 const strictEqual = (value, expected) => expect(value).toEqual(expected)
 
 let cc
-let server
+const mockHandler = jest.fn()
+
+const server = setupServer(
+  http.post('/api/v1/conversations', () => {
+    mockHandler()
+    return HttpResponse.json({})
+  }),
+)
 
 describe('ConversationCreator', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
+    mockHandler.mockClear()
+  })
+  afterAll(() => server.close())
+
   beforeEach(() => {
     cc = new ConversationCreator({chunkSize: 2})
-    server = sinon.fakeServer.create()
-  })
-
-  afterEach(() => {
-    return server.restore()
   })
 
   test('#validate passes through to Conversation', function () {
@@ -48,19 +58,14 @@ describe('ConversationCreator', () => {
     )
   })
 
-  test('#save calls save in batches', function () {
-    const spy = sinon.spy()
-    server.respondWith('POST', '/api/v1/conversations', xhr => {
-      spy()
-      xhr.respond(200, {'Content-Type': 'application/json'}, JSON.stringify({}))
-    })
+  test('#save calls save in batches', async function () {
     const dfd = cc.save({
       body: 'body',
       recipients: [1, 2, 3, 4],
     })
     equal(dfd.state(), 'pending')
-    server.respond()
+    await dfd
     equal(dfd.state(), 'resolved')
-    ok(spy.calledTwice)
+    expect(mockHandler).toHaveBeenCalledTimes(2)
   })
 })
