@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {shallow} from 'enzyme'
 import userEvent from '@testing-library/user-event'
 import MigrationSync from '../MigrationSync'
 
@@ -33,24 +32,24 @@ describe('MigrationSync component', () => {
   })
 
   test('renders the MigrationSync component', () => {
-    const tree = shallow(<MigrationSync {...defaultProps()} />)
-    const node = tree.find('.bcs__migration-sync')
+    const {container} = render(<MigrationSync {...defaultProps()} />)
+    const node = container.querySelector('.bcs__migration-sync')
     expect(node).toBeTruthy()
   })
 
   test('renders the progress indicator if in a loading migration state', () => {
     const props = defaultProps()
     props.migrationStatus = 'queued'
-    const tree = shallow(<MigrationSync {...props} />)
-    const node = tree.find('.bcs__migration-sync__loading')
+    const {container} = render(<MigrationSync {...props} />)
+    const node = container.querySelector('.bcs__migration-sync__loading')
     expect(node).toBeTruthy()
   })
 
   test('renders the progress indicator if in the process of beginning a migration', () => {
     const props = defaultProps()
     props.isLoadingBeginMigration = true
-    const tree = shallow(<MigrationSync {...props} />)
-    const node = tree.find('.bcs__migration-sync__loading')
+    const {container} = render(<MigrationSync {...props} />)
+    const node = container.querySelector('.bcs__migration-sync__loading')
     expect(node).toBeTruthy()
   })
 
@@ -68,7 +67,7 @@ describe('MigrationSync component', () => {
     const props = defaultProps()
     props.hasCheckedMigration = false
     props.checkMigration = jest.fn()
-    const tree = shallow(<MigrationSync {...props} />)
+    render(<MigrationSync {...props} />)
     expect(props.checkMigration).toHaveBeenCalledTimes(1)
   })
 
@@ -76,7 +75,7 @@ describe('MigrationSync component', () => {
     const props = defaultProps()
     props.hasCheckedMigration = true
     props.checkMigration = jest.fn()
-    const tree = shallow(<MigrationSync {...props} />)
+    render(<MigrationSync {...props} />)
     expect(props.checkMigration).not.toHaveBeenCalled()
   })
 })
