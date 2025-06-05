@@ -17,27 +17,33 @@
  */
 
 import BackoffPoller from '../index'
-import sinon from 'sinon'
+import jQuery from 'jquery'
 
 const ok = a => expect(a).toBeTruthy()
 
 let ran_callback
 let callback
-let clock
-let server
 
 describe('BackoffPoller', () => {
   beforeEach(() => {
     ran_callback = false
     callback = () => (ran_callback = true)
-    clock = sinon.useFakeTimers()
-    server = sinon.fakeServer.create()
-    server.respondWith('fixtures/ok.json', '{"status":"ok"}')
+    jest.useFakeTimers()
+
+    // Mock jQuery.ajaxJSON
+    jest.spyOn(jQuery, 'ajaxJSON').mockImplementation((url, method, data, success, error) => {
+      // Simulate async behavior
+      setTimeout(() => {
+        success({status: 'ok'})
+      }, 0)
+      return {}
+    })
   })
 
   afterEach(() => {
-    clock.restore()
-    server.restore()
+    jest.restoreAllMocks()
+    jest.clearAllTimers()
+    jest.useRealTimers()
   })
 
   test('should keep polling when it gets a "continue"', function () {
@@ -48,10 +54,10 @@ describe('BackoffPoller', () => {
     })
     poller.start().then(callback)
 
-    // let the first interval expire, and then respond to the request
-    clock.tick(10)
-    server.respond()
-    ok(poller.running, 'poller should be running')
+    // let the first interval expire and process the ajax call
+    jest.advanceTimersByTime(10)
+    jest.runOnlyPendingTimers()
+    expect(!!poller.running).toBeTruthy() // 'poller should be running'
     poller.stop(false)
   })
 
@@ -63,10 +69,10 @@ describe('BackoffPoller', () => {
     })
     poller.start().then(callback)
 
-    // let the first interval expire, and then respond to the request
-    clock.tick(10)
-    server.respond()
-    ok(poller.running, 'poller should be running')
+    // let the first interval expire and process the ajax call
+    jest.advanceTimersByTime(10)
+    jest.runOnlyPendingTimers()
+    expect(!!poller.running).toBeTruthy() // 'poller should be running'
     ok(poller.attempts <= 1, 'counter should be reset') // either zero or one, depending on whether we're waiting for a timeout or an ajax call
     poller.stop(false)
   })
@@ -82,15 +88,17 @@ describe('BackoffPoller', () => {
       },
     )
     poller.start().then(callback)
-    // let the four 'continue' intervals expire, responding after each
+
+    // let the four 'continue' intervals expire
     for (let i = 0; i < 4; i++) {
-      clock.tick(10)
-      server.respond()
+      jest.advanceTimersByTime(10)
+      jest.runOnlyPendingTimers()
     }
-    ok(poller.running, 'poller should be running')
-    clock.tick(10)
-    server.respond()
-    ok(!poller.running, 'poller should be stopped')
+    expect(!!poller.running).toBeTruthy() // 'poller should be running'
+
+    jest.advanceTimersByTime(10)
+    jest.runOnlyPendingTimers()
+    expect(!poller.running).toBeTruthy() // 'poller should be stopped'
     ok(ran_callback, 'poller should have run callbacks')
   })
 
@@ -102,17 +110,17 @@ describe('BackoffPoller', () => {
     })
     poller.start().then(callback)
 
-    // let the first two intervals expire, responding after each
+    // let the first two intervals expire
     for (let i = 0; i < 2; i++) {
-      clock.tick(10)
-      server.respond()
+      jest.advanceTimersByTime(10)
+      jest.runOnlyPendingTimers()
     }
-    ok(poller.running, 'poller should be running')
+    expect(!!poller.running).toBeTruthy() // 'poller should be running'
 
-    // let the final interval expire, and then respond to the request
-    clock.tick(10)
-    server.respond()
-    ok(!poller.running, 'poller should be stopped')
+    // let the final interval expire
+    jest.advanceTimersByTime(10)
+    jest.runOnlyPendingTimers()
+    expect(!poller.running).toBeTruthy() // 'poller should be stopped'
     ok(!ran_callback, 'poller should not have run callbacks')
   })
 
@@ -120,10 +128,10 @@ describe('BackoffPoller', () => {
     const poller = new BackoffPoller('fixtures/ok.json', () => 'omgwtfbbq', {baseInterval: 10})
     poller.start().then(callback)
 
-    // let the interval expire, and then respond to the request
-    clock.tick(10)
-    server.respond()
-    ok(!poller.running, 'poller should be stopped')
+    // let the interval expire
+    jest.advanceTimersByTime(10)
+    jest.runOnlyPendingTimers()
+    expect(!poller.running).toBeTruthy() // 'poller should be stopped'
     ok(!ran_callback, 'poller should not have run callbacks')
   })
 })
