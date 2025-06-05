@@ -17,10 +17,11 @@
  */
 
 import $ from 'jquery'
-import sinon from 'sinon'
 import {configure, mount, unmount} from '../index'
 import {findByTestId, waitFor} from '@testing-library/dom'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http} from 'msw'
 
 const fixture = {
   '/api/v1/courses/1/quizzes/1/statistics': {
@@ -719,20 +720,31 @@ const fixture = {
 }
 
 describe('canvas_quizzes/statistics', () => {
-  let fakeServer
+  const server = setupServer()
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     fakeENV.setup()
-    fakeServer = sinon.createFakeServer()
-    fakeServer.autoRespond = true
-    fakeServer.respondImmediately = true
 
+    // Set up MSW handlers for all fixture URLs
     for (const url of Object.keys(fixture)) {
-      fakeServer.respondWith('GET', new RegExp(`^${url}`), [
-        200,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(fixture[url]),
-      ])
+      server.use(
+        http.get(url, () => {
+          return new Response(JSON.stringify(fixture[url]), {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+        }),
+      )
     }
 
     configure({
@@ -746,8 +758,7 @@ describe('canvas_quizzes/statistics', () => {
   })
 
   afterEach(async () => {
-    fakeServer.restore()
-    fakeServer = null
+    server.resetHandlers()
     await unmount()
     fakeENV.teardown()
   })
