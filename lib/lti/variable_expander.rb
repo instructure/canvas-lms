@@ -2211,6 +2211,30 @@ module Lti
                        -> { TextHelper.round_if_whole(@assignment.points_possible) },
                        ASSIGNMENT_GUARD
 
+    # Returns the decimal separator for the root account.
+    # This is used to have custom formatting on numbers, independent from root account's locale.
+    # If the root account does not have a decimal separator set, it will return "$Canvas.root_account.decimal_separator".
+    #
+    # @example
+    #   ```
+    #   "comma"
+    #   ```
+    register_expansion "Canvas.root_account.decimal_separator",
+                       [],
+                       -> { @root_account.settings.dig(:decimal_separator, :value) }
+
+    # Returns the thousand separator for the root account.
+    # This is used to have custom formatting on numbers, independent from root account's locale.
+    # If the root account does not have a thousand separator set, it will return "$Canvas.root_account.decimal_separator".
+    #
+    # @example
+    #   ```
+    #   "period"
+    #   ```
+    register_expansion "Canvas.root_account.thousand_separator",
+                       [],
+                       -> { @root_account.settings&.dig(:thousand_separator, :value) }
+
     private
 
     def unique_submission_dates
