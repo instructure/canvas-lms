@@ -1352,6 +1352,19 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         this.announcing = 0
       }
     })
+
+    editor.on('ResizeEditor', ({deltaY}) => {
+      if (!deltaY) return
+      if (deltaY < 0) {
+        this.setState({
+          announcement: formatMessage('The height of Rich Content Area is decreased.'),
+        })
+      } else {
+        this.setState({
+          announcement: formatMessage('The height of Rich Content Area is increased.'),
+        })
+      }
+    })
   }
 
   /* ********** autosave support *************** */
@@ -1537,7 +1550,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       }
       this.setState({height: newHeight})
       // play nice and send the same event that the silver theme would send
-      editor.fire('ResizeEditor')
+      editor.fire('ResizeEditor', {deltaY: coordinates.deltaY})
     }
   }
 
