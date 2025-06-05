@@ -157,8 +157,7 @@ describe "student planner" do
 
   context "Peer Reviews" do
     before :once do
-      @reviewee = user_factory(active_all: true)
-      @course.enroll_student(@reviewee).accept!
+      @reviewee = course_with_student(course: @course, active_all: true).user
       @assignment = @course.assignments.create({
                                                  name: "Peer Review Assignment",
                                                  due_at: 1.day.from_now,
@@ -166,10 +165,11 @@ describe "student planner" do
                                                  automatic_peer_reviews: false,
                                                  submission_types: "online_text_entry"
                                                })
+      submission_model(assignment: @assignment, user: @reviewee)
       @assignment.assign_peer_review(@student1, @reviewee)
     end
 
-    it "shows peer review submissions" do
+    it "shows peer review submissions", priority: "1" do
       go_to_list_view
 
       validate_object_displayed(@course.name, "Peer Review")
@@ -178,16 +178,20 @@ describe "student planner" do
       expect(list_view_planner_item("Planner Course Assignment")).not_to contain_css(peer_review_icon_selector)
     end
 
-    it "navigates to peer review submission when clicked" do
+    it "will navigate to peer review submission when clicked", priority: "1" do
+      @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "text")
       go_to_list_view
-      click_peer_review(@course.name, @assignment.name)
-
-      expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
+      link = peer_review_link(@course.name, @assignment.name)
+      expect(link).to be_present
+      expect(link.attribute("href")).to include(
+        "courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
+      )
     end
 
-    it "marks peer review as completed" do
+    it "marks peer review as completed", priority: "1" do
       go_to_list_view
       mark_peer_review_as_complete(@course.name)
+      wait_for_ajaximations
 
       expect(peer_review_item(@course.name)).to contain_jqcss("label:contains('Peer Review #{@assignment.name} is marked as done.')")
     end
@@ -278,6 +282,7 @@ describe "student planner" do
       # gives the To Do a new name and saves it
       title_input("Title Text").send_keys([:control, "a"], :backspace, "New Text")
       todo_save_button.click
+      wait_for_ajaximations
 
       # verifies that the edited To Do is showing up
       todo_item = todo_info_holder
@@ -327,7 +332,9 @@ describe "student planner" do
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("Title Text")
       click_item_button("Title Text")
-      fj("button:contains('Delete')").click
+      delete_button = fj("button:contains('Delete')")
+      keep_trying_until { expect(delete_button).to be_present }
+      delete_button.click
       alert = driver.switch_to.alert
       expect(alert.text).to eq("Are you sure you want to delete this planner item?")
       alert.accept
@@ -449,11 +456,15 @@ describe "student planner" do
     end
   end
 
-  it "shows and navigates to wiki pages with todo dates from student planner", priority: "1" do
+  it "shows wiki pages with todo dates from student planner", priority: "1" do
     page = @course.wiki_pages.create!(title: "Page1", todo_date: 2.days.from_now)
     go_to_list_view
     validate_object_displayed(@course.name, "Page")
-    validate_link_to_url(page, "pages")
+    page_title = flnpt(page.title.to_s)
+    expect(page_title).to be_present
+    expect(page_title.attribute("href")).to include(
+      "courses/#{@course.id}/pages/#{page.title.downcase}"
+    )
   end
 
   context "with existing assignment, open opportunities" do
