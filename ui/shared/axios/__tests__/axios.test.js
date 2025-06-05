@@ -17,36 +17,53 @@
  */
 
 import axios from '../index'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {mswServer} from '../../msw/mswServer'
 
 const ok = value => expect(value).toBeTruthy()
 
+const server = mswServer([])
+
 describe('Custom Axios Tests', () => {
-  beforeEach(() => {
-    moxios.install()
+  beforeAll(() => {
+    server.listen()
   })
 
   afterEach(() => {
-    moxios.uninstall()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   test('Accept headers request stringified ids', async () => {
-    moxios.stubRequest('/some/url', {
-      status: 200,
-      responseText: 'hello',
-    })
+    let capturedRequest
+    server.use(
+      http.get('*/some/url', ({request}) => {
+        capturedRequest = request
+        return new HttpResponse('hello', {
+          status: 200,
+        })
+      }),
+    )
 
-    const response = await axios.get('/some/url')
-    ok(response.config.headers.Accept.includes('application/json+canvas-string-ids'))
+    await axios.get('/some/url')
+    ok(capturedRequest.headers.get('Accept').includes('application/json+canvas-string-ids'))
   })
 
   test('passes X-Requested-With header', async () => {
-    moxios.stubRequest('/some/url', {
-      status: 200,
-      responseText: 'hello',
-    })
+    let capturedRequest
+    server.use(
+      http.get('*/some/url', ({request}) => {
+        capturedRequest = request
+        return new HttpResponse('hello', {
+          status: 200,
+        })
+      }),
+    )
 
-    const response = await axios.get('/some/url')
-    ok(response.config.headers['X-Requested-With'] === 'XMLHttpRequest')
+    await axios.get('/some/url')
+    ok(capturedRequest.headers.get('X-Requested-With') === 'XMLHttpRequest')
   })
 })
