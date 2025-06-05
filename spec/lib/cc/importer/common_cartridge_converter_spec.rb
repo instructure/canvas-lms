@@ -152,14 +152,14 @@ describe "Standard Common Cartridge importing" do
     expect(et.url).to eq "http://www.imsglobal.org/developers/BLTI/tool.php"
     expect(et.settings[:custom_fields]).to eq({ "key1" => "value1", "key2" => "value2" })
     expect(et.settings[:vendor_extensions]).to eq [{ platform: "my.lms.com", custom_fields: { "key" => "value" } }, { platform: "your.lms.com", custom_fields: { "key" => "value", "key2" => "value2" } }].map(&:with_indifferent_access)
-    expect(@migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.")).to be_truthy
+    expect(@migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" may need to be set in Course Settings.")).to be_truthy
 
     et = @course.context_external_tools.where(migration_id: "I_00011_R").first
     expect(et.name).to eq "BLTI Assignment Test"
     expect(et.url).to eq "http://www.imsglobal.org/developers/BLTI/tool2.php"
     expect(et.settings[:custom_fields]).to eq({})
     expect(et.settings[:vendor_extensions]).to eq [].map(&:with_indifferent_access)
-    expect(@migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.")).to be_truthy
+    expect(@migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" may need to be set in Course Settings.")).to be_truthy
 
     # That second tool had the assignment flag set, so an assignment for it should have been created
     asmnt = @course.assignments.where(migration_id: "I_00011_R").first
