@@ -16,20 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Frame, SerializedNodes} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
-import {DummyBlock} from './Blocks/DummyBlock'
-import {TextBlock} from './Blocks/TextBlock'
+import {render} from '@testing-library/react'
+import {TextBlock} from '../TextBlock'
 
-export const PageEditor = (props: {
-  data: SerializedNodes | null
-}) => {
-  return (
-    <>
-      <Editor resolver={{DummyBlock, TextBlock}}>
-        <AddBlock />
-        <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
-      </Editor>
-    </>
-  )
-}
+describe('TextBlock', () => {
+  it('should render without crashing', () => {
+    render(<TextBlock />)
+    expect(true).toBe(true)
+  })
+})
