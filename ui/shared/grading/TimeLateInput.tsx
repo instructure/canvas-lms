@@ -39,25 +39,28 @@ function defaultDurationLate(interval: string, secondsLate: number): number {
 }
 
 type Props = {
-  disabled: boolean
+  disabled?: boolean
   lateSubmissionInterval: 'day' | 'hour'
   locale: string
   renderLabelBefore: boolean
   secondsLate: number
-  onSecondsLateUpdated: (submission: {secondsLateOverride: number}) => void
+  onSecondsLateUpdated: (submission: {
+    latePolicyStatus: 'late'
+    secondsLateOverride: number
+  }) => void
   width: string
-  visible: boolean
+  visible?: boolean
 }
 
 export default function TimeLateInput({
-  disabled,
+  disabled = false,
   lateSubmissionInterval,
   locale,
   renderLabelBefore,
   secondsLate,
   onSecondsLateUpdated,
   width,
-  visible,
+  visible = true,
 }: Props) {
   const [numberInputValue, setNumberInputValue] = useState(
     defaultDurationLate(lateSubmissionInterval, secondsLate),
@@ -76,8 +79,7 @@ export default function TimeLateInput({
     return null
   }
 
-  // @ts-expect-error
-  const handleNumberInputBlur = ({target: {value}}) => {
+  const handleNumberInputBlur = ({target: {value}}: React.FocusEvent<HTMLInputElement>) => {
     if (!NumberHelper.validate(value)) {
       return
     }
@@ -98,7 +100,6 @@ export default function TimeLateInput({
     }
 
     onSecondsLateUpdated({
-      // @ts-expect-error
       latePolicyStatus: 'late',
       secondsLateOverride: Math.trunc(secondsLateOverride),
     })
@@ -114,11 +115,9 @@ export default function TimeLateInput({
             interaction={disabled ? 'disabled' : 'enabled'}
             display="inline-block"
             renderLabel={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
-            // @ts-expect-error
-            locale={locale}
             min="0"
             onBlur={handleNumberInputBlur}
-            onChange={(e, value) => {
+            onChange={(_e, value) => {
               const inputValue = parseInt(value, 10)
               setNumberInputValue(Number.isNaN(inputValue) ? 0 : inputValue)
             }}
@@ -136,9 +135,4 @@ export default function TimeLateInput({
       </Flex>
     </span>
   )
-}
-
-TimeLateInput.defaultProps = {
-  disabled: false,
-  visible: true,
 }
