@@ -19,7 +19,6 @@
 import React from 'react'
 import {render, cleanup, waitFor, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import sinon from 'sinon'
 
 import AssignmentColumnHeader from '../AssignmentColumnHeader'
 import {getMenuItem} from './ColumnHeaderSpecHelpers'
@@ -211,7 +210,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.hideGradesAction.onSelect = sinon.stub()
+        props.hideGradesAction.onSelect = jest.fn()
       })
 
       test('does not restore focus to the "Options" menu trigger', () => {
@@ -221,12 +220,12 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
       test('calls the .hideGradesAction.onSelect callback', () => {
         getMenuItem(menuContent, 'Hide grades').click()
-        expect(props.hideGradesAction.onSelect.callCount).toBe(1)
+        expect(props.hideGradesAction.onSelect).toHaveBeenCalledTimes(1)
       })
 
       test('includes a callback for restoring focus upon dialog close', () => {
         getMenuItem(menuContent, 'Hide grades').click()
-        const [callback] = props.hideGradesAction.onSelect.lastCall.args
+        const [callback] = props.hideGradesAction.onSelect.mock.calls[0]
         callback()
         expect(document.activeElement).toBe(getOptionsMenuTrigger())
       })
