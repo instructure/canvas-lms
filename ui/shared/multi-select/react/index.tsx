@@ -17,7 +17,14 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React, {useState, useEffect, useRef, useMemo, type PropsWithChildren} from 'react'
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  type PropsWithChildren,
+  useContext,
+} from 'react'
 import keycode from 'keycode'
 import {Select, type SelectProps} from '@instructure/ui-select'
 import type {ViewProps} from '@instructure/ui-view'
@@ -27,6 +34,7 @@ import {compact, uniqueId} from 'lodash'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import type {FormMessage} from '@instructure/ui-form-field'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 const I18n = createI18nScope('app_shared_components')
 
@@ -114,8 +122,11 @@ function CanvasMultiSelect(props: Props) {
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null)
   const [announcement, setAnnouncement] = useState<string | null>(null)
+
   const inputRef = useRef<HTMLInputElement | null>(null)
   const noOptionId = useRef(uniqueId(NO_OPTIONS_OPTION_ID))
+
+  const {setOnSuccess} = useContext(AlertManagerContext)
 
   if (inputRef && setInputRef) {
     setInputRef(inputRef.current)
@@ -281,6 +292,13 @@ function CanvasMultiSelect(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(memoizedChildprops)])
 
+  const handleNoMatchResult = () => {
+    setOnSuccess('')
+    setTimeout(() => {
+      setOnSuccess(I18n.t('No result found'))
+    }, 100)
+  }
+
   function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const {value} = e.target
     filterOptions(value)
@@ -317,9 +335,15 @@ function CanvasMultiSelect(props: Props) {
       const child = getChildById(filtered[0].id)
       if (child) message = primaryLabel(child) + '. ' + message
     }
+
     setFilteredOptionIds(filtered.map(f => f.id))
 
-    if (filtered.length > 0) setHighlightedOptionId(filtered[0].id)
+    if (filtered.length > 0) {
+      setHighlightedOptionId(filtered[0].id)
+    } else {
+      handleNoMatchResult()
+    }
+
     setIsShowingOptions(true)
     setAnnouncement(message)
   }
