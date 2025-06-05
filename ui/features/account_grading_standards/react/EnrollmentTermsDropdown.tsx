@@ -17,31 +17,45 @@
  */
 
 import React, {useRef} from 'react'
-import PropTypes from 'prop-types'
 import {map, filter, sortBy} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('EnrollmentTermsDropdown')
 
-const EnrollmentTermsDropdown = ({terms, changeSelectedEnrollmentTerm}) => {
-  const termsDropdownRef = useRef(null)
+interface Term {
+  id: string | number
+  displayName: string
+  startAt?: string
+  createdAt: string
+}
 
-  const sortedTerms = termsList => {
-    const dated = filter(termsList, term => term.startAt)
+interface EnrollmentTermsDropdownProps {
+  terms: Term[]
+  changeSelectedEnrollmentTerm: (event: React.ChangeEvent<HTMLSelectElement>) => void
+}
+
+const EnrollmentTermsDropdown: React.FC<EnrollmentTermsDropdownProps> = ({
+  terms,
+  changeSelectedEnrollmentTerm,
+}) => {
+  const termsDropdownRef = useRef<HTMLSelectElement>(null)
+
+  const sortedTerms = (termsList: Term[]): Term[] => {
+    const dated = filter(termsList, (term): term is Term => !!term.startAt) as Term[]
     const datedTermsSortedByStart = sortBy(dated, term => term.startAt).reverse()
 
-    const undated = filter(termsList, term => !term.startAt)
+    const undated = filter(termsList, (term): term is Term => !term.startAt) as Term[]
     const undatedTermsSortedByCreate = sortBy(undated, term => term.createdAt).reverse()
     return datedTermsSortedByStart.concat(undatedTermsSortedByCreate)
   }
 
-  const termOptions = termsList => {
+  const termOptions = (termsList: Term[]) => {
     const allTermsOption = (
       <option key={0} value={0}>
         {I18n.t('All Terms')}
       </option>
     )
-    const options = map(sortedTerms(termsList), term => (
+    const options = map(sortedTerms(termsList), (term: Term) => (
       <option key={term.id} value={term.id}>
         {term.displayName}
       </option>
@@ -64,11 +78,6 @@ const EnrollmentTermsDropdown = ({terms, changeSelectedEnrollmentTerm}) => {
       {termOptions(terms)}
     </select>
   )
-}
-
-EnrollmentTermsDropdown.propTypes = {
-  terms: PropTypes.array.isRequired,
-  changeSelectedEnrollmentTerm: PropTypes.func.isRequired,
 }
 
 export default EnrollmentTermsDropdown
