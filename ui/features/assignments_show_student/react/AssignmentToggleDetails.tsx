@@ -23,21 +23,20 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
-import {string} from 'prop-types'
 
 const I18n = createI18nScope('assignment_2_assignment_toggle_details')
 
-function AssignmentDetailsText(description) {
+interface AssignmentToggleDetailsProps {
+  description?: string
+}
+
+function AssignmentDetailsText(description?: string): string {
   return description
     ? apiUserContent.convert(description)
     : I18n.t('No additional details were added for this assignment.')
 }
 
-AssignmentToggleDetails.propTypes = {
-  description: string,
-}
-
-export default function AssignmentToggleDetails(props) {
+export default function AssignmentToggleDetails(props: AssignmentToggleDetailsProps) {
   return (
     <div className="a2-toggle-details-container">
       <ToggleDetails
