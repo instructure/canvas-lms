@@ -22,6 +22,12 @@ import ready from '@instructure/ready'
 import LearningMastery from './react'
 
 ready(() => {
-  const root = createRoot(document.getElementById('learning_mastery_gradebook'))
+  const container = document.getElementById('learning_mastery_gradebook')
+  if (!container) {
+    console.error('Could not find learning_mastery_gradebook container element')
+    return
+  }
+
+  const root = createRoot(container)
   root.render(<LearningMastery courseId={ENV.GRADEBOOK_OPTIONS.context_id} />)
 })
