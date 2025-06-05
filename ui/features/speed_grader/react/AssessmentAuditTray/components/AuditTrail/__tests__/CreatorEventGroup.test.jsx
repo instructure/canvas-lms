@@ -77,11 +77,12 @@ describe('AssessmentAuditTray CreatorEventGroup', () => {
         expect(screen.getByTestId('warning-icon')).toBeInTheDocument()
       })
 
-      // FOO-3825
-      it.skip('displays a tooltip', () => {
+      it('displays a tooltip', async () => {
         renderComponent()
+        const warningIcon = screen.getByTestId('warning-icon')
+        await userEvent.hover(warningIcon)
         expect(
-          screen.getByText(`${users[0].name} performed actions while anonymous was off`),
+          await screen.findByText(`${users[0].name} performed actions while anonymous was off`),
         ).toBeInTheDocument()
       })
     })
