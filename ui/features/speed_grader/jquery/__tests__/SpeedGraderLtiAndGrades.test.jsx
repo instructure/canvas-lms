@@ -23,6 +23,8 @@ import {unescape} from '@instructure/html-escape'
 import SpeedGrader from '../speed_grader'
 import SpeedGraderHelpers from '../speed_grader_helpers'
 import '@canvas/jquery/jquery.ajaxJSON'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 // Mock SpeedGraderSettingsMenu
 jest.mock('../../react/SpeedGraderSettingsMenu', () => ({
@@ -30,8 +32,15 @@ jest.mock('../../react/SpeedGraderSettingsMenu', () => ({
   default: () => null,
 }))
 
+const server = setupServer()
+
 describe('SpeedGrader', () => {
   let fixtures
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   const requiredDOMFixtures = `
     <div id="hide-assignment-grades-tray"></div>
     <div id="post-assignment-grades-tray"></div>
@@ -99,8 +108,19 @@ describe('SpeedGrader', () => {
       fixtures.innerHTML = requiredDOMFixtures + '<div id="iframe_holder">not empty</div>'
       $div = $(fixtures).find('#iframe_holder')
 
+      server.use(
+        http.get('*', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('*', () => {
+          return HttpResponse.json({})
+        }),
+        http.put('*', () => {
+          return HttpResponse.json({})
+        }),
+      )
+
       jest.spyOn($, 'getJSON')
-      jest.spyOn($, 'ajaxJSON')
       jest.spyOn(SpeedGrader.EG, 'domReady')
 
       // Mock $.ajaxJSON.storeRequest
