@@ -22,8 +22,6 @@ import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDat
 import {registerTranslations} from '@canvas/i18n'
 import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
 import filterUselessConsoleMessages from '@instructure/filter-console-messages'
-import Enzyme from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
 import CoreTranslations from '../public/javascripts/translations/en.json'
 import {up as installNodeDecorations} from '../ui/boot/initializers/installNodeDecorations'
 
@@ -118,8 +116,6 @@ window.ENV = {
     extended_submission_state: true,
   },
 }
-
-Enzyme.configure({adapter: new Adapter()})
 
 // because InstUI themeable components need an explicit "dir" attribute on the <html> element
 document.documentElement.setAttribute('dir', 'ltr')
