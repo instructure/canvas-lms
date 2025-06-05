@@ -181,7 +181,36 @@ class Lti::ContextControl < ActiveRecord::Base
     [context_name]
   end
 
+  # Includes all nested subaccounts that belong to the control's account.
+  def subaccount_count
+    return 0 unless account
+
+    # equivalent to `Account.sub_account_ids_recursive(account.id).count`
+    calculated_attrs[:subaccount_count]
+  end
+
+  # Includes all courses in the control's account and in all nested subaccounts.
+  def course_count
+    return 0 unless account
+
+    # equivalent to `Course.where(account_id: subaccount_ids + [account_id]).active.count`
+    calculated_attrs[:course_count]
+  end
+
+  # Includes all ContextControls for the same deployment that are present in
+  # any subaccount or course that belong to the control's account.
+  def child_control_count
+    return 0 unless account
+
+    # equivalent to Lti::ContextControl.active.where(deployment:).where("path like ?", "#{path}%").where.not(id:).count
+    calculated_attrs[:child_control_count]
+  end
+
   private
+
+  def calculated_attrs
+    @calculated_attrs ||= Lti::ContextControlService.preload_calculated_attrs([self])[id]
+  end
 
   def set_path
     self.path = self.class.calculate_path(account || course)
