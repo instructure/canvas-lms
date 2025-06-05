@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const MAX_GRID_WIDTH = 1440
-export const COLUMN_WIDTH = 160
-export const STUDENT_COLUMN_WIDTH = 220
-export const STUDENT_COLUMN_RIGHT_PADDING = 15
-export const COLUMN_PADDING = 2
-export const CELL_HEIGHT = 45
+export const MAX_GRID_WIDTH: number = 1440
+export const COLUMN_WIDTH: number = 160
+export const STUDENT_COLUMN_WIDTH: number = 220
+export const STUDENT_COLUMN_RIGHT_PADDING: number = 15
+export const COLUMN_PADDING: number = 2
+export const CELL_HEIGHT: number = 45

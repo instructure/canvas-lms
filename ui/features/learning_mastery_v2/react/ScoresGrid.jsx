@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import StudentOutcomeScore from './StudentOutcomeScore'
 import {studentShape, outcomeShape, studentRollupsShape} from './shapes'
-import {COLUMN_WIDTH, COLUMN_PADDING, CELL_HEIGHT} from './constants'
+import {COLUMN_WIDTH, COLUMN_PADDING, CELL_HEIGHT} from './utils/constants'
 
 const ScoresGrid = ({students, outcomes, rollups, visibleRatings}) => {
   const rollupsByStudentAndOutcome = useMemo(() => {
