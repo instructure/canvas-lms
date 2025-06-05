@@ -21,8 +21,20 @@ import 'jquery-migrate'
 import WikiPage from '../WikiPage'
 import WikiPageRevision from '../WikiPageRevision'
 import '@canvas/jquery/jquery.ajaxJSON'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 describe('WikiPageRevision', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
     jest.resetModules()
@@ -30,6 +42,7 @@ describe('WikiPageRevision', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    server.resetHandlers()
   })
 
   describe('urls', () => {
@@ -135,8 +148,17 @@ describe('WikiPageRevision', () => {
   })
 
   describe('fetch', () => {
-    test('the summary flag is passed to the server', () => {
-      jest.spyOn($, 'ajax').mockReturnValue($.Deferred())
+    test('the summary flag is passed to the server', async () => {
+      let capturedParams = null
+
+      server.use(
+        http.get('*/api/v1/courses/73/pages/page-url/revisions', ({request}) => {
+          const url = new URL(request.url)
+          capturedParams = Object.fromEntries(url.searchParams.entries())
+          return HttpResponse.json([])
+        }),
+      )
+
       const revision = new WikiPageRevision(
         {},
         {
@@ -145,8 +167,8 @@ describe('WikiPageRevision', () => {
           summary: true,
         },
       )
-      revision.fetch()
-      expect($.ajax.mock.calls[0][0].data.summary).toBe(true)
+      await revision.fetch()
+      expect(capturedParams.summary).toBe('true')
     })
 
     test('pollForChanges performs a fetch at most every interval', () => {
