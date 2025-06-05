@@ -22,7 +22,6 @@ import React from 'react'
 import CustomHelpLinkSettings from '../CustomHelpLinkSettings'
 import {render, fireEvent, within} from '@testing-library/react'
 import $ from 'jquery'
-import sinon from 'sinon'
 
 function makeProps(overrides = {}) {
   const defaultLinks = [
@@ -136,11 +135,11 @@ describe('<CustomHelpLinkSettings/>', () => {
 
   describe('validate', () => {
     beforeEach(() => {
-      sinon.spy($, 'screenReaderFlashMessage')
+      jest.spyOn($, 'screenReaderFlashMessage')
     })
 
     afterEach(() => {
-      $.screenReaderFlashMessage.restore()
+      $.screenReaderFlashMessage.mockRestore()
     })
 
     it('accepts properly formatted urls', () => {
@@ -178,19 +177,19 @@ describe('<CustomHelpLinkSettings/>', () => {
 
       // flash message when transitions to invalid
       await updateTextField(rendered, 'Name', '')
-      expect($.screenReaderFlashMessage.callCount).toEqual(1)
+      expect($.screenReaderFlashMessage).toHaveBeenCalledTimes(1)
 
       // no flash message as long as is invalid
       await updateTextField(rendered, 'Name', '')
-      expect($.screenReaderFlashMessage.callCount).toEqual(1)
+      expect($.screenReaderFlashMessage).toHaveBeenCalledTimes(1)
 
       // it's valid now
       await updateTextField(rendered, 'Name', 'foo')
-      expect($.screenReaderFlashMessage.callCount).toEqual(1)
+      expect($.screenReaderFlashMessage).toHaveBeenCalledTimes(1)
 
       // and invalid again, show message
       await updateTextField(rendered, 'Name', '')
-      expect($.screenReaderFlashMessage.callCount).toEqual(2)
+      expect($.screenReaderFlashMessage).toHaveBeenCalledTimes(2)
     })
   })
 
@@ -240,9 +239,7 @@ describe('<CustomHelpLinkSettings/>', () => {
     fireEvent.click(getByLabelText('New'))
     fireEvent.click(getByText('Update link'))
     expect(getByText(/New/)).toBeInTheDocument()
-    expect(
-      within(getByText('Report a Problem').closest('li')).getByText('New'),
-    ).toBeInTheDocument()
+    expect(within(getByText('Report a Problem').closest('li')).getByText('New')).toBeInTheDocument()
   })
 
   it('adds link at second position when featured link exists', async () => {
