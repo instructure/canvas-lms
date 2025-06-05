@@ -428,4 +428,47 @@ describe('checker', () => {
       expect(renderResult.queryByText('Link for learning more')).not.toBeInTheDocument()
     })
   })
+
+  describe('Send message when tray is closed or open', () => {
+    beforeEach(() => {
+      global.window.webkit = {
+        messageHandlers: {
+          modalPresentation: {
+            postMessage: jest.fn(),
+          },
+        },
+      }
+    })
+
+    afterEach(() => {
+      delete global.window.webkit
+    })
+
+    test('should send a message when the tray is closed', () => {
+      const onClose = jest.fn()
+      const instanceRef = React.createRef()
+      render(
+        <Checker ref={instanceRef} getBody={() => node} editor={fakeEditor} onClose={onClose} />,
+      )
+      const instance = instanceRef.current
+
+      instance.handleClose() // Simulate closing the tray
+
+      expect(window.webkit.messageHandlers.modalPresentation.postMessage).toHaveBeenCalledWith({
+        open: false,
+      })
+    })
+
+    test('should send a message when the tray is open', () => {
+      const instanceRef = React.createRef()
+      render(<Checker ref={instanceRef} getBody={() => node} editor={fakeEditor} />)
+      const instance = instanceRef.current
+
+      instance.check() // Simulate opening the tray
+
+      expect(window.webkit.messageHandlers.modalPresentation.postMessage).toHaveBeenCalledWith({
+        open: true,
+      })
+    })
+  })
 })
