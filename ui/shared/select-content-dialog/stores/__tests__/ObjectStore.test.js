@@ -17,18 +17,33 @@
  */
 
 import Store from '../ObjectStore'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {mswServer} from '../../../msw/mswServer'
+import {waitFor} from '@testing-library/dom'
+
+const handlers = []
+const server = mswServer(handlers)
 
 describe('ObjectStore', () => {
   let testStore
-  let server
   let foldersPageOne
   let foldersPageTwo
   let foldersPageThree
 
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     testStore = new Store('/api/v1/courses/2/folders', {someOption: 'value'}) // Update with required second argument
-    server = sinon.createFakeServer()
     foldersPageOne = [
       {
         full_name: 'course files/@123',
@@ -111,22 +126,22 @@ describe('ObjectStore', () => {
   })
 
   afterEach(() => {
-    server.restore()
     return testStore.reset()
   })
 
-  test('fetch', () => {
-    server.respondWith('GET', /\/folders/, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(foldersPageOne),
-    ])
+  test('fetch', async () => {
+    server.use(
+      http.get(/\/folders/, () => {
+        return HttpResponse.json(foldersPageOne)
+      }),
+    )
     testStore.fetch()
-    server.respond()
-    expect(testStore.getState().items).toEqual(foldersPageOne) // Use Jest's expect
+    await waitFor(() => {
+      expect(testStore.getState().items).toEqual(foldersPageOne)
+    })
   })
 
-  test('fetch with fetchAll', () => {
+  test('fetch with fetchAll', async () => {
     const linkHeaders =
       '<https://folders?page=1&per_page=2>; rel="current",' +
       '<https://page2>; rel="next",' +
@@ -137,43 +152,51 @@ describe('ObjectStore', () => {
       '<https://page3>; rel="next",' +
       '<https://folders?page=1&per_page=2>; rel="first",' +
       '<https://page3>; rel="last"'
-    server.respondWith('GET', /\/folders/, [
-      200,
-      {
-        'Content-Type': 'application/json',
-        Link: linkHeaders,
-      },
-      JSON.stringify(foldersPageOne),
-    ])
+
+    server.use(
+      http.get(/\/folders/, () => {
+        return new HttpResponse(JSON.stringify(foldersPageOne), {
+          headers: {
+            'Content-Type': 'application/json',
+            Link: linkHeaders,
+          },
+        })
+      }),
+      http.get(/page2/, () => {
+        return new HttpResponse(JSON.stringify(foldersPageTwo), {
+          headers: {
+            'Content-Type': 'application/json',
+            Link: linkHeaders2,
+          },
+        })
+      }),
+      http.get(/page3/, () => {
+        return HttpResponse.json(foldersPageThree)
+      }),
+    )
+
     testStore.fetch({fetchAll: true})
-    server.respond()
-    server.respondWith('GET', /page2/, [
-      200,
-      {
-        'Content-Type': 'application/json',
-        Link: linkHeaders2,
-      },
-      JSON.stringify(foldersPageTwo),
-    ])
-    server.respond()
-    server.respondWith('GET', /page3/, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(foldersPageThree),
-    ])
-    server.respond()
-    expect(testStore.getState().items).toEqual(
-      foldersPageOne.concat(foldersPageTwo).concat(foldersPageThree),
-    ) // Use Jest's expect
+
+    await waitFor(() => {
+      expect(testStore.getState().items).toEqual(
+        foldersPageOne.concat(foldersPageTwo).concat(foldersPageThree),
+      )
+    })
   })
 
-  test('fetch with error', () => {
-    server.respondWith('GET', /\/folders/, [500, {}, ''])
+  test('fetch with error', async () => {
+    server.use(
+      http.get(/\/folders/, () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     testStore.fetch()
-    server.respond()
-    const state = testStore.getState()
-    expect(state.items).toHaveLength(0) // Use Jest's expect
-    expect(state.hasMore).toBe(true) // Use Jest's expect
-    expect(state.isLoaded).toBe(false) // Use Jest's expect
+
+    await waitFor(() => {
+      const state = testStore.getState()
+      expect(state.items).toHaveLength(0)
+      expect(state.hasMore).toBe(true)
+      expect(state.isLoaded).toBe(false)
+    })
   })
 })
