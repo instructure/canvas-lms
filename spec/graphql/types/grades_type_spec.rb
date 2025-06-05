@@ -51,8 +51,9 @@ describe Types::GradesType do
     )
   end
 
-  def resolve_grades_field(field)
-    enrollment_type.resolve("grades { #{field} }", current_user: teacher)
+  def resolve_grades_field(field, context = {})
+    context = context.merge(current_user: teacher)
+    enrollment_type.resolve("grades { #{field} }", context)
   end
 
   describe "fields" do
@@ -112,6 +113,15 @@ describe Types::GradesType do
 
     it "resolves the state field to the Score's workflow_state" do
       expect(resolve_grades_field("state")).to eq "active"
+    end
+
+    it "resolves the htmlUrl field to the correct grades URL" do
+      expected_url = Rails.application.routes.url_helpers.course_student_grades_url(
+        course.id,
+        student_enrollment.user_id,
+        host: "test.host"
+      )
+      expect(resolve_grades_field("htmlUrl", { request: ActionDispatch::TestRequest.create })).to eq expected_url
     end
   end
 end

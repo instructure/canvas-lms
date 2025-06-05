@@ -66,7 +66,8 @@ apply_score_to_ungraded:
   state: hidden
   applies_to: Account
   display_name: Apply Score to Ungraded
-  description: Allows instructors to apply scores to ungraded submissions en masse from assignment
+  description:
+    Allows instructors to apply scores to ungraded submissions en masse from assignment
     group and Total column menus in the Gradebook.
   environments:
     development:
@@ -75,12 +76,14 @@ enhanced_grade_statistics:
   state: hidden
   applies_to: SiteAdmin
   display_name: Show quartiles for grades and use them for box and whiskers
-  description: Updates the student-facing assignment statistics to include quartiles and makes the
+  description:
+    Updates the student-facing assignment statistics to include quartiles and makes the
     box-and-whiskers plot a proper box and whiskers plot.
 submission_comment_emojis:
   state: hidden
   display_name: Emojis in Submission Comments
-  description: Adds an emoji picker that allows students and teachers to add emojis to
+  description:
+    Adds an emoji picker that allows students and teachers to add emojis to
     their submission comments.
   applies_to: Course
   root_opt_in: true
@@ -93,7 +96,8 @@ peer_reviews_for_a2:
   state: hidden
   applies_to: Course
   display_name: Peer Review Support in Assignment Enhancements
-  description: Students will be able to provide feedback on another student's assignment submission
+  description:
+    Students will be able to provide feedback on another student's assignment submission
     using the enhanced assignment view
 assignment_missing_shortcut:
   state: hidden
@@ -138,7 +142,8 @@ proxy_file_uploads:
   state: hidden
   applies_to: SiteAdmin
   display_name: Submit on Behalf of Student
-  description: Allows teachers with the proper permissions to submit file upload assignments
+  description:
+    Allows teachers with the proper permissions to submit file upload assignments
     on behalf of their students.
   environments:
     ci:
@@ -147,7 +152,8 @@ deprioritize_section_overrides_for_nonactive_enrollments:
   state: hidden
   applies_to: SiteAdmin
   display_name: Deprioritize Section Overrides for Nonactive Enrollments
-  description: If set, deprioritizes using due dates, lock dates, and unlock dates from
+  description:
+    If set, deprioritizes using due dates, lock dates, and unlock dates from
     section overrides on an assignment that are associated with a deactivated, concluded, or
     otherwise non-active enrollment for a student.
   environments:
@@ -174,7 +180,8 @@ new_quiz_deleted_workflow_restore_pending_review_state:
   state: hidden
   applies_to: SiteAdmin
   display_name: New Quiz deleted user restore pending review state on enroll
-  description: When set, determines if the workflow state of a new quiz should be
+  description:
+    When set, determines if the workflow state of a new quiz should be
     set as graded or pending_review if a user had a previous pending_review new quiz but
     had been re-enrolled in the course.
   environments:
@@ -188,7 +195,8 @@ hide_zero_point_quizzes_option:
   state: hidden
   applies_to: SiteAdmin
   display_name: Hide zero point new quizzes from the student and teacher gradebooks
-  description: When set, an option to not display a new quiz with 0 points possible in the gradebook
+  description:
+    When set, an option to not display a new quiz with 0 points possible in the gradebook
     will be available in the form of a checkbox when creating or editing the quiz.
   environments:
     ci:
@@ -207,7 +215,8 @@ fix_missing_policy_applicator_gradebook_history:
   state: hidden
   applies_to: SiteAdmin
   display_name: Fix Missing Policy Applicator Gradebook History
-  description: Fixes the missing policy applicator to insert records into Gradebook History
+  description:
+    Fixes the missing policy applicator to insert records into Gradebook History
     for each submission marked as missing.
   environments:
     ci:
@@ -339,6 +348,16 @@ platform_service_speedgrader:
       state: allowed
     development:
       state: allowed
+moderated_grading_modernized_speedgrader:
+  state: hidden
+  display_name: Performance and Usability Updates for Moderated Grading in SpeedGrader
+  description: This feature provides the new SpeedGrader platform experience with a focus on improved performance for large courses for Moderated Grading assignments
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
 grading_periods_filter_dates:
   state: hidden
   applies_to: SiteAdmin
@@ -459,3 +478,9 @@ project_lhotse:
   display_name: Grading Assistance
   description: Enables the new AI-assisted grading tool inside of the Modernized Speedgrader for assignments in this course.
   hidden: true
+use_graphql_for_gradebook:
+  state: on
+  applies_to: Course
+  display_name: Use GraphQL for Gradebook
+  description: This feature prioritizes GraphQL API over other APIs to reduce load time and improve performance.
+  shadow: true

@@ -43,7 +43,13 @@ export interface CommMessagesViewProps {
 export default function CommMessagesView({accountId}: CommMessagesViewProps): JSX.Element {
   const [query, setQuery] = useState<MessagesQueryParams | null>(null)
 
-  const handleSelect = useCallback((parms: MessagesQueryParams | null) => setQuery(parms), [])
+  const handleSelect = useCallback(
+    (parms: MessagesQueryParams | null) => {
+      if (parms === null && query === null) return
+      setQuery(parms)
+    },
+    [query],
+  )
 
   return (
     <>

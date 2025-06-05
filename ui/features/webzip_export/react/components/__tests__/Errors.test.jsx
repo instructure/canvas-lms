@@ -17,15 +17,15 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import Errors from '../Errors'
 
 describe('Web Zip Export Errors', () => {
   test('renders the Error component', () => {
     const errors = [{response: 'Instance of demon found in code', code: 666}]
-    const tree = shallow(<Errors errors={errors} />)
-    const node = tree.find('.webzipexport__errors')
+    const {container} = render(<Errors errors={errors} />)
+    const node = container.querySelector('.webzipexport__errors')
 
-    expect(node.exists()).toBe(true)
+    expect(node).toBeInTheDocument()
   })
 })

@@ -3961,7 +3961,7 @@ describe DiscussionTopic do
     end
   end
 
-  describe "#sort_order_for_user" do
+  describe "sort_order and expand" do
     before(:once) do
       Account.site_admin.enable_feature! :discussion_default_sort
       @topic = @course.discussion_topics.create!(sort_order: "asc")
@@ -4016,6 +4016,26 @@ describe DiscussionTopic do
 
         expect(topic2.sort_order_for_user(@teacher)).to eq sort_order
         expect(topic2.expanded_for_user(@teacher)).to eq expanded
+      end
+    end
+
+    context "subtopic" do
+      it "create subtopic with same values" do
+        group_discussion_assignment
+        subtopic = @topic.child_topics.first
+        expect(subtopic.sort_order).to eq @topic.sort_order
+        expect(subtopic.expanded).to eq @topic.expanded
+        expect(subtopic.sort_order_locked).to eq @topic.sort_order_locked
+      end
+
+      it "update subtopic with same values" do
+        group_discussion_assignment
+        @topic.update!(sort_order: "desc", expanded: true, expanded_locked: true, sort_order_locked: false)
+        subtopic = @topic.child_topics.first
+        expect(subtopic.sort_order).to eq "desc"
+        expect(subtopic.expanded).to be true
+        expect(subtopic.sort_order_locked).to be false
+        expect(subtopic.expanded_locked).to be true
       end
     end
   end

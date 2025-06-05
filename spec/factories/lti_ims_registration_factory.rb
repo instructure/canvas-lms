@@ -37,7 +37,8 @@ module Factories
         https://purl.imsglobal.org/spec/lti/scope/noticehandlers
         https://purl.imsglobal.org/spec/lti/scope/asset.readonly
         https://purl.imsglobal.org/spec/lti/scope/report
-        https://purl.imsglobal.org/spec/lti/scope/eula
+        https://purl.imsglobal.org/spec/lti/scope/eula/user
+        https://purl.imsglobal.org/spec/lti/scope/eula/deployment
 
         https://canvas.instructure.com/lti/public_jwk/scope/update
         https://canvas.instructure.com/lti/account_lookup/scope/show

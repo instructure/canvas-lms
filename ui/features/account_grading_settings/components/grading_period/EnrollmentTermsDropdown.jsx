@@ -29,6 +29,8 @@ class EnrollmentTermsDropdown extends React.Component {
     changeSelectedEnrollmentTerm: PropTypes.func.isRequired,
   }
 
+  termsDropdown = React.createRef()
+
   sortedTerms = terms => {
     const dated = filter(terms, term => term.startAt)
     const datedTermsSortedByStart = sortBy(dated, term => term.startAt).reverse()
@@ -61,7 +63,7 @@ class EnrollmentTermsDropdown extends React.Component {
         name="enrollment_term"
         data-view="termSelect"
         aria-label="Enrollment Term"
-        ref="termsDropdown"
+        ref={this.termsDropdown}
         onChange={this.props.changeSelectedEnrollmentTerm}
       >
         {this.termOptions(this.props.terms)}

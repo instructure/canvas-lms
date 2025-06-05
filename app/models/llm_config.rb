@@ -33,7 +33,7 @@ class LLMConfig
     new_template = template.dup
 
     substitutions.each do |placeholder_prefix, sub_value|
-      new_template.gsub!("<#{placeholder_prefix}_PLACEHOLDER>", sub_value.to_s)
+      new_template.gsub!("<#{placeholder_prefix}_PLACEHOLDER>") { sub_value.to_s }
     end
 
     if (remaining_placeholder = new_template.match(/<\w+_PLACEHOLDER>/))

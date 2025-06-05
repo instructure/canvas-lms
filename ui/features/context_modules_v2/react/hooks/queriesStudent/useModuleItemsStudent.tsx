@@ -17,7 +17,7 @@
  */
 
 import {gql} from 'graphql-tag'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {ModuleItemsResponse, ModuleItemsGraphQLResult, ModuleItem} from '../../utils/types'
 import {useQuery} from '@tanstack/react-query'
 
@@ -38,6 +38,7 @@ export const MODULE_ITEMS_STUDENT_QUERY = gql`
               title
               type: __typename
               pointsPossible
+              isNewQuiz
               published
               submissionsConnection(filter: {includeUnsubmitted: true}) {
                 nodes {
@@ -139,7 +140,8 @@ export function useModuleItemsStudent(moduleId: string, enabled: boolean = false
     queryKey: ['moduleItemsStudent', moduleId],
     queryFn: getModuleItemsStudent,
     enabled,
-    refetchOnWindowFocus: enabled,
-    refetchOnReconnect: enabled,
+    refetchOnWindowFocus: true,
+    // 15 minutes, will reload on refresh because there is no persistence
+    staleTime: 15 * 60 * 1000,
   })
 }

@@ -1,0 +1,11 @@
+.base-block-layout {
+  border: solid 1px #d7dade;
+}
+
+.base-block-layout [data-header] {
+  height: 38px;
+}
+
+.base-block-layout [data-title] {
+  color: #9ea6ad;
+}

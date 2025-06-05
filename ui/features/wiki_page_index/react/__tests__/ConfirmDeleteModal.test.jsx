@@ -18,41 +18,52 @@
 
 import '@instructure/canvas-theme'
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render, fireEvent} from '@testing-library/react'
 import ConfirmDeleteModal from '../ConfirmDeleteModal'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
 
 const defaultProps = () => ({
   pageTitles: ['page_1'],
-  onConfirm: () => Promise.resolve({}),
-})
-
-test('renders the ConfirmDeleteModal component', () => {
-  const modal = shallow(<ConfirmDeleteModal {...defaultProps()} />)
-  expect(modal.exists()).toBe(true)
+  onConfirm: () => Promise.resolve({failures: []}),
 })
 
 test('renders cancel and delete button', () => {
-  const modal = shallow(<ConfirmDeleteModal {...defaultProps()} />)
-  const node = modal.find('Button')
-  expect(node.length).toEqual(2)
+  const ref = React.createRef()
+  const {getByText} = render(<ConfirmDeleteModal {...defaultProps()} ref={ref} />)
+  ref.current.show()
+
+  expect(getByText('Cancel')).toBeInTheDocument()
+  expect(getByText('Delete')).toBeInTheDocument()
 })
 
-test('closes the ConfirmDeleteModal when cancel pressed', () => {
-  const modal = shallow(<ConfirmDeleteModal {...defaultProps()} />)
-  const cancel = modal.find('Button').first()
-  cancel.simulate('click')
-  expect(modal.state().show).toBe(false)
+test('closes the ConfirmDeleteModal when cancel pressed', async () => {
+  const ref = React.createRef()
+  const onHide = jest.fn()
+  const {getByText} = render(<ConfirmDeleteModal {...defaultProps()} onHide={onHide} ref={ref} />)
+  ref.current.show()
+
+  const cancelButton = getByText('Cancel')
+  fireEvent.click(cancelButton)
+
+  await new Promise(resolve => setTimeout(resolve, 0))
+  expect(onHide).toHaveBeenCalledWith(false, false)
 })
 
 test('shows spinner on delete', () => {
-  const modal = shallow(<ConfirmDeleteModal {...defaultProps()} />)
-  const deleteBtn = modal.find('Button').at(1)
-  deleteBtn.simulate('click')
-  expect(modal.find('Spinner').exists()).toBe(true)
+  const ref = React.createRef()
+  const {getByText, getByTitle} = render(<ConfirmDeleteModal {...defaultProps()} ref={ref} />)
+  ref.current.show()
+
+  const deleteButton = getByText('Delete')
+  fireEvent.click(deleteButton)
+
+  expect(getByTitle('Delete in progress')).toBeInTheDocument()
 })
 
 test('renders provided page titles', () => {
-  const modal = shallow(<ConfirmDeleteModal {...defaultProps()} />)
-  expect(modal.find(Modal.Body).render().text()).toMatch(/page_1/)
+  const ref = React.createRef()
+  const {getByText} = render(<ConfirmDeleteModal {...defaultProps()} ref={ref} />)
+  ref.current.show()
+
+  expect(getByText('page_1')).toBeInTheDocument()
+  expect(getByText('1 page selected for deletion')).toBeInTheDocument()
 })

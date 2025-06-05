@@ -19,8 +19,8 @@
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import ReactDOM from 'react-dom'
-import {InstUISettingsProvider} from '@instructure/emotion'
 import {getTheme} from '@canvas/instui-bindings'
+import {DynamicInstUISettingsProvider} from '@canvas/instui-bindings/react/DynamicInstUISettingProvider'
 
 type Options = {
   highContrast?: boolean
@@ -40,7 +40,7 @@ export function legacyRender(
 
   // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(
-    <InstUISettingsProvider theme={theme}>{element}</InstUISettingsProvider>,
+    <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>,
     container,
   )
 }
@@ -57,6 +57,8 @@ export function render(
   const theme = getTheme(options.highContrast, options.brandVariables)
 
   const root = createRoot(container)
-  root.render(<InstUISettingsProvider theme={theme}>{element}</InstUISettingsProvider>)
+  root.render(
+    <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>,
+  )
   return root
 }

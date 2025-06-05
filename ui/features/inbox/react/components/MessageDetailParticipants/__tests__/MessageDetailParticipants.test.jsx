@@ -51,6 +51,22 @@ describe('MessageDetailParticipants', () => {
     expect(container.queryByTestId('participant-list')).not.toBeInTheDocument()
   })
 
+  it('decodes HTML entities in participant names', () => {
+    const props = {
+      conversationMessage: {
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+        recipients: [
+          {name: 'Chef Bear&#39;ber', shortName: 'Chef Bear&#39;ber'},
+          {name: 'Billy Harris', shortName: 'Billy Harris'},
+        ],
+      },
+    }
+
+    const {getByText} = render(<MessageDetailParticipants {...props} />)
+
+    expect(getByText(", Chef Bear'ber, Billy Harris")).toBeInTheDocument()
+  })
+
   it('renders with limited list until expanded', () => {
     const participantList = [
       {name: 'Bob Barker', shortName: 'Bob Barker'},

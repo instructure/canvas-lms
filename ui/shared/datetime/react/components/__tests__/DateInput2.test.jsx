@@ -61,10 +61,14 @@ beforeEach(() => {
   // beginning of the day and don't retain the time.
   MockDate.set('2025-04-09T00:42:00Z', 0)
   moment.locale('en-us')
+  jest.useFakeTimers({
+    doNotFake: ['Date'],
+  })
 })
 
 afterEach(() => {
   MockDate.reset()
+  jest.useRealTimers()
   moment.locale(oldLocale)
 })
 

@@ -18,6 +18,7 @@
 
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
 import EnhancedSmartSearch from '../EnhancedSmartSearch'
+import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 
@@ -84,6 +85,16 @@ const SEARCH_URL = encodeURI(
 )
 
 describe('EnhancedSmartSearch', () => {
+  const renderSearch = (overrides = {}) => {
+    return render(
+      <BrowserRouter basename="">
+        <Routes>
+          <Route path="/" element={<EnhancedSmartSearch {...props} {...overrides} />} />
+        </Routes>
+      </BrowserRouter>,
+    )
+  }
+
   afterEach(() => {
     fetchMock.restore()
   })
@@ -93,7 +104,8 @@ describe('EnhancedSmartSearch', () => {
       status: 'indexing',
       progress: 75,
     })
-    const {getByTestId, queryByText, getByText} = render(<EnhancedSmartSearch {...props} />)
+    fetchMock.get(SEARCH_URL, {results: []})
+    const {getByTestId, queryByText, getByText} = renderSearch()
 
     expect(queryByText('Similar Results')).toBeNull()
     expect(queryByText('Best Matches')).toBeNull()
@@ -108,7 +120,8 @@ describe('EnhancedSmartSearch', () => {
       status: 'complete',
       progress: 100,
     })
-    const {getByTestId, queryByTestId, queryByText} = render(<EnhancedSmartSearch {...props} />)
+    fetchMock.get(SEARCH_URL, {results: []})
+    const {getByTestId, queryByTestId, queryByText} = renderSearch()
 
     expect(getByTestId('search-input')).toBeInTheDocument()
 
@@ -135,12 +148,11 @@ describe('EnhancedSmartSearch', () => {
 
     it('should render results', async () => {
       const user = userEvent.setup()
-      const {getByTestId, getByText} = render(<EnhancedSmartSearch {...props} />)
+      const {getByTestId, getByText} = renderSearch()
 
       const searchInput = getByTestId('search-input')
-      fireEvent.change(searchInput, {
-        target: {value: SEARCH_TERM},
-      })
+      await user.click(searchInput)
+      fireEvent.change(searchInput, {target: {value: SEARCH_TERM}})
       user.click(getByTestId('search-button'))
 
       await waitFor(() => {
@@ -153,13 +165,14 @@ describe('EnhancedSmartSearch', () => {
 
     it('should render modules for each result', async () => {
       const user = userEvent.setup()
-      const {getByTestId, getAllByTestId} = render(<EnhancedSmartSearch {...props} />)
+      const {getByTestId, getAllByTestId} = renderSearch()
 
       const searchInput = getByTestId('search-input')
+      await user.click(searchInput)
       fireEvent.change(searchInput, {
         target: {value: SEARCH_TERM},
       })
-      user.click(getByTestId('search-button'))
+      await user.click(getByTestId('search-button'))
 
       await waitFor(() => {
         expect(getAllByTestId('search-result')).toHaveLength(2)
@@ -175,13 +188,14 @@ describe('EnhancedSmartSearch', () => {
 
     it('should render pills for each result', async () => {
       const user = userEvent.setup()
-      const {getByTestId, getAllByTestId} = render(<EnhancedSmartSearch {...props} />)
+      const {getByTestId, getAllByTestId} = renderSearch()
 
       const searchInput = getByTestId('search-input')
+      await user.click(searchInput)
       fireEvent.change(searchInput, {
         target: {value: SEARCH_TERM},
       })
-      user.click(getByTestId('search-button'))
+      await user.click(getByTestId('search-button'))
 
       await waitFor(() => {
         expect(getAllByTestId('search-result')).toHaveLength(2)
@@ -211,13 +225,14 @@ describe('EnhancedSmartSearch', () => {
       progress: 100,
     })
     fetchMock.get(SEARCH_URL, 404)
-    const {getByTestId, getByText} = render(<EnhancedSmartSearch {...props} />)
+    const {getByTestId, getByText} = renderSearch()
 
     const searchInput = getByTestId('search-input')
+    await user.click(searchInput)
     fireEvent.change(searchInput, {
       target: {value: SEARCH_TERM},
     })
-    user.click(getByTestId('search-button'))
+    await user.click(getByTestId('search-button'))
 
     await waitFor(() => {
       expect(getByText(/Failed to execute search/)).toBeInTheDocument()

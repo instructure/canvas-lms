@@ -1383,7 +1383,8 @@ describe AssignmentsController do
         shared_secret: "test_secret",
         consumer_key: "test_key",
         name: "test tool",
-        domain: "example.com"
+        domain: "example.com",
+        settings: { selection_width: 800, selection_height: 600 }
       )
       user_session(@teacher)
       @assignment.submission_types = "external_tool"
@@ -1393,6 +1394,8 @@ describe AssignmentsController do
       get "show", params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).not_to be_nil
       expect(assigns[:js_env][:LTI_TOOL_ID]).not_to be_nil
+      expect(assigns[:js_env][:LTI_TOOL_SELECTION_WIDTH]).to eq 800
+      expect(assigns[:js_env][:LTI_TOOL_SELECTION_HEIGHT]).to eq 600
     end
 
     it "sets first_annotation_submission to true if it's the first submission and the assignment is annotatable" do
@@ -2166,6 +2169,36 @@ describe AssignmentsController do
             <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}?location=course_syllabus_#{@course.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
             <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?location=course_syllabus_#{@course.id}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
           HTML
+        end
+
+        context "sharding" do
+          specs_require_sharding
+
+          it "handles short form cross-shard file URLs" do
+            @shard1.activate do
+              user_model
+              @course.enroll_teacher(@user)
+              @image1 = attachment_model(context: @user, display_name: "file1.jpg")
+              @video1 = attachment_model(context: @user, display_name: "file1.mp4", media_entry_id: "cat_hugs1")
+              @doc1 = attachment_model(context: @user, display_name: "file1.docx")
+            end
+
+            syllabus_body = <<~HTML
+              <p><img id="#{@image1.id}" src="/users/#{Shard.short_id_for(@user.id)}/files/#{Shard.short_id_for(@image1.id)}/preview" alt="test-1.jpg" /></p>
+              <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{Shard.short_id_for(@video1.id)}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video1.media_entry_id}"></iframe></p>
+              <p><a class="instructure_file_link auto_open" title="Link" href="/users/#{Shard.short_id_for(@user.id)}/files/#{Shard.short_id_for(@doc1.id)}?wrap=1" target="_blank" rel="noopener" data-canvas-previewable="true">#{@doc1.display_name}</a></p>
+            HTML
+
+            @course.update!(syllabus_body:)
+
+            get "syllabus", params: { course_id: @course.id }
+
+            expect(assigns[:syllabus_body]).to eql(<<~HTML)
+              <p><img id="#{@image1.global_id}" src="/users/#{@user.global_id}/files/#{@image1.global_id}/preview?location=course_syllabus_#{@course.id}" alt="test-1.jpg" loading="lazy"></p>
+              <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video1.global_id}?location=course_syllabus_#{@course.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video1.media_entry_id}"></iframe></p>
+              <p><a class="instructure_file_link auto_open" title="Link" href="/users/#{@user.global_id}/files/#{@doc1.global_id}?location=course_syllabus_#{@course.id}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc1.display_name}</a></p>
+            HTML
+          end
         end
       end
 
@@ -3113,6 +3146,52 @@ describe AssignmentsController do
       it "is an empty array when there are no asset processors" do
         get :edit, params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:ASSET_PROCESSORS]).to eq []
+      end
+    end
+
+    context "assigned_rubric and rubric_association" do
+      before do
+        Account.site_admin.enable_feature!(:enhanced_rubrics_assignments)
+        @course.enable_feature!(:enhanced_rubrics)
+        rubric = @course.rubrics.create!(user: @teacher, data: [])
+        rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                   hide_score_total: "0",
+                                                                                   purpose: "grading",
+                                                                                   skip_updating_points_possible: false,
+                                                                                   update_if_existing: true,
+                                                                                   use_for_grading: "1",
+                                                                                   association_object: @assignment
+                                                                                 })
+        rubric_assoc = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
+        @assignment.rubric_association = rubric_assoc
+        @assignment.save!
+        user_session(@teacher)
+      end
+
+      it "sets assigned_rubric and rubric_association in the ENV when FF is ON" do
+        allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(true)
+        get :edit, params: { course_id: @course.id, id: @assignment.id, quiz_lti: true }
+        expect(assigns[:js_env][:assigned_rubric][:id]).to eq @assignment.rubric_association.rubric_id
+        expect(assigns[:js_env][:assigned_rubric][:title]).to eq "Unnamed Course Rubric"
+        expect(assigns[:js_env][:assigned_rubric][:can_update]).to be_truthy
+        expect(assigns[:js_env][:assigned_rubric][:association_count]).to eq 1
+        expect(assigns[:js_env][:rubric_association][:id]).to eq @assignment.rubric_association.id
+      end
+
+      it "does not set assigned_rubric and rubric_association in the ENV when FF is OFF" do
+        allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(true)
+        Account.site_admin.disable_feature!(:enhanced_rubrics_assignments)
+        get :edit, params: { course_id: @course.id, id: @assignment.id, quiz_lti: true }
+        expect(assigns[:js_env][:assigned_rubric]).to be_nil
+        expect(assigns[:js_env][:rubric_association]).to be_nil
+      end
+
+      it "does not set assigned_rubric and rubric_association in the ENV when FF is OFF and quiz_lti is false" do
+        allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(false)
+        Account.site_admin.disable_feature!(:enhanced_rubrics_assignments)
+        get :edit, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:assigned_rubric]).to be_nil
+        expect(assigns[:js_env][:rubric_association]).to be_nil
       end
     end
   end

@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import {Collection, Model} from '..'
-import sinon from 'sinon'
 
 class TestCollection extends Collection {}
 TestCollection.prototype.defaults = {
@@ -34,16 +33,11 @@ TestCollection.prototype.url = '/fake'
 TestCollection.prototype.model = Model.extend()
 
 describe('Collection', () => {
-  let xhr
-  let ajaxSpy
-
   beforeEach(() => {
-    xhr = sinon.useFakeXMLHttpRequest()
-    ajaxSpy = jest.spyOn($, 'ajax')
+    jest.spyOn($, 'ajax').mockImplementation(() => Promise.resolve())
   })
 
   afterEach(() => {
-    xhr.restore()
     jest.restoreAllMocks()
   })
 

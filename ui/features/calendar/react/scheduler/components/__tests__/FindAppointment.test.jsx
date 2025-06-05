@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
 import {render} from '@testing-library/react'
 import FindAppointmentApp from '../FindAppointment'
 
@@ -35,8 +34,8 @@ describe('FindAppointmentApp', () => {
       },
     }
 
-    const wrapper = shallow(<FindAppointmentApp courses={courses} store={store} />)
-    expect(wrapper.find('#FindAppointmentButton').text()).toEqual('Find Appointment')
+    const {getByRole} = render(<FindAppointmentApp courses={courses} store={store} />)
+    expect(getByRole('button', {name: 'Find Appointment'})).toBeInTheDocument()
   })
 
   test('correct button renders', () => {
@@ -48,8 +47,8 @@ describe('FindAppointmentApp', () => {
       },
     }
 
-    const wrapper = shallow(<FindAppointmentApp courses={courses} store={store} />)
-    expect(wrapper.find('#FindAppointmentButton').text()).toEqual('Close')
+    const {getByRole} = render(<FindAppointmentApp courses={courses} store={store} />)
+    expect(getByRole('button', {name: 'Close'})).toBeInTheDocument()
   })
 
   test('selectCourse sets the proper selected course', () => {

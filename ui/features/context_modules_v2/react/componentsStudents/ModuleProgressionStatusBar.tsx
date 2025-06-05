@@ -23,15 +23,18 @@ import {Text} from '@instructure/ui-text'
 import {CompletionRequirement, ModuleProgression} from '../utils/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ProgressBar} from '@instructure/ui-progress'
+import {filterRequirementsMet} from '../utils/utils'
 
 const I18n = createI18nScope('context_modules_v2')
 
 interface ModuleProgressionStatusBarProps {
+  requirementCount?: number
   completionRequirements: CompletionRequirement[]
   progression?: ModuleProgression
 }
 
 const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
+  requirementCount,
   completionRequirements,
   progression,
 }) => {
@@ -39,23 +42,25 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
     return null
   }
 
-  const completedCount = progression.requirementsMet?.length || 0
-  const totalCount = completionRequirements.length
+  const totalCount = requirementCount ? 1 : completionRequirements?.length
+  const completedCount =
+    filterRequirementsMet(progression.requirementsMet, completionRequirements).length || 0
 
   const completionPercentage = Math.round((completedCount / totalCount) * 100)
-  const isComplete = completionPercentage === 100
-  const completionText = I18n.t('%{completed}/%{total} Required Items Completed', {
-    completed: completedCount,
+  const isComplete = completionPercentage >= 100
+  const completionText = I18n.t('%{completed} of %{total} Required Items', {
+    completed: completedCount > totalCount ? totalCount : completedCount,
     total: totalCount,
   })
 
   return (
     <View as="div" margin="xx-small 0 0 0">
-      <Flex direction="column">
-        <Flex.Item overflowY="hidden">
+      <Flex alignItems="center">
+        <Flex.Item overflowY="hidden" width="33%" margin="xxx-small 0 0 0">
           <View
             as="div"
-            width="70%"
+            width="100%"
+            minWidth="100%"
             overflowX="hidden"
             overflowY="hidden"
             borderRadius="large"
@@ -76,7 +81,12 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
             />
           </View>
         </Flex.Item>
-        <Flex.Item>
+        <Flex.Item margin="0 0 0 x-small">
+          <Text size="x-small" weight="normal">
+            {completionPercentage}%
+          </Text>
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
           <Text size="x-small" weight="normal">
             {completionText}
           </Text>

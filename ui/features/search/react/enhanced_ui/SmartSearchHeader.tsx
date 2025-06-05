@@ -17,18 +17,19 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useCallback, useEffect, useRef} from 'react'
-import {TextInput} from '@instructure/ui-text-input'
-import {Button, IconButton} from '@instructure/ui-buttons'
-import {IconSearchLine} from '@instructure/ui-icons'
+import {useCallback, useEffect, useRef, useState} from 'react'
+import {Button} from '@instructure/ui-buttons'
 import type {IndexProgress, Result} from '../types'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import AutocompleteSearch from './AutocompleteSearch'
+import {useSearchParams} from 'react-router-dom'
 
 const I18n = createI18nScope('SmartSearch')
 
 const MAX_NUMBER_OF_RESULTS = 25
+const MAX_RECENT_SEARCHES = 25 // Maximum number of recent searches to store
 
 interface Props {
   courseId: string
@@ -39,6 +40,19 @@ interface Props {
   onIndexingProgress: (progress: IndexProgress | null) => void
 }
 
+const executeSmartSearch = async (searchQuery: string, courseId: string) => {
+  const params = {
+    q: searchQuery,
+    per_page: MAX_NUMBER_OF_RESULTS,
+    include: ['modules', 'status'],
+  }
+  const {json} = await doFetchApi<{results: Result[]}>({
+    path: `/api/v1/courses/${courseId}/smartsearch`,
+    params,
+  })
+  return json
+}
+
 /*
  * This component is incomplete.
  * Will eventually contain the branding and updated search button.
@@ -46,47 +60,55 @@ interface Props {
  */
 export default function SmartSearchHeader(props: Props) {
   const searchInput = useRef<HTMLInputElement | null>(null)
+  const [searchParam, setSearchParams] = useSearchParams()
+  const [recentSearches, setRecentSearches] = useState<string[]>([])
 
-  const onSearch = async () => {
-    if (!searchInput.current) return
-
-    const searchTerm = searchInput.current.value.trim()
-    if (searchTerm === '') return
-
-    props.onSearch(searchTerm)
-
-    const url = new URL(window.location.href)
-    if (url.searchParams.get('q') !== searchTerm) {
-      url.searchParams.set('q', searchTerm)
-      window.history.pushState({}, '', url)
-    }
-
-    try {
-      const params = {
-        q: searchTerm,
-        per_page: MAX_NUMBER_OF_RESULTS,
-        include: ['modules', 'status'],
-      }
-      const {json} = await doFetchApi<{results: Result[]}>({
-        path: `/api/v1/courses/${props.courseId}/smartsearch`,
-        params,
-      })
-      props.onSuccess(json!.results)
-    } catch (error) {
-      props.onError(I18n.t('Failed to execute search: ') + error)
-    }
-  }
-
-  const doUrlSearch = useCallback((perform = true) => {
-    const url = new URL(window.location.href)
-    const searchTerm = url.searchParams.get('q')
-    if (searchTerm && searchTerm.length && searchInput.current) {
-      searchInput.current.value = searchTerm
-      if (perform) {
-        onSearch()
-      }
+  useEffect(() => {
+    const localSearches = localStorage.getItem('recentSmartSearches') || '[]'
+    const parsedSearches = JSON.parse(localSearches)
+    if (Array.isArray(parsedSearches)) {
+      setRecentSearches(parsedSearches)
     }
   }, [])
+
+  const updateRecentSearches = useCallback((searchTerm: string, recentSearches: string[]) => {
+    const searches = recentSearches.filter(search => search !== searchTerm)
+    const updatedSearches = [searchTerm, ...searches].slice(0, MAX_RECENT_SEARCHES)
+    setRecentSearches(updatedSearches)
+    localStorage.setItem('recentSmartSearches', JSON.stringify(updatedSearches))
+  }, [])
+
+  const onSearch = useCallback(
+    async (useUrl: boolean) => {
+      let searchTerm = searchInput.current?.value.trim() || ''
+      const queryParam = searchParam.get('q')
+      if (useUrl) {
+        // search based on the URL
+        searchTerm = queryParam || searchTerm
+      } else if (queryParam !== searchTerm) {
+        // update the URL with the new search term
+        setSearchParams(prevParams => {
+          return {
+            ...prevParams,
+            q: searchTerm,
+          }
+        })
+      }
+      if (searchTerm === '') return
+
+      props.onSearch(searchTerm)
+
+      try {
+        const json = await executeSmartSearch(searchTerm, props.courseId)
+        props.onSuccess(json!.results)
+      } catch (error) {
+        props.onError(I18n.t('Failed to execute search: ') + error)
+      } finally {
+        updateRecentSearches(searchTerm, recentSearches)
+      }
+    },
+    [props, recentSearches, searchParam, setSearchParams, updateRecentSearches],
+  )
 
   const checkIndexStatus = useCallback(async () => {
     try {
@@ -98,21 +120,19 @@ export default function SmartSearchHeader(props: Props) {
         setTimeout(checkIndexStatus, 2000)
       } else {
         props.onIndexingProgress(null)
-        doUrlSearch()
+        onSearch(true)
       }
     } catch (error) {
       props.onError(I18n.t('Failed to check index status: ') + error)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [onSearch, props])
 
   useEffect(() => {
-    doUrlSearch(false) // init the box but don't actually do the search until we've checked index status
     if (searchInput.current) {
       searchInput.current.focus()
     }
     checkIndexStatus()
-    window.addEventListener('popstate', () => doUrlSearch())
+    // only run this effect once component mounts
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -122,29 +142,24 @@ export default function SmartSearchHeader(props: Props) {
         {I18n.t('Smart Search')}
       </Heading>
       <Flex
+        width="50%"
         gap="x-small"
         as="form"
         onSubmit={e => {
           e.preventDefault()
-          onSearch()
+          onSearch(false)
         }}
       >
-        <TextInput
-          data-testid="search-input"
-          inputRef={el => (searchInput.current = el)}
-          placeholder={I18n.t('Food that a panda eats')}
-          renderAfterInput={
-            <IconButton
-              interaction={props.isLoading ? 'disabled' : 'enabled'}
-              renderIcon={<IconSearchLine />}
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel={'Search'}
-              type="submit"
-            />
-          }
-          renderLabel=""
-        />
+        <Flex.Item shouldGrow>
+          <AutocompleteSearch
+            defaultValue={searchParam.get('q') || ''}
+            setInputRef={input => {
+              searchInput.current = input
+            }}
+            isLoading={props.isLoading}
+            options={recentSearches}
+          />
+        </Flex.Item>
         <Button color="primary" type="submit" data-testid="search-button">
           {I18n.t('Search')}
         </Button>

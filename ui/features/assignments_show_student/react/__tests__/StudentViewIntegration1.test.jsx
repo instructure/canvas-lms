@@ -49,18 +49,11 @@ describe('student view integration tests', () => {
       PREREQS: {},
       current_user_roles: ['user', 'student'],
     })
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([]),
-      }),
-    )
   })
 
   afterEach(() => {
     fakeENV.teardown()
     jest.clearAllMocks()
-    jest.restoreAllMocks()
   })
 
   describe('StudentViewQuery', () => {

@@ -28,6 +28,14 @@ class Mutations::AutoGradeSubmission < Mutations::BaseMutation
     submission_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:submission_id], "Submission")
     submission = Submission.find(submission_id)
 
+    assignment_errors = GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment: submission.assignment)
+    submission_errors = GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
+    errors = assignment_errors + submission_errors
+
+    if errors.any?
+      raise GraphQL::ExecutionError, "Auto-grading failed due to the following issue(s): #{errors.join(", ")}"
+    end
+
     raise "Submission not found" unless submission
 
     course = submission.assignment&.course
@@ -39,7 +47,8 @@ class Mutations::AutoGradeSubmission < Mutations::BaseMutation
 
     verify_authorized_action!(course, :manage_grades)
 
-    progress = course.auto_grade_submission_in_background(submission)
+    service = AutoGradeOrchestrationService.new(course:)
+    progress = service.auto_grade_in_background(submission:)
 
     { progress: }
   rescue => e

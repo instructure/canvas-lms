@@ -685,6 +685,38 @@ RSpec.describe Lti::Registration do
         expect(subject.context_controls).to include(Lti::ContextControl.last)
         expect(subject.context_controls.first.deployment).to eq(subject)
       end
+
+      it "sets context control to available" do
+        expect(subject.context_controls.first.available).to be true
+      end
+
+      context "with available: false" do
+        subject { registration.new_external_tool(account, available: false) }
+
+        it "sets context control to unavailable" do
+          expect(subject.context_controls.first.available).to be false
+        end
+
+        context "with an existing tool" do
+          subject { registration.new_external_tool(account, existing_tool:, available: true) }
+
+          let(:existing_tool) { registration.new_external_tool(account, available: false) }
+
+          before do
+            existing_tool # instantiate before test runs
+          end
+
+          it "does not create a new deployment" do
+            expect { subject }.not_to change { ContextExternalTool.count }
+            expect(subject).to eq(existing_tool)
+          end
+
+          it "does not change availability" do
+            subject
+            expect(existing_tool.context_controls.first.available).to be false
+          end
+        end
+      end
     end
 
     context "with an ims_registration" do
@@ -703,6 +735,18 @@ RSpec.describe Lti::Registration do
         expect { subject }.to change { Lti::ContextControl.count }.by(1)
         expect(subject.context_controls).to include(Lti::ContextControl.last)
         expect(subject.context_controls.first.deployment).to eq(subject)
+      end
+
+      it "sets context control to available" do
+        expect(subject.context_controls.first.available).to be true
+      end
+
+      context "with available: false" do
+        subject { registration.new_external_tool(account, available: false) }
+
+        it "sets context control to unavailable" do
+          expect(subject.context_controls.first.available).to be false
+        end
       end
     end
   end

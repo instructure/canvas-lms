@@ -29,7 +29,16 @@ function createRowProps(title, roleId) {
   const permission = role.permissions[permissionName]
   const onChange = Function.prototype
 
-  return {title, role, permission, permissionName, permissionLabel: 'whatever', onChange}
+  return {
+    title,
+    role,
+    permission,
+    permissionName,
+    permissionLabel: 'whatever',
+    onChange,
+    permButton: () => <div>Mock Button</div>,
+    permCheckbox: () => <div>Mock Checkbox</div>,
+  }
 }
 
 it('renders the component with only one child', () => {

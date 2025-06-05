@@ -33,7 +33,7 @@ type PortalMount = {
 
 // Feature Flags tab
 function featureFlagsTab(portals: PortalMount[]): void {
-  const mountPoint = document.getElementById('tab-features')
+  const mountPoint = document.getElementById('tab-features-mount')
   if (!mountPoint) return
   portals.push({
     mountPoint,

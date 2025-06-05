@@ -21,11 +21,10 @@
 class ContentExportsController < ApplicationController
   include K5Mode
 
-  before_action :require_permission, except: :xml_schema
+  before_action :require_user, :get_context, :require_permission, except: :xml_schema
   before_action { |c| c.active_tab = "settings" }
 
   def require_permission
-    get_context
     @context ||= @current_user # if we're going through the dashboard
     authorized_action(@context, @current_user, [:read, :read_as_admin], all_rights: true)
   end

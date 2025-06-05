@@ -253,6 +253,41 @@ describe Types::CourseType do
         end
       end
 
+      context "submission types" do
+        before(:once) do
+          @assignment1 = course.assignments.create!(
+            name: "Online Upload Assignment",
+            submission_types: "online_upload",
+            workflow_state: "published"
+          )
+          @assignment2 = course.assignments.create!(
+            name: "Online Quiz Assignment",
+            submission_types: "online_quiz",
+            workflow_state: "published"
+          )
+          @assignment3 = course.assignments.create!(
+            name: "No Submission Assignment",
+            submission_types: "none",
+            workflow_state: "published"
+          )
+          @assignment4 = course.assignments.create!(
+            name: "Multiple Submission Types Assignment",
+            submission_types: "online_upload,online_quiz",
+            workflow_state: "published"
+          )
+        end
+
+        it "only returns assignments with online_upload submission type" do
+          result = course_type.resolve("assignmentsConnection(filter: { submissionTypes: [online_upload] }) { edges { node { _id } } }", current_user: @student)
+          expect(result).to eq [@assignment1.id.to_s, @assignment4.id.to_s]
+        end
+
+        it "only returns assignments with online_upload, online_quiz submission type" do
+          result = course_type.resolve("assignmentsConnection(filter: { submissionTypes: [online_upload, online_quiz] }) { edges { node { _id } } }", current_user: @student)
+          expect(result).to eq [@assignment1.id.to_s, @assignment2.id.to_s, @assignment4.id.to_s]
+        end
+      end
+
       context "grading periods" do
         before(:once) do
           gpg = GradingPeriodGroup.create! title: "asdf",
@@ -1571,6 +1606,19 @@ describe Types::CourseType do
               current_user: @teacher
             )
           ).to eq [observer_enrollment.id.to_s]
+        end
+
+        it "returns only enrollments with the specified user_ids if included" do
+          student_1 = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+          student_2 = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+          course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+
+          expect(
+            course_type.resolve(
+              "enrollmentsConnection(filter: {userIds: [#{student_1.id}, #{student_2.id}]}) { nodes { _id } }",
+              current_user: @teacher
+            )
+          ).to eq [student_1.enrollments.first.id.to_s, student_2.enrollments.first.id.to_s]
         end
 
         it "returns only enrollments with the specified states if included" do

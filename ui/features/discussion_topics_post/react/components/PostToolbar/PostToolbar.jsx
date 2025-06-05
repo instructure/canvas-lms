@@ -97,6 +97,8 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
                 <Flex.Item>
                   <span className="discussion-post-publish">
                     <ToggleButton
+                      data-testid="publishToggle"
+                      data-action-state={props.isPublished ? 'unpublishButton' : 'publishButton'}
                       size="small"
                       status={props.isPublished ? 'pressed' : 'unpressed'}
                       color={props.isPublished ? 'success' : 'secondary'}
@@ -117,6 +119,10 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
                 <Flex.Item>
                   <span className="discussion-post-subscribe">
                     <ToggleButton
+                      data-testid="subscribeToggle"
+                      data-action-state={
+                        props.isSubscribed ? 'unsubscribeButton' : 'subscribeButton'
+                      }
                       size="small"
                       status={props.isSubscribed ? 'pressed' : 'unpressed'}
                       color={props.isSubscribed ? 'success' : 'secondary'}
@@ -288,7 +294,11 @@ const getMenuConfigs = props => {
 }
 
 const renderMenuItem = ({selectionCallback, icon, label, key}) => (
-  <Menu.Item onSelect={selectionCallback} key={key}>
+  <Menu.Item
+    onSelect={selectionCallback}
+    key={key}
+    data-testid={`discussion-thread-menuitem-${key}`}
+  >
     <span className={`discussion-thread-menuitem-${key}`}>
       <Flex>
         <Flex.Item>{icon}</Flex.Item>

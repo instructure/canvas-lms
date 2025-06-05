@@ -255,6 +255,22 @@ describe "context modules" do
       expect(published_module_icon(@mod.id)).to be_present
       expect(f("span.publish-icon.unpublished.publish-icon-published > i.icon-publish")).to be_present
     end
+
+    it "toggles visibility of the move contents link when items are added or removed" do
+      go_to_modules
+      expect(f(".move-contents-container")[:style]).to include("display: none;")
+
+      @assignment = Assignment.create!(context: @course, title: "some assignment in a module")
+      @assignment.save!
+      @mod.add_item(type: "assignment", id: @assignment.id)
+      @mod.save!
+      refresh_page
+      expect(f(".move-contents-container")[:style]).not_to include("display: none;")
+
+      @assignment.destroy!
+      refresh_page
+      expect(f(".move-contents-container")[:style]).to include("display: none;")
+    end
   end
 
   context "edit inline items on module page" do
@@ -610,20 +626,48 @@ describe "context modules" do
       expect(f(".context_module_item")).to include_text(file_name)
     end
 
-    it "sets usage rights on a file in a module", priority: "1" do
-      course_module
-      @module.add_item({ id: @file.id, type: "attachment" })
-      get "/courses/#{@course.id}/modules"
+    context("files rewrite tooggle") do
+      before(:once) do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
+      end
 
-      f(".icon-publish").click
-      wait_for_ajaximations
-      set_value f(".UsageRightsSelectBox__select"), "own_copyright"
-      set_value f("#copyrightHolder"), "Test User"
-      f(".form-horizontal.form-dialog.permissions-dialog-form > div.form-controls > button.btn.btn-primary").click
-      wait_for_ajaximations
-      get "/courses/#{@course.id}/files/folder/unfiled"
-      icon_class = "icon-files-copyright"
-      expect(f(".UsageRightsIndicator__openModal i.#{icon_class}")).to be_displayed
+      before do
+        user_session @teacher
+      end
+
+      it "sets usage rights on a file in a module", priority: "1" do
+        @teacher.set_preference(:files_ui_version, "v1")
+        course_module
+        @module.add_item({ id: @file.id, type: "attachment" })
+        get "/courses/#{@course.id}/modules"
+
+        f(".icon-publish").click
+        wait_for_ajaximations
+        set_value f(".UsageRightsSelectBox__select"), "own_copyright"
+        set_value f("#copyrightHolder"), "Test User"
+        f(".form-horizontal.form-dialog.permissions-dialog-form > div.form-controls > button.btn.btn-primary").click
+        wait_for_ajaximations
+        get "/courses/#{@course.id}/files/folder/unfiled"
+        icon_class = "icon-files-copyright"
+        expect(f(".UsageRightsIndicator__openModal i.#{icon_class}")).to be_displayed
+      end
+
+      it "sets usage rights on a file in a module with new files UI", priority: "1" do
+        @teacher.set_preference(:files_ui_version, "v2")
+        course_module
+        @module.add_item({ id: @file.id, type: "attachment" })
+        get "/courses/#{@course.id}/modules"
+
+        f(".icon-publish").click
+        wait_for_ajaximations
+        set_value f(".UsageRightsSelectBox__select"), "used_by_permission"
+        set_value f("#copyrightHolder"), "Test User"
+        f(".form-horizontal.form-dialog.permissions-dialog-form > div.form-controls > button.btn.btn-primary").click
+        wait_for_ajaximations
+        get "/courses/#{@course.id}/files/folder/unfiled"
+        expect(fxpath("//button[.//span[text()='Used by Permission']]")).to be_displayed
+      end
     end
 
     it "edit file module item inline", priority: "2" do

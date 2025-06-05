@@ -1960,73 +1960,95 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env]).to have_key(:active_grading_periods)
     end
 
-    it "js_env SECTION_LIST is set correctly for section specific announcements on a limited privileges user" do
-      user_session(@teacher)
-      section1 = @course.course_sections.create!(name: "Section 1")
-      @course.course_sections.create!(name: "Section 2")
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept!
-      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
-      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
-      ann.save!
-      get :edit, params: { course_id: @course.id, id: ann.id }
+    context "with sections" do
+      subject { get :edit, params: { course_id: @course.id, id: ann.id } }
 
-      # 2 because there is a default course created in the course_with_teacher factory
-      expect(assigns[:js_env]["SECTION_LIST"].length).to eq(2)
-    end
+      before do
+        user_session(@teacher)
 
-    it "js_env SECTION_LIST is ordered alphabetically for section specific announcements on a limited privileges user" do
-      user_session(@teacher)
-      sections = []
-      sections << @course.course_sections.create!(name: "Z Section")
-      sections << @course.course_sections.create!(name: "A Section")
-      sections << @course.course_sections.create!(name: "K Section")
-      sections.each do |s|
-        @course.enroll_teacher(@teacher, section: s, allow_multiple_enrollments: true).accept!
+        sections_to_enroll.each do |s|
+          @course.enroll_teacher(@teacher, section: s, allow_multiple_enrollments: true).accept!
+        end
       end
-      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
-      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: sections)
-      ann.save!
-      get :edit, params: { course_id: @course.id, id: ann.id }
 
-      # 4 because there is a default course created in the course_with_teacher factory
-      expect(assigns[:js_env]["SECTION_LIST"].length).to eq(4)
-      expect(assigns[:js_env]["SECTION_LIST"][0][:name]).to eq(sections[1][:name])
-      expect(assigns[:js_env]["SECTION_LIST"][1][:name]).to eq(sections[2][:name])
-      # default course is returned at position 2
-      expect(assigns[:js_env]["SECTION_LIST"][3][:name]).to eq(sections[0][:name])
-    end
+      let!(:sections_to_enroll) do
+        [
+          @course.course_sections.create!(name: "Z Section", start_at: 1.day.ago, end_at: 1.day.from_now, restrict_enrollments_to_section_dates: true),
+          @course.course_sections.create!(name: "A Section"),
+          @course.course_sections.create!(name: "K Section")
+        ]
+      end
+      let!(:section_not_enrolled) { @course.course_sections.create!(name: "Section Not enrolled for teacher") }
+      let(:ann) { @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: sections_to_enroll) }
 
-    it "js_env SECTION_LIST is set correctly for section specific announcements on a not limited privileges user" do
-      user_session(@teacher)
-      section1 = @course.course_sections.create!(name: "Section 1")
-      @course.course_sections.create!(name: "Section 2")
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept!
-      Enrollment.limit_privileges_to_course_section!(@course, @teacher, false)
-      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
-      ann.save!
-      get :edit, params: { course_id: @course.id, id: ann.id }
+      it "orders the sections alphabetically" do
+        subject
+        expect(assigns[:js_env][:SECTION_LIST].length).to eq(5)
+        expect(assigns[:js_env][:SECTION_LIST][0][:name]).to eq(sections_to_enroll[1][:name])
+        expect(assigns[:js_env][:SECTION_LIST][1][:name]).to eq(sections_to_enroll[2][:name])
+        # default course is returned at position 2
+        expect(assigns[:js_env][:SECTION_LIST][4][:name]).to eq(sections_to_enroll[0][:name])
+      end
 
-      # 3 because there is a default course created in the course_with_teacher factory
-      expect(assigns[:js_env]["SECTION_LIST"].length).to eq(3)
-    end
+      it "selects correct attributes for sections" do
+        subject
+        section = assigns[:js_env][:SECTION_LIST][4]
+        expect(section[:id]).to eq(sections_to_enroll[0].id)
+        expect(section[:name]).to eq(sections_to_enroll[0].name)
+        expect(section[:start_at]).to eq(sections_to_enroll[0].start_at)
+        expect(section[:end_at]).to eq(sections_to_enroll[0].end_at)
+        expect(section[:override_course_and_term_dates]).to eq(sections_to_enroll[0].restrict_enrollments_to_section_dates)
+      end
 
-    it "js_env SECTION_LIST is ordered alphabetically for section specific announcements on a not limited privileges user" do
-      user_session(@teacher)
-      sections = []
-      sections << @course.course_sections.create!(name: "Z Section")
-      sections << @course.course_sections.create!(name: "A Section")
-      sections << @course.course_sections.create!(name: "K Section")
-      Enrollment.limit_privileges_to_course_section!(@course, @teacher, false)
-      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [sections[0]])
-      ann.save!
-      get :edit, params: { course_id: @course.id, id: ann.id }
+      it "selects correct attributes for selected_section_list" do
+        subject
+        expect(assigns[:js_env][:SELECTED_SECTION_LIST].length).to eq(sections_to_enroll.length)
+        selected_section_sample = assigns[:js_env][:SELECTED_SECTION_LIST].find { |s| s[:id] == sections_to_enroll[0].id }
+        expect(selected_section_sample[:id]).to eq(sections_to_enroll[0].id)
+        expect(selected_section_sample[:name]).to eq(sections_to_enroll[0].name)
+      end
 
-      # 4 because there is a default course created in the course_with_teacher factory
-      expect(assigns[:js_env]["SECTION_LIST"].length).to eq(4)
-      expect(assigns[:js_env]["SECTION_LIST"][0][:name]).to eq(sections[1][:name])
-      expect(assigns[:js_env]["SECTION_LIST"][1][:name]).to eq(sections[2][:name])
-      # default course is returned at position 2
-      expect(assigns[:js_env]["SECTION_LIST"][3][:name]).to eq(sections[0][:name])
+      context "with limited priviliges user" do
+        before { Enrollment.limit_privileges_to_course_section!(@course, @teacher, true) }
+
+        it "filters sections to those the user is enrolled in" do
+          subject
+          # 2 because there is a default course created in the course_with_teacher factory
+          expect(assigns[:js_env][:SECTION_LIST].length).to eq(4)
+          expect(assigns[:js_env][:SECTION_LIST].pluck(:name)).not_to include(section_not_enrolled.name)
+        end
+      end
+
+      context "with NOT limited priviliges user" do
+        before { Enrollment.limit_privileges_to_course_section!(@course, @teacher, false) }
+
+        it "returns all the sections to the course" do
+          subject
+          # 3 because there is a default course created in the course_with_teacher factory
+          expect(assigns[:js_env][:SECTION_LIST].length).to eq(5)
+          expect(assigns[:js_env][:SECTION_LIST].pluck(:name)).to include(section_not_enrolled.name)
+        end
+      end
+
+      context "when context is a group" do
+        subject { get :edit, params: { group_id: group, id: group_topic } }
+
+        before do
+          group1 = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+          group1.enrollment_terms << @course.enrollment_term
+          user_session(@teacher)
+        end
+
+        let(:group) { group_model(context: @course) }
+        let(:group_topic) { group.discussion_topics.create!(title: "title") }
+
+        it "returns an empty sections list" do
+          subject
+          expect(response).to be_successful
+          expect(assigns[:js_env][:SECTION_LIST]).to be_empty
+          expect(assigns[:js_env][:SELECTED_SECTION_LIST]).to be_nil
+        end
+      end
     end
 
     it "returns unauthorized for a user that does not have visibilites to view thiss" do
@@ -2060,18 +2082,6 @@ describe DiscussionTopicsController do
 
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
-    end
-
-    it "js_env SELECTED_SECTION_LIST is set correctly for section specific announcements" do
-      user_session(@teacher)
-      section1 = course.course_sections.create!(name: "Section 1")
-      section2 = course.course_sections.create!(name: "Section 2")
-      course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
-      course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
-      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
-      ann.save!
-      get :edit, params: { course_id: @course.id, id: ann.id }
-      expect(assigns[:js_env]["SELECTED_SECTION_LIST"]).to eq([{ id: section1.id, name: section1.name }])
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do

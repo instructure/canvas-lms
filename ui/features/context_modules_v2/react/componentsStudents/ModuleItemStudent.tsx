@@ -17,14 +17,14 @@
  */
 
 import React, {useMemo} from 'react'
-import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {getItemIcon, INDENT_LOOKUP} from '../utils/utils'
+import {getItemIcon, getItemTypeText, INDENT_LOOKUP} from '../utils/utils'
 import {CompletionRequirement, ModuleItemContent, ModuleProgression} from '../utils/types'
 import ModuleItemSupplementalInfoStudent from './ModuleItemSupplementalInfoStudent'
 import ModuleItemStatusIcon from './ModuleItemStatusIcon'
+import ModuleItemTitleStudent from './ModuleItemTitleStudent'
 
 export interface ModuleItemStudentProps {
   _id: string
@@ -52,6 +52,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
 }) => {
   // Hooks must be called unconditionally
   const itemIcon = useMemo(() => (content ? getItemIcon(content, true) : null), [content])
+  const itemTypeText = useMemo(() => (content ? getItemTypeText(content) : null), [content])
   const itemLeftMargin = useMemo(() => INDENT_LOOKUP[indent ?? 0], [indent])
 
   // Early return after hooks
@@ -60,72 +61,84 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   return (
     <View
       as="div"
-      padding="small small small x-small"
-      background="transparent"
+      padding="paddingCardMedium"
+      background="primary"
       borderWidth="0"
-      borderRadius="medium"
+      borderRadius="large"
       overflowX="hidden"
       data-item-id={_id}
+      margin="paddingCardMedium"
+      minHeight="5.125rem"
+      display="flex"
     >
-      <Flex wrap="wrap">
+      <Flex wrap="wrap" width="100%">
         <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`} shouldGrow>
           <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>
-            <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
+            <Flex
+              alignItems="start"
+              justifyItems="start"
+              wrap="no-wrap"
+              gap="space8"
+              direction="column"
+            >
               {/* Item Title */}
-              <Flex.Item>
-                <Flex.Item shouldGrow={true}>
-                  {progression?.locked ||
-                  (requireSequentialProgress &&
-                    progression?.currentPosition &&
-                    progression?.currentPosition < position) ? (
-                    <Flex alignItems="center">
-                      <Text weight="light" color="secondary" data-testid="module-item-title-locked">
-                        {content?.title || 'Untitled Item'}
-                      </Text>
-                    </Flex>
-                  ) : (
-                    <Link href={url} isWithinText={false} onClick={onClick}>
-                      <Text weight="bold" color="primary" data-testid="module-item-title">
-                        {content?.title || 'Untitled Item'}
-                      </Text>
-                    </Link>
-                  )}
-                </Flex.Item>
+              <Flex.Item shouldGrow={true}>
+                <ModuleItemTitleStudent
+                  content={content}
+                  url={url}
+                  onClick={onClick}
+                  position={position}
+                  requireSequentialProgress={requireSequentialProgress}
+                  progression={progression}
+                />
               </Flex.Item>
               {/* Due Date and Points Possible */}
-              <Flex.Item>
-                <Flex wrap="wrap">
-                  {/* Item Type Icon */}
-                  {itemIcon && (
-                    <>
-                      <Flex.Item margin="0 small 0 0">
-                        <View as="div">{itemIcon}</View>
+              {content.type !== 'SubHeader' && (
+                <Flex.Item type="span">
+                  <div style={{lineHeight: '0.9375rem'}}>
+                    <Flex wrap="wrap">
+                      {/* Item Type Icon */}
+                      {itemIcon && (
+                        <>
+                          <Flex.Item margin="0 space4 0 0" aria-hidden="true">
+                            <View as="div" height="x-small">
+                              {itemIcon}
+                            </View>
+                          </Flex.Item>
+                          <Flex.Item margin="0 small 0 0" aria-hidden="true">
+                            <Text size="x-small" transform="capitalize">
+                              {itemTypeText}
+                            </Text>
+                          </Flex.Item>
+                        </>
+                      )}
+                      <Flex.Item>
+                        <ModuleItemSupplementalInfoStudent
+                          contentTagId={_id}
+                          content={content}
+                          completionRequirement={completionRequirements?.find(
+                            req => req.id === _id,
+                          )}
+                        />
                       </Flex.Item>
-                      <Flex.Item margin="0 small 0 0">
-                        <Text size="x-small">{content?.type}</Text>
-                      </Flex.Item>
-                    </>
-                  )}
-                  <Flex.Item>
-                    <ModuleItemSupplementalInfoStudent
-                      contentTagId={_id}
-                      content={content}
-                      completionRequirement={completionRequirements?.find(req => req.id === _id)}
-                    />
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
+                    </Flex>
+                  </div>
+                </Flex.Item>
+              )}
             </Flex>
           </div>
         </Flex.Item>
-        <Flex.Item>
-          <ModuleItemStatusIcon
-            itemId={_id || ''}
-            completionRequirement={completionRequirements?.find(req => req.id === _id)}
-            requirementsMet={progression?.requirementsMet || []}
-            content={content}
-          />
-        </Flex.Item>
+        {content.type !== 'SubHeader' && (
+          <Flex.Item>
+            <ModuleItemStatusIcon
+              itemId={_id || ''}
+              moduleCompleted={progression?.completed || false}
+              completionRequirements={completionRequirements}
+              requirementsMet={progression?.requirementsMet || []}
+              content={content}
+            />
+          </Flex.Item>
+        )}
       </Flex>
     </View>
   )

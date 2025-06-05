@@ -20,9 +20,6 @@ import $ from 'jquery'
 import kalturaAnalytics from '../kalturaAnalytics'
 import mejs from '@canvas/mediaelement'
 import 'jquery.cookie'
-import sinon from 'sinon'
-
-const sandbox = sinon.createSandbox()
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toEqual(y)
@@ -48,8 +45,9 @@ describe('kaltura analytics helper', () => {
   })
 
   test('adds event listeners', function () {
-    sandbox.mock(player).expects('addEventListener').atLeast(6)
+    player.addEventListener = jest.fn()
     kalturaAnalytics('1', player, pluginSettings)
+    expect(player.addEventListener).toHaveBeenCalledTimes(6)
   })
 
   test('generate api url', function () {
@@ -63,8 +61,8 @@ describe('kaltura analytics helper', () => {
 
   test('queue new analytics call', function () {
     const ka = kalturaAnalytics('1', player, pluginSettings)
-    const exp = sinon.expectation.create([]).once()
-    ka.iframes[0].pinger = exp
+    const pinger = jest.fn()
+    ka.iframes[0].pinger = pinger
     ka.queueAnalyticEvent('oioi')
     if (window.location.protocol === 'http:') {
       equal(
@@ -82,7 +80,7 @@ describe('kaltura analytics helper', () => {
       )
     }
     ok(ka.iframes[0].queue[0].match(/eventType=oioi/))
-    exp.verify()
+    expect(pinger).toHaveBeenCalledTimes(1)
   })
 
   test("don't load if disabled", function () {

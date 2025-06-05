@@ -33,8 +33,8 @@ import {View} from '@instructure/ui-view'
 
 import actions from '../actions'
 import {GROUP_PERMISSION_DESCRIPTIONS} from '../templates/groupPermissionDescriptions'
-import {ConnectedPermissionButton} from './PermissionButton'
-import {ConnectedGranularCheckbox} from './GranularCheckbox'
+import PermissionButton from './PermissionButton'
+import GranularCheckbox from './GranularCheckbox'
 import propTypes from '@canvas/permissions/react/propTypes'
 
 const I18n = createI18nScope('permissions')
@@ -246,7 +246,7 @@ export default class PermissionsTable extends Component {
         {this.renderLeftHeader(permission)}
         {this.props.roles.map(role => (
           <td key={role.id}>
-            <ConnectedGranularCheckbox
+            <GranularCheckbox
               permission={role.permissions[permission.permission_name]}
               permissionName={permission.permission_name}
               permissionLabel={permission.label}
@@ -271,7 +271,7 @@ export default class PermissionsTable extends Component {
                 {this.props.roles.map(role => (
                   <td key={role.id} id={`${perm.permission_name}_role_${role.id}`}>
                     <div className="ic-permissions__cell-content">
-                      <ConnectedPermissionButton
+                      <PermissionButton
                         permission={role.permissions[perm.permission_name]}
                         permissionName={perm.permission_name}
                         permissionLabel={perm.label}

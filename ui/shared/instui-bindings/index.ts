@@ -73,13 +73,19 @@ function getTheme_(highContrast?: unknown, brandVariables?: BrandVariables) {
   return isHighContrast
     ? {
         ...canvasHighContrastTheme,
-        typography,
+        typography: {
+          ...canvasHighContrastTheme.typography,
+          ...typography,
+        },
       }
     : {
         ...transitionOverride,
         ...canvasBaseTheme,
         ...brandVariables_,
-        typography,
+        typography: {
+          ...canvasBaseTheme.typography,
+          ...typography,
+        },
       }
 }
 export const getTheme = memoize(getTheme_)

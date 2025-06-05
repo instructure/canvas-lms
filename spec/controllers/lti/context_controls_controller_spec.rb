@@ -58,17 +58,89 @@ describe Lti::ContextControlsController, type: :request do
 
   before do
     user_session(admin)
+    registration # auto-create deployment and control first
   end
 
   def deployment_for(context)
     registration.new_external_tool(context)
   end
 
+  def control_for(deployment, context)
+    if context.is_a?(Course)
+      Lti::ContextControl.create!(course: context, registration:, deployment:)
+    elsif context.is_a?(Account)
+      Lti::ContextControl.create!(account: context, registration:, deployment:)
+    else
+      raise ArgumentError, "Context must be a Course or Account"
+    end
+  end
+
   describe "GET #index" do
-    subject { get "/api/v1/lti_registrations/#{registration.id}/controls" }
+    subject { get "/api/v1/lti_registrations/#{registration.id}/controls", params: }
+
+    let(:params) { { per_page: 15 } }
+
+    context "with multiple deployments and lots of controls" do
+      let(:account_deployment) { ContextExternalTool.find_by(lti_registration: registration, context: account) }
+      let(:course) { course_model(account:) }
+      let(:subaccount) { account_model(parent_account: account) }
+      let(:course_deployment) { deployment_for(course) }
+      let(:subaccount_deployment) { deployment_for(subaccount) }
+
+      before do
+        9.times do
+          account_course = course_model(account:)
+          other_subaccount = account_model(parent_account: account)
+          subaccount_course = course_model(account: other_subaccount)
+
+          control_for(account_deployment, account_course)
+          control_for(course_deployment, other_subaccount)
+          control_for(subaccount_deployment, subaccount_course)
+        end
+      end
+
+      it "paginates across deployments" do
+        subject
+        expect(response).to be_successful
+        # Expecting 2 deployments for a total of 15 controls
+        expect(response_json.length).to eq(2)
+        expect(response_json[0]["id"]).to eq(account_deployment.id)
+        expect(response_json[0]["context_controls"].length).to eq(10)
+        response_json[0]["context_controls"].each do |control|
+          expect(control["deployment_id"]).to eq(account_deployment.id)
+        end
+        expect(response_json[1]["id"]).to eq(course_deployment.id)
+        expect(response_json[1]["context_controls"].length).to eq(5)
+        response_json[1]["context_controls"].each do |control|
+          expect(control["deployment_id"]).to eq(course_deployment.id)
+        end
+
+        links = Api.parse_pagination_links(response.headers["Link"])
+        next_link = links.detect { |link| link[:rel] == "next" }
+        expect(next_link["page"]).to start_with "bookmark:"
+
+        get next_link[:uri].to_s
+        expect(response).to be_successful
+        next_page_json = response.parsed_body
+        expect(next_page_json.length).to eq(2)
+        expect(next_page_json[0]["id"]).to eq(course_deployment.id)
+        expect(next_page_json[0]["context_controls"].length).to eq(5)
+        next_page_json[0]["context_controls"].each do |control|
+          expect(control["deployment_id"]).to eq(course_deployment.id)
+        end
+        expect(next_page_json[1]["id"]).to eq(subaccount_deployment.id)
+        expect(next_page_json[1]["context_controls"].length).to eq(10)
+        next_page_json[1]["context_controls"].each do |control|
+          expect(control["deployment_id"]).to eq(subaccount_deployment.id)
+        end
+
+        Api.parse_pagination_links(response.headers["Link"])
+        links.detect { |link| link[:rel] == "next" }
+      end
+    end
 
     context "with deployments" do
-      let(:deployment) { deployment_for(account) }
+      let(:deployment) { registration.deployments.first }
       let(:control) { deployment.context_controls.first }
       let(:course) { course_model(account:) }
       let(:subaccount) { account_model(parent_account: account) }
@@ -123,18 +195,21 @@ describe Lti::ContextControlsController, type: :request do
           other_control
         end
 
-        it "only returns control for deployment context" do
-          # TODO: will be removed as part of INTEROP-8992
+        it "returns controls for the deployment" do
           subject
 
           deployment_json = response_json.find { |d| d["id"] == deployment.id }
-          expect(deployment_json["context_controls"].length).to eq(1)
-          expect(deployment_json["context_controls"].map { |cc| cc["id"] }).not_to include(other_control.id)
+          expect(deployment_json["context_controls"].length).to eq(2)
+          expect(deployment_json["context_controls"].map { |cc| cc["id"] }).to include(other_control.id)
         end
       end
     end
 
     context "with no deployments" do
+      before do
+        registration.deployments.each(&:destroy)
+      end
+
       it "is successful" do
         subject
         expect(response).to be_successful
@@ -245,7 +320,7 @@ describe Lti::ContextControlsController, type: :request do
 
     let(:params) { { course_id: course.id } }
     let(:course) { course_model(account:) }
-    let(:root_deployment) { registration.new_external_tool(account).tap(&:save!) }
+    let(:root_deployment) { registration.deployments.first }
 
     before { root_deployment }
 
@@ -427,7 +502,7 @@ describe Lti::ContextControlsController, type: :request do
     end
 
     let(:params) { [] }
-    let(:root_deployment) { registration.new_external_tool(account).tap(&:save!) }
+    let(:root_deployment) { registration.deployments.first }
 
     before { root_deployment }
 

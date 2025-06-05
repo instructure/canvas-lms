@@ -22,6 +22,5 @@ import ReactDOM from 'react-dom'
 import PronounsInput from './react/PronounsInput'
 
 $(() => {
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<PronounsInput />, $('<div/>').appendTo('#personal_pronouns_options')[0])
 })

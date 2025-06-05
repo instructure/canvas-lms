@@ -54,7 +54,7 @@ describe('LDBLoginPopup', () => {
   it('injects stylesheets into the popup window', () => {
     const whnd = popup.exec()
     const mainLinks = $('link')
-    expect(whnd.document.find('link[href]').length).toBe(mainLinks.length)
+    expect(whnd.document.find('link[href]')).toHaveLength(mainLinks.length)
   })
 
   it('closes after a successful login', () => {

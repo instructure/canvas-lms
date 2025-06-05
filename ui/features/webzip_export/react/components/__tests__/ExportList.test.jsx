@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-
-import enzyme from 'enzyme'
+import {render} from '@testing-library/react'
 import ExportList from '../ExportList'
 
 describe('ExportList', () => {
@@ -38,15 +37,14 @@ describe('ExportList', () => {
       },
     ]
 
-    const tree = enzyme.shallow(<ExportList exports={exports} />)
-    const node = tree.find('.webzipexport__list')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<ExportList exports={exports} />)
+    const node = container.querySelector('.webzipexport__list')
+    expect(node).toBeInTheDocument()
   })
 
   it('renders empty text if there are no exports', () => {
     const exports = []
-    const tree = enzyme.shallow(<ExportList exports={exports} />)
-    const node = tree.find('.webzipexport__list')
-    expect(node.text()).toEqual('No exports to display')
+    const {getByText} = render(<ExportList exports={exports} />)
+    expect(getByText('No exports to display')).toBeInTheDocument()
   })
 })

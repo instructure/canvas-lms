@@ -31,7 +31,7 @@ template: |
 
   Please follow these steps to create a rubric:
 
-  1. Analyze the assignment description. Identify the main objectives of the assignment, note specific requirements or criteria mentioned, and determine key skills or knowledge areas being assessed.
+  1. Analyze the assignment description. Identify the main objectives of the assignment, note specific requirements or criteria mentioned, and determine key skills or knowledge areas being assessed. <ADDITIONAL_PROMPT_INFO_PLACEHOLDER>
 
   2. Create rubric criteria. Brainstorm potential criteria based on your analysis, then select the best <CRITERIA_COUNT_PLACEHOLDER> criteria that encompass the essential elements of the assignment. Ensure these criteria align with the assignment's objectives and requirements. Make sure criteria are clear, concise, and mutually exclusive
 

@@ -177,7 +177,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     const createPageAction = editor => {
       this.createNewPage(e, editor)
     }
-    ENV.FEATURES?.BLOCK_EDITOR
+    ENV.EDITOR_FEATURE !== null
       ? renderChooseEditorModal(e, createPageAction)
       : this.createNewPage(e)
   }
@@ -270,6 +270,11 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
   createNewPage(ev, editor = 'rce') {
     if (ev != null) {
       ev.preventDefault()
+    }
+
+    if (editor === 'canvas_content_builder') {
+      window.location.href = ENV.NEW_PAGE_URL
+      return
     }
 
     this.$el.hide()
@@ -451,7 +456,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     json.rce_is_preferred = window.ENV.text_editor_preference === 'rce'
     json.no_preferred_editor = window.ENV.text_editor_preference === null
 
-    json.block_editor = !!ENV.FEATURES?.BLOCK_EDITOR
+    json.block_editor = ENV.EDITOR_FEATURE === 'block_editor'
     return json
   }
 }

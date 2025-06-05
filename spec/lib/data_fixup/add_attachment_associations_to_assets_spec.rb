@@ -52,7 +52,7 @@ describe DataFixup::AddAttachmentAssociationsToAssets do
   it "would not re-create attachment associations if they already exist on syllabus attachments" do
     @image.attachment_associations.create!(
       context: @course,
-      field_name: "syllabus_body",
+      context_concern: "syllabus_body",
       user: @user
     )
 

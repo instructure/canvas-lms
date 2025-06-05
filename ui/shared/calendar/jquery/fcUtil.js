@@ -64,7 +64,7 @@ const clone = function (moment) {
 // compensates for intervals spanning DST changes
 const addMinuteDelta = function (moment, minuteDelta) {
   let date
-  // eslint-disable-next-line no-bitwise
+
   const dayDelta = (minuteDelta / 1440) | 0
   minuteDelta %= 1440
   date = unwrap(moment)

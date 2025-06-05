@@ -30,7 +30,7 @@ import {transformRubricData, transformRubricAssessmentData} from '../helpers/Rub
 import useStore from './stores/index'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
 import {useAllPages} from '@canvas/query'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {Assignment, Submission} from './RubricsQuery.types'
 
 const I18n = createI18nScope('assignments_2')

@@ -37,7 +37,8 @@
   description = criterion.try(:description) || t('defaults.description', "Description of criterion")
 %>
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if learning_outcome_criterion %>" style="<%= hidden unless criterion %>">
-  <td class="criterion_description hover-container pad-box-micro">
+  <td class="criterion_description hover-container pad-box-micro"
+      aria-label="<%= t "description of criterion" %>">
     <div class="criterion_description_container">
       <div class="description_content">
         <span class="outcome_sr_content" aria-hidden="<%= learning_outcome_criterion.nil? %>">
@@ -84,7 +85,7 @@
       </div>
     <% end %>
   </td>
-  <td style="padding: 0;">
+  <td style="padding: 0;" aria-label="<%= t "criterion ratings" %>">
     <% if !edit_view && criterion && rubric && rubric.free_form_criterion_comments %>
       <div class="custom_ratings_entry assessing">
         <div style="margin-<%= direction('left') %>: 5px; margin-top: 2px; <%= hidden unless rubric_association && rubric_association.summary_data && rubric_association.summary_data[:saved_comments] && rubric_association.summary_data[:saved_comments][criterion.id.to_s] %>" class="saved_custom_rating_holder">
@@ -158,7 +159,8 @@
       </div>
     <% end %>
   </td>
-  <td class="nobr points_form toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>">
+  <td class="nobr points_form toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>"
+      aria-label="<%= t "criterion points" %>">
     <div class="editing" style="white-space: normal">
       <span style="white-space: nowrap; font-size: 0.8em">
         <%

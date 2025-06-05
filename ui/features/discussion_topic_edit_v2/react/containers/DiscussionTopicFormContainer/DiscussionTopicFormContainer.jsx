@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useContext, useEffect, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react'
 
 import {useMutation, useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -25,6 +25,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 import {assignLocation} from '@canvas/util/globalUtils'
 import WithBreakpoints from '@canvas/with-breakpoints'
+import {usePathTransform, whenPendoReady} from '@canvas/pendo'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -67,6 +68,8 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
 
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
   const shouldSaveMasteryPaths = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement
+
+  usePathTransform(whenPendoReady, 'discussion_topics', 'announcements', isAnnouncement)
 
   const {data: contextData, loading: courseIsLoading} = useQuery(contextQueryToUse, {
     variables: contextQueryVariables,

@@ -177,15 +177,6 @@ describe TokenScopes do
       end
     end
 
-    context "with the platform_notification_service flag off" do
-      before { mock_ff_off(:platform_notification_service) }
-
-      it "is missing the PNS scope" do
-        expect(scopes_hash).to eq TokenScopes::LTI_SCOPES.except(TokenScopes::LTI_PNS_SCOPE)
-        expect(scopes_list).to eq TokenScopes::LTI_SCOPES.keys - [TokenScopes::LTI_PNS_SCOPE]
-      end
-    end
-
     context "with the lti_asset_processor flag off" do
       before { mock_ff_off(:lti_asset_processor) }
 
@@ -193,7 +184,8 @@ describe TokenScopes do
         asset_scopes = [
           TokenScopes::LTI_ASSET_READ_ONLY_SCOPE,
           TokenScopes::LTI_ASSET_REPORT_SCOPE,
-          TokenScopes::LTI_EULA_SCOPE
+          TokenScopes::LTI_EULA_USER_SCOPE,
+          TokenScopes::LTI_EULA_DEPLOYMENT_SCOPE
         ]
         expect(scopes_hash).to eq TokenScopes::LTI_SCOPES.except(*asset_scopes)
         expect(scopes_list).to eq TokenScopes::LTI_SCOPES.keys - asset_scopes

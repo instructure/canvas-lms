@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import Outcome from '../../../../backbone/models/Outcome'
 import OutcomeContentBase from '../OutcomeContentBase'
 import OutcomeView from '../OutcomeView'
@@ -75,11 +76,18 @@ function createView(opts) {
 
 describe('OutcomeView', () => {
   beforeEach(() => {
+    fakeENV.setup()
     document.body.innerHTML = '<div id="fixtures"></div>'
+    $('body').attr('class', '')
+    $('.ui-dialog').remove()
   })
 
   afterEach(() => {
+    $('.ui-dialog').remove()
+    $('.ui-widget-overlay').remove()
     document.body.innerHTML = ''
+    $('body').attr('class', '')
+    fakeENV.teardown()
   })
 
   describe('Assessment Banners', () => {
@@ -183,31 +191,48 @@ describe('OutcomeView', () => {
         model: newOutcome({calculation_method: 'highest'}),
         state: 'edit',
       })
-      await waitFrames(10)
+
+      view.edit($.Event())
+      await waitFrames(30)
+
+      expect(view.$('#calculation_method')).toHaveLength(1)
+
       view.$('#calculation_method').val('n_mastery').trigger('change')
-      await waitFrames(10)
-      expect(view.$('#calculation_int').val()).toBe('5')
+      await waitFrames(30)
+
+      const calcIntField = view.$('#calculation_int')
+      expect(calcIntField).toHaveLength(1)
+
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      const calcIntValue = calcIntField.val()
+      expect(calcIntValue).toBeDefined()
+      expect(calcIntValue).toBe('5')
 
       view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(10)
+      await waitFrames(30)
+      await new Promise(resolve => setTimeout(resolve, 50))
       expect(view.$('#calculation_int').val()).toBe('65')
 
       view.$('#calculation_method').val('n_mastery').trigger('change')
-      await waitFrames(10)
+      await waitFrames(30)
+      await new Promise(resolve => setTimeout(resolve, 50))
       expect(view.$('#calculation_int').val()).toBe('5')
 
-      view.$('#calculation_int').val('4')
-      await waitFrames(10)
+      view.$('#calculation_int').val('4').trigger('change')
+      await waitFrames(30)
       expect(view.$('#calculation_int').val()).toBe('4')
 
       view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(10)
+      await waitFrames(30)
+      await new Promise(resolve => setTimeout(resolve, 50))
       expect(view.$('#calculation_int').val()).toBe('65')
 
       view.$('#calculation_method').val('highest').trigger('change')
-      await waitFrames(10)
+      await waitFrames(30)
       view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(10)
+      await waitFrames(30)
+      await new Promise(resolve => setTimeout(resolve, 50))
       expect(view.$('#calculation_int').val()).toBe('65')
       view.remove()
     })
@@ -220,10 +245,17 @@ describe('OutcomeView', () => {
         }),
         state: 'edit',
       })
-      await waitFrames(10)
+
+      view.edit($.Event())
+      await waitFrames(30)
+
       view.$('#calculation_method').val('n_mastery').trigger('change')
-      await waitFrames(10)
-      expect(view.$('#calculation_int').val()).toBe('5')
+      await waitFrames(30)
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      const calcIntValue = view.$('#calculation_int').val()
+      expect(calcIntValue).toBeDefined()
+      expect(calcIntValue).toBe('5')
       view.remove()
     })
   })

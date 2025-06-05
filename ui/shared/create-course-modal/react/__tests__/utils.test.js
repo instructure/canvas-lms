@@ -47,7 +47,7 @@ describe('getAccountsFromEnrollments', () => {
       },
     ]
     const accounts = getAccountsFromEnrollments(enrollments)
-    expect(accounts.length).toBe(1)
+    expect(accounts).toHaveLength(1)
     expect(accounts[0].id).toBe(6)
     expect(accounts[0].name).toBe('Elementary')
     expect(accounts[0].workflow_state).toBeUndefined()
@@ -69,7 +69,7 @@ describe('getAccountsFromEnrollments', () => {
       },
     ]
     const accounts = getAccountsFromEnrollments(enrollments)
-    expect(accounts.length).toBe(1)
+    expect(accounts).toHaveLength(1)
   })
 
   it('ignores enrollments without an account property', () => {
@@ -87,7 +87,7 @@ describe('getAccountsFromEnrollments', () => {
       },
     ]
     const accounts = getAccountsFromEnrollments(enrollments)
-    expect(accounts.length).toBe(1)
+    expect(accounts).toHaveLength(1)
     expect(accounts[0].id).toBe(1)
   })
 })

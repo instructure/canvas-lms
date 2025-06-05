@@ -19,58 +19,81 @@
 import $ from 'jquery'
 import AvatarDialogView from '../AvatarDialogView'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
-import sinon from 'sinon'
 
-const sandbox = sinon.createSandbox()
-
-const ok = value => expect(value).toBeTruthy()
-
-let server
 let avatarDialogView
 
 describe('AvatarDialogView#onPreflight', () => {
   beforeEach(() => {
-    server = sinon.fakeServer.create()
     avatarDialogView = new AvatarDialogView()
+    // Mock jQuery's post and getJSON methods
+    $.post = jest.fn()
+    $.getJSON = jest.fn()
+    $.flashError = jest.fn()
   })
 
   afterEach(() => {
-    server.restore()
     avatarDialogView = null
     $('.ui-dialog').remove()
+    jest.restoreAllMocks()
   })
 
   test('it should be accessible', function (done) {
     isAccessible(avatarDialogView, done, {a11yReport: true})
   })
 
-  // Passes in QUnit, fails in Jest
-  test.skip('calls flashError with base error message when errors are present', function () {
+  test('calls flashError with base error message when errors are present', async () => {
     const errorMessage = 'User storage quota exceeded'
-    sandbox.stub(avatarDialogView, 'enableSelectButton')
-    const mock = sandbox.mock($).expects('flashError').withArgs(errorMessage)
+    avatarDialogView.enableSelectButton = jest.fn()
+
+    // Mock the failed POST request
+    $.post.mockImplementation(() => {
+      const deferred = $.Deferred()
+      setTimeout(() => {
+        deferred.reject({
+          responseText: JSON.stringify({
+            errors: {
+              base: errorMessage,
+            },
+          }),
+        })
+      }, 0)
+      return deferred.promise()
+    })
+
+    // Since preflightRequest doesn't return the promise from $.post for failed requests,
+    // we need to wait for the next tick
     avatarDialogView.preflightRequest()
-    server.respond('POST', '/files/pending', [
-      400,
-      {'Content-Type': 'application/json'},
-      `{\"errors\":{\"base\":\"${errorMessage}\"}}`,
-    ])
-    ok(mock.verify())
+    await new Promise(resolve => setTimeout(resolve, 10))
+
+    expect($.flashError).toHaveBeenCalledWith(errorMessage)
+    expect(avatarDialogView.enableSelectButton).toHaveBeenCalled()
   })
 
-  test('errors if waitAndSaveUserAvatar is called more than 50 times without successful save', function (done) {
-    sandbox
-      .mock($)
-      .expects('getJSON')
-      .returns(Promise.resolve([{token: 'avatar-token'}]))
-    const mock = sandbox.mock(avatarDialogView).expects('handleErrorUpdating')
-    const maxCalls = 50
-    avatarDialogView
-      .waitAndSaveUserAvatar('fake-token', 'fake-url', maxCalls)
-      .then(() => {
-        ok(mock.verify())
-        done()
-      })
-      .catch(done)
+  test('errors if waitAndSaveUserAvatar is called more than 50 times without successful save', async () => {
+    // Mock getJSON to always return empty array (no processed avatar)
+    $.getJSON.mockResolvedValue([])
+
+    // Mock handleErrorUpdating
+    avatarDialogView.handleErrorUpdating = jest.fn()
+
+    // Speed up the test by mocking setTimeout
+    jest.useFakeTimers()
+
+    const promise = avatarDialogView.waitAndSaveUserAvatar('fake-token', 'fake-url', 0)
+
+    // Run all timers to simulate the 50 retries
+    for (let i = 0; i < 50; i++) {
+      jest.runOnlyPendingTimers()
+      await Promise.resolve() // Let promises settle
+    }
+
+    jest.runOnlyPendingTimers()
+    await promise
+
+    expect(avatarDialogView.handleErrorUpdating).toHaveBeenCalledWith(
+      expect.stringContaining('Profile photo save failed too many times'),
+    )
+
+    jest.useRealTimers()
   })
 })

@@ -137,11 +137,20 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
   }, [mode, differentiationTagSet, getInitialState])
 
   useEffect(() => {
-    if (focusIndex === -1) {
-      inputRefs.current[tags[0].id]?.focus()
-      setFocusIndex(null)
-    } else if (focusIndex !== null) {
-      focusElRef.current[focusIndex]?.focus()
+    switch (focusIndex) {
+      case -1:
+        inputRefs.current[tags[0]?.id]?.focus()
+        setFocusIndex(null)
+        break
+      case -2:
+        inputRefs.current[tags[tags.length - 1]?.id]?.focus()
+        setFocusIndex(null)
+        break
+      case null:
+        break
+      // Put focus on the corresponding tag delete button
+      default:
+        focusElRef.current[focusIndex]?.focus()
     }
   }, [focusIndex])
 
@@ -197,6 +206,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
       }
     }
     setTags(prev => [...prev, {id: Date.now(), name: ''}])
+    setFocusIndex(-2)
   }
 
   const handleRemoveTag = (id: number) => {
@@ -515,7 +525,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
               <CondensedButton
                 onClick={handleAddTagClick}
                 margin="0 0 small 0"
-                aria-label={I18n.t('+ Add another tag')}
+                aria-label={I18n.t('Add another tag')}
               >
                 {I18n.t('+ Add another tag')}
               </CondensedButton>

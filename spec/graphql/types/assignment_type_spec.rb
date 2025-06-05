@@ -40,6 +40,12 @@ describe Types::AssignmentType do
   let(:teacher_assignment_type) { GraphQLTypeTester.new(assignment, current_user: teacher) }
   let(:admin_user_assignment_type) { GraphQLTypeTester.new(assignment, current_user: admin_user) }
 
+  let(:assignment_visibility) do
+    AssignmentVisibility::AssignmentVisibilityService.users_with_visibility_by_assignment(
+      course_id: course.id, user_ids: [student.id], assignment_ids: [assignment.id]
+    )[assignment.id].map(&:to_s)
+  end
+
   it "works" do
     expect(assignment_type.resolve("_id")).to eq assignment.id.to_s
     expect(assignment_type.resolve("name")).to eq assignment.name
@@ -62,6 +68,9 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("postManually")).to eq assignment.post_manually?
     expect(assignment_type.resolve("published")).to eq assignment.published?
     expect(assignment_type.resolve("importantDates")).to eq assignment.important_dates
+    expect(assignment_type.resolve("isNewQuiz")).to eq assignment.quiz_lti?
+    expect(assignment_type.resolve("muted")).to eq assignment.muted?
+    expect(assignment_type.resolve("hasRubric")).to eq assignment.active_rubric_association?
   end
 
   describe "graded_submissions_exist" do
@@ -384,15 +393,27 @@ describe Types::AssignmentType do
   end
 
   describe "gradingStandard" do
-    it "returns the grading standard" do
-      grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
-      assignment.update(grading_type: "letter_grade", grading_standard_id: grading_standard.id)
-      assignment.save!
-      expect(assignment_type.resolve("gradingStandard { title }")).to eq grading_standard.title
+    context "is set" do
+      before do
+        @grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+        assignment.update(grading_type: "letter_grade", grading_standard_id: @grading_standard.id)
+        assignment.save!
+      end
+
+      it "returns the grading standard id" do
+        expect(assignment_type.resolve("gradingStandardId")).to eq @grading_standard.id.to_s
+      end
+
+      it "returns the grading standard" do
+        expect(assignment_type.resolve("gradingStandard { title }")).to eq @grading_standard.title
+      end
     end
 
-    it "returns null if no grading standard is set" do
-      expect(assignment_type.resolve("gradingStandard { title }")).to be_nil
+    context "is not set" do
+      it "returns null if no grading standard is set" do
+        expect(assignment_type.resolve("gradingStandardId")).to be_nil
+        expect(assignment_type.resolve("gradingStandard { title }")).to be_nil
+      end
     end
   end
 
@@ -536,21 +557,17 @@ describe Types::AssignmentType do
       end
 
       it "returns submissions only for the given section" do
-        section1_submission_ids = assignment_type.resolve(<<~GQL, current_user: teacher)
-          submissionsConnection(filter: {sectionIds: [#{section1.id}]}) {
+        gql = "submissionsConnection(filter: {sectionIds: [#{section1.id}]}) {
             edges { node { _id } }
-          }
-        GQL
+          }"
+        section1_submission_ids = assignment_type.resolve(gql, current_user: teacher)
         expect(section1_submission_ids.map(&:to_i)).to contain_exactly(@section1_student_submission.id)
       end
 
       it "respects visibility for limited teachers" do
         teacher.enrollments.first.update! course_section: section2,
                                           limit_privileges_to_course_section: true
-
-        submissions = assignment_type.resolve(<<~GQL, current_user: teacher)
-          submissionsConnection { nodes { _id } }
-        GQL
+        submissions = assignment_type.resolve("submissionsConnection { nodes { _id } }", current_user: teacher)
 
         expect(submissions).not_to include @section1_student_submission.id.to_s
         expect(submissions).to include @section2_student_submission.id.to_s
@@ -864,6 +881,77 @@ describe Types::AssignmentType do
       it "returns null in place of the PostPolicy" do
         resolver = GraphQLTypeTester.new(assignment, context)
         expect(resolver.resolve("postPolicy {_id}")).to be_nil
+      end
+    end
+  end
+
+  describe "provisional_grading_locked" do
+    let(:moderated_assignment) do
+      course.assignments.create!(
+        title: "moderated assignment",
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: teacher
+      )
+    end
+
+    let(:moderated_assignment_type) { GraphQLTypeTester.new(moderated_assignment, current_user: teacher) }
+
+    context "when user is a student" do
+      it "returns false" do
+        student_type = GraphQLTypeTester.new(moderated_assignment, current_user: student)
+        expect(student_type.resolve("provisionalGradingLocked")).to be false
+      end
+    end
+
+    context "when user is the final grader" do
+      it "returns false" do
+        expect(moderated_assignment_type.resolve("provisionalGradingLocked")).to be false
+      end
+    end
+
+    context "when grades are published" do
+      it "returns false" do
+        other_teacher = teacher_in_course(course:, active_all: true).user
+        other_teacher_type = GraphQLTypeTester.new(moderated_assignment, current_user: other_teacher)
+
+        moderated_assignment.update!(grades_published_at: Time.now.utc)
+
+        expect(other_teacher_type.resolve("provisionalGradingLocked")).to be false
+      end
+    end
+
+    context "when user is already a provisional grader" do
+      it "returns false" do
+        other_teacher = teacher_in_course(course:, active_all: true).user
+        other_teacher_type = GraphQLTypeTester.new(moderated_assignment, current_user: other_teacher)
+
+        moderated_assignment.moderation_graders.create!(user: other_teacher, anonymous_id: "abcde")
+
+        expect(other_teacher_type.resolve("provisionalGradingLocked")).to be false
+      end
+    end
+
+    context "when grader limit is not reached" do
+      it "returns false" do
+        other_teacher = teacher_in_course(course:, active_all: true).user
+        other_teacher_type = GraphQLTypeTester.new(moderated_assignment, current_user: other_teacher)
+
+        expect(other_teacher_type.resolve("provisionalGradingLocked")).to be false
+      end
+    end
+
+    context "when grader limit is reached" do
+      it "returns true for a teacher who is not already a grader" do
+        grader1 = teacher_in_course(course:, active_all: true).user
+        grader2 = teacher_in_course(course:, active_all: true).user
+        extra_teacher = teacher_in_course(course:, active_all: true).user
+
+        moderated_assignment.moderation_graders.create!(user: grader1, anonymous_id: "abcde")
+        moderated_assignment.moderation_graders.create!(user: grader2, anonymous_id: "fghij")
+
+        extra_teacher_type = GraphQLTypeTester.new(moderated_assignment, current_user: extra_teacher)
+        expect(extra_teacher_type.resolve("provisionalGradingLocked")).to be true
       end
     end
   end
@@ -1341,6 +1429,100 @@ describe Types::AssignmentType do
           expect(result).to match_array(assignment.submissions.pluck(:anonymous_id))
         end
       end
+    end
+  end
+
+  describe "assignmentVisibility" do
+    it "returns assignment visiblity for teachers" do
+      expect(teacher_assignment_type.resolve("assignmentVisibility")).to eq assignment_visibility
+    end
+
+    it "returns nil as assignment visiblity for non-authorized users" do
+      expect(assignment_type.resolve("assignmentVisibility")).to be_nil
+    end
+  end
+
+  describe "module_items" do
+    let_once(:module_1) { course.context_modules.create!(name: "module 1") }
+    let_once(:module_2) { course.context_modules.create!(name: "module 2") }
+
+    let(:regular_assignment) do
+      assignment = course.assignments.create!(
+        title: "regular assignment",
+        submission_types: "online_text_entry"
+      )
+      module_1.add_item(type: "assignment", id: assignment.id)
+      assignment
+    end
+
+    let(:multi_module_assignment) do
+      assignment = course.assignments.create!(
+        title: "multi module assignment",
+        submission_types: "online_text_entry,online_upload"
+      )
+      module_1.add_item(type: "assignment", id: assignment.id)
+      module_2.add_item(type: "assignment", id: assignment.id)
+      assignment
+    end
+
+    let(:quiz_assignment) do
+      quiz = course.quizzes.create!(title: "test quiz")
+      quiz.publish!
+      module_1.add_item(type: "quiz", id: quiz.id)
+      quiz.assignment
+    end
+
+    let(:discussion_assignment) do
+      discussion = course.discussion_topics.create!(
+        title: "test discussion",
+        assignment: course.assignments.create!
+      )
+      module_1.add_item(type: "discussion_topic", id: discussion.id)
+      discussion.assignment
+    end
+
+    let(:orphaned_assignment) do
+      course.assignments.create!(title: "orphaned assignment")
+    end
+
+    it "returns module items for regular assignment" do
+      resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
+      expect(resolver.resolve("moduleItems { _id }")).to eq(regular_assignment.context_module_tags.map { |tag| tag.id.to_s })
+      expect(resolver.resolve("moduleItems { position }")).to eq(regular_assignment.context_module_tags.map(&:position))
+      expect(resolver.resolve("moduleItems { content { type } }")).to eq ["Assignment"]
+      expect(resolver.resolve("moduleItems { module { _id } }")).to eq [module_1.id.to_s]
+    end
+
+    it "returns module items for quiz assignment" do
+      resolver = GraphQLTypeTester.new(quiz_assignment, current_user: teacher)
+      expect(resolver.resolve("moduleItems { _id }")).to eq(quiz_assignment.quiz.context_module_tags.map { |tag| tag.id.to_s })
+      expect(resolver.resolve("moduleItems { position }")).to eq(quiz_assignment.quiz.context_module_tags.map(&:position))
+      expect(resolver.resolve("moduleItems { content { type } }")).to eq ["Quizzes::Quiz"]
+      expect(resolver.resolve("moduleItems { module { _id } }")).to eq [module_1.id.to_s]
+    end
+
+    it "returns module items for discussion assignment" do
+      resolver = GraphQLTypeTester.new(discussion_assignment, current_user: teacher)
+      expect(resolver.resolve("moduleItems { _id }")).to eq(discussion_assignment.discussion_topic.context_module_tags.map { |tag| tag.id.to_s })
+      expect(resolver.resolve("moduleItems { position }")).to eq(discussion_assignment.discussion_topic.context_module_tags.map(&:position))
+      expect(resolver.resolve("moduleItems { content { type } }")).to eq ["DiscussionTopic"]
+      expect(resolver.resolve("moduleItems { module { _id } }")).to eq [module_1.id.to_s]
+    end
+
+    it "returns empty array when assignment is not in any module" do
+      resolver = GraphQLTypeTester.new(orphaned_assignment, current_user: teacher)
+      module_items = resolver.resolve("moduleItems { id }")
+
+      expect(module_items).to eq []
+    end
+
+    it "returns multiple module items for an assignment in multiple modules" do
+      resolver = GraphQLTypeTester.new(multi_module_assignment, current_user: teacher)
+
+      expect(resolver.resolve("moduleItems { _id }")).to eq(multi_module_assignment.context_module_tags.map { |tag| tag.id.to_s })
+      expect(resolver.resolve("moduleItems { position }")).to eq(multi_module_assignment.context_module_tags.map(&:position))
+      expect(resolver.resolve("moduleItems { content { type } }")).to eq ["Assignment", "Assignment"]
+      expect(resolver.resolve("moduleItems { module { _id } }")).to eq [module_1.id.to_s, module_2.id.to_s]
     end
   end
 end

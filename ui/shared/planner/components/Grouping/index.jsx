@@ -149,12 +149,13 @@ export class Grouping extends Component {
     }
 
     const componentsToRender = this.renderItems(itemsToRender)
-    componentsToRender.push(
-      this.renderFacade(
-        completedItems,
-        this.props.animatableIndex * 100 + itemsToRender.length + 1,
-      ),
+    const facade = this.renderFacade(
+      completedItems,
+      this.props.animatableIndex * 100 + itemsToRender.length + 1,
     )
+    if (facade) {
+      componentsToRender.push(facade)
+    }
     return componentsToRender
   }
 
@@ -196,6 +197,8 @@ export class Grouping extends Component {
           responsiveSize={this.props.responsiveSize}
           onlineMeetingURL={item.onlineMeetingURL}
           isObserving={this.props.isObserving}
+          newActivityTestId="item-new-activity-indicator"
+          missingIndicatorTestId="item-missing-indicator"
         />
       </li>
     ))
@@ -261,6 +264,7 @@ export class Grouping extends Component {
     if (newItem || missing) {
       const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator
       const badgeMessage = this.props.title ? this.props.title : this.renderToDoText()
+      const testId = newItem ? 'new-activity-indicator' : 'missing-indicator'
       return (
         <NotificationBadge>
           <IndicatorComponent
@@ -268,6 +272,7 @@ export class Grouping extends Component {
             itemIds={this.itemUniqueIds()}
             animatableIndex={this.props.animatableIndex}
             getFocusable={this.getFocusable}
+            testId={testId}
           />
         </NotificationBadge>
       )

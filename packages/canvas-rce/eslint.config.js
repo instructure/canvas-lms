@@ -14,17 +14,10 @@ const pluginJest = require('eslint-plugin-jest')
 module.exports = tseslint.config(
   // General
   {
-    files: ['src/**/*.ts', 'testcafe/**/*.{js,mjs,ts,jsx,tsx}'],
+    files: ['src/**/*.ts'],
   },
   {
-    ignores: [
-      'es/**/*',
-      './src/translations/*/*',
-      'scripts',
-      'packages/canvas-rce/webpack.testcafe.config.js',
-      'testcafe/',
-      'webpack.*.config.js',
-    ],
+    ignores: ['es/**/*', './src/translations/*/*', 'scripts', 'webpack.*.config.js'],
   },
 
   // Globals
@@ -165,11 +158,7 @@ module.exports = tseslint.config(
   // Imports
   importPlugin.flatConfigs.recommended,
   {
-    files: [
-      '__tests__/**/*.{js,mjs,ts,jsx,tsx}',
-      'src/**/*.{js,mjs,ts,jsx,tsx}',
-      'testcafe/**/*.{js,mjs,ts,jsx,tsx}',
-    ],
+    files: ['__tests__/**/*.{js,mjs,ts,jsx,tsx}', 'src/**/*.{js,mjs,ts,jsx,tsx}'],
     ignores: ['src/translations/**'],
     languageOptions: {
       ecmaVersion: 'latest',
@@ -209,17 +198,6 @@ module.exports = tseslint.config(
   {
     rules: {
       '@eslint-community/eslint-comments/disable-enable-pair': ['error', {allowWholeFile: true}],
-    },
-  },
-
-  // Testcafe
-  {
-    files: ['testcafe/**/*.{js,mjs,ts,jsx,tsx}'],
-    languageOptions: {
-      globals: {
-        test: true,
-        fixture: true,
-      },
     },
   },
 

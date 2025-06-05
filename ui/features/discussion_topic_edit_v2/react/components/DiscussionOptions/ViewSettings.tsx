@@ -120,6 +120,7 @@ export const ViewSettings = ({
                 }}
                 disabled={!expanded}
                 data-testid="view-expanded-locked"
+                data-action-state={expandedLocked ? 'unlockExpandedState' : 'lockExpandedState'}
               />
             </View>
           </FormFieldGroup>
@@ -170,6 +171,7 @@ export const ViewSettings = ({
                   false // Could be disabled, if the Discussion Topic author is Student
                 }
                 data-testid="view-sort-order-locked"
+                data-action-state={sortOrderLocked ? 'unlockSortOrder' : 'lockSortOrder'}
               />
             </View>
           </FormFieldGroup>

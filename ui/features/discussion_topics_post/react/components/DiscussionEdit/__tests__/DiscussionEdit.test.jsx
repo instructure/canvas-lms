@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {DiscussionEdit} from '../DiscussionEdit'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import $ from '@canvas/rails-flash-notifications'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
@@ -37,6 +37,7 @@ const defaultProps = ({
   canReplyAnonymously = false,
   discussionAnonymousState = null,
   isAnnouncement = false,
+  quotedEntry = {message: 'quoted message'},
 } = {}) => ({
   show,
   value,
@@ -46,6 +47,7 @@ const defaultProps = ({
   canReplyAnonymously,
   discussionAnonymousState,
   isAnnouncement,
+  quotedEntry,
 })
 
 describe('DiscussionEdit', () => {
@@ -71,6 +73,23 @@ describe('DiscussionEdit', () => {
       const {getByTestId} = setup(defaultProps())
       const container = getByTestId('DiscussionEdit-container')
       expect(container.style.display).toBe('')
+    })
+
+    it('should add trackable attribute correctly', () => {
+      const {getByTestId} = setup(defaultProps({quotedEntry: {message: 'message'}}))
+      const button = getByTestId('quotedReplyToggle')
+      expect(button).toHaveAttribute('data-action-state', 'excludeQuotedReply')
+    })
+
+    describe('with quoted reply turned off', () => {
+      it('should add trackable attribute correctly', async () => {
+        const {getByTestId} = setup(defaultProps())
+        const button = getByTestId('quotedReplyToggle')
+        fireEvent.click(button)
+
+        await waitFor(() => expect(button).not.toBeChecked())
+        expect(button).toHaveAttribute('data-action-state', 'includeQuotedReply')
+      })
     })
   })
 

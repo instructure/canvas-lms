@@ -1,4 +1,3 @@
-/* eslint-disable no-global-assign */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -19,67 +18,73 @@
 
 import progressable from '../progressable'
 import {Model} from '@canvas/backbone'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toBe(y)
 
 const progressUrl = '/progress'
-let server = null
-let clock = null
-let model = null
+let quizModel = null
 
 class QuizCSV extends Model {}
 QuizCSV.mixin(progressable)
 
+const server = setupServer(
+  http.get(progressUrl, () => {
+    return HttpResponse.json({workflow_state: 'completed'})
+  }),
+  http.get('/quiz_csv', () => {
+    return HttpResponse.json({csv: 'one,two,three'})
+  }),
+)
+
 describe('progressable', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    clock = sinon.useFakeTimers()
-    model = new QuizCSV()
-    model.url = '/quiz_csv'
-    server = sinon.fakeServer.create()
-    server.respondWith('GET', progressUrl, [
-      200,
-      {'Content-Type': 'application/json'},
-      '{"workflow_state": "completed"}',
-    ])
-    server.respondWith('GET', model.url, [
-      200,
-      {'Content-Type': 'application/json'},
-      '{"csv": "one,two,three"}',
-    ])
+    jest.useFakeTimers()
+    quizModel = new QuizCSV()
+    quizModel.url = '/quiz_csv'
   })
 
   afterEach(() => {
-    server.restore()
-    clock.restore()
+    jest.useRealTimers()
   })
 
-  test('set progress_url', () => {
-    const spy = sinon.spy()
-    model.progressModel.on('complete', spy)
-    model.on('progressResolved', spy)
-    model.set({progress_url: progressUrl})
-    server.respond() // respond to progress, which queues model fetch
-    clock.tick(1)
-    server.respond() // respond to model fetch
-    clock.tick(1)
-    ok(spy.calledTwice, 'complete and progressResolved handlers called')
-    equal(model.progressModel.get('workflow_state'), 'completed')
-    equal(model.get('csv'), 'one,two,three')
+  test('set progress_url', async () => {
+    const spy = jest.fn()
+    quizModel.progressModel.on('complete', spy)
+    quizModel.on('progressResolved', spy)
+    quizModel.set({progress_url: progressUrl})
+
+    // Wait for the progress request to complete
+    await jest.runOnlyPendingTimersAsync()
+
+    // Wait for the model fetch to complete
+    await jest.runOnlyPendingTimersAsync()
+
+    ok(spy.mock.calls.length === 2, 'complete and progressResolved handlers called')
+    equal(quizModel.progressModel.get('workflow_state'), 'completed')
+    equal(quizModel.get('csv'), 'one,two,three')
   })
 
-  test('set progress.url', () => {
-    const spy = sinon.spy()
-    model.progressModel.on('complete', spy)
-    model.on('progressResolved', spy)
-    model.progressModel.set({url: progressUrl, workflow_state: 'queued'})
-    server.respond() // respond to progress, which queues model fetch
-    clock.tick(1)
-    server.respond() // respond to model fetch
-    clock.tick(1)
-    ok(spy.calledTwice, 'complete and progressResolved handlers called')
-    equal(model.progressModel.get('workflow_state'), 'completed')
-    equal(model.get('csv'), 'one,two,three')
+  test('set progress.url', async () => {
+    const spy = jest.fn()
+    quizModel.progressModel.on('complete', spy)
+    quizModel.on('progressResolved', spy)
+    quizModel.progressModel.set({url: progressUrl, workflow_state: 'queued'})
+
+    // Wait for the progress request to complete
+    await jest.runOnlyPendingTimersAsync()
+
+    // Wait for the model fetch to complete
+    await jest.runOnlyPendingTimersAsync()
+
+    ok(spy.mock.calls.length === 2, 'complete and progressResolved handlers called')
+    equal(quizModel.progressModel.get('workflow_state'), 'completed')
+    equal(quizModel.get('csv'), 'one,two,three')
   })
 })

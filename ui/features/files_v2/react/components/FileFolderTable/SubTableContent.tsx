@@ -22,16 +22,29 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {NoResultsFound} from './NoResultsFound'
+import {FileUploadDrop} from '../shared/FileUploadDrop'
+import {useFileManagement} from '../../contexts/FileManagementContext'
+import {pluralizeContextTypeString} from '../../../utils/fileFolderUtils'
 
 const I18n = createI18nScope('files_v2')
 
-interface SubTableContentProps {
+const FILE_DROP_HEIGHT = 350
+export interface SubTableContentProps {
   isLoading: boolean
   isEmpty: boolean
   searchString: string
+  showDrop?: boolean
+  handleFileDropRef?: (el: HTMLInputElement | null) => void
 }
 
-const SubTableContent = ({isLoading, isEmpty, searchString}: SubTableContentProps) => {
+const SubTableContent = ({
+  isLoading,
+  isEmpty,
+  searchString,
+  showDrop,
+  handleFileDropRef,
+}: SubTableContentProps) => {
+  const {currentFolder, contextId, contextType} = useFileManagement()
   if (isLoading) {
     return (
       <Flex as="div" alignItems="center" justifyItems="center" padding="medium">
@@ -45,6 +58,18 @@ const SubTableContent = ({isLoading, isEmpty, searchString}: SubTableContentProp
       <View as="div" padding="medium 0 0 0">
         <NoResultsFound searchTerm={searchString} />
       </View>
+    )
+  } else if (isEmpty && showDrop) {
+    return (
+      <div className="FileDrag">
+        <FileUploadDrop
+          contextId={contextId}
+          contextType={pluralizeContextTypeString(contextType)}
+          currentFolder={currentFolder!}
+          fileDropHeight={FILE_DROP_HEIGHT}
+          handleFileDropRef={handleFileDropRef}
+        />
+      </div>
     )
   }
 }

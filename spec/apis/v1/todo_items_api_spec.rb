@@ -314,6 +314,38 @@ describe UsersController, type: :request do
     expect(json.length).to eq 0
   end
 
+  it "does not include items assigned to a concluded section enrollment while also having an active enrollment in the course" do
+    mixed_course = course_factory(active_course: true, course_name: "Mixed Course")
+    active_section = mixed_course.course_sections.create!(name: "active section")
+    concluded_section = mixed_course.course_sections.create!(name: "concluded section")
+    concluded_assignment = Assignment.create!(context: mixed_course, title: "concluded assignment", submission_types: "online_text_entry", points_possible: 15, workflow_state: "published")
+    concluded_assignment.submissions.create!(user: @user)
+
+    StudentEnrollment.create!(user: @user, course: mixed_course, course_section: active_section, workflow_state: "active")
+    concluded_enrollment = StudentEnrollment.create!(user: @user, course: mixed_course, course_section: concluded_section, workflow_state: "active")
+    ao = AssignmentOverride.new(
+      assignment: concluded_assignment,
+      title: "Lorem",
+      workflow_state: "active",
+      set: concluded_section,
+      due_at: 1.day.from_now,
+      unassign_item: false,
+      unlock_at_overridden: true,
+      lock_at_overridden: true
+    )
+    ao.save!
+    concluded_assignment.update(only_visible_to_overrides: true)
+    concluded_assignment.submissions.update(cached_due_date: 1.day.from_now)
+    expect(concluded_assignment.submissions.last.cached_due_date).not_to be_nil
+    json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
+    expect(json.map { |e| e["assignment"]["id"] }).to include concluded_assignment.id
+
+    concluded_enrollment.conclude
+
+    json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
+    expect(json.map { |e| e["assignment"]["id"] }).not_to include concluded_assignment.id
+  end
+
   it "does not include items from courses concluded by terms dates if the user is also an admin" do
     account_admin_user(account: @teacher_course.root_account, user: @user)
     json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"

@@ -20,7 +20,11 @@
       "packages/jquery*",
       "packages/react-dnd-test-backend/index.js",
       "packages/slickgrid",
-      "ui/shared/apollo-v3/possibleTypes.json"
+      "ui/shared/apollo-v3/possibleTypes.json",
+      "ui/shared/graphql/fragment-masking.ts",
+      "ui/shared/graphql/gql.ts",
+      "ui/shared/graphql/graphql.ts",
+      "schema.graphql"
     ]
   },
   "formatter": {

@@ -17,12 +17,12 @@
  */
 
 import {userEvent} from '@testing-library/user-event'
-import {screen, waitFor} from '@testing-library/dom'
+import {fireEvent, screen, waitFor} from '@testing-library/dom'
 import {confirmWithPrompt, type PromptConfirmProps} from '../ConfirmWithPrompt'
 
 const user = userEvent.setup()
 
-describe.skip('confirmWithPrompt', () => {
+describe('confirmWithPrompt', () => {
   const defaultProps: PromptConfirmProps = {
     title: 'Dialog Title',
     message: 'Dialog Msg',
@@ -60,9 +60,12 @@ describe.skip('confirmWithPrompt', () => {
 
   it('returns true when correct value is entered and confirm is clicked', async () => {
     const success = await runAndWaitUntilClosed({}, async () => {
-      const input = screen.getByLabelText(new RegExp('Input Label'))
-      await user.click(input)
-      await user.paste('correct')
+      const input = screen.getByTestId('confirm-prompt-input')
+      // For some reason, userEvent.paste results in flaky tests (the value doesn't even show up in the input)
+      // so we use fireEvent.change instead. Could be because we call render ourselves instead of using the
+      // RTL render function, but regardless, this works.
+      fireEvent.change(input, {target: {value: 'correct'}})
+      expect(input).toHaveValue('correct')
       await clickConfirm()
     })
     expect(success).toBe(true)
@@ -76,16 +79,17 @@ describe.skip('confirmWithPrompt', () => {
   })
 
   it('shows error when incorrect value is entered', async () => {
-    await runAndWaitUntilClosed({}, async () => {
-      const input = screen.getByLabelText(new RegExp('Input Label'))
-      await user.click(input)
-      await user.paste('incorrect')
+    const result = await runAndWaitUntilClosed({}, async () => {
+      const input = screen.getByTestId('confirm-prompt-input')
+      fireEvent.change(input, {target: {value: 'incorrect'}})
+      expect(input).toHaveValue('incorrect')
       await clickConfirm()
       expect(
         await screen.findByText('The provided value is incorrect. Please try again.'),
       ).toBeInTheDocument()
       await clickCancel()
     })
+    expect(result).toBe(false)
   })
 
   it('allows setting of heading, message, title, and confirm text', async () => {
@@ -101,9 +105,9 @@ describe.skip('confirmWithPrompt', () => {
         expect(screen.getByText('Custom Message')).toBeInTheDocument()
         expect(screen.getAllByText('Custom Label')[0]).toBeInTheDocument()
 
-        const input = screen.getByLabelText(new RegExp('Custom Label'))
-        await user.click(input)
-        await user.paste('correct')
+        const input = screen.getByTestId('confirm-prompt-input')
+        expect(input).toHaveValue('')
+        fireEvent.change(input, {target: {value: 'correct'}})
         await clickConfirm('Custom Confirm')
       },
     )

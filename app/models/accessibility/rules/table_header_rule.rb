@@ -49,6 +49,38 @@ module Accessibility
           options: ["None", "Header row", "Header column", "Header row and column"]
         )
       end
+
+      def self.fix(elem, value)
+        # Remove existing headers by converting <th> to <td>
+        elem.query_selector_all("th").each do |th|
+          th.name = "td"
+        end
+
+        case value
+        when "None"
+          return elem
+        when "Header row", "Header row and column"
+          first_row = elem.query_selector("tr")
+          first_row&.query_selector_all("td")&.each do |td|
+            td.name = "th"
+            td["scope"] = "col"
+          end
+        end
+
+        if ["Header column", "Header row and column"].include?(value)
+          elem.query_selector_all("tr").each_with_index do |row, index|
+            next if index == 0 # Skip the first row
+
+            first_cell = row.query_selector("td")
+            if first_cell
+              first_cell.name = "th"
+              first_cell["scope"] = "row"
+            end
+          end
+        end
+
+        elem
+      end
     end
   end
 end

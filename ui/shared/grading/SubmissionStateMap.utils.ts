@@ -37,7 +37,10 @@ export type StudentSubmissionMap = {
   [assignmentId: string]: Submission | MissingSubmission
 }
 
-export function submissionGradingPeriodInformation(assignment: Assignment, student: Student) {
+export function submissionGradingPeriodInformation(
+  assignment: Pick<Assignment, 'effectiveDueDates'>,
+  student: Student,
+) {
   const submissionInfo: {
     grading_period_id?: null | string
     in_closed_grading_period?: boolean
@@ -48,7 +51,10 @@ export function submissionGradingPeriodInformation(assignment: Assignment, stude
   }
 }
 
-export function isHiddenFromStudent(assignment: Assignment, student: Student) {
+export function isHiddenFromStudent(
+  assignment: Pick<Assignment, 'visible_to_everyone' | 'assignment_visibility'>,
+  student: Student,
+) {
   if (!assignment.visible_to_everyone) {
     return !(assignment.assignment_visibility || []).includes(student.id)
   }
@@ -56,7 +62,7 @@ export function isHiddenFromStudent(assignment: Assignment, student: Student) {
 }
 
 export function gradingPeriodInfoForCell(
-  assignment: Assignment,
+  assignment: Pick<Assignment, 'effectiveDueDates'>,
   student: Student,
   selectedGradingPeriodID: string,
 ) {
@@ -77,7 +83,7 @@ export function gradingPeriodInfoForCell(
 }
 
 export function cellMappingsForMultipleGradingPeriods(
-  assignment: Assignment,
+  assignment: Pick<Assignment, 'effectiveDueDates'>,
   student: Student,
   selectedGradingPeriodID: string,
   isAdmin: boolean,
@@ -102,7 +108,16 @@ export function cellMappingsForMultipleGradingPeriods(
 }
 
 export function cellMapForSubmission(
-  assignment: Assignment,
+  assignment: Pick<
+    Assignment,
+    | 'published'
+    | 'anonymize_students'
+    | 'moderated_grading'
+    | 'grades_published'
+    | 'visible_to_everyone'
+    | 'assignment_visibility'
+    | 'effectiveDueDates'
+  >,
   student: Student,
   hasGradingPeriods: boolean,
   selectedGradingPeriodID: string,

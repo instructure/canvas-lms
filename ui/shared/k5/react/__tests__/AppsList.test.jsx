@@ -77,7 +77,7 @@ describe('AppsList', () => {
   it('renders 2 loading skeletons if isLoading set', () => {
     const {getAllByText} = render(<AppsList {...getProps({isLoading: true})} />)
     const skeletons = getAllByText('Loading apps...')
-    expect(skeletons.length).toBe(3)
+    expect(skeletons).toHaveLength(3)
   })
 
   it('renders no loading indicator if isLoading not set', () => {

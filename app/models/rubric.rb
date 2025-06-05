@@ -542,6 +542,7 @@ class Rubric < ActiveRecord::Base
       }.to_json,
       CRITERIA_COUNT: generate_options[:criteria_count] || DEFAULT_GENERATE_OPTIONS[:criteria_count],
       RATING_COUNT: generate_options[:rating_count] || DEFAULT_GENERATE_OPTIONS[:rating_count],
+      ADDITIONAL_PROMPT_INFO: generate_options[:additional_prompt_info].present? ? "Also consider: #{generate_options[:additional_prompt_info]}" : "",
     }
 
     prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)

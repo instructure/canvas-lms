@@ -31,7 +31,7 @@ module Lti
         submission,
         asset_processor
       )
-      head :created
+      head :no_content
     end
 
     def assignment
@@ -72,8 +72,21 @@ module Lti
       @student ||= User.find_by(id: student_id)
     end
 
+    # "latest", 0, or any invalid value will be treated as latest
+    def attempt
+      @params ||= params[:attempt].to_i
+    end
+
     def submission
-      @submission ||= assignment.submission_for_student(student)
+      @submission ||=
+        begin
+          sub = assignment.submission_for_student(student)
+          if attempt.positive?
+            version = sub.versions.find { |s| s.model.attempt == attempt }&.model
+          end
+
+          version || sub
+        end
     end
 
     def require_submission

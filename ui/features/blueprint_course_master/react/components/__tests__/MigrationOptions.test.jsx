@@ -17,9 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
 import {render} from '@testing-library/react'
-import {getByLabelText} from '@testing-library/dom'
 import MigrationOptions from '../MigrationOptions'
 import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 
@@ -42,15 +40,15 @@ describe('MigrationOptions component', () => {
   }
 
   test('renders the MigrationOptions component', () => {
-    const tree = shallow(<MigrationOptions {...defaultProps} />)
-    const node = tree.find({as: 'fieldset'})
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<MigrationOptions {...defaultProps} />)
+    const node = container.querySelector('fieldset')
+    expect(node).toBeTruthy()
   })
 
   test('renders the course-settings and notification-enable checkboxes', () => {
-    const tree = render(<MigrationOptions {...defaultProps} />)
-    const checkboxes = tree.container.querySelectorAll('input[type="checkbox"]')
-    expect(checkboxes.length).toEqual(2)
+    const {container} = render(<MigrationOptions {...defaultProps} />)
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]')
+    expect(checkboxes).toHaveLength(2)
     expect(checkboxes[0].checked).toEqual(false)
     expect(checkboxes[1].checked).toEqual(false)
   })
@@ -58,9 +56,9 @@ describe('MigrationOptions component', () => {
   test('renders the item-notifications checkbox if the feature is enabled', () => {
     const props = {...defaultProps}
     props.itemNotificationFeatureEnabled = true
-    const tree = render(<MigrationOptions {...props} />)
-    const checkboxes = tree.container.querySelectorAll('input[type="checkbox"]')
-    expect(checkboxes.length).toEqual(3)
+    const {container} = render(<MigrationOptions {...props} />)
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]')
+    expect(checkboxes).toHaveLength(3)
     expect(checkboxes[2].checked).toEqual(false)
   })
 
@@ -68,21 +66,21 @@ describe('MigrationOptions component', () => {
     const props = {...defaultProps}
     props.willSendNotification = true
 
-    const tree = render(<MigrationOptions {...props} />)
+    const {container, getByLabelText} = render(<MigrationOptions {...props} />)
 
-    const courseSettingsCheckbox = getByLabelText(tree.container, 'Include Course Settings')
+    const courseSettingsCheckbox = getByLabelText('Include Course Settings')
     expect(courseSettingsCheckbox).toBeTruthy()
     expect(courseSettingsCheckbox.checked).toEqual(false)
 
-    const notificationCheckbox = getByLabelText(tree.container, 'Send Notification')
+    const notificationCheckbox = getByLabelText('Send Notification')
     expect(notificationCheckbox).toBeTruthy()
     expect(notificationCheckbox.checked).toEqual(true)
 
-    const checkbox3 = getByLabelText(tree.container, 'Add a Message (0/140)')
+    const checkbox3 = getByLabelText('Add a Message (0/140)')
     expect(checkbox3).toBeTruthy()
     expect(checkbox3.checked).toEqual(false)
 
-    const messagebox = tree.container.querySelector('textarea')
+    const messagebox = container.querySelector('textarea')
     expect(messagebox).toBeFalsy()
   })
 
@@ -91,8 +89,8 @@ describe('MigrationOptions component', () => {
     props.willSendNotification = true
     props.willIncludeCustomNotificationMessage = true
 
-    const tree = render(<MigrationOptions {...props} />)
-    const messagebox = tree.container.querySelector('textarea')
+    const {container} = render(<MigrationOptions {...props} />)
+    const messagebox = container.querySelector('textarea')
     expect(messagebox).toBeTruthy()
   })
 })

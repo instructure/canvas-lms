@@ -32,7 +32,6 @@ export function renderTray(props, rootContainer = document.body) {
     rootContainer.appendChild(root)
   }
 
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<MoveItemTray {...props} ref={tray => tray && tray.open()} />, root)
 }
 

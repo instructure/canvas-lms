@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, waitFor, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import ConfigurationForm from '../ConfigurationForm'
@@ -87,8 +87,7 @@ describe('ConfigurationForm', () => {
     })
   })
 
-  // cf. INTEROP-9131
-  describe.skip('form submission', () => {
+  describe('form submission', () => {
     it('saves manual form with trimmed props', async () => {
       const handleSubmit = jest.fn()
       const tool = {
@@ -101,42 +100,42 @@ describe('ConfigurationForm', () => {
         customFields: 'a=1\nb=2\nc=3',
       }
 
-      const {getByLabelText, getByRole} = renderConfigurationForm({
+      renderConfigurationForm({
         configurationType: 'manual',
         handleSubmit,
         tool,
       })
 
       // Fill in form fields
-      const nameInput = getByLabelText('Name *')
+      const nameInput = screen.getByLabelText('Name *')
       await userEvent.clear(nameInput)
       await userEvent.type(nameInput, tool.name)
 
-      const consumerKeyInput = getByLabelText('Consumer Key')
+      const consumerKeyInput = screen.getByLabelText('Consumer Key')
       await userEvent.clear(consumerKeyInput)
       await userEvent.type(consumerKeyInput, tool.consumerKey)
 
-      const sharedSecretInput = getByLabelText('Shared Secret')
+      const sharedSecretInput = screen.getByLabelText('Shared Secret')
       await userEvent.clear(sharedSecretInput)
       await userEvent.type(sharedSecretInput, tool.sharedSecret)
 
-      const urlInput = getByLabelText('Launch URL *')
+      const urlInput = screen.getByLabelText('Launch URL *')
       await userEvent.clear(urlInput)
       await userEvent.type(urlInput, tool.url)
 
-      const domainInput = getByLabelText('Domain')
+      const domainInput = screen.getByLabelText('Domain')
       await userEvent.clear(domainInput)
       await userEvent.type(domainInput, tool.domain)
 
-      const descriptionInput = getByLabelText('Description')
+      const descriptionInput = screen.getByLabelText('Description')
       await userEvent.clear(descriptionInput)
       await userEvent.type(descriptionInput, tool.description)
 
-      const customFieldsInput = getByLabelText('Custom Fields')
+      const customFieldsInput = screen.getByLabelText('Custom Fields')
       await userEvent.clear(customFieldsInput)
       await userEvent.type(customFieldsInput, tool.customFields)
 
-      const submitButton = getByRole('button', {name: /submit/i})
+      const submitButton = screen.getByText('Submit')
       await userEvent.click(submitButton)
 
       await waitFor(() => {
@@ -167,30 +166,30 @@ describe('ConfigurationForm', () => {
         configUrl: '  http://example.com',
       }
 
-      const {getByLabelText, getByRole} = renderConfigurationForm({
+      renderConfigurationForm({
         configurationType: 'url',
         handleSubmit,
         tool,
       })
 
       // Fill in form fields
-      const nameInput = getByLabelText('Name *')
+      const nameInput = screen.getByLabelText('Name *')
       await userEvent.clear(nameInput)
       await userEvent.type(nameInput, tool.name)
 
-      const consumerKeyInput = getByLabelText('Consumer Key')
+      const consumerKeyInput = screen.getByLabelText('Consumer Key')
       await userEvent.clear(consumerKeyInput)
       await userEvent.type(consumerKeyInput, tool.consumerKey)
 
-      const sharedSecretInput = getByLabelText('Shared Secret')
+      const sharedSecretInput = screen.getByLabelText('Shared Secret')
       await userEvent.clear(sharedSecretInput)
       await userEvent.type(sharedSecretInput, tool.sharedSecret)
 
-      const configUrlInput = getByLabelText('Config URL *')
+      const configUrlInput = screen.getByLabelText('Config URL *')
       await userEvent.clear(configUrlInput)
       await userEvent.type(configUrlInput, tool.configUrl)
 
-      const submitButton = getByRole('button', {name: /submit/i})
+      const submitButton = screen.getByText('Submit')
       await userEvent.click(submitButton)
 
       await waitFor(() => {
@@ -217,30 +216,30 @@ describe('ConfigurationForm', () => {
         xml: '  some xml',
       }
 
-      const {getByLabelText, getByRole} = renderConfigurationForm({
+      renderConfigurationForm({
         configurationType: 'xml',
         handleSubmit,
         tool,
       })
 
       // Fill in form fields
-      const nameInput = getByLabelText('Name *')
+      const nameInput = screen.getByLabelText('Name *')
       await userEvent.clear(nameInput)
       await userEvent.type(nameInput, tool.name)
 
-      const consumerKeyInput = getByLabelText('Consumer Key')
+      const consumerKeyInput = screen.getByLabelText('Consumer Key')
       await userEvent.clear(consumerKeyInput)
       await userEvent.type(consumerKeyInput, tool.consumerKey)
 
-      const sharedSecretInput = getByLabelText('Shared Secret')
+      const sharedSecretInput = screen.getByLabelText('Shared Secret')
       await userEvent.clear(sharedSecretInput)
       await userEvent.type(sharedSecretInput, tool.sharedSecret)
 
-      const xmlInput = getByLabelText('XML Configuration')
+      const xmlInput = screen.getByLabelText('XML Configuration *')
       await userEvent.clear(xmlInput)
       await userEvent.type(xmlInput, tool.xml)
 
-      const submitButton = getByRole('button', {name: /submit/i})
+      const submitButton = screen.getByText('Submit')
       await userEvent.click(submitButton)
 
       await waitFor(() => {
@@ -264,18 +263,18 @@ describe('ConfigurationForm', () => {
         registrationUrl: '  https://lti-tool-provider-example..com/register',
       }
 
-      const {getByLabelText, getByRole} = renderConfigurationForm({
+      renderConfigurationForm({
         configurationType: 'lti2',
         handleSubmit,
         tool,
       })
 
       // Fill in form fields
-      const registrationUrlInput = getByLabelText('Registration URL *')
+      const registrationUrlInput = screen.getByLabelText('Registration URL *')
       await userEvent.clear(registrationUrlInput)
       await userEvent.type(registrationUrlInput, tool.registrationUrl)
 
-      const submitButton = getByRole('button', {name: /launch registration tool/i})
+      const submitButton = screen.getByText('Launch Registration Tool')
       await userEvent.click(submitButton)
 
       await waitFor(() => {

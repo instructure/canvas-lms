@@ -20,6 +20,7 @@ import {render, screen} from '@testing-library/react'
 import {merge} from 'lodash'
 import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -95,10 +96,13 @@ describe('DiscussionRow', () => {
       props,
     )
 
-  const oldEnv = window.ENV
+  beforeEach(() => {
+    fakeENV.setup()
+    ENV.discussion_anonymity_enabled = true
+  })
 
   afterEach(() => {
-    window.ENV = oldEnv
+    fakeENV.teardown()
   })
 
   it('does not render UnreadBadge if discussion has replies == 0', () => {
@@ -314,29 +318,28 @@ describe('DiscussionRow', () => {
   })
 
   it('renders the further available until date for ungraded overrides', () => {
+    // Use specific dates with very different formatted representations to make the test more robust
     const futureDate = new Date('2027-01-17T00:00:00Z')
-    const furtherFutureDate = new Date('2028-01-17T00:00:00Z')
+    const furtherFutureDate = new Date('2028-12-25T00:00:00Z') // Christmas 2028, very distinct date
+
     const discussion = {
       ungraded_discussion_overrides: [
         {assignment_override: {lock_at: futureDate}},
         {assignment_override: {lock_at: furtherFutureDate}},
       ],
     }
-    render(<DiscussionRow {...makeProps({discussion})} />)
 
-    // Find all elements that contain text starting with "Available until"
-    const availabilityElements = screen.getAllByText(/^Available until/)
-    expect(availabilityElements.length).toBeGreaterThan(0)
+    const {container} = render(<DiscussionRow {...makeProps({discussion})} />)
 
-    // Get all text content that includes "Available until"
-    const availabilityTexts = availabilityElements.map(el => el.textContent)
+    // Format the date we're looking for
+    const formattedLaterDate = dateFormatter(furtherFutureDate)
 
-    // Verify at least one of them has the later date
-    const hasLaterDate = availabilityTexts.some(text => {
-      const formattedDate = dateFormatter(furtherFutureDate)
-      return text.includes(formattedDate)
-    })
-    expect(hasLaterDate).toBe(true)
+    // Look for the exact text with the formatted date
+    const availabilityText = `Available until ${formattedLaterDate}`
+
+    // Use a more reliable query that searches for the text anywhere in the document
+    const textContent = container.textContent
+    expect(textContent.includes(availabilityText)).toBe(true)
   })
 
   it('renders locked at if appropriate', () => {

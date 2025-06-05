@@ -1267,7 +1267,7 @@ describe RubricsController do
            params: {
              course_id: @course.id,
              rubric_association: { association_type: "Assignment", association_id: @assignment.id },
-             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5, use_range: true }
+             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5, use_range: true, additional_prompt_info: "Second grade course" }
            },
            format: :json
 

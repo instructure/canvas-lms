@@ -130,6 +130,10 @@ module CC
       doc.allow_rating topic.allow_rating
       doc.only_graders_can_rate topic.only_graders_can_rate
       doc.sort_by_rating topic.sort_by_rating
+      doc.sort_order topic.sort_order
+      doc.sort_order_locked topic.sort_order_locked
+      doc.expanded topic.expanded
+      doc.expanded_locked topic.expanded_locked
       doc.todo_date topic.todo_date
       doc.locked "true" if topic.locked
       if topic.assignment && !topic.assignment.deleted?

@@ -90,7 +90,7 @@ describe('DeleteGroupView', () => {
     const view = createView(false, true)
     view.render()
     const results = await axe.run(view.el)
-    expect(results.violations.length).toBe(0)
+    expect(results.violations).toHaveLength(0)
   })
 
   it('should delete a group without assignments', () => {
@@ -114,7 +114,7 @@ describe('DeleteGroupView', () => {
     const $groupSelect = $(view.el).find('.group_select')
 
     expect($assignmentCount.text()).toBe('2')
-    expect($groupSelect.find('option').length).toBe(2)
+    expect($groupSelect.find('option')).toHaveLength(2)
   })
 
   it('updates assignment and group counts when changed', () => {
@@ -128,7 +128,7 @@ describe('DeleteGroupView', () => {
     const $groupSelect = $(view.el).find('.group_select')
 
     expect($assignmentCount.text()).toBe('3')
-    expect($groupSelect.find('option').length).toBe(3)
+    expect($groupSelect.find('option')).toHaveLength(3)
   })
 
   it('deletes a group with assignments', () => {

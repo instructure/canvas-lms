@@ -220,11 +220,10 @@ module Lti::Messages
         @tool.developer_key.scopes.intersect?(TokenScopes::LTI_AGS_SCOPES)
     end
 
-    # Follows 1EdTech Platform Notification Spec (not final/public as of Oct 2024)
+    # Follows 1EdTech Platform Notification Spec at https://www.imsglobal.org/spec/lti-pns/v1p0/main
     def include_platform_notification_service_claims?
       include_claims?(:platform_notification_service) &&
-        @tool.developer_key.scopes.include?(TokenScopes::LTI_PNS_SCOPE) &&
-        @tool.root_account.feature_enabled?(:platform_notification_service)
+        @tool.developer_key.scopes.include?(TokenScopes::LTI_PNS_SCOPE)
     end
 
     def include_eulaservice_claims?
@@ -267,7 +266,7 @@ module Lti::Messages
 
     def add_eulaservice_claims!
       @message.eulaservice.url = @tool.asset_processor_eula_url
-      @message.eulaservice.scope = [TokenScopes::LTI_EULA_SCOPE]
+      @message.eulaservice.scope = [TokenScopes::LTI_EULA_USER_SCOPE, TokenScopes::LTI_EULA_DEPLOYMENT_SCOPE]
     end
 
     def associated_1_1_tool

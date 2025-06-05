@@ -235,6 +235,39 @@ describe "Module Items API", type: :request do
       end
     end
 
+    context "index with > 100 items" do
+      before do
+        @module_x = @course.context_modules.create!(name: "moduleX")
+        (1..101).each do |i|
+          @module_x.add_item(type: "context_module_sub_header", title: "external resources #{i}")
+        end
+      end
+
+      it "returns a maximum of 100 items if the only[] parameter is not specified regardless of the per_page parameter" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/modules/#{@module_x.id}/items?per_page=200",
+                        controller: "context_module_items_api",
+                        action: "index",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        module_id: @module_x.id.to_s,
+                        per_page: 200)
+        expect(json.length).to eq 100
+      end
+
+      it "returns all items if the only[] parameter is specified" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/modules/#{@module_x.id}/items?only[]=title",
+                        controller: "context_module_items_api",
+                        action: "index",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        module_id: @module_x.id.to_s,
+                        only: ["title"])
+        expect(json.length).to eq 101
+      end
+    end
+
     context "show item with estimated duration" do
       before do
         Account.default.enable_feature!(:horizon_course_setting)

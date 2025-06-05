@@ -17,37 +17,40 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import NewUserTutorialToggleButton from '../NewUserTutorialToggleButton'
 import createTutorialStore from '../util/createTutorialStore'
 
 describe('NewUserTutorialToggleButton Spec', () => {
   test('Defaults to expanded', () => {
     const store = createTutorialStore()
-    const wrapper = shallow(<NewUserTutorialToggleButton store={store} />)
-    expect(wrapper.state('isCollapsed')).toBeFalsy()
+    const {getByRole} = render(<NewUserTutorialToggleButton store={store} />)
+    // Test button has correct screen reader label for expanded state
+    expect(getByRole('button', {name: /collapse tutorial tray/i})).toBeInTheDocument()
   })
 
-  test('Toggles isCollapsed when clicked', () => {
-    const fakeEvent = {
-      preventDefault() {},
-    }
-
+  test('Toggles isCollapsed when clicked', async () => {
+    const user = userEvent.setup()
     const store = createTutorialStore()
-    const wrapper = shallow(<NewUserTutorialToggleButton store={store} />)
-    wrapper.simulate('click', fakeEvent)
-    expect(wrapper.state('isCollapsed')).toBeTruthy()
+    const {getByRole} = render(<NewUserTutorialToggleButton store={store} />)
+
+    const button = getByRole('button', {name: /collapse tutorial tray/i})
+    await user.click(button)
+
+    // After clicking, should show expand label (collapsed state)
+    expect(getByRole('button', {name: /expand tutorial tray/i})).toBeInTheDocument()
   })
 
-  test('shows IconMoveStart when isCollapsed is true', () => {
+  test('shows correct label when isCollapsed is true', () => {
     const store = createTutorialStore({isCollapsed: true})
-    const wrapper = shallow(<NewUserTutorialToggleButton store={store} />)
-    expect(wrapper.find('IconMoveStartLine').exists()).toBeTruthy()
+    const {getByRole} = render(<NewUserTutorialToggleButton store={store} />)
+    expect(getByRole('button', {name: /expand tutorial tray/i})).toBeInTheDocument()
   })
 
-  test('shows IconMoveEnd when isCollapsed is false', () => {
+  test('shows correct label when isCollapsed is false', () => {
     const store = createTutorialStore({isCollapsed: false})
-    const wrapper = shallow(<NewUserTutorialToggleButton store={store} />)
-    expect(wrapper.find('IconMoveEndLine').exists()).toBeTruthy()
+    const {getByRole} = render(<NewUserTutorialToggleButton store={store} />)
+    expect(getByRole('button', {name: /collapse tutorial tray/i})).toBeInTheDocument()
   })
 })

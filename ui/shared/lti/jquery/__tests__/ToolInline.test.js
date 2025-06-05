@@ -83,7 +83,7 @@ describe('ToolLaunchResizer', () => {
   it('returns empty when no wrapper id is provided with multiple tools', () => {
     const launchResizer = new ToolLaunchResizer()
     const wrapper = launchResizer.tool_content_wrapper()
-    expect(wrapper.length).toBe(0)
+    expect(wrapper).toHaveLength(0)
   })
 
   it('enforces minimum height when resizing', () => {

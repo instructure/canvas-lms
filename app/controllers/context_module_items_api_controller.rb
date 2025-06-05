@@ -277,7 +277,10 @@ class ContextModuleItemsApiController < ApplicationController
       route = polymorphic_url([:api_v1, @context, mod, :items])
       scope = mod.content_tags_visible_to(@student || @current_user)
       scope = ContentTag.search_by_attribute(scope, :title, params[:search_term])
-      items = Api.paginate(scope, self, route)
+      # with modules_perf flag enabled we call the api with the only[]=title (and maybe others) param
+      # in this case we want all the items because we're using the api to get a list of all
+      # the items in the module
+      items = params[:only] ? scope.to_a : Api.paginate(scope, self, route)
       prog = @student ? mod.evaluate_for(@student) : nil
       includes = Array(params[:include])
       opts = {}

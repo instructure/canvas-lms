@@ -32,6 +32,7 @@ import React, {useState, useEffect} from 'react'
 import {AccessibilityData, ContentItem, ContentItemType} from '../../types'
 import {AccessibilityIssuesModal} from '../AccessibilityIssuesModal/AccessibilityIssuesModal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {TypeToKeyMap} from '../../constants'
 
 export const AccessibilityCheckerApp: React.FC = () => {
   const [accessibilityIssues, setAccessibilityIssues] = useState<AccessibilityData | null>(null)
@@ -43,7 +44,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
       return str.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
     }
 
-    const convertKeysToCamelCase = function (input: any): object {
+    const convertKeysToCamelCase = function (input: any): object | boolean {
       if (Array.isArray(input)) {
         return input.map(convertKeysToCamelCase)
       } else if (input !== null && typeof input === 'object') {
@@ -76,39 +77,42 @@ export const AccessibilityCheckerApp: React.FC = () => {
     const processData = () => {
       const flatData: ContentItem[] = []
 
-      if (accessibilityIssues?.pages) {
-        Object.entries(accessibilityIssues.pages).forEach(([id, pageData]) => {
-          if (pageData) {
+      const processContentItems = (
+        items: Record<string, ContentItem> | undefined,
+        type: ContentItemType,
+        defaultTitle: string,
+      ) => {
+        if (!items) return
+
+        Object.entries(items).forEach(([id, itemData]) => {
+          if (itemData) {
             flatData.push({
               id: Number(id),
-              type: ContentItemType.WikiPage,
-              title: pageData.title || 'Untitled Page',
-              published: pageData.published || false,
-              updatedAt: pageData.updatedAt || '',
-              count: pageData.count || 0,
-              url: pageData.url,
-              editUrl: pageData.editUrl,
+              type,
+              title: itemData?.title || defaultTitle,
+              published: itemData?.published || false,
+              updatedAt: itemData?.updatedAt || '',
+              count: itemData?.count || 0,
+              url: itemData?.url,
+              editUrl: itemData?.editUrl,
             })
           }
         })
       }
 
-      if (accessibilityIssues?.assignments) {
-        Object.entries(accessibilityIssues.assignments).forEach(([id, assignmentData]) => {
-          if (assignmentData) {
-            flatData.push({
-              id: Number(id),
-              type: ContentItemType.Assignment,
-              title: assignmentData.title || 'Untitled Assignment',
-              published: assignmentData.published || false,
-              updatedAt: assignmentData.updatedAt || '',
-              count: assignmentData.count || 0,
-              url: assignmentData.url,
-              editUrl: assignmentData.editUrl,
-            })
-          }
-        })
-      }
+      processContentItems(accessibilityIssues?.pages, ContentItemType.WikiPage, 'Untitled Page')
+
+      processContentItems(
+        accessibilityIssues?.assignments,
+        ContentItemType.Assignment,
+        'Untitled Assignment',
+      )
+
+      processContentItems(
+        accessibilityIssues?.attachments,
+        ContentItemType.Attachment,
+        'Untitled Attachment',
+      )
 
       setTableData(flatData)
     }
@@ -117,7 +121,8 @@ export const AccessibilityCheckerApp: React.FC = () => {
   }, [accessibilityIssues])
 
   const handleRowClick = (item: ContentItem) => {
-    const typeKey = item.type === ContentItemType.WikiPage ? 'pages' : 'assignments'
+    const typeKey = TypeToKeyMap[item.type]
+
     const contentItem = accessibilityIssues?.[typeKey]?.[item.id]
       ? structuredClone(accessibilityIssues[typeKey]?.[item.id])
       : undefined
@@ -132,9 +137,11 @@ export const AccessibilityCheckerApp: React.FC = () => {
     window.location.reload()
   }
 
-  const closeModal = () => {
+  const closeModal = (shallReload: boolean) => {
     setShowModal(false)
-    window.location.reload()
+    if (shallReload) {
+      window.location.reload()
+    }
   }
 
   if (loading)
@@ -161,17 +168,37 @@ export const AccessibilityCheckerApp: React.FC = () => {
       </Alert>
     )
   else {
+    const lastCheckedDate =
+      accessibilityIssues.lastChecked &&
+      new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+      }).format(new Date(accessibilityIssues.lastChecked))
+
     return (
       <View as="div">
-        <Flex as="div" margin="medium 0" alignItems="start" direction="column">
+        <Flex as="div" alignItems="start" direction="row">
           <Flex.Item>
-            <Heading level="h1">{I18n.t('Accessibility Checker')}</Heading>
+            <Heading level="h1">{I18n.t('Course Accessibility Checker')}</Heading>
           </Flex.Item>
-          <Flex.Item margin="0 0 0 auto" padding="small">
+          <Flex.Item margin="0 0 0 auto" padding="small 0">
             <Button color="primary" onClick={handleReload}>
               {I18n.t('Scan course')}
             </Button>
           </Flex.Item>
+        </Flex>
+        <Flex as="div" alignItems="start" direction="row">
+          {lastCheckedDate && (
+            <Flex.Item>
+              <Text size="small" color="secondary">
+                <>
+                  {I18n.t('Last checked at ')}
+                  {lastCheckedDate}
+                </>
+              </Text>
+            </Flex.Item>
+          )}
         </Flex>
 
         <View as="div" margin="medium 0 0 0" borderWidth="small" borderRadius="medium">

@@ -66,7 +66,7 @@ describe('View', () => {
     }
     SomeView.initClass()
     const view = new SomeView({test: new Backbone.View()})
-    expect(view.children.length).toBe(1)
+    expect(view.children).toHaveLength(1)
   })
 
   it('template optionProperty', () => {

@@ -24,7 +24,6 @@ jest.mock('../UploadFileView', () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(options => {
-      // eslint-disable-next-line new-cap
       const instance = new originalModule.default(options)
       instance.loadPreview = jest.fn().mockResolvedValue()
       instance.getImage = jest
@@ -65,7 +64,7 @@ describe('UploadFileView', () => {
   })
 
   it('loads given file', async () => {
-    expect(view.$el.find('.avatar-preview').length).toBe(0)
+    expect(view.$el.find('.avatar-preview')).toHaveLength(0)
 
     await view.loadPreview(mockBlob)
     expect(view.loadPreview).toHaveBeenCalledWith(mockBlob)

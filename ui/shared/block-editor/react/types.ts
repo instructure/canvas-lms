@@ -67,6 +67,7 @@ export type BlockTemplateGridItemProps = {
 }
 
 export type ChooseEditorModalProps = {
+  editorFeature: EditorFeatures
   createPageAction: any
   onClose: any
 }
@@ -81,6 +82,8 @@ export const dispatchTemplateEvent = (event: CustomEvent) => {
 }
 
 export type EditorTypes = 'rce' | 'block_editor' | ''
+export type EditorFeatures = 'canvas_content_builder' | 'block_editor' | null
 export type EditorPrefEnv = {
   text_editor_preference: EditorTypes
+  EDITOR_FEATURE: EditorFeatures
 }

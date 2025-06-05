@@ -17,7 +17,8 @@
  */
 
 import $ from 'jquery'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {configure, mount, unmount} from '../index'
 import {fireEvent, findByTestId, waitFor} from '@testing-library/dom'
 
@@ -864,27 +865,24 @@ const fixture = {
   },
 }
 
+// Setup MSW server
+const server = setupServer(
+  ...Object.entries(fixture).map(([url, response]) =>
+    http.get(url, () => HttpResponse.json(response)),
+  ),
+)
+
 describe('canvas_quizzes/events', () => {
-  let fakeServer
   let container
 
-  beforeEach(() => {
-    fakeServer = sinon.createFakeServer()
-    fakeServer.autoRespond = true
-    fakeServer.respondImmediately = true
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
+  beforeEach(() => {
     // Reset container for each test
     container = document.createElement('div')
     document.body.appendChild(container)
-
-    // Set up server responses
-    for (const url of Object.keys(fixture)) {
-      fakeServer.respondWith('GET', url, [
-        200,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(fixture[url]),
-      ])
-    }
 
     configure({
       ajax: $.ajax,
@@ -905,16 +903,11 @@ describe('canvas_quizzes/events', () => {
       container.parentNode.removeChild(container)
     }
     container = null
-
-    if (fakeServer) {
-      fakeServer.restore()
-      fakeServer = null
-    }
   })
 
   it('renders event stream', async () => {
     await mount(container)
-    
+
     // If we're in table view, switch to stream view
     const answerMatrix = container.querySelector('#ic-AnswerMatrix')
     if (answerMatrix) {

@@ -128,7 +128,7 @@ describe('GradeSummary getEnv()', () => {
   describe('.graders', () => {
     describe('when graders are not anonymous', () => {
       test('includes all GRADERS', () => {
-        expect(getEnv().graders.length).toBe(3)
+        expect(getEnv().graders).toHaveLength(3)
       })
 
       test('includes .id', () => {
@@ -176,7 +176,7 @@ describe('GradeSummary getEnv()', () => {
       })
 
       test('includes all GRADERS', () => {
-        expect(getEnv().graders.length).toBe(3)
+        expect(getEnv().graders).toHaveLength(3)
       })
 
       test('includes .id', () => {

@@ -1844,11 +1844,8 @@ describe SpeedGrader::Assignment do
       expect(Lti::AssetReport).to receive(:info_for_display_by_submission) do |submission_ids:|
         expect(submission_ids).to include(@submission1.id, @submission2.id)
         {
-          asset_processor_ids: [ap1.id, ap2.id],
-          reports_by_submission: {
-            @submission1.id => { by_attachment: { 123 => { ap1.id => [rep1] } } },
-            @submission2.id => { by_attachment: { 67 => { ap2.id => [rep2] } } }
-          }
+          @submission1.id => { by_attachment: { 123 => { ap1.id => [rep1] } } },
+          @submission2.id => { by_attachment: { 67 => { ap2.id => [rep2] } } }
         }
       end
 
@@ -1871,12 +1868,9 @@ describe SpeedGrader::Assignment do
                                               })
     end
 
-    context "when info_for_display_by_submission returns nil or empty reports" do
+    context "when info_for_display_by_submission returns no reports" do
       it "doesn't not include lti_asset_reports or lti_asset_processors" do
-        expect(Lti::AssetReport).to receive(:info_for_display_by_submission).and_return({
-                                                                                          asset_processor_ids: [ap1.id],
-                                                                                          reports_by_submission: {}
-                                                                                        })
+        expect(Lti::AssetReport).to receive(:info_for_display_by_submission).and_return({})
         json = SpeedGrader::Assignment.new(@assignment, @teacher).json
         expect(json).not_to have_key("lti_asset_reports")
         expect(json["submissions"].first).not_to have_key("lti_asset_reports")

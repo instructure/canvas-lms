@@ -18,7 +18,6 @@
 
 import React from 'react'
 
-// eslint-disable-next-line react/prefer-stateless-function
 export default class ModalButtons extends React.Component {
   static displayName = 'ModalButtons'
 

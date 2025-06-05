@@ -34,6 +34,13 @@ export default class AppDetails extends React.Component {
     shortName: PropTypes.string.isRequired,
   }
 
+  constructor(props) {
+    super(props)
+    this.addAppButtonRef = React.createRef()
+    this.appNameRef = React.createRef()
+    this.appDescriptionRef = React.createRef()
+  }
+
   state = {
     app: null,
   }
@@ -96,7 +103,7 @@ export default class AppDetails extends React.Component {
                     {this.alreadyInstalled()}
                   </div>
                   <AddApp
-                    ref="addAppButton"
+                    ref={this.addAppButtonRef}
                     app={this.state.app}
                     handleToolInstalled={this.handleToolInstalled}
                   />
@@ -106,9 +113,9 @@ export default class AppDetails extends React.Component {
                   </a>
                 </td>
                 <td className="individual-app-right" valign="top">
-                  <h2 ref="appName">{this.state.app.name}</h2>
+                  <h2 ref={this.appNameRef}>{this.state.app.name}</h2>
                   <p
-                    ref="appDescription"
+                    ref={this.appDescriptionRef}
                     dangerouslySetInnerHTML={{__html: this.state.app.description}}
                   />
                 </td>

@@ -93,6 +93,16 @@ class Lti::AssetReport < ApplicationRecord
   validate :validate_extensions
   validate :validate_asset_compatible_with_processor
 
+  scope :for_active_processors, lambda {
+    joins(:asset_processor)
+      .where(lti_asset_processors: { workflow_state: :active })
+  }
+
+  scope :for_submissions, lambda { |submission_ids|
+    joins(:asset)
+      .where(lti_assets: { submission_id: submission_ids })
+  }
+
   def validate_asset_compatible_with_processor
     unless asset&.compatible_with_processor?(asset_processor)
       errors.add(:asset, "internal error, asset (e.g. asset's submission) not compatible with processor")
@@ -115,9 +125,11 @@ class Lti::AssetReport < ApplicationRecord
     end
   end
 
+  # See also fields in graphql/types/lti_asset_report_type.rb (used
+  # in New Speedgrader)
   def info_for_display
     {
-      id:,
+      _id: id,
       title:,
       comment:,
       result:,
@@ -125,11 +137,20 @@ class Lti::AssetReport < ApplicationRecord
       indicationColor: indication_color,
       indicationAlt: indication_alt,
       errorCode: error_code,
-      processingProgress: processing_progress,
+      processingProgress: effective_processing_progress,
       priority:,
       launchUrlPath: launch_url_path,
-      resubmitUrlPath: resubmit_url_path,
+      resubmitAvailable: resubmit_available?,
     }.compact
+  end
+
+  def effective_processing_progress
+    if PROGRESSES.include?(processing_progress)
+      processing_progress
+    else
+      # Per spec
+      PROGRESS_NOT_READY
+    end
   end
 
   def launch_url_path
@@ -138,15 +159,6 @@ class Lti::AssetReport < ApplicationRecord
     Rails.application.routes.url_helpers.asset_report_launch_path(
       asset_processor_id: lti_asset_processor_id,
       report_id: id
-    )
-  end
-
-  def resubmit_url_path
-    return nil unless resubmit_available?
-
-    Rails.application.routes.url_helpers.lti_asset_processor_notice_resubmit_path(
-      asset_processor_id: lti_asset_processor_id,
-      student_id: asset.submission.user_id
     )
   end
 
@@ -163,34 +175,26 @@ class Lti::AssetReport < ApplicationRecord
   end
 
   # Returns all reports for the given asset processor and submission IDs.
-  # Returns hash with:
-  #   asset_processors_ids: array of ids
-  #   reports_by_submission: hash of form
-  #     {
-  #       submission_id => {
-  #         by_attachment: {
-  #           attachment_id => {
-  #             lti_asset_processor_id => [
-  #               { id: report1.id, title: report1.title, ... },
-  #               { id: report2.id, title: report2.title, ... },
-  #             ],
+  # Returns reports by submission, hash of form:
+  #   submission_id => {
+  #     by_attachment: {
+  #       attachment_id => {
+  #         lti_asset_processor_id => [
+  #           { id: report1.id, title: report1.title, ... },
+  #           { id: report2.id, title: report2.title, ... },
+  #         ],
   # ...
   def self.info_for_display_by_submission(submission_ids:)
-    asset_processor_ids = Set.new
     reports_by_submission = {}
 
     if submission_ids.present?
       scope =
         active
-        .joins(:asset)
-        .joins(:asset_processor)
-        .where(lti_asset_processors: { workflow_state: :active })
-        .where(lti_assets: { submission_id: submission_ids })
+        .for_active_processors
+        .for_submissions(submission_ids)
         .select("lti_asset_reports.*, lti_assets.submission_id as asset_sub_id, lti_assets.attachment_id as asset_att_id")
 
       scope.find_each do |report|
-        asset_processor_ids << report.lti_asset_processor_id
-
         sub_reports = (reports_by_submission[report.asset_sub_id] ||= {})
 
         if report.asset_att_id
@@ -203,6 +207,6 @@ class Lti::AssetReport < ApplicationRecord
       end
     end
 
-    { reports_by_submission:, asset_processor_ids: asset_processor_ids.to_a }
+    reports_by_submission
   end
 end

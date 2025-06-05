@@ -20,10 +20,17 @@ import React from 'react'
 import moxios from 'moxios'
 import WebZipExportApp from '../App'
 import {act, render, waitFor} from '@testing-library/react'
+import {assignLocation} from '@canvas/util/globalUtils'
+
+// Mock the assignLocation function
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 describe('Webzip export app', () => {
   beforeEach(() => {
     moxios.install()
+    jest.clearAllMocks()
   })
 
   afterEach(() => {
@@ -209,7 +216,6 @@ describe('Webzip export app', () => {
     ENV.context_asset_string = 'courses_2'
     const ref = React.createRef()
     const wrapper = render(<WebZipExportApp ref={ref} />)
-    const download = jest.spyOn(ref.current, 'downloadLink')
     act(() => {
       ref.current.getExports('126')
     })
@@ -217,7 +223,6 @@ describe('Webzip export app', () => {
       moxios.requests.mostRecent()
       expect(wrapper.queryByText('Loading')).toBeNull()
       expect(wrapper.getByText('Most recent export')).toBeInTheDocument()
-      download.mockRestore()
     })
   })
 
@@ -237,15 +242,13 @@ describe('Webzip export app', () => {
     ENV.context_asset_string = 'courses_2'
     const ref = React.createRef()
     const wrapper = render(<WebZipExportApp ref={ref} />)
-    const download = jest.spyOn(ref.current, 'downloadLink')
     act(() => {
       ref.current.getExports('126')
     })
     await waitFor(async () => {
       moxios.requests.mostRecent()
       expect(wrapper.queryByText('Loading')).toBeNull()
-      expect(download).toHaveBeenCalledTimes(1)
-      download.mockRestore()
+      expect(assignLocation).toHaveBeenCalledWith('http://example.com/thing')
     })
   })
 })

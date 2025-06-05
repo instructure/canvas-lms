@@ -22,6 +22,7 @@ import {Pill} from '@instructure/ui-pill'
 import {IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {assignLocation} from '@canvas/util/globalUtils'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/EditHeaderView.handlebars'
@@ -122,7 +123,7 @@ EditHeaderView.prototype.delete = function () {
 }
 
 EditHeaderView.prototype.onDeleteSuccess = function () {
-  return (window.location.href = ENV.ASSIGNMENT_INDEX_URL)
+  return assignLocation(ENV.ASSIGNMENT_INDEX_URL)
 }
 
 EditHeaderView.prototype.onGradingTypeUpdate = function (e) {

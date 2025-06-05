@@ -16,28 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {createRoot} from 'react-dom/client'
-import ModuleFileDrop from '@canvas/context-module-file-drop'
+import {addEmptyModuleUI, MODULE_ITEM_LIST} from '@canvas/context-modules/utils/moduleHelpers'
 import ready from '@instructure/ready'
 
 ready(() => {
-  const contextModules = document.getElementById('context_modules')
   const zones = document.querySelectorAll('.editable_context_module:not(#context_module_blank)')
   zones.forEach(zone => {
+    const content = zone.querySelector('.content')
+    if (!content) return
+    const itemslist = content?.querySelector('.context_module_items')
+    if (!itemslist) {
+      content.insertAdjacentHTML('afterbegin', MODULE_ITEM_LIST)
+    }
     const moduleDnd = zone.querySelector('.module_dnd')
     if (moduleDnd) {
-      const moduleName = zone.querySelector('.ig-header-title .name')?.textContent || null
-
-      const root = createRoot(moduleDnd)
-      root.render(
-        <ModuleFileDrop
-          courseId={ENV.course_id}
-          moduleId={moduleDnd.getAttribute('data-context-module-id')}
-          contextModules={contextModules}
-          moduleName={moduleName}
-        />,
-      )
+      addEmptyModuleUI(zone)
     }
   })
 })

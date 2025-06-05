@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-console */
-
 let filename
 
 export function logCurrentContext(currentContext, options = {}) {
@@ -126,4 +124,3 @@ try {
     filename = ''
   }
 }
-/* eslint-enable no-console */

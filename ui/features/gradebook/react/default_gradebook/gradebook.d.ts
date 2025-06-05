@@ -177,6 +177,7 @@ export type GradebookOptions = {
   stickers_enabled: boolean
   student_groups: StudentGroupCategoryMap
   user_asset_string: string
+  use_graphql_for_gradebook: boolean
   teacher_notes: {
     hidden: boolean
     id: string

@@ -152,7 +152,7 @@ export const TEACHER_QUERY = gql`
 `
 
 export const TEACHER_EDIT_QUERY = gql`
-  query GetAssignment($assignmentLid: ID!) {
+  query GetAssignmentForEdit($assignmentLid: ID!) {
     assignment(id: $assignmentLid) {
       lid: _id
       state

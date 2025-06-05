@@ -183,15 +183,40 @@ module AttachmentHelper
       return no_error_on_failure ? false : render_unauthorized_action
     end
 
+    if params[:sf_token]
+      return true if check_safe_files_token(attachment, params[:sf_token])
+    end
+
     no_error_on_failure ? attachment.grants_right?(user, session, access_type) : authorized_action(attachment, user, access_type)
   end
 
   def access_via_location?(attachment, user, access_type)
     if params[:location] && [:read, :download].include?(access_type)
-      return AttachmentAssociation.verify_access(params[:location], attachment.id, user, session)
+      return AttachmentAssociation.verify_access(params[:location], attachment, user, session)
     end
 
     false
+  end
+
+  def check_safe_files_token(attachment, sf_token)
+    return false unless Account.site_admin.feature_enabled?(:safe_files_token) && sf_token && !safer_domain_available?
+
+    sf_token_key = "sf_token:#{sf_token}"
+    sf_token_data = Rails.cache.read(sf_token_key)
+    return false unless sf_token_data
+
+    if sf_token_data[:full_path] == attachment.full_path
+      # access is checked twice so delete token after second check
+      if sf_token_data[:used]
+        Rails.cache.delete(sf_token_key)
+      else
+        sf_token_data[:used] = true
+        Rails.cache.write(sf_token_key, sf_token_data, expires_in: 5.minutes)
+      end
+      true
+    else
+      false
+    end
   end
 
   def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false)

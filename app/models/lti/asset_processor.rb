@@ -76,7 +76,14 @@ class Lti::AssetProcessor < ApplicationRecord
                        .merge(ContextExternalTool.active)
   end
 
+  def icon_or_tool_icon_url
+    icon_url ||
+      context_external_tool.extension_setting(:ActivityAssetProcessor, :icon_url)
+  end
+
   # Result structure should match with ExistingAttachedAssetProcessor in UI
+  # See also fields in app/graphql/types/lti_asset_processor_type.rb which are used
+  # in Speedgrader 2
   def self.info_for_display
     raise ArgumentError, "Must be used with a scope" unless current_scope
 
@@ -88,12 +95,14 @@ class Lti::AssetProcessor < ApplicationRecord
         tool_id: ap.context_external_tool_id,
         tool_name: ap.context_external_tool.name,
         tool_placement_label: ap.context_external_tool.label_for(:ActivityAssetProcessor, I18n.locale),
-        icon_or_tool_icon_url:
-          ap.icon_url ||
-            ap.context_external_tool.extension_setting(:ActivityAssetProcessor, :icon_url),
+        icon_or_tool_icon_url: ap.icon_or_tool_icon_url,
         iframe: ap.iframe,
         window: ap.window,
       }.compact
     end
+  end
+
+  def report_custom_variables
+    (custom || {}).merge!(report&.dig("custom") || {})
   end
 end

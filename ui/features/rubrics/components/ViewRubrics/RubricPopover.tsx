@@ -91,6 +91,7 @@ export const RubricPopover = ({
         freeFormCriterionComments={freeFormCriterionComments}
         accountId={accountId}
         courseId={courseId}
+        workflowState={workflowState}
       />
       <DeleteRubricModal
         isOpen={isDeleteRubricModalOpen}

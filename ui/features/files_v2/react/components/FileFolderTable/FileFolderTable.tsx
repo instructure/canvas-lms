@@ -31,8 +31,6 @@ import renderTableBody from './RenderTableBody'
 import {useFileManagement} from '../../contexts/FileManagementContext'
 import {Alert} from '@instructure/ui-alerts'
 import UsageRightsModal from './UsageRightsModal'
-import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
-import FileTableUpload from './FileTableUpload'
 import PermissionsModal from './PermissionsModal'
 import {Sort} from '../../hooks/useGetPaginatedFiles'
 import {createPortal} from 'react-dom'
@@ -43,7 +41,6 @@ import {
 } from './FileFolderTableUtils'
 
 const I18n = createI18nScope('files_v2')
-const MIN_HEIGHT = 450
 
 export interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
@@ -93,11 +90,6 @@ const FileFolderTable = ({
     return getSelectionScreenReaderText(selectedRows.size, rows.length)
   })
   const [modalOrTrayOptions, _setModalOrTrayOptions] = useState<ModalOrTrayOptions | null>(null)
-
-  const [isDragging, setIsDragging] = useState(false)
-  const [directoryMinHeight, setDirectoryMinHeight] = useState('auto')
-
-  const filesDirectoryRef = useRef<HTMLDivElement | null>(null)
 
   const setModalOrTrayOptions = useCallback(
     (options: ModalOrTrayOptions | null) => () => _setModalOrTrayOptions(options),
@@ -190,129 +182,57 @@ const FileFolderTable = ({
     },
   )
 
-  const showDrop = !isLoading && !searchString && !isStacked
-
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    if (e.dataTransfer?.types.includes('Files')) {
-      e.preventDefault()
-      if (!isDragging && showDrop) {
-        if (filesDirectoryRef.current && filesDirectoryRef.current.offsetHeight < MIN_HEIGHT) {
-          setDirectoryMinHeight(MIN_HEIGHT + 'px')
-        }
-        setIsDragging(true)
-      }
-      return false
-    } else {
-      return true
-    }
-  }
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    if (filesDirectoryRef.current) {
-      const rect = filesDirectoryRef.current.getBoundingClientRect()
-      if (
-        rect &&
-        (e.clientY < rect.top ||
-          e.clientY >= rect.bottom ||
-          e.clientX < rect.left ||
-          e.clientX >= rect.right)
-      ) {
-        setIsDragging(false)
-        setDirectoryMinHeight('auto')
-      }
-    }
-  }
-
-  const handleDropState = () => {
-    setIsDragging(false)
-    setDirectoryMinHeight('auto')
-  }
-
-  const handleDrop = (
-    accepted: ArrayLike<DataTransferItem | globalThis.File>,
-    _rejected: ArrayLike<DataTransferItem | globalThis.File>,
-    e: React.DragEvent<Element>,
-  ) => {
-    e.preventDefault()
-    e.stopPropagation()
-    handleDropState()
-    FileOptionsCollection.setFolder(currentFolder)
-    FileOptionsCollection.setOptionsFromFiles(accepted, true)
-  }
+  const showDrop = userCanEditFilesForContext && !isLoading && !searchString && !isStacked
 
   return (
     <>
       {renderModals()}
       <Flex direction="column">
-        <div
-          data-testid="files-directory"
-          ref={filesDirectoryRef}
-          style={{minHeight: rows.length === 0 && showDrop ? MIN_HEIGHT : directoryMinHeight}}
-          className="files_directory"
-          onDragEnter={e => handleDragEnter(e as React.DragEvent<HTMLDivElement>)}
-          onDragLeave={e => handleDragLeave(e as React.DragEvent<HTMLDivElement>)}
-          onDragOver={e => e.preventDefault()}
-          onDrop={_e => handleDropState()}
+        <Table
+          caption={tableCaption}
+          hover={true}
+          layout={isStacked ? 'stacked' : 'fixed'}
+          data-testid="files-table"
         >
-          <Table
-            caption={tableCaption}
-            hover={true}
-            layout={isStacked ? 'stacked' : 'fixed'}
-            data-testid="files-table"
+          <Table.Head
+            renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
           >
-            <Table.Head
-              renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
-            >
-              <Table.Row>
-                {renderTableHead(
-                  size,
-                  allRowsSelected,
-                  someRowsSelected,
-                  toggleSelectAll,
-                  isStacked,
-                  filteredColumns,
-                  sort,
-                  handleColumnHeaderClick,
-                  selectAllRef,
-                )}
-              </Table.Row>
-            </Table.Head>
-            <Table.Body>
-              {renderTableBody(
-                rows,
-                filteredColumns,
-                selectedRows,
+            <Table.Row>
+              {renderTableHead(
                 size,
+                allRowsSelected,
+                someRowsSelected,
+                toggleSelectAll,
                 isStacked,
-                toggleRowSelection,
-                userCanEditFilesForContext,
-                userCanDeleteFilesForContext,
-                userCanRestrictFilesForContext,
-                usageRightsRequiredForContext,
-                setModalOrTrayOptions,
+                filteredColumns,
+                sort,
+                handleColumnHeaderClick,
+                selectAllRef,
               )}
-              {/* Only render the upload row when needed, else screenreaders count an extra row 
-                  and the upload has to be in a <tr> else browsers will complain */}
-              {userCanEditFilesForContext && showDrop && (isDragging || rows.length === 0) && (
-                <Table.Row data-upload>
-                  <Table.Cell>
-                    <FileTableUpload
-                      currentFolder={currentFolder!}
-                      isDragging={isDragging}
-                      handleDrop={handleDrop}
-                      handleFileDropRef={handleFileDropRef}
-                    />
-                  </Table.Cell>
-                </Table.Row>
-              )}
-            </Table.Body>
-          </Table>
-        </div>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {renderTableBody(
+              rows,
+              filteredColumns,
+              selectedRows,
+              size,
+              isStacked,
+              toggleRowSelection,
+              userCanEditFilesForContext,
+              userCanDeleteFilesForContext,
+              userCanRestrictFilesForContext,
+              usageRightsRequiredForContext,
+              setModalOrTrayOptions,
+            )}
+          </Table.Body>
+        </Table>
         <SubTableContent
           isLoading={isLoading}
           isEmpty={rows.length === 0 && !isLoading}
           searchString={searchString}
+          showDrop={showDrop}
+          handleFileDropRef={handleFileDropRef}
         />
         {selectionAnnouncement && (
           <Alert

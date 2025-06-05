@@ -82,6 +82,7 @@ const TagAsMenu = (props: {courseId: number; handleMenuSelection: HandleMenuSele
               <Menu.Item
                 key={`tag-group-${option.groups[0].id}`}
                 value={option.groups[0].id}
+                data-testid={`tag-group-${option.groups[0].name}`}
                 themeOverride={{
                   labelPadding: '0.75rem',
                 }}
@@ -91,12 +92,18 @@ const TagAsMenu = (props: {courseId: number; handleMenuSelection: HandleMenuSele
               <Menu.Separator />,
             ]
           : [
-              <Menu.Group key={`tag-set-${option.id}`} label={option.name} allowMultiple={false}>
+              <Menu.Group
+                key={`tag-set-${option.id}`}
+                label={option.name}
+                data-testid={`tag-set-${option.name}`}
+                allowMultiple={false}
+              >
                 {option.groups &&
                   option.groups.map(groupOption => (
                     <Menu.Item
                       key={`tag-group-${groupOption.id}`}
                       value={groupOption.id}
+                      data-testid={`tag-group-${groupOption.name}`}
                       themeOverride={{
                         labelPadding: '0.75rem',
                       }}

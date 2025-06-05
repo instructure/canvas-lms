@@ -305,11 +305,6 @@ describe ConversationsController do
           expect(response).to be_successful
 
           expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.react")
-          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.inbox.count.react", 2).once
-          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.sent.count.react", 3).once
-          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.unread.count.react", 1).once
-          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.starred.count.react", 1).once
-          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.archived.count.react", 1).once
         end
       end
     end

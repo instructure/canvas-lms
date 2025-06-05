@@ -23,6 +23,7 @@ import {merge} from 'lodash'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import Folder from '@canvas/files/backbone/models/Folder'
 import SearchResults from '../SearchResults'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const defaultProps = (props = {}) => {
   const ref = document.createElement('div')
@@ -62,19 +63,17 @@ const defaultProps = (props = {}) => {
 }
 
 describe('SearchResults', () => {
-  let oldEnv
-
   beforeEach(() => {
     userEvent.setup()
-    oldEnv = window.ENV
-    window.ENV = {
+    fakeENV.setup({
       COURSE_ID: '101',
       context_asset_string: 'course_17',
-    }
+      API_URL: 'http://localhost:3000',
+    })
   })
 
   afterEach(() => {
-    window.ENV = oldEnv
+    fakeENV.teardown()
   })
 
   describe('accessibility message', () => {

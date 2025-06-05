@@ -44,10 +44,12 @@ export default createReactClass({
       modalIsOpen: false,
       errorMessage: null,
       fields: {},
+      _isMounted: false,
     }
   },
 
   componentDidMount() {
+    this.setState({_isMounted: true})
     const fields = {}
 
     fields.name = {
@@ -89,6 +91,10 @@ export default createReactClass({
     }
   },
 
+  componentWillUnmount() {
+    this.setState({_isMounted: false})
+  },
+
   handleChange(e) {
     const target = e.target
     let value = target.value
@@ -116,8 +122,7 @@ export default createReactClass({
 
   openModal(e) {
     e.preventDefault()
-    // eslint-disable-next-line react/no-is-mounted
-    if (this.isMounted()) {
+    if (this.state._isMounted) {
       this.setState({modalIsOpen: true})
     }
   },

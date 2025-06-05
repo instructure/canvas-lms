@@ -41,7 +41,7 @@ DateDueColumnView.prototype.afterRender = function () {
       collision: 'fit fit',
     },
     tooltipClass: 'center bottom vertical',
-    // eslint-disable-next-line object-shorthand
+
     content: function () {
       return $($(this).data('tooltipSelector')).html()
     },

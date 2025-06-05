@@ -19,7 +19,7 @@
 import {useEffect, useState, useRef, useMemo} from 'react'
 
 import {useGetAssigneeOptions} from './useGetAssigneeOptions'
-import {getCourseSettings} from './queryFn'
+import {getCourseSettings, CourseSettings} from './queryFn'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {uniqBy} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -63,11 +63,12 @@ const useFetchAssignees = ({
     return {per_page: 100}
   }, [])
 
-  const {data: fetchedCourseSettings, isSuccess: courseSettingsIsSuccess} = useQuery({
-    queryKey: ['courseSettings', courseId],
-    queryFn: getCourseSettings,
-    enabled: shouldFetch && checkMasteryPaths,
-  })
+  const {data: fetchedCourseSettings, isSuccess: courseSettingsIsSuccess} =
+    useQuery<CourseSettings>({
+      queryKey: ['courseSettings', courseId],
+      queryFn: getCourseSettings,
+      enabled: shouldFetch && checkMasteryPaths,
+    })
 
   const {baseFetchedOptions, isLoading} = useGetAssigneeOptions({
     allOptions,

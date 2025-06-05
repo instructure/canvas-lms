@@ -37,14 +37,12 @@ declare const ENV: GlobalEnv & EditorPrefEnv
 
 const I18n = createI18nScope('block-editor')
 
+type EditorChoices = 'rce' | 'block_editor' | 'canvas_content_builder' | ''
+
 const ChooseEditorModal = (props: ChooseEditorModalProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(true)
-  const [rememberMyChoice, setRememberMyChoice] = useState<boolean>(
-    ENV.text_editor_preference !== null,
-  )
-  const [editorChoice, setEditorChoice] = useState<'rce' | 'block_editor' | ''>(
-    ENV.text_editor_preference || '',
-  )
+  const [rememberMyChoice, setRememberMyChoice] = useState<boolean>(!!ENV.text_editor_preference)
+  const [editorChoice, setEditorChoice] = useState<EditorChoices>(ENV.text_editor_preference || '')
   const [erroredForm, setErroredForm] = useState<boolean>(false)
   const close = () => {
     setIsOpen(false)
@@ -52,7 +50,7 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
   }
 
   const validEditorChoice = () => {
-    if (['rce', 'block_editor'].includes(editorChoice)) {
+    if (['rce', 'block_editor', 'canvas_content_builder'].includes(editorChoice)) {
       return true
     } else {
       setErroredForm(true)
@@ -128,20 +126,23 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
             setErroredForm(false)
             setEditorChoice(data.value as EditorTypes)
           }}
-          renderLabel={
-            <Flex>
-              <Flex.Item>{I18n.t('Select an Editor')}</Flex.Item>
-              <Flex.Item>*</Flex.Item>
-            </Flex>
-          }
+          renderLabel={I18n.t('Select an Editor')}
           messages={erroredForm ? [{type: 'error', text: I18n.t('Please choose an editor')}] : []}
           placeholder={I18n.t('Select One')}
           defaultValue={editorChoice}
           data-testid="choose-an-editor-dropdown"
+          required={true}
         >
-          <SimpleSelect.Option id="block_editor" value="block_editor">
-            {I18n.t('Try the Block Editor')}
-          </SimpleSelect.Option>
+          {props.editorFeature === 'block_editor' && (
+            <SimpleSelect.Option id="block_editor" value="block_editor">
+              {I18n.t('Try the Block Editor')}
+            </SimpleSelect.Option>
+          )}
+          {props.editorFeature === 'canvas_content_builder' && (
+            <SimpleSelect.Option id="canvas_content_builder" value="canvas_content_builder">
+              {I18n.t('Try the Canvas Content Builder')}
+            </SimpleSelect.Option>
+          )}
           <SimpleSelect.Option id="rce" value="rce">
             {I18n.t('Use the RCE')}
           </SimpleSelect.Option>
@@ -173,15 +174,16 @@ const renderChooseEditorModal = (e: React.SyntheticEvent, createPageAction: () =
   if (e != null) {
     e.preventDefault()
   }
+  const editorFeature = ENV.EDITOR_FEATURE
+
   const rootElement = document.querySelector('#choose-editor-mount-point')
   if (rootElement) {
     const root = createRoot(rootElement)
     const editorModal = (
       <ChooseEditorModal
+        editorFeature={editorFeature}
         createPageAction={createPageAction}
-        onClose={() => {
-          root.unmount()
-        }}
+        onClose={() => root.unmount()}
       />
     )
     root.render(editorModal)

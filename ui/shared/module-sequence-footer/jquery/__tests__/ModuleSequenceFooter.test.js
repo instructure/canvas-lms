@@ -181,8 +181,8 @@ describe('ModuleSequenceFooter', () => {
       // Wait for React to render
       jest.runAllTimers()
 
-      expect($testEl.find('[aria-label="Previous Module Item"]').length).toBe(0)
-      expect($testEl.find('[aria-label="Next Module Item"]').length).toBe(0)
+      expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(0)
+      expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(0)
     })
 
     it('shows modules tooltip when current module id differs from next/prev module id', () => {
@@ -231,8 +231,8 @@ describe('ModuleSequenceFooter', () => {
       // Wait for React to render
       jest.runAllTimers()
 
-      expect($testEl.find('[aria-label="Previous Module Item"]').length).toBe(1)
-      expect($testEl.find('[aria-label="Next Module Item"]').length).toBe(1)
+      expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(1)
+      expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
     })
 
     it('shows item tooltip when current module id matches next/prev module id', () => {
@@ -282,8 +282,8 @@ describe('ModuleSequenceFooter', () => {
       // Wait for React to render
       jest.runAllTimers()
 
-      expect($testEl.find('[aria-label="Previous Module Item"]').length).toBe(1)
-      expect($testEl.find('[aria-label="Next Module Item"]').length).toBe(1)
+      expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(1)
+      expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
     })
 
     it('uses module_item_id from URL as assetID with ModuleItem type', () => {
@@ -367,7 +367,7 @@ describe('ModuleSequenceFooter', () => {
       // Wait for React to render
       jest.runAllTimers()
 
-      expect($testEl.find('[aria-label="Next Module Item"]').length).toBe(1)
+      expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
       expect($testEl.find('a').attr('href')).toMatch('chew-z')
     })
 
@@ -388,7 +388,7 @@ describe('ModuleSequenceFooter', () => {
       // Wait for React to render
       jest.runAllTimers()
 
-      expect($testEl.find('[aria-label="Next Module Item"]').length).toBe(1)
+      expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
       expect($testEl.find('a').attr('href')).toMatch('mod.module.mod')
     })
 
@@ -411,7 +411,7 @@ describe('ModuleSequenceFooter', () => {
       // Wait for React to render
       jest.runAllTimers()
 
-      expect($testEl.find('[aria-label="Next Module Item"][disabled]').length).toBe(1)
+      expect($testEl.find('[aria-label="Next Module Item"][disabled]')).toHaveLength(1)
     })
 
     it('shows next button when no next items exist and paths are processing', () => {
@@ -438,7 +438,7 @@ describe('ModuleSequenceFooter', () => {
       // Wait for React to render
       jest.runAllTimers()
 
-      expect($testEl.find('[aria-label="Next Module Item"]').length).toBe(1)
+      expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
       expect($testEl.find('a').attr('href')).toMatch('mod.module.mod')
     })
   })
@@ -492,8 +492,8 @@ describe('ModuleSequenceFooter', () => {
       // Wait for React to render
       jest.runAllTimers()
 
-      expect($testEl.find('[aria-label="Previous Module Item"]').length).toBe(1)
-      expect($testEl.find('[aria-label="Next Module Item - opens in new window"]').length).toBe(1)
+      expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(1)
+      expect($testEl.find('[aria-label="Next Module Item - opens in new window"]')).toHaveLength(1)
     })
   })
 })

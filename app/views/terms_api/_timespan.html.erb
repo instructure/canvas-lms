@@ -24,16 +24,15 @@
       </div>
       <div class="edit_term">
         <div class="date_field_container">
-          <label class="screenreader-only" id="<%= key %>_start_at_label_<%= idx %>">
+          <label class="screenreader-only">
             <%= start_tooltip %> <%= datepicker_screenreader_prompt %>
           </label>
           <input type="text"
             name="enrollment_term<%= key %>[start_at]"
             value="<%= datetime_string(object.try(:start_at), :long) %>"
-            title="<%= accessible_date_format %>"
             class="date_field"
             style="width: 120px;"
-            aria-labelledby="<%= key %>_start_at_label_<%= idx %>"
+            title="<%= accessible_date_format %>"
             data-tooltip />
         </div>
       </div>
@@ -49,17 +48,16 @@
       </div>
       <div class="edit_term">
         <div class="date_field_container">
-          <label class="screenreader-only" id="<%= key %>_end_at_label_<%= idx %>">
+          <label class="screenreader-only">
             <%= end_tooltip %> <%= datepicker_screenreader_prompt %>
           </label>
           <input
             type="text"
             name="enrollment_term<%= key %>[end_at]"
             value="<%= datetime_string(object.try(:end_at), :long) %>"
-            title="<%= accessible_date_format %>"
             class="date_field"
             style="width: 120px;"
-            aria-labelledby="<%= key %>_end_at_label_<%= idx %>"
+            title="<%= accessible_date_format %>"
             data-tooltip />
         </div>
       </div>

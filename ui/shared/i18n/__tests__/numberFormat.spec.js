@@ -28,7 +28,7 @@ describe('numberFormat _format', () => {
 
   test('passes through non-numbers', () => {
     expect(numberFormat._format('foo')).toBe('foo')
-    // eslint-disable-next-line no-restricted-globals
+
     expect(isNaN(numberFormat._format(NaN))).toBe(true)
   })
 

@@ -56,7 +56,9 @@ export const CourseListItemContent = ({course}: {course: Course}) => {
   return (
     <>
       <Link isWithinText={false} href={`/courses/${course.id}`}>
-        {course.name}
+        <Text as="div" size="medium">
+          {course.name}
+        </Text>
       </Link>
       {sectionDetails && (
         <Text as="div" size="x-small" weight="light">

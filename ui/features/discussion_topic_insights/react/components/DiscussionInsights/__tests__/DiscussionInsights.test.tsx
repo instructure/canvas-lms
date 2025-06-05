@@ -31,16 +31,21 @@ const mockedUseInsight = useInsight as jest.Mock
 
 describe('DiscussionInsights', () => {
   beforeEach(() => {
-    mockedUseInsightStore.mockReturnValue(() => ({
+    const mockState = {
       context: 'test-context',
       contextId: 'test-context-id',
       discussionId: 'test-discussion-id',
+      filterType: 'all',
       setModalOpen: jest.fn(),
       genereteInsight: jest.fn(),
       setEntryId: jest.fn(),
       setEntries: jest.fn(),
       setFeedbackNotes: jest.fn(),
-    }))
+      setFilterType: jest.fn(),
+      setIsFilteredTable: jest.fn(),
+      openEvaluationModal: jest.fn(),
+    }
+    mockedUseInsightStore.mockImplementation(selector => selector(mockState))
   })
 
   it('displays loading placeholder when loading', () => {
@@ -131,7 +136,9 @@ describe('DiscussionInsights', () => {
 
     render(<DiscussionInsights />)
     expect(
-      screen.getByText('The discussion board has some new activity since the last insights were generated.'),
+      screen.getByText(
+        'The discussion board has some new activity since the last insights were generated.',
+      ),
     ).toBeInTheDocument()
   })
 })

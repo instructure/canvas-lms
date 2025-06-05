@@ -196,6 +196,17 @@ module Types
       assignment.restrict_quantitative_data?(current_user, check_extra_permissions)
     end
 
+    field :provisional_grading_locked, Boolean, "Indicates if the user is locked out of provisional grading for this assignment.", null: false
+    def provisional_grading_locked
+      return false unless assignment.moderated_grader_limit_reached?
+      return false unless assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
+      return false if assignment.grades_published?
+      return false if assignment.permits_moderation?(current_user)
+      return false if assignment.provisional_moderation_graders.where(user: current_user).exists?
+
+      true
+    end
+
     def self.overridden_field(field_name, description)
       field field_name, DateTimeType, description, null: true do
         argument :apply_overrides, Boolean, <<~MD, required: false, default_value: true
@@ -288,6 +299,16 @@ module Types
 
     field :can_unpublish, Boolean, method: :can_unpublish?, null: true
     field :due_date_required, Boolean, method: :due_date_required?, null: true
+
+    field :has_rubric, Boolean, method: :active_rubric_association?
+    field :muted, Boolean, null: true
+
+    field :assignment_visibility, [ID], null: true
+    def assignment_visibility
+      return unless object.course.grants_any_right?(current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+
+      Loaders::AssignmentVisibilityLoader.load(object.id)
+    end
 
     field :originality_report_visibility, String, null: true
     def originality_report_visibility
@@ -553,6 +574,8 @@ module Types
       end
     end
 
+    field :grading_standard_id, ID, null: true
+
     field :grading_standard, GradingStandardType, null: true
     def grading_standard
       load_association(:grading_standard)
@@ -573,6 +596,17 @@ module Types
                   ]).then do
         students = assignment.representatives(user: current_user)
         scope.where(user_id: students)
+      end
+    end
+
+    field :lti_asset_processors_connection, LtiAssetProcessorType.connection_type, null: true
+    def lti_asset_processors_connection
+      load_association(:context).then do |course|
+        # In the future we may need this for students, but for now
+        # this is safest
+        if course.root_account.feature_enabled?(:lti_asset_processor) && course.grants_right?(current_user, :manage_grades)
+          load_association(:lti_asset_processors)
+        end
       end
     end
 
@@ -668,6 +702,28 @@ module Types
     field :auto_grade_assignment_errors, [String], null: false, description: "Issues related to the assignment"
     def auto_grade_assignment_errors
       GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
+    end
+
+    field :is_new_quiz, Boolean, null: false, description: "Assignment is connected to a New Quiz"
+    def is_new_quiz
+      assignment.quiz_lti?
+    end
+
+    field :module_items, [Types::ModuleItemType], null: true
+    def module_items
+      case object.submission_types
+      when "online_quiz"
+        load_association(:quiz).then do |quiz|
+          Loaders::AssociationLoader.for(QuizType, :context_module_tags).load(quiz)
+        end
+
+      when "discussion_topic"
+        load_association(:discussion_topic).then do |discussion|
+          Loaders::AssociationLoader.for(DiscussionType, :context_module_tags).load(discussion)
+        end
+      else
+        load_association(:context_module_tags)
+      end
     end
   end
 end

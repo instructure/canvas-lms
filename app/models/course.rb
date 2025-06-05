@@ -2435,160 +2435,6 @@ class Course < ActiveRecord::Base
     create_attachment(attachment, csv)
   end
 
-  def auto_grade_submission_in_background(submission)
-    user = submission.user
-    progress = progresses.create!(tag: "auto_grade_submission", user:)
-    singleton_key = "Course#run_auto_grader:#{submission.global_id}:#{submission.attempt}"
-    n_strand_key = ["Course#run_auto_grader", global_root_account_id]
-    max_attempts = 3
-
-    progress.process_job(
-      self,
-      :run_auto_grader,
-      {
-        priority: Delayed::HIGH_PRIORITY,
-        n_strand: n_strand_key,
-        singleton: singleton_key,
-        on_conflict: :use_earliest,
-        preserve_method_args: true,
-        max_attempts:
-      },
-      progress,
-      submission,
-      max_attempts
-    )
-
-    # Find all unlocked jobs with the same singleton key
-    matching_jobs = Delayed::Job.where(singleton: singleton_key, locked_at: nil)
-
-    # Check if any of those jobs already have associated progress
-    existing_progress = Progress.where(delayed_job_id: matching_jobs.pluck(:id))
-                                .where.not(id: progress.id)
-                                .first
-
-    if existing_progress
-      # If progress exists for any similar job, mark current progress as skipped
-      progress.update!(
-        workflow_state: "failed",
-        completion: 0,
-        message: "Skipped: a similar job is already queued or running."
-      )
-      existing_progress
-    else
-      # No existing progress found, continue with current progress
-      progress
-    end
-  end
-
-  def run_auto_grader(progress, submission, max_attempts)
-    assignment = submission.assignment
-    assignment_text = ActionView::Base.full_sanitizer.sanitize(assignment.description || "")
-    essay = ActionView::Base.full_sanitizer.sanitize(submission.body || "")
-    rubric = assignment.rubric_association&.rubric
-
-    auto_grade_result = nil
-
-    begin
-      if submission.blank? || submission.body.blank? || submission.attempt < 1
-        raise "No essay submission found"
-      end
-
-      root_account_uuid = submission.course.account.root_account.uuid
-
-      auto_grade_result = AutoGradeResult.find_or_initialize_by(
-        submission:,
-        attempt: submission.attempt
-      )
-
-      if auto_grade_result.grade_data.blank?
-        grade_data = AutoGradeService.new(
-          assignment: assignment_text,
-          essay:,
-          rubric: rubric.data,
-          root_account_uuid:
-        ).call
-
-        auto_grade_result.update!(
-          root_account_id: submission.course.root_account_id,
-          grade_data:,
-          error_message: nil,
-          grading_attempts: auto_grade_result.grading_attempts + 1
-        )
-      end
-
-      grade_data = auto_grade_result.grade_data
-      all_missing_comments = grade_data.all? { |item| !item.key?("comments") }
-
-      if all_missing_comments
-
-        grade_data_with_comments = AutoGradeCommentsService.new(
-          assignment: assignment_text,
-          grade_data:,
-          root_account_uuid:
-        ).call
-
-        auto_grade_result.update!(
-          root_account_id: submission.course.root_account_id,
-          grade_data: grade_data_with_comments,
-          error_message: nil,
-          grading_attempts: auto_grade_result.grading_attempts + 1
-        )
-      end
-
-      progress&.results = auto_grade_result.grade_data
-      progress&.message = nil
-      progress&.complete!
-    rescue CedarAIGraderError => e
-      error_message = e.message
-
-      begin
-        autograde_error_handling(submission, auto_grade_result, progress, error_message)
-      rescue
-        # log error_message
-      end
-
-      current_attempts = progress&.delayed_job&.attempts&.+ 1
-      if current_attempts < max_attempts
-        raise Delayed::RetriableError, error_message
-      end
-
-      progress&.results = []
-      progress&.message = I18n.t("Grading failed. Please try again later or grade manually.")
-      progress&.complete!
-    rescue => e
-      error_message = "Grading failed: #{e.message}"
-
-      begin
-        autograde_error_handling(submission, auto_grade_result, progress, error_message)
-      rescue
-        # log error_message
-      end
-
-      progress&.results = []
-      progress&.message = I18n.t("Grading failed. Please try again later or grade manually.")
-      progress&.complete!
-    end
-  end
-
-  def autograde_error_handling(submission, auto_grade_result, progress, error_message)
-    if auto_grade_result.nil?
-      auto_grade_result = AutoGradeResult.find_or_initialize_by(
-        submission:,
-        attempt: submission.attempt
-      )
-    end
-
-    auto_grade_result&.update!(
-      root_account_id: submission.course.root_account_id,
-      grade_data: {},
-      error_message:,
-      grading_attempts: auto_grade_result.grading_attempts + 1
-    )
-
-    progress&.results = []
-    progress&.message = error_message
-  end
-
   def create_attachment(attachment, csv)
     Attachments::Storage.store_for_attachment(attachment, StringIO.new(csv))
     attachment.content_type = "text/csv"
@@ -3385,6 +3231,7 @@ class Course < ActiveRecord::Base
   TAB_COURSE_PACES = 20
   TAB_SEARCH = 21
   TAB_ACCESSIBILITY = 22
+  TAB_ITEM_BANKS = 23
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3657,6 +3504,19 @@ class Course < ActiveRecord::Base
       end
       tabs += default_tabs
       tabs += external_tabs
+
+      if root_account.feature_enabled?(:ams_service) && tabs.any? { |t| t[:label] == "Item Banks" }
+        ams_item_banks_tab = {
+          id: TAB_ITEM_BANKS,
+          label: t("#tabs.item_banks", "Item Banks"),
+          css_class: "item_banks",
+          href: :course_item_banks_path,
+        }
+
+        item_banks_index = tabs.find_index { |t| t[:label] == "Item Banks" }
+        tabs.delete_at(item_banks_index)
+        tabs.insert(item_banks_index, ams_item_banks_tab)
+      end
 
       tabs.delete_if { |t| t[:id] == TAB_SETTINGS }
       if course_subject_tabs

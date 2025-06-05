@@ -48,6 +48,10 @@ module Accessibility
           value: ""
         )
       end
+
+      def self.fix(elem, value)
+        elem["alt"] = value
+      end
     end
   end
 end

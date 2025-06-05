@@ -17,70 +17,74 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render, screen as rtlScreen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import SyncChange from '../SyncChange'
-import {Pill} from '@instructure/ui-pill'
-import getSampleData from '../../../getSampleData'
-import ReactDOM from 'react-dom'
-import $ from 'jquery'
-
-const ok = x => expect(x).toBeTruthy()
-const equal = (x, y) => expect(x).toBe(y)
-
-const container = document.createElement('div')
-container.setAttribute('id', 'fixtures')
-document.body.appendChild(container)
+import getSampleData from './getSampleData'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const defaultProps = () => ({
   change: getSampleData().history[0].changes[0],
 })
 
 describe('SyncChange component', () => {
+  beforeEach(() => {
+    fakeENV.setup()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   test('renders the SyncChange component', () => {
-    const tree = shallow(<SyncChange {...defaultProps()} />)
-    const node = tree.find('.bcs__history-item__change')
-    ok(node.exists())
+    render(<SyncChange {...defaultProps()} />)
+    expect(document.querySelector('.bcs__history-item__change')).toBeInTheDocument()
   })
 
-  test('renders the SyncChange component expanded when state.isExpanded = true', () => {
-    const props = {...defaultProps(), isLoadingHistory: true}
-    const tree = shallow(<SyncChange {...props} />)
-    tree.setState({isExpanded: true})
-    const node = tree.find('.bcs__history-item__change__expanded')
-    ok(node.exists())
+  test('renders the SyncChange component expanded when clicked', async () => {
+    const user = userEvent.setup()
+    render(<SyncChange {...defaultProps()} />)
+
+    const changeElement = document.querySelector('.bcs__history-item__change')
+    await user.click(changeElement)
+
+    expect(document.querySelector('.bcs__history-item__change__expanded')).toBeInTheDocument()
   })
 
-  test('toggles isExpanded on click', () => {
-    const props = defaultProps()
-    props.isLoadingHistory = true
-    const tree = shallow(<SyncChange {...props} />)
-    tree.at(0).simulate('click')
+  test('toggles isExpanded on click', async () => {
+    const user = userEvent.setup()
+    render(<SyncChange {...defaultProps()} />)
 
-    const node = tree.find('.bcs__history-item__change__expanded')
-    ok(node.exists())
+    const changeElement = document.querySelector('.bcs__history-item__change')
+
+    expect(document.querySelector('.bcs__history-item__change__expanded')).not.toBeInTheDocument()
+
+    await user.click(changeElement)
+    expect(document.querySelector('.bcs__history-item__change__expanded')).toBeInTheDocument()
+
+    await user.click(changeElement)
+    expect(document.querySelector('.bcs__history-item__change__expanded')).not.toBeInTheDocument()
   })
 
   test('displays the correct exception count', () => {
-    const props = defaultProps()
-    const tree = shallow(<SyncChange {...props} />)
-    const pill = tree.find(Pill).render()
-    equal(pill.text(), '3 exceptions')
+    render(<SyncChange {...defaultProps()} />)
+    expect(rtlScreen.getByText('3 exceptions')).toBeInTheDocument()
   })
 
-  // cf. LX-1762
-  test.skip('displays the correct exception types', () => {
-    const props = defaultProps()
-    props.isLoadingHistory = true
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(<SyncChange {...props} />, document.getElementById('fixtures'))
-    $('.bcs__history-item__content button').click()
-    const exceptionGroups = $('li.bcs__history-item__change-exceps__group')
-    let exceptionGroup = exceptionGroups.first()
-    equal(exceptionGroup.text(), 'Points changed exceptions:Default Term - Course 1')
-    exceptionGroup = $(exceptionGroups[1])
-    equal(exceptionGroup.text(), 'Content changed exceptions:Default Term - Course 5')
-    exceptionGroup = $(exceptionGroups[2])
-    equal(exceptionGroup.text(), 'Deleted content exceptions:Default Term - Course 56')
-    ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
+  test('displays the correct exception types when expanded', async () => {
+    const user = userEvent.setup()
+    render(<SyncChange {...defaultProps()} />)
+
+    const changeElement = document.querySelector('.bcs__history-item__change')
+    await user.click(changeElement)
+
+    expect(rtlScreen.getByText('Points changed exceptions:', {exact: false})).toBeInTheDocument()
+    expect(rtlScreen.getByText('Default Term - Course 1')).toBeInTheDocument()
+
+    expect(rtlScreen.getByText('Content changed exceptions:', {exact: false})).toBeInTheDocument()
+    expect(rtlScreen.getByText('Default Term - Course 5')).toBeInTheDocument()
+
+    expect(rtlScreen.getByText('Deleted content exceptions:', {exact: false})).toBeInTheDocument()
+    expect(rtlScreen.getByText('Default Term - Course 56')).toBeInTheDocument()
   })
 })

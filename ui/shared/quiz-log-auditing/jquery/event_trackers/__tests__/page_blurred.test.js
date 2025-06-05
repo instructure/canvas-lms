@@ -21,6 +21,12 @@ import K from '../../constants'
 import $ from 'jquery'
 import 'jquery-migrate'
 
+// Mock window.blur since jsdom doesn't implement it
+Object.defineProperty(window, 'blur', {
+  value: jest.fn(),
+  writable: true,
+})
+
 describe('Quizzes::LogAuditing::EventTrackers::PageBlurred', () => {
   it('sets up the proper context in constructor', () => {
     const tracker = new Subject()

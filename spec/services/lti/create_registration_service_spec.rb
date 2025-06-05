@@ -67,6 +67,8 @@ describe Lti::CreateRegistrationService do
       .by(1)
       .and change { Lti::RegistrationAccountBinding.count }
       .by(1)
+      .and change { ContextExternalTool.count }
+      .by(1)
 
     expect(Lti::Registration.last.attributes.with_indifferent_access).to include(
       **registration_params
@@ -158,6 +160,11 @@ describe Lti::CreateRegistrationService do
       expect { subject }.to change { Lti::ToolConfiguration.count }.by(1)
 
       expect(Lti::ToolConfiguration.last.unified_tool_id).to eql(unified_tool_id)
+    end
+
+    it "sets the unified_tool_id on the deployment" do
+      subject
+      expect(ContextExternalTool.last.unified_tool_id).to eql(unified_tool_id)
     end
   end
 

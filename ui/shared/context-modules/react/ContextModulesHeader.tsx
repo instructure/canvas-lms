@@ -216,11 +216,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
           overflowY="visible"
           margin={responsive.matches.includes('large') ? 'x-small 0 0 0' : '0'}
         >
-          <Flex
-            gap="small"
-            withVisualDebug={false}
-            direction={responsive.matches.includes('small') ? 'column-reverse' : 'row'}
-          >
+          <Flex gap="small" wrap="wrap" withVisualDebug={false}>
             {props.moreMenu.menuTools.visible && (
               <Flex.Item overflowY="visible">
                 <View
@@ -257,14 +253,14 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
 
             <Flex.Item overflowY="visible">
               {props.overrides?.expandCollapseAll?.renderComponent({
-                display: responsive.props.display,
+                display: 'block',
                 ariaExpanded: props.expandCollapseAll.ariaExpanded,
                 dataExpand: props.expandCollapseAll.dataExpand,
                 ariaLabel: props.expandCollapseAll.ariaLabel,
               }) || (
                 <Button
                   id="expand_collapse_all"
-                  display={responsive.props.display}
+                  display="block"
                   aria-expanded={props.expandCollapseAll.ariaExpanded}
                   data-expand={props.expandCollapseAll.dataExpand}
                   data-url={props.expandCollapseAll.dataUrl}
@@ -279,7 +275,6 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
               <Flex.Item overflowY="visible">
                 <Button
                   id="context-modules-header-view-progress-button"
-                  display={responsive.props.display}
                   href={props.viewProgress.url}
                 >
                   {props.viewProgress.label}
@@ -294,7 +289,6 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
                   renderIcon={IconExportLine}
                   href={props.moreMenu.exportCourseContent.url}
                   id="context-modules-header-export-course-button"
-                  display={responsive.props.display}
                 >
                   {props.moreMenu.exportCourseContent.label}
                 </Button>
@@ -337,7 +331,6 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
                   color="primary"
                   // @ts-expect-error
                   renderIcon={IconAddLine}
-                  display={responsive.props.display}
                 >
                   {props.addModule.label}
                 </Button>

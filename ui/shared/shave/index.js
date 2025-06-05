@@ -20,7 +20,6 @@
 // with few modifications
 
 export default function shave(target, maxHeight, opts = {}) {
-  // eslint-disable-next-line no-restricted-globals
   if (typeof maxHeight === 'undefined' || isNaN(maxHeight)) throw Error('maxHeight is required')
   let els = typeof target === 'string' ? document.querySelectorAll(target) : target
   if (!els) return
@@ -74,7 +73,7 @@ export default function shave(target, maxHeight, opts = {}) {
     let min = 0
     let pivot
     while (min < max) {
-      pivot = (min + max + 1) >> 1 // eslint-disable-line no-bitwise
+      pivot = (min + max + 1) >> 1
       el[textProp] = spaces ? words.slice(0, pivot).join(' ') : words.slice(0, pivot)
       el.insertAdjacentHTML('beforeend', charHtml)
       if (el.offsetHeight > maxHeight) max = pivot - 1

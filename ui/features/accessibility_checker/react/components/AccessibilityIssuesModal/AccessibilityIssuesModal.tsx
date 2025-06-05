@@ -32,10 +32,11 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {IconPublishSolid} from '@instructure/ui-icons'
+import {Alert} from '@instructure/ui-alerts'
 
 interface AccessibilityIssuesModalProps {
   isOpen: boolean
-  onClose: () => void
+  onClose: (shallClose: boolean) => void
   item: ContentItem
 }
 
@@ -45,6 +46,8 @@ export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> =
   item,
 }) => {
   const I18n = createI18nScope('accessibility_checker')
+
+  const [shallReload, setShallReload] = useState(false)
 
   const [solvedIssue, setSolvedIssue] = useState(
     new Map(
@@ -56,7 +59,7 @@ export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> =
   const [issueFormState, setIssueFormState] = useState(
     new Map(
       item.issues?.map(issue => {
-        return [issue.id, issue.form.value]
+        return [issue.id, issue.form?.value]
       }) || [],
     ),
   )
@@ -99,6 +102,7 @@ export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> =
         const newState = new Map(applying)
         newState.set(issue.id, false)
         setApplying(newState)
+        setShallReload(true)
       })
   }
 
@@ -186,14 +190,25 @@ export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> =
   return (
     <Modal
       open={isOpen}
-      onDismiss={onClose}
+      onDismiss={() => onClose(shallReload)}
       size="medium"
       label={`${item.title} - ${I18n.t('Accessibility Issues')}`}
     >
       <Modal.Header>
-        <CloseButton placement="end" onClick={onClose} screenReaderLabel={I18n.t('Close')} />
+        <CloseButton
+          placement="end"
+          onClick={() => onClose(shallReload)}
+          screenReaderLabel={I18n.t('Close')}
+        />
         <Heading level="h2">{item.title}</Heading>
-        <Flex margin="small 0">
+        <Flex margin="small 0" direction="column">
+          <Flex.Item shouldGrow>
+            <Alert variant="warning" margin="small">
+              {I18n.t(
+                'Pressing "Apply Fix" for any issue below will modify the content instantly.',
+              )}
+            </Alert>
+          </Flex.Item>
           <Flex.Item padding="0 small 0 0">
             <Text weight="bold">
               {I18n.t(
@@ -271,7 +286,7 @@ export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> =
       <Modal.Footer>
         <Flex justifyItems="end">
           <Flex.Item margin="0 small 0 0">
-            <Button onClick={onClose}>{I18n.t('Close')}</Button>
+            <Button onClick={() => onClose(shallReload)}>{I18n.t('Close')}</Button>
           </Flex.Item>
           <Flex.Item>
             <Button color="primary" href={item.editUrl}>

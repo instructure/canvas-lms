@@ -41,14 +41,12 @@ export default function BestResults(props: Props) {
             <Heading level="h2">
               {I18n.t('No best matches for "%{searchTerm}"', {searchTerm: props.searchTerm})}
             </Heading>
+            {/* TODO: determine what start over should do here*/}
+            <Text>{I18n.t('Try a similar result below or start over.')}</Text>
           </Flex.Item>
           <Flex.Item>
             <Feedback courseId={props.courseId} searchTerm={props.searchTerm} />
           </Flex.Item>
-        </Flex>
-        <Flex direction="column" gap="small">
-          {/* TODO: determine what start over should do here*/}
-          <Text>{I18n.t('Try a similar result below or start over.')}</Text>
         </Flex>
       </>
     )
@@ -69,7 +67,7 @@ export default function BestResults(props: Props) {
           <Feedback courseId={props.courseId} searchTerm={props.searchTerm} />
         </Flex.Item>
       </Flex>
-      <Flex direction="column" gap="small">
+      <Flex direction="column" gap="medium">
         {props.results.map(result => {
           return (
             <ResultCard

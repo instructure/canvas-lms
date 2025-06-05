@@ -129,8 +129,9 @@ describe "courses/settings" do
       assign(:current_user, admin)
       assign(:publishing_enabled, true)
       render
-      expect(response.body).to match(/<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/)
-      expect(response.body).to match(/<div id="tab-grade-publishing">/)
+      html = Nokogiri::HTML(response.body)
+      expect(html.at_css("#tab-grade-publishing-mount")["id"]).to eq("tab-grade-publishing-mount")
+      expect(html.at_css("div#tab-grade-publishing-mount")).not_to be_nil
     end
 
     it "does not show grade export when disabled" do
@@ -139,8 +140,9 @@ describe "courses/settings" do
       assign(:current_user, admin)
       assign(:publishing_enabled, false)
       render
-      expect(response.body).not_to match(/<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/)
-      expect(response.body).not_to match(/<div id="tab-grade-publishing">/)
+      html = Nokogiri::HTML(response.body)
+      expect(html.at_css("#tab-grade-publishing")).to be_nil
+      expect(html.at_css("#tab-grade-publishing-mount")).to be_nil
     end
   end
 

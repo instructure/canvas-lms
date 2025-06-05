@@ -2421,17 +2421,78 @@ class CoursesController < ApplicationController
           js_bundle :wiki_page_show
           css_bundle :wiki_page, :tinymce
         when "modules"
-          @progress = Progress.find_by(
-            context: @context,
-            tag: "context_module_batch_update",
-            workflow_state: ["queued", "running"]
-          )
+          if (@context.grants_right?(@current_user, session, :read_as_admin) && @context.root_account.feature_enabled?(:modules_page_rewrite)) || (@is_student && @context.feature_enabled?(:modules_page_rewrite_student_view))
+            # Load new modules page assets
+            context_modules_header_props = {
+              title: t("Modules"),
+              viewProgress: {
+                label: t("links.student_progress", "View Progress"),
+                url: progressions_course_context_modules_path(@context),
+                visible: @can_view_grades,
+              },
+              publishMenu: {
+                courseId: @context.id,
+                runningProgressId: @progress&.id,
+                disabled: @modules.empty?,
+                visible: @context.grants_right?(@current_user, session, :manage_course_content_edit),
+              },
+              expandCollapseAll: {
+                label: t("Collapse All"),
+                dataUrl: context_url(@context, :context_url) + "/collapse_all_modules",
+                dataExpand: false,
+                ariaExpanded: false,
+                ariaLabel: t("Collapse All Modules"),
+              },
+              addModule: {
+                label: t("Add Module"),
+                visible: @can_add,
+              },
+              moreMenu: {
+                label: t("Modules Settings"),
+                menuTools: {
+                  items: external_tools_menu_items_raw_with_modules(@menu_tools, %i[module_index_menu module_index_menu_modal]),
+                  visible: @allow_menu_tools,
+                },
+                exportCourseContent: {
+                  label: t("Export Course Content"),
+                  url: context_url(@context, :context_start_offline_web_export_url),
+                  visible: @allow_web_export_download,
+                },
+              },
+              lastExport: {
+                label: t("#context_modules.last_export", "Last Export: "),
+                url: context_url(@context, :context_offline_web_exports_url),
+                date: @last_web_export.nil? ? nil : datetime_string(force_zone(@last_web_export.created_at)),
+                visible: !@last_web_export.nil?
+              },
+            }
+            js_env(CONTEXT_MODULES_HEADER_PROPS: context_modules_header_props)
 
-          js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
-          js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
+            modules_permissions = {
+              canAdd: @can_add,
+              canEdit: @can_edit,
+              canDelete: @can_delete,
+              canViewUnpublished: @can_view_unpublished,
+              canDirectShare: can_do(@context, @current_user, :direct_share),
+              readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin)
+            }
 
-          js_bundle :context_modules
-          css_bundle :content_next, :context_modules2
+            js_env(MODULES_PERMISSIONS: modules_permissions)
+
+            js_bundle :context_modules_v2
+          else
+            @progress = Progress.find_by(
+              context: @context,
+              tag: "context_module_batch_update",
+              workflow_state: ["queued", "running"]
+            )
+
+            js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
+            js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
+
+            js_bundle :context_modules
+            css_bundle :content_next, :context_modules2
+          end
         when "assignments"
           js_bundle :assignment_index
           css_bundle :new_assignments

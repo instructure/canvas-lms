@@ -72,7 +72,10 @@ describe Lti::Messages::AssetProcessorSettingsRequest do
   end
 
   it "includes custom params claim" do
-    expect(subject["#{IMS_CLAIM_PREFIX}/custom"]).to eq({})
+    expect(subject["#{IMS_CLAIM_PREFIX}/custom"]).to eq({
+                                                          "customkey" => "customvar",
+                                                          "raid" => asset_processor.root_account_id.to_s
+                                                        })
   end
 
   context "when asset_processor is null" do

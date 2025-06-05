@@ -178,7 +178,7 @@ describe('GroupCategoryCloneModal', () => {
         .setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
         .click(queryByText('Submit'))
 
-      const errorMessage = `${CATEGORY_NAME_MAX_LENGTH} character limit exceeded`
+      const errorMessage = `Must be fewer than ${CATEGORY_NAME_MAX_LENGTH} characters`
       expect(queryByText(errorMessage)).toBeInTheDocument()
     })
   })

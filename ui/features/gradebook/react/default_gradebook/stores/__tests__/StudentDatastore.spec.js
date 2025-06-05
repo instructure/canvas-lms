@@ -35,7 +35,7 @@ describe('StudentDatastore', () => {
       const studentIds = ['1101', '1102', '1103']
       studentDatastore.setStudentIds(studentIds)
       const storedStudentIds = studentDatastore.listStudentIds()
-      expect(storedStudentIds.length).toBe(3)
+      expect(storedStudentIds).toHaveLength(3)
       expect(storedStudentIds).toEqual(studentIds)
     })
   })
@@ -46,7 +46,7 @@ describe('StudentDatastore', () => {
       studentDatastore.addUserStudents(students)
       studentDatastore.setStudentIds(['1102'])
       const storedStudents = studentDatastore.listStudents()
-      expect(storedStudents.length).toBe(1)
+      expect(storedStudents).toHaveLength(1)
       expect(storedStudents[0].id).toBe('1102')
     })
 
@@ -55,7 +55,7 @@ describe('StudentDatastore', () => {
       studentDatastore.addTestStudents(students)
       studentDatastore.setStudentIds(['1102'])
       const storedStudents = studentDatastore.listStudents()
-      expect(storedStudents.length).toBe(1)
+      expect(storedStudents).toHaveLength(1)
       expect(storedStudents[0].id).toBe('1102')
     })
   })
@@ -66,7 +66,7 @@ describe('StudentDatastore', () => {
       studentDatastore.addUserStudents(students)
       studentDatastore.setStudentIds(['1101', '1102', '1103'])
       const storedStudents = studentDatastore.listStudents()
-      expect(storedStudents.length).toBe(3)
+      expect(storedStudents).toHaveLength(3)
       expect(storedStudents).toEqual(_.sortBy(students, 'id'))
     })
 
@@ -76,7 +76,7 @@ describe('StudentDatastore', () => {
       studentDatastore.addTestStudents(students.slice(2, 3))
       studentDatastore.setStudentIds(['1101', '1102', '1103'])
       const storedStudents = studentDatastore.listStudents()
-      expect(storedStudents.length).toBe(3)
+      expect(storedStudents).toHaveLength(3)
       expect(storedStudents).toEqual(_.sortBy(students, 'id'))
     })
 
@@ -85,7 +85,7 @@ describe('StudentDatastore', () => {
       const students = [{id: '1103'}, {id: '1101'}, {id: '1102'}]
       Object.assign(userStudentMap, _.keyBy(students, 'id'))
       const storedStudents = studentDatastore.listStudents()
-      expect(storedStudents.length).toBe(3)
+      expect(storedStudents).toHaveLength(3)
       expect(storedStudents).toEqual(_.sortBy(students, 'id'))
     })
 
@@ -94,7 +94,7 @@ describe('StudentDatastore', () => {
       const students = [{id: '1103'}, {id: '1101'}, {id: '1102'}]
       Object.assign(testStudentMap, _.keyBy(students, 'id'))
       const storedStudents = studentDatastore.listStudents()
-      expect(storedStudents.length).toBe(3)
+      expect(storedStudents).toHaveLength(3)
       expect(storedStudents).toEqual(_.sortBy(students, 'id'))
     })
 

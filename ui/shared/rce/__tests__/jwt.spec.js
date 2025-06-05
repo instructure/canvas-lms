@@ -41,7 +41,7 @@ describe('JWT', () => {
 
     test('sends an ajax request', async () => {
       await refreshFn()
-      expect(server.receivedRequests.length).toBe(1)
+      expect(server.receivedRequests).toHaveLength(1)
     })
 
     test('sends the request to the "refresh JWT" endpoint', async () => {
@@ -64,7 +64,7 @@ describe('JWT', () => {
         })
         .respond([{status: 200, body: {token: newToken}}])
       await refreshFn()
-      expect(server.receivedRequests.length).toBe(1)
+      expect(server.receivedRequests).toHaveLength(1)
     })
 
     test('returns the refreshed token with the resolved promise', async () => {

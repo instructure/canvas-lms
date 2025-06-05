@@ -35,8 +35,11 @@
 - scope: https://purl.imsglobal.org/spec/lti/scope/report
   description: Can create reports using the Asset Report Service
 
-- scope: https://purl.imsglobal.org/spec/lti/scope/eula
+- scope: https://purl.imsglobal.org/spec/lti/scope/eula/user
   description: Can update or remove the tool's EULA accepted flag
+
+- scope: https://purl.imsglobal.org/spec/lti/scope/eula/deployment
+  description: Can update or remove the tool's EULA requirement flag
 
 ### Documented Canvas extensions ###
 - scope: https://canvas.instructure.com/lti/page_content/show

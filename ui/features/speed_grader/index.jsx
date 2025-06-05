@@ -44,7 +44,7 @@ import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import speedGrader from './jquery/speed_grader'
 import SGUploader from './sg_uploader'
 
@@ -144,7 +144,6 @@ ready(() => {
         postMessageAliases,
         context: {
           userId: window.ENV.current_user_id,
-          grading_role: window.ENV.grading_role,
           assignmentId: params.get('assignment_id'),
           studentId: params.get('student_id'),
           hrefs: {
@@ -159,7 +158,7 @@ ready(() => {
           commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled ?? false,
           lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
           ltiIframeAllowances: iframeAllowances(),
-          permissions: { canViewAuditTrail: window.ENV.can_view_audit_trail ?? false },
+          permissions: {canViewAuditTrail: window.ENV.can_view_audit_trail ?? false},
           gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
         },
         features: {

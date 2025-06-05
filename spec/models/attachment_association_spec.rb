@@ -49,47 +49,18 @@ describe AttachmentAssociation do
     end
   end
 
-  describe "#insert_all" do
-    let(:submission) { submission_model({ course: }) }
-
-    let(:attachment_association_params_1) do
-      {
-        context_type: "Course",
-        context_id: course.id,
-        attachment_id: user_attachment.id,
-        user_id: student.id,
-        field_name: "syllabus_body"
-      }
-    end
-
-    let(:attachment_association_params_2) do
-      {
-        context_type: "Course",
-        context_id: course.id,
-        attachment_id: teacher_attachment.id,
-        user_id: student.id,
-        field_name: "syllabus_body"
-      }
-    end
-
-    it "batch inserts all attachment association and makes sure root_account_id is set" do
-      AttachmentAssociation.insert_all([attachment_association_params_1, attachment_association_params_2], course.root_account_id)
-      expect(AttachmentAssociation.pluck(:root_account_id)).to eq [course.root_account_id, course.root_account_id]
-    end
-  end
-
   describe "#update_associations" do
-    def fetch_list_with_field_name(field_name)
-      AttachmentAssociation.where(context: course, field_name:).pluck(:attachment_id)
+    def fetch_list_with_field_name(context_concern)
+      AttachmentAssociation.where(context: course, context_concern:).pluck(:attachment_id)
     end
 
-    def make_association_update(attachment_ids, field_name, user = teacher)
+    def make_association_update(attachment_ids, context_concern, user = teacher)
       AttachmentAssociation.update_associations(
         course,
         attachment_ids,
         user,
         nil,
-        field_name
+        context_concern
       )
     end
 
@@ -126,11 +97,30 @@ describe AttachmentAssociation do
       expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id, course_attachment2.id])
       expect(fetch_list_with_field_name("syllabus_body")).to match_array([course_attachment3.id])
     end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      it "creates associations on the context's shard, not the attachment's" do
+        @shard1.activate do
+          account_model
+          course_model(account: @account)
+          @course.enroll_teacher(teacher)
+          attachment_model(context: @course, filename: "shard1.txt")
+          AttachmentAssociation.update_associations(course, [@attachment.id], teacher, nil, "syllabus_body")
+        end
+
+        aa = AttachmentAssociation.find_by(context: course, context_concern: "syllabus_body")
+        expect(aa.attachment_id).to eql @attachment.global_id
+        expect(aa.context_id).to eql course.local_id
+      end
+    end
   end
 
   describe "#verify_access" do
     before do
       course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      course.root_account.enable_feature!(:file_association_access)
     end
 
     def make_associations

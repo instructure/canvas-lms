@@ -49,4 +49,14 @@ RSpec.describe "ImgAltFilenameRule", type: :feature do
       end
     end
   end
+
+  context "when fixing image alt text using filenames" do
+    it "updates the alt text to a descriptive value" do
+      input_html = '<div><img id="test-element" src="image.jpg" alt="image.jpg"></div>'
+      fixed_html = fix_issue(:img_alt_filename, input_html, './/img[@id="test-element"]', "Descriptive alt text")
+
+      expect(fixed_html).to include('<img id="test-element" src="image.jpg" alt="Descriptive alt text">')
+      expect(fixed_html).not_to include('<img id="test-element" src="image.jpg" alt="image.jpg">')
+    end
+  end
 end

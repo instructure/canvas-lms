@@ -32,6 +32,65 @@ describe Translation do
     allow(described_class).to receive(:translation_client).and_return(translation_client)
   end
 
+  # rubocop:disable Layout/MultilineArrayLineBreaks
+  describe "#languages" do
+    subject { described_class.languages(improvements_feature_enabled) }
+
+    context "when improvements feature is enabled" do
+      let(:improvements_feature_enabled) { true }
+      let(:language_abbrs) do
+        %w[
+          af sq am ar hy az bn bs bg ca zh-TW zh hr cs da fa-AF nl en et
+          fa tl fi fr-CA fr ka de el gu ht ha he hi hu is id
+          ga it ja kn kk ko lv lt mk ms ml mt mr mn no ps pl pt pt-PT pa
+          ro ru sr si sk sl so es es-MX sw sv ta te th tr uk ur uz vi cy
+        ]
+      end
+
+      it "returns the proper list" do
+        expect(subject.pluck(:id)).to match_array(language_abbrs)
+      end
+
+      it "returns the list of languages in name asc" do
+        expect(subject.pluck(:name).sort).to eq(subject.pluck(:name))
+      end
+    end
+
+    context "when improvements feature is disabled" do
+      let(:improvements_feature_enabled) { false }
+      let(:language_abbrs) do
+        %w[
+          af sq am ar hy az bn bs bg ca zh hr cs da nl en et
+          fa tl fi fr ka de el gu ht ha he hi hu is id
+          ga it ja kn kk ko lv lt mk ms ml mr mn no ps pl pt pa
+          ro ru sr si sk sl so es sw sv ta th tr uk ur uz vi cy
+          ast ba be br ceb ff fy gd gl ig ilo jv km lb lg ln lo
+          mg my ne ns oc or sd ss su tn wo xh yi yo zu
+        ]
+      end
+
+      it "returns the proper list" do
+        expect(subject.pluck(:id)).to match_array(language_abbrs)
+      end
+
+      it "returns the list of languages in name asc" do
+        expect(subject.pluck(:name).sort).to eq(subject.pluck(:name))
+      end
+    end
+
+    context "when language characters using unicode chars" do
+      let(:improvements_feature_enabled) { true }
+
+      it "returns the proper list sorted by unicode characters" do
+        I18n.with_locale(:hu) do
+          result_names = subject.pluck(:name)
+          expect(result_names.find_index("Örmény") < result_names.find_index("Román")).to be true
+        end
+      end
+    end
+  end
+  # rubocop:enable Layout/MultilineArrayLineBreaks
+
   describe "available?" do
     let(:context) { double("Context", feature_enabled?: true) }
 

@@ -349,6 +349,12 @@ describe('ActionMenuButton', () => {
   })
 
   describe('Delete behavior', () => {
+    beforeEach(() => {
+      // Mock successful delete responses for both files and folders
+      fetchMock.delete(/.*\/files\/\d+\?force=true/, 200, {overwriteRoutes: true})
+      fetchMock.delete(/.*\/folders\/\d+\?force=true/, 200, {overwriteRoutes: true})
+    })
+
     it('opens delete modal when delete button is clicked', async () => {
       const user = userEvent.setup()
       renderComponent()

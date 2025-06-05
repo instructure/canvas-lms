@@ -26,6 +26,8 @@ import UploadProgress, {Uploader} from './UploadProgress'
 import FileRenameForm from '../FilesHeader/UploadButton/FileRenameForm'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import {type ResolvedName} from '../FilesHeader/UploadButton/FileOptions'
+import {queueOptionsCollectionUploads} from '../shared/FileUploadDrop'
+import {useFileManagement} from '../../contexts/FileManagementContext'
 
 const hasInProgressUploads = (uploaders: Uploader[], conflicted: Uploader[]) => {
   // we can't just use UploadQueue.pendingUploads() because errored uploads are counted
@@ -37,6 +39,7 @@ const hasInProgressUploads = (uploaders: Uploader[], conflicted: Uploader[]) => 
 const CurrentUploads = () => {
   const [currentUploads, setCurrentUploads] = useState<Uploader[]>([])
   const [conflictedUploads, setConflictedUploads] = useState<Uploader[]>([])
+  const {contextId, contextType} = useFileManagement()
   const previouslyHadInProgressUploads = usePrevious(
     hasInProgressUploads(currentUploads, conflictedUploads),
   )
@@ -61,8 +64,12 @@ const CurrentUploads = () => {
     FileOptionsCollection.setState({
       newOptions: true,
     })
-    FileOptionsCollection.onChange()
-    conflictedUploads[0].cancel?.()
+    queueOptionsCollectionUploads(
+      contextId,
+      contextType,
+      FileOptionsCollection.getState(),
+      conflictedUploads[0].cancel,
+    )
   }
 
   useEffect(() => {

@@ -27,8 +27,19 @@ import {MockedProvider} from '@apollo/client/testing'
 import React, {createRef} from 'react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/upload-file')
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+  replaceLocation: jest.fn(),
+  reloadWindow: jest.fn(),
+  openWindow: jest.fn(),
+  forceReload: jest.fn(),
+  windowAlert: jest.fn(),
+  windowConfirm: jest.fn(() => true),
+  windowPathname: jest.fn(() => '/'),
+}))
 
 const defaultMocks = (result = {data: {}}) => [
   {
@@ -56,6 +67,18 @@ describe('ContentTabs', () => {
         return this
       })
     }
+  })
+
+  beforeEach(() => {
+    fakeENV.setup({
+      context_asset_string: 'course_1',
+      current_user: {id: '1', display_name: 'Test User'},
+      enrollment_state: 'active',
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
   const renderAttemptTab = async props => {

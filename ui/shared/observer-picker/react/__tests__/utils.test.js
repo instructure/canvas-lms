@@ -24,7 +24,7 @@ describe('parseObservedUsersList', () => {
       {id: '4', name: 'Student 4', avatar_url: 'https://url_here'},
       {id: '6', name: 'Student 6'},
     ])
-    expect(users.length).toBe(2)
+    expect(users).toHaveLength(2)
     expect(users[0].id).toBe('4')
     expect(users[0].name).toBe('Student 4')
     expect(users[0].avatarUrl).toBe('https://url_here')
@@ -34,6 +34,6 @@ describe('parseObservedUsersList', () => {
 
   it('returns empty list if no observers passed', () => {
     const users = parseObservedUsersList([])
-    expect(users.length).toBe(0)
+    expect(users).toHaveLength(0)
   })
 })

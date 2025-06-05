@@ -18,10 +18,7 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {shallow} from 'enzyme'
 import {render, screen} from '@testing-library/react'
-import {Spinner} from '@instructure/ui-spinner'
-import {Table} from '@instructure/ui-table'
 import {SearchResultsComponent} from '../SearchResults'
 
 function defaultHistoryItems() {
@@ -92,25 +89,24 @@ interface SearchResultsComponentProps {
   requestingResults?: boolean
 }
 
-function mountComponent(customProps: Partial<SearchResultsComponentProps> = {}) {
-  return shallow(<SearchResultsComponent {...defaultProps()} {...customProps} />)
+function renderComponent(customProps: Partial<SearchResultsComponentProps> = {}) {
+  return render(<SearchResultsComponent {...defaultProps()} {...customProps} />)
 }
 
 describe('SearchResults', () => {
   test('does not show a Table/Spinner if no historyItems passed', () => {
-    const wrapper = mountComponent({historyItems: []})
-    expect(wrapper.find(Table).exists()).toBeFalsy()
+    renderComponent({historyItems: []})
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 
   test('shows a Table if there are historyItems passed', function () {
-    const wrapper = mountComponent(defaultProps())
-    expect(wrapper.find(Table).exists()).toBeTruthy()
+    renderComponent(defaultProps())
+    expect(screen.getByRole('table')).toBeInTheDocument()
   })
 
-  test('Table is passed the label and caption props', function () {
-    const wrapper = mountComponent(defaultProps())
-    const table = wrapper.find(Table)
-    expect(table.props().caption).toEqual('search results caption')
+  test('Table has the correct caption', function () {
+    renderComponent(defaultProps())
+    expect(screen.getByRole('table', {name: 'search results caption'})).toBeInTheDocument()
   })
 
   test('Table has column headers in correct order', () => {
@@ -139,14 +135,14 @@ describe('SearchResults', () => {
   })
 
   test('does not show a Spinner if requestingResults false', function () {
-    const wrapper = mountComponent(defaultProps())
-    expect(wrapper.find(Spinner).exists()).toBeFalsy()
+    renderComponent(defaultProps())
+    expect(screen.queryByRole('img', {name: /loading/i})).not.toBeInTheDocument()
   })
 
   test('shows a Spinner if requestingResults true', () => {
     $.screenReaderFlashMessage = jest.fn()
-    const wrapper = mountComponent({requestingResults: true})
-    expect(wrapper.find(Spinner).exists()).toBeTruthy()
+    renderComponent({requestingResults: true})
+    expect(screen.getByRole('img', {name: /loading/i})).toBeInTheDocument()
   })
 
   test('Table shows text if request was made but no results were found', () => {

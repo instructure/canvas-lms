@@ -18,22 +18,34 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import SubTableContent from '../SubTableContent'
+import SubTableContent, {SubTableContentProps} from '../SubTableContent'
+import {FileManagementProvider} from '../../../contexts/FileManagementContext'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 
 describe('SubTableContent', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
+  const renderComponent = (props: SubTableContentProps) => {
+    return render(
+      <FileManagementProvider value={createMockFileManagementContext()}>
+        <SubTableContent {...props} />
+      </FileManagementProvider>,
+    )
+  }
+
   it('renders loading spinner when isLoading is true', () => {
-    const {getByText} = render(<SubTableContent isLoading={true} isEmpty={false} searchString="" />)
+    const {getByText} = renderComponent({isLoading: true, isEmpty: false, searchString: ''})
     expect(getByText('Loading data')).toBeInTheDocument()
   })
 
   it('renders NoResultsFound when isEmpty is true and searchString is provided', () => {
-    const {getAllByText} = render(
-      <SubTableContent isLoading={false} isEmpty={true} searchString="test query" />,
-    )
+    const {getAllByText} = renderComponent({
+      isLoading: false,
+      isEmpty: true,
+      searchString: 'test query',
+    })
 
     const noResultsElements = getAllByText('No results found')
     expect(noResultsElements.length).toBeGreaterThan(0)
@@ -41,14 +53,34 @@ describe('SubTableContent', () => {
   })
 
   it('renders nothing when not loading and not empty', () => {
-    const {container} = render(
-      <SubTableContent isLoading={false} isEmpty={false} searchString="" />,
-    )
+    const {container} = renderComponent({isLoading: false, isEmpty: false, searchString: ''})
     expect(container.firstChild).toBeNull()
   })
 
   it('renders nothing when isEmpty is true but searchString is empty', () => {
-    const {container} = render(<SubTableContent isLoading={false} isEmpty={true} searchString="" />)
+    const {container} = renderComponent({isLoading: false, isEmpty: true, searchString: ''})
+    expect(container.firstChild).toBeNull()
+  })
+
+  it('renders FileUploadDrop when isEmpty is true and showDrop is true', () => {
+    const {getByText} = renderComponent({
+      isLoading: false,
+      isEmpty: true,
+      searchString: '',
+      showDrop: true,
+    })
+
+    expect(getByText('Drop files here to upload')).toBeInTheDocument()
+  })
+
+  it('does not render FileUploadDrop when isEmpty is true but showDrop is false', () => {
+    const {container} = renderComponent({
+      isLoading: false,
+      isEmpty: true,
+      searchString: '',
+      showDrop: false,
+    })
+
     expect(container.firstChild).toBeNull()
   })
 })

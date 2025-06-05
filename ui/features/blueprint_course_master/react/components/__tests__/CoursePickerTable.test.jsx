@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {shallow} from 'enzyme'
 import CoursePickerTable from '../CoursePickerTable'
 import getSampleData from './getSampleData'
 import userEvent from '@testing-library/user-event'
@@ -31,23 +30,23 @@ describe('CoursePickerTable component', () => {
   })
 
   test('renders the CoursePickerTable component', () => {
-    const tree = shallow(<CoursePickerTable {...defaultProps()} />)
-    const node = tree.find('.bca-table__wrapper')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<CoursePickerTable {...defaultProps()} />)
+    const node = container.querySelector('.bca-table__wrapper')
+    expect(node).toBeTruthy()
   })
 
   test('show no results if no courses passed in', () => {
     const props = defaultProps()
     props.courses = []
-    const tree = shallow(<CoursePickerTable {...props} />)
-    const node = tree.find('[data-testid="bca-table__no-results"]')
-    expect(node.exists()).toBeTruthy()
+    const {getByTestId} = render(<CoursePickerTable {...props} />)
+    const node = getByTestId('bca-table__no-results')
+    expect(node).toBeTruthy()
   })
 
   test('displays correct table data', () => {
     const props = defaultProps()
-    const tree = render(<CoursePickerTable {...props} />)
-    const rows = tree.container.querySelectorAll('tr[data-testid="bca-table__course-row"]')
+    const {container} = render(<CoursePickerTable {...props} />)
+    const rows = container.querySelectorAll('tr[data-testid="bca-table__course-row"]')
 
     expect(rows).toHaveLength(props.courses.length)
     expect(rows[0].querySelectorAll('td')[0].textContent).toEqual(
@@ -61,8 +60,8 @@ describe('CoursePickerTable component', () => {
   test('calls onSelectedChanged when courses are selected', async () => {
     const props = defaultProps()
     props.onSelectedChanged = jest.fn()
-    const tree = render(<CoursePickerTable {...props} />)
-    const checkbox = tree.container.querySelectorAll(
+    const {container} = render(<CoursePickerTable {...props} />)
+    const checkbox = container.querySelectorAll(
       '[data-testid="bca-table__course-row"] input[type="checkbox"]',
     )[0]
     await userEvent.click(checkbox)
@@ -75,8 +74,8 @@ describe('CoursePickerTable component', () => {
     const props = defaultProps()
     props.selectedCourses = ['1']
     props.onSelectedChanged = jest.fn()
-    const tree = render(<CoursePickerTable {...props} />)
-    const checkbox = tree.container.querySelectorAll(
+    const {container} = render(<CoursePickerTable {...props} />)
+    const checkbox = container.querySelectorAll(
       '[data-testid="bca-table__course-row"] input[type="checkbox"]',
     )[0]
     await userEvent.click(checkbox)
@@ -88,9 +87,9 @@ describe('CoursePickerTable component', () => {
   test('calls onSelectedChanged with correct data when "Select All" is selected', async () => {
     const props = defaultProps()
     props.onSelectedChanged = jest.fn()
-    const tree = render(<CoursePickerTable {...props} />)
+    const {container} = render(<CoursePickerTable {...props} />)
 
-    const checkbox = tree.container.querySelectorAll(
+    const checkbox = container.querySelectorAll(
       '.btps-table__header-wrapper input[type="checkbox"]',
     )[0]
     await userEvent.click(checkbox)
@@ -102,10 +101,10 @@ describe('CoursePickerTable component', () => {
   test('handleFocusLoss focuses the next item', () => {
     const props = defaultProps()
     const ref = React.createRef()
-    const tree = render(<CoursePickerTable {...props} ref={ref} />)
+    const {container} = render(<CoursePickerTable {...props} ref={ref} />)
     const instance = ref.current
 
-    const check = tree.container.querySelectorAll(
+    const check = container.querySelectorAll(
       '[data-testid="bca-table__course-row"] input[type="checkbox"]',
     )[0]
     check.focus = jest.fn()
@@ -117,10 +116,10 @@ describe('CoursePickerTable component', () => {
   test('handleFocusLoss focuses the previous item if called on the last item', () => {
     const props = defaultProps()
     const ref = React.createRef()
-    const tree = render(<CoursePickerTable {...props} ref={ref} />)
+    const {container} = render(<CoursePickerTable {...props} ref={ref} />)
     const instance = ref.current
 
-    const check = tree.container.querySelectorAll(
+    const check = container.querySelectorAll(
       '[data-testid="bca-table__course-row"] input[type="checkbox"]',
     )[1]
     check.focus = jest.fn()
@@ -133,12 +132,10 @@ describe('CoursePickerTable component', () => {
     const props = defaultProps()
     props.courses = []
     const ref = React.createRef()
-    const tree = render(<CoursePickerTable {...props} ref={ref} />)
+    const {container} = render(<CoursePickerTable {...props} ref={ref} />)
     const instance = ref.current
 
-    const check = tree.container.querySelectorAll(
-      '.bca-table__select-all input[type="checkbox"]',
-    )[0]
+    const check = container.querySelectorAll('.bca-table__select-all input[type="checkbox"]')[0]
     check.focus = jest.fn()
 
     instance.handleFocusLoss(1)

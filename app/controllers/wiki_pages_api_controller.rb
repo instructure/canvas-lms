@@ -609,15 +609,15 @@ class WikiPagesApiController < ApplicationController
   def check_title_availability
     return render status: :not_found, json: { errors: [message: "The specified resource does not exist."] } unless Account.site_admin.feature_enabled?(:permanent_page_links)
 
-    return render_json_unauthorized unless @context.wiki.grants_right?(@current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
+    if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
+      title = params.require(:title)
+      query = @context.wiki.wiki_pages.not_deleted.where(title:)
 
-    title = params.require(:title)
-    query = @context.wiki.wiki_pages.not_deleted.where(title:)
+      current_id = params[:current_page_id].presence
+      query = query.where.not(id: current_id) if current_id
 
-    current_id = params[:current_page_id].presence
-    query = query.where.not(id: current_id) if current_id
-
-    render json: { conflict: query.exists? }
+      render json: { conflict: query.exists? }
+    end
   end
 
   protected

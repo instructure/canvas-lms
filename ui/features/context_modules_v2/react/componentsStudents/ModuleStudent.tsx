@@ -22,12 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import ModuleHeaderStudent from './ModuleHeaderStudent'
 import ModuleItemListStudent from './ModuleItemListStudent'
 import {useModuleItemsStudent} from '../hooks/queriesStudent/useModuleItemsStudent'
-import {
-  CompletionRequirement,
-  ModuleItem,
-  ModuleProgression,
-  ModuleStatistics,
-} from '../utils/types'
+import {CompletionRequirement, ModuleProgression, ModuleStatistics} from '../utils/types'
 
 export interface ModuleStudentProps {
   id: string
@@ -54,7 +49,6 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
   const {data, isLoading, error} = useModuleItemsStudent(id, !!isExpanded)
-  const [moduleItems, setModuleItems] = useState<ModuleItem[]>([])
 
   const toggleExpanded = (moduleId: string) => {
     const newExpandedState = !isExpanded
@@ -63,24 +57,6 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
       onToggleExpand(moduleId)
     }
   }
-
-  useEffect(() => {
-    if (isExpanded && data?.moduleItems && data.moduleItems.length > 0) {
-      const transformedItems = data.moduleItems.map((item: ModuleItem, index: number) => ({
-        ...item,
-        moduleId: id,
-        index,
-        content: item.content
-          ? {
-              ...item.content,
-              id: item.content.id || item._id,
-              type: item?.content?.type,
-            }
-          : null,
-      }))
-      setModuleItems(transformedItems)
-    }
-  }, [data, id, isExpanded])
 
   useEffect(() => {
     if (propExpanded !== undefined) {
@@ -93,10 +69,8 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
       as="div"
       margin="0 0 large 0"
       padding="0"
-      background="primary"
-      borderWidth="small"
+      background="secondary"
       borderRadius="medium"
-      borderColor="primary"
       shadow="resting"
       overflowX="hidden"
       data-module-id={id}
@@ -119,7 +93,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
         {isExpanded && (
           <Flex.Item>
             <ModuleItemListStudent
-              moduleItems={moduleItems}
+              moduleItems={data?.moduleItems || []}
               requireSequentialProgress={requireSequentialProgress}
               completionRequirements={completionRequirements}
               progression={progression}

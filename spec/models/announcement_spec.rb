@@ -213,6 +213,26 @@ describe Announcement do
       expect(@a.messages_sent["Announcement Created By You"].map(&:user)).to include(@teacher)
     end
 
+    it "does send a notification to the creator of the announcement after update" do
+      course_with_student(active_all: true)
+      Notification.create(name: "Announcement Created By You", category: "TestImmediately")
+
+      communication_channel(@teacher, { username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true })
+
+      @context = @course
+      announcement_model(user: @teacher, notify_users: true)
+      expect(@a.messages_sent["Announcement Created By You"].map(&:user)).to include(@teacher)
+
+      message = "Updated message"
+      @a.update(message:)
+
+      sent_messages = @a.messages_sent["Announcement Created By You"].select { |m| m.id.present? }
+
+      expect(sent_messages.size).to eq(2)
+      expect(sent_messages.map(&:user)).to include(@teacher)
+      expect(sent_messages[1].body).to include(message)
+    end
+
     it "does not broadcast if read_announcements is diabled" do
       Account.default.role_overrides.create!(role: student_role, permission: "read_announcements", enabled: false)
       course_with_student(active_all: true)

@@ -16,29 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from 'sinon'
 import UnassignedGroupUserCollection from '../UnassignedGroupUserCollection'
 
-let collection, sandbox
+let collection
 
 describe('UnassignedGroupUserCollection', () => {
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     collection = new UnassignedGroupUserCollection()
   })
 
   test('aborts active requests before fetching new ones', () => {
-    const fakeRequest1 = {abort: sandbox.spy()}
-    const fakeRequest2 = {abort: sandbox.spy()}
+    const fakeRequest1 = {abort: jest.fn()}
+    const fakeRequest2 = {abort: jest.fn()}
     collection = new UnassignedGroupUserCollection()
     collection.lastRequests = [fakeRequest1, fakeRequest2]
 
-    const fetchStub = sandbox.stub(collection, 'fetch').returns(Promise.resolve())
+    const fetchSpy = jest.spyOn(collection, 'fetch').mockResolvedValue()
 
     collection.search('abcde')
-    expect(fakeRequest1.abort.calledOnce).toBe(true)
-    expect(fakeRequest2.abort.calledOnce).toBe(true)
+    expect(fakeRequest1.abort).toHaveBeenCalledTimes(1)
+    expect(fakeRequest2.abort).toHaveBeenCalledTimes(1)
 
-    expect(fetchStub.calledOnce).toBe(true)
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
   })
 })

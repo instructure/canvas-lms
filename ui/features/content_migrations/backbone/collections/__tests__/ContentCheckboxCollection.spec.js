@@ -44,7 +44,7 @@ describe('ContentCheckboxCollectionSpec', () => {
 
   test("contains ContentCheckboxModel's", () => {
     const {model} = createCheckboxCollection()
-    // eslint-disable-next-line new-cap
+
     const modelInstance = new model()
     expect(modelInstance).toBeInstanceOf(CheckboxModel)
   })

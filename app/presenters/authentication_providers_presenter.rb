@@ -50,7 +50,11 @@ class AuthenticationProvidersPresenter
     options = { controller: "login/#{aac.auth_type}", action: :new }
     if !aac.is_a?(AuthenticationProvider::LDAP) &&
        configs.many? { |other| other.auth_type == aac.auth_type }
-      options[:id] = aac
+      if aac.is_a?(AuthenticationProvider::OpenIDConnect) && aac.issuer.present?
+        options[:iss] = aac.issuer
+      else
+        options[:id] = aac
+      end
     end
     options
   end

@@ -122,6 +122,20 @@ module Types
       end
     end
 
+    field :lti_asset_reports_connection,
+          LtiAssetReportType.connection_type,
+          "Lti Asset Reports with active processors, with assets preloaded",
+          null: true
+    def lti_asset_reports_connection
+      load_association(:root_account).then do |root_account|
+        if root_account.feature_enabled?(:lti_asset_processor) && object.assignment.context.grants_right?(current_user, :manage_grades)
+          # We may need to adjust this in the future to allow students
+          # to see their own reports
+          Loaders::SubmissionLtiAssetReportsLoader.load(submission.id)
+        end
+      end
+    end
+
     field :sub_assignment_tag, String, null: true
     def sub_assignment_tag
       return object.assignment.sub_assignment_tag if object.assignment.is_a?(SubAssignment)

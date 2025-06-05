@@ -19,7 +19,7 @@
 import {useMemo} from 'react'
 import {useAllPages} from '@canvas/query'
 import {Student} from '../MessageStudentsWhoDialog'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {
   OBSERVER_ENROLLMENTS_QUERY,
   ObserverEnrollmentQueryResult,

@@ -21,6 +21,9 @@ import {render, screen, waitFor} from '@testing-library/react'
 import MigrationRow from '../migration_row'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Table} from '@instructure/ui-table'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('content_migrations_redesign')
 
 jest.mock('../utils', () => ({
   timeout: (_delay: number) => {
@@ -80,7 +83,7 @@ const updateMigrationItem = jest.fn()
 const renderComponent = (overrideProps?: any) => {
   const layout = overrideProps?.layout || 'auto'
   render(
-    <Table layout={layout}>
+    <Table caption={I18n.t('Content migrations')} layout={layout}>
       <Table.Body>
         <MigrationRow
           migration={migration}
@@ -88,7 +91,7 @@ const renderComponent = (overrideProps?: any) => {
           {...overrideProps}
         />
       </Table.Body>
-    </Table>
+    </Table>,
   )
 }
 

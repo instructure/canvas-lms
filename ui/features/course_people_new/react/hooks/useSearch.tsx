@@ -30,12 +30,12 @@ const useSearch = (debounceTime: number = 500): UseSearchResult => {
   const [search, setSearch] = useState<string>('')
   const [debouncedSearch, setDebouncedSearch] = useState<string>('')
 
-  const [debouncedCallback] = useDebouncedCallback((value: string) => {
+  const debouncedCallback = useDebouncedCallback((value: string) => {
     setDebouncedSearch(value)
   }, debounceTime)
 
   const onChangeHandler = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-      setSearch(event?.target?.value || '')
+    setSearch(event?.target?.value || '')
   }, [])
 
   const onClearHandler = useCallback(() => {

@@ -17,16 +17,12 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import createStore from '@canvas/backbone/createStore'
 import CourseHomeDialog from '../Dialog'
-import sinon from 'sinon'
+import axios from '@canvas/axios'
 
-const ok = x => expect(x).toBeTruthy()
-const equal = (x, y) => expect(x).toEqual(y)
-
-const xhrs = []
-let fakeXhr
+jest.mock('@canvas/axios')
 
 const store = createStore({
   selectedDefaultView: 'modules',
@@ -44,74 +40,69 @@ const getDefaultProps = () => ({
 
 describe('CourseHomeDialog', () => {
   beforeEach(() => {
-    fakeXhr = sinon.useFakeXMLHttpRequest()
-    fakeXhr.onCreate = xhr => xhrs.push(xhr)
-  })
-
-  afterEach(() => {
-    fakeXhr.restore()
+    jest.clearAllMocks()
+    store.setState({
+      selectedDefaultView: 'modules',
+      savedDefaultView: 'modules',
+    })
   })
 
   test('Renders', () => {
-    const dialog = shallow(<CourseHomeDialog {...getDefaultProps()} />)
-    ok(dialog.exists())
+    const {getByText} = render(<CourseHomeDialog {...getDefaultProps()} />)
+    expect(getByText('Choose Course Home Page')).toBeInTheDocument()
   })
 
   test('enables wiki selection if front page is provided', () => {
-    const isWikiDisabled = wrapper => wrapper.find({value: 'wiki'}).props().disabled
+    const {rerender, getByLabelText} = render(<CourseHomeDialog {...getDefaultProps()} />)
+    const wikiRadio = getByLabelText(/Pages Front Page/)
+    expect(wikiRadio).toBeDisabled()
 
-    const noWiki = shallow(<CourseHomeDialog {...getDefaultProps()} />)
-    ok(isWikiDisabled(noWiki), 'wiki radio should be disabled')
-
-    const hasWiki = shallow(
-      <CourseHomeDialog {...getDefaultProps()} wikiFrontPageTitle="Welcome" />,
-    )
-    ok(!isWikiDisabled(hasWiki), 'wiki radio should be enabled')
+    rerender(<CourseHomeDialog {...getDefaultProps()} wikiFrontPageTitle="Welcome" />)
+    expect(getByLabelText(/Pages Front Page/)).not.toBeDisabled()
   })
 
-  const submitButton = wrapper => wrapper.find('Button').last()
+  test('Saves the preference on submit', async () => {
+    const onSubmit = jest.fn()
+    axios.put.mockResolvedValue({data: {default_view: 'assignments'}})
 
-  test('Saves the preference on submit', done => {
-    const onSubmit = sinon.spy()
+    const {getByRole, getByLabelText} = render(
+      <CourseHomeDialog {...getDefaultProps()} onSubmit={onSubmit} />,
+    )
 
-    const dialog = shallow(<CourseHomeDialog {...getDefaultProps()} onSubmit={onSubmit} />)
+    const assignmentsRadio = getByLabelText('Assignments List')
+    fireEvent.click(assignmentsRadio)
 
-    store.setState({selectedDefaultView: 'assignments'})
-    submitButton(dialog).simulate('click')
+    const saveButton = getByRole('button', {name: 'Save'})
+    fireEvent.click(saveButton)
 
-    setTimeout(() => {
-      equal(xhrs.length, 1)
-      xhrs[0].respond(
-        200,
-        { 'Content-Type': 'application/json' },
-        JSON.stringify({ default_view: 'assignments' })
-      )
-
-      setTimeout(() => {
-        ok(onSubmit.called, 'onSubmit should be called after saving')
-        done()
-      }, 50)
-    }, 0)
+    await waitFor(() => {
+      expect(axios.put).toHaveBeenCalledWith('/api/v1/courses/1', {
+        course: {default_view: 'assignments'},
+      })
+      expect(onSubmit).toHaveBeenCalled()
+    })
   })
 
   test('calls onRequestClose when cancel is clicked', () => {
-    const onRequestClose = sinon.spy()
-    const dialog = shallow(
+    const onRequestClose = jest.fn()
+    const {getByText} = render(
       <CourseHomeDialog {...getDefaultProps()} onRequestClose={onRequestClose} />,
     )
-    const cancelBtn = dialog.find('Button').at(0)
-    equal(cancelBtn.props().children, 'Cancel')
-    cancelBtn.simulate('click')
-    ok(onRequestClose.called)
+    const cancelBtn = getByText('Cancel')
+    fireEvent.click(cancelBtn)
+    expect(onRequestClose).toHaveBeenCalled()
   })
 
   test('save button disabled when publishing if modules selected', () => {
-    store.setState({selectedDefaultView: 'modules'})
-    let dialog = shallow(<CourseHomeDialog {...getDefaultProps()} isPublishing={true} />)
-    ok(submitButton(dialog).props().disabled, 'submit disabled when modules selected')
+    const {rerender, getByRole, getByLabelText} = render(
+      <CourseHomeDialog {...getDefaultProps()} isPublishing={true} />,
+    )
+    expect(getByRole('button', {name: 'Choose and Publish'})).toBeDisabled()
 
-    store.setState({selectedDefaultView: 'feed'})
-    dialog = shallow(<CourseHomeDialog {...getDefaultProps()} />)
-    ok(!submitButton(dialog).props().disabled, 'submit enabled when modules not selected')
+    const feedRadio = getByLabelText('Course Activity Stream')
+    fireEvent.click(feedRadio)
+
+    rerender(<CourseHomeDialog {...getDefaultProps()} isPublishing={true} />)
+    expect(getByRole('button', {name: 'Choose and Publish'})).not.toBeDisabled()
   })
 })

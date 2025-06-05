@@ -169,4 +169,8 @@ module Modules2IndexPage
 
     @course.reload
   end
+
+  def visit_course(course)
+    get "/courses/#{course.id}"
+  end
 end

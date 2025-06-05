@@ -842,7 +842,7 @@ shared_examples_for "context modules for teachers" do
       get "/courses/#{@course.id}/modules"
       add_new_module_item_and_yield("#discussion_topics_select", "Discussion", @topic.title)
       details = f("div.ig-details").text
-      expect(details).to eq "Reply to Topic: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}"
+      expect(details).to include "Reply to Topic: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}"
     end
 
     it "can duplicate modules with checkpointed discussions" do

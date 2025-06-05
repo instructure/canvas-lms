@@ -124,6 +124,6 @@
 .wiki-legend {
   border: 0;
   border-bottom: none;
-  @include fontSize($baseFontSize * 1.25);
+  @include fontSize($baseFontSize * 0.7);
   line-height: $baseLineHeight;
 }

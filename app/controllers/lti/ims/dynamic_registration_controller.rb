@@ -172,10 +172,11 @@ module Lti
         return render status: :unprocessable_entity, json: { errors: } if errors.present?
 
         registration_url = jwt["registration_url"]
+        current_user = User.find(jwt["user_id"])
 
         root_account.shard.activate do
           developer_key = DeveloperKey.new(
-            current_user: User.find(jwt["user_id"]),
+            current_user:,
             name: registration_attrs["client_name"],
             account: root_account.site_admin? ? nil : root_account,
             redirect_uris: registration_attrs["redirect_uris"],
@@ -183,10 +184,11 @@ module Lti
             oidc_initiation_url: registration_attrs["initiate_login_uri"],
             is_lti_key: true,
             scopes: registration_attrs["scopes"],
-            icon_url: registration_attrs["logo_uri"]
+            icon_url: registration_attrs["logo_uri"],
+            skip_lti_sync: true
           )
 
-          registration = Lti::IMS::Registration.new(
+          ims_registration = Lti::IMS::Registration.new(
             developer_key:,
             root_account_id: root_account.id,
             guid: jwt["uuid"],
@@ -195,13 +197,28 @@ module Lti
             **registration_attrs
           )
 
+          registration = Lti::Registration.new(
+            developer_key:,
+            account: root_account,
+            created_by: current_user,
+            updated_by: current_user,
+            admin_nickname: registration_attrs["client_name"],
+            name: registration_attrs["client_name"],
+            vendor: ims_registration.vendor,
+            ims_registration:
+          )
+
           ActiveRecord::Base.transaction do
             developer_key.save!
+            ims_registration.save!
             registration.save!
-            registration.lti_registration.update!(vendor: registration.vendor)
+
+            if root_account.feature_enabled?(:lti_registrations_next)
+              registration.new_external_tool(root_account, current_user:, available: false)
+            end
           end
 
-          render_registration(registration, developer_key) if registration.persisted?
+          render_registration(ims_registration, developer_key) if ims_registration.persisted?
         end
       end
 

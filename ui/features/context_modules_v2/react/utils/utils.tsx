@@ -24,8 +24,10 @@ import {
   IconQuizLine,
   IconLinkLine,
 } from '@instructure/ui-icons'
-import {ModuleItemContent} from './types'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {CompletionRequirement, ModuleItemContent, ModuleRequirement} from './types'
 
+const I18n = createI18nScope('context_modules_v2')
 const pixelOffset = 20
 
 export const INDENT_LOOKUP: Record<number, string> = {
@@ -49,7 +51,11 @@ export const getItemIcon = (content: ModuleItemContent, isStudentView = false) =
 
   switch (type) {
     case 'Assignment':
-      return <IconAssignmentLine color={color} data-testid="assignment-icon" />
+      return content.isNewQuiz ? (
+        <IconQuizLine color={color} data-testid="new-quiz-icon" />
+      ) : (
+        <IconAssignmentLine color={color} data-testid="assignment-icon" />
+      )
     case 'Quiz':
       return <IconQuizLine color={color} data-testid="quiz-icon" />
     case 'Discussion':
@@ -63,6 +69,28 @@ export const getItemIcon = (content: ModuleItemContent, isStudentView = false) =
       return <IconDocumentLine color={color} data-testid="page-icon" />
     default:
       return <IconDocumentLine color="primary" data-testid="document-icon" />
+  }
+}
+
+export const getItemTypeText = (content: ModuleItemContent) => {
+  if (!content?.type) return I18n.t('Unknown')
+
+  switch (content.type) {
+    case 'Assignment':
+      return content.isNewQuiz ? I18n.t('New Quiz') : I18n.t('Assignment')
+    case 'Quiz':
+      return I18n.t('Quiz')
+    case 'Discussion':
+      return I18n.t('Discussion')
+    case 'File':
+    case 'Attachment':
+      return I18n.t('File')
+    case 'ExternalUrl':
+      return I18n.t('External Url')
+    case 'Page':
+      return I18n.t('Page')
+    default:
+      return I18n.t('Unknown')
   }
 }
 
@@ -106,5 +134,24 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
     prevProps.indent === nextProps.indent &&
     prevProps.index === nextProps.index &&
     prevProps.content === nextProps.content
+  )
+}
+
+export const filterRequirementsMet = (
+  requirementsMet: ModuleRequirement[],
+  completionRequirements: CompletionRequirement[],
+) => {
+  return requirementsMet.filter(req =>
+    completionRequirements.some(cr => {
+      const idMatch = String(req.id) === String(cr.id)
+
+      const typeMatch = req?.type === cr?.type
+
+      const scoreMatch = req?.minScore === cr?.minScore
+
+      const percentageMatch = req?.minPercentage === cr?.minPercentage
+
+      return idMatch && typeMatch && scoreMatch && percentageMatch
+    }),
   )
 }

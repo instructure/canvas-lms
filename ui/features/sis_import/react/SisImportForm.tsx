@@ -33,6 +33,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ConfirmationModal} from './ConfirmationModal'
+import {Select} from '@instructure/ui-select'
 
 const I18n = createI18nScope('sis_import')
 
@@ -75,7 +76,7 @@ export default function SisImportForm(props: Props) {
     pageParam = '1',
   }: QueryFunctionContext): Promise<{json: EnrollmentTerms; nextPage: string | null}> => {
     const params = {
-      per_page: 50,
+      per_page: 100,
       page: String(pageParam),
     }
     const {json, link} = await doFetchApi<EnrollmentTerms>({
@@ -100,7 +101,7 @@ export default function SisImportForm(props: Props) {
   }, [submitting, confirmed])
 
   useEffect(() => {
-    if (data && termId === '') {
+    if (data && data.pages.length === 1 && termId === '') {
       // set first term as default
       setTermId(data.pages[0].json.enrollment_terms[0].id as string)
     }
@@ -153,6 +154,23 @@ export default function SisImportForm(props: Props) {
     }
   }
 
+  const renderObserver = () => {
+    return isFetching ? (
+      // (Simple)Select.Option's ref property has a parameter type of
+      // Option | null, so we cannot use a ref callback directly here.
+      // Instead, we use a span with a ref to trigger the IntersectionObserver.
+      // Additionally, we are using Select.Option instead of SimpleSelect.Option here
+      // because SimpleSelect.Option does not support ReactNode children.
+      <Select.Option id="loading" disabled={true} value="loading">
+        <Spinner size="small" renderTitle={I18n.t('Loading more terms')} />
+      </Select.Option>
+    ) : (
+      <Select.Option id="observer" disabled={true} value="observer">
+        <span ref={ref => setPageLoadTrigger(ref)} />
+      </Select.Option>
+    )
+  }
+
   const renderSelect = (terms: Term[]) => {
     if (error) {
       return <Alert variant="error">{I18n.t('Error loading terms')}</Alert>
@@ -169,18 +187,13 @@ export default function SisImportForm(props: Props) {
             width="30rem"
             renderLabel={I18n.t('Term')}
             onChange={(_, {value}) => setTermId(value as string)}
-            listRef={(ref: HTMLUListElement | null) => {
-              if (ref) {
-                setPageLoadTrigger(ref.lastElementChild)
-              }
-            }}
           >
             {terms.map(term => (
               <SimpleSelect.Option key={term.id} id={term.id} value={term.id}>
                 {term.name}
               </SimpleSelect.Option>
             ))}
-            {isFetching ? <Spinner size="small" renderTitle={I18n.t('Loading terms')} /> : null}
+            {hasNextPage ? renderObserver() : null}
           </SimpleSelect>
         </View>
       )

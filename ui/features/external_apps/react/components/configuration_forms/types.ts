@@ -23,5 +23,5 @@ export type TextInputChangeHandler = (event: ChangeEvent<HTMLInputElement>, valu
 export type TextAreaChangeHandler = (event: ChangeEvent<HTMLTextAreaElement>) => void
 
 export interface I18nType {
-  t: (key: string, substitutions?: Object) => string
+  t: (key: string, substitutions?: object) => string
 }

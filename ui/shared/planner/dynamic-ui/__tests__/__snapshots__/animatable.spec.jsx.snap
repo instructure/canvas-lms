@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`passes trigger property functions and forwards the calls to the dynamic ui manager 1`] = `
-<div
-  data-testid="mock-component"
-/>
-`;

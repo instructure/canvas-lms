@@ -586,7 +586,7 @@ class ContextModule < ActiveRecord::Base
 
   def completion_requirements_visible_to(user, opts = {})
     valid_ids = content_tags_visible_to(user, opts).map(&:id)
-    completion_requirements.select { |cr| valid_ids.include? cr[:id] }
+    completion_requirements&.select { |cr| valid_ids.include? cr[:id] } || []
   end
 
   def content_tags_visible_to(user, opts = {})

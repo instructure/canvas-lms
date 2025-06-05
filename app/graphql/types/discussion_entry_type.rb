@@ -38,43 +38,49 @@ module Types
     def message
       return nil if object.deleted?
 
+      # You'll see the reassignment "work_to_do = work_to_do.then" below. Its important to remember then returns a new
+      # promise and doesn't mutate an existing one, since we want to build a chain we need to keep reassigning to
+      # work_to_do.
+      work_to_do = Promise.new.tap(&:fulfill)
+
       if object.message&.include?("<span class=\"mceNonEditable mention\"")
-        doc = Nokogiri::HTML::DocumentFragment.parse(object.message)
-        mentioned_spans = doc.css("span[data-mention]")
-        mentioned_user_ids = mentioned_spans.pluck("data-mention").map(&:to_i)
+        work_to_do = work_to_do.then do
+          doc = Nokogiri::HTML::DocumentFragment.parse(object.message)
+          mentioned_spans = doc.css("span[data-mention]")
+          mentioned_user_ids = mentioned_spans.pluck("data-mention").map(&:to_i)
 
-        users = GraphQL::Batch.batch do
-          Loaders::DiscussionEntryUserLoader.load_many(mentioned_user_ids).sync
-        end
-
-        mentioned_spans.each do |span|
-          user = users.find { |u| u.id == span["data-mention"].to_i }
-          if user
-            mention_node = span.children.find { |node| node.text? && node.content.start_with?("@") }
-            mention_node.content = "@" + user.name if mention_node
-          end
-        end
-        object.message = doc.to_html
-      end
-
-      if object.message&.include?("instructure_inline_media_comment")
-        load_association(:discussion_topic).then do |topic|
-          Loaders::ApiContentAttachmentLoader.for(topic.context).load(object.message).then do |preloaded_attachments|
-            object.message = GraphQLHelpers::UserContent.process(
-              object.message,
-              context: topic.context,
-              in_app: true,
-              request:,
-              preloaded_attachments:,
-              user: current_user,
-              options: { rewrite_api_urls: true, domain_root_account: context[:domain_root_account] },
-              location: object.asset_string
-            )
-          end
+          Loaders::DiscussionEntryUserLoader.load_many(mentioned_user_ids).then do |users|
+            mentioned_spans.each do |span|
+              user = users.find { |u| u.id == span["data-mention"].to_i }
+              if user
+                mention_node = span.children.find { |node| node.text? && node.content.start_with?("@") }
+                mention_node.content = "@" + user.name if mention_node
+              end
+            end
+          end.then { object.message = doc.to_html }
         end
       end
 
-      object.message
+      if rich_content_attachment?
+        work_to_do = work_to_do.then do
+          load_association(:discussion_topic).then do |topic|
+            Loaders::ApiContentAttachmentLoader.for(topic.context).load(object.message).then do |preloaded_attachments|
+              object.message = GraphQLHelpers::UserContent.process(
+                object.message,
+                context: topic.context,
+                in_app: true,
+                request:,
+                preloaded_attachments:,
+                user: current_user,
+                options: { rewrite_api_urls: true, domain_root_account: context[:domain_root_account] },
+                location: object.asset_string
+              )
+            end
+          end
+        end
+      end
+
+      work_to_do.then { object.message }
     end
 
     field :root_entry_page_number, Integer, null: true do
@@ -117,8 +123,15 @@ module Types
     def author(course_id: nil, role_types: nil, built_in_only: false)
       load_association(:discussion_topic).then do |topic|
         course_id = topic&.course&.id if course_id.nil?
-        # Set the graphql context so it can be used downstream
-        context[:course_id] = course_id
+
+        if topic&.course.is_a?(Account) && !topic&.group&.id.nil?
+          # If the discussion entry is in an admin group there is no course
+          context[:group_id] = topic&.group&.id
+        else
+          # Set the graphql context so it can be used downstream
+          context[:course_id] = course_id
+        end
+
         if topic.anonymous? && object.is_anonymous_author
           nil
         else
@@ -293,5 +306,11 @@ module Types
 
     field :depth, Integer, null: true
     delegate :depth, to: :object
+
+    private
+
+    def rich_content_attachment?
+      !Api::Html::Content.collect_attachment_ids(object.message).empty?
+    end
   end
 end

@@ -60,8 +60,15 @@ const TestComponent = () => {
 }
 
 describe('NewLoginDataContext', () => {
+  let originalConsoleError: typeof console.error
+
   beforeEach(() => {
     jest.clearAllMocks()
+    originalConsoleError = console.error
+  })
+
+  afterEach(() => {
+    console.error = originalConsoleError
   })
 
   it('ensures NewLoginDataContext stays in sync with useFetchNewLoginData', () => {
@@ -201,11 +208,44 @@ describe('NewLoginDataContext', () => {
   })
 
   it('throws an error if useNewLoginData is used outside NewLoginDataProvider', () => {
-    const OriginalConsoleError = console.error
+    // Note: This test intentionally triggers a console error from React/JSDOM which is expected behavior
+    // when testing error boundaries. The error is properly caught and the test validates the correct error message.
     console.error = jest.fn()
-    expect(() => {
-      render(<TestComponent />)
-    }).toThrow('useNewLoginData must be used within a NewLoginDataProvider')
-    console.error = OriginalConsoleError
+
+    // Create an error boundary component to catch the error
+    class ErrorBoundary extends React.Component<
+      {children: React.ReactNode},
+      {hasError: boolean; error?: Error}
+    > {
+      constructor(props: {children: React.ReactNode}) {
+        super(props)
+        this.state = {hasError: false}
+      }
+
+      static getDerivedStateFromError(error: Error) {
+        return {hasError: true, error}
+      }
+
+      componentDidCatch() {
+        // Error is caught and handled by the boundary
+      }
+
+      render() {
+        if (this.state.hasError) {
+          return <div data-testid="error">{this.state.error?.message}</div>
+        }
+        return this.props.children
+      }
+    }
+
+    render(
+      <ErrorBoundary>
+        <TestComponent />
+      </ErrorBoundary>,
+    )
+
+    expect(screen.getByTestId('error')).toHaveTextContent(
+      'useNewLoginData must be used within a NewLoginDataProvider',
+    )
   })
 })

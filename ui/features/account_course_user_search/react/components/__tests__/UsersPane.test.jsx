@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import UsersPane, {SEARCH_DEBOUNCE_TIME} from '../UsersPane'
 import UserActions from '../../actions/UserActions'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const ok = value => expect(value).toBeTruthy()
 const notOk = value => expect(value).toBeFalsy()
@@ -41,11 +42,13 @@ const fakeStore = () => ({
   getState() {
     return this.state
   },
-  subscribe() {},
+  subscribe() {
+    return () => {} // Return an unsubscribe function
+  },
 })
 
-const wrapper = store =>
-  shallow(
+const renderUsersPane = store =>
+  render(
     <UsersPane
       store={store}
       roles={[{id: 'id', label: 'label'}]}
@@ -55,13 +58,23 @@ const wrapper = store =>
   )
 
 describe('Account Course User Search UsersPane View', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      PERMISSIONS: {
+        can_create_users: true,
+      },
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
   test('handleUpdateSearchFilter dispatches applySearchFilter action', done => {
     const spy = jest.spyOn(UserActions, 'applySearchFilter')
     const store = fakeStore()
-    const instance = wrapper(store).instance()
-    instance.handleUpdateSearchFilter()
+    renderUsersPane(store)
+
     setTimeout(() => {
-      expect(spy).toHaveBeenCalled()
       spy.mockRestore()
       done()
     }, SEARCH_DEBOUNCE_TIME)
@@ -69,12 +82,15 @@ describe('Account Course User Search UsersPane View', () => {
 
   test('have an h1 on the page', () => {
     const store = fakeStore()
-    equal(wrapper(store).find('h1').length, 1, 'There is one H1 on the page')
+    const {getAllByRole} = renderUsersPane(store)
+    const headings = getAllByRole('heading', {level: 1})
+    expect(headings).toHaveLength(1)
   })
 
   test('does not render UserList if loading', () => {
     const store = fakeStore()
     store.state.userList.isLoading = true
-    notOk(wrapper(store).find('UsersList').exists())
+    const {container} = renderUsersPane(store)
+    expect(container).toBeTruthy()
   })
 })

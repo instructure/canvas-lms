@@ -29,6 +29,15 @@ analytics_2_lti_13_enabled:
   beta: true
   shadow: true
   after_state_change_proc: analytics_2_after_state_change_hook
+hide_legacy_course_analytics:
+  state: hidden
+  applies_to: Account
+  display_name: Hide Legacy Course Analytics
+  description:
+    hide_legacy_course_analytics_description: Hides the Legacy Course Analytics feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
 
 # Admin Analytics - Provided through K20 LTI App
 admin_analytics_view_permission:
@@ -73,6 +82,33 @@ k20_course_readiness:
   root_opt_in: true
   beta: true
   shadow: true
+k20_course_readiness_due_date_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Due Date Criteria
+  description:
+    k20_course_readiness_due_date_criteria: Enables the Intelligent Insights - Course Readiness - Due Date Criteria feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_gradebook_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Gradebook Criteria
+  description:
+    k20_course_readiness_gradebook_criteria: Enables the Intelligent Insights - Course Readiness - Gradebook Criteria feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_broken_links_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Broken Links Criteria
+  description:
+    k20_course_readiness_broken_links_criteria: Enables the Intelligent Insights - Course Readiness - Broken Links Criteria feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
 k20_students_in_need_of_attention:
   state: hidden
   applies_to: Account
@@ -105,6 +141,15 @@ k20_lti_usage:
   display_name: Intelligent Insights - LTI Usage Dashboard
   description:
     k20_lti_usage:  Enables the LTI Usage Dashboard and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+title_iv_financial_aid_report:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Financial Aid Compliance
+  description:
+    title-iv-financial-aid-report: Enables the Intelligent Insights - Financial Aid Compliance feature and accompanying permission.
   root_opt_in: true
   beta: true
   shadow: true

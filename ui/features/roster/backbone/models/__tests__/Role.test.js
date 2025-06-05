@@ -20,7 +20,8 @@ import Role from '../Role'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {clone, omit} from 'lodash'
 import Backbone from '@canvas/backbone'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 class Account extends Backbone.Model {
   present = () => clone(this.attributes)
@@ -33,20 +34,23 @@ class Account extends Backbone.Model {
 
 Account.prototype.urlRoot = '/api/v1/accounts'
 
+const server = setupServer()
+
 describe('RoleModel', () => {
   let account
   let role
-  let server
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     account = new Account({id: 4})
     role = new Role({account})
-    server = sinon.fakeServer.create()
     fakeENV.setup({ACCOUNT_ID: 3})
   })
 
   afterEach(() => {
-    server.restore()
     role = null
     fakeENV.teardown()
   })
@@ -54,7 +58,17 @@ describe('RoleModel', () => {
   test('generates the correct url for existing and non-existing roles', async () => {
     expect(role.url()).toBe('/api/v1/accounts/3/roles')
 
-    const fetchPromise = new Promise(resolve => {
+    server.use(
+      http.get('/api/v1/accounts/3/roles', () => {
+        return HttpResponse.json({
+          role: 'existingRole',
+          id: '1',
+          account,
+        })
+      }),
+    )
+
+    await new Promise(resolve => {
       role.fetch({
         success: () => {
           expect(role.url()).toBe('/api/v1/accounts/3/roles/1')
@@ -62,18 +76,5 @@ describe('RoleModel', () => {
         },
       })
     })
-
-    server.respondWith('GET', role.url(), [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify({
-        role: 'existingRole',
-        id: '1',
-        account,
-      }),
-    ])
-
-    server.respond()
-    await fetchPromise
   })
 })

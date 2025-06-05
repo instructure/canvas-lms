@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow} from 'enzyme'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {Opportunities_ as Opportunities, OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID} from '../index'
 
 function defaultProps() {
@@ -52,8 +52,15 @@ function defaultProps() {
 jest.useFakeTimers()
 
 it('renders the base component correctly with one of each kind of opportunity', () => {
-  const wrapper = shallow(<Opportunities {...defaultProps()} />)
-  expect(wrapper).toMatchSnapshot()
+  const {container, getByRole} = render(<Opportunities {...defaultProps()} />)
+  expect(getByRole('tablist')).toBeInTheDocument()
+  expect(getByRole('button', {name: /close/i})).toBeInTheDocument()
+  expect(container.querySelector('#opportunities_parent')).toBeInTheDocument()
+  // Check for tab panels
+  const panels = container.querySelectorAll('[role="tabpanel"]')
+  expect(panels).toHaveLength(2) // new and dismissed tabs
+  // Check that style is rendered
+  expect(container.querySelector('style')).toBeInTheDocument()
 })
 
 it('renders the right course with the right opportunity', () => {
@@ -69,28 +76,35 @@ it('renders the right course with the right opportunity', () => {
     id: '2',
     shortName: 'A different Course Name',
   })
-  const wrapper = shallow(<Opportunities {...tempProps} />)
-  expect(wrapper).toMatchSnapshot()
+  const {container, getByRole} = render(<Opportunities {...tempProps} />)
+  expect(getByRole('tablist')).toBeInTheDocument()
+  const panels = container.querySelectorAll('[role="tabpanel"]')
+  expect(panels).toHaveLength(2)
+  // Verify component structure and that it has the expected number of opportunities in props
+  expect(tempProps.newOpportunities).toHaveLength(2)
+  expect(tempProps.dismissedOpportunities).toHaveLength(1)
 })
 
-it('renders nothing if no opportunities', () => {
+it('renders empty state when no opportunities', () => {
   const tempProps = defaultProps()
   tempProps.newOpportunities = []
   tempProps.dismissedOpportunities = []
-  const wrapper = shallow(<Opportunities {...tempProps} />)
-  expect(wrapper).toMatchSnapshot()
+  const {container, getByRole, getByText} = render(<Opportunities {...tempProps} />)
+  expect(container.querySelector('#opportunities_parent')).toBeInTheDocument()
+  expect(getByRole('tablist')).toBeInTheDocument()
+  // Should show empty state messages instead of opportunities
+  expect(getByText('Nothing new needs attention.')).toBeInTheDocument()
 })
 
 it('calls toggle popover when escape is pressed', () => {
   const tempProps = defaultProps()
   const mockDispatch = jest.fn()
   tempProps.togglePopover = mockDispatch
-  const wrapper = shallow(<Opportunities {...tempProps} />)
-  wrapper.find('#opportunities_parent').simulate('keyDown', {
+  const {container} = render(<Opportunities {...tempProps} />)
+  const opportunitiesParent = container.querySelector('#opportunities_parent')
+  fireEvent.keyDown(opportunitiesParent, {
+    key: 'Escape',
     keyCode: 27,
-    which: 27,
-    key: 'escape',
-    preventDefault: () => {},
   })
   expect(tempProps.togglePopover).toHaveBeenCalled()
 })

@@ -16,17 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import {Pill} from '@instructure/ui-pill'
 import BadgeList from '../index'
 
 it('renders Pill components as list items', () => {
-  const wrapper = shallow(
+  const {container, getByText} = render(
     <BadgeList>
       <Pill>Pill 1</Pill>
       <Pill>Pill 2</Pill>
       <Pill>Pill 3</Pill>
     </BadgeList>,
   )
-  expect(wrapper).toMatchSnapshot()
+
+  // Should render a ul element
+  const list = container.querySelector('ul')
+  expect(list).toBeInTheDocument()
+
+  // Should have proper CSS class
+  expect(list).toHaveClass('BadgeList-styles__root')
+
+  // Should render 3 list items
+  const items = container.querySelectorAll('li')
+  expect(items).toHaveLength(3)
+
+  // Each list item should have the proper CSS class
+  items.forEach(item => {
+    expect(item).toHaveClass('BadgeList-styles__item')
+  })
+
+  // Check that Pills have correct text content
+  expect(getByText('Pill 1')).toBeInTheDocument()
+  expect(getByText('Pill 2')).toBeInTheDocument()
+  expect(getByText('Pill 3')).toBeInTheDocument()
 })

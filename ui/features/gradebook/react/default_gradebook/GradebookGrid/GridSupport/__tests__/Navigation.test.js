@@ -19,7 +19,6 @@
 import '@canvas/jquery-keycodes' // used by some SlickGrid editors
 import slickgrid from 'slickgrid'
 import GridSupport from '../index'
-import sinon from 'sinon'
 
 const {Grid, Editors} = slickgrid
 
@@ -76,7 +75,6 @@ describe('GradebookGrid GridSupport Navigation', () => {
   let grid
   let gridSupport
   let triggeredEvent
-  let sandbox
 
   function onKeyDown(event) {
     bubbledEvent = event
@@ -114,9 +112,6 @@ describe('GradebookGrid GridSupport Navigation', () => {
     // Reset event tracking variables
     bubbledEvent = undefined
     triggeredEvent = undefined
-
-    // Create sandbox for each test
-    sandbox = sinon.createSandbox()
   })
 
   afterEach(() => {
@@ -129,9 +124,6 @@ describe('GradebookGrid GridSupport Navigation', () => {
 
     // Remove fixtures
     $fixtures.remove()
-
-    // Restore sandbox
-    sandbox.restore()
   })
 
   describe('Tab into the grid', () => {
@@ -149,10 +141,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateNext', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateNext.subscribe(handler)
       simulateKeyDown('Tab')
-      expect(handler.callCount).toBe(1)
+      expect(handler).toHaveBeenCalledTimes(1)
     })
 
     test('includes the event when triggering onNavigateNext', () => {
@@ -236,10 +228,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateNext', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateNext.subscribe(handler)
       simulateKeyDown('Tab')
-      expect(handler.callCount).toBe(1)
+      expect(handler).toHaveBeenCalledTimes(1)
     })
 
     test('includes the event when triggering onNavigateNext', () => {
@@ -338,10 +330,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateNext', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateNext.subscribe(handler)
       simulateKeyDown('Tab')
-      expect(handler.callCount).toBe(1)
+      expect(handler).toHaveBeenCalledTimes(1)
     })
 
     test('includes the event when triggering onNavigateNext', () => {
@@ -447,10 +439,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigatePrev', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigatePrev.subscribe(handler)
       simulateKeyDown('ShiftTab')
-      expect(handler.callCount).toBe(1)
+      expect(handler).toHaveBeenCalledTimes(1)
     })
 
     test('includes the event when triggering onNavigatePrev', () => {
@@ -514,10 +506,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigatePrev', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigatePrev.subscribe(handler)
       simulateKeyDown('ShiftTab')
-      expect(handler.callCount).toBe(1)
+      expect(handler).toHaveBeenCalledTimes(1)
     })
 
     test('includes the event when triggering onNavigatePrev', () => {
@@ -581,10 +573,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateRight', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateRight.subscribe(handler)
       simulateKeyDown('RightArrow')
-      expect(handler.callCount).toBe(1)
+      expect(handler).toHaveBeenCalledTimes(1)
     })
 
     test('includes the event when triggering onNavigateRight', () => {
@@ -637,10 +629,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateRight', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateRight.subscribe(handler)
       simulateKeyDown('RightArrow')
-      expect(handler.callCount).toBe(1)
+      expect(handler).toHaveBeenCalledTimes(1)
     })
 
     test('includes the event when triggering onNavigateRight', () => {
@@ -694,10 +686,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('does not trigger onNavigateRight', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateRight.subscribe(handler)
       simulateKeyDown('RightArrow')
-      expect(handler.callCount).toBe(0)
+      expect(handler).toHaveBeenCalledTimes(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
@@ -785,10 +777,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateLeft', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateLeft.subscribe(handler)
       simulateKeyDown('LeftArrow')
-      expect(handler.callCount).toBe(1)
+      expect(handler).toHaveBeenCalledTimes(1)
     })
 
     test('includes the event when triggering onNavigateLeft', () => {
@@ -841,10 +833,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateLeft', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateLeft.subscribe(handler)
       simulateKeyDown('LeftArrow')
-      expect(handler.callCount).toBe(1)
+      expect(handler).toHaveBeenCalledTimes(1)
     })
 
     test('includes the event when triggering onNavigateLeft', () => {
@@ -898,10 +890,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('does not trigger onNavigateLeft', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateLeft.subscribe(handler)
       simulateKeyDown('LeftArrow')
-      expect(handler.callCount).toBe(0)
+      expect(handler).toHaveBeenCalledTimes(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
@@ -1020,10 +1012,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('does not trigger onNavigateUp', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateUp.subscribe(handler)
       simulateKeyDown('UpArrow')
-      expect(handler.callCount).toBe(0)
+      expect(handler).toHaveBeenCalledTimes(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
@@ -1057,10 +1049,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateUp', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateUp.subscribe(handler)
       simulateKeyDown('UpArrow')
-      expect(handler.callCount).toBe(1)
+      expect(handler).toHaveBeenCalledTimes(1)
     })
 
     test('includes the event when triggering onNavigateUp', () => {
@@ -1139,10 +1131,10 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateDown', () => {
-      const handler = sandbox.spy()
+      const handler = jest.fn()
       gridSupport.events.onNavigateDown.subscribe(handler)
       simulateKeyDown('DownArrow')
-      expect(handler.callCount).toBe(1)
+      expect(handler).toHaveBeenCalledTimes(1)
     })
 
     test('includes the event when triggering onNavigateDown', () => {
@@ -1285,11 +1277,11 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers the event when handling keydown on a header child element', () => {
-      const spy = sandbox.spy()
+      const spy = jest.fn()
       gridSupport.events.onKeyDown.subscribe(spy)
       const headerChild = document.querySelectorAll('.slick-column-name')[2]
       simulateKeyDown('Tab', headerChild)
-      expect(spy.callCount).toBe(1)
+      expect(spy).toHaveBeenCalledTimes(1)
     })
 
     test('skips Navigation behavior when a handler returns false', () => {

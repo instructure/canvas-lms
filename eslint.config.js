@@ -227,17 +227,6 @@ module.exports = [
     },
   },
 
-  // Testcafe
-  {
-    files: ['**/testcafe/**/*.{js,mjs,ts,jsx,tsx}'],
-    languageOptions: {
-      globals: {
-        test: true,
-        fixture: true,
-      },
-    },
-  },
-
   // Jest
   require('./eslint.config.jest'),
 

@@ -76,6 +76,8 @@ module Types
 
     alias_method :override, :object
 
+    field :assignment_id, ID, null: true
+
     field :assignment, AssignmentType, null: true
     def assignment
       load_association(:assignment)
@@ -99,6 +101,7 @@ module Types
     end
 
     field :all_day, Boolean, null: true
+    field :all_day_date, DateTimeType, null: true
     field :context_module, ModuleType, null: true
     field :due_at, DateTimeType, null: true
     field :lock_at, DateTimeType, null: true

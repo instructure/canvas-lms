@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import * as enzyme from 'enzyme'
+import {render} from '@testing-library/react'
 import ChildChangeLog from '../ChildChangeLog'
 import loadStates from '@canvas/blueprint-courses/react/loadStates'
 import getSampleData from '@canvas/blueprint-courses/getSampleData'
@@ -29,32 +29,32 @@ const defaultProps = () => ({
 
 describe('ChildChangeLog component', () => {
   test('renders the ChildChangeLog component', () => {
-    const tree = enzyme.shallow(<ChildChangeLog {...defaultProps()} />)
-    const node = tree.find('.bcc__change-log')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<ChildChangeLog {...defaultProps()} />)
+    const node = container.querySelector('.bcc__change-log')
+    expect(node).toBeInTheDocument()
   })
 
   test('renders loading indicator if in loading state', () => {
     const props = defaultProps()
     props.status = loadStates.states.loading
-    const tree = enzyme.shallow(<ChildChangeLog {...props} />)
-    const node = tree.find('.bcc__change-log__loading')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<ChildChangeLog {...props} />)
+    const node = container.querySelector('.bcc__change-log__loading')
+    expect(node).toBeInTheDocument()
   })
 
   test('renders history item when in loaded state', () => {
     const props = defaultProps()
     props.status = loadStates.states.loaded
-    const tree = enzyme.shallow(<ChildChangeLog {...props} />)
-    const node = tree.find('SyncHistoryItem')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<ChildChangeLog {...props} />)
+    const node = container.querySelector('.bcs__history-item')
+    expect(node).toBeInTheDocument()
   })
 
   test('does not render history item when in loading state', () => {
     const props = defaultProps()
     props.status = loadStates.states.loading
-    const tree = enzyme.shallow(<ChildChangeLog {...props} />)
-    const node = tree.find('SyncHistoryItem')
-    expect(node.exists()).not.toBeTruthy()
+    const {container} = render(<ChildChangeLog {...props} />)
+    const node = container.querySelector('.bcs__history-item')
+    expect(node).not.toBeInTheDocument()
   })
 })

@@ -183,6 +183,8 @@ describe('DiscussionRow', () => {
   })
 
   it('renders checkpoint information without crashing when only one checkpoint exists', () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
     const props = makeProps({
       discussion: {
         reply_to_entry_required_count: 1,
@@ -208,6 +210,13 @@ describe('DiscussionRow', () => {
       screen.queryByText(props.dateFormatter('2024-09-14T05:59:00Z'), {exact: false}),
     ).toBeInTheDocument()
     expect(screen.queryByText('No Due Date', {exact: false})).toBeInTheDocument()
+
+    // Verify that the console.error was called for the inconsistent checkpoint scenario
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Error: Inconsistent checkpoints - Only one of the reply-to-topic or reply-to-entry checkpoint exists.',
+    )
+
+    consoleSpy.mockRestore()
   })
 
   it('renders to do date if ungraded with a to do date', () => {

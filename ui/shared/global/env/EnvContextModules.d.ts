@@ -66,4 +66,5 @@ export interface EnvContextModules {
   }
   POST_TO_SIS: boolean
   DEFAULT_DUE_TIME?: string
+  FEATURE_MODULES_PERF?: boolean
 }

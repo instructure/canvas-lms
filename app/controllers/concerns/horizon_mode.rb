@@ -22,20 +22,50 @@ module HorizonMode
   # Combines both student and provider career loading in one method
   def load_canvas_career
     return if Canvas::Plugin.value_to_boolean(params[:force_classic])
+    return if api_request?
 
-    if @context.is_a?(Account)
-      # We'd only ever load the provider app for an account
+    # Check appropriate feature flag before redirecting
+    if should_load_provider_app?
+      return unless canvas_career_learning_provider_app_enabled?
+
       load_canvas_career_for_provider
     else
-      # Otherwise, try the learner app and then the provider app
       load_canvas_career_for_student
-      load_canvas_career_for_provider unless performed?
     end
   end
 
+  # Helper method to determine if provider app should be loaded
+  def should_load_provider_app?
+    @context.is_a?(Account) || horizon_admin?
+  end
+
+  # Helper methods to centralize feature flag checking
+  def learner_app_feature_enabled?
+    @context.account.feature_enabled?(:horizon_learner_app_for_students)
+  end
+
+  def provider_app_feature_enabled_for_courses?
+    @context.account.feature_enabled?(:horizon_learning_provider_app_for_courses)
+  end
+
+  def provider_app_feature_enabled_for_accounts?
+    @context.feature_enabled?(:horizon_learning_provider_app_for_accounts)
+  end
+
   def canvas_career_learning_provider_app_launch_url
-    uri = @context.root_account.horizon_url("learning-provider/remoteEntry.js")
-    uri.to_s
+    @context.root_account.horizon_url("learning-provider/remoteEntry.js").to_s
+  end
+
+  def canvas_career_learner_app_launch_url
+    @context.root_account.horizon_url("remoteEntry.js").to_s
+  end
+
+  def canvas_career_learner_app_enabled?
+    if @context.is_a?(Course)
+      canvas_career_learner_app_enabled_for_students?
+    else
+      false
+    end
   end
 
   def canvas_career_learning_provider_app_enabled?
@@ -63,20 +93,31 @@ module HorizonMode
   end
 
   def horizon_student?
+    return false if @context.nil?
+
     !(@context.user_is_admin?(@current_user) || @context.cached_account_users_for(@current_user).any?)
   end
 
   def horizon_admin?
+    return false if @context.nil?
+
     @context.grants_right?(@current_user, :read_as_admin)
   end
 
   # Use this function after @context is set
   def load_canvas_career_for_student
+    return unless @context # Safety check: ensure @context exists
+    return if request.path.include?("/career")
+
     return if params[:invitation].present?
-    return unless horizon_course?
-    return unless horizon_student?
+
+    if canvas_career_learner_app_enabled_for_students?
+      redirect_to career_learn_path(course_id: @context.id)
+      return
+    end
 
     redirect_url = @context.root_account.horizon_redirect_url(request.path)
+
     return if redirect_url.nil?
 
     redirect_to redirect_url
@@ -84,6 +125,7 @@ module HorizonMode
 
   # Use this function after @context is set
   def load_canvas_career_for_provider
+    return unless @context # Safety check: ensure @context exists
     return unless canvas_career_learning_provider_app_enabled?
     return if request.path.include?("/career")
 
@@ -99,20 +141,23 @@ module HorizonMode
   end
 
   def canvas_career_learning_provider_app_enabled_for_courses?
-    return false unless horizon_course?
-    return false unless horizon_admin?
-    return false if canvas_career_learning_provider_app_launch_url.blank?
-    return false unless @context.account.feature_enabled?(:horizon_learning_provider_app_for_courses)
-
-    true
+    horizon_course? &&
+      provider_app_feature_enabled_for_courses? &&
+      horizon_admin? &&
+      canvas_career_learning_provider_app_launch_url.present?
   end
 
   def canvas_career_learning_provider_app_enabled_for_accounts?
-    return false unless horizon_account?
-    return false unless horizon_admin?
-    return false if canvas_career_learning_provider_app_launch_url.blank?
-    return false unless @context.feature_enabled?(:horizon_learning_provider_app_for_accounts)
+    horizon_account? &&
+      provider_app_feature_enabled_for_accounts? &&
+      horizon_admin? &&
+      canvas_career_learning_provider_app_launch_url.present?
+  end
 
-    true
+  def canvas_career_learner_app_enabled_for_students?
+    horizon_course? &&
+      learner_app_feature_enabled? &&
+      horizon_student? &&
+      canvas_career_learner_app_launch_url.present?
   end
 end

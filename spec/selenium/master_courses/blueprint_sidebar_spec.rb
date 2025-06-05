@@ -206,8 +206,8 @@ describe "master courses sidebar" do
       f("body").find_element(:xpath, '//*[@aria-label="Associations"]//button[contains(., "Close")]').click
       expect(f("body")).not_to contain_css('[aria-label="Associations"]')
       # try again from the sections tab, just to be sure
-      f("#sections_tab>a").click
-      expect(f("#tab-sections")).to be_displayed
+      f("#tab-sections").click
+      expect(f("#tab-sections-mount")).to be_displayed
       f("button#mcSidebarAsscBtn").click
       expect(f('span[aria-label="Associations"]')).to be_displayed
       f("body").find_element(:xpath, '//*[@aria-label="Associations"]//button[contains(., "Close")]').click

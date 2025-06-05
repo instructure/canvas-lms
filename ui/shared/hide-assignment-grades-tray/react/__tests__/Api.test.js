@@ -18,13 +18,26 @@
 
 import MockCanvasClient from '@canvas/test-utils/MockCanvasClient'
 import * as Api from '../Api'
-import sinon from 'sinon'
+import {http} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 describe('HideAssignmentGradesTray Api', () => {
   const ASSIGNMENT_ID = '23'
   const BAD_ASSIGNMENT_ID = '24'
   const PROGRESS_ID = 7331
   const SECTION_IDS = ['2001', '2002', '2003']
+
+  beforeAll(() => {
+    server.listen({
+      onUnhandledRequest: 'error',
+    })
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     MockCanvasClient.install([
@@ -89,6 +102,7 @@ describe('HideAssignmentGradesTray Api', () => {
 
   afterEach(() => {
     MockCanvasClient.uninstall()
+    server.resetHandlers()
   })
 
   describe('.hideAssignmentGrades()', () => {
@@ -118,28 +132,19 @@ describe('HideAssignmentGradesTray Api', () => {
   })
 
   describe('.resolveHideAssignmentGradesStatus', () => {
-    let server
-
-    beforeEach(() => {
-      server = sinon.createFakeServer()
-      server.respondImmediately = true
-    })
-
-    afterEach(() => {
-      server.restore()
-    })
-
     it('returns ids of submissions hidden when job finishes', async () => {
       const responseData = {
         results: {submission_ids: ['201', '202', '203']},
         url: `/api/v1/progress/${PROGRESS_ID}`,
         workflow_state: 'completed',
       }
-      server.respondWith('GET', `/api/v1/progress/${PROGRESS_ID}`, [
-        200,
-        {},
-        JSON.stringify(responseData),
-      ])
+      server.use(
+        http.get(`/api/v1/progress/${PROGRESS_ID}`, () => {
+          return new Response(JSON.stringify(responseData), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
       const results = await Api.resolveHideAssignmentGradesStatus({
         id: PROGRESS_ID,
         workflowState: 'queued',
@@ -153,11 +158,13 @@ describe('HideAssignmentGradesTray Api', () => {
         url: `/api/v1/progress/${PROGRESS_ID}`,
         workflow_state: 'failed',
       }
-      server.respondWith('GET', `/api/v1/progress/${PROGRESS_ID}`, [
-        200,
-        {},
-        JSON.stringify(responseData),
-      ])
+      server.use(
+        http.get(`/api/v1/progress/${PROGRESS_ID}`, () => {
+          return new Response(JSON.stringify(responseData), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
 
       await expect(
         Api.resolveHideAssignmentGradesStatus({id: PROGRESS_ID, workflowState: 'queued'}),

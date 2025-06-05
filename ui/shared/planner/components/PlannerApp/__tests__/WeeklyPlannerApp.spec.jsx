@@ -19,7 +19,6 @@
 import React from 'react'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
-// import {shallow, mount} from 'enzyme'
 import {render} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import {PlannerApp, mapStateToProps} from '../index'

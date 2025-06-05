@@ -62,7 +62,6 @@ const buildResponseMessages = ({
     if (targetWindow) {
       targetWindow.postMessage({...message, ...contents}, origin)
     } else {
-      // eslint-disable-next-line no-console
       console.error('Error sending response postMessage: target window does not exist')
     }
   }

@@ -78,10 +78,63 @@ describe Types::UserType do
     end
   end
 
+  context "login_id" do
+    before(:once) do
+      @student.pseudonyms.create!(
+        account: @course.account,
+        unique_id: "alex@columbia.edu",
+        workflow_state: "active"
+      )
+    end
+
+    let(:admin) { account_admin_user }
+    let(:user_type_as_admin) do
+      GraphQLTypeTester.new(@student,
+                            current_user: admin,
+                            domain_root_account: @course.account.root_account,
+                            request: ActionDispatch::TestRequest.create)
+    end
+
+    context "returns login_id" do
+      it "if there is no pseudonym" do
+        expect(user_type_as_admin.resolve("loginId")).to be_nil
+      end
+    end
+
+    context "returns nil" do
+      it "when there is no course in context" do
+        expect(user_type_as_admin.resolve("loginId")).to be_nil
+      end
+
+      it "when requesting user has no permission :view_user_logins" do
+        account_admin_user_with_role_changes(role_changes: { view_user_logins: false })
+        expect(user_type_as_admin.resolve("loginId")).to be_nil
+      end
+
+      it "when there is no pseudonym created" do
+        expect(user_type_as_admin.resolve("loginId", current_user: @other_student)).to be_nil
+      end
+    end
+  end
+
   context "name" do
     it "encodes html entities" do
       @student.update! name: "<script>alert(1)</script>"
       expect(user_type.resolve("name")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
+    end
+  end
+
+  context "firstName" do
+    it "encodes html entities" do
+      @student.update! sortable_name: "<script>alert(1)</script>"
+      expect(user_type.resolve("firstName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
+    end
+  end
+
+  context "lastName" do
+    it "encodes html entities" do
+      @student.update! sortable_name: "<script>alert(1)</script>,<script>alert(1)</script>"
+      expect(user_type.resolve("lastName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
     end
   end
 
@@ -629,6 +682,24 @@ describe Types::UserType do
       expect(
         user_type.resolve("groups { _id }", current_user: @teacher)
       ).to be_nil
+    end
+  end
+
+  context "groupMemberships" do
+    before(:once) do
+      @group_category_a = @course.group_categories.create!(name: "Test Category A", non_collaborative: true)
+      @group_category_b = @course.group_categories.create!(name: "Test Category B", non_collaborative: false)
+      @group_a = @course.groups.create!(name: "Group A", group_category: @group_category_a)
+      @group_b = @course.groups.create!(name: "Group B", group_category: @group_category_b)
+
+      @gm1 = @group_a.add_user(@student)
+      @gm2 = @group_b.add_user(@student)
+    end
+
+    it "returns group memberships for the user" do
+      expect(
+        user_type.resolve("groupMemberships { group { _id } }")
+      ).to match_array [@gm1.group.id.to_s, @gm2.group.id.to_s]
     end
   end
 

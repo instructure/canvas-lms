@@ -861,7 +861,7 @@
         "message": "Cerca"
     },
     "find_and_replace_6e345933": {
-        "message": "Cerca i substituir"
+        "message": "Cerca i substitució"
     },
     "finish_bc343002": {
         "message": "Finalitza"
@@ -1950,7 +1950,7 @@
         "message": "Elimina l''enllaç"
     },
     "replace_all_d3d68b3": {
-        "message": "Substitueixo-ho tot"
+        "message": "Substitueix-ho tot"
     },
     "replace_all_findtext_with_replacetext_da574b32": {
         "message": "Substitueix tot { findText } amb { replaceText }"
@@ -1962,7 +1962,7 @@
         "message": "Substitueix { findText } amb { replaceText }"
     },
     "replace_with_eeff01ad": {
-        "message": "Substitueixo-ho per"
+        "message": "Substitueix-ho per"
     },
     "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
         "message": "S’ha substituït { alertFindText } amb { alertReplaceText }"

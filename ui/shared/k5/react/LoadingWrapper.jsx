@@ -78,7 +78,6 @@ export default function LoadingWrapper({
         try {
           localStorage.setItem(cacheKey, skeletonsNum)
         } catch (e) {
-           
           console.warn("Unable to save to localStorage, likely because it's out of space.")
         }
       }
@@ -87,13 +86,16 @@ export default function LoadingWrapper({
   }, [skeletonsNum, isLoading]) // eslint-disable-line react-hooks/exhaustive-deps
 
   for (let i = 0; i < skeletonsToRender; i++) {
+    const key = generateKey(i)
     skeletons.push(
       // if renderCustomSkeleton prop is passed, it will be called 'skeletonsNum' times,
       // delegating the job of rendering the skeletons to that callback
-      renderCustomSkeleton?.({key: generateKey(i)}) || (
+      renderCustomSkeleton ? (
+        <React.Fragment key={key}>{renderCustomSkeleton({})}</React.Fragment>
+      ) : (
         // if no renderCustomSkeleton is provided, the default skeleton will be generated
         <View
-          key={generateKey(i)}
+          key={key}
           display={display}
           width={width}
           height={height}

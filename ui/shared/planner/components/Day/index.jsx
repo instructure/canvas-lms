@@ -106,6 +106,7 @@ export class Day extends Component {
     const groupColor = (courseInfo.color ? courseInfo.color : this.props.currentUser.color) || null
     return (
       <Grouping
+        key={groupKey}
         title={courseInfo.title}
         image_url={courseInfo.image_url}
         color={groupColor}
@@ -114,7 +115,6 @@ export class Day extends Component {
         items={groupItems}
         animatableIndex={this.props.animatableIndex * 100 + index + 1}
         url={courseInfo.url}
-        key={groupKey}
         themeOverride={{
           titleColor: groupColor,
         }}

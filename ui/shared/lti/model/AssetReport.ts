@@ -46,16 +46,16 @@ const ZLtiAssetReportPriority = z.union([
  * Asset Report information, as shown e.g. in Speedgrader
  */
 export const ZLtiAssetReport = z.object({
+  _id: z.number(),
   comment: z.string().optional(),
   errorCode: z.string().optional(),
-  id: z.number(),
   indicationAlt: z.string().optional(),
   indicationColor: z.string().optional(),
   launchUrlPath: z.string().optional(),
   priority: ZLtiAssetReportPriority,
   processingProgress: ZLtiAssetReportProcessingProgress,
   reportType: z.string(),
-  resubmitUrlPath: z.string().optional(),
+  resubmitAvailable: z.boolean(),
   result: z.string().optional(),
   resultTruncated: z.string().optional(),
   title: z.string().optional(),

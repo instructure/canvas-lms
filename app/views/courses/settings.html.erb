@@ -50,36 +50,47 @@
   <%= render :partial => 'settings_sidebar', :locals => { blueprint_subscription: blueprint_subscription, show_publish_controls: show_publish_controls } %>
 <% end %>
 
+<% tabs = [] %>
+<% tabs << { id: "details",   title: t('tabs.details',    default: "Course Details"),       contentMount: "tab-details-mount" } %>
+<% tabs << { id: "sections",  title: t('tabs.sections',   default: "Sections"),              contentMount: "tab-sections-mount" } %>
+<% if can_do(@context, @current_user, :update) && !@context.elementary_homeroom_course? %>
+  <% tabs << { id: "navigation", title: t('tabs.navigation', default: "Navigation"),       contentMount: "tab-navigation-mount" } %>
+<% end %>
+<% if can_do(@context, @current_user, :read_as_admin) && !@context.elementary_homeroom_course? %>
+  <% tabs << {
+      id:           "tools",
+      title:        t('tabs.apps',    default: "Apps"),
+      contentMount: "tab-tools-mount"
+    } %>
+<% end %>
+<% if @context.root_account.feature_enabled?(:lti_apps_page_instructors) && can_do(@context, @current_user, :read_as_admin) &&
+      !@context.elementary_homeroom_course? %>
+  <% tabs << {
+      id:           "apps",
+      title:        t('tabs.apps_new', default: "Apps (New)"),
+      contentMount: "tab-apps-mount"
+    } %>
+<% end %>
+<% if @publishing_enabled %>
+  <% tabs << { id: "grade-publishing", title: t('tabs.grade_syncing', default: "Grade Syncing"), contentMount: "tab-grade-publishing-mount" } %>
+<% end %>
+<% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
+  <% tabs << { id: "alerts",  title: t('tabs.alerts',     default: "Alerts"),                contentMount: "tab-alerts-mount" } %>
+<% end %>
+<% if can_do(@context, @current_user, :view_feature_flags) && !@context.elementary_homeroom_course? %>
+  <% tabs << { id: "features", title: t('tabs.feature_options', default: "Feature Options"), contentMount: "tab-features-mount" } %>
+<% end %>
+<% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
+  <% tabs << { id: "integrations", title: t('tabs.integrations', default: "Integrations"), contentMount: "tab-integrations-mount" } %>
+<% end %>
+<%= tag.div id: "course_settings_tabs_mount",
+            data: {
+              component: "SettingsTabs",
+              props:json_escape({ tabs: tabs }.to_json)
+            } %>
+<%= tag.div id: "course_details_tabs", style: "display: none;" do %>
 <h1 class="screenreader-only"><%= t 'course_settings_title', "Course Settings" %></h1>
-<div id="course_details_tabs" style="display:none;" class="ui-tabs-minimal">
-  <ul>
-    <li id="course_details_tab"><a href="#tab-details"><%= t('tabs.details', %{Course Details}) %></a></li>
-    <li id="sections_tab"><a href="#tab-sections"><%= t('tabs.sections', %{Sections}) %></a></li>
-    <% unless @context.elementary_homeroom_course? %>
-      <% if can_do(@context, @current_user, :update) %>
-        <li id="navigation_tab"><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
-      <% end %>
-      <% if can_do(@context, @current_user, :read_as_admin) %>
-        <li id="external_tools_tab"><a href="#tab-tools" id="tab-tools-link"><%= t('Apps') %></a></li>
-      <% end %>
-      <% if can_do(@context, @current_user, :read_as_admin) && @context.root_account.feature_enabled?(:lti_apps_page_instructors) %>
-        <li id="apps_tab"><a href="#tab-apps" id="tab-apps-link"><%= t('tabs.apps', %{Apps (New)}) %></a></li>
-      <% end %>
-      <% if @publishing_enabled %>
-        <li id="grade_publishing_tab"><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('Grade Syncing') %></a></li>
-      <% end %>
-      <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
-        <li id="alerts_tab"><a href="#tab-alerts" id="tab-alerts-link"><%= t('tabs.alerts', %{Alerts}) %></a></li>
-      <% end %>
-      <% if can_do(@context, @current_user, :view_feature_flags) %>
-        <li id="feature_flags_tab"><a href="#tab-features" id="tab-features-link"><%= t('Feature Options') %></a></li>
-      <% end %>
-      <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
-        <li id="integrations_tab"><a href="#tab-integrations" id="tab-integrations-link"><%= t('Integrations') %></a></li>
-      <% end %>
-    <% end %>
-  </ul>
-  <div id="tab-details">
+  <div id="tab-details-mount">
     <h2>
       <%= t('headings.details', %{Course Details}) %>
       <% unless show_publish_controls %>
@@ -275,6 +286,7 @@
         </div>
       </div>
       <% if (@context.elementary_subject_course? && @context.sis_batch_id.blank?) || (@context.elementary_homeroom_course? && @synced_subjects.length > 0) %>
+
         <div class="form-row">
           <div class="form-label nobr"><%= f.blabel :enrollments_from_homeroom, :en => "Enrollments" %></div>
           <div class="tall-row">
@@ -727,7 +739,7 @@
     </div>
     <% end %>
   </div>
-  <div id="tab-sections">
+  <div id="tab-sections-mount">
     <h2 style="margin-top: 10px;"><%= t('headings.sections', %{Course Sections}) %></h2>
     <div class="course_section_dates">
       <%= t('Course Start Date: %{start_date} | Course End Date: %{end_date}', {
@@ -852,8 +864,7 @@
     <% end %>
   </div>
   <% if can_do(@context, @current_user, :update) && !@context.elementary_homeroom_course? %>
-
-  <div id="tab-navigation">
+  <div id="tab-navigation-mount">
     <h2 class="screenreader-only"><%= t('headings.navigation', %{Course Navigation}) %></h2>
     <div class="screenreader-only drag_and_drop_warning" tabindex="0">
       <%= t('nav_items_keyboard_drag_and_drop',
@@ -966,21 +977,20 @@
       </p>
     <% end %>
   </div>
-
   <% end %>
 
   <% if can_do(@context, @current_user, :read_as_admin) && !@context.elementary_homeroom_course? %>
-    <div id="tab-tools">
+    <div id="tab-tools-mount">
       <%= render :partial => 'external_tools/external_tools' %>
     </div>
   <% end %>
 
   <% if @context.root_account.feature_enabled?(:lti_apps_page_instructors) && can_do(@context, @current_user, :read_as_admin) && !@context.elementary_homeroom_course? %>
-    <div id="tab-apps"></div>
+    <div id="tab-apps-mount"></div>
   <% end %>
 
   <% if @publishing_enabled && !@context.elementary_homeroom_course? %>
-    <div id="tab-grade-publishing">
+    <div id="tab-grade-publishing-mount">
       <h2><%= t('Grade Syncing') %></h2>
       <%= form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
       <a href="#" id="publish_grades_link" class="btn disabled">...</a>
@@ -989,24 +999,22 @@
   <% end %>
 
   <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) && !@context.elementary_homeroom_course? %>
-    <div id="tab-alerts">
-      <div id="alerts_mount_point"></div> 
+    <div id="tab-alerts-mount">
+      <div id="alerts_mount_point"></div>
     </div>
   <% end %>
 
   <% if can_do(@context, @current_user, :view_feature_flags) && !@context.elementary_homeroom_course? %>
-    <div id="tab-features"></div>
+    <div id="tab-features-mount"></div>
   <% end %>
 
   <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) && !@context.elementary_homeroom_course? %>
-    <div id="tab-integrations"></div>
+    <div id="tab-integrations-mount"></div>
   <% end %>
-
   <% if @context.account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
     <% js_bundle :horizon_toggle %>
   <% end %>
-</div><!-- end course details tab -->
-
+<% end %>
 <% if Account.site_admin.grants_any_right?(@current_user, :manage_courses_admin) %>
   <div id="move_course_dialog" style="display: none;">
     <h2><%= t('headings.move_course', %{Move the course to another root account}) %></h2>
@@ -1038,5 +1046,4 @@
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_url) %>" style="display: none;" id="update_course_url">&nbsp;</a>
-
 </div>

@@ -84,7 +84,7 @@ describe('DirectShareCopyToTray', () => {
     it('handles error when user managed course fetch fails', async () => {
       // Setup mocks
       useManagedCourseSearchApi.mockImplementation(({error}) => {
-        error([{status: 400, body: 'Error fetching data'}])
+        setTimeout(() => error([{status: 400, body: 'Error fetching data'}]), 0)
         return () => {} // Cleanup function
       })
 

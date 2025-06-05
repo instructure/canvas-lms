@@ -23,7 +23,7 @@ import ConnectorIcon from './ConnectorIcon'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {FormField} from '@instructure/ui-form-field'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text as InstText} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -39,7 +39,7 @@ export const itemShape = shape({
 const I18n = createI18nScope('selectPosition')
 
 RenderSelect.propTypes = {
-  label: string.isRequired,
+  label: oneOfType([string, node]).isRequired,
   onChange: func.isRequired,
   options: arrayOf(node),
   className: string,

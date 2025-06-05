@@ -18,20 +18,20 @@
 
 import Module from '../Module'
 import ModuleItemCollection from '../../collections/ModuleItemCollection'
-import sinon from 'sinon'
+import $ from 'jquery'
 
 const ok = value => expect(value).toBeTruthy()
 const equal = (value, expected) => expect(value).toEqual(expected)
 
-let server
-
 describe('Module', () => {
+  let ajaxMock
+
   beforeEach(() => {
-    server = sinon.fakeServer.create()
+    ajaxMock = jest.spyOn($, 'ajax')
   })
 
   afterEach(() => {
-    server.restore()
+    ajaxMock.mockRestore()
   })
 
   test('should build an itemCollection from items', () => {
@@ -44,21 +44,31 @@ describe('Module', () => {
     equal(mod.itemCollection.length, 2, 'incorrect item length')
   })
 
-  test('should build an itemCollection and fetch if items are not passed', function () {
+  test('should build an itemCollection and fetch if items are not passed', async () => {
     const mod = new Module({
       id: 3,
       course_id: 4,
     })
     ok(mod.itemCollection instanceof ModuleItemCollection, 'itemCollection is not built')
-    mod.itemCollection.fetch({
-      success() {
-        equal(mod.itemCollection.length, 1, 'incorrect item length')
-      },
+
+    // Mock the AJAX request
+    ajaxMock.mockImplementation(options => {
+      // Simulate successful response
+      if (options.success) {
+        options.success({id: 2})
+      }
+      return Promise.resolve({id: 2})
     })
-    return server.respond('GET', mod.itemCollection.url(), [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify({id: 2}),
-    ])
+
+    const fetchPromise = new Promise(resolve => {
+      mod.itemCollection.fetch({
+        success() {
+          equal(mod.itemCollection.length, 1, 'incorrect item length')
+          resolve()
+        },
+      })
+    })
+
+    await fetchPromise
   })
 })

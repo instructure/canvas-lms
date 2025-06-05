@@ -17,15 +17,15 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {bool, func, node, oneOfType, string} from 'prop-types'
+import PropTypes, {bool, func, node, oneOfType, string} from 'prop-types'
 import React from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {IconArrowOpenStartSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import {ConnectedGranularCheckbox} from './GranularCheckbox'
-import {ConnectedPermissionButton} from './PermissionButton'
+import GranularCheckbox from './GranularCheckbox'
+import PermissionButton from './PermissionButton'
 import permissionPropTypes from '@canvas/permissions/react/propTypes'
 
 const I18n = createI18nScope('permissions_role_tray_table_row')
@@ -55,6 +55,8 @@ export default function RoleTrayTableRow({
         permissionLabel={permissionLabel}
         roleId={role.id}
         roleLabel={role.label}
+        inTray={true}
+        handleScroll={() => {}}
       />
     )
   } else {
@@ -124,13 +126,13 @@ RoleTrayTableRow.propTypes = {
   permissionLabel: string.isRequired,
   role: permissionPropTypes.role.isRequired,
   title: string.isRequired,
-  permButton: oneOfType([node, func]), // used for tests only
-  permCheckbox: oneOfType([node, func]), // used for tests only
+  permButton: oneOfType([node, func, PropTypes.elementType]), // used for tests only
+  permCheckbox: oneOfType([node, func, PropTypes.elementType]), // used for tests only
 }
 
 RoleTrayTableRow.defaultProps = {
   description: '',
   expandable: false,
-  permButton: ConnectedPermissionButton,
-  permCheckbox: ConnectedGranularCheckbox,
+  permButton: PermissionButton,
+  permCheckbox: GranularCheckbox,
 }

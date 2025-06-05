@@ -415,11 +415,10 @@ class ApplicationController < ActionController::Base
     validate_call_to_action
     new_quizzes_navigation_updates
     create_wiki_page_mastery_path_overrides
-    remove_rce_resize_button
     create_external_apps_side_tray_overrides
-    ams_service
     files_a11y_rewrite_toggle
     files_a11y_rewrite
+    rce_a11y_resize
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -457,6 +456,8 @@ class ApplicationController < ActionController::Base
     course_pace_weighted_assignments
     modules_requirements_allow_percentage
     course_pace_allow_bulk_pace_assign
+    lti_apps_page_ai_translation
+    ams_service
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
@@ -2500,7 +2501,7 @@ class ApplicationController < ActionController::Base
       # i don't know if we really need this but in case these expired tokens are a client caching issue,
       # let's throw an extra param in the fallback so we hopefully don't infinite loop
       fallback_url += (query.present? ? "&" : "?") + "fallback_ts=#{Time.now.to_i}"
-
+      authorization ||= { attachment: } if Account.site_admin.feature_enabled?(:safe_files_token)
       opts = generate_access_verifier(return_url:, fallback_url:, authorization:)
       opts[:verifier] = verifier if verifier.present?
 
@@ -2655,16 +2656,19 @@ class ApplicationController < ActionController::Base
   end
   helper_method :verified_file_download_url
 
-  def user_content(str)
+  # safe_html is used to indicate that the HTML is already safe and should not be escaped,
+  # please also note that if the html has any attachments, safe_html should be set to true!!!
+  # since we neet to process the attachments in the html.
+  def user_content(str, context: @context, user: @current_user, is_public: false, location: nil, safe_html: false)
     return nil unless str
-    return str.html_safe unless str.match?(/object|embed|equation_image/)
+    return str if safe_html
 
-    UserContent.escape(str, request.host_with_port, use_new_math_equation_handling?)
-  end
-  helper_method :user_content
-
-  def public_user_content(str, context: @context, user: @current_user, is_public: false, location: nil)
-    return nil unless str
+    is_course_syllabus = location&.include?("course_syllabus_") && context.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+    render_location_tag = if is_course_syllabus || (location && context.root_account.feature_enabled?(:file_association_access))
+                            location
+                          else
+                            nil
+                          end
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
     file_handler = proc do |match|
@@ -2675,14 +2679,14 @@ class ApplicationController < ActionController::Base
         preloaded_attachments: {},
         in_app: in_app?,
         is_public:,
-        location:
+        location: render_location_tag
       ).processed_url
     end
     rewriter.set_handler("files", &file_handler)
     rewriter.set_handler("media_attachments_iframe", &file_handler)
     UserContent.escape(rewriter.translate_content(str), request.host_with_port, use_new_math_equation_handling?)
   end
-  helper_method :public_user_content
+  helper_method :user_content
 
   def find_bank(id, check_context_chain = true)
     bank = @context.assessment_question_banks.active.where(id:).first || @current_user.assessment_question_banks.active.where(id:).first
@@ -3395,5 +3399,9 @@ class ApplicationController < ActionController::Base
     allowed = allowed_dirs.any? { |base_dir| full_path.ascend.include?(base_dir) }
     reject! "Invalid file path" unless allowed
     send_file(full_path.to_s, options)
+  end
+
+  def inject_ai_feedback_link
+    js_env(AI_FEEDBACK_LINK: Setting.get("ai_feedback_link", "https://inst.bid/ai/feedback"))
   end
 end

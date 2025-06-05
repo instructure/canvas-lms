@@ -17,11 +17,13 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
+import {Provider} from 'react-redux'
 
-import {ROLES} from '../../__tests__/examples'
+import {ROLES, DEFAULT_PROPS} from '../../__tests__/examples'
 import PermissionTray from '../PermissionTray'
 import {ENABLED_FOR_ALL} from '@canvas/permissions/react/propTypes'
+import createStore from '../../store'
 
 const permission = {
   enabled: ENABLED_FOR_ALL,
@@ -44,44 +46,46 @@ function makeDefaultProps() {
   }
 }
 
+function renderWithRedux(
+  subject,
+  {data = DEFAULT_PROPS(), store = createStore(data), ...renderOptions} = {},
+) {
+  const Wrapper = props => <Provider store={store}>{props.children}</Provider>
+  return render(subject, {wrapper: Wrapper, ...renderOptions})
+}
+
 it('renders the label', () => {
   const props = makeDefaultProps()
-  const tree = shallow(<PermissionTray {...props} />)
-  const node = tree.find('Heading')
-  expect(node.exists()).toBeTruthy()
-  expect(node.children().text()).toEqual('Student')
+  const {getByRole} = renderWithRedux(<PermissionTray {...props} />)
+  const heading = getByRole('heading', {name: 'Student'})
+  expect(heading).toBeInTheDocument()
 })
 
 it('renders assigned roles if any are present', () => {
   const props = makeDefaultProps()
   props.unassignedRoles = []
-  const tree = shallow(<PermissionTray {...props} />)
-  const node = tree.find('RoleTrayTable')
-  expect(node.exists()).toBeTruthy()
-  expect(node.props().title).toEqual('Assigned Roles')
+  const {getByText} = renderWithRedux(<PermissionTray {...props} />)
+  expect(getByText('Assigned Roles')).toBeInTheDocument()
 })
 
 it('does not render assigned or unassigned roles if none are present', () => {
   const props = makeDefaultProps()
   props.assignedRoles = []
   props.unassignedRoles = []
-  const tree = shallow(<PermissionTray {...props} />)
-  const node = tree.find('RoleTrayTable')
-  expect(node.exists()).toBeFalsy()
+  const {queryByText} = renderWithRedux(<PermissionTray {...props} />)
+  expect(queryByText('Assigned Roles')).not.toBeInTheDocument()
+  expect(queryByText('Unassigned Roles')).not.toBeInTheDocument()
 })
 
 it('renders unassigned roles if any are present', () => {
   const props = makeDefaultProps()
   props.assignedRoles = []
-  const tree = shallow(<PermissionTray {...props} />)
-  const node = tree.find('RoleTrayTable')
-  expect(node.exists()).toBeTruthy()
-  expect(node.props().title).toEqual('Unassigned Roles')
+  const {getByText} = renderWithRedux(<PermissionTray {...props} />)
+  expect(getByText('Unassigned Roles')).toBeInTheDocument()
 })
 
 it('renders details toggles for permissions if any are present', () => {
   const props = makeDefaultProps()
-  const tree = shallow(<PermissionTray {...props} />)
-  const node = tree.find('PermissionDetailToggles')
-  expect(node.exists()).toBeTruthy()
+  const {getByTitle} = renderWithRedux(<PermissionTray {...props} />)
+  expect(getByTitle('Loading')).toBeInTheDocument()
 })

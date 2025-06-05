@@ -19,12 +19,16 @@
 import React from 'react'
 import {render, act, within} from '@testing-library/react'
 import {Provider} from 'react-redux'
-import sinon from 'sinon'
 
 import * as GradeActions from '../../grades/GradeActions'
 import * as StudentActions from '../../students/StudentActions'
 import GradersTable from '../GradersTable/index'
 import configureStore from '../../configureStore'
+
+jest.mock('../../grades/GradeActions', () => ({
+  ...jest.requireActual('../../grades/GradeActions'),
+  acceptGraderGrades: jest.fn(),
+}))
 
 describe('GradeSummary GradersTable', () => {
   let provisionalGrades
@@ -33,6 +37,7 @@ describe('GradeSummary GradersTable', () => {
   let wrapper
 
   beforeEach(() => {
+    jest.clearAllMocks()
     storeEnv = {
       assignment: {
         courseId: '1201',
@@ -199,11 +204,9 @@ describe('GradeSummary GradersTable', () => {
     })
 
     test('accepts grades for the related grader when clicked', () => {
-      sinon
-        .stub(GradeActions, 'acceptGraderGrades')
-        .callsFake(graderId =>
-          GradeActions.setBulkSelectProvisionalGradesStatus(graderId, GradeActions.STARTED),
-        )
+      GradeActions.acceptGraderGrades.mockImplementation(graderId => dispatch => {
+        dispatch(GradeActions.setBulkSelectProvisionalGradesStatus(graderId, GradeActions.STARTED))
+      })
       mountAndFinishLoading()
       const button = getGraderAcceptGradesButton('1101')
       button.click()

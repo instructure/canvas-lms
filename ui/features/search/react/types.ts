@@ -63,3 +63,10 @@ export type DiscussionTopic = {
   published: boolean
   assignment: Assignment
 }
+
+export type SegmentRecord = {
+  segments: string[]
+  segementIndex: number
+  concentration: number
+  concatSegment: string
+}

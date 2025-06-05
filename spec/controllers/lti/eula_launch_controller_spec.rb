@@ -67,7 +67,10 @@ module Lti
           expect(id_token_decoded["https://purl.imsglobal.org/spec/lti/claim/deployment_id"]).to eq(tool.deployment_id)
           expect(id_token_decoded["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]).to eq(tool.launch_url)
           expect(id_token_decoded["https://purl.imsglobal.org/spec/lti/claim/roles"]).not_to be_nil
-          expect(id_token_decoded["https://purl.imsglobal.org/spec/lti/claim/eulaservice"]["scope"]).to eq(["https://purl.imsglobal.org/spec/lti/scope/eula"])
+          expect(id_token_decoded["https://purl.imsglobal.org/spec/lti/claim/eulaservice"]["scope"]).to eq(
+            ["https://purl.imsglobal.org/spec/lti/scope/eula/user",
+             "https://purl.imsglobal.org/spec/lti/scope/eula/deployment"]
+          )
           expect(id_token_decoded["https://purl.imsglobal.org/spec/lti/claim/eulaservice"]["url"]).to eq(tool.asset_processor_eula_url)
         end
       end

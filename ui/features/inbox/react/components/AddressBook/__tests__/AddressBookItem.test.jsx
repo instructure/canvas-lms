@@ -76,7 +76,7 @@ describe('Address Book Component', () => {
       const mockFunction = jest.fn()
       const {container} = setup({...defaultProps, onSelect: mockFunction})
       fireEvent.mouseDown(container.querySelector('li'))
-      expect(mockFunction.mock.calls.length).toBe(1)
+      expect(mockFunction.mock.calls).toHaveLength(1)
     })
   })
 })

@@ -75,7 +75,7 @@ describe('AssessmentAuditTray Api', () => {
         .respond({status: 200, body: {audit_events: auditEvents, users, tools, quizzes}})
       await loadAssessmentAuditTrail()
       const requests = server.receivedRequests.filter(request => request.url === url)
-      expect(requests.length).toBe(1)
+      expect(requests).toHaveLength(1)
     })
 
     test('sends a GET request', async () => {

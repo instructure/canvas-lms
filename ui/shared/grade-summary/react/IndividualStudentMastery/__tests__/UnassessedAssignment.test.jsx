@@ -17,14 +17,13 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
 import {render} from '@testing-library/react'
 import UnassessedAssignment from '../UnassessedAssignment'
 
 it('properly renders the UnassessedAssignment component', () => {
   const props = {assignment: {id: 1, title: 'example', url: 'www.example.com'}}
-  const wrapper = shallow(<UnassessedAssignment {...props} />)
-  expect(wrapper.html()).toMatch(/example \(not yet assessed\)/i)
+  const {container} = render(<UnassessedAssignment {...props} />)
+  expect(container).toHaveTextContent(/example \(not yet assessed\)/i)
 })
 
 it('properly renders with a quiz icon when submission type is online quiz', () => {
@@ -36,6 +35,6 @@ it('properly renders with a quiz icon when submission type is online quiz', () =
       submission_types: ['online_quiz'],
     },
   }
-  const wrapper = render(<UnassessedAssignment {...props} />)
-  expect(wrapper.container.querySelector('svg[name="IconQuiz"]')).toBeInTheDocument()
+  const {container} = render(<UnassessedAssignment {...props} />)
+  expect(container.querySelector('svg[name="IconQuiz"]')).toBeInTheDocument()
 })

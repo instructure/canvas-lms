@@ -19,7 +19,8 @@
 import UserRestoreModel from '../UserRestore'
 import $ from 'jquery'
 import 'jquery-migrate'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 const userJSON = {
   id: 17,
@@ -30,51 +31,48 @@ const userJSON = {
 let account_id = null
 let user_id = null
 let userRestore = null
-let server = null
-let clock = null
+
+const server = setupServer()
 
 describe('UserRestore', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
+    account_id = null
+    $('#fixtures').empty()
+  })
+  afterAll(() => server.close())
+
   beforeEach(() => {
     account_id = 4
     user_id = 17
     userRestore = new UserRestoreModel({account_id})
-    server = sinon.fakeServer.create()
-    clock = sinon.useFakeTimers()
-    return $('#fixtures').append($('<div id="flash_screenreader_holder" />'))
-  })
-  afterEach(() => {
-    server.restore()
-    clock.restore()
-    account_id = null
-    $('#fixtures').empty()
+    $('#fixtures').append($('<div id="flash_screenreader_holder" />'))
   })
 
   // Describes searching for a user by ID
   test("triggers 'searching' when search is called", function () {
-    const callback = sinon.spy()
+    const callback = jest.fn()
     userRestore.on('searching', callback)
     userRestore.search(account_id)
-    expect(callback.called).toBeTruthy()
+    expect(callback).toHaveBeenCalled()
   })
 
-  test('populates UserRestore model with response, keeping its original account_id', function () {
+  test('populates UserRestore model with response, keeping its original account_id', async function () {
+    server.use(http.get('*/accounts/*/users/*', () => HttpResponse.json(userJSON)))
+
     userRestore.search(user_id)
-    server.respond('GET', userRestore.searchUrl(), [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(userJSON),
-    ])
+    await new Promise(resolve => setTimeout(resolve, 0)) // Wait for async response
+
     expect(userRestore.get('account_id')).toBe(account_id)
     expect(userRestore.get('id')).toBe(userJSON.id)
   })
 
-  test('set status when user not found', function () {
+  test('set status when user not found', async function () {
+    server.use(http.get('*/accounts/*/users/*', () => HttpResponse.json({}, {status: 404})))
+
     userRestore.search('a')
-    server.respond('GET', userRestore.searchUrl(), [
-      404,
-      {'Content-Type': 'application/json'},
-      JSON.stringify({}),
-    ])
+    await new Promise(resolve => setTimeout(resolve, 0)) // Wait for async response
 
     expect(userRestore.get('status')).toBe(404)
   })
@@ -89,20 +87,21 @@ describe('UserRestore', () => {
     expect($.isFunction(dfd.done)).toBeTruthy()
   })
 
-  test('restores a user after search finds a deleted user', function () {
+  test('restores a user after search finds a deleted user', async function () {
+    server.use(
+      http.get('*/accounts/*/users/*', () => HttpResponse.json(userJSON)),
+      http.put('*/api/v1/accounts/*/users/*/restore', () =>
+        HttpResponse.json({...userJSON, login_id: 'du'}),
+      ),
+    )
+
     userRestore.search(user_id)
-    server.respond('GET', userRestore.searchUrl(), [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(userJSON),
-    ])
+    await new Promise(resolve => setTimeout(resolve, 0)) // Wait for search
+
     const dfd = userRestore.restore()
-    server.respond('PUT', `/api/v1/accounts/4/users/17/restore`, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify({...userJSON, login_id: 'du'}),
-    ])
-    expect(dfd.state() === 'resolved').toBeTruthy()
+    await dfd // Wait for restore to complete
+
+    expect(dfd.state()).toBe('resolved')
     expect(userRestore.get('login_id')).toBe('du')
   })
 })

@@ -203,5 +203,39 @@ describe "course copy" do
       new_event = new_course.calendar_events.where(title: "Monday Event").last
       expect(new_event.all_day_date).to eq event.all_day_date + 7.days
     end
+
+    it "new dates are updated when course dates are changed" do
+      course_with_admin_logged_in
+
+      @course.start_at = Time.zone.parse("2012-07-07")
+      @course.conclude_at = Time.zone.parse("2012-07-11")
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      get "/courses/#{@course.id}/copy"
+
+      replace_and_proceed(NewCourseCopyPage.course_start_date_input, "2012-08-05")
+      replace_and_proceed(NewCourseCopyPage.course_end_date_input, "2012-11-15")
+      NewCourseCopyPage.date_adjust_checkbox.click
+
+      expect_new_page_load { NewCourseCopyPage.create_course_button.click }
+      wait_for_ajaximations
+      wait_for_migration_to_complete
+
+      opts = ContentMigration.where(source_course_id: @course.id)
+                             .order(:created_at).last.migration_settings["date_shift_options"]
+
+      expect(opts).not_to be_nil
+      expect(opts["shift_dates"]).to be_truthy
+      expected = {
+        "old_start_date" => "Jul 7, 2012",
+        "old_end_date" => "Jul 11, 2012",
+        "new_start_date" => "Aug 5, 2012",
+        "new_end_date" => "Nov 15, 2012"
+      }
+      expected.each do |k, v|
+        expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
+      end
+    end
   end
 end

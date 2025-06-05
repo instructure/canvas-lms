@@ -33,6 +33,10 @@ module UserContent
         rest.include?("download_frd=1")
       end
 
+      def with_verifier?
+        rest.include?("verifier=")
+      end
+
       def media_iframe_url?
         url.start_with?("/media_attachments_iframe")
       end
@@ -77,7 +81,7 @@ module UserContent
         { only_path: true }.tap do |h|
           h[:download] = 1 if match.download_frd?
           unless attachment.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api)
-            h[:verifier] = attachment.uuid unless (in_app && !is_public) || no_verifiers || location
+            h[:verifier] = attachment.uuid unless (in_app && !is_public && !match.with_verifier?) || no_verifiers || location
           end
           h[:location] = location if location
           if !match.preview? && match.rest.include?("wrap=1")

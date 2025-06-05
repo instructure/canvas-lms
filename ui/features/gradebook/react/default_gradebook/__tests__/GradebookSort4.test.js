@@ -17,11 +17,9 @@
  */
 
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
-import sinon from 'sinon'
 
 describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
   let gradebook
-  let sandbox
   let $fixtures
   let oldEnv
 
@@ -29,7 +27,6 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
     $fixtures = document.createElement('div')
     document.body.appendChild($fixtures)
     setFixtureHtml($fixtures)
-    sandbox = sinon.createSandbox()
     oldEnv = window.ENV
     window.ENV = {
       FEATURES: {instui_nav: true},
@@ -40,7 +37,7 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
       },
     }
     gradebook = createGradebook()
-    sandbox.stub(gradebook, 'arrangeColumnsBy')
+    jest.spyOn(gradebook, 'arrangeColumnsBy').mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -48,7 +45,7 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
       gradebook.destroy && gradebook.destroy()
     }
     $fixtures.remove()
-    sandbox.restore()
+    jest.restoreAllMocks()
     window.ENV = oldEnv
   })
 
@@ -111,55 +108,57 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
 
   test('sets onSortByNameAscending to a function that sorts columns by name ascending', () => {
     getProps().onSortByNameAscending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('name', 'ascending'))
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(...expectedArgs('name', 'ascending'))
   })
 
   test('sets onSortByNameDescending to a function that sorts columns by name descending', () => {
     getProps().onSortByNameDescending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('name', 'descending'))
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(...expectedArgs('name', 'descending'))
   })
 
   test('sets onSortByDueDateAscending to a function that sorts columns by due date ascending', () => {
     getProps().onSortByDueDateAscending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('due_date', 'ascending'))
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(
+      ...expectedArgs('due_date', 'ascending'),
+    )
   })
 
   test('sets onSortByDueDateDescending to a function that sorts columns by due date descending', () => {
     getProps().onSortByDueDateDescending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(
-      expectedArgs('due_date', 'descending'),
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(
+      ...expectedArgs('due_date', 'descending'),
     )
   })
 
   test('sets onSortByPointsAscending to a function that sorts columns by points ascending', () => {
     getProps().onSortByPointsAscending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('points', 'ascending'))
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(...expectedArgs('points', 'ascending'))
   })
 
   test('sets onSortByPointsDescending to a function that sorts columns by points descending', () => {
     getProps().onSortByPointsDescending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('points', 'descending'))
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(...expectedArgs('points', 'descending'))
   })
 
   test('sets onSortByModuleAscending to a function that sorts columns by module position ascending', () => {
     getProps().onSortByModuleAscending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(
-      expectedArgs('module_position', 'ascending'),
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(
+      ...expectedArgs('module_position', 'ascending'),
     )
   })
 
   test('sets onSortByModuleDescending to a function that sorts columns by module position descending', () => {
     getProps().onSortByModuleDescending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(
-      expectedArgs('module_position', 'descending'),
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(
+      ...expectedArgs('module_position', 'descending'),
     )
   })
 })

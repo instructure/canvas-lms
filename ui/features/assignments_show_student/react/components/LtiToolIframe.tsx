@@ -16,47 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
-import {defaultFetchOptions, getPrefetchedXHR} from '@canvas/util/xhr'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {LtiToolIframeProps, LtiConfig} from '../../ltiTool'
-import {getConfigBasedOnToolId} from '../helpers/ltiConfigHelper'
+import {LtiToolIframeProps} from '../../ltiTool'
 
 const I18n = createI18nScope('assignments_2_student_content')
 
 export const LtiToolIframe = ({submission, assignment}: LtiToolIframeProps) => {
-  const [ltiConfig, setLtiConfig] = useState<LtiConfig | null>(null)
   const showTool = ENV.LTI_TOOL === 'true'
   const showSubmissionDetailsLink =
     submission.state === 'graded' && assignment.submissionTypes?.includes('external_tool')
 
-  useEffect(() => {
-    const getLTILaunchConfig = async () => {
-      const definitionUrl = encodeURI(
-        `/api/v1/courses/${ENV.COURSE_ID}/lti_apps/launch_definitions?placements[]=assignment_selection&only_visible=true`,
-      )
-      const response =
-        (await getPrefetchedXHR(definitionUrl)) ||
-        (await fetch(definitionUrl, defaultFetchOptions()))
-      if (response.ok) {
-        const data = await response.json()
-        setLtiConfig(getConfigBasedOnToolId(data))
-      }
-    }
-
-    getLTILaunchConfig()
-  }, [])
-
-  if (!showTool && !showSubmissionDetailsLink && !ltiConfig) {
+  if (!showTool && !showSubmissionDetailsLink) {
     return null
   }
 
   const launchURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/tool_launch`
   const submissionDetailsURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/submissions/${ENV.current_user_id}`
+
+  const style: React.CSSProperties = {}
+  if (ENV.LTI_TOOL_SELECTION_HEIGHT) {
+    style.height = `${ENV.LTI_TOOL_SELECTION_HEIGHT}px`
+  }
+  if (ENV.LTI_TOOL_SELECTION_WIDTH) {
+    style.width = `${ENV.LTI_TOOL_SELECTION_WIDTH}px`
+  }
 
   return (
     <>
@@ -71,14 +58,7 @@ export const LtiToolIframe = ({submission, assignment}: LtiToolIframeProps) => {
         <ToolLaunchIframe
           allow={iframeAllowances()}
           src={launchURL}
-          style={
-            ltiConfig
-              ? {
-                  height: ltiConfig.placements.assignment_selection.selection_height,
-                  width: ltiConfig.placements.assignment_selection.selection_width,
-                }
-              : {}
-          }
+          style={style}
           data-testid="lti-external-tool"
           title={I18n.t('Tool content')}
           allowFullScreen

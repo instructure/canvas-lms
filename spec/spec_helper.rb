@@ -331,8 +331,8 @@ module RenderWithHelpers
 
       controller_class._helper_methods.each do |helper|
         class_eval <<~RUBY, __FILE__, __LINE__ + 1
-          def #{helper}(*args, &block)
-            real_controller.send(:#{helper}, *args, &block)
+          def #{helper}(*args, **kwargs, &block)
+            real_controller.send(:#{helper}, *args, **kwargs, &block)
           end
         RUBY
       end

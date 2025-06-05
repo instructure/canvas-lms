@@ -197,7 +197,7 @@ describe "root account basic settings" do
 
         it "lets a user update what settings they want to use" do
           get account_settings_url
-          f("#tab-integrations-link").click
+          f("#tab-integrations").click
 
           tenant_input_area = fxpath('//input[@placeholder="microsoft_tenant_name.onmicrosoft.com"]')
           set_value(tenant_input_area, tenant)
@@ -231,7 +231,7 @@ describe "root account basic settings" do
           account.save!
 
           get account_settings_url
-          f("#tab-integrations-link").click
+          f("#tab-integrations").click
           f("#microsoft_teams_sync_toggle_button").click
           wait_for_ajaximations
 
@@ -267,7 +267,7 @@ describe "root account basic settings" do
     it "has date pickers for reports tab" do
       course_with_admin_logged_in
       get account_settings_url
-      f("#tab-reports-link").click
+      f("#tab-reports").click
       wait_for_ajax_requests
       f("#configure_zero_activity_csv").click
       expect(modal_body.find('[data-testid="parameters[start_at]"]')).to be_present
@@ -348,7 +348,7 @@ describe "root account basic settings" do
     group_model(context: @course)
     get account_settings_url
 
-    f("#tab-quotas-link").click
+    f("#tab-quotas").click
 
     # update the quotas
     user_quota = account.default_user_storage_quota_mb
@@ -457,6 +457,44 @@ describe "root account basic settings" do
         expect(account.no_enrollments_can_create_courses?).to be_falsey
         expect(account.teachers_can_create_courses_anywhere?).to be_truthy
         expect(account.students_can_create_courses_anywhere?).to be_falsey
+      end
+    end
+  end
+
+  context "Differentiation Tags" do
+    before :once do
+      account_admin_user(active_all: true)
+    end
+
+    before do
+      user_session(@admin)
+    end
+
+    describe "allow_assign_to_differentiation_tags originally enabled" do
+      before do
+        account.enable_feature!(:assign_to_differentiation_tags)
+        account.settings[:allow_assign_to_differentiation_tags] = true
+        account.save!
+        get account_settings_url
+      end
+
+      it "shows warning message when differentiation tags settings is unchecked" do
+        differentiation_checkbox = f("#account_settings_allow_assign_to_differentiation_tags_value")
+        expect(differentiation_checkbox.selected?).to be true
+        scroll_into_view(differentiation_checkbox)
+        differentiation_checkbox.click
+
+        warning_message = f("#differentiation_tags_account_settings_warning_message")
+        description = f("#differentiation_tags_account_settings_description_message")
+        expect(warning_message).to be_displayed
+        expect(description).not_to be_displayed
+      end
+
+      it "shows description message when differentiation tags settings is checked" do
+        differentiation_checkbox = f("#account_settings_allow_assign_to_differentiation_tags_value")
+        expect(differentiation_checkbox.selected?).to be true
+        expect(f("#differentiation_tags_account_settings_warning_message")).not_to be_displayed
+        expect(f("#differentiation_tags_account_settings_description_message")).to be_displayed
       end
     end
   end

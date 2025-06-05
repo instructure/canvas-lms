@@ -329,6 +329,17 @@
         <xs:element name="module_locked" type="xs:boolean" minOccurs="0"/>
         <xs:element name="only_graders_can_rate" type="xs:boolean" minOccurs="0"/>
         <xs:element name="sort_by_rating" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="sort_order" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="asc"/>
+              <xs:enumeration value="desc"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="sort_order_locked" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="expanded" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="expanded_locked" type="xs:boolean" minOccurs="0"/>
         <xs:element name="todo_date" type="optional_dateTime" minOccurs="0"/>
         <xs:element name="publish_at" type="optional_dateTime" minOccurs="0"/>
         <xs:element name="reply_to_entry_required_count" minOccurs="0">
