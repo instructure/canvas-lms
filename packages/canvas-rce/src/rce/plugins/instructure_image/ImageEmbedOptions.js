@@ -69,6 +69,10 @@ function imageSizeFromKnownOptions(imageOptions) {
   return sizeByMaximumDimension[largestDimension] || CUSTOM
 }
 
+function hasHeightAndWidth($element) {
+  return $element.hasAttribute('width') && $element.hasAttribute('height')
+}
+
 function getPercentageUnitsFromAttributes($element) {
   const getAttribute = attribute =>
     $element.hasAttribute(attribute) ? $element.getAttribute(attribute) : $element[attribute]
@@ -88,7 +92,8 @@ export function fromImageEmbed($element) {
     naturalWidth: $element.naturalWidth,
     naturalHeight: $element.naturalHeight,
     appliedPercentage: percentageUnits || 100,
-    usePercentageUnits: !!percentageUnits,
+    // by default use percentage units
+    usePercentageUnits: hasHeightAndWidth($element) ? !!percentageUnits : true,
     altText: altText || '',
     isDecorativeImage: altText !== null && altText.replace(/\s/g, '') === '',
     url: $element.src,

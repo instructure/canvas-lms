@@ -107,8 +107,8 @@ export default function DimensionsInput(props) {
             onChange={handleDimensionTypeChange}
             value={dimensionsState.usePercentageUnits ? 'percentage' : 'pixels'}
           >
-            <RadioInput label={formatMessage('Pixels')} value="pixels" />
             <RadioInput label={formatMessage('Percentage')} value="percentage" />
+            <RadioInput label={formatMessage('Pixels')} value="pixels" />
           </RadioInputGroup>
         )}
       </Flex.Item>
@@ -189,7 +189,7 @@ DimensionsInput.propTypes = {
   minWidth: number.isRequired,
   minPercentage: number.isRequired,
   hidePercentage: bool,
-  dimensionsRef: object
+  dimensionsRef: object,
 }
 
 DimensionsInput.defaultProps = {
