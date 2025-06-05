@@ -16,11 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
 import React from 'react'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 
-export default function SelectMenu(props) {
+interface SelectMenuProps {
+  defaultValue: string
+  disabled: boolean
+  id: string
+  label: string
+  onChange: (event: React.SyntheticEvent, data: {value?: string | number; id?: string}) => void
+  options: Array<Record<string | number, any>>
+  textAttribute: string | number
+  valueAttribute: string | number
+}
+
+export default function SelectMenu(props: SelectMenuProps) {
   const options = props.options.map(option => {
     const text = option[props.textAttribute]
     const value = option[props.valueAttribute]
@@ -44,15 +54,4 @@ export default function SelectMenu(props) {
       {options}
     </SimpleSelect>
   )
-}
-
-SelectMenu.propTypes = {
-  defaultValue: PropTypes.string.isRequired,
-  disabled: PropTypes.bool.isRequired,
-  id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  options: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.array, PropTypes.object])).isRequired,
-  textAttribute: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  valueAttribute: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 }
