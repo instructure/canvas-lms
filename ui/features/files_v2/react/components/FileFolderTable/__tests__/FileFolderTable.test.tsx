@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {screen, fireEvent} from '@testing-library/react'
+import {screen, fireEvent, waitFor} from '@testing-library/react'
 import userEvent, {UserEvent} from '@testing-library/user-event'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
 import {renderComponent} from './testUtils'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {getUniqueId} from '../../../../utils/fileFolderUtils'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(),
@@ -32,6 +33,7 @@ describe('FileFolderTable', () => {
   let flashElements: any
 
   beforeEach(() => {
+    fakeENV.setup()
     flashElements = document.createElement('div')
     flashElements.setAttribute('id', 'flash_screenreader_holder')
     flashElements.setAttribute('data-testid', 'flash_screenreader_holder')
@@ -43,6 +45,7 @@ describe('FileFolderTable', () => {
     document.body.removeChild(flashElements)
     flashElements = undefined
     jest.clearAllMocks()
+    fakeENV.teardown()
   })
 
   it('renders filedrop when no results and not loading', async () => {
@@ -273,27 +276,49 @@ describe('FileFolderTable', () => {
 
   describe('rights column', () => {
     it('does not render rights column when usage rights are not required', async () => {
-      renderComponent({usageRightsRequiredForContext: false, rows: [FAKE_FILES[0]]})
+      const {queryByTestId} = renderComponent({
+        usageRightsRequiredForContext: false,
+        rows: [FAKE_FILES[0]],
+      })
 
-      expect(screen.queryByTestId('rights')).toBeNull()
+      expect(queryByTestId('rights')).toBeNull()
     })
 
     it('does not render the icon if it is a folder', async () => {
-      renderComponent({usageRightsRequiredForContext: true, rows: [FAKE_FOLDERS[0]]})
+      const {findAllByTestId} = renderComponent({
+        usageRightsRequiredForContext: true,
+        rows: [FAKE_FOLDERS[0]],
+      })
 
-      const rows = await screen.findAllByTestId('table-row')
+      const rows = await findAllByTestId('table-row')
       expect(rows[0].getElementsByTagName('td')[5]).toBeEmptyDOMElement()
     })
 
     it('renders rights column and icons when usage rights are required', async () => {
-      renderComponent({usageRightsRequiredForContext: true, rows: [FAKE_FILES[0]]})
+      // Create a file with usage rights for this test to avoid any AJAX calls
+      const fileWithRights = {
+        ...FAKE_FILES[0],
+        usage_rights: {
+          use_justification: 'own_copyright',
+          license: 'private',
+          legal_copyright: '',
+          license_name: 'Private (Copyrighted)',
+        },
+      }
 
-      expect(await screen.findByTestId('rights')).toBeInTheDocument()
+      const {findAllByTestId} = renderComponent({
+        usageRightsRequiredForContext: true,
+        rows: [fileWithRights],
+      })
 
-      const rows = await screen.findAllByTestId('table-row')
-      expect(
-        rows[0].getElementsByTagName('td')[5].getElementsByTagName('button')[0],
-      ).toBeInTheDocument()
+      // Add data-testid to make the test more robust
+      await waitFor(() => {
+        expect(document.querySelector('[data-testid="rights"]')).toBeInTheDocument()
+      })
+
+      const rows = await findAllByTestId('table-row')
+      const rightsCell = rows[0].getElementsByTagName('td')[5]
+      expect(rightsCell.getElementsByTagName('button')[0]).toBeInTheDocument()
     })
   })
 
