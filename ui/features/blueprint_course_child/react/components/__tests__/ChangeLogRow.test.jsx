@@ -52,14 +52,14 @@ describe('ChangeLogRow component', () => {
   })
 
   test('renders the ChangeRow component', () => {
-    const tree = render(<ChangeRow change={getSampleData().history[0].changes[0]} />)
-    const node = tree.container.querySelector('.bcs__history-item__change-log-row')
+    const {container} = render(<ChangeRow change={getSampleData().history[0].changes[0]} />)
+    const node = container.querySelector('.bcs__history-item__change-log-row')
     expect(node).toBeTruthy()
   })
 
   test('renders lock icon when its a ChangeRow component', () => {
-    const tree = render(<ChangeRow change={getSampleData().history[0].changes[0]} />)
-    const node = tree.container.querySelector(
+    const {container} = render(<ChangeRow change={getSampleData().history[0].changes[0]} />)
+    const node = container.querySelector(
       '.bcs__history-item__content .bcs__history-item__lock-icon',
     )
     expect(node).toBeTruthy()
