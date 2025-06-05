@@ -18,7 +18,6 @@
 
 import DownloadSubmissionsDialogManager from '@canvas/grading/DownloadSubmissionsDialogManager'
 import '../index'
-import sinon from 'sinon'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -93,19 +92,16 @@ describe('DownloadSubmissionsDialogManager#isDialogEnabled', () => {
 })
 
 describe('DownloadSubmissionsDialogManager#showDialog', () => {
-  let sandbox
-
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
+    INST.downloadSubmissions = jest.fn()
   })
 
   afterEach(() => {
-    sandbox.restore()
+    delete INST.downloadSubmissions
   })
 
   it('calls submissions downloading callback and opens downloadSubmissions dialog', () => {
-    sandbox.stub(INST, 'downloadSubmissions')
-    const submissionsDownloading = sandbox.stub()
+    const submissionsDownloading = jest.fn()
     const manager = new DownloadSubmissionsDialogManager(
       {
         id: 'the_id',
@@ -117,7 +113,7 @@ describe('DownloadSubmissionsDialogManager#showDialog', () => {
     )
     manager.showDialog()
 
-    expect(submissionsDownloading.calledWith('the_id')).toBe(true)
-    expect(INST.downloadSubmissions.calledWith('the_the_id_url')).toBe(true)
+    expect(submissionsDownloading).toHaveBeenCalledWith('the_id')
+    expect(INST.downloadSubmissions).toHaveBeenCalledWith('the_the_id_url', undefined)
   })
 })
