@@ -32,12 +32,12 @@ import OutcomeKebabMenu from './OutcomeKebabMenu'
 const I18n = createI18nScope('OutcomeManagement')
 
 const OutcomeGroupHeader = ({
-  title,
-  minWidth,
+  title = '',
+  minWidth = 'auto',
   onMenuHandler,
-  canManage,
-  description,
-  hideOutcomesView,
+  canManage = false,
+  description = '',
+  hideOutcomesView = () => {},
 }) => {
   const {isMobileView} = useCanvasContext()
   const hideButtonRef = useRef()
@@ -99,14 +99,6 @@ const OutcomeGroupHeader = ({
       </Flex>
     </View>
   )
-}
-
-OutcomeGroupHeader.defaultProps = {
-  minWidth: 'auto',
-  title: '',
-  description: '',
-  canManage: false,
-  hideOutcomesView: () => {},
 }
 
 OutcomeGroupHeader.propTypes = {
