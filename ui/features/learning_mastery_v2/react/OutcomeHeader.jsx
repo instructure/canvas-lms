@@ -27,7 +27,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {CELL_HEIGHT, COLUMN_WIDTH} from './utils/constants'
-import {outcomeShape} from './shapes'
+import {outcomeShape} from './types/shapes'
 import OutcomeDescriptionModal from './OutcomeDescriptionModal'
 
 const I18n = createI18nScope('learning_mastery_gradebook')

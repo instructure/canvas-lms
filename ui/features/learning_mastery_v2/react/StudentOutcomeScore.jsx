@@ -21,7 +21,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {svgUrl} from './utils/icons'
-import {outcomeShape, outcomeRollupShape} from './shapes'
+import {outcomeShape, outcomeRollupShape} from './types/shapes'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('learning_mastery_gradebook')

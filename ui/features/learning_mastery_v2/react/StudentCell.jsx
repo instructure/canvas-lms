@@ -22,7 +22,7 @@ import {Avatar} from '@instructure/ui-avatar'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {studentShape} from './shapes'
+import {studentShape} from './types/shapes'
 
 const StudentCell = ({courseId, student}) => {
   const student_grades_url = `/courses/${courseId}/grades/${student.id}#tab-outcomes`

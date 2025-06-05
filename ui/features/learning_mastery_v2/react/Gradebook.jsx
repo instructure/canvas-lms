@@ -23,7 +23,7 @@ import StudentCell from './StudentCell'
 import OutcomeHeader from './OutcomeHeader'
 import StudentHeader from './StudentHeader'
 import ScoresGrid from './ScoresGrid'
-import {studentShape, outcomeShape, studentRollupsShape} from './shapes'
+import {studentShape, outcomeShape, studentRollupsShape} from './types/shapes'
 import {
   COLUMN_WIDTH,
   STUDENT_COLUMN_WIDTH,
