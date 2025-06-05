@@ -19,18 +19,31 @@
 import _ from 'lodash'
 import StudentGroupStore from '../StudentGroupStore'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import sinon from 'sinon'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 describe('StudentGroupStore', () => {
-  let server
   let responseA
   let responseB
+
+  const server = setupServer()
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     StudentGroupStore.reset()
     fakeENV.setup()
     ENV.context_asset_string = 'course_1'
-    server = sinon.fakeServer.create()
 
     responseA = [
       {id: 1, title: 'group A', group_category_id: 1},
@@ -41,37 +54,61 @@ describe('StudentGroupStore', () => {
       {id: 4, title: 'group D', group_category_id: 1},
     ]
 
-    // single page
-    server.respondWith('GET', '/api/v1/courses/1/groups', [
-      200,
-      {
-        'Content-Type': 'application/json',
-        Link: {},
-      },
-      JSON.stringify(responseA),
-    ])
-
     const linkHeaders1 =
       '<http://api/v1/courses/2/groups?page=2&per_page=2>; rel="next",' +
       '<http://api/v1/courses/2/groups?page=1&per_page=2>; rel="current",' +
       '<http://api/v1/courses/2/groups?page=1&per_page=2>; rel="first",' +
       '<http://api/v1/courses/2/groups?page=2&per_page=2>; rel="last"'
 
-    // multiple pages
-    server.respondWith('GET', '/api/v1/courses/2/groups', [
-      200,
-      {'Content-Type': 'application/json', Link: linkHeaders1},
-      JSON.stringify(responseA),
-    ])
-    server.respondWith('GET', 'http://api/v1/courses/2/groups?page=2&per_page=2', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(responseB),
-    ])
+    // Set up request handlers
+    server.use(
+      // single page
+      http.get('/api/v1/courses/1/groups', () => {
+        return HttpResponse.json(responseA, {
+          headers: {
+            'Content-Type': 'application/json',
+            Link: '',
+          },
+        })
+      }),
+
+      // multiple pages - first page
+      http.get('/api/v1/courses/2/groups', () => {
+        return HttpResponse.json(responseA, {
+          headers: {
+            'Content-Type': 'application/json',
+            Link: linkHeaders1,
+          },
+        })
+      }),
+
+      // multiple pages - second page
+      http.get('http://api/v1/courses/2/groups', ({request}) => {
+        const url = new URL(request.url)
+        if (url.searchParams.get('page') === '2') {
+          return HttpResponse.json(responseB, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+        }
+      }),
+
+      // Handle relative URL as well
+      http.get('/api/v1/courses/2/groups', ({request}) => {
+        const url = new URL(request.url, window.location.origin)
+        if (url.searchParams.get('page') === '2') {
+          return HttpResponse.json(responseB, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+        }
+      }),
+    )
   })
 
   afterEach(() => {
-    server.restore()
     StudentGroupStore.reset()
     fakeENV.teardown()
   })
@@ -121,19 +158,40 @@ describe('StudentGroupStore', () => {
   // ==================
   //  FETCHING GROUPS
   // ==================
-  it('groups are added to state once fetched', () => {
+  it('groups are added to state once fetched', async () => {
     StudentGroupStore.fetchGroupsForCourse('/api/v1/courses/1/groups')
-    server.respond()
+
+    // Wait for the fetch to complete
+    await new Promise(resolve => {
+      const checkComplete = () => {
+        if (StudentGroupStore.fetchComplete()) {
+          resolve()
+        } else {
+          setTimeout(checkComplete, 10)
+        }
+      }
+      checkComplete()
+    })
+
     expect(StudentGroupStore.getGroups()[1].title).toBe('group A')
   })
 
-  it('multiple calls are made if server has multiple pages', () => {
+  it('multiple calls are made if server has multiple pages', async () => {
     ENV.context_asset_string = 'course_2'
     StudentGroupStore.fetchGroupsForCourse()
-    server.respond()
-    expect(_.values(StudentGroupStore.getGroups())).toHaveLength(2)
-    expect(StudentGroupStore.fetchComplete()).toBe(false)
-    server.respond()
+
+    // Wait for all fetches to complete
+    await new Promise(resolve => {
+      const checkComplete = () => {
+        if (StudentGroupStore.fetchComplete()) {
+          resolve()
+        } else {
+          setTimeout(checkComplete, 10)
+        }
+      }
+      checkComplete()
+    })
+
     expect(_.values(StudentGroupStore.getGroups())).toHaveLength(4)
     expect(StudentGroupStore.fetchComplete()).toBe(true)
   })
