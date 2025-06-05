@@ -23,7 +23,17 @@ import ConfirmCommunicationChannel, {
   type ConfirmCommunicationChannelProps,
 } from '../ConfirmCommunicationChannel'
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+  showFlashError: jest.fn(),
+  showFlashSuccess: jest.fn(),
+  destroyContainer: jest.fn(),
+}))
+
 describe('ConfirmCommunicationChannel', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   const props: ConfirmCommunicationChannelProps = {
     phoneNumberOrEmail: '123-456-7890',
     communicationChannel: {user_id: '1', pseudonym_id: '2', channel_id: '3'},
@@ -41,45 +51,45 @@ describe('ConfirmCommunicationChannel', () => {
   })
 
   it('should show an error is the verification code is empty', async () => {
-    render(<ConfirmCommunicationChannel {...props} />)
-    const confirm = screen.getByLabelText('Confirm')
+    const {getByLabelText, findByText} = render(<ConfirmCommunicationChannel {...props} />)
+    const confirm = getByLabelText('Confirm')
 
     fireEvent.click(confirm)
 
-    const errorText = await screen.findByText('Code is required.')
+    const errorText = await findByText('Code is required.')
     expect(errorText).toBeInTheDocument()
   })
 
   it('should show an error is the verification code is too short', async () => {
-    render(<ConfirmCommunicationChannel {...props} />)
-    const confirm = screen.getByLabelText('Confirm')
-    const code = screen.getByLabelText('Code')
+    const {getByLabelText, findByText} = render(<ConfirmCommunicationChannel {...props} />)
+    const confirm = getByLabelText('Confirm')
+    const code = getByLabelText('Code')
 
     fireEvent.input(code, {target: {value: '1'}})
     fireEvent.click(confirm)
 
-    const errorText = await screen.findByText('Code must be four characters.')
+    const errorText = await findByText('Code must be four characters.')
     expect(errorText).toBeInTheDocument()
   })
 
   it('should show an error is the verification code is too long', async () => {
-    render(<ConfirmCommunicationChannel {...props} />)
-    const confirm = screen.getByLabelText('Confirm')
-    const code = screen.getByLabelText('Code')
+    const {getByLabelText, findByText} = render(<ConfirmCommunicationChannel {...props} />)
+    const confirm = getByLabelText('Confirm')
+    const code = getByLabelText('Code')
 
     fireEvent.input(code, {target: {value: '12345'}})
     fireEvent.click(confirm)
 
-    const errorText = await screen.findByText('Code must be four characters.')
+    const errorText = await findByText('Code must be four characters.')
     expect(errorText).toBeInTheDocument()
   })
 
   it('should call onSubmit after a successful response', async () => {
     const code = '1234'
     fetchMock.post(`/register/${code}`, 200, {overwriteRoutes: true})
-    render(<ConfirmCommunicationChannel {...props} />)
-    const codeInput = screen.getByLabelText('Code')
-    const confirm = screen.getByLabelText('Confirm')
+    const {getByLabelText} = render(<ConfirmCommunicationChannel {...props} />)
+    const codeInput = getByLabelText('Code')
+    const confirm = getByLabelText('Confirm')
 
     fireEvent.input(codeInput, {target: {value: code}})
     fireEvent.click(confirm)
@@ -92,9 +102,9 @@ describe('ConfirmCommunicationChannel', () => {
   it('should call onError after a failed response', async () => {
     const code = '1234'
     fetchMock.post(`/register/${code}`, 500, {overwriteRoutes: true})
-    render(<ConfirmCommunicationChannel {...props} />)
-    const codeInput = screen.getByLabelText('Code')
-    const confirm = screen.getByLabelText('Confirm')
+    const {getByLabelText} = render(<ConfirmCommunicationChannel {...props} />)
+    const codeInput = getByLabelText('Code')
+    const confirm = getByLabelText('Confirm')
 
     fireEvent.input(codeInput, {target: {value: code}})
     fireEvent.click(confirm)
