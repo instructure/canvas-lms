@@ -161,7 +161,7 @@
     "mime": "^4.0.1",
     "minimatch": "~3.0.4",
     "moment": "^2.29.4",
-    "moment-timezone": "^0.5.45",
+    "moment-timezone": "^0.5.48",
     "nanoid": "3.3.8",
     "normalize-scroll-left": "^0.2",
     "page": "^1.11",
