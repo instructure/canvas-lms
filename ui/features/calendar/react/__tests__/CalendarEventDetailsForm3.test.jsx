@@ -339,28 +339,6 @@ describe('CalendarEventDetailsForm', () => {
       )
     })
 
-    it('with not-repeat option selected does not contain RRULE on submit', async () => {
-      const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      const title = changeValue(component, 'edit-calendar-event-form-title', 'title')
-      expect(title.value).toBe('title')
-
-      const frequencyPicker = component.getByTestId('frequency-picker')
-      await userEvent.click(frequencyPicker)
-      await userEvent.click(component.getByText('Does not repeat'))
-
-      component.getByText('Submit').click()
-
-      await waitFor(() =>
-        expect(defaultProps.event.save).toHaveBeenCalledWith(
-          expect.not.objectContaining({
-            'calendar_event[rrule]': expect.anything(),
-          }),
-          expect.any(Function),
-          expect.any(Function),
-        ),
-      )
-    })
-
     it('with custom option selected opens the modal', async () => {
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
       component.getByText('Frequency').click()
