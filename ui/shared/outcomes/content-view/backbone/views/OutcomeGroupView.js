@@ -20,7 +20,7 @@ import OutcomeContentBase from './OutcomeContentBase'
 import outcomeGroupTemplate from '../../jst/outcomeGroup.handlebars'
 import outcomeGroupFormTemplate from '../../jst/outcomeGroupForm.handlebars'
 import {createRoot} from 'react-dom/client'
-import {createElement} from 'react';
+import {createElement} from 'react'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
@@ -52,12 +52,14 @@ export default class OutcomeGroupView extends OutcomeContentBase {
       title: {
         root: (() => {
           const el = this.$('#outcome_group_title_container')[0]
-          if(!el) return null
+          if (!el) return null
           return {rootElement: createRoot(el), initialValue: el.dataset.initialValue}
         })(),
-        render: (errorMessages) => {
+        render: errorMessages => {
           this.instUIInputs.title.root?.rootElement.render(
-            createElement(View, {as: 'div', margin: 'none none small none'},
+            createElement(
+              View,
+              {as: 'div', margin: 'none none small none'},
               createElement(TextInput, {
                 name: 'title',
                 id: 'outcome_group_title',
@@ -65,14 +67,20 @@ export default class OutcomeGroupView extends OutcomeContentBase {
                 defaultValue: this.instUIInputs.title.root?.initialValue,
                 width: '30ch',
                 placeholder: I18n.t('New Outcome Group'),
-                renderLabel: ()=> createElement(Text, { weight: 'normal', size: 'small' }, I18n.t('title', 'Name this group')),
-                messages: errorMessages?.map((m) => ({ text: m.message, type: 'newError' })),
-              })
-            )
+                renderLabel: () =>
+                  createElement(
+                    Text,
+                    {weight: 'normal', size: 'small'},
+                    I18n.t('title', 'Name this group'),
+                  ),
+                messages: errorMessages?.map(m => ({text: m.message, type: 'newError'})),
+                'data-testid': 'outcome-group-title-input',
+              }),
+            ),
           )
         },
         inputElement: () => this.$('#outcome_group_title')[0],
-      }
+      },
     }
 
     this.instUIInputs.title.render()
