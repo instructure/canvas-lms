@@ -18,14 +18,11 @@
 
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import GradebookApi from '../apis/GradebookApi'
-import sinon from 'sinon'
 
 describe('Gradebook#sortGridRows', () => {
   let gradebook
-  let sandbox
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     window.ENV = {
       current_user_id: '1',
       context_id: '1',
@@ -51,13 +48,12 @@ describe('Gradebook#sortGridRows', () => {
       },
     })
     gradebook.gridDisplaySettings.viewUngradedAsZero = false
-    sandbox.stub(gradebook.gradebookGrid, 'updateColumns')
-    sandbox.stub(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders')
-    sandbox.stub(gradebook, 'saveSettings').resolves({})
+    gradebook.gradebookGrid.updateColumns = jest.fn()
+    gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders = jest.fn()
+    gradebook.saveSettings = jest.fn().mockResolvedValue({})
   })
 
   afterEach(() => {
-    sandbox.restore()
     window.ENV = undefined
   })
 
@@ -119,13 +115,12 @@ describe('Gradebook#sortGridRows', () => {
 
   test('updates the column headers after sorting', () => {
     gradebook.sortGridRows()
-    expect(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount).toBe(1)
+    expect(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders).toHaveBeenCalledTimes(1)
   })
 })
 
 describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
   let gradebook
-  let sandbox
   let $fixtures
   let oldEnv
 
@@ -133,7 +128,6 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
     $fixtures = document.createElement('div')
     document.body.appendChild($fixtures)
     setFixtureHtml($fixtures)
-    sandbox = sinon.createSandbox()
     oldEnv = window.ENV
     window.ENV = {
       FEATURES: {instui_nav: true},
@@ -144,16 +138,15 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
       },
     }
     gradebook = createGradebook()
-    sandbox.stub(gradebook, 'arrangeColumnsBy')
-    sandbox.stub(gradebook, 'saveSettings').resolves({})
+    gradebook.arrangeColumnsBy = jest.fn()
+    gradebook.saveSettings = jest.fn().mockResolvedValue({})
   })
 
   afterEach(async () => {
-    if (gradebook) {
-      gradebook.destroy && gradebook.destroy()
+    if (gradebook?.destroy) {
+      gradebook.destroy()
     }
     $fixtures.remove()
-    sandbox.restore()
     window.ENV = oldEnv
     // Wait a tick to let any pending promises settle
     await new Promise(resolve => setTimeout(resolve, 0))
@@ -218,55 +211,57 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
 
   test('sets onSortByNameAscending to a function that sorts columns by name ascending', () => {
     getProps().onSortByNameAscending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('name', 'ascending'))
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(...expectedArgs('name', 'ascending'))
   })
 
   test('sets onSortByNameDescending to a function that sorts columns by name descending', () => {
     getProps().onSortByNameDescending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('name', 'descending'))
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(...expectedArgs('name', 'descending'))
   })
 
   test('sets onSortByDueDateAscending to a function that sorts columns by due date ascending', () => {
     getProps().onSortByDueDateAscending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('due_date', 'ascending'))
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(
+      ...expectedArgs('due_date', 'ascending'),
+    )
   })
 
   test('sets onSortByDueDateDescending to a function that sorts columns by due date descending', () => {
     getProps().onSortByDueDateDescending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(
-      expectedArgs('due_date', 'descending'),
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(
+      ...expectedArgs('due_date', 'descending'),
     )
   })
 
   test('sets onSortByPointsAscending to a function that sorts columns by points ascending', () => {
     getProps().onSortByPointsAscending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('points', 'ascending'))
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(...expectedArgs('points', 'ascending'))
   })
 
   test('sets onSortByPointsDescending to a function that sorts columns by points descending', () => {
     getProps().onSortByPointsDescending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('points', 'descending'))
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(...expectedArgs('points', 'descending'))
   })
 
   test('sets onSortByModuleAscending to a function that sorts columns by module position ascending', () => {
     getProps().onSortByModuleAscending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(
-      expectedArgs('module_position', 'ascending'),
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(
+      ...expectedArgs('module_position', 'ascending'),
     )
   })
 
   test('sets onSortByModuleDescending to a function that sorts columns by module position descending', () => {
     getProps().onSortByModuleDescending()
-    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
-    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(
-      expectedArgs('module_position', 'descending'),
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledTimes(1)
+    expect(gradebook.arrangeColumnsBy).toHaveBeenCalledWith(
+      ...expectedArgs('module_position', 'descending'),
     )
   })
 })
@@ -275,8 +270,6 @@ describe('when enhanced_gradebook_filters is enabled', () => {
   let gradebook
   let errorFn
   let successFn
-  let saveUserSettingsStub
-  let sandbox
   let $fixtures
   let oldEnv
 
@@ -284,7 +277,6 @@ describe('when enhanced_gradebook_filters is enabled', () => {
     $fixtures = document.createElement('div')
     document.body.appendChild($fixtures)
     setFixtureHtml($fixtures)
-    sandbox = sinon.createSandbox()
     oldEnv = window.ENV
     window.ENV = {
       FEATURES: {instui_nav: true},
@@ -308,46 +300,44 @@ describe('when enhanced_gradebook_filters is enabled', () => {
     gradebook.setAssignments({2301: assignment})
     gradebook.setAssignmentsLoaded()
 
-    errorFn = sandbox.stub()
-    successFn = sandbox.stub()
+    errorFn = jest.fn()
+    successFn = jest.fn()
 
-    saveUserSettingsStub = sandbox.stub(GradebookApi, 'saveUserSettings').resolves({})
+    GradebookApi.saveUserSettings = jest.fn().mockResolvedValue({})
   })
 
   afterEach(() => {
-    if (gradebook) {
-      gradebook.destroy && gradebook.destroy()
+    if (gradebook?.destroy) {
+      gradebook.destroy()
     }
     $fixtures.remove()
-    saveUserSettingsStub.restore()
-    sandbox.restore()
     window.ENV = oldEnv
   })
 
   test('calls the provided successFn if the request succeeds', async () => {
-    saveUserSettingsStub.resolves({})
+    GradebookApi.saveUserSettings.mockResolvedValue({})
     await gradebook.saveSettings({}).then(successFn).catch(errorFn)
-    expect(successFn.callCount).toBe(1)
-    expect(errorFn.notCalled).toBeTruthy()
+    expect(successFn).toHaveBeenCalledTimes(1)
+    expect(errorFn).not.toHaveBeenCalled()
   })
 
   test('calls the provided errorFn if the request fails', async () => {
-    saveUserSettingsStub.rejects(new Error(':('))
+    GradebookApi.saveUserSettings.mockRejectedValue(new Error(':('))
     await gradebook.saveSettings({}).then(successFn).catch(errorFn)
-    expect(errorFn.callCount).toBe(1)
-    expect(successFn.notCalled).toBeTruthy()
+    expect(errorFn).toHaveBeenCalledTimes(1)
+    expect(successFn).not.toHaveBeenCalled()
   })
 
   test('just returns if the request succeeds and no successFn is provided', async () => {
     // QUnit.expect(0) is not needed in Jest
-    saveUserSettingsStub.resolves({})
+    GradebookApi.saveUserSettings.mockResolvedValue({})
     await gradebook.saveSettings({})
     // No assertions needed
   })
 
   test('throws an error if the request fails and no errorFn is provided', async () => {
     // QUnit.expect(1) is not needed in Jest
-    saveUserSettingsStub.rejects(new Error('>:('))
+    GradebookApi.saveUserSettings.mockRejectedValue(new Error('>:('))
 
     await expect(gradebook.saveSettings({})).rejects.toThrow('>:(')
   })
