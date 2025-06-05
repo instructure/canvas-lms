@@ -16,20 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Frame, SerializedNodes} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
-import {DummyBlock} from './Blocks/DummyBlock'
-import {TextBlock} from './Blocks/TextBlock'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {TextBlockLayout} from './TextBlockLayout'
+import {TextBlockContent} from './TextBlockContent'
+import {BaseBlock} from '../BaseBlock'
 
-export const PageEditor = (props: {
-  data: SerializedNodes | null
-}) => {
+const I18n = createI18nScope('page_editor')
+
+export const TextBlock = () => {
   return (
-    <>
-      <Editor resolver={{DummyBlock, TextBlock}}>
-        <AddBlock />
-        <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
-      </Editor>
-    </>
+    <BaseBlock title={I18n.t('Text Block')}>
+      <TextBlockLayout content={<TextBlockContent />} />
+    </BaseBlock>
   )
 }

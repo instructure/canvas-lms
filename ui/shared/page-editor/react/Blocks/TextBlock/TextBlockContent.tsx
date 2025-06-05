@@ -16,20 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Frame, SerializedNodes} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
-import {DummyBlock} from './Blocks/DummyBlock'
-import {TextBlock} from './Blocks/TextBlock'
+import {TextBlockEdit} from './TextBlockEdit'
+import {TextBlockPreview} from './TextBlockPreview'
+import {useIsEditMode} from '../BaseBlock'
 
-export const PageEditor = (props: {
-  data: SerializedNodes | null
-}) => {
-  return (
-    <>
-      <Editor resolver={{DummyBlock, TextBlock}}>
-        <AddBlock />
-        <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
-      </Editor>
-    </>
-  )
+export const TextBlockContent = () => {
+  const isEditMode = useIsEditMode()
+  return isEditMode ? <TextBlockEdit /> : <TextBlockPreview />
 }

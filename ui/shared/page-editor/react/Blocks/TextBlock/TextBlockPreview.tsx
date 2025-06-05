@@ -16,20 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Frame, SerializedNodes} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
-import {DummyBlock} from './Blocks/DummyBlock'
-import {TextBlock} from './Blocks/TextBlock'
+import {View} from '@instructure/ui-view'
 
-export const PageEditor = (props: {
-  data: SerializedNodes | null
-}) => {
+export const TextBlockPreview = () => {
   return (
     <>
-      <Editor resolver={{DummyBlock, TextBlock}}>
-        <AddBlock />
-        <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
-      </Editor>
+      <View as="p">Text Block Preview</View>
     </>
   )
 }
