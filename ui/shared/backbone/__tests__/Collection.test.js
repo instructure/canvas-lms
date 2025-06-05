@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import 'jquery-migrate'
 import {Collection, Model} from '..'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 class TestCollection extends Collection {}
 TestCollection.prototype.defaults = {
@@ -32,13 +33,29 @@ TestCollection.optionProperty('foo')
 TestCollection.prototype.url = '/fake'
 TestCollection.prototype.model = Model.extend()
 
+const server = setupServer()
+
 describe('Collection', () => {
+  beforeAll(() => {
+    server.listen({
+      onUnhandledRequest: 'error',
+    })
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
-    jest.spyOn($, 'ajax').mockImplementation(() => Promise.resolve())
+    server.use(
+      http.get('/fake', () => {
+        return HttpResponse.json([])
+      }),
+    )
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    server.resetHandlers()
   })
 
   test('default options', () => {
@@ -55,14 +72,40 @@ describe('Collection', () => {
     expect(collection.foo).toBe('bar')
   })
 
-  test('sends @params in request', () => {
+  test('sends @params in request', async () => {
+    let capturedParams = null
+
+    server.use(
+      http.get('/fake', ({request}) => {
+        const url = new URL(request.url)
+        // Collect all parameters, including arrays
+        capturedParams = {}
+        for (const [key, value] of url.searchParams.entries()) {
+          // Check if it's an array parameter (ends with [])
+          if (key.endsWith('[]')) {
+            const arrayKey = key.slice(0, -2)
+            if (!capturedParams[arrayKey]) {
+              capturedParams[arrayKey] = []
+            }
+            capturedParams[arrayKey].push(value)
+          } else {
+            capturedParams[key] = value
+          }
+        }
+        return HttpResponse.json([])
+      }),
+    )
+
     const collection = new TestCollection()
-    collection.fetch()
-    expect($.ajax.mock.calls[0][0].data).toEqual(collection.options.params)
+    await collection.fetch()
+    expect(capturedParams).toEqual({
+      multi: ['foos', 'bars'],
+      single: '1',
+    })
 
     collection.options.params = {a: 'b', c: ['d']}
-    collection.fetch()
-    expect($.ajax.mock.calls[1][0].data).toEqual(collection.options.params)
+    await collection.fetch()
+    expect(capturedParams).toEqual({a: 'b', c: ['d']})
   })
 
   test('uses conventional default url', () => {

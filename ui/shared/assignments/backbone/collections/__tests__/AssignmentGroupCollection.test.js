@@ -22,7 +22,8 @@ import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/
 import Course from '@canvas/courses/backbone/models/Course'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {saveObservedId} from '@canvas/observer-picker/ObserverGetObservee'
-import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toEqual(y)
@@ -35,7 +36,19 @@ let assignments
 let group
 let collection
 
+const server = setupServer()
+
 describe('AssignmentGroupCollection', () => {
+  beforeAll(() => {
+    server.listen({
+      onUnhandledRequest: 'error',
+    })
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     fakeENV.setup()
     assignments = [1, 2, 3, 4].map(id => new Assignment({id}))
@@ -47,7 +60,7 @@ describe('AssignmentGroupCollection', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    server.resetHandlers()
   })
 
   test('::model is AssignmentGroup', () =>
@@ -72,7 +85,7 @@ describe('AssignmentGroupCollection', () => {
     strictEqual(collection_.course, course, 'assigns course to course')
   })
 
-  test('(#getGrades) loading grades from the server', function () {
+  test('(#getGrades) loading grades from the server', async function () {
     ENV.observed_student_ids = []
     ENV.PERMISSIONS.read_grades = true
     let triggeredChangeForAssignmentWithoutSubmission = false
@@ -82,17 +95,14 @@ describe('AssignmentGroupCollection', () => {
       grade: id,
     }))
 
-    const ajaxSpy = jest.spyOn($, 'ajax').mockImplementation(options => {
-      if (options.url === `${COURSE_SUBMISSIONS_URL}?per_page=50`) {
-        // Simulate successful response
-        const deferred = $.Deferred()
-        setTimeout(() => {
-          options.success(submissions)
-          deferred.resolve(submissions)
-        }, 0)
-        return deferred.promise()
-      }
-    })
+    server.use(
+      http.get(`${COURSE_SUBMISSIONS_URL}`, ({request}) => {
+        const url = new URL(request.url)
+        if (url.searchParams.get('per_page') === '50') {
+          return HttpResponse.json(submissions)
+        }
+      }),
+    )
 
     const lastAssignment = assignments[3]
     lastAssignment.on(
@@ -100,26 +110,20 @@ describe('AssignmentGroupCollection', () => {
       () => (triggeredChangeForAssignmentWithoutSubmission = true),
     )
 
-    collection.getGrades()
+    await collection.getGrades()
 
-    // Wait for the mock to resolve
-    return new Promise(resolve => {
-      setTimeout(() => {
-        for (const assignment of assignments) {
-          if (assignment.get('id') === 4) continue
-          equal(
-            assignment.get('submission').get('grade'),
-            assignment.get('id'),
-            'sets submission grade for assignments with a matching submission',
-          )
-        }
-        ok(
-          triggeredChangeForAssignmentWithoutSubmission,
-          'triggers change for assignments without a matching submission grade so the UI can update',
-        )
-        resolve()
-      }, 10)
-    })
+    for (const assignment of assignments) {
+      if (assignment.get('id') === 4) continue
+      equal(
+        assignment.get('submission').get('grade'),
+        assignment.get('id'),
+        'sets submission grade for assignments with a matching submission',
+      )
+    }
+    ok(
+      triggeredChangeForAssignmentWithoutSubmission,
+      'triggers change for assignments without a matching submission grade so the UI can update',
+    )
   })
 
   test('(#getObservedUserId) when observing a student', function () {
