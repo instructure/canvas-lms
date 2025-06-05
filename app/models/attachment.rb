@@ -1847,7 +1847,13 @@ class Attachment < ActiveRecord::Base
     end
 
     shard.activate do
-      InstFS.delete_file(instfs_uuid) unless Attachment.where(instfs_uuid:).exists?
+      # any linked Canvadoc retains the old instfs_uuid, and deleting it would break re-rendering
+      return if Canvadoc.where(attachment_id: self).exists?
+
+      # double-check that no other attachments are using this instfs_uuid
+      return if Attachment.where(instfs_uuid:).exists?
+
+      InstFS.delete_file(instfs_uuid)
     end
   end
 
