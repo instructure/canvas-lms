@@ -182,7 +182,8 @@ module Lti
         paginated
         .group_by(&:deployment)
         .map do |deployment, context_controls|
-          lti_deployment_json(deployment, @current_user, session, context, context_controls:)
+          context_controls_calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(context_controls)
+          lti_deployment_json(deployment, @current_user, session, context, context_controls:, context_controls_calculated_attrs:)
         end
       )
     rescue => e
@@ -347,9 +348,10 @@ module Lti
       end
 
       controls = Lti::ContextControl.where(id: ids).preload(:account, :course, :created_by, :updated_by).order(id: :asc)
+      calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(controls)
 
       json = controls.map do |control|
-        lti_context_control_json(control, @current_user, session, context, include_users: true)
+        lti_context_control_json(control, @current_user, session, context, include_users: true, calculated_attrs: calculated_attrs[control.id])
       end
 
       render json:, status: :created

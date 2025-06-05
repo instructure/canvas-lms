@@ -655,6 +655,53 @@ describe Lti::ContextControl do
     end
   end
 
+  describe "#subaccount_count" do
+    let(:control) { create! }
+
+    before do
+      3.times do
+        sub = account_model(parent_account: control.account)
+        account_model(parent_account: sub)
+      end
+    end
+
+    it "returns the number of all nested subaccounts" do
+      expect(control.subaccount_count).to eq(6)
+    end
+  end
+
+  describe "#course_count" do
+    let(:control) { create! }
+
+    before do
+      3.times do
+        sub = account_model(parent_account: control.account)
+        course_model(account: control.account)
+        course_model(account: sub)
+      end
+    end
+
+    it "returns the number of all courses in account" do
+      expect(control.course_count).to eq(6)
+    end
+  end
+
+  describe "#child_control_count" do
+    let(:control) { create! }
+
+    before do
+      3.times do
+        sub = account_model(parent_account: control.account)
+        create!(account: sub, deployment: control.deployment)
+        create!(account: nil, course: course_model(account: sub), deployment: control.deployment)
+      end
+    end
+
+    it "returns the number of all nested controls below this context" do
+      expect(control.child_control_count).to eq(6)
+    end
+  end
+
   describe "self.calculate_path_for_course_id" do
     it "returns the correct path" do
       expect(described_class.calculate_path_for_course_id(123, [1, 2, 3]))

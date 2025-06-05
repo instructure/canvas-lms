@@ -207,21 +207,25 @@ RSpec.describe Lti::DeploymentsController do
 
     it "has the expected fields in the results" do
       subject
-      expect(response_json.first).to include(
+      control = deployment.context_controls.first
+      expect(response_json.find { |c| c["id"] == control.id }).to eq(
         {
           account_id: account.id,
           available: true,
-          context_name: an_instance_of(String),
+          child_control_count: control.child_control_count,
+          context_name: control.context_name,
+          course_count: control.course_count,
           course_id: nil,
-          created_at: an_instance_of(String),
+          created_at: control.created_at.iso8601,
           created_by: nil,
           deployment_id: deployment.id,
           depth: 0,
-          display_path: [an_instance_of(String)],
-          id: an_instance_of(Integer),
-          path: an_instance_of(String),
+          display_path: control.path_names,
+          id: control.id,
+          path: control.path,
           registration_id: registration.id,
-          updated_at: an_instance_of(String),
+          subaccount_count: control.subaccount_count,
+          updated_at: control.updated_at.iso8601,
           updated_by: nil,
           workflow_state: "active"
         }.with_indifferent_access
