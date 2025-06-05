@@ -8362,6 +8362,7 @@ hu:
     grading_settings: Osztályzás
     grading_standards: Osztályzás
     groups: Csoportok
+    item_banks: "Item Bankok"
     jobs: Jobok
     jobs_v2: "Jobok v2"
     media: Média
@@ -24466,7 +24467,10 @@ hu:
   text_file_73d8d08c: "Szöveges fájl"
   text_header_48fa9c37: "Szöveges fejléc"
   text_input_d3480b8c: "Szöveges bemenet"
+  text_is_difficult_to_read_without_sufficient_contr_69e62bd6: "A szöveg nehezen olvasható, ha nincs elegendő kontraszt a szöveg és a háttér között, különösen a gyengénlátók számára."
+  text_larger_than_18pt_or_bold_14pt_should_display__5c364db6: "A 18 pt-nél nagyobb (vagy félkövér 14 pt-nél nagyobb) szövegnek legalább 3:1 kontrasztarányt kell megjelenítenie."
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "A szöveg No Question átkerült egy Stimulusba; kérjük, adjon hozzá egy kérdést, hogy megjelenhessen a kvízben."
+  text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b: "A 18 pt-nél kisebb (vagy félkövér 14 pt-nél) szövegek kontrasztaránya legalább 4,5:1 legyen."
   text_sms_4e2d82a7: "Szöveg (SMS)"
   thai_8f9bc548: Thai
   thailand_66_5b3ef324: "Thaiföld (+66)"
