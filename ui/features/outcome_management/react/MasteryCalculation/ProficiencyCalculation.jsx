@@ -272,15 +272,15 @@ const getModalText = contextType => {
 }
 
 const ProficiencyCalculation = ({
-  method,
-  update,
-  updateError,
+  method = defaultProficiencyCalculation,
+  update = () => {},
+  updateError = null,
   canManage,
   onNotifyPendingChanges,
   masteryPoints,
   individualOutcome,
   setError,
-  calcIntInputRef,
+  calcIntInputRef = () => {},
 }) => {
   method = JSON.parse(JSON.stringify(method))
 
@@ -489,13 +489,6 @@ ProficiencyCalculation.propTypes = {
   individualOutcome: PropTypes.oneOf(['display', 'edit']),
   setError: PropTypes.func,
   calcIntInputRef: PropTypes.func,
-}
-
-ProficiencyCalculation.defaultProps = {
-  method: defaultProficiencyCalculation,
-  updateError: null,
-  update: () => {},
-  calcIntInputRef: () => {},
 }
 
 export default ProficiencyCalculation
