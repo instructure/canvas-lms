@@ -17,15 +17,12 @@
  */
 
 import {createGradebook, setFixtureHtml} from '../GradebookSpecHelper'
-import sinon from 'sinon'
 
 describe('Gradebook > Assignment Groups', () => {
   let $container
   let gradebook
-  let sandbox
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     $container = document.body.appendChild(document.createElement('div'))
     setFixtureHtml($container)
   })
@@ -33,7 +30,7 @@ describe('Gradebook > Assignment Groups', () => {
   afterEach(() => {
     gradebook.destroy()
     $container.remove()
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   describe('#updateAssignmentGroups()', () => {
@@ -96,13 +93,13 @@ describe('Gradebook > Assignment Groups', () => {
     })
 
     test('renders the view options menu', () => {
-      sandbox.spy(gradebook, 'renderViewOptionsMenu')
+      const renderViewOptionsMenuSpy = jest.spyOn(gradebook, 'renderViewOptionsMenu')
       gradebook.updateAssignmentGroups(assignmentGroups)
-      expect(gradebook.renderViewOptionsMenu.callCount).toBe(1)
+      expect(renderViewOptionsMenuSpy).toHaveBeenCalledTimes(1)
     })
 
     test('renders the view options menu after storing the assignment groups', () => {
-      sandbox.stub(gradebook, 'renderViewOptionsMenu').callsFake(() => {
+      jest.spyOn(gradebook, 'renderViewOptionsMenu').mockImplementation(() => {
         const storedGroups = gradebook.assignmentGroupList()
         expect(storedGroups).toHaveLength(2)
       })
@@ -110,20 +107,20 @@ describe('Gradebook > Assignment Groups', () => {
     })
 
     test('renders the view options menu after updating the assignment groups loaded status', () => {
-      sandbox.stub(gradebook, 'renderViewOptionsMenu').callsFake(() => {
+      jest.spyOn(gradebook, 'renderViewOptionsMenu').mockImplementation(() => {
         expect(gradebook.contentLoadStates.assignmentGroupsLoaded).toBe(true)
       })
       gradebook.updateAssignmentGroups(assignmentGroups)
     })
 
     test('updates column headers', () => {
-      sandbox.spy(gradebook, 'updateColumnHeaders')
+      const updateColumnHeadersSpy = jest.spyOn(gradebook, 'updateColumnHeaders')
       gradebook.updateAssignmentGroups(assignmentGroups)
-      expect(gradebook.updateColumnHeaders.callCount).toBe(1)
+      expect(updateColumnHeadersSpy).toHaveBeenCalledTimes(1)
     })
 
     test('updates column headers after storing the assignment groups', () => {
-      sandbox.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+      jest.spyOn(gradebook, 'updateColumnHeaders').mockImplementation(() => {
         const storedGroups = gradebook.assignmentGroupList()
         expect(storedGroups).toHaveLength(2)
       })
@@ -131,28 +128,29 @@ describe('Gradebook > Assignment Groups', () => {
     })
 
     test('updates column headers after updating the assignment groups loaded status', () => {
-      sandbox.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+      jest.spyOn(gradebook, 'updateColumnHeaders').mockImplementation(() => {
         expect(gradebook.contentLoadStates.assignmentGroupsLoaded).toBe(true)
       })
       gradebook.updateAssignmentGroups(assignmentGroups)
     })
 
     test('updates essential data load status', () => {
-      sandbox.spy(gradebook, '_updateEssentialDataLoaded')
+      const updateEssentialDataLoadedSpy = jest.spyOn(gradebook, '_updateEssentialDataLoaded')
       gradebook.updateAssignmentGroups(assignmentGroups)
-      expect(gradebook._updateEssentialDataLoaded.callCount).toBe(1)
+      expect(updateEssentialDataLoadedSpy).toHaveBeenCalledTimes(1)
     })
 
     test('updates essential data load status after updating the assignment groups loaded status', () => {
-      sandbox.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
+      jest.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
         expect(gradebook.contentLoadStates.assignmentGroupsLoaded).toBe(true)
       })
       gradebook.updateAssignmentGroups(assignmentGroups)
     })
 
-    test.skip('updates essential data load status after rendering filters', () => {
-      sandbox.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
-        expect(gradebook.updateColumnHeaders.callCount).toBe(1)
+    test('updates essential data load status after rendering filters', () => {
+      const updateColumnHeadersSpy = jest.spyOn(gradebook, 'updateColumnHeaders')
+      jest.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
+        expect(updateColumnHeadersSpy).toHaveBeenCalledTimes(1)
       })
       gradebook.updateAssignmentGroups(assignmentGroups)
     })
