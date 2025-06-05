@@ -16,43 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from 'sinon'
 import ContextGroupCollection from '../ContextGroupCollection'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 
-let collection, sandbox
+let collection
 
 describe('ContextGroupCollection', () => {
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     collection = new ContextGroupCollection()
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
-
-  const setupFetchSpy = () => {
-    return sandbox.spy(PaginatedCollection.prototype, 'fetch')
-  }
 
   test('should add no-cache header when disableCache is true', () => {
     collection.options.disableCache = true
 
-    const fetchSpy = setupFetchSpy()
+    const fetchSpy = jest.spyOn(PaginatedCollection.prototype, 'fetch')
     collection.fetch()
 
-    expect(fetchSpy.called).toBe(true)
-    const callArgs = PaginatedCollection.prototype.fetch.firstCall.args[0]
+    expect(fetchSpy).toHaveBeenCalled()
+    const callArgs = fetchSpy.mock.calls[0][0]
     expect(callArgs.headers['Cache-Control']).toEqual('no-cache')
   })
 
   test('should not add no-cache header when disableCache is not defined', () => {
-    const fetchSpy = setupFetchSpy()
+    const fetchSpy = jest.spyOn(PaginatedCollection.prototype, 'fetch')
     collection.fetch()
 
-    expect(fetchSpy.called).toBe(true)
-    const callArgs = PaginatedCollection.prototype.fetch.firstCall.args[0]
+    expect(fetchSpy).toHaveBeenCalled()
+    const callArgs = fetchSpy.mock.calls[0][0]
     expect(callArgs.headers).toBeUndefined()
   })
 })
