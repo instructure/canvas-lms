@@ -18,6 +18,14 @@
 
 import store from '../AppCenterStore'
 import $ from 'jquery'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const defaultApps = () => [
   {
@@ -105,28 +113,17 @@ const defaultApps = () => [
 
 describe('ExternalApps.AppCenterStore', () => {
   let apps
-  let ajaxSpy
 
   beforeEach(() => {
     store.reset()
     apps = defaultApps()
-
-    // Setup jQuery ajax mock
-    ajaxSpy = jest.spyOn($, 'ajax').mockImplementation(({success}) => {
-      success(apps)
-      return {
-        success: callback => {
-          callback(apps)
-          return {error: () => {}}
-        },
-        error: () => {},
-      }
-    })
+    // Set ENV for the store
+    window.ENV = window.ENV || {}
+    window.ENV.CONTEXT_BASE_URL = '/courses/1'
   })
 
   afterEach(() => {
     store.reset()
-    ajaxSpy.mockRestore()
   })
 
   test('findAppByShortName', () => {
@@ -154,9 +151,23 @@ describe('ExternalApps.AppCenterStore', () => {
     expect(store.filteredApps()).toHaveLength(1)
   })
 
-  test('fetch', async () => {
-    await store.fetch()
-    expect(ajaxSpy).toHaveBeenCalled()
-    expect(store.getState().apps).toHaveLength(3)
+  test('fetch', done => {
+    server.use(
+      http.get('/api/v1/courses/1/app_center/apps', () => {
+        return HttpResponse.json(apps)
+      }),
+      // AppCenterStore also triggers ExternalAppsStore.fetch() in its success handler
+      http.get('/api/v1/courses/1/lti_apps', () => {
+        return HttpResponse.json([])
+      }),
+    )
+
+    store.fetch()
+
+    // Wait for the async operation to complete
+    setTimeout(() => {
+      expect(store.getState().apps).toHaveLength(3)
+      done()
+    }, 100)
   })
 })
