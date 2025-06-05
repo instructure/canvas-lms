@@ -220,7 +220,7 @@ describe Api::V1::PlannerItem do
         expect(json[:plannable][:todo_date]).to eq submission.cached_due_date
       end
 
-      it "includes the submission url" do
+      it "includes the assignment url if the student has not submitted their assignment" do
         submission = @assignment.submit_homework(@student, body: "the stuff")
         assessor_submission = @assignment.find_or_create_submission(@reviewer)
         @peer_review = AssessmentRequest.create!(
@@ -230,14 +230,28 @@ describe Api::V1::PlannerItem do
           user: @student
         )
         json = api.planner_item_json(@peer_review, @reviewer, session)
-        expected_url = "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+        expected_url = "course_assignment_url"
+        expect(json[:html_url]).to eq expected_url
+      end
+
+      it "includes the submission url if the student has submitted their assignment" do
+        assessor_submission = @assignment.submit_homework(@reviewer, body: "reviewer submission")
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        @peer_review = AssessmentRequest.create!(
+          assessor: @reviewer,
+          assessor_asset: assessor_submission,
+          asset: submission,
+          user: @student
+        )
+        json = api.planner_item_json(@peer_review, @reviewer, session)
+        expected_url = "/courses/#{@assignment.course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
         expect(json[:html_url]).to eq expected_url
       end
 
       it "includes the anonymized submission url when anonymous peer reviews" do
         @assignment.update!(anonymous_peer_reviews: true)
+        assessor_submission = @assignment.submit_homework(@reviewer, body: "reviewer submission")
         submission = @assignment.submit_homework(@student, body: "the stuff")
-        assessor_submission = @assignment.find_or_create_submission(@reviewer)
         @peer_review = AssessmentRequest.create!(
           assessor: @reviewer,
           assessor_asset: assessor_submission,
@@ -251,28 +265,21 @@ describe Api::V1::PlannerItem do
 
       context "assignments_2_student feature flag" do
         before do
-          @submission = @assignment.submit_homework(@student, body: "student submission")
-          @assessor_submission = @assignment.find_or_create_submission(@reviewer)
-          @peer_review = AssessmentRequest.create!(
-            assessor: @reviewer,
-            assessor_asset: @assessor_submission,
-            asset: @submission,
-            user: @student
-          )
-        end
-
-        it "returns legacy peer review url when feature flag is disabled" do
-          @course.disable_feature!(:assignments_2_student)
-          json = api.planner_item_json(@peer_review, @reviewer, session)
-          legacy_peer_review_url = "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
-          expect(json[:html_url]).to eq legacy_peer_review_url
+          @course.enable_feature!(:assignments_2_student)
         end
 
         it "returns enhanced peer review url when feature flag is enabled" do
-          @course.enable_feature!(:assignments_2_student)
-          allow(api).to receive(:student_peer_review_url_in_a2_for).with(@course, @assignment, @peer_review).and_return("enhanced_peer_review_url")
+          submission = @assignment.submit_homework(@student, body: "the stuff")
+          assessor_submission = @assignment.find_or_create_submission(@reviewer)
+          @peer_review = AssessmentRequest.create!(
+            assessor: @reviewer,
+            assessor_asset: assessor_submission,
+            asset: submission,
+            user: @student
+          )
           json = api.planner_item_json(@peer_review, @reviewer, session)
-          expect(json[:html_url]).to eq "enhanced_peer_review_url"
+          expected_url = "course_assignment_url"
+          expect(json[:html_url]).to eq expected_url
         end
       end
     end

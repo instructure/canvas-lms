@@ -271,14 +271,20 @@ describe PlannerController do
         @current_user = @student
         reviewee = course_with_student(course: @course, active_all: true).user
         assignment_model(course: @course, peer_reviews: true)
-        submission_model(assignment: @assignment, user: reviewee)
-        assessment_request = @assignment.assign_peer_review(@current_user, reviewee)
+        submission = submission_model(assignment: @assignment, user: reviewee)
+        assessor_submission = @assignment.submit_homework(@current_user, submission_type: "online_text_entry", body: "text")
+        assessment_request = AssessmentRequest.create!(
+          assessor: @current_user,
+          assessor_asset: assessor_submission,
+          asset: submission,
+          user: reviewee
+        )
         get :index
         response_json = json_parse(response.body)
         peer_review = response_json.detect { |i| i["plannable_type"] == "assessment_request" }
         expect(peer_review["plannable"]["id"]).to eq assessment_request.id
         expect(peer_review["plannable"]["title"]).to eq @assignment.title
-        expect(peer_review["html_url"]).to match "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+        expect(peer_review["html_url"]).to match "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{reviewee.id}"
       end
 
       it "shows peer reviews for assignments with no 'everyone' date and no peer review date" do

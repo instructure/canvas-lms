@@ -167,16 +167,16 @@ describe "ToDoListPresenter" do
 
     before do
       course1.offer!
-      assignment = Assignment.create({
-                                       context: course1,
-                                       title: "assignment3",
-                                       submission_types: "online_text_entry",
-                                       due_at: 1.day.from_now,
-                                       peer_reviews: true
-                                     })
-      assignment.publish
-      assignment.assign_peer_review(reviewer, reviewee)
-      assignment.submit_homework(reviewee, body: "you say potato...")
+      @assignment = Assignment.create({
+                                        context: course1,
+                                        title: "assignment3",
+                                        submission_types: "online_text_entry",
+                                        due_at: 1.day.from_now,
+                                        peer_reviews: true
+                                      })
+      @assignment.publish
+      @assignment.assign_peer_review(reviewer, reviewee)
+      @assignment.submit_homework(reviewee, body: "you say potato...")
     end
 
     it "does not blow up" do
@@ -185,21 +185,54 @@ describe "ToDoListPresenter" do
       expect(presenter).not_to be_nil
     end
 
-    it "returns the correct submission_path for peer reviews" do
+    it "returns the assignment path when the assessor has not submitted their assignment" do
       view_stub = double("view")
-      allow(view_stub).to receive(:course_assignment_submission_path).and_return("path/to/submission")
-
-      course1.assignments.last.update({ anonymous_peer_reviews: false })
+      @assignment.update({ anonymous_peer_reviews: false })
       presenter = ToDoListPresenter.new(view_stub, reviewer, [course1])
-
-      expect(presenter.needs_reviewing.last.submission_path).to eq "path/to/submission"
+      expect(presenter.needs_reviewing.last.submission_path).to eq "/courses/#{course1.id}/assignments/#{@assignment.id}?reviewee_id=#{reviewee.id}"
     end
 
-    it "returns the correct submission_path for anonymous peer reviews" do
-      course1.assignments.last.update({ anonymous_peer_reviews: true })
+    it "returns the submission path when the assessor has submitted their assignment" do
+      @assignment.submit_homework(reviewer, body: "you say tomato...")
+      view_stub = double("view")
+      @assignment.update({ anonymous_peer_reviews: false })
+      presenter = ToDoListPresenter.new(view_stub, reviewer, [course1])
+      expect(presenter.needs_reviewing.last.submission_path).to eq "/courses/#{course1.id}/assignments/#{@assignment.id}/submissions/#{reviewee.id}"
+    end
+
+    it "returns the correct assignment path for anonymous peer reviews when the assessor has not submitted their assignment" do
+      @assignment.update({ anonymous_peer_reviews: true })
+      presenter = ToDoListPresenter.new(nil, reviewer, [course1])
+
+      expect(presenter.needs_reviewing.last.submission_path).to include("anonymous_asset_id")
+    end
+
+    it "returns the correct submission path for anonymous peer reviews when the assessor has submitted their assignment" do
+      @assignment.submit_homework(reviewer, body: "you say tomato...")
+      @assignment.update({ anonymous_peer_reviews: true })
       presenter = ToDoListPresenter.new(nil, reviewer, [course1])
 
       expect(presenter.needs_reviewing.last.submission_path).to include("anonymous_submissions")
+    end
+
+    context "Assignment Enhancements FF enabled" do
+      before do
+        course1.enable_feature!(:assignments_2_student)
+      end
+
+      it "returns the correct assignment path with reviewee_id for peer reviews" do
+        view_stub = double("view")
+        course1.assignments.last.update({ anonymous_peer_reviews: false })
+        presenter = ToDoListPresenter.new(view_stub, reviewer, [course1])
+        expect(presenter.needs_reviewing.last.submission_path).to eq "/courses/#{course1.id}/assignments/#{course1.assignments.last.id}?reviewee_id=#{reviewee.id}"
+      end
+
+      it "returns the correct assignment path with anonymous_asset_id for anonymous peer reviews" do
+        course1.assignments.last.update({ anonymous_peer_reviews: true })
+        presenter = ToDoListPresenter.new(nil, reviewer, [course1])
+
+        expect(presenter.needs_reviewing.last.submission_path).to include("anonymous_asset_id")
+      end
     end
   end
 end

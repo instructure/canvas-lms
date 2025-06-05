@@ -41,7 +41,7 @@
       aria-label='<%= title %>'
       tabindex="-1"
       class="for-nvda"
-      href="<%= student_peer_review_url_in_a2_for(@context, assignment, assessment) %>">
+      href="<%= student_peer_review_url(@context, assignment, assessment) %>">
       <%= title %>
     </a>
 
@@ -59,7 +59,7 @@
           <a
             title="<%= title %>"
             class="ig-title title item_link"
-            href="<%= student_peer_review_url_in_a2_for(@context, assignment, assessment) %>"
+            href="<%= student_peer_review_url(@context, assignment, assessment) %>"
           >
             <%= title %>
           </a>

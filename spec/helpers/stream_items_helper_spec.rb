@@ -34,8 +34,22 @@ describe StreamItemsHelper do
     entry.save!
     @announcement = announcement_model
     @assignment = assignment_model(course: @course, peer_reviews: true)
-    @assignment.assign_peer_review(@teacher, @student)
-    @assignment.assign_peer_review(@reviewer_student, @reviewee_student)
+    assessor_submission1 = @assignment.submit_homework(@reviewer_student, body: "submission text")
+    assessor_submission2 = @assignment.submit_homework(@teacher, body: "submission text")
+    submission1 = submission_model(assignment: @assignment, user: @reviewee_student)
+    submission2 = submission_model(assignment: @assignment, user: @student)
+    AssessmentRequest.create!(
+      assessor: @reviewer_student,
+      assessor_asset: assessor_submission1,
+      asset: submission1,
+      user: @reviewee_student
+    )
+    AssessmentRequest.create!(
+      assessor: @teacher,
+      assessor_asset: assessor_submission2,
+      asset: submission2,
+      user: @student
+    )
     # this conversation will not be shown, since the teacher is the last author
     conversation(@another_user, @teacher).conversation.add_message(@teacher, "zomg")
     # whereas this one will be shown
@@ -230,7 +244,7 @@ describe StreamItemsHelper do
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       student = @student
       create_enrollments(@course, [@other_user])
-      assessor_submission = submission_model(assignment: @assignment, user: @other_user)
+      assessor_submission = @assignment.submit_homework(@other_user, body: "submission text")
       assessment_request = AssessmentRequest.create!(
         assessor: @other_user,
         asset: @submission,
