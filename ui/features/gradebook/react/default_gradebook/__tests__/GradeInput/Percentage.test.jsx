@@ -21,7 +21,6 @@ import {render, cleanup, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import GradeInput from '../../components/GradeInput'
 import '@testing-library/jest-dom/extend-expect'
-import sinon from 'sinon'
 
 describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
   let props
@@ -55,7 +54,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       disabled: false,
       enterGradesAs: 'percent',
       gradingScheme,
-      onSubmissionUpdate: sinon.stub(),
+      onSubmissionUpdate: jest.fn(),
       pendingGradeInfo: null,
       submission,
     }
@@ -130,7 +129,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
     })
 
     it('does not call the onSubmissionUpdate prop', () => {
-      expect(props.onSubmissionUpdate.callCount).toBe(0)
+      expect(props.onSubmissionUpdate).not.toHaveBeenCalled()
     })
   })
 
@@ -144,16 +143,18 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
     })
 
     it('calls the onSubmissionUpdate prop', () => {
-      expect(props.onSubmissionUpdate.callCount).toBe(1)
+      expect(props.onSubmissionUpdate).toHaveBeenCalledTimes(1)
     })
 
     it('calls the onSubmissionUpdate prop with the submission', () => {
-      const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
+      const [updatedSubmission] =
+        props.onSubmissionUpdate.mock.calls[props.onSubmissionUpdate.mock.calls.length - 1]
       expect(updatedSubmission).toBe(props.submission)
     })
 
     it('calls the onSubmissionUpdate prop with the current grade info', () => {
-      const [, gradeInfo] = props.onSubmissionUpdate.lastCall.args
+      const [, gradeInfo] =
+        props.onSubmissionUpdate.mock.calls[props.onSubmissionUpdate.mock.calls.length - 1]
       expect(gradeInfo.grade).toBe('98%')
     })
 
@@ -166,7 +167,8 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
         await userEvent.clear(input)
         await userEvent.type(input, '89.1')
         fireEvent.blur(input)
-        gradeInfo = props.onSubmissionUpdate.lastCall.args[1]
+        gradeInfo =
+          props.onSubmissionUpdate.mock.calls[props.onSubmissionUpdate.mock.calls.length - 1][1]
       })
 
       it('calls the onSubmissionUpdate prop with the entered grade', () => {
@@ -191,7 +193,8 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
         await userEvent.clear(input)
         await userEvent.type(input, '89.1%')
         fireEvent.blur(input)
-        gradeInfo = props.onSubmissionUpdate.lastCall.args[1]
+        gradeInfo =
+          props.onSubmissionUpdate.mock.calls[props.onSubmissionUpdate.mock.calls.length - 1][1]
       })
 
       it('calls the onSubmissionUpdate prop with the percent form of the entered grade', () => {
@@ -216,7 +219,8 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
         await userEvent.clear(input)
         await userEvent.type(input, 'B')
         fireEvent.blur(input)
-        gradeInfo = props.onSubmissionUpdate.lastCall.args[1]
+        gradeInfo =
+          props.onSubmissionUpdate.mock.calls[props.onSubmissionUpdate.mock.calls.length - 1][1]
       })
 
       it('calls the onSubmissionUpdate prop with the percent form of the entered grade', () => {
@@ -241,7 +245,8 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
         await userEvent.clear(input)
         await userEvent.type(input, 'EX')
         fireEvent.blur(input)
-        gradeInfo = props.onSubmissionUpdate.lastCall.args[1]
+        gradeInfo =
+          props.onSubmissionUpdate.mock.calls[props.onSubmissionUpdate.mock.calls.length - 1][1]
       })
 
       it('calls the onSubmissionUpdate prop with a null grade form', () => {
@@ -266,7 +271,8 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
         await userEvent.clear(input)
         await userEvent.type(input, 'unknown')
         fireEvent.blur(input)
-        gradeInfo = props.onSubmissionUpdate.lastCall.args[1]
+        gradeInfo =
+          props.onSubmissionUpdate.mock.calls[props.onSubmissionUpdate.mock.calls.length - 1][1]
       })
 
       it('calls the onSubmissionUpdate prop with the grade set to the given value', () => {
@@ -299,7 +305,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
     })
 
     it('does not call the onSubmissionUpdate prop', () => {
-      expect(props.onSubmissionUpdate.callCount).toBe(0)
+      expect(props.onSubmissionUpdate).not.toHaveBeenCalled()
     })
   })
 
