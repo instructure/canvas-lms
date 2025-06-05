@@ -150,7 +150,9 @@ describe('CreateAssignmentView', () => {
     assignment5 = new Assignment(buildAssignment5())
     group = assignmentGroup()
     I18nStubber.pushFrame()
-    fakeENV.setup()
+    fakeENV.setup({
+      SETTINGS: {},
+    })
   })
 
   afterEach(() => {

@@ -155,6 +155,9 @@ const AssignmentTable = ({
       </Table.Head>
       <Table.Body>
         {sortAssignments(assignmentSortBy, assignmentsData?.assignments)
+          ?.filter(
+            assignment => !ENV.SETTINGS.suppress_assignments || !assignment.suppressAssignment,
+          )
           ?.map(assignment => {
             const modifiedAssignment = {
               ...assignment,

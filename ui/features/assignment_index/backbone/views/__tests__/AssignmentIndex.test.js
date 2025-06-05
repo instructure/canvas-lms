@@ -111,6 +111,7 @@ describe('AssignmentIndex', () => {
       PERMISSIONS: {
         manage_assignments_add: true,
       },
+      SETTINGS: {},
     })
   })
 
@@ -163,6 +164,7 @@ describe('AssignmentIndex', () => {
       URLS: {
         assignment_sort_base_url: 'test',
       },
+      SETTINGS: {},
     })
 
     const view = createAssignmentIndex()

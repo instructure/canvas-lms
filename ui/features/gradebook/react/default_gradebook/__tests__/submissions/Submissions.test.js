@@ -27,7 +27,7 @@ describe('Gradebook > Submissions', () => {
   beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
     setFixtureHtml($container)
-
+    window.ENV.SETTINGS = {}
     gradebookOptions = {}
   })
 

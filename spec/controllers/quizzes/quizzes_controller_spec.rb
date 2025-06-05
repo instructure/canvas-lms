@@ -1942,6 +1942,22 @@ describe Quizzes::QuizzesController do
       expect(@quiz.reload.published).to be(false)
     end
 
+    context "when the account has suppress_assignments setting on" do
+      before do
+        account = @course.root_account
+        account.settings[:suppress_assignments] = true
+        account.save
+      end
+
+      it "quiz suppress_assignment false then true" do
+        user_session(@teacher)
+        course_quiz
+        expect(@quiz.assignment.suppress_assignment).to be(false) # default
+        put "update", params: { course_id: @course.id, id: @quiz.id, quiz: { title: "some quiz" }, suppress_assignment: "1" }
+        expect(assigns[:quiz].assignment.suppress_assignment).to be(true)
+      end
+    end
+
     context "post_to_sis" do
       before { @course.enable_feature!(:post_grades) }
 

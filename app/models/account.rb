@@ -339,6 +339,7 @@ class Account < ActiveRecord::Base
   add_setting :show_scheduler, boolean: true, root_only: true, default: false
   add_setting :enable_profiles, boolean: true, root_only: true, default: false
   add_setting :enable_turnitin, boolean: true, default: false
+  add_setting :suppress_assignments, boolean: true, default: false, root_only: true
   add_setting :mfa_settings, root_only: true
   add_setting :mobile_qr_login_is_enabled, boolean: true, root_only: true, default: true
   add_setting :admins_can_change_passwords, boolean: true, root_only: true, default: false

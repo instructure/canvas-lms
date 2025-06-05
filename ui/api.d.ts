@@ -231,6 +231,7 @@ export type Assignment = Readonly<{
   secure_params: string
   sis_assignment_id: null | string
   submission_types: string[]
+  suppress_assignment: boolean
   submissions_download_url: string
   unlock_at: null | string
   unpublishable: boolean

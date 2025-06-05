@@ -151,6 +151,7 @@ describe('EditView', () => {
         can_edit_grades: true,
       },
       context_asset_string: 'course_1',
+      SETTINGS: {},
     }
 
     fetchMock.get('/api/v1/courses/1/settings', {})
@@ -207,6 +208,7 @@ describe('EditView', () => {
           can_edit_grades: true,
         },
         context_asset_string: 'course_1',
+        SETTINGS: {},
       }
     })
 

@@ -192,6 +192,9 @@ describe('EditView#handleModeratedGradingChanged', () => {
       PERMISSIONS: {
         can_edit_grades: true,
       },
+      SETTINGS: {
+        suppress_assignments: false,
+      },
       context_asset_string: 'course_1',
       ASSIGNMENT_GROUPS: [],
       GROUP_CATEGORIES: [],
@@ -294,6 +297,9 @@ describe('EditView#handleMessageEvent', () => {
       PERMISSIONS: {
         can_edit_grades: true,
       },
+      SETTINGS: {
+        suppress_assignments: false,
+      },
       context_asset_string: 'course_1',
       ASSIGNMENT_GROUPS: [],
       GROUP_CATEGORIES: [],
@@ -372,5 +378,63 @@ describe('EditView#handleMessageEvent', () => {
 
     view.handleMessageEvent(messageEvent)
     // Add assertions based on what the handler should do with LtiDeepLinkingResponse
+  })
+})
+
+describe('EditView#handlesuppressFromGradebookChange', () => {
+  let view
+
+  beforeEach(() => {
+    fakeENV.setup({
+      current_user_roles: ['teacher'],
+      COURSE_ID: 1,
+      SETTINGS: {
+        suppress_assignments: true,
+      },
+      PERMISSIONS: {can_edit_grades: true},
+      ASSIGNMENT_GROUPS: [],
+      GROUP_CATEGORIES: [],
+    })
+
+    document.body.innerHTML = `<div id="fixtures"></div>`
+    view = createEditView()
+    view.render()
+
+    view.$suppressAssignment = view.$el.find('#assignment_suppress_from_gradebook')
+
+    $('#fixtures').append(view.$el)
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    document.body.innerHTML = ''
+  })
+
+  it('registers the suppressAssignment element manually', () => {
+    expect(view.$suppressAssignment).toHaveLength(1)
+  })
+
+  it('calls suppressAssignment on the model when checkbox is changed', () => {
+    const spy = jest.spyOn(view.model, 'suppressAssignment').mockImplementation(() => {})
+
+    view.$suppressAssignment = view.$el.find('#assignment_suppress_from_gradebook')
+    expect(view.$suppressAssignment).toHaveLength(1)
+    view.$suppressAssignment.prop('checked', true)
+
+    view.handlesuppressFromGradebookChange()
+
+    expect(spy).toHaveBeenCalledWith(true)
+  })
+
+  it('sets model.suppressAssignment to false when unchecked', () => {
+    const spy = jest.spyOn(view.model, 'suppressAssignment').mockImplementation(() => {})
+
+    view.$suppressAssignment = view.$el.find('#assignment_suppress_from_gradebook')
+    expect(view.$suppressAssignment).toHaveLength(1)
+    view.$suppressAssignment.prop('checked', false)
+
+    view.handlesuppressFromGradebookChange()
+
+    expect(spy).toHaveBeenCalledWith(false)
   })
 })

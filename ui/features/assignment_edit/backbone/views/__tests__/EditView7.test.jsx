@@ -192,6 +192,9 @@ describe('EditView#handleModeratedGradingChanged', () => {
       PERMISSIONS: {
         can_edit_grades: true,
       },
+      SETTINGS: {
+        suppress_assignments: false,
+      },
       context_asset_string: 'course_1',
       ASSIGNMENT_GROUPS: [],
       GROUP_CATEGORIES: [],
@@ -247,6 +250,9 @@ describe('EditView#handleGraderCommentsVisibleToGradersChanged', () => {
       COURSE_ID: 1,
       PERMISSIONS: {
         can_edit_grades: true,
+      },
+      SETTINGS: {
+        suppress_assignments: false,
       },
       context_asset_string: 'course_1',
       ASSIGNMENT_GROUPS: [],
@@ -304,6 +310,9 @@ describe('EditView#uncheckAndHideGraderAnonymousToGraders', () => {
       COURSE_ID: 1,
       PERMISSIONS: {
         can_edit_grades: true,
+      },
+      SETTINGS: {
+        suppress_assignments: false,
       },
       context_asset_string: 'course_1',
       ASSIGNMENT_GROUPS: [],
@@ -382,6 +391,9 @@ describe('EditView student annotation submission', () => {
       COURSE_ID: 1,
       PERMISSIONS: {
         can_edit_grades: true,
+      },
+      SETTINGS: {
+        suppress_assignments: false,
       },
       context_asset_string: 'course_1',
       ASSIGNMENT_GROUPS: [],

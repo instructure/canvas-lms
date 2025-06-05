@@ -89,8 +89,9 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
         gradebook_is_editable: true,
       },
       enhanced_gradebook_filters: true,
-      settings: {
+      SETTINGS: {
         show_unpublished_assignments: false,
+        suppress_assignments: false,
       },
       view_ungraded_as_zero: false,
     }

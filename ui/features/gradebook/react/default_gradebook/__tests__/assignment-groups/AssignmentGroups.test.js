@@ -25,6 +25,7 @@ describe('Gradebook > Assignment Groups', () => {
   beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
     setFixtureHtml($container)
+    ENV.SETTINGS = {}
   })
 
   afterEach(() => {

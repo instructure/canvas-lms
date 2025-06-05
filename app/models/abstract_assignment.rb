@@ -714,6 +714,10 @@ class AbstractAssignment < ActiveRecord::Base
     title
   end
 
+  def suppress!
+    update(suppress_assignment: true)
+  end
+
   def name=(val)
     self.title = val
   end
@@ -3190,6 +3194,8 @@ class AbstractAssignment < ActiveRecord::Base
   scope :by_assignment_group_id, lambda { |group_id|
     where(assignment_group_id: group_id.to_s)
   }
+
+  scope :without_suppressed_assignments, -> { where(suppress_assignment: false) }
 
   # assignments only ever belong to courses, so we can reduce this to just IDs to simplify the db query
   scope :for_context_codes, lambda { |codes|
